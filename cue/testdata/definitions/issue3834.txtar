@@ -1,0 +1,807 @@
+-- in.cue --
+// expose at top level
+X: {
+	_a: foo: true
+	_a: _ | close({y!: z?: _})
+	_b: _a & {y: {}}
+	concrete: _b.y
+	isTrue: concrete != _|_
+}
+{X}
+
+sub: t1: {
+	X: {
+		_a: foo: true
+		_a: _ | close({y!: z?: _})
+		_b: _a & {y: {}}
+		concrete: _b.y
+	}
+	{X}
+}
+sub: t2: {
+	X: {
+		_a: foo: true
+		_a: _ | close({y!: z?: _})
+		_b: _a & {y: {}}
+		concrete: _b.y
+	}
+	X
+}
+sub: t3: {
+	#X: {
+		_a: foo: true
+		_a: _ | close({y!: z?: _})
+		_b: _a & {y: {}}
+		concrete: _b.y
+	}
+	{#X}
+}
+sub: t4: {
+	#X: {
+		_a: foo: true
+		_a: _ | close({y!: z?: _})
+		_b: _a & {y: {}}
+		concrete: _b.y
+	}
+	#X
+}
+
+full: {
+	#Foo: {
+		_data: Foo: true
+		_data: _ | close({Extra!: optional?: _})
+
+		_dataWithExtra: _data & {Extra: {}}
+
+		out: _dataWithExtra.Extra != _|_
+	}
+
+	{#Foo}
+}
+-- out/eval/stats --
+Leaks:  24
+Freed:  207
+Reused: 200
+Allocs: 31
+Retain: 30
+
+Unifications: 183
+Conjuncts:    344
+Disjuncts:    237
+-- out/evalalpha --
+(struct){
+  X: (struct){
+    _a: (struct){
+      foo: (bool){ true }
+    }
+    _b: (struct){
+      y: (struct){
+      }
+      foo: (bool){ true }
+    }
+    concrete: (struct){
+    }
+    isTrue: (bool){ true }
+  }
+  sub: (struct){
+    t1: (struct){
+      X: (struct){
+        _a: (struct){
+          foo: (bool){ true }
+        }
+        _b: (struct){
+          y: (struct){
+          }
+          foo: (bool){ true }
+        }
+        concrete: (struct){
+        }
+      }
+      _a: (struct){
+        foo: (bool){ true }
+      }
+      _b: (struct){
+        y: (struct){
+        }
+        foo: (bool){ true }
+      }
+      concrete: (struct){
+      }
+    }
+    t2: (struct){
+      X: (struct){
+        _a: (struct){
+          foo: (bool){ true }
+        }
+        _b: (struct){
+          y: (struct){
+          }
+          foo: (bool){ true }
+        }
+        concrete: (struct){
+        }
+      }
+      _a: (struct){ |((struct){
+          foo: (bool){ true }
+        }, (#struct){
+          foo: (bool){ true }
+          y!: (struct){
+            z?: (_){ _ }
+          }
+        }) }
+      _b: (struct){ |((struct){
+          y: (struct){
+          }
+          foo: (bool){ true }
+        }, (#struct){
+          y: (struct){
+            z?: (_){ _ }
+          }
+          foo: (bool){ true }
+        }) }
+      concrete: (_|_){
+        // [incomplete] sub.t2.concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
+        //     ./in.cue:25:13
+      }
+    }
+    t3: (#struct){
+      #X: (#struct){
+        _a: (#struct){
+          foo: (bool){ true }
+        }
+        _b: (#struct){
+          y: (#struct){
+          }
+          foo: (bool){ true }
+        }
+        concrete: (#struct){
+        }
+      }
+      _a: (#struct){ |((#struct){
+          foo: (bool){ true }
+        }, (#struct){
+          foo: (bool){ true }
+          y!: (#struct){
+            z?: (_){ _ }
+          }
+        }) }
+      _b: (#struct){ |((#struct){
+          y: (#struct){
+          }
+          foo: (bool){ true }
+        }, (#struct){
+          y: (#struct){
+            z?: (_){ _ }
+          }
+          foo: (bool){ true }
+        }) }
+      concrete: (_|_){
+        // [incomplete] sub.t3.concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
+        //     ./in.cue:34:13
+      }
+    }
+    t4: (#struct){
+      #X: (#struct){
+        _a: (#struct){
+          foo: (bool){ true }
+        }
+        _b: (#struct){
+          y: (#struct){
+          }
+          foo: (bool){ true }
+        }
+        concrete: (#struct){
+        }
+      }
+      _a: (#struct){ |((#struct){
+          foo: (bool){ true }
+        }, (#struct){
+          foo: (bool){ true }
+          y!: (#struct){
+            z?: (_){ _ }
+          }
+        }) }
+      _b: (#struct){ |((#struct){
+          y: (#struct){
+          }
+          foo: (bool){ true }
+        }, (#struct){
+          y: (#struct){
+            z?: (_){ _ }
+          }
+          foo: (bool){ true }
+        }) }
+      concrete: (_|_){
+        // [incomplete] sub.t4.concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
+        //     ./in.cue:43:13
+      }
+    }
+  }
+  full: (#struct){
+    #Foo: (#struct){
+      _data: (#struct){
+        Foo: (bool){ true }
+      }
+      _dataWithExtra: (#struct){
+        Extra: (#struct){
+        }
+        Foo: (bool){ true }
+      }
+      out: (bool){ true }
+    }
+    _data: (#struct){ |((#struct){
+        Foo: (bool){ true }
+      }, (#struct){
+        Foo: (bool){ true }
+        Extra!: (#struct){
+          optional?: (_){ _ }
+        }
+      }) }
+    _dataWithExtra: (#struct){ |((#struct){
+        Extra: (#struct){
+        }
+        Foo: (bool){ true }
+      }, (#struct){
+        Extra: (#struct){
+          optional?: (_){ _ }
+        }
+        Foo: (bool){ true }
+      }) }
+    out: (bool){ false }
+  }
+  _a: (struct){
+    foo: (bool){ true }
+  }
+  _b: (struct){
+    y: (struct){
+    }
+    foo: (bool){ true }
+  }
+  concrete: (struct){
+  }
+  isTrue: (bool){ true }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -4,25 +4,14 @@
+       foo: (bool){ true }
+     }
+     _b: (struct){
+-      foo: (bool){ true }
+       y: (struct){
+       }
++      foo: (bool){ true }
+     }
+     concrete: (struct){
+     }
+     isTrue: (bool){ true }
+   }
+-  _a: (struct){
+-    foo: (bool){ true }
+-  }
+-  _b: (struct){
+-    foo: (bool){ true }
+-    y: (struct){
+-    }
+-  }
+-  concrete: (struct){
+-  }
+-  isTrue: (bool){ true }
+   sub: (struct){
+     t1: (struct){
+       X: (struct){
+@@ -30,20 +19,20 @@
+           foo: (bool){ true }
+         }
+         _b: (struct){
+-          foo: (bool){ true }
+-          y: (struct){
+-          }
+-        }
+-        concrete: (struct){
+-        }
+-      }
+-      _a: (struct){
+-        foo: (bool){ true }
+-      }
+-      _b: (struct){
+-        foo: (bool){ true }
+-        y: (struct){
+-        }
++          y: (struct){
++          }
++          foo: (bool){ true }
++        }
++        concrete: (struct){
++        }
++      }
++      _a: (struct){
++        foo: (bool){ true }
++      }
++      _b: (struct){
++        y: (struct){
++        }
++        foo: (bool){ true }
+       }
+       concrete: (struct){
+       }
+@@ -54,22 +43,34 @@
+           foo: (bool){ true }
+         }
+         _b: (struct){
+-          foo: (bool){ true }
+-          y: (struct){
+-          }
+-        }
+-        concrete: (struct){
+-        }
+-      }
+-      _a: (struct){
+-        foo: (bool){ true }
+-      }
+-      _b: (struct){
+-        foo: (bool){ true }
+-        y: (struct){
+-        }
+-      }
+-      concrete: (struct){
++          y: (struct){
++          }
++          foo: (bool){ true }
++        }
++        concrete: (struct){
++        }
++      }
++      _a: (struct){ |((struct){
++          foo: (bool){ true }
++        }, (#struct){
++          foo: (bool){ true }
++          y!: (struct){
++            z?: (_){ _ }
++          }
++        }) }
++      _b: (struct){ |((struct){
++          y: (struct){
++          }
++          foo: (bool){ true }
++        }, (#struct){
++          y: (struct){
++            z?: (_){ _ }
++          }
++          foo: (bool){ true }
++        }) }
++      concrete: (_|_){
++        // [incomplete] sub.t2.concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
++        //     ./in.cue:25:13
+       }
+     }
+     t3: (#struct){
+@@ -78,22 +79,34 @@
+           foo: (bool){ true }
+         }
+         _b: (#struct){
+-          foo: (bool){ true }
+-          y: (#struct){
+-          }
+-        }
+-        concrete: (#struct){
+-        }
+-      }
+-      _a: (#struct){
+-        foo: (bool){ true }
+-      }
+-      _b: (#struct){
+-        foo: (bool){ true }
+-        y: (#struct){
+-        }
+-      }
+-      concrete: (#struct){
++          y: (#struct){
++          }
++          foo: (bool){ true }
++        }
++        concrete: (#struct){
++        }
++      }
++      _a: (#struct){ |((#struct){
++          foo: (bool){ true }
++        }, (#struct){
++          foo: (bool){ true }
++          y!: (#struct){
++            z?: (_){ _ }
++          }
++        }) }
++      _b: (#struct){ |((#struct){
++          y: (#struct){
++          }
++          foo: (bool){ true }
++        }, (#struct){
++          y: (#struct){
++            z?: (_){ _ }
++          }
++          foo: (bool){ true }
++        }) }
++      concrete: (_|_){
++        // [incomplete] sub.t3.concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
++        //     ./in.cue:34:13
+       }
+     }
+     t4: (#struct){
+@@ -102,22 +115,34 @@
+           foo: (bool){ true }
+         }
+         _b: (#struct){
+-          foo: (bool){ true }
+-          y: (#struct){
+-          }
+-        }
+-        concrete: (#struct){
+-        }
+-      }
+-      _a: (#struct){
+-        foo: (bool){ true }
+-      }
+-      _b: (#struct){
+-        foo: (bool){ true }
+-        y: (#struct){
+-        }
+-      }
+-      concrete: (#struct){
++          y: (#struct){
++          }
++          foo: (bool){ true }
++        }
++        concrete: (#struct){
++        }
++      }
++      _a: (#struct){ |((#struct){
++          foo: (bool){ true }
++        }, (#struct){
++          foo: (bool){ true }
++          y!: (#struct){
++            z?: (_){ _ }
++          }
++        }) }
++      _b: (#struct){ |((#struct){
++          y: (#struct){
++          }
++          foo: (bool){ true }
++        }, (#struct){
++          y: (#struct){
++            z?: (_){ _ }
++          }
++          foo: (bool){ true }
++        }) }
++      concrete: (_|_){
++        // [incomplete] sub.t4.concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
++        //     ./in.cue:43:13
+       }
+     }
+   }
+@@ -127,20 +152,41 @@
+         Foo: (bool){ true }
+       }
+       _dataWithExtra: (#struct){
+-        Foo: (bool){ true }
+-        Extra: (#struct){
+-        }
++        Extra: (#struct){
++        }
++        Foo: (bool){ true }
+       }
+       out: (bool){ true }
+     }
+-    _data: (#struct){
+-      Foo: (bool){ true }
+-    }
+-    _dataWithExtra: (#struct){
+-      Foo: (bool){ true }
+-      Extra: (#struct){
+-      }
+-    }
+-    out: (bool){ true }
+-  }
++    _data: (#struct){ |((#struct){
++        Foo: (bool){ true }
++      }, (#struct){
++        Foo: (bool){ true }
++        Extra!: (#struct){
++          optional?: (_){ _ }
++        }
++      }) }
++    _dataWithExtra: (#struct){ |((#struct){
++        Extra: (#struct){
++        }
++        Foo: (bool){ true }
++      }, (#struct){
++        Extra: (#struct){
++          optional?: (_){ _ }
++        }
++        Foo: (bool){ true }
++      }) }
++    out: (bool){ false }
++  }
++  _a: (struct){
++    foo: (bool){ true }
++  }
++  _b: (struct){
++    y: (struct){
++    }
++    foo: (bool){ true }
++  }
++  concrete: (struct){
++  }
++  isTrue: (bool){ true }
+ }
+-- diff/todo/p1 --
+*.concrete: several fields where there is still an disjunction
+-- out/eval --
+(struct){
+  X: (struct){
+    _a: (struct){
+      foo: (bool){ true }
+    }
+    _b: (struct){
+      foo: (bool){ true }
+      y: (struct){
+      }
+    }
+    concrete: (struct){
+    }
+    isTrue: (bool){ true }
+  }
+  _a: (struct){
+    foo: (bool){ true }
+  }
+  _b: (struct){
+    foo: (bool){ true }
+    y: (struct){
+    }
+  }
+  concrete: (struct){
+  }
+  isTrue: (bool){ true }
+  sub: (struct){
+    t1: (struct){
+      X: (struct){
+        _a: (struct){
+          foo: (bool){ true }
+        }
+        _b: (struct){
+          foo: (bool){ true }
+          y: (struct){
+          }
+        }
+        concrete: (struct){
+        }
+      }
+      _a: (struct){
+        foo: (bool){ true }
+      }
+      _b: (struct){
+        foo: (bool){ true }
+        y: (struct){
+        }
+      }
+      concrete: (struct){
+      }
+    }
+    t2: (struct){
+      X: (struct){
+        _a: (struct){
+          foo: (bool){ true }
+        }
+        _b: (struct){
+          foo: (bool){ true }
+          y: (struct){
+          }
+        }
+        concrete: (struct){
+        }
+      }
+      _a: (struct){
+        foo: (bool){ true }
+      }
+      _b: (struct){
+        foo: (bool){ true }
+        y: (struct){
+        }
+      }
+      concrete: (struct){
+      }
+    }
+    t3: (#struct){
+      #X: (#struct){
+        _a: (#struct){
+          foo: (bool){ true }
+        }
+        _b: (#struct){
+          foo: (bool){ true }
+          y: (#struct){
+          }
+        }
+        concrete: (#struct){
+        }
+      }
+      _a: (#struct){
+        foo: (bool){ true }
+      }
+      _b: (#struct){
+        foo: (bool){ true }
+        y: (#struct){
+        }
+      }
+      concrete: (#struct){
+      }
+    }
+    t4: (#struct){
+      #X: (#struct){
+        _a: (#struct){
+          foo: (bool){ true }
+        }
+        _b: (#struct){
+          foo: (bool){ true }
+          y: (#struct){
+          }
+        }
+        concrete: (#struct){
+        }
+      }
+      _a: (#struct){
+        foo: (bool){ true }
+      }
+      _b: (#struct){
+        foo: (bool){ true }
+        y: (#struct){
+        }
+      }
+      concrete: (#struct){
+      }
+    }
+  }
+  full: (#struct){
+    #Foo: (#struct){
+      _data: (#struct){
+        Foo: (bool){ true }
+      }
+      _dataWithExtra: (#struct){
+        Foo: (bool){ true }
+        Extra: (#struct){
+        }
+      }
+      out: (bool){ true }
+    }
+    _data: (#struct){
+      Foo: (bool){ true }
+    }
+    _dataWithExtra: (#struct){
+      Foo: (bool){ true }
+      Extra: (#struct){
+      }
+    }
+    out: (bool){ true }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  X: {
+    _a: {
+      foo: true
+    }
+    _a: (_|close({
+      y!: {
+        z?: _
+      }
+    }))
+    _b: (〈0;_a〉 & {
+      y: {}
+    })
+    concrete: 〈0;_b〉.y
+    isTrue: (〈0;concrete〉 != _|_(explicit error (_|_ literal) in source))
+  }
+  {
+    〈1;X〉
+  }
+  sub: {
+    t1: {
+      X: {
+        _a: {
+          foo: true
+        }
+        _a: (_|close({
+          y!: {
+            z?: _
+          }
+        }))
+        _b: (〈0;_a〉 & {
+          y: {}
+        })
+        concrete: 〈0;_b〉.y
+      }
+      {
+        〈1;X〉
+      }
+    }
+  }
+  sub: {
+    t2: {
+      X: {
+        _a: {
+          foo: true
+        }
+        _a: (_|close({
+          y!: {
+            z?: _
+          }
+        }))
+        _b: (〈0;_a〉 & {
+          y: {}
+        })
+        concrete: 〈0;_b〉.y
+      }
+      〈0;X〉
+    }
+  }
+  sub: {
+    t3: {
+      #X: {
+        _a: {
+          foo: true
+        }
+        _a: (_|close({
+          y!: {
+            z?: _
+          }
+        }))
+        _b: (〈0;_a〉 & {
+          y: {}
+        })
+        concrete: 〈0;_b〉.y
+      }
+      {
+        〈1;#X〉
+      }
+    }
+  }
+  sub: {
+    t4: {
+      #X: {
+        _a: {
+          foo: true
+        }
+        _a: (_|close({
+          y!: {
+            z?: _
+          }
+        }))
+        _b: (〈0;_a〉 & {
+          y: {}
+        })
+        concrete: 〈0;_b〉.y
+      }
+      〈0;#X〉
+    }
+  }
+  full: {
+    #Foo: {
+      _data: {
+        Foo: true
+      }
+      _data: (_|close({
+        Extra!: {
+          optional?: _
+        }
+      }))
+      _dataWithExtra: (〈0;_data〉 & {
+        Extra: {}
+      })
+      out: (〈0;_dataWithExtra〉.Extra != _|_(explicit error (_|_ literal) in source))
+    }
+    {
+      〈1;#Foo〉
+    }
+  }
+}

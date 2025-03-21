@@ -30,20 +30,31 @@ func IsPackage(s string) bool {
 		return false
 	}
 
-	// This goes off the assumption that file names may not have a `:` in their
-	// name in cue.
-	// A filename must have an extension or be preceded by a qualifier argument.
-	// So strings of the form foo/bar:baz, where bar is a valid identifier and
-	// absolute package
-	if p := strings.LastIndexByte(s, ':'); p > 0 {
-		if !ast.IsValidIdent(s[p+1:]) {
+	ip := ast.ParseImportPath(s)
+	if ip.ExplicitQualifier {
+		if !ast.IsValidIdent(ip.Qualifier) || strings.Contains(ip.Path, ":") || ip.Path == "-" {
+			// TODO potentially widen the scope of "file-like"
+			// paths here to include more invalid package paths?
 			return false
 		}
-		// For a non-pkg, the part before : may only be lowercase and '+'.
-		// In addition, a package necessarily must have a slash of some form.
-		return strings.ContainsAny(s[:p], `/.\`)
+		// If it's got an explicit qualifier, the path has a colon in
+		// which isn't generally allowed in CUE file names.
+		return true
+	}
+	if ip.Version != "" {
+		if strings.Contains(ip.Version, "/") {
+			// We'll definitely not allow slashes in the version string
+			// so treat it as a file name.
+			return false
+		}
+		// Looks like an explicit version suffix.
+		// Deliberately leave the syntax fairly open so that
+		// we get reasonable error messages when invalid version
+		// queries are specified.
+		return true
 	}
 
+	// No version and no qualifier.
 	// Assuming we terminate search for packages once a scoped qualifier is
 	// found, we know that any file without an extension (except maybe '-')
 	// is invalid. We can therefore assume it is a package.

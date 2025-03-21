@@ -193,7 +193,7 @@ diff old new
 +Reused: 0
 +Allocs: 250
 +Retain: 0
-
+ 
 -Unifications: 1373
 -Conjuncts:    3626
 -Disjuncts:    1548

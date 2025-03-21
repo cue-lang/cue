@@ -26,10 +26,17 @@ func TestIsPackage(t *testing.T) {
 		{"../.../foo", true},
 		{".../foo", true},
 		{"./:foo", true},
+		{"foo.bar@v1.2.3", true},
+		{"foo.bar/baz@v1.2", true},
+		{"foo.bar/baz@v1.latest:foo", true},
 		{"foo.bar/foo", true},
 		{"./.foo", true},
 		{"./.foo.json", false},
-
+		{`C:\Users\somefile.cue`, false},
+		{`/foo.cue`, false},
+		{`C:somefile.cue`, false},
+		{`foo.cue:1234`, false},
+		{`foo.cue:12:13`, false},
 		// Not supported yet, but could be and isn't anything else valid.
 		{":foo", true},
 
@@ -43,7 +50,7 @@ func TestIsPackage(t *testing.T) {
 		t.Run(tc.in, func(t *testing.T) {
 			got := IsPackage(tc.in)
 			if got != tc.out {
-				t.Errorf("got %v; want %v", got, tc.out)
+				t.Errorf("%q; got %v; want %v", tc.in, got, tc.out)
 			}
 		})
 	}

@@ -227,17 +227,29 @@ Disjuncts:    237
     }
     out: (bool){ true }
   }
-  _a: (struct){
-    foo: (bool){ true }
+  _a: (struct){ |((struct){
+      foo: (bool){ true }
+    }, (#struct){
+      foo: (bool){ true }
+      y!: (struct){
+        z?: (_){ _ }
+      }
+    }) }
+  _b: (struct){ |((struct){
+      y: (struct){
+      }
+      foo: (bool){ true }
+    }, (#struct){
+      y: (struct){
+        z?: (_){ _ }
+      }
+      foo: (bool){ true }
+    }) }
+  concrete: (_|_){
+    // [incomplete] concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
+    //     ./in.cue:6:12
   }
-  _b: (struct){
-    y: (struct){
-    }
-    foo: (bool){ true }
-  }
-  concrete: (struct){
-  }
-  isTrue: (bool){ true }
+  isTrue: (bool){ false }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -248,8 +260,10 @@ diff old new
      }
      _b: (struct){
 -      foo: (bool){ true }
-       y: (struct){
-       }
+-      y: (struct){
+-      }
++      y: (struct){
++      }
 +      foo: (bool){ true }
      }
      concrete: (struct){
@@ -453,7 +467,7 @@ diff old new
        }
        out: (bool){ true }
      }
-@@ -137,10 +150,21 @@
+@@ -137,10 +150,33 @@
        Foo: (bool){ true }
      }
      _dataWithExtra: (#struct){
@@ -464,17 +478,29 @@ diff old new
      }
      out: (bool){ true }
    }
-+  _a: (struct){
-+    foo: (bool){ true }
++  _a: (struct){ |((struct){
++      foo: (bool){ true }
++    }, (#struct){
++      foo: (bool){ true }
++      y!: (struct){
++        z?: (_){ _ }
++      }
++    }) }
++  _b: (struct){ |((struct){
++      y: (struct){
++      }
++      foo: (bool){ true }
++    }, (#struct){
++      y: (struct){
++        z?: (_){ _ }
++      }
++      foo: (bool){ true }
++    }) }
++  concrete: (_|_){
++    // [incomplete] concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
++    //     ./in.cue:6:12
 +  }
-+  _b: (struct){
-+    y: (struct){
-+    }
-+    foo: (bool){ true }
-+  }
-+  concrete: (struct){
-+  }
-+  isTrue: (bool){ true }
++  isTrue: (bool){ false }
  }
 -- diff/todo/p1 --
 *.concrete: several fields where there is still an disjunction

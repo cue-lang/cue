@@ -226,9 +226,6 @@ type Vertex struct {
 	// the for source of comprehensions and let fields or let clauses.
 	anonymous bool
 
-	// withinLet indicate that this vertex is a let value.
-	withinLet bool
-
 	// hasPendingArc is set if this Vertex has a void arc (e.g. for comprehensions)
 	hasPendingArc bool
 
@@ -1359,7 +1356,6 @@ func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew 
 		ArcType:   t,
 		nonRooted: v.IsDynamic || v.Label.IsLet() || v.nonRooted,
 		anonymous: v.anonymous || v.Label.IsLet(),
-		withinLet: v.withinLet || v.Label.IsLet(),
 	}
 	v.Arcs = append(v.Arcs, arc)
 	if t == ArcPending {

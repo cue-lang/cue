@@ -184,13 +184,21 @@ func (c *OpContext) getNextDefID() defID {
 type refInfo struct {
 	v  *Vertex
 	id defID
-	// exclude
+
+	// exclude defines a subtree of CloseInfo.def that should not be
+	// transitively added to the set of allowed fields.
+	//
 	// It would probably be more efficient to track a separate allow and deny
 	// list, rather than tracking the entire tree except for the excluded.
 	exclude defID
 
-	ignore      bool
-	placeholder bool
+	// ignore defines whether we should not do typo checking for this defID.
+	ignore bool
+
+	// isOuterStruct indicates that this struct is marked as "outerID" in a
+	// CloseInfo. The debug visualization in ./debug.go uses this to show a
+	// mark ("S") next to the defID to visualize that this fact.
+	isOuterStruct bool
 }
 
 type conjunctFlags uint8
@@ -323,7 +331,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 	if id.enclosingEmbed != 0 && !ignore {
 		ph := id.outerID
 		n.addReplacement(replaceID{from: dstID, to: ph, add: true})
-		id, dstID = n.newGroup(id)
+		id, dstID = n.newGroup(id, false)
 		id.enclosingEmbed = dstID
 	}
 
@@ -337,13 +345,15 @@ func (c *OpContext) subField(ci CloseInfo) CloseInfo {
 	return ci
 }
 
-func (n *nodeContext) newGroup(id CloseInfo) (CloseInfo, defID) {
+func (n *nodeContext) newGroup(id CloseInfo, placeholder bool) (CloseInfo, defID) {
 	srcID := id.defID
 	dstID := n.ctx.getNextDefID()
+	// TODO: consider only adding when record || OpenGraph
 	n.reqDefIDs = append(n.reqDefIDs, refInfo{
-		v:      emptyNode,
-		id:     dstID,
-		ignore: true,
+		v:             emptyNode,
+		id:            dstID,
+		ignore:        true,
+		isOuterStruct: placeholder,
 	})
 	id.defID = dstID
 	n.addReplacement(replaceID{from: srcID, to: dstID, add: true})
@@ -396,7 +406,7 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 		}
 	}
 
-	id, dstID := n.newGroup(id)
+	id, dstID := n.newGroup(id, false)
 	id.enclosingEmbed = dstID
 
 	return id
@@ -430,7 +440,7 @@ func (n *nodeContext) splitDefID(s *StructLit, id CloseInfo) CloseInfo {
 		return id
 	}
 
-	id, dstID := n.newGroup(id)
+	id, dstID := n.newGroup(id, true)
 
 	if id.outerID == 0 {
 		id.outerID = dstID

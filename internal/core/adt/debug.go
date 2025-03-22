@@ -396,7 +396,7 @@ func (m *mermaidContext) vertexInfo(vc *mermaidVertex, recursive bool) {
 				format = "%s((<s><i>%d%si</i></s>))\n"
 			}
 			flags := ""
-			if d.placeholder {
+			if d.isOuterStruct {
 				flags += "S"
 			}
 			if d.exclude != 0 {

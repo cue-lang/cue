@@ -323,7 +323,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 	if id.enclosingEmbed != 0 && !ignore {
 		ph := id.outerID
 		n.addReplacement(replaceID{from: dstID, to: ph, add: true})
-		id, dstID = n.newGroup(id)
+		id, dstID = n.newGroup(id, false)
 		id.enclosingEmbed = dstID
 	}
 
@@ -337,13 +337,15 @@ func (c *OpContext) subField(ci CloseInfo) CloseInfo {
 	return ci
 }
 
-func (n *nodeContext) newGroup(id CloseInfo) (CloseInfo, defID) {
+func (n *nodeContext) newGroup(id CloseInfo, placeholder bool) (CloseInfo, defID) {
 	srcID := id.defID
 	dstID := n.ctx.getNextDefID()
+	// TODO: consider only adding when record || OpenGraph
 	n.reqDefIDs = append(n.reqDefIDs, refInfo{
-		v:      emptyNode,
-		id:     dstID,
-		ignore: true,
+		v:           emptyNode,
+		id:          dstID,
+		ignore:      true,
+		placeholder: placeholder,
 	})
 	id.defID = dstID
 	n.addReplacement(replaceID{from: srcID, to: dstID, add: true})
@@ -396,7 +398,7 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 		}
 	}
 
-	id, dstID := n.newGroup(id)
+	id, dstID := n.newGroup(id, false)
 	id.enclosingEmbed = dstID
 
 	return id
@@ -430,7 +432,7 @@ func (n *nodeContext) splitDefID(s *StructLit, id CloseInfo) CloseInfo {
 		return id
 	}
 
-	id, dstID := n.newGroup(id)
+	id, dstID := n.newGroup(id, true)
 
 	if id.outerID == 0 {
 		id.outerID = dstID

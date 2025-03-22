@@ -107,7 +107,8 @@ func (n *nodeContext) scheduleConjuncts() {
 
 	defer ctx.PopArc(ctx.PushArc(v))
 
-	for _, c := range v.Conjuncts {
+	for i, c := range v.Conjuncts {
+		_ = i // for debugging purposes
 		ci := c.CloseInfo
 		ci = ctx.combineCycleInfo(ci)
 		n.scheduleConjunct(c, ci)
@@ -224,7 +225,9 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 
 	n.process(nodeOnlyNeeds, mode)
 
-	if n.node.ArcType != ArcPending {
+	if n.node.ArcType != ArcPending &&
+		n.meets(allAncestorsProcessed) &&
+		len(n.tasks) == n.taskPos {
 		n.signal(arcTypeKnown)
 	}
 

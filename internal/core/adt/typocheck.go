@@ -307,8 +307,15 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 		}
 	}
 
-	if dstID == 0 {
-		dstID = n.ctx.getNextDefID()
+	if dstID == 0 || id.enclosingEmbed != 0 {
+		next := n.ctx.getNextDefID()
+		if dstID != 0 {
+			// If we need to activate an enclosing embed group, and the added
+			// resolver was already before, we need to allocate a new ID and
+			// add the original ID to the set of the new one.
+			n.addReplacement(replaceID{from: next, to: dstID, add: true})
+		}
+		dstID = next
 
 		n.reqDefIDs = append(n.reqDefIDs, refInfo{
 			v:       v,
@@ -319,6 +326,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 	}
 	id.defID = dstID
 
+	// TODO: consider using add: !isClosed
 	n.addReplacement(replaceID{from: srcID, to: dstID, add: true})
 	if id.enclosingEmbed != 0 && !ignore {
 		ph := id.outerID
@@ -379,7 +387,6 @@ func (v *Vertex) AddOpenConjunct(ctx *OpContext, w *Vertex) {
 // We can then say that requirement 3 (node A) holds if all fields contain
 // either label 3, or any field within 1 that is not 2.
 func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
-	srcID := id.defID
 	id.FromEmbed = true
 
 	// Filter cases where we do not need to track the definition.
@@ -388,12 +395,6 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 		return id
 	case *BinaryExpr:
 		if x.Op != AndOp {
-			return id
-		}
-	case *StructLit:
-	default:
-		// This is necessary for top-level closedness.
-		if srcID != 0 {
 			return id
 		}
 	}

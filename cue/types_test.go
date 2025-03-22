@@ -2427,8 +2427,6 @@ func TestConjunctDedup(t *testing.T) {
 // as can happen more readily through the API, that the deduplication of the
 // conjuncts works as expected.
 func TestIssue3826(t *testing.T) {
-	t.Skip() // TODO: remove when fixed.
-
 	cuetdtest.FullMatrix.Run(t, "test", func(t *testing.T, m *cuetdtest.M) {
 		ctx := m.CueContext()
 

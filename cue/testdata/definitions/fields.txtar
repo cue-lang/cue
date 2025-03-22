@@ -278,6 +278,10 @@ err.t3.p2.a.b.c: field not allowed:
     ./in.cue:153:8
 err.t4.a.b.h: field not allowed:
     ./in.cue:159:8
+err.t5.b.b.h: field not allowed:
+    ./in.cue:168:8
+err.t6.b.b.c.d.e.h: field not allowed:
+    ./in.cue:177:17
 err.t7.a.b: field not allowed:
     ./in.cue:189:5
 err.t8.V.c.e: field not allowed:
@@ -556,7 +560,8 @@ Result:
         }
       }
     }
-    t5: (struct){
+    t5: (_|_){
+      // [eval]
       a: (#struct){
         b: (#struct){
           f: (int){ 1 }
@@ -573,15 +578,21 @@ Result:
           g: (int){ 1 }
         }
       }
-      b: (#struct){
-        b: (#struct){
-          h: (int){ 1 }
+      b: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval]
+          h: (_|_){
+            // [eval] err.t5.b.b.h: field not allowed:
+            //     ./in.cue:168:8
+          }
           f: (int){ 1 }
           g: (int){ 1 }
         }
       }
     }
-    t6: (struct){
+    t6: (_|_){
+      // [eval]
       a: (#struct){
         b: (#struct){
           c: (#struct){
@@ -616,12 +627,20 @@ Result:
           }
         }
       }
-      b: (#struct){
-        b: (#struct){
-          c: (#struct){
-            d: (#struct){
-              e: (#struct){
-                h: (int){ 1 }
+      b: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval]
+          c: (_|_){
+            // [eval]
+            d: (_|_){
+              // [eval]
+              e: (_|_){
+                // [eval]
+                h: (_|_){
+                  // [eval] err.t6.b.b.c.d.e.h: field not allowed:
+                  //     ./in.cue:177:17
+                }
                 f: (int){ 1 }
                 g: (int){ 1 }
               }
@@ -740,7 +759,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,74 +1,24 @@
+@@ -1,74 +1,28 @@
  Errors:
  err.t1.a.disallowed: field not allowed:
 -    ./in.cue:133:10
@@ -763,20 +782,20 @@ diff old new
 -    ./in.cue:157:5
 -    ./in.cue:158:9
      ./in.cue:159:8
--err.t5.b.b.h: field not allowed:
+ err.t5.b.b.h: field not allowed:
 -    ./in.cue:164:6
 -    ./in.cue:164:10
 -    ./in.cue:165:9
 -    ./in.cue:166:9
 -    ./in.cue:167:5
--    ./in.cue:168:8
--err.t6.b.b.c.d.e.h: field not allowed:
+     ./in.cue:168:8
+ err.t6.b.b.c.d.e.h: field not allowed:
 -    ./in.cue:173:6
 -    ./in.cue:173:10
 -    ./in.cue:174:18
 -    ./in.cue:175:18
 -    ./in.cue:176:5
--    ./in.cue:177:17
+     ./in.cue:177:17
  err.t7.a.b: field not allowed:
 -    ./in.cue:187:10
 -    ./in.cue:188:5
@@ -815,7 +834,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -77,7 +27,7 @@
+@@ -77,7 +31,7 @@
      // [eval]
      t1: (struct){
        c: (#list){
@@ -824,7 +843,7 @@ diff old new
            b: (int){ int }
          }
        }
-@@ -86,7 +36,7 @@
+@@ -86,7 +40,7 @@
      }
      t2: (struct){
        #A: (_){ _ }
@@ -833,7 +852,7 @@ diff old new
          f: (string){ "hi" }
        }
      }
-@@ -116,11 +66,11 @@
+@@ -116,11 +70,11 @@
          }
        }
        W: (#struct){
@@ -850,7 +869,7 @@ diff old new
          }
        }
      }
-@@ -134,10 +84,6 @@
+@@ -134,10 +88,6 @@
          // [eval]
          c: (_|_){
            // [eval] ok.t5.x.c: field not allowed:
@@ -861,7 +880,7 @@ diff old new
            //     ./in.cue:41:5
          }
        }
-@@ -170,16 +116,7 @@
+@@ -170,16 +120,7 @@
        }
      }
      t8: (struct){
@@ -879,7 +898,7 @@ diff old new
        #X: (#struct){
          a: (#struct){
            b: (#struct){
-@@ -193,7 +130,7 @@
+@@ -193,7 +134,7 @@
      }
      t9: (struct){
        c: (#list){
@@ -888,7 +907,7 @@ diff old new
            b: (int){ int }
          }
        }
-@@ -202,7 +139,7 @@
+@@ -202,7 +143,7 @@
      }
      t10: (struct){
        #A: (_){ _ }
@@ -897,7 +916,7 @@ diff old new
          f: (string){ "hi" }
        }
      }
-@@ -232,11 +169,11 @@
+@@ -232,11 +173,11 @@
          }
        }
        W: (#struct){
@@ -914,7 +933,7 @@ diff old new
          }
        }
      }
-@@ -250,10 +187,6 @@
+@@ -250,10 +191,6 @@
          // [eval]
          c: (_|_){
            // [eval] ok.t13.x.c: field not allowed:
@@ -925,7 +944,7 @@ diff old new
            //     ./in.cue:112:5
          }
        }
-@@ -277,13 +210,11 @@
+@@ -277,13 +214,11 @@
        }
        a: (_|_){
          // [eval]
@@ -940,7 +959,7 @@ diff old new
        }
      }
      t2: (_|_){
-@@ -297,14 +228,11 @@
+@@ -297,14 +232,11 @@
          // [eval]
          c: (_|_){
            // [eval]
@@ -956,7 +975,7 @@ diff old new
          }
        }
      }
-@@ -318,8 +246,6 @@
+@@ -318,8 +250,6 @@
            // [eval]
            c: (_|_){
              // [eval] err.t3.p1.a.c: field not allowed:
@@ -965,7 +984,7 @@ diff old new
              //     ./in.cue:147:5
            }
          }
-@@ -336,8 +262,6 @@
+@@ -336,8 +266,6 @@
              // [eval]
              c: (_|_){
                // [eval] err.t3.p2.a.b.c: field not allowed:
@@ -974,7 +993,7 @@ diff old new
                //     ./in.cue:153:8
              }
            }
-@@ -350,114 +274,87 @@
+@@ -350,54 +278,47 @@
          // [eval]
          b: (_|_){
            // [eval]
@@ -1017,156 +1036,72 @@ diff old new
 -          // [eval]
 -          f: (int){ 1 }
 -          g: (int){ 1 }
--          h: (_|_){
--            // [eval] err.t5.b.b.h: field not allowed:
++          f: (int){ 1 }
++        }
++      }
++      #A: (#struct){
++        b: (#struct){
++          f: (int){ 1 }
++        }
++      }
++    }
++    t5: (_|_){
++      // [eval]
++      a: (#struct){
++        b: (#struct){
++          f: (int){ 1 }
++          g: (int){ 1 }
++        }
++      }
++      #A: (#struct){
++        b: (#struct){
++          f: (int){ 1 }
++        }
++      }
++      #B: (#struct){
++        b: (#struct){
++          g: (int){ 1 }
++        }
++      }
++      b: (_|_){
++        // [eval]
++        b: (_|_){
++          // [eval]
+           h: (_|_){
+             // [eval] err.t5.b.b.h: field not allowed:
 -            //     ./in.cue:164:6
 -            //     ./in.cue:164:10
 -            //     ./in.cue:165:9
 -            //     ./in.cue:166:9
 -            //     ./in.cue:167:5
--            //     ./in.cue:168:8
--          }
--        }
--      }
--    }
--    t6: (_|_){
--      // [eval]
--      a: (#struct){
--        b: (#struct){
--          c: (#struct){
--            d: (#struct){
--              e: (#struct){
+             //     ./in.cue:168:8
+           }
++          f: (int){ 1 }
++          g: (int){ 1 }
+         }
+       }
+     }
+@@ -447,17 +368,12 @@
+               // [eval]
+               e: (_|_){
+                 // [eval]
 -                f: (int){ 1 }
 -                g: (int){ 1 }
--              }
--            }
--          }
--        }
--      }
--      #A: (#struct){
--        b: (#struct){
--          c: (#struct){
--            d: (#struct){
--              e: (#struct){
--                f: (int){ 1 }
--              }
--            }
--          }
--        }
--      }
--      #B: (#struct){
--        b: (#struct){
--          c: (#struct){
--            d: (#struct){
--              e: (#struct){
--                g: (int){ 1 }
--              }
--            }
--          }
--        }
--      }
--      b: (_|_){
--        // [eval]
--        b: (_|_){
--          // [eval]
--          c: (_|_){
--            // [eval]
--            d: (_|_){
--              // [eval]
--              e: (_|_){
--                // [eval]
--                f: (int){ 1 }
--                g: (int){ 1 }
--                h: (_|_){
--                  // [eval] err.t6.b.b.c.d.e.h: field not allowed:
+                 h: (_|_){
+                   // [eval] err.t6.b.b.c.d.e.h: field not allowed:
 -                  //     ./in.cue:173:6
 -                  //     ./in.cue:173:10
 -                  //     ./in.cue:174:18
 -                  //     ./in.cue:175:18
 -                  //     ./in.cue:176:5
--                  //     ./in.cue:177:17
--                }
-+          f: (int){ 1 }
-+        }
-+      }
-+      #A: (#struct){
-+        b: (#struct){
-+          f: (int){ 1 }
-+        }
-+      }
-+    }
-+    t5: (struct){
-+      a: (#struct){
-+        b: (#struct){
-+          f: (int){ 1 }
-+          g: (int){ 1 }
-+        }
-+      }
-+      #A: (#struct){
-+        b: (#struct){
-+          f: (int){ 1 }
-+        }
-+      }
-+      #B: (#struct){
-+        b: (#struct){
-+          g: (int){ 1 }
-+        }
-+      }
-+      b: (#struct){
-+        b: (#struct){
-+          h: (int){ 1 }
-+          f: (int){ 1 }
-+          g: (int){ 1 }
-+        }
-+      }
-+    }
-+    t6: (struct){
-+      a: (#struct){
-+        b: (#struct){
-+          c: (#struct){
-+            d: (#struct){
-+              e: (#struct){
-+                f: (int){ 1 }
-+                g: (int){ 1 }
-+              }
-+            }
-+          }
-+        }
-+      }
-+      #A: (#struct){
-+        b: (#struct){
-+          c: (#struct){
-+            d: (#struct){
-+              e: (#struct){
-+                f: (int){ 1 }
-+              }
-+            }
-+          }
-+        }
-+      }
-+      #B: (#struct){
-+        b: (#struct){
-+          c: (#struct){
-+            d: (#struct){
-+              e: (#struct){
-+                g: (int){ 1 }
-+              }
-+            }
-+          }
-+        }
-+      }
-+      b: (#struct){
-+        b: (#struct){
-+          c: (#struct){
-+            d: (#struct){
-+              e: (#struct){
-+                h: (int){ 1 }
+                   //     ./in.cue:177:17
+                 }
 +                f: (int){ 1 }
 +                g: (int){ 1 }
                }
              }
            }
-@@ -471,13 +368,11 @@
+@@ -471,13 +387,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1181,7 +1116,7 @@ diff old new
        }
      }
      t8: (_|_){
-@@ -491,14 +386,11 @@
+@@ -491,14 +405,11 @@
          // [eval]
          c: (_|_){
            // [eval]
@@ -1197,7 +1132,7 @@ diff old new
          }
        }
      }
-@@ -512,11 +404,11 @@
+@@ -512,11 +423,11 @@
        }
      }
      egs: (struct){
@@ -1211,7 +1146,7 @@ diff old new
          name: (string){ "blah" }
          age2: (int){ 5 }
        }
-@@ -540,8 +432,7 @@
+@@ -540,8 +451,7 @@
    }
    validator: (_|_){
      // [eval]
@@ -1221,7 +1156,7 @@ diff old new
        #Schema: (_){
          matchN(1, (#list){
            0: (_|_){// 〈1;#x〉
-@@ -551,28 +442,10 @@
+@@ -551,28 +461,10 @@
            trailingComma?: (string){ "all" }
          }
        }
@@ -1254,7 +1189,7 @@ diff old new
          }
        }
      }
-@@ -584,14 +457,12 @@
+@@ -584,14 +476,12 @@
        }
        x: (_|_){
          // [eval]

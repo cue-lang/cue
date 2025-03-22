@@ -977,24 +977,40 @@ func addConjuncts(ctx *OpContext, dst *Vertex, src Value) {
 	closeInfo.FromDef = false
 	c := MakeConjunct(nil, src, closeInfo)
 
-	if v, ok := src.(*Vertex); ok && v.ClosedRecursive {
+	if v, ok := src.(*Vertex); ok {
 		if ctx.Version == internal.EvalV2 {
-			var root CloseInfo
-			c.CloseInfo = root.SpawnRef(v, v.ClosedRecursive, nil)
+			if v.ClosedRecursive {
+				var root CloseInfo
+				c.CloseInfo = root.SpawnRef(v, v.ClosedRecursive, nil)
+			}
 		} else {
+			// By default, all conjuncts in a node are considered to be not
+			// mutually closed. This means that if one of the arguments to Unify
+			// closes, but is acquired to embedding, the closeness information
+			// is disregarded. For instance, for Unify(a, b) where a and b are
+			//
+			//		a:  {#D, #D: d: f: int}
+			//		b:  {d: e: 1}
+			//
+			// we expect 'e' to be not allowed.
+			//
+			// In order to do so, we wrap the outer conjunct in a separate
+			// scope that will be closed in the presence of closed embeddings
+			// independently from the other conjuncts.
+			n := dst.getBareState(ctx)
+			c.CloseInfo = n.splitScope(c.CloseInfo)
+
 			// Even if a node is marked as ClosedRecursive, it may be that this
 			// is the first node that references a definition.
 			// We approximate this to see if the path leading up to this
 			// value is a defintion. This is not fully accurate. We could
 			// investigate the closedness information contained in the parent.
-			isDef := false
 			for p := v; p != nil; p = p.Parent {
 				if p.Label.IsDef() {
-					isDef = true
+					c.CloseInfo.FromDef = true
 					break
 				}
 			}
-			c.CloseInfo.TopDef = isDef
 		}
 	}
 

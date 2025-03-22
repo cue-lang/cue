@@ -6,8 +6,8 @@ v2:
 
 v3:
 	schema extract (pass / total): 1054 / 1363 = 77.3%
-	tests (pass / total): 3793 / 4803 = 79.0%
-	tests on extracted schemas (pass / total): 3793 / 3955 = 95.9%
+	tests (pass / total): 3788 / 4803 = 78.9%
+	tests on extracted schemas (pass / total): 3788 / 3955 = 95.8%
 
 Optional tests
 
@@ -18,5 +18,5 @@ v2:
 
 v3:
 	schema extract (pass / total): 235 / 274 = 85.8%
-	tests (pass / total): 1635 / 2372 = 68.9%
-	tests on extracted schemas (pass / total): 1635 / 2262 = 72.3%
+	tests (pass / total): 1600 / 2372 = 67.5%
+	tests on extracted schemas (pass / total): 1600 / 2262 = 70.7%

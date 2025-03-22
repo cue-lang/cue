@@ -1383,6 +1383,21 @@ func TestFillPath(t *testing.T) {
 			x:    1,
 			path: cue.MakePath(cue.Str("b").Optional()),
 			out:  `{b: 1}`,
+		}, {
+			in: `
+				_schema: _
+				_schema
+				apiVersion: "foo"
+				spec: group: "foo"
+			`,
+			x: ctx.CompileString(`
+				#Schema: spec!: group!: string
+			`).LookupPath(cue.MakePath(cue.Def("#Schema"))),
+			path: cue.MakePath(cue.Hid("_schema", "_")),
+			out: `
+				apiVersion: "foo"
+				spec: group: "foo"
+            `,
 		}}
 
 		for _, tc := range testCases {
@@ -2280,14 +2295,38 @@ func TestUnify2(t *testing.T) {
 		b:   `quux: "boom"`,
 		err: true,
 	}, {
-		a: `close({[=~"a"]: _})`,
-		b: `a: 1`,
+		a:   `close({[=~"a"]: _})`,
+		b:   `a: 1`,
+		err: false,
 	}, {
-		a: `close({{[=~"a"]: _}})`,
-		b: `a: 1`,
+		a:   `close({{[=~"a"]: _}})`,
+		b:   `a: 1`,
+		err: false,
+	}, {
+		a:   `close({{["d"]: _}})`,
+		b:   `e: 1`,
+		err: true,
+	}, {
+		a:   `close({{["d"]: f: int}})`,
+		b:   `d: e: 1`,
+		err: false,
+	}, {
+		a:   `#D, #D: d: f: int`,
+		b:   `d: e: 1`,
+		err: true,
+	}, {
+		a:   `_x, _x: null | close({ foo?: bool })`,
+		b:   `bar: false`,
+		err: true,
+	}, {
+		a:   `_x, _x: null | close({ foo?: _x })`,
+		b:   `bar: false`,
+		err: true,
+	}, {
+		a:   `#d, #d: null | { foo?: _x }`,
+		b:   `bar: false`,
+		err: true,
 	}}
-
-	adt.DebugDeps = true
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
 		ctx := t.M.CueContext()
@@ -2419,8 +2458,6 @@ func TestConjunctDedup(t *testing.T) {
 // as can happen more readily through the API, that the deduplication of the
 // conjuncts works as expected.
 func TestIssue3826(t *testing.T) {
-	t.Skip() // TODO: remove when fixed.
-
 	cuetdtest.FullMatrix.Run(t, "test", func(t *testing.T, m *cuetdtest.M) {
 		ctx := m.CueContext()
 

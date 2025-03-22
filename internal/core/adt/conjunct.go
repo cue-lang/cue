@@ -224,7 +224,7 @@ loop1:
 	// TODO: if embed, add an "ignore" field.
 	// When inserting a replace that is a definition, flip the ignore.
 	if hasEmbed {
-		ci = n.splitDefID(s, ci)
+		ci = n.splitStruct(s, ci)
 	}
 
 	// First add fixed fields and schedule expressions.
@@ -342,9 +342,7 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	// intermediate node refers to a definition, things are evaluated at least
 	// once.
 	switch isDef, _ := IsDef(c.Expr()); {
-	case isDef || arc.Label.IsDef() || closeInfo.TopDef:
-		closeInfo.TopDef = false
-
+	case isDef || arc.Label.IsDef():
 		n.isDef = true
 		// n.node.ClosedRecursive = true // TODO: should we set this here?
 		closeInfo.FromDef = true

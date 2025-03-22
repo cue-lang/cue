@@ -32,7 +32,10 @@
 				"data": {
 					"bar": false
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "recursive mismatch",

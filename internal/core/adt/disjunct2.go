@@ -389,7 +389,7 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 			ID.node.nextDisjunct(j, len(dn.disjuncts), d.expr)
 
 			c := MakeConjunct(dn.env, d.expr, dn.cloneID)
-			r, err := p.doDisjunct(c, d.mode, mode)
+			r, err := p.doDisjunct(c, d.mode, mode, n.node)
 
 			if err != nil {
 				// TODO: store more error context
@@ -436,7 +436,10 @@ func (n *nodeContext) collectErrors(dn *envDisjunct) (errs *Bottom) {
 	return b
 }
 
-func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*nodeContext, *Bottom) {
+// doDisjunct computes a single disjunct. n is the current disjunct that is
+// augmented, whereas orig is the original node where disjunction processing
+// started. orig is used to clean up Environments.
+func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *Vertex) (*nodeContext, *Bottom) {
 	n.ctx.inDisjunct++
 	defer func() { n.ctx.inDisjunct-- }()
 
@@ -458,6 +461,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 
 	d := oc.cloneRoot(n)
 	d.runMode = mode
+	c.Env = derefDisjunctsEnv(c.Env, orig, d.node)
 
 	d.defaultMode = combineDefault(m, n.defaultMode)
 

@@ -1897,6 +1897,7 @@ func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r ad
 	if inst == nil {
 		return nil, nil
 	}
+	inst.Finalize(c)
 	return inst, path
 }
 

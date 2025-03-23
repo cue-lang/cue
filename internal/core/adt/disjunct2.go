@@ -252,37 +252,6 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 	a := n.disjunctions
 	n.disjunctions = n.disjunctions[:0]
 
-	// TODO: simplify hole logic. Probably no need for a slice.
-	holes := make([]disjunctHole, len(n.disjunctCCs))
-	copy(holes, n.disjunctCCs)
-
-	// Upon completion, decrement the DISJUNCT counters that were incremented
-	// in scheduleDisjunction. Note that this disjunction may be a copy of the
-	// original, in which case we need to decrement the copied disjunctCCs, not
-	// the original.
-	//
-	// This is not strictly necessary, but it helps for balancing counters.
-	// TODO: Consider disabling this when DebugDeps is not set.
-	defer func() {
-		// We add a "top" value to disable closedness checking for this
-		// disjunction to avoid a spurious "field not allowed" error.
-		// We return the errors below, which will, in turn, be reported as
-		// the error.
-		for i, d := range a {
-			// TODO(perf: prove that holeIDs are always stored in increasing
-			// order and allow for an incremental search to reduce cost.
-			for _, h := range holes {
-				if h.holeID != a[i].holeID {
-					continue
-				}
-				id := a[i].cloneID
-				c := MakeConjunct(d.env, top, id)
-				n.scheduleConjunct(c, d.cloneID)
-				break
-			}
-		}
-	}()
-
 	if !initArcs(n.ctx, n.node) {
 		return n.getError()
 	}
@@ -330,7 +299,7 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 		}
 
 		// Mark no final in nodeContext and observe later.
-		results = n.crossProduct(results, cross, d, mode, d.holeID)
+		results = n.crossProduct(results, cross, d, mode)
 
 		// TODO: do we unwind only at the end or also intermittently?
 		switch len(results) {
@@ -405,7 +374,7 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 
 // crossProduct computes the cross product of the disjuncts of a disjunction
 // with an existing set of results.
-func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, mode runMode, hole int) []*nodeContext {
+func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, mode runMode) []*nodeContext {
 	defer n.unmarkDepth(n.markDepth())
 	defer n.unmarkOptional(n.markOptional())
 
@@ -420,7 +389,7 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 			ID.node.nextDisjunct(j, len(dn.disjuncts), d.expr)
 
 			c := MakeConjunct(dn.env, d.expr, dn.cloneID)
-			r, err := p.doDisjunct(c, d.mode, mode, hole)
+			r, err := p.doDisjunct(c, d.mode, mode)
 
 			if err != nil {
 				// TODO: store more error context
@@ -467,7 +436,7 @@ func (n *nodeContext) collectErrors(dn *envDisjunct) (errs *Bottom) {
 	return b
 }
 
-func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole int) (*nodeContext, *Bottom) {
+func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*nodeContext, *Bottom) {
 	n.ctx.inDisjunct++
 	defer func() { n.ctx.inDisjunct-- }()
 

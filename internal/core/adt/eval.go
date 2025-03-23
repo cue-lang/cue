@@ -1087,16 +1087,6 @@ type nodeContext struct {
 	// Disjunction handling
 	disjunctions []envDisjunct
 
-	// disjunctCCs holds the close context that represent "holes" in which
-	// pending disjuncts are to be inserted for the clone represented by this
-	// nodeContext. Holes that are not yet filled will always need to be cloned
-	// when a disjunction branches in doDisjunct.
-	//
-	// Holes may accumulate as nested disjunctions get added and filled holes
-	// may be removed. So the list of disjunctCCs may differ from the number
-	// of disjunctions.
-	disjunctCCs []disjunctHole
-
 	// usedDefault indicates the for each of possibly multiple parent
 	// disjunctions whether it is unified with a default disjunct or not.
 	// This is then later used to determine whether a disjunction should
@@ -1370,7 +1360,6 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			replaceIDs:         n.replaceIDs[:0],
 			conjunctInfo:       n.conjunctInfo[:0],
 			disjunctions:       n.disjunctions[:0],
-			disjunctCCs:        n.disjunctCCs[:0],
 			usedDefault:        n.usedDefault[:0],
 			disjunctErrs:       n.disjunctErrs[:0],
 			disjuncts:          n.disjuncts[:0],

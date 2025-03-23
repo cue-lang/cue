@@ -214,8 +214,13 @@ func (v *Vertex) insertConjunct(ctx *OpContext, c Conjunct, id CloseInfo, mode A
 		v.addConjunctUnchecked(c)
 		added = true
 	} else if srcRef := c2.CloseInfo.defID; srcRef != 0 {
-		// TODO: this seems to have no effect. Is this necessary at all?
-		n.addReplacement(replaceID{from: srcRef, to: id.defID, add: true})
+		// Most duplicates are deduped in insertVertexConjuncts by deduping the
+		// reference that brings in conjuncts in the first place. However, with
+		// API calls, and in some cases possibly with structure sharing, it may
+		// be possible that different Vertices refer to the same conjuncts. In
+		// this case, we need to ensure that the current defID also considers
+		// the ID associated with the original insertion in its set.
+		n.addReplacement(replaceID{from: id.defID, to: srcRef, add: true})
 	}
 
 	if v.isInProgress() {
@@ -268,8 +273,6 @@ func (n *nodeContext) insertArcCC(f Feature, mode ArcType, c Conjunct, id CloseI
 	// 	n.node.reportFieldCycleError(n.ctx, pos(c.x), f)
 	// 	return v
 	// }
-
-	n.updateConjunctInfo(StructKind, id, 0) // something that is not top
 
 	_, added := v.insertConjunct(n.ctx, c, id, mode, check, true)
 	if !added || !insertedArc {

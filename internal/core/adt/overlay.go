@@ -57,7 +57,7 @@ type overlayContext struct {
 // inserting selected disjuncts into a new Vertex.
 func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 	// Clone all vertices that need to be cloned to support the overlay.
-	v := ctx.cloneVertex(root.node)
+	v := ctx.cloneVertex(root.node, nil, nil)
 	v.IsDisjunct = true
 
 	for _, v := range ctx.vertices {
@@ -101,7 +101,7 @@ func (ctx *overlayContext) unlinkOverlay() {
 // benefit this gives. More importantly, we should first implement the filter
 // to eliminate disjunctions pre-copy based on discriminator fields and what
 // have you. This is not unlikely to eliminate
-func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
+func (ctx *overlayContext) cloneVertex(x, from, to *Vertex) *Vertex {
 	if x.overlay != nil {
 		return x.overlay
 	}
@@ -109,21 +109,38 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 	v := &Vertex{}
 	*v = *x
 
+	// from == nil signals that cloneVertex is directly called from cloneRoot.
+	// All nested calls to cloneVertex will be called with the value of x and v
+	// of this vertex. Ideally, cloneRoot would call cloneVertex with the
+	// correct values already, but x is not known yet at that point.
+	if from == nil {
+		from, to = x, v
+	}
+
 	x.overlay = v
 
 	ctx.vertices = append(ctx.vertices, x)
 
+	v.Conjuncts = slices.Clone(v.Conjuncts)
+
 	// The group of the root closeContext should point to the Conjuncts field
 	// of the Vertex. As we already allocated the group, we use that allocation,
 	// but "move" it to v.Conjuncts.
-	v.Conjuncts = slices.Clone(v.Conjuncts)
+	// TODO: Is this ever necessary? It is certainly necessary to rewrite
+	// environments from inserted disjunction values, but expressions that
+	// were already added will typically need to be recomputed and recreated
+	// anyway. We add this in to be a bit defensive and reinvestigate once we
+	// have more aggressive structure sharing implemented
+	for i, c := range v.Conjuncts {
+		v.Conjuncts[i].Env = derefDisjunctsEnv(c.Env, x, v)
+	}
 
 	if a := x.Arcs; len(a) > 0 {
 		// TODO(perf): reuse buffer.
 		v.Arcs = make([]*Vertex, len(a))
 		for i, arc := range a {
 			// TODO(perf): reuse when finalized.
-			arc := ctx.cloneVertex(arc)
+			arc := ctx.cloneVertex(arc, from, to)
 			v.Arcs[i] = arc
 			arc.Parent = v
 		}
@@ -139,7 +156,7 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 		for i, p := range pc.Pairs {
 			npc.Pairs[i] = PatternConstraint{
 				Pattern:    p.Pattern,
-				Constraint: ctx.cloneVertex(p.Constraint),
+				Constraint: ctx.cloneVertex(p.Constraint, from, to),
 			}
 		}
 	}
@@ -152,6 +169,23 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 	}
 
 	return v
+}
+
+// derefDisjunctsEnv creates a new env for each Environment in the Up chain
+// with each Environment where Vertex is "from" to one where Vertex is "to".
+func derefDisjunctsEnv(env *Environment, from, to *Vertex) *Environment {
+	if env == nil {
+		return nil
+	}
+	up := derefDisjunctsEnv(env.Up, from, to)
+	if up != env.Up || env.Vertex == from {
+		env = &Environment{
+			Up:           up,
+			Vertex:       to,
+			DynamicLabel: env.DynamicLabel,
+		}
+	}
+	return env
 }
 
 func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {

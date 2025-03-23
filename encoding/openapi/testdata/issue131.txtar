@@ -1,4 +1,3 @@
-#skip-v3-noshare
 -- in.cue --
 package ext
 

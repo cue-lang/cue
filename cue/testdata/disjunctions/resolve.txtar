@@ -1,0 +1,195 @@
+// Ensure that references are resolved on the boundaries of disjunctions.
+-- in.cue --
+resolveAcrossDisjunct: t1: {
+	{} | { #B: 1} // d resolves to 1 in the second case.
+	{d: #B} | {}
+	#B: int
+}
+resolveAcrossDisjunct: nested: {
+	{} | { a: b: #B: 1} // d resolves to 1 in the second case.
+	{d: a.b.#B} | {}
+	a: b: #B: int
+}
+-- out/evalalpha/stats --
+Leaks:  48
+Freed:  0
+Reused: 0
+Allocs: 48
+Retain: 0
+
+Unifications: 12
+Conjuncts:    33
+Disjuncts:    12
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  44
+-Reused: 32
+-Allocs: 12
++Leaks:  48
++Freed:  0
++Reused: 0
++Allocs: 48
+ Retain: 0
+ 
+-Unifications: 32
+-Conjuncts:    67
+-Disjuncts:    44
++Unifications: 12
++Conjuncts:    33
++Disjuncts:    12
+-- out/eval/stats --
+Leaks:  0
+Freed:  44
+Reused: 32
+Allocs: 12
+Retain: 0
+
+Unifications: 32
+Conjuncts:    67
+Disjuncts:    44
+-- out/evalalpha --
+(struct){
+  resolveAcrossDisjunct: (struct){
+    t1: (struct){ |((struct){
+        #B: (int){ int }
+        d: (int){ int }
+      }, (struct){
+        #B: (int){ int }
+      }, (struct){
+        #B: (int){ 1 }
+        d: (int){ int }
+      }, (struct){
+        #B: (int){ 1 }
+      }) }
+    nested: (struct){ |((struct){
+        a: (struct){
+          b: (struct){
+            #B: (int){ int }
+          }
+        }
+        d: (int){ int }
+      }, (struct){
+        a: (struct){
+          b: (struct){
+            #B: (int){ int }
+          }
+        }
+      }, (struct){
+        a: (struct){
+          b: (struct){
+            #B: (int){ 1 }
+          }
+        }
+        d: (int){ int }
+      }, (struct){
+        a: (struct){
+          b: (struct){
+            #B: (int){ 1 }
+          }
+        }
+      }) }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -7,7 +7,7 @@
+         #B: (int){ int }
+       }, (struct){
+         #B: (int){ 1 }
+-        d: (int){ 1 }
++        d: (int){ int }
+       }, (struct){
+         #B: (int){ 1 }
+       }) }
+@@ -30,7 +30,7 @@
+             #B: (int){ 1 }
+           }
+         }
+-        d: (int){ 1 }
++        d: (int){ int }
+       }, (struct){
+         a: (struct){
+           b: (struct){
+-- out/eval --
+(struct){
+  resolveAcrossDisjunct: (struct){
+    t1: (struct){ |((struct){
+        #B: (int){ int }
+        d: (int){ int }
+      }, (struct){
+        #B: (int){ int }
+      }, (struct){
+        #B: (int){ 1 }
+        d: (int){ 1 }
+      }, (struct){
+        #B: (int){ 1 }
+      }) }
+    nested: (struct){ |((struct){
+        a: (struct){
+          b: (struct){
+            #B: (int){ int }
+          }
+        }
+        d: (int){ int }
+      }, (struct){
+        a: (struct){
+          b: (struct){
+            #B: (int){ int }
+          }
+        }
+      }, (struct){
+        a: (struct){
+          b: (struct){
+            #B: (int){ 1 }
+          }
+        }
+        d: (int){ 1 }
+      }, (struct){
+        a: (struct){
+          b: (struct){
+            #B: (int){ 1 }
+          }
+        }
+      }) }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  resolveAcrossDisjunct: {
+    t1: {
+      ({}|{
+        #B: 1
+      })
+      ({
+        d: 〈1;#B〉
+      }|{})
+      #B: int
+    }
+  }
+  resolveAcrossDisjunct: {
+    nested: {
+      ({}|{
+        a: {
+          b: {
+            #B: 1
+          }
+        }
+      })
+      ({
+        d: 〈1;a〉.b.#B
+      }|{})
+      a: {
+        b: {
+          #B: int
+        }
+      }
+    }
+  }
+}

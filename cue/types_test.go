@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
@@ -2371,6 +2372,54 @@ func TestUnifyAccept(t *testing.T) {
 			}
 			t.Equal(string(b), tc.want)
 		})
+	})
+}
+
+// TestConjunctDedup tests a case where the same expression is added within
+// multiple Vertices. Normally, duplicate expressions happen when the same
+// Vertex is unified into the same node multiple times. But when CUE is
+// programmatically created, for instance through an API, the same expression
+// may end up in different vertices. Such duplicate expressions, when dedupped,
+// need to be handled similarly as when dedupping normal Vertices. This test
+// tests this case.
+//
+// Issue #3829
+func TestConjunctDedup(t *testing.T) {
+	const str = `
+	#t: {} | {f1: int}
+	#t: {f: string}
+	`
+
+	const want = `
+{
+	f: string
+} | {
+	f1: int
+	f:  string
+}
+`
+
+	cuetdtest.FullMatrix.Run(t, "test", func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
+		tPath := cue.MakePath(cue.Def("#t"))
+		vOrig := ctx.CompileString(str).LookupPath(tPath)
+
+		if err := vOrig.Err(); err != nil {
+			t.Fatal(err)
+		}
+
+		_, args := vOrig.Expr()
+
+		var v cue.Value
+		v = v.UnifyAccept(args[0], vOrig)
+		v = v.UnifyAccept(args[1], vOrig)
+
+		if err := v.Err(); err != nil {
+			t.Fatal(errors.Details(v.Err(), nil))
+		}
+		if got := fmt.Sprint(v); got != strings.TrimSpace(want) {
+			t.Errorf("got %s; want %s", got, want)
+		}
 	})
 }
 

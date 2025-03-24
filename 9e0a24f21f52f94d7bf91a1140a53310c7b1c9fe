@@ -16,6 +16,24 @@
       "message": "I\u0027m a bit concerned about defensiveness here. Clearly `x` cannot be nil. But this method allows `from` and `to` to be nil. I think the intention is that either they must both be nil, or neither must be nil (i.e. `(from \u003d\u003d nil) \u003d\u003d (to \u003d\u003d nil)`) but there\u0027s no checking of this. I would find it helpful it the code was more explicit about what\u0027s expected and allowed, and what\u0027s not.",
       "revId": "9e0a24f21f52f94d7bf91a1140a53310c7b1c9fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4d836b3_a64393e6",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-24T11:56:46Z",
+      "side": 1,
+      "message": "`from` and `to` should be passed recursively and are always the same.\nIdeally, cloneRoot would pass them to cloneVertex, but v is not known yet at this point. So from \u003d\u003d nil is only used as a marker that this is a call to the root vertex and that we need to set them.\n\nI\u0027ll add a comment.",
+      "parentUuid": "64278a45_4c3ab30a",
+      "revId": "9e0a24f21f52f94d7bf91a1140a53310c7b1c9fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

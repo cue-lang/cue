@@ -16,6 +16,24 @@
       "message": "Please could there be some documentation of this field? It only seems to be used in debugging. Is that all it\u0027s ever going to be used for? What does it represent?",
       "revId": "703b12885a450d285cdbad419e981fd90779ac57",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4d3990e_eb4a6ff9",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-24T11:51:58Z",
+      "side": 1,
+      "message": "Renamed field and added doc comment.",
+      "parentUuid": "0b4f88a5_cebfc351",
+      "revId": "703b12885a450d285cdbad419e981fd90779ac57",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

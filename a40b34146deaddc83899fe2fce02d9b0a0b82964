@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa4a9b38_ba5e3d74",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-24T08:06:52Z",
+      "side": 1,
+      "message": "Decide whether to first fix JSON schema issues.",
+      "revId": "a40b34146deaddc83899fe2fce02d9b0a0b82964",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

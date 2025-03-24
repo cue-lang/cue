@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a16a05f0_74caf246",
+        "filename": "cmd/cue/cmd/testdata/script/eval_rec.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-24T11:03:10Z",
+      "side": 1,
+      "message": "well spotted, done.",
+      "parentUuid": "a83fc67b_683108de",
+      "revId": "82ee49e2c01c9b508a58aee8d12dc8d13db2e440",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5ecc494_be3acc23",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-03-24T10:41:04Z",
       "side": 1,
       "message": "TODO(evalv3): for top of file: this is an incorrect error, probably as the result of structure sharing.",
+      "revId": "82ee49e2c01c9b508a58aee8d12dc8d13db2e440",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d9f3caa_c878b6eb",
+        "filename": "cmd/cue/cmd/testdata/script/export_required.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-24T11:03:10Z",
+      "side": 1,
+      "message": "done; added a mention that evalv2 had this error, but under `b.x` rather than `#Def.x`.",
+      "parentUuid": "e5ecc494_be3acc23",
       "revId": "82ee49e2c01c9b508a58aee8d12dc8d13db2e440",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd58148a_2709ff2b",
+        "filename": "cmd/cue/cmd/testdata/script/invalid_tag_pos.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-24T11:03:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07a44cf6_bd8ed653",
+      "revId": "82ee49e2c01c9b508a58aee8d12dc8d13db2e440",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c6df476_9c89f25b",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-03-24T10:41:04Z",
       "side": 1,
       "message": "Maybe add TODO(toposort): is this the right order?",
+      "revId": "82ee49e2c01c9b508a58aee8d12dc8d13db2e440",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76bf67dd_52c9de29",
+        "filename": "codereview.cfg",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-24T11:03:10Z",
+      "side": 1,
+      "message": "not really because this is a generated file, but I\u0027ll ping Matthew to check this.",
+      "parentUuid": "7c6df476_9c89f25b",
       "revId": "82ee49e2c01c9b508a58aee8d12dc8d13db2e440",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

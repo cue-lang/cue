@@ -100,9 +100,11 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 	} else {
 		found := false
 		constraint.VisitLeafConjuncts(func(x Conjunct) bool {
-			if c.x == x.x {
+			if x.x == c.x && x.Env.Up == c.Env.Up && x.Env.Vertex == c.Env.Vertex {
+				src := x.CloseInfo.defID
+				dst := c.CloseInfo.defID
 				found = true
-				// TODO(evalv3): need to reroute conjunct here?
+				n.addReplacement(replaceID{from: dst, to: src, add: true})
 				return false
 			}
 			return true

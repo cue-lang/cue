@@ -16,14 +16,18 @@ package jsonschema_test
 
 import (
 	"path"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal/astinternal"
+	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 )
 
@@ -62,4 +66,70 @@ func TestX(t *testing.T) {
 	}
 
 	t.Fatal(astinternal.DebugStr(expr))
+}
+
+// This is a test for debugging external tests.
+func TestExtX(t *testing.T) {
+	t.Skip()
+
+	version := cuecontext.EvalDefault
+	// version = cuecontext.EvalExperiment
+	ctx := cuecontext.New(cuecontext.EvaluatorVersion(version))
+
+	const filename = `tests/draft4/optional/ecmascript-regexp.json`
+	const jsonSchema = `
+		{
+			"type": "object",
+			"patternProperties": {
+				"\\wcole": {}
+			},
+			"additionalProperties": false
+		}
+	`
+	const testData = `
+		{
+			"l'école": "pas de vraie vie"
+		}
+	`
+
+	jsonAST, err := json.Extract("schema.json", []byte(jsonSchema))
+	qt.Assert(t, qt.IsNil(err))
+	jsonValue := ctx.BuildExpr(jsonAST)
+	qt.Assert(t, qt.IsNil(jsonValue.Err()))
+	versStr, _, _ := strings.Cut(strings.TrimPrefix(filename, "tests/"), "/")
+	vers, ok := extVersionToVersion[versStr]
+	if !ok {
+		t.Fatalf("unknown JSON schema version for file %q", filename)
+	}
+	if vers == jsonschema.VersionUnknown {
+		t.Skipf("skipping test for unknown schema version %v", versStr)
+	}
+	schemaAST, extractErr := jsonschema.Extract(jsonValue, &jsonschema.Config{
+		StrictFeatures: true,
+		DefaultVersion: vers,
+	})
+	qt.Assert(t, qt.IsNil(extractErr))
+	b, err := format.Node(schemaAST, format.Simplify())
+	qt.Assert(t, qt.IsNil(err))
+	t.Logf("extracted schema: %v", string(b))
+	schema := string(b)
+	schemaValue := ctx.CompileBytes(b, cue.Filename("generated.cue"))
+	if err := schemaValue.Err(); err != nil {
+		t.Fatalf("cannot compile resulting schema: %v", errors.Details(err, nil))
+	}
+
+	instAST, err := json.Extract("instance.json", []byte(testData))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	qt.Assert(t, qt.IsNil(err), qt.Commentf("test data: %q; details: %v", testData, errors.Details(err, nil)))
+
+	instValue := ctx.BuildExpr(instAST)
+	qt.Assert(t, qt.IsNil(instValue.Err()))
+	err = instValue.Unify(schemaValue).Validate(cue.Concrete(true))
+
+	t.Error(err)
+	t.Log("VALUE", instValue)
+	t.Log("SCHEMA", schema)
 }

@@ -205,7 +205,26 @@ issue3839: full: {
 		...
 	}
 }
-
+-- issue3843.cue --
+// Pattern is unified twice. Ensure that deduping is handled correctly.
+dedupPattern: t1: p1: {
+	A: {
+		#Z: [string]: _
+		x: #Z
+		x: y: z: 1
+	}
+	B: A & __no_sharing
+	out: A.#Z & B.x
+}
+dedupPattern: t1: p2: {
+	A: {
+		#Z: [string]: _
+		x: #Z
+		x: y: z: 1
+	}
+	B: A & __no_sharing
+	out: B.x & A.#Z
+}
 -- large.cue --
 full: {
 	#Resource: {
@@ -255,14 +274,14 @@ full: {
 	out: (#Main & {namespace: "ns1"}).output
 }
 -- out/evalalpha/stats --
-Leaks:  435
+Leaks:  475
 Freed:  0
 Reused: 0
-Allocs: 435
+Allocs: 475
 Retain: 0
 
-Unifications: 336
-Conjuncts:    656
+Unifications: 376
+Conjuncts:    727
 Disjuncts:    34
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -270,38 +289,44 @@ diff old new
 +++ new
 @@ -1,9 +1,9 @@
 -Leaks:  95
--Freed:  575
--Reused: 561
+-Freed:  605
+-Reused: 591
 -Allocs: 109
 -Retain: 313
-+Leaks:  435
++Leaks:  475
 +Freed:  0
 +Reused: 0
-+Allocs: 435
++Allocs: 475
 +Retain: 0
  
--Unifications: 606
--Conjuncts:    1263
--Disjuncts:    831
-+Unifications: 336
-+Conjuncts:    656
+-Unifications: 636
+-Conjuncts:    1326
+-Disjuncts:    861
++Unifications: 376
++Conjuncts:    727
 +Disjuncts:    34
 -- out/eval/stats --
 Leaks:  95
-Freed:  575
-Reused: 561
+Freed:  605
+Reused: 591
 Allocs: 109
 Retain: 313
 
-Unifications: 606
-Conjuncts:    1263
-Disjuncts:    831
+Unifications: 636
+Conjuncts:    1326
+Disjuncts:    861
 -- out/evalalpha --
 Errors:
 and.transitive.out.ok: field not allowed:
     ./in.cue:38:3
 and.transitiveWithEmbed.out.ok: field not allowed:
     ./in.cue:46:3
+dedupPattern.t1.p1.out.y: field not allowed:
+    ./issue3843.cue:4:7
+    ./issue3843.cue:6:6
+dedupPattern.t1.p2.out.y: field not allowed:
+    ./issue3843.cue:13:7
+    ./issue3843.cue:15:6
 embed.andEmbed.d.err: field not allowed:
     ./in.cue:31:11
 embed.andInStruct.a.err: field not allowed:
@@ -752,6 +777,78 @@ Result:
       }
     }
   }
+  dedupPattern: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      p1: (_|_){
+        // [eval]
+        A: (struct){
+          #Z: (#struct){
+          }
+          x: (#struct){
+            y: (#struct){
+              z: (int){ 1 }
+            }
+          }
+        }
+        B: (struct){
+          #Z: (#struct){
+          }
+          x: (#struct){
+            y: (#struct){
+              z: (int){ 1 }
+            }
+          }
+        }
+        out: (_|_){
+          // [eval]
+          y: (_|_){
+            // [eval] dedupPattern.t1.p1.out.y: field not allowed:
+            //     ./issue3843.cue:4:7
+            //     ./issue3843.cue:6:6
+            z: (_|_){
+              // [eval] dedupPattern.t1.p1.out.y.z: field not allowed:
+              //     ./issue3843.cue:6:9
+            }
+          }
+        }
+      }
+      p2: (_|_){
+        // [eval]
+        A: (struct){
+          #Z: (#struct){
+          }
+          x: (#struct){
+            y: (#struct){
+              z: (int){ 1 }
+            }
+          }
+        }
+        B: (struct){
+          #Z: (#struct){
+          }
+          x: (#struct){
+            y: (#struct){
+              z: (int){ 1 }
+            }
+          }
+        }
+        out: (_|_){
+          // [eval]
+          y: (_|_){
+            // [eval] dedupPattern.t1.p2.out.y: field not allowed:
+            //     ./issue3843.cue:13:7
+            //     ./issue3843.cue:15:6
+            z: (_|_){
+              // [eval] dedupPattern.t1.p2.out.y.z: field not allowed:
+              //     ./issue3843.cue:15:9
+            }
+          }
+        }
+      }
+    }
+  }
   full: (struct){
     #Resource: (#struct){
       someMsg: (string){ string }
@@ -916,7 +1013,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,81 +1,29 @@
+@@ -1,81 +1,35 @@
  Errors:
  and.transitive.out.ok: field not allowed:
 -    ./in.cue:34:5
@@ -933,6 +1030,12 @@ diff old new
 -    ./in.cue:44:7
 -    ./in.cue:45:7
      ./in.cue:46:3
++dedupPattern.t1.p1.out.y: field not allowed:
++    ./issue3843.cue:4:7
++    ./issue3843.cue:6:6
++dedupPattern.t1.p2.out.y: field not allowed:
++    ./issue3843.cue:13:7
++    ./issue3843.cue:15:6
  embed.andEmbed.d.err: field not allowed:
 -    ./in.cue:28:6
 -    ./in.cue:29:6
@@ -998,7 +1101,7 @@ diff old new
  embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
      ./validators.cue:21:5
      ./validators.cue:21:12
-@@ -94,14 +42,11 @@
+@@ -94,14 +48,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1014,7 +1117,7 @@ diff old new
        }
      }
      andInStruct: (_|_){
-@@ -111,14 +56,11 @@
+@@ -111,14 +62,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1030,7 +1133,7 @@ diff old new
        }
      }
      embedDefWithEmbedding: (_|_){
-@@ -128,15 +70,11 @@
+@@ -128,15 +76,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1047,7 +1150,7 @@ diff old new
        }
      }
      embedComprehension: (_|_){
-@@ -146,16 +84,11 @@
+@@ -146,16 +90,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1065,7 +1168,7 @@ diff old new
        }
      }
      fieldWithAnd: (_|_){
-@@ -166,9 +99,6 @@
+@@ -166,9 +105,6 @@
          // [eval]
          err: (_|_){
            // [eval] embed.fieldWithAnd.a.err: field not allowed:
@@ -1075,7 +1178,7 @@ diff old new
            //     ./in.cue:20:13
          }
        }
-@@ -179,20 +109,15 @@
+@@ -179,20 +115,15 @@
          a: (int){ int }
        }
        B: (struct){
@@ -1101,7 +1204,7 @@ diff old new
        }
      }
      andEmbed: (_|_){
-@@ -208,17 +133,11 @@
+@@ -208,17 +139,11 @@
        }
        d: (_|_){
          // [eval]
@@ -1120,7 +1223,7 @@ diff old new
        }
      }
      nonDef: (struct){
-@@ -227,12 +146,12 @@
+@@ -227,12 +152,12 @@
            a: (string){ string }
          }
          #Y: (#struct){
@@ -1137,7 +1240,7 @@ diff old new
          }
        }
      }
-@@ -242,12 +161,12 @@
+@@ -242,12 +167,12 @@
            Name: (string){ string }
          }
          #Step: (#struct){
@@ -1154,7 +1257,7 @@ diff old new
          }
          out: (#struct){
            Name: (string){ "foo" }
-@@ -257,21 +176,15 @@
+@@ -257,21 +182,15 @@
      }
      withIndirect: (_|_){
        // [eval]
@@ -1181,7 +1284,7 @@ diff old new
      }
      normalValidator: (_|_){
        // [eval]
-@@ -281,20 +194,17 @@
+@@ -281,20 +200,17 @@
        }
        x: (_|_){
          // [eval]
@@ -1205,7 +1308,7 @@ diff old new
          #X: (_){
            matchN(0, (#list){
            })
-@@ -301,17 +211,10 @@
+@@ -301,17 +217,10 @@
            a?: (int){ int }
            b?: (int){ int }
          }
@@ -1227,7 +1330,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -330,10 +233,7 @@
+@@ -330,10 +239,7 @@
            // [eval]
            b: (_|_){
              // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
@@ -1238,7 +1341,7 @@ diff old new
              //     ./validators.cue:24:8
              // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
              //     ./validators.cue:21:5
-@@ -360,16 +260,11 @@
+@@ -360,16 +266,11 @@
        }
        out: (_|_){
          // [eval]
@@ -1256,7 +1359,7 @@ diff old new
        }
      }
      transitiveWithEmbed: (_|_){
-@@ -385,17 +280,11 @@
+@@ -385,17 +286,11 @@
        }
        out: (_|_){
          // [eval]
@@ -1275,7 +1378,7 @@ diff old new
        }
      }
    }
-@@ -414,8 +303,8 @@
+@@ -414,8 +309,8 @@
              //     ./issue3832.cue:8:16
            }
            outFirstName: (_|_){
@@ -1286,7 +1389,7 @@ diff old new
            }
          }
        }
-@@ -425,35 +314,27 @@
+@@ -425,35 +320,27 @@
          }, (#struct){
            pass: (#struct){
              let self#1 = (_|_){
@@ -1332,7 +1435,7 @@ diff old new
        pass: (#struct){
          let self#1 = (#struct){
            firstName: (string){ "Sam" }
-@@ -460,18 +341,21 @@
+@@ -460,18 +347,21 @@
          }
          outFirstName: (string){ "Sam" }
        }
@@ -1366,7 +1469,7 @@ diff old new
    }
    issue3833: (struct){
      out: (#struct){
-@@ -547,12 +431,8 @@
+@@ -547,12 +437,8 @@
          globalField: (string){ string }
        }
        #Context: (#struct){
@@ -1381,7 +1484,130 @@ diff old new
        }
        out: (struct){
          ingress: (#struct){
-@@ -621,38 +501,11 @@
+@@ -573,55 +459,73 @@
+       }
+     }
+   }
+-  dedupPattern: (struct){
+-    t1: (struct){
+-      p1: (struct){
+-        A: (struct){
+-          #Z: (#struct){
+-          }
+-          x: (#struct){
+-            y: (struct){
+-              z: (int){ 1 }
+-            }
+-          }
+-        }
+-        B: (struct){
+-          #Z: (#struct){
+-          }
+-          x: (#struct){
+-            y: (struct){
+-              z: (int){ 1 }
+-            }
+-          }
+-        }
+-        out: (#struct){
+-          y: (struct){
+-            z: (int){ 1 }
+-          }
+-        }
+-      }
+-      p2: (struct){
+-        A: (struct){
+-          #Z: (#struct){
+-          }
+-          x: (#struct){
+-            y: (struct){
+-              z: (int){ 1 }
+-            }
+-          }
+-        }
+-        B: (struct){
+-          #Z: (#struct){
+-          }
+-          x: (#struct){
+-            y: (struct){
+-              z: (int){ 1 }
+-            }
+-          }
+-        }
+-        out: (#struct){
+-          y: (struct){
+-            z: (int){ 1 }
++  dedupPattern: (_|_){
++    // [eval]
++    t1: (_|_){
++      // [eval]
++      p1: (_|_){
++        // [eval]
++        A: (struct){
++          #Z: (#struct){
++          }
++          x: (#struct){
++            y: (#struct){
++              z: (int){ 1 }
++            }
++          }
++        }
++        B: (struct){
++          #Z: (#struct){
++          }
++          x: (#struct){
++            y: (#struct){
++              z: (int){ 1 }
++            }
++          }
++        }
++        out: (_|_){
++          // [eval]
++          y: (_|_){
++            // [eval] dedupPattern.t1.p1.out.y: field not allowed:
++            //     ./issue3843.cue:4:7
++            //     ./issue3843.cue:6:6
++            z: (_|_){
++              // [eval] dedupPattern.t1.p1.out.y.z: field not allowed:
++              //     ./issue3843.cue:6:9
++            }
++          }
++        }
++      }
++      p2: (_|_){
++        // [eval]
++        A: (struct){
++          #Z: (#struct){
++          }
++          x: (#struct){
++            y: (#struct){
++              z: (int){ 1 }
++            }
++          }
++        }
++        B: (struct){
++          #Z: (#struct){
++          }
++          x: (#struct){
++            y: (#struct){
++              z: (int){ 1 }
++            }
++          }
++        }
++        out: (_|_){
++          // [eval]
++          y: (_|_){
++            // [eval] dedupPattern.t1.p2.out.y: field not allowed:
++            //     ./issue3843.cue:13:7
++            //     ./issue3843.cue:15:6
++            z: (_|_){
++              // [eval] dedupPattern.t1.p2.out.y.z: field not allowed:
++              //     ./issue3843.cue:15:9
++            }
+           }
+         }
+       }
+@@ -675,38 +579,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -1422,7 +1648,7 @@ diff old new
          let base#6 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -695,6 +548,19 @@
+@@ -749,6 +626,19 @@
              }
            }
          }
@@ -1442,7 +1668,7 @@ diff old new
        }
      }
      out: (#struct){
-@@ -714,7 +580,9 @@
+@@ -768,7 +658,9 @@
          }
          out: (#struct){
            b1: (_|_){
@@ -1453,7 +1679,7 @@ diff old new
              // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
              //     ./validators.cue:29:7
              //     ./validators.cue:31:17
-@@ -724,17 +592,8 @@
+@@ -778,17 +670,8 @@
              //     ./validators.cue:32:17
              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
              //     ./validators.cue:29:22
@@ -2053,6 +2279,60 @@ Result:
       }
     }
   }
+  dedupPattern: (struct){
+    t1: (struct){
+      p1: (struct){
+        A: (struct){
+          #Z: (#struct){
+          }
+          x: (#struct){
+            y: (struct){
+              z: (int){ 1 }
+            }
+          }
+        }
+        B: (struct){
+          #Z: (#struct){
+          }
+          x: (#struct){
+            y: (struct){
+              z: (int){ 1 }
+            }
+          }
+        }
+        out: (#struct){
+          y: (struct){
+            z: (int){ 1 }
+          }
+        }
+      }
+      p2: (struct){
+        A: (struct){
+          #Z: (#struct){
+          }
+          x: (#struct){
+            y: (struct){
+              z: (int){ 1 }
+            }
+          }
+        }
+        B: (struct){
+          #Z: (#struct){
+          }
+          x: (#struct){
+            y: (struct){
+              z: (int){ 1 }
+            }
+          }
+        }
+        out: (#struct){
+          y: (struct){
+            z: (int){ 1 }
+          }
+        }
+      }
+    }
+  }
   full: (struct){
     #Resource: (#struct){
       someMsg: (string){ string }
@@ -2546,6 +2826,47 @@ Result:
       #Ingress: {
         〈1;#Embed〉
         ...
+      }
+    }
+  }
+}
+--- issue3843.cue
+{
+  dedupPattern: {
+    t1: {
+      p1: {
+        A: {
+          #Z: {
+            [string]: _
+          }
+          x: 〈0;#Z〉
+          x: {
+            y: {
+              z: 1
+            }
+          }
+        }
+        B: (〈0;A〉 & _|_(no sharing))
+        out: (〈0;A〉.#Z & 〈0;B〉.x)
+      }
+    }
+  }
+  dedupPattern: {
+    t1: {
+      p2: {
+        A: {
+          #Z: {
+            [string]: _
+          }
+          x: 〈0;#Z〉
+          x: {
+            y: {
+              z: 1
+            }
+          }
+        }
+        B: (〈0;A〉 & _|_(no sharing))
+        out: (〈0;B〉.x & 〈0;A〉.#Z)
       }
     }
   }

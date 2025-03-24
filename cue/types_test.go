@@ -1914,10 +1914,6 @@ func TestTemplate(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
-			if tc.skip {
-				m.TODO_V3(t) // P2: reordering
-			}
-
 			v := getValue(m, tc.value)
 			for _, p := range tc.path {
 				if p == "" {
@@ -1978,10 +1974,6 @@ func TestElem(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
-			if tc.skip {
-				m.TODO_V3(t) // P2: reordering
-			}
-
 			v := getValue(m, tc.value)
 			cue.ValueVertex(v).Finalize(cue.ValueCtx(v))
 			for _, p := range tc.path {
@@ -2658,10 +2650,6 @@ func TestValidate(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *testing.T, m *cuetdtest.M) {
-			if tc.skip {
-				m.TODO_V3(t) // P1: wrong results
-			}
-
 			ctx := m.CueContext()
 			val := ctx.CompileString(tc.in, cue.Filename("validate"))
 			err := val.Validate(tc.opts...)
@@ -3210,8 +3198,6 @@ func TestWalk(t *testing.T) {
 	}}
 	for i, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, m *cuetdtest.M) {
-			m.TODO_V3(t) // P1: missing undefined field
-
 			val := getValue(m, tc.value)
 			buf := []byte{}
 			stripComma := func() {

@@ -35,7 +35,6 @@ import (
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/encoding/yaml"
-	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	_ "cuelang.org/go/pkg"
@@ -408,41 +407,4 @@ foo.#x & {
 		"otherpkg.example/bar.#x": "bool",
 		"otherpkg.example/foo.#x": "// foo can be a number or a string\nnumber | string",
 	}))
-}
-
-func TestX(t *testing.T) {
-	t.Skip()
-	data := `
--- schema.json --
-`
-
-	a := txtar.Parse([]byte(data))
-
-	ctx := cuecontext.New()
-	var v cue.Value
-	var err error
-	for _, f := range a.Files {
-		switch path.Ext(f.Name) {
-		case ".json":
-			expr, err := json.Extract(f.Name, f.Data)
-			if err != nil {
-				t.Fatal(err)
-			}
-			v = ctx.BuildExpr(expr)
-		case ".yaml":
-			file, err := yaml.Extract(f.Name, f.Data)
-			if err != nil {
-				t.Fatal(err)
-			}
-			v = ctx.BuildFile(file)
-		}
-	}
-
-	cfg := &jsonschema.Config{ID: "test"}
-	expr, err := jsonschema.Extract(v, cfg)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Fatal(astinternal.DebugStr(expr))
 }

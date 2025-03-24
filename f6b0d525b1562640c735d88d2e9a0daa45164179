@@ -16,6 +16,23 @@
       "message": "Placing a hold as a reminder that we want to flip evalv3 on by default before we merge further changes. Should be done very soon.",
       "revId": "f6b0d525b1562640c735d88d2e9a0daa45164179",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "311d87f6_f28af59e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-24T12:12:15Z",
+      "side": 1,
+      "message": "done flipping the default and switching Unity to evalv3 :)",
+      "revId": "f6b0d525b1562640c735d88d2e9a0daa45164179",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

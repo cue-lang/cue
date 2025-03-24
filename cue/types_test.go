@@ -58,7 +58,6 @@ func TestAPI(t *testing.T) {
 		input string
 		fun   func(i cue.Value) cue.Value
 		want  string
-		skip  bool
 	}{{
 		// Issue #567
 		input: `
@@ -149,9 +148,6 @@ func TestAPI(t *testing.T) {
 		want: `"test1"`,
 	}}
 	for _, tc := range testCases {
-		if tc.skip {
-			continue
-		}
 		m := cuetdtest.FullMatrix
 		m.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			ctx := m.CueContext()
@@ -766,8 +762,6 @@ func TestFields(t *testing.T) {
 		err   string
 		opts  []cue.Option
 		path  string
-
-		todoV3 bool
 	}{{
 		value: `{ #def: 1, _hidden: 2, opt?: 3, reg: 4 }`,
 		res:   "{reg:4,}",
@@ -1438,8 +1432,6 @@ func TestAllows(t *testing.T) {
 		in    string
 		sel   cue.Selector
 		allow bool
-
-		todo_nosharing bool
 	}{{
 		desc: "allow new field in open struct",
 		in: `
@@ -1626,8 +1618,6 @@ func TestAllows(t *testing.T) {
 		`,
 		sel:   cue.AnyString,
 		allow: true,
-
-		todo_nosharing: true,
 	}, {
 		desc: "disallow label in disjunction",
 		in: `
@@ -1670,9 +1660,6 @@ func TestAllows(t *testing.T) {
 
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *testing.T, m *cuetdtest.M) {
-			if tc.todo_nosharing {
-				m.TODO_NoSharing(t)
-			}
 			ctx := m.CueContext()
 			v := mustCompile(t, ctx, tc.in)
 			v = v.LookupPath(path)
@@ -1876,8 +1863,6 @@ func TestTemplate(t *testing.T) {
 		value string
 		path  []string
 		want  string
-
-		skip bool
 	}{{
 		value: `
 		a: [Name=string]: Name
@@ -1909,8 +1894,6 @@ func TestTemplate(t *testing.T) {
 		`,
 		path: []string{"a", "foo", "b", ""},
 		want: `{"c":"foolabel","d":"label"}`,
-
-		skip: true, // TODO: reordering
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
@@ -1938,7 +1921,6 @@ func TestElem(t *testing.T) {
 		value string
 		path  []string
 		want  string
-		skip  bool
 	}{{
 		value: `
 		a: [...int]
@@ -1970,7 +1952,6 @@ func TestElem(t *testing.T) {
 		`,
 		path: []string{"a", "foo", "b", ""},
 		want: "{\n\tc: \"foo\" + string\n\td: string\n}",
-		skip: true, // TODO(p3): Skip because this is just a reordering.
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
@@ -2514,8 +2495,6 @@ func TestValidate(t *testing.T) {
 		in   string
 		err  bool
 		opts []cue.Option
-
-		skip bool
 	}{{
 		desc: "issue #51",
 		in: `
@@ -2594,15 +2573,6 @@ func TestValidate(t *testing.T) {
 			`,
 		opts: []cue.Option{cue.DisallowCycles(true)},
 		err:  true,
-
-		// TODO: in the new evaluator these are not considered to be cycles
-		// but rather incomplete errors. This is actually the correct behavior
-		// and the old evaluator treats errors like this by default.
-		// The option tested in this test was added for backwards compatibility
-		// when the old evaluator was made to treat these kinds of errors
-		// equally. With the new evaluator we can no longer distinguish these
-		// errors. For now, at least. Consider what to do with this option.
-		skip: true,
 	}, {
 		desc: "builtins are okay",
 		in: `

@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a83fc67b_683108de",
+        "filename": "cmd/cue/cmd/testdata/script/eval_rec.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-24T10:41:04Z",
+      "side": 1,
+      "message": "Although not super critical, we may still want to add a TODO(evalv3) at the top of this file to note that foo? shows too much \"unrolling\".",
+      "revId": "82ee49e2c01c9b508a58aee8d12dc8d13db2e440",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5ecc494_be3acc23",
+        "filename": "cmd/cue/cmd/testdata/script/export_required.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-24T10:41:04Z",
+      "side": 1,
+      "message": "TODO(evalv3): for top of file: this is an incorrect error, probably as the result of structure sharing.",
+      "revId": "82ee49e2c01c9b508a58aee8d12dc8d13db2e440",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07a44cf6_bd8ed653",
+        "filename": "cmd/cue/cmd/testdata/script/invalid_tag_pos.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-24T10:41:04Z",
+      "side": 1,
+      "message": "Something seems off here. Please add TODO",
+      "revId": "82ee49e2c01c9b508a58aee8d12dc8d13db2e440",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c6df476_9c89f25b",
+        "filename": "codereview.cfg",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-24T10:41:04Z",
+      "side": 1,
+      "message": "Maybe add TODO(toposort): is this the right order?",
+      "revId": "82ee49e2c01c9b508a58aee8d12dc8d13db2e440",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

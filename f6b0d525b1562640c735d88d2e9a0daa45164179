@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84086ac1_11c9aaef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-24T09:13:35Z",
+      "side": 1,
+      "message": "Placing a hold as a reminder that we want to flip evalv3 on by default before we merge further changes. Should be done very soon.",
+      "revId": "f6b0d525b1562640c735d88d2e9a0daa45164179",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

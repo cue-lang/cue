@@ -179,8 +179,6 @@ diff old new
      B: (#list){
      }
    }
--- diff/todo/p1 --
-full.ports|reduced.B: incomplete value (list)
 -- out/eval --
 (struct){
   full: (struct){

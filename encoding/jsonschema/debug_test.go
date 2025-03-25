@@ -111,8 +111,7 @@ func TestExtX(t *testing.T) {
 	qt.Assert(t, qt.IsNil(extractErr))
 	b, err := format.Node(schemaAST, format.Simplify())
 	qt.Assert(t, qt.IsNil(err))
-	t.Logf("extracted schema: %v", string(b))
-	schema := string(b)
+	t.Logf("SCHEMA: %v", string(b))
 	schemaValue := ctx.CompileBytes(b, cue.Filename("generated.cue"))
 	if err := schemaValue.Err(); err != nil {
 		t.Fatalf("cannot compile resulting schema: %v", errors.Details(err, nil))
@@ -126,10 +125,9 @@ func TestExtX(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err), qt.Commentf("test data: %q; details: %v", testData, errors.Details(err, nil)))
 
 	instValue := ctx.BuildExpr(instAST)
+	t.Log("VALUE", instValue)
 	qt.Assert(t, qt.IsNil(instValue.Err()))
 	err = instValue.Unify(schemaValue).Validate(cue.Concrete(true))
 
-	t.Error(err)
-	t.Log("VALUE", instValue)
-	t.Log("SCHEMA", schema)
+	t.Error(errors.Details(err, nil))
 }

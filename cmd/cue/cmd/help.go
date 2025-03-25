@@ -297,7 +297,7 @@ If an environment variable is unset or empty, sensible default setting is used.
 	CUE_EXPERIMENT
 		Comma-separated list of experiment flags to enable or disable:
 
-		evalv3
+		evalv3 (default true)
 			Enable the new CUE evaluator, addressing performance issues
 			and bringing a better disjunction algorithm.
 		embed
@@ -318,10 +318,6 @@ If an environment variable is unset or empty, sensible default setting is used.
 			when interacting with module registries.
 		sortfields
 			Force fields in stucts to be sorted lexicographically.
-		openinline (default true)
-			Permit disallowed fields to be selected into literal struct
-			that would normally result in a close error, mimicking evalv2
-			closedness behavior in evalv3 to aid the transition.
 
 CUE_EXPERIMENT and CUE_DEBUG are comma-separated lists of key-value strings,
 where the value is a boolean "true" or "1" if omitted. For example:

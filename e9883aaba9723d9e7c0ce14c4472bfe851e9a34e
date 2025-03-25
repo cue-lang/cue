@@ -16,6 +16,24 @@
       "message": "As noted in the subsequent CL, I think this CL is simpler and clearer if squashed into the subsequent CL.",
       "revId": "e9883aaba9723d9e7c0ce14c4472bfe851e9a34e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78de55f2_5ef697c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-25T14:55:45Z",
+      "side": 1,
+      "message": "ok, I\u0027ll squash it. I was afraid this would become too big.",
+      "parentUuid": "82a878b8_26dbaa0d",
+      "revId": "e9883aaba9723d9e7c0ce14c4472bfe851e9a34e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

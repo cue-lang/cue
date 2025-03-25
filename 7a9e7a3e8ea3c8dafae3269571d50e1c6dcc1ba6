@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2032aa2_dcd1dac1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-25T14:24:25Z",
+      "side": 1,
+      "message": "I do think this should be squashed with the preceding CL - it took some figuring out that this CL undid *all* of the changes to the jsonschema tests from the preceding CL.",
+      "revId": "7a9e7a3e8ea3c8dafae3269571d50e1c6dcc1ba6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e1b0eb9_e80c88ed",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 988,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-25T14:24:25Z",
+      "side": 1,
+      "message": "\"one\" I think.",
+      "range": {
+        "startLine": 988,
+        "startChar": 42,
+        "endLine": 988,
+        "endChar": 44
+      },
+      "revId": "7a9e7a3e8ea3c8dafae3269571d50e1c6dcc1ba6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff28fd27_f22c496b",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 993,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-25T14:24:25Z",
+      "side": 1,
+      "message": "Odd indentation here.",
+      "revId": "7a9e7a3e8ea3c8dafae3269571d50e1c6dcc1ba6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

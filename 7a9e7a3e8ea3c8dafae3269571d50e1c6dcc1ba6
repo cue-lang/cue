@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05c36244_86ead5bc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-25T15:03:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f2032aa2_dcd1dac1",
+      "revId": "7a9e7a3e8ea3c8dafae3269571d50e1c6dcc1ba6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e1b0eb9_e80c88ed",
@@ -41,6 +59,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1f78185_739423a0",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 988,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-25T15:03:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e1b0eb9_e80c88ed",
+      "range": {
+        "startLine": 988,
+        "startChar": 42,
+        "endLine": 988,
+        "endChar": 44
+      },
+      "revId": "7a9e7a3e8ea3c8dafae3269571d50e1c6dcc1ba6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff28fd27_f22c496b",
@@ -54,6 +96,24 @@
       "writtenOn": "2025-03-25T14:24:25Z",
       "side": 1,
       "message": "Odd indentation here.",
+      "revId": "7a9e7a3e8ea3c8dafae3269571d50e1c6dcc1ba6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3c233b6_5a67e59f",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 993,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-25T15:03:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff28fd27_f22c496b",
       "revId": "7a9e7a3e8ea3c8dafae3269571d50e1c6dcc1ba6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

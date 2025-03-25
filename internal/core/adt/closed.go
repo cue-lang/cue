@@ -125,7 +125,6 @@ type CloseInfo struct {
 	// from fields defined by this conjunct.
 	// NOTE: only used when using closeContext.
 	FromDef bool
-	TopDef  bool
 
 	// FieldTypes indicates which kinds of fields (optional, dynamic, patterns,
 	// etc.) are contained in this conjunct.

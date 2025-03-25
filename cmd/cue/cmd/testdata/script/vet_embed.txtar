@@ -2,9 +2,6 @@
 # correctly against files from other packages without first merging these
 # files, thereby effectively embedding them and averting the closed check.
 
-# TODO(evalv3: reenable this test.
-skip
-
 # Issue #743
 
 ! exec cue vet schema.cue foo.yaml

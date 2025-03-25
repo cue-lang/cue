@@ -413,7 +413,7 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 	return id
 }
 
-// splitDefID is used to mark the outer struct of a field in which embeddings
+// splitStruct is used to mark the outer struct of a field in which embeddings
 // occur. The significance is that a reference to this node expects a node
 // to be closed, even if it only has embeddings. Consider for instance:
 //
@@ -423,7 +423,7 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 // TODO(flatclose): this is a temporary solution to handle the case where a
 // definition is embedded within a struct. It can be removed if we implement
 // the #A vs #A... semantics.
-func (n *nodeContext) splitDefID(s *StructLit, id CloseInfo) CloseInfo {
+func (n *nodeContext) splitStruct(s *StructLit, id CloseInfo) CloseInfo {
 	if n.ctx.OpenDef {
 		return id
 	}
@@ -441,6 +441,10 @@ func (n *nodeContext) splitDefID(s *StructLit, id CloseInfo) CloseInfo {
 		return id
 	}
 
+	return n.splitScope(id)
+}
+
+func (n *nodeContext) splitScope(id CloseInfo) CloseInfo {
 	id, dstID := n.newGroup(id, true)
 
 	if id.outerID == 0 {

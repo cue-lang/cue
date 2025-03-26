@@ -760,6 +760,7 @@ func (v *Vertex) IsData() bool {
 // of this vertex. Arcs are left untouched.
 // It is used by cue.Eval to convert nodes to data on per-node basis.
 func (v *Vertex) ToDataSingle() *Vertex {
+	v = v.DerefValue()
 	w := *v
 	w.isData = true
 	w.state = nil

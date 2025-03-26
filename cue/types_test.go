@@ -2409,8 +2409,9 @@ func TestUnifyAccept(t *testing.T) {
 // Issue #3829
 func TestConjunctDedup(t *testing.T) {
 	type testCase struct {
-		value string
-		want  string
+		value     string
+		want      string
+		conjuncts string // only tested if not ""
 	}
 	testCases := []testCase{{
 		value: `
@@ -2423,6 +2424,16 @@ func TestConjunctDedup(t *testing.T) {
 	f1: int
 	f:  string
 }`,
+	}, {
+		// Issue #3847
+		value: `
+		import "struct"
+
+		#t: struct.MinFields(4)
+		#t: struct.MaxFields(9)
+		`,
+		want:      `struct.MinFields(4) & struct.MaxFields(9)`,
+		conjuncts: `[struct.MinFields(4) struct.MaxFields(9)]`,
 	}}
 
 	matrix := cuetdtest.FullMatrix
@@ -2446,6 +2457,12 @@ func TestConjunctDedup(t *testing.T) {
 				}
 			}
 			t.Equal(fmt.Sprint(v), tc.want)
+
+			_, args = v.Expr()
+			if tc.conjuncts == "" {
+				return
+			}
+			t.Equal(fmt.Sprint(args), tc.conjuncts)
 		})
 	})
 }

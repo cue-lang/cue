@@ -1766,24 +1766,20 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 		n.AddConjunct(cv)
 		n.AddConjunct(cw)
 
-		n.Finalize(ctx)
-
-		n.Parent = v.v.Parent
-		n.Label = v.v.Label
-
-		if err := n.Err(ctx); err != nil {
-			return makeValue(v.idx, n, v.parent_)
-		}
-		if err := allowed(ctx, accept.v, n); err != nil {
-			return newErrValue(accept, err)
-		}
-
 	case internal.EvalV3:
 		n.AddOpenConjunct(ctx, v.v)
 		n.AddOpenConjunct(ctx, w.v)
-		ca := adt.MakeRootConjunct(nil, accept.v)
-		n.AddConjunct(ca)
-		n.Finalize(ctx)
+	}
+	n.Finalize(ctx)
+
+	n.Parent = v.v.Parent
+	n.Label = v.v.Label
+
+	if err := n.Err(ctx); err != nil {
+		return makeValue(v.idx, n, v.parent_)
+	}
+	if err := allowed(ctx, accept.v, n); err != nil {
+		return newErrValue(accept, err)
 	}
 
 	return makeValue(v.idx, n, v.parent_)

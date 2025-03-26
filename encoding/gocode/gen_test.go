@@ -50,58 +50,43 @@ conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encodi
     pkg1/instance.cue:x:x
 A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
     pkg1/instance.cue:x:x
+    _:1:4
     pkg1/instance.cue:x:x
 `,
 	}, {
 		name:  "failing field of type int",
 		value: &pkg1.MyStruct{A: 11, B: "dog"},
 		want: `
-5 errors in empty disjunction:
-cannot combine regular field "B" with null
-cannot combine regular field "I" with null
+2 errors in empty disjunction:
 conflicting values null and {A:<=10,B:(=~"cat"|*"dog"),O?:OtherStruct,I:"cuelang.org/go/encoding/gocode/testdata/pkg2".ImportMe} (mismatched types null and struct):
     pkg1/instance.cue:x:x
-cannot combine regular field "T" with null:
-    json:1:1
 A: invalid value 11 (out of bound <=10):
-    pkg1/instance.cue:x:x
-`,
+    pkg1/instance.cue:x:x`,
 	}, {
 		name:  "failing nested struct ",
 		value: &pkg1.MyStruct{A: 5, B: "dog", O: &pkg1.OtherStruct{A: "car", P: 6}},
 		want: `
-9 errors in empty disjunction:
-cannot combine regular field "A" with null
-cannot combine regular field "B" with null
-cannot combine regular field "I" with null
+4 errors in empty disjunction:
 conflicting values null and {A:<=10,B:(=~"cat"|*"dog"),O?:OtherStruct,I:"cuelang.org/go/encoding/gocode/testdata/pkg2".ImportMe} (mismatched types null and struct):
     pkg1/instance.cue:x:x
-O: 3 errors in empty disjunction:
-O: cannot combine regular field "P" with null
+O: 2 errors in empty disjunction:
 O: conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encoding/gocode/testdata/pkg2".PickMe} (mismatched types null and struct):
     pkg1/instance.cue:x:x
-cannot combine regular field "T" with null:
-    json:1:1
 O.A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
     pkg1/instance.cue:x:x
+    _:1:4
     pkg1/instance.cue:x:x
 `,
 	}, {
 		name:  "fail nested struct of different package",
 		value: &pkg1.MyStruct{A: 5, B: "dog", O: &pkg1.OtherStruct{A: "X", P: 4}},
 		want: `
-9 errors in empty disjunction:
-cannot combine regular field "A" with null
-cannot combine regular field "B" with null
-cannot combine regular field "I" with null
+4 errors in empty disjunction:
 conflicting values null and {A:<=10,B:(=~"cat"|*"dog"),O?:OtherStruct,I:"cuelang.org/go/encoding/gocode/testdata/pkg2".ImportMe} (mismatched types null and struct):
     pkg1/instance.cue:x:x
-O: 3 errors in empty disjunction:
-O: cannot combine regular field "A" with null
+O: 2 errors in empty disjunction:
 O: conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encoding/gocode/testdata/pkg2".PickMe} (mismatched types null and struct):
     pkg1/instance.cue:x:x
-cannot combine regular field "T" with null:
-    json:1:1
 O.P: invalid value 4 (out of bound >5):
     pkg2/instance.cue:x:x
 `,

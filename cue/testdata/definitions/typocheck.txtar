@@ -280,8 +280,8 @@ Reused: 0
 Allocs: 475
 Retain: 0
 
-Unifications: 376
-Conjuncts:    731
+Unifications: 375
+Conjuncts:    730
 Disjuncts:    34
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -302,8 +302,8 @@ diff old new
 -Unifications: 636
 -Conjuncts:    1326
 -Disjuncts:    861
-+Unifications: 376
-+Conjuncts:    731
++Unifications: 375
++Conjuncts:    730
 +Disjuncts:    34
 -- out/eval/stats --
 Leaks:  95
@@ -952,9 +952,7 @@ Result:
         }
         out: (#struct){
           b1: (_|_){
-            // [incomplete] disjunction.withErr.t1.out.b1: 5 errors in empty disjunction:
-            // disjunction.withErr.t1.out.b1: cannot combine regular field "b2" with null:
-            //     ./validators.cue:31:17
+            // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
             // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
             //     ./validators.cue:29:7
             //     ./validators.cue:31:17
@@ -1593,18 +1591,7 @@ diff old new
        }
      }
      out: (#struct){
-@@ -768,7 +634,9 @@
-         }
-         out: (#struct){
-           b1: (_|_){
--            // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
-+            // [incomplete] disjunction.withErr.t1.out.b1: 5 errors in empty disjunction:
-+            // disjunction.withErr.t1.out.b1: cannot combine regular field "b2" with null:
-+            //     ./validators.cue:31:17
-             // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
-             //     ./validators.cue:29:7
-             //     ./validators.cue:31:17
-@@ -778,17 +646,8 @@
+@@ -778,17 +644,8 @@
              //     ./validators.cue:32:17
              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
              //     ./validators.cue:29:22

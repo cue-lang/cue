@@ -305,6 +305,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 		// TODO: consider bailing on error if n.errs != nil.
 		// At the very least, no longer propagate typo errors if this node
 		// is erroneous.
+		case n.kind == BottomKind:
 		case n.completeAllArcs(needs, mode, checkTypos):
 		}
 

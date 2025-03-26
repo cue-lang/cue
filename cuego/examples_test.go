@@ -44,10 +44,7 @@ func ExampleComplete_structTag() {
 	// Output:
 	// completed: cuego_test.Sum{A:1, B:5, C:6} (err: <nil>)
 	// completed: cuego_test.Sum{A:2, B:6, C:8} (err: <nil>)
-	// 5 errors in empty disjunction:
-	// cannot combine regular field "A" with null
-	// cannot combine regular field "B" with null
-	// cannot combine regular field "C" with null
+	// 2 errors in empty disjunction:
 	// conflicting values null and {A:2,B:3,C:8} (mismatched types null and struct)
 	// A: conflicting values 5 and 2
 }
@@ -100,14 +97,10 @@ func ExampleConstrain() {
 	// Output:
 	// error: nil
 	// validate: nil
-	// validate: 4 errors in empty disjunction:
-	// cannot combine regular field "Filename" with null
-	// cannot combine regular field "MaxCount" with null
+	// validate: 2 errors in empty disjunction:
 	// conflicting values null and {Filename:"foo.json",MaxCount:12,MinCount:39} (mismatched types null and struct)
 	// MinCount: invalid value 39 (out of bound <=12)
-	// validate: 4 errors in empty disjunction:
-	// cannot combine regular field "MaxCount" with null
-	// cannot combine regular field "MinCount" with null
+	// validate: 2 errors in empty disjunction:
 	// conflicting values null and {Filename:"foo.jso",MaxCount:120,MinCount:39} (mismatched types null and struct)
 	// Filename: invalid value "foo.jso" (out of bound =~".json$")
 }

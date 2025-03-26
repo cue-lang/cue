@@ -280,11 +280,6 @@ issue3474.topValidator.failType.A: invalid operands {C:1} and 10 to '>' (type _|
     ./issue3474.cue:53:5
     ./issue3474.cue:53:17
     ./issue3474.cue:54:5
-issue3474.topValidator.failType.A: cannot combine regular field "C" with {C:1}:
-    ./issue3474.cue:55:15
-    ./issue3474.cue:53:5
-    ./issue3474.cue:53:16
-    ./issue3474.cue:54:5
 
 Result:
 (_|_){
@@ -507,11 +502,6 @@ Result:
           //     ./issue3474.cue:53:5
           //     ./issue3474.cue:53:17
           //     ./issue3474.cue:54:5
-          // issue3474.topValidator.failType.A: cannot combine regular field "C" with {C:1}:
-          //     ./issue3474.cue:55:15
-          //     ./issue3474.cue:53:5
-          //     ./issue3474.cue:53:16
-          //     ./issue3474.cue:54:5
           C: (int){ 1 }
         }
       }
@@ -571,7 +561,7 @@ diff old new
      ./issue3474.cue:12:5
      ./issue3474.cue:12:22
      ./issue3474.cue:13:5
-@@ -51,6 +51,16 @@
+@@ -51,6 +51,11 @@
      ./issue3474.cue:53:5
      ./issue3474.cue:53:12
      ./issue3474.cue:54:5
@@ -580,15 +570,10 @@ diff old new
 +    ./issue3474.cue:53:5
 +    ./issue3474.cue:53:17
 +    ./issue3474.cue:54:5
-+issue3474.topValidator.failType.A: cannot combine regular field "C" with {C:1}:
-+    ./issue3474.cue:55:15
-+    ./issue3474.cue:53:5
-+    ./issue3474.cue:53:16
-+    ./issue3474.cue:54:5
  
  Result:
  (_|_){
-@@ -142,10 +152,8 @@
+@@ -142,10 +147,8 @@
        }
      }
      incomplete1: (_|_){
@@ -601,7 +586,7 @@ diff old new
        _a: (_|_){
          // [incomplete] issue2098.incomplete1._a: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
          //     ./in.cue:112:6
-@@ -209,7 +217,7 @@
+@@ -209,7 +212,7 @@
        failAfter: (_|_){
          // [eval]
          A: (_|_){
@@ -610,7 +595,7 @@ diff old new
            //     ./issue3474.cue:12:5
            //     ./issue3474.cue:12:22
            //     ./issue3474.cue:13:5
-@@ -270,6 +278,16 @@
+@@ -270,6 +273,11 @@
            //     ./issue3474.cue:53:5
            //     ./issue3474.cue:53:12
            //     ./issue3474.cue:54:5
@@ -619,15 +604,10 @@ diff old new
 +          //     ./issue3474.cue:53:5
 +          //     ./issue3474.cue:53:17
 +          //     ./issue3474.cue:54:5
-+          // issue3474.topValidator.failType.A: cannot combine regular field "C" with {C:1}:
-+          //     ./issue3474.cue:55:15
-+          //     ./issue3474.cue:53:5
-+          //     ./issue3474.cue:53:16
-+          //     ./issue3474.cue:54:5
            C: (int){ 1 }
          }
        }
-@@ -276,7 +294,7 @@
+@@ -276,7 +284,7 @@
      }
    }
    issue3639: (struct){
@@ -636,7 +616,7 @@ diff old new
        b: (int){ 1 }
      }
      #X: (_){ matchN(1, (#list){
-@@ -293,7 +311,7 @@
+@@ -293,7 +301,7 @@
            // }
          }
        }) }
@@ -645,7 +625,7 @@ diff old new
        b: (int){ 1 }
      }
    }
-@@ -308,10 +326,10 @@
+@@ -308,10 +316,10 @@
            // }
          }
        }) }

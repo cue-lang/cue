@@ -178,7 +178,6 @@ shareCycle.t1.Y.x.x: structural cycle
 shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
     ./sharecycle.cue:8:6
     ./sharecycle.cue:9:5
-shareCycle.t2.Y.x.x: structural cycle
 shareCycle.t3.Y.x.x: structural cycle
 
 Result:
@@ -441,9 +440,7 @@ Result:
           // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
           //     ./sharecycle.cue:8:6
           //     ./sharecycle.cue:9:5
-          // shareCycle.t2.Y.x.x: structural cycle
-          x: (_|_){
-            // [structural cycle] shareCycle.t2.Y.x.x: structural cycle
+          x: (_|_){// (〈1;#X〉 & 〈1;Y〉)
           }
         }
       }
@@ -468,15 +465,16 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -3,7 +3,6 @@
+@@ -3,8 +3,6 @@
  shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
      ./sharecycle.cue:8:6
      ./sharecycle.cue:9:5
 -    ./sharecycle.cue:10:11
- shareCycle.t2.Y.x.x: structural cycle
+-shareCycle.t2.Y.x.x: structural cycle
  shareCycle.t3.Y.x.x: structural cycle
  
-@@ -27,102 +26,75 @@
+ Result:
+@@ -27,102 +25,75 @@
            }
          }
          #Config1: (#struct){
@@ -648,7 +646,7 @@ diff old new
          }
          Config: (#struct){
            cfg: (#struct){
-@@ -148,24 +120,13 @@
+@@ -148,24 +119,13 @@
          }
        }
        #Config1: (#struct){
@@ -676,7 +674,7 @@ diff old new
        }
        #Config: (#struct){
          cfg: (#struct){
-@@ -173,12 +134,7 @@
+@@ -173,12 +133,7 @@
            }
          }
        }
@@ -690,7 +688,7 @@ diff old new
        out: (#struct){
          sch: (#struct){
            cfg: (#struct){
-@@ -247,9 +203,7 @@
+@@ -247,9 +202,7 @@
    }
    debug: (struct){
      sharingOn: (struct){
@@ -701,15 +699,17 @@ diff old new
        b: (struct){
          c: (int){ 1 }
        }
-@@ -312,7 +266,7 @@
+@@ -312,9 +265,7 @@
            // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
            //     ./sharecycle.cue:8:6
            //     ./sharecycle.cue:9:5
 -          //     ./sharecycle.cue:10:11
-+          // shareCycle.t2.Y.x.x: structural cycle
-           x: (_|_){
-             // [structural cycle] shareCycle.t2.Y.x.x: structural cycle
+-          x: (_|_){
+-            // [structural cycle] shareCycle.t2.Y.x.x: structural cycle
++          x: (_|_){// (〈1;#X〉 & 〈1;Y〉)
            }
+         }
+       }
 -- out/eval --
 Errors:
 shareCycle.t1.Y.x.x: structural cycle

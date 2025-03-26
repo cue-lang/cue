@@ -1,4 +1,3 @@
-#skip-v3
 -- in.cue --
 import "struct"
 

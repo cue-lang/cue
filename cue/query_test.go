@@ -121,6 +121,14 @@ func TestLookupPath(t *testing.T) {
 		`,
 		path: cue.MakePath(cue.Str("y"), cue.AnyString),
 		out:  `int`,
+	}, {
+		in:   `t: {...}`,
+		path: cue.MakePath(cue.Str("t"), cue.AnyString),
+		out:  `_`,
+	}, {
+		in:   `t: [...]`,
+		path: cue.MakePath(cue.Str("t"), cue.AnyIndex),
+		out:  `_`,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.path.String(), func(t *testing.T, m *cuetdtest.M) {

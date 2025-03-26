@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a341d84_ff425cb8",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-26T12:10:28Z",
+      "side": 1,
+      "message": "this change in error message also seems fine; the struct here is the `#root` schema with many fields. I guess the evaluator chooses one field to show as part of the short error message; `doc` and `embedded2` are both top-level optional fields in `#root`.",
+      "revId": "903b077cef04470f00232b692d3aa81d3042fbcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

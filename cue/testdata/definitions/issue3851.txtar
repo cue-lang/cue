@@ -1,0 +1,178 @@
+-- in.cue --
+#App: {
+	name?: string
+	sub1?: sub2?: null | _
+}
+#Output: null | #App
+out: #Output & {
+	name: "foo"
+	sub1: sub2: {} | _
+	sub1: sub2: {
+		sub3: {
+			let _let = "bar"
+			foo: _let
+		}
+	}
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  48
+Reused: 39
+Allocs: 9
+Retain: 0
+
+Unifications: 34
+Conjuncts:    65
+Disjuncts:    48
+-- out/evalalpha --
+Errors:
+out: 3 errors in empty disjunction:
+out.name: field not allowed:
+    ./in.cue:7:2
+out.sub1: field not allowed:
+    ./in.cue:8:2
+    ./in.cue:9:2
+out.sub1.sub2: field not allowed:
+    ./in.cue:3:9
+    ./in.cue:8:8
+    ./in.cue:9:8
+
+Result:
+(_|_){
+  // [eval]
+  #App: (#struct){
+    name?: (string){ string }
+    sub1?: (#struct){
+      sub2?: (_){ |((null){ null }, (_){ _ }) }
+    }
+  }
+  #Output: ((null|struct)){ |((null){ null }, (#struct){
+      name?: (string){ string }
+      sub1?: (#struct){
+        sub2?: (_){ |((null){ null }, (_){ _ }) }
+      }
+    }) }
+  out: (_|_){
+    // [eval] out: 3 errors in empty disjunction:
+    // out.name: field not allowed:
+    //     ./in.cue:7:2
+    // out.sub1: field not allowed:
+    //     ./in.cue:8:2
+    //     ./in.cue:9:2
+    // out.sub1.sub2: field not allowed:
+    //     ./in.cue:3:9
+    //     ./in.cue:8:8
+    //     ./in.cue:9:8
+    name: (string){ "foo" }
+    sub1: (struct){
+      sub2: (struct){
+        sub3: (struct){
+          let _let#1 = (string){ "bar" }
+          foo: (_){ _ }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,18 @@
+-(struct){
++Errors:
++out: 3 errors in empty disjunction:
++out.name: field not allowed:
++    ./in.cue:7:2
++out.sub1: field not allowed:
++    ./in.cue:8:2
++    ./in.cue:9:2
++out.sub1.sub2: field not allowed:
++    ./in.cue:3:9
++    ./in.cue:8:8
++    ./in.cue:9:8
++
++Result:
++(_|_){
++  // [eval]
+   #App: (#struct){
+     name?: (string){ string }
+     sub1?: (#struct){
+@@ -11,13 +25,23 @@
+         sub2?: (_){ |((null){ null }, (_){ _ }) }
+       }
+     }) }
+-  out: (#struct){
++  out: (_|_){
++    // [eval] out: 3 errors in empty disjunction:
++    // out.name: field not allowed:
++    //     ./in.cue:7:2
++    // out.sub1: field not allowed:
++    //     ./in.cue:8:2
++    //     ./in.cue:9:2
++    // out.sub1.sub2: field not allowed:
++    //     ./in.cue:3:9
++    //     ./in.cue:8:8
++    //     ./in.cue:9:8
+     name: (string){ "foo" }
+-    sub1: (#struct){
++    sub1: (struct){
+       sub2: (struct){
+         sub3: (struct){
+           let _let#1 = (string){ "bar" }
+-          foo: (string){ "bar" }
++          foo: (_){ _ }
+         }
+       }
+     }
+-- out/eval --
+(struct){
+  #App: (#struct){
+    name?: (string){ string }
+    sub1?: (#struct){
+      sub2?: (_){ |((null){ null }, (_){ _ }) }
+    }
+  }
+  #Output: ((null|struct)){ |((null){ null }, (#struct){
+      name?: (string){ string }
+      sub1?: (#struct){
+        sub2?: (_){ |((null){ null }, (_){ _ }) }
+      }
+    }) }
+  out: (#struct){
+    name: (string){ "foo" }
+    sub1: (#struct){
+      sub2: (struct){
+        sub3: (struct){
+          let _let#1 = (string){ "bar" }
+          foo: (string){ "bar" }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #App: {
+    name?: string
+    sub1?: {
+      sub2?: (null|_)
+    }
+  }
+  #Output: (null|〈0;#App〉)
+  out: (〈0;#Output〉 & {
+    name: "foo"
+    sub1: {
+      sub2: ({}|_)
+    }
+    sub1: {
+      sub2: {
+        sub3: {
+          let _let#1 = "bar"
+          foo: 〈0;let _let#1〉
+        }
+      }
+    }
+  })
+}

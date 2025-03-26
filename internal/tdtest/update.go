@@ -206,7 +206,8 @@ func findFileAndPackage(path string, pkgs []*packages.Package) (*ast.File, *pack
 func isT(s string) bool {
 	// TODO: parametrize this so that tdtest does not have to know of cuetdtest.
 	return s == "*cuelang.org/go/internal/tdtest.T" ||
-		s == "*cuelang.org/go/internal/cuetdtest.T"
+		s == "*cuelang.org/go/internal/cuetdtest.T" ||
+		s == "*cuelang.org/go/internal/cuetest.T"
 }
 
 // findCalls finds all call expressions within a given block for functions

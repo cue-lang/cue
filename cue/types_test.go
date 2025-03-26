@@ -2340,13 +2340,19 @@ func TestUnifyAccept(t *testing.T) {
 		want:  `"foo"`,
 	}, {
 		value: `#v: {a: "foo"}, #w: {b: 4}, #accept: {a: string, b: int}`,
-		want:  `{"a":"foo","b":4}`,
+		want: `{
+	a: "foo"
+	b: 4
+}`,
 	}, {
 		value: `#v: [string,  4], #w: ["foo", 4], #accept: [string, int, ...]`,
-		want:  `["foo",4]`,
+		want:  `["foo", 4]`,
 	}, {
 		value: `#v: {a: string, b: 1, _#hidden: int}, #w: {a: "foo"}, #accept: {...}`,
-		want:  `{"a":"foo","b":1}`,
+		want: `{
+	a: "foo"
+	b: 1
+}`,
 	}, {
 		// Issue #2325: let should not result in a closedness error.
 		value: `#accept: {
@@ -2364,7 +2370,9 @@ func TestUnifyAccept(t *testing.T) {
 		#w: {b:1}
 		#accept: {...}
 		`,
-		want: `{"b":1}`,
+		want: `{
+	b: 1
+}`,
 	}}
 
 	matrix := cuetdtest.FullMatrix
@@ -2375,14 +2383,17 @@ func TestUnifyAccept(t *testing.T) {
 	matrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 			v := getValue(m, tc.value)
+			if err := v.Err(); err != nil {
+				t.Fatal(err)
+			}
 			x := v.LookupPath(cue.ParsePath("#v"))
 			y := v.LookupPath(cue.ParsePath("#w"))
 			a := v.LookupPath(cue.ParsePath("#accept"))
-			b, err := x.UnifyAccept(y, a).MarshalJSON()
-			if err != nil {
+			z := x.UnifyAccept(y, a)
+			if err := z.Err(); err != nil {
 				t.Fatal(err)
 			}
-			t.Equal(string(b), tc.want)
+			t.Equal(fmt.Sprint(z), tc.want)
 		})
 	})
 }

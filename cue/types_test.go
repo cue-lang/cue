@@ -2408,41 +2408,45 @@ func TestUnifyAccept(t *testing.T) {
 //
 // Issue #3829
 func TestConjunctDedup(t *testing.T) {
-	const str = `
-	#t: {} | {f1: int}
-	#t: {f: string}
-	`
-
-	const want = `
-{
+	type testCase struct {
+		value string
+		want  string
+	}
+	testCases := []testCase{{
+		value: `
+		#t: {} | {f1: int}
+		#t: {f: string}
+		`,
+		want: `{
 	f: string
 } | {
 	f1: int
 	f:  string
-}
-`
+}`,
+	}}
 
-	cuetdtest.FullMatrix.Run(t, "test", func(t *testing.T, m *cuetdtest.M) {
-		ctx := m.CueContext()
-		tPath := cue.MakePath(cue.Def("#t"))
-		vOrig := ctx.CompileString(str).LookupPath(tPath)
+	matrix := cuetdtest.FullMatrix
+	matrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
+			ctx := m.CueContext()
+			tPath := cue.MakePath(cue.Def("#t"))
+			vOrig := ctx.CompileString(tc.value).LookupPath(tPath)
 
-		if err := vOrig.Err(); err != nil {
-			t.Fatal(err)
-		}
+			if err := vOrig.Err(); err != nil {
+				t.Fatal(err)
+			}
 
-		_, args := vOrig.Expr()
+			_, args := vOrig.Expr()
 
-		var v cue.Value
-		v = v.UnifyAccept(args[0], vOrig)
-		v = v.UnifyAccept(args[1], vOrig)
-
-		if err := v.Err(); err != nil {
-			t.Fatal(errors.Details(v.Err(), nil))
-		}
-		if got := fmt.Sprint(v); got != strings.TrimSpace(want) {
-			t.Errorf("got %s; want %s", got, want)
-		}
+			var v cue.Value
+			for _, a := range args {
+				v = v.UnifyAccept(a, vOrig)
+				if err := v.Err(); err != nil {
+					t.Fatal(errors.Details(v.Err(), nil))
+				}
+			}
+			t.Equal(fmt.Sprint(v), tc.want)
+		})
 	})
 }
 

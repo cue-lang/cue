@@ -16,6 +16,24 @@
       "message": "Testing the release step via https://github.com/cue-lang/cue/actions/runs/14083677151/job/39442191882",
       "revId": "b5da8ab3f32c7f8f344c34b33f146f4ca7f93053",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97991901_64cdb242",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-03-26T12:54:15Z",
+      "side": 1,
+      "message": "This passed ok.",
+      "parentUuid": "87390b21_97f9fad5",
+      "revId": "b5da8ab3f32c7f8f344c34b33f146f4ca7f93053",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

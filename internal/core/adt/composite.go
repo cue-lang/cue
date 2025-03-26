@@ -1264,12 +1264,14 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 	}
 
 	// Go backwards to simulate old implementation.
-	for i := len(v.Structs) - 1; i >= 0; i-- {
-		s := v.Structs[i]
-		if s.Disable {
-			continue
+	if !ctx.isDevVersion() {
+		for i := len(v.Structs) - 1; i >= 0; i-- {
+			s := v.Structs[i]
+			if s.Disable {
+				continue
+			}
+			s.MatchAndInsert(ctx, arc)
 		}
-		s.MatchAndInsert(ctx, arc)
 	}
 
 	// This is the equivalent for the new implementation.
@@ -1288,8 +1290,14 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 			}
 		}
 	}
-}
 
+	if len(arc.Conjuncts) == 0 && v.HasEllipsis {
+		// TODO: consider adding an Ellipsis fields to the Constraints struct
+		// to record the original position of the elllipsis.
+		c := MakeRootConjunct(nil, &Top{})
+		arc.insertConjunct(ctx, c, c.CloseInfo, ArcOptional, false, false)
+	}
+}
 func (v *Vertex) IsList() bool {
 	_, ok := v.BaseValue.(*ListMarker)
 	return ok

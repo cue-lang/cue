@@ -187,7 +187,7 @@ func (n *nodeContext) insertComprehension(
 				conjunct := MakeConjunct(env, c, ci)
 				if n.ctx.isDevVersion() {
 					n.assertInitialized()
-					n.insertArcCC(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
+					n.insertArc(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
 				} else {
 					n.insertFieldUnchecked(f.Label, ArcPending, conjunct)
 				}

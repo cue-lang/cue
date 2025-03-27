@@ -295,6 +295,26 @@ loop1:
 // scheduleVertexConjuncts injects the conjuncst of src n. If src was not fully
 // evaluated, it subscribes dst for future updates.
 func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo CloseInfo) {
+	// We should not "activate" an enclosing struct for typo checking if it is
+	// derived from an embedded, inlined value:
+	//
+	//    #Schema: foo: { {embed: embedded: "foo"}.embed }
+	//    #Schema: foo: { field: string }
+	//
+	// Even though the embedding is within a schema, it should not treat the
+	// struct as closed if it itself does not refer to a schema, as it may still
+	// be unified with another struct.
+	//
+	// We check this by checking if the result is not marked as Closed.
+	// Alternativley, we could always disable this for inlined structs.
+	//
+	// TODO(#A...): this code could go if we had explicitly opened values.
+	if !arc.ClosedRecursive &&
+		!arc.ClosedNonRecursive &&
+		closeInfo.enclosingEmbed != 0 {
+		closeInfo.FromDef = false
+	}
+
 	// disjunctions, we need to dereference he underlying node.
 	if deref(n.node) == deref(arc) {
 		if n.isShared {

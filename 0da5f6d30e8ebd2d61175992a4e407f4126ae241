@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2987aa93_4f4a7507",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-27T08:25:58Z",
+      "side": 1,
+      "message": "From my testing, this does fix 3722, and it doesn\u0027t cause the same breakage to the docs side of things that my CL did.",
+      "revId": "0da5f6d30e8ebd2d61175992a4e407f4126ae241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

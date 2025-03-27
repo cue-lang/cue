@@ -786,11 +786,6 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 		state.completeNodeTasks(attemptOnly)
 	}
 
-	// TODO: remove because unnecessary?
-	if task != nil && task.state != taskRUNNING {
-		return nil // abort, task is blocked or terminated in a cycle.
-	}
-
 	// TODO: verify lookup types.
 
 	arc := v.LookupRaw(f)

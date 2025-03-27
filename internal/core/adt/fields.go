@@ -243,14 +243,6 @@ func (v *Vertex) insertConjunct(ctx *OpContext, c Conjunct, id CloseInfo, mode A
 }
 
 func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInfo, check bool) *Vertex {
-	v := n.insertArcCC(f, mode, c, id, check)
-	return v
-}
-
-// insertArc inserts conjunct c into n. If check is true it will not add c if it
-// was already added.
-// Returns the arc of n.node with label f.
-func (n *nodeContext) insertArcCC(f Feature, mode ArcType, c Conjunct, id CloseInfo, check bool) *Vertex {
 	n.assertInitialized()
 
 	if n == nil {

@@ -313,11 +313,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 			n.signal(subFieldsProcessed)
 		}
 
-		if v.BaseValue == nil {
-			// TODO: this seems to not be possible. Possibly remove.
-			state := finalized
-			v.BaseValue = n.getValidators(state)
-		}
 		if v := n.node.Value(); v != nil && IsConcrete(v) {
 			// Ensure that checks are not run again when this value is used
 			// in a validator.

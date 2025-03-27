@@ -216,11 +216,6 @@ func processDisjunctions(c *OpContext, t *task, mode runMode) {
 	t.err = CombineErrors(nil, t.err, err)
 }
 
-func processFinalizeDisjunctions(c *OpContext, t *task, mode runMode) {
-	n := t.node
-	n.finalizeDisjunctions()
-}
-
 func processListLit(c *OpContext, t *task, mode runMode) {
 	n := t.node
 

@@ -203,11 +203,6 @@ type disjunct struct {
 	mode      defaultMode
 }
 
-// TODO: remove this type.
-type disjunctHole struct {
-	holeID int
-}
-
 func (n *nodeContext) scheduleDisjunction(d envDisjunct) {
 	if len(n.disjunctions) == 0 {
 		// This processes all disjunctions in a single pass.

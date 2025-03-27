@@ -790,7 +790,6 @@ func root(v *Vertex) *Vertex {
 }
 
 func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Vertex {
-	task := c.current()
 	needs := flags.condition
 	runMode := flags.mode
 
@@ -826,11 +825,6 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 		// which circumstances this is still necessary, and at least ensure
 		// this will not be run if node v currently has a running task.
 		state.completeNodeTasks(attemptOnly)
-	}
-
-	// TODO: remove because unnecessary?
-	if task != nil && task.state != taskRUNNING {
-		return nil // abort, task is blocked or terminated in a cycle.
 	}
 
 	// TODO: verify lookup types.

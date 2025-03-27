@@ -16,7 +16,6 @@ package builtintest
 
 import (
 	"fmt"
-	"regexp"
 	"testing"
 
 	"cuelang.org/go/cue/format"
@@ -33,10 +32,6 @@ func Run(name string, t *testing.T) {
 		Name:   name,
 		Matrix: cuetdtest.SmallMatrix,
 	}
-
-	// Find common patterns that we want to ignore for testing purposes.
-	// TODO(evalv3): remove once new implementation is stable.
-	re := regexp.MustCompile(` \(and \d* more errors\)`)
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		r := t.Runtime()
@@ -73,8 +68,6 @@ func Run(name string, t *testing.T) {
 			t.Fatal(err)
 		}
 
-		s := re.ReplaceAllString(string(b), "")
-
-		fmt.Fprint(t, s)
+		fmt.Fprint(t, string(b))
 	})
 }

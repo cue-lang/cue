@@ -1453,15 +1453,6 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 		v.Finalize(c)
 
 		switch {
-		case !v.IsDefined(c):
-			c.verifyNonMonotonicResult(env, x, true) // TODO: remove?
-
-			// TODO: mimic comparison to bottom semantics. If it is a valid
-			// value, check for concreteness that this level only. This
-			// should ultimately be replaced with an exists and valid
-			// builtin.
-			match = op == EqualOp
-
 		case isFinalError(v):
 			// Need to recursively check for errors, so we need to evaluate the
 			// Vertex in case it hadn't been evaluated yet.

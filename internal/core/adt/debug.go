@@ -158,8 +158,6 @@ type mermaidContext struct {
 
 	hasError bool
 
-	refRoot map[defID]*mermaidVertex
-
 	// roots maps a Vertex to the analysis data for that Vertex.
 	roots map[*Vertex]*mermaidVertex
 

@@ -130,10 +130,12 @@ Conjuncts:    121
 Disjuncts:    94
 -- out/evalalpha --
 Errors:
-issue3691.original.a.b: conflicting values 1 and string (mismatched types int and string):
+issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
     ./issue3691.cue:4:15
     ./issue3691.cue:8:10
-issue3691.structuralCycle.a.b.c: structural cycle
+issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
+    ./issue3691.cue:14:15
+    ./issue3691.cue:15:5
 
 Result:
 (_|_){
@@ -250,7 +252,7 @@ Result:
         b: (_|_){
           // [eval]
           c: (_|_){
-            // [eval] issue3691.original.a.b: conflicting values 1 and string (mismatched types int and string):
+            // [eval] issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
             //     ./issue3691.cue:4:15
             //     ./issue3691.cue:8:10
           }
@@ -258,15 +260,20 @@ Result:
       }
     }
     structuralCycle: (_|_){
-      // [structural cycle]
+      // [eval]
       X: (struct){
       }
       a: (_|_){
-        // [structural cycle]
+        // [eval]
         b: (_|_){
-          // [structural cycle]
+          // [eval]
           c: (_|_){
-            // [structural cycle] issue3691.structuralCycle.a.b.c: structural cycle
+            // [eval] issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
+            //     ./issue3691.cue:14:15
+            //     ./issue3691.cue:15:5
+            b: (_|_){
+              // [cycle] cycle error
+            }
           }
         }
       }
@@ -277,69 +284,44 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,14 +1,8 @@
+@@ -1,14 +1,10 @@
  Errors:
--issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
-+issue3691.original.a.b: conflicting values 1 and string (mismatched types int and string):
+ issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
      ./issue3691.cue:4:15
 -    ./issue3691.cue:7:3
      ./issue3691.cue:8:10
--issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
--    ./issue3691.cue:14:15
--    ./issue3691.cue:15:5
+ issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
+     ./issue3691.cue:14:15
+     ./issue3691.cue:15:5
 -    ./issue3691.cue:17:3
 -    ./issue3691.cue:18:10
 -issue3691.structuralCycle.a.b.c.b.c: structural cycle
-+issue3691.structuralCycle.a.b.c: structural cycle
  
  Result:
  (_|_){
-@@ -125,9 +119,8 @@
-         b: (_|_){
-           // [eval]
+@@ -127,7 +123,6 @@
            c: (_|_){
--            // [eval] issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
-+            // [eval] issue3691.original.a.b: conflicting values 1 and string (mismatched types int and string):
+             // [eval] issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
              //     ./issue3691.cue:4:15
 -            //     ./issue3691.cue:7:3
              //     ./issue3691.cue:8:10
            }
          }
-@@ -134,25 +127,15 @@
-       }
-     }
-     structuralCycle: (_|_){
--      // [eval]
--      X: (struct){
--      }
--      a: (_|_){
--        // [eval]
--        b: (_|_){
--          // [eval]
--          c: (_|_){
--            // [eval] issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
--            //     ./issue3691.cue:14:15
--            //     ./issue3691.cue:15:5
+@@ -145,13 +140,8 @@
+             // [eval] issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
+             //     ./issue3691.cue:14:15
+             //     ./issue3691.cue:15:5
 -            //     ./issue3691.cue:17:3
 -            //     ./issue3691.cue:18:10
--            b: (_|_){
+             b: (_|_){
 -              // [structural cycle]
 -              c: (_|_){
 -                // [structural cycle] issue3691.structuralCycle.a.b.c.b.c: structural cycle
 -              }
--            }
-+      // [structural cycle]
-+      X: (struct){
-+      }
-+      a: (_|_){
-+        // [structural cycle]
-+        b: (_|_){
-+          // [structural cycle]
-+          c: (_|_){
-+            // [structural cycle] issue3691.structuralCycle.a.b.c: structural cycle
++              // [cycle] cycle error
+             }
            }
          }
-       }
 -- diff/todo/p2 --
 Missing error positions.
 -- out/eval --

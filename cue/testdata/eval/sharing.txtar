@@ -191,8 +191,6 @@ Conjuncts:    401
 Disjuncts:    225
 -- out/evalalpha --
 Errors:
-issue3849.dep.metadata.name: field not allowed:
-    ./pendingarcs.cue:12:18
 shareCycle.t1.Y.x.x: structural cycle
 shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
     ./sharecycle.cue:8:6
@@ -436,7 +434,14 @@ Result:
   }
   pending: (struct){
     t1: (struct){
-      a: ~(pending.t1.X)
+      a: (struct){
+        b: (struct){
+          c: (struct){
+            e: (int){ 1 }
+            d: (int){ int }
+          }
+        }
+      }
       X: (struct){
         b: ~(pending.t1.Y)
       }
@@ -447,19 +452,11 @@ Result:
       }
     }
   }
-  issue3849: (_|_){
-    // [eval]
-    dep: (_|_){
-      // [eval]
-      metadata: (_|_){
-        // [eval]
-        name: (_|_){
-          // [eval] issue3849.dep.metadata.name: field not allowed:
-          //     ./pendingarcs.cue:12:18
-          app: (_|_){
-            // [eval] issue3849.dep.metadata.name.app: field not allowed:
-            //     ./pendingarcs.cue:12:24
-          }
+  issue3849: (struct){
+    dep: (#struct){
+      metadata: (#struct){
+        name: (#struct){
+          app: (string){ "mysql" }
         }
       }
     }
@@ -521,11 +518,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,10 +1,10 @@
- Errors:
-+issue3849.dep.metadata.name: field not allowed:
-+    ./pendingarcs.cue:12:18
- shareCycle.t1.Y.x.x: structural cycle
+@@ -3,8 +3,6 @@
  shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
      ./sharecycle.cue:8:6
      ./sharecycle.cue:9:5
@@ -534,7 +527,7 @@ diff old new
  shareCycle.t3.Y.x.x: structural cycle
  
  Result:
-@@ -27,102 +27,75 @@
+@@ -27,102 +25,75 @@
            }
          }
          #Config1: (#struct){
@@ -706,7 +699,7 @@ diff old new
          }
          Config: (#struct){
            cfg: (#struct){
-@@ -148,24 +121,13 @@
+@@ -148,24 +119,13 @@
          }
        }
        #Config1: (#struct){
@@ -734,7 +727,7 @@ diff old new
        }
        #Config: (#struct){
          cfg: (#struct){
-@@ -173,12 +135,7 @@
+@@ -173,12 +133,7 @@
            }
          }
        }
@@ -748,7 +741,7 @@ diff old new
        out: (#struct){
          sch: (#struct){
            cfg: (#struct){
-@@ -247,9 +204,7 @@
+@@ -247,9 +202,7 @@
    }
    debug: (struct){
      sharingOn: (struct){
@@ -759,15 +752,12 @@ diff old new
        b: (struct){
          c: (int){ 1 }
        }
-@@ -289,20 +244,9 @@
-   }
-   pending: (struct){
-     t1: (struct){
--      a: (struct){
--        b: (struct){
--          c: (struct){
+@@ -292,17 +245,13 @@
+       a: (struct){
+         b: (struct){
+           c: (struct){
 -            d: (int){ int }
--            e: (int){ 1 }
+             e: (int){ 1 }
 -          }
 -        }
 -      }
@@ -777,35 +767,16 @@ diff old new
 -            d: (int){ int }
 -          }
 -        }
-+      a: ~(pending.t1.X)
++            d: (int){ int }
++          }
++        }
++      }
 +      X: (struct){
 +        b: ~(pending.t1.Y)
        }
        Y: (struct){
          c: (struct){
-@@ -311,19 +255,24 @@
-       }
-     }
-   }
--  issue3849: (struct){
--    dep: (#struct){
--      metadata: (#struct){
--        name: (#struct){
--          app: (string){ "mysql" }
-+  issue3849: (_|_){
-+    // [eval]
-+    dep: (_|_){
-+      // [eval]
-+      metadata: (_|_){
-+        // [eval]
-+        name: (_|_){
-+          // [eval] issue3849.dep.metadata.name: field not allowed:
-+          //     ./pendingarcs.cue:12:18
-+          app: (_|_){
-+            // [eval] issue3849.dep.metadata.name.app: field not allowed:
-+            //     ./pendingarcs.cue:12:24
-+          }
-         }
+@@ -320,10 +269,7 @@
        }
      }
      #Deployment: (#struct){
@@ -817,7 +788,7 @@ diff old new
      }
      #ObjectMeta: (#struct){
        name?: (#struct){
-@@ -355,9 +304,7 @@
+@@ -355,9 +301,7 @@
            // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
            //     ./sharecycle.cue:8:6
            //     ./sharecycle.cue:9:5

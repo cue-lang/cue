@@ -142,6 +142,22 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 		return false
 	}
 
+	// We disallow sharing for any Arcs, even pending ones, to be defensive.
+	// CUE currently does not always unwind sharing properly in the precense of
+	// pending arcs. See, for instance:
+	//
+	// 		a: X
+	// 		if true {
+	// 			a: b: c: e: 1 // ensure 'e' is added
+	// 		}
+	// 		X: b: Y
+	// 		Y: c: d: int
+	//
+	// TODO: allow sharing in the precense of pending or not present arcs.
+	if len(n.node.Arcs) > 0 {
+		return false
+	}
+
 	// See Issue #3801: structure sharing seems to be broken for non-rooted
 	// values. We disable sharing for now.
 	// TODO: make sharing work again for non-rooted structs.

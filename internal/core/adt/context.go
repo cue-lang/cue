@@ -1062,6 +1062,14 @@ func pos(x Node) token.Pos {
 
 // node is called by SelectorExpr.resolve and IndexExpr.resolve.
 func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *Vertex {
+	// Do not treat inline structs as closed by default if within a schema.
+	// See comment at top of scheduleVertexConjuncts.
+	if _, ok := x.(Resolver); !ok {
+		saved := c.ci.FromDef
+		c.ci.FromDef = false
+		defer func() { c.ci.FromDef = saved }()
+	}
+
 	if c.OpenInline {
 		if _, ok := x.(Resolver); !ok {
 			c.ci.FromEmbed = true

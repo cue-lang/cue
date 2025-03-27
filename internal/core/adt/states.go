@@ -339,20 +339,3 @@ func (n *nodeContext) scheduleTask(r *runner, env *Environment, x Node, ci Close
 	n.insertTask(t)
 	return t
 }
-
-// require ensures that a given condition is met for the given Vertex by
-// evaluating it. It yields execution back to the scheduler if it cannot
-// be completed at this point.
-func (c *OpContext) require(v *Vertex, needs condition) {
-	state := v.getState(c)
-	if state == nil {
-		return
-	}
-	state.process(needs, yield)
-}
-
-// scalarValue evaluates the given expression and either returns a
-// concrete value or schedules the task for later evaluation.
-func (ctx *OpContext) scalarValue(t *task, x Expr) Value {
-	return ctx.value(x, require(0, scalarKnown))
-}

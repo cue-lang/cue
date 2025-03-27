@@ -283,17 +283,6 @@ type scheduler struct {
 }
 
 func (s *scheduler) clear() {
-	// Any tasks blocked on this scheduler are unblocked once the scheduler is cleared.
-	// Otherwise they might signal a cleared scheduler, which can panic.
-	//
-	// TODO(mvdan,mpvl): In principle, all blocks should have been removed when a scheduler
-	// is cleared. Perhaps this can happen when the scheduler is stopped prematurely.
-	// For now, this solution seems to work OK.
-	for _, t := range s.blocking {
-		t.blockedOn = nil
-		t.blockCondition = neverKnown
-	}
-
 	// Free tasks back to the pool for reuse. Tasks are not cleared here because
 	// they may still be referenced in other schedulers' blocking queues.
 	// They will be cleared when obtained from the pool for reuse.

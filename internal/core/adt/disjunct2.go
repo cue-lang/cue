@@ -374,7 +374,13 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 
 // crossProduct computes the cross product of the disjuncts of a disjunction
 // with an existing set of results.
-func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, mode runMode) []*nodeContext {
+func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dnp *envDisjunct, mode runMode) []*nodeContext {
+
+	// TODO: the envDisjunct may be overwritten with recursive calls to
+	// disjunction processing. Investigate why this is. For now we copy the
+	// value to make its state effectively immutable.
+	dn := *dnp
+
 	defer n.unmarkDepth(n.markDepth())
 	defer n.unmarkOptional(n.markOptional())
 

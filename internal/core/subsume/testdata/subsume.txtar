@@ -3515,93 +3515,118 @@ true
 true
 -- out/TestValues/9/null_⊑__ --
 Errors:
-value not an instance
+null does not subsume _:
+    value:1:4
 
 Result:
 false
 -- out/TestValues/10/int_⊑__ --
 Errors:
-value not an instance
+int does not subsume _:
+    value:1:4
 
 Result:
 false
 -- out/TestValues/11/1_⊑__ --
 Errors:
-value not an instance
+1 does not subsume _:
+    value:1:4
 
 Result:
 false
 -- out/TestValues/12/float_⊑__ --
 Errors:
-value not an instance
+float does not subsume _:
+    value:1:4
 
 Result:
 false
 -- out/TestValues/13/"s"_⊑__ --
 Errors:
-value not an instance
+"s" does not subsume _:
+    value:1:4
 
 Result:
 false
 -- out/TestValues/14/{}_⊑__ --
 Errors:
-value not an instance
+{} does not subsume _:
+    value:1:4
+    value:1:16
 
 Result:
 false
 -- out/TestValues/15/[]_⊑__ --
 Errors:
+[] does not subsume _:
+    value:1:4
+    value:1:16
 list does not subsume _ (type _):
     value:1:16
-value not an instance
 
 Result:
 false
 -- out/TestValues/16/_|__⊑__ --
 Errors:
-value not an instance
+_|_(explicit error (_|_ literal) in source) does not subsume _:
+    value:1:4
+    value:1:18
 
 Result:
 false
 -- out/TestValues/17/_|__⊑_null --
 Errors:
-value not an instance
+_|_(explicit error (_|_ literal) in source) does not subsume null:
+    value:1:4
+    value:1:12
 
 Result:
 false
 -- out/TestValues/18/_|__⊑_int --
 Errors:
-value not an instance
+_|_(explicit error (_|_ literal) in source) does not subsume int:
+    value:1:4
+    value:1:12
 
 Result:
 false
 -- out/TestValues/19/_|__⊑_1 --
 Errors:
-value not an instance
+_|_(explicit error (_|_ literal) in source) does not subsume 1:
+    value:1:4
+    value:1:12
 
 Result:
 false
 -- out/TestValues/20/_|__⊑_float --
 Errors:
-value not an instance
+_|_(explicit error (_|_ literal) in source) does not subsume float:
+    value:1:4
+    value:1:12
 
 Result:
 false
 -- out/TestValues/21/_|__⊑_"s" --
 Errors:
-value not an instance
+_|_(explicit error (_|_ literal) in source) does not subsume "s":
+    value:1:4
+    value:1:12
 
 Result:
 false
 -- out/TestValues/22/_|__⊑_{} --
 Errors:
-value not an instance
+_|_(explicit error (_|_ literal) in source) does not subsume {}:
+    value:1:4
+    value:1:12
 
 Result:
 false
 -- out/TestValues/23/_|__⊑_[] --
 Errors:
-value not an instance
+_|_(explicit error (_|_ literal) in source) does not subsume []:
+    value:1:4
+    value:1:12
 
 Result:
 false
@@ -3629,13 +3654,17 @@ true
 true
 -- out/TestValues/35/null_⊑_1 --
 Errors:
-value not an instance
+null does not subsume 1:
+    value:1:4
+    value:1:13
 
 Result:
 false
 -- out/TestValues/36/1_⊑_null --
 Errors:
-value not an instance
+1 does not subsume null:
+    value:1:4
+    value:1:13
 
 Result:
 false
@@ -3643,7 +3672,9 @@ false
 true
 -- out/TestValues/38/true_⊑_false --
 Errors:
-value not an instance
+true does not subsume false:
+    value:1:4
+    value:1:13
 
 Result:
 false
@@ -3651,7 +3682,9 @@ false
 true
 -- out/TestValues/40/"a"_⊑_"b" --
 Errors:
-value not an instance
+"a" does not subsume "b":
+    value:1:4
+    value:1:15
 
 Result:
 false
@@ -3659,7 +3692,9 @@ false
 true
 -- out/TestValues/42/"a"_⊑_string --
 Errors:
-value not an instance
+"a" does not subsume string:
+    value:1:4
+    value:1:15
 
 Result:
 false
@@ -3671,19 +3706,25 @@ true
 true
 -- out/TestValues/46/1.0_⊑_1 --
 Errors:
-value not an instance
+1.0 does not subsume 1:
+    value:1:4
+    value:1:12
 
 Result:
 false
 -- out/TestValues/47/1_⊑_1.0 --
 Errors:
-value not an instance
+1 does not subsume 1.0:
+    value:1:4
+    value:1:10
 
 Result:
 false
 -- out/TestValues/48/3_⊑_3.0 --
 Errors:
-value not an instance
+3 does not subsume 3.0:
+    value:1:4
+    value:1:10
 
 Result:
 false
@@ -3695,13 +3736,17 @@ true
 true
 -- out/TestValues/52/float_⊑_1 --
 Errors:
-value not an instance
+float does not subsume 1:
+    value:1:4
+    value:1:14
 
 Result:
 false
 -- out/TestValues/53/int_⊑_1.0 --
 Errors:
-value not an instance
+int does not subsume 1.0:
+    value:1:4
+    value:1:12
 
 Result:
 false
@@ -3724,7 +3769,9 @@ true
 -- out/TestValues/70/{a:1}_⊑_{}-v3 --
 Errors:
 regular field is constraint in subsumed value: a
-value not an instance
+{a:1} does not subsume {}:
+    value:1:4
+    value:1:14
 
 Result:
 false
@@ -3736,13 +3783,15 @@ diff old new
  Errors:
 -required field is optional in subsumed value: a
 +regular field is constraint in subsumed value: a
- value not an instance
- 
- Result:
+ {a:1} does not subsume {}:
+     value:1:4
+     value:1:14
 -- out/TestValues/70/{a:1}_⊑_{}-v3-noshare --
 Errors:
 regular field is constraint in subsumed value: a
-value not an instance
+{a:1} does not subsume {}:
+    value:1:4
+    value:1:14
 
 Result:
 false
@@ -3754,20 +3803,24 @@ diff old new
  Errors:
 -required field is optional in subsumed value: a
 +regular field is constraint in subsumed value: a
- value not an instance
- 
- Result:
+ {a:1} does not subsume {}:
+     value:1:4
+     value:1:14
 -- out/TestValues/70/{a:1}_⊑_{} --
 Errors:
 required field is optional in subsumed value: a
-value not an instance
+{a:1} does not subsume {}:
+    value:1:4
+    value:1:14
 
 Result:
 false
 -- out/TestValues/71/{a:1,_b:1}_⊑_{a:1}-v3 --
 Errors:
 regular field is constraint in subsumed value: b
-value not an instance
+{a:1,b:1} does not subsume {a:1}:
+    value:1:4
+    value:1:19
 
 Result:
 false
@@ -3779,13 +3832,15 @@ diff old new
  Errors:
 -required field is optional in subsumed value: b
 +regular field is constraint in subsumed value: b
- value not an instance
- 
- Result:
+ {a:1,b:1} does not subsume {a:1}:
+     value:1:4
+     value:1:19
 -- out/TestValues/71/{a:1,_b:1}_⊑_{a:1}-v3-noshare --
 Errors:
 regular field is constraint in subsumed value: b
-value not an instance
+{a:1,b:1} does not subsume {a:1}:
+    value:1:4
+    value:1:19
 
 Result:
 false
@@ -3797,22 +3852,29 @@ diff old new
  Errors:
 -required field is optional in subsumed value: b
 +regular field is constraint in subsumed value: b
- value not an instance
- 
- Result:
+ {a:1,b:1} does not subsume {a:1}:
+     value:1:4
+     value:1:19
 -- out/TestValues/71/{a:1,_b:1}_⊑_{a:1} --
 Errors:
 required field is optional in subsumed value: b
-value not an instance
+{a:1,b:1} does not subsume {a:1}:
+    value:1:4
+    value:1:19
 
 Result:
 false
 -- out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}}-v3 --
 Errors:
-field s not present in {s:{}}:
-    value:1:21
-missing field "s"
 regular field is constraint in subsumed value: a
+{a:1} does not subsume {}:
+    value:1:8
+    value:1:26
+{a:1} in {s:{a:1}} does not subsume {} in {s:{}}:
+    value:1:4
+    value:1:8
+    value:1:21
+    value:1:26
 
 Result:
 false
@@ -3820,21 +3882,24 @@ false
 diff old new
 --- old
 +++ new
-@@ -2,7 +2,7 @@
- field s not present in {s:{}}:
-     value:1:21
- missing field "s"
+@@ -1,5 +1,5 @@
+ Errors:
 -required field is optional in subsumed value: a
 +regular field is constraint in subsumed value: a
- 
- Result:
- false
+ {a:1} does not subsume {}:
+     value:1:8
+     value:1:26
 -- out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}}-v3-noshare --
 Errors:
-field s not present in {s:{}}:
-    value:1:21
-missing field "s"
 regular field is constraint in subsumed value: a
+{a:1} does not subsume {}:
+    value:1:8
+    value:1:26
+{a:1} in {s:{a:1}} does not subsume {} in {s:{}}:
+    value:1:4
+    value:1:8
+    value:1:21
+    value:1:26
 
 Result:
 false
@@ -3842,21 +3907,24 @@ false
 diff old new
 --- old
 +++ new
-@@ -2,7 +2,7 @@
- field s not present in {s:{}}:
-     value:1:21
- missing field "s"
+@@ -1,5 +1,5 @@
+ Errors:
 -required field is optional in subsumed value: a
 +regular field is constraint in subsumed value: a
- 
- Result:
- false
+ {a:1} does not subsume {}:
+     value:1:8
+     value:1:26
 -- out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}} --
 Errors:
-field s not present in {s:{}}:
-    value:1:21
-missing field "s"
 required field is optional in subsumed value: a
+{a:1} does not subsume {}:
+    value:1:8
+    value:1:26
+{a:1} in {s:{a:1}} does not subsume {} in {s:{}}:
+    value:1:4
+    value:1:8
+    value:1:21
+    value:1:26
 
 Result:
 false
@@ -3870,7 +3938,9 @@ true
 true
 -- out/TestValues/88/int_⊑_1_|_2_|_3.1 --
 Errors:
-value not an instance
+int does not subsume 3.1:
+    value:1:4
+    value:1:20
 
 Result:
 false
@@ -3878,7 +3948,9 @@ false
 true
 -- out/TestValues/90/int_⊑_1_|_2_|_3.1 --
 Errors:
-value not an instance
+int does not subsume 3.1:
+    value:1:4
+    value:1:20
 
 Result:
 false
@@ -3888,13 +3960,17 @@ true
 true
 -- out/TestValues/93/1_|_2_⊑_3 --
 Errors:
-value not an instance
+1 does not subsume 3:
+    value:1:4
+    value:1:14
 
 Result:
 false
 -- out/TestValues/150/number_|_*1_⊑_number_|_*2 --
 Errors:
-value not an instance
+1 does not subsume 2:
+    value:1:14
+    value:1:30
 
 Result:
 false
@@ -3904,7 +3980,9 @@ true
 true
 -- out/TestValues/153/int_|_*2_⊑_int_|_*2.0 --
 Errors:
-value not an instance
+2 does not subsume 2.0:
+    value:1:11
+    value:1:24
 
 Result:
 false
@@ -3924,7 +4002,9 @@ true
 true
 -- out/TestValues/175/>1_⊑_>=1 --
 Errors:
-value not an instance
+>1 does not subsume >=1:
+    value:1:4
+    value:1:11
 
 Result:
 false
@@ -3936,7 +4016,9 @@ true
 true
 -- out/TestValues/179/<1_⊑_<=1 --
 Errors:
-value not an instance
+<1 does not subsume <=1:
+    value:1:4
+    value:1:11
 
 Result:
 false
@@ -3946,13 +4028,17 @@ true
 true
 -- out/TestValues/182/!=1_⊑_!=2 --
 Errors:
-value not an instance
+!=1 does not subsume !=2:
+    value:1:4
+    value:1:12
 
 Result:
 false
 -- out/TestValues/183/!=1_⊑_<=1 --
 Errors:
-value not an instance
+!=1 does not subsume <=1:
+    value:1:4
+    value:1:12
 
 Result:
 false
@@ -3960,7 +4046,9 @@ false
 true
 -- out/TestValues/185/!=1_⊑_>=1 --
 Errors:
-value not an instance
+!=1 does not subsume >=1:
+    value:1:4
+    value:1:12
 
 Result:
 false
@@ -3974,25 +4062,33 @@ true
 true
 -- out/TestValues/195/>=2_⊑_!=2 --
 Errors:
-value not an instance
+>=2 does not subsume !=2:
+    value:1:4
+    value:1:12
 
 Result:
 false
 -- out/TestValues/196/>2_⊑_!=2 --
 Errors:
-value not an instance
+>2 does not subsume !=2:
+    value:1:4
+    value:1:11
 
 Result:
 false
 -- out/TestValues/197/<2_⊑_!=2 --
 Errors:
-value not an instance
+<2 does not subsume !=2:
+    value:1:4
+    value:1:11
 
 Result:
 false
 -- out/TestValues/198/<=2_⊑_!=2 --
 Errors:
-value not an instance
+<=2 does not subsume !=2:
+    value:1:4
+    value:1:12
 
 Result:
 false
@@ -4000,13 +4096,17 @@ false
 true
 -- out/TestValues/201/=~"foo"_⊑_=~"bar" --
 Errors:
-value not an instance
+=~"foo" does not subsume =~"bar":
+    value:1:4
+    value:1:16
 
 Result:
 false
 -- out/TestValues/202/=~"foo1"_⊑_=~"foo" --
 Errors:
-value not an instance
+=~"foo1" does not subsume =~"foo":
+    value:1:4
+    value:1:17
 
 Result:
 false
@@ -4014,25 +4114,33 @@ false
 true
 -- out/TestValues/204/!~"foo"_⊑_!~"bar" --
 Errors:
-value not an instance
+!~"foo" does not subsume !~"bar":
+    value:1:4
+    value:1:16
 
 Result:
 false
 -- out/TestValues/205/!~"foo"_⊑_!~"foo1" --
 Errors:
-value not an instance
+!~"foo" does not subsume !~"foo1":
+    value:1:4
+    value:1:16
 
 Result:
 false
 -- out/TestValues/210/=~"foo"_⊑_=~"foo1" --
 Errors:
-value not an instance
+=~"foo" does not subsume =~"foo1":
+    value:1:4
+    value:1:16
 
 Result:
 false
 -- out/TestValues/211/!~"foo1"_⊑_!~"foo" --
 Errors:
-value not an instance
+!~"foo1" does not subsume !~"foo":
+    value:1:4
+    value:1:17
 
 Result:
 false
@@ -4040,7 +4148,9 @@ false
 true
 -- out/TestValues/221/<5_⊑_5 --
 Errors:
-value not an instance
+<5 does not subsume 5:
+    value:1:4
+    value:1:11
 
 Result:
 false
@@ -4048,7 +4158,9 @@ false
 true
 -- out/TestValues/223/<=5.0_⊑_5.00000001 --
 Errors:
-value not an instance
+<=5.0 does not subsume 5.00000001:
+    value:1:4
+    value:1:14
 
 Result:
 false
@@ -4056,7 +4168,9 @@ false
 true
 -- out/TestValues/225/>5_⊑_5 --
 Errors:
-value not an instance
+>5 does not subsume 5:
+    value:1:4
+    value:1:11
 
 Result:
 false
@@ -4064,7 +4178,9 @@ false
 true
 -- out/TestValues/227/>=5_⊑_4 --
 Errors:
-value not an instance
+>=5 does not subsume 4:
+    value:1:4
+    value:1:12
 
 Result:
 false
@@ -4072,19 +4188,25 @@ false
 true
 -- out/TestValues/229/!=5_⊑_5 --
 Errors:
-value not an instance
+!=5 does not subsume 5:
+    value:1:4
+    value:1:12
 
 Result:
 false
 -- out/TestValues/230/!=5.0_⊑_5.0 --
 Errors:
-value not an instance
+!=5.0 does not subsume 5.0:
+    value:1:4
+    value:1:14
 
 Result:
 false
 -- out/TestValues/231/!=5.0_⊑_5 --
 Errors:
-value not an instance
+!=5.0 does not subsume 5:
+    value:1:4
+    value:1:14
 
 Result:
 false
@@ -4092,7 +4214,9 @@ false
 true
 -- out/TestValues/251/=~_#"^\d{3}$"#_⊑_"1234" --
 Errors:
-value not an instance
+=~"^\\d{3}$" does not subsume "1234":
+    value:1:4
+    value:1:23
 
 Result:
 false
@@ -4100,7 +4224,9 @@ false
 true
 -- out/TestValues/253/!~_#"^\d{3}$"#_⊑_"123" --
 Errors:
-value not an instance
+!~"^\\d{3}$" does not subsume "123":
+    value:1:4
+    value:1:23
 
 Result:
 false
@@ -4108,7 +4234,9 @@ false
 true
 -- out/TestValues/301/>0_⊑_>=0_&_<=100 --
 Errors:
-value not an instance
+>0 does not subsume >=0:
+    value:1:4
+    value:1:11
 
 Result:
 false
@@ -4118,7 +4246,9 @@ true
 true
 -- out/TestValues/312/!=2_&_!=4_⊑_>3 --
 Errors:
-value not an instance
+!=4 does not subsume >3:
+    value:1:10
+    value:1:18
 
 Result:
 false
@@ -4126,7 +4256,9 @@ false
 true
 -- out/TestValues/314/>=0_&_<=100_⊑_>=0_&_<=150 --
 Errors:
-value not an instance
+<=100 does not subsume >=0:
+    value:1:10
+    value:1:20
 
 Result:
 false
@@ -4136,14 +4268,18 @@ true
 true
 -- out/TestValues/331/>8_⊑_>10_|_8 --
 Errors:
-value not an instance
+>8 does not subsume 8:
+    value:1:4
+    value:1:17
 
 Result:
 false
 -- out/TestValues/400/{foo:_1}_⊑_{}-v3 --
 Errors:
 regular field is constraint in subsumed value: foo
-value not an instance
+{foo:1} does not subsume {}:
+    value:1:4
+    value:1:17
 
 Result:
 false
@@ -4155,13 +4291,15 @@ diff old new
  Errors:
 -required field is optional in subsumed value: foo
 +regular field is constraint in subsumed value: foo
- value not an instance
- 
- Result:
+ {foo:1} does not subsume {}:
+     value:1:4
+     value:1:17
 -- out/TestValues/400/{foo:_1}_⊑_{}-v3-noshare --
 Errors:
 regular field is constraint in subsumed value: foo
-value not an instance
+{foo:1} does not subsume {}:
+    value:1:4
+    value:1:17
 
 Result:
 false
@@ -4173,21 +4311,26 @@ diff old new
  Errors:
 -required field is optional in subsumed value: foo
 +regular field is constraint in subsumed value: foo
- value not an instance
- 
- Result:
+ {foo:1} does not subsume {}:
+     value:1:4
+     value:1:17
 -- out/TestValues/400/{foo:_1}_⊑_{} --
 Errors:
 required field is optional in subsumed value: foo
-value not an instance
+{foo:1} does not subsume {}:
+    value:1:4
+    value:1:17
 
 Result:
 false
 -- out/TestValues/401/{foo?:_1}_⊑_{} --
 Errors:
-field foo not present in {}:
+1 does not subsume _:
+    value:1:11
+1 in {foo?:1} does not subsume _ in {}:
+    value:1:4
+    value:1:11
     value:1:18
-missing field "foo"
 
 Result:
 false
@@ -4203,41 +4346,66 @@ true
 true
 -- out/TestValues/407/{foo:_1}_⊑_{foo?:_1} --
 Errors:
-field foo not present in {foo?:1}:
+1 does not subsume 1:
+    value:1:10
+    value:1:24
+1 in {foo:1} does not subsume 1 in {foo?:1}:
+    value:1:4
+    value:1:10
     value:1:17
-missing field "foo"
+    value:1:24
 
 Result:
 false
 -- out/TestValues/408/{foo:_1}_⊑_{foo:_2} --
 Errors:
-field foo not present in {foo:2}:
+1 does not subsume 2:
+    value:1:10
+    value:1:23
+1 in {foo:1} does not subsume 2 in {foo:2}:
+    value:1:4
+    value:1:10
     value:1:17
-missing field "foo"
+    value:1:23
 
 Result:
 false
 -- out/TestValues/409/{foo?:_1}_⊑_{foo:_2} --
 Errors:
-field foo not present in {foo:2}:
+1 does not subsume 2:
+    value:1:11
+    value:1:24
+1 in {foo?:1} does not subsume 2 in {foo:2}:
+    value:1:4
+    value:1:11
     value:1:18
-missing field "foo"
+    value:1:24
 
 Result:
 false
 -- out/TestValues/410/{foo?:_1}_⊑_{foo?:_2} --
 Errors:
-field foo not present in {foo?:2}:
+1 does not subsume 2:
+    value:1:11
+    value:1:25
+1 in {foo?:1} does not subsume 2 in {foo?:2}:
+    value:1:4
+    value:1:11
     value:1:18
-missing field "foo"
+    value:1:25
 
 Result:
 false
 -- out/TestValues/411/{foo:_1}_⊑_{foo?:_2} --
 Errors:
-field foo not present in {foo?:2}:
+1 does not subsume 2:
+    value:1:10
+    value:1:24
+1 in {foo:1} does not subsume 2 in {foo?:2}:
+    value:1:4
+    value:1:10
     value:1:17
-missing field "foo"
+    value:1:24
 
 Result:
 false
@@ -4249,41 +4417,66 @@ true
 true
 -- out/TestValues/415/{foo:_number}_⊑_{foo?:_2} --
 Errors:
-field foo not present in {foo?:2}:
+number does not subsume 2:
+    value:1:10
+    value:1:29
+number in {foo:number} does not subsume 2 in {foo?:2}:
+    value:1:4
+    value:1:10
     value:1:22
-missing field "foo"
+    value:1:29
 
 Result:
 false
 -- out/TestValues/416/{foo:_1}_⊑_{foo:_number} --
 Errors:
-field foo not present in {foo:number}:
+1 does not subsume number:
+    value:1:10
+    value:1:23
+1 in {foo:1} does not subsume number in {foo:number}:
+    value:1:4
+    value:1:10
     value:1:17
-missing field "foo"
+    value:1:23
 
 Result:
 false
 -- out/TestValues/417/{foo?:_1}_⊑_{foo:_number} --
 Errors:
-field foo not present in {foo:number}:
+1 does not subsume number:
+    value:1:11
+    value:1:24
+1 in {foo?:1} does not subsume number in {foo:number}:
+    value:1:4
+    value:1:11
     value:1:18
-missing field "foo"
+    value:1:24
 
 Result:
 false
 -- out/TestValues/418/{foo?:_1}_⊑_{foo?:_number} --
 Errors:
-field foo not present in {foo?:number}:
+1 does not subsume number:
+    value:1:11
+    value:1:25
+1 in {foo?:1} does not subsume number in {foo?:number}:
+    value:1:4
+    value:1:11
     value:1:18
-missing field "foo"
+    value:1:25
 
 Result:
 false
 -- out/TestValues/419/{foo:_1}_⊑_{foo?:_number} --
 Errors:
-field foo not present in {foo?:number}:
+1 does not subsume number:
+    value:1:10
+    value:1:24
+1 in {foo:1} does not subsume number in {foo?:number}:
+    value:1:4
+    value:1:10
     value:1:17
-missing field "foo"
+    value:1:24
 
 Result:
 false
@@ -4291,7 +4484,9 @@ false
 true
 -- out/TestValues/430/{[_]:_4}_⊑_{[_]:_int}-v3 --
 Errors:
-value not an instance
+4 does not subsume int:
+    value:1:10
+    value:1:23
 
 Result:
 false
@@ -4299,16 +4494,22 @@ false
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,5 @@
+@@ -1,7 +1,7 @@
  Errors:
--value not an instance: inexact subsumption
-+value not an instance
+-{} does not subsume {}: inexact subsumption:
+-    value:1:4
+-    value:1:17
++4 does not subsume int:
++    value:1:10
++    value:1:23
  
  Result:
  false
 -- out/TestValues/430/{[_]:_4}_⊑_{[_]:_int}-v3-noshare --
 Errors:
-value not an instance
+4 does not subsume int:
+    value:1:10
+    value:1:23
 
 Result:
 false
@@ -4316,16 +4517,22 @@ false
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,5 @@
+@@ -1,7 +1,7 @@
  Errors:
--value not an instance: inexact subsumption
-+value not an instance
+-{} does not subsume {}: inexact subsumption:
+-    value:1:4
+-    value:1:17
++4 does not subsume int:
++    value:1:10
++    value:1:23
  
  Result:
  false
 -- out/TestValues/430/{[_]:_4}_⊑_{[_]:_int} --
 Errors:
-value not an instance: inexact subsumption
+{} does not subsume {}: inexact subsumption:
+    value:1:4
+    value:1:17
 
 Result:
 false
@@ -4343,7 +4550,9 @@ true
 true
 -- out/TestValues/434/{[<"n"]:_3,_[string]:_int}_⊑_{[string]:_2,_[<"m"]:_3} --
 Errors:
-value not an instance: inexact subsumption
+{} does not subsume {}: inexact subsumption:
+    value:1:4
+    value:1:35
 
 Result:
 false
@@ -4357,7 +4566,9 @@ true
 true
 -- out/TestValues/437/{[_]:_>5,_[>"b"]:_int}_⊑_{[_]:_6} --
 Errors:
-value not an instance: inexact subsumption
+{} does not subsume {}: inexact subsumption:
+    value:1:4
+    value:1:31
 
 Result:
 false
@@ -4371,10 +4582,16 @@ true
 true
 -- out/TestValues/463/{1,_#foo:_number}_⊑_{1,_#foo?:_1} --
 Errors:
-field #foo not present in 1:
+number does not subsume 1:
+    value:1:14
+    value:1:37
+number in 1 does not subsume 1 in 1:
+    value:1:4
+    value:1:5
+    value:1:14
     value:1:26
     value:1:27
-missing field "#foo"
+    value:1:37
 
 Result:
 false
@@ -4382,22 +4599,32 @@ false
 true
 -- out/TestValues/465/{int,_#foo:_1}_⊑_{1,_#foo:_number} --
 Errors:
-field #foo not present in 1:
+1 does not subsume number:
+    value:1:16
+    value:1:33
+1 in int does not subsume number in 1:
+    value:1:4
+    value:1:5
+    value:1:16
     value:1:23
     value:1:24
-missing field "#foo"
+    value:1:33
 
 Result:
 false
 -- out/TestValues/466/{1,_#foo:_number}_⊑_{int,_#foo:_1} --
 Errors:
-value not an instance
+1 does not subsume int:
+    value:1:5
+    value:1:27
 
 Result:
 false
 -- out/TestValues/467/{1,_#foo:_1}_⊑_{int,_#foo:_number} --
 Errors:
-value not an instance
+1 does not subsume int:
+    value:1:5
+    value:1:22
 
 Result:
 false
@@ -4407,13 +4634,17 @@ true
 true
 -- out/TestValues/508/[1]_⊑_[2] --
 Errors:
-value not an instance
+1 does not subsume 2:
+    value:1:5
+    value:1:13
 
 Result:
 false
 -- out/TestValues/509/[1]_⊑_[2,_3] --
 Errors:
-value not an instance
+[1] does not subsume [2,3]:
+    value:1:4
+    value:1:12
 
 Result:
 false
@@ -4423,46 +4654,63 @@ true
 true
 -- out/TestValues/512/[{b:_"foo"}],_b:_[{_⊑_string}] --
 Errors:
-field b not present in {b:string}:
+"foo" does not subsume string:
+    value:1:9
+    value:1:26
+"foo" in {b:"foo"} does not subsume string in {b:string}:
+    value:1:5
+    value:1:9
     value:1:22
-missing field "b"
+    value:1:26
 
 Result:
 false
 -- out/TestValues/513/[{b:_string}],_b:_[{b:_"foo"},_...{_⊑_"foo"}] --
 Errors:
-value not an instance
+[{b:string}] does not subsume [{b:"foo"}]:
+    value:1:4
+    value:1:22
 
 Result:
 false
 -- out/TestValues/520/[_,_int,_...]_⊑_[int,_string,_...string] --
 Errors:
-value not an instance
+int does not subsume string:
+    value:1:8
+    value:1:28
 
 Result:
 false
 -- out/TestValues/600/close({})_⊑_{a:_1} --
 Errors:
-value not an instance
+{} does not subsume {a:1}:
+    value:1:4
+    value:1:18
 
 Result:
 false
 -- out/TestValues/601/close({a:_1})_⊑_{a:_1} --
 Errors:
-value not an instance
+{a:1} does not subsume {a:1}:
+    value:1:4
+    value:1:22
 
 Result:
 false
 -- out/TestValues/602/close({a:_1,_b:_1})_⊑_{a:_1} --
 Errors:
-value not an instance
+{a:1,b:1} does not subsume {a:1}:
+    value:1:4
+    value:1:28
 
 Result:
 false
 -- out/TestValues/603/{a:_1}_⊑_close({})-v3 --
 Errors:
 regular field is constraint in subsumed value: a
-value not an instance
+{a:1} does not subsume {}:
+    value:1:4
+    value:1:15
 
 Result:
 false
@@ -4474,13 +4722,15 @@ diff old new
  Errors:
 -required field is optional in subsumed value: a
 +regular field is constraint in subsumed value: a
- value not an instance
- 
- Result:
+ {a:1} does not subsume {}:
+     value:1:4
+     value:1:15
 -- out/TestValues/603/{a:_1}_⊑_close({})-v3-noshare --
 Errors:
 regular field is constraint in subsumed value: a
-value not an instance
+{a:1} does not subsume {}:
+    value:1:4
+    value:1:15
 
 Result:
 false
@@ -4492,13 +4742,15 @@ diff old new
  Errors:
 -required field is optional in subsumed value: a
 +regular field is constraint in subsumed value: a
- value not an instance
- 
- Result:
+ {a:1} does not subsume {}:
+     value:1:4
+     value:1:15
 -- out/TestValues/603/{a:_1}_⊑_close({}) --
 Errors:
 required field is optional in subsumed value: a
-value not an instance
+{a:1} does not subsume {}:
+    value:1:4
+    value:1:15
 
 Result:
 false
@@ -4510,9 +4762,14 @@ true
 true
 -- out/TestValues/607/close({b:_1})_⊑_close({b?:_1}) --
 Errors:
-field b not present in {b?:1}:
+1 does not subsume 1:
+    value:1:14
+    value:1:33
+1 in {b:1} does not subsume 1 in {b?:1}:
+    value:1:4
+    value:1:14
     value:1:22
-missing field "b"
+    value:1:33
 
 Result:
 false
@@ -4525,7 +4782,9 @@ true
 -- out/TestValues/611/close({foo?:1})_⊑_close({bar?:_1}) --
 Errors:
 field not allowed in closed struct: bar
-value not an instance
+{foo?:1} does not subsume {bar?:1}:
+    value:1:4
+    value:1:24
 
 Result:
 false
@@ -4536,7 +4795,9 @@ true
 -- out/TestValues/630/{#a:_1}_⊑_{a:_1}-v3 --
 Errors:
 regular field is constraint in subsumed value: #a
-value not an instance
+{#a:1} does not subsume {a:1}:
+    value:1:4
+    value:1:16
 
 Result:
 false
@@ -4548,13 +4809,15 @@ diff old new
  Errors:
 -required field is optional in subsumed value: #a
 +regular field is constraint in subsumed value: #a
- value not an instance
- 
- Result:
+ {#a:1} does not subsume {a:1}:
+     value:1:4
+     value:1:16
 -- out/TestValues/630/{#a:_1}_⊑_{a:_1}-v3-noshare --
 Errors:
 regular field is constraint in subsumed value: #a
-value not an instance
+{#a:1} does not subsume {a:1}:
+    value:1:4
+    value:1:16
 
 Result:
 false
@@ -4566,20 +4829,24 @@ diff old new
  Errors:
 -required field is optional in subsumed value: #a
 +regular field is constraint in subsumed value: #a
- value not an instance
- 
- Result:
+ {#a:1} does not subsume {a:1}:
+     value:1:4
+     value:1:16
 -- out/TestValues/630/{#a:_1}_⊑_{a:_1} --
 Errors:
 required field is optional in subsumed value: #a
-value not an instance
+{#a:1} does not subsume {a:1}:
+    value:1:4
+    value:1:16
 
 Result:
 false
 -- out/TestValues/631/{a:_1}_⊑_{#a:_1}-v3 --
 Errors:
 regular field is constraint in subsumed value: a
-value not an instance
+{a:1} does not subsume {#a:1}:
+    value:1:4
+    value:1:15
 
 Result:
 false
@@ -4591,13 +4858,15 @@ diff old new
  Errors:
 -required field is optional in subsumed value: a
 +regular field is constraint in subsumed value: a
- value not an instance
- 
- Result:
+ {a:1} does not subsume {#a:1}:
+     value:1:4
+     value:1:15
 -- out/TestValues/631/{a:_1}_⊑_{#a:_1}-v3-noshare --
 Errors:
 regular field is constraint in subsumed value: a
-value not an instance
+{a:1} does not subsume {#a:1}:
+    value:1:4
+    value:1:15
 
 Result:
 false
@@ -4609,13 +4878,15 @@ diff old new
  Errors:
 -required field is optional in subsumed value: a
 +regular field is constraint in subsumed value: a
- value not an instance
- 
- Result:
+ {a:1} does not subsume {#a:1}:
+     value:1:4
+     value:1:15
 -- out/TestValues/631/{a:_1}_⊑_{#a:_1} --
 Errors:
 required field is optional in subsumed value: a
-value not an instance
+{a:1} does not subsume {#a:1}:
+    value:1:4
+    value:1:15
 
 Result:
 false
@@ -4628,15 +4899,22 @@ true
 -- out/TestValues/703/close({["foo"]:_1})_⊑_{bar:_1} --
 Errors:
 field not allowed in closed struct: bar
-value not an instance
+{} does not subsume {bar:1}:
+    value:1:4
+    value:1:28
 
 Result:
 false
 -- out/TestValues/704/{foo:_1}_⊑_{foo?:_1} --
 Errors:
-field foo not present in {foo?:1}:
+1 does not subsume 1:
+    value:1:10
+    value:1:24
+1 in {foo:1} does not subsume 1 in {foo?:1}:
+    value:1:4
+    value:1:10
     value:1:17
-missing field "foo"
+    value:1:24
 
 Result:
 false
@@ -4648,7 +4926,9 @@ true
 true
 -- out/TestValues/708/{[string]:_1}_⊑_{foo:_2} --
 Errors:
-value not an instance
+1 does not subsume 2:
+    value:1:15
+    value:1:28
 
 Result:
 false
@@ -4657,7 +4937,9 @@ true
 -- out/TestValues/710/{foo:_[...string]}_⊑_{}-v3 --
 Errors:
 regular field is constraint in subsumed value: foo
-value not an instance
+{foo:[]} does not subsume {}:
+    value:1:4
+    value:1:27
 
 Result:
 false
@@ -4669,13 +4951,15 @@ diff old new
  Errors:
 -required field is optional in subsumed value: foo
 +regular field is constraint in subsumed value: foo
- value not an instance
- 
- Result:
+ {foo:[]} does not subsume {}:
+     value:1:4
+     value:1:27
 -- out/TestValues/710/{foo:_[...string]}_⊑_{}-v3-noshare --
 Errors:
 regular field is constraint in subsumed value: foo
-value not an instance
+{foo:[]} does not subsume {}:
+    value:1:4
+    value:1:27
 
 Result:
 false
@@ -4687,13 +4971,15 @@ diff old new
  Errors:
 -required field is optional in subsumed value: foo
 +regular field is constraint in subsumed value: foo
- value not an instance
- 
- Result:
+ {foo:[]} does not subsume {}:
+     value:1:4
+     value:1:27
 -- out/TestValues/710/{foo:_[...string]}_⊑_{} --
 Errors:
 required field is optional in subsumed value: foo
-value not an instance
+{foo:[]} does not subsume {}:
+    value:1:4
+    value:1:27
 
 Result:
 false
@@ -4701,9 +4987,14 @@ false
 true
 -- out/TestValues/804/{foo:_1}_⊑_{foo?:_1} --
 Errors:
-field foo not present in {foo?:1}:
+1 does not subsume 1:
+    value:1:10
+    value:1:24
+1 in {foo:1} does not subsume 1 in {foo?:1}:
+    value:1:4
+    value:1:10
     value:1:17
-missing field "foo"
+    value:1:24
 
 Result:
 false
@@ -4715,7 +5006,9 @@ true
 true
 -- out/TestValues/808/{[string]:_1}_⊑_{foo:_2}-v3 --
 Errors:
-value not an instance
+1 does not subsume 2:
+    value:1:15
+    value:1:28
 
 Result:
 false
@@ -4723,16 +5016,22 @@ false
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,5 @@
+@@ -1,7 +1,7 @@
  Errors:
--value not an instance: inexact subsumption
-+value not an instance
+-{} does not subsume {foo:2}: inexact subsumption:
+-    value:1:4
+-    value:1:22
++1 does not subsume 2:
++    value:1:15
++    value:1:28
  
  Result:
  false
 -- out/TestValues/808/{[string]:_1}_⊑_{foo:_2}-v3-noshare --
 Errors:
-value not an instance
+1 does not subsume 2:
+    value:1:15
+    value:1:28
 
 Result:
 false
@@ -4740,16 +5039,22 @@ false
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,5 @@
+@@ -1,7 +1,7 @@
  Errors:
--value not an instance: inexact subsumption
-+value not an instance
+-{} does not subsume {foo:2}: inexact subsumption:
+-    value:1:4
+-    value:1:22
++1 does not subsume 2:
++    value:1:15
++    value:1:28
  
  Result:
  false
 -- out/TestValues/808/{[string]:_1}_⊑_{foo:_2} --
 Errors:
-value not an instance: inexact subsumption
+{} does not subsume {foo:2}: inexact subsumption:
+    value:1:4
+    value:1:22
 
 Result:
 false
@@ -4763,7 +5068,9 @@ true
 true
 -- out/TestValues/953/[]_⊑_[...] --
 Errors:
-value not an instance
+[] does not subsume []:
+    value:1:4
+    value:1:11
 
 Result:
 false
@@ -4773,7 +5080,9 @@ true
 true
 -- out/TestValues/956/[2]_⊑_[int] --
 Errors:
-value not an instance
+2 does not subsume int:
+    value:1:5
+    value:1:13
 
 Result:
 false
@@ -4785,7 +5094,9 @@ true
 true
 -- out/TestValues/960/[...2]_⊑_[int] --
 Errors:
-value not an instance
+2 does not subsume int:
+    value:1:8
+    value:1:16
 
 Result:
 false
@@ -4793,37 +5104,49 @@ false
 true
 -- out/TestValues/962/[2]_⊑_[...2] --
 Errors:
-value not an instance
+[2] does not subsume []:
+    value:1:4
+    value:1:12
 
 Result:
 false
 -- out/TestValues/963/[int]_⊑_[...2] --
 Errors:
-value not an instance
+[int] does not subsume []:
+    value:1:4
+    value:1:14
 
 Result:
 false
 -- out/TestValues/964/[2]_⊑_[...int] --
 Errors:
-value not an instance
+[2] does not subsume []:
+    value:1:4
+    value:1:12
 
 Result:
 false
 -- out/TestValues/965/[int]_⊑_[...int] --
 Errors:
-value not an instance
+[int] does not subsume []:
+    value:1:4
+    value:1:14
 
 Result:
 false
 -- out/TestValues/966/[...int]_⊑_["foo"] --
 Errors:
-value not an instance
+int does not subsume "foo":
+    value:1:8
+    value:1:18
 
 Result:
 false
 -- out/TestValues/967/["foo"]_⊑_[...int] --
 Errors:
-value not an instance
+["foo"] does not subsume []:
+    value:1:4
+    value:1:16
 
 Result:
 false

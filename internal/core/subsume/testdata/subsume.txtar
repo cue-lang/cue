@@ -1,0 +1,4837 @@
+-- out/TestValues/0/__⊑__/v2 --
+true
+-- out/TestValues/0/__⊑__/v3 --
+true
+-- out/TestValues/0/__⊑__/v3-noshare --
+true
+-- out/TestValues/1/__⊑_null/v2 --
+true
+-- out/TestValues/1/__⊑_null/v3 --
+true
+-- out/TestValues/1/__⊑_null/v3-noshare --
+true
+-- out/TestValues/2/__⊑_int/v2 --
+true
+-- out/TestValues/2/__⊑_int/v3 --
+true
+-- out/TestValues/2/__⊑_int/v3-noshare --
+true
+-- out/TestValues/3/__⊑_1/v2 --
+true
+-- out/TestValues/3/__⊑_1/v3 --
+true
+-- out/TestValues/3/__⊑_1/v3-noshare --
+true
+-- out/TestValues/4/__⊑_float/v2 --
+true
+-- out/TestValues/4/__⊑_float/v3 --
+true
+-- out/TestValues/4/__⊑_float/v3-noshare --
+true
+-- out/TestValues/5/__⊑_"s"/v2 --
+true
+-- out/TestValues/5/__⊑_"s"/v3 --
+true
+-- out/TestValues/5/__⊑_"s"/v3-noshare --
+true
+-- out/TestValues/6/__⊑_{}/v2 --
+true
+-- out/TestValues/6/__⊑_{}/v3 --
+true
+-- out/TestValues/6/__⊑_{}/v3-noshare --
+true
+-- out/TestValues/7/__⊑_[]/v2 --
+true
+-- out/TestValues/7/__⊑_[]/v3 --
+true
+-- out/TestValues/7/__⊑_[]/v3-noshare --
+true
+-- out/TestValues/8/__⊑__|_/v2 --
+true
+-- out/TestValues/8/__⊑__|_/v3 --
+true
+-- out/TestValues/8/__⊑__|_/v3-noshare --
+true
+-- out/TestValues/9/null_⊑__/v2 --
+Errors:
+null does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/9/null_⊑__/v3 --
+Errors:
+null does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/9/null_⊑__/v3-noshare --
+Errors:
+null does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/10/int_⊑__/v2 --
+Errors:
+int does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/10/int_⊑__/v3 --
+Errors:
+int does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/10/int_⊑__/v3-noshare --
+Errors:
+int does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/11/1_⊑__/v2 --
+Errors:
+1 does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/11/1_⊑__/v3 --
+Errors:
+1 does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/11/1_⊑__/v3-noshare --
+Errors:
+1 does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/12/float_⊑__/v2 --
+Errors:
+float does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/12/float_⊑__/v3 --
+Errors:
+float does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/12/float_⊑__/v3-noshare --
+Errors:
+float does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/13/"s"_⊑__/v2 --
+Errors:
+"s" does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/13/"s"_⊑__/v3 --
+Errors:
+"s" does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/13/"s"_⊑__/v3-noshare --
+Errors:
+"s" does not subsume _:
+    value:1:4
+
+Result:
+false
+-- out/TestValues/14/{}_⊑__/v2 --
+Errors:
+{} does not subsume _:
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/14/{}_⊑__/v3 --
+Errors:
+{} does not subsume _:
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/14/{}_⊑__/v3-noshare --
+Errors:
+{} does not subsume _:
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/15/[]_⊑__/v2 --
+Errors:
+[] does not subsume _:
+    value:1:4
+    value:1:16
+list does not subsume _ (type _):
+    value:1:16
+
+Result:
+false
+-- out/TestValues/15/[]_⊑__/v3 --
+Errors:
+[] does not subsume _:
+    value:1:4
+    value:1:16
+list does not subsume _ (type _):
+    value:1:16
+
+Result:
+false
+-- out/TestValues/15/[]_⊑__/v3-noshare --
+Errors:
+[] does not subsume _:
+    value:1:4
+    value:1:16
+list does not subsume _ (type _):
+    value:1:16
+
+Result:
+false
+-- out/TestValues/16/_|__⊑__/v2 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume _:
+    value:1:4
+    value:1:18
+
+Result:
+false
+-- out/TestValues/16/_|__⊑__/v3 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume _:
+    value:1:4
+    value:1:18
+
+Result:
+false
+-- out/TestValues/16/_|__⊑__/v3-noshare --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume _:
+    value:1:4
+    value:1:18
+
+Result:
+false
+-- out/TestValues/17/_|__⊑_null/v2 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume null:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/17/_|__⊑_null/v3 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume null:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/17/_|__⊑_null/v3-noshare --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume null:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/18/_|__⊑_int/v2 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume int:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/18/_|__⊑_int/v3 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume int:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/18/_|__⊑_int/v3-noshare --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume int:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/19/_|__⊑_1/v2 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume 1:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/19/_|__⊑_1/v3 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume 1:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/19/_|__⊑_1/v3-noshare --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume 1:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/20/_|__⊑_float/v2 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume float:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/20/_|__⊑_float/v3 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume float:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/20/_|__⊑_float/v3-noshare --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume float:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/21/_|__⊑_"s"/v2 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume "s":
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/21/_|__⊑_"s"/v3 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume "s":
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/21/_|__⊑_"s"/v3-noshare --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume "s":
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/22/_|__⊑_{}/v2 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume {}:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/22/_|__⊑_{}/v3 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume {}:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/22/_|__⊑_{}/v3-noshare --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume {}:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/23/_|__⊑_[]/v2 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume []:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/23/_|__⊑_[]/v3 --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume []:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/23/_|__⊑_[]/v3-noshare --
+Errors:
+_|_(explicit error (_|_ literal) in source) does not subsume []:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/24/_|__⊑__|_/v2 --
+true
+-- out/TestValues/24/_|__⊑__|_/v3 --
+true
+-- out/TestValues/24/_|__⊑__|_/v3-noshare --
+true
+-- out/TestValues/25/null_⊑__|_/v2 --
+true
+-- out/TestValues/25/null_⊑__|_/v3 --
+true
+-- out/TestValues/25/null_⊑__|_/v3-noshare --
+true
+-- out/TestValues/26/int_⊑__|_/v2 --
+true
+-- out/TestValues/26/int_⊑__|_/v3 --
+true
+-- out/TestValues/26/int_⊑__|_/v3-noshare --
+true
+-- out/TestValues/27/1_⊑__|_/v2 --
+true
+-- out/TestValues/27/1_⊑__|_/v3 --
+true
+-- out/TestValues/27/1_⊑__|_/v3-noshare --
+true
+-- out/TestValues/28/float_⊑__|_/v2 --
+true
+-- out/TestValues/28/float_⊑__|_/v3 --
+true
+-- out/TestValues/28/float_⊑__|_/v3-noshare --
+true
+-- out/TestValues/29/"s"_⊑__|_/v2 --
+true
+-- out/TestValues/29/"s"_⊑__|_/v3 --
+true
+-- out/TestValues/29/"s"_⊑__|_/v3-noshare --
+true
+-- out/TestValues/30/{}_⊑__|_/v2 --
+true
+-- out/TestValues/30/{}_⊑__|_/v3 --
+true
+-- out/TestValues/30/{}_⊑__|_/v3-noshare --
+true
+-- out/TestValues/31/[]_⊑__|_/v2 --
+true
+-- out/TestValues/31/[]_⊑__|_/v3 --
+true
+-- out/TestValues/31/[]_⊑__|_/v3-noshare --
+true
+-- out/TestValues/32/true_⊑__|_/v2 --
+true
+-- out/TestValues/32/true_⊑__|_/v3 --
+true
+-- out/TestValues/32/true_⊑__|_/v3-noshare --
+true
+-- out/TestValues/33/_|__⊑__|_/v2 --
+true
+-- out/TestValues/33/_|__⊑__|_/v3 --
+true
+-- out/TestValues/33/_|__⊑__|_/v3-noshare --
+true
+-- out/TestValues/34/null_⊑_null/v2 --
+true
+-- out/TestValues/34/null_⊑_null/v3 --
+true
+-- out/TestValues/34/null_⊑_null/v3-noshare --
+true
+-- out/TestValues/35/null_⊑_1/v2 --
+Errors:
+null does not subsume 1:
+    value:1:4
+    value:1:13
+
+Result:
+false
+-- out/TestValues/35/null_⊑_1/v3 --
+Errors:
+null does not subsume 1:
+    value:1:4
+    value:1:13
+
+Result:
+false
+-- out/TestValues/35/null_⊑_1/v3-noshare --
+Errors:
+null does not subsume 1:
+    value:1:4
+    value:1:13
+
+Result:
+false
+-- out/TestValues/36/1_⊑_null/v2 --
+Errors:
+1 does not subsume null:
+    value:1:4
+    value:1:13
+
+Result:
+false
+-- out/TestValues/36/1_⊑_null/v3 --
+Errors:
+1 does not subsume null:
+    value:1:4
+    value:1:13
+
+Result:
+false
+-- out/TestValues/36/1_⊑_null/v3-noshare --
+Errors:
+1 does not subsume null:
+    value:1:4
+    value:1:13
+
+Result:
+false
+-- out/TestValues/37/true_⊑_true/v2 --
+true
+-- out/TestValues/37/true_⊑_true/v3 --
+true
+-- out/TestValues/37/true_⊑_true/v3-noshare --
+true
+-- out/TestValues/38/true_⊑_false/v2 --
+Errors:
+true does not subsume false:
+    value:1:4
+    value:1:13
+
+Result:
+false
+-- out/TestValues/38/true_⊑_false/v3 --
+Errors:
+true does not subsume false:
+    value:1:4
+    value:1:13
+
+Result:
+false
+-- out/TestValues/38/true_⊑_false/v3-noshare --
+Errors:
+true does not subsume false:
+    value:1:4
+    value:1:13
+
+Result:
+false
+-- out/TestValues/39/"a"_⊑_"a"/v2 --
+true
+-- out/TestValues/39/"a"_⊑_"a"/v3 --
+true
+-- out/TestValues/39/"a"_⊑_"a"/v3-noshare --
+true
+-- out/TestValues/40/"a"_⊑_"b"/v2 --
+Errors:
+"a" does not subsume "b":
+    value:1:4
+    value:1:15
+
+Result:
+false
+-- out/TestValues/40/"a"_⊑_"b"/v3 --
+Errors:
+"a" does not subsume "b":
+    value:1:4
+    value:1:15
+
+Result:
+false
+-- out/TestValues/40/"a"_⊑_"b"/v3-noshare --
+Errors:
+"a" does not subsume "b":
+    value:1:4
+    value:1:15
+
+Result:
+false
+-- out/TestValues/41/string_⊑_"a"/v2 --
+true
+-- out/TestValues/41/string_⊑_"a"/v3 --
+true
+-- out/TestValues/41/string_⊑_"a"/v3-noshare --
+true
+-- out/TestValues/42/"a"_⊑_string/v2 --
+Errors:
+"a" does not subsume string:
+    value:1:4
+    value:1:15
+
+Result:
+false
+-- out/TestValues/42/"a"_⊑_string/v3 --
+Errors:
+"a" does not subsume string:
+    value:1:4
+    value:1:15
+
+Result:
+false
+-- out/TestValues/42/"a"_⊑_string/v3-noshare --
+Errors:
+"a" does not subsume string:
+    value:1:4
+    value:1:15
+
+Result:
+false
+-- out/TestValues/43/1_⊑_1/v2 --
+true
+-- out/TestValues/43/1_⊑_1/v3 --
+true
+-- out/TestValues/43/1_⊑_1/v3-noshare --
+true
+-- out/TestValues/44/1.0_⊑_1.0/v2 --
+true
+-- out/TestValues/44/1.0_⊑_1.0/v3 --
+true
+-- out/TestValues/44/1.0_⊑_1.0/v3-noshare --
+true
+-- out/TestValues/45/3.0_⊑_3.0/v2 --
+true
+-- out/TestValues/45/3.0_⊑_3.0/v3 --
+true
+-- out/TestValues/45/3.0_⊑_3.0/v3-noshare --
+true
+-- out/TestValues/46/1.0_⊑_1/v2 --
+Errors:
+1.0 does not subsume 1:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/46/1.0_⊑_1/v3 --
+Errors:
+1.0 does not subsume 1:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/46/1.0_⊑_1/v3-noshare --
+Errors:
+1.0 does not subsume 1:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/47/1_⊑_1.0/v2 --
+Errors:
+1 does not subsume 1.0:
+    value:1:4
+    value:1:10
+
+Result:
+false
+-- out/TestValues/47/1_⊑_1.0/v3 --
+Errors:
+1 does not subsume 1.0:
+    value:1:4
+    value:1:10
+
+Result:
+false
+-- out/TestValues/47/1_⊑_1.0/v3-noshare --
+Errors:
+1 does not subsume 1.0:
+    value:1:4
+    value:1:10
+
+Result:
+false
+-- out/TestValues/48/3_⊑_3.0/v2 --
+Errors:
+3 does not subsume 3.0:
+    value:1:4
+    value:1:10
+
+Result:
+false
+-- out/TestValues/48/3_⊑_3.0/v3 --
+Errors:
+3 does not subsume 3.0:
+    value:1:4
+    value:1:10
+
+Result:
+false
+-- out/TestValues/48/3_⊑_3.0/v3-noshare --
+Errors:
+3 does not subsume 3.0:
+    value:1:4
+    value:1:10
+
+Result:
+false
+-- out/TestValues/49/int_⊑_1/v2 --
+true
+-- out/TestValues/49/int_⊑_1/v3 --
+true
+-- out/TestValues/49/int_⊑_1/v3-noshare --
+true
+-- out/TestValues/50/int_⊑_int_&_1/v2 --
+true
+-- out/TestValues/50/int_⊑_int_&_1/v3 --
+true
+-- out/TestValues/50/int_⊑_int_&_1/v3-noshare --
+true
+-- out/TestValues/51/float_⊑_1.0/v2 --
+true
+-- out/TestValues/51/float_⊑_1.0/v3 --
+true
+-- out/TestValues/51/float_⊑_1.0/v3-noshare --
+true
+-- out/TestValues/52/float_⊑_1/v2 --
+Errors:
+float does not subsume 1:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/52/float_⊑_1/v3 --
+Errors:
+float does not subsume 1:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/52/float_⊑_1/v3-noshare --
+Errors:
+float does not subsume 1:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/53/int_⊑_1.0/v2 --
+Errors:
+int does not subsume 1.0:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/53/int_⊑_1.0/v3 --
+Errors:
+int does not subsume 1.0:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/53/int_⊑_1.0/v3-noshare --
+Errors:
+int does not subsume 1.0:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/54/int_⊑_int/v2 --
+true
+-- out/TestValues/54/int_⊑_int/v3 --
+true
+-- out/TestValues/54/int_⊑_int/v3-noshare --
+true
+-- out/TestValues/55/number_⊑_int/v2 --
+true
+-- out/TestValues/55/number_⊑_int/v3 --
+true
+-- out/TestValues/55/number_⊑_int/v3-noshare --
+true
+-- out/TestValues/64/{}_⊑_{}/v2 --
+true
+-- out/TestValues/64/{}_⊑_{}/v3 --
+true
+-- out/TestValues/64/{}_⊑_{}/v3-noshare --
+true
+-- out/TestValues/65/{}_⊑_{a:_1}/v2 --
+true
+-- out/TestValues/65/{}_⊑_{a:_1}/v3 --
+true
+-- out/TestValues/65/{}_⊑_{a:_1}/v3-noshare --
+true
+-- out/TestValues/66/{a:1}_⊑_{a:1,_b:1}/v2 --
+true
+-- out/TestValues/66/{a:1}_⊑_{a:1,_b:1}/v3 --
+true
+-- out/TestValues/66/{a:1}_⊑_{a:1,_b:1}/v3-noshare --
+true
+-- out/TestValues/67/{s:_{_a:1}_}_⊑_{_s:_{_a:1,_b:2_}}/v2 --
+true
+-- out/TestValues/67/{s:_{_a:1}_}_⊑_{_s:_{_a:1,_b:2_}}/v3 --
+true
+-- out/TestValues/67/{s:_{_a:1}_}_⊑_{_s:_{_a:1,_b:2_}}/v3-noshare --
+true
+-- out/TestValues/68/{}_⊑_{}/v2 --
+true
+-- out/TestValues/68/{}_⊑_{}/v3 --
+true
+-- out/TestValues/68/{}_⊑_{}/v3-noshare --
+true
+-- out/TestValues/69/{}_⊑_{}_&_c,_c:_{}/v2 --
+true
+-- out/TestValues/69/{}_⊑_{}_&_c,_c:_{}/v3 --
+true
+-- out/TestValues/69/{}_⊑_{}_&_c,_c:_{}/v3-noshare --
+true
+-- out/TestValues/70/{a:1}_⊑_{}/v2 --
+Errors:
+required field is optional in subsumed value: a
+{a:1} does not subsume {}:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/70/{a:1}_⊑_{}/v3 --
+Errors:
+regular field is constraint in subsumed value: a
+{a:1} does not subsume {}:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/70/{a:1}_⊑_{}/v3-noshare --
+Errors:
+regular field is constraint in subsumed value: a
+{a:1} does not subsume {}:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/71/{a:1,_b:1}_⊑_{a:1}/v2 --
+Errors:
+required field is optional in subsumed value: b
+{a:1,b:1} does not subsume {a:1}:
+    value:1:4
+    value:1:19
+
+Result:
+false
+-- out/TestValues/71/{a:1,_b:1}_⊑_{a:1}/v3 --
+Errors:
+regular field is constraint in subsumed value: b
+{a:1,b:1} does not subsume {a:1}:
+    value:1:4
+    value:1:19
+
+Result:
+false
+-- out/TestValues/71/{a:1,_b:1}_⊑_{a:1}/v3-noshare --
+Errors:
+regular field is constraint in subsumed value: b
+{a:1,b:1} does not subsume {a:1}:
+    value:1:4
+    value:1:19
+
+Result:
+false
+-- out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}}/v2 --
+Errors:
+required field is optional in subsumed value: a
+{a:1} does not subsume {}:
+    value:1:8
+    value:1:26
+{a:1} in {s:{a:1}} does not subsume {} in {s:{}}:
+    value:1:4
+    value:1:8
+    value:1:21
+    value:1:26
+
+Result:
+false
+-- out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}}/v3 --
+Errors:
+regular field is constraint in subsumed value: a
+{a:1} does not subsume {}:
+    value:1:8
+    value:1:26
+
+Result:
+false
+-- out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}}/v3-noshare --
+Errors:
+regular field is constraint in subsumed value: a
+{a:1} does not subsume {}:
+    value:1:8
+    value:1:26
+
+Result:
+false
+-- out/TestValues/84/1_|_2_⊑_2_|_1/v2 --
+true
+-- out/TestValues/84/1_|_2_⊑_2_|_1/v3 --
+true
+-- out/TestValues/84/1_|_2_⊑_2_|_1/v3-noshare --
+true
+-- out/TestValues/85/1_|_2_⊑_1_|_2/v2 --
+true
+-- out/TestValues/85/1_|_2_⊑_1_|_2/v3 --
+true
+-- out/TestValues/85/1_|_2_⊑_1_|_2/v3-noshare --
+true
+-- out/TestValues/86/number_⊑_2_|_1/v2 --
+true
+-- out/TestValues/86/number_⊑_2_|_1/v3 --
+true
+-- out/TestValues/86/number_⊑_2_|_1/v3-noshare --
+true
+-- out/TestValues/87/number_⊑_2_|_1/v2 --
+true
+-- out/TestValues/87/number_⊑_2_|_1/v3 --
+true
+-- out/TestValues/87/number_⊑_2_|_1/v3-noshare --
+true
+-- out/TestValues/88/int_⊑_1_|_2_|_3.1/v2 --
+Errors:
+int does not subsume 3.1:
+    value:1:4
+    value:1:20
+
+Result:
+false
+-- out/TestValues/88/int_⊑_1_|_2_|_3.1/v3 --
+Errors:
+int does not subsume 3.1:
+    value:1:4
+    value:1:20
+
+Result:
+false
+-- out/TestValues/88/int_⊑_1_|_2_|_3.1/v3-noshare --
+Errors:
+int does not subsume 3.1:
+    value:1:4
+    value:1:20
+
+Result:
+false
+-- out/TestValues/89/float_|_number_⊑_1_|_2_|_3.1/v2 --
+true
+-- out/TestValues/89/float_|_number_⊑_1_|_2_|_3.1/v3 --
+true
+-- out/TestValues/89/float_|_number_⊑_1_|_2_|_3.1/v3-noshare --
+true
+-- out/TestValues/90/int_⊑_1_|_2_|_3.1/v2 --
+Errors:
+int does not subsume 3.1:
+    value:1:4
+    value:1:20
+
+Result:
+false
+-- out/TestValues/90/int_⊑_1_|_2_|_3.1/v3 --
+Errors:
+int does not subsume 3.1:
+    value:1:4
+    value:1:20
+
+Result:
+false
+-- out/TestValues/90/int_⊑_1_|_2_|_3.1/v3-noshare --
+Errors:
+int does not subsume 3.1:
+    value:1:4
+    value:1:20
+
+Result:
+false
+-- out/TestValues/91/1_|_2_⊑_1/v2 --
+true
+-- out/TestValues/91/1_|_2_⊑_1/v3 --
+true
+-- out/TestValues/91/1_|_2_⊑_1/v3-noshare --
+true
+-- out/TestValues/92/1_|_2_⊑_2/v2 --
+true
+-- out/TestValues/92/1_|_2_⊑_2/v3 --
+true
+-- out/TestValues/92/1_|_2_⊑_2/v3-noshare --
+true
+-- out/TestValues/93/1_|_2_⊑_3/v2 --
+Errors:
+1 does not subsume 3:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/93/1_|_2_⊑_3/v3 --
+Errors:
+1 does not subsume 3:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/93/1_|_2_⊑_3/v3-noshare --
+Errors:
+1 does not subsume 3:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/150/number_|_*1_⊑_number_|_*2/v2 --
+Errors:
+1 does not subsume 2:
+    value:1:14
+    value:1:30
+
+Result:
+false
+-- out/TestValues/150/number_|_*1_⊑_number_|_*2/v3 --
+Errors:
+1 does not subsume 2:
+    value:1:14
+    value:1:30
+
+Result:
+false
+-- out/TestValues/150/number_|_*1_⊑_number_|_*2/v3-noshare --
+Errors:
+1 does not subsume 2:
+    value:1:14
+    value:1:30
+
+Result:
+false
+-- out/TestValues/151/number_|_*2_⊑_number_|_*2/v2 --
+true
+-- out/TestValues/151/number_|_*2_⊑_number_|_*2/v3 --
+true
+-- out/TestValues/151/number_|_*2_⊑_number_|_*2/v3-noshare --
+true
+-- out/TestValues/152/int_|_*float_⊑_int_|_*2.0/v2 --
+true
+-- out/TestValues/152/int_|_*float_⊑_int_|_*2.0/v3 --
+true
+-- out/TestValues/152/int_|_*float_⊑_int_|_*2.0/v3-noshare --
+true
+-- out/TestValues/153/int_|_*2_⊑_int_|_*2.0/v2 --
+Errors:
+2 does not subsume 2.0:
+    value:1:11
+    value:1:24
+
+Result:
+false
+-- out/TestValues/153/int_|_*2_⊑_int_|_*2.0/v3 --
+Errors:
+2 does not subsume 2.0:
+    value:1:11
+    value:1:24
+
+Result:
+false
+-- out/TestValues/153/int_|_*2_⊑_int_|_*2.0/v3-noshare --
+Errors:
+2 does not subsume 2.0:
+    value:1:11
+    value:1:24
+
+Result:
+false
+-- out/TestValues/154/number_|_*2_|_*3_⊑_number_|_*2/v2 --
+true
+-- out/TestValues/154/number_|_*2_|_*3_⊑_number_|_*2/v3 --
+true
+-- out/TestValues/154/number_|_*2_|_*3_⊑_number_|_*2/v3-noshare --
+true
+-- out/TestValues/155/number_⊑_number_|_*2/v2 --
+true
+-- out/TestValues/155/number_⊑_number_|_*2/v3 --
+true
+-- out/TestValues/155/number_⊑_number_|_*2/v3-noshare --
+true
+-- out/TestValues/170/>=2_⊑_>=2/v2 --
+true
+-- out/TestValues/170/>=2_⊑_>=2/v3 --
+true
+-- out/TestValues/170/>=2_⊑_>=2/v3-noshare --
+true
+-- out/TestValues/171/>=1_⊑_>=2/v2 --
+true
+-- out/TestValues/171/>=1_⊑_>=2/v3 --
+true
+-- out/TestValues/171/>=1_⊑_>=2/v3-noshare --
+true
+-- out/TestValues/172/>0_⊑_>=2/v2 --
+true
+-- out/TestValues/172/>0_⊑_>=2/v3 --
+true
+-- out/TestValues/172/>0_⊑_>=2/v3-noshare --
+true
+-- out/TestValues/173/>1_⊑_>1/v2 --
+true
+-- out/TestValues/173/>1_⊑_>1/v3 --
+true
+-- out/TestValues/173/>1_⊑_>1/v3-noshare --
+true
+-- out/TestValues/174/>=1_⊑_>1/v2 --
+true
+-- out/TestValues/174/>=1_⊑_>1/v3 --
+true
+-- out/TestValues/174/>=1_⊑_>1/v3-noshare --
+true
+-- out/TestValues/175/>1_⊑_>=1/v2 --
+Errors:
+>1 does not subsume >=1:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/175/>1_⊑_>=1/v3 --
+Errors:
+>1 does not subsume >=1:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/175/>1_⊑_>=1/v3-noshare --
+Errors:
+>1 does not subsume >=1:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/176/>=1_⊑_>=1/v2 --
+true
+-- out/TestValues/176/>=1_⊑_>=1/v3 --
+true
+-- out/TestValues/176/>=1_⊑_>=1/v3-noshare --
+true
+-- out/TestValues/177/<1_⊑_<1/v2 --
+true
+-- out/TestValues/177/<1_⊑_<1/v3 --
+true
+-- out/TestValues/177/<1_⊑_<1/v3-noshare --
+true
+-- out/TestValues/178/<=1_⊑_<1/v2 --
+true
+-- out/TestValues/178/<=1_⊑_<1/v3 --
+true
+-- out/TestValues/178/<=1_⊑_<1/v3-noshare --
+true
+-- out/TestValues/179/<1_⊑_<=1/v2 --
+Errors:
+<1 does not subsume <=1:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/179/<1_⊑_<=1/v3 --
+Errors:
+<1 does not subsume <=1:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/179/<1_⊑_<=1/v3-noshare --
+Errors:
+<1 does not subsume <=1:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/180/<=1_⊑_<=1/v2 --
+true
+-- out/TestValues/180/<=1_⊑_<=1/v3 --
+true
+-- out/TestValues/180/<=1_⊑_<=1/v3-noshare --
+true
+-- out/TestValues/181/!=1_⊑_!=1/v2 --
+true
+-- out/TestValues/181/!=1_⊑_!=1/v3 --
+true
+-- out/TestValues/181/!=1_⊑_!=1/v3-noshare --
+true
+-- out/TestValues/182/!=1_⊑_!=2/v2 --
+Errors:
+!=1 does not subsume !=2:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/182/!=1_⊑_!=2/v3 --
+Errors:
+!=1 does not subsume !=2:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/182/!=1_⊑_!=2/v3-noshare --
+Errors:
+!=1 does not subsume !=2:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/183/!=1_⊑_<=1/v2 --
+Errors:
+!=1 does not subsume <=1:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/183/!=1_⊑_<=1/v3 --
+Errors:
+!=1 does not subsume <=1:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/183/!=1_⊑_<=1/v3-noshare --
+Errors:
+!=1 does not subsume <=1:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/184/!=1_⊑_<1/v2 --
+true
+-- out/TestValues/184/!=1_⊑_<1/v3 --
+true
+-- out/TestValues/184/!=1_⊑_<1/v3-noshare --
+true
+-- out/TestValues/185/!=1_⊑_>=1/v2 --
+Errors:
+!=1 does not subsume >=1:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/185/!=1_⊑_>=1/v3 --
+Errors:
+!=1 does not subsume >=1:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/185/!=1_⊑_>=1/v3-noshare --
+Errors:
+!=1 does not subsume >=1:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/186/!=1_⊑_<1/v2 --
+true
+-- out/TestValues/186/!=1_⊑_<1/v3 --
+true
+-- out/TestValues/186/!=1_⊑_<1/v3-noshare --
+true
+-- out/TestValues/187/!=1_⊑_<=0/v2 --
+true
+-- out/TestValues/187/!=1_⊑_<=0/v3 --
+true
+-- out/TestValues/187/!=1_⊑_<=0/v3-noshare --
+true
+-- out/TestValues/188/!=1_⊑_>=2/v2 --
+true
+-- out/TestValues/188/!=1_⊑_>=2/v3 --
+true
+-- out/TestValues/188/!=1_⊑_>=2/v3-noshare --
+true
+-- out/TestValues/189/!=1_⊑_>1/v2 --
+true
+-- out/TestValues/189/!=1_⊑_>1/v3 --
+true
+-- out/TestValues/189/!=1_⊑_>1/v3-noshare --
+true
+-- out/TestValues/195/>=2_⊑_!=2/v2 --
+Errors:
+>=2 does not subsume !=2:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/195/>=2_⊑_!=2/v3 --
+Errors:
+>=2 does not subsume !=2:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/195/>=2_⊑_!=2/v3-noshare --
+Errors:
+>=2 does not subsume !=2:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/196/>2_⊑_!=2/v2 --
+Errors:
+>2 does not subsume !=2:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/196/>2_⊑_!=2/v3 --
+Errors:
+>2 does not subsume !=2:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/196/>2_⊑_!=2/v3-noshare --
+Errors:
+>2 does not subsume !=2:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/197/<2_⊑_!=2/v2 --
+Errors:
+<2 does not subsume !=2:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/197/<2_⊑_!=2/v3 --
+Errors:
+<2 does not subsume !=2:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/197/<2_⊑_!=2/v3-noshare --
+Errors:
+<2 does not subsume !=2:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/198/<=2_⊑_!=2/v2 --
+Errors:
+<=2 does not subsume !=2:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/198/<=2_⊑_!=2/v3 --
+Errors:
+<=2 does not subsume !=2:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/198/<=2_⊑_!=2/v3-noshare --
+Errors:
+<=2 does not subsume !=2:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/200/=~"foo"_⊑_=~"foo"/v2 --
+true
+-- out/TestValues/200/=~"foo"_⊑_=~"foo"/v3 --
+true
+-- out/TestValues/200/=~"foo"_⊑_=~"foo"/v3-noshare --
+true
+-- out/TestValues/201/=~"foo"_⊑_=~"bar"/v2 --
+Errors:
+=~"foo" does not subsume =~"bar":
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/201/=~"foo"_⊑_=~"bar"/v3 --
+Errors:
+=~"foo" does not subsume =~"bar":
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/201/=~"foo"_⊑_=~"bar"/v3-noshare --
+Errors:
+=~"foo" does not subsume =~"bar":
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/202/=~"foo1"_⊑_=~"foo"/v2 --
+Errors:
+=~"foo1" does not subsume =~"foo":
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/202/=~"foo1"_⊑_=~"foo"/v3 --
+Errors:
+=~"foo1" does not subsume =~"foo":
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/202/=~"foo1"_⊑_=~"foo"/v3-noshare --
+Errors:
+=~"foo1" does not subsume =~"foo":
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/203/!~"foo"_⊑_!~"foo"/v2 --
+true
+-- out/TestValues/203/!~"foo"_⊑_!~"foo"/v3 --
+true
+-- out/TestValues/203/!~"foo"_⊑_!~"foo"/v3-noshare --
+true
+-- out/TestValues/204/!~"foo"_⊑_!~"bar"/v2 --
+Errors:
+!~"foo" does not subsume !~"bar":
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/204/!~"foo"_⊑_!~"bar"/v3 --
+Errors:
+!~"foo" does not subsume !~"bar":
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/204/!~"foo"_⊑_!~"bar"/v3-noshare --
+Errors:
+!~"foo" does not subsume !~"bar":
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/205/!~"foo"_⊑_!~"foo1"/v2 --
+Errors:
+!~"foo" does not subsume !~"foo1":
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/205/!~"foo"_⊑_!~"foo1"/v3 --
+Errors:
+!~"foo" does not subsume !~"foo1":
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/205/!~"foo"_⊑_!~"foo1"/v3-noshare --
+Errors:
+!~"foo" does not subsume !~"foo1":
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/210/=~"foo"_⊑_=~"foo1"/v2 --
+Errors:
+=~"foo" does not subsume =~"foo1":
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/210/=~"foo"_⊑_=~"foo1"/v3 --
+Errors:
+=~"foo" does not subsume =~"foo1":
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/210/=~"foo"_⊑_=~"foo1"/v3-noshare --
+Errors:
+=~"foo" does not subsume =~"foo1":
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/211/!~"foo1"_⊑_!~"foo"/v2 --
+Errors:
+!~"foo1" does not subsume !~"foo":
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/211/!~"foo1"_⊑_!~"foo"/v3 --
+Errors:
+!~"foo1" does not subsume !~"foo":
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/211/!~"foo1"_⊑_!~"foo"/v3-noshare --
+Errors:
+!~"foo1" does not subsume !~"foo":
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/220/<5_⊑_4/v2 --
+true
+-- out/TestValues/220/<5_⊑_4/v3 --
+true
+-- out/TestValues/220/<5_⊑_4/v3-noshare --
+true
+-- out/TestValues/221/<5_⊑_5/v2 --
+Errors:
+<5 does not subsume 5:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/221/<5_⊑_5/v3 --
+Errors:
+<5 does not subsume 5:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/221/<5_⊑_5/v3-noshare --
+Errors:
+<5 does not subsume 5:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/222/<=5_⊑_5/v2 --
+true
+-- out/TestValues/222/<=5_⊑_5/v3 --
+true
+-- out/TestValues/222/<=5_⊑_5/v3-noshare --
+true
+-- out/TestValues/223/<=5.0_⊑_5.00000001/v2 --
+Errors:
+<=5.0 does not subsume 5.00000001:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/223/<=5.0_⊑_5.00000001/v3 --
+Errors:
+<=5.0 does not subsume 5.00000001:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/223/<=5.0_⊑_5.00000001/v3-noshare --
+Errors:
+<=5.0 does not subsume 5.00000001:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/224/>5_⊑_6/v2 --
+true
+-- out/TestValues/224/>5_⊑_6/v3 --
+true
+-- out/TestValues/224/>5_⊑_6/v3-noshare --
+true
+-- out/TestValues/225/>5_⊑_5/v2 --
+Errors:
+>5 does not subsume 5:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/225/>5_⊑_5/v3 --
+Errors:
+>5 does not subsume 5:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/225/>5_⊑_5/v3-noshare --
+Errors:
+>5 does not subsume 5:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/226/>=5_⊑_5/v2 --
+true
+-- out/TestValues/226/>=5_⊑_5/v3 --
+true
+-- out/TestValues/226/>=5_⊑_5/v3-noshare --
+true
+-- out/TestValues/227/>=5_⊑_4/v2 --
+Errors:
+>=5 does not subsume 4:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/227/>=5_⊑_4/v3 --
+Errors:
+>=5 does not subsume 4:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/227/>=5_⊑_4/v3-noshare --
+Errors:
+>=5 does not subsume 4:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/228/!=5_⊑_6/v2 --
+true
+-- out/TestValues/228/!=5_⊑_6/v3 --
+true
+-- out/TestValues/228/!=5_⊑_6/v3-noshare --
+true
+-- out/TestValues/229/!=5_⊑_5/v2 --
+Errors:
+!=5 does not subsume 5:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/229/!=5_⊑_5/v3 --
+Errors:
+!=5 does not subsume 5:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/229/!=5_⊑_5/v3-noshare --
+Errors:
+!=5 does not subsume 5:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/230/!=5.0_⊑_5.0/v2 --
+Errors:
+!=5.0 does not subsume 5.0:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/230/!=5.0_⊑_5.0/v3 --
+Errors:
+!=5.0 does not subsume 5.0:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/230/!=5.0_⊑_5.0/v3-noshare --
+Errors:
+!=5.0 does not subsume 5.0:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/231/!=5.0_⊑_5/v2 --
+Errors:
+!=5.0 does not subsume 5:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/231/!=5.0_⊑_5/v3 --
+Errors:
+!=5.0 does not subsume 5:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/231/!=5.0_⊑_5/v3-noshare --
+Errors:
+!=5.0 does not subsume 5:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/250/=~_#"^\d{3}$"#_⊑_"123"/v2 --
+true
+-- out/TestValues/250/=~_#"^\d{3}$"#_⊑_"123"/v3 --
+true
+-- out/TestValues/250/=~_#"^\d{3}$"#_⊑_"123"/v3-noshare --
+true
+-- out/TestValues/251/=~_#"^\d{3}$"#_⊑_"1234"/v2 --
+Errors:
+=~"^\\d{3}$" does not subsume "1234":
+    value:1:4
+    value:1:23
+
+Result:
+false
+-- out/TestValues/251/=~_#"^\d{3}$"#_⊑_"1234"/v3 --
+Errors:
+=~"^\\d{3}$" does not subsume "1234":
+    value:1:4
+    value:1:23
+
+Result:
+false
+-- out/TestValues/251/=~_#"^\d{3}$"#_⊑_"1234"/v3-noshare --
+Errors:
+=~"^\\d{3}$" does not subsume "1234":
+    value:1:4
+    value:1:23
+
+Result:
+false
+-- out/TestValues/252/!~_#"^\d{3}$"#_⊑_"1234"/v2 --
+true
+-- out/TestValues/252/!~_#"^\d{3}$"#_⊑_"1234"/v3 --
+true
+-- out/TestValues/252/!~_#"^\d{3}$"#_⊑_"1234"/v3-noshare --
+true
+-- out/TestValues/253/!~_#"^\d{3}$"#_⊑_"123"/v2 --
+Errors:
+!~"^\\d{3}$" does not subsume "123":
+    value:1:4
+    value:1:23
+
+Result:
+false
+-- out/TestValues/253/!~_#"^\d{3}$"#_⊑_"123"/v3 --
+Errors:
+!~"^\\d{3}$" does not subsume "123":
+    value:1:4
+    value:1:23
+
+Result:
+false
+-- out/TestValues/253/!~_#"^\d{3}$"#_⊑_"123"/v3-noshare --
+Errors:
+!~"^\\d{3}$" does not subsume "123":
+    value:1:4
+    value:1:23
+
+Result:
+false
+-- out/TestValues/300/>0_⊑_>=2_&_<=100/v2 --
+true
+-- out/TestValues/300/>0_⊑_>=2_&_<=100/v3 --
+true
+-- out/TestValues/300/>0_⊑_>=2_&_<=100/v3-noshare --
+true
+-- out/TestValues/301/>0_⊑_>=0_&_<=100/v2 --
+Errors:
+>0 does not subsume >=0:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/301/>0_⊑_>=0_&_<=100/v3 --
+Errors:
+>0 does not subsume >=0:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/301/>0_⊑_>=0_&_<=100/v3-noshare --
+Errors:
+>0 does not subsume >=0:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/310/>=0_&_<=100_⊑_10/v2 --
+true
+-- out/TestValues/310/>=0_&_<=100_⊑_10/v3 --
+true
+-- out/TestValues/310/>=0_&_<=100_⊑_10/v3-noshare --
+true
+-- out/TestValues/311/>=0_&_<=100_⊑_>=0_&_<=100/v2 --
+true
+-- out/TestValues/311/>=0_&_<=100_⊑_>=0_&_<=100/v3 --
+true
+-- out/TestValues/311/>=0_&_<=100_⊑_>=0_&_<=100/v3-noshare --
+true
+-- out/TestValues/312/!=2_&_!=4_⊑_>3/v2 --
+Errors:
+!=4 does not subsume >3:
+    value:1:10
+    value:1:18
+
+Result:
+false
+-- out/TestValues/312/!=2_&_!=4_⊑_>3/v3 --
+Errors:
+!=4 does not subsume >3:
+    value:1:10
+    value:1:18
+
+Result:
+false
+-- out/TestValues/312/!=2_&_!=4_⊑_>3/v3-noshare --
+Errors:
+!=4 does not subsume >3:
+    value:1:10
+    value:1:18
+
+Result:
+false
+-- out/TestValues/313/!=2_&_!=4_⊑_>5/v2 --
+true
+-- out/TestValues/313/!=2_&_!=4_⊑_>5/v3 --
+true
+-- out/TestValues/313/!=2_&_!=4_⊑_>5/v3-noshare --
+true
+-- out/TestValues/314/>=0_&_<=100_⊑_>=0_&_<=150/v2 --
+Errors:
+<=100 does not subsume >=0:
+    value:1:10
+    value:1:20
+
+Result:
+false
+-- out/TestValues/314/>=0_&_<=100_⊑_>=0_&_<=150/v3 --
+Errors:
+<=100 does not subsume >=0:
+    value:1:10
+    value:1:20
+
+Result:
+false
+-- out/TestValues/314/>=0_&_<=100_⊑_>=0_&_<=150/v3-noshare --
+Errors:
+<=100 does not subsume >=0:
+    value:1:10
+    value:1:20
+
+Result:
+false
+-- out/TestValues/315/>=0_&_<=150_⊑_>=0_&_<=100/v2 --
+true
+-- out/TestValues/315/>=0_&_<=150_⊑_>=0_&_<=100/v3 --
+true
+-- out/TestValues/315/>=0_&_<=150_⊑_>=0_&_<=100/v3-noshare --
+true
+-- out/TestValues/330/>5_⊑_>10_|_8/v2 --
+true
+-- out/TestValues/330/>5_⊑_>10_|_8/v3 --
+true
+-- out/TestValues/330/>5_⊑_>10_|_8/v3-noshare --
+true
+-- out/TestValues/331/>8_⊑_>10_|_8/v2 --
+Errors:
+>8 does not subsume 8:
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/331/>8_⊑_>10_|_8/v3 --
+Errors:
+>8 does not subsume 8:
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/331/>8_⊑_>10_|_8/v3-noshare --
+Errors:
+>8 does not subsume 8:
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/400/{foo:_1}_⊑_{}/v2 --
+Errors:
+required field is optional in subsumed value: foo
+{foo:1} does not subsume {}:
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/400/{foo:_1}_⊑_{}/v3 --
+Errors:
+regular field is constraint in subsumed value: foo
+{foo:1} does not subsume {}:
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/400/{foo:_1}_⊑_{}/v3-noshare --
+Errors:
+regular field is constraint in subsumed value: foo
+{foo:1} does not subsume {}:
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/401/{foo?:_1}_⊑_{}/v2 --
+Errors:
+1 does not subsume _:
+    value:1:11
+1 in {foo?:1} does not subsume _ in {}:
+    value:1:4
+    value:1:11
+    value:1:18
+
+Result:
+false
+-- out/TestValues/401/{foo?:_1}_⊑_{}/v3 --
+Errors:
+1 does not subsume _:
+    value:1:11
+
+Result:
+false
+-- out/TestValues/401/{foo?:_1}_⊑_{}/v3-noshare --
+Errors:
+1 does not subsume _:
+    value:1:11
+
+Result:
+false
+-- out/TestValues/402/{}_⊑_{foo:_1}/v2 --
+true
+-- out/TestValues/402/{}_⊑_{foo:_1}/v3 --
+true
+-- out/TestValues/402/{}_⊑_{foo:_1}/v3-noshare --
+true
+-- out/TestValues/403/{}_⊑_{foo?:_1}/v2 --
+true
+-- out/TestValues/403/{}_⊑_{foo?:_1}/v3 --
+true
+-- out/TestValues/403/{}_⊑_{foo?:_1}/v3-noshare --
+true
+-- out/TestValues/404/{foo:_1}_⊑_{foo:_1}/v2 --
+true
+-- out/TestValues/404/{foo:_1}_⊑_{foo:_1}/v3 --
+true
+-- out/TestValues/404/{foo:_1}_⊑_{foo:_1}/v3-noshare --
+true
+-- out/TestValues/405/{foo?:_1}_⊑_{foo:_1}/v2 --
+true
+-- out/TestValues/405/{foo?:_1}_⊑_{foo:_1}/v3 --
+true
+-- out/TestValues/405/{foo?:_1}_⊑_{foo:_1}/v3-noshare --
+true
+-- out/TestValues/406/{foo?:_1}_⊑_{foo?:_1}/v2 --
+true
+-- out/TestValues/406/{foo?:_1}_⊑_{foo?:_1}/v3 --
+true
+-- out/TestValues/406/{foo?:_1}_⊑_{foo?:_1}/v3-noshare --
+true
+-- out/TestValues/407/{foo:_1}_⊑_{foo?:_1}/v2 --
+Errors:
+1 does not subsume 1:
+    value:1:10
+    value:1:24
+1 in {foo:1} does not subsume 1 in {foo?:1}:
+    value:1:4
+    value:1:10
+    value:1:17
+    value:1:24
+
+Result:
+false
+-- out/TestValues/407/{foo:_1}_⊑_{foo?:_1}/v3 --
+Errors:
+1 does not subsume 1:
+    value:1:10
+    value:1:24
+
+Result:
+false
+-- out/TestValues/407/{foo:_1}_⊑_{foo?:_1}/v3-noshare --
+Errors:
+1 does not subsume 1:
+    value:1:10
+    value:1:24
+
+Result:
+false
+-- out/TestValues/408/{foo:_1}_⊑_{foo:_2}/v2 --
+Errors:
+1 does not subsume 2:
+    value:1:10
+    value:1:23
+1 in {foo:1} does not subsume 2 in {foo:2}:
+    value:1:4
+    value:1:10
+    value:1:17
+    value:1:23
+
+Result:
+false
+-- out/TestValues/408/{foo:_1}_⊑_{foo:_2}/v3 --
+Errors:
+1 does not subsume 2:
+    value:1:10
+    value:1:23
+
+Result:
+false
+-- out/TestValues/408/{foo:_1}_⊑_{foo:_2}/v3-noshare --
+Errors:
+1 does not subsume 2:
+    value:1:10
+    value:1:23
+
+Result:
+false
+-- out/TestValues/409/{foo?:_1}_⊑_{foo:_2}/v2 --
+Errors:
+1 does not subsume 2:
+    value:1:11
+    value:1:24
+1 in {foo?:1} does not subsume 2 in {foo:2}:
+    value:1:4
+    value:1:11
+    value:1:18
+    value:1:24
+
+Result:
+false
+-- out/TestValues/409/{foo?:_1}_⊑_{foo:_2}/v3 --
+Errors:
+1 does not subsume 2:
+    value:1:11
+    value:1:24
+
+Result:
+false
+-- out/TestValues/409/{foo?:_1}_⊑_{foo:_2}/v3-noshare --
+Errors:
+1 does not subsume 2:
+    value:1:11
+    value:1:24
+
+Result:
+false
+-- out/TestValues/410/{foo?:_1}_⊑_{foo?:_2}/v2 --
+Errors:
+1 does not subsume 2:
+    value:1:11
+    value:1:25
+1 in {foo?:1} does not subsume 2 in {foo?:2}:
+    value:1:4
+    value:1:11
+    value:1:18
+    value:1:25
+
+Result:
+false
+-- out/TestValues/410/{foo?:_1}_⊑_{foo?:_2}/v3 --
+Errors:
+1 does not subsume 2:
+    value:1:11
+    value:1:25
+
+Result:
+false
+-- out/TestValues/410/{foo?:_1}_⊑_{foo?:_2}/v3-noshare --
+Errors:
+1 does not subsume 2:
+    value:1:11
+    value:1:25
+
+Result:
+false
+-- out/TestValues/411/{foo:_1}_⊑_{foo?:_2}/v2 --
+Errors:
+1 does not subsume 2:
+    value:1:10
+    value:1:24
+1 in {foo:1} does not subsume 2 in {foo?:2}:
+    value:1:4
+    value:1:10
+    value:1:17
+    value:1:24
+
+Result:
+false
+-- out/TestValues/411/{foo:_1}_⊑_{foo?:_2}/v3 --
+Errors:
+1 does not subsume 2:
+    value:1:10
+    value:1:24
+
+Result:
+false
+-- out/TestValues/411/{foo:_1}_⊑_{foo?:_2}/v3-noshare --
+Errors:
+1 does not subsume 2:
+    value:1:10
+    value:1:24
+
+Result:
+false
+-- out/TestValues/412/{foo:_number}_⊑_{foo:_2}/v2 --
+true
+-- out/TestValues/412/{foo:_number}_⊑_{foo:_2}/v3 --
+true
+-- out/TestValues/412/{foo:_number}_⊑_{foo:_2}/v3-noshare --
+true
+-- out/TestValues/413/{foo?:_number}_⊑_{foo:_2}/v2 --
+true
+-- out/TestValues/413/{foo?:_number}_⊑_{foo:_2}/v3 --
+true
+-- out/TestValues/413/{foo?:_number}_⊑_{foo:_2}/v3-noshare --
+true
+-- out/TestValues/414/{foo?:_number}_⊑_{foo?:_2}/v2 --
+true
+-- out/TestValues/414/{foo?:_number}_⊑_{foo?:_2}/v3 --
+true
+-- out/TestValues/414/{foo?:_number}_⊑_{foo?:_2}/v3-noshare --
+true
+-- out/TestValues/415/{foo:_number}_⊑_{foo?:_2}/v2 --
+Errors:
+number does not subsume 2:
+    value:1:10
+    value:1:29
+number in {foo:number} does not subsume 2 in {foo?:2}:
+    value:1:4
+    value:1:10
+    value:1:22
+    value:1:29
+
+Result:
+false
+-- out/TestValues/415/{foo:_number}_⊑_{foo?:_2}/v3 --
+Errors:
+number does not subsume 2:
+    value:1:10
+    value:1:29
+
+Result:
+false
+-- out/TestValues/415/{foo:_number}_⊑_{foo?:_2}/v3-noshare --
+Errors:
+number does not subsume 2:
+    value:1:10
+    value:1:29
+
+Result:
+false
+-- out/TestValues/416/{foo:_1}_⊑_{foo:_number}/v2 --
+Errors:
+1 does not subsume number:
+    value:1:10
+    value:1:23
+1 in {foo:1} does not subsume number in {foo:number}:
+    value:1:4
+    value:1:10
+    value:1:17
+    value:1:23
+
+Result:
+false
+-- out/TestValues/416/{foo:_1}_⊑_{foo:_number}/v3 --
+Errors:
+1 does not subsume number:
+    value:1:10
+    value:1:23
+
+Result:
+false
+-- out/TestValues/416/{foo:_1}_⊑_{foo:_number}/v3-noshare --
+Errors:
+1 does not subsume number:
+    value:1:10
+    value:1:23
+
+Result:
+false
+-- out/TestValues/417/{foo?:_1}_⊑_{foo:_number}/v2 --
+Errors:
+1 does not subsume number:
+    value:1:11
+    value:1:24
+1 in {foo?:1} does not subsume number in {foo:number}:
+    value:1:4
+    value:1:11
+    value:1:18
+    value:1:24
+
+Result:
+false
+-- out/TestValues/417/{foo?:_1}_⊑_{foo:_number}/v3 --
+Errors:
+1 does not subsume number:
+    value:1:11
+    value:1:24
+
+Result:
+false
+-- out/TestValues/417/{foo?:_1}_⊑_{foo:_number}/v3-noshare --
+Errors:
+1 does not subsume number:
+    value:1:11
+    value:1:24
+
+Result:
+false
+-- out/TestValues/418/{foo?:_1}_⊑_{foo?:_number}/v2 --
+Errors:
+1 does not subsume number:
+    value:1:11
+    value:1:25
+1 in {foo?:1} does not subsume number in {foo?:number}:
+    value:1:4
+    value:1:11
+    value:1:18
+    value:1:25
+
+Result:
+false
+-- out/TestValues/418/{foo?:_1}_⊑_{foo?:_number}/v3 --
+Errors:
+1 does not subsume number:
+    value:1:11
+    value:1:25
+
+Result:
+false
+-- out/TestValues/418/{foo?:_1}_⊑_{foo?:_number}/v3-noshare --
+Errors:
+1 does not subsume number:
+    value:1:11
+    value:1:25
+
+Result:
+false
+-- out/TestValues/419/{foo:_1}_⊑_{foo?:_number}/v2 --
+Errors:
+1 does not subsume number:
+    value:1:10
+    value:1:24
+1 in {foo:1} does not subsume number in {foo?:number}:
+    value:1:4
+    value:1:10
+    value:1:17
+    value:1:24
+
+Result:
+false
+-- out/TestValues/419/{foo:_1}_⊑_{foo?:_number}/v3 --
+Errors:
+1 does not subsume number:
+    value:1:10
+    value:1:24
+
+Result:
+false
+-- out/TestValues/419/{foo:_1}_⊑_{foo?:_number}/v3-noshare --
+Errors:
+1 does not subsume number:
+    value:1:10
+    value:1:24
+
+Result:
+false
+-- out/TestValues/420/{foo?:__}_⊑_{}/v2 --
+true
+-- out/TestValues/420/{foo?:__}_⊑_{}/v3 --
+true
+-- out/TestValues/420/{foo?:__}_⊑_{}/v3-noshare --
+true
+-- out/TestValues/430/{[_]:_4}_⊑_{[_]:_int}/v2 --
+Errors:
+{} does not subsume {}: inexact subsumption:
+    value:1:4
+    value:1:17
+
+Result:
+false
+-- out/TestValues/430/{[_]:_4}_⊑_{[_]:_int}/v3 --
+Errors:
+4 does not subsume int:
+    value:1:10
+    value:1:23
+
+Result:
+false
+-- out/TestValues/430/{[_]:_4}_⊑_{[_]:_int}/v3-noshare --
+Errors:
+4 does not subsume int:
+    value:1:10
+    value:1:23
+
+Result:
+false
+-- out/TestValues/431/{[_]:_int}_⊑_{[_]:_2}/v3 --
+true
+-- out/TestValues/431/{[_]:_int}_⊑_{[_]:_2}/v3-noshare --
+true
+-- out/TestValues/432/{[string]:_int,_[<"m"]:_3}_⊑_{[string]:_2,_[<"m"]:_3}/v3 --
+true
+-- out/TestValues/432/{[string]:_int,_[<"m"]:_3}_⊑_{[string]:_2,_[<"m"]:_3}/v3-noshare --
+true
+-- out/TestValues/433/{[<"m"]:_3,_[string]:_int}_⊑_{[string]:_2,_[<"m"]:_3}/v3 --
+true
+-- out/TestValues/433/{[<"m"]:_3,_[string]:_int}_⊑_{[string]:_2,_[<"m"]:_3}/v3-noshare --
+true
+-- out/TestValues/434/{[<"n"]:_3,_[string]:_int}_⊑_{[string]:_2,_[<"m"]:_3}/v2 --
+Errors:
+{} does not subsume {}: inexact subsumption:
+    value:1:4
+    value:1:35
+
+Result:
+false
+-- out/TestValues/434/{[<"n"]:_3,_[string]:_int}_⊑_{[string]:_2,_[<"m"]:_3}/v3 --
+Errors:
+{} does not subsume {}: inexact subsumption:
+    value:1:4
+    value:1:35
+
+Result:
+false
+-- out/TestValues/434/{[<"n"]:_3,_[string]:_int}_⊑_{[string]:_2,_[<"m"]:_3}/v3-noshare --
+Errors:
+{} does not subsume {}: inexact subsumption:
+    value:1:4
+    value:1:35
+
+Result:
+false
+-- out/TestValues/435/{[string]:_<5,_[string]:_int}_⊑_{[string]:_<=3,_[string]:_3}/v3 --
+true
+-- out/TestValues/435/{[string]:_<5,_[string]:_int}_⊑_{[string]:_<=3,_[string]:_3}/v3-noshare --
+true
+-- out/TestValues/436/{[string]:_>5}_⊑_{[string]:_1,_[string]:_2}/v3 --
+true
+-- out/TestValues/436/{[string]:_>5}_⊑_{[string]:_1,_[string]:_2}/v3-noshare --
+true
+-- out/TestValues/437/{[_]:_>5,_[>"b"]:_int}_⊑_{[_]:_6}/v2 --
+Errors:
+{} does not subsume {}: inexact subsumption:
+    value:1:4
+    value:1:31
+
+Result:
+false
+-- out/TestValues/437/{[_]:_>5,_[>"b"]:_int}_⊑_{[_]:_6}/v3 --
+Errors:
+{} does not subsume {}: inexact subsumption:
+    value:1:4
+    value:1:31
+
+Result:
+false
+-- out/TestValues/437/{[_]:_>5,_[>"b"]:_int}_⊑_{[_]:_6}/v3-noshare --
+Errors:
+{} does not subsume {}: inexact subsumption:
+    value:1:4
+    value:1:31
+
+Result:
+false
+-- out/TestValues/438/{}_⊑_{[_]:_6}/v2 --
+true
+-- out/TestValues/438/{}_⊑_{[_]:_6}/v3 --
+true
+-- out/TestValues/438/{}_⊑_{[_]:_6}/v3-noshare --
+true
+-- out/TestValues/460/{1,_#foo:_number}_⊑_{1,_#foo:_1}/v2 --
+true
+-- out/TestValues/460/{1,_#foo:_number}_⊑_{1,_#foo:_1}/v3 --
+true
+-- out/TestValues/460/{1,_#foo:_number}_⊑_{1,_#foo:_1}/v3-noshare --
+true
+-- out/TestValues/461/{1,_#foo?:_number}_⊑_{1,_#foo:_1}/v2 --
+true
+-- out/TestValues/461/{1,_#foo?:_number}_⊑_{1,_#foo:_1}/v3 --
+true
+-- out/TestValues/461/{1,_#foo?:_number}_⊑_{1,_#foo:_1}/v3-noshare --
+true
+-- out/TestValues/462/{1,_#foo?:_number}_⊑_{1,_#foo?:_1}/v2 --
+true
+-- out/TestValues/462/{1,_#foo?:_number}_⊑_{1,_#foo?:_1}/v3 --
+true
+-- out/TestValues/462/{1,_#foo?:_number}_⊑_{1,_#foo?:_1}/v3-noshare --
+true
+-- out/TestValues/463/{1,_#foo:_number}_⊑_{1,_#foo?:_1}/v2 --
+Errors:
+number does not subsume 1:
+    value:1:14
+    value:1:37
+number in 1 does not subsume 1 in 1:
+    value:1:4
+    value:1:5
+    value:1:14
+    value:1:26
+    value:1:27
+    value:1:37
+
+Result:
+false
+-- out/TestValues/463/{1,_#foo:_number}_⊑_{1,_#foo?:_1}/v3 --
+Errors:
+number does not subsume 1:
+    value:1:14
+    value:1:37
+
+Result:
+false
+-- out/TestValues/463/{1,_#foo:_number}_⊑_{1,_#foo?:_1}/v3-noshare --
+Errors:
+number does not subsume 1:
+    value:1:14
+    value:1:37
+
+Result:
+false
+-- out/TestValues/464/{int,_#foo:_number}_⊑_{1,_#foo:_1}/v2 --
+true
+-- out/TestValues/464/{int,_#foo:_number}_⊑_{1,_#foo:_1}/v3 --
+true
+-- out/TestValues/464/{int,_#foo:_number}_⊑_{1,_#foo:_1}/v3-noshare --
+true
+-- out/TestValues/465/{int,_#foo:_1}_⊑_{1,_#foo:_number}/v2 --
+Errors:
+1 does not subsume number:
+    value:1:16
+    value:1:33
+1 in int does not subsume number in 1:
+    value:1:4
+    value:1:5
+    value:1:16
+    value:1:23
+    value:1:24
+    value:1:33
+
+Result:
+false
+-- out/TestValues/465/{int,_#foo:_1}_⊑_{1,_#foo:_number}/v3 --
+Errors:
+1 does not subsume number:
+    value:1:16
+    value:1:33
+
+Result:
+false
+-- out/TestValues/465/{int,_#foo:_1}_⊑_{1,_#foo:_number}/v3-noshare --
+Errors:
+1 does not subsume number:
+    value:1:16
+    value:1:33
+
+Result:
+false
+-- out/TestValues/466/{1,_#foo:_number}_⊑_{int,_#foo:_1}/v2 --
+Errors:
+1 does not subsume int:
+    value:1:5
+    value:1:27
+
+Result:
+false
+-- out/TestValues/466/{1,_#foo:_number}_⊑_{int,_#foo:_1}/v3 --
+Errors:
+1 does not subsume int:
+    value:1:5
+    value:1:27
+
+Result:
+false
+-- out/TestValues/466/{1,_#foo:_number}_⊑_{int,_#foo:_1}/v3-noshare --
+Errors:
+1 does not subsume int:
+    value:1:5
+    value:1:27
+
+Result:
+false
+-- out/TestValues/467/{1,_#foo:_1}_⊑_{int,_#foo:_number}/v2 --
+Errors:
+1 does not subsume int:
+    value:1:5
+    value:1:22
+
+Result:
+false
+-- out/TestValues/467/{1,_#foo:_1}_⊑_{int,_#foo:_number}/v3 --
+Errors:
+1 does not subsume int:
+    value:1:5
+    value:1:22
+
+Result:
+false
+-- out/TestValues/467/{1,_#foo:_1}_⊑_{int,_#foo:_number}/v3-noshare --
+Errors:
+1 does not subsume int:
+    value:1:5
+    value:1:22
+
+Result:
+false
+-- out/TestValues/506/[]_⊑_[]/v2 --
+true
+-- out/TestValues/506/[]_⊑_[]/v3 --
+true
+-- out/TestValues/506/[]_⊑_[]/v3-noshare --
+true
+-- out/TestValues/507/[1]_⊑_[1]/v2 --
+true
+-- out/TestValues/507/[1]_⊑_[1]/v3 --
+true
+-- out/TestValues/507/[1]_⊑_[1]/v3-noshare --
+true
+-- out/TestValues/508/[1]_⊑_[2]/v2 --
+Errors:
+1 does not subsume 2:
+    value:1:5
+    value:1:13
+
+Result:
+false
+-- out/TestValues/508/[1]_⊑_[2]/v3 --
+Errors:
+1 does not subsume 2:
+    value:1:5
+    value:1:13
+
+Result:
+false
+-- out/TestValues/508/[1]_⊑_[2]/v3-noshare --
+Errors:
+1 does not subsume 2:
+    value:1:5
+    value:1:13
+
+Result:
+false
+-- out/TestValues/509/[1]_⊑_[2,_3]/v2 --
+Errors:
+[1] does not subsume [2,3]:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/509/[1]_⊑_[2,_3]/v3 --
+Errors:
+[1] does not subsume [2,3]:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/509/[1]_⊑_[2,_3]/v3-noshare --
+Errors:
+[1] does not subsume [2,3]:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/510/[{b:_string}],_b:_[{_⊑_"foo"}]/v2 --
+true
+-- out/TestValues/510/[{b:_string}],_b:_[{_⊑_"foo"}]/v3 --
+true
+-- out/TestValues/510/[{b:_string}],_b:_[{_⊑_"foo"}]/v3-noshare --
+true
+-- out/TestValues/511/[...{b:_string}],_b:_[{_⊑_"foo"}]/v2 --
+true
+-- out/TestValues/511/[...{b:_string}],_b:_[{_⊑_"foo"}]/v3 --
+true
+-- out/TestValues/511/[...{b:_string}],_b:_[{_⊑_"foo"}]/v3-noshare --
+true
+-- out/TestValues/512/[{b:_"foo"}],_b:_[{_⊑_string}]/v2 --
+Errors:
+"foo" does not subsume string:
+    value:1:9
+    value:1:26
+"foo" in {b:"foo"} does not subsume string in {b:string}:
+    value:1:5
+    value:1:9
+    value:1:22
+    value:1:26
+
+Result:
+false
+-- out/TestValues/512/[{b:_"foo"}],_b:_[{_⊑_string}]/v3 --
+Errors:
+"foo" does not subsume string:
+    value:1:9
+    value:1:26
+
+Result:
+false
+-- out/TestValues/512/[{b:_"foo"}],_b:_[{_⊑_string}]/v3-noshare --
+Errors:
+"foo" does not subsume string:
+    value:1:9
+    value:1:26
+
+Result:
+false
+-- out/TestValues/513/[{b:_string}],_b:_[{b:_"foo"},_...{_⊑_"foo"}]/v2 --
+Errors:
+[{b:string}] does not subsume [{b:"foo"}]:
+    value:1:4
+    value:1:22
+
+Result:
+false
+-- out/TestValues/513/[{b:_string}],_b:_[{b:_"foo"},_...{_⊑_"foo"}]/v3 --
+Errors:
+[{b:string}] does not subsume [{b:"foo"}]:
+    value:1:4
+    value:1:22
+
+Result:
+false
+-- out/TestValues/513/[{b:_string}],_b:_[{b:_"foo"},_...{_⊑_"foo"}]/v3-noshare --
+Errors:
+[{b:string}] does not subsume [{b:"foo"}]:
+    value:1:4
+    value:1:22
+
+Result:
+false
+-- out/TestValues/520/[_,_int,_...]_⊑_[int,_string,_...string]/v2 --
+Errors:
+int does not subsume string:
+    value:1:8
+    value:1:28
+
+Result:
+false
+-- out/TestValues/520/[_,_int,_...]_⊑_[int,_string,_...string]/v3 --
+Errors:
+int does not subsume string:
+    value:1:8
+    value:1:28
+
+Result:
+false
+-- out/TestValues/520/[_,_int,_...]_⊑_[int,_string,_...string]/v3-noshare --
+Errors:
+int does not subsume string:
+    value:1:8
+    value:1:28
+
+Result:
+false
+-- out/TestValues/600/close({})_⊑_{a:_1}/v2 --
+Errors:
+{} does not subsume {a:1}:
+    value:1:4
+    value:1:18
+
+Result:
+false
+-- out/TestValues/600/close({})_⊑_{a:_1}/v3 --
+Errors:
+{} does not subsume {a:1}:
+    value:1:4
+    value:1:18
+
+Result:
+false
+-- out/TestValues/600/close({})_⊑_{a:_1}/v3-noshare --
+Errors:
+{} does not subsume {a:1}:
+    value:1:4
+    value:1:18
+
+Result:
+false
+-- out/TestValues/601/close({a:_1})_⊑_{a:_1}/v2 --
+Errors:
+{a:1} does not subsume {a:1}:
+    value:1:4
+    value:1:22
+
+Result:
+false
+-- out/TestValues/601/close({a:_1})_⊑_{a:_1}/v3 --
+Errors:
+{a:1} does not subsume {a:1}:
+    value:1:4
+    value:1:22
+
+Result:
+false
+-- out/TestValues/601/close({a:_1})_⊑_{a:_1}/v3-noshare --
+Errors:
+{a:1} does not subsume {a:1}:
+    value:1:4
+    value:1:22
+
+Result:
+false
+-- out/TestValues/602/close({a:_1,_b:_1})_⊑_{a:_1}/v2 --
+Errors:
+{a:1,b:1} does not subsume {a:1}:
+    value:1:4
+    value:1:28
+
+Result:
+false
+-- out/TestValues/602/close({a:_1,_b:_1})_⊑_{a:_1}/v3 --
+Errors:
+{a:1,b:1} does not subsume {a:1}:
+    value:1:4
+    value:1:28
+
+Result:
+false
+-- out/TestValues/602/close({a:_1,_b:_1})_⊑_{a:_1}/v3-noshare --
+Errors:
+{a:1,b:1} does not subsume {a:1}:
+    value:1:4
+    value:1:28
+
+Result:
+false
+-- out/TestValues/603/{a:_1}_⊑_close({})/v2 --
+Errors:
+required field is optional in subsumed value: a
+{a:1} does not subsume {}:
+    value:1:4
+    value:1:15
+
+Result:
+false
+-- out/TestValues/603/{a:_1}_⊑_close({})/v3 --
+Errors:
+regular field is constraint in subsumed value: a
+{a:1} does not subsume {}:
+    value:1:4
+    value:1:15
+
+Result:
+false
+-- out/TestValues/603/{a:_1}_⊑_close({})/v3-noshare --
+Errors:
+regular field is constraint in subsumed value: a
+{a:1} does not subsume {}:
+    value:1:4
+    value:1:15
+
+Result:
+false
+-- out/TestValues/604/{a:_1}_⊑_close({a:_1})/v2 --
+true
+-- out/TestValues/604/{a:_1}_⊑_close({a:_1})/v3 --
+true
+-- out/TestValues/604/{a:_1}_⊑_close({a:_1})/v3-noshare --
+true
+-- out/TestValues/605/{a:_1},_b:_close({a:_1_⊑_1})/v2 --
+true
+-- out/TestValues/605/{a:_1},_b:_close({a:_1_⊑_1})/v3 --
+true
+-- out/TestValues/605/{a:_1},_b:_close({a:_1_⊑_1})/v3-noshare --
+true
+-- out/TestValues/606/close({b?:_1}),_b:_close({_⊑_1})/v2 --
+true
+-- out/TestValues/606/close({b?:_1}),_b:_close({_⊑_1})/v3 --
+true
+-- out/TestValues/606/close({b?:_1}),_b:_close({_⊑_1})/v3-noshare --
+true
+-- out/TestValues/607/close({b:_1})_⊑_close({b?:_1})/v2 --
+Errors:
+1 does not subsume 1:
+    value:1:14
+    value:1:33
+1 in {b:1} does not subsume 1 in {b?:1}:
+    value:1:4
+    value:1:14
+    value:1:22
+    value:1:33
+
+Result:
+false
+-- out/TestValues/607/close({b:_1})_⊑_close({b?:_1})/v3 --
+Errors:
+1 does not subsume 1:
+    value:1:14
+    value:1:33
+
+Result:
+false
+-- out/TestValues/607/close({b:_1})_⊑_close({b?:_1})/v3-noshare --
+Errors:
+1 does not subsume 1:
+    value:1:14
+    value:1:33
+
+Result:
+false
+-- out/TestValues/608/{}_⊑_close({})/v2 --
+true
+-- out/TestValues/608/{}_⊑_close({})/v3 --
+true
+-- out/TestValues/608/{}_⊑_close({})/v3-noshare --
+true
+-- out/TestValues/609/{}_⊑_close({foo?:_1})/v2 --
+true
+-- out/TestValues/609/{}_⊑_close({foo?:_1})/v3 --
+true
+-- out/TestValues/609/{}_⊑_close({foo?:_1})/v3-noshare --
+true
+-- out/TestValues/610/{foo?:1}_⊑_close({})/v2 --
+true
+-- out/TestValues/610/{foo?:1}_⊑_close({})/v3 --
+true
+-- out/TestValues/610/{foo?:1}_⊑_close({})/v3-noshare --
+true
+-- out/TestValues/611/close({foo?:1})_⊑_close({bar?:_1})/v2 --
+Errors:
+field not allowed in closed struct: bar
+{foo?:1} does not subsume {bar?:1}:
+    value:1:4
+    value:1:24
+
+Result:
+false
+-- out/TestValues/611/close({foo?:1})_⊑_close({bar?:_1})/v3 --
+Errors:
+field not allowed in closed struct: bar
+{foo?:1} does not subsume {bar?:1}:
+    value:1:4
+    value:1:24
+
+Result:
+false
+-- out/TestValues/611/close({foo?:1})_⊑_close({bar?:_1})/v3-noshare --
+Errors:
+field not allowed in closed struct: bar
+{foo?:1} does not subsume {bar?:1}:
+    value:1:4
+    value:1:24
+
+Result:
+false
+-- out/TestValues/612/{foo?:1}_⊑_close({bar?:_1})/v2 --
+true
+-- out/TestValues/612/{foo?:1}_⊑_close({bar?:_1})/v3 --
+true
+-- out/TestValues/612/{foo?:1}_⊑_close({bar?:_1})/v3-noshare --
+true
+-- out/TestValues/613/{foo?:1}_⊑_close({bar:_1})/v2 --
+true
+-- out/TestValues/613/{foo?:1}_⊑_close({bar:_1})/v3 --
+true
+-- out/TestValues/613/{foo?:1}_⊑_close({bar:_1})/v3-noshare --
+true
+-- out/TestValues/630/{#a:_1}_⊑_{a:_1}/v2 --
+Errors:
+required field is optional in subsumed value: #a
+{#a:1} does not subsume {a:1}:
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/630/{#a:_1}_⊑_{a:_1}/v3 --
+Errors:
+regular field is constraint in subsumed value: #a
+{#a:1} does not subsume {a:1}:
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/630/{#a:_1}_⊑_{a:_1}/v3-noshare --
+Errors:
+regular field is constraint in subsumed value: #a
+{#a:1} does not subsume {a:1}:
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/631/{a:_1}_⊑_{#a:_1}/v2 --
+Errors:
+required field is optional in subsumed value: a
+{a:1} does not subsume {#a:1}:
+    value:1:4
+    value:1:15
+
+Result:
+false
+-- out/TestValues/631/{a:_1}_⊑_{#a:_1}/v3 --
+Errors:
+regular field is constraint in subsumed value: a
+{a:1} does not subsume {#a:1}:
+    value:1:4
+    value:1:15
+
+Result:
+false
+-- out/TestValues/631/{a:_1}_⊑_{#a:_1}/v3-noshare --
+Errors:
+regular field is constraint in subsumed value: a
+{a:1} does not subsume {#a:1}:
+    value:1:4
+    value:1:15
+
+Result:
+false
+-- out/TestValues/700/[string]:_1_⊑_{foo:_1}/v2 --
+true
+-- out/TestValues/700/[string]:_1_⊑_{foo:_1}/v3 --
+true
+-- out/TestValues/700/[string]:_1_⊑_{foo:_1}/v3-noshare --
+true
+-- out/TestValues/701/[string]:_int_⊑_{foo:_1}/v2 --
+true
+-- out/TestValues/701/[string]:_int_⊑_{foo:_1}/v3 --
+true
+-- out/TestValues/701/[string]:_int_⊑_{foo:_1}/v3-noshare --
+true
+-- out/TestValues/702/{["foo"]:_int}_⊑_{foo:_1}/v2 --
+true
+-- out/TestValues/702/{["foo"]:_int}_⊑_{foo:_1}/v3 --
+true
+-- out/TestValues/702/{["foo"]:_int}_⊑_{foo:_1}/v3-noshare --
+true
+-- out/TestValues/703/close({["foo"]:_1})_⊑_{bar:_1}/v2 --
+Errors:
+field not allowed in closed struct: bar
+{} does not subsume {bar:1}:
+    value:1:4
+    value:1:28
+
+Result:
+false
+-- out/TestValues/703/close({["foo"]:_1})_⊑_{bar:_1}/v3 --
+Errors:
+field not allowed in closed struct: bar
+{} does not subsume {bar:1}:
+    value:1:4
+    value:1:28
+
+Result:
+false
+-- out/TestValues/703/close({["foo"]:_1})_⊑_{bar:_1}/v3-noshare --
+Errors:
+field not allowed in closed struct: bar
+{} does not subsume {bar:1}:
+    value:1:4
+    value:1:28
+
+Result:
+false
+-- out/TestValues/704/{foo:_1}_⊑_{foo?:_1}/v2 --
+Errors:
+1 does not subsume 1:
+    value:1:10
+    value:1:24
+1 in {foo:1} does not subsume 1 in {foo?:1}:
+    value:1:4
+    value:1:10
+    value:1:17
+    value:1:24
+
+Result:
+false
+-- out/TestValues/704/{foo:_1}_⊑_{foo?:_1}/v3 --
+Errors:
+1 does not subsume 1:
+    value:1:10
+    value:1:24
+
+Result:
+false
+-- out/TestValues/704/{foo:_1}_⊑_{foo?:_1}/v3-noshare --
+Errors:
+1 does not subsume 1:
+    value:1:10
+    value:1:24
+
+Result:
+false
+-- out/TestValues/705/close({})_⊑_{foo?:_1}/v2 --
+true
+-- out/TestValues/705/close({})_⊑_{foo?:_1}/v3 --
+true
+-- out/TestValues/705/close({})_⊑_{foo?:_1}/v3-noshare --
+true
+-- out/TestValues/706/close({})_⊑_close({foo?:_1})/v2 --
+true
+-- out/TestValues/706/close({})_⊑_close({foo?:_1})/v3 --
+true
+-- out/TestValues/706/close({})_⊑_close({foo?:_1})/v3-noshare --
+true
+-- out/TestValues/707/{}_⊑_close({})/v2 --
+true
+-- out/TestValues/707/{}_⊑_close({})/v3 --
+true
+-- out/TestValues/707/{}_⊑_close({})/v3-noshare --
+true
+-- out/TestValues/708/{[string]:_1}_⊑_{foo:_2}/v2 --
+Errors:
+1 does not subsume 2:
+    value:1:15
+    value:1:28
+
+Result:
+false
+-- out/TestValues/708/{[string]:_1}_⊑_{foo:_2}/v3 --
+Errors:
+1 does not subsume 2:
+    value:1:15
+    value:1:28
+
+Result:
+false
+-- out/TestValues/708/{[string]:_1}_⊑_{foo:_2}/v3-noshare --
+Errors:
+1 does not subsume 2:
+    value:1:15
+    value:1:28
+
+Result:
+false
+-- out/TestValues/709/{}_⊑_close({foo?:_1})/v2 --
+true
+-- out/TestValues/709/{}_⊑_close({foo?:_1})/v3 --
+true
+-- out/TestValues/709/{}_⊑_close({foo?:_1})/v3-noshare --
+true
+-- out/TestValues/710/{foo:_[...string]}_⊑_{}/v2 --
+Errors:
+required field is optional in subsumed value: foo
+{foo:[]} does not subsume {}:
+    value:1:4
+    value:1:27
+
+Result:
+false
+-- out/TestValues/710/{foo:_[...string]}_⊑_{}/v3 --
+Errors:
+regular field is constraint in subsumed value: foo
+{foo:[]} does not subsume {}:
+    value:1:4
+    value:1:27
+
+Result:
+false
+-- out/TestValues/710/{foo:_[...string]}_⊑_{}/v3-noshare --
+Errors:
+regular field is constraint in subsumed value: foo
+{foo:[]} does not subsume {}:
+    value:1:4
+    value:1:27
+
+Result:
+false
+-- out/TestValues/800/close({})_⊑_{foo:_1}/v2 --
+true
+-- out/TestValues/800/close({})_⊑_{foo:_1}/v3 --
+true
+-- out/TestValues/800/close({})_⊑_{foo:_1}/v3-noshare --
+true
+-- out/TestValues/804/{foo:_1}_⊑_{foo?:_1}/v2 --
+Errors:
+1 does not subsume 1:
+    value:1:10
+    value:1:24
+1 in {foo:1} does not subsume 1 in {foo?:1}:
+    value:1:4
+    value:1:10
+    value:1:17
+    value:1:24
+
+Result:
+false
+-- out/TestValues/804/{foo:_1}_⊑_{foo?:_1}/v3 --
+Errors:
+1 does not subsume 1:
+    value:1:10
+    value:1:24
+
+Result:
+false
+-- out/TestValues/804/{foo:_1}_⊑_{foo?:_1}/v3-noshare --
+Errors:
+1 does not subsume 1:
+    value:1:10
+    value:1:24
+
+Result:
+false
+-- out/TestValues/805/close({})_⊑_{foo?:_1}/v2 --
+true
+-- out/TestValues/805/close({})_⊑_{foo?:_1}/v3 --
+true
+-- out/TestValues/805/close({})_⊑_{foo?:_1}/v3-noshare --
+true
+-- out/TestValues/806/close({})_⊑_close({foo?:_1})/v2 --
+true
+-- out/TestValues/806/close({})_⊑_close({foo?:_1})/v3 --
+true
+-- out/TestValues/806/close({})_⊑_close({foo?:_1})/v3-noshare --
+true
+-- out/TestValues/807/{}_⊑_close({})/v2 --
+true
+-- out/TestValues/807/{}_⊑_close({})/v3 --
+true
+-- out/TestValues/807/{}_⊑_close({})/v3-noshare --
+true
+-- out/TestValues/808/{[string]:_1}_⊑_{foo:_2}/v2 --
+Errors:
+{} does not subsume {foo:2}: inexact subsumption:
+    value:1:4
+    value:1:22
+
+Result:
+false
+-- out/TestValues/808/{[string]:_1}_⊑_{foo:_2}/v3 --
+Errors:
+1 does not subsume 2:
+    value:1:15
+    value:1:28
+
+Result:
+false
+-- out/TestValues/808/{[string]:_1}_⊑_{foo:_2}/v3-noshare --
+Errors:
+1 does not subsume 2:
+    value:1:15
+    value:1:28
+
+Result:
+false
+-- out/TestValues/809/{}_⊑_close({foo?:_1})/v2 --
+true
+-- out/TestValues/809/{}_⊑_close({foo?:_1})/v3 --
+true
+-- out/TestValues/809/{}_⊑_close({foo?:_1})/v3-noshare --
+true
+-- out/TestValues/950/[]_⊑_[]/v2 --
+true
+-- out/TestValues/950/[]_⊑_[]/v3 --
+true
+-- out/TestValues/950/[]_⊑_[]/v3-noshare --
+true
+-- out/TestValues/951/[...]_⊑_[]/v2 --
+true
+-- out/TestValues/951/[...]_⊑_[]/v3 --
+true
+-- out/TestValues/951/[...]_⊑_[]/v3-noshare --
+true
+-- out/TestValues/952/[...]_⊑_[...]/v2 --
+true
+-- out/TestValues/952/[...]_⊑_[...]/v3 --
+true
+-- out/TestValues/952/[...]_⊑_[...]/v3-noshare --
+true
+-- out/TestValues/953/[]_⊑_[...]/v2 --
+Errors:
+[] does not subsume []:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/953/[]_⊑_[...]/v3 --
+Errors:
+[] does not subsume []:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/953/[]_⊑_[...]/v3-noshare --
+Errors:
+[] does not subsume []:
+    value:1:4
+    value:1:11
+
+Result:
+false
+-- out/TestValues/954/[2]_⊑_[2]/v2 --
+true
+-- out/TestValues/954/[2]_⊑_[2]/v3 --
+true
+-- out/TestValues/954/[2]_⊑_[2]/v3-noshare --
+true
+-- out/TestValues/955/[int]_⊑_[2]/v2 --
+true
+-- out/TestValues/955/[int]_⊑_[2]/v3 --
+true
+-- out/TestValues/955/[int]_⊑_[2]/v3-noshare --
+true
+-- out/TestValues/956/[2]_⊑_[int]/v2 --
+Errors:
+2 does not subsume int:
+    value:1:5
+    value:1:13
+
+Result:
+false
+-- out/TestValues/956/[2]_⊑_[int]/v3 --
+Errors:
+2 does not subsume int:
+    value:1:5
+    value:1:13
+
+Result:
+false
+-- out/TestValues/956/[2]_⊑_[int]/v3-noshare --
+Errors:
+2 does not subsume int:
+    value:1:5
+    value:1:13
+
+Result:
+false
+-- out/TestValues/957/[int]_⊑_[int]/v2 --
+true
+-- out/TestValues/957/[int]_⊑_[int]/v3 --
+true
+-- out/TestValues/957/[int]_⊑_[int]/v3-noshare --
+true
+-- out/TestValues/958/[...2]_⊑_[2]/v2 --
+true
+-- out/TestValues/958/[...2]_⊑_[2]/v3 --
+true
+-- out/TestValues/958/[...2]_⊑_[2]/v3-noshare --
+true
+-- out/TestValues/959/[...int]_⊑_[2]/v2 --
+true
+-- out/TestValues/959/[...int]_⊑_[2]/v3 --
+true
+-- out/TestValues/959/[...int]_⊑_[2]/v3-noshare --
+true
+-- out/TestValues/960/[...2]_⊑_[int]/v2 --
+Errors:
+2 does not subsume int:
+    value:1:8
+    value:1:16
+
+Result:
+false
+-- out/TestValues/960/[...2]_⊑_[int]/v3 --
+Errors:
+2 does not subsume int:
+    value:1:8
+    value:1:16
+
+Result:
+false
+-- out/TestValues/960/[...2]_⊑_[int]/v3-noshare --
+Errors:
+2 does not subsume int:
+    value:1:8
+    value:1:16
+
+Result:
+false
+-- out/TestValues/961/[...int]_⊑_[int]/v2 --
+true
+-- out/TestValues/961/[...int]_⊑_[int]/v3 --
+true
+-- out/TestValues/961/[...int]_⊑_[int]/v3-noshare --
+true
+-- out/TestValues/962/[2]_⊑_[...2]/v2 --
+Errors:
+[2] does not subsume []:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/962/[2]_⊑_[...2]/v3 --
+Errors:
+[2] does not subsume []:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/962/[2]_⊑_[...2]/v3-noshare --
+Errors:
+[2] does not subsume []:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/963/[int]_⊑_[...2]/v2 --
+Errors:
+[int] does not subsume []:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/963/[int]_⊑_[...2]/v3 --
+Errors:
+[int] does not subsume []:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/963/[int]_⊑_[...2]/v3-noshare --
+Errors:
+[int] does not subsume []:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/964/[2]_⊑_[...int]/v2 --
+Errors:
+[2] does not subsume []:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/964/[2]_⊑_[...int]/v3 --
+Errors:
+[2] does not subsume []:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/964/[2]_⊑_[...int]/v3-noshare --
+Errors:
+[2] does not subsume []:
+    value:1:4
+    value:1:12
+
+Result:
+false
+-- out/TestValues/965/[int]_⊑_[...int]/v2 --
+Errors:
+[int] does not subsume []:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/965/[int]_⊑_[...int]/v3 --
+Errors:
+[int] does not subsume []:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/965/[int]_⊑_[...int]/v3-noshare --
+Errors:
+[int] does not subsume []:
+    value:1:4
+    value:1:14
+
+Result:
+false
+-- out/TestValues/966/[...int]_⊑_["foo"]/v2 --
+Errors:
+int does not subsume "foo":
+    value:1:8
+    value:1:18
+
+Result:
+false
+-- out/TestValues/966/[...int]_⊑_["foo"]/v3 --
+Errors:
+int does not subsume "foo":
+    value:1:8
+    value:1:18
+
+Result:
+false
+-- out/TestValues/966/[...int]_⊑_["foo"]/v3-noshare --
+Errors:
+int does not subsume "foo":
+    value:1:8
+    value:1:18
+
+Result:
+false
+-- out/TestValues/967/["foo"]_⊑_[...int]/v2 --
+Errors:
+["foo"] does not subsume []:
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/967/["foo"]_⊑_[...int]/v3 --
+Errors:
+["foo"] does not subsume []:
+    value:1:4
+    value:1:1
+
+Result:
+false
+-- out/TestValues/967/["foo"]_⊑_[...int]/v3-noshare --
+Errors:
+["foo"] does not subsume []:
+    value:1:4
+    value:1:16
+
+Result:
+false
+-- out/TestValues/970/[]_⊑_[...int]/v2 --
+true
+-- out/TestValues/970/[]_⊑_[...int]/v3 --
+true
+-- out/TestValues/970/[]_⊑_[...int]/v3-noshare --
+true
+-- out/TestValues/971/[2]_⊑_[2,_...int]/v2 --
+true
+-- out/TestValues/971/[2]_⊑_[2,_...int]/v3 --
+true
+-- out/TestValues/971/[2]_⊑_[2,_...int]/v3-noshare --
+true
+-- out/TestValues/980/[]_⊑_[...int]/v2 --
+true
+-- out/TestValues/980/[]_⊑_[...int]/v3 --
+true
+-- out/TestValues/980/[]_⊑_[...int]/v3-noshare --
+true
+-- out/TestValues/981/[2]_⊑_[2,_...int]/v2 --
+true
+-- out/TestValues/981/[2]_⊑_[2,_...int]/v3 --
+true
+-- out/TestValues/981/[2]_⊑_[2,_...int]/v3-noshare --
+true
+-- out/TestValues/0/__⊑__ --
+true
+-- out/TestValues/1/__⊑_null --
+true
+-- out/TestValues/2/__⊑_int --
+true
+-- out/TestValues/3/__⊑_1 --
+true
+-- out/TestValues/4/__⊑_float --
+true
+-- out/TestValues/5/__⊑_"s" --
+true
+-- out/TestValues/6/__⊑_{} --
+true
+-- out/TestValues/7/__⊑_[] --
+true
+-- out/TestValues/8/__⊑__|_ --
+true
+-- out/TestValues/9/null_⊑__ --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/10/int_⊑__ --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/11/1_⊑__ --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/12/float_⊑__ --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/13/"s"_⊑__ --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/14/{}_⊑__ --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/15/[]_⊑__ --
+Errors:
+list does not subsume _ (type _):
+    value:1:16
+value not an instance
+
+Result:
+false
+-- out/TestValues/16/_|__⊑__ --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/17/_|__⊑_null --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/18/_|__⊑_int --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/19/_|__⊑_1 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/20/_|__⊑_float --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/21/_|__⊑_"s" --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/22/_|__⊑_{} --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/23/_|__⊑_[] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/24/_|__⊑__|_ --
+true
+-- out/TestValues/25/null_⊑__|_ --
+true
+-- out/TestValues/26/int_⊑__|_ --
+true
+-- out/TestValues/27/1_⊑__|_ --
+true
+-- out/TestValues/28/float_⊑__|_ --
+true
+-- out/TestValues/29/"s"_⊑__|_ --
+true
+-- out/TestValues/30/{}_⊑__|_ --
+true
+-- out/TestValues/31/[]_⊑__|_ --
+true
+-- out/TestValues/32/true_⊑__|_ --
+true
+-- out/TestValues/33/_|__⊑__|_ --
+true
+-- out/TestValues/34/null_⊑_null --
+true
+-- out/TestValues/35/null_⊑_1 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/36/1_⊑_null --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/37/true_⊑_true --
+true
+-- out/TestValues/38/true_⊑_false --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/39/"a"_⊑_"a" --
+true
+-- out/TestValues/40/"a"_⊑_"b" --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/41/string_⊑_"a" --
+true
+-- out/TestValues/42/"a"_⊑_string --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/43/1_⊑_1 --
+true
+-- out/TestValues/44/1.0_⊑_1.0 --
+true
+-- out/TestValues/45/3.0_⊑_3.0 --
+true
+-- out/TestValues/46/1.0_⊑_1 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/47/1_⊑_1.0 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/48/3_⊑_3.0 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/49/int_⊑_1 --
+true
+-- out/TestValues/50/int_⊑_int_&_1 --
+true
+-- out/TestValues/51/float_⊑_1.0 --
+true
+-- out/TestValues/52/float_⊑_1 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/53/int_⊑_1.0 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/54/int_⊑_int --
+true
+-- out/TestValues/55/number_⊑_int --
+true
+-- out/TestValues/64/{}_⊑_{} --
+true
+-- out/TestValues/65/{}_⊑_{a:_1} --
+true
+-- out/TestValues/66/{a:1}_⊑_{a:1,_b:1} --
+true
+-- out/TestValues/67/{s:_{_a:1}_}_⊑_{_s:_{_a:1,_b:2_}} --
+true
+-- out/TestValues/68/{}_⊑_{} --
+true
+-- out/TestValues/69/{}_⊑_{}_&_c,_c:_{} --
+true
+-- out/TestValues/70/{a:1}_⊑_{}-v3 --
+Errors:
+regular field is constraint in subsumed value: a
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/70/{a:1}_⊑_{}-v3<==>+out/TestValues/70/{a:1}_⊑_{} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: a
++regular field is constraint in subsumed value: a
+ value not an instance
+ 
+ Result:
+-- out/TestValues/70/{a:1}_⊑_{}-v3-noshare --
+Errors:
+regular field is constraint in subsumed value: a
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/70/{a:1}_⊑_{}-v3-noshare<==>+out/TestValues/70/{a:1}_⊑_{} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: a
++regular field is constraint in subsumed value: a
+ value not an instance
+ 
+ Result:
+-- out/TestValues/70/{a:1}_⊑_{} --
+Errors:
+required field is optional in subsumed value: a
+value not an instance
+
+Result:
+false
+-- out/TestValues/71/{a:1,_b:1}_⊑_{a:1}-v3 --
+Errors:
+regular field is constraint in subsumed value: b
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/71/{a:1,_b:1}_⊑_{a:1}-v3<==>+out/TestValues/71/{a:1,_b:1}_⊑_{a:1} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: b
++regular field is constraint in subsumed value: b
+ value not an instance
+ 
+ Result:
+-- out/TestValues/71/{a:1,_b:1}_⊑_{a:1}-v3-noshare --
+Errors:
+regular field is constraint in subsumed value: b
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/71/{a:1,_b:1}_⊑_{a:1}-v3-noshare<==>+out/TestValues/71/{a:1,_b:1}_⊑_{a:1} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: b
++regular field is constraint in subsumed value: b
+ value not an instance
+ 
+ Result:
+-- out/TestValues/71/{a:1,_b:1}_⊑_{a:1} --
+Errors:
+required field is optional in subsumed value: b
+value not an instance
+
+Result:
+false
+-- out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}}-v3 --
+Errors:
+field s not present in {s:{}}:
+    value:1:21
+missing field "s"
+regular field is constraint in subsumed value: a
+
+Result:
+false
+-- diff/-out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}}-v3<==>+out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}} --
+diff old new
+--- old
++++ new
+@@ -2,7 +2,7 @@
+ field s not present in {s:{}}:
+     value:1:21
+ missing field "s"
+-required field is optional in subsumed value: a
++regular field is constraint in subsumed value: a
+ 
+ Result:
+ false
+-- out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}}-v3-noshare --
+Errors:
+field s not present in {s:{}}:
+    value:1:21
+missing field "s"
+regular field is constraint in subsumed value: a
+
+Result:
+false
+-- diff/-out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}}-v3-noshare<==>+out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}} --
+diff old new
+--- old
++++ new
+@@ -2,7 +2,7 @@
+ field s not present in {s:{}}:
+     value:1:21
+ missing field "s"
+-required field is optional in subsumed value: a
++regular field is constraint in subsumed value: a
+ 
+ Result:
+ false
+-- out/TestValues/72/{s:_{_a:1}_}_⊑_{_s:_{}} --
+Errors:
+field s not present in {s:{}}:
+    value:1:21
+missing field "s"
+required field is optional in subsumed value: a
+
+Result:
+false
+-- out/TestValues/84/1_|_2_⊑_2_|_1 --
+true
+-- out/TestValues/85/1_|_2_⊑_1_|_2 --
+true
+-- out/TestValues/86/number_⊑_2_|_1 --
+true
+-- out/TestValues/87/number_⊑_2_|_1 --
+true
+-- out/TestValues/88/int_⊑_1_|_2_|_3.1 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/89/float_|_number_⊑_1_|_2_|_3.1 --
+true
+-- out/TestValues/90/int_⊑_1_|_2_|_3.1 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/91/1_|_2_⊑_1 --
+true
+-- out/TestValues/92/1_|_2_⊑_2 --
+true
+-- out/TestValues/93/1_|_2_⊑_3 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/150/number_|_*1_⊑_number_|_*2 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/151/number_|_*2_⊑_number_|_*2 --
+true
+-- out/TestValues/152/int_|_*float_⊑_int_|_*2.0 --
+true
+-- out/TestValues/153/int_|_*2_⊑_int_|_*2.0 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/154/number_|_*2_|_*3_⊑_number_|_*2 --
+true
+-- out/TestValues/155/number_⊑_number_|_*2 --
+true
+-- out/TestValues/170/>=2_⊑_>=2 --
+true
+-- out/TestValues/171/>=1_⊑_>=2 --
+true
+-- out/TestValues/172/>0_⊑_>=2 --
+true
+-- out/TestValues/173/>1_⊑_>1 --
+true
+-- out/TestValues/174/>=1_⊑_>1 --
+true
+-- out/TestValues/175/>1_⊑_>=1 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/176/>=1_⊑_>=1 --
+true
+-- out/TestValues/177/<1_⊑_<1 --
+true
+-- out/TestValues/178/<=1_⊑_<1 --
+true
+-- out/TestValues/179/<1_⊑_<=1 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/180/<=1_⊑_<=1 --
+true
+-- out/TestValues/181/!=1_⊑_!=1 --
+true
+-- out/TestValues/182/!=1_⊑_!=2 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/183/!=1_⊑_<=1 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/184/!=1_⊑_<1 --
+true
+-- out/TestValues/185/!=1_⊑_>=1 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/186/!=1_⊑_<1 --
+true
+-- out/TestValues/187/!=1_⊑_<=0 --
+true
+-- out/TestValues/188/!=1_⊑_>=2 --
+true
+-- out/TestValues/189/!=1_⊑_>1 --
+true
+-- out/TestValues/195/>=2_⊑_!=2 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/196/>2_⊑_!=2 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/197/<2_⊑_!=2 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/198/<=2_⊑_!=2 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/200/=~"foo"_⊑_=~"foo" --
+true
+-- out/TestValues/201/=~"foo"_⊑_=~"bar" --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/202/=~"foo1"_⊑_=~"foo" --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/203/!~"foo"_⊑_!~"foo" --
+true
+-- out/TestValues/204/!~"foo"_⊑_!~"bar" --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/205/!~"foo"_⊑_!~"foo1" --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/210/=~"foo"_⊑_=~"foo1" --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/211/!~"foo1"_⊑_!~"foo" --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/220/<5_⊑_4 --
+true
+-- out/TestValues/221/<5_⊑_5 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/222/<=5_⊑_5 --
+true
+-- out/TestValues/223/<=5.0_⊑_5.00000001 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/224/>5_⊑_6 --
+true
+-- out/TestValues/225/>5_⊑_5 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/226/>=5_⊑_5 --
+true
+-- out/TestValues/227/>=5_⊑_4 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/228/!=5_⊑_6 --
+true
+-- out/TestValues/229/!=5_⊑_5 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/230/!=5.0_⊑_5.0 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/231/!=5.0_⊑_5 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/250/=~_#"^\d{3}$"#_⊑_"123" --
+true
+-- out/TestValues/251/=~_#"^\d{3}$"#_⊑_"1234" --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/252/!~_#"^\d{3}$"#_⊑_"1234" --
+true
+-- out/TestValues/253/!~_#"^\d{3}$"#_⊑_"123" --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/300/>0_⊑_>=2_&_<=100 --
+true
+-- out/TestValues/301/>0_⊑_>=0_&_<=100 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/310/>=0_&_<=100_⊑_10 --
+true
+-- out/TestValues/311/>=0_&_<=100_⊑_>=0_&_<=100 --
+true
+-- out/TestValues/312/!=2_&_!=4_⊑_>3 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/313/!=2_&_!=4_⊑_>5 --
+true
+-- out/TestValues/314/>=0_&_<=100_⊑_>=0_&_<=150 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/315/>=0_&_<=150_⊑_>=0_&_<=100 --
+true
+-- out/TestValues/330/>5_⊑_>10_|_8 --
+true
+-- out/TestValues/331/>8_⊑_>10_|_8 --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/400/{foo:_1}_⊑_{}-v3 --
+Errors:
+regular field is constraint in subsumed value: foo
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/400/{foo:_1}_⊑_{}-v3<==>+out/TestValues/400/{foo:_1}_⊑_{} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: foo
++regular field is constraint in subsumed value: foo
+ value not an instance
+ 
+ Result:
+-- out/TestValues/400/{foo:_1}_⊑_{}-v3-noshare --
+Errors:
+regular field is constraint in subsumed value: foo
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/400/{foo:_1}_⊑_{}-v3-noshare<==>+out/TestValues/400/{foo:_1}_⊑_{} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: foo
++regular field is constraint in subsumed value: foo
+ value not an instance
+ 
+ Result:
+-- out/TestValues/400/{foo:_1}_⊑_{} --
+Errors:
+required field is optional in subsumed value: foo
+value not an instance
+
+Result:
+false
+-- out/TestValues/401/{foo?:_1}_⊑_{} --
+Errors:
+field foo not present in {}:
+    value:1:18
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/402/{}_⊑_{foo:_1} --
+true
+-- out/TestValues/403/{}_⊑_{foo?:_1} --
+true
+-- out/TestValues/404/{foo:_1}_⊑_{foo:_1} --
+true
+-- out/TestValues/405/{foo?:_1}_⊑_{foo:_1} --
+true
+-- out/TestValues/406/{foo?:_1}_⊑_{foo?:_1} --
+true
+-- out/TestValues/407/{foo:_1}_⊑_{foo?:_1} --
+Errors:
+field foo not present in {foo?:1}:
+    value:1:17
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/408/{foo:_1}_⊑_{foo:_2} --
+Errors:
+field foo not present in {foo:2}:
+    value:1:17
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/409/{foo?:_1}_⊑_{foo:_2} --
+Errors:
+field foo not present in {foo:2}:
+    value:1:18
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/410/{foo?:_1}_⊑_{foo?:_2} --
+Errors:
+field foo not present in {foo?:2}:
+    value:1:18
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/411/{foo:_1}_⊑_{foo?:_2} --
+Errors:
+field foo not present in {foo?:2}:
+    value:1:17
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/412/{foo:_number}_⊑_{foo:_2} --
+true
+-- out/TestValues/413/{foo?:_number}_⊑_{foo:_2} --
+true
+-- out/TestValues/414/{foo?:_number}_⊑_{foo?:_2} --
+true
+-- out/TestValues/415/{foo:_number}_⊑_{foo?:_2} --
+Errors:
+field foo not present in {foo?:2}:
+    value:1:22
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/416/{foo:_1}_⊑_{foo:_number} --
+Errors:
+field foo not present in {foo:number}:
+    value:1:17
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/417/{foo?:_1}_⊑_{foo:_number} --
+Errors:
+field foo not present in {foo:number}:
+    value:1:18
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/418/{foo?:_1}_⊑_{foo?:_number} --
+Errors:
+field foo not present in {foo?:number}:
+    value:1:18
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/419/{foo:_1}_⊑_{foo?:_number} --
+Errors:
+field foo not present in {foo?:number}:
+    value:1:17
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/420/{foo?:__}_⊑_{} --
+true
+-- out/TestValues/430/{[_]:_4}_⊑_{[_]:_int}-v3 --
+Errors:
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/430/{[_]:_4}_⊑_{[_]:_int}-v3<==>+out/TestValues/430/{[_]:_4}_⊑_{[_]:_int} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-value not an instance: inexact subsumption
++value not an instance
+ 
+ Result:
+ false
+-- out/TestValues/430/{[_]:_4}_⊑_{[_]:_int}-v3-noshare --
+Errors:
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/430/{[_]:_4}_⊑_{[_]:_int}-v3-noshare<==>+out/TestValues/430/{[_]:_4}_⊑_{[_]:_int} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-value not an instance: inexact subsumption
++value not an instance
+ 
+ Result:
+ false
+-- out/TestValues/430/{[_]:_4}_⊑_{[_]:_int} --
+Errors:
+value not an instance: inexact subsumption
+
+Result:
+false
+-- out/TestValues/431/{[_]:_int}_⊑_{[_]:_2}-v3 --
+true
+-- out/TestValues/431/{[_]:_int}_⊑_{[_]:_2}-v3-noshare --
+true
+-- out/TestValues/432/{[string]:_int,_[<"m"]:_3}_⊑_{[string]:_2,_[<"m"]:_3}-v3 --
+true
+-- out/TestValues/432/{[string]:_int,_[<"m"]:_3}_⊑_{[string]:_2,_[<"m"]:_3}-v3-noshare --
+true
+-- out/TestValues/433/{[<"m"]:_3,_[string]:_int}_⊑_{[string]:_2,_[<"m"]:_3}-v3 --
+true
+-- out/TestValues/433/{[<"m"]:_3,_[string]:_int}_⊑_{[string]:_2,_[<"m"]:_3}-v3-noshare --
+true
+-- out/TestValues/434/{[<"n"]:_3,_[string]:_int}_⊑_{[string]:_2,_[<"m"]:_3} --
+Errors:
+value not an instance: inexact subsumption
+
+Result:
+false
+-- out/TestValues/435/{[string]:_<5,_[string]:_int}_⊑_{[string]:_<=3,_[string]:_3}-v3 --
+true
+-- out/TestValues/435/{[string]:_<5,_[string]:_int}_⊑_{[string]:_<=3,_[string]:_3}-v3-noshare --
+true
+-- out/TestValues/436/{[string]:_>5}_⊑_{[string]:_1,_[string]:_2}-v3 --
+true
+-- out/TestValues/436/{[string]:_>5}_⊑_{[string]:_1,_[string]:_2}-v3-noshare --
+true
+-- out/TestValues/437/{[_]:_>5,_[>"b"]:_int}_⊑_{[_]:_6} --
+Errors:
+value not an instance: inexact subsumption
+
+Result:
+false
+-- out/TestValues/438/{}_⊑_{[_]:_6} --
+true
+-- out/TestValues/460/{1,_#foo:_number}_⊑_{1,_#foo:_1} --
+true
+-- out/TestValues/461/{1,_#foo?:_number}_⊑_{1,_#foo:_1} --
+true
+-- out/TestValues/462/{1,_#foo?:_number}_⊑_{1,_#foo?:_1} --
+true
+-- out/TestValues/463/{1,_#foo:_number}_⊑_{1,_#foo?:_1} --
+Errors:
+field #foo not present in 1:
+    value:1:26
+    value:1:27
+missing field "#foo"
+
+Result:
+false
+-- out/TestValues/464/{int,_#foo:_number}_⊑_{1,_#foo:_1} --
+true
+-- out/TestValues/465/{int,_#foo:_1}_⊑_{1,_#foo:_number} --
+Errors:
+field #foo not present in 1:
+    value:1:23
+    value:1:24
+missing field "#foo"
+
+Result:
+false
+-- out/TestValues/466/{1,_#foo:_number}_⊑_{int,_#foo:_1} --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/467/{1,_#foo:_1}_⊑_{int,_#foo:_number} --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/506/[]_⊑_[] --
+true
+-- out/TestValues/507/[1]_⊑_[1] --
+true
+-- out/TestValues/508/[1]_⊑_[2] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/509/[1]_⊑_[2,_3] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/510/[{b:_string}],_b:_[{_⊑_"foo"}] --
+true
+-- out/TestValues/511/[...{b:_string}],_b:_[{_⊑_"foo"}] --
+true
+-- out/TestValues/512/[{b:_"foo"}],_b:_[{_⊑_string}] --
+Errors:
+field b not present in {b:string}:
+    value:1:22
+missing field "b"
+
+Result:
+false
+-- out/TestValues/513/[{b:_string}],_b:_[{b:_"foo"},_...{_⊑_"foo"}] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/520/[_,_int,_...]_⊑_[int,_string,_...string] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/600/close({})_⊑_{a:_1} --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/601/close({a:_1})_⊑_{a:_1} --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/602/close({a:_1,_b:_1})_⊑_{a:_1} --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/603/{a:_1}_⊑_close({})-v3 --
+Errors:
+regular field is constraint in subsumed value: a
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/603/{a:_1}_⊑_close({})-v3<==>+out/TestValues/603/{a:_1}_⊑_close({}) --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: a
++regular field is constraint in subsumed value: a
+ value not an instance
+ 
+ Result:
+-- out/TestValues/603/{a:_1}_⊑_close({})-v3-noshare --
+Errors:
+regular field is constraint in subsumed value: a
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/603/{a:_1}_⊑_close({})-v3-noshare<==>+out/TestValues/603/{a:_1}_⊑_close({}) --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: a
++regular field is constraint in subsumed value: a
+ value not an instance
+ 
+ Result:
+-- out/TestValues/603/{a:_1}_⊑_close({}) --
+Errors:
+required field is optional in subsumed value: a
+value not an instance
+
+Result:
+false
+-- out/TestValues/604/{a:_1}_⊑_close({a:_1}) --
+true
+-- out/TestValues/605/{a:_1},_b:_close({a:_1_⊑_1}) --
+true
+-- out/TestValues/606/close({b?:_1}),_b:_close({_⊑_1}) --
+true
+-- out/TestValues/607/close({b:_1})_⊑_close({b?:_1}) --
+Errors:
+field b not present in {b?:1}:
+    value:1:22
+missing field "b"
+
+Result:
+false
+-- out/TestValues/608/{}_⊑_close({}) --
+true
+-- out/TestValues/609/{}_⊑_close({foo?:_1}) --
+true
+-- out/TestValues/610/{foo?:1}_⊑_close({}) --
+true
+-- out/TestValues/611/close({foo?:1})_⊑_close({bar?:_1}) --
+Errors:
+field not allowed in closed struct: bar
+value not an instance
+
+Result:
+false
+-- out/TestValues/612/{foo?:1}_⊑_close({bar?:_1}) --
+true
+-- out/TestValues/613/{foo?:1}_⊑_close({bar:_1}) --
+true
+-- out/TestValues/630/{#a:_1}_⊑_{a:_1}-v3 --
+Errors:
+regular field is constraint in subsumed value: #a
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/630/{#a:_1}_⊑_{a:_1}-v3<==>+out/TestValues/630/{#a:_1}_⊑_{a:_1} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: #a
++regular field is constraint in subsumed value: #a
+ value not an instance
+ 
+ Result:
+-- out/TestValues/630/{#a:_1}_⊑_{a:_1}-v3-noshare --
+Errors:
+regular field is constraint in subsumed value: #a
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/630/{#a:_1}_⊑_{a:_1}-v3-noshare<==>+out/TestValues/630/{#a:_1}_⊑_{a:_1} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: #a
++regular field is constraint in subsumed value: #a
+ value not an instance
+ 
+ Result:
+-- out/TestValues/630/{#a:_1}_⊑_{a:_1} --
+Errors:
+required field is optional in subsumed value: #a
+value not an instance
+
+Result:
+false
+-- out/TestValues/631/{a:_1}_⊑_{#a:_1}-v3 --
+Errors:
+regular field is constraint in subsumed value: a
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/631/{a:_1}_⊑_{#a:_1}-v3<==>+out/TestValues/631/{a:_1}_⊑_{#a:_1} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: a
++regular field is constraint in subsumed value: a
+ value not an instance
+ 
+ Result:
+-- out/TestValues/631/{a:_1}_⊑_{#a:_1}-v3-noshare --
+Errors:
+regular field is constraint in subsumed value: a
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/631/{a:_1}_⊑_{#a:_1}-v3-noshare<==>+out/TestValues/631/{a:_1}_⊑_{#a:_1} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: a
++regular field is constraint in subsumed value: a
+ value not an instance
+ 
+ Result:
+-- out/TestValues/631/{a:_1}_⊑_{#a:_1} --
+Errors:
+required field is optional in subsumed value: a
+value not an instance
+
+Result:
+false
+-- out/TestValues/700/[string]:_1_⊑_{foo:_1} --
+true
+-- out/TestValues/701/[string]:_int_⊑_{foo:_1} --
+true
+-- out/TestValues/702/{["foo"]:_int}_⊑_{foo:_1} --
+true
+-- out/TestValues/703/close({["foo"]:_1})_⊑_{bar:_1} --
+Errors:
+field not allowed in closed struct: bar
+value not an instance
+
+Result:
+false
+-- out/TestValues/704/{foo:_1}_⊑_{foo?:_1} --
+Errors:
+field foo not present in {foo?:1}:
+    value:1:17
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/705/close({})_⊑_{foo?:_1} --
+true
+-- out/TestValues/706/close({})_⊑_close({foo?:_1}) --
+true
+-- out/TestValues/707/{}_⊑_close({}) --
+true
+-- out/TestValues/708/{[string]:_1}_⊑_{foo:_2} --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/709/{}_⊑_close({foo?:_1}) --
+true
+-- out/TestValues/710/{foo:_[...string]}_⊑_{}-v3 --
+Errors:
+regular field is constraint in subsumed value: foo
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/710/{foo:_[...string]}_⊑_{}-v3<==>+out/TestValues/710/{foo:_[...string]}_⊑_{} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: foo
++regular field is constraint in subsumed value: foo
+ value not an instance
+ 
+ Result:
+-- out/TestValues/710/{foo:_[...string]}_⊑_{}-v3-noshare --
+Errors:
+regular field is constraint in subsumed value: foo
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/710/{foo:_[...string]}_⊑_{}-v3-noshare<==>+out/TestValues/710/{foo:_[...string]}_⊑_{} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-required field is optional in subsumed value: foo
++regular field is constraint in subsumed value: foo
+ value not an instance
+ 
+ Result:
+-- out/TestValues/710/{foo:_[...string]}_⊑_{} --
+Errors:
+required field is optional in subsumed value: foo
+value not an instance
+
+Result:
+false
+-- out/TestValues/800/close({})_⊑_{foo:_1} --
+true
+-- out/TestValues/804/{foo:_1}_⊑_{foo?:_1} --
+Errors:
+field foo not present in {foo?:1}:
+    value:1:17
+missing field "foo"
+
+Result:
+false
+-- out/TestValues/805/close({})_⊑_{foo?:_1} --
+true
+-- out/TestValues/806/close({})_⊑_close({foo?:_1}) --
+true
+-- out/TestValues/807/{}_⊑_close({}) --
+true
+-- out/TestValues/808/{[string]:_1}_⊑_{foo:_2}-v3 --
+Errors:
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/808/{[string]:_1}_⊑_{foo:_2}-v3<==>+out/TestValues/808/{[string]:_1}_⊑_{foo:_2} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-value not an instance: inexact subsumption
++value not an instance
+ 
+ Result:
+ false
+-- out/TestValues/808/{[string]:_1}_⊑_{foo:_2}-v3-noshare --
+Errors:
+value not an instance
+
+Result:
+false
+-- diff/-out/TestValues/808/{[string]:_1}_⊑_{foo:_2}-v3-noshare<==>+out/TestValues/808/{[string]:_1}_⊑_{foo:_2} --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-value not an instance: inexact subsumption
++value not an instance
+ 
+ Result:
+ false
+-- out/TestValues/808/{[string]:_1}_⊑_{foo:_2} --
+Errors:
+value not an instance: inexact subsumption
+
+Result:
+false
+-- out/TestValues/809/{}_⊑_close({foo?:_1}) --
+true
+-- out/TestValues/950/[]_⊑_[] --
+true
+-- out/TestValues/951/[...]_⊑_[] --
+true
+-- out/TestValues/952/[...]_⊑_[...] --
+true
+-- out/TestValues/953/[]_⊑_[...] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/954/[2]_⊑_[2] --
+true
+-- out/TestValues/955/[int]_⊑_[2] --
+true
+-- out/TestValues/956/[2]_⊑_[int] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/957/[int]_⊑_[int] --
+true
+-- out/TestValues/958/[...2]_⊑_[2] --
+true
+-- out/TestValues/959/[...int]_⊑_[2] --
+true
+-- out/TestValues/960/[...2]_⊑_[int] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/961/[...int]_⊑_[int] --
+true
+-- out/TestValues/962/[2]_⊑_[...2] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/963/[int]_⊑_[...2] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/964/[2]_⊑_[...int] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/965/[int]_⊑_[...int] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/966/[...int]_⊑_["foo"] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/967/["foo"]_⊑_[...int] --
+Errors:
+value not an instance
+
+Result:
+false
+-- out/TestValues/970/[]_⊑_[...int] --
+true
+-- out/TestValues/971/[2]_⊑_[2,_...int] --
+true
+-- out/TestValues/980/[]_⊑_[...int] --
+true
+-- out/TestValues/981/[2]_⊑_[2,_...int] --
+true

@@ -15,6 +15,7 @@
 package subsume_test
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -26,6 +27,7 @@ import (
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/subsume"
 	"cuelang.org/go/internal/cuetdtest"
+	"cuelang.org/go/internal/cuetxtar"
 )
 
 const (
@@ -46,6 +48,11 @@ func TestValues(t *testing.T) {
 		mode     int
 
 		skip_v2 bool // Bug only exists in v2. Won't fix.
+	}
+	test := cuetxtar.TxTarTest{
+		Root:   "testdata",
+		Name:   "values",
+		Matrix: cuetdtest.FullMatrix,
 	}
 	testCases := []subsumeTest{
 		// Top subsumes everything
@@ -460,55 +467,67 @@ func TestValues(t *testing.T) {
 		const cutset = "\n ,"
 		key := strings.Trim(m[1], cutset) + " ⊑ " + strings.Trim(m[2], cutset)
 
-		cuetdtest.FullMatrix.Run(t, strconv.Itoa(i)+"/"+key, func(t *testing.T, m *cuetdtest.M) {
-			if tc.skip_v2 && m.IsDefault() {
-				t.Skipf("skipping v2 test")
-			}
-			r := m.Runtime()
-
-			file, err := parser.ParseFile("subsume", tc.in)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			root, errs := compile.Files(nil, r, "", file)
-			if errs != nil {
-				t.Fatal(errs)
-			}
-
-			ctx := eval.NewContext(r, root)
-			root.Finalize(ctx)
-
-			// Use low-level lookup to avoid evaluation.
-			var a, b adt.Value
-			for _, arc := range root.Arcs {
-				switch arc.Label {
-				case ctx.StringLabel("a"):
-					a = arc
-				case ctx.StringLabel("b"):
-					b = arc
+		t.Run(strconv.Itoa(i)+"/"+key, func(t *testing.T) {
+			test.Name = t.Name()
+			test.Run(t, func(t *cuetxtar.Test) {
+				if tc.skip_v2 && t.IsDefault() {
+					t.Skipf("skipping v2 test")
 				}
-			}
+				r := t.Runtime()
 
-			switch tc.mode {
-			case subNone:
-				err = subsume.Value(ctx, a, b)
-			case subSchema:
-				err = subsume.API.Value(ctx, a, b)
-			// TODO: see comments above.
-			// case subNoOptional:
-			// 	err = IgnoreOptional.Value(ctx, a, b)
-			case subDefaults:
-				p := subsume.Profile{Defaults: true}
-				err = p.Value(ctx, a, b)
-			case subFinal:
-				err = subsume.Final.Value(ctx, a, b)
-			}
-			got := err == nil
+				file, err := parser.ParseFile("value", tc.in)
+				if err != nil {
+					t.Fatal(err)
+				}
 
-			if got != tc.subsumes {
-				t.Errorf("got %v; want %v (%v vs %v)", got, tc.subsumes, a.Kind(), b.Kind())
-			}
+				root, errs := compile.Files(nil, r, "", file)
+				if errs != nil {
+					t.Fatal(errs)
+				}
+
+				ctx := eval.NewContext(r, root)
+				root.Finalize(ctx)
+
+				// Use low-level lookup to avoid evaluation.
+				var a, b adt.Value
+				for _, arc := range root.Arcs {
+					switch arc.Label {
+					case ctx.StringLabel("a"):
+						a = arc
+					case ctx.StringLabel("b"):
+						b = arc
+					}
+				}
+
+				switch tc.mode {
+				case subNone:
+					errs = subsume.Value(ctx, a, b)
+				case subSchema:
+					errs = subsume.API.Value(ctx, a, b)
+				// TODO: see comments above.
+				// case subNoOptional:
+				// 	err = IgnoreOptional.Value(ctx, a, b)
+				case subDefaults:
+					p := subsume.Profile{Defaults: true}
+					errs = p.Value(ctx, a, b)
+				case subFinal:
+					errs = subsume.Final.Value(ctx, a, b)
+				}
+				got := errs == nil
+
+				if got != tc.subsumes {
+					t.Errorf("got %v; want %v (%v vs %v)", got, tc.subsumes, a.Kind(), b.Kind())
+				}
+
+				if errs != nil {
+					fmt.Fprintln(t, "Errors:")
+					t.WriteErrors(errs)
+					fmt.Fprintln(t, "")
+					fmt.Fprintln(t, "Result:")
+				}
+
+				fmt.Fprint(t, strconv.FormatBool(got))
+			})
 		})
 	}
 }

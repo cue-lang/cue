@@ -42,10 +42,10 @@ Conjuncts:    33
 Disjuncts:    20
 -- out/evalalpha --
 Errors:
-#V1.x.f2: field not allowed:
-    ./variant1.cue:3:5
 z.x.f2: field not allowed:
     ./in.cue:14:3
+#V1.x.f2: field not allowed:
+    ./variant1.cue:3:5
 
 Result:
 (_|_){
@@ -90,14 +90,14 @@ diff old new
 +++ new
 @@ -1,11 +1,7 @@
  Errors:
- #V1.x.f2: field not allowed:
--    ./variant1.cue:2:11
-     ./variant1.cue:3:5
  z.x.f2: field not allowed:
 -    ./in.cue:2:2
 -    ./in.cue:5:12
 -    ./in.cue:11:4
      ./in.cue:14:3
+ #V1.x.f2: field not allowed:
+-    ./variant1.cue:2:11
+     ./variant1.cue:3:5
  
  Result:
 @@ -23,9 +19,6 @@
@@ -130,14 +130,14 @@ Missing positions
 Reordering
 -- out/eval --
 Errors:
-#V1.x.f2: field not allowed:
-    ./variant1.cue:2:11
-    ./variant1.cue:3:5
 z.x.f2: field not allowed:
     ./in.cue:2:2
     ./in.cue:5:12
     ./in.cue:11:4
     ./in.cue:14:3
+#V1.x.f2: field not allowed:
+    ./variant1.cue:2:11
+    ./variant1.cue:3:5
 
 Result:
 (_|_){

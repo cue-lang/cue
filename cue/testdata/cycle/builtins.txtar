@@ -298,16 +298,16 @@ Conjuncts:    821
 Disjuncts:    537
 -- out/evalalpha --
 Errors:
+noCycle.t1._s.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+    ./cycle.cue:4:7
+    ./cycle.cue:4:14
+    ./cycle.cue:5:13
 noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
     ./cycle.cue:4:7
     ./cycle.cue:4:14
     ./cycle.cue:5:13
 noCycle.t1.#x.#x: structural cycle:
     ./cycle.cue:4:7
-noCycle.t1._s.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-    ./cycle.cue:4:7
-    ./cycle.cue:4:14
-    ./cycle.cue:5:13
 issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
     ./cycle.cue:31:6
     ./cycle.cue:28:11
@@ -375,9 +375,9 @@ selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Val
     ./yamlcycle.cue:31:8
     ./yamlcycle.cue:32:8
     ./yamlcycle.cue:33:8
-selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
-    ./yamlcycle.cue:41:8
 selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
+    ./yamlcycle.cue:41:8
+selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
     ./yamlcycle.cue:41:8
 selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): error in call to encoding/yaml.ValidatePartial: structural cycle:
     ./yamlcycle.cue:44:8
@@ -861,17 +861,15 @@ diff old new
      ./cycle.cue:4:7
      ./cycle.cue:4:14
      ./cycle.cue:5:13
--noCycle.t1.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+-noCycle.t1._s.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
 -    ./cycle.cue:4:7
 -    ./cycle.cue:4:14
 -    ./cycle.cue:5:13
-+noCycle.t1.#x.#x: structural cycle:
-+    ./cycle.cue:4:7
- noCycle.t1._s.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+ noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
      ./cycle.cue:4:7
      ./cycle.cue:4:14
      ./cycle.cue:5:13
--noCycle.t1._s.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+-noCycle.t1.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
 -    ./cycle.cue:4:7
 -    ./cycle.cue:4:14
 -    ./cycle.cue:5:13
@@ -879,6 +877,8 @@ diff old new
 -    ./jsoncycle.cue:4:22
 -listMatchN.structCycle.x.y.y: structural cycle:
 -    ./listmatchncycle.cue:4:23
++noCycle.t1.#x.#x: structural cycle:
++    ./cycle.cue:4:7
 +issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
 +    ./cycle.cue:31:6
 +    ./cycle.cue:28:11
@@ -941,9 +941,9 @@ diff old new
 +    ./yamlcycle.cue:31:8
 +    ./yamlcycle.cue:32:8
 +    ./yamlcycle.cue:33:8
-+selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
-+    ./yamlcycle.cue:41:8
 +selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
++    ./yamlcycle.cue:41:8
++selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
 +    ./yamlcycle.cue:41:8
 +selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): error in call to encoding/yaml.ValidatePartial: structural cycle:
 +    ./yamlcycle.cue:44:8
@@ -1120,23 +1120,15 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -393,13 +432,13 @@
-         //     ./matchn.cue:63:6
-         //     ./matchn.cue:62:8
-         //     ./matchn.cue:63:13
--        // issue3633.final.a: field is required but not present:
--        //     ./matchn.cue:63:17
--        //     ./matchn.cue:63:29
-         // issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+@@ -397,7 +436,7 @@
          //     ./matchn.cue:63:17
          //     ./matchn.cue:62:8
          //     ./matchn.cue:63:24
+-        // issue3633.final.a: field is required but not present:
 +        // issue3633.final.data.a: field is required but not present:
-+        //     ./matchn.cue:63:17
-+        //     ./matchn.cue:63:29
+         //     ./matchn.cue:63:17
+         //     ./matchn.cue:63:29
        }
-       #s: (_){ matchN(1, (#list){
-           0: (_|_){// matchN(1, [
 @@ -417,8 +456,8 @@
        a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
      }
@@ -1260,19 +1252,19 @@ diff old new
 issue3443: Sort out differences in reporting of cycles.
 -- out/eval --
 Errors:
-noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-    ./cycle.cue:4:7
-    ./cycle.cue:4:14
-    ./cycle.cue:5:13
-noCycle.t1.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-    ./cycle.cue:4:7
-    ./cycle.cue:4:14
-    ./cycle.cue:5:13
 noCycle.t1._s.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
     ./cycle.cue:4:7
     ./cycle.cue:4:14
     ./cycle.cue:5:13
 noCycle.t1._s.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+    ./cycle.cue:4:7
+    ./cycle.cue:4:14
+    ./cycle.cue:5:13
+noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+    ./cycle.cue:4:7
+    ./cycle.cue:4:14
+    ./cycle.cue:5:13
+noCycle.t1.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
     ./cycle.cue:4:7
     ./cycle.cue:4:14
     ./cycle.cue:5:13
@@ -1654,13 +1646,13 @@ Result:
         //     ./matchn.cue:63:6
         //     ./matchn.cue:62:8
         //     ./matchn.cue:63:13
-        // issue3633.final.a: field is required but not present:
-        //     ./matchn.cue:63:17
-        //     ./matchn.cue:63:29
         // issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
         //     ./matchn.cue:63:17
         //     ./matchn.cue:62:8
         //     ./matchn.cue:63:24
+        // issue3633.final.a: field is required but not present:
+        //     ./matchn.cue:63:17
+        //     ./matchn.cue:63:29
       }
       #s: (_){ matchN(1, (#list){
           0: (_|_){// matchN(1, [

@@ -180,11 +180,11 @@ Result:
     foo: (struct){
       bar: (struct){
         entries: (_|_){
-          // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
+          // [incomplete] noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(invalid interpolation: noCycleError.foo.baz.#ID: non-concrete value string (type string)):
+          //     ./in.cue:61:22
+          // noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
           //     ./in.cue:59:8
           //     ./in.cue:59:11
-          // noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(invalid interpolation: noCycleError.foo.baz.#ID: non-concrete value string (type string)):
-          //     ./in.cue:61:22
         }
         #ID: (_|_){
           // [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
@@ -253,15 +253,17 @@ diff old new
    withError: (_|_){
      // [eval]
      issue799: (_|_){
-@@ -81,6 +79,8 @@
-           // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
+@@ -78,7 +76,9 @@
+     foo: (struct){
+       bar: (struct){
+         entries: (_|_){
+-          // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
++          // [incomplete] noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(invalid interpolation: noCycleError.foo.baz.#ID: non-concrete value string (type string)):
++          //     ./in.cue:61:22
++          // noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
            //     ./in.cue:59:8
            //     ./in.cue:59:11
-+          // noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(invalid interpolation: noCycleError.foo.baz.#ID: non-concrete value string (type string)):
-+          //     ./in.cue:61:22
          }
-         #ID: (_|_){
-           // [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
 @@ -123,6 +123,9 @@
        botUser: (string){ "bot1" }
      }

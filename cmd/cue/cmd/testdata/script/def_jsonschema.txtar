@@ -84,10 +84,10 @@ import "strings"
   "foo": true
 }
 -- expect-stderr-strict --
-keyword "$dynamicAnchor" not yet implemented:
-    ./bad.json:4:3
 unknown keyword "foo":
     ./bad.json:5:3
+keyword "$dynamicAnchor" not yet implemented:
+    ./bad.json:4:3
 -- expect-stderr-strict-features --
 keyword "$dynamicAnchor" not yet implemented:
     ./bad.json:4:3

@@ -105,9 +105,9 @@ Conjuncts:    354
 Disjuncts:    0
 -- out/evalalpha --
 Errors:
-issue3182.first.t2.x.b: structural cycle
 structural cycle:
     ./in.cue:56:8
+issue3182.first.t2.x.b: structural cycle
 
 Result:
 (_|_){
@@ -267,14 +267,13 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,7 @@
+@@ -1,4 +1,6 @@
  Errors:
- issue3182.first.t2.x.b: structural cycle
 +structural cycle:
 +    ./in.cue:56:8
+ issue3182.first.t2.x.b: structural cycle
  
  Result:
- (_|_){
 @@ -44,7 +46,8 @@
      k20: (int){ 0 }
      k30: (int){ 0 }

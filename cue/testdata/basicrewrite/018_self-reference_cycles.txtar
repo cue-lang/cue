@@ -191,13 +191,13 @@ Disjuncts:    88
     }
     t2: (struct){
       a: (_|_){
-        // [incomplete] oneway.t2.a: 2 errors in empty disjunction:
+        // [incomplete] oneway.t2.a: non-concrete value <3 in operand to +:
+        //     ./disjunction.cue:4:12
+        //     ./disjunction.cue:5:12
+        // oneway.t2.a: 2 errors in empty disjunction:
         // oneway.t2.a: conflicting values 1 and 3:
         //     ./disjunction.cue:3:13
         //     ./disjunction.cue:8:12
-        // oneway.t2.a: non-concrete value <3 in operand to +:
-        //     ./disjunction.cue:4:12
-        //     ./disjunction.cue:5:12
       }
       b: (number){ <3 }
     }
@@ -205,16 +205,16 @@ Disjuncts:    88
   issue3669: (struct){
     #Schema: (#struct){
       two: (_|_){
-        // [cycle] issue3669.#Schema.two: cycle with field: one:
-        //     ./disjunction.cue:14:12
-        // issue3669.#Schema.one: cycle with field: two:
+        // [cycle] issue3669.#Schema.one: cycle with field: two:
         //     ./disjunction.cue:15:8
+        // issue3669.#Schema.two: cycle with field: one:
+        //     ./disjunction.cue:14:12
       }
       one: (_|_){
-        // [cycle] issue3669.#Schema.two: cycle with field: one:
-        //     ./disjunction.cue:14:12
-        // issue3669.#Schema.one: cycle with field: two:
+        // [cycle] issue3669.#Schema.one: cycle with field: two:
         //     ./disjunction.cue:15:8
+        // issue3669.#Schema.two: cycle with field: one:
+        //     ./disjunction.cue:14:12
       }
     }
     out: (#struct){
@@ -223,16 +223,16 @@ Disjuncts:    88
     }
   }
   a: (_|_){
-    // [cycle] a: cycle with field: b:
-    //     ./in.cue:1:4
-    // b: cycle with field: a:
+    // [cycle] b: cycle with field: a:
     //     ./in.cue:2:4
+    // a: cycle with field: b:
+    //     ./in.cue:1:4
   }
   b: (_|_){
-    // [cycle] a: cycle with field: b:
-    //     ./in.cue:1:4
-    // b: cycle with field: a:
+    // [cycle] b: cycle with field: a:
     //     ./in.cue:2:4
+    // a: cycle with field: b:
+    //     ./in.cue:1:4
   }
   c: (#list){
     0: (_){ _ }
@@ -244,16 +244,16 @@ Disjuncts:    88
     reduced1: (struct){
       #A: (#struct){
         a: (_|_){
-          // [cycle] issue3737.reduced1.#A.a: cycle with field: b:
-          //     ./issue3737.cue:3:12
-          // issue3737.reduced1.#A.b: cycle with field: a:
+          // [cycle] issue3737.reduced1.#A.b: cycle with field: a:
           //     ./issue3737.cue:4:12
+          // issue3737.reduced1.#A.a: cycle with field: b:
+          //     ./issue3737.cue:3:12
         }
         b: (_|_){
-          // [cycle] issue3737.reduced1.#A.a: cycle with field: b:
-          //     ./issue3737.cue:3:12
-          // issue3737.reduced1.#A.b: cycle with field: a:
+          // [cycle] issue3737.reduced1.#A.b: cycle with field: a:
           //     ./issue3737.cue:4:12
+          // issue3737.reduced1.#A.a: cycle with field: b:
+          //     ./issue3737.cue:3:12
         }
       }
       x: (#struct){
@@ -278,10 +278,10 @@ Disjuncts:    88
       }
       #TimeSpan: (#struct){
         start: (_|_){
-          // [cycle] issue3737.reduced2.#TimeSpan.start: cycle with field: end:
-          //     ./issue3737.cue:23:19
-          // issue3737.reduced2.#TimeSpan.end: cycle with field: start:
+          // [cycle] issue3737.reduced2.#TimeSpan.end: cycle with field: start:
           //     ./issue3737.cue:25:19
+          // issue3737.reduced2.#TimeSpan.start: cycle with field: end:
+          //     ./issue3737.cue:23:19
           // issue3737.reduced2.#TimeSpan.end: cycle with field: duration:
           //     ./issue3737.cue:25:27
         }
@@ -309,32 +309,43 @@ Disjuncts:    88
 diff old new
 --- old
 +++ new
-@@ -13,7 +13,6 @@
-         // [incomplete] oneway.t2.a: 2 errors in empty disjunction:
+@@ -10,14 +10,13 @@
+     }
+     t2: (struct){
+       a: (_|_){
+-        // [incomplete] oneway.t2.a: 2 errors in empty disjunction:
++        // [incomplete] oneway.t2.a: non-concrete value <3 in operand to +:
++        //     ./disjunction.cue:4:12
++        //     ./disjunction.cue:5:12
++        // oneway.t2.a: 2 errors in empty disjunction:
          // oneway.t2.a: conflicting values 1 and 3:
          //     ./disjunction.cue:3:13
 -        //     ./disjunction.cue:7:9
          //     ./disjunction.cue:8:12
-         // oneway.t2.a: non-concrete value <3 in operand to +:
-         //     ./disjunction.cue:4:12
-@@ -25,57 +24,60 @@
+-        // oneway.t2.a: non-concrete value <3 in operand to +:
+-        //     ./disjunction.cue:4:12
+-        //     ./disjunction.cue:5:12
+       }
+       b: (number){ <3 }
+     }
+@@ -25,28 +24,33 @@
    issue3669: (struct){
      #Schema: (#struct){
        two: (_|_){
 -        // [cycle] cycle error:
 -        //     ./disjunction.cue:14:8
-+        // [cycle] issue3669.#Schema.two: cycle with field: one:
-+        //     ./disjunction.cue:14:12
-+        // issue3669.#Schema.one: cycle with field: two:
++        // [cycle] issue3669.#Schema.one: cycle with field: two:
 +        //     ./disjunction.cue:15:8
++        // issue3669.#Schema.two: cycle with field: one:
++        //     ./disjunction.cue:14:12
        }
        one: (_|_){
 -        // [cycle] cycle error:
 -        //     ./disjunction.cue:14:8
-+        // [cycle] issue3669.#Schema.two: cycle with field: one:
-+        //     ./disjunction.cue:14:12
-+        // issue3669.#Schema.one: cycle with field: two:
++        // [cycle] issue3669.#Schema.one: cycle with field: two:
 +        //     ./disjunction.cue:15:8
++        // issue3669.#Schema.two: cycle with field: one:
++        //     ./disjunction.cue:14:12
        }
      }
      out: (#struct){
@@ -349,21 +360,20 @@ diff old new
    }
    a: (_|_){
 -    // [cycle] cycle error:
--    //     ./in.cue:1:4
-+    // [cycle] a: cycle with field: b:
-+    //     ./in.cue:1:4
-+    // b: cycle with field: a:
++    // [cycle] b: cycle with field: a:
 +    //     ./in.cue:2:4
++    // a: cycle with field: b:
+     //     ./in.cue:1:4
    }
    b: (_|_){
 -    // [cycle] cycle error:
--    //     ./in.cue:1:4
-+    // [cycle] a: cycle with field: b:
-+    //     ./in.cue:1:4
-+    // b: cycle with field: a:
++    // [cycle] b: cycle with field: a:
 +    //     ./in.cue:2:4
++    // a: cycle with field: b:
+     //     ./in.cue:1:4
    }
    c: (#list){
+@@ -53,29 +57,27 @@
      0: (_){ _ }
      1: (_){ _ }
    }
@@ -382,11 +392,10 @@ diff old new
        #A: (#struct){
          a: (_|_){
 -          // [cycle] cycle error:
--          //     ./issue3737.cue:3:12
-+          // [cycle] issue3737.reduced1.#A.a: cycle with field: b:
-+          //     ./issue3737.cue:3:12
-+          // issue3737.reduced1.#A.b: cycle with field: a:
++          // [cycle] issue3737.reduced1.#A.b: cycle with field: a:
 +          //     ./issue3737.cue:4:12
++          // issue3737.reduced1.#A.a: cycle with field: b:
+           //     ./issue3737.cue:3:12
          }
          b: (_|_){
 -          // [cycle] cycle error:
@@ -395,10 +404,10 @@ diff old new
 -      }
 -      x: (#struct){
 -        a: (float){ 12000.0 }
-+          // [cycle] issue3737.reduced1.#A.a: cycle with field: b:
-+          //     ./issue3737.cue:3:12
-+          // issue3737.reduced1.#A.b: cycle with field: a:
++          // [cycle] issue3737.reduced1.#A.b: cycle with field: a:
 +          //     ./issue3737.cue:4:12
++          // issue3737.reduced1.#A.a: cycle with field: b:
++          //     ./issue3737.cue:3:12
 +        }
 +      }
 +      x: (#struct){
@@ -430,10 +439,10 @@ diff old new
          start: (_|_){
 -          // [cycle] cycle error:
 -          //     ./issue3737.cue:23:19
-+          // [cycle] issue3737.reduced2.#TimeSpan.start: cycle with field: end:
-+          //     ./issue3737.cue:23:19
-+          // issue3737.reduced2.#TimeSpan.end: cycle with field: start:
++          // [cycle] issue3737.reduced2.#TimeSpan.end: cycle with field: start:
 +          //     ./issue3737.cue:25:19
++          // issue3737.reduced2.#TimeSpan.start: cycle with field: end:
++          //     ./issue3737.cue:23:19
 +          // issue3737.reduced2.#TimeSpan.end: cycle with field: duration:
 +          //     ./issue3737.cue:25:27
          }

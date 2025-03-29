@@ -694,74 +694,136 @@ Conjuncts:    1965
 Disjuncts:    845
 -- out/eval --
 Errors:
-a.q.e: field not allowed:
-    ./in.cue:1:5
-    ./in.cue:6:5
-    ./in.cue:7:3
-    ./in.cue:11:4
-    ./in.cue:15:3
-indirect.closed.err1.Y.a.e: field not allowed:
-    ./reroot.cue:73:7
-    ./reroot.cue:74:7
-    ./reroot.cue:75:7
-    ./reroot.cue:77:6
-    ./reroot.cue:79:7
-    ./reroot.cue:80:7
-    ./reroot.cue:82:7
 issue3778.full.z.b: field not allowed:
     ./ellipsis.cue:2:6
     ./ellipsis.cue:3:6
     ./ellipsis.cue:3:13
     ./ellipsis.cue:4:5
     ./ellipsis.cue:6:3
-issue852.a.Foo: field not allowed:
-    ./in.cue:22:6
-    ./in.cue:26:5
-    ./in.cue:28:5
-nested.err1.x.#V.c.d: field not allowed:
-    ./reroot.cue:112:5
-    ./reroot.cue:114:6
-    ./reroot.cue:117:7
-    ./reroot.cue:118:5
-    ./reroot.cue:122:8
-    ./reroot.cue:123:6
-nested.err1.x.#V.c.f: field not allowed:
-    ./reroot.cue:112:5
-    ./reroot.cue:114:6
-    ./reroot.cue:117:7
-    ./reroot.cue:117:11
-    ./reroot.cue:122:8
-    ./reroot.cue:123:6
-nested.err1.x.b.f: field not allowed:
-    ./reroot.cue:112:5
-    ./reroot.cue:114:6
-    ./reroot.cue:122:8
-    ./reroot.cue:123:6
-nested.err1.x.b.g: field not allowed:
-    ./reroot.cue:112:5
-    ./reroot.cue:114:6
-    ./reroot.cue:122:8
-    ./reroot.cue:123:6
-nested.err1.x.v.c.d: field not allowed:
-    ./reroot.cue:112:5
-    ./reroot.cue:114:6
-    ./reroot.cue:115:6
-    ./reroot.cue:117:7
-    ./reroot.cue:118:5
-    ./reroot.cue:122:8
-    ./reroot.cue:123:6
-nested.err1.x.v.c.f: field not allowed:
-    ./reroot.cue:112:5
-    ./reroot.cue:114:6
-    ./reroot.cue:115:6
-    ./reroot.cue:117:7
-    ./reroot.cue:117:11
-    ./reroot.cue:122:8
-    ./reroot.cue:123:6
-nested.err2.x.b.g: field not allowed:
-    ./reroot.cue:128:6
-    ./reroot.cue:136:5
-    ./reroot.cue:137:8
+patterns.shallow.single.err.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:36:6
+    ./embed.cue:37:8
+    ./embed.cue:38:8
+patterns.shallow.and.p1.err.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:45:6
+    ./embed.cue:45:11
+    ./embed.cue:47:8
+    ./embed.cue:48:8
+patterns.shallow.and.p2.err.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:55:6
+    ./embed.cue:55:11
+    ./embed.cue:56:8
+    ./embed.cue:57:8
+patterns.shallow.andEmbed.p1.err.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:64:6
+    ./embed.cue:64:8
+    ./embed.cue:64:13
+    ./embed.cue:66:8
+    ./embed.cue:67:8
+patterns.shallow.andEmbed.p2.err.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:74:6
+    ./embed.cue:74:8
+    ./embed.cue:74:13
+    ./embed.cue:75:8
+    ./embed.cue:76:8
+patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:32:6
+    ./embed.cue:33:6
+    ./embed.cue:103:6
+    ./embed.cue:104:4
+    ./embed.cue:104:9
+    ./embed.cue:105:4
+    ./embed.cue:105:9
+    ./embed.cue:107:9
+    ./embed.cue:108:9
+patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:32:6
+    ./embed.cue:33:6
+    ./embed.cue:116:6
+    ./embed.cue:117:4
+    ./embed.cue:117:9
+    ./embed.cue:118:4
+    ./embed.cue:118:9
+    ./embed.cue:120:9
+    ./embed.cue:121:9
+patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:32:6
+    ./embed.cue:33:6
+    ./embed.cue:129:6
+    ./embed.cue:130:4
+    ./embed.cue:130:9
+    ./embed.cue:131:4
+    ./embed.cue:131:9
+    ./embed.cue:134:9
+    ./embed.cue:135:9
+patterns.shallow.indirect.p1.err1.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:147:7
+    ./embed.cue:150:7
+    ./embed.cue:151:10
+    ./embed.cue:152:10
+patterns.shallow.indirect.p1.err2.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:147:7
+    ./embed.cue:150:7
+    ./embed.cue:154:10
+    ./embed.cue:155:10
+patterns.shallow.indirect.p2.err1.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:162:8
+    ./embed.cue:163:7
+    ./embed.cue:165:10
+    ./embed.cue:166:10
+patterns.shallow.indirect.p2.err2.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:162:8
+    ./embed.cue:163:7
+    ./embed.cue:168:10
+    ./embed.cue:169:10
+patterns.shallow.indirect.p3.err1.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:147:7
+    ./embed.cue:176:7
+    ./embed.cue:178:10
+    ./embed.cue:179:10
+patterns.shallow.indirect.p3.err2.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:147:7
+    ./embed.cue:176:7
+    ./embed.cue:181:10
+    ./embed.cue:182:10
+patterns.shallow.indirect.p4.err1.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:189:8
+    ./embed.cue:190:7
+    ./embed.cue:193:10
+    ./embed.cue:194:10
+patterns.shallow.indirect.p4.err2.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:189:8
+    ./embed.cue:190:7
+    ./embed.cue:196:10
+    ./embed.cue:197:10
+patterns.nested.single.err.x.y.j: field not allowed:
+    ./embed.cue:206:12
+    ./embed.cue:212:6
+    ./embed.cue:213:8
+    ./embed.cue:214:14
 patterns.nested.and.p1.err.x.y.j: field not allowed:
     ./embed.cue:206:12
     ./embed.cue:207:12
@@ -882,130 +944,68 @@ patterns.nested.indirect.p4.err2.x.y.j: field not allowed:
     ./embed.cue:366:7
     ./embed.cue:372:10
     ./embed.cue:373:16
-patterns.nested.single.err.x.y.j: field not allowed:
-    ./embed.cue:206:12
-    ./embed.cue:212:6
-    ./embed.cue:213:8
-    ./embed.cue:214:14
-patterns.shallow.and.p1.err.j: field not allowed:
-    ./embed.cue:30:6
-    ./embed.cue:31:6
-    ./embed.cue:45:6
-    ./embed.cue:45:11
-    ./embed.cue:47:8
-    ./embed.cue:48:8
-patterns.shallow.and.p2.err.j: field not allowed:
-    ./embed.cue:30:6
-    ./embed.cue:31:6
-    ./embed.cue:55:6
-    ./embed.cue:55:11
-    ./embed.cue:56:8
-    ./embed.cue:57:8
-patterns.shallow.andEmbed.p1.err.j: field not allowed:
-    ./embed.cue:30:6
-    ./embed.cue:31:6
-    ./embed.cue:64:6
-    ./embed.cue:64:8
-    ./embed.cue:64:13
-    ./embed.cue:66:8
-    ./embed.cue:67:8
-patterns.shallow.andEmbed.p2.err.j: field not allowed:
-    ./embed.cue:30:6
-    ./embed.cue:31:6
-    ./embed.cue:74:6
-    ./embed.cue:74:8
-    ./embed.cue:74:13
-    ./embed.cue:75:8
-    ./embed.cue:76:8
-patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
-    ./embed.cue:30:6
-    ./embed.cue:31:6
-    ./embed.cue:32:6
-    ./embed.cue:33:6
-    ./embed.cue:103:6
-    ./embed.cue:104:4
-    ./embed.cue:104:9
-    ./embed.cue:105:4
-    ./embed.cue:105:9
-    ./embed.cue:107:9
-    ./embed.cue:108:9
-patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
-    ./embed.cue:30:6
-    ./embed.cue:31:6
-    ./embed.cue:32:6
-    ./embed.cue:33:6
-    ./embed.cue:116:6
-    ./embed.cue:117:4
-    ./embed.cue:117:9
-    ./embed.cue:118:4
-    ./embed.cue:118:9
-    ./embed.cue:120:9
-    ./embed.cue:121:9
-patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
-    ./embed.cue:30:6
-    ./embed.cue:31:6
-    ./embed.cue:32:6
-    ./embed.cue:33:6
-    ./embed.cue:129:6
-    ./embed.cue:130:4
-    ./embed.cue:130:9
-    ./embed.cue:131:4
-    ./embed.cue:131:9
-    ./embed.cue:134:9
-    ./embed.cue:135:9
-patterns.shallow.indirect.p1.err1.j: field not allowed:
-    ./embed.cue:146:6
-    ./embed.cue:147:7
-    ./embed.cue:150:7
-    ./embed.cue:151:10
-    ./embed.cue:152:10
-patterns.shallow.indirect.p1.err2.j: field not allowed:
-    ./embed.cue:146:6
-    ./embed.cue:147:7
-    ./embed.cue:150:7
-    ./embed.cue:154:10
-    ./embed.cue:155:10
-patterns.shallow.indirect.p2.err1.j: field not allowed:
-    ./embed.cue:146:6
-    ./embed.cue:162:8
-    ./embed.cue:163:7
-    ./embed.cue:165:10
-    ./embed.cue:166:10
-patterns.shallow.indirect.p2.err2.j: field not allowed:
-    ./embed.cue:146:6
-    ./embed.cue:162:8
-    ./embed.cue:163:7
-    ./embed.cue:168:10
-    ./embed.cue:169:10
-patterns.shallow.indirect.p3.err1.j: field not allowed:
-    ./embed.cue:146:6
-    ./embed.cue:147:7
-    ./embed.cue:176:7
-    ./embed.cue:178:10
-    ./embed.cue:179:10
-patterns.shallow.indirect.p3.err2.j: field not allowed:
-    ./embed.cue:146:6
-    ./embed.cue:147:7
-    ./embed.cue:176:7
-    ./embed.cue:181:10
-    ./embed.cue:182:10
-patterns.shallow.indirect.p4.err1.j: field not allowed:
-    ./embed.cue:146:6
-    ./embed.cue:189:8
-    ./embed.cue:190:7
-    ./embed.cue:193:10
-    ./embed.cue:194:10
-patterns.shallow.indirect.p4.err2.j: field not allowed:
-    ./embed.cue:146:6
-    ./embed.cue:189:8
-    ./embed.cue:190:7
-    ./embed.cue:196:10
-    ./embed.cue:197:10
-patterns.shallow.single.err.j: field not allowed:
-    ./embed.cue:30:6
-    ./embed.cue:36:6
-    ./embed.cue:37:8
-    ./embed.cue:38:8
+a.q.e: field not allowed:
+    ./in.cue:1:5
+    ./in.cue:6:5
+    ./in.cue:7:3
+    ./in.cue:11:4
+    ./in.cue:15:3
+issue852.a.Foo: field not allowed:
+    ./in.cue:22:6
+    ./in.cue:26:5
+    ./in.cue:28:5
+indirect.closed.err1.Y.a.e: field not allowed:
+    ./reroot.cue:73:7
+    ./reroot.cue:74:7
+    ./reroot.cue:75:7
+    ./reroot.cue:77:6
+    ./reroot.cue:79:7
+    ./reroot.cue:80:7
+    ./reroot.cue:82:7
+nested.err1.x.b.f: field not allowed:
+    ./reroot.cue:112:5
+    ./reroot.cue:114:6
+    ./reroot.cue:122:8
+    ./reroot.cue:123:6
+nested.err1.x.b.g: field not allowed:
+    ./reroot.cue:112:5
+    ./reroot.cue:114:6
+    ./reroot.cue:122:8
+    ./reroot.cue:123:6
+nested.err1.x.v.c.f: field not allowed:
+    ./reroot.cue:112:5
+    ./reroot.cue:114:6
+    ./reroot.cue:115:6
+    ./reroot.cue:117:7
+    ./reroot.cue:117:11
+    ./reroot.cue:122:8
+    ./reroot.cue:123:6
+nested.err1.x.v.c.d: field not allowed:
+    ./reroot.cue:112:5
+    ./reroot.cue:114:6
+    ./reroot.cue:115:6
+    ./reroot.cue:117:7
+    ./reroot.cue:118:5
+    ./reroot.cue:122:8
+    ./reroot.cue:123:6
+nested.err1.x.#V.c.f: field not allowed:
+    ./reroot.cue:112:5
+    ./reroot.cue:114:6
+    ./reroot.cue:117:7
+    ./reroot.cue:117:11
+    ./reroot.cue:122:8
+    ./reroot.cue:123:6
+nested.err1.x.#V.c.d: field not allowed:
+    ./reroot.cue:112:5
+    ./reroot.cue:114:6
+    ./reroot.cue:117:7
+    ./reroot.cue:118:5
+    ./reroot.cue:122:8
+    ./reroot.cue:123:6
+nested.err2.x.b.g: field not allowed:
+    ./reroot.cue:128:6
+    ./reroot.cue:136:5
+    ./reroot.cue:137:8
 
 Result:
 (_|_){
@@ -2705,54 +2705,10 @@ Result:
 }
 -- out/evalalpha --
 Errors:
-a.q.e: field not allowed:
-    ./in.cue:15:3
-indirect.closed.err1.Y.a.e: field not allowed:
-    ./reroot.cue:75:7
 issue3778.full.z.b: field not allowed:
     ./ellipsis.cue:6:3
-issue852.a.Foo: field not allowed:
-    ./in.cue:28:5
-nested.err1.x.#V.c.d: field not allowed:
-    ./reroot.cue:118:5
-nested.err1.x.#V.c.f: field not allowed:
-    ./reroot.cue:114:6
-nested.err1.x.b.f: field not allowed:
-    ./reroot.cue:114:6
-nested.err1.x.b.g: field not allowed:
-    ./reroot.cue:123:6
-nested.err2.x.b.g: field not allowed:
-    ./reroot.cue:137:8
-patterns.nested.and.p1.err.x.y.j: field not allowed:
-    ./embed.cue:207:12
-    ./embed.cue:224:14
-patterns.nested.and.p2.err.x.y.j: field not allowed:
-    ./embed.cue:207:12
-    ./embed.cue:233:14
-patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
-    ./embed.cue:207:12
-    ./embed.cue:243:14
-patterns.nested.andEmbed.p2.err.x.y.j: field not allowed:
-    ./embed.cue:207:12
-    ./embed.cue:252:14
-patterns.nested.indirect.p1.err1.x.y.j: field not allowed:
-    ./embed.cue:328:16
-patterns.nested.indirect.p1.err2.x.y.j: field not allowed:
-    ./embed.cue:331:16
-patterns.nested.indirect.p2.err1.x.y.j: field not allowed:
-    ./embed.cue:342:16
-patterns.nested.indirect.p2.err2.x.y.j: field not allowed:
-    ./embed.cue:345:16
-patterns.nested.indirect.p3.err1.x.y.j: field not allowed:
-    ./embed.cue:355:16
-patterns.nested.indirect.p3.err2.x.y.j: field not allowed:
-    ./embed.cue:358:16
-patterns.nested.indirect.p4.err1.x.y.j: field not allowed:
-    ./embed.cue:370:16
-patterns.nested.indirect.p4.err2.x.y.j: field not allowed:
-    ./embed.cue:373:16
-patterns.nested.single.err.x.y.j: field not allowed:
-    ./embed.cue:214:14
+patterns.shallow.single.err.j: field not allowed:
+    ./embed.cue:38:8
 patterns.shallow.and.p1.err.j: field not allowed:
     ./embed.cue:31:6
     ./embed.cue:48:8
@@ -2781,8 +2737,52 @@ patterns.shallow.indirect.p4.err1.j: field not allowed:
     ./embed.cue:194:10
 patterns.shallow.indirect.p4.err2.j: field not allowed:
     ./embed.cue:197:10
-patterns.shallow.single.err.j: field not allowed:
-    ./embed.cue:38:8
+patterns.nested.single.err.x.y.j: field not allowed:
+    ./embed.cue:214:14
+patterns.nested.and.p1.err.x.y.j: field not allowed:
+    ./embed.cue:207:12
+    ./embed.cue:224:14
+patterns.nested.and.p2.err.x.y.j: field not allowed:
+    ./embed.cue:207:12
+    ./embed.cue:233:14
+patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
+    ./embed.cue:207:12
+    ./embed.cue:243:14
+patterns.nested.andEmbed.p2.err.x.y.j: field not allowed:
+    ./embed.cue:207:12
+    ./embed.cue:252:14
+patterns.nested.indirect.p1.err1.x.y.j: field not allowed:
+    ./embed.cue:328:16
+patterns.nested.indirect.p1.err2.x.y.j: field not allowed:
+    ./embed.cue:331:16
+patterns.nested.indirect.p2.err1.x.y.j: field not allowed:
+    ./embed.cue:342:16
+patterns.nested.indirect.p2.err2.x.y.j: field not allowed:
+    ./embed.cue:345:16
+patterns.nested.indirect.p3.err1.x.y.j: field not allowed:
+    ./embed.cue:355:16
+patterns.nested.indirect.p3.err2.x.y.j: field not allowed:
+    ./embed.cue:358:16
+patterns.nested.indirect.p4.err1.x.y.j: field not allowed:
+    ./embed.cue:370:16
+patterns.nested.indirect.p4.err2.x.y.j: field not allowed:
+    ./embed.cue:373:16
+a.q.e: field not allowed:
+    ./in.cue:15:3
+issue852.a.Foo: field not allowed:
+    ./in.cue:28:5
+indirect.closed.err1.Y.a.e: field not allowed:
+    ./reroot.cue:75:7
+nested.err1.x.b.f: field not allowed:
+    ./reroot.cue:114:6
+nested.err1.x.b.g: field not allowed:
+    ./reroot.cue:123:6
+nested.err1.x.#V.c.d: field not allowed:
+    ./reroot.cue:118:5
+nested.err1.x.#V.c.f: field not allowed:
+    ./reroot.cue:114:6
+nested.err2.x.b.g: field not allowed:
+    ./reroot.cue:137:8
 
 Result:
 (_|_){
@@ -4136,77 +4136,140 @@ diff old new
 +++ new
 @@ -1,315 +1,81 @@
  Errors:
- a.q.e: field not allowed:
--    ./in.cue:1:5
--    ./in.cue:6:5
--    ./in.cue:7:3
--    ./in.cue:11:4
-     ./in.cue:15:3
- indirect.closed.err1.Y.a.e: field not allowed:
--    ./reroot.cue:73:7
--    ./reroot.cue:74:7
-     ./reroot.cue:75:7
--    ./reroot.cue:77:6
--    ./reroot.cue:79:7
--    ./reroot.cue:80:7
--    ./reroot.cue:82:7
  issue3778.full.z.b: field not allowed:
 -    ./ellipsis.cue:2:6
 -    ./ellipsis.cue:3:6
 -    ./ellipsis.cue:3:13
 -    ./ellipsis.cue:4:5
      ./ellipsis.cue:6:3
- issue852.a.Foo: field not allowed:
--    ./in.cue:22:6
--    ./in.cue:26:5
-     ./in.cue:28:5
- nested.err1.x.#V.c.d: field not allowed:
--    ./reroot.cue:112:5
--    ./reroot.cue:114:6
--    ./reroot.cue:117:7
--    ./reroot.cue:118:5
--    ./reroot.cue:122:8
--    ./reroot.cue:123:6
-+    ./reroot.cue:118:5
- nested.err1.x.#V.c.f: field not allowed:
--    ./reroot.cue:112:5
--    ./reroot.cue:114:6
--    ./reroot.cue:117:7
--    ./reroot.cue:117:11
--    ./reroot.cue:122:8
--    ./reroot.cue:123:6
-+    ./reroot.cue:114:6
- nested.err1.x.b.f: field not allowed:
--    ./reroot.cue:112:5
--    ./reroot.cue:114:6
--    ./reroot.cue:122:8
--    ./reroot.cue:123:6
-+    ./reroot.cue:114:6
- nested.err1.x.b.g: field not allowed:
--    ./reroot.cue:112:5
--    ./reroot.cue:114:6
--    ./reroot.cue:122:8
--    ./reroot.cue:123:6
--nested.err1.x.v.c.d: field not allowed:
--    ./reroot.cue:112:5
--    ./reroot.cue:114:6
--    ./reroot.cue:115:6
--    ./reroot.cue:117:7
--    ./reroot.cue:118:5
--    ./reroot.cue:122:8
--    ./reroot.cue:123:6
--nested.err1.x.v.c.f: field not allowed:
--    ./reroot.cue:112:5
--    ./reroot.cue:114:6
--    ./reroot.cue:115:6
--    ./reroot.cue:117:7
--    ./reroot.cue:117:11
--    ./reroot.cue:122:8
-     ./reroot.cue:123:6
- nested.err2.x.b.g: field not allowed:
--    ./reroot.cue:128:6
--    ./reroot.cue:136:5
-     ./reroot.cue:137:8
+ patterns.shallow.single.err.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:36:6
+-    ./embed.cue:37:8
+     ./embed.cue:38:8
+ patterns.shallow.and.p1.err.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:45:6
+-    ./embed.cue:45:11
+-    ./embed.cue:47:8
++    ./embed.cue:31:6
+     ./embed.cue:48:8
+ patterns.shallow.and.p2.err.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:55:6
+-    ./embed.cue:55:11
+-    ./embed.cue:56:8
++    ./embed.cue:31:6
+     ./embed.cue:57:8
+ patterns.shallow.andEmbed.p1.err.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:64:6
+-    ./embed.cue:64:8
+-    ./embed.cue:64:13
+-    ./embed.cue:66:8
++    ./embed.cue:31:6
+     ./embed.cue:67:8
+ patterns.shallow.andEmbed.p2.err.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:74:6
+-    ./embed.cue:74:8
+-    ./embed.cue:74:13
+-    ./embed.cue:75:8
++    ./embed.cue:31:6
+     ./embed.cue:76:8
+-patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:32:6
+-    ./embed.cue:33:6
+-    ./embed.cue:103:6
+-    ./embed.cue:104:4
+-    ./embed.cue:104:9
+-    ./embed.cue:105:4
+-    ./embed.cue:105:9
+-    ./embed.cue:107:9
+-    ./embed.cue:108:9
+-patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:32:6
+-    ./embed.cue:33:6
+-    ./embed.cue:116:6
+-    ./embed.cue:117:4
+-    ./embed.cue:117:9
+-    ./embed.cue:118:4
+-    ./embed.cue:118:9
+-    ./embed.cue:120:9
+-    ./embed.cue:121:9
+-patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:32:6
+-    ./embed.cue:33:6
+-    ./embed.cue:129:6
+-    ./embed.cue:130:4
+-    ./embed.cue:130:9
+-    ./embed.cue:131:4
+-    ./embed.cue:131:9
+-    ./embed.cue:134:9
+-    ./embed.cue:135:9
+ patterns.shallow.indirect.p1.err1.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:147:7
+-    ./embed.cue:150:7
+-    ./embed.cue:151:10
+     ./embed.cue:152:10
+ patterns.shallow.indirect.p1.err2.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:147:7
+-    ./embed.cue:150:7
+-    ./embed.cue:154:10
+     ./embed.cue:155:10
+ patterns.shallow.indirect.p2.err1.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:162:8
+-    ./embed.cue:163:7
+-    ./embed.cue:165:10
+     ./embed.cue:166:10
+ patterns.shallow.indirect.p2.err2.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:162:8
+-    ./embed.cue:163:7
+-    ./embed.cue:168:10
+     ./embed.cue:169:10
+ patterns.shallow.indirect.p3.err1.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:147:7
+-    ./embed.cue:176:7
+-    ./embed.cue:178:10
+     ./embed.cue:179:10
+ patterns.shallow.indirect.p3.err2.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:147:7
+-    ./embed.cue:176:7
+-    ./embed.cue:181:10
+     ./embed.cue:182:10
+ patterns.shallow.indirect.p4.err1.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:189:8
+-    ./embed.cue:190:7
+-    ./embed.cue:193:10
+     ./embed.cue:194:10
+ patterns.shallow.indirect.p4.err2.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:189:8
+-    ./embed.cue:190:7
+-    ./embed.cue:196:10
+     ./embed.cue:197:10
+ patterns.nested.single.err.x.y.j: field not allowed:
+-    ./embed.cue:206:12
+-    ./embed.cue:212:6
+-    ./embed.cue:213:8
+     ./embed.cue:214:14
  patterns.nested.and.p1.err.x.y.j: field not allowed:
 -    ./embed.cue:206:12
 -    ./embed.cue:207:12
@@ -4331,134 +4394,72 @@ diff old new
 -    ./embed.cue:366:7
 -    ./embed.cue:372:10
      ./embed.cue:373:16
- patterns.nested.single.err.x.y.j: field not allowed:
--    ./embed.cue:206:12
--    ./embed.cue:212:6
--    ./embed.cue:213:8
-     ./embed.cue:214:14
- patterns.shallow.and.p1.err.j: field not allowed:
--    ./embed.cue:30:6
--    ./embed.cue:31:6
--    ./embed.cue:45:6
--    ./embed.cue:45:11
--    ./embed.cue:47:8
-+    ./embed.cue:31:6
-     ./embed.cue:48:8
- patterns.shallow.and.p2.err.j: field not allowed:
--    ./embed.cue:30:6
--    ./embed.cue:31:6
--    ./embed.cue:55:6
--    ./embed.cue:55:11
--    ./embed.cue:56:8
-+    ./embed.cue:31:6
-     ./embed.cue:57:8
- patterns.shallow.andEmbed.p1.err.j: field not allowed:
--    ./embed.cue:30:6
--    ./embed.cue:31:6
--    ./embed.cue:64:6
--    ./embed.cue:64:8
--    ./embed.cue:64:13
--    ./embed.cue:66:8
-+    ./embed.cue:31:6
-     ./embed.cue:67:8
- patterns.shallow.andEmbed.p2.err.j: field not allowed:
--    ./embed.cue:30:6
--    ./embed.cue:31:6
--    ./embed.cue:74:6
--    ./embed.cue:74:8
--    ./embed.cue:74:13
--    ./embed.cue:75:8
-+    ./embed.cue:31:6
-     ./embed.cue:76:8
--patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
--    ./embed.cue:30:6
--    ./embed.cue:31:6
--    ./embed.cue:32:6
--    ./embed.cue:33:6
--    ./embed.cue:103:6
--    ./embed.cue:104:4
--    ./embed.cue:104:9
--    ./embed.cue:105:4
--    ./embed.cue:105:9
--    ./embed.cue:107:9
--    ./embed.cue:108:9
--patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
--    ./embed.cue:30:6
--    ./embed.cue:31:6
--    ./embed.cue:32:6
--    ./embed.cue:33:6
--    ./embed.cue:116:6
--    ./embed.cue:117:4
--    ./embed.cue:117:9
--    ./embed.cue:118:4
--    ./embed.cue:118:9
--    ./embed.cue:120:9
--    ./embed.cue:121:9
--patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
--    ./embed.cue:30:6
--    ./embed.cue:31:6
--    ./embed.cue:32:6
--    ./embed.cue:33:6
--    ./embed.cue:129:6
--    ./embed.cue:130:4
--    ./embed.cue:130:9
--    ./embed.cue:131:4
--    ./embed.cue:131:9
--    ./embed.cue:134:9
--    ./embed.cue:135:9
- patterns.shallow.indirect.p1.err1.j: field not allowed:
--    ./embed.cue:146:6
--    ./embed.cue:147:7
--    ./embed.cue:150:7
--    ./embed.cue:151:10
-     ./embed.cue:152:10
- patterns.shallow.indirect.p1.err2.j: field not allowed:
--    ./embed.cue:146:6
--    ./embed.cue:147:7
--    ./embed.cue:150:7
--    ./embed.cue:154:10
-     ./embed.cue:155:10
- patterns.shallow.indirect.p2.err1.j: field not allowed:
--    ./embed.cue:146:6
--    ./embed.cue:162:8
--    ./embed.cue:163:7
--    ./embed.cue:165:10
-     ./embed.cue:166:10
- patterns.shallow.indirect.p2.err2.j: field not allowed:
--    ./embed.cue:146:6
--    ./embed.cue:162:8
--    ./embed.cue:163:7
--    ./embed.cue:168:10
-     ./embed.cue:169:10
- patterns.shallow.indirect.p3.err1.j: field not allowed:
--    ./embed.cue:146:6
--    ./embed.cue:147:7
--    ./embed.cue:176:7
--    ./embed.cue:178:10
-     ./embed.cue:179:10
- patterns.shallow.indirect.p3.err2.j: field not allowed:
--    ./embed.cue:146:6
--    ./embed.cue:147:7
--    ./embed.cue:176:7
--    ./embed.cue:181:10
-     ./embed.cue:182:10
- patterns.shallow.indirect.p4.err1.j: field not allowed:
--    ./embed.cue:146:6
--    ./embed.cue:189:8
--    ./embed.cue:190:7
--    ./embed.cue:193:10
-     ./embed.cue:194:10
- patterns.shallow.indirect.p4.err2.j: field not allowed:
--    ./embed.cue:146:6
--    ./embed.cue:189:8
--    ./embed.cue:190:7
--    ./embed.cue:196:10
-     ./embed.cue:197:10
- patterns.shallow.single.err.j: field not allowed:
--    ./embed.cue:30:6
--    ./embed.cue:36:6
--    ./embed.cue:37:8
-     ./embed.cue:38:8
+ a.q.e: field not allowed:
+-    ./in.cue:1:5
+-    ./in.cue:6:5
+-    ./in.cue:7:3
+-    ./in.cue:11:4
+     ./in.cue:15:3
+ issue852.a.Foo: field not allowed:
+-    ./in.cue:22:6
+-    ./in.cue:26:5
+     ./in.cue:28:5
+ indirect.closed.err1.Y.a.e: field not allowed:
+-    ./reroot.cue:73:7
+-    ./reroot.cue:74:7
+     ./reroot.cue:75:7
+-    ./reroot.cue:77:6
+-    ./reroot.cue:79:7
+-    ./reroot.cue:80:7
+-    ./reroot.cue:82:7
+ nested.err1.x.b.f: field not allowed:
+-    ./reroot.cue:112:5
+-    ./reroot.cue:114:6
+-    ./reroot.cue:122:8
+-    ./reroot.cue:123:6
++    ./reroot.cue:114:6
+ nested.err1.x.b.g: field not allowed:
+-    ./reroot.cue:112:5
+-    ./reroot.cue:114:6
+-    ./reroot.cue:122:8
+-    ./reroot.cue:123:6
+-nested.err1.x.v.c.f: field not allowed:
+-    ./reroot.cue:112:5
+-    ./reroot.cue:114:6
+-    ./reroot.cue:115:6
+-    ./reroot.cue:117:7
+-    ./reroot.cue:117:11
+-    ./reroot.cue:122:8
+-    ./reroot.cue:123:6
+-nested.err1.x.v.c.d: field not allowed:
+-    ./reroot.cue:112:5
+-    ./reroot.cue:114:6
+-    ./reroot.cue:115:6
+-    ./reroot.cue:117:7
+-    ./reroot.cue:118:5
+-    ./reroot.cue:122:8
+-    ./reroot.cue:123:6
+-nested.err1.x.#V.c.f: field not allowed:
+-    ./reroot.cue:112:5
+-    ./reroot.cue:114:6
+-    ./reroot.cue:117:7
+-    ./reroot.cue:117:11
+-    ./reroot.cue:122:8
+     ./reroot.cue:123:6
+ nested.err1.x.#V.c.d: field not allowed:
+-    ./reroot.cue:112:5
+-    ./reroot.cue:114:6
+-    ./reroot.cue:117:7
+-    ./reroot.cue:118:5
+-    ./reroot.cue:122:8
+-    ./reroot.cue:123:6
++    ./reroot.cue:118:5
++nested.err1.x.#V.c.f: field not allowed:
++    ./reroot.cue:114:6
+ nested.err2.x.b.g: field not allowed:
+-    ./reroot.cue:128:6
+-    ./reroot.cue:136:5
+     ./reroot.cue:137:8
  
  Result:
 @@ -330,10 +96,6 @@

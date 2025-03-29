@@ -87,16 +87,16 @@ Disjuncts:    82
 (struct){
   n1: (struct){
     min: (_|_){
-      // [cycle] n1.min: cycle with field: max:
-      //     ./in.cue:3:12
-      // n1.max: cycle with field: min:
+      // [cycle] n1.max: cycle with field: min:
       //     ./in.cue:3:23
+      // n1.min: cycle with field: max:
+      //     ./in.cue:3:12
     }
     max: (_|_){
-      // [cycle] n1.min: cycle with field: max:
-      //     ./in.cue:3:12
-      // n1.max: cycle with field: min:
+      // [cycle] n1.max: cycle with field: min:
       //     ./in.cue:3:23
+      // n1.min: cycle with field: max:
+      //     ./in.cue:3:12
     }
   }
   n2: (_|_){
@@ -155,17 +155,17 @@ diff old new
    n1: (struct){
      min: (_|_){
 -      // [cycle] cycle error
-+      // [cycle] n1.min: cycle with field: max:
-+      //     ./in.cue:3:12
-+      // n1.max: cycle with field: min:
++      // [cycle] n1.max: cycle with field: min:
 +      //     ./in.cue:3:23
++      // n1.min: cycle with field: max:
++      //     ./in.cue:3:12
      }
      max: (_|_){
 -      // [cycle] cycle error
-+      // [cycle] n1.min: cycle with field: max:
-+      //     ./in.cue:3:12
-+      // n1.max: cycle with field: min:
++      // [cycle] n1.max: cycle with field: min:
 +      //     ./in.cue:3:23
++      // n1.min: cycle with field: max:
++      //     ./in.cue:3:12
      }
    }
    n2: (_|_){

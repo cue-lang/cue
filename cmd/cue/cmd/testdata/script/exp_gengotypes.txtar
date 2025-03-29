@@ -163,6 +163,12 @@ _typeTests: [...#typeTest] & [
 	{name: "LinkedList",         fail: both: {next: "x"}},
 ]
 -- cuetest/fail_check.stderr --
+fail.both.notString: conflicting values "not_a_struct" and {embedded2?:int} (mismatched types string and struct):
+    ./cuetest/all.cue:4:24
+    ./root/root.cue:95:2
+fail.both.notList: conflicting values [1,2,3] and {embedded2?:int} (mismatched types list and struct):
+    ./cuetest/all.cue:5:24
+    ./root/root.cue:95:2
 fail.both."16_IntList".types.IntList.0: conflicting values "foo" and int (mismatched types string and int):
     ./cuetest/all.cue:67:40
     ./root/types.cue:26:23
@@ -184,16 +190,22 @@ fail.both."40_NonEmptyString".types.NonEmptyString: conflicting values string an
 fail.both."42_LinkedList".types.LinkedList.next: conflicting values "x" and {item?:_,next?:#linkedList} (mismatched types string and struct):
     ./cuetest/all.cue:94:50
     ./root/types.cue:43:14
-fail.both.notList: conflicting values [1,2,3] and {embedded2?:int} (mismatched types list and struct):
-    ./cuetest/all.cue:5:24
-    ./root/root.cue:95:2
-fail.both.notString: conflicting values "not_a_struct" and {embedded2?:int} (mismatched types string and struct):
-    ./cuetest/all.cue:4:24
-    ./root/root.cue:95:2
+fail.cue.isNotEqual.mustEqual2: conflicting values 8 and 99:
+    ./cuetest/all.cue:11:37
+    ./cuetest/all.cue:11:52
+fail.cue.discBoth.discriminatorField: 2 errors in empty disjunction:
+fail.cue.discBoth.discriminatorField.two: field not allowed:
+    ./cuetest/all.cue:14:51
+fail.cue.discBoth.discriminatorField.one: field not allowed:
+    ./cuetest/all.cue:14:43
+fail.cue."9_Uint".types.Uint: invalid value -34 (out of bound >=0):
+    ./cuetest/all.cue:59:30
 fail.cue."11_Int8".types.Int8: invalid value 99999 (out of bound <=127):
     ./cuetest/all.cue:61:30
 fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
     ./cuetest/all.cue:62:30
+fail.cue."18_IntListClosed2".types.IntListClosed2: incompatible list lengths (2 and 4):
+    ./cuetest/all.cue:69:38
 fail.cue."29_NullOrStruct".types.NullOrStruct: 2 errors in empty disjunction:
 fail.cue."29_NullOrStruct".types.NullOrStruct: conflicting values "foo" and null (mismatched types string and null):
     ./cuetest/all.cue:81:43
@@ -208,21 +220,6 @@ fail.cue."32_NullOrString".types.NullOrString: conflicting values 123 and null (
 fail.cue."32_NullOrString".types.NullOrString: conflicting values 123 and string (mismatched types int and string):
     ./cuetest/all.cue:84:43
     ./root/types.cue:36:30
-fail.cue."39_UniqueStrings".types.UniqueStrings: invalid value ["foo","foo"] (does not satisfy list.UniqueItems): equal value ("foo") at position 0 and 1:
-    ./cuetest/all.cue:25:55
-    ./root/types.cue:39:23
-fail.cue."9_Uint".types.Uint: invalid value -34 (out of bound >=0):
-    ./cuetest/all.cue:59:30
-fail.cue.discBoth.discriminatorField: 2 errors in empty disjunction:
-fail.cue.discBoth.discriminatorField.one: field not allowed:
-    ./cuetest/all.cue:14:43
-fail.cue.discBoth.discriminatorField.two: field not allowed:
-    ./cuetest/all.cue:14:51
-fail.cue.isNotEqual.mustEqual2: conflicting values 8 and 99:
-    ./cuetest/all.cue:11:37
-    ./cuetest/all.cue:11:52
-fail.cue."18_IntListClosed2".types.IntListClosed2: incompatible list lengths (2 and 4):
-    ./cuetest/all.cue:69:38
 fail.cue."34_NumericBounds".types.NumericBounds: invalid value 5555 (out of bound <100):
     ./root/types.cue:37:28
     ./cuetest/all.cue:86:43
@@ -231,6 +228,9 @@ fail.cue."36_NonEmptyString".types.NonEmptyString: invalid value "" (out of boun
     ./cuetest/all.cue:25:55
     ./cuetest/all.cue:88:43
     ./root/types.cue:38:23
+fail.cue."39_UniqueStrings".types.UniqueStrings: invalid value ["foo","foo"] (does not satisfy list.UniqueItems): equal value ("foo") at position 0 and 1:
+    ./cuetest/all.cue:25:55
+    ./root/types.cue:39:23
 -- go.mod --
 module "foo.test/bar"
 

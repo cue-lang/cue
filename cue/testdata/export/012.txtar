@@ -26,7 +26,7 @@ Disjuncts:    7
 (struct){
   a: ((int|string)){ |(*(string){ "foo" }, *(string){ "bar" }, *(string){ string }, (int){ int }) }
   b: (_|_){
-    // [incomplete] b: non-concrete slice subject a:
+    // [incomplete] b: unresolved disjunction *"foo" | *"bar" | *string | int (type (int|string)):
     //     ./in.cue:1:41
   }
 }

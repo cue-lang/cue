@@ -657,30 +657,6 @@ diff old new
 +++ new
 @@ -1,110 +1,106 @@
  Errors:
--simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
--    ./binarystring.cue:27:13
--    ./binarystring.cue:27:20
--simplifyBinary.byte.err1.p2: incompatible bytes bounds <'a' and >'b':
--    ./binarystring.cue:28:13
--    ./binarystring.cue:28:20
--simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
--    ./binarystring.cue:30:13
--    ./binarystring.cue:30:20
--simplifyBinary.byte.err2.p2: incompatible bytes bounds <='a' and >'b':
--    ./binarystring.cue:31:13
--    ./binarystring.cue:31:21
--simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
--    ./binarystring.cue:33:13
--    ./binarystring.cue:33:21
--simplifyBinary.byte.err3.p2: incompatible bytes bounds <'b' and >='b':
--    ./binarystring.cue:34:13
--    ./binarystring.cue:34:20
--simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
--    ./binarystring.cue:35:13
--    ./binarystring.cue:35:20
--simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
--    ./binarystring.cue:36:13
--    ./binarystring.cue:36:21
  simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
 -    ./binary.cue:2:13
      ./binary.cue:2:18
@@ -797,29 +773,37 @@ diff old new
 -    ./binarystring.cue:11:13
      ./binarystring.cue:11:21
 +    ./binarystring.cue:11:13
-+simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
-+    ./binarystring.cue:27:20
+ simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
+-    ./binarystring.cue:27:13
+     ./binarystring.cue:27:20
 +    ./binarystring.cue:27:13
-+simplifyBinary.byte.err1.p2: incompatible bytes bounds <'a' and >'b':
-+    ./binarystring.cue:28:20
+ simplifyBinary.byte.err1.p2: incompatible bytes bounds <'a' and >'b':
+-    ./binarystring.cue:28:13
+     ./binarystring.cue:28:20
 +    ./binarystring.cue:28:13
-+simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
-+    ./binarystring.cue:30:20
+ simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
+-    ./binarystring.cue:30:13
+     ./binarystring.cue:30:20
 +    ./binarystring.cue:30:13
-+simplifyBinary.byte.err2.p2: incompatible bytes bounds <='a' and >'b':
-+    ./binarystring.cue:31:21
+ simplifyBinary.byte.err2.p2: incompatible bytes bounds <='a' and >'b':
+-    ./binarystring.cue:31:13
+     ./binarystring.cue:31:21
 +    ./binarystring.cue:31:13
-+simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
-+    ./binarystring.cue:33:21
+ simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
+-    ./binarystring.cue:33:13
+     ./binarystring.cue:33:21
 +    ./binarystring.cue:33:13
-+simplifyBinary.byte.err3.p2: incompatible bytes bounds <'b' and >='b':
-+    ./binarystring.cue:34:20
+ simplifyBinary.byte.err3.p2: incompatible bytes bounds <'b' and >='b':
+-    ./binarystring.cue:34:13
+     ./binarystring.cue:34:20
 +    ./binarystring.cue:34:13
-+simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
-+    ./binarystring.cue:35:20
+ simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
+-    ./binarystring.cue:35:13
+     ./binarystring.cue:35:20
 +    ./binarystring.cue:35:13
-+simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
-+    ./binarystring.cue:36:21
+ simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
+-    ./binarystring.cue:36:13
+     ./binarystring.cue:36:21
 +    ./binarystring.cue:36:13
  simplifyExpr.e2: cannot use null for bound >:
      ./in.cue:62:8
@@ -1126,30 +1110,6 @@ diff old new
 simplifyBinary.integer.ok2.*: v3 indicates correct type.
 -- out/eval --
 Errors:
-simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
-    ./binarystring.cue:27:13
-    ./binarystring.cue:27:20
-simplifyBinary.byte.err1.p2: incompatible bytes bounds <'a' and >'b':
-    ./binarystring.cue:28:13
-    ./binarystring.cue:28:20
-simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
-    ./binarystring.cue:30:13
-    ./binarystring.cue:30:20
-simplifyBinary.byte.err2.p2: incompatible bytes bounds <='a' and >'b':
-    ./binarystring.cue:31:13
-    ./binarystring.cue:31:21
-simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
-    ./binarystring.cue:33:13
-    ./binarystring.cue:33:21
-simplifyBinary.byte.err3.p2: incompatible bytes bounds <'b' and >='b':
-    ./binarystring.cue:34:13
-    ./binarystring.cue:34:20
-simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
-    ./binarystring.cue:35:13
-    ./binarystring.cue:35:20
-simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
-    ./binarystring.cue:36:13
-    ./binarystring.cue:36:21
 simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
     ./binary.cue:2:13
     ./binary.cue:2:18
@@ -1232,6 +1192,30 @@ simplifyBinary.strings.err3.p3: incompatible string bounds <="b" and >"b":
 simplifyBinary.strings.err3.p4: incompatible string bounds <="b" and >"b":
     ./binarystring.cue:11:13
     ./binarystring.cue:11:21
+simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
+    ./binarystring.cue:27:13
+    ./binarystring.cue:27:20
+simplifyBinary.byte.err1.p2: incompatible bytes bounds <'a' and >'b':
+    ./binarystring.cue:28:13
+    ./binarystring.cue:28:20
+simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
+    ./binarystring.cue:30:13
+    ./binarystring.cue:30:20
+simplifyBinary.byte.err2.p2: incompatible bytes bounds <='a' and >'b':
+    ./binarystring.cue:31:13
+    ./binarystring.cue:31:21
+simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
+    ./binarystring.cue:33:13
+    ./binarystring.cue:33:21
+simplifyBinary.byte.err3.p2: incompatible bytes bounds <'b' and >='b':
+    ./binarystring.cue:34:13
+    ./binarystring.cue:34:20
+simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
+    ./binarystring.cue:35:13
+    ./binarystring.cue:35:20
+simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
+    ./binarystring.cue:36:13
+    ./binarystring.cue:36:21
 simplifyExpr.e2: cannot use null for bound >:
     ./in.cue:62:8
 

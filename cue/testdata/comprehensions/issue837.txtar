@@ -192,9 +192,9 @@ diff old new
 +++ new
 @@ -1,8 +1,4 @@
  Errors:
--#Configure.service.description.role: undefined field: role:
--    ./in.cue:40:19
 -#DoDeploy.deployment.description.service.description.role: undefined field: role:
+-    ./in.cue:40:19
+-#Configure.service.description.role: undefined field: role:
 -    ./in.cue:40:19
  #RelabelService.out.labstr: undefined field: label:
      ./in.cue:51:14
@@ -413,9 +413,9 @@ Conjuncts:    243
 Disjuncts:    170
 -- out/eval --
 Errors:
-#Configure.service.description.role: undefined field: role:
-    ./in.cue:40:19
 #DoDeploy.deployment.description.service.description.role: undefined field: role:
+    ./in.cue:40:19
+#Configure.service.description.role: undefined field: role:
     ./in.cue:40:19
 #RelabelService.out.labstr: undefined field: label:
     ./in.cue:51:14

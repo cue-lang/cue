@@ -158,15 +158,15 @@ Conjuncts:    66
 Disjuncts:    57
 -- out/evalalpha --
 Errors:
-issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
-    ./in.cue:61:8
-    ./in.cue:63:11
 wrongConcreteType: cannot use 2 (type int) as type bool:
     ./in.cue:4:2
     ./in.cue:1:8
 wrongType: cannot use int (type int) as type bool:
     ./in.cue:10:2
     ./in.cue:1:14
+issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+    ./in.cue:61:8
+    ./in.cue:63:11
 
 Result:
 (_|_){
@@ -241,22 +241,17 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,7 @@
- Errors:
--issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
--    ./in.cue:54:12
-+issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
-     ./in.cue:61:8
-+    ./in.cue:63:11
- wrongConcreteType: cannot use 2 (type int) as type bool:
-     ./in.cue:4:2
-     ./in.cue:1:8
-@@ -8,8 +8,6 @@
+@@ -5,11 +5,9 @@
  wrongType: cannot use int (type int) as type bool:
      ./in.cue:10:2
      ./in.cue:1:14
 -issue1972.err1: invalid list index someCondition (type string):
 -    ./in.cue:65:6
+-issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+-    ./in.cue:54:12
++issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+     ./in.cue:61:8
++    ./in.cue:63:11
  
  Result:
  (_|_){
@@ -264,12 +259,12 @@ diff old new
    issue1972: (_|_){
      // [eval]
      err1: (_|_){
--      // [eval] issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+-      // [eval] issue1972.err1: invalid list index someCondition (type string):
+-      //     ./in.cue:65:6
+-      // issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
 -      //     ./in.cue:54:12
 +      // [eval] issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
        //     ./in.cue:61:8
--      // issue1972.err1: invalid list index someCondition (type string):
--      //     ./in.cue:65:6
 -      #patchs: (#list){
 -      }
 -      someCondition: (_){ _ }
@@ -292,9 +287,6 @@ are already covered by the other error message and should be elided.
 This may lead to a large number of errors otherwise.
 -- out/eval --
 Errors:
-issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
-    ./in.cue:54:12
-    ./in.cue:61:8
 wrongConcreteType: cannot use 2 (type int) as type bool:
     ./in.cue:4:2
     ./in.cue:1:8
@@ -303,6 +295,9 @@ wrongType: cannot use int (type int) as type bool:
     ./in.cue:1:14
 issue1972.err1: invalid list index someCondition (type string):
     ./in.cue:65:6
+issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+    ./in.cue:54:12
+    ./in.cue:61:8
 
 Result:
 (_|_){
@@ -359,11 +354,11 @@ Result:
   issue1972: (_|_){
     // [eval]
     err1: (_|_){
-      // [eval] issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+      // [eval] issue1972.err1: invalid list index someCondition (type string):
+      //     ./in.cue:65:6
+      // issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
       //     ./in.cue:54:12
       //     ./in.cue:61:8
-      // issue1972.err1: invalid list index someCondition (type string):
-      //     ./in.cue:65:6
       #patchs: (#list){
       }
       someCondition: (_){ _ }

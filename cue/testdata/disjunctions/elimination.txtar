@@ -1659,36 +1659,11 @@ diff old new
 +++ new
 @@ -1,58 +1,4 @@
 -Errors:
--issue1417.ids.2: 2 errors in empty disjunction:
--issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
--issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
--issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
--    ./issue2209full.cue:43:7
--    ./issue2209full.cue:48:13
--    ./issue2209full.cue:67:10
--    ./issue2209full.cue:83:16
--    ./issue2209full.cue:87:13
--    ./issue2209full.cue:107:20
--issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
--issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
--    ./issue2209full.cue:43:7
--    ./issue2209full.cue:48:13
--    ./issue2209full.cue:55:16
--    ./issue2209full.cue:71:4
--    ./issue2209full.cue:72:13
--    ./issue2209full.cue:92:13
--issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
--    ./issue2209full.cue:43:7
--    ./issue2209full.cue:48:13
--    ./issue2209full.cue:67:10
--    ./issue2209full.cue:83:16
--    ./issue2209full.cue:92:13
--    ./issue2209full.cue:105:20
--issue3149.list.3.name: 2 errors in empty disjunction:
 -issue1417.ids.1: invalid value "ab" (out of bound !~"^a"):
 -    ./issue1417.cue:2:7
 -    ./issue1417.cue:4:11
 -    ./issue1417.cue:4:26
+-issue1417.ids.2: 2 errors in empty disjunction:
 -issue1417.ids.2: invalid value "aB" (out of bound !~"^a"):
 -    ./issue1417.cue:2:7
 -    ./issue1417.cue:4:11
@@ -1699,8 +1674,33 @@ diff old new
 -    ./issue1417.cue:4:32
 -issue2209.simplified.t3.BAZ: undefined field: y:
 -    ./issue2209full.cue:35:9
+-issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
+-issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
 -issue2209.full.Bar.resource.spec.minBar: undefined field: min:
 -    ./issue2209full.cue:77:25
+-issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
+-    ./issue2209full.cue:43:7
+-    ./issue2209full.cue:48:13
+-    ./issue2209full.cue:67:10
+-    ./issue2209full.cue:83:16
+-    ./issue2209full.cue:87:13
+-    ./issue2209full.cue:107:20
+-issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+-issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+-    ./issue2209full.cue:43:7
+-    ./issue2209full.cue:48:13
+-    ./issue2209full.cue:67:10
+-    ./issue2209full.cue:83:16
+-    ./issue2209full.cue:92:13
+-    ./issue2209full.cue:105:20
+-issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+-    ./issue2209full.cue:43:7
+-    ./issue2209full.cue:48:13
+-    ./issue2209full.cue:55:16
+-    ./issue2209full.cue:71:4
+-    ./issue2209full.cue:72:13
+-    ./issue2209full.cue:92:13
+-issue3149.list.3.name: 2 errors in empty disjunction:
 -issue3149.list.3.name: invalid value "an exception" (out of bound =~"^Foo"):
 -    ./issue3149.cue:3:13
 -    ./issue3149.cue:3:10
@@ -1979,6 +1979,8 @@ diff old new
 -          spec: (_|_){
 -            // [eval] issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
 -            // issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
+-            // issue2209.full.Bar.resource.spec.minBar: undefined field: min:
+-            //     ./issue2209full.cue:77:25
 -            // issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
 -            //     ./issue2209full.cue:43:7
 -            //     ./issue2209full.cue:48:13
@@ -1987,13 +1989,6 @@ diff old new
 -            //     ./issue2209full.cue:87:13
 -            //     ./issue2209full.cue:107:20
 -            // issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
--            // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
--            //     ./issue2209full.cue:43:7
--            //     ./issue2209full.cue:48:13
--            //     ./issue2209full.cue:55:16
--            //     ./issue2209full.cue:71:4
--            //     ./issue2209full.cue:72:13
--            //     ./issue2209full.cue:92:13
 -            // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
 -            //     ./issue2209full.cue:43:7
 -            //     ./issue2209full.cue:48:13
@@ -2001,17 +1996,15 @@ diff old new
 -            //     ./issue2209full.cue:83:16
 -            //     ./issue2209full.cue:92:13
 -            //     ./issue2209full.cue:105:20
--            // issue2209.full.Bar.resource.spec.minBar: undefined field: min:
--            //     ./issue2209full.cue:77:25
+-            // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+-            //     ./issue2209full.cue:43:7
+-            //     ./issue2209full.cue:48:13
+-            //     ./issue2209full.cue:55:16
+-            //     ./issue2209full.cue:71:4
+-            //     ./issue2209full.cue:72:13
+-            //     ./issue2209full.cue:92:13
 -            minFoo: (_|_){
 -              // [eval] issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
--              // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
--              //     ./issue2209full.cue:43:7
--              //     ./issue2209full.cue:48:13
--              //     ./issue2209full.cue:55:16
--              //     ./issue2209full.cue:71:4
--              //     ./issue2209full.cue:72:13
--              //     ./issue2209full.cue:92:13
 -              // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
 -              //     ./issue2209full.cue:43:7
 -              //     ./issue2209full.cue:48:13
@@ -2019,16 +2012,16 @@ diff old new
 -              //     ./issue2209full.cue:83:16
 -              //     ./issue2209full.cue:92:13
 -              //     ./issue2209full.cue:105:20
+-              // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+-              //     ./issue2209full.cue:43:7
+-              //     ./issue2209full.cue:48:13
+-              //     ./issue2209full.cue:55:16
+-              //     ./issue2209full.cue:71:4
+-              //     ./issue2209full.cue:72:13
+-              //     ./issue2209full.cue:92:13
 -            }
 -            maxFoo: (_|_){
 -              // [eval] issue2209.full.Bar.resource.spec.maxFoo: 2 errors in empty disjunction:
--              // issue2209.full.Bar.resource.spec.maxFoo: conflicting values null and 20 (mismatched types null and int):
--              //     ./issue2209full.cue:43:7
--              //     ./issue2209full.cue:48:13
--              //     ./issue2209full.cue:56:16
--              //     ./issue2209full.cue:71:4
--              //     ./issue2209full.cue:73:13
--              //     ./issue2209full.cue:93:13
 -              // issue2209.full.Bar.resource.spec.maxFoo: conflicting values null and int (mismatched types null and int):
 -              //     ./issue2209full.cue:43:7
 -              //     ./issue2209full.cue:48:13
@@ -2036,6 +2029,13 @@ diff old new
 -              //     ./issue2209full.cue:83:16
 -              //     ./issue2209full.cue:93:13
 -              //     ./issue2209full.cue:106:20
+-              // issue2209.full.Bar.resource.spec.maxFoo: conflicting values null and 20 (mismatched types null and int):
+-              //     ./issue2209full.cue:43:7
+-              //     ./issue2209full.cue:48:13
+-              //     ./issue2209full.cue:56:16
+-              //     ./issue2209full.cue:71:4
+-              //     ./issue2209full.cue:73:13
+-              //     ./issue2209full.cue:93:13
 -            }
 -            minBar: (_|_){
 -              // [eval] issue2209.full.Bar.resource.spec.minBar: undefined field: min:
@@ -2412,36 +2412,11 @@ issue3149: new evaluator fixes known bug
 issue770: new evaluator fixes a bug in "c" and "coo" where defaults did not apply correctly.
 -- out/eval --
 Errors:
-issue1417.ids.2: 2 errors in empty disjunction:
-issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
-issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
-issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
-    ./issue2209full.cue:43:7
-    ./issue2209full.cue:48:13
-    ./issue2209full.cue:67:10
-    ./issue2209full.cue:83:16
-    ./issue2209full.cue:87:13
-    ./issue2209full.cue:107:20
-issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
-issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
-    ./issue2209full.cue:43:7
-    ./issue2209full.cue:48:13
-    ./issue2209full.cue:55:16
-    ./issue2209full.cue:71:4
-    ./issue2209full.cue:72:13
-    ./issue2209full.cue:92:13
-issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
-    ./issue2209full.cue:43:7
-    ./issue2209full.cue:48:13
-    ./issue2209full.cue:67:10
-    ./issue2209full.cue:83:16
-    ./issue2209full.cue:92:13
-    ./issue2209full.cue:105:20
-issue3149.list.3.name: 2 errors in empty disjunction:
 issue1417.ids.1: invalid value "ab" (out of bound !~"^a"):
     ./issue1417.cue:2:7
     ./issue1417.cue:4:11
     ./issue1417.cue:4:26
+issue1417.ids.2: 2 errors in empty disjunction:
 issue1417.ids.2: invalid value "aB" (out of bound !~"^a"):
     ./issue1417.cue:2:7
     ./issue1417.cue:4:11
@@ -2452,8 +2427,33 @@ issue1417.ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
     ./issue1417.cue:4:32
 issue2209.simplified.t3.BAZ: undefined field: y:
     ./issue2209full.cue:35:9
+issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
+issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
 issue2209.full.Bar.resource.spec.minBar: undefined field: min:
     ./issue2209full.cue:77:25
+issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
+    ./issue2209full.cue:43:7
+    ./issue2209full.cue:48:13
+    ./issue2209full.cue:67:10
+    ./issue2209full.cue:83:16
+    ./issue2209full.cue:87:13
+    ./issue2209full.cue:107:20
+issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+    ./issue2209full.cue:43:7
+    ./issue2209full.cue:48:13
+    ./issue2209full.cue:67:10
+    ./issue2209full.cue:83:16
+    ./issue2209full.cue:92:13
+    ./issue2209full.cue:105:20
+issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+    ./issue2209full.cue:43:7
+    ./issue2209full.cue:48:13
+    ./issue2209full.cue:55:16
+    ./issue2209full.cue:71:4
+    ./issue2209full.cue:72:13
+    ./issue2209full.cue:92:13
+issue3149.list.3.name: 2 errors in empty disjunction:
 issue3149.list.3.name: invalid value "an exception" (out of bound =~"^Foo"):
     ./issue3149.cue:3:13
     ./issue3149.cue:3:10
@@ -3063,6 +3063,8 @@ Result:
           spec: (_|_){
             // [eval] issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
             // issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
+            // issue2209.full.Bar.resource.spec.minBar: undefined field: min:
+            //     ./issue2209full.cue:77:25
             // issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
             //     ./issue2209full.cue:43:7
             //     ./issue2209full.cue:48:13
@@ -3071,13 +3073,6 @@ Result:
             //     ./issue2209full.cue:87:13
             //     ./issue2209full.cue:107:20
             // issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
-            // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
-            //     ./issue2209full.cue:43:7
-            //     ./issue2209full.cue:48:13
-            //     ./issue2209full.cue:55:16
-            //     ./issue2209full.cue:71:4
-            //     ./issue2209full.cue:72:13
-            //     ./issue2209full.cue:92:13
             // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
             //     ./issue2209full.cue:43:7
             //     ./issue2209full.cue:48:13
@@ -3085,17 +3080,15 @@ Result:
             //     ./issue2209full.cue:83:16
             //     ./issue2209full.cue:92:13
             //     ./issue2209full.cue:105:20
-            // issue2209.full.Bar.resource.spec.minBar: undefined field: min:
-            //     ./issue2209full.cue:77:25
+            // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+            //     ./issue2209full.cue:43:7
+            //     ./issue2209full.cue:48:13
+            //     ./issue2209full.cue:55:16
+            //     ./issue2209full.cue:71:4
+            //     ./issue2209full.cue:72:13
+            //     ./issue2209full.cue:92:13
             minFoo: (_|_){
               // [eval] issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
-              // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
-              //     ./issue2209full.cue:43:7
-              //     ./issue2209full.cue:48:13
-              //     ./issue2209full.cue:55:16
-              //     ./issue2209full.cue:71:4
-              //     ./issue2209full.cue:72:13
-              //     ./issue2209full.cue:92:13
               // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
               //     ./issue2209full.cue:43:7
               //     ./issue2209full.cue:48:13
@@ -3103,16 +3096,16 @@ Result:
               //     ./issue2209full.cue:83:16
               //     ./issue2209full.cue:92:13
               //     ./issue2209full.cue:105:20
+              // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+              //     ./issue2209full.cue:43:7
+              //     ./issue2209full.cue:48:13
+              //     ./issue2209full.cue:55:16
+              //     ./issue2209full.cue:71:4
+              //     ./issue2209full.cue:72:13
+              //     ./issue2209full.cue:92:13
             }
             maxFoo: (_|_){
               // [eval] issue2209.full.Bar.resource.spec.maxFoo: 2 errors in empty disjunction:
-              // issue2209.full.Bar.resource.spec.maxFoo: conflicting values null and 20 (mismatched types null and int):
-              //     ./issue2209full.cue:43:7
-              //     ./issue2209full.cue:48:13
-              //     ./issue2209full.cue:56:16
-              //     ./issue2209full.cue:71:4
-              //     ./issue2209full.cue:73:13
-              //     ./issue2209full.cue:93:13
               // issue2209.full.Bar.resource.spec.maxFoo: conflicting values null and int (mismatched types null and int):
               //     ./issue2209full.cue:43:7
               //     ./issue2209full.cue:48:13
@@ -3120,6 +3113,13 @@ Result:
               //     ./issue2209full.cue:83:16
               //     ./issue2209full.cue:93:13
               //     ./issue2209full.cue:106:20
+              // issue2209.full.Bar.resource.spec.maxFoo: conflicting values null and 20 (mismatched types null and int):
+              //     ./issue2209full.cue:43:7
+              //     ./issue2209full.cue:48:13
+              //     ./issue2209full.cue:56:16
+              //     ./issue2209full.cue:71:4
+              //     ./issue2209full.cue:73:13
+              //     ./issue2209full.cue:93:13
             }
             minBar: (_|_){
               // [eval] issue2209.full.Bar.resource.spec.minBar: undefined field: min:

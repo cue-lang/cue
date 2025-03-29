@@ -25,9 +25,6 @@ t15: regexp.ReplaceAllLiteral(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from", "-${
 t16: regexp.ReplaceAllLiteral(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from", "-$1-$2-")
 -- out/regexp --
 Errors:
-t13: invalid value "invalid)" (does not satisfy regexp.Valid): error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`:
-    ./in.cue:15:6
-    ./in.cue:15:21
 t2: error in call to regexp.Find: no match:
     ./in.cue:4:6
 t4: error in call to regexp.FindAll: no match:
@@ -36,6 +33,9 @@ t7: error in call to regexp.FindAllSubmatch: no match:
     ./in.cue:9:6
 t11: error in call to regexp.FindAllNamedSubmatch: no match:
     ./in.cue:13:6
+t13: invalid value "invalid)" (does not satisfy regexp.Valid): error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`:
+    ./in.cue:15:6
+    ./in.cue:15:21
 
 Result:
 t1: "foo"

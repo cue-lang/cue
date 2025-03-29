@@ -79,21 +79,21 @@ fail: structOrderIrrelevant: [close({
 })]
 -- out/list-v3 --
 Errors:
+fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
+    ./in.cue:3:21
+    ./in.cue:44:8
+fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
+    ./in.cue:3:21
+    ./in.cue:45:11
 fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:48:16
 fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:52:18
-fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
-    ./in.cue:3:21
-    ./in.cue:44:8
 fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:72:30
-fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
-    ./in.cue:3:21
-    ./in.cue:45:11
 
 Result:
 import "list"
@@ -254,18 +254,18 @@ diff old new
  	// these values here via close(), which gives the same behaviour
 -- out/list --
 Errors:
-fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
-    ./in.cue:3:21
-    ./in.cue:48:16
 fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
     ./in.cue:3:21
     ./in.cue:44:8
-fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
-    ./in.cue:3:21
-    ./in.cue:72:30
 fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:45:11
+fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
+    ./in.cue:3:21
+    ./in.cue:48:16
+fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
+    ./in.cue:3:21
+    ./in.cue:72:30
 
 Result:
 import "list"

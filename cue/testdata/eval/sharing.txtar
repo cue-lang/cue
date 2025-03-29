@@ -191,10 +191,10 @@ Conjuncts:    401
 Disjuncts:    225
 -- out/evalalpha --
 Errors:
-shareCycle.t1.Y.x.x: structural cycle
 shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
     ./sharecycle.cue:8:6
     ./sharecycle.cue:9:5
+shareCycle.t1.Y.x.x: structural cycle
 shareCycle.t3.Y.x.x: structural cycle
 
 Result:
@@ -518,11 +518,12 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -3,8 +3,6 @@
+@@ -2,9 +2,7 @@
  shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
      ./sharecycle.cue:8:6
      ./sharecycle.cue:9:5
 -    ./sharecycle.cue:10:11
+ shareCycle.t1.Y.x.x: structural cycle
 -shareCycle.t2.Y.x.x: structural cycle
  shareCycle.t3.Y.x.x: structural cycle
  
@@ -801,11 +802,11 @@ diff old new
        }
 -- out/eval --
 Errors:
-shareCycle.t1.Y.x.x: structural cycle
 shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
     ./sharecycle.cue:8:6
     ./sharecycle.cue:9:5
     ./sharecycle.cue:10:11
+shareCycle.t1.Y.x.x: structural cycle
 shareCycle.t2.Y.x.x: structural cycle
 shareCycle.t3.Y.x.x: structural cycle
 

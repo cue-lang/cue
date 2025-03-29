@@ -126,10 +126,10 @@ Conjuncts:    41
 Disjuncts:    30
 -- out/evalalpha --
 Errors:
-#D4.env.b: field not allowed:
-    ./in.cue:27:7
 d1.env.c: field not allowed:
     ./in.cue:9:17
+#D4.env.b: field not allowed:
+    ./in.cue:27:7
 
 Result:
 (_|_){
@@ -189,19 +189,20 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,7 @@
+@@ -1,13 +1,8 @@
  Errors:
- #D4.env.b: field not allowed:
--    ./in.cue:26:7
-     ./in.cue:27:7
--    ./in.cue:30:6
  d1.env.c: field not allowed:
 -    ./in.cue:3:7
 -    ./in.cue:4:7
 -    ./in.cue:9:5
      ./in.cue:9:17
+ #D4.env.b: field not allowed:
+-    ./in.cue:26:7
+     ./in.cue:27:7
+-    ./in.cue:30:6
  
  Result:
+ (_|_){
 @@ -26,15 +21,12 @@
      // [eval]
      env: (_|_){
@@ -242,15 +243,15 @@ Missing positions
 Reordering
 -- out/eval --
 Errors:
-#D4.env.b: field not allowed:
-    ./in.cue:26:7
-    ./in.cue:27:7
-    ./in.cue:30:6
 d1.env.c: field not allowed:
     ./in.cue:3:7
     ./in.cue:4:7
     ./in.cue:9:5
     ./in.cue:9:17
+#D4.env.b: field not allowed:
+    ./in.cue:26:7
+    ./in.cue:27:7
+    ./in.cue:30:6
 
 Result:
 (_|_){

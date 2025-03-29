@@ -223,10 +223,6 @@ Conjuncts:    327
 Disjuncts:    202
 -- out/evalalpha --
 Errors:
-issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):
-    ./issue3474.cue:53:5
-    ./issue3474.cue:53:16
-    ./issue3474.cue:54:5
 callOfCallToValidator.e: cannot call previously called validator b:
     ./in.cue:94:5
 issue3418.t1: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
@@ -274,6 +270,10 @@ issue3474.topValidator.fail.A: invalid value 1 (out of bound >10):
 issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
     ./issue3474.cue:53:5
     ./issue3474.cue:53:12
+    ./issue3474.cue:54:5
+issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):
+    ./issue3474.cue:53:5
+    ./issue3474.cue:53:16
     ./issue3474.cue:54:5
 issue3474.topValidator.failType.A: invalid operands {C:1} and 10 to '>' (type _|_ and int):
     ./issue3474.cue:53:16
@@ -489,13 +489,13 @@ Result:
       failType: (_|_){
         // [eval]
         A: (_|_){
-          // [eval] issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):
-          //     ./issue3474.cue:53:5
-          //     ./issue3474.cue:53:16
-          //     ./issue3474.cue:54:5
-          // issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
+          // [eval] issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
           //     ./issue3474.cue:53:5
           //     ./issue3474.cue:53:12
+          //     ./issue3474.cue:54:5
+          // issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):
+          //     ./issue3474.cue:53:5
+          //     ./issue3474.cue:53:16
           //     ./issue3474.cue:54:5
           // issue3474.topValidator.failType.A: invalid operands {C:1} and 10 to '>' (type _|_ and int):
           //     ./issue3474.cue:53:16
@@ -552,7 +552,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -31,7 +31,7 @@
+@@ -27,7 +27,7 @@
      ./issue3418.cue:10:16
      ./issue3418.cue:10:18
      ./issue3418.cue:11:5
@@ -563,7 +563,7 @@ diff old new
      ./issue3474.cue:13:5
 @@ -51,6 +51,11 @@
      ./issue3474.cue:53:5
-     ./issue3474.cue:53:12
+     ./issue3474.cue:53:16
      ./issue3474.cue:54:5
 +issue3474.topValidator.failType.A: invalid operands {C:1} and 10 to '>' (type _|_ and int):
 +    ./issue3474.cue:53:16
@@ -597,7 +597,7 @@ diff old new
            //     ./issue3474.cue:13:5
 @@ -270,6 +273,11 @@
            //     ./issue3474.cue:53:5
-           //     ./issue3474.cue:53:12
+           //     ./issue3474.cue:53:16
            //     ./issue3474.cue:54:5
 +          // issue3474.topValidator.failType.A: invalid operands {C:1} and 10 to '>' (type _|_ and int):
 +          //     ./issue3474.cue:53:16
@@ -642,10 +642,6 @@ diff old new
    }
 -- out/eval --
 Errors:
-issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):
-    ./issue3474.cue:53:5
-    ./issue3474.cue:53:16
-    ./issue3474.cue:54:5
 callOfCallToValidator.e: cannot call previously called validator b:
     ./in.cue:94:5
 issue3418.t1: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
@@ -693,6 +689,10 @@ issue3474.topValidator.fail.A: invalid value 1 (out of bound >10):
 issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
     ./issue3474.cue:53:5
     ./issue3474.cue:53:12
+    ./issue3474.cue:54:5
+issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):
+    ./issue3474.cue:53:5
+    ./issue3474.cue:53:16
     ./issue3474.cue:54:5
 
 Result:
@@ -905,13 +905,13 @@ Result:
       failType: (_|_){
         // [eval]
         A: (_|_){
-          // [eval] issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):
-          //     ./issue3474.cue:53:5
-          //     ./issue3474.cue:53:16
-          //     ./issue3474.cue:54:5
-          // issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
+          // [eval] issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
           //     ./issue3474.cue:53:5
           //     ./issue3474.cue:53:12
+          //     ./issue3474.cue:54:5
+          // issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):
+          //     ./issue3474.cue:53:5
+          //     ./issue3474.cue:53:16
           //     ./issue3474.cue:54:5
           C: (int){ 1 }
         }

@@ -75,10 +75,10 @@ Conjuncts:    29
 Disjuncts:    21
 -- out/evalalpha --
 Errors:
-V.b.extra: field not allowed:
-    ./in.cue:11:5
 V.c.e: field not allowed:
     ./in.cue:10:5
+V.b.extra: field not allowed:
+    ./in.cue:11:5
 
 Result:
 (_|_){
@@ -129,16 +129,16 @@ diff old new
 +++ new
 @@ -1,13 +1,7 @@
  Errors:
- V.b.extra: field not allowed:
--    ./in.cue:6:10
--    ./in.cue:7:5
--    ./in.cue:9:4
-     ./in.cue:11:5
  V.c.e: field not allowed:
 -    ./in.cue:3:2
 -    ./in.cue:4:6
 -    ./in.cue:9:4
      ./in.cue:10:5
+ V.b.extra: field not allowed:
+-    ./in.cue:6:10
+-    ./in.cue:7:5
+-    ./in.cue:9:4
+     ./in.cue:11:5
  
  Result:
 @@ -29,33 +23,27 @@
@@ -188,16 +188,16 @@ Positions.
 Reordering.
 -- out/eval --
 Errors:
-V.b.extra: field not allowed:
-    ./in.cue:6:10
-    ./in.cue:7:5
-    ./in.cue:9:4
-    ./in.cue:11:5
 V.c.e: field not allowed:
     ./in.cue:3:2
     ./in.cue:4:6
     ./in.cue:9:4
     ./in.cue:10:5
+V.b.extra: field not allowed:
+    ./in.cue:6:10
+    ./in.cue:7:5
+    ./in.cue:9:4
+    ./in.cue:11:5
 
 Result:
 (_|_){

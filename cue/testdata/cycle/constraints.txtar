@@ -588,15 +588,15 @@ Conjuncts:    399
 Disjuncts:    213
 -- out/evalalpha --
 Errors:
-brokenRing.t1.p1.T.b: structural cycle
-cyclicRing.t1.T.b: structural cycle
-mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b: structural cycle
 noCancelSelfInvoke.t1.x.c.b.b: structural cycle
 noCancelSelfInvoke.t1.x.c.c: structural cycle
-selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
-selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
 selfTriggerCycle.t1.#T.b.b: structural cycle
 selfTriggerCycle.t2.b.c.a: structural cycle
+selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
+selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
+mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b: structural cycle
+brokenRing.t1.p1.T.b: structural cycle
+cyclicRing.t1.T.b: structural cycle
 
 Result:
 (_|_){
@@ -1015,22 +1015,23 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,11 @@
+@@ -1,13 +1,12 @@
  Errors:
++noCancelSelfInvoke.t1.x.c.b.b: structural cycle
+ noCancelSelfInvoke.t1.x.c.c: structural cycle
+-noCancelSelfInvoke.t1.x.c.b.b.b: structural cycle
+ selfTriggerCycle.t1.#T.b.b: structural cycle
+ selfTriggerCycle.t2.b.c.a: structural cycle
+-selfTriggerCycle.long1.a.c.b.c.b.c.b.c.b: structural cycle
++selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
+ selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
+-mutuallyTriggeringCycle.t1.x.c.b.b.b.b: structural cycle
++mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b: structural cycle
  brokenRing.t1.p1.T.b: structural cycle
 -cyclicRing.t1.D.a.b: structural cycle
  cyclicRing.t1.T.b: structural cycle
--mutuallyTriggeringCycle.t1.x.c.b.b.b.b: structural cycle
--noCancelSelfInvoke.t1.x.c.b.b.b: structural cycle
-+mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b: structural cycle
-+noCancelSelfInvoke.t1.x.c.b.b: structural cycle
- noCancelSelfInvoke.t1.x.c.c: structural cycle
- selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
--selfTriggerCycle.long1.a.c.b.c.b.c.b.c.b: structural cycle
-+selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
- selfTriggerCycle.t1.#T.b.b: structural cycle
- selfTriggerCycle.t2.b.c.a: structural cycle
  
+ Result:
 @@ -152,18 +151,10 @@
        #D: (#struct){
        }
@@ -1205,16 +1206,16 @@ diff old new
 selfTriggerCycle.t1.a.b.b: cycle detected slightly too late
 -- out/eval --
 Errors:
+noCancelSelfInvoke.t1.x.c.c: structural cycle
+noCancelSelfInvoke.t1.x.c.b.b.b: structural cycle
+selfTriggerCycle.t1.#T.b.b: structural cycle
+selfTriggerCycle.t2.b.c.a: structural cycle
+selfTriggerCycle.long1.a.c.b.c.b.c.b.c.b: structural cycle
+selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
+mutuallyTriggeringCycle.t1.x.c.b.b.b.b: structural cycle
 brokenRing.t1.p1.T.b: structural cycle
 cyclicRing.t1.D.a.b: structural cycle
 cyclicRing.t1.T.b: structural cycle
-mutuallyTriggeringCycle.t1.x.c.b.b.b.b: structural cycle
-noCancelSelfInvoke.t1.x.c.b.b.b: structural cycle
-noCancelSelfInvoke.t1.x.c.c: structural cycle
-selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
-selfTriggerCycle.long1.a.c.b.c.b.c.b.c.b: structural cycle
-selfTriggerCycle.t1.#T.b.b: structural cycle
-selfTriggerCycle.t2.b.c.a: structural cycle
 
 Result:
 (_|_){

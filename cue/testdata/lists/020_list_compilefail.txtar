@@ -15,10 +15,10 @@ l3: invalid operand <=2 ('*' requires concrete value):
     ./in.cue:1:5
 l4: invalid operand <=2 ('*' requires concrete value):
     ./in.cue:2:5
-l5: invalid operand <=2 ('*' requires concrete value):
-    ./in.cue:3:5
 l5: invalid operand int ('*' requires concrete value):
     ./in.cue:3:12
+l5: invalid operand <=2 ('*' requires concrete value):
+    ./in.cue:3:5
 b: invalid operand <=5 ('*' requires concrete value):
     ./in.cue:4:5
 d: invalid operand >=2 ('*' requires concrete value):
@@ -62,10 +62,10 @@ l3: invalid operand <=2 ('*' requires concrete value):
     ./in.cue:1:5
 l4: invalid operand <=2 ('*' requires concrete value):
     ./in.cue:2:5
-l5: invalid operand <=2 ('*' requires concrete value):
-    ./in.cue:3:5
 l5: invalid operand int ('*' requires concrete value):
     ./in.cue:3:12
+l5: invalid operand <=2 ('*' requires concrete value):
+    ./in.cue:3:5
 b: invalid operand <=5 ('*' requires concrete value):
     ./in.cue:4:5
 d: invalid operand >=2 ('*' requires concrete value):

@@ -183,12 +183,12 @@ Conjuncts:    639
 Disjuncts:    297
 -- out/evalalpha --
 Errors:
-issue3670.a.not_int: field not allowed:
-    ./intpattern.cue:4:5
 t1.c.z: field not allowed:
     ./in.cue:19:11
 t2.c.z: field not allowed:
     ./in.cue:27:11
+issue3670.a.not_int: field not allowed:
+    ./intpattern.cue:4:5
 
 Result:
 (_|_){
@@ -440,10 +440,6 @@ diff old new
 +++ new
 @@ -1,34 +1,10 @@
  Errors:
- issue3670.a.not_int: field not allowed:
--    ./intpattern.cue:2:6
--    ./intpattern.cue:3:5
-     ./intpattern.cue:4:5
  t1.c.z: field not allowed:
 -    ./in.cue:15:6
 -    ./in.cue:19:5
@@ -452,6 +448,10 @@ diff old new
 -    ./in.cue:23:6
 -    ./in.cue:27:5
      ./in.cue:27:11
+ issue3670.a.not_int: field not allowed:
+-    ./intpattern.cue:2:6
+-    ./intpattern.cue:3:5
+     ./intpattern.cue:4:5
 -patternCycle.issue2109.p1.countries: cyclic pattern constraint:
 -    ./issue2109.cue:11:15
 -    ./issue2109.cue:10:13
@@ -826,10 +826,6 @@ a disjunction that should have already been disambiguated.
 In V3, the disjunction is properly disambiguated.
 -- out/eval --
 Errors:
-issue3670.a.not_int: field not allowed:
-    ./intpattern.cue:2:6
-    ./intpattern.cue:3:5
-    ./intpattern.cue:4:5
 t1.c.z: field not allowed:
     ./in.cue:15:6
     ./in.cue:19:5
@@ -838,6 +834,10 @@ t2.c.z: field not allowed:
     ./in.cue:23:6
     ./in.cue:27:5
     ./in.cue:27:11
+issue3670.a.not_int: field not allowed:
+    ./intpattern.cue:2:6
+    ./intpattern.cue:3:5
+    ./intpattern.cue:4:5
 patternCycle.issue2109.p1.countries: cyclic pattern constraint:
     ./issue2109.cue:11:15
     ./issue2109.cue:10:13

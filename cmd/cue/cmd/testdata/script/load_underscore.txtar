@@ -8,7 +8,7 @@ cmp stderr want-stderr
 ! exec cue export other.example/m:_
 cmp stderr want-stderr-2
 -- want-stderr --
-test.example/foo/foo@v0: import failed: _ is not a valid import path qualifier in "other.example/m:_":
+test.example/foo/foo@v0: import failed: cannot find package "other.example/m": _ is not a valid import path qualifier in "other.example/m:_":
     ./foo/foo.cue:8:8
 -- want-stderr-2 --
 invalid import path qualifier _ in "other.example/m:_"

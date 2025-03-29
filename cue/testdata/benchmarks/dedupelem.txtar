@@ -66,30 +66,33 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,10 +1,4 @@
+@@ -1,13 +1,7 @@
  Errors:
 -foo.0: 2 errors in empty disjunction:
+ foo.0.type: conflicting values "string" and "float":
+     ./in.cue:5:14
+     ./in.cue:10:14
 -foo.0.type: conflicting values "int" and "float":
 -    ./in.cue:3:16
 -    ./in.cue:5:14
 -    ./in.cue:5:27
 -    ./in.cue:5:30
- foo.0.type: conflicting values "string" and "float":
-     ./in.cue:5:14
-     ./in.cue:10:14
+ 
+ Result:
+ (_|_){
 @@ -22,15 +16,7 @@
    foo: (_|_){
      // [eval]
      0: (_|_){
 -      // [eval] foo.0: 2 errors in empty disjunction:
+-      // foo.0.type: conflicting values "string" and "float":
+-      //     ./in.cue:5:14
+-      //     ./in.cue:10:14
 -      // foo.0.type: conflicting values "int" and "float":
 -      //     ./in.cue:3:16
 -      //     ./in.cue:5:14
 -      //     ./in.cue:5:27
 -      //     ./in.cue:5:30
--      // foo.0.type: conflicting values "string" and "float":
--      //     ./in.cue:5:14
--      //     ./in.cue:10:14
 +      // [eval]
        type: (_|_){
          // [eval] foo.0.type: conflicting values "string" and "float":
@@ -99,14 +102,14 @@ Improved and simplified error message which can be detected before disjunction.
 -- out/eval --
 Errors:
 foo.0: 2 errors in empty disjunction:
+foo.0.type: conflicting values "string" and "float":
+    ./in.cue:5:14
+    ./in.cue:10:14
 foo.0.type: conflicting values "int" and "float":
     ./in.cue:3:16
     ./in.cue:5:14
     ./in.cue:5:27
     ./in.cue:5:30
-foo.0.type: conflicting values "string" and "float":
-    ./in.cue:5:14
-    ./in.cue:10:14
 
 Result:
 (_|_){
@@ -122,14 +125,14 @@ Result:
     // [eval]
     0: (_|_){
       // [eval] foo.0: 2 errors in empty disjunction:
+      // foo.0.type: conflicting values "string" and "float":
+      //     ./in.cue:5:14
+      //     ./in.cue:10:14
       // foo.0.type: conflicting values "int" and "float":
       //     ./in.cue:3:16
       //     ./in.cue:5:14
       //     ./in.cue:5:27
       //     ./in.cue:5:30
-      // foo.0.type: conflicting values "string" and "float":
-      //     ./in.cue:5:14
-      //     ./in.cue:10:14
       type: (_|_){
         // [eval] foo.0.type: conflicting values "string" and "float":
         //     ./in.cue:5:14

@@ -85,10 +85,10 @@ Conjuncts:    124
 Disjuncts:    69
 -- out/evalalpha --
 Errors:
-reclose1.z.d: field not allowed:
-    ./in.cue:34:5
 recloseSimple.a.b: field not allowed:
     ./in.cue:17:15
+reclose1.z.d: field not allowed:
+    ./in.cue:34:5
 
 Result:
 (_|_){
@@ -190,15 +190,15 @@ diff old new
 +++ new
 @@ -1,12 +1,7 @@
  Errors:
- reclose1.z.d: field not allowed:
--    ./in.cue:28:6
--    ./in.cue:33:5
-     ./in.cue:34:5
  recloseSimple.a.b: field not allowed:
 -    ./in.cue:16:8
 -    ./in.cue:17:5
 -    ./in.cue:17:6
      ./in.cue:17:15
+ reclose1.z.d: field not allowed:
+-    ./in.cue:28:6
+-    ./in.cue:33:5
+     ./in.cue:34:5
  
  Result:
 @@ -20,9 +15,7 @@
@@ -286,15 +286,15 @@ Reordering
 Missing error positions
 -- out/eval --
 Errors:
-reclose1.z.d: field not allowed:
-    ./in.cue:28:6
-    ./in.cue:33:5
-    ./in.cue:34:5
 recloseSimple.a.b: field not allowed:
     ./in.cue:16:8
     ./in.cue:17:5
     ./in.cue:17:6
     ./in.cue:17:15
+reclose1.z.d: field not allowed:
+    ./in.cue:28:6
+    ./in.cue:33:5
+    ./in.cue:34:5
 
 Result:
 (_|_){

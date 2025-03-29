@@ -596,10 +596,10 @@ Disjuncts:    302
       }
     }
     doubleAddfail: (_|_){
-      // [incomplete] nestedChain.doubleAddfail.#E.y: cyclic reference to field y:
-      //     ./nestedchain.cue:25:3
-      // nestedChain.doubleAddfail.#E.x: cyclic reference to field x:
+      // [incomplete] nestedChain.doubleAddfail.#E.x: cyclic reference to field x:
       //     ./nestedchain.cue:28:3
+      // nestedChain.doubleAddfail.#E.y: cyclic reference to field y:
+      //     ./nestedchain.cue:25:3
       #E: (#struct){
       }
     }
@@ -715,10 +715,10 @@ diff old new
      doubleAddfail: (_|_){
 -      // [cycle] nestedChain.doubleAddfail: cycle with field #E.y:
 -      //     ./nestedchain.cue:28:6
-+      // [incomplete] nestedChain.doubleAddfail.#E.y: cyclic reference to field y:
-+      //     ./nestedchain.cue:25:3
-+      // nestedChain.doubleAddfail.#E.x: cyclic reference to field x:
++      // [incomplete] nestedChain.doubleAddfail.#E.x: cyclic reference to field x:
 +      //     ./nestedchain.cue:28:3
++      // nestedChain.doubleAddfail.#E.y: cyclic reference to field y:
++      //     ./nestedchain.cue:25:3
 +      #E: (#struct){
 +      }
      }

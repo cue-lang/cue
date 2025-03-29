@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa715ccc_bc2bdfde",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-29T15:17:44Z",
+      "side": 1,
+      "message": "SGTM, but note that the entire wording around EvalDefault and EvalExperiment is entirely wrong. EvalDefault being v2 is wrong, and EvalExperiment being v3 is at least misleading. See https://review.gerrithub.io/c/cue-lang/cue/+/1208335 for example.\n\nI\u0027ll make a note to discuss this with Marcel as a v0.13.0 blocker.",
+      "revId": "f892df67299d59e03369f388519a4659d6fdefa8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

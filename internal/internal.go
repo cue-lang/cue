@@ -118,6 +118,12 @@ const (
 	// EvalVersionUnset is the zero value, which signals that no evaluator version is provided.
 	EvalVersionUnset EvaluatorVersion = 0
 
+	// DefaultVersion is a special value as it selects a version depending on the current
+	// value of CUE_EXPERIMENT. It exists separately to [EvalVersionUnset], even though both
+	// implement the same version selection logic, so that we can distinguish between
+	// a user explicitly asking for the default version versus an entirely unset version.
+	DefaultVersion EvaluatorVersion = -1 // TODO(mvdan): rename to EvalDefault for consistency with cuecontext
+
 	// The values below are documented under [cuelang.org/go/cue/cuecontext.EvalVersion].
 	// We should never change or delete the values below, as they describe all known past versions
 	// which is useful for understanding old debug output.
@@ -125,10 +131,10 @@ const (
 	EvalV2 EvaluatorVersion = 2
 	EvalV3 EvaluatorVersion = 3
 
-	// The current default and experimental versions.
+	// The current default, stable, and experimental versions.
 
-	DefaultVersion = EvalV2 // TODO(mvdan): rename to EvalDefault for consistency with cuecontext
-	DevVersion     = EvalV3 // TODO(mvdan): rename to EvalExperiment for consistency with cuecontext
+	StableVersion = EvalV3 // TODO(mvdan): rename to EvalStable for consistency with cuecontext
+	DevVersion    = EvalV3 // TODO(mvdan): rename to EvalExperiment for consistency with cuecontext
 )
 
 // ListEllipsis reports the list type and remaining elements of a list. If we

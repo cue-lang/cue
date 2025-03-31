@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "50917d1d_e85a56f2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-31T12:53:41Z",
+      "side": 1,
+      "message": "As discussed, and FTR, I\u0027m not a fan of the Default const when it can be impacted by env vars. I think I\u0027d prefer it to be gone, or at least to reflect the dynamic value of the env var. But I accept this is not a new feature and we can\u0027t remove it in a hurry right now.",
+      "revId": "bd817c9c1b50d436c16af3e5ef8e114db50df092",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "517c6ff2_8985ca66",

@@ -14,6 +14,8 @@
 
 package adt
 
+import "slices"
+
 // # Overview
 //
 // This files contains the disjunction algorithm of the CUE evaluator. It works
@@ -249,7 +251,11 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 
 	// TODO(perf): check scalar errors so far to avoid unnecessary work.
 
-	a := n.disjunctions
+	// TODO: during processing disjunctions, new disjunctions may be added.
+	// We copy the slice to prevent the original slice from being overwritten.
+	// TODO(perf): use some pre-existing buffer or use a persising position
+	// so that disjunctions can be processed incrementally.
+	a := slices.Clone(n.disjunctions)
 	n.disjunctions = n.disjunctions[:0]
 
 	if !initArcs(n.ctx, n.node) {
@@ -374,13 +380,7 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 
 // crossProduct computes the cross product of the disjuncts of a disjunction
 // with an existing set of results.
-func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dnp *envDisjunct, mode runMode) []*nodeContext {
-
-	// TODO: the envDisjunct may be overwritten with recursive calls to
-	// disjunction processing. Investigate why this is. For now we copy the
-	// value to make its state effectively immutable.
-	dn := *dnp
-
+func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, mode runMode) []*nodeContext {
 	defer n.unmarkDepth(n.markDepth())
 	defer n.unmarkOptional(n.markOptional())
 
@@ -759,9 +759,9 @@ func isEqualNodeValue(x, y *nodeContext) bool {
 	if xk != yk {
 		return false
 	}
-	if x.hasTop != y.hasTop {
-		return false
-	}
+	// if x.hasTop != y.hasTop {
+	// 	return false
+	// }
 	if !isEqualValue(x.ctx, x.scalar, y.scalar) {
 		return false
 	}

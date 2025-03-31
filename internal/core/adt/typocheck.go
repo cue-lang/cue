@@ -288,6 +288,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 		// This is the case, for instance, if a resolver resolves to a
 		// non-definition.
 		ignore = true
+		id.FromDef = false
 	case id.enclosingEmbed != 0 || id.outerID == 0:
 		// We have a reference within an inner embedding group. If this is
 		// a definition, or otherwise typo checked struct, we need to track

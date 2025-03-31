@@ -3457,8 +3457,8 @@ Result:
             }
           }
           ok: (#struct){
-            x: (#struct){
-              y: (#struct){
+            x: (struct){
+              y: (struct){
                 k: (int){ 3 }
               }
             }
@@ -3500,8 +3500,8 @@ Result:
             }
           }
           ok: (#struct){
-            x: (#struct){
-              y: (#struct){
+            x: (struct){
+              y: (struct){
                 k: (int){ 3 }
               }
             }
@@ -3510,8 +3510,8 @@ Result:
         p3: (_|_){
           // [eval]
           X: (#struct){
-            x: (#struct){
-              y: (#struct){
+            x: (struct){
+              y: (struct){
               }
             }
           }
@@ -3542,8 +3542,8 @@ Result:
             }
           }
           ok: (#struct){
-            x: (#struct){
-              y: (#struct){
+            x: (struct){
+              y: (struct){
                 k: (int){ 3 }
               }
             }
@@ -3590,8 +3590,8 @@ Result:
             }
           }
           ok: (#struct){
-            x: (#struct){
-              y: (#struct){
+            x: (struct){
+              y: (struct){
                 k: (int){ 3 }
               }
             }
@@ -5104,16 +5104,46 @@ diff old new
                    //     ./embed.cue:331:16
                  }
                }
-@@ -1206,12 +766,7 @@
-               }
+@@ -1191,27 +751,22 @@
              }
            }
+           ok: (#struct){
+-            x: (#struct){
+-              y: (#struct){
+-                k: (int){ 3 }
+-              }
+-            }
+-          }
+-        }
+-        p2: (_|_){
+-          // [eval]
+-          #a: (#struct){
+-            x: (#struct){
+-              y: (#struct){
+-              }
+-            }
+-          }
 -          X: (#struct){
 -            x: (#struct){
 -              y: (#struct){
 -              }
 -            }
 -          }
++            x: (struct){
++              y: (struct){
++                k: (int){ 3 }
++              }
++            }
++          }
++        }
++        p2: (_|_){
++          // [eval]
++          #a: (#struct){
++            x: (#struct){
++              y: (#struct){
++              }
++            }
++          }
 +          X: ~(patterns.nested.indirect.p2.#a)
            err1: (_|_){
              // [eval]
@@ -5140,6 +5170,37 @@ diff old new
                    //     ./embed.cue:345:16
                  }
                }
+@@ -1247,18 +794,18 @@
+             }
+           }
+           ok: (#struct){
+-            x: (#struct){
+-              y: (#struct){
+-                k: (int){ 3 }
+-              }
+-            }
+-          }
+-        }
+-        p3: (_|_){
+-          // [eval]
+-          X: (#struct){
+-            x: (#struct){
+-              y: (#struct){
++            x: (struct){
++              y: (struct){
++                k: (int){ 3 }
++              }
++            }
++          }
++        }
++        p3: (_|_){
++          // [eval]
++          X: (#struct){
++            x: (struct){
++              y: (struct){
+               }
+             }
+           }
 @@ -1270,10 +817,6 @@
                  // [eval]
                  j: (_|_){
@@ -5162,6 +5223,17 @@ diff old new
                    //     ./embed.cue:358:16
                  }
                }
+@@ -1297,8 +836,8 @@
+             }
+           }
+           ok: (#struct){
+-            x: (#struct){
+-              y: (#struct){
++            x: (struct){
++              y: (struct){
+                 k: (int){ 3 }
+               }
+             }
 @@ -1326,10 +865,6 @@
                  // [eval]
                  j: (_|_){
@@ -5184,6 +5256,17 @@ diff old new
                    //     ./embed.cue:373:16
                  }
                }
+@@ -1353,8 +884,8 @@
+             }
+           }
+           ok: (#struct){
+-            x: (#struct){
+-              y: (#struct){
++            x: (struct){
++              y: (struct){
+                 k: (int){ 3 }
+               }
+             }
 @@ -1369,8 +900,8 @@
    #A: (#struct){
      b: (int){ int }

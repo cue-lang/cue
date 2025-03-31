@@ -569,7 +569,7 @@ Result:
   issue1881: (struct){
     p1: (struct){
       o: (#struct){
-        retry: (#struct){
+        retry: (struct){
           output: (#struct){
             reject: (string){ "ok" }
           }
@@ -605,7 +605,7 @@ Result:
         }
       }
       o: (#struct){
-        retry: (#struct){
+        retry: (struct){
           output: (#struct){
             reject: (string){ "ok" }
           }
@@ -635,7 +635,7 @@ Result:
           resource: (string){ string }
         }) }
       o: (#struct){
-        retry: (#struct){
+        retry: (struct){
           output: (#struct){
             reject: (string){ "ok" }
           }
@@ -786,6 +786,33 @@ diff old new
        }
      }
      acrossOr: (struct){
+@@ -254,7 +247,7 @@
+   issue1881: (struct){
+     p1: (struct){
+       o: (#struct){
+-        retry: (#struct){
++        retry: (struct){
+           output: (#struct){
+             reject: (string){ "ok" }
+           }
+@@ -290,7 +283,7 @@
+         }
+       }
+       o: (#struct){
+-        retry: (#struct){
++        retry: (struct){
+           output: (#struct){
+             reject: (string){ "ok" }
+           }
+@@ -320,7 +313,7 @@
+           resource: (string){ string }
+         }) }
+       o: (#struct){
+-        retry: (#struct){
++        retry: (struct){
+           output: (#struct){
+             reject: (string){ "ok" }
+           }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old

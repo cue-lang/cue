@@ -32,6 +32,48 @@ Retain: 10
 Unifications: 31
 Conjuncts:    57
 Disjuncts:    38
+-- out/evalalpha --
+(struct){
+  reduced: (struct){
+    A: (struct){
+      b: (int){ 1 }
+      c: (struct){
+        x: (int){ 1 }
+      }
+    }
+  }
+  full: (struct){
+    out: (#struct){
+      uses: (string){ "actions/upload-artifact@v3" }
+      with: (struct){
+        name: (string){ "foo" }
+        path: (string){ "bar" }
+      }
+    }
+    #Workflow: (#struct){
+      #Step: (#struct){
+        uses?: (string){ string }
+        with?: (#struct){
+        }
+      }
+      steps: (#struct){
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -10,7 +10,7 @@
+   full: (struct){
+     out: (#struct){
+       uses: (string){ "actions/upload-artifact@v3" }
+-      with: (#struct){
++      with: (struct){
+         name: (string){ "foo" }
+         path: (string){ "bar" }
+       }
 -- out/eval --
 (struct){
   reduced: (struct){

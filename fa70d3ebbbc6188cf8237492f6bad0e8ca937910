@@ -16,6 +16,24 @@
       "message": "SGTM; no tests because the original test for #3857 still works here? or should we be adding another test case here?",
       "revId": "fa70d3ebbbc6188cf8237492f6bad0e8ca937910",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e6aa086_60b5001e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-31T12:37:21Z",
+      "side": 1,
+      "message": "The original tests still work. I removed the old fix to \"reexpose\" the issue.\n\nIt would take some considerable effort to construct a test case to reproduce further issues, so I didn\u0027t want to go there per se. Better to put that effort into a good fuzzing architecture down the line.",
+      "parentUuid": "eb1028aa_60235fbd",
+      "revId": "fa70d3ebbbc6188cf8237492f6bad0e8ca937910",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -31,20 +31,36 @@ embed: andEmbed: {
 	#D: {#A & #B}
 	d: #D & {err: 3}
 }
-and: transitive: {
+and: transitive: ok: {
 	Z: a: string
 	#Y: Z
 	#X: #Y & Z
 	out: #X & {
-		ok: "foo"
+		a: "foo"
 	}
 }
-and: transitiveWithEmbed: {
+and: transitive: err: {
+	Z: a: string
+	#Y: Z
+	#X: #Y & Z
+	out: #X & {
+		err: "foo"
+	}
+}
+and: transitiveWithEmbed: ok: {
 	Z: a: string
 	#X: #Y & Z
 	#Y: {Z}
 	out: #X & {
-		ok: "foo"
+		a: "foo"
+	}
+}
+and: transitiveWithEmbed: err: {
+	Z: a: string
+	#X: #Y & Z
+	#Y: {Z}
+	out: #X & {
+		err: "foo"
 	}
 }
 embed: nonDef: t1: {
@@ -375,14 +391,14 @@ full: {
 	out: (#Main & {namespace: "ns1"}).output
 }
 -- out/evalalpha/stats --
-Leaks:  634
+Leaks:  654
 Freed:  0
 Reused: 0
-Allocs: 634
+Allocs: 654
 Retain: 0
 
-Unifications: 524
-Conjuncts:    1011
+Unifications: 544
+Conjuncts:    1058
 Disjuncts:    34
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -390,38 +406,38 @@ diff old new
 +++ new
 @@ -1,9 +1,9 @@
 -Leaks:  115
--Freed:  774
--Reused: 760
+-Freed:  794
+-Reused: 780
 -Allocs: 129
--Retain: 356
-+Leaks:  634
+-Retain: 357
++Leaks:  654
 +Freed:  0
 +Reused: 0
-+Allocs: 634
++Allocs: 654
 +Retain: 0
  
--Unifications: 825
--Conjuncts:    1694
--Disjuncts:    1073
-+Unifications: 524
-+Conjuncts:    1011
+-Unifications: 845
+-Conjuncts:    1749
+-Disjuncts:    1094
++Unifications: 544
++Conjuncts:    1058
 +Disjuncts:    34
 -- out/eval/stats --
 Leaks:  115
-Freed:  774
-Reused: 760
+Freed:  794
+Reused: 780
 Allocs: 129
-Retain: 356
+Retain: 357
 
-Unifications: 825
-Conjuncts:    1694
-Disjuncts:    1073
+Unifications: 845
+Conjuncts:    1749
+Disjuncts:    1094
 -- out/evalalpha --
 Errors:
-and.transitive.out.ok: field not allowed:
-    ./in.cue:38:3
-and.transitiveWithEmbed.out.ok: field not allowed:
+and.transitive.err.out.err: field not allowed:
     ./in.cue:46:3
+and.transitiveWithEmbed.err.out.err: field not allowed:
+    ./in.cue:62:3
 embed.andEmbed.d.err: field not allowed:
     ./in.cue:31:11
 embed.andInStruct.a.err: field not allowed:
@@ -442,7 +458,7 @@ embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types in
 embed.simple.a.err: field not allowed:
     ./in.cue:4:5
 embed.withIndirect.err: field not allowed:
-    ./in.cue:71:8
+    ./in.cue:87:8
 embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
     ./validators.cue:21:5
     ./validators.cue:21:12
@@ -601,7 +617,7 @@ Result:
       }
       err: (_|_){
         // [eval] embed.withIndirect.err: field not allowed:
-        //     ./in.cue:71:8
+        //     ./in.cue:87:8
       }
       b: (int){ int }
     }
@@ -668,42 +684,76 @@ Result:
     // [eval]
     transitive: (_|_){
       // [eval]
-      Z: (struct){
-        a: (string){ string }
-      }
-      #Y: (#struct){
-        a: (string){ string }
-      }
-      #X: (#struct){
-        a: (string){ string }
-      }
-      out: (_|_){
-        // [eval]
-        ok: (_|_){
-          // [eval] and.transitive.out.ok: field not allowed:
-          //     ./in.cue:38:3
+      ok: (struct){
+        Z: (struct){
+          a: (string){ string }
         }
-        a: (string){ string }
+        #Y: (#struct){
+          a: (string){ string }
+        }
+        #X: (#struct){
+          a: (string){ string }
+        }
+        out: (#struct){
+          a: (string){ "foo" }
+        }
+      }
+      err: (_|_){
+        // [eval]
+        Z: (struct){
+          a: (string){ string }
+        }
+        #Y: (#struct){
+          a: (string){ string }
+        }
+        #X: (#struct){
+          a: (string){ string }
+        }
+        out: (_|_){
+          // [eval]
+          err: (_|_){
+            // [eval] and.transitive.err.out.err: field not allowed:
+            //     ./in.cue:46:3
+          }
+          a: (string){ string }
+        }
       }
     }
     transitiveWithEmbed: (_|_){
       // [eval]
-      Z: (struct){
-        a: (string){ string }
-      }
-      #X: (#struct){
-        a: (string){ string }
-      }
-      #Y: (#struct){
-        a: (string){ string }
-      }
-      out: (_|_){
-        // [eval]
-        ok: (_|_){
-          // [eval] and.transitiveWithEmbed.out.ok: field not allowed:
-          //     ./in.cue:46:3
+      ok: (struct){
+        Z: (struct){
+          a: (string){ string }
         }
-        a: (string){ string }
+        #X: (#struct){
+          a: (string){ string }
+        }
+        #Y: (#struct){
+          a: (string){ string }
+        }
+        out: (#struct){
+          a: (string){ "foo" }
+        }
+      }
+      err: (_|_){
+        // [eval]
+        Z: (struct){
+          a: (string){ string }
+        }
+        #X: (#struct){
+          a: (string){ string }
+        }
+        #Y: (#struct){
+          a: (string){ string }
+        }
+        out: (_|_){
+          // [eval]
+          err: (_|_){
+            // [eval] and.transitiveWithEmbed.err.out.err: field not allowed:
+            //     ./in.cue:62:3
+          }
+          a: (string){ string }
+        }
       }
     }
   }
@@ -1269,21 +1319,21 @@ diff old new
 +++ new
 @@ -1,81 +1,29 @@
  Errors:
- and.transitive.out.ok: field not allowed:
--    ./in.cue:34:5
--    ./in.cue:35:6
--    ./in.cue:36:6
--    ./in.cue:36:11
--    ./in.cue:37:7
-     ./in.cue:38:3
- and.transitiveWithEmbed.out.ok: field not allowed:
+ and.transitive.err.out.err: field not allowed:
 -    ./in.cue:42:5
 -    ./in.cue:43:6
--    ./in.cue:43:11
 -    ./in.cue:44:6
--    ./in.cue:44:7
+-    ./in.cue:44:11
 -    ./in.cue:45:7
      ./in.cue:46:3
+ and.transitiveWithEmbed.err.out.err: field not allowed:
+-    ./in.cue:58:5
+-    ./in.cue:59:6
+-    ./in.cue:59:11
+-    ./in.cue:60:6
+-    ./in.cue:60:7
+-    ./in.cue:61:7
+     ./in.cue:62:3
  embed.andEmbed.d.err: field not allowed:
 -    ./in.cue:28:6
 -    ./in.cue:29:6
@@ -1336,11 +1386,11 @@ diff old new
 -    ./in.cue:3:7
      ./in.cue:4:5
  embed.withIndirect.err: field not allowed:
--    ./in.cue:68:22
--    ./in.cue:69:5
--    ./in.cue:70:6
--    ./in.cue:71:2
-     ./in.cue:71:8
+-    ./in.cue:84:22
+-    ./in.cue:85:5
+-    ./in.cue:86:6
+-    ./in.cue:87:2
+     ./in.cue:87:8
 -embed.openValidator.t1.x.err: field not allowed:
 -    ./validators.cue:13:3
 -    ./validators.cue:12:6
@@ -1522,11 +1572,11 @@ diff old new
 +      }
        err: (_|_){
          // [eval] embed.withIndirect.err: field not allowed:
--        //     ./in.cue:68:22
--        //     ./in.cue:69:5
--        //     ./in.cue:70:6
--        //     ./in.cue:71:2
-         //     ./in.cue:71:8
+-        //     ./in.cue:84:22
+-        //     ./in.cue:85:5
+-        //     ./in.cue:86:6
+-        //     ./in.cue:87:2
+         //     ./in.cue:87:8
        }
 +      b: (int){ int }
      }
@@ -1589,44 +1639,44 @@ diff old new
              //     ./validators.cue:24:8
              // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
              //     ./validators.cue:21:5
-@@ -360,16 +260,11 @@
-       }
-       out: (_|_){
-         // [eval]
--        a: (string){ string }
-         ok: (_|_){
-           // [eval] and.transitive.out.ok: field not allowed:
--          //     ./in.cue:34:5
--          //     ./in.cue:35:6
--          //     ./in.cue:36:6
--          //     ./in.cue:36:11
--          //     ./in.cue:37:7
-           //     ./in.cue:38:3
+@@ -376,16 +276,11 @@
          }
-+        a: (string){ string }
+         out: (_|_){
+           // [eval]
+-          a: (string){ string }
+           err: (_|_){
+             // [eval] and.transitive.err.out.err: field not allowed:
+-            //     ./in.cue:42:5
+-            //     ./in.cue:43:6
+-            //     ./in.cue:44:6
+-            //     ./in.cue:44:11
+-            //     ./in.cue:45:7
+             //     ./in.cue:46:3
+           }
++          a: (string){ string }
+         }
        }
      }
-     transitiveWithEmbed: (_|_){
-@@ -385,17 +280,11 @@
-       }
-       out: (_|_){
-         // [eval]
--        a: (string){ string }
-         ok: (_|_){
-           // [eval] and.transitiveWithEmbed.out.ok: field not allowed:
--          //     ./in.cue:42:5
--          //     ./in.cue:43:6
--          //     ./in.cue:43:11
--          //     ./in.cue:44:6
--          //     ./in.cue:44:7
--          //     ./in.cue:45:7
-           //     ./in.cue:46:3
+@@ -418,17 +313,11 @@
          }
-+        a: (string){ string }
+         out: (_|_){
+           // [eval]
+-          a: (string){ string }
+           err: (_|_){
+             // [eval] and.transitiveWithEmbed.err.out.err: field not allowed:
+-            //     ./in.cue:58:5
+-            //     ./in.cue:59:6
+-            //     ./in.cue:59:11
+-            //     ./in.cue:60:6
+-            //     ./in.cue:60:7
+-            //     ./in.cue:61:7
+             //     ./in.cue:62:3
+           }
++          a: (string){ string }
+         }
        }
      }
-   }
-@@ -440,8 +329,8 @@
+@@ -474,8 +363,8 @@
              //     ./issue3832.cue:8:16
            }
            outFirstName: (_|_){
@@ -1637,7 +1687,7 @@ diff old new
            }
          }
        }
-@@ -451,35 +340,27 @@
+@@ -485,35 +374,27 @@
          }, (#struct){
            pass: (#struct){
              let self#1 = (_|_){
@@ -1683,7 +1733,7 @@ diff old new
        pass: (#struct){
          let self#1 = (#struct){
            firstName: (string){ "Sam" }
-@@ -486,18 +367,21 @@
+@@ -520,18 +401,21 @@
          }
          outFirstName: (string){ "Sam" }
        }
@@ -1717,7 +1767,7 @@ diff old new
    }
    issue3833: (struct){
      out: (#struct){
-@@ -573,12 +457,8 @@
+@@ -607,12 +491,8 @@
          globalField: (string){ string }
        }
        #Context: (#struct){
@@ -1732,7 +1782,7 @@ diff old new
        }
        out: (struct){
          ingress: (#struct){
-@@ -606,22 +486,22 @@
+@@ -640,22 +520,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -1771,7 +1821,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -631,22 +511,22 @@
+@@ -665,22 +545,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -1810,7 +1860,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -661,11 +541,7 @@
+@@ -695,11 +575,7 @@
          }
        }
        #JobConfig: (#struct){
@@ -1823,7 +1873,7 @@ diff old new
          job: (#struct){
            image: (string){ "foo:v1" }
            vcs: (string){ "git" }
-@@ -729,7 +605,7 @@
+@@ -763,7 +639,7 @@
          }
        }
        out: (#struct){
@@ -1832,7 +1882,7 @@ diff old new
            input: (#struct){
              image: (string){ "someimage" }
              env: (string){ "FOO" }
-@@ -761,11 +637,11 @@
+@@ -795,11 +671,11 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -1849,7 +1899,7 @@ diff old new
            e: (string){ "foo" }
            f: (int){ 1 }
          }
-@@ -798,24 +674,16 @@
+@@ -832,24 +708,16 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -1884,7 +1934,7 @@ diff old new
      }
    }
    full: (struct){
-@@ -866,38 +734,11 @@
+@@ -900,38 +768,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -1925,7 +1975,7 @@ diff old new
          let base#6 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -940,6 +781,19 @@
+@@ -974,6 +815,19 @@
              }
            }
          }
@@ -1945,7 +1995,7 @@ diff old new
        }
      }
      out: (#struct){
-@@ -969,17 +823,8 @@
+@@ -1003,17 +857,8 @@
              //     ./validators.cue:32:17
              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
              //     ./validators.cue:29:22
@@ -1971,21 +2021,21 @@ embed.openValidator.t1.err: unexpected pass.
 and.transitive(WithEmbed)?.out.ok: unexpected error
 -- out/eval --
 Errors:
-and.transitive.out.ok: field not allowed:
-    ./in.cue:34:5
-    ./in.cue:35:6
-    ./in.cue:36:6
-    ./in.cue:36:11
-    ./in.cue:37:7
-    ./in.cue:38:3
-and.transitiveWithEmbed.out.ok: field not allowed:
+and.transitive.err.out.err: field not allowed:
     ./in.cue:42:5
     ./in.cue:43:6
-    ./in.cue:43:11
     ./in.cue:44:6
-    ./in.cue:44:7
+    ./in.cue:44:11
     ./in.cue:45:7
     ./in.cue:46:3
+and.transitiveWithEmbed.err.out.err: field not allowed:
+    ./in.cue:58:5
+    ./in.cue:59:6
+    ./in.cue:59:11
+    ./in.cue:60:6
+    ./in.cue:60:7
+    ./in.cue:61:7
+    ./in.cue:62:3
 embed.andEmbed.d.err: field not allowed:
     ./in.cue:28:6
     ./in.cue:29:6
@@ -2038,11 +2088,11 @@ embed.simple.a.err: field not allowed:
     ./in.cue:3:7
     ./in.cue:4:5
 embed.withIndirect.err: field not allowed:
-    ./in.cue:68:22
-    ./in.cue:69:5
-    ./in.cue:70:6
-    ./in.cue:71:2
-    ./in.cue:71:8
+    ./in.cue:84:22
+    ./in.cue:85:5
+    ./in.cue:86:6
+    ./in.cue:87:2
+    ./in.cue:87:8
 embed.openValidator.t1.x.err: field not allowed:
     ./validators.cue:13:3
     ./validators.cue:12:6
@@ -2238,11 +2288,11 @@ Result:
       b: (int){ int }
       err: (_|_){
         // [eval] embed.withIndirect.err: field not allowed:
-        //     ./in.cue:68:22
-        //     ./in.cue:69:5
-        //     ./in.cue:70:6
-        //     ./in.cue:71:2
-        //     ./in.cue:71:8
+        //     ./in.cue:84:22
+        //     ./in.cue:85:5
+        //     ./in.cue:86:6
+        //     ./in.cue:87:2
+        //     ./in.cue:87:8
       }
     }
     normalValidator: (_|_){
@@ -2321,52 +2371,86 @@ Result:
     // [eval]
     transitive: (_|_){
       // [eval]
-      Z: (struct){
-        a: (string){ string }
+      ok: (struct){
+        Z: (struct){
+          a: (string){ string }
+        }
+        #Y: (#struct){
+          a: (string){ string }
+        }
+        #X: (#struct){
+          a: (string){ string }
+        }
+        out: (#struct){
+          a: (string){ "foo" }
+        }
       }
-      #Y: (#struct){
-        a: (string){ string }
-      }
-      #X: (#struct){
-        a: (string){ string }
-      }
-      out: (_|_){
+      err: (_|_){
         // [eval]
-        a: (string){ string }
-        ok: (_|_){
-          // [eval] and.transitive.out.ok: field not allowed:
-          //     ./in.cue:34:5
-          //     ./in.cue:35:6
-          //     ./in.cue:36:6
-          //     ./in.cue:36:11
-          //     ./in.cue:37:7
-          //     ./in.cue:38:3
+        Z: (struct){
+          a: (string){ string }
+        }
+        #Y: (#struct){
+          a: (string){ string }
+        }
+        #X: (#struct){
+          a: (string){ string }
+        }
+        out: (_|_){
+          // [eval]
+          a: (string){ string }
+          err: (_|_){
+            // [eval] and.transitive.err.out.err: field not allowed:
+            //     ./in.cue:42:5
+            //     ./in.cue:43:6
+            //     ./in.cue:44:6
+            //     ./in.cue:44:11
+            //     ./in.cue:45:7
+            //     ./in.cue:46:3
+          }
         }
       }
     }
     transitiveWithEmbed: (_|_){
       // [eval]
-      Z: (struct){
-        a: (string){ string }
+      ok: (struct){
+        Z: (struct){
+          a: (string){ string }
+        }
+        #X: (#struct){
+          a: (string){ string }
+        }
+        #Y: (#struct){
+          a: (string){ string }
+        }
+        out: (#struct){
+          a: (string){ "foo" }
+        }
       }
-      #X: (#struct){
-        a: (string){ string }
-      }
-      #Y: (#struct){
-        a: (string){ string }
-      }
-      out: (_|_){
+      err: (_|_){
         // [eval]
-        a: (string){ string }
-        ok: (_|_){
-          // [eval] and.transitiveWithEmbed.out.ok: field not allowed:
-          //     ./in.cue:42:5
-          //     ./in.cue:43:6
-          //     ./in.cue:43:11
-          //     ./in.cue:44:6
-          //     ./in.cue:44:7
-          //     ./in.cue:45:7
-          //     ./in.cue:46:3
+        Z: (struct){
+          a: (string){ string }
+        }
+        #X: (#struct){
+          a: (string){ string }
+        }
+        #Y: (#struct){
+          a: (string){ string }
+        }
+        out: (_|_){
+          // [eval]
+          a: (string){ string }
+          err: (_|_){
+            // [eval] and.transitiveWithEmbed.err.out.err: field not allowed:
+            //     ./in.cue:58:5
+            //     ./in.cue:59:6
+            //     ./in.cue:59:11
+            //     ./in.cue:60:6
+            //     ./in.cue:60:7
+            //     ./in.cue:61:7
+            //     ./in.cue:62:3
+          }
         }
       }
     }
@@ -3070,28 +3154,62 @@ Result:
   }
   and: {
     transitive: {
-      Z: {
-        a: string
+      ok: {
+        Z: {
+          a: string
+        }
+        #Y: 〈0;Z〉
+        #X: (〈0;#Y〉 & 〈0;Z〉)
+        out: (〈0;#X〉 & {
+          a: "foo"
+        })
       }
-      #Y: 〈0;Z〉
-      #X: (〈0;#Y〉 & 〈0;Z〉)
-      out: (〈0;#X〉 & {
-        ok: "foo"
-      })
+    }
+  }
+  and: {
+    transitive: {
+      err: {
+        Z: {
+          a: string
+        }
+        #Y: 〈0;Z〉
+        #X: (〈0;#Y〉 & 〈0;Z〉)
+        out: (〈0;#X〉 & {
+          err: "foo"
+        })
+      }
     }
   }
   and: {
     transitiveWithEmbed: {
-      Z: {
-        a: string
+      ok: {
+        Z: {
+          a: string
+        }
+        #X: (〈0;#Y〉 & 〈0;Z〉)
+        #Y: {
+          〈1;Z〉
+        }
+        out: (〈0;#X〉 & {
+          a: "foo"
+        })
       }
-      #X: (〈0;#Y〉 & 〈0;Z〉)
-      #Y: {
-        〈1;Z〉
+    }
+  }
+  and: {
+    transitiveWithEmbed: {
+      err: {
+        Z: {
+          a: string
+        }
+        #X: (〈0;#Y〉 & 〈0;Z〉)
+        #Y: {
+          〈1;Z〉
+        }
+        out: (〈0;#X〉 & {
+          err: "foo"
+        })
       }
-      out: (〈0;#X〉 & {
-        ok: "foo"
-      })
     }
   }
   embed: {

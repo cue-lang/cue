@@ -9,12 +9,12 @@ for x in c {a: E}
 
 Z1=[Z2=string]: Z1 + Z2
 -- out/compile --
-unreferenced alias or let clause X:
-    ./in.cue:1:2
 a: reference "Y" not found:
     ./in.cue:4:12
 for[].a: reference "E" not found:
     ./in.cue:7:16
+unreferenced alias or let clause X:
+    ./in.cue:1:2
 --- in.cue
 {
   let X#1 = {}

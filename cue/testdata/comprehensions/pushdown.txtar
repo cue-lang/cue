@@ -932,20 +932,20 @@ embed.fail1.p: field not allowed:
     ./in.cue:49:9
 embed.fail4.p: field not allowed:
     ./in.cue:87:4
-issue3535.regular.foo.regular: field not allowed:
-    ./issue3535.cue:22:4
-issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
-    ./issue3729.cue:9:9
-    ./issue3729.cue:11:9
+fieldMismatch.a: cannot combine regular field "x" with 2:
+    ./in.cue:152:7
+    ./in.cue:150:3
 noStackOverflowStructCycle.#list.tail: structural cycle
 noStackOverflowStructCycle.list.tail: structural cycle
 provideIncompleteSuccess.t2.a.c.d: field not allowed:
     ./in.cue:203:8
 structShare.err1.x.d.e: field not allowed:
     ./in.cue:591:9
-fieldMismatch.a: cannot combine regular field "x" with 2:
-    ./in.cue:152:7
-    ./in.cue:150:3
+issue3535.regular.foo.regular: field not allowed:
+    ./issue3535.cue:22:4
+issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+    ./issue3729.cue:9:9
+    ./issue3729.cue:11:9
 
 Result:
 (_|_){
@@ -1783,7 +1783,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,39 +1,19 @@
+@@ -1,16 +1,8 @@
  Errors:
  embed.fail1.p: field not allowed:
 -    ./in.cue:37:9
@@ -1798,17 +1798,9 @@ diff old new
 -    ./in.cue:84:9
 -    ./in.cue:85:3
      ./in.cue:87:4
- issue3535.regular.foo.regular: field not allowed:
--    ./issue3535.cue:15:6
--    ./issue3535.cue:19:7
--    ./issue3535.cue:19:12
--    ./issue3535.cue:21:3
-     ./issue3535.cue:22:4
--    ./issue3535.cue:25:7
- issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
-     ./issue3729.cue:9:9
--    ./issue3729.cue:10:2
-     ./issue3729.cue:11:9
+ fieldMismatch.a: cannot combine regular field "x" with 2:
+     ./in.cue:152:7
+@@ -18,25 +10,13 @@
  noStackOverflowStructCycle.#list.tail: structural cycle
  noStackOverflowStructCycle.list.tail: structural cycle
  provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -1821,8 +1813,19 @@ diff old new
 -    ./in.cue:589:9
 -    ./in.cue:590:2
      ./in.cue:591:9
- fieldMismatch.a: cannot combine regular field "x" with 2:
-     ./in.cue:152:7
+ issue3535.regular.foo.regular: field not allowed:
+-    ./issue3535.cue:15:6
+-    ./issue3535.cue:19:7
+-    ./issue3535.cue:19:12
+-    ./issue3535.cue:21:3
+     ./issue3535.cue:22:4
+-    ./issue3535.cue:25:7
+ issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+     ./issue3729.cue:9:9
+-    ./issue3729.cue:10:2
+     ./issue3729.cue:11:9
+ 
+ Result:
 @@ -79,8 +59,8 @@
    }
    fail: (struct){
@@ -2181,17 +2184,9 @@ embed.fail4.p: field not allowed:
     ./in.cue:84:9
     ./in.cue:85:3
     ./in.cue:87:4
-issue3535.regular.foo.regular: field not allowed:
-    ./issue3535.cue:15:6
-    ./issue3535.cue:19:7
-    ./issue3535.cue:19:12
-    ./issue3535.cue:21:3
-    ./issue3535.cue:22:4
-    ./issue3535.cue:25:7
-issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
-    ./issue3729.cue:9:9
-    ./issue3729.cue:10:2
-    ./issue3729.cue:11:9
+fieldMismatch.a: cannot combine regular field "x" with 2:
+    ./in.cue:152:7
+    ./in.cue:150:3
 noStackOverflowStructCycle.#list.tail: structural cycle
 noStackOverflowStructCycle.list.tail: structural cycle
 provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -2204,9 +2199,17 @@ structShare.err1.x.d.e: field not allowed:
     ./in.cue:589:9
     ./in.cue:590:2
     ./in.cue:591:9
-fieldMismatch.a: cannot combine regular field "x" with 2:
-    ./in.cue:152:7
-    ./in.cue:150:3
+issue3535.regular.foo.regular: field not allowed:
+    ./issue3535.cue:15:6
+    ./issue3535.cue:19:7
+    ./issue3535.cue:19:12
+    ./issue3535.cue:21:3
+    ./issue3535.cue:22:4
+    ./issue3535.cue:25:7
+issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+    ./issue3729.cue:9:9
+    ./issue3729.cue:10:2
+    ./issue3729.cue:11:9
 
 Result:
 (_|_){

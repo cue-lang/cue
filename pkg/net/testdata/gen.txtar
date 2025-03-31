@@ -39,9 +39,22 @@ t33: net.AbsURL & "https://foo.com/bar"
 t34: net.AbsURL & "%"
 -- out/net --
 Errors:
+t7: error in call to net.JoinHostPort: invalid host [192, 30, 4]:
+    ./in.cue:9:6
+t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4):
+    ./in.cue:11:6
+    ./in.cue:11:17
+t13: invalid value "ff02::1:3" (does not satisfy net.IPv4):
+    ./in.cue:15:6
+    ./in.cue:15:19
+t20: error in call to net.IPCIDR: netip.ParsePrefix("172.16.12.3"): no '/':
+    ./in.cue:22:6
 t25: invalid value "2001:db8::1234567" (does not satisfy net.IPv6):
     ./in.cue:27:6
     ./in.cue:27:17
+t27: invalid value "23.23.23.23" (does not satisfy net.IPv6):
+    ./in.cue:29:6
+    ./in.cue:29:19
 t30: invalid value "%" (does not satisfy net.URL): error in call to net.URL: parse "%": invalid URL escape "%":
     ./in.cue:32:6
     ./in.cue:32:16
@@ -51,19 +64,6 @@ t32: invalid value "/foo/bar" (does not satisfy net.AbsURL): error in call to ne
 t34: invalid value "%" (does not satisfy net.AbsURL): error in call to net.AbsURL: parse "%": invalid URL escape "%":
     ./in.cue:36:6
     ./in.cue:36:19
-t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4):
-    ./in.cue:11:6
-    ./in.cue:11:17
-t7: error in call to net.JoinHostPort: invalid host [192, 30, 4]:
-    ./in.cue:9:6
-t13: invalid value "ff02::1:3" (does not satisfy net.IPv4):
-    ./in.cue:15:6
-    ./in.cue:15:19
-t20: error in call to net.IPCIDR: netip.ParsePrefix("172.16.12.3"): no '/':
-    ./in.cue:22:6
-t27: invalid value "23.23.23.23" (does not satisfy net.IPv6):
-    ./in.cue:29:6
-    ./in.cue:29:19
 
 Result:
 t1: "foo.bar."

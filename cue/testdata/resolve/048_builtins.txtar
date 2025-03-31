@@ -111,13 +111,6 @@ Conjuncts:    152
 Disjuncts:    97
 -- out/evalalpha --
 Errors:
-o3.a: 2 errors in empty disjunction:
-o3.a: conflicting values "bar" and "foo":
-    ./in.cue:17:5
-    ./in.cue:20:14
-o3.a: conflicting values "baz" and "foo":
-    ./in.cue:20:14
-    ./in.cue:20:24
 a3.a: invalid value "bar" (out of bound =~"oo"):
     ./in.cue:8:5
     ./in.cue:7:5
@@ -126,6 +119,13 @@ a3.a: invalid value "bar" (out of bound =~"fo"):
     ./in.cue:9:5
     ./in.cue:7:5
     ./in.cue:12:14
+o3.a: 2 errors in empty disjunction:
+o3.a: conflicting values "baz" and "foo":
+    ./in.cue:20:14
+    ./in.cue:20:24
+o3.a: conflicting values "bar" and "foo":
+    ./in.cue:17:5
+    ./in.cue:20:14
 stringListErrors.b.result: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
     ./in.cue:31:11
     ./in.cue:30:7
@@ -177,12 +177,12 @@ Result:
     // [eval]
     a: (_|_){
       // [eval] o3.a: 2 errors in empty disjunction:
-      // o3.a: conflicting values "bar" and "foo":
-      //     ./in.cue:17:5
-      //     ./in.cue:20:14
       // o3.a: conflicting values "baz" and "foo":
       //     ./in.cue:20:14
       //     ./in.cue:20:24
+      // o3.a: conflicting values "bar" and "foo":
+      //     ./in.cue:17:5
+      //     ./in.cue:20:14
     }
     b: (string){ "baz" }
     c: (string){ "bar" }
@@ -274,49 +274,40 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,13 +1,9 @@
- Errors:
+@@ -9,14 +9,10 @@
+     ./in.cue:12:14
  o3.a: 2 errors in empty disjunction:
- o3.a: conflicting values "bar" and "foo":
--    ./in.cue:15:12
-     ./in.cue:17:5
--    ./in.cue:20:5
-     ./in.cue:20:14
  o3.a: conflicting values "baz" and "foo":
 -    ./in.cue:15:9
 -    ./in.cue:20:5
      ./in.cue:20:14
      ./in.cue:20:24
- a3.a: invalid value "bar" (out of bound =~"oo"):
-@@ -70,13 +66,9 @@
+ o3.a: conflicting values "bar" and "foo":
+-    ./in.cue:15:12
+     ./in.cue:17:5
+-    ./in.cue:20:5
+     ./in.cue:20:14
+ stringListErrors.b.result: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
+     ./in.cue:31:11
+@@ -70,14 +66,10 @@
      a: (_|_){
        // [eval] o3.a: 2 errors in empty disjunction:
-       // o3.a: conflicting values "bar" and "foo":
--      //     ./in.cue:15:12
-       //     ./in.cue:17:5
--      //     ./in.cue:20:5
-       //     ./in.cue:20:14
        // o3.a: conflicting values "baz" and "foo":
 -      //     ./in.cue:15:9
 -      //     ./in.cue:20:5
        //     ./in.cue:20:14
        //     ./in.cue:20:24
+       // o3.a: conflicting values "bar" and "foo":
+-      //     ./in.cue:15:12
+       //     ./in.cue:17:5
+-      //     ./in.cue:20:5
+       //     ./in.cue:20:14
      }
+     b: (string){ "baz" }
 -- diff/todo/p2 --
 Missing error positions.
 -- out/eval --
 Errors:
-o3.a: 2 errors in empty disjunction:
-o3.a: conflicting values "bar" and "foo":
-    ./in.cue:15:12
-    ./in.cue:17:5
-    ./in.cue:20:5
-    ./in.cue:20:14
-o3.a: conflicting values "baz" and "foo":
-    ./in.cue:15:9
-    ./in.cue:20:5
-    ./in.cue:20:14
-    ./in.cue:20:24
 a3.a: invalid value "bar" (out of bound =~"oo"):
     ./in.cue:8:5
     ./in.cue:7:5
@@ -325,6 +316,17 @@ a3.a: invalid value "bar" (out of bound =~"fo"):
     ./in.cue:9:5
     ./in.cue:7:5
     ./in.cue:12:14
+o3.a: 2 errors in empty disjunction:
+o3.a: conflicting values "baz" and "foo":
+    ./in.cue:15:9
+    ./in.cue:20:5
+    ./in.cue:20:14
+    ./in.cue:20:24
+o3.a: conflicting values "bar" and "foo":
+    ./in.cue:15:12
+    ./in.cue:17:5
+    ./in.cue:20:5
+    ./in.cue:20:14
 stringListErrors.b.result: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
     ./in.cue:31:11
     ./in.cue:30:7
@@ -376,16 +378,16 @@ Result:
     // [eval]
     a: (_|_){
       // [eval] o3.a: 2 errors in empty disjunction:
-      // o3.a: conflicting values "bar" and "foo":
-      //     ./in.cue:15:12
-      //     ./in.cue:17:5
-      //     ./in.cue:20:5
-      //     ./in.cue:20:14
       // o3.a: conflicting values "baz" and "foo":
       //     ./in.cue:15:9
       //     ./in.cue:20:5
       //     ./in.cue:20:14
       //     ./in.cue:20:24
+      // o3.a: conflicting values "bar" and "foo":
+      //     ./in.cue:15:12
+      //     ./in.cue:17:5
+      //     ./in.cue:20:5
+      //     ./in.cue:20:14
     }
     b: (string){ "baz" }
     c: (string){ "bar" }

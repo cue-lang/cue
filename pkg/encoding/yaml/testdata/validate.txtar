@@ -36,10 +36,6 @@ missing position
 Errors:
 #test.t1.ok1: cannot call non-function fn (type _):
     ./in.cue:8:11
-validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b!:int}:
-    ./in.cue:8:11
-    ./in.cue:6:9
-    ./in.cue:7:16
 #test.t1.ok2: cannot call non-function fn (type _):
     ./in.cue:9:11
 #test.t1.ok3: cannot call non-function fn (type _):
@@ -48,6 +44,10 @@ validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate):
     ./in.cue:17:11
 #test.t2.ok2: cannot call non-function fn (type _):
     ./in.cue:18:11
+validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b!:int}:
+    ./in.cue:8:11
+    ./in.cue:6:9
+    ./in.cue:7:16
 
 Result:
 import "encoding/yaml"

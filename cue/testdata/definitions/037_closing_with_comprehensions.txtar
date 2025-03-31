@@ -112,10 +112,10 @@ Conjuncts:    43
 Disjuncts:    28
 -- out/evalalpha --
 Errors:
-#E.f3: field not allowed:
-    ./in.cue:29:3
 a.f3: field not allowed:
     ./in.cue:4:11
+#E.f3: field not allowed:
+    ./in.cue:29:3
 
 Result:
 (_|_){
@@ -158,17 +158,17 @@ diff old new
 +++ new
 @@ -1,14 +1,7 @@
  Errors:
+ a.f3: field not allowed:
+-    ./in.cue:1:5
+-    ./in.cue:3:1
+-    ./in.cue:4:5
+     ./in.cue:4:11
  #E.f3: field not allowed:
 -    ./in.cue:1:5
 -    ./in.cue:27:5
 -    ./in.cue:27:10
 -    ./in.cue:28:2
      ./in.cue:29:3
- a.f3: field not allowed:
--    ./in.cue:1:5
--    ./in.cue:3:1
--    ./in.cue:4:5
-     ./in.cue:4:11
  
  Result:
 @@ -24,9 +17,6 @@
@@ -196,17 +196,17 @@ diff old new
 error positions
 -- out/eval --
 Errors:
+a.f3: field not allowed:
+    ./in.cue:1:5
+    ./in.cue:3:1
+    ./in.cue:4:5
+    ./in.cue:4:11
 #E.f3: field not allowed:
     ./in.cue:1:5
     ./in.cue:27:5
     ./in.cue:27:10
     ./in.cue:28:2
     ./in.cue:29:3
-a.f3: field not allowed:
-    ./in.cue:1:5
-    ./in.cue:3:1
-    ./in.cue:4:5
-    ./in.cue:4:11
 
 Result:
 (_|_){

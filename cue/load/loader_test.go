@@ -69,12 +69,12 @@ func TestLoad(t *testing.T) {
 		cfg:  badModCfg,
 		args: []string{"."},
 		want: `err:    module: 2 errors in empty disjunction:
-module: conflicting values 123 and "" (mismatched types int and string):
-    $CWD/testdata/badmod/cue.mod/module.cue:2:9
-    cuelang.org/go/mod/modfile/schema.cue:56:22
 module: conflicting values 123 and string (mismatched types int and string):
     $CWD/testdata/badmod/cue.mod/module.cue:2:9
     cuelang.org/go/mod/modfile/schema.cue:98:12
+module: conflicting values 123 and "" (mismatched types int and string):
+    $CWD/testdata/badmod/cue.mod/module.cue:2:9
+    cuelang.org/go/mod/modfile/schema.cue:56:22
 path:   ""
 module: ""
 root:   ""
@@ -215,8 +215,8 @@ files:
 		name: "BadIdentifier",
 		cfg:  dirCfg,
 		args: []string{"foo.com/bad-identifier"},
-		want: `err:    cannot determine package name for "foo.com/bad-identifier"; set it explicitly with ':'
-cannot find package "foo.com/bad-identifier": cannot find module providing package foo.com/bad-identifier
+		want: `err:    cannot find package "foo.com/bad-identifier": cannot find module providing package foo.com/bad-identifier
+cannot determine package name for "foo.com/bad-identifier"; set it explicitly with ':'
 path:   foo.com/bad-identifier
 module: ""
 root:   $CWD/testdata/testmod
@@ -335,11 +335,11 @@ files:
 			Tags: []string{"prod"},
 		},
 		args: []string{"./tagsbad"},
-		want: `err:    tag "prod" not used in any file
+		want: `err:    multiple @if attributes:
+    $CWD/testdata/testmod/tagsbad/prod.cue:2:1
 previous declaration here:
     $CWD/testdata/testmod/tagsbad/prod.cue:1:1
-multiple @if attributes:
-    $CWD/testdata/testmod/tagsbad/prod.cue:2:1
+tag "prod" not used in any file
 path:   mod.test/test/tagsbad@v0
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod

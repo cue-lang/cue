@@ -396,9 +396,7 @@ func (p list) sanitize() list {
 	if p == nil {
 		return p
 	}
-	a := slices.Clone(p)
-	a.RemoveMultiples()
-	return a
+	return p.RemoveMultiples()
 }
 
 // Sort sorts an List. *posError entries are sorted by position,
@@ -417,19 +415,22 @@ func (p list) Sort() {
 	})
 }
 
-// RemoveMultiples sorts an List and removes all but the first error per line.
-func (p *list) RemoveMultiples() {
-	p.Sort()
-	var last Error
-	i := 0
-	for _, e := range *p {
-		if last == nil || !approximateEqual(last, e) {
-			last = e
-			(*p)[i] = e
-			i++
+// RemoveMultiples removes all but the first instance of an error message per line.
+func (p list) RemoveMultiples() list {
+	deduplicated := slices.Clone(p)
+
+	deduplicatedIdx := 0
+OUTER:
+	for _, element := range p {
+		for _, deduplicatedElement := range deduplicated[0:deduplicatedIdx] {
+			if approximateEqual(deduplicatedElement, element) {
+				continue OUTER
+			}
 		}
+		deduplicated[deduplicatedIdx] = element
+		deduplicatedIdx++
 	}
-	(*p) = (*p)[0:i]
+	return deduplicated[0:deduplicatedIdx]
 }
 
 func approximateEqual(a, b Error) bool {

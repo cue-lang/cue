@@ -462,7 +462,7 @@ issue2052: full: {
         #funcs: (_|_){
           // [incomplete] issue2052.full.#RecurseN: error in call to list.Range: non-concrete value _:
           //     ./issue2052.cue:111:15
-          // issue2052.full.#RecurseN.#funcs: invalid interpolation: non-concrete value _ (type _):
+          // issue2052.full.#RecurseN.#funcs: key value of dynamic field must be concrete, found _|_(invalid interpolation: issue2052.full.#RecurseN.#funcs: non-concrete value _ (type _)):
           //     ./issue2052.cue:117:11
         }
       }
@@ -1152,7 +1152,7 @@ diff old new
 +        #funcs: (_|_){
 +          // [incomplete] issue2052.full.#RecurseN: error in call to list.Range: non-concrete value _:
 +          //     ./issue2052.cue:111:15
-+          // issue2052.full.#RecurseN.#funcs: invalid interpolation: non-concrete value _ (type _):
++          // issue2052.full.#RecurseN.#funcs: key value of dynamic field must be concrete, found _|_(invalid interpolation: issue2052.full.#RecurseN.#funcs: non-concrete value _ (type _)):
 +          //     ./issue2052.cue:117:11
          }
        }

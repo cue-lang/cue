@@ -61,7 +61,7 @@ func TestStateNames(t *testing.T) {
 // TestScheduler tests the non-CUE specific scheduler functionality.
 func TestScheduler(t *testing.T) {
 	ctx := &OpContext{
-		Version: internal.DefaultVersion,
+		Version: internal.EvalV2,
 		taskContext: taskContext{
 			counterMask: c1AllAncestorsProcessed | c2ArcTypeKnown | c3ValueKnown | c4ScalarKnown,
 			complete:    func(s *scheduler) condition { return 0 },

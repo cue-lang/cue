@@ -44,8 +44,8 @@ var (
 	todo = flag.Bool("todo", false, "run tests marked with #todo-compile")
 )
 
-// TestEval tests the default implementation of the evaluator.
-func TestEval(t *testing.T) {
+// TestEvalV2 tests the old implementation of the evaluator.
+func TestEvalV2(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root: "../../../cue/testdata",
 		Name: "eval",
@@ -61,7 +61,7 @@ func TestEval(t *testing.T) {
 	}
 
 	test.Run(t, func(tc *cuetxtar.Test) {
-		runEvalTest(tc, internal.DefaultVersion, flags)
+		runEvalTest(tc, internal.EvalV2, flags)
 	})
 }
 
@@ -74,7 +74,7 @@ var needFix = map[string]string{
 	"cycle/patterns": "cycle detection in v2",
 }
 
-func TestEvalAlpha(t *testing.T) {
+func TestEvalV3(t *testing.T) {
 	// TODO: remove use of externalDeps for processing. Currently, enabling
 	// this would fix some issues, but also introduce some closedness bugs.
 	// As a first step, we should ensure that the temporary hack of using
@@ -109,7 +109,7 @@ func TestEvalAlpha(t *testing.T) {
 		}
 		ran++
 
-		errorCount += runEvalTest(t, internal.DevVersion, flags)
+		errorCount += runEvalTest(t, internal.EvalV3, flags)
 	})
 
 	t.Logf("todo: %d, ran: %d, skipped: %d, nodeErrors: %d",

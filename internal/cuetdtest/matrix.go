@@ -52,22 +52,23 @@ func (t *M) Runtime() *runtime.Runtime {
 	return (*runtime.Runtime)(t.CueContext())
 }
 
+// TODO(mvdan): the default should now be evalv3.
 const DefaultVersion = "v2"
 
 type Matrix []M
 
 var FullMatrix Matrix = []M{{
 	name:    DefaultVersion,
-	version: internal.DefaultVersion,
+	version: internal.EvalV2,
 }, {
 	name:     "v3",
 	fallback: "v2",
-	version:  internal.DevVersion,
+	version:  internal.EvalV3,
 	Flags:    cuedebug.Config{Sharing: true},
 }, {
 	name:     "v3-noshare",
 	fallback: "v2",
-	version:  internal.DevVersion,
+	version:  internal.EvalV3,
 }}
 
 var SmallMatrix Matrix = FullMatrix[:2]
@@ -94,13 +95,13 @@ func (m Matrix) Do(t *testing.T, f func(t *testing.T, m *M)) {
 }
 
 func (m *M) TODO_V2(t testing.TB) {
-	if m.version == internal.DefaultVersion {
+	if m.version == internal.EvalV2 {
 		t.Skip("Skipping v2")
 	}
 }
 
 func (m *M) TODO_V3(t testing.TB) {
-	if m.version == internal.DevVersion {
+	if m.version == internal.EvalV3 {
 		t.Skip("Skipping v3")
 	}
 }
@@ -112,7 +113,7 @@ func (m *M) TODO_Sharing(t testing.TB) {
 }
 
 func (m *M) TODO_NoSharing(t testing.TB) {
-	if m.version == internal.DevVersion && !m.Flags.Sharing {
+	if m.version == internal.EvalV3 && !m.Flags.Sharing {
 		t.Skip("Skipping v3 without sharing")
 	}
 }

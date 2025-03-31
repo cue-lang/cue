@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "517c6ff2_8985ca66",
+        "filename": "internal/internal.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-31T12:09:42Z",
+      "side": 1,
+      "message": "I\u0027m yet to be convinced that DefaultVersion is worth keeping at all. Discussing after lunch!",
+      "revId": "bd817c9c1b50d436c16af3e5ef8e114db50df092",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

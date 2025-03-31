@@ -272,7 +272,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 
 	isClosed := id.FromDef || v.ClosedNonRecursive
 
-	if isClosed {
+	if isClosed && !forceIgnore {
 		for i, x := range n.reqDefIDs {
 			if x.id == id.outerID && id.outerID != 0 {
 				n.reqDefIDs[i].ignore = false
@@ -288,6 +288,8 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 		// This is the case, for instance, if a resolver resolves to a
 		// non-definition.
 		ignore = true
+		// TODO: Consider resetting FromDef.
+		// id.FromDef = false
 	case id.enclosingEmbed != 0 || id.outerID == 0:
 		// We have a reference within an inner embedding group. If this is
 		// a definition, or otherwise typo checked struct, we need to track

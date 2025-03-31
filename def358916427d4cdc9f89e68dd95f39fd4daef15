@@ -1,0 +1,351 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bffc502c_a1c152dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "SGTM, thanks! Just some last nits and then I\u0027m happy to merge.",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f68f5244_94258843",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "use https://cuelang.org/discussion/3776, which is consistent with our other short links throughout the project.",
+      "range": {
+        "startLine": 17,
+        "startChar": 42,
+        "endLine": 17,
+        "endChar": 54
+      },
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89dd17e6_593089f6",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "please fix up the rest of these aka.ms short links too, following my earlier comment.",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a47cf6f_ad23243c",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "return directly now that the func does almost nothing",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f2b6c7e_935da1ae",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "For?",
+      "range": {
+        "startLine": 180,
+        "startChar": 4,
+        "endLine": 180,
+        "endChar": 7
+      },
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c50db13_e74ea772",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "reuse resultValue here",
+      "range": {
+        "startLine": 280,
+        "startChar": 28,
+        "endLine": 280,
+        "endChar": 57
+      },
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd1cf5c6_752f6ca0",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "you can remove this line",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52951222_d662994b",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "use qt here for consistency",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60402785_72115a83",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "AFAICT cue.Schema is not needed here?",
+      "range": {
+        "startLine": 169,
+        "startChar": 48,
+        "endLine": 169,
+        "endChar": 62
+      },
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f685530_b8d9b040",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "you can replace this entire loop with `errors.Details(err, nil)`: https://pkg.go.dev/cuelang.org/go/cue/errors#Details",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f05a2a0_0e4f70dd",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "this appears like a no-op?",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7756c269_e0b59500",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "I would omit the numbering prefixes; the names are descriptive and unique enough, so there\u0027s no need to make them even longer.",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38d2afdf_6c6e870a",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "it would be a good idea to be consistent with the indentation in the input XML strings; otherwise it gets pretty difficult to read the test cases one after another if they use seemingly random indentation.",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "454054e2_23449ee2",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 574,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "skip these empty lines - especially because they seem to contain trailing whitespace",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3a43471_349d5f25",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 610,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "use qt for consistency",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ca98aac_1e99232b",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "use `cue/format.Node` instead, which is more specific",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "150bd29c_626ba9e8",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 617,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "this also seems like a no-op",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "443e0acb_47a60134",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 677,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "any such single-use var you should inline for the sake of verbosity",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef4f0c23_78ef4a2a",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 682,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-31T16:03:38Z",
+      "side": 1,
+      "message": "prefer using https://pkg.go.dev/github.com/go-quicktest/qt#ErrorMatches, which is a bit easier with errors - and allows doing a regular expression match too",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -80,7 +80,17 @@ func NewWithSettings(v internal.EvaluatorVersion, flags cuedebug.Config) *Runtim
 // SetVersion sets the version to use for the Runtime. This should only be set
 // before first use.
 func (r *Runtime) SetVersion(v internal.EvaluatorVersion) {
-	r.version = v
+	switch v {
+	case internal.EvalV2, internal.EvalV3:
+		r.version = v
+	case internal.EvalVersionUnset, internal.DefaultVersion:
+		cueexperiment.Init()
+		if cueexperiment.Flags.EvalV3 {
+			r.version = internal.EvalV3
+		} else {
+			r.version = internal.EvalV2
+		}
+	}
 }
 
 // SetTopologicalSort sets whether or not to use topological sorting
@@ -114,12 +124,7 @@ func (r *Runtime) Init() {
 
 	r.loaded = map[*build.Instance]interface{}{}
 
-	cueexperiment.Init()
-	if cueexperiment.Flags.EvalV3 {
-		r.version = internal.EvalV3
-	} else {
-		r.version = internal.EvalV2
-	}
+	r.SetVersion(internal.DefaultVersion)
 	r.topoSort = cueexperiment.Flags.TopoSort
 
 	// By default we follow the environment's CUE_DEBUG settings,

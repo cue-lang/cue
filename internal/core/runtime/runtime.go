@@ -116,9 +116,9 @@ func (r *Runtime) Init() {
 
 	cueexperiment.Init()
 	if cueexperiment.Flags.EvalV3 {
-		r.version = internal.DevVersion
+		r.version = internal.EvalV3
 	} else {
-		r.version = internal.DefaultVersion
+		r.version = internal.EvalV2
 	}
 	r.topoSort = cueexperiment.Flags.TopoSort
 

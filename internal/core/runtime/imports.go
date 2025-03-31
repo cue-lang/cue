@@ -61,9 +61,9 @@ var SharedRuntime = sync.OnceValue(func() *Runtime {
 	// or getting rid of SharedRuntime altogether.
 	cueexperiment.Init()
 	if cueexperiment.Flags.EvalV3 {
-		r.version = internal.DevVersion
+		r.version = internal.EvalV3
 	} else {
-		r.version = internal.DefaultVersion
+		r.version = internal.EvalV2
 	}
 	return r
 })

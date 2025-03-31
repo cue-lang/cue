@@ -362,10 +362,11 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	// intermediate node refers to a definition, things are evaluated at least
 	// once.
 	switch isDef, _ := IsDef(c.Expr()); {
-	case isDef || arc.Label.IsDef():
+	case isDef || arc.Label.IsDef() || closeInfo.TopDef:
 		n.isDef = true
 		// n.node.ClosedRecursive = true // TODO: should we set this here?
 		closeInfo.FromDef = true
+		closeInfo.TopDef = false
 
 		closeInfo = n.addResolver(arc, closeInfo, false)
 	default:

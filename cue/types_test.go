@@ -147,7 +147,8 @@ func TestAPI(t *testing.T) {
 		},
 		want: `"test1"`,
 	}}
-	for _, tc := range testCases {
+	for i, tc := range testCases {
+		_ = i // for debugging purposes
 		m := cuetdtest.FullMatrix
 		m.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			ctx := m.CueContext()

@@ -1008,7 +1008,7 @@ func addConjuncts(ctx *OpContext, dst *Vertex, src Value) {
 			// investigate the closedness information contained in the parent.
 			for p := v; p != nil; p = p.Parent {
 				if p.Label.IsDef() {
-					c.CloseInfo.FromDef = true
+					c.CloseInfo.TopDef = true
 					break
 				}
 			}

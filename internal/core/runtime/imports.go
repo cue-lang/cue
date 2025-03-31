@@ -22,7 +22,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/cueexperiment"
 )
 
 type PackageFunc func(ctx adt.Runtime) (*adt.Vertex, errors.Error)
@@ -59,12 +58,7 @@ var SharedRuntime = sync.OnceValue(func() *Runtime {
 	// but future evaluator versions may not be compatible at that level.
 	// We should consider using one SharedRuntime per evaluator version,
 	// or getting rid of SharedRuntime altogether.
-	cueexperiment.Init()
-	if cueexperiment.Flags.EvalV3 {
-		r.version = internal.EvalV3
-	} else {
-		r.version = internal.EvalV2
-	}
+	r.SetVersion(internal.DefaultVersion)
 	return r
 })
 

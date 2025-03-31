@@ -93,6 +93,7 @@ func TestEvalVersion(t *testing.T) {
 	// The experiment evaluator version setting does not affect the specific
 	// versions like Stable or V3, as they are fixed.
 	testFixedVersions := func() {
+		test(New(EvaluatorVersion(EvalStable)), internal.EvalV3)
 		// We currently don't have an experimental version, so it's the current version.
 		test(New(EvaluatorVersion(EvalExperiment)), internal.EvalV3)
 		test(New(EvaluatorVersion(EvalV2)), internal.EvalV2)
@@ -102,15 +103,7 @@ func TestEvalVersion(t *testing.T) {
 	// The current and default evaluator version is EvalV3.
 	qt.Assert(t, qt.Equals(cueexperiment.Flags.EvalV3, true))
 	test(New(), internal.EvalV3)
-	// TODO(mvdan): explicitly selecting the default should result in evalv3 here,
-	// just like implicitly selecting the default by not using the EvaluatorVersion flag.
-	// It currently does not, because internally, we treat "unset" vs "default"
-	// as different version selection scenarios.
-	//
-	// Or, if we want an evaluator version to describe "latest stable", opposing
-	// EvalExperiment to describe "latest experimental", we should rename it to EvalStable
-	// and keep its current behavior.
-	test(New(EvaluatorVersion(EvalDefault)), internal.EvalV2)
+	test(New(EvaluatorVersion(EvalDefault)), internal.EvalV3)
 
 	testFixedVersions()
 

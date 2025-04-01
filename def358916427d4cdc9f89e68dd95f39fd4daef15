@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "81f31fbf_cd5f1fbe",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Sure, I\u0027ve updated the short link to point to that.",
+      "parentUuid": "f68f5244_94258843",
+      "range": {
+        "startLine": 17,
+        "startChar": 42,
+        "endLine": 17,
+        "endChar": 54
+      },
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "89dd17e6_593089f6",
@@ -54,6 +78,24 @@
       "writtenOn": "2025-03-31T16:03:38Z",
       "side": 1,
       "message": "please fix up the rest of these aka.ms short links too, following my earlier comment.",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88a4d724_a8e40be6",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "I\u0027ve redirected the short link to point to the cuelang.org rather than the github.com domain. If that\u0027s not what you meant, please let me know and I can update.",
+      "parentUuid": "89dd17e6_593089f6",
       "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -75,6 +117,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "83c40b33_5c1f7ecb",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a47cf6f_ad23243c",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f2b6c7e_935da1ae",
@@ -88,6 +148,30 @@
       "writtenOn": "2025-03-31T16:03:38Z",
       "side": 1,
       "message": "For?",
+      "range": {
+        "startLine": 180,
+        "startChar": 4,
+        "endLine": 180,
+        "endChar": 7
+      },
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b0d9e13_9c632628",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f2b6c7e_935da1ae",
       "range": {
         "startLine": 180,
         "startChar": 4,
@@ -121,6 +205,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b22a0314_e1e68f14",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c50db13_e74ea772",
+      "range": {
+        "startLine": 280,
+        "startChar": 28,
+        "endLine": 280,
+        "endChar": 57
+      },
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd1cf5c6_752f6ca0",
@@ -138,6 +246,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "970ba9b0_6f17830b",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd1cf5c6_752f6ca0",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "52951222_d662994b",
@@ -151,6 +277,24 @@
       "writtenOn": "2025-03-31T16:03:38Z",
       "side": 1,
       "message": "use qt here for consistency",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "098f6af6_d3bdc8fe",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52951222_d662994b",
       "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -178,6 +322,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6500e8a4_2eaa9862",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60402785_72115a83",
+      "range": {
+        "startLine": 169,
+        "startChar": 48,
+        "endLine": 169,
+        "endChar": 62
+      },
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f685530_b8d9b040",
@@ -191,6 +359,24 @@
       "writtenOn": "2025-03-31T16:03:38Z",
       "side": 1,
       "message": "you can replace this entire loop with `errors.Details(err, nil)`: https://pkg.go.dev/cuelang.org/go/cue/errors#Details",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96f76cc8_db3ebf1d",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f685530_b8d9b040",
       "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -212,6 +398,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1dec23a4_c0a19b4d",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f05a2a0_0e4f70dd",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7756c269_e0b59500",
@@ -225,6 +429,24 @@
       "writtenOn": "2025-03-31T16:03:38Z",
       "side": 1,
       "message": "I would omit the numbering prefixes; the names are descriptive and unique enough, so there\u0027s no need to make them even longer.",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1526c760_62342e0e",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7756c269_e0b59500",
       "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -246,6 +468,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bd7149b_b40d985f",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "I agree, however this test intentionally tests spacing (including new lines) on either side of the xml root node. I will update the test name to make this clearer.",
+      "parentUuid": "38d2afdf_6c6e870a",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "454054e2_23449ee2",
@@ -259,6 +499,24 @@
       "writtenOn": "2025-03-31T16:03:38Z",
       "side": 1,
       "message": "skip these empty lines - especially because they seem to contain trailing whitespace",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91d48f6a_5b7eb896",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 574,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "I agree, however this test intentionally tests spacing (including new lines) on either side of the xml root node. I will update the test name to make this clearer.",
+      "parentUuid": "454054e2_23449ee2",
       "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -280,6 +538,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae3029e1_d09622f2",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 610,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3a43471_349d5f25",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ca98aac_1e99232b",
@@ -293,6 +569,24 @@
       "writtenOn": "2025-03-31T16:03:38Z",
       "side": 1,
       "message": "use `cue/format.Node` instead, which is more specific",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99164375_f87faa85",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ca98aac_1e99232b",
       "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -314,6 +608,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5c29197_54cedf11",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 617,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "150bd29c_626ba9e8",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "443e0acb_47a60134",
@@ -331,6 +643,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7af3575d_54dfb562",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 677,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "443e0acb_47a60134",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef4f0c23_78ef4a2a",
@@ -344,6 +674,24 @@
       "writtenOn": "2025-03-31T16:03:38Z",
       "side": 1,
       "message": "prefer using https://pkg.go.dev/github.com/go-quicktest/qt#ErrorMatches, which is a bit easier with errors - and allows doing a regular expression match too",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa6ac31b_8fc6021f",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 682,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-01T12:48:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef4f0c23_78ef4a2a",
       "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

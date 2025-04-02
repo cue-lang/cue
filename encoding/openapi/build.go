@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	cuejson "cuelang.org/go/encoding/json"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
@@ -738,6 +739,26 @@ func (b *builder) object(v cue.Value) {
 
 	if !hasProps && properties.len() > 0 {
 		b.setSingle("properties", (*ast.StructLit)(properties), false)
+	}
+
+	attr := v.Attribute("openapi")
+	for i := 0; i < attr.NumArgs(); i++ {
+		key, value := attr.Arg(i)
+		if key != "extension" {
+			continue
+		}
+
+		parts := strings.SplitN(value, ":", 2)
+		if len(parts) != 2 {
+			b.failf(v, "invalid openapi extension attribute %q: %v must be in the format key:value", key, value)
+		} else {
+			extension, err := cuejson.Extract(key, []byte(parts[1]))
+			if err != nil {
+				b.failf(v, "invalid openapi extension attribute %q: %v", key, err)
+			}
+
+			b.setSingle(parts[0], extension, true)
+		}
 	}
 
 	if t := v.LookupPath(cue.MakePath(cue.AnyString)); t.Exists() &&

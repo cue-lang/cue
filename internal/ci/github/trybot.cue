@@ -181,16 +181,6 @@ workflows: trybot: _repo.bashWorkflow & {
 				go mod tidy
 				(cd internal/_e2e && go test -run=-)
 				"""
-		}, {
-			name: "staticcheck"
-			// TODO(mvdan): once we can do 'go tool staticcheck' with Go 1.24+,
-			// then using this action is probably no longer worthwhile.
-			// Note that we should then persist staticcheck's cache too.
-			uses: "dominikh/staticcheck-action@v1"
-			with: {
-				version:      "2024.1.1" // Pin a version for determinism.
-				"install-go": false      // We install Go ourselves.
-			}
 		},
 	]
 

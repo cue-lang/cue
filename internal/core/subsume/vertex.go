@@ -170,11 +170,19 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 			continue
 		}
 
-		s.missing = f
-		s.gt = a
-		s.lt = y
+		if b == nil {
+			s.missing = f
+			s.gt = a
+			s.lt = y
 
-		s.errf("field %v not present in %v", f, y)
+			s.errf("field %v not present in %v", f, y)
+		} else {
+			s.gt = a
+			s.lt = b
+
+			s.errf("%v in %v does not subsume %v in %v", a, x, b, y)
+		}
+
 		return false
 	}
 
@@ -373,11 +381,18 @@ func (s *subsumer) verticesDev(x, y *adt.Vertex) bool {
 			continue
 		}
 
-		s.missing = f
-		s.gt = a
-		s.lt = y
+		if b == nil {
+			s.missing = f
+			s.gt = a
+			s.lt = y
 
-		s.errf("field %v not present in %v", f, y)
+			s.errf("field %v not present in %v", f, y)
+		} else {
+			s.gt = a
+			s.lt = b
+
+			s.errf("%v in %v does not subsume %v in %v", a, x, b, y)
+		}
 		return false
 	}
 

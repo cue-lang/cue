@@ -156,6 +156,7 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 		Language: old.Language,
 		Deps:     make(map[string]*modfile.Dep),
 		Source:   old.Source,
+		Custom:   old.Custom,
 	}
 	defaults := rs.DefaultMajorVersions()
 	for _, v := range rs.RootModules() {

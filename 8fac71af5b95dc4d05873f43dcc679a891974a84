@@ -16,6 +16,23 @@
       "message": "PS17 moves the package to encoding/xml/koala as discussed, and expands the commit message a bit.\n\nPS18 includes some last minor tweaks to the code and tests, but nothing major, and the logic is untouched.",
       "revId": "8fac71af5b95dc4d05873f43dcc679a891974a84",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43710fe4_6e3ce957",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-07T13:05:27Z",
+      "side": 1,
+      "message": "I already approved this with very minor tweaks, but Gerrit knows I\u0027m the last uploader, so my review no longer counts. Doing another approval as a bot.",
+      "revId": "8fac71af5b95dc4d05873f43dcc679a891974a84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

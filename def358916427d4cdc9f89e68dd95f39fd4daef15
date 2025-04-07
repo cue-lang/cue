@@ -100,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c00f9f2b_f84232b7",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-07T10:16:56Z",
+      "side": 1,
+      "message": "I did mean using cuelang.org links in the code here. I will update this in the last patchset before merging.",
+      "parentUuid": "88a4d724_a8e40be6",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a47cf6f_ad23243c",
@@ -482,6 +500,24 @@
       "side": 1,
       "message": "I agree, however this test intentionally tests spacing (including new lines) on either side of the xml root node. I will update the test name to make this clearer.",
       "parentUuid": "38d2afdf_6c6e870a",
+      "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "441816e6_ca23bd39",
+        "filename": "encoding/koala/decode_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-07T10:16:56Z",
+      "side": 1,
+      "message": "ack",
+      "parentUuid": "9bd7149b_b40d985f",
       "revId": "def358916427d4cdc9f89e68dd95f39fd4daef15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

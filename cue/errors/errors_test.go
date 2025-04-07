@@ -17,6 +17,7 @@ package errors
 import (
 	"bytes"
 	"fmt"
+	"slices"
 	"testing"
 
 	"cuelang.org/go/cue/token"
@@ -79,14 +80,44 @@ func TestErrorList_Sort(t *testing.T) {
 }
 
 func TestErrorList_RemoveMultiples(t *testing.T) {
+	error1 := Promote(fmt.Errorf("error1"), "msg1")
+	error2 := Promote(fmt.Errorf("error2"), "msg2")
+
 	tests := []struct {
 		name string
-		p    *list
+		p    list
+		want list
 	}{
-		// TODO: Add test cases.
+		{
+			name: "SingleError",
+			p:    list{error1},
+			want: list{error1},
+		},
+		{
+			name: "TwoErrorsNoDuplicatesOrder12",
+			p:    list{error1, error2},
+			want: list{error1, error2},
+		},
+		{
+			name: "TwoErrorsNoDuplicatesOrder21",
+			p:    list{error2, error1},
+			want: list{error2, error1},
+		},
+		{
+			name: "TwoErrorsDuplicates",
+			p:    list{error1, error1},
+			want: list{error1},
+		},
+		{
+			name: "ThreeErrorsPreserveOrder",
+			p:    list{error1, error2, error1},
+			want: list{error1, error2},
+		},
 	}
 	for _, tt := range tests {
-		tt.p.RemoveMultiples()
+		if got := tt.p.RemoveMultiples(); !slices.Equal(got, tt.want) {
+			t.Errorf("%q. list.RemoveMultiples() list = %v, want = %v", tt.name, got, tt.want)
+		}
 	}
 }
 

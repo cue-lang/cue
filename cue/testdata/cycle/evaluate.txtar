@@ -159,24 +159,24 @@ Conjuncts:    299
 Disjuncts:    192
 -- out/evalalpha --
 Errors:
-closeCycle.c: structural cycle
-closeFail.x.b: field not allowed:
-    ./in.cue:104:6
-    ./in.cue:107:5
-letCycleFail.t1.a.c: structural cycle
-printCycle.a.X: structural cycle
-structCycle.c: structural cycle
 disjunctionCycle.b: cannot use 1 (type int) as type list:
     ./in.cue:56:5
     ./in.cue:56:9
+letCycleFail.t1.a.c: structural cycle
 b: structural cycle:
     ./in.cue:62:6
+closeCycle.c: structural cycle
+structCycle.c: structural cycle
 structural cycle:
     ./in.cue:85:12
 listAddCycle.c: structural cycle:
     ./in.cue:91:5
 listMulCycle.c: structural cycle:
     ./in.cue:97:5
+closeFail.x.b: field not allowed:
+    ./in.cue:104:6
+    ./in.cue:107:5
+printCycle.a.X: structural cycle
 
 Result:
 (_|_){
@@ -372,44 +372,45 @@ diff old new
 +++ new
 @@ -1,33 +1,22 @@
  Errors:
--closeCycle.a: structural cycle
--closeCycle.b.d: structural cycle
-+closeCycle.c: structural cycle
- closeFail.x.b: field not allowed:
-     ./in.cue:104:6
--    ./in.cue:105:12
--    ./in.cue:106:6
-     ./in.cue:107:5
- letCycleFail.t1.a.c: structural cycle
--structCycle.a: structural cycle
--structCycle.b.d: structural cycle
 -disjunctionCycle.a: cannot use 1 (type int) as type list:
 -    ./in.cue:56:5
 -    ./in.cue:56:9
-+printCycle.a.X: structural cycle
-+structCycle.c: structural cycle
+-letCycleFail.t1.a.c: structural cycle
  disjunctionCycle.b: cannot use 1 (type int) as type list:
      ./in.cue:56:5
      ./in.cue:56:9
 -disjunctionCycle.c: cannot use 1 (type int) as type list:
 -    ./in.cue:56:5
 -    ./in.cue:56:9
++letCycleFail.t1.a.c: structural cycle
  b: structural cycle:
      ./in.cue:62:6
+-closeCycle.a: structural cycle
+-closeCycle.b.d: structural cycle
 -closeCycle.c: structural cycle:
 -    ./in.cue:73:15
+-structCycle.a: structural cycle
+-structCycle.b.d: structural cycle
 -structCycle.c: structural cycle:
 -    ./in.cue:79:14
 -embedCycle: structural cycle:
 -    ./in.cue:85:11
--printCycle.a.X.X: structural cycle:
--    ./in.cue:113:6
++closeCycle.c: structural cycle
++structCycle.c: structural cycle
 +structural cycle:
 +    ./in.cue:85:12
 +listAddCycle.c: structural cycle:
 +    ./in.cue:91:5
 +listMulCycle.c: structural cycle:
 +    ./in.cue:97:5
+ closeFail.x.b: field not allowed:
+     ./in.cue:104:6
+-    ./in.cue:105:12
+-    ./in.cue:106:6
+     ./in.cue:107:5
+-printCycle.a.X.X: structural cycle:
+-    ./in.cue:113:6
++printCycle.a.X: structural cycle
  
  Result:
  (_|_){
@@ -622,19 +623,10 @@ embedCycle: technically not a structural cycle, so V3 result
 is okay or even an improvement. See TODO(dyncyclecheck).
 -- out/eval --
 Errors:
-closeCycle.a: structural cycle
-closeCycle.b.d: structural cycle
-closeFail.x.b: field not allowed:
-    ./in.cue:104:6
-    ./in.cue:105:12
-    ./in.cue:106:6
-    ./in.cue:107:5
-letCycleFail.t1.a.c: structural cycle
-structCycle.a: structural cycle
-structCycle.b.d: structural cycle
 disjunctionCycle.a: cannot use 1 (type int) as type list:
     ./in.cue:56:5
     ./in.cue:56:9
+letCycleFail.t1.a.c: structural cycle
 disjunctionCycle.b: cannot use 1 (type int) as type list:
     ./in.cue:56:5
     ./in.cue:56:9
@@ -643,12 +635,21 @@ disjunctionCycle.c: cannot use 1 (type int) as type list:
     ./in.cue:56:9
 b: structural cycle:
     ./in.cue:62:6
+closeCycle.a: structural cycle
+closeCycle.b.d: structural cycle
 closeCycle.c: structural cycle:
     ./in.cue:73:15
+structCycle.a: structural cycle
+structCycle.b.d: structural cycle
 structCycle.c: structural cycle:
     ./in.cue:79:14
 embedCycle: structural cycle:
     ./in.cue:85:11
+closeFail.x.b: field not allowed:
+    ./in.cue:104:6
+    ./in.cue:105:12
+    ./in.cue:106:6
+    ./in.cue:107:5
 printCycle.a.X.X: structural cycle:
     ./in.cue:113:6
 

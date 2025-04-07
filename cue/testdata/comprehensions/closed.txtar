@@ -250,7 +250,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,19 +1,8 @@
+@@ -1,20 +1,9 @@
  Errors:
  disallowed.vErr.d: field not allowed:
 -    ./in.cue:26:6
@@ -259,17 +259,18 @@ diff old new
      ./in.cue:28:4
 -    ./in.cue:32:8
      ./in.cue:32:14
+ noEraseDefinition.a.0.b: field not allowed:
+-    ./in.cue:54:17
+-    ./in.cue:55:7
+     ./in.cue:55:17
 -issue3486.out.extra: field not allowed:
 -    ./v3issues.cue:10:11
 -    ./v3issues.cue:12:2
 -    ./v3issues.cue:14:4
 -    ./v3issues.cue:16:4
- noEraseDefinition.a.0.b: field not allowed:
--    ./in.cue:54:17
--    ./in.cue:55:7
-     ./in.cue:55:17
  
  Result:
+ (_|_){
 @@ -50,11 +39,7 @@
        // [eval]
        d: (_|_){
@@ -349,15 +350,15 @@ disallowed.vErr.d: field not allowed:
     ./in.cue:28:4
     ./in.cue:32:8
     ./in.cue:32:14
+noEraseDefinition.a.0.b: field not allowed:
+    ./in.cue:54:17
+    ./in.cue:55:7
+    ./in.cue:55:17
 issue3486.out.extra: field not allowed:
     ./v3issues.cue:10:11
     ./v3issues.cue:12:2
     ./v3issues.cue:14:4
     ./v3issues.cue:16:4
-noEraseDefinition.a.0.b: field not allowed:
-    ./in.cue:54:17
-    ./in.cue:55:7
-    ./in.cue:55:17
 
 Result:
 (_|_){

@@ -234,10 +234,10 @@ definition.t1.err.a.c: field not allowed:
     ./definition.cue:8:5
     ./definition.cue:9:5
     ./definition.cue:11:6
-mutual.t4.ok.p0.z: cannot add to field b
 mutual.t4.ok.p0.z: cannot add to field c
-mutual.t4.ok.p4.z: cannot add to field b
+mutual.t4.ok.p0.z: cannot add to field b
 mutual.t4.ok.p4.z: cannot add to field c
+mutual.t4.ok.p4.z: cannot add to field b
 
 Result:
 (_|_){
@@ -504,8 +504,8 @@ Result:
         p0: (_|_){
           // [eval]
           z: (_|_){
-            // [eval] mutual.t4.ok.p0.z: cannot add to field b
-            // mutual.t4.ok.p0.z: cannot add to field c
+            // [eval] mutual.t4.ok.p0.z: cannot add to field c
+            // mutual.t4.ok.p0.z: cannot add to field b
             d: (struct){
               a: (int){ 1 }
               b: (int){ 2 }
@@ -605,8 +605,8 @@ Result:
         p4: (_|_){
           // [eval]
           z: (_|_){
-            // [eval] mutual.t4.ok.p4.z: cannot add to field b
-            // mutual.t4.ok.p4.z: cannot add to field c
+            // [eval] mutual.t4.ok.p4.z: cannot add to field c
+            // mutual.t4.ok.p4.z: cannot add to field b
             d: (struct){
               a: (int){ 1 }
               b: (int){ 2 }
@@ -1136,10 +1136,10 @@ diff old new
 -    ./definition.cue:8:5
      ./definition.cue:9:5
 -    ./definition.cue:11:6
--mutual.t4.ok.p0.z: cannot add to field b
 -mutual.t4.ok.p0.z: cannot add to field c
--mutual.t4.ok.p4.z: cannot add to field b
+-mutual.t4.ok.p0.z: cannot add to field b
 -mutual.t4.ok.p4.z: cannot add to field c
+-mutual.t4.ok.p4.z: cannot add to field b
  
  Result:
  (_|_){
@@ -1273,8 +1273,8 @@ diff old new
 -        p0: (_|_){
 -          // [eval]
 -          z: (_|_){
--            // [eval] mutual.t4.ok.p0.z: cannot add to field b
--            // mutual.t4.ok.p0.z: cannot add to field c
+-            // [eval] mutual.t4.ok.p0.z: cannot add to field c
+-            // mutual.t4.ok.p0.z: cannot add to field b
 -            d: (struct){
 -              a: (int){ 1 }
 -              b: (int){ 2 }
@@ -1374,8 +1374,8 @@ diff old new
 -        p4: (_|_){
 -          // [eval]
 -          z: (_|_){
--            // [eval] mutual.t4.ok.p4.z: cannot add to field b
--            // mutual.t4.ok.p4.z: cannot add to field c
+-            // [eval] mutual.t4.ok.p4.z: cannot add to field c
+-            // mutual.t4.ok.p4.z: cannot add to field b
 -            d: (struct){
 -              a: (int){ 1 }
 -              b: (int){ 2 }

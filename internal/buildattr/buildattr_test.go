@@ -88,10 +88,10 @@ package something
 `,
 	wantOK:   false,
 	wantAttr: "@if(foo)",
-	wantError: `previous declaration here:
-    testfile.cue:3:1
-multiple @if attributes:
+	wantError: `multiple @if attributes:
     testfile.cue:4:1
+previous declaration here:
+    testfile.cue:3:1
 `,
 }, {
 	testName: "MultipleIfAttributesWithOneAfterPackage",
@@ -292,10 +292,10 @@ package something
 package something
 `,
 	wantOK: false,
-	wantError: `previous declaration here:
-    testfile.cue:2:1
-multiple @if attributes:
+	wantError: `multiple @if attributes:
     testfile.cue:3:1
+previous declaration here:
+    testfile.cue:2:1
 `,
 	wantAttr: "@if(foo)",
 }, {

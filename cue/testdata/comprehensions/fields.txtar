@@ -91,12 +91,12 @@ Disjuncts:    30
       c: (string){ string }
     }
     y: (_|_){
-      // [incomplete] missingRequiredError.y: missing required field in for comprehension: a:
+      // [incomplete] missingRequiredError.y: key value of dynamic field must be concrete, found _|_(missingRequiredError.y: missing required field in for comprehension: a):
+      //     ./in.cue:34:5
+      // missingRequiredError.y: missing required field in for comprehension: a:
       //     ./in.cue:33:3
       //     ./in.cue:27:3
       //     ./in.cue:33:14
-      // missingRequiredError.y: key value of dynamic field must be concrete, found _|_(missingRequiredError.y: missing required field in for comprehension: a):
-      //     ./in.cue:34:5
     }
   }
   issue560: (struct){
@@ -123,15 +123,17 @@ Disjuncts:    30
 diff old new
 --- old
 +++ new
-@@ -24,6 +24,8 @@
+@@ -20,7 +20,9 @@
+       c: (string){ string }
+     }
+     y: (_|_){
+-      // [incomplete] missingRequiredError.y: missing required field in for comprehension: a:
++      // [incomplete] missingRequiredError.y: key value of dynamic field must be concrete, found _|_(missingRequiredError.y: missing required field in for comprehension: a):
++      //     ./in.cue:34:5
++      // missingRequiredError.y: missing required field in for comprehension: a:
        //     ./in.cue:33:3
        //     ./in.cue:27:3
        //     ./in.cue:33:14
-+      // missingRequiredError.y: key value of dynamic field must be concrete, found _|_(missingRequiredError.y: missing required field in for comprehension: a):
-+      //     ./in.cue:34:5
-     }
-   }
-   issue560: (struct){
 -- diff/todo/p2 --
 Near-duplicate message
 -- out/eval --

@@ -149,9 +149,9 @@ diff old new
  structural cycle:
      ./in.cue:3:25
 -structural cycle:
--    ./in.cue:8:9
--structural cycle:
 -    ./in.cue:8:38
+-structural cycle:
+-    ./in.cue:8:9
  
  Result:
  (_|_){
@@ -172,19 +172,21 @@ diff old new
    }
    fib7: (_|_){
      // [structural cycle] structural cycle:
-     //     ./in.cue:3:25
--    // structural cycle:
 -    //     ./in.cue:8:9
 -    // structural cycle:
+-    //     ./in.cue:3:25
+-    // structural cycle:
 -    //     ./in.cue:8:38
++    //     ./in.cue:3:25
    }
    fib12: (_|_){
      // [structural cycle] structural cycle:
-     //     ./in.cue:3:25
--    // structural cycle:
 -    //     ./in.cue:8:9
 -    // structural cycle:
+-    //     ./in.cue:3:25
+-    // structural cycle:
 -    //     ./in.cue:8:38
++    //     ./in.cue:3:25
    }
  }
 -- diff/todo/p3 --
@@ -204,9 +206,9 @@ Errors:
 structural cycle:
     ./in.cue:3:25
 structural cycle:
-    ./in.cue:8:9
-structural cycle:
     ./in.cue:8:38
+structural cycle:
+    ./in.cue:8:9
 
 Result:
 (_|_){
@@ -243,17 +245,17 @@ Result:
   }
   fib7: (_|_){
     // [structural cycle] structural cycle:
-    //     ./in.cue:3:25
-    // structural cycle:
     //     ./in.cue:8:9
+    // structural cycle:
+    //     ./in.cue:3:25
     // structural cycle:
     //     ./in.cue:8:38
   }
   fib12: (_|_){
     // [structural cycle] structural cycle:
-    //     ./in.cue:3:25
-    // structural cycle:
     //     ./in.cue:8:9
+    // structural cycle:
+    //     ./in.cue:3:25
     // structural cycle:
     //     ./in.cue:8:38
   }

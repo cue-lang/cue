@@ -74,11 +74,11 @@ reverse: {
 Errors:
 repeat.t8.v: error in call to list.Repeat: negative count:
     ./in.cue:4:30
+concat.t7.v: cannot use 1 (type int) as list in argument 1 to list.Concat:
+    ./in.cue:30:9
 concat.t8.v: error in call to list.Concat: cannot use value 1 (type int) as list:
     ./in.cue:19:22
     ./in.cue:31:10
-concat.t7.v: cannot use 1 (type int) as list in argument 1 to list.Concat:
-    ./in.cue:30:9
 minItems.fail1: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
     ./in.cue:45:12
     ./in.cue:45:26

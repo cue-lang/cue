@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3229fa5_3bbfc149",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-07T09:00:50Z",
+      "side": 1,
+      "message": "The commit message could use shorter lines to play nicer with the rest of our commit messages, but that\u0027s a minor nit so it\u0027s entirely up to you.",
+      "revId": "ba10ec3659be341167dec2602ea65f22d3db1889",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

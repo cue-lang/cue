@@ -265,6 +265,9 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 				continue
 			}
 			cueName := sel.String()
+			if sel.IsString() {
+				cueName = sel.Unquoted()
+			}
 			cueName = strings.TrimRight(cueName, "?!")
 			g.emitDocs(cueName, val.Doc())
 			// TODO: should we ensure that optional fields are always nilable in Go?

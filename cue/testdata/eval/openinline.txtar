@@ -1,4 +1,7 @@
-#openInline: true
+# This test is important in locking in the closedness behavior
+# of evalv2, where inline structs cause some closedness errors
+# to be ignored. evalv3 mimics this behavior for the sake of
+# backwards compatibility and not breaking existing users.
 
 -- cue.mod/module.cue --
 module: "mod.test"

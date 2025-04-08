@@ -1,5 +1,5 @@
-# This test is important in locking in the behaviour of the now-defalut
-# CUE_DEBUG=openinline=0.
+# This test is important in locking in the behaviour of evalv3,
+# which fixed some closedness bugs present in the older evalv2.
 
 -- x.cue --
 package x

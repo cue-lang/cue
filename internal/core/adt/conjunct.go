@@ -41,18 +41,6 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 	if c.CloseInfo.FromDef {
 		n.node.ClosedRecursive = true
 	}
-	// NOTE: the check for OpenInline is not strictly necessary, but it
-	// clarifies that using id.FromEmbed is not used when OpenInline is not
-	// used.
-	// TODO(dynclose): we have disabled OpenInline for the new dynamic
-	// closedness to be more inline with V2 and because it works slightly
-	// differently. Consider reinstating this in some shape or form.
-	// if c.CloseInfo.FromEmbed || (n.ctx.OpenInline && id.FromEmbed) {
-	// 	if !n.ctx.OpenInline {
-	// 		c.CloseInfo.FromEmbed = false
-	// 		id.FromEmbed = false
-	// 	}
-	// }
 
 	// TODO: consider setting this as a safety measure.
 	// if c.CloseInfo.CycleType > id.CycleType {

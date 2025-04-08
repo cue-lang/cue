@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "894ffe78_186928cd",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_xml_koala.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-08T16:02:50Z",
+      "side": 1,
+      "message": "Nit: I would tweak this comment. \n\nWe don\u0027t want to support an encoding into XML without a \"variant\" for now.\n\nSeparately, we also don\u0027t support encoding into `xml+koala`... yet.",
+      "revId": "f487528924ad431ae0339948d9319ec53b7f43bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2277f11b_891eeb3e",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_xml_koala.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-08T16:02:50Z",
+      "side": 1,
+      "message": "So we did end up supporting this? I thought we concluded not to support this, because we essentially unnecessarily crowd the encoding namespace. `koala` (at least for now) only makes sense in the context of XML.",
+      "revId": "f487528924ad431ae0339948d9319ec53b7f43bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5f139ee_745e1939",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_xml_koala.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-08T16:02:50Z",
+      "side": 1,
+      "message": "Perhaps spell this as `xml+koala` - see comment above.",
+      "revId": "f487528924ad431ae0339948d9319ec53b7f43bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b573b8f_56b84de8",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_xml_koala.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-08T16:02:50Z",
+      "side": 1,
+      "message": "What are you trying to spell here? Did you mean `koala:`?",
+      "revId": "f487528924ad431ae0339948d9319ec53b7f43bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

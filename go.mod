@@ -13,7 +13,7 @@ require (
 	github.com/kr/pretty v0.3.1
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1
-	github.com/pelletier/go-toml/v2 v2.2.3
+	github.com/pelletier/go-toml/v2 v2.2.4
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20250129171521-feedd8250727
 	github.com/rogpeppe/go-internal v1.14.1
 	github.com/spf13/cobra v1.9.1

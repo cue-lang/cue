@@ -37,7 +37,7 @@ unsupported encoding "xml"
 -- decode-xml.stderr --
 xml requires a variant, such as: xml+koala
 -- decode-koala.stderr --
-unknown filetype koala
+tag koala is not allowed in this context
 -- export.xml --
 <root>
     <message>Hello World!</message>

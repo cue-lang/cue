@@ -15,7 +15,7 @@
 package filetypes
 
 import (
-	"fmt"
+	"iter"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -106,28 +106,28 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 	evalMu.Lock()
 	defer evalMu.Unlock()
 	typesInit()
-	modeVal := typesValue.LookupPath(cue.MakePath(cue.Str("modes"), cue.Str(mode.String())))
-	fileVal := modeVal.LookupPath(cue.MakePath(cue.Str("FileInfo")))
+	modeVal := lookup(typesValue, "modes", mode.String())
+	fileVal := lookup(modeVal, "FileInfo")
 	fileVal = fileVal.FillPath(cue.Path{}, b)
 
 	if b.Encoding == "" {
-		ext := modeVal.LookupPath(cue.MakePath(cue.Str("extensions"), cue.Str(fileExt(b.Filename))))
+		ext := lookup(modeVal, "extensions", fileExt(b.Filename))
 		if ext.Exists() {
 			fileVal = fileVal.Unify(ext)
 		}
 	}
 	var errs errors.Error
 
-	interpretation, _ := fileVal.LookupPath(cue.MakePath(cue.Str("interpretation"))).String()
+	interpretation, _ := lookup(fileVal, "interpretation").String()
 	if b.Form != "" {
 		fileVal, errs = unifyWith(errs, fileVal, typesValue, "forms", string(b.Form))
 		// may leave some encoding-dependent options open in data mode.
 	} else if interpretation != "" {
-		// always sets schema form.
+		// always sets form=*schema
 		fileVal, errs = unifyWith(errs, fileVal, typesValue, "interpretations", interpretation)
 	}
 	if interpretation == "" {
-		s, err := fileVal.LookupPath(cue.MakePath(cue.Str("encoding"))).String()
+		s, err := lookup(fileVal, "encoding").String()
 		if err != nil {
 			return nil, err
 		}
@@ -143,7 +143,7 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 
 // unifyWith returns the equivalent of `v1 & v2[field][value]`.
 func unifyWith(errs errors.Error, v1, v2 cue.Value, field, value string) (cue.Value, errors.Error) {
-	v1 = v1.Unify(v2.LookupPath(cue.MakePath(cue.Str(field), cue.Str(value))))
+	v1 = v1.Unify(lookup(v2, field, value))
 	if err := v1.Err(); err != nil {
 		errs = errors.Append(errs,
 			errors.Newf(token.NoPos, "unknown %s %s", field, value))
@@ -172,33 +172,28 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 	evalMu.Lock()
 	defer evalMu.Unlock()
 	typesInit()
-	var modeVal, fileVal cue.Value
 
 	qualifier := ""
 	hasFiles := false
 
+	emptyScope := true
+	sc := &scope{}
 	for i, s := range args {
 		a := strings.Split(s, ":")
 		switch {
 		case len(a) == 1 || len(a[0]) == 1: // filename
-			if !fileVal.Exists() {
-				if len(a) == 1 && strings.HasSuffix(a[0], ".cue") {
-					// Handle majority case.
-					f := *fileForCUE
-					f.Filename = a[0]
-					files = append(files, &f)
-					hasFiles = true
-					continue
-				}
-				modeVal, fileVal, err = parseType("", Input)
-				if err != nil {
-					return nil, err
-				}
-			}
 			if s == "" {
 				return nil, errors.Newf(token.NoPos, "empty file name")
 			}
-			f, err := toFile(modeVal, fileVal, s)
+			if emptyScope && len(a) == 1 && strings.HasSuffix(a[0], ".cue") {
+				// Handle majority case.
+				f := *fileForCUE
+				f.Filename = a[0]
+				files = append(files, &f)
+				hasFiles = true
+				continue
+			}
+			f, err := toFile(Input, sc, s)
 			if err != nil {
 				return nil, err
 			}
@@ -220,10 +215,11 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 			case qualifier != "" && !hasFiles:
 				return nil, errors.Newf(token.NoPos, "scoped qualifier %q without file", qualifier+":")
 			}
-			modeVal, fileVal, err = parseType(a[0], Input)
+			sc, err = parseScope(a[0])
 			if err != nil {
 				return nil, err
 			}
+			emptyScope = false
 			qualifier = a[0]
 			hasFiles = false
 		}
@@ -243,12 +239,11 @@ func DefaultTagsForInterpretation(interp build.Interpretation, mode Mode) map[st
 	// TODO this could be done once only.
 
 	// This should never fail if called with a legitimate build.Interpretation constant.
-
-	mv, fv, err := parseType(string(interp), mode)
-	if err != nil {
-		panic(err)
-	}
-	f, err := toFile(mv, fv, "-")
+	f, err := toFile(mode, &scope{
+		topLevel: map[string]bool{
+			string(interp): true,
+		},
+	}, "-")
 	if err != nil {
 		panic(err)
 	}
@@ -305,27 +300,52 @@ func ParseFileAndType(file, scope string, mode Mode) (*build.File, error) {
 			return &f1, nil
 		}
 	}
-	modeVal, fileVal, err := parseType(scope, mode)
+	sc, err := parseScope(scope)
 	if err != nil {
 		return nil, err
 	}
-	return toFile(modeVal, fileVal, file)
+	return toFile(mode, sc, file)
 }
 
 func hasEncoding(v cue.Value) bool {
-	return v.LookupPath(cue.MakePath(cue.Str("encoding"))).Exists()
+	return lookup(v, "encoding").Exists()
 }
 
-func toFile(modeVal, fileVal cue.Value, filename string) (*build.File, error) {
+func toFile(mode Mode, sc *scope, filename string) (*build.File, error) {
+	modeVal := lookup(typesValue, "modes", mode.String())
+	fileVal := lookup(modeVal, "FileInfo")
+
+	for tagName := range sc.topLevel {
+		info := lookup(typesValue, "tagInfo", tagName)
+		if info.Exists() {
+			fileVal = fileVal.Unify(info)
+		} else {
+			return nil, errors.Newf(token.NoPos, "unknown filetype %s", tagName)
+		}
+	}
+	allowedSubsidiaryBool := lookup(fileVal, "boolTags")
+	for tagName, val := range sc.subsidiaryBool {
+		if !lookup(allowedSubsidiaryBool, tagName).Exists() {
+			return nil, errors.Newf(token.NoPos, "tag %s is not allowed in this context", tagName)
+		}
+		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("boolTags"), cue.Str(tagName)), val)
+	}
+	allowedSubsidiaryString := lookup(fileVal, "tags")
+	for tagName, val := range sc.subsidiaryString {
+		if !lookup(allowedSubsidiaryString, tagName).Exists() {
+			return nil, errors.Newf(token.NoPos, "tag %s is not allowed in this context", tagName)
+		}
+		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("tags"), cue.Str(tagName)), val)
+	}
 	if !hasEncoding(fileVal) {
 		if filename == "-" {
-			fileVal = fileVal.Unify(modeVal.LookupPath(cue.MakePath(cue.Str("Default"))))
+			fileVal = fileVal.Unify(lookup(modeVal, "Default"))
 		} else if ext := fileExt(filename); ext != "" {
-			extFile := modeVal.LookupPath(cue.MakePath(cue.Str("extensions"), cue.Str(ext)))
-			fileVal = fileVal.Unify(extFile)
-			if err := fileVal.Err(); err != nil {
+			extFile := lookup(modeVal, "extensions", ext)
+			if !extFile.Exists() {
 				return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
 			}
+			fileVal = fileVal.Unify(extFile)
 		} else {
 			return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", filename)
 		}
@@ -341,62 +361,52 @@ func toFile(modeVal, fileVal cue.Value, filename string) (*build.File, error) {
 	return f, nil
 }
 
-func parseType(scope string, mode Mode) (modeVal, fileVal cue.Value, _ error) {
-	modeVal = typesValue.LookupPath(cue.MakePath(cue.Str("modes"), cue.Str(mode.String())))
-	fileVal = modeVal.LookupPath(cue.MakePath(cue.Str("FileInfo")))
+// scope holds attributes that influence encoding and decoding.
+// Together with the mode and the file name, they determine
+// a number of properties of the encoding process.
+type scope struct {
+	topLevel         map[string]bool
+	subsidiaryBool   map[string]bool
+	subsidiaryString map[string]string
+}
 
-	if scope == "" {
-		return modeVal, fileVal, nil
+func parseScope(scopeStr string) (*scope, error) {
+	if scopeStr == "" {
+		return &scope{}, nil
 	}
-	var otherTags []string
-	for _, tag := range strings.Split(scope, "+") {
-		tagName, _, ok := strings.Cut(tag, "=")
-		if ok {
-			otherTags = append(otherTags, tag)
-		} else {
-			info := typesValue.LookupPath(cue.MakePath(cue.Str("tagInfo"), cue.Str(tagName)))
-			if info.Exists() {
-				fileVal = fileVal.Unify(info)
-			} else {
-				// The tag might only be available when all the
-				// other tags have been evaluated.
-				otherTags = append(otherTags, tag)
-			}
-		}
+	sc := scope{
+		topLevel:         make(map[string]bool),
+		subsidiaryBool:   make(map[string]bool),
+		subsidiaryString: make(map[string]string),
 	}
-	if len(otherTags) == 0 {
-		return modeVal, fileVal, nil
-	}
-	// There are tags that aren't mentioned in tagInfo.
-	// They might still be valid, but just only valid within the file types that
-	// have been specified above, so look at the schema that we've got
-	// and see if it specifies any tags.
-	allowedTags := fileVal.LookupPath(cue.MakePath(cue.Str("tags")))
-	allowedBoolTags := fileVal.LookupPath(cue.MakePath(cue.Str("boolTags")))
-	for _, tag := range otherTags {
+	for _, tag := range strings.Split(scopeStr, "+") {
 		tagName, tagVal, hasValue := strings.Cut(tag, "=")
-		tagNamePath := cue.MakePath(cue.Str(tagName)).Optional()
-		tagSchema := allowedTags.LookupPath(tagNamePath)
-		if tagSchema.Exists() {
-			fileVal = fileVal.FillPath(cue.MakePath(cue.Str("tags"), cue.Str(tagName)), tagVal)
-			continue
-		}
-		if !allowedBoolTags.LookupPath(tagNamePath).Exists() {
-			return cue.Value{}, cue.Value{}, errors.Newf(token.NoPos, "unknown filetype %s", tagName)
-		}
-		tagValBool := true
-		if hasValue {
-			// It's a boolean tag and an explicit value has been specified.
-			// Allow the usual boolean string values.
-			t, err := strconv.ParseBool(tagVal)
-			if err != nil {
-				return cue.Value{}, cue.Value{}, fmt.Errorf("invalid boolean value for tag %q", tagName)
+		switch tagTypes[tagName] {
+		case tagTopLevel:
+			if hasValue {
+				return nil, errors.Newf(token.NoPos, "cannot specify value for tag %q", tagName)
 			}
-			tagValBool = t
+			sc.topLevel[tagName] = true
+		case tagSubsidiaryBool:
+			if hasValue {
+				t, err := strconv.ParseBool(tagVal)
+				if err != nil {
+					return nil, errors.Newf(token.NoPos, "invalid boolean value for tag %q", tagName)
+				}
+				sc.subsidiaryBool[tagName] = t
+			} else {
+				sc.subsidiaryBool[tagName] = true
+			}
+		case tagSubsidiaryString:
+			if !hasValue {
+				return nil, errors.Newf(token.NoPos, "tag %q must have value (%s=<value>)", tagName, tagName)
+			}
+			sc.subsidiaryString[tagName] = tagVal
+		default:
+			return nil, errors.Newf(token.NoPos, "unknown filetype %s", tagName)
 		}
-		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("boolTags"), cue.Str(tagName)), tagValBool)
 	}
-	return modeVal, fileVal, nil
+	return &sc, nil
 }
 
 // fileExt is like filepath.Ext except we don't treat file names starting with "." as having an extension
@@ -407,4 +417,44 @@ func fileExt(f string) string {
 		return ""
 	}
 	return e
+}
+
+func seqConcat[T any](iters ...iter.Seq[T]) iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for _, it := range iters {
+			for x := range it {
+				if !yield(x) {
+					return
+				}
+			}
+		}
+	}
+}
+
+// lookup looks up the given string field path in v.
+func lookup(v cue.Value, elems ...string) cue.Value {
+	sels := make([]cue.Selector, len(elems))
+	for i := range elems {
+		sels[i] = cue.Str(elems[i])
+	}
+	return v.LookupPath(cue.MakePath(sels...))
+}
+
+// structFields returns an iterator over the names of all the regulat fields
+// in v and their values.
+func structFields(v cue.Value) iter.Seq2[string, cue.Value] {
+	return func(yield func(string, cue.Value) bool) {
+		if !v.Exists() {
+			return
+		}
+		iter, err := v.Fields()
+		if err != nil {
+			return
+		}
+		for iter.Next() {
+			if !yield(iter.Selector().Unquoted(), iter.Value()) {
+				break
+			}
+		}
+	}
 }

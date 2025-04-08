@@ -405,7 +405,7 @@ func TestParseFile(t *testing.T) {
 		},
 	}, {
 		in:  "json+lang=js:foo.x",
-		out: `unknown filetype lang`,
+		out: `tag lang is not allowed in this context`,
 	}, {
 		in:  "foo:file.bar",
 		out: `unknown filetype foo`,
@@ -477,7 +477,7 @@ func TestParseArgs(t *testing.T) {
 		},
 	}, {
 		in:  "koala: bar.xml",
-		out: "unknown filetype koala",
+		out: "tag koala is not allowed in this context",
 	}, {
 		in: "jsonschema+strict: bar.schema",
 		out: []*build.File{

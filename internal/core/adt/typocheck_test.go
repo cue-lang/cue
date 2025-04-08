@@ -477,7 +477,7 @@ func TestReplaceIDs(t *testing.T) {
 			tt.reqSets.assert()
 			tt.expected.assert()
 
-			tt.reqSets.replaceIDs(tt.replace...)
+			tt.reqSets.replaceIDs(&OpContext{}, tt.replace...)
 			if !slices.Equal(tt.reqSets, tt.expected) {
 				t.Errorf("got: \n%v, want:\n%v", tt.reqSets, tt.expected)
 			}

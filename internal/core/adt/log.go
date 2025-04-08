@@ -68,6 +68,9 @@ func (c *OpContext) Un(s nestString, id int) {
 // Indentf logs a function call and increases the nesting level.
 // The first argument must be the function name.
 func (c *OpContext) Indentf(v *Vertex, format string, args ...any) (s nestString, id int) {
+	if c.LogEval == 0 {
+		panic("avoid calling OpContext.Indentf when logging is disabled to prevent overhead")
+	}
 	name := strings.Split(format, "(")[0]
 	if name == "" {
 		name, _ = getCallerFunctionName(1)

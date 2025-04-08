@@ -655,7 +655,9 @@ func runTask(t *task, mode runMode) {
 		return
 	}
 	ctx := t.node.ctx
-	defer ctx.Un(ctx.Indentf(t.node.node, "RUNTASK(%v, %v)", t.run.name, t.x))
+	if ctx.LogEval > 0 {
+		defer ctx.Un(ctx.Indentf(t.node.node, "RUNTASK(%v, %v)", t.run.name, t.x))
+	}
 
 	switch t.state {
 	case taskSUCCESS, taskFAILED:

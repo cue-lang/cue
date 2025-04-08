@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "40d1bcad_85b5ecd3",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_xml_koala.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-08T16:05:12Z",
+      "side": 1,
+      "message": "as discussed on a call just now - with Roger we agreed it would be hacky and inconsistent to do that in filetypes, which I summarised in the Discord thread. we can always decide to tweak this before v0.13.0 if we wish to.",
+      "parentUuid": "2277f11b_891eeb3e",
+      "revId": "f487528924ad431ae0339948d9319ec53b7f43bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5f139ee_745e1939",
@@ -65,6 +83,24 @@
       "writtenOn": "2025-04-08T16:02:50Z",
       "side": 1,
       "message": "What are you trying to spell here? Did you mean `koala:`?",
+      "revId": "f487528924ad431ae0339948d9319ec53b7f43bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9d87865_7b27ee79",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_xml_koala.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-08T16:05:12Z",
+      "side": 1,
+      "message": "it is perhaps not very common, but `cue import $mode $inputs` is valid.",
+      "parentUuid": "9b573b8f_56b84de8",
       "revId": "f487528924ad431ae0339948d9319ec53b7f43bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

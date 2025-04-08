@@ -68,9 +68,9 @@ package build
 // to change this.
 fileForExtVanilla: modes.input.extensions
 
-// modes sets defaults for different operational modes.
-// The key corresponds to the Go internal/filetypes.Mode type.
-modes: [string]: {
+// #Mode represents an overall mode that CUE is being run in
+// (e.g. eval, export).
+#Mode: {
 	// FileInfo holds the base file information for this mode.
 	// This will be unified with information derived from the
 	// file extension and any filetype tags explicitly provided.
@@ -79,19 +79,33 @@ modes: [string]: {
 	// Default holds the base file information for standard input
 	// or output, where we don't have any file extension available.
 	Default!: #Default
+
+	// extensions holds the set of file extensions that are defined
+	// for this mode.
+	extensions!: [_]: #FileInfo
+
+	// encodings holds the set of encodings defined for this mode.
+	encodings!: [_]: #FileInfo
 }
+
+// modes sets defaults for different operational modes.
+// The key corresponds to the Go internal/filetypes.Mode type.
+modes: [string]: #Mode
 
 // input defines modes for input, such as import, eval, vet or def.
 // In input mode, settings flags are interpreted as what is allowed to occur
 // in the input. The default settings, therefore, tend to be permissive.
 modes: input: {
+	// Default holds the mode that applies to stdin/stdout.
 	Default: {
 		encoding: *"cue" | _
 	}
+	// FileInfo holds a value that's unified with the file value.
 	FileInfo: {
 		docs:       *true | false
 		attributes: *true | false
 	}
+	// encodings is unified to the file value when interpretation is empty.
 	encodings: cue: {
 		*forms.schema | _
 	}
@@ -323,6 +337,8 @@ interpretations: pb: {
 	forms.data
 	stream: true
 }
+
+tagInfo: [_]: #FileInfo
 
 // tagInfo maps command line tags to file properties.
 tagInfo: {

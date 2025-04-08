@@ -104,7 +104,7 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 	fileVal := modeVal.LookupPath(cue.MakePath(cue.Str("FileInfo")))
 	fileVal = fileVal.FillPath(cue.Path{}, b)
 
-	if b.Encoding == "" {
+	if !hasEncoding(fileVal) {
 		ext := modeVal.LookupPath(cue.MakePath(cue.Str("extensions"), cue.Str(fileExt(b.Filename))))
 		if ext.Exists() {
 			fileVal = fileVal.Unify(ext)

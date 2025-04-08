@@ -188,6 +188,8 @@ type OpContext struct {
 	currentDisjunctionID int // sequence number for call to processDisjunctions
 
 	disjunctStack []disjunctInfo // stack of disjunct IDs
+
+	reqSetsBuf reqSets // reuse a reqSets slice
 }
 
 func (c *OpContext) CloseInfo() CloseInfo         { return c.ci }

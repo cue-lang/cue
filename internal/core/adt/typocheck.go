@@ -487,7 +487,7 @@ func (n *nodeContext) checkTypos() {
 		replacements := na.getReplacements(nil) // TODO(perf): use buffer
 		required := slices.Clone(required)      // TODO(perf): use buffer
 		// do the right thing in appendRequired either way.
-		required.replaceIDs(replacements...)
+		required.replaceIDs(n.ctx, replacements...)
 
 		a = a.DerefDisjunct()
 		// TODO(perf): somehow prevent error generation of recursive structures,
@@ -617,10 +617,10 @@ func (a reqSets) assert() {
 // - If in active definition, replace old definition
 // - If in embed, replace embed in respective sets. definition starts new group
 // - child definition replaces parent definition
-func (a *reqSets) replaceIDs(b ...replaceID) {
+func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
 	temp := *a
 	temp = temp[:0]
-	var buf reqSets
+	buf := ctx.reqSetsBuf[:0]
 outer:
 	for i := 0; i < len(*a); {
 		e := (*a)[i]
@@ -641,7 +641,7 @@ outer:
 				} else {
 					temp = append(temp, buf...)
 				}
-				buf = buf[:0] // TODO(perf): use OpContext buffer.
+				buf = buf[:0]
 			}
 		}
 
@@ -653,6 +653,7 @@ outer:
 		buf[0].size = uint32(len(buf))
 		temp = append(temp, buf...)
 	}
+	ctx.reqSetsBuf = buf[:0] // to be reused later on
 	*a = temp
 }
 
@@ -772,7 +773,7 @@ outer:
 		})
 	}
 
-	a.replaceIDs(n.replaceIDs...)
+	a.replaceIDs(n.ctx, n.replaceIDs...)
 
 	// If 'v' is a hidden field, then all reqSets in 'a' for which there is no
 	// corresponding entry in conjunctInfo should be removed from 'a'.

@@ -139,11 +139,6 @@ func skipFiles(a ...*ast.File) (reason string) {
 }
 
 func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cuedebug.Config) (errorCount int) {
-	// If #openInline is set, override the default as set by the cuedebug package.
-	if s, ok := t.Value("openInline"); ok {
-		flags.OpenInline = s == "true"
-	}
-
 	a := t.Instance()
 	r := runtime.NewWithSettings(version, flags)
 
@@ -220,8 +215,7 @@ func TestX(t *testing.T) {
 
 	flags := cuedebug.Config{
 		Sharing: true, // Uncomment to turn sharing off.
-		// OpenInline: true,
-		LogEval: 1, // Uncomment to turn logging off
+		LogEval: 1,    // Uncomment to turn logging off
 	}
 
 	version := internal.DefaultVersion

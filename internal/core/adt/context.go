@@ -162,11 +162,6 @@ type OpContext struct {
 	// enabled.
 	inConstraint int
 
-	// inLiteralSelectee indicates that we are evaluating a literal struct
-	// as the receiver of a selector. This is used to turn off closedness
-	// checking in compatibility mode.
-	inLiteralSelectee int
-
 	// inDetached indicates that inline structs evaluated in the current context
 	// should never be shared. This is the case, for instance, with the source
 	// for the for clause in a comprehension.
@@ -1068,14 +1063,6 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *V
 		saved := c.ci.FromDef
 		c.ci.FromDef = false
 		defer func() { c.ci.FromDef = saved }()
-	}
-
-	if c.OpenInline {
-		if _, ok := x.(Resolver); !ok {
-			c.ci.FromEmbed = true
-			c.inLiteralSelectee++
-			defer func() { c.inLiteralSelectee-- }()
-		}
 	}
 
 	// TODO: always get the vertex. This allows a whole bunch of trickery

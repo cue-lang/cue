@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3607bf53_62242453",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_xml_koala.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-08T21:38:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "894ffe78_186928cd",
+      "revId": "f487528924ad431ae0339948d9319ec53b7f43bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2277f11b_891eeb3e",
@@ -66,6 +84,24 @@
       "writtenOn": "2025-04-08T16:02:50Z",
       "side": 1,
       "message": "Perhaps spell this as `xml+koala` - see comment above.",
+      "revId": "f487528924ad431ae0339948d9319ec53b7f43bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0f87e84_6da90d94",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_xml_koala.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-08T21:38:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5f139ee_745e1939",
       "revId": "f487528924ad431ae0339948d9319ec53b7f43bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

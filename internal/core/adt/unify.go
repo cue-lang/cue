@@ -486,7 +486,9 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 // NOT:
 // - complete value. That is reserved for Unify.
 func (n *nodeContext) completeNodeTasks(mode runMode) {
-	defer n.ctx.Un(n.ctx.Indentf(n.node, "(%v)", mode))
+	if n.ctx.LogEval > 0 {
+		defer n.ctx.Un(n.ctx.Indentf(n.node, "(%v)", mode))
+	}
 
 	n.assertInitialized()
 

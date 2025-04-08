@@ -87,6 +87,24 @@
       "parentUuid": "fe8d9437_e3aca2bf",
       "revId": "201e75d64e90577c0eff5b1ce0288407a2af758b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02239b70_d1ab6954",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-08T16:11:00Z",
+      "side": 1,
+      "message": "I tend to agree with using a pinned version. However, there\u0027s a problem if we add a new feature (e.g. func signatures) that\u0027s not supported by the old version. But I\u0027m sure we can cross that bridge when we come to it.",
+      "parentUuid": "712e18b5_e61bfe11",
+      "revId": "201e75d64e90577c0eff5b1ce0288407a2af758b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

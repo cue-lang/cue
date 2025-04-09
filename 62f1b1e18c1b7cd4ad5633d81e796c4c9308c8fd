@@ -16,6 +16,24 @@
       "message": "Could we add a test for a field name that itself contains a double-quote or a comma? I suspect both of those should be errors, but it would be good to have a test either way.\n\nCould be done in a subsequent CL if that\u0027s easier.",
       "revId": "62f1b1e18c1b7cd4ad5633d81e796c4c9308c8fd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbcb2055_a1e9f321",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-09T15:41:42Z",
+      "side": 1,
+      "message": "this is a patch from a contributor, so I lean against being too nitpicky - I will send a follow-up CL. it\u0027s also better that we split up changes so that the author information is not mixed up.",
+      "parentUuid": "bcab35eb_75f35839",
+      "revId": "62f1b1e18c1b7cd4ad5633d81e796c4c9308c8fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

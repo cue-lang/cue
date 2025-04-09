@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
@@ -68,6 +69,10 @@ type FileInfo struct {
 	Attributes   bool `json:"attributes"`   // include/allow attributes
 }
 
+// evalMu guards against concurrent execution of the CUE evaluator.
+// See issue https://cuelang.org/issue/2733
+var evalMu sync.Mutex
+
 // TODO(mvdan): the funcs below make use of typesValue concurrently,
 // even though we clearly document that cue.Values are not safe for concurrent use.
 // It seems to be OK in practice, as otherwise we would run into `go test -race` failures.
@@ -76,35 +81,14 @@ type FileInfo struct {
 // Encoding must be specified.
 // TODO: mode should probably not be necessary here.
 func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
-	// Handle common case. This allows certain test cases to be analyzed in
-	// isolation without interference from evaluating these files.
-	if mode == Input &&
-		b.Encoding == build.CUE &&
-		b.Form == "" &&
-		b.Interpretation == "" {
-		return &FileInfo{
-			File: b,
-
-			Definitions:  true,
-			Data:         true,
-			Optional:     true,
-			Constraints:  true,
-			References:   true,
-			Cycles:       true,
-			KeepDefaults: true,
-			Incomplete:   true,
-			Imports:      true,
-			Docs:         true,
-			Attributes:   true,
-		}, nil
-	}
-
+	evalMu.Lock()
+	defer evalMu.Unlock()
 	typesInit()
 	modeVal := typesValue.LookupPath(cue.MakePath(cue.Str("modes"), cue.Str(mode.String())))
 	fileVal := modeVal.LookupPath(cue.MakePath(cue.Str("FileInfo")))
 	fileVal = fileVal.FillPath(cue.Path{}, b)
 
-	if !hasEncoding(fileVal) {
+	if b.Encoding == "" {
 		ext := modeVal.LookupPath(cue.MakePath(cue.Str("extensions"), cue.Str(fileExt(b.Filename))))
 		if ext.Exists() {
 			fileVal = fileVal.Unify(ext)
@@ -163,6 +147,8 @@ func unifyWith(errs errors.Error, v1, v2 cue.Value, field, value string) (cue.Va
 //
 //	json: foo.data bar.data json+schema: bar.schema
 func ParseArgs(args []string) (files []*build.File, err error) {
+	evalMu.Lock()
+	defer evalMu.Unlock()
 	typesInit()
 	var modeVal, fileVal cue.Value
 
@@ -174,15 +160,6 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 		switch {
 		case len(a) == 1 || len(a[0]) == 1: // filename
 			if !fileVal.Exists() {
-				if len(a) == 1 && strings.HasSuffix(a[0], ".cue") {
-					// Handle majority case.
-					f := *fileForCUE
-					f.Filename = a[0]
-					files = append(files, &f)
-					hasFiles = true
-					continue
-				}
-
 				modeVal, fileVal, err = parseType("", Input)
 				if err != nil {
 					return nil, err
@@ -231,6 +208,8 @@ func DefaultTagsForInterpretation(interp build.Interpretation, mode Mode) map[st
 	if interp == "" {
 		return nil
 	}
+	evalMu.Lock()
+	defer evalMu.Unlock()
 	// TODO this could be done once only.
 
 	// This should never fail if called with a legitimate build.Interpretation constant.
@@ -276,24 +255,11 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 
 // ParseFileAndType parses a file and type combo.
 func ParseFileAndType(file, scope string, mode Mode) (*build.File, error) {
+	evalMu.Lock()
+	defer evalMu.Unlock()
 	// Quickly discard files which we aren't interested in.
 	// These cases are very common when loading `./...` in a large repository.
 	typesInit()
-	if scope == "" && file != "-" {
-		ext := fileExt(file)
-		if ext == "" {
-			return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", file)
-		}
-		f, ok := fileForExt[ext]
-		if !ok {
-			return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
-		}
-		if mode == Input {
-			f1 := *f
-			f1.Filename = file
-			return &f1, nil
-		}
-	}
 	modeVal, fileVal, err := parseType(scope, mode)
 	if err != nil {
 		return nil, err
@@ -302,9 +268,7 @@ func ParseFileAndType(file, scope string, mode Mode) (*build.File, error) {
 }
 
 func hasEncoding(v cue.Value) bool {
-	enc := v.LookupPath(cue.MakePath(cue.Str("encoding")))
-	d, _ := enc.Default()
-	return d.IsConcrete()
+	return v.LookupPath(cue.MakePath(cue.Str("encoding"))).Exists()
 }
 
 func toFile(modeVal, fileVal cue.Value, filename string) (*build.File, error) {

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9347f7b1_a660a007",
+        "filename": "cue/build/file.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-09T15:28:09Z",
+      "side": 1,
+      "message": "This is weird. It\u0027s not an interpretation any more, right?",
+      "revId": "9b86309eb2a2742384d7646c4ac68fb3515afeab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "642b6548_dad2941b",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 9
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-09T15:28:09Z",
+      "side": 1,
+      "message": "FWIW I think that we\u0027d probably get better error messages by _avoiding_ a one-of here and leaving it to the xml encoding to produce a more accurate error message than the regular CUE logic could.",
+      "revId": "9b86309eb2a2742384d7646c4ac68fb3515afeab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -12,9 +12,9 @@ stdout -count=5 'cue_types_.*gen\.go.want$'
 ! stdout 'unused.*'${/@R}gen_go.cue
 
 # Check the contents of the generated files.
-cmp root/cue_types_gen.go                           root/cue_types_gen.go
-cmp imported/subinst/cue_types_imported_gen.go      imported/subinst/cue_types_imported_gen.go
-cmp imported/indirect/cue_types_gen.go              imported/indirect/cue_types_gen.go
+cmp root/cue_types_gen.go                           root/cue_types_gen.go.want
+cmp imported/subinst/cue_types_imported_gen.go      imported/subinst/cue_types_imported_gen.go.want
+cmp imported/indirect/cue_types_gen.go              imported/indirect/cue_types_gen.go.want
 cmp imported/multipkg/cue_types_multipkg_one_gen.go imported/multipkg/cue_types_multipkg_one_gen.go.want
 cmp imported/multipkg/cue_types_multipkg_two_gen.go imported/multipkg/cue_types_multipkg_two_gen.go.want
 
@@ -572,9 +572,9 @@ type RemoteStructs struct {
 
 	UpperDef imported.UpperDef `json:"UpperDef,omitempty"`
 
-	MultiOne multipkg_one.One `json:"multiOne,omitempty"`
+	MultiOne multipkg.One `json:"multiOne,omitempty"`
 
-	MultiTwo multipkg_two.Two `json:"multiTwo,omitempty"`
+	MultiTwo multipkg.Two `json:"multiTwo,omitempty"`
 }
 
 type Types struct {
@@ -648,8 +648,6 @@ type Root struct {
 
 		Required int64 `json:"required,omitempty"`
 
-		QuotedField string `json:"quoted-field"`
-
 		// Optional types are represented as *T in Go if they are structs.
 		Optional int64 `json:"optional,omitempty"`
 
@@ -714,6 +712,8 @@ type Root struct {
 	MustEqual1 int64 `json:"mustEqual1,omitempty"`
 
 	MustEqual2 any/* TODO: IncompleteKind: _|_ */ `json:"mustEqual2,omitempty"`
+
+	QuotedField string `json:"quoted-field,omitempty"`
 }
 
 type EmbeddedStruct struct {
@@ -724,7 +724,13 @@ type EmbeddedStruct struct {
 
 type AttrChangedName int64
 
+type AttrChangedNameEmbed struct {
+	Field int64 `json:"field,omitempty"`
+}
+
 type AttrType constant.Kind
+
+type AttrTypeEmbed constant.Kind
 
 type Root_innerStruct struct {
 	InnerStructField int64 `json:"innerStructField,omitempty"`

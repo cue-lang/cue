@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a0cfcb1_43210811",
+        "filename": "cue/build/file.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-09T15:46:58Z",
+      "side": 1,
+      "message": "oops, this was unintentionally left over.",
+      "parentUuid": "9347f7b1_a660a007",
+      "revId": "9b86309eb2a2742384d7646c4ac68fb3515afeab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "642b6548_dad2941b",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-04-09T15:28:09Z",
       "side": 1,
       "message": "FWIW I think that we\u0027d probably get better error messages by _avoiding_ a one-of here and leaving it to the xml encoding to produce a more accurate error message than the regular CUE logic could.",
+      "revId": "9b86309eb2a2742384d7646c4ac68fb3515afeab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4314ee3d_1532786a",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 9
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-09T15:46:58Z",
+      "side": 1,
+      "message": "ack, fair enough. I was looking ahead at custom error message support in CUE, but that\u0027s perhaps too wishful. I\u0027ll just tweak this comment.",
+      "parentUuid": "642b6548_dad2941b",
       "revId": "9b86309eb2a2742384d7646c4ac68fb3515afeab",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

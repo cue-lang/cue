@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5001a4c0_1d6fbc98",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-09T09:29:13Z",
+      "side": 1,
+      "message": "LGTM in general, but I have reservations about the `koala: foo.json` behaviour.",
+      "revId": "aa02c2e6ef7cd4f46baacfa4e4ee3ac6333380f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "979ac860_f245cf4a",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_xml_koala.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-09T09:29:13Z",
+      "side": 1,
+      "message": "let\u0027s also add test cases for `koala: export.xml` and `koala: filewithoutextension`, so we can see what the behaviour is.",
+      "revId": "aa02c2e6ef7cd4f46baacfa4e4ee3ac6333380f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2c2b7a1_2a61465e",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_xml_koala.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-09T09:29:13Z",
+      "side": 1,
+      "message": "Let\u0027s add it as a test case anyway, just to expose what actually happens if we do this.",
+      "revId": "aa02c2e6ef7cd4f46baacfa4e4ee3ac6333380f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47ba37ef_f4f327d2",
+        "filename": "internal/filetypes/filetypes_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 485,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-09T09:29:13Z",
+      "side": 1,
+      "message": "I thought the idea was not to allow this without something explicitly calling out \"xml\" somewhere. I don\u0027t mind tbh, but that was my understanding.",
+      "revId": "aa02c2e6ef7cd4f46baacfa4e4ee3ac6333380f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3bb3b37_4f43cb6b",
+        "filename": "internal/filetypes/filetypes_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-09T09:29:13Z",
+      "side": 1,
+      "message": "This in particular is problematic: I don\u0027t think we\u0027ll ever support koala with JSON, so ISTM this should really be an error.",
+      "revId": "aa02c2e6ef7cd4f46baacfa4e4ee3ac6333380f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

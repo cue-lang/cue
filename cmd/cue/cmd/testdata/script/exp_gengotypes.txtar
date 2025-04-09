@@ -186,10 +186,10 @@ fail.both."42_LinkedList".types.LinkedList.next: conflicting values "x" and {ite
     ./root/types.cue:43:14
 fail.both.notList: conflicting values [1,2,3] and {embedded2?:int} (mismatched types list and struct):
     ./cuetest/all.cue:5:24
-    ./root/root.cue:96:2
+    ./root/root.cue:108:2
 fail.both.notString: conflicting values "not_a_struct" and {embedded2?:int} (mismatched types string and struct):
     ./cuetest/all.cue:4:24
-    ./root/root.cue:96:2
+    ./root/root.cue:108:2
 fail.cue."11_Int8".types.Int8: invalid value 99999 (out of bound <=127):
     ./cuetest/all.cue:61:30
 fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
@@ -435,7 +435,19 @@ _#overridenNeverGenerate: string
 
 	mustEqual1?: int
 	mustEqual2?: mustEqual1
-	"quoted-field"?: string @go(QuotedField)
+
+	// Various forms of quoted fields which we can represent in Go with encoding/json.
+	"with-dashes"?: string
+	"with-dashes-attr"?: string @go(WithDashesNewName)
+	"123LeadingNumber"?: string
+
+	// We could represent some of these with a future encoding/json/v2,
+	// but not with encoding/json today, and they seem unlikely to happen in practice.
+	"with\"quotes"?:      string
+	"with`backquotes"?:   string
+	"with,commas"?:       string
+	"with\nnewlines"?:    string
+	"with\\backslashes"?: string
 }
 
 // Actually, this field needed even more documentation.
@@ -713,7 +725,25 @@ type Root struct {
 
 	MustEqual2 any/* TODO: IncompleteKind: _|_ */ `json:"mustEqual2,omitempty"`
 
-	QuotedField string `json:"quoted-field,omitempty"`
+	// Various forms of quoted fields which we can represent in Go with encoding/json.
+	With_dashes string `json:"with-dashes,omitempty"`
+
+	WithDashesNewName string `json:"with-dashes-attr,omitempty"`
+
+	F123LeadingNumber string `json:"123LeadingNumber,omitempty"`
+
+	// We could represent some of these with a future encoding/json/v2,
+	// but not with encoding/json today, and they seem unlikely to happen in practice.
+	// CUE field "with\"quotes": encoding/json does not support this field name
+
+	// CUE field "with`backquotes": encoding/json does not support this field name
+
+	// CUE field "with,commas": encoding/json does not support this field name
+
+	// CUE field "with\nnewlines": encoding/json does not support this field name
+
+	// CUE field "with\\backslashes": encoding/json does not support this field name
+
 }
 
 type EmbeddedStruct struct {

@@ -23,6 +23,8 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -292,6 +294,13 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 				goName = s
 			}
 
+			// Since CUE fields using double quotes or commas in their names are rare,
+			// and the upcoming encoding/json/v2 will support field tags with name quoting,
+			// we choose to ignore such fields with a clear note for now.
+			if strings.ContainsAny(cueName, "\\\"`,\n") {
+				g.appendf("// CUE field %q: encoding/json does not support this field name\n\n", cueName)
+				continue
+			}
 			g.appendf("%s ", goName)
 			if err := g.emitType(val, optional); err != nil {
 				return err
@@ -375,21 +384,43 @@ func goNameFromPath(path cue.Path, defsOnly bool) string {
 			sb.WriteString("_")
 		}
 		str := sel.String()
+		if sel.IsString() {
+			str = sel.Unquoted()
+		}
 		str, hidden := strings.CutPrefix(str, "_")
 		if hidden {
 			// If any part of the path is hidden, we are not exporting.
-			// TODO: we currently don't generate hidden definitions unless XXX
 			export = false
 		}
 		// Leading or trailing characters for definitions, optional, or required
 		// are not included as part of Go names.
 		str = strings.TrimPrefix(str, "#")
 		str = strings.TrimRight(str, "?!")
-		sb.WriteString(str)
+		// CUE allows quoted field names such as "foo-bar" or "123baz",
+		// none of which are valid Go identifiers per https://go.dev/ref/spec#Identifiers.
+		// Replace forbidden characters with underscores, like `go test` does with subtest names,
+		// and add a leading "F" if the name begins with a digit.
+		// TODO: this could result in name collisions; fix if it actually happens in practice.
+		for i, r := range str {
+			switch {
+			case unicode.IsLetter(r):
+				sb.WriteRune(r)
+			case unicode.IsDigit(r):
+				if i == 0 {
+					sb.WriteRune('F')
+				}
+				sb.WriteRune(r)
+			default:
+				sb.WriteRune('_')
+			}
+		}
 	}
 	name := sb.String()
 	if export {
-		name = strings.Title(name)
+		// Capitalize the first letter to export the name in Go.
+		// https://go.dev/ref/spec#Exported_identifiers
+		first, size := utf8.DecodeRuneInString(name)
+		name = string(unicode.ToTitle(first)) + name[size:]
 	}
 	// TODO: lowercase if not exporting
 	return name

@@ -78,6 +78,7 @@ type FileInfo struct {
 func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 	// Handle common case. This allows certain test cases to be analyzed in
 	// isolation without interference from evaluating these files.
+	// It also avoids a race condition when running the evaluator concurrently.
 	if mode == Input &&
 		b.Encoding == build.CUE &&
 		b.Form == "" &&
@@ -104,7 +105,7 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 	fileVal := modeVal.LookupPath(cue.MakePath(cue.Str("FileInfo")))
 	fileVal = fileVal.FillPath(cue.Path{}, b)
 
-	if !hasEncoding(fileVal) {
+	if b.Encoding == "" {
 		ext := modeVal.LookupPath(cue.MakePath(cue.Str("extensions"), cue.Str(fileExt(b.Filename))))
 		if ext.Exists() {
 			fileVal = fileVal.Unify(ext)
@@ -174,15 +175,6 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 		switch {
 		case len(a) == 1 || len(a[0]) == 1: // filename
 			if !fileVal.Exists() {
-				if len(a) == 1 && strings.HasSuffix(a[0], ".cue") {
-					// Handle majority case.
-					f := *fileForCUE
-					f.Filename = a[0]
-					files = append(files, &f)
-					hasFiles = true
-					continue
-				}
-
 				modeVal, fileVal, err = parseType("", Input)
 				if err != nil {
 					return nil, err
@@ -302,9 +294,7 @@ func ParseFileAndType(file, scope string, mode Mode) (*build.File, error) {
 }
 
 func hasEncoding(v cue.Value) bool {
-	enc := v.LookupPath(cue.MakePath(cue.Str("encoding")))
-	d, _ := enc.Default()
-	return d.IsConcrete()
+	return v.LookupPath(cue.MakePath(cue.Str("encoding"))).Exists()
 }
 
 func toFile(modeVal, fileVal cue.Value, filename string) (*build.File, error) {

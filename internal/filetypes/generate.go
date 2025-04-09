@@ -13,7 +13,6 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
-	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/filetypes"
 )
 
@@ -108,7 +107,8 @@ type tagInfo struct {
 type tags struct {
 	bits uint64
 	val  cue.Value
-	info filetypes.FileInfo
+	ext  string
+	info *filetypes.FileInfo
 }
 
 type tagEnumerator struct {
@@ -133,8 +133,8 @@ func generate() error {
 	v := ctx.CompileString(typesCUE, cue.Filename("types.cue"))
 	tagInfoV := v.LookupPath(cue.MakePath(cue.Str("tagInfo")))
 
-	for name, mode := range structFields(v.LookupPath(cue.MakePath(cue.Str("modes")))) {
-		e, err := tagCombinations(mode, tagInfoV)
+	for name, _ := range structFields(v.LookupPath(cue.MakePath(cue.Str("modes")))) {
+		e, err := tagCombinations(top, tagInfoV)
 		if err != nil {
 			return nil
 		}
@@ -199,25 +199,20 @@ func (e *tagEnumerator) walk(v cue.Value, bits uint64, maxBit int) {
 	for i := maxBit; i < len(e.tags); i++ {
 		e.count++
 		bit := uint64(1) << i
+		current := bits | bit
 		v1 := v.Unify(e.tags[i].value)
 		if err := v1.Validate(); err != nil {
-			if (bits | bit) == e.search {
-				log.Printf("error: %v", errors.Details(err, nil))
-			}
 			continue
 		}
 
-		foundBits := bits | bit
-		var info filetypes.FileInfo
-		if err := v1.Decode(&info); err != nil {
-			panic(err)
-		}
+		var info *filetypes.FileInfo
+		_ = v1.Decode(&info)
 		e.found = append(e.found, tags{
-			bits: foundBits,
+			bits: current,
 			val:  v1,
 			info: info,
 		})
-		e.walk(v1, foundBits, i+1)
+		e.walk(v1, current, i+1)
 	}
 }
 

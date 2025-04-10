@@ -38,13 +38,6 @@ func Parse(s string) (string, error) {
 	return x.String(), err
 }
 
-// TODO(mvdan): what is ToString meant to do? it appears like a no-op?
-
-// String represents a 128-bit UUID value as a string.
-func ToString(x string) string {
-	return x
-}
-
 // URN reports the canonical URN of a UUID.
 func URN(x string) (string, error) {
 	u, err := uuid.Parse(x)

@@ -39,18 +39,6 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
-		Name: "ToString",
-		Params: []pkg.Param{
-			{Kind: adt.StringKind},
-		},
-		Result: adt.StringKind,
-		Func: func(c *pkg.CallCtxt) {
-			x := c.String(0)
-			if c.Do() {
-				c.Ret = ToString(x)
-			}
-		},
-	}, {
 		Name: "URN",
 		Params: []pkg.Param{
 			{Kind: adt.StringKind},

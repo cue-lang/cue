@@ -17,6 +17,7 @@ package filetypes
 import (
 	_ "embed"
 	"fmt"
+	"iter"
 	"sync"
 
 	"cuelang.org/go/cue"
@@ -82,6 +83,25 @@ var typesInit = sync.OnceFunc(func() {
 	addSubsidiary(lookup(typesValue, "interpretations"))
 	addSubsidiary(lookup(typesValue, "forms"))
 })
+
+// structFields returns an iterator over the names of all the regulat fields
+// in v and their values.
+func structFields(v cue.Value) iter.Seq2[string, cue.Value] {
+	return func(yield func(string, cue.Value) bool) {
+		if !v.Exists() {
+			return
+		}
+		iter, err := v.Fields()
+		if err != nil {
+			return
+		}
+		for iter.Next() {
+			if !yield(iter.Selector().Unquoted(), iter.Value()) {
+				break
+			}
+		}
+	}
+}
 
 func tagTypeOf(s string) tagType {
 	return tagTypes[s]

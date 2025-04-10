@@ -45,7 +45,7 @@ func TestFromFile(t *testing.T) {
 	}{{
 		name: "must specify encoding",
 		in:   build.File{},
-		out:  `modes.input.FileInfo: field not found: encoding`,
+		out:  `no encoding specified`,
 	}, {
 		// Default without any
 		name: "cue",
@@ -98,12 +98,13 @@ func TestFromFile(t *testing.T) {
 			Filename: ".json",
 		},
 		mode: Def,
-		out:  `modes.def.FileInfo: field not found: encoding`,
+		out:  `no encoding specified`,
 	}, {
 		name: "yaml",
 		mode: Def,
 		in: build.File{
 			Filename: "foo.yaml",
+			Encoding: build.YAML,
 		},
 		out: &FileInfo{
 			File: &build.File{
@@ -122,6 +123,7 @@ func TestFromFile(t *testing.T) {
 		name: "yaml+openapi",
 		in: build.File{
 			Filename:       "foo.yaml",
+			Encoding:       build.YAML,
 			Interpretation: build.OpenAPI,
 		},
 		out: &FileInfo{
@@ -153,31 +155,32 @@ func TestFromFile(t *testing.T) {
 		mode: Input,
 		in: build.File{
 			Filename: "data.json",
+			Encoding: build.JSON,
 		},
 		out: &FileInfo{
 			File: &build.File{
-				Filename:       "data.json",
-				Encoding:       build.JSON,
-				Interpretation: build.Auto,
-				Form:           build.Schema,
+				Filename: "data.json",
+				Encoding: build.JSON,
+				Form:     build.Data,
 			},
-			Definitions:  true,
+			Definitions:  false,
 			Data:         true,
-			Optional:     true,
-			Constraints:  true,
-			References:   true,
-			Cycles:       true,
-			KeepDefaults: true,
-			Incomplete:   true,
-			Imports:      true,
-			Docs:         true,
-			Attributes:   true,
+			Optional:     false,
+			Constraints:  false,
+			References:   false,
+			Cycles:       false,
+			KeepDefaults: false,
+			Incomplete:   false,
+			Imports:      false,
+			Docs:         false,
+			Attributes:   false,
 		},
 	}, {
 		name: "JSONSchema",
 		in: build.File{
 			Filename:       "foo.json",
 			Interpretation: "jsonschema",
+			Encoding:       build.JSON,
 		},
 		out: &FileInfo{
 			File: &build.File{
@@ -207,6 +210,7 @@ func TestFromFile(t *testing.T) {
 		name: "JSONOpenAPI",
 		in: build.File{
 			Filename:       "foo.json",
+			Encoding:       build.JSON,
 			Interpretation: build.OpenAPI,
 		},
 		mode: Def,
@@ -238,6 +242,7 @@ func TestFromFile(t *testing.T) {
 		name: "OpenAPIDefaults",
 		in: build.File{
 			Filename:       "-",
+			Encoding:       build.JSON,
 			Interpretation: build.OpenAPI,
 		},
 		mode: Def,
@@ -268,6 +273,7 @@ func TestFromFile(t *testing.T) {
 	}, {
 		name: "Go",
 		in: build.File{
+			Encoding: build.Code,
 			Filename: "foo.go",
 		},
 		mode: Def,
@@ -276,7 +282,6 @@ func TestFromFile(t *testing.T) {
 				Filename: "foo.go",
 				Encoding: build.Code,
 				Form:     build.Schema,
-				Tags:     map[string]string{"lang": "go"},
 			},
 			Definitions:  true,
 			Data:         true,

@@ -266,7 +266,13 @@ func parseScope(scopeStr string) (*scope, error) {
 
 // fileExt is like filepath.Ext except we don't treat file names starting with "." as having an extension
 // unless there's also another . in the name.
+//
+// It also treats "-" as a special case, so we treat stdin/stdout as
+// a regular file.
 func fileExt(f string) string {
+	if f == "-" {
+		return "-"
+	}
 	e := filepath.Ext(f)
 	if e == "" || e == filepath.Base(f) {
 		return ""

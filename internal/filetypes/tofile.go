@@ -54,9 +54,7 @@ func toFile(mode Mode, sc *scope, filename string) (*build.File, error) {
 		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("tags"), cue.Str(tagName)), val)
 	}
 	if !lookup(fileVal, "encoding").Exists() {
-		if filename == "-" {
-			fileVal = fileVal.Unify(lookup(modeVal, "Default"))
-		} else if ext := fileExt(filename); ext != "" {
+		if ext := fileExt(filename); ext != "" {
 			extFile := lookup(modeVal, "extensions", ext)
 			if !extFile.Exists() {
 				return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
@@ -126,10 +124,6 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 	}
 	if b.Encoding == "" {
 		return nil, errors.Newf(token.NoPos, "no encoding specified")
-		ext := lookup(modeVal, "extensions", fileExt(b.Filename))
-		if ext.Exists() {
-			fileVal = fileVal.Unify(ext)
-		}
 	}
 	var errs errors.Error
 	interpretation, _ := lookup(fileVal, "interpretation").String()

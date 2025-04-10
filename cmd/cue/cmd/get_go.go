@@ -1474,8 +1474,11 @@ func (e *extractor) isOptional(f *types.Var, doc *ast.CommentGroup, tag string) 
 		}
 	}
 
+	// Go 1.24 added the "omitzero" option to encoding/json, an improvement over "omitempty".
+	// Note that, as of mid 2025, YAML libraries don't seem to have picked up "omitzero" yet.
 	// TODO: also when the type is a list or other kind of pointer.
 	return hasFlag(tag, "json", "omitempty", 1) ||
+		hasFlag(tag, "json", "omitzero", 1) ||
 		hasFlag(tag, "yaml", "omitempty", 1)
 }
 

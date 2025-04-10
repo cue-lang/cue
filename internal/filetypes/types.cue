@@ -31,12 +31,6 @@ package build
 	boolTags?: [string]: bool
 }
 
-// Default is the file used for stdin and stdout. The settings depend
-// on the file mode.
-#Default: #FileInfo & {
-	filename: *"-" | string
-}
-
 // A FileInfo defines how a file is encoded and interpreted.
 #FileInfo: {
 	#File
@@ -76,10 +70,6 @@ fileForExtVanilla: modes.input.extensions
 	// file extension and any filetype tags explicitly provided.
 	FileInfo!: #FileInfo
 
-	// Default holds the base file information for standard input
-	// or output, where we don't have any file extension available.
-	Default!: #Default
-
 	// extensions holds the set of file extensions that are defined
 	// for this mode.
 	extensions!: [_]: #FileInfo
@@ -96,10 +86,6 @@ modes: [string]: #Mode
 // In input mode, settings flags are interpreted as what is allowed to occur
 // in the input. The default settings, therefore, tend to be permissive.
 modes: input: {
-	// Default holds the mode that applies to stdin/stdout.
-	Default: {
-		encoding: *"cue" | _
-	}
 	// FileInfo holds a value that's unified with the file value.
 	FileInfo: {
 		docs:       *true | false
@@ -109,6 +95,7 @@ modes: input: {
 	encodings: cue: {
 		*forms.schema | _
 	}
+	extensions: "-": encoding: *"cue" | _
 	extensions: ".json": interpretation: *"auto" | _
 	extensions: ".yaml": interpretation: *"auto" | _
 	extensions: ".yml":  interpretation: *"auto" | _
@@ -117,37 +104,31 @@ modes: input: {
 }
 
 modes: export: {
-	Default: {
-		encoding: *"json" | _
-	}
 	FileInfo: {
 		docs:       true | *false
 		attributes: true | *false
 	}
 	encodings: cue: forms.data
+	extensions: "-": encoding: *"json" | _
 }
 
 // eval is a legacy mode
 modes: eval: {
-	Default: {
-		encoding: *"cue" | _
-	}
 	FileInfo: {
 		docs:       true | *false
 		attributes: true | *false
 	}
 	encodings: cue: forms.final
+	extensions: "-": encoding: *"cue" | _
 }
 
 modes: def: {
-	Default: {
-		encoding: *"cue" | _
-	}
 	FileInfo: {
 		docs:       *true | false
 		attributes: *true | false
 	}
 	encodings: cue: forms.schema
+	extensions: "-": encoding: *"cue" | _
 }
 
 // A Encoding indicates a file format for representing a program.
@@ -166,7 +147,6 @@ modes: def: {
 modes: [string]: {
 	// extensions maps a file extension to its associated default file properties.
 	extensions: {
-		// "":           _
 		".cue":       tagInfo.cue
 		".json":      tagInfo.json
 		".jsonl":     tagInfo.jsonl

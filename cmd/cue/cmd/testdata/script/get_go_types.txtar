@@ -108,6 +108,8 @@ type Foozer struct {
 
 	OptionalOmitEmptyJSON string `json:"optionalOmitEmptyJSON,omitempty"`
 
+	OptionalOmitZeroJSON time.Time `json:"optionalOmitZeroJSON,omitzero"`
+
 	OptionalOmitEmptyYAML string `yaml:"optionalOmitEmptyYAML,omitempty"`
 
 	// +optional
@@ -328,8 +330,9 @@ import (
 	Embed: {
 		CustomJSON: #CustomJSON
 	} @go(,struct{CustomJSON})
-	optionalOmitEmptyJSON?: string @go(OptionalOmitEmptyJSON)
-	optionalOmitEmptyYAML?: string @go(OptionalOmitEmptyYAML)
+	optionalOmitEmptyJSON?: string    @go(OptionalOmitEmptyJSON)
+	optionalOmitZeroJSON:   time.Time @go(OptionalOmitZeroJSON)
+	optionalOmitEmptyYAML?: string    @go(OptionalOmitEmptyYAML)
 
 	// +optional
 	optionalComment?: string @go(OptionalComment)

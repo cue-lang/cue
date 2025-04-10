@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package koala converts XML to and from CUE, as proposed in https://cuelang.org/discussion/3776.
-//
+// Package koala converts XML to and from CUE, as described in the proposal for the [koala] encoding.
 // This encoding is inspired by the [BadgerFish] convention for translating XML to JSON.
+// It differs from this to better fit CUE syntax, (as "$" and "@" are special characters), 
+// and for improved readability, as described in the koala proposal.
+//
 // XML elements are modeled as CUE structs, their attributes are modeled as struct fields
-// prefixed with "$", and their inner text content is modeleed as a field named "$$".
+// prefixed with "$", and their inner text content is modeled as a field named "$$".
 //
 // WARNING: THIS PACKAGE IS EXPERIMENTAL.
 // ITS API MAY CHANGE AT ANY TIME.
 //
+// [koala]: https://cuelang.org/discussion/3776
 // [BadgerFish]: http://www.sklar.com/badgerfish/
 package koala
 

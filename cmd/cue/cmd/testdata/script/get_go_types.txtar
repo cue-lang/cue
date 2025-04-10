@@ -331,7 +331,7 @@ import (
 		CustomJSON: #CustomJSON
 	} @go(,struct{CustomJSON})
 	optionalOmitEmptyJSON?: string    @go(OptionalOmitEmptyJSON)
-	optionalOmitZeroJSON:   time.Time @go(OptionalOmitZeroJSON)
+	optionalOmitZeroJSON?:  time.Time @go(OptionalOmitZeroJSON)
 	optionalOmitEmptyYAML?: string    @go(OptionalOmitEmptyYAML)
 
 	// +optional

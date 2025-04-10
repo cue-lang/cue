@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd3913be_591244ad",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-10T11:38:42Z",
+      "side": 1,
+      "message": "Maybe try one with a newline too, just to make sure that it doesn\u0027t result in a potential injection attack.",
+      "revId": "da74b97b975ed30d7c15862f011aa9768b4214e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddab8fd2_cbc2b5fc",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-10T11:38:42Z",
+      "side": 1,
+      "message": "I missed the final `\\n// ` here.\nHow about using two appendf calls to make it clear that the field below is also commented?",
+      "revId": "da74b97b975ed30d7c15862f011aa9768b4214e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

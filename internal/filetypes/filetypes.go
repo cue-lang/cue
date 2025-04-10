@@ -19,9 +19,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"sync"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -70,99 +68,6 @@ type FileInfo struct {
 	Stream       bool `json:"stream"`       // permit streaming
 	Docs         bool `json:"docs"`         // show/allow docs
 	Attributes   bool `json:"attributes"`   // include/allow attributes
-}
-
-// evalMu guards against concurrent execution of the CUE evaluator.
-// See issue https://cuelang.org/issue/2733
-var evalMu sync.Mutex
-
-// TODO(mvdan): the funcs below make use of typesValue concurrently,
-// even though we clearly document that cue.Values are not safe for concurrent use.
-// It seems to be OK in practice, as otherwise we would run into `go test -race` failures.
-
-// FromFile returns detailed file info for a given build file. It ignores b.Tags and
-// b.BoolTags, instead assuming that any tag handling has already been processed
-// by [ParseArgs] or similar.
-// Encoding must be specified.
-// TODO: mode should probably not be necessary here.
-func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
-	// Handle common case. This allows certain test cases to be analyzed in
-	// isolation without interference from evaluating these files.
-	if mode == Input &&
-		b.Encoding == build.CUE &&
-		b.Form == "" &&
-		b.Interpretation == "" {
-		return &FileInfo{
-			Encoding: build.CUE,
-			Form:     build.Schema,
-
-			Definitions:  true,
-			Data:         true,
-			Optional:     true,
-			Constraints:  true,
-			References:   true,
-			Cycles:       true,
-			KeepDefaults: true,
-			Incomplete:   true,
-			Imports:      true,
-			Docs:         true,
-			Attributes:   true,
-		}, nil
-	}
-	evalMu.Lock()
-	defer evalMu.Unlock()
-	typesInit()
-	modeVal := lookup(typesValue, "modes", mode.String())
-	fileVal := lookup(modeVal, "FileInfo")
-	if b.Encoding != "" {
-		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("encoding")), b.Encoding)
-	}
-	if b.Interpretation != "" {
-		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("interpretation")), b.Interpretation)
-	}
-	if b.Form != "" {
-		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("form")), b.Form)
-	}
-	if b.Encoding == "" {
-		return nil, errors.Newf(token.NoPos, "no encoding specified")
-		ext := lookup(modeVal, "extensions", fileExt(b.Filename))
-		if ext.Exists() {
-			fileVal = fileVal.Unify(ext)
-		}
-	}
-	var errs errors.Error
-	interpretation, _ := lookup(fileVal, "interpretation").String()
-	if b.Form != "" {
-		fileVal, errs = unifyWith(errs, fileVal, typesValue, "forms", string(b.Form))
-		// may leave some encoding-dependent options open in data mode.
-	} else if interpretation != "" {
-		// always sets form=*schema
-		fileVal, errs = unifyWith(errs, fileVal, typesValue, "interpretations", interpretation)
-	}
-	if interpretation == "" {
-		s, err := lookup(fileVal, "encoding").String()
-		if err != nil {
-			return nil, err
-		}
-		fileVal, errs = unifyWith(errs, fileVal, modeVal, "encodings", s)
-	}
-
-	fi := &FileInfo{}
-	if err := fileVal.Decode(fi); err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "could not parse arguments")
-	}
-	fi.Filename = b.Filename
-	return fi, errs
-}
-
-// unifyWith returns the equivalent of `v1 & v2[field][value]`.
-func unifyWith(errs errors.Error, v1, v2 cue.Value, field, value string) (cue.Value, errors.Error) {
-	v1 = v1.Unify(lookup(v2, field, value))
-	if err := v1.Err(); err != nil {
-		errs = errors.Append(errs,
-			errors.Newf(token.NoPos, "unknown %s %s", field, value))
-	}
-	return v1, errs
 }
 
 // ParseArgs converts a sequence of command line arguments representing
@@ -311,60 +216,6 @@ func ParseFileAndType(file, scope string, mode Mode) (*build.File, error) {
 	return toFile(mode, sc, file)
 }
 
-func hasEncoding(v cue.Value) bool {
-	return lookup(v, "encoding").Exists()
-}
-
-func toFile(mode Mode, sc *scope, filename string) (*build.File, error) {
-	modeVal := lookup(typesValue, "modes", mode.String())
-	fileVal := lookup(modeVal, "FileInfo")
-
-	for tagName := range sc.topLevel {
-		info := lookup(typesValue, "tagInfo", tagName)
-		if info.Exists() {
-			fileVal = fileVal.Unify(info)
-		} else {
-			return nil, errors.Newf(token.NoPos, "unknown filetype %s", tagName)
-		}
-	}
-	allowedSubsidiaryBool := lookup(fileVal, "boolTags")
-	for tagName, val := range sc.subsidiaryBool {
-		if !lookup(allowedSubsidiaryBool, tagName).Exists() {
-			return nil, errors.Newf(token.NoPos, "tag %s is not allowed in this context", tagName)
-		}
-		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("boolTags"), cue.Str(tagName)), val)
-	}
-	allowedSubsidiaryString := lookup(fileVal, "tags")
-	for tagName, val := range sc.subsidiaryString {
-		if !lookup(allowedSubsidiaryString, tagName).Exists() {
-			return nil, errors.Newf(token.NoPos, "tag %s is not allowed in this context", tagName)
-		}
-		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("tags"), cue.Str(tagName)), val)
-	}
-	if !hasEncoding(fileVal) {
-		if filename == "-" {
-			fileVal = fileVal.Unify(lookup(modeVal, "Default"))
-		} else if ext := fileExt(filename); ext != "" {
-			extFile := lookup(modeVal, "extensions", ext)
-			if !extFile.Exists() {
-				return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
-			}
-			fileVal = fileVal.Unify(extFile)
-		} else {
-			return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", filename)
-		}
-	}
-
-	// Note that the filename is only filled in the Go value, and not the CUE value.
-	// This makes no difference to the logic, but saves a non-trivial amount of evaluator work.
-	f := &build.File{Filename: filename}
-	if err := fileVal.Decode(f); err != nil {
-		return nil, errors.Wrapf(err, token.NoPos,
-			"could not determine file type")
-	}
-	return f, nil
-}
-
 // scope holds attributes that influence encoding and decoding.
 // Together with the mode and the file name, they determine
 // a number of properties of the encoding process.
@@ -430,33 +281,6 @@ func seqConcat[T any](iters ...iter.Seq[T]) iter.Seq[T] {
 				if !yield(x) {
 					return
 				}
-			}
-		}
-	}
-}
-
-func lookup(v cue.Value, elems ...string) cue.Value {
-	sels := make([]cue.Selector, len(elems))
-	for i := range elems {
-		sels[i] = cue.Str(elems[i])
-	}
-	return v.LookupPath(cue.MakePath(sels...))
-}
-
-// structFields returns an iterator over the names of all the regulat fields
-// in v and their values.
-func structFields(v cue.Value) iter.Seq2[string, cue.Value] {
-	return func(yield func(string, cue.Value) bool) {
-		if !v.Exists() {
-			return
-		}
-		iter, err := v.Fields()
-		if err != nil {
-			return
-		}
-		for iter.Next() {
-			if !yield(iter.Selector().Unquoted(), iter.Value()) {
-				break
 			}
 		}
 	}

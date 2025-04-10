@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2afc96f4_d30ff772",
+        "filename": "encoding/xml/koala/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-10T11:46:54Z",
+      "side": 1,
+      "message": "how about\n\n\u003e with some changes to better fit CUE syntax as \"$\" and \"@\" are special characters.\n\nthis gives a direct hint without the user needing to read the full proposal, and it\u0027s also a bit more precise - because we _could_ represent fields called `@foo` or `$` in CUE, so it\u0027s not a compatibility issue. It\u0027s just that the quoting would lead to bad UX, so I think \"better fit\" is clearer.",
+      "revId": "20f59ddab3950383fd934749f44e7025eb0dd5f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

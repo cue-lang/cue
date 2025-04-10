@@ -53,7 +53,10 @@ func (m Mode) String() string {
 
 // FileInfo defines the parsing plan for a file.
 type FileInfo struct {
-	*build.File
+	Filename       string               `json:"filename"`
+	Encoding       build.Encoding       `json:"encoding,omitempty"`
+	Interpretation build.Interpretation `json:"interpretation,omitempty"`
+	Form           build.Form           `json:"form,omitempty"`
 
 	Definitions  bool `json:"definitions"`  // include/allow definition fields
 	Data         bool `json:"data"`         // include/allow regular fields
@@ -77,7 +80,9 @@ var evalMu sync.Mutex
 // even though we clearly document that cue.Values are not safe for concurrent use.
 // It seems to be OK in practice, as otherwise we would run into `go test -race` failures.
 
-// FromFile return detailed file info for a given build file.
+// FromFile returns detailed file info for a given build file. It ignores b.Tags and
+// b.BoolTags, instead assuming that any tag handling has already been processed
+// by [ParseArgs] or similar.
 // Encoding must be specified.
 // TODO: mode should probably not be necessary here.
 func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
@@ -88,7 +93,8 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 		b.Form == "" &&
 		b.Interpretation == "" {
 		return &FileInfo{
-			File: b,
+			Encoding: build.CUE,
+			Form:     build.Schema,
 
 			Definitions:  true,
 			Data:         true,
@@ -108,16 +114,23 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 	typesInit()
 	modeVal := lookup(typesValue, "modes", mode.String())
 	fileVal := lookup(modeVal, "FileInfo")
-	fileVal = fileVal.FillPath(cue.Path{}, b)
-
+	if b.Encoding != "" {
+		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("encoding")), b.Encoding)
+	}
+	if b.Interpretation != "" {
+		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("interpretation")), b.Interpretation)
+	}
+	if b.Form != "" {
+		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("form")), b.Form)
+	}
 	if b.Encoding == "" {
+		return nil, errors.Newf(token.NoPos, "no encoding specified")
 		ext := lookup(modeVal, "extensions", fileExt(b.Filename))
 		if ext.Exists() {
 			fileVal = fileVal.Unify(ext)
 		}
 	}
 	var errs errors.Error
-
 	interpretation, _ := lookup(fileVal, "interpretation").String()
 	if b.Form != "" {
 		fileVal, errs = unifyWith(errs, fileVal, typesValue, "forms", string(b.Form))
@@ -138,6 +151,7 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 	if err := fileVal.Decode(fi); err != nil {
 		return nil, errors.Wrapf(err, token.NoPos, "could not parse arguments")
 	}
+	fi.Filename = b.Filename
 	return fi, errs
 }
 
@@ -344,7 +358,7 @@ func toFile(mode Mode, sc *scope, filename string) (*build.File, error) {
 	// Note that the filename is only filled in the Go value, and not the CUE value.
 	// This makes no difference to the logic, but saves a non-trivial amount of evaluator work.
 	f := &build.File{Filename: filename}
-	if err := fileVal.Decode(&f); err != nil {
+	if err := fileVal.Decode(f); err != nil {
 		return nil, errors.Wrapf(err, token.NoPos,
 			"could not determine file type")
 	}

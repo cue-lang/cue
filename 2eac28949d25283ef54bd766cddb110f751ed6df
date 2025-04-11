@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80606b34_ada46711",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-11T13:35:38Z",
+      "side": 1,
+      "message": "You could explore adding a test for this mode as part of something like https://github.com/cue-lang/cue/blob/28244057b0e22ed049fb9b65d4b278d2e0493c53/cmd/cue/cmd/integration/workspace/workspace_folders_test.go#L69 but I leave it up for you whether you do that here or \"add to a list\" later.",
+      "revId": "2eac28949d25283ef54bd766cddb110f751ed6df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c380635_8ec84028",
+        "filename": "internal/golangorgx/gopls/debug/info.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-11T13:35:38Z",
+      "side": 1,
+      "message": "I suspect this can/should be removed later, because we already carry version information.",
+      "revId": "2eac28949d25283ef54bd766cddb110f751ed6df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

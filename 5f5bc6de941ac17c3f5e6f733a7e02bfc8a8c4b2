@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "004b2e91_5e7522eb",
+        "filename": "internal/golangorgx/gopls/test/integration/fake/editor.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-11T14:50:45Z",
+      "side": 1,
+      "message": "This is a bug in upstream, though if you inspect the current gopls source, they\u0027ve fixed it in a different way. This will do for now. This change is necessary so that the `WorkspaceFolders` option in `options.go` works correctly - it carries this doccomment:\n\n```\n// WorkspaceFolders configures the workdir-relative workspace folders to send\n// to the LSP server. By default the editor sends a single workspace folder\n// corresponding to the workdir root. To explicitly configure no workspace\n// folders, use WorkspaceFolders with no arguments.\nfunc WorkspaceFolders(relFolders ...string) RunOption {\n```",
+      "revId": "5f5bc6de941ac17c3f5e6f733a7e02bfc8a8c4b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

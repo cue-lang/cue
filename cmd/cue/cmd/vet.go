@@ -54,10 +54,10 @@ a set of definitions to pick from.
 Examples:
 
   # Check files against a CUE file:
-  cue vet foo.cue foo.yaml
+  cue vet -c foo.cue foo.yaml
 
   # Check files against a particular expression
-  cue vet foo.cue lang/en.yaml lang/de.yaml -d '#Translation'
+  cue vet -c foo.cue lang/en.yaml lang/de.yaml -d '#Translation'
 
 More than one expression may be given using multiple -d flags. Each non-CUE
 file must match all expression values.

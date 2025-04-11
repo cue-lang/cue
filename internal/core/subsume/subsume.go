@@ -120,11 +120,9 @@ func (s *subsumer) getError() (err errors.Error) {
 	if s.gt != nil && s.lt != nil {
 		// src := binSrc(token.NoPos, opUnify, s.gt, s.lt)
 		if s.missing != 0 {
-			s.errf("missing field %q", s.missing.SelectorString(c))
-		} else if b, ok := unifyValue(c, s.gt, s.lt).(*adt.Bottom); !ok {
-			s.errf("value not an instance")
+			s.errf("field %q not present in %v", s.missing.SelectorString(c), s.lt)
 		} else {
-			s.errs = errors.Append(s.errs, b.Err)
+			s.errf("%v does not subsume %v", s.gt, s.lt)
 		}
 	}
 	if s.errs == nil {

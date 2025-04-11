@@ -132,8 +132,8 @@ func (s *Serve) Run(ctx context.Context, args ...string) error {
 		addr = fmt.Sprintf(":%v", s.Port)
 	}
 	if addr != "" {
-		log.Printf("Gopls daemon: listening on %s network, address %s...", network, addr)
-		defer log.Printf("Gopls daemon: exiting")
+		log.Printf("cue lsp daemon: listening on %s network, address %s...", network, addr)
+		defer log.Printf("cue lsp daemon: exiting")
 		return jsonrpc2.ListenAndServe(ctx, network, addr, ss, s.IdleTimeout)
 	}
 	stream := jsonrpc2.NewHeaderStream(fakenet.NewConn("stdio", os.Stdin, os.Stdout))

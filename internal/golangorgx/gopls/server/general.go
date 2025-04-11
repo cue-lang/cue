@@ -79,14 +79,20 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 	// prioritise work to support different clients etc based on bug reports.
 	//
 	// Ensure this logic is consistent with [server.DidChangeWorkspaceFolders].
-	//
-	// Note that (for now) we do not support a fallback to params.RootURI. We
-	// might do this in the future.
-	if l := len(params.WorkspaceFolders); l != 1 {
+	folders := params.WorkspaceFolders
+	if len(folders) == 0 {
+		if params.RootURI != "" {
+			folders = []protocol.WorkspaceFolder{{
+				URI:  string(params.RootURI),
+				Name: path.Base(params.RootURI.Path()),
+			}}
+		}
+	}
+
+	if l := len(folders); l != 1 {
 		return nil, fmt.Errorf("got %d WorkspaceFolders; expected 1", l)
 	}
 
-	folders := params.WorkspaceFolders
 	for _, folder := range folders {
 		if folder.URI == "" {
 			return nil, fmt.Errorf("empty WorkspaceFolder.URI")

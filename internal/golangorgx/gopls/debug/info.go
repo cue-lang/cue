@@ -47,7 +47,7 @@ func VersionInfo() *ServerVersion {
 	return &ServerVersion{
 		Version: version.Version(),
 		BuildInfo: &debug.BuildInfo{
-			Path:      "gopls, built in GOPATH mode",
+			Path:      "cue lsp, built in GOPATH mode",
 			GoVersion: runtime.Version(),
 		},
 	}

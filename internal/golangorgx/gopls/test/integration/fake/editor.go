@@ -98,6 +98,10 @@ type EditorConfig struct {
 	// To explicitly send no workspace folders, use an empty (non-nil) slice.
 	WorkspaceFolders []string
 
+	// RootURIAsDefaultFolder configures the RootURI initialization
+	// parameter to be set to the default workdir root.
+	RootURIAsDefaultFolder bool
+
 	// Whether to edit files with windows line endings.
 	WindowsLineEndings bool
 
@@ -291,6 +295,9 @@ func (e *Editor) initialize(ctx context.Context) error {
 	}
 	params.InitializationOptions = makeSettings(e.sandbox, config, nil)
 	params.WorkspaceFolders = makeWorkspaceFolders(e.sandbox, config.WorkspaceFolders)
+	if config.RootURIAsDefaultFolder {
+		params.RootURI = e.sandbox.Workdir.URI(string(e.sandbox.Workdir.RelativeTo))
+	}
 
 	capabilities, err := clientCapabilities(config)
 	if err != nil {
@@ -391,7 +398,7 @@ func (e *Editor) HasCommand(id string) bool {
 // makeWorkspaceFolders creates a slice of workspace folders to use for
 // this editing session, based on the editor configuration.
 func makeWorkspaceFolders(sandbox *Sandbox, paths []string) (folders []protocol.WorkspaceFolder) {
-	if len(paths) == 0 {
+	if paths == nil {
 		paths = []string{string(sandbox.Workdir.RelativeTo)}
 	}
 

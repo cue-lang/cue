@@ -250,6 +250,82 @@ dedupPattern: t1: p2: {
 	B: A & __no_sharing
 	out: B.x & A.#Z
 }
+-- issue3858.cue --
+orig: t1: {
+	#Image: embed: image: "foo:v1"
+	#JobConfig: {
+		image: #Image
+		job: #Job & {
+			image.embed
+		}
+	}
+	#Job: {
+		image: string
+		vcs:   "git"
+		args:  [...string]
+		env:   [string]: string
+	}
+
+	#Output: {
+		_in:  _
+		out:  (_in & {})
+	}
+	#Output & {
+		_in: (#JobConfig & {}).job
+	}
+}
+reduced: t1: {
+	Y: {
+		a: e: "foo"
+		b: X & { a }
+	}
+	X: {
+		e: string
+		f: 1 // fails in `out`
+	}
+	#Z: {
+		_in:  _
+		out:  _in & __no_sharing
+	}
+	#Z & {
+		_in: Y
+	}
+}
+orig: t2: {
+	#JobConfig: {
+		image: spec: image: "someimage"
+		job: #Job & {
+			image.spec
+		}
+	}
+	#Job: {
+		image: string
+		env:   "FOO"
+	}
+	
+	#Output: {
+		in: _
+		out: (in & {}).input
+	}
+	out: #Output & {
+		in: input: (#JobConfig & {}).job
+	}
+}
+reduced: t2: {
+	Y: {
+		a: e: "foo"
+		b: X & { a }
+	}
+	X: {
+		e: string
+		f: 1 // fails
+	}
+	#Z: {
+		_in:  _
+		out:  _in
+	}
+	#Z & { _in: Y }
+}
 -- large.cue --
 full: {
 	#Resource: {
@@ -299,47 +375,47 @@ full: {
 	out: (#Main & {namespace: "ns1"}).output
 }
 -- out/evalalpha/stats --
-Leaks:  508
+Leaks:  632
 Freed:  0
 Reused: 0
-Allocs: 508
+Allocs: 632
 Retain: 0
 
-Unifications: 403
-Conjuncts:    781
+Unifications: 522
+Conjuncts:    1003
 Disjuncts:    34
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  107
--Freed:  633
--Reused: 619
--Allocs: 121
--Retain: 325
-+Leaks:  508
+-Leaks:  115
+-Freed:  774
+-Reused: 760
+-Allocs: 129
+-Retain: 356
++Leaks:  632
 +Freed:  0
 +Reused: 0
-+Allocs: 508
++Allocs: 632
 +Retain: 0
  
--Unifications: 676
--Conjuncts:    1396
--Disjuncts:    901
-+Unifications: 403
-+Conjuncts:    781
+-Unifications: 825
+-Conjuncts:    1694
+-Disjuncts:    1073
++Unifications: 522
++Conjuncts:    1003
 +Disjuncts:    34
 -- out/eval/stats --
-Leaks:  107
-Freed:  633
-Reused: 619
-Allocs: 121
-Retain: 325
+Leaks:  115
+Freed:  774
+Reused: 760
+Allocs: 129
+Retain: 356
 
-Unifications: 676
-Conjuncts:    1396
-Disjuncts:    901
+Unifications: 825
+Conjuncts:    1694
+Disjuncts:    1073
 -- out/evalalpha --
 Errors:
 and.transitive.out.ok: field not allowed:
@@ -367,6 +443,17 @@ embed.simple.a.err: field not allowed:
     ./in.cue:4:5
 embed.withIndirect.err: field not allowed:
     ./in.cue:71:8
+orig.t1.out.args: field not allowed:
+    ./issue3858.cue:12:3
+orig.t1.out.env: field not allowed:
+    ./issue3858.cue:13:3
+orig.t1.out.vcs: field not allowed:
+    ./issue3858.cue:11:3
+reduced.t1.out.b.f: field not allowed:
+    ./issue3858.cue:31:3
+job.env: field not allowed:
+    ./issue3858.cue:58:15
+    ./issue3858.cue:50:3
 embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
     ./validators.cue:21:5
     ./validators.cue:21:12
@@ -876,6 +963,179 @@ Result:
       }
     }
   }
+  orig: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      #Image: (#struct){
+        embed: (#struct){
+          image: (string){ "foo:v1" }
+        }
+      }
+      #JobConfig: (#struct){
+        image: ~(orig.t1.#Image)
+        job: (#struct){
+          image: (string){ "foo:v1" }
+          vcs: (string){ "git" }
+          args: (list){
+          }
+          env: (#struct){
+          }
+        }
+      }
+      #Job: (#struct){
+        image: (string){ string }
+        vcs: (string){ "git" }
+        args: (list){
+        }
+        env: (#struct){
+        }
+      }
+      #Output: (#struct){
+        _in: (_){ _ }
+        out: (#struct){
+        }
+      }
+      _in: (#struct){
+        image: (string){ "foo:v1" }
+        vcs: (string){ "git" }
+        args: (list){
+        }
+        env: (#struct){
+        }
+      }
+      out: (_|_){
+        // [eval]
+        image: (string){ "foo:v1" }
+        vcs: (_|_){
+          // [eval] orig.t1.out.vcs: field not allowed:
+          //     ./issue3858.cue:11:3
+        }
+        args: (_|_){
+          // [eval] orig.t1.out.args: field not allowed:
+          //     ./issue3858.cue:12:3
+        }
+        env: (_|_){
+          // [eval] orig.t1.out.env: field not allowed:
+          //     ./issue3858.cue:13:3
+        }
+      }
+    }
+    t2: (_|_){
+      // [eval]
+      #JobConfig: (#struct){
+        image: (#struct){
+          spec: (#struct){
+            image: (string){ "someimage" }
+          }
+        }
+        job: (#struct){
+          image: (string){ "someimage" }
+          env: (string){ "FOO" }
+        }
+      }
+      #Job: (#struct){
+        image: (string){ string }
+        env: (string){ "FOO" }
+      }
+      #Output: (#struct){
+        in: (_){ _ }
+        out: (_|_){
+          // [incomplete] orig.t2.#Output.out: undefined field: input:
+          //     ./issue3858.cue:55:18
+        }
+      }
+      out: (_|_){
+        // [eval]
+        in: (#struct){
+          input: (#struct){
+            image: (string){ "someimage" }
+            env: (string){ "FOO" }
+          }
+        }
+        out: (_|_){
+          // [eval] job.env: field not allowed:
+          //     ./issue3858.cue:58:15
+          //     ./issue3858.cue:50:3
+        }
+      }
+    }
+  }
+  reduced: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      Y: (struct){
+        a: (struct){
+          e: (string){ "foo" }
+        }
+        b: (struct){
+          e: (string){ "foo" }
+          f: (int){ 1 }
+        }
+      }
+      X: (struct){
+        e: (string){ string }
+        f: (int){ 1 }
+      }
+      #Z: (#struct){
+        _in: (_){ _ }
+        out: (_){ _ }
+      }
+      _in: (#struct){
+        a: (#struct){
+          e: (string){ "foo" }
+        }
+        b: (#struct){
+          e: (string){ "foo" }
+          f: (int){ 1 }
+        }
+      }
+      out: (_|_){
+        // [eval]
+        a: (#struct){
+          e: (string){ "foo" }
+        }
+        b: (_|_){
+          // [eval]
+          e: (string){ "foo" }
+          f: (_|_){
+            // [eval] reduced.t1.out.b.f: field not allowed:
+            //     ./issue3858.cue:31:3
+          }
+        }
+      }
+    }
+    t2: (#struct){
+      Y: (struct){
+        a: (struct){
+          e: (string){ "foo" }
+        }
+        b: (struct){
+          e: (string){ "foo" }
+          f: (int){ 1 }
+        }
+      }
+      X: (struct){
+        e: (string){ string }
+        f: (int){ 1 }
+      }
+      #Z: (#struct){
+        _in: (_){ _ }
+        out: (_){ _ }
+      }
+      _in: (#struct){
+        a: (#struct){
+          e: (string){ "foo" }
+        }
+        b: (#struct){
+          e: (string){ "foo" }
+          f: (int){ 1 }
+        }
+      }
+      out: ~(reduced.t2._in)
+    }
+  }
   full: (struct){
     #Resource: (#struct){
       someMsg: (string){ string }
@@ -1038,7 +1298,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,81 +1,29 @@
+@@ -1,81 +1,40 @@
  Errors:
  and.transitive.out.ok: field not allowed:
 -    ./in.cue:34:5
@@ -1117,10 +1377,21 @@ diff old new
 -    ./validators.cue:12:6
 -    ./validators.cue:17:5
 -    ./validators.cue:18:5
++orig.t1.out.args: field not allowed:
++    ./issue3858.cue:12:3
++orig.t1.out.env: field not allowed:
++    ./issue3858.cue:13:3
++orig.t1.out.vcs: field not allowed:
++    ./issue3858.cue:11:3
++reduced.t1.out.b.f: field not allowed:
++    ./issue3858.cue:31:3
++job.env: field not allowed:
++    ./issue3858.cue:58:15
++    ./issue3858.cue:50:3
  embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
      ./validators.cue:21:5
      ./validators.cue:21:12
-@@ -94,14 +42,11 @@
+@@ -94,14 +53,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1136,7 +1407,7 @@ diff old new
        }
      }
      andInStruct: (_|_){
-@@ -111,14 +56,11 @@
+@@ -111,14 +67,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1152,7 +1423,7 @@ diff old new
        }
      }
      embedDefWithEmbedding: (_|_){
-@@ -128,15 +70,11 @@
+@@ -128,15 +81,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1169,7 +1440,7 @@ diff old new
        }
      }
      embedComprehension: (_|_){
-@@ -146,16 +84,11 @@
+@@ -146,16 +95,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1187,7 +1458,7 @@ diff old new
        }
      }
      fieldWithAnd: (_|_){
-@@ -166,9 +99,6 @@
+@@ -166,9 +110,6 @@
          // [eval]
          err: (_|_){
            // [eval] embed.fieldWithAnd.a.err: field not allowed:
@@ -1197,7 +1468,7 @@ diff old new
            //     ./in.cue:20:13
          }
        }
-@@ -179,20 +109,15 @@
+@@ -179,20 +120,15 @@
          a: (int){ int }
        }
        B: (struct){
@@ -1223,7 +1494,7 @@ diff old new
        }
      }
      andEmbed: (_|_){
-@@ -208,17 +133,11 @@
+@@ -208,17 +144,11 @@
        }
        d: (_|_){
          // [eval]
@@ -1242,7 +1513,7 @@ diff old new
        }
      }
      nonDef: (struct){
-@@ -227,12 +146,12 @@
+@@ -227,12 +157,12 @@
            a: (string){ string }
          }
          #Y: (#struct){
@@ -1259,7 +1530,7 @@ diff old new
          }
        }
      }
-@@ -242,12 +161,12 @@
+@@ -242,12 +172,12 @@
            Name: (string){ string }
          }
          #Step: (#struct){
@@ -1276,7 +1547,7 @@ diff old new
          }
          out: (#struct){
            Name: (string){ "foo" }
-@@ -257,21 +176,15 @@
+@@ -257,21 +187,15 @@
      }
      withIndirect: (_|_){
        // [eval]
@@ -1303,7 +1574,7 @@ diff old new
      }
      normalValidator: (_|_){
        // [eval]
-@@ -281,20 +194,17 @@
+@@ -281,20 +205,17 @@
        }
        x: (_|_){
          // [eval]
@@ -1327,7 +1598,7 @@ diff old new
          #X: (_){
            matchN(0, (#list){
            })
-@@ -301,17 +211,10 @@
+@@ -301,17 +222,10 @@
            a?: (int){ int }
            b?: (int){ int }
          }
@@ -1349,7 +1620,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -330,10 +233,7 @@
+@@ -330,10 +244,7 @@
            // [eval]
            b: (_|_){
              // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
@@ -1360,7 +1631,7 @@ diff old new
              //     ./validators.cue:24:8
              // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
              //     ./validators.cue:21:5
-@@ -360,16 +260,11 @@
+@@ -360,16 +271,11 @@
        }
        out: (_|_){
          // [eval]
@@ -1378,7 +1649,7 @@ diff old new
        }
      }
      transitiveWithEmbed: (_|_){
-@@ -385,17 +280,11 @@
+@@ -385,17 +291,11 @@
        }
        out: (_|_){
          // [eval]
@@ -1397,7 +1668,7 @@ diff old new
        }
      }
    }
-@@ -440,8 +329,8 @@
+@@ -440,8 +340,8 @@
              //     ./issue3832.cue:8:16
            }
            outFirstName: (_|_){
@@ -1408,7 +1679,7 @@ diff old new
            }
          }
        }
-@@ -451,35 +340,27 @@
+@@ -451,35 +351,27 @@
          }, (#struct){
            pass: (#struct){
              let self#1 = (_|_){
@@ -1454,7 +1725,7 @@ diff old new
        pass: (#struct){
          let self#1 = (#struct){
            firstName: (string){ "Sam" }
-@@ -486,18 +367,21 @@
+@@ -486,18 +378,21 @@
          }
          outFirstName: (string){ "Sam" }
        }
@@ -1488,7 +1759,7 @@ diff old new
    }
    issue3833: (struct){
      out: (#struct){
-@@ -573,12 +457,8 @@
+@@ -573,12 +468,8 @@
          globalField: (string){ string }
        }
        #Context: (#struct){
@@ -1503,7 +1774,7 @@ diff old new
        }
        out: (struct){
          ingress: (#struct){
-@@ -606,22 +486,22 @@
+@@ -606,22 +497,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -1542,7 +1813,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -631,22 +511,22 @@
+@@ -631,30 +522,32 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -1562,6 +1833,14 @@ diff old new
 -        }
 -        out: (#struct){
 -          y: (struct){
+-            z: (int){ 1 }
+-          }
+-        }
+-      }
+-    }
+-  }
+-  orig: (struct){
+-    t1: (#struct){
 +            y: (#struct){
 +              z: (int){ 1 }
 +            }
@@ -1578,10 +1857,213 @@ diff old new
 +        }
 +        out: (#struct){
 +          y: (#struct){
-             z: (int){ 1 }
++            z: (int){ 1 }
++          }
++        }
++      }
++    }
++  }
++  orig: (_|_){
++    // [eval]
++    t1: (_|_){
++      // [eval]
+       #Image: (#struct){
+         embed: (#struct){
+           image: (string){ "foo:v1" }
+@@ -661,11 +554,7 @@
+         }
+       }
+       #JobConfig: (#struct){
+-        image: (#struct){
+-          embed: (#struct){
+-            image: (string){ "foo:v1" }
+-          }
+-        }
++        image: ~(orig.t1.#Image)
+         job: (#struct){
+           image: (string){ "foo:v1" }
+           vcs: (string){ "git" }
+@@ -696,16 +585,25 @@
+         env: (#struct){
+         }
+       }
+-      out: (#struct){
+-        image: (string){ "foo:v1" }
+-        vcs: (string){ "git" }
+-        args: (list){
+-        }
+-        env: (#struct){
+-        }
+-      }
+-    }
+-    t2: (struct){
++      out: (_|_){
++        // [eval]
++        image: (string){ "foo:v1" }
++        vcs: (_|_){
++          // [eval] orig.t1.out.vcs: field not allowed:
++          //     ./issue3858.cue:11:3
++        }
++        args: (_|_){
++          // [eval] orig.t1.out.args: field not allowed:
++          //     ./issue3858.cue:12:3
++        }
++        env: (_|_){
++          // [eval] orig.t1.out.env: field not allowed:
++          //     ./issue3858.cue:13:3
++        }
++      }
++    }
++    t2: (_|_){
++      // [eval]
+       #JobConfig: (#struct){
+         image: (#struct){
+           spec: (#struct){
+@@ -728,55 +626,64 @@
+           //     ./issue3858.cue:55:18
+         }
+       }
+-      out: (#struct){
+-        in: (struct){
++      out: (_|_){
++        // [eval]
++        in: (#struct){
+           input: (#struct){
+             image: (string){ "someimage" }
+             env: (string){ "FOO" }
            }
          }
-@@ -701,38 +581,11 @@
+-        out: (#struct){
+-          image: (string){ "someimage" }
+-          env: (string){ "FOO" }
+-        }
+-      }
+-    }
+-  }
+-  reduced: (struct){
+-    t1: (#struct){
+-      Y: (struct){
+-        a: (struct){
+-          e: (string){ "foo" }
+-        }
+-        b: (struct){
+-          e: (string){ "foo" }
+-          f: (int){ 1 }
+-        }
+-      }
+-      X: (struct){
+-        e: (string){ string }
+-        f: (int){ 1 }
+-      }
+-      #Z: (#struct){
+-        _in: (_){ _ }
+-        out: (_){ _ }
+-      }
+-      _in: (struct){
+-        a: (struct){
+-          e: (string){ "foo" }
+-        }
+-        b: (struct){
+-          e: (string){ "foo" }
+-          f: (int){ 1 }
+-        }
+-      }
+-      out: (#struct){
+-        a: (#struct){
+-          e: (string){ "foo" }
+-        }
+-        b: (#struct){
+-          e: (string){ "foo" }
+-          f: (int){ 1 }
++        out: (_|_){
++          // [eval] job.env: field not allowed:
++          //     ./issue3858.cue:58:15
++          //     ./issue3858.cue:50:3
++        }
++      }
++    }
++  }
++  reduced: (_|_){
++    // [eval]
++    t1: (_|_){
++      // [eval]
++      Y: (struct){
++        a: (struct){
++          e: (string){ "foo" }
++        }
++        b: (struct){
++          e: (string){ "foo" }
++          f: (int){ 1 }
++        }
++      }
++      X: (struct){
++        e: (string){ string }
++        f: (int){ 1 }
++      }
++      #Z: (#struct){
++        _in: (_){ _ }
++        out: (_){ _ }
++      }
++      _in: (#struct){
++        a: (#struct){
++          e: (string){ "foo" }
++        }
++        b: (#struct){
++          e: (string){ "foo" }
++          f: (int){ 1 }
++        }
++      }
++      out: (_|_){
++        // [eval]
++        a: (#struct){
++          e: (string){ "foo" }
++        }
++        b: (_|_){
++          // [eval]
++          e: (string){ "foo" }
++          f: (_|_){
++            // [eval] reduced.t1.out.b.f: field not allowed:
++            //     ./issue3858.cue:31:3
++          }
+         }
+       }
+     }
+@@ -798,24 +705,16 @@
+         _in: (_){ _ }
+         out: (_){ _ }
+       }
+-      _in: (struct){
+-        a: (struct){
+-          e: (string){ "foo" }
+-        }
+-        b: (struct){
+-          e: (string){ "foo" }
+-          f: (int){ 1 }
+-        }
+-      }
+-      out: (#struct){
+-        a: (#struct){
+-          e: (string){ "foo" }
+-        }
+-        b: (#struct){
+-          e: (string){ "foo" }
+-          f: (int){ 1 }
+-        }
+-      }
++      _in: (#struct){
++        a: (#struct){
++          e: (string){ "foo" }
++        }
++        b: (#struct){
++          e: (string){ "foo" }
++          f: (int){ 1 }
++        }
++      }
++      out: ~(reduced.t2._in)
+     }
+   }
+   full: (struct){
+@@ -866,38 +765,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -1622,7 +2104,7 @@ diff old new
          let base#6 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -775,6 +628,19 @@
+@@ -940,6 +812,19 @@
              }
            }
          }
@@ -1642,7 +2124,7 @@ diff old new
        }
      }
      out: (#struct){
-@@ -804,17 +670,8 @@
+@@ -969,17 +854,8 @@
              //     ./validators.cue:32:17
              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
              //     ./validators.cue:29:22
@@ -2322,6 +2804,171 @@ Result:
       }
     }
   }
+  orig: (struct){
+    t1: (#struct){
+      #Image: (#struct){
+        embed: (#struct){
+          image: (string){ "foo:v1" }
+        }
+      }
+      #JobConfig: (#struct){
+        image: (#struct){
+          embed: (#struct){
+            image: (string){ "foo:v1" }
+          }
+        }
+        job: (#struct){
+          image: (string){ "foo:v1" }
+          vcs: (string){ "git" }
+          args: (list){
+          }
+          env: (#struct){
+          }
+        }
+      }
+      #Job: (#struct){
+        image: (string){ string }
+        vcs: (string){ "git" }
+        args: (list){
+        }
+        env: (#struct){
+        }
+      }
+      #Output: (#struct){
+        _in: (_){ _ }
+        out: (#struct){
+        }
+      }
+      _in: (#struct){
+        image: (string){ "foo:v1" }
+        vcs: (string){ "git" }
+        args: (list){
+        }
+        env: (#struct){
+        }
+      }
+      out: (#struct){
+        image: (string){ "foo:v1" }
+        vcs: (string){ "git" }
+        args: (list){
+        }
+        env: (#struct){
+        }
+      }
+    }
+    t2: (struct){
+      #JobConfig: (#struct){
+        image: (#struct){
+          spec: (#struct){
+            image: (string){ "someimage" }
+          }
+        }
+        job: (#struct){
+          image: (string){ "someimage" }
+          env: (string){ "FOO" }
+        }
+      }
+      #Job: (#struct){
+        image: (string){ string }
+        env: (string){ "FOO" }
+      }
+      #Output: (#struct){
+        in: (_){ _ }
+        out: (_|_){
+          // [incomplete] orig.t2.#Output.out: undefined field: input:
+          //     ./issue3858.cue:55:18
+        }
+      }
+      out: (#struct){
+        in: (struct){
+          input: (#struct){
+            image: (string){ "someimage" }
+            env: (string){ "FOO" }
+          }
+        }
+        out: (#struct){
+          image: (string){ "someimage" }
+          env: (string){ "FOO" }
+        }
+      }
+    }
+  }
+  reduced: (struct){
+    t1: (#struct){
+      Y: (struct){
+        a: (struct){
+          e: (string){ "foo" }
+        }
+        b: (struct){
+          e: (string){ "foo" }
+          f: (int){ 1 }
+        }
+      }
+      X: (struct){
+        e: (string){ string }
+        f: (int){ 1 }
+      }
+      #Z: (#struct){
+        _in: (_){ _ }
+        out: (_){ _ }
+      }
+      _in: (struct){
+        a: (struct){
+          e: (string){ "foo" }
+        }
+        b: (struct){
+          e: (string){ "foo" }
+          f: (int){ 1 }
+        }
+      }
+      out: (#struct){
+        a: (#struct){
+          e: (string){ "foo" }
+        }
+        b: (#struct){
+          e: (string){ "foo" }
+          f: (int){ 1 }
+        }
+      }
+    }
+    t2: (#struct){
+      Y: (struct){
+        a: (struct){
+          e: (string){ "foo" }
+        }
+        b: (struct){
+          e: (string){ "foo" }
+          f: (int){ 1 }
+        }
+      }
+      X: (struct){
+        e: (string){ string }
+        f: (int){ 1 }
+      }
+      #Z: (#struct){
+        _in: (_){ _ }
+        out: (_){ _ }
+      }
+      _in: (struct){
+        a: (struct){
+          e: (string){ "foo" }
+        }
+        b: (struct){
+          e: (string){ "foo" }
+          f: (int){ 1 }
+        }
+      }
+      out: (#struct){
+        a: (#struct){
+          e: (string){ "foo" }
+        }
+        b: (#struct){
+          e: (string){ "foo" }
+          f: (int){ 1 }
+        }
+      }
+    }
+  }
   full: (struct){
     #Resource: (#struct){
       someMsg: (string){ string }
@@ -2896,6 +3543,114 @@ Result:
         B: (〈0;A〉 & _|_(no sharing))
         out: (〈0;B〉.x & 〈0;A〉.#Z)
       }
+    }
+  }
+}
+--- issue3858.cue
+{
+  orig: {
+    t1: {
+      #Image: {
+        embed: {
+          image: "foo:v1"
+        }
+      }
+      #JobConfig: {
+        image: 〈1;#Image〉
+        job: (〈1;#Job〉 & {
+          〈1;image〉.embed
+        })
+      }
+      #Job: {
+        image: string
+        vcs: "git"
+        args: [
+          ...string,
+        ]
+        env: {
+          [string]: string
+        }
+      }
+      #Output: {
+        _in: _
+        out: (〈0;_in〉 & {})
+      }
+      (〈0;#Output〉 & {
+        _in: (〈1;#JobConfig〉 & {}).job
+      })
+    }
+  }
+  reduced: {
+    t1: {
+      Y: {
+        a: {
+          e: "foo"
+        }
+        b: (〈1;X〉 & {
+          〈1;a〉
+        })
+      }
+      X: {
+        e: string
+        f: 1
+      }
+      #Z: {
+        _in: _
+        out: (〈0;_in〉 & _|_(no sharing))
+      }
+      (〈0;#Z〉 & {
+        _in: 〈1;Y〉
+      })
+    }
+  }
+  orig: {
+    t2: {
+      #JobConfig: {
+        image: {
+          spec: {
+            image: "someimage"
+          }
+        }
+        job: (〈1;#Job〉 & {
+          〈1;image〉.spec
+        })
+      }
+      #Job: {
+        image: string
+        env: "FOO"
+      }
+      #Output: {
+        in: _
+        out: (〈0;in〉 & {}).input
+      }
+      out: (〈0;#Output〉 & {
+        in: {
+          input: (〈2;#JobConfig〉 & {}).job
+        }
+      })
+    }
+  }
+  reduced: {
+    t2: {
+      Y: {
+        a: {
+          e: "foo"
+        }
+        b: (〈1;X〉 & {
+          〈1;a〉
+        })
+      }
+      X: {
+        e: string
+        f: 1
+      }
+      #Z: {
+        _in: _
+        out: 〈0;_in〉
+      }
+      (〈0;#Z〉 & {
+        _in: 〈1;Y〉
+      })
     }
   }
 }

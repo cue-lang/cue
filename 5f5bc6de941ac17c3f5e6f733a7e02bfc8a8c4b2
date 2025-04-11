@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7d5f51e_d77d947e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-11T15:06:08Z",
+      "side": 1,
+      "message": "I don\u0027t have strong feelings really either here - \"CUE LSP\" is arguably a bit \"shouty\" so I\u0027m happy to follow your lead.",
+      "parentUuid": "c48d02b7_7b0884f2",
+      "revId": "5f5bc6de941ac17c3f5e6f733a7e02bfc8a8c4b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5512f77b_3c130ef5",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-04-11T14:57:48Z",
       "side": 1,
       "message": "This comment seems to suggest \"both\" are provided, but I see nothing about workspace folders run option below?",
+      "revId": "5f5bc6de941ac17c3f5e6f733a7e02bfc8a8c4b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78f32ee3_b38b3d78",
+        "filename": "cmd/cue/cmd/integration/workspace/workspace_folders_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-11T15:06:08Z",
+      "side": 1,
+      "message": "Indeed - relying on the testing framework providing the default. I\u0027ll switch it so that it\u0027s explicit - simpler to visually verify that it\u0027s correct.",
+      "parentUuid": "5512f77b_3c130ef5",
       "revId": "5f5bc6de941ac17c3f5e6f733a7e02bfc8a8c4b2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5353d643_5c3923b2",
+        "filename": "cmd/cue/cmd/integration/workspace/workspace_folders_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-11T15:06:08Z",
+      "side": 1,
+      "message": "mid-air collision - already fixed in the latest patchset 😊",
+      "parentUuid": "5de278c7_93721e87",
+      "revId": "5f5bc6de941ac17c3f5e6f733a7e02bfc8a8c4b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d56146cc_d4c788d2",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-04-11T14:57:48Z",
       "side": 1,
       "message": "Might just be worth adding a comment here that the edit of a file within the workspace folder(s) is used as a means of verifying at some very superficial level that things are \"plumbed together\" on the server.",
+      "revId": "5f5bc6de941ac17c3f5e6f733a7e02bfc8a8c4b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c2718a6_36058f0f",
+        "filename": "cmd/cue/cmd/integration/workspace/workspace_folders_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-11T15:06:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d56146cc_d4c788d2",
       "revId": "5f5bc6de941ac17c3f5e6f733a7e02bfc8a8c4b2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -17,39 +17,22 @@ func TestMain(m *testing.M) {
 	Main(m, hooks.Options)
 }
 
-// TestWorkingSimpleModule ensures that we have a successful package load for a
-// simple module rooted in the workspace folder with a single CUE file at the
-// root.
-func TestWorkingSimpleModule(t *testing.T) {
-	const files = `
+// TestWorkspaceFoldersRootURI tests that the server initialization
+// works, or fails, as expected, due to various combinations of
+// WorkspaceFolders and the RootURI being set or unset.
+func TestWorkspaceFoldersRootURI(t *testing.T) {
+	const filesOneModule = `
 -- cue.mod/module.cue --
-module: "mod.example"
-language: {
-        version: "v0.11.0"
-}
--- a.cue --
+module: "mod.example/b"
+language: version: "v0.11.0"
+
+-- a/a.cue --
 package a
 -- b/b.cue --
 package c
 `
-	WithOptions().Run(t, files, func(t *testing.T, env *Env) {
-		// Simulate a change and ensure we get diagnostics back
-		env.OpenFile("a.cue")
-		env.EditBuffer("a.cue", fake.NewEdit(1, 0, 1, 0, "\nx: 5\n"))
-		got := env.BufferText("a.cue")
-		want := "package a\n\nx: 5\n"
-		qt.Assert(t, qt.Equals(got, want))
-		env.Await(env.DoneWithChange())
-	})
-}
 
-// TestMultipleWorkspaceFolders verifies the behaviour of starting 'cue lsp'
-// with multiple WorkspaceFolders. This is currently not supported, and hence
-// the test is a negative test that asserts 'cue lsp' will fail (during the
-// Initialize phase).
-func TestMultipleWorkspaceFolders(t *testing.T) {
-	const files = `
-
+	const filesTwoModules = `
 -- a/cue.mod/module.cue --
 module: "mod.example/b"
 language: version: "v0.11.0"
@@ -65,10 +48,92 @@ language: version: "v0.11.0"
 package a
 
 `
-	WithOptions(
-		WorkspaceFolders("a", "b"),
-		InitializeError("initialize: got 2 WorkspaceFolders; expected 1"),
-	).Run(t, files, nil)
+
+	type tc struct {
+		name          string
+		opts          []RunOption
+		files         string
+		expectSuccess bool
+	}
+	tests := []tc{
+		{
+			// With no workspace folders and no rooturi, the server will
+			// return an error during initialization.
+			name: "no workspace folders, no rooturi",
+			opts: []RunOption{
+				WorkspaceFolders(),
+				InitializeError("initialize: got 0 WorkspaceFolders; expected 1"),
+			},
+			files:         filesOneModule,
+			expectSuccess: false,
+		},
+		{
+			// If no workspace folders are set, but a rooturi is set, the
+			// server will treat the rooturi as if it is a workspace
+			// folder.
+			name: "no workspace folders, rooturi set",
+			opts: []RunOption{
+				WorkspaceFolders(),
+				RootURIAsDefaultFolder(),
+			},
+			files:         filesOneModule,
+			expectSuccess: true,
+		},
+		{
+			// If both workspace folders and rooturi are provided, the
+			// rooturi is ignored, and only workspace folders are used.
+			name: "workspace folders, and rooturi",
+			opts: []RunOption{
+				RootURIAsDefaultFolder(),
+			},
+			files:         filesOneModule,
+			expectSuccess: true,
+		},
+		{
+			// CUE LSP does not currently support multiple workspace folders.
+			name: "multiple folders, one module",
+			opts: []RunOption{
+				WorkspaceFolders("a", "b"),
+				InitializeError("initialize: got 2 WorkspaceFolders; expected 1"),
+			},
+			files:         filesOneModule,
+			expectSuccess: false,
+		},
+		{
+			// CUE LSP does not currently support multiple workspace
+			// folders, even if they correctly refer to different
+			// modules.
+			name: "multiple folders, two modules",
+			opts: []RunOption{
+				WorkspaceFolders("a", "b"),
+				InitializeError("initialize: got 2 WorkspaceFolders; expected 1"),
+			},
+			files:         filesTwoModules,
+			expectSuccess: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			hadSuccess := false
+			WithOptions(tc.opts...).Run(t, tc.files, func(t *testing.T, env *Env) {
+				hadSuccess = true
+				if tc.expectSuccess {
+					env.OpenFile("a/a.cue")
+					env.EditBuffer("a/a.cue", fake.NewEdit(1, 0, 1, 0, "\nx: 5\n"))
+					got := env.BufferText("a/a.cue")
+					want := "package a\n\nx: 5\n"
+					qt.Assert(t, qt.Equals(got, want))
+					env.Await(env.DoneWithChange())
+				}
+			})
+			if tc.expectSuccess && !hadSuccess {
+				t.Fatal("Initialisation should have succeeded, but it failed")
+			} else if !tc.expectSuccess && hadSuccess {
+				t.Fatal("Initialisation should have failed, but it succeeded")
+			}
+		})
+	}
 }
 
 // TODO(myitcv): add a test that verifies we get an error in the case that a

@@ -117,6 +117,15 @@ func WorkspaceFolders(relFolders ...string) RunOption {
 	})
 }
 
+// RootURIAsDefaultFolder configures the RootURI initialization
+// parameter to be set to the default workdir root. This is sent to the
+// LSP server as part of initialization.
+func RootURIAsDefaultFolder() RunOption {
+	return optionSetter(func(opts *runConfig) {
+		opts.editor.RootURIAsDefaultFolder = true
+	})
+}
+
 // The InitializeError RunOption establishes the expectation that creating a
 // new fake editor (happens as part of Run) will fail with the non-empty error
 // string err.

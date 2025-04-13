@@ -101,7 +101,7 @@ func (c *OpContext) RewriteArgs(args ...interface{}) {
 
 func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
 	if c.LogEval == 0 {
-		return
+		panic("avoid calling OpContext.Indentf when logging is disabled to prevent overhead")
 	}
 	w := &strings.Builder{}
 
@@ -218,7 +218,9 @@ func (n *nodeContext) logDoDisjunct() *disjunctInfo {
 
 	d.disjunctID = int(c.stats.Disjuncts)
 
-	n.Logf("====== Do DISJUNCT %v & %v ======", d.lhs, d.rhs)
+	if n.ctx.LogEval > 0 {
+		n.Logf("====== Do DISJUNCT %v & %v ======", d.lhs, d.rhs)
+	}
 
 	return d
 }

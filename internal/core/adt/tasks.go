@@ -109,7 +109,9 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	}
 	arc = arc.DerefNonDisjunct()
 
-	ctx.Logf(t.node.node, "RESOLVED %v to %v %v", r, arc.Label, fmt.Sprintf("%p", arc))
+	if ctx.LogEval > 0 {
+		ctx.Logf(t.node.node, "RESOLVED %v to %v %v", r, arc.Label, fmt.Sprintf("%p", arc))
+	}
 	// TODO: consider moving after markCycle or removing.
 	d := arc.DerefDisjunct()
 

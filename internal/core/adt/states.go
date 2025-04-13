@@ -260,7 +260,9 @@ var schedConfig = taskContext{
 func stateCompletions(s *scheduler) condition {
 	x := s.completed
 	v := s.node.node
-	s.node.Logf("=== stateCompletions: %v  %v", v.Label, s.completed)
+	if s.node.ctx.LogEval > 0 {
+		s.node.Logf("=== stateCompletions: %v  %v", v.Label, s.completed)
+	}
 	if x.meets(allAncestorsProcessed) {
 		x |= conditionsUsingCounters &^ s.provided
 		// If we have a pending or constraint arc, a sub arc may still cause the

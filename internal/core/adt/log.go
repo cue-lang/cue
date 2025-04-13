@@ -69,6 +69,8 @@ func (c *OpContext) Un(s nestString, id int) {
 // The first argument must be the function name.
 func (c *OpContext) Indentf(v *Vertex, format string, args ...any) (s nestString, id int) {
 	if c.LogEval == 0 {
+		// The Go compiler as of 1.24 is not very clever with no-op function calls;
+		// any arguments passed to ...args above escape to the heap and allocate.
 		panic("avoid calling OpContext.Indentf when logging is disabled to prevent overhead")
 	}
 	name := strings.Split(format, "(")[0]
@@ -101,7 +103,9 @@ func (c *OpContext) RewriteArgs(args ...interface{}) {
 
 func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
 	if c.LogEval == 0 {
-		return
+		// The Go compiler as of 1.24 is not very clever with no-op function calls;
+		// any arguments passed to ...args above escape to the heap and allocate.
+		panic("avoid calling OpContext.Logf when logging is disabled to prevent overhead")
 	}
 	w := &strings.Builder{}
 
@@ -218,7 +222,9 @@ func (n *nodeContext) logDoDisjunct() *disjunctInfo {
 
 	d.disjunctID = int(c.stats.Disjuncts)
 
-	n.Logf("====== Do DISJUNCT %v & %v ======", d.lhs, d.rhs)
+	if n.ctx.LogEval > 0 {
+		n.Logf("====== Do DISJUNCT %v & %v ======", d.lhs, d.rhs)
+	}
 
 	return d
 }

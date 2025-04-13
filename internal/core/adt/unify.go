@@ -761,7 +761,9 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 
 	v = v.DerefValue()
 
-	c.Logf(c.vertex, "LOOKUP %v", f)
+	if c.LogEval > 0 {
+		c.Logf(c.vertex, "LOOKUP %v", f)
+	}
 
 	state := v.getState(c)
 	if state != nil {

@@ -91,7 +91,7 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 
 			g.emitDocs(goName, val.Doc())
 			g.appendf("type %s ", goName)
-			if err := g.emitType(val, false); err != nil {
+			if err := g.emitType(val, false, optionalZero); err != nil {
 				return err
 			}
 			g.appendf("\n\n")
@@ -199,10 +199,21 @@ func (g *generator) addDef(path cue.Path) {
 	g.defsList = append(g.defsList, path)
 }
 
+type optionalStrategy int
+
+const (
+	_ optionalStrategy = iota
+	// optional=zero (default); emit the Go type as-is and rely on the zero value.
+	optionalZero
+	// optional=nillable; emit the Go type with a pointer unless it can already
+	// be compared to nil.
+	optionalNillable
+)
+
 // emitType generates a CUE value as a Go type.
 // When possible, the Go type is emitted in the form of a reference.
 // Otherwise, an inline Go type expression is used.
-func (g *generator) emitType(val cue.Value, optional bool) error {
+func (g *generator) emitType(val cue.Value, optional bool, optionalStg optionalStrategy) error {
 	goAttr := goValueAttr(val)
 	// We prefer the form @go(Name,type=pkg.Baz) as it is explicit and extensible,
 	// but we are also backwards compatible with @go(Name,pkg.Baz) as emitted by `cue get go`.
@@ -226,9 +237,15 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 		g.appendf("%s", attrType)
 		return nil
 	}
+	switch {
+	case optional && optionalStg == optionalZero:
+	case optional && optionalStg == optionalNillable:
+		// TODO: only use a pointer when the type isn't already nillable.
+		g.appendf("*")
+	}
 	// TODO: support nullable types, such as `null | #SomeReference` and
 	// `null | {foo: int}`.
-	if g.emitTypeReference(val, optional) {
+	if g.emitTypeReference(val) {
 		return nil
 	}
 
@@ -236,7 +253,7 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 	case cue.StructKind:
 		if elem := val.LookupPath(cue.MakePath(cue.AnyString)); elem.Err() == nil {
 			g.appendf("map[string]")
-			if err := g.emitType(elem, false); err != nil {
+			if err := g.emitType(elem, false, optionalStg); err != nil {
 				return err
 			}
 			break
@@ -254,9 +271,6 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 			break
 		}
 		// TODO: treat a single embedding like `{[string]: int}` like we would `[string]: int`
-		if optional {
-			g.appendf("*")
-		}
 		g.appendf("struct {\n")
 		iter, err := val.Fields(cue.Definitions(true), cue.Optional(true))
 		if err != nil {
@@ -275,16 +289,6 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 			}
 			cueName = strings.TrimRight(cueName, "?!")
 			g.emitDocs(cueName, val.Doc())
-			// TODO: should we ensure that optional fields are always nilable in Go?
-			// On one hand this allows telling int64(0) apart from a missing field,
-			// but on the other, it's often unnecessary and leads to clumsy types.
-			// Perhaps add a @go() attribute parameter to require nullability.
-			//
-			// For now, only structs are always pointers when optional.
-			// This is necessary to allow recursive Go types such as linked lists.
-			// Pointers to structs are still OK in terms of UX, given that
-			// one can do X.PtrY.Z without needing to do (*X.PtrY).Z.
-			optional := sel.ConstraintType()&cue.OptionalConstraint != 0
 
 			// We want the Go name from just this selector, even when it's not a definition.
 			goName := goNameFromPath(cue.MakePath(sel), false)
@@ -297,6 +301,22 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 				goName = s
 			}
 
+			optional := sel.ConstraintType()&cue.OptionalConstraint != 0
+			optionalStg := optionalStg // only for this field
+
+			// TODO: much like @go(-), support @(,optional=) when embedded in a value,
+			// or attached to an entire package or file, to set a default for an entire scope.
+			switch s, ok, _ := goAttr.Lookup(1, "optional"); s {
+			case "zero":
+				optionalStg = optionalZero
+			case "nillable":
+				optionalStg = optionalNillable
+			default:
+				if ok {
+					return fmt.Errorf("unknown optional strategy %q", s)
+				}
+			}
+
 			// Since CUE fields using double quotes or commas in their names are rare,
 			// and the upcoming encoding/json/v2 will support field tags with name quoting,
 			// we choose to ignore such fields with a clear note for now.
@@ -305,7 +325,7 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 				continue
 			}
 			g.appendf("%s ", goName)
-			if err := g.emitType(val, optional); err != nil {
+			if err := g.emitType(val, optional, optionalStg); err != nil {
 				return err
 			}
 			// TODO: should we generate cuego tags like `cue:"expr"`?
@@ -326,7 +346,7 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 		if !elem.Exists() {
 			// TODO: perhaps mention the original type.
 			g.appendf("any /* CUE closed list */")
-		} else if err := g.emitType(elem, false); err != nil {
+		} else if err := g.emitType(elem, false, optionalStg); err != nil {
 			return err
 		}
 
@@ -455,7 +475,7 @@ func goPkgNameForInstance(inst *build.Instance, instVal cue.Value) string {
 
 // emitTypeReference attempts to generate a CUE value as a Go type via a reference,
 // either to a type in the same Go package, or to a type in an imported package.
-func (g *generator) emitTypeReference(val cue.Value, optional bool) bool {
+func (g *generator) emitTypeReference(val cue.Value) bool {
 	// References to existing names, either from the same package or an imported package.
 	root, path := val.ReferencePath()
 	// TODO: surely there is a better way to check whether ReferencePath returned "no path",
@@ -470,9 +490,6 @@ func (g *generator) emitTypeReference(val cue.Value, optional bool) bool {
 	unqualifiedPath := ast.ParseImportPath(inst.ImportPath).Unqualified().String()
 
 	var sb strings.Builder
-	if optional && cue.Dereference(val).IncompleteKind() == cue.StructKind {
-		sb.WriteString("*")
-	}
 	if root != g.pkgRoot {
 		sb.WriteString(goPkgNameForInstance(inst, root))
 		sb.WriteString(".")

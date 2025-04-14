@@ -246,7 +246,6 @@ import (
 	"go/token"
 	"maps"
 	"os"
-	"reflect"
 	"slices"
 
 	"foo.test/bar/root"
@@ -267,13 +266,7 @@ func main() {
 	var _ = root.AttrType(constant.Kind(0))
 
 	// It's easier to test the fields with a root value.
-	// We use reflection to ensure that inline struct pointers are initialized.
 	var zeroRoot root.Root
-	rv := reflect.ValueOf(&zeroRoot).Elem()
-	fv := rv.FieldByName("Fields")
-	fv.Set(reflect.New(fv.Type().Elem()))
-	tv := rv.FieldByName("Types")
-	tv.Set(reflect.New(tv.Type().Elem()))
 
 	var _ = zeroRoot.Embedded1
 	var _ = zeroRoot.Embedded2
@@ -290,18 +283,18 @@ func main() {
 	zeroRoot.Fields.OptionalBasic = 5
 	zeroRoot.Fields.OptionalList = make([]int64, 0)
 	zeroRoot.Fields.OptionalMap = make(map[string]int64, 0)
-	zeroRoot.Fields.OptionalBasicAttrNillable = 5
-	zeroRoot.Fields.OptionalListAttrNillable = make([]int64, 0)
-	zeroRoot.Fields.OptionalMapAttrNillable = make(map[string]int64, 0)
-	zeroRoot.Fields.OptionalStruct = &root.EmptyStruct{}
+	zeroRoot.Fields.OptionalBasicAttrNillable = new(int64)
+	zeroRoot.Fields.OptionalListAttrNillable = new([]int64)
+	zeroRoot.Fields.OptionalMapAttrNillable = new(map[string]int64)
+	zeroRoot.Fields.OptionalStruct = root.EmptyStruct{}
 	zeroRoot.Fields.OptionalStructAttrType = root.EmptyStruct{}
-	zeroRoot.Fields.OptionalStructAttrZero = &root.EmptyStruct{}
+	zeroRoot.Fields.OptionalStructAttrZero = root.EmptyStruct{}
 	zeroRoot.Fields.OptionalStructAttrNillable = &root.EmptyStruct{}
 
 	// Optional fields which inherit and the optional attribute flag.
 	zeroRoot.Fields.NestedStructAttrNillable.OptionalStruct = &root.EmptyStruct{}
 	zeroRoot.Fields.NestedStructAttrNillable.OptionalStructAttrType = root.EmptyStruct{}
-	zeroRoot.Fields.NestedStructAttrNillable.OptionalStructAttrZero = &root.EmptyStruct{}
+	zeroRoot.Fields.NestedStructAttrNillable.OptionalStructAttrZero = root.EmptyStruct{}
 
 	zeroRoot.Types.IntMap = make(map[string]int64)
 
@@ -605,7 +598,7 @@ import (
 )
 
 type RemoteStructs struct {
-	Inst *imported.InstanceStruct `json:"inst,omitempty"`
+	Inst imported.InstanceStruct `json:"inst,omitempty"`
 
 	LowerRegular int64 `json:"lowerRegular,omitempty"`
 
@@ -667,7 +660,7 @@ type Types struct {
 
 	UniqueStrings []string `json:"UniqueStrings,omitempty"`
 
-	LinkedList *LinkedList `json:"LinkedList,omitempty"`
+	LinkedList LinkedList `json:"LinkedList,omitempty"`
 }
 
 type LinkedList struct {
@@ -687,9 +680,9 @@ type Root struct {
 
 	Embedded2 int64 `json:"embedded2,omitempty"`
 
-	Types *Types `json:"types,omitempty"`
+	Types Types `json:"types,omitempty"`
 
-	Fields *struct {
+	Fields struct {
 		Regular int64 `json:"regular"`
 
 		Required int64 `json:"required,omitempty"`
@@ -700,17 +693,17 @@ type Root struct {
 
 		OptionalMap map[string]int64 `json:"optionalMap,omitempty"`
 
-		OptionalBasicAttrNillable int64 `json:"optionalBasicAttrNillable,omitempty"`
+		OptionalBasicAttrNillable *int64 `json:"optionalBasicAttrNillable,omitempty"`
 
-		OptionalListAttrNillable []int64 `json:"optionalListAttrNillable,omitempty"`
+		OptionalListAttrNillable *[]int64 `json:"optionalListAttrNillable,omitempty"`
 
-		OptionalMapAttrNillable map[string]int64 `json:"optionalMapAttrNillable,omitempty"`
+		OptionalMapAttrNillable *map[string]int64 `json:"optionalMapAttrNillable,omitempty"`
 
-		OptionalStruct *EmptyStruct `json:"optionalStruct,omitempty"`
+		OptionalStruct EmptyStruct `json:"optionalStruct,omitempty"`
 
 		OptionalStructAttrType EmptyStruct `json:"optionalStructAttrType,omitempty"`
 
-		OptionalStructAttrZero *EmptyStruct `json:"optionalStructAttrZero,omitempty"`
+		OptionalStructAttrZero EmptyStruct `json:"optionalStructAttrZero,omitempty"`
 
 		OptionalStructAttrNillable *EmptyStruct `json:"optionalStructAttrNillable,omitempty"`
 
@@ -719,7 +712,7 @@ type Root struct {
 
 			OptionalStructAttrType EmptyStruct `json:"optionalStructAttrType,omitempty"`
 
-			OptionalStructAttrZero *EmptyStruct `json:"optionalStructAttrZero,omitempty"`
+			OptionalStructAttrZero EmptyStruct `json:"optionalStructAttrZero,omitempty"`
 		} `json:"nestedStructAttrNillable"`
 
 		RegularStruct struct {
@@ -728,7 +721,7 @@ type Root struct {
 
 		UseRegular int64 `json:"useRegular,omitempty"`
 
-		UseRegularStruct *struct {
+		UseRegularStruct struct {
 			Field int64 `json:"field,omitempty"`
 		} `json:"useRegularStruct,omitempty"`
 	} `json:"fields,omitempty"`
@@ -754,23 +747,23 @@ type Root struct {
 
 	InlineDoc int64 `json:"inlineDoc,omitempty"`
 
-	InnerDoc *struct {
+	InnerDoc struct {
 		InnerDocField int64 `json:"innerDocField,omitempty"`
 	} `json:"innerDoc,omitempty"`
 
-	UseInnerStruct *Root_innerStruct `json:"useInnerStruct,omitempty"`
+	UseInnerStruct Root_innerStruct `json:"useInnerStruct,omitempty"`
 
-	UseHiddenInnerStruct *root_hiddenInnerStruct `json:"useHiddenInnerStruct,omitempty"`
+	UseHiddenInnerStruct root_hiddenInnerStruct `json:"useHiddenInnerStruct,omitempty"`
 
-	DeeplyNested *struct {
-		One *struct {
-			Two *struct {
+	DeeplyNested struct {
+		One struct {
+			Two struct {
 				Three int64 `json:"three,omitempty"`
 			} `json:"two,omitempty"`
 		} `json:"one,omitempty"`
 	} `json:"deeplyNested,omitempty"`
 
-	UseHiddenStruct *hiddenStruct `json:"useHiddenStruct,omitempty"`
+	UseHiddenStruct hiddenStruct `json:"useHiddenStruct,omitempty"`
 
 	DiscriminatorField map[string]any `json:"discriminatorField,omitempty"`
 
@@ -827,7 +820,7 @@ type root_hiddenInnerStruct struct {
 type hiddenStruct struct {
 	InnerField int64 `json:"innerField,omitempty"`
 
-	InnerStruct *hiddenStruct_innerStruct `json:"innerStruct,omitempty"`
+	InnerStruct hiddenStruct_innerStruct `json:"innerStruct,omitempty"`
 }
 
 type hiddenStruct_innerStruct struct {

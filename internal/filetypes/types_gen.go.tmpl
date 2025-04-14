@@ -1,0 +1,77 @@
+//go:build !bootstrap
+
+package filetypes
+
+import (
+	_ "embed"
+	"maps"
+	"fmt"
+	"slices"
+	"log"
+	"sync"
+
+	"cuelang.org/go/cue/build"
+	"cuelang.org/go/internal/filetypes/internal/genstruct"
+)
+
+//go:embed fileinfo.dat
+var fileInfoDataBytes []byte
+
+func init() {
+	tagTypes = map[string]TagType{
+		{{range $k, $v := .TagTypes}}{{printf "\t%q: %v,\n" $k $v}}{{end}}
+	}
+}
+
+var errInvalidTagCombination = fmt.Errorf("invalid tag combination")
+
+{{$.ToFileParams.GenInit}}
+
+{{$.ToFileResult.GenInit}}
+
+func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, error) {
+	dumpOnce.Do(dumpData)
+	key := make([]byte, {{.ToFileParams.Size}})
+	{{.ToFileParams.Tags.GenPut "key" "maps.Keys(sc.topLevel)"}}
+	{{.ToFileParams.FileExt.GenPut "key" "fileExt(filename)"}}
+	{{.ToFileParams.Mode.GenPut "key" "mode"}}
+
+	data, ok := genstruct.FindRecord(fileInfoDataBytes, {{.ToFileParams.Size}}+{{.ToFileResult.Size}}, key)
+	if !ok {
+		return nil, errInvalidTagCombination		// TODO what error would be best?
+	}
+
+	switch e := {{$.ToFileResult.Error.GenGet "data"}}; e {
+	default:
+		return nil, fmt.Errorf("unknown error %d", e)
+	case 1, 2, 3:
+		return nil, fmt.Errorf("error %d", e)
+	case 0:
+		// no error
+	}
+
+	var f build.File
+	f.Filename = filename
+	f.Encoding = {{$.ToFileResult.Encoding.GenGet "data"}}
+	f.Interpretation = {{$.ToFileResult.Interpretation.GenGet "data"}}
+	f.Form = {{$.ToFileResult.Form.GenGet "data"}}
+	// TODO check allowed tags
+	return &f, nil
+}
+
+var dumpOnce sync.Once
+
+func dumpData() {
+	return
+	recSize := {{.ToFileParams.Size}}+{{.ToFileResult.Size}}
+	i := 0
+	for data := fileInfoDataBytes; len(data) > 0; data, i = data[recSize:], i+1 {
+		data := data[:recSize:recSize]
+		key := data[:{{.ToFileParams.Size}}]
+		//val := data[len(key):]
+		tags := slices.Collect({{.ToFileParams.Tags.GenGet "key"}})
+		fileExt := {{.ToFileParams.FileExt.GenGet "key"}}
+		mode := {{.ToFileParams.Mode.GenGet "key"}}
+		log.Printf("key %d: mode %v; fileExt %q; tags %q; %v", i, mode, fileExt, tags, key)
+	}
+}

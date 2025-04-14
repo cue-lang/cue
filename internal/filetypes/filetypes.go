@@ -34,6 +34,7 @@ const (
 	Export
 	Def
 	Eval
+	NumModes
 )
 
 func (m Mode) String() string {
@@ -213,12 +214,12 @@ func parseScope(scopeStr string) (*scope, error) {
 	for _, tag := range strings.Split(scopeStr, "+") {
 		tagName, tagVal, hasValue := strings.Cut(tag, "=")
 		switch tagTypeOf(tagName) {
-		case tagTopLevel:
+		case TagTopLevel:
 			if hasValue {
 				return nil, errors.Newf(token.NoPos, "cannot specify value for tag %q", tagName)
 			}
 			sc.topLevel[tagName] = true
-		case tagSubsidiaryBool:
+		case TagSubsidiaryBool:
 			if hasValue {
 				t, err := strconv.ParseBool(tagVal)
 				if err != nil {
@@ -228,7 +229,7 @@ func parseScope(scopeStr string) (*scope, error) {
 			} else {
 				sc.subsidiaryBool[tagName] = true
 			}
-		case tagSubsidiaryString:
+		case TagSubsidiaryString:
 			if !hasValue {
 				return nil, errors.Newf(token.NoPos, "tag %q must have value (%s=<value>)", tagName, tagName)
 			}

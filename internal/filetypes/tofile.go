@@ -15,16 +15,33 @@
 package filetypes
 
 import (
+	"log"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+
+	"github.com/google/go-cmp/cmp"
 )
 
+//go:generate go run -tags bootstrap ./generate.go
+
 func toFile(mode Mode, sc *scope, filename string) (*build.File, error) {
+	f0, err0 := toFileOrig(mode, sc, filename)
+	f1, err1 := toFileGenerated(mode, sc, filename)
+	if (err0 != nil) != (err1 != nil) {
+		log.Printf("error discrepancy mode %v; scope %v; filename %v:\nold: %v\nnew: %v", mode, sc, filename, err0, err1)
+	} else if diff := cmp.Diff(f0, f1); diff != "" {
+		log.Printf("discrepancy mode %v; scope %v; filename %v:\n%s", mode, sc, filename, diff)
+	}
+
+	return f0, err0
+}
+
+func toFileOrig(mode Mode, sc *scope, filename string) (*build.File, error) {
 	modeVal := lookup(typesValue, "modes", mode.String())
 	fileVal := lookup(modeVal, "FileInfo")
-
 	for tagName := range sc.topLevel {
 		info := lookup(typesValue, "tagInfo", tagName)
 		if info.Exists() {
@@ -47,6 +64,10 @@ func toFile(mode Mode, sc *scope, filename string) (*build.File, error) {
 		}
 		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("tags"), cue.Str(tagName)), val)
 	}
+	return toFile1(modeVal, fileVal, filename)
+}
+
+func toFile1(modeVal, fileVal cue.Value, filename string) (*build.File, error) {
 	if !lookup(fileVal, "encoding").Exists() {
 		if ext := fileExt(filename); ext != "" {
 			extFile := lookup(modeVal, "extensions", ext)

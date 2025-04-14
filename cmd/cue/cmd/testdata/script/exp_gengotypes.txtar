@@ -792,6 +792,24 @@ type Root struct {
 
 }
 
+type Root_innerStruct struct {
+	InnerStructField int64 `json:"innerStructField,omitempty"`
+}
+
+type root_hiddenInnerStruct struct {
+	InnerStructField int64 `json:"innerStructField,omitempty"`
+}
+
+type hiddenStruct struct {
+	InnerField int64 `json:"innerField,omitempty"`
+
+	InnerStruct hiddenStruct_innerStruct `json:"innerStruct,omitempty"`
+}
+
+type hiddenStruct_innerStruct struct {
+	Field int64 `json:"field,omitempty"`
+}
+
 type EmbeddedStruct struct {
 	Embedded1 int64 `json:"embedded1,omitempty"`
 
@@ -807,25 +825,6 @@ type AttrChangedNameEmbed struct {
 type AttrType constant.Kind
 
 type AttrTypeEmbed constant.Kind
-
-type Root_innerStruct struct {
-	InnerStructField int64 `json:"innerStructField,omitempty"`
-}
-
-type root_hiddenInnerStruct struct {
-	InnerStructField int64 `json:"innerStructField,omitempty"`
-}
-
-// All definitions underneath here must not be exported.
-type hiddenStruct struct {
-	InnerField int64 `json:"innerField,omitempty"`
-
-	InnerStruct hiddenStruct_innerStruct `json:"innerStruct,omitempty"`
-}
-
-type hiddenStruct_innerStruct struct {
-	Field int64 `json:"field,omitempty"`
-}
 -- imported/imported.cue --
 package imported
 

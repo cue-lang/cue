@@ -40,6 +40,8 @@ as the objective is to gain experience and then move the feature elsewhere.
 	return cmd
 }
 
+// TODO(mvdan): document the "optional" attribute option when finished.
+
 func newExpGenGoTypesCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gengotypes",

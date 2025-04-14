@@ -74,7 +74,7 @@ fail: both: notString: "not_a_struct"
 fail: both: notList:   [1, 2, 3]
 
 pass: noOptional:           fields: {required: 3, regular: 4}
-pass: withOptional:         fields: {required: 3, regular: 4, optional: 5}
+pass: withOptional:         fields: {required: 3, regular: 4, optionalBasic: 5}
 fail: cue: missingRequired: fields: regular: 4
 
 fail: cue: isNotEqual: {mustEqual1: 8, mustEqual2: 99}
@@ -186,10 +186,10 @@ fail.both."42_LinkedList".types.LinkedList.next: conflicting values "x" and {ite
     ./root/types.cue:43:14
 fail.both.notList: conflicting values [1,2,3] and {embedded2?:int} (mismatched types list and struct):
     ./cuetest/all.cue:5:24
-    ./root/root.cue:108:2
+    ./root/root.cue:120:2
 fail.both.notString: conflicting values "not_a_struct" and {embedded2?:int} (mismatched types string and struct):
     ./cuetest/all.cue:4:24
-    ./root/root.cue:108:2
+    ./root/root.cue:120:2
 fail.cue."11_Int8".types.Int8: invalid value 99999 (out of bound <=127):
     ./cuetest/all.cue:61:30
 fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
@@ -285,8 +285,24 @@ func main() {
 	zeroRoot.AttrTypeCompat = token.Token(0)
 	zeroRoot.AttrTypeNested = make(map[any]any)
 	zeroRoot.DiscriminatorField = make(map[string]any)
+
+	// Optional fields which use the optional attribute flag.
+	zeroRoot.Fields.OptionalBasic = 5
+	zeroRoot.Fields.OptionalList = make([]int64, 0)
+	zeroRoot.Fields.OptionalMap = make(map[string]int64, 0)
+	zeroRoot.Fields.OptionalBasicAttrNillable = 5
+	zeroRoot.Fields.OptionalListAttrNillable = make([]int64, 0)
+	zeroRoot.Fields.OptionalMapAttrNillable = make(map[string]int64, 0)
 	zeroRoot.Fields.OptionalStruct = &root.EmptyStruct{}
 	zeroRoot.Fields.OptionalStructAttrType = root.EmptyStruct{}
+	zeroRoot.Fields.OptionalStructAttrZero = &root.EmptyStruct{}
+	zeroRoot.Fields.OptionalStructAttrNillable = &root.EmptyStruct{}
+
+	// Optional fields which inherit and the optional attribute flag.
+	zeroRoot.Fields.NestedStructAttrNillable.OptionalStruct = &root.EmptyStruct{}
+	zeroRoot.Fields.NestedStructAttrNillable.OptionalStructAttrType = root.EmptyStruct{}
+	zeroRoot.Fields.NestedStructAttrNillable.OptionalStructAttrZero = &root.EmptyStruct{}
+
 	zeroRoot.Types.IntMap = make(map[string]int64)
 
 	// Sanity check that Go can JSON decode all the values we expect.
@@ -373,12 +389,24 @@ _#overridenNeverGenerate: string
 		regular:   int
 		required?: int
 
-		// Optional types are represented as *T in Go if they are structs.
-		optional?:         int
-		optionalNullable?: [...int]
+		optionalBasic?: int
+		optionalList?:  [...int]
+		optionalMap?:   [string]: int
+
+		optionalBasicAttrNillable?: int @go(,optional=nillable)
+		optionalListAttrNillable?:  [...int] @go(,optional=nillable)
+		optionalMapAttrNillable?:   {[string]: int} @go(,optional=nillable)
 
 		optionalStruct?: #emptyStruct
 		optionalStructAttrType?: #emptyStruct @go(,type=EmptyStruct)
+		optionalStructAttrZero?: #emptyStruct @go(,optional=zero)
+		optionalStructAttrNillable?: #emptyStruct @go(,optional=nillable)
+
+		nestedStructAttrNillable: {
+			optionalStruct?: #emptyStruct
+			optionalStructAttrType?: #emptyStruct @go(,type=EmptyStruct)
+			optionalStructAttrZero?: #emptyStruct @go(,optional=zero)
+		} @go(,optional=nillable)
 
 		regularStruct: field?: int
 
@@ -535,7 +563,10 @@ import (
 
 #linkedList: {
 	item?: _
-	next?: #linkedList
+	// TODO: it would be nice to not have to specify optional= here;
+	// we could determine that this is a recursive type, so a pointer must be used
+	// as otherwise the Go type tries to have infinite size.
+	next?: #linkedList @go(,optional=nillable)
 }
 -- root/import.cue --
 package root
@@ -642,6 +673,9 @@ type Types struct {
 type LinkedList struct {
 	Item any/* CUE top */ `json:"item,omitempty"`
 
+	// TODO: it would be nice to not have to specify optional= here;
+	// we could determine that this is a recursive type, so a pointer must be used
+	// as otherwise the Go type tries to have infinite size.
 	Next *LinkedList `json:"next,omitempty"`
 }
 
@@ -660,14 +694,33 @@ type Root struct {
 
 		Required int64 `json:"required,omitempty"`
 
-		// Optional types are represented as *T in Go if they are structs.
-		Optional int64 `json:"optional,omitempty"`
+		OptionalBasic int64 `json:"optionalBasic,omitempty"`
 
-		OptionalNullable []int64 `json:"optionalNullable,omitempty"`
+		OptionalList []int64 `json:"optionalList,omitempty"`
+
+		OptionalMap map[string]int64 `json:"optionalMap,omitempty"`
+
+		OptionalBasicAttrNillable int64 `json:"optionalBasicAttrNillable,omitempty"`
+
+		OptionalListAttrNillable []int64 `json:"optionalListAttrNillable,omitempty"`
+
+		OptionalMapAttrNillable map[string]int64 `json:"optionalMapAttrNillable,omitempty"`
 
 		OptionalStruct *EmptyStruct `json:"optionalStruct,omitempty"`
 
 		OptionalStructAttrType EmptyStruct `json:"optionalStructAttrType,omitempty"`
+
+		OptionalStructAttrZero *EmptyStruct `json:"optionalStructAttrZero,omitempty"`
+
+		OptionalStructAttrNillable *EmptyStruct `json:"optionalStructAttrNillable,omitempty"`
+
+		NestedStructAttrNillable struct {
+			OptionalStruct *EmptyStruct `json:"optionalStruct,omitempty"`
+
+			OptionalStructAttrType EmptyStruct `json:"optionalStructAttrType,omitempty"`
+
+			OptionalStructAttrZero *EmptyStruct `json:"optionalStructAttrZero,omitempty"`
+		} `json:"nestedStructAttrNillable"`
 
 		RegularStruct struct {
 			Field int64 `json:"field,omitempty"`

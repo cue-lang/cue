@@ -206,9 +206,12 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 	goAttr := goValueAttr(val)
 	// We prefer the form @go(Name,type=pkg.Baz) as it is explicit and extensible,
 	// but we are also backwards compatible with @go(Name,pkg.Baz) as emitted by `cue get go`.
+	// Make sure that we don't mistake @go(,foo=bar) for a type though.
 	attrType, _, _ := goAttr.Lookup(1, "type")
 	if attrType == "" {
-		attrType, _ = goAttr.String(1)
+		if s, _ := goAttr.String(1); !strings.Contains(s, "=") {
+			attrType = s
+		}
 	}
 	if attrType != "" {
 		pkgPath, _, ok := cutLast(attrType, ".")

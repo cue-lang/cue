@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65d0c2d1_4c8b0a60",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-14T11:50:54Z",
+      "side": 1,
+      "message": "using the \"syntax\" word sounds good. I was hoping to leave the detail of encodings other than koala to the proposal. How about something in between like: \"with changes to better fit CUE syntax and for improved readability, as described in the koala proposal.\"?",
+      "revId": "21aacc67dc8fb316267f71b14a6d79215e21015c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

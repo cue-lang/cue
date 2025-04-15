@@ -88,6 +88,24 @@
       "parentUuid": "802544f7_0ef94b1b",
       "revId": "20f59ddab3950383fd934749f44e7025eb0dd5f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42f12e39_c853c62c",
+        "filename": "encoding/xml/koala/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-04-15T12:02:04Z",
+      "side": 1,
+      "message": "Sure, I\u0027ve split the sentence and made line length shorter there.",
+      "parentUuid": "3c06b3d9_79d6fc36",
+      "revId": "20f59ddab3950383fd934749f44e7025eb0dd5f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

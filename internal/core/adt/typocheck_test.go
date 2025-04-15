@@ -571,11 +571,13 @@ func TestHasEvidence(t *testing.T) {
 		want: false,
 	}}
 
+	n := &nodeContext{}
+	n.ctx = &OpContext{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.reqSets.assert()
 
-			if got := hasEvidenceForAll(tt.reqSets, tt.conjuncts); got != tt.want {
+			if got := n.hasEvidenceForAll(tt.reqSets, tt.conjuncts); got != tt.want {
 				t.Errorf("got %v, want %v", got, tt.want)
 			}
 		})

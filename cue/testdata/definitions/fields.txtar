@@ -256,6 +256,45 @@ issue3491: {
 	a: b
 	b: #Extra: {}
 }
+-- out/evalalpha/stats --
+Leaks:  244
+Freed:  0
+Reused: 0
+Allocs: 244
+Retain: 0
+
+Unifications: 241
+Conjuncts:    428
+Disjuncts:    0
+
+CloseIDElems: 1332
+NumCloseIDs: 140
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+-Leaks:  5
+-Freed:  239
+-Reused: 232
+-Allocs: 12
+-Retain: 25
+-
+-Unifications: 244
+-Conjuncts:    441
+-Disjuncts:    263
++Leaks:  244
++Freed:  0
++Reused: 0
++Allocs: 244
++Retain: 0
++
++Unifications: 241
++Conjuncts:    428
++Disjuncts:    0
++
++CloseIDElems: 1332
++NumCloseIDs: 140
 -- out/eval/stats --
 Leaks:  5
 Freed:  239

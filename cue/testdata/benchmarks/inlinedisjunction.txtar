@@ -23,6 +23,9 @@ Retain: 0
 Unifications: 16
 Conjuncts:    113
 Disjuncts:    58
+
+CloseIDElems: 10
+NumCloseIDs: 3
 -- out/eval --
 (struct){
   #def: (#struct){ |((#struct){
@@ -45,7 +48,7 @@ Disjuncts:    58
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,9 @@
+@@ -1,9 +1,12 @@
 -Leaks:  0
 -Freed:  4674
 -Reused: 3903
@@ -62,6 +65,9 @@ diff old new
 +Unifications: 16
 +Conjuncts:    113
 +Disjuncts:    58
++
++CloseIDElems: 10
++NumCloseIDs: 3
 -- out/eval/stats --
 Leaks:  0
 Freed:  4674

@@ -103,6 +103,9 @@ Retain: 0
 Unifications: 135
 Conjuncts:    354
 Disjuncts:    0
+
+CloseIDElems: 18
+NumCloseIDs: 167
 -- out/evalalpha --
 Errors:
 issue3182.first.t2.x.b: structural cycle
@@ -245,24 +248,28 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,9 @@
+@@ -1,9 +1,12 @@
 -Leaks:  309
 -Freed:  437
 -Reused: 429
 -Allocs: 317
 -Retain: 1074
+-
+-Unifications: 746
+-Conjuncts:    2813
+-Disjuncts:    1485
 +Leaks:  213
 +Freed:  0
 +Reused: 0
 +Allocs: 213
 +Retain: 0
- 
--Unifications: 746
--Conjuncts:    2813
--Disjuncts:    1485
++
 +Unifications: 135
 +Conjuncts:    354
 +Disjuncts:    0
++
++CloseIDElems: 18
++NumCloseIDs: 167
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

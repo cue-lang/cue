@@ -319,6 +319,9 @@ Retain: 0
 Unifications: 401
 Conjuncts:    1104
 Disjuncts:    190
+
+CloseIDElems: 930
+NumCloseIDs: 488
 -- out/evalalpha --
 Errors:
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
@@ -790,24 +793,28 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,9 @@
+@@ -1,9 +1,12 @@
 -Leaks:  50
 -Freed:  1270
 -Reused: 1260
 -Allocs: 60
 -Retain: 145
+-
+-Unifications: 832
+-Conjuncts:    2525
+-Disjuncts:    1404
 +Leaks:  763
 +Freed:  0
 +Reused: 0
 +Allocs: 763
 +Retain: 0
- 
--Unifications: 832
--Conjuncts:    2525
--Disjuncts:    1404
++
 +Unifications: 401
 +Conjuncts:    1104
 +Disjuncts:    190
++
++CloseIDElems: 930
++NumCloseIDs: 488
 -- out/eval/stats --
 Leaks:  50
 Freed:  1270

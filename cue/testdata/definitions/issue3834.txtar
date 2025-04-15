@@ -58,6 +58,45 @@ full: {
 
 	{#Foo}
 }
+-- out/evalalpha/stats --
+Leaks:  339
+Freed:  0
+Reused: 0
+Allocs: 339
+Retain: 0
+
+Unifications: 171
+Conjuncts:    322
+Disjuncts:    48
+
+CloseIDElems: 1232
+NumCloseIDs: 64
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+-Leaks:  24
+-Freed:  207
+-Reused: 200
+-Allocs: 31
+-Retain: 30
+-
+-Unifications: 183
+-Conjuncts:    344
+-Disjuncts:    237
++Leaks:  339
++Freed:  0
++Reused: 0
++Allocs: 339
++Retain: 0
++
++Unifications: 171
++Conjuncts:    322
++Disjuncts:    48
++
++CloseIDElems: 1232
++NumCloseIDs: 64
 -- out/eval/stats --
 Leaks:  24
 Freed:  207

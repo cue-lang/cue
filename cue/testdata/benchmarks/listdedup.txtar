@@ -42,6 +42,9 @@ Retain: 0
 Unifications: 40
 Conjuncts:    98
 Disjuncts:    24
+
+CloseIDElems: 599
+NumCloseIDs: 22
 -- out/evalalpha --
 (struct){
   A: (#struct){ |((#struct){
@@ -463,24 +466,28 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,9 @@
+@@ -1,9 +1,12 @@
 -Leaks:  0
 -Freed:  24096
 -Reused: 24051
 -Allocs: 45
 -Retain: 1
+-
+-Unifications: 18724
+-Conjuncts:    100730
+-Disjuncts:    24097
 +Leaks:  96
 +Freed:  0
 +Reused: 0
 +Allocs: 96
 +Retain: 0
- 
--Unifications: 18724
--Conjuncts:    100730
--Disjuncts:    24097
++
 +Unifications: 40
 +Conjuncts:    98
 +Disjuncts:    24
++
++CloseIDElems: 599
++NumCloseIDs: 22
 -- out/eval/stats --
 Leaks:  0
 Freed:  24096

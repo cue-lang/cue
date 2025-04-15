@@ -177,6 +177,7 @@ type defID uint32
 const deleteID defID = math.MaxUint32
 
 func (c *OpContext) getNextDefID() defID {
+	c.stats.NumCloseIDs++
 	c.nextDefID++
 	return c.nextDefID
 }
@@ -511,7 +512,7 @@ func (n *nodeContext) checkTypos() {
 			continue
 		}
 
-		if hasEvidenceForAll(required, na.conjunctInfo) {
+		if n.hasEvidenceForAll(required, na.conjunctInfo) {
 			continue
 		}
 
@@ -531,7 +532,7 @@ func (n *nodeContext) checkTypos() {
 // hasEvidenceForAll reports whether there is evidence in a set of
 // conjuncts for each of the typo-checked structs represented by
 // the reqSets.
-func hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) bool {
+func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) bool {
 	for i := uint32(0); int(i) < len(a); i += a[i].size {
 		if a[i].size == 0 {
 			panic("unexpected set length")
@@ -653,7 +654,7 @@ outer:
 			}
 		}
 
-		buf = transitiveMapping(buf, e, b)
+		buf = transitiveMapping(ctx, buf, e, b)
 
 		i++
 	}
@@ -668,7 +669,7 @@ outer:
 // TODO: this is a polynomial algorithm. At some point, if this turns out to be
 // a bottleneck, we should consider filtering unnecessary entries and/or using a
 // more efficient algorithm.
-func transitiveMapping(buf reqSets, x reqSet, b []replaceID) reqSets {
+func transitiveMapping(ctx *OpContext, buf reqSets, x reqSet, b []replaceID) reqSets {
 	// Trim subtree for embedded conjunctions.
 	if len(buf) > 0 && buf[0].del == x.id {
 		return buf
@@ -682,6 +683,7 @@ func transitiveMapping(buf reqSets, x reqSet, b []replaceID) reqSets {
 	}
 
 	buf = append(buf, x)
+	ctx.stats.CloseIDElems++
 
 	for _, y := range b {
 		if x.id == y.from {
@@ -689,7 +691,10 @@ func transitiveMapping(buf reqSets, x reqSet, b []replaceID) reqSets {
 				buf = buf[:len(buf)-1]
 				return buf
 			}
-			buf = transitiveMapping(buf, reqSet{id: y.to, once: x.once}, b)
+			buf = transitiveMapping(ctx, buf, reqSet{
+				id:   y.to,
+				once: x.once,
+			}, b)
 		}
 	}
 	return buf

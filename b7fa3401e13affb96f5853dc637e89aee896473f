@@ -81,6 +81,24 @@
       "parentUuid": "ee38447f_24dbdb28",
       "revId": "b7fa3401e13affb96f5853dc637e89aee896473f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d272a2b5_02dacbf9",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-15T15:50:09Z",
+      "side": 1,
+      "message": "Well, if you hadn\u0027t taken the pointer at this point, it might break - if you look further down around line 470 then there is pointer equality \u003d\u003d between structMetas:\n\n```\n\t\t\tif exists \u0026\u0026 node.structMeta \u003d\u003d sMeta {\n```\n\nI just can\u0027t remember or figure out at this point whether structural equality there would be correct. Anyway, I can\u0027t see any real problem with your change; I guess it just makes me slightly nervous.",
+      "parentUuid": "62381c9a_a54224c3",
+      "revId": "b7fa3401e13affb96f5853dc637e89aee896473f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

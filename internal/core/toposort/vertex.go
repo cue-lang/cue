@@ -137,6 +137,7 @@ package toposort
 
 import (
 	"fmt"
+	"maps"
 	"slices"
 
 	"cuelang.org/go/cue/token"
@@ -218,7 +219,18 @@ func (sm *structMeta) hasDynamic(dynFieldsMap map[*adt.DynamicField][]adt.Featur
 // the binary expression, and mark them as explicit unification.
 func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []*structMeta {
 	structInfos := v.Structs
-	nodeToStructMeta := make(map[adt.Node][]*structMeta)
+	// Note that it's important that nodeToStructMetas avoids duplicate entries,
+	// which cause significant slowness for some large configs.
+	nodeToStructMetas := make(map[adt.Node]map[*structMeta]bool)
+	// structMetaMap is heplful as we can't insert into a map unless we make it.
+	structMetaMap := func(node adt.Node) map[*structMeta]bool {
+		if m := nodeToStructMetas[node]; m != nil {
+			return m
+		}
+		m := make(map[*structMeta]bool)
+		nodeToStructMetas[node] = m
+		return m
+	}
 	structMetas := make([]*structMeta, 0, len(structInfos))
 
 	// Create all the structMetas and map to them from a StructInfo's
@@ -235,9 +247,9 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []*structMeta {
 		if src := sl.Source(); src != nil {
 			sMeta.pos = src.Pos()
 		}
-		nodeToStructMeta[sl] = append(nodeToStructMeta[sl], sMeta)
+		structMetaMap(sl)[sMeta] = true
 		for _, decl := range sl.Decls {
-			nodeToStructMeta[decl] = append(nodeToStructMeta[decl], sMeta)
+			structMetaMap(decl)[sMeta] = true
 		}
 	}
 
@@ -250,12 +262,12 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []*structMeta {
 			field := c.Field()
 			debug("self arc conjunct field %p :: %T, expr %p :: %T (%v)\n",
 				field, field, c.Expr(), c.Expr(), c.Expr().Source())
-			sMetas, found := nodeToStructMeta[field]
+			sMetas, found := nodeToStructMetas[field]
 			if !found {
 				return true
 			}
 			if src := field.Source(); src != nil {
-				for _, sMeta := range sMetas {
+				for sMeta := range sMetas {
 					sMeta.pos = src.Pos()
 				}
 			}
@@ -270,9 +282,9 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []*structMeta {
 				debug(" ref %p :: %T (%v)\n",
 					refs.Ref, refs.Ref, refs.Ref.Source().Pos())
 			}
-			nodeToStructMeta[refs.Ref] = append(nodeToStructMeta[refs.Ref], sMetas...)
+			maps.Insert(structMetaMap(refs.Ref), maps.All(sMetas))
 			if pos := refs.Ref.Source().Pos(); pos != token.NoPos {
-				for _, sMeta := range nodeToStructMeta[refs.Ref] {
+				for sMeta := range nodeToStructMetas[refs.Ref] {
 					sMeta.pos = pos
 				}
 			}
@@ -307,7 +319,7 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []*structMeta {
 			continue
 		}
 		for _, expr := range []adt.Expr{binExpr.X, binExpr.Y} {
-			for _, sMeta := range nodeToStructMeta[expr] {
+			for sMeta := range nodeToStructMetas[expr] {
 				sMeta.isExplicit = true
 				debug(" now explicit: %v\n", sMeta)
 			}

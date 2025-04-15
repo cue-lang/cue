@@ -460,17 +460,22 @@ func (n *nodeContext) checkTypos() {
 	ctx := n.ctx
 	if ctx.OpenDef {
 		return
-
 	}
 	noDeref := n.node // noDeref retained for debugging purposes.
 	v := noDeref.DerefValue()
 
-	required := appendRequired(nil, n)
-	if len(required) == 0 {
+	// Stop early, avoiding the work in appendRequired below, if we have no arcs to check.
+	if len(v.Arcs) == 0 {
 		return
 	}
+
 	// Avoid unnecessary errors.
 	if b, ok := v.BaseValue.(*Bottom); ok && !b.CloseCheck {
+		return
+	}
+
+	required := appendRequired(nil, n)
+	if len(required) == 0 {
 		return
 	}
 

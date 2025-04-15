@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8a578a5_87db099f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-15T15:36:16Z",
+      "side": 1,
+      "message": "As a general rule, I\u0027m personally not much of a fan of non-type-safe lists of indices. It\u0027s possible to misuse the values in `nodeToStructMetaIndex`, and it\u0027s possible to add illegal values to those slices. This is why I would prefer pointers because it\u0027s much safer, in my opinion.\n\nIn this case, the lifespan of `nodeToStructMetaIndex` is limited to this method, so it\u0027s certainly not part of any API - either private or public. And then if we did stick with the pointers, the only \"efficient\" solution would be to use map-of-maps (or rather map-of-sets), which for the normal case of small numbers of values in each set, I imagine would be quite a lot slower, and this clearly is a performance-critical area.\n\nDid you happen to test with map-of-sets at all, or did you go straight to this solution knowing that map-of-sets would be too slow? Just curious really.",
+      "revId": "6445d14f70caf6ba5b8e1c25f7538960c49395f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

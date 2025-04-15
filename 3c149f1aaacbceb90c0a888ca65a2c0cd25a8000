@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "284c79e4_877c1d4b",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-04-15T13:09:05Z",
+      "side": 0,
+      "message": "In theory the hasOpenValidator is necessary. So better to investigate this separately. I reckon the performance improvement is not related to this field, as, AFAICS, alignment will avoid an reduction in struct size in this case.",
+      "revId": "3c149f1aaacbceb90c0a888ca65a2c0cd25a8000",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

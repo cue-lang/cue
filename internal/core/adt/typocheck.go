@@ -466,7 +466,6 @@ func (n *nodeContext) checkTypos() {
 	v := noDeref.DerefValue()
 
 	required := appendRequired(nil, n)
-
 	if len(required) == 0 {
 		return
 	}
@@ -474,6 +473,8 @@ func (n *nodeContext) checkTypos() {
 	if b, ok := v.BaseValue.(*Bottom); ok && !b.CloseCheck {
 		return
 	}
+
+	var replacements []replaceID // TODO(perf): reuse a buffer via OpContext
 
 	var err *Bottom
 	// outer:
@@ -486,8 +487,8 @@ func (n *nodeContext) checkTypos() {
 		// TODO(mem): child states of uncompleted nodes must have a state.
 		na := a.state
 
-		replacements := na.getReplacements(nil) // TODO(perf): use buffer
-		required := slices.Clone(required)      // TODO(perf): use buffer
+		replacements = na.getReplacements(replacements[:0])
+		required := slices.Clone(required) // TODO(perf): use buffer
 		// do the right thing in appendRequired either way.
 		required.replaceIDs(n.ctx, replacements...)
 

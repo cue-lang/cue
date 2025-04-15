@@ -296,10 +296,11 @@ func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg
 
 // A ValueError is returned as a result of evaluating a value.
 type ValueError struct {
-	r      Runtime
-	v      *Vertex
-	pos    token.Pos
-	auxpos []token.Pos
+	r       Runtime
+	v       *Vertex
+	pos     token.Pos
+	auxpos  []token.Pos
+	altPath []string
 	errors.Message
 }
 
@@ -388,13 +389,31 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 			args[i] = x.SelectorString(c.Runtime)
 		}
 	}
+
 	return &ValueError{
 		r:       c.Runtime,
 		v:       c.errNode(),
 		pos:     p,
 		auxpos:  a,
+		altPath: c.makeAltPath(),
 		Message: errors.NewMessagef(format, args...),
 	}
+}
+
+func (c *OpContext) makeAltPath() (a []string) {
+	if len(c.altPath) == 0 {
+		return nil
+	}
+
+	for _, f := range appendPath(nil, c.altPath[0]) {
+		a = append(a, f.SelectorString(c))
+	}
+	for _, v := range c.altPath[1:] {
+		if f := v.Label; f != 0 {
+			a = append(a, f.SelectorString(c))
+		}
+	}
+	return a
 }
 
 func (e *ValueError) Error() string {
@@ -410,6 +429,9 @@ func (e *ValueError) InputPositions() (a []token.Pos) {
 }
 
 func (e *ValueError) Path() (a []string) {
+	if len(e.altPath) > 0 {
+		return e.altPath
+	}
 	if e.v == nil {
 		return nil
 	}

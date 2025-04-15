@@ -190,6 +190,11 @@ type OpContext struct {
 	disjunctStack []disjunctInfo // stack of disjunct IDs
 
 	reqSetsBuf reqSets // reuse a reqSets slice
+
+	// altPath, if non-empty, provides an altnative path for errors. This is
+	// necessary to get the right path for incomplete errors in the precense of
+	// structure sharing.
+	altPath []*Vertex // stack of selectors
 }
 
 func (c *OpContext) CloseInfo() CloseInfo         { return c.ci }
@@ -390,10 +395,21 @@ func (c *OpContext) PushArc(v *Vertex) (saved *Vertex) {
 	c.vertex, saved = v, c.vertex
 	return saved
 }
+func (c *OpContext) PushArcAndLabel(v *Vertex) (saved *Vertex) {
+
+	c.vertex, saved = v, c.vertex
+	c.altPath = append(c.altPath, v)
+	return saved
+}
 
 // PopArc signals completion of processing the current arc.
 func (c *OpContext) PopArc(saved *Vertex) {
 	c.vertex = saved
+}
+
+func (c *OpContext) PopArcAndLabel(saved *Vertex) {
+	c.vertex = saved
+	c.altPath = c.altPath[:len(c.altPath)-1]
 }
 
 // Resolve finds a node in the tree.

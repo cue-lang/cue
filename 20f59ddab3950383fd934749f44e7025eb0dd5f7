@@ -70,6 +70,24 @@
       "parentUuid": "73f46368_f243d3a9",
       "revId": "20f59ddab3950383fd934749f44e7025eb0dd5f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c06b3d9_79d6fc36",
+        "filename": "encoding/xml/koala/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-15T08:49:13Z",
+      "side": 1,
+      "message": "OK. Please adhere to the rough line length limit; your line is now about twice as long as the rest.\n\nThe sentence also feels too long now, so it probably needs a period somewhere for a pause.",
+      "parentUuid": "802544f7_0ef94b1b",
+      "revId": "20f59ddab3950383fd934749f44e7025eb0dd5f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

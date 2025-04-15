@@ -216,28 +216,26 @@ func (sm *structMeta) hasDynamic(dynFieldsMap map[*adt.DynamicField][]adt.Featur
 // we look at the vertex's conjuncts. If a conjunct is a binary
 // expression &, then we look up the structMeta for the arguments to
 // the binary expression, and mark them as explicit unification.
-func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []*structMeta {
+func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 	structInfos := v.Structs
-	nodeToStructMeta := make(map[adt.Node][]*structMeta)
-	structMetas := make([]*structMeta, 0, len(structInfos))
+	nodeToStructMetaIndex := make(map[adt.Node][]int)
+	structMetas := make([]structMeta, len(structInfos))
 
 	// Create all the structMetas and map to them from a StructInfo's
 	// StructLit, and all its internal Decls. Initial attempt at
 	// recording a position, which will be correct only for direct use
 	// of literal structs in the calculation of vertex v.
-	for _, s := range structInfos {
+	for i, s := range structInfos {
 		sl := s.StructLit
-		sMeta := &structMeta{
-			structInfo: s,
-		}
-		structMetas = append(structMetas, sMeta)
+		sMeta := &structMetas[i]
+		sMeta.structInfo = s
 
 		if src := sl.Source(); src != nil {
 			sMeta.pos = src.Pos()
 		}
-		nodeToStructMeta[sl] = append(nodeToStructMeta[sl], sMeta)
+		nodeToStructMetaIndex[sl] = append(nodeToStructMetaIndex[sl], i)
 		for _, decl := range sl.Decls {
-			nodeToStructMeta[decl] = append(nodeToStructMeta[decl], sMeta)
+			nodeToStructMetaIndex[decl] = append(nodeToStructMetaIndex[decl], i)
 		}
 	}
 
@@ -250,13 +248,13 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []*structMeta {
 			field := c.Field()
 			debug("self arc conjunct field %p :: %T, expr %p :: %T (%v)\n",
 				field, field, c.Expr(), c.Expr(), c.Expr().Source())
-			sMetas, found := nodeToStructMeta[field]
+			sMetas, found := nodeToStructMetaIndex[field]
 			if !found {
 				return true
 			}
 			if src := field.Source(); src != nil {
-				for _, sMeta := range sMetas {
-					sMeta.pos = src.Pos()
+				for _, idx := range sMetas {
+					structMetas[idx].pos = src.Pos()
 				}
 			}
 			refs := c.CloseInfo.CycleInfo.Refs
@@ -270,10 +268,10 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []*structMeta {
 				debug(" ref %p :: %T (%v)\n",
 					refs.Ref, refs.Ref, refs.Ref.Source().Pos())
 			}
-			nodeToStructMeta[refs.Ref] = append(nodeToStructMeta[refs.Ref], sMetas...)
+			nodeToStructMetaIndex[refs.Ref] = append(nodeToStructMetaIndex[refs.Ref], sMetas...)
 			if pos := refs.Ref.Source().Pos(); pos != token.NoPos {
-				for _, sMeta := range nodeToStructMeta[refs.Ref] {
-					sMeta.pos = pos
+				for _, idx := range nodeToStructMetaIndex[refs.Ref] {
+					structMetas[idx].pos = pos
 				}
 			}
 
@@ -307,7 +305,8 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []*structMeta {
 			continue
 		}
 		for _, expr := range []adt.Expr{binExpr.X, binExpr.Y} {
-			for _, sMeta := range nodeToStructMeta[expr] {
+			for _, idx := range nodeToStructMetaIndex[expr] {
+				sMeta := &structMetas[idx]
 				sMeta.isExplicit = true
 				debug(" now explicit: %v\n", sMeta)
 			}
@@ -365,7 +364,7 @@ type vertexFeatures struct {
 	dynFieldsMap map[*adt.DynamicField][]adt.Feature
 }
 
-func (vf *vertexFeatures) compareStructMeta(a, b *structMeta) int {
+func (vf *vertexFeatures) compareStructMeta(a, b structMeta) int {
 	if c := a.pos.Compare(b.pos); c != 0 {
 		return c
 	}
@@ -398,7 +397,8 @@ func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
 
 	var batches structMetaBatches
 	var batch structMetaBatch
-	for _, root := range roots {
+	for i := range roots {
+		root := &roots[i]
 		if len(batch) == 0 ||
 			(batch[0].pos == root.pos && !root.hasDynamic(dynFieldsMap)) {
 			batch = append(batch, root)

@@ -63,6 +63,9 @@ type Counts struct {
 	// algorithmic behavior.
 	Conjuncts int64
 
+	CloseIDElems int64
+	NumCloseIDs  int64
+
 	// Buffer counters
 	//
 	// Each unification and disjunct operation is associated with an object
@@ -100,6 +103,9 @@ func (c *Counts) Add(other Counts) {
 	c.Conjuncts += other.Conjuncts
 	c.Disjuncts += other.Disjuncts
 
+	c.CloseIDElems += other.CloseIDElems
+	c.NumCloseIDs += other.NumCloseIDs
+
 	c.Freed += other.Freed
 	c.Retained += other.Retained
 	c.Reused += other.Reused
@@ -110,6 +116,8 @@ func (c Counts) Since(start Counts) Counts {
 	c.Unifications -= start.Unifications
 	c.Conjuncts -= start.Conjuncts
 	c.Disjuncts -= start.Disjuncts
+	c.CloseIDElems -= start.CloseIDElems
+	c.NumCloseIDs -= start.NumCloseIDs
 
 	c.Freed -= start.Freed
 	c.Retained -= start.Retained
@@ -139,7 +147,10 @@ Retain: {{.Retained}}
 
 Unifications: {{.Unifications}}
 Conjuncts:    {{.Conjuncts}}
-Disjuncts:    {{.Disjuncts}}`))
+Disjuncts:    {{.Disjuncts}}{{if .NumCloseIDs}}
+
+CloseIDElems: {{.CloseIDElems}}
+NumCloseIDs: {{.NumCloseIDs}}{{end}}`))
 })
 
 func (s Counts) String() string {

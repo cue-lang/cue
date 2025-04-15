@@ -70,6 +70,9 @@ Retain: 0
 Unifications: 62
 Conjuncts:    132
 Disjuncts:    0
+
+CloseIDElems: 0
+NumCloseIDs: 25
 -- out/evalalpha --
 Errors:
 structural cycle:
@@ -122,24 +125,28 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,9 @@
+@@ -1,9 +1,12 @@
 -Leaks:  16
 -Freed:  180
 -Reused: 170
 -Allocs: 26
 -Retain: 148
+-
+-Unifications: 196
+-Conjuncts:    464
+-Disjuncts:    268
 +Leaks:  70
 +Freed:  0
 +Reused: 0
 +Allocs: 70
 +Retain: 0
- 
--Unifications: 196
--Conjuncts:    464
--Disjuncts:    268
++
 +Unifications: 62
 +Conjuncts:    132
 +Disjuncts:    0
++
++CloseIDElems: 0
++NumCloseIDs: 25
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

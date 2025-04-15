@@ -170,7 +170,8 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 			case orig.Disjuncts < counts.Disjuncts,
 				orig.Disjuncts > counts.Disjuncts*5 &&
 					counts.Disjuncts > 20,
-				orig.Conjuncts > counts.Conjuncts*2:
+				orig.Conjuncts > counts.Conjuncts*2,
+				counts.CloseIDElems > 1000:
 				// For now, we only care about disjuncts.
 				// TODO: add triggers once the disjunction issues have bene
 				// solved.

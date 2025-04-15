@@ -49,6 +49,8 @@ contents overwritten
         "Unifications": 4,
         "Disjuncts": 2,
         "Conjuncts": 8,
+        "CloseIDElems": 0,
+        "NumCloseIDs": 2,
         "Freed": 0,
         "Reused": 0,
         "Allocs": 6,
@@ -65,6 +67,8 @@ CUE: {
 	Unifications: 4
 	Disjuncts:    2
 	Conjuncts:    8
+	CloseIDElems: 0
+	NumCloseIDs:  2
 	Freed:        0
 	Reused:       0
 	Allocs:       6
@@ -80,6 +84,8 @@ CUE:
   Unifications: 4
   Disjuncts: 2
   Conjuncts: 8
+  CloseIDElems: 0
+  NumCloseIDs: 2
   Freed: 0
   Reused: 0
   Allocs: 6
@@ -94,6 +100,8 @@ Go:
         "Unifications": 4,
         "Disjuncts": 2,
         "Conjuncts": 8,
+        "CloseIDElems": 0,
+        "NumCloseIDs": 2,
         "Freed": 0,
         "Reused": 0,
         "Allocs": 6,

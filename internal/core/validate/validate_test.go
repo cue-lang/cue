@@ -252,6 +252,45 @@ y: conflicting values 4 and 2:
 			#D: x: #D.y + 1
 			#D: y: int
 				`,
+	}, {
+		name: "allow incomplete error with final while in definition",
+		cfg:  &validate.Config{Final: true},
+		in: `
+			#D: x: #D.y + 1
+			#D: y: int
+				`,
+	}, {
+		name: "report non-concrete value of structure shared node in correct position",
+		cfg: &validate.Config{
+			Concrete: true,
+			Final:    true,
+		},
+		in: `
+			#Def: a: x!: int
+			b: #Def
+			`,
+		out: "incomplete\nb.a.x: field is required but not present:\n    test:2:13\n    test:3:7",
+
+		todo_v3: true, // missing position
+	}, {
+		// Issue #3864: issue resulting from structure sharing.
+		name: "attribute incomplete values in definitions to concrete path",
+		cfg: &validate.Config{
+			Concrete: true,
+			Final:    true,
+		},
+		in: `
+			#A: y: string
+			#B: x: #A
+			#C: {
+				x: #A
+				v: #B & { x: x } // note: 'x' resolves to self.
+			}
+			config: #C & {
+				x: y: "dev"
+			}
+		`,
+		out: "incomplete\nconfig.v.x.y: incomplete value string:\n    test:2:11",
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {

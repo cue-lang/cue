@@ -51,6 +51,13 @@ type validator struct {
 	ctx          *adt.OpContext
 	err          *adt.Bottom
 	inDefinition int
+
+	// shared vertices should be visited at least once if referenced by
+	// a non-definition.
+	// TODO: we could also keep track of the number of references to a
+	// shared vertex. This would allow us to report more than a single error
+	// per shared vertex.
+	visited map[*adt.Vertex]bool
 }
 
 func (v *validator) checkConcrete() bool {
@@ -72,12 +79,29 @@ func (v *validator) add(b *adt.Bottom) {
 }
 
 func (v *validator) validate(x *adt.Vertex) {
-	defer v.ctx.PopArc(v.ctx.PushArc(x))
+	defer v.ctx.PopArcAndLabel(v.ctx.PushArcAndLabel(x))
+
+	y := x
 
 	// Dereference values, but only those that are not shared. This includes let
 	// values. This prevents us from processing structure-shared nodes more than
 	// once and prevents potential cycles.
-	x = x.DerefNonShared()
+	x = x.DerefValue()
+	if y != x {
+		// Ensure that each structure shared node is processed at least once
+		// in a position that is not a definition.
+		if v.inDefinition > 0 {
+			return
+		}
+		if v.visited == nil {
+			v.visited = make(map[*adt.Vertex]bool)
+		}
+		if v.visited[x] {
+			return
+		}
+		v.visited[x] = true
+	}
+
 	if b := x.Bottom(); b != nil {
 		switch b.Code {
 		case adt.CycleError:
@@ -110,7 +134,9 @@ func (v *validator) validate(x *adt.Vertex) {
 
 	for _, a := range x.Arcs {
 		if a.ArcType == adt.ArcRequired && v.Final && v.inDefinition == 0 {
+			v.ctx.PushArcAndLabel(a)
 			v.add(adt.NewRequiredNotPresentError(v.ctx, a))
+			v.ctx.PopArcAndLabel(a)
 			continue
 		}
 

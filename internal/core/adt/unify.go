@@ -447,13 +447,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 
 	// TODO: find more strategic place to set ClosedRecursive and get rid
 	// of helper fields.
-	blockClose := n.hasTop
-	if n.hasStruct {
-		blockClose = false
-	}
-	if n.hasOpenValidator {
-		blockClose = true
-	}
+	blockClose := n.hasTop && !n.hasStruct
 	if n.isDef && !blockClose {
 		n.node.ClosedRecursive = true
 	}

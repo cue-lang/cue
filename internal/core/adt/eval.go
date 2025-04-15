@@ -1027,10 +1027,6 @@ type nodeContext struct {
 	// set for all Vertex values that were cloned.
 	underlying *Vertex
 
-	// overlays is set if this node is the root of a disjunct created in
-	// doDisjunct. It points to the direct parent nodeContext.
-	overlays *nodeContext
-
 	nodeContextState
 
 	scheduler
@@ -1098,7 +1094,6 @@ type nodeContext struct {
 	disjuncts    []*nodeContext
 	buffer       []*nodeContext
 	disjunctErrs []*Bottom
-	disjunct     Conjunct
 
 	// hasDisjunction marks wither any disjunct was added. It is listed here
 	// instead of in nodeContextState as it should be cleared when a disjunction
@@ -1159,9 +1154,8 @@ type nodeContextState struct {
 	hasNonCyclic         bool // has non-cyclic conjuncts at start of field processing
 
 	// These simulate the old closeContext logic. TODO: perhaps remove.
-	hasStruct        bool // this node has a struct conjunct
-	hasOpenValidator bool // this node has an open validator
-	isDef            bool // this node is a definition
+	hasStruct bool // this node has a struct conjunct
+	isDef     bool // this node is a definition
 
 	dropParentRequirements bool // used for typo checking
 

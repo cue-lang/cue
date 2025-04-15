@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd8d8644_545c00ca",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-15T15:39:37Z",
+      "side": 1,
+      "message": "done - I\u0027ll push this change when you\u0027re done reviewing the two patches.",
+      "parentUuid": "8314f703_79719ea6",
+      "range": {
+        "startLine": 251,
+        "startChar": 3,
+        "endLine": 251,
+        "endChar": 9
+      },
+      "revId": "b7fa3401e13affb96f5853dc637e89aee896473f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee38447f_24dbdb28",
@@ -37,6 +61,24 @@
       "writtenOn": "2025-04-15T15:27:43Z",
       "side": 1,
       "message": "It feels weird to me that it\u0027s worth avoiding the copy here, but the above change to `copmareStructMeta`, which is going to be taking copies of every pair compared. I\u0027m not saying I disagree with it, but it just feels weird and slightly bamboozling how in some cases the copying is considered acceptable and in others it\u0027s not.",
+      "revId": "b7fa3401e13affb96f5853dc637e89aee896473f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62381c9a_a54224c3",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-15T15:39:37Z",
+      "side": 1,
+      "message": "structMeta is small - the size of three pointers plus a boolean, so the cost of copying that is negligible. hence I don\u0027t worry about it overall. I lean towards avoiding pointers unless there\u0027s a good reason to use them - like needing to share/update memory, performance for large structs, or consistency with other bits of code.\n\nhere I use a pointer because I felt it was unnecessary to refactor the rest of this code at the same time. the slowness came from analyseStructs, so that\u0027s what I focused on.\n\nI agree it would be nicer to be consistent one way or the other. this is ultimately your code so I\u0027m happy to defer to you on the decision. I\u0027m also happy for you to send a follow-up patch to leave things the way you would like them.",
+      "parentUuid": "ee38447f_24dbdb28",
       "revId": "b7fa3401e13affb96f5853dc637e89aee896473f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

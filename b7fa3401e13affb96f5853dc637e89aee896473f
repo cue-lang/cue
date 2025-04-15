@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8314f703_79719ea6",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-15T15:27:43Z",
+      "side": 1,
+      "message": "Personally, I would prefer `sMetas` to become `sMetaIndices` or something like that.",
+      "range": {
+        "startLine": 251,
+        "startChar": 3,
+        "endLine": 251,
+        "endChar": 9
+      },
+      "revId": "b7fa3401e13affb96f5853dc637e89aee896473f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee38447f_24dbdb28",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-15T15:27:43Z",
+      "side": 1,
+      "message": "It feels weird to me that it\u0027s worth avoiding the copy here, but the above change to `copmareStructMeta`, which is going to be taking copies of every pair compared. I\u0027m not saying I disagree with it, but it just feels weird and slightly bamboozling how in some cases the copying is considered acceptable and in others it\u0027s not.",
+      "revId": "b7fa3401e13affb96f5853dc637e89aee896473f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

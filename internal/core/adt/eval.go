@@ -1027,10 +1027,6 @@ type nodeContext struct {
 	// set for all Vertex values that were cloned.
 	underlying *Vertex
 
-	// overlays is set if this node is the root of a disjunct created in
-	// doDisjunct. It points to the direct parent nodeContext.
-	overlays *nodeContext
-
 	nodeContextState
 
 	scheduler
@@ -1098,7 +1094,6 @@ type nodeContext struct {
 	disjuncts    []*nodeContext
 	buffer       []*nodeContext
 	disjunctErrs []*Bottom
-	disjunct     Conjunct
 
 	// hasDisjunction marks wither any disjunct was added. It is listed here
 	// instead of in nodeContextState as it should be cleared when a disjunction

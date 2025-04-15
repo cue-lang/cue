@@ -218,7 +218,9 @@ func (sm *structMeta) hasDynamic(dynFieldsMap map[*adt.DynamicField][]adt.Featur
 // the binary expression, and mark them as explicit unification.
 func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 	structInfos := v.Structs
-	nodeToStructMetaIndex := make(map[adt.Node][]int)
+	// Note that it's important that nodeToStructMetaIndex avoids duplicate entries,
+	// which are unnecessary and cause significant slowness for some large configs.
+	nodeToStructMetaIndex := make(map[adt.Node]sortedInts)
 	structMetas := make([]structMeta, len(structInfos))
 
 	// Create all the structMetas and map to them from a StructInfo's
@@ -233,9 +235,9 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 		if src := sl.Source(); src != nil {
 			sMeta.pos = src.Pos()
 		}
-		nodeToStructMetaIndex[sl] = append(nodeToStructMetaIndex[sl], i)
+		nodeToStructMetaIndex[sl] = nodeToStructMetaIndex[sl].insert(i)
 		for _, decl := range sl.Decls {
-			nodeToStructMetaIndex[decl] = append(nodeToStructMetaIndex[decl], i)
+			nodeToStructMetaIndex[decl] = nodeToStructMetaIndex[decl].insert(i)
 		}
 	}
 
@@ -268,7 +270,9 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 				debug(" ref %p :: %T (%v)\n",
 					refs.Ref, refs.Ref, refs.Ref.Source().Pos())
 			}
-			nodeToStructMetaIndex[refs.Ref] = append(nodeToStructMetaIndex[refs.Ref], sMetas...)
+			for _, idx := range sMetas {
+				nodeToStructMetaIndex[refs.Ref] = nodeToStructMetaIndex[refs.Ref].insert(idx)
+			}
 			if pos := refs.Ref.Source().Pos(); pos != token.NoPos {
 				for _, idx := range nodeToStructMetaIndex[refs.Ref] {
 					structMetas[idx].pos = pos
@@ -315,6 +319,17 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 	}
 
 	return structMetas
+}
+
+// sortedInts allows insertion while keeping the list sorted and free of duplicates.
+type sortedInts []int
+
+func (a sortedInts) insert(n int) sortedInts {
+	i, found := slices.BinarySearch(a, n)
+	if found {
+		return a
+	}
+	return slices.Insert(a, i, n)
 }
 
 // Find all fields which have been created as a result of successful

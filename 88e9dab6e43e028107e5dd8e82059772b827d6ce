@@ -34,6 +34,24 @@
       "parentUuid": "c166b2e1_baa13aa4",
       "revId": "88e9dab6e43e028107e5dd8e82059772b827d6ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfe6c69c_99fade6a",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-04-16T09:15:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8bc0e08e_1b027a68",
+      "revId": "88e9dab6e43e028107e5dd8e82059772b827d6ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

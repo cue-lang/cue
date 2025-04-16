@@ -1073,6 +1073,7 @@ type nodeContext struct {
 	reqDefIDs    []refInfo
 	replaceIDs   []replaceID
 	conjunctInfo []conjunctInfo
+	reqSets      reqSets
 
 	// Checks is a list of conjuncts, as we need to preserve the context in
 	// which it was evaluated. The conjunct is always a validator (and thus
@@ -1162,6 +1163,7 @@ type nodeContextState struct {
 	isDef            bool // this node is a definition
 
 	dropParentRequirements bool // used for typo checking
+	computedCloseInfo      bool // used for typo checking
 
 	isShared         bool       // set if we are currently structure sharing
 	noSharing        bool       // set if structure sharing is not allowed
@@ -1318,6 +1320,7 @@ func (n *nodeContext) clone() *nodeContext {
 	d.reqDefIDs = append(d.reqDefIDs, n.reqDefIDs...)
 	d.replaceIDs = append(d.replaceIDs, n.replaceIDs...)
 	d.conjunctInfo = append(d.conjunctInfo, n.conjunctInfo...)
+	d.reqSets = append(d.reqSets, n.reqSets...)
 
 	d.checks = append(d.checks, n.checks...)
 	d.postChecks = append(d.postChecks, n.postChecks...)
@@ -1357,6 +1360,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			reqDefIDs:          n.reqDefIDs[:0],
 			replaceIDs:         n.replaceIDs[:0],
 			conjunctInfo:       n.conjunctInfo[:0],
+			reqSets:            n.reqSets[:0],
 			disjunctions:       n.disjunctions[:0],
 			usedDefault:        n.usedDefault[:0],
 			disjunctErrs:       n.disjunctErrs[:0],

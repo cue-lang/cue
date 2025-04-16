@@ -14,42 +14,94 @@
 
 package embed
 
-import "testing"
+import (
+	"testing"
+	"testing/fstest"
 
-func TestIsHidden(t *testing.T) {
+	"github.com/go-quicktest/qt"
+	"github.com/google/go-cmp/cmp/cmpopts"
+)
+
+func TestFSGlob(t *testing.T) {
 	// These test cases are the same for both Unix and Windows.
 	testCases := []struct {
-		path string
-		want bool
+		testName  string
+		paths     []string
+		pattern   string
+		want      []string
+		wantError string
 	}{{
-		path: "",
-		want: false,
+		testName: "EmptyDirectory",
+		paths:    []string{},
+		pattern:  "*/*.txt",
+		want:     nil,
 	}, {
-		path: "foo",
-		want: false,
+		testName: "DirectoryWithSingleDotFile",
+		paths: []string{
+			"foo/bar",
+			"foo/bar.txt",
+			"foo/.hello.txt",
+		},
+		pattern: "*/*.txt",
+		want: []string{
+			"foo/bar.txt",
+		},
 	}, {
-		path: ".foo",
-		want: true,
+		testName: "DotPrefixedDirectory",
+		paths: []string{
+			"foo/bar.txt",
+			"foo/.hello.txt",
+			"foo/baz.txt",
+			".git/something.txt",
+		},
+		pattern: "*/*.txt",
+		want: []string{
+			"foo/bar.txt",
+			"foo/baz.txt",
+		},
 	}, {
-		path: "foo/bar",
-		want: false,
+		testName: "DotPrefixedDirectoryWithExplicitDot",
+		paths: []string{
+			"foo/bar.txt",
+			"foo/.hello.txt",
+			"foo/baz.txt",
+			".git/something.txt",
+			".git/.otherthing.txt",
+		},
+		pattern: ".*/*.txt",
+		want: []string{
+			".git/something.txt",
+		},
 	}, {
-		path: "foo/.bar",
-		want: true,
+		testName: "DotInCharacterClass",
+		paths: []string{
+			".foo",
+		},
+		pattern: "[.x]foo",
+		want:    nil,
 	}, {
-		path: ".foo/bar",
-		want: true,
-	}, {
-		path: "x/.foo/bar",
-		want: true,
+		testName: "SlashInCharacterClass",
+		paths: []string{
+			"fooxbar",
+			"foo/bar",
+		},
+		pattern:   "foo[/x]bar",
+		wantError: `syntax error in pattern`,
 	}}
-	c := &compiler{dir: "/tmp"}
 	for _, tc := range testCases {
-		t.Run(tc.path, func(t *testing.T) {
-			got := c.isHidden(tc.path)
-			if got != tc.want {
-				t.Errorf("isHidden(%q) = %t; want %t", tc.path, got, tc.want)
+		t.Run(tc.testName, func(t *testing.T) {
+			m := make(fstest.MapFS)
+			for _, p := range tc.paths {
+				m[p] = &fstest.MapFile{
+					Mode: 0o666,
+				}
 			}
+			got, err := fsGlob(m, tc.pattern)
+			if tc.wantError != "" {
+				qt.Assert(t, qt.ErrorMatches(err, tc.wantError))
+				return
+			}
+			qt.Assert(t, qt.CmpEquals(got, tc.want, cmpopts.EquateEmpty()))
 		})
 	}
 }

@@ -245,7 +245,11 @@ special: {
     dotFile: {
         z: 46
     }
-    dotFileExplicit: {}
+    dotFileExplicit: {
+        "y/.test.json": {
+            z: 46
+        }
+    }
     dotdotFile: {
         dotdot: true
     }
@@ -315,7 +319,7 @@ special: {
 	// These are all valid.
 	underscoreFile: z: 45
 	dotFile: z:        46
-	dotFileExplicit: {}
+	dotFileExplicit: "y/.test.json": z: 46
 	dotdotFile: dotdot: true
 	underscoreDir: z:   47
 	dotDir: z:          48

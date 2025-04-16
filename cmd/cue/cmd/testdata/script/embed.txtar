@@ -55,6 +55,7 @@ special: {
 	// These are all valid.
 	underscoreFile: _ @embed(file="y/_test.json")
 	dotFile:        _ @embed(file="y/.test.json")
+	dotFileExplicit: _ @embed(glob="y/.*.json", type=yaml)
 	dotdotFile:        _ @embed(file="..dotdot.json")
 	underscoreDir:  _ @embed(file="_y/test.json")
 	dotDir:         _ @embed(file=".y/test.json")
@@ -244,6 +245,11 @@ special: {
     dotFile: {
         z: 46
     }
+    dotFileExplicit: {
+        "y/.test.json": {
+            z: 46
+        }
+    }
     dotdotFile: {
         dotdot: true
     }
@@ -311,8 +317,9 @@ j: '''
 	'''
 special: {
 	// These are all valid.
-	underscoreFile: z:  45
-	dotFile: z:         46
+	underscoreFile: z: 45
+	dotFile: z:        46
+	dotFileExplicit: "y/.test.json": z: 46
 	dotdotFile: dotdot: true
 	underscoreDir: z:   47
 	dotDir: z:          48

@@ -462,7 +462,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 
 	d := oc.cloneRoot(n)
 	d.runMode = mode
-	c.Env = derefDisjunctsEnv(c.Env, orig, d.node)
+	c.Env = oc.derefDisjunctsEnv(c.Env)
 
 	d.defaultMode = combineDefault(m, n.defaultMode)
 

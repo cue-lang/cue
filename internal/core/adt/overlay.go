@@ -14,7 +14,10 @@
 
 package adt
 
-import "slices"
+import (
+	"maps"
+	"slices"
+)
 
 // This file implements a Vertex overlay. This is used by the disjunction
 // algorithm to fork an existing Vertex value without modifying the original.
@@ -39,7 +42,12 @@ import "slices"
 // could get by with only copying arcs to that are modified in the copy.
 
 func newOverlayContext(ctx *OpContext) *overlayContext {
-	return &overlayContext{ctx: ctx}
+	return &overlayContext{
+		ctx: ctx,
+
+		// TODO(perf): take a map from a pool of maps and reuse.
+		vertexMap: make(map[*Vertex]*Vertex),
+	}
 }
 
 // An overlayContext keeps track of copied vertices, closeContexts, and tasks.
@@ -51,14 +59,39 @@ type overlayContext struct {
 	// vertices holds the original, non-overlay vertices. The overlay for a
 	// vertex v can be obtained by looking up v.cc.overlay.src.
 	vertices []*Vertex
+
+	// vertexMap maps Vertex values of an originating node to the ones copied
+	// for this overlayContext. This is used to update the Vertex values in
+	// Environment values.
+	vertexMap vertexMap
+}
+
+type vertexMap map[*Vertex]*Vertex
+
+// deref reports a replacement of v or v itself if such a replacement does not
+// exists. It computes the transitive closure of the replacement graph.
+// TODO(perf): it is probably sufficient to only replace one level. But we need
+// to prove this to be sure. Until then, we keep the code as is.
+func (m vertexMap) deref(v *Vertex) *Vertex {
+	for {
+		x, ok := m[v]
+		if !ok {
+			break
+		}
+		v = x
+	}
+	return v
 }
 
 // cloneRoot clones the Vertex in which disjunctions are defined to allow
 // inserting selected disjuncts into a new Vertex.
 func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
+	maps.Copy(ctx.vertexMap, root.vertexMap)
+
 	// Clone all vertices that need to be cloned to support the overlay.
-	v := ctx.cloneVertex(root.node, nil, nil)
+	v := ctx.cloneVertex(root.node)
 	v.IsDisjunct = true
+	v.state.vertexMap = ctx.vertexMap
 
 	for _, v := range ctx.vertices {
 		n := v.state
@@ -73,6 +106,18 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 			if p.state == nil {
 				panic("unexpected nil nodeContext")
 			}
+		}
+
+		// The group of the root closeContext should point to the Conjuncts field
+		// of the Vertex. As we already allocated the group, we use that allocation,
+		// but "move" it to v.Conjuncts.
+		// TODO: Is this ever necessary? It is certainly necessary to rewrite
+		// environments from inserted disjunction values, but expressions that
+		// were already added will typically need to be recomputed and recreated
+		// anyway. We add this in to be a bit defensive and reinvestigate once we
+		// have more aggressive structure sharing implemented
+		for i, c := range v.Conjuncts {
+			v.Conjuncts[i].Env = ctx.derefDisjunctsEnv(c.Env)
 		}
 	}
 
@@ -101,21 +146,19 @@ func (ctx *overlayContext) unlinkOverlay() {
 // benefit this gives. More importantly, we should first implement the filter
 // to eliminate disjunctions pre-copy based on discriminator fields and what
 // have you. This is not unlikely to eliminate
-func (ctx *overlayContext) cloneVertex(x, from, to *Vertex) *Vertex {
+func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 	if x.overlay != nil {
 		return x.overlay
 	}
 
 	v := &Vertex{}
 	*v = *x
+	ctx.vertexMap[x] = v
 
 	// from == nil signals that cloneVertex is directly called from cloneRoot.
 	// All nested calls to cloneVertex will be called with the value of x and v
 	// of this vertex. Ideally, cloneRoot would call cloneVertex with the
 	// correct values already, but x is not known yet at that point.
-	if from == nil {
-		from, to = x, v
-	}
 
 	x.overlay = v
 
@@ -123,24 +166,12 @@ func (ctx *overlayContext) cloneVertex(x, from, to *Vertex) *Vertex {
 
 	v.Conjuncts = slices.Clone(v.Conjuncts)
 
-	// The group of the root closeContext should point to the Conjuncts field
-	// of the Vertex. As we already allocated the group, we use that allocation,
-	// but "move" it to v.Conjuncts.
-	// TODO: Is this ever necessary? It is certainly necessary to rewrite
-	// environments from inserted disjunction values, but expressions that
-	// were already added will typically need to be recomputed and recreated
-	// anyway. We add this in to be a bit defensive and reinvestigate once we
-	// have more aggressive structure sharing implemented
-	for i, c := range v.Conjuncts {
-		v.Conjuncts[i].Env = derefDisjunctsEnv(c.Env, x, v)
-	}
-
 	if a := x.Arcs; len(a) > 0 {
 		// TODO(perf): reuse buffer.
 		v.Arcs = make([]*Vertex, len(a))
 		for i, arc := range a {
 			// TODO(perf): reuse when finalized.
-			arc := ctx.cloneVertex(arc, from, to)
+			arc := ctx.cloneVertex(arc)
 			v.Arcs[i] = arc
 			arc.Parent = v
 		}
@@ -156,7 +187,7 @@ func (ctx *overlayContext) cloneVertex(x, from, to *Vertex) *Vertex {
 		for i, p := range pc.Pairs {
 			npc.Pairs[i] = PatternConstraint{
 				Pattern:    p.Pattern,
-				Constraint: ctx.cloneVertex(p.Constraint, from, to),
+				Constraint: ctx.cloneVertex(p.Constraint),
 			}
 		}
 	}
@@ -171,14 +202,20 @@ func (ctx *overlayContext) cloneVertex(x, from, to *Vertex) *Vertex {
 	return v
 }
 
-// derefDisjunctsEnv creates a new env for each Environment in the Up chain
-// with each Environment where Vertex is "from" to one where Vertex is "to".
-func derefDisjunctsEnv(env *Environment, from, to *Vertex) *Environment {
+// derefDisjunctsEnv creates a new env for each Environment in the Up chain with
+// each Environment where Vertex is "from" to one where Vertex is "to".
+//
+// TODO(perf): we could, instead, just look up the mapped vertex in
+// OpContext.Up. This would avoid us having to copy the Environments for each
+// disjunct. This requires quite a bit of plumbing, though, so we leave it as
+// is until this proves to be a performance issue.
+func (ctx *overlayContext) derefDisjunctsEnv(env *Environment) *Environment {
 	if env == nil {
 		return nil
 	}
-	up := derefDisjunctsEnv(env.Up, from, to)
-	if up != env.Up || env.Vertex == from {
+	up := ctx.derefDisjunctsEnv(env.Up)
+	to := ctx.vertexMap.deref(env.Vertex)
+	if up != env.Up || env.Vertex != to {
 		env = &Environment{
 			Up:           up,
 			Vertex:       to,
@@ -293,9 +330,10 @@ func (ctx *overlayContext) cloneTask(t *task, dst, src *scheduler) *task {
 		unblocked:      t.unblocked,
 		blockCondition: t.blockCondition,
 		err:            t.err,
-		env:            t.env,
-		x:              t.x,
-		id:             id,
+		// env:            t.env,
+		env: ctx.derefDisjunctsEnv(t.env),
+		x:   t.x,
+		id:  id,
 
 		node: dst.node,
 

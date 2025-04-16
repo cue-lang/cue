@@ -239,6 +239,11 @@ func (n *nodeContext) addReplacement(x replaceID) {
 	if x.from == x.to {
 		return
 	}
+	// TODO: we currently may compute n.reqSets too early in some rare
+	// circumstances. We clear the set if it needs to be recomputed.
+	n.computedCloseInfo = false
+	n.reqSets = n.reqSets[:0]
+
 	n.replaceIDs = append(n.replaceIDs, x)
 }
 
@@ -475,7 +480,7 @@ func (n *nodeContext) checkTypos() {
 		return
 	}
 
-	required := appendRequired(nil, n)
+	required := getReqSets(n)
 	if len(required) == 0 {
 		return
 	}
@@ -750,15 +755,25 @@ func (n *nodeContext) getReplacements(a []replaceID) []replaceID {
 	return a
 }
 
-// appendRequired
-func appendRequired(a reqSets, n *nodeContext) reqSets {
+// getReqSets initializes, if necessary, and returns the reqSets for n.
+func getReqSets(n *nodeContext) reqSets {
 	if n == nil {
-		return a
+		return nil
 	}
+
+	if n.computedCloseInfo {
+		return n.reqSets
+	}
+	n.reqSets = n.reqSets[:0]
+	n.computedCloseInfo = true
+
+	a := n.reqSets
 	v := n.node
-	if !n.dropParentRequirements {
-		if p := v.Parent; p != nil {
-			a = appendRequired(a, p.state)
+
+	if p := v.Parent; p != nil {
+		aReq := getReqSets(p.state)
+		if !n.dropParentRequirements {
+			a = append(a, aReq...)
 		}
 	}
 	a.filterNonRecursive()
@@ -805,6 +820,7 @@ outer:
 
 	a.filterTop(n.conjunctInfo)
 
+	n.reqSets = a
 	return a
 }
 

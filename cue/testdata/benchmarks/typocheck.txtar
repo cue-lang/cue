@@ -1,0 +1,3404 @@
+-- in.cue --
+// Issue #3881
+import "list"
+
+out: #Output & {#input: _input}
+
+_input: {
+	for n in list.Range(1, 300, 1) {
+		"A\(n)": "B\(n)": name: "name\(n)"
+	}
+}
+#Embed: [string]: string
+#Output: {
+	#Embed
+	#input: _
+
+	for _, lvlA in #input {
+		for nameB, lvlB in lvlA {
+			(nameB): lvlB.name
+		}
+	}
+}
+-- out/evalalpha/stats --
+Leaks:  2103
+Freed:  0
+Reused: 0
+Allocs: 2103
+Retain: 0
+
+Unifications: 2103
+Conjuncts:    3905
+Disjuncts:    0
+
+CloseIDElems: 1181991
+NumCloseIDs: 610
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+-Leaks:  0
+-Freed:  2100
+-Reused: 1794
+-Allocs: 306
+-Retain: 308
+-
+-Unifications: 2100
+-Conjuncts:    3902
+-Disjuncts:    2407
++Leaks:  2103
++Freed:  0
++Reused: 0
++Allocs: 2103
++Retain: 0
++
++Unifications: 2103
++Conjuncts:    3905
++Disjuncts:    0
++
++CloseIDElems: 1181991
++NumCloseIDs: 610
+-- out/eval/stats --
+Leaks:  0
+Freed:  2100
+Reused: 1794
+Allocs: 306
+Retain: 308
+
+Unifications: 2100
+Conjuncts:    3902
+Disjuncts:    2407
+-- out/eval --
+(struct){
+  out: (#struct){
+    #input: (#struct){
+      A1: (#struct){
+        B1: (#struct){
+          name: (string){ "name1" }
+        }
+      }
+      A2: (#struct){
+        B2: (#struct){
+          name: (string){ "name2" }
+        }
+      }
+      A3: (#struct){
+        B3: (#struct){
+          name: (string){ "name3" }
+        }
+      }
+      A4: (#struct){
+        B4: (#struct){
+          name: (string){ "name4" }
+        }
+      }
+      A5: (#struct){
+        B5: (#struct){
+          name: (string){ "name5" }
+        }
+      }
+      A6: (#struct){
+        B6: (#struct){
+          name: (string){ "name6" }
+        }
+      }
+      A7: (#struct){
+        B7: (#struct){
+          name: (string){ "name7" }
+        }
+      }
+      A8: (#struct){
+        B8: (#struct){
+          name: (string){ "name8" }
+        }
+      }
+      A9: (#struct){
+        B9: (#struct){
+          name: (string){ "name9" }
+        }
+      }
+      A10: (#struct){
+        B10: (#struct){
+          name: (string){ "name10" }
+        }
+      }
+      A11: (#struct){
+        B11: (#struct){
+          name: (string){ "name11" }
+        }
+      }
+      A12: (#struct){
+        B12: (#struct){
+          name: (string){ "name12" }
+        }
+      }
+      A13: (#struct){
+        B13: (#struct){
+          name: (string){ "name13" }
+        }
+      }
+      A14: (#struct){
+        B14: (#struct){
+          name: (string){ "name14" }
+        }
+      }
+      A15: (#struct){
+        B15: (#struct){
+          name: (string){ "name15" }
+        }
+      }
+      A16: (#struct){
+        B16: (#struct){
+          name: (string){ "name16" }
+        }
+      }
+      A17: (#struct){
+        B17: (#struct){
+          name: (string){ "name17" }
+        }
+      }
+      A18: (#struct){
+        B18: (#struct){
+          name: (string){ "name18" }
+        }
+      }
+      A19: (#struct){
+        B19: (#struct){
+          name: (string){ "name19" }
+        }
+      }
+      A20: (#struct){
+        B20: (#struct){
+          name: (string){ "name20" }
+        }
+      }
+      A21: (#struct){
+        B21: (#struct){
+          name: (string){ "name21" }
+        }
+      }
+      A22: (#struct){
+        B22: (#struct){
+          name: (string){ "name22" }
+        }
+      }
+      A23: (#struct){
+        B23: (#struct){
+          name: (string){ "name23" }
+        }
+      }
+      A24: (#struct){
+        B24: (#struct){
+          name: (string){ "name24" }
+        }
+      }
+      A25: (#struct){
+        B25: (#struct){
+          name: (string){ "name25" }
+        }
+      }
+      A26: (#struct){
+        B26: (#struct){
+          name: (string){ "name26" }
+        }
+      }
+      A27: (#struct){
+        B27: (#struct){
+          name: (string){ "name27" }
+        }
+      }
+      A28: (#struct){
+        B28: (#struct){
+          name: (string){ "name28" }
+        }
+      }
+      A29: (#struct){
+        B29: (#struct){
+          name: (string){ "name29" }
+        }
+      }
+      A30: (#struct){
+        B30: (#struct){
+          name: (string){ "name30" }
+        }
+      }
+      A31: (#struct){
+        B31: (#struct){
+          name: (string){ "name31" }
+        }
+      }
+      A32: (#struct){
+        B32: (#struct){
+          name: (string){ "name32" }
+        }
+      }
+      A33: (#struct){
+        B33: (#struct){
+          name: (string){ "name33" }
+        }
+      }
+      A34: (#struct){
+        B34: (#struct){
+          name: (string){ "name34" }
+        }
+      }
+      A35: (#struct){
+        B35: (#struct){
+          name: (string){ "name35" }
+        }
+      }
+      A36: (#struct){
+        B36: (#struct){
+          name: (string){ "name36" }
+        }
+      }
+      A37: (#struct){
+        B37: (#struct){
+          name: (string){ "name37" }
+        }
+      }
+      A38: (#struct){
+        B38: (#struct){
+          name: (string){ "name38" }
+        }
+      }
+      A39: (#struct){
+        B39: (#struct){
+          name: (string){ "name39" }
+        }
+      }
+      A40: (#struct){
+        B40: (#struct){
+          name: (string){ "name40" }
+        }
+      }
+      A41: (#struct){
+        B41: (#struct){
+          name: (string){ "name41" }
+        }
+      }
+      A42: (#struct){
+        B42: (#struct){
+          name: (string){ "name42" }
+        }
+      }
+      A43: (#struct){
+        B43: (#struct){
+          name: (string){ "name43" }
+        }
+      }
+      A44: (#struct){
+        B44: (#struct){
+          name: (string){ "name44" }
+        }
+      }
+      A45: (#struct){
+        B45: (#struct){
+          name: (string){ "name45" }
+        }
+      }
+      A46: (#struct){
+        B46: (#struct){
+          name: (string){ "name46" }
+        }
+      }
+      A47: (#struct){
+        B47: (#struct){
+          name: (string){ "name47" }
+        }
+      }
+      A48: (#struct){
+        B48: (#struct){
+          name: (string){ "name48" }
+        }
+      }
+      A49: (#struct){
+        B49: (#struct){
+          name: (string){ "name49" }
+        }
+      }
+      A50: (#struct){
+        B50: (#struct){
+          name: (string){ "name50" }
+        }
+      }
+      A51: (#struct){
+        B51: (#struct){
+          name: (string){ "name51" }
+        }
+      }
+      A52: (#struct){
+        B52: (#struct){
+          name: (string){ "name52" }
+        }
+      }
+      A53: (#struct){
+        B53: (#struct){
+          name: (string){ "name53" }
+        }
+      }
+      A54: (#struct){
+        B54: (#struct){
+          name: (string){ "name54" }
+        }
+      }
+      A55: (#struct){
+        B55: (#struct){
+          name: (string){ "name55" }
+        }
+      }
+      A56: (#struct){
+        B56: (#struct){
+          name: (string){ "name56" }
+        }
+      }
+      A57: (#struct){
+        B57: (#struct){
+          name: (string){ "name57" }
+        }
+      }
+      A58: (#struct){
+        B58: (#struct){
+          name: (string){ "name58" }
+        }
+      }
+      A59: (#struct){
+        B59: (#struct){
+          name: (string){ "name59" }
+        }
+      }
+      A60: (#struct){
+        B60: (#struct){
+          name: (string){ "name60" }
+        }
+      }
+      A61: (#struct){
+        B61: (#struct){
+          name: (string){ "name61" }
+        }
+      }
+      A62: (#struct){
+        B62: (#struct){
+          name: (string){ "name62" }
+        }
+      }
+      A63: (#struct){
+        B63: (#struct){
+          name: (string){ "name63" }
+        }
+      }
+      A64: (#struct){
+        B64: (#struct){
+          name: (string){ "name64" }
+        }
+      }
+      A65: (#struct){
+        B65: (#struct){
+          name: (string){ "name65" }
+        }
+      }
+      A66: (#struct){
+        B66: (#struct){
+          name: (string){ "name66" }
+        }
+      }
+      A67: (#struct){
+        B67: (#struct){
+          name: (string){ "name67" }
+        }
+      }
+      A68: (#struct){
+        B68: (#struct){
+          name: (string){ "name68" }
+        }
+      }
+      A69: (#struct){
+        B69: (#struct){
+          name: (string){ "name69" }
+        }
+      }
+      A70: (#struct){
+        B70: (#struct){
+          name: (string){ "name70" }
+        }
+      }
+      A71: (#struct){
+        B71: (#struct){
+          name: (string){ "name71" }
+        }
+      }
+      A72: (#struct){
+        B72: (#struct){
+          name: (string){ "name72" }
+        }
+      }
+      A73: (#struct){
+        B73: (#struct){
+          name: (string){ "name73" }
+        }
+      }
+      A74: (#struct){
+        B74: (#struct){
+          name: (string){ "name74" }
+        }
+      }
+      A75: (#struct){
+        B75: (#struct){
+          name: (string){ "name75" }
+        }
+      }
+      A76: (#struct){
+        B76: (#struct){
+          name: (string){ "name76" }
+        }
+      }
+      A77: (#struct){
+        B77: (#struct){
+          name: (string){ "name77" }
+        }
+      }
+      A78: (#struct){
+        B78: (#struct){
+          name: (string){ "name78" }
+        }
+      }
+      A79: (#struct){
+        B79: (#struct){
+          name: (string){ "name79" }
+        }
+      }
+      A80: (#struct){
+        B80: (#struct){
+          name: (string){ "name80" }
+        }
+      }
+      A81: (#struct){
+        B81: (#struct){
+          name: (string){ "name81" }
+        }
+      }
+      A82: (#struct){
+        B82: (#struct){
+          name: (string){ "name82" }
+        }
+      }
+      A83: (#struct){
+        B83: (#struct){
+          name: (string){ "name83" }
+        }
+      }
+      A84: (#struct){
+        B84: (#struct){
+          name: (string){ "name84" }
+        }
+      }
+      A85: (#struct){
+        B85: (#struct){
+          name: (string){ "name85" }
+        }
+      }
+      A86: (#struct){
+        B86: (#struct){
+          name: (string){ "name86" }
+        }
+      }
+      A87: (#struct){
+        B87: (#struct){
+          name: (string){ "name87" }
+        }
+      }
+      A88: (#struct){
+        B88: (#struct){
+          name: (string){ "name88" }
+        }
+      }
+      A89: (#struct){
+        B89: (#struct){
+          name: (string){ "name89" }
+        }
+      }
+      A90: (#struct){
+        B90: (#struct){
+          name: (string){ "name90" }
+        }
+      }
+      A91: (#struct){
+        B91: (#struct){
+          name: (string){ "name91" }
+        }
+      }
+      A92: (#struct){
+        B92: (#struct){
+          name: (string){ "name92" }
+        }
+      }
+      A93: (#struct){
+        B93: (#struct){
+          name: (string){ "name93" }
+        }
+      }
+      A94: (#struct){
+        B94: (#struct){
+          name: (string){ "name94" }
+        }
+      }
+      A95: (#struct){
+        B95: (#struct){
+          name: (string){ "name95" }
+        }
+      }
+      A96: (#struct){
+        B96: (#struct){
+          name: (string){ "name96" }
+        }
+      }
+      A97: (#struct){
+        B97: (#struct){
+          name: (string){ "name97" }
+        }
+      }
+      A98: (#struct){
+        B98: (#struct){
+          name: (string){ "name98" }
+        }
+      }
+      A99: (#struct){
+        B99: (#struct){
+          name: (string){ "name99" }
+        }
+      }
+      A100: (#struct){
+        B100: (#struct){
+          name: (string){ "name100" }
+        }
+      }
+      A101: (#struct){
+        B101: (#struct){
+          name: (string){ "name101" }
+        }
+      }
+      A102: (#struct){
+        B102: (#struct){
+          name: (string){ "name102" }
+        }
+      }
+      A103: (#struct){
+        B103: (#struct){
+          name: (string){ "name103" }
+        }
+      }
+      A104: (#struct){
+        B104: (#struct){
+          name: (string){ "name104" }
+        }
+      }
+      A105: (#struct){
+        B105: (#struct){
+          name: (string){ "name105" }
+        }
+      }
+      A106: (#struct){
+        B106: (#struct){
+          name: (string){ "name106" }
+        }
+      }
+      A107: (#struct){
+        B107: (#struct){
+          name: (string){ "name107" }
+        }
+      }
+      A108: (#struct){
+        B108: (#struct){
+          name: (string){ "name108" }
+        }
+      }
+      A109: (#struct){
+        B109: (#struct){
+          name: (string){ "name109" }
+        }
+      }
+      A110: (#struct){
+        B110: (#struct){
+          name: (string){ "name110" }
+        }
+      }
+      A111: (#struct){
+        B111: (#struct){
+          name: (string){ "name111" }
+        }
+      }
+      A112: (#struct){
+        B112: (#struct){
+          name: (string){ "name112" }
+        }
+      }
+      A113: (#struct){
+        B113: (#struct){
+          name: (string){ "name113" }
+        }
+      }
+      A114: (#struct){
+        B114: (#struct){
+          name: (string){ "name114" }
+        }
+      }
+      A115: (#struct){
+        B115: (#struct){
+          name: (string){ "name115" }
+        }
+      }
+      A116: (#struct){
+        B116: (#struct){
+          name: (string){ "name116" }
+        }
+      }
+      A117: (#struct){
+        B117: (#struct){
+          name: (string){ "name117" }
+        }
+      }
+      A118: (#struct){
+        B118: (#struct){
+          name: (string){ "name118" }
+        }
+      }
+      A119: (#struct){
+        B119: (#struct){
+          name: (string){ "name119" }
+        }
+      }
+      A120: (#struct){
+        B120: (#struct){
+          name: (string){ "name120" }
+        }
+      }
+      A121: (#struct){
+        B121: (#struct){
+          name: (string){ "name121" }
+        }
+      }
+      A122: (#struct){
+        B122: (#struct){
+          name: (string){ "name122" }
+        }
+      }
+      A123: (#struct){
+        B123: (#struct){
+          name: (string){ "name123" }
+        }
+      }
+      A124: (#struct){
+        B124: (#struct){
+          name: (string){ "name124" }
+        }
+      }
+      A125: (#struct){
+        B125: (#struct){
+          name: (string){ "name125" }
+        }
+      }
+      A126: (#struct){
+        B126: (#struct){
+          name: (string){ "name126" }
+        }
+      }
+      A127: (#struct){
+        B127: (#struct){
+          name: (string){ "name127" }
+        }
+      }
+      A128: (#struct){
+        B128: (#struct){
+          name: (string){ "name128" }
+        }
+      }
+      A129: (#struct){
+        B129: (#struct){
+          name: (string){ "name129" }
+        }
+      }
+      A130: (#struct){
+        B130: (#struct){
+          name: (string){ "name130" }
+        }
+      }
+      A131: (#struct){
+        B131: (#struct){
+          name: (string){ "name131" }
+        }
+      }
+      A132: (#struct){
+        B132: (#struct){
+          name: (string){ "name132" }
+        }
+      }
+      A133: (#struct){
+        B133: (#struct){
+          name: (string){ "name133" }
+        }
+      }
+      A134: (#struct){
+        B134: (#struct){
+          name: (string){ "name134" }
+        }
+      }
+      A135: (#struct){
+        B135: (#struct){
+          name: (string){ "name135" }
+        }
+      }
+      A136: (#struct){
+        B136: (#struct){
+          name: (string){ "name136" }
+        }
+      }
+      A137: (#struct){
+        B137: (#struct){
+          name: (string){ "name137" }
+        }
+      }
+      A138: (#struct){
+        B138: (#struct){
+          name: (string){ "name138" }
+        }
+      }
+      A139: (#struct){
+        B139: (#struct){
+          name: (string){ "name139" }
+        }
+      }
+      A140: (#struct){
+        B140: (#struct){
+          name: (string){ "name140" }
+        }
+      }
+      A141: (#struct){
+        B141: (#struct){
+          name: (string){ "name141" }
+        }
+      }
+      A142: (#struct){
+        B142: (#struct){
+          name: (string){ "name142" }
+        }
+      }
+      A143: (#struct){
+        B143: (#struct){
+          name: (string){ "name143" }
+        }
+      }
+      A144: (#struct){
+        B144: (#struct){
+          name: (string){ "name144" }
+        }
+      }
+      A145: (#struct){
+        B145: (#struct){
+          name: (string){ "name145" }
+        }
+      }
+      A146: (#struct){
+        B146: (#struct){
+          name: (string){ "name146" }
+        }
+      }
+      A147: (#struct){
+        B147: (#struct){
+          name: (string){ "name147" }
+        }
+      }
+      A148: (#struct){
+        B148: (#struct){
+          name: (string){ "name148" }
+        }
+      }
+      A149: (#struct){
+        B149: (#struct){
+          name: (string){ "name149" }
+        }
+      }
+      A150: (#struct){
+        B150: (#struct){
+          name: (string){ "name150" }
+        }
+      }
+      A151: (#struct){
+        B151: (#struct){
+          name: (string){ "name151" }
+        }
+      }
+      A152: (#struct){
+        B152: (#struct){
+          name: (string){ "name152" }
+        }
+      }
+      A153: (#struct){
+        B153: (#struct){
+          name: (string){ "name153" }
+        }
+      }
+      A154: (#struct){
+        B154: (#struct){
+          name: (string){ "name154" }
+        }
+      }
+      A155: (#struct){
+        B155: (#struct){
+          name: (string){ "name155" }
+        }
+      }
+      A156: (#struct){
+        B156: (#struct){
+          name: (string){ "name156" }
+        }
+      }
+      A157: (#struct){
+        B157: (#struct){
+          name: (string){ "name157" }
+        }
+      }
+      A158: (#struct){
+        B158: (#struct){
+          name: (string){ "name158" }
+        }
+      }
+      A159: (#struct){
+        B159: (#struct){
+          name: (string){ "name159" }
+        }
+      }
+      A160: (#struct){
+        B160: (#struct){
+          name: (string){ "name160" }
+        }
+      }
+      A161: (#struct){
+        B161: (#struct){
+          name: (string){ "name161" }
+        }
+      }
+      A162: (#struct){
+        B162: (#struct){
+          name: (string){ "name162" }
+        }
+      }
+      A163: (#struct){
+        B163: (#struct){
+          name: (string){ "name163" }
+        }
+      }
+      A164: (#struct){
+        B164: (#struct){
+          name: (string){ "name164" }
+        }
+      }
+      A165: (#struct){
+        B165: (#struct){
+          name: (string){ "name165" }
+        }
+      }
+      A166: (#struct){
+        B166: (#struct){
+          name: (string){ "name166" }
+        }
+      }
+      A167: (#struct){
+        B167: (#struct){
+          name: (string){ "name167" }
+        }
+      }
+      A168: (#struct){
+        B168: (#struct){
+          name: (string){ "name168" }
+        }
+      }
+      A169: (#struct){
+        B169: (#struct){
+          name: (string){ "name169" }
+        }
+      }
+      A170: (#struct){
+        B170: (#struct){
+          name: (string){ "name170" }
+        }
+      }
+      A171: (#struct){
+        B171: (#struct){
+          name: (string){ "name171" }
+        }
+      }
+      A172: (#struct){
+        B172: (#struct){
+          name: (string){ "name172" }
+        }
+      }
+      A173: (#struct){
+        B173: (#struct){
+          name: (string){ "name173" }
+        }
+      }
+      A174: (#struct){
+        B174: (#struct){
+          name: (string){ "name174" }
+        }
+      }
+      A175: (#struct){
+        B175: (#struct){
+          name: (string){ "name175" }
+        }
+      }
+      A176: (#struct){
+        B176: (#struct){
+          name: (string){ "name176" }
+        }
+      }
+      A177: (#struct){
+        B177: (#struct){
+          name: (string){ "name177" }
+        }
+      }
+      A178: (#struct){
+        B178: (#struct){
+          name: (string){ "name178" }
+        }
+      }
+      A179: (#struct){
+        B179: (#struct){
+          name: (string){ "name179" }
+        }
+      }
+      A180: (#struct){
+        B180: (#struct){
+          name: (string){ "name180" }
+        }
+      }
+      A181: (#struct){
+        B181: (#struct){
+          name: (string){ "name181" }
+        }
+      }
+      A182: (#struct){
+        B182: (#struct){
+          name: (string){ "name182" }
+        }
+      }
+      A183: (#struct){
+        B183: (#struct){
+          name: (string){ "name183" }
+        }
+      }
+      A184: (#struct){
+        B184: (#struct){
+          name: (string){ "name184" }
+        }
+      }
+      A185: (#struct){
+        B185: (#struct){
+          name: (string){ "name185" }
+        }
+      }
+      A186: (#struct){
+        B186: (#struct){
+          name: (string){ "name186" }
+        }
+      }
+      A187: (#struct){
+        B187: (#struct){
+          name: (string){ "name187" }
+        }
+      }
+      A188: (#struct){
+        B188: (#struct){
+          name: (string){ "name188" }
+        }
+      }
+      A189: (#struct){
+        B189: (#struct){
+          name: (string){ "name189" }
+        }
+      }
+      A190: (#struct){
+        B190: (#struct){
+          name: (string){ "name190" }
+        }
+      }
+      A191: (#struct){
+        B191: (#struct){
+          name: (string){ "name191" }
+        }
+      }
+      A192: (#struct){
+        B192: (#struct){
+          name: (string){ "name192" }
+        }
+      }
+      A193: (#struct){
+        B193: (#struct){
+          name: (string){ "name193" }
+        }
+      }
+      A194: (#struct){
+        B194: (#struct){
+          name: (string){ "name194" }
+        }
+      }
+      A195: (#struct){
+        B195: (#struct){
+          name: (string){ "name195" }
+        }
+      }
+      A196: (#struct){
+        B196: (#struct){
+          name: (string){ "name196" }
+        }
+      }
+      A197: (#struct){
+        B197: (#struct){
+          name: (string){ "name197" }
+        }
+      }
+      A198: (#struct){
+        B198: (#struct){
+          name: (string){ "name198" }
+        }
+      }
+      A199: (#struct){
+        B199: (#struct){
+          name: (string){ "name199" }
+        }
+      }
+      A200: (#struct){
+        B200: (#struct){
+          name: (string){ "name200" }
+        }
+      }
+      A201: (#struct){
+        B201: (#struct){
+          name: (string){ "name201" }
+        }
+      }
+      A202: (#struct){
+        B202: (#struct){
+          name: (string){ "name202" }
+        }
+      }
+      A203: (#struct){
+        B203: (#struct){
+          name: (string){ "name203" }
+        }
+      }
+      A204: (#struct){
+        B204: (#struct){
+          name: (string){ "name204" }
+        }
+      }
+      A205: (#struct){
+        B205: (#struct){
+          name: (string){ "name205" }
+        }
+      }
+      A206: (#struct){
+        B206: (#struct){
+          name: (string){ "name206" }
+        }
+      }
+      A207: (#struct){
+        B207: (#struct){
+          name: (string){ "name207" }
+        }
+      }
+      A208: (#struct){
+        B208: (#struct){
+          name: (string){ "name208" }
+        }
+      }
+      A209: (#struct){
+        B209: (#struct){
+          name: (string){ "name209" }
+        }
+      }
+      A210: (#struct){
+        B210: (#struct){
+          name: (string){ "name210" }
+        }
+      }
+      A211: (#struct){
+        B211: (#struct){
+          name: (string){ "name211" }
+        }
+      }
+      A212: (#struct){
+        B212: (#struct){
+          name: (string){ "name212" }
+        }
+      }
+      A213: (#struct){
+        B213: (#struct){
+          name: (string){ "name213" }
+        }
+      }
+      A214: (#struct){
+        B214: (#struct){
+          name: (string){ "name214" }
+        }
+      }
+      A215: (#struct){
+        B215: (#struct){
+          name: (string){ "name215" }
+        }
+      }
+      A216: (#struct){
+        B216: (#struct){
+          name: (string){ "name216" }
+        }
+      }
+      A217: (#struct){
+        B217: (#struct){
+          name: (string){ "name217" }
+        }
+      }
+      A218: (#struct){
+        B218: (#struct){
+          name: (string){ "name218" }
+        }
+      }
+      A219: (#struct){
+        B219: (#struct){
+          name: (string){ "name219" }
+        }
+      }
+      A220: (#struct){
+        B220: (#struct){
+          name: (string){ "name220" }
+        }
+      }
+      A221: (#struct){
+        B221: (#struct){
+          name: (string){ "name221" }
+        }
+      }
+      A222: (#struct){
+        B222: (#struct){
+          name: (string){ "name222" }
+        }
+      }
+      A223: (#struct){
+        B223: (#struct){
+          name: (string){ "name223" }
+        }
+      }
+      A224: (#struct){
+        B224: (#struct){
+          name: (string){ "name224" }
+        }
+      }
+      A225: (#struct){
+        B225: (#struct){
+          name: (string){ "name225" }
+        }
+      }
+      A226: (#struct){
+        B226: (#struct){
+          name: (string){ "name226" }
+        }
+      }
+      A227: (#struct){
+        B227: (#struct){
+          name: (string){ "name227" }
+        }
+      }
+      A228: (#struct){
+        B228: (#struct){
+          name: (string){ "name228" }
+        }
+      }
+      A229: (#struct){
+        B229: (#struct){
+          name: (string){ "name229" }
+        }
+      }
+      A230: (#struct){
+        B230: (#struct){
+          name: (string){ "name230" }
+        }
+      }
+      A231: (#struct){
+        B231: (#struct){
+          name: (string){ "name231" }
+        }
+      }
+      A232: (#struct){
+        B232: (#struct){
+          name: (string){ "name232" }
+        }
+      }
+      A233: (#struct){
+        B233: (#struct){
+          name: (string){ "name233" }
+        }
+      }
+      A234: (#struct){
+        B234: (#struct){
+          name: (string){ "name234" }
+        }
+      }
+      A235: (#struct){
+        B235: (#struct){
+          name: (string){ "name235" }
+        }
+      }
+      A236: (#struct){
+        B236: (#struct){
+          name: (string){ "name236" }
+        }
+      }
+      A237: (#struct){
+        B237: (#struct){
+          name: (string){ "name237" }
+        }
+      }
+      A238: (#struct){
+        B238: (#struct){
+          name: (string){ "name238" }
+        }
+      }
+      A239: (#struct){
+        B239: (#struct){
+          name: (string){ "name239" }
+        }
+      }
+      A240: (#struct){
+        B240: (#struct){
+          name: (string){ "name240" }
+        }
+      }
+      A241: (#struct){
+        B241: (#struct){
+          name: (string){ "name241" }
+        }
+      }
+      A242: (#struct){
+        B242: (#struct){
+          name: (string){ "name242" }
+        }
+      }
+      A243: (#struct){
+        B243: (#struct){
+          name: (string){ "name243" }
+        }
+      }
+      A244: (#struct){
+        B244: (#struct){
+          name: (string){ "name244" }
+        }
+      }
+      A245: (#struct){
+        B245: (#struct){
+          name: (string){ "name245" }
+        }
+      }
+      A246: (#struct){
+        B246: (#struct){
+          name: (string){ "name246" }
+        }
+      }
+      A247: (#struct){
+        B247: (#struct){
+          name: (string){ "name247" }
+        }
+      }
+      A248: (#struct){
+        B248: (#struct){
+          name: (string){ "name248" }
+        }
+      }
+      A249: (#struct){
+        B249: (#struct){
+          name: (string){ "name249" }
+        }
+      }
+      A250: (#struct){
+        B250: (#struct){
+          name: (string){ "name250" }
+        }
+      }
+      A251: (#struct){
+        B251: (#struct){
+          name: (string){ "name251" }
+        }
+      }
+      A252: (#struct){
+        B252: (#struct){
+          name: (string){ "name252" }
+        }
+      }
+      A253: (#struct){
+        B253: (#struct){
+          name: (string){ "name253" }
+        }
+      }
+      A254: (#struct){
+        B254: (#struct){
+          name: (string){ "name254" }
+        }
+      }
+      A255: (#struct){
+        B255: (#struct){
+          name: (string){ "name255" }
+        }
+      }
+      A256: (#struct){
+        B256: (#struct){
+          name: (string){ "name256" }
+        }
+      }
+      A257: (#struct){
+        B257: (#struct){
+          name: (string){ "name257" }
+        }
+      }
+      A258: (#struct){
+        B258: (#struct){
+          name: (string){ "name258" }
+        }
+      }
+      A259: (#struct){
+        B259: (#struct){
+          name: (string){ "name259" }
+        }
+      }
+      A260: (#struct){
+        B260: (#struct){
+          name: (string){ "name260" }
+        }
+      }
+      A261: (#struct){
+        B261: (#struct){
+          name: (string){ "name261" }
+        }
+      }
+      A262: (#struct){
+        B262: (#struct){
+          name: (string){ "name262" }
+        }
+      }
+      A263: (#struct){
+        B263: (#struct){
+          name: (string){ "name263" }
+        }
+      }
+      A264: (#struct){
+        B264: (#struct){
+          name: (string){ "name264" }
+        }
+      }
+      A265: (#struct){
+        B265: (#struct){
+          name: (string){ "name265" }
+        }
+      }
+      A266: (#struct){
+        B266: (#struct){
+          name: (string){ "name266" }
+        }
+      }
+      A267: (#struct){
+        B267: (#struct){
+          name: (string){ "name267" }
+        }
+      }
+      A268: (#struct){
+        B268: (#struct){
+          name: (string){ "name268" }
+        }
+      }
+      A269: (#struct){
+        B269: (#struct){
+          name: (string){ "name269" }
+        }
+      }
+      A270: (#struct){
+        B270: (#struct){
+          name: (string){ "name270" }
+        }
+      }
+      A271: (#struct){
+        B271: (#struct){
+          name: (string){ "name271" }
+        }
+      }
+      A272: (#struct){
+        B272: (#struct){
+          name: (string){ "name272" }
+        }
+      }
+      A273: (#struct){
+        B273: (#struct){
+          name: (string){ "name273" }
+        }
+      }
+      A274: (#struct){
+        B274: (#struct){
+          name: (string){ "name274" }
+        }
+      }
+      A275: (#struct){
+        B275: (#struct){
+          name: (string){ "name275" }
+        }
+      }
+      A276: (#struct){
+        B276: (#struct){
+          name: (string){ "name276" }
+        }
+      }
+      A277: (#struct){
+        B277: (#struct){
+          name: (string){ "name277" }
+        }
+      }
+      A278: (#struct){
+        B278: (#struct){
+          name: (string){ "name278" }
+        }
+      }
+      A279: (#struct){
+        B279: (#struct){
+          name: (string){ "name279" }
+        }
+      }
+      A280: (#struct){
+        B280: (#struct){
+          name: (string){ "name280" }
+        }
+      }
+      A281: (#struct){
+        B281: (#struct){
+          name: (string){ "name281" }
+        }
+      }
+      A282: (#struct){
+        B282: (#struct){
+          name: (string){ "name282" }
+        }
+      }
+      A283: (#struct){
+        B283: (#struct){
+          name: (string){ "name283" }
+        }
+      }
+      A284: (#struct){
+        B284: (#struct){
+          name: (string){ "name284" }
+        }
+      }
+      A285: (#struct){
+        B285: (#struct){
+          name: (string){ "name285" }
+        }
+      }
+      A286: (#struct){
+        B286: (#struct){
+          name: (string){ "name286" }
+        }
+      }
+      A287: (#struct){
+        B287: (#struct){
+          name: (string){ "name287" }
+        }
+      }
+      A288: (#struct){
+        B288: (#struct){
+          name: (string){ "name288" }
+        }
+      }
+      A289: (#struct){
+        B289: (#struct){
+          name: (string){ "name289" }
+        }
+      }
+      A290: (#struct){
+        B290: (#struct){
+          name: (string){ "name290" }
+        }
+      }
+      A291: (#struct){
+        B291: (#struct){
+          name: (string){ "name291" }
+        }
+      }
+      A292: (#struct){
+        B292: (#struct){
+          name: (string){ "name292" }
+        }
+      }
+      A293: (#struct){
+        B293: (#struct){
+          name: (string){ "name293" }
+        }
+      }
+      A294: (#struct){
+        B294: (#struct){
+          name: (string){ "name294" }
+        }
+      }
+      A295: (#struct){
+        B295: (#struct){
+          name: (string){ "name295" }
+        }
+      }
+      A296: (#struct){
+        B296: (#struct){
+          name: (string){ "name296" }
+        }
+      }
+      A297: (#struct){
+        B297: (#struct){
+          name: (string){ "name297" }
+        }
+      }
+      A298: (#struct){
+        B298: (#struct){
+          name: (string){ "name298" }
+        }
+      }
+      A299: (#struct){
+        B299: (#struct){
+          name: (string){ "name299" }
+        }
+      }
+    }
+    B1: (string){ "name1" }
+    B2: (string){ "name2" }
+    B3: (string){ "name3" }
+    B4: (string){ "name4" }
+    B5: (string){ "name5" }
+    B6: (string){ "name6" }
+    B7: (string){ "name7" }
+    B8: (string){ "name8" }
+    B9: (string){ "name9" }
+    B10: (string){ "name10" }
+    B11: (string){ "name11" }
+    B12: (string){ "name12" }
+    B13: (string){ "name13" }
+    B14: (string){ "name14" }
+    B15: (string){ "name15" }
+    B16: (string){ "name16" }
+    B17: (string){ "name17" }
+    B18: (string){ "name18" }
+    B19: (string){ "name19" }
+    B20: (string){ "name20" }
+    B21: (string){ "name21" }
+    B22: (string){ "name22" }
+    B23: (string){ "name23" }
+    B24: (string){ "name24" }
+    B25: (string){ "name25" }
+    B26: (string){ "name26" }
+    B27: (string){ "name27" }
+    B28: (string){ "name28" }
+    B29: (string){ "name29" }
+    B30: (string){ "name30" }
+    B31: (string){ "name31" }
+    B32: (string){ "name32" }
+    B33: (string){ "name33" }
+    B34: (string){ "name34" }
+    B35: (string){ "name35" }
+    B36: (string){ "name36" }
+    B37: (string){ "name37" }
+    B38: (string){ "name38" }
+    B39: (string){ "name39" }
+    B40: (string){ "name40" }
+    B41: (string){ "name41" }
+    B42: (string){ "name42" }
+    B43: (string){ "name43" }
+    B44: (string){ "name44" }
+    B45: (string){ "name45" }
+    B46: (string){ "name46" }
+    B47: (string){ "name47" }
+    B48: (string){ "name48" }
+    B49: (string){ "name49" }
+    B50: (string){ "name50" }
+    B51: (string){ "name51" }
+    B52: (string){ "name52" }
+    B53: (string){ "name53" }
+    B54: (string){ "name54" }
+    B55: (string){ "name55" }
+    B56: (string){ "name56" }
+    B57: (string){ "name57" }
+    B58: (string){ "name58" }
+    B59: (string){ "name59" }
+    B60: (string){ "name60" }
+    B61: (string){ "name61" }
+    B62: (string){ "name62" }
+    B63: (string){ "name63" }
+    B64: (string){ "name64" }
+    B65: (string){ "name65" }
+    B66: (string){ "name66" }
+    B67: (string){ "name67" }
+    B68: (string){ "name68" }
+    B69: (string){ "name69" }
+    B70: (string){ "name70" }
+    B71: (string){ "name71" }
+    B72: (string){ "name72" }
+    B73: (string){ "name73" }
+    B74: (string){ "name74" }
+    B75: (string){ "name75" }
+    B76: (string){ "name76" }
+    B77: (string){ "name77" }
+    B78: (string){ "name78" }
+    B79: (string){ "name79" }
+    B80: (string){ "name80" }
+    B81: (string){ "name81" }
+    B82: (string){ "name82" }
+    B83: (string){ "name83" }
+    B84: (string){ "name84" }
+    B85: (string){ "name85" }
+    B86: (string){ "name86" }
+    B87: (string){ "name87" }
+    B88: (string){ "name88" }
+    B89: (string){ "name89" }
+    B90: (string){ "name90" }
+    B91: (string){ "name91" }
+    B92: (string){ "name92" }
+    B93: (string){ "name93" }
+    B94: (string){ "name94" }
+    B95: (string){ "name95" }
+    B96: (string){ "name96" }
+    B97: (string){ "name97" }
+    B98: (string){ "name98" }
+    B99: (string){ "name99" }
+    B100: (string){ "name100" }
+    B101: (string){ "name101" }
+    B102: (string){ "name102" }
+    B103: (string){ "name103" }
+    B104: (string){ "name104" }
+    B105: (string){ "name105" }
+    B106: (string){ "name106" }
+    B107: (string){ "name107" }
+    B108: (string){ "name108" }
+    B109: (string){ "name109" }
+    B110: (string){ "name110" }
+    B111: (string){ "name111" }
+    B112: (string){ "name112" }
+    B113: (string){ "name113" }
+    B114: (string){ "name114" }
+    B115: (string){ "name115" }
+    B116: (string){ "name116" }
+    B117: (string){ "name117" }
+    B118: (string){ "name118" }
+    B119: (string){ "name119" }
+    B120: (string){ "name120" }
+    B121: (string){ "name121" }
+    B122: (string){ "name122" }
+    B123: (string){ "name123" }
+    B124: (string){ "name124" }
+    B125: (string){ "name125" }
+    B126: (string){ "name126" }
+    B127: (string){ "name127" }
+    B128: (string){ "name128" }
+    B129: (string){ "name129" }
+    B130: (string){ "name130" }
+    B131: (string){ "name131" }
+    B132: (string){ "name132" }
+    B133: (string){ "name133" }
+    B134: (string){ "name134" }
+    B135: (string){ "name135" }
+    B136: (string){ "name136" }
+    B137: (string){ "name137" }
+    B138: (string){ "name138" }
+    B139: (string){ "name139" }
+    B140: (string){ "name140" }
+    B141: (string){ "name141" }
+    B142: (string){ "name142" }
+    B143: (string){ "name143" }
+    B144: (string){ "name144" }
+    B145: (string){ "name145" }
+    B146: (string){ "name146" }
+    B147: (string){ "name147" }
+    B148: (string){ "name148" }
+    B149: (string){ "name149" }
+    B150: (string){ "name150" }
+    B151: (string){ "name151" }
+    B152: (string){ "name152" }
+    B153: (string){ "name153" }
+    B154: (string){ "name154" }
+    B155: (string){ "name155" }
+    B156: (string){ "name156" }
+    B157: (string){ "name157" }
+    B158: (string){ "name158" }
+    B159: (string){ "name159" }
+    B160: (string){ "name160" }
+    B161: (string){ "name161" }
+    B162: (string){ "name162" }
+    B163: (string){ "name163" }
+    B164: (string){ "name164" }
+    B165: (string){ "name165" }
+    B166: (string){ "name166" }
+    B167: (string){ "name167" }
+    B168: (string){ "name168" }
+    B169: (string){ "name169" }
+    B170: (string){ "name170" }
+    B171: (string){ "name171" }
+    B172: (string){ "name172" }
+    B173: (string){ "name173" }
+    B174: (string){ "name174" }
+    B175: (string){ "name175" }
+    B176: (string){ "name176" }
+    B177: (string){ "name177" }
+    B178: (string){ "name178" }
+    B179: (string){ "name179" }
+    B180: (string){ "name180" }
+    B181: (string){ "name181" }
+    B182: (string){ "name182" }
+    B183: (string){ "name183" }
+    B184: (string){ "name184" }
+    B185: (string){ "name185" }
+    B186: (string){ "name186" }
+    B187: (string){ "name187" }
+    B188: (string){ "name188" }
+    B189: (string){ "name189" }
+    B190: (string){ "name190" }
+    B191: (string){ "name191" }
+    B192: (string){ "name192" }
+    B193: (string){ "name193" }
+    B194: (string){ "name194" }
+    B195: (string){ "name195" }
+    B196: (string){ "name196" }
+    B197: (string){ "name197" }
+    B198: (string){ "name198" }
+    B199: (string){ "name199" }
+    B200: (string){ "name200" }
+    B201: (string){ "name201" }
+    B202: (string){ "name202" }
+    B203: (string){ "name203" }
+    B204: (string){ "name204" }
+    B205: (string){ "name205" }
+    B206: (string){ "name206" }
+    B207: (string){ "name207" }
+    B208: (string){ "name208" }
+    B209: (string){ "name209" }
+    B210: (string){ "name210" }
+    B211: (string){ "name211" }
+    B212: (string){ "name212" }
+    B213: (string){ "name213" }
+    B214: (string){ "name214" }
+    B215: (string){ "name215" }
+    B216: (string){ "name216" }
+    B217: (string){ "name217" }
+    B218: (string){ "name218" }
+    B219: (string){ "name219" }
+    B220: (string){ "name220" }
+    B221: (string){ "name221" }
+    B222: (string){ "name222" }
+    B223: (string){ "name223" }
+    B224: (string){ "name224" }
+    B225: (string){ "name225" }
+    B226: (string){ "name226" }
+    B227: (string){ "name227" }
+    B228: (string){ "name228" }
+    B229: (string){ "name229" }
+    B230: (string){ "name230" }
+    B231: (string){ "name231" }
+    B232: (string){ "name232" }
+    B233: (string){ "name233" }
+    B234: (string){ "name234" }
+    B235: (string){ "name235" }
+    B236: (string){ "name236" }
+    B237: (string){ "name237" }
+    B238: (string){ "name238" }
+    B239: (string){ "name239" }
+    B240: (string){ "name240" }
+    B241: (string){ "name241" }
+    B242: (string){ "name242" }
+    B243: (string){ "name243" }
+    B244: (string){ "name244" }
+    B245: (string){ "name245" }
+    B246: (string){ "name246" }
+    B247: (string){ "name247" }
+    B248: (string){ "name248" }
+    B249: (string){ "name249" }
+    B250: (string){ "name250" }
+    B251: (string){ "name251" }
+    B252: (string){ "name252" }
+    B253: (string){ "name253" }
+    B254: (string){ "name254" }
+    B255: (string){ "name255" }
+    B256: (string){ "name256" }
+    B257: (string){ "name257" }
+    B258: (string){ "name258" }
+    B259: (string){ "name259" }
+    B260: (string){ "name260" }
+    B261: (string){ "name261" }
+    B262: (string){ "name262" }
+    B263: (string){ "name263" }
+    B264: (string){ "name264" }
+    B265: (string){ "name265" }
+    B266: (string){ "name266" }
+    B267: (string){ "name267" }
+    B268: (string){ "name268" }
+    B269: (string){ "name269" }
+    B270: (string){ "name270" }
+    B271: (string){ "name271" }
+    B272: (string){ "name272" }
+    B273: (string){ "name273" }
+    B274: (string){ "name274" }
+    B275: (string){ "name275" }
+    B276: (string){ "name276" }
+    B277: (string){ "name277" }
+    B278: (string){ "name278" }
+    B279: (string){ "name279" }
+    B280: (string){ "name280" }
+    B281: (string){ "name281" }
+    B282: (string){ "name282" }
+    B283: (string){ "name283" }
+    B284: (string){ "name284" }
+    B285: (string){ "name285" }
+    B286: (string){ "name286" }
+    B287: (string){ "name287" }
+    B288: (string){ "name288" }
+    B289: (string){ "name289" }
+    B290: (string){ "name290" }
+    B291: (string){ "name291" }
+    B292: (string){ "name292" }
+    B293: (string){ "name293" }
+    B294: (string){ "name294" }
+    B295: (string){ "name295" }
+    B296: (string){ "name296" }
+    B297: (string){ "name297" }
+    B298: (string){ "name298" }
+    B299: (string){ "name299" }
+  }
+  _input: (struct){
+    A1: (struct){
+      B1: (struct){
+        name: (string){ "name1" }
+      }
+    }
+    A2: (struct){
+      B2: (struct){
+        name: (string){ "name2" }
+      }
+    }
+    A3: (struct){
+      B3: (struct){
+        name: (string){ "name3" }
+      }
+    }
+    A4: (struct){
+      B4: (struct){
+        name: (string){ "name4" }
+      }
+    }
+    A5: (struct){
+      B5: (struct){
+        name: (string){ "name5" }
+      }
+    }
+    A6: (struct){
+      B6: (struct){
+        name: (string){ "name6" }
+      }
+    }
+    A7: (struct){
+      B7: (struct){
+        name: (string){ "name7" }
+      }
+    }
+    A8: (struct){
+      B8: (struct){
+        name: (string){ "name8" }
+      }
+    }
+    A9: (struct){
+      B9: (struct){
+        name: (string){ "name9" }
+      }
+    }
+    A10: (struct){
+      B10: (struct){
+        name: (string){ "name10" }
+      }
+    }
+    A11: (struct){
+      B11: (struct){
+        name: (string){ "name11" }
+      }
+    }
+    A12: (struct){
+      B12: (struct){
+        name: (string){ "name12" }
+      }
+    }
+    A13: (struct){
+      B13: (struct){
+        name: (string){ "name13" }
+      }
+    }
+    A14: (struct){
+      B14: (struct){
+        name: (string){ "name14" }
+      }
+    }
+    A15: (struct){
+      B15: (struct){
+        name: (string){ "name15" }
+      }
+    }
+    A16: (struct){
+      B16: (struct){
+        name: (string){ "name16" }
+      }
+    }
+    A17: (struct){
+      B17: (struct){
+        name: (string){ "name17" }
+      }
+    }
+    A18: (struct){
+      B18: (struct){
+        name: (string){ "name18" }
+      }
+    }
+    A19: (struct){
+      B19: (struct){
+        name: (string){ "name19" }
+      }
+    }
+    A20: (struct){
+      B20: (struct){
+        name: (string){ "name20" }
+      }
+    }
+    A21: (struct){
+      B21: (struct){
+        name: (string){ "name21" }
+      }
+    }
+    A22: (struct){
+      B22: (struct){
+        name: (string){ "name22" }
+      }
+    }
+    A23: (struct){
+      B23: (struct){
+        name: (string){ "name23" }
+      }
+    }
+    A24: (struct){
+      B24: (struct){
+        name: (string){ "name24" }
+      }
+    }
+    A25: (struct){
+      B25: (struct){
+        name: (string){ "name25" }
+      }
+    }
+    A26: (struct){
+      B26: (struct){
+        name: (string){ "name26" }
+      }
+    }
+    A27: (struct){
+      B27: (struct){
+        name: (string){ "name27" }
+      }
+    }
+    A28: (struct){
+      B28: (struct){
+        name: (string){ "name28" }
+      }
+    }
+    A29: (struct){
+      B29: (struct){
+        name: (string){ "name29" }
+      }
+    }
+    A30: (struct){
+      B30: (struct){
+        name: (string){ "name30" }
+      }
+    }
+    A31: (struct){
+      B31: (struct){
+        name: (string){ "name31" }
+      }
+    }
+    A32: (struct){
+      B32: (struct){
+        name: (string){ "name32" }
+      }
+    }
+    A33: (struct){
+      B33: (struct){
+        name: (string){ "name33" }
+      }
+    }
+    A34: (struct){
+      B34: (struct){
+        name: (string){ "name34" }
+      }
+    }
+    A35: (struct){
+      B35: (struct){
+        name: (string){ "name35" }
+      }
+    }
+    A36: (struct){
+      B36: (struct){
+        name: (string){ "name36" }
+      }
+    }
+    A37: (struct){
+      B37: (struct){
+        name: (string){ "name37" }
+      }
+    }
+    A38: (struct){
+      B38: (struct){
+        name: (string){ "name38" }
+      }
+    }
+    A39: (struct){
+      B39: (struct){
+        name: (string){ "name39" }
+      }
+    }
+    A40: (struct){
+      B40: (struct){
+        name: (string){ "name40" }
+      }
+    }
+    A41: (struct){
+      B41: (struct){
+        name: (string){ "name41" }
+      }
+    }
+    A42: (struct){
+      B42: (struct){
+        name: (string){ "name42" }
+      }
+    }
+    A43: (struct){
+      B43: (struct){
+        name: (string){ "name43" }
+      }
+    }
+    A44: (struct){
+      B44: (struct){
+        name: (string){ "name44" }
+      }
+    }
+    A45: (struct){
+      B45: (struct){
+        name: (string){ "name45" }
+      }
+    }
+    A46: (struct){
+      B46: (struct){
+        name: (string){ "name46" }
+      }
+    }
+    A47: (struct){
+      B47: (struct){
+        name: (string){ "name47" }
+      }
+    }
+    A48: (struct){
+      B48: (struct){
+        name: (string){ "name48" }
+      }
+    }
+    A49: (struct){
+      B49: (struct){
+        name: (string){ "name49" }
+      }
+    }
+    A50: (struct){
+      B50: (struct){
+        name: (string){ "name50" }
+      }
+    }
+    A51: (struct){
+      B51: (struct){
+        name: (string){ "name51" }
+      }
+    }
+    A52: (struct){
+      B52: (struct){
+        name: (string){ "name52" }
+      }
+    }
+    A53: (struct){
+      B53: (struct){
+        name: (string){ "name53" }
+      }
+    }
+    A54: (struct){
+      B54: (struct){
+        name: (string){ "name54" }
+      }
+    }
+    A55: (struct){
+      B55: (struct){
+        name: (string){ "name55" }
+      }
+    }
+    A56: (struct){
+      B56: (struct){
+        name: (string){ "name56" }
+      }
+    }
+    A57: (struct){
+      B57: (struct){
+        name: (string){ "name57" }
+      }
+    }
+    A58: (struct){
+      B58: (struct){
+        name: (string){ "name58" }
+      }
+    }
+    A59: (struct){
+      B59: (struct){
+        name: (string){ "name59" }
+      }
+    }
+    A60: (struct){
+      B60: (struct){
+        name: (string){ "name60" }
+      }
+    }
+    A61: (struct){
+      B61: (struct){
+        name: (string){ "name61" }
+      }
+    }
+    A62: (struct){
+      B62: (struct){
+        name: (string){ "name62" }
+      }
+    }
+    A63: (struct){
+      B63: (struct){
+        name: (string){ "name63" }
+      }
+    }
+    A64: (struct){
+      B64: (struct){
+        name: (string){ "name64" }
+      }
+    }
+    A65: (struct){
+      B65: (struct){
+        name: (string){ "name65" }
+      }
+    }
+    A66: (struct){
+      B66: (struct){
+        name: (string){ "name66" }
+      }
+    }
+    A67: (struct){
+      B67: (struct){
+        name: (string){ "name67" }
+      }
+    }
+    A68: (struct){
+      B68: (struct){
+        name: (string){ "name68" }
+      }
+    }
+    A69: (struct){
+      B69: (struct){
+        name: (string){ "name69" }
+      }
+    }
+    A70: (struct){
+      B70: (struct){
+        name: (string){ "name70" }
+      }
+    }
+    A71: (struct){
+      B71: (struct){
+        name: (string){ "name71" }
+      }
+    }
+    A72: (struct){
+      B72: (struct){
+        name: (string){ "name72" }
+      }
+    }
+    A73: (struct){
+      B73: (struct){
+        name: (string){ "name73" }
+      }
+    }
+    A74: (struct){
+      B74: (struct){
+        name: (string){ "name74" }
+      }
+    }
+    A75: (struct){
+      B75: (struct){
+        name: (string){ "name75" }
+      }
+    }
+    A76: (struct){
+      B76: (struct){
+        name: (string){ "name76" }
+      }
+    }
+    A77: (struct){
+      B77: (struct){
+        name: (string){ "name77" }
+      }
+    }
+    A78: (struct){
+      B78: (struct){
+        name: (string){ "name78" }
+      }
+    }
+    A79: (struct){
+      B79: (struct){
+        name: (string){ "name79" }
+      }
+    }
+    A80: (struct){
+      B80: (struct){
+        name: (string){ "name80" }
+      }
+    }
+    A81: (struct){
+      B81: (struct){
+        name: (string){ "name81" }
+      }
+    }
+    A82: (struct){
+      B82: (struct){
+        name: (string){ "name82" }
+      }
+    }
+    A83: (struct){
+      B83: (struct){
+        name: (string){ "name83" }
+      }
+    }
+    A84: (struct){
+      B84: (struct){
+        name: (string){ "name84" }
+      }
+    }
+    A85: (struct){
+      B85: (struct){
+        name: (string){ "name85" }
+      }
+    }
+    A86: (struct){
+      B86: (struct){
+        name: (string){ "name86" }
+      }
+    }
+    A87: (struct){
+      B87: (struct){
+        name: (string){ "name87" }
+      }
+    }
+    A88: (struct){
+      B88: (struct){
+        name: (string){ "name88" }
+      }
+    }
+    A89: (struct){
+      B89: (struct){
+        name: (string){ "name89" }
+      }
+    }
+    A90: (struct){
+      B90: (struct){
+        name: (string){ "name90" }
+      }
+    }
+    A91: (struct){
+      B91: (struct){
+        name: (string){ "name91" }
+      }
+    }
+    A92: (struct){
+      B92: (struct){
+        name: (string){ "name92" }
+      }
+    }
+    A93: (struct){
+      B93: (struct){
+        name: (string){ "name93" }
+      }
+    }
+    A94: (struct){
+      B94: (struct){
+        name: (string){ "name94" }
+      }
+    }
+    A95: (struct){
+      B95: (struct){
+        name: (string){ "name95" }
+      }
+    }
+    A96: (struct){
+      B96: (struct){
+        name: (string){ "name96" }
+      }
+    }
+    A97: (struct){
+      B97: (struct){
+        name: (string){ "name97" }
+      }
+    }
+    A98: (struct){
+      B98: (struct){
+        name: (string){ "name98" }
+      }
+    }
+    A99: (struct){
+      B99: (struct){
+        name: (string){ "name99" }
+      }
+    }
+    A100: (struct){
+      B100: (struct){
+        name: (string){ "name100" }
+      }
+    }
+    A101: (struct){
+      B101: (struct){
+        name: (string){ "name101" }
+      }
+    }
+    A102: (struct){
+      B102: (struct){
+        name: (string){ "name102" }
+      }
+    }
+    A103: (struct){
+      B103: (struct){
+        name: (string){ "name103" }
+      }
+    }
+    A104: (struct){
+      B104: (struct){
+        name: (string){ "name104" }
+      }
+    }
+    A105: (struct){
+      B105: (struct){
+        name: (string){ "name105" }
+      }
+    }
+    A106: (struct){
+      B106: (struct){
+        name: (string){ "name106" }
+      }
+    }
+    A107: (struct){
+      B107: (struct){
+        name: (string){ "name107" }
+      }
+    }
+    A108: (struct){
+      B108: (struct){
+        name: (string){ "name108" }
+      }
+    }
+    A109: (struct){
+      B109: (struct){
+        name: (string){ "name109" }
+      }
+    }
+    A110: (struct){
+      B110: (struct){
+        name: (string){ "name110" }
+      }
+    }
+    A111: (struct){
+      B111: (struct){
+        name: (string){ "name111" }
+      }
+    }
+    A112: (struct){
+      B112: (struct){
+        name: (string){ "name112" }
+      }
+    }
+    A113: (struct){
+      B113: (struct){
+        name: (string){ "name113" }
+      }
+    }
+    A114: (struct){
+      B114: (struct){
+        name: (string){ "name114" }
+      }
+    }
+    A115: (struct){
+      B115: (struct){
+        name: (string){ "name115" }
+      }
+    }
+    A116: (struct){
+      B116: (struct){
+        name: (string){ "name116" }
+      }
+    }
+    A117: (struct){
+      B117: (struct){
+        name: (string){ "name117" }
+      }
+    }
+    A118: (struct){
+      B118: (struct){
+        name: (string){ "name118" }
+      }
+    }
+    A119: (struct){
+      B119: (struct){
+        name: (string){ "name119" }
+      }
+    }
+    A120: (struct){
+      B120: (struct){
+        name: (string){ "name120" }
+      }
+    }
+    A121: (struct){
+      B121: (struct){
+        name: (string){ "name121" }
+      }
+    }
+    A122: (struct){
+      B122: (struct){
+        name: (string){ "name122" }
+      }
+    }
+    A123: (struct){
+      B123: (struct){
+        name: (string){ "name123" }
+      }
+    }
+    A124: (struct){
+      B124: (struct){
+        name: (string){ "name124" }
+      }
+    }
+    A125: (struct){
+      B125: (struct){
+        name: (string){ "name125" }
+      }
+    }
+    A126: (struct){
+      B126: (struct){
+        name: (string){ "name126" }
+      }
+    }
+    A127: (struct){
+      B127: (struct){
+        name: (string){ "name127" }
+      }
+    }
+    A128: (struct){
+      B128: (struct){
+        name: (string){ "name128" }
+      }
+    }
+    A129: (struct){
+      B129: (struct){
+        name: (string){ "name129" }
+      }
+    }
+    A130: (struct){
+      B130: (struct){
+        name: (string){ "name130" }
+      }
+    }
+    A131: (struct){
+      B131: (struct){
+        name: (string){ "name131" }
+      }
+    }
+    A132: (struct){
+      B132: (struct){
+        name: (string){ "name132" }
+      }
+    }
+    A133: (struct){
+      B133: (struct){
+        name: (string){ "name133" }
+      }
+    }
+    A134: (struct){
+      B134: (struct){
+        name: (string){ "name134" }
+      }
+    }
+    A135: (struct){
+      B135: (struct){
+        name: (string){ "name135" }
+      }
+    }
+    A136: (struct){
+      B136: (struct){
+        name: (string){ "name136" }
+      }
+    }
+    A137: (struct){
+      B137: (struct){
+        name: (string){ "name137" }
+      }
+    }
+    A138: (struct){
+      B138: (struct){
+        name: (string){ "name138" }
+      }
+    }
+    A139: (struct){
+      B139: (struct){
+        name: (string){ "name139" }
+      }
+    }
+    A140: (struct){
+      B140: (struct){
+        name: (string){ "name140" }
+      }
+    }
+    A141: (struct){
+      B141: (struct){
+        name: (string){ "name141" }
+      }
+    }
+    A142: (struct){
+      B142: (struct){
+        name: (string){ "name142" }
+      }
+    }
+    A143: (struct){
+      B143: (struct){
+        name: (string){ "name143" }
+      }
+    }
+    A144: (struct){
+      B144: (struct){
+        name: (string){ "name144" }
+      }
+    }
+    A145: (struct){
+      B145: (struct){
+        name: (string){ "name145" }
+      }
+    }
+    A146: (struct){
+      B146: (struct){
+        name: (string){ "name146" }
+      }
+    }
+    A147: (struct){
+      B147: (struct){
+        name: (string){ "name147" }
+      }
+    }
+    A148: (struct){
+      B148: (struct){
+        name: (string){ "name148" }
+      }
+    }
+    A149: (struct){
+      B149: (struct){
+        name: (string){ "name149" }
+      }
+    }
+    A150: (struct){
+      B150: (struct){
+        name: (string){ "name150" }
+      }
+    }
+    A151: (struct){
+      B151: (struct){
+        name: (string){ "name151" }
+      }
+    }
+    A152: (struct){
+      B152: (struct){
+        name: (string){ "name152" }
+      }
+    }
+    A153: (struct){
+      B153: (struct){
+        name: (string){ "name153" }
+      }
+    }
+    A154: (struct){
+      B154: (struct){
+        name: (string){ "name154" }
+      }
+    }
+    A155: (struct){
+      B155: (struct){
+        name: (string){ "name155" }
+      }
+    }
+    A156: (struct){
+      B156: (struct){
+        name: (string){ "name156" }
+      }
+    }
+    A157: (struct){
+      B157: (struct){
+        name: (string){ "name157" }
+      }
+    }
+    A158: (struct){
+      B158: (struct){
+        name: (string){ "name158" }
+      }
+    }
+    A159: (struct){
+      B159: (struct){
+        name: (string){ "name159" }
+      }
+    }
+    A160: (struct){
+      B160: (struct){
+        name: (string){ "name160" }
+      }
+    }
+    A161: (struct){
+      B161: (struct){
+        name: (string){ "name161" }
+      }
+    }
+    A162: (struct){
+      B162: (struct){
+        name: (string){ "name162" }
+      }
+    }
+    A163: (struct){
+      B163: (struct){
+        name: (string){ "name163" }
+      }
+    }
+    A164: (struct){
+      B164: (struct){
+        name: (string){ "name164" }
+      }
+    }
+    A165: (struct){
+      B165: (struct){
+        name: (string){ "name165" }
+      }
+    }
+    A166: (struct){
+      B166: (struct){
+        name: (string){ "name166" }
+      }
+    }
+    A167: (struct){
+      B167: (struct){
+        name: (string){ "name167" }
+      }
+    }
+    A168: (struct){
+      B168: (struct){
+        name: (string){ "name168" }
+      }
+    }
+    A169: (struct){
+      B169: (struct){
+        name: (string){ "name169" }
+      }
+    }
+    A170: (struct){
+      B170: (struct){
+        name: (string){ "name170" }
+      }
+    }
+    A171: (struct){
+      B171: (struct){
+        name: (string){ "name171" }
+      }
+    }
+    A172: (struct){
+      B172: (struct){
+        name: (string){ "name172" }
+      }
+    }
+    A173: (struct){
+      B173: (struct){
+        name: (string){ "name173" }
+      }
+    }
+    A174: (struct){
+      B174: (struct){
+        name: (string){ "name174" }
+      }
+    }
+    A175: (struct){
+      B175: (struct){
+        name: (string){ "name175" }
+      }
+    }
+    A176: (struct){
+      B176: (struct){
+        name: (string){ "name176" }
+      }
+    }
+    A177: (struct){
+      B177: (struct){
+        name: (string){ "name177" }
+      }
+    }
+    A178: (struct){
+      B178: (struct){
+        name: (string){ "name178" }
+      }
+    }
+    A179: (struct){
+      B179: (struct){
+        name: (string){ "name179" }
+      }
+    }
+    A180: (struct){
+      B180: (struct){
+        name: (string){ "name180" }
+      }
+    }
+    A181: (struct){
+      B181: (struct){
+        name: (string){ "name181" }
+      }
+    }
+    A182: (struct){
+      B182: (struct){
+        name: (string){ "name182" }
+      }
+    }
+    A183: (struct){
+      B183: (struct){
+        name: (string){ "name183" }
+      }
+    }
+    A184: (struct){
+      B184: (struct){
+        name: (string){ "name184" }
+      }
+    }
+    A185: (struct){
+      B185: (struct){
+        name: (string){ "name185" }
+      }
+    }
+    A186: (struct){
+      B186: (struct){
+        name: (string){ "name186" }
+      }
+    }
+    A187: (struct){
+      B187: (struct){
+        name: (string){ "name187" }
+      }
+    }
+    A188: (struct){
+      B188: (struct){
+        name: (string){ "name188" }
+      }
+    }
+    A189: (struct){
+      B189: (struct){
+        name: (string){ "name189" }
+      }
+    }
+    A190: (struct){
+      B190: (struct){
+        name: (string){ "name190" }
+      }
+    }
+    A191: (struct){
+      B191: (struct){
+        name: (string){ "name191" }
+      }
+    }
+    A192: (struct){
+      B192: (struct){
+        name: (string){ "name192" }
+      }
+    }
+    A193: (struct){
+      B193: (struct){
+        name: (string){ "name193" }
+      }
+    }
+    A194: (struct){
+      B194: (struct){
+        name: (string){ "name194" }
+      }
+    }
+    A195: (struct){
+      B195: (struct){
+        name: (string){ "name195" }
+      }
+    }
+    A196: (struct){
+      B196: (struct){
+        name: (string){ "name196" }
+      }
+    }
+    A197: (struct){
+      B197: (struct){
+        name: (string){ "name197" }
+      }
+    }
+    A198: (struct){
+      B198: (struct){
+        name: (string){ "name198" }
+      }
+    }
+    A199: (struct){
+      B199: (struct){
+        name: (string){ "name199" }
+      }
+    }
+    A200: (struct){
+      B200: (struct){
+        name: (string){ "name200" }
+      }
+    }
+    A201: (struct){
+      B201: (struct){
+        name: (string){ "name201" }
+      }
+    }
+    A202: (struct){
+      B202: (struct){
+        name: (string){ "name202" }
+      }
+    }
+    A203: (struct){
+      B203: (struct){
+        name: (string){ "name203" }
+      }
+    }
+    A204: (struct){
+      B204: (struct){
+        name: (string){ "name204" }
+      }
+    }
+    A205: (struct){
+      B205: (struct){
+        name: (string){ "name205" }
+      }
+    }
+    A206: (struct){
+      B206: (struct){
+        name: (string){ "name206" }
+      }
+    }
+    A207: (struct){
+      B207: (struct){
+        name: (string){ "name207" }
+      }
+    }
+    A208: (struct){
+      B208: (struct){
+        name: (string){ "name208" }
+      }
+    }
+    A209: (struct){
+      B209: (struct){
+        name: (string){ "name209" }
+      }
+    }
+    A210: (struct){
+      B210: (struct){
+        name: (string){ "name210" }
+      }
+    }
+    A211: (struct){
+      B211: (struct){
+        name: (string){ "name211" }
+      }
+    }
+    A212: (struct){
+      B212: (struct){
+        name: (string){ "name212" }
+      }
+    }
+    A213: (struct){
+      B213: (struct){
+        name: (string){ "name213" }
+      }
+    }
+    A214: (struct){
+      B214: (struct){
+        name: (string){ "name214" }
+      }
+    }
+    A215: (struct){
+      B215: (struct){
+        name: (string){ "name215" }
+      }
+    }
+    A216: (struct){
+      B216: (struct){
+        name: (string){ "name216" }
+      }
+    }
+    A217: (struct){
+      B217: (struct){
+        name: (string){ "name217" }
+      }
+    }
+    A218: (struct){
+      B218: (struct){
+        name: (string){ "name218" }
+      }
+    }
+    A219: (struct){
+      B219: (struct){
+        name: (string){ "name219" }
+      }
+    }
+    A220: (struct){
+      B220: (struct){
+        name: (string){ "name220" }
+      }
+    }
+    A221: (struct){
+      B221: (struct){
+        name: (string){ "name221" }
+      }
+    }
+    A222: (struct){
+      B222: (struct){
+        name: (string){ "name222" }
+      }
+    }
+    A223: (struct){
+      B223: (struct){
+        name: (string){ "name223" }
+      }
+    }
+    A224: (struct){
+      B224: (struct){
+        name: (string){ "name224" }
+      }
+    }
+    A225: (struct){
+      B225: (struct){
+        name: (string){ "name225" }
+      }
+    }
+    A226: (struct){
+      B226: (struct){
+        name: (string){ "name226" }
+      }
+    }
+    A227: (struct){
+      B227: (struct){
+        name: (string){ "name227" }
+      }
+    }
+    A228: (struct){
+      B228: (struct){
+        name: (string){ "name228" }
+      }
+    }
+    A229: (struct){
+      B229: (struct){
+        name: (string){ "name229" }
+      }
+    }
+    A230: (struct){
+      B230: (struct){
+        name: (string){ "name230" }
+      }
+    }
+    A231: (struct){
+      B231: (struct){
+        name: (string){ "name231" }
+      }
+    }
+    A232: (struct){
+      B232: (struct){
+        name: (string){ "name232" }
+      }
+    }
+    A233: (struct){
+      B233: (struct){
+        name: (string){ "name233" }
+      }
+    }
+    A234: (struct){
+      B234: (struct){
+        name: (string){ "name234" }
+      }
+    }
+    A235: (struct){
+      B235: (struct){
+        name: (string){ "name235" }
+      }
+    }
+    A236: (struct){
+      B236: (struct){
+        name: (string){ "name236" }
+      }
+    }
+    A237: (struct){
+      B237: (struct){
+        name: (string){ "name237" }
+      }
+    }
+    A238: (struct){
+      B238: (struct){
+        name: (string){ "name238" }
+      }
+    }
+    A239: (struct){
+      B239: (struct){
+        name: (string){ "name239" }
+      }
+    }
+    A240: (struct){
+      B240: (struct){
+        name: (string){ "name240" }
+      }
+    }
+    A241: (struct){
+      B241: (struct){
+        name: (string){ "name241" }
+      }
+    }
+    A242: (struct){
+      B242: (struct){
+        name: (string){ "name242" }
+      }
+    }
+    A243: (struct){
+      B243: (struct){
+        name: (string){ "name243" }
+      }
+    }
+    A244: (struct){
+      B244: (struct){
+        name: (string){ "name244" }
+      }
+    }
+    A245: (struct){
+      B245: (struct){
+        name: (string){ "name245" }
+      }
+    }
+    A246: (struct){
+      B246: (struct){
+        name: (string){ "name246" }
+      }
+    }
+    A247: (struct){
+      B247: (struct){
+        name: (string){ "name247" }
+      }
+    }
+    A248: (struct){
+      B248: (struct){
+        name: (string){ "name248" }
+      }
+    }
+    A249: (struct){
+      B249: (struct){
+        name: (string){ "name249" }
+      }
+    }
+    A250: (struct){
+      B250: (struct){
+        name: (string){ "name250" }
+      }
+    }
+    A251: (struct){
+      B251: (struct){
+        name: (string){ "name251" }
+      }
+    }
+    A252: (struct){
+      B252: (struct){
+        name: (string){ "name252" }
+      }
+    }
+    A253: (struct){
+      B253: (struct){
+        name: (string){ "name253" }
+      }
+    }
+    A254: (struct){
+      B254: (struct){
+        name: (string){ "name254" }
+      }
+    }
+    A255: (struct){
+      B255: (struct){
+        name: (string){ "name255" }
+      }
+    }
+    A256: (struct){
+      B256: (struct){
+        name: (string){ "name256" }
+      }
+    }
+    A257: (struct){
+      B257: (struct){
+        name: (string){ "name257" }
+      }
+    }
+    A258: (struct){
+      B258: (struct){
+        name: (string){ "name258" }
+      }
+    }
+    A259: (struct){
+      B259: (struct){
+        name: (string){ "name259" }
+      }
+    }
+    A260: (struct){
+      B260: (struct){
+        name: (string){ "name260" }
+      }
+    }
+    A261: (struct){
+      B261: (struct){
+        name: (string){ "name261" }
+      }
+    }
+    A262: (struct){
+      B262: (struct){
+        name: (string){ "name262" }
+      }
+    }
+    A263: (struct){
+      B263: (struct){
+        name: (string){ "name263" }
+      }
+    }
+    A264: (struct){
+      B264: (struct){
+        name: (string){ "name264" }
+      }
+    }
+    A265: (struct){
+      B265: (struct){
+        name: (string){ "name265" }
+      }
+    }
+    A266: (struct){
+      B266: (struct){
+        name: (string){ "name266" }
+      }
+    }
+    A267: (struct){
+      B267: (struct){
+        name: (string){ "name267" }
+      }
+    }
+    A268: (struct){
+      B268: (struct){
+        name: (string){ "name268" }
+      }
+    }
+    A269: (struct){
+      B269: (struct){
+        name: (string){ "name269" }
+      }
+    }
+    A270: (struct){
+      B270: (struct){
+        name: (string){ "name270" }
+      }
+    }
+    A271: (struct){
+      B271: (struct){
+        name: (string){ "name271" }
+      }
+    }
+    A272: (struct){
+      B272: (struct){
+        name: (string){ "name272" }
+      }
+    }
+    A273: (struct){
+      B273: (struct){
+        name: (string){ "name273" }
+      }
+    }
+    A274: (struct){
+      B274: (struct){
+        name: (string){ "name274" }
+      }
+    }
+    A275: (struct){
+      B275: (struct){
+        name: (string){ "name275" }
+      }
+    }
+    A276: (struct){
+      B276: (struct){
+        name: (string){ "name276" }
+      }
+    }
+    A277: (struct){
+      B277: (struct){
+        name: (string){ "name277" }
+      }
+    }
+    A278: (struct){
+      B278: (struct){
+        name: (string){ "name278" }
+      }
+    }
+    A279: (struct){
+      B279: (struct){
+        name: (string){ "name279" }
+      }
+    }
+    A280: (struct){
+      B280: (struct){
+        name: (string){ "name280" }
+      }
+    }
+    A281: (struct){
+      B281: (struct){
+        name: (string){ "name281" }
+      }
+    }
+    A282: (struct){
+      B282: (struct){
+        name: (string){ "name282" }
+      }
+    }
+    A283: (struct){
+      B283: (struct){
+        name: (string){ "name283" }
+      }
+    }
+    A284: (struct){
+      B284: (struct){
+        name: (string){ "name284" }
+      }
+    }
+    A285: (struct){
+      B285: (struct){
+        name: (string){ "name285" }
+      }
+    }
+    A286: (struct){
+      B286: (struct){
+        name: (string){ "name286" }
+      }
+    }
+    A287: (struct){
+      B287: (struct){
+        name: (string){ "name287" }
+      }
+    }
+    A288: (struct){
+      B288: (struct){
+        name: (string){ "name288" }
+      }
+    }
+    A289: (struct){
+      B289: (struct){
+        name: (string){ "name289" }
+      }
+    }
+    A290: (struct){
+      B290: (struct){
+        name: (string){ "name290" }
+      }
+    }
+    A291: (struct){
+      B291: (struct){
+        name: (string){ "name291" }
+      }
+    }
+    A292: (struct){
+      B292: (struct){
+        name: (string){ "name292" }
+      }
+    }
+    A293: (struct){
+      B293: (struct){
+        name: (string){ "name293" }
+      }
+    }
+    A294: (struct){
+      B294: (struct){
+        name: (string){ "name294" }
+      }
+    }
+    A295: (struct){
+      B295: (struct){
+        name: (string){ "name295" }
+      }
+    }
+    A296: (struct){
+      B296: (struct){
+        name: (string){ "name296" }
+      }
+    }
+    A297: (struct){
+      B297: (struct){
+        name: (string){ "name297" }
+      }
+    }
+    A298: (struct){
+      B298: (struct){
+        name: (string){ "name298" }
+      }
+    }
+    A299: (struct){
+      B299: (struct){
+        name: (string){ "name299" }
+      }
+    }
+  }
+  #Embed: (#struct){
+  }
+  #Output: (_|_){
+    // [incomplete] #Output: cannot range over #input (incomplete type _):
+    //     ./in.cue:16:17
+    #input: (_){ _ }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  out: (〈0;#Output〉 & {
+    #input: 〈1;_input〉
+  })
+  _input: {
+    for _, n in 〈import;list〉.Range(1, 300, 1) {
+      "A\(〈1;n〉)": {
+        "B\(〈2;n〉)": {
+          name: "name\(〈3;n〉)"
+        }
+      }
+    }
+  }
+  #Embed: {
+    [string]: string
+  }
+  #Output: {
+    〈1;#Embed〉
+    #input: _
+    for _, lvlA in 〈0;#input〉 {
+      for nameB, lvlB in 〈1;lvlA〉 {
+        〈1;nameB〉: 〈1;lvlB〉.name
+      }
+    }
+  }
+}

@@ -16,6 +16,24 @@
       "message": "I wonder whether it\u0027s worth having a very simple cycle detection in here - e.g. count the number of times around the loop, and if that goes \u003e len(m) then it\u0027s an error. Just belt and braces / being defensive really in case some future bug or unforeseen situation creates a cycle here?",
       "revId": "88e9dab6e43e028107e5dd8e82059772b827d6ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bc0e08e_1b027a68",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-04-16T09:08:01Z",
+      "side": 1,
+      "message": "It is quite straightforward to prove that this is not possible. But maybe. To be clear, this would convert a \"hang\" into panic.",
+      "parentUuid": "c166b2e1_baa13aa4",
+      "revId": "88e9dab6e43e028107e5dd8e82059772b827d6ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

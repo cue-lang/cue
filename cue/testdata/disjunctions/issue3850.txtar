@@ -1,0 +1,468 @@
+-- issue3850.cue --
+issue3850: full: {
+	global: glb1: glb2: "123"
+	out: {foo?: _} | {}
+	out: {foo?: _} | {}
+	out: #WithFoo
+
+	#WithFoo: {
+		_global: global
+		foo: _global.glb1.glb2
+	}
+}
+issue3850: incomplete: {
+	global: glb1: glb2: "123"
+	out: {foo?: _} | {}
+	out: {foo?: _} | {}
+	out: #WithFoo
+
+	#WithFoo: {
+		_global: global
+		foo: _global.glb1.glb2
+		...
+	}
+}
+issue3850: p2p: {
+	out: *{} | _
+	out: *{} | _
+	out: {
+		reg: #def
+		#def: foo: _global
+	}
+
+	_global: "global value"
+}
+-- issue3875.cue --
+issue3875: full: {
+	_global: name: "foo"
+
+	out: desc: {
+		_hidden: _global.name
+		name: _hidden
+	}
+	out: #Schema | "never"
+
+	#Schema: desc: {...}
+}
+issue3875: reduced: {
+	global: a: "foo"
+
+	out: desc: {
+		a: b
+		b: global.a
+	}
+	out: S | null
+
+	S: {}
+}
+-- out/evalalpha/stats --
+Leaks:  144
+Freed:  0
+Reused: 0
+Allocs: 144
+Retain: 0
+
+Unifications: 68
+Conjuncts:    125
+Disjuncts:    22
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  113
+-Reused: 102
+-Allocs: 11
+-Retain: 18
++Leaks:  144
++Freed:  0
++Reused: 0
++Allocs: 144
++Retain: 0
+ 
+-Unifications: 97
+-Conjuncts:    182
+-Disjuncts:    123
++Unifications: 68
++Conjuncts:    125
++Disjuncts:    22
+-- out/eval/stats --
+Leaks:  0
+Freed:  113
+Reused: 102
+Allocs: 11
+Retain: 18
+
+Unifications: 97
+Conjuncts:    182
+Disjuncts:    123
+-- out/evalalpha --
+Errors:
+issue3850.full.out.foo: field not allowed:
+    ./issue3850.cue:4:8
+    ./issue3850.cue:9:3
+
+Result:
+(_|_){
+  // [eval]
+  issue3850: (_|_){
+    // [eval]
+    full: (_|_){
+      // [eval]
+      global: (struct){
+        glb1: (struct){
+          glb2: (string){ "123" }
+        }
+      }
+      out: (_|_){
+        // [eval] issue3850.full.out.foo: field not allowed:
+        //     ./issue3850.cue:4:8
+        //     ./issue3850.cue:9:3
+        _global: (_){ _ }
+        foo: (_){ _ }
+      }
+      #WithFoo: (#struct){
+        _global: (#struct){
+          glb1: (#struct){
+            glb2: (string){ "123" }
+          }
+        }
+        foo: (string){ "123" }
+      }
+    }
+    incomplete: (struct){
+      global: (struct){
+        glb1: (struct){
+          glb2: (string){ "123" }
+        }
+      }
+      out: (#struct){
+        _global: (#struct){
+          glb1: (#struct){
+            glb2: (string){ "123" }
+          }
+        }
+        foo: (_){ _ }
+      }
+      #WithFoo: (#struct){
+        _global: (#struct){
+          glb1: (#struct){
+            glb2: (string){ "123" }
+          }
+        }
+        foo: (string){ "123" }
+      }
+    }
+    p2p: (struct){
+      out: (struct){
+        reg: ~(issue3850.p2p.out.#def)
+        #def: (#struct){
+          foo: (string){ "global value" }
+        }
+      }
+      _global: (string){ "global value" }
+    }
+  }
+  issue3875: (struct){
+    full: (struct){
+      _global: (struct){
+        name: (string){ "foo" }
+      }
+      out: (#struct){
+        desc: (#struct){
+          _hidden: (string){ "foo" }
+          name: (_){ _ }
+        }
+      }
+      #Schema: (#struct){
+        desc: (#struct){
+        }
+      }
+    }
+    reduced: (struct){
+      global: (struct){
+        a: (string){ "foo" }
+      }
+      out: (struct){
+        desc: (struct){
+          a: (_){ _ }
+          b: (string){ "foo" }
+        }
+      }
+      S: (struct){
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,18 +1,26 @@
+-(struct){
+-  issue3850: (struct){
+-    full: (struct){
+-      global: (struct){
+-        glb1: (struct){
+-          glb2: (string){ "123" }
+-        }
+-      }
+-      out: (#struct){
+-        _global: (#struct){
+-          glb1: (#struct){
+-            glb2: (string){ "123" }
+-          }
+-        }
+-        foo: (string){ "123" }
++Errors:
++issue3850.full.out.foo: field not allowed:
++    ./issue3850.cue:4:8
++    ./issue3850.cue:9:3
++
++Result:
++(_|_){
++  // [eval]
++  issue3850: (_|_){
++    // [eval]
++    full: (_|_){
++      // [eval]
++      global: (struct){
++        glb1: (struct){
++          glb2: (string){ "123" }
++        }
++      }
++      out: (_|_){
++        // [eval] issue3850.full.out.foo: field not allowed:
++        //     ./issue3850.cue:4:8
++        //     ./issue3850.cue:9:3
++        _global: (_){ _ }
++        foo: (_){ _ }
+       }
+       #WithFoo: (#struct){
+         _global: (#struct){
+@@ -35,7 +43,7 @@
+             glb2: (string){ "123" }
+           }
+         }
+-        foo: (string){ "123" }
++        foo: (_){ _ }
+       }
+       #WithFoo: (#struct){
+         _global: (#struct){
+@@ -48,9 +56,7 @@
+     }
+     p2p: (struct){
+       out: (struct){
+-        reg: (#struct){
+-          foo: (string){ "global value" }
+-        }
++        reg: ~(issue3850.p2p.out.#def)
+         #def: (#struct){
+           foo: (string){ "global value" }
+         }
+@@ -66,7 +72,7 @@
+       out: (#struct){
+         desc: (#struct){
+           _hidden: (string){ "foo" }
+-          name: (string){ "foo" }
++          name: (_){ _ }
+         }
+       }
+       #Schema: (#struct){
+@@ -80,7 +86,7 @@
+       }
+       out: (struct){
+         desc: (struct){
+-          a: (string){ "foo" }
++          a: (_){ _ }
+           b: (string){ "foo" }
+         }
+       }
+-- out/eval --
+(struct){
+  issue3850: (struct){
+    full: (struct){
+      global: (struct){
+        glb1: (struct){
+          glb2: (string){ "123" }
+        }
+      }
+      out: (#struct){
+        _global: (#struct){
+          glb1: (#struct){
+            glb2: (string){ "123" }
+          }
+        }
+        foo: (string){ "123" }
+      }
+      #WithFoo: (#struct){
+        _global: (#struct){
+          glb1: (#struct){
+            glb2: (string){ "123" }
+          }
+        }
+        foo: (string){ "123" }
+      }
+    }
+    incomplete: (struct){
+      global: (struct){
+        glb1: (struct){
+          glb2: (string){ "123" }
+        }
+      }
+      out: (#struct){
+        _global: (#struct){
+          glb1: (#struct){
+            glb2: (string){ "123" }
+          }
+        }
+        foo: (string){ "123" }
+      }
+      #WithFoo: (#struct){
+        _global: (#struct){
+          glb1: (#struct){
+            glb2: (string){ "123" }
+          }
+        }
+        foo: (string){ "123" }
+      }
+    }
+    p2p: (struct){
+      out: (struct){
+        reg: (#struct){
+          foo: (string){ "global value" }
+        }
+        #def: (#struct){
+          foo: (string){ "global value" }
+        }
+      }
+      _global: (string){ "global value" }
+    }
+  }
+  issue3875: (struct){
+    full: (struct){
+      _global: (struct){
+        name: (string){ "foo" }
+      }
+      out: (#struct){
+        desc: (#struct){
+          _hidden: (string){ "foo" }
+          name: (string){ "foo" }
+        }
+      }
+      #Schema: (#struct){
+        desc: (#struct){
+        }
+      }
+    }
+    reduced: (struct){
+      global: (struct){
+        a: (string){ "foo" }
+      }
+      out: (struct){
+        desc: (struct){
+          a: (string){ "foo" }
+          b: (string){ "foo" }
+        }
+      }
+      S: (struct){
+      }
+    }
+  }
+}
+-- out/compile --
+--- issue3850.cue
+{
+  issue3850: {
+    full: {
+      global: {
+        glb1: {
+          glb2: "123"
+        }
+      }
+      out: ({
+        foo?: _
+      }|{})
+      out: ({
+        foo?: _
+      }|{})
+      out: 〈0;#WithFoo〉
+      #WithFoo: {
+        _global: 〈1;global〉
+        foo: 〈0;_global〉.glb1.glb2
+      }
+    }
+  }
+  issue3850: {
+    incomplete: {
+      global: {
+        glb1: {
+          glb2: "123"
+        }
+      }
+      out: ({
+        foo?: _
+      }|{})
+      out: ({
+        foo?: _
+      }|{})
+      out: 〈0;#WithFoo〉
+      #WithFoo: {
+        _global: 〈1;global〉
+        foo: 〈0;_global〉.glb1.glb2
+        ...
+      }
+    }
+  }
+  issue3850: {
+    p2p: {
+      out: (*{}|_)
+      out: (*{}|_)
+      out: {
+        reg: 〈0;#def〉
+        #def: {
+          foo: 〈2;_global〉
+        }
+      }
+      _global: "global value"
+    }
+  }
+}
+--- issue3875.cue
+{
+  issue3875: {
+    full: {
+      _global: {
+        name: "foo"
+      }
+      out: {
+        desc: {
+          _hidden: 〈2;_global〉.name
+          name: 〈0;_hidden〉
+        }
+      }
+      out: (〈0;#Schema〉|"never")
+      #Schema: {
+        desc: {
+          ...
+        }
+      }
+    }
+  }
+  issue3875: {
+    reduced: {
+      global: {
+        a: "foo"
+      }
+      out: {
+        desc: {
+          a: 〈0;b〉
+          b: 〈2;global〉.a
+        }
+      }
+      out: (〈0;S〉|null)
+      S: {}
+    }
+  }
+}

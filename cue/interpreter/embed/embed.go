@@ -83,6 +83,7 @@ package embed
 
 import (
 	"io/fs"
+	"iter"
 	"os"
 	"path"
 	"path/filepath"
@@ -232,17 +233,13 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 
 	m := &adt.StructLit{}
 
-	matches, err := fs.Glob(c.fs, glob)
+	matches, err := fsGlob(c.fs, glob)
 	if err != nil {
 		return nil, errors.Promote(err, "failed to match glob")
 	}
 
 	dirs := make(map[string]string)
 	for _, f := range matches {
-		if c.isHidden(f) {
-			// TODO: allow option for including hidden files?
-			continue
-		}
 		// TODO: lots of stat calls happening in this MVP so another won't hurt.
 		// We don't support '**' initially, and '*' only matches files, so skip
 		// any directories.
@@ -293,10 +290,50 @@ func (c *compiler) clean(s string) (string, errors.Error) {
 	return file, nil
 }
 
-// isHidden checks if a file is hidden on Windows. We do not return an error
-// if the file does not exist and will check that elsewhere.
-func (c *compiler) isHidden(file string) bool {
-	return strings.HasPrefix(file, ".") || strings.Contains(file, "/.")
+// fsGlob is like [fs.Glob] but only includes dot-prefixed files
+// when the dot is explictly present in an element.
+// TODO: add option for including dot files?
+func fsGlob(fsys fs.FS, pattern string) ([]string, error) {
+	pattern = path.Clean(pattern)
+	matches, err := fs.Glob(fsys, pattern)
+	if err != nil {
+		return nil, err
+	}
+	patElems := strings.Split(pattern, "/")
+	included := func(m string) bool {
+		i := 0
+		for elem := range pathElems(m) {
+			if strings.HasPrefix(elem, ".") && (i >= len(patElems) || !strings.HasPrefix(patElems[i], ".")) {
+				return false
+			}
+			i++
+		}
+		return true
+	}
+
+	i := 0
+	for _, m := range matches {
+		if included(m) {
+			matches[i] = m
+			i++
+		}
+	}
+	return matches[:i], nil
+}
+
+func pathElems(p string) iter.Seq[string] {
+	return func(yield func(string) bool) {
+		for {
+			elem, rest, ok := strings.Cut(p, "/")
+			if !yield(elem) {
+				return
+			}
+			if !ok {
+				return
+			}
+			p = rest
+		}
+	}
 }
 
 func (c *compiler) decodeFile(file, scope string, schema adt.Value) (adt.Expr, errors.Error) {

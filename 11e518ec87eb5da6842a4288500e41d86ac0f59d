@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ff7fe5c_46742f98",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-17T05:08:19Z",
+      "side": 1,
+      "message": "Drive-by comment: how can `i \u003e\u003d len(patElems)` ever be true? Wouldn\u0027t we have run out of `pathElems(m)` before then?",
+      "revId": "11e518ec87eb5da6842a4288500e41d86ac0f59d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

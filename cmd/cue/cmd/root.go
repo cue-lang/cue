@@ -23,6 +23,7 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"testing"
+	"time"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/text/message"
@@ -286,7 +287,18 @@ var rootWorkingDir = func() string {
 
 // Main runs the cue tool and returns the code for passing to os.Exit.
 func Main() int {
+	start := time.Now()
 	cmd, _ := New(os.Args[1:])
+	// CUE_BENCH makes the cue tool act like a `go test -bench=. -benchmem` benchmark,
+	// doing all of its work and then only printing a benchmark result line to stdout
+	// including the elapsed time, Go allocated bytes, and Go allocations count.
+	// This is helpful for benchmarking `cue export` or `cue vet` like one would a Go API
+	// without having to write one-off bench_test.go files imitating what the CLI does.
+	benchName := os.Getenv("CUE_BENCH")
+	if benchName != "" {
+		// Don't let anything else be printed to stdout; we're only benchmarking.
+		cmd.SetOutput(io.Discard)
+	}
 	if err := cmd.Run(backgroundContext()); err != nil {
 		if err != ErrPrintedError {
 			errors.Print(os.Stderr, err, &errors.Config{
@@ -295,6 +307,15 @@ func Main() int {
 			})
 		}
 		return 1
+	}
+	if benchName != "" {
+		fmt.Printf("Benchmark%s\t", benchName)
+		fmt.Printf("%d\t%d ns/op", 1, time.Since(start))
+		var memStats runtime.MemStats
+		runtime.ReadMemStats(&memStats)
+		fmt.Printf("\t%d B/op", memStats.TotalAlloc)
+		fmt.Printf("\t%d allocs/op", memStats.Mallocs)
+		fmt.Printf("\n")
 	}
 	return 0
 }

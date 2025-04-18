@@ -485,7 +485,9 @@ func (n *nodeContext) checkTypos() {
 		return
 	}
 
-	var replacements []replaceID // TODO(perf): reuse a buffer via OpContext
+	// TODO(perf): reuse buffers via OpContext
+	requiredCopy := make(reqSets, 0, len(required))
+	var replacements []replaceID
 
 	var err *Bottom
 	// outer:
@@ -499,7 +501,7 @@ func (n *nodeContext) checkTypos() {
 		na := a.state
 
 		replacements = na.getReplacements(replacements[:0])
-		required := slices.Clone(required) // TODO(perf): use buffer
+		required := append(requiredCopy[:0], required...)
 		// do the right thing in appendRequired either way.
 		required.replaceIDs(n.ctx, replacements...)
 

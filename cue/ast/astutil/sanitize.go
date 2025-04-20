@@ -50,24 +50,25 @@ func Sanitize(f *ast.File) error {
 	}
 
 	// Gather all names.
-	walkVisitor(f, &scope{
+	s := &scope{
 		errFn:   z.errf,
 		nameFn:  z.addName,
 		identFn: z.markUsed,
-	})
+	}
+	ast.Walk(f, s.Before, nil)
 	if z.errs != nil {
 		return z.errs
 	}
 
 	// Add imports and unshadow.
-	s := &scope{
+	s = &scope{
 		file:    f,
 		errFn:   z.errf,
 		identFn: z.handleIdent,
 		index:   make(map[string]entry),
 	}
 	z.fileScope = s
-	walkVisitor(f, s)
+	ast.Walk(f, s.Before, nil)
 	if z.errs != nil {
 		return z.errs
 	}

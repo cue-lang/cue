@@ -27,6 +27,13 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+var PredeclaredFile = token.NewFile("", 0, 0)
+
+func isPredeclared(expr Expr) bool {
+	src := expr.Source()
+	return src != nil && src.Pos().File() == PredeclaredFile
+}
+
 var _ Elem = &ConjunctGroup{}
 
 // A ConjunctGroup is an Elem that is used for internal grouping of Conjuncts

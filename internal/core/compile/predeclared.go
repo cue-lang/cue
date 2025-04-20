@@ -134,6 +134,7 @@ func mkUint() adt.Expr {
 	from := newBound(adt.GreaterEqualOp, adt.IntKind, parseInt("0"))
 	ident := ast.NewIdent("__int")
 	src := ast.NewBinExpr(token.AND, ident, from.Src)
+	ast.SetPos(src, adt.PredeclaredFile.Pos(0, token.NoRelPos))
 	return &adt.Conjunction{
 		Src: src,
 		Values: []adt.Value{
@@ -147,6 +148,7 @@ func mkIntRange(a, b string) adt.Expr {
 	to := newBound(adt.LessEqualOp, adt.IntKind, parseInt(b))
 	ident := ast.NewIdent("__int")
 	src := ast.NewBinExpr(token.AND, ident, from.Src, to.Src)
+	ast.SetPos(src, adt.PredeclaredFile.Pos(0, token.NoRelPos))
 	return &adt.Conjunction{
 		Src: src,
 		Values: []adt.Value{
@@ -159,23 +161,27 @@ func mkFloatRange(a, b string) adt.Expr {
 	from := newBound(adt.GreaterEqualOp, adt.NumberKind, parseFloat(a))
 	to := newBound(adt.LessEqualOp, adt.NumberKind, parseFloat(b))
 	src := ast.NewBinExpr(token.AND, from.Src, to.Src)
+	ast.SetPos(src, adt.PredeclaredFile.Pos(0, token.NoRelPos))
 	return &adt.Conjunction{Src: src, Values: []adt.Value{from, to}}
 }
 
 func newBound(op adt.Op, k adt.Kind, v adt.Value) *adt.BoundValue {
 	src := &ast.UnaryExpr{Op: op.Token(), X: v.Source().(ast.Expr)}
+	ast.SetPos(src, adt.PredeclaredFile.Pos(0, token.NoRelPos))
 	return &adt.BoundValue{Src: src, Op: op, Value: v}
 }
 
 func parseInt(s string) *adt.Num {
 	n := parseNum(adt.IntKind, s)
 	n.Src = &ast.BasicLit{Kind: token.INT, Value: s}
+	ast.SetPos(n.Src, adt.PredeclaredFile.Pos(0, token.NoRelPos))
 	return n
 }
 
 func parseFloat(s string) *adt.Num {
 	n := parseNum(adt.FloatKind, s)
 	n.Src = &ast.BasicLit{Kind: token.FLOAT, Value: s}
+	ast.SetPos(n.Src, adt.PredeclaredFile.Pos(0, token.NoRelPos))
 	return n
 }
 

@@ -28,6 +28,11 @@ import (
 //
 // k represents additional type constraints, such as `int`.
 func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
+	if isPredeclared(x) && isPredeclared(y) {
+		// Predeclared bounds like the expanded int64 builtin cannot be
+		// simplified further, so skip the computation below.
+		return nil
+	}
 	xv := x.Value
 	yv := y.Value
 

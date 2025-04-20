@@ -126,30 +126,52 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		}
 		a, aOK := xv.(*Num)
 		b, bOK := yv.(*Num)
-
-		if !aOK || !bOK {
+		if !aOK || !bOK || a.X.Form != apd.Finite || b.X.Form != apd.Finite {
+			// Nothing to do if either bound is not a finite number.
 			break
 		}
 
-		var d, lo, hi apd.Decimal
-		lo.Set(&a.X)
-		hi.Set(&b.X)
+		var d apd.Decimal
+		lo, hi := a.X, b.X
 		if k&FloatKind == 0 {
-			// Readjust bounds for integers.
-			if x.Op == GreaterEqualOp {
-				// >=3.4  ==>  >=4
-				_, _ = internal.BaseContext.Ceil(&lo, &a.X)
-			} else {
-				// >3.4  ==>  >3
-				_, _ = internal.BaseContext.Floor(&lo, &a.X)
+			// Readjust bounds for integers if the bounds have decimal places,
+			// which are represented as a negative exponent to multiply with the coefficient.
+			// We reset lo and hi to empty apd.Decimal values to not modify the originals,
+			// given that apd.Decimal contains pointers which are carried with shallow copies.
+			if a.X.Exponent < 0 {
+				lo = apd.Decimal{}
+				if x.Op == GreaterEqualOp {
+					// >=3.4  ==>  >=4
+					internal.BaseContext.Ceil(&lo, &a.X)
+				} else {
+					// >3.4   ==>  >3
+					internal.BaseContext.Floor(&lo, &a.X)
+				}
 			}
-			if y.Op == LessEqualOp {
-				// <=2.3  ==>  <= 2
-				_, _ = internal.BaseContext.Floor(&hi, &b.X)
-			} else {
-				// <2.3   ==>  < 3
-				_, _ = internal.BaseContext.Ceil(&hi, &b.X)
+			if b.X.Exponent < 0 {
+				hi = apd.Decimal{}
+				if y.Op == LessEqualOp {
+					// <=2.3  ==>  <= 2
+					internal.BaseContext.Floor(&hi, &b.X)
+				} else {
+					// <2.3   ==>  < 3
+					internal.BaseContext.Ceil(&hi, &b.X)
+				}
 			}
+		}
+
+		// Negative or zero minimum with a large positive maximum
+		// common with e.g. int32 being ">=-2147483648 & <=2147483647"
+		// or uint16 being ">=0 & <=65535".
+		//
+		// We detect a large positive maximum by checking that the exponent isn't negative
+		// and that the coefficient has at least two digits, so its value must be at least 10.
+		// When the maximum is at least 10 and the minimum is at most 0,
+		// the subtraction will be positive and larger than 2, so we can avoid all the work below.
+		// This is important given that a subtraction allocates a new number for the result.
+		hiSign, loSign := hi.Sign(), lo.Sign()
+		if hiSign > 0 && loSign <= 0 && hi.Exponent >= 0 && hi.NumDigits() > 1 {
+			break
 		}
 
 		cond, err := internal.BaseContext.Sub(&d, &hi, &lo)
@@ -185,18 +207,6 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 
 		if d.Negative {
 			return errIncompatibleBounds(ctx, k, x, y)
-		}
-		// [apd.Decimal.Int64] on `d = hi - lo` will error if it overflows an int64.
-		// This is pretty common with CUE bounds like int64, which expands to:
-		//
-		//     >=-9_223_372_036_854_775_808 & <=9_223_372_036_854_775_807
-		//
-		// Constructing that error is unfortunate as it allocates a few times
-		// and stringifies the number too, which also has a cost.
-		// Which is entirely unnecessary, as we don't use the error value at all.
-		// If we know the integer will have more than one digit, give up early.
-		if d.NumDigits() > 1 {
-			break
 		}
 		switch diff, err := d.Int64(); {
 		case diff == 1:

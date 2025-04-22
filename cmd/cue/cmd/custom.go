@@ -18,11 +18,13 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/spf13/cobra"
 
@@ -149,15 +151,76 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 }
 
 func doTasks(cmd *Command, command string, root *cue.Instance) error {
+	cmdPath := cue.MakePath(cue.Str(commandSection), cue.Str(command))
 	cfg := &flow.Config{
-		Root:           cue.MakePath(cue.Str(commandSection), cue.Str(command)),
+		Root:           cmdPath,
 		InferTasks:     true,
 		IgnoreConcrete: true,
 	}
 
-	c := flow.New(cfg, root, newTaskFunc(cmd))
+	// Command and task discovery
+	//
+	// It should clearly be an error if we attempt to invoke cue cmd with a path
+	// expression that does not exist within the command struct:
+	//
+	//    $ cue cmd doesNotExist
+	//    command: field not found: doesNotExist
+	//
+	// Less clear is the case that the command struct value referenced itself is
+	// in error, for example when a top level field in that struct has an
+	// incomplete field name:
+	//
+	//    input: string
+	//    command: willFail: {
+	//    	"\(input)": exec.Run & {cmd: "true"}
+	//    }
+	//    $ cue cmd willFail
+	//    command.willFail: invalid interpolation: non-concrete value string (type string)
+	//
+	// For now, this is an error, but previous discussions (captured in
+	// https://cuelang.org/issue/1325) have explored whether we can
+	// safely/sensibly allow this, subject to the point/caveat below.
+	//
+	// It should also be an error when the command we have invoked declares no
+	// tasks. It might be the command declares literally no tasks, or that the
+	// CUE value it references is sufficiently incomplete:
+	//
+	//    input: string
+	//    command: shouldFail: NESTED: {
+	//    	"\(input)": exec.Run & {cmd: "true"}
+	//    }
+	//    $ cue cmd shouldFail
+	//    command.shouldFail: no tasks found
+	//
+	// Note that the case of the RHS of a task being incomplete is different. We
+	// care simply at this stage that tasks are discovered, sufficient for the
+	// tools/flow runner to attempt to do some work. If none of the tasks can
+	// proceed, that's a different kind of error. As a rather brute-force
+	// measure until we address https://cuelang.org/issue/1325 we simply error
+	// in case that we don't find any tasks.
+	//
+	// In case a command genuinely has no work to do, and wants to "do nothing"
+	// we could trivially introduce a no-op task.
+	//
+	// All of this leaves a rather large grey space of cases/situations where
+	// tasks are expected to be found and run, but don't because of missing
+	// data, etc. https://cuelang.org/issue/1325 is being used as a place to
+	// capture the nuance of those situations, and ways in which this UX could
+	// be improved.
 
-	return c.Run(backgroundContext())
+	var didWork atomic.Bool
+	c := flow.New(cfg, root, newTaskFunc(cmd, &didWork))
+
+	// Return early if anything was in error
+	if err := c.Run(backgroundContext()); err != nil {
+		return err
+	}
+
+	if !didWork.Load() {
+		return fmt.Errorf("%v: no tasks found", cmdPath)
+	}
+
+	return nil
 }
 
 // func (r *customRunner) tagReference(t *task, ref cue.Value) error {
@@ -206,11 +269,12 @@ var legacyKinds = map[string]string{
 	"testserver": "cmd/cue/cmd.Test",
 }
 
-func newTaskFunc(cmd *Command) flow.TaskFunc {
+func newTaskFunc(cmd *Command, didWork *atomic.Bool) flow.TaskFunc {
 	return func(v cue.Value) (flow.Runner, error) {
 		if !isTask(v) {
 			return nil, nil
 		}
+		didWork.Store(true)
 
 		kind, err := v.Lookup("$id").String()
 		if err != nil {

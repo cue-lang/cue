@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc04bfe4_b8307cd9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-22T16:14:58Z",
+      "side": 1,
+      "message": "LGTM modulo a few minor nits. I do have minor reservations about it being a backwardly incompatible change though (consider a command that defines a set of tasks by using a comprehension over a field that might or might not be empty). I suspect that\u0027s very unlikely to happen in practice however.",
+      "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ef4beaa_bbfef783",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-22T16:14:58Z",
+      "side": 1,
+      "message": "This comment is instantly out of date 😊 When I read it tomorrow, it won\u0027t be accurate. Best not to define the behaviour with respect to some previous incarnation of the code, I think.",
+      "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eafebc07_9bafbe9d",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-22T16:14:58Z",
+      "side": 1,
+      "message": "should \"asdf\" not be \"doesNotExist\" here? Otherwise I don\u0027t see where the error message has come from.",
+      "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53ac3acf_c8b985ee",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-22T16:14:58Z",
+      "side": 1,
+      "message": "nit:\n```suggestion\n\t// task is found\".\n```\n\n(the code that sets didWork is attached to the task-finding logic not the the task-running logic, which is in the function returned by newTaskFunc).",
+      "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fe26047_624630cf",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-22T16:14:58Z",
+      "side": 1,
+      "message": "atomic.Bool would arguably be clearer here I think.",
+      "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39ed4d2d_d7af3c9d",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-22T16:14:58Z",
+      "side": 1,
+      "message": "Maybe \"no tasks found in command\" might be a slightly nicer error message?",
+      "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

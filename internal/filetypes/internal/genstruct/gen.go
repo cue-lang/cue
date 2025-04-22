@@ -41,6 +41,59 @@ func GetSet[T comparable](data []byte, offset, size int, values []T) iter.Seq[T]
 	return ElemsFromBits(GetUint64(data, offset, size), values)
 }
 
+// GetEnumMap returns an iterator through all the keys and values in
+// data[offset:offset+size], where keys and values hold the possible
+// keys and values respectively, in index order.
+func GetEnumMap(data []byte, offset, size int, keys, values []string) iter.Seq2[string, string] {
+	return func(yield func(k, v string) bool) {
+		x := GetUint64(data, offset, size)
+		valueBits := bits.Len64(uint64(len(values)))
+		mask := uint64(1)<<valueBits - 1
+		for x != 0 {
+			i := bits.TrailingZeros64(x)
+			// We've found a single bit, but that might be anywhere inside
+			// the value. Round down to find the actual offset.
+			keyIndex := i / valueBits
+			shift := keyIndex * valueBits
+			valueIndex := (x>>shift)&mask - 1
+			if !yield(keys[keyIndex], values[valueIndex]) {
+				return
+			}
+			x &^= mask << shift
+		}
+	}
+}
+
+// PutEnumMap puts the keys and values in x into data at the given offset and size, where valueBits holds
+// the number of bits per value in the map and valueMap and keyMap give indexes for each possible
+// key and value, and defaultKeyIndex/defaultValueIndex provide values to use in case a given
+// value isn't one of the allowed keys or values.
+func PutEnumMap(data []byte, offset, size int, valueBits int, valueMap, keyMap map[string]int, defaultKeyIndex, defaultValueIndex int, x iter.Seq2[string, string]) error {
+	var bits uint64
+	mask := (uint64(1) << valueBits) - 1
+	for k, v := range x {
+		ki, ok := keyMap[k]
+		if !ok {
+			if defaultKeyIndex == -1 {
+				return fmt.Errorf("unknown key %#v", k)
+			}
+			ki = defaultKeyIndex
+		}
+		vi, ok := valueMap[v]
+		if !ok {
+			if defaultValueIndex == -1 {
+				return fmt.Errorf("unknown value %#v", v)
+			}
+			vi = defaultValueIndex
+		}
+		shift := ki * valueBits
+		bits &^= mask << shift
+		bits |= (uint64(vi) + 1) << shift
+	}
+	PutUint64(data, offset, size, bits)
+	return nil
+}
+
 // ElemsFromBits returns an iterator over all the items in the bitset
 // x, where bit 1<<i implies that values[i] is in the set.
 func ElemsFromBits[T comparable](x uint64, values []T) iter.Seq[T] {

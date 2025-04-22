@@ -1,0 +1,25 @@
+exec cue cmd tc1
+stdout 'success!'
+
+! exec cue cmd tc2
+stderr 'command\.tc2: invalid interpolation: non-concrete value string \(type string\)'
+
+! exec cue cmd tc3
+stderr 'command\.tc3: no tasks found'
+
+-- p_tool.cue --
+package p
+
+import "tool/cli"
+
+input: string @tag(input)
+
+command: tc1: NESTED: {
+	taskName: cli.Print & {text: "success!"}
+}
+command: tc2: {
+	"\(input)": cli.Print & {text: "ok"}
+}
+command: tc3: NESTED: {
+	"\(input)": cli.Print & {text: "ok"}
+}

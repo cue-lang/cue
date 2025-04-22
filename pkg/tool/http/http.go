@@ -116,6 +116,22 @@ func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		// TODO: timeout
 	}
 
+	followRedirects := true
+	followRedirectsValue := ctx.Obj.LookupPath(cue.MakePath(cue.Str("followRedirects")))
+	if followRedirectsValue.Exists() {
+		var err error
+		followRedirects, err = followRedirectsValue.Bool()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if !followRedirects {
+		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		}
+	}
+
 	req, err := http.NewRequest(method, u, r)
 	if err != nil {
 		return nil, err

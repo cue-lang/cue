@@ -15,6 +15,10 @@
 //		method: string
 //		url:    string // TODO: make url.URL type
 //
+//		// followRedirects controls whether the http client follows redirects
+//		// or not. Defaults to true, like the default net/http client in Go.
+//		followRedirects: *true | bool
+//
 //		tls: {
 //			// Whether the server certificate must be validated.
 //			verify: *true | bool
@@ -70,9 +74,10 @@ var p = &pkg.Package{
 	Put: Do & {method: "PUT"}
 	Delete: Do & {method: "DELETE"}
 	Do: {
-		$id:    *"tool/http.Do" | "http"
-		method: string
-		url:    string
+		$id:             *"tool/http.Do" | "http"
+		method:          string
+		url:             string
+		followRedirects: *true | bool
 		tls: {
 			verify:  *true | bool
 			caCert?: bytes | string

@@ -18,11 +18,13 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/spf13/cobra"
 
@@ -149,15 +151,56 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 }
 
 func doTasks(cmd *Command, command string, root *cue.Instance) error {
+	cmdPath := cue.MakePath(cue.Str(commandSection), cue.Str(command))
 	cfg := &flow.Config{
-		Root:           cue.MakePath(cue.Str(commandSection), cue.Str(command)),
+		Root:           cmdPath,
 		InferTasks:     true,
 		IgnoreConcrete: true,
 	}
 
-	c := flow.New(cfg, root, newTaskFunc(cmd))
+	// Keep track of whether we actually do any work running a test.
+	//
+	// The way cue cmd is defined today, it fails if you invoke it with a path
+	// expression that does not exist within the command struct:
+	//
+	//    $ cue cmd doesNotExist
+	//    command: field not found: asdf
+	//
+	// It also fails in the case that the command struct value referenced itself
+	// is in error, for example when a top level field in that struct has an
+	// incomplete field name:
+	//
+	//    command: willFail: {
+	//    	"\(input)": exec.Run & {cmd: "true"}
+	//    }
+	//    $ cue cmd willFail
+	//    command.willFail: invalid interpolation: non-concrete value string (type string)
+	//
+	// But does _not_ fail if a field one level deeper in the command struct
+	// value referenced contains an invalid struct value:
+	//
+	//    command: shouldFail: NESTED: {
+	//    	"\(input)": exec.Run & {cmd: "true"}
+	//    }
+	//    $ cue cmd shouldFail
+	//
+	// As a rather brute-force measure until we address
+	// https://cuelang.org/issue/1325 we simply error in the case that we don't
+	// do any useful work, where "useful" is simply defined as "at least one
+	// task runs".
+	var didWork uint32
+	c := flow.New(cfg, root, newTaskFunc(cmd, &didWork))
 
-	return c.Run(backgroundContext())
+	// Return early if anything was in error
+	if err := c.Run(backgroundContext()); err != nil {
+		return err
+	}
+
+	if atomic.LoadUint32(&didWork) != 1 {
+		return fmt.Errorf("%v: did not run any tasks", cmdPath)
+	}
+
+	return nil
 }
 
 // func (r *customRunner) tagReference(t *task, ref cue.Value) error {
@@ -206,11 +249,12 @@ var legacyKinds = map[string]string{
 	"testserver": "cmd/cue/cmd.Test",
 }
 
-func newTaskFunc(cmd *Command) flow.TaskFunc {
+func newTaskFunc(cmd *Command, didWork *uint32) flow.TaskFunc {
 	return func(v cue.Value) (flow.Runner, error) {
 		if !isTask(v) {
 			return nil, nil
 		}
+		atomic.StoreUint32(didWork, 1)
 
 		kind, err := v.Lookup("$id").String()
 		if err != nil {

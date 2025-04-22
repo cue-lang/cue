@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38e245b6_9d5d7538",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-22T16:01:55Z",
+      "side": 1,
+      "message": "LGTM with a few minor thoughts.",
+      "revId": "47cbea65a9da586b837ac2fc2f88268266c37339",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f905d29_3a52dd62",
+        "filename": "pkg/tool/http/http.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-22T16:01:55Z",
+      "side": 1,
+      "message": "I wonder if a slightly nicer approach might be to just unify the actual schema into ctx.Obj and then look up `followRedirects` unconditionally. That way there\u0027s no need to second-guess the default value, and it _might_ be less code too.",
+      "revId": "47cbea65a9da586b837ac2fc2f88268266c37339",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97909e1a_be7ab98d",
+        "filename": "pkg/tool/http/http_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-22T16:01:55Z",
+      "side": 1,
+      "message": "a bit shorter using `any`",
+      "revId": "47cbea65a9da586b837ac2fc2f88268266c37339",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6da965e_0fb95525",
+        "filename": "pkg/tool/http/http_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-22T16:01:55Z",
+      "side": 1,
+      "message": "FWIW i\u0027ve been calling this \"ref\" where I\u0027ve been defining it (e.g. in ./encoding/jsonschema/jsonschema.go) and it might be nice to be consistent, one way or other. I\u0027ve no particularly strong opinions about which spelling is better.",
+      "revId": "47cbea65a9da586b837ac2fc2f88268266c37339",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

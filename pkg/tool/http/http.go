@@ -116,6 +116,29 @@ func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		// TODO: timeout
 	}
 
+	// Rather clumsily, we need to also default followRedirects here because
+	// it's still valid for tasks to be specified via the special $id field, in
+	// which case we cannot be clear that the documented CUE-based defaults have
+	// been applied.
+	//
+	// This is noted as something to fix, more precisely a mistake not to make
+	// again, in https://cuelang.org/issue/1325
+	followRedirects := true
+	followRedirectsValue := ctx.Obj.LookupPath(cue.MakePath(cue.Str("followRedirects")))
+	if followRedirectsValue.Exists() {
+		var err error
+		followRedirects, err = followRedirectsValue.Bool()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if !followRedirects {
+		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		}
+	}
+
 	req, err := http.NewRequest(method, u, r)
 	if err != nil {
 		return nil, err

@@ -163,3 +163,104 @@ func TestParseHeaders(t *testing.T) {
 		})
 	}
 }
+
+// TestRedirect exercises the followRedirects configuration on an http.Do request
+func TestRedirect(t *testing.T) {
+	mux := http.NewServeMux()
+
+	// In this test server, /a redirects to /b. /b serves "hello"
+	mux.Handle("/a", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/b", http.StatusFound)
+	}))
+	mux.Handle("/b", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "hello")
+	}))
+
+	server := httptest.NewUnstartedServer(mux)
+	server.Start()
+	t.Cleanup(server.Close)
+
+	testCases := []struct {
+		name            string
+		path            string
+		statusCode      int
+		followRedirects *bool
+		body            *string
+	}{
+		{
+			name:       "/a silent on redirects",
+			path:       "/a",
+			statusCode: 200,
+			body:       ptr("hello"),
+		},
+		{
+			name:            "/a with explicit followRedirects: true",
+			path:            "/a",
+			statusCode:      200,
+			followRedirects: ptr(true),
+			body:            ptr("hello"),
+		},
+		{
+			name:            "/a with explicit followRedirects: false",
+			path:            "/a",
+			statusCode:      302,
+			followRedirects: ptr(false),
+		},
+		{
+			name:       "/b silent on redirects",
+			path:       "/b",
+			statusCode: 200,
+			body:       ptr("hello"),
+		},
+		{
+			name:            "/b with explicit followRedirects: true",
+			path:            "/b",
+			statusCode:      200,
+			followRedirects: ptr(true),
+			body:            ptr("hello"),
+		},
+		{
+			name:            "/b with explicit followRedirects: false",
+			path:            "/b",
+			statusCode:      200,
+			followRedirects: ptr(true),
+			body:            ptr("hello"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			v3 := parse(t, "tool/http.Get", fmt.Sprintf(`
+			{
+				url: "%s%s"
+			}`, server.URL, tc.path))
+
+			if tc.followRedirects != nil {
+				v3 = v3.FillPath(cue.ParsePath("followRedirects"), *tc.followRedirects)
+			}
+
+			resp, err := (*httpCmd).Run(nil, &task.Context{Obj: v3})
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// grab the response
+			response := resp.(map[string]interface{})["response"].(map[string]interface{})
+
+			if got := response["statusCode"]; got != tc.statusCode {
+				t.Fatalf("status not as expected: wanted %d, got %d", got, tc.statusCode)
+			}
+
+			if tc.body != nil {
+				want := *tc.body
+				if got := response["body"]; got != want {
+					t.Fatalf("body not as expected; wanted %q, got %q", got, want)
+				}
+			}
+		})
+	}
+}
+
+func ptr[T any](v T) *T {
+	return &v
+}

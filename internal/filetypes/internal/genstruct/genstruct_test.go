@@ -2,6 +2,7 @@ package genstruct
 
 import (
 	"fmt"
+	"maps"
 	"slices"
 	"testing"
 
@@ -38,6 +39,25 @@ func TestEnum(t *testing.T) {
 
 	a.Put(data, "baz")
 	qt.Assert(t, qt.Equals(GetEnum(data, 0, 1, values), "baz"))
+}
+
+func TestEnumMap(t *testing.T) {
+	keys := []string{"a", "b", "c", "d"}
+	values := []string{"v1", "v2"}
+	var s Struct
+	a := AddEnumMap(&s, keys, values, "", "m")
+	qt.Assert(t, qt.Equals(s.Size(), 1))
+	data := make([]byte, s.Size())
+	contents := map[string]string{
+		"a": "v1",
+		"d": "v2",
+	}
+	a.Put(data, maps.All(contents))
+	qt.Assert(t, qt.Equals(data[0], 0b10_00_00_01))
+	qt.Assert(t, qt.Equals(a.GenGet("x"), `genstruct.GetEnumMap(x, 0, 1, m_keys, m_values)`))
+	got := make(map[string]string)
+	maps.Insert(got, GetEnumMap(data, 0, 1, keys, values))
+	qt.Assert(t, qt.DeepEquals(got, contents))
 }
 
 func TestSet(t *testing.T) {

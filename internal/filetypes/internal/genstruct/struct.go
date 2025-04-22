@@ -6,6 +6,7 @@ package genstruct
 import (
 	"encoding/binary"
 	"fmt"
+	"io"
 	"iter"
 	"math/bits"
 	"strings"
@@ -101,7 +102,7 @@ func AddEnum[T comparable](s *Struct, values []T, defaultValue T, goValuesIdent,
 	}
 
 	a := enumAccessor[T]{
-		a:                 AddInt(s, uint64(len(values)), ""),
+		a:                 AddInt(s, uint64(len(values)-1), ""),
 		values:            values,
 		valueToIndex:      valueToIndex,
 		defaultValueIndex: -1,
@@ -158,23 +159,11 @@ func (a enumAccessor[T]) GenPut(bytesExpr, srcExpr string) string {
 
 func (a enumAccessor[T]) genInit() string {
 	var buf strings.Builder
-	fmt.Fprintf(&buf, "var (\n")
-	fmt.Fprintf(&buf, "\t%s = []%s {\n",
-		a.goValuesIdent,
-		a.goValueType,
-	)
 	if len(a.goValues) > 0 {
-		for _, v := range a.goValues {
-			fmt.Fprintf(&buf, "\t\t%#v,\n", v)
-		}
+		writeTable(&buf, a.goValuesIdent, a.goValueType, a.goValues)
 	} else {
-		for _, v := range a.values {
-			fmt.Fprintf(&buf, "\t\t%#v,\n", v)
-		}
+		writeTable(&buf, a.goValuesIdent, a.goValueType, a.values)
 	}
-	fmt.Fprintf(&buf, "\t}\n")
-	fmt.Fprintf(&buf, "\t%[1]s_rev = genstruct.IndexMap(%[1]s)\n", a.goValuesIdent)
-	fmt.Fprintf(&buf, ")\n")
 	return buf.String()
 }
 
@@ -234,7 +223,6 @@ func (a setAccessor) where() (int, int) {
 }
 
 func (a setAccessor) GenGet(bytesExpr string) string {
-	// e.g. SetEnum(&x.Foo, data, 24, 4, somethings)
 	offset, size := a.where()
 	return fmt.Sprintf("genstruct.GetSet(%s, %d, %d, %s)",
 		bytesExpr,
@@ -257,19 +245,114 @@ func (a setAccessor) GenPut(bytesExpr string, srcExpr string) string {
 
 func (a setAccessor) genInit() string {
 	var buf strings.Builder
-	fmt.Fprintf(&buf, "var (\n")
-	fmt.Fprintf(&buf, "\t%s = []string {\n",
-		a.goValuesIdent,
-	)
-	for _, v := range a.values {
-		fmt.Fprintf(&buf, "\t\t%q,\n", v)
+	writeTable(&buf, a.goValuesIdent, "string", a.values)
+	return buf.String()
+}
+
+// AddEnumMap adds a field to s that contains a map of any of the
+// possible keys, each of which can be any of the possible enum values.
+// If defaultValue is a member of values, it will be used as a default
+// value for values outside the set.
+func AddEnumMap[T comparable](s *Struct, keys []string, values []T, defaultValue T, goIdent string) Accessor[iter.Seq2[string, T]] {
+	if len(values) == 0 {
+		panic("empty set")
 	}
-	fmt.Fprintf(&buf, "\t}\n")
-	fmt.Fprintf(&buf, "\t%[1]s_rev = genstruct.IndexMap(%[1]s)\n", a.goValuesIdent)
-	fmt.Fprintf(&buf, ")\n")
+	// Note: one extra value (max is len(values) not len(values)-1) so
+	// that we can encode "key-not-present" as the zero value.
+	valueBits := bits.Len64(uint64(len(values)))
+	totalBits := len(keys) * valueBits
+	if totalBits > 64 {
+		// TODO allow for arbitrary length
+		panic("more than 2^64 possible values in map")
+	}
+	a := enumMapAccessor[T]{
+		a:          AddInt(s, (uint64(1)<<totalBits)-1, ""),
+		valueBits:  valueBits,
+		keyIndex:   IndexMap(keys),
+		valueIndex: IndexMap(values),
+		keys:       keys,
+		values:     values,
+		goIdent:    goIdent,
+	}
+	s.genInits = append(s.genInits, a.genInit)
+	return a
+}
+
+type enumMapAccessor[T comparable] struct {
+	a          Accessor[uint64]
+	valueBits  int
+	keyIndex   map[string]int
+	valueIndex map[T]int
+	keys       []string
+	values     []T
+	goIdent    string
+}
+
+func (a enumMapAccessor[T]) Put(data []byte, xs iter.Seq2[string, T]) {
+	var bits uint64
+	for key, val := range xs {
+		ki, ok := a.keyIndex[key]
+		if !ok {
+			panic(fmt.Errorf("map key %#v outside possible range", key))
+		}
+		vi, ok := a.valueIndex[val]
+		if !ok {
+			panic(fmt.Errorf("map value %#v outside possible range", val))
+		}
+		shift := ki * a.valueBits
+		// clear bits to guard against the possibility of having duplicate
+		// keys in the sequence.
+		bits &^= ((1 << a.valueBits) - 1) << shift // clear bits
+		bits |= (uint64(vi) + 1) << shift
+	}
+	a.a.Put(data, bits)
+}
+
+func (a enumMapAccessor[T]) where() (int, int) {
+	return a.a.where()
+}
+
+func (a enumMapAccessor[T]) GenGet(bytesExpr string) string {
+	offset, size := a.where()
+	return fmt.Sprintf("genstruct.GetEnumMap(%s, %d, %d, %s, %s)",
+		bytesExpr,
+		offset,
+		size,
+		a.goIdent+"_keys",
+		a.goIdent+"_values",
+	)
+}
+
+func (a enumMapAccessor[T]) GenPut(bytesExpr string, srcExpr string) string {
+	offset, size := a.where()
+	return fmt.Sprintf("genstruct.PutEnumMap(%s, %d, %d, %s, %s, -1, -1, %s)",
+		bytesExpr,
+		offset,
+		size,
+		a.goIdent+"_keys_rev",
+		a.goIdent+"_values_rev",
+		srcExpr,
+	)
+}
+
+func (a enumMapAccessor[T]) genInit() string {
+	var buf strings.Builder
+	writeTable(&buf, a.goIdent+"_keys", "string", a.keys)
+	writeTable(&buf, a.goIdent+"_values", "string", a.values)
 	return buf.String()
 }
 
 func intSize[T ~int | ~uint64](i T) int {
 	return (bits.Len64(uint64(i)) + 7) / 8
+}
+
+func writeTable[T any](w io.Writer, ident string, goType string, values []T) {
+	fmt.Fprintf(w, "var (\n")
+	fmt.Fprintf(w, "\t%s = []%s {\n", ident, goType)
+	for _, v := range values {
+		fmt.Fprintf(w, "\t\t%#v,\n", v)
+	}
+	fmt.Fprintf(w, "\t}\n")
+	fmt.Fprintf(w, "\t%[1]s_rev = genstruct.IndexMap(%[1]s)\n", ident)
+	fmt.Fprintf(w, ")\n")
 }

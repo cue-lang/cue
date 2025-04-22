@@ -25,9 +25,9 @@ func init() {
 
 var errInvalidTagCombination = fmt.Errorf("invalid tag combination")
 
-{{$.ToFileParams.GenInit}}
+{{.ToFileParams.GenInit}}
 
-{{$.ToFileResult.GenInit}}
+{{.ToFileResult.GenInit}}
 
 func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, error) {
 	dumpOnce.Do(dumpData)
@@ -41,7 +41,7 @@ func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, error)
 		return nil, errInvalidTagCombination		// TODO what error would be best?
 	}
 
-	switch e := {{$.ToFileResult.Error.GenGet "data"}}; e {
+	switch e := {{.ToFileResult.Error.GenGet "data"}}; e {
 	default:
 		return nil, fmt.Errorf("unknown error %d", e)
 	case 1, 2, 3:
@@ -52,10 +52,10 @@ func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, error)
 
 	var f build.File
 	f.Filename = filename
-	f.Encoding = {{$.ToFileResult.Encoding.GenGet "data"}}
-	f.Interpretation = {{$.ToFileResult.Interpretation.GenGet "data"}}
-	f.Form = {{$.ToFileResult.Form.GenGet "data"}}
-	// TODO check allowed tags
+	f.Encoding = {{.ToFileResult.Encoding.GenGet "data"}}
+	f.Interpretation = {{.ToFileResult.Interpretation.GenGet "data"}}
+	f.Form = {{.ToFileResult.Form.GenGet "data"}}
+
 	return &f, nil
 }
 

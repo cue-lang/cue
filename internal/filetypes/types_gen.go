@@ -167,7 +167,7 @@ func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, error)
 	f.Encoding = genstruct.GetEnum(data, 0, 1, allEncodings)
 	f.Interpretation = genstruct.GetEnum(data, 1, 1, allInterpretations)
 	f.Form = genstruct.GetEnum(data, 2, 1, allForms)
-	// TODO check allowed tags
+
 	return &f, nil
 }
 

@@ -7,7 +7,7 @@ import (
 	"cmp"
 	_ "embed"
 	"fmt"
-	"go/format"
+	goformat "go/format"
 	"iter"
 	"log"
 	"os"
@@ -20,6 +20,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/filetypes/internal/genstruct"
 )
@@ -51,12 +52,13 @@ type tagInfo struct {
 type fileResult struct {
 	bits uint64
 
-	mode           string
-	fileVal        cue.Value
-	filename       string
-	file           *build.File
-	subsidiaryTags map[string]bool
-	err            errorKind
+	mode               string
+	fileVal            cue.Value
+	filename           string
+	file               *build.File
+	subsidiaryTags     cue.Value
+	subsidiaryBoolTags cue.Value
+	err                errorKind
 
 	tags []string
 }
@@ -148,17 +150,57 @@ func generate() error {
 	if err := tmpl.Execute(&buf, params); err != nil {
 		return err
 	}
-	data, err := format.Source(buf.Bytes())
+	data, err := goformat.Source(buf.Bytes())
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "malformed source:\n%s\n", buf.Bytes())
-		return fmt.Errorf("malformed source: %v", err)
+		if err := os.WriteFile("types_gen.go", buf.Bytes(), 0o666); err != nil {
+			return err
+		}
+		return fmt.Errorf("malformed source in types_gen.go: %v", err)
 	}
 	if err := os.WriteFile("types_gen.go", data, 0o666); err != nil {
 		return err
 	}
 
+	results := slices.Collect(allCombinations(rootVal, topLevelTags, tags))
+	subsidiaryTagsByCUE := make(map[string]cue.Value)
+	subsidiaryTagKeys := make(map[string]bool)
+	//subsidiaryTagValues := make(map[string]bool)
+	subsidiaryBoolTagsByCUE := make(map[string]cue.Value)
+	subsidiaryBoolTagKeys := make(map[string]bool)
+	for _, r := range results {
+		if v := r.subsidiaryBoolTags; v.Exists() {
+			data, err := format.Node(v.Syntax())
+			if err != nil {
+				return err
+			}
+			subsidiaryBoolTagsByCUE[string(data)] = v
+			for name := range structFields(v, cue.Optional(true)) {
+				subsidiaryBoolTagKeys[name] = true
+			}
+		}
+		if v := r.subsidiaryTags; v.Exists() {
+			data, err := format.Node(v.Syntax())
+			if err != nil {
+				return err
+			}
+			subsidiaryTagsByCUE[string(data)] = v
+			for name := range structFields(v, cue.Optional(true)) {
+				subsidiaryTagKeys[name] = true
+				// TODO add values to subsidiaryTagValues
+			}
+		}
+	}
+	log.Printf("subsidiaryTags: %d variants; keys %v", len(subsidiaryTagsByCUE), subsidiaryTagKeys)
+	for c := range subsidiaryTagsByCUE {
+		log.Printf("- %s", c)
+	}
+	log.Printf("subsidiaryBoolTags: %d variants; keys %v", len(subsidiaryBoolTagsByCUE), subsidiaryBoolTagKeys)
+	for c := range subsidiaryBoolTagsByCUE {
+		log.Printf("- %s", c)
+	}
+
 	var recordData []byte
-	for r := range allCombinations(rootVal, topLevelTags, tags) {
+	for _, r := range results {
 		count++
 		if r.err != errNoError {
 			errCount++
@@ -194,22 +236,16 @@ func allCombinations(rootVal cue.Value, topLevelTags []string, tagInfo map[strin
 		}
 		filenames = append(filenames, "other")
 
-		for tags := range tagCombinations(top, topLevelTags, tagInfo) {
+		for r := range tagCombinations(top, topLevelTags, tagInfo) {
 			for mode, modeVal := range structFields(lookup(rootVal, "modes")) {
-				tags.fileVal = tags.fileVal.Unify(lookup(modeVal, "FileInfo"))
-				tags.subsidiaryTags = make(map[string]bool)
-				for tagName := range structFields(lookup(tags.fileVal, "tags")) {
-					tags.subsidiaryTags[tagName] = true
-				}
-				for tagName := range structFields(lookup(tags.fileVal, "boolTags")) {
-					tags.subsidiaryTags[tagName] = true
-				}
+				r.fileVal = r.fileVal.Unify(lookup(modeVal, "FileInfo"))
+				r.subsidiaryBoolTags = lookup(r.fileVal, "boolTags")
+				r.subsidiaryTags = lookup(r.fileVal, "tags")
+				r.mode = mode
 				for _, filename := range filenames {
-					tags1 := tags
-					tags1.mode = mode
-					tags1.filename = filename
-					tags1.file, tags1.err = toFile1(modeVal, tags.fileVal, filename)
-					if !yield(tags1) {
+					r.filename = filename
+					r.file, r.err = toFile1(modeVal, r.fileVal, filename)
+					if !yield(r) {
 						return
 					}
 				}
@@ -287,61 +323,26 @@ func tagCombinations(initial cue.Value, topLevelTags []string, tagInfo map[strin
 		if len(topLevelTags) > 64 {
 			panic("too many tags")
 		}
-		e := &tagEnumerator{
-			tags:    topLevelTags,
-			tagInfo: tagInfo,
-			yield:   yield,
+		type bitsValue struct {
+			bits uint64
+			v    cue.Value
+		}
+		evaluate := func(v bitsValue, tagIndex int, _ int) (bitsValue, bool) {
+			v.v = v.v.Unify(tagInfo[topLevelTags[tagIndex]].value)
+			v.bits |= 1 << tagIndex
+			return v, v.v.Validate() == nil
 		}
 
-		e.walk(initial, 0, 0)
-	}
-}
-
-type tagEnumerator struct {
-	count   int
-	tags    []string
-	tagInfo map[string]tagInfo
-	yield   func(fileResult) bool
-}
-
-func (e *tagEnumerator) bitsFor(tags ...string) uint64 {
-	r := uint64(0)
-	for _, name := range tags {
-		found := -1
-		for i, t := range e.tags {
-			if t == name {
-				found = i
+		for v := range walkSpace(len(topLevelTags), 1, bitsValue{0, initial}, evaluate) {
+			if !yield(fileResult{
+				bits:    v.bits,
+				fileVal: v.v,
+				tags:    topLevelTags,
+			}) {
+				return
 			}
 		}
-		if found == -1 {
-			panic(name + " not found")
-		}
-		r |= 1 << found
 	}
-	return r
-}
-
-func (e *tagEnumerator) walk(v cue.Value, bits uint64, maxBit int) bool {
-	if !e.yield(fileResult{
-		bits:    bits,
-		fileVal: v,
-		tags:    e.tags,
-	}) {
-		return false
-	}
-	for i := maxBit; i < len(e.tags); i++ {
-		e.count++
-		bit := uint64(1) << i
-		current := bits | bit
-		v1 := v.Unify(e.tagInfo[e.tags[i]].value)
-		if err := v1.Validate(); err != nil {
-			continue
-		}
-		if !e.walk(v1, current, i+1) {
-			return false
-		}
-	}
-	return true
 }
 
 func (ts fileResult) String() string {
@@ -366,12 +367,12 @@ func (ts fileResult) Compare(ts1 fileResult) int {
 
 // structFields returns an iterator over the names of all the fields
 // in v and their values.
-func structFields(v cue.Value) iter.Seq2[string, cue.Value] {
+func structFields(v cue.Value, opts ...cue.Option) iter.Seq2[string, cue.Value] {
 	return func(yield func(string, cue.Value) bool) {
 		if !v.Exists() {
 			return
 		}
-		iter, err := v.Fields()
+		iter, err := v.Fields(opts...)
 		if err != nil {
 			return
 		}
@@ -383,13 +384,6 @@ func structFields(v cue.Value) iter.Seq2[string, cue.Value] {
 	}
 }
 
-type genToFileParams struct {
-	genstruct.Struct
-	Tags    genstruct.Accessor[iter.Seq[string]]
-	FileExt genstruct.Accessor[string]
-	Mode    genstruct.Accessor[filetypes.Mode]
-}
-
 func newToFileParamsStruct(topLevelTags, fileExts []string) *genToFileParams {
 	r := &genToFileParams{}
 	r.Mode = genstruct.AddInt(&r.Struct, filetypes.NumModes, "Mode")
@@ -398,6 +392,13 @@ func newToFileParamsStruct(topLevelTags, fileExts []string) *genToFileParams {
 	r.FileExt = genstruct.AddEnum(&r.Struct, fileExts, "", "allFileExts", "string", nil)
 	r.Tags = genstruct.AddSet(&r.Struct, topLevelTags, "allTopLevelTags")
 	return r
+}
+
+type genToFileParams struct {
+	genstruct.Struct
+	Tags    genstruct.Accessor[iter.Seq[string]]
+	FileExt genstruct.Accessor[string]
+	Mode    genstruct.Accessor[filetypes.Mode]
 }
 
 type genToFileResult struct {
@@ -423,6 +424,53 @@ func newToFileResultStruct(
 	r.Error = genstruct.AddInt(&r.Struct, numErrors, "int")
 
 	return r
+}
+
+type dimspace[V any] struct {
+	evaluate      func(v V, dim, item int) (V, bool)
+	numDimensions int
+	numValues     int
+	yield         func(V) bool
+}
+
+// walkSpace explores the values that are possible to reach from the given initial
+// value within the given number of dimensions (numDimentions), where each point in space
+// can have the given number of possible item values (numItems).
+// It calls evaluate to derive further values as it walks the space, and
+// truncates the tree whereever evaluate returns false.
+//
+// Note that evaluate will always be called with arguments in the range [0, numDimensions)
+// and [0, numItems].
+//
+// Note also that this exploration relies on the property that evaluate is commutative;
+// that is, for a given point in the space, the result does not depend on the path
+// taken to reach that point.
+func walkSpace[V any](numDimensions, numValues int, initial V, evaluate func(v V, dim, item int) (V, bool)) iter.Seq[V] {
+	return func(yield func(V) bool) {
+		b := &dimspace[V]{
+			evaluate:      evaluate,
+			numDimensions: numDimensions,
+			numValues:     numValues,
+			yield:         yield,
+		}
+		b.walk(initial, 0)
+	}
+}
+
+func (b *dimspace[V]) walk(v V, maxDim int) bool {
+	if !b.yield(v) {
+		return false
+	}
+	for i := maxDim; i < b.numDimensions; i++ {
+		for j := range b.numValues {
+			if v1, ok := b.evaluate(v, i, j); ok {
+				if !b.walk(v1, i+1) {
+					return false
+				}
+			}
+		}
+	}
+	return true
 }
 
 func keys[K, V any](seq iter.Seq2[K, V]) iter.Seq[K] {

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cafab668_50801b31",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T13:20:45Z",
+      "side": 1,
+      "message": "I would add a brief mention that the new behaviour aligns with Go\u0027s embed.",
+      "revId": "2e024473fe8dc87f2d77413864e983ec20d53aa4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2621665f_157ae4e8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T13:20:45Z",
+      "side": 1,
+      "message": "And I would draw the analogy here with bash\u0027s option-based approach here.",
+      "revId": "2e024473fe8dc87f2d77413864e983ec20d53aa4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "Drive-by comment: how can `i \u003e\u003d len(patElems)` ever be true? Wouldn\u0027t we have run out of `pathElems(m)` before then?",
       "revId": "11e518ec87eb5da6842a4288500e41d86ac0f59d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a9d663a_185d8bc6",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-23T13:16:34Z",
+      "side": 1,
+      "message": "Defensive programming. I don\u0027t think it can, but nonetheless I don\u0027t want the risk of a panic if for some reason it is actually possible.",
+      "parentUuid": "4ff7fe5c_46742f98",
+      "revId": "11e518ec87eb5da6842a4288500e41d86ac0f59d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

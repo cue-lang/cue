@@ -1,0 +1,21 @@
+# Test that a wildcard match that doesn't match anything will
+# results in an error.
+
+! exec cue export
+cmp stderr stderr.golden
+
+-- stderr.golden --
+@embed: no matches for gob pattern "*.json":
+    ./test.cue:5:6
+-- cue.mod/module.cue --
+module: "cue.example"
+language: version: "v0.11.0"
+
+-- test.cue --
+@extern(embed)
+
+package foo
+
+a: _ @embed(glob="*.json")
+-- .foo.json --
+true

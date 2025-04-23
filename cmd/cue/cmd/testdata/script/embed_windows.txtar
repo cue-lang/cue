@@ -2,8 +2,8 @@
 [!windows] exec cue export --out cue
 [!windows] cmp stdout out/export-unix
 
-[windows] exec cue export --out cue
-[windows] cmp stdout out/export-windows
+[windows] ! exec cue export --out cue
+[windows] cmp stderr out/stderr-windows
 
 -- cue.mod/module.cue --
 module: "cue.test"
@@ -30,6 +30,6 @@ globStar: {
 	"star/simple.json": x: "does not contain a star character"
 }
 globEscapeStar: "star/*.json": x: "to be reused for more names"
--- out/export-windows --
-globStar: "star/simple.json": x: "does not contain a star character"
-globEscapeStar: {}
+-- out/stderr-windows --
+@embed: no matches for gob pattern "star/\\**":
+    ./test.cue:10:19

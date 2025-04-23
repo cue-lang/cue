@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b87cdcbb_d9bb0330",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T13:25:34Z",
+      "side": 1,
+      "message": "I\u0027m not as familiar as you on the iterator patterns etc, so please feel free to take that nit with a pinch of salt.",
+      "revId": "b21c047257d6e5003d736646aa4dd41e8efb1292",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6537c13_c6740305",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T13:25:34Z",
+      "side": 1,
+      "message": "nit: this (and the pathElems iterator below) feels like a lot of machinery?! Would `strings.Split` not be simpler in this case?",
+      "revId": "b21c047257d6e5003d736646aa4dd41e8efb1292",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

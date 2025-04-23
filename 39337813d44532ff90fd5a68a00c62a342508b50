@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "648a9eef_40fe9dd5",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T09:58:37Z",
+      "side": 1,
+      "message": "Ha! That\u0027s an excellent point. I think most of this comment belongs in the commit message :)\n\nI\u0027ve reworded this section to make it current, i.e. a statement of when we want errors to be surfaced during the initial command and task discovery phase.",
+      "parentUuid": "3ef4beaa_bbfef783",
+      "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eafebc07_9bafbe9d",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-04-22T16:14:58Z",
       "side": 1,
       "message": "should \"asdf\" not be \"doesNotExist\" here? Otherwise I don\u0027t see where the error message has come from.",
+      "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1437d24_05c9c981",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T09:58:37Z",
+      "side": 1,
+      "message": "Copy-paste typo issue. I tweaked the example in another terminal where I was testing this stuff, then didn\u0027t fix up properly.",
+      "parentUuid": "eafebc07_9bafbe9d",
       "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a89af060_a24888e8",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T09:58:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53ac3acf_c8b985ee",
+      "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6fe26047_624630cf",
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6325fd6a_f946db85",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T09:58:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6fe26047_624630cf",
+      "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "39ed4d2d_d7af3c9d",
@@ -99,6 +171,24 @@
       "writtenOn": "2025-04-22T16:14:58Z",
       "side": 1,
       "message": "Maybe \"no tasks found in command\" might be a slightly nicer error message?",
+      "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0580141d_d580f999",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T09:58:37Z",
+      "side": 1,
+      "message": "I went with \"no tasks found\" because the `command` context is present at the start of the error message.",
+      "parentUuid": "39ed4d2d_d7af3c9d",
       "revId": "39337813d44532ff90fd5a68a00c62a342508b50",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

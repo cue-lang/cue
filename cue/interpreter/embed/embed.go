@@ -236,6 +236,9 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 	if err != nil {
 		return nil, errors.Promote(err, "failed to match glob")
 	}
+	if len(matches) == 0 {
+		return nil, errors.Newf(c.pos, "no matches for gob pattern %q", glob)
+	}
 
 	dirs := make(map[string]string)
 	for _, f := range matches {

@@ -33,6 +33,24 @@
       "message": "nit: this (and the pathElems iterator below) feels like a lot of machinery?! Would `strings.Split` not be simpler in this case?",
       "revId": "b21c047257d6e5003d736646aa4dd41e8efb1292",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7254c1f9_eec8701e",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-23T15:29:51Z",
+      "side": 1,
+      "message": "Yeah, good point. And it\u0027s not even that good of a path iterator anyway. Done.",
+      "parentUuid": "f6537c13_c6740305",
+      "revId": "b21c047257d6e5003d736646aa4dd41e8efb1292",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

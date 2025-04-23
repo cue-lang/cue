@@ -16,6 +16,24 @@
       "message": "nit: either \"in the case\" or \"when\" would work better grammatically, I think.",
       "revId": "431a7217592a40efaf5032865bfe179055f2344b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3e5956e_e14856fb",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T12:56:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f2e6e4fd_ebd955b8",
+      "revId": "431a7217592a40efaf5032865bfe179055f2344b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

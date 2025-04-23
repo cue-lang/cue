@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e99f894_46aadc49",
+        "filename": "pkg/tool/http/http.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T13:01:03Z",
+      "side": 1,
+      "message": "We could do that, but in many/most situations that would be redundant where the user has done this already. For now, I\u0027ll leave as is, not least because that\u0027s consistent with the pattern used elsewhere. We can follow up if required, but the comment in #1325 is pretty clear that this \"backdoor\" approach needs to not exist.",
+      "parentUuid": "2f905d29_3a52dd62",
+      "revId": "47cbea65a9da586b837ac2fc2f88268266c37339",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97909e1a_be7ab98d",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f87ad31_1827639a",
+        "filename": "pkg/tool/http/http_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T13:01:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97909e1a_be7ab98d",
+      "revId": "47cbea65a9da586b837ac2fc2f88268266c37339",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6da965e_0fb95525",
@@ -65,6 +101,24 @@
       "writtenOn": "2025-04-22T16:01:55Z",
       "side": 1,
       "message": "FWIW i\u0027ve been calling this \"ref\" where I\u0027ve been defining it (e.g. in ./encoding/jsonschema/jsonschema.go) and it might be nice to be consistent, one way or other. I\u0027ve no particularly strong opinions about which spelling is better.",
+      "revId": "47cbea65a9da586b837ac2fc2f88268266c37339",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4997eb6_ecb1cee7",
+        "filename": "pkg/tool/http/http_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-23T13:01:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a6da965e_0fb95525",
       "revId": "47cbea65a9da586b837ac2fc2f88268266c37339",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

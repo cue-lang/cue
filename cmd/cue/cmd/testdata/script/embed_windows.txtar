@@ -31,5 +31,5 @@ globStar: {
 }
 globEscapeStar: "star/*.json": x: "to be reused for more names"
 -- out/stderr-windows --
-@embed: no matches for gob pattern "star/\\**":
+@embed: no matches for glob pattern "star/\\**":
     ./test.cue:10:19

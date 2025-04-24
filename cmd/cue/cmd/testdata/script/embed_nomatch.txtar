@@ -5,7 +5,7 @@
 cmp stderr stderr.golden
 
 -- stderr.golden --
-@embed: no matches for gob pattern "*.json":
+@embed: no matches for glob pattern "*.json":
     ./test.cue:5:6
 -- cue.mod/module.cue --
 module: "cue.example"

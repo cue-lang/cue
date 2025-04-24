@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cd877f2_94ccb979",
+        "filename": "internal/golangorgx/gopls/cache/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 692,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-24T11:55:45Z",
+      "side": 1,
+      "message": "I\u0027ll come back and sort this out when I get a little further on - I realise this is not right yet!",
+      "revId": "914f0b7926f033dca55bc6d28bc1fc100003c409",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

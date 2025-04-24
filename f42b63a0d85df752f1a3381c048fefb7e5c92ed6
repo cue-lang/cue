@@ -16,6 +16,23 @@
       "message": "This is because all of this code is really for supporting the metadata.Package type which gopls uses. But really, I think the CUE equiv there is a build.Instance. And so if we need the current functionality, it\u0027s all going to have to be rewritten anyway.",
       "revId": "f42b63a0d85df752f1a3381c048fefb7e5c92ed6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "422cdb35_0acef357",
+        "filename": "internal/golangorgx/gopls/cache/view.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-24T15:32:11Z",
+      "side": 1,
+      "message": "Probably in the next CL, I\u0027ll add tests to deal with \"what if the module.cue file is garbage\". I\u0027m not currently reading the modulePath field at all in Snapshot.load...",
+      "revId": "f42b63a0d85df752f1a3381c048fefb7e5c92ed6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

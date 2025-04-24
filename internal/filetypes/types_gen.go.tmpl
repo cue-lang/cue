@@ -17,10 +17,15 @@ import (
 	"cuelang.org/go/internal/filetypes/internal/genstruct"
 )
 
-// Define the opt type and its associated [some] function for use by the generated code.
+// TODO use string instead of []byte so that we can
+// use the init data directly without copying into
+// read-write memory.
 
 //go:embed fileinfo.dat
 var fileInfoDataBytes []byte
+
+//go:embed fromfile.dat
+var fromFileDataBytes []byte
 
 func init() {
 	tagTypes = map[string]TagType{
@@ -28,10 +33,13 @@ func init() {
 	}
 }
 
+{{.ToFileParams.GenInit .Generated}}
 
-{{.ToFileParams.GenInit}}
+{{.ToFileResult.GenInit .Generated}}
 
-{{.ToFileResult.GenInit}}
+{{.FromFileParams.GenInit .Generated}}
+
+{{.FromFileResult.GenInit .Generated}}
 
 func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, errors.Error) {
 	key := make([]byte, {{.ToFileParams.Size}})
@@ -93,6 +101,27 @@ func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, errors
 	}
 
 	return &f, nil
+}
+
+func fromFileGenerated(b *build.File, mode Mode) (*FileInfo, error) {
+	key := make([]byte, {{.FromFileParams.Size}})
+	{{.FromFileParams.Mode.GenPut "key" "mode"}}
+	{{.FromFileParams.Encoding.GenPut "key" "b.Encoding"}}
+	{{.FromFileParams.Interpretation.GenPut "key" "b.Interpretation"}}
+	{{.FromFileParams.Form.GenPut "key" "b.Form"}}
+
+	data, ok := genstruct.FindRecord(fromFileDataBytes, {{.FromFileParams.Size}}+{{.FromFileResult.Size}}, key)
+	if !ok {
+		return nil, errors.Newf(token.NoPos, "no encoding specified")
+	}
+	fi := &FileInfo{
+		Filename: b.Filename,
+		Encoding: {{.FromFileResult.Encoding.GenGet "data"}},
+		Interpretation: {{.FromFileResult.Interpretation.GenGet "data"}},
+		Form: {{.FromFileResult.Form.GenGet "data"}},
+	}
+	fi.SetAspects({{.FromFileResult.Aspects.GenGet "data"}})
+	return fi, nil
 }
 
 func someKey[K cmp.Ordered, V any](m map[K] V) K {

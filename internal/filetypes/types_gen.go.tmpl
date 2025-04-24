@@ -27,8 +27,15 @@ func some[T any](x T) opt[T] {
 	return optpkg.Some(x)
 }
 
+// TODO use string instead of []byte so that we can
+// use the init data directly without copying into
+// read-write memory.
+
 //go:embed fileinfo.dat
 var fileInfoDataBytes []byte
+
+//go:embed fromfile.dat
+var fromFileDataBytes []byte
 
 func init() {
 	tagTypes = map[string]TagType{
@@ -36,13 +43,15 @@ func init() {
 	}
 }
 
+{{.ToFileParams.GenInit .Generated}}
 
-{{.ToFileParams.GenInit}}
+{{.ToFileResult.GenInit .Generated}}
 
-{{.ToFileResult.GenInit}}
+{{.FromFileParams.GenInit .Generated}}
+
+{{.FromFileResult.GenInit .Generated}}
 
 func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, errors.Error) {
-	dumpOnce.Do(dumpData)
 	key := make([]byte, {{.ToFileParams.Size}})
 	{{.ToFileParams.Tags.GenPut "key" "maps.Keys(sc.topLevel)"}}
 	{{.ToFileParams.FileExt.GenPut "key" "fileExt(filename)"}}
@@ -104,6 +113,28 @@ func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, errors
 	return &f, nil
 }
 
+func fromFileGenerated(b *build.File, mode Mode) (*FileInfo, error) {
+	dumpOnce.Do(dumpData)
+	key := make([]byte, {{.FromFileParams.Size}})
+	{{.FromFileParams.Mode.GenPut "key" "mode"}}
+	{{.FromFileParams.Encoding.GenPut "key" "b.Encoding"}}
+	{{.FromFileParams.Interpretation.GenPut "key" "b.Interpretation"}}
+	{{.FromFileParams.Form.GenPut "key" "b.Form"}}
+
+	data, ok := genstruct.FindRecord(fromFileDataBytes, {{.FromFileParams.Size}}+{{.FromFileResult.Size}}, key)
+	if !ok {
+		return nil, errors.Newf(token.NoPos, "no encoding specified")
+	}
+	fi := &FileInfo{
+		Filename: b.Filename,
+		Encoding: {{.FromFileResult.Encoding.GenGet "data"}},
+		Interpretation: {{.FromFileResult.Interpretation.GenGet "data"}},
+		Form: {{.FromFileResult.Form.GenGet "data"}},
+	}
+	fi.SetAspects({{.FromFileResult.Aspects.GenGet "data"}})
+	return fi, nil
+}
+
 func someKey[K cmp.Ordered, V any](m map[K] V) K {
 	return slices.Sorted(maps.Keys(m))[0]
 }
@@ -121,16 +152,33 @@ var subsidiaryTagFuncs = []func(subsidiaryTags) (subsidiaryTags, error) {
 var dumpOnce sync.Once
 
 func dumpData() {
-	return
-	recSize := {{.ToFileParams.Size}}+{{.ToFileResult.Size}}
-	i := 0
-	for data := fileInfoDataBytes; len(data) > 0; data, i = data[recSize:], i+1 {
-		data := data[:recSize:recSize]
-		key := data[:{{.ToFileParams.Size}}]
-		//val := data[len(key):]
-		tags := slices.Collect({{.ToFileParams.Tags.GenGet "key"}})
-		fileExt := {{.ToFileParams.FileExt.GenGet "key"}}
-		mode := {{.ToFileParams.Mode.GenGet "key"}}
-		log.Printf("key %d: mode %v; fileExt %q; tags %q; %v", i, mode, fileExt, tags, key)
+	if false {
+		log.Printf("toFile data:")
+		recSize := {{.ToFileParams.Size}}+{{.ToFileResult.Size}}
+		i := 0
+		for data := fileInfoDataBytes; len(data) > 0; data, i = data[recSize:], i+1 {
+			data := data[:recSize:recSize]
+			key := data[:{{.ToFileParams.Size}}]
+			//val := data[len(key):]
+			tags := slices.Collect({{.ToFileParams.Tags.GenGet "key"}})
+			fileExt := {{.ToFileParams.FileExt.GenGet "key"}}
+			mode := {{.ToFileParams.Mode.GenGet "key"}}
+			log.Printf("key %d: mode %v; fileExt %q; tags %q; %v", i, mode, fileExt, tags, key)
+		}
+	}
+	if false {
+		log.Printf("fromFile data:")
+		recSize := {{.FromFileParams.Size}}+{{.FromFileResult.Size}}
+		i := 0
+		for data := fromFileDataBytes; len(data) > 0; data, i = data[recSize:], i+1 {
+			data := data[:recSize:recSize]
+			key := data[:{{.FromFileParams.Size}}]
+			//val := data[len(key):]
+			mode := {{.FromFileParams.Mode.GenGet "key"}}
+			encoding := {{.FromFileParams.Encoding.GenGet "key"}}
+			interpretation := {{.FromFileParams.Interpretation.GenGet "key"}}
+			form := {{.FromFileParams.Form.GenGet "key"}}
+			log.Printf("key %d: mode %v; encoding %q; interpretation %q; form %q; %v", i, mode, encoding, interpretation, form, key)
+		}
 	}
 }

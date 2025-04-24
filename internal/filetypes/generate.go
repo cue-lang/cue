@@ -21,7 +21,9 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/filetypes/internal"
 	"cuelang.org/go/internal/filetypes/internal/genfunc"
@@ -32,9 +34,14 @@ type tmplParams struct {
 	TagTypes                   map[string]filetypes.TagType
 	ToFileParams               *genToFileParams
 	ToFileResult               *genToFileResult
+	FromFileParams             *genFromFileParams
+	FromFileResult             *genFromFileResult
 	SubsidiaryBoolTagFuncCount int
 	SubsidiaryTagFuncCount     int
 	Data                       string
+	// Generated is used by the generation code to avoid
+	// generating the same global identifier twice.
+	Generated map[string]bool
 }
 
 var (
@@ -73,16 +80,16 @@ type fileResult struct {
 	tags []string
 }
 
-func (r *fileResult) appendRecord(data []byte, paramStruct *genToFileParams, resultStruct *genToFileResult) []byte {
-	recordSize := paramStruct.Size() + resultStruct.Size()
+func (r *fileResult) appendRecord(data []byte, paramsStruct *genToFileParams, resultStruct *genToFileResult) []byte {
+	recordSize := paramsStruct.Size() + resultStruct.Size()
 	data = slices.Grow(data, recordSize)
 	data = data[:len(data)+recordSize]
 	record := data[len(data)-recordSize:]
 
 	// Write the key part of the record.
-	param := slices.Clip(record[:paramStruct.Size()])
-	paramStruct.FileExt.Put(param, fileExt(r.filename))
-	paramStruct.Tags.Put(param, genstruct.ElemsFromBits(r.bits, r.tags))
+	param := slices.Clip(record[:paramsStruct.Size()])
+	paramsStruct.FileExt.Put(param, fileExt(r.filename))
+	paramsStruct.Tags.Put(param, genstruct.ElemsFromBits(r.bits, r.tags))
 	var mode filetypes.Mode
 	switch r.mode {
 	case "input":
@@ -96,9 +103,9 @@ func (r *fileResult) appendRecord(data []byte, paramStruct *genToFileParams, res
 	default:
 		panic(fmt.Errorf("unknown mode %q", r.mode))
 	}
-	paramStruct.Mode.Put(param, mode)
+	paramsStruct.Mode.Put(param, mode)
 
-	result := slices.Clip(record[paramStruct.Size():])
+	result := slices.Clip(record[paramsStruct.Size():])
 	// Write the result part of the record.
 	if r.err != internal.ErrNoError {
 		resultStruct.Error.Put(result, r.err)
@@ -129,13 +136,38 @@ func generate() error {
 	top = ctx.CompileString("_")
 	rootVal := ctx.CompileString(typesCUE, cue.Filename("types.cue"))
 
-	if err := generateToFile(rootVal); err != nil {
+	toFile, err := generateToFile(rootVal)
+	if err != nil {
+		return err
+	}
+	fromFile, err := generateFromFile(rootVal)
+	if err != nil {
+		return err
+	}
+	if err := generateCode(toFile, fromFile); err != nil {
 		return err
 	}
 	return nil
 }
 
-func generateToFile(rootVal cue.Value) error {
+// toFileInfo holds the information needed to generate the toFile implementation code.
+type toFileInfo struct {
+	paramsStruct            *genToFileParams
+	resultStruct            *genToFileResult
+	tagTypes                map[string]filetypes.TagType
+	subsidiaryBoolTagsByCUE map[string]cueValue
+	subsidiaryTagsByCUE     map[string]cueValue
+	subsidiaryBoolTagKeys   []string
+	subsidiaryTagKeys       []string
+}
+
+// fromFileInfo holds the information needed to generate the fromFile implementation code.
+type fromFileInfo struct {
+	paramsStruct *genFromFileParams
+	resultStruct *genFromFileResult
+}
+
+func generateToFile(rootVal cue.Value) (toFileInfo, error) {
 	count := 0
 	errCount := 0
 	tags, topLevelTags, _ := allTags(rootVal)
@@ -174,47 +206,6 @@ func generateToFile(rootVal cue.Value) error {
 	for name, info := range tags {
 		tagTypes[name] = info.typ
 	}
-	params := tmplParams{
-		ToFileParams:               toFileParams,
-		ToFileResult:               toFileResult,
-		TagTypes:                   tagTypes,
-		Data:                       "fileInfoDataBytes",
-		SubsidiaryBoolTagFuncCount: len(subsidiaryBoolTagsByCUE),
-		SubsidiaryTagFuncCount:     len(subsidiaryTagsByCUE),
-	}
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, params); err != nil {
-		return err
-	}
-
-	// Now generate the subsidiary tag logic; we generate
-	// a type for each class of subsidiary tag, containing all the possible
-	// tags for that class. Then we generate a function for each
-	// distinct piece of CUE logic that implements that logic
-	// in Go.
-	genfunc.GenerateGoTypeForFields(&buf, "subsidiaryTags", subsidiaryTagKeys, "string")
-	genfunc.GenerateGoTypeForFields(&buf, "subsidiaryBoolTags", subsidiaryBoolTagKeys, "bool")
-
-	for _, k := range slices.Sorted(maps.Keys(subsidiaryTagsByCUE)) {
-		v := subsidiaryTagsByCUE[k]
-		genfunc.GenerateGoFuncForCUEStruct(&buf, fmt.Sprintf("unifySubsidiaryTags_%d", v.index), "subsidiaryTags", v.v, subsidiaryTagKeys, "string")
-	}
-
-	for _, k := range slices.Sorted(maps.Keys(subsidiaryBoolTagsByCUE)) {
-		v := subsidiaryBoolTagsByCUE[k]
-		genfunc.GenerateGoFuncForCUEStruct(&buf, fmt.Sprintf("unifySubsidiaryBoolTags_%d", v.index), "subsidiaryBoolTags", v.v, subsidiaryBoolTagKeys, "bool")
-	}
-
-	data, err := goformat.Source(buf.Bytes())
-	if err != nil {
-		if err := os.WriteFile("types_gen.go", buf.Bytes(), 0o666); err != nil {
-			return err
-		}
-		return fmt.Errorf("malformed source in types_gen.go:%v", err)
-	}
-	if err := os.WriteFile("types_gen.go", data, 0o666); err != nil {
-		return err
-	}
 	//	log.Printf("subsidiaryTags: %d variants; keys %v", len(subsidiaryTagsByCUE), subsidiaryTagKeys)
 	//	for c := range subsidiaryTagsByCUE {
 	//		log.Printf("- %s", c)
@@ -236,7 +227,7 @@ func generateToFile(rootVal cue.Value) error {
 	//	log.Printf("got %d possibilities; %d errors\n", count, errCount)
 	//	log.Printf("recordData length %d; record length %d\n", len(recordData), toFileParams.Size()+toFileResult.Size())
 	if err := os.WriteFile("fileinfo.dat", recordData, 0o666); err != nil {
-		return err
+		return toFileInfo{}, err
 	}
 
 	//fmt.Printf("mode %s; got %d combinations {\n", name, len(found))
@@ -246,7 +237,193 @@ func generateToFile(rootVal cue.Value) error {
 	//			fmt.Printf("\tfile: %#v\n", t.info.File)
 	//			fmt.Printf("}\n")
 	//		}
+	return toFileInfo{
+		paramsStruct:            toFileParams,
+		resultStruct:            toFileResult,
+		tagTypes:                tagTypes,
+		subsidiaryBoolTagsByCUE: subsidiaryBoolTagsByCUE,
+		subsidiaryTagsByCUE:     subsidiaryTagsByCUE,
+		subsidiaryBoolTagKeys:   subsidiaryBoolTagKeys,
+		subsidiaryTagKeys:       subsidiaryTagKeys,
+	}, nil
+}
+
+func generateCode(
+	toFile toFileInfo,
+	fromFile fromFileInfo,
+) error {
+	params := tmplParams{
+		ToFileParams:               toFile.paramsStruct,
+		ToFileResult:               toFile.resultStruct,
+		FromFileParams:             fromFile.paramsStruct,
+		FromFileResult:             fromFile.resultStruct,
+		TagTypes:                   toFile.tagTypes,
+		Data:                       "fileInfoDataBytes",
+		SubsidiaryBoolTagFuncCount: len(toFile.subsidiaryBoolTagsByCUE),
+		SubsidiaryTagFuncCount:     len(toFile.subsidiaryTagsByCUE),
+		Generated:                  make(map[string]bool),
+	}
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, params); err != nil {
+		return err
+	}
+
+	// Now generate the subsidiary tag logic; we generate
+	// a type for each class of subsidiary tag, containing all the possible
+	// tags for that class. Then we generate a function for each
+	// distinct piece of CUE logic that implements that logic
+	// in Go.
+	genfunc.GenerateGoTypeForFields(&buf, "subsidiaryTags", toFile.subsidiaryTagKeys, "string")
+	genfunc.GenerateGoTypeForFields(&buf, "subsidiaryBoolTags", toFile.subsidiaryBoolTagKeys, "bool")
+
+	for _, k := range slices.Sorted(maps.Keys(toFile.subsidiaryTagsByCUE)) {
+		v := toFile.subsidiaryTagsByCUE[k]
+		genfunc.GenerateGoFuncForCUEStruct(&buf, fmt.Sprintf("unifySubsidiaryTags_%d", v.index), "subsidiaryTags", v.v, toFile.subsidiaryTagKeys, "string")
+	}
+
+	for _, k := range slices.Sorted(maps.Keys(toFile.subsidiaryBoolTagsByCUE)) {
+		v := toFile.subsidiaryBoolTagsByCUE[k]
+		genfunc.GenerateGoFuncForCUEStruct(&buf, fmt.Sprintf("unifySubsidiaryBoolTags_%d", v.index), "subsidiaryBoolTags", v.v, toFile.subsidiaryBoolTagKeys, "bool")
+	}
+
+	data, err := goformat.Source(buf.Bytes())
+	if err != nil {
+		if err := os.WriteFile("types_gen.go", buf.Bytes(), 0o666); err != nil {
+			return err
+		}
+		return fmt.Errorf("malformed source in types_gen.go:%v", err)
+	}
+	if err := os.WriteFile("types_gen.go", data, 0o666); err != nil {
+		return err
+	}
 	return nil
+}
+
+func generateFromFile(rootVal cue.Value) (fromFileInfo, error) {
+	allEncodings := append(allKeys[build.Encoding](rootVal, "all", "encodings"), "")
+	allInterpretations := append(allKeys[build.Interpretation](rootVal, "all", "interpretations"), "")
+	allForms := append(allKeys[build.Form](rootVal, "all", "forms"), "")
+	paramsStruct := newFromFileParamsStruct(
+		allEncodings,
+		allInterpretations,
+		allForms,
+	)
+	resultStruct := newFromFileResult(
+		allEncodings,
+		allInterpretations,
+		allForms,
+	)
+	var recordData []byte
+	for mode := range filetypes.NumModes {
+		for _, encoding := range allEncodings {
+			for _, interpretation := range allInterpretations {
+				for _, form := range allForms {
+					f := &build.File{
+						Encoding:       encoding,
+						Interpretation: interpretation,
+						Form:           form,
+					}
+					fi, err := fromFileOrig(rootVal, f, mode)
+					if err != nil {
+						continue
+					}
+					recordData = appendFromFileRecord(recordData, paramsStruct, resultStruct, mode, f, fi)
+				}
+			}
+		}
+	}
+	genstruct.SortRecords(recordData, paramsStruct.Size()+resultStruct.Size(), paramsStruct.Size())
+	if err := os.WriteFile("fromfile.dat", recordData, 0o666); err != nil {
+		return fromFileInfo{}, err
+	}
+
+	return fromFileInfo{
+		paramsStruct: paramsStruct,
+		resultStruct: resultStruct,
+	}, nil
+}
+
+func appendFromFileRecord(
+	data []byte,
+	paramsStruct *genFromFileParams,
+	resultStruct *genFromFileResult,
+	mode filetypes.Mode,
+	f *build.File,
+	fi *filetypes.FileInfo,
+) []byte {
+	recordSize := paramsStruct.Size() + resultStruct.Size()
+	data = slices.Grow(data, recordSize)
+	data = data[:len(data)+recordSize]
+	record := data[len(data)-recordSize:]
+
+	// Write the key part of the record.
+	param := slices.Clip(record[:paramsStruct.Size()])
+	paramsStruct.Mode.Put(param, mode)
+	paramsStruct.Encoding.Put(param, f.Encoding)
+	paramsStruct.Interpretation.Put(param, f.Interpretation)
+	paramsStruct.Form.Put(param, f.Form)
+
+	result := slices.Clip(record[paramsStruct.Size():])
+	resultStruct.Encoding.Put(result, fi.Encoding)
+	resultStruct.Interpretation.Put(result, fi.Interpretation)
+	resultStruct.Form.Put(result, fi.Form)
+	resultStruct.Aspects.Put(result, fi.Aspects())
+	return data
+}
+
+func fromFileOrig(rootVal cue.Value, b *build.File, mode filetypes.Mode) (*filetypes.FileInfo, error) {
+	modeVal := lookup(rootVal, "modes", mode.String())
+	fileVal := lookup(modeVal, "FileInfo")
+	if b.Encoding == "" {
+		return nil, errors.Newf(token.NoPos, "no encoding specified")
+	}
+	fileVal = fileVal.FillPath(cue.MakePath(cue.Str("encoding")), b.Encoding)
+	if b.Interpretation != "" {
+		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("interpretation")), b.Interpretation)
+	}
+	if b.Form != "" {
+		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("form")), b.Form)
+	}
+	var errs errors.Error
+	var interpretation string
+	if b.Form != "" {
+		fileVal, errs = unifyWith(errs, fileVal, rootVal, "forms", string(b.Form))
+		if errs != nil {
+			return nil, errs
+		}
+		interpretation, _ = lookup(fileVal, "interpretation").String()
+		// may leave some encoding-dependent options open in data mode.
+	} else {
+		interpretation, _ = lookup(fileVal, "interpretation").String()
+		if interpretation != "" {
+			// always sets form=*schema
+			fileVal, errs = unifyWith(errs, fileVal, rootVal, "interpretations", interpretation)
+		}
+	}
+	if interpretation == "" {
+		encoding, err := lookup(fileVal, "encoding").String()
+		if err != nil {
+			return nil, err
+		}
+		fileVal, errs = unifyWith(errs, fileVal, modeVal, "encodings", encoding)
+	}
+
+	fi := &filetypes.FileInfo{}
+	if err := fileVal.Decode(fi); err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "could not parse arguments")
+	}
+	fi.Filename = b.Filename
+	return fi, errs
+}
+
+// unifyWith returns the equivalent of `v1 & v2[field][value]`.
+func unifyWith(errs errors.Error, v1, v2 cue.Value, field, value string) (cue.Value, errors.Error) {
+	v1 = v1.Unify(lookup(v2, field, value))
+	if err := v1.Err(); err != nil {
+		errs = errors.Append(errs,
+			errors.Newf(token.NoPos, "unknown %s %s", field, value))
+	}
+	return v1, errs
 }
 
 // cueValue holds a CUE value and an index that will be used
@@ -441,6 +618,48 @@ func structFields(v cue.Value, opts ...cue.Option) iter.Seq2[string, cue.Value] 
 	}
 }
 
+type genFromFileParams struct {
+	genstruct.Struct
+	Mode           genstruct.Accessor[filetypes.Mode]
+	Encoding       genstruct.Accessor[build.Encoding]
+	Interpretation genstruct.Accessor[build.Interpretation]
+	Form           genstruct.Accessor[build.Form]
+}
+
+type genFromFileResult struct {
+	genstruct.Struct
+	Encoding       genstruct.Accessor[build.Encoding]
+	Interpretation genstruct.Accessor[build.Interpretation]
+	Form           genstruct.Accessor[build.Form]
+	Aspects        genstruct.Accessor[internal.Aspects]
+}
+
+func newFromFileParamsStruct(
+	encodings []build.Encoding,
+	interpretations []build.Interpretation,
+	forms []build.Form,
+) *genFromFileParams {
+	r := &genFromFileParams{}
+	r.Mode = genstruct.AddInt(&r.Struct, filetypes.NumModes, "Mode")
+	r.Encoding = genstruct.AddEnum(&r.Struct, encodings, "", "allEncodings", "build.Encoding", nil)
+	r.Interpretation = genstruct.AddEnum(&r.Struct, interpretations, "", "allInterpretations", "build.Interpretation", nil)
+	r.Form = genstruct.AddEnum(&r.Struct, forms, "", "allForms", "build.Form", nil)
+	return r
+}
+
+func newFromFileResult(
+	encodings []build.Encoding,
+	interpretations []build.Interpretation,
+	forms []build.Form,
+) *genFromFileResult {
+	r := &genFromFileResult{}
+	r.Encoding = genstruct.AddEnum(&r.Struct, encodings, "", "allEncodings", "build.Encoding", nil)
+	r.Interpretation = genstruct.AddEnum(&r.Struct, interpretations, "", "allInterpretations", "build.Interpretation", nil)
+	r.Form = genstruct.AddEnum(&r.Struct, forms, "", "allForms", "build.Form", nil)
+	r.Aspects = genstruct.AddInt(&r.Struct, internal.AllAspects, "internal.Aspects")
+	return r
+}
+
 func newToFileParamsStruct(topLevelTags, fileExts []string) *genToFileParams {
 	r := &genToFileParams{}
 	r.Mode = genstruct.AddInt(&r.Struct, filetypes.NumModes, "Mode")
@@ -498,7 +717,7 @@ type dimspace[V any] struct {
 }
 
 // walkSpace explores the values that are possible to reach from the given initial
-// value within the given number of dimensions (numDimentions), where each point in space
+// value within the given number of dimensions (numDimensions), where each point in space
 // can have the given number of possible item values (numItems).
 // It calls evaluate to derive further values as it walks the space, and
 // truncates the tree whereever evaluate returns false.

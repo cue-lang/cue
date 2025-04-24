@@ -26,17 +26,25 @@ import (
 	"strings"
 )
 
+type initInfo struct {
+	genInit func() string
+	ident   string
+}
+
 // Struct represents a binary-marshalable struct.
 type Struct struct {
 	fields   []field
 	size     int
-	genInits []func() string
+	genInits []initInfo
 }
 
-func (s *Struct) GenInit() string {
+func (s *Struct) GenInit(generated map[string]bool) string {
 	var buf strings.Builder
-	for _, genInit := range s.genInits {
-		buf.WriteString(genInit())
+	for _, info := range s.genInits {
+		if !generated[info.ident] {
+			generated[info.ident] = true
+			buf.WriteString(info.genInit())
+		}
 	}
 	return buf.String()
 }
@@ -128,7 +136,10 @@ func AddEnum[T comparable](s *Struct, values []T, defaultValue T, goValuesIdent,
 		a.defaultValueIndex = i
 	}
 
-	s.genInits = append(s.genInits, a.genInit)
+	s.genInits = append(s.genInits, initInfo{
+		genInit: a.genInit,
+		ident:   a.goValuesIdent,
+	})
 	return a
 }
 
@@ -209,7 +220,10 @@ func AddSet(s *Struct, values []string, goValuesIdent string) Accessor[iter.Seq[
 		valueToBit:    valueToBit,
 		goValuesIdent: goValuesIdent,
 	}
-	s.genInits = append(s.genInits, a.genInit)
+	s.genInits = append(s.genInits, initInfo{
+		genInit: a.genInit,
+		ident:   a.goValuesIdent,
+	})
 	return a
 }
 
@@ -288,7 +302,10 @@ func AddEnumMap[T comparable](s *Struct, keys []string, values []T, defaultValue
 		values:     values,
 		goIdent:    goIdent,
 	}
-	s.genInits = append(s.genInits, a.genInit)
+	s.genInits = append(s.genInits, initInfo{
+		genInit: a.genInit,
+		ident:   a.goIdent,
+	})
 	return a
 }
 

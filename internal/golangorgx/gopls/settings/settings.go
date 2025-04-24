@@ -118,14 +118,6 @@ type BuildOptions struct {
 	// Include only project_a, but not node_modules inside it: `-`, `+project_a`, `-project_a/node_modules`
 	DirectoryFilters []string
 
-	// TemplateExtensions gives the extensions of file names that are treateed
-	// as template files. (The extension
-	// is the part of the file name after the final dot.)
-	TemplateExtensions []string
-
-	// obsolete, no effect
-	MemoryMode string `status:"experimental"`
-
 	// ExpandWorkspaceToModule determines which packages are considered
 	// "workspace packages" when the workspace is using modules.
 	//
@@ -701,7 +693,7 @@ func (o *Options) ForClientCapabilities(clientName *protocol.ClientInfo, caps pr
 
 func (o *Options) Clone() *Options {
 	// TODO(rfindley): has this function gone stale? It appears that there are
-	// settings that are incorrectly cloned here (such as TemplateExtensions).
+	// settings that are incorrectly cloned here (?).
 	result := &Options{
 		ClientOptions:   o.ClientOptions,
 		InternalOptions: o.InternalOptions,
@@ -845,8 +837,6 @@ func (o *Options) set(name string, value interface{}, seen map[string]struct{}) 
 		}
 		o.DirectoryFilters = filters
 
-	case "memoryMode":
-		result.deprecated("")
 	case "completionDocumentation":
 		result.setBool(&o.CompletionDocumentation)
 	case "usePlaceholders":
@@ -936,12 +926,6 @@ func (o *Options) set(name string, value interface{}, seen map[string]struct{}) 
 			}
 		}
 
-		// codelens is deprecated, but still works for now.
-		// TODO(rstambler): Remove this for the gopls/v0.7.0 release.
-		if name == "codelens" {
-			result.deprecated("codelenses")
-		}
-
 	case "staticcheck":
 		if v, ok := result.asBool(); ok {
 			o.Staticcheck = v
@@ -959,9 +943,6 @@ func (o *Options) set(name string, value interface{}, seen map[string]struct{}) 
 
 	case "verboseWorkDoneProgress":
 		result.setBool(&o.VerboseWorkDoneProgress)
-
-	case "tempModFile":
-		result.deprecated("")
 
 	case "showBugReports":
 		result.setBool(&o.ShowBugReports)
@@ -995,30 +976,6 @@ func (o *Options) set(name string, value interface{}, seen map[string]struct{}) 
 	case "experimentalPostfixCompletions":
 		result.setBool(&o.ExperimentalPostfixCompletions)
 
-	case "experimentalWorkspaceModule":
-		result.deprecated("")
-
-	case "experimentalTemplateSupport": // TODO(pjw): remove after June 2022
-		result.deprecated("")
-
-	case "templateExtensions":
-		if iexts, ok := value.([]interface{}); ok {
-			ans := []string{}
-			for _, x := range iexts {
-				ans = append(ans, fmt.Sprint(x))
-			}
-			o.TemplateExtensions = ans
-			break
-		}
-		if value == nil {
-			o.TemplateExtensions = nil
-			break
-		}
-		result.parseErrorf("unexpected type %T not []string", value)
-
-	case "experimentalDiagnosticsDelay":
-		result.deprecated("diagnosticsDelay")
-
 	case "diagnosticsDelay":
 		result.setDuration(&o.DiagnosticsDelay)
 
@@ -1033,12 +990,6 @@ func (o *Options) set(name string, value interface{}, seen map[string]struct{}) 
 	case "analysisProgressReporting":
 		result.setBool(&o.AnalysisProgressReporting)
 
-	case "experimentalWatchedFileDelay":
-		result.deprecated("")
-
-	case "experimentalPackageCacheKey":
-		result.deprecated("")
-
 	case "allowModfileModifications":
 		result.softErrorf("gopls setting \"allowModfileModifications\" is deprecated.\nPlease comment on https://go.dev/issue/65546 if this impacts your workflow.")
 		result.setBool(&o.AllowModfileModifications)
@@ -1046,18 +997,12 @@ func (o *Options) set(name string, value interface{}, seen map[string]struct{}) 
 	case "allowImplicitNetworkAccess":
 		result.setBool(&o.AllowImplicitNetworkAccess)
 
-	case "experimentalUseInvalidMetadata":
-		result.deprecated("")
-
 	case "standaloneTags":
 		result.setStringSlice(&o.StandaloneTags)
 
 	case "allExperiments":
 		// This setting should be handled before all of the other options are
 		// processed, so do nothing here.
-
-	case "newDiff":
-		result.deprecated("")
 
 	case "subdirWatchPatterns":
 		if s, ok := result.asOneOf(
@@ -1083,41 +1028,6 @@ func (o *Options) set(name string, value interface{}, seen map[string]struct{}) 
 	case "zeroConfig":
 		result.setBool(&o.ZeroConfig)
 
-	// Replaced settings.
-	case "experimentalDisabledAnalyses":
-		result.deprecated("analyses")
-
-	case "disableDeepCompletion":
-		result.deprecated("deepCompletion")
-
-	case "disableFuzzyMatching":
-		result.deprecated("fuzzyMatching")
-
-	case "wantCompletionDocumentation":
-		result.deprecated("completionDocumentation")
-
-	case "wantUnimportedCompletions":
-		result.deprecated("completeUnimported")
-
-	case "fuzzyMatching":
-		result.deprecated("matcher")
-
-	case "caseSensitiveCompletion":
-		result.deprecated("matcher")
-
-	// Deprecated settings.
-	case "wantSuggestedFixes":
-		result.deprecated("")
-
-	case "noIncrementalSync":
-		result.deprecated("")
-
-	case "watchFileChanges":
-		result.deprecated("")
-
-	case "go-diff":
-		result.deprecated("")
-
 	default:
 		result.unexpected()
 	}
@@ -1140,16 +1050,6 @@ type SoftError struct {
 
 func (e *SoftError) Error() string {
 	return e.msg
-}
-
-// deprecated reports the current setting as deprecated. If 'replacement' is
-// non-nil, it is suggested to the user.
-func (r *OptionResult) deprecated(replacement string) {
-	msg := fmt.Sprintf("gopls setting %q is deprecated", r.Name)
-	if replacement != "" {
-		msg = fmt.Sprintf("%s, use %q instead", msg, replacement)
-	}
-	r.Error = &SoftError{msg}
 }
 
 // softErrorf reports a soft error related to the current option.

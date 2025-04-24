@@ -12,11 +12,8 @@ package cache
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -30,8 +27,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/util/maps"
 	"cuelang.org/go/internal/golangorgx/gopls/util/slices"
-	"cuelang.org/go/internal/golangorgx/tools/event"
-	"cuelang.org/go/internal/golangorgx/tools/gocommand"
 	"cuelang.org/go/internal/golangorgx/tools/xcontext"
 )
 
@@ -326,49 +321,6 @@ func fileHasExtension(path string, suffixes []string) bool {
 	return false
 }
 
-// locateTemplateFiles ensures that the snapshot has mapped template files
-// within the workspace folder.
-func (s *Snapshot) locateTemplateFiles(ctx context.Context) {
-	suffixes := s.Options().TemplateExtensions
-	if len(suffixes) == 0 {
-		return
-	}
-
-	searched := 0
-	filterFunc := s.view.filterFunc()
-	err := filepath.WalkDir(s.view.folder.Dir.Path(), func(path string, entry os.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if entry.IsDir() {
-			return nil
-		}
-		if fileLimit > 0 && searched > fileLimit {
-			return errExhausted
-		}
-		searched++
-		if !fileHasExtension(path, suffixes) {
-			return nil
-		}
-		uri := protocol.URIFromPath(path)
-		if filterFunc(uri) {
-			return nil
-		}
-		// Get the file in order to include it in the snapshot.
-		// TODO(golang/go#57558): it is fundamentally broken to track files in this
-		// way; we may lose them if configuration or layout changes cause a view to
-		// be recreated.
-		//
-		// Furthermore, this operation must ignore errors, including context
-		// cancellation, or risk leaving the snapshot in an undefined state.
-		s.ReadFile(ctx, uri)
-		return nil
-	})
-	if err != nil {
-		event.Error(ctx, "searching for template files failed", err)
-	}
-}
-
 // filterFunc returns a func that reports whether uri is filtered by the currently configured
 // directoryFilters.
 func (v *View) filterFunc() func(protocol.DocumentURI) bool {
@@ -573,104 +525,6 @@ func defineView(ctx context.Context, fs file.Source, folder *Folder, forFile fil
 
 	def.typ = CUEModView
 	return def, nil
-}
-
-// FetchGoEnv queries the environment and Go command to collect environment
-// variables necessary for the workspace folder.
-func FetchGoEnv(ctx context.Context, folder protocol.DocumentURI, opts *settings.Options) (*GoEnv, error) {
-	dir := folder.Path()
-	// All of the go commands invoked here should be fast. No need to share a
-	// runner with other operations.
-	runner := new(gocommand.Runner)
-	inv := gocommand.Invocation{
-		WorkingDir: dir,
-		Env:        opts.EnvSlice(),
-	}
-
-	var (
-		env = new(GoEnv)
-		err error
-	)
-	envvars := map[string]*string{
-		"GOOS":        &env.GOOS,
-		"GOARCH":      &env.GOARCH,
-		"GOCACHE":     &env.GOCACHE,
-		"GOPATH":      &env.GOPATH,
-		"GOPRIVATE":   &env.GOPRIVATE,
-		"GOMODCACHE":  &env.GOMODCACHE,
-		"GOFLAGS":     &env.GOFLAGS,
-		"GO111MODULE": &env.GO111MODULE,
-	}
-	if err := loadGoEnv(ctx, dir, opts.EnvSlice(), runner, envvars); err != nil {
-		return nil, err
-	}
-
-	env.GoVersion, err = gocommand.GoVersion(ctx, inv, runner)
-	if err != nil {
-		return nil, err
-	}
-	env.GoVersionOutput, err = gocommand.GoVersionOutput(ctx, inv, runner)
-	if err != nil {
-		return nil, err
-	}
-
-	// The value of GOPACKAGESDRIVER is not returned through the go command.
-	if driver, ok := opts.Env["GOPACKAGESDRIVER"]; ok {
-		env.GOPACKAGESDRIVER = driver
-	} else {
-		env.GOPACKAGESDRIVER = os.Getenv("GOPACKAGESDRIVER")
-		// A user may also have a gopackagesdriver binary on their machine, which
-		// works the same way as setting GOPACKAGESDRIVER.
-		//
-		// TODO(rfindley): remove this call to LookPath. We should not support this
-		// undocumented method of setting GOPACKAGESDRIVER.
-		if env.GOPACKAGESDRIVER == "" {
-			tool, err := exec.LookPath("gopackagesdriver")
-			if err == nil && tool != "" {
-				env.GOPACKAGESDRIVER = tool
-			}
-		}
-	}
-
-	// While GOWORK is available through the Go command, we want to differentiate
-	// between an explicit GOWORK value and one which is implicit from the file
-	// system. The former doesn't change unless the environment changes.
-	if gowork, ok := opts.Env["GOWORK"]; ok {
-		env.GOWORK = gowork
-	} else {
-		env.GOWORK = os.Getenv("GOWORK")
-	}
-	return env, nil
-}
-
-// loadGoEnv loads `go env` values into the provided map, keyed by Go variable
-// name.
-func loadGoEnv(ctx context.Context, dir string, configEnv []string, runner *gocommand.Runner, vars map[string]*string) error {
-	// We can save ~200 ms by requesting only the variables we care about.
-	args := []string{"-json"}
-	for k := range vars {
-		args = append(args, k)
-	}
-
-	inv := gocommand.Invocation{
-		Verb:       "env",
-		Args:       args,
-		Env:        configEnv,
-		WorkingDir: dir,
-	}
-	stdout, err := runner.Run(ctx, inv)
-	if err != nil {
-		return err
-	}
-	envMap := make(map[string]string)
-	if err := json.Unmarshal(stdout.Bytes(), &envMap); err != nil {
-		return fmt.Errorf("internal error unmarshaling JSON from 'go env': %w", err)
-	}
-	for key, ptr := range vars {
-		*ptr = envMap[key]
-	}
-
-	return nil
 }
 
 // findRootPattern looks for files with the given basename in dir or any parent

@@ -44,7 +44,6 @@ func DefaultOptions(overrides ...func(*Options)) *Options {
 				BuildOptions: BuildOptions{
 					ExpandWorkspaceToModule: true,
 					DirectoryFilters:        []string{"-**/node_modules"},
-					TemplateExtensions:      []string{},
 					StandaloneTags:          []string{"ignore"},
 				},
 				UIOptions: UIOptions{

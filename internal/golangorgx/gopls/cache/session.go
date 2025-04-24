@@ -673,9 +673,6 @@ func (fs *overlayFS) updateOverlays(ctx context.Context, changes []file.Modifica
 			// Do nothing. sameContentOnDisk should be false.
 		case file.Save:
 			// Make sure the version and content (if present) is the same.
-			if false && o.version != version { // Client no longer sends the version
-				return nil, fmt.Errorf("updateOverlays: saving %s at version %v, currently at %v", c.URI, c.Version, o.version)
-			}
 			if c.Text != nil && o.hash != hash {
 				return nil, fmt.Errorf("updateOverlays: overlay %s changed on save", c.URI)
 			}

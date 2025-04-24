@@ -33,15 +33,15 @@ var evalMu sync.Mutex
 //go:generate go run -tags bootstrap ./generate.go
 
 func toFile(mode Mode, sc *scope, filename string) (*build.File, error) {
-	f0, err0 := toFileOrig(mode, sc, filename)
-	f1, err1 := toFileGenerated(mode, sc, filename)
+	f0, err0 := toFileGenerated(mode, sc, filename)
+	f1, err1 := toFileOrig(mode, sc, filename)
 	if (err0 != nil) != (err1 != nil) {
-		panic(fmt.Errorf("toFile discrepancy on error return; mode %v; scope %v; filename %v:\nold: %v\nnew: %v", mode, sc, filename, err0, err1))
+		panic(fmt.Errorf("toFile discrepancy on error return; mode %v; scope %v; filename %v:\nold: %v\nnew: %v", mode, sc, filename, err1, err0))
 	} else if diff := cmp.Diff(f0, f1); diff != "" {
 		panic(fmt.Errorf("toFile result discrepancy; mode %v; scope %v; filename %v:\n%s", mode, sc, filename, diff))
 	}
 
-	return f1, err1
+	return f0, err0
 }
 
 func toFileOrig(mode Mode, sc *scope, filename string) (*build.File, error) {
@@ -96,15 +96,23 @@ func toFile1(modeVal, fileVal cue.Value, filename string, sc *scope) (*build.Fil
 	return f, nil
 }
 
-// TODO(mvdan): the funcs below make use of typesValue concurrently,
-// even though we clearly document that cue.Values are not safe for concurrent use.
-// It seems to be OK in practice, as otherwise we would run into `go test -race` failures.
-
 // FromFile returns detailed file info for a given build file. It ignores b.Tags and
 // b.BoolTags, instead assuming that any tag handling has already been processed
 // by [ParseArgs] or similar.
 // The b.Encoding field must be non-empty.
 func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
+	fi0, err0 := fromFileGenerated(b, mode)
+	fi1, err1 := fromFileOrig(b, mode)
+	if (err0 != nil) != (err1 != nil) {
+		panic(fmt.Errorf("toFile discrepancy on error return; mode %v; file %#v:\nold: %v\nnew: %v", mode, b, err1, err0))
+	} else if diff := cmp.Diff(fi1, fi0); diff != "" {
+		panic(fmt.Errorf("toFile result discrepancy; mode %v; file %#v\n%s", mode, b, diff))
+	}
+
+	return fi0, err0
+}
+
+func fromFileOrig(b *build.File, mode Mode) (*FileInfo, error) {
 	evalMu.Lock()
 	defer evalMu.Unlock()
 	typesInit()

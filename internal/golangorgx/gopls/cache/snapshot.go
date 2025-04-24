@@ -700,16 +700,16 @@ func (s *Snapshot) fileWatchingGlobPatterns() map[protocol.RelativePattern]unit 
 		//
 		// The assumption is that the user is not actively editing non-workspace
 		// modules, so don't pay the price of file watching.
-		for modFile := range s.view.workspaceModFiles {
-			dir := filepath.Dir(modFile.Path())
-			dirs = append(dirs, dir)
+		for modDir := range s.view.workspaceModDirs {
+			rootDir := filepath.Dir(modDir.Path())
+			dirs = append(dirs, rootDir)
 
 			// TODO(golang/go#64724): thoroughly test these patterns, particularly on
 			// on Windows.
 			//
 			// Note that glob patterns should use '/' on Windows:
 			// https://code.visualstudio.com/docs/editor/glob-patterns
-			patterns[protocol.RelativePattern{BaseURI: modFile.Dir(), Pattern: watchGoFiles}] = unit{}
+			patterns[protocol.RelativePattern{BaseURI: modDir.Dir(), Pattern: watchGoFiles}] = unit{}
 		}
 	} else {
 		// In non-module modes (GOPATH or AdHoc), we just watch the workspace root.
@@ -926,7 +926,7 @@ func (s *Snapshot) AllMetadata(ctx context.Context) ([]*metadata.Package, error)
 // TODO(rfindley): clarify that this is only active modules. Or update to just
 // use findRootPattern.
 func (s *Snapshot) GoModForFile(uri protocol.DocumentURI) protocol.DocumentURI {
-	return moduleForURI(s.view.workspaceModFiles, uri)
+	return moduleForURI(s.view.workspaceModDirs, uri)
 }
 
 func moduleForURI(modFiles map[protocol.DocumentURI]struct{}, uri protocol.DocumentURI) protocol.DocumentURI {

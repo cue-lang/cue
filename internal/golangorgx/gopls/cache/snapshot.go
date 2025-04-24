@@ -239,23 +239,7 @@ func (s *Snapshot) View() *View {
 // an .html file actually contains Go "html/template" syntax,
 // or even that a .go file contains Python.
 func (s *Snapshot) FileKind(fh file.Handle) file.Kind {
-	if k := fileKind(fh); k != file.UnknownKind {
-		return k
-	}
-	fext := filepath.Ext(fh.URI().Path())
-	exts := s.Options().TemplateExtensions
-	for _, ext := range exts {
-		if fext == ext || fext == "."+ext {
-			return file.Tmpl
-		}
-	}
-
-	// and now what? This should never happen, but it does for cgo before go1.15
-	//
-	// TODO(rfindley): this doesn't look right. We should default to UnknownKind.
-	// Also, I don't understand the comment above, though I'd guess before go1.15
-	// we encountered cgo files without the .go extension.
-	return file.Go
+	return fileKind(fh)
 }
 
 // fileKind returns the default file kind for a file, before considering
@@ -706,9 +690,6 @@ func (s *Snapshot) fileWatchingGlobPatterns() map[protocol.RelativePattern]unit 
 	// If GOWORK is outside the folder, ensure we are watching it.
 
 	extensions := "go,mod,sum,work"
-	for _, ext := range s.Options().TemplateExtensions {
-		extensions += "," + ext
-	}
 	watchGoFiles := fmt.Sprintf("**/*.{%s}", extensions)
 
 	var dirs []string

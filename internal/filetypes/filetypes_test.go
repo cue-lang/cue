@@ -366,6 +366,13 @@ func TestParseFile(t *testing.T) {
 			Tags:     map[string]string{"lang": "js"},
 		},
 	}, {
+		in: "foo.go",
+		out: &build.File{
+			Filename: "foo.go",
+			Encoding: build.Code,
+			Tags:     map[string]string{"lang": "go"},
+		},
+	}, {
 		in:  "json+lang=js:foo.x",
 		out: `tag lang is not allowed in this context`,
 	}, {

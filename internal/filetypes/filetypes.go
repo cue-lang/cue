@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/filetypes/internal"
 )
 
 // Mode indicate the base mode of operation and indicates a different set of
@@ -50,26 +51,7 @@ func (m Mode) String() string {
 	}
 }
 
-// FileInfo defines the parsing plan for a file.
-type FileInfo struct {
-	Filename       string               `json:"filename"`
-	Encoding       build.Encoding       `json:"encoding,omitempty"`
-	Interpretation build.Interpretation `json:"interpretation,omitempty"`
-	Form           build.Form           `json:"form,omitempty"`
-
-	Definitions  bool `json:"definitions"`  // include/allow definition fields
-	Data         bool `json:"data"`         // include/allow regular fields
-	Optional     bool `json:"optional"`     // include/allow definition fields
-	Constraints  bool `json:"constraints"`  // include/allow constraints
-	References   bool `json:"references"`   // don't resolve/allow references
-	Cycles       bool `json:"cycles"`       // cycles are permitted
-	KeepDefaults bool `json:"keepDefaults"` // select/allow default values
-	Incomplete   bool `json:"incomplete"`   // permit incomplete values
-	Imports      bool `json:"imports"`      // don't expand/allow imports
-	Stream       bool `json:"stream"`       // permit streaming
-	Docs         bool `json:"docs"`         // show/allow docs
-	Attributes   bool `json:"attributes"`   // include/allow attributes
-}
+type FileInfo = internal.FileInfo
 
 // ParseArgs converts a sequence of command line arguments representing
 // files into a sequence of build file specifications.

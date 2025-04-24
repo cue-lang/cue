@@ -27,7 +27,9 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/util/maps"
 	"cuelang.org/go/internal/golangorgx/gopls/util/slices"
+	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/xcontext"
+	"cuelang.org/go/mod/modfile"
 )
 
 // A Folder represents an LSP workspace folder, together with its per-folder
@@ -136,9 +138,10 @@ type viewDefinition struct {
 
 	// root represents the directory root of the CUE module that contains
 	// the WorkspaceFolder folder
-	root protocol.DocumentURI
+	root   protocol.DocumentURI
+	cuemod protocol.DocumentURI // the nearest cue.mod directory, or ""
 
-	// workspaceModFiles holds the set of mod files active in this snapshot.
+	// workspaceModDirs holds the set of cue.mod dirs active in this snapshot.
 	//
 	// For a go.work workspace, this is the set of workspace modfiles. For a
 	// go.mod workspace, this contains the go.mod file defining the workspace
@@ -146,7 +149,7 @@ type viewDefinition struct {
 	// "includeReplaceInWorkspace" is set).
 	//
 	// TODO(rfindley): should we just run `go list -m` to compute this set?
-	workspaceModFiles    map[protocol.DocumentURI]struct{}
+	workspaceModDirs     map[protocol.DocumentURI]struct{}
 	workspaceModFilesErr error // error encountered computing workspaceModFiles
 
 	// envOverlay holds additional environment to apply to this viewDefinition.
@@ -174,11 +177,11 @@ func (d *viewDefinition) EnvOverlay() []string {
 	return env
 }
 
-// ModFiles are the go.mod files enclosed in the snapshot's view and known
+// ModDirs are the cue.mod dirs enclosed in the snapshot's view and known
 // to the snapshot.
-func (d viewDefinition) ModFiles() []protocol.DocumentURI {
+func (d viewDefinition) ModDirs() []protocol.DocumentURI {
 	var uris []protocol.DocumentURI
-	for modURI := range d.workspaceModFiles {
+	for modURI := range d.workspaceModDirs {
 		uris = append(uris, modURI)
 	}
 	return uris
@@ -193,7 +196,7 @@ func viewDefinitionsEqual(x, y *viewDefinition) bool {
 		if x.workspaceModFilesErr.Error() != y.workspaceModFilesErr.Error() {
 			return false
 		}
-	} else if !maps.SameKeys(x.workspaceModFiles, y.workspaceModFiles) {
+	} else if !maps.SameKeys(x.workspaceModDirs, y.workspaceModDirs) {
 		return false
 	}
 	if len(x.envOverlay) != len(y.envOverlay) {
@@ -403,13 +406,85 @@ func (s *Snapshot) initialize(ctx context.Context, firstAttempt bool) {
 		}
 	}()
 
+	var scopes []loadScope           // scopes to load
+	var modDiagnostics []*Diagnostic // diagnostics for broken go.mod files
+	addError := func(uri protocol.DocumentURI, err error) {
+		modDiagnostics = append(modDiagnostics, &Diagnostic{
+			URI:      uri,
+			Severity: protocol.SeverityError,
+			Source:   ListError,
+			Message:  err.Error(),
+		})
+	}
+
+	if len(s.view.workspaceModDirs) > 0 {
+		for modURI := range s.view.workspaceModDirs {
+			fh, err := s.ReadFile(ctx, modURI+"/module.cue")
+			if err != nil {
+				if ctx.Err() != nil {
+					return
+				}
+				addError(modURI, err)
+				continue
+			}
+			modContent, err := fh.Content()
+			if err != nil {
+				if ctx.Err() != nil {
+					return
+				}
+				addError(modURI, err)
+				continue
+			}
+
+			parsed, err := modfile.ParseNonStrict(modContent, "module.cue")
+			if err != nil {
+				if ctx.Err() != nil {
+					return
+				}
+				addError(modURI, err)
+				continue
+			}
+			modDir := filepath.Dir(modURI.Path())
+			scopes = append(scopes, moduleLoadScope{dir: modDir, modulePath: parsed.ModulePath()})
+		}
+	} else {
+		scopes = append(scopes, viewLoadScope{})
+	}
+
+	loadErr := s.load(ctx, true, scopes...)
+
+	// A failure is retryable if it may have been due to context cancellation,
+	// and this is not the initial workspace load (firstAttempt==true).
+	//
+	// The IWL runs on a detached context with a long (~10m) timeout, so
+	// if the context was canceled we consider loading to have failed
+	// permanently.
+	if loadErr != nil && ctx.Err() != nil && !firstAttempt {
+		return
+	}
+
+	var initialErr *InitializationError
+	switch {
+	case loadErr != nil:
+		event.Error(ctx, fmt.Sprintf("initial workspace load: %v", loadErr), loadErr)
+		initialErr = &InitializationError{
+			MainError: loadErr,
+		}
+	case s.view.workspaceModFilesErr != nil:
+		initialErr = &InitializationError{
+			MainError: s.view.workspaceModFilesErr,
+		}
+	case len(modDiagnostics) > 0:
+		initialErr = &InitializationError{
+			MainError: fmt.Errorf(modDiagnostics[0].Message),
+		}
+	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	s.initialized = true
-
-	// TODO(myitcv): fix this?
-	s.initialErr = nil
+	s.initialErr = initialErr
 }
 
 // A StateChange describes external state changes that may affect a snapshot.
@@ -498,6 +573,7 @@ func defineView(ctx context.Context, fs file.Source, folder *Folder, forFile fil
 	if err := checkPathValid(folder.Dir.Path()); err != nil {
 		return nil, fmt.Errorf("invalid workspace folder path: %w; check that the spelling of the configured workspace folder path agrees with the spelling reported by the operating system", err)
 	}
+	dir := folder.Dir.Path()
 
 	if forFile != nil {
 		// TODO(myitcv): fix the implementation here. forFile != nil when we are trying
@@ -509,21 +585,26 @@ func defineView(ctx context.Context, fs file.Source, folder *Folder, forFile fil
 
 	def := new(viewDefinition)
 	def.folder = folder
-	def.root = folder.Dir
 
-	// Enforce that the workspace folder corresponds exactly to the root of a
-	// CUE module defined by the existence of a cue.mod/module.cue file.
-	targetFile := filepath.Join(folder.Dir.Path(), filepath.FromSlash("cue.mod/module.cue"))
-	targetURI := protocol.URIFromPath(targetFile)
-	modFile, err := fs.ReadFile(ctx, targetURI)
+	var err error
+	dirURI := protocol.URIFromPath(dir)
+	moduleCue, err := findRootPattern(ctx, dirURI, filepath.FromSlash("cue.mod/module.cue"), fs)
 	if err != nil {
-		return nil, err // cancelled
+		return nil, err
 	}
-	if !fileExists(modFile) {
+	if moduleCue == "" {
+		// We found no module, and currently we only support workspaces with modules.
 		return nil, fmt.Errorf("WorkspaceFolder %s does not correspond to a CUE module", folder.Dir.Path())
 	}
+	def.cuemod = moduleCue.Dir()
 
 	def.typ = CUEModView
+	def.root = def.cuemod.Dir()
+	if def.root != dirURI {
+		return nil, fmt.Errorf("WorkspaceFolder %s does not correspond to a CUE module", folder.Dir.Path())
+	}
+	def.workspaceModDirs = map[protocol.DocumentURI]struct{}{def.cuemod: {}}
+
 	return def, nil
 }
 

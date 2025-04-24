@@ -8,7 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -414,16 +414,16 @@ func bestView[V viewDefiner](ctx context.Context, fs file.Source, fh file.Handle
 
 	v := views[0]
 
-	fileDir := fh.URI().Dir()
-	fileBase := path.Base(string(fh.URI()))
-	modRoot, err := findRootPattern(ctx, fileDir, fileBase, fs)
+	dirURI := fh.URI().Dir()
+	moduleCue, err := findRootPattern(ctx, dirURI, filepath.FromSlash("cue.mod/module.cue"), fs)
 	if err != nil {
 		return zero, err
 	}
 
 	// Only if the module root corresponds to that of the view (workspace folder)
 	// do we match.
-	if modRoot == v.definition().root {
+	root := moduleCue.Dir().Dir()
+	if root == v.definition().root {
 		return v, nil
 	}
 

@@ -25,7 +25,8 @@ func TestEnum(t *testing.T) {
 		"bar": 1,
 		"baz": 2,
 	}))
-	qt.Assert(t, qt.Equals(s.GenInit(), `var (
+	generated := make(map[string]bool)
+	qt.Assert(t, qt.Equals(s.GenInit(generated), `var (
 	values = []string {
 		"foo",
 		"bar",
@@ -36,6 +37,10 @@ func TestEnum(t *testing.T) {
 `))
 	qt.Assert(t, qt.Equals(a.GenGet("data"), `genstruct.GetEnum(data, 0, 1, values)`))
 	qt.Assert(t, qt.Equals(GetEnum(data, 0, 1, values), "bar"))
+	qt.Assert(t, qt.DeepEquals(generated, map[string]bool{"values": true}))
+
+	// Try GenInit again to make sure it doesn't regenerate the same variable.
+	qt.Assert(t, qt.Equals(s.GenInit(generated), ""))
 
 	a.Put(data, "baz")
 	qt.Assert(t, qt.Equals(GetEnum(data, 0, 1, values), "baz"))
@@ -70,7 +75,7 @@ func TestSet(t *testing.T) {
 	qt.Assert(t, qt.Equals(data[0], 0b101))
 	a.Put(data, slices.Values([]string{"bar"}))
 	qt.Assert(t, qt.Equals(data[0], 0b010))
-	qt.Assert(t, qt.Equals(s.GenInit(), `var (
+	qt.Assert(t, qt.Equals(s.GenInit(make(map[string]bool)), `var (
 	values = []string {
 		"foo",
 		"bar",

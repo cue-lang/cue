@@ -27,8 +27,15 @@ func some[T any](x T) opt[T] {
 	return optpkg.Some(x)
 }
 
+// TODO use string instead of []byte so that we can
+// use the init data directly without copying into
+// read-write memory.
+
 //go:embed fileinfo.dat
 var fileInfoDataBytes []byte
+
+//go:embed fromfile.dat
+var fromFileDataBytes []byte
 
 func init() {
 	tagTypes = map[string]TagType{
@@ -150,7 +157,6 @@ var (
 )
 
 func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, errors.Error) {
-	dumpOnce.Do(dumpData)
 	key := make([]byte, 5)
 	genstruct.PutSet(key, 2, 3, allTopLevelTags_rev, maps.Keys(sc.topLevel))
 	genstruct.PutEnum(key, 1, 1, allFileExts_rev, 16, fileExt(filename))
@@ -212,6 +218,28 @@ func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, errors
 	return &f, nil
 }
 
+func fromFileGenerated(b *build.File, mode Mode) (*FileInfo, error) {
+	dumpOnce.Do(dumpData)
+	key := make([]byte, 4)
+	genstruct.PutUint64(key, 0, 1, uint64(mode))
+	genstruct.PutEnum(key, 1, 1, allEncodings_rev, 12, b.Encoding)
+	genstruct.PutEnum(key, 2, 1, allInterpretations_rev, 4, b.Interpretation)
+	genstruct.PutEnum(key, 3, 1, allForms_rev, 5, b.Form)
+
+	data, ok := genstruct.FindRecord(fromFileDataBytes, 4+5, key)
+	if !ok {
+		return nil, errors.Newf(token.NoPos, "no encoding specified")
+	}
+	fi := &FileInfo{
+		Filename:       b.Filename,
+		Encoding:       genstruct.GetEnum(data, 0, 1, allEncodings),
+		Interpretation: genstruct.GetEnum(data, 1, 1, allInterpretations),
+		Form:           genstruct.GetEnum(data, 2, 1, allForms),
+	}
+	fi.SetAspects(internal.Aspects(genstruct.GetUint64(data, 3, 2)))
+	return fi, nil
+}
+
 func someKey[K cmp.Ordered, V any](m map[K]V) K {
 	return slices.Sorted(maps.Keys(m))[0]
 }
@@ -231,17 +259,34 @@ var subsidiaryTagFuncs = []func(subsidiaryTags) (subsidiaryTags, error){
 var dumpOnce sync.Once
 
 func dumpData() {
-	return
-	recSize := 5 + 6
-	i := 0
-	for data := fileInfoDataBytes; len(data) > 0; data, i = data[recSize:], i+1 {
-		data := data[:recSize:recSize]
-		key := data[:5]
-		//val := data[len(key):]
-		tags := slices.Collect(genstruct.GetSet(key, 2, 3, allTopLevelTags))
-		fileExt := genstruct.GetEnum(key, 1, 1, allFileExts)
-		mode := Mode(genstruct.GetUint64(key, 0, 1))
-		log.Printf("key %d: mode %v; fileExt %q; tags %q; %v", i, mode, fileExt, tags, key)
+	if false {
+		log.Printf("toFile data:")
+		recSize := 5 + 6
+		i := 0
+		for data := fileInfoDataBytes; len(data) > 0; data, i = data[recSize:], i+1 {
+			data := data[:recSize:recSize]
+			key := data[:5]
+			//val := data[len(key):]
+			tags := slices.Collect(genstruct.GetSet(key, 2, 3, allTopLevelTags))
+			fileExt := genstruct.GetEnum(key, 1, 1, allFileExts)
+			mode := Mode(genstruct.GetUint64(key, 0, 1))
+			log.Printf("key %d: mode %v; fileExt %q; tags %q; %v", i, mode, fileExt, tags, key)
+		}
+	}
+	if false {
+		log.Printf("fromFile data:")
+		recSize := 4 + 5
+		i := 0
+		for data := fromFileDataBytes; len(data) > 0; data, i = data[recSize:], i+1 {
+			data := data[:recSize:recSize]
+			key := data[:4]
+			//val := data[len(key):]
+			mode := Mode(genstruct.GetUint64(key, 0, 1))
+			encoding := genstruct.GetEnum(key, 1, 1, allEncodings)
+			interpretation := genstruct.GetEnum(key, 2, 1, allInterpretations)
+			form := genstruct.GetEnum(key, 3, 1, allForms)
+			log.Printf("key %d: mode %v; encoding %q; interpretation %q; form %q; %v", i, mode, encoding, interpretation, form, key)
+		}
 	}
 }
 

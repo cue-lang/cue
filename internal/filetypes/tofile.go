@@ -28,15 +28,15 @@ import (
 //go:generate go run -tags bootstrap ./generate.go
 
 func toFile(mode Mode, sc *scope, filename string) (*build.File, error) {
-	f0, err0 := toFileOrig(mode, sc, filename)
-	f1, err1 := toFileGenerated(mode, sc, filename)
+	f0, err0 := toFileGenerated(mode, sc, filename)
+	f1, err1 := toFileOrig(mode, sc, filename)
 	if (err0 != nil) != (err1 != nil) {
-		panic(fmt.Errorf("toFile discrepancy on error return; mode %v; scope %v; filename %v:\nold: %v\nnew: %v", mode, sc, filename, err0, err1))
+		panic(fmt.Errorf("toFile discrepancy on error return; mode %v; scope %v; filename %v:\nold: %v\nnew: %v", mode, sc, filename, err1, err0))
 	} else if diff := cmp.Diff(f0, f1); diff != "" {
 		panic(fmt.Errorf("toFile result discrepancy; mode %v; scope %v; filename %v:\n%s", mode, sc, filename, diff))
 	}
 
-	return f1, err1
+	return f0, err0
 }
 
 func toFileOrig(mode Mode, sc *scope, filename string) (*build.File, error) {
@@ -91,15 +91,27 @@ func toFile1(modeVal, fileVal cue.Value, filename string, sc *scope) (*build.Fil
 	return f, nil
 }
 
-// TODO(mvdan): the funcs below make use of typesValue concurrently,
-// even though we clearly document that cue.Values are not safe for concurrent use.
-// It seems to be OK in practice, as otherwise we would run into `go test -race` failures.
-
 // FromFile returns detailed file info for a given build file. It ignores b.Tags and
 // b.BoolTags, instead assuming that any tag handling has already been processed
 // by [ParseArgs] or similar.
 // The b.Encoding field must be non-empty.
 func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
+	fi0, err0 := fromFileGenerated(b, mode)
+	fi1, err1 := fromFileOrig(b, mode)
+	if (err0 != nil) != (err1 != nil) {
+		panic(fmt.Errorf("toFile discrepancy on error return; mode %v; file %#v:\nold: %v\nnew: %v", mode, b, err1, err0))
+	} else if diff := cmp.Diff(fi1, fi0); diff != "" {
+		panic(fmt.Errorf("toFile result discrepancy; mode %v; file %#v\n%s", mode, b, diff))
+	}
+
+	return fi0, err0
+}
+
+// TODO(mvdan): the funcs below make use of typesValue concurrently,
+// even though we clearly document that cue.Values are not safe for concurrent use.
+// It seems to be OK in practice, as otherwise we would run into `go test -race` failures.
+
+func fromFileOrig(b *build.File, mode Mode) (*FileInfo, error) {
 	// Handle common case. This allows certain test cases to be analyzed in
 	// isolation without interference from evaluating these files.
 	// It also avoids a race condition when running the evaluator concurrently.
@@ -127,33 +139,38 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 	typesInit()
 	modeVal := lookup(typesValue, "modes", mode.String())
 	fileVal := lookup(modeVal, "FileInfo")
-	if b.Encoding != "" {
-		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("encoding")), b.Encoding)
+	if b.Encoding == "" {
+		return nil, errors.Newf(token.NoPos, "no encoding specified")
 	}
+	fileVal = fileVal.FillPath(cue.MakePath(cue.Str("encoding")), b.Encoding)
 	if b.Interpretation != "" {
 		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("interpretation")), b.Interpretation)
 	}
 	if b.Form != "" {
 		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("form")), b.Form)
 	}
-	if b.Encoding == "" {
-		return nil, errors.Newf(token.NoPos, "no encoding specified")
-	}
 	var errs errors.Error
-	interpretation, _ := lookup(fileVal, "interpretation").String()
+	var interpretation string
 	if b.Form != "" {
 		fileVal, errs = unifyWith(errs, fileVal, typesValue, "forms", string(b.Form))
+		if errs != nil {
+			return nil, errs
+		}
+		interpretation, _ = lookup(fileVal, "interpretation").String()
 		// may leave some encoding-dependent options open in data mode.
-	} else if interpretation != "" {
-		// always sets form=*schema
-		fileVal, errs = unifyWith(errs, fileVal, typesValue, "interpretations", interpretation)
+	} else {
+		interpretation, _ = lookup(fileVal, "interpretation").String()
+		if interpretation != "" {
+			// always sets form=*schema
+			fileVal, errs = unifyWith(errs, fileVal, typesValue, "interpretations", interpretation)
+		}
 	}
 	if interpretation == "" {
-		s, err := lookup(fileVal, "encoding").String()
+		encoding, err := lookup(fileVal, "encoding").String()
 		if err != nil {
 			return nil, err
 		}
-		fileVal, errs = unifyWith(errs, fileVal, modeVal, "encodings", s)
+		fileVal, errs = unifyWith(errs, fileVal, modeVal, "encodings", encoding)
 	}
 
 	fi := &FileInfo{}

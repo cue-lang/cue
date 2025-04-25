@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b606751_293db02f",
+        "filename": "internal/golangorgx/gopls/cache/view.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-25T04:43:38Z",
+      "side": 1,
+      "message": "Given that you have `workspaceModDirs` below, and given that is the more general case (i.e. we ultimately don\u0027t want to limit to one module per view, nor do we want to limit that it has to be at the root), is this field relatively short-lived? Does it actually carry its weight even in the short term, vs placing constraints on the length/form etc of the keys of `workspaceModDirs`?\n\nOr is this handling the case where the view is root at a subdirectory inside a module? If so, we could choose to avoid that case for now, because it doesn\u0027t seem to be an unreasonable constraint that the view encapsulates at least one module (for now at least). But again, I hold that lightly: I\u0027m certainly not looking to impose arbitrary constraints where we don\u0027t need to!",
+      "revId": "e90217debd11d4e85f1af3279241739f5fa468bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b529dfeb_0415d98c",
+        "filename": "internal/golangorgx/gopls/cache/view.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-25T04:43:38Z",
+      "side": 1,
+      "message": "`cue.mod/module.cue` files?",
+      "range": {
+        "startLine": 410,
+        "startChar": 60,
+        "endLine": 410,
+        "endChar": 66
+      },
+      "revId": "e90217debd11d4e85f1af3279241739f5fa468bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa51f815_8988ee13",
+        "filename": "internal/golangorgx/gopls/cache/view.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-25T04:43:38Z",
+      "side": 1,
+      "message": "IWL? I\u0027ve clearly been away from this code for too long.",
+      "range": {
+        "startLine": 459,
+        "startChar": 8,
+        "endLine": 459,
+        "endChar": 11
+      },
+      "revId": "e90217debd11d4e85f1af3279241739f5fa468bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2db353c_e0540620",
+        "filename": "internal/golangorgx/gopls/cache/view.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 597,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-25T04:43:38Z",
+      "side": 1,
+      "message": "As discussed; if this is an artificial constraint given the changes you\u0027re making elsewhere, please remove whenever you like. It\u0027s certainly not a goal per se to keep this limitation when we don\u0027t need it.",
+      "revId": "e90217debd11d4e85f1af3279241739f5fa468bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b99a0a73_3da22f51",
+        "filename": "internal/golangorgx/gopls/cache/view.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-25T04:43:38Z",
+      "side": 1,
+      "message": "Question (for my understanding/idle mind). If (in the future) a workspace folder (view) is openend and there is no module at the root directory, and furthermore no modules on the path to `/`, that\u0027s presuambly fine. i.e. we (ultimately) want someone to be able to start with a blank slate, and then create a module within a view, at the root or otherwise. \n\nAgain, certainly not trying to bring forward that moment, just thinking out loud.",
+      "revId": "e90217debd11d4e85f1af3279241739f5fa468bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

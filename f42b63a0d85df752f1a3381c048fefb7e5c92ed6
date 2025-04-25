@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "7ae24ae8_0e797168",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-25T04:43:38Z",
+      "side": 1,
+      "message": "Makes sense.",
+      "parentUuid": "05202613_1fd00e60",
+      "revId": "f42b63a0d85df752f1a3381c048fefb7e5c92ed6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "422cdb35_0acef357",
         "filename": "internal/golangorgx/gopls/cache/view.go",
         "patchSetId": 1

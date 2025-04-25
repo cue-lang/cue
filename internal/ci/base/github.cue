@@ -7,8 +7,7 @@ import (
 	"list"
 	"strings"
 	"strconv"
-
-	"github.com/cue-tmp/jsonschema-pub/exp3/githubactions"
+	"cue.dev/x/githubactions"
 )
 
 bashWorkflow: githubactions.#Workflow & {

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "615e8e2d_ea689f6f",
+        "filename": "internal/golangorgx/gopls/cache/view.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-25T07:56:05Z",
+      "side": 1,
+      "message": "A bunch of these changes are really bringing back, in some form, fields and code that exist in the upstream gopls, which have been removed, which I suspect we will need.\n\nSo in this case, gopls does have a gomod field here, and it\u0027s used in bestView (I\u0027m yet to need that), along with defineView (I\u0027m doing similar here, but the gopls code is more elaborate at this point). It\u0027s also used in viewDefinitionsEqual which we no longer have, but I suspect we\u0027ll need to bring back at some point.\n\nSo it\u0027s all a trade-off - trying to figure out whether it\u0027s better to keep things as minimal as possible right now, or be a bit more generous and tidy things further later. There\u0027s absolutely going to need to be a further tidy up pass later (probably several) so I think generally trying to match gopls makes more sense for now, until we know for sure we can diverge.",
+      "parentUuid": "4b606751_293db02f",
+      "revId": "e90217debd11d4e85f1af3279241739f5fa468bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b529dfeb_0415d98c",
@@ -31,6 +49,30 @@
       "writtenOn": "2025-04-25T04:43:38Z",
       "side": 1,
       "message": "`cue.mod/module.cue` files?",
+      "range": {
+        "startLine": 410,
+        "startChar": 60,
+        "endLine": 410,
+        "endChar": 66
+      },
+      "revId": "e90217debd11d4e85f1af3279241739f5fa468bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b68de5e_4ad0728d",
+        "filename": "internal/golangorgx/gopls/cache/view.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-25T07:56:05Z",
+      "side": 1,
+      "message": "Yes, sorry - this is c+p from upstream gopls code. Fixed.",
+      "parentUuid": "b529dfeb_0415d98c",
       "range": {
         "startLine": 410,
         "startChar": 60,
@@ -64,6 +106,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc12c7d2_f9d9c26e",
+        "filename": "internal/golangorgx/gopls/cache/view.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-25T07:56:05Z",
+      "side": 1,
+      "message": "Again, this is c+p from gopls. A grep through that code suggests it\u0027s InitialWorkspaceLoad. I\u0027ll expand the acronym here - as with single letter vars, it costs nothing to actually be helpful and clear...",
+      "parentUuid": "aa51f815_8988ee13",
+      "range": {
+        "startLine": 459,
+        "startChar": 8,
+        "endLine": 459,
+        "endChar": 11
+      },
+      "revId": "e90217debd11d4e85f1af3279241739f5fa468bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2db353c_e0540620",
@@ -81,6 +147,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6757d4d1_393da2f9",
+        "filename": "internal/golangorgx/gopls/cache/view.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 597,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-25T07:56:05Z",
+      "side": 1,
+      "message": "Yes I understand that. But I quite like the simplified requirements for now, and once we have something a bit more complete, then come back and relax them. Although this area of code might be correct and might cope just fine, I have no evidence the rest of it can just yet. So in the interests of keeping life simple, I want to get an end-to-end simple thing working first.",
+      "parentUuid": "a2db353c_e0540620",
+      "revId": "e90217debd11d4e85f1af3279241739f5fa468bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b99a0a73_3da22f51",
@@ -94,6 +178,24 @@
       "writtenOn": "2025-04-25T04:43:38Z",
       "side": 1,
       "message": "Question (for my understanding/idle mind). If (in the future) a workspace folder (view) is openend and there is no module at the root directory, and furthermore no modules on the path to `/`, that\u0027s presuambly fine. i.e. we (ultimately) want someone to be able to start with a blank slate, and then create a module within a view, at the root or otherwise. \n\nAgain, certainly not trying to bring forward that moment, just thinking out loud.",
+      "revId": "e90217debd11d4e85f1af3279241739f5fa468bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb3b86a9_6d159788",
+        "filename": "internal/golangorgx/gopls/cache/view.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-25T07:56:05Z",
+      "side": 1,
+      "message": "Yes, good thinking - and this is a scenario I\u0027ve not thought about. Tbqh, I have low understanding of what happens in gopls when the first thing that happens is the editor creates and opens a brand new go.mod file in an otherwise empty workspace. Gopls looks for broken go.mod files, and presumably this is all linked to the \"initialization may need to happen more than once\" stuff, but I\u0027ve not figured out how it works. Does it start off life in some sort of ad-hoc mode? Can we even implement this scenario before supporting ad-hoc mode? No idea just yet, but certainly something to keep in mind.",
+      "parentUuid": "b99a0a73_3da22f51",
       "revId": "e90217debd11d4e85f1af3279241739f5fa468bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

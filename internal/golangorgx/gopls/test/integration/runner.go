@@ -137,8 +137,6 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 	// TODO(rfindley): this function has gotten overly complicated, and warrants
 	// refactoring.
 	t.Helper()
-	checkBuilder(t)
-	testenv.NeedsGoPackages(t)
 
 	tests := []struct {
 		name      string
@@ -262,33 +260,6 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 			env.Await(InitialWorkspaceLoad)
 			test(t, env)
 		})
-	}
-}
-
-// longBuilders maps builders that are skipped when -short is set to a
-// (possibly empty) justification.
-var longBuilders = map[string]string{
-	"openbsd-amd64-64":        "golang.org/issues/42789",
-	"openbsd-386-64":          "golang.org/issues/42789",
-	"openbsd-386-68":          "golang.org/issues/42789",
-	"openbsd-amd64-68":        "golang.org/issues/42789",
-	"darwin-amd64-10_12":      "",
-	"freebsd-amd64-race":      "",
-	"illumos-amd64":           "",
-	"netbsd-arm-bsiegert":     "",
-	"solaris-amd64-oraclerel": "",
-	"windows-arm-zx2c4":       "",
-}
-
-func checkBuilder(t *testing.T) {
-	t.Helper()
-	builder := os.Getenv("GO_BUILDER_NAME")
-	if reason, ok := longBuilders[builder]; ok && testing.Short() {
-		if reason != "" {
-			t.Skipf("Skipping %s with -short due to %s", builder, reason)
-		} else {
-			t.Skipf("Skipping %s with -short", builder)
-		}
 	}
 }
 

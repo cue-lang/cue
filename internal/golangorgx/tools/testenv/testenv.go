@@ -19,8 +19,6 @@ import (
 	"sync"
 	"testing"
 	"time"
-
-	"golang.org/x/mod/modfile"
 )
 
 // packageMainIsDevel reports whether the module containing package main
@@ -204,47 +202,6 @@ func NeedsTool(t testing.TB, tool string) {
 	}
 }
 
-// NeedsGoPackages skips t if the go/packages driver (or 'go' tool) implied by
-// the current process environment is not present in the path.
-func NeedsGoPackages(t testing.TB) {
-	t.Helper()
-
-	tool := os.Getenv("GOPACKAGESDRIVER")
-	switch tool {
-	case "off":
-		// "off" forces go/packages to use the go command.
-		tool = "go"
-	case "":
-		if _, err := exec.LookPath("gopackagesdriver"); err == nil {
-			tool = "gopackagesdriver"
-		} else {
-			tool = "go"
-		}
-	}
-
-	NeedsTool(t, tool)
-}
-
-// NeedsGoPackagesEnv skips t if the go/packages driver (or 'go' tool) implied
-// by env is not present in the path.
-func NeedsGoPackagesEnv(t testing.TB, env []string) {
-	t.Helper()
-
-	for _, v := range env {
-		if strings.HasPrefix(v, "GOPACKAGESDRIVER=") {
-			tool := strings.TrimPrefix(v, "GOPACKAGESDRIVER=")
-			if tool == "off" {
-				NeedsTool(t, "go")
-			} else {
-				NeedsTool(t, tool)
-			}
-			return
-		}
-	}
-
-	NeedsGoPackages(t)
-}
-
 // NeedsGoBuild skips t if the current system can't build programs with “go build”
 // and then run them with os.StartProcess or exec.Command.
 // Android doesn't have the userspace go build needs to run,
@@ -256,43 +213,6 @@ func NeedsGoBuild(t testing.TB) {
 	// may need to be updated as that function evolves.
 
 	NeedsTool(t, "go")
-}
-
-// ExitIfSmallMachine emits a helpful diagnostic and calls os.Exit(0) if the
-// current machine is a builder known to have scarce resources.
-//
-// It should be called from within a TestMain function.
-func ExitIfSmallMachine() {
-	switch b := os.Getenv("GO_BUILDER_NAME"); b {
-	case "linux-arm-scaleway":
-		// "linux-arm" was renamed to "linux-arm-scaleway" in CL 303230.
-		fmt.Fprintln(os.Stderr, "skipping test: linux-arm-scaleway builder lacks sufficient memory (https://golang.org/issue/32834)")
-	case "plan9-arm":
-		fmt.Fprintln(os.Stderr, "skipping test: plan9-arm builder lacks sufficient memory (https://golang.org/issue/38772)")
-	case "netbsd-arm-bsiegert", "netbsd-arm64-bsiegert":
-		// As of 2021-06-02, these builders are running with GO_TEST_TIMEOUT_SCALE=10,
-		// and there is only one of each. We shouldn't waste those scarce resources
-		// running very slow tests.
-		fmt.Fprintf(os.Stderr, "skipping test: %s builder is very slow\n", b)
-	case "dragonfly-amd64":
-		// As of 2021-11-02, this builder is running with GO_TEST_TIMEOUT_SCALE=2,
-		// and seems to have unusually slow disk performance.
-		fmt.Fprintln(os.Stderr, "skipping test: dragonfly-amd64 has slow disk (https://golang.org/issue/45216)")
-	case "linux-riscv64-unmatched":
-		// As of 2021-11-03, this builder is empirically not fast enough to run
-		// gopls tests. Ideally we should make the tests faster in short mode
-		// and/or fix them to not assume arbitrary deadlines.
-		// For now, we'll skip them instead.
-		fmt.Fprintf(os.Stderr, "skipping test: %s builder is too slow (https://golang.org/issue/49321)\n", b)
-	default:
-		switch runtime.GOOS {
-		case "android", "ios":
-			fmt.Fprintf(os.Stderr, "skipping test: assuming that %s is resource-constrained\n", runtime.GOOS)
-		default:
-			return
-		}
-	}
-	os.Exit(0)
 }
 
 // Go1Point returns the x in Go 1.x.
@@ -325,15 +245,6 @@ func SkipAfterGo1Point(t testing.TB, x int) {
 	}
 }
 
-// NeedsLocalhostNet skips t if networking does not work for ports opened
-// with "localhost".
-func NeedsLocalhostNet(t testing.TB) {
-	switch runtime.GOOS {
-	case "js", "wasip1":
-		t.Skipf(`Listening on "localhost" fails on %s; see https://go.dev/issue/59718`, runtime.GOOS)
-	}
-}
-
 // Deadline returns the deadline of t, if known,
 // using the Deadline method added in Go 1.15.
 func Deadline(t testing.TB) (time.Time, bool) {
@@ -344,89 +255,6 @@ func Deadline(t testing.TB) (time.Time, bool) {
 		return time.Time{}, false
 	}
 	return td.Deadline()
-}
-
-var (
-	gorootOnce sync.Once
-	gorootPath string
-	gorootErr  error
-)
-
-func findGOROOT() (string, error) {
-	gorootOnce.Do(func() {
-		gorootPath = runtime.GOROOT()
-		if gorootPath != "" {
-			// If runtime.GOROOT() is non-empty, assume that it is valid. (It might
-			// not be: for example, the user may have explicitly set GOROOT
-			// to the wrong directory.)
-			return
-		}
-
-		cmd := exec.Command("go", "env", "GOROOT")
-		out, err := cmd.Output()
-		if err != nil {
-			gorootErr = fmt.Errorf("%v: %v", cmd, err)
-		}
-		gorootPath = strings.TrimSpace(string(out))
-	})
-
-	return gorootPath, gorootErr
-}
-
-// GOROOT reports the path to the directory containing the root of the Go
-// project source tree. This is normally equivalent to runtime.GOROOT, but
-// works even if the test binary was built with -trimpath.
-//
-// If GOROOT cannot be found, GOROOT skips t if t is non-nil,
-// or panics otherwise.
-func GOROOT(t testing.TB) string {
-	path, err := findGOROOT()
-	if err != nil {
-		if t == nil {
-			panic(err)
-		}
-		t.Helper()
-		t.Skip(err)
-	}
-	return path
-}
-
-// NeedsLocalXTools skips t if the golang.org/x/tools module is replaced and
-// its replacement directory does not exist (or does not contain the module).
-func NeedsLocalXTools(t testing.TB) {
-	t.Helper()
-
-	NeedsTool(t, "go")
-
-	cmd := Command(t, "go", "list", "-f", "{{with .Replace}}{{.Dir}}{{end}}", "-m", "golang.org/x/tools")
-	out, err := cmd.Output()
-	if err != nil {
-		if ee, ok := err.(*exec.ExitError); ok && len(ee.Stderr) > 0 {
-			t.Skipf("skipping test: %v: %v\n%s", cmd, err, ee.Stderr)
-		}
-		t.Skipf("skipping test: %v: %v", cmd, err)
-	}
-
-	dir := string(bytes.TrimSpace(out))
-	if dir == "" {
-		// No replacement directory, and (since we didn't set -e) no error either.
-		// Maybe x/tools isn't replaced at all (as in a gopls release, or when
-		// using a go.work file that includes the x/tools module).
-		return
-	}
-
-	// We found the directory where x/tools would exist if we're in a clone of the
-	// repo. Is it there? (If not, we're probably in the module cache instead.)
-	modFilePath := filepath.Join(dir, "go.mod")
-	b, err := os.ReadFile(modFilePath)
-	if err != nil {
-		t.Skipf("skipping test: x/tools replacement not found: %v", err)
-	}
-	modulePath := modfile.ModulePath(b)
-
-	if want := "golang.org/x/tools"; modulePath != want {
-		t.Skipf("skipping test: %s module path is %q, not %q", modFilePath, modulePath, want)
-	}
 }
 
 // NeedsGoExperiment skips t if the current process environment does not

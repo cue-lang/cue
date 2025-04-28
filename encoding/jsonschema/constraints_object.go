@@ -47,16 +47,18 @@ func constraintPreserveUnknownFields(key string, n cue.Value, s *state) {
 func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 	switch n.Kind() {
 	case cue.BoolKind:
-		closeStruct := !s.boolValue(n)
-		if s.schemaVersion == VersionKubernetesCRD && closeStruct {
-			s.errf(n, "additionalProperties may not be set to false in a CRD schema")
-			return
+		if s.boolValue(n) {
+			s.openness = explicitlyOpen
+		} else {
+			if s.schemaVersion == VersionKubernetesCRD {
+				s.errf(n, "additionalProperties may not be set to false in a CRD schema")
+				return
+			}
+			s.openness = explicitlyClosed
 		}
-		s.closeStruct = !s.boolValue(n)
 		_ = s.object(n)
 
 	case cue.StructKind:
-		s.closeStruct = true
 		obj := s.object(n)
 		if len(obj.Elts) == 0 {
 			obj.Elts = append(obj.Elts, &ast.Field{

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bb726d7_758bd379",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-28T15:43:29Z",
+      "side": 1,
+      "message": "LGTM but isn\u0027t there some documentation to be updated too?",
+      "revId": "0c6732743c5443738494d129b6edc12305b81fe8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d0a9aff_d95771b7",
+        "filename": "internal/core/adt/simplify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T10:23:28Z",
+      "side": 1,
+      "message": "yes I think you\u0027re right. I\u0027ll send a quick follow-up separately because tweaking the existing comment is separate to the minor perf improvement.",
+      "parentUuid": "f32fe1fb_001207b7",
+      "revId": "32cd2171379fa1866b9ec53cf2d8966a3d5fa18a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e24bb76d_89160058",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4bb44a62_db488b92",
+        "filename": "internal/core/adt/simplify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T10:23:28Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "e24bb76d_89160058",
+      "revId": "32cd2171379fa1866b9ec53cf2d8966a3d5fa18a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5ee3ca0_f22cda5c",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-04-28T07:26:09Z",
       "side": 1,
       "message": "I\u0027m sure I\u0027m being slow, as it\u0027s Monday morning and I\u0027ve only had one coffee so far, but I don\u0027t understand this comment, because the range here you\u0027ve given is exactly the range of an int64 (inclusive) and so by definition, it will fit in an int64. What am I failing to understand?",
+      "revId": "32cd2171379fa1866b9ec53cf2d8966a3d5fa18a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0264ffe_d5157dd9",
+        "filename": "internal/core/adt/simplify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T10:23:28Z",
+      "side": 1,
+      "message": "Ah, I see how maybe my wording was confusing. We do `d \u003d hi - lo` and try to store that as a Go int64. With a CUE int64, the bounds are what is shown above, so `hi - lo` is roughly twice as large as the largest int64 Go can store, hence... overflow, and `d.Int64` errors.\n\nI\u0027ve rewritten this comment a bit, is it clearer now?",
+      "parentUuid": "a5ee3ca0_f22cda5c",
       "revId": "32cd2171379fa1866b9ec53cf2d8966a3d5fa18a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

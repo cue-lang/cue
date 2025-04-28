@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "70a27aa8_04a5f3c7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T08:51:31Z",
+      "side": 1,
+      "message": "Both save just under 2% of allocs/op, which is ultimately what affects the GC overhead - as it needs to find all allocated objects in the heap, so a thousand one-byte allocations are way more expensive for the GC to track than a single one-thousand-byte allocation.\n\nBut yes, this one does lead to a much larger bytes/op reduction in allocs, which should also lead to lower memory usage and better performance :) So this one is better overall, but both are good as long as they\u0027re reasonable code changes.",
+      "parentUuid": "8644222d_b54bbbbb",
+      "revId": "e384085f51f28e94721299ae82b36f12c92ce188",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b0d7e32_4d8099a1",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-04-28T07:15:45Z",
       "side": 1,
       "message": "Presumably, given the lengths are all known ahead of time, there\u0027s no advantage/disadvantage of using copy here, rather than append?",
+      "revId": "e384085f51f28e94721299ae82b36f12c92ce188",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5527ca7_de738f95",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 504,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T08:51:31Z",
+      "side": 1,
+      "message": "good point - in this case we could use `copy` and the result would be the same.\n\nI couldn\u0027t measure a difference in cpu cost between the two when the slice capacity doesn\u0027t need to be grown (which makes sense). However I\u0027m leaning towards leaving the `append` method, because the equivalent alternative to shadow `required` would be two lines like:\n\n```\ncopy(requiredCopy, required)\nrequired :\u003d requiredCopy\n```",
+      "parentUuid": "6b0d7e32_4d8099a1",
       "revId": "e384085f51f28e94721299ae82b36f12c92ce188",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

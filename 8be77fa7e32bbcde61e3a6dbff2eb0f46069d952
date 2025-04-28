@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8589837f_2f934d90",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T15:15:07Z",
+      "side": 1,
+      "message": "start this the usual godoc way - NonExplicitOpen ...",
+      "revId": "8be77fa7e32bbcde61e3a6dbff2eb0f46069d952",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "266200f3_e9e0061c",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T15:15:07Z",
+      "side": 1,
+      "message": "ditto, linkify VersionKubernetesCRD",
+      "revId": "8be77fa7e32bbcde61e3a6dbff2eb0f46069d952",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "591f55d7_27d7eca6",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T15:15:07Z",
+      "side": 1,
+      "message": "perhaps clarify this as \"Set to true for...\" to summarize to the user what they\u0027d want to do in such scenarios. Perhaps also mention that this is commonly used for k8s and CRDs? Because at least from reading the godoc alone I wouldn\u0027t have made that connection myself.",
+      "range": {
+        "startLine": 262,
+        "startChar": 4,
+        "endLine": 262,
+        "endChar": 22
+      },
+      "revId": "8be77fa7e32bbcde61e3a6dbff2eb0f46069d952",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba6d7289_3aafbe3e",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T15:15:07Z",
+      "side": 1,
+      "message": "linkify VersionKubernetesCRD?",
+      "revId": "8be77fa7e32bbcde61e3a6dbff2eb0f46069d952",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed77d83f_241d716e",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T15:15:07Z",
+      "side": 1,
+      "message": "why not call this ImplicitOpen? I find negated options to be harder to understand and use properly. For example, `cfg.NonExplicitOpen \u003d false` is a double negative, and I have to pause for ten seconds to understand what the default false behavior is.\n\nditto for the rest of the code, e.g. nonExplicitlyOpen could be implicitlyOpen.",
+      "revId": "8be77fa7e32bbcde61e3a6dbff2eb0f46069d952",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

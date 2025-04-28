@@ -43,6 +43,9 @@ func constraintAddDefinitions(key string, n cue.Value, s *state) {
 func constraintComment(key string, n cue.Value, s *state) {
 }
 
+func constraintIgnore(key string, b cue.Value, s *state) {
+}
+
 func constraintConst(key string, n cue.Value, s *state) {
 	s.all.add(n, s.constValue(n))
 	s.allowedTypes &= n.Kind()

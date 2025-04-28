@@ -530,6 +530,12 @@ type state struct {
 	// reset within properties or additionalProperties.
 	preserveUnknownFields bool
 
+	// k8sResourceKind and k8sAPIVersion record values from the
+	// x-kubernetes-group-version-kind keyword
+	// for the kind and apiVersion properties respectively.
+	k8sResourceKind string
+	k8sAPIVersion   string
+
 	// Keep track of whether the object has been explicitly
 	// closed or opened (see [Config.OpenOnlyWhenExplicit]).
 	openness openness

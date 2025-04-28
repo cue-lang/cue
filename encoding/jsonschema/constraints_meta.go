@@ -74,3 +74,10 @@ func constraintTODO(key string, n cue.Value, s *state) {
 		s.errf(n, `keyword %q not yet implemented`, key)
 	}
 }
+
+// constraintIgnore represents a constraint that we're deliberately
+// ignoring, by contrast with [constraintTODO] that represents
+// a constraint that we're definitely intending to implement
+// at some point.
+func constraintIgnore(key string, b cue.Value, s *state) {
+}

@@ -15,6 +15,8 @@
 package jsonschema
 
 import (
+	"strings"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -42,6 +44,38 @@ func constraintPreserveUnknownFields(key string, n cue.Value, s *state) {
 	// before "allOf", because it's important that this value be
 	// passed down recursively to allOf and friends.
 	s.preserveUnknownFields = true
+}
+
+func constraintGroupVersionKind(key string, n cue.Value, s *state) {
+	// x-kubernetes-group-version-kind is used by Kubernetes schemas
+	// to indicate the required values of the apiVersion and kind fields.
+	items := s.listItems(key, n, false)
+	if len(items) != 1 {
+		// When there's more than one item, we _could_ generate
+		// a disjunction over apiVersion and kind but for now, we'll
+		// just ignore it.
+		// TODO implement support for multiple items
+		return
+	}
+	s.processMap(items[0], func(key string, n cue.Value) {
+		if strings.HasPrefix(key, "x-") {
+			// TODO are x- extension properties actually allowed in this context?
+			return
+		}
+		switch key {
+		case "group":
+			return
+		case "kind":
+			s.k8sResourceKind, _ = s.strValue(n)
+		case "version":
+			s.k8sAPIVersion, _ = s.strValue(n)
+		default:
+			s.errf(n, "unknown field %q in x-kubernetes-group-version-kind item", key)
+		}
+	})
+	if s.k8sResourceKind == "" || s.k8sAPIVersion == "" {
+		s.errf(n, "x-kubernetes-group-version-kind needs both kind and version fields")
+	}
 }
 
 func constraintAdditionalProperties(key string, n cue.Value, s *state) {
@@ -178,6 +212,8 @@ func constraintProperties(key string, n cue.Value, s *state) {
 	if n.Kind() != cue.StructKind {
 		s.errf(n, `"properties" expected an object, found %v`, n.Kind())
 	}
+	hasKind := false
+	hasAPIVersion := false
 	s.processMap(n, func(key string, n cue.Value) {
 		// property?: value
 		name := ast.NewString(key)
@@ -188,7 +224,19 @@ func constraintProperties(key string, n cue.Value, s *state) {
 		if doc := state.comment(); doc != nil {
 			ast.SetComments(f, []*ast.CommentGroup{doc})
 		}
-		f.Optional = token.Blank.Pos()
+		f.Constraint = token.OPTION
+		if s.k8sResourceKind != "" && key == "kind" {
+			// Define a regular field with the specified kind value.
+			f.Constraint = token.ILLEGAL
+			f.Value = ast.NewString(s.k8sResourceKind)
+			hasKind = true
+		}
+		if s.k8sAPIVersion != "" && key == "apiVersion" {
+			// Define a regular field with the specified value.
+			f.Constraint = token.ILLEGAL
+			f.Value = ast.NewString(s.k8sAPIVersion)
+			hasAPIVersion = true
+		}
 		if len(obj.Elts) > 0 && len(f.Comments()) > 0 {
 			// TODO: change formatter such that either a NewSection on the
 			// field or doc comment will cause a new section.
@@ -204,6 +252,21 @@ func constraintProperties(key string, n cue.Value, s *state) {
 		}
 		obj.Elts = append(obj.Elts, f)
 	})
+	// It's not entirely clear whether it's OK to have an x-kubernetes-group-version-kind
+	// keyword without the kind and apiVersion properties but be defensive
+	// and add them anyway even if they're not there already.
+	if s.k8sAPIVersion != "" && !hasAPIVersion {
+		obj.Elts = append(obj.Elts, &ast.Field{
+			Label: ast.NewString("apiVersion"),
+			Value: ast.NewString(s.k8sAPIVersion),
+		})
+	}
+	if s.k8sResourceKind != "" && !hasKind {
+		obj.Elts = append(obj.Elts, &ast.Field{
+			Label: ast.NewString("kind"),
+			Value: ast.NewString(s.k8sResourceKind),
+		})
+	}
 	s.hasProperties = true
 }
 
@@ -249,10 +312,9 @@ func constraintRequired(key string, n cue.Value, s *state) {
 			obj.Elts = append(obj.Elts, f)
 			continue
 		}
-		if f.Optional == token.NoPos {
+		if f.Constraint == token.NOT {
 			s.errf(n, "duplicate required field %q", str)
 		}
 		f.Constraint = token.NOT
-		f.Optional = token.NoPos
 	}
 }

@@ -1,0 +1,97 @@
+Note: the schema.json file here is derived from the
+file api/openapi-spec/v3/api_openapi.json in
+the Kubernetes repository.
+
+#version: k8sAPI
+
+-- schema.json --
+{
+  "components": {
+    "schemas": {
+      "io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions": {
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "serverAddressByClientCIDRs": {
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR"
+                }
+              ],
+              "default": {}
+            },
+            "type": "array",
+            "x-kubernetes-list-type": "atomic"
+          },
+          "versions": {
+            "items": {
+              "default": "",
+              "type": "string"
+            },
+            "type": "array",
+            "x-kubernetes-list-type": "atomic"
+          }
+        },
+        "required": [
+          "versions",
+          "serverAddressByClientCIDRs"
+        ],
+        "type": "object",
+        "x-kubernetes-group-version-kind": [
+          {
+            "group": "",
+            "kind": "APIVersions",
+            "version": "v1"
+          }
+        ]
+      },
+      "io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR": {
+        "properties": {
+          "clientCIDR": {
+            "default": "",
+            "type": "string"
+          },
+          "serverAddress": {
+            "default": "",
+            "type": "string"
+          }
+        },
+        "required": [
+          "clientCIDR",
+          "serverAddress"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerToken": {
+        "in": "header",
+        "name": "authorization",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "title": "Kubernetes",
+    "version": "unversioned"
+  },
+  "openapi": "3.0.0",
+  "paths": {}
+}
+-- out/decode/extract --
+_#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions": {
+	apiVersion: "v1"
+	kind:       "APIVersions"
+	serverAddressByClientCIDRs!: [..._#defs."/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR"]
+	versions!: [...string]
+}
+
+_#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR": {
+	clientCIDR!:    string
+	serverAddress!: string
+}

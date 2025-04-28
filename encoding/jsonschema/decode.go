@@ -390,7 +390,7 @@ var coreToCUE = []cue.Kind{
 	objectType: cue.StructKind,
 }
 
-func kindToAST(k cue.Kind) ast.Expr {
+func kindToAST(k cue.Kind, explicitOpen bool) ast.Expr {
 	switch k {
 	case cue.NullKind:
 		// TODO: handle OpenAPI restrictions.
@@ -408,6 +408,9 @@ func kindToAST(k cue.Kind) ast.Expr {
 	case cue.ListKind:
 		return ast.NewList(&ast.Ellipsis{})
 	case cue.StructKind:
+		if explicitOpen {
+			return ast.NewStruct()
+		}
 		return ast.NewStruct(&ast.Ellipsis{})
 	}
 	panic(fmt.Errorf("unexpected kind %v", k))
@@ -429,8 +432,8 @@ type constraintInfo struct {
 	constraints []ast.Expr
 }
 
-func (c *constraintInfo) setTypeUsed(n cue.Value, t coreType) {
-	c.typ = kindToAST(coreToCUE[t])
+func (c *constraintInfo) setTypeUsed(n cue.Value, t coreType, explicitOpen bool) {
+	c.typ = kindToAST(coreToCUE[t], explicitOpen)
 	setPos(c.typ, n)
 	ast.SetRelPos(c.typ, token.NoRelPos)
 }
@@ -451,7 +454,7 @@ func (s *state) setTypeUsed(n cue.Value, t coreType) {
 	if int(t) >= len(s.types) {
 		panic(fmt.Errorf("type out of range %v/%v", int(t), len(s.types)))
 	}
-	s.types[t].setTypeUsed(n, t)
+	s.types[t].setTypeUsed(n, t, s.cfg.ExplicitOpen)
 }
 
 type state struct {
@@ -487,8 +490,7 @@ type state struct {
 	obj  *ast.StructLit
 	objN cue.Value // used for adding obj to constraints
 
-	closeStruct bool
-	patterns    []ast.Expr
+	patterns []ast.Expr
 
 	list *ast.ListLit
 
@@ -523,7 +525,19 @@ type state struct {
 	// which is preserved recursively by default, and is
 	// reset within properties or additionalProperties.
 	preserveUnknownFields bool
+
+	// Keep track of whether the object has been explicitly
+	// closed or opened (see [Config.NonExplicitOpen]).
+	openness openness
 }
+
+type openness int
+
+const (
+	implicitlyOpen openness = iota
+	explicitlyOpen
+	explicitlyClosed
+)
 
 // schemaInfo holds information about a schema
 // after it has been created.
@@ -565,30 +579,27 @@ func (s *state) object(n cue.Value) *ast.StructLit {
 }
 
 func (s *state) finalizeObject() {
-	if s.obj == nil && s.schemaVersion == VersionKubernetesCRD && (s.allowedTypes&cue.StructKind) != 0 && !s.preserveUnknownFields {
-		// With regular JSON Schema, we'll never get a closed struct
-		// unless additionalProperties is specified, which invokes
-		// s.object. However, that's not true of CRDs which are closed
-		// (or at least non-preserving) by default, so make sure there's
-		// an object.
+	if s.obj == nil && s.schemaVersion == VersionKubernetesCRD && (s.allowedTypes&cue.StructKind) != 0 && s.preserveUnknownFields {
+		// When x-kubernetes-preserve-unknown-fields is set, we need
+		// an explicit ellipsis even though kindToAST won't have added
+		// one, so make sure there's an object.
 		_ = s.object(s.pos)
 	}
 	if s.obj == nil {
 		return
 	}
-	var e ast.Expr
-	if s.closeStruct || (s.schemaVersion == VersionKubernetesCRD && !s.preserveUnknownFields) {
-		// TODO in CRDs, this isn't quite right, as the
-		// structs aren't _really_ closed: it's just that
-		// unknown fields are discarded when persisting
-		// data. But we don't really have a way of representing
-		// that in CUE yet, so close will have to do.
+	if s.preserveUnknownFields {
+		s.openness = explicitlyOpen
+	}
+	var e ast.Expr = s.obj
+	if s.cfg.ExplicitOpen && s.openness == implicitlyOpen {
+		// Nothing to do: the struct is implicitly open but
+		// we've been directed to leave it like that.
+	} else if s.openness == explicitlyClosed {
 		e = ast.NewCall(ast.NewIdent("close"), s.obj)
 	} else {
 		s.obj.Elts = append(s.obj.Elts, &ast.Ellipsis{})
-		e = s.obj
 	}
-
 	s.add(s.objN, objectType, e)
 }
 
@@ -683,7 +694,7 @@ func (s *state) finalize() (e ast.Expr) {
 			case allowed:
 				npossible++
 				if s.knownTypes&k != 0 {
-					disjuncts = append(disjuncts, kindToAST(k))
+					disjuncts = append(disjuncts, kindToAST(k, s.cfg.ExplicitOpen))
 				}
 			}
 		}

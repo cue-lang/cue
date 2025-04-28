@@ -76,14 +76,16 @@ close({
 	fields?: struct.MinFields(3) & struct.MaxFields(10) & {
 		[=~"^\\P{Lu}"]: _
 	}
-	additional?: close({
+	additional?: {
 		foo?: number
 		bar?: number
 		{[!~"^(foo|bar)$"]: string}
-	})
-	map?: close({
+		...
+	}
+	map?: {
 		[string]: string
-	})
+		...
+	}
 	patterns?: {
 		foo?: number
 		bar?: number
@@ -99,7 +101,7 @@ close({
 		{[=~"^\\P{Lo}"]: int}
 		...
 	}
-	complex?: close({
+	complex?: {
 		foo?: number
 		bar?: number
 
@@ -107,7 +109,8 @@ close({
 
 		{[=~"^\\P{Lo}" & !~"^(foo|bar)$"]: int}
 		{[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string}
-	})
+		...
+	}
 	multi?: >=7 | struct.MaxFields(5) & {
 		foo?: number
 		bar?: number

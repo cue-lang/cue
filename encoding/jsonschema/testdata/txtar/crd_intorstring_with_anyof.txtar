@@ -35,6 +35,4 @@ spec:
               - type: string
 
 -- out/decode/extract --
-close({
-	spec?: matchN(>=1, [int, string]) & (int | string)
-})
+spec?: matchN(>=1, [int, string]) & (int | string)

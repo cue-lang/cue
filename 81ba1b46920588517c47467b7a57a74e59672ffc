@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "094a1e07_aad2ec39",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-28T15:54:09Z",
+      "side": 1,
+      "message": "nit: given that this doesn\u0027t behave like append, but more like printf (it doesn\u0027t take a buf argument or return one), i\u0027d probably name this `printf`, `emitf`, `writef` or something different from `appendf`.",
+      "revId": "81ba1b46920588517c47467b7a57a74e59672ffc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf4cc75f_5e333350",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-28T15:54:09Z",
+      "side": 1,
+      "message": "Maybe a doc comment explaining why this comes in useful?",
+      "revId": "81ba1b46920588517c47467b7a57a74e59672ffc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03572086_3cbe4055",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-28T15:54:09Z",
+      "side": 1,
+      "message": "similar remark about the `appendf` name here.",
+      "revId": "81ba1b46920588517c47467b7a57a74e59672ffc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2d8e123_0e6d57ed",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-28T15:54:09Z",
+      "side": 1,
+      "message": "This doc comment is detached from `genDef` and seems to be referring to the wrong name.",
+      "revId": "81ba1b46920588517c47467b7a57a74e59672ffc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f6be107_15a38123",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-28T15:54:09Z",
+      "side": 1,
+      "message": "A brief comment explaining what\u0027s going on here might help future readers.",
+      "revId": "81ba1b46920588517c47467b7a57a74e59672ffc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

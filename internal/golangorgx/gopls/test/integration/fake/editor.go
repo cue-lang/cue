@@ -14,6 +14,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"sync"
 
@@ -21,7 +22,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake/glob"
 	"cuelang.org/go/internal/golangorgx/gopls/util/pathutil"
-	"cuelang.org/go/internal/golangorgx/gopls/util/slices"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2/servertest"
 	"cuelang.org/go/internal/golangorgx/tools/xcontext"

@@ -16,6 +16,24 @@
       "message": "LGTM but isn\u0027t there some documentation to be updated too?",
       "revId": "0c6732743c5443738494d129b6edc12305b81fe8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02c37be8_52a030ee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T19:40:30Z",
+      "side": 1,
+      "message": "not exactly; `cue help exp gengotypes` does not say anything about pointers or this new option yet. I plan to add docs once the feature is finished, otherwise master/early users may get really confused. I\u0027ve added a TODO.",
+      "parentUuid": "8bb726d7_758bd379",
+      "revId": "0c6732743c5443738494d129b6edc12305b81fe8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

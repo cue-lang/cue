@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d03bb47c_86bff916",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T15:01:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd3913be_591244ad",
+      "revId": "da74b97b975ed30d7c15862f011aa9768b4214e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ddab8fd2_cbc2b5fc",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-04-10T11:38:42Z",
       "side": 1,
       "message": "I missed the final `\\n// ` here.\nHow about using two appendf calls to make it clear that the field below is also commented?",
+      "revId": "da74b97b975ed30d7c15862f011aa9768b4214e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f4bbf94_fc57805a",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T15:01:04Z",
+      "side": 1,
+      "message": "ended up with a single commented line and %q for the original field name, as otherwise it containing a newline gets in the way as you predicted.",
+      "parentUuid": "ddab8fd2_cbc2b5fc",
       "revId": "da74b97b975ed30d7c15862f011aa9768b4214e0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

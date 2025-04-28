@@ -46,16 +46,14 @@
     }
 }
 -- out/decode/extract --
-close({
-	r1?: {
-		_embeddedResource
-		...
-	}
-	r2?: close({
-		_embeddedResource
-		foo?: string
-	})
-})
+r1?: {
+	_embeddedResource
+	...
+}
+r2?: {
+	_embeddedResource
+	foo?: string
+}
 
 _embeddedResource: {
 	apiVersion!: string

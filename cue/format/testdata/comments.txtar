@@ -1,5 +1,8 @@
 simplify
 
+-- empty.input --
+-- empty.golden --
+
 -- comments.input --
 // Package line 1 group 1
 // Package line 2 group 1

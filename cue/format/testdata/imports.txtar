@@ -1,5 +1,17 @@
 sort-imports
 
+-- pkgonly.input --
+package foo
+-- pkgonly.golden --
+package foo
+-- attronly.input --
+@attr(foo)
+-- attronly.golden --
+@attr(foo)
+-- importonly.input --
+import "foo"
+-- importonly.golden --
+import "foo"
 -- imports.input --
 package foo
 

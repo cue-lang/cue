@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ee3c062_5fe7ff98",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T19:40:30Z",
+      "side": 1,
+      "message": "well spotted, done",
+      "parentUuid": "094a1e07_aad2ec39",
+      "revId": "81ba1b46920588517c47467b7a57a74e59672ffc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cf4cc75f_5e333350",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-04-28T15:54:09Z",
       "side": 1,
       "message": "Maybe a doc comment explaining why this comes in useful?",
+      "revId": "81ba1b46920588517c47467b7a57a74e59672ffc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09e4320a_ffe723fc",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T19:40:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cf4cc75f_5e333350",
       "revId": "81ba1b46920588517c47467b7a57a74e59672ffc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eab821a3_dbc609d9",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T19:40:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "03572086_3cbe4055",
+      "revId": "81ba1b46920588517c47467b7a57a74e59672ffc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2d8e123_0e6d57ed",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d79b9ed2_0c9dc833",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T19:40:30Z",
+      "side": 1,
+      "message": "ah, I had left it split up and with the old name as a reminder to myself to rewrite this, as the method now does something a bit different. well spotted. done.",
+      "parentUuid": "f2d8e123_0e6d57ed",
+      "revId": "81ba1b46920588517c47467b7a57a74e59672ffc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8f6be107_15a38123",
@@ -82,6 +154,24 @@
       "writtenOn": "2025-04-28T15:54:09Z",
       "side": 1,
       "message": "A brief comment explaining what\u0027s going on here might help future readers.",
+      "revId": "81ba1b46920588517c47467b7a57a74e59672ffc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14d28176_27b5180a",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-28T19:40:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f6be107_15a38123",
       "revId": "81ba1b46920588517c47467b7a57a74e59672ffc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

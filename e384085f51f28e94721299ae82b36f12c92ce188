@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b0d7e32_4d8099a1",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 504,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-28T07:15:45Z",
+      "side": 1,
+      "message": "Presumably, given the lengths are all known ahead of time, there\u0027s no advantage/disadvantage of using copy here, rather than append?",
+      "revId": "e384085f51f28e94721299ae82b36f12c92ce188",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -161,7 +161,7 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		// numbers
 		// >=a & <=b
 		//     a   if a == b
-		//     _|_ if a < b
+		//     _|_ if b < a
 		// >=a & <b
 		//     _|_ if b <= a
 		// >a  & <=b
@@ -172,7 +172,7 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		// integers
 		// >=a & <=b
 		//     a   if b-a == 0
-		//     _|_ if a < b
+		//     _|_ if b < a
 		// >=a & <b
 		//     a   if b-a == 1
 		//     _|_ if b <= a

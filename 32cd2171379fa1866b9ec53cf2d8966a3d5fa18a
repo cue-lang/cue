@@ -104,6 +104,24 @@
       "parentUuid": "a5ee3ca0_f22cda5c",
       "revId": "32cd2171379fa1866b9ec53cf2d8966a3d5fa18a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd38c01c_c219b79c",
+        "filename": "internal/core/adt/simplify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-04-28T10:26:37Z",
+      "side": 1,
+      "message": "Ah yes, that makes a big difference knowing that you\u0027re talking about the subtraction! Thank you.",
+      "parentUuid": "c0264ffe_d5157dd9",
+      "revId": "32cd2171379fa1866b9ec53cf2d8966a3d5fa18a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

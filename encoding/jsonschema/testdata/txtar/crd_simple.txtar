@@ -30,8 +30,6 @@ spec:
             x-kubernetes-preserve-unknown-fields: true
 
 -- out/decode/extract --
-close({
-	spec?: {
-		...
-	}
-})
+spec?: {
+	...
+}

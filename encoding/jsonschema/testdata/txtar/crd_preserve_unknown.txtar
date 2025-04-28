@@ -82,18 +82,14 @@ preserving?: {
 	preserving?: {
 		...
 	}
-	pruning?: close({})
-	pruning2?: close({
-		[string]: close({
-			preserved?: string
-		})
-	})
+	pruning?: {}
+	pruning2?: [string]: preserved?: string
 	...
 }
-pruning?: close({
+pruning?: {
 	preserving?: {
 		...
 	}
-	pruning?: close({})
-})
+	pruning?: {}
+}
 ...

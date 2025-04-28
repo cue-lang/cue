@@ -65,6 +65,9 @@ func Extract(data cue.InstanceOrValue, cfg *Config) (*ast.File, error) {
 		cfg.StrictKeywords = true
 		cfg.StrictFeatures = true
 	}
+	if cfg.DefaultVersion == VersionKubernetesCRD {
+		cfg.NonExplicitOpen = true
+	}
 	if cfg.ID == "" {
 		// Always choose a fully-qualified ID for the schema, even
 		// if it doesn't declare one.
@@ -248,6 +251,20 @@ type Config struct {
 	// StrictKeywords reports an error when unknown keywords
 	// are encountered.
 	StrictKeywords bool
+
+	// By default schemas will be explicitly closed (with `close`)
+	// when `allowAdditionalProperties` is false and opened
+	// (with `...`) otherwise. When NonExplicitOpen is set,
+	// the`...` will only be added if `allowAdditionalProperties` is
+	// explicitly true, or the version is VersionKubernetesCRD and
+	// `x-kubernetes-preserve-unknown-fields` is true.
+	//
+	// This is useful for Kubernetes schemas that are not allowed to
+	// be explicitly closed but are nonetheless de-facto closed
+	// despite defined JSON Schema semantics.
+	//
+	// Implied true when the version is VersionKubernetesCRD.
+	NonExplicitOpen bool
 
 	// DefaultVersion holds the default schema version to use
 	// when no $schema field is present. If it is zero, [DefaultVersion]

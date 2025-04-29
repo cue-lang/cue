@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f48f37b0_e136b2aa",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-29T15:05:13Z",
+      "side": 0,
+      "message": "wasn\u0027t this another optimization that should be pushed further up the stack, closer to where we swap out the CUE evaluator for the generator?",
+      "revId": "492a3c1686ceee1be7bad4a4788810dac7b707a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

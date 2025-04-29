@@ -144,6 +144,23 @@ modes: def: {
 // It corresponds to the Go cue/build.Form type.
 #Form: string
 
+all: {
+	for m in modes {
+		for name, _ in m.encodings {
+			encodings: (name): true
+		}
+		for name, _ in m.extensions {
+			extensions: (name): true
+		}
+	}
+	for name, _ in interpretations {
+		interpretations: (name): true
+	}
+	for name, _ in forms {
+		forms: (name): true
+	}
+}
+
 modes: [string]: {
 	// extensions maps a file extension to its associated default file properties.
 	extensions: {

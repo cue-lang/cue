@@ -1,0 +1,418 @@
+//go:build !bootstrap
+
+package filetypes
+
+import (
+	"cmp"
+	_ "embed"
+	"fmt"
+	"maps"
+	"slices"
+
+	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/filetypes/internal"
+	"cuelang.org/go/internal/filetypes/internal/genstruct"
+	"cuelang.org/go/internal/filetypes/internal/opt"
+)
+
+// Define the opt type and its associated [some] function for use by the generated code.
+
+//go:embed fileinfo.dat
+var fileInfoDataBytes []byte
+
+func init() {
+	tagTypes = map[string]TagType{
+		"auto":           TagTopLevel,
+		"binary":         TagTopLevel,
+		"code":           TagTopLevel,
+		"cue":            TagTopLevel,
+		"dag":            TagTopLevel,
+		"data":           TagTopLevel,
+		"go":             TagTopLevel,
+		"graph":          TagTopLevel,
+		"json":           TagTopLevel,
+		"jsonl":          TagTopLevel,
+		"jsonschema":     TagTopLevel,
+		"koala":          TagSubsidiaryBool,
+		"lang":           TagSubsidiaryString,
+		"openapi":        TagTopLevel,
+		"pb":             TagTopLevel,
+		"proto":          TagTopLevel,
+		"schema":         TagTopLevel,
+		"strict":         TagSubsidiaryBool,
+		"strictFeatures": TagSubsidiaryBool,
+		"strictKeywords": TagSubsidiaryBool,
+		"text":           TagTopLevel,
+		"textproto":      TagTopLevel,
+		"toml":           TagTopLevel,
+		"xml":            TagTopLevel,
+		"yaml":           TagTopLevel,
+	}
+}
+
+var (
+	allFileExts = []string{
+		"-",
+		".cue",
+		".go",
+		".json",
+		".jsonl",
+		".ldjson",
+		".ndjson",
+		".proto",
+		".textpb",
+		".textproto",
+		".toml",
+		".txt",
+		".wasm",
+		".xml",
+		".yaml",
+		".yml",
+		".unknown",
+		"",
+	}
+	allFileExts_rev = genstruct.IndexMap(allFileExts)
+)
+var (
+	allTopLevelTags = []string{
+		"auto",
+		"binary",
+		"code",
+		"cue",
+		"dag",
+		"data",
+		"go",
+		"graph",
+		"json",
+		"jsonl",
+		"jsonschema",
+		"openapi",
+		"pb",
+		"proto",
+		"schema",
+		"text",
+		"textproto",
+		"toml",
+		"xml",
+		"yaml",
+	}
+	allTopLevelTags_rev = genstruct.IndexMap(allTopLevelTags)
+)
+
+var (
+	allEncodings = []build.Encoding{
+		"binary",
+		"binarypb",
+		"code",
+		"cue",
+		"json",
+		"jsonl",
+		"proto",
+		"text",
+		"textproto",
+		"toml",
+		"xml",
+		"yaml",
+		"",
+	}
+	allEncodings_rev = genstruct.IndexMap(allEncodings)
+)
+var (
+	allInterpretations = []build.Interpretation{
+		"auto",
+		"jsonschema",
+		"openapi",
+		"pb",
+		"",
+	}
+	allInterpretations_rev = genstruct.IndexMap(allInterpretations)
+)
+var (
+	allForms = []build.Form{
+		"dag",
+		"data",
+		"final",
+		"graph",
+		"schema",
+		"",
+	}
+	allForms_rev = genstruct.IndexMap(allForms)
+)
+
+func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, errors.Error) {
+	key := make([]byte, 5)
+	genstruct.PutSet(key, 2, 3, allTopLevelTags_rev, maps.Keys(sc.topLevel))
+	genstruct.PutEnum(key, 1, 1, allFileExts_rev, 16, fileExt(filename))
+	genstruct.PutUint64(key, 0, 1, uint64(mode))
+
+	data, ok := genstruct.FindRecord(fileInfoDataBytes, 5+6, key)
+	if !ok {
+		return nil, errors.Newf(token.NoPos, "invalid tag combination") // TODO what error would be best?
+	}
+
+	switch e := internal.ErrorKind(genstruct.GetUint64(data, 3, 1)); e {
+	default:
+		return nil, errors.Newf(token.NoPos, "unknown filetype error %d", e)
+	case internal.ErrUnknownFileExtension:
+		return nil, errors.Newf(token.NoPos, "unknown file extension %s", fileExt(filename))
+	case internal.ErrCouldNotDetermineFileType:
+		return nil, errors.Newf(token.NoPos, "could not determine file type for file %q", filename)
+	case internal.ErrNoEncodingSpecified:
+		return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", filename)
+	case 0:
+		// no error
+	}
+
+	var f build.File
+	f.Filename = filename
+	f.Encoding = genstruct.GetEnum(data, 0, 1, allEncodings)
+	f.Interpretation = genstruct.GetEnum(data, 1, 1, allInterpretations)
+	f.Form = genstruct.GetEnum(data, 2, 1, allForms)
+	if index := int(genstruct.GetUint64(data, 4, 1)); index > 0 {
+		tagFunc := subsidiaryTagFuncs[index-1]
+		var t subsidiaryTags
+		if err := t.unmarshalFromMap(sc.subsidiaryString); err != nil {
+			return nil, errors.Promote(err, "")
+		}
+		t, err := tagFunc(t)
+		if err != nil {
+			return nil, errors.Promote(err, "")
+		}
+		f.Tags = t.marshalToMap()
+
+	} else if len(sc.subsidiaryString) > 0 {
+		return nil, errors.Newf(token.NoPos, "tag %s is not allowed in this context", someKey(sc.subsidiaryString))
+	}
+	if index := int(genstruct.GetUint64(data, 5, 1)); index > 0 {
+		tagFunc := subsidiaryBoolTagFuncs[index-1]
+		var t subsidiaryBoolTags
+		if err := t.unmarshalFromMap(sc.subsidiaryBool); err != nil {
+			return nil, errors.Promote(err, "")
+		}
+		t, err := tagFunc(t)
+		if err != nil {
+			return nil, errors.Promote(err, "")
+		}
+		f.BoolTags = t.marshalToMap()
+	} else if len(sc.subsidiaryBool) > 0 {
+		return nil, errors.Newf(token.NoPos, "tag %s is not allowed in this context", someKey(sc.subsidiaryBool))
+	}
+
+	return &f, nil
+}
+
+func someKey[K cmp.Ordered, V any](m map[K]V) K {
+	return slices.Sorted(maps.Keys(m))[0]
+}
+
+var subsidiaryBoolTagFuncs = []func(subsidiaryBoolTags) (subsidiaryBoolTags, error){
+	unifySubsidiaryBoolTags_0,
+	unifySubsidiaryBoolTags_1,
+	unifySubsidiaryBoolTags_2,
+}
+
+var subsidiaryTagFuncs = []func(subsidiaryTags) (subsidiaryTags, error){
+	unifySubsidiaryTags_0,
+	unifySubsidiaryTags_1,
+	unifySubsidiaryTags_2,
+}
+
+type subsidiaryTags struct {
+	lang opt.Opt[string]
+}
+
+func (t *subsidiaryTags) unmarshalFromMap(m map[string]string) error {
+	if x, ok := m["lang"]; ok {
+		t.lang = opt.Some(x)
+	}
+	return nil
+}
+func (t subsidiaryTags) marshalToMap() map[string]string {
+	m := make(map[string]string)
+	if t.lang.IsPresent() {
+		m["lang"] = t.lang.Value()
+	}
+	return m
+}
+
+type subsidiaryBoolTags struct {
+	koala          opt.Opt[bool]
+	strict         opt.Opt[bool]
+	strictFeatures opt.Opt[bool]
+	strictKeywords opt.Opt[bool]
+}
+
+func (t *subsidiaryBoolTags) unmarshalFromMap(m map[string]bool) error {
+	if x, ok := m["koala"]; ok {
+		t.koala = opt.Some(x)
+	}
+	if x, ok := m["strict"]; ok {
+		t.strict = opt.Some(x)
+	}
+	if x, ok := m["strictFeatures"]; ok {
+		t.strictFeatures = opt.Some(x)
+	}
+	if x, ok := m["strictKeywords"]; ok {
+		t.strictKeywords = opt.Some(x)
+	}
+	return nil
+}
+func (t subsidiaryBoolTags) marshalToMap() map[string]bool {
+	m := make(map[string]bool)
+	if t.koala.IsPresent() {
+		m["koala"] = t.koala.Value()
+	}
+	if t.strict.IsPresent() {
+		m["strict"] = t.strict.Value()
+	}
+	if t.strictFeatures.IsPresent() {
+		m["strictFeatures"] = t.strictFeatures.Value()
+	}
+	if t.strictKeywords.IsPresent() {
+		m["strictKeywords"] = t.strictKeywords.Value()
+	}
+	return m
+}
+
+// unifySubsidiaryTags_0 unifies subsidiaryTags values according to the following CUE logic:
+//
+//	{
+//		{
+//			[string]: string
+//		}
+//		lang: "go"
+//	}
+func unifySubsidiaryTags_0(t subsidiaryTags) (subsidiaryTags, error) {
+	var r subsidiaryTags
+	r.lang = opt.Some("go")
+	if t.lang.IsPresent() && t.lang.Value() != r.lang.Value() {
+		return subsidiaryTags{}, fmt.Errorf("conflict on lang; %#v provided but need %#v", t.lang.Value(), r.lang.Value())
+	}
+	return r, nil
+}
+
+// unifySubsidiaryTags_2 unifies subsidiaryTags values according to the following CUE logic:
+//
+//	{
+//		{
+//			[string]: string
+//		}
+//		lang: (*"" | string) & {
+//			"go"
+//		}
+//	}
+func unifySubsidiaryTags_2(t subsidiaryTags) (subsidiaryTags, error) {
+	var r subsidiaryTags
+	r.lang = opt.Some("go")
+	if t.lang.IsPresent() && t.lang.Value() != r.lang.Value() {
+		return subsidiaryTags{}, fmt.Errorf("conflict on lang; %#v provided but need %#v", t.lang.Value(), r.lang.Value())
+	}
+	return r, nil
+}
+
+// unifySubsidiaryTags_1 unifies subsidiaryTags values according to the following CUE logic:
+//
+//	{
+//		{
+//			[string]: string
+//		}
+//		lang: *"" | string
+//	}
+func unifySubsidiaryTags_1(t subsidiaryTags) (subsidiaryTags, error) {
+	var r subsidiaryTags
+	r.lang = opt.Some("")
+	if t.lang.IsPresent() {
+		r.lang = t.lang
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_2 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{
+//			[string]: bool
+//		}
+//		koala:          *false | bool
+//		strict:         *false | bool
+//		strictKeywords: *strict | bool
+//		strictFeatures: *strict | bool
+//	}
+func unifySubsidiaryBoolTags_2(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	r.koala = opt.Some(false)
+	if t.koala.IsPresent() {
+		r.koala = t.koala
+	}
+	r.strict = opt.Some(false)
+	if t.strict.IsPresent() {
+		r.strict = t.strict
+	}
+	r.strictFeatures = r.strict
+	if t.strictFeatures.IsPresent() {
+		r.strictFeatures = t.strictFeatures
+	}
+	r.strictKeywords = r.strict
+	if t.strictKeywords.IsPresent() {
+		r.strictKeywords = t.strictKeywords
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_0 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{
+//			[string]: bool
+//		}
+//		koala: *false | bool
+//	}
+func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	r.koala = opt.Some(false)
+	if t.koala.IsPresent() {
+		r.koala = t.koala
+	}
+	if t.strict.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strict")
+	}
+	if t.strictFeatures.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictFeatures")
+	}
+	if t.strictKeywords.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strictKeywords")
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_1 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{
+//			[string]: bool
+//		}
+//		strict:         *false | bool
+//		strictKeywords: *strict | bool
+//		strictFeatures: *strict | bool
+//	}
+func unifySubsidiaryBoolTags_1(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	if t.koala.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	}
+	r.strict = opt.Some(false)
+	if t.strict.IsPresent() {
+		r.strict = t.strict
+	}
+	r.strictFeatures = r.strict
+	if t.strictFeatures.IsPresent() {
+		r.strictFeatures = t.strictFeatures
+	}
+	r.strictKeywords = r.strict
+	if t.strictKeywords.IsPresent() {
+		r.strictKeywords = t.strictKeywords
+	}
+	return r, nil
+}

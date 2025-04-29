@@ -16,9 +16,11 @@ cmp stderr encode-xml-koala.stderr
 ! exec cue export export.xml
 cmp stderr decode-xml.stderr
 
-# Koala by itself is not a top-level encoding, unlike jsonschema.
-! exec cue export koala: export.xml
-cmp stderr decode-koala.stderr
+# Although Koala by itself is not a top-level encoding, the file
+# extension is a sufficient hint that we can use an explicit
+# xml file with the koala encoding.
+exec cue export koala: export.xml
+cmp stdout export.json
 
 # Specifying xml+koala works, no matter the file input filename.
 exec cue export xml+koala: export.xml
@@ -36,8 +38,6 @@ unsupported encoding "xml"
 unsupported encoding "xml"
 -- decode-xml.stderr --
 xml requires a variant, such as: xml+koala
--- decode-koala.stderr --
-tag koala is not allowed in this context
 -- export.xml --
 <root>
     <message>Hello World!</message>

@@ -32,16 +32,18 @@ var (
 	typesValue cue.Value
 	fileForExt map[string]*build.File
 	fileForCUE *build.File
-	tagTypes   map[string]tagType
+	tagTypes   map[string]TagType
 )
 
-type tagType int
+//go:generate go run golang.org/x/tools/cmd/stringer -type=TagType -linecomment
+
+type TagType int
 
 const (
-	tagUnknown tagType = iota
-	tagTopLevel
-	tagSubsidiaryBool
-	tagSubsidiaryString
+	TagUnknown TagType = iota
+	TagTopLevel
+	TagSubsidiaryBool
+	TagSubsidiaryString
 )
 
 var typesInit = sync.OnceFunc(func() {
@@ -61,27 +63,6 @@ var typesInit = sync.OnceFunc(func() {
 	if fileForCUE.Form != "" || fileForCUE.Interpretation != "" || fileForCUE.Encoding != build.CUE {
 		panic(fmt.Errorf("unexpected value for CUE file type: %#v", fileForCUE))
 	}
-	tagTypes = make(map[string]tagType)
-	setType := func(name string, typ tagType) {
-		if otherTyp, ok := tagTypes[name]; ok && typ != otherTyp {
-			panic("tag redefinition")
-		}
-		tagTypes[name] = typ
-	}
-	addSubsidiary := func(v cue.Value) {
-		for tagName := range structFields(lookup(v, "boolTags")) {
-			setType(tagName, tagSubsidiaryBool)
-		}
-		for tagName := range structFields(lookup(v, "tags")) {
-			setType(tagName, tagSubsidiaryString)
-		}
-	}
-	for tagName, v := range structFields(lookup(typesValue, "tagInfo")) {
-		setType(tagName, tagTopLevel)
-		addSubsidiary(v)
-	}
-	addSubsidiary(lookup(typesValue, "interpretations"))
-	addSubsidiary(lookup(typesValue, "forms"))
 })
 
 // structFields returns an iterator over the names of all the regulat fields
@@ -103,6 +84,6 @@ func structFields(v cue.Value) iter.Seq2[string, cue.Value] {
 	}
 }
 
-func tagTypeOf(s string) tagType {
+func tagTypeOf(s string) TagType {
 	return tagTypes[s]
 }

@@ -29,6 +29,9 @@ cmp imported/multipkg/cue_types_multipkg_two_gen.go imported/multipkg/cue_types_
 ! grep '__' root/cue_types_gen.go
 # TODO: ensure that no IncompleteKind TODOs are left in the output.
 
+# TODO: doc comments on top-level definitions seem to be lost.
+! grep '^// emptyStruct has a doc comment.$' root/cue_types_gen.go
+
 # The resulting Go should all build without error.
 go build ./...
 
@@ -186,10 +189,10 @@ fail.both."42_LinkedList".types.LinkedList.next: conflicting values "x" and {ite
     ./root/types.cue:43:14
 fail.both.notList: conflicting values [1,2,3] and {embedded2?:int} (mismatched types list and struct):
     ./cuetest/all.cue:5:24
-    ./root/root.cue:120:2
+    ./root/root.cue:121:2
 fail.both.notString: conflicting values "not_a_struct" and {embedded2?:int} (mismatched types string and struct):
     ./cuetest/all.cue:4:24
-    ./root/root.cue:120:2
+    ./root/root.cue:121:2
 fail.cue."11_Int8".types.Int8: invalid value 99999 (out of bound <=127):
     ./cuetest/all.cue:61:30
 fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
@@ -371,6 +374,7 @@ package root
 // so it should never be generated.
 _#overridenNeverGenerate: string
 
+// emptyStruct has a doc comment.
 #emptyStruct: {}
 #root: {
 	// TODO: keep the embedding on the Go side to avoid repeating types

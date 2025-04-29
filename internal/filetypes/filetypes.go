@@ -71,14 +71,9 @@ type FileInfo = internal.FileInfo
 //
 //	json: foo.data bar.data json+schema: bar.schema
 func ParseArgs(args []string) (files []*build.File, err error) {
-	evalMu.Lock()
-	defer evalMu.Unlock()
-	typesInit()
-
 	qualifier := ""
 	hasFiles := false
 
-	emptyScope := true
 	sc := &scope{}
 	for i, s := range args {
 		a := strings.Split(s, ":")
@@ -86,14 +81,6 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 		case len(a) == 1 || len(a[0]) == 1: // filename
 			if s == "" {
 				return nil, errors.Newf(token.NoPos, "empty file name")
-			}
-			if emptyScope && len(a) == 1 && strings.HasSuffix(a[0], ".cue") {
-				// Handle majority case.
-				f := *fileForCUE
-				f.Filename = a[0]
-				files = append(files, &f)
-				hasFiles = true
-				continue
 			}
 			f, err := toFile(Input, sc, s)
 			if err != nil {
@@ -121,7 +108,6 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 			if err != nil {
 				return nil, err
 			}
-			emptyScope = false
 			qualifier = a[0]
 			hasFiles = false
 		}
@@ -136,9 +122,6 @@ func DefaultTagsForInterpretation(interp build.Interpretation, mode Mode) map[st
 	if interp == "" {
 		return nil
 	}
-	evalMu.Lock()
-	defer evalMu.Unlock()
-	// TODO this could be done once only.
 
 	// This should never fail if called with a legitimate build.Interpretation constant.
 	f, err := toFile(mode, &scope{
@@ -182,9 +165,6 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 
 // ParseFileAndType parses a file and type combo.
 func ParseFileAndType(file, scope string, mode Mode) (*build.File, error) {
-	evalMu.Lock()
-	defer evalMu.Unlock()
-	typesInit()
 	sc, err := parseScope(scope)
 	if err != nil {
 		return nil, err

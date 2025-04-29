@@ -125,7 +125,7 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 				goName = s
 			}
 
-			g.emitDocs(goName, val.Doc())
+			emitDocs(printf, goName, val.Doc())
 			printf("type %s ", goName)
 
 			// As we grab the generated source, do some sanity checks too.
@@ -229,6 +229,11 @@ type generatedDef struct {
 }
 
 func (g *generatedDef) printf(format string, args ...any) {
+	if !g.inProgress {
+		// It only makes sense to append to src while we are building the Go type expression.
+		// If we append bytes after we're done, it's pointless, and likely a bug.
+		panic("generatedDef.printf called when inProgress is false")
+	}
 	g.src = fmt.Appendf(g.src, format, args...)
 }
 
@@ -347,7 +352,7 @@ func (g *generator) emitType(val cue.Value, optional bool, optionalStg optionalS
 				cueName = sel.Unquoted()
 			}
 			cueName = strings.TrimRight(cueName, "?!")
-			g.emitDocs(cueName, val.Doc())
+			emitDocs(g.def.printf, cueName, val.Doc())
 
 			// We want the Go name from just this selector, even when it's not a definition.
 			goName := goNameFromPath(cue.MakePath(sel), false)
@@ -587,15 +592,17 @@ func (g *generator) emitTypeReference(val cue.Value) bool {
 }
 
 // emitDocs generates the documentation comments attached to the following declaration.
-func (g *generator) emitDocs(name string, groups []*ast.CommentGroup) {
+// It takes a printf function as we emit docs directly in the generated Go code
+// when emitting the top-level Go type definitions.
+func emitDocs(printf func(string, ...any), name string, groups []*ast.CommentGroup) {
 	// TODO: place the comment group starting with `// $name ...` first.
 	// TODO: ensure that the Go name is used in the godoc.
 	for i, group := range groups {
 		if i > 0 {
-			g.def.printf("//\n")
+			printf("//\n")
 		}
 		for _, line := range group.List {
-			g.def.printf("%s\n", line.Text)
+			printf("%s\n", line.Text)
 		}
 	}
 }

@@ -29,8 +29,7 @@ cmp imported/multipkg/cue_types_multipkg_two_gen.go imported/multipkg/cue_types_
 ! grep '__' root/cue_types_gen.go
 # TODO: ensure that no IncompleteKind TODOs are left in the output.
 
-# TODO: doc comments on top-level definitions seem to be lost.
-! grep '^// emptyStruct has a doc comment.$' root/cue_types_gen.go
+grep '^// emptyStruct has a doc comment\.$' root/cue_types_gen.go
 
 # The resulting Go should all build without error.
 go build ./...
@@ -676,6 +675,7 @@ type LinkedList struct {
 	Next *LinkedList `json:"next,omitempty"`
 }
 
+// emptyStruct has a doc comment.
 type EmptyStruct struct {
 }
 
@@ -804,6 +804,7 @@ type root_hiddenInnerStruct struct {
 	InnerStructField int64 `json:"innerStructField,omitempty"`
 }
 
+// All definitions underneath here must not be exported.
 type hiddenStruct struct {
 	InnerField int64 `json:"innerField,omitempty"`
 

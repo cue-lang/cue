@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6350e298_a3ef4b71",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-29T15:42:33Z",
+      "side": 1,
+      "message": "Are we positive that this won\u0027t cause issues with e.g. `foo.-` or `foo-`?",
+      "revId": "f4c1ec076a2aa06557df5666cd3fa7233d4b97e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

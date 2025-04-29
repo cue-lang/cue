@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76626ab0_484b765a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-29T15:41:26Z",
+      "side": 1,
+      "message": "as far as I can tell, this happened in a split up CL already.",
+      "revId": "afa7c276377c198934d0abee2e156a1bf8c1b1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4c5620d_1367d00c",
+        "filename": "internal/filetypes/tofile.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-29T15:41:26Z",
+      "side": 1,
+      "message": "this TODO is resolved by your earlier introduction of a mutex.",
+      "revId": "afa7c276377c198934d0abee2e156a1bf8c1b1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

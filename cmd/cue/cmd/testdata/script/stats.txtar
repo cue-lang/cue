@@ -46,14 +46,14 @@ contents overwritten
 {
     "CUE": {
         "EvalVersion": 3,
-        "Unifications": 6,
+        "Unifications": 4,
         "Disjuncts": 2,
-        "Conjuncts": 12,
+        "Conjuncts": 8,
         "CloseIDElems": 0,
-        "NumCloseIDs": 4,
+        "NumCloseIDs": 2,
         "Freed": 0,
         "Reused": 0,
-        "Allocs": 8,
+        "Allocs": 6,
         "Retained": 0
     },
     "Go": {
@@ -64,14 +64,14 @@ contents overwritten
 -- out/stats.cue --
 CUE: {
 	EvalVersion:  3
-	Unifications: 6
+	Unifications: 4
 	Disjuncts:    2
-	Conjuncts:    12
+	Conjuncts:    8
 	CloseIDElems: 0
-	NumCloseIDs:  4
+	NumCloseIDs:  2
 	Freed:        0
 	Reused:       0
-	Allocs:       8
+	Allocs:       6
 	Retained:     0
 }
 Go: {
@@ -81,14 +81,14 @@ Go: {
 -- out/stats.yaml --
 CUE:
   EvalVersion: 3
-  Unifications: 6
+  Unifications: 4
   Disjuncts: 2
-  Conjuncts: 12
+  Conjuncts: 8
   CloseIDElems: 0
-  NumCloseIDs: 4
+  NumCloseIDs: 2
   Freed: 0
   Reused: 0
-  Allocs: 8
+  Allocs: 6
   Retained: 0
 Go:
   AllocBytes: 300456
@@ -97,14 +97,14 @@ Go:
 {
     "CUE": {
         "EvalVersion": 3,
-        "Unifications": 6,
+        "Unifications": 4,
         "Disjuncts": 2,
-        "Conjuncts": 12,
+        "Conjuncts": 8,
         "CloseIDElems": 0,
-        "NumCloseIDs": 4,
+        "NumCloseIDs": 2,
         "Freed": 0,
         "Reused": 0,
-        "Allocs": 8,
+        "Allocs": 6,
         "Retained": 0
     },
     "Go": {

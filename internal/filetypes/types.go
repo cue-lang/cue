@@ -16,23 +16,6 @@ package filetypes
 
 import (
 	_ "embed"
-	"fmt"
-	"iter"
-	"sync"
-
-	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/cuecontext"
-)
-
-//go:embed types.cue
-var typesCUE string
-
-var (
-	typesValue cue.Value
-	fileForExt map[string]*build.File
-	fileForCUE *build.File
-	tagTypes   map[string]TagType
 )
 
 //go:generate go run golang.org/x/tools/cmd/stringer -type=TagType -linecomment
@@ -46,44 +29,9 @@ const (
 	TagSubsidiaryString
 )
 
-var typesInit = sync.OnceFunc(func() {
-	ctx := cuecontext.New()
-	typesValue = ctx.CompileString(typesCUE, cue.Filename("types.cue"))
-	if err := typesValue.Err(); err != nil {
-		panic(err)
-	}
-	// Reading a file in input mode with a non-explicit scope is a very
-	// common operation, so cache the build.File value for all
-	// the known file extensions.
-	if err := typesValue.LookupPath(cue.MakePath(cue.Str("fileForExtVanilla"))).Decode(&fileForExt); err != nil {
-		panic(err)
-	}
-	fileForCUE = fileForExt[".cue"]
-	// Check invariants assumed by FromFile
-	if fileForCUE.Form != "" || fileForCUE.Interpretation != "" || fileForCUE.Encoding != build.CUE {
-		panic(fmt.Errorf("unexpected value for CUE file type: %#v", fileForCUE))
-	}
-})
-
-// structFields returns an iterator over the names of all the regulat fields
-// in v and their values.
-func structFields(v cue.Value) iter.Seq2[string, cue.Value] {
-	return func(yield func(string, cue.Value) bool) {
-		if !v.Exists() {
-			return
-		}
-		iter, err := v.Fields()
-		if err != nil {
-			return
-		}
-		for iter.Next() {
-			if !yield(iter.Selector().Unquoted(), iter.Value()) {
-				break
-			}
-		}
-	}
-}
-
 func tagTypeOf(s string) TagType {
 	return tagTypes[s]
 }
+
+// initialized by types_gen.go
+var tagTypes map[string]TagType

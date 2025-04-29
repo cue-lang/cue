@@ -71,10 +71,6 @@ type FileInfo = internal.FileInfo
 //
 //	json: foo.data bar.data json+schema: bar.schema
 func ParseArgs(args []string) (files []*build.File, err error) {
-	evalMu.Lock()
-	defer evalMu.Unlock()
-	typesInit()
-
 	qualifier := ""
 	hasFiles := false
 
@@ -126,9 +122,6 @@ func DefaultTagsForInterpretation(interp build.Interpretation, mode Mode) map[st
 	if interp == "" {
 		return nil
 	}
-	evalMu.Lock()
-	defer evalMu.Unlock()
-	// TODO this could be done once only.
 
 	// This should never fail if called with a legitimate build.Interpretation constant.
 	f, err := toFile(mode, &scope{
@@ -172,9 +165,6 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 
 // ParseFileAndType parses a file and type combo.
 func ParseFileAndType(file, scope string, mode Mode) (*build.File, error) {
-	evalMu.Lock()
-	defer evalMu.Unlock()
-	typesInit()
 	sc, err := parseScope(scope)
 	if err != nil {
 		return nil, err

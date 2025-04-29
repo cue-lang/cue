@@ -71,7 +71,6 @@ type FileInfo = internal.FileInfo
 //
 //	json: foo.data bar.data json+schema: bar.schema
 func ParseArgs(args []string) (files []*build.File, err error) {
-	typesInit()
 
 	qualifier := ""
 	hasFiles := false
@@ -170,7 +169,6 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 func ParseFileAndType(file, scope string, mode Mode) (*build.File, error) {
 	// Quickly discard files which we aren't interested in.
 	// These cases are very common when loading `./...` in a large repository.
-	typesInit()
 	sc, err := parseScope(scope)
 	if err != nil {
 		return nil, err

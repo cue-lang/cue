@@ -33,6 +33,24 @@
       "message": "make this export.json to not duplicate golden files.",
       "revId": "4be96246e576524cc4e3a812a0735153aecc9c1f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cab5caed_a88e7325",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_xml_koala.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-29T16:06:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3bae6ddf_cedd5dc3",
+      "revId": "4be96246e576524cc4e3a812a0735153aecc9c1f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

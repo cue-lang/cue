@@ -201,24 +201,7 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 func ParseFileAndType(file, scope string, mode Mode) (*build.File, error) {
 	evalMu.Lock()
 	defer evalMu.Unlock()
-	// Quickly discard files which we aren't interested in.
-	// These cases are very common when loading `./...` in a large repository.
 	typesInit()
-	if scope == "" && file != "-" {
-		ext := fileExt(file)
-		if ext == "" {
-			return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", file)
-		}
-		f, ok := fileForExt[ext]
-		if !ok {
-			return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
-		}
-		if mode == Input {
-			f1 := *f
-			f1.Filename = file
-			return &f1, nil
-		}
-	}
 	sc, err := parseScope(scope)
 	if err != nil {
 		return nil, err

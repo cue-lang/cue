@@ -52,6 +52,24 @@
       "parentUuid": "e37f0ad7_0e5fa0a4",
       "revId": "5f57731c75687fcd983d4ad63a194d2dd9dc36aa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e35dc79a_fdb568b9",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-29T13:18:24Z",
+      "side": 1,
+      "message": "longer to make it harder to misunderstand SGTM :)",
+      "parentUuid": "1f405b86_9b4b12ef",
+      "revId": "5f57731c75687fcd983d4ad63a194d2dd9dc36aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8720aa66_d65ea8da",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-29T15:53:01Z",
+      "side": 1,
+      "message": "Given that this is called quite a bit and we never look up definitions in this package, I think this is probably OK. `lookupStrs` seems rather cluttered as a name and avoiding clutter was what made me add a helper in the first place.\n\nI\u0027ll add a doc comment though, just to make it clearer.",
+      "parentUuid": "8cf8e026_3dae9e09",
+      "revId": "b9d0d2acc183b19605acae57cb43a31b18fd0b87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8fd179d7_349df026",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-04-29T15:05:13Z",
       "side": 1,
       "message": "is this helper func really that helpful?",
+      "revId": "b9d0d2acc183b19605acae57cb43a31b18fd0b87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a09e3833_0ec31a88",
+        "filename": "internal/filetypes/types.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-29T15:53:01Z",
+      "side": 1,
+      "message": "Yeah, not really. I initially made it a function thinking that I was going to generate it as a function, but I ended up with exactly the same variable.",
+      "parentUuid": "8fd179d7_349df026",
       "revId": "b9d0d2acc183b19605acae57cb43a31b18fd0b87",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -16,6 +16,24 @@
       "message": "wasn\u0027t this another optimization that should be pushed further up the stack, closer to where we swap out the CUE evaluator for the generator?",
       "revId": "492a3c1686ceee1be7bad4a4788810dac7b707a8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6cef71fe_209bdb4a",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-29T15:53:01Z",
+      "side": 0,
+      "message": "Yeah, fair point. Reinstated.",
+      "parentUuid": "f48f37b0_e136b2aa",
+      "revId": "492a3c1686ceee1be7bad4a4788810dac7b707a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

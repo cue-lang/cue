@@ -438,8 +438,17 @@ func TestParseArgs(t *testing.T) {
 			},
 		},
 	}, {
-		in:  "koala: bar.xml",
-		out: "tag koala is not allowed in this context",
+		in: "koala: bar.xml",
+		out: []*build.File{
+			{
+				Filename:       "bar.xml",
+				Encoding:       "xml",
+				Interpretation: "auto",
+				BoolTags: map[string]bool{
+					"koala": true,
+				},
+			},
+		},
 	}, {
 		in: "jsonschema+strict: bar.schema",
 		out: []*build.File{

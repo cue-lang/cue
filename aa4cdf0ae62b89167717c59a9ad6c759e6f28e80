@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e405c368_2557df88",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-04-29T17:17:42Z",
+      "side": 1,
+      "message": "Per our discussion, please reword to clarify that it\u0027s the abbreviation that is now valid, and that\u0027s what you\u0027re highlighting (as opposed to the more general use of koala being valid where before it was not)",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 31
+      },
+      "revId": "aa4cdf0ae62b89167717c59a9ad6c759e6f28e80",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

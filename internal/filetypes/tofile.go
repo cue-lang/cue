@@ -83,30 +83,6 @@ func toFile(mode Mode, sc *scope, filename string) (*build.File, error) {
 // by [ParseArgs] or similar.
 // The b.Encoding field must be non-empty.
 func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
-	// Handle common case. This allows certain test cases to be analyzed in
-	// isolation without interference from evaluating these files.
-	if mode == Input &&
-		b.Encoding == build.CUE &&
-		b.Form == "" &&
-		b.Interpretation == "" {
-		return &FileInfo{
-			Filename: b.Filename,
-			Encoding: build.CUE,
-			Form:     build.Schema,
-
-			Definitions:  true,
-			Data:         true,
-			Optional:     true,
-			Constraints:  true,
-			References:   true,
-			Cycles:       true,
-			KeepDefaults: true,
-			Incomplete:   true,
-			Imports:      true,
-			Docs:         true,
-			Attributes:   true,
-		}, nil
-	}
 	evalMu.Lock()
 	defer evalMu.Unlock()
 	typesInit()

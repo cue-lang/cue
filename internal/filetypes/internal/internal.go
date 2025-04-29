@@ -12,28 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package opt
+// Package internal holds some internal parts of the filetypes package
+// that need to be shared between the code generator and the package proper.
+package internal
 
-type Opt[T any] struct {
-	x       T
-	present bool
-}
+type ErrorKind int
 
-func (o Opt[T]) IsPresent() bool {
-	return o.present
-}
-
-func (o Opt[T]) Value() T {
-	return o.x
-}
-
-func Some[T any](x T) Opt[T] {
-	return Opt[T]{
-		x:       x,
-		present: true,
-	}
-}
-
-func None[T any]() Opt[T] {
-	return Opt[T]{}
-}
+const (
+	ErrNoError ErrorKind = iota
+	ErrUnknownFileExtension
+	ErrCouldNotDetermineFileType
+	ErrNoEncodingSpecified
+	NumErrorKinds
+)

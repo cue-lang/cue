@@ -12,28 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package opt
+//go:build bootstrap
 
-type Opt[T any] struct {
-	x       T
-	present bool
-}
+package filetypes
 
-func (o Opt[T]) IsPresent() bool {
-	return o.present
-}
+import "cuelang.org/go/cue/build"
 
-func (o Opt[T]) Value() T {
-	return o.x
-}
-
-func Some[T any](x T) Opt[T] {
-	return Opt[T]{
-		x:       x,
-		present: true,
-	}
-}
-
-func None[T any]() Opt[T] {
-	return Opt[T]{}
+func toFileGenerated(mode Mode, sc *scope, filename string) (*build.File, error) {
+	panic("never called")
 }

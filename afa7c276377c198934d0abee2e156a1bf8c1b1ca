@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cb0c07b_4087927e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-29T16:00:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76626ab0_484b765a",
+      "revId": "afa7c276377c198934d0abee2e156a1bf8c1b1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d4c5620d_1367d00c",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-04-29T15:41:26Z",
       "side": 1,
       "message": "this TODO is resolved by your earlier introduction of a mutex.",
+      "revId": "afa7c276377c198934d0abee2e156a1bf8c1b1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c2b5c86_3242fad2",
+        "filename": "internal/filetypes/tofile.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-04-29T16:00:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4c5620d_1367d00c",
       "revId": "afa7c276377c198934d0abee2e156a1bf8c1b1ca",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

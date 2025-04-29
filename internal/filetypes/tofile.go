@@ -30,13 +30,23 @@ var evalMu sync.Mutex
 func toFile(mode Mode, sc *scope, filename string) (*build.File, error) {
 	modeVal := lookup(typesValue, "modes", mode.String())
 	fileVal := lookup(modeVal, "FileInfo")
-
 	for tagName := range sc.topLevel {
 		info := lookup(typesValue, "tagInfo", tagName)
 		if info.Exists() {
 			fileVal = fileVal.Unify(info)
 		} else {
 			return nil, errors.Newf(token.NoPos, "unknown filetype %s", tagName)
+		}
+	}
+	if !lookup(fileVal, "encoding").Exists() {
+		if ext := fileExt(filename); ext != "" {
+			extFile := lookup(modeVal, "extensions", ext)
+			if !extFile.Exists() {
+				return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
+			}
+			fileVal = fileVal.Unify(extFile)
+		} else {
+			return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", filename)
 		}
 	}
 	allowedSubsidiaryBool := lookup(fileVal, "boolTags")
@@ -52,17 +62,6 @@ func toFile(mode Mode, sc *scope, filename string) (*build.File, error) {
 			return nil, errors.Newf(token.NoPos, "tag %s is not allowed in this context", tagName)
 		}
 		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("tags"), cue.Str(tagName)), val)
-	}
-	if !lookup(fileVal, "encoding").Exists() {
-		if ext := fileExt(filename); ext != "" {
-			extFile := lookup(modeVal, "extensions", ext)
-			if !extFile.Exists() {
-				return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
-			}
-			fileVal = fileVal.Unify(extFile)
-		} else {
-			return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", filename)
-		}
 	}
 
 	// Note that the filename is only filled in the Go value, and not the CUE value.

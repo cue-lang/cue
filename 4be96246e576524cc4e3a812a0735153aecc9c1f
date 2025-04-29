@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afb99b33_3615e788",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-29T15:53:09Z",
+      "side": 1,
+      "message": "Personally I\u0027m fine with this as long as `koala: noextension` or `koala: -` fails, which I believe was our top concern in terms of not treating \"koala\" as a top-level encoding. But perhaps it\u0027s best to not merge until we\u0027ve discussed with Paul and Marcel.",
+      "revId": "4be96246e576524cc4e3a812a0735153aecc9c1f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bae6ddf_cedd5dc3",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_xml_koala.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-04-29T15:53:09Z",
+      "side": 1,
+      "message": "make this export.json to not duplicate golden files.",
+      "revId": "4be96246e576524cc4e3a812a0735153aecc9c1f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

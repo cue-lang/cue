@@ -1,4 +1,4 @@
-#version: crd
+#version: k8sCRD
 
 -- schema.json --
 {

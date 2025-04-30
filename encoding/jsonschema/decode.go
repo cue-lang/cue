@@ -833,7 +833,7 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, init func(*state)) (ex
 		expr = s.maybeDefine(expr, info)
 	}()
 	if n.Kind() == cue.BoolKind {
-		if vfrom(VersionDraft6).contains(s.schemaVersion) {
+		if s.schemaVersion.is(vfrom(VersionDraft6)) {
 			// From draft6 onwards, boolean values signify a schema that always passes or fails.
 			// TODO if false, set s.allowedTypes and s.knownTypes to zero?
 			return boolSchema(s.boolValue(n)), s.schemaInfo
@@ -873,11 +873,11 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, init func(*state)) (ex
 			if c.phase != pass {
 				return
 			}
-			if !c.versions.contains(s.schemaVersion) {
+			if !s.schemaVersion.is(c.versions) {
 				s.warnUnrecognizedKeyword(key, value, "keyword %q is not supported in JSON schema version %v", key, s.schemaVersion)
 				return
 			}
-			if pass > 0 && !vfrom(VersionDraft2019_09).contains(s.schemaVersion) && s.hasRefKeyword && key != "$ref" {
+			if pass > 0 && !s.schemaVersion.is(vfrom(VersionDraft2019_09)) && s.hasRefKeyword && key != "$ref" {
 				// We're using a schema version that ignores keywords alongside $ref.
 				//
 				// Note that we specifically exclude pass 0 (the pass in which $schema is checked)
@@ -914,7 +914,7 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, init func(*state)) (ex
 			s.errf(n, "additionalProperties may not be combined with properties in %v", s.schemaVersion)
 		}
 	}
-	if openAPILike.contains(s.schemaVersion) {
+	if s.schemaVersion.is(openAPILike) {
 		if s.isArray && !s.hasItems {
 			// From https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/3.0.0.md#schema-object
 			// "`items` MUST be present if the `type` is `array`."
@@ -931,7 +931,7 @@ func (s *state) warnUnrecognizedKeyword(key string, n cue.Value, msg string, arg
 	if !s.cfg.StrictKeywords {
 		return
 	}
-	if openAPILike.contains(s.schemaVersion) && strings.HasPrefix(key, "x-") {
+	if s.schemaVersion.is(openAPILike) && strings.HasPrefix(key, "x-") {
 		// Unimplemented x- keywords are allowed even with strict keywords
 		// under OpenAPI-like versions, because those versions enable
 		// strict keywords by default.

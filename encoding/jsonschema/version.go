@@ -36,14 +36,22 @@ const (
 
 	// Note: The following versions stand alone: they're not in the regular JSON Schema lineage.
 	VersionOpenAPI       // OpenAPI 3.0
+	VersionKubernetesAPI // Kubernetes API
 	VersionKubernetesCRD // Kubernetes CRD
 )
 
 const (
 	openAPI     = versionSet(1 << VersionOpenAPI)
+	k8sAPI      = versionSet(1 << VersionKubernetesAPI)
 	k8sCRD      = versionSet(1 << VersionKubernetesCRD)
-	openAPILike = openAPI | k8sCRD
+	k8s         = k8sAPI | k8sCRD
+	openAPILike = openAPI | k8s
 )
+
+// is reports whether v is in the set vs.
+func (v Version) is(vs versionSet) bool {
+	return vs.contains(v)
+}
 
 type versionSet int
 

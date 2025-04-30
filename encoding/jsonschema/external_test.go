@@ -21,6 +21,7 @@ import (
 	"maps"
 	"os"
 	"path"
+	"regexp"
 	"slices"
 	"strings"
 	"testing"
@@ -79,6 +80,14 @@ func TestExternal(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 }
 
+var rxCharacterClassCategoryAlias = regexp.MustCompile(`\\p{(Cased_Letter|Close_Punctuation|Combining_Mark|Connector_Punctuation|Control|Currency_Symbol|Dash_Punctuation|Decimal_Number|Enclosing_Mark|Final_Punctuation|Format|Initial_Punctuation|Letter|Letter_Number|Line_Separator|Lowercase_Letter|Mark|Math_Symbol|Modifier_Letter|Modifier_Symbol|Nonspacing_Mark|Number|Open_Punctuation|Other|Other_Letter|Other_Number|Other_Punctuation|Other_Symbol|Paragraph_Separator|Private_Use|Punctuation|Separator|Space_Separator|Spacing_Mark|Surrogate|Symbol|Titlecase_Letter|Unassigned|Uppercase_Letter|cntrl|digit|punct)}`)
+
+var supportsCharacterClassCategoryAlias = func() bool {
+	//lint:ignore SA1000 this regular expression is meant to fail to compile on Go 1.24 and earlier
+	_, err := regexp.Compile(`\p{Letter}`)
+	return err == nil
+}()
+
 func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *externaltest.Schema) {
 	t.Logf("file %v", path.Join("testdata/external", filename))
 	ctx := m.CueContext()
@@ -94,6 +103,22 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 	if vers == jsonschema.VersionUnknown {
 		t.Skipf("skipping test for unknown schema version %v", versStr)
 	}
+
+	// The upcoming Go 1.25 implements Unicode category aliases in regular expressions,
+	// such that e.g. \p{Letter} begins working on Go tip and 1.25 pre-releases.
+	// Our tests must run on the latest two stable Go versions, currently 1.23 and 1.24,
+	// where such character classes lead to schema compilation errors.
+	//
+	// As a temporary compromise, only run these tests on the broken and older Go versions.
+	// With the testdata files being updated with the latest stable Go, 1.24,
+	// this results in testdata reflecting what most Go users see with the latest Go,
+	// while we are still able to use `go test` normally with Go tip.
+	// TODO: swap around to expect the fixed behavior once Go 1.25.0 is released.
+	// TODO: get rid of this whole thing once we require Go 1.25 or later in the future.
+	if rxCharacterClassCategoryAlias.Match(s.Schema) && supportsCharacterClassCategoryAlias {
+		t.Skip("regexp character classes for Unicode category aliases work only on Go 1.25 and later")
+	}
+
 	schemaAST, extractErr := jsonschema.Extract(jsonValue, &jsonschema.Config{
 		StrictFeatures: true,
 		DefaultVersion: vers,

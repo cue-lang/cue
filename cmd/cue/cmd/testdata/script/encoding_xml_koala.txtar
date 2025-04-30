@@ -26,7 +26,7 @@ cmp stdout export.json
 exec cue export xml+koala: export.xml
 cmp stdout export.json
 stdin export.xml
-exec cue export xml+koala: export.xml
+exec cue export xml+koala: -
 cmp stdout export.json
 
 exec cue import -o - xml+koala: export.xml

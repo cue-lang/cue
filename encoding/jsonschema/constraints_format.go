@@ -95,13 +95,13 @@ func constraintFormat(key string, n cue.Value, s *state) {
 		// we want unknown formats to be ignored even when StrictFeatures
 		// is enabled, and StrictKeywords is closest to what we want.
 		// Perhaps we should have a "lint" mode?
-		if s.cfg.StrictKeywords && !openAPILike.contains(s.schemaVersion) {
+		if s.cfg.StrictKeywords && !s.schemaVersion.is(openAPILike) {
 			s.errf(n, "unknown format %q", formatStr)
 		}
 		return
 	}
-	if !finfo.versions.contains(s.schemaVersion) {
-		if s.cfg.StrictKeywords && !openAPILike.contains(s.schemaVersion) {
+	if !s.schemaVersion.is(finfo.versions) {
+		if s.cfg.StrictKeywords && !s.schemaVersion.is(openAPILike) {
 			s.errf(n, "format %q is not recognized in schema version %v", formatStr, s.schemaVersion)
 		}
 		return

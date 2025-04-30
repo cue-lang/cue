@@ -1,6 +1,6 @@
 CRDs do not allow $ref, so test for that.
 
-#version: crd
+#version: k8sCRD
 
 -- schema.yaml --
 apiVersion: apiextensions.k8s.io/v1

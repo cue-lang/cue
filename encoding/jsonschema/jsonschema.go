@@ -65,7 +65,7 @@ func Extract(data cue.InstanceOrValue, cfg *Config) (*ast.File, error) {
 		cfg.StrictKeywords = true
 		cfg.StrictFeatures = true
 	}
-	if cfg.DefaultVersion == VersionKubernetesCRD {
+	if cfg.DefaultVersion.is(k8s) {
 		cfg.OpenOnlyWhenExplicit = true
 	}
 	if cfg.ID == "" {
@@ -266,7 +266,8 @@ type Config struct {
 	// use additionalProperties: false but are nonetheless desired
 	// to be treated as closed.
 	//
-	// Implied true when the version is [VersionKubernetesCRD].
+	// Implied true when the version is [VersionKubernetesCRD] or
+	// [VersionKubernetesAPI].
 	OpenOnlyWhenExplicit bool
 
 	// DefaultVersion holds the default schema version to use

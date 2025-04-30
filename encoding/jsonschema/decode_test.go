@@ -83,17 +83,19 @@ func TestDecode(t *testing.T) {
 			// We should probably change most of the tests to use an explicit $schema
 			// field apart from when we're explicitly testing the default version logic.
 			switch versStr {
-			case "openapi":
-				// OpenAPI doesn't have a JSON Schema URI so it gets a special case.
+			case "openapi", "k8sAPI":
 				cfg.DefaultVersion = jsonschema.VersionOpenAPI
+				if versStr == "k8sAPI" {
+					cfg.DefaultVersion = jsonschema.VersionKubernetesAPI
+				} else {
+					cfg.Map = func(p token.Pos, a []string) ([]ast.Label, error) {
+						// Just for testing: does not validate the path.
+						return []ast.Label{ast.NewIdent("#" + a[len(a)-1])}, nil
+					}
+				}
 				cfg.Root = "#/components/schemas/"
 				cfg.StrictKeywords = true // OpenAPI always uses strict keywords
-				cfg.Map = func(p token.Pos, a []string) ([]ast.Label, error) {
-					// Just for testing: does not validate the path.
-					return []ast.Label{ast.NewIdent("#" + a[len(a)-1])}, nil
-				}
-			case "crd":
-				// Similar for CRDs as OpenAPI.
+			case "k8sCRD":
 				cfg.DefaultVersion = jsonschema.VersionKubernetesCRD
 				// Default to the first version; can be overridden with #root.
 				cfg.Root = "#/spec/versions/0/schema/openAPIV3Schema"

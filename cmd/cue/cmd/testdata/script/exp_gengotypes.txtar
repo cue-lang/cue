@@ -188,10 +188,10 @@ fail.both."42_LinkedList".types.LinkedList.next: conflicting values "x" and {ite
     ./root/types.cue:43:14
 fail.both.notList: conflicting values [1,2,3] and {embedded2?:int} (mismatched types list and struct):
     ./cuetest/all.cue:5:24
-    ./root/root.cue:121:2
+    ./root/root.cue:127:2
 fail.both.notString: conflicting values "not_a_struct" and {embedded2?:int} (mismatched types string and struct):
     ./cuetest/all.cue:4:24
-    ./root/root.cue:121:2
+    ./root/root.cue:127:2
 fail.cue."11_Int8".types.Int8: invalid value 99999 (out of bound <=127):
     ./cuetest/all.cue:61:30
 fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
@@ -400,7 +400,7 @@ _#overridenNeverGenerate: string
 
 		nestedStructAttrNillable: {
 			optionalStruct?: #emptyStruct
-			optionalStructAttrType?: #emptyStruct @go(,type=EmptyStruct)
+			optionalStructAttrType?: #emptyStruct @go(,type=EmptyStruct) // overrides optional=nillable
 			optionalStructAttrZero?: #emptyStruct @go(,optional=zero)
 		} @go(,optional=nillable)
 
@@ -415,10 +415,16 @@ _#overridenNeverGenerate: string
 
 	attrName?:       int @go(AttrChangedName)
 	attrNameNested?: int @go(AttrChangedNameNested)
-	attrType?:       _#overridenNeverGenerate @go(,type=go/constant.Kind)
+	attrType?:       _#overridenNeverGenerate @go(,type="go/constant".Kind)
 	// For compatibility with `cue get go`, an unnamed second value is also a type.
-	attrTypeCompat?: _#overridenNeverGenerate @go(,go/token.Token)
-	attrTypeNested?: {one?: two?: three?: int} @go(,type=map[any]any)
+	attrTypeCompat?:  _#overridenNeverGenerate @go(,"go/token".Token)
+	attrTypeNested?:  {one?: two?: three?: int} @go(,type=map[any]any)
+	attrTypeComplex?: _#overridenNeverGenerate @go(,type=*[]*"go/constant".Kind)
+	// See the TODO around semicolons being inserted on newlines.
+	// attrTypeStruct?:  _#overridenNeverGenerate @go(,type=struct{
+	// 	AttrTypeStructOne int
+	// 	AttrTypeStructTwo string
+	// })
 
 	attrIgnoreNeverGenerate?: int @go(-)
 
@@ -501,9 +507,9 @@ _#unusedHiddenStruct: neverGenerate?: int
 
 	field?: int
 }
-#attrType: _#overridenNeverGenerate @go(,type=go/constant.Kind)
+#attrType: _#overridenNeverGenerate @go(,type="go/constant".Kind)
 #attrTypeEmbed: {
-	@go(,type=go/constant.Kind) // obeyed even when the type has a different kind
+	@go(,type="go/constant".Kind) // obeyed even when the type has a different kind
 
 	neverGenerate?: int
 }
@@ -740,6 +746,8 @@ type Root struct {
 	AttrTypeCompat token.Token `json:"attrTypeCompat,omitempty"`
 
 	AttrTypeNested map[any]any `json:"attrTypeNested,omitempty"`
+
+	AttrTypeComplex *[]*constant.Kind `json:"attrTypeComplex,omitempty"`
 
 	// doc is a great field.
 	//

@@ -1,0 +1,69 @@
+# Test each of the variables injected by --inject-vars/-T.
+cd cwd_subdir
+exec cue export -T
+cmpenv stdout ../export.stdout
+cd ..
+
+# Validate the username and hostname against the standard Linux tools.
+# We could validate against os/user.Current and os.Hostname,
+# but that's the cmd/cue implementation, so it'd be a bit of a silly test.
+# Note that "whoami" on Windows prints "domain\username" so it's unhelpful.
+[!windows] [exec:whoami] exec whoami
+cp stdout whoami.stdout
+exec cue export -e username --out text -T username.cue
+stdout '^[^"]+$'
+[!windows] [exec:whoami] cmp stdout whoami.stdout
+[exec:hostname] exec hostname
+cp stdout hostname.stdout
+exec cue export -e hostname --out text -T hostname.cue
+stdout '^[^"]+$'
+[exec:hostname] cmp stdout hostname.stdout
+
+# A random number is not deterministic by nature,
+# but we can validate that two consecutive runs with a random 128-bit integer
+# are extremely unlikely to result in the same random number.
+exec cue export -T rand.cue
+stdout '"rand": \d+'
+cp stdout rand-previous.stdout
+exec cue export -T rand.cue
+! cmp stdout rand-previous.stdout
+-- cwd_subdir/input.cue --
+package p
+
+import (
+	"path"
+	"time"
+)
+
+// The current time is constantly changing,
+// so simply check that it's valid and between 2020 and 3000.
+_now: string @tag(now,var=now)
+_parts: time.Split(_now)
+nowValidYear: _parts.year > 2020 && _parts.year < 3000
+
+// The current directory will include a temporary directory,
+// so extract the basename only, which we can control here.
+// Convert Windows path separators to slashes first, for consistent results.
+_cwd: string @tag(cwd,var=cwd)
+cwdBase: path.Base(path.ToSlash(_cwd, path.Windows), path.Unix)
+
+// os and arch are just Go's GOOS and GOARCH, validated via cmpenv.
+os: string @tag(os,var=os)
+arch: string @tag(arch,var=arch)
+
+-- username.cue --
+username: string @tag(username,var=username)
+
+-- hostname.cue --
+hostname: string @tag(hostname,var=hostname)
+
+-- rand.cue --
+rand: int @tag(rand,var=rand)
+
+-- export.stdout --
+{
+    "nowValidYear": true,
+    "cwdBase": "cwd_subdir",
+    "os": "${GOOS}",
+    "arch": "${GOARCH}"
+}

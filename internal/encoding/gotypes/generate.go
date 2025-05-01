@@ -17,14 +17,21 @@ package gotypes
 import (
 	"bytes"
 	"fmt"
+	goast "go/ast"
 	goformat "go/format"
+	goparser "go/parser"
+	goscanner "go/scanner"
+	gotoken "go/token"
 	"maps"
 	"os"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	goastutil "golang.org/x/tools/go/ast/astutil"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -61,7 +68,7 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 		g.pkg = inst
 		g.emitDefs = nil
 		g.pkgRoot = instVal
-		g.importedAs = make(map[string]string)
+		g.importCuePkgAsGoPkg = make(map[string]string)
 
 		iter, err := instVal.Fields(cue.Definitions(true))
 		if err != nil {
@@ -83,7 +90,7 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 		// TODO: we should refuse to generate for packages which are not
 		// part of the main module, as they may be inside the read-only module cache.
 		for _, imp := range inst.Imports {
-			if !instDone[imp] && g.importedAs[imp.ImportPath] != "" {
+			if !instDone[imp] && g.importCuePkgAsGoPkg[imp.ImportPath] != "" {
 				insts = append(insts, imp)
 			}
 		}
@@ -100,11 +107,11 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 			goPkgNamesDoneByDir[inst.Dir] = goPkgName
 		}
 		printf("package %s\n\n", goPkgName)
-		imported := slices.Sorted(maps.Values(g.importedAs))
-		imported = slices.Compact(imported)
-		if len(imported) > 0 {
+		importedGo := slices.Sorted(maps.Values(g.importCuePkgAsGoPkg))
+		importedGo = slices.Compact(importedGo)
+		if len(importedGo) > 0 {
 			printf("import (\n")
-			for _, path := range imported {
+			for _, path := range importedGo {
 				printf("\t%q\n", path)
 			}
 			printf(")\n")
@@ -195,12 +202,12 @@ type generator struct {
 	// emitDefs records paths for the definitions we should emit as Go types.
 	emitDefs []cue.Path
 
-	// importedAs records which CUE packages need to be imported as which Go packages in the generated Go package.
+	// importCuePkgAsGoPkg records which CUE packages need to be imported as which Go packages in the generated Go package.
 	// This is collected as we emit types, given that some CUE fields and types are omitted
 	// and we don't want to end up with unused Go imports.
 	//
 	// The keys are full CUE import paths; the values are their resulting Go import paths.
-	importedAs map[string]string
+	importCuePkgAsGoPkg map[string]string
 
 	// pkgRoot is the root value of the CUE package, necessary to tell if a referenced value
 	// belongs to the current package or not.
@@ -225,6 +232,8 @@ type generatedDef struct {
 	inProgress bool
 
 	// src is the generated Go type expression source.
+	// We generate types as plaintext Go source rather than [goast.Expr]
+	// as the latter makes it very hard to use empty lines and comment placement correctly.
 	src []byte
 }
 
@@ -289,16 +298,35 @@ func (g *generator) emitType(val cue.Value, optional bool, optionalStg optionalS
 		}
 	}
 	if attrType != "" {
-		pkgPath, _, ok := cutLast(attrType, ".")
-		if ok {
-			// For "type=foo.Name", we need to ensure that "foo" is imported.
-			g.importedAs[pkgPath] = pkgPath
-			// For "type=foo/bar.Name", the selector is just "bar.Name".
-			// Note that this doesn't support Go packages whose name does not match
-			// the last element of their import path. That seems OK for now.
-			_, attrType, _ = cutLast(attrType, "/")
+		fset := gotoken.NewFileSet()
+		expr, importedByName, err := parseTypeExpr(fset, attrType)
+		if err != nil {
+			return fmt.Errorf("cannot parse @go type expression: %w", err)
 		}
-		g.def.printf("%s", attrType)
+		for _, pkgPath := range importedByName {
+			g.importCuePkgAsGoPkg[pkgPath] = pkgPath
+		}
+		// Collect any remaining imports from selectors on unquoted single-element std packages
+		// such as `@go(,type=io.Reader)`.
+		expr = goastutil.Apply(expr, func(c *goastutil.Cursor) bool {
+			if sel, _ := c.Node().(*goast.SelectorExpr); sel != nil {
+				if imp, _ := sel.X.(*goast.Ident); imp != nil {
+					if importedByName[imp.Name] != "" {
+						// `@go(,type="go/constant".Kind)` ends up being parsed as the Go expression `constant.Kind`;
+						// via importedByName we can tell that "constant" is already provided via "go/constant".
+						return true
+					}
+					g.importCuePkgAsGoPkg[imp.Name] = imp.Name
+				}
+			}
+			return true
+		}, nil).(goast.Expr)
+		var buf bytes.Buffer
+		// We emit in plaintext, so format the parsed Go expression and print it out.
+		if err := goformat.Node(&buf, fset, expr); err != nil {
+			return err
+		}
+		g.def.printf("%s", buf.Bytes())
 		return nil
 	}
 	switch {
@@ -449,6 +477,63 @@ func (g *generator) emitType(val cue.Value, optional bool, optionalStg optionalS
 	return nil
 }
 
+// parseTypeExpr extends [goparser.ParseExpr] to allow selecting from full import paths.
+// `[]go/constant.Kind` is not a valid Go expression, and `[]constant.Kind` is valid
+// but doesn't specify a full import path, so it's ambiguous.
+//
+// Accept `[]"go/constant".Kind` with a pre-processing step to find quoted strings,
+// record them as imports keyed by package name in the returned map,
+// and rewrite the Go expression to be in terms of the imported package.
+// Note that a pre-processing step is necessary as ParseExpr rejects this custom syntax.
+func parseTypeExpr(fset *gotoken.FileSet, src string) (goast.Expr, map[string]string, error) {
+	var goSrc strings.Builder
+	importedByName := make(map[string]string)
+
+	var scan goscanner.Scanner
+	scan.Init(fset.AddFile("", fset.Base(), len(src)), []byte(src), nil, 0)
+	lastStringLit := ""
+	for {
+		_, tok, lit := scan.Scan()
+		if tok == gotoken.EOF {
+			break
+		}
+		if lastStringLit != "" {
+			if tok == gotoken.PERIOD {
+				imp, err := strconv.Unquote(lastStringLit)
+				if err != nil {
+					panic(err) // should never happen
+				}
+				// We assume the package name is the last path component.
+				// TODO: consider how we might support renaming imports,
+				// so that importing both foo.com/x and bar.com/x is possible.
+				_, impName, _ := cutLast(imp, "/")
+				importedByName[impName] = imp
+				goSrc.WriteString(impName)
+			} else {
+				goSrc.WriteString(lastStringLit)
+			}
+			lastStringLit = ""
+		}
+		switch tok {
+		case gotoken.STRING:
+			lastStringLit = lit
+		case gotoken.IDENT, gotoken.INT, gotoken.FLOAT, gotoken.IMAG, gotoken.CHAR:
+			goSrc.WriteString(lit)
+		case gotoken.SEMICOLON:
+			// TODO: How can we support multi-line types such as structs?
+			// Note that EOF inserts a semicolon, which breaks goparser.ParseExpr.
+			if lit == "\n" {
+				break // inserted semicolon at EOF
+			}
+			fallthrough
+		default:
+			goSrc.WriteString(tok.String())
+		}
+	}
+	expr, err := goparser.ParseExpr(goSrc.String())
+	return expr, importedByName, err
+}
+
 func cutLast(s, sep string) (before, after string, found bool) {
 	if i := strings.LastIndex(s, sep); i >= 0 {
 		return s[:i], s[i+len(sep):], true
@@ -584,7 +669,7 @@ func (g *generator) emitTypeReference(val cue.Value) bool {
 	// we need to ensure that package is imported.
 	// Otherwise, we need to ensure that the referenced local definition is generated.
 	if root != g.pkgRoot {
-		g.importedAs[inst.ImportPath] = unqualifiedPath
+		g.importCuePkgAsGoPkg[inst.ImportPath] = unqualifiedPath
 	} else {
 		g.genDef(path, cue.Dereference(val))
 	}

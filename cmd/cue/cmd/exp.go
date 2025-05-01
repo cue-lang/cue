@@ -74,8 +74,10 @@ given that Go does not allow declaring nested types.
 
 	#Bar: {
 		@go(BetterBarTypeName)
-		renamed: int    @go(BetterFieldName)
-		retyped: string @go(,type=foo.com/bar.NamedString)
+		renamed: int @go(BetterFieldName)
+
+		retypedLocal:  [...string] @go(,type=[]LocalType)
+		retypedImport: [...string] @go(,type=[]"foo.com/bar".ImportedType)
 	}
 
 The attribute "@go(-)" can be used to ignore a definition or field, for example:

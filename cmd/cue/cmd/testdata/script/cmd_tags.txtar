@@ -6,9 +6,10 @@ cmp stdout expect-stdout
 exec cue cmd tag tags.cue tags_tool.cue -t prod -t name=bar
 cmp stdout expect-stdout
 
-# Verify that the new global -t flag added as a fix for issue 2510 above
-# works with the explicit or implicit "cmd" sub-command,
-# but not with other sub-commands like "fmt".
+# Verify that the global -t flag works with commands like "cmd"
+# or "eval", but not "fmt".
+exec cue -t prod -t name=bar cmd tag tags.cue tags_tool.cue
+cmp stdout expect-stdout
 exec cue eval -t name=bar tags.cue
 stdout 'name: *"bar"'
 exec cue -t name=bar eval tags.cue

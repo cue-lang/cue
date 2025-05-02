@@ -188,10 +188,10 @@ fail.both."42_LinkedList".types.LinkedList.next: conflicting values "x" and {ite
     ./root/types.cue:43:14
 fail.both.notList: conflicting values [1,2,3] and {embedded2?:int} (mismatched types list and struct):
     ./cuetest/all.cue:5:24
-    ./root/root.cue:122:2
+    ./root/root.cue:131:2
 fail.both.notString: conflicting values "not_a_struct" and {embedded2?:int} (mismatched types string and struct):
     ./cuetest/all.cue:4:24
-    ./root/root.cue:122:2
+    ./root/root.cue:131:2
 fail.cue."11_Int8".types.Int8: invalid value 99999 (out of bound <=127):
     ./cuetest/all.cue:61:30
 fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
@@ -282,12 +282,21 @@ func main() {
 	zeroRoot.DiscriminatorField = make(map[string]any)
 
 	// Optional fields which use the optional attribute flag.
+
 	zeroRoot.Fields.OptionalBasic = 5
 	zeroRoot.Fields.OptionalList = make([]int64, 0)
 	zeroRoot.Fields.OptionalMap = make(map[string]int64, 0)
-	zeroRoot.Fields.OptionalBasicAttrNillable = new(int64)
-	zeroRoot.Fields.OptionalListAttrNillable = new([]int64)
-	zeroRoot.Fields.OptionalMapAttrNillable = new(map[string]int64)
+
+	zeroRoot.Fields.OptionalTopAttrNillable = (*any)(nil)
+	zeroRoot.Fields.OptionalNullAttrNillable = (**struct{})(nil)
+	zeroRoot.Fields.OptionalBasicAttrNillable = (*int64)(nil)
+	zeroRoot.Fields.OptionalListAttrNillable = (*[]int64)(nil)
+
+	zeroRoot.Fields.OptionalInlineMapAttrNillable = (*map[string]int64)(nil)
+	zeroRoot.Fields.OptionalNamedMapAttrNillable = (*root.NamedMap)(nil)
+	zeroRoot.Fields.OptionalInlineNestedAttrNillable = (*struct{F *[]string `json:"f,omitempty"`})(nil)
+	zeroRoot.Fields.OptionalNamedNestedAttrNillable = (*root.NamedNested)(nil)
+
 	zeroRoot.Fields.OptionalStruct = root.EmptyStruct{}
 	zeroRoot.Fields.OptionalStructAttrType = root.EmptyStruct{}
 	zeroRoot.Fields.OptionalStructAttrZero = root.EmptyStruct{}
@@ -389,9 +398,18 @@ _#overridenNeverGenerate: string
 		optionalList?:  [...int]
 		optionalMap?:   [string]: int
 
+		optionalTopAttrNillable?:   _ @go(,optional=nillable)
+		optionalNullAttrNillable?:  null @go(,optional=nillable)
 		optionalBasicAttrNillable?: int @go(,optional=nillable)
 		optionalListAttrNillable?:  [...int] @go(,optional=nillable)
-		optionalMapAttrNillable?:   {[string]: int} @go(,optional=nillable)
+
+		// Ensure that "is nillable" is worked out correctly for inline types, referenced definitions,
+		// and nested types where only part of the type is not nillable, but not the top level.
+
+		optionalInlineMapAttrNillable?:    {[string]: int} @go(,optional=nillable)
+		optionalNamedMapAttrNillable?:     #namedMap @go(,optional=nillable)
+		optionalInlineNestedAttrNillable?: {f?: [...string]} @go(,optional=nillable)
+		optionalNamedNestedAttrNillable?:  #namedNested @go(,optional=nillable)
 
 		optionalStruct?: #emptyStruct
 		optionalStructAttrType?: #emptyStruct @go(,type=EmptyStruct)
@@ -492,6 +510,10 @@ _#hiddenStruct: {
 		embedded2?: int
 	}
 }
+
+#namedMap: [string]: int
+
+#namedNested: f?: [...string]
 
 // Hidden definitions are only generated if referenced; this one is not.
 _#unusedHiddenStruct: neverGenerate?: int
@@ -698,11 +720,23 @@ type Root struct {
 
 		OptionalMap map[string]int64 `json:"optionalMap,omitempty"`
 
+		OptionalTopAttrNillable *any/* CUE top */ `json:"optionalTopAttrNillable,omitempty"`
+
+		OptionalNullAttrNillable **struct{}/* CUE null */ `json:"optionalNullAttrNillable,omitempty"`
+
 		OptionalBasicAttrNillable *int64 `json:"optionalBasicAttrNillable,omitempty"`
 
 		OptionalListAttrNillable *[]int64 `json:"optionalListAttrNillable,omitempty"`
 
-		OptionalMapAttrNillable *map[string]int64 `json:"optionalMapAttrNillable,omitempty"`
+		OptionalInlineMapAttrNillable *map[string]int64 `json:"optionalInlineMapAttrNillable,omitempty"`
+
+		OptionalNamedMapAttrNillable *NamedMap `json:"optionalNamedMapAttrNillable,omitempty"`
+
+		OptionalInlineNestedAttrNillable *struct {
+			F *[]string `json:"f,omitempty"`
+		} `json:"optionalInlineNestedAttrNillable,omitempty"`
+
+		OptionalNamedNestedAttrNillable *NamedNested `json:"optionalNamedNestedAttrNillable,omitempty"`
 
 		OptionalStruct EmptyStruct `json:"optionalStruct,omitempty"`
 
@@ -797,6 +831,12 @@ type Root struct {
 
 	// CUE field "with\\backslashes": encoding/json does not support this field name
 
+}
+
+type NamedMap map[string]int64
+
+type NamedNested struct {
+	F []string `json:"f,omitempty"`
 }
 
 type Root_innerStruct struct {

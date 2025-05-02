@@ -188,10 +188,10 @@ fail.both."42_LinkedList".types.LinkedList.next: conflicting values "x" and {ite
     ./root/types.cue:43:14
 fail.both.notList: conflicting values [1,2,3] and {embedded2?:int} (mismatched types list and struct):
     ./cuetest/all.cue:5:24
-    ./root/root.cue:127:2
+    ./root/root.cue:136:2
 fail.both.notString: conflicting values "not_a_struct" and {embedded2?:int} (mismatched types string and struct):
     ./cuetest/all.cue:4:24
-    ./root/root.cue:127:2
+    ./root/root.cue:136:2
 fail.cue."11_Int8".types.Int8: invalid value 99999 (out of bound <=127):
     ./cuetest/all.cue:61:30
 fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
@@ -251,6 +251,7 @@ import (
 	"slices"
 
 	"foo.test/bar/root"
+	imported "foo.test/bar/imported/subinst"
 )
 
 type Tests struct {
@@ -267,8 +268,9 @@ func main() {
 	var _ root.AttrChangedNameEmbed
 	var _ = root.AttrType(constant.Kind(0))
 
-	// It's easier to test the fields with a root value.
+	// It's easier to test the fields with zero values.
 	var zeroRoot root.Root
+	var zeroRootImports root.RootImports
 
 	var _ = zeroRoot.Embedded1
 	var _ = zeroRoot.Embedded2
@@ -282,12 +284,27 @@ func main() {
 	zeroRoot.DiscriminatorField = make(map[string]any)
 
 	// Optional fields which use the optional attribute flag.
+
 	zeroRoot.Fields.OptionalBasic = 5
 	zeroRoot.Fields.OptionalList = make([]int64, 0)
 	zeroRoot.Fields.OptionalMap = make(map[string]int64, 0)
-	zeroRoot.Fields.OptionalBasicAttrNillable = new(int64)
-	zeroRoot.Fields.OptionalListAttrNillable = new([]int64)
-	zeroRoot.Fields.OptionalMapAttrNillable = new(map[string]int64)
+
+	zeroRoot.Fields.OptionalTopAttrNillable = (*any)(nil)
+	zeroRoot.Fields.OptionalNullAttrNillable = (**struct{})(nil)
+	zeroRoot.Fields.OptionalBasicAttrNillable = (*int64)(nil)
+	zeroRoot.Fields.OptionalListAttrNillable = (*[]int64)(nil)
+
+	zeroRoot.Fields.OptionalInlineMapAttrNillable = (*map[string]int64)(nil)
+	zeroRoot.Fields.OptionalLocalMapAttrNillable = (*root.LocalMap)(nil)
+	zeroRoot.Fields.OptionalInlineNestedAttrNillable = (*struct{F *[]string `json:"f,omitempty"`})(nil)
+	zeroRoot.Fields.OptionalLocalNestedAttrNillable = (*root.LocalNested)(nil)
+
+	// #localNested is not affected by one of the references using optional=nullable.
+	var _ = root.LocalNested{F: []string{}}
+
+	zeroRootImports.OptionalRemoteMapAttrNillable = (*imported.RemoteMap)(nil)
+	zeroRootImports.OptionalRemoteNestedAttrNillable = (*imported.RemoteNested)(nil)
+
 	zeroRoot.Fields.OptionalStruct = root.EmptyStruct{}
 	zeroRoot.Fields.OptionalStructAttrType = root.EmptyStruct{}
 	zeroRoot.Fields.OptionalStructAttrZero = root.EmptyStruct{}
@@ -389,9 +406,18 @@ _#overridenNeverGenerate: string
 		optionalList?:  [...int]
 		optionalMap?:   [string]: int
 
+		optionalTopAttrNillable?:   _ @go(,optional=nillable)
+		optionalNullAttrNillable?:  null @go(,optional=nillable)
 		optionalBasicAttrNillable?: int @go(,optional=nillable)
 		optionalListAttrNillable?:  [...int] @go(,optional=nillable)
-		optionalMapAttrNillable?:   {[string]: int} @go(,optional=nillable)
+
+		// Ensure that "is nillable" is worked out correctly for inline types, referenced definitions,
+		// and nested types where only part of the type is not nillable, but not the top level.
+
+		optionalInlineMapAttrNillable?:    {[string]: int} @go(,optional=nillable)
+		optionalLocalMapAttrNillable?:     #localMap @go(,optional=nillable)
+		optionalInlineNestedAttrNillable?: {f?: [...string]} @go(,optional=nillable)
+		optionalLocalNestedAttrNillable?:  #localNested @go(,optional=nillable)
 
 		optionalStruct?: #emptyStruct
 		optionalStructAttrType?: #emptyStruct @go(,type=EmptyStruct)
@@ -498,6 +524,9 @@ _#hiddenStruct: {
 	}
 }
 
+#localMap: [string]: int
+#localNested: f?: [...string]
+
 // Hidden definitions are only generated if referenced; this one is not.
 _#unusedHiddenStruct: neverGenerate?: int
 
@@ -580,7 +609,7 @@ import (
 	"foo.test/bar/imported/unused"
 )
 
-#remoteStructs: {
+#rootImports: {
 	inst?: imported.#instanceStruct
 
 	lowerRegular?: imported.lowerRegular
@@ -590,6 +619,9 @@ import (
 
 	multiOne?: multipkg_one.#One
 	multiTwo?: multipkg_two.#Two
+
+	optionalRemoteMapAttrNillable?:     imported.#remoteMap @go(,optional=nillable)
+	optionalRemoteNestedAttrNillable?:  imported.#remoteNested @go(,optional=nillable)
 }
 
 _unusedImport: unused.#UnusedNeverGenerate
@@ -606,7 +638,7 @@ import (
 	"time"
 )
 
-type RemoteStructs struct {
+type RootImports struct {
 	Inst imported.InstanceStruct `json:"inst,omitempty"`
 
 	LowerRegular int64 `json:"lowerRegular,omitempty"`
@@ -620,6 +652,10 @@ type RemoteStructs struct {
 	MultiOne multipkg.One `json:"multiOne,omitempty"`
 
 	MultiTwo multipkg.Two `json:"multiTwo,omitempty"`
+
+	OptionalRemoteMapAttrNillable *imported.RemoteMap `json:"optionalRemoteMapAttrNillable,omitempty"`
+
+	OptionalRemoteNestedAttrNillable *imported.RemoteNested `json:"optionalRemoteNestedAttrNillable,omitempty"`
 }
 
 type Types struct {
@@ -703,11 +739,23 @@ type Root struct {
 
 		OptionalMap map[string]int64 `json:"optionalMap,omitempty"`
 
+		OptionalTopAttrNillable *any/* CUE top */ `json:"optionalTopAttrNillable,omitempty"`
+
+		OptionalNullAttrNillable **struct{}/* CUE null */ `json:"optionalNullAttrNillable,omitempty"`
+
 		OptionalBasicAttrNillable *int64 `json:"optionalBasicAttrNillable,omitempty"`
 
 		OptionalListAttrNillable *[]int64 `json:"optionalListAttrNillable,omitempty"`
 
-		OptionalMapAttrNillable *map[string]int64 `json:"optionalMapAttrNillable,omitempty"`
+		OptionalInlineMapAttrNillable *map[string]int64 `json:"optionalInlineMapAttrNillable,omitempty"`
+
+		OptionalLocalMapAttrNillable *LocalMap `json:"optionalLocalMapAttrNillable,omitempty"`
+
+		OptionalInlineNestedAttrNillable *struct {
+			F *[]string `json:"f,omitempty"`
+		} `json:"optionalInlineNestedAttrNillable,omitempty"`
+
+		OptionalLocalNestedAttrNillable *LocalNested `json:"optionalLocalNestedAttrNillable,omitempty"`
 
 		OptionalStruct EmptyStruct `json:"optionalStruct,omitempty"`
 
@@ -804,6 +852,12 @@ type Root struct {
 
 }
 
+type LocalMap map[string]int64
+
+type LocalNested struct {
+	F []string `json:"f,omitempty"`
+}
+
 type Root_innerStruct struct {
 	InnerStructField int64 `json:"innerStructField,omitempty"`
 }
@@ -861,6 +915,9 @@ lowerRegular: int
 UpperRegular: int
 #lowerDef: int
 #UpperDef: int
+
+#remoteMap: [string]: int
+#remoteNested: f?: [...string]
 -- imported/subinst/cue_types_imported_gen.go.want --
 // Code generated by "cue exp gengotypes"; DO NOT EDIT.
 
@@ -879,6 +936,12 @@ type InstanceStruct struct {
 type LowerDef int64
 
 type UpperDef int64
+
+type RemoteMap map[string]int64
+
+type RemoteNested struct {
+	F []string `json:"f,omitempty"`
+}
 -- imported/indirect/indirect.cue --
 package indirect
 

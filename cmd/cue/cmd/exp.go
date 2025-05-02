@@ -40,34 +40,27 @@ as the objective is to gain experience and then move the feature elsewhere.
 	return cmd
 }
 
-// TODO(mvdan): document the "optional" attribute option when finished.
-
 func newExpGenGoTypesCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gengotypes",
 		Short: "generate Go types from CUE definitions",
-		Long: `
-gengotypes generates Go type definitions from exported CUE definitions.
+		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
 
-*This command is experimental and may be changed at any time - see "cue help exp"*
+gengotypes generates Go type definitions from exported CUE definitions.
 
 The generated Go types are guaranteed to accept any value accepted by the CUE definitions,
 but may be more general. For example, "string | int" will translate into the Go
-type "any" because the Go type system is not able to express
-disjunctions.
+type "any" because the Go type system is not able to express disjunctions.
 
 To ensure that the resulting Go code works, any imported CUE packages or
 referenced CUE definitions are transitively generated as well.
-The generated code is placed in cue_types*_gen.go files in the directory of
-each CUE package.
+Generated code is placed in cue_types*_gen.go files in each CUE package directory.
 
 Generated Go type and field names may differ from the original CUE names by default.
 For instance, an exported definition "#foo" becomes "Foo",
-given that Go uses capitalization to export names in a package,
-and a nested definition like "#foo.#bar" becomes "Foo_Bar",
-given that Go does not allow declaring nested types.
+and a nested definition like "#foo.#bar" becomes "Foo_Bar".
 
-@go attributes can be used to override which name or type to be generated, for example:
+@go attributes can be used to override which name to be generated:
 
 	package foo
 	@go(betterpkgname)
@@ -75,17 +68,29 @@ given that Go does not allow declaring nested types.
 	#Bar: {
 		@go(BetterBarTypeName)
 		renamed: int @go(BetterFieldName)
-
-		retypedLocal:  [...string] @go(,type=[]LocalType)
-		retypedImport: [...string] @go(,type=[]"foo.com/bar".ImportedType)
 	}
 
-The attribute "@go(-)" can be used to ignore a definition or field, for example:
+The attribute "@go(-)" can be used to ignore a definition or field:
 
 	#ignoredDefinition: {
 		@go(-)
 	}
 	ignoredField: int @go(-)
+
+"type=" overrides an entire value to generate as a given Go type expression:
+
+	retypedLocal:  [string]: int @go(,type=map[LocalType]int)
+	retypedImport: [...string]   @go(,type=[]"foo.com/bar".ImportedType)
+
+"optional=" controls how CUE optional fields are generated as Go fields.
+The default is "zero", representing a missing field as the zero value.
+"nillable" ensures the generated Go type can represent missing fields as nil.
+
+	optionalDefault?:  int                         // generates as "int64"
+	optionalNillable?: int @go(,optional=nillable) // generates as "*int64"
+	nested: {
+		@go(,optional=nillable) // set for all fields under this struct
+	}
 `[1:],
 		// TODO: write a long help text once the feature set is reasonably stable.
 		RunE: mkRunE(c, runExpGenGoTypes),

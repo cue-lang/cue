@@ -289,19 +289,20 @@ func main() {
 	zeroRoot.Fields.OptionalList = make([]int64, 0)
 	zeroRoot.Fields.OptionalMap = make(map[string]int64, 0)
 
-	zeroRoot.Fields.OptionalTopAttrNillable = (*any)(nil)
-	zeroRoot.Fields.OptionalNullAttrNillable = (**struct{})(nil)
+	zeroRoot.Fields.OptionalTopAttrNillable = (any)(nil)
+	zeroRoot.Fields.OptionalNullAttrNillable = (*struct{})(nil)
 	zeroRoot.Fields.OptionalBasicAttrNillable = (*int64)(nil)
-	zeroRoot.Fields.OptionalListAttrNillable = (*[]int64)(nil)
+	zeroRoot.Fields.OptionalListAttrNillable = ([]int64)(nil)
 
-	zeroRoot.Fields.OptionalInlineMapAttrNillable = (*map[string]int64)(nil)
-	zeroRoot.Fields.OptionalLocalMapAttrNillable = (*root.LocalMap)(nil)
-	zeroRoot.Fields.OptionalInlineNestedAttrNillable = (*struct{F *[]string `json:"f,omitempty"`})(nil)
+	zeroRoot.Fields.OptionalInlineMapAttrNillable = (map[string]int64)(nil)
+	zeroRoot.Fields.OptionalLocalMapAttrNillable = (root.LocalMap)(nil)
+	zeroRoot.Fields.OptionalInlineNestedAttrNillable = (*struct{F []string `json:"f,omitempty"`})(nil)
 	zeroRoot.Fields.OptionalLocalNestedAttrNillable = (*root.LocalNested)(nil)
 
 	// #localNested is not affected by one of the references using optional=nullable.
 	var _ = root.LocalNested{F: []string{}}
 
+	// TODO: we should notice when types from imported packages are nillable already.
 	zeroRootImports.OptionalRemoteMapAttrNillable = (*imported.RemoteMap)(nil)
 	zeroRootImports.OptionalRemoteNestedAttrNillable = (*imported.RemoteNested)(nil)
 
@@ -739,20 +740,20 @@ type Root struct {
 
 		OptionalMap map[string]int64 `json:"optionalMap,omitempty"`
 
-		OptionalTopAttrNillable *any/* CUE top */ `json:"optionalTopAttrNillable,omitempty"`
+		OptionalTopAttrNillable any/* CUE top */ `json:"optionalTopAttrNillable,omitempty"`
 
-		OptionalNullAttrNillable **struct{}/* CUE null */ `json:"optionalNullAttrNillable,omitempty"`
+		OptionalNullAttrNillable *struct{}/* CUE null */ `json:"optionalNullAttrNillable,omitempty"`
 
 		OptionalBasicAttrNillable *int64 `json:"optionalBasicAttrNillable,omitempty"`
 
-		OptionalListAttrNillable *[]int64 `json:"optionalListAttrNillable,omitempty"`
+		OptionalListAttrNillable []int64 `json:"optionalListAttrNillable,omitempty"`
 
-		OptionalInlineMapAttrNillable *map[string]int64 `json:"optionalInlineMapAttrNillable,omitempty"`
+		OptionalInlineMapAttrNillable map[string]int64 `json:"optionalInlineMapAttrNillable,omitempty"`
 
-		OptionalLocalMapAttrNillable *LocalMap `json:"optionalLocalMapAttrNillable,omitempty"`
+		OptionalLocalMapAttrNillable LocalMap `json:"optionalLocalMapAttrNillable,omitempty"`
 
 		OptionalInlineNestedAttrNillable *struct {
-			F *[]string `json:"f,omitempty"`
+			F []string `json:"f,omitempty"`
 		} `json:"optionalInlineNestedAttrNillable,omitempty"`
 
 		OptionalLocalNestedAttrNillable *LocalNested `json:"optionalLocalNestedAttrNillable,omitempty"`

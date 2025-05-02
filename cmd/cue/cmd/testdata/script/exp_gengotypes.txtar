@@ -287,14 +287,14 @@ func main() {
 	zeroRoot.Fields.OptionalList = make([]int64, 0)
 	zeroRoot.Fields.OptionalMap = make(map[string]int64, 0)
 
-	zeroRoot.Fields.OptionalTopAttrNillable = (*any)(nil)
-	zeroRoot.Fields.OptionalNullAttrNillable = (**struct{})(nil)
+	zeroRoot.Fields.OptionalTopAttrNillable = (any)(nil)
+	zeroRoot.Fields.OptionalNullAttrNillable = (*struct{})(nil)
 	zeroRoot.Fields.OptionalBasicAttrNillable = (*int64)(nil)
-	zeroRoot.Fields.OptionalListAttrNillable = (*[]int64)(nil)
+	zeroRoot.Fields.OptionalListAttrNillable = ([]int64)(nil)
 
-	zeroRoot.Fields.OptionalInlineMapAttrNillable = (*map[string]int64)(nil)
-	zeroRoot.Fields.OptionalNamedMapAttrNillable = (*root.NamedMap)(nil)
-	zeroRoot.Fields.OptionalInlineNestedAttrNillable = (*struct{F *[]string `json:"f,omitempty"`})(nil)
+	zeroRoot.Fields.OptionalInlineMapAttrNillable = (map[string]int64)(nil)
+	zeroRoot.Fields.OptionalNamedMapAttrNillable = (root.NamedMap)(nil)
+	zeroRoot.Fields.OptionalInlineNestedAttrNillable = (*struct{F []string `json:"f,omitempty"`})(nil)
 	zeroRoot.Fields.OptionalNamedNestedAttrNillable = (*root.NamedNested)(nil)
 
 	zeroRoot.Fields.OptionalStruct = root.EmptyStruct{}
@@ -720,20 +720,20 @@ type Root struct {
 
 		OptionalMap map[string]int64 `json:"optionalMap,omitempty"`
 
-		OptionalTopAttrNillable *any/* CUE top */ `json:"optionalTopAttrNillable,omitempty"`
+		OptionalTopAttrNillable any/* CUE top */ `json:"optionalTopAttrNillable,omitempty"`
 
-		OptionalNullAttrNillable **struct{}/* CUE null */ `json:"optionalNullAttrNillable,omitempty"`
+		OptionalNullAttrNillable *struct{}/* CUE null */ `json:"optionalNullAttrNillable,omitempty"`
 
 		OptionalBasicAttrNillable *int64 `json:"optionalBasicAttrNillable,omitempty"`
 
-		OptionalListAttrNillable *[]int64 `json:"optionalListAttrNillable,omitempty"`
+		OptionalListAttrNillable []int64 `json:"optionalListAttrNillable,omitempty"`
 
-		OptionalInlineMapAttrNillable *map[string]int64 `json:"optionalInlineMapAttrNillable,omitempty"`
+		OptionalInlineMapAttrNillable map[string]int64 `json:"optionalInlineMapAttrNillable,omitempty"`
 
-		OptionalNamedMapAttrNillable *NamedMap `json:"optionalNamedMapAttrNillable,omitempty"`
+		OptionalNamedMapAttrNillable NamedMap `json:"optionalNamedMapAttrNillable,omitempty"`
 
 		OptionalInlineNestedAttrNillable *struct {
-			F *[]string `json:"f,omitempty"`
+			F []string `json:"f,omitempty"`
 		} `json:"optionalInlineNestedAttrNillable,omitempty"`
 
 		OptionalNamedNestedAttrNillable *NamedNested `json:"optionalNamedNestedAttrNillable,omitempty"`

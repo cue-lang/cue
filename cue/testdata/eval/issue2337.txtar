@@ -1,0 +1,194 @@
+-- in.cue --
+// evalv2 failed with the confusing error "x: was already used"
+// rather than a friendlier "conflicting values" error.
+simple: {
+	x:   "x"
+	(x): "foo"
+}
+
+// Worked on CUE v0.5.0, broke on v0.6.0 with "was already used".
+// Should succeed, as the comprehension does not change env2.
+issue2473: one: {
+	c: {
+		env:  "prod"
+		env:  "dev" | "prod"
+		env2: env
+	}
+
+	if c.env2 == "prod" {
+		{
+			c: env2: string
+			example: c.env2
+		}
+	}
+}
+// A variant of the above which failed on v0.5.0 as well.
+issue2473: two: {
+	env:  "prod"
+	env:  "dev" | "prod"
+	env2: env
+
+	if env2 == "prod" {
+		{
+			env2:    string
+			example: env2
+		}
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  simple: {
+    x: "x"
+    〈0;x〉: "foo"
+  }
+  issue2473: {
+    one: {
+      c: {
+        env: "prod"
+        env: ("dev"|"prod")
+        env2: 〈0;env〉
+      }
+      if (〈0;c〉.env2 == "prod") {
+        {
+          c: {
+            env2: string
+          }
+          example: 〈0;c〉.env2
+        }
+      }
+    }
+  }
+  issue2473: {
+    two: {
+      env: "prod"
+      env: ("dev"|"prod")
+      env2: 〈0;env〉
+      if (〈0;env2〉 == "prod") {
+        {
+          env2: string
+          example: 〈0;env2〉
+        }
+      }
+    }
+  }
+}
+-- out/eval/stats --
+Leaks:  2
+Freed:  19
+Reused: 13
+Allocs: 8
+Retain: 10
+
+Unifications: 13
+Conjuncts:    37
+Disjuncts:    21
+-- out/evalalpha --
+Errors:
+simple.x: conflicting values "foo" and "x":
+    ./in.cue:4:7
+    ./in.cue:5:7
+
+Result:
+(_|_){
+  // [eval]
+  simple: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval] simple.x: conflicting values "foo" and "x":
+      //     ./in.cue:4:7
+      //     ./in.cue:5:7
+    }
+  }
+  issue2473: (struct){
+    one: (struct){
+      c: (struct){
+        env: (string){ "prod" }
+        env2: (string){ "prod" }
+      }
+      example: (string){ "prod" }
+    }
+    two: (struct){
+      env: (string){ "prod" }
+      env2: (string){ "prod" }
+      example: (string){ "prod" }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,25 +1,28 @@
+-(struct){
++Errors:
++simple.x: conflicting values "foo" and "x":
++    ./in.cue:4:7
++    ./in.cue:5:7
++
++Result:
++(_|_){
++  // [eval]
+   simple: (_|_){
+-    // [incomplete] simple: cannot add field x: was already used:
+-    //     ./in.cue:5:2
+-    x: (string){ "x" }
++    // [eval]
++    x: (_|_){
++      // [eval] simple.x: conflicting values "foo" and "x":
++      //     ./in.cue:4:7
++      //     ./in.cue:5:7
++    }
+   }
+   issue2473: (struct){
+     one: (struct){
+-      c: (_|_){
+-        // [incomplete] issue2473.one: cannot add field env2: was already used:
+-        //     ./in.cue:19:7
++      c: (struct){
+         env: (string){ "prod" }
+         env2: (string){ "prod" }
+       }
+-      example: (_|_){
+-        // [incomplete] issue2473.one: cannot add field env2: was already used:
+-        //     ./in.cue:19:7
+-      }
+-    }
+-    two: (_|_){
+-      // [incomplete] issue2473.two: cannot add field env2: was already used:
+-      //     ./in.cue:32:4
++      example: (string){ "prod" }
++    }
++    two: (struct){
+       env: (string){ "prod" }
+       env2: (string){ "prod" }
+       example: (string){ "prod" }
+-- out/eval --
+(struct){
+  simple: (_|_){
+    // [incomplete] simple: cannot add field x: was already used:
+    //     ./in.cue:5:2
+    x: (string){ "x" }
+  }
+  issue2473: (struct){
+    one: (struct){
+      c: (_|_){
+        // [incomplete] issue2473.one: cannot add field env2: was already used:
+        //     ./in.cue:19:7
+        env: (string){ "prod" }
+        env2: (string){ "prod" }
+      }
+      example: (_|_){
+        // [incomplete] issue2473.one: cannot add field env2: was already used:
+        //     ./in.cue:19:7
+      }
+    }
+    two: (_|_){
+      // [incomplete] issue2473.two: cannot add field env2: was already used:
+      //     ./in.cue:32:4
+      env: (string){ "prod" }
+      env2: (string){ "prod" }
+      example: (string){ "prod" }
+    }
+  }
+}

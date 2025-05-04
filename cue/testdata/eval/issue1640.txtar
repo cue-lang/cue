@@ -1,0 +1,115 @@
+-- a1.cue --
+package bug
+
+y: fact2.uc
+x: fact1.uc
+-- a2.cue --
+package bug
+
+x: fact1.uc
+y: fact2.uc
+-- x.cue --
+package bug
+
+fact1: #MCS & {
+	lc: fact2.lc
+}
+fact2: #MCS & {
+	lc: "foo"
+}
+
+#MCS: #MultiCaseString
+#MultiCaseString: {
+	lc: string
+	uc: lc
+}
+-- out/compile --
+--- a1.cue
+{
+  y: 〈0;fact2〉.uc
+  x: 〈0;fact1〉.uc
+}
+--- a2.cue
+{
+  x: 〈0;fact1〉.uc
+  y: 〈0;fact2〉.uc
+}
+--- x.cue
+{
+  fact1: (〈0;#MCS〉 & {
+    lc: 〈1;fact2〉.lc
+  })
+  fact2: (〈0;#MCS〉 & {
+    lc: "foo"
+  })
+  #MCS: 〈0;#MultiCaseString〉
+  #MultiCaseString: {
+    lc: string
+    uc: 〈0;lc〉
+  }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  15
+Reused: 8
+Allocs: 7
+Retain: 21
+
+Unifications: 15
+Conjuncts:    45
+Disjuncts:    31
+-- out/evalalpha --
+(struct){
+  y: (string){ "foo" }
+  x: (string){ "foo" }
+  fact1: (#struct){
+    lc: (string){ "foo" }
+    uc: (string){ "foo" }
+  }
+  fact2: (#struct){
+    lc: (string){ "foo" }
+    uc: (string){ "foo" }
+  }
+  #MCS: ~(#MultiCaseString)
+  #MultiCaseString: (#struct){
+    lc: (string){ string }
+    uc: (string){ string }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -9,10 +9,7 @@
+     lc: (string){ "foo" }
+     uc: (string){ "foo" }
+   }
+-  #MCS: (#struct){
+-    lc: (string){ string }
+-    uc: (string){ string }
+-  }
++  #MCS: ~(#MultiCaseString)
+   #MultiCaseString: (#struct){
+     lc: (string){ string }
+     uc: (string){ string }
+-- out/eval --
+(struct){
+  y: (string){ "foo" }
+  x: (string){ "foo" }
+  fact1: (#struct){
+    lc: (string){ "foo" }
+    uc: (string){ "foo" }
+  }
+  fact2: (#struct){
+    lc: (string){ "foo" }
+    uc: (string){ "foo" }
+  }
+  #MCS: (#struct){
+    lc: (string){ string }
+    uc: (string){ string }
+  }
+  #MultiCaseString: (#struct){
+    lc: (string){ string }
+    uc: (string){ string }
+  }
+}

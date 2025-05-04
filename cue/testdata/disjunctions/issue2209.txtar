@@ -1,0 +1,1412 @@
+-- input.cue --
+full: {
+	Foo: #Abstract & {spec: foo: {}}
+	Bar: #Abstract & {spec: bar: {}}
+
+	#Abstract: X={
+		spec: _#Spec
+
+		resource: _Thing & {_X: spec: X.spec}
+	}
+
+	_#Spec: *_#SpecFoo | _#SpecBar
+
+	_#SpecFoo: {
+		foo: {
+			min: int | *10
+			max: int | *20
+		}
+	}
+
+	_#SpecBar: {
+		bar: {
+			min: int | *30
+			max: int | *40
+		}
+	}
+
+	_Thing: #Constrained & {
+		_X: _
+
+		spec: {
+			if _X.spec.foo != _|_ {
+				minFoo: _X.spec.foo.min
+				maxFoo: _X.spec.foo.max
+			}
+
+			if _X.spec.bar != _|_ {
+				minBar: _X.spec.bar.min
+				maxBar: _X.spec.bar.max
+			}
+		}
+	}
+
+	#Constrained: #Base & {
+		spec: {
+			minFoo:  int | *10
+			maxFoo:  int | *20
+			minBar?: null
+			maxBar?: null
+		} | {
+			minBar:  int | *30
+			maxBar:  int | *40
+			minFoo?: null
+			maxFoo?: null
+		}
+
+		spec: *{
+			fuga?: null
+		} | {
+			hoge?: null
+		}
+	}
+
+	#Base: {
+		spec: {
+			minFoo?: null | int
+			maxFoo?: null | int
+			minBar?: null | int
+			maxBar?: null | int
+
+			hoge?: null | bool
+			fuga?: null | bool
+		}
+	}
+}
+
+reduced: {
+	Foo: #Obj & {spec: foo: {}}
+	Bar: #Obj & {spec: bar: {}}
+
+	#Obj: X={
+		spec: *#SpecFoo | #SpecBar
+
+		out: #Out & {
+			_Xspec: X.spec
+			if _Xspec.foo != _|_ {
+				minFoo: _Xspec.foo.min
+			}
+			if _Xspec.bar != _|_ {
+				minBar: _Xspec.bar.min
+			}
+		}
+	}
+
+	#SpecFoo: foo: min: int | *10
+	#SpecBar: bar: min: int | *20
+
+	#Out: {
+		{minFoo: int} | {minBar: int}
+
+		*{nullFoo: null} | {nullBar: null}
+	}
+}
+-- out/compile --
+--- input.cue
+{
+  full: {
+    Foo: (〈0;#Abstract〉 & {
+      spec: {
+        foo: {}
+      }
+    })
+    Bar: (〈0;#Abstract〉 & {
+      spec: {
+        bar: {}
+      }
+    })
+    #Abstract: {
+      spec: 〈1;_#Spec〉
+      resource: (〈1;_Thing〉 & {
+        _X: {
+          spec: 〈3〉.spec
+        }
+      })
+    }
+    _#Spec: (*〈0;_#SpecFoo〉|〈0;_#SpecBar〉)
+    _#SpecFoo: {
+      foo: {
+        min: (int|*10)
+        max: (int|*20)
+      }
+    }
+    _#SpecBar: {
+      bar: {
+        min: (int|*30)
+        max: (int|*40)
+      }
+    }
+    _Thing: (〈0;#Constrained〉 & {
+      _X: _
+      spec: {
+        if (〈1;_X〉.spec.foo != _|_(explicit error (_|_ literal) in source)) {
+          minFoo: 〈2;_X〉.spec.foo.min
+          maxFoo: 〈2;_X〉.spec.foo.max
+        }
+        if (〈1;_X〉.spec.bar != _|_(explicit error (_|_ literal) in source)) {
+          minBar: 〈2;_X〉.spec.bar.min
+          maxBar: 〈2;_X〉.spec.bar.max
+        }
+      }
+    })
+    #Constrained: (〈0;#Base〉 & {
+      spec: ({
+        minFoo: (int|*10)
+        maxFoo: (int|*20)
+        minBar?: null
+        maxBar?: null
+      }|{
+        minBar: (int|*30)
+        maxBar: (int|*40)
+        minFoo?: null
+        maxFoo?: null
+      })
+      spec: (*{
+        fuga?: null
+      }|{
+        hoge?: null
+      })
+    })
+    #Base: {
+      spec: {
+        minFoo?: (null|int)
+        maxFoo?: (null|int)
+        minBar?: (null|int)
+        maxBar?: (null|int)
+        hoge?: (null|bool)
+        fuga?: (null|bool)
+      }
+    }
+  }
+  reduced: {
+    Foo: (〈0;#Obj〉 & {
+      spec: {
+        foo: {}
+      }
+    })
+    Bar: (〈0;#Obj〉 & {
+      spec: {
+        bar: {}
+      }
+    })
+    #Obj: {
+      spec: (*〈1;#SpecFoo〉|〈1;#SpecBar〉)
+      out: (〈1;#Out〉 & {
+        _Xspec: 〈2〉.spec
+        if (〈0;_Xspec〉.foo != _|_(explicit error (_|_ literal) in source)) {
+          minFoo: 〈1;_Xspec〉.foo.min
+        }
+        if (〈0;_Xspec〉.bar != _|_(explicit error (_|_ literal) in source)) {
+          minBar: 〈1;_Xspec〉.bar.min
+        }
+      })
+    }
+    #SpecFoo: {
+      foo: {
+        min: (int|*10)
+      }
+    }
+    #SpecBar: {
+      bar: {
+        min: (int|*20)
+      }
+    }
+    #Out: {
+      ({
+        minFoo: int
+      }|{
+        minBar: int
+      })
+      (*{
+        nullFoo: null
+      }|{
+        nullBar: null
+      })
+    }
+  }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  1141
+Reused: 1122
+Allocs: 19
+Retain: 51
+
+Unifications: 375
+Conjuncts:    1463
+Disjuncts:    1192
+-- out/evalalpha --
+(struct){
+  full: (struct){
+    Foo: (#struct){
+      spec: (#struct){
+        foo: (#struct){
+          min: (int){ |(*(int){ 10 }, (int){ int }) }
+          max: (int){ |(*(int){ 20 }, (int){ int }) }
+        }
+      }
+      resource: (#struct){
+        _X: (#struct){
+          spec: ~(full.Foo.spec)
+        }
+        spec: (#struct){ |(*(#struct){
+            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+            minBar?: (null){ null }
+            maxBar?: (null){ null }
+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: (null){ null }
+          }, (#struct){
+            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+            minBar?: (null){ null }
+            maxBar?: (null){ null }
+            hoge?: (null){ null }
+            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          }) }
+      }
+    }
+    Bar: (#struct){
+      spec: (#struct){
+        bar: (#struct){
+          min: (int){ |(*(int){ 30 }, (int){ int }) }
+          max: (int){ |(*(int){ 40 }, (int){ int }) }
+        }
+      }
+      resource: (#struct){
+        _X: (#struct){
+          spec: ~(full.Bar.spec)
+        }
+        spec: (#struct){ |(*(#struct){
+            minFoo?: (null){ null }
+            maxFoo?: (null){ null }
+            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: (null){ null }
+          }, (#struct){
+            minFoo?: (null){ null }
+            maxFoo?: (null){ null }
+            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+            hoge?: (null){ null }
+            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          }) }
+      }
+    }
+    #Abstract: (#struct){
+      spec: (#struct){ |(*(#struct){
+          foo: (#struct){
+            min: (int){ |(*(int){ 10 }, (int){ int }) }
+            max: (int){ |(*(int){ 20 }, (int){ int }) }
+          }
+        }, (#struct){
+          bar: (#struct){
+            min: (int){ |(*(int){ 30 }, (int){ int }) }
+            max: (int){ |(*(int){ 40 }, (int){ int }) }
+          }
+        }) }
+      resource: (#struct){
+        _X: (#struct){
+          spec: (#struct){ |(*(#struct){
+              foo: (#struct){
+                min: (int){ |(*(int){ 10 }, (int){ int }) }
+                max: (int){ |(*(int){ 20 }, (int){ int }) }
+              }
+            }, (#struct){
+              bar: (#struct){
+                min: (int){ |(*(int){ 30 }, (int){ int }) }
+                max: (int){ |(*(int){ 40 }, (int){ int }) }
+              }
+            }) }
+        }
+        spec: (#struct){ |(*(#struct){
+            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+            minBar?: (null){ null }
+            maxBar?: (null){ null }
+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: (null){ null }
+          }, (#struct){
+            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+            minBar?: (null){ null }
+            maxBar?: (null){ null }
+            hoge?: (null){ null }
+            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          }) }
+      }
+    }
+    _#Spec: (#struct){ |(*(#struct){
+        foo: (#struct){
+          min: (int){ |(*(int){ 10 }, (int){ int }) }
+          max: (int){ |(*(int){ 20 }, (int){ int }) }
+        }
+      }, (#struct){
+        bar: (#struct){
+          min: (int){ |(*(int){ 30 }, (int){ int }) }
+          max: (int){ |(*(int){ 40 }, (int){ int }) }
+        }
+      }) }
+    _#SpecFoo: (#struct){
+      foo: (#struct){
+        min: (int){ |(*(int){ 10 }, (int){ int }) }
+        max: (int){ |(*(int){ 20 }, (int){ int }) }
+      }
+    }
+    _#SpecBar: (#struct){
+      bar: (#struct){
+        min: (int){ |(*(int){ 30 }, (int){ int }) }
+        max: (int){ |(*(int){ 40 }, (int){ int }) }
+      }
+    }
+    _Thing: (#struct){
+      _X: (_){ _ }
+      spec: (#struct){ |(*(#struct){
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+          minBar?: (null){ null }
+          maxBar?: (null){ null }
+          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          fuga?: (null){ null }
+        }, *(#struct){
+          minFoo?: (null){ null }
+          maxFoo?: (null){ null }
+          minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+          maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          fuga?: (null){ null }
+        }, (#struct){
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+          minBar?: (null){ null }
+          maxBar?: (null){ null }
+          hoge?: (null){ null }
+          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+        }, (#struct){
+          minFoo?: (null){ null }
+          maxFoo?: (null){ null }
+          minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+          maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+          hoge?: (null){ null }
+          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+        }) }
+    }
+    #Constrained: (#struct){
+      spec: (#struct){ |(*(#struct){
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+          minBar?: (null){ null }
+          maxBar?: (null){ null }
+          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          fuga?: (null){ null }
+        }, *(#struct){
+          minFoo?: (null){ null }
+          maxFoo?: (null){ null }
+          minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+          maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          fuga?: (null){ null }
+        }, (#struct){
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+          minBar?: (null){ null }
+          maxBar?: (null){ null }
+          hoge?: (null){ null }
+          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+        }, (#struct){
+          minFoo?: (null){ null }
+          maxFoo?: (null){ null }
+          minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+          maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+          hoge?: (null){ null }
+          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+        }) }
+    }
+    #Base: (#struct){
+      spec: (#struct){
+        minFoo?: ((null|int)){ |((null){ null }, (int){ int }) }
+        maxFoo?: ((null|int)){ |((null){ null }, (int){ int }) }
+        minBar?: ((null|int)){ |((null){ null }, (int){ int }) }
+        maxBar?: ((null|int)){ |((null){ null }, (int){ int }) }
+        hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+        fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+      }
+    }
+  }
+  reduced: (struct){
+    Foo: (#struct){
+      spec: (#struct){
+        foo: (#struct){
+          min: (int){ |(*(int){ 10 }, (int){ int }) }
+        }
+      }
+      out: (#struct){ |(*(#struct){
+          _Xspec: ~(reduced.Foo.spec)
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          nullFoo: (null){ null }
+        }, (#struct){
+          _Xspec: ~(reduced.Foo.spec)
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          nullBar: (null){ null }
+        }) }
+    }
+    Bar: (#struct){
+      spec: (#struct){
+        bar: (#struct){
+          min: (int){ |(*(int){ 20 }, (int){ int }) }
+        }
+      }
+      out: (#struct){ |(*(#struct){
+          _Xspec: ~(reduced.Bar.spec)
+          minBar: (int){ |(*(int){ 20 }, (int){ int }) }
+          nullFoo: (null){ null }
+        }, (#struct){
+          _Xspec: ~(reduced.Bar.spec)
+          minBar: (int){ |(*(int){ 20 }, (int){ int }) }
+          nullBar: (null){ null }
+        }) }
+    }
+    #Obj: (#struct){
+      spec: (#struct){ |(*(#struct){
+          foo: (#struct){
+            min: (int){ |(*(int){ 10 }, (int){ int }) }
+          }
+        }, (#struct){
+          bar: (#struct){
+            min: (int){ |(*(int){ 20 }, (int){ int }) }
+          }
+        }) }
+      out: (#struct){ |(*(#struct){
+          _Xspec: (#struct){ |(*(#struct){
+              foo: (#struct){
+                min: (int){ |(*(int){ 10 }, (int){ int }) }
+              }
+            }, (#struct){
+              bar: (#struct){
+                min: (int){ |(*(int){ 20 }, (int){ int }) }
+              }
+            }) }
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          nullFoo: (null){ null }
+        }, (#struct){
+          _Xspec: (#struct){ |(*(#struct){
+              foo: (#struct){
+                min: (int){ |(*(int){ 10 }, (int){ int }) }
+              }
+            }, (#struct){
+              bar: (#struct){
+                min: (int){ |(*(int){ 20 }, (int){ int }) }
+              }
+            }) }
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          nullBar: (null){ null }
+        }) }
+    }
+    #SpecFoo: (#struct){
+      foo: (#struct){
+        min: (int){ |(*(int){ 10 }, (int){ int }) }
+      }
+    }
+    #SpecBar: (#struct){
+      bar: (#struct){
+        min: (int){ |(*(int){ 20 }, (int){ int }) }
+      }
+    }
+    #Out: (#struct){ |(*(#struct){
+        minFoo: (int){ int }
+        nullFoo: (null){ null }
+      }, *(#struct){
+        minBar: (int){ int }
+        nullFoo: (null){ null }
+      }, (#struct){
+        minFoo: (int){ int }
+        nullBar: (null){ null }
+      }, (#struct){
+        minBar: (int){ int }
+        nullBar: (null){ null }
+      }) }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,175 +1,59 @@
+-Errors:
+-full.Bar.resource.spec: 6 errors in empty disjunction:
+-full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
+-full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
+-    ./input.cue:3:7
+-    ./input.cue:8:13
+-    ./input.cue:27:10
+-    ./input.cue:43:16
+-    ./input.cue:47:13
+-    ./input.cue:67:20
+-full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+-full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+-    ./input.cue:3:7
+-    ./input.cue:8:13
+-    ./input.cue:15:16
+-    ./input.cue:31:4
+-    ./input.cue:32:13
+-    ./input.cue:52:13
+-full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+-    ./input.cue:3:7
+-    ./input.cue:8:13
+-    ./input.cue:27:10
+-    ./input.cue:43:16
+-    ./input.cue:52:13
+-    ./input.cue:65:20
+-full.Bar.resource.spec.minBar: undefined field: min:
+-    ./input.cue:37:25
+-reduced.Bar.out.minBar: undefined field: min:
+-    ./input.cue:89:24
+-
+-Result:
+-(_|_){
+-  // [eval]
+-  full: (_|_){
+-    // [eval]
+-    Foo: (#struct){
+-      spec: (#struct){
+-        foo: (#struct){
+-          min: (int){ |(*(int){ 10 }, (int){ int }) }
+-          max: (int){ |(*(int){ 20 }, (int){ int }) }
+-        }
+-      }
+-      resource: (#struct){
+-        spec: (#struct){ |(*(#struct){
+-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-            minBar?: (null){ null }
+-            maxBar?: (null){ null }
+-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-            fuga?: (null){ null }
+-          }, (#struct){
+-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-            minBar?: (null){ null }
+-            maxBar?: (null){ null }
+-            hoge?: (null){ null }
+-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-          }) }
+-        _X: (#struct){
+-          spec: (#struct){ |(*(#struct){
+-              foo: (#struct){
+-                min: (int){ |(*(int){ 10 }, (int){ int }) }
+-                max: (int){ |(*(int){ 20 }, (int){ int }) }
+-              }
+-            }, (#struct){
+-              foo: (#struct){
+-              }
+-              bar: (#struct){
+-                min: (int){ |(*(int){ 30 }, (int){ int }) }
+-                max: (int){ |(*(int){ 40 }, (int){ int }) }
+-              }
+-            }) }
+-        }
+-      }
+-    }
+-    Bar: (_|_){
+-      // [eval]
+-      spec: (#struct){
+-        bar: (#struct){
+-          min: (int){ |(*(int){ 30 }, (int){ int }) }
+-          max: (int){ |(*(int){ 40 }, (int){ int }) }
+-        }
+-      }
+-      resource: (_|_){
+-        // [eval]
+-        spec: (_|_){
+-          // [eval] full.Bar.resource.spec: 6 errors in empty disjunction:
+-          // full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
+-          // full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
+-          //     ./input.cue:3:7
+-          //     ./input.cue:8:13
+-          //     ./input.cue:27:10
+-          //     ./input.cue:43:16
+-          //     ./input.cue:47:13
+-          //     ./input.cue:67:20
+-          // full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+-          // full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+-          //     ./input.cue:3:7
+-          //     ./input.cue:8:13
+-          //     ./input.cue:15:16
+-          //     ./input.cue:31:4
+-          //     ./input.cue:32:13
+-          //     ./input.cue:52:13
+-          // full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+-          //     ./input.cue:3:7
+-          //     ./input.cue:8:13
+-          //     ./input.cue:27:10
+-          //     ./input.cue:43:16
+-          //     ./input.cue:52:13
+-          //     ./input.cue:65:20
+-          // full.Bar.resource.spec.minBar: undefined field: min:
+-          //     ./input.cue:37:25
+-          minFoo: (_|_){
+-            // [eval] full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+-            // full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+-            //     ./input.cue:3:7
+-            //     ./input.cue:8:13
+-            //     ./input.cue:15:16
+-            //     ./input.cue:31:4
+-            //     ./input.cue:32:13
+-            //     ./input.cue:52:13
+-            // full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+-            //     ./input.cue:3:7
+-            //     ./input.cue:8:13
+-            //     ./input.cue:27:10
+-            //     ./input.cue:43:16
+-            //     ./input.cue:52:13
+-            //     ./input.cue:65:20
+-          }
+-          maxFoo: (_|_){
+-            // [eval] full.Bar.resource.spec.maxFoo: 2 errors in empty disjunction:
+-            // full.Bar.resource.spec.maxFoo: conflicting values null and 20 (mismatched types null and int):
+-            //     ./input.cue:3:7
+-            //     ./input.cue:8:13
+-            //     ./input.cue:16:16
+-            //     ./input.cue:31:4
+-            //     ./input.cue:33:13
+-            //     ./input.cue:53:13
+-            // full.Bar.resource.spec.maxFoo: conflicting values null and int (mismatched types null and int):
+-            //     ./input.cue:3:7
+-            //     ./input.cue:8:13
+-            //     ./input.cue:27:10
+-            //     ./input.cue:43:16
+-            //     ./input.cue:53:13
+-            //     ./input.cue:66:20
+-          }
+-          minBar: (_|_){
+-            // [eval] full.Bar.resource.spec.minBar: undefined field: min:
+-            //     ./input.cue:37:25
+-          }
+-          maxBar: (_|_){
+-            // [eval] full.Bar.resource.spec.maxBar: undefined field: max:
+-            //     ./input.cue:38:25
+-          }
+-          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-        }
+-        _X: (#struct){
+-          spec: (#struct){ |(*(#struct){
+-              bar: (#struct){
+-              }
+-              foo: (#struct){
+-                min: (int){ |(*(int){ 10 }, (int){ int }) }
+-                max: (int){ |(*(int){ 20 }, (int){ int }) }
+-              }
+-            }, (#struct){
+-              bar: (#struct){
+-                min: (int){ |(*(int){ 30 }, (int){ int }) }
+-                max: (int){ |(*(int){ 40 }, (int){ int }) }
+-              }
+-            }) }
+-        }
++(struct){
++  full: (struct){
++    Foo: (#struct){
++      spec: (#struct){
++        foo: (#struct){
++          min: (int){ |(*(int){ 10 }, (int){ int }) }
++          max: (int){ |(*(int){ 20 }, (int){ int }) }
++        }
++      }
++      resource: (#struct){
++        _X: (#struct){
++          spec: ~(full.Foo.spec)
++        }
++        spec: (#struct){ |(*(#struct){
++            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
++            minBar?: (null){ null }
++            maxBar?: (null){ null }
++            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++            fuga?: (null){ null }
++          }, (#struct){
++            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
++            minBar?: (null){ null }
++            maxBar?: (null){ null }
++            hoge?: (null){ null }
++            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++          }) }
++      }
++    }
++    Bar: (#struct){
++      spec: (#struct){
++        bar: (#struct){
++          min: (int){ |(*(int){ 30 }, (int){ int }) }
++          max: (int){ |(*(int){ 40 }, (int){ int }) }
++        }
++      }
++      resource: (#struct){
++        _X: (#struct){
++          spec: ~(full.Bar.spec)
++        }
++        spec: (#struct){ |(*(#struct){
++            minFoo?: (null){ null }
++            maxFoo?: (null){ null }
++            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
++            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
++            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++            fuga?: (null){ null }
++          }, (#struct){
++            minFoo?: (null){ null }
++            maxFoo?: (null){ null }
++            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
++            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
++            hoge?: (null){ null }
++            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++          }) }
+       }
+     }
+     #Abstract: (#struct){
+@@ -185,34 +69,34 @@
+           }
+         }) }
+       resource: (#struct){
+-        spec: (#struct){ |(*(#struct){
+-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-            minBar?: (null){ null }
+-            maxBar?: (null){ null }
+-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-            fuga?: (null){ null }
+-          }, (#struct){
+-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-            minBar?: (null){ null }
+-            maxBar?: (null){ null }
+-            hoge?: (null){ null }
+-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-          }) }
+-        _X: (#struct){
+-          spec: (#struct){ |(*(#struct){
+-              foo: (#struct){
+-                min: (int){ |(*(int){ 10 }, (int){ int }) }
+-                max: (int){ |(*(int){ 20 }, (int){ int }) }
+-              }
+-            }, (#struct){
+-              bar: (#struct){
+-                min: (int){ |(*(int){ 30 }, (int){ int }) }
+-                max: (int){ |(*(int){ 40 }, (int){ int }) }
+-              }
+-            }) }
+-        }
++        _X: (#struct){
++          spec: (#struct){ |(*(#struct){
++              foo: (#struct){
++                min: (int){ |(*(int){ 10 }, (int){ int }) }
++                max: (int){ |(*(int){ 20 }, (int){ int }) }
++              }
++            }, (#struct){
++              bar: (#struct){
++                min: (int){ |(*(int){ 30 }, (int){ int }) }
++                max: (int){ |(*(int){ 40 }, (int){ int }) }
++              }
++            }) }
++        }
++        spec: (#struct){ |(*(#struct){
++            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
++            minBar?: (null){ null }
++            maxBar?: (null){ null }
++            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++            fuga?: (null){ null }
++          }, (#struct){
++            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
++            minBar?: (null){ null }
++            maxBar?: (null){ null }
++            hoge?: (null){ null }
++            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++          }) }
+       }
+     }
+     _#Spec: (#struct){ |(*(#struct){
+@@ -239,36 +123,36 @@
+       }
+     }
+     _Thing: (#struct){
+-      spec: (#struct){ |(*(#struct){
+-          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-          maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-          minBar?: (null){ null }
+-          maxBar?: (null){ null }
+-          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-          fuga?: (null){ null }
+-        }, *(#struct){
+-          minFoo?: (null){ null }
+-          maxFoo?: (null){ null }
+-          minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+-          maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+-          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-          fuga?: (null){ null }
+-        }, (#struct){
+-          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-          maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-          minBar?: (null){ null }
+-          maxBar?: (null){ null }
+-          hoge?: (null){ null }
+-          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-        }, (#struct){
+-          minFoo?: (null){ null }
+-          maxFoo?: (null){ null }
+-          minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+-          maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+-          hoge?: (null){ null }
+-          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-        }) }
+       _X: (_){ _ }
++      spec: (#struct){ |(*(#struct){
++          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++          maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
++          minBar?: (null){ null }
++          maxBar?: (null){ null }
++          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++          fuga?: (null){ null }
++        }, *(#struct){
++          minFoo?: (null){ null }
++          maxFoo?: (null){ null }
++          minBar: (int){ |(*(int){ 30 }, (int){ int }) }
++          maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
++          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++          fuga?: (null){ null }
++        }, (#struct){
++          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++          maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
++          minBar?: (null){ null }
++          maxBar?: (null){ null }
++          hoge?: (null){ null }
++          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++        }, (#struct){
++          minFoo?: (null){ null }
++          maxFoo?: (null){ null }
++          minBar: (int){ |(*(int){ 30 }, (int){ int }) }
++          maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
++          hoge?: (null){ null }
++          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++        }) }
+     }
+     #Constrained: (#struct){
+       spec: (#struct){ |(*(#struct){
+@@ -312,59 +196,38 @@
+       }
+     }
+   }
+-  reduced: (_|_){
+-    // [eval]
+-    Foo: (#struct){
+-      spec: (#struct){
+-        foo: (#struct){
+-          min: (int){ |(*(int){ 10 }, (int){ int }) }
+-        }
+-      }
+-      out: (#struct){ |(*(#struct){
+-          _Xspec: (#struct){
+-            foo: (#struct){
+-              min: (int){ |(*(int){ 10 }, (int){ int }) }
+-            }
+-          }
+-          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-          nullFoo: (null){ null }
+-        }, (#struct){
+-          _Xspec: (#struct){
+-            foo: (#struct){
+-              min: (int){ |(*(int){ 10 }, (int){ int }) }
+-            }
+-          }
+-          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-          nullBar: (null){ null }
+-        }) }
+-    }
+-    Bar: (_|_){
+-      // [eval]
++  reduced: (struct){
++    Foo: (#struct){
++      spec: (#struct){
++        foo: (#struct){
++          min: (int){ |(*(int){ 10 }, (int){ int }) }
++        }
++      }
++      out: (#struct){ |(*(#struct){
++          _Xspec: ~(reduced.Foo.spec)
++          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++          nullFoo: (null){ null }
++        }, (#struct){
++          _Xspec: ~(reduced.Foo.spec)
++          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++          nullBar: (null){ null }
++        }) }
++    }
++    Bar: (#struct){
+       spec: (#struct){
+         bar: (#struct){
+           min: (int){ |(*(int){ 20 }, (int){ int }) }
+         }
+       }
+-      out: (_|_){
+-        // [eval] reduced.Bar.out.minBar: undefined field: min:
+-        //     ./input.cue:89:24
+-        _Xspec: (#struct){ |(*(#struct){
+-            bar: (#struct){
+-            }
+-            foo: (#struct){
+-              min: (int){ |(*(int){ 10 }, (int){ int }) }
+-            }
+-          }, (#struct){
+-            bar: (#struct){
+-              min: (int){ |(*(int){ 20 }, (int){ int }) }
+-            }
+-          }) }
+-        minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-        minBar: (_|_){
+-          // [eval] reduced.Bar.out.minBar: undefined field: min:
+-          //     ./input.cue:89:24
+-        }
+-      }
++      out: (#struct){ |(*(#struct){
++          _Xspec: ~(reduced.Bar.spec)
++          minBar: (int){ |(*(int){ 20 }, (int){ int }) }
++          nullFoo: (null){ null }
++        }, (#struct){
++          _Xspec: ~(reduced.Bar.spec)
++          minBar: (int){ |(*(int){ 20 }, (int){ int }) }
++          nullBar: (null){ null }
++        }) }
+     }
+     #Obj: (#struct){
+       spec: (#struct){ |(*(#struct){
+-- out/eval --
+Errors:
+full.Bar.resource.spec: 6 errors in empty disjunction:
+full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
+full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
+    ./input.cue:3:7
+    ./input.cue:8:13
+    ./input.cue:27:10
+    ./input.cue:43:16
+    ./input.cue:47:13
+    ./input.cue:67:20
+full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+    ./input.cue:3:7
+    ./input.cue:8:13
+    ./input.cue:15:16
+    ./input.cue:31:4
+    ./input.cue:32:13
+    ./input.cue:52:13
+full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+    ./input.cue:3:7
+    ./input.cue:8:13
+    ./input.cue:27:10
+    ./input.cue:43:16
+    ./input.cue:52:13
+    ./input.cue:65:20
+full.Bar.resource.spec.minBar: undefined field: min:
+    ./input.cue:37:25
+reduced.Bar.out.minBar: undefined field: min:
+    ./input.cue:89:24
+
+Result:
+(_|_){
+  // [eval]
+  full: (_|_){
+    // [eval]
+    Foo: (#struct){
+      spec: (#struct){
+        foo: (#struct){
+          min: (int){ |(*(int){ 10 }, (int){ int }) }
+          max: (int){ |(*(int){ 20 }, (int){ int }) }
+        }
+      }
+      resource: (#struct){
+        spec: (#struct){ |(*(#struct){
+            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+            minBar?: (null){ null }
+            maxBar?: (null){ null }
+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: (null){ null }
+          }, (#struct){
+            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+            minBar?: (null){ null }
+            maxBar?: (null){ null }
+            hoge?: (null){ null }
+            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          }) }
+        _X: (#struct){
+          spec: (#struct){ |(*(#struct){
+              foo: (#struct){
+                min: (int){ |(*(int){ 10 }, (int){ int }) }
+                max: (int){ |(*(int){ 20 }, (int){ int }) }
+              }
+            }, (#struct){
+              foo: (#struct){
+              }
+              bar: (#struct){
+                min: (int){ |(*(int){ 30 }, (int){ int }) }
+                max: (int){ |(*(int){ 40 }, (int){ int }) }
+              }
+            }) }
+        }
+      }
+    }
+    Bar: (_|_){
+      // [eval]
+      spec: (#struct){
+        bar: (#struct){
+          min: (int){ |(*(int){ 30 }, (int){ int }) }
+          max: (int){ |(*(int){ 40 }, (int){ int }) }
+        }
+      }
+      resource: (_|_){
+        // [eval]
+        spec: (_|_){
+          // [eval] full.Bar.resource.spec: 6 errors in empty disjunction:
+          // full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
+          // full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
+          //     ./input.cue:3:7
+          //     ./input.cue:8:13
+          //     ./input.cue:27:10
+          //     ./input.cue:43:16
+          //     ./input.cue:47:13
+          //     ./input.cue:67:20
+          // full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+          // full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+          //     ./input.cue:3:7
+          //     ./input.cue:8:13
+          //     ./input.cue:15:16
+          //     ./input.cue:31:4
+          //     ./input.cue:32:13
+          //     ./input.cue:52:13
+          // full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+          //     ./input.cue:3:7
+          //     ./input.cue:8:13
+          //     ./input.cue:27:10
+          //     ./input.cue:43:16
+          //     ./input.cue:52:13
+          //     ./input.cue:65:20
+          // full.Bar.resource.spec.minBar: undefined field: min:
+          //     ./input.cue:37:25
+          minFoo: (_|_){
+            // [eval] full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+            // full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+            //     ./input.cue:3:7
+            //     ./input.cue:8:13
+            //     ./input.cue:15:16
+            //     ./input.cue:31:4
+            //     ./input.cue:32:13
+            //     ./input.cue:52:13
+            // full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+            //     ./input.cue:3:7
+            //     ./input.cue:8:13
+            //     ./input.cue:27:10
+            //     ./input.cue:43:16
+            //     ./input.cue:52:13
+            //     ./input.cue:65:20
+          }
+          maxFoo: (_|_){
+            // [eval] full.Bar.resource.spec.maxFoo: 2 errors in empty disjunction:
+            // full.Bar.resource.spec.maxFoo: conflicting values null and 20 (mismatched types null and int):
+            //     ./input.cue:3:7
+            //     ./input.cue:8:13
+            //     ./input.cue:16:16
+            //     ./input.cue:31:4
+            //     ./input.cue:33:13
+            //     ./input.cue:53:13
+            // full.Bar.resource.spec.maxFoo: conflicting values null and int (mismatched types null and int):
+            //     ./input.cue:3:7
+            //     ./input.cue:8:13
+            //     ./input.cue:27:10
+            //     ./input.cue:43:16
+            //     ./input.cue:53:13
+            //     ./input.cue:66:20
+          }
+          minBar: (_|_){
+            // [eval] full.Bar.resource.spec.minBar: undefined field: min:
+            //     ./input.cue:37:25
+          }
+          maxBar: (_|_){
+            // [eval] full.Bar.resource.spec.maxBar: undefined field: max:
+            //     ./input.cue:38:25
+          }
+          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+        }
+        _X: (#struct){
+          spec: (#struct){ |(*(#struct){
+              bar: (#struct){
+              }
+              foo: (#struct){
+                min: (int){ |(*(int){ 10 }, (int){ int }) }
+                max: (int){ |(*(int){ 20 }, (int){ int }) }
+              }
+            }, (#struct){
+              bar: (#struct){
+                min: (int){ |(*(int){ 30 }, (int){ int }) }
+                max: (int){ |(*(int){ 40 }, (int){ int }) }
+              }
+            }) }
+        }
+      }
+    }
+    #Abstract: (#struct){
+      spec: (#struct){ |(*(#struct){
+          foo: (#struct){
+            min: (int){ |(*(int){ 10 }, (int){ int }) }
+            max: (int){ |(*(int){ 20 }, (int){ int }) }
+          }
+        }, (#struct){
+          bar: (#struct){
+            min: (int){ |(*(int){ 30 }, (int){ int }) }
+            max: (int){ |(*(int){ 40 }, (int){ int }) }
+          }
+        }) }
+      resource: (#struct){
+        spec: (#struct){ |(*(#struct){
+            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+            minBar?: (null){ null }
+            maxBar?: (null){ null }
+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: (null){ null }
+          }, (#struct){
+            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+            minBar?: (null){ null }
+            maxBar?: (null){ null }
+            hoge?: (null){ null }
+            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          }) }
+        _X: (#struct){
+          spec: (#struct){ |(*(#struct){
+              foo: (#struct){
+                min: (int){ |(*(int){ 10 }, (int){ int }) }
+                max: (int){ |(*(int){ 20 }, (int){ int }) }
+              }
+            }, (#struct){
+              bar: (#struct){
+                min: (int){ |(*(int){ 30 }, (int){ int }) }
+                max: (int){ |(*(int){ 40 }, (int){ int }) }
+              }
+            }) }
+        }
+      }
+    }
+    _#Spec: (#struct){ |(*(#struct){
+        foo: (#struct){
+          min: (int){ |(*(int){ 10 }, (int){ int }) }
+          max: (int){ |(*(int){ 20 }, (int){ int }) }
+        }
+      }, (#struct){
+        bar: (#struct){
+          min: (int){ |(*(int){ 30 }, (int){ int }) }
+          max: (int){ |(*(int){ 40 }, (int){ int }) }
+        }
+      }) }
+    _#SpecFoo: (#struct){
+      foo: (#struct){
+        min: (int){ |(*(int){ 10 }, (int){ int }) }
+        max: (int){ |(*(int){ 20 }, (int){ int }) }
+      }
+    }
+    _#SpecBar: (#struct){
+      bar: (#struct){
+        min: (int){ |(*(int){ 30 }, (int){ int }) }
+        max: (int){ |(*(int){ 40 }, (int){ int }) }
+      }
+    }
+    _Thing: (#struct){
+      spec: (#struct){ |(*(#struct){
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+          minBar?: (null){ null }
+          maxBar?: (null){ null }
+          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          fuga?: (null){ null }
+        }, *(#struct){
+          minFoo?: (null){ null }
+          maxFoo?: (null){ null }
+          minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+          maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          fuga?: (null){ null }
+        }, (#struct){
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+          minBar?: (null){ null }
+          maxBar?: (null){ null }
+          hoge?: (null){ null }
+          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+        }, (#struct){
+          minFoo?: (null){ null }
+          maxFoo?: (null){ null }
+          minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+          maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+          hoge?: (null){ null }
+          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+        }) }
+      _X: (_){ _ }
+    }
+    #Constrained: (#struct){
+      spec: (#struct){ |(*(#struct){
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+          minBar?: (null){ null }
+          maxBar?: (null){ null }
+          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          fuga?: (null){ null }
+        }, *(#struct){
+          minFoo?: (null){ null }
+          maxFoo?: (null){ null }
+          minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+          maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          fuga?: (null){ null }
+        }, (#struct){
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+          minBar?: (null){ null }
+          maxBar?: (null){ null }
+          hoge?: (null){ null }
+          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+        }, (#struct){
+          minFoo?: (null){ null }
+          maxFoo?: (null){ null }
+          minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+          maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+          hoge?: (null){ null }
+          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+        }) }
+    }
+    #Base: (#struct){
+      spec: (#struct){
+        minFoo?: ((null|int)){ |((null){ null }, (int){ int }) }
+        maxFoo?: ((null|int)){ |((null){ null }, (int){ int }) }
+        minBar?: ((null|int)){ |((null){ null }, (int){ int }) }
+        maxBar?: ((null|int)){ |((null){ null }, (int){ int }) }
+        hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+        fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+      }
+    }
+  }
+  reduced: (_|_){
+    // [eval]
+    Foo: (#struct){
+      spec: (#struct){
+        foo: (#struct){
+          min: (int){ |(*(int){ 10 }, (int){ int }) }
+        }
+      }
+      out: (#struct){ |(*(#struct){
+          _Xspec: (#struct){
+            foo: (#struct){
+              min: (int){ |(*(int){ 10 }, (int){ int }) }
+            }
+          }
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          nullFoo: (null){ null }
+        }, (#struct){
+          _Xspec: (#struct){
+            foo: (#struct){
+              min: (int){ |(*(int){ 10 }, (int){ int }) }
+            }
+          }
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          nullBar: (null){ null }
+        }) }
+    }
+    Bar: (_|_){
+      // [eval]
+      spec: (#struct){
+        bar: (#struct){
+          min: (int){ |(*(int){ 20 }, (int){ int }) }
+        }
+      }
+      out: (_|_){
+        // [eval] reduced.Bar.out.minBar: undefined field: min:
+        //     ./input.cue:89:24
+        _Xspec: (#struct){ |(*(#struct){
+            bar: (#struct){
+            }
+            foo: (#struct){
+              min: (int){ |(*(int){ 10 }, (int){ int }) }
+            }
+          }, (#struct){
+            bar: (#struct){
+              min: (int){ |(*(int){ 20 }, (int){ int }) }
+            }
+          }) }
+        minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+        minBar: (_|_){
+          // [eval] reduced.Bar.out.minBar: undefined field: min:
+          //     ./input.cue:89:24
+        }
+      }
+    }
+    #Obj: (#struct){
+      spec: (#struct){ |(*(#struct){
+          foo: (#struct){
+            min: (int){ |(*(int){ 10 }, (int){ int }) }
+          }
+        }, (#struct){
+          bar: (#struct){
+            min: (int){ |(*(int){ 20 }, (int){ int }) }
+          }
+        }) }
+      out: (#struct){ |(*(#struct){
+          _Xspec: (#struct){ |(*(#struct){
+              foo: (#struct){
+                min: (int){ |(*(int){ 10 }, (int){ int }) }
+              }
+            }, (#struct){
+              bar: (#struct){
+                min: (int){ |(*(int){ 20 }, (int){ int }) }
+              }
+            }) }
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          nullFoo: (null){ null }
+        }, (#struct){
+          _Xspec: (#struct){ |(*(#struct){
+              foo: (#struct){
+                min: (int){ |(*(int){ 10 }, (int){ int }) }
+              }
+            }, (#struct){
+              bar: (#struct){
+                min: (int){ |(*(int){ 20 }, (int){ int }) }
+              }
+            }) }
+          minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+          nullBar: (null){ null }
+        }) }
+    }
+    #SpecFoo: (#struct){
+      foo: (#struct){
+        min: (int){ |(*(int){ 10 }, (int){ int }) }
+      }
+    }
+    #SpecBar: (#struct){
+      bar: (#struct){
+        min: (int){ |(*(int){ 20 }, (int){ int }) }
+      }
+    }
+    #Out: (#struct){ |(*(#struct){
+        minFoo: (int){ int }
+        nullFoo: (null){ null }
+      }, *(#struct){
+        minBar: (int){ int }
+        nullFoo: (null){ null }
+      }, (#struct){
+        minFoo: (int){ int }
+        nullBar: (null){ null }
+      }, (#struct){
+        minBar: (int){ int }
+        nullBar: (null){ null }
+      }) }
+  }
+}

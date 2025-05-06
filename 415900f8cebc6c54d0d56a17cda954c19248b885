@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "976bdc4f_fb02bcae",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-05-06T14:23:27Z",
+      "side": 1,
+      "message": "I\u0027ve moved to the same heading formatting as the `cue help registryconfig` command in the latest PS.\n\nPersonally, as a reader, I find that \"double blank line followed by a section header\" formatting to be unhelpful in a couple of ways:\n- it increases the help text\u0027s length, reducing scanablity of the text, as the extra blank line needs to be present to delinate a section heading\n- the section heading *isn\u0027t* delinated usefully; it\u0027s visually very similar to the `Examples:` intros that exist inside sections and aren\u0027t section headings themselves.\n\nI\u0027ll propose a global change elsewhere, outside this CL.",
+      "parentUuid": "769c8516_bb5ddc48",
+      "range": {
+        "startLine": 12,
+        "startChar": 15,
+        "endLine": 13,
+        "endChar": 34
+      },
+      "revId": "415900f8cebc6c54d0d56a17cda954c19248b885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9b135891_8b7716e2",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-06-24T09:45:12Z",
       "side": 1,
       "message": "do we have an issue to track figuring out the -p flag and documenting it? that would be my only request to safely drop the current documentation - otherwise we\u0027ll likely forget about the flag over time.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 28
+      },
+      "revId": "415900f8cebc6c54d0d56a17cda954c19248b885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9de7996a_ec8023a3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-05-06T14:23:27Z",
+      "side": 1,
+      "message": "A more recent `cue export` change updated the flag so that it specifies the output package when CUE is emitted. It only works for CUE packages, not for files, which is tracked in cue-lang/cue#3671.\n\nI\u0027ve opened cue-lang/cue#3914 which I suspect will require the flag\u0027s description to be updated.",
+      "parentUuid": "9b135891_8b7716e2",
       "range": {
         "startLine": 15,
         "startChar": 0,
@@ -64,6 +112,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c559641e_1c193c36",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-05-06T14:23:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "822c0037_4d4aec7e",
+      "revId": "415900f8cebc6c54d0d56a17cda954c19248b885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af931e7b_36186a50",
@@ -77,6 +143,24 @@
       "writtenOn": "2024-08-06T10:14:31Z",
       "side": 1,
       "message": "```suggestion\n    \"yaml\":   output as YAML   (can encode any value)\n    \"toml\":   output as TOML   (can encode any value)\n```\nNow, the \"export\" cmd also includes toml support. Should we update the help text to reflect this addition?",
+      "revId": "415900f8cebc6c54d0d56a17cda954c19248b885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd6430ef_5589fe51",
+        "filename": "cmd/cue/cmd/export.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-05-06T14:23:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af931e7b_36186a50",
       "revId": "415900f8cebc6c54d0d56a17cda954c19248b885",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

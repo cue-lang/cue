@@ -77,6 +77,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "46141b01_793fcec9",
+        "filename": "cmd/cue/cmd/vet.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-05-06T12:20:28Z",
+      "side": 1,
+      "message": "I\u0027ve started with this and updated it somewhat - PTAL.",
+      "parentUuid": "46a2d8af_e99edc1f",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 2
+      },
+      "revId": "40756119be55484fa0052071ee852161bcaeaac3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a60c1ed1_41772616",
         "filename": "cmd/cue/cmd/vet.go",
         "patchSetId": 1
@@ -88,6 +112,30 @@
       "writtenOn": "2025-02-19T11:27:58Z",
       "side": 1,
       "message": "FWIW, I don\u0027t think these sorts of compound phrases translate well. We should be able to explain things in plainer language.",
+      "range": {
+        "startLine": 29,
+        "startChar": 32,
+        "endLine": 29,
+        "endChar": 52
+      },
+      "revId": "40756119be55484fa0052071ee852161bcaeaac3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc55dbac_4dd988a9",
+        "filename": "cmd/cue/cmd/vet.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-05-06T12:20:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a60c1ed1_41772616",
       "range": {
         "startLine": 29,
         "startChar": 32,
@@ -111,6 +159,24 @@
       "writtenOn": "2025-02-19T11:27:58Z",
       "side": 1,
       "message": "Rather than refer the person to the text above, just tell them about `-c\u003dfalse` inline?\n\n```\nrequire the evaluation to be concrete, or set -c\u003dfalse to allow incomplete values\n```",
+      "revId": "40756119be55484fa0052071ee852161bcaeaac3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7edbf961_af084d10",
+        "filename": "cmd/cue/cmd/vet.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-05-06T12:20:28Z",
+      "side": 1,
+      "message": "Done. I\u0027m personally not a fan of when (any) commands\u0027 argument \"tables\" force a line-wrap on 80 character terminals, but `cue help vet`\u0027s table already suffers from this on several params.",
+      "parentUuid": "2b388e3a_cbab3400",
       "revId": "40756119be55484fa0052071ee852161bcaeaac3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

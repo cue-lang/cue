@@ -30,13 +30,17 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 )
 
-// A Context is used for creating CUE [Value]s.
+// A Context is used for creating CUE [Value] objects.
 //
 // A Context keeps track of loaded instances, indices of internal
 // representations of values, and defines the set of supported builtins. Any
 // operation that involves two Values should originate from the same Context.
 //
 // Use [cuelang.org/go/cue/cuecontext.New] to create a new context.
+//
+// Note that a context may grow in size as more values are created or loaded.
+// If memory usage becomes a problem, consider avoiding long-lived contexts,
+// such as using one context per task or periodically re-creating the context.
 type Context runtime.Runtime
 
 func (c *Context) runtime() *runtime.Runtime {

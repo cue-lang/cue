@@ -1948,7 +1948,7 @@ func Schema() Option {
 
 // Concrete ensures that all values are concrete.
 //
-// For [Validate] this means it returns an error if this is not the case.
+// For [Value.Validate] this means it returns an error if this is not the case.
 // In other cases a non-concrete value will be replaced with an error.
 func Concrete(concrete bool) Option {
 	return func(p *options) {

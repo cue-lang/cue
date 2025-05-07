@@ -49,8 +49,6 @@ func TestEvalV2(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root: "../../../cue/testdata",
 		Name: "eval",
-		Skip: alwaysSkip,
-		ToDo: needFix,
 	}
 
 	cuedebug.Init()
@@ -65,15 +63,6 @@ func TestEvalV2(t *testing.T) {
 	})
 }
 
-var alwaysSkip = map[string]string{
-	"compile/erralias": "compile error",
-}
-
-var needFix = map[string]string{
-	"DIR/NAME":       "reason",
-	"cycle/patterns": "cycle detection in v2",
-}
-
 func TestEvalV3(t *testing.T) {
 	// TODO: remove use of externalDeps for processing. Currently, enabling
 	// this would fix some issues, but also introduce some closedness bugs.
@@ -86,14 +75,10 @@ func TestEvalV3(t *testing.T) {
 	cuedebug.Init()
 	flags := cuedebug.Flags
 
-	var todoAlpha = map[string]string{}
-
 	test := cuetxtar.TxTarTest{
 		Root:     "../../../cue/testdata",
 		Name:     "evalalpha",
 		Fallback: "eval", // Allow eval golden files to pass these tests.
-		Skip:     alwaysSkip,
-		ToDo:     todoAlpha,
 	}
 
 	if *todo {
@@ -112,8 +97,8 @@ func TestEvalV3(t *testing.T) {
 		errorCount += runEvalTest(t, internal.EvalV3, flags)
 	})
 
-	t.Logf("todo: %d, ran: %d, skipped: %d, nodeErrors: %d",
-		len(todoAlpha), ran, skipped, errorCount)
+	t.Logf("ran: %d, skipped: %d, nodeErrors: %d",
+		ran, skipped, errorCount)
 }
 
 // skipFiles returns true if the given files contain CUE that is not yet handled

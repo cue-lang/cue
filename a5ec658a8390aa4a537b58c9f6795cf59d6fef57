@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a438dd8c_c42ea3ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-05-07T11:22:12Z",
+      "side": 1,
+      "message": "Please submit at your convenience - I don\u0027t have privs in this repo.",
+      "revId": "a5ec658a8390aa4a537b58c9f6795cf59d6fef57",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

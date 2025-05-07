@@ -99,6 +99,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e986226_975017c9",
+        "filename": "cmd/cue/cmd/vet.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-05-07T11:22:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46141b01_793fcec9",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 2
+      },
+      "revId": "40756119be55484fa0052071ee852161bcaeaac3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a60c1ed1_41772616",

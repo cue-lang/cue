@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "449a355e_50a5dd04",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-07T09:41:27Z",
+      "side": 1,
+      "message": "Seems kinda reasonable, but I think there\u0027s a cleaner solution available here, as suggested.",
+      "revId": "dae61d84e365ef9d1cc6edbcd6699c81e9f572de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c8cbb31_e08e55f1",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 479,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-07T09:41:27Z",
+      "side": 1,
+      "message": "goparts.ParseExpr doesn\u0027t return a map: what does the returned map here hold?",
+      "revId": "dae61d84e365ef9d1cc6edbcd6699c81e9f572de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "996cb051_0aff708f",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-07T09:41:27Z",
+      "side": 1,
+      "message": "This assumes that a package can be uniquely identified by its last component, but that\u0027s not necessarily the case. For example:\n```\n@go(,type\u003dstruct{\n\tA \"go/token\".Token\n\tB \"cuelang.org/go/cue/token\".Token\n})\n```\nI will admit this is probably a rare case, but probably worth a TODO.\n\nAs an alternative, how about avoiding the string manipulation shenanigans entirely and just using `goparser.ParseExpr`, then walking the resulting AST for selector expressions where the LHS is a string? That would seem like a cleaner solution to me.",
+      "revId": "dae61d84e365ef9d1cc6edbcd6699c81e9f572de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -68,10 +68,6 @@ func TestGenerateOpenAPI(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		if t.HasTag("skip-" + t.Name()) {
-			t.Skip()
-		}
-
 		a := t.Instance()
 		ctx := t.CueContext()
 		v := ctx.BuildInstance(a)

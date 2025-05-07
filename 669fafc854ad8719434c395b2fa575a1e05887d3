@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10afd7da_6794fecb",
+        "filename": "internal/filetypes/internal/genstruct/gen.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T12:55:03Z",
+      "side": 1,
+      "message": "which dst?",
+      "range": {
+        "startLine": 12,
+        "startChar": 16,
+        "endLine": 12,
+        "endChar": 19
+      },
+      "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5860a531_d8f10fd9",
+        "filename": "internal/filetypes/internal/genstruct/gen.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T12:55:03Z",
+      "side": 1,
+      "message": "AFAICT this buffer and copy are entirely unnecessary; encoding/binary\u0027s Uint64 reads bytes from the passed byte slice, but it is not modified in any way.",
+      "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f1c9b3c_4c1d9d08",
+        "filename": "internal/filetypes/internal/genstruct/gen.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T12:55:03Z",
+      "side": 1,
+      "message": "join these last two lines?",
+      "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47ea7a46_90f711cc",
+        "filename": "internal/filetypes/internal/genstruct/struct.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T12:55:03Z",
+      "side": 1,
+      "message": "Reuse your own PutUint64 here, from gen.go",
+      "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b35ed74_2f96e82b",
+        "filename": "internal/filetypes/internal/genstruct/struct.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T12:55:03Z",
+      "side": 1,
+      "message": "unused field?",
+      "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

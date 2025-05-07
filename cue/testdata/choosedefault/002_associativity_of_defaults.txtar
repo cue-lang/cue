@@ -12,6 +12,60 @@ s2: *1 | ((*2 | 3) & (*2 | 3))
 s3: *1 | ((*2 | 3) & 3)
 s4: *1 | ((*2 | 3) & 2)
 s5: *1 | *(*2 | 3)
+
+e1: *(1&2) | (*"x" | string)
+e2: (*"x" | string) | *(1&2)
+
+-- complex.cue --
+// add some test cases suggested by an automated prover based on this pattern:
+// 1. ValK = (ValA & ValB_ND) & ValC_D \neq _|_ (the element we track must exist).
+// 2. ValC_D & (ValA & ValB_D) = _|_ (for Path 1 Cond(ValC_D, Disj_AB) to be true).
+// 3. ValC_D & ValB_D \neq _|_ (for Path 2 Cond(ValC_D, Disj_B) to be false).
+
+// Let's define these CUE values. The trick is that ValA must introduce a
+// component that causes ValC_D to conflict with (ValA & ValB_D),
+// but ValC_D must *not* conflict with ValB_D on its own.
+t1: {
+	va:  {a: 1, b: 2}
+	vb1: {c: 3}
+	vb2: {c: 4}
+	vc : {c: 4}
+	vd:  string
+
+	A: va | vd
+	B: *vb1 | vb2 | vd
+	C: *vc | vd
+
+	p1: (A & B) & C
+	p2: A & (B & C)
+}
+t2: {
+	va:  0 | 1 | 2
+	vb1: 2 | 3
+	vb2: 0 | 1 | 4
+	vc:  0 | 3 | 4
+	vd:  string
+
+	A: va | vd
+	B: *vb1 | vb2 | vd
+	C: *vc | vd
+
+	p1: (A & B) & C
+	p2: A & (B & C)
+}
+-- issue3908.cue --
+issue3908: reduced: p1: {
+	string | *null
+	string | *"str"
+}
+issue3908: reduced: p2: {
+	string | *"str"
+	string | *null
+}
+issue3908: full: {
+	out: #Schema & { field: string | *"dataDefault" }
+	#Schema: field: string | *null
+}
 -- out/def --
 x: a & b
 y: b & c
@@ -21,6 +75,42 @@ c: *"a" | *"b" | "c"
 -- out/legacy-debug --
 <0>{x: "a", y: (*"a" | *"b"), a: "a", b: "a", c: (*"a" | *"b")}
 -- out/compile --
+--- complex.cue
+{
+  t1: {
+    va: {
+      a: 1
+      b: 2
+    }
+    vb1: {
+      c: 3
+    }
+    vb2: {
+      c: 4
+    }
+    vc: {
+      c: 4
+    }
+    vd: string
+    A: (〈0;va〉|〈0;vd〉)
+    B: (*〈0;vb1〉|〈0;vb2〉|〈0;vd〉)
+    C: (*〈0;vc〉|〈0;vd〉)
+    p1: ((〈0;A〉 & 〈0;B〉) & 〈0;C〉)
+    p2: (〈0;A〉 & (〈0;B〉 & 〈0;C〉))
+  }
+  t2: {
+    va: (0|1|2)
+    vb1: (2|3)
+    vb2: (0|1|4)
+    vc: (0|3|4)
+    vd: string
+    A: (〈0;va〉|〈0;vd〉)
+    B: (*〈0;vb1〉|〈0;vb2〉|〈0;vd〉)
+    C: (*〈0;vc〉|〈0;vd〉)
+    p1: ((〈0;A〉 & 〈0;B〉) & 〈0;C〉)
+    p2: (〈0;A〉 & (〈0;B〉 & 〈0;C〉))
+  }
+}
 --- in.cue
 {
   a: (*"a"|("b"|"c"))
@@ -33,19 +123,100 @@ c: *"a" | *"b" | "c"
   s3: (*1|((*2|3) & 3))
   s4: (*1|((*2|3) & 2))
   s5: (*1|*(*2|3))
+  e1: (*(1 & 2)|(*"x"|string))
+  e2: ((*"x"|string)|*(1 & 2))
+}
+--- issue3908.cue
+{
+  issue3908: {
+    reduced: {
+      p1: {
+        (string|*null)
+        (string|*"str")
+      }
+    }
+  }
+  issue3908: {
+    reduced: {
+      p2: {
+        (string|*"str")
+        (string|*null)
+      }
+    }
+  }
+  issue3908: {
+    full: {
+      out: (〈0;#Schema〉 & {
+        field: (string|*"dataDefault")
+      })
+      #Schema: {
+        field: (string|*null)
+      }
+    }
+  }
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  83
-Reused: 74
-Allocs: 9
-Retain: 0
+Freed:  382
+Reused: 370
+Allocs: 12
+Retain: 1
 
-Unifications: 11
-Conjuncts:    93
-Disjuncts:    83
+Unifications: 104
+Conjuncts:    516
+Disjuncts:    383
 -- out/eval --
 (struct){
+  t1: (struct){
+    va: (struct){
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }
+    vb1: (struct){
+      c: (int){ 3 }
+    }
+    vb2: (struct){
+      c: (int){ 4 }
+    }
+    vc: (struct){
+      c: (int){ 4 }
+    }
+    vd: (string){ string }
+    A: ((string|struct)){ |((struct){
+        a: (int){ 1 }
+        b: (int){ 2 }
+      }, (string){ string }) }
+    B: ((string|struct)){ |(*(struct){
+        c: (int){ 3 }
+      }, (struct){
+        c: (int){ 4 }
+      }, (string){ string }) }
+    C: ((string|struct)){ |(*(struct){
+        c: (int){ 4 }
+      }, (string){ string }) }
+    p1: ((string|struct)){ |(*(struct){
+        a: (int){ 1 }
+        b: (int){ 2 }
+        c: (int){ 4 }
+      }, (string){ string }) }
+    p2: ((string|struct)){ |(*(struct){
+        a: (int){ 1 }
+        b: (int){ 2 }
+        c: (int){ 4 }
+      }, (string){ string }) }
+  }
+  t2: (struct){
+    va: (int){ |((int){ 0 }, (int){ 1 }, (int){ 2 }) }
+    vb1: (int){ |((int){ 2 }, (int){ 3 }) }
+    vb2: (int){ |((int){ 0 }, (int){ 1 }, (int){ 4 }) }
+    vc: (int){ |((int){ 0 }, (int){ 3 }, (int){ 4 }) }
+    vd: (string){ string }
+    A: ((int|string)){ |((int){ 0 }, (int){ 1 }, (int){ 2 }, (string){ string }) }
+    B: ((int|string)){ |(*(int){ 2 }, *(int){ 3 }, (int){ 0 }, (int){ 1 }, (int){ 4 }, (string){ string }) }
+    C: ((int|string)){ |(*(int){ 0 }, *(int){ 3 }, *(int){ 4 }, (string){ string }) }
+    p1: ((int|string)){ |(*(int){ 0 }, (string){ string }) }
+    p2: ((int|string)){ |(*(int){ 0 }, (string){ string }) }
+  }
   a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
   b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
   c: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
@@ -56,4 +227,20 @@ Disjuncts:    83
   s3: (int){ |(*(int){ 1 }, (int){ 3 }) }
   s4: (int){ |(*(int){ 1 }, (int){ 2 }) }
   s5: (int){ |(*(int){ 1 }, *(int){ 2 }, (int){ 3 }) }
+  e1: (string){ |((string){ "x" }, (string){ string }) }
+  e2: (string){ |((string){ "x" }, (string){ string }) }
+  issue3908: (struct){
+    reduced: (struct){
+      p1: (string){ |(*(string){ "str" }, (string){ string }) }
+      p2: (string){ |(*(string){ "str" }, (string){ string }) }
+    }
+    full: (struct){
+      out: (#struct){
+        field: (string){ |(*(string){ "dataDefault" }, (string){ string }) }
+      }
+      #Schema: (#struct){
+        field: ((null|string)){ |(*(null){ null }, (string){ string }) }
+      }
+    }
+  }
 }

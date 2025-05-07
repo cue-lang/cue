@@ -379,6 +379,13 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 	defer n.unmarkDepth(n.markDepth())
 	defer n.unmarkOptional(n.markOptional())
 
+	// TODO(perf): use a pre-allocated buffer in n.ctx. Note that the actual
+	// buffer may grow and has a max size of len(cross) * len(dn.disjuncts).
+	tmp := make([]*nodeContext, 0, len(cross))
+
+	leftHasDefault := false
+	rightHasDefault := false
+
 	for i, p := range cross {
 		ID := n.nextCrossProduct(i, len(cross), p)
 
@@ -398,23 +405,51 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 				continue
 			}
 
-			// Unroll nested disjunctions.
-			switch len(r.disjuncts) {
-			case 0:
-				// r did not have a nested disjunction.
-				dst = appendDisjunct(n.ctx, dst, r)
-
-			case 1:
-				panic("unexpected number of disjuncts")
-
-			default:
-				for _, x := range r.disjuncts {
-					dst = appendDisjunct(n.ctx, dst, x)
-				}
+			tmp = append(tmp, r)
+			if p.defaultMode == isDefault {
+				leftHasDefault = true
+			}
+			if d.mode == isDefault {
+				rightHasDefault = true
 			}
 		}
 	}
+
+	for _, r := range tmp {
+		// Unroll nested disjunctions.
+		switch len(r.disjuncts) {
+		case 0:
+			r.defaultMode = combineDefault2(r.defaultMode, r.origDefaultMode, leftHasDefault, rightHasDefault)
+			// r did not have a nested disjunction.
+			dst = appendDisjunct(n.ctx, dst, r)
+
+		case 1:
+			panic("unexpected number of disjuncts")
+
+		default:
+			for _, x := range r.disjuncts {
+				m := combineDefault(r.origDefaultMode, x.defaultMode)
+
+				// TODO(defaults): using rightHasDefault instead of true here is
+				// not according to the spec, but may result in better user
+				// ergononmics. See Issue #1304.
+				x.defaultMode = combineDefault2(r.defaultMode, m, leftHasDefault, true)
+				dst = appendDisjunct(n.ctx, dst, x)
+			}
+		}
+	}
+
 	return dst
+}
+
+func combineDefault2(a, b defaultMode, hasDefaultA, hasDefaultB bool) defaultMode {
+	if !hasDefaultA {
+		a = maybeDefault
+	}
+	if !hasDefaultB {
+		b = maybeDefault
+	}
+	return combineDefault(a, b)
 }
 
 // collectErrors collects errors from a failed disjunctions.
@@ -464,8 +499,6 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 	d.runMode = mode
 	c.Env = oc.derefDisjunctsEnv(c.Env)
 
-	d.defaultMode = combineDefault(m, n.defaultMode)
-
 	v := d.node
 
 	defer n.setBaseValue(n.swapBaseValue(v))
@@ -486,6 +519,9 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 	n.ctx.blocking = nil
 	defer func() { n.ctx.blocking = saved }()
 
+	d.defaultMode = n.defaultMode
+	d.origDefaultMode = m
+
 	v.unify(n.ctx, allKnown, mode, true)
 
 	if err := d.getErrorAll(); err != nil && !isCyclePlaceholder(err) {
@@ -493,7 +529,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 		return nil, err
 	}
 
-	d.node.DerefDisjunct().state.defaultMode = d.defaultMode
+	d.node.DerefDisjunct().state.origDefaultMode = d.origDefaultMode
 	d = d.node.DerefDisjunct().state // TODO: maybe do not unroll at all.
 
 	return d, nil

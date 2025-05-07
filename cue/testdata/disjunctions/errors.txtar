@@ -206,11 +206,11 @@ Result:
   }
   issue2916: (struct){
     b: (struct){
-      c: (int){ |((int){ &(>=3, int) }, (int){ 3 }) }
+      c: (int){ |(*(int){ 3 }, (int){ &(>=3, int) }) }
     }
   }
   issue3157: (struct){
-    foo: ((bool|int)){ |((int){ 43 }, (bool){ bool }) }
+    foo: ((bool|int)){ |(*(int){ 43 }, (bool){ bool }) }
   }
   issue3576: (struct){
     reduced: (struct){
@@ -411,20 +411,6 @@ diff old new
          metrics: (struct){
            foo: (struct){
            }
-@@ -86,11 +70,11 @@
-   }
-   issue2916: (struct){
-     b: (struct){
--      c: (int){ |(*(int){ 3 }, (int){ &(>=3, int) }) }
-+      c: (int){ |((int){ &(>=3, int) }, (int){ 3 }) }
-     }
-   }
-   issue3157: (struct){
--    foo: ((bool|int)){ |(*(int){ 43 }, (bool){ bool }) }
-+    foo: ((bool|int)){ |((int){ 43 }, (bool){ bool }) }
-   }
-   issue3576: (struct){
-     reduced: (struct){
 @@ -136,13 +120,11 @@
      reduced: (struct){
        list: (_|_){
@@ -488,7 +474,6 @@ Missing error positions.
 The additional "field not allowed" error is correct and a message corresponding
 to one of the conjuncts failing.
 issue516.x.match: changes are okay and arguably better.
-issue2916 and issue3157: the old evaluator incorrectly kept a default in the output.
 -- out/eval --
 Errors:
 issue516.x: 2 errors in empty disjunction:

@@ -1172,8 +1172,9 @@ type nodeContextState struct {
 	origBaseValue    BaseValue  // the BaseValue that structure sharing replaces
 	shareDecremented bool       // counters of sharedIDs have been decremented
 
-	depth       int32
-	defaultMode defaultMode
+	depth           int32
+	defaultMode     defaultMode // cumulative default mode
+	origDefaultMode defaultMode // default mode of the original disjunct
 
 	// has a value filled out before the node splits into a disjunction. Aside
 	// from detecting a self-reference cycle when there is otherwise just an

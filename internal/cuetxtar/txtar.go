@@ -98,6 +98,7 @@ type TxTarTest struct {
 // A txtar file can define test-specific tags and values in the comment section.
 // These are available via the [Test.HasTag] and [Test.Value] methods.
 // The #skip tag causes a [Test] to be skipped.
+// When running via [cuetdtest.Matrix], #skip-[cuetdtest.M.Name] tags can also be used.
 // The #noformat tag causes the $CUE_FORMAT_TXTAR value
 // to be ignored.
 //
@@ -459,7 +460,16 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			if tc.HasTag("skip") {
 				t.Skip()
 			}
-
+			if tc.M != nil {
+				// When running via [cuetdtest.Matrix], support e.g. #skip-v2.
+				if tc.HasTag("skip-" + tc.Name()) {
+					t.Skip()
+				}
+			} else if tc.HasTag("skip-v2") && strings.Contains(t.Name(), "EvalV2") {
+				// Temporary hack since internal/core/adt uses TestEvalV2 rather than [cuetdtest.Matrix].
+				// TODO(mvdan): clean this up.
+				t.Skip()
+			}
 			if msg, ok := x.Skip[testName]; ok {
 				t.Skip(msg)
 			}

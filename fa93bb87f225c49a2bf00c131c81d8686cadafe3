@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54b37497_0a37326a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T08:48:50Z",
+      "side": 1,
+      "message": "The text isn\u0027t super intuitive, but that\u0027s just a result of us having a tri-state boolean flag, which is very odd.",
+      "revId": "fa93bb87f225c49a2bf00c131c81d8686cadafe3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd331001_30fb4343",
+        "filename": "cmd/cue/cmd/vet.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T08:48:50Z",
+      "side": 1,
+      "message": "\"skip this step and\"\n\nIMHO easier to comprehend that way, as -c\u003dfalse basically skips this concreteness check entirely.",
+      "range": {
+        "startLine": 37,
+        "startChar": 20,
+        "endLine": 37,
+        "endChar": 48
+      },
+      "revId": "fa93bb87f225c49a2bf00c131c81d8686cadafe3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+# Unknown and redeclared imports should be reported for anonymous packages too.
+
+# TODO: we should not use absolute paths in reported errors, which requires using 'cmpenv' below
+
+! exec cue export named.cue
+cmpenv stderr named.stderr
+
+# TODO: this should report "redeclared as imported package" too; see https://cuelang.org/issue/1850
+! exec cue export missing.cue
+cmpenv stderr missing.stderr
+
+-- named.cue --
+package p
+
+import "notinstd"
+import "list"
+
+list: 123
+-- named.stderr --
+builtin package "notinstd" undefined:
+    ./named.cue:3:8
+list redeclared as imported package name
+	previous declaration at ${WORK}${/}named.cue:6:1:
+    ./named.cue:4:8
+-- missing.cue --
+import "notinstd"
+import "list"
+
+list: 123
+-- missing.stderr --
+builtin package "notinstd" undefined:
+    ./missing.cue:1:8

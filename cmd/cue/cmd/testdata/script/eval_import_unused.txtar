@@ -1,0 +1,49 @@
+# Unused imports should be reported no matter whether a package clause exists
+# or what kind of import is unused.
+
+! exec cue export named.cue
+cmp stderr named.stderr
+
+! exec cue export renamed.cue
+cmp stderr renamed.stderr
+
+# TODO: these should fail; see https://cuelang.org/issue/1850
+
+exec cue export missing.cue
+# ! exec cue export missing.cue
+# cmp stderr missing.stderr
+
+exec cue export underscore.cue
+# ! exec cue export underscore.cue
+# cmp stderr underscore.stderr
+
+-- named.cue --
+package p
+
+import "list"
+
+out: 123
+-- named.stderr --
+imported and not used: "list":
+    ./named.cue:3:8
+-- renamed.cue --
+package p
+
+import x "list"
+
+out: 123
+-- renamed.stderr --
+imported and not used: "list" as x:
+    ./renamed.cue:3:8
+-- missing.cue --
+import "list"
+
+out: 123
+-- missing.stderr --
+-- underscore.cue --
+package _
+
+import "list"
+
+out: 123
+-- underscore.stderr --

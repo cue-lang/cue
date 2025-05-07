@@ -672,6 +672,27 @@ issue3601: reduced: {
 	}
 }
 
+// All three reproducers below should fail with "field not allowed".
+issue1867: one: {
+	#T: close({})
+	#T: {...}
+	x: #T
+	x: foo: "foo"
+}
+issue1867: two: {
+	#S: {}
+	#T: s: #S
+	#T: s: {...}
+	x: #T.s
+	x: foo: "foo"
+}
+// This third version used to not fail as expected on evalv2.
+issue1867: three: {
+	#T: s: close({})
+	#T: s: {...}
+	x: #T.s
+	x: foo: "foo"
+}
 -- validation.cue --
 import "list"
 
@@ -683,54 +704,54 @@ issue3332: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  907
+Leaks:  931
 Freed:  0
 Reused: 0
-Allocs: 907
+Allocs: 931
 Retain: 0
 
-Unifications: 885
-Conjuncts:    1935
+Unifications: 909
+Conjuncts:    1981
 Disjuncts:    2
 
-CloseIDElems: 4693
-NumCloseIDs: 660
+CloseIDElems: 4705
+NumCloseIDs: 669
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
--Leaks:  14
--Freed:  765
--Reused: 757
--Allocs: 22
--Retain: 79
+-Leaks:  18
+-Freed:  781
+-Reused: 776
+-Allocs: 23
+-Retain: 83
 -
--Unifications: 773
--Conjuncts:    1965
--Disjuncts:    845
-+Leaks:  907
+-Unifications: 793
+-Conjuncts:    2010
+-Disjuncts:    865
++Leaks:  931
 +Freed:  0
 +Reused: 0
-+Allocs: 907
++Allocs: 931
 +Retain: 0
 +
-+Unifications: 885
-+Conjuncts:    1935
++Unifications: 909
++Conjuncts:    1981
 +Disjuncts:    2
 +
-+CloseIDElems: 4693
-+NumCloseIDs: 660
++CloseIDElems: 4705
++NumCloseIDs: 669
 -- out/eval/stats --
-Leaks:  14
-Freed:  765
-Reused: 757
-Allocs: 22
-Retain: 79
+Leaks:  18
+Freed:  781
+Reused: 776
+Allocs: 23
+Retain: 83
 
-Unifications: 773
-Conjuncts:    1965
-Disjuncts:    845
+Unifications: 793
+Conjuncts:    2010
+Disjuncts:    865
 -- out/eval --
 Errors:
 a.q.e: field not allowed:
@@ -747,6 +768,22 @@ indirect.closed.err1.Y.a.e: field not allowed:
     ./reroot.cue:79:7
     ./reroot.cue:80:7
     ./reroot.cue:82:7
+issue1867.one.x.foo: field not allowed:
+    ./reroot.cue:234:12
+    ./reroot.cue:235:7
+    ./reroot.cue:236:5
+    ./reroot.cue:237:5
+issue1867.three.x.foo: field not allowed:
+    ./reroot.cue:247:15
+    ./reroot.cue:248:10
+    ./reroot.cue:249:5
+    ./reroot.cue:250:5
+issue1867.two.x.foo: field not allowed:
+    ./reroot.cue:240:6
+    ./reroot.cue:241:9
+    ./reroot.cue:242:10
+    ./reroot.cue:243:5
+    ./reroot.cue:244:5
 issue3778.full.z.b: field not allowed:
     ./ellipsis.cue:2:6
     ./ellipsis.cue:3:6
@@ -2731,6 +2768,61 @@ Result:
       }
     }
   }
+  issue1867: (_|_){
+    // [eval]
+    one: (_|_){
+      // [eval]
+      #T: (#struct){
+      }
+      x: (_|_){
+        // [eval]
+        foo: (_|_){
+          // [eval] issue1867.one.x.foo: field not allowed:
+          //     ./reroot.cue:234:12
+          //     ./reroot.cue:235:7
+          //     ./reroot.cue:236:5
+          //     ./reroot.cue:237:5
+        }
+      }
+    }
+    two: (_|_){
+      // [eval]
+      #S: (#struct){
+      }
+      #T: (#struct){
+        s: (#struct){
+        }
+      }
+      x: (_|_){
+        // [eval]
+        foo: (_|_){
+          // [eval] issue1867.two.x.foo: field not allowed:
+          //     ./reroot.cue:240:6
+          //     ./reroot.cue:241:9
+          //     ./reroot.cue:242:10
+          //     ./reroot.cue:243:5
+          //     ./reroot.cue:244:5
+        }
+      }
+    }
+    three: (_|_){
+      // [eval]
+      #T: (#struct){
+        s: (#struct){
+        }
+      }
+      x: (_|_){
+        // [eval]
+        foo: (_|_){
+          // [eval] issue1867.three.x.foo: field not allowed:
+          //     ./reroot.cue:247:15
+          //     ./reroot.cue:248:10
+          //     ./reroot.cue:249:5
+          //     ./reroot.cue:250:5
+        }
+      }
+    }
+  }
   issue3332: (struct){
     #def: (#struct){
       field: (list){ list.MinItems(1) }
@@ -2748,6 +2840,12 @@ a.q.e: field not allowed:
     ./in.cue:15:3
 indirect.closed.err1.Y.a.e: field not allowed:
     ./reroot.cue:75:7
+issue1867.one.x.foo: field not allowed:
+    ./reroot.cue:237:5
+issue1867.three.x.foo: field not allowed:
+    ./reroot.cue:250:5
+issue1867.two.x.foo: field not allowed:
+    ./reroot.cue:244:5
 issue3778.full.z.b: field not allowed:
     ./ellipsis.cue:6:3
 issue852.a.Foo: field not allowed:
@@ -4158,6 +4256,51 @@ Result:
       }
     }
   }
+  issue1867: (_|_){
+    // [eval]
+    one: (_|_){
+      // [eval]
+      #T: (#struct){
+      }
+      x: (_|_){
+        // [eval]
+        foo: (_|_){
+          // [eval] issue1867.one.x.foo: field not allowed:
+          //     ./reroot.cue:237:5
+        }
+      }
+    }
+    two: (_|_){
+      // [eval]
+      #S: (#struct){
+      }
+      #T: (#struct){
+        s: (#struct){
+        }
+      }
+      x: (_|_){
+        // [eval]
+        foo: (_|_){
+          // [eval] issue1867.two.x.foo: field not allowed:
+          //     ./reroot.cue:244:5
+        }
+      }
+    }
+    three: (_|_){
+      // [eval]
+      #T: (#struct){
+        s: (#struct){
+        }
+      }
+      x: (_|_){
+        // [eval]
+        foo: (_|_){
+          // [eval] issue1867.three.x.foo: field not allowed:
+          //     ./reroot.cue:250:5
+        }
+      }
+    }
+  }
   issue3332: (struct){
     #def: (#struct){
       field: (list){ list.MinItems(1) }
@@ -4173,7 +4316,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,315 +1,81 @@
+@@ -1,331 +1,87 @@
  Errors:
  a.q.e: field not allowed:
 -    ./in.cue:1:5
@@ -4189,6 +4332,22 @@ diff old new
 -    ./reroot.cue:79:7
 -    ./reroot.cue:80:7
 -    ./reroot.cue:82:7
+ issue1867.one.x.foo: field not allowed:
+-    ./reroot.cue:234:12
+-    ./reroot.cue:235:7
+-    ./reroot.cue:236:5
+     ./reroot.cue:237:5
+ issue1867.three.x.foo: field not allowed:
+-    ./reroot.cue:247:15
+-    ./reroot.cue:248:10
+-    ./reroot.cue:249:5
+     ./reroot.cue:250:5
+ issue1867.two.x.foo: field not allowed:
+-    ./reroot.cue:240:6
+-    ./reroot.cue:241:9
+-    ./reroot.cue:242:10
+-    ./reroot.cue:243:5
+     ./reroot.cue:244:5
  issue3778.full.z.b: field not allowed:
 -    ./ellipsis.cue:2:6
 -    ./ellipsis.cue:3:6
@@ -4500,7 +4659,7 @@ diff old new
      ./embed.cue:38:8
  
  Result:
-@@ -330,10 +96,6 @@
+@@ -346,10 +102,6 @@
          a: (string){ "ok" }
          b: (_|_){
            // [eval] issue3778.full.z.b: field not allowed:
@@ -4511,7 +4670,7 @@ diff old new
            //     ./ellipsis.cue:6:3
          }
        }
-@@ -362,13 +124,13 @@
+@@ -378,13 +130,13 @@
          }
        }
        #Extended: (#struct){
@@ -4532,7 +4691,7 @@ diff old new
        }
        broken: (#struct){
          name: (string){ "base" }
-@@ -380,13 +142,13 @@
+@@ -396,13 +148,13 @@
          }
        }
        works: (#struct){
@@ -4553,7 +4712,7 @@ diff old new
        }
      }
    }
-@@ -410,9 +172,6 @@
+@@ -426,9 +178,6 @@
            // [eval]
            j: (_|_){
              // [eval] patterns.shallow.single.err.j: field not allowed:
@@ -4563,7 +4722,7 @@ diff old new
              //     ./embed.cue:38:8
            }
          }
-@@ -430,11 +189,7 @@
+@@ -446,11 +195,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.and.p1.err.j: field not allowed:
@@ -4576,7 +4735,7 @@ diff old new
                //     ./embed.cue:48:8
              }
            }
-@@ -450,11 +205,7 @@
+@@ -466,11 +211,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.and.p2.err.j: field not allowed:
@@ -4589,7 +4748,7 @@ diff old new
                //     ./embed.cue:57:8
              }
            }
-@@ -473,12 +224,7 @@
+@@ -489,12 +230,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.andEmbed.p1.err.j: field not allowed:
@@ -4603,7 +4762,7 @@ diff old new
                //     ./embed.cue:67:8
              }
            }
-@@ -494,12 +240,7 @@
+@@ -510,12 +246,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.andEmbed.p2.err.j: field not allowed:
@@ -4617,7 +4776,7 @@ diff old new
                //     ./embed.cue:76:8
              }
            }
-@@ -530,81 +271,34 @@
+@@ -546,81 +277,34 @@
            }
          }
        }
@@ -4727,7 +4886,7 @@ diff old new
            }
            ok1: (#struct){
              k: (int){ 3 }
-@@ -628,10 +322,6 @@
+@@ -644,10 +328,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p1.err1.j: field not allowed:
@@ -4738,7 +4897,7 @@ diff old new
                //     ./embed.cue:152:10
              }
            }
-@@ -639,10 +329,6 @@
+@@ -655,10 +335,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p1.err2.j: field not allowed:
@@ -4749,7 +4908,7 @@ diff old new
                //     ./embed.cue:155:10
              }
            }
-@@ -660,10 +346,6 @@
+@@ -676,10 +352,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p2.err1.j: field not allowed:
@@ -4760,7 +4919,7 @@ diff old new
                //     ./embed.cue:166:10
              }
            }
-@@ -671,10 +353,6 @@
+@@ -687,10 +359,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p2.err2.j: field not allowed:
@@ -4771,7 +4930,7 @@ diff old new
                //     ./embed.cue:169:10
              }
            }
-@@ -690,10 +368,6 @@
+@@ -706,10 +374,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p3.err1.j: field not allowed:
@@ -4782,7 +4941,7 @@ diff old new
                //     ./embed.cue:179:10
              }
            }
-@@ -701,10 +375,6 @@
+@@ -717,10 +381,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p3.err2.j: field not allowed:
@@ -4793,7 +4952,7 @@ diff old new
                //     ./embed.cue:182:10
              }
            }
-@@ -722,10 +392,6 @@
+@@ -738,10 +398,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p4.err1.j: field not allowed:
@@ -4804,7 +4963,7 @@ diff old new
                //     ./embed.cue:194:10
              }
            }
-@@ -733,10 +399,6 @@
+@@ -749,10 +405,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p4.err2.j: field not allowed:
@@ -4815,7 +4974,7 @@ diff old new
                //     ./embed.cue:197:10
              }
            }
-@@ -774,12 +436,7 @@
+@@ -790,12 +442,7 @@
        }
        single: (_|_){
          // [eval]
@@ -4829,7 +4988,7 @@ diff old new
          err: (_|_){
            // [eval]
            x: (_|_){
-@@ -788,9 +445,6 @@
+@@ -804,9 +451,6 @@
                // [eval]
                j: (_|_){
                  // [eval] patterns.nested.single.err.x.y.j: field not allowed:
@@ -4839,7 +4998,7 @@ diff old new
                  //     ./embed.cue:214:14
                }
              }
-@@ -822,11 +476,7 @@
+@@ -838,11 +482,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.and.p1.err.x.y.j: field not allowed:
@@ -4852,7 +5011,7 @@ diff old new
                    //     ./embed.cue:224:14
                  }
                }
-@@ -856,11 +506,7 @@
+@@ -872,11 +512,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.and.p2.err.x.y.j: field not allowed:
@@ -4865,7 +5024,7 @@ diff old new
                    //     ./embed.cue:233:14
                  }
                }
-@@ -893,11 +539,7 @@
+@@ -909,11 +545,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
@@ -4878,7 +5037,7 @@ diff old new
                    //     ./embed.cue:243:14
                  }
                }
-@@ -927,11 +569,7 @@
+@@ -943,11 +575,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.andEmbed.p2.err.x.y.j: field not allowed:
@@ -4891,7 +5050,7 @@ diff old new
                    //     ./embed.cue:252:14
                  }
                }
-@@ -992,143 +630,78 @@
+@@ -1008,143 +636,78 @@
            }
          }
        }
@@ -5107,7 +5266,7 @@ diff old new
                }
              }
            }
-@@ -1150,12 +723,7 @@
+@@ -1166,12 +729,7 @@
          }
          p1: (_|_){
            // [eval]
@@ -5121,7 +5280,7 @@ diff old new
            err1: (_|_){
              // [eval]
              x: (_|_){
-@@ -1164,10 +732,6 @@
+@@ -1180,10 +738,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p1.err1.x.y.j: field not allowed:
@@ -5132,7 +5291,7 @@ diff old new
                    //     ./embed.cue:328:16
                  }
                }
-@@ -1181,10 +745,6 @@
+@@ -1197,10 +751,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p1.err2.x.y.j: field not allowed:
@@ -5143,7 +5302,7 @@ diff old new
                    //     ./embed.cue:331:16
                  }
                }
-@@ -1206,12 +766,7 @@
+@@ -1222,12 +772,7 @@
                }
              }
            }
@@ -5157,7 +5316,7 @@ diff old new
            err1: (_|_){
              // [eval]
              x: (_|_){
-@@ -1220,10 +775,6 @@
+@@ -1236,10 +781,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p2.err1.x.y.j: field not allowed:
@@ -5168,7 +5327,7 @@ diff old new
                    //     ./embed.cue:342:16
                  }
                }
-@@ -1237,10 +788,6 @@
+@@ -1253,10 +794,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p2.err2.x.y.j: field not allowed:
@@ -5179,7 +5338,7 @@ diff old new
                    //     ./embed.cue:345:16
                  }
                }
-@@ -1270,10 +817,6 @@
+@@ -1286,10 +823,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p3.err1.x.y.j: field not allowed:
@@ -5190,7 +5349,7 @@ diff old new
                    //     ./embed.cue:355:16
                  }
                }
-@@ -1287,10 +830,6 @@
+@@ -1303,10 +836,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p3.err2.x.y.j: field not allowed:
@@ -5201,7 +5360,7 @@ diff old new
                    //     ./embed.cue:358:16
                  }
                }
-@@ -1326,10 +865,6 @@
+@@ -1342,10 +871,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p4.err1.x.y.j: field not allowed:
@@ -5212,7 +5371,7 @@ diff old new
                    //     ./embed.cue:370:16
                  }
                }
-@@ -1343,10 +878,6 @@
+@@ -1359,10 +884,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p4.err2.x.y.j: field not allowed:
@@ -5223,7 +5382,7 @@ diff old new
                    //     ./embed.cue:373:16
                  }
                }
-@@ -1369,8 +900,8 @@
+@@ -1385,8 +906,8 @@
    #A: (#struct){
      b: (int){ int }
      q: (#struct){
@@ -5233,7 +5392,7 @@ diff old new
      }
    }
    a: (_|_){
-@@ -1379,21 +910,15 @@
+@@ -1395,21 +916,15 @@
      q: (_|_){
        // [eval]
        c: (int){ 2 }
@@ -5256,7 +5415,7 @@ diff old new
      //     ./in.cue:28:5
      #A: (#struct){
      }
-@@ -1401,8 +926,6 @@
+@@ -1417,8 +932,6 @@
        // [eval]
        Foo: (_|_){
          // [eval] issue852.a.Foo: field not allowed:
@@ -5265,7 +5424,7 @@ diff old new
          //     ./in.cue:28:5
        }
      }
-@@ -1413,8 +936,8 @@
+@@ -1429,8 +942,8 @@
        foo: (int){ int }
      }
      d: (#struct){
@@ -5275,7 +5434,7 @@ diff old new
      }
    }
    issue3330: (struct){
-@@ -1428,13 +951,7 @@
+@@ -1444,13 +957,7 @@
            }
          }
          out: (#list){
@@ -5290,7 +5449,7 @@ diff old new
          }
        }
      }
-@@ -1463,13 +980,7 @@
+@@ -1479,13 +986,7 @@
            g: (#struct){
            }
          }
@@ -5305,7 +5464,7 @@ diff old new
          out2: (#struct){
            field: (#struct){
              n: (int){ 3 }
-@@ -1490,13 +1001,7 @@
+@@ -1506,13 +1007,7 @@
              d: (int){ 1 }
            }
          }
@@ -5320,7 +5479,7 @@ diff old new
        }
      }
      variant1: (struct){
-@@ -1509,13 +1014,7 @@
+@@ -1525,13 +1020,7 @@
            }
          }
          0: (#list){
@@ -5335,7 +5494,7 @@ diff old new
          }
        }
      }
-@@ -1531,10 +1030,7 @@
+@@ -1547,10 +1036,7 @@
                c: (int){ 2 }
              }
            }
@@ -5347,7 +5506,7 @@ diff old new
          }
          #x: (#struct){
            a: (#struct){
-@@ -1546,22 +1042,11 @@
+@@ -1562,22 +1048,11 @@
              c: (int){ 2 }
            }
          }
@@ -5373,7 +5532,7 @@ diff old new
          }
        }
      }
-@@ -1578,22 +1063,16 @@
+@@ -1594,22 +1069,16 @@
          }
          Y: (_|_){
            // [eval]
@@ -5401,7 +5560,7 @@ diff old new
            }
          }
          #X: (#struct){
-@@ -1613,25 +1092,11 @@
+@@ -1629,25 +1098,11 @@
            }
          }
        }
@@ -5432,7 +5591,7 @@ diff old new
          #A: (#struct){
            d: (#struct){
              e: (int){ int }
-@@ -1656,69 +1121,27 @@
+@@ -1672,69 +1127,27 @@
            // [eval]
            f: (_|_){
              // [eval] nested.err1.x.b.f: field not allowed:
@@ -5514,7 +5673,7 @@ diff old new
            }
          }
        }
-@@ -1726,16 +1149,11 @@
+@@ -1742,16 +1155,11 @@
          b: (#struct){
            f: (int){ 1 }
          }
@@ -5534,7 +5693,7 @@ diff old new
            }
          }
        }
-@@ -1758,14 +1176,12 @@
+@@ -1774,14 +1182,12 @@
            // [eval]
            g: (_|_){
              // [eval] nested.err2.x.b.g: field not allowed:
@@ -5550,7 +5709,7 @@ diff old new
          }
        }
      }
-@@ -1778,11 +1194,11 @@
+@@ -1794,11 +1200,11 @@
          }
        }
      }
@@ -5564,7 +5723,7 @@ diff old new
        name: (string){ "a" }
        age2: (int){ 5 }
      }
-@@ -1929,20 +1345,20 @@
+@@ -1945,20 +1351,20 @@
          }
        }
        original: (struct){
@@ -5594,7 +5753,7 @@ diff old new
              c: (string){ "v1" }
            }
          }
-@@ -1966,8 +1382,8 @@
+@@ -1982,8 +1388,8 @@
            empty: (#struct){
            }
          }
@@ -5605,7 +5764,7 @@ diff old new
              c: (string){ "v1" }
            }
          }
-@@ -1984,13 +1400,13 @@
+@@ -2000,13 +1406,13 @@
            empty: (#struct){
            }
          }
@@ -5626,6 +5785,37 @@ diff old new
              d: (string){ "v1" }
            }
          }
+@@ -2023,9 +1429,6 @@
+         // [eval]
+         foo: (_|_){
+           // [eval] issue1867.one.x.foo: field not allowed:
+-          //     ./reroot.cue:234:12
+-          //     ./reroot.cue:235:7
+-          //     ./reroot.cue:236:5
+           //     ./reroot.cue:237:5
+         }
+       }
+@@ -2042,10 +1445,6 @@
+         // [eval]
+         foo: (_|_){
+           // [eval] issue1867.two.x.foo: field not allowed:
+-          //     ./reroot.cue:240:6
+-          //     ./reroot.cue:241:9
+-          //     ./reroot.cue:242:10
+-          //     ./reroot.cue:243:5
+           //     ./reroot.cue:244:5
+         }
+       }
+@@ -2060,9 +1459,6 @@
+         // [eval]
+         foo: (_|_){
+           // [eval] issue1867.three.x.foo: field not allowed:
+-          //     ./reroot.cue:247:15
+-          //     ./reroot.cue:248:10
+-          //     ./reroot.cue:249:5
+           //     ./reroot.cue:250:5
+         }
+       }
 -- diff/todo/p2 --
 Positions / reordering
 -- diff/explanation --
@@ -6742,6 +6932,51 @@ indirect.embed: now correctly fails for V3.
         }
         Y: (〈0;#X〉.a & _|_(no sharing)).b
         Z: (〈0;Y〉 & _|_(no sharing))
+      }
+    }
+  }
+  issue1867: {
+    one: {
+      #T: close({})
+      #T: {
+        ...
+      }
+      x: 〈0;#T〉
+      x: {
+        foo: "foo"
+      }
+    }
+  }
+  issue1867: {
+    two: {
+      #S: {}
+      #T: {
+        s: 〈1;#S〉
+      }
+      #T: {
+        s: {
+          ...
+        }
+      }
+      x: 〈0;#T〉.s
+      x: {
+        foo: "foo"
+      }
+    }
+  }
+  issue1867: {
+    three: {
+      #T: {
+        s: close({})
+      }
+      #T: {
+        s: {
+          ...
+        }
+      }
+      x: 〈0;#T〉.s
+      x: {
+        foo: "foo"
       }
     }
   }

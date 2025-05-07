@@ -739,8 +739,6 @@ errorPropagation: {
 }
 
 -- issue2131.cue --
-import "path"
-
 issue2131: tests: {
 	windows: {
 		eg1: in: #"c:\d"#

@@ -1,10 +1,4 @@
 -- in.cue --
-import (
-	"list"
-	"strings"
-	"text/template"
-)
-
 Len: len(*[1, 2, 3] | 0)
 Close: close(*{} | 0)
 And: and(*[1, 1] | int)

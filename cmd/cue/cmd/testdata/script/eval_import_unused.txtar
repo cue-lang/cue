@@ -7,15 +7,11 @@ cmp stderr named.stderr
 ! exec cue export renamed.cue
 cmp stderr renamed.stderr
 
-# TODO: these should fail; see https://cuelang.org/issue/1850
+! exec cue export missing.cue
+cmp stderr missing.stderr
 
-exec cue export missing.cue
-# ! exec cue export missing.cue
-# cmp stderr missing.stderr
-
-exec cue export underscore.cue
-# ! exec cue export underscore.cue
-# cmp stderr underscore.stderr
+! exec cue export underscore.cue
+cmp stderr underscore.stderr
 
 -- named.cue --
 package p
@@ -40,6 +36,8 @@ import "list"
 
 out: 123
 -- missing.stderr --
+imported and not used: "list":
+    ./missing.cue:1:8
 -- underscore.cue --
 package _
 
@@ -47,3 +45,5 @@ import "list"
 
 out: 123
 -- underscore.stderr --
+imported and not used: "list":
+    ./underscore.cue:3:8

@@ -5,7 +5,6 @@
 ! exec cue export named.cue
 cmpenv stderr named.stderr
 
-# TODO: this should report "redeclared as imported package" too; see https://cuelang.org/issue/1850
 ! exec cue export missing.cue
 cmpenv stderr missing.stderr
 
@@ -30,3 +29,6 @@ list: 123
 -- missing.stderr --
 builtin package "notinstd" undefined:
     ./missing.cue:1:8
+list redeclared as imported package name
+	previous declaration at ${WORK}${/}missing.cue:4:1:
+    ./missing.cue:2:8

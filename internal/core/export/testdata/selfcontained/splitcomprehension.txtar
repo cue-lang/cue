@@ -3,8 +3,6 @@
 // TODO: merge output structs.
 
 -- in.cue --
-import "encoding/yaml"
-
 for key, value in { test: 1 } {
 	("a"): b: k1: key
 	("a"): b: v1: value

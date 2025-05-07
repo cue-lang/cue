@@ -54,6 +54,29 @@ issue3541: {
 		val.num + val.test
 	}])
 }
+
+issue2594: sumFirst: {
+	#Def: {
+		number & list.Sum(#In)
+		#In: [...number]
+	}
+
+	x!: 6
+	x:  #Def & {_
+		#In: [1, 2, 3]
+	}
+}
+issue2594: sumSecond: {
+	#Def: {
+		#In: [...number]
+		number & list.Sum(#In)
+	}
+
+	x!: 6
+	x:  #Def & {_
+		#In: [1, 2, 3]
+	}
+}
 -- out/list-v3 --
 Errors:
 0: invalid operands 2 and {num:6} to '+' (type int and struct):
@@ -85,30 +108,78 @@ issue1404: {
 	sum: 1
 }
 issue3541: _|_ // 0: invalid operands 2 and {num:6} to '+' (type int and struct)
+issue2594: {
+	sumFirst: {
+		#Def: {
+			0
+			#In: [...number]
+		}
+		x: {
+			6
+			#In: [1, 2, 3]
+		}
+	}
+	sumSecond: {
+		#Def: {
+			0
+			#In: [...number]
+		}
+		x: {
+			6
+			#In: [1, 2, 3]
+		}
+	}
+}
 -- diff/-out/list-v3<==>+out/list --
 diff old new
 --- old
 +++ new
-@@ -1,3 +1,10 @@
-+Errors:
+@@ -1,9 +1,8 @@
+ Errors:
+-issue2594.sumSecond.x: conflicting values 0 and 6:
+-    ./in.cue:71:3
+-    ./in.cue:71:12
+-    ./in.cue:74:6
+-    ./in.cue:75:6
 +0: invalid operands 2 and {num:6} to '+' (type int and struct):
 +    ./in.cue:53:3
 +    ./in.cue:35:9
 +    ./in.cue:36:10
-+
-+Result:
+ 
+ Result:
  issue563: {
- 	#MyDef: {
- 		name: string
-@@ -20,4 +27,4 @@
+@@ -28,7 +27,7 @@
  	a:   *1 | 2
  	sum: 1
  }
 -issue3541: {}
 +issue3541: _|_ // 0: invalid operands 2 and {num:6} to '+' (type int and struct)
+ issue2594: {
+ 	sumFirst: {
+ 		#Def: {
+@@ -45,6 +44,9 @@
+ 			0
+ 			#In: [...number]
+ 		}
+-		x: _|_ // issue2594.sumSecond.x: conflicting values 0 and 6
++		x: {
++			6
++			#In: [1, 2, 3]
++		}
+ 	}
+ }
 -- diff/explanation --
 issue3541: evalv3 correctly spots an invalid operand error which evalv2 drops on the floor.
+issue2594: evalv3 fixes an ordering issue present in evalv2.
 -- out/list --
+Errors:
+issue2594.sumSecond.x: conflicting values 0 and 6:
+    ./in.cue:71:3
+    ./in.cue:71:12
+    ./in.cue:74:6
+    ./in.cue:75:6
+
+Result:
 issue563: {
 	#MyDef: {
 		name: string
@@ -132,3 +203,22 @@ issue1404: {
 	sum: 1
 }
 issue3541: {}
+issue2594: {
+	sumFirst: {
+		#Def: {
+			0
+			#In: [...number]
+		}
+		x: {
+			6
+			#In: [1, 2, 3]
+		}
+	}
+	sumSecond: {
+		#Def: {
+			0
+			#In: [...number]
+		}
+		x: _|_ // issue2594.sumSecond.x: conflicting values 0 and 6
+	}
+}

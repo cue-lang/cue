@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a2cbbd0_81f3a507",
+        "filename": "internal/filetypes/internal/genfunc/gen.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T14:17:07Z",
+      "side": 1,
+      "message": "and?",
+      "range": {
+        "startLine": 18,
+        "startChar": 38,
+        "endLine": 18,
+        "endChar": 40
+      },
+      "revId": "a4af94aefd892d9daa319dfee3e52b4ba4fcbc9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e655c97d_cc754405",
+        "filename": "internal/filetypes/internal/genfunc/gen.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T14:17:07Z",
+      "side": 1,
+      "message": "reuse emitf for consistency in the lines above, and also to not need to be explicit about the trailing newlines",
+      "revId": "a4af94aefd892d9daa319dfee3e52b4ba4fcbc9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f72c2050_618468d0",
+        "filename": "internal/filetypes/internal/genfunc/gen.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T14:17:07Z",
+      "side": 1,
+      "message": "you don\u0027t seem to consistently indent, e.g. the \"if\" line above should be one tab, and this should be two tabs. I would suggest that you don\u0027t indent anything at all, and let go/format deal with it.\n\nor if the indentation is helpful for debugging/testing, perhaps do it consistently?",
+      "revId": "a4af94aefd892d9daa319dfee3e52b4ba4fcbc9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5419b43_f0fa8947",
+        "filename": "internal/filetypes/internal/genfunc/gen.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T14:17:07Z",
+      "side": 1,
+      "message": "exprFor uses Sprintf itself, so why not call it e.g. generateExprFor, and use it like:\n\n```\ng.emitf(\"r.%s \u003d \", fieldName)\ng.generateExprFor(unaryExpr.X)\n```\n\nI\u0027m not worried about performance here, as this is a generator, but it is a little bit harder to follow what\u0027s going on when one printf layer is used on top of another.",
+      "revId": "a4af94aefd892d9daa319dfee3e52b4ba4fcbc9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b316b02_8163d339",
+        "filename": "internal/filetypes/internal/genfunc/gen_test.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T14:17:07Z",
+      "side": 1,
+      "message": "what about placing test.go in the same cue module, as a `//go:build ignore` main package file?\n\nif your worry is that you don\u0027t want to pollute the current directory or git checkout, that\u0027s fair enough, but then you can use `go build -overlay` to insert a new file on the cuelang.org/go module without needing to write it to disk.",
+      "revId": "a4af94aefd892d9daa319dfee3e52b4ba4fcbc9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

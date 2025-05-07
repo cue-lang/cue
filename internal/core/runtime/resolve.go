@@ -43,9 +43,6 @@ func (r *Runtime) ResolveFiles(p *build.Instance) (errs errors.Error) {
 		}
 	}
 	for _, f := range p.Files {
-		if f.PackageName() == "" {
-			continue
-		}
 		err := resolveFile(idx, f, p, allFields)
 		errs = errors.Append(errs, err)
 	}

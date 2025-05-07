@@ -12,7 +12,6 @@ Disjuncts:    3820
 -- in.cue --
 import (
 	"strings"
-	"strconv"
 	"list"
 )
 
@@ -115,17 +114,17 @@ Disjuncts:    1475
       length: (int){ int }
       position: (_|_){
         // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
-        //     ./in.cue:14:21
-        //     ./in.cue:9:11
+        //     ./in.cue:13:21
+        //     ./in.cue:8:11
         let characters#1 = (_|_){
           // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
-          //     ./in.cue:14:21
-          //     ./in.cue:9:11
+          //     ./in.cue:13:21
+          //     ./in.cue:8:11
         }
         let unique_combinations#2 = (_|_){
           // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
-          //     ./in.cue:14:21
-          //     ./in.cue:9:11
+          //     ./in.cue:13:21
+          //     ./in.cue:8:11
           let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
         }
       }
@@ -140,8 +139,8 @@ Disjuncts:    1475
       length: (int){ int }
       position: (_|_){
         // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
-        //     ./in.cue:17:36
-        //     ./in.cue:12:11
+        //     ./in.cue:16:36
+        //     ./in.cue:11:11
         let characters#1 = (#list){
           0: (string){ "m" }
           1: (string){ "j" }
@@ -176,8 +175,8 @@ Disjuncts:    1475
         }
         let unique_combinations#2 = (_|_){
           // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
-          //     ./in.cue:17:36
-          //     ./in.cue:12:11
+          //     ./in.cue:16:36
+          //     ./in.cue:11:11
           let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
         }
       }
@@ -523,8 +522,8 @@ diff old new
 --- old
 +++ new
 @@ -12,13 +12,11 @@
-           //     ./in.cue:14:21
-           //     ./in.cue:9:11
+           //     ./in.cue:13:21
+           //     ./in.cue:8:11
          }
 -        let unique_combinations#2multi = {
 -          for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
@@ -535,8 +534,8 @@ diff old new
 -          }
 +        let unique_combinations#2 = (_|_){
 +          // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
-+          //     ./in.cue:14:21
-+          //     ./in.cue:9:11
++          //     ./in.cue:13:21
++          //     ./in.cue:8:11
 +          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
          }
        }
@@ -554,8 +553,8 @@ diff old new
 -          }
 +        let unique_combinations#2 = (_|_){
 +          // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
-+          //     ./in.cue:17:36
-+          //     ./in.cue:12:11
++          //     ./in.cue:16:36
++          //     ./in.cue:11:11
 +          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
          }
        }
@@ -854,12 +853,12 @@ let unique_combinations: not marked as multi. Seems benign, but should be fixed.
       length: (int){ int }
       position: (_|_){
         // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
-        //     ./in.cue:14:21
-        //     ./in.cue:9:11
+        //     ./in.cue:13:21
+        //     ./in.cue:8:11
         let characters#1 = (_|_){
           // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
-          //     ./in.cue:14:21
-          //     ./in.cue:9:11
+          //     ./in.cue:13:21
+          //     ./in.cue:8:11
         }
         let unique_combinations#2multi = {
           for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
@@ -881,8 +880,8 @@ let unique_combinations: not marked as multi. Seems benign, but should be fixed.
       length: (int){ int }
       position: (_|_){
         // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
-        //     ./in.cue:17:36
-        //     ./in.cue:12:11
+        //     ./in.cue:16:36
+        //     ./in.cue:11:11
         let characters#1 = (#list){
           0: (string){ "m" }
           1: (string){ "j" }

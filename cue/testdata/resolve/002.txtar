@@ -1,4 +1,0 @@
-#skip
-#evalPartial
--- out/legacy-debug --
-<0>{x: 3, "foo-bar": 3}

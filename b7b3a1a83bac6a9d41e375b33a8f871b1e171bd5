@@ -1,0 +1,192 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c28398f_c4cde5d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T15:29:45Z",
+      "side": 1,
+      "message": "did we reason about 10k being roughly the right number?\n\nat least my naive impression is that it\u0027s higher than I expected. some filetypes like jsonschema do have various combinations possible, e.g. the input encoding on one axis (json, yaml, etc) and option tags as another set of axis (strictFeatures, etc), but surely that shouldn\u0027t result in thousands of combinations, especially as the boolean tags are simple options that don\u0027t affect anything else.",
+      "revId": "b7b3a1a83bac6a9d41e375b33a8f871b1e171bd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ab6289f_76c12a53",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T15:29:45Z",
+      "side": 1,
+      "message": "only doing a +1 for now as I\u0027d like to better understand the reason behind the 10k combinations (and 150KiB .dat size) and how that scales as we need to add more data encodings like ini, protobuf, csv, and so on.",
+      "revId": "b7b3a1a83bac6a9d41e375b33a8f871b1e171bd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edb712f4_8b21f0fc",
+        "filename": "internal/filetypes/generate.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T15:29:45Z",
+      "side": 1,
+      "message": "what do you mean by an int being valid?",
+      "range": {
+        "startLine": 83,
+        "startChar": 35,
+        "endLine": 83,
+        "endChar": 40
+      },
+      "revId": "b7b3a1a83bac6a9d41e375b33a8f871b1e171bd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "824e16ab_39d6d297",
+        "filename": "internal/filetypes/generate.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T15:29:45Z",
+      "side": 1,
+      "message": "missing space after the colon?",
+      "range": {
+        "startLine": 227,
+        "startChar": 54,
+        "endLine": 227,
+        "endChar": 56
+      },
+      "revId": "b7b3a1a83bac6a9d41e375b33a8f871b1e171bd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17ef21a6_fd48f9a1",
+        "filename": "internal/filetypes/generate.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T15:29:45Z",
+      "side": 1,
+      "message": "assuming this is for debugging purposes, I\u0027d use log.Printf calls for clarity. at first I thought this was part of the generation that you meant to use or remove, given the use of fmt.",
+      "revId": "b7b3a1a83bac6a9d41e375b33a8f871b1e171bd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89a49760_0f862616",
+        "filename": "internal/filetypes/generate.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T15:29:45Z",
+      "side": 1,
+      "message": "can you elaborate a bit?",
+      "revId": "b7b3a1a83bac6a9d41e375b33a8f871b1e171bd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a48f706_66d80f2e",
+        "filename": "internal/filetypes/generate.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 601,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T15:29:45Z",
+      "side": 1,
+      "message": "is this helper really that useful?",
+      "revId": "b7b3a1a83bac6a9d41e375b33a8f871b1e171bd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6590cdae_a706f5f5",
+        "filename": "internal/filetypes/internal/genfunc/simplify.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T15:29:45Z",
+      "side": 1,
+      "message": "these files were all added in previous CLs in this stack. ISTM like these copyright notice additions need to be moved to the previous CLs which added the files, otherwise the diffstats are really confusing, and it seems like we briefly had non-apache-licensed source files.",
+      "revId": "b7b3a1a83bac6a9d41e375b33a8f871b1e171bd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e3f0c20_8e862df4",
+        "filename": "internal/filetypes/types_gen.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T15:29:45Z",
+      "side": 1,
+      "message": "surely this file needs a DO NOT EDIT reminder at the top? at first I didn\u0027t notice the filename and thought it was a manually maintained file.",
+      "revId": "b7b3a1a83bac6a9d41e375b33a8f871b1e171bd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7abc058_709ec4cd",
+        "filename": "internal/filetypes/types_gen.go.tmpl",
+        "patchSetId": 19
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T15:29:45Z",
+      "side": 1,
+      "message": "I suspect that any tabs here are entirely unnecessary given that you go/format the result.",
+      "range": {
+        "startLine": 29,
+        "startChar": 41,
+        "endLine": 29,
+        "endChar": 43
+      },
+      "revId": "b7b3a1a83bac6a9d41e375b33a8f871b1e171bd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -151,6 +151,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b8885da4_32f1f0e7",
+        "filename": "internal/filetypes/internal/internal.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T15:36:59Z",
+      "side": 1,
+      "message": "`internal/filetypes/internal` seems a bit odd. if it\u0027s not crucial to have a second internal layer here, perhaps give it a name other than internal?",
+      "revId": "b7b3a1a83bac6a9d41e375b33a8f871b1e171bd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5e3f0c20_8e862df4",
         "filename": "internal/filetypes/types_gen.go",
         "patchSetId": 19

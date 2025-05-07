@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72d4396e_86a12819",
+        "filename": "internal/filetypes/internal/genfunc/simplify.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T13:01:35Z",
+      "side": 1,
+      "message": "I wish the pattern you copied from `errors.As` didn\u0027t lead to a handful of variables here... :)",
+      "revId": "a97770ac69fb6f21256d30e68ec6843eac11724a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9ea890b_b575c678",
+        "filename": "internal/filetypes/internal/genfunc/simplify.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T13:01:35Z",
+      "side": 1,
+      "message": "move this to the test file, as it is unused in the non-test code",
+      "revId": "a97770ac69fb6f21256d30e68ec6843eac11724a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

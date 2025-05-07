@@ -36,8 +36,6 @@ func TestCompile(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root: "../../../cue/testdata/",
 		Name: "compile",
-		Skip: alwaysSkip,
-		ToDo: needFix,
 	}
 
 	if *todo {
@@ -70,14 +68,6 @@ func TestCompile(t *testing.T) {
 		}
 		fmt.Fprintln(t)
 	})
-}
-
-var alwaysSkip = map[string]string{
-	"fulleval/031_comparison against bottom": "fix bin op binding in test",
-}
-
-var needFix = map[string]string{
-	"DIR/NAME": "explanation",
 }
 
 // TestX is for debugging. Do not delete.

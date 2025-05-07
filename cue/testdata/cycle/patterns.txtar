@@ -1,5 +1,6 @@
 // Excluded from V2, which no longer passes.
-Lots of cycle-reference goodness.
+#skip-v2
+// Lots of cycle-reference goodness.
 
 -- in.cue --
 [!~"^[.]"]: c

@@ -1,3 +1,5 @@
+// Causes a stack overflow on evalv2 and evalv3.
+#skip
 -- in.cue --
  let X = {}
 

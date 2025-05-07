@@ -71,10 +71,8 @@ nodes: [{
 }]
 
 -- check.cue --
-import "list"
-
 #map: {for n in nodes {"\(n.name)": n}}
 
 -- out-stderr --
 #map: reference "nodes" not found:
-    ./check.cue:3:17
+    ./check.cue:1:17

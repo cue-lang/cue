@@ -9,12 +9,12 @@ expr: error2: {
 	a: a + 1
 	a: 3
 }
-list: error1: {
+listConcat: error1: {
 	a: ["1", "2"]
 	a: list.Concat([a, ["3"]])
 }
 
-list: error2: {
+listConcat: error2: {
 	a: list.Concat([["3"], a])
 	a: ["1", "2"]
 }
@@ -309,7 +309,7 @@ Result:
       }
     }
   }
-  list: (_|_){
+  listConcat: (_|_){
     // [structural cycle]
     error1: (_|_){
       // [structural cycle]
@@ -723,7 +723,7 @@ Result:
       }
     }
   }
-  list: (_|_){
+  listConcat: (_|_){
     // [structural cycle]
     error1: (_|_){
       // [structural cycle]
@@ -1061,7 +1061,7 @@ Result:
       a: 3
     }
   }
-  list: {
+  listConcat: {
     error1: {
       a: [
         "1",
@@ -1075,7 +1075,7 @@ Result:
       ])
     }
   }
-  list: {
+  listConcat: {
     error2: {
       a: 〈import;list〉.Concat([
         [

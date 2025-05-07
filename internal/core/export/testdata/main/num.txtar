@@ -1,6 +1,4 @@
 -- in.cue --
-import "strings"
-
 floats: {
 	a: 3.0
 	b: float & 3.0

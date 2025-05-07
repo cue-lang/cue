@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "174626fb_d9f6b733",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T12:32:11Z",
+      "side": 1,
+      "message": "SGTM but marking as \"hold\" so that we only submit the entire rest of this stack when ready. Submitting just these optimization removals first would lead to a temporary slow-down in master.",
+      "revId": "28699c658fbaf72bd082fe014746ba4c2bd45e2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

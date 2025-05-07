@@ -16,6 +16,57 @@
       "message": "PTAL.",
       "revId": "e4c1de3ab1875a9b9b2b6d6c48a8e10d9e4217f0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43f85ac9_d45a7f54",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T08:58:41Z",
+      "side": 1,
+      "message": "SGTM in general but this basically repeats 2/3rds of what is already explained in `cue help inputs`, so the duplication is going to lead to discrepancies and confusion.\n\nI think those two sections should be joined and shortened to just one paragraph, saying e.g. \"see `cue help inputs` for more\".",
+      "revId": "e4c1de3ab1875a9b9b2b6d6c48a8e10d9e4217f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88ec5521_300c0a36",
+        "filename": "cmd/cue/cmd/export.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T08:58:41Z",
+      "side": 1,
+      "message": "I also think this section repeats much of what is already said in `cue help inputs`.",
+      "revId": "e4c1de3ab1875a9b9b2b6d6c48a8e10d9e4217f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f68831a_4b07847a",
+        "filename": "cmd/cue/cmd/export.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T08:58:41Z",
+      "side": 1,
+      "message": "I don\u0027t think this section should be here; we have `cue help inputs` to explain how to give CUE files or packages as arguments to CLI commands. This repeats some of that text.",
+      "revId": "e4c1de3ab1875a9b9b2b6d6c48a8e10d9e4217f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

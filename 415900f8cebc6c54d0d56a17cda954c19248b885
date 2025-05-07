@@ -48,6 +48,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ae7b5ab_d25e9936",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-07T08:58:41Z",
+      "side": 1,
+      "message": "I don\u0027t have strong feelings either way. Personally, I\u0027d lean towards shorter help texts in the CLI, and lengthier docs with details and examples should go on cuelang.org, where we can use much nicer structure and formatting.\n\nThanks for tweaking in the meantime; I really didn\u0027t want us to have inconsistent styling while we figure it out.",
+      "parentUuid": "976bdc4f_fb02bcae",
+      "range": {
+        "startLine": 12,
+        "startChar": 15,
+        "endLine": 13,
+        "endChar": 34
+      },
+      "revId": "415900f8cebc6c54d0d56a17cda954c19248b885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9b135891_8b7716e2",

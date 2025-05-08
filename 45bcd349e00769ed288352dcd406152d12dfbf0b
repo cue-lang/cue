@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fae388bd_f614abcf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-08T09:21:28Z",
+      "side": 1,
+      "message": "I totally forgot to mention in the commit message: we had a number of unused imports in anonymous CUE files in testdata directories. Those are spotted now thanks to the fix, so I had to resolve the issues.",
+      "revId": "45bcd349e00769ed288352dcd406152d12dfbf0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

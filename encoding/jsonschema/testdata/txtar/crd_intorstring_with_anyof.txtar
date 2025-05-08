@@ -35,4 +35,13 @@ spec:
               - type: string
 
 -- out/decode/extract --
+_embeddedResource
 spec?: matchN(>=1, [int, string]) & (int | string)
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata!: {
+		...
+	}
+}

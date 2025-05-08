@@ -29,4 +29,13 @@ spec:
             x-kubernetes-int-or-string: true
 
 -- out/decode/extract --
+_embeddedResource
 spec?: int | string
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata!: {
+		...
+	}
+}

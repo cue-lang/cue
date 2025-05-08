@@ -7,11 +7,14 @@ package server
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"sync"
 
 	"cuelang.org/go/internal/golangorgx/gopls/cache"
+	"cuelang.org/go/internal/golangorgx/gopls/cache/metadata"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/tools/event"
@@ -98,13 +101,14 @@ func (s *server) DidOpen(ctx context.Context, params *protocol.DidOpenTextDocume
 	// that is not part of the CUE module. For now we will not support that, because it massively
 	// opens up a can of worms in terms of single-file support, ad hoc workspaces etc.
 
-	return s.didModifyFiles(ctx, []file.Modification{{
+	modifications := []file.Modification{{
 		URI:        uri,
 		Action:     file.Open,
 		Version:    params.TextDocument.Version,
 		Text:       []byte(params.TextDocument.Text),
 		LanguageID: params.TextDocument.LanguageID,
-	}}, FromDidOpen)
+	}}
+	return s.didModifyFiles(ctx, modifications, FromDidOpen)
 }
 
 func (s *server) DidChange(ctx context.Context, params *protocol.DidChangeTextDocumentParams) error {
@@ -172,6 +176,27 @@ func (s *server) DidClose(ctx context.Context, params *protocol.DidCloseTextDocu
 	}, FromDidClose)
 }
 
+// This exists temporarily for facilitating integration tests. TODO(ms): remove when possible.
+func logFilesToPackage(ctx context.Context, s *server, modifications []file.Modification) {
+	uriToSnapshot := make(map[protocol.DocumentURI]map[protocol.DocumentURI][]metadata.ImportPath)
+	for _, mod := range modifications {
+		snapshot, release, err := s.session.SnapshotOf(ctx, mod.URI)
+		if err != nil {
+			continue
+		}
+		uriToSnapshot[mod.URI] = maps.Clone(snapshot.MetadataGraph().FilesToPackage)
+		release()
+	}
+	bs, err := json.Marshal(uriToSnapshot)
+	if err != nil {
+		return
+	}
+	s.client.LogMessage(ctx, &protocol.LogMessageParams{
+		Type:    protocol.Debug,
+		Message: string(bs),
+	})
+}
+
 func (s *server) didModifyFiles(ctx context.Context, modifications []file.Modification, cause ModificationSource) error {
 	// wg guards two conditions:
 	//  1. didModifyFiles is complete
@@ -224,6 +249,8 @@ func (s *server) didModifyFiles(ctx context.Context, modifications []file.Modifi
 	go func() {
 		s.diagnoseChangedViews(modCtx, modID, viewsToDiagnose, cause)
 		wg.Done()
+		// Temporary exposure of internal behaviour for testing only. TODO(ms): remove when possible.
+		logFilesToPackage(ctx, s, modifications)
 	}()
 
 	// After any file modifications, we need to update our watched files,

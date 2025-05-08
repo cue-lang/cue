@@ -183,7 +183,7 @@ type Source interface {
 // "command-line-arguments" package, which is a package with an unknown ID
 // created by the go command. It can have a test variant, which is why callers
 // should not check that a value equals "command-line-arguments" directly.
-func IsCommandLineArguments(id PackageID) bool {
+func IsCommandLineArguments(id ImportPath) bool {
 	return strings.Contains(string(id), "command-line-arguments")
 }
 
@@ -245,7 +245,10 @@ func IsValidImport(pkgPath, importPkgPath PackagePath) bool {
 	}
 	// TODO(rfindley): this looks wrong: IsCommandLineArguments is meant to
 	// operate on package IDs, not package paths.
-	if IsCommandLineArguments(PackageID(pkgPath)) {
+	//
+	// TODO(ms): fixed the above, but this code should be going away
+	// completely real soon now.
+	if IsCommandLineArguments(ImportPath(pkgPath)) {
 		return true
 	}
 	// TODO(rfindley): this is wrong. mod.testx/p should not be able to

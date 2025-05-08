@@ -139,17 +139,16 @@ type viewDefinition struct {
 	// root represents the directory root of the CUE module that contains
 	// the WorkspaceFolder folder
 	root   protocol.DocumentURI
-	cuemod protocol.DocumentURI // the nearest cue.mod directory, or ""
+	cuemod protocol.DocumentURI // the nearest cue.mod/module.cue file, or ""
 
-	// workspaceModDirs holds the set of cue.mod dirs active in this snapshot.
+	// workspaceModFiles holds the set of cue.mod/module.cue files
+	// active in this snapshot.
 	//
 	// For a go.work workspace, this is the set of workspace modfiles. For a
 	// go.mod workspace, this contains the go.mod file defining the workspace
 	// root, as well as any locally replaced modules (if
 	// "includeReplaceInWorkspace" is set).
-	//
-	// TODO(rfindley): should we just run `go list -m` to compute this set?
-	workspaceModDirs     map[protocol.DocumentURI]struct{}
+	workspaceModFiles    map[protocol.DocumentURI]struct{}
 	workspaceModFilesErr error // error encountered computing workspaceModFiles
 
 	// envOverlay holds additional environment to apply to this viewDefinition.
@@ -177,11 +176,11 @@ func (d *viewDefinition) EnvOverlay() []string {
 	return env
 }
 
-// ModDirs are the cue.mod dirs enclosed in the snapshot's view and known
-// to the snapshot.
-func (d viewDefinition) ModDirs() []protocol.DocumentURI {
+// ModFiles are the cue.mod/module.cue files enclosed in the
+// snapshot's view and known to the snapshot.
+func (d viewDefinition) ModFiles() []protocol.DocumentURI {
 	var uris []protocol.DocumentURI
-	for modURI := range d.workspaceModDirs {
+	for modURI := range d.workspaceModFiles {
 		uris = append(uris, modURI)
 	}
 	return uris
@@ -196,7 +195,7 @@ func viewDefinitionsEqual(x, y *viewDefinition) bool {
 		if x.workspaceModFilesErr.Error() != y.workspaceModFilesErr.Error() {
 			return false
 		}
-	} else if !maps.SameKeys(x.workspaceModDirs, y.workspaceModDirs) {
+	} else if !maps.SameKeys(x.workspaceModFiles, y.workspaceModFiles) {
 		return false
 	}
 	if len(x.envOverlay) != len(y.envOverlay) {
@@ -417,9 +416,9 @@ func (s *Snapshot) initialize(ctx context.Context, firstAttempt bool) {
 		})
 	}
 
-	if len(s.view.workspaceModDirs) > 0 {
-		for modURI := range s.view.workspaceModDirs {
-			fh, err := s.ReadFile(ctx, modURI+"/module.cue")
+	if len(s.view.workspaceModFiles) > 0 {
+		for modURI := range s.view.workspaceModFiles {
+			fh, err := s.ReadFile(ctx, modURI)
 			if err != nil {
 				if ctx.Err() != nil {
 					return
@@ -444,8 +443,8 @@ func (s *Snapshot) initialize(ctx context.Context, firstAttempt bool) {
 				addError(modURI, err)
 				continue
 			}
-			modDir := filepath.Dir(modURI.Path())
-			scopes = append(scopes, moduleLoadScope{dir: modDir, modulePath: parsed.ModulePath()})
+			rootDir := filepath.Dir(filepath.Dir(modURI.Path()))
+			scopes = append(scopes, moduleLoadScope{dir: rootDir, modulePath: parsed.ModulePath()})
 		}
 	} else {
 		scopes = append(scopes, viewLoadScope{})
@@ -597,14 +596,14 @@ func defineView(ctx context.Context, fs file.Source, folder *Folder, forFile fil
 		// We found no module, and currently we only support workspaces with modules.
 		return nil, fmt.Errorf("WorkspaceFolder %s does not correspond to a CUE module", folder.Dir.Path())
 	}
-	def.cuemod = moduleCue.Dir()
+	def.cuemod = moduleCue
 
 	def.typ = CUEModView
-	def.root = def.cuemod.Dir()
+	def.root = def.cuemod.Dir().Dir()
 	if def.root != dirURI {
 		return nil, fmt.Errorf("WorkspaceFolder %s does not correspond to a CUE module", folder.Dir.Path())
 	}
-	def.workspaceModDirs = map[protocol.DocumentURI]struct{}{def.cuemod: {}}
+	def.workspaceModFiles = map[protocol.DocumentURI]struct{}{def.cuemod: {}}
 
 	return def, nil
 }

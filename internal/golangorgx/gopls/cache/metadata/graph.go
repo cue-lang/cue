@@ -5,8 +5,10 @@
 package metadata
 
 import (
+	"maps"
 	"sort"
 
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/util/bug"
 	"golang.org/x/tools/go/packages"
@@ -14,17 +16,20 @@ import (
 
 // A Graph is an immutable and transitively closed graph of [Package] data.
 type Graph struct {
-	// Packages maps package IDs to their associated Packages.
-	Packages map[PackageID]*Package
+	// Packages maps package import paths to their associated Packages.
+	Packages map[ImportPath]*build.Instance
 
 	// ImportedBy maps package IDs to the list of packages that import them.
-	ImportedBy map[PackageID][]PackageID
+	// Note this is direct imports only; not transitive.
+	ImportedBy map[ImportPath][]ImportPath
 
-	// IDs maps file URIs to package IDs, sorted by (!valid, cli, packageID).
-	// A single file may belong to multiple packages due to tests packages.
+	// FilesToPackage maps file URIs to package import paths, sorted by
+	// (!valid, cli, packageID).  A single file may belong to multiple
+	// packages due to ancestor package import.
 	//
-	// Invariant: all IDs present in the IDs map exist in the metadata map.
-	IDs map[protocol.DocumentURI][]PackageID
+	// Invariant: all ImportPaths present in the FilesToPackage map
+	// exist in the Packages map.
+	FilesToPackage map[protocol.DocumentURI][]ImportPath
 }
 
 // Update creates a new Graph containing the result of applying the given
@@ -32,7 +37,7 @@ type Graph struct {
 // special case, if updates is empty, Update just returns the receiver.
 //
 // A nil map value is used to indicate a deletion.
-func (g *Graph) Update(updates map[PackageID]*Package) *Graph {
+func (g *Graph) Update(updates map[ImportPath]*build.Instance) *Graph {
 	if len(updates) == 0 {
 		// Optimization: since the graph is immutable, we can return the receiver.
 		return g
@@ -44,72 +49,71 @@ func (g *Graph) Update(updates map[PackageID]*Package) *Graph {
 		bug.Reportf("metadata is cyclic even before updates: %s", cycle)
 	}
 	// Assert that the updates contain no self-cycles.
-	for id, mp := range updates {
-		if mp != nil {
-			for _, depID := range mp.DepsByPkgPath {
-				if depID == id {
-					bug.Reportf("self-cycle in metadata update: %s", id)
+	for path, inst := range updates {
+		if inst != nil {
+			for _, importedInst := range inst.Imports {
+				if importedInst == inst {
+					bug.Reportf("self-cycle in metadata update: %s", path)
 				}
 			}
 		}
 	}
 
 	// Copy pkgs map then apply updates.
-	pkgs := make(map[PackageID]*Package, len(g.Packages))
-	for id, mp := range g.Packages {
-		pkgs[id] = mp
+	pkgs := maps.Clone(g.Packages)
+	if pkgs == nil {
+		pkgs = make(map[ImportPath]*build.Instance)
 	}
-	for id, mp := range updates {
-		if mp == nil {
-			delete(pkgs, id)
+	for path, inst := range updates {
+		if inst == nil {
+			delete(pkgs, path)
 		} else {
-			pkgs[id] = mp
+			pkgs[path] = inst
 		}
 	}
 
 	// Break import cycles involving updated nodes.
-	breakImportCycles(pkgs, updates)
+	// TODO(ms): figure out if we need anything like this
+	//breakImportCycles(pkgs, updates)
 
 	return newGraph(pkgs)
 }
 
 // newGraph returns a new metadataGraph,
 // deriving relations from the specified metadata.
-func newGraph(pkgs map[PackageID]*Package) *Graph {
+func newGraph(pkgs map[ImportPath]*build.Instance) *Graph {
 	// Build the import graph.
-	importedBy := make(map[PackageID][]PackageID)
-	for id, mp := range pkgs {
-		for _, depID := range mp.DepsByPkgPath {
-			importedBy[depID] = append(importedBy[depID], id)
+	importedBy := make(map[ImportPath][]ImportPath)
+	for path, inst := range pkgs {
+		for _, importedInst := range inst.Imports {
+			importedPath := ImportPath(importedInst.ImportPath)
+			importedBy[importedPath] = append(importedBy[importedPath], path)
 		}
 	}
 
 	// Collect file associations.
-	uriIDs := make(map[protocol.DocumentURI][]PackageID)
-	for id, mp := range pkgs {
-		uris := map[protocol.DocumentURI]struct{}{}
-		for _, uri := range mp.CompiledGoFiles {
-			uris[uri] = struct{}{}
+	filesToPkg := make(map[protocol.DocumentURI][]ImportPath)
+	for pkgImportPath, inst := range pkgs {
+		files := map[protocol.DocumentURI]struct{}{}
+		for _, file := range inst.BuildFiles {
+			files[protocol.URIFromPath(file.Filename)] = struct{}{}
 		}
-		for _, uri := range mp.GoFiles {
-			uris[uri] = struct{}{}
-		}
-		for uri := range uris {
-			uriIDs[uri] = append(uriIDs[uri], id)
+		for file := range files {
+			filesToPkg[file] = append(filesToPkg[file], pkgImportPath)
 		}
 	}
 
 	// Sort and filter file associations.
-	for uri, ids := range uriIDs {
-		sort.Slice(ids, func(i, j int) bool {
-			cli := IsCommandLineArguments(ids[i])
-			clj := IsCommandLineArguments(ids[j])
+	for file, pkgImportPaths := range filesToPkg {
+		sort.Slice(pkgImportPaths, func(i, j int) bool {
+			cli := IsCommandLineArguments(pkgImportPaths[i])
+			clj := IsCommandLineArguments(pkgImportPaths[j])
 			if cli != clj {
 				return clj
 			}
 
 			// 2. packages appear in name order.
-			return ids[i] < ids[j]
+			return pkgImportPaths[i] < pkgImportPaths[j]
 		})
 
 		// Choose the best IDs for each URI, according to the following rules:
@@ -118,41 +122,23 @@ func newGraph(pkgs map[PackageID]*Package) *Graph {
 		//
 		// TODO(rfindley): it might be better to track all IDs here, and exclude
 		// them later when type checking, but this is the existing behavior.
-		for i, id := range ids {
+		//
+		// TODO(ms): is any of this stuff needed for cue?
+		for i, pkgImportPath := range pkgImportPaths {
 			// If we've seen *anything* prior to command-line arguments package, take
 			// it. Note that ids[0] may itself be command-line-arguments.
-			if i > 0 && IsCommandLineArguments(id) {
-				uriIDs[uri] = ids[:i]
+			if i > 0 && IsCommandLineArguments(pkgImportPath) {
+				filesToPkg[file] = pkgImportPaths[:i]
 				break
 			}
 		}
 	}
 
 	return &Graph{
-		Packages:   pkgs,
-		ImportedBy: importedBy,
-		IDs:        uriIDs,
+		Packages:       pkgs,
+		ImportedBy:     importedBy,
+		FilesToPackage: filesToPkg,
 	}
-}
-
-// ReverseReflexiveTransitiveClosure returns a new mapping containing the
-// metadata for the specified packages along with any package that
-// transitively imports one of them, keyed by ID, including all the initial packages.
-func (g *Graph) ReverseReflexiveTransitiveClosure(ids ...PackageID) map[PackageID]*Package {
-	seen := make(map[PackageID]*Package)
-	var visitAll func([]PackageID)
-	visitAll = func(ids []PackageID) {
-		for _, id := range ids {
-			if seen[id] == nil {
-				if mp := g.Packages[id]; mp != nil {
-					seen[id] = mp
-					visitAll(g.ImportedBy[id])
-				}
-			}
-		}
-	}
-	visitAll(ids)
-	return seen
 }
 
 // breakImportCycles breaks import cycles in the metadata by deleting
@@ -241,35 +227,34 @@ func breakImportCycles(metadata, updates map[PackageID]*Package) {
 
 // cyclic returns a description of a cycle,
 // if the graph is cyclic, otherwise "".
-func cyclic(graph map[PackageID]*Package) string {
+func cyclic(graph map[ImportPath]*build.Instance) string {
 	const (
 		unvisited = 0
 		visited   = 1
 		onstack   = 2
 	)
-	color := make(map[PackageID]int)
-	var visit func(id PackageID) string
-	visit = func(id PackageID) string {
-		switch color[id] {
+	color := make(map[ImportPath]int)
+	var visit func(inst *build.Instance) string
+	visit = func(inst *build.Instance) string {
+		path := ImportPath(inst.ImportPath)
+		switch color[path] {
 		case unvisited:
-			color[id] = onstack
+			color[path] = onstack
 		case onstack:
-			return string(id) // cycle!
+			return string(path) // cycle!
 		case visited:
 			return ""
 		}
-		if mp := graph[id]; mp != nil {
-			for _, depID := range mp.DepsByPkgPath {
-				if cycle := visit(depID); cycle != "" {
-					return string(id) + "->" + cycle
-				}
+		for _, importedInst := range inst.Imports {
+			if cycle := visit(importedInst); cycle != "" {
+				return string(path) + "->" + cycle
 			}
 		}
-		color[id] = visited
+		color[path] = visited
 		return ""
 	}
-	for id := range graph {
-		if cycle := visit(id); cycle != "" {
+	for _, inst := range graph {
+		if cycle := visit(inst); cycle != "" {
 			return cycle
 		}
 	}

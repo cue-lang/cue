@@ -18,7 +18,7 @@ command: release: {
 
 	let _env = env
 
-	let _githubRef = env.GITHUB_REF | "refs/no_ref_kind/not_a_release" // filled when running in CI
+	let _githubRef = *env.GITHUB_REF | "refs/no_ref_kind/not_a_release" // filled when running in CI
 	let _githubRefName = path.Base(_githubRef)
 
 	tempDir: file.MkdirTemp & {

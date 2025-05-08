@@ -476,9 +476,6 @@ func (n *nodeContext) collectErrors(dn *envDisjunct) (errs *Bottom) {
 // augmented, whereas orig is the original node where disjunction processing
 // started. orig is used to clean up Environments.
 func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *Vertex) (*nodeContext, *Bottom) {
-	n.ctx.inDisjunct++
-	defer func() { n.ctx.inDisjunct-- }()
-
 	ID := n.logDoDisjunct()
 	_ = ID // Do not remove, used for debugging.
 

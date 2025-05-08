@@ -126,8 +126,18 @@ Result:
     res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
   }
   #nonEmptyRange: (#struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-    max: (number){ >1 }
+    min: (_|_){
+      // [cycle] #nonEmptyRange.min: cycle with field: max:
+      //     ./in.cue:29:8
+      // #nonEmptyRange.max: cycle with field: min:
+      //     ./in.cue:30:8
+    }
+    max: (_|_){
+      // [cycle] #nonEmptyRange.min: cycle with field: max:
+      //     ./in.cue:29:8
+      // #nonEmptyRange.max: cycle with field: min:
+      //     ./in.cue:30:8
+    }
   }
   r1: (#struct){
     min: (int){ 3 }
@@ -231,21 +241,32 @@ diff old new
        //     ./in.cue:21:7
        //     ./in.cue:22:7
        // es3.max: invalid value 5 (out of bound >10):
-@@ -70,11 +62,10 @@
+@@ -70,12 +62,21 @@
        //     ./in.cue:5:7
        //     ./in.cue:22:7
      }
 +    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
    }
    #nonEmptyRange: (#struct){
--    min: (_|_){
+     min: (_|_){
 -      // [cycle] cycle error
 -    }
-+    min: (int){ |(*(int){ 1 }, (int){ int }) }
-     max: (number){ >1 }
+-    max: (number){ >1 }
++      // [cycle] #nonEmptyRange.min: cycle with field: max:
++      //     ./in.cue:29:8
++      // #nonEmptyRange.max: cycle with field: min:
++      //     ./in.cue:30:8
++    }
++    max: (_|_){
++      // [cycle] #nonEmptyRange.min: cycle with field: max:
++      //     ./in.cue:29:8
++      // #nonEmptyRange.max: cycle with field: min:
++      //     ./in.cue:30:8
++    }
    }
    r1: (#struct){
-@@ -82,8 +73,8 @@
+     min: (int){ 3 }
+@@ -82,8 +83,8 @@
      max: (number){ >3 }
    }
    r2: (#struct){
@@ -255,7 +276,7 @@ diff old new
    }
    r3: (#struct){
      min: (int){ 3 }
-@@ -95,17 +86,15 @@
+@@ -95,17 +96,15 @@
        // [eval] er3.min: 2 errors in empty disjunction:
        // er3.min: conflicting values 1 and 5:
        //     ./in.cue:28:8

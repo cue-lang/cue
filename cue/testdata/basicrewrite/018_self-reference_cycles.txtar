@@ -147,7 +147,7 @@ Unifications: 47
 Conjuncts:    91
 Disjuncts:    10
 
-CloseIDElems: 16
+CloseIDElems: 17
 NumCloseIDs: 10
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -173,7 +173,7 @@ diff old new
 +Conjuncts:    91
 +Disjuncts:    10
 +
-+CloseIDElems: 16
++CloseIDElems: 17
 +NumCloseIDs: 10
 -- out/eval/stats --
 Leaks:  1
@@ -190,11 +190,17 @@ Disjuncts:    88
   oneway: (struct){
     t1: (struct){
       a: (_|_){
-        // [incomplete] oneway.t1.a: non-concrete value <1 in operand to +:
+        // [cycle] oneway.t1.a: cycle with field: b:
         //     ./disjunction.cue:4:12
-        //     ./disjunction.cue:5:12
+        // oneway.t1.b: cycle with field: a:
+        //     ./disjunction.cue:5:13
       }
-      b: (number){ <1 }
+      b: (_|_){
+        // [cycle] oneway.t1.a: cycle with field: b:
+        //     ./disjunction.cue:4:12
+        // oneway.t1.b: cycle with field: a:
+        //     ./disjunction.cue:5:13
+      }
     }
     t2: (struct){
       a: (_|_){
@@ -225,8 +231,18 @@ Disjuncts:    88
       }
     }
     out: (#struct){
-      two: (int){ |(*(int){ 2 }, (int){ 0 }) }
-      one: (int){ 1 }
+      two: (_|_){
+        // [cycle] issue3669.out.two: cycle with field: one:
+        //     ./disjunction.cue:14:12
+        // issue3669.out.one: cycle with field: two:
+        //     ./disjunction.cue:15:8
+      }
+      one: (_|_){
+        // [cycle] issue3669.out.two: cycle with field: one:
+        //     ./disjunction.cue:14:12
+        // issue3669.out.one: cycle with field: two:
+        //     ./disjunction.cue:15:8
+      }
     }
   }
   a: (_|_){
@@ -316,7 +332,30 @@ Disjuncts:    88
 diff old new
 --- old
 +++ new
-@@ -13,7 +13,6 @@
+@@ -2,11 +2,17 @@
+   oneway: (struct){
+     t1: (struct){
+       a: (_|_){
+-        // [incomplete] oneway.t1.a: non-concrete value <1 in operand to +:
+-        //     ./disjunction.cue:4:12
+-        //     ./disjunction.cue:5:12
+-      }
+-      b: (number){ <1 }
++        // [cycle] oneway.t1.a: cycle with field: b:
++        //     ./disjunction.cue:4:12
++        // oneway.t1.b: cycle with field: a:
++        //     ./disjunction.cue:5:13
++      }
++      b: (_|_){
++        // [cycle] oneway.t1.a: cycle with field: b:
++        //     ./disjunction.cue:4:12
++        // oneway.t1.b: cycle with field: a:
++        //     ./disjunction.cue:5:13
++      }
+     }
+     t2: (struct){
+       a: (_|_){
+@@ -13,7 +19,6 @@
          // [incomplete] oneway.t2.a: 2 errors in empty disjunction:
          // oneway.t2.a: conflicting values 1 and 3:
          //     ./disjunction.cue:3:13
@@ -324,20 +363,22 @@ diff old new
          //     ./disjunction.cue:8:12
          // oneway.t2.a: non-concrete value <3 in operand to +:
          //     ./disjunction.cue:4:12
-@@ -25,57 +24,60 @@
+@@ -25,57 +30,70 @@
    issue3669: (struct){
      #Schema: (#struct){
        two: (_|_){
+-        // [cycle] cycle error:
+-        //     ./disjunction.cue:14:8
+-      }
+-      one: (_|_){
 -        // [cycle] cycle error:
 -        //     ./disjunction.cue:14:8
 +        // [cycle] issue3669.#Schema.two: cycle with field: one:
 +        //     ./disjunction.cue:14:12
 +        // issue3669.#Schema.one: cycle with field: two:
 +        //     ./disjunction.cue:15:8
-       }
-       one: (_|_){
--        // [cycle] cycle error:
--        //     ./disjunction.cue:14:8
++      }
++      one: (_|_){
 +        // [cycle] issue3669.#Schema.two: cycle with field: one:
 +        //     ./disjunction.cue:14:12
 +        // issue3669.#Schema.one: cycle with field: two:
@@ -345,13 +386,22 @@ diff old new
        }
      }
      out: (#struct){
--      two: (_|_){
+       two: (_|_){
 -        // [cycle] cycle error:
 -        //     ./disjunction.cue:14:8
 -      }
 -      one: (int){ -1 }
-+      two: (int){ |(*(int){ 2 }, (int){ 0 }) }
-+      one: (int){ 1 }
++        // [cycle] issue3669.out.two: cycle with field: one:
++        //     ./disjunction.cue:14:12
++        // issue3669.out.one: cycle with field: two:
++        //     ./disjunction.cue:15:8
++      }
++      one: (_|_){
++        // [cycle] issue3669.out.two: cycle with field: one:
++        //     ./disjunction.cue:14:12
++        // issue3669.out.one: cycle with field: two:
++        //     ./disjunction.cue:15:8
++      }
      }
    }
    a: (_|_){
@@ -414,7 +464,7 @@ diff old new
        }
        y: (#struct){
          b: (float){ 700.00 }
-@@ -85,28 +87,38 @@
+@@ -85,28 +103,38 @@
      reduced2: (struct){
        x: (#struct){
          start: (float){ 900.0 }

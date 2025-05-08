@@ -24,6 +24,15 @@
                     "openAPIV3Schema": {
                         "type": "object",
                         "properties": {
+                            "apiVersion": {
+                              "type": "string"
+                            },
+                            "kind": {
+                               "type": "string"
+                            },
+                            "metadata": {
+                              "type": "object"
+                            },
                             "r1": {
                                 "type": "object",
                                 "x-kubernetes-embedded-resource": true,
@@ -46,6 +55,9 @@
     }
 }
 -- out/decode/extract --
+apiVersion?: string
+kind?:       string
+metadata?: {}
 r1?: {
 	_embeddedResource
 	...

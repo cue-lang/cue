@@ -273,16 +273,37 @@ indexElimination: {
 		z: [for i, v in y {bits.Set(*z[i-1] | 0, len(y)-i-1, v)}][3]
 	}
 }
+-- issue3899.cue --
+issue3899: reduced: p1: {
+	b: c + "" | string
+	c?: string
+}
+issue3899: reduced: p1: {
+	c?: string
+	b: c + "" | string
+}
+issue3899: full: {
+	out: #Schema & {
+		name: "foo"
+   }
+   #Schema: {
+	   _versions: foo: "123"
+	   spec: limits: true
+	   name!: string
+	   spec: image: string | *"\(name)"
+	   deployImage: _versions[spec.image]
+   }
+}
 -- out/eval/stats --
 Leaks:  36
-Freed:  709
-Reused: 695
+Freed:  739
+Reused: 725
 Allocs: 50
-Retain: 77
+Retain: 95
 
-Unifications: 408
-Conjuncts:    1394
-Disjuncts:    756
+Unifications: 430
+Conjuncts:    1449
+Disjuncts:    803
 -- out/evalalpha --
 Errors:
 f: 2 errors in empty disjunction:
@@ -298,6 +319,9 @@ issue3606.data: conflicting values string and {notAllowed:true} (mismatched type
     ./dependencies.cue:6:6
 issue3606.data.notAllowed: field not allowed:
     ./dependencies.cue:3:3
+issue3899.full.#Schema.deployImage: invalid index spec.image (invalid type _):
+    ./issue3899.cue:18:18
+    ./issue3899.cue:18:28
 
 Result:
 (_|_){
@@ -699,6 +723,45 @@ Result:
         }) }
     }
   }
+  issue3899: (_|_){
+    // [eval]
+    reduced: (struct){
+      p1: (struct){
+        b: (_){ |((_){ _ }, (string){ string }) }
+        c?: (string){ string }
+      }
+    }
+    full: (_|_){
+      // [eval]
+      out: (#struct){
+        name: (string){ "foo" }
+        _versions: (#struct){
+          foo: (string){ "123" }
+        }
+        spec: (#struct){
+          limits: (bool){ true }
+          image: (string){ |(*(string){ "foo" }, (string){ string }) }
+        }
+        deployImage: (string){ "123" }
+      }
+      #Schema: (_|_){
+        // [eval]
+        _versions: (#struct){
+          foo: (string){ "123" }
+        }
+        spec: (#struct){
+          limits: (bool){ true }
+          image: (_){ |(*(_){ _ }, (string){ string }) }
+        }
+        name!: (string){ string }
+        deployImage: (_|_){
+          // [eval] issue3899.full.#Schema.deployImage: invalid index spec.image (invalid type _):
+          //     ./issue3899.cue:18:18
+          //     ./issue3899.cue:18:28
+        }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -716,16 +779,19 @@ diff old new
      ./in.cue:15:27
  issue3606.data: 2 errors in empty disjunction:
  issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
-@@ -14,8 +12,6 @@
+@@ -14,8 +12,9 @@
      ./dependencies.cue:6:6
  issue3606.data.notAllowed: field not allowed:
      ./dependencies.cue:3:3
 -    ./dependencies.cue:4:6
 -    ./dependencies.cue:6:15
++issue3899.full.#Schema.deployImage: invalid index spec.image (invalid type _):
++    ./issue3899.cue:18:18
++    ./issue3899.cue:18:28
  
  Result:
  (_|_){
-@@ -29,14 +25,7 @@
+@@ -29,14 +28,7 @@
        //     ./dependencies.cue:6:6
        // issue3606.data.notAllowed: field not allowed:
        //     ./dependencies.cue:3:3
@@ -741,7 +807,7 @@ diff old new
      }
      #S: ((string|struct)){ |((string){ string }, (#struct){
        }) }
-@@ -144,19 +133,12 @@
+@@ -144,19 +136,12 @@
      // [eval] f: 2 errors in empty disjunction:
      // f.name: conflicting values "int" and "str":
      //     ./in.cue:5:8
@@ -762,7 +828,7 @@ diff old new
    }
    e1: (struct){
      a: ((null|struct)){ |((null){ null }, (struct){
-@@ -268,8 +250,8 @@
+@@ -268,8 +253,8 @@
      e: (struct){
        foobar: (#struct){
          b: (#struct){
@@ -772,7 +838,7 @@ diff old new
          }
        }
      }
-@@ -279,10 +261,7 @@
+@@ -279,10 +264,7 @@
        x: (int){ 0 }
      }
      inList1: (struct){
@@ -784,7 +850,7 @@ diff old new
      }
      inList2: (struct){
        x: (int){ 0 }
-@@ -402,7 +381,7 @@
+@@ -402,7 +384,7 @@
            let Ok#2 = (bool){ true }
          }, (#struct){
            _ok: (bool){ true }
@@ -793,6 +859,70 @@ diff old new
            x: (bool){ true }
          }) }
        bar: (#struct){ |((#struct){
+@@ -434,37 +416,41 @@
+         }) }
+     }
+   }
+-  issue3899: (struct){
+-    reduced: (struct){
+-      p1: (struct){
+-        b: (string){ string }
++  issue3899: (_|_){
++    // [eval]
++    reduced: (struct){
++      p1: (struct){
++        b: (_){ |((_){ _ }, (string){ string }) }
+         c?: (string){ string }
+       }
+     }
+-    full: (struct){
+-      out: (#struct){
+-        _versions: (#struct){
+-          foo: (string){ "123" }
+-        }
+-        spec: (#struct){
+-          limits: (bool){ true }
+-          image: (string){ |(*(string){ "foo" }, (string){ string }) }
+-        }
++    full: (_|_){
++      // [eval]
++      out: (#struct){
+         name: (string){ "foo" }
++        _versions: (#struct){
++          foo: (string){ "123" }
++        }
++        spec: (#struct){
++          limits: (bool){ true }
++          image: (string){ |(*(string){ "foo" }, (string){ string }) }
++        }
+         deployImage: (string){ "123" }
+       }
+-      #Schema: (#struct){
+-        _versions: (#struct){
+-          foo: (string){ "123" }
+-        }
+-        spec: (#struct){
+-          limits: (bool){ true }
+-          image: (string){ string }
++      #Schema: (_|_){
++        // [eval]
++        _versions: (#struct){
++          foo: (string){ "123" }
++        }
++        spec: (#struct){
++          limits: (bool){ true }
++          image: (_){ |(*(_){ _ }, (string){ string }) }
+         }
+         name!: (string){ string }
+         deployImage: (_|_){
+-          // [incomplete] issue3899.full.#Schema.deployImage: invalid non-ground value string (must be concrete string):
+-          //     ./issue3899.cue:17:18
++          // [eval] issue3899.full.#Schema.deployImage: invalid index spec.image (invalid type _):
++          //     ./issue3899.cue:18:18
++          //     ./issue3899.cue:18:28
+         }
+       }
+     }
 -- diff/todo/p3 --
 Missing error positions.
   It is probably okay to show name and val fields with original values, as long
@@ -1233,6 +1363,41 @@ Result:
           let Ok#3 = (bool){ true }
           x: (bool){ true }
         }) }
+    }
+  }
+  issue3899: (struct){
+    reduced: (struct){
+      p1: (struct){
+        b: (string){ string }
+        c?: (string){ string }
+      }
+    }
+    full: (struct){
+      out: (#struct){
+        _versions: (#struct){
+          foo: (string){ "123" }
+        }
+        spec: (#struct){
+          limits: (bool){ true }
+          image: (string){ |(*(string){ "foo" }, (string){ string }) }
+        }
+        name: (string){ "foo" }
+        deployImage: (string){ "123" }
+      }
+      #Schema: (#struct){
+        _versions: (#struct){
+          foo: (string){ "123" }
+        }
+        spec: (#struct){
+          limits: (bool){ true }
+          image: (string){ string }
+        }
+        name!: (string){ string }
+        deployImage: (_|_){
+          // [incomplete] issue3899.full.#Schema.deployImage: invalid non-ground value string (must be concrete string):
+          //     ./issue3899.cue:17:18
+        }
+      }
     }
   }
 }
@@ -1719,6 +1884,45 @@ Result:
       foo: (〈0;X〉 & {
         〈1;X〉
       })
+    }
+  }
+}
+--- issue3899.cue
+{
+  issue3899: {
+    reduced: {
+      p1: {
+        b: ((〈0;c〉 + "")|string)
+        c?: string
+      }
+    }
+  }
+  issue3899: {
+    reduced: {
+      p1: {
+        c?: string
+        b: ((〈0;c〉 + "")|string)
+      }
+    }
+  }
+  issue3899: {
+    full: {
+      out: (〈0;#Schema〉 & {
+        name: "foo"
+      })
+      #Schema: {
+        _versions: {
+          foo: "123"
+        }
+        spec: {
+          limits: true
+        }
+        name!: string
+        spec: {
+          image: (string|*"\(〈1;name〉)")
+        }
+        deployImage: 〈0;_versions〉[〈0;spec〉.image]
+      }
     }
   }
 }

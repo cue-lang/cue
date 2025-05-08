@@ -505,12 +505,14 @@ type Config struct {
 	ToSlash bool
 }
 
+var zeroConfig = &Config{}
+
 // Print is a utility function that prints a list of errors to w,
 // one error per line, if the err parameter is an List. Otherwise
 // it prints the err string.
 func Print(w io.Writer, err error, cfg *Config) {
 	if cfg == nil {
-		cfg = &Config{}
+		cfg = zeroConfig
 	}
 	for _, e := range list(Errors(err)).sanitize() {
 		printError(w, e, cfg)
@@ -528,11 +530,11 @@ func Details(err error, cfg *Config) string {
 // String generates a short message from a given Error.
 func String(err Error) string {
 	var b strings.Builder
-	writeErr(&b, err)
+	writeErr(&b, err, zeroConfig)
 	return b.String()
 }
 
-func writeErr(w io.Writer, err Error) {
+func writeErr(w io.Writer, err Error, cfg *Config) {
 	if path := strings.Join(err.Path(), "."); path != "" {
 		_, _ = io.WriteString(w, path)
 		_, _ = io.WriteString(w, ": ")
@@ -542,6 +544,25 @@ func writeErr(w io.Writer, err Error) {
 		u := errors.Unwrap(err)
 
 		msg, args := err.Msg()
+
+		// Just like [printError] does when printing one position per line,
+		// make sure that any position formatting arguments print as relative paths.
+		//
+		// Note that [Error.Msg] isn't clear about whether we should treat args as read-only,
+		// so we make a copy if we need to replace any arguments.
+		didCopy := false
+		for i, arg := range args {
+			if arg, ok := arg.(token.Pos); ok {
+				if !didCopy {
+					args = slices.Clone(args)
+					didCopy = true
+				}
+				pos := arg.Position()
+				pos.Filename = relPath(pos.Filename, cfg)
+				args[i] = pos
+			}
+		}
+
 		n, _ := fmt.Fprintf(w, msg, args...)
 
 		if u == nil {
@@ -573,7 +594,7 @@ func printError(w io.Writer, err error, cfg *Config) {
 	}
 
 	if e, ok := err.(Error); ok {
-		writeErr(w, e)
+		writeErr(w, e, cfg)
 	} else {
 		fprintf(w, "%v", err)
 	}
@@ -586,21 +607,7 @@ func printError(w io.Writer, err error, cfg *Config) {
 	fprintf(w, ":\n")
 	for _, p := range positions {
 		pos := p.Position()
-		path := pos.Filename
-		if cfg.Cwd != "" {
-			if p, err := filepath.Rel(cfg.Cwd, path); err == nil {
-				path = p
-				// Some IDEs (e.g. VSCode) only recognize a path if it starts
-				// with a dot. This also helps to distinguish between local
-				// files and builtin packages.
-				if !strings.HasPrefix(path, ".") {
-					path = fmt.Sprintf(".%c%s", filepath.Separator, path)
-				}
-			}
-		}
-		if cfg.ToSlash {
-			path = filepath.ToSlash(path)
-		}
+		path := relPath(pos.Filename, cfg)
 		fprintf(w, "    %s", path)
 		if pos.IsValid() {
 			if path != "" {
@@ -610,4 +617,22 @@ func printError(w io.Writer, err error, cfg *Config) {
 		}
 		fprintf(w, "\n")
 	}
+}
+
+func relPath(path string, cfg *Config) string {
+	if cfg.Cwd != "" {
+		if p, err := filepath.Rel(cfg.Cwd, path); err == nil {
+			path = p
+			// Some IDEs (e.g. VSCode) only recognize a path if it starts
+			// with a dot. This also helps to distinguish between local
+			// files and builtin packages.
+			if !strings.HasPrefix(path, ".") {
+				path = fmt.Sprintf(".%c%s", filepath.Separator, path)
+			}
+		}
+	}
+	if cfg.ToSlash {
+		path = filepath.ToSlash(path)
+	}
+	return path
 }

@@ -55,6 +55,7 @@
     }
 }
 -- out/decode/extract --
+_embeddedResource
 apiVersion?: string
 kind?:       string
 metadata?: {}

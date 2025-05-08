@@ -76,6 +76,7 @@
 }
 
 -- out/decode/extract --
+_embeddedResource
 alpha?: string
 beta?:  number
 preserving?: {
@@ -91,5 +92,13 @@ pruning?: {
 		...
 	}
 	pruning?: {}
+}
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata!: {
+		...
+	}
 }
 ...

@@ -71,7 +71,7 @@ r2?: {
 _embeddedResource: {
 	apiVersion!: string
 	kind!:       string
-	metadata!: {
+	metadata?: {
 		...
 	}
 }

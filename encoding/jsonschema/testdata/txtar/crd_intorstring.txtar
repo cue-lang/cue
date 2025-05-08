@@ -35,7 +35,7 @@ spec?: int | string
 _embeddedResource: {
 	apiVersion!: string
 	kind!:       string
-	metadata!: {
+	metadata?: {
 		...
 	}
 }

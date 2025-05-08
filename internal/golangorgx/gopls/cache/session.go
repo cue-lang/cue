@@ -15,6 +15,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/metadata"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/typerefs"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
@@ -144,12 +145,12 @@ func (s *Session) createView(ctx context.Context, def *viewDefinition) (*View, *
 		store:            s.cache.store,
 		refcount:         1, // Snapshots are born referenced.
 		done:             s.snapshotWG.Done,
-		packages:         new(persistent.Map[PackageID, *packageHandle]),
+		packages:         new(persistent.Map[ImportPath, *packageHandle]),
 		meta:             new(metadata.Graph),
 		files:            newFileMap(),
-		activePackages:   new(persistent.Map[PackageID, *Package]),
+		activePackages:   new(persistent.Map[ImportPath, *build.Instance]),
 		symbolizeHandles: new(persistent.Map[protocol.DocumentURI, *memoize.Promise]),
-		shouldLoad:       new(persistent.Map[PackageID, []PackagePath]),
+		shouldLoad:       new(persistent.Map[ImportPath, []PackagePath]),
 		unloadableFiles:  new(persistent.Set[protocol.DocumentURI]),
 		pkgIndex:         typerefs.NewPackageIndex(),
 	}
@@ -265,9 +266,11 @@ func (s *Session) SnapshotOf(ctx context.Context, uri protocol.DocumentURI) (*Sn
 
 	for _, v := range views {
 		snapshot, release, err := v.Snapshot()
-		if err == nil {
-			return snapshot, release, nil // first valid snapshot
+		if err != nil {
+			continue
 		}
+		_ = snapshot.awaitLoaded(ctx) // ignore error
+		return snapshot, release, nil // first valid snapshot
 	}
 	return nil, nil, errNoViews
 }

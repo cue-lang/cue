@@ -16,6 +16,7 @@ import (
 	"sync"
 	"time"
 
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/metadata"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
@@ -229,7 +230,7 @@ func (s *server) diagnoseChangedFiles(ctx context.Context, snapshot *cache.Snaps
 	ctx, done := event.Start(ctx, "Server.diagnoseChangedFiles", snapshot.Labels()...)
 	defer done()
 
-	toDiagnose := make(map[metadata.PackageID]*metadata.Package)
+	toDiagnose := make(map[metadata.ImportPath]*build.Instance)
 	for _, uri := range uris {
 		// If the file is not open, don't diagnose its package.
 		//
@@ -246,6 +247,24 @@ func (s *server) diagnoseChangedFiles(ctx context.Context, snapshot *cache.Snaps
 		if snapshot.FindFile(uri) == nil {
 			continue
 		}
+
+		insts, err := snapshot.MetadataForFile(ctx, uri)
+		if err != nil {
+			if ctx.Err() != nil {
+				return nil, ctx.Err()
+			}
+			// TODO(findleyr): we should probably do something with the error here,
+			// but as of now this can fail repeatedly if load fails, so can be too
+			// noisy to log (and we'll handle things later in the slow pass).
+			continue
+		}
+		if len(insts) > 0 {
+			// The results of snapshot.MetadataForFile are sorted, with
+			// the instance with the fewest BuildFiles first. We want the
+			// smallest/narrowest instance here.
+			inst := insts[0]
+			toDiagnose[metadata.ImportPath(inst.ImportPath)] = inst
+		}
 	}
 	diags, err := snapshot.PackageDiagnostics(ctx, maps.Keys(toDiagnose)...)
 	if err != nil {
@@ -257,8 +276,9 @@ func (s *server) diagnoseChangedFiles(ctx context.Context, snapshot *cache.Snaps
 	// golang/go#59587: guarantee that we compute type-checking diagnostics
 	// for every compiled package file, otherwise diagnostics won't be quickly
 	// cleared following a fix.
-	for _, meta := range toDiagnose {
-		for _, uri := range meta.CompiledGoFiles {
+	for _, inst := range toDiagnose {
+		for _, file := range inst.BuildFiles {
+			uri := protocol.URIFromPath(file.Filename)
 			if _, ok := diags[uri]; !ok {
 				diags[uri] = nil
 			}

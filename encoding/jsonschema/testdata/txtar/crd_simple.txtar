@@ -30,6 +30,15 @@ spec:
             x-kubernetes-preserve-unknown-fields: true
 
 -- out/decode/extract --
+_embeddedResource
 spec?: {
 	...
+}
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata!: {
+		...
+	}
 }

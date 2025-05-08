@@ -182,7 +182,11 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 			// containing a field for each definition.
 			constraintAddDefinitions("schemas", defsRoot, root)
 		} else {
-			expr, state := root.schemaState(v, allTypes, nil)
+			expr, state := root.schemaState(v, allTypes, func(s *state) {
+				// We want the top level state to be treated as root even
+				// though it's some levels below the actual document top level.
+				s.isRoot = true
+			})
 			if state.allowedTypes == 0 {
 				root.errf(v, "constraints are not possible to satisfy")
 				return nil
@@ -887,6 +891,18 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, init func(*state)) (ex
 			}
 			c.fn(key, value, s)
 		})
+		if s.schemaVersion == VersionKubernetesCRD && s.isRoot {
+			// The root of a CRD is always a resource, so treat it as if it contained
+			// the x-kubernetes-embedded-resource keyword
+			c := constraintMap["x-kubernetes-embedded-resource"]
+			if c.phase != pass {
+				continue
+			}
+			// Note: there is no field value for the embedded-resource keyword,
+			// but it's not actually used except for its position so passing
+			// the parent object should work fine.
+			c.fn("x-kubernetes-embedded-resource", n, s)
+		}
 	}
 	if s.id != nil {
 		// If there's an ID, it can be referred to.

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c050a3a_0a234c36",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 552,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-08T12:04:41Z",
+      "side": 1,
+      "message": "do we currently get and weird behaviour if you don\u0027t take a copy and modify in place?",
+      "revId": "b575bdf038f5ea4c9549aeea915fd523dc8e4ed5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c600ca3_0402c010",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 624,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-08T12:04:41Z",
+      "side": 1,
+      "message": "it\u0027s a real (tiny) shame to have to split this `if` up like this, but I\u0027ve read the filepath.Rel source and tried a few things, and I can\u0027t see any sane way around it. Oh well.",
+      "revId": "b575bdf038f5ea4c9549aeea915fd523dc8e4ed5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1827e9ef_344c7c74",
+        "filename": "internal/core/runtime/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-08T12:04:41Z",
+      "side": 1,
+      "message": "Oh really? `%s` is preferred if the value has a String() method? I know in practice it\u0027ll behave the same as `%v` but I always thought `%v` was the preferred form.",
+      "revId": "b575bdf038f5ea4c9549aeea915fd523dc8e4ed5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

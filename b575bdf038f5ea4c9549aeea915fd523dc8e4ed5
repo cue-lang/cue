@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "63faf9e7_46888b30",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 552,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-08T14:21:47Z",
+      "side": 1,
+      "message": "there is no weird behavior, because cmd/cue only prints errors right when it is finishing, i.e. something failed.\n\nhowever there are users calling the cue/errors Go API directly, so it would be odd to modify their errors in-place silently. I left the note as a reminder to revisit this interface to clarify.",
+      "parentUuid": "6c050a3a_0a234c36",
+      "revId": "b575bdf038f5ea4c9549aeea915fd523dc8e4ed5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5c600ca3_0402c010",
         "filename": "cue/errors/errors.go",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2025-05-08T12:04:41Z",
       "side": 1,
       "message": "it\u0027s a real (tiny) shame to have to split this `if` up like this, but I\u0027ve read the filepath.Rel source and tried a few things, and I can\u0027t see any sane way around it. Oh well.",
+      "revId": "b575bdf038f5ea4c9549aeea915fd523dc8e4ed5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "360abb04_962d0ad5",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 624,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-08T14:21:47Z",
+      "side": 1,
+      "message": "yep indeed.",
+      "parentUuid": "5c600ca3_0402c010",
       "revId": "b575bdf038f5ea4c9549aeea915fd523dc8e4ed5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -48,6 +84,24 @@
       "writtenOn": "2025-05-08T12:04:41Z",
       "side": 1,
       "message": "Oh really? `%s` is preferred if the value has a String() method? I know in practice it\u0027ll behave the same as `%v` but I always thought `%v` was the preferred form.",
+      "revId": "b575bdf038f5ea4c9549aeea915fd523dc8e4ed5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "147099fc_584d1fc1",
+        "filename": "internal/core/runtime/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-08T14:21:47Z",
+      "side": 1,
+      "message": "the main point here was to pass `token.Pos` as the argument. I also did `%s` while here, but I didn\u0027t have to.\n\nthere\u0027s no right or wrong answer AFAICT. I looked at the other error messages using positions as arguments and they seemed to use `%s` so I went with it for consistency.\n\nOn one hand, `%v` is more flexible so it will work with other types too. On the other, if we mess up and pass an argument that isn\u0027t a string or a stringer, then %s will catch that mistake (and `cue vet` will say) but %v will happily chug along.\n\nSo I personally lean towards %s for strings for stable and maintainable code. But overall it\u0027s not a huge deal either way.",
+      "parentUuid": "1827e9ef_344c7c74",
       "revId": "b575bdf038f5ea4c9549aeea915fd523dc8e4ed5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

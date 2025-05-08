@@ -1,12 +1,10 @@
 # Unknown and redeclared imports should be reported for anonymous packages too.
 
-# TODO: we should not use absolute paths in reported errors, which requires using 'cmpenv' below
-
 ! exec cue export named.cue
-cmpenv stderr named.stderr
+cmp stderr named.stderr
 
 ! exec cue export missing.cue
-cmpenv stderr missing.stderr
+cmp stderr missing.stderr
 
 -- named.cue --
 package p
@@ -19,7 +17,7 @@ list: 123
 builtin package "notinstd" undefined:
     ./named.cue:3:8
 list redeclared as imported package name
-	previous declaration at ${WORK}${/}named.cue:6:1:
+	previous declaration at ./named.cue:6:1:
     ./named.cue:4:8
 -- missing.cue --
 import "notinstd"
@@ -30,5 +28,5 @@ list: 123
 builtin package "notinstd" undefined:
     ./missing.cue:1:8
 list redeclared as imported package name
-	previous declaration at ${WORK}${/}missing.cue:4:1:
+	previous declaration at ./missing.cue:4:1:
     ./missing.cue:2:8

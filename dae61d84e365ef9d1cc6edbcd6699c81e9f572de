@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c2ad415_896213ed",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 479,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-08T17:21:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c8cbb31_e08e55f1",
+      "revId": "dae61d84e365ef9d1cc6edbcd6699c81e9f572de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "996cb051_0aff708f",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-05-07T09:41:27Z",
       "side": 1,
       "message": "This assumes that a package can be uniquely identified by its last component, but that\u0027s not necessarily the case. For example:\n```\n@go(,type\u003dstruct{\n\tA \"go/token\".Token\n\tB \"cuelang.org/go/cue/token\".Token\n})\n```\nI will admit this is probably a rare case, but probably worth a TODO.\n\nAs an alternative, how about avoiding the string manipulation shenanigans entirely and just using `goparser.ParseExpr`, then walking the resulting AST for selector expressions where the LHS is a string? That would seem like a cleaner solution to me.",
+      "revId": "dae61d84e365ef9d1cc6edbcd6699c81e9f572de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "043fd987_85dca98a",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-08T17:21:08Z",
+      "side": 1,
+      "message": "as discussed, we can\u0027t use ParseExpr directly. I will make an explicit note of this on the godoc.\n\nI\u0027ll add a TODO about disambiguating imports too.\n\nand as agreed, I\u0027ll look at using go/scanner.",
+      "parentUuid": "996cb051_0aff708f",
       "revId": "dae61d84e365ef9d1cc6edbcd6699c81e9f572de",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

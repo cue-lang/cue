@@ -97,7 +97,7 @@ pruning?: {
 _embeddedResource: {
 	apiVersion!: string
 	kind!:       string
-	metadata!: {
+	metadata?: {
 		...
 	}
 }

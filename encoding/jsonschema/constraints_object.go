@@ -159,7 +159,7 @@ func constraintEmbeddedResource(key string, n cue.Value, s *state) {
 	s.builder.put(resourceDefinitionPath, ast.NewStruct(
 		"apiVersion", token.NOT, ast.NewIdent("string"),
 		"kind", token.NOT, ast.NewIdent("string"),
-		"metadata", token.NOT, ast.NewStruct(&ast.Ellipsis{}),
+		"metadata", token.OPTION, ast.NewStruct(&ast.Ellipsis{}),
 	), nil)
 	refExpr, err := s.builder.getRef(resourceDefinitionPath)
 	if err != nil {

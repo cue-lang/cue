@@ -132,6 +132,125 @@ Retain: 25
 Unifications: 27
 Conjuncts:    82
 Disjuncts:    58
+-- out/evalalpha --
+Errors:
+xe3: conflicting values 7 and 6:
+    ./in.cue:35:6
+    ./in.cue:35:10
+
+Result:
+(_|_){
+  // [eval]
+  xa1: (int){ 8 }
+  xa2: (int){ 8 }
+  xa3: (int){ 6 }
+  xa4: (int){ 10 }
+  xb1: (_|_){
+    // [cycle] xb1: 4 errors in empty disjunction:
+    // xb2: unresolved disjunction: xb3:
+    //     ./in.cue:9:6
+    // xb3: 3 errors in empty disjunction::
+    //     ./in.cue:9:6
+    // xb3: unresolved disjunction: xb1:
+    //     ./in.cue:10:13
+    // xb3: cycle with field: xb2:
+    //     ./in.cue:11:6
+  }
+  xb2: (_|_){
+    // [cycle] xb2: unresolved disjunction: xb3:
+    //     ./in.cue:9:6
+    // xb3: cycle with field: xb2:
+    //     ./in.cue:11:6
+  }
+  xb3: (_|_){
+    // [cycle] xb2: unresolved disjunction: xb3:
+    //     ./in.cue:9:6
+    // xb3: 3 errors in empty disjunction::
+    //     ./in.cue:9:6
+    // xb3: unresolved disjunction: xb1:
+    //     ./in.cue:10:13
+    // xb3: cycle with field: xb2:
+    //     ./in.cue:11:6
+  }
+  xb4: (_|_){
+    // [cycle] xb2: unresolved disjunction: xb3:
+    //     ./in.cue:9:6
+    // xb3: cycle with field: xb2:
+    //     ./in.cue:11:6
+  }
+  xc1: (int){ |(*(int){ 8 }, (int){ 9 }) }
+  xc2: (int){ 8 }
+  xc3: (int){ 6 }
+  xc4: (int){ 9 }
+  xc5: (int){ 10 }
+  xd1: (int){ |(*(int){ 8 }, (int){ 9 }) }
+  xd2: (int){ 8 }
+  xd3: (int){ 6 }
+  xd4: (int){ 9 }
+  xd5: (int){ 10 }
+  xe1: (int){ 9 }
+  xe2: (int){ 8 }
+  xe3: (_|_){
+    // [eval] xe3: conflicting values 7 and 6:
+    //     ./in.cue:35:6
+    //     ./in.cue:35:10
+  }
+  xe4: (int){ 9 }
+  xe5: (int){ 10 }
+  z1: (int){ |(*(int){ 11 }, (int){ 13 }) }
+  z2: (int){ 10 }
+  z3: (int){ 8 }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -10,10 +10,39 @@
+   xa2: (int){ 8 }
+   xa3: (int){ 6 }
+   xa4: (int){ 10 }
+-  xb1: (int){ 8 }
+-  xb2: (int){ 8 }
+-  xb3: (int){ |(*(int){ 6 }, (int){ 9 }) }
+-  xb4: (int){ 10 }
++  xb1: (_|_){
++    // [cycle] xb1: 4 errors in empty disjunction:
++    // xb2: unresolved disjunction: xb3:
++    //     ./in.cue:9:6
++    // xb3: 3 errors in empty disjunction::
++    //     ./in.cue:9:6
++    // xb3: unresolved disjunction: xb1:
++    //     ./in.cue:10:13
++    // xb3: cycle with field: xb2:
++    //     ./in.cue:11:6
++  }
++  xb2: (_|_){
++    // [cycle] xb2: unresolved disjunction: xb3:
++    //     ./in.cue:9:6
++    // xb3: cycle with field: xb2:
++    //     ./in.cue:11:6
++  }
++  xb3: (_|_){
++    // [cycle] xb2: unresolved disjunction: xb3:
++    //     ./in.cue:9:6
++    // xb3: 3 errors in empty disjunction::
++    //     ./in.cue:9:6
++    // xb3: unresolved disjunction: xb1:
++    //     ./in.cue:10:13
++    // xb3: cycle with field: xb2:
++    //     ./in.cue:11:6
++  }
++  xb4: (_|_){
++    // [cycle] xb2: unresolved disjunction: xb3:
++    //     ./in.cue:9:6
++    // xb3: cycle with field: xb2:
++    //     ./in.cue:11:6
++  }
+   xc1: (int){ |(*(int){ 8 }, (int){ 9 }) }
+   xc2: (int){ 8 }
+   xc3: (int){ 6 }
+-- diff/todo/p2 --
+xb*: cycles are not broken if between disjuncts if they are within expressions.
 -- out/eval --
 Errors:
 xe3: conflicting values 7 and 6:

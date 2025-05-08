@@ -816,7 +816,7 @@ Result:
         }, (#struct){
           pass: (#struct){
             let self#1 = (_|_){
-              // [cycle] issue3832.#T._assert.pass.self: cycle error referencing self:
+              // [incomplete] issue3832.#T._assert.pass.self: undefined field: self:
               //     ./issue3832.cue:8:19
             }
             outFirstName: (_|_){
@@ -827,7 +827,7 @@ Result:
           invoke!: (_){ _ }
         }) }
       results: (_|_){
-        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: cycle error referencing self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
+        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
         //     ./issue3832.cue:20:12
       }
     }
@@ -1700,7 +1700,7 @@ diff old new
              let self#1 = (_|_){
 -              // [incomplete] issue3832.#T._assert.pass.self: in.self undefined (in is incomplete):
 -              //     ./issue3832.cue:8:16
-+              // [cycle] issue3832.#T._assert.pass.self: cycle error referencing self:
++              // [incomplete] issue3832.#T._assert.pass.self: undefined field: self:
 +              //     ./issue3832.cue:8:19
              }
              outFirstName: (_|_){
@@ -1714,7 +1714,7 @@ diff old new
          }) }
        results: (_|_){
 -        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete)),outFirstName:_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete))},invoke!:_} (type struct):
-+        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: cycle error referencing self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
++        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
          //     ./issue3832.cue:20:12
        }
      }

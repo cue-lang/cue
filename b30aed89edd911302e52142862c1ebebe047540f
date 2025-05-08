@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "95ce15e5_503cb448",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-08T22:27:50Z",
+      "side": 1,
+      "message": "gengotypes doesn\u0027t deal with this just yet - there is a TODO for it in the code. so I don\u0027t think we should make this suggestion.",
+      "parentUuid": "565b6243_d0e32ccc",
+      "revId": "b30aed89edd911302e52142862c1ebebe047540f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5eefe31_cd72931f",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-05-08T14:18:53Z",
       "side": 1,
       "message": "I had to do a double-take on \"optionalStg\" - I might be inclined to name it just \"strategy\" given the domain of the function here.",
+      "revId": "b30aed89edd911302e52142862c1ebebe047540f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0ff2f5a_3d450629",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-08T22:27:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5eefe31_cd72931f",
       "revId": "b30aed89edd911302e52142862c1ebebe047540f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c17f5f72_7aeb2f75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T07:47:23Z",
+      "side": 1,
+      "message": "LGTM with one minor thought. It might be nice to have a test case with a struct type to make sure that works OK.",
+      "revId": "e41b4c231056ce88c029a7a6a3ae5de83aa2d087",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f960e54_cc331370",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T07:47:23Z",
+      "side": 1,
+      "message": "How are we sure of that? Won\u0027t it apply to any inline newline, such as the end of a struct field?",
+      "revId": "e41b4c231056ce88c029a7a6a3ae5de83aa2d087",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

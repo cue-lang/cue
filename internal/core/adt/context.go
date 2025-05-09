@@ -178,6 +178,8 @@ type OpContext struct {
 	// TODO: strictly separate validators and functions.
 	IsValidator bool
 
+	overlays []overlayFrame
+
 	// ==== Debugging ====
 	logID int // sequence number for log messages
 

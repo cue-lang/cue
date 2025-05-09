@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"math/bits"
 	"path"
 	"reflect"
 	"strings"
@@ -869,10 +868,6 @@ line two.\
 			// and the resulting TOML is still JSON-equivalent.
 			t.Run("reencode", func(t *testing.T) {
 				switch test.name {
-				case "Integers":
-					if bits.UintSize == 32 {
-						t.Skip("TODO(mvdan): big integers always encode as TOML strings today; can be resolved once CUE_EXPERIMENT=decodeint64 is enabled")
-					}
 				case "DateTimes":
 					t.Skip("TODO(mvdan): dates and times always encode as TOML strings today")
 				}

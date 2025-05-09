@@ -1742,7 +1742,12 @@ Result:
             #sub2?: (bool){ bool }
           }
         }
-        root: ((null|struct)){ |((null){ null }, (#struct){
+        root: ((null|struct)){ |((null){
+            null
+            #sub1?: (#struct){
+              #sub2: (bool){ true }
+            }
+          }, (#struct){
             #sub1?: (#struct){
               #sub2: (bool){ true }
             }
@@ -1787,7 +1792,7 @@ Result:
   arcTypeAcrossTwo: (struct){
     a: (struct){
       b: (struct){
-        c?: (struct){
+        c: (struct){
           d: (bool){ true }
         }
       }
@@ -1796,6 +1801,9 @@ Result:
   issue3894: (struct){
     reduced: (struct){
       p1: (struct){ |((struct){
+          b: (struct){
+            value: (string){ "true" }
+          }
           a: (string){ string }
         }, (struct){
           b: (struct){
@@ -1821,13 +1829,11 @@ Result:
             value: (string){ string }
           }
         }) }
-      out: (#struct){ |((#struct){
-          a?: (string){ string }
-        }, (#struct){
-          b: (#struct){
-            value: (string){ "true" }
-          }
-        }) }
+      out: (#struct){
+        b: (#struct){
+          value: (string){ "true" }
+        }
+      }
     }
   }
   unifyDynamicReflectSuccess: (struct){
@@ -2162,21 +2168,7 @@ diff old new
          //     ./issue3729.cue:11:9
          #sub1?: (#struct){
            #sub2: (bool){ true }
-@@ -850,12 +789,7 @@
-             #sub2?: (bool){ bool }
-           }
-         }
--        root: ((null|struct)){ |((null){
--            null
--            #sub1?: (#struct){
--              #sub2: (bool){ true }
--            }
--          }, (#struct){
-+        root: ((null|struct)){ |((null){ null }, (#struct){
-             #sub1?: (#struct){
-               #sub2: (bool){ true }
-             }
-@@ -864,14 +798,7 @@
+@@ -864,14 +803,7 @@
      }
      full: (struct){
        #Application: (#struct){
@@ -2192,44 +2184,6 @@ diff old new
        }
        #ApplicationSpec: (#struct){
          syncPolicy?: ((null|struct)){ |((null){ null }, (#struct){
-@@ -907,7 +834,7 @@
-   arcTypeAcrossTwo: (struct){
-     a: (struct){
-       b: (struct){
--        c: (struct){
-+        c?: (struct){
-           d: (bool){ true }
-         }
-       }
-@@ -916,9 +843,6 @@
-   issue3894: (struct){
-     reduced: (struct){
-       p1: (struct){ |((struct){
--          b: (struct){
--            value: (string){ "true" }
--          }
-           a: (string){ string }
-         }, (struct){
-           b: (struct){
-@@ -944,11 +868,13 @@
-             value: (string){ string }
-           }
-         }) }
--      out: (#struct){
--        b: (#struct){
--          value: (string){ "true" }
--        }
--      }
-+      out: (#struct){ |((#struct){
-+          a?: (string){ string }
-+        }, (#struct){
-+          b: (#struct){
-+            value: (string){ "true" }
-+          }
-+        }) }
-     }
-   }
-   unifyDynamicReflectSuccess: (struct){
 -- out/evalalpha/stats --
 Leaks:  690
 Freed:  0
@@ -2238,10 +2192,10 @@ Allocs: 690
 Retain: 0
 
 Unifications: 602
-Conjuncts:    1027
+Conjuncts:    1029
 Disjuncts:    44
 
-CloseIDElems: 218
+CloseIDElems: 222
 NumCloseIDs: 181
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -2264,10 +2218,10 @@ diff old new
 +Retain: 0
 +
 +Unifications: 602
-+Conjuncts:    1027
++Conjuncts:    1029
 +Disjuncts:    44
 +
-+CloseIDElems: 218
++CloseIDElems: 222
 +NumCloseIDs: 181
 -- out/eval/stats --
 Leaks:  73

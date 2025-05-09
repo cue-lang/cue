@@ -493,6 +493,10 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 	n.scheduler.blocking = n.scheduler.blocking[:0]
 
 	d := oc.cloneRoot(n)
+
+	n.ctx.pushOverlay(n.node, oc.vertexMap)
+	defer n.ctx.popOverlay()
+
 	d.runMode = mode
 	c.Env = oc.derefDisjunctsEnv(c.Env)
 

@@ -68,6 +68,45 @@ type overlayContext struct {
 
 type vertexMap map[*Vertex]*Vertex
 
+// overlayFrom is used to store overlay information in the OpContext. This
+// is used for dynamic resolution of vertices, which prevents data structures
+// from having to be copied in the overlay.
+//
+// TODO(perf): right now this is only used for resolving vertices in
+// comprehensions. We could also use this for resolving environments, though.
+// Furthermore, we could used the "cleared" vertexMaps on this stack to avoid
+// allocating memory.
+//
+// NOTE: using a stack globally in OpContext is not very principled, as we
+// may be evaluating nested evaluations of different disjunctions. However,
+// in practice this just results in more work: as the vertices should not
+// overlap, there will be no cycles.
+type overlayFrame struct {
+	vertexMap vertexMap
+	root      *Vertex
+}
+
+func (c *OpContext) pushOverlay(v *Vertex, m vertexMap) {
+	c.overlays = append(c.overlays, overlayFrame{m, v})
+}
+
+func (c *OpContext) popOverlay() {
+	c.overlays = c.overlays[:len(c.overlays)-1]
+}
+
+func (c *OpContext) deref(v *Vertex) *Vertex {
+	for i := len(c.overlays) - 1; i >= 0; i-- {
+		f := c.overlays[i]
+		if f.root == v {
+			continue
+		}
+		if x, ok := f.vertexMap[v]; ok {
+			return x
+		}
+	}
+	return v
+}
+
 // deref reports a replacement of v or v itself if such a replacement does not
 // exists. It computes the transitive closure of the replacement graph.
 // TODO(perf): it is probably sufficient to only replace one level. But we need
@@ -346,7 +385,7 @@ func (ctx *overlayContext) cloneTask(t *task, dst, src *scheduler) *task {
 
 		node: dst.node,
 
-		// TODO: need to copy closeContexts?
+		// TODO(evalv3): rewrite comp and leaf to reflect disjunctions.
 		comp: t.comp,
 		leaf: t.leaf,
 	}

@@ -16,6 +16,24 @@
       "message": "a comment here should summarize what\u0027s special about metadata that makes it optional, given that some docs seem to imply it\u0027s required. otherwise we might get really confused in the future when we forget what happened here.",
       "revId": "2672730743e434e836d196db18c47f739bb0709a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5be5b056_3ac3ca9d",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T12:51:05Z",
+      "side": 1,
+      "message": "I\u0027m actually not entirely sure! I\u0027ll wait for confirmation from someone that knows better than me before landing this.",
+      "parentUuid": "b480386f_89114dfc",
+      "revId": "2672730743e434e836d196db18c47f739bb0709a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

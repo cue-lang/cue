@@ -1,4 +1,4 @@
-env CUE_DEBUG_TOOLS_FLOW=1
+env CUE_DEBUG=toolsflow=1
 
 exec cue cmd bar
 cmp stderr stderr.golden

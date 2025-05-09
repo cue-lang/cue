@@ -238,6 +238,32 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
+		Name: "AddIPOffset",
+		Params: []pkg.Param{
+			{Kind: adt.TopKind},
+			{Kind: adt.IntKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *pkg.CallCtxt) {
+			ip, offset := c.Value(0), c.BigInt(1)
+			if c.Do() {
+				c.Ret, c.Err = AddIPOffset(ip, offset)
+			}
+		},
+	}, {
+		Name: "AddIPCIDROffset",
+		Params: []pkg.Param{
+			{Kind: adt.TopKind},
+			{Kind: adt.IntKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *pkg.CallCtxt) {
+			ip, offset := c.Value(0), c.BigInt(1)
+			if c.Do() {
+				c.Ret, c.Err = AddIPCIDROffset(ip, offset)
+			}
+		},
+	}, {
 		Name: "PathEscape",
 		Params: []pkg.Param{
 			{Kind: adt.StringKind},

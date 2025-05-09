@@ -9,7 +9,7 @@ import (
 // Flags holds the set of global CUE_DEBUG flags. It is initialized by Init.
 var Flags Config
 
-// Flags holds the set of known CUE_DEBUG flags.
+// Config holds the set of known CUE_DEBUG flags.
 //
 // When adding, deleting, or modifying entries below,
 // update cmd/cue/cmd/help.go as well for `cue help environment`.
@@ -44,6 +44,9 @@ type Config struct {
 
 	// OpenDef disables the check for closedness of definitions.
 	OpenDef bool
+
+	// ToolsFlow causes [cuelang.org/go/tools/flow] to print a task dependency mermaid graph.
+	ToolsFlow bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

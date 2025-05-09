@@ -33,6 +33,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/value"
 )
 
@@ -145,7 +146,8 @@ func (c *Controller) markReady(t *Task) {
 		}
 	}
 
-	if debug {
+	cuedebug.Init()
+	if cuedebug.Flags.ToolsFlow {
 		fmt.Fprintln(os.Stderr, "tools/flow task dependency graph:")
 		fmt.Fprintln(os.Stderr, "```mermaid")
 		fmt.Fprint(os.Stderr, mermaidGraph(c))

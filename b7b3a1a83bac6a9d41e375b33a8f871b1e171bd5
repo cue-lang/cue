@@ -293,6 +293,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b62ce3b6_8f44c963",
+        "filename": "internal/filetypes/internal/genfunc/simplify.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:24:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6590cdae_a706f5f5",
+      "revId": "b7b3a1a83bac6a9d41e375b33a8f871b1e171bd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8885da4_32f1f0e7",

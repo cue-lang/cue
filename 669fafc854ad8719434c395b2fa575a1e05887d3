@@ -85,6 +85,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "19a27c87_f095cb1f",
+        "filename": "internal/filetypes/internal/genstruct/gen.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-09T11:09:21Z",
+      "side": 1,
+      "message": "oof, I hadn\u0027t even thought about that. that deserves a comment because it\u0027s very subtle.",
+      "parentUuid": "79288a07_11d1f1d2",
+      "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5f1c9b3c_4c1d9d08",
         "filename": "internal/filetypes/internal/genstruct/gen.go",
         "patchSetId": 12

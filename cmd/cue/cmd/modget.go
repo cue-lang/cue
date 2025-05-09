@@ -118,7 +118,7 @@ func readModuleFile() (string, *modfile.File, []byte, error) {
 func findModuleRoot() (string, error) {
 	// TODO this logic is duplicated in multiple places. We should
 	// consider deduplicating it.
-	dir := rootWorkingDir
+	dir := rootWorkingDir()
 	for {
 		if _, err := os.Stat(filepath.Join(dir, "cue.mod")); err == nil {
 			return dir, nil

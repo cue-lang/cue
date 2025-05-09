@@ -147,7 +147,7 @@ Run "cue help commands" for more details on tasks and workflow commands.
 			sub, err := customCommand(cmd, commandSection, args[0], tools)
 			if err != nil {
 				w := cmd.OutOrStderr()
-				fmt.Fprint(w, errors.Details(err, &errors.Config{Cwd: rootWorkingDir}))
+				fmt.Fprint(w, errors.Details(err, &errors.Config{Cwd: rootWorkingDir()}))
 				fmt.Fprintln(w, `Ensure custom commands are defined in a "_tool.cue" file.`)
 				fmt.Fprintln(w, "Run 'cue help cmd' to list available custom commands.")
 				return ErrPrintedError

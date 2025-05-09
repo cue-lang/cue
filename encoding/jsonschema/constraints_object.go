@@ -111,6 +111,7 @@ func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 			Value: expr,
 		}))
 		obj.Elts = append(obj.Elts, f)
+		s.openness = allFieldsCovered
 
 	default:
 		s.errf(n, `value of "additionalProperties" must be an object or boolean`)

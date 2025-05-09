@@ -544,9 +544,10 @@ type state struct {
 type openness int
 
 const (
-	implicitlyOpen openness = iota
-	explicitlyOpen
-	explicitlyClosed
+	implicitlyOpen   openness = iota
+	explicitlyOpen            // explicitly opened, e.g. additionalProperties: true
+	explicitlyClosed          // explicitly closed, e.g. additionalProperties: false
+	allFieldsCovered          // complete pattern present, e.g. additionalProperties: type: string
 )
 
 // schemaInfo holds information about a schema
@@ -605,6 +606,9 @@ func (s *state) finalizeObject() {
 	if s.cfg.OpenOnlyWhenExplicit && s.openness == implicitlyOpen {
 		// Nothing to do: the struct is implicitly open but
 		// we've been directed to leave it like that.
+	} else if s.openness == allFieldsCovered {
+		// Nothing to do: there is a pattern constraint that covers all
+		// possible fields.
 	} else if s.openness == explicitlyClosed {
 		e = ast.NewCall(ast.NewIdent("close"), s.obj)
 	} else {

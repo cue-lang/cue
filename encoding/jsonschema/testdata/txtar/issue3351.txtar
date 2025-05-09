@@ -86,7 +86,6 @@ _schema: {
 	#: "jsone-object-array": [..._schema]
 
 	#: "jsone-value": matchN(1, [_schema, [..._schema]])
-	...
 }
 -- out/decode-v3-noshare/extract --
 // JSON-e templates
@@ -110,5 +109,4 @@ _schema: {
 	#: "jsone-object-array": [..._schema]
 
 	#: "jsone-value": matchN(1, [_schema, [..._schema]])
-	...
 }

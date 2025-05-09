@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"os"
 	"strings"
 	"testing"
 
@@ -60,4 +61,31 @@ func TestCommand(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 	err = c.Execute()
 	qt.Assert(t, qt.IsNotNil(err))
+
+	// Verify that we can change the current directory via [os.Chdir].
+	// We test by ensuring we can load the module under testdata/files,
+	// which uses the working directory as a starting point to find a module root.
+	t.Run("Chdir", func(t *testing.T) {
+		// TODO: use [testing.T.Chdir] once we can use Go 1.24 or later.
+		origDir, err := os.Getwd()
+		qt.Assert(t, qt.IsNil(err))
+
+		qt.Assert(t, qt.IsNil(os.Chdir("testdata/module_broken")))
+		t.Cleanup(func() {
+			qt.Assert(t, qt.IsNil(os.Chdir(origDir)))
+		})
+
+		c, err = cmd.New([]string{"mod", "tidy", "--check"})
+		qt.Assert(t, qt.IsNil(err))
+		err = c.Execute()
+		qt.Assert(t, qt.ErrorMatches(err, `^disallowed: field not allowed`))
+
+		// Change the directory a second time, to ensure the global state is not sticky.
+		qt.Assert(t, qt.IsNil(os.Chdir("../module_ok")))
+
+		c, err = cmd.New([]string{"mod", "tidy", "--check"})
+		qt.Assert(t, qt.IsNil(err))
+		err = c.Execute()
+		qt.Assert(t, qt.IsNil(err))
+	})
 }

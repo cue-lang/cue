@@ -308,7 +308,7 @@ func rootLICENSEFile(ctx context.Context, vcsImpl vcs.VCS) (string, error) {
 
 	// relLicenseFile is used in a couple of error situations below
 	relLicenseFile := func() string {
-		rel, err := filepath.Rel(rootWorkingDir, licenseFile)
+		rel, err := filepath.Rel(rootWorkingDir(), licenseFile)
 		if err == nil {
 			return rel
 		}

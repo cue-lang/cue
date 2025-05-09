@@ -205,7 +205,7 @@ func formatFile(file *build.File, opts []format.Option, doDiff, check bool, cmd 
 		return false, nil
 	}
 
-	path, err := filepath.Rel(rootWorkingDir, file.Filename)
+	path, err := filepath.Rel(rootWorkingDir(), file.Filename)
 	if err != nil {
 		path = file.Filename
 	}

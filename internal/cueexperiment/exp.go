@@ -19,11 +19,6 @@ var Flags struct {
 	// TODO(v0.14): deprecate this flag to forbid disabling this feature.
 	Embed bool `envflag:"default:true"`
 
-	// DecodeInt64 changes [cuelang.org/go/cue.Value.Decode] to choose
-	// `int64` rather than `int` as the default type for CUE integer values
-	// to ensure consistency with 32-bit platforms.
-	DecodeInt64 bool `envflag:"default:true"`
-
 	// Enable topological sorting of struct fields.
 	TopoSort bool `envflag:"default:true"`
 
@@ -37,6 +32,10 @@ var Flags struct {
 
 	// YAMLV3Decoder was an experiment which ran from early 2024 to late 2024.
 	YAMLV3Decoder bool `envflag:"deprecated,default:true"`
+
+	// DecodeInt64 was an experiment which ran from late 2024
+	// to mid 2025.
+	DecodeInt64 bool `envflag:"deprecated,default:true"`
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

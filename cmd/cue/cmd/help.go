@@ -303,9 +303,6 @@ If an environment variable is unset or empty, sensible default setting is used.
 		embed
 			Enable support for embedded data files as described in
 			https://cuelang.org/discussion/3264.
-		decodeint64 (default true)
-			Tweak cue.Value.Decode to choose "int64" rather than "int"
-			as the default Go type for CUE integer values.
 		toposort
 			Enable topological sorting of struct fields.
 			Provide feedback via https://cuelang.org/issue/3558

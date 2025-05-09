@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecd979c0_1b2b6e25",
+        "filename": "internal/filetypes/internal/genfunc/gen.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:01:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a2cbbd0_81f3a507",
+      "range": {
+        "startLine": 18,
+        "startChar": 38,
+        "endLine": 18,
+        "endChar": 40
+      },
+      "revId": "a4af94aefd892d9daa319dfee3e52b4ba4fcbc9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e655c97d_cc754405",
@@ -37,6 +61,24 @@
       "writtenOn": "2025-05-07T14:17:07Z",
       "side": 1,
       "message": "reuse emitf for consistency in the lines above, and also to not need to be explicit about the trailing newlines",
+      "revId": "a4af94aefd892d9daa319dfee3e52b4ba4fcbc9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20c03a91_b71694fa",
+        "filename": "internal/filetypes/internal/genfunc/gen.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:01:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e655c97d_cc754405",
       "revId": "a4af94aefd892d9daa319dfee3e52b4ba4fcbc9e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38e8f237_9317cb93",
+        "filename": "internal/filetypes/internal/genfunc/gen.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:01:09Z",
+      "side": 1,
+      "message": "Yeah, it\u0027s a helpful convenience for when we happen to generate incorrect syntax so we\u0027ve only got the raw output to look at and the indentation helps visual parsing. It doesn\u0027t matter that much though. I\u0027ve updated to use somewhat more consistent indentation.",
+      "parentUuid": "f72c2050_618468d0",
+      "revId": "a4af94aefd892d9daa319dfee3e52b4ba4fcbc9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d5419b43_f0fa8947",
@@ -75,6 +135,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "afe3a936_370931e6",
+        "filename": "internal/filetypes/internal/genfunc/gen.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:01:09Z",
+      "side": 1,
+      "message": "Mainly because emitf adds a newline but I don\u0027t want a newline after the `\u003d` (and `go/format` won\u0027t remove it).",
+      "parentUuid": "d5419b43_f0fa8947",
+      "revId": "a4af94aefd892d9daa319dfee3e52b4ba4fcbc9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3b316b02_8163d339",
@@ -88,6 +166,24 @@
       "writtenOn": "2025-05-07T14:17:07Z",
       "side": 1,
       "message": "what about placing test.go in the same cue module, as a `//go:build ignore` main package file?\n\nif your worry is that you don\u0027t want to pollute the current directory or git checkout, that\u0027s fair enough, but then you can use `go build -overlay` to insert a new file on the cuelang.org/go module without needing to write it to disk.",
+      "revId": "a4af94aefd892d9daa319dfee3e52b4ba4fcbc9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afbfc441_8ff0a490",
+        "filename": "internal/filetypes/internal/genfunc/gen_test.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:01:09Z",
+      "side": 1,
+      "message": "That\u0027s a great idea! I\u0027d totally forgotten (maybe never even knew about) `go build -overlay`. Done.",
+      "parentUuid": "3b316b02_8163d339",
       "revId": "a4af94aefd892d9daa319dfee3e52b4ba4fcbc9e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

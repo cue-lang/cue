@@ -923,6 +923,33 @@ issue3729: full: {
 	}
 	argoApp: spec: _syncpolicy: "selfhealprune"
 }
+-- pending.cue --
+// resolving comprehensions arcs across disjunctions.
+arcTypeAcrossTwo: {
+	a?: b?: {
+		c?: null | {}
+	} | null
+	if true {
+		a: b: c: d: true
+	}
+}
+issue3894: reduced: p1: {
+	{a: string} | {b: value: string}
+	if true { b: value: "true" }
+}
+issue3894: reduced: p2: {
+	{b: value: string} | {a: string}
+	if true { b: value: "true" }
+}
+issue3894: full: {
+	#Output: {a?: string} | {b?: {value: string}}
+	out: #Output
+	out: {
+		if true == true {
+			b: {value: "true"}
+		}
+	}
+}
 -- out/evalalpha --
 Errors:
 embed.fail1.p: field not allowed:
@@ -1757,6 +1784,52 @@ Result:
       }
     }
   }
+  arcTypeAcrossTwo: (struct){
+    a: (struct){
+      b: (struct){
+        c?: (struct){
+          d: (bool){ true }
+        }
+      }
+    }
+  }
+  issue3894: (struct){
+    reduced: (struct){
+      p1: (struct){ |((struct){
+          a: (string){ string }
+        }, (struct){
+          b: (struct){
+            value: (string){ "true" }
+          }
+        }) }
+      p2: (struct){ |((struct){
+          b: (struct){
+            value: (string){ "true" }
+          }
+        }, (struct){
+          b: (struct){
+            value: (string){ "true" }
+          }
+          a: (string){ string }
+        }) }
+    }
+    full: (struct){
+      #Output: (#struct){ |((#struct){
+          a?: (string){ string }
+        }, (#struct){
+          b?: (#struct){
+            value: (string){ string }
+          }
+        }) }
+      out: (#struct){ |((#struct){
+          a?: (string){ string }
+        }, (#struct){
+          b: (#struct){
+            value: (string){ "true" }
+          }
+        }) }
+    }
+  }
   unifyDynamicReflectSuccess: (struct){
     X: (struct){
       X: (struct){
@@ -2119,55 +2192,93 @@ diff old new
        }
        #ApplicationSpec: (#struct){
          syncPolicy?: ((null|struct)){ |((null){ null }, (#struct){
+@@ -907,7 +834,7 @@
+   arcTypeAcrossTwo: (struct){
+     a: (struct){
+       b: (struct){
+-        c: (struct){
++        c?: (struct){
+           d: (bool){ true }
+         }
+       }
+@@ -916,9 +843,6 @@
+   issue3894: (struct){
+     reduced: (struct){
+       p1: (struct){ |((struct){
+-          b: (struct){
+-            value: (string){ "true" }
+-          }
+           a: (string){ string }
+         }, (struct){
+           b: (struct){
+@@ -944,11 +868,13 @@
+             value: (string){ string }
+           }
+         }) }
+-      out: (#struct){
+-        b: (#struct){
+-          value: (string){ "true" }
+-        }
+-      }
++      out: (#struct){ |((#struct){
++          a?: (string){ string }
++        }, (#struct){
++          b: (#struct){
++            value: (string){ "true" }
++          }
++        }) }
+     }
+   }
+   unifyDynamicReflectSuccess: (struct){
 -- out/evalalpha/stats --
-Leaks:  636
+Leaks:  690
 Freed:  0
 Reused: 0
-Allocs: 636
+Allocs: 690
 Retain: 0
 
-Unifications: 578
-Conjuncts:    965
-Disjuncts:    32
+Unifications: 602
+Conjuncts:    1027
+Disjuncts:    44
 
-CloseIDElems: 210
-NumCloseIDs: 176
+CloseIDElems: 218
+NumCloseIDs: 181
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
--Leaks:  63
--Freed:  518
--Reused: 510
--Allocs: 71
+-Leaks:  73
+-Freed:  553
+-Reused: 548
+-Allocs: 78
 -Retain: 107
 -
--Unifications: 545
--Conjuncts:    870
--Disjuncts:    641
-+Leaks:  636
+-Unifications: 578
+-Conjuncts:    922
+-Disjuncts:    686
++Leaks:  690
 +Freed:  0
 +Reused: 0
-+Allocs: 636
++Allocs: 690
 +Retain: 0
 +
-+Unifications: 578
-+Conjuncts:    965
-+Disjuncts:    32
++Unifications: 602
++Conjuncts:    1027
++Disjuncts:    44
 +
-+CloseIDElems: 210
-+NumCloseIDs: 176
++CloseIDElems: 218
++NumCloseIDs: 181
 -- out/eval/stats --
-Leaks:  63
-Freed:  518
-Reused: 510
-Allocs: 71
+Leaks:  73
+Freed:  553
+Reused: 548
+Allocs: 78
 Retain: 107
 
-Unifications: 545
-Conjuncts:    870
-Disjuncts:    641
+Unifications: 578
+Conjuncts:    922
+Disjuncts:    686
 -- diff/explanation --
 cyclicError: improved error message.
 nestedWithDynamicFieldOK: fixed bug.
@@ -3074,6 +3185,53 @@ Result:
             }
           }
           _syncpolicy: (string){ "selfhealprune" }
+        }
+      }
+    }
+  }
+  arcTypeAcrossTwo: (struct){
+    a: (struct){
+      b: (struct){
+        c: (struct){
+          d: (bool){ true }
+        }
+      }
+    }
+  }
+  issue3894: (struct){
+    reduced: (struct){
+      p1: (struct){ |((struct){
+          b: (struct){
+            value: (string){ "true" }
+          }
+          a: (string){ string }
+        }, (struct){
+          b: (struct){
+            value: (string){ "true" }
+          }
+        }) }
+      p2: (struct){ |((struct){
+          b: (struct){
+            value: (string){ "true" }
+          }
+        }, (struct){
+          b: (struct){
+            value: (string){ "true" }
+          }
+          a: (string){ string }
+        }) }
+    }
+    full: (struct){
+      #Output: (#struct){ |((#struct){
+          a?: (string){ string }
+        }, (#struct){
+          b?: (#struct){
+            value: (string){ string }
+          }
+        }) }
+      out: (#struct){
+        b: (#struct){
+          value: (string){ "true" }
         }
       }
     }
@@ -4263,6 +4421,80 @@ Result:
       argoApp: {
         spec: {
           _syncpolicy: "selfhealprune"
+        }
+      }
+    }
+  }
+}
+--- pending.cue
+{
+  arcTypeAcrossTwo: {
+    a?: {
+      b?: ({
+        c?: (null|{})
+      }|null)
+    }
+    if true {
+      a: {
+        b: {
+          c: {
+            d: true
+          }
+        }
+      }
+    }
+  }
+  issue3894: {
+    reduced: {
+      p1: {
+        ({
+          a: string
+        }|{
+          b: {
+            value: string
+          }
+        })
+        if true {
+          b: {
+            value: "true"
+          }
+        }
+      }
+    }
+  }
+  issue3894: {
+    reduced: {
+      p2: {
+        ({
+          b: {
+            value: string
+          }
+        }|{
+          a: string
+        })
+        if true {
+          b: {
+            value: "true"
+          }
+        }
+      }
+    }
+  }
+  issue3894: {
+    full: {
+      #Output: ({
+        a?: string
+      }|{
+        b?: {
+          value: string
+        }
+      })
+      out: 〈0;#Output〉
+      out: {
+        if (true == true) {
+          b: {
+            value: "true"
+          }
         }
       }
     }

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b87fde8a_81008da8",
+        "filename": "internal/filetypes/internal/genstruct/gen.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:01:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10afd7da_6794fecb",
+      "range": {
+        "startLine": 12,
+        "startChar": 16,
+        "endLine": 12,
+        "endChar": 19
+      },
+      "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5860a531_d8f10fd9",
@@ -37,6 +61,24 @@
       "writtenOn": "2025-05-07T12:55:03Z",
       "side": 1,
       "message": "AFAICT this buffer and copy are entirely unnecessary; encoding/binary\u0027s Uint64 reads bytes from the passed byte slice, but it is not modified in any way.",
+      "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79288a07_11d1f1d2",
+        "filename": "internal/filetypes/internal/genstruct/gen.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:01:09Z",
+      "side": 1,
+      "message": "the Uint64 method always reads 8 bytes. data might not be (and usually isn\u0027t) 8 bytes long. If we don\u0027t use the buffer it\u0027ll read beyond where it should or panic. Unless I\u0027m missing something?",
+      "parentUuid": "5860a531_d8f10fd9",
       "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6df46f9_6b58b62d",
+        "filename": "internal/filetypes/internal/genstruct/gen.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:01:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f1c9b3c_4c1d9d08",
+      "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "47ea7a46_90f711cc",
@@ -75,6 +135,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e272c7c_36e857f6",
+        "filename": "internal/filetypes/internal/genstruct/struct.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:01:09Z",
+      "side": 1,
+      "message": "Good call. Done.",
+      "parentUuid": "47ea7a46_90f711cc",
+      "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9b35ed74_2f96e82b",
@@ -88,6 +166,24 @@
       "writtenOn": "2025-05-07T12:55:03Z",
       "side": 1,
       "message": "unused field?",
+      "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b731e4d_6509accd",
+        "filename": "internal/filetypes/internal/genstruct/struct.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:01:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b35ed74_2f96e82b",
       "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

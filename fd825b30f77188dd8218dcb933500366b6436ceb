@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e87e3d0_252495d3",
+        "filename": "encoding/jsonschema/constraints_generic.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-09T16:21:38Z",
+      "side": 1,
+      "message": "perhaps document how this differs from constraintTODO, like you did in the commit message.",
+      "revId": "fd825b30f77188dd8218dcb933500366b6436ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

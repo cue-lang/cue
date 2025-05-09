@@ -53,7 +53,7 @@ config: {
 			"doc/ref/spec.md",
 		]
 		format_overrides: [{
-			goos:    "windows"
+			goos: "windows"
 			formats: ["zip"]
 		}]
 	}]

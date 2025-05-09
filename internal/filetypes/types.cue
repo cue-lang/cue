@@ -27,7 +27,7 @@ package build
 	interpretation?: #Interpretation
 	form?:           #Form
 	// Note: tags includes values for non-boolean tags only.
-	tags?: [string]: string
+	tags?: [string]:     string
 	boolTags?: [string]: bool
 }
 
@@ -95,12 +95,12 @@ modes: input: {
 	encodings: cue: {
 		*forms.schema | _
 	}
-	extensions: "-": encoding: *"cue" | _
+	extensions: "-": encoding:           *"cue" | _
 	extensions: ".json": interpretation: *"auto" | _
 	extensions: ".yaml": interpretation: *"auto" | _
-	extensions: ".yml":  interpretation: *"auto" | _
+	extensions: ".yml": interpretation:  *"auto" | _
 	extensions: ".toml": interpretation: *"auto" | _
-	extensions: ".xml":  interpretation: *"auto" | _
+	extensions: ".xml": interpretation:  *"auto" | _
 }
 
 modes: export: {
@@ -344,11 +344,11 @@ tagInfo: {
 	dag: form:    "dag"
 	data: form:   "data"
 
-	cue: encoding:       "cue"
-	json: encoding:      "json"
-	jsonl: encoding:     "jsonl"
-	yaml: encoding:      "yaml"
-	toml: encoding:      "toml"
+	cue: encoding:   "cue"
+	json: encoding:  "json"
+	jsonl: encoding: "jsonl"
+	yaml: encoding:  "yaml"
+	toml: encoding:  "toml"
 	xml: {
 		encoding: "xml"
 		boolTags: {

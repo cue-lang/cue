@@ -80,12 +80,8 @@ close({
 		foo?: number
 		bar?: number
 		{[!~"^(foo|bar)$"]: string}
-		...
 	}
-	map?: {
-		[string]: string
-		...
-	}
+	map?: [string]: string
 	patterns?: {
 		foo?: number
 		bar?: number
@@ -109,7 +105,6 @@ close({
 
 		{[=~"^\\P{Lo}" & !~"^(foo|bar)$"]: int}
 		{[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string}
-		...
 	}
 	multi?: >=7 | struct.MaxFields(5) & {
 		foo?: number

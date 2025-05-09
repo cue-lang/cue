@@ -22,6 +22,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
+	"sync"
 	"testing"
 	"time"
 
@@ -201,6 +202,11 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 	}
 }
 
+// rootWorkingDir avoids repeated calls to [os.Getwd] in cmd/cue.
+// If we can't figure out the current directory, something is very wrong,
+// and there's no point in continuing to run a command.
+var rootWorkingDir = func() string { panic("must be replaced by a sync.OnceValue") }
+
 // TODO(mvdan): remove this error return at some point.
 // The API could also be made clearer if we want to keep cmd public,
 // such as not leaking *cobra.Command via embedding.
@@ -208,6 +214,16 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 // New creates the top-level command.
 // The returned error is always nil, and is a historical artifact.
 func New(args []string) (*Command, error) {
+	// Each call to New resets rootWorkingDir, to support [os.Chdir] calls in between.
+	rootWorkingDir = sync.OnceValue(func() string {
+		wd, err := os.Getwd()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "cannot get current directory: %v\n", err)
+			os.Exit(1)
+		}
+		return wd
+	})
+
 	cmd := &cobra.Command{
 		Use: "cue",
 		// TODO: the short help text below seems to refer to `cue cmd`, like helpTemplate.
@@ -273,18 +289,6 @@ func New(args []string) (*Command, error) {
 	return c, nil
 }
 
-// rootWorkingDir avoids repeated calls to [os.Getwd] in cmd/cue.
-// If we can't figure out the current directory, something is very wrong,
-// and there's no point in continuing to run a command.
-var rootWorkingDir = func() string {
-	wd, err := os.Getwd()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "cannot get current directory: %v\n", err)
-		os.Exit(1)
-	}
-	return wd
-}()
-
 // Main runs the cue tool and returns the code for passing to os.Exit.
 func Main() int {
 	start := time.Now()
@@ -302,7 +306,7 @@ func Main() int {
 	if err := cmd.Run(backgroundContext()); err != nil {
 		if err != ErrPrintedError {
 			errors.Print(os.Stderr, err, &errors.Config{
-				Cwd:     rootWorkingDir,
+				Cwd:     rootWorkingDir(),
 				ToSlash: testing.Testing(),
 			})
 		}
@@ -389,7 +393,7 @@ func printError(cmd *Command, err error) {
 	}
 	errors.Print(cmd.Stderr(), err, &errors.Config{
 		Format:  format,
-		Cwd:     rootWorkingDir,
+		Cwd:     rootWorkingDir(),
 		ToSlash: testing.Testing(),
 	})
 }

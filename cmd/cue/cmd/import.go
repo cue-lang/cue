@@ -479,7 +479,7 @@ func handleFile(b *buildPlan, f *ast.File) (err error) {
 
 func writeFile(p *buildPlan, f *ast.File, cueFile string) error {
 	if flagDryRun.Bool(p.cmd) {
-		cueFile, err := filepath.Rel(rootWorkingDir, cueFile)
+		cueFile, err := filepath.Rel(rootWorkingDir(), cueFile)
 		if err != nil {
 			return err
 		}

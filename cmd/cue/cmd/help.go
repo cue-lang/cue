@@ -315,6 +315,8 @@ If an environment variable is unset or empty, sensible default setting is used.
 			when interacting with module registries.
 		sortfields
 			Force fields in stucts to be sorted lexicographically.
+		toolsflow
+			Print task dependency mermaid graphs in 'cue cmd'.
 
 CUE_EXPERIMENT and CUE_DEBUG are comma-separated lists of key-value strings,
 where the value is a boolean "true" or "1" if omitted. For example:

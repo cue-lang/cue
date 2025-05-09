@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b480386f_89114dfc",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-09T11:11:58Z",
+      "side": 1,
+      "message": "a comment here should summarize what\u0027s special about metadata that makes it optional, given that some docs seem to imply it\u0027s required. otherwise we might get really confused in the future when we forget what happened here.",
+      "revId": "2672730743e434e836d196db18c47f739bb0709a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -33,6 +33,24 @@
       "message": "How are we sure of that? Won\u0027t it apply to any inline newline, such as the end of a struct field?",
       "revId": "e41b4c231056ce88c029a7a6a3ae5de83aa2d087",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df85d02b_5a580f2f",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-09T13:36:29Z",
+      "side": 1,
+      "message": "yes, that won\u0027t work. it\u0027s one of the complications added by using go/scanner. I added a TODO for now because I don\u0027t expect multi-line type expressions will be common right away, and because I don\u0027t want to go down a rabbit hole of perfecting this and holding up the chain. I need to get on to other stuff :)",
+      "parentUuid": "3f960e54_cc331370",
+      "revId": "e41b4c231056ce88c029a7a6a3ae5de83aa2d087",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

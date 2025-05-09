@@ -101,6 +101,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9859be5_9a77c596",
+        "filename": "internal/filetypes/internal/genstruct/gen.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:24:12Z",
+      "side": 1,
+      "message": "Ha, I thought it was obvious! I\u0027ll add a comment 😊",
+      "parentUuid": "19a27c87_f095cb1f",
+      "revId": "669fafc854ad8719434c395b2fa575a1e05887d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f1c9b3c_4c1d9d08",

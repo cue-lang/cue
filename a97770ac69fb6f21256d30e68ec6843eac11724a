@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aee94748_20270012",
+        "filename": "internal/filetypes/internal/genfunc/simplify.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T11:01:09Z",
+      "side": 1,
+      "message": "I actually copied it from a vague memory of a talk/blog of Russ\u0027s, which I couldn\u0027t actually find again. I do agree, but I couldn\u0027t think of a nicer way of doing match-and-bind without needing endless nesting that would make everything way harder to read.\n\nSuggestions for alternative idioms welcome!",
+      "parentUuid": "72d4396e_86a12819",
+      "revId": "a97770ac69fb6f21256d30e68ec6843eac11724a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c9ea890b_b575c678",

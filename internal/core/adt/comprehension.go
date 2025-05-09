@@ -459,6 +459,7 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 
 	v := n.node
 	for c := d.leaf; c.parent != nil; c = c.parent {
+		v = n.ctx.deref(v)
 		v.updateArcType(c.arcType)
 		if v.ArcType == ArcNotPresent {
 			parent := v.Parent

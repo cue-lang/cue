@@ -34,6 +34,24 @@
       "parentUuid": "b480386f_89114dfc",
       "revId": "2672730743e434e836d196db18c47f739bb0709a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2d265b5_c37c72a7",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-09T12:52:18Z",
+      "side": 1,
+      "message": "Darn, I accidentally hit Submit instead of Reply. No particular harm done. Can revert later if needed.",
+      "parentUuid": "5be5b056_3ac3ca9d",
+      "revId": "2672730743e434e836d196db18c47f739bb0709a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

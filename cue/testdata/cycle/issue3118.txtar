@@ -174,11 +174,13 @@ the new evaluator includes positions with the cycle error and the old evaluator 
 diff old new
 --- old
 +++ new
-@@ -1,14 +1,31 @@
+@@ -1,16 +1,31 @@
  (struct){
    #TimeSpan: (#struct){
      start: (_|_){
 -      // [cycle] cycle error
+-      // cycle error:
+-      //     ./in.cue:10:9
 +      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
 +      //     ./in.cue:10:11
 +      // #TimeSpan.start: non-concrete value float in operand to -:
@@ -210,11 +212,13 @@ diff old new
        //     ./in.cue:8:12
      }
    }
-@@ -20,26 +37,56 @@
+@@ -22,32 +37,56 @@
      }
      eg2: (#struct){
        start: (_|_){
 -        // [cycle] cycle error
+-        // cycle error:
+-        //     ./in.cue:10:9
 -      }
 -      duration: (_|_){
 -        // [cycle] cycle error:
@@ -222,6 +226,10 @@ diff old new
 -      }
 -      end: (_|_){
 -        // [cycle] cycle error
+-        // cycle error:
+-        //     ./in.cue:7:12
+-        // cycle error:
+-        //     ./in.cue:10:9
 +        // [incomplete] examples.eg2.start: non-concrete value end for bound <=:
 +        //     ./in.cue:10:11
 +        // examples.eg2.start: non-concrete value float in operand to -:
@@ -288,6 +296,8 @@ diff old new
   #TimeSpan: (#struct){
     start: (_|_){
       // [cycle] cycle error
+      // cycle error:
+      //     ./in.cue:10:9
     }
     duration: (_|_){
       // [cycle] cycle error:
@@ -307,6 +317,8 @@ diff old new
     eg2: (#struct){
       start: (_|_){
         // [cycle] cycle error
+        // cycle error:
+        //     ./in.cue:10:9
       }
       duration: (_|_){
         // [cycle] cycle error:
@@ -314,6 +326,10 @@ diff old new
       }
       end: (_|_){
         // [cycle] cycle error
+        // cycle error:
+        //     ./in.cue:7:12
+        // cycle error:
+        //     ./in.cue:10:9
       }
     }
     eg3: (#struct){

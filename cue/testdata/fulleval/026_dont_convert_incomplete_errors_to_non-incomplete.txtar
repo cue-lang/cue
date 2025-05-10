@@ -150,7 +150,7 @@ Disjuncts:    82
 diff old new
 --- old
 +++ new
-@@ -1,10 +1,16 @@
+@@ -1,12 +1,16 @@
  (struct){
    n1: (struct){
      min: (_|_){
@@ -162,6 +162,8 @@ diff old new
      }
      max: (_|_){
 -      // [cycle] cycle error
+-      // cycle error:
+-      //     ./in.cue:3:22
 +      // [cycle] n1.min: cycle with field: max:
 +      //     ./in.cue:3:12
 +      // n1.max: cycle with field: min:
@@ -177,6 +179,8 @@ diff old new
     }
     max: (_|_){
       // [cycle] cycle error
+      // cycle error:
+      //     ./in.cue:3:22
     }
   }
   n2: (_|_){

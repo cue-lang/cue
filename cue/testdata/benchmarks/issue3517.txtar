@@ -308,11 +308,13 @@ diff old new
      ./main.cue:50:19
  
  Result:
-@@ -11,32 +8,37 @@
+@@ -11,36 +8,37 @@
    // [eval]
    #TimeSpan: (#struct){
      start: (_|_){
 -      // [cycle] cycle error
+-      // cycle error:
+-      //     ./main.cue:12:9
 +      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
 +      //     ./main.cue:12:11
 +      // #TimeSpan.start: non-concrete value float in operand to -:
@@ -349,6 +351,8 @@ diff old new
 -    timeSpan: (#struct){
 -      start: (_|_){
 -        // [cycle] cycle error
+-        // cycle error:
+-        //     ./main.cue:12:9
 -      }
 -      duration: (_|_){
 -        // [cycle] cycle error:
@@ -363,13 +367,15 @@ diff old new
    }
    #TaskSet: (#struct){
      action: (string){ string }
-@@ -44,32 +46,38 @@
+@@ -48,41 +46,38 @@
      }
      tasks: (#list){
      }
 -    timeSpan?: (#struct){
 -      start: (_|_){
 -        // [cycle] cycle error
+-        // cycle error:
+-        //     ./main.cue:12:9
 -      }
 -      duration: (_|_){
 -        // [cycle] cycle error:
@@ -387,6 +393,8 @@ diff old new
      timeSpan: (#struct){
 -      start: (_|_){
 -        // [cycle] cycle error
+-        // cycle error:
+-        //     ./main.cue:12:9
 -      }
 -      duration: (_|_){
 -        // [cycle] cycle error:
@@ -394,6 +402,11 @@ diff old new
 -      }
 -      end: (_|_){
 -        // [cycle] cycle error
+-        // cycle error:
+-        //     ./main.cue:9:12
+-        //     ./main.cue:8:12
+-        // cycle error:
+-        //     ./main.cue:12:9
 +      duration: (_|_){
 +        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
 +        //     ./main.cue:12:11
@@ -424,12 +437,14 @@ diff old new
        }
      }
    }
-@@ -76,15 +84,33 @@
+@@ -89,22 +84,33 @@
    #T2: (#struct){
      action: (string){ "Task 2" }
      timeSpan: (#struct){
 -      start: (_|_){
 -        // [cycle] cycle error
+-        // cycle error:
+-        //     ./main.cue:12:9
 -      }
 -      duration: (_|_){
 -        // [cycle] cycle error:
@@ -437,6 +452,11 @@ diff old new
 -      }
 -      end: (_|_){
 -        // [cycle] cycle error
+-        // cycle error:
+-        //     ./main.cue:9:12
+-        //     ./main.cue:8:12
+-        // cycle error:
+-        //     ./main.cue:12:9
 +      duration: (_|_){
 +        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
 +        //     ./main.cue:12:11
@@ -467,7 +487,7 @@ diff old new
        }
      }
    }
-@@ -93,66 +119,73 @@
+@@ -113,66 +119,73 @@
      action: (string){ "Task 1 and Task 2" }
      #tasks: (_|_){
        // [eval]
@@ -605,6 +625,8 @@ Result:
   #TimeSpan: (#struct){
     start: (_|_){
       // [cycle] cycle error
+      // cycle error:
+      //     ./main.cue:12:9
     }
     duration: (_|_){
       // [cycle] cycle error:
@@ -620,6 +642,8 @@ Result:
     timeSpan: (#struct){
       start: (_|_){
         // [cycle] cycle error
+        // cycle error:
+        //     ./main.cue:12:9
       }
       duration: (_|_){
         // [cycle] cycle error:
@@ -640,6 +664,8 @@ Result:
     timeSpan?: (#struct){
       start: (_|_){
         // [cycle] cycle error
+        // cycle error:
+        //     ./main.cue:12:9
       }
       duration: (_|_){
         // [cycle] cycle error:
@@ -656,6 +682,8 @@ Result:
     timeSpan: (#struct){
       start: (_|_){
         // [cycle] cycle error
+        // cycle error:
+        //     ./main.cue:12:9
       }
       duration: (_|_){
         // [cycle] cycle error:
@@ -663,6 +691,11 @@ Result:
       }
       end: (_|_){
         // [cycle] cycle error
+        // cycle error:
+        //     ./main.cue:9:12
+        //     ./main.cue:8:12
+        // cycle error:
+        //     ./main.cue:12:9
       }
     }
   }
@@ -671,6 +704,8 @@ Result:
     timeSpan: (#struct){
       start: (_|_){
         // [cycle] cycle error
+        // cycle error:
+        //     ./main.cue:12:9
       }
       duration: (_|_){
         // [cycle] cycle error:
@@ -678,6 +713,11 @@ Result:
       }
       end: (_|_){
         // [cycle] cycle error
+        // cycle error:
+        //     ./main.cue:9:12
+        //     ./main.cue:8:12
+        // cycle error:
+        //     ./main.cue:12:9
       }
     }
   }

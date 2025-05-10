@@ -420,16 +420,7 @@ func (p list) Sort() {
 // RemoveMultiples sorts an List and removes all but the first error per line.
 func (p *list) RemoveMultiples() {
 	p.Sort()
-	var last Error
-	i := 0
-	for _, e := range *p {
-		if last == nil || !approximateEqual(last, e) {
-			last = e
-			(*p)[i] = e
-			i++
-		}
-	}
-	(*p) = (*p)[0:i]
+	*p = slices.CompactFunc(*p, approximateEqual)
 }
 
 func approximateEqual(a, b Error) bool {

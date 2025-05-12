@@ -20,6 +20,7 @@ var Flags struct {
 	Embed bool `envflag:"default:true"`
 
 	// Enable topological sorting of struct fields.
+	// TODO(v0.14): deprecate this flag to forbid disabling this feature.
 	TopoSort bool `envflag:"default:true"`
 
 	// The flags below describe completed experiments; they can still be set
@@ -33,8 +34,7 @@ var Flags struct {
 	// YAMLV3Decoder was an experiment which ran from early 2024 to late 2024.
 	YAMLV3Decoder bool `envflag:"deprecated,default:true"`
 
-	// DecodeInt64 was an experiment which ran from late 2024
-	// to mid 2025.
+	// DecodeInt64 was an experiment which ran from late 2024 to mid 2025.
 	DecodeInt64 bool `envflag:"deprecated,default:true"`
 }
 

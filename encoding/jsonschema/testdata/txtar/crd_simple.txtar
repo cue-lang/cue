@@ -28,12 +28,16 @@ spec:
           spec:
             type: object
             x-kubernetes-preserve-unknown-fields: true
+          intField:
+            type: number
+            format: uint32
 
 -- out/decode/extract --
 _embeddedResource
 spec?: {
 	...
 }
+intField?: number
 
 _embeddedResource: {
 	apiVersion!: string

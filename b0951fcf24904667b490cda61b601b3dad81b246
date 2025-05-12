@@ -16,6 +16,24 @@
       "message": "Did you think about a test? Or is this tested via curated modules?",
       "revId": "b0951fcf24904667b490cda61b601b3dad81b246",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53af65f6_65d13abb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-12T11:10:05Z",
+      "side": 1,
+      "message": "Yeah, I thought about adding a test here but I don\u0027t think it adds much value. The real test is when this logic is applied to real k8s schemas, and indeed I noticed the effect of the lack of support for this keyword when reviewing changes to curated schemas, so I think that\u0027s probably good enough.",
+      "parentUuid": "0b0cb16d_ecc8299a",
+      "revId": "b0951fcf24904667b490cda61b601b3dad81b246",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

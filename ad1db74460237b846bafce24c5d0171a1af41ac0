@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35562142_e989ea1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-12T11:01:22Z",
+      "side": 1,
+      "message": "There is much less new code here than it appears - a lot of it is really resurrecting upstream code, and fairly light adaptations of it. But that does make it a pita to review (and to write!). Comparison with https://github.com/golang/tools/tree/c11269ccb0bf3687bf1f75fa7b2ae44c6806dcae/gopls/internal/cache will be more useful than comparison with the ancestor commit in this repo.",
+      "revId": "ad1db74460237b846bafce24c5d0171a1af41ac0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

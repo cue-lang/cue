@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e89165b5_108d1836",
+        "filename": "internal/golangorgx/gopls/cache/load.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-12T14:00:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e1b1449d_16e83076",
+      "revId": "a51ab7c675eded60fbe905a5b5ba09683f14f8a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff38b4be_86276e58",
@@ -65,6 +83,24 @@
       "writtenOn": "2025-05-12T13:09:28Z",
       "side": 1,
       "message": "add comment near-by talking about files which don\u0027t have named packages, and thus end up in `_`\n\nalso better document purpose of code in bottom half of this function.",
+      "revId": "a51ab7c675eded60fbe905a5b5ba09683f14f8a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ab48ee4_e81c7c16",
+        "filename": "internal/golangorgx/gopls/cache/snapshot.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1385,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-12T14:00:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff38b4be_86276e58",
       "revId": "a51ab7c675eded60fbe905a5b5ba09683f14f8a8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

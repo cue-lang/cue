@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b8f3f424_84bbefe4",
+        "filename": "internal/golangorgx/gopls/cache/load.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-12T14:00:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95327ff9_ec4ca052",
+      "revId": "f71e52b8d286b1d009738cdd3364945022dd5202",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "9a41b33c_c11149fe",
         "filename": "internal/golangorgx/gopls/cache/load.go",
         "patchSetId": 1
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "(unresolving to aid review)",
       "parentUuid": "9a41b33c_c11149fe",
+      "revId": "f71e52b8d286b1d009738cdd3364945022dd5202",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ded09cb_9a390ece",
+        "filename": "internal/golangorgx/gopls/cache/load.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-12T14:00:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "440647f7_de97d208",
       "revId": "f71e52b8d286b1d009738cdd3364945022dd5202",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -108,6 +144,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "d4aa88e8_b77ced0c",
+        "filename": "internal/golangorgx/gopls/cache/metadata/graph.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-12T14:00:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "252443e3_25d12f90",
+      "revId": "f71e52b8d286b1d009738cdd3364945022dd5202",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "f5c4f81b_37d99748",
         "filename": "internal/golangorgx/gopls/cache/session.go",
         "patchSetId": 1
@@ -137,6 +191,24 @@
       "side": 1,
       "message": "(unresolving to aid review)",
       "parentUuid": "f5c4f81b_37d99748",
+      "revId": "f71e52b8d286b1d009738cdd3364945022dd5202",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca1a2f2f_dd4fb06d",
+        "filename": "internal/golangorgx/gopls/cache/session.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-12T14:00:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c450cf0_d51cbde3",
       "revId": "f71e52b8d286b1d009738cdd3364945022dd5202",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -178,6 +250,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "782a58f6_0f19bee8",
+        "filename": "internal/golangorgx/gopls/cache/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-12T14:00:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1ed0397_d5fd2b9d",
+      "revId": "f71e52b8d286b1d009738cdd3364945022dd5202",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e49aa270_599cfa5a",
         "filename": "internal/golangorgx/gopls/cache/snapshot.go",
         "patchSetId": 1
@@ -213,6 +303,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "670af414_d008b1ad",
+        "filename": "internal/golangorgx/gopls/cache/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1076,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-12T14:00:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "719005b6_37361cfc",
+      "revId": "f71e52b8d286b1d009738cdd3364945022dd5202",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "bbbdad6d_a60e33b3",
         "filename": "internal/golangorgx/gopls/cache/snapshot.go",
         "patchSetId": 1
@@ -242,6 +350,24 @@
       "side": 1,
       "message": "(unresolving to aid review)",
       "parentUuid": "bbbdad6d_a60e33b3",
+      "revId": "f71e52b8d286b1d009738cdd3364945022dd5202",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e063214_2340657c",
+        "filename": "internal/golangorgx/gopls/cache/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1171,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-12T14:00:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c92cc81_46e75752",
       "revId": "f71e52b8d286b1d009738cdd3364945022dd5202",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -8,7 +8,7 @@ cmp stderr import_stderr.golden
 cmp stderr absolute_stderr.golden
 ! exec cue eval ./x
 # TODO: it would be nice if the error output was similar for this case as the others.
-stderr 'found packages "y" \(y.cue\) and "z" \(z.cue\) in ".*"'
+stderr 'found packages "y" \(y.cue\) and "z" \(z.cue\) in "x"'
 
 -- cue.mod/module.cue --
 module: "mod.com"

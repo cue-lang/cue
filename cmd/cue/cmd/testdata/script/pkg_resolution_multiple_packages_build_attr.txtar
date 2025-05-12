@@ -5,7 +5,7 @@ exec cue eval ./...
 cmp stdout eval-all.golden
 
 ! exec cue eval -t something ./...
-stderr '^found packages "x" \(x.cue\) and "y" \(y.cue\) in ".*x"$'
+stderr '^found packages "x" \(x.cue\) and "y" \(y.cue\) in "x"$'
 
 # Test that a non-wildcard pattern similarly respects
 # build attributes.

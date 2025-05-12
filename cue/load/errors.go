@@ -131,7 +131,9 @@ func (e *MultiplePackageError) Msg() (string, []interface{}) {
 		e.Files[0],
 		e.Packages[1],
 		e.Files[1],
-		e.Dir,
+		// To make sure [cue/errors] prints this directory name as relative,
+		// use a [token.Position] even though it's really only meant for regular source files.
+		token.Position{Filename: e.Dir},
 	}
 }
 

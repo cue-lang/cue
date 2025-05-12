@@ -292,11 +292,11 @@ func (g *generator) genDef(path cue.Path, val cue.Value) (*generatedDef, error) 
 	def := &generatedDef{inProgress: true}
 	g.def = def
 	g.generatedTypes[qpath] = def
-	info, err := g.emitType(val, optionalZero)
+	facts, err := g.emitType(val, optionalZero)
 	if err != nil {
 		return nil, err
 	}
-	g.def.facts = info
+	g.def.facts = facts
 	g.def.inProgress = false
 	g.def = parentDef
 	return def, nil
@@ -356,10 +356,10 @@ func (g *generator) emitType(val cue.Value, optionalStg optionalStrategy) (typeF
 	// Note that type references don't get optionalStg,
 	// as @go(,optional=) only affects fields under the current type expression.
 	// TODO: support nullable types, such as `null | #SomeReference` and `null | {foo: int}`.
-	if done, info, err := g.emitTypeReference(val); err != nil {
-		return info, err
+	if done, facts, err := g.emitTypeReference(val); err != nil {
+		return typeFacts{}, err
 	} else if done {
-		return info, nil
+		return facts, nil
 	}
 
 	// Inline types are below.
@@ -443,18 +443,18 @@ func (g *generator) emitType(val cue.Value, optionalStg optionalStrategy) (typeF
 			}
 			g.def.printf("%s ", goName)
 
-			// Pointers in Go are a prefix in the syntax, but we won't find out the generated type info
+			// Pointers in Go are a prefix in the syntax, but we won't find out the generated type facts
 			// until we have emitted its Go source, which we do into the same buffer to avoid copies.
 			// Luckily, since a pointer is always one byte, and we gofmt the result anyway for nice formatting,
 			// we can add the pointer first and replace it with whitespace later if not wanted.
 			ptrOffset := len(g.def.src)
 			g.def.printf("*")
 
-			info, err := g.emitType(val, optionalStg)
+			facts, err := g.emitType(val, optionalStg)
 			if err != nil {
-				return info, err
+				return facts, err
 			}
-			if !usePointer(info, optional, optionalStg) {
+			if !usePointer(facts, optional, optionalStg) {
 				g.def.src[ptrOffset] = ' '
 			}
 
@@ -522,8 +522,8 @@ func (g *generator) emitType(val cue.Value, optionalStg optionalStrategy) (typeF
 	return facts, nil
 }
 
-func usePointer(info typeFacts, optional bool, strategy optionalStrategy) bool {
-	if info.isTypeOverride {
+func usePointer(facts typeFacts, optional bool, strategy optionalStrategy) bool {
+	if facts.isTypeOverride {
 		// @(,type=) overrides any @(,optional=) setting
 		return false
 	}
@@ -536,7 +536,7 @@ func usePointer(info typeFacts, optional bool, strategy optionalStrategy) bool {
 		return false
 	case optionalNillable:
 		// Only use a pointer when the type isn't already nillable.
-		return !info.isNillable
+		return !facts.isNillable
 	default:
 		panic("unreachable")
 	}
@@ -690,25 +690,18 @@ func goPkgNameForInstance(inst *build.Instance, instVal cue.Value) string {
 // emitTypeReference attempts to generate a CUE value as a Go type via a reference,
 // either to a type in the same Go package, or to a type in an imported package.
 func (g *generator) emitTypeReference(val cue.Value) (bool, typeFacts, error) {
-	var facts typeFacts
 	// References to existing names, either from the same package or an imported package.
 	root, path := val.ReferencePath()
 	// TODO: surely there is a better way to check whether ReferencePath returned "no path",
 	// such as a possible path.IsValid method?
 	if len(path.Selectors()) == 0 {
-		return false, facts, nil
+		return false, typeFacts{}, nil
 	}
 	inst := root.BuildInstance()
 	// Go has no notion of qualified import paths; if a CUE file imports
 	// "foo.com/bar:qualified", we import just "foo.com/bar" on the Go side.
 	// TODO: deal with multiple packages existing in the same directory.
 	unqualifiedPath := ast.ParseImportPath(inst.ImportPath).Unqualified().String()
-
-	var sb strings.Builder
-	if root != g.pkgRoot {
-		sb.WriteString(goPkgNameForInstance(inst, root))
-		sb.WriteString(".")
-	}
 
 	// As a special case, some CUE standard library types are allowed as references
 	// even though they aren't definitions.
@@ -718,33 +711,44 @@ func (g *generator) emitTypeReference(val cue.Value) (bool, typeFacts, error) {
 		// Note that CUE represents durations as strings, but Go as int64.
 		// TODO: can we do better here, such as a custom duration type?
 		g.def.printf("string /* CUE time.Duration */")
-		return true, facts, nil
+		return true, typeFacts{}, nil
 	case "time.Time":
 		defsOnly = false
 	}
 
 	name := goNameFromPath(path, defsOnly)
 	if name == "" {
-		return false, facts, nil // Not a path we are generating.
+		return false, typeFacts{}, nil // Not a path we are generating.
 	}
 
-	sb.WriteString(name)
-	g.def.printf("%s", sb.String())
-
+	var facts typeFacts
+	inProgress := false
 	// We did use a reference; if the referenced name was from another package,
 	// we need to ensure that package is imported.
 	// Otherwise, we need to ensure that the referenced local definition is generated.
 	// Either way, return the facts about the referenced type.
 	if root != g.pkgRoot {
-		// TODO: populate the facts here, which will require generating imported packages first.
 		g.importCuePkgAsGoPkg[inst.ImportPath] = unqualifiedPath
-		return true, facts, nil
+		// TODO: populate the facts here, which will require generating imported packages first.
+	} else {
+		def, err := g.genDef(path, cue.Dereference(val))
+		if err != nil {
+			return false, typeFacts{}, err
+		}
+		facts = def.facts
+		inProgress = def.inProgress
 	}
-	def, err := g.genDef(path, cue.Dereference(val))
-	if err != nil {
-		return false, facts, err
+	// We generate types depth-first; if the type referenced here is still in progress,
+	// it means that we are in a cyclic type, so we must be nillable to avoid a Go type of infinite size.
+	if inProgress && !facts.isNillable {
+		g.def.printf("*")
+		facts.isNillable = true // pointers can be nil
 	}
-	return true, def.facts, nil
+	if root != g.pkgRoot {
+		g.def.printf("%s.", goPkgNameForInstance(inst, root))
+	}
+	g.def.printf("%s", name)
+	return true, facts, nil
 }
 
 // emitDocs generates the documentation comments attached to the following declaration.

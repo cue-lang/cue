@@ -595,10 +595,7 @@ import (
 
 #linkedList: {
 	item?: _
-	// TODO: it would be nice to not have to specify optional= here;
-	// we could determine that this is a recursive type, so a pointer must be used
-	// as otherwise the Go type tries to have infinite size.
-	next?: #linkedList @go(,optional=nillable)
+	next?: #linkedList
 }
 -- root/import.cue --
 package root
@@ -712,9 +709,6 @@ type Types struct {
 type LinkedList struct {
 	Item any/* CUE top */ `json:"item,omitempty"`
 
-	// TODO: it would be nice to not have to specify optional= here;
-	// we could determine that this is a recursive type, so a pointer must be used
-	// as otherwise the Go type tries to have infinite size.
 	Next *LinkedList `json:"next,omitempty"`
 }
 

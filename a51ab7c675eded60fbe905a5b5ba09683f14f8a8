@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2262d2d_3b82c671",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-12T13:14:58Z",
+      "side": 1,
+      "message": "We did a \"pair review\" on a video call where Matthew screen shared the changes and showed me which ones were almost verbatim from gopls, so could be skipped over. We also discussed a few points which ended up as the TODOs he\u0027s adding now.",
+      "revId": "a51ab7c675eded60fbe905a5b5ba09683f14f8a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1307c2b2_e7964884",

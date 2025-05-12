@@ -317,6 +317,8 @@ If an environment variable is unset or empty, sensible default setting is used.
 			Force fields in stucts to be sorted lexicographically.
 		toolsflow
 			Print task dependency mermaid graphs in 'cue cmd'.
+		parsertrace
+			Print a trace of parsed CUE productions.
 
 CUE_EXPERIMENT and CUE_DEBUG are comma-separated lists of key-value strings,
 where the value is a boolean "true" or "1" if omitted. For example:

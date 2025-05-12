@@ -543,15 +543,21 @@ func writeErr(w io.Writer, err Error, cfg *Config) {
 		// so we make a copy if we need to replace any arguments.
 		didCopy := false
 		for i, arg := range args {
-			if arg, ok := arg.(token.Pos); ok {
-				if !didCopy {
-					args = slices.Clone(args)
-					didCopy = true
-				}
-				pos := arg.Position()
-				pos.Filename = relPath(pos.Filename, cfg)
-				args[i] = pos
+			var pos token.Position
+			switch arg := arg.(type) {
+			case token.Pos:
+				pos = arg.Position()
+			case token.Position:
+				pos = arg
+			default:
+				continue
 			}
+			if !didCopy {
+				args = slices.Clone(args)
+				didCopy = true
+			}
+			pos.Filename = relPath(pos.Filename, cfg)
+			args[i] = pos
 		}
 
 		n, _ := fmt.Fprintf(w, msg, args...)

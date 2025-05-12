@@ -8,7 +8,7 @@ exec cue eval mod.com/x
 cmp stdout stdout.golden
 # TODO: the following command fails unexpectedly although it should be consistent with the above.
 ! exec cue eval ./x
-stderr 'found packages "x" \(x.cue\) and "y" \(y.cue\) in ".*script-pkg_resolution_multiple_packages_one_matching_path_element.*"'
+stderr 'found packages "x" \(x.cue\) and "y" \(y.cue\) in "\./x"'
 
 -- stdout.golden --
 x: 5

@@ -163,6 +163,8 @@ _typeTests: [...#typeTest] & [
 	{name: "NonEmptyString",     fail: both: [1, 2, 3]},
 	{name: "LinkedList",         pass:       {item: 12, next: {item: 34}}},
 	{name: "LinkedList",         fail: both: {next: "x"}},
+	{name: "GraphNode",          pass:       {edges: [{}, {edges: [{}]}]}},
+	{name: "GraphNode",          fail: both: {edges: {}}},
 ]
 -- cuetest/fail_check.stderr --
 fail.both."16_IntList".types.IntList.0: conflicting values "foo" and int (mismatched types string and int):
@@ -185,7 +187,10 @@ fail.both."40_NonEmptyString".types.NonEmptyString: conflicting values string an
     ./root/types.cue:38:23
 fail.both."42_LinkedList".types.LinkedList.next: conflicting values "x" and {item?:_,next?:#linkedList} (mismatched types string and struct):
     ./cuetest/all.cue:94:50
-    ./root/types.cue:43:14
+    ./root/types.cue:44:14
+fail.both."44_GraphNode".types.GraphNode.edges: conflicting values [...#graphNode] and {} (mismatched types list and struct):
+    ./cuetest/all.cue:96:51
+    ./root/types.cue:50:10
 fail.both.notList: conflicting values [1,2,3] and {embedded2?:int} (mismatched types list and struct):
     ./cuetest/all.cue:5:24
     ./root/root.cue:136:2
@@ -591,14 +596,16 @@ import (
 	NonEmptyString?:     string & != ""
 	UniqueStrings?:      list.UniqueItems & [... string]
 	LinkedList?:         #linkedList
+	GraphNode?:          #graphNode
 }
 
 #linkedList: {
 	item?: _
-	// TODO: it would be nice to not have to specify optional= here;
-	// we could determine that this is a recursive type, so a pointer must be used
-	// as otherwise the Go type tries to have infinite size.
-	next?: #linkedList @go(,optional=nillable)
+	next?: #linkedList
+}
+
+#graphNode: {
+	edges?: [...#graphNode]
 }
 -- root/import.cue --
 package root
@@ -707,15 +714,18 @@ type Types struct {
 	UniqueStrings []string `json:"UniqueStrings,omitempty"`
 
 	LinkedList LinkedList `json:"LinkedList,omitempty"`
+
+	GraphNode GraphNode `json:"GraphNode,omitempty"`
 }
 
 type LinkedList struct {
 	Item any/* CUE top */ `json:"item,omitempty"`
 
-	// TODO: it would be nice to not have to specify optional= here;
-	// we could determine that this is a recursive type, so a pointer must be used
-	// as otherwise the Go type tries to have infinite size.
 	Next *LinkedList `json:"next,omitempty"`
+}
+
+type GraphNode struct {
+	Edges []*GraphNode `json:"edges,omitempty"`
 }
 
 // emptyStruct has a doc comment.

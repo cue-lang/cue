@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a99084e_05574356",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-12T15:03:17Z",
+      "side": 1,
+      "message": "LGTM with one minor suggestion, thanks.",
+      "revId": "5df2b4497b91c47a43d7ab97baa28b567e626784",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d996f1bb_d21e3b17",
+        "filename": "cmd/cue/cmd/testdata/module_broken/cue.mod/module.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-12T15:03:17Z",
+      "side": 1,
+      "message": "Maybe mention which test uses this? (ditto for the other new test files)",
+      "revId": "5df2b4497b91c47a43d7ab97baa28b567e626784",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

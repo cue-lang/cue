@@ -57,6 +57,7 @@ func constraintGroupVersionKind(key string, n cue.Value, s *state) {
 		// TODO implement support for multiple items
 		return
 	}
+	var group, version string
 	s.processMap(items[0], func(key string, n cue.Value) {
 		if strings.HasPrefix(key, "x-") {
 			// TODO are x- extension properties actually allowed in this context?
@@ -64,17 +65,22 @@ func constraintGroupVersionKind(key string, n cue.Value, s *state) {
 		}
 		switch key {
 		case "group":
-			return
+			group, _ = s.strValue(n)
 		case "kind":
 			s.k8sResourceKind, _ = s.strValue(n)
 		case "version":
-			s.k8sAPIVersion, _ = s.strValue(n)
+			version, _ = s.strValue(n)
 		default:
 			s.errf(n, "unknown field %q in x-kubernetes-group-version-kind item", key)
 		}
 	})
-	if s.k8sResourceKind == "" || s.k8sAPIVersion == "" {
+	if s.k8sResourceKind == "" || version == "" {
 		s.errf(n, "x-kubernetes-group-version-kind needs both kind and version fields")
+	}
+	if group == "" {
+		s.k8sAPIVersion = version
+	} else {
+		s.k8sAPIVersion = group + "/" + version
 	}
 }
 

@@ -1,5 +1,5 @@
-Note: the schema.json file here is derived from the
-file api/openapi-spec/v3/api_openapi.json in
+Note: the schema.json file here has components
+derived from the api/openapi-spec/v3 directory
 the Kubernetes repository.
 
 #version: k8sAPI
@@ -8,6 +8,24 @@ the Kubernetes repository.
 {
   "components": {
     "schemas": {
+      "io.k8s.api.apps.v1.Deployment": {
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-kubernetes-group-version-kind": [
+          {
+            "group": "apps",
+            "kind": "Deployment",
+            "version": "v1"
+          }
+        ]
+      },
       "io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions": {
         "properties": {
           "apiVersion": {
@@ -84,6 +102,11 @@ the Kubernetes repository.
   "paths": {}
 }
 -- out/decode/extract --
+_#defs: "/components/schemas/io.k8s.api.apps.v1.Deployment": {
+	apiVersion: "apps/v1"
+	kind:       "Deployment"
+}
+
 _#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions": {
 	apiVersion: "v1"
 	kind:       "APIVersions"

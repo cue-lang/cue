@@ -37,7 +37,7 @@ _embeddedResource
 spec?: {
 	...
 }
-intField?: number
+intField?: uint32
 
 _embeddedResource: {
 	apiVersion!: string

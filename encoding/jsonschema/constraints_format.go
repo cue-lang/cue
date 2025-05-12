@@ -33,48 +33,50 @@ type formatFuncInfo struct {
 var formatFuncs = sync.OnceValue(func() map[string]formatFuncInfo {
 	return map[string]formatFuncInfo{
 		"binary":                {openAPI, formatTODO},
-		"bsonobjectid":          {k8sCRD, formatTODO},
-		"byte|k8sCRD":           {openAPI, formatTODO},
-		"cidr":                  {k8sCRD, formatTODO},
-		"creditcard":            {k8sCRD, formatTODO},
+		"bsonobjectid":          {k8s, formatTODO},
+		"byte":                  {openAPI | k8s, formatTODO},
+		"cidr":                  {k8s, formatTODO},
+		"creditcard":            {k8s, formatTODO},
 		"data":                  {openAPI, formatTODO},
-		"date":                  {vfrom(VersionDraft7) | openAPI | k8sCRD, formatDate},
+		"date":                  {vfrom(VersionDraft7) | openAPI | k8s, formatDate},
 		"date-time":             {allVersions | openAPI, formatDateTime},
-		"datetime":              {k8sCRD, formatDateTime},
-		"double":                {openAPI, formatTODO},
-		"duration":              {vfrom(VersionDraft2019_09) | k8sCRD, formatTODO},
-		"email":                 {allVersions | openAPI | k8sCRD, formatTODO},
-		"float":                 {openAPI, formatTODO},
-		"hexcolor":              {k8sCRD, formatTODO},
-		"hostname":              {allVersions | openAPI | k8sCRD, formatTODO},
+		"datetime":              {k8s, formatDateTime},
+		"double":                {openAPI | k8s, formatTODO},
+		"duration":              {vfrom(VersionDraft2019_09) | k8s, formatTODO},
+		"email":                 {allVersions | openAPI | k8s, formatTODO},
+		"float":                 {openAPI | k8s, formatTODO},
+		"hexcolor":              {k8s, formatTODO},
+		"hostname":              {allVersions | openAPI | k8s, formatTODO},
 		"idn-email":             {vfrom(VersionDraft7), formatTODO},
 		"idn-hostname":          {vfrom(VersionDraft7), formatTODO},
-		"int32":                 {openAPI, formatInt32},
-		"int64":                 {openAPI, formatInt64},
-		"ipv4":                  {allVersions | openAPI | k8sCRD, formatTODO},
-		"ipv6":                  {allVersions | openAPI | k8sCRD, formatTODO},
+		"int32":                 {openAPI | k8s, formatInt32},
+		"int64":                 {openAPI | k8s, formatInt64},
+		"ipv4":                  {allVersions | openAPI | k8s, formatTODO},
+		"ipv6":                  {allVersions | openAPI | k8s, formatTODO},
 		"iri":                   {vfrom(VersionDraft7), formatURI},
 		"iri-reference":         {vfrom(VersionDraft7), formatURIReference},
-		"isbn":                  {k8sCRD, formatTODO},
-		"isbn10":                {k8sCRD, formatTODO},
-		"isbn13":                {k8sCRD, formatTODO},
+		"isbn":                  {k8s, formatTODO},
+		"isbn10":                {k8s, formatTODO},
+		"isbn13":                {k8s, formatTODO},
 		"json-pointer":          {vfrom(VersionDraft6), formatTODO},
-		"mac":                   {k8sCRD, formatTODO},
-		"password":              {openAPI | k8sCRD, formatTODO},
+		"mac":                   {k8s, formatTODO},
+		"password":              {openAPI | k8s, formatTODO},
 		"regex":                 {vfrom(VersionDraft7), formatRegex},
 		"relative-json-pointer": {vfrom(VersionDraft7), formatTODO},
-		"rgbcolor":              {k8sCRD, formatTODO},
-		"ssn":                   {k8sCRD, formatTODO},
+		"rgbcolor":              {k8s, formatTODO},
+		"ssn":                   {k8s, formatTODO},
 		"time":                  {vfrom(VersionDraft7), formatTODO},
+		"uint32":                {k8s, formatUint32},
+		"uint64":                {k8s, formatUint64},
 		// TODO we should probably disallow non-ASCII URIs (IRIs) but
 		// this is good enough for now.
-		"uri":           {allVersions | openAPI | k8sCRD, formatURI},
+		"uri":           {allVersions | openAPI | k8s, formatURI},
 		"uri-reference": {vfrom(VersionDraft6), formatURIReference},
 		"uri-template":  {vfrom(VersionDraft6), formatTODO},
-		"uuid":          {vfrom(VersionDraft2019_09) | k8sCRD, formatTODO},
-		"uuid3":         {k8sCRD, formatTODO},
-		"uuid4":         {k8sCRD, formatTODO},
-		"uuid5":         {k8sCRD, formatTODO},
+		"uuid":          {vfrom(VersionDraft2019_09) | k8s, formatTODO},
+		"uuid3":         {k8s, formatTODO},
+		"uuid4":         {k8s, formatTODO},
+		"uuid5":         {k8s, formatTODO},
 	}
 })
 
@@ -142,6 +144,14 @@ func formatInt32(n cue.Value, s *state) {
 
 func formatInt64(n cue.Value, s *state) {
 	s.add(n, numType, ast.NewIdent("int64"))
+}
+
+func formatUint32(n cue.Value, s *state) {
+	s.add(n, numType, ast.NewIdent("uint32"))
+}
+
+func formatUint64(n cue.Value, s *state) {
+	s.add(n, numType, ast.NewIdent("uint64"))
 }
 
 func formatTODO(n cue.Value, s *state) {}

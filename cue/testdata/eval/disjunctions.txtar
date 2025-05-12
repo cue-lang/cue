@@ -294,16 +294,40 @@ issue3899: full: {
 	   deployImage: _versions[spec.image]
    }
 }
+-- issue3891.cue --
+issue3891: reduced: {
+	{x: _} | null
+	{x: _} | null
+	x: *a.y | _
+	a: b
+	b: y: 1
+}
+issue3891: full: {
+	out: #Foo | "never"
+	out: #Foo | "never"
+	out: _fooTemplate & {
+		_input: (_transform & {in: sub1: sub2: "bar"}).out
+	}
+	_transform: {
+		in: _
+		out: in
+	}
+	#Foo: foo?: _
+	_fooTemplate: {
+		_input: _
+		foo: *_input.sub1.sub2 | _
+	}
+}
 -- out/eval/stats --
-Leaks:  36
-Freed:  739
-Reused: 725
-Allocs: 50
-Retain: 95
+Leaks:  40
+Freed:  837
+Reused: 825
+Allocs: 52
+Retain: 130
 
-Unifications: 430
-Conjuncts:    1449
-Disjuncts:    803
+Unifications: 506
+Conjuncts:    1619
+Disjuncts:    936
 -- out/evalalpha --
 Errors:
 f: 2 errors in empty disjunction:
@@ -720,6 +744,36 @@ Result:
         }) }
     }
   }
+  issue3891: (struct){
+    reduced: (struct){
+      x: (_){ _ }
+      a: ~(issue3891.reduced.b)
+      b: (struct){
+        y: (int){ 1 }
+      }
+    }
+    full: (struct){
+      out: (#struct){
+        _input: (struct){
+          sub1: (struct){
+            sub2: (string){ "bar" }
+          }
+        }
+        foo: (_){ _ }
+      }
+      _transform: (struct){
+        in: (_){ _ }
+        out: (_){ _ }
+      }
+      #Foo: (#struct){
+        foo?: (_){ _ }
+      }
+      _fooTemplate: (struct){
+        _input: (_){ _ }
+        foo: (_){ _ }
+      }
+    }
+  }
   issue3899: (struct){
     reduced: (struct){
       p1: (struct){
@@ -849,7 +903,29 @@ diff old new
            x: (bool){ true }
          }) }
        bar: (#struct){ |((#struct){
-@@ -443,14 +422,14 @@
+@@ -436,10 +415,8 @@
+   }
+   issue3891: (struct){
+     reduced: (struct){
+-      x: (_){ |(*(int){ 1 }, (_){ _ }) }
+-      a: (struct){
+-        y: (int){ 1 }
+-      }
++      x: (_){ _ }
++      a: ~(issue3891.reduced.b)
+       b: (struct){
+         y: (int){ 1 }
+       }
+@@ -451,7 +428,7 @@
+             sub2: (string){ "bar" }
+           }
+         }
+-        foo: (_){ |(*(string){ "bar" }, (_){ _ }) }
++        foo: (_){ _ }
+       }
+       _transform: (struct){
+         in: (_){ _ }
+@@ -475,14 +452,14 @@
      }
      full: (struct){
        out: (#struct){
@@ -1311,6 +1387,38 @@ Result:
           let Ok#3 = (bool){ true }
           x: (bool){ true }
         }) }
+    }
+  }
+  issue3891: (struct){
+    reduced: (struct){
+      x: (_){ |(*(int){ 1 }, (_){ _ }) }
+      a: (struct){
+        y: (int){ 1 }
+      }
+      b: (struct){
+        y: (int){ 1 }
+      }
+    }
+    full: (struct){
+      out: (#struct){
+        _input: (struct){
+          sub1: (struct){
+            sub2: (string){ "bar" }
+          }
+        }
+        foo: (_){ |(*(string){ "bar" }, (_){ _ }) }
+      }
+      _transform: (struct){
+        in: (_){ _ }
+        out: (_){ _ }
+      }
+      #Foo: (#struct){
+        foo?: (_){ _ }
+      }
+      _fooTemplate: (struct){
+        _input: (_){ _ }
+        foo: (_){ _ }
+      }
     }
   }
   issue3899: (struct){
@@ -1832,6 +1940,50 @@ Result:
       foo: (〈0;X〉 & {
         〈1;X〉
       })
+    }
+  }
+}
+--- issue3891.cue
+{
+  issue3891: {
+    reduced: {
+      ({
+        x: _
+      }|null)
+      ({
+        x: _
+      }|null)
+      x: (*〈0;a〉.y|_)
+      a: 〈0;b〉
+      b: {
+        y: 1
+      }
+    }
+  }
+  issue3891: {
+    full: {
+      out: (〈0;#Foo〉|"never")
+      out: (〈0;#Foo〉|"never")
+      out: (〈0;_fooTemplate〉 & {
+        _input: (〈1;_transform〉 & {
+          in: {
+            sub1: {
+              sub2: "bar"
+            }
+          }
+        }).out
+      })
+      _transform: {
+        in: _
+        out: 〈0;in〉
+      }
+      #Foo: {
+        foo?: _
+      }
+      _fooTemplate: {
+        _input: _
+        foo: (*〈0;_input〉.sub1.sub2|_)
+      }
     }
   }
 }

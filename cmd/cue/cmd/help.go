@@ -300,10 +300,10 @@ If an environment variable is unset or empty, sensible default setting is used.
 		evalv3 (default true)
 			Enable the new CUE evaluator, addressing performance issues
 			and bringing a better disjunction algorithm.
-		embed
+		embed (default true)
 			Enable support for embedded data files as described in
 			https://cuelang.org/discussion/3264.
-		toposort
+		toposort (default true)
 			Enable topological sorting of struct fields.
 			Provide feedback via https://cuelang.org/issue/3558
 

@@ -39,7 +39,7 @@ var formatFuncs = sync.OnceValue(func() map[string]formatFuncInfo {
 		"creditcard":            {k8s, formatTODO},
 		"data":                  {openAPI, formatTODO},
 		"date":                  {vfrom(VersionDraft7) | openAPI | k8s, formatDate},
-		"date-time":             {allVersions | openAPI, formatDateTime},
+		"date-time":             {allVersions | openAPI | k8s, formatDateTime},
 		"datetime":              {k8s, formatDateTime},
 		"double":                {openAPI | k8s, formatTODO},
 		"duration":              {vfrom(VersionDraft2019_09) | k8s, formatTODO},

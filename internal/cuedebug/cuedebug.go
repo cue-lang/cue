@@ -47,6 +47,9 @@ type Config struct {
 
 	// ToolsFlow causes [cuelang.org/go/tools/flow] to print a task dependency mermaid graph.
 	ToolsFlow bool
+
+	// ParserTrace causes [cuelang.org/go/cue/parser] to print a trace of parsed productions.
+	ParserTrace bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

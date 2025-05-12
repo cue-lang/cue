@@ -1,4 +1,4 @@
-env CUE_DEBUG_PARSER_TRACE=1
+env CUE_DEBUG=parsertrace=1
 
 exec cue vet -c=false schema.cue
 cmp stdout parser-trace.stdout

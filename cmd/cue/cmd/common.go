@@ -32,6 +32,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
 )
@@ -57,8 +58,8 @@ func defaultConfig() (*config, error) {
 					parser.FromVersion(version),
 					parser.ParseComments,
 				}
-				// TODO: consolidate all options into a single CUE_DEBUG variable.
-				if os.Getenv("CUE_DEBUG_PARSER_TRACE") != "" {
+				cuedebug.Init()
+				if cuedebug.Flags.ParserTrace {
 					options = append(options, parser.Trace)
 				}
 				return parser.ParseFile(name, src, options...)

@@ -309,7 +309,10 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 	if len(n.disjunctions) > 0 {
 		// Do not clone cc in disjunctions, as it is identified by underlying.
 		// We only need to clone the cc in disjunctCCs.
-		d.disjunctions = append(d.disjunctions, n.disjunctions...)
+		for _, x := range n.disjunctions {
+			x.env = ctx.derefDisjunctsEnv(x.env)
+			d.disjunctions = append(d.disjunctions, x)
+		}
 	}
 
 	return d

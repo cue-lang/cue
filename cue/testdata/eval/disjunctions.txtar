@@ -746,7 +746,7 @@ Result:
   }
   issue3891: (struct){
     reduced: (struct){
-      x: (_){ _ }
+      x: (_){ |(*(int){ 1 }, (_){ _ }) }
       a: ~(issue3891.reduced.b)
       b: (struct){
         y: (int){ 1 }
@@ -759,7 +759,7 @@ Result:
             sub2: (string){ "bar" }
           }
         }
-        foo: (_){ _ }
+        foo: (_){ |(*(string){ "bar" }, (_){ _ }) }
       }
       _transform: (struct){
         in: (_){ _ }
@@ -903,28 +903,17 @@ diff old new
            x: (bool){ true }
          }) }
        bar: (#struct){ |((#struct){
-@@ -436,10 +415,8 @@
-   }
+@@ -437,9 +416,7 @@
    issue3891: (struct){
      reduced: (struct){
--      x: (_){ |(*(int){ 1 }, (_){ _ }) }
+       x: (_){ |(*(int){ 1 }, (_){ _ }) }
 -      a: (struct){
 -        y: (int){ 1 }
 -      }
-+      x: (_){ _ }
 +      a: ~(issue3891.reduced.b)
        b: (struct){
          y: (int){ 1 }
        }
-@@ -451,7 +428,7 @@
-             sub2: (string){ "bar" }
-           }
-         }
--        foo: (_){ |(*(string){ "bar" }, (_){ _ }) }
-+        foo: (_){ _ }
-       }
-       _transform: (struct){
-         in: (_){ _ }
 @@ -475,14 +452,14 @@
      }
      full: (struct){

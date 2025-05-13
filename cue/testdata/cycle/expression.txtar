@@ -107,7 +107,7 @@ Conjuncts:    168
 Disjuncts:    0
 
 CloseIDElems: 0
-NumCloseIDs: 32
+NumCloseIDs: 39
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -131,7 +131,7 @@ diff old new
 +Disjuncts:    0
 +
 +CloseIDElems: 0
-+NumCloseIDs: 32
++NumCloseIDs: 39
 -- out/eval/stats --
 Leaks:  0
 Freed:  58

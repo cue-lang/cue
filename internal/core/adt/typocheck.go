@@ -357,7 +357,6 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 // subField updates a CloseInfo for subfields of a struct.
 func (c *OpContext) subField(ci CloseInfo) CloseInfo {
 	ci.outerID = 0
-	ci.enclosingEmbed = 0
 	return ci
 }
 

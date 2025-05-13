@@ -360,8 +360,8 @@ Unifications: 510
 Conjuncts:    1511
 Disjuncts:    190
 
-CloseIDElems: 10020
-NumCloseIDs: 811
+CloseIDElems: 11587
+NumCloseIDs: 834
 -- out/evalalpha --
 Errors:
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
@@ -1296,8 +1296,8 @@ diff old new
 +Conjuncts:    1511
 +Disjuncts:    190
 +
-+CloseIDElems: 10020
-+NumCloseIDs: 811
++CloseIDElems: 11587
++NumCloseIDs: 834
 -- out/eval/stats --
 Leaks:  74
 Freed:  1323

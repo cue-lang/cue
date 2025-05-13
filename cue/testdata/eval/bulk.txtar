@@ -112,7 +112,7 @@ issue3638: full: {
 			other: []
 		}]
 	}
-	
+
 	// Order dependent! Breaks if the lines below are moved to the top of the file.
 	entrypoint: used.output
 	used: #Kubernetes & {
@@ -410,9 +410,12 @@ Result:
         }
       }
       out: (struct){
-        foo: (#struct){
-          a: (int){ 1 }
-        }
+        foo: (#struct){ |(*(#struct){
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }, (#struct){
+            a: (int){ 1 }
+          }) }
       }
       #x: (#struct){ |(*(#struct){
           b: (int){ 2 }
@@ -429,9 +432,12 @@ Result:
         }
       }
       out: (struct){
-        foo: (#struct){
-          a: (int){ 1 }
-        }
+        foo: (#struct){ |(*(#struct){
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }, (#struct){
+            a: (int){ 1 }
+          }) }
       }
       #x: (#struct){ |(*(#struct){
           b: (int){ 2 }
@@ -791,38 +797,6 @@ diff old new
        }
      }
      reduced: (struct){
-@@ -310,12 +219,9 @@
-         }
-       }
-       out: (struct){
--        foo: (#struct){ |(*(#struct){
--            a: (int){ 1 }
--            b: (int){ 2 }
--          }, (#struct){
--            a: (int){ 1 }
--          }) }
-+        foo: (#struct){
-+          a: (int){ 1 }
-+        }
-       }
-       #x: (#struct){ |(*(#struct){
-           b: (int){ 2 }
-@@ -332,12 +238,9 @@
-         }
-       }
-       out: (struct){
--        foo: (#struct){ |(*(#struct){
--            a: (int){ 1 }
--            b: (int){ 2 }
--          }, (#struct){
--            a: (int){ 1 }
--          }) }
-+        foo: (#struct){
-+          a: (int){ 1 }
-+        }
-       }
-       #x: (#struct){ |(*(#struct){
-           b: (int){ 2 }
 -- diff/todo/p3 --
 Reordering of error messages.
 -- diff/explanation --

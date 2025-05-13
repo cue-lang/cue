@@ -318,9 +318,14 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 	dstID := defID(0)
 	for _, x := range n.reqDefIDs {
 		if x.v == v {
+			id.parentEmbed = 0 // Reset embedding passing down on schema reuse.
 			dstID = x.id
 			break
 		}
+	}
+
+	if id.parentEmbed != 0 {
+		id.enclosingEmbed = id.parentEmbed
 	}
 
 	if dstID == 0 || id.enclosingEmbed != 0 {
@@ -417,6 +422,7 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 
 	id, dstID := n.newGroup(id, false)
 	id.enclosingEmbed = dstID
+	id.parentEmbed = dstID
 
 	return id
 }

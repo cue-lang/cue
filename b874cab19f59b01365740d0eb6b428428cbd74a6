@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65b3022d_caee358b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-13T21:07:26Z",
+      "side": 1,
+      "message": "oops, done.",
+      "parentUuid": "b85cbe99_eba878c3",
+      "revId": "b874cab19f59b01365740d0eb6b428428cbd74a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64bc3f62_30eb22b3",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-05-12T15:52:28Z",
       "side": 1,
       "message": "Hmm, that\u0027s not necessarily the case AFAICS.\n\nFor example,\n\n```\n#Foo: {\n   children: [... #Foo]\n}\n```\n\nThere\u0027s no need for `#Foo` to be nillable there because the reference is inside a slice. The same applies to map values too.\n\nI don\u0027t necessarily think it\u0027s a bad thing to use pointers in these cases, but I think the comment should be updated and it might be nice to have a test case like the above too.",
+      "revId": "b874cab19f59b01365740d0eb6b428428cbd74a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "978babbf_c778ee93",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 742,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-13T21:07:26Z",
+      "side": 1,
+      "message": "done and done.",
+      "parentUuid": "64bc3f62_30eb22b3",
       "revId": "b874cab19f59b01365740d0eb6b428428cbd74a6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

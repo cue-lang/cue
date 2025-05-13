@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "689c3b4d_1cdabfdb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-13T12:53:22Z",
+      "side": 1,
+      "message": "Given that we want to redesign closedness with a language change, which would entirely remove this hack, SGTM.",
+      "revId": "f6b9f8fb9a212427541586f7e28addea948fd216",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "934e7b5a_fc3546c8",
+        "filename": "cue/testdata/eval/bulk.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 825,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-13T12:53:22Z",
+      "side": 0,
+      "message": "this is not an unintentional regressin? sounds like a disjunction is no longer disambiguated in evalv3.",
+      "revId": "e2adbec9ad924fdda4c54f0112c61edc58b3492c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

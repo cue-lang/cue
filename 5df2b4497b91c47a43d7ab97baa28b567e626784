@@ -33,6 +33,24 @@
       "message": "Maybe mention which test uses this? (ditto for the other new test files)",
       "revId": "5df2b4497b91c47a43d7ab97baa28b567e626784",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "113fcd50_9ca605d7",
+        "filename": "cmd/cue/cmd/testdata/module_broken/cue.mod/module.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-13T20:58:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d996f1bb_d21e3b17",
+      "revId": "5df2b4497b91c47a43d7ab97baa28b567e626784",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -352,7 +352,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 	if id.enclosingEmbed != 0 && !ignore {
 		ph := id.outerID
 		n.addReplacement(replaceID{from: dstID, to: ph, add: true})
-		id, dstID = n.newGroup(id, false)
+		_, dstID = n.newGroup(id, false)
 		id.enclosingEmbed = dstID
 	}
 
@@ -842,7 +842,11 @@ func (a *reqSets) filterTop(conjuncts []conjunctInfo) {
 				if e.id != c.id {
 					continue
 				}
-				f |= c.flags
+				flags := c.flags
+				if c.id < a[0].id {
+					flags &^= cHasStruct
+				}
+				f |= flags
 			}
 		}
 		if (f.hasTop() && !f.hasStruct()) || f.forceOpen() {

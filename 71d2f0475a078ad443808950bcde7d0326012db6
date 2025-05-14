@@ -24,6 +24,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e8db825_cb71e043",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-14T22:50:25Z",
+      "side": 1,
+      "message": "Vector has two kinds of failures with this patch unfortunately. One is extremely similar to https://github.com/cue-lang/cue/issues/3925:\n\n```\n[string]: {\n\tif true {\n\t\tshared: all_total: foo.fooData.total\n\t}\n}\n\nfoo: fooData: {\n\ttotal: tags: _hidden\n\t_hidden: extra: {}\n}\n\n#Tags: [string]: {}\nbar: {\n\tshared: {\n\t\t[string]: tags: #Tags\n\t\tbar_total: foo.fooData.total\n\t}\n}\n```\nexports OK under evalv2, as well as master, but now...\n```\nbar.shared.all_total.tags: adding field extra not allowed as field set was already referenced:\n    ./out.cue:8:15\n```",
+      "revId": "71d2f0475a078ad443808950bcde7d0326012db6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d41d8eb_ba8351d2",

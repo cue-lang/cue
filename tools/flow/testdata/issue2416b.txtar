@@ -44,21 +44,21 @@ graph TD
 }
 -- out/run/t1/stats --
 Leaks:  0
-Freed:  30
-Reused: 24
-Allocs: 6
+Freed:  33
+Reused: 26
+Allocs: 7
 Retain: 1
 
-Unifications: 22
-Conjuncts:    57
-Disjuncts:    31
+Unifications: 23
+Conjuncts:    61
+Disjuncts:    34
 -- out/run/stats/totals --
 Leaks:  0
-Freed:  30
-Reused: 24
-Allocs: 6
+Freed:  33
+Reused: 26
+Allocs: 7
 Retain: 1
 
-Unifications: 22
-Conjuncts:    57
-Disjuncts:    31
+Unifications: 23
+Conjuncts:    61
+Disjuncts:    34

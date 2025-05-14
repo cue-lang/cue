@@ -17,21 +17,24 @@
 //	// To define a shorthand, define the shorthand as a new flag referring to
 //	// the flag of which it is a shorthand.
 //	Setenv: {
-//		$id: "tool/os.Setenv"
+//		$id: _id
+//		_id: "tool/os.Setenv"
 //
 //		{[Name]: Value}
 //	}
 //
 //	// Getenv gets and parses the specific command line variables.
 //	Getenv: {
-//		$id: "tool/os.Getenv"
+//		$id: _id
+//		_id: "tool/os.Getenv"
 //
 //		{[Name]: Value}
 //	}
 //
 //	// Environ populates a struct with all environment variables.
 //	Environ: {
-//		$id: "tool/os.Environ"
+//		$id: _id
+//		_id: "tool/os.Environ"
 //
 //		// A map of all populated values.
 //		// Individual entries may be specified ahead of time to enable
@@ -42,7 +45,8 @@
 //
 //	// Clearenv clears all environment variables.
 //	Clearenv: {
-//		$id: "tool/os.Clearenv"
+//		$id: _id
+//		_id: "tool/os.Clearenv"
 //	}
 package os
 
@@ -63,19 +67,23 @@ var p = &pkg.Package{
 	Value: bool | number | *string | null
 	Name:  !="" & !~"^[$]"
 	Setenv: {
-		$id: "tool/os.Setenv"
+		$id: _id
+		_id: "tool/os.Setenv"
 		{[Name]: Value}
 	}
 	Getenv: {
-		$id: "tool/os.Getenv"
+		$id: _id
+		_id: "tool/os.Getenv"
 		{[Name]: Value}
 	}
 	Environ: {
-		$id: "tool/os.Environ"
+		$id: _id
+		_id: "tool/os.Environ"
 		{[Name]: Value}
 	}
 	Clearenv: {
-		$id: "tool/os.Clearenv"
+		$id: _id
+		_id: "tool/os.Clearenv"
 	}
 }`,
 }

@@ -16,7 +16,8 @@ package file
 
 // Read reads the contents of a file.
 Read: {
-	$id: "tool/file.Read"
+	$id: _id
+	_id: "tool/file.Read"
 
 	// filename names the file to read.
 	//
@@ -32,7 +33,8 @@ Read: {
 
 // Append writes contents to the given file.
 Append: {
-	$id: "tool/file.Append"
+	$id: _id
+	_id: "tool/file.Append"
 
 	// filename names the file to append.
 	//
@@ -49,7 +51,8 @@ Append: {
 
 // Create writes contents to the given file.
 Create: {
-	$id: "tool/file.Create"
+	$id: _id
+	_id: "tool/file.Create"
 
 	// filename names the file to write.
 	//
@@ -66,7 +69,8 @@ Create: {
 
 // Glob returns a list of files.
 Glob: {
-	$id: "tool/file.Glob"
+	$id: _id
+	_id: "tool/file.Glob"
 
 	// glob specifies the pattern to match files with.
 	//
@@ -78,7 +82,8 @@ Glob: {
 
 // Mkdir creates a directory at the specified path.
 Mkdir: {
-	$id: "tool/file.Mkdir"
+	$id: _id
+	_id: "tool/file.Mkdir"
 
 	// The directory path to create.
 	// If path is already a directory, Mkdir does nothing.
@@ -105,7 +110,8 @@ MkdirAll: Mkdir & {
 // It is the caller's responsibility to remove the directory when it is no
 // longer needed.
 MkdirTemp: {
-	$id: "tool/file.MkdirTemp"
+	$id: _id
+	_id: "tool/file.MkdirTemp"
 
 	// The temporary directory is created in the directory specified by dir.
 	// If dir is the empty string, MkdirTemp uses the default directory for
@@ -123,7 +129,8 @@ MkdirTemp: {
 // RemoveAll removes path and any children it contains.
 // It removes everything it can but returns the first error it encounters.
 RemoveAll: {
-	$id: "tool/file.RemoveAll"
+	$id: _id
+	_id: "tool/file.RemoveAll"
 
 	// The path to remove.
 	// If the path does not exist, RemoveAll does nothing.

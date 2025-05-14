@@ -315,7 +315,7 @@ interpretations: jsonschema: {
 	boolTags: {
 		strict:         *false | bool
 		strictKeywords: *strict | bool
-		// TODO(v0.12): enable strictFeatures by default
+		// TODO: enable strictFeatures by default?
 		strictFeatures: *strict | bool
 	}
 }

@@ -19,63 +19,114 @@ reduced: {
 	}
 	port: int | *30080
 }
+-- secondary.cue --
+issue3925: {
+	[string]: {
+		if true {
+			shared: all_total: foo.fooData.total
+		}
+	}
+	foo: fooData: {
+		total: tags: _hidden
+		_hidden: extra: {}
+	}
+	#Tags: [string]: {}
+	bar: {
+		shared: {
+			[string]: tags: #Tags
+			bar_total: foo.fooData.total
+		}
+	}
+}
 -- out/eval/stats --
-Leaks:  0
-Freed:  13
-Reused: 5
+Leaks:  2
+Freed:  32
+Reused: 26
 Allocs: 8
-Retain: 0
+Retain: 1
 
-Unifications: 9
-Conjuncts:    13
-Disjuncts:    13
+Unifications: 30
+Conjuncts:    51
+Disjuncts:    35
 -- out/evalalpha --
 (struct){
   full: (struct){
     out: (struct){
       env: (struct){
-        PORT: (_|_){
-          // [incomplete] full.out.env.PORT: error in call to math.Abs: non-concrete value _:
-          //     ./in.cue:7:11
-        }
+        PORT: (int){ 30080 }
       }
       port: (int){ |(*(int){ 30080 }, (int){ int }) }
     }
   }
   reduced: (struct){
-    a: (_|_){
-      // [incomplete] reduced.a: error in call to math.Abs: non-concrete value _:
-      //     ./in.cue:17:6
-    }
+    a: (int){ 30080 }
     port: (int){ |(*(int){ 30080 }, (int){ int }) }
+  }
+  issue3925: (struct){
+    foo: (struct){
+      fooData: (struct){
+        total: (struct){
+          tags: ~(issue3925.foo.fooData._hidden)
+        }
+        _hidden: (struct){
+          extra: (struct){
+          }
+        }
+      }
+      shared: (struct){
+        all_total: ~(issue3925.foo.fooData.total)
+      }
+    }
+    #Tags: (#struct){
+    }
+    bar: (struct){
+      shared: (struct){
+        bar_total: (struct){
+          tags: (#struct){
+            extra: (#struct){
+            }
+          }
+        }
+        all_total: (struct){
+          tags: (#struct){
+            extra: (#struct){
+            }
+          }
+        }
+      }
+    }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -2,13 +2,19 @@
-   full: (struct){
-     out: (struct){
-       env: (struct){
--        PORT: (int){ 30080 }
-+        PORT: (_|_){
-+          // [incomplete] full.out.env.PORT: error in call to math.Abs: non-concrete value _:
-+          //     ./in.cue:7:11
-+        }
+@@ -15,10 +15,7 @@
+     foo: (struct){
+       fooData: (struct){
+         total: (struct){
+-          tags: (struct){
+-            extra: (struct){
+-            }
+-          }
++          tags: ~(issue3925.foo.fooData._hidden)
+         }
+         _hidden: (struct){
+           extra: (struct){
+@@ -26,12 +23,7 @@
+         }
        }
-       port: (int){ |(*(int){ 30080 }, (int){ int }) }
+       shared: (struct){
+-        all_total: (struct){
+-          tags: (struct){
+-            extra: (struct){
+-            }
+-          }
+-        }
++        all_total: ~(issue3925.foo.fooData.total)
+       }
      }
-   }
-   reduced: (struct){
--    a: (int){ 30080 }
-+    a: (_|_){
-+      // [incomplete] reduced.a: error in call to math.Abs: non-concrete value _:
-+      //     ./in.cue:17:6
-+    }
-     port: (int){ |(*(int){ 30080 }, (int){ int }) }
-   }
- }
+     #Tags: (#struct){
 -- out/eval --
 (struct){
   full: (struct){
@@ -89,6 +140,48 @@ diff old new
   reduced: (struct){
     a: (int){ 30080 }
     port: (int){ |(*(int){ 30080 }, (int){ int }) }
+  }
+  issue3925: (struct){
+    foo: (struct){
+      fooData: (struct){
+        total: (struct){
+          tags: (struct){
+            extra: (struct){
+            }
+          }
+        }
+        _hidden: (struct){
+          extra: (struct){
+          }
+        }
+      }
+      shared: (struct){
+        all_total: (struct){
+          tags: (struct){
+            extra: (struct){
+            }
+          }
+        }
+      }
+    }
+    #Tags: (#struct){
+    }
+    bar: (struct){
+      shared: (struct){
+        bar_total: (struct){
+          tags: (#struct){
+            extra: (#struct){
+            }
+          }
+        }
+        all_total: (struct){
+          tags: (#struct){
+            extra: (#struct){
+            }
+          }
+        }
+      }
+    }
   }
 }
 -- out/compile --
@@ -111,5 +204,38 @@ diff old new
       a: 〈import;math〉.Abs(〈1;port〉)
     }
     port: (int|*30080)
+  }
+}
+--- secondary.cue
+{
+  issue3925: {
+    [string]: {
+      if true {
+        shared: {
+          all_total: 〈3;foo〉.fooData.total
+        }
+      }
+    }
+    foo: {
+      fooData: {
+        total: {
+          tags: 〈1;_hidden〉
+        }
+        _hidden: {
+          extra: {}
+        }
+      }
+    }
+    #Tags: {
+      [string]: {}
+    }
+    bar: {
+      shared: {
+        [string]: {
+          tags: 〈3;#Tags〉
+        }
+        bar_total: 〈2;foo〉.fooData.total
+      }
+    }
   }
 }

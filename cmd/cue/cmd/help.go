@@ -309,6 +309,8 @@ If an environment variable is unset or empty, sensible default setting is used.
 		toposort (default true)
 			Enable topological sorting of struct fields.
 			Provide feedback via https://cuelang.org/issue/3558
+		cmdreferencepkg
+		    Require referencing imported tool packages to declare "cue cmd" tasks.
 
 	CUE_DEBUG
 		Comma-separated list of debug flags to enable or disable, such as:
@@ -778,6 +780,12 @@ line, fetch a web page, and so on. Each task has inputs and
 outputs. Outputs are typically filled out by the task
 implementation as the task completes.
 
+Tasks are found as regular fields underneath the top-level "command" field,
+excluding hidden fields and definitions. Note that regular fields
+may be produced by comprehensions or from the result of other tasks,
+which can result in discovering more tasks.
+To avoid this, set the CUE_EXPERIMENT=cmdreferencepkg experiment flag.
+
 Inputs of tasks my refer to outputs of other tasks. The cue tool
 does a static analysis of the configuration and only starts tasks
 that are fully specified. Upon completion of each task, cue
@@ -908,14 +916,12 @@ cuelang.org/go/pkg/tool/tool.cue.
 
 	// A Task defines a step in the execution of a command.
 	Task: {
-		$type: "tool.Task" // legacy field 'kind' still supported for now.
-
-		// $id indicates the operation to run. It must be of the form
-		// packagePath.Operation.
+		// $id indicates the operation to run. Do not use this field directly;
+		// instead unify with a task imported from one of the tool packages.
 		$id: =~#"\."#
 
-		// $after can be used to specify a task is run after another one, when
-		// it does not otherwise refer to an output of that task.
+		// $after can be used to specify a task is run after another one,
+		// when it does not otherwise refer to an output of that task.
 		$after?: Task | [...Task]
 	}
 `,

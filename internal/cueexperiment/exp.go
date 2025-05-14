@@ -23,6 +23,10 @@ var Flags struct {
 	// TODO(v0.14): deprecate this flag to forbid disabling this feature.
 	TopoSort bool `envflag:"default:true"`
 
+	// CmdReferencePkg requires referencing an imported tool package to declare tasks.
+	// Otherwise, declaring tasks by setting "$id" or "kind" string fields is allowed.
+	CmdReferencePkg bool
+
 	// The flags below describe completed experiments; they can still be set
 	// as long as the value aligns with the final behavior once the experiment finished.
 	// Breaking users who set such a flag seems unnecessary,

@@ -309,6 +309,8 @@ If an environment variable is unset or empty, sensible default setting is used.
 		toposort (default true)
 			Enable topological sorting of struct fields.
 			Provide feedback via https://cuelang.org/issue/3558
+		cmdtaskbyid (default true)
+			Allow declaring tasks without referencing imported tool packages.
 
 	CUE_DEBUG
 		Comma-separated list of debug flags to enable or disable, such as:

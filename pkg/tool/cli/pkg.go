@@ -6,7 +6,8 @@
 //
 //	// Print sends text to the stdout of the current process.
 //	Print: {
-//		$id: *"tool/cli.Print" | "print" // for backwards compatibility
+//		$id: _id
+//		_id: *"tool/cli.Print" | "print" // for backwards compatibility
 //
 //		// text is the text to be printed.
 //		text: string
@@ -20,7 +21,8 @@
 //	//         response: bool
 //	//     })
 //	Ask: {
-//		$id: "tool/cli.Ask"
+//		$id: _id
+//		_id: "tool/cli.Ask"
 //
 //		// prompt sends this message to the output.
 //		prompt: string
@@ -46,11 +48,13 @@ var p = &pkg.Package{
 	Native: []*pkg.Builtin{},
 	CUE: `{
 	Print: {
-		$id:  *"tool/cli.Print" | "print"
+		$id:  _id
+		_id:  *"tool/cli.Print" | "print"
 		text: string
 	}
 	Ask: {
-		$id:      "tool/cli.Ask"
+		$id:      _id
+		_id:      "tool/cli.Ask"
 		prompt:   string
 		response: string | bool
 	}

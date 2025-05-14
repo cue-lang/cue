@@ -214,13 +214,8 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 	if n.node.ArcType == ArcPending {
 		// forcefully do an early recursive evaluation to decide the state
 		// of the arc. See https://cuelang.org/issue/3621.
-		n.process(nodeOnlyNeeds, attemptOnly)
-		if n.node.ArcType == ArcPending {
-			for _, a := range n.node.Arcs {
-				a.unify(c, needs, attemptOnly, checkTypos)
-			}
-		}
-		n.completePending(mode)
+		n.process(pendingKnown, yield)
+		n.completePending(yield)
 	}
 
 	n.process(nodeOnlyNeeds, mode)

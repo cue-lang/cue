@@ -29,53 +29,6 @@ Retain: 0
 Unifications: 9
 Conjuncts:    13
 Disjuncts:    13
--- out/evalalpha --
-(struct){
-  full: (struct){
-    out: (struct){
-      env: (struct){
-        PORT: (_|_){
-          // [incomplete] full.out.env.PORT: error in call to math.Abs: non-concrete value _:
-          //     ./in.cue:7:11
-        }
-      }
-      port: (int){ |(*(int){ 30080 }, (int){ int }) }
-    }
-  }
-  reduced: (struct){
-    a: (_|_){
-      // [incomplete] reduced.a: error in call to math.Abs: non-concrete value _:
-      //     ./in.cue:17:6
-    }
-    port: (int){ |(*(int){ 30080 }, (int){ int }) }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -2,13 +2,19 @@
-   full: (struct){
-     out: (struct){
-       env: (struct){
--        PORT: (int){ 30080 }
-+        PORT: (_|_){
-+          // [incomplete] full.out.env.PORT: error in call to math.Abs: non-concrete value _:
-+          //     ./in.cue:7:11
-+        }
-       }
-       port: (int){ |(*(int){ 30080 }, (int){ int }) }
-     }
-   }
-   reduced: (struct){
--    a: (int){ 30080 }
-+    a: (_|_){
-+      // [incomplete] reduced.a: error in call to math.Abs: non-concrete value _:
-+      //     ./in.cue:17:6
-+    }
-     port: (int){ |(*(int){ 30080 }, (int){ int }) }
-   }
- }
 -- out/eval --
 (struct){
   full: (struct){

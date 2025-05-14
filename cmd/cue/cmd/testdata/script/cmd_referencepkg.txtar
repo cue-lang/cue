@@ -1,0 +1,104 @@
+# `cue cmd` supports referring to tasks from tool/... packages via the
+# kind or $id string fields. This can result in surprising behavior
+# when unmarshalling data as a regular field alongside other tasks,
+# as the data can then declare further tasks to be run.
+
+# Decoding input data containing a `kind` field outside other task values.
+exec cue cmd inputKindOutside
+stdout -count=1 '^hello$'
+stdout -count=1 '^command from input$'
+
+# Decoding input data containing a `$id` field outside other task values.
+exec cue cmd inputDollarIdOutside
+stdout -count=1 '^hello$'
+stdout -count=1 '^command from input$'
+
+# Decoding input data containing a `_id` field outside other task values.
+exec cue cmd inputUnderscoreIdOutside
+stdout -count=1 '^hello$'
+! stdout '^command from input$'
+
+# Decoding input data containing a `$id` field inside a task value.
+exec cue cmd inputDollarIdInside
+stdout -count=1 '^hello$'
+! stdout '^command from input$'
+
+# Decoding input data containing a `$id` field outside other task values
+# and as a hidden field.
+exec cue cmd inputDollarIdOutsideHidden
+stdout -count=1 '^hello$'
+! stdout '^command from input$'
+
+# Use tool/cli.Print by copy pasting its definition, including the `$id` field.
+exec cue cmd useCliPrintCopy
+stdout -count=1 '^hello$'
+
+-- input_kind.json --
+{"cmd": {"kind": "print",          "text": "command from input"}, "data": "hello"}
+-- input_dollar_id.json --
+{"cmd": {"$id":  "tool/cli.Print", "text": "command from input"}, "data": "hello"}
+-- input_underscore_id.json --
+{"cmd": {"_id":  "tool/cli.Print", "text": "command from input"}, "data": "hello"}
+-- in_tool.cue --
+package p
+
+import (
+	"tool/cli"
+	"tool/file"
+	"encoding/json"
+)
+
+command: inputKindOutside: {
+	input: file.Read & {
+		filename: "input_kind.json"
+	}
+	unmarshal: json.Unmarshal(input.contents)
+	display: cli.Print & {
+		text: unmarshal.data
+	}
+}
+command: inputDollarIdOutside: {
+	input: file.Read & {
+		filename: "input_dollar_id.json"
+	}
+	unmarshal: json.Unmarshal(input.contents)
+	display: cli.Print & {
+		text: unmarshal.data
+	}
+}
+command: inputUnderscoreIdOutside: {
+	input: file.Read & {
+		filename: "input_underscore_id.json"
+	}
+	unmarshal: json.Unmarshal(input.contents)
+	display: cli.Print & {
+		text: unmarshal.data
+	}
+}
+command: inputDollarIdInside: {
+	input: file.Read & {
+		filename: "input_dollar_id.json"
+	}
+	display: cli.Print & {
+		unmarshal: json.Unmarshal(input.contents)
+		text: unmarshal.data
+	}
+}
+command: inputDollarIdOutsideHidden: {
+	input: file.Read & {
+		filename: "input_dollar_id.json"
+	}
+	_unmarshal: json.Unmarshal(input.contents)
+	display: cli.Print & {
+		text: _unmarshal.data
+	}
+}
+
+command: useCliPrintCopy: cliPrintCopy & {
+	text: "hello"
+}
+cliPrintCopy: {
+	$id: _id
+	_id: *"tool/cli.Print" | "print"
+	text: string
+}

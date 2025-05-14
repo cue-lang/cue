@@ -6,7 +6,8 @@
 //
 //	// Run executes a program with the given arguments.
 //	Run: {
-//		$id: *"tool/exec.Run" | "exec" // exec for backwards compatibility
+//		$id: _id
+//		_id: *"tool/exec.Run" | "exec" // exec for backwards compatibility
 //
 //		// cmd is a non-empty list holding the program name to run
 //		// and the arguments to be passed to it.
@@ -64,7 +65,8 @@ var p = &pkg.Package{
 	Native: []*pkg.Builtin{},
 	CUE: `{
 	Run: {
-		$id: *"tool/exec.Run" | "exec"
+		$id: _id
+		_id: *"tool/exec.Run" | "exec"
 		cmd: string | [string, ...string]
 		dir?: string
 		env: {[string]: string} | [...=~"="]

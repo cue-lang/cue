@@ -10,7 +10,8 @@
 //	Delete: Do & {method: "DELETE"}
 //
 //	Do: {
-//		$id: *"tool/http.Do" | "http" // http for backwards compatibility
+//		$id: _id
+//		_id: *"tool/http.Do" | "http" // http for backwards compatibility
 //
 //		method: string
 //		url:    string // TODO: make url.URL type
@@ -74,7 +75,8 @@ var p = &pkg.Package{
 	Put: Do & {method: "PUT"}
 	Delete: Do & {method: "DELETE"}
 	Do: {
-		$id:             *"tool/http.Do" | "http"
+		$id:             _id
+		_id:             *"tool/http.Do" | "http"
 		method:          string
 		url:             string
 		followRedirects: *true | bool

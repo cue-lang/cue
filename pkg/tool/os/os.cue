@@ -27,21 +27,24 @@ Name: !="" & !~"^[$]"
 // To define a shorthand, define the shorthand as a new flag referring to
 // the flag of which it is a shorthand.
 Setenv: {
-	$id: "tool/os.Setenv"
+	$id: _id
+	_id: "tool/os.Setenv"
 
 	{[Name]: Value}
 }
 
 // Getenv gets and parses the specific command line variables.
 Getenv: {
-	$id: "tool/os.Getenv"
+	$id: _id
+	_id: "tool/os.Getenv"
 
 	{[Name]: Value}
 }
 
 // Environ populates a struct with all environment variables.
 Environ: {
-	$id: "tool/os.Environ"
+	$id: _id
+	_id: "tool/os.Environ"
 
 	// A map of all populated values.
 	// Individual entries may be specified ahead of time to enable
@@ -52,5 +55,6 @@ Environ: {
 
 // Clearenv clears all environment variables.
 Clearenv: {
-	$id: "tool/os.Clearenv"
+	$id: _id
+	_id: "tool/os.Clearenv"
 }

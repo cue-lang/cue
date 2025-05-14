@@ -20,7 +20,8 @@ Put: Do & {method: "PUT"}
 Delete: Do & {method: "DELETE"}
 
 Do: {
-	$id: *"tool/http.Do" | "http" // http for backwards compatibility
+	$id: _id
+	_id: *"tool/http.Do" | "http" // http for backwards compatibility
 
 	method: string
 	url:    string // TODO: make url.URL type

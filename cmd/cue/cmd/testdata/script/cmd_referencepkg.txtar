@@ -33,6 +33,20 @@ stdout -count=1 '^hello$'
 exec cue cmd useCliPrintCopy
 stdout -count=1 '^hello$'
 
+# Enabling the cmdreferencepkg experiment, tasks only work when referencing imported tool packages.
+env CUE_EXPERIMENT=cmdreferencepkg
+
+exec cue cmd inputKindOutside
+stdout -count=1 '^hello$'
+! stdout '^command from input$'
+
+exec cue cmd inputDollarIdOutside
+stdout -count=1 '^hello$'
+! stdout '^command from input$'
+
+! exec cue cmd useCliPrintCopy
+stderr 'no tasks found'
+
 -- input_kind.json --
 {"cmd": {"kind": "print",          "text": "command from input"}, "data": "hello"}
 -- input_dollar_id.json --

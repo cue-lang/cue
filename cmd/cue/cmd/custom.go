@@ -32,6 +32,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/cueexperiment"
 	itask "cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
@@ -253,13 +254,32 @@ func isTask(v cue.Value) bool {
 	if v.Kind() != cue.StructKind {
 		return false
 	}
-	if v.Lookup("$id").Exists() {
-		return true
+
+	id := v.LookupPath(cue.MakePath(cue.Str("$id")))
+
+	cueexperiment.Init()
+	if cueexperiment.Flags.CmdTaskByID {
+		if id.Exists() {
+			return true
+		}
+		// Is it an existing legacy kind.
+		str, err := v.Lookup("kind").String()
+		_, ok := legacyKinds[str]
+		return err == nil && ok
 	}
-	// Is it an existing legacy kind.
-	str, err := v.Lookup("kind").String()
-	_, ok := legacyKinds[str]
-	return err == nil && ok
+
+	// $id must exist and be a reference to the hidden _id field from a tool/... package.
+	if !id.Exists() {
+		return false
+	}
+	fromToolsPackage := false
+	id.Walk(func(v cue.Value) bool {
+		if strings.HasPrefix(v.Pos().Filename(), "tool/") {
+			fromToolsPackage = true
+		}
+		return true
+	}, nil)
+	return fromToolsPackage
 }
 
 var legacyKinds = map[string]string{

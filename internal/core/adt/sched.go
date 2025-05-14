@@ -413,9 +413,12 @@ processNextTask:
 		if s.meets(needs) {
 			return true
 		}
-		c.current().waitFor(s, needs)
-		s.yield()
-		panic("unreachable")
+		// This can happen in some cases. We "promote" to finalization if this
+		// was not triggered by a task.
+		if t := c.current(); t != nil {
+			t.waitFor(s, needs)
+			s.yield()
+		}
 
 	case finalize:
 		// remainder of function

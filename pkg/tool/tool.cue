@@ -64,8 +64,6 @@ Name: =~#"^\PL([-](\PL|\PN))*$"#
 
 // A Task defines a step in the execution of a command.
 Task: {
-	$type: "tool.Task" // legacy field 'kind' still supported for now.
-
 	// $id indicates the operation to run. It must be of the form
 	// packagePath.Operation.
 	$id: =~#"\."#

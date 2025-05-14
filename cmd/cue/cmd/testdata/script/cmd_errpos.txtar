@@ -9,11 +9,11 @@ command.prompter.contents: invalid bytes argument: non-concrete value string:
     ./task_tool.cue:9:10
     ./task_tool.cue:12:13
     ./task_tool.cue:17:3
-    tool/file:11:3
+    tool/file:13:3
 command.prompter.filename: invalid string argument: non-concrete value string:
     ./task_tool.cue:9:10
-    tool/file:9:3
-    tool/file:9:16
+    tool/file:11:3
+    tool/file:11:16
 -- task_tool.cue --
 package foo
 

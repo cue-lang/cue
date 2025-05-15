@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b6ef411_4cabb51c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-05-15T13:25:03Z",
+      "side": 1,
+      "message": "Just adding a +1 here to reflect my \"direction LGTM\"",
+      "revId": "daf2329d6f8c9a5de0e1fd6689183644b48aba5d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

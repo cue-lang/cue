@@ -758,10 +758,6 @@ definition.t0.err.d1.env.c: field not allowed:
     ./definition.cue:3:11
 definition.t1.err.a.c: field not allowed:
     ./definition.cue:9:5
-issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
-    ./chained.cue:8:11
-issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
-    ./chained.cue:17:19
 
 Result:
 (_|_){
@@ -781,44 +777,32 @@ Result:
       }
     }
   }
-  issue3925: (_|_){
-    // [eval]
-    reduced: (_|_){
-      // [eval]
-      out: (_|_){
-        // [eval] issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
-        //     ./chained.cue:8:11
-      }
-      in: (_|_){
-        // [eval]
+  issue3925: (struct){
+    reduced: (struct){
+      out: (string){ "c: str\n" }
+      in: (struct){
         a: (string){ "actual" }
-        b: (_|_){
-          // [eval] issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
-          //     ./chained.cue:8:11
-        }
-      }
-    }
-    full: (_|_){
-      // [eval]
-      out: (_|_){
-        // [eval]
-        input1: (_|_){
-          // [eval]
-          early: (string){ "early value" }
-          lateYAML: (_|_){
-            // [eval] issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
-            //     ./chained.cue:17:19
+        b: (struct){
+          actual: (struct){
+            c: (string){ "str" }
           }
         }
       }
-      _inputs: (_|_){
-        // [eval]
-        input1: (_|_){
-          // [eval]
+    }
+    full: (struct){
+      out: (struct){
+        input1: (struct){
+          early: (string){ "early value" }
+          lateYAML: (string){ "one: one value\n" }
+        }
+      }
+      _inputs: (struct){
+        input1: (struct){
           name: (string){ "actual" }
-          config: (_|_){
-            // [eval] issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
-            //     ./chained.cue:17:19
+          config: (struct){
+            actual: (struct){
+              one: (string){ "one value" }
+            }
           }
         }
       }
@@ -1237,7 +1221,7 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,16 +1,12 @@
+@@ -1,16 +1,8 @@
  Errors:
  definition.t0.err.d1.env.c: field not allowed:
 -    ./definition.cue:2:12
@@ -1251,14 +1235,10 @@ diff old new
 -mutual.t4.ok.p0.z: cannot add to field c
 -mutual.t4.ok.p4.z: cannot add to field b
 -mutual.t4.ok.p4.z: cannot add to field c
-+issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
-+    ./chained.cue:8:11
-+issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
-+    ./chained.cue:17:19
  
  Result:
  (_|_){
-@@ -19,12 +15,7 @@
+@@ -19,12 +11,7 @@
      t1: (struct){
        ok: (struct){
          s3: (string){ strings.ContainsAny("dd") }
@@ -1272,75 +1252,7 @@ diff old new
        }
      }
      t2: (struct){
-@@ -35,32 +26,44 @@
-       }
-     }
-   }
--  issue3925: (struct){
--    reduced: (struct){
--      out: (string){ "c: str\n" }
--      in: (struct){
-+  issue3925: (_|_){
-+    // [eval]
-+    reduced: (_|_){
-+      // [eval]
-+      out: (_|_){
-+        // [eval] issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
-+        //     ./chained.cue:8:11
-+      }
-+      in: (_|_){
-+        // [eval]
-         a: (string){ "actual" }
--        b: (struct){
--          actual: (struct){
--            c: (string){ "str" }
--          }
--        }
--      }
--    }
--    full: (struct){
--      out: (struct){
--        input1: (struct){
-+        b: (_|_){
-+          // [eval] issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
-+          //     ./chained.cue:8:11
-+        }
-+      }
-+    }
-+    full: (_|_){
-+      // [eval]
-+      out: (_|_){
-+        // [eval]
-+        input1: (_|_){
-+          // [eval]
-           early: (string){ "early value" }
--          lateYAML: (string){ "one: one value\n" }
--        }
--      }
--      _inputs: (struct){
--        input1: (struct){
-+          lateYAML: (_|_){
-+            // [eval] issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
-+            //     ./chained.cue:17:19
-+          }
-+        }
-+      }
-+      _inputs: (_|_){
-+        // [eval]
-+        input1: (_|_){
-+          // [eval]
-           name: (string){ "actual" }
--          config: (struct){
--            actual: (struct){
--              one: (string){ "one value" }
--            }
-+          config: (_|_){
-+            // [eval] issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
-+            //     ./chained.cue:17:19
-           }
-         }
-       }
-@@ -92,9 +95,7 @@
+@@ -92,9 +79,7 @@
              // [eval]
              c: (_|_){
                // [eval] definition.t0.err.d1.env.c: field not allowed:
@@ -1350,7 +1262,7 @@ diff old new
              }
            }
          }
-@@ -108,9 +109,7 @@
+@@ -108,9 +93,7 @@
            // [eval]
            c: (_|_){
              // [eval] definition.t1.err.a.c: field not allowed:
@@ -1360,7 +1272,7 @@ diff old new
            }
          }
          #A: (#struct){
-@@ -124,32 +123,32 @@
+@@ -124,32 +107,32 @@
              a: (int){ int }
            }
            x: (#struct){
@@ -1419,7 +1331,7 @@ diff old new
            }
            #A: (#struct){
              a: (int){ int }
-@@ -172,14 +171,7 @@
+@@ -172,14 +155,7 @@
      }
      t2: (struct){
        ok: (struct){
@@ -1435,7 +1347,7 @@ diff old new
          #X: (#struct){
            a: (#struct){
              b: (#struct){
-@@ -233,8 +225,7 @@
+@@ -233,8 +209,7 @@
        }
      }
    }
@@ -1445,7 +1357,7 @@ diff old new
      t0: (struct){
        ok: (struct){
          c: (struct){
-@@ -301,135 +292,116 @@
+@@ -301,135 +276,116 @@
          }
        }
      }
@@ -1691,7 +1603,7 @@ diff old new
            }
          }
          p5: (struct){
-@@ -438,23 +410,20 @@
+@@ -438,23 +394,20 @@
                d: (struct){
                  b: (int){ 2 }
                }
@@ -1729,7 +1641,7 @@ diff old new
            }
          }
          check: (struct){
-@@ -476,10 +445,7 @@
+@@ -476,10 +429,7 @@
              b: (int){ 2 }
            }
            y: (struct){

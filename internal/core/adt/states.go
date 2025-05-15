@@ -191,7 +191,8 @@ const (
 		// TODO: not adding this improves error message for issue3691 in
 		// eval/comprehensions.txtar. But without this, TestVisit of dep
 		// panics. Investigate.
-		pendingKnown
+		pendingKnown |
+		disjunctionTask
 
 	// The xConjunct condition sets indicate a conjunct MAY contribute the to
 	// final result. For some conjuncts it may not be known what the

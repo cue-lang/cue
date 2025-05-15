@@ -214,16 +214,42 @@ issue3194: reduced: {
 	}.out
 }
 
+-- chained.cue --
+import "encoding/yaml"
+
+issue3925: reduced: {
+	out: yaml.Marshal(in.b.actual)
+	in: {
+		a: "actual"
+		a: "actual" | "other"
+		b: (a): c: "str"
+	}
+}
+issue3925: full: {
+	for name, _ in _inputs {
+		out: (name): early: "early value"
+	}
+	_inputs: input1: {
+		name: "actual"
+		config: (name): one: "one value"
+	}
+	_inputs: [_]: {
+		name: "actual" | "other"
+	}
+	for name, input in _inputs {
+		out: (name): lateYAML: yaml.Marshal(input.config[input.name])
+	}
+}
 -- out/eval/stats --
 Leaks:  4
-Freed:  285
-Reused: 273
+Freed:  308
+Reused: 296
 Allocs: 16
-Retain: 170
+Retain: 183
 
-Unifications: 269
-Conjuncts:    1619
-Disjuncts:    436
+Unifications: 288
+Conjuncts:    1650
+Disjuncts:    472
 -- out/eval --
 Errors:
 definition.t0.err.d1.env.c: field not allowed:
@@ -259,6 +285,37 @@ Result:
         s3: (bool){ true }
         s5: (string){ "dd" }
         s6: (string){ "dd" }
+      }
+    }
+  }
+  issue3925: (struct){
+    reduced: (struct){
+      out: (string){ "c: str\n" }
+      in: (struct){
+        a: (string){ "actual" }
+        b: (struct){
+          actual: (struct){
+            c: (string){ "str" }
+          }
+        }
+      }
+    }
+    full: (struct){
+      out: (struct){
+        input1: (struct){
+          early: (string){ "early value" }
+          lateYAML: (string){ "one: one value\n" }
+        }
+      }
+      _inputs: (struct){
+        input1: (struct){
+          name: (string){ "actual" }
+          config: (struct){
+            actual: (struct){
+              one: (string){ "one value" }
+            }
+          }
+        }
       }
     }
   }
@@ -683,24 +740,28 @@ Result:
   }
 }
 -- out/evalalpha/stats --
-Leaks:  265
+Leaks:  292
 Freed:  0
 Reused: 0
-Allocs: 265
+Allocs: 292
 Retain: 0
 
-Unifications: 256
-Conjuncts:    568
-Disjuncts:    6
+Unifications: 277
+Conjuncts:    605
+Disjuncts:    12
 
 CloseIDElems: 38
-NumCloseIDs: 82
+NumCloseIDs: 83
 -- out/evalalpha --
 Errors:
 definition.t0.err.d1.env.c: field not allowed:
     ./definition.cue:3:11
 definition.t1.err.a.c: field not allowed:
     ./definition.cue:9:5
+issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
+    ./chained.cue:8:11
+issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
+    ./chained.cue:17:19
 
 Result:
 (_|_){
@@ -717,6 +778,49 @@ Result:
         s3: (bool){ true }
         s5: (string){ "dd" }
         s6: (string){ "dd" }
+      }
+    }
+  }
+  issue3925: (_|_){
+    // [eval]
+    reduced: (_|_){
+      // [eval]
+      out: (_|_){
+        // [eval] issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
+        //     ./chained.cue:8:11
+      }
+      in: (_|_){
+        // [eval]
+        a: (string){ "actual" }
+        b: (_|_){
+          // [eval] issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
+          //     ./chained.cue:8:11
+        }
+      }
+    }
+    full: (_|_){
+      // [eval]
+      out: (_|_){
+        // [eval]
+        input1: (_|_){
+          // [eval]
+          early: (string){ "early value" }
+          lateYAML: (_|_){
+            // [eval] issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
+            //     ./chained.cue:17:19
+          }
+        }
+      }
+      _inputs: (_|_){
+        // [eval]
+        input1: (_|_){
+          // [eval]
+          name: (string){ "actual" }
+          config: (_|_){
+            // [eval] issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
+            //     ./chained.cue:17:19
+          }
+        }
       }
     }
   }
@@ -1109,31 +1213,31 @@ diff old new
 +++ new
 @@ -1,9 +1,12 @@
 -Leaks:  4
--Freed:  285
--Reused: 273
+-Freed:  308
+-Reused: 296
 -Allocs: 16
--Retain: 170
+-Retain: 183
 -
--Unifications: 269
--Conjuncts:    1619
--Disjuncts:    436
-+Leaks:  265
+-Unifications: 288
+-Conjuncts:    1650
+-Disjuncts:    472
++Leaks:  292
 +Freed:  0
 +Reused: 0
-+Allocs: 265
++Allocs: 292
 +Retain: 0
 +
-+Unifications: 256
-+Conjuncts:    568
-+Disjuncts:    6
++Unifications: 277
++Conjuncts:    605
++Disjuncts:    12
 +
 +CloseIDElems: 38
-+NumCloseIDs: 82
++NumCloseIDs: 83
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,16 +1,8 @@
+@@ -1,16 +1,12 @@
  Errors:
  definition.t0.err.d1.env.c: field not allowed:
 -    ./definition.cue:2:12
@@ -1147,10 +1251,14 @@ diff old new
 -mutual.t4.ok.p0.z: cannot add to field c
 -mutual.t4.ok.p4.z: cannot add to field b
 -mutual.t4.ok.p4.z: cannot add to field c
++issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
++    ./chained.cue:8:11
++issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
++    ./chained.cue:17:19
  
  Result:
  (_|_){
-@@ -19,12 +11,7 @@
+@@ -19,12 +15,7 @@
      t1: (struct){
        ok: (struct){
          s3: (string){ strings.ContainsAny("dd") }
@@ -1164,7 +1272,75 @@ diff old new
        }
      }
      t2: (struct){
-@@ -61,9 +48,7 @@
+@@ -35,32 +26,44 @@
+       }
+     }
+   }
+-  issue3925: (struct){
+-    reduced: (struct){
+-      out: (string){ "c: str\n" }
+-      in: (struct){
++  issue3925: (_|_){
++    // [eval]
++    reduced: (_|_){
++      // [eval]
++      out: (_|_){
++        // [eval] issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
++        //     ./chained.cue:8:11
++      }
++      in: (_|_){
++        // [eval]
+         a: (string){ "actual" }
+-        b: (struct){
+-          actual: (struct){
+-            c: (string){ "str" }
+-          }
+-        }
+-      }
+-    }
+-    full: (struct){
+-      out: (struct){
+-        input1: (struct){
++        b: (_|_){
++          // [eval] issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
++          //     ./chained.cue:8:11
++        }
++      }
++    }
++    full: (_|_){
++      // [eval]
++      out: (_|_){
++        // [eval]
++        input1: (_|_){
++          // [eval]
+           early: (string){ "early value" }
+-          lateYAML: (string){ "one: one value\n" }
+-        }
+-      }
+-      _inputs: (struct){
+-        input1: (struct){
++          lateYAML: (_|_){
++            // [eval] issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
++            //     ./chained.cue:17:19
++          }
++        }
++      }
++      _inputs: (_|_){
++        // [eval]
++        input1: (_|_){
++          // [eval]
+           name: (string){ "actual" }
+-          config: (struct){
+-            actual: (struct){
+-              one: (string){ "one value" }
+-            }
++          config: (_|_){
++            // [eval] issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
++            //     ./chained.cue:17:19
+           }
+         }
+       }
+@@ -92,9 +95,7 @@
              // [eval]
              c: (_|_){
                // [eval] definition.t0.err.d1.env.c: field not allowed:
@@ -1174,7 +1350,7 @@ diff old new
              }
            }
          }
-@@ -77,9 +62,7 @@
+@@ -108,9 +109,7 @@
            // [eval]
            c: (_|_){
              // [eval] definition.t1.err.a.c: field not allowed:
@@ -1184,7 +1360,7 @@ diff old new
            }
          }
          #A: (#struct){
-@@ -93,32 +76,32 @@
+@@ -124,32 +123,32 @@
              a: (int){ int }
            }
            x: (#struct){
@@ -1243,7 +1419,7 @@ diff old new
            }
            #A: (#struct){
              a: (int){ int }
-@@ -141,14 +124,7 @@
+@@ -172,14 +171,7 @@
      }
      t2: (struct){
        ok: (struct){
@@ -1259,7 +1435,7 @@ diff old new
          #X: (#struct){
            a: (#struct){
              b: (#struct){
-@@ -202,8 +178,7 @@
+@@ -233,8 +225,7 @@
        }
      }
    }
@@ -1269,7 +1445,7 @@ diff old new
      t0: (struct){
        ok: (struct){
          c: (struct){
-@@ -270,135 +245,116 @@
+@@ -301,135 +292,116 @@
          }
        }
      }
@@ -1515,7 +1691,7 @@ diff old new
            }
          }
          p5: (struct){
-@@ -407,23 +363,20 @@
+@@ -438,23 +410,20 @@
                d: (struct){
                  b: (int){ 2 }
                }
@@ -1553,7 +1729,7 @@ diff old new
            }
          }
          check: (struct){
-@@ -445,10 +398,7 @@
+@@ -476,10 +445,7 @@
              b: (int){ 2 }
            }
            y: (struct){
@@ -1587,6 +1763,56 @@ Reordering / positions.
         s3: 〈import;strings〉.ContainsAny(〈0;s5〉, "dd")
         s5: 〈0;s6〉
         s6: "dd"
+      }
+    }
+  }
+}
+--- chained.cue
+{
+  issue3925: {
+    reduced: {
+      out: 〈import;"encoding/yaml"〉.Marshal(〈0;in〉.b.actual)
+      in: {
+        a: "actual"
+        a: ("actual"|"other")
+        b: {
+          〈1;a〉: {
+            c: "str"
+          }
+        }
+      }
+    }
+  }
+  issue3925: {
+    full: {
+      for name, _ in 〈0;_inputs〉 {
+        out: {
+          〈2;name〉: {
+            early: "early value"
+          }
+        }
+      }
+      _inputs: {
+        input1: {
+          name: "actual"
+          config: {
+            〈1;name〉: {
+              one: "one value"
+            }
+          }
+        }
+      }
+      _inputs: {
+        [_]: {
+          name: ("actual"|"other")
+        }
+      }
+      for name, input in 〈0;_inputs〉 {
+        out: {
+          〈2;name〉: {
+            lateYAML: 〈import;"encoding/yaml"〉.Marshal(〈3;input〉.config[〈3;input〉.name])
+          }
+        }
       }
     }
   }

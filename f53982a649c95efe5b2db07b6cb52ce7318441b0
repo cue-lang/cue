@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a7b1c37_f5354697",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-15T13:39:05Z",
+      "side": 1,
+      "message": "This breaks Unity because GreyMatter starts failing again, as #3920 is un-fixed by this revert.",
+      "revId": "f53982a649c95efe5b2db07b6cb52ce7318441b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

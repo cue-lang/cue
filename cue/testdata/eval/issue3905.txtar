@@ -1,0 +1,229 @@
+-- in.cue --
+issue3905: full: {
+	#ReferenceGrantBuilder: {
+		parameters: {
+			namespace:        string
+			gatewayNamespace: string | *"foo"
+		}
+	
+		referenceGrant: (parameters.gatewayNamespace): #ReferenceGrant & {
+			metadata: name:      parameters.gatewayNamespace
+			metadata: namespace: parameters.namespace
+		}
+	}
+	
+	(#ReferenceGrantBuilder & {
+		parameters: namespace: "foo"
+	}).referenceGrant
+	
+	#ReferenceGrant: {
+		apiVersion: "gateway.networking.k8s.io/v1beta1"
+		kind: "ReferenceGrant"
+		metadata!: {
+			name!: string
+			namespace!: string
+			labels?: {
+				[string]: string
+			}
+			annotations?: {
+				[string]: string
+			}
+		}
+	}
+}
+-- out/eval/stats --
+Leaks:  3
+Freed:  48
+Reused: 38
+Allocs: 13
+Retain: 20
+
+Unifications: 41
+Conjuncts:    81
+Disjuncts:    66
+-- out/evalalpha --
+(struct){
+  issue3905: (struct){
+    full: (_|_){
+      // [incomplete] issue3905.full: key value of dynamic field must be concrete, found _|_(cycle error):
+      //     ./in.cue:8:20
+      #ReferenceGrantBuilder: (#struct){
+        parameters: (#struct){
+          namespace: (string){ string }
+          gatewayNamespace: (string){ |(*(string){ "foo" }, (string){ string }) }
+        }
+        referenceGrant: (#struct){
+          foo: (#struct){
+            metadata: (#struct){
+              name: (string){ |(*(string){ "foo" }, (string){ string }) }
+              namespace: (string){ string }
+              labels?: (#struct){
+              }
+              annotations?: (#struct){
+              }
+            }
+            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+            kind: (string){ "ReferenceGrant" }
+          }
+        }
+      }
+      #ReferenceGrant: (#struct){
+        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+        kind: (string){ "ReferenceGrant" }
+        metadata!: (#struct){
+          name!: (string){ string }
+          namespace!: (string){ string }
+          labels?: (#struct){
+          }
+          annotations?: (#struct){
+          }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,6 +1,8 @@
+ (struct){
+   issue3905: (struct){
+-    full: (struct){
++    full: (_|_){
++      // [incomplete] issue3905.full: key value of dynamic field must be concrete, found _|_(cycle error):
++      //     ./in.cue:8:20
+       #ReferenceGrantBuilder: (#struct){
+         parameters: (#struct){
+           namespace: (string){ string }
+@@ -8,8 +10,6 @@
+         }
+         referenceGrant: (#struct){
+           foo: (#struct){
+-            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+-            kind: (string){ "ReferenceGrant" }
+             metadata: (#struct){
+               name: (string){ |(*(string){ "foo" }, (string){ string }) }
+               namespace: (string){ string }
+@@ -18,6 +18,8 @@
+               annotations?: (#struct){
+               }
+             }
++            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
++            kind: (string){ "ReferenceGrant" }
+           }
+         }
+       }
+@@ -33,18 +35,6 @@
+           }
+         }
+       }
+-      foo: (#struct){
+-        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+-        kind: (string){ "ReferenceGrant" }
+-        metadata: (#struct){
+-          name: (string){ |(*(string){ "foo" }, (string){ string }) }
+-          namespace: (string){ "foo" }
+-          labels?: (#struct){
+-          }
+-          annotations?: (#struct){
+-          }
+-        }
+-      }
+     }
+   }
+ }
+-- out/eval --
+(struct){
+  issue3905: (struct){
+    full: (struct){
+      #ReferenceGrantBuilder: (#struct){
+        parameters: (#struct){
+          namespace: (string){ string }
+          gatewayNamespace: (string){ |(*(string){ "foo" }, (string){ string }) }
+        }
+        referenceGrant: (#struct){
+          foo: (#struct){
+            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+            kind: (string){ "ReferenceGrant" }
+            metadata: (#struct){
+              name: (string){ |(*(string){ "foo" }, (string){ string }) }
+              namespace: (string){ string }
+              labels?: (#struct){
+              }
+              annotations?: (#struct){
+              }
+            }
+          }
+        }
+      }
+      #ReferenceGrant: (#struct){
+        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+        kind: (string){ "ReferenceGrant" }
+        metadata!: (#struct){
+          name!: (string){ string }
+          namespace!: (string){ string }
+          labels?: (#struct){
+          }
+          annotations?: (#struct){
+          }
+        }
+      }
+      foo: (#struct){
+        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+        kind: (string){ "ReferenceGrant" }
+        metadata: (#struct){
+          name: (string){ |(*(string){ "foo" }, (string){ string }) }
+          namespace: (string){ "foo" }
+          labels?: (#struct){
+          }
+          annotations?: (#struct){
+          }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  issue3905: {
+    full: {
+      #ReferenceGrantBuilder: {
+        parameters: {
+          namespace: string
+          gatewayNamespace: (string|*"foo")
+        }
+        referenceGrant: {
+          〈1;parameters〉.gatewayNamespace: (〈2;#ReferenceGrant〉 & {
+            metadata: {
+              name: 〈3;parameters〉.gatewayNamespace
+            }
+            metadata: {
+              namespace: 〈3;parameters〉.namespace
+            }
+          })
+        }
+      }
+      (〈0;#ReferenceGrantBuilder〉 & {
+        parameters: {
+          namespace: "foo"
+        }
+      }).referenceGrant
+      #ReferenceGrant: {
+        apiVersion: "gateway.networking.k8s.io/v1beta1"
+        kind: "ReferenceGrant"
+        metadata!: {
+          name!: string
+          namespace!: string
+          labels?: {
+            [string]: string
+          }
+          annotations?: {
+            [string]: string
+          }
+        }
+      }
+    }
+  }
+}

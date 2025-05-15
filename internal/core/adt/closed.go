@@ -107,7 +107,6 @@ type CloseInfo struct {
 	// defID is a unique ID to track anything that gets inserted from this
 	// Conjunct.
 	defID          defID
-	parentEmbed    defID // Allow restoring enclosingEmbed.
 	enclosingEmbed defID // Tracks an embedding within a struct.
 	outerID        defID // Tracks the {} that should be closed after unifying.
 

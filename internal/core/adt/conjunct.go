@@ -83,12 +83,6 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		// NOTE: do not unshare: a conjunction could still allow structure
 		// sharing, such as in the case of `ref & ref`.
 		if x.Op == AndOp {
-			// HACK: if we have an explicit conjunction, we will force this
-			// intersection and override the disabling of closedness as a result
-			// of an embedding.
-			// TODO(#A...): this will no longer be necessary once we have
-			// opening, instead of embedding.
-			id.parentEmbed = 0
 			n.scheduleConjunct(MakeConjunct(env, x.X, id), id)
 			n.scheduleConjunct(MakeConjunct(env, x.Y, id), id)
 			return
@@ -219,7 +213,6 @@ loop1:
 	// When inserting a replace that is a definition, flip the ignore.
 	if hasEmbed {
 		ci = n.splitStruct(s, ci)
-		ci.parentEmbed = 0
 	}
 
 	// First add fixed fields and schedule expressions.

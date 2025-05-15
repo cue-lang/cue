@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7eb9e87_6ee725b1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-15T20:18:10Z",
+      "side": 1,
+      "message": "Say 3905 in the title too?",
+      "revId": "35f3e06ce7d0cb857b4a412fa7952b4185d169b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fa891ad_4a8dc0b3",
+        "filename": "cue/testdata/eval/issue3905.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-15T20:18:10Z",
+      "side": 1,
+      "message": "You\u0027re missing the smaller reproducer I shared in that thread too, no? I think both would be useful.",
+      "revId": "35f3e06ce7d0cb857b4a412fa7952b4185d169b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

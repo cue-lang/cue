@@ -53,9 +53,7 @@ Disjuncts:    81
 -- out/evalalpha --
 (struct){
   issue3905: (struct){
-    reduced: (_|_){
-      // [incomplete] issue3905.reduced: key value of dynamic field must be concrete, found _|_(cycle error):
-      //     ./in.cue:5:12
+    reduced: (#struct){
       #Schema: (#struct){
         params: (#struct){
           name: (string){ |(*(string){ "foo" }, (string){ string }) }
@@ -64,10 +62,9 @@ Disjuncts:    81
           foo: (string){ "bar" }
         }
       }
+      foo: (string){ "bar" }
     }
-    full: (_|_){
-      // [incomplete] issue3905.full: key value of dynamic field must be concrete, found _|_(cycle error):
-      //     ./in.cue:17:20
+    full: (#struct){
       #ReferenceGrantBuilder: (#struct){
         parameters: (#struct){
           namespace: (string){ string }
@@ -100,6 +97,18 @@ Disjuncts:    81
           }
         }
       }
+      foo: (#struct){
+        metadata: (#struct){
+          name: (string){ |(*(string){ "foo" }, (string){ string }) }
+          namespace: (string){ "foo" }
+          labels?: (#struct){
+          }
+          annotations?: (#struct){
+          }
+        }
+        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+        kind: (string){ "ReferenceGrant" }
+      }
     }
   }
 }
@@ -107,31 +116,16 @@ Disjuncts:    81
 diff old new
 --- old
 +++ new
-@@ -1,6 +1,8 @@
- (struct){
-   issue3905: (struct){
--    reduced: (#struct){
-+    reduced: (_|_){
-+      // [incomplete] issue3905.reduced: key value of dynamic field must be concrete, found _|_(cycle error):
-+      //     ./in.cue:5:12
-       #Schema: (#struct){
-         params: (#struct){
-           name: (string){ |(*(string){ "foo" }, (string){ string }) }
-@@ -9,9 +11,10 @@
-           foo: (string){ "bar" }
-         }
+@@ -11,7 +11,7 @@
        }
--      foo: (string){ "bar" }
--    }
+       foo: (string){ "bar" }
+     }
 -    full: (struct){
-+    }
-+    full: (_|_){
-+      // [incomplete] issue3905.full: key value of dynamic field must be concrete, found _|_(cycle error):
-+      //     ./in.cue:17:20
++    full: (#struct){
        #ReferenceGrantBuilder: (#struct){
          parameters: (#struct){
            namespace: (string){ string }
-@@ -19,8 +22,6 @@
+@@ -19,8 +19,6 @@
          }
          referenceGrant: (#struct){
            foo: (#struct){
@@ -140,7 +134,7 @@ diff old new
              metadata: (#struct){
                name: (string){ |(*(string){ "foo" }, (string){ string }) }
                namespace: (string){ string }
-@@ -29,6 +30,8 @@
+@@ -29,6 +27,8 @@
                annotations?: (#struct){
                }
              }
@@ -149,25 +143,24 @@ diff old new
            }
          }
        }
-@@ -44,18 +47,6 @@
-           }
+@@ -45,8 +45,6 @@
          }
        }
--      foo: (#struct){
+       foo: (#struct){
 -        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
 -        kind: (string){ "ReferenceGrant" }
--        metadata: (#struct){
--          name: (string){ |(*(string){ "foo" }, (string){ string }) }
--          namespace: (string){ "foo" }
--          labels?: (#struct){
--          }
--          annotations?: (#struct){
--          }
--        }
--      }
+         metadata: (#struct){
+           name: (string){ |(*(string){ "foo" }, (string){ string }) }
+           namespace: (string){ "foo" }
+@@ -55,6 +53,8 @@
+           annotations?: (#struct){
+           }
+         }
++        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
++        kind: (string){ "ReferenceGrant" }
+       }
      }
    }
- }
 -- out/eval --
 (struct){
   issue3905: (struct){

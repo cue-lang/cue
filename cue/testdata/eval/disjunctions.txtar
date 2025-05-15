@@ -369,10 +369,6 @@ issue3606.data: conflicting values string and {notAllowed:true} (mismatched type
     ./dependencies.cue:6:6
 issue3606.data.notAllowed: field not allowed:
     ./dependencies.cue:3:3
-issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
-    ./issue3925.cue:8:11
-issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
-    ./issue3925.cue:17:19
 
 Result:
 (_|_){
@@ -839,44 +835,32 @@ Result:
       }
     }
   }
-  issue3925: (_|_){
-    // [eval]
-    reduced: (_|_){
-      // [eval]
-      out: (_|_){
-        // [eval] issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
-        //     ./issue3925.cue:8:11
-      }
-      in: (_|_){
-        // [eval]
+  issue3925: (struct){
+    reduced: (struct){
+      out: (string){ "c: str\n" }
+      in: (struct){
         a: (string){ "actual" }
-        b: (_|_){
-          // [eval] issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
-          //     ./issue3925.cue:8:11
-        }
-      }
-    }
-    full: (_|_){
-      // [eval]
-      out: (_|_){
-        // [eval]
-        input1: (_|_){
-          // [eval]
-          early: (string){ "early value" }
-          lateYAML: (_|_){
-            // [eval] issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
-            //     ./issue3925.cue:17:19
+        b: (struct){
+          actual: (struct){
+            c: (string){ "str" }
           }
         }
       }
-      _inputs: (_|_){
-        // [eval]
-        input1: (_|_){
-          // [eval]
+    }
+    full: (struct){
+      out: (struct){
+        input1: (struct){
+          early: (string){ "early value" }
+          lateYAML: (string){ "one: one value\n" }
+        }
+      }
+      _inputs: (struct){
+        input1: (struct){
           name: (string){ "actual" }
-          config: (_|_){
-            // [eval] issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
-            //     ./issue3925.cue:17:19
+          config: (struct){
+            actual: (struct){
+              one: (string){ "one value" }
+            }
           }
         }
       }
@@ -899,20 +883,16 @@ diff old new
      ./in.cue:15:27
  issue3606.data: 2 errors in empty disjunction:
  issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
-@@ -14,8 +12,10 @@
+@@ -14,8 +12,6 @@
      ./dependencies.cue:6:6
  issue3606.data.notAllowed: field not allowed:
      ./dependencies.cue:3:3
 -    ./dependencies.cue:4:6
 -    ./dependencies.cue:6:15
-+issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
-+    ./issue3925.cue:8:11
-+issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
-+    ./issue3925.cue:17:19
  
  Result:
  (_|_){
-@@ -29,14 +29,7 @@
+@@ -29,14 +25,7 @@
        //     ./dependencies.cue:6:6
        // issue3606.data.notAllowed: field not allowed:
        //     ./dependencies.cue:3:3
@@ -928,7 +908,7 @@ diff old new
      }
      #S: ((string|struct)){ |((string){ string }, (#struct){
        }) }
-@@ -144,19 +137,12 @@
+@@ -144,19 +133,12 @@
      // [eval] f: 2 errors in empty disjunction:
      // f.name: conflicting values "int" and "str":
      //     ./in.cue:5:8
@@ -949,7 +929,7 @@ diff old new
    }
    e1: (struct){
      a: ((null|struct)){ |((null){ null }, (struct){
-@@ -268,8 +254,8 @@
+@@ -268,8 +250,8 @@
      e: (struct){
        foobar: (#struct){
          b: (#struct){
@@ -959,7 +939,7 @@ diff old new
          }
        }
      }
-@@ -279,10 +265,7 @@
+@@ -279,10 +261,7 @@
        x: (int){ 0 }
      }
      inList1: (struct){
@@ -971,7 +951,7 @@ diff old new
      }
      inList2: (struct){
        x: (int){ 0 }
-@@ -402,7 +385,7 @@
+@@ -402,7 +381,7 @@
            let Ok#2 = (bool){ true }
          }, (#struct){
            _ok: (bool){ true }
@@ -980,7 +960,7 @@ diff old new
            x: (bool){ true }
          }) }
        bar: (#struct){ |((#struct){
-@@ -437,9 +420,7 @@
+@@ -437,9 +416,7 @@
    issue3891: (struct){
      reduced: (struct){
        x: (_){ |(*(int){ 1 }, (_){ _ }) }
@@ -991,7 +971,7 @@ diff old new
        b: (struct){
          y: (int){ 1 }
        }
-@@ -475,14 +456,14 @@
+@@ -475,14 +452,14 @@
      }
      full: (struct){
        out: (#struct){
@@ -1013,74 +993,6 @@ diff old new
          deployImage: (string){ "123" }
        }
        #Schema: (#struct){
-@@ -501,32 +482,44 @@
-       }
-     }
-   }
--  issue3925: (struct){
--    reduced: (struct){
--      out: (string){ "c: str\n" }
--      in: (struct){
-+  issue3925: (_|_){
-+    // [eval]
-+    reduced: (_|_){
-+      // [eval]
-+      out: (_|_){
-+        // [eval] issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
-+        //     ./issue3925.cue:8:11
-+      }
-+      in: (_|_){
-+        // [eval]
-         a: (string){ "actual" }
--        b: (struct){
--          actual: (struct){
--            c: (string){ "str" }
--          }
--        }
--      }
--    }
--    full: (struct){
--      out: (struct){
--        input1: (struct){
-+        b: (_|_){
-+          // [eval] issue3925.reduced.in.b.actual: adding field c not allowed as field set was already referenced:
-+          //     ./issue3925.cue:8:11
-+        }
-+      }
-+    }
-+    full: (_|_){
-+      // [eval]
-+      out: (_|_){
-+        // [eval]
-+        input1: (_|_){
-+          // [eval]
-           early: (string){ "early value" }
--          lateYAML: (string){ "one: one value\n" }
--        }
--      }
--      _inputs: (struct){
--        input1: (struct){
-+          lateYAML: (_|_){
-+            // [eval] issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
-+            //     ./issue3925.cue:17:19
-+          }
-+        }
-+      }
-+      _inputs: (_|_){
-+        // [eval]
-+        input1: (_|_){
-+          // [eval]
-           name: (string){ "actual" }
--          config: (struct){
--            actual: (struct){
--              one: (string){ "one value" }
--            }
-+          config: (_|_){
-+            // [eval] issue3925.full._inputs.input1.config.actual: adding field one not allowed as field set was already referenced:
-+            //     ./issue3925.cue:17:19
-           }
-         }
-       }
 -- diff/todo/p3 --
 Missing error positions.
   It is probably okay to show name and val fields with original values, as long

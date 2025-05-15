@@ -340,6 +340,8 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 		n.setBaseValue(err)
 	}
 
+	n.finalizeDisjunctions()
+
 	if mode == attemptOnly {
 		return n.meets(needs)
 	}
@@ -348,8 +350,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 		// TODO: phase3: validation
 		n.signal(mask)
 	}
-
-	n.finalizeDisjunctions()
 
 	w = v.DerefValue() // Dereference anything, including shared nodes.
 	if w != v {

@@ -449,21 +449,19 @@ issue2052: full: {
       }
     }
     full: (struct){
-      #RecurseN: (_|_){
-        // [incomplete] issue2052.full.#RecurseN: error in call to list.Range: non-concrete value _:
-        //     ./issue2052.cue:111:15
-        // issue2052.full.#RecurseN: undefined field: "0":
-        //     ./issue2052.cue:121:10
+      #RecurseN: (_){
+        _
         #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
         #funcFactory: (#struct){
           #next: (_){ _ }
           #func: (_){ _ }
         }
-        #funcs: (_|_){
-          // [incomplete] issue2052.full.#RecurseN: error in call to list.Range: non-concrete value _:
-          //     ./issue2052.cue:111:15
-          // issue2052.full.#RecurseN.#funcs: invalid interpolation: non-concrete value _ (type _):
-          //     ./issue2052.cue:117:11
+        #funcs: (#struct){
+          "4": (null){ null }
+          "0": (_){ _ }
+          "1": (_){ _ }
+          "2": (_){ _ }
+          "3": (_){ _ }
         }
       }
       #DepthF: (#struct){
@@ -1127,37 +1125,7 @@ diff old new
            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
            out: (int){ 1 }
          }
-@@ -223,19 +215,21 @@
-       }
-     }
-     full: (struct){
--      #RecurseN: (_){
--        _
-+      #RecurseN: (_|_){
-+        // [incomplete] issue2052.full.#RecurseN: error in call to list.Range: non-concrete value _:
-+        //     ./issue2052.cue:111:15
-+        // issue2052.full.#RecurseN: undefined field: "0":
-+        //     ./issue2052.cue:121:10
-         #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
-         #funcFactory: (#struct){
-           #next: (_){ _ }
-           #func: (_){ _ }
-         }
--        #funcs: (#struct){
--          "4": (null){ null }
--          "0": (_){ _ }
--          "1": (_){ _ }
--          "2": (_){ _ }
--          "3": (_){ _ }
-+        #funcs: (_|_){
-+          // [incomplete] issue2052.full.#RecurseN: error in call to list.Range: non-concrete value _:
-+          //     ./issue2052.cue:111:15
-+          // issue2052.full.#RecurseN.#funcs: invalid interpolation: non-concrete value _ (type _):
-+          //     ./issue2052.cue:117:11
-         }
-       }
-       #DepthF: (#struct){
-@@ -245,7 +239,13 @@
+@@ -245,7 +237,13 @@
            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
            out: (int){
              1
@@ -1172,7 +1140,7 @@ diff old new
            }
          }
        }
-@@ -258,98 +258,170 @@
+@@ -258,98 +256,170 @@
              #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
              out: (int){
                1
@@ -1435,7 +1403,7 @@ diff old new
              }
            }
          }
-@@ -357,7 +429,13 @@
+@@ -357,7 +427,13 @@
          #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
          out: (int){
            1
@@ -1450,7 +1418,7 @@ diff old new
          }
        }
        tree: (struct){
-@@ -371,49 +449,7 @@
+@@ -371,49 +447,7 @@
          }
          cow: (string){ "moo" }
        }
@@ -1501,7 +1469,7 @@ diff old new
          #in: (#struct){
            a: (#struct){
              foo: (string){ "bar" }
-@@ -425,6 +461,192 @@
+@@ -425,6 +459,192 @@
            }
            cow: (string){ "moo" }
          }
@@ -1695,18 +1663,18 @@ diff old new
      }
    }
 -- out/evalalpha/stats --
-Leaks:  3130
+Leaks:  3149
 Freed:  0
 Reused: 0
-Allocs: 3130
+Allocs: 3149
 Retain: 0
 
-Unifications: 931
-Conjuncts:    4994
+Unifications: 940
+Conjuncts:    5024
 Disjuncts:    1615
 
-CloseIDElems: 20484
-NumCloseIDs: 1535
+CloseIDElems: 20500
+NumCloseIDs: 1548
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -1721,18 +1689,18 @@ diff old new
 -Unifications: 759
 -Conjuncts:    3139
 -Disjuncts:    1942
-+Leaks:  3130
++Leaks:  3149
 +Freed:  0
 +Reused: 0
-+Allocs: 3130
++Allocs: 3149
 +Retain: 0
 +
-+Unifications: 931
-+Conjuncts:    4994
++Unifications: 940
++Conjuncts:    5024
 +Disjuncts:    1615
 +
-+CloseIDElems: 20484
-+NumCloseIDs: 1535
++CloseIDElems: 20500
++NumCloseIDs: 1548
 -- out/eval/stats --
 Leaks:  56
 Freed:  1788
@@ -1743,15 +1711,6 @@ Retain: 174
 Unifications: 759
 Conjuncts:    3139
 Disjuncts:    1942
--- diff/todo/p2 --
-issue2052.full.#Recurse: cycle error. This is not the worst, as a self-reference
-cycle is an incomplete error and more or less equivalent to _, but the same
-resolution as V2 would be preferential. This is P2, rather than P1, as the
-result for V3 is already better than V2.
--- diff/explanation --
-issue2052.full.d.#funcs: v3 has 11 elements, whereas v2 has 4.
-It seems to me that v3 is correct, 11 is explicitly set in #Depth,
-which is used in d.
 -- out/eval --
 (struct){
   chain: (struct){

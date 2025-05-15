@@ -474,6 +474,29 @@ issue1867: three: {
 	x: #T.s
 	x: foo: "foo"
 }
+issue3924: one: {
+	#Schema: {
+		...
+		{[string]: #SchemaInner}
+	}
+	#SchemaInner: allowed?: string
+
+	out: #Schema & {foo: disallowed: "foo"} // should fail
+}
+issue3924: two: {
+	#Schema: {
+		{[string]: #job}
+
+		#job: matchN(1, [{
+			other?: string
+			...
+		}]) & close({
+			allowed?: string
+		})
+	}
+	out: #Schema & {foo: disallowed: "bar"} // should fail
+}
+
 -- reroot.cue --
 import "list"
 
@@ -718,54 +741,54 @@ issue3332: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  940
+Leaks:  994
 Freed:  0
 Reused: 0
-Allocs: 940
+Allocs: 994
 Retain: 0
 
-Unifications: 918
-Conjuncts:    1997
+Unifications: 966
+Conjuncts:    2073
 Disjuncts:    2
 
-CloseIDElems: 4858
-NumCloseIDs: 680
+CloseIDElems: 4949
+NumCloseIDs: 708
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
--Leaks:  18
--Freed:  790
--Reused: 782
--Allocs: 26
--Retain: 83
+-Leaks:  21
+-Freed:  828
+-Reused: 820
+-Allocs: 29
+-Retain: 89
 -
--Unifications: 802
--Conjuncts:    2026
--Disjuncts:    874
-+Leaks:  940
+-Unifications: 843
+-Conjuncts:    2097
+-Disjuncts:    918
++Leaks:  994
 +Freed:  0
 +Reused: 0
-+Allocs: 940
++Allocs: 994
 +Retain: 0
 +
-+Unifications: 918
-+Conjuncts:    1997
++Unifications: 966
++Conjuncts:    2073
 +Disjuncts:    2
 +
-+CloseIDElems: 4858
-+NumCloseIDs: 680
++CloseIDElems: 4949
++NumCloseIDs: 708
 -- out/eval/stats --
-Leaks:  18
-Freed:  790
-Reused: 782
-Allocs: 26
-Retain: 83
+Leaks:  21
+Freed:  828
+Reused: 820
+Allocs: 29
+Retain: 89
 
-Unifications: 802
-Conjuncts:    2026
-Disjuncts:    874
+Unifications: 843
+Conjuncts:    2097
+Disjuncts:    918
 -- out/eval --
 Errors:
 a.q.e: field not allowed:
@@ -804,6 +827,12 @@ issue3778.full.z.b: field not allowed:
     ./ellipsis.cue:3:13
     ./ellipsis.cue:4:5
     ./ellipsis.cue:6:3
+issue3924.one.out.foo.disallowed: field not allowed:
+    ./ellipsis.cue:42:3
+    ./ellipsis.cue:42:14
+    ./ellipsis.cue:44:16
+    ./ellipsis.cue:46:7
+    ./ellipsis.cue:46:23
 issue852.a.Foo: field not allowed:
     ./in.cue:22:6
     ./in.cue:26:5
@@ -1096,6 +1125,18 @@ patterns.shallow.single.err.j: field not allowed:
     ./embed.cue:36:6
     ./embed.cue:37:8
     ./embed.cue:38:8
+issue3924.two.out.foo: invalid value {disallowed:_|_(issue3924.two.out.foo.disallowed: field not allowed),allowed?:string} (does not satisfy matchN): 0 matched, expected 1:
+    ./ellipsis.cue:52:9
+    ./ellipsis.cue:50:14
+    ./ellipsis.cue:52:16
+    ./ellipsis.cue:59:23
+issue3924.two.out.foo.disallowed: field not allowed:
+    ./ellipsis.cue:52:9
+    ./ellipsis.cue:50:3
+    ./ellipsis.cue:50:14
+    ./ellipsis.cue:55:15
+    ./ellipsis.cue:59:7
+    ./ellipsis.cue:59:23
 
 Result:
 (_|_){
@@ -1187,6 +1228,70 @@ Result:
           //     ./ellipsis.cue:35:10
           //     ./ellipsis.cue:36:5
           //     ./ellipsis.cue:37:5
+        }
+      }
+    }
+  }
+  issue3924: (_|_){
+    // [eval]
+    one: (_|_){
+      // [eval]
+      #Schema: (#struct){
+      }
+      #SchemaInner: (#struct){
+        allowed?: (string){ string }
+      }
+      out: (_|_){
+        // [eval]
+        foo: (_|_){
+          // [eval]
+          disallowed: (_|_){
+            // [eval] issue3924.one.out.foo.disallowed: field not allowed:
+            //     ./ellipsis.cue:42:3
+            //     ./ellipsis.cue:42:14
+            //     ./ellipsis.cue:44:16
+            //     ./ellipsis.cue:46:7
+            //     ./ellipsis.cue:46:23
+          }
+          allowed?: (string){ string }
+        }
+      }
+    }
+    two: (_|_){
+      // [eval]
+      #Schema: (#struct){
+        #job: (#struct){
+          allowed?: (string){ string }
+        }
+      }
+      out: (_|_){
+        // [eval]
+        #job: (#struct){
+          allowed?: (string){ string }
+        }
+        foo: (_|_){
+          // [eval] issue3924.two.out.foo: invalid value {disallowed:_|_(issue3924.two.out.foo.disallowed: field not allowed),allowed?:string} (does not satisfy matchN): 0 matched, expected 1:
+          //     ./ellipsis.cue:52:9
+          //     ./ellipsis.cue:50:14
+          //     ./ellipsis.cue:52:16
+          //     ./ellipsis.cue:59:23
+          // issue3924.two.out.foo.disallowed: field not allowed:
+          //     ./ellipsis.cue:52:9
+          //     ./ellipsis.cue:50:3
+          //     ./ellipsis.cue:50:14
+          //     ./ellipsis.cue:55:15
+          //     ./ellipsis.cue:59:7
+          //     ./ellipsis.cue:59:23
+          disallowed: (_|_){
+            // [eval] issue3924.two.out.foo.disallowed: field not allowed:
+            //     ./ellipsis.cue:52:9
+            //     ./ellipsis.cue:50:3
+            //     ./ellipsis.cue:50:14
+            //     ./ellipsis.cue:55:15
+            //     ./ellipsis.cue:59:7
+            //     ./ellipsis.cue:59:23
+          }
+          allowed?: (string){ string }
         }
       }
     }
@@ -3032,6 +3137,37 @@ Result:
       }
     }
   }
+  issue3924: (struct){
+    one: (struct){
+      #Schema: (#struct){
+      }
+      #SchemaInner: (#struct){
+        allowed?: (string){ string }
+      }
+      out: (#struct){
+        foo: (#struct){
+          disallowed: (string){ "foo" }
+          allowed?: (string){ string }
+        }
+      }
+    }
+    two: (struct){
+      #Schema: (#struct){
+        #job: (#struct){
+          allowed?: (string){ string }
+        }
+      }
+      out: (#struct){
+        foo: (#struct){
+          disallowed: (string){ "bar" }
+          allowed?: (string){ string }
+        }
+        #job: (#struct){
+          allowed?: (string){ string }
+        }
+      }
+    }
+  }
   issue3325: (struct){
     ok: (struct){
       #Items: (#struct){
@@ -4368,7 +4504,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,331 +1,89 @@
+@@ -1,350 +1,90 @@
  Errors:
  a.q.e: field not allowed:
 -    ./in.cue:1:5
@@ -4408,6 +4544,12 @@ diff old new
 -    ./ellipsis.cue:3:13
 -    ./ellipsis.cue:4:5
      ./ellipsis.cue:6:3
+-issue3924.one.out.foo.disallowed: field not allowed:
+-    ./ellipsis.cue:42:3
+-    ./ellipsis.cue:42:14
+-    ./ellipsis.cue:44:16
+-    ./ellipsis.cue:46:7
+-    ./ellipsis.cue:46:23
  issue852.a.Foo: field not allowed:
 -    ./in.cue:22:6
 -    ./in.cue:26:5
@@ -4711,9 +4853,22 @@ diff old new
 -    ./embed.cue:36:6
 -    ./embed.cue:37:8
      ./embed.cue:38:8
+-issue3924.two.out.foo: invalid value {disallowed:_|_(issue3924.two.out.foo.disallowed: field not allowed),allowed?:string} (does not satisfy matchN): 0 matched, expected 1:
+-    ./ellipsis.cue:52:9
+-    ./ellipsis.cue:50:14
+-    ./ellipsis.cue:52:16
+-    ./ellipsis.cue:59:23
+-issue3924.two.out.foo.disallowed: field not allowed:
+-    ./ellipsis.cue:52:9
+-    ./ellipsis.cue:50:3
+-    ./ellipsis.cue:50:14
+-    ./ellipsis.cue:55:15
+-    ./ellipsis.cue:59:7
+-    ./ellipsis.cue:59:23
  
  Result:
-@@ -346,10 +104,6 @@
+ (_|_){
+@@ -364,10 +104,6 @@
          a: (string){ "ok" }
          b: (_|_){
            // [eval] issue3778.full.z.b: field not allowed:
@@ -4724,7 +4879,7 @@ diff old new
            //     ./ellipsis.cue:6:3
          }
        }
-@@ -377,9 +131,6 @@
+@@ -395,9 +131,6 @@
          // [eval]
          foo: (_|_){
            // [eval] issue1867.one.x.foo: field not allowed:
@@ -4734,7 +4889,7 @@ diff old new
            //     ./ellipsis.cue:23:5
          }
        }
-@@ -396,10 +147,6 @@
+@@ -414,10 +147,6 @@
          // [eval]
          foo: (_|_){
            // [eval] issue1867.two.x.foo: field not allowed:
@@ -4745,7 +4900,7 @@ diff old new
            //     ./ellipsis.cue:30:5
          }
        }
-@@ -414,9 +161,6 @@
+@@ -432,73 +161,37 @@
          // [eval]
          foo: (_|_){
            // [eval] issue1867.three.x.foo: field not allowed:
@@ -4755,7 +4910,92 @@ diff old new
            //     ./ellipsis.cue:37:5
          }
        }
-@@ -433,13 +177,13 @@
+     }
+   }
+-  issue3924: (_|_){
+-    // [eval]
+-    one: (_|_){
+-      // [eval]
++  issue3924: (struct){
++    one: (struct){
+       #Schema: (#struct){
+       }
+       #SchemaInner: (#struct){
+         allowed?: (string){ string }
+       }
+-      out: (_|_){
+-        // [eval]
+-        foo: (_|_){
+-          // [eval]
+-          disallowed: (_|_){
+-            // [eval] issue3924.one.out.foo.disallowed: field not allowed:
+-            //     ./ellipsis.cue:42:3
+-            //     ./ellipsis.cue:42:14
+-            //     ./ellipsis.cue:44:16
+-            //     ./ellipsis.cue:46:7
+-            //     ./ellipsis.cue:46:23
+-          }
+-          allowed?: (string){ string }
+-        }
+-      }
+-    }
+-    two: (_|_){
+-      // [eval]
+-      #Schema: (#struct){
+-        #job: (#struct){
+-          allowed?: (string){ string }
+-        }
+-      }
+-      out: (_|_){
+-        // [eval]
+-        #job: (#struct){
+-          allowed?: (string){ string }
+-        }
+-        foo: (_|_){
+-          // [eval] issue3924.two.out.foo: invalid value {disallowed:_|_(issue3924.two.out.foo.disallowed: field not allowed),allowed?:string} (does not satisfy matchN): 0 matched, expected 1:
+-          //     ./ellipsis.cue:52:9
+-          //     ./ellipsis.cue:50:14
+-          //     ./ellipsis.cue:52:16
+-          //     ./ellipsis.cue:59:23
+-          // issue3924.two.out.foo.disallowed: field not allowed:
+-          //     ./ellipsis.cue:52:9
+-          //     ./ellipsis.cue:50:3
+-          //     ./ellipsis.cue:50:14
+-          //     ./ellipsis.cue:55:15
+-          //     ./ellipsis.cue:59:7
+-          //     ./ellipsis.cue:59:23
+-          disallowed: (_|_){
+-            // [eval] issue3924.two.out.foo.disallowed: field not allowed:
+-            //     ./ellipsis.cue:52:9
+-            //     ./ellipsis.cue:50:3
+-            //     ./ellipsis.cue:50:14
+-            //     ./ellipsis.cue:55:15
+-            //     ./ellipsis.cue:59:7
+-            //     ./ellipsis.cue:59:23
+-          }
++      out: (#struct){
++        foo: (#struct){
++          disallowed: (string){ "foo" }
++          allowed?: (string){ string }
++        }
++      }
++    }
++    two: (struct){
++      #Schema: (#struct){
++        #job: (#struct){
++          allowed?: (string){ string }
++        }
++      }
++      out: (#struct){
++        foo: (#struct){
++          disallowed: (string){ "bar" }
++          allowed?: (string){ string }
++        }
++        #job: (#struct){
+           allowed?: (string){ string }
+         }
+       }
+@@ -515,13 +208,13 @@
          }
        }
        #Extended: (#struct){
@@ -4776,7 +5016,7 @@ diff old new
        }
        broken: (#struct){
          name: (string){ "base" }
-@@ -451,13 +195,13 @@
+@@ -533,13 +226,13 @@
          }
        }
        works: (#struct){
@@ -4797,7 +5037,7 @@ diff old new
        }
      }
    }
-@@ -481,9 +225,6 @@
+@@ -563,9 +256,6 @@
            // [eval]
            j: (_|_){
              // [eval] patterns.shallow.single.err.j: field not allowed:
@@ -4807,7 +5047,7 @@ diff old new
              //     ./embed.cue:38:8
            }
          }
-@@ -501,11 +242,7 @@
+@@ -583,11 +273,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.and.p1.err.j: field not allowed:
@@ -4820,7 +5060,7 @@ diff old new
                //     ./embed.cue:48:8
              }
            }
-@@ -521,11 +258,7 @@
+@@ -603,11 +289,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.and.p2.err.j: field not allowed:
@@ -4833,7 +5073,7 @@ diff old new
                //     ./embed.cue:57:8
              }
            }
-@@ -544,12 +277,7 @@
+@@ -626,12 +308,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.andEmbed.p1.err.j: field not allowed:
@@ -4847,7 +5087,7 @@ diff old new
                //     ./embed.cue:67:8
              }
            }
-@@ -565,12 +293,7 @@
+@@ -647,12 +324,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.andEmbed.p2.err.j: field not allowed:
@@ -4861,7 +5101,7 @@ diff old new
                //     ./embed.cue:76:8
              }
            }
-@@ -601,81 +324,34 @@
+@@ -683,81 +355,34 @@
            }
          }
        }
@@ -4971,7 +5211,7 @@ diff old new
            }
            ok1: (#struct){
              k: (int){ 3 }
-@@ -699,10 +375,6 @@
+@@ -781,10 +406,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p1.err1.j: field not allowed:
@@ -4982,7 +5222,7 @@ diff old new
                //     ./embed.cue:152:10
              }
            }
-@@ -710,10 +382,6 @@
+@@ -792,10 +413,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p1.err2.j: field not allowed:
@@ -4993,7 +5233,7 @@ diff old new
                //     ./embed.cue:155:10
              }
            }
-@@ -731,10 +399,6 @@
+@@ -813,10 +430,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p2.err1.j: field not allowed:
@@ -5004,7 +5244,7 @@ diff old new
                //     ./embed.cue:166:10
              }
            }
-@@ -742,10 +406,6 @@
+@@ -824,10 +437,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p2.err2.j: field not allowed:
@@ -5015,7 +5255,7 @@ diff old new
                //     ./embed.cue:169:10
              }
            }
-@@ -761,10 +421,6 @@
+@@ -843,10 +452,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p3.err1.j: field not allowed:
@@ -5026,7 +5266,7 @@ diff old new
                //     ./embed.cue:179:10
              }
            }
-@@ -772,10 +428,6 @@
+@@ -854,10 +459,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p3.err2.j: field not allowed:
@@ -5037,7 +5277,7 @@ diff old new
                //     ./embed.cue:182:10
              }
            }
-@@ -793,10 +445,6 @@
+@@ -875,10 +476,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p4.err1.j: field not allowed:
@@ -5048,7 +5288,7 @@ diff old new
                //     ./embed.cue:194:10
              }
            }
-@@ -804,10 +452,6 @@
+@@ -886,10 +483,6 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p4.err2.j: field not allowed:
@@ -5059,7 +5299,7 @@ diff old new
                //     ./embed.cue:197:10
              }
            }
-@@ -845,12 +489,7 @@
+@@ -927,12 +520,7 @@
        }
        single: (_|_){
          // [eval]
@@ -5073,7 +5313,7 @@ diff old new
          err: (_|_){
            // [eval]
            x: (_|_){
-@@ -859,9 +498,6 @@
+@@ -941,9 +529,6 @@
                // [eval]
                j: (_|_){
                  // [eval] patterns.nested.single.err.x.y.j: field not allowed:
@@ -5083,7 +5323,7 @@ diff old new
                  //     ./embed.cue:214:14
                }
              }
-@@ -893,11 +529,7 @@
+@@ -975,11 +560,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.and.p1.err.x.y.j: field not allowed:
@@ -5096,7 +5336,7 @@ diff old new
                    //     ./embed.cue:224:14
                  }
                }
-@@ -927,11 +559,7 @@
+@@ -1009,11 +590,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.and.p2.err.x.y.j: field not allowed:
@@ -5109,7 +5349,7 @@ diff old new
                    //     ./embed.cue:233:14
                  }
                }
-@@ -964,11 +592,7 @@
+@@ -1046,11 +623,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
@@ -5122,7 +5362,7 @@ diff old new
                    //     ./embed.cue:243:14
                  }
                }
-@@ -998,11 +622,7 @@
+@@ -1080,11 +653,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.andEmbed.p2.err.x.y.j: field not allowed:
@@ -5135,7 +5375,7 @@ diff old new
                    //     ./embed.cue:252:14
                  }
                }
-@@ -1063,143 +683,78 @@
+@@ -1145,143 +714,78 @@
            }
          }
        }
@@ -5351,7 +5591,7 @@ diff old new
                }
              }
            }
-@@ -1221,12 +776,7 @@
+@@ -1303,12 +807,7 @@
          }
          p1: (_|_){
            // [eval]
@@ -5365,7 +5605,7 @@ diff old new
            err1: (_|_){
              // [eval]
              x: (_|_){
-@@ -1235,10 +785,6 @@
+@@ -1317,10 +816,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p1.err1.x.y.j: field not allowed:
@@ -5376,7 +5616,7 @@ diff old new
                    //     ./embed.cue:328:16
                  }
                }
-@@ -1252,10 +798,6 @@
+@@ -1334,10 +829,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p1.err2.x.y.j: field not allowed:
@@ -5387,7 +5627,7 @@ diff old new
                    //     ./embed.cue:331:16
                  }
                }
-@@ -1277,12 +819,7 @@
+@@ -1359,12 +850,7 @@
                }
              }
            }
@@ -5401,7 +5641,7 @@ diff old new
            err1: (_|_){
              // [eval]
              x: (_|_){
-@@ -1291,10 +828,6 @@
+@@ -1373,10 +859,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p2.err1.x.y.j: field not allowed:
@@ -5412,7 +5652,7 @@ diff old new
                    //     ./embed.cue:342:16
                  }
                }
-@@ -1308,10 +841,6 @@
+@@ -1390,10 +872,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p2.err2.x.y.j: field not allowed:
@@ -5423,7 +5663,7 @@ diff old new
                    //     ./embed.cue:345:16
                  }
                }
-@@ -1341,10 +870,6 @@
+@@ -1423,10 +901,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p3.err1.x.y.j: field not allowed:
@@ -5434,7 +5674,7 @@ diff old new
                    //     ./embed.cue:355:16
                  }
                }
-@@ -1358,10 +883,6 @@
+@@ -1440,10 +914,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p3.err2.x.y.j: field not allowed:
@@ -5445,7 +5685,7 @@ diff old new
                    //     ./embed.cue:358:16
                  }
                }
-@@ -1397,10 +918,6 @@
+@@ -1479,10 +949,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p4.err1.x.y.j: field not allowed:
@@ -5456,7 +5696,7 @@ diff old new
                    //     ./embed.cue:370:16
                  }
                }
-@@ -1414,10 +931,6 @@
+@@ -1496,10 +962,6 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p4.err2.x.y.j: field not allowed:
@@ -5467,7 +5707,7 @@ diff old new
                    //     ./embed.cue:373:16
                  }
                }
-@@ -1434,7 +947,8 @@
+@@ -1516,7 +978,8 @@
        }
      }
    }
@@ -5477,7 +5717,7 @@ diff old new
      #close: (#struct){
      }
      a: (#struct){
-@@ -1442,10 +956,15 @@
+@@ -1524,10 +987,15 @@
          q: (int){ 2 }
        }
      }
@@ -5497,7 +5737,7 @@ diff old new
        }
      }
    }
-@@ -1455,8 +974,8 @@
+@@ -1537,8 +1005,8 @@
    #A: (#struct){
      b: (int){ int }
      q: (#struct){
@@ -5507,7 +5747,7 @@ diff old new
      }
    }
    a: (_|_){
-@@ -1465,21 +984,15 @@
+@@ -1547,21 +1015,15 @@
      q: (_|_){
        // [eval]
        c: (int){ 2 }
@@ -5530,7 +5770,7 @@ diff old new
      //     ./in.cue:28:5
      #A: (#struct){
      }
-@@ -1487,8 +1000,6 @@
+@@ -1569,8 +1031,6 @@
        // [eval]
        Foo: (_|_){
          // [eval] issue852.a.Foo: field not allowed:
@@ -5539,7 +5779,7 @@ diff old new
          //     ./in.cue:28:5
        }
      }
-@@ -1499,8 +1010,8 @@
+@@ -1581,8 +1041,8 @@
        foo: (int){ int }
      }
      d: (#struct){
@@ -5549,7 +5789,7 @@ diff old new
      }
    }
    issue3330: (struct){
-@@ -1514,13 +1025,7 @@
+@@ -1596,13 +1056,7 @@
            }
          }
          out: (#list){
@@ -5564,7 +5804,7 @@ diff old new
          }
        }
      }
-@@ -1549,13 +1054,7 @@
+@@ -1631,13 +1085,7 @@
            g: (#struct){
            }
          }
@@ -5579,7 +5819,7 @@ diff old new
          out2: (#struct){
            field: (#struct){
              n: (int){ 3 }
-@@ -1576,13 +1075,7 @@
+@@ -1658,13 +1106,7 @@
              d: (int){ 1 }
            }
          }
@@ -5594,7 +5834,7 @@ diff old new
        }
      }
      variant1: (struct){
-@@ -1595,13 +1088,7 @@
+@@ -1677,13 +1119,7 @@
            }
          }
          0: (#list){
@@ -5609,7 +5849,7 @@ diff old new
          }
        }
      }
-@@ -1617,10 +1104,7 @@
+@@ -1699,10 +1135,7 @@
                c: (int){ 2 }
              }
            }
@@ -5621,7 +5861,7 @@ diff old new
          }
          #x: (#struct){
            a: (#struct){
-@@ -1632,22 +1116,11 @@
+@@ -1714,22 +1147,11 @@
              c: (int){ 2 }
            }
          }
@@ -5647,7 +5887,7 @@ diff old new
          }
        }
      }
-@@ -1664,22 +1137,16 @@
+@@ -1746,22 +1168,16 @@
          }
          Y: (_|_){
            // [eval]
@@ -5675,7 +5915,7 @@ diff old new
            }
          }
          #X: (#struct){
-@@ -1699,25 +1166,11 @@
+@@ -1781,25 +1197,11 @@
            }
          }
        }
@@ -5706,7 +5946,7 @@ diff old new
          #A: (#struct){
            d: (#struct){
              e: (int){ int }
-@@ -1742,69 +1195,27 @@
+@@ -1824,69 +1226,27 @@
            // [eval]
            f: (_|_){
              // [eval] nested.err1.x.b.f: field not allowed:
@@ -5788,7 +6028,7 @@ diff old new
            }
          }
        }
-@@ -1812,16 +1223,11 @@
+@@ -1894,16 +1254,11 @@
          b: (#struct){
            f: (int){ 1 }
          }
@@ -5808,7 +6048,7 @@ diff old new
            }
          }
        }
-@@ -1844,14 +1250,12 @@
+@@ -1926,14 +1281,12 @@
            // [eval]
            g: (_|_){
              // [eval] nested.err2.x.b.g: field not allowed:
@@ -5824,7 +6064,7 @@ diff old new
          }
        }
      }
-@@ -1864,11 +1268,11 @@
+@@ -1946,11 +1299,11 @@
          }
        }
      }
@@ -5838,7 +6078,7 @@ diff old new
        name: (string){ "a" }
        age2: (int){ 5 }
      }
-@@ -2015,20 +1419,20 @@
+@@ -2097,20 +1450,20 @@
          }
        }
        original: (struct){
@@ -5868,7 +6108,7 @@ diff old new
              c: (string){ "v1" }
            }
          }
-@@ -2052,8 +1456,8 @@
+@@ -2134,8 +1487,8 @@
            empty: (#struct){
            }
          }
@@ -5879,7 +6119,7 @@ diff old new
              c: (string){ "v1" }
            }
          }
-@@ -2070,13 +1474,13 @@
+@@ -2152,13 +1505,13 @@
            empty: (#struct){
            }
          }
@@ -5983,6 +6223,46 @@ issue2241: now correctly fails for V3.
       x: {
         foo: "foo"
       }
+    }
+  }
+  issue3924: {
+    one: {
+      #Schema: {
+        ...
+        {
+          [string]: 〈2;#SchemaInner〉
+        }
+      }
+      #SchemaInner: {
+        allowed?: string
+      }
+      out: (〈0;#Schema〉 & {
+        foo: {
+          disallowed: "foo"
+        }
+      })
+    }
+  }
+  issue3924: {
+    two: {
+      #Schema: {
+        {
+          [string]: 〈1;#job〉
+        }
+        #job: (matchN(1, [
+          {
+            other?: string
+            ...
+          },
+        ]) & close({
+          allowed?: string
+        }))
+      }
+      out: (〈0;#Schema〉 & {
+        foo: {
+          disallowed: "bar"
+        }
+      })
     }
   }
 }

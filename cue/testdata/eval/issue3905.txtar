@@ -1,0 +1,288 @@
+-- in.cue --
+issue3905: reduced: {
+	#Schema: {
+		params: name: string | *"foo"
+	
+		result: (params.name): "bar"
+	}
+	
+	(#Schema).result
+}
+issue3905: full: {
+	#ReferenceGrantBuilder: {
+		parameters: {
+			namespace:        string
+			gatewayNamespace: string | *"foo"
+		}
+	
+		referenceGrant: (parameters.gatewayNamespace): #ReferenceGrant & {
+			metadata: name:      parameters.gatewayNamespace
+			metadata: namespace: parameters.namespace
+		}
+	}
+	
+	(#ReferenceGrantBuilder & {
+		parameters: namespace: "foo"
+	}).referenceGrant
+	
+	#ReferenceGrant: {
+		apiVersion: "gateway.networking.k8s.io/v1beta1"
+		kind: "ReferenceGrant"
+		metadata!: {
+			name!: string
+			namespace!: string
+			labels?: {
+				[string]: string
+			}
+			annotations?: {
+				[string]: string
+			}
+		}
+	}
+}
+-- out/eval/stats --
+Leaks:  3
+Freed:  57
+Reused: 47
+Allocs: 13
+Retain: 26
+
+Unifications: 48
+Conjuncts:    93
+Disjuncts:    81
+-- out/evalalpha --
+(struct){
+  issue3905: (struct){
+    reduced: (_|_){
+      // [incomplete] issue3905.reduced: key value of dynamic field must be concrete, found _|_(cycle error):
+      //     ./in.cue:5:12
+      #Schema: (#struct){
+        params: (#struct){
+          name: (string){ |(*(string){ "foo" }, (string){ string }) }
+        }
+        result: (#struct){
+          foo: (string){ "bar" }
+        }
+      }
+    }
+    full: (_|_){
+      // [incomplete] issue3905.full: key value of dynamic field must be concrete, found _|_(cycle error):
+      //     ./in.cue:17:20
+      #ReferenceGrantBuilder: (#struct){
+        parameters: (#struct){
+          namespace: (string){ string }
+          gatewayNamespace: (string){ |(*(string){ "foo" }, (string){ string }) }
+        }
+        referenceGrant: (#struct){
+          foo: (#struct){
+            metadata: (#struct){
+              name: (string){ |(*(string){ "foo" }, (string){ string }) }
+              namespace: (string){ string }
+              labels?: (#struct){
+              }
+              annotations?: (#struct){
+              }
+            }
+            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+            kind: (string){ "ReferenceGrant" }
+          }
+        }
+      }
+      #ReferenceGrant: (#struct){
+        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+        kind: (string){ "ReferenceGrant" }
+        metadata!: (#struct){
+          name!: (string){ string }
+          namespace!: (string){ string }
+          labels?: (#struct){
+          }
+          annotations?: (#struct){
+          }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,6 +1,8 @@
+ (struct){
+   issue3905: (struct){
+-    reduced: (#struct){
++    reduced: (_|_){
++      // [incomplete] issue3905.reduced: key value of dynamic field must be concrete, found _|_(cycle error):
++      //     ./in.cue:5:12
+       #Schema: (#struct){
+         params: (#struct){
+           name: (string){ |(*(string){ "foo" }, (string){ string }) }
+@@ -9,9 +11,10 @@
+           foo: (string){ "bar" }
+         }
+       }
+-      foo: (string){ "bar" }
+-    }
+-    full: (struct){
++    }
++    full: (_|_){
++      // [incomplete] issue3905.full: key value of dynamic field must be concrete, found _|_(cycle error):
++      //     ./in.cue:17:20
+       #ReferenceGrantBuilder: (#struct){
+         parameters: (#struct){
+           namespace: (string){ string }
+@@ -19,8 +22,6 @@
+         }
+         referenceGrant: (#struct){
+           foo: (#struct){
+-            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+-            kind: (string){ "ReferenceGrant" }
+             metadata: (#struct){
+               name: (string){ |(*(string){ "foo" }, (string){ string }) }
+               namespace: (string){ string }
+@@ -29,6 +30,8 @@
+               annotations?: (#struct){
+               }
+             }
++            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
++            kind: (string){ "ReferenceGrant" }
+           }
+         }
+       }
+@@ -44,18 +47,6 @@
+           }
+         }
+       }
+-      foo: (#struct){
+-        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+-        kind: (string){ "ReferenceGrant" }
+-        metadata: (#struct){
+-          name: (string){ |(*(string){ "foo" }, (string){ string }) }
+-          namespace: (string){ "foo" }
+-          labels?: (#struct){
+-          }
+-          annotations?: (#struct){
+-          }
+-        }
+-      }
+     }
+   }
+ }
+-- out/eval --
+(struct){
+  issue3905: (struct){
+    reduced: (#struct){
+      #Schema: (#struct){
+        params: (#struct){
+          name: (string){ |(*(string){ "foo" }, (string){ string }) }
+        }
+        result: (#struct){
+          foo: (string){ "bar" }
+        }
+      }
+      foo: (string){ "bar" }
+    }
+    full: (struct){
+      #ReferenceGrantBuilder: (#struct){
+        parameters: (#struct){
+          namespace: (string){ string }
+          gatewayNamespace: (string){ |(*(string){ "foo" }, (string){ string }) }
+        }
+        referenceGrant: (#struct){
+          foo: (#struct){
+            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+            kind: (string){ "ReferenceGrant" }
+            metadata: (#struct){
+              name: (string){ |(*(string){ "foo" }, (string){ string }) }
+              namespace: (string){ string }
+              labels?: (#struct){
+              }
+              annotations?: (#struct){
+              }
+            }
+          }
+        }
+      }
+      #ReferenceGrant: (#struct){
+        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+        kind: (string){ "ReferenceGrant" }
+        metadata!: (#struct){
+          name!: (string){ string }
+          namespace!: (string){ string }
+          labels?: (#struct){
+          }
+          annotations?: (#struct){
+          }
+        }
+      }
+      foo: (#struct){
+        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
+        kind: (string){ "ReferenceGrant" }
+        metadata: (#struct){
+          name: (string){ |(*(string){ "foo" }, (string){ string }) }
+          namespace: (string){ "foo" }
+          labels?: (#struct){
+          }
+          annotations?: (#struct){
+          }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  issue3905: {
+    reduced: {
+      #Schema: {
+        params: {
+          name: (string|*"foo")
+        }
+        result: {
+          〈1;params〉.name: "bar"
+        }
+      }
+      〈0;#Schema〉.result
+    }
+  }
+  issue3905: {
+    full: {
+      #ReferenceGrantBuilder: {
+        parameters: {
+          namespace: string
+          gatewayNamespace: (string|*"foo")
+        }
+        referenceGrant: {
+          〈1;parameters〉.gatewayNamespace: (〈2;#ReferenceGrant〉 & {
+            metadata: {
+              name: 〈3;parameters〉.gatewayNamespace
+            }
+            metadata: {
+              namespace: 〈3;parameters〉.namespace
+            }
+          })
+        }
+      }
+      (〈0;#ReferenceGrantBuilder〉 & {
+        parameters: {
+          namespace: "foo"
+        }
+      }).referenceGrant
+      #ReferenceGrant: {
+        apiVersion: "gateway.networking.k8s.io/v1beta1"
+        kind: "ReferenceGrant"
+        metadata!: {
+          name!: string
+          namespace!: string
+          labels?: {
+            [string]: string
+          }
+          annotations?: {
+            [string]: string
+          }
+        }
+      }
+    }
+  }
+}

@@ -56,6 +56,24 @@
       "message": "does this comment need updating now?",
       "revId": "71d2f0475a078ad443808950bcde7d0326012db6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76a4173b_8e3640f1",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-05-15T12:33:07Z",
+      "side": 1,
+      "message": "Still applies.",
+      "parentUuid": "7d41d8eb_ba8351d2",
+      "revId": "71d2f0475a078ad443808950bcde7d0326012db6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

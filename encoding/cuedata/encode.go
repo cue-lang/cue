@@ -31,7 +31,6 @@ import (
 	"slices"
 	"strconv"
 	"strings"
-	"unicode/utf8"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
@@ -393,11 +392,4 @@ func isNil(x reflect.Value) bool {
 
 func formatFloat(f float64) string {
 	return strconv.FormatFloat(f, 'g', -1, 64)
-}
-
-func toValidUTF8(s string) string {
-	if utf8.ValidString(s) {
-		return s
-	}
-	return string([]rune(s))
 }

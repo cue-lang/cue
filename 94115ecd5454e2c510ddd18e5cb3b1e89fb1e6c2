@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad448d5f_e9981af2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-05-16T05:09:52Z",
+      "side": 1,
+      "message": "My brain is somewhat struggling with the fact that we have the sense for this experiment inverted relative to others. \n\nPerhaps explain why you\u0027ve got it this way around, or flip the sense of it to be more in line with \"we don\u0027t enable the experiment yet, but will flip the default to enable it later\"\n\nBecause identifying tasks by kind/$id is not really an experiment; it\u0027s what\u0027s happening. \n\nBit of a mouthful but perhaps:\n\n```\nCUE_EXPERIMENT\u003ddisallowcmdtaskbyid\n```\n\nYes there is then a double negative in the case that the experiment is not enabled, but I think that\u0027s still ok?",
+      "revId": "94115ecd5454e2c510ddd18e5cb3b1e89fb1e6c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a21c107_193ba18f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-05-16T05:09:52Z",
+      "side": 1,
+      "message": "FWIW, I checked locally what tests failed (and would therefore need to be corrected) with the default flipped. Everything as expected.\n\nPlease get @mpvl@gmail.com to glance over the task resolution code.",
+      "revId": "94115ecd5454e2c510ddd18e5cb3b1e89fb1e6c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bb054b5_6725fd2a",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 916,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-05-16T05:09:52Z",
+      "side": 1,
+      "message": "I think we need to extend this comment somewhat, here and in the source, to make clear that people must unify with the `tool/$pkg.$task` in order to use the task.",
+      "revId": "94115ecd5454e2c510ddd18e5cb3b1e89fb1e6c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

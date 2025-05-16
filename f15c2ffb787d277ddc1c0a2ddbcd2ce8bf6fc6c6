@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0926be0d_5cff7b86",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_taskbyid.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-16T11:26:08Z",
+      "side": 1,
+      "message": "Rather than trying to explain all variants upfront, which gets lengthy and then you have to move your cursor/eyes up and down to follow, I documented each case briefly.",
+      "parentUuid": "62c815cb_34567f39",
+      "revId": "f15c2ffb787d277ddc1c0a2ddbcd2ce8bf6fc6c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e98ddf5_f68ec2f2",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-05-16T04:49:37Z",
       "side": 1,
       "message": "I would suggest explicitly comment this ready for changing it later:\n\n```\n# Using a \"copy\" of the source task, even with indirection of the `$id` field \n# via a hidden field value works: it is the concrete value of the field that\n# resolves the task.\n```",
+      "revId": "f15c2ffb787d277ddc1c0a2ddbcd2ce8bf6fc6c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22008cf1_f4f25129",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_taskbyid.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-16T11:26:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e98ddf5_f68ec2f2",
       "revId": "f15c2ffb787d277ddc1c0a2ddbcd2ce8bf6fc6c6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -22,7 +22,6 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 )
@@ -91,15 +90,13 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 	return v, errs
 }
 
-func dummyLoad(token.Pos, string) *build.Instance { return nil }
-
 func (r *Runtime) Compile(cfg *Config, source interface{}) (*adt.Vertex, *build.Instance) {
 	ctx := build.NewContext()
 	var filename string
 	if cfg != nil && cfg.Filename != "" {
 		filename = cfg.Filename
 	}
-	p := ctx.NewInstance(filename, dummyLoad)
+	p := ctx.NewInstance(filename, nil)
 	if err := p.AddFile(filename, source); err != nil {
 		return nil, p
 	}
@@ -113,7 +110,7 @@ func (r *Runtime) CompileFile(cfg *Config, file *ast.File) (*adt.Vertex, *build.
 	if cfg != nil && cfg.Filename != "" {
 		filename = cfg.Filename
 	}
-	p := ctx.NewInstance(filename, dummyLoad)
+	p := ctx.NewInstance(filename, nil)
 	err := p.AddSyntax(file)
 	if err != nil {
 		return nil, p

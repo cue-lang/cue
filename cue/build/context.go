@@ -39,7 +39,8 @@ type Context struct {
 	imports map[string]*Instance
 }
 
-// NewInstance creates an instance for this Context.
+// NewInstance creates an instance for this Context. If the [LoadFunc]
+// is nil, then the LoadFunc in the [Context] is used.
 func (c *Context) NewInstance(dir string, f LoadFunc) *Instance {
 	if c == nil {
 		c = &Context{}

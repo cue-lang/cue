@@ -311,7 +311,7 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 		panic(fmt.Errorf("non-relative import path %q passed to newRelInstance", path))
 	}
 
-	p := l.cfg.Context.NewInstance(path, l.loadFunc())
+	p := l.cfg.Context.NewInstance(path, nil)
 	p.PkgName = pkgName
 	p.DisplayPath = filepath.ToSlash(path)
 	// p.ImportPath = string(dir) // compute unique ID.
@@ -387,7 +387,7 @@ func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath
 
 func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	dir, modPath, err := l.absDirFromImportPath(pos, p)
-	i := l.cfg.Context.NewInstance(dir, l.loadFunc())
+	i := l.cfg.Context.NewInstance(dir, nil)
 	i.Err = errors.Append(i.Err, err)
 	i.Dir = dir
 

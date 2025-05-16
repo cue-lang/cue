@@ -59,7 +59,7 @@ func (b *unmarshaller) load(pos token.Pos, path string) *build.Instance {
 }
 
 func (b *unmarshaller) build(bi *instanceData) *build.Instance {
-	p := b.ctxt.NewInstance(bi.Path, b.load)
+	p := b.ctxt.NewInstance(bi.Path, nil)
 	p.ImportPath = bi.Path
 	for _, f := range bi.Files {
 		_ = p.AddFile(f.Name, f.Data)
@@ -70,9 +70,9 @@ func (b *unmarshaller) build(bi *instanceData) *build.Instance {
 
 func compileInstances(r *Runtime, data []*instanceData) (instances []*Instance, err error) {
 	b := unmarshaller{
-		ctxt:    build.NewContext(),
 		imports: map[string]*instanceData{},
 	}
+	b.ctxt = build.NewContext(build.Loader(b.load))
 	for _, i := range data {
 		if i.Path == "" {
 			if !i.Root {

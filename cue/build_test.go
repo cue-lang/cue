@@ -233,9 +233,10 @@ type bimport struct {
 
 func makeInstances(insts []*bimport) (instances []*build.Instance) {
 	b := builder{
-		ctxt:    build.NewContext(),
 		imports: map[string]*bimport{},
 	}
+	b.ctxt = build.NewContext(build.Loader(b.load))
+
 	for _, bi := range insts {
 		if bi.path != "" {
 			b.imports[bi.path] = bi
@@ -254,7 +255,7 @@ func (b *builder) build(bi *bimport) *build.Instance {
 	if path == "" {
 		path = "dir"
 	}
-	p := b.ctxt.NewInstance(path, b.load)
+	p := b.ctxt.NewInstance(path, nil)
 	for i, f := range bi.files {
 		_ = p.AddFile(fmt.Sprintf("file%d.cue", i), f)
 	}

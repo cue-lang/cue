@@ -76,7 +76,7 @@ func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface
 // (typically named on the command line).
 func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	// ModInit() // TODO: support modules
-	pkg := l.cfg.Context.NewInstance(l.cfg.Dir, l.loadFunc())
+	pkg := l.cfg.Context.NewInstance(l.cfg.Dir, nil)
 
 	for _, bf := range files {
 		f := bf.Filename

@@ -16,6 +16,46 @@
       "message": "Still LGTM but I\u0027ll leave to Marcel for a final look",
       "revId": "bb3abd16d9cf8507e1a6e828ab048b140456687b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd82e21a_fe167aec",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-05-16T13:03:28Z",
+      "side": 1,
+      "message": "I personally would write cue.ParsePath(\"$id\"), instead of cue.MakePath(cue.Str(\"$id\")), but that is a matter of style, I guess.",
+      "range": {
+        "startLine": 258,
+        "startChar": 20,
+        "endLine": 258,
+        "endChar": 48
+      },
+      "revId": "bb3abd16d9cf8507e1a6e828ab048b140456687b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d70a8a4_08bf2322",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-05-16T13:03:28Z",
+      "side": 1,
+      "message": "I\u0027m wondering if it is possible to construct a \"tool/\" prefix, or if this would always be prefixed by \"./\". I\u0027m a bit surprised about that the prefix is this.\n\nI would either add a TODO: that we should have some accessor to get the import path of a value (to see from which package it originates).\n\nAlternatively, you could try if `v.BuildInstance().ImportPath` works.",
+      "revId": "bb3abd16d9cf8507e1a6e828ab048b140456687b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

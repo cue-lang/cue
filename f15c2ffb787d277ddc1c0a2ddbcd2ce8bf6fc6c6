@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62c815cb_34567f39",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_taskbyid.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-05-16T04:49:37Z",
+      "side": 1,
+      "message": "A minor nit (that can certainly be followed up later) but commenting these cases is probably helpful to the reader. Or rather a comment explaining the naming pattern used as a shorthand.\n\nPerhaps something like the following:\n\n```\n# The following test cases use a naming pattern. \"inject\" is a reference to a\n# task that returns some payload which, when decoded (unmarshalled), could itself\n# potentially be interpretted as a task declaration.\n#\n# \"Kind\" and \"Dollar\" refer to whether that decoded payload contains a \"kind\" or\n# \"$id\" field respectively.\n#\n# \"Inside\" and \"Outside\" refer to the position of the field that holds the \n# decoded payload, the position relative to the task that yielded the payload.\n# \"Inside\" means that field is declared as part of the yielding task, \"Outside\"\n# means it sits outside of the scope of the task. This is relevant because\n# tasks cannot contain other tasks. \n#\n# The optional modifier \"Hidden\" determines whether the yielding field is hidden \n# or not. Again, this is relevant insofar as tasks are only \"found\" in regular\n# paths. \n```",
+      "revId": "f15c2ffb787d277ddc1c0a2ddbcd2ce8bf6fc6c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e98ddf5_f68ec2f2",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_taskbyid.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-05-16T04:49:37Z",
+      "side": 1,
+      "message": "I would suggest explicitly comment this ready for changing it later:\n\n```\n# Using a \"copy\" of the source task, even with indirection of the `$id` field \n# via a hidden field value works: it is the concrete value of the field that\n# resolves the task.\n```",
+      "revId": "f15c2ffb787d277ddc1c0a2ddbcd2ce8bf6fc6c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8febf27_f43aee76",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-05-16T07:08:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a7eb9e87_6ee725b1",
+      "revId": "35f3e06ce7d0cb857b4a412fa7952b4185d169b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7fa891ad_4a8dc0b3",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-05-15T20:18:10Z",
       "side": 1,
       "message": "You\u0027re missing the smaller reproducer I shared in that thread too, no? I think both would be useful.",
+      "revId": "35f3e06ce7d0cb857b4a412fa7952b4185d169b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7f30d00_01c4ca20",
+        "filename": "cue/testdata/eval/issue3905.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-05-16T07:08:55Z",
+      "side": 1,
+      "message": "This _is_ the smaller reproducer!!\n\nI thought the original issue was a bit too big excessive to include",
+      "parentUuid": "7fa891ad_4a8dc0b3",
       "revId": "35f3e06ce7d0cb857b4a412fa7952b4185d169b0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "237ed289_a733c3f6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-16T11:26:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad448d5f_e9981af2",
+      "revId": "94115ecd5454e2c510ddd18e5cb3b1e89fb1e6c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6a21c107_193ba18f",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9dffcb17_38626318",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-16T11:26:08Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6a21c107_193ba18f",
+      "revId": "94115ecd5454e2c510ddd18e5cb3b1e89fb1e6c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7bb054b5_6725fd2a",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-05-16T05:09:52Z",
       "side": 1,
       "message": "I think we need to extend this comment somewhat, here and in the source, to make clear that people must unify with the `tool/$pkg.$task` in order to use the task.",
+      "revId": "94115ecd5454e2c510ddd18e5cb3b1e89fb1e6c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1aee91da_9352b000",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 916,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-16T11:26:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7bb054b5_6725fd2a",
       "revId": "94115ecd5454e2c510ddd18e5cb3b1e89fb1e6c2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

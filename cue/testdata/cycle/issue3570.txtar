@@ -1,0 +1,38 @@
+// This code caused a panic on evalv2.
+#skip-v2
+-- in.cue --
+foo: foo: 25 | 44
+foo
+foo: foo
+-- out/compile --
+--- in.cue
+{
+  foo: {
+    foo: (25|44)
+  }
+  〈0;foo〉
+  foo: 〈0;foo〉
+}
+-- out/evalalpha --
+Errors:
+2 errors in empty disjunction:
+conflicting values 25 and {foo:(25|44)} (mismatched types int and struct):
+    ./in.cue:1:6
+    ./in.cue:1:11
+conflicting values 44 and {foo:(25|44)} (mismatched types int and struct):
+    ./in.cue:1:6
+    ./in.cue:1:16
+
+Result:
+(_|_){
+  // [eval] 2 errors in empty disjunction:
+  // conflicting values 25 and {foo:(25|44)} (mismatched types int and struct):
+  //     ./in.cue:1:6
+  //     ./in.cue:1:11
+  // conflicting values 44 and {foo:(25|44)} (mismatched types int and struct):
+  //     ./in.cue:1:6
+  //     ./in.cue:1:16
+  foo: (struct){
+    foo: (_){ _ }
+  }
+}

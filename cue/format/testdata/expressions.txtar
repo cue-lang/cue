@@ -283,7 +283,7 @@ import "list"
     s: [string]: [string]: a
     s: [string]: {s: string}
 }
--- expressions.golden --
+-- out/format/expressions.golden --
 package expressions
 
 import "list"
@@ -587,7 +587,7 @@ _foo: {
 
 	// skip_create_image: true
 }
--- issue2496.golden --
+-- out/format/issue2496.golden --
 machine_type: [
 	if arch == "amd" {"n2-standard-2"},
 	if arch == "arm" {"t2a-standard-2"},

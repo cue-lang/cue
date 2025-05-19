@@ -1,7 +1,7 @@
-simplify
+#simplify
 
 -- empty.input --
--- empty.golden --
+-- out/format/empty.golden --
 
 -- comments.input --
 // Package line 1 group 1
@@ -173,7 +173,7 @@ foo: [
         [string]: _ // comment
     }
 }
--- comments.golden --
+-- out/format/comments.golden --
 // Package line 1 group 1
 // Package line 2 group 1
 
@@ -334,25 +334,25 @@ foo: [
 }
 -- comment_alone.input --
 // Just one comment on its own.
--- comment_alone.golden --
+-- out/format/comment_alone.golden --
 // Just one comment on its own.
 -- comment_field.input --
 // Just one comment on a field.
 foo: string
--- comment_field.golden --
+-- out/format/comment_field.golden --
 // Just one comment on a field.
 foo: string
 -- comments_alone.input --
 // Just a few comments
 // on their own.
--- comments_alone.golden --
+-- out/format/comments_alone.golden --
 // Just a few comments
 // on their own.
 -- comments_field.input --
 // Just a few comments
 // on a field.
 foo: string
--- comments_field.golden --
+-- out/format/comments_field.golden --
 // Just a few comments
 // on a field.
 foo: string

@@ -15,7 +15,7 @@ a: 3.e100
 s: """
     x\"\"\"
     """
--- values.golden --
+-- out/format/values.golden --
 a: 0e+1
 a: 0e1
 a: 0e+1

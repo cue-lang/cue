@@ -12,107 +12,66 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package format
+package format_test
 
 // TODO: port more of the tests of go/printer
 
 import (
-	"io/fs"
-	"os"
-	"path"
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/go-quicktest/qt"
-	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/cuetxtar"
 )
 
-var (
-	defaultConfig = newConfig([]Option{})
-	Fprint        = defaultConfig.fprint
-)
+const debug = false
 
 func TestFiles(t *testing.T) {
-	txtarFiles, err := filepath.Glob("testdata/*.txtar")
-	qt.Assert(t, qt.IsNil(err))
-	for _, txtarFile := range txtarFiles {
-		ar, err := txtar.ParseFile(txtarFile)
-		qt.Assert(t, qt.IsNil(err))
-
-		opts := []Option{TabIndent(true)}
-		for _, word := range strings.Fields(string(ar.Comment)) {
-			switch word {
-			case "simplify":
-				opts = append(opts, Simplify())
-			case "sort-imports":
-				opts = append(opts, sortImportsOption())
-			}
-		}
-
-		tfs, err := txtar.FS(ar)
-		qt.Assert(t, qt.IsNil(err))
-		inputFiles, err := fs.Glob(tfs, "*.input")
-		qt.Assert(t, qt.IsNil(err))
-
-		for _, inputFile := range inputFiles {
-			goldenFile := strings.TrimSuffix(inputFile, ".input") + ".golden"
-			t.Run(path.Join(txtarFile, inputFile), func(t *testing.T) {
-				src, err := fs.ReadFile(tfs, inputFile)
-				qt.Assert(t, qt.IsNil(err))
-
-				res, err := Source(src, opts...)
-				qt.Assert(t, qt.IsNil(err))
-
-				// make sure formatted output is syntactically correct
-				_, err = parser.ParseFile("", res, parser.AllErrors)
-				qt.Assert(t, qt.IsNil(err))
-
-				// update golden files if necessary
-				// TODO(mvdan): deduplicate this code with UpdateGoldenFiles on txtar files?
-				if cuetest.UpdateGoldenFiles {
-					for i := range ar.Files {
-						file := &ar.Files[i]
-						if file.Name == goldenFile {
-							file.Data = res
-							return
-						}
-					}
-					ar.Files = append(ar.Files, txtar.File{
-						Name: goldenFile,
-						Data: res,
-					})
-					return
-				}
-
-				// get golden
-				gld, err := fs.ReadFile(tfs, goldenFile)
-				qt.Assert(t, qt.IsNil(err))
-
-				// formatted source and golden must be the same
-				qt.Assert(t, qt.Equals(string(res), string(gld)))
-
-				// TODO(mvdan): check that all files format in an idempotent way,
-				// i.e. that formatting a golden file results in no changes.
-			})
-		}
-		if cuetest.UpdateGoldenFiles {
-			err = os.WriteFile(txtarFile, txtar.Format(ar), 0o666)
-			qt.Assert(t, qt.IsNil(err))
-		}
+	test := cuetxtar.TxTarTest{
+		Root: "./testdata",
+		Name: "format",
 	}
+	test.Run(t, func(t *cuetxtar.Test) {
+		opts := []format.Option{format.TabIndent(true)}
+		if t.HasTag("simplify") {
+			opts = append(opts, format.Simplify())
+		}
+		// TODO(mvdan): note that this option is not exposed in the API,
+		// nor does it seem to be actually tested in any of the txtar testdata files.
+		// if t.HasTag("sort-imports") {
+		// 	opts = append(opts, format.sortImportsOption())
+		// }
+
+		for _, f := range t.Archive.Files {
+			if !strings.HasSuffix(f.Name, ".input") {
+				continue
+			}
+			res, err := format.Source(f.Data, opts...)
+			qt.Assert(t, qt.IsNil(err))
+
+			// make sure formatted output is syntactically correct
+			_, err = parser.ParseFile("", res, parser.AllErrors)
+			qt.Assert(t, qt.IsNil(err))
+
+			goldenFile := strings.TrimSuffix(f.Name, ".input") + ".golden"
+			t.Writer(goldenFile).Write(res)
+
+			// TODO(mvdan): check that all files format in an idempotent way,
+			// i.e. that formatting a golden file results in no changes.
+		}
+	})
 }
 
 // Verify that the printer can be invoked during initialization.
 func init() {
 	const name = "foobar"
-	b, err := Fprint(&ast.Ident{Name: name})
+	b, err := format.Node(&ast.Ident{Name: name})
 	if err != nil {
 		panic(err) // error in test
 	}
@@ -163,7 +122,7 @@ func TestNodes(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			b, err := Node(tc.in, Simplify())
+			b, err := format.Node(tc.in, format.Simplify())
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -183,7 +142,7 @@ func TestBadNodes(t *testing.T) {
 	if err == nil {
 		t.Error("expected illegal program") // error in test
 	}
-	b, _ := Fprint(f)
+	b, _ := format.Node(f)
 	if string(b) != res {
 		t.Errorf("got %q, expected %q", string(b), res)
 	}
@@ -201,7 +160,7 @@ func TestPackage(t *testing.T) {
 			},
 		},
 	}
-	b, err := Node(f)
+	b, err := format.Node(f)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -270,7 +229,7 @@ e2: c*t.z
 	}
 
 	// pretty-print original
-	b, err := (&config{UseSpaces: true, Tabwidth: 8}).fprint(f1)
+	b, err := format.Node(f1, format.UseSpaces(8))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -331,12 +290,12 @@ func TestDeclLists(t *testing.T) {
 			panic(err) // error in test
 		}
 
-		b, err := Fprint(file.Decls) // only print declarations
+		b, err := format.Node(file) // only print declarations
 		if err != nil {
 			panic(err) // error in test
 		}
 
-		out := string(b)
+		out := strings.TrimSpace(string(b))
 
 		if out != src {
 			t.Errorf("\ngot : %q\nwant: %q\n", out, src)
@@ -355,7 +314,7 @@ func TestIncorrectIdent(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.ident, func(t *testing.T) {
-			b, _ := Node(&ast.Field{Label: ast.NewIdent(tc.ident), Value: ast.NewIdent("A")})
+			b, _ := format.Node(&ast.Field{Label: ast.NewIdent(tc.ident), Value: ast.NewIdent("A")})
 			if got, want := string(b), tc.out+`: A`; got != want {
 				t.Errorf("got %q; want %q", got, want)
 			}
@@ -370,7 +329,7 @@ func TestX(t *testing.T) {
 	const src = `
 
 `
-	b, err := Source([]byte(src), Simplify())
+	b, err := format.Source([]byte(src), format.Simplify())
 	if err != nil {
 		t.Error(err)
 	}

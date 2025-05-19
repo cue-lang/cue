@@ -8,7 +8,7 @@ B: [
 	},
 	4, // this comment is fine
 ]
--- file.golden --
+-- out/format/file.golden --
 A: true
 B: [
 	1, // this comment is fine

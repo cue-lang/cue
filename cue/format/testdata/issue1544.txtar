@@ -2,21 +2,21 @@
 if true {
 	x: 5
 }
--- if.golden --
+-- out/format/if.golden --
 if true {
 	x: 5
 }
 -- let.input --
 let x = 5
 y: x
--- let.golden --
+-- out/format/let.golden --
 let x = 5
 y: x
 -- for.input --
 for v in ["a", "b"] {
 	(v): v
 }
--- for.golden --
+-- out/format/for.golden --
 for v in ["a", "b"] {
 	(v): v
 }

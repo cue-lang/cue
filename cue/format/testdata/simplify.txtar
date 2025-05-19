@@ -1,4 +1,4 @@
-simplify
+#simplify
 
 -- simplify.input --
 import "time"
@@ -89,7 +89,7 @@ y: {
     foo: {}
     bar: "foo": foo // removing the quotes would cause a cyclic reference
 }
--- simplify.golden --
+-- out/format/simplify.golden --
 import "time"
 
 foo: bar: "str"

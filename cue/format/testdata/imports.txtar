@@ -1,16 +1,16 @@
-sort-imports
+#sort-imports
 
 -- pkgonly.input --
 package foo
--- pkgonly.golden --
+-- out/format/pkgonly.golden --
 package foo
 -- attronly.input --
 @attr(foo)
--- attronly.golden --
+-- out/format/attronly.golden --
 @attr(foo)
 -- importonly.input --
 import "foo"
--- importonly.golden --
+-- out/format/importonly.golden --
 import "foo"
 -- imports.input --
 package foo
@@ -40,7 +40,7 @@ import (
 a: time.time
 b: foo.foo
 c: bar.Bar
--- imports.golden --
+-- out/format/imports.golden --
 package foo
 
 import (

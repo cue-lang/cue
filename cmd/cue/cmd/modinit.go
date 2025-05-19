@@ -97,12 +97,5 @@ func runModInit(cmd *Command, args []string) (err error) {
 		return err
 	}
 
-	if err = os.Mkdir(filepath.Join(mod, "usr"), 0777); err != nil {
-		return err
-	}
-	if err = os.Mkdir(filepath.Join(mod, "pkg"), 0777); err != nil {
-		return err
-	}
-
-	return err
+	return nil
 }

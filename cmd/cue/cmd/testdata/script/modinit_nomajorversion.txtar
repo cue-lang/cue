@@ -6,8 +6,8 @@ env-fill want-module-experiment.cue
 # with earlier cue versions.
 exec cue mod init foo.com/bar
 cmp cue.mod/module.cue want-module-experiment.cue
-exists cue.mod/usr
-exists cue.mod/pkg
+! exists cue.mod/usr
+! exists cue.mod/pkg
 
 -- want-module.cue --
 module: "foo.com/bar"

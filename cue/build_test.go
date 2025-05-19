@@ -223,7 +223,9 @@ func (b *builder) load(pos token.Pos, path string) *build.Instance {
 	if bi == nil {
 		return nil
 	}
-	return b.build(bi)
+	inst := b.build(bi)
+	inst.ImportPath = path
+	return inst
 }
 
 type bimport struct {

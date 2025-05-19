@@ -473,6 +473,7 @@ func (c *Config) newErrInstance(err error) *build.Instance {
 	i.Root = c.ModuleRoot
 	i.Module = c.Module
 	i.Err = errors.Promote(err, "")
+	i.Incomplete = true
 	return i
 }
 

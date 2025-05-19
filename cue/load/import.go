@@ -55,29 +55,23 @@ import (
 //	_       anonymous files (which may be marked with _)
 //	*       all packages
 func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
-	retErr := func(errs errors.Error) []*build.Instance {
-		// XXX: move this loop to ReportError
-		for _, err := range errors.Errors(errs) {
-			p.ReportError(err)
-		}
+	if p.Err != nil {
 		return []*build.Instance{p}
 	}
 
-	for _, item := range l.stk {
-		if item == p.ImportPath {
-			return retErr(&PackageError{Message: errors.NewMessagef("package import cycle not allowed")})
-		}
+	retErr := func(errs errors.Error) []*build.Instance {
+		p.ReportError(errs)
+		return []*build.Instance{p}
+	}
+
+	if slices.Contains(l.stk, p.ImportPath) {
+		return retErr(&PackageError{Message: errors.NewMessagef("package import cycle not allowed")})
 	}
 	l.stk.Push(p.ImportPath)
 	defer l.stk.Pop()
 
 	cfg := l.cfg
 	ctxt := cfg.fileSystem
-
-	if p.Err != nil {
-		return []*build.Instance{p}
-	}
-
 	fp := newFileProcessor(cfg, p, l.tagger)
 
 	if p.PkgName == "" {
@@ -311,19 +305,13 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 		panic(fmt.Errorf("non-relative import path %q passed to newRelInstance", path))
 	}
 
-	p := l.cfg.Context.NewInstance(path, nil)
-	p.PkgName = pkgName
-	p.DisplayPath = filepath.ToSlash(path)
-	// p.ImportPath = string(dir) // compute unique ID.
-	p.Root = l.cfg.ModuleRoot
-	p.Module = l.cfg.Module
-
 	var err errors.Error
 	if path != cleanImport(path) {
 		err = errors.Append(err, l.errPkgf(nil,
 			"non-canonical import path: %q should be %q", path, pathpkg.Clean(path)))
 	}
 
+	iptPath := ""
 	dir := filepath.Join(l.cfg.Dir, filepath.FromSlash(path))
 	if pkgPath, e := importPathFromAbsDir(l.cfg, dir, path); e != nil {
 		// Detect later to keep error messages consistent.
@@ -338,22 +326,27 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 		if e != nil {
 			// Detect later to keep error messages consistent.
 		} else {
-			p.ImportPath = string(pkgPath)
+			iptPath = string(pkgPath)
 		}
 	}
 
-	p.Dir = dir
-
+	// By the time we get here, path has been passed through
+	// filepath.ToSlash. However, under windows this could lead to
+	// C://foo which we still want to identify as an absolute path, and
+	// filepath.IsAbs will do that. Note though that under Windows,
+	// filepath.IsAbs("/foo") will return false, but we really do want
+	// to treat that as absolute, hence the additional
+	// strings.HasPrefix test.
 	if filepath.IsAbs(path) || strings.HasPrefix(path, "/") {
 		err = errors.Append(err, errors.Newf(pos,
 			"absolute import path %q not allowed", path))
 	}
+
 	if err != nil {
-		p.Err = errors.Append(p.Err, err)
-		p.Incomplete = true
+		return l.cfg.newErrInstance(err)
 	}
 
-	return p
+	return l.cfg.Context.EnsureInstance(dir, l.cfg.ModuleRoot, iptPath, pkgName, path, l.cfg.Module)
 }
 
 func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath, error) {
@@ -387,23 +380,22 @@ func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath
 
 func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	dir, modPath, err := l.absDirFromImportPath(pos, p)
-	i := l.cfg.Context.NewInstance(dir, nil)
-	i.Err = errors.Append(i.Err, err)
-	i.Dir = dir
 
 	parts := ast.ParseImportPath(string(p))
-	i.PkgName = parts.Qualifier
-	if i.PkgName == "" {
-		i.Err = errors.Append(i.Err, l.errPkgf([]token.Pos{pos}, "cannot determine package name for %q; set it explicitly with ':'", p))
-	} else if i.PkgName == "_" {
-		i.Err = errors.Append(i.Err, l.errPkgf([]token.Pos{pos}, "_ is not a valid import path qualifier in %q", p))
+	pkgName := parts.Qualifier
+	if pkgName == "" {
+		err = errors.Append(err, l.errPkgf([]token.Pos{pos}, "cannot determine package name for %q; set it explicitly with ':'", p))
+	} else if pkgName == "_" {
+		err = errors.Append(err, l.errPkgf([]token.Pos{pos}, "_ is not a valid import path qualifier in %q", p))
 	}
-	i.DisplayPath = string(p)
-	i.ImportPath = string(p)
-	i.Root = l.cfg.ModuleRoot
-	i.Module = modPath
 
-	return i
+	inst := l.cfg.Context.EnsureInstance(dir, l.cfg.ModuleRoot, string(p), pkgName, string(p), modPath)
+	if err != nil {
+		inst.Err = errors.Append(inst.Err, err)
+		inst.Incomplete = true
+	}
+
+	return inst
 }
 
 // absDirFromImportPath converts a giving import path to an absolute directory

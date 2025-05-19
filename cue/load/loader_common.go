@@ -242,12 +242,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 			return
 		}
 		if q == nil {
-			q = fp.c.Context.NewInstance(p.Dir, nil)
-			q.PkgName = pkg
-			q.DisplayPath = p.DisplayPath
-			q.ImportPath = p.ImportPath + ":" + pkg
-			q.Root = p.Root
-			q.Module = p.Module
+			q = fp.c.Context.EnsureInstance(p.Dir, p.Root, p.ImportPath+":"+pkg, pkg, p.DisplayPath, p.Module)
 			fp.pkgs[pkg] = q
 		}
 		p = q
@@ -326,23 +321,32 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 	switch {
 	case isTest:
 		if fp.c.Tests {
-			p.BuildFiles = append(p.BuildFiles, file)
+			p.BuildFiles = ensureInFiles(p.BuildFiles, file)
 		} else {
 			file.ExcludeReason = excludeError{errors.Newf(pos,
 				"_test.cue files excluded in non-test mode")}
-			p.IgnoredFiles = append(p.IgnoredFiles, file)
+			p.IgnoredFiles = ensureInFiles(p.IgnoredFiles, file)
 		}
 	case isTool:
 		if fp.c.Tools {
-			p.BuildFiles = append(p.BuildFiles, file)
+			p.BuildFiles = ensureInFiles(p.BuildFiles, file)
 		} else {
 			file.ExcludeReason = excludeError{errors.Newf(pos,
 				"_tool.cue files excluded in non-cmd mode")}
-			p.IgnoredFiles = append(p.IgnoredFiles, file)
+			p.IgnoredFiles = ensureInFiles(p.IgnoredFiles, file)
 		}
 	default:
-		p.BuildFiles = append(p.BuildFiles, file)
+		p.BuildFiles = ensureInFiles(p.BuildFiles, file)
 	}
+}
+
+func ensureInFiles(files []*build.File, f *build.File) []*build.File {
+	if slices.ContainsFunc(files, func(g *build.File) bool {
+		return g.Filename == f.Filename
+	}) {
+		return files
+	}
+	return append(files, f)
 }
 
 // isLocalImport reports whether the import path is

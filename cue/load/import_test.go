@@ -113,7 +113,6 @@ func TestImportPaths(t *testing.T) {
 		Dir:        testdata("testmod", "importpaths"),
 	})
 
-	duplicateImportPaths := make(map[string]struct{})
 	uniqueInstances := make(map[*build.Instance]struct{})
 	byImportPath := make(map[string]*build.Instance)
 	var walkImports func(inst *build.Instance)
@@ -126,7 +125,7 @@ func TestImportPaths(t *testing.T) {
 		} else if existing == inst {
 			return
 		} else {
-			duplicateImportPaths[inst.ImportPath] = struct{}{}
+			t.Fatalf("Got 2 different instances for the same import path: %q", inst.ImportPath)
 		}
 
 		for _, ipt := range inst.Imports {
@@ -143,11 +142,6 @@ func TestImportPaths(t *testing.T) {
 		qt.Assert(t, qt.Not(qt.Equals(inst.PkgName, "_")))
 		walkImports(inst)
 	}
-
-	// Both the top-level load.Instances, and c/c.cue will create
-	// instances for d@v0:d
-	_, found := duplicateImportPaths["mod.test/test/importpaths/d@v0:d"]
-	qt.Assert(t, qt.IsTrue(found))
 
 	importPaths := make([]string, 0, len(byImportPath))
 	for path, inst := range byImportPath {

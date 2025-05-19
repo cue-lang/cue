@@ -105,7 +105,6 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	}
 
 	// TODO: ModImportFromFiles(files)
-	pkg.Dir = l.cfg.Dir
 	rewriteFiles(pkg, pkg.Dir, true)
 	for _, err := range errors.Errors(fp.finalize(pkg)) { // ImportDir(&ctxt, dir, 0)
 		var x *NoFilesError

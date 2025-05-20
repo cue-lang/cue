@@ -134,6 +134,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 			})
 		}
 		n.scheduleDisjunction(d)
+		n.updateConjunctInfo(TopKind, id, 0)
 
 	case *Comprehension:
 		// always a partial comprehension.
@@ -423,6 +424,8 @@ var NoShareSentinel = &Bottom{
 func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInfo) {
 	ctx := n.ctx
 
+	n.updateConjunctInfo(TopKind, id, 0)
+
 	switch x := v.(type) {
 	case *Vertex:
 		if x.ClosedNonRecursive {
@@ -537,6 +540,9 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 	case *BasicType:
 		n.updateCyclicStatusV3(id)
+		if x.K != TopKind {
+			n.updateConjunctInfo(TopKind, id, cHasTop)
+		}
 
 	case *BoundValue:
 		n.updateCyclicStatusV3(id)

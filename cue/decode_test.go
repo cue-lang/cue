@@ -277,6 +277,14 @@ func TestDecode(t *testing.T) {
 		value: `-1.99769313499e+508`,
 		dst:   new(interface{}),
 		err:   "value was rounded down",
+	}, {
+		value: `1.99769313499e+508`,
+		dst:   new(*big.Float),
+		err:   "Decode: cannot use value 1.99769313499E+508 (type float) as (string|bytes)",
+	}, {
+		value: `-1.99769313499e+508`,
+		dst:   new(*big.Float),
+		err:   "Decode: cannot use value -1.99769313499E+508 (type float) as (string|bytes)",
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {

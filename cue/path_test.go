@@ -16,9 +16,11 @@ package cue_test
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/cuetdtest"
 )
 
@@ -130,6 +132,11 @@ func TestPaths(t *testing.T) {
 		path: cue.ParsePath("pkg.y"),
 		out:  `"hello"`,
 		str:  "pkg.y", // show original path, not structure shared path.
+	}, {
+		// Issue 3922
+		path: cue.ParsePath("out.name"),
+		out:  `"one"`,
+		str:  "out.name",
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
@@ -151,6 +158,11 @@ func TestPaths(t *testing.T) {
 			// Issue 3577
 			pkg: z
 			z: y: "hello"
+
+			// Issue 3922
+			out: #Output
+			#Output: name: _data.name
+			_data: name: "one"
 		`)
 
 		t.Equal(tc.path.Err() != nil, tc.err)
@@ -165,6 +177,132 @@ func TestPaths(t *testing.T) {
 
 		t.Equal(w.Path().String(), tc.str)
 	})
+}
+
+// TestWalkPath is a more comprehensive table-driven test.
+func TestWalkPath(t *testing.T) {
+	ctx := cuecontext.New()
+
+	testCases := []struct {
+		name      string
+		cueInput  string
+		wantPaths []string
+	}{
+		{
+			name: "issue 3922",
+			cueInput: `
+				out: #Output
+				#Output: name: _data.name
+				_data: name: "one"
+			`,
+			wantPaths: []string{
+				"", // root
+				"out",
+				"out.name",
+			},
+		},
+		{
+			name: "simple struct",
+			cueInput: `
+				b: {
+					d: 3
+					c: 2
+				}
+				a: 1
+			`,
+			wantPaths: []string{
+				"", // root
+				"b",
+				"b.d",
+				"b.c",
+				"a",
+			},
+		},
+		{
+			name: "struct with list",
+			cueInput: `
+				l: [10, {y: 30, x: 20}]
+			`,
+			wantPaths: []string{
+				"", // root
+				"l",
+				"l[0]",
+				"l[1]",
+				"l[1].y",
+				"l[1].x",
+			},
+		},
+		{
+			name:     "root list",
+			cueInput: `[10, {x: 20}]`,
+			wantPaths: []string{
+				"", // root
+				"[0]",
+				"[1]",
+				"[1].x",
+			},
+		},
+		{
+			name:     "root literal string",
+			cueInput: `"hello"`,
+			wantPaths: []string{
+				"", // root
+			},
+		},
+		{
+			name:     "root literal int",
+			cueInput: `123`,
+			wantPaths: []string{
+				"", // root
+			},
+		},
+		{
+			name:     "empty struct",
+			cueInput: `{}`,
+			wantPaths: []string{
+				"", // root
+			},
+		},
+		{
+			name: "struct with various field types",
+			cueInput: `
+				c: _h
+				_h: #D
+				#D: b: c: 3
+				a: _g
+				_g: #B
+				#B: x: "definition B"
+			`,
+			// Order: regular (a, c), definitions (#B, #D), hidden (_g, _h)
+			wantPaths: []string{
+				"", // root
+				"c",
+				"c.b",
+				"c.b.c",
+				"a",
+				"a.x",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			v := ctx.CompileString(tc.cueInput)
+			if err := v.Err(); err != nil {
+				t.Fatalf("CompileString failed for input\n%s\nError: %v", tc.cueInput, err)
+			}
+
+			var gotPaths []string
+			v.Walk(func(val cue.Value) bool {
+				gotPaths = append(gotPaths, val.Path().String())
+				return true
+			}, nil)
+
+			if !reflect.DeepEqual(gotPaths, tc.wantPaths) {
+				t.Errorf("Walk() paths mismatch for input\n%s\ngot:  %#v\nwant: %#v", tc.cueInput, gotPaths, tc.wantPaths)
+			}
+		})
+	}
 }
 
 var selectorTests = []struct {

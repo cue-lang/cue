@@ -64,13 +64,7 @@ Unifications: 47
 Conjuncts:    73
 Disjuncts:    54
 -- out/evalalpha --
-Errors:
-issue3931.full.bar.bar1.spec.selector: adding field expr not allowed as field set was already referenced:
-    ./let.cue:8:14
-
-Result:
-(_|_){
-  // [eval]
+(struct){
   full: (struct){
     out: (struct){
       env: (struct){
@@ -83,19 +77,15 @@ Result:
     a: (int){ 30080 }
     port: (int){ |(*(int){ 30080 }, (int){ int }) }
   }
-  issue3931: (_|_){
-    // [eval]
-    full: (_|_){
-      // [eval]
-      bar: (_|_){
-        // [eval]
-        bar1: (_|_){
-          // [eval]
-          spec: (_|_){
-            // [eval]
-            selector: (_|_){
-              // [eval] issue3931.full.bar.bar1.spec.selector: adding field expr not allowed as field set was already referenced:
-              //     ./let.cue:8:14
+  issue3931: (struct){
+    full: (struct){
+      bar: (struct){
+        bar1: (struct){
+          spec: (struct){
+            selector: (struct){
+              label: (string){ "foo" }
+              expr?: (list){
+              }
             }
           }
         }
@@ -156,48 +146,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,10 @@
--(struct){
-+Errors:
-+issue3931.full.bar.bar1.spec.selector: adding field expr not allowed as field set was already referenced:
-+    ./let.cue:8:14
-+
-+Result:
-+(_|_){
-+  // [eval]
-   full: (struct){
-     out: (struct){
-       env: (struct){
-@@ -11,15 +17,19 @@
-     a: (int){ 30080 }
-     port: (int){ |(*(int){ 30080 }, (int){ int }) }
-   }
--  issue3931: (struct){
--    full: (struct){
--      bar: (struct){
--        bar1: (struct){
--          spec: (struct){
--            selector: (struct){
--              label: (string){ "foo" }
--              expr?: (list){
--              }
-+  issue3931: (_|_){
-+    // [eval]
-+    full: (_|_){
-+      // [eval]
-+      bar: (_|_){
-+        // [eval]
-+        bar1: (_|_){
-+          // [eval]
-+          spec: (_|_){
-+            // [eval]
-+            selector: (_|_){
-+              // [eval] issue3931.full.bar.bar1.spec.selector: adding field expr not allowed as field set was already referenced:
-+              //     ./let.cue:8:14
-             }
-           }
-         }
-@@ -45,10 +55,7 @@
+@@ -45,10 +45,7 @@
      foo: (struct){
        fooData: (struct){
          total: (struct){
@@ -209,7 +158,7 @@ diff old new
          }
          _hidden: (struct){
            extra: (struct){
-@@ -56,12 +63,7 @@
+@@ -56,12 +53,7 @@
          }
        }
        shared: (struct){

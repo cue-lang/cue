@@ -38,18 +38,39 @@ related: {
 		}
 	}
 }
+-- let.cue --
+issue3931: full: {
+	bar: [string]: spec?: Spec
+	if true {
+		foo: label: "foo"
+		bar: bar1: spec: selector: foo
+	}
+	let Spec = {
+		selector?: Selector
+	}
+	let Selector = {
+		label?: string
+		expr?: [...string]
+	}
+}
 -- out/eval/stats --
-Leaks:  2
-Freed:  32
-Reused: 26
-Allocs: 8
-Retain: 1
+Leaks:  7
+Freed:  44
+Reused: 38
+Allocs: 13
+Retain: 3
 
-Unifications: 30
-Conjuncts:    51
-Disjuncts:    35
+Unifications: 47
+Conjuncts:    73
+Disjuncts:    54
 -- out/evalalpha --
-(struct){
+Errors:
+issue3931.full.bar.bar1.spec.selector: adding field expr not allowed as field set was already referenced:
+    ./let.cue:8:14
+
+Result:
+(_|_){
+  // [eval]
   full: (struct){
     out: (struct){
       env: (struct){
@@ -61,6 +82,40 @@ Disjuncts:    35
   reduced: (struct){
     a: (int){ 30080 }
     port: (int){ |(*(int){ 30080 }, (int){ int }) }
+  }
+  issue3931: (_|_){
+    // [eval]
+    full: (_|_){
+      // [eval]
+      bar: (_|_){
+        // [eval]
+        bar1: (_|_){
+          // [eval]
+          spec: (_|_){
+            // [eval]
+            selector: (_|_){
+              // [eval] issue3931.full.bar.bar1.spec.selector: adding field expr not allowed as field set was already referenced:
+              //     ./let.cue:8:14
+            }
+          }
+        }
+      }
+      foo: (struct){
+        label: (string){ "foo" }
+      }
+      let Spec#1 = (struct){
+        selector?: (struct){
+          label?: (string){ string }
+          expr?: (list){
+          }
+        }
+      }
+      let Selector#2 = (struct){
+        label?: (string){ string }
+        expr?: (list){
+        }
+      }
+    }
   }
   related: (struct){
     foo: (struct){
@@ -101,7 +156,48 @@ Disjuncts:    35
 diff old new
 --- old
 +++ new
-@@ -15,10 +15,7 @@
+@@ -1,4 +1,10 @@
+-(struct){
++Errors:
++issue3931.full.bar.bar1.spec.selector: adding field expr not allowed as field set was already referenced:
++    ./let.cue:8:14
++
++Result:
++(_|_){
++  // [eval]
+   full: (struct){
+     out: (struct){
+       env: (struct){
+@@ -11,15 +17,19 @@
+     a: (int){ 30080 }
+     port: (int){ |(*(int){ 30080 }, (int){ int }) }
+   }
+-  issue3931: (struct){
+-    full: (struct){
+-      bar: (struct){
+-        bar1: (struct){
+-          spec: (struct){
+-            selector: (struct){
+-              label: (string){ "foo" }
+-              expr?: (list){
+-              }
++  issue3931: (_|_){
++    // [eval]
++    full: (_|_){
++      // [eval]
++      bar: (_|_){
++        // [eval]
++        bar1: (_|_){
++          // [eval]
++          spec: (_|_){
++            // [eval]
++            selector: (_|_){
++              // [eval] issue3931.full.bar.bar1.spec.selector: adding field expr not allowed as field set was already referenced:
++              //     ./let.cue:8:14
+             }
+           }
+         }
+@@ -45,10 +55,7 @@
      foo: (struct){
        fooData: (struct){
          total: (struct){
@@ -113,7 +209,7 @@ diff old new
          }
          _hidden: (struct){
            extra: (struct){
-@@ -26,12 +23,7 @@
+@@ -56,12 +63,7 @@
          }
        }
        shared: (struct){
@@ -140,6 +236,36 @@ diff old new
   reduced: (struct){
     a: (int){ 30080 }
     port: (int){ |(*(int){ 30080 }, (int){ int }) }
+  }
+  issue3931: (struct){
+    full: (struct){
+      bar: (struct){
+        bar1: (struct){
+          spec: (struct){
+            selector: (struct){
+              label: (string){ "foo" }
+              expr?: (list){
+              }
+            }
+          }
+        }
+      }
+      foo: (struct){
+        label: (string){ "foo" }
+      }
+      let Spec#1 = (struct){
+        selector?: (struct){
+          label?: (string){ string }
+          expr?: (list){
+          }
+        }
+      }
+      let Selector#2 = (struct){
+        label?: (string){ string }
+        expr?: (list){
+        }
+      }
+    }
   }
   related: (struct){
     foo: (struct){
@@ -204,6 +330,39 @@ diff old new
       a: 〈import;math〉.Abs(〈1;port〉)
     }
     port: (int|*30080)
+  }
+}
+--- let.cue
+{
+  issue3931: {
+    full: {
+      bar: {
+        [string]: {
+          spec?: 〈2;let Spec#1〉
+        }
+      }
+      if true {
+        foo: {
+          label: "foo"
+        }
+        bar: {
+          bar1: {
+            spec: {
+              selector: 〈3;foo〉
+            }
+          }
+        }
+      }
+      let Spec#1 = {
+        selector?: 〈1;let Selector#2〉
+      }
+      let Selector#2 = {
+        label?: string
+        expr?: [
+          ...string,
+        ]
+      }
+    }
   }
 }
 --- secondary.cue

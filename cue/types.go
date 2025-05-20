@@ -491,6 +491,24 @@ func init() {
 	}
 }
 
+// Float returns a big.Float nearest to x. It reports an error if v is
+// not a number. If a non-nil *Float argument f is provided, Float stores the result in f
+// instead of allocating a new Float.
+func (v Value) Float(f *big.Float) (*big.Float, error) {
+	var err error
+
+	n, err := v.getNum(adt.NumberKind)
+	if err != nil {
+		return nil, err
+	}
+	if f == nil {
+		f = &big.Float{}
+	}
+
+	f, _, err = f.Parse(n.X.String(), 0)
+	return f, err
+}
+
 // Float64 returns the float64 value nearest to x. It reports an error if v is
 // not a number. If x is too small to be represented by a float64 (|x| <
 // math.SmallestNonzeroFloat64), the result is (0, ErrBelow) or (-0, ErrAbove),

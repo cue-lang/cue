@@ -148,8 +148,8 @@ func validate(c *adt.OpContext, b []byte, v pkg.Schema) (bool, error) {
 	}
 
 	vx := adt.Unify(c, value.Vertex(v2), value.Vertex(v))
-	x := value.Make(c, vx)
-	if err := x.Err(); err != nil {
+	v = value.Make(c, vx)
+	if err := v.Err(); err != nil {
 		return false, err
 	}
 

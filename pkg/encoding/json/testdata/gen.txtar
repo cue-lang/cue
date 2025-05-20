@@ -152,11 +152,7 @@ validate: {
 	}
 }
 issue3932: {
-	f: json.Validate({
-		name!: string
-	}) & json.Marshal({
-		name: "foo"
-	})
+	f: "{\"name\":\"foo\"}"
 }
 valid: {
 	t1: {

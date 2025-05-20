@@ -19,6 +19,7 @@ import (
 	"cmp"
 	"encoding"
 	"encoding/json"
+	"math/big"
 	"reflect"
 	"slices"
 	"strconv"
@@ -125,6 +126,17 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 	}
 
 	if it != nil {
+		if _, ok := it.(*big.Float); ok {
+			f, err := v.Float(nil)
+			if err != nil {
+				err = errors.Wrapf(err, v.Pos(), "Decode")
+				d.addErr(err)
+				return
+			}
+			x.Elem().Set(reflect.ValueOf(*f))
+			return
+		}
+
 		b, err := v.Bytes()
 		if err != nil {
 			err = errors.Wrapf(err, v.Pos(), "Decode")
@@ -273,7 +285,10 @@ func (d *decoder) interfaceValue(v Value) (x interface{}) {
 		x, err = v.Int(nil)
 
 	case FloatKind:
-		x, err = v.Float64() // or big int or
+		if f, err := v.Float64(); err == nil {
+			return f
+		} // or big int or
+		x, err = v.Float(nil)
 
 	case StringKind:
 		x, err = v.String()
@@ -895,11 +910,11 @@ func indirect(v reflect.Value, decodingNull bool) (json.Unmarshaler, encoding.Te
 		}
 		if v.Type().NumMethod() > 0 && v.CanInterface() {
 			if u, ok := v.Interface().(json.Unmarshaler); ok {
-				return u, nil, reflect.Value{}
+				return u, nil, v
 			}
 			if !decodingNull {
 				if u, ok := v.Interface().(encoding.TextUnmarshaler); ok {
-					return nil, u, reflect.Value{}
+					return nil, u, v
 				}
 			}
 		}

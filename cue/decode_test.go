@@ -23,6 +23,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/cuetdtest"
+	"github.com/cockroachdb/apd/v3"
 	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
 )
@@ -261,6 +262,24 @@ func TestDecode(t *testing.T) {
 		dst:   new(interface{}),
 		want:  bigInt("-9500000000000000000"),
 	}, {
+		value: `9500000000000000000`,
+		dst:   new(*big.Int),
+		want:  bigInt("9500000000000000000"),
+	}, {
+		value: `-9500000000000000000`,
+		dst:   new(*big.Int),
+		want:  bigInt("-9500000000000000000"),
+	}, {
+		// TODO: should this work?
+		value: `9500000000000000000`,
+		dst:   new(*apd.Decimal),
+		err:   "Decode: cannot use value 9500000000000000000 (type int) as (string|bytes)",
+	}, {
+		// TODO: should this work?
+		value: `-9500000000000000000`,
+		dst:   new(*apd.Decimal),
+		err:   "Decode: cannot use value -9500000000000000000 (type int) as (string|bytes)",
+	}, {
 		// large float which doesn't fit into a float32
 		value: `1.797693134e+308`,
 		dst:   new(interface{}),
@@ -277,6 +296,16 @@ func TestDecode(t *testing.T) {
 		value: `-1.99769313499e+508`,
 		dst:   new(interface{}),
 		err:   "value was rounded down",
+	}, {
+		// TODO: this should work.
+		value: `1.99769313499e+508`,
+		dst:   new(*big.Float),
+		err:   "Decode: cannot use value 1.99769313499E+508 (type float) as (string|bytes)",
+	}, {
+		// TODO: this should work.
+		value: `-1.99769313499e+508`,
+		dst:   new(*big.Float),
+		err:   "Decode: cannot use value -1.99769313499E+508 (type float) as (string|bytes)",
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {

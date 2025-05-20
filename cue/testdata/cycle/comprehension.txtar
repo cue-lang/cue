@@ -360,7 +360,7 @@ Unifications: 510
 Conjuncts:    1511
 Disjuncts:    190
 
-CloseIDElems: 10222
+CloseIDElems: 10053
 NumCloseIDs: 811
 -- out/evalalpha --
 Errors:
@@ -1296,7 +1296,7 @@ diff old new
 +Conjuncts:    1511
 +Disjuncts:    190
 +
-+CloseIDElems: 10222
++CloseIDElems: 10053
 +NumCloseIDs: 811
 -- out/eval/stats --
 Leaks:  74

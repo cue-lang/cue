@@ -20,6 +20,11 @@ validate: enforceRequired: {
 	schema: {x!: int}
 }
 
+issue3932: {
+	f: json.Validate({name!: string})
+	f: json.Marshal({name: "foo"})
+}
+
 valid: [string]: {
 	string // input
 	#result: json.Valid(string)
@@ -96,9 +101,9 @@ validate.t2.result: error in call to encoding/json.Validate: invalid value 10 (o
     ./in.cue:9:27
     json.Validate:1:6
 unmarshal.trailingInvalid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
-    ./in.cue:42:11
+    ./in.cue:47:11
 unmarshal.trailingValid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
-    ./in.cue:42:11
+    ./in.cue:47:11
 
 Result:
 import "encoding/json"
@@ -145,6 +150,13 @@ validate: {
 		}
 		result: json.Validate(str, schema)
 	}
+}
+issue3932: {
+	f: json.Validate({
+		name!: string
+	}) & json.Marshal({
+		name: "foo"
+	})
 }
 valid: {
 	t1: {

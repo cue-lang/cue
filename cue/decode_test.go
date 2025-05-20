@@ -266,25 +266,21 @@ func TestDecode(t *testing.T) {
 		dst:   new(interface{}),
 		want:  float64(1.797693134e+308),
 	}, {
-		// even larger float which doesn't fit into a float64
-		// TODO(mvdan): this should work via *big.Float, just like we do with *big.Int above.
 		value: `1.99769313499e+508`,
 		dst:   new(interface{}),
-		err:   "value was rounded up",
+		want:  bigFloat(`1.99769313499e+508`),
 	}, {
-		// same as the above, but negative
-		// TODO(mvdan): this should work via *big.Float, just like we do with *big.Int above.
 		value: `-1.99769313499e+508`,
 		dst:   new(interface{}),
-		err:   "value was rounded down",
+		want:  bigFloat(`-1.99769313499e+508`),
 	}, {
 		value: `1.99769313499e+508`,
 		dst:   new(*big.Float),
-		err:   "Decode: cannot use value 1.99769313499E+508 (type float) as (string|bytes)",
+		want:  bigFloat(`1.99769313499e+508`),
 	}, {
 		value: `-1.99769313499e+508`,
 		dst:   new(*big.Float),
-		err:   "Decode: cannot use value -1.99769313499E+508 (type float) as (string|bytes)",
+		want:  bigFloat(`-1.99769313499e+508`),
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
@@ -293,6 +289,8 @@ func TestDecode(t *testing.T) {
 
 			got := reflect.ValueOf(tc.dst).Elem().Interface()
 			if diff := cmp.Diff(got, tc.want, cmp.Comparer(func(a, b *big.Int) bool {
+				return a.Cmp(b) == 0
+			}), cmp.Comparer(func(a, b *big.Float) bool {
 				return a.Cmp(b) == 0
 			})); diff != "" {
 				t.Error(diff)
@@ -305,6 +303,12 @@ func TestDecode(t *testing.T) {
 func bigInt(s string) *big.Int {
 	n, _ := big.NewInt(0).SetString(s, 10)
 	return n
+}
+
+func bigFloat(s string) *big.Float {
+	f := &big.Float{}
+	f, _, _ = f.Parse(s, 0)
+	return f
 }
 
 func TestDecodeIntoCUEValue(t *testing.T) {

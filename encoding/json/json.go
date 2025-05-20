@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package json converts JSON to and from CUE.
+// Package json converts JSON to CUE.
+// To convert CUE to JSON, use [encoding/json.Marshal] on a [cue.Value].
 package json
 
 import (

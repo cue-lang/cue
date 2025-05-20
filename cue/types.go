@@ -605,7 +605,6 @@ func newValueRoot(idx *runtime.Runtime, ctx *adt.OpContext, x adt.Expr) Value {
 
 func newChildValue(o *structValue, i int) Value {
 	arc := o.at(i)
-	// TODO: fix linkage to parent.
 	return makeValue(o.v.idx, arc, linkParent(o.v.parent_, o.v.v, arc))
 }
 
@@ -1249,6 +1248,7 @@ func (v Value) structValData(ctx *adt.OpContext) (structValue, *adt.Bottom) {
 
 // structVal returns an structVal or an error if v is not a struct.
 func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err *adt.Bottom) {
+	orig := v
 	v, _ = v.Default()
 
 	obj := v.v
@@ -1305,7 +1305,7 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 		}
 		arcs = append(arcs, arc)
 	}
-	return structValue{ctx, v, obj, arcs}, nil
+	return structValue{ctx, orig, obj, arcs}, nil
 }
 
 // Struct returns the underlying struct of a value or an error if the value

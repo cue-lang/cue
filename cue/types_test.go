@@ -581,6 +581,74 @@ func TestFloat(t *testing.T) {
 	}
 }
 
+func TestBigFloat(t *testing.T) {
+	testCases := []struct {
+		value    string
+		bigFloat *big.Float
+		kind     cue.Kind
+		err      string
+	}{{
+		value:    "1",
+		bigFloat: bigFloat("1"),
+		kind:     cue.IntKind,
+	}, {
+		value:    "-1",
+		bigFloat: bigFloat("-1"),
+		kind:     cue.IntKind,
+	}, {
+		value:    "0.0",
+		bigFloat: bigFloat("0.0"),
+		kind:     cue.FloatKind,
+	}, {
+		value:    "1.0",
+		bigFloat: bigFloat("1.0"),
+		kind:     cue.FloatKind,
+	}, {
+		value:    "2.6",
+		bigFloat: bigFloat("2.6"),
+		kind:     cue.FloatKind,
+	}, {
+		value:    "20.600",
+		bigFloat: bigFloat("20.600"),
+		kind:     cue.FloatKind,
+	}, {
+		value:    "1/0",
+		bigFloat: nil,
+		err:      "division by zero",
+		kind:     cue.BottomKind,
+	}, {
+		value:    "1.797693134862315708145274237317043567982e+308",
+		bigFloat: bigFloat("1.797693134862315708145274237317043567982e+308"),
+		kind:     cue.FloatKind,
+	}, {
+		value:    "-1.797693134862315708145274237317043567982e+308",
+		bigFloat: bigFloat("-1.797693134862315708145274237317043567982e+308"),
+		kind:     cue.FloatKind,
+	}, {
+		value:    "4.940656458412465441765687928682213723650e-324",
+		bigFloat: bigFloat("4.940656458412465441765687928682213723650e-324"),
+		kind:     cue.FloatKind,
+	}, {
+		value:    "-4.940656458412465441765687928682213723650e-324",
+		bigFloat: bigFloat("-4.940656458412465441765687928682213723650e-324"),
+		kind:     cue.FloatKind,
+	}}
+	for _, tc := range testCases {
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			n := getValue(m, tc.value)
+			if n.Kind() != tc.kind {
+				t.Fatal("Not a number")
+			}
+
+			bf, err := n.Float(nil)
+			checkErr(t, err, tc.err, "Float")
+			if bf != nil && bf.Cmp(tc.bigFloat) != 0 {
+				t.Errorf("Float: got %v; want %v", bf, tc.bigFloat)
+			}
+		})
+	}
+}
+
 func TestString(t *testing.T) {
 	testCases := []struct {
 		value string

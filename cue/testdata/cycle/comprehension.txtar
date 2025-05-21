@@ -387,26 +387,26 @@ issue3903: full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  920
+Leaks:  924
 Freed:  0
 Reused: 0
-Allocs: 920
+Allocs: 924
 Retain: 0
 
 Unifications: 557
-Conjuncts:    1597
+Conjuncts:    1599
 Disjuncts:    190
 
 CloseIDElems: 10088
-NumCloseIDs: 829
+NumCloseIDs: 831
 -- out/evalalpha --
 Errors:
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
     ./in.cue:122:14
 structural cycle:
-    ./issue3903.cue:3:14
+    ./issue3903.cue:9:16
 structural cycle:
-    ./issue3903.cue:20:6
+    ./issue3903.cue:32:16
 
 Result:
 (_|_){
@@ -1021,7 +1021,7 @@ Result:
         }
         objs: (_|_){
           // [structural cycle] structural cycle:
-          //     ./issue3903.cue:3:14
+          //     ./issue3903.cue:9:16
         }
       }
       #Schema: (#struct){
@@ -1052,7 +1052,7 @@ Result:
         }
         objs: (_|_){
           // [structural cycle] structural cycle:
-          //     ./issue3903.cue:20:6
+          //     ./issue3903.cue:32:16
         }
       }
       s2: (#struct){
@@ -1094,9 +1094,9 @@ diff old new
 +selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
 +    ./in.cue:122:14
 +structural cycle:
-+    ./issue3903.cue:3:14
++    ./issue3903.cue:9:16
 +structural cycle:
-+    ./issue3903.cue:20:6
++    ./issue3903.cue:32:16
  
  Result:
  (_|_){
@@ -1433,7 +1433,7 @@ diff old new
 +        }
 +        objs: (_|_){
 +          // [structural cycle] structural cycle:
-+          //     ./issue3903.cue:3:14
++          //     ./issue3903.cue:9:16
 +        }
 +      }
 +      #Schema: (#struct){
@@ -1462,7 +1462,7 @@ diff old new
 +        }
 +        objs: (_|_){
 +          // [structural cycle] structural cycle:
-+          //     ./issue3903.cue:20:6
++          //     ./issue3903.cue:32:16
          }
        }
        s2: (#struct){
@@ -1480,18 +1480,18 @@ diff old new
 -Unifications: 953
 -Conjuncts:    2946
 -Disjuncts:    1686
-+Leaks:  920
++Leaks:  924
 +Freed:  0
 +Reused: 0
-+Allocs: 920
++Allocs: 924
 +Retain: 0
 +
 +Unifications: 557
-+Conjuncts:    1597
++Conjuncts:    1599
 +Disjuncts:    190
 +
 +CloseIDElems: 10088
-+NumCloseIDs: 829
++NumCloseIDs: 831
 -- out/eval/stats --
 Leaks:  74
 Freed:  1367

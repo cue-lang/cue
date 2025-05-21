@@ -1004,23 +1004,6 @@ issue3535.regular.foo.regular: field not allowed:
 issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
     ./issue3729.cue:9:9
     ./issue3729.cue:11:9
-issue3935.full.out: 4 errors in empty disjunction:
-issue3935.full.out.spec.config: field not allowed:
-    ./issue3935.cue:19:4
-    ./issue3935.cue:32:4
-issue3935.full.out.spec.name: field not allowed:
-    ./issue3935.cue:18:4
-    ./issue3935.cue:31:4
-issue3935.full.out.spec.otherRegular: field not allowed:
-    ./issue3935.cue:25:4
-issue3935.full.out.spec.otherRequired: field not allowed:
-    ./issue3935.cue:26:4
-issue3935.reduced.out: 2 errors in empty disjunction:
-issue3935.reduced.out.y.other: field not allowed:
-    ./issue3935.cue:6:9
-issue3935.reduced.out.y.x: field not allowed:
-    ./issue3935.cue:4:6
-    ./issue3935.cue:11:7
 noStackOverflowStructCycle.#list.tail: structural cycle
 noStackOverflowStructCycle.list.tail: structural cycle
 provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -1848,20 +1831,13 @@ Result:
       }
     }
   }
-  issue3935: (_|_){
-    // [eval]
-    reduced: (_|_){
-      // [eval]
-      out: (_|_){
-        // [eval] issue3935.reduced.out: 2 errors in empty disjunction:
-        // issue3935.reduced.out.y.other: field not allowed:
-        //     ./issue3935.cue:6:9
-        // issue3935.reduced.out.y.x: field not allowed:
-        //     ./issue3935.cue:4:6
-        //     ./issue3935.cue:11:7
+  issue3935: (struct){
+    reduced: (struct){
+      out: (#struct){
         y: (#struct){
           x: (string){ "bar" }
         }
+        x: (string){ "bar" }
       }
       #A: (#struct){
         y: (#struct){
@@ -1875,27 +1851,16 @@ Result:
         }
       }
     }
-    full: (_|_){
-      // [eval]
-      out: (_|_){
-        // [eval] issue3935.full.out: 4 errors in empty disjunction:
-        // issue3935.full.out.spec.config: field not allowed:
-        //     ./issue3935.cue:19:4
-        //     ./issue3935.cue:32:4
-        // issue3935.full.out.spec.name: field not allowed:
-        //     ./issue3935.cue:18:4
-        //     ./issue3935.cue:31:4
-        // issue3935.full.out.spec.otherRegular: field not allowed:
-        //     ./issue3935.cue:25:4
-        // issue3935.full.out.spec.otherRequired: field not allowed:
-        //     ./issue3935.cue:26:4
+    full: (struct){
+      out: (#struct){
         spec: (#struct){
           name: (string){ "foo" }
           config: (#struct){
             namespace: (string){ "bar" }
           }
         }
-        _specConfig: (_){ _ }
+        namespace: (string){ "bar" }
+        _specConfig: ~(issue3935.full.out.spec.config)
       }
       #SchemaOther: (#struct){
         spec: (#struct){
@@ -1988,7 +1953,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,39 +1,36 @@
+@@ -1,39 +1,19 @@
  Errors:
  embed.fail1.p: field not allowed:
 -    ./in.cue:37:9
@@ -2014,23 +1979,6 @@ diff old new
      ./issue3729.cue:9:9
 -    ./issue3729.cue:10:2
      ./issue3729.cue:11:9
-+issue3935.full.out: 4 errors in empty disjunction:
-+issue3935.full.out.spec.config: field not allowed:
-+    ./issue3935.cue:19:4
-+    ./issue3935.cue:32:4
-+issue3935.full.out.spec.name: field not allowed:
-+    ./issue3935.cue:18:4
-+    ./issue3935.cue:31:4
-+issue3935.full.out.spec.otherRegular: field not allowed:
-+    ./issue3935.cue:25:4
-+issue3935.full.out.spec.otherRequired: field not allowed:
-+    ./issue3935.cue:26:4
-+issue3935.reduced.out: 2 errors in empty disjunction:
-+issue3935.reduced.out.y.other: field not allowed:
-+    ./issue3935.cue:6:9
-+issue3935.reduced.out.y.x: field not allowed:
-+    ./issue3935.cue:4:6
-+    ./issue3935.cue:11:7
  noStackOverflowStructCycle.#list.tail: structural cycle
  noStackOverflowStructCycle.list.tail: structural cycle
  provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -2045,7 +1993,7 @@ diff old new
      ./in.cue:591:9
  fieldMismatch.a: cannot combine regular field "x" with 2:
      ./in.cue:152:7
-@@ -79,8 +76,8 @@
+@@ -79,8 +59,8 @@
    }
    fail: (struct){
      a: (_|_){
@@ -2056,7 +2004,7 @@ diff old new
      }
    }
    embed: (_|_){
-@@ -89,10 +86,6 @@
+@@ -89,10 +69,6 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail1.p: field not allowed:
@@ -2067,7 +2015,7 @@ diff old new
          //     ./in.cue:46:4
          //     ./in.cue:49:9
        }
-@@ -121,12 +114,11 @@
+@@ -121,12 +97,11 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail4.p: field not allowed:
@@ -2084,7 +2032,7 @@ diff old new
        }
      }
      #C4: (#struct){
-@@ -207,13 +199,10 @@
+@@ -207,13 +182,10 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -2102,7 +2050,7 @@ diff old new
      }
      t2: (_|_){
        // [eval]
-@@ -229,10 +218,7 @@
+@@ -229,10 +201,7 @@
            // [eval]
            d: (_|_){
              // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -2113,7 +2061,7 @@ diff old new
            }
          }
          b: (bool){ true }
-@@ -263,9 +249,22 @@
+@@ -263,9 +232,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -2139,7 +2087,7 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -279,24 +278,9 @@
+@@ -279,24 +261,9 @@
          }
        }
      }
@@ -2167,7 +2115,7 @@ diff old new
    }
    closedCheck: (struct){
      success1: (struct){
-@@ -399,13 +383,7 @@
+@@ -399,13 +366,7 @@
            }
          }
        }
@@ -2182,7 +2130,7 @@ diff old new
        #F: (#struct){
          e: (bool){ bool }
          f: (_|_){
-@@ -422,17 +400,11 @@
+@@ -422,17 +383,11 @@
          }
        }
        E: (_|_){
@@ -2201,7 +2149,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -443,17 +415,11 @@
+@@ -443,17 +398,11 @@
          }
        }
        E: (_|_){
@@ -2220,7 +2168,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -576,9 +542,6 @@
+@@ -576,9 +525,6 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -2230,7 +2178,7 @@ diff old new
              //     ./in.cue:591:9
            }
          }
-@@ -602,13 +565,13 @@
+@@ -602,13 +548,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -2248,7 +2196,7 @@ diff old new
          }
        }
      }
-@@ -645,9 +608,8 @@
+@@ -645,9 +591,8 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -2260,7 +2208,7 @@ diff old new
      }
    }
    errorPropagation: (_|_){
-@@ -705,10 +667,10 @@
+@@ -705,10 +650,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -2273,7 +2221,7 @@ diff old new
        }
      }
      regular: (_|_){
-@@ -721,16 +683,11 @@
+@@ -721,16 +666,11 @@
        foo: (_|_){
          // [eval]
          kind: (string){ "foo" }
@@ -2292,7 +2240,7 @@ diff old new
          }
        }
      }
-@@ -742,10 +699,10 @@
+@@ -742,10 +682,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -2305,7 +2253,7 @@ diff old new
        }
      }
    }
-@@ -816,7 +773,6 @@
+@@ -816,7 +756,6 @@
        root: (_|_){
          // [eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
          //     ./issue3729.cue:9:9
@@ -2313,7 +2261,7 @@ diff old new
          //     ./issue3729.cue:11:9
          #sub1?: (#struct){
            #sub2: (bool){ true }
-@@ -864,14 +820,7 @@
+@@ -864,14 +803,7 @@
      }
      full: (struct){
        #Application: (#struct){
@@ -2329,48 +2277,20 @@ diff old new
        }
        #ApplicationSpec: (#struct){
          syncPolicy?: ((null|struct)){ |((null){ null }, (#struct){
-@@ -904,10 +853,17 @@
-       }
-     }
-   }
--  issue3935: (struct){
--    reduced: (struct){
--      out: (#struct){
+@@ -907,10 +839,10 @@
+   issue3935: (struct){
+     reduced: (struct){
+       out: (#struct){
 -        x: (string){ "bar" }
-+  issue3935: (_|_){
-+    // [eval]
-+    reduced: (_|_){
-+      // [eval]
-+      out: (_|_){
-+        // [eval] issue3935.reduced.out: 2 errors in empty disjunction:
-+        // issue3935.reduced.out.y.other: field not allowed:
-+        //     ./issue3935.cue:6:9
-+        // issue3935.reduced.out.y.x: field not allowed:
-+        //     ./issue3935.cue:4:6
-+        //     ./issue3935.cue:11:7
          y: (#struct){
            x: (string){ "bar" }
          }
-@@ -924,18 +880,27 @@
-         }
++        x: (string){ "bar" }
        }
-     }
--    full: (struct){
--      out: (#struct){
-+    full: (_|_){
-+      // [eval]
-+      out: (_|_){
-+        // [eval] issue3935.full.out: 4 errors in empty disjunction:
-+        // issue3935.full.out.spec.config: field not allowed:
-+        //     ./issue3935.cue:19:4
-+        //     ./issue3935.cue:32:4
-+        // issue3935.full.out.spec.name: field not allowed:
-+        //     ./issue3935.cue:18:4
-+        //     ./issue3935.cue:31:4
-+        // issue3935.full.out.spec.otherRegular: field not allowed:
-+        //     ./issue3935.cue:25:4
-+        // issue3935.full.out.spec.otherRequired: field not allowed:
-+        //     ./issue3935.cue:26:4
+       #A: (#struct){
+         y: (#struct){
+@@ -928,14 +860,12 @@
+       out: (#struct){
          spec: (#struct){
            name: (string){ "foo" }
 -          config: (struct){
@@ -2378,15 +2298,15 @@ diff old new
              namespace: (string){ "bar" }
            }
          }
--        namespace: (string){ "bar" }
+         namespace: (string){ "bar" }
 -        _specConfig: (#struct){
 -          namespace: (string){ "bar" }
 -        }
-+        _specConfig: (_){ _ }
++        _specConfig: ~(issue3935.full.out.spec.config)
        }
        #SchemaOther: (#struct){
          spec: (#struct){
-@@ -950,7 +915,7 @@
+@@ -950,7 +880,7 @@
            config!: (_){ _ }
          }
          namespace: (_|_){
@@ -2403,11 +2323,11 @@ Allocs: 748
 Retain: 0
 
 Unifications: 638
-Conjuncts:    1092
+Conjuncts:    1093
 Disjuncts:    48
 
-CloseIDElems: 275
-NumCloseIDs: 189
+CloseIDElems: 286
+NumCloseIDs: 190
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -2429,11 +2349,11 @@ diff old new
 +Retain: 0
 +
 +Unifications: 638
-+Conjuncts:    1092
++Conjuncts:    1093
 +Disjuncts:    48
 +
-+CloseIDElems: 275
-+NumCloseIDs: 189
++CloseIDElems: 286
++NumCloseIDs: 190
 -- out/eval/stats --
 Leaks:  74
 Freed:  602

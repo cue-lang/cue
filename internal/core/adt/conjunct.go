@@ -58,6 +58,8 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 
 	env := c.Env
 
+	n.markNonCyclic(id)
+
 	switch x := c.Elem().(type) {
 	case *ConjunctGroup:
 		for _, c := range *x {

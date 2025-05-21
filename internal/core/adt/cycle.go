@@ -709,6 +709,14 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 	return ci, false
 }
 
+// markNonCyclic records when a non-cyclic conjunct is processed.
+func (n *nodeContext) markNonCyclic(id CloseInfo) {
+	switch id.CycleType {
+	case NoCycle, IsOptional:
+		n.hasNonCyclic = true
+	}
+}
+
 // markCyclicV3 marks a conjunct as being cyclic. Also, it postpones processing
 // the conjunct in the absence of evidence of a non-cyclic conjunct.
 func (n *nodeContext) markCyclicV3(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (CloseInfo, bool) {

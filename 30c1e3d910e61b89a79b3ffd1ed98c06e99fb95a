@@ -16,6 +16,24 @@
       "message": "Maybe mirror the language of the previous sentence to make things clearer?\n\n```suggestion\n// To convert CUE to JSON, use [encoding/json.Marshal] on a [cue.Value].\n```",
       "revId": "30c1e3d910e61b89a79b3ffd1ed98c06e99fb95a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51c65642_14a5f39f",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-21T14:45:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59acc675_0fa3023c",
+      "revId": "30c1e3d910e61b89a79b3ffd1ed98c06e99fb95a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

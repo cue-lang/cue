@@ -1066,9 +1066,6 @@ type nodeContext struct {
 	vLists []*Vertex
 	exprs  []envExpr
 
-	// TODO: remove
-	closeParent *nodeContext
-
 	// These fields are used to track type checking.
 	reqDefIDs    []refInfo
 	replaceIDs   []replaceID

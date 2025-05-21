@@ -140,18 +140,18 @@ issue3638: compare: {
 	#x: { a: int } | *{ b: 2 }
 }
 -- out/evalalpha/stats --
-Leaks:  332
+Leaks:  302
 Freed:  0
 Reused: 0
-Allocs: 332
+Allocs: 302
 Retain: 0
 
-Unifications: 248
-Conjuncts:    487
-Disjuncts:    63
+Unifications: 229
+Conjuncts:    453
+Disjuncts:    53
 
-CloseIDElems: 1023
-NumCloseIDs: 130
+CloseIDElems: 121
+NumCloseIDs: 125
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -166,18 +166,18 @@ diff old new
 -Unifications: 214
 -Conjuncts:    639
 -Disjuncts:    297
-+Leaks:  332
++Leaks:  302
 +Freed:  0
 +Reused: 0
-+Allocs: 332
++Allocs: 302
 +Retain: 0
 +
-+Unifications: 248
-+Conjuncts:    487
-+Disjuncts:    63
++Unifications: 229
++Conjuncts:    453
++Disjuncts:    53
 +
-+CloseIDElems: 1023
-+NumCloseIDs: 130
++CloseIDElems: 121
++NumCloseIDs: 125
 -- out/eval/stats --
 Leaks:  4
 Freed:  269

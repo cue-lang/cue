@@ -487,9 +487,7 @@ Result:
         }
       }
       _inputByName: (struct){
-        foo: (struct){
-          name: (string){ "foo" }
-        }
+        foo: ~(issue3903.full._input)
       }
       _template: (struct){
         input: (struct){
@@ -503,13 +501,9 @@ Result:
       }
       foo: (struct){
         input: (struct){
-          name: (string){ string }
+          name: (string){ "foo" }
         }
-        result: (_|_){
-          // [incomplete] issue3903.full.foo.result: invalid interpolation: non-concrete value string (type string):
-          //     ./let.cue:21:11
-          //     ./let.cue:20:16
-        }
+        result: (string){ "result-foo" }
       }
     }
     noshare: (struct){
@@ -868,7 +862,7 @@ diff old new
        b: (struct){
          c: (int){ 1 }
        }
-@@ -293,14 +246,14 @@
+@@ -293,14 +246,12 @@
            name: (string){ "foo" }
          }, (null){ null }) }
        let _inputList#2 = (#list){
@@ -885,30 +879,11 @@ diff old new
 +        }
 +      }
 +      _inputByName: (struct){
-+        foo: (struct){
-+          name: (string){ "foo" }
-+        }
++        foo: ~(issue3903.full._input)
        }
        _template: (struct){
          input: (struct){
-@@ -314,9 +267,13 @@
-       }
-       foo: (struct){
-         input: (struct){
--          name: (string){ "foo" }
--        }
--        result: (string){ "result-foo" }
-+          name: (string){ string }
-+        }
-+        result: (_|_){
-+          // [incomplete] issue3903.full.foo.result: invalid interpolation: non-concrete value string (type string):
-+          //     ./let.cue:21:11
-+          //     ./let.cue:20:16
-+        }
-       }
-     }
-     noshare: (struct){
-@@ -324,14 +281,14 @@
+@@ -324,14 +275,14 @@
            name: (string){ "foo" }
          }, (null){ null }) }
        let _inputList#3 = (#list){
@@ -931,7 +906,7 @@ diff old new
        }
        _template: (struct){
          input: (struct){
-@@ -345,9 +302,13 @@
+@@ -345,9 +296,13 @@
        }
        foo: (struct){
          input: (struct){
@@ -948,7 +923,7 @@ diff old new
        }
      }
    }
-@@ -356,17 +317,13 @@
+@@ -356,17 +311,13 @@
        a: (struct){
          b: (struct){
            c: (struct){
@@ -972,7 +947,7 @@ diff old new
        }
        Y: (struct){
          c: (struct){
-@@ -384,10 +341,7 @@
+@@ -384,10 +335,7 @@
        }
      }
      #Deployment: (#struct){
@@ -984,7 +959,7 @@ diff old new
      }
      #ObjectMeta: (#struct){
        name?: (#struct){
-@@ -419,9 +373,7 @@
+@@ -419,9 +367,7 @@
            // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
            //     ./sharecycle.cue:8:6
            //     ./sharecycle.cue:9:5

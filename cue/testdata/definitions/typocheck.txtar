@@ -448,18 +448,18 @@ full: {
 	out: (#Main & {namespace: "ns1"}).output
 }
 -- out/evalalpha/stats --
-Leaks:  739
+Leaks:  738
 Freed:  0
 Reused: 0
-Allocs: 739
+Allocs: 738
 Retain: 0
 
-Unifications: 611
-Conjuncts:    1199
+Unifications: 615
+Conjuncts:    1193
 Disjuncts:    45
 
-CloseIDElems: 1839
-NumCloseIDs: 395
+CloseIDElems: 1859
+NumCloseIDs: 386
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -474,18 +474,18 @@ diff old new
 -Unifications: 918
 -Conjuncts:    1892
 -Disjuncts:    1189
-+Leaks:  739
++Leaks:  738
 +Freed:  0
 +Reused: 0
-+Allocs: 739
++Allocs: 738
 +Retain: 0
 +
-+Unifications: 611
-+Conjuncts:    1199
++Unifications: 615
++Conjuncts:    1193
 +Disjuncts:    45
 +
-+CloseIDElems: 1839
-+NumCloseIDs: 395
++CloseIDElems: 1859
++NumCloseIDs: 386
 -- out/eval/stats --
 Leaks:  115
 Freed:  879
@@ -1351,7 +1351,7 @@ Result:
           op: (string){ "add" }
           path: (string){ "/metadata" }
           value: (_|_){
-            // [incomplete] full.#Resource.patches.0.value: invalid interpolation: non-concrete value string (type string):
+            // [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
             //     ./large.cue:7:25
             //     ./large.cue:3:12
           }
@@ -1380,7 +1380,7 @@ Result:
     #Main: (#struct){
       namespace: (string){ string }
       output: (_|_){
-        // [incomplete] full.#Main.output: key value of dynamic field must be concrete, found string:
+        // [incomplete] full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
         //     ./large.cue:21:24
         //     ./large.cue:19:15
       }
@@ -1403,7 +1403,7 @@ Result:
               op: (string){ "add" }
               path: (string){ "/metadata" }
               value: (_|_){
-                // [incomplete] full.#Main.jsonPatch.base.patches.0.value: invalid interpolation: non-concrete value string (type string):
+                // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
                 //     ./large.cue:7:25
                 //     ./large.cue:3:12
               }
@@ -2159,12 +2159,21 @@ diff old new
      }
      #Foo: (#struct){
        foo?: ((null|struct)){ |(*(#struct){
+@@ -983,7 +852,7 @@
+           op: (string){ "add" }
+           path: (string){ "/metadata" }
+           value: (_|_){
+-            // [incomplete] full.#Resource.patches.0.value: invalid interpolation: non-concrete value string (type string):
++            // [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+             //     ./large.cue:7:25
+             //     ./large.cue:3:12
+           }
 @@ -1012,38 +881,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
 -        // [incomplete] full.#Main.output: invalid non-ground value string (must be concrete string):
-+        // [incomplete] full.#Main.output: key value of dynamic field must be concrete, found string:
++        // [incomplete] full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
 +        //     ./large.cue:21:24
          //     ./large.cue:19:15
 -        //     ./large.cue:41:15
@@ -2200,6 +2209,15 @@ diff old new
          let base#6 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
+@@ -1062,7 +904,7 @@
+               op: (string){ "add" }
+               path: (string){ "/metadata" }
+               value: (_|_){
+-                // [incomplete] full.#Main.jsonPatch.base.patches.0.value: invalid interpolation: non-concrete value string (type string):
++                // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+                 //     ./large.cue:7:25
+                 //     ./large.cue:3:12
+               }
 @@ -1086,6 +928,19 @@
              }
            }

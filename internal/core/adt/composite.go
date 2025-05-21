@@ -379,6 +379,11 @@ func (v *Vertex) Rooted() bool {
 	return !v.nonRooted && !v.Label.IsLet() && !v.IsDynamic
 }
 
+// Internal is like !Rooted, but also counts internal let nodes as internal.
+func (v *Vertex) Internal() bool {
+	return v.nonRooted || v.anonymous || v.IsDynamic
+}
+
 // IsDetached reports whether this Vertex does not have a path from the root.
 func (v *Vertex) IsDetached() bool {
 	// v might have resulted from an inline struct that was subsequently shared.

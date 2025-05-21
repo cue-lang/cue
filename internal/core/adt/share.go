@@ -161,7 +161,7 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 	// See Issue #3801: structure sharing seems to be broken for non-rooted
 	// values. We disable sharing for now.
 	// TODO: make sharing work again for non-rooted structs.
-	if arc.nonRooted || arc.IsDynamic || arc.anonymous {
+	if arc.nonRooted || arc.IsDynamic {
 		return false
 	}
 

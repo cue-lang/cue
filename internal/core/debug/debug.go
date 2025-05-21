@@ -132,7 +132,6 @@ func (w *printer) shared(v *adt.Vertex) {
 // of v, if it is a shared node. It reports the dereferenced node and whether
 // the node was printed.
 func (w *printer) printShared(v0 *adt.Vertex) (x *adt.Vertex, ok bool) {
-
 	// Handle cyclic shared nodes differently.  If a shared node was part of
 	// a disjunction, it will still be wrapped in a disjunct Vertex.
 	// Similarly, a shared node should never point to a disjunct directly,
@@ -142,7 +141,7 @@ func (w *printer) printShared(v0 *adt.Vertex) (x *adt.Vertex, ok bool) {
 	isCyclic := v0.IsCyclic
 	s, ok := v0.BaseValue.(*adt.Vertex)
 	v1 := v0.DerefValue()
-	useReference := v0.IsShared && v1.Rooted()
+	useReference := v0.IsShared && !v1.Internal()
 	isCyclic = isCyclic || v1.IsCyclic
 	_ = isCyclic
 	// NOTE(debug): use this line instead of the following to expand shared

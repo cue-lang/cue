@@ -61,18 +61,18 @@ fib12: (fib & {n: 12}).out // Error
   }).out
 }
 -- out/evalalpha/stats --
-Leaks:  70
+Leaks:  78
 Freed:  0
 Reused: 0
-Allocs: 70
+Allocs: 78
 Retain: 0
 
 Unifications: 62
-Conjuncts:    132
+Conjuncts:    140
 Disjuncts:    0
 
 CloseIDElems: 0
-NumCloseIDs: 25
+NumCloseIDs: 41
 -- out/evalalpha --
 Errors:
 structural cycle:
@@ -135,18 +135,18 @@ diff old new
 -Unifications: 196
 -Conjuncts:    464
 -Disjuncts:    268
-+Leaks:  70
++Leaks:  78
 +Freed:  0
 +Reused: 0
-+Allocs: 70
++Allocs: 78
 +Retain: 0
 +
 +Unifications: 62
-+Conjuncts:    132
++Conjuncts:    140
 +Disjuncts:    0
 +
 +CloseIDElems: 0
-+NumCloseIDs: 25
++NumCloseIDs: 41
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

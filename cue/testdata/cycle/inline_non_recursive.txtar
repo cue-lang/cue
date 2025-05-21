@@ -94,23 +94,21 @@ select: indirect: {
 	opt?: run?: string
 }
 -- out/evalalpha/stats --
-Leaks:  213
+Leaks:  225
 Freed:  0
 Reused: 0
-Allocs: 213
+Allocs: 225
 Retain: 0
 
-Unifications: 135
-Conjuncts:    354
+Unifications: 141
+Conjuncts:    375
 Disjuncts:    0
 
 CloseIDElems: 14
-NumCloseIDs: 167
+NumCloseIDs: 178
 -- out/evalalpha --
 Errors:
 issue3182.first.t2.x.b: structural cycle
-structural cycle:
-    ./in.cue:56:8
 
 Result:
 (_|_){
@@ -155,8 +153,7 @@ Result:
     k20: (int){ 0 }
     k30: (int){ 0 }
   }
-  issue1708: (_|_){
-    // [structural cycle]
+  issue1708: (struct){
     #add10: (#struct){
       in: (number){ number }
       a10: (#struct){
@@ -175,13 +172,10 @@ Result:
     }
     k00: (int){ 0 }
     k10: (int){ 10 }
-    k20: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:56:8
-    }
+    k20: (int){ 20 }
     k30: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:56:8
+      // [incomplete] a10.i: undefined field: out:
+      //     ./in.cue:56:28
     }
   }
   issue3182: (_|_){
@@ -258,41 +252,23 @@ diff old new
 -Unifications: 746
 -Conjuncts:    2813
 -Disjuncts:    1485
-+Leaks:  213
++Leaks:  225
 +Freed:  0
 +Reused: 0
-+Allocs: 213
++Allocs: 225
 +Retain: 0
 +
-+Unifications: 135
-+Conjuncts:    354
++Unifications: 141
++Conjuncts:    375
 +Disjuncts:    0
 +
 +CloseIDElems: 14
-+NumCloseIDs: 167
++NumCloseIDs: 178
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,7 @@
- Errors:
- issue3182.first.t2.x.b: structural cycle
-+structural cycle:
-+    ./in.cue:56:8
- 
- Result:
- (_|_){
-@@ -44,7 +46,8 @@
-     k20: (int){ 0 }
-     k30: (int){ 0 }
-   }
--  issue1708: (struct){
-+  issue1708: (_|_){
-+    // [structural cycle]
-     #add10: (#struct){
-       in: (number){ number }
-       a10: (#struct){
-@@ -53,20 +56,24 @@
+@@ -53,20 +53,21 @@
            // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
            //     ./in.cue:52:20
            //     ./in.cue:51:7
@@ -309,20 +285,16 @@ diff old new
      }
      k00: (int){ 0 }
      k10: (int){ 10 }
--    k20: (int){ 20 }
+     k20: (int){ 20 }
 -    k30: (int){ 30 }
-+    k20: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:56:8
-+    }
 +    k30: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:56:8
++      // [incomplete] a10.i: undefined field: out:
++      //     ./in.cue:56:28
 +    }
    }
    issue3182: (_|_){
      // [structural cycle]
-@@ -116,7 +123,6 @@
+@@ -116,7 +117,6 @@
          //     ./select.cue:8:15
          // select.indirect.#Job.req: field is required but not present:
          //     ./select.cue:8:8

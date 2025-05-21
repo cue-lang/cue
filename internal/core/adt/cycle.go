@@ -666,13 +666,6 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 
 	for r := ci.Refs; r != nil; r = r.Next {
 		if equalDeref(r.Arc, arc) {
-			// TODO(dyncyclecheck): this block can go now and its removal will
-			// have some benefits. But do this in a separate CL.
-			if n.node.IsDynamic {
-				n.reportCycleError()
-				return ci, true
-			}
-
 			if equalDeref(r.Node, n.node) {
 				// reference cycle
 				return ci, true

@@ -196,10 +196,7 @@ func (v *Vertex) insertConjunct(ctx *OpContext, c Conjunct, id CloseInfo, mode A
 		return 0, false
 	}
 
-	switch id.CycleType {
-	case NoCycle, IsOptional:
-		n.hasNonCyclic = true
-	}
+	n.markNonCyclic(id)
 
 	v.updateArcType(mode)
 

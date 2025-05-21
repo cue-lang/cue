@@ -178,8 +178,6 @@ disjunctionCycle.b: cannot use 1 (type int) as type list:
     ./in.cue:56:9
 b: structural cycle:
     ./in.cue:62:6
-structural cycle:
-    ./in.cue:85:12
 listAddCycle.c: structural cycle:
     ./in.cue:91:5
 listMulCycle.c: structural cycle:
@@ -303,19 +301,12 @@ Result:
       // [structural cycle] structCycle.c: structural cycle
     }
   }
-  embedCycle: (_|_){
-    // [structural cycle]
-    a: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:85:12
+  embedCycle: (struct){
+    a: (#struct){
     }
-    b: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:85:12
+    b: (#struct){
     }
-    c: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:85:12
+    c: (#struct){
     }
   }
   listAddCycle: (_|_){
@@ -377,7 +368,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,33 +1,22 @@
+@@ -1,33 +1,20 @@
  Errors:
 -closeCycle.a: structural cycle
 -closeCycle.b.d: structural cycle
@@ -411,8 +402,6 @@ diff old new
 -    ./in.cue:85:11
 -printCycle.a.X.X: structural cycle:
 -    ./in.cue:113:6
-+structural cycle:
-+    ./in.cue:85:12
 +listAddCycle.c: structural cycle:
 +    ./in.cue:91:5
 +listMulCycle.c: structural cycle:
@@ -420,7 +409,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -65,14 +54,9 @@
+@@ -65,14 +52,9 @@
      }
      t2: (struct){
        a: (struct){
@@ -438,7 +427,7 @@ diff old new
          }
          x: (struct){
            y: (string){ "" }
-@@ -88,17 +72,17 @@
+@@ -88,17 +70,17 @@
    disjunctionCycle: (_|_){
      // [eval]
      a: (_|_){
@@ -467,7 +456,7 @@ diff old new
        //     ./in.cue:56:5
        //     ./in.cue:56:9
      }
-@@ -124,80 +108,77 @@
+@@ -124,80 +106,70 @@
      }
      b: (struct){
      }
@@ -516,20 +505,11 @@ diff old new
 -    c: (_|_){
 -      // [structural cycle] structCycle.c: structural cycle:
 -      //     ./in.cue:79:14
-+    a: ~(structCycle.b)
-+    b: (_|_){
-+      // [structural cycle]
-+      d: (_|_){
-+        // [structural cycle] structCycle.c: structural cycle
-+      }
-+    }
-+    c: (_|_){
-+      // [structural cycle] structCycle.c: structural cycle
-     }
-   }
-   embedCycle: (_|_){
-     // [structural cycle]
-     a: (_|_){
+-    }
+-  }
+-  embedCycle: (_|_){
+-    // [structural cycle]
+-    a: (_|_){
 -      // [structural cycle] embedCycle: structural cycle:
 -      //     ./in.cue:85:11
 -    }
@@ -540,16 +520,23 @@ diff old new
 -    c: (_|_){
 -      // [structural cycle] embedCycle: structural cycle:
 -      //     ./in.cue:85:11
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:85:12
-+    }
++    a: ~(structCycle.b)
 +    b: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:85:12
++      // [structural cycle]
++      d: (_|_){
++        // [structural cycle] structCycle.c: structural cycle
++      }
 +    }
 +    c: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:85:12
++      // [structural cycle] structCycle.c: structural cycle
++    }
++  }
++  embedCycle: (struct){
++    a: (#struct){
++    }
++    b: (#struct){
++    }
++    c: (#struct){
      }
    }
    listAddCycle: (_|_){
@@ -597,7 +584,7 @@ diff old new
      }
    }
    closeFail: (_|_){
-@@ -207,21 +188,21 @@
+@@ -207,21 +179,21 @@
      }
      x: (_|_){
        // [eval]
@@ -624,9 +611,6 @@ diff old new
      }
    }
  }
--- diff/explanation --
-embedCycle: technically not a structural cycle, so V3 result
-is okay or even an improvement. See TODO(dyncyclecheck).
 -- out/eval --
 Errors:
 closeCycle.a: structural cycle

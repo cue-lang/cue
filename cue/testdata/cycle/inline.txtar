@@ -395,18 +395,18 @@ issue3731: full: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  332
+Leaks:  333
 Freed:  0
 Reused: 0
-Allocs: 332
+Allocs: 333
 Retain: 0
 
 Unifications: 253
-Conjuncts:    639
+Conjuncts:    640
 Disjuncts:    0
 
 CloseIDElems: 329
-NumCloseIDs: 229
+NumCloseIDs: 230
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -421,18 +421,18 @@ diff old new
 -Unifications: 539
 -Conjuncts:    1663
 -Disjuncts:    943
-+Leaks:  332
++Leaks:  333
 +Freed:  0
 +Reused: 0
-+Allocs: 332
++Allocs: 333
 +Retain: 0
 +
 +Unifications: 253
-+Conjuncts:    639
++Conjuncts:    640
 +Disjuncts:    0
 +
 +CloseIDElems: 329
-+NumCloseIDs: 229
++NumCloseIDs: 230
 -- out/eval/stats --
 Leaks:  286
 Freed:  253

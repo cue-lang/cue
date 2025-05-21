@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/kr/pretty"
 	"gopkg.in/yaml.v3"
 
 	"cuelang.org/go/cue/ast"
@@ -325,21 +324,4 @@ true
 			}
 		})
 	}
-}
-
-// TestX is for experimentation with the YAML package to figure out the
-// semantics of the Node type.
-func TestX(t *testing.T) {
-	t.Skip()
-	var n yaml.Node
-	yaml.Unmarshal([]byte(`
-# map
-map: {
-	# doc
-} # line 1
-
-`), &n)
-
-	pretty.Print(n)
-	t.Fail()
 }

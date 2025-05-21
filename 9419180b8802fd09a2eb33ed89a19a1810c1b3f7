@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6d4d8b3_a6687b02",
+        "filename": "cue/testdata/cycle/evaluate.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 629,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-21T13:18:35Z",
+      "side": 0,
+      "message": "we still need this explanation given that embedCycle is a cycle on evalv2 but not on evalv3, no?",
+      "revId": "9419180b8802fd09a2eb33ed89a19a1810c1b3f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

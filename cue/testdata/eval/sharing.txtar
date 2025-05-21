@@ -463,9 +463,7 @@ Result:
     }
   }
   _inputByName: (struct){
-    foo: (struct){
-      name: (string){ "foo" }
-    }
+    foo: ~(_input)
   }
   _template: (struct){
     input: (struct){
@@ -560,13 +558,9 @@ Result:
   }
   foo: (struct){
     input: (struct){
-      name: (string){ string }
+      name: (string){ "foo" }
     }
-    result: (_|_){
-      // [incomplete] foo.result: invalid interpolation: non-concrete value string (type string):
-      //     ./let.cue:20:10
-      //     ./let.cue:19:15
-    }
+    result: (string){ "result-foo" }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
@@ -807,7 +801,7 @@ diff old new
        b: (struct){
          c: (int){ 1 }
        }
-@@ -291,14 +244,14 @@
+@@ -291,14 +244,12 @@
        name: (string){ "foo" }
      }, (null){ null }) }
    let _inputList#2 = (#list){
@@ -822,13 +816,11 @@ diff old new
 -    foo: ((null|struct)){ |(*(struct){
 -        name: (string){ "foo" }
 -      }, (null){ null }) }
-+    foo: (struct){
-+      name: (string){ "foo" }
-+    }
++    foo: ~(_input)
    }
    _template: (struct){
      input: (struct){
-@@ -315,17 +268,13 @@
+@@ -315,17 +266,13 @@
        a: (struct){
          b: (struct){
            c: (struct){
@@ -852,7 +844,7 @@ diff old new
        }
        Y: (struct){
          c: (struct){
-@@ -343,10 +292,7 @@
+@@ -343,10 +290,7 @@
        }
      }
      #Deployment: (#struct){
@@ -864,7 +856,7 @@ diff old new
      }
      #ObjectMeta: (#struct){
        name?: (#struct){
-@@ -378,9 +324,7 @@
+@@ -378,9 +322,7 @@
            // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
            //     ./sharecycle.cue:8:6
            //     ./sharecycle.cue:9:5
@@ -875,22 +867,6 @@ diff old new
            }
          }
        }
-@@ -402,8 +346,12 @@
-   }
-   foo: (struct){
-     input: (struct){
--      name: (string){ "foo" }
--    }
--    result: (string){ "result-foo" }
-+      name: (string){ string }
-+    }
-+    result: (_|_){
-+      // [incomplete] foo.result: invalid interpolation: non-concrete value string (type string):
-+      //     ./let.cue:20:10
-+      //     ./let.cue:19:15
-+    }
-   }
- }
 -- out/eval --
 Errors:
 shareCycle.t1.Y.x.x: structural cycle

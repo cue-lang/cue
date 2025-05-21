@@ -179,16 +179,60 @@ issue3849: {
 	#Deployment: metadata?: #ObjectMeta
 	#ObjectMeta: name?: [string]: string
 }
--- out/eval/stats --
-Leaks:  11
-Freed:  194
-Reused: 188
-Allocs: 17
-Retain: 28
+-- let.cue --
+import "list"
 
-Unifications: 203
-Conjuncts:    401
-Disjuncts:    225
+issue3903: full: {
+	_input: null | *{name: "foo"}
+
+	let _inputList = list.FlattenN([_input], 0)
+
+	_inputByName: {
+		for input in _inputList {
+			(input.name): input
+		}
+	}
+
+	for name, _input in _inputByName {
+		(name): _template & {
+			input: _input
+		}
+	}
+	_template: {
+		input: name: string
+		result: "result-\(input.name)"
+	}
+}
+issue3903: noshare: {
+	_input: null | *{name: "foo"}
+
+	let _inputList = list.FlattenN([_input], 0)
+
+	_inputByName: {
+		for input in (_inputList & __no_sharing) {
+			(input.name): input
+		}
+	}
+	for name, _input in _inputByName {
+		(name): _template & {
+			input: _input
+		}
+	}
+	_template: {
+		input:  name: string
+		result: "result-\(input.name)"
+	}
+}
+-- out/eval/stats --
+Leaks:  12
+Freed:  266
+Reused: 260
+Allocs: 18
+Retain: 36
+
+Unifications: 252
+Conjuncts:    523
+Disjuncts:    305
 -- out/evalalpha --
 Errors:
 shareCycle.t1.Y.x.x: structural cycle
@@ -431,6 +475,78 @@ Result:
       out: (string){ "prefix: global value" }
     }
     _global: (string){ "global value" }
+  }
+  issue3903: (struct){
+    full: (struct){
+      _input: ((null|struct)){ |(*(struct){
+          name: (string){ "foo" }
+        }, (null){ null }) }
+      let _inputList#2 = (#list){
+        0: (struct){
+          name: (string){ "foo" }
+        }
+      }
+      _inputByName: (struct){
+        foo: (struct){
+          name: (string){ "foo" }
+        }
+      }
+      _template: (struct){
+        input: (struct){
+          name: (string){ string }
+        }
+        result: (_|_){
+          // [incomplete] issue3903.full._template.result: invalid interpolation: non-concrete value string (type string):
+          //     ./let.cue:21:11
+          //     ./let.cue:20:16
+        }
+      }
+      foo: (struct){
+        input: (struct){
+          name: (string){ string }
+        }
+        result: (_|_){
+          // [incomplete] issue3903.full.foo.result: invalid interpolation: non-concrete value string (type string):
+          //     ./let.cue:21:11
+          //     ./let.cue:20:16
+        }
+      }
+    }
+    noshare: (struct){
+      _input: ((null|struct)){ |(*(struct){
+          name: (string){ "foo" }
+        }, (null){ null }) }
+      let _inputList#3 = (#list){
+        0: (struct){
+          name: (string){ "foo" }
+        }
+      }
+      _inputByName: (struct){
+        foo: (struct){
+          name: (string){ "foo" }
+        }
+      }
+      _template: (struct){
+        input: (struct){
+          name: (string){ string }
+        }
+        result: (_|_){
+          // [incomplete] issue3903.noshare._template.result: invalid interpolation: non-concrete value string (type string):
+          //     ./let.cue:41:11
+          //     ./let.cue:40:17
+        }
+      }
+      foo: (struct){
+        input: (struct){
+          name: (string){ string }
+        }
+        result: (_|_){
+          // [incomplete] issue3903.noshare.foo.result: invalid interpolation: non-concrete value string (type string):
+          //     ./let.cue:41:11
+          //     ./let.cue:40:17
+        }
+      }
+    }
   }
   pending: (struct){
     t1: (struct){
@@ -752,7 +868,87 @@ diff old new
        b: (struct){
          c: (int){ 1 }
        }
-@@ -292,17 +245,13 @@
+@@ -293,14 +246,14 @@
+           name: (string){ "foo" }
+         }, (null){ null }) }
+       let _inputList#2 = (#list){
+-        0: ((null|struct)){ |(*(struct){
+-            name: (string){ "foo" }
+-          }, (null){ null }) }
+-      }
+-      _inputByName: (struct){
+-        foo: ((null|struct)){ |(*(struct){
+-            name: (string){ "foo" }
+-          }, (null){ null }) }
++        0: (struct){
++          name: (string){ "foo" }
++        }
++      }
++      _inputByName: (struct){
++        foo: (struct){
++          name: (string){ "foo" }
++        }
+       }
+       _template: (struct){
+         input: (struct){
+@@ -314,9 +267,13 @@
+       }
+       foo: (struct){
+         input: (struct){
+-          name: (string){ "foo" }
+-        }
+-        result: (string){ "result-foo" }
++          name: (string){ string }
++        }
++        result: (_|_){
++          // [incomplete] issue3903.full.foo.result: invalid interpolation: non-concrete value string (type string):
++          //     ./let.cue:21:11
++          //     ./let.cue:20:16
++        }
+       }
+     }
+     noshare: (struct){
+@@ -324,14 +281,14 @@
+           name: (string){ "foo" }
+         }, (null){ null }) }
+       let _inputList#3 = (#list){
+-        0: ((null|struct)){ |(*(struct){
+-            name: (string){ "foo" }
+-          }, (null){ null }) }
+-      }
+-      _inputByName: (struct){
+-        foo: ((null|struct)){ |(*(struct){
+-            name: (string){ "foo" }
+-          }, (null){ null }) }
++        0: (struct){
++          name: (string){ "foo" }
++        }
++      }
++      _inputByName: (struct){
++        foo: (struct){
++          name: (string){ "foo" }
++        }
+       }
+       _template: (struct){
+         input: (struct){
+@@ -345,9 +302,13 @@
+       }
+       foo: (struct){
+         input: (struct){
+-          name: (string){ "foo" }
+-        }
+-        result: (string){ "result-foo" }
++          name: (string){ string }
++        }
++        result: (_|_){
++          // [incomplete] issue3903.noshare.foo.result: invalid interpolation: non-concrete value string (type string):
++          //     ./let.cue:41:11
++          //     ./let.cue:40:17
++        }
+       }
+     }
+   }
+@@ -356,17 +317,13 @@
        a: (struct){
          b: (struct){
            c: (struct){
@@ -776,7 +972,7 @@ diff old new
        }
        Y: (struct){
          c: (struct){
-@@ -320,10 +269,7 @@
+@@ -384,10 +341,7 @@
        }
      }
      #Deployment: (#struct){
@@ -788,7 +984,7 @@ diff old new
      }
      #ObjectMeta: (#struct){
        name?: (#struct){
-@@ -355,9 +301,7 @@
+@@ -419,9 +373,7 @@
            // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
            //     ./sharecycle.cue:8:6
            //     ./sharecycle.cue:9:5
@@ -799,6 +995,8 @@ diff old new
            }
          }
        }
+-- diff/todo/p2 --
+issue3903.noshare.foo: should be error free, like with the full version.
 -- out/eval --
 Errors:
 shareCycle.t1.Y.x.x: structural cycle
@@ -1088,6 +1286,70 @@ Result:
       out: (string){ "prefix: global value" }
     }
     _global: (string){ "global value" }
+  }
+  issue3903: (struct){
+    full: (struct){
+      _input: ((null|struct)){ |(*(struct){
+          name: (string){ "foo" }
+        }, (null){ null }) }
+      let _inputList#2 = (#list){
+        0: ((null|struct)){ |(*(struct){
+            name: (string){ "foo" }
+          }, (null){ null }) }
+      }
+      _inputByName: (struct){
+        foo: ((null|struct)){ |(*(struct){
+            name: (string){ "foo" }
+          }, (null){ null }) }
+      }
+      _template: (struct){
+        input: (struct){
+          name: (string){ string }
+        }
+        result: (_|_){
+          // [incomplete] issue3903.full._template.result: invalid interpolation: non-concrete value string (type string):
+          //     ./let.cue:21:11
+          //     ./let.cue:20:16
+        }
+      }
+      foo: (struct){
+        input: (struct){
+          name: (string){ "foo" }
+        }
+        result: (string){ "result-foo" }
+      }
+    }
+    noshare: (struct){
+      _input: ((null|struct)){ |(*(struct){
+          name: (string){ "foo" }
+        }, (null){ null }) }
+      let _inputList#3 = (#list){
+        0: ((null|struct)){ |(*(struct){
+            name: (string){ "foo" }
+          }, (null){ null }) }
+      }
+      _inputByName: (struct){
+        foo: ((null|struct)){ |(*(struct){
+            name: (string){ "foo" }
+          }, (null){ null }) }
+      }
+      _template: (struct){
+        input: (struct){
+          name: (string){ string }
+        }
+        result: (_|_){
+          // [incomplete] issue3903.noshare._template.result: invalid interpolation: non-concrete value string (type string):
+          //     ./let.cue:41:11
+          //     ./let.cue:40:17
+        }
+      }
+      foo: (struct){
+        input: (struct){
+          name: (string){ "foo" }
+        }
+        result: (string){ "result-foo" }
+      }
+    }
   }
   pending: (struct){
     t1: (struct){
@@ -1386,6 +1648,61 @@ Result:
     [string]: {
       if true let orgBotUser = 〈1;_global〉 {
         out: ("prefix: " + 〈1;orgBotUser〉)
+      }
+    }
+  }
+}
+--- let.cue
+{
+  issue3903: {
+    full: {
+      _input: (null|*{
+        name: "foo"
+      })
+      let _inputList#2 = 〈import;list〉.FlattenN([
+        〈1;_input〉,
+      ], 0)
+      _inputByName: {
+        for _, input in 〈1;let _inputList#2〉 {
+          〈1;input〉.name: 〈1;input〉
+        }
+      }
+      for name, _input in 〈0;_inputByName〉 {
+        〈1;name〉: (〈2;_template〉 & {
+          input: 〈2;_input〉
+        })
+      }
+      _template: {
+        input: {
+          name: string
+        }
+        result: "result-\(〈0;input〉.name)"
+      }
+    }
+  }
+  issue3903: {
+    noshare: {
+      _input: (null|*{
+        name: "foo"
+      })
+      let _inputList#3 = 〈import;list〉.FlattenN([
+        〈1;_input〉,
+      ], 0)
+      _inputByName: {
+        for _, input in (〈1;let _inputList#3〉 & _|_(no sharing)) {
+          〈1;input〉.name: 〈1;input〉
+        }
+      }
+      for name, _input in 〈0;_inputByName〉 {
+        〈1;name〉: (〈2;_template〉 & {
+          input: 〈2;_input〉
+        })
+      }
+      _template: {
+        input: {
+          name: string
+        }
+        result: "result-\(〈0;input〉.name)"
       }
     }
   }

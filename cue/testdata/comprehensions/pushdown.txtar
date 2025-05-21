@@ -950,6 +950,48 @@ issue3894: full: {
 		}
 	}
 }
+-- issue3935.cue --
+issue3935: reduced: {
+	out: #A | #B
+	out: #B & {
+		y: x: "bar"
+	}
+	#A: y: other: int
+	#B: {
+		if true {
+			x: y.x
+		}
+		y!: x!: _
+	}
+}
+issue3935: full: {
+	out: #SchemaOther | #SchemaSelected
+	out: #SchemaSelected & {
+		spec: {
+			name: "foo"
+			config: namespace: "bar"
+		}
+	}
+	#SchemaOther: {
+		spec: {
+			otherOptional?: int
+			otherRegular:   int
+			otherRequired!: int
+		}
+	}
+	#SchemaSelected: {
+		spec!: {
+			name!: string
+			config!: _
+		}
+
+		if true {
+			namespace: _specConfig.namespace
+		}
+
+		_specConfig: spec.config
+	}
+}
 -- out/evalalpha --
 Errors:
 embed.fail1.p: field not allowed:
@@ -962,6 +1004,23 @@ issue3535.regular.foo.regular: field not allowed:
 issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
     ./issue3729.cue:9:9
     ./issue3729.cue:11:9
+issue3935.full.out: 4 errors in empty disjunction:
+issue3935.full.out.spec.config: field not allowed:
+    ./issue3935.cue:19:4
+    ./issue3935.cue:32:4
+issue3935.full.out.spec.name: field not allowed:
+    ./issue3935.cue:18:4
+    ./issue3935.cue:31:4
+issue3935.full.out.spec.otherRegular: field not allowed:
+    ./issue3935.cue:25:4
+issue3935.full.out.spec.otherRequired: field not allowed:
+    ./issue3935.cue:26:4
+issue3935.reduced.out: 2 errors in empty disjunction:
+issue3935.reduced.out.y.other: field not allowed:
+    ./issue3935.cue:6:9
+issue3935.reduced.out.y.x: field not allowed:
+    ./issue3935.cue:4:6
+    ./issue3935.cue:11:7
 noStackOverflowStructCycle.#list.tail: structural cycle
 noStackOverflowStructCycle.list.tail: structural cycle
 provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -1789,6 +1848,75 @@ Result:
       }
     }
   }
+  issue3935: (_|_){
+    // [eval]
+    reduced: (_|_){
+      // [eval]
+      out: (_|_){
+        // [eval] issue3935.reduced.out: 2 errors in empty disjunction:
+        // issue3935.reduced.out.y.other: field not allowed:
+        //     ./issue3935.cue:6:9
+        // issue3935.reduced.out.y.x: field not allowed:
+        //     ./issue3935.cue:4:6
+        //     ./issue3935.cue:11:7
+        y: (#struct){
+          x: (string){ "bar" }
+        }
+      }
+      #A: (#struct){
+        y: (#struct){
+          other: (int){ int }
+        }
+      }
+      #B: (#struct){
+        x: (_){ _ }
+        y!: (#struct){
+          x!: (_){ _ }
+        }
+      }
+    }
+    full: (_|_){
+      // [eval]
+      out: (_|_){
+        // [eval] issue3935.full.out: 4 errors in empty disjunction:
+        // issue3935.full.out.spec.config: field not allowed:
+        //     ./issue3935.cue:19:4
+        //     ./issue3935.cue:32:4
+        // issue3935.full.out.spec.name: field not allowed:
+        //     ./issue3935.cue:18:4
+        //     ./issue3935.cue:31:4
+        // issue3935.full.out.spec.otherRegular: field not allowed:
+        //     ./issue3935.cue:25:4
+        // issue3935.full.out.spec.otherRequired: field not allowed:
+        //     ./issue3935.cue:26:4
+        spec: (#struct){
+          name: (string){ "foo" }
+          config: (#struct){
+            namespace: (string){ "bar" }
+          }
+        }
+        _specConfig: (_){ _ }
+      }
+      #SchemaOther: (#struct){
+        spec: (#struct){
+          otherOptional?: (int){ int }
+          otherRegular: (int){ int }
+          otherRequired!: (int){ int }
+        }
+      }
+      #SchemaSelected: (#struct){
+        spec!: (#struct){
+          name!: (string){ string }
+          config!: (_){ _ }
+        }
+        namespace: (_|_){
+          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined as _specConfig is incomplete (type _):
+          //     ./issue3935.cue:36:15
+        }
+        _specConfig: (_){ _ }
+      }
+    }
+  }
   arcTypeAcrossTwo: (struct){
     a: (struct){
       b: (struct){
@@ -1860,7 +1988,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,39 +1,19 @@
+@@ -1,39 +1,36 @@
  Errors:
  embed.fail1.p: field not allowed:
 -    ./in.cue:37:9
@@ -1886,6 +2014,23 @@ diff old new
      ./issue3729.cue:9:9
 -    ./issue3729.cue:10:2
      ./issue3729.cue:11:9
++issue3935.full.out: 4 errors in empty disjunction:
++issue3935.full.out.spec.config: field not allowed:
++    ./issue3935.cue:19:4
++    ./issue3935.cue:32:4
++issue3935.full.out.spec.name: field not allowed:
++    ./issue3935.cue:18:4
++    ./issue3935.cue:31:4
++issue3935.full.out.spec.otherRegular: field not allowed:
++    ./issue3935.cue:25:4
++issue3935.full.out.spec.otherRequired: field not allowed:
++    ./issue3935.cue:26:4
++issue3935.reduced.out: 2 errors in empty disjunction:
++issue3935.reduced.out.y.other: field not allowed:
++    ./issue3935.cue:6:9
++issue3935.reduced.out.y.x: field not allowed:
++    ./issue3935.cue:4:6
++    ./issue3935.cue:11:7
  noStackOverflowStructCycle.#list.tail: structural cycle
  noStackOverflowStructCycle.list.tail: structural cycle
  provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -1900,7 +2045,7 @@ diff old new
      ./in.cue:591:9
  fieldMismatch.a: cannot combine regular field "x" with 2:
      ./in.cue:152:7
-@@ -79,8 +59,8 @@
+@@ -79,8 +76,8 @@
    }
    fail: (struct){
      a: (_|_){
@@ -1911,7 +2056,7 @@ diff old new
      }
    }
    embed: (_|_){
-@@ -89,10 +69,6 @@
+@@ -89,10 +86,6 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail1.p: field not allowed:
@@ -1922,7 +2067,7 @@ diff old new
          //     ./in.cue:46:4
          //     ./in.cue:49:9
        }
-@@ -121,12 +97,11 @@
+@@ -121,12 +114,11 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail4.p: field not allowed:
@@ -1939,7 +2084,7 @@ diff old new
        }
      }
      #C4: (#struct){
-@@ -207,13 +182,10 @@
+@@ -207,13 +199,10 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -1957,7 +2102,7 @@ diff old new
      }
      t2: (_|_){
        // [eval]
-@@ -229,10 +201,7 @@
+@@ -229,10 +218,7 @@
            // [eval]
            d: (_|_){
              // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -1968,7 +2113,7 @@ diff old new
            }
          }
          b: (bool){ true }
-@@ -263,9 +232,22 @@
+@@ -263,9 +249,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -1994,7 +2139,7 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -279,24 +261,9 @@
+@@ -279,24 +278,9 @@
          }
        }
      }
@@ -2022,7 +2167,7 @@ diff old new
    }
    closedCheck: (struct){
      success1: (struct){
-@@ -399,13 +366,7 @@
+@@ -399,13 +383,7 @@
            }
          }
        }
@@ -2037,7 +2182,7 @@ diff old new
        #F: (#struct){
          e: (bool){ bool }
          f: (_|_){
-@@ -422,17 +383,11 @@
+@@ -422,17 +400,11 @@
          }
        }
        E: (_|_){
@@ -2056,7 +2201,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -443,17 +398,11 @@
+@@ -443,17 +415,11 @@
          }
        }
        E: (_|_){
@@ -2075,7 +2220,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -576,9 +525,6 @@
+@@ -576,9 +542,6 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -2085,7 +2230,7 @@ diff old new
              //     ./in.cue:591:9
            }
          }
-@@ -602,13 +548,13 @@
+@@ -602,13 +565,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -2103,7 +2248,7 @@ diff old new
          }
        }
      }
-@@ -645,9 +591,8 @@
+@@ -645,9 +608,8 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -2115,7 +2260,7 @@ diff old new
      }
    }
    errorPropagation: (_|_){
-@@ -705,10 +650,10 @@
+@@ -705,10 +667,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -2128,7 +2273,7 @@ diff old new
        }
      }
      regular: (_|_){
-@@ -721,16 +666,11 @@
+@@ -721,16 +683,11 @@
        foo: (_|_){
          // [eval]
          kind: (string){ "foo" }
@@ -2147,7 +2292,7 @@ diff old new
          }
        }
      }
-@@ -742,10 +682,10 @@
+@@ -742,10 +699,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -2160,7 +2305,7 @@ diff old new
        }
      }
    }
-@@ -816,7 +756,6 @@
+@@ -816,7 +773,6 @@
        root: (_|_){
          // [eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
          //     ./issue3729.cue:9:9
@@ -2168,7 +2313,7 @@ diff old new
          //     ./issue3729.cue:11:9
          #sub1?: (#struct){
            #sub2: (bool){ true }
-@@ -864,14 +803,7 @@
+@@ -864,14 +820,7 @@
      }
      full: (struct){
        #Application: (#struct){
@@ -2184,55 +2329,121 @@ diff old new
        }
        #ApplicationSpec: (#struct){
          syncPolicy?: ((null|struct)){ |((null){ null }, (#struct){
+@@ -904,10 +853,17 @@
+       }
+     }
+   }
+-  issue3935: (struct){
+-    reduced: (struct){
+-      out: (#struct){
+-        x: (string){ "bar" }
++  issue3935: (_|_){
++    // [eval]
++    reduced: (_|_){
++      // [eval]
++      out: (_|_){
++        // [eval] issue3935.reduced.out: 2 errors in empty disjunction:
++        // issue3935.reduced.out.y.other: field not allowed:
++        //     ./issue3935.cue:6:9
++        // issue3935.reduced.out.y.x: field not allowed:
++        //     ./issue3935.cue:4:6
++        //     ./issue3935.cue:11:7
+         y: (#struct){
+           x: (string){ "bar" }
+         }
+@@ -924,18 +880,27 @@
+         }
+       }
+     }
+-    full: (struct){
+-      out: (#struct){
++    full: (_|_){
++      // [eval]
++      out: (_|_){
++        // [eval] issue3935.full.out: 4 errors in empty disjunction:
++        // issue3935.full.out.spec.config: field not allowed:
++        //     ./issue3935.cue:19:4
++        //     ./issue3935.cue:32:4
++        // issue3935.full.out.spec.name: field not allowed:
++        //     ./issue3935.cue:18:4
++        //     ./issue3935.cue:31:4
++        // issue3935.full.out.spec.otherRegular: field not allowed:
++        //     ./issue3935.cue:25:4
++        // issue3935.full.out.spec.otherRequired: field not allowed:
++        //     ./issue3935.cue:26:4
+         spec: (#struct){
+           name: (string){ "foo" }
+-          config: (struct){
++          config: (#struct){
+             namespace: (string){ "bar" }
+           }
+         }
+-        namespace: (string){ "bar" }
+-        _specConfig: (#struct){
+-          namespace: (string){ "bar" }
+-        }
++        _specConfig: (_){ _ }
+       }
+       #SchemaOther: (#struct){
+         spec: (#struct){
+@@ -950,7 +915,7 @@
+           config!: (_){ _ }
+         }
+         namespace: (_|_){
+-          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined (_specConfig is incomplete):
++          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined as _specConfig is incomplete (type _):
+           //     ./issue3935.cue:36:15
+         }
+         _specConfig: (_){ _ }
 -- out/evalalpha/stats --
-Leaks:  690
+Leaks:  748
 Freed:  0
 Reused: 0
-Allocs: 690
+Allocs: 748
 Retain: 0
 
-Unifications: 602
-Conjuncts:    1029
-Disjuncts:    44
+Unifications: 638
+Conjuncts:    1092
+Disjuncts:    48
 
-CloseIDElems: 222
-NumCloseIDs: 181
+CloseIDElems: 275
+NumCloseIDs: 189
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
--Leaks:  73
--Freed:  553
--Reused: 548
--Allocs: 78
--Retain: 107
+-Leaks:  74
+-Freed:  602
+-Reused: 597
+-Allocs: 79
+-Retain: 132
 -
--Unifications: 578
--Conjuncts:    922
--Disjuncts:    686
-+Leaks:  690
+-Unifications: 624
+-Conjuncts:    1004
+-Disjuncts:    756
++Leaks:  748
 +Freed:  0
 +Reused: 0
-+Allocs: 690
++Allocs: 748
 +Retain: 0
 +
-+Unifications: 602
-+Conjuncts:    1029
-+Disjuncts:    44
++Unifications: 638
++Conjuncts:    1092
++Disjuncts:    48
 +
-+CloseIDElems: 222
-+NumCloseIDs: 181
++CloseIDElems: 275
++NumCloseIDs: 189
 -- out/eval/stats --
-Leaks:  73
-Freed:  553
-Reused: 548
-Allocs: 78
-Retain: 107
+Leaks:  74
+Freed:  602
+Reused: 597
+Allocs: 79
+Retain: 132
 
-Unifications: 578
-Conjuncts:    922
-Disjuncts:    686
+Unifications: 624
+Conjuncts:    1004
+Disjuncts:    756
 -- diff/explanation --
 cyclicError: improved error message.
 nestedWithDynamicFieldOK: fixed bug.
@@ -3140,6 +3351,59 @@ Result:
           }
           _syncpolicy: (string){ "selfhealprune" }
         }
+      }
+    }
+  }
+  issue3935: (struct){
+    reduced: (struct){
+      out: (#struct){
+        x: (string){ "bar" }
+        y: (#struct){
+          x: (string){ "bar" }
+        }
+      }
+      #A: (#struct){
+        y: (#struct){
+          other: (int){ int }
+        }
+      }
+      #B: (#struct){
+        x: (_){ _ }
+        y!: (#struct){
+          x!: (_){ _ }
+        }
+      }
+    }
+    full: (struct){
+      out: (#struct){
+        spec: (#struct){
+          name: (string){ "foo" }
+          config: (struct){
+            namespace: (string){ "bar" }
+          }
+        }
+        namespace: (string){ "bar" }
+        _specConfig: (#struct){
+          namespace: (string){ "bar" }
+        }
+      }
+      #SchemaOther: (#struct){
+        spec: (#struct){
+          otherOptional?: (int){ int }
+          otherRegular: (int){ int }
+          otherRequired!: (int){ int }
+        }
+      }
+      #SchemaSelected: (#struct){
+        spec!: (#struct){
+          name!: (string){ string }
+          config!: (_){ _ }
+        }
+        namespace: (_|_){
+          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined (_specConfig is incomplete):
+          //     ./issue3935.cue:36:15
+        }
+        _specConfig: (_){ _ }
       }
     }
   }
@@ -4376,6 +4640,62 @@ Result:
         spec: {
           _syncpolicy: "selfhealprune"
         }
+      }
+    }
+  }
+}
+--- issue3935.cue
+{
+  issue3935: {
+    reduced: {
+      out: (〈0;#A〉|〈0;#B〉)
+      out: (〈0;#B〉 & {
+        y: {
+          x: "bar"
+        }
+      })
+      #A: {
+        y: {
+          other: int
+        }
+      }
+      #B: {
+        if true {
+          x: 〈1;y〉.x
+        }
+        y!: {
+          x!: _
+        }
+      }
+    }
+  }
+  issue3935: {
+    full: {
+      out: (〈0;#SchemaOther〉|〈0;#SchemaSelected〉)
+      out: (〈0;#SchemaSelected〉 & {
+        spec: {
+          name: "foo"
+          config: {
+            namespace: "bar"
+          }
+        }
+      })
+      #SchemaOther: {
+        spec: {
+          otherOptional?: int
+          otherRegular: int
+          otherRequired!: int
+        }
+      }
+      #SchemaSelected: {
+        spec!: {
+          name!: string
+          config!: _
+        }
+        if true {
+          namespace: 〈1;_specConfig〉.namespace
+        }
+        _specConfig: 〈0;spec〉.config
       }
     }
   }

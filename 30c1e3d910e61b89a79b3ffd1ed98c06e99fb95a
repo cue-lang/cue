@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59acc675_0fa3023c",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-21T12:07:51Z",
+      "side": 1,
+      "message": "Maybe mirror the language of the previous sentence to make things clearer?\n\n```suggestion\n// To convert CUE to JSON, use [encoding/json.Marshal] on a [cue.Value].\n```",
+      "revId": "30c1e3d910e61b89a79b3ffd1ed98c06e99fb95a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

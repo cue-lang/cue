@@ -142,18 +142,11 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 	v.state.vertexMap = ctx.vertexMap
 
 	for _, v := range ctx.vertices {
-		n := v.state
-		if n == nil || n.closeParent == nil {
-			continue
-		}
+		v = v.overlay
 
-		if p := n.closeParent.node; p.overlay != nil {
-			// Use the new nodeContext if the node was cloned. Otherwise it
-			// is fine to use the old one.
-			n.closeParent = p.state
-			if p.state == nil {
-				panic("unexpected nil nodeContext")
-			}
+		n := v.state
+		if n == nil {
+			continue
 		}
 
 		// The group of the root closeContext should point to the Conjuncts field

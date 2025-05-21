@@ -713,7 +713,10 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 				c.ci, _ = n.markCycle(arc, nil, x, c.ci)
 			}
 		}
-		c.ci.Inline = true
+
+		if !c.isDevVersion() {
+			c.ci.Inline = true
+		}
 
 		if c.isDevVersion() {
 			if s := arc.getState(c); s != nil {

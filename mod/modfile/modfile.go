@@ -22,12 +22,8 @@ package modfile
 import (
 	_ "embed"
 	"fmt"
-	"path"
-	"slices"
 	"strings"
 	"sync"
-
-	"cuelang.org/go/internal/mod/semver"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -39,7 +35,8 @@ import (
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
-	"cuelang.org/go/mod/module"
+	"cuelang.org/go/internal/mod/modfiledata"
+	"cuelang.org/go/internal/mod/semver"
 )
 
 //go:embed schema.cue
@@ -47,62 +44,17 @@ var moduleSchemaData string
 
 const schemaFile = "cuelang.org/go/mod/modfile/schema.cue"
 
-// File represents the contents of a cue.mod/module.cue file.
-type File struct {
-	// Module holds the module path, which may
-	// not contain a major version suffix.
-	// Use the [File.QualifiedModule] method to obtain a module
-	// path that's always qualified. See also the
-	// [File.ModulePath] and [File.MajorVersion] methods.
-	Module          string                    `json:"module"`
-	Language        *Language                 `json:"language,omitempty"`
-	Source          *Source                   `json:"source,omitempty"`
-	Deps            map[string]*Dep           `json:"deps,omitempty"`
-	Custom          map[string]map[string]any `json:"custom,omitempty"`
-	versions        []module.Version
-	versionByModule map[string]module.Version
-	// defaultMajorVersions maps from module base path to the
-	// major version default for that path.
-	defaultMajorVersions map[string]string
-	// actualSchemaVersion holds the actual schema version
-	// that was used to validate the file. This will be one of the
-	// entries in the versions field in schema.cue and
-	// is set by the Parse functions.
-	actualSchemaVersion string
-}
+type (
+	// File represents the contents of a cue.mod/module.cue file.
+	File = modfiledata.File
 
-// Module returns the fully qualified module path
-// if is one. It returns the empty string when [ParseLegacy]
-// is used and the module field is empty.
-//
-// Note that when the module field does not contain a major
-// version suffix, "@v0" is assumed.
-func (f *File) QualifiedModule() string {
-	if strings.Contains(f.Module, "@") {
-		return f.Module
-	}
-	if f.Module == "" {
-		return ""
-	}
-	return f.Module + "@v0"
-}
+	// Source represents how to transform from a module's
+	// source to its actual contents.
+	Source = modfiledata.Source
 
-// ModulePath returns the path part of the module without
-// its major version suffix.
-func (f *File) ModulePath() string {
-	path, _, _ := ast.SplitPackageVersion(f.QualifiedModule())
-	return path
-}
-
-// MajorVersion returns the major version of the module,
-// not including the "@".
-// If there is no module (which can happen when [ParseLegacy]
-// is used or if Module is explicitly set to an empty string),
-// it returns the empty string.
-func (f *File) MajorVersion() string {
-	_, vers, _ := ast.SplitPackageVersion(f.QualifiedModule())
-	return vers
-}
+	Language = modfiledata.Language
+	Dep      = modfiledata.Dep
+)
 
 // baseFileVersion is used to decode the language version
 // to decide how to decode the rest of the file.
@@ -112,24 +64,9 @@ type baseFileVersion struct {
 	} `json:"language"`
 }
 
-// Source represents how to transform from a module's
-// source to its actual contents.
-type Source struct {
-	Kind string `json:"kind"`
-}
-
-// Validate checks that src is well formed.
-func (src *Source) Validate() error {
-	switch src.Kind {
-	case "git", "self":
-		return nil
-	}
-	return fmt.Errorf("unrecognized source kind %q", src.Kind)
-}
-
 // Format returns a formatted representation of f
 // in CUE syntax.
-func (f *File) Format() ([]byte, error) {
+func Format(f *File) ([]byte, error) {
 	if len(f.Deps) == 0 && f.Deps != nil {
 		// There's no way to get the CUE encoder to omit an empty
 		// but non-nil slice (despite the current doc comment on
@@ -156,11 +93,11 @@ func (f *File) Format() ([]byte, error) {
 	// Sanity check that it can be parsed.
 	// TODO this could be more efficient by checking all the file fields
 	// before formatting the output.
-	f1, err := ParseNonStrict(data, "-")
+	_, actualSchemaVersion, err := parse(data, "-", false)
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse result: %v", strings.TrimSuffix(errors.Details(err, nil), "\n"))
 	}
-	if f.Language != nil && f1.actualSchemaVersion == "v0.0.0" {
+	if f.Language != nil && actualSchemaVersion == "v0.0.0" {
 		// It's not a legacy module file (because the language field is present)
 		// but we've used the legacy schema to parse it, which means that
 		// it's almost certainly a bogus version because all versions
@@ -169,15 +106,6 @@ func (f *File) Format() ([]byte, error) {
 		return nil, fmt.Errorf("language version %v is too early for module.cue (need at least %v)", f.Language.Version, EarliestClosedSchemaVersion())
 	}
 	return data, err
-}
-
-type Language struct {
-	Version string `json:"version,omitempty"`
-}
-
-type Dep struct {
-	Version string `json:"v"`
-	Default bool   `json:"default,omitempty"`
 }
 
 type noDepsFile struct {
@@ -256,7 +184,8 @@ var earliestClosedSchemaVersion = sync.OnceValue(func() string {
 // All dependencies must be specified correctly: with major
 // versions in the module paths and canonical dependency versions.
 func Parse(modfile []byte, filename string) (*File, error) {
-	return parse(modfile, filename, true)
+	f, _, err := parse(modfile, filename, true)
+	return f, err
 }
 
 // ParseLegacy parses the legacy version of the module file
@@ -266,20 +195,19 @@ func ParseLegacy(modfile []byte, filename string) (*File, error) {
 	ctx := cuecontext.New()
 	file, err := parseDataOnlyCUE(ctx, modfile, filename)
 	if err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file syntax")
+		return nil, errors.Wrapf(err, token.NoPos, "invalid module file syntax")
 	}
 	// Unfortunately we need a new context. See the note inside [moduleSchemaDo].
 	v := ctx.BuildFile(file)
 	if err := v.Err(); err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file")
+		return nil, errors.Wrapf(err, token.NoPos, "invalid module file")
 	}
 	var f noDepsFile
 	if err := v.Decode(&f); err != nil {
 		return nil, newCUEError(err, filename)
 	}
 	return &File{
-		Module:              f.Module,
-		actualSchemaVersion: "v0.0.0",
+		Module: f.Module,
 	}, nil
 }
 
@@ -289,7 +217,8 @@ func ParseLegacy(modfile []byte, filename string) (*File, error) {
 //
 // The file name is used for error messages.
 func ParseNonStrict(modfile []byte, filename string) (*File, error) {
-	return parse(modfile, filename, false)
+	file, _, err := parse(modfile, filename, false)
+	return file, err
 }
 
 // FixLegacy converts a legacy module.cue file as parsed by [ParseLegacy]
@@ -309,11 +238,11 @@ func FixLegacy(modfile []byte, filename string) (*File, error) {
 	ctx := cuecontext.New()
 	file, err := parseDataOnlyCUE(ctx, modfile, filename)
 	if err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file syntax")
+		return nil, errors.Wrapf(err, token.NoPos, "invalid module file syntax")
 	}
 	v := ctx.BuildFile(file)
 	if err := v.Validate(cue.Concrete(true)); err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file value")
+		return nil, errors.Wrapf(err, token.NoPos, "invalid module file value")
 	}
 	var allFields map[string]any
 	if err := v.Decode(&allFields); err != nil {
@@ -355,7 +284,7 @@ func FixLegacy(modfile []byte, filename string) (*File, error) {
 	// Round-trip through [Parse] so that we get exactly the same
 	// result as a later parse of the same data will. This also
 	// adds a major version to the module path if needed.
-	data, err := f.Format()
+	data, err := Format(f)
 	if err != nil {
 		return nil, fmt.Errorf("cannot format fixed file: %v", err)
 	}
@@ -366,34 +295,37 @@ func FixLegacy(modfile []byte, filename string) (*File, error) {
 	return f, nil
 }
 
-func parse(modfile []byte, filename string, strict bool) (*File, error) {
+func parse(modfile []byte, filename string, strict bool) (file *File, actualSchemaVersion string, err error) {
 	// Unfortunately we need a new context. See the note inside [moduleSchemaDo].
 	ctx := cuecontext.New()
-	file, err := parseDataOnlyCUE(ctx, modfile, filename)
+	astFile, err := parseDataOnlyCUE(ctx, modfile, filename)
 	if err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file syntax")
+		return nil, "", errors.Wrapf(err, token.NoPos, "invalid module file syntax")
 	}
 
-	v := ctx.BuildFile(file)
+	v := ctx.BuildFile(astFile)
 	if err := v.Validate(cue.Concrete(true)); err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file value")
+		return nil, "", errors.Wrapf(err, token.NoPos, "invalid module file value")
 	}
 	// First determine the declared version of the module file.
 	var base baseFileVersion
 	if err := v.Decode(&base); err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "cannot determine language version")
+		return nil, "", errors.Wrapf(err, token.NoPos, "cannot determine language version")
 	}
 	if base.Language.Version == "" {
-		return nil, ErrNoLanguageVersion
+		return nil, "", ErrNoLanguageVersion
 	}
 	if !semver.IsValid(base.Language.Version) {
-		return nil, fmt.Errorf("language version %q in module.cue is not valid semantic version", base.Language.Version)
+		return nil, "", fmt.Errorf("language version %q in module.cue is not valid semantic version", base.Language.Version)
 	}
 	if mv, lv := base.Language.Version, cueversion.LanguageVersion(); semver.Compare(mv, lv) > 0 {
-		return nil, fmt.Errorf("language version %q declared in module.cue is too new for current language version %q", mv, lv)
+		return nil, "", fmt.Errorf("language version %q declared in module.cue is too new for current language version %q", mv, lv)
 	}
-
-	mf, err := moduleSchemaDo(func(schemas *schemaInfo) (*File, error) {
+	type result struct {
+		file                *File
+		actualSchemaVersion string
+	}
+	r, err := moduleSchemaDo(func(schemas *schemaInfo) (result, error) {
 		// Now that we're happy we're within bounds, find the latest
 		// schema that applies to the declared version.
 		latest := ""
@@ -410,12 +342,12 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		if latest == "" {
 			// Should never happen, because there should always
 			// be some applicable schema.
-			return nil, fmt.Errorf("cannot find schema suitable for reading module file with language version %q", base.Language.Version)
+			return result{}, fmt.Errorf("cannot find schema suitable for reading module file with language version %q", base.Language.Version)
 		}
 		schema := latestSchema
 		v = v.Unify(lookup(schema, cue.Def("#File")))
 		if err := v.Validate(); err != nil {
-			return nil, newCUEError(err, filename)
+			return result{}, newCUEError(err, filename)
 		}
 		if latest == "v0.0.0" {
 			// The chosen schema is the earliest schema which allowed
@@ -425,87 +357,36 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 			// This mirrors the behavior of [ParseLegacy].
 			var f noDepsFile
 			if err := v.Decode(&f); err != nil {
-				return nil, newCUEError(err, filename)
+				return result{}, newCUEError(err, filename)
 			}
-			return &File{
-				Module:              f.Module,
-				actualSchemaVersion: "v0.0.0",
+			return result{
+				file: &File{
+					Module: f.Module,
+				},
+				actualSchemaVersion: latest,
 			}, nil
 		}
 		var mf File
 		if err := v.Decode(&mf); err != nil {
-			return nil, errors.Wrapf(err, token.NoPos, "internal error: cannot decode into modFile struct")
+			return result{}, errors.Wrapf(err, token.NoPos, "internal error: cannot decode into modFile struct")
 		}
-		mf.actualSchemaVersion = latest
-		return &mf, nil
+		return result{
+			file:                &mf,
+			actualSchemaVersion: latest,
+		}, nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	mainPath, mainMajor, ok := ast.SplitPackageVersion(mf.Module)
-	if ok {
-		if semver.Major(mainMajor) != mainMajor {
-			return nil, fmt.Errorf("module path %s in %q should contain the major version only", mf.Module, filename)
-		}
-	} else if mainPath != "" {
-		if err := module.CheckPathWithoutVersion(mainPath); err != nil {
-			return nil, fmt.Errorf("module path %q in %q is not valid: %v", mainPath, filename, err)
-		}
-		// There's no main module major version: default to v0.
-		mainMajor = "v0"
+	if strict {
+		err = r.file.Init()
 	} else {
-		return nil, fmt.Errorf("empty module path in %q", filename)
+		err = r.file.InitNonStrict()
 	}
-	if mf.Language != nil {
-		vers := mf.Language.Version
-		if !semver.IsValid(vers) {
-			return nil, fmt.Errorf("language version %q in %s is not well formed", vers, filename)
-		}
-		if semver.Canonical(vers) != vers {
-			return nil, fmt.Errorf("language version %v in %s is not canonical", vers, filename)
-		}
+	if err != nil {
+		return nil, "", fmt.Errorf("invalid module file %s: %v", filename, err)
 	}
-	mf.versionByModule = make(map[string]module.Version)
-	var versions []module.Version
-	defaultMajorVersions := make(map[string]string)
-	if mainPath != "" {
-		// The main module is always the default for its own major version.
-		defaultMajorVersions[mainPath] = mainMajor
-	}
-	// Check that major versions match dependency versions.
-	for m, dep := range mf.Deps {
-		vers, err := module.NewVersion(m, dep.Version)
-		if err != nil {
-			return nil, fmt.Errorf("invalid module.cue file %s: cannot make version from module %q, version %q: %v", filename, m, dep.Version, err)
-		}
-		versions = append(versions, vers)
-		if strict && vers.Path() != m {
-			return nil, fmt.Errorf("invalid module.cue file %s: no major version in %q", filename, m)
-		}
-		if dep.Default {
-			mp := vers.BasePath()
-			if _, ok := defaultMajorVersions[mp]; ok {
-				return nil, fmt.Errorf("multiple default major versions found for %v", mp)
-			}
-			defaultMajorVersions[mp] = semver.Major(vers.Version())
-		}
-		mf.versionByModule[vers.Path()] = vers
-	}
-	if mainPath != "" {
-		// We don't necessarily have a full version for the main module.
-		mainWithMajor := mainPath + "@" + mainMajor
-		mainVersion, err := module.NewVersion(mainWithMajor, "")
-		if err != nil {
-			return nil, err
-		}
-		mf.versionByModule[mainWithMajor] = mainVersion
-	}
-	if len(defaultMajorVersions) > 0 {
-		mf.defaultMajorVersions = defaultMajorVersions
-	}
-	mf.versions = versions[:len(versions):len(versions)]
-	slices.SortFunc(mf.versions, module.Version.Compare)
-	return mf, nil
+	return r.file, r.actualSchemaVersion, nil
 }
 
 // ErrNoLanguageVersion is returned by [Parse] and [ParseNonStrict]
@@ -533,7 +414,7 @@ func newCUEError(err error, filename string) error {
 	ps := errors.Positions(err)
 	for _, p := range ps {
 		if errStr := findErrorComment(p); errStr != "" {
-			return fmt.Errorf("invalid module.cue file: %s", errStr)
+			return fmt.Errorf("invalid module file: %s", errStr)
 		}
 	}
 	// TODO we have more potential to improve error messages here.
@@ -577,44 +458,4 @@ func cutLast(s, sep string) (before, after string, found bool) {
 		return s[:i], s[i+len(sep):], true
 	}
 	return "", s, false
-}
-
-// DepVersions returns the versions of all the modules depended on by the
-// file. The caller should not modify the returned slice.
-//
-// This always returns the same value, even if the contents
-// of f are changed. If f was not created with [Parse], it returns nil.
-func (f *File) DepVersions() []module.Version {
-	return slices.Clip(f.versions)
-}
-
-// DefaultMajorVersions returns a map from module base path
-// to the major version that's specified as the default for that module.
-// The caller should not modify the returned map.
-func (f *File) DefaultMajorVersions() map[string]string {
-	return f.defaultMajorVersions
-}
-
-// ModuleForImportPath returns the module that should contain the given
-// import path and reports whether the module was found.
-// It does not check to see if the import path actually exists within the module.
-//
-// It works entirely from information in f, meaning that it does
-// not consult a registry to resolve a package whose module is not
-// mentioned in the file, which means it will not work in general unless
-// the module is tidy (as with `cue mod tidy`).
-func (f *File) ModuleForImportPath(importPath string) (module.Version, bool) {
-	ip := ast.ParseImportPath(importPath)
-	for prefix := ip.Path; prefix != "."; prefix = path.Dir(prefix) {
-		pkgVersion := ip.Version
-		if pkgVersion == "" {
-			if pkgVersion = f.defaultMajorVersions[prefix]; pkgVersion == "" {
-				continue
-			}
-		}
-		if mv, ok := f.versionByModule[prefix+"@"+pkgVersion]; ok {
-			return mv, true
-		}
-	}
-	return module.Version{}, false
 }

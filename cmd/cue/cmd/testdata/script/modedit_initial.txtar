@@ -102,4 +102,4 @@ invalid argument "v0.4.3" for "--language-version" flag: language version "v0.4.
 -- want-stderr-9 --
 invalid argument "v2.3.4" for "--language-version" flag: language version "v2.3.4" may not be after current language version $CUE_LANGUAGE_VERSION
 -- want-stderr-10 --
-invalid resulting module.cue file after edits: cannot parse result: invalid module.cue file: source field is not allowed at this language version; need at least v0.9.0-alpha.0
+invalid resulting module.cue file after edits: cannot parse result: invalid module file: source field is not allowed at this language version; need at least v0.9.0-alpha.0

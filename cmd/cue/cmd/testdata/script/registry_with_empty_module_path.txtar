@@ -1,5 +1,5 @@
 ! exec cue export x.cue
-stderr 'empty module path in .*module\.cue'
+stderr 'invalid module file .*module\.cue: empty module path'
 -- cue.mod/module.cue --
 module: ""
 language: version: "v0.8.0"

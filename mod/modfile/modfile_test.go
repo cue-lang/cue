@@ -178,7 +178,7 @@ module: "foo.com/bar@v0"
 language: version: "v0.8.6"
 source: kind: "git"
 `,
-	wantError: `invalid module.cue file: source field is not allowed at this language version; need at least v0.9.0-alpha.0`,
+	wantError: `invalid module file: source field is not allowed at this language version; need at least v0.9.0-alpha.0`,
 }, {
 	testName: "AmbiguousDefaults",
 	parse:    Parse,
@@ -194,7 +194,7 @@ deps: "example.com@v2": {
 	v: "v2.0.0"
 }
 `,
-	wantError: `multiple default major versions found for example.com`,
+	wantError: `invalid module file module.cue: multiple default major versions found for example.com`,
 }, {
 	testName: "AmbiguousDefaultsWithMainModule",
 	parse:    Parse,
@@ -206,7 +206,7 @@ deps: "foo.com/bar@v1": {
 	v: "v1.2.3"
 }
 `,
-	wantError: `multiple default major versions found for foo.com/bar`,
+	wantError: `invalid module file module.cue: multiple default major versions found for foo.com/bar`,
 }, {
 	testName: "MisspelledLanguageVersionField",
 	parse:    Parse,
@@ -243,7 +243,7 @@ module: "foo.com/bar@v0"`,
 module: "foo.com/bar@v0"
 language: version: "v0.8"
 `,
-	wantError: `language version v0.8 in module.cue is not canonical`,
+	wantError: `invalid module file module.cue: language version v0.8 is not canonical`,
 }, {
 	testName: "InvalidDepVersion",
 	parse:    Parse,
@@ -252,7 +252,7 @@ module: "foo.com/bar@v1"
 language: version: "v0.8.0"
 deps: "example.com@v1": v: "1.2.3"
 `,
-	wantError: `invalid module.cue file module.cue: cannot make version from module "example.com@v1", version "1.2.3": version "1.2.3" \(of module "example.com@v1"\) is not well formed`,
+	wantError: `invalid module file module.cue: cannot make version from module "example.com@v1", version "1.2.3": version "1.2.3" \(of module "example.com@v1"\) is not well formed`,
 }, {
 	testName: "NonCanonicalVersion",
 	parse:    Parse,
@@ -261,7 +261,7 @@ module: "foo.com/bar@v1"
 language: version: "v0.8.0"
 deps: "example.com@v1": v: "v1.2"
 `,
-	wantError: `invalid module.cue file module.cue: cannot make version from module "example.com@v1", version "v1.2": version "v1.2" \(of module "example.com@v1"\) is not canonical`,
+	wantError: `invalid module file module.cue: cannot make version from module "example.com@v1", version "v1.2": version "v1.2" \(of module "example.com@v1"\) is not canonical`,
 }, {
 	testName: "NonCanonicalModule",
 	parse:    Parse,
@@ -269,7 +269,7 @@ deps: "example.com@v1": v: "v1.2"
 module: "foo.com/bar@v0.1.2"
 language: version: "v0.8.0"
 `,
-	wantError: `module path foo.com/bar@v0.1.2 in "module.cue" should contain the major version only`,
+	wantError: `invalid module file module.cue: module path foo.com/bar@v0.1.2 should contain the major version only`,
 }, {
 	testName: "NonCanonicalDep",
 	parse:    Parse,
@@ -278,7 +278,7 @@ module: "foo.com/bar@v1"
 language: version: "v0.8.0"
 deps: "example.com": v: "v1.2.3"
 `,
-	wantError: `invalid module.cue file module.cue: no major version in "example.com"`,
+	wantError: `invalid module file module.cue: no major version in "example.com"`,
 }, {
 	testName: "MismatchedMajorVersion",
 	parse:    Parse,
@@ -287,7 +287,7 @@ module: "foo.com/bar@v1"
 language: version: "v0.8.0"
 deps: "example.com@v1": v: "v0.1.2"
 `,
-	wantError: `invalid module.cue file module.cue: cannot make version from module "example.com@v1", version "v0.1.2": mismatched major version suffix in "example.com@v1" \(version v0.1.2\)`,
+	wantError: `invalid module file module.cue: cannot make version from module "example.com@v1", version "v0.1.2": mismatched major version suffix in "example.com@v1" \(version v0.1.2\)`,
 }, {
 	testName: "NonStrictNoMajorVersions",
 	parse:    ParseNonStrict,
@@ -333,7 +333,7 @@ language: version: "xxx"
 module: _foo
 _foo: "blah.example"
 `,
-	wantError: `invalid module.cue file syntax: references not allowed in data mode:
+	wantError: `invalid module file syntax: references not allowed in data mode:
     module.cue:2:9`,
 }, {
 	testName: "LegacyNoModule",
@@ -349,7 +349,7 @@ _foo: "blah.example"
 	testName:  "NonLegacyEmptyModule",
 	parse:     Parse,
 	data:      `module: "", language: version: "v0.8.0"`,
-	wantError: `empty module path in "module.cue"`,
+	wantError: `invalid module file module.cue: empty module path`,
 }, {
 	testName: "ReferencesNotAllowed#1",
 	parse:    Parse,
@@ -358,7 +358,7 @@ module: "foo.com/bar"
 _foo: "v0.9.0"
 language: version: _foo
 `,
-	wantError: `invalid module.cue file syntax: references not allowed in data mode:
+	wantError: `invalid module file syntax: references not allowed in data mode:
     module.cue:4:20`,
 }, {
 	testName: "ReferencesNotAllowed#2",
@@ -368,9 +368,9 @@ module: "foo.com/bar"
 let foo = "v0.9.0"
 language: version: foo
 `,
-	wantError: `invalid module.cue file syntax: references not allowed in data mode:
+	wantError: `invalid module file syntax: references not allowed in data mode:
     module.cue:3:1
-invalid module.cue file syntax: references not allowed in data mode:
+invalid module file syntax: references not allowed in data mode:
     module.cue:4:20`,
 }, {
 	testName: "DefinitionsNotAllowed",
@@ -380,7 +380,7 @@ module: "foo.com/bar"
 #x: "v0.9.0"
 language: version: "v0.9.0"
 `,
-	wantError: `invalid module.cue file syntax: definitions not allowed in data mode:
+	wantError: `invalid module file syntax: definitions not allowed in data mode:
     module.cue:3:1`,
 }, {
 	testName: "CustomData",
@@ -586,7 +586,7 @@ language: {
 `,
 	}}
 	cuetest.Run(t, tests, func(t *cuetest.T, test *formatTest) {
-		data, err := test.file.Format()
+		data, err := Format(test.file)
 		if test.wantError != "" {
 			qt.Assert(t, qt.ErrorMatches(err, test.wantError))
 			return

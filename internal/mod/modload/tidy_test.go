@@ -14,6 +14,7 @@ import (
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/mod/modcache"
+	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/modregistrytest"
 )
@@ -46,7 +47,7 @@ func TestTidy(t *testing.T) {
 			if err != nil {
 				fmt.Fprintf(&out, "error: %v\n", err)
 			} else {
-				tidyFile, err = mf.Format()
+				tidyFile, err = modfile.Format(mf)
 				qt.Assert(t, qt.IsNil(err))
 				out.Write(tidyFile)
 			}

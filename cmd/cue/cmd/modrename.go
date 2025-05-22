@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/mod/semver"
+	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 	"github.com/spf13/cobra"
 )
@@ -80,7 +81,7 @@ func runModRename(cmd *Command, args []string) error {
 
 	// TODO if we're renaming to a module that we currently depend on,
 	// perhaps we should detect that and give an error.
-	newModFileData, err := mf.Format()
+	newModFileData, err := modfile.Format(mf)
 	if err != nil {
 		return fmt.Errorf("invalid resulting module.cue file after edits: %v", err)
 	}

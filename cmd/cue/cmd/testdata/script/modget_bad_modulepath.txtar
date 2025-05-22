@@ -2,7 +2,7 @@
 # path includes the path to the offending file (issue 3259)
 
 ! exec cue mod get example.com/foo
-stderr 'empty module path in.*module.cue'
+stderr 'invalid module file .*module\.cue: empty module path'
 -- cue.mod/module.cue --
 module: ""
 language: version: "v0.9.2"

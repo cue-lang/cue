@@ -311,7 +311,7 @@ x: 42
 	c := newTestClient(t)
 	zipData := createZip(t, mv, testMod)
 	err := c.PutModule(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)))
-	qt.Assert(t, qt.ErrorMatches(err, `module.cue file check failed: invalid module.cue file cue.mod/module.cue: cannot make version from module "example.com@v1", version "v1.2": version "v1.2" \(of module "example.com@v1"\) is not canonical`))
+	qt.Assert(t, qt.ErrorMatches(err, `module.cue file check failed: invalid module file cue.mod/module.cue: cannot make version from module "example.com@v1", version "v1.2": version "v1.2" \(of module "example.com@v1"\) is not canonical`))
 }
 
 var checkModuleTests = []struct {
@@ -344,7 +344,7 @@ language: version: "v0.8.0"
 module: "foo@v1.2.3"
 language: version: "v0.8.0"
 `,
-	wantError: `module.cue file check failed: module path foo@v1.2.3 in "cue.mod/module.cue" should contain the major version only`,
+	wantError: `module.cue file check failed: invalid module file cue.mod/module.cue: module path foo@v1.2.3 should contain the major version only`,
 }, {
 	testName: "DependencyWithInvalidVersion",
 	mv:       module.MustNewVersion("foo.com/bar", "v1.2.3"),
@@ -354,7 +354,7 @@ module: "foo@v1"
 language: version: "v0.8.0"
 deps: "foo.com/bar@v2": v: "invalid"
 `,
-	wantError: `module.cue file check failed: invalid module.cue file cue.mod/module.cue: cannot make version from module "foo.com/bar@v2", version "invalid": version "invalid" \(of module "foo.com/bar@v2"\) is not well formed`,
+	wantError: `module.cue file check failed: invalid module file cue.mod/module.cue: cannot make version from module "foo.com/bar@v2", version "invalid": version "invalid" \(of module "foo.com/bar@v2"\) is not well formed`,
 }}
 
 func TestCheckModule(t *testing.T) {

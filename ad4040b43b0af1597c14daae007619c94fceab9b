@@ -20,6 +20,132 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bc56714e_17b4682e",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-22T12:39:42Z",
+      "side": 1,
+      "message": "I realise this is just moved code, but I find this doc comment confusing: it assumes knowledge of \"module base path\" - this term has not been defined in this file. Please could it be? (also on the method that returns this map). Having read more of this, there\u0027s `module/Version.BasePath()` which kinda defines what it is. I\u0027m also unclear how it differs from `ast/ImportPath.Path`",
+      "range": {
+        "startLine": 53,
+        "startChar": 35,
+        "endLine": 53,
+        "endChar": 52
+      },
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7409c100_1ff30852",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-22T12:39:42Z",
+      "side": 1,
+      "message": "Again, I know this is just movement, but, this method must have been renamed at some point, and the docs have not been updated.",
+      "range": {
+        "startLine": 58,
+        "startChar": 3,
+        "endLine": 58,
+        "endChar": 9
+      },
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f96980ac_b597cf6c",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-22T12:39:42Z",
+      "side": 1,
+      "message": "\"if there is\" I think.",
+      "range": {
+        "startLine": 59,
+        "startChar": 3,
+        "endLine": 59,
+        "endChar": 8
+      },
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad6df551_dcd1b141",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-22T12:39:42Z",
+      "side": 1,
+      "message": "Heh, I guess someone changed the receiver name at some point.",
+      "range": {
+        "startLine": 105,
+        "startChar": 61,
+        "endLine": 105,
+        "endChar": 62
+      },
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c3ab714_c797882b",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-22T12:39:42Z",
+      "side": 1,
+      "message": "Given this is in `internal`, I don\u0027t think I see any value in this getter method - why not just make the field public?",
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd5e38e9_cbbc11e7",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-22T12:39:42Z",
+      "side": 1,
+      "message": "very minor nit: given you call the func immediately, I think I find the `initf` approach slightly less obvious than\n\n```\nif strict {\n  err \u003d r.file.Init()\n} else {\n  err \u003d r.file.InitNonStrict()\n}\nif err !\u003d nil {\n```",
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8099daf7_0fa35cfe",
         "filename": "mod/modfile/modfile_test.go",
         "patchSetId": 3

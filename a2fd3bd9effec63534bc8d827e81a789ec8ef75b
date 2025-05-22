@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9397e2cf_b54cdfcc",
+        "filename": "cue/build_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-22T15:41:01Z",
+      "side": 1,
+      "message": "Careful inspection of the loading code shows that the setting of these fields *is* the responsibility of the \"loader func\" - i.e. the default loader func does it. And so we also make this loader responsible in the same way.\n\nThe reason this wasn\u0027t necessary before, was due to import.go#L104, which has been removed - it\u0027s rather rogue there, and setting ImportPath alone is not particularly useful - all the other fields should be being filled in too, and those really are only reachable via the default loader func.",
+      "revId": "a2fd3bd9effec63534bc8d827e81a789ec8ef75b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb628c95_da9f57bd",
+        "filename": "cue/load/loader_common.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-22T15:41:01Z",
+      "side": 1,
+      "message": "I tried adding an idempotent filter on the whole of `loader.importPkg()`. Sadly, in some cases, parts of the instance are filled out when `importPkg()` calls `fileProcessor.add()` and that defeats the caching - you don\u0027t really know the key to look up until after `fileProcessor.add()` has finished (e.g. inst.PkgName can change). Therefore, I decided it was simpler to cope with the possibility that `loader.importPkg()` can be called multiple times for the same instance, and that requires idempotent modifications on the various fooFiles fields.",
+      "revId": "a2fd3bd9effec63534bc8d827e81a789ec8ef75b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

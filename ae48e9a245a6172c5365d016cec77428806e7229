@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1956fd06_8e96915c",
+        "filename": "cue/load/import.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-22T15:41:01Z",
+      "side": 0,
+      "message": "I worked through all the code paths that could lead to here, and I believe managed to verify that by the time we get here, path has *always* gone through a `filepath.ToSlash` call. Thus the IsAbs check isn\u0027t needed. I think.",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

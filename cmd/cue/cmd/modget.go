@@ -78,7 +78,7 @@ func runModGet(cmd *Command, args []string) error {
 		return suggestModCommand(err)
 	}
 	// TODO check whether it's changed or not.
-	data, err := mf.Format()
+	data, err := modfile.Format(mf)
 	if err != nil {
 		return fmt.Errorf("internal error: invalid module.cue file generated: %v", err)
 	}

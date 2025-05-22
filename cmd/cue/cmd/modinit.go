@@ -89,7 +89,7 @@ func runModInit(cmd *Command, args []string) (err error) {
 		return err
 	}
 
-	data, err := mf.Format()
+	data, err := modfile.Format(mf)
 	if err != nil {
 		return err
 	}

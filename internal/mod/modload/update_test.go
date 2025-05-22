@@ -9,12 +9,14 @@ import (
 	"strings"
 	"testing"
 
-	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/internal/mod/semver"
-	"cuelang.org/go/mod/modcache"
 	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
+
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/mod/semver"
+	"cuelang.org/go/mod/modcache"
+	"cuelang.org/go/mod/modfile"
 )
 
 func TestUpdateVersions(t *testing.T) {
@@ -39,7 +41,7 @@ func TestUpdateVersions(t *testing.T) {
 			if err != nil {
 				fmt.Fprintf(&out, "error: %v\n", err)
 			} else {
-				data, err := mf.Format()
+				data, err := modfile.Format(mf)
 				qt.Assert(t, qt.IsNil(err))
 				out.Write(data)
 			}

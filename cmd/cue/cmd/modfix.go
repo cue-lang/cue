@@ -62,7 +62,7 @@ func runModFix(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	newData, err := mf.Format()
+	newData, err := modfile.Format(mf)
 	if err != nil {
 		return fmt.Errorf("internal error: invalid module.cue file generated: %v", err)
 	}

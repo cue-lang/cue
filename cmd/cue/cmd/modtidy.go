@@ -71,7 +71,7 @@ func runModTidy(cmd *Command, args []string) error {
 	if err != nil {
 		return suggestModCommand(err)
 	}
-	data, err := mf.Format()
+	data, err := modfile.Format(mf)
 	if err != nil {
 		return fmt.Errorf("internal error: invalid module.cue file generated: %v", err)
 	}

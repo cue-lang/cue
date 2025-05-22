@@ -194,7 +194,7 @@ deps: "example.com@v2": {
 	v: "v2.0.0"
 }
 `,
-	wantError: `multiple default major versions found for example.com`,
+	wantError: `invalid module.cue file module.cue: multiple default major versions found for example.com`,
 }, {
 	testName: "AmbiguousDefaultsWithMainModule",
 	parse:    Parse,
@@ -206,7 +206,7 @@ deps: "foo.com/bar@v1": {
 	v: "v1.2.3"
 }
 `,
-	wantError: `multiple default major versions found for foo.com/bar`,
+	wantError: `invalid module.cue file module.cue: multiple default major versions found for foo.com/bar`,
 }, {
 	testName: "MisspelledLanguageVersionField",
 	parse:    Parse,
@@ -243,7 +243,7 @@ module: "foo.com/bar@v0"`,
 module: "foo.com/bar@v0"
 language: version: "v0.8"
 `,
-	wantError: `language version v0.8 in module.cue is not canonical`,
+	wantError: `invalid module.cue file module.cue: language version v0.8 is not canonical`,
 }, {
 	testName: "InvalidDepVersion",
 	parse:    Parse,
@@ -269,7 +269,7 @@ deps: "example.com@v1": v: "v1.2"
 module: "foo.com/bar@v0.1.2"
 language: version: "v0.8.0"
 `,
-	wantError: `module path foo.com/bar@v0.1.2 in "module.cue" should contain the major version only`,
+	wantError: `invalid module.cue file module.cue: module path foo.com/bar@v0.1.2 should contain the major version only`,
 }, {
 	testName: "NonCanonicalDep",
 	parse:    Parse,
@@ -349,7 +349,7 @@ _foo: "blah.example"
 	testName:  "NonLegacyEmptyModule",
 	parse:     Parse,
 	data:      `module: "", language: version: "v0.8.0"`,
-	wantError: `empty module path in "module.cue"`,
+	wantError: `invalid module.cue file module.cue: empty module path`,
 }, {
 	testName: "ReferencesNotAllowed#1",
 	parse:    Parse,
@@ -586,7 +586,7 @@ language: {
 `,
 	}}
 	cuetest.Run(t, tests, func(t *cuetest.T, test *formatTest) {
-		data, err := test.file.Format()
+		data, err := Format(test.file)
 		if test.wantError != "" {
 			qt.Assert(t, qt.ErrorMatches(err, test.wantError))
 			return

@@ -220,7 +220,9 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 				a.unify(c, needs, attemptOnly, checkTypos)
 			}
 		}
-		n.completePending(yield)
+		// TODO(evalv3): do we need this? Error messages are slightly better,
+		// but adding leads to Issue #3941.
+		// n.completePending(yield)
 	}
 
 	n.process(nodeOnlyNeeds, mode)

@@ -344,7 +344,7 @@ language: version: "v0.8.0"
 module: "foo@v1.2.3"
 language: version: "v0.8.0"
 `,
-	wantError: `module.cue file check failed: module path foo@v1.2.3 in "cue.mod/module.cue" should contain the major version only`,
+	wantError: `module.cue file check failed: invalid module.cue file cue.mod/module.cue: module path foo@v1.2.3 should contain the major version only`,
 }, {
 	testName: "DependencyWithInvalidVersion",
 	mv:       module.MustNewVersion("foo.com/bar", "v1.2.3"),

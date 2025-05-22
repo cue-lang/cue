@@ -79,7 +79,7 @@ func (c *modEditCmd) run(cmd *Command, args []string) error {
 			return err
 		}
 	}
-	newData, err := mf.Format()
+	newData, err := modfile.Format(mf)
 	if err != nil {
 		return fmt.Errorf("invalid resulting module.cue file after edits: %v", err)
 	}

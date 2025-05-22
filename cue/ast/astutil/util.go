@@ -48,7 +48,9 @@ type ImportInfo struct {
 	Ident   string // identifier used to refer to the import
 	PkgName string // name of the package
 	ID      string // full import path, including the name
-	Dir     string // import path, excluding the name
+
+	// Deprecated: use [ast.ParseImportPath](ID).Path instead.
+	Dir string // import path, excluding the name
 }
 
 // ParseImportSpec returns the name and full path of an ImportSpec.
@@ -62,7 +64,10 @@ func ParseImportSpec(spec *ast.ImportSpec) (ImportInfo, error) {
 		ID:      str,
 		Ident:   ip.Qualifier,
 		PkgName: ip.Qualifier,
-		Dir:     ip.Unqualified().String(),
+		// Note: this still leave the major version suffix in place
+		// so this "directory" isn't likely to correspond to any
+		// actual directory if there's a version present.
+		Dir: ip.Unqualified().String(),
 	}
 	if spec.Name != nil {
 		info.Ident = spec.Name.Name

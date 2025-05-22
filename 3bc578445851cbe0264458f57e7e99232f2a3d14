@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca8a37b9_dbc1a0c3",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-22T11:11:24Z",
+      "side": 0,
+      "message": "I think the commit message should mention that this unexported field is now a result of `modfile.parse` rather than a field. Particularly because now it\u0027s thrown away once `modfile.Parse` is done using it - I presume we\u0027re okay with that, but I\u0027m not 100% sure.",
+      "revId": "3bc578445851cbe0264458f57e7e99232f2a3d14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

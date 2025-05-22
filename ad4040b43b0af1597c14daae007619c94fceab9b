@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d6482ab_ea32a802",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-22T11:11:24Z",
+      "side": 1,
+      "message": "please add a TODO to merge back into modfile once we can refactor that package to not depend on the evaluator, e.g. once we can load data-only CUE without it.",
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8099daf7_0fa35cfe",
+        "filename": "mod/modfile/modfile_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-22T11:11:24Z",
+      "side": 1,
+      "message": "I see how you ended up with these repetitive error messages - the input filename may not be \"module.cue\" - but for the vast majority of users it will be, so this error is now strictly worse.\n\nsome ideas that come to mind:\n1) `invalid module file module.cue` or `invalid modfile module.cue` - same sentence, but avoids the identical repetition\n2) detect if the filename is `module.cue` or `path/to/module.cue` so that you directly say e.g. `invalid cue.mod/module.cue` rather than `invalid module.cue file cue.mod/module.cue`\n3) use a decorated error with a position, like...\n\n```\ninvalid module.cue file: empty module path\n    ./path/to/cue.mod:1:1\n```\n\nPersonally I would go for 3, as it seems like a cleaner solution than 1 or 2. But if you prefer plain Go errors without attached positions, then I think I\u0027d go for 1.",
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

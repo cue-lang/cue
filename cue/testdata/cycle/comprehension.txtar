@@ -386,23 +386,43 @@ issue3903: full: {
 		]
 	}
 }
+-- issue3941.cue --
+issue3941: full: {
+	#Metadata: name: string
+	#Resource: metadata: #Metadata
+
+	out: {
+		_metadata: name: "foo"
+		resource: [string]: [string]: #Resource
+
+		_names: [_metadata.name]
+
+		for name in _names {
+			resource: level1: (name): {
+				metadata: _metadata
+			}
+		}
+	}
+}
 -- out/evalalpha/stats --
-Leaks:  978
+Leaks:  996
 Freed:  0
 Reused: 0
-Allocs: 978
+Allocs: 996
 Retain: 0
 
-Unifications: 607
-Conjuncts:    1677
+Unifications: 625
+Conjuncts:    1705
 Disjuncts:    202
 
 CloseIDElems: 10137
-NumCloseIDs: 846
+NumCloseIDs: 850
 -- out/evalalpha --
 Errors:
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
     ./in.cue:122:14
+issue3941.full.out.resource.level1.foo.metadata: adding field name not allowed as field set was already referenced:
+    ./issue3941.cue:3:23
 
 Result:
 (_|_){
@@ -1064,12 +1084,46 @@ Result:
       }
     }
   }
+  issue3941: (_|_){
+    // [eval]
+    full: (_|_){
+      // [eval]
+      #Metadata: (#struct){
+        name: (string){ string }
+      }
+      #Resource: (#struct){
+        metadata: ~(issue3941.full.#Metadata)
+      }
+      out: (_|_){
+        // [eval]
+        _metadata: (struct){
+          name: (string){ "foo" }
+        }
+        resource: (_|_){
+          // [eval]
+          level1: (_|_){
+            // [eval]
+            foo: (_|_){
+              // [eval]
+              metadata: (_|_){
+                // [eval] issue3941.full.out.resource.level1.foo.metadata: adding field name not allowed as field set was already referenced:
+                //     ./issue3941.cue:3:23
+              }
+            }
+          }
+        }
+        _names: (#list){
+          0: (string){ "foo" }
+        }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,13 +1,6 @@
+@@ -1,13 +1,8 @@
  Errors:
 -selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
 -issue2310.original.#sub.#_1.#_1.#_1: structural cycle:
@@ -1082,10 +1136,12 @@ diff old new
 -    ./in.cue:347:21
 +selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
 +    ./in.cue:122:14
++issue3941.full.out.resource.level1.foo.metadata: adding field name not allowed as field set was already referenced:
++    ./issue3941.cue:3:23
  
  Result:
  (_|_){
-@@ -27,7 +20,9 @@
+@@ -27,7 +22,9 @@
    B: (struct){
      a: (struct){
        parent: (string){ "" }
@@ -1096,7 +1152,7 @@ diff old new
        }
      }
    }
-@@ -60,17 +55,12 @@
+@@ -60,17 +57,12 @@
        }
      }
      _e: (#struct){
@@ -1120,7 +1176,7 @@ diff old new
        }
      }
      e: (#struct){
-@@ -84,12 +74,7 @@
+@@ -84,12 +76,7 @@
        }
        f2: (#struct){
          a: (#struct){
@@ -1134,7 +1190,7 @@ diff old new
          }
        }
      }
-@@ -135,9 +120,9 @@
+@@ -135,9 +122,9 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -1146,7 +1202,7 @@ diff old new
        }
      }
      acrossOr: (struct){
-@@ -405,10 +390,8 @@
+@@ -405,10 +392,8 @@
    issue2367: (struct){
      a: (_){ _ }
    }
@@ -1159,7 +1215,7 @@ diff old new
        #s: (_|_){
          // [incomplete] issue2310.original.#s: error in call to strings.Replace: non-concrete value string:
          //     ./in.cue:318:46
-@@ -418,14 +401,128 @@
+@@ -418,14 +403,128 @@
          #_3: (string){ string }
        }
        #sub: (_|_){
@@ -1296,7 +1352,7 @@ diff old new
        }
        #subs: (#list){
          0: (_|_){
-@@ -432,33 +529,62 @@
+@@ -432,33 +531,62 @@
            // [incomplete] issue2310.original.#subs.0: error in call to strings.Replace: non-concrete value string:
            //     ./in.cue:318:46
            //     ./in.cue:318:12
@@ -1372,7 +1428,7 @@ diff old new
        }
        #s: (_|_){
          // [incomplete] issue2310.reduced.#s: non-concrete value string in operand to +:
-@@ -496,9 +622,6 @@
+@@ -496,9 +624,6 @@
      }
      full: (struct){
        s1: (#struct){
@@ -1382,7 +1438,7 @@ diff old new
          _deps: (#list){
            0: (#struct){
              _local: (#list){
-@@ -511,6 +634,9 @@
+@@ -511,6 +636,9 @@
              }
            }
          }
@@ -1392,42 +1448,85 @@ diff old new
          objs: (#list){
            0: (string){ "s1 local" }
            1: (string){ "s2 local" }
+@@ -536,25 +664,30 @@
+       }
+     }
+   }
+-  issue3941: (struct){
+-    full: (struct){
++  issue3941: (_|_){
++    // [eval]
++    full: (_|_){
++      // [eval]
+       #Metadata: (#struct){
+         name: (string){ string }
+       }
+       #Resource: (#struct){
+-        metadata: (#struct){
+-          name: (string){ string }
+-        }
+-      }
+-      out: (struct){
++        metadata: ~(issue3941.full.#Metadata)
++      }
++      out: (_|_){
++        // [eval]
+         _metadata: (struct){
+           name: (string){ "foo" }
+         }
+-        resource: (struct){
+-          level1: (struct){
+-            foo: (#struct){
+-              metadata: (#struct){
+-                name: (string){ "foo" }
++        resource: (_|_){
++          // [eval]
++          level1: (_|_){
++            // [eval]
++            foo: (_|_){
++              // [eval]
++              metadata: (_|_){
++                // [eval] issue3941.full.out.resource.level1.foo.metadata: adding field name not allowed as field set was already referenced:
++                //     ./issue3941.cue:3:23
+               }
+             }
+           }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
--Leaks:  74
--Freed:  1367
--Reused: 1341
+-Leaks:  75
+-Freed:  1383
+-Reused: 1358
 -Allocs: 100
--Retain: 478
+-Retain: 479
 -
--Unifications: 953
--Conjuncts:    2946
--Disjuncts:    1686
-+Leaks:  978
+-Unifications: 970
+-Conjuncts:    2973
+-Disjuncts:    1704
++Leaks:  996
 +Freed:  0
 +Reused: 0
-+Allocs: 978
++Allocs: 996
 +Retain: 0
 +
-+Unifications: 607
-+Conjuncts:    1677
++Unifications: 625
++Conjuncts:    1705
 +Disjuncts:    202
 +
 +CloseIDElems: 10137
-+NumCloseIDs: 846
++NumCloseIDs: 850
 -- out/eval/stats --
-Leaks:  74
-Freed:  1367
-Reused: 1341
+Leaks:  75
+Freed:  1383
+Reused: 1358
 Allocs: 100
-Retain: 478
+Retain: 479
 
-Unifications: 953
-Conjuncts:    2946
-Disjuncts:    1686
+Unifications: 970
+Conjuncts:    2973
+Disjuncts:    1704
 -- diff/explanation --
 B.a.children: now correctly marked as incomplete
 -- out/eval --
@@ -1965,6 +2064,35 @@ Result:
         _deps: (list){
         }
         objs: (#list){
+        }
+      }
+    }
+  }
+  issue3941: (struct){
+    full: (struct){
+      #Metadata: (#struct){
+        name: (string){ string }
+      }
+      #Resource: (#struct){
+        metadata: (#struct){
+          name: (string){ string }
+        }
+      }
+      out: (struct){
+        _metadata: (struct){
+          name: (string){ "foo" }
+        }
+        resource: (struct){
+          level1: (struct){
+            foo: (#struct){
+              metadata: (#struct){
+                name: (string){ "foo" }
+              }
+            }
+          }
+        }
+        _names: (#list){
+          0: (string){ "foo" }
         }
       }
     }
@@ -2581,6 +2709,41 @@ Result:
             〈1;obj〉
           },
         ]
+      }
+    }
+  }
+}
+--- issue3941.cue
+{
+  issue3941: {
+    full: {
+      #Metadata: {
+        name: string
+      }
+      #Resource: {
+        metadata: 〈1;#Metadata〉
+      }
+      out: {
+        _metadata: {
+          name: "foo"
+        }
+        resource: {
+          [string]: {
+            [string]: 〈3;#Resource〉
+          }
+        }
+        _names: [
+          〈1;_metadata〉.name,
+        ]
+        for _, name in 〈0;_names〉 {
+          resource: {
+            level1: {
+              〈3;name〉: {
+                metadata: 〈5;_metadata〉
+              }
+            }
+          }
+        }
       }
     }
   }

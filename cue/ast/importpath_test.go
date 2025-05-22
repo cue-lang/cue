@@ -140,7 +140,6 @@ var parseImportPathTests = []struct {
 		ExplicitQualifier: false,
 		Qualifier:         "blah",
 	},
-	wantCanonical: "foo.com/bar/.../blah",
 }, {
 	testName: "WithPatternAtEnd",
 	path:     "foo.com/bar/...",
@@ -150,7 +149,6 @@ var parseImportPathTests = []struct {
 		ExplicitQualifier: false,
 		Qualifier:         "",
 	},
-	wantCanonical: "foo.com/bar/...",
 }, {
 	testName: "WithUnderscoreLastElement",
 	path:     "foo.com/bar/_foo",
@@ -160,7 +158,6 @@ var parseImportPathTests = []struct {
 		ExplicitQualifier: false,
 		Qualifier:         "_foo",
 	},
-	wantCanonical: "foo.com/bar/_foo",
 }, {
 	testName: "WithHashLastElement",
 	path:     "foo.com/bar/#foo",
@@ -170,7 +167,16 @@ var parseImportPathTests = []struct {
 		ExplicitQualifier: false,
 		Qualifier:         "",
 	},
-	wantCanonical: "foo.com/bar/#foo",
+}, {
+	testName: "StdlibPathWithQualifier",
+	path:     "strings:strings",
+	want: ImportPath{
+		Path:              "strings",
+		Version:           "",
+		ExplicitQualifier: true,
+		Qualifier:         "strings",
+	},
+	wantCanonical: "strings",
 }}
 
 func TestParseImportPath(t *testing.T) {
@@ -182,9 +188,23 @@ func TestParseImportPath(t *testing.T) {
 			if test.wantCanonical == "" {
 				test.wantCanonical = test.path
 			}
-			qt.Assert(t, qt.Equals(parts.Canonical().String(), test.wantCanonical))
+			gotCanonical := parts.Canonical().String()
+			qt.Assert(t, qt.Equals(gotCanonical, test.wantCanonical))
+			// Make sure that the canonical version round-trips OK.
+			qt.Assert(t, qt.Equals(ParseImportPath(gotCanonical).String(), gotCanonical))
 		})
 	}
+}
+
+func TestCanonicalAddsQualifier(t *testing.T) {
+	p := ImportPath{
+		Path: "foo.com/bar",
+	}.Canonical()
+	qt.Assert(t, qt.DeepEquals(p, ImportPath{
+		Path:      "foo.com/bar",
+		Qualifier: "bar",
+	}))
+	qt.Assert(t, qt.Equals(p.String(), "foo.com/bar"))
 }
 
 func TestImportPathStringAddsQualifier(t *testing.T) {

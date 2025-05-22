@@ -18,14 +18,7 @@ func ParseImportPath(p string) ImportPath {
 		parts.Path = path
 	}
 	if !parts.ExplicitQualifier {
-		if i := strings.LastIndex(parts.Path, "/"); i >= 0 {
-			parts.Qualifier = parts.Path[i+1:]
-		} else {
-			parts.Qualifier = parts.Path
-		}
-		if !IsValidIdent(parts.Qualifier) || strings.HasPrefix(parts.Qualifier, "#") || parts.Qualifier == "_" {
-			parts.Qualifier = ""
-		}
+		parts.Qualifier = impliedQualifier(parts.Path)
 	}
 	return parts
 }
@@ -57,9 +50,23 @@ type ImportPath struct {
 // Canonical returns the canonical form of the import path.
 // Specifically, it will only include the package qualifier
 // if it's different from the last component of parts.Path.
+//
+// It also ensures that the Qualifier field is set when
+// appropriate.
 func (parts ImportPath) Canonical() ImportPath {
-	if i := strings.LastIndex(parts.Path, "/"); i >= 0 && parts.Path[i+1:] == parts.Qualifier {
-		parts.Qualifier = ""
+	q := impliedQualifier(parts.Path)
+	if q == "" {
+		return parts
+	}
+	if q == parts.Qualifier {
+		// Do not include the qualifier because it matches the implied qualifier.
+		parts.ExplicitQualifier = false
+	} else if parts.Qualifier == "" {
+		// There's an implied qualifier but none set; this
+		// could happen if someone has manually constructed the
+		// ImportPath instance (it should never happen otherwise),
+		// so be defensive and set the qualifier anyway.
+		parts.Qualifier = q
 		parts.ExplicitQualifier = false
 	}
 	return parts
@@ -75,8 +82,7 @@ func (parts ImportPath) Unqualified() ImportPath {
 func (parts ImportPath) String() string {
 	needQualifier := parts.ExplicitQualifier
 	if !needQualifier && parts.Qualifier != "" {
-		_, last, _ := cutLast(parts.Path, "/")
-		if last != "" && last != parts.Qualifier {
+		if impliedQualifier(parts.Path) != parts.Qualifier {
 			needQualifier = true
 		}
 	}
@@ -95,6 +101,21 @@ func (parts ImportPath) String() string {
 		buf.WriteString(parts.Qualifier)
 	}
 	return buf.String()
+}
+
+// impliedQualifier returns the package qualifier implied
+// from the last component of the (bare) package path.
+func impliedQualifier(path string) string {
+	var q string
+	if i := strings.LastIndex(path, "/"); i >= 0 {
+		q = path[i+1:]
+	} else {
+		q = path
+	}
+	if !IsValidIdent(q) || strings.HasPrefix(q, "#") || q == "_" {
+		return ""
+	}
+	return q
 }
 
 // SplitPackageVersion returns a prefix and version suffix such that

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7b61e3d_012fb91c",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-22T16:21:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d6482ab_ea32a802",
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc56714e_17b4682e",
@@ -31,6 +49,30 @@
       "writtenOn": "2025-05-22T12:39:42Z",
       "side": 1,
       "message": "I realise this is just moved code, but I find this doc comment confusing: it assumes knowledge of \"module base path\" - this term has not been defined in this file. Please could it be? (also on the method that returns this map). Having read more of this, there\u0027s `module/Version.BasePath()` which kinda defines what it is. I\u0027m also unclear how it differs from `ast/ImportPath.Path`",
+      "range": {
+        "startLine": 53,
+        "startChar": 35,
+        "endLine": 53,
+        "endChar": 52
+      },
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ae9321a_70b85bfe",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-22T16:21:59Z",
+      "side": 1,
+      "message": "It\u0027s essentially the same thing as ast/ImportPath.Path except in the module namespace rather than the package namespace (the two are semantically distinct although overlapping). I\u0027ll adjust the comment to make it clearer.",
+      "parentUuid": "bc56714e_17b4682e",
       "range": {
         "startLine": 53,
         "startChar": 35,
@@ -64,6 +106,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b44dd48_684a1b78",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-22T16:21:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7409c100_1ff30852",
+      "range": {
+        "startLine": 58,
+        "startChar": 3,
+        "endLine": 58,
+        "endChar": 9
+      },
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f96980ac_b597cf6c",
@@ -77,6 +143,30 @@
       "writtenOn": "2025-05-22T12:39:42Z",
       "side": 1,
       "message": "\"if there is\" I think.",
+      "range": {
+        "startLine": 59,
+        "startChar": 3,
+        "endLine": 59,
+        "endChar": 8
+      },
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91a2ce75_c135f3a0",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-22T16:21:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f96980ac_b597cf6c",
       "range": {
         "startLine": 59,
         "startChar": 3,
@@ -110,6 +200,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90057c3e_ccf741c3",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-22T16:21:59Z",
+      "side": 1,
+      "message": "I guess they did :) Done.",
+      "parentUuid": "ad6df551_dcd1b141",
+      "range": {
+        "startLine": 105,
+        "startChar": 61,
+        "endLine": 105,
+        "endChar": 62
+      },
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5c3ab714_c797882b",
@@ -127,6 +241,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d73d2c10_09c9c97e",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-22T16:21:59Z",
+      "side": 1,
+      "message": "Yes, it is internal, but there\u0027s an alias in `modfile` which makes this and all its fields public, so I think this is still justified.",
+      "parentUuid": "5c3ab714_c797882b",
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd5e38e9_cbbc11e7",
@@ -140,6 +272,24 @@
       "writtenOn": "2025-05-22T12:39:42Z",
       "side": 1,
       "message": "very minor nit: given you call the func immediately, I think I find the `initf` approach slightly less obvious than\n\n```\nif strict {\n  err \u003d r.file.Init()\n} else {\n  err \u003d r.file.InitNonStrict()\n}\nif err !\u003d nil {\n```",
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f1eff00_af39a17f",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-22T16:21:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd5e38e9_cbbc11e7",
       "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -175,6 +325,24 @@
       "side": 1,
       "message": "I typoed the decorated error message, I meant to write:\n\n```\ninvalid module.cue file: empty module path\n    ./path/to/module.cue:1:1\n```",
       "parentUuid": "8099daf7_0fa35cfe",
+      "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2218915_376011b1",
+        "filename": "mod/modfile/modfile_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-22T16:21:59Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s _that_ repetitive in practice because when we see this for real, there will almost always be an actual path there, e.g.\n\n```\ninvalid module.cue file /home/rogpeppe/src/cuelabs/cue/cue.mod/module.cue: empty module path\n```\nThat said, I think `invalid module file` reads OK so I\u0027ve gone with that.\n\nI\u0027d like the position-oriented messages but I\u0027d like the positions to actually correspond to the position of the errors and that\u0027s a larger piece of work. I think we can leave it for now.",
+      "parentUuid": "8bfd54db_dedafee0",
       "revId": "ad4040b43b0af1597c14daae007619c94fceab9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

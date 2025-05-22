@@ -19,9 +19,11 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"slices"
 	"testing"
 
 	"cuelang.org/go/cue/build"
+	"github.com/go-quicktest/qt"
 )
 
 func testdata(elems ...string) string {
@@ -98,4 +100,64 @@ func TestLocalDirectory(t *testing.T) {
 	if p.DisplayPath != "." {
 		t.Fatalf("DisplayPath=%q, want %q", p.DisplayPath, ".")
 	}
+}
+
+func TestImportPaths(t *testing.T) {
+	insts := Instances([]string{"./..."}, &Config{
+		Package:    "*",
+		ModuleRoot: filepath.Join(pkgRootDir, testdata("testmod")),
+		Dir:        testdata("testmod", "importpaths"),
+	})
+
+	uniqueInstances := make(map[*build.Instance]struct{})
+	byImportPath := make(map[string]*build.Instance)
+	var f func(inst *build.Instance)
+	f = func(inst *build.Instance) {
+		uniqueInstances[inst] = struct{}{}
+
+		existing := byImportPath[inst.ImportPath]
+		if existing == nil {
+			byImportPath[inst.ImportPath] = inst
+		} else if existing == inst {
+			return
+		} else {
+			t.Fatalf("Got 2 different instances for the same import path: %q", inst.ImportPath)
+		}
+
+		for _, ipt := range inst.Imports {
+			f(ipt)
+		}
+	}
+
+	// packages: a:a, b:b, c:c, d:d, d:e,
+	qt.Assert(t, qt.HasLen(insts, 5))
+
+	for _, inst := range insts {
+		// All files have explicit packages, so there should be no use
+		// of the "empty" package "_".
+		qt.Assert(t, qt.Not(qt.CmpEquals(inst.PkgName, "_")))
+		f(inst)
+	}
+
+	importPaths := make([]string, 0, len(byImportPath))
+	for path, inst := range byImportPath {
+		importPaths = append(importPaths, path)
+		qt.Assert(t, qt.HasLen(inst.BuildFiles, 1))
+
+		// require every import path has a different instance:
+		_, found := uniqueInstances[inst]
+		qt.Assert(t, qt.IsTrue(found))
+		delete(uniqueInstances, inst)
+	}
+	slices.Sort(importPaths)
+
+	qt.Assert(t, qt.CmpEquals(importPaths, []string{
+		"mod.test/test/importpaths/a@v0:a",
+		"mod.test/test/importpaths/b@v0:b",
+		"mod.test/test/importpaths/c@v0:c",
+		"mod.test/test/importpaths/d",      // a/a.cue imports it this way
+		"mod.test/test/importpaths/d@v0",   // b/b.cue imports it this way
+		"mod.test/test/importpaths/d@v0:d", // c/c.cue imports it this way
+		"mod.test/test/importpaths/d@v0:e",
+	}))
 }

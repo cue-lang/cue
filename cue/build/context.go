@@ -37,6 +37,17 @@ type Context struct {
 	initialized bool
 
 	imports map[string]*Instance
+
+	// instances is used to make EnsureInstance idempotent; i.e. with
+	// the same (moduleRoot, importPath, pkgName)-tuple, the same
+	// Instance will be returned.
+	instances map[instanceKey]*Instance
+}
+
+type instanceKey struct {
+	moduleRoot string
+	importPath string
+	pkgName    string
 }
 
 // NewInstance creates an instance for this Context. If the [LoadFunc]
@@ -53,6 +64,45 @@ func (c *Context) NewInstance(dir string, f LoadFunc) *Instance {
 		loadFunc: f,
 		Dir:      dir,
 	}
+}
+
+// EnsureInstance returns an instance for configured for the supplied
+// arguments. If moduleRoot or importPath are empty strings, then the
+// [Instance] returned is always unique (new). Otherwise, the
+// behaviour of this method is idempotent: multiple calls with the
+// same moduleRoot, importPath, and pkgName will return the same
+// Instance.
+func (c *Context) EnsureInstance(dir, moduleRoot, importPath, pkgName, displayPath, module string) *Instance {
+	if moduleRoot == "" || importPath == "" {
+		return &Instance{
+			ctxt:        c,
+			loadFunc:    c.loader,
+			Dir:         dir,
+			PkgName:     pkgName,
+			DisplayPath: displayPath,
+			Module:      module,
+		}
+	}
+	if c.instances == nil {
+		c.instances = make(map[instanceKey]*Instance)
+	}
+
+	key := instanceKey{moduleRoot: moduleRoot, importPath: importPath, pkgName: pkgName}
+	inst := c.instances[key]
+	if inst == nil {
+		inst = &Instance{
+			ctxt:        c,
+			loadFunc:    c.loader,
+			Dir:         dir,
+			Root:        moduleRoot,
+			ImportPath:  importPath,
+			PkgName:     pkgName,
+			DisplayPath: displayPath,
+			Module:      module,
+		}
+		c.instances[key] = inst
+	}
+	return inst
 }
 
 // Complete finishes the initialization of an instance. All files must have

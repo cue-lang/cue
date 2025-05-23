@@ -34,6 +34,58 @@
       "parentUuid": "1956fd06_8e96915c",
       "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d1e21a5_3e8165e6",
+        "filename": "cue/load/import.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-23T15:48:44Z",
+      "side": 0,
+      "message": "As mentioned online, I don\u0027t believe this reasoning is true. I believe that `filepath.IsAbs(filepath.ToSlash(p))` can return true because `ToSlash` doesn\u0027t affect the leading volume name and `IsAbs` uses `filepath.IsSeparator` which allows both forward and backward slash. I don\u0027t know if this means that this change is incorrect though!",
+      "parentUuid": "1956fd06_8e96915c",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5edb24af_ae5a2174",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-23T15:48:44Z",
+      "side": 0,
+      "message": "Can\u0027t we now check that `len(duplicateImportPaths) \u003d\u003d 0` ?",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64ea4e2c_33bb9444",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-23T15:48:44Z",
+      "side": 0,
+      "message": "Out of interest, why is this no longer needed?",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

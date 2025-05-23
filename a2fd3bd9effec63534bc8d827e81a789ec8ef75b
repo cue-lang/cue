@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "30c05170_0b0b1e95",
+        "filename": "cue/build/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-23T15:48:44Z",
+      "side": 1,
+      "message": "```suggestion\n// EnsureInstance returns an instance configured for the supplied\n```",
+      "revId": "a2fd3bd9effec63534bc8d827e81a789ec8ef75b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9397e2cf_b54cdfcc",
         "filename": "cue/build_test.go",
         "patchSetId": 2
@@ -14,6 +31,58 @@
       "writtenOn": "2025-05-22T15:41:01Z",
       "side": 1,
       "message": "Careful inspection of the loading code shows that the setting of these fields *is* the responsibility of the \"loader func\" - i.e. the default loader func does it. And so we also make this loader responsible in the same way.\n\nThe reason this wasn\u0027t necessary before, was due to import.go#L104, which has been removed - it\u0027s rather rogue there, and setting ImportPath alone is not particularly useful - all the other fields should be being filled in too, and those really are only reachable via the default loader func.",
+      "revId": "a2fd3bd9effec63534bc8d827e81a789ec8ef75b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c87dd0c6_5667c8d5",
+        "filename": "cue/build_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-23T15:48:44Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9397e2cf_b54cdfcc",
+      "revId": "a2fd3bd9effec63534bc8d827e81a789ec8ef75b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28e0a13e_53923da7",
+        "filename": "cue/load/import.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-23T15:48:44Z",
+      "side": 1,
+      "message": "nice cleanups.",
+      "revId": "a2fd3bd9effec63534bc8d827e81a789ec8ef75b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ec7a837_3656306b",
+        "filename": "cue/load/import.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-23T15:48:44Z",
+      "side": 1,
+      "message": "This is kinda weird when the instance might be in use somewhere else where there _wasn\u0027t_ an error, but it\u0027s probably fine... maybe that can never happen in practice. It makes one think that perhaps the de-duplication should be happening at a slightly higher level so we\u0027re only ever dealing with a single import path at a time.\n\nThe other thing that\u0027s giving me pause is that special case in `EnsureInstance` that says it _sometimes_ de-dupes but otherwise doesn\u0027t. That\u0027s a bit odd: is it only for this use case? Might it be better to explicitly return an error instance if `err !\u003d nil` here and change `EnsureInstance` so it _always_ de-dupes (and panics if the import path is empty, or returns an error)",
       "revId": "a2fd3bd9effec63534bc8d827e81a789ec8ef75b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

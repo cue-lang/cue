@@ -28,7 +28,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	cuejson "cuelang.org/go/encoding/json"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
@@ -742,22 +741,33 @@ func (b *builder) object(v cue.Value) {
 	}
 
 	attr := v.Attribute("openapi")
-	for i := 0; i < attr.NumArgs(); i++ {
+	for i := range attr.NumArgs() {
 		key, value := attr.Arg(i)
-		if key != "extension" {
+		if key != "extensions" {
 			continue
 		}
 
-		parts := strings.SplitN(value, ":", 2)
-		if len(parts) != 2 {
-			b.failf(v, "invalid openapi extension attribute %q: %v must be in the format key:value", key, value)
-		} else {
-			extension, err := cuejson.Extract(key, []byte(parts[1]))
-			if err != nil {
-				b.failf(v, "invalid openapi extension attribute %q: %v", key, err)
-			}
+		extension := v.Context().CompileString(value)
 
-			b.setSingle(parts[0], extension, true)
+		if extension.Err() != nil {
+			b.failf(v, "invalid openapi extension attribute %q: %v", key, extension.Err())
+			return
+		}
+
+		iter, err := extension.Fields()
+		if err != nil {
+			b.failf(v, "invalid openapi extension attribute %q: %v", key, err)
+			return
+		}
+		for iter.Next() {
+			sel := iter.Selector()
+
+			switch node := iter.Value().Syntax(cue.Concrete(true)).(type) {
+			case ast.Expr:
+				b.setSingle(sel.Unquoted(), node, true)
+			default:
+				b.failf(v, "invalid openapi extension attribute %q: %v must be an expression", key, value)
+			}
 		}
 	}
 

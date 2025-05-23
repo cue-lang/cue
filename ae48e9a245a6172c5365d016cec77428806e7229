@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0361c438_dfca56d9",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-23T14:53:22Z",
+      "side": 1,
+      "message": "Maybe a brief comment to say that we\u0027re specifically testing that we get shared instances between arguments and dependencies here?",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "619d2197_0690abac",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-23T14:53:22Z",
+      "side": 1,
+      "message": "FWIW I tend just to use `bool` rather than `struct{}`: it\u0027s arguably error-prone/sloppy because there _can_ be explicit `false` entries in there, but in practice it\u0027s easier to use, e.g.\n```\nqt.Assert(t, qt.IsTrue(duplicateImportPaths[\"mod.test/test/importpaths/d@v0:d\"]))\n```",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12961e2f_cd2d1d66",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-23T14:53:22Z",
+      "side": 1,
+      "message": "```suggestion\n\tvar walkImports func(inst *build.Instance)\n```\n\n?",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76706818_c40d959a",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-23T14:53:22Z",
+      "side": 1,
+      "message": "I tend to use the most specific form of equality checking; CmpEquals is pretty rare to need (it\u0027s really there just in case one needs extra cmp options).\n\n```suggestion\n\t\tqt.Assert(t, qt.Not(qt.Equals(inst.PkgName, \"_\")))\n```\n\nThat said, it could be argued that the signature of `DeepEquals` should have been that of `CmpEquals` all along and then `CmpEquals` wouldn\u0027t need to exist. Oh well, water under the bridge.",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7926f6c9_2a9b61fb",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-23T14:53:22Z",
+      "side": 1,
+      "message": "```suggestion\n\tqt.Assert(t, qt.DeepEquals(importPaths, []string{\n```",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

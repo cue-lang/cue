@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5aede249_df3af6f4",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-23T15:17:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0361c438_dfca56d9",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "619d2197_0690abac",
@@ -70,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7a4f6c1_d436aad4",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-23T15:17:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12961e2f_cd2d1d66",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "76706818_c40d959a",
@@ -87,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "37f26d2a_9ff11fe6",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-23T15:17:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76706818_c40d959a",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7926f6c9_2a9b61fb",
@@ -100,6 +154,24 @@
       "writtenOn": "2025-05-23T14:53:22Z",
       "side": 1,
       "message": "```suggestion\n\tqt.Assert(t, qt.DeepEquals(importPaths, []string{\n```",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f2e84a0_662a7c6a",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-23T15:17:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7926f6c9_2a9b61fb",
       "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

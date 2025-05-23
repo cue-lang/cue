@@ -16,6 +16,24 @@
       "message": "I worked through all the code paths that could lead to here, and I believe managed to verify that by the time we get here, path has *always* gone through a `filepath.ToSlash` call. Thus the IsAbs check isn\u0027t needed. I think.",
       "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70c32c45_32ea4a1d",
+        "filename": "cue/load/import.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-23T15:32:36Z",
+      "side": 0,
+      "message": "Discussed on discord. This change is incorrect. Reverted, and comments added.",
+      "parentUuid": "1956fd06_8e96915c",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

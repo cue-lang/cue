@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0262fd64_be3c3ef2",
+        "filename": "cue/build/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-23T16:51:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30c05170_0b0b1e95",
+      "revId": "a2fd3bd9effec63534bc8d827e81a789ec8ef75b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9397e2cf_b54cdfcc",
@@ -83,6 +101,24 @@
       "writtenOn": "2025-05-23T15:48:44Z",
       "side": 1,
       "message": "This is kinda weird when the instance might be in use somewhere else where there _wasn\u0027t_ an error, but it\u0027s probably fine... maybe that can never happen in practice. It makes one think that perhaps the de-duplication should be happening at a slightly higher level so we\u0027re only ever dealing with a single import path at a time.\n\nThe other thing that\u0027s giving me pause is that special case in `EnsureInstance` that says it _sometimes_ de-dupes but otherwise doesn\u0027t. That\u0027s a bit odd: is it only for this use case? Might it be better to explicitly return an error instance if `err !\u003d nil` here and change `EnsureInstance` so it _always_ de-dupes (and panics if the import path is empty, or returns an error)",
+      "revId": "a2fd3bd9effec63534bc8d827e81a789ec8ef75b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62868ba4_3b0a5aea",
+        "filename": "cue/load/import.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-23T16:51:10Z",
+      "side": 1,
+      "message": "I have changed this (your concern in the first para) in the most recent patchset to avoid this situation.",
+      "parentUuid": "3ec7a837_3656306b",
       "revId": "a2fd3bd9effec63534bc8d827e81a789ec8ef75b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

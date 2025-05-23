@@ -89,6 +89,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "10695eec_f1bb8614",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-23T16:40:02Z",
+      "side": 0,
+      "message": "Discussed elsewhere, this was a misreading of the code. I think we agreed it does all make sense as is.",
+      "parentUuid": "5edb24af_ae5a2174",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64ea4e2c_33bb9444",
@@ -102,6 +120,24 @@
       "writtenOn": "2025-05-23T15:48:44Z",
       "side": 0,
       "message": "Out of interest, why is this no longer needed?",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "875d2ad8_8175ccd2",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-23T16:40:02Z",
+      "side": 0,
+      "message": "I think because I was generally removing (semi)-random mutations of these fields and found this (and others) could be removed with no ill-effect on the tests given I\u0027d also made effort to ensure Instances are created with more of the right fields to start with.",
+      "parentUuid": "64ea4e2c_33bb9444",
       "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

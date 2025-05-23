@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a590236_a506b8ae",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-05-23T15:12:15Z",
+      "side": 1,
+      "message": "I\u0027m afraid I\u0027ve taught myself to go the other route, to the extent that I often consider `bool` as _wrong_ on the basis it allows a 3-valued logic which is normally not wanted. The ergononmics don\u0027t bother me. But I completely accept I\u0027m probably in the minority on this one ;)",
+      "parentUuid": "619d2197_0690abac",
+      "revId": "ae48e9a245a6172c5365d016cec77428806e7229",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "12961e2f_cd2d1d66",

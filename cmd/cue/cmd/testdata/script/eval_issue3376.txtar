@@ -10,38 +10,16 @@
 #
 # The new evaluator correctly results in no errors in these cases.
 
-env CUE_EXPERIMENT=evalv3=0
-
-# evalv2 - scenario 1
+# scenario 1
 exec cue eval ./scenario1.cue
 
-# evalv2 - scenario 2
-#
-# This should not fail but it does. Fixed in evalv3
-! exec cue eval ./scenario2.cue
-cmp stderr scenario2.evalv2.stderr
-
-# evalv2 - scenario 3
-exec cue eval ./scenario3.cue
-
-# evalv2 - scenario 4
-#
-# This should not fail. Fixed in evalv3
-! exec cue eval ./scenario4.cue
-stderr 'items.a: cannot add to field '
-
-env CUE_EXPERIMENT=evalv3=1
-
-# evalv3 - scenario 1
-exec cue eval ./scenario1.cue
-
-# evalv3 - scenario 2
+# scenario 2
 exec cue eval ./scenario2.cue
 
-# evalv3 - scenario 3
+# scenario 3
 exec cue eval ./scenario3.cue
 
-# evalv3 - scenario 4
+# scenario 4
 exec cue eval ./scenario4.cue
 
 -- scenario1.cue --
@@ -110,7 +88,3 @@ items: a: deps: items.b.id
 items: b: deps: []
 items: c: deps: [items.a.id, items.b.id]
 items: d: _
-
--- scenario2.evalv2.stderr --
-items.a: cannot add to field _:
-    ./scenario2.cue:1:32

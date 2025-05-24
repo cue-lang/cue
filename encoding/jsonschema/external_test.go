@@ -187,7 +187,6 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 // testCaseTxtar returns a testscript that runs the given test.
 func testCaseTxtar(s *externaltest.Schema, test *externaltest.Test) string {
 	var buf strings.Builder
-	fmt.Fprintf(&buf, "env CUE_EXPERIMENT=evalv3\n")
 	fmt.Fprintf(&buf, "exec cue def json+jsonschema: schema.json\n")
 	if !test.Valid {
 		buf.WriteString("! ")
@@ -203,7 +202,6 @@ func testCaseTxtar(s *externaltest.Schema, test *externaltest.Test) string {
 // testCaseTxtar returns a testscript that decodes the given schema.
 func schemaFailureTxtar(s *externaltest.Schema) string {
 	var buf strings.Builder
-	fmt.Fprintf(&buf, "env CUE_EXPERIMENT=evalv3\n")
 	fmt.Fprintf(&buf, "exec cue def -o schema.cue json+jsonschema: schema.json\n")
 	fmt.Fprintf(&buf, "exec cat schema.cue\n")
 	fmt.Fprintf(&buf, "exec cue vet schema.cue\n")

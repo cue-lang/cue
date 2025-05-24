@@ -1,9 +1,3 @@
-# With the old evaluator.
-env CUE_EXPERIMENT=evalv3=0
-exec cue vet -c schema.cue data.json
-
-# With the new evaluator.
-env CUE_EXPERIMENT=evalv3=1
 exec cue vet -c schema.cue data.json
 
 -- data.json --

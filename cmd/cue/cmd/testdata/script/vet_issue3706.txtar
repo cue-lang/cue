@@ -1,9 +1,3 @@
-# evalv2
-env CUE_EXPERIMENT=evalv3=0
-exec cue vet -c -d '#site' schema.cue site.json
-
-# evalv3
-env CUE_EXPERIMENT=evalv3=1
 exec cue vet -c -d '#site' schema.cue site.json
 
 -- schema.cue --

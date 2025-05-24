@@ -1,10 +1,5 @@
 # Issue #3646
 
-env CUE_EXPERIMENT=evalv3=0
-exec cue cmd two
-stdout 'msg.*hello'
-
-env CUE_EXPERIMENT=evalv3=1
 exec cue cmd two
 stdout 'msg.*hello'
 

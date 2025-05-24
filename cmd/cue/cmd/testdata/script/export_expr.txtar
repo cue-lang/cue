@@ -4,7 +4,6 @@ cmp stdout expect-stdout
 cd ..
 
 # Issue 2542 was a regression introduced in CUE v0.6 which was resolved by evalv3.
-env CUE_EXPERIMENT=evalv3
 cd issue2542
 exec cue export -e 'obj2.name' input.cue
 cmp stdout stdout.golden

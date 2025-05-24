@@ -2,7 +2,7 @@ env CUE_EXPERIMENT=evalv3=0
 ! exec cue eval
 cmp stderr outv2
 
-env CUE_EXPERIMENT=evalv3
+env CUE_EXPERIMENT=evalv3=1
 exec cue eval
 cmp stdout outv3
 

@@ -1,25 +1,11 @@
 # https://cuelang.org/issues/2704
 
-env CUE_EXPERIMENT=evalv3=0
-
-! exec cue export schema.cue data.json
-cmp stderr evalv2-stderr.golden
-! exec cue vet schema.cue data.json
-cmp stderr evalv2-stderr.golden
-
-# This issue is already fixed in the new evaluator.
-env CUE_EXPERIMENT=evalv3=1
-
 exec cue export schema.cue data.json
-cmp stdout evalv3-stdout.golden
+cmp stdout stdout.golden
 exec cue vet schema.cue data.json
 ! stdout .
 
--- evalv2-stderr.golden --
-1: invalid value "value" (out of bound =~"^[0-9]+$"):
-    ./schema.cue:1:14
-    ./data.json:1:7
--- evalv3-stdout.golden --
+-- stdout.golden --
 [
     "5",
     "value"

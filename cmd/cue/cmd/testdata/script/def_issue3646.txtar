@@ -1,10 +1,3 @@
-env CUE_EXPERIMENT=evalv3=0
-exec cue def --inline-imports ./p1
-stdin stdout
-exec cue eval --out=json -
-cmp stdout stdout.golden
-
-env CUE_EXPERIMENT=evalv3=1
 exec cue def --inline-imports ./p1
 stdin stdout
 exec cue eval --out=json -

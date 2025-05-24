@@ -3,11 +3,6 @@ env MYTEXT=World
 exec cue cmd env
 cmp stdout cmd_env.out
 
-env CUE_EXPERIMENT=evalv3=0
-exec cue cmd issue3908
-stdout '^World$'
-
-env CUE_EXPERIMENT=evalv3=1
 ! exec cue cmd issue3908
 stderr 'issue3908.print.text: .*non-concrete value string'
 

@@ -20,11 +20,6 @@ cmp stdout def.stdout
 exec cue eval input.cue
 cmp stdout eval.stdout
 
-# Just to double check, ensure it also works for evalv3.
-env CUE_EXPERIMENT=evalv3
-exec cue export input.cue
-cmp stdout export.stdout
-
 # Also ensure that it's wired up for the Go API.
 stdin input.cue
 exec cuectx_export

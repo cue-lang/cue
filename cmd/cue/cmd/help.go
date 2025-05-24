@@ -310,7 +310,7 @@ If an environment variable is unset or empty, sensible default setting is used.
 			Enable topological sorting of struct fields.
 			Provide feedback via https://cuelang.org/issue/3558
 		cmdreferencepkg
-		    Require referencing imported tool packages to declare "cue cmd" tasks.
+			Require referencing imported tool packages to declare "cue cmd" tasks.
 
 	CUE_DEBUG
 		Comma-separated list of debug flags to enable or disable, such as:
@@ -353,7 +353,7 @@ For a detailed reference on modules:
 
 For information on commands that interact with modules:
 
-    cue help mod
+	cue help mod
 
 For tutorials on how to use the Central Registry, see:
 
@@ -578,7 +578,7 @@ The cue tool will infer a file's type from its extension by
 default. The user may override this behavior by using qualifiers.
 A qualifier takes the form
 
-    <tag>{'+'<tag>}':'
+	<tag>{'+'<tag>}':'
 
 For instance,
 
@@ -588,7 +588,7 @@ specifies that 'foo.data' should be read as a JSON file. File
 formats that do not have a default extension may be represented
 in any data format using the same notation:
 
-   cue def jsonschema: bar.cue foo.yaml openapi+yaml: baz.def
+	cue def jsonschema: bar.cue foo.yaml openapi+yaml: baz.def
 
 interprets the files bar.cue and foo.yaml as data in the
 respective formats encoding an JSON Schema, while 'baz.def' is
@@ -669,10 +669,10 @@ defined by the user on the command line.
 For example, the following file will only be included in a build
 if the user includes the flag "-t prod" on the command line.
 
-   // File prod.cue
-   @if(prod)
+	// File prod.cue
+	@if(prod)
 
-   package foo
+	package foo
 
 Ignoring files
 
@@ -682,11 +682,11 @@ clause or before any other CUE syntax if there is no package clause.
 
 For example:
 
-    @ignore()
+	@ignore()
 
-    // This file will be excluded for all purposes.
+	// This file will be excluded for all purposes.
 
-    package foo
+	package foo
 
 Injecting values
 
@@ -695,21 +695,21 @@ that are not defined within the scope of a comprehension, list, or
 optional field and that are marked with a "tag" attribute. For any
 field of the form
 
-   field: x @tag(key)
+	field: x @tag(key)
 
 an "--inject key=value" flag will modify the field to
 
-   field: x & "value"
+	field: x & "value"
 
 By default, the injected value is treated as a string.
 Alternatively, the "type" option allows a value to be interpreted
 as an int, number, or bool. For instance, for a field
 
-   field: x @tag(key,type=int)
+	field: x @tag(key,type=int)
 
 the flag "-t key=2" modifies the field to
 
-   field: x & 2
+	field: x & 2
 
 Valid values for type are "int", "number", "bool", and "string".
 
@@ -717,7 +717,7 @@ A tag attribute can also define shorthand values, which can be
 injected into the fields without having to specify the key. For
 instance, for
 
-   environment: string @tag(env,short=prod|staging)
+	environment: string @tag(env,short=prod|staging)
 
 "-t prod" sets the environment field to the value "prod". It is
 still possible to specify "-t env=prod" in this case.
@@ -725,7 +725,7 @@ still possible to specify "-t env=prod" in this case.
 Use the usual CUE constraints to limit the possible values of a
 field. For instance
 
-   environment: "prod" | "staging" @tag(env,short=prod|staging)
+	environment: "prod" | "staging" @tag(env,short=prod|staging)
 
 ensures the user may only specify "prod" or "staging".
 
@@ -736,7 +736,7 @@ The injection mechanism allows for the injection of system variables:
 when variable injection is enabled by passing the --inject-vars/-T flag,
 tags of the form
 
-    @tag(dir,var=cwd)
+	@tag(dir,var=cwd)
 
 will inject the named variable (here cwd) into the tag. An explicitly
 set value for a tag using --inject/-t takes precedence over an

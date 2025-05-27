@@ -1,8 +1,21 @@
 memregistry MEMREGISTRY
 
 env oldRegistry=$CUE_REGISTRY
+
+# smoke-test the dry-run output.
+exec cue mod mirror --dry-run --to $MEMREGISTRY example.com
+stdout '^mirroring baz.org@v0.5.0$'
+stdout '^push .*/baz.org@sha256:6a99876cf4d65e06d0d7ce3e5e7a8217d919f0b603c47d39b0ecf7db5299d85a \[355 bytes\]$'
+stdout '^tag .*/baz.org:v0.5.0@sha256:c145b84adf1458ec694b142ba85cd4a39aec82c1b31936694e0ca0abfc99a4fc$'
+
 exec cue mod mirror --to $MEMREGISTRY example.com
 cmp stdout want-mirror1-stdout
+
+# The dry-run output should not mention any push or tag operations now
+# because the content is already present.
+exec cue mod mirror --dry-run --to $MEMREGISTRY example.com
+stdout '^mirroring baz.org@v0.5.0$'
+! stdout '^(push|tag)'
 
 # Check that we can use the mirrored content.
 cd example

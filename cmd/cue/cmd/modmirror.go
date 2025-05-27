@@ -17,7 +17,11 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io"
 
+	"cuelabs.dev/go/oci/ociregistry"
+	"cuelabs.dev/go/oci/ociregistry/ociref"
+	"github.com/opencontainers/go-digest"
 	"github.com/spf13/cobra"
 
 	"cuelang.org/go/internal/mod/modload"
@@ -79,7 +83,7 @@ Note that this command is not yet stable and may be changed.
 
 func runModMirror(cmd *Command, args []string) error {
 	ctx := cmd.Context()
-	//dryRun := flagDryRun.Bool(cmd)	// TODO
+	dryRun := flagDryRun.Bool(cmd)
 	noDeps := flagNoDeps.Bool(cmd)
 	srcRegStr := flagFrom.String(cmd)
 	dstRegStr := flagTo.String(cmd)
@@ -96,13 +100,19 @@ func runModMirror(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	srcReg := modregistry.NewClientWithResolver(srcResolver)
+	srcReg := modregistry.NewClientWithResolver(modMirrorRegistryResolverShim{
+		resolver: srcResolver,
+		dryRun:   dryRun,
+	})
 
 	dstResolver, err := modconfig.NewResolver(newModConfig(dstRegStr))
 	if err != nil {
 		return err
 	}
-	dstReg := modregistry.NewClientWithResolver(dstResolver)
+	dstReg := modregistry.NewClientWithResolver(modMirrorRegistryResolverShim{
+		resolver: dstResolver,
+		dryRun:   dryRun,
+	})
 
 	var mf *modfile.File
 	if useMod {
@@ -241,4 +251,94 @@ func (mm *modMirror) mirrorWithDeps(ctx context.Context, mv module.Version) erro
 		return err
 	}
 	return nil
+}
+
+type modMirrorRegistryResolverShim struct {
+	resolver *modconfig.Resolver
+	dryRun   bool
+}
+
+func (r modMirrorRegistryResolverShim) ResolveToRegistry(mpath, vers string) (modregistry.RegistryLocation, error) {
+	regLoc, err := r.resolver.ResolveToRegistry(mpath, vers)
+	if err != nil {
+		return modregistry.RegistryLocation{}, err
+	}
+	loc, ok := r.resolver.ResolveToLocation(mpath, vers)
+	if !ok {
+		panic("unreachable: ResolveToLocation failed when ResolveToRegistry succeeded")
+	}
+	errorRegistry := &ociregistry.Funcs{
+		NewError: func(ctx context.Context, methodName, repo string) error {
+			return fmt.Errorf("unexpected OCI method %q invoked when mirroring", methodName)
+		},
+	}
+
+	// Allow pass-through of read methods but error on any mutating
+	// method that we don't explicitly implement.
+	type oneDeeper struct {
+		ociregistry.Interface
+	}
+	registryShim := struct {
+		ociregistry.Writer
+		ociregistry.Deleter
+		oneDeeper
+	}{
+		Writer:    errorRegistry,
+		Deleter:   errorRegistry,
+		oneDeeper: oneDeeper{regLoc.Registry},
+	}
+	return modregistry.RegistryLocation{
+		Registry: modMirrorRegistryShim{
+			host:      loc.Host,
+			Interface: registryShim,
+			registry:  regLoc.Registry,
+			dryRun:    r.dryRun,
+		},
+		Repository: loc.Repository,
+		Tag:        loc.Tag,
+	}, nil
+}
+
+type modMirrorRegistryShim struct {
+	host string
+	ociregistry.Interface
+	registry ociregistry.Interface
+	dryRun   bool
+}
+
+func (r modMirrorRegistryShim) PushBlob(ctx context.Context, repoName string, desc ociregistry.Descriptor, content io.Reader) (ociregistry.Descriptor, error) {
+	if !r.dryRun {
+		return r.registry.PushBlob(ctx, repoName, desc, content)
+	}
+	// Sanity check we can read the content.
+	_, err := io.Copy(io.Discard, content)
+	if err != nil {
+		return ociregistry.Descriptor{}, fmt.Errorf("cannot read blob data: %v", err)
+	}
+	ref := ociref.Reference{
+		Host:       r.host,
+		Repository: repoName,
+		Digest:     desc.Digest,
+	}
+	fmt.Printf("push %v [%d bytes]\n", ref, desc.Size)
+	return desc, nil
+}
+
+func (r modMirrorRegistryShim) PushManifest(ctx context.Context, repoName string, tag string, data []byte, mediaType string) (ociregistry.Descriptor, error) {
+	if !r.dryRun {
+		return r.registry.PushManifest(ctx, repoName, tag, data, mediaType)
+	}
+	desc := ociregistry.Descriptor{
+		Digest:    digest.FromBytes(data),
+		MediaType: mediaType,
+		Size:      int64(len(data)),
+	}
+	ref := ociref.Reference{
+		Host:       r.host,
+		Repository: repoName,
+		Digest:     desc.Digest,
+		Tag:        tag,
+	}
+	fmt.Printf("tag %v\n", ref)
+	return desc, nil
 }

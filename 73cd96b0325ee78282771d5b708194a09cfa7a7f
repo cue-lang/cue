@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "858e5622_f452c407",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-28T10:57:34Z",
+      "side": 1,
+      "message": "Thanks very much for adding these. LGTM with a couple of minor suggestions.",
+      "revId": "73cd96b0325ee78282771d5b708194a09cfa7a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc489647_2bc97489",
+        "filename": "cue/decode_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-28T10:57:34Z",
+      "side": 1,
+      "message": "Maybe also add test cases for explicitly decoding into `*big.Int` and `*apd.Decimal` ?\n\nAnd I\u0027d also add TODOs because these cases _should_ work, just don\u0027t currently.",
+      "revId": "73cd96b0325ee78282771d5b708194a09cfa7a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

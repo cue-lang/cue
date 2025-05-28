@@ -454,17 +454,17 @@ full: {
 	out: (#Main & {namespace: "ns1"}).output
 }
 -- out/evalalpha/stats --
-Leaks:  751
+Leaks:  755
 Freed:  0
 Reused: 0
-Allocs: 751
+Allocs: 755
 Retain: 0
 
-Unifications: 624
-Conjuncts:    1210
-Disjuncts:    49
+Unifications: 626
+Conjuncts:    1213
+Disjuncts:    50
 
-CloseIDElems: 1869
+CloseIDElems: 1880
 NumCloseIDs: 388
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -480,17 +480,17 @@ diff old new
 -Unifications: 927
 -Conjuncts:    1909
 -Disjuncts:    1202
-+Leaks:  751
++Leaks:  755
 +Freed:  0
 +Reused: 0
-+Allocs: 751
++Allocs: 755
 +Retain: 0
 +
-+Unifications: 624
-+Conjuncts:    1210
-+Disjuncts:    49
++Unifications: 626
++Conjuncts:    1213
++Disjuncts:    50
 +
-+CloseIDElems: 1869
++CloseIDElems: 1880
 +NumCloseIDs: 388
 -- out/eval/stats --
 Leaks:  115
@@ -1342,8 +1342,13 @@ Result:
   }
   issue3934: (struct){
     out: (#struct){
-      foo: (#struct){
-      }
+      foo: ((null|struct)){ |(*(#struct){
+          bar: (int){ 3 }
+        }, (#struct){
+          extra?: ((null|struct)){ |((null){ null }, (#struct){
+            }) }
+          bar?: (int){ int }
+        }, (null){ null }) }
     }
     #Foo: (#struct){
       foo?: ((null|struct)){ |(*(#struct){
@@ -2155,7 +2160,7 @@ diff old new
            e: (string){ "foo" }
            f: (int){ 1 }
          }
-@@ -947,35 +823,22 @@
+@@ -947,24 +823,16 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2190,20 +2195,7 @@ diff old new
      }
    }
    issue3934: (struct){
-     out: (#struct){
--      foo: ((null|struct)){ |(*(#struct){
--          bar: (int){ 3 }
--        }, (#struct){
--          extra?: ((null|struct)){ |((null){ null }, (#struct){
--            }) }
--          bar?: (int){ int }
--        }, (null){ null }) }
-+      foo: (#struct){
-+      }
-     }
-     #Foo: (#struct){
-       foo?: ((null|struct)){ |(*(#struct){
-@@ -1011,7 +874,7 @@
+@@ -1011,7 +879,7 @@
            op: (string){ "add" }
            path: (string){ "/metadata" }
            value: (_|_){
@@ -2212,7 +2204,7 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -1040,38 +903,11 @@
+@@ -1040,38 +908,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -2253,7 +2245,7 @@ diff old new
          let base#6 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -1090,7 +926,7 @@
+@@ -1090,7 +931,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
                value: (_|_){
@@ -2262,7 +2254,7 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
-@@ -1114,6 +950,19 @@
+@@ -1114,6 +955,19 @@
              }
            }
          }
@@ -2282,7 +2274,7 @@ diff old new
        }
      }
      out: (#struct){
-@@ -1143,17 +992,8 @@
+@@ -1143,17 +997,8 @@
              //     ./validators.cue:32:17
              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
              //     ./validators.cue:29:22

@@ -213,7 +213,7 @@ func doTasks(cmd *Command, command string, root *cue.Instance) error {
 	c := flow.New(cfg, root, newTaskFunc(cmd, &didWork))
 
 	// Return early if anything was in error
-	if err := c.Run(backgroundContext()); err != nil {
+	if err := c.Run(cmd.Context()); err != nil {
 		return err
 	}
 

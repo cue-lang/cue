@@ -251,7 +251,7 @@ func runModUpload(cmd *Command, args []string) error {
 	}
 
 	rclient := modregistry.NewClientWithResolver(resolver)
-	if err := rclient.PutModuleWithMetadata(backgroundContext(), mv, zf, info.Size(), meta); err != nil {
+	if err := rclient.PutModuleWithMetadata(ctx, mv, zf, info.Size(), meta); err != nil {
 		return fmt.Errorf("cannot put module: %v", err)
 	}
 	ref := ociref.Reference{

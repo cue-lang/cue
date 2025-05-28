@@ -58,7 +58,7 @@ func runModTidy(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	ctx := backgroundContext()
+	ctx := cmd.Context()
 	modRoot, err := findModuleRoot()
 	if err != nil {
 		return err

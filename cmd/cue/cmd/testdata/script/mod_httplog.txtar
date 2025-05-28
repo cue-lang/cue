@@ -15,14 +15,13 @@ exec cue mod get example.com@latest
 stderr '"msg":"http client->".*"method":"GET","url":"http://[^/]+/v2/example.com/tags/list\?n=\d+",'
 
 # Mirror a module to a registry with auth; the auth credentials should be redacted.
-# TODO: the list?n= parameter is being redacted for some reason.
 memregistry -auth=foo:bar MEMREGISTRY
 env OLD_CUE_REGISTRY=${CUE_REGISTRY}
 env CUE_REGISTRY=$MEMREGISTRY+insecure
 env DOCKER_CONFIG=$WORK/dockerconfig
 env-fill $DOCKER_CONFIG/config.json
 exec cue mod mirror --from $OLD_CUE_REGISTRY example.com
-stderr '"msg":"http client->".*"method":"GET","url":"http://[^/]+/v2/example.com/tags/list\?n=REDACTED","contentLength":0,'
+stderr '"msg":"http client->".*"method":"GET","url":"http://[^/]+/v2/example.com/tags/list\?n=\d+","contentLength":0,'
 stderr '"msg":"http client->".*"method":"POST","url":"http://[^/]+/v2/example.com/blobs/uploads/","contentLength":0,"header":{"Authorization":\["Basic REDACTED"\],'
 
 # Publish a module, again with redacted auth credentials.

@@ -16,14 +16,12 @@ package cmd
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
 
-	"cuelang.org/go/internal/httplog"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/mod/modfile"
 )
@@ -68,7 +66,7 @@ func runModGet(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	ctx := backgroundContext()
+	ctx := cmd.Context()
 	modRoot, err := findModuleRoot()
 	if err != nil {
 		return err
@@ -131,14 +129,6 @@ func findModuleRoot() (string, error) {
 		}
 		dir = dir1
 	}
-}
-
-func backgroundContext() context.Context {
-	// TODO move this into the ociregistry module
-	return httplog.ContextWithAllowedURLQueryParams(
-		context.Background(),
-		allowURLQueryParam,
-	)
 }
 
 // The set of query string keys that we expect to send as part of the OCI

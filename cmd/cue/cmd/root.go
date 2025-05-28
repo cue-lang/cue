@@ -38,6 +38,7 @@ import (
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/httplog"
 )
 
 // TODO: commands
@@ -303,7 +304,12 @@ func Main() int {
 		// Don't let anything else be printed to stdout; we're only benchmarking.
 		cmd.SetOutput(io.Discard)
 	}
-	if err := cmd.Run(backgroundContext()); err != nil {
+	// TODO(mvdan): consider using [os/signal.NotifyContext]
+	ctx := httplog.ContextWithAllowedURLQueryParams(
+		context.Background(),
+		allowURLQueryParam,
+	)
+	if err := cmd.Run(ctx); err != nil {
 		if err != ErrPrintedError {
 			errors.Print(os.Stderr, err, &errors.Config{
 				Cwd:     rootWorkingDir(),
@@ -404,7 +410,7 @@ func (c *Command) Run(ctx context.Context) (err error) {
 	// - user defined
 	// - help
 	// For the latter two, we need to use the default loading.
-	if err := c.root.Execute(); err != nil {
+	if err := c.root.ExecuteContext(ctx); err != nil {
 		return err
 	}
 	if c.hasErr {

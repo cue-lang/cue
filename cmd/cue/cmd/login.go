@@ -96,8 +96,9 @@ inside $CUE_CONFIG_DIR; see 'cue help environment'.
 					return fmt.Errorf("the --token flag needs a non-empty string")
 				}
 
-				ctx := backgroundContext()
+				ctx := cmd.Context()
 				// Cause the oauth2 logic to log HTTP requests when logging is enabled.
+				// TODO(mvdan): test that these debug logs actually work.
 				ctx = context.WithValue(ctx, oauth2.HTTPClient, &http.Client{
 					Transport: httpTransport(),
 				})

@@ -16,6 +16,24 @@
       "message": "do we need some sort of TODO for this, then?",
       "revId": "e71b4aae802d67e072d7be61ca639bd7183fde19",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8119bc0b_4ace3780",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-05-28T13:00:35Z",
+      "side": 1,
+      "message": "No. I think both answers were arguably correct. It seems nice, though, that evalv2 and evalv3 are identical.",
+      "parentUuid": "0a702661_82728657",
+      "revId": "e71b4aae802d67e072d7be61ca639bd7183fde19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

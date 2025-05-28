@@ -6,7 +6,6 @@
 
 env DOCKER_CONFIG=$WORK/dockerconfig
 env-fill $DOCKER_CONFIG/config.json
-env CUE_DEBUG=http
 exec cue mod tidy
 exec cue export .
 cmp stdout expect-stdout

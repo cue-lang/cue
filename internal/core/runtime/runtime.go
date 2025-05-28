@@ -125,6 +125,7 @@ func (r *Runtime) Init() {
 	r.loaded = map[*build.Instance]interface{}{}
 
 	r.SetVersion(internal.DefaultVersion)
+	cueexperiment.Init()
 	r.topoSort = cueexperiment.Flags.TopoSort
 
 	// By default we follow the environment's CUE_DEBUG settings,

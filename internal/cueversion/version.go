@@ -9,8 +9,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"golang.org/x/mod/module"
 )
 
 // LanguageVersion returns the CUE language version.
@@ -66,10 +64,21 @@ var moduleVersionOnce = sync.OnceValue(func() string {
 		}
 	}
 	if vcsRevision != "" {
-		version = module.PseudoVersion("", "", vcsTime, vcsRevision)
+		version = pseudoVersion(vcsTime, vcsRevision)
 	}
 	return version
 })
+
+const pseudoVersionTimestampFormat = "20060102150405"
+
+// pseudoVersion returns a Go-style pseudo-version, given a revision time,
+// and revision identifier (usually a 12-byte commit hash prefix).
+//
+// This code was adapted directly from [golang.org/x/mod/module.PseudoVersion] (@v0.24.0)
+// to avoid adding a dependency on that module from the core CUE packages.
+func pseudoVersion(t time.Time, rev string) string {
+	return fmt.Sprintf("v0.0.0-%s-%s", t.UTC().Format(pseudoVersionTimestampFormat), rev)
+}
 
 func findCUEModule(bi *debug.BuildInfo) *debug.Module {
 	if bi.Main.Path == cueModule {

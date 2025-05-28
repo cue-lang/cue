@@ -493,7 +493,7 @@ func (n *nodeContext) checkTypos() {
 	// outer:
 	for _, a := range v.Arcs {
 		f := a.Label
-		if a.IsFromDisjunction() {
+		if a.isDisjunct() {
 			continue // Already checked in disjuncts.
 		}
 

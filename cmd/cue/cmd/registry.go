@@ -30,6 +30,7 @@ func newModConfig(registry string) *modconfig.Config {
 }
 
 func httpTransport() http.RoundTripper {
+	cuedebug.Init()
 	if !cuedebug.Flags.HTTP {
 		return http.DefaultTransport
 	}

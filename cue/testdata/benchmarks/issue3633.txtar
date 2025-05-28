@@ -1,16 +1,16 @@
 #Issue: 3633
 -- out/evalalpha/stats --
-Leaks:  2287
+Leaks:  2627
 Freed:  0
 Reused: 0
-Allocs: 2287
+Allocs: 2627
 Retain: 0
 
-Unifications: 537
-Conjuncts:    2338
-Disjuncts:    1745
+Unifications: 667
+Conjuncts:    2680
+Disjuncts:    1955
 
-CloseIDElems: 1249
+CloseIDElems: 4233
 NumCloseIDs: 55
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -21,20 +21,20 @@ diff old new
 -Freed:  3595
 -Reused: 3575
 -Allocs: 20
-+Leaks:  2287
++Leaks:  2627
 +Freed:  0
 +Reused: 0
-+Allocs: 2287
++Allocs: 2627
  Retain: 0
  
 -Unifications: 885
 -Conjuncts:    3846
 -Disjuncts:    3595
-+Unifications: 537
-+Conjuncts:    2338
-+Disjuncts:    1745
++Unifications: 667
++Conjuncts:    2680
++Disjuncts:    1955
 +
-+CloseIDElems: 1249
++CloseIDElems: 4233
 +NumCloseIDs: 55
 -- out/eval/stats --
 Leaks:  0

@@ -16,6 +16,24 @@
       "message": "My initial intuition was to skip the shims when dryRun is false, and have their logic always assume dryRun is true, which would keep the logic a bit more separate.\n\nBut I guess then we can\u0027t use the shims for anything else in the future, and it\u0027s likely we will want other knobs in the future.",
       "revId": "25db7de22f5a90244717c092ad3ba77b7908e932",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57fcbd1e_8a8bfe86",
+        "filename": "cmd/cue/cmd/modmirror.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-28T09:07:10Z",
+      "side": 1,
+      "message": "Yup, that was exactly my train of thought too! I thought we might well want a verbose mode, for example, and it\u0027s also nice to have the dry-run shim present even in the non-dry-run case to give us more confidence that the dry run is as true to reality as it purports to be.",
+      "parentUuid": "5e119389_e8311602",
+      "revId": "25db7de22f5a90244717c092ad3ba77b7908e932",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

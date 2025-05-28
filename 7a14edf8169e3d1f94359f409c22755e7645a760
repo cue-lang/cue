@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "175eab49_c2ff366b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-28T13:32:14Z",
+      "side": 1,
+      "message": "SGTM. As soon as Go 1.25 is out, we can rely on Go 1.24 and later properly stamping local builds too, so at that point we can remove this hack anyway.",
+      "revId": "7a14edf8169e3d1f94359f409c22755e7645a760",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

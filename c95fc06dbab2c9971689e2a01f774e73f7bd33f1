@@ -16,6 +16,24 @@
       "message": "Maybe move this to the top of this Init function to make it clear that we\u0027re allowed to inspect cueexperiment flags anywhere inside the runtime logic?",
       "revId": "c95fc06dbab2c9971689e2a01f774e73f7bd33f1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40154169_8f5bdace",
+        "filename": "internal/core/runtime/runtime.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-29T16:13:53Z",
+      "side": 1,
+      "message": "we consistently call Init right before the flags are used elsewhere, so I\u0027d rather stick to that for now.",
+      "parentUuid": "8c7e8819_a272c898",
+      "revId": "c95fc06dbab2c9971689e2a01f774e73f7bd33f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

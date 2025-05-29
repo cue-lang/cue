@@ -16,6 +16,24 @@
       "message": "Out of interest, why would we consider doing that, given that we don\u0027t catch signals anywhere apart from in the `mod registry` implementation?",
       "revId": "085c66be9f8db6add2b01d7f74c48e5e6f3639cc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db1dea01_c07ea3ee",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-29T16:11:21Z",
+      "side": 1,
+      "message": "so that longer operations, like a `cue mod mirror` or `cue mod tidy`, can be gracefully cancelled via a ^C without it immediately killing the Go process. rather than having every command set up its own signal handler, we could do it here, having a top-level context that is cancelled on a signal.\n\nleft as a TODO as it should be done separately.",
+      "parentUuid": "e861c4b1_41b809fc",
+      "revId": "085c66be9f8db6add2b01d7f74c48e5e6f3639cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -15,11 +15,6 @@ var Flags struct {
 	// and bringing better algorithms for disjunctions, closedness, and cycles.
 	EvalV3 bool `envflag:"default:true"`
 
-	// Embed enables support for embedded data files as described in
-	// https://cuelang.org/discussion/3264.
-	// TODO(v0.14): deprecate this flag to forbid disabling this feature.
-	Embed bool `envflag:"default:true"`
-
 	// TopoSort enables topological sorting of struct fields.
 	// Provide feedback via https://cuelang.org/issue/3558.
 	// TODO(v0.14): deprecate this flag to forbid disabling this feature.
@@ -49,6 +44,11 @@ var Flags struct {
 	// to ensure consistency with 32-bit platforms.
 	// This experiment ran from late 2024 to mid 2025.
 	DecodeInt64 bool `envflag:"deprecated,default:true"`
+
+	// Embed enables support for embedded data files as described in
+	// https://cuelang.org/discussion/3264.
+	// This experiment ran from mid 2024 to mid 2025.
+	Embed bool `envflag:"deprecated,default:true"`
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

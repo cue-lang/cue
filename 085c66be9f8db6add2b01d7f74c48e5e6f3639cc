@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e861c4b1_41b809fc",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-29T16:06:36Z",
+      "side": 1,
+      "message": "Out of interest, why would we consider doing that, given that we don\u0027t catch signals anywhere apart from in the `mod registry` implementation?",
+      "revId": "085c66be9f8db6add2b01d7f74c48e5e6f3639cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

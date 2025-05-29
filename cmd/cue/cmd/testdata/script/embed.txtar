@@ -1,4 +1,4 @@
-# Embedding is enabled by default, but it can still be disabled.
+# Embedding can no longer be disabled.
 env CUE_EXPERIMENT=embed=0
 ! exec cue eval
 cmp stderr out/noembed
@@ -151,8 +151,7 @@ language: version: "v0.9.0"
     }
 }
 -- out/noembed --
-no interpreter defined for "embed":
-    ./test.cue:1:1
+cannot parse CUE_EXPERIMENT: cannot change default value of deprecated flag "embed"
 -- out/eval --
 a: {
     x: 34

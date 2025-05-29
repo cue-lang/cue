@@ -8,9 +8,9 @@ import (
 
 func TestInit(t *testing.T) {
 	// This is just a smoke test to make sure it's all wired up OK.
-	t.Setenv("CUE_EXPERIMENT", "evalv3,embed=0")
+	t.Setenv("CUE_EXPERIMENT", "evalv3=0,cmdreferencepkg")
 	err := Init()
 	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.IsTrue(Flags.EvalV3))
-	qt.Assert(t, qt.IsFalse(Flags.Embed))
+	qt.Assert(t, qt.IsFalse(Flags.EvalV3))
+	qt.Assert(t, qt.IsTrue(Flags.CmdReferencePkg))
 }

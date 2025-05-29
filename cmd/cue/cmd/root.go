@@ -135,12 +135,10 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if wasmInterp != nil {
 			opts = append(opts, cuecontext.Interpreter(wasmInterp))
 		}
-		// CUE_EXPERIMENT=embed should probably be obeyed by [cuecontext.New] just like
-		// other flags such as evalv3 or toposort. Currently that causes an import cycle.
+		// Embedding should work with [cuecontext.New] too.
+		// Currently that causes an import cycle.
 		// See: https://cuelang.org/issue/3613
-		if cueexperiment.Flags.Embed {
-			opts = append(opts, cuecontext.Interpreter(embed.New()))
-		}
+		opts = append(opts, cuecontext.Interpreter(embed.New()))
 		c.ctx = cuecontext.New(opts...)
 		// Some init work, such as in internal/filetypes, evaluates CUE by design.
 		// We don't want that work to count towards $CUE_STATS.

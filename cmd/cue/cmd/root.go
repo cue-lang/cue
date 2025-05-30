@@ -32,7 +32,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/interpreter/embed"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cueexperiment"
@@ -135,10 +134,6 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if wasmInterp != nil {
 			opts = append(opts, cuecontext.Interpreter(wasmInterp))
 		}
-		// Embedding should work with [cuecontext.New] too.
-		// Currently that causes an import cycle.
-		// See: https://cuelang.org/issue/3613
-		opts = append(opts, cuecontext.Interpreter(embed.New()))
 		c.ctx = cuecontext.New(opts...)
 		// Some init work, such as in internal/filetypes, evaluates CUE by design.
 		// We don't want that work to count towards $CUE_STATS.

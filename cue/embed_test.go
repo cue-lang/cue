@@ -4,12 +4,11 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/cuecontext"
-	"cuelang.org/go/cue/interpreter/embed"
 	"github.com/go-quicktest/qt"
 )
 
 func TestEmbedFailsWhenNotInModule(t *testing.T) {
-	ctx := cuecontext.New(cuecontext.Interpreter(embed.New()))
+	ctx := cuecontext.New()
 	v := ctx.CompileString(`
 @extern(embed)
 

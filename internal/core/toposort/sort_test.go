@@ -43,7 +43,6 @@ func TestTopologicalSort(t *testing.T) {
 			test.Run(t, func(t *cuetxtar.Test) {
 				t.Flags.SortFields = lexico
 				run := t.Runtime()
-				run.SetTopologicalSort(true)
 
 				inst := t.Instance()
 

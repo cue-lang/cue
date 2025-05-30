@@ -18,14 +18,6 @@ var Flags struct {
 	// and enabled by default in v0.13.0 (2025-05).
 	EvalV3 bool `envflag:"default:true"`
 
-	// TopoSort enables topological sorting of struct fields.
-	// Provide feedback via https://cuelang.org/issue/3558.
-	//
-	// This experiment was introduced in v0.11.0 (2024-11)
-	// and enabled by default in v0.12.0 (2025-01).
-	// TODO(v0.14): deprecate this flag to forbid disabling this feature.
-	TopoSort bool `envflag:"default:true"`
-
 	// CmdReferencePkg requires referencing an imported tool package to declare tasks.
 	// Otherwise, declaring tasks via "$id" or "kind" string fields is allowed.
 	//
@@ -68,6 +60,14 @@ var Flags struct {
 	// enabled by default in v0.12.0 (2025-01),
 	// and deprecated in the upcoming v0.14 release.
 	Embed bool `envflag:"deprecated,default:true"`
+
+	// TopoSort enables topological sorting of struct fields.
+	// Provide feedback via https://cuelang.org/issue/3558.
+	//
+	// This experiment was introduced in v0.11.0 (2024-11)
+	// enabled by default in v0.12.0 (2025-01),
+	// and deprecated in the upcoming v0.14 release.
+	TopoSort bool `envflag:"deprecated,default:true"`
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

@@ -21,8 +21,9 @@ var Flags struct {
 	// CmdReferencePkg requires referencing an imported tool package to declare tasks.
 	// Otherwise, declaring tasks via "$id" or "kind" string fields is allowed.
 	//
-	// This experiment was introduced in v0.13.0 (2025-05).
-	CmdReferencePkg bool
+	// This experiment was introduced in v0.13.0 (2025-05),
+	// and enabled by default in the upcoming v0.14 release.
+	CmdReferencePkg bool `envflag:"default:true"`
 
 	// The flags below describe completed experiments; they can still be set
 	// as long as the value aligns with the final behavior once the experiment finished.

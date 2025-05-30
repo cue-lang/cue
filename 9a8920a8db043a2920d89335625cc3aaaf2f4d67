@@ -16,6 +16,24 @@
       "message": "I just remembered about https://github.com/cue-lang/cue/issues/3613; at minimum that needs to be marked as fixed. I\u0027m re-reading the thread now.",
       "revId": "9a8920a8db043a2920d89335625cc3aaaf2f4d67",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a62c0ad9_61dd8483",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-05-30T12:24:35Z",
+      "side": 1,
+      "message": "Re-reading the thread, I still think it\u0027s OK to close the issue as resolved by this change. I don\u0027t think it\u0027s a security or user concern that embedding will be on by default with cue/load and cue/cuecontext.\n\nWe might want to offer some sort of API option to turn it off, but that would only make sense if there was a similar knob for cmd/cue, so I lean towards only considering that if users ask for it.",
+      "parentUuid": "e2810787_84e609ab",
+      "revId": "9a8920a8db043a2920d89335625cc3aaaf2f4d67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package yaml
+package yaml_test
 
 import (
 	"strings"
@@ -20,6 +20,7 @@ import (
 
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/encoding/yaml"
 )
 
 func TestYAML(t *testing.T) {
@@ -99,7 +100,7 @@ null
 	ctx := cuecontext.New()
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			f, err := Extract(tc.name, tc.yaml)
+			f, err := yaml.Extract(tc.name, tc.yaml)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -108,7 +109,7 @@ null
 				t.Errorf("Extract:\ngot  %q\nwant %q", got, tc.want)
 			}
 
-			file, err := Extract(tc.name, tc.yaml)
+			file, err := yaml.Extract(tc.name, tc.yaml)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -124,7 +125,7 @@ null
 
 			wantVal := ctx.CompileString(tc.want)
 			if !tc.isStream {
-				b, err = Encode(wantVal)
+				b, err = yaml.Encode(wantVal)
 				if err != nil {
 					t.Error(err)
 				}
@@ -133,7 +134,7 @@ null
 				}
 			} else {
 				iter, _ := wantVal.List()
-				b, err := EncodeStream(iter)
+				b, err := yaml.EncodeStream(iter)
 				if err != nil {
 					t.Error(err)
 				}
@@ -231,7 +232,7 @@ func TestYAMLValues(t *testing.T) {
 			c := cuecontext.New()
 			v := c.CompileString(tc.cue)
 
-			b, err := Encode(v)
+			b, err := yaml.Encode(v)
 			if err != nil {
 				t.Error(err)
 			}

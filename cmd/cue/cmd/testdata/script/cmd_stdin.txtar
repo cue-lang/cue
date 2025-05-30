@@ -51,14 +51,12 @@ import (
 )
 
 command: echo: {
-    echo: {
-        kind:   "exec"
+    echo: exec.Run & {
         cmd:    "cat"
         stdout: string
     }
 
-    pass: {
-        kind:   "exec"
+    pass: exec.Run & {
         cmd:    "cat"
         stdin:  echo.stdout
     }

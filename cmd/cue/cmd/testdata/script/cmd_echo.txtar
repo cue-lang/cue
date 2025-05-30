@@ -19,29 +19,30 @@ message: "Hello \(_who)!" // who declared in data.cue
 -- hello_tool.cue --
 package hello
 
+import (
+    "tool/cli"
+    "tool/exec"
+)
+
 command: echo: {
-    echo: {
-        kind:   "exec"
+    echo: exec.Run & {
         cmd:    "echo \(message)"
         stdout: string
     }
 
-    task: display: {
-        kind: "print"
+    task: display: cli.Print & {
         text: echo.stdout
     }
 }
 
 // Issue #924
 command: echohidden: {
-    echo: {
-        kind:   "exec"
+    echo: exec.Run & {
         cmd:    "echo Hello \(_who)!"
         stdout: string
     }
 
-    task: display: {
-        kind: "print"
+    task: display: cli.Print & {
         text: echo.stdout
     }
 }

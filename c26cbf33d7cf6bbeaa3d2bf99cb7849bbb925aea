@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27bde8af_8cd77ba5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-30T11:56:13Z",
+      "side": 1,
+      "message": "LGTM with one minor suggestion, thanks!",
+      "revId": "c26cbf33d7cf6bbeaa3d2bf99cb7849bbb925aea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47e7f9ae_b62c08de",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-05-30T11:56:13Z",
+      "side": 1,
+      "message": "I know that this is implicitly called as part of the decoding logic, but it would be nice to have some explicit unit tests of this new public API too.",
+      "revId": "c26cbf33d7cf6bbeaa3d2bf99cb7849bbb925aea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

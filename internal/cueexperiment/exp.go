@@ -13,15 +13,23 @@ import (
 var Flags struct {
 	// EvalV3 enables the new CUE evaluator, addressing performance issues
 	// and bringing better algorithms for disjunctions, closedness, and cycles.
+	//
+	// This experiment was introduced in v0.9.0 (2024-06),
+	// and enabled by default in v0.13.0 (2025-05).
 	EvalV3 bool `envflag:"default:true"`
 
 	// TopoSort enables topological sorting of struct fields.
 	// Provide feedback via https://cuelang.org/issue/3558.
+	//
+	// This experiment was introduced in v0.11.0 (2024-11)
+	// and enabled by default in v0.12.0 (2025-01).
 	// TODO(v0.14): deprecate this flag to forbid disabling this feature.
 	TopoSort bool `envflag:"default:true"`
 
 	// CmdReferencePkg requires referencing an imported tool package to declare tasks.
 	// Otherwise, declaring tasks via "$id" or "kind" string fields is allowed.
+	//
+	// This experiment was introduced in v0.13.0 (2025-05).
 	CmdReferencePkg bool
 
 	// The flags below describe completed experiments; they can still be set
@@ -31,23 +39,34 @@ var Flags struct {
 
 	// Modules enables support for the modules and package management proposal
 	// as described in https://cuelang.org/discussion/2939.
-	// This experiment ran from early 2023 to late 2024.
+	//
+	// This experiment was introduced in v0.8.0 (2024-03),
+	// enabled by default in v0.9.0 (2024-06),
+	// and deprecated in v0.11.0 (2024-11).
 	Modules bool `envflag:"deprecated,default:true"`
 
 	// YAMLV3Decoder swaps the old internal/third_party/yaml decoder with the new
 	// decoder implemented in internal/encoding/yaml on top of yaml.v3.
-	// This experiment ran from early 2024 to late 2024.
+	//
+	// This experiment was introduced in v0.9.0 (2024-06), already on by default,
+	// and was deprecated in v0.11.0 (2024-11).
 	YAMLV3Decoder bool `envflag:"deprecated,default:true"`
 
 	// DecodeInt64 changes [cuelang.org/go/cue.Value.Decode] to choose
 	// `int64` rather than `int` as the default type for CUE integer values
 	// to ensure consistency with 32-bit platforms.
-	// This experiment ran from late 2024 to mid 2025.
+	//
+	// This experiment was introduced in v0.11.0 (2024-11),
+	// enabled by default in v0.12.0 (2025-01),
+	// and was deprecated in v0.13.0 (2025-05).
 	DecodeInt64 bool `envflag:"deprecated,default:true"`
 
 	// Embed enables support for embedded data files as described in
 	// https://cuelang.org/discussion/3264.
-	// This experiment ran from mid 2024 to mid 2025.
+	//
+	// This experiment was introduced in v0.10.0 (2024-08),
+	// enabled by default in v0.12.0 (2025-01),
+	// and deprecated in the upcoming v0.14 release.
 	Embed bool `envflag:"deprecated,default:true"`
 }
 

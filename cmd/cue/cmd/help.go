@@ -300,9 +300,6 @@ If an environment variable is unset or empty, sensible default setting is used.
 		evalv3 (default true)
 			Enable the new CUE evaluator, addressing performance issues
 			and bringing a better disjunction algorithm.
-		toposort (default true)
-			Enable topological sorting of struct fields.
-			Provide feedback via https://cuelang.org/issue/3558
 		cmdreferencepkg
 			Require referencing imported tool packages to declare "cue cmd" tasks.
 

@@ -90,7 +90,6 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -107,19 +106,24 @@ import (
 // interpreter is a [cuecontext.ExternInterpreter] for embedded files.
 type interpreter struct{}
 
+// Note that [cuecontext.ExternInterpreter] is just an alias for [runtime.Interpreter]
+// but because the [cuelang.org/go/cue/cuecontext] package depends on embedding
+// we cannot refer to that type directly.
+
 // New returns a new interpreter for embedded files as a
-// [cuecontext.ExternInterpreter] suitable for passing to [cuecontext.New].
-func New() cuecontext.ExternInterpreter {
-	return &interpreter{}
+// [cuelang.org/go/cue/cuecontext.ExternInterpreter] suitable for
+// passing to [cuelang.org/go/cue/cuecontext.New].
+func New() runtime.Interpreter {
+	return interpreter{}
 }
 
-func (i *interpreter) Kind() string {
+func (i interpreter) Kind() string {
 	return "embed"
 }
 
 // NewCompiler returns a compiler that can decode and embed files that exist
 // within a CUE module.
-func (i *interpreter) NewCompiler(b *build.Instance, r *runtime.Runtime) (runtime.Compiler, errors.Error) {
+func (i interpreter) NewCompiler(b *build.Instance, r *runtime.Runtime) (runtime.Compiler, errors.Error) {
 	if b.Module == "" {
 		return nil, errors.Newf(token.Pos{}, "cannot embed files when not in a module")
 	}

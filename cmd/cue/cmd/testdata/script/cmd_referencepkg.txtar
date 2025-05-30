@@ -1,17 +1,18 @@
-# `cue cmd` supports referring to tasks from tool/... packages via the
+# `cue cmd` used to support referring to tasks from tool/... packages via the
 # kind or $id string fields. This can result in surprising behavior
 # when unmarshalling data as a regular field alongside other tasks,
 # as the data can then declare further tasks to be run.
+# That is now only possible by setting CUE_EXPERIMENT=cmdreferencepkg=0.
 
 # Decoding input data containing a `kind` field outside other task values.
 exec cue cmd inputKindOutside
 stdout -count=1 '^hello$'
-stdout -count=1 '^command from input$'
+! stdout '^command from input$'
 
 # Decoding input data containing a `$id` field outside other task values.
 exec cue cmd inputDollarIdOutside
 stdout -count=1 '^hello$'
-stdout -count=1 '^command from input$'
+! stdout '^command from input$'
 
 # Decoding input data containing a `_id` field outside other task values.
 exec cue cmd inputUnderscoreIdOutside
@@ -30,22 +31,22 @@ stdout -count=1 '^hello$'
 ! stdout '^command from input$'
 
 # Use tool/cli.Print by copy pasting its definition, including the `$id` field.
-exec cue cmd useCliPrintCopy
-stdout -count=1 '^hello$'
+! exec cue cmd useCliPrintCopy
+stderr 'no tasks found'
 
-# Enabling the cmdreferencepkg experiment, tasks only work when referencing imported tool packages.
-env CUE_EXPERIMENT=cmdreferencepkg
+# Disabling the cmdreferencepkg experiment, tasks work without referencing imported tool packages.
+env CUE_EXPERIMENT=cmdreferencepkg=0
 
 exec cue cmd inputKindOutside
 stdout -count=1 '^hello$'
-! stdout '^command from input$'
+stdout -count=1 '^command from input$'
 
 exec cue cmd inputDollarIdOutside
 stdout -count=1 '^hello$'
-! stdout '^command from input$'
+stdout -count=1 '^command from input$'
 
-! exec cue cmd useCliPrintCopy
-stderr 'no tasks found'
+exec cue cmd useCliPrintCopy
+stdout -count=1 '^hello$'
 
 -- input_kind.json --
 {"cmd": {"kind": "print",          "text": "command from input"}, "data": "hello"}

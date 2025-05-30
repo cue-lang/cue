@@ -300,7 +300,7 @@ If an environment variable is unset or empty, sensible default setting is used.
 		evalv3 (default true)
 			Enable the new CUE evaluator, addressing performance issues
 			and bringing a better disjunction algorithm.
-		cmdreferencepkg
+		cmdreferencepkg (default true)
 			Require referencing imported tool packages to declare "cue cmd" tasks.
 
 	CUE_DEBUG

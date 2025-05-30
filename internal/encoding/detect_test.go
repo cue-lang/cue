@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package encoding
+package encoding_test
 
 import (
 	"testing"
@@ -20,6 +20,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/internal/encoding"
 )
 
 func TestDetect(t *testing.T) {
@@ -93,7 +94,7 @@ func TestDetect(t *testing.T) {
 			if err := v.Err(); err != nil {
 				t.Fatal(err)
 			}
-			got := Detect(v)
+			got := encoding.Detect(v)
 			if got != tc.out {
 				t.Errorf("got %v; want %v", got, tc.out)
 			}

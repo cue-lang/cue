@@ -9,7 +9,6 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
-	"cuelang.org/go/cue/interpreter/embed"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/token"
 )
@@ -97,7 +96,7 @@ func ReadTestDir(dir string) (tests map[string][]*Schema, err error) {
 	if err := inst.Err; err != nil {
 		return nil, err
 	}
-	ctx := cuecontext.New(cuecontext.Interpreter(embed.New()))
+	ctx := cuecontext.New()
 	instVal := ctx.BuildInstance(inst)
 	if err := instVal.Err(); err != nil {
 		return nil, err

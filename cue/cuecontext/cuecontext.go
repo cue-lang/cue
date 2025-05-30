@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/interpreter/embed"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
@@ -40,6 +41,8 @@ type Option struct {
 // [cue help environment]: https://cuelang.org/docs/reference/command/cue-help-environment/
 func New(options ...Option) *cue.Context {
 	r := runtime.New()
+	// Embedding is always available.
+	r.SetInterpreter(embed.New())
 	for _, o := range options {
 		o.apply(r)
 	}

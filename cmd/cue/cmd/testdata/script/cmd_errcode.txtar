@@ -13,7 +13,6 @@ import "tool/exec"
 
 command: errcode: {
 	task: bad: exec.Run & {
-		kind:   "exec"
 		cmd:    "ls --badflags"
 		stderr: string // suppress error message
 	}

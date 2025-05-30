@@ -48,6 +48,8 @@ command: kube: {
 -- issue2416a_tool.cue --
 package kubecluster
 
+import "tool/file"
+
 Cluster: {}
 
 m: x: Cluster
@@ -63,8 +65,7 @@ for _, X in m {
 	dnsRecords: "\(m.x.foo)": "127.0.0.1"
 }
 
-command: build: {
-	$id: "tool/file.Create"
+command: build: file.Create & {
 	filename: "output/dns-records.zone"
 	permissions: int | *0o666
 	let lines = [
@@ -110,9 +111,10 @@ limits:
 
 -- stderr2416.golden --
 command.build.contents: invalid bytes argument: index out of range [0] with length 0:
-    ./issue2416a_tool.cue:18:10
-    ./issue2416a_tool.cue:27:2
-    ./issue2416a_tool.cue:27:18
+    ./issue2416a_tool.cue:20:10
+    ./issue2416a_tool.cue:28:2
+    ./issue2416a_tool.cue:28:18
+    tool/file:20:3
 -- stdout2416.golden --
 key=default val=foo
 key=bar val=bar

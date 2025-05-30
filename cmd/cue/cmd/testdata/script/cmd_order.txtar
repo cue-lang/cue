@@ -3,8 +3,11 @@ exec cue cmd gen
 -- task_tool.cue --
 package ci
 
-command: gen: {
-	$id:  "tool/cli.Print"
+import (
+    "tool/cli"
+)
+
+command: gen: cli.Print & {
 	text: {
 		#early: *"X" | string
 		#early

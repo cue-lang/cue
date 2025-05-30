@@ -11,16 +11,19 @@ b.txt
 -- ls_tool.cue --
 package ls
 
+import (
+    "tool/cli"
+    "tool/exec"
+)
+
 command: ls: {
-    ls: {
-		kind:   "exec"
+    ls: exec.Run & {
 		cmd:    "ls"
 		dir:    "ls-work-dir"
 		stdout: string
 	}
 
-	task: display: {
-		kind: "print"
+	task: display: cli.Print & {
 		text: ls.stdout
 	}
 }

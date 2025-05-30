@@ -11,16 +11,15 @@ package hello
 
 import (
 	"tool/cli"
+	"tool/exec"
 )
 
 command: runtwo: {
-    foo: {
-        kind:   "exec"
+    foo: exec.Run & {
         cmd:    ["testcmd", "concurrent", "foo", "bar"]
         stdout: string
     }
-    bar: {
-        kind:   "exec"
+    bar: exec.Run & {
         cmd:    ["testcmd", "concurrent", "bar", "foo"]
 		stdout: string
     }

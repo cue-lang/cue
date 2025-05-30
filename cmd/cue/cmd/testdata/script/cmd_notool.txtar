@@ -8,11 +8,13 @@ Ensure custom commands are defined in a "_tool.cue" file.
 Run 'cue help cmd' to list available custom commands.
 -- task.cue --
 package home
+
+import "tool/cli"
+
 message: "Hello world!"
 
-command: notool: {
+command: notool: cli.Print & {
 	task: display: {
-		kind: "print"
 		text: 42
 	}
 }

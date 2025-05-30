@@ -15,16 +15,19 @@ command: run_list: runBase & {
 -- base_tool.cue --
 package home
 
+import (
+    "tool/cli"
+    "tool/exec"
+)
+
 // deliberately put in another file to test resolving top-level identifiers
 // in different files.
 runBase: {
-	task: echo: {
-		kind:   "exec"
+	task: echo: exec.Run & {
 		stdout: string
 	}
 
-	task: display: {
-		kind: "print"
+	task: display: cli.Print & {
 		text: task.echo.stdout
 	}
 }

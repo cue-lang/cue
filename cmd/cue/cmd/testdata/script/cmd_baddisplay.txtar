@@ -4,7 +4,7 @@ cmp stderr cmd_baddisplay.out
 
 -- cmd_baddisplay.out --
 command.baddisplay.display.text: conflicting values 42 and string (mismatched types int and string):
-    ./task_tool.cue:6:9
+    ./task_tool.cue:7:9
     tool/cli:5:9
 -- task.cue --
 package home
@@ -13,9 +13,10 @@ message: "Hello world!"
 -- task_tool.cue --
 package home
 
+import "tool/cli"
+
 command: baddisplay: {
-	display: {
-		kind: "print"
+	display: cli.Print & {
 		text: 42
 	}
 }

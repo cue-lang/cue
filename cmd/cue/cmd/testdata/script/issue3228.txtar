@@ -28,4 +28,4 @@ x: 1
 }
 -- error --
 build constraints exclude all CUE files in .:
-    script-issue3228/example.cue: @if( A && B || C ) did not match
+    ./example.cue: @if( A && B || C ) did not match

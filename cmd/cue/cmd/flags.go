@@ -91,10 +91,9 @@ func addGlobalFlags(f *pflag.FlagSet) {
 		"print information about progress")
 	f.BoolP(string(flagAllErrors), "E", false, "print all available errors")
 
-	// Deprecated flags are hidden but still work for now.
-	// TODO(mvdan): make this flag give a warning or error in early 2025.
-	f.Bool(string(flagStrict), false,
-		"report errors for lossy mappings (deprecated: use \"jsonschema+strict:\" filetype instead; see cue help filetypes)")
+	// As of v0.14, this deprecated flag now fails when used.
+	// TODO(mvdan): remove entirely in v0.16; no users should remain by then.
+	f.Bool(string(flagStrict), false, "")
 	f.MarkHidden(string(flagStrict))
 
 	f.String(string(flagCpuProfile), "", "write a CPU profile to the specified file before exiting")

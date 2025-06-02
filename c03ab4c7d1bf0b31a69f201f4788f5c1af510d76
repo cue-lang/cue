@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d020c3a5_afcfdecc",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 652,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-02T13:55:05Z",
+      "side": 1,
+      "message": "Technically this doesn\u0027t stop people writing `--strict\u003dfalse`, but it\u0027s probably good enough, right?",
+      "revId": "c03ab4c7d1bf0b31a69f201f4788f5c1af510d76",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

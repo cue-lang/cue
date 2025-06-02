@@ -15,7 +15,7 @@ cmp stderr expect-stderr-strict-features
 exec cue def jsonschema: bad.json
 
 ! exec cue def jsonschema: bad.json --strict
-cmp stderr expect-stderr-strict
+cmp stderr expect-stderr-strict-flag
 
 ! exec cue def jsonschema+strict: bad.json
 cmp stderr expect-stderr-strict
@@ -83,6 +83,8 @@ import "strings"
   "$dynamicAnchor": "bar",
   "foo": true
 }
+-- expect-stderr-strict-flag --
+--strict is deprecated; use "jsonschema+strict:" as shown in "cue help filetypes"
 -- expect-stderr-strict --
 keyword "$dynamicAnchor" not yet implemented:
     ./bad.json:4:3

@@ -125,7 +125,7 @@ display:""`}, {
 		cfg:  dirCfg,
 		args: []string{"./anon"},
 		want: `err:    build constraints exclude all CUE files in ./anon:
-    anon/anon.cue: no package name
+    $CWD/testdata/testmod/anon/anon.cue: no package name
 path:   mod.test/test/anon@v0
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
@@ -296,8 +296,8 @@ files:
 		},
 		args: []string{"./toolonly"},
 		want: `err:    build constraints exclude all CUE files in ./toolonly:
-    test.cue: package is test, want foo
-    toolonly/foo_tool.cue: _tool.cue files excluded in non-cmd mode
+    $CWD/testdata/testmod/test.cue: package is test, want foo
+    $CWD/testdata/testmod/toolonly/foo_tool.cue: _tool.cue files excluded in non-cmd mode
 path:   mod.test/test/toolonly@v0:foo
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod

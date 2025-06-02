@@ -73,10 +73,7 @@ func (e *NoFilesError) InputPositions() []token.Pos { return nil }
 func (e *NoFilesError) Path() []string              { return nil }
 
 // TODO(localize)
-func (e *NoFilesError) Msg() (string, []interface{}) { return e.Error(), nil }
-
-// TODO(localize)
-func (e *NoFilesError) Error() string {
+func (e *NoFilesError) Msg() (string, []interface{}) {
 	// Count files beginning with _, which we will pretend don't exist at all.
 	dummy := 0
 	for _, f := range e.Package.IgnoredFiles {
@@ -90,19 +87,19 @@ func (e *NoFilesError) Error() string {
 
 	if len(e.Package.IgnoredFiles) > dummy {
 		b := strings.Builder{}
-		b.WriteString("build constraints exclude all CUE files in ")
-		b.WriteString(path)
-		b.WriteString(":")
+		var args []any
+		b.WriteString("build constraints exclude all CUE files in %s:")
+		args = append(args, token.Position{Filename: path})
 		// CUE files exist, but they were ignored due to build constraints.
 		for _, f := range e.Package.IgnoredFiles {
-			b.WriteString("\n    ")
-			b.WriteString(filepath.ToSlash(e.Package.RelPath(f)))
+			b.WriteString("\n    %s")
+			args = append(args, token.Position{Filename: f.Filename})
 			if f.ExcludeReason != nil {
-				b.WriteString(": ")
-				b.WriteString(f.ExcludeReason.Error())
+				b.WriteString(": %v")
+				args = append(args, f.ExcludeReason)
 			}
 		}
-		return b.String()
+		return b.String(), args
 	}
 	// if len(e.Package.TestCUEFiles) > 0 {
 	// 	// Test CUE files exist, but we're not interested in them.
@@ -110,7 +107,12 @@ func (e *NoFilesError) Error() string {
 	// 	// to appear at the end of error message.
 	// 	return "no non-test CUE files in " + e.Package.Dir
 	// }
-	return "no CUE files in " + path
+	return "no CUE files in %s", []any{path}
+}
+
+func (e *NoFilesError) Error() string {
+	format, args := e.Msg()
+	return fmt.Sprintf(format, args...)
 }
 
 // MultiplePackageError describes an attempt to build a package composed of

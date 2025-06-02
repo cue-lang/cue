@@ -22,7 +22,7 @@ env CUE_STATS_FILE=-
 exec cue eval x.cue
 cmp stderr out/stderr
 
-# Check that EvalVersion reports the correct value.
+# Check that CUE_EXPERIMENT=evalv3 works, and EvalVersion reports the correct value.
 env CUE_STATS_FILE=-
 env CUE_EXPERIMENT=evalv3=0
 exec cue eval x.cue

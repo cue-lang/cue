@@ -16,6 +16,24 @@
       "message": "Technically this doesn\u0027t stop people writing `--strict\u003dfalse`, but it\u0027s probably good enough, right?",
       "revId": "c03ab4c7d1bf0b31a69f201f4788f5c1af510d76",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68ea7c9a_9ed880e7",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 652,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-02T14:24:59Z",
+      "side": 1,
+      "message": "indeed this is probably good enough, but we already have an IsSet method, so I\u0027ve gone ahead and switched it.",
+      "parentUuid": "d020c3a5_afcfdecc",
+      "revId": "c03ab4c7d1bf0b31a69f201f4788f5c1af510d76",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

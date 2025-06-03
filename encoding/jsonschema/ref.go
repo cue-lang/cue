@@ -62,9 +62,8 @@ func parseRootRef(str string) (cue.Path, error) {
 
 var errRefNotFound = errors.New("JSON Pointer reference not found")
 
-func lookupJSONPointer(v cue.Value, p string) (_ cue.Value, _err error) {
-	// TODO(go1.23) for part := range jsonPointerTokens(p)
-	jsonPointerTokens(p)(func(part string) bool {
+func lookupJSONPointer(v cue.Value, p string) (cue.Value, error) {
+	for part := range jsonPointerTokens(p) {
 		// Note: a JSON Pointer doesn't distinguish between indexing
 		// and struct lookup. We have to use the value itself to decide
 		// which operation is appropriate.
@@ -76,23 +75,19 @@ func lookupJSONPointer(v cue.Value, p string) (_ cue.Value, _err error) {
 			idx := int64(0)
 			if len(part) > 1 && part[0] == '0' {
 				// Leading zeros are not allowed
-				_err = errRefNotFound
-				return false
+				return cue.Value{}, errRefNotFound
 			}
 			idx, err := strconv.ParseInt(part, 10, 64)
 			if err != nil {
-				_err = errRefNotFound
-				return false
+				return cue.Value{}, errRefNotFound
 			}
 			v = v.LookupPath(cue.MakePath(cue.Index(idx)))
 		}
 		if !v.Exists() {
-			_err = errRefNotFound
-			return false
+			return cue.Value{}, errRefNotFound
 		}
-		return true
-	})
-	return v, _err
+	}
+	return v, nil
 }
 
 func sameSchemaRoot(u1, u2 *url.URL) bool {

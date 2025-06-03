@@ -16,7 +16,6 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
-	"regexp"
 	"slices"
 	"sort"
 	"strings"
@@ -693,23 +692,4 @@ func globsMatchPath(globs, target string) bool {
 		}
 	}
 	return false
-}
-
-var modFlagRegexp = regexp.MustCompile(`-mod[ =](\w+)`)
-
-// TODO(rfindley): clean up the redundancy of allFilesExcluded,
-// pathExcludedByFilterFunc, pathExcludedByFilter, view.filterFunc...
-func allFilesExcluded(files []string, filterFunc func(protocol.DocumentURI) bool) bool {
-	for _, f := range files {
-		uri := protocol.URIFromPath(f)
-		if !filterFunc(uri) {
-			return false
-		}
-	}
-	return true
-}
-
-func relPathExcludedByFilter(path string, filterer *Filterer) bool {
-	path = strings.TrimPrefix(filepath.ToSlash(path), "/")
-	return filterer.Disallow(path)
 }

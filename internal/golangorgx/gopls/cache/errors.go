@@ -11,17 +11,11 @@ package cache
 import (
 	"fmt"
 	"go/scanner"
-	"path/filepath"
-	"regexp"
-	"strconv"
-	"strings"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/util/bug"
-	"cuelang.org/go/internal/golangorgx/tools/typesinternal"
-	"golang.org/x/tools/go/packages"
 )
 
 func parseErrorDiagnostics(pkg *syntaxPackage, errList scanner.ErrorList) ([]*Diagnostic, error) {
@@ -46,9 +40,6 @@ func parseErrorDiagnostics(pkg *syntaxPackage, errList scanner.ErrorList) ([]*Di
 		Message:  e.Msg,
 	}}, nil
 }
-
-var importErrorRe = regexp.MustCompile(`could not import ([^\s]+)`)
-var unsupportedFeatureRe = regexp.MustCompile(`.*require.* go(\d+\.\d+) or later`)
 
 func goGetQuickFixes(moduleMode bool, uri protocol.DocumentURI, pkg string) []SuggestedFix {
 	// Go get only supports module mode for now.
@@ -243,66 +234,4 @@ func onlyDeletions(fixes []SuggestedFix) bool {
 		}
 	}
 	return len(fixes) > 0
-}
-
-func typesCodeHref(linkTarget string, code typesinternal.ErrorCode) string {
-	return BuildLink(linkTarget, "cuelang.org/go/internal/golangorgx/tools/typesinternal", code.String())
-}
-
-// BuildLink constructs a URL with the given target, path, and anchor.
-func BuildLink(target, path, anchor string) string {
-	link := fmt.Sprintf("https://%s/%s", target, path)
-	if anchor == "" {
-		return link
-	}
-	return link + "#" + anchor
-}
-
-func parseGoListError(e packages.Error, dir string) (filename string, line, col8 int) {
-	input := e.Pos
-	if input == "" {
-		// No position. Attempt to parse one out of a
-		// go list error of the form "file:line:col:
-		// message" by stripping off the message.
-		input = strings.TrimSpace(e.Msg)
-		if i := strings.Index(input, ": "); i >= 0 {
-			input = input[:i]
-		}
-	}
-
-	filename, line, col8 = splitFileLineCol(input)
-	if !filepath.IsAbs(filename) {
-		filename = filepath.Join(dir, filename)
-	}
-	return filename, line, col8
-}
-
-// splitFileLineCol splits s into "filename:line:col",
-// where line and col consist of decimal digits.
-func splitFileLineCol(s string) (file string, line, col8 int) {
-	// Beware that the filename may contain colon on Windows.
-
-	// stripColonDigits removes a ":%d" suffix, if any.
-	stripColonDigits := func(s string) (rest string, num int) {
-		if i := strings.LastIndex(s, ":"); i >= 0 {
-			if v, err := strconv.ParseInt(s[i+1:], 10, 32); err == nil {
-				return s[:i], int(v)
-			}
-		}
-		return s, -1
-	}
-
-	// strip col ":%d"
-	s, n1 := stripColonDigits(s)
-	if n1 < 0 {
-		return s, 0, 0 // "filename"
-	}
-
-	// strip line ":%d"
-	s, n2 := stripColonDigits(s)
-	if n2 < 0 {
-		return s, n1, 0 // "filename:line"
-	}
-
-	return s, n2, n1 // "filename:line:col"
 }

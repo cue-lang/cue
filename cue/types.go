@@ -141,7 +141,7 @@ func (o *hiddenStructValue) Lookup(key string) Value {
 	return newChildValue(o, i)
 }
 
-// MarshalJSON returns a valid JSON encoding or reports an error if any of the
+// appendJSON appends a valid JSON encoding or reports an error if any of the
 // fields is invalid.
 func (o *structValue) appendJSON(b []byte) ([]byte, error) {
 	b = append(b, '{')
@@ -280,7 +280,7 @@ func (i *Iterator) FieldType() SelectorType {
 	return featureToSelType(i.f, i.arcType)
 }
 
-// marshalJSON iterates over the list and generates JSON output. HasNext
+// listAppendJSON iterates over the list and generates JSON output. HasNext
 // will return false after this operation.
 func listAppendJSON(b []byte, l *Iterator) ([]byte, error) {
 	b = append(b, '[')

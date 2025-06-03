@@ -1,0 +1,157 @@
+-- in.cue --
+root: input: foo: {
+    metadata: name: *"foo" | string
+    id: "id-\(metadata.name)"
+    #deps: [string]: _
+    #deps: root: {}
+    spec: replicas: 1
+}
+{root.input.foo.#deps}
+-- out/eval/stats --
+Leaks:  0
+Freed:  13
+Reused: 4
+Allocs: 9
+Retain: 4
+
+Unifications: 11
+Conjuncts:    20
+Disjuncts:    17
+-- out/evalalpha --
+Errors:
+root.input: field not allowed:
+    ./in.cue:1:7
+
+Result:
+(_|_){
+  // [eval]
+  root: (_|_){
+    // [eval]
+    input: (_|_){
+      // [eval] root.input: field not allowed:
+      //     ./in.cue:1:7
+      foo: (_|_){
+        // [eval] root.input.foo: field not allowed:
+        //     ./in.cue:1:14
+        metadata: (_|_){
+          // [eval] root.input.foo.metadata: field not allowed:
+          //     ./in.cue:2:5
+          name: (string){ |(*(string){ "foo" }, (string){ string }) }
+        }
+        id: (_|_){
+          // [eval] root.input.foo.id: field not allowed:
+          //     ./in.cue:3:5
+        }
+        #deps: (#struct){
+          root: (#struct){
+          }
+        }
+        spec: (_|_){
+          // [eval] root.input.foo.spec: field not allowed:
+          //     ./in.cue:6:5
+          replicas: (_|_){
+            // [eval] root.input.foo.spec.replicas: field not allowed:
+            //     ./in.cue:6:11
+          }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,17 +1,38 @@
+-(#struct){
+-  root: (#struct){
+-    input: (struct){
+-      foo: (struct){
+-        metadata: (struct){
++Errors:
++root.input: field not allowed:
++    ./in.cue:1:7
++
++Result:
++(_|_){
++  // [eval]
++  root: (_|_){
++    // [eval]
++    input: (_|_){
++      // [eval] root.input: field not allowed:
++      //     ./in.cue:1:7
++      foo: (_|_){
++        // [eval] root.input.foo: field not allowed:
++        //     ./in.cue:1:14
++        metadata: (_|_){
++          // [eval] root.input.foo.metadata: field not allowed:
++          //     ./in.cue:2:5
+           name: (string){ |(*(string){ "foo" }, (string){ string }) }
+         }
+-        id: (string){ "id-foo" }
++        id: (_|_){
++          // [eval] root.input.foo.id: field not allowed:
++          //     ./in.cue:3:5
++        }
+         #deps: (#struct){
+           root: (#struct){
+           }
+         }
+-        spec: (struct){
+-          replicas: (int){ 1 }
++        spec: (_|_){
++          // [eval] root.input.foo.spec: field not allowed:
++          //     ./in.cue:6:5
++          replicas: (_|_){
++            // [eval] root.input.foo.spec.replicas: field not allowed:
++            //     ./in.cue:6:11
++          }
+         }
+       }
+     }
+-- out/eval --
+(#struct){
+  root: (#struct){
+    input: (struct){
+      foo: (struct){
+        metadata: (struct){
+          name: (string){ |(*(string){ "foo" }, (string){ string }) }
+        }
+        id: (string){ "id-foo" }
+        #deps: (#struct){
+          root: (#struct){
+          }
+        }
+        spec: (struct){
+          replicas: (int){ 1 }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  root: {
+    input: {
+      foo: {
+        metadata: {
+          name: (*"foo"|string)
+        }
+        id: "id-\(〈0;metadata〉.name)"
+        #deps: {
+          [string]: _
+        }
+        #deps: {
+          root: {}
+        }
+        spec: {
+          replicas: 1
+        }
+      }
+    }
+  }
+  {
+    〈1;root〉.input.foo.#deps
+  }
+}

@@ -16,6 +16,24 @@
       "message": "tiny tiny nit: can\u0027t we do `args :\u003d []any{token.Position{Filename: path}}` here, and kill the line 2 up?",
       "revId": "41ca49be0ce1e6a197d2b87b4a9f843e5b974e6e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef30e256_7c50a7ee",
+        "filename": "cue/load/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-03T09:37:55Z",
+      "side": 1,
+      "message": "truly tiny nit :) I think I lean towards this way because it keeps the code consistent, with an append following each fmt verb. But I agree that it doesn\u0027t matter either way - I would not have minded existing (or someone else\u0027s) code doing it the other way.",
+      "parentUuid": "5546874a_a0df9461",
+      "revId": "41ca49be0ce1e6a197d2b87b4a9f843e5b974e6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

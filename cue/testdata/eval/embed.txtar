@@ -25,16 +25,37 @@ y: #B
 y: {
 	c: int
 }
+-- noclose.cue --
+double: {
+	a: b?: c: d: "c"
+	a: {{
+		b: {{
+				c: e: "member"
+		}}
+	}}
+}
+doubleAsComprehension: {
+	a: b?: c: d: "c"
+	a: {
+		if true {
+			b: {
+				if true {
+					c: e: "member"
+				}
+			}
+		}
+	}
+}
 -- out/eval/stats --
-Leaks:  0
-Freed:  16
-Reused: 12
-Allocs: 4
+Leaks:  1
+Freed:  27
+Reused: 22
+Allocs: 6
 Retain: 1
 
-Unifications: 16
-Conjuncts:    32
-Disjuncts:    17
+Unifications: 28
+Conjuncts:    52
+Disjuncts:    29
 -- out/evalalpha --
 (struct){
   #A: (#struct){
@@ -57,12 +78,32 @@ Disjuncts:    17
     c: (int){ int }
     a: (int){ int }
   }
+  double: (struct){
+    a: (struct){
+      b: (struct){
+        c: (struct){
+          d: (string){ "c" }
+          e: (string){ "member" }
+        }
+      }
+    }
+  }
+  doubleAsComprehension: (struct){
+    a: (struct){
+      b: (struct){
+        c: (struct){
+          d: (string){ "c" }
+          e: (string){ "member" }
+        }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -8,15 +8,15 @@
+@@ -8,16 +8,16 @@
      b: (int){ int }
    }
    x: (#struct){
@@ -82,7 +123,8 @@ diff old new
 +    c: (int){ int }
 +    a: (int){ int }
    }
- }
+   double: (struct){
+     a: (struct){
 -- diff/explanation --
 Reordering
 -- out/eval --
@@ -106,6 +148,26 @@ Reordering
   y: (#struct){
     a: (int){ int }
     c: (int){ int }
+  }
+  double: (struct){
+    a: (struct){
+      b: (struct){
+        c: (struct){
+          d: (string){ "c" }
+          e: (string){ "member" }
+        }
+      }
+    }
+  }
+  doubleAsComprehension: (struct){
+    a: (struct){
+      b: (struct){
+        c: (struct){
+          d: (string){ "c" }
+          e: (string){ "member" }
+        }
+      }
+    }
   }
 }
 -- out/compile --
@@ -132,5 +194,48 @@ Reordering
   y: 〈0;#B〉
   y: {
     c: int
+  }
+}
+--- noclose.cue
+{
+  double: {
+    a: {
+      b?: {
+        c: {
+          d: "c"
+        }
+      }
+    }
+    a: {
+      {
+        b: {
+          {
+            c: {
+              e: "member"
+            }
+          }
+        }
+      }
+    }
+  }
+  doubleAsComprehension: {
+    a: {
+      b?: {
+        c: {
+          d: "c"
+        }
+      }
+    }
+    a: {
+      if true {
+        b: {
+          if true {
+            c: {
+              e: "member"
+            }
+          }
+        }
+      }
+    }
   }
 }

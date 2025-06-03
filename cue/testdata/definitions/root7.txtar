@@ -1,0 +1,81 @@
+-- in.cue --
+root: input: #deps: root: {}
+{root.input.#deps}
+-- out/eval/stats --
+Leaks:  0
+Freed:  5
+Reused: 0
+Allocs: 5
+Retain: 3
+
+Unifications: 5
+Conjuncts:    9
+Disjuncts:    8
+-- out/evalalpha --
+Errors:
+root.input: field not allowed:
+    ./in.cue:1:7
+
+Result:
+(_|_){
+  // [eval]
+  root: (_|_){
+    // [eval]
+    input: (_|_){
+      // [eval] root.input: field not allowed:
+      //     ./in.cue:1:7
+      #deps: (#struct){
+        root: (#struct){
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,6 +1,15 @@
+-(#struct){
+-  root: (#struct){
+-    input: (struct){
++Errors:
++root.input: field not allowed:
++    ./in.cue:1:7
++
++Result:
++(_|_){
++  // [eval]
++  root: (_|_){
++    // [eval]
++    input: (_|_){
++      // [eval] root.input: field not allowed:
++      //     ./in.cue:1:7
+       #deps: (#struct){
+         root: (#struct){
+         }
+-- out/eval --
+(#struct){
+  root: (#struct){
+    input: (struct){
+      #deps: (#struct){
+        root: (#struct){
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  root: {
+    input: {
+      #deps: {
+        root: {}
+      }
+    }
+  }
+  {
+    〈1;root〉.input.#deps
+  }
+}

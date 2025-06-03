@@ -20,7 +20,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/tools/memoize"
-	"cuelang.org/go/internal/golangorgx/tools/tokeninternal"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -368,7 +367,9 @@ func (c *parseCache) parseFiles(ctx context.Context, fset *token.FileSet, mode p
 		}
 		tokenFiles = append(tokenFiles, pgf.Tok)
 	}
-	tokeninternal.AddExistingFiles(fset, tokenFiles)
+	// Disabled because the tokeninternal hacks broke with Go 1.25,
+	// and `cue lsp` doesn't need to load Go code anyway.
+	// tokeninternal.AddExistingFiles(fset, tokenFiles)
 
 	const debugIssue59080 = true
 	if debugIssue59080 {

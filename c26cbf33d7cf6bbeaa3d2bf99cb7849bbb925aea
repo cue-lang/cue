@@ -33,6 +33,24 @@
       "message": "I know that this is implicitly called as part of the decoding logic, but it would be nice to have some explicit unit tests of this new public API too.",
       "revId": "c26cbf33d7cf6bbeaa3d2bf99cb7849bbb925aea",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb5d9920_7cfe302e",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2025-06-03T07:47:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47e7f9ae_b62c08de",
+      "revId": "c26cbf33d7cf6bbeaa3d2bf99cb7849bbb925aea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

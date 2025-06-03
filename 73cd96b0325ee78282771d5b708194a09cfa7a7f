@@ -33,6 +33,24 @@
       "message": "Maybe also add test cases for explicitly decoding into `*big.Int` and `*apd.Decimal` ?\n\nAnd I\u0027d also add TODOs because these cases _should_ work, just don\u0027t currently.",
       "revId": "73cd96b0325ee78282771d5b708194a09cfa7a7f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f04474e4_555a5860",
+        "filename": "cue/decode_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2025-06-03T07:02:21Z",
+      "side": 1,
+      "message": "I have added the test cases for `*big.Int` and `*apd.Decimal`. Decoding into `*apd.Decimal` seems not to work because it only implements `encoding.TextMarshaler`.",
+      "parentUuid": "fc489647_2bc97489",
+      "revId": "73cd96b0325ee78282771d5b708194a09cfa7a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

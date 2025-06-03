@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5546874a_a0df9461",
+        "filename": "cue/load/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-06-03T08:01:51Z",
+      "side": 1,
+      "message": "tiny tiny nit: can\u0027t we do `args :\u003d []any{token.Position{Filename: path}}` here, and kill the line 2 up?",
+      "revId": "41ca49be0ce1e6a197d2b87b4a9f843e5b974e6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

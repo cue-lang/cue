@@ -27,7 +27,7 @@ import (
 // TODO(adonovan): eliminate once go1.23+ is assured.
 func Supported() bool { return setCrashOutput != nil }
 
-var setCrashOutput func(*os.File) error // = runtime.SetCrashOutput on go1.23+
+var setCrashOutput = func(f *os.File) error { return debug.SetCrashOutput(f, debug.CrashOptions{}) }
 
 // Start starts the monitor process, which performs automated
 // reporting of unexpected crashes via Go telemetry. Call this

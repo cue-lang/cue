@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a3d974f_9863246f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-03T09:30:17Z",
+      "side": 1,
+      "message": "LGTM with one minor suggestion.",
+      "revId": "9e7c115e880801d6fa3bc1ea115053285778ba49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "092f365a_63824501",
+        "filename": "internal/golangorgx/gopls/cache/analysis.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 706,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-03T09:30:17Z",
+      "side": 1,
+      "message": "I\u0027d at least add a TODO explaining why all this code is left in despite it being a no-op (and below).",
+      "revId": "9e7c115e880801d6fa3bc1ea115053285778ba49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

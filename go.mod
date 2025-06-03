@@ -20,12 +20,12 @@ require (
 	github.com/tetratelabs/wazero v1.6.0
 	github.com/yuin/goldmark v1.7.8
 	golang.org/x/mod v0.24.0
-	golang.org/x/net v0.39.0
-	golang.org/x/oauth2 v0.29.0
-	golang.org/x/sync v0.13.0
-	golang.org/x/sys v0.32.0
-	golang.org/x/text v0.24.0
-	golang.org/x/tools v0.32.0
+	golang.org/x/net v0.40.0
+	golang.org/x/oauth2 v0.30.0
+	golang.org/x/sync v0.14.0
+	golang.org/x/sys v0.33.0
+	golang.org/x/text v0.25.0
+	golang.org/x/tools v0.33.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

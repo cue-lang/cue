@@ -24,7 +24,6 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/cueimports"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/metadata"
-	"cuelang.org/go/internal/golangorgx/gopls/cache/methodsets"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/typerefs"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/xrefs"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
@@ -351,7 +350,6 @@ func (s *Snapshot) Overlays() []*overlay {
 // the file cache.
 const (
 	xrefsKind       = "xrefs"
-	methodSetsKind  = "methodsets"
 	exportDataKind  = "export"
 	diagnosticsKind = "diagnostics"
 	typerefsKind    = "typerefs"
@@ -388,17 +386,6 @@ type xrefIndex struct {
 
 func (index xrefIndex) Lookup(targets map[PackagePath]map[objectpath.Path]struct{}) []protocol.Location {
 	return xrefs.Lookup(index.mp, index.data, targets)
-}
-
-// MethodSets returns method-set indexes for the specified packages.
-//
-// If these indexes cannot be loaded from cache, the requested packages may
-// be type-checked.
-func (s *Snapshot) MethodSets(ctx context.Context, ids ...PackageID) ([]*methodsets.Index, error) {
-	ctx, done := event.Start(ctx, "cache.snapshot.MethodSets")
-	defer done()
-
-	return nil, nil
 }
 
 // MetadataForFile returns a new slice containing metadata for each

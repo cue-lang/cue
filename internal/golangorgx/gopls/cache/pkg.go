@@ -13,7 +13,6 @@ import (
 	"sync"
 
 	"cuelang.org/go/internal/golangorgx/gopls/cache/metadata"
-	"cuelang.org/go/internal/golangorgx/gopls/cache/methodsets"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/parsego"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/xrefs"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -62,9 +61,6 @@ type syntaxPackage struct {
 
 	xrefsOnce sync.Once
 	_xrefs    []byte // only used by the xrefs method
-
-	methodsetsOnce sync.Once
-	_methodsets    *methodsets.Index // only used by the methodsets method
 }
 
 func (p *syntaxPackage) xrefs() []byte {
@@ -72,13 +68,6 @@ func (p *syntaxPackage) xrefs() []byte {
 		p._xrefs = xrefs.Index(p.compiledGoFiles, p.types, p.typesInfo)
 	})
 	return p._xrefs
-}
-
-func (p *syntaxPackage) methodsets() *methodsets.Index {
-	p.methodsetsOnce.Do(func() {
-		p._methodsets = methodsets.NewIndex(p.fset, p.types)
-	})
-	return p._methodsets
 }
 
 func (p *Package) String() string { return string(p.metadata.ID) }

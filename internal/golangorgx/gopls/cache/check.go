@@ -21,11 +21,8 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/filecache"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/util/bug"
-	"cuelang.org/go/internal/golangorgx/gopls/util/safetoken"
-	"cuelang.org/go/internal/golangorgx/tools/analysisinternal"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
-	"cuelang.org/go/internal/golangorgx/tools/typesinternal"
 )
 
 // Various optimizations that should not affect correctness.
@@ -598,144 +595,6 @@ func localPackageKey(inputs typeCheckInputs) file.Hash {
 
 // e.g. "go1" or "go1.2" or "go1.2.3"
 var goVersionRx = regexp.MustCompile(`^go[1-9][0-9]*(?:\.(0|[1-9][0-9]*)){0,2}$`)
-
-// typeErrorsToDiagnostics translates a slice of types.Errors into a slice of
-// Diagnostics.
-//
-// In addition to simply mapping data such as position information and error
-// codes, this function interprets related go/types "continuation" errors as
-// protocol.DiagnosticRelatedInformation. Continuation errors are go/types
-// errors whose messages starts with "\t". By convention, these errors relate
-// to the previous error in the errs slice (such as if they were printed in
-// sequence to a terminal).
-//
-// The linkTarget, moduleMode, and supportsRelatedInformation parameters affect
-// the construction of protocol objects (see the code for details).
-func typeErrorsToDiagnostics(pkg *syntaxPackage, errs []types.Error, linkTarget string, moduleMode, supportsRelatedInformation bool) []*Diagnostic {
-	var result []*Diagnostic
-
-	// batch records diagnostics for a set of related types.Errors.
-	batch := func(related []types.Error) {
-		var diags []*Diagnostic
-		for i, e := range related {
-			code, start, end, ok := typesinternal.ReadGo116ErrorData(e)
-			if !ok || !start.IsValid() || !end.IsValid() {
-				start, end = e.Pos, e.Pos
-				code = 0
-			}
-			if !start.IsValid() {
-				// Type checker errors may be missing position information if they
-				// relate to synthetic syntax, such as if the file were fixed. In that
-				// case, we should have a parse error anyway, so skipping the type
-				// checker error is likely benign.
-				//
-				// TODO(golang/go#64335): we should eventually verify that all type
-				// checked syntax has valid positions, and promote this skip to a bug
-				// report.
-				continue
-			}
-			posn := safetoken.StartPosition(e.Fset, start)
-			if !posn.IsValid() {
-				// All valid positions produced by the type checker should described by
-				// its fileset.
-				//
-				// Note: in golang/go#64488, we observed an error that was positioned
-				// over fixed syntax, which overflowed its file. So it's definitely
-				// possible that we get here (it's hard to reason about fixing up the
-				// AST). Nevertheless, it's a bug.
-				bug.Reportf("internal error: type checker error %q outside its Fset", e)
-				continue
-			}
-			pgf, err := pkg.File(protocol.URIFromPath(posn.Filename))
-			if err != nil {
-				// Sometimes type-checker errors refer to positions in other packages,
-				// such as when a declaration duplicates a dot-imported name.
-				//
-				// In these cases, we don't want to report an error in the other
-				// package (the message would be rather confusing), but we do want to
-				// report an error in the current package (golang/go#59005).
-				if i == 0 {
-					bug.Reportf("internal error: could not locate file for primary type checker error %v: %v", e, err)
-				}
-				continue
-			}
-			if !end.IsValid() || end == start {
-				// Expand the end position to a more meaningful span.
-				end = analysisinternal.TypeErrorEndPos(e.Fset, pgf.Src, start)
-			}
-			rng, err := pgf.Mapper.PosRange(pgf.Tok, start, end)
-			if err != nil {
-				bug.Reportf("internal error: could not compute pos to range for %v: %v", e, err)
-				continue
-			}
-			msg := related[0].Msg
-			if i > 0 {
-				if supportsRelatedInformation {
-					msg += " (see details)"
-				} else {
-					msg += fmt.Sprintf(" (this error: %v)", e.Msg)
-				}
-			}
-			diag := &Diagnostic{
-				URI:      pgf.URI,
-				Range:    rng,
-				Severity: protocol.SeverityError,
-				Source:   TypeError,
-				Message:  msg,
-			}
-			if code != 0 {
-				diag.Code = code.String()
-				diag.CodeHref = typesCodeHref(linkTarget, code)
-			}
-			if code == typesinternal.UnusedVar || code == typesinternal.UnusedImport {
-				diag.Tags = append(diag.Tags, protocol.Unnecessary)
-			}
-			if match := importErrorRe.FindStringSubmatch(e.Msg); match != nil {
-				diag.SuggestedFixes = append(diag.SuggestedFixes, goGetQuickFixes(moduleMode, pgf.URI, match[1])...)
-			}
-			if match := unsupportedFeatureRe.FindStringSubmatch(e.Msg); match != nil {
-				diag.SuggestedFixes = append(diag.SuggestedFixes, editGoDirectiveQuickFix(moduleMode, pgf.URI, match[1])...)
-			}
-
-			// Link up related information. For the primary error, all related errors
-			// are treated as related information. For secondary errors, only the
-			// primary is related.
-			//
-			// This is because go/types assumes that errors are read top-down, such as
-			// in the cycle error "A refers to...". The structure of the secondary
-			// error set likely only makes sense for the primary error.
-			if i > 0 {
-				primary := diags[0]
-				primary.Related = append(primary.Related, protocol.DiagnosticRelatedInformation{
-					Location: protocol.Location{URI: diag.URI, Range: diag.Range},
-					Message:  related[i].Msg, // use the unmodified secondary error for related errors.
-				})
-				diag.Related = []protocol.DiagnosticRelatedInformation{{
-					Location: protocol.Location{URI: primary.URI, Range: primary.Range},
-				}}
-			}
-			diags = append(diags, diag)
-		}
-		result = append(result, diags...)
-	}
-
-	// Process batches of related errors.
-	for len(errs) > 0 {
-		related := []types.Error{errs[0]}
-		for i := 1; i < len(errs); i++ {
-			spl := errs[i]
-			if len(spl.Msg) == 0 || spl.Msg[0] != '\t' {
-				break
-			}
-			spl.Msg = spl.Msg[len("\t"):]
-			related = append(related, spl)
-		}
-		batch(related)
-		errs = errs[len(related):]
-	}
-
-	return result
-}
 
 // An importFunc is an implementation of the single-method
 // types.Importer interface based on a function value.

@@ -39,7 +39,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/facts"
 	"cuelang.org/go/internal/golangorgx/tools/gcimporter"
-	"cuelang.org/go/internal/golangorgx/tools/typesinternal"
 	"cuelang.org/go/internal/golangorgx/tools/versions"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/tools/go/analysis"
@@ -704,14 +703,14 @@ func (an *analysisNode) typeCheck(parsed []*ParsedGoFile) *analysisPackage {
 		// An unparsable mod file should probably stop us
 		// before we get here, but double check just in case.
 		if goVersionRx.MatchString(goVersion) {
-			typesinternal.SetGoVersion(cfg, goVersion)
+			// typesinternal.SetGoVersion(cfg, goVersion)
 		}
 	}
 
 	// We want to type check cgo code if go/types supports it.
 	// We passed typecheckCgo to go/packages when we Loaded.
 	// TODO(adonovan): do we actually need this??
-	typesinternal.SetUsesCgo(cfg)
+	// typesinternal.SetUsesCgo(cfg)
 
 	check := types.NewChecker(cfg, pkg.fset, pkg.types, pkg.typesInfo)
 

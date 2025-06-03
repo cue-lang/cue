@@ -115,66 +115,68 @@ func Benchmark(b *testing.B) {
 // and cover other encodings too.
 // We should also cover both encoding and decoding performance.
 func BenchmarkLargeValueMarshalJSON(b *testing.B) {
-	b.ReportAllocs()
-	size := 2000
+	for _, size := range []int{100, 1_000, 10_000} {
+		b.Run(fmt.Sprintf("size=%d", size), func(b *testing.B) {
+			var buf bytes.Buffer
 
-	var buf bytes.Buffer
+			fmt.Fprintf(&buf, "longString: \"")
+			for range size {
+				fmt.Fprintf(&buf, "x")
+			}
+			fmt.Fprintf(&buf, "\"\n")
 
-	fmt.Fprintf(&buf, "longString: \"")
-	for range size {
-		fmt.Fprintf(&buf, "x")
-	}
-	fmt.Fprintf(&buf, "\"\n")
+			fmt.Fprintf(&buf, "nestedList: ")
+			for range size {
+				fmt.Fprintf(&buf, "[")
+			}
+			fmt.Fprintf(&buf, "0")
+			for range size {
+				fmt.Fprintf(&buf, "]")
+			}
+			fmt.Fprintf(&buf, "\n")
 
-	fmt.Fprintf(&buf, "nestedList: ")
-	for range size {
-		fmt.Fprintf(&buf, "[")
-	}
-	fmt.Fprintf(&buf, "0")
-	for range size {
-		fmt.Fprintf(&buf, "]")
-	}
-	fmt.Fprintf(&buf, "\n")
+			fmt.Fprintf(&buf, "longList: [")
+			for i := range size {
+				if i > 0 {
+					fmt.Fprintf(&buf, ",")
+				}
+				fmt.Fprintf(&buf, "0")
+			}
+			fmt.Fprintf(&buf, "]\n")
 
-	fmt.Fprintf(&buf, "longList: [")
-	for i := range size {
-		if i > 0 {
-			fmt.Fprintf(&buf, ",")
-		}
-		fmt.Fprintf(&buf, "0")
-	}
-	fmt.Fprintf(&buf, "]\n")
+			fmt.Fprintf(&buf, "nestedStruct: ")
+			for range size {
+				fmt.Fprintf(&buf, "{k:")
+			}
+			fmt.Fprintf(&buf, "0")
+			for range size {
+				fmt.Fprintf(&buf, "}")
+			}
+			fmt.Fprintf(&buf, "\n")
 
-	fmt.Fprintf(&buf, "nestedStruct: ")
-	for range size {
-		fmt.Fprintf(&buf, "{k:")
-	}
-	fmt.Fprintf(&buf, "0")
-	for range size {
-		fmt.Fprintf(&buf, "}")
-	}
-	fmt.Fprintf(&buf, "\n")
+			fmt.Fprintf(&buf, "longStruct: {")
+			for i := range size {
+				if i > 0 {
+					fmt.Fprintf(&buf, ",")
+				}
+				fmt.Fprintf(&buf, "k%d: 0", i)
+			}
+			fmt.Fprintf(&buf, "}\n")
 
-	fmt.Fprintf(&buf, "longStruct: {")
-	for i := range size {
-		if i > 0 {
-			fmt.Fprintf(&buf, ",")
-		}
-		fmt.Fprintf(&buf, "k%d: 0", i)
-	}
-	fmt.Fprintf(&buf, "}\n")
-
-	ctx := cuecontext.New()
-	val := ctx.CompileBytes(buf.Bytes())
-	if err := val.Err(); err != nil {
-		b.Fatal(err)
-	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		data, err := val.MarshalJSON()
-		if err != nil {
-			b.Fatal(err)
-		}
-		_ = data
+			ctx := cuecontext.New()
+			val := ctx.CompileBytes(buf.Bytes())
+			if err := val.Err(); err != nil {
+				b.Fatal(err)
+			}
+			b.ResetTimer()
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				data, err := val.MarshalJSON()
+				if err != nil {
+					b.Fatal(err)
+				}
+				_ = data
+			}
+		})
 	}
 }

@@ -33,6 +33,24 @@
       "message": "I\u0027d at least add a TODO explaining why all this code is left in despite it being a no-op (and below).",
       "revId": "9e7c115e880801d6fa3bc1ea115053285778ba49",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6020b7dd_142a2423",
+        "filename": "internal/golangorgx/gopls/cache/analysis.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 706,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-03T09:42:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "092f365a_63824501",
+      "revId": "9e7c115e880801d6fa3bc1ea115053285778ba49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

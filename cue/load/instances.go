@@ -20,6 +20,7 @@ import (
 	"io/fs"
 	"maps"
 	"path"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -57,7 +58,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 			isAbsPkg = true
 		}
 	}
-	pkgArgs := args[:i]
+	pkgArgs := slices.Clone(args[:i])
 	otherArgs := args[i:]
 	otherFiles, err := filetypes.ParseArgs(otherArgs)
 	if err != nil {
@@ -85,15 +86,26 @@ func Instances(args []string, c *Config) []*build.Instance {
 		// between package paths specified as arguments, which
 		// have the qualifier added, and package paths that are dependencies
 		// of those, which don't.
-		pkgArgs1 := make([]string, 0, len(pkgArgs))
-		for _, p := range pkgArgs {
+		for i, p := range pkgArgs {
 			if ip := ast.ParseImportPath(p); !ip.ExplicitQualifier {
 				ip.Qualifier = c.Package
-				p = ip.String()
+				pkgArgs[i] = ip.String()
 			}
-			pkgArgs1 = append(pkgArgs1, p)
 		}
-		pkgArgs = pkgArgs1
+	}
+	for i, p := range pkgArgs {
+		// Allow loading absolute paths to packages; $PWD/foo/bar is equivalent to ./foo/bar.
+		// As a courtesy to Windows developers, we also rewrite \ to /. Handles .\... and so on.
+		if filepath.IsAbs(p) {
+			rel, err := filepath.Rel(c.Dir, p)
+			if err != nil {
+				return []*build.Instance{c.newErrInstance(err)}
+			}
+			p = "./" + filepath.ToSlash(rel)
+		} else {
+			p = filepath.ToSlash(p)
+		}
+		pkgArgs[i] = p
 	}
 
 	tg := newTagger(c)

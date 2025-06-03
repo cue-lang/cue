@@ -304,14 +304,6 @@ func expandPackageArgs(c *Config, pkgArgs []string, pkgQual string, tg *tagger) 
 // Its semantics follow those of [Config.Package].
 func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string, pkgQual string, tg *tagger) ([]resolvedPackageArg, error) {
 	origp := p
-	if filepath.IsAbs(p) {
-		return nil, fmt.Errorf("cannot use absolute directory %q as package path", p)
-	}
-	// Arguments are supposed to be import paths, but
-	// as a courtesy to Windows developers, rewrite \ to /
-	// in command-line arguments. Handles .\... and so on.
-	p = filepath.ToSlash(p)
-
 	ip := ast.ParseImportPath(p)
 	if ip.Qualifier == "_" {
 		return nil, fmt.Errorf("invalid import path qualifier _ in %q", origp)

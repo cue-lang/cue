@@ -27,6 +27,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"iter"
 	"net/http"
 	"strings"
 
@@ -124,13 +125,11 @@ func (src *Client) Mirror(ctx context.Context, dst *Client, mv module.Version) e
 	// on whatever is calling the function too rather than just doing
 	// all uploads in parallel.
 	var g errgroup.Group
-	// TODO for desc := range manifestRefs(m.manifest)
-	manifestRefs(m.manifest)(func(desc ociregistry.Descriptor) bool {
+	for desc := range manifestRefs(m.manifest) {
 		g.Go(func() error {
 			return mirrorBlob(ctx, m.loc, dstLoc, desc)
 		})
-		return true
-	})
+	}
 	if err := g.Wait(); err != nil {
 		return err
 	}
@@ -570,7 +569,7 @@ func (r singleResolver) ResolveToRegistry(mpath, vers string) (RegistryLocation,
 
 // manifestRefs returns an iterator that produces all the references
 // contained in m.
-func manifestRefs(m ocispec.Manifest) func(func(ociregistry.Descriptor) bool) {
+func manifestRefs(m ocispec.Manifest) iter.Seq[ociregistry.Descriptor] {
 	return func(yield func(ociregistry.Descriptor) bool) {
 		if !yield(m.Config) {
 			return

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"iter"
 	"maps"
 	"path"
 	"slices"
@@ -32,7 +33,7 @@ type ModuleFile struct {
 // AllImports returns a sorted list of all the package paths
 // imported by the module files produced by modFilesIter
 // in canonical form.
-func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, retErr error) {
+func AllImports(modFilesIter iter.Seq2[ModuleFile, error]) (_ []string, retErr error) {
 	pkgPaths := make(map[string]bool)
 	modFilesIter(func(mf ModuleFile, err error) bool {
 		if err != nil {
@@ -65,7 +66,7 @@ func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, re
 //
 // TODO(mvdan): this should now be called InstanceFiles, to follow the naming from
 // https://cuelang.org/docs/concept/modules-packages-instances/#instances.
-func PackageFiles(fsys fs.FS, dir string, pkgQualifier string) func(func(ModuleFile, error) bool) {
+func PackageFiles(fsys fs.FS, dir string, pkgQualifier string) iter.Seq2[ModuleFile, error] {
 	return func(yield func(ModuleFile, error) bool) {
 		// Start at the target directory, but also include package files
 		// from packages with the same name(s) in parent directories.
@@ -146,7 +147,7 @@ func PackageFiles(fsys fs.FS, dir string, pkgQualifier string) func(func(ModuleF
 // module at the given root.
 //
 // The caller may assume that files from the same package are always adjacent.
-func AllModuleFiles(fsys fs.FS, root string) func(func(ModuleFile, error) bool) {
+func AllModuleFiles(fsys fs.FS, root string) iter.Seq2[ModuleFile, error] {
 	return func(yield func(ModuleFile, error) bool) {
 		yieldAllModFiles(fsys, root, true, yield)
 	}

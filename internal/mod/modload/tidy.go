@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"iter"
 	"log"
 	"maps"
 	"path"
@@ -713,15 +714,16 @@ func (ld *loader) spotCheckRoots(ctx context.Context, rs *modrequirements.Requir
 	return true
 }
 
-func withoutIgnoredFiles(iter func(func(modimports.ModuleFile, error) bool)) func(func(modimports.ModuleFile, error) bool) {
+func withoutIgnoredFiles(modFiles iter.Seq2[modimports.ModuleFile, error]) iter.Seq2[modimports.ModuleFile, error] {
 	return func(yield func(modimports.ModuleFile, error) bool) {
-		// TODO for mf, err := range iter {
-		iter(func(mf modimports.ModuleFile, err error) bool {
+		for mf, err := range modFiles {
 			if err == nil && buildattr.ShouldIgnoreFile(mf.Syntax) {
-				return true
+				continue
 			}
-			return yield(mf, err)
-		})
+			if !yield(mf, err) {
+				break
+			}
+		}
 	}
 }
 

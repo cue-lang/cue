@@ -485,13 +485,13 @@ Unifications: 655
 Conjuncts:    1267
 Disjuncts:    50
 
-CloseIDElems: 2138
-NumCloseIDs: 414
+CloseIDElems: 3157
+NumCloseIDs: 360
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,12 @@
+@@ -1,12 +1,12 @@
 -Leaks:  116
 -Freed:  919
 -Reused: 905
@@ -501,6 +501,9 @@ diff old new
 -Unifications: 955
 -Conjuncts:    1966
 -Disjuncts:    1233
+-
+-CloseIDElems: 0
+-NumCloseIDs: 3
 +Leaks:  784
 +Freed:  0
 +Reused: 0
@@ -511,8 +514,8 @@ diff old new
 +Conjuncts:    1267
 +Disjuncts:    50
 +
-+CloseIDElems: 2138
-+NumCloseIDs: 414
++CloseIDElems: 3157
++NumCloseIDs: 360
 -- out/eval/stats --
 Leaks:  116
 Freed:  919
@@ -523,12 +526,17 @@ Retain: 371
 Unifications: 955
 Conjuncts:    1966
 Disjuncts:    1233
+
+CloseIDElems: 0
+NumCloseIDs: 3
 -- out/evalalpha --
 Errors:
 and.transitive.err.out.err: field not allowed:
     ./in.cue:46:3
 and.transitiveWithEmbed.err.out.err: field not allowed:
     ./in.cue:62:3
+closeInEmbed.x.d.e: field not allowed:
+    ./chaineddef.cue:17:8
 embed.andEmbed.d.err: field not allowed:
     ./in.cue:31:11
 embed.andInStruct.a.err: field not allowed:
@@ -553,8 +561,6 @@ embed.withIndirect.err: field not allowed:
 issue3833.evalv2Issue.out.a.c: field not allowed:
     ./issue3833.cue:19:6
     ./issue3833.cue:21:9
-issue3920.out.a.b: field not allowed:
-    ./chaineddef.cue:5:6
 issue3947.full.out.disallowed: field not allowed:
     ./disjunction.cue:3:13
 embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
@@ -566,16 +572,10 @@ embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched
 Result:
 (_|_){
   // [eval]
-  issue3920: (_|_){
-    // [eval]
-    out: (_|_){
-      // [eval]
-      a: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] issue3920.out.a.b: field not allowed:
-          //     ./chaineddef.cue:5:6
-        }
+  issue3920: (struct){
+    out: (#struct){
+      a: (#struct){
+        b: (string){ "out" }
         c?: (string){ string }
       }
     }
@@ -597,10 +597,16 @@ Result:
       }
     }
   }
-  closeInEmbed: (struct){
-    x: (#struct){
-      d: (struct){
-        e: (int){ 1 }
+  closeInEmbed: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval]
+      d: (_|_){
+        // [eval]
+        e: (_|_){
+          // [eval] closeInEmbed.x.d.e: field not allowed:
+          //     ./chaineddef.cue:17:8
+        }
         f: (int){ int }
       }
     }
@@ -1617,6 +1623,8 @@ diff old new
 -    ./in.cue:60:7
 -    ./in.cue:61:7
      ./in.cue:62:3
++closeInEmbed.x.d.e: field not allowed:
++    ./chaineddef.cue:17:8
  embed.andEmbed.d.err: field not allowed:
 -    ./in.cue:28:6
 -    ./in.cue:29:6
@@ -1677,8 +1685,6 @@ diff old new
 +issue3833.evalv2Issue.out.a.c: field not allowed:
 +    ./issue3833.cue:19:6
 +    ./issue3833.cue:21:9
-+issue3920.out.a.b: field not allowed:
-+    ./chaineddef.cue:5:6
  issue3947.full.out.disallowed: field not allowed:
 -    ./disjunction.cue:2:11
      ./disjunction.cue:3:13
@@ -1692,25 +1698,12 @@ diff old new
  embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
      ./validators.cue:21:5
      ./validators.cue:21:12
-@@ -90,17 +40,21 @@
- Result:
- (_|_){
-   // [eval]
--  issue3920: (struct){
--    out: (#struct){
--      a: (#struct){
+@@ -93,14 +43,12 @@
+   issue3920: (struct){
+     out: (#struct){
+       a: (#struct){
 -        c?: (string){ string }
--        b: (string){ "out" }
-+  issue3920: (_|_){
-+    // [eval]
-+    out: (_|_){
-+      // [eval]
-+      a: (_|_){
-+        // [eval]
-+        b: (_|_){
-+          // [eval] issue3920.out.a.b: field not allowed:
-+          //     ./chaineddef.cue:5:6
-+        }
+         b: (string){ "out" }
 +        c?: (string){ string }
        }
      }
@@ -1722,6 +1715,27 @@ diff old new
      }
      #B: (#struct){
        c?: (string){ string }
+@@ -117,10 +65,16 @@
+       }
+     }
+   }
+-  closeInEmbed: (struct){
+-    x: (#struct){
+-      d: (struct){
+-        e: (int){ 1 }
++  closeInEmbed: (_|_){
++    // [eval]
++    x: (_|_){
++      // [eval]
++      d: (_|_){
++        // [eval]
++        e: (_|_){
++          // [eval] closeInEmbed.x.d.e: field not allowed:
++          //     ./chaineddef.cue:17:8
++        }
+         f: (int){ int }
+       }
+     }
 @@ -140,10 +94,7 @@
          allowed?: (string){ string }
          disallowed: (_|_){

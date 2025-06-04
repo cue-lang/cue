@@ -250,6 +250,9 @@ Retain: 183
 Unifications: 288
 Conjuncts:    1650
 Disjuncts:    472
+
+CloseIDElems: 0
+NumCloseIDs: 5
 -- out/eval --
 Errors:
 definition.t0.err.d1.env.c: field not allowed:
@@ -750,8 +753,8 @@ Unifications: 277
 Conjuncts:    605
 Disjuncts:    12
 
-CloseIDElems: 72
-NumCloseIDs: 83
+CloseIDElems: 367
+NumCloseIDs: 86
 -- out/evalalpha --
 Errors:
 definition.t0.err.d1.env.c: field not allowed:
@@ -1195,7 +1198,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,12 @@
+@@ -1,12 +1,12 @@
 -Leaks:  4
 -Freed:  308
 -Reused: 296
@@ -1205,6 +1208,9 @@ diff old new
 -Unifications: 288
 -Conjuncts:    1650
 -Disjuncts:    472
+-
+-CloseIDElems: 0
+-NumCloseIDs: 5
 +Leaks:  292
 +Freed:  0
 +Reused: 0
@@ -1215,8 +1221,8 @@ diff old new
 +Conjuncts:    605
 +Disjuncts:    12
 +
-+CloseIDElems: 72
-+NumCloseIDs: 83
++CloseIDElems: 367
++NumCloseIDs: 86
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

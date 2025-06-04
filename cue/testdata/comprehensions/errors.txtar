@@ -53,6 +53,9 @@ Retain: 1
 Unifications: 19
 Conjuncts:    40
 Disjuncts:    29
+
+CloseIDElems: 0
+NumCloseIDs: 7
 -- out/evalalpha --
 Errors:
 conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):

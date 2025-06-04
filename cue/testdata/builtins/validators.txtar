@@ -221,6 +221,9 @@ Retain: 23
 Unifications: 181
 Conjuncts:    327
 Disjuncts:    202
+
+CloseIDElems: 0
+NumCloseIDs: 8
 -- out/evalalpha --
 Errors:
 issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):

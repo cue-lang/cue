@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd8f866b_9e54d799",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-04T15:23:25Z",
+      "side": 1,
+      "message": "LGTM except for a general feeling that I don\u0027t know what it actually means to be able to specify directories as packages that aren\u0027t in the main module. I suspect that\u0027s already covered by existing logic though (and will be an error).",
+      "revId": "fc646b15bfee377f50fd83eeb6b939f6291ebc96",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "577a106c_6ce0abfd",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_filetypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-04T15:23:25Z",
+      "side": 1,
+      "message": "Can we test what happens if we use an absolute path to a directory outside the current module? Is that allowed, in fact?",
+      "revId": "fc646b15bfee377f50fd83eeb6b939f6291ebc96",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

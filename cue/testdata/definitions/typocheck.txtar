@@ -153,7 +153,19 @@ issue3947: full: {
 	out: #Schema & _defaults
 }
 -- issue3833.cue --
-issue3833: {
+issue3833: ok: {
+	out: { #A & { a: #B } }
+	#A: {
+		a: {b: string, ...}
+		...
+	}
+	#C: c: string
+	#B: {
+		#C & {c: "foo"}
+		b: "foo"
+	}
+}
+issue3833: evalv2Issue:{
 	out: { #A & { a: #B } }
 	#A: {
 		a: b: string
@@ -245,7 +257,7 @@ issue3839: full: {
 			bar: "http"
 		}
 	}
-	#Embed: #def: {}
+	#Embed: #def: {...}
 
 	#Ingress: {
 		#Embed
@@ -463,54 +475,54 @@ full: {
 	out: (#Main & {namespace: "ns1"}).output
 }
 -- out/evalalpha/stats --
-Leaks:  770
+Leaks:  784
 Freed:  0
 Reused: 0
-Allocs: 770
+Allocs: 784
 Retain: 0
 
-Unifications: 641
-Conjuncts:    1238
+Unifications: 655
+Conjuncts:    1267
 Disjuncts:    50
 
-CloseIDElems: 1906
-NumCloseIDs: 401
+CloseIDElems: 1970
+NumCloseIDs: 414
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
 -Leaks:  116
--Freed:  905
--Reused: 891
+-Freed:  919
+-Reused: 905
 -Allocs: 130
--Retain: 368
+-Retain: 371
 -
--Unifications: 941
--Conjuncts:    1935
--Disjuncts:    1216
-+Leaks:  770
+-Unifications: 955
+-Conjuncts:    1966
+-Disjuncts:    1233
++Leaks:  784
 +Freed:  0
 +Reused: 0
-+Allocs: 770
++Allocs: 784
 +Retain: 0
 +
-+Unifications: 641
-+Conjuncts:    1238
++Unifications: 655
++Conjuncts:    1267
 +Disjuncts:    50
 +
-+CloseIDElems: 1906
-+NumCloseIDs: 401
++CloseIDElems: 1970
++NumCloseIDs: 414
 -- out/eval/stats --
 Leaks:  116
-Freed:  905
-Reused: 891
+Freed:  919
+Reused: 905
 Allocs: 130
-Retain: 368
+Retain: 371
 
-Unifications: 941
-Conjuncts:    1935
-Disjuncts:    1216
+Unifications: 955
+Conjuncts:    1966
+Disjuncts:    1233
 -- out/evalalpha --
 Errors:
 and.transitive.err.out.err: field not allowed:
@@ -1066,23 +1078,45 @@ Result:
     results: ~(issue3832._assert.pass)
   }
   issue3833: (struct){
-    out: (#struct){
-      a: (#struct){
-        b: (string){ "foo" }
+    ok: (struct){
+      out: (#struct){
+        a: (#struct){
+          b: (string){ "foo" }
+          c: (string){ "foo" }
+        }
+      }
+      #A: (#struct){
+        a: (#struct){
+          b: (string){ string }
+        }
+      }
+      #C: (#struct){
+        c: (string){ string }
+      }
+      #B: (#struct){
         c: (string){ "foo" }
+        b: (string){ "foo" }
       }
     }
-    #A: (#struct){
-      a: (#struct){
-        b: (string){ string }
+    evalv2Issue: (struct){
+      out: (#struct){
+        a: (#struct){
+          b: (string){ "foo" }
+          c: (string){ "foo" }
+        }
       }
-    }
-    #C: (#struct){
-      c: (string){ string }
-    }
-    #B: (#struct){
-      c: (string){ "foo" }
-      b: (string){ "foo" }
+      #A: (#struct){
+        a: (#struct){
+          b: (string){ string }
+        }
+      }
+      #C: (#struct){
+        c: (string){ string }
+      }
+      #B: (#struct){
+        c: (string){ "foo" }
+        b: (string){ "foo" }
+      }
     }
   }
   issue3837: (struct){
@@ -1653,12 +1687,6 @@ diff old new
 -      a: (#struct){
 -        c?: (string){ string }
 -        b: (string){ "out" }
--      }
--    }
--    #A: (#struct){
--      a?: (#struct){
--        c?: (string){ string }
--      }
 +  issue3920: (_|_){
 +    // [eval]
 +    out: (_|_){
@@ -1670,9 +1698,12 @@ diff old new
 +          //     ./chaineddef.cue:5:6
 +        }
 +        c?: (string){ string }
-+      }
-+    }
-+    #A: (#struct){
+       }
+     }
+     #A: (#struct){
+-      a?: (#struct){
+-        c?: (string){ string }
+-      }
 +      a?: ~(issue3920.#B)
      }
      #B: (#struct){
@@ -2055,8 +2086,8 @@ diff old new
 +    results: ~(issue3832._assert.pass)
    }
    issue3833: (struct){
-     out: (#struct){
-@@ -741,12 +625,8 @@
+     ok: (struct){
+@@ -763,12 +647,8 @@
          globalField: (string){ string }
        }
        #Context: (#struct){
@@ -2071,7 +2102,7 @@ diff old new
        }
        out: (struct){
          ingress: (#struct){
-@@ -774,22 +654,22 @@
+@@ -796,22 +676,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2110,7 +2141,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -799,22 +679,22 @@
+@@ -821,22 +701,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2149,7 +2180,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -829,11 +709,7 @@
+@@ -851,11 +731,7 @@
          }
        }
        #JobConfig: (#struct){
@@ -2162,7 +2193,7 @@ diff old new
          job: (#struct){
            image: (string){ "foo:v1" }
            vcs: (string){ "git" }
-@@ -897,7 +773,7 @@
+@@ -919,7 +795,7 @@
          }
        }
        out: (#struct){
@@ -2171,7 +2202,7 @@ diff old new
            input: (#struct){
              image: (string){ "someimage" }
              env: (string){ "FOO" }
-@@ -929,11 +805,11 @@
+@@ -951,11 +827,11 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2188,7 +2219,7 @@ diff old new
            e: (string){ "foo" }
            f: (int){ 1 }
          }
-@@ -966,24 +842,16 @@
+@@ -988,24 +864,16 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2223,7 +2254,7 @@ diff old new
      }
    }
    issue3934: (struct){
-@@ -1030,7 +898,7 @@
+@@ -1052,7 +920,7 @@
            op: (string){ "add" }
            path: (string){ "/metadata" }
            value: (_|_){
@@ -2232,7 +2263,7 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -1059,38 +927,11 @@
+@@ -1081,38 +949,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -2273,7 +2304,7 @@ diff old new
          let base#6 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -1109,7 +950,7 @@
+@@ -1131,7 +972,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
                value: (_|_){
@@ -2282,7 +2313,7 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
-@@ -1133,6 +974,19 @@
+@@ -1155,6 +996,19 @@
              }
            }
          }
@@ -2302,7 +2333,7 @@ diff old new
        }
      }
      out: (#struct){
-@@ -1162,17 +1016,8 @@
+@@ -1184,17 +1038,8 @@
              //     ./validators.cue:32:17
              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
              //     ./validators.cue:29:22
@@ -2997,23 +3028,45 @@ Result:
     }
   }
   issue3833: (struct){
-    out: (#struct){
-      a: (#struct){
-        b: (string){ "foo" }
+    ok: (struct){
+      out: (#struct){
+        a: (#struct){
+          b: (string){ "foo" }
+          c: (string){ "foo" }
+        }
+      }
+      #A: (#struct){
+        a: (#struct){
+          b: (string){ string }
+        }
+      }
+      #C: (#struct){
+        c: (string){ string }
+      }
+      #B: (#struct){
         c: (string){ "foo" }
+        b: (string){ "foo" }
       }
     }
-    #A: (#struct){
-      a: (#struct){
-        b: (string){ string }
+    evalv2Issue: (struct){
+      out: (#struct){
+        a: (#struct){
+          b: (string){ "foo" }
+          c: (string){ "foo" }
+        }
       }
-    }
-    #C: (#struct){
-      c: (string){ string }
-    }
-    #B: (#struct){
-      c: (string){ "foo" }
-      b: (string){ "foo" }
+      #A: (#struct){
+        a: (#struct){
+          b: (string){ string }
+        }
+      }
+      #C: (#struct){
+        c: (string){ string }
+      }
+      #B: (#struct){
+        c: (string){ "foo" }
+        b: (string){ "foo" }
+      }
     }
   }
   issue3837: (struct){
@@ -3926,25 +3979,52 @@ Result:
 --- issue3833.cue
 {
   issue3833: {
-    out: {
-      (〈1;#A〉 & {
-        a: 〈2;#B〉
-      })
-    }
-    #A: {
-      a: {
-        b: string
+    ok: {
+      out: {
+        (〈1;#A〉 & {
+          a: 〈2;#B〉
+        })
       }
-      ...
+      #A: {
+        a: {
+          b: string
+          ...
+        }
+        ...
+      }
+      #C: {
+        c: string
+      }
+      #B: {
+        (〈1;#C〉 & {
+          c: "foo"
+        })
+        b: "foo"
+      }
     }
-    #C: {
-      c: string
-    }
-    #B: {
-      (〈1;#C〉 & {
-        c: "foo"
-      })
-      b: "foo"
+  }
+  issue3833: {
+    evalv2Issue: {
+      out: {
+        (〈1;#A〉 & {
+          a: 〈2;#B〉
+        })
+      }
+      #A: {
+        a: {
+          b: string
+        }
+        ...
+      }
+      #C: {
+        c: string
+      }
+      #B: {
+        (〈1;#C〉 & {
+          c: "foo"
+        })
+        b: "foo"
+      }
     }
   }
 }
@@ -4027,7 +4107,9 @@ Result:
         }
       }
       #Embed: {
-        #def: {}
+        #def: {
+          ...
+        }
       }
       #Ingress: {
         〈1;#Embed〉

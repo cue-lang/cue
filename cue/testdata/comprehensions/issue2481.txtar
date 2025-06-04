@@ -80,6 +80,9 @@ Retain: 57
 Unifications: 26
 Conjuncts:    50
 Disjuncts:    56
+
+CloseIDElems: 0
+NumCloseIDs: 3
 -- out/eval --
 Errors:
 out: cannot combine regular field "val" with "b":

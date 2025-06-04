@@ -87,6 +87,9 @@ Retain: 5
 Unifications: 41
 Conjuncts:    101
 Disjuncts:    59
+
+CloseIDElems: 0
+NumCloseIDs: 3
 -- out/run/t2 --
 graph TD
   t0("root.build.task.mkdir.output [Terminated]")
@@ -121,6 +124,9 @@ Retain: 5
 Unifications: 42
 Conjuncts:    108
 Disjuncts:    60
+
+CloseIDElems: 0
+NumCloseIDs: 3
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  115
@@ -131,3 +137,6 @@ Retain: 10
 Unifications: 83
 Conjuncts:    209
 Disjuncts:    119
+
+CloseIDElems: 0
+NumCloseIDs: 6

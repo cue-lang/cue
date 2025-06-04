@@ -130,8 +130,13 @@ Retain: 7
 Unifications: 110
 Conjuncts:    217
 Disjuncts:    122
+
+CloseIDElems: 0
+NumCloseIDs: 4
 -- out/evalalpha --
 Errors:
+closednessInversion.out.a: field not allowed:
+    ./noclose.cue:92:3
 fieldNotAllowed.t1.addTwo.objs.extra: field not allowed:
     ./noclose.cue:26:5
 fieldNotAllowed.t2.#AddTwo.objs.two.extra: field not allowed:
@@ -376,7 +381,8 @@ Result:
       }
     }
   }
-  closednessInversion: (struct){
+  closednessInversion: (_|_){
+    // [eval]
     base: (#struct){
       x: (#struct){
         y: (string){ |(*(string){ "default" }, (string){ string }) }
@@ -389,10 +395,18 @@ Result:
     #Y: (#struct){
       y: (string){ |(*(string){ "default" }, (string){ string }) }
     }
-    out: (#struct){
-      a: (struct){
-        b: (struct){
-          c: (string){ "d" }
+    out: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval] closednessInversion.out.a: field not allowed:
+        //     ./noclose.cue:92:3
+        b: (_|_){
+          // [eval] closednessInversion.out.a.b: field not allowed:
+          //     ./noclose.cue:92:6
+          c: (_|_){
+            // [eval] closednessInversion.out.a.b.c: field not allowed:
+            //     ./noclose.cue:92:9
+          }
         }
       }
       y: (string){ |(*(string){ "default" }, (string){ string }) }
@@ -403,9 +417,11 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,24 @@
+@@ -1,4 +1,26 @@
 -(struct){
 +Errors:
++closednessInversion.out.a: field not allowed:
++    ./noclose.cue:92:3
 +fieldNotAllowed.t1.addTwo.objs.extra: field not allowed:
 +    ./noclose.cue:26:5
 +fieldNotAllowed.t2.#AddTwo.objs.two.extra: field not allowed:
@@ -429,7 +445,7 @@ diff old new
    #A: (#struct){
      a: (int){ int }
      b: (int){ int }
-@@ -8,16 +28,16 @@
+@@ -8,16 +30,16 @@
      b: (int){ int }
    }
    x: (#struct){
@@ -451,7 +467,7 @@ diff old new
    }
    double: (struct){
      a: (struct){
-@@ -39,31 +59,41 @@
+@@ -39,31 +61,41 @@
        }
      }
    }
@@ -517,7 +533,7 @@ diff old new
        #AddObjsExtra: (#struct){
          objs: (#struct){
          }
-@@ -72,9 +102,12 @@
+@@ -72,9 +104,12 @@
          unused: (#struct){
          }
        }
@@ -533,7 +549,7 @@ diff old new
              name: (string){ "Two" }
              labels: (#struct){
                app: (_|_){
-@@ -82,45 +115,73 @@
+@@ -82,45 +117,73 @@
                  //     ./noclose.cue:50:23
                }
              }
@@ -646,7 +662,7 @@ diff old new
              }
            }
            port: (string){ "1" }
-@@ -138,24 +199,46 @@
+@@ -138,29 +201,52 @@
          }
        }
        x1: (struct){
@@ -669,6 +685,11 @@ diff old new
 -            }
 -          }
 -          port: (string){ "1" }
+-        }
+-      }
+-    }
+-  }
+-  closednessInversion: (struct){
 +      w: (_|_){
 +        // [eval]
 +        y: (_|_){
@@ -704,19 +725,40 @@ diff old new
 +            //     ./noclose.cue:64:5
 +            //     ./noclose.cue:73:7
 +          }
-         }
-       }
-     }
-@@ -174,12 +257,12 @@
++        }
++      }
++    }
++  }
++  closednessInversion: (_|_){
++    // [eval]
+     base: (#struct){
+       x: (#struct){
+         y: (string){ |(*(string){ "default" }, (string){ string }) }
+@@ -173,13 +259,21 @@
+     #Y: (#struct){
        y: (string){ |(*(string){ "default" }, (string){ string }) }
      }
-     out: (#struct){
+-    out: (#struct){
 -      y: (string){ |(*(string){ "default" }, (string){ string }) }
-       a: (struct){
-         b: (struct){
-           c: (string){ "d" }
-         }
-       }
+-      a: (struct){
+-        b: (struct){
+-          c: (string){ "d" }
+-        }
+-      }
++    out: (_|_){
++      // [eval]
++      a: (_|_){
++        // [eval] closednessInversion.out.a: field not allowed:
++        //     ./noclose.cue:92:3
++        b: (_|_){
++          // [eval] closednessInversion.out.a.b: field not allowed:
++          //     ./noclose.cue:92:6
++          c: (_|_){
++            // [eval] closednessInversion.out.a.b.c: field not allowed:
++            //     ./noclose.cue:92:9
++          }
++        }
++      }
 +      y: (string){ |(*(string){ "default" }, (string){ string }) }
      }
    }

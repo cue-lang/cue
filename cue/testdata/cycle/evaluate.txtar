@@ -164,6 +164,9 @@ Retain: 138
 Unifications: 163
 Conjuncts:    299
 Disjuncts:    192
+
+CloseIDElems: 0
+NumCloseIDs: 5
 -- out/evalalpha --
 Errors:
 closeCycle.c: structural cycle

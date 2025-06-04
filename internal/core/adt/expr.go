@@ -54,10 +54,11 @@ type StructLit struct {
 	// excluded are all literal fields that already exist.
 	Bulk []*BulkOptionalField
 
-	Additional  []*Ellipsis
-	HasEmbed    bool
-	IsOpen      bool // has a ...
-	initialized bool
+	Additional      []*Ellipsis
+	HasEmbed        bool
+	IsOpen          bool // has a ...
+	initialized     bool
+	isComprehension bool
 
 	types OptionalType
 

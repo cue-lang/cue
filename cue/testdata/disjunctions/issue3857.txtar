@@ -60,6 +60,9 @@ Retain: 2
 Unifications: 60
 Conjuncts:    151
 Disjuncts:    98
+
+CloseIDElems: 0
+NumCloseIDs: 6
 -- out/evalalpha --
 (struct){
   reduced: (struct){

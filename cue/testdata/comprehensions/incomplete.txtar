@@ -15,6 +15,9 @@ Retain: 0
 Unifications: 7
 Conjuncts:    7
 Disjuncts:    7
+
+CloseIDElems: 0
+NumCloseIDs: 1
 -- out/eval --
 (struct){
   cond: (bool){ bool }

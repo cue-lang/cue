@@ -225,6 +225,48 @@ reduced: {
     }
   }
 }
+-- out/evalalpha/stats --
+Leaks:  1002
+Freed:  0
+Reused: 0
+Allocs: 1002
+Retain: 0
+
+Unifications: 146
+Conjuncts:    989
+Disjuncts:    610
+
+CloseIDElems: 1357
+NumCloseIDs: 88
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,12 @@
+-Leaks:  0
+-Freed:  1141
+-Reused: 1122
+-Allocs: 19
+-Retain: 51
+-
+-Unifications: 375
+-Conjuncts:    1463
+-Disjuncts:    1192
+-
+-CloseIDElems: 0
+-NumCloseIDs: 14
++Leaks:  1002
++Freed:  0
++Reused: 0
++Allocs: 1002
++Retain: 0
++
++Unifications: 146
++Conjuncts:    989
++Disjuncts:    610
++
++CloseIDElems: 1357
++NumCloseIDs: 88
 -- out/eval/stats --
 Leaks:  0
 Freed:  1141
@@ -235,6 +277,9 @@ Retain: 51
 Unifications: 375
 Conjuncts:    1463
 Disjuncts:    1192
+
+CloseIDElems: 0
+NumCloseIDs: 14
 -- out/evalalpha --
 (struct){
   full: (struct){

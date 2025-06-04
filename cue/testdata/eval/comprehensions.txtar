@@ -128,6 +128,9 @@ Retain: 19
 Unifications: 81
 Conjuncts:    121
 Disjuncts:    94
+
+CloseIDElems: 0
+NumCloseIDs: 19
 -- out/evalalpha --
 Errors:
 issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
@@ -273,7 +276,7 @@ Result:
             //     ./issue3691.cue:15:5
             b*: (_|_){// [e]if true {
               //   c: 〈3;a〉
-              // }[e] & 〈1;X〉
+              // } & 〈1;X〉
             }
           }
         }
@@ -321,7 +324,7 @@ diff old new
 -              }
 +            b*: (_|_){// [e]if true {
 +              //   c: 〈3;a〉
-+              // }[e] & 〈1;X〉
++              // } & 〈1;X〉
              }
            }
          }

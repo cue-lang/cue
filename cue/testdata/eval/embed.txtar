@@ -92,8 +92,13 @@ Retain: 5
 Unifications: 69
 Conjuncts:    141
 Disjuncts:    80
+
+CloseIDElems: 0
+NumCloseIDs: 4
 -- out/evalalpha --
 Errors:
+closednessInversion.out.a: field not allowed:
+    ./noclose.cue:54:3
 fieldNotAllowed.w.y.z.a: field not allowed:
     ./noclose.cue:26:4
     ./noclose.cue:38:6
@@ -214,7 +219,8 @@ Result:
       }
     }
   }
-  closednessInversion: (struct){
+  closednessInversion: (_|_){
+    // [eval]
     base: (#struct){
       x: (#struct){
         y: (string){ |(*(string){ "default" }, (string){ string }) }
@@ -227,10 +233,18 @@ Result:
     #Y: (#struct){
       y: (string){ |(*(string){ "default" }, (string){ string }) }
     }
-    out: (#struct){
-      a: (struct){
-        b: (struct){
-          c: (string){ "d" }
+    out: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval] closednessInversion.out.a: field not allowed:
+        //     ./noclose.cue:54:3
+        b: (_|_){
+          // [eval] closednessInversion.out.a.b: field not allowed:
+          //     ./noclose.cue:54:6
+          c: (_|_){
+            // [eval] closednessInversion.out.a.b.c: field not allowed:
+            //     ./noclose.cue:54:9
+          }
         }
       }
       y: (string){ |(*(string){ "default" }, (string){ string }) }
@@ -241,9 +255,11 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,14 @@
+@@ -1,4 +1,16 @@
 -(struct){
 +Errors:
++closednessInversion.out.a: field not allowed:
++    ./noclose.cue:54:3
 +fieldNotAllowed.w.y.z.a: field not allowed:
 +    ./noclose.cue:26:4
 +    ./noclose.cue:38:6
@@ -257,7 +273,7 @@ diff old new
    #A: (#struct){
      a: (int){ int }
      b: (int){ int }
-@@ -8,16 +18,16 @@
+@@ -8,16 +20,16 @@
      b: (int){ int }
    }
    x: (#struct){
@@ -279,7 +295,7 @@ diff old new
    }
    double: (struct){
      a: (struct){
-@@ -39,15 +49,16 @@
+@@ -39,15 +51,16 @@
        }
      }
    }
@@ -302,7 +318,7 @@ diff old new
            }
          }
          port: (string){ "1" }
-@@ -65,24 +76,46 @@
+@@ -65,28 +78,51 @@
        }
      }
      x1: (struct){
@@ -325,6 +341,10 @@ diff old new
 -          }
 -        }
 -        port: (string){ "1" }
+-      }
+-    }
+-  }
+-  closednessInversion: (struct){
 +    w: (_|_){
 +      // [eval]
 +      y: (_|_){
@@ -360,19 +380,39 @@ diff old new
 +          //     ./noclose.cue:27:4
 +          //     ./noclose.cue:36:6
 +        }
-       }
-     }
-   }
-@@ -100,12 +133,12 @@
++      }
++    }
++  }
++  closednessInversion: (_|_){
++    // [eval]
+     base: (#struct){
+       x: (#struct){
+         y: (string){ |(*(string){ "default" }, (string){ string }) }
+@@ -99,13 +135,21 @@
+     #Y: (#struct){
        y: (string){ |(*(string){ "default" }, (string){ string }) }
      }
-     out: (#struct){
+-    out: (#struct){
 -      y: (string){ |(*(string){ "default" }, (string){ string }) }
-       a: (struct){
-         b: (struct){
-           c: (string){ "d" }
-         }
-       }
+-      a: (struct){
+-        b: (struct){
+-          c: (string){ "d" }
+-        }
+-      }
++    out: (_|_){
++      // [eval]
++      a: (_|_){
++        // [eval] closednessInversion.out.a: field not allowed:
++        //     ./noclose.cue:54:3
++        b: (_|_){
++          // [eval] closednessInversion.out.a.b: field not allowed:
++          //     ./noclose.cue:54:6
++          c: (_|_){
++            // [eval] closednessInversion.out.a.b.c: field not allowed:
++            //     ./noclose.cue:54:9
++          }
++        }
++      }
 +      y: (string){ |(*(string){ "default" }, (string){ string }) }
      }
    }

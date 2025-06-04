@@ -24,7 +24,7 @@ Unifications: 16
 Conjuncts:    113
 Disjuncts:    58
 
-CloseIDElems: 10
+CloseIDElems: 22
 NumCloseIDs: 3
 -- out/eval --
 (struct){
@@ -66,7 +66,7 @@ diff old new
 +Conjuncts:    113
 +Disjuncts:    58
 +
-+CloseIDElems: 10
++CloseIDElems: 22
 +NumCloseIDs: 3
 -- out/eval/stats --
 Leaks:  0

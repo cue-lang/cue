@@ -22,6 +22,9 @@ Retain: 7
 Unifications: 18
 Conjuncts:    18
 Disjuncts:    21
+
+CloseIDElems: 0
+NumCloseIDs: 5
 -- out/eval --
 Errors:
 k: cannot range over e (found int, want list or struct):

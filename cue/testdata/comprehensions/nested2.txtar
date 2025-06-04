@@ -107,6 +107,48 @@ Y: x: {
 		if true { M: {} }
 	}
 }
+-- out/evalalpha/stats --
+Leaks:  50
+Freed:  0
+Reused: 0
+Allocs: 50
+Retain: 0
+
+Unifications: 50
+Conjuncts:    92
+Disjuncts:    0
+
+CloseIDElems: 1260
+NumCloseIDs: 78
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,12 @@
+-Leaks:  2
+-Freed:  50
+-Reused: 45
+-Allocs: 7
+-Retain: 12
+-
+-Unifications: 52
+-Conjuncts:    91
+-Disjuncts:    57
+-
+-CloseIDElems: 0
+-NumCloseIDs: 27
++Leaks:  50
++Freed:  0
++Reused: 0
++Allocs: 50
++Retain: 0
++
++Unifications: 50
++Conjuncts:    92
++Disjuncts:    0
++
++CloseIDElems: 1260
++NumCloseIDs: 78
 -- out/eval/stats --
 Leaks:  2
 Freed:  50
@@ -117,6 +159,9 @@ Retain: 12
 Unifications: 52
 Conjuncts:    91
 Disjuncts:    57
+
+CloseIDElems: 0
+NumCloseIDs: 10
 -- out/eval --
 (struct){
   given: (struct){

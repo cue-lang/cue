@@ -221,6 +221,9 @@ type refInfo struct {
 
 	// kind explains the type of defID.
 	kind defIDType
+
+	// isRecursive indicates this is recursively closed.
+	isRecursive bool
 }
 
 type conjunctFlags uint8
@@ -312,6 +315,9 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 			x := n.reqDefIDs[i]
 			if x.id == outerID && outerID != 0 {
 				n.reqDefIDs[i].ignore = false
+				if v.ClosedRecursive {
+					n.reqDefIDs[i].isRecursive = true
+				}
 				outerID = x.parent
 			}
 		}
@@ -364,12 +370,13 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 		dstID = next
 
 		n.reqDefIDs = append(n.reqDefIDs, refInfo{
-			v:      v,
-			id:     dstID,
-			parent: id.outerID,
-			ignore: ignore,
-			kind:   defReference,
-			embed:  id.enclosingEmbed,
+			v:           v,
+			id:          dstID,
+			parent:      id.outerID,
+			ignore:      ignore,
+			kind:        defReference,
+			embed:       id.enclosingEmbed,
+			isRecursive: v.ClosedRecursive,
 		})
 	}
 	srcID := id.defID
@@ -410,12 +417,13 @@ func (n *nodeContext) newReq(id CloseInfo, kind defIDType) CloseInfo {
 
 	// TODO: consider only adding when record || OpenGraph
 	n.reqDefIDs = append(n.reqDefIDs, refInfo{
-		v:      emptyNode,
-		id:     dstID,
-		parent: parent,
-		embed:  id.enclosingEmbed,
-		ignore: true,
-		kind:   kind,
+		v:           emptyNode,
+		id:          dstID,
+		parent:      parent,
+		embed:       id.enclosingEmbed,
+		ignore:      true,
+		kind:        kind,
+		isRecursive: id.FromDef,
 	})
 
 	return id
@@ -906,6 +914,9 @@ outer:
 		once := false
 		if y.v != nil && y.kind != defEmbedding {
 			once = y.v.ClosedNonRecursive
+			if !y.ignore && !y.isRecursive {
+				once = true
+			}
 		}
 
 		a = append(a, reqSet{
@@ -923,6 +934,11 @@ outer:
 			for i := last; i >= 0 && outerID != 0; i-- {
 				x := a[i]
 				if x.id == outerID {
+					if a[i].ignored {
+						a[i].once = !y.isRecursive
+					} else {
+						a[i].once = a[i].once && !y.isRecursive
+					}
 					a[i].ignored = false
 					outerID = x.parent
 				}
@@ -1012,7 +1028,7 @@ func (a *reqSets) filterNonRecursive() {
 	a.filterSets(func(e []reqSet) bool {
 		x := e[0]
 		if x.once { //  || x.id == 0
-			return false // discard the entry
+			e[0].ignored = true
 		}
 		return true // keep the entry
 	})

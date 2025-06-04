@@ -1,14 +1,14 @@
-# Note that the permission errors below cover unix and windows.
+# Note that the permission errors below cover unix and windows (including wine).
 
 # We can't read nor write.
 chmod 000 in.cue
 ! exec cue fmt in.cue
-stderr 'permission denied|Access is denied'
+stderr 'permission denied|Access (is )?denied'
 
 # We can read, but not write. We used to ignore some open/write errors.
 chmod 444 in.cue
 ! exec cue fmt in.cue
-stderr 'permission denied|Access is denied'
+stderr 'permission denied|Access (is )?denied'
 
 # We can read and write.
 chmod 666 in.cue

@@ -28,7 +28,6 @@ stderr 'module example.com/e1@v0.0.1: cannot do HTTP request'
 # If no CUE_CONFIG_DIR is set and we can't find its default location,
 # we should still carry on with Docker auth assuming that logins.json does not exist.
 env HOME= CUE_CONFIG_DIR=
-exec env
 ! exec cue export .
 stderr 'module example.com/e1@v0.0.1: cannot do HTTP request'
 -- cueconfig/logins.json --

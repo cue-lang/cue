@@ -7,7 +7,6 @@ cmp stdout want-stdout-0
 exec cue refactor imports example.com other.com
 cmp x.cue x.cue-1
 exec cue mod tidy
-exec cat cue.mod/module.cue
 
 exec cue export
 cmp stdout want-stdout-1

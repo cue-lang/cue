@@ -1,4 +1,3 @@
-exec cat cue.mod/module.cue
 exec cue eval .
 cmp stdout expect-stdout
 

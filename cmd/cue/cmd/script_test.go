@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"io/fs"
@@ -426,6 +427,38 @@ func TestMain(m *testing.M) {
 			}
 		},
 		"testcmd": func() { check(testCmd()) },
+		// These Unix-like commands are used by a few testscripts, especially when testing `cue cmd`.
+		// They are not available on vanilla Windows, so add a simple version of them here.
+		"false": func() {
+			os.Exit(1)
+		},
+		"echo": func() {
+			flag.Parse()
+			args := flag.Args()
+			for i, arg := range args {
+				if i > 0 {
+					fmt.Print(" ")
+				}
+				fmt.Print(arg)
+			}
+			fmt.Println()
+		},
+		"cat": func() {
+			flag.Parse()
+			args := flag.Args()
+			if len(args) == 0 {
+				_, err := io.Copy(os.Stdout, os.Stdin)
+				check(err)
+				return
+			}
+			for _, arg := range args {
+				f, err := os.Open(arg)
+				check(err)
+				_, err = io.Copy(os.Stdout, f)
+				f.Close()
+				check(err)
+			}
+		},
 		// Like `cue export`, but as a standalone Go program which doesn't
 		// go through cmd/cue's setup of cuecontext and the evaluator.
 		// Useful to check what the export behavior is for Go API users,

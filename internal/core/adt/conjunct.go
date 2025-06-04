@@ -214,7 +214,7 @@ loop1:
 
 	// TODO: if embed, add an "ignore" field.
 	// When inserting a replace that is a definition, flip the ignore.
-	if hasEmbed {
+	if hasEmbed && !s.isComprehension { // only if more than one decl.
 		ci = n.splitStruct(s, ci)
 	}
 

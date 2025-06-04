@@ -68,6 +68,9 @@ Retain: 33
 Unifications: 35
 Conjuncts:    95
 Disjuncts:    75
+
+CloseIDElems: 0
+NumCloseIDs: 1
 -- out/eval --
 (struct){
   service: (struct){

@@ -161,6 +161,9 @@ Retain: 57
 Unifications: 136
 Conjuncts:    304
 Disjuncts:    173
+
+CloseIDElems: 0
+NumCloseIDs: 2
 -- out/evalalpha --
 Errors:
 listEmbed.b6: index out of range [5] with length 2:

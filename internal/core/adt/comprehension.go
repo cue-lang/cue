@@ -158,6 +158,8 @@ func (n *nodeContext) insertComprehension(
 	var decls []Decl
 	switch v := ToExpr(x).(type) {
 	case *StructLit:
+		ci = n.splitStruct(v, ci)
+
 		kind := TopKind
 		numFixed := 0
 		var fields []Decl
@@ -236,8 +238,9 @@ func (n *nodeContext) insertComprehension(
 			st := v
 			if len(fields) < len(v.Decls) {
 				st = &StructLit{
-					Src:   v.Src,
-					Decls: fields,
+					Src:             v.Src,
+					Decls:           fields,
+					isComprehension: true,
 				}
 			}
 			node.AddStruct(st, env, ci)
@@ -270,7 +273,10 @@ func (n *nodeContext) insertComprehension(
 		default:
 			// Create a new StructLit with only the fields that need to be
 			// added at this level.
-			x = &StructLit{Decls: decls}
+			x = &StructLit{
+				Decls:           decls,
+				isComprehension: true,
+			}
 		}
 	}
 

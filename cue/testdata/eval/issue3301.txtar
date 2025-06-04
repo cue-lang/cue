@@ -50,6 +50,9 @@ Retain: 7
 Unifications: 11
 Conjuncts:    25
 Disjuncts:    18
+
+CloseIDElems: 0
+NumCloseIDs: 2
 -- out/compile --
 --- in.cue
 {

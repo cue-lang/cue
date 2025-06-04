@@ -30,6 +30,9 @@ Retain: 3
 Unifications: 7
 Conjuncts:    13
 Disjuncts:    7
+
+CloseIDElems: 0
+NumCloseIDs: 3
 -- out/evalalpha --
 Errors:
 ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):

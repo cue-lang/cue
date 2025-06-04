@@ -121,6 +121,48 @@ foo: {
 		}
 	}
 }
+-- out/evalalpha/stats --
+Leaks:  108
+Freed:  0
+Reused: 0
+Allocs: 108
+Retain: 0
+
+Unifications: 94
+Conjuncts:    172
+Disjuncts:    6
+
+CloseIDElems: 1067
+NumCloseIDs: 38
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,12 @@
+-Leaks:  3
+-Freed:  118
+-Reused: 103
+-Allocs: 18
+-Retain: 10
+-
+-Unifications: 111
+-Conjuncts:    249
+-Disjuncts:    126
+-
+-CloseIDElems: 0
+-NumCloseIDs: 8
++Leaks:  108
++Freed:  0
++Reused: 0
++Allocs: 108
++Retain: 0
++
++Unifications: 94
++Conjuncts:    172
++Disjuncts:    6
++
++CloseIDElems: 1067
++NumCloseIDs: 38
 -- out/eval/stats --
 Leaks:  3
 Freed:  118
@@ -131,6 +173,9 @@ Retain: 10
 Unifications: 111
 Conjuncts:    249
 Disjuncts:    126
+
+CloseIDElems: 0
+NumCloseIDs: 8
 -- out/evalalpha --
 (struct){
   networkingv1: (struct){

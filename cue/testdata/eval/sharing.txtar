@@ -223,6 +223,48 @@ issue3903: noshare: {
 		result: "result-\(input.name)"
 	}
 }
+-- out/evalalpha/stats --
+Leaks:  240
+Freed:  0
+Reused: 0
+Allocs: 240
+Retain: 0
+
+Unifications: 229
+Conjuncts:    417
+Disjuncts:    6
+
+CloseIDElems: 1039
+NumCloseIDs: 122
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,12 @@
+-Leaks:  12
+-Freed:  266
+-Reused: 260
+-Allocs: 18
+-Retain: 36
+-
+-Unifications: 252
+-Conjuncts:    523
+-Disjuncts:    305
+-
+-CloseIDElems: 0
+-NumCloseIDs: 13
++Leaks:  240
++Freed:  0
++Reused: 0
++Allocs: 240
++Retain: 0
++
++Unifications: 229
++Conjuncts:    417
++Disjuncts:    6
++
++CloseIDElems: 1039
++NumCloseIDs: 122
 -- out/eval/stats --
 Leaks:  12
 Freed:  266
@@ -233,6 +275,9 @@ Retain: 36
 Unifications: 252
 Conjuncts:    523
 Disjuncts:    305
+
+CloseIDElems: 0
+NumCloseIDs: 7
 -- out/evalalpha --
 Errors:
 shareCycle.t1.Y.x.x: structural cycle

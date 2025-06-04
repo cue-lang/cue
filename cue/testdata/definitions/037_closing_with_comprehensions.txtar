@@ -110,6 +110,9 @@ Retain: 10
 Unifications: 28
 Conjuncts:    43
 Disjuncts:    28
+
+CloseIDElems: 0
+NumCloseIDs: 5
 -- out/evalalpha --
 Errors:
 #E.f3: field not allowed:

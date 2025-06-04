@@ -501,6 +501,48 @@ diff old new
    }
    _parent_configs: (struct){
      PARENT: (bool){ true }
+-- out/evalalpha/stats --
+Leaks:  199
+Freed:  0
+Reused: 0
+Allocs: 199
+Retain: 0
+
+Unifications: 166
+Conjuncts:    315
+Disjuncts:    10
+
+CloseIDElems: 1098
+NumCloseIDs: 127
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,12 @@
+-Leaks:  52
+-Freed:  158
+-Reused: 149
+-Allocs: 61
+-Retain: 184
+-
+-Unifications: 196
+-Conjuncts:    365
+-Disjuncts:    241
+-
+-CloseIDElems: 0
+-NumCloseIDs: 18
++Leaks:  199
++Freed:  0
++Reused: 0
++Allocs: 199
++Retain: 0
++
++Unifications: 166
++Conjuncts:    315
++Disjuncts:    10
++
++CloseIDElems: 1098
++NumCloseIDs: 127
 -- out/eval/stats --
 Leaks:  52
 Freed:  158
@@ -511,6 +553,9 @@ Retain: 184
 Unifications: 196
 Conjuncts:    365
 Disjuncts:    241
+
+CloseIDElems: 0
+NumCloseIDs: 11
 -- out/eval --
 Errors:
 indirectReference.y: conflicting values 2 and 1:

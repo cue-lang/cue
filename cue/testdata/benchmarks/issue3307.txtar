@@ -32,6 +32,9 @@ Retain: 72
 Unifications: 21
 Conjuncts:    3
 Disjuncts:    93
+
+CloseIDElems: 0
+NumCloseIDs: 1
 -- out/eval --
 (_|_){
   // [incomplete] incomplete bool: _

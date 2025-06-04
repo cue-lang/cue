@@ -150,13 +150,13 @@ Unifications: 229
 Conjuncts:    453
 Disjuncts:    53
 
-CloseIDElems: 1541
-NumCloseIDs: 125
+CloseIDElems: 2508
+NumCloseIDs: 107
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,12 @@
+@@ -1,12 +1,12 @@
 -Leaks:  4
 -Freed:  269
 -Reused: 250
@@ -166,6 +166,9 @@ diff old new
 -Unifications: 214
 -Conjuncts:    639
 -Disjuncts:    297
+-
+-CloseIDElems: 0
+-NumCloseIDs: 4
 +Leaks:  302
 +Freed:  0
 +Reused: 0
@@ -176,8 +179,8 @@ diff old new
 +Conjuncts:    453
 +Disjuncts:    53
 +
-+CloseIDElems: 1541
-+NumCloseIDs: 125
++CloseIDElems: 2508
++NumCloseIDs: 107
 -- out/eval/stats --
 Leaks:  4
 Freed:  269
@@ -188,6 +191,9 @@ Retain: 30
 Unifications: 214
 Conjuncts:    639
 Disjuncts:    297
+
+CloseIDElems: 0
+NumCloseIDs: 4
 -- out/evalalpha --
 Errors:
 issue3670.a.not_int: field not allowed:

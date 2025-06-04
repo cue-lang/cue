@@ -394,11 +394,14 @@ func (m *mermaidContext) vertexInfo(vc *mermaidVertex, recursive bool) {
 				format = "%s((<s><i>%d%si</i></s>))\n"
 			}
 			flags := ""
-			if d.isOuterStruct {
-				flags += "S"
+			if d.kind != 0 {
+				flags += d.kind.String()
 			}
-			if d.exclude != 0 {
-				flags += fmt.Sprintf("-%d", d.exclude)
+			if d.embed != 0 {
+				flags += fmt.Sprintf("-%de", d.embed)
+			}
+			if d.parent != 0 {
+				flags += fmt.Sprintf("-%dp", d.parent)
 			}
 
 			fmt.Fprintf(node, format, reqID, id, flags)
@@ -432,7 +435,11 @@ func (m *mermaidContext) vertexInfo(vc *mermaidVertex, recursive bool) {
 			if x&cHasOpenValidator != 0 {
 				flags += "o"
 			}
-			fmt.Fprintf(node, "%s_conj_%d((%v\n%d%s))", m.vertexID(v), i, kind, conj.id, flags)
+			var scope string
+			if conj.embed != 0 {
+				scope = fmt.Sprintf("-%d", conj.embed)
+			}
+			fmt.Fprintf(node, "%s_conj_%d((%v\n%d%s%s))", m.vertexID(v), i, kind, conj.id, scope, flags)
 		}
 		indentOnNewline(node, 2)
 		fmt.Fprintln(node, "end")

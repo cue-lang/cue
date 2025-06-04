@@ -426,7 +426,7 @@ func TestMain(m *testing.M) {
 				os.Exit(1)
 			}
 		},
-		"testcmd": func() { check(testCmd()) },
+		"testcmd": testCmd,
 		// These Unix-like commands are used by a few testscripts, especially when testing `cue cmd`.
 		// They are not available on vanilla Windows, so add a simple version of them here.
 		"false": func() {
@@ -498,7 +498,13 @@ func mainStdinPipe() error {
 	return cmd.Run(context.Background())
 }
 
-func testCmd() error {
+func testCmd() {
+	check := func(err error) {
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+	}
 	cmd := os.Args[1]
 	args := os.Args[2:]
 	switch cmd {
@@ -508,23 +514,27 @@ func testCmd() error {
 		// each command creates one file and waits for the other to exist.
 		// If the commands are run sequentially, neither will succeed.
 		if len(args) != 2 {
-			return fmt.Errorf("usage: concurrent to_create to_wait\n")
+			check(fmt.Errorf("usage: concurrent to_create to_wait\n"))
 		}
 		toCreate := args[0]
 		toWait := args[1]
-		if err := os.WriteFile(toCreate, []byte("dummy"), 0o666); err != nil {
-			return err
-		}
-		for i := 0; i < 10; i++ {
+		check(os.WriteFile(toCreate, []byte("dummy"), 0o666))
+		for range 10 {
 			if _, err := os.Stat(toWait); err == nil {
 				fmt.Printf("wrote %s and found %s\n", toCreate, toWait)
-				return nil
+				return
 			}
 			time.Sleep(100 * time.Millisecond)
 		}
-		return fmt.Errorf("timed out waiting for %s to exist", toWait)
+		check(fmt.Errorf("timed out waiting for %s to exist", toWait))
+	case "exitcode":
+		if len(args) > 0 {
+			code, err := strconv.Atoi(args[0])
+			check(err)
+			os.Exit(code)
+		}
 	default:
-		return fmt.Errorf("unknown command: %q\n", cmd)
+		check(fmt.Errorf("unknown command: %q\n", cmd))
 	}
 }
 

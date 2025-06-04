@@ -1,10 +1,6 @@
 ! exec cue cmd errcode
 ! stdout .
-stderr '^task failed: command \["ls" "--badflags"\] failed: exit status [12]$'
-
--- task.cue --
-package home
-message: "Hello world!"
+stderr '^task failed: command \["testcmd" "exitcode" "5"\] failed: exit status 5$'
 
 -- task_tool.cue --
 package home
@@ -13,7 +9,6 @@ import "tool/exec"
 
 command: errcode: {
 	task: bad: exec.Run & {
-		cmd:    "ls --badflags"
-		stderr: string // suppress error message
+		cmd: ["testcmd", "exitcode", "5"]
 	}
 }

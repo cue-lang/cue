@@ -91,6 +91,9 @@ Retain: 0
 Unifications: 22
 Conjuncts:    32
 Disjuncts:    22
+
+CloseIDElems: 0
+NumCloseIDs: 1
 -- out/eval --
 (struct){
   foo: (struct){

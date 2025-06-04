@@ -68,6 +68,9 @@ Retain: 1
 Unifications: 11
 Conjuncts:    23
 Disjuncts:    16
+
+CloseIDElems: 0
+NumCloseIDs: 1
 -- out/evalalpha --
 Errors:
 listOfCloseds.0.b: field not allowed:

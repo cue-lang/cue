@@ -26,6 +26,9 @@ Retain: 2
 Unifications: 5
 Conjuncts:    5
 Disjuncts:    6
+
+CloseIDElems: 0
+NumCloseIDs: 1
 -- out/eval --
 Errors:
 undefined field: missing:

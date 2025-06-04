@@ -432,6 +432,15 @@ func TestMain(m *testing.M) {
 		"false": func() {
 			os.Exit(1)
 		},
+		"exit": func() {
+			flag.Parse()
+			args := flag.Args()
+			if len(args) > 0 {
+				code, err := strconv.Atoi(args[0])
+				check(err)
+				os.Exit(code)
+			}
+		},
 		"echo": func() {
 			flag.Parse()
 			args := flag.Args()

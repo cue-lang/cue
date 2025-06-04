@@ -15,7 +15,7 @@ import (
 command: ref: {
 	t1: exec.Run & {
 			ref: t1.stdout
-			cmd: ["sh", "-c", "echo hello"]
+			cmd: ["echo", "hello"]
 			stdout: string
 	}
 	t2: cli.Print & {

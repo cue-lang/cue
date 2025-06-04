@@ -114,6 +114,9 @@ Retain: 0
 Unifications: 21
 Conjuncts:    35
 Disjuncts:    21
+
+CloseIDElems: 0
+NumCloseIDs: 2
 -- out/run/t2/stats --
 Leaks:  0
 Freed:  23
@@ -124,6 +127,9 @@ Retain: 0
 Unifications: 23
 Conjuncts:    44
 Disjuncts:    23
+
+CloseIDElems: 0
+NumCloseIDs: 2
 -- out/run/t3/stats --
 Leaks:  0
 Freed:  28
@@ -134,6 +140,9 @@ Retain: 0
 Unifications: 28
 Conjuncts:    57
 Disjuncts:    28
+
+CloseIDElems: 0
+NumCloseIDs: 2
 -- out/run/t4/stats --
 Leaks:  0
 Freed:  29
@@ -144,6 +153,9 @@ Retain: 0
 Unifications: 29
 Conjuncts:    63
 Disjuncts:    29
+
+CloseIDElems: 0
+NumCloseIDs: 2
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  101
@@ -154,3 +166,6 @@ Retain: 0
 Unifications: 101
 Conjuncts:    199
 Disjuncts:    101
+
+CloseIDElems: 0
+NumCloseIDs: 8

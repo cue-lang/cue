@@ -485,7 +485,7 @@ Unifications: 655
 Conjuncts:    1267
 Disjuncts:    50
 
-CloseIDElems: 1970
+CloseIDElems: 2138
 NumCloseIDs: 414
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -511,7 +511,7 @@ diff old new
 +Conjuncts:    1267
 +Disjuncts:    50
 +
-+CloseIDElems: 1970
++CloseIDElems: 2138
 +NumCloseIDs: 414
 -- out/eval/stats --
 Leaks:  116
@@ -550,6 +550,9 @@ embed.simple.a.err: field not allowed:
     ./in.cue:4:5
 embed.withIndirect.err: field not allowed:
     ./in.cue:87:8
+issue3833.evalv2Issue.out.a.c: field not allowed:
+    ./issue3833.cue:19:6
+    ./issue3833.cue:21:9
 issue3920.out.a.b: field not allowed:
     ./chaineddef.cue:5:6
 issue3947.full.out.disallowed: field not allowed:
@@ -1077,7 +1080,8 @@ Result:
     }
     results: ~(issue3832._assert.pass)
   }
-  issue3833: (struct){
+  issue3833: (_|_){
+    // [eval]
     ok: (struct){
       out: (#struct){
         a: (#struct){
@@ -1098,11 +1102,18 @@ Result:
         b: (string){ "foo" }
       }
     }
-    evalv2Issue: (struct){
-      out: (#struct){
-        a: (#struct){
+    evalv2Issue: (_|_){
+      // [eval]
+      out: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval]
           b: (string){ "foo" }
-          c: (string){ "foo" }
+          c: (_|_){
+            // [eval] issue3833.evalv2Issue.out.a.c: field not allowed:
+            //     ./issue3833.cue:19:6
+            //     ./issue3833.cue:21:9
+          }
         }
       }
       #A: (#struct){
@@ -1589,7 +1600,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,86 +1,33 @@
+@@ -1,86 +1,36 @@
  Errors:
  and.transitive.err.out.err: field not allowed:
 -    ./in.cue:42:5
@@ -1663,6 +1674,9 @@ diff old new
 -    ./in.cue:86:6
 -    ./in.cue:87:2
      ./in.cue:87:8
++issue3833.evalv2Issue.out.a.c: field not allowed:
++    ./issue3833.cue:19:6
++    ./issue3833.cue:21:9
 +issue3920.out.a.b: field not allowed:
 +    ./chaineddef.cue:5:6
  issue3947.full.out.disallowed: field not allowed:
@@ -1678,7 +1692,7 @@ diff old new
  embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
      ./validators.cue:21:5
      ./validators.cue:21:12
-@@ -90,17 +37,21 @@
+@@ -90,17 +40,21 @@
  Result:
  (_|_){
    // [eval]
@@ -1708,7 +1722,7 @@ diff old new
      }
      #B: (#struct){
        c?: (string){ string }
-@@ -140,10 +91,7 @@
+@@ -140,10 +94,7 @@
          allowed?: (string){ string }
          disallowed: (_|_){
            // [eval] issue3947.full.out.disallowed: field not allowed:
@@ -1719,7 +1733,7 @@ diff old new
          }
        }
      }
-@@ -228,14 +176,11 @@
+@@ -228,14 +179,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1735,7 +1749,7 @@ diff old new
        }
      }
      andInStruct: (_|_){
-@@ -245,14 +190,11 @@
+@@ -245,14 +193,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1751,7 +1765,7 @@ diff old new
        }
      }
      embedDefWithEmbedding: (_|_){
-@@ -262,15 +204,11 @@
+@@ -262,15 +207,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1768,7 +1782,7 @@ diff old new
        }
      }
      embedComprehension: (_|_){
-@@ -280,16 +218,11 @@
+@@ -280,16 +221,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1786,7 +1800,7 @@ diff old new
        }
      }
      fieldWithAnd: (_|_){
-@@ -300,9 +233,6 @@
+@@ -300,9 +236,6 @@
          // [eval]
          err: (_|_){
            // [eval] embed.fieldWithAnd.a.err: field not allowed:
@@ -1796,7 +1810,7 @@ diff old new
            //     ./in.cue:20:13
          }
        }
-@@ -313,20 +243,15 @@
+@@ -313,20 +246,15 @@
          a: (int){ int }
        }
        B: (struct){
@@ -1822,7 +1836,7 @@ diff old new
        }
      }
      andEmbed: (_|_){
-@@ -342,17 +267,11 @@
+@@ -342,17 +270,11 @@
        }
        d: (_|_){
          // [eval]
@@ -1841,7 +1855,7 @@ diff old new
        }
      }
      nonDef: (struct){
-@@ -361,12 +280,12 @@
+@@ -361,12 +283,12 @@
            a: (string){ string }
          }
          #Y: (#struct){
@@ -1858,7 +1872,7 @@ diff old new
          }
        }
      }
-@@ -376,12 +295,12 @@
+@@ -376,12 +298,12 @@
            Name: (string){ string }
          }
          #Step: (#struct){
@@ -1875,7 +1889,7 @@ diff old new
          }
          out: (#struct){
            Name: (string){ "foo" }
-@@ -391,21 +310,15 @@
+@@ -391,21 +313,15 @@
      }
      withIndirect: (_|_){
        // [eval]
@@ -1902,7 +1916,7 @@ diff old new
      }
      normalValidator: (_|_){
        // [eval]
-@@ -415,20 +328,17 @@
+@@ -415,20 +331,17 @@
        }
        x: (_|_){
          // [eval]
@@ -1926,7 +1940,7 @@ diff old new
          #X: (_){
            matchN(0, (#list){
            })
-@@ -435,17 +345,10 @@
+@@ -435,17 +348,10 @@
            a?: (int){ int }
            b?: (int){ int }
          }
@@ -1948,7 +1962,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -464,10 +367,7 @@
+@@ -464,10 +370,7 @@
            // [eval]
            b: (_|_){
              // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
@@ -1959,7 +1973,7 @@ diff old new
              //     ./validators.cue:24:8
              // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
              //     ./validators.cue:21:5
-@@ -510,16 +410,11 @@
+@@ -510,16 +413,11 @@
          }
          out: (_|_){
            // [eval]
@@ -1977,7 +1991,7 @@ diff old new
          }
        }
      }
-@@ -552,17 +447,11 @@
+@@ -552,17 +450,11 @@
          }
          out: (_|_){
            // [eval]
@@ -1996,7 +2010,7 @@ diff old new
          }
        }
      }
-@@ -608,8 +497,8 @@
+@@ -608,8 +500,8 @@
              //     ./issue3832.cue:8:16
            }
            outFirstName: (_|_){
@@ -2007,7 +2021,7 @@ diff old new
            }
          }
        }
-@@ -619,35 +508,27 @@
+@@ -619,35 +511,27 @@
          }, (#struct){
            pass: (#struct){
              let self#1 = (_|_){
@@ -2053,7 +2067,7 @@ diff old new
        pass: (#struct){
          let self#1 = (#struct){
            firstName: (string){ "Sam" }
-@@ -654,18 +535,21 @@
+@@ -654,20 +538,24 @@
          }
          outFirstName: (string){ "Sam" }
        }
@@ -2069,6 +2083,8 @@ diff old new
 -      }
 -      outFirstName: (string){ "Sam" }
 -    }
+-  }
+-  issue3833: (struct){
 +    }
 +    _subject: (#struct){
 +      in: (_){ _ }
@@ -2084,10 +2100,37 @@ diff old new
 +      }
 +    }
 +    results: ~(issue3832._assert.pass)
-   }
-   issue3833: (struct){
++  }
++  issue3833: (_|_){
++    // [eval]
      ok: (struct){
-@@ -763,12 +647,8 @@
+       out: (#struct){
+         a: (#struct){
+@@ -688,11 +576,18 @@
+         b: (string){ "foo" }
+       }
+     }
+-    evalv2Issue: (struct){
+-      out: (#struct){
+-        a: (#struct){
+-          b: (string){ "foo" }
+-          c: (string){ "foo" }
++    evalv2Issue: (_|_){
++      // [eval]
++      out: (_|_){
++        // [eval]
++        a: (_|_){
++          // [eval]
++          b: (string){ "foo" }
++          c: (_|_){
++            // [eval] issue3833.evalv2Issue.out.a.c: field not allowed:
++            //     ./issue3833.cue:19:6
++            //     ./issue3833.cue:21:9
++          }
+         }
+       }
+       #A: (#struct){
+@@ -763,12 +658,8 @@
          globalField: (string){ string }
        }
        #Context: (#struct){
@@ -2102,7 +2145,7 @@ diff old new
        }
        out: (struct){
          ingress: (#struct){
-@@ -796,22 +676,22 @@
+@@ -796,22 +687,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2141,7 +2184,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -821,22 +701,22 @@
+@@ -821,22 +712,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2180,7 +2223,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -851,11 +731,7 @@
+@@ -851,11 +742,7 @@
          }
        }
        #JobConfig: (#struct){
@@ -2193,7 +2236,7 @@ diff old new
          job: (#struct){
            image: (string){ "foo:v1" }
            vcs: (string){ "git" }
-@@ -919,7 +795,7 @@
+@@ -919,7 +806,7 @@
          }
        }
        out: (#struct){
@@ -2202,7 +2245,7 @@ diff old new
            input: (#struct){
              image: (string){ "someimage" }
              env: (string){ "FOO" }
-@@ -951,11 +827,11 @@
+@@ -951,11 +838,11 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2219,7 +2262,7 @@ diff old new
            e: (string){ "foo" }
            f: (int){ 1 }
          }
-@@ -988,24 +864,16 @@
+@@ -988,24 +875,16 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2254,7 +2297,7 @@ diff old new
      }
    }
    issue3934: (struct){
-@@ -1052,7 +920,7 @@
+@@ -1052,7 +931,7 @@
            op: (string){ "add" }
            path: (string){ "/metadata" }
            value: (_|_){
@@ -2263,7 +2306,7 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -1081,38 +949,11 @@
+@@ -1081,38 +960,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -2304,7 +2347,7 @@ diff old new
          let base#6 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -1131,7 +972,7 @@
+@@ -1131,7 +983,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
                value: (_|_){
@@ -2313,7 +2356,7 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
-@@ -1155,6 +996,19 @@
+@@ -1155,6 +1007,19 @@
              }
            }
          }
@@ -2333,7 +2376,7 @@ diff old new
        }
      }
      out: (#struct){
-@@ -1184,17 +1038,8 @@
+@@ -1184,17 +1049,8 @@
              //     ./validators.cue:32:17
              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
              //     ./validators.cue:29:22
@@ -2357,6 +2400,10 @@ diff old new
 embed.openValidator.t1.err: unexpected pass.
 -- diff/todo/p2 --
 and.transitive(WithEmbed)?.out.ok: unexpected error
+-- diff/explanation --
+issue3833.evalv2Issue: now catches an invalid field that was previously allowed.
+Note that this is not the same field as the one reported in the issue. This is a
+correct fix relative to evalv2.
 -- out/eval --
 Errors:
 and.transitive.err.out.err: field not allowed:

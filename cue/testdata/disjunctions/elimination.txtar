@@ -2632,13 +2632,13 @@ Unifications: 686
 Conjuncts:    2767
 Disjuncts:    1290
 
-CloseIDElems: 5666
-NumCloseIDs: 317
+CloseIDElems: 3750
+NumCloseIDs: 277
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,12 @@
+@@ -1,12 +1,12 @@
 -Leaks:  9
 -Freed:  2786
 -Reused: 2771
@@ -2648,6 +2648,9 @@ diff old new
 -Unifications: 1427
 -Conjuncts:    4068
 -Disjuncts:    2909
+-
+-CloseIDElems: 0
+-NumCloseIDs: 10
 +Leaks:  2786
 +Freed:  0
 +Reused: 0
@@ -2658,8 +2661,8 @@ diff old new
 +Conjuncts:    2767
 +Disjuncts:    1290
 +
-+CloseIDElems: 5666
-+NumCloseIDs: 317
++CloseIDElems: 3750
++NumCloseIDs: 277
 -- out/eval/stats --
 Leaks:  9
 Freed:  2786
@@ -2670,6 +2673,9 @@ Retain: 123
 Unifications: 1427
 Conjuncts:    4068
 Disjuncts:    2909
+
+CloseIDElems: 0
+NumCloseIDs: 10
 -- diff/todo/p2 --
 noChildError.issue1808.#type: one disjunction options eliminated due to earlier detected structural cycle. May be okay, but investigate.
 issue2209.simplified.full._X: ditto

@@ -2326,13 +2326,13 @@ Unifications: 638
 Conjuncts:    1093
 Disjuncts:    48
 
-CloseIDElems: 344
-NumCloseIDs: 190
+CloseIDElems: 1746
+NumCloseIDs: 290
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,12 @@
+@@ -1,12 +1,12 @@
 -Leaks:  74
 -Freed:  602
 -Reused: 597
@@ -2342,6 +2342,9 @@ diff old new
 -Unifications: 624
 -Conjuncts:    1004
 -Disjuncts:    756
+-
+-CloseIDElems: 0
+-NumCloseIDs: 107
 +Leaks:  748
 +Freed:  0
 +Reused: 0
@@ -2352,8 +2355,8 @@ diff old new
 +Conjuncts:    1093
 +Disjuncts:    48
 +
-+CloseIDElems: 344
-+NumCloseIDs: 190
++CloseIDElems: 1746
++NumCloseIDs: 290
 -- out/eval/stats --
 Leaks:  74
 Freed:  602
@@ -2364,6 +2367,9 @@ Retain: 132
 Unifications: 624
 Conjuncts:    1004
 Disjuncts:    756
+
+CloseIDElems: 0
+NumCloseIDs: 107
 -- diff/explanation --
 cyclicError: improved error message.
 nestedWithDynamicFieldOK: fixed bug.

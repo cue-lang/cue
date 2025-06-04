@@ -267,13 +267,13 @@ Unifications: 241
 Conjuncts:    428
 Disjuncts:    0
 
-CloseIDElems: 1332
-NumCloseIDs: 140
+CloseIDElems: 1081
+NumCloseIDs: 122
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,12 @@
+@@ -1,12 +1,12 @@
 -Leaks:  5
 -Freed:  239
 -Reused: 232
@@ -283,6 +283,9 @@ diff old new
 -Unifications: 244
 -Conjuncts:    441
 -Disjuncts:    263
+-
+-CloseIDElems: 0
+-NumCloseIDs: 2
 +Leaks:  244
 +Freed:  0
 +Reused: 0
@@ -293,8 +296,8 @@ diff old new
 +Conjuncts:    428
 +Disjuncts:    0
 +
-+CloseIDElems: 1332
-+NumCloseIDs: 140
++CloseIDElems: 1081
++NumCloseIDs: 122
 -- out/eval/stats --
 Leaks:  5
 Freed:  239
@@ -305,6 +308,9 @@ Retain: 25
 Unifications: 244
 Conjuncts:    441
 Disjuncts:    263
+
+CloseIDElems: 0
+NumCloseIDs: 2
 -- out/evalalpha --
 Errors:
 err.t1.a.disallowed: field not allowed:

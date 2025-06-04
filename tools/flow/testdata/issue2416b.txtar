@@ -52,6 +52,9 @@ Retain: 1
 Unifications: 23
 Conjuncts:    61
 Disjuncts:    34
+
+CloseIDElems: 0
+NumCloseIDs: 4
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  33
@@ -62,3 +65,6 @@ Retain: 1
 Unifications: 23
 Conjuncts:    61
 Disjuncts:    34
+
+CloseIDElems: 0
+NumCloseIDs: 4

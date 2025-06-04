@@ -345,6 +345,45 @@ issue3694: simple: {
 		uses?: string
 	})
 }
+-- out/evalalpha/stats --
+Leaks:  1034
+Freed:  0
+Reused: 0
+Allocs: 1034
+Retain: 0
+
+Unifications: 931
+Conjuncts:    1511
+Disjuncts:    16
+
+CloseIDElems: 1638
+NumCloseIDs: 483
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+-Leaks:  52
+-Freed:  951
+-Reused: 944
+-Allocs: 59
+-Retain: 129
+-
+-Unifications: 987
+-Conjuncts:    1635
+-Disjuncts:    1081
++Leaks:  1034
++Freed:  0
++Reused: 0
++Allocs: 1034
++Retain: 0
++
++Unifications: 931
++Conjuncts:    1511
++Disjuncts:    16
++
++CloseIDElems: 1638
++NumCloseIDs: 483
 -- out/eval/stats --
 Leaks:  52
 Freed:  951

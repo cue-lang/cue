@@ -108,6 +108,7 @@ type CloseInfo struct {
 	// Conjunct.
 	defID          defID
 	enclosingEmbed defID // Tracks an embedding within a struct.
+	embedScope     defID
 	outerID        defID // Tracks the {} that should be closed after unifying.
 
 	// IsClosed is true if this conjunct represents a single level of closing

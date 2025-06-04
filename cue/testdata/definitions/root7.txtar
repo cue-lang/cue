@@ -11,49 +11,6 @@ Retain: 3
 Unifications: 5
 Conjuncts:    9
 Disjuncts:    8
--- out/evalalpha --
-Errors:
-root.input: field not allowed:
-    ./in.cue:1:7
-
-Result:
-(_|_){
-  // [eval]
-  root: (_|_){
-    // [eval]
-    input: (_|_){
-      // [eval] root.input: field not allowed:
-      //     ./in.cue:1:7
-      #deps: (#struct){
-        root: (#struct){
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,6 +1,15 @@
--(#struct){
--  root: (#struct){
--    input: (struct){
-+Errors:
-+root.input: field not allowed:
-+    ./in.cue:1:7
-+
-+Result:
-+(_|_){
-+  // [eval]
-+  root: (_|_){
-+    // [eval]
-+    input: (_|_){
-+      // [eval] root.input: field not allowed:
-+      //     ./in.cue:1:7
-       #deps: (#struct){
-         root: (#struct){
-         }
 -- out/eval --
 (#struct){
   root: (#struct){

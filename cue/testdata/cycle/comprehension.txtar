@@ -415,8 +415,8 @@ Unifications: 625
 Conjuncts:    1705
 Disjuncts:    202
 
-CloseIDElems: 10146
-NumCloseIDs: 850
+CloseIDElems: 6770
+NumCloseIDs: 709
 -- out/evalalpha --
 Errors:
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
@@ -1452,7 +1452,7 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,12 @@
+@@ -1,12 +1,12 @@
 -Leaks:  75
 -Freed:  1383
 -Reused: 1358
@@ -1462,6 +1462,9 @@ diff old new
 -Unifications: 970
 -Conjuncts:    2973
 -Disjuncts:    1704
+-
+-CloseIDElems: 0
+-NumCloseIDs: 16
 +Leaks:  996
 +Freed:  0
 +Reused: 0
@@ -1472,8 +1475,8 @@ diff old new
 +Conjuncts:    1705
 +Disjuncts:    202
 +
-+CloseIDElems: 10146
-+NumCloseIDs: 850
++CloseIDElems: 6770
++NumCloseIDs: 709
 -- out/eval/stats --
 Leaks:  75
 Freed:  1383
@@ -1484,6 +1487,9 @@ Retain: 479
 Unifications: 970
 Conjuncts:    2973
 Disjuncts:    1704
+
+CloseIDElems: 0
+NumCloseIDs: 16
 -- diff/explanation --
 B.a.children: now correctly marked as incomplete
 -- out/eval --

@@ -201,6 +201,9 @@ Retain: 148
 Unifications: 196
 Conjuncts:    464
 Disjuncts:    268
+
+CloseIDElems: 0
+NumCloseIDs: 46
 -- out/eval --
 Errors:
 structural cycle:

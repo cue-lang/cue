@@ -767,13 +767,13 @@ Unifications: 990
 Conjuncts:    2118
 Disjuncts:    2
 
-CloseIDElems: 4843
-NumCloseIDs: 715
+CloseIDElems: 4928
+NumCloseIDs: 575
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,12 @@
+@@ -1,12 +1,12 @@
 -Leaks:  21
 -Freed:  859
 -Reused: 851
@@ -783,6 +783,9 @@ diff old new
 -Unifications: 874
 -Conjuncts:    2156
 -Disjuncts:    954
+-
+-CloseIDElems: 0
+-NumCloseIDs: 1
 +Leaks:  1019
 +Freed:  0
 +Reused: 0
@@ -793,8 +796,8 @@ diff old new
 +Conjuncts:    2118
 +Disjuncts:    2
 +
-+CloseIDElems: 4843
-+NumCloseIDs: 715
++CloseIDElems: 4928
++NumCloseIDs: 575
 -- out/eval/stats --
 Leaks:  21
 Freed:  859
@@ -805,6 +808,9 @@ Retain: 94
 Unifications: 874
 Conjuncts:    2156
 Disjuncts:    954
+
+CloseIDElems: 0
+NumCloseIDs: 1
 -- out/eval --
 Errors:
 a.q.e: field not allowed:

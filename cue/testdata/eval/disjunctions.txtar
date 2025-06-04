@@ -328,6 +328,9 @@ Retain: 130
 Unifications: 506
 Conjuncts:    1619
 Disjuncts:    936
+
+CloseIDElems: 0
+NumCloseIDs: 2
 -- out/evalalpha --
 Errors:
 f: 2 errors in empty disjunction:

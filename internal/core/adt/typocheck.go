@@ -174,6 +174,30 @@ import (
 
 type defID uint32
 
+type defIDType int8
+
+const (
+	// defIDTypeUnknown indicates that the ID is not a definition.
+	defIDTypeUnknown defIDType = iota
+
+	defEmbedding
+	defReference
+	defStruct
+)
+
+func (d defIDType) String() string {
+	switch d {
+	case defEmbedding:
+		return "E"
+	case defReference:
+		return "D"
+	case defStruct:
+		return "S"
+	default:
+		return "*"
+	}
+}
+
 const deleteID defID = math.MaxUint32
 
 func (c *OpContext) getNextDefID() defID {
@@ -186,20 +210,24 @@ type refInfo struct {
 	v  *Vertex
 	id defID
 
+	// parent is used for enclosing structs and embedding relations.
+	parent defID
+
 	// exclude defines a subtree of CloseInfo.def that should not be
 	// transitively added to the set of allowed fields.
 	//
 	// It would probably be more efficient to track a separate allow and deny
 	// list, rather than tracking the entire tree except for the excluded.
 	exclude defID
+	scope   defID
 
 	// ignore defines whether we should not do typo checking for this defID.
-	ignore bool
+	ignore  bool
+	ignore2 bool
 
-	// isOuterStruct indicates that this struct is marked as "outerID" in a
-	// CloseInfo. The debug visualization in ./debug.go uses this to show a
-	// mark ("S") next to the defID to visualize that this fact.
-	isOuterStruct bool
+	// kind explains the type of defID
+	// In debug:
+	kind defIDType
 }
 
 type conjunctFlags uint8
@@ -213,6 +241,8 @@ const (
 
 type conjunctInfo struct {
 	id    defID
+	embed defID
+	// outer defID
 	kind  Kind
 	flags conjunctFlags
 }
@@ -265,6 +295,8 @@ func (n *nodeContext) updateConjunctInfo(k Kind, id CloseInfo, flags conjunctFla
 	}
 	n.conjunctInfo = append(n.conjunctInfo, conjunctInfo{
 		id:    id.defID,
+		embed: id.enclosingEmbed,
+		// outer: id.outerID,
 		kind:  k,
 		flags: flags,
 	})
@@ -283,12 +315,20 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 	isClosed := id.FromDef || v.ClosedNonRecursive
 
 	if isClosed && !forceIgnore {
-		for i, x := range n.reqDefIDs {
-			if x.id == id.outerID && id.outerID != 0 {
+		outerID := id.outerID
+		// for n := n; n != nil; {
+		for i := len(n.reqDefIDs) - 1; i >= 0; i-- {
+			x := n.reqDefIDs[i]
+			if x.id == outerID && outerID != 0 {
 				n.reqDefIDs[i].ignore = false
-				break
+				outerID = x.parent
 			}
 		}
+		// if n.node.Parent == nil {
+		// 	break
+		// }
+		// n = n.node.Parent.state
+		// }
 	}
 
 	var ignore bool
@@ -318,7 +358,6 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 		ignore = id.FromEmbed
 	}
 
-	srcID := id.defID
 	dstID := defID(0)
 	for _, x := range n.reqDefIDs {
 		if x.v == v {
@@ -340,44 +379,76 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 		n.reqDefIDs = append(n.reqDefIDs, refInfo{
 			v:       v,
 			id:      dstID,
-			exclude: id.enclosingEmbed,
+			parent:  id.outerID,
 			ignore:  ignore,
+			ignore2: isClosed && !forceIgnore,
+			kind:    defReference,
+			exclude: id.enclosingEmbed,
+			scope:   id.embedScope,
 		})
 	}
+	srcID := id.defID
 	id.defID = dstID
+	// id.outerID = dstID // only for structs
 
 	// TODO: consider using add: !isClosed
 	n.addReplacement(replaceID{from: srcID, to: dstID, add: true})
-	if id.enclosingEmbed != 0 && !ignore {
-		ph := id.outerID
-		n.addReplacement(replaceID{from: dstID, to: ph, add: true})
-		_, dstID = n.newGroup(id, false)
-		id.enclosingEmbed = dstID
-	}
+
+	// if id.enclosingEmbed != 0 {
+	// 	// Necessary?
+	// 	// n.addReplacement(replaceID{from: id.enclosingEmbed, to: dstID, add: true})
+	// }
 
 	return id
 }
 
 // subField updates a CloseInfo for subfields of a struct.
 func (c *OpContext) subField(ci CloseInfo) CloseInfo {
-	ci.outerID = 0
-	ci.enclosingEmbed = 0
+	// ci.outerID = 0
+	ci.FromEmbed = false
+	// ci.enclosingEmbed = 0
 	return ci
 }
 
-func (n *nodeContext) newGroup(id CloseInfo, placeholder bool) (CloseInfo, defID) {
-	srcID := id.defID
+func (n *nodeContext) newReq(id CloseInfo, kind defIDType) CloseInfo {
 	dstID := n.ctx.getNextDefID()
+	n.addReplacement(replaceID{from: id.defID, to: dstID, add: true})
+
+	if dstID == 7 {
+		// n.Logf("newReq: %d", id.defID)
+	}
+
+	parent := id.defID
+	id.defID = dstID
+
+	switch kind {
+	case defEmbedding:
+		id.enclosingEmbed = dstID
+		id.embedScope = id.outerID
+
+	case defStruct:
+		id.outerID = dstID
+
+	default:
+		panic("unknown kind")
+	}
+
 	// TODO: consider only adding when record || OpenGraph
 	n.reqDefIDs = append(n.reqDefIDs, refInfo{
-		v:             emptyNode,
-		id:            dstID,
-		ignore:        true,
-		isOuterStruct: placeholder,
+		v:       emptyNode,
+		id:      dstID,
+		parent:  parent,
+		exclude: id.enclosingEmbed,
+		scope:   id.embedScope,
+		ignore:  true,
+		kind:    kind,
 	})
-	id.defID = dstID
-	n.addReplacement(replaceID{from: srcID, to: dstID, add: true})
-	return id, dstID
+
+	return id
+}
+
+func (n *nodeContext) splitScope(id CloseInfo) CloseInfo {
+	return n.newReq(id, defStruct)
 }
 
 // AddOpenConjunct adds w as a conjunct of v and disables typo checking for w,
@@ -411,7 +482,7 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 
 	// Filter cases where we do not need to track the definition.
 	switch x := x.(type) {
-	case *DisjunctionExpr, *Disjunction, *Comprehension:
+	case *DisjunctionExpr, *Disjunction:
 		return id
 	case *BinaryExpr:
 		if x.Op != AndOp {
@@ -419,10 +490,7 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 		}
 	}
 
-	id, dstID := n.newGroup(id, false)
-	id.enclosingEmbed = dstID
-
-	return id
+	return n.newReq(id, defEmbedding)
 }
 
 // splitStruct is used to mark the outer struct of a field in which embeddings
@@ -440,6 +508,13 @@ func (n *nodeContext) splitStruct(s *StructLit, id CloseInfo) CloseInfo {
 		return id
 	}
 
+	if id.outerID != 0 {
+		return id
+	}
+	if id.FromEmbed {
+		return id
+	}
+
 	if _, ok := s.Src.(*ast.File); ok {
 		// If this is not a file, the struct indicates the scope/
 		// boundary at which closedness should apply. This is not true
@@ -450,20 +525,15 @@ func (n *nodeContext) splitStruct(s *StructLit, id CloseInfo) CloseInfo {
 		// TODO(evalv3): use a more principled detection mechanism.
 		// TODO: set this as a flag in StructLit so as to not have to
 		// do the somewhat dangerous cast here.
+		// if n.ctx.nextDefID != 0 {
+		// 	id.defID = 1
+		// 	id.outerID = 1
+		// 	return id
+		// }
 		return id
 	}
 
 	return n.splitScope(id)
-}
-
-func (n *nodeContext) splitScope(id CloseInfo) CloseInfo {
-	id, dstID := n.newGroup(id, true)
-
-	if id.outerID == 0 {
-		id.outerID = dstID
-	}
-
-	return id
 }
 
 func (n *nodeContext) checkTypos() {
@@ -492,6 +562,8 @@ func (n *nodeContext) checkTypos() {
 	// TODO(perf): reuse buffers via OpContext
 	requiredCopy := make(reqSets, 0, len(required))
 	var replacements []replaceID
+
+	// openDebugGraph(ctx, v, "XXXX") // Uncomment for debugging.
 
 	var err *Bottom
 	// outer:
@@ -531,9 +603,11 @@ func (n *nodeContext) checkTypos() {
 			continue
 		}
 
+		// As a final check, all conjuncts must NOT be in the embedding scope.
+
 		// TODO: do not descend on optional?
 
-		// openDebugGraph(ctx, a, "NOT ALLOWED") // Uncomment for debugging.
+		openDebugGraph(ctx, a, "NOT ALLOWED") // Uncomment for debugging.
 		if b := ctx.notAllowedError(a); b != nil && a.ArcType <= ArcRequired {
 			err = CombineErrors(nil, err, b)
 		}
@@ -552,7 +626,31 @@ func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) boo
 		if a[i].size == 0 {
 			panic("unexpected set length")
 		}
-		if !hasEvidenceForOne(a[i:i+a[i].size], conjuncts) {
+		if a[i].ignore {
+			continue
+		}
+		var outerScope, embedScope reqSets
+		if es := a[i].del; es != 0 {
+			for i := uint32(0); int(i) < len(a); i += a[i].size {
+				if a[i].id == es {
+					embedScope = a[i : i+a[i].size]
+					break
+				}
+			}
+		}
+		if os := a[i].scope; os != 0 { // XXX: change to parent
+			for i := uint32(0); int(i) < len(a); i += a[i].size {
+				if a[i].id == os {
+					outerScope = a[i : i+a[i].size]
+					break
+				}
+			}
+		}
+
+		if !hasEvidenceForOne(a[i:i+a[i].size], embedScope, outerScope, conjuncts) {
+			if n.ctx.LogEval > 0 {
+				n.Logf("DENIED BY %d", a[i].id)
+			}
 			return false
 		}
 	}
@@ -561,13 +659,47 @@ func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) boo
 
 // hasEvidenceForOne reports whether a single typo-checked set has evidence for
 // any of its defIDs.
-func hasEvidenceForOne(a reqSets, conjuncts []conjunctInfo) bool {
+func hasEvidenceForOne(a, embedScope, outerScope reqSets, conjuncts []conjunctInfo) bool {
 	for _, c := range conjuncts {
 		for _, ri := range a {
 			if c.id == ri.id {
 				return true
 			}
 		}
+	}
+
+	if len(embedScope) == 0 {
+		return false
+	}
+
+	// if a[0].parent == 0 || len(outerScope) == 0 {
+	// 	return true
+	// }
+
+outer:
+	for _, c := range conjuncts {
+		for _, x := range embedScope {
+			if x.id == c.embed {
+				// Within the scope of the embedding.
+				continue outer
+			}
+		}
+		// return true
+
+		if a[0].parent == 0 || len(outerScope) == 0 {
+			return true
+		}
+		// If this conjunct is within the outer struct, but outside the
+		// embedding scope, this means it was "added" and we do not have
+		// to verify it within the embedding scope.
+		for _, x := range outerScope {
+			if x.id == c.id {
+				return true
+				// Within the scope of the embedding.
+				// continue outer
+			}
+		}
+		// return false
 	}
 	return false
 }
@@ -589,12 +721,15 @@ type reqSets []reqSet
 //     pointed to by its refInfo. Similarly,
 //     refInfo is added to the list
 type reqSet struct {
-	id defID
+	id     defID
+	parent defID
 	// size is the number of elements in the set. This is only set for the head.
 	// Entries with equivalence IDs have size set to 0.
-	size uint32
-	del  defID // TODO(flatclose): can be removed later.
-	once bool
+	size   uint32
+	del    defID // TODO(flatclose): can be removed later.
+	scope  defID
+	once   bool
+	ignore bool
 }
 
 // assert checks the invariants of a reqSets. It can be used for debugging.
@@ -788,27 +923,46 @@ func getReqSets(n *nodeContext) reqSets {
 	}
 	a.filterNonRecursive()
 
+	last := len(a) - 1
+	_ = last
+
 outer:
 	for _, y := range n.reqDefIDs {
-		if y.ignore {
-			continue
-		}
+		// if y.ignore && y.kind != defEmbedding {
+		// 	continue
+		// }
+
 		for _, x := range a {
 			if x.id == y.id {
 				continue outer
 			}
 		}
 		once := false
-		if y.v != nil {
-			once = !y.v.ClosedRecursive
+		if y.v != nil && y.kind != defEmbedding {
+			once = y.v.ClosedNonRecursive
 		}
 
 		a = append(a, reqSet{
-			id:   y.id,
-			once: once,
-			del:  y.exclude,
-			size: 1,
+			id:     y.id,
+			parent: y.parent,
+			once:   once,
+			ignore: y.ignore,
+			del:    y.exclude,
+			scope:  y.scope,
+			size:   1,
 		})
+
+		// could be reduced.
+		if y.parent != 0 && y.ignore2 {
+			outerID := y.parent
+			for i := last; i >= 0 && outerID != 0; i-- {
+				x := a[i]
+				if x.id == outerID {
+					a[i].ignore = false
+					outerID = x.parent
+				}
+			}
+		}
 	}
 
 	a.replaceIDs(n.ctx, n.replaceIDs...)

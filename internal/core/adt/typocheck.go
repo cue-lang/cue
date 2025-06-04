@@ -226,7 +226,11 @@ func (c conjunctFlags) hasStruct() bool {
 }
 
 func (c conjunctFlags) forceOpen() bool {
-	return c&(cHasEllipsis|cHasOpenValidator) != 0
+	return c&(cHasOpenValidator) != 0
+}
+
+func (c conjunctFlags) hasEllipsis() bool {
+	return c&(cHasEllipsis) != 0
 }
 
 type replaceID struct {
@@ -503,6 +507,9 @@ func (n *nodeContext) checkTypos() {
 		// do the right thing in appendRequired either way.
 		required.replaceIDs(n.ctx, replacements...)
 
+		required.filterSets(func(a []reqSet) bool {
+			return !hasParentEllipsis(a, n.conjunctInfo)
+		})
 		// TODO(perf): somehow prevent error generation of recursive structures,
 		// or at least make it cheap. Right now if this field is a typo, likely
 		// all descendents will be regarded as typos.
@@ -817,7 +824,12 @@ outer:
 		})
 	}
 
-	a.filterTop(n.conjunctInfo)
+	var parentConjuncts []conjunctInfo
+	if p := v.Parent; p != nil && p.state != nil {
+		parentConjuncts = p.state.conjunctInfo
+	}
+
+	a.filterTop(n.conjunctInfo, parentConjuncts)
 
 	n.reqSets = a
 	return a
@@ -825,14 +837,16 @@ outer:
 
 // If there is a top or ellipsis for all supported conjuncts, we have
 // evidence that this node can be dropped.
-func (a *reqSets) filterTop(conjuncts []conjunctInfo) {
+func (a *reqSets) filterTop(conjuncts, parentConjuncts []conjunctInfo) (openLevel bool) {
 	a.filterSets(func(a []reqSet) bool {
 		var f conjunctFlags
+		hasAny := false
 		for _, e := range a {
 			for _, c := range conjuncts {
 				if e.id != c.id {
 					continue
 				}
+				hasAny = true
 				flags := c.flags
 				if c.id < a[0].id {
 					flags &^= cHasStruct
@@ -843,8 +857,32 @@ func (a *reqSets) filterTop(conjuncts []conjunctInfo) {
 		if (f.hasTop() && !f.hasStruct()) || f.forceOpen() {
 			return false
 		}
+		if !hasAny && hasParentEllipsis(a, parentConjuncts) {
+			return false
+		}
 		return true
 	})
+	return openLevel
+}
+
+// hasParentEllipsis reports if the parent has any conjuncts from an ellipsis
+// matching any of the ids in a.
+//
+// TODO: this is currently called twice. Consider an approach where we only need
+// to filter this once for each node. Luckily we can avoid quadratic checks
+// for any conjunct that is not an ellipsis, which is most.
+func hasParentEllipsis(a reqSets, conjuncts []conjunctInfo) bool {
+	for _, c := range conjuncts {
+		if !c.flags.hasEllipsis() {
+			continue
+		}
+		for _, e := range a {
+			if e.id == c.id {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (a *reqSets) filterNonRecursive() {

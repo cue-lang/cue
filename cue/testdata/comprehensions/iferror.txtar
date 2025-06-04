@@ -156,6 +156,9 @@ Retain: 14
 Unifications: 33
 Conjuncts:    66
 Disjuncts:    57
+
+CloseIDElems: 0
+NumCloseIDs: 7
 -- out/evalalpha --
 Errors:
 issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):

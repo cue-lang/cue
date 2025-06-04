@@ -68,6 +68,9 @@ Retain: 337
 Unifications: 18345
 Conjuncts:    76395
 Disjuncts:    25826
+
+CloseIDElems: 0
+NumCloseIDs: 72
 -- out/run/stats/totals --
 Leaks:  35
 Freed:  25542
@@ -78,6 +81,9 @@ Retain: 337
 Unifications: 18345
 Conjuncts:    76395
 Disjuncts:    25826
+
+CloseIDElems: 0
+NumCloseIDs: 72
 -- out/run/t2 --
 graph TD
   t0("root.prepare [Terminated]")

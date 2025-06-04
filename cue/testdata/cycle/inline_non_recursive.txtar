@@ -104,8 +104,8 @@ Unifications: 141
 Conjuncts:    375
 Disjuncts:    0
 
-CloseIDElems: 14
-NumCloseIDs: 178
+CloseIDElems: 85
+NumCloseIDs: 169
 -- out/evalalpha --
 Errors:
 issue3182.first.t2.x.b: structural cycle
@@ -262,8 +262,8 @@ diff old new
 +Conjuncts:    375
 +Disjuncts:    0
 +
-+CloseIDElems: 14
-+NumCloseIDs: 178
++CloseIDElems: 85
++NumCloseIDs: 169
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

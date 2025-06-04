@@ -83,6 +83,9 @@ Retain: 10
 Unifications: 13
 Conjuncts:    37
 Disjuncts:    21
+
+CloseIDElems: 0
+NumCloseIDs: 2
 -- out/evalalpha --
 Errors:
 simple.x: conflicting values "foo" and "x":

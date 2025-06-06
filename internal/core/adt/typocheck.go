@@ -553,7 +553,10 @@ func (n *nodeContext) checkTypos() {
 		required.replaceIDs(n.ctx, replacements...)
 
 		required.filterSets(func(a []reqSet) bool {
-			return !hasParentEllipsis(a, n.conjunctInfo)
+			if hasParentEllipsis(a, n.conjunctInfo) {
+				a[0].removed = true
+			}
+			return true
 		})
 
 		a = a.DerefDisjunct()
@@ -599,6 +602,9 @@ func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) boo
 		if a[i].ignore {
 			continue
 		}
+		if a[i].removed {
+			continue
+		}
 
 		if !hasEvidenceForOne(a, i, conjuncts) {
 			if n.ctx.LogEval > 0 {
@@ -640,7 +646,7 @@ outer:
 			}
 		}
 
-		if len(outerScope) == 0 {
+		if len(outerScope) == 0 || a[0].parent == 0 {
 			return true
 		}
 
@@ -677,10 +683,11 @@ type reqSet struct {
 	parent defID
 	// size is the number of elements in the set. This is only set for the head.
 	// Entries with equivalence IDs have size set to 0.
-	size   uint32
-	del    defID // TODO(flatclose): can be removed later.
-	once   bool
-	ignore bool
+	size    uint32
+	del     defID // TODO(flatclose): can be removed later.
+	once    bool
+	ignore  bool
+	removed bool
 }
 
 // assert checks the invariants of a reqSets. It can be used for debugging.
@@ -968,7 +975,7 @@ func (a *reqSets) filterTop(conjuncts, parentConjuncts []conjunctInfo) (openLeve
 			return false
 		}
 		if !hasAny && hasParentEllipsis(a, parentConjuncts) {
-			return false
+			a[0].removed = true
 		}
 		return true
 	})

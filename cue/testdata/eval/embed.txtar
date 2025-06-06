@@ -46,18 +46,64 @@ doubleAsComprehension: {
 		}
 	}
 }
+fieldNotAllowed: {
+	// This was not correctly enforced in evalv2.
+	x: #X
+	#X: y: {
+		z: {
+			a: [string]: string
+			b: E: "1"
+		}
+		...
+	}
+
+	x1: y: #Y
+	#Y: port?: string
+
+	x: y: {
+		z: b: E: string
+		port: z.b.E
+		z: a: c?: string
+	}
+
+	if true {
+		w: x & {
+			y: x1.y
+		}
+	}
+}
+closednessInversion: {
+	base: #X // comment out this line and evalv3 works!
+	base: x: #Y
+	#X: x: {...}
+	#Y: y: string | *"default"
+	out: {
+		base.x
+		a: b: c: "d"
+	}
+}
 -- out/eval/stats --
 Leaks:  1
-Freed:  27
-Reused: 22
-Allocs: 6
-Retain: 1
+Freed:  74
+Reused: 66
+Allocs: 9
+Retain: 5
 
-Unifications: 28
-Conjuncts:    52
-Disjuncts:    29
+Unifications: 69
+Conjuncts:    141
+Disjuncts:    80
 -- out/evalalpha --
-(struct){
+Errors:
+fieldNotAllowed.w.y.z.a: field not allowed:
+    ./noclose.cue:26:4
+    ./noclose.cue:38:6
+fieldNotAllowed.w.y.z.b: field not allowed:
+    ./noclose.cue:27:4
+    ./noclose.cue:36:6
+
+Result:
+(_|_){
+  // [eval]
   #A: (#struct){
     a: (int){ int }
     b: (int){ int }
@@ -98,12 +144,120 @@ Disjuncts:    29
       }
     }
   }
+  fieldNotAllowed: (_|_){
+    // [eval]
+    x: (#struct){
+      y: (#struct){
+        z: (#struct){
+          b: (#struct){
+            E: (string){ "1" }
+          }
+          a: (#struct){
+            c?: (string){ string }
+          }
+        }
+        port: (string){ "1" }
+      }
+    }
+    #X: (#struct){
+      y: (#struct){
+        z: (#struct){
+          a: (#struct){
+          }
+          b: (#struct){
+            E: (string){ "1" }
+          }
+        }
+      }
+    }
+    x1: (struct){
+      y: ~(fieldNotAllowed.#Y)
+    }
+    #Y: (#struct){
+      port?: (string){ string }
+    }
+    w: (_|_){
+      // [eval]
+      y: (_|_){
+        // [eval]
+        z: (_|_){
+          // [eval]
+          b: (_|_){
+            // [eval] fieldNotAllowed.w.y.z.b: field not allowed:
+            //     ./noclose.cue:27:4
+            //     ./noclose.cue:36:6
+            E: (_|_){
+              // [eval] fieldNotAllowed.w.y.z.b.E: field not allowed:
+              //     ./noclose.cue:27:7
+              //     ./noclose.cue:36:9
+            }
+          }
+          a: (_|_){
+            // [eval] fieldNotAllowed.w.y.z.a: field not allowed:
+            //     ./noclose.cue:26:4
+            //     ./noclose.cue:38:6
+            c?: (_|_){
+              // [eval] fieldNotAllowed.w.y.z.a.c: field not allowed:
+              //     ./noclose.cue:26:7
+              //     ./noclose.cue:38:9
+            }
+          }
+        }
+        port: (_|_){
+          // [eval] fieldNotAllowed.w.y.z.a: field not allowed:
+          //     ./noclose.cue:26:4
+          //     ./noclose.cue:38:6
+          // fieldNotAllowed.w.y.z.b: field not allowed:
+          //     ./noclose.cue:27:4
+          //     ./noclose.cue:36:6
+        }
+      }
+    }
+  }
+  closednessInversion: (struct){
+    base: (#struct){
+      x: (#struct){
+        y: (string){ |(*(string){ "default" }, (string){ string }) }
+      }
+    }
+    #X: (#struct){
+      x: (#struct){
+      }
+    }
+    #Y: (#struct){
+      y: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    out: (#struct){
+      a: (struct){
+        b: (struct){
+          c: (string){ "d" }
+        }
+      }
+      y: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -8,16 +8,16 @@
+@@ -1,4 +1,14 @@
+-(struct){
++Errors:
++fieldNotAllowed.w.y.z.a: field not allowed:
++    ./noclose.cue:26:4
++    ./noclose.cue:38:6
++fieldNotAllowed.w.y.z.b: field not allowed:
++    ./noclose.cue:27:4
++    ./noclose.cue:36:6
++
++Result:
++(_|_){
++  // [eval]
+   #A: (#struct){
+     a: (int){ int }
+     b: (int){ int }
+@@ -8,16 +18,16 @@
      b: (int){ int }
    }
    x: (#struct){
@@ -125,6 +279,104 @@ diff old new
    }
    double: (struct){
      a: (struct){
+@@ -39,15 +49,16 @@
+       }
+     }
+   }
+-  fieldNotAllowed: (struct){
++  fieldNotAllowed: (_|_){
++    // [eval]
+     x: (#struct){
+       y: (#struct){
+         z: (#struct){
+-          a: (#struct){
+-            c?: (string){ string }
+-          }
+-          b: (#struct){
+-            E: (string){ "1" }
++          b: (#struct){
++            E: (string){ "1" }
++          }
++          a: (#struct){
++            c?: (string){ string }
+           }
+         }
+         port: (string){ "1" }
+@@ -65,24 +76,46 @@
+       }
+     }
+     x1: (struct){
+-      y: (#struct){
+-        port?: (string){ string }
+-      }
++      y: ~(fieldNotAllowed.#Y)
+     }
+     #Y: (#struct){
+       port?: (string){ string }
+     }
+-    w: (#struct){
+-      y: (#struct){
+-        z: (#struct){
+-          a: (#struct){
+-            c?: (string){ string }
+-          }
+-          b: (#struct){
+-            E: (string){ "1" }
+-          }
+-        }
+-        port: (string){ "1" }
++    w: (_|_){
++      // [eval]
++      y: (_|_){
++        // [eval]
++        z: (_|_){
++          // [eval]
++          b: (_|_){
++            // [eval] fieldNotAllowed.w.y.z.b: field not allowed:
++            //     ./noclose.cue:27:4
++            //     ./noclose.cue:36:6
++            E: (_|_){
++              // [eval] fieldNotAllowed.w.y.z.b.E: field not allowed:
++              //     ./noclose.cue:27:7
++              //     ./noclose.cue:36:9
++            }
++          }
++          a: (_|_){
++            // [eval] fieldNotAllowed.w.y.z.a: field not allowed:
++            //     ./noclose.cue:26:4
++            //     ./noclose.cue:38:6
++            c?: (_|_){
++              // [eval] fieldNotAllowed.w.y.z.a.c: field not allowed:
++              //     ./noclose.cue:26:7
++              //     ./noclose.cue:38:9
++            }
++          }
++        }
++        port: (_|_){
++          // [eval] fieldNotAllowed.w.y.z.a: field not allowed:
++          //     ./noclose.cue:26:4
++          //     ./noclose.cue:38:6
++          // fieldNotAllowed.w.y.z.b: field not allowed:
++          //     ./noclose.cue:27:4
++          //     ./noclose.cue:36:6
++        }
+       }
+     }
+   }
+@@ -100,12 +133,12 @@
+       y: (string){ |(*(string){ "default" }, (string){ string }) }
+     }
+     out: (#struct){
+-      y: (string){ |(*(string){ "default" }, (string){ string }) }
+       a: (struct){
+         b: (struct){
+           c: (string){ "d" }
+         }
+       }
++      y: (string){ |(*(string){ "default" }, (string){ string }) }
+     }
+   }
+ }
 -- diff/explanation --
 Reordering
 -- out/eval --
@@ -165,6 +417,75 @@ Reordering
         c: (struct){
           d: (string){ "c" }
           e: (string){ "member" }
+        }
+      }
+    }
+  }
+  fieldNotAllowed: (struct){
+    x: (#struct){
+      y: (#struct){
+        z: (#struct){
+          a: (#struct){
+            c?: (string){ string }
+          }
+          b: (#struct){
+            E: (string){ "1" }
+          }
+        }
+        port: (string){ "1" }
+      }
+    }
+    #X: (#struct){
+      y: (#struct){
+        z: (#struct){
+          a: (#struct){
+          }
+          b: (#struct){
+            E: (string){ "1" }
+          }
+        }
+      }
+    }
+    x1: (struct){
+      y: (#struct){
+        port?: (string){ string }
+      }
+    }
+    #Y: (#struct){
+      port?: (string){ string }
+    }
+    w: (#struct){
+      y: (#struct){
+        z: (#struct){
+          a: (#struct){
+            c?: (string){ string }
+          }
+          b: (#struct){
+            E: (string){ "1" }
+          }
+        }
+        port: (string){ "1" }
+      }
+    }
+  }
+  closednessInversion: (struct){
+    base: (#struct){
+      x: (#struct){
+        y: (string){ |(*(string){ "default" }, (string){ string }) }
+      }
+    }
+    #X: (#struct){
+      x: (#struct){
+      }
+    }
+    #Y: (#struct){
+      y: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    out: (#struct){
+      y: (string){ |(*(string){ "default" }, (string){ string }) }
+      a: (struct){
+        b: (struct){
+          c: (string){ "d" }
         }
       }
     }
@@ -234,6 +555,70 @@ Reordering
               e: "member"
             }
           }
+        }
+      }
+    }
+  }
+  fieldNotAllowed: {
+    x: 〈0;#X〉
+    #X: {
+      y: {
+        z: {
+          a: {
+            [string]: string
+          }
+          b: {
+            E: "1"
+          }
+        }
+        ...
+      }
+    }
+    x1: {
+      y: 〈1;#Y〉
+    }
+    #Y: {
+      port?: string
+    }
+    x: {
+      y: {
+        z: {
+          b: {
+            E: string
+          }
+        }
+        port: 〈0;z〉.b.E
+        z: {
+          a: {
+            c?: string
+          }
+        }
+      }
+    }
+    if true {
+      w: (〈1;x〉 & {
+        y: 〈2;x1〉.y
+      })
+    }
+  }
+  closednessInversion: {
+    base: 〈0;#X〉
+    base: {
+      x: 〈1;#Y〉
+    }
+    #X: {
+      x: {
+        ...
+      }
+    }
+    #Y: {
+      y: (string|*"default")
+    }
+    out: {
+      〈1;base〉.x
+      a: {
+        b: {
+          c: "d"
         }
       }
     }

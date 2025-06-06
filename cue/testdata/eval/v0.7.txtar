@@ -753,7 +753,7 @@ Unifications: 277
 Conjuncts:    605
 Disjuncts:    12
 
-CloseIDElems: 367
+CloseIDElems: 1159
 NumCloseIDs: 86
 -- out/evalalpha --
 Errors:
@@ -1221,7 +1221,7 @@ diff old new
 +Conjuncts:    605
 +Disjuncts:    12
 +
-+CloseIDElems: 367
++CloseIDElems: 1159
 +NumCloseIDs: 86
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new

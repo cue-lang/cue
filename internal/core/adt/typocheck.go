@@ -564,7 +564,11 @@ func (n *nodeContext) checkTypos() {
 		required.replaceIDs(n.ctx, replacements...)
 
 		required.filterSets(func(a []reqSet) bool {
-			return !hasParentEllipsis(a, n.conjunctInfo)
+			if hasParentEllipsis(a, n.conjunctInfo) {
+				a[0].removed = true
+				// return false
+			}
+			return true
 		})
 
 		a = a.DerefDisjunct()
@@ -608,6 +612,9 @@ func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) boo
 			panic("unexpected set length")
 		}
 		if a[i].ignore {
+			continue
+		}
+		if a[i].removed {
 			continue
 		}
 
@@ -688,10 +695,11 @@ type reqSet struct {
 	parent defID
 	// size is the number of elements in the set. This is only set for the head.
 	// Entries with equivalence IDs have size set to 0.
-	size   uint32
-	del    defID // TODO(flatclose): can be removed later.
-	once   bool
-	ignore bool
+	size    uint32
+	del     defID // TODO(flatclose): can be removed later.
+	once    bool
+	ignore  bool
+	removed bool
 }
 
 // assert checks the invariants of a reqSets. It can be used for debugging.
@@ -892,9 +900,9 @@ outer:
 		// A defReference is never "reactivated" once it is ignored.
 		// Embeddings we need to keep around to compute the embedding scope,
 		// even when the embedding itself is ignored.
-		if y.ignore && y.kind == defReference {
-			continue
-		}
+		// if y.ignore && y.kind == defReference {
+		// 	continue
+		// }
 
 		for _, x := range a {
 			if x.id == y.id {
@@ -982,7 +990,7 @@ func (a *reqSets) filterTop(conjuncts, parentConjuncts []conjunctInfo) (openLeve
 			return false
 		}
 		if !hasAny && hasParentEllipsis(a, parentConjuncts) {
-			return false
+			a[0].removed = true
 		}
 		return true
 	})

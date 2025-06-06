@@ -34,6 +34,24 @@
       "parentUuid": "7c733395_e546d34d",
       "revId": "f97c9915cca3fcec2a07dc402bf6f244a90f8234",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74e4b2ea_fa157d07",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-06T10:16:29Z",
+      "side": 1,
+      "message": "\"false\" doesn\u0027t take arguments, and that fact is already relied upon in a different test, so I\u0027d rather not fold into that.\n\nhowever you\u0027re right that \"exit\" is not a coreutils program, but rather a shell builtin. so I\u0027ll move this to `testcmd exitcode` to clarify it\u0027s a made up command.",
+      "parentUuid": "126d5177_e48653f0",
+      "revId": "f97c9915cca3fcec2a07dc402bf6f244a90f8234",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -48,6 +48,13 @@ var parseImportPathTests = []struct {
 		Qualifier:         "other",
 	},
 }, {
+	testName: "ExplicitEmptyQualifier",
+	path:     "stdlib/path:",
+	want: ImportPath{
+		Path:              "stdlib/path",
+		ExplicitQualifier: true,
+	},
+}, {
 	testName: "StdlibLikeExplicitQualifierNoSlash",
 	path:     "math:other",
 	want: ImportPath{
@@ -140,7 +147,6 @@ var parseImportPathTests = []struct {
 		ExplicitQualifier: false,
 		Qualifier:         "blah",
 	},
-	wantCanonical: "foo.com/bar/.../blah",
 }, {
 	testName: "WithPatternAtEnd",
 	path:     "foo.com/bar/...",
@@ -150,7 +156,6 @@ var parseImportPathTests = []struct {
 		ExplicitQualifier: false,
 		Qualifier:         "",
 	},
-	wantCanonical: "foo.com/bar/...",
 }, {
 	testName: "WithUnderscoreLastElement",
 	path:     "foo.com/bar/_foo",
@@ -160,7 +165,6 @@ var parseImportPathTests = []struct {
 		ExplicitQualifier: false,
 		Qualifier:         "_foo",
 	},
-	wantCanonical: "foo.com/bar/_foo",
 }, {
 	testName: "WithHashLastElement",
 	path:     "foo.com/bar/#foo",
@@ -170,7 +174,16 @@ var parseImportPathTests = []struct {
 		ExplicitQualifier: false,
 		Qualifier:         "",
 	},
-	wantCanonical: "foo.com/bar/#foo",
+}, {
+	testName: "StdlibPathWithQualifier",
+	path:     "strings:strings",
+	want: ImportPath{
+		Path:              "strings",
+		Version:           "",
+		ExplicitQualifier: true,
+		Qualifier:         "strings",
+	},
+	wantCanonical: "strings:strings",
 }}
 
 func TestParseImportPath(t *testing.T) {
@@ -182,7 +195,49 @@ func TestParseImportPath(t *testing.T) {
 			if test.wantCanonical == "" {
 				test.wantCanonical = test.path
 			}
-			qt.Assert(t, qt.Equals(parts.Canonical().String(), test.wantCanonical))
+			gotCanonical := parts.Canonical().String()
+			qt.Assert(t, qt.Equals(gotCanonical, test.wantCanonical))
+			// Make sure that the canonical version round-trips OK.
+			qt.Assert(t, qt.Equals(ParseImportPath(gotCanonical).String(), gotCanonical))
+		})
+	}
+}
+
+var canonicalWithManuallyConstructedImportPathTests = []struct {
+	testName   string
+	ip         ImportPath
+	want       ImportPath
+	wantString string
+}{{
+	testName: "MissingQualifierIsAdded",
+	ip: ImportPath{
+		Path: "foo.com/bar",
+	},
+	want: ImportPath{
+		Path: "foo.com/bar",
+	},
+	wantString: "foo.com/bar",
+}, {
+	testName: "ExplicitQualifierIsSet",
+	ip: ImportPath{
+		Path:      "foo.com/bar",
+		Qualifier: "other",
+	},
+	want: ImportPath{
+		Path:      "foo.com/bar",
+		Qualifier: "other",
+	},
+	wantString: "foo.com/bar:other",
+}}
+
+func TestCanonicalWithManuallyConstructedImportPath(t *testing.T) {
+	// Test that Canonical works correctly on ImportPath values
+	// that are in forms that would not be returned by ParseImportPath.
+	for _, test := range canonicalWithManuallyConstructedImportPathTests {
+		t.Run(test.testName, func(t *testing.T) {
+			got := test.ip.Canonical()
+			qt.Assert(t, qt.DeepEquals(got, test.want))
+			qt.Assert(t, qt.Equals(got.String(), test.wantString))
 		})
 	}
 }

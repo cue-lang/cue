@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f75c01b2_b9204c94",
+        "filename": "cue/ast/importpath.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-06-06T10:40:47Z",
+      "side": 1,
+      "message": "I see your reasoning. I would however question whether there\u0027s ever a realistic expectation that the empty explicit qualifier be considered distinct from the implied qualifier. In my mind, there isn\u0027t - it\u0027s the same thing. And so we should not have 2 ways of representing the same thing. There either already is, or I played with, using .Canonical().String() as keys in a map, and in some cases, trailing `:` started appearing and causing difficulties.",
+      "parentUuid": "27b2ebcf_721effe3",
+      "revId": "b082eaac45cea1d40d2432aa3f797652a66d79f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "87f8a9bd_b64fa083",
         "filename": "cue/ast/importpath.go",
         "patchSetId": 4

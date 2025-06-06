@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a2db14c_4eefe70e",
+        "filename": "cue/ast/importpath.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-06-06T10:02:45Z",
+      "side": 1,
+      "message": "Would it also be worthwhile in here ensuring that if Qualifier is \"\" then Explicit must be false? Otherwise, on String, I think you can get a trailing `:`\n\n\n```suggestion\nfunc (parts ImportPath) Canonical() ImportPath {\n\tif parts.Qualifier \u003d\u003d \"\" {\n\t\tparts.ExplicitQualifier \u003d false\n\t}\n```",
+      "revId": "b082eaac45cea1d40d2432aa3f797652a66d79f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87f8a9bd_b64fa083",
+        "filename": "cue/ast/importpath.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-06-06T10:02:45Z",
+      "side": 1,
+      "message": "Nit-esq: It might be clearer to say \"Ensure the qualifier is not included in string representations because ...\". Saying \"Do not include...\" made me double-take slightly.",
+      "revId": "b082eaac45cea1d40d2432aa3f797652a66d79f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd0b09c7_46dbe6b5",
+        "filename": "cue/ast/importpath.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-06-06T10:02:45Z",
+      "side": 1,
+      "message": "```suggestion\n\t} else {\n\t\tparts.ExplicitQualifier \u003d true\n\t}\n```\n\nMaybe? Because we know there is a non-empty qualifier, and it\u0027s different from the (also non-empty) implied qualifier",
+      "revId": "b082eaac45cea1d40d2432aa3f797652a66d79f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

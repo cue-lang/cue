@@ -16,6 +16,24 @@
       "message": "Or be a bit more specific, given that we know exactly what the two messages are?\n\n```suggestion\nstderr \u0027permission denied|Access (is )?denied\u0027\n```",
       "revId": "9d93d7850338bf230b87c7e5527b66eae244dc18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a078f670_b6a1ebb8",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_issue1791.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-06T10:16:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a572de5c_bfd14aeb",
+      "revId": "9d93d7850338bf230b87c7e5527b66eae244dc18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

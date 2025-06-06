@@ -549,7 +549,10 @@ func (n *nodeContext) checkTypos() {
 		required.replaceIDs(n.ctx, replacements...)
 
 		required.filterSets(func(a []reqSet) bool {
-			return !hasParentEllipsis(a, n.conjunctInfo)
+			if hasParentEllipsis(a, n.conjunctInfo) {
+				a[0].removed = true
+			}
+			return true
 		})
 		// TODO(perf): somehow prevent error generation of recursive structures,
 		// or at least make it cheap. Right now if this field is a typo, likely
@@ -593,6 +596,9 @@ func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) boo
 		if a[i].ignored {
 			continue
 		}
+		if a[i].removed {
+			continue
+		}
 
 		if !hasEvidenceForOne(a, i, conjuncts) {
 			if n.ctx.LogEval > 0 {
@@ -634,7 +640,7 @@ outer:
 			}
 		}
 
-		if len(outerScope) == 0 {
+		if len(outerScope) == 0 || a[0].parent == 0 {
 			return true
 		}
 
@@ -679,7 +685,15 @@ type reqSet struct {
 	// ignored indicates whether this reqSet should be used to check closedness.
 	// A group can be ignored while still needed to determine the scope of
 	// an outer struct or embedding group.
+	// The value of ignored may flip from true to false (e.g. with an embedded
+	// definition) or false to true (e.g. getting out of scope of a close()
+	// builtin).
 	ignored bool
+	// removed is like ignore, but is permanent. Once removed, a reqSet cannot
+	// be "unremoved". In many cases we cannot actually remove a reqSet as
+	// we still need to track the group memberships for embeddings or enclosing
+	// structs.
+	removed bool
 }
 
 // assert checks the invariants of a reqSets. It can be used for debugging.
@@ -967,7 +981,7 @@ func (a *reqSets) filterTop(conjuncts, parentConjuncts []conjunctInfo) (openLeve
 			return false
 		}
 		if !hasAny && hasParentEllipsis(a, parentConjuncts) {
-			return false
+			a[0].removed = true
 		}
 		return true
 	})

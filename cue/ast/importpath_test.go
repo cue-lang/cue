@@ -183,7 +183,7 @@ var parseImportPathTests = []struct {
 		ExplicitQualifier: true,
 		Qualifier:         "strings",
 	},
-	wantCanonical: "strings:strings",
+	wantCanonical: "strings",
 }}
 
 func TestParseImportPath(t *testing.T) {
@@ -214,7 +214,8 @@ var canonicalWithManuallyConstructedImportPathTests = []struct {
 		Path: "foo.com/bar",
 	},
 	want: ImportPath{
-		Path: "foo.com/bar",
+		Path:      "foo.com/bar",
+		Qualifier: "bar",
 	},
 	wantString: "foo.com/bar",
 }, {
@@ -224,8 +225,9 @@ var canonicalWithManuallyConstructedImportPathTests = []struct {
 		Qualifier: "other",
 	},
 	want: ImportPath{
-		Path:      "foo.com/bar",
-		Qualifier: "other",
+		Path:              "foo.com/bar",
+		Qualifier:         "other",
+		ExplicitQualifier: true,
 	},
 	wantString: "foo.com/bar:other",
 }}

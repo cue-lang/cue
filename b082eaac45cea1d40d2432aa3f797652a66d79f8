@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27b2ebcf_721effe3",
+        "filename": "cue/ast/importpath.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-06T10:29:26Z",
+      "side": 1,
+      "message": "Interesting point. Given that in general we do not check that Qualifier is a valid identifier, and the empty string is one such invalid identifier, on balance I _think_ that we should respect ExplicitQualifier, so `ParseImportPath(\"foo.com/bar:\").Canonical().String()` is still `foo.com/bar:`.\n\nNote that `ParseImportPath(\"foo.com/bar:\").String()` is also `foo.com/bar:`.",
+      "parentUuid": "3a2db14c_4eefe70e",
+      "revId": "b082eaac45cea1d40d2432aa3f797652a66d79f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87f8a9bd_b64fa083",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ec891fc_87bfbfc9",
+        "filename": "cue/ast/importpath.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-06T10:29:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87f8a9bd_b64fa083",
+      "revId": "b082eaac45cea1d40d2432aa3f797652a66d79f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd0b09c7_46dbe6b5",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-06-06T10:02:45Z",
       "side": 1,
       "message": "```suggestion\n\t} else {\n\t\tparts.ExplicitQualifier \u003d true\n\t}\n```\n\nMaybe? Because we know there is a non-empty qualifier, and it\u0027s different from the (also non-empty) implied qualifier",
+      "revId": "b082eaac45cea1d40d2432aa3f797652a66d79f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eddd5932_050aa88a",
+        "filename": "cue/ast/importpath.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-06T10:29:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd0b09c7_46dbe6b5",
       "revId": "b082eaac45cea1d40d2432aa3f797652a66d79f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

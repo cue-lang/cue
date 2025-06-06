@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0878eb6b_4525e0ad",
+        "filename": "cue/ast/importpath.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-06T10:54:01Z",
+      "side": 1,
+      "message": "As discussed online, I think that a trailing empty qualifier _should_ be considered invalid, not as an equivalent to the missing qualifier, just like any invalid identifier. I think that the behaviour proposed in this CL just goes along with the current approach of being liberal in accepting different parts that are not necessarily valid, but can be checked for validity later.",
+      "parentUuid": "f75c01b2_b9204c94",
+      "revId": "b082eaac45cea1d40d2432aa3f797652a66d79f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87f8a9bd_b64fa083",

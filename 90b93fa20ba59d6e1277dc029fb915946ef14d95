@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e600f2b_5997ad55",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-09T14:27:45Z",
+      "side": 1,
+      "message": "perhaps give some context as to why we\u0027re mentioning 3924 here, and adding more tests for it, given that it is an issue which was already fixed and closed.",
+      "revId": "90b93fa20ba59d6e1277dc029fb915946ef14d95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d15a9628_d2bed5a0",
+        "filename": "cue/testdata/builtins/closed.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-09T14:27:45Z",
+      "side": 1,
+      "message": "can we use e.g. `\"value\"` rather than `false` with all of these? otherwise `allowed: false` makes it sound like it\u0027s a negative, meaning it should NOT be allowed.",
+      "range": {
+        "startLine": 62,
+        "startChar": 15,
+        "endLine": 62,
+        "endChar": 20
+      },
+      "revId": "90b93fa20ba59d6e1277dc029fb915946ef14d95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d27c9aa_bce4b475",
+        "filename": "cue/testdata/eval/embed.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-09T14:27:45Z",
+      "side": 1,
+      "message": "this comment was mine from the reduction, so it won\u0027t be true anymore once you fix evalv3. perhaps remove?",
+      "revId": "90b93fa20ba59d6e1277dc029fb915946ef14d95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

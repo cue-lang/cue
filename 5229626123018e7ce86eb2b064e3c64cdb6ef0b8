@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3dea08d_651fa71a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-09T14:45:52Z",
+      "side": 1,
+      "message": "SGTM with the understanding that we can avoid a lot of this overhead once we move towards `#A...`",
+      "revId": "5229626123018e7ce86eb2b064e3c64cdb6ef0b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

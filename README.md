@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-[![Go Reference](https://pkg.go.dev/badge/cuelang.org/go.svg)](https://pkg.go.dev/cuelang.org/go)
+[![Go Reference](https://pkg.go.dev/badge/cuelang.org/go.svg)](https://cuelang.org/go)
 [![Documentation](https://img.shields.io/badge/CUE-Docs-0066ff)](https://cuelang.org/docs/)
 [![Github](https://github.com/cue-lang/cue/actions/workflows/trybot.yaml/badge.svg)](https://github.com/cue-lang/cue/actions/workflows/trybot.yaml?query=branch%3Amaster+event%3Apush)
 [![Go 1.23+](https://img.shields.io/badge/go-1.23-9cf.svg)](https://golang.org/dl/)
@@ -26,14 +26,14 @@ CUE makes it easy to validate data, write schemas,
 and ensure configurations align with policies.
 
 CUE works with a wide range of tools and formats that you're already using
-such as Go, JSON, YAML, OpenAPI, and JSON Schema.
+such as Go, JSON, YAML, TOML, OpenAPI, Protocol Buffers, and JSON Schema.
 
 For more information and documentation, including __tutorials and guides__, see [cuelang.org](https://cuelang.org).
 
 ### Download and Install
 
-The full range of installation methods for the `cue` command are listed on the
-[cuelang.org site](https://cuelang.org/docs/introduction/installation/),
+The full range of installation methods for the `cue` command are listed on
+[cuelang.org](https://cuelang.org/docs/introduction/installation/),
 including the official container image suitable for use with Docker.
 Here are two common ways to install the command:
 
@@ -51,21 +51,28 @@ You can also clone the repository and build it directly via `go install ./cmd/cu
 Note that local builds [lack version information](https://go.dev/issue/50603),
 so you should inject the version string when building a release, such as:
 
-	git switch -d v0.11.0
-	go install -ldflags='-X cuelang.org/go/cmd/cue/cmd.version=v0.11.0' ./cmd/cue
+	git switch -d v0.13.0
+	go install -ldflags='-X cuelang.org/go/cmd/cue/cmd.version=v0.13.0' ./cmd/cue
 
 ### Learning CUE
 
-The fastest way to learn the basics is to follow the [tour on the website](https://cuelang.org/docs/tour/).
+The fastest way to learn the basics is to follow [the language tour](https://cuelang.org/docs/tour/) on the website.
 
-More documentation including various tutorials can be found [on the website](https://cuelang.org/docs/).
+The [cuelang.org](https://cuelang.org) website also contains
+[more documentation](https://cuelang.org/docs/), including
+[tutorials](https://cuelang.org/docs/tutorial/),
+[how-to guides](https://cuelang.org/docs/howto/),
+[concept guides](https://cuelang.org/docs/concept/), and
+[references](https://cuelang.org/docs/reference/).
 
-### References
+### Popular references
 
-- [Language Specification](https://cuelang.org/docs/reference/spec/): the official CUE Language specification
-- [Go API](https://pkg.go.dev/cuelang.org/go/cue): the Go API on pkg.go.dev
-- [Builtin packages](https://pkg.go.dev/cuelang.org/go/pkg): builtin functions available from CUE programs
-- [`cue` CLI](https://cuelang.org/docs/reference/cli/): the `cue` command line interface
+- The official [CUE Language Specification](https://cuelang.org/docs/reference/spec/)
+- The CUE [Go API](https://cuelang.org/go) on pkg.go.dev
+- [Builtin packages and functions](https://cuelang.org/go/pkg) available from
+  CUE programs
+- [The `cue` command](https://cuelang.org/docs/reference/command/),
+  a versatile interface for working with data, CUE, and its ecosystem
 
 ### Go release support policy
 

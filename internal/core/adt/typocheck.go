@@ -644,6 +644,10 @@ func hasEvidenceForOne(all reqSets, i uint32, conjuncts []conjunctInfo) bool {
 
 	outerScope := all.lookupSet(a[0].parent)
 
+	if len(outerScope) > 0 && outerScope[0].removed {
+		return true
+	}
+
 outer:
 	for _, c := range conjuncts {
 		for _, x := range embedScope {

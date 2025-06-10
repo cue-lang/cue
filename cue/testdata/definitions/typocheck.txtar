@@ -147,10 +147,37 @@ issue3853: {
 	out: {x: (#Schema & {}).a}.x
 }
 -- disjunction.cue --
+import "list"
+
 issue3947: full: {
 	#Schema: allowed?: string
 	_defaults: disallowed: _ | *"default value"
 	out: #Schema & _defaults
+}
+issue3957: reduced: {
+	c: a: "bar"
+	c: #B & {a: string | *"foo"}
+	#B: b?: string
+}
+issue3957: full: {
+	#oneof: {a: string} | {b?: [...string]}
+	c: #oneof & {a: string | *"foo"}
+	c: a: "bar"
+}
+issue3957: derived: t1: {
+	#Schema: {
+		in: string | [...string]
+		out: list.FlattenN([in], 1)
+	}
+	x: #Schema & {in: "foo"}
+}
+issue3957: derived: t2: {
+	#Schema: {
+		in: string | [...string]
+		let _flat = list.FlattenN([in], 1)
+		out: _flat
+	}
+	out: #Schema & {in: "foo"}
 }
 -- issue3833.cue --
 issue3833: {
@@ -454,54 +481,54 @@ full: {
 	out: (#Main & {namespace: "ns1"}).output
 }
 -- out/evalalpha/stats --
-Leaks:  755
+Leaks:  830
 Freed:  0
 Reused: 0
-Allocs: 755
+Allocs: 830
 Retain: 0
 
-Unifications: 626
-Conjuncts:    1213
-Disjuncts:    50
+Unifications: 681
+Conjuncts:    1313
+Disjuncts:    68
 
-CloseIDElems: 1880
-NumCloseIDs: 388
+CloseIDElems: 1901
+NumCloseIDs: 400
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
 -Leaks:  115
--Freed:  892
--Reused: 878
+-Freed:  984
+-Reused: 970
 -Allocs: 129
--Retain: 367
+-Retain: 374
 -
--Unifications: 927
--Conjuncts:    1909
--Disjuncts:    1202
-+Leaks:  755
+-Unifications: 977
+-Conjuncts:    2053
+-Disjuncts:    1301
++Leaks:  830
 +Freed:  0
 +Reused: 0
-+Allocs: 755
++Allocs: 830
 +Retain: 0
 +
-+Unifications: 626
-+Conjuncts:    1213
-+Disjuncts:    50
++Unifications: 681
++Conjuncts:    1313
++Disjuncts:    68
 +
-+CloseIDElems: 1880
-+NumCloseIDs: 388
++CloseIDElems: 1901
++NumCloseIDs: 400
 -- out/eval/stats --
 Leaks:  115
-Freed:  892
-Reused: 878
+Freed:  984
+Reused: 970
 Allocs: 129
-Retain: 367
+Retain: 374
 
-Unifications: 927
-Conjuncts:    1909
-Disjuncts:    1202
+Unifications: 977
+Conjuncts:    2053
+Disjuncts:    1301
 -- out/evalalpha --
 Errors:
 and.transitive.err.out.err: field not allowed:
@@ -532,7 +559,7 @@ embed.withIndirect.err: field not allowed:
 issue3920.out.a.b: field not allowed:
     ./chaineddef.cue:5:6
 issue3947.full.out.disallowed: field not allowed:
-    ./disjunction.cue:3:13
+    ./disjunction.cue:5:13
 embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
     ./validators.cue:21:5
     ./validators.cue:21:12
@@ -577,7 +604,74 @@ Result:
         allowed?: (string){ string }
         disallowed: (_|_){
           // [eval] issue3947.full.out.disallowed: field not allowed:
-          //     ./disjunction.cue:3:13
+          //     ./disjunction.cue:5:13
+        }
+      }
+    }
+  }
+  issue3957: (struct){
+    reduced: (struct){
+      c: (#struct){
+        a: (string){ "bar" }
+        b?: (string){ string }
+      }
+      #B: (#struct){
+        b?: (string){ string }
+      }
+    }
+    full: (struct){
+      #oneof: (#struct){ |((#struct){
+          a: (string){ string }
+        }, (#struct){
+          b?: (list){
+          }
+        }) }
+      c: (#struct){ |((#struct){
+          a: (string){ "bar" }
+        }, (#struct){
+          a: (string){ "bar" }
+          b?: (list){
+          }
+        }) }
+    }
+    derived: (struct){
+      t1: (struct){
+        #Schema: (#struct){
+          in: ((string|list)){ |((string){ string }, (list){
+            }) }
+          out: (#list){
+            0: ((string|list)){ |((string){ string }, (list){
+              }) }
+          }
+        }
+        x: (#struct){
+          in: (string){ "foo" }
+          out: (#list){
+            0: (string){ "foo" }
+          }
+        }
+      }
+      t2: (struct){
+        #Schema: (#struct){
+          in: ((string|list)){ |((string){ string }, (list){
+            }) }
+          let _flat#1 = (#list){
+            0: ((string|list)){ |((string){ string }, (list){
+              }) }
+          }
+          out: (#list){
+            0: ((string|list)){ |((string){ string }, (list){
+              }) }
+          }
+        }
+        out: (#struct){
+          in: (string){ "foo" }
+          let _flat#1 = (#list){
+            0: (string){ "foo" }
+          }
+          out: (#list){
+            0: (string){ "foo" }
+          }
         }
       }
     }
@@ -978,7 +1072,7 @@ Result:
       _subject: (#struct){
         in: (_){ _ }
         out: (#struct){
-          let self#1 = (_|_){
+          let self#2 = (_|_){
             // [incomplete] issue3832.#T._subject.out.self: in.self undefined as in is incomplete (type _):
             //     ./issue3832.cue:8:16
           }
@@ -993,7 +1087,7 @@ Result:
           check!: (_){ _ }
         }, (#struct){
           pass: (#struct){
-            let self#1 = (_|_){
+            let self#2 = (_|_){
               // [incomplete] issue3832.#T._assert.pass.self: undefined field: self:
               //     ./issue3832.cue:8:19
             }
@@ -1005,7 +1099,7 @@ Result:
           invoke!: (_){ _ }
         }) }
       results: (_|_){
-        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
+        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
         //     ./issue3832.cue:20:12
       }
     }
@@ -1016,7 +1110,7 @@ Result:
         }
       }
       pass: (#struct){
-        let self#1 = (#struct){
+        let self#2 = (#struct){
           firstName: (string){ "Sam" }
         }
         outFirstName: (string){ "Sam" }
@@ -1025,7 +1119,7 @@ Result:
     _subject: (#struct){
       in: (_){ _ }
       out: (#struct){
-        let self#1 = (_|_){
+        let self#2 = (_|_){
           // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
           //     ./issue3832.cue:8:16
         }
@@ -1372,7 +1466,7 @@ Result:
           missing: (bool){ true }
         }, (#struct){
         }) }
-      let pickMsg#2 = (#struct){
+      let pickMsg#3 = (#struct){
         msg: (_|_){
           // [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
           //     ./large.cue:7:25
@@ -1417,14 +1511,14 @@ Result:
         //     ./large.cue:21:24
         //     ./large.cue:19:15
       }
-      let jsonPatch#3 = (#struct){
-        let base#6 = (#struct){
+      let jsonPatch#4 = (#struct){
+        let base#7 = (#struct){
           someMsg: (string){ string }
           obs: (#struct){ |(*(#struct){
               missing: (bool){ true }
             }, (#struct){
             }) }
-          let pickMsg#2 = (#struct){
+          let pickMsg#3 = (#struct){
             msg: (_|_){
               // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
               //     ./large.cue:7:25
@@ -1443,13 +1537,13 @@ Result:
             }
           }
         }
-        let withMsg#7 = (#struct){
+        let withMsg#8 = (#struct){
           someMsg: (string){ "foo" }
           obs: (#struct){ |(*(#struct){
               missing: (bool){ true }
             }, (#struct){
             }) }
-          let pickMsg#2 = (#struct){
+          let pickMsg#3 = (#struct){
             msg: (string){ "foo" }
           }
           patches: (#list){
@@ -1527,7 +1621,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,86 +1,33 @@
+@@ -1,95 +1,33 @@
  Errors:
  and.transitive.err.out.err: field not allowed:
 -    ./in.cue:42:5
@@ -1604,10 +1698,19 @@ diff old new
 +issue3920.out.a.b: field not allowed:
 +    ./chaineddef.cue:5:6
  issue3947.full.out.disallowed: field not allowed:
--    ./disjunction.cue:2:11
-     ./disjunction.cue:3:13
--    ./disjunction.cue:4:7
--    ./disjunction.cue:4:17
+-    ./disjunction.cue:4:11
+     ./disjunction.cue:5:13
+-    ./disjunction.cue:6:7
+-    ./disjunction.cue:6:17
+-issue3957.reduced.c.a: 2 errors in empty disjunction:
+-issue3957.reduced.c.a: conflicting values "foo" and "bar":
+-    ./disjunction.cue:9:8
+-    ./disjunction.cue:10:24
+-issue3957.reduced.c.a: field not allowed:
+-    ./disjunction.cue:9:5
+-    ./disjunction.cue:10:5
+-    ./disjunction.cue:10:11
+-    ./disjunction.cue:11:6
 -embed.openValidator.t1.x.err: field not allowed:
 -    ./validators.cue:13:3
 -    ./validators.cue:12:6
@@ -1616,7 +1719,7 @@ diff old new
  embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
      ./validators.cue:21:5
      ./validators.cue:21:12
-@@ -90,17 +37,21 @@
+@@ -99,17 +37,21 @@
  Result:
  (_|_){
    // [eval]
@@ -1649,18 +1752,81 @@ diff old new
      }
      #B: (#struct){
        c?: (string){ string }
-@@ -121,10 +72,7 @@
+@@ -130,47 +72,35 @@
          allowed?: (string){ string }
          disallowed: (_|_){
            // [eval] issue3947.full.out.disallowed: field not allowed:
--          //     ./disjunction.cue:2:11
-           //     ./disjunction.cue:3:13
--          //     ./disjunction.cue:4:7
--          //     ./disjunction.cue:4:17
-         }
-       }
+-          //     ./disjunction.cue:4:11
+           //     ./disjunction.cue:5:13
+-          //     ./disjunction.cue:6:7
+-          //     ./disjunction.cue:6:17
+-        }
+-      }
+-    }
+-  }
+-  issue3957: (_|_){
+-    // [eval]
+-    reduced: (_|_){
+-      // [eval]
+-      c: (_|_){
+-        // [eval]
+-        a: (_|_){
+-          // [eval] issue3957.reduced.c.a: 2 errors in empty disjunction:
+-          // issue3957.reduced.c.a: conflicting values "foo" and "bar":
+-          //     ./disjunction.cue:9:8
+-          //     ./disjunction.cue:10:24
+-          // issue3957.reduced.c.a: field not allowed:
+-          //     ./disjunction.cue:9:5
+-          //     ./disjunction.cue:10:5
+-          //     ./disjunction.cue:10:11
+-          //     ./disjunction.cue:11:6
+-        }
+-        b?: (string){ string }
+-      }
+-      #B: (#struct){
+-        b?: (string){ string }
+-      }
+-    }
+-    full: (struct){
+-      #oneof: (#struct){ |((#struct){
+-          a: (string){ string }
+-        }, (#struct){
+-          b?: (list){
+-          }
+-        }) }
++        }
++      }
++    }
++  }
++  issue3957: (struct){
++    reduced: (struct){
+       c: (#struct){
+         a: (string){ "bar" }
+-      }
++        b?: (string){ string }
++      }
++      #B: (#struct){
++        b?: (string){ string }
++      }
++    }
++    full: (struct){
++      #oneof: (#struct){ |((#struct){
++          a: (string){ string }
++        }, (#struct){
++          b?: (list){
++          }
++        }) }
++      c: (#struct){ |((#struct){
++          a: (string){ "bar" }
++        }, (#struct){
++          a: (string){ "bar" }
++          b?: (list){
++          }
++        }) }
      }
-@@ -209,14 +157,11 @@
+     derived: (struct){
+       t1: (struct){
+@@ -294,14 +224,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1676,7 +1842,7 @@ diff old new
        }
      }
      andInStruct: (_|_){
-@@ -226,14 +171,11 @@
+@@ -311,14 +238,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1692,7 +1858,7 @@ diff old new
        }
      }
      embedDefWithEmbedding: (_|_){
-@@ -243,15 +185,11 @@
+@@ -328,15 +252,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1709,7 +1875,7 @@ diff old new
        }
      }
      embedComprehension: (_|_){
-@@ -261,16 +199,11 @@
+@@ -346,16 +266,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1727,7 +1893,7 @@ diff old new
        }
      }
      fieldWithAnd: (_|_){
-@@ -281,9 +214,6 @@
+@@ -366,9 +281,6 @@
          // [eval]
          err: (_|_){
            // [eval] embed.fieldWithAnd.a.err: field not allowed:
@@ -1737,7 +1903,7 @@ diff old new
            //     ./in.cue:20:13
          }
        }
-@@ -294,20 +224,15 @@
+@@ -379,20 +291,15 @@
          a: (int){ int }
        }
        B: (struct){
@@ -1763,7 +1929,7 @@ diff old new
        }
      }
      andEmbed: (_|_){
-@@ -323,17 +248,11 @@
+@@ -408,17 +315,11 @@
        }
        d: (_|_){
          // [eval]
@@ -1782,7 +1948,7 @@ diff old new
        }
      }
      nonDef: (struct){
-@@ -342,12 +261,12 @@
+@@ -427,12 +328,12 @@
            a: (string){ string }
          }
          #Y: (#struct){
@@ -1799,7 +1965,7 @@ diff old new
          }
        }
      }
-@@ -357,12 +276,12 @@
+@@ -442,12 +343,12 @@
            Name: (string){ string }
          }
          #Step: (#struct){
@@ -1816,7 +1982,7 @@ diff old new
          }
          out: (#struct){
            Name: (string){ "foo" }
-@@ -372,21 +291,15 @@
+@@ -457,21 +358,15 @@
      }
      withIndirect: (_|_){
        // [eval]
@@ -1843,7 +2009,7 @@ diff old new
      }
      normalValidator: (_|_){
        // [eval]
-@@ -396,20 +309,17 @@
+@@ -481,20 +376,17 @@
        }
        x: (_|_){
          // [eval]
@@ -1867,7 +2033,7 @@ diff old new
          #X: (_){
            matchN(0, (#list){
            })
-@@ -416,17 +326,10 @@
+@@ -501,17 +393,10 @@
            a?: (int){ int }
            b?: (int){ int }
          }
@@ -1889,7 +2055,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -445,10 +348,7 @@
+@@ -530,10 +415,7 @@
            // [eval]
            b: (_|_){
              // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
@@ -1900,7 +2066,7 @@ diff old new
              //     ./validators.cue:24:8
              // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
              //     ./validators.cue:21:5
-@@ -491,16 +391,11 @@
+@@ -576,16 +458,11 @@
          }
          out: (_|_){
            // [eval]
@@ -1918,7 +2084,7 @@ diff old new
          }
        }
      }
-@@ -533,17 +428,11 @@
+@@ -618,17 +495,11 @@
          }
          out: (_|_){
            // [eval]
@@ -1937,7 +2103,7 @@ diff old new
          }
        }
      }
-@@ -589,8 +478,8 @@
+@@ -674,8 +545,8 @@
              //     ./issue3832.cue:8:16
            }
            outFirstName: (_|_){
@@ -1948,10 +2114,10 @@ diff old new
            }
          }
        }
-@@ -600,35 +489,27 @@
+@@ -685,35 +556,27 @@
          }, (#struct){
            pass: (#struct){
-             let self#1 = (_|_){
+             let self#2 = (_|_){
 -              // [incomplete] issue3832.#T._assert.pass.self: in.self undefined (in is incomplete):
 -              //     ./issue3832.cue:8:16
 +              // [incomplete] issue3832.#T._assert.pass.self: undefined field: self:
@@ -1967,15 +2133,15 @@ diff old new
            invoke!: (_){ _ }
          }) }
        results: (_|_){
--        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete)),outFirstName:_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete))},invoke!:_} (type struct):
-+        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
+-        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete)),outFirstName:_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete))},invoke!:_} (type struct):
++        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
          //     ./issue3832.cue:20:12
        }
      }
 -    _subject: (#struct){
 -      in: (_){ _ }
 -      out: (#struct){
--        let self#1 = (_|_){
+-        let self#2 = (_|_){
 -          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
 -          //     ./issue3832.cue:8:16
 -        }
@@ -1992,9 +2158,9 @@ diff old new
 +        }
 +      }
        pass: (#struct){
-         let self#1 = (#struct){
+         let self#2 = (#struct){
            firstName: (string){ "Sam" }
-@@ -635,18 +516,21 @@
+@@ -720,18 +583,21 @@
          }
          outFirstName: (string){ "Sam" }
        }
@@ -2005,7 +2171,7 @@ diff old new
 -      }
 -    }
 -    results: (#struct){
--      let self#1 = (#struct){
+-      let self#2 = (#struct){
 -        firstName: (string){ "Sam" }
 -      }
 -      outFirstName: (string){ "Sam" }
@@ -2014,7 +2180,7 @@ diff old new
 +    _subject: (#struct){
 +      in: (_){ _ }
 +      out: (#struct){
-+        let self#1 = (_|_){
++        let self#2 = (_|_){
 +          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
 +          //     ./issue3832.cue:8:16
 +        }
@@ -2028,7 +2194,7 @@ diff old new
    }
    issue3833: (struct){
      out: (#struct){
-@@ -722,12 +606,8 @@
+@@ -807,12 +673,8 @@
          globalField: (string){ string }
        }
        #Context: (#struct){
@@ -2043,7 +2209,7 @@ diff old new
        }
        out: (struct){
          ingress: (#struct){
-@@ -755,22 +635,22 @@
+@@ -840,22 +702,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2082,7 +2248,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -780,22 +660,22 @@
+@@ -865,22 +727,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2121,7 +2287,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -810,11 +690,7 @@
+@@ -895,11 +757,7 @@
          }
        }
        #JobConfig: (#struct){
@@ -2134,7 +2300,7 @@ diff old new
          job: (#struct){
            image: (string){ "foo:v1" }
            vcs: (string){ "git" }
-@@ -878,7 +754,7 @@
+@@ -963,7 +821,7 @@
          }
        }
        out: (#struct){
@@ -2143,7 +2309,7 @@ diff old new
            input: (#struct){
              image: (string){ "someimage" }
              env: (string){ "FOO" }
-@@ -910,11 +786,11 @@
+@@ -995,11 +853,11 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2160,7 +2326,7 @@ diff old new
            e: (string){ "foo" }
            f: (int){ 1 }
          }
-@@ -947,24 +823,16 @@
+@@ -1032,24 +890,16 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2195,7 +2361,7 @@ diff old new
      }
    }
    issue3934: (struct){
-@@ -1011,7 +879,7 @@
+@@ -1096,7 +946,7 @@
            op: (string){ "add" }
            path: (string){ "/metadata" }
            value: (_|_){
@@ -2204,7 +2370,7 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -1040,38 +908,11 @@
+@@ -1125,38 +975,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -2221,7 +2387,7 @@ diff old new
 -          }
 -        }
        }
-       let jsonPatch#3 = (#struct){
+       let jsonPatch#4 = (#struct){
 -        namespace: (string){ string }
 -        patch: (#list){
 -          0: (#struct){
@@ -2242,10 +2408,10 @@ diff old new
 -            }
 -          }
 -        }
-         let base#6 = (#struct){
+         let base#7 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -1090,7 +931,7 @@
+@@ -1175,7 +998,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
                value: (_|_){
@@ -2254,7 +2420,7 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
-@@ -1114,6 +955,19 @@
+@@ -1199,6 +1022,19 @@
              }
            }
          }
@@ -2274,7 +2440,7 @@ diff old new
        }
      }
      out: (#struct){
-@@ -1143,17 +997,8 @@
+@@ -1228,17 +1064,8 @@
              //     ./validators.cue:32:17
              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
              //     ./validators.cue:29:22
@@ -2373,10 +2539,19 @@ embed.withIndirect.err: field not allowed:
     ./in.cue:87:2
     ./in.cue:87:8
 issue3947.full.out.disallowed: field not allowed:
-    ./disjunction.cue:2:11
-    ./disjunction.cue:3:13
-    ./disjunction.cue:4:7
-    ./disjunction.cue:4:17
+    ./disjunction.cue:4:11
+    ./disjunction.cue:5:13
+    ./disjunction.cue:6:7
+    ./disjunction.cue:6:17
+issue3957.reduced.c.a: 2 errors in empty disjunction:
+issue3957.reduced.c.a: conflicting values "foo" and "bar":
+    ./disjunction.cue:9:8
+    ./disjunction.cue:10:24
+issue3957.reduced.c.a: field not allowed:
+    ./disjunction.cue:9:5
+    ./disjunction.cue:10:5
+    ./disjunction.cue:10:11
+    ./disjunction.cue:11:6
 embed.openValidator.t1.x.err: field not allowed:
     ./validators.cue:13:3
     ./validators.cue:12:6
@@ -2422,10 +2597,86 @@ Result:
         allowed?: (string){ string }
         disallowed: (_|_){
           // [eval] issue3947.full.out.disallowed: field not allowed:
-          //     ./disjunction.cue:2:11
-          //     ./disjunction.cue:3:13
-          //     ./disjunction.cue:4:7
-          //     ./disjunction.cue:4:17
+          //     ./disjunction.cue:4:11
+          //     ./disjunction.cue:5:13
+          //     ./disjunction.cue:6:7
+          //     ./disjunction.cue:6:17
+        }
+      }
+    }
+  }
+  issue3957: (_|_){
+    // [eval]
+    reduced: (_|_){
+      // [eval]
+      c: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval] issue3957.reduced.c.a: 2 errors in empty disjunction:
+          // issue3957.reduced.c.a: conflicting values "foo" and "bar":
+          //     ./disjunction.cue:9:8
+          //     ./disjunction.cue:10:24
+          // issue3957.reduced.c.a: field not allowed:
+          //     ./disjunction.cue:9:5
+          //     ./disjunction.cue:10:5
+          //     ./disjunction.cue:10:11
+          //     ./disjunction.cue:11:6
+        }
+        b?: (string){ string }
+      }
+      #B: (#struct){
+        b?: (string){ string }
+      }
+    }
+    full: (struct){
+      #oneof: (#struct){ |((#struct){
+          a: (string){ string }
+        }, (#struct){
+          b?: (list){
+          }
+        }) }
+      c: (#struct){
+        a: (string){ "bar" }
+      }
+    }
+    derived: (struct){
+      t1: (struct){
+        #Schema: (#struct){
+          in: ((string|list)){ |((string){ string }, (list){
+            }) }
+          out: (#list){
+            0: ((string|list)){ |((string){ string }, (list){
+              }) }
+          }
+        }
+        x: (#struct){
+          in: (string){ "foo" }
+          out: (#list){
+            0: (string){ "foo" }
+          }
+        }
+      }
+      t2: (struct){
+        #Schema: (#struct){
+          in: ((string|list)){ |((string){ string }, (list){
+            }) }
+          let _flat#1 = (#list){
+            0: ((string|list)){ |((string){ string }, (list){
+              }) }
+          }
+          out: (#list){
+            0: ((string|list)){ |((string){ string }, (list){
+              }) }
+          }
+        }
+        out: (#struct){
+          in: (string){ "foo" }
+          let _flat#1 = (#list){
+            0: (string){ "foo" }
+          }
+          out: (#list){
+            0: (string){ "foo" }
+          }
         }
       }
     }
@@ -2885,7 +3136,7 @@ Result:
       _subject: (#struct){
         in: (_){ _ }
         out: (#struct){
-          let self#1 = (_|_){
+          let self#2 = (_|_){
             // [incomplete] issue3832.#T._subject.out.self: in.self undefined as in is incomplete (type _):
             //     ./issue3832.cue:8:16
           }
@@ -2900,7 +3151,7 @@ Result:
           check!: (_){ _ }
         }, (#struct){
           pass: (#struct){
-            let self#1 = (_|_){
+            let self#2 = (_|_){
               // [incomplete] issue3832.#T._assert.pass.self: in.self undefined (in is incomplete):
               //     ./issue3832.cue:8:16
             }
@@ -2912,14 +3163,14 @@ Result:
           invoke!: (_){ _ }
         }) }
       results: (_|_){
-        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete)),outFirstName:_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete))},invoke!:_} (type struct):
+        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete)),outFirstName:_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete))},invoke!:_} (type struct):
         //     ./issue3832.cue:20:12
       }
     }
     _subject: (#struct){
       in: (_){ _ }
       out: (#struct){
-        let self#1 = (_|_){
+        let self#2 = (_|_){
           // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
           //     ./issue3832.cue:8:16
         }
@@ -2931,7 +3182,7 @@ Result:
     }
     _assert: (#struct){
       pass: (#struct){
-        let self#1 = (#struct){
+        let self#2 = (#struct){
           firstName: (string){ "Sam" }
         }
         outFirstName: (string){ "Sam" }
@@ -2943,7 +3194,7 @@ Result:
       }
     }
     results: (#struct){
-      let self#1 = (#struct){
+      let self#2 = (#struct){
         firstName: (string){ "Sam" }
       }
       outFirstName: (string){ "Sam" }
@@ -3300,7 +3551,7 @@ Result:
           missing: (bool){ true }
         }, (#struct){
         }) }
-      let pickMsg#2 = (#struct){
+      let pickMsg#3 = (#struct){
         msg: (_|_){
           // [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
           //     ./large.cue:7:25
@@ -3352,7 +3603,7 @@ Result:
           }
         }
       }
-      let jsonPatch#3 = (#struct){
+      let jsonPatch#4 = (#struct){
         namespace: (string){ string }
         patch: (#list){
           0: (#struct){
@@ -3373,13 +3624,13 @@ Result:
             }
           }
         }
-        let base#6 = (#struct){
+        let base#7 = (#struct){
           someMsg: (string){ string }
           obs: (#struct){ |(*(#struct){
               missing: (bool){ true }
             }, (#struct){
             }) }
-          let pickMsg#2 = (#struct){
+          let pickMsg#3 = (#struct){
             msg: (_|_){
               // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
               //     ./large.cue:7:25
@@ -3398,13 +3649,13 @@ Result:
             }
           }
         }
-        let withMsg#7 = (#struct){
+        let withMsg#8 = (#struct){
           someMsg: (string){ "foo" }
           obs: (#struct){ |(*(#struct){
               missing: (bool){ true }
             }, (#struct){
             }) }
-          let pickMsg#2 = (#struct){
+          let pickMsg#3 = (#struct){
             msg: (string){ "foo" }
           }
           patches: (#list){
@@ -3503,6 +3754,71 @@ Result:
         disallowed: (_|*"default value")
       }
       out: (〈0;#Schema〉 & 〈0;_defaults〉)
+    }
+  }
+  issue3957: {
+    reduced: {
+      c: {
+        a: "bar"
+      }
+      c: (〈0;#B〉 & {
+        a: (string|*"foo")
+      })
+      #B: {
+        b?: string
+      }
+    }
+  }
+  issue3957: {
+    full: {
+      #oneof: ({
+        a: string
+      }|{
+        b?: [
+          ...string,
+        ]
+      })
+      c: (〈0;#oneof〉 & {
+        a: (string|*"foo")
+      })
+      c: {
+        a: "bar"
+      }
+    }
+  }
+  issue3957: {
+    derived: {
+      t1: {
+        #Schema: {
+          in: (string|[
+            ...string,
+          ])
+          out: 〈import;list〉.FlattenN([
+            〈1;in〉,
+          ], 1)
+        }
+        x: (〈0;#Schema〉 & {
+          in: "foo"
+        })
+      }
+    }
+  }
+  issue3957: {
+    derived: {
+      t2: {
+        #Schema: {
+          in: (string|[
+            ...string,
+          ])
+          let _flat#1 = 〈import;list〉.FlattenN([
+            〈1;in〉,
+          ], 1)
+          out: 〈0;let _flat#1〉
+        }
+        out: (〈0;#Schema〉 & {
+          in: "foo"
+        })
+      }
     }
   }
 }
@@ -3820,8 +4136,8 @@ Result:
       _subject: {
         in: _
         out: {
-          let self#1 = 〈1;in〉.self
-          outFirstName: 〈0;let self#1〉.firstName
+          let self#2 = 〈1;in〉.self
+          outFirstName: 〈0;let self#2〉.firstName
         }
       }
       _assert: {
@@ -4140,7 +4456,7 @@ Result:
       obs: ({}|*{
         missing: true
       })
-      let pickMsg#2 = [
+      let pickMsg#3 = [
         if 〈1;obs〉.missing {
           msg: "\(〈2;someMsg〉)"
         },
@@ -4152,7 +4468,7 @@ Result:
         {
           op: "add"
           path: "/metadata"
-          value: 〈2;let pickMsg#2〉.msg
+          value: 〈2;let pickMsg#3〉.msg
         },
       ]
     }
@@ -4178,14 +4494,14 @@ Result:
     })
     #Main: {
       namespace: string
-      output: 〈0;let jsonPatch#3〉.output
-      let jsonPatch#3 = (〈1;#JSONPatch〉 & {
-        let base#6 = (〈2;#Resource〉 & {})
-        let withMsg#7 = (〈0;let base#6〉 & {
+      output: 〈0;let jsonPatch#4〉.output
+      let jsonPatch#4 = (〈1;#JSONPatch〉 & {
+        let base#7 = (〈2;#Resource〉 & {})
+        let withMsg#8 = (〈0;let base#7〉 & {
           someMsg: "foo"
         })
         namespace: 〈1;namespace〉
-        patch: 〈0;let withMsg#7〉.patches
+        patch: 〈0;let withMsg#8〉.patches
       })
     }
     out: (〈0;#Main〉 & {

@@ -493,9 +493,6 @@ func (n *nodeContext) checkTypos() {
 	// outer:
 	for _, a := range v.Arcs {
 		f := a.Label
-		if a.isDisjunct() {
-			continue // Already checked in disjuncts.
-		}
 
 		// TODO(mem): child states of uncompleted nodes must have a state.
 		na := a.state

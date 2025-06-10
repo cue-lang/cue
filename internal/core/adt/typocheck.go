@@ -493,11 +493,9 @@ func (n *nodeContext) checkTypos() {
 	// outer:
 	for _, a := range v.Arcs {
 		f := a.Label
-		if a.isDisjunct() {
-			continue // Already checked in disjuncts.
-		}
 
 		// TODO(mem): child states of uncompleted nodes must have a state.
+		a = a.DerefDisjunct()
 		na := a.state
 
 		replacements = na.getReplacements(replacements[:0])
@@ -505,7 +503,6 @@ func (n *nodeContext) checkTypos() {
 		// do the right thing in appendRequired either way.
 		required.replaceIDs(n.ctx, replacements...)
 
-		a = a.DerefDisjunct()
 		// TODO(perf): somehow prevent error generation of recursive structures,
 		// or at least make it cheap. Right now if this field is a typo, likely
 		// all descendents will be regarded as typos.

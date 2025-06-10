@@ -99,6 +99,11 @@ func (r *Runtime) SetDebugOptions(flags *cuedebug.Config) {
 	r.flags = *flags
 }
 
+// SetGlobalExperiments that apply to language evaluation.
+func (r *Runtime) SetGlobalExperiments(flags *cueexperiment.Config) {
+	r.simplifyValidators = !flags.KeepValidators
+}
+
 // IsInitialized reports whether the runtime has been initialized.
 func (r *Runtime) IsInitialized() bool {
 	return r.index != nil
@@ -124,4 +129,7 @@ func (r *Runtime) Init() {
 	// such as with the API option [cuelang.org/go/cue/cuecontext.CUE_DEBUG].
 	cuedebug.Init()
 	r.SetDebugOptions(&cuedebug.Flags)
+
+	cueexperiment.Init()
+	r.SetGlobalExperiments(&cueexperiment.Flags)
 }

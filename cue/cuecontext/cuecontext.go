@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
+	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/envflag"
 
 	_ "cuelang.org/go/pkg"
@@ -106,5 +107,19 @@ func CUE_DEBUG(s string) Option {
 
 	return Option{func(r *runtime.Runtime) {
 		r.SetDebugOptions(&c)
+	}}
+}
+
+// CUE_EXPERIMENTS takes a string with the same contents as CUE_EXPERIMENTS and
+// configures the context with the relevant debug options. It panics for unknown
+// or malformed options.
+func CUE_EXPERIMENTS(s string) Option {
+	var c cueexperiment.Config
+	if err := envflag.Parse(&c, s); err != nil {
+		panic(fmt.Errorf("cuecontext.CUE_DEBUG: %v", err))
+	}
+
+	return Option{func(r *runtime.Runtime) {
+		r.SetGlobalExperiments(&c)
 	}}
 }

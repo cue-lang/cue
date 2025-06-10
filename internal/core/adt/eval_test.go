@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuedebug"
+	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cuetxtar"
 	_ "cuelang.org/go/pkg"
 )
@@ -204,6 +205,8 @@ func TestX(t *testing.T) {
 		Sharing: true, // Uncomment to turn sharing off.
 		LogEval: 1,    // Uncomment to turn logging off
 	}
+	cueexperiment.Init()
+	exps := cueexperiment.Flags
 
 	version := internal.DefaultVersion
 	version = internal.DevVersion // comment to use default implementation.
@@ -228,6 +231,7 @@ language: version: "v0.9.0"
 	}
 
 	r := runtime.NewWithSettings(version, flags)
+	r.SetGlobalExperiments(&exps)
 
 	v, err := r.Build(nil, instance)
 	if err != nil {

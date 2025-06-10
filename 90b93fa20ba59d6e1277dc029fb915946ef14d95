@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "810202f5_daad8a9e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-10T16:53:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e600f2b_5997ad55",
+      "revId": "90b93fa20ba59d6e1277dc029fb915946ef14d95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d15a9628_d2bed5a0",
@@ -41,6 +59,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f238a5c9_df0edee6",
+        "filename": "cue/testdata/builtins/closed.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-10T16:53:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d15a9628_d2bed5a0",
+      "range": {
+        "startLine": 62,
+        "startChar": 15,
+        "endLine": 62,
+        "endChar": 20
+      },
+      "revId": "90b93fa20ba59d6e1277dc029fb915946ef14d95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d27c9aa_bce4b475",
@@ -54,6 +96,24 @@
       "writtenOn": "2025-06-09T14:27:45Z",
       "side": 1,
       "message": "this comment was mine from the reduction, so it won\u0027t be true anymore once you fix evalv3. perhaps remove?",
+      "revId": "90b93fa20ba59d6e1277dc029fb915946ef14d95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c706cc2c_77e8cb14",
+        "filename": "cue/testdata/eval/embed.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-10T16:53:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d27c9aa_bce4b475",
       "revId": "90b93fa20ba59d6e1277dc029fb915946ef14d95",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

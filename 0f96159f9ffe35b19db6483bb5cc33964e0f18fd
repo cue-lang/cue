@@ -16,6 +16,24 @@
       "message": "is it worth leaving anything here as a note or TODO for a future second attempt at optimizing this, or not worth it?",
       "revId": "0f96159f9ffe35b19db6483bb5cc33964e0f18fd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2eb51bf1_f681e460",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-10T09:09:55Z",
+      "side": 0,
+      "message": "I think it is not worth it. The savings are quite minimal.",
+      "parentUuid": "9a1e572f_9d93609a",
+      "revId": "0f96159f9ffe35b19db6483bb5cc33964e0f18fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

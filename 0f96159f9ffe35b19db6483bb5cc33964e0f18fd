@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a1e572f_9d93609a",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-10T09:08:31Z",
+      "side": 0,
+      "message": "is it worth leaving anything here as a note or TODO for a future second attempt at optimizing this, or not worth it?",
+      "revId": "0f96159f9ffe35b19db6483bb5cc33964e0f18fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

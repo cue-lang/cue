@@ -189,6 +189,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		return -cmp.Compare(f1, f2)
 	})
 
+	// TODO: should this not use the new toposort? it still uses the pre-toposort field sorting.
 	m := sortArcs(extractFeatures(e.structs))
 	slices.SortStableFunc(fields, func(f1, f2 adt.Feature) int {
 		if m[f2] == 0 {

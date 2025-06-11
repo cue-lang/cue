@@ -96,7 +96,6 @@ type OpContext struct {
 
 	cuedebug.Config
 	Version            internal.EvaluatorVersion // Copied from Runtime
-	TopoSort           bool                      // Copied from Runtime
 	SimplifyValidators bool                      // Copied from Runtime
 
 	taskContext

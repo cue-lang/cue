@@ -16,6 +16,63 @@
       "message": "PTAL",
       "revId": "0ee028299763e59c82352bf99259d5fcb02516f9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a92d2cdc_78237f04",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:52:49Z",
+      "side": 1,
+      "message": "I\u0027ll push back on this gently - this just redirects the browser back to pkg.go.dev, so it\u0027s an extra step for the user, slowing them down for an extra 200ms or so, for no real benefit. We\u0027re fine with direct links to pkg.go.dev in general; the redirects exist just as a pure convenience, but not as the canonical docs URL.\n\nIt\u0027s different for github issue and gerrit CL links, because it\u0027s entirely possible that we will replace the issue tracking and code hosting sites in the future. However I think it\u0027s very unlikely that Go\u0027s pkg.go.dev will be abandoned in the next decade.",
+      "revId": "0ee028299763e59c82352bf99259d5fcb02516f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03cf9c86_a5921497",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:52:49Z",
+      "side": 1,
+      "message": "nit: at least my experience is that most people refer to it as \"Protobuf\", so I\u0027d do that here as well, given that it\u0027s a README and not technical docs where using the full name is best.",
+      "range": {
+        "startLine": 29,
+        "startChar": 39,
+        "endLine": 29,
+        "endChar": 55
+      },
+      "revId": "0ee028299763e59c82352bf99259d5fcb02516f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aaa95c82_f0903c2e",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:52:49Z",
+      "side": 1,
+      "message": "ditto - I think Go doc links should remain on pkg.go.dev",
+      "revId": "0ee028299763e59c82352bf99259d5fcb02516f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

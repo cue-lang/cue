@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0052bc04_a5f2c279",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:55:01Z",
+      "side": 1,
+      "message": "Unity: all green; the failure is just because Greymatter now succeeds, where we expected a known failure before. All three Unity breakages introduced earlier in the chain are now fixed.",
+      "revId": "b94666995ea66056bcc1e2e3abd8283463909695",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

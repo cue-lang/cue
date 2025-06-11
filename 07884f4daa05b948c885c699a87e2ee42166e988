@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d9928bf_eee90e8b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:33:46Z",
+      "side": 1,
+      "message": "incomplete sentence?",
+      "revId": "07884f4daa05b948c885c699a87e2ee42166e988",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cf3b8c1_cfd554d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:33:46Z",
+      "side": 1,
+      "message": "Unity: this fixes cue-labs/services again, and breaks three other projects as we already discussed, but those are fixed later on in the chain.",
+      "revId": "07884f4daa05b948c885c699a87e2ee42166e988",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c842d64_07d821aa",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 689,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:33:46Z",
+      "side": 1,
+      "message": "a bit odd that \"ignore\" and \"removed\" are not in the same tense; perhaps make them consistent, e.g. \"ignored\" and \"removed\".\n\nI\u0027d also document; alongside \"ignored\", \"removed\" seems a bit confusing.",
+      "revId": "07884f4daa05b948c885c699a87e2ee42166e988",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "a29be391_ebaa3e2d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-11T08:39:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6128ae79_d9282fec",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 9
+      },
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5e99d70f_8fc4d30c",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 10
@@ -37,6 +61,23 @@
       "writtenOn": "2025-06-11T07:28:51Z",
       "side": 1,
       "message": "For reference regarding Unity: this fixes Greymatter, and breaks cue-labs/services, but that breakage is resolved later on in the chain.",
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4db2749b_4c392cc2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-11T08:39:50Z",
+      "side": 1,
+      "message": "Also updated some comments and renamed some fields (exclude -\u003e embed, del -\u003e embed) to reflect the slightly different roles these fields now play.",
       "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +99,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3033ed3_dce19e92",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-11T08:39:50Z",
+      "side": 1,
+      "message": "Yeah, comment removed.",
+      "parentUuid": "9beade51_31289fc0",
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da63157c_6a2be8b6",
@@ -75,6 +134,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1280ca6d_a263b60e",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-11T08:39:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da63157c_6a2be8b6",
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db69824b_469a7185",
@@ -88,6 +165,30 @@
       "writtenOn": "2025-06-11T07:28:51Z",
       "side": 1,
       "message": "separate",
+      "range": {
+        "startLine": 393,
+        "startChar": 30,
+        "endLine": 393,
+        "endChar": 39
+      },
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f7cb5fb_b92b74c0",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-11T08:39:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db69824b_469a7185",
       "range": {
         "startLine": 393,
         "startChar": 30,
@@ -117,6 +218,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c36ecb37_2dd2b039",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-11T08:39:50Z",
+      "side": 1,
+      "message": "Triple? They are consecutive loops. Also \"outer scopes\" are typically not very deep, so one can expect the list to be small.",
+      "parentUuid": "5c3cde6d_1bf1e662",
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5a6216ac_95919604",
         "filename": "internal/core/adt/typocheck.go",
         "patchSetId": 10
@@ -128,6 +247,24 @@
       "writtenOn": "2025-06-11T07:28:51Z",
       "side": 1,
       "message": "document? it seems less obvious than the rest.",
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d50be25_966357a4",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 682,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-11T08:39:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a6216ac_95919604",
       "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

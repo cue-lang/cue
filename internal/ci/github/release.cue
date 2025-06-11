@@ -67,8 +67,6 @@ workflows: release: _repo.bashWorkflow & {
 				}
 			},
 
-			_repo.loginCentralRegistry,
-
 			githubactions.#Step & {
 				name: "Install GoReleaser"
 				uses: "goreleaser/goreleaser-action@v5"

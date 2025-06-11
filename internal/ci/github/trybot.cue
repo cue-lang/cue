@@ -65,8 +65,6 @@ workflows: trybot: _repo.bashWorkflow & {
 				// are established by running each tool.
 				for v in _setupGoActionsCaches {v},
 
-				_repo.loginCentralRegistry,
-
 				_repo.earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
 					// so we only need to run them on one of the matrix jobs.

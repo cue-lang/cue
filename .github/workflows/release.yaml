@@ -74,7 +74,6 @@ jobs:
           registry: docker.io
           username: cueckoo
           password: ${{ secrets.CUECKOO_DOCKER_PAT }}
-      - run: go run cuelang.org/go/cmd/cue login --token=${{ secrets.NOTCUECKOO_CUE_TOKEN }}
       - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b7b19dd_54981d54",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-06-11T13:13:39Z",
+      "side": 1,
+      "message": "Done. I had imagined that if we had analytics on the redirector pages in the future, perhaps including HTTP referrer info, funnelling these clicks via cuelang.org would give us data on the relative volumes/popularity of consumers coming from (say) GitHub vs pkg.go.dev itself vs etc...",
+      "parentUuid": "a92d2cdc_78237f04",
+      "revId": "0ee028299763e59c82352bf99259d5fcb02516f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "03cf9c86_a5921497",
@@ -58,6 +76,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52c46211_8eea8aec",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-06-11T13:13:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "03cf9c86_a5921497",
+      "range": {
+        "startLine": 29,
+        "startChar": 39,
+        "endLine": 29,
+        "endChar": 55
+      },
+      "revId": "0ee028299763e59c82352bf99259d5fcb02516f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aaa95c82_f0903c2e",
@@ -71,6 +113,24 @@
       "writtenOn": "2025-06-11T07:52:49Z",
       "side": 1,
       "message": "ditto - I think Go doc links should remain on pkg.go.dev",
+      "revId": "0ee028299763e59c82352bf99259d5fcb02516f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8369f047_dfb445b2",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-06-11T13:13:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aaa95c82_f0903c2e",
       "revId": "0ee028299763e59c82352bf99259d5fcb02516f9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

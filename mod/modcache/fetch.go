@@ -7,7 +7,7 @@ import (
 	"io"
 	"io/fs"
 	"log"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"path/filepath"
 	"slices"
@@ -361,8 +361,8 @@ func quoteGlob(s string) string {
 
 // tempFile creates a new temporary file with given permission bits.
 func tempFile(ctx context.Context, dir, prefix string, perm fs.FileMode) (f *os.File, err error) {
-	for i := 0; i < 10000; i++ {
-		name := filepath.Join(dir, prefix+strconv.Itoa(rand.Intn(1000000000))+".tmp")
+	for range 10000 {
+		name := filepath.Join(dir, prefix+strconv.Itoa(rand.IntN(1000000000))+".tmp")
 		f, err = os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_EXCL, perm)
 		if os.IsExist(err) {
 			if ctx.Err() != nil {

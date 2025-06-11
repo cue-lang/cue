@@ -16,7 +16,7 @@ package toposort_test
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"slices"
 	"strconv"
@@ -138,9 +138,9 @@ func TestSortFullyConnected(t *testing.T) {
 }
 
 func TestSortRandom(t *testing.T) {
-	seed := rand.Int63()
+	seed := rand.Uint64()
 	if str := os.Getenv("SEED"); str != "" {
-		num, err := strconv.ParseInt(str, 10, 64)
+		num, err := strconv.ParseUint(str, 10, 64)
 		if err != nil {
 			t.Fatalf("Could not parse SEED env var %q: %v", str, err)
 			return
@@ -148,18 +148,18 @@ func TestSortRandom(t *testing.T) {
 		seed = num
 	}
 	t.Log("Seed", seed)
-	rng := rand.New(rand.NewSource(seed))
+	rng := rand.New(rand.NewPCG(seed, 123))
 
 	names := strings.Split("abcdefghijklm", "")
 	index := runtime.New()
 
-	for n := 0; n < 100; n++ {
-		inputs := make([][]string, 2+rng.Intn(4))
+	for n := range 100 {
+		inputs := make([][]string, 2+rng.IntN(4))
 		for i := range inputs {
 			names := slices.Clone(names)
 			rng.Shuffle(len(names),
 				func(i, j int) { names[i], names[j] = names[j], names[i] })
-			inputs[i] = names[:2+rng.Intn(4)]
+			inputs[i] = names[:2+rng.IntN(4)]
 		}
 
 		t.Run(fmt.Sprint(n), func(t *testing.T) {

@@ -7,7 +7,7 @@ package par
 
 import (
 	"errors"
-	"math/rand"
+	"math/rand/v2"
 	"sync"
 	"sync/atomic"
 )
@@ -93,7 +93,7 @@ func (w *Work[T]) runner() {
 		// to eliminate pathological contention
 		// in case items added at about the same time
 		// are most likely to contend.
-		i := rand.Intn(len(w.todo))
+		i := rand.IntN(len(w.todo))
 		item := w.todo[i]
 		w.todo[i] = w.todo[len(w.todo)-1]
 		w.todo = w.todo[:len(w.todo)-1]

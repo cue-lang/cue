@@ -17,7 +17,7 @@
 package v1
 
 import (
-	status_1 "google.golang.org/genproto/googleapis/rpc/status"
+	status_9 "google.golang.org/genproto/googleapis/rpc/status"
 	"time"
 )
 
@@ -59,7 +59,7 @@ import (
 	#PreconditionResult: {
 		// A status code of OK indicates all preconditions were satisfied. Any other code indicates not
 		// all preconditions were satisfied and details describe why.
-		status?: status_1.#Status @protobuf(1,google.rpc.Status,"(gogoproto.nullable)=false")
+		status?: status_9.#Status @protobuf(1,google.rpc.Status,"(gogoproto.nullable)=false")
 
 		// The amount of time for which this result can be considered valid.
 		validDuration?: time.Duration @protobuf(2,google.protobuf.Duration,name=valid_duration,"(gogoproto.nullable)=false","(gogoproto.stdduration)")

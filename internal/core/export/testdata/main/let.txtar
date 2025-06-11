@@ -196,8 +196,8 @@ scoped: {
 		}]
 	}
 	listEmbed: {
-		let Args_8 = _args
-		a: [Args_8.required]
+		let Args_A = _args
+		a: [Args_A.required]
 	}
 }
 x: "foo"
@@ -229,9 +229,9 @@ incomplete: {
 	}
 	d: {
 		let A_4 = run.a
-		let A_32 = run2.a
+		let A_9 = run2.a
 		x:  "a \(A_4) z"
-		x2: "a \(A_32) z"
+		x2: "a \(A_9) z"
 		run: {
 			a: string
 		}
@@ -242,13 +242,13 @@ incomplete: {
 }
 unresolvedDisjunction: {
 	#TypePrimitive: {
-		let Args_9 = _args
+		let Args_D = _args
 		{
 			"*": {}
 		} | {
 			bool: #TypeBool & {
 				_args: {
-					required: Args_9.required
+					required: Args_D.required
 				}
 			}
 		}
@@ -257,12 +257,12 @@ unresolvedDisjunction: {
 		}
 	}
 	#TypeBool: {
-		let Args_B = _args
+		let Args_F = _args
 		_args: {
 			required: bool
 		}
 
-		if !Args_B.required {
+		if !Args_F.required {
 			// `default` sets the default value.
 			default: bool | null
 		}

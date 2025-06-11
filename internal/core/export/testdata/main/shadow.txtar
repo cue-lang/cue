@@ -148,22 +148,22 @@ shadowField: issue2378: {
 -- out/definition --
 shadowRef: {
 	t1: {
-		x_1=x: {
-			x: x_1 | null
+		x_9=x: {
+			x: x_9 | null
 		}
 	}
 	t2: {
-		x_5=x: {
+		x_B=x: {
 			x: {
-				x: x_5 | null
+				x: x_B | null
 			}
 		}
 	}
 	t3: {
 		x: {
 			x: {
-				x_A=x: {
-					x: x_A | null
+				x_6=x: {
+					x: x_6 | null
 				}
 			}
 		}
@@ -180,8 +180,8 @@ shadowRef: {
 		}
 	}
 	e1: {
-		x_8=x: {
-			x: x_8
+		x_0=x: {
+			x: x_0
 		}
 	}
 }

@@ -47,11 +47,11 @@ func TestSanitize(t *testing.T) {
 		}(),
 		want: `import (
 	// will be renamed
-	list_1 "list"
+	list_9 "list"
 )
 
 {
-	list: list_1.Min()
+	list: list_9.Min()
 }
 `,
 	}, {
@@ -69,10 +69,10 @@ func TestSanitize(t *testing.T) {
 				},
 			}}
 		}(),
-		want: `import list_1 "list"
+		want: `import list_9 "list"
 
 a: {
-	list: list_1.Min()
+	list: list_9.Min()
 }
 `,
 	}, {
@@ -122,14 +122,14 @@ package pkg
 
 import (
 	"bar"
-	bar_1 "foo/bar"
-	bar_5 "foo"
+	bar_9 "foo/bar"
+	bar_B "foo"
 )
 
 a: {
 	b: bar.A()
-	c: bar_1.A()
-	d: bar_5.A()
+	c: bar_9.A()
+	d: bar_B.A()
 }
 `,
 	}, {
@@ -158,13 +158,13 @@ a: {
 		}(),
 		want: `import (
 	bar "foo"
-	bar_1 "bar"
-	bar_5 "foo/bar"
+	bar_9 "bar"
+	bar_B "foo/bar"
 )
 
 a: {
-	b: bar_1.A()
-	c: bar_5.A()
+	b: bar_9.A()
+	c: bar_B.A()
 	d: bar.A()
 }
 `,
@@ -228,11 +228,11 @@ a: {
 			},
 		}},
 		want: `a: {
-	b: c_1
+	b: c_9
 	c: d
 }
 
-let c_1 = c
+let c_9 = c
 `,
 	}, {
 		desc: "Add alias to shadowed field",
@@ -256,10 +256,10 @@ let c_1 = c
 				},
 			}}
 		}(),
-		want: `a_1=a: "b"
+		want: `a_9=a: "b"
 c: {
 	a: {}
-	b: a_1
+	b: a_9
 	c: d
 }
 `,
@@ -291,12 +291,12 @@ c: {
 				},
 			}}
 		}(),
-		want: `a_1=a: "b"
+		want: `a_9=a: "b"
 c: {
 	a: {}
-	b: a_1
+	b: a_9
 	c: d
-	e: a_1
+	e: a_9
 }
 `,
 	}, {
@@ -342,14 +342,14 @@ c: {
 			}}
 		}(),
 		want: `
-let X_1 = X
+let X_9 = X
 X=a: "b"
 Y=q: "b"
 c: {
 	a: {}
 	b: X
 	c: d
-	e: X_1
+	e: X_9
 	f: Y
 }
 `,
@@ -382,11 +382,11 @@ c: {
 			}}
 		}(),
 		want: `b: {
-	a_1=a: "b"
+	a_9=a: "b"
 	b: {
 		a: "bar"
-		b: a_1
-		e: a_1
+		b: a_9
+		e: a_9
 	}
 }
 `,
@@ -422,12 +422,12 @@ c: {
 			}}
 		}(),
 		want: `b: {
-	let X_1 = X
+	let X_9 = X
 	X=a: "b"
 	b: {
 		a: "bar"
-		b: X_1
-		e: X_1
+		b: X_9
+		e: X_9
 	}
 }
 `,

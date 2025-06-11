@@ -1,0 +1,135 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6128ae79_d9282fec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:28:51Z",
+      "side": 1,
+      "message": "Embeddings, as the rest of the sentence works with a plural? Otherwise rewrite the rest to work with the singular, e.g. \"refers\" and \"closes\".",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 9
+      },
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e99d70f_8fc4d30c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:28:51Z",
+      "side": 1,
+      "message": "For reference regarding Unity: this fixes Greymatter, and breaks cue-labs/services, but that breakage is resolved later on in the chain.",
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9beade51_31289fc0",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:28:51Z",
+      "side": 1,
+      "message": "is this \"ignore\" field in the TODO related to the new reqSet.ignore field?",
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da63157c_6a2be8b6",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:28:51Z",
+      "side": 1,
+      "message": "unfininshed line?",
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db69824b_469a7185",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:28:51Z",
+      "side": 1,
+      "message": "separate",
+      "range": {
+        "startLine": 393,
+        "startChar": 30,
+        "endLine": 393,
+        "endChar": 39
+      },
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c3cde6d_1bf1e662",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:28:51Z",
+      "side": 1,
+      "message": "this triple loop is making me nervous - should there be a performance TODO here?",
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a6216ac_95919604",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 682,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T07:28:51Z",
+      "side": 1,
+      "message": "document? it seems less obvious than the rest.",
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

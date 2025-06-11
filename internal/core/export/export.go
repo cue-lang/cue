@@ -16,7 +16,7 @@ package export
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -644,7 +644,7 @@ type featureSet interface {
 }
 
 func (e *exporter) intn(n int) int {
-	return e.rand.Intn(n)
+	return e.rand.IntN(n)
 }
 
 func (e *exporter) makeFeature(s string) (f adt.Feature, ok bool) {
@@ -665,7 +665,7 @@ func (e *exporter) makeFeature(s string) (f adt.Feature, ok bool) {
 // clearer this concerns a generated number.
 func (e *exporter) uniqueFeature(base string) (f adt.Feature, name string) {
 	if e.rand == nil {
-		e.rand = rand.New(rand.NewSource(808))
+		e.rand = rand.New(rand.NewPCG(123, 456)) // ensure determinism between runs
 	}
 	return findUnique(e, base)
 }

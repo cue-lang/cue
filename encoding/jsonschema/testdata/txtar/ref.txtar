@@ -67,7 +67,7 @@
 import (
 	"acme.com/external.json:external"
 	"acme.com/external-foo.json:schema"
-	schema_1 "acme.com/external-bar.json:schema"
+	schema_9 "acme.com/external-bar.json:schema"
 )
 
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
@@ -100,7 +100,7 @@ shipping_address?: #address
 		h?: external._#defs."/properties/foo"
 		i?: external
 		j?: schema
-		k?: schema_1
+		k?: schema_9
 		z?: _
 		...
 	}

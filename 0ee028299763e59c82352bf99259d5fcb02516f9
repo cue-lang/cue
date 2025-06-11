@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eed7b9b3_562fdbfb",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T15:02:13Z",
+      "side": 1,
+      "message": "ah gotcha. I think most Go docs consumers will go directly to pkg.go.dev anyway, and AFAIK it doesn\u0027t give us any sort of stats, so I don\u0027t think this is particularly useful in the near future.",
+      "parentUuid": "3b7b19dd_54981d54",
+      "revId": "0ee028299763e59c82352bf99259d5fcb02516f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "03cf9c86_a5921497",

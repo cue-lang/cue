@@ -82,6 +82,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bca0aea8_e7c5bf38",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T08:40:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4db2749b_4c392cc2",
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9beade51_31289fc0",
@@ -230,6 +248,24 @@
       "side": 1,
       "message": "Triple? They are consecutive loops. Also \"outer scopes\" are typically not very deep, so one can expect the list to be small.",
       "parentUuid": "5c3cde6d_1bf1e662",
+      "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e51861c_b55893eb",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-11T08:40:57Z",
+      "side": 1,
+      "message": "Sorry, I misread. It\u0027s two nested loops, not three.",
+      "parentUuid": "c36ecb37_2dd2b039",
       "revId": "f1760c5aef528b29637c054b21a7a4da1dc48a15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

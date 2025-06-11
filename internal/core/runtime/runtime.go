@@ -33,7 +33,6 @@ type Runtime struct {
 	interpreters map[string]Interpreter
 
 	version            internal.EvaluatorVersion
-	topoSort           bool
 	simplifyValidators bool
 
 	flags cuedebug.Config
@@ -45,7 +44,6 @@ func (r *Runtime) Settings() (internal.EvaluatorVersion, cuedebug.Config) {
 
 func (r *Runtime) ConfigureOpCtx(ctx *adt.OpContext) {
 	ctx.Version = r.version
-	ctx.TopoSort = r.topoSort
 	ctx.SimplifyValidators = r.simplifyValidators
 	ctx.Config = r.flags
 }
@@ -95,17 +93,10 @@ func (r *Runtime) SetVersion(v internal.EvaluatorVersion) {
 	}
 }
 
-// SetTopologicalSort sets whether or not to use topological sorting
-// for the Runtime.
-func (r *Runtime) SetTopologicalSort(b bool) {
-	r.topoSort = b
-}
-
 // SetDebugOptions sets the debug flags to use for the Runtime. This should only
 // be set before first use.
 func (r *Runtime) SetDebugOptions(flags *cuedebug.Config) {
 	r.flags = *flags
-	r.topoSort = r.topoSort || r.flags.SortFields
 }
 
 // IsInitialized reports whether the runtime has been initialized.
@@ -127,8 +118,6 @@ func (r *Runtime) Init() {
 	r.loaded = map[*build.Instance]interface{}{}
 
 	r.SetVersion(internal.DefaultVersion)
-	cueexperiment.Init()
-	r.topoSort = cueexperiment.Flags.TopoSort
 
 	// By default we follow the environment's CUE_DEBUG settings,
 	// which can be overriden via [Runtime.SetDebugOptions],

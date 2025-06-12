@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "282c3000_093a03a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-12T15:54:47Z",
+      "side": 1,
+      "message": "It makes the logic a bit awkward, which may introduce bugs. I figured I keep it as we plan to remove it at some point anyway.",
+      "parentUuid": "91c147bc_f0a3aa19",
+      "revId": "06f09439778e9005e5809a4fe5c26440771e8e98",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a5b8c927_6dbcd8ab",
         "filename": "cue/cuecontext/cuecontext.go",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2025-06-12T13:22:21Z",
       "side": 1,
       "message": "for consistency with CUE_DEBUG and the env var names, this needs to be CUE_EXPERIMENT",
+      "revId": "06f09439778e9005e5809a4fe5c26440771e8e98",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "585f21a9_a33903bd",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-12T15:54:47Z",
+      "side": 1,
+      "message": "Ah yes, meant to do that. Done.",
+      "parentUuid": "a5b8c927_6dbcd8ab",
       "revId": "06f09439778e9005e5809a4fe5c26440771e8e98",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -48,6 +84,24 @@
       "writtenOn": "2025-06-12T13:22:21Z",
       "side": 1,
       "message": "surely this should apply the value of EvalV3 as well? It would be odd if `cuecontext.CUE_EXPERIMENT(\"evalv3\u003d0\")` did nothing at all.",
+      "revId": "06f09439778e9005e5809a4fe5c26440771e8e98",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb39f8c8_6e4027b0",
+        "filename": "internal/core/runtime/runtime.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-12T15:54:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ec94cbcd_77074d63",
       "revId": "06f09439778e9005e5809a4fe5c26440771e8e98",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

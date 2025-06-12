@@ -460,8 +460,6 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 
 	// Filter cases where we do not need to track the definition.
 	switch x := x.(type) {
-	case *DisjunctionExpr, *Disjunction:
-		return id
 	case *BinaryExpr:
 		if x.Op != AndOp {
 			return id

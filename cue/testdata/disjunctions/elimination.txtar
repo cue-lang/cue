@@ -647,6 +647,18 @@ issue3784: variant2: {
 		cname?: string
 	}
 }
+-- issue3958.cue --
+issue3958: t1: {
+	#schema: int | *1
+	#schema: int | *3
+
+	test1: #schema & {int | *2}
+	test2: #schema & {int | *4}
+}
+issue3958: t2: {
+ 	a: (int | *4) & (int | *1) & (int | *3) & (int | *8)
+	b: (int | *4) & (int | *1) & (int | *3)
+}
 -- out/evalalpha --
 (struct){
   disambiguateClosed: (struct){
@@ -1732,6 +1744,17 @@ issue3784: variant2: {
       }
     }
   }
+  issue3958: (struct){
+    t1: (struct){
+      #schema: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }) }
+      test1: (int){ |(*(int){ 3 }, (int){ int }, (int){ 1 }, (int){ 2 }) }
+      test2: (int){ |(*(int){ 3 }, (int){ int }, (int){ 1 }, (int){ 4 }) }
+    }
+    t2: (struct){
+      a: (int){ |((int){ int }, (int){ 8 }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
+      b: (int){ |(*(int){ 3 }, (int){ int }, (int){ 1 }, (int){ 4 }) }
+    }
+  }
   issue770: (struct){
     #A: (#struct){
       v: (string){ |((string){ "a" }, (string){ "b" }, (string){ "c" }) }
@@ -2608,7 +2631,23 @@ diff old new
        }
      }
    }
-@@ -1216,10 +1097,10 @@
+@@ -1204,12 +1085,12 @@
+   issue3958: (struct){
+     t1: (struct){
+       #schema: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }) }
+-      test1: (int){ |((int){ int }, (int){ 2 }, (int){ 3 }, (int){ 1 }) }
+-      test2: (int){ |((int){ int }, (int){ 4 }, (int){ 3 }, (int){ 1 }) }
++      test1: (int){ |(*(int){ 3 }, (int){ int }, (int){ 1 }, (int){ 2 }) }
++      test2: (int){ |(*(int){ 3 }, (int){ int }, (int){ 1 }, (int){ 4 }) }
+     }
+     t2: (struct){
+       a: (int){ |((int){ int }, (int){ 8 }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
+-      b: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
++      b: (int){ |(*(int){ 3 }, (int){ int }, (int){ 1 }, (int){ 4 }) }
+     }
+   }
+   issue770: (struct){
+@@ -1227,10 +1108,10 @@
          v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
        }
        c: (#struct){
@@ -2622,57 +2661,57 @@ diff old new
      }
    }
 -- out/evalalpha/stats --
-Leaks:  2786
+Leaks:  2856
 Freed:  0
 Reused: 0
-Allocs: 2786
+Allocs: 2856
 Retain: 0
 
-Unifications: 686
-Conjuncts:    2767
-Disjuncts:    1290
+Unifications: 694
+Conjuncts:    2853
+Disjuncts:    1352
 
 CloseIDElems: 4360
-NumCloseIDs: 277
+NumCloseIDs: 281
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,12 +1,12 @@
 -Leaks:  9
--Freed:  2786
--Reused: 2771
+-Freed:  2856
+-Reused: 2841
 -Allocs: 24
 -Retain: 123
 -
--Unifications: 1427
--Conjuncts:    4068
--Disjuncts:    2909
+-Unifications: 1435
+-Conjuncts:    4154
+-Disjuncts:    2979
 -
 -CloseIDElems: 0
 -NumCloseIDs: 10
-+Leaks:  2786
++Leaks:  2856
 +Freed:  0
 +Reused: 0
-+Allocs: 2786
++Allocs: 2856
 +Retain: 0
 +
-+Unifications: 686
-+Conjuncts:    2767
-+Disjuncts:    1290
++Unifications: 694
++Conjuncts:    2853
++Disjuncts:    1352
 +
 +CloseIDElems: 4360
-+NumCloseIDs: 277
++NumCloseIDs: 281
 -- out/eval/stats --
 Leaks:  9
-Freed:  2786
-Reused: 2771
+Freed:  2856
+Reused: 2841
 Allocs: 24
 Retain: 123
 
-Unifications: 1427
-Conjuncts:    4068
-Disjuncts:    2909
+Unifications: 1435
+Conjuncts:    4154
+Disjuncts:    2979
 
 CloseIDElems: 0
 NumCloseIDs: 10
@@ -3889,6 +3928,17 @@ Result:
         }
         cname?: (string){ string }
       }
+    }
+  }
+  issue3958: (struct){
+    t1: (struct){
+      #schema: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }) }
+      test1: (int){ |((int){ int }, (int){ 2 }, (int){ 3 }, (int){ 1 }) }
+      test2: (int){ |((int){ int }, (int){ 4 }, (int){ 3 }, (int){ 1 }) }
+    }
+    t2: (struct){
+      a: (int){ |((int){ int }, (int){ 8 }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
+      b: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
     }
   }
   issue770: (struct){
@@ -5156,6 +5206,27 @@ Result:
         }
         cname?: string
       }
+    }
+  }
+}
+--- issue3958.cue
+{
+  issue3958: {
+    t1: {
+      #schema: (int|*1)
+      #schema: (int|*3)
+      test1: (〈0;#schema〉 & {
+        (int|*2)
+      })
+      test2: (〈0;#schema〉 & {
+        (int|*4)
+      })
+    }
+  }
+  issue3958: {
+    t2: {
+      a: ((((int|*4) & (int|*1)) & (int|*3)) & (int|*8))
+      b: (((int|*4) & (int|*1)) & (int|*3))
     }
   }
 }

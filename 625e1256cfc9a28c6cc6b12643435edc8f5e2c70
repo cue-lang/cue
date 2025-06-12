@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "056b7ccf_ce6ecbb1",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 436,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-12T15:58:25Z",
+      "side": 1,
+      "message": "this TODO seems out of date now? e.g. it mentions the \"true\" argument which is now false.",
+      "revId": "625e1256cfc9a28c6cc6b12643435edc8f5e2c70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

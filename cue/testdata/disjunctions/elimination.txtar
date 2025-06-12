@@ -1747,12 +1747,12 @@ issue3958: t2: {
   issue3958: (struct){
     t1: (struct){
       #schema: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }) }
-      test1: (int){ |(*(int){ 3 }, (int){ int }, (int){ 1 }, (int){ 2 }) }
-      test2: (int){ |(*(int){ 3 }, (int){ int }, (int){ 1 }, (int){ 4 }) }
+      test1: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 2 }) }
+      test2: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
     }
     t2: (struct){
       a: (int){ |((int){ int }, (int){ 8 }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
-      b: (int){ |(*(int){ 3 }, (int){ int }, (int){ 1 }, (int){ 4 }) }
+      b: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
     }
   }
   issue770: (struct){
@@ -2631,22 +2631,17 @@ diff old new
        }
      }
    }
-@@ -1204,12 +1085,12 @@
+@@ -1204,8 +1085,8 @@
    issue3958: (struct){
      t1: (struct){
        #schema: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }) }
 -      test1: (int){ |((int){ int }, (int){ 2 }, (int){ 3 }, (int){ 1 }) }
 -      test2: (int){ |((int){ int }, (int){ 4 }, (int){ 3 }, (int){ 1 }) }
-+      test1: (int){ |(*(int){ 3 }, (int){ int }, (int){ 1 }, (int){ 2 }) }
-+      test2: (int){ |(*(int){ 3 }, (int){ int }, (int){ 1 }, (int){ 4 }) }
++      test1: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 2 }) }
++      test2: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
      }
      t2: (struct){
        a: (int){ |((int){ int }, (int){ 8 }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
--      b: (int){ |((int){ int }, (int){ 3 }, (int){ 1 }, (int){ 4 }) }
-+      b: (int){ |(*(int){ 3 }, (int){ int }, (int){ 1 }, (int){ 4 }) }
-     }
-   }
-   issue770: (struct){
 @@ -1227,10 +1108,10 @@
          v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
        }

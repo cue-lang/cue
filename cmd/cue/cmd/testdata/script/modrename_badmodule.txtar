@@ -1,0 +1,8 @@
+# Test that we see an error when the module cannot be loaded
+
+# TODO this should be an error
+exec cue mod rename other.org
+
+-- cue.mod/module.cue --
+// Note: no language version
+module: "main.org"

@@ -1,15 +1,39 @@
-! exec cue def ./a
-stderr 'panic: not a string label'
+exec cue def ./a
+cmp stdout a-stdout
 
-! exec cue def ./b
-stderr 'panic: not a string label'
+exec cue def ./b
+cmp stdout b-stdout
 
-! exec cue def ./c
-stderr 'panic: not a string label'
+exec cue def ./c
+cmp stdout c-stdout
 
-! exec cue def ./d
-stderr 'panic: not a string label'
+exec cue def ./d
+cmp stdout d-stdout
 
+-- a-stdout --
+package a
+
+import #s "strings"
+
+x: #s.ToUpper("foo")
+-- b-stdout --
+package b
+
+import _s "strings"
+
+x: _s.ToUpper("foo")
+-- c-stdout --
+package c
+
+import "test.example/other1:_x"
+
+_x
+-- d-stdout --
+package d
+
+import "test.example/other2:#x"
+
+#x
 -- cue.mod/module.cue --
 module: "test.example"
 language: version: "v0.11.0"

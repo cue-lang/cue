@@ -1622,6 +1622,9 @@ func (p *parser) parseImportSpec(_ int) *ast.ImportSpec {
 	var ident *ast.Ident
 	if p.tok == token.IDENT {
 		ident = p.parseIdent()
+		if isDefinition(ident) {
+			p.errf(p.pos, "cannot import package as definition identifier")
+		}
 	}
 
 	pos := p.pos
@@ -1719,7 +1722,9 @@ func (p *parser) parseFile() *ast.File {
 		if name.Name == "_" && p.mode&declarationErrorsMode != 0 {
 			p.errf(p.pos, "invalid package name _")
 		}
-
+		if isDefinition(name) {
+			p.errf(p.pos, "invalid package name %s", name.Name)
+		}
 		pkg := &ast.Package{
 			PackagePos: pos,
 			Name:       name,
@@ -1755,4 +1760,9 @@ func (p *parser) parseFile() *ast.File {
 	}
 	c.closeNode(p, f)
 	return f
+}
+
+func isDefinition(ident *ast.Ident) bool {
+	return strings.HasPrefix(ident.Name, "#") ||
+		strings.HasPrefix(ident.Name, "_#")
 }

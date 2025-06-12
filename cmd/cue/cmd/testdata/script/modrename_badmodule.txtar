@@ -1,8 +1,10 @@
 # Test that we see an error when the module cannot be loaded
 
-# TODO this should be an error
-exec cue mod rename other.org
+! exec cue mod rename other.org
+cmp stderr want-stderr
 
+-- want-stderr --
+no language version declared in module.cue
 -- cue.mod/module.cue --
 // Note: no language version
 module: "main.org"

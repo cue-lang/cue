@@ -570,8 +570,8 @@ Unifications: 767
 Conjuncts:    1490
 Disjuncts:    78
 
-CloseIDElems: 3539
-NumCloseIDs: 417
+CloseIDElems: 3671
+NumCloseIDs: 422
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -599,8 +599,8 @@ diff old new
 +Conjuncts:    1490
 +Disjuncts:    78
 +
-+CloseIDElems: 3539
-+NumCloseIDs: 417
++CloseIDElems: 3671
++NumCloseIDs: 422
 -- out/eval/stats --
 Leaks:  116
 Freed:  1077
@@ -649,16 +649,6 @@ issue3947.full.out.disallowed: field not allowed:
 issue3957.reduced.c.a: field not allowed:
     ./disjunction.cue:9:5
     ./disjunction.cue:10:11
-issue3964.full.#Output.name: field not allowed:
-    ./issue3964.cue:17:3
-issue3964.full.out: 2 errors in empty disjunction:
-issue3964.full.out.name: field not allowed:
-    ./issue3964.cue:12:3
-    ./issue3964.cue:17:3
-issue3964.full.out.used: field not allowed:
-    ./issue3964.cue:13:3
-issue3964.reduced.#Output.name: field not allowed:
-    ./issue3964.cue:4:3
 embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
     ./validators.cue:25:5
     ./validators.cue:25:12
@@ -1649,13 +1639,9 @@ Result:
         }) }
     }
   }
-  issue3964: (_|_){
-    // [eval]
-    reduced: (_|_){
-      // [eval]
-      #Output: (_|_){
-        // [eval] issue3964.reduced.#Output.name: field not allowed:
-        //     ./issue3964.cue:4:3
+  issue3964: (struct){
+    reduced: (struct){
+      #Output: (#struct){
         name: (string){ string }
       }
       #Embedded: (#struct){
@@ -1666,23 +1652,18 @@ Result:
       #Used: (#struct){
       }
     }
-    full: (_|_){
-      // [eval]
-      out: (_|_){
-        // [eval] issue3964.full.out: 2 errors in empty disjunction:
-        // issue3964.full.out.name: field not allowed:
-        //     ./issue3964.cue:12:3
-        //     ./issue3964.cue:17:3
-        // issue3964.full.out.used: field not allowed:
-        //     ./issue3964.cue:13:3
+    full: (struct){
+      out: (#struct){
         name: (string){ "oauth2" }
         used: (string){ "bar" }
       }
-      #Output: (_|_){
-        // [eval] issue3964.full.#Output.name: field not allowed:
-        //     ./issue3964.cue:17:3
-        name: (string){ string }
-      }
+      #Output: (#struct){ |((#struct){
+          name: (string){ string }
+          unused: (string){ string }
+        }, (#struct){
+          name: (string){ string }
+          used: (string){ string }
+        }) }
       #Embedded: (#struct){ |((#struct){
           name: (string){ string }
           unused: (string){ string }
@@ -1860,7 +1841,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,95 +1,47 @@
+@@ -1,95 +1,37 @@
  Errors:
  and.transitive.err.out.err: field not allowed:
 -    ./in.cue:42:5
@@ -1956,20 +1937,10 @@ diff old new
 -    ./validators.cue:16:6
 -    ./validators.cue:21:5
 -    ./validators.cue:22:5
-+issue3964.full.#Output.name: field not allowed:
-+    ./issue3964.cue:17:3
-+issue3964.full.out: 2 errors in empty disjunction:
-+issue3964.full.out.name: field not allowed:
-+    ./issue3964.cue:12:3
-+    ./issue3964.cue:17:3
-+issue3964.full.out.used: field not allowed:
-+    ./issue3964.cue:13:3
-+issue3964.reduced.#Output.name: field not allowed:
-+    ./issue3964.cue:4:3
  embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
      ./validators.cue:25:5
      ./validators.cue:25:12
-@@ -102,14 +54,12 @@
+@@ -102,14 +44,12 @@
    issue3920: (struct){
      out: (#struct){
        a: (#struct){
@@ -1986,7 +1957,7 @@ diff old new
      }
      #B: (#struct){
        c?: (string){ string }
-@@ -149,10 +99,7 @@
+@@ -149,10 +89,7 @@
          allowed?: (string){ string }
          disallowed: (_|_){
            // [eval] issue3947.full.out.disallowed: field not allowed:
@@ -1997,7 +1968,7 @@ diff old new
          }
        }
      }
-@@ -164,15 +111,9 @@
+@@ -164,15 +101,9 @@
        c: (_|_){
          // [eval]
          a: (_|_){
@@ -2014,7 +1985,7 @@ diff old new
          }
          b?: (string){ string }
        }
-@@ -245,9 +186,6 @@
+@@ -245,9 +176,6 @@
      }
      nestedWithPatterns: (struct){
        out: (#struct){
@@ -2024,7 +1995,7 @@ diff old new
          objs: (#struct){
            obj1: (#struct){
              extra: (string){ "foo" }
-@@ -254,6 +192,9 @@
+@@ -254,6 +182,9 @@
              name?: (int){ int }
            }
          }
@@ -2034,7 +2005,7 @@ diff old new
        }
        #Schema: (#struct){
          #meta: (#struct){
-@@ -344,14 +285,11 @@
+@@ -344,14 +275,11 @@
        }
        a: (_|_){
          // [eval]
@@ -2050,7 +2021,7 @@ diff old new
        }
      }
      andInStruct: (_|_){
-@@ -361,14 +299,11 @@
+@@ -361,14 +289,11 @@
        }
        a: (_|_){
          // [eval]
@@ -2066,7 +2037,7 @@ diff old new
        }
      }
      embedDefWithEmbedding: (_|_){
-@@ -378,15 +313,11 @@
+@@ -378,15 +303,11 @@
        }
        a: (_|_){
          // [eval]
@@ -2083,7 +2054,7 @@ diff old new
        }
      }
      embedComprehension: (_|_){
-@@ -396,16 +327,11 @@
+@@ -396,16 +317,11 @@
        }
        a: (_|_){
          // [eval]
@@ -2101,7 +2072,7 @@ diff old new
        }
      }
      fieldWithAnd: (_|_){
-@@ -416,9 +342,6 @@
+@@ -416,9 +332,6 @@
          // [eval]
          err: (_|_){
            // [eval] embed.fieldWithAnd.a.err: field not allowed:
@@ -2111,7 +2082,7 @@ diff old new
            //     ./in.cue:20:13
          }
        }
-@@ -429,20 +352,15 @@
+@@ -429,20 +342,15 @@
          a: (int){ int }
        }
        B: (struct){
@@ -2137,7 +2108,7 @@ diff old new
        }
      }
      andEmbed: (_|_){
-@@ -458,17 +376,11 @@
+@@ -458,17 +366,11 @@
        }
        d: (_|_){
          // [eval]
@@ -2156,7 +2127,7 @@ diff old new
        }
      }
      nonDef: (struct){
-@@ -477,12 +389,12 @@
+@@ -477,12 +379,12 @@
            a: (string){ string }
          }
          #Y: (#struct){
@@ -2173,7 +2144,7 @@ diff old new
          }
        }
      }
-@@ -492,12 +404,12 @@
+@@ -492,12 +394,12 @@
            Name: (string){ string }
          }
          #Step: (#struct){
@@ -2190,7 +2161,7 @@ diff old new
          }
          out: (#struct){
            Name: (string){ "foo" }
-@@ -507,21 +419,15 @@
+@@ -507,21 +409,15 @@
      }
      withIndirect: (_|_){
        // [eval]
@@ -2217,7 +2188,7 @@ diff old new
      }
      normalValidator: (_|_){
        // [eval]
-@@ -531,20 +437,17 @@
+@@ -531,20 +427,17 @@
        }
        x: (_|_){
          // [eval]
@@ -2241,7 +2212,7 @@ diff old new
          #X: (_){
            matchN(0, (#list){
            })
-@@ -551,17 +454,10 @@
+@@ -551,17 +444,10 @@
            a?: (int){ int }
            b?: (int){ int }
          }
@@ -2263,7 +2234,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -580,10 +476,7 @@
+@@ -580,10 +466,7 @@
            // [eval]
            b: (_|_){
              // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
@@ -2274,7 +2245,7 @@ diff old new
              //     ./validators.cue:28:8
              // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
              //     ./validators.cue:25:5
-@@ -640,16 +533,11 @@
+@@ -640,16 +523,11 @@
          }
          out: (_|_){
            // [eval]
@@ -2292,7 +2263,7 @@ diff old new
          }
        }
      }
-@@ -682,17 +570,11 @@
+@@ -682,17 +560,11 @@
          }
          out: (_|_){
            // [eval]
@@ -2311,7 +2282,7 @@ diff old new
          }
        }
      }
-@@ -738,8 +620,8 @@
+@@ -738,8 +610,8 @@
              //     ./issue3832.cue:8:16
            }
            outFirstName: (_|_){
@@ -2322,7 +2293,7 @@ diff old new
            }
          }
        }
-@@ -749,35 +631,27 @@
+@@ -749,35 +621,27 @@
          }, (#struct){
            pass: (#struct){
              let self#2 = (_|_){
@@ -2368,7 +2339,7 @@ diff old new
        pass: (#struct){
          let self#2 = (#struct){
            firstName: (string){ "Sam" }
-@@ -784,20 +658,24 @@
+@@ -784,20 +648,24 @@
          }
          outFirstName: (string){ "Sam" }
        }
@@ -2407,7 +2378,7 @@ diff old new
      ok: (struct){
        out: (#struct){
          a: (#struct){
-@@ -818,11 +696,18 @@
+@@ -818,11 +686,18 @@
          b: (string){ "foo" }
        }
      }
@@ -2431,7 +2402,7 @@ diff old new
          }
        }
        #A: (#struct){
-@@ -893,12 +778,8 @@
+@@ -893,12 +768,8 @@
          globalField: (string){ string }
        }
        #Context: (#struct){
@@ -2446,7 +2417,7 @@ diff old new
        }
        out: (struct){
          ingress: (#struct){
-@@ -926,22 +807,22 @@
+@@ -926,22 +797,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2485,7 +2456,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -951,22 +832,22 @@
+@@ -951,22 +822,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2524,7 +2495,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -981,11 +862,7 @@
+@@ -981,11 +852,7 @@
          }
        }
        #JobConfig: (#struct){
@@ -2537,7 +2508,7 @@ diff old new
          job: (#struct){
            image: (string){ "foo:v1" }
            vcs: (string){ "git" }
-@@ -1049,7 +926,7 @@
+@@ -1049,7 +916,7 @@
          }
        }
        out: (#struct){
@@ -2546,7 +2517,7 @@ diff old new
            input: (#struct){
              image: (string){ "someimage" }
              env: (string){ "FOO" }
-@@ -1081,11 +958,11 @@
+@@ -1081,11 +948,11 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2563,7 +2534,7 @@ diff old new
            e: (string){ "foo" }
            f: (int){ 1 }
          }
-@@ -1118,24 +995,16 @@
+@@ -1118,24 +985,16 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2598,57 +2569,7 @@ diff old new
      }
    }
    issue3934: (struct){
-@@ -1163,9 +1032,13 @@
-         }) }
-     }
-   }
--  issue3964: (struct){
--    reduced: (struct){
--      #Output: (#struct){
-+  issue3964: (_|_){
-+    // [eval]
-+    reduced: (_|_){
-+      // [eval]
-+      #Output: (_|_){
-+        // [eval] issue3964.reduced.#Output.name: field not allowed:
-+        //     ./issue3964.cue:4:3
-         name: (string){ string }
-       }
-       #Embedded: (#struct){
-@@ -1176,18 +1049,23 @@
-       #Used: (#struct){
-       }
-     }
--    full: (struct){
--      out: (#struct){
-+    full: (_|_){
-+      // [eval]
-+      out: (_|_){
-+        // [eval] issue3964.full.out: 2 errors in empty disjunction:
-+        // issue3964.full.out.name: field not allowed:
-+        //     ./issue3964.cue:12:3
-+        //     ./issue3964.cue:17:3
-+        // issue3964.full.out.used: field not allowed:
-+        //     ./issue3964.cue:13:3
-         name: (string){ "oauth2" }
-         used: (string){ "bar" }
-       }
--      #Output: (#struct){ |((#struct){
--          name: (string){ string }
--          unused: (string){ string }
--        }, (#struct){
--          name: (string){ string }
--          used: (string){ string }
--        }) }
-+      #Output: (_|_){
-+        // [eval] issue3964.full.#Output.name: field not allowed:
-+        //     ./issue3964.cue:17:3
-+        name: (string){ string }
-+      }
-       #Embedded: (#struct){ |((#struct){
-           name: (string){ string }
-           unused: (string){ string }
-@@ -1222,7 +1100,7 @@
+@@ -1222,7 +1081,7 @@
            op: (string){ "add" }
            path: (string){ "/metadata" }
            value: (_|_){
@@ -2657,7 +2578,7 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -1251,38 +1129,11 @@
+@@ -1251,38 +1110,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -2698,7 +2619,7 @@ diff old new
          let base#7 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -1301,7 +1152,7 @@
+@@ -1301,7 +1133,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
                value: (_|_){
@@ -2707,7 +2628,7 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
-@@ -1325,6 +1176,19 @@
+@@ -1325,6 +1157,19 @@
              }
            }
          }
@@ -2727,7 +2648,7 @@ diff old new
        }
      }
      out: (#struct){
-@@ -1354,17 +1218,8 @@
+@@ -1354,17 +1199,8 @@
              //     ./validators.cue:36:17
              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
              //     ./validators.cue:33:22

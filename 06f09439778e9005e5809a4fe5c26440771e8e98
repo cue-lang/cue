@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91c147bc_f0a3aa19",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-12T13:22:21Z",
+      "side": 1,
+      "message": "is it worth also renaming the internal simplifyValidators field to align with the renamed KeepValidators?",
+      "revId": "06f09439778e9005e5809a4fe5c26440771e8e98",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5b8c927_6dbcd8ab",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-12T13:22:21Z",
+      "side": 1,
+      "message": "for consistency with CUE_DEBUG and the env var names, this needs to be CUE_EXPERIMENT",
+      "revId": "06f09439778e9005e5809a4fe5c26440771e8e98",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec94cbcd_77074d63",
+        "filename": "internal/core/runtime/runtime.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-12T13:22:21Z",
+      "side": 1,
+      "message": "surely this should apply the value of EvalV3 as well? It would be odd if `cuecontext.CUE_EXPERIMENT(\"evalv3\u003d0\")` did nothing at all.",
+      "revId": "06f09439778e9005e5809a4fe5c26440771e8e98",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

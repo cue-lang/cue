@@ -16,6 +16,24 @@
       "message": "this TODO seems out of date now? e.g. it mentions the \"true\" argument which is now false.",
       "revId": "625e1256cfc9a28c6cc6b12643435edc8f5e2c70",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de0d487c_031f0b9a",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 436,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-12T16:40:21Z",
+      "side": 1,
+      "message": "Ah, yes, the boolean argument flipped. Updated.",
+      "parentUuid": "056b7ccf_ce6ecbb1",
+      "revId": "625e1256cfc9a28c6cc6b12643435edc8f5e2c70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

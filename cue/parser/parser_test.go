@@ -235,6 +235,26 @@ func TestParse(t *testing.T) {
 		`,
 		`package k8s, {}`,
 	}, {
+		"invalid package identifier: definition",
+		`package #x`,
+		`package #x
+invalid package name #x`,
+	}, {
+		"invalid package identifier: hidden definition",
+		`package _#x`,
+		`package _#x
+invalid package name _#x`,
+	}, {
+		"invalid import identifier: definition",
+		`import #x "foo"`,
+		`import #x "foo"
+cannot import package as definition identifier`,
+	}, {
+		"invalid import identifier: hidden definition",
+		`import _#x "foo"`,
+		`import _#x "foo"
+cannot import package as definition identifier`,
+	}, {
 		"imports group",
 		`package k8s
 

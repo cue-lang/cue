@@ -1,5 +1,5 @@
-exec cue def ./a
-cmp stdout a-stdout
+! exec cue def ./a
+cmp stderr a-stderr
 
 exec cue def ./b
 cmp stdout b-stdout
@@ -7,15 +7,12 @@ cmp stdout b-stdout
 exec cue def ./c
 cmp stdout c-stdout
 
-exec cue def ./d
-cmp stdout d-stdout
+! exec cue def ./d
+cmp stderr d-stderr
 
--- a-stdout --
-package a
-
-import #s "strings"
-
-x: #s.ToUpper("foo")
+-- a-stderr --
+cannot import package as definition identifier:
+    ./a/a.cue:3:11
 -- b-stdout --
 package b
 
@@ -28,12 +25,9 @@ package c
 import "test.example/other1:_x"
 
 _x
--- d-stdout --
-package d
-
-import "test.example/other2:#x"
-
-#x
+-- d-stderr --
+test.example/d@v0: import failed: cannot find package "test.example/other2": cannot get imports: cannot read "other2/other.cue": invalid package name #x:
+    ./d/d.cue:3:8
 -- cue.mod/module.cue --
 module: "test.example"
 language: version: "v0.11.0"

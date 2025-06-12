@@ -60,7 +60,7 @@ type modRenamer struct {
 func runModRename(cmd *Command, args []string) error {
 	modFilePath, mf, _, err := readModuleFile()
 	if err != nil {
-		return nil
+		return err
 	}
 	if mf.Module == args[0] {
 		// Nothing to do

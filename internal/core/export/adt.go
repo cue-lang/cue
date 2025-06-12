@@ -484,13 +484,13 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 
 	case *adt.ImportReference:
 		importPath := x.ImportPath.StringValue(e.index)
+		info := ast.ParseImportPath(importPath)
 		spec := ast.NewImport(nil, importPath)
 
-		info, _ := astutil.ParseImportSpec(spec)
-		name := info.PkgName
+		name := info.Qualifier
 		if x.Label != 0 {
-			name = x.Label.StringValue(e.index)
-			if name != info.PkgName {
+			name = x.Label.IdentString(e.index)
+			if name != info.Qualifier {
 				spec.Name = ast.NewIdent(name)
 			}
 		}

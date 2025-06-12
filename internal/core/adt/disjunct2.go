@@ -383,8 +383,8 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 	// buffer may grow and has a max size of len(cross) * len(dn.disjuncts).
 	tmp := make([]*nodeContext, 0, len(cross))
 
-	leftHasDefault := false
-	rightHasDefault := false
+	leftDropsDefault := true
+	rightDropsDefault := true
 
 	for i, p := range cross {
 		ID := n.nextCrossProduct(i, len(cross), p)
@@ -406,20 +406,21 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 			}
 
 			tmp = append(tmp, r)
-			if p.defaultMode == isDefault {
-				leftHasDefault = true
+			if p.defaultMode == isDefault || p.origDefaultMode == isDefault {
+				leftDropsDefault = false
 			}
 			if d.mode == isDefault {
-				rightHasDefault = true
+				rightDropsDefault = false
 			}
 		}
 	}
 
+	hasNonMaybe := false
 	for _, r := range tmp {
 		// Unroll nested disjunctions.
 		switch len(r.disjuncts) {
 		case 0:
-			r.defaultMode = combineDefault2(r.defaultMode, r.origDefaultMode, leftHasDefault, rightHasDefault)
+			r.defaultMode = combineDefault2(r.defaultMode, r.origDefaultMode, leftDropsDefault, rightDropsDefault)
 			// r did not have a nested disjunction.
 			dst = appendDisjunct(n.ctx, dst, r)
 
@@ -433,8 +434,19 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 				// TODO(defaults): using rightHasDefault instead of true here is
 				// not according to the spec, but may result in better user
 				// ergononmics. See Issue #1304.
-				x.defaultMode = combineDefault2(r.defaultMode, m, leftHasDefault, true)
+				x.defaultMode = combineDefault2(r.defaultMode, m, leftDropsDefault, false)
+				if x.defaultMode != maybeDefault {
+					hasNonMaybe = true
+				}
 				dst = appendDisjunct(n.ctx, dst, x)
+			}
+		}
+	}
+
+	if hasNonMaybe {
+		for _, r := range dst {
+			if r.defaultMode == maybeDefault {
+				r.defaultMode = notDefault
 			}
 		}
 	}
@@ -442,11 +454,11 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 	return dst
 }
 
-func combineDefault2(a, b defaultMode, hasDefaultA, hasDefaultB bool) defaultMode {
-	if !hasDefaultA {
+func combineDefault2(a, b defaultMode, dropsDefaultA, dropsDefaultB bool) defaultMode {
+	if dropsDefaultA {
 		a = maybeDefault
 	}
-	if !hasDefaultB {
+	if dropsDefaultB {
 		b = maybeDefault
 	}
 	return combineDefault(a, b)

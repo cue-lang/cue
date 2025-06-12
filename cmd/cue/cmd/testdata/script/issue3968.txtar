@@ -1,0 +1,53 @@
+! exec cue def ./a
+stderr 'panic: not a string label'
+
+! exec cue def ./b
+stderr 'panic: not a string label'
+
+! exec cue def ./c
+stderr 'panic: not a string label'
+
+! exec cue def ./d
+stderr 'panic: not a string label'
+
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.11.0"
+
+-- a/a.cue --
+package a
+
+import #s "strings"
+
+x: #s.ToUpper("foo")
+
+-- b/b.cue --
+package b
+
+import _s "strings"
+
+x: _s.ToUpper("foo")
+
+-- c/c.cue --
+package c
+
+import "test.example/other1:_x"
+
+_x
+
+-- d/d.cue --
+package d
+
+import "test.example/other2:#x"
+
+#x
+
+-- other1/other.cue --
+package _x
+
+foo: "bar"
+
+-- other2/other.cue --
+package #x
+
+foo: "bar"

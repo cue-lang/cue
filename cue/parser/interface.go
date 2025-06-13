@@ -239,10 +239,3 @@ func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, erro
 
 	return e, p.errors
 }
-
-// parseExprString is a convenience function for obtaining the AST of an
-// expression x. The position information recorded in the AST is undefined. The
-// filename used in error messages is the empty string.
-func parseExprString(x string) (ast.Expr, error) {
-	return ParseExpr("", []byte(x))
-}

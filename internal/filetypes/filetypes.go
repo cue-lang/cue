@@ -15,7 +15,6 @@
 package filetypes
 
 import (
-	"iter"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -234,16 +233,4 @@ func fileExt(f string) string {
 		return ""
 	}
 	return e
-}
-
-func seqConcat[T any](iters ...iter.Seq[T]) iter.Seq[T] {
-	return func(yield func(T) bool) {
-		for _, it := range iters {
-			for x := range it {
-				if !yield(x) {
-					return
-				}
-			}
-		}
-	}
 }

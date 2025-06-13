@@ -766,6 +766,13 @@ func TestStrict(t *testing.T) {
 	}
 }
 
+// parseExprString is a convenience function for obtaining the AST of an
+// expression x. The position information recorded in the AST is undefined. The
+// filename used in error messages is the empty string.
+func parseExprString(x string) (ast.Expr, error) {
+	return ParseExpr("", []byte(x))
+}
+
 func TestParseExpr(t *testing.T) {
 	// just kicking the tires:
 	// a valid arithmetic expression

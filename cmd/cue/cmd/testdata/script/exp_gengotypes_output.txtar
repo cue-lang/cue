@@ -1,0 +1,34 @@
+cd nomod
+exec cue exp gengotypes ./...
+find-files .
+stdout -count=2 '_gen\.go$'
+stdout 'pkg1/cue_types_pkg1_gen\.go' # Keep the package name; without a module, there is no import path.
+stdout 'pkg2/cue_types_otherpkg_gen\.go'
+
+cd ../withmod
+exec cue exp gengotypes ./...
+find-files .
+stdout -count=2 '_gen\.go$'
+stdout 'pkg1/cue_types_gen\.go' # Omit the package name, as it matches the import path.
+stdout 'pkg2/cue_types_otherpkg_gen\.go'
+
+-- nomod/pkg1/pkg1.cue --
+package pkg1
+
+#Foo: int
+-- nomod/pkg2/pkg2.cue --
+package otherpkg
+
+#Foo: int
+-- withmod/cue.mod/module.cue --
+module: "foo.test/root"
+language: version: "v0.13.0"
+-- withmod/pkg1/pkg1.cue --
+package pkg1
+
+#Foo: int
+-- withmod/pkg2/pkg2.cue --
+package otherpkg
+
+#Foo: int
+

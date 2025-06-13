@@ -54,7 +54,8 @@ type "any" because the Go type system is not able to express disjunctions.
 
 To ensure that the resulting Go code works, any imported CUE packages or
 referenced CUE definitions are transitively generated as well.
-Generated code is placed in cue_types*_gen.go files in each CUE package directory.
+Generated code is placed in cue_types_${pkgname}_gen.go files in each CUE package directory,
+where the package name is omitted from the filename if it is implied by the import path.
 
 Generated Go type and field names may differ from the original CUE names by default.
 For instance, an exported definition "#foo" becomes "Foo",
@@ -92,7 +93,6 @@ The default is "zero", representing a missing field as the zero value.
 		@go(,optional=nillable) // set for all fields under this struct
 	}
 `[1:],
-		// TODO: write a long help text once the feature set is reasonably stable.
 		RunE: mkRunE(c, runExpGenGoTypes),
 	}
 

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bc15403_51d6ee5d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-06-13T11:55:50Z",
+      "side": 1,
+      "message": "LGTM. I can\u0027t +2 in this repo.",
+      "revId": "94f9e805b18345c8f58d308582a7332c56240c73",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "480ca096_5c75ce54",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-06-13T11:55:50Z",
+      "side": 1,
+      "message": "*Perhaps* clarify that that\u0027s the CUE package name; not the (possibly mutated) Go package name?",
+      "revId": "94f9e805b18345c8f58d308582a7332c56240c73",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

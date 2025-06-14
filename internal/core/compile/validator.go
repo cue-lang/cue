@@ -18,7 +18,6 @@ package compile
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/validate"
 )
 
 // matchN is a validator that checks that the number of schemas in the given
@@ -50,7 +49,7 @@ var matchNBuiltin = &adt.Builtin{
 		var count, possibleCount int64
 		for _, check := range constraints {
 			v := adt.Unify(c, self, check)
-			if err := validate.Validate(c, v, finalCfg); err == nil {
+			if err := adt.Validate(c, v, finalCfg); err == nil {
 				// TODO: is it always true that the lack of an error signifies
 				// success?
 				count++
@@ -107,13 +106,13 @@ var matchIfBuiltin = &adt.Builtin{
 		ifSchema, thenSchema, elseSchema := args[1], args[2], args[3]
 		v := adt.Unify(c, self, ifSchema)
 		var chosenSchema adt.Value
-		if err := validate.Validate(c, v, finalCfg); err == nil {
+		if err := adt.Validate(c, v, finalCfg); err == nil {
 			chosenSchema = thenSchema
 		} else {
 			chosenSchema = elseSchema
 		}
 		v = adt.Unify(c, self, chosenSchema)
-		err := validate.Validate(c, v, finalCfg)
+		err := adt.Validate(c, v, finalCfg)
 		if err == nil {
 			return &adt.Bool{B: true}
 		}
@@ -123,7 +122,7 @@ var matchIfBuiltin = &adt.Builtin{
 	},
 }
 
-var finalCfg = &validate.Config{Final: true}
+var finalCfg = &adt.ValidateConfig{Final: true}
 
 // finalizeSelf ensures a value is fully evaluated and then strips it of any
 // of its validators or default values.

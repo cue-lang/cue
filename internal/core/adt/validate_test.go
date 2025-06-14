@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package validate_test
+package adt_test
 
 import (
 	"fmt"
@@ -24,7 +24,6 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
-	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuetdtest"
 	"github.com/google/go-cmp/cmp"
 )
@@ -35,13 +34,13 @@ func TestValidate(t *testing.T) {
 		in     string
 		out    string
 		lookup string
-		cfg    *validate.Config
+		cfg    *adt.ValidateConfig
 
 		todo_v3 bool
 	}
 	testCases := []testCase{{
 		name: "no error, but not concrete, even with definition label",
-		cfg:  &validate.Config{Concrete: true},
+		cfg:  &adt.ValidateConfig{Concrete: true},
 		in: `
 		#foo: { use: string }
 		`,
@@ -49,13 +48,13 @@ func TestValidate(t *testing.T) {
 		out:    "incomplete\n#foo.use: incomplete value string:\n    test:2:16",
 	}, {
 		name: "definitions not considered for completeness",
-		cfg:  &validate.Config{Concrete: true},
+		cfg:  &adt.ValidateConfig{Concrete: true},
 		in: `
 		#foo: { use: string }
 		`,
 	}, {
 		name: "hidden fields not considered for completeness",
-		cfg:  &validate.Config{Concrete: true},
+		cfg:  &adt.ValidateConfig{Concrete: true},
 		in: `
 		_foo: { use: string }
 		`,
@@ -85,7 +84,7 @@ func TestValidate(t *testing.T) {
 		out: "eval\nx: conflicting values 2 and 1:\n    test:2:6\n    test:2:10",
 	}, {
 		name: "all errors",
-		cfg:  &validate.Config{AllErrors: true},
+		cfg:  &adt.ValidateConfig{AllErrors: true},
 		in: `
 		x: 1 & 2
 		y: 2 & 4
@@ -99,7 +98,7 @@ y: conflicting values 4 and 2:
     test:3:10`,
 	}, {
 		name: "incomplete",
-		cfg:  &validate.Config{Concrete: true},
+		cfg:  &adt.ValidateConfig{Concrete: true},
 		in: `
 		y: 2 + x
 		x: string
@@ -113,7 +112,7 @@ y: conflicting values 4 and 2:
 		`,
 	}, {
 		name: "allowed incomplete when disallowing cycles",
-		cfg:  &validate.Config{DisallowCycles: true},
+		cfg:  &adt.ValidateConfig{DisallowCycles: true},
 		in: `
 		y: string
 		x: y
@@ -123,7 +122,7 @@ y: conflicting values 4 and 2:
 		todo_v3: true,
 
 		name: "disallow cycle",
-		cfg:  &validate.Config{DisallowCycles: true},
+		cfg:  &adt.ValidateConfig{DisallowCycles: true},
 		in: `
 		y: x + 1
 		x: y - 1
@@ -134,7 +133,7 @@ y: conflicting values 4 and 2:
 		todo_v3: true,
 
 		name: "disallow cycle",
-		cfg:  &validate.Config{DisallowCycles: true},
+		cfg:  &adt.ValidateConfig{DisallowCycles: true},
 		in: `
 		a: b - 100
 		b: a + 100
@@ -142,7 +141,7 @@ y: conflicting values 4 and 2:
 		out: "cycle\ncycle error:\n    test:2:6",
 	}, {
 		name: "treat cycles as incomplete when not disallowing",
-		cfg:  &validate.Config{},
+		cfg:  &adt.ValidateConfig{},
 		in: `
 		y: x + 1
 		x: y - 1
@@ -151,7 +150,7 @@ y: conflicting values 4 and 2:
 		// Note: this is already handled by evaluation, as terminal errors
 		// are percolated up.
 		name: "catch most serious error",
-		cfg:  &validate.Config{Concrete: true},
+		cfg:  &adt.ValidateConfig{Concrete: true},
 		in: `
 		y: string
 		x: 1 & 2
@@ -159,13 +158,13 @@ y: conflicting values 4 and 2:
 		out: "eval\nx: conflicting values 2 and 1:\n    test:3:6\n    test:3:10",
 	}, {
 		name: "consider defaults for concreteness",
-		cfg:  &validate.Config{Concrete: true},
+		cfg:  &adt.ValidateConfig{Concrete: true},
 		in: `
 		x: *1 | 2
 		`,
 	}, {
 		name: "allow non-concrete in definitions in concrete mode",
-		cfg:  &validate.Config{Concrete: true},
+		cfg:  &adt.ValidateConfig{Concrete: true},
 		in: `
 		x: 2
 		#d: {
@@ -175,7 +174,7 @@ y: conflicting values 4 and 2:
 		`,
 	}, {
 		name: "pick up non-concrete value in default",
-		cfg:  &validate.Config{Concrete: true},
+		cfg:  &adt.ValidateConfig{Concrete: true},
 		in: `
 		x: null | *{
 			a: int
@@ -184,7 +183,7 @@ y: conflicting values 4 and 2:
 		out: "incomplete\nx.a: incomplete value int:\n    test:3:7",
 	}, {
 		name: "pick up non-concrete value in default",
-		cfg:  &validate.Config{Concrete: true},
+		cfg:  &adt.ValidateConfig{Concrete: true},
 		in: `
 			x: null | *{
 				a: 1 | 2
@@ -193,7 +192,7 @@ y: conflicting values 4 and 2:
 		out: "incomplete\nx.a: incomplete value 1 | 2",
 	}, {
 		name: "required field not present",
-		cfg:  &validate.Config{Final: true},
+		cfg:  &adt.ValidateConfig{Final: true},
 		in: `
 			Person: {
 				name!:  string
@@ -204,7 +203,7 @@ y: conflicting values 4 and 2:
 		out: "incomplete\nPerson.name: field is required but not present:\n    test:3:5",
 	}, {
 		name: "allow required fields in definitions",
-		cfg:  &validate.Config{Concrete: true},
+		cfg:  &adt.ValidateConfig{Concrete: true},
 		in: `
 		#Person: {
 			name!: string
@@ -223,7 +222,7 @@ y: conflicting values 4 and 2:
 		out: "",
 	}, {
 		name: "indirect resolved disjunction using matchN",
-		cfg:  &validate.Config{Final: true},
+		cfg:  &adt.ValidateConfig{Final: true},
 		in: `
 			x: {}
 			x: matchN(0, [bool | {x!: _}])
@@ -231,7 +230,7 @@ y: conflicting values 4 and 2:
 		out: "",
 	}, {
 		name: "indirect resolved disjunction",
-		cfg:  &validate.Config{Final: true},
+		cfg:  &adt.ValidateConfig{Final: true},
 		in: `
 				x: {bar: 2}
 				x: string | {foo!: string}
@@ -239,7 +238,7 @@ y: conflicting values 4 and 2:
 		out: "incomplete\nx.foo: field is required but not present:\n    test:3:18",
 	}, {
 		name: "disallow incomplete error with final",
-		cfg:  &validate.Config{Final: true},
+		cfg:  &adt.ValidateConfig{Final: true},
 		in: `
 			x: y + 1
 			y: int
@@ -247,21 +246,21 @@ y: conflicting values 4 and 2:
 		out: "incomplete\nx: non-concrete value int in operand to +:\n    test:2:7\n    test:3:7",
 	}, {
 		name: "allow incomplete error with final while in definition",
-		cfg:  &validate.Config{Final: true},
+		cfg:  &adt.ValidateConfig{Final: true},
 		in: `
 			#D: x: #D.y + 1
 			#D: y: int
 				`,
 	}, {
 		name: "allow incomplete error with final while in definition",
-		cfg:  &validate.Config{Final: true},
+		cfg:  &adt.ValidateConfig{Final: true},
 		in: `
 			#D: x: #D.y + 1
 			#D: y: int
 				`,
 	}, {
 		name: "report non-concrete value of structure shared node in correct position",
-		cfg: &validate.Config{
+		cfg: &adt.ValidateConfig{
 			Concrete: true,
 			Final:    true,
 		},
@@ -275,7 +274,7 @@ y: conflicting values 4 and 2:
 	}, {
 		// Issue #3864: issue resulting from structure sharing.
 		name: "attribute incomplete values in definitions to concrete path",
-		cfg: &validate.Config{
+		cfg: &adt.ValidateConfig{
 			Concrete: true,
 			Final:    true,
 		},
@@ -313,7 +312,7 @@ y: conflicting values 4 and 2:
 			v = v.Lookup(adt.MakeIdentLabel(r, tc.lookup, "main"))
 		}
 
-		b := validate.Validate(ctx, v, tc.cfg)
+		b := adt.Validate(ctx, v, tc.cfg)
 
 		w := &strings.Builder{}
 		if b != nil {

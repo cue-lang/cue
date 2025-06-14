@@ -19,9 +19,9 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
-	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 )
@@ -46,7 +46,7 @@ func Run(name string, t *testing.T) {
 		ctx := e.NewContext(v)
 		v.Finalize(ctx)
 
-		if b := validate.Validate(ctx, v, &validate.Config{
+		if b := adt.Validate(ctx, v, &adt.ValidateConfig{
 			AllErrors: true,
 		}); b != nil {
 			fmt.Fprintln(t, "Errors:")

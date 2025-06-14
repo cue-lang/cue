@@ -13,13 +13,9 @@
 // limitations under the License.
 
 // Package validate collects errors from an evaluated Vertex.
-package validate
+package adt
 
-import (
-	"cuelang.org/go/internal/core/adt"
-)
-
-type Config struct {
+type ValidateConfig struct {
 	// Concrete, if true, requires that all values be concrete.
 	Concrete bool
 
@@ -37,19 +33,19 @@ type Config struct {
 
 // Validate checks that a value has certain properties. The value must have
 // been evaluated.
-func Validate(ctx *adt.OpContext, v *adt.Vertex, cfg *Config) *adt.Bottom {
+func Validate(ctx *OpContext, v *Vertex, cfg *ValidateConfig) *Bottom {
 	if cfg == nil {
-		cfg = &Config{}
+		cfg = &ValidateConfig{}
 	}
-	x := validator{Config: *cfg, ctx: ctx}
+	x := validator{ValidateConfig: *cfg, ctx: ctx}
 	x.validate(v)
 	return x.err
 }
 
 type validator struct {
-	Config
-	ctx          *adt.OpContext
-	err          *adt.Bottom
+	ValidateConfig
+	ctx          *OpContext
+	err          *Bottom
 	inDefinition int
 
 	// shared vertices should be visited at least once if referenced by
@@ -57,7 +53,7 @@ type validator struct {
 	// TODO: we could also keep track of the number of references to a
 	// shared vertex. This would allow us to report more than a single error
 	// per shared vertex.
-	visited map[*adt.Vertex]bool
+	visited map[*Vertex]bool
 }
 
 func (v *validator) checkConcrete() bool {
@@ -68,17 +64,17 @@ func (v *validator) checkFinal() bool {
 	return (v.Concrete || v.Final) && v.inDefinition == 0
 }
 
-func (v *validator) add(b *adt.Bottom) {
+func (v *validator) add(b *Bottom) {
 	if !v.AllErrors {
-		v.err = adt.CombineErrors(nil, v.err, b)
+		v.err = CombineErrors(nil, v.err, b)
 		return
 	}
 	if !b.ChildError {
-		v.err = adt.CombineErrors(nil, v.err, b)
+		v.err = CombineErrors(nil, v.err, b)
 	}
 }
 
-func (v *validator) validate(x *adt.Vertex) {
+func (v *validator) validate(x *Vertex) {
 	defer v.ctx.PopArcAndLabel(v.ctx.PushArcAndLabel(x))
 
 	y := x
@@ -94,7 +90,7 @@ func (v *validator) validate(x *adt.Vertex) {
 			return
 		}
 		if v.visited == nil {
-			v.visited = make(map[*adt.Vertex]bool)
+			v.visited = make(map[*Vertex]bool)
 		}
 		if v.visited[x] {
 			return
@@ -104,12 +100,12 @@ func (v *validator) validate(x *adt.Vertex) {
 
 	if b := x.Bottom(); b != nil {
 		switch b.Code {
-		case adt.CycleError:
+		case CycleError:
 			if v.checkFinal() || v.DisallowCycles {
 				v.add(b)
 			}
 
-		case adt.IncompleteError:
+		case IncompleteError:
 			if v.checkFinal() {
 				v.add(b)
 			}
@@ -123,19 +119,19 @@ func (v *validator) validate(x *adt.Vertex) {
 
 	} else if v.checkConcrete() {
 		x = x.Default()
-		if !adt.IsConcrete(x) {
+		if !IsConcrete(x) {
 			x := x.Value()
-			v.add(&adt.Bottom{
-				Code: adt.IncompleteError,
+			v.add(&Bottom{
+				Code: IncompleteError,
 				Err:  v.ctx.Newf("incomplete value %v", x),
 			})
 		}
 	}
 
 	for _, a := range x.Arcs {
-		if a.ArcType == adt.ArcRequired && v.Final && v.inDefinition == 0 {
+		if a.ArcType == ArcRequired && v.Final && v.inDefinition == 0 {
 			v.ctx.PushArcAndLabel(a)
-			v.add(adt.NewRequiredNotPresentError(v.ctx, a))
+			v.add(NewRequiredNotPresentError(v.ctx, a))
 			v.ctx.PopArcAndLabel(a)
 			continue
 		}

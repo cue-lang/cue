@@ -34,7 +34,6 @@ import (
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
-	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cuetxtar"
@@ -177,7 +176,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 	// 	t.Skipf("%d leaks reported", n)
 	// }
 
-	if b := validate.Validate(ctx, v, &validate.Config{
+	if b := adt.Validate(ctx, v, &adt.ValidateConfig{
 		AllErrors: true,
 	}); b != nil {
 		fmt.Fprintln(t, "Errors:")
@@ -251,7 +250,7 @@ language: version: "v0.9.0"
 		}
 	}
 
-	if b := validate.Validate(ctx, v, &validate.Config{
+	if b := adt.Validate(ctx, v, &adt.ValidateConfig{
 		AllErrors: true,
 	}); b != nil {
 		t.Log(errors.Details(b.Err, nil))

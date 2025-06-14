@@ -37,7 +37,6 @@ import (
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/subsume"
-	"cuelang.org/go/internal/core/validate"
 	internaljson "cuelang.org/go/internal/encoding/json"
 	"cuelang.org/go/internal/types"
 )
@@ -2103,14 +2102,14 @@ func (v Value) Validate(opts ...Option) error {
 	o := options{}
 	o.updateOptions(opts)
 
-	cfg := &validate.Config{
+	cfg := &adt.ValidateConfig{
 		Concrete:       o.concrete,
 		Final:          o.final,
 		DisallowCycles: o.disallowCycles,
 		AllErrors:      true,
 	}
 
-	b := validate.Validate(v.ctx(), v.v, cfg)
+	b := adt.Validate(v.ctx(), v.v, cfg)
 	if b != nil {
 		return v.toErr(b)
 	}

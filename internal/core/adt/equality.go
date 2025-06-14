@@ -79,7 +79,7 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 	}
 
 	// TODO: this really should be subsumption.
-	if flags != 0 {
+	if flags&CheckStructural != 0 {
 		if x.IsClosedStruct() != y.IsClosedStruct() {
 			return false
 		}

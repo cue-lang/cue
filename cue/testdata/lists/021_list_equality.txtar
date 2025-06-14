@@ -60,6 +60,10 @@ fne8:  [1, 2] != [1]
 fne9:  [1, ...] != [1, 2]
 fne10: [1, 2] != [1, ...]
 fne11: [1, ...] != [1, 2, ...]
+
+eqIncomplete1: [1] == [string]
+
+neIncomplete1: [1] != [string]
 -- out/def --
 eq0:   true
 eq1:   true
@@ -479,17 +483,27 @@ fne11: false
     2,
     ...,
   ])
+  eqIncomplete1: ([
+    1,
+  ] == [
+    string,
+  ])
+  neIncomplete1: ([
+    1,
+  ] != [
+    string,
+  ])
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  234
-Reused: 229
+Freed:  244
+Reused: 239
 Allocs: 5
-Retain: 96
+Retain: 100
 
-Unifications: 234
-Conjuncts:    234
-Disjuncts:    330
+Unifications: 244
+Conjuncts:    244
+Disjuncts:    344
 -- out/eval --
 (struct){
   eq0: (bool){ true }
@@ -540,4 +554,6 @@ Disjuncts:    330
   fne9: (bool){ true }
   fne10: (bool){ true }
   fne11: (bool){ true }
+  eqIncomplete1: (bool){ false }
+  neIncomplete1: (bool){ true }
 }

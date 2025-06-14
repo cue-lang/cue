@@ -1,68 +1,1344 @@
 #name: comparison
 #evalPartial
 -- in.cue --
-lss: 1 < 2
-leq: 1 <= 1.0
-leq: 2.0 <= 3
-eql: 1 == 1.0
-neq: 1.0 == 1
-gtr: !(2 > 3)
-geq: 2.0 >= 2
-seq: "a"+"b" == "ab"
-err: 2 == "s"
--- out/def --
-lss: true
-leq: true
-eql: true
-neq: true
-gtr: true
-geq: true
-seq: true
-err: _|_ // invalid operation 2 == "s" (mismatched types int and string)
--- out/legacy-debug --
-<0>{lss: true, leq: true, eql: true, neq: true, gtr: true, geq: true, seq: true, err: _|_((2 == "s"):invalid operation 2 == "s" (mismatched types int and string))}
+// Explanation of error markers:
+// t: true
+// f: false
+// e: permanent error
+// i: incomplete error
+numbers: {
+	tLss: 1 < 2
+	tLeq: 1 <= 1.0
+	tLeq: 2.0 <= 3
+	tEql: 1 == 1.0
+	tNeq: 1.0 == 1
+	tGeq: 2.0 >= 2
+	tGtr: !(2 > 3)
+	tExpr: "a"+"b" == "ab"
+}
+-- lists.cue --
+lists: {
+	// Equal lists
+	t1: [] == []
+	t2: [1, 2, 3] == [1, 2, 3]
+	t3: [1, "foo", true] == [1, "foo", true]
+	t4: [[1, 2], [3, 4]] == [[1, 2], [3, 4]]
+	t5: ([1, ...int] & [1, 2, 3]) == [1, 2, 3]
+	// FIX:
+	t6: [1] == ([...1] & [_])
+	t7: [{a: 1}] == ([...{a: 1}] & [_])
+	t8: [{a: 1}] != [...{a: 1}] // true as it is not equal
+	t9: [...int] == [...string] // additional types are irrelevant.
+
+	// Non-equal lists
+	f1: [1, 2, 3] == [1, 2, 4]
+	f2: [1, 2, 3] == [1, 2]
+	f3: [1, 2, 3] == [1, 3, 2]  // different order
+	f4: [] == [1]
+	f5: [1, 2] == [1, "2"]  // different types
+	f6: [*1 | 2 | 3] == [*2 | 3 | 4]
+
+	// Error cases
+	// FIX:
+	eErrPassthrough: [1/0] == [1]
+	eIncompat: [int] == [string] // types can never match
+	_e3l: {}
+	eErrPassthrough: [_e3l.b] == [1] // incomplete passtrhough
+	eErrPassthrough: [1, 2] == [1, int & string]
+
+	// Inequality tests
+	tNeq1: [1, 2] != [1, 3]
+	fNeq2: [1, 2] != [1, 2]
+}
+-- structs.cue --
+structs: eq: {
+    // Equal structs
+    t1: {} == {}
+    t2: {a: 1, b: "foo"} == {a: 1, b: "foo"}
+    t3: {a: 1, b: 2} == {b: 2, a: 1}  // different order
+    t4: {a: {x: 1, y: 2}} == {a: {x: 1, y: 2}} // nested structs
+    t5: ({a: 1, b: 2, c: 3} & {d: 4}) == {a: 1, b: 2, c: 3, d: 4} // unification
+    t6: {{{{a: 1}}}} == {{a: 1}} // embedding
+    t7: {[string]: int} == {[string]: string}
+	_t8l: *1 | 2 | 3
+    t8: {a: _t8l} == {a: 3| *1}
+
+
+    // Non-equal structs
+    f1: {a: 1, b: "foo"} == {a: 2, b: "foo"}
+    f2: {a: 1, b: "foo"} == {a: 1, c: "foo"}
+    f3: {a: {x: 1}} == {a: {x: 2}}
+    f4: {a: 1, b: 2} == {a: 1}
+    f5: {} == {a: 1}
+    f6: {a: 1} == 1
+    f7: {a: 1, b?: 2} == {a: 1, b: 2} // optional field does not exist
+    f8: {{{{a: 1}}}} == {{a: 1, b: 2}} // embedding
+	_f9r:  *2 | 3 | 4
+    f9: {a: *1 | 2 | 3} == {a: _f9r}
+
+	// Only test some versions of != recognizing the same code paths are
+	// followed for ==.
+	tNe1: {a: 1} != {a: 2}
+	fNe1: {a: 2} != {a: 2}
+}
+ignore: {
+	t0: {_hidden: 1} == {_hidden: 2}
+	t1: {_hidden: 1} == {}
+	t1: {} == {_hidden: 1}
+	t2: {#def: 1} == {#def: 2}
+	t3: {#def: 1} == {}
+	t4: {} == {#def: 1}
+	t5: {_#hiddenDef: 1} == {_#hiddenDef: 2}
+	t6: {_#hiddenDef: 1} == {}
+	t7: {} == {_#hiddenDef: 1}
+
+	f0: {_hidden: 1} != {_hidden: 2}
+	f1: {_hidden: 1} != {}
+	f1: {} != {_hidden: 1}
+	f2: {#def: 1} != {#def: 2}
+	f3: {#def: 1} != {}
+	f4: {} != {#def: 1}
+	f5: {_#hiddenDef: 1} != {_#hiddenDef: 2}
+	f6: {_#hiddenDef: 1} != {}
+	f7: {} != {_#hiddenDef: 1}
+}
+embeddedScalars: {
+	t1: 1 == {1}
+	t2: [1] == [{1}]
+	t3: {a: 1} == {a: {1}}
+
+	_one: 1
+	_two: 2
+	f1: _one == [{_two}]
+	f2: {a: _two} == {a: {_one}}
+	f3: _one == {_two}
+	f4: [_two] == [{_one}]
+}
+
+// Error cases
+incomplete: {
+	_int:    int
+	_string: string
+
+	iErr1: {a!: _int} == {a!: _int}
+	iErr2: {a!: _int} == {a!: 1}
+	eErr3: {a: _int} == {a: _string} // Can never match
+	eErr4: {a: 1/0} == {a: 1}        // Error passthrough
+
+	eErr5: {a: 1} == {a: _int & _string} // Error passthrough
+	iErr6: {a!: 1} == {a: 1}
+	eErr7: {a: 1} == {a!: 2} // Required cannot match even when concrete.
+}
+-- typediff.cue --
+diffTypes: {
+	// Right now, all these tests are expected to report a type error. The
+	// result indicators are assuming, however, that we define equality to be
+	// total for all concrete values. This means that those marked as false (or
+	// true for !=) are permanent errors.
+
+	// Tests with different types.
+	fScalar1:  2 == "s"
+	fScalar2:  "s" == 2
+	fScalar3: true == 2
+
+	fStruct1: {a: 1} == "s"
+
+	fList1: 5 == [5]
+	fList2: "ab" == ["a", "b"]
+	fList3: true == [true]
+	fList4: {a: 1} == [{a: 1}]
+	fList5: [1, 2] == 3
+	fList6: [1, 2] == "ab"
+	fList7: [true] == false
+	fList8: [1, 2] == {a: 1}
+	fList9: [1, 2] == null
+
+	// Negated comparisons
+	tNeList1: [1, 2] != 3
+	tNeList2: [1, 2] != "ab"
+
+	_int:    int
+	_string: string
+
+	// Lists with incompatible element types
+	iRecursive1: [_int] == [_int]    // can still match, but not concrete
+	eRecursive2: [_int] == [_string] // can never match
+	fRecursive3: [1, 2] == [1, "2"]
+	tRecursive4: [...int] == [...string]
+	fRecursive5: [1, "a"] == [1, 2]
+
+	eNe1: [1, 2] != [_int] // length can never match
+	iNe2: [_int] != [1]
+	iNe3: {a: 1} != {a: _int}
+	iNe4: {a: _int} != {a: 1}
+}
 -- out/compile --
 --- in.cue
 {
-  lss: (1 < 2)
-  leq: (1 <= 1.0)
-  leq: (2.0 <= 3)
-  eql: (1 == 1.0)
-  neq: (1.0 == 1)
-  gtr: !(2 > 3)
-  geq: (2.0 >= 2)
-  seq: (("a" + "b") == "ab")
-  err: (2 == "s")
+  numbers: {
+    tLss: (1 < 2)
+    tLeq: (1 <= 1.0)
+    tLeq: (2.0 <= 3)
+    tEql: (1 == 1.0)
+    tNeq: (1.0 == 1)
+    tGeq: (2.0 >= 2)
+    tGtr: !(2 > 3)
+    tExpr: (("a" + "b") == "ab")
+  }
+}
+--- lists.cue
+{
+  lists: {
+    t1: ([] == [])
+    t2: ([
+      1,
+      2,
+      3,
+    ] == [
+      1,
+      2,
+      3,
+    ])
+    t3: ([
+      1,
+      "foo",
+      true,
+    ] == [
+      1,
+      "foo",
+      true,
+    ])
+    t4: ([
+      [
+        1,
+        2,
+      ],
+      [
+        3,
+        4,
+      ],
+    ] == [
+      [
+        1,
+        2,
+      ],
+      [
+        3,
+        4,
+      ],
+    ])
+    t5: (([
+      1,
+      ...int,
+    ] & [
+      1,
+      2,
+      3,
+    ]) == [
+      1,
+      2,
+      3,
+    ])
+    t6: ([
+      1,
+    ] == ([
+      ...1,
+    ] & [
+      _,
+    ]))
+    t7: ([
+      {
+        a: 1
+      },
+    ] == ([
+      ...{
+        a: 1
+      },
+    ] & [
+      _,
+    ]))
+    t8: ([
+      {
+        a: 1
+      },
+    ] != [
+      ...{
+        a: 1
+      },
+    ])
+    t9: ([
+      ...int,
+    ] == [
+      ...string,
+    ])
+    f1: ([
+      1,
+      2,
+      3,
+    ] == [
+      1,
+      2,
+      4,
+    ])
+    f2: ([
+      1,
+      2,
+      3,
+    ] == [
+      1,
+      2,
+    ])
+    f3: ([
+      1,
+      2,
+      3,
+    ] == [
+      1,
+      3,
+      2,
+    ])
+    f4: ([] == [
+      1,
+    ])
+    f5: ([
+      1,
+      2,
+    ] == [
+      1,
+      "2",
+    ])
+    f6: ([
+      (*1|2|3),
+    ] == [
+      (*2|3|4),
+    ])
+    eErrPassthrough: ([
+      (1 / 0),
+    ] == [
+      1,
+    ])
+    eIncompat: ([
+      int,
+    ] == [
+      string,
+    ])
+    _e3l: {}
+    eErrPassthrough: ([
+      〈1;_e3l〉.b,
+    ] == [
+      1,
+    ])
+    eErrPassthrough: ([
+      1,
+      2,
+    ] == [
+      1,
+      (int & string),
+    ])
+    tNeq1: ([
+      1,
+      2,
+    ] != [
+      1,
+      3,
+    ])
+    fNeq2: ([
+      1,
+      2,
+    ] != [
+      1,
+      2,
+    ])
+  }
+}
+--- structs.cue
+{
+  structs: {
+    eq: {
+      t1: ({} == {})
+      t2: ({
+        a: 1
+        b: "foo"
+      } == {
+        a: 1
+        b: "foo"
+      })
+      t3: ({
+        a: 1
+        b: 2
+      } == {
+        b: 2
+        a: 1
+      })
+      t4: ({
+        a: {
+          x: 1
+          y: 2
+        }
+      } == {
+        a: {
+          x: 1
+          y: 2
+        }
+      })
+      t5: (({
+        a: 1
+        b: 2
+        c: 3
+      } & {
+        d: 4
+      }) == {
+        a: 1
+        b: 2
+        c: 3
+        d: 4
+      })
+      t6: ({
+        {
+          {
+            {
+              a: 1
+            }
+          }
+        }
+      } == {
+        {
+          a: 1
+        }
+      })
+      t7: ({
+        [string]: int
+      } == {
+        [string]: string
+      })
+      _t8l: (*1|2|3)
+      t8: ({
+        a: 〈1;_t8l〉
+      } == {
+        a: (3|*1)
+      })
+      f1: ({
+        a: 1
+        b: "foo"
+      } == {
+        a: 2
+        b: "foo"
+      })
+      f2: ({
+        a: 1
+        b: "foo"
+      } == {
+        a: 1
+        c: "foo"
+      })
+      f3: ({
+        a: {
+          x: 1
+        }
+      } == {
+        a: {
+          x: 2
+        }
+      })
+      f4: ({
+        a: 1
+        b: 2
+      } == {
+        a: 1
+      })
+      f5: ({} == {
+        a: 1
+      })
+      f6: ({
+        a: 1
+      } == 1)
+      f7: ({
+        a: 1
+        b?: 2
+      } == {
+        a: 1
+        b: 2
+      })
+      f8: ({
+        {
+          {
+            {
+              a: 1
+            }
+          }
+        }
+      } == {
+        {
+          a: 1
+          b: 2
+        }
+      })
+      _f9r: (*2|3|4)
+      f9: ({
+        a: (*1|2|3)
+      } == {
+        a: 〈1;_f9r〉
+      })
+      tNe1: ({
+        a: 1
+      } != {
+        a: 2
+      })
+      fNe1: ({
+        a: 2
+      } != {
+        a: 2
+      })
+    }
+  }
+  ignore: {
+    t0: ({
+      _hidden: 1
+    } == {
+      _hidden: 2
+    })
+    t1: ({
+      _hidden: 1
+    } == {})
+    t1: ({} == {
+      _hidden: 1
+    })
+    t2: ({
+      #def: 1
+    } == {
+      #def: 2
+    })
+    t3: ({
+      #def: 1
+    } == {})
+    t4: ({} == {
+      #def: 1
+    })
+    t5: ({
+      _#hiddenDef: 1
+    } == {
+      _#hiddenDef: 2
+    })
+    t6: ({
+      _#hiddenDef: 1
+    } == {})
+    t7: ({} == {
+      _#hiddenDef: 1
+    })
+    f0: ({
+      _hidden: 1
+    } != {
+      _hidden: 2
+    })
+    f1: ({
+      _hidden: 1
+    } != {})
+    f1: ({} != {
+      _hidden: 1
+    })
+    f2: ({
+      #def: 1
+    } != {
+      #def: 2
+    })
+    f3: ({
+      #def: 1
+    } != {})
+    f4: ({} != {
+      #def: 1
+    })
+    f5: ({
+      _#hiddenDef: 1
+    } != {
+      _#hiddenDef: 2
+    })
+    f6: ({
+      _#hiddenDef: 1
+    } != {})
+    f7: ({} != {
+      _#hiddenDef: 1
+    })
+  }
+  embeddedScalars: {
+    t1: (1 == {
+      1
+    })
+    t2: ([
+      1,
+    ] == [
+      {
+        1
+      },
+    ])
+    t3: ({
+      a: 1
+    } == {
+      a: {
+        1
+      }
+    })
+    _one: 1
+    _two: 2
+    f1: (〈0;_one〉 == [
+      {
+        〈2;_two〉
+      },
+    ])
+    f2: ({
+      a: 〈1;_two〉
+    } == {
+      a: {
+        〈2;_one〉
+      }
+    })
+    f3: (〈0;_one〉 == {
+      〈1;_two〉
+    })
+    f4: ([
+      〈1;_two〉,
+    ] == [
+      {
+        〈2;_one〉
+      },
+    ])
+  }
+  incomplete: {
+    _int: int
+    _string: string
+    iErr1: ({
+      a!: 〈1;_int〉
+    } == {
+      a!: 〈1;_int〉
+    })
+    iErr2: ({
+      a!: 〈1;_int〉
+    } == {
+      a!: 1
+    })
+    eErr3: ({
+      a: 〈1;_int〉
+    } == {
+      a: 〈1;_string〉
+    })
+    eErr4: ({
+      a: (1 / 0)
+    } == {
+      a: 1
+    })
+    eErr5: ({
+      a: 1
+    } == {
+      a: (〈1;_int〉 & 〈1;_string〉)
+    })
+    iErr6: ({
+      a!: 1
+    } == {
+      a: 1
+    })
+    eErr7: ({
+      a: 1
+    } == {
+      a!: 2
+    })
+  }
+}
+--- typediff.cue
+{
+  diffTypes: {
+    fScalar1: (2 == "s")
+    fScalar2: ("s" == 2)
+    fScalar3: (true == 2)
+    fStruct1: ({
+      a: 1
+    } == "s")
+    fList1: (5 == [
+      5,
+    ])
+    fList2: ("ab" == [
+      "a",
+      "b",
+    ])
+    fList3: (true == [
+      true,
+    ])
+    fList4: ({
+      a: 1
+    } == [
+      {
+        a: 1
+      },
+    ])
+    fList5: ([
+      1,
+      2,
+    ] == 3)
+    fList6: ([
+      1,
+      2,
+    ] == "ab")
+    fList7: ([
+      true,
+    ] == false)
+    fList8: ([
+      1,
+      2,
+    ] == {
+      a: 1
+    })
+    fList9: ([
+      1,
+      2,
+    ] == null)
+    tNeList1: ([
+      1,
+      2,
+    ] != 3)
+    tNeList2: ([
+      1,
+      2,
+    ] != "ab")
+    _int: int
+    _string: string
+    iRecursive1: ([
+      〈1;_int〉,
+    ] == [
+      〈1;_int〉,
+    ])
+    eRecursive2: ([
+      〈1;_int〉,
+    ] == [
+      〈1;_string〉,
+    ])
+    fRecursive3: ([
+      1,
+      2,
+    ] == [
+      1,
+      "2",
+    ])
+    tRecursive4: ([
+      ...int,
+    ] == [
+      ...string,
+    ])
+    fRecursive5: ([
+      1,
+      "a",
+    ] == [
+      1,
+      2,
+    ])
+    eNe1: ([
+      1,
+      2,
+    ] != [
+      〈1;_int〉,
+    ])
+    iNe2: ([
+      〈1;_int〉,
+    ] != [
+      1,
+    ])
+    iNe3: ({
+      a: 1
+    } != {
+      a: 〈1;_int〉
+    })
+    iNe4: ({
+      a: 〈1;_int〉
+    } != {
+      a: 1
+    })
+  }
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  9
-Reused: 7
-Allocs: 2
-Retain: 0
+Leaks:  112
+Freed:  290
+Reused: 287
+Allocs: 115
+Retain: 173
 
-Unifications: 9
-Conjuncts:    10
-Disjuncts:    9
+Unifications: 390
+Conjuncts:    441
+Disjuncts:    463
 -- out/eval --
 Errors:
-err: invalid operands 2 and "s" to '==' (type int and string):
-    ./in.cue:9:6
-    ./in.cue:9:11
+structs.eq.t1: invalid operands {} and {} to '==' (type struct and struct):
+    ./structs.cue:3:9
+    ./structs.cue:3:15
+structs.eq.t2: invalid operands {a:1,b:"foo"} and {a:1,b:"foo"} to '==' (type struct and struct):
+    ./structs.cue:4:9
+    ./structs.cue:4:29
+structs.eq.t3: invalid operands {a:1,b:2} and {b:2,a:1} to '==' (type struct and struct):
+    ./structs.cue:5:9
+    ./structs.cue:5:25
+structs.eq.t4: invalid operands {a:{x:1,y:2}} and {a:{x:1,y:2}} to '==' (type struct and struct):
+    ./structs.cue:6:9
+    ./structs.cue:6:30
+structs.eq.t5: invalid operands {a:1,b:2,c:3,d:4} and {a:1,b:2,c:3,d:4} to '==' (type struct and struct):
+    ./structs.cue:7:9
+    ./structs.cue:7:10
+    ./structs.cue:7:42
+structs.eq.t6: invalid operands {a:1} and {a:1} to '==' (type struct and struct):
+    ./structs.cue:8:9
+    ./structs.cue:8:25
+structs.eq.t7: invalid operands {} and {} to '==' (type struct and struct):
+    ./structs.cue:9:9
+    ./structs.cue:9:28
+structs.eq.t8: invalid operands {a:_t8l} and {a:(3|*1)} to '==' (type struct and struct):
+    ./structs.cue:11:9
+    ./structs.cue:11:22
+structs.eq.f1: invalid operands {a:1,b:"foo"} and {a:2,b:"foo"} to '==' (type struct and struct):
+    ./structs.cue:15:9
+    ./structs.cue:15:29
+structs.eq.f2: invalid operands {a:1,b:"foo"} and {a:1,c:"foo"} to '==' (type struct and struct):
+    ./structs.cue:16:9
+    ./structs.cue:16:29
+structs.eq.f3: invalid operands {a:{x:1}} and {a:{x:2}} to '==' (type struct and struct):
+    ./structs.cue:17:9
+    ./structs.cue:17:24
+structs.eq.f4: invalid operands {a:1,b:2} and {a:1} to '==' (type struct and struct):
+    ./structs.cue:18:9
+    ./structs.cue:18:25
+structs.eq.f5: invalid operands {} and {a:1} to '==' (type struct and struct):
+    ./structs.cue:19:9
+    ./structs.cue:19:15
+structs.eq.f6: invalid operands {a:1} and 1 to '==' (type struct and int):
+    ./structs.cue:20:9
+    ./structs.cue:20:19
+structs.eq.f7: invalid operands {a:1,b?:2} and {a:1,b:2} to '==' (type struct and struct):
+    ./structs.cue:21:9
+    ./structs.cue:21:26
+structs.eq.f8: invalid operands {a:1} and {a:1,b:2} to '==' (type struct and struct):
+    ./structs.cue:22:9
+    ./structs.cue:22:25
+structs.eq.f9: invalid operands {a:(*1|2|3)} and {a:_f9r} to '==' (type struct and struct):
+    ./structs.cue:24:9
+    ./structs.cue:24:28
+structs.eq.tNe1: invalid operands {a:1} and {a:2} to '!=' (type struct and struct):
+    ./structs.cue:28:8
+    ./structs.cue:28:18
+structs.eq.fNe1: invalid operands {a:2} and {a:2} to '!=' (type struct and struct):
+    ./structs.cue:29:8
+    ./structs.cue:29:18
+ignore.t0: invalid operands {_hidden:1} and {_hidden:2} to '==' (type struct and struct):
+    ./structs.cue:32:6
+    ./structs.cue:32:22
+ignore.t1: invalid operands {_hidden:1} and {} to '==' (type struct and struct):
+    ./structs.cue:33:6
+    ./structs.cue:33:22
+ignore.t1: invalid operands {} and {_hidden:1} to '==' (type struct and struct):
+    ./structs.cue:34:6
+    ./structs.cue:34:12
+ignore.t2: invalid operands {#def:1} and {#def:2} to '==' (type struct and struct):
+    ./structs.cue:35:6
+    ./structs.cue:35:19
+ignore.t3: invalid operands {#def:1} and {} to '==' (type struct and struct):
+    ./structs.cue:36:6
+    ./structs.cue:36:19
+ignore.t4: invalid operands {} and {#def:1} to '==' (type struct and struct):
+    ./structs.cue:37:6
+    ./structs.cue:37:12
+ignore.t5: invalid operands {_#hiddenDef:1} and {_#hiddenDef:2} to '==' (type struct and struct):
+    ./structs.cue:38:6
+    ./structs.cue:38:26
+ignore.t6: invalid operands {_#hiddenDef:1} and {} to '==' (type struct and struct):
+    ./structs.cue:39:6
+    ./structs.cue:39:26
+ignore.t7: invalid operands {} and {_#hiddenDef:1} to '==' (type struct and struct):
+    ./structs.cue:40:6
+    ./structs.cue:40:12
+ignore.f0: invalid operands {_hidden:1} and {_hidden:2} to '!=' (type struct and struct):
+    ./structs.cue:42:6
+    ./structs.cue:42:22
+ignore.f1: invalid operands {_hidden:1} and {} to '!=' (type struct and struct):
+    ./structs.cue:43:6
+    ./structs.cue:43:22
+ignore.f1: invalid operands {} and {_hidden:1} to '!=' (type struct and struct):
+    ./structs.cue:44:6
+    ./structs.cue:44:12
+ignore.f2: invalid operands {#def:1} and {#def:2} to '!=' (type struct and struct):
+    ./structs.cue:45:6
+    ./structs.cue:45:19
+ignore.f3: invalid operands {#def:1} and {} to '!=' (type struct and struct):
+    ./structs.cue:46:6
+    ./structs.cue:46:19
+ignore.f4: invalid operands {} and {#def:1} to '!=' (type struct and struct):
+    ./structs.cue:47:6
+    ./structs.cue:47:12
+ignore.f5: invalid operands {_#hiddenDef:1} and {_#hiddenDef:2} to '!=' (type struct and struct):
+    ./structs.cue:48:6
+    ./structs.cue:48:26
+ignore.f6: invalid operands {_#hiddenDef:1} and {} to '!=' (type struct and struct):
+    ./structs.cue:49:6
+    ./structs.cue:49:26
+ignore.f7: invalid operands {} and {_#hiddenDef:1} to '!=' (type struct and struct):
+    ./structs.cue:50:6
+    ./structs.cue:50:12
+embeddedScalars.t3: invalid operands {a:1} and {a:{1}} to '==' (type struct and struct):
+    ./structs.cue:55:6
+    ./structs.cue:55:16
+embeddedScalars.f1: invalid operands 1 and [{_two}] to '==' (type int and list):
+    ./structs.cue:59:6
+    ./structs.cue:57:8
+    ./structs.cue:59:14
+embeddedScalars.f2: invalid operands {a:_two} and {a:{_one}} to '==' (type struct and struct):
+    ./structs.cue:60:6
+    ./structs.cue:60:19
+incomplete.iErr1: invalid operands {a!:_int} and {a!:_int} to '==' (type struct and struct):
+    ./structs.cue:70:9
+    ./structs.cue:70:23
+incomplete.iErr2: invalid operands {a!:_int} and {a!:1} to '==' (type struct and struct):
+    ./structs.cue:71:9
+    ./structs.cue:71:23
+incomplete.eErr3: invalid operands {a:_int} and {a:_string} to '==' (type struct and struct):
+    ./structs.cue:72:9
+    ./structs.cue:72:22
+incomplete.eErr4: invalid operands {a:(1 / 0)} and {a:1} to '==' (type struct and struct):
+    ./structs.cue:73:9
+    ./structs.cue:73:21
+incomplete.eErr5: invalid operands {a:1} and {a:(_int & _string)} to '==' (type struct and struct):
+    ./structs.cue:75:9
+    ./structs.cue:75:19
+incomplete.iErr6: invalid operands {a!:1} and {a:1} to '==' (type struct and struct):
+    ./structs.cue:76:9
+    ./structs.cue:76:20
+incomplete.eErr7: invalid operands {a:1} and {a!:2} to '==' (type struct and struct):
+    ./structs.cue:77:9
+    ./structs.cue:77:19
+diffTypes.fScalar1: invalid operands 2 and "s" to '==' (type int and string):
+    ./typediff.cue:8:13
+    ./typediff.cue:8:18
+diffTypes.fScalar2: cannot use 2 (type int) as type string:
+    ./typediff.cue:9:13
+    ./typediff.cue:9:20
+diffTypes.fScalar3: cannot use 2 (type int) as type bool:
+    ./typediff.cue:10:12
+    ./typediff.cue:10:20
+diffTypes.fStruct1: invalid operands {a:1} and "s" to '==' (type struct and string):
+    ./typediff.cue:12:12
+    ./typediff.cue:12:22
+diffTypes.fList1: invalid operands 5 and [5] to '==' (type int and list):
+    ./typediff.cue:14:10
+    ./typediff.cue:14:15
+diffTypes.fList2: cannot use ["a","b"] (type list) as type string:
+    ./typediff.cue:15:10
+    ./typediff.cue:15:18
+diffTypes.fList3: cannot use [true] (type list) as type bool:
+    ./typediff.cue:16:10
+    ./typediff.cue:16:18
+diffTypes.fList4: invalid operands {a:1} and [{a:1}] to '==' (type struct and list):
+    ./typediff.cue:17:10
+    ./typediff.cue:17:20
+diffTypes.fList5: invalid operands [1,2] and 3 to '==' (type list and int):
+    ./typediff.cue:18:10
+    ./typediff.cue:18:20
+diffTypes.fList6: invalid operands [1,2] and "ab" to '==' (type list and string):
+    ./typediff.cue:19:10
+    ./typediff.cue:19:20
+diffTypes.fList7: invalid operands [true] and false to '==' (type list and bool):
+    ./typediff.cue:20:10
+    ./typediff.cue:20:20
+diffTypes.fList8: invalid operands [1,2] and {a:1} to '==' (type list and struct):
+    ./typediff.cue:21:10
+    ./typediff.cue:21:20
+diffTypes.tNeList1: invalid operands [1,2] and 3 to '!=' (type list and int):
+    ./typediff.cue:25:12
+    ./typediff.cue:25:22
+diffTypes.tNeList2: invalid operands [1,2] and "ab" to '!=' (type list and string):
+    ./typediff.cue:26:12
+    ./typediff.cue:26:22
+diffTypes.iNe3: invalid operands {a:1} and {a:_int} to '!=' (type struct and struct):
+    ./typediff.cue:40:8
+    ./typediff.cue:40:18
+diffTypes.iNe4: invalid operands {a:_int} and {a:1} to '!=' (type struct and struct):
+    ./typediff.cue:41:8
+    ./typediff.cue:41:21
 
 Result:
 (_|_){
   // [eval]
-  lss: (bool){ true }
-  leq: (bool){ true }
-  eql: (bool){ true }
-  neq: (bool){ true }
-  gtr: (bool){ true }
-  geq: (bool){ true }
-  seq: (bool){ true }
-  err: (_|_){
-    // [eval] err: invalid operands 2 and "s" to '==' (type int and string):
-    //     ./in.cue:9:6
-    //     ./in.cue:9:11
+  numbers: (struct){
+    tLss: (bool){ true }
+    tLeq: (bool){ true }
+    tEql: (bool){ true }
+    tNeq: (bool){ true }
+    tGeq: (bool){ true }
+    tGtr: (bool){ true }
+    tExpr: (bool){ true }
+  }
+  lists: (struct){
+    t1: (bool){ true }
+    t2: (bool){ true }
+    t3: (bool){ true }
+    t4: (bool){ true }
+    t5: (bool){ true }
+    t6: (bool){ true }
+    t7: (bool){ false }
+    t8: (bool){ true }
+    t9: (bool){ true }
+    f1: (bool){ false }
+    f2: (bool){ false }
+    f3: (bool){ false }
+    f4: (bool){ false }
+    f5: (bool){ false }
+    f6: (bool){ false }
+    eErrPassthrough: (bool){ false }
+    eIncompat: (bool){ false }
+    _e3l: (struct){
+    }
+    tNeq1: (bool){ true }
+    fNeq2: (bool){ false }
+  }
+  structs: (_|_){
+    // [eval]
+    eq: (_|_){
+      // [eval]
+      t1: (_|_){
+        // [eval] structs.eq.t1: invalid operands {} and {} to '==' (type struct and struct):
+        //     ./structs.cue:3:9
+        //     ./structs.cue:3:15
+      }
+      t2: (_|_){
+        // [eval] structs.eq.t2: invalid operands {a:1,b:"foo"} and {a:1,b:"foo"} to '==' (type struct and struct):
+        //     ./structs.cue:4:9
+        //     ./structs.cue:4:29
+      }
+      t3: (_|_){
+        // [eval] structs.eq.t3: invalid operands {a:1,b:2} and {b:2,a:1} to '==' (type struct and struct):
+        //     ./structs.cue:5:9
+        //     ./structs.cue:5:25
+      }
+      t4: (_|_){
+        // [eval] structs.eq.t4: invalid operands {a:{x:1,y:2}} and {a:{x:1,y:2}} to '==' (type struct and struct):
+        //     ./structs.cue:6:9
+        //     ./structs.cue:6:30
+      }
+      t5: (_|_){
+        // [eval] structs.eq.t5: invalid operands {a:1,b:2,c:3,d:4} and {a:1,b:2,c:3,d:4} to '==' (type struct and struct):
+        //     ./structs.cue:7:9
+        //     ./structs.cue:7:10
+        //     ./structs.cue:7:42
+      }
+      t6: (_|_){
+        // [eval] structs.eq.t6: invalid operands {a:1} and {a:1} to '==' (type struct and struct):
+        //     ./structs.cue:8:9
+        //     ./structs.cue:8:25
+      }
+      t7: (_|_){
+        // [eval] structs.eq.t7: invalid operands {} and {} to '==' (type struct and struct):
+        //     ./structs.cue:9:9
+        //     ./structs.cue:9:28
+      }
+      _t8l: (int){ |(*(int){ 1 }, (int){ 2 }, (int){ 3 }) }
+      t8: (_|_){
+        // [eval] structs.eq.t8: invalid operands {a:_t8l} and {a:(3|*1)} to '==' (type struct and struct):
+        //     ./structs.cue:11:9
+        //     ./structs.cue:11:22
+      }
+      f1: (_|_){
+        // [eval] structs.eq.f1: invalid operands {a:1,b:"foo"} and {a:2,b:"foo"} to '==' (type struct and struct):
+        //     ./structs.cue:15:9
+        //     ./structs.cue:15:29
+      }
+      f2: (_|_){
+        // [eval] structs.eq.f2: invalid operands {a:1,b:"foo"} and {a:1,c:"foo"} to '==' (type struct and struct):
+        //     ./structs.cue:16:9
+        //     ./structs.cue:16:29
+      }
+      f3: (_|_){
+        // [eval] structs.eq.f3: invalid operands {a:{x:1}} and {a:{x:2}} to '==' (type struct and struct):
+        //     ./structs.cue:17:9
+        //     ./structs.cue:17:24
+      }
+      f4: (_|_){
+        // [eval] structs.eq.f4: invalid operands {a:1,b:2} and {a:1} to '==' (type struct and struct):
+        //     ./structs.cue:18:9
+        //     ./structs.cue:18:25
+      }
+      f5: (_|_){
+        // [eval] structs.eq.f5: invalid operands {} and {a:1} to '==' (type struct and struct):
+        //     ./structs.cue:19:9
+        //     ./structs.cue:19:15
+      }
+      f6: (_|_){
+        // [eval] structs.eq.f6: invalid operands {a:1} and 1 to '==' (type struct and int):
+        //     ./structs.cue:20:9
+        //     ./structs.cue:20:19
+      }
+      f7: (_|_){
+        // [eval] structs.eq.f7: invalid operands {a:1,b?:2} and {a:1,b:2} to '==' (type struct and struct):
+        //     ./structs.cue:21:9
+        //     ./structs.cue:21:26
+      }
+      f8: (_|_){
+        // [eval] structs.eq.f8: invalid operands {a:1} and {a:1,b:2} to '==' (type struct and struct):
+        //     ./structs.cue:22:9
+        //     ./structs.cue:22:25
+      }
+      _f9r: (int){ |(*(int){ 2 }, (int){ 3 }, (int){ 4 }) }
+      f9: (_|_){
+        // [eval] structs.eq.f9: invalid operands {a:(*1|2|3)} and {a:_f9r} to '==' (type struct and struct):
+        //     ./structs.cue:24:9
+        //     ./structs.cue:24:28
+      }
+      tNe1: (_|_){
+        // [eval] structs.eq.tNe1: invalid operands {a:1} and {a:2} to '!=' (type struct and struct):
+        //     ./structs.cue:28:8
+        //     ./structs.cue:28:18
+      }
+      fNe1: (_|_){
+        // [eval] structs.eq.fNe1: invalid operands {a:2} and {a:2} to '!=' (type struct and struct):
+        //     ./structs.cue:29:8
+        //     ./structs.cue:29:18
+      }
+    }
+  }
+  ignore: (_|_){
+    // [eval]
+    t0: (_|_){
+      // [eval] ignore.t0: invalid operands {_hidden:1} and {_hidden:2} to '==' (type struct and struct):
+      //     ./structs.cue:32:6
+      //     ./structs.cue:32:22
+    }
+    t1: (_|_){
+      // [eval] ignore.t1: invalid operands {_hidden:1} and {} to '==' (type struct and struct):
+      //     ./structs.cue:33:6
+      //     ./structs.cue:33:22
+      // ignore.t1: invalid operands {} and {_hidden:1} to '==' (type struct and struct):
+      //     ./structs.cue:34:6
+      //     ./structs.cue:34:12
+    }
+    t2: (_|_){
+      // [eval] ignore.t2: invalid operands {#def:1} and {#def:2} to '==' (type struct and struct):
+      //     ./structs.cue:35:6
+      //     ./structs.cue:35:19
+    }
+    t3: (_|_){
+      // [eval] ignore.t3: invalid operands {#def:1} and {} to '==' (type struct and struct):
+      //     ./structs.cue:36:6
+      //     ./structs.cue:36:19
+    }
+    t4: (_|_){
+      // [eval] ignore.t4: invalid operands {} and {#def:1} to '==' (type struct and struct):
+      //     ./structs.cue:37:6
+      //     ./structs.cue:37:12
+    }
+    t5: (_|_){
+      // [eval] ignore.t5: invalid operands {_#hiddenDef:1} and {_#hiddenDef:2} to '==' (type struct and struct):
+      //     ./structs.cue:38:6
+      //     ./structs.cue:38:26
+    }
+    t6: (_|_){
+      // [eval] ignore.t6: invalid operands {_#hiddenDef:1} and {} to '==' (type struct and struct):
+      //     ./structs.cue:39:6
+      //     ./structs.cue:39:26
+    }
+    t7: (_|_){
+      // [eval] ignore.t7: invalid operands {} and {_#hiddenDef:1} to '==' (type struct and struct):
+      //     ./structs.cue:40:6
+      //     ./structs.cue:40:12
+    }
+    f0: (_|_){
+      // [eval] ignore.f0: invalid operands {_hidden:1} and {_hidden:2} to '!=' (type struct and struct):
+      //     ./structs.cue:42:6
+      //     ./structs.cue:42:22
+    }
+    f1: (_|_){
+      // [eval] ignore.f1: invalid operands {_hidden:1} and {} to '!=' (type struct and struct):
+      //     ./structs.cue:43:6
+      //     ./structs.cue:43:22
+      // ignore.f1: invalid operands {} and {_hidden:1} to '!=' (type struct and struct):
+      //     ./structs.cue:44:6
+      //     ./structs.cue:44:12
+    }
+    f2: (_|_){
+      // [eval] ignore.f2: invalid operands {#def:1} and {#def:2} to '!=' (type struct and struct):
+      //     ./structs.cue:45:6
+      //     ./structs.cue:45:19
+    }
+    f3: (_|_){
+      // [eval] ignore.f3: invalid operands {#def:1} and {} to '!=' (type struct and struct):
+      //     ./structs.cue:46:6
+      //     ./structs.cue:46:19
+    }
+    f4: (_|_){
+      // [eval] ignore.f4: invalid operands {} and {#def:1} to '!=' (type struct and struct):
+      //     ./structs.cue:47:6
+      //     ./structs.cue:47:12
+    }
+    f5: (_|_){
+      // [eval] ignore.f5: invalid operands {_#hiddenDef:1} and {_#hiddenDef:2} to '!=' (type struct and struct):
+      //     ./structs.cue:48:6
+      //     ./structs.cue:48:26
+    }
+    f6: (_|_){
+      // [eval] ignore.f6: invalid operands {_#hiddenDef:1} and {} to '!=' (type struct and struct):
+      //     ./structs.cue:49:6
+      //     ./structs.cue:49:26
+    }
+    f7: (_|_){
+      // [eval] ignore.f7: invalid operands {} and {_#hiddenDef:1} to '!=' (type struct and struct):
+      //     ./structs.cue:50:6
+      //     ./structs.cue:50:12
+    }
+  }
+  embeddedScalars: (_|_){
+    // [eval]
+    t1: (bool){ true }
+    t2: (bool){ true }
+    t3: (_|_){
+      // [eval] embeddedScalars.t3: invalid operands {a:1} and {a:{1}} to '==' (type struct and struct):
+      //     ./structs.cue:55:6
+      //     ./structs.cue:55:16
+    }
+    _one: (int){ 1 }
+    _two: (int){ 2 }
+    f1: (_|_){
+      // [eval] embeddedScalars.f1: invalid operands 1 and [{_two}] to '==' (type int and list):
+      //     ./structs.cue:59:6
+      //     ./structs.cue:57:8
+      //     ./structs.cue:59:14
+    }
+    f2: (_|_){
+      // [eval] embeddedScalars.f2: invalid operands {a:_two} and {a:{_one}} to '==' (type struct and struct):
+      //     ./structs.cue:60:6
+      //     ./structs.cue:60:19
+    }
+    f3: (bool){ false }
+    f4: (bool){ false }
+  }
+  incomplete: (_|_){
+    // [eval]
+    _int: (int){ int }
+    _string: (string){ string }
+    iErr1: (_|_){
+      // [eval] incomplete.iErr1: invalid operands {a!:_int} and {a!:_int} to '==' (type struct and struct):
+      //     ./structs.cue:70:9
+      //     ./structs.cue:70:23
+    }
+    iErr2: (_|_){
+      // [eval] incomplete.iErr2: invalid operands {a!:_int} and {a!:1} to '==' (type struct and struct):
+      //     ./structs.cue:71:9
+      //     ./structs.cue:71:23
+    }
+    eErr3: (_|_){
+      // [eval] incomplete.eErr3: invalid operands {a:_int} and {a:_string} to '==' (type struct and struct):
+      //     ./structs.cue:72:9
+      //     ./structs.cue:72:22
+    }
+    eErr4: (_|_){
+      // [eval] incomplete.eErr4: invalid operands {a:(1 / 0)} and {a:1} to '==' (type struct and struct):
+      //     ./structs.cue:73:9
+      //     ./structs.cue:73:21
+    }
+    eErr5: (_|_){
+      // [eval] incomplete.eErr5: invalid operands {a:1} and {a:(_int & _string)} to '==' (type struct and struct):
+      //     ./structs.cue:75:9
+      //     ./structs.cue:75:19
+    }
+    iErr6: (_|_){
+      // [eval] incomplete.iErr6: invalid operands {a!:1} and {a:1} to '==' (type struct and struct):
+      //     ./structs.cue:76:9
+      //     ./structs.cue:76:20
+    }
+    eErr7: (_|_){
+      // [eval] incomplete.eErr7: invalid operands {a:1} and {a!:2} to '==' (type struct and struct):
+      //     ./structs.cue:77:9
+      //     ./structs.cue:77:19
+    }
+  }
+  diffTypes: (_|_){
+    // [eval]
+    fScalar1: (_|_){
+      // [eval] diffTypes.fScalar1: invalid operands 2 and "s" to '==' (type int and string):
+      //     ./typediff.cue:8:13
+      //     ./typediff.cue:8:18
+    }
+    fScalar2: (_|_){
+      // [eval] diffTypes.fScalar2: cannot use 2 (type int) as type string:
+      //     ./typediff.cue:9:13
+      //     ./typediff.cue:9:20
+    }
+    fScalar3: (_|_){
+      // [eval] diffTypes.fScalar3: cannot use 2 (type int) as type bool:
+      //     ./typediff.cue:10:12
+      //     ./typediff.cue:10:20
+    }
+    fStruct1: (_|_){
+      // [eval] diffTypes.fStruct1: invalid operands {a:1} and "s" to '==' (type struct and string):
+      //     ./typediff.cue:12:12
+      //     ./typediff.cue:12:22
+    }
+    fList1: (_|_){
+      // [eval] diffTypes.fList1: invalid operands 5 and [5] to '==' (type int and list):
+      //     ./typediff.cue:14:10
+      //     ./typediff.cue:14:15
+    }
+    fList2: (_|_){
+      // [eval] diffTypes.fList2: cannot use ["a","b"] (type list) as type string:
+      //     ./typediff.cue:15:10
+      //     ./typediff.cue:15:18
+    }
+    fList3: (_|_){
+      // [eval] diffTypes.fList3: cannot use [true] (type list) as type bool:
+      //     ./typediff.cue:16:10
+      //     ./typediff.cue:16:18
+    }
+    fList4: (_|_){
+      // [eval] diffTypes.fList4: invalid operands {a:1} and [{a:1}] to '==' (type struct and list):
+      //     ./typediff.cue:17:10
+      //     ./typediff.cue:17:20
+    }
+    fList5: (_|_){
+      // [eval] diffTypes.fList5: invalid operands [1,2] and 3 to '==' (type list and int):
+      //     ./typediff.cue:18:10
+      //     ./typediff.cue:18:20
+    }
+    fList6: (_|_){
+      // [eval] diffTypes.fList6: invalid operands [1,2] and "ab" to '==' (type list and string):
+      //     ./typediff.cue:19:10
+      //     ./typediff.cue:19:20
+    }
+    fList7: (_|_){
+      // [eval] diffTypes.fList7: invalid operands [true] and false to '==' (type list and bool):
+      //     ./typediff.cue:20:10
+      //     ./typediff.cue:20:20
+    }
+    fList8: (_|_){
+      // [eval] diffTypes.fList8: invalid operands [1,2] and {a:1} to '==' (type list and struct):
+      //     ./typediff.cue:21:10
+      //     ./typediff.cue:21:20
+    }
+    fList9: (bool){ false }
+    tNeList1: (_|_){
+      // [eval] diffTypes.tNeList1: invalid operands [1,2] and 3 to '!=' (type list and int):
+      //     ./typediff.cue:25:12
+      //     ./typediff.cue:25:22
+    }
+    tNeList2: (_|_){
+      // [eval] diffTypes.tNeList2: invalid operands [1,2] and "ab" to '!=' (type list and string):
+      //     ./typediff.cue:26:12
+      //     ./typediff.cue:26:22
+    }
+    _int: (int){ int }
+    _string: (string){ string }
+    iRecursive1: (bool){ false }
+    eRecursive2: (bool){ false }
+    fRecursive3: (bool){ false }
+    tRecursive4: (bool){ true }
+    fRecursive5: (bool){ false }
+    eNe1: (bool){ true }
+    iNe2: (bool){ true }
+    iNe3: (_|_){
+      // [eval] diffTypes.iNe3: invalid operands {a:1} and {a:_int} to '!=' (type struct and struct):
+      //     ./typediff.cue:40:8
+      //     ./typediff.cue:40:18
+    }
+    iNe4: (_|_){
+      // [eval] diffTypes.iNe4: invalid operands {a:_int} and {a:1} to '!=' (type struct and struct):
+      //     ./typediff.cue:41:8
+      //     ./typediff.cue:41:21
+    }
   }
 }

@@ -781,59 +781,10 @@ lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): 0: failed ari
     ./lists.cue:24:19
 lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
     ./lists.cue:28:19
-structs.eq.f6: invalid operands {a:1} and 1 to '==' (type struct and int):
-    ./structs.cue:22:9
-    ./structs.cue:22:19
-embeddedScalars.f1: invalid operands 1 and [2] to '==' (type int and list):
-    ./structs.cue:63:6
-    ./structs.cue:55:8
-    ./structs.cue:63:14
 incomplete.eErr4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
     ./structs.cue:77:9
 incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values int and string (mismatched types int and string):
     ./structs.cue:79:9
-diffTypes.fScalar1: invalid operands 2 and "s" to '==' (type int and string):
-    ./typediff.cue:11:13
-    ./typediff.cue:11:18
-diffTypes.fScalar2: cannot use 2 (type int) as type string:
-    ./typediff.cue:12:13
-    ./typediff.cue:12:20
-diffTypes.fScalar3: cannot use 2 (type int) as type bool:
-    ./typediff.cue:13:12
-    ./typediff.cue:13:20
-diffTypes.fStruct1: invalid operands {a:1} and "s" to '==' (type struct and string):
-    ./typediff.cue:15:12
-    ./typediff.cue:15:22
-diffTypes.fList1: invalid operands 5 and [5] to '==' (type int and list):
-    ./typediff.cue:17:10
-    ./typediff.cue:17:15
-diffTypes.fList2: cannot use ["a","b"] (type list) as type string:
-    ./typediff.cue:18:10
-    ./typediff.cue:18:18
-diffTypes.fList3: cannot use [true] (type list) as type bool:
-    ./typediff.cue:19:10
-    ./typediff.cue:19:18
-diffTypes.fList4: invalid operands {a:1} and [{a:1}] to '==' (type struct and list):
-    ./typediff.cue:20:10
-    ./typediff.cue:20:20
-diffTypes.fList5: invalid operands [1,2] and 3 to '==' (type list and int):
-    ./typediff.cue:21:10
-    ./typediff.cue:21:20
-diffTypes.fList6: invalid operands [1,2] and "ab" to '==' (type list and string):
-    ./typediff.cue:22:10
-    ./typediff.cue:22:20
-diffTypes.fList7: invalid operands [true] and false to '==' (type list and bool):
-    ./typediff.cue:23:10
-    ./typediff.cue:23:20
-diffTypes.fList8: invalid operands [1,2] and {a:1} to '==' (type list and struct):
-    ./typediff.cue:24:10
-    ./typediff.cue:24:20
-diffTypes.tNeList1: invalid operands [1,2] and 3 to '!=' (type list and int):
-    ./typediff.cue:28:12
-    ./typediff.cue:28:22
-diffTypes.tNeList2: invalid operands [1,2] and "ab" to '!=' (type list and string):
-    ./typediff.cue:29:12
-    ./typediff.cue:29:22
 
 Result:
 (_|_){
@@ -879,10 +830,8 @@ Result:
     tNeq1: (bool){ true }
     fNeq2: (bool){ false }
   }
-  structs: (_|_){
-    // [eval]
-    eq: (_|_){
-      // [eval]
+  structs: (struct){
+    eq: (struct){
       t1: (bool){ true }
       t2: (bool){ true }
       t3: (bool){ true }
@@ -897,11 +846,7 @@ Result:
       f3: (bool){ false }
       f4: (bool){ false }
       f5: (bool){ false }
-      f6: (_|_){
-        // [eval] structs.eq.f6: invalid operands {a:1} and 1 to '==' (type struct and int):
-        //     ./structs.cue:22:9
-        //     ./structs.cue:22:19
-      }
+      f6: (bool){ false }
       f7: (bool){ false }
       f8: (bool){ false }
       _f9r: (int){ |(*(int){ 2 }, (int){ 3 }, (int){ 4 }) }
@@ -928,20 +873,14 @@ Result:
     f6: (bool){ false }
     f7: (bool){ false }
   }
-  embeddedScalars: (_|_){
-    // [eval]
+  embeddedScalars: (struct){
     _one: (int){ 1 }
     _two: (int){ 2 }
     t1: (bool){ true }
     t2: (bool){ true }
     t3: (bool){ true }
     t4: (bool){ true }
-    f1: (_|_){
-      // [eval] embeddedScalars.f1: invalid operands 1 and [2] to '==' (type int and list):
-      //     ./structs.cue:63:6
-      //     ./structs.cue:55:8
-      //     ./structs.cue:63:14
-    }
+    f1: (bool){ false }
     f2: (bool){ false }
     f3: (bool){ false }
     f4: (bool){ false }
@@ -979,79 +918,22 @@ Result:
       //     ./structs.cue:81:9
     }
   }
-  diffTypes: (_|_){
-    // [eval]
-    fScalar1: (_|_){
-      // [eval] diffTypes.fScalar1: invalid operands 2 and "s" to '==' (type int and string):
-      //     ./typediff.cue:11:13
-      //     ./typediff.cue:11:18
-    }
-    fScalar2: (_|_){
-      // [eval] diffTypes.fScalar2: cannot use 2 (type int) as type string:
-      //     ./typediff.cue:12:13
-      //     ./typediff.cue:12:20
-    }
-    fScalar3: (_|_){
-      // [eval] diffTypes.fScalar3: cannot use 2 (type int) as type bool:
-      //     ./typediff.cue:13:12
-      //     ./typediff.cue:13:20
-    }
-    fStruct1: (_|_){
-      // [eval] diffTypes.fStruct1: invalid operands {a:1} and "s" to '==' (type struct and string):
-      //     ./typediff.cue:15:12
-      //     ./typediff.cue:15:22
-    }
-    fList1: (_|_){
-      // [eval] diffTypes.fList1: invalid operands 5 and [5] to '==' (type int and list):
-      //     ./typediff.cue:17:10
-      //     ./typediff.cue:17:15
-    }
-    fList2: (_|_){
-      // [eval] diffTypes.fList2: cannot use ["a","b"] (type list) as type string:
-      //     ./typediff.cue:18:10
-      //     ./typediff.cue:18:18
-    }
-    fList3: (_|_){
-      // [eval] diffTypes.fList3: cannot use [true] (type list) as type bool:
-      //     ./typediff.cue:19:10
-      //     ./typediff.cue:19:18
-    }
-    fList4: (_|_){
-      // [eval] diffTypes.fList4: invalid operands {a:1} and [{a:1}] to '==' (type struct and list):
-      //     ./typediff.cue:20:10
-      //     ./typediff.cue:20:20
-    }
-    fList5: (_|_){
-      // [eval] diffTypes.fList5: invalid operands [1,2] and 3 to '==' (type list and int):
-      //     ./typediff.cue:21:10
-      //     ./typediff.cue:21:20
-    }
-    fList6: (_|_){
-      // [eval] diffTypes.fList6: invalid operands [1,2] and "ab" to '==' (type list and string):
-      //     ./typediff.cue:22:10
-      //     ./typediff.cue:22:20
-    }
-    fList7: (_|_){
-      // [eval] diffTypes.fList7: invalid operands [true] and false to '==' (type list and bool):
-      //     ./typediff.cue:23:10
-      //     ./typediff.cue:23:20
-    }
-    fList8: (_|_){
-      // [eval] diffTypes.fList8: invalid operands [1,2] and {a:1} to '==' (type list and struct):
-      //     ./typediff.cue:24:10
-      //     ./typediff.cue:24:20
-    }
+  diffTypes: (struct){
+    fScalar1: (bool){ false }
+    fScalar2: (bool){ false }
+    fScalar3: (bool){ false }
+    fStruct1: (bool){ false }
+    fList1: (bool){ false }
+    fList2: (bool){ false }
+    fList3: (bool){ false }
+    fList4: (bool){ false }
+    fList5: (bool){ false }
+    fList6: (bool){ false }
+    fList7: (bool){ false }
+    fList8: (bool){ false }
     fList9: (bool){ false }
-    tNeList1: (_|_){
-      // [eval] diffTypes.tNeList1: invalid operands [1,2] and 3 to '!=' (type list and int):
-      //     ./typediff.cue:28:12
-      //     ./typediff.cue:28:22
-    }
-    tNeList2: (_|_){
-      // [eval] diffTypes.tNeList2: invalid operands [1,2] and "ab" to '!=' (type list and string):
-      //     ./typediff.cue:29:12
-      //     ./typediff.cue:29:22
-    }
+    tNeList1: (bool){ true }
+    tNeList2: (bool){ true }
     _int: (int){ int }
     _string: (string){ string }
     iRecursive1: (_|_){
@@ -1087,7 +969,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,7 @@
+@@ -1,11 +1,11 @@
  Errors:
 -lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
 +lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
@@ -1095,21 +977,15 @@ diff old new
 -lists.eErrPassthrough: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
 +lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
      ./lists.cue:28:19
- structs.eq.f6: invalid operands {a:1} and 1 to '==' (type struct and int):
-     ./structs.cue:22:9
-@@ -10,9 +10,9 @@
-     ./structs.cue:63:6
-     ./structs.cue:55:8
-     ./structs.cue:63:14
 -incomplete.eErr4: invalid left-hand value to '==' (type _|_): incomplete.a: failed arithmetic: division by zero:
 +incomplete.eErr4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
      ./structs.cue:77:9
 -incomplete.eErr5: invalid right-hand value to '==' (type struct): incomplete.a: conflicting values int and string (mismatched types int and string):
 +incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values int and string (mismatched types int and string):
      ./structs.cue:79:9
- diffTypes.fScalar1: invalid operands 2 and "s" to '==' (type int and string):
-     ./typediff.cue:11:13
-@@ -87,13 +87,13 @@
+ 
+ Result:
+@@ -38,13 +38,13 @@
      f5: (bool){ false }
      f6: (bool){ false }
      eErrPassthrough: (_|_){
@@ -1126,7 +1002,7 @@ diff old new
        //     ./lists.cue:25:13
      }
      _e3l: (struct){
-@@ -173,31 +173,31 @@
+@@ -112,31 +112,31 @@
      _int: (int){ int }
      _string: (string){ string }
      iErr1: (_|_){
@@ -1165,7 +1041,7 @@ diff old new
        //     ./structs.cue:81:9
      }
    }
-@@ -277,11 +277,11 @@
+@@ -159,11 +159,11 @@
      _int: (int){ int }
      _string: (string){ string }
      iRecursive1: (_|_){
@@ -1179,7 +1055,7 @@ diff old new
        //     ./typediff.cue:36:15
      }
      fRecursive3: (bool){ false }
-@@ -288,19 +288,19 @@
+@@ -170,19 +170,19 @@
      tRecursive4: (bool){ true }
      fRecursive5: (bool){ false }
      eNe1: (_|_){
@@ -1209,59 +1085,10 @@ lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): lists.0: fail
     ./lists.cue:24:19
 lists.eErrPassthrough: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
     ./lists.cue:28:19
-structs.eq.f6: invalid operands {a:1} and 1 to '==' (type struct and int):
-    ./structs.cue:22:9
-    ./structs.cue:22:19
-embeddedScalars.f1: invalid operands 1 and [2] to '==' (type int and list):
-    ./structs.cue:63:6
-    ./structs.cue:55:8
-    ./structs.cue:63:14
 incomplete.eErr4: invalid left-hand value to '==' (type _|_): incomplete.a: failed arithmetic: division by zero:
     ./structs.cue:77:9
 incomplete.eErr5: invalid right-hand value to '==' (type struct): incomplete.a: conflicting values int and string (mismatched types int and string):
     ./structs.cue:79:9
-diffTypes.fScalar1: invalid operands 2 and "s" to '==' (type int and string):
-    ./typediff.cue:11:13
-    ./typediff.cue:11:18
-diffTypes.fScalar2: cannot use 2 (type int) as type string:
-    ./typediff.cue:12:13
-    ./typediff.cue:12:20
-diffTypes.fScalar3: cannot use 2 (type int) as type bool:
-    ./typediff.cue:13:12
-    ./typediff.cue:13:20
-diffTypes.fStruct1: invalid operands {a:1} and "s" to '==' (type struct and string):
-    ./typediff.cue:15:12
-    ./typediff.cue:15:22
-diffTypes.fList1: invalid operands 5 and [5] to '==' (type int and list):
-    ./typediff.cue:17:10
-    ./typediff.cue:17:15
-diffTypes.fList2: cannot use ["a","b"] (type list) as type string:
-    ./typediff.cue:18:10
-    ./typediff.cue:18:18
-diffTypes.fList3: cannot use [true] (type list) as type bool:
-    ./typediff.cue:19:10
-    ./typediff.cue:19:18
-diffTypes.fList4: invalid operands {a:1} and [{a:1}] to '==' (type struct and list):
-    ./typediff.cue:20:10
-    ./typediff.cue:20:20
-diffTypes.fList5: invalid operands [1,2] and 3 to '==' (type list and int):
-    ./typediff.cue:21:10
-    ./typediff.cue:21:20
-diffTypes.fList6: invalid operands [1,2] and "ab" to '==' (type list and string):
-    ./typediff.cue:22:10
-    ./typediff.cue:22:20
-diffTypes.fList7: invalid operands [true] and false to '==' (type list and bool):
-    ./typediff.cue:23:10
-    ./typediff.cue:23:20
-diffTypes.fList8: invalid operands [1,2] and {a:1} to '==' (type list and struct):
-    ./typediff.cue:24:10
-    ./typediff.cue:24:20
-diffTypes.tNeList1: invalid operands [1,2] and 3 to '!=' (type list and int):
-    ./typediff.cue:28:12
-    ./typediff.cue:28:22
-diffTypes.tNeList2: invalid operands [1,2] and "ab" to '!=' (type list and string):
-    ./typediff.cue:29:12
-    ./typediff.cue:29:22
 
 Result:
 (_|_){
@@ -1307,10 +1134,8 @@ Result:
     tNeq1: (bool){ true }
     fNeq2: (bool){ false }
   }
-  structs: (_|_){
-    // [eval]
-    eq: (_|_){
-      // [eval]
+  structs: (struct){
+    eq: (struct){
       t1: (bool){ true }
       t2: (bool){ true }
       t3: (bool){ true }
@@ -1325,11 +1150,7 @@ Result:
       f3: (bool){ false }
       f4: (bool){ false }
       f5: (bool){ false }
-      f6: (_|_){
-        // [eval] structs.eq.f6: invalid operands {a:1} and 1 to '==' (type struct and int):
-        //     ./structs.cue:22:9
-        //     ./structs.cue:22:19
-      }
+      f6: (bool){ false }
       f7: (bool){ false }
       f8: (bool){ false }
       _f9r: (int){ |(*(int){ 2 }, (int){ 3 }, (int){ 4 }) }
@@ -1356,20 +1177,14 @@ Result:
     f6: (bool){ false }
     f7: (bool){ false }
   }
-  embeddedScalars: (_|_){
-    // [eval]
+  embeddedScalars: (struct){
     _one: (int){ 1 }
     _two: (int){ 2 }
     t1: (bool){ true }
     t2: (bool){ true }
     t3: (bool){ true }
     t4: (bool){ true }
-    f1: (_|_){
-      // [eval] embeddedScalars.f1: invalid operands 1 and [2] to '==' (type int and list):
-      //     ./structs.cue:63:6
-      //     ./structs.cue:55:8
-      //     ./structs.cue:63:14
-    }
+    f1: (bool){ false }
     f2: (bool){ false }
     f3: (bool){ false }
     f4: (bool){ false }
@@ -1407,79 +1222,22 @@ Result:
       //     ./structs.cue:81:9
     }
   }
-  diffTypes: (_|_){
-    // [eval]
-    fScalar1: (_|_){
-      // [eval] diffTypes.fScalar1: invalid operands 2 and "s" to '==' (type int and string):
-      //     ./typediff.cue:11:13
-      //     ./typediff.cue:11:18
-    }
-    fScalar2: (_|_){
-      // [eval] diffTypes.fScalar2: cannot use 2 (type int) as type string:
-      //     ./typediff.cue:12:13
-      //     ./typediff.cue:12:20
-    }
-    fScalar3: (_|_){
-      // [eval] diffTypes.fScalar3: cannot use 2 (type int) as type bool:
-      //     ./typediff.cue:13:12
-      //     ./typediff.cue:13:20
-    }
-    fStruct1: (_|_){
-      // [eval] diffTypes.fStruct1: invalid operands {a:1} and "s" to '==' (type struct and string):
-      //     ./typediff.cue:15:12
-      //     ./typediff.cue:15:22
-    }
-    fList1: (_|_){
-      // [eval] diffTypes.fList1: invalid operands 5 and [5] to '==' (type int and list):
-      //     ./typediff.cue:17:10
-      //     ./typediff.cue:17:15
-    }
-    fList2: (_|_){
-      // [eval] diffTypes.fList2: cannot use ["a","b"] (type list) as type string:
-      //     ./typediff.cue:18:10
-      //     ./typediff.cue:18:18
-    }
-    fList3: (_|_){
-      // [eval] diffTypes.fList3: cannot use [true] (type list) as type bool:
-      //     ./typediff.cue:19:10
-      //     ./typediff.cue:19:18
-    }
-    fList4: (_|_){
-      // [eval] diffTypes.fList4: invalid operands {a:1} and [{a:1}] to '==' (type struct and list):
-      //     ./typediff.cue:20:10
-      //     ./typediff.cue:20:20
-    }
-    fList5: (_|_){
-      // [eval] diffTypes.fList5: invalid operands [1,2] and 3 to '==' (type list and int):
-      //     ./typediff.cue:21:10
-      //     ./typediff.cue:21:20
-    }
-    fList6: (_|_){
-      // [eval] diffTypes.fList6: invalid operands [1,2] and "ab" to '==' (type list and string):
-      //     ./typediff.cue:22:10
-      //     ./typediff.cue:22:20
-    }
-    fList7: (_|_){
-      // [eval] diffTypes.fList7: invalid operands [true] and false to '==' (type list and bool):
-      //     ./typediff.cue:23:10
-      //     ./typediff.cue:23:20
-    }
-    fList8: (_|_){
-      // [eval] diffTypes.fList8: invalid operands [1,2] and {a:1} to '==' (type list and struct):
-      //     ./typediff.cue:24:10
-      //     ./typediff.cue:24:20
-    }
+  diffTypes: (struct){
+    fScalar1: (bool){ false }
+    fScalar2: (bool){ false }
+    fScalar3: (bool){ false }
+    fStruct1: (bool){ false }
+    fList1: (bool){ false }
+    fList2: (bool){ false }
+    fList3: (bool){ false }
+    fList4: (bool){ false }
+    fList5: (bool){ false }
+    fList6: (bool){ false }
+    fList7: (bool){ false }
+    fList8: (bool){ false }
     fList9: (bool){ false }
-    tNeList1: (_|_){
-      // [eval] diffTypes.tNeList1: invalid operands [1,2] and 3 to '!=' (type list and int):
-      //     ./typediff.cue:28:12
-      //     ./typediff.cue:28:22
-    }
-    tNeList2: (_|_){
-      // [eval] diffTypes.tNeList2: invalid operands [1,2] and "ab" to '!=' (type list and string):
-      //     ./typediff.cue:29:12
-      //     ./typediff.cue:29:22
-    }
+    tNeList1: (bool){ true }
+    tNeList2: (bool){ true }
     _int: (int){ int }
     _string: (string){ string }
     iRecursive1: (_|_){

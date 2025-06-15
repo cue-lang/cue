@@ -172,7 +172,7 @@ Retain: 0
 
 Unifications: 50
 Conjuncts:    126
-Disjuncts:    50
+Disjuncts:    51
 -- out/evalalpha --
 Errors:
 e1: conflicting values null and !=null (mismatched types null and (bool|string|bytes|func|list|struct|number)):

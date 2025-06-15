@@ -160,16 +160,47 @@ simplifyBinary: integer: {
   ok3: p3: <3 & >=2
   ok3: p4: <=3 & >2
 }
+-- equals.cue --
+@experiment(structcmp)
+
+equalScalar: {
+	ok1: ==1
+	ok1: 1
+
+	ok2: [1, 2]
+	ok2: ==[1, 2]
+
+	err1: ==1
+	err1: 2
+
+	err2: [1, 2]
+	err2: !=[1, 2]
+}
+equalStruct: {
+	ok1: =={}
+	ok1: {}
+
+	ok2: {a: 1, b: 2}
+	ok2: =={a: 1, b: 2}
+
+	err1: =={}
+	err1: {a: 1, b: 2}
+
+	err2: {a: 1, b: 2}
+	err2: !={a: 1, b: 2}
+}
 -- out/eval/stats --
 Leaks:  0
-Freed:  148
-Reused: 143
+Freed:  182
+Reused: 177
 Allocs: 5
-Retain: 1
+Retain: 7
 
-Unifications: 148
-Conjuncts:    437
-Disjuncts:    149
+Unifications: 182
+Conjuncts:    480
+Disjuncts:    191
+-- diff/explanation --
+simplifyBinary.integer.ok2.*: v3 indicates correct type.
 -- out/evalalpha --
 Errors:
 simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
@@ -274,6 +305,18 @@ simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
 simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
     ./binarystring.cue:36:21
     ./binarystring.cue:36:13
+equalScalar.err1: invalid value 2 (out of bound ==1):
+    ./equals.cue:10:8
+    ./equals.cue:11:8
+equalScalar.err2: invalid value [1,2] (out of bound !=[1,2]):
+    ./equals.cue:14:8
+    ./equals.cue:13:8
+equalStruct.err1: invalid value {a:1,b:2} (out of bound =={}):
+    ./equals.cue:23:8
+    ./equals.cue:24:8
+equalStruct.err2: invalid value {a:1,b:2} (out of bound !={a:1,b:2}):
+    ./equals.cue:27:8
+    ./equals.cue:26:8
 simplifyExpr.e2: cannot use null for bound >:
     ./in.cue:62:8
 
@@ -560,6 +603,49 @@ Result:
       }
     }
   }
+  equalScalar: (_|_){
+    // [eval]
+    ok1: (int){ 1 }
+    ok2: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+    }
+    err1: (_|_){
+      // [eval] equalScalar.err1: invalid value 2 (out of bound ==1):
+      //     ./equals.cue:10:8
+      //     ./equals.cue:11:8
+    }
+    err2: (_|_){
+      // [eval] equalScalar.err2: invalid value [1,2] (out of bound !=[1,2]):
+      //     ./equals.cue:14:8
+      //     ./equals.cue:13:8
+      0: (int){ 1 }
+      1: (int){ 2 }
+    }
+  }
+  equalStruct: (_|_){
+    // [eval]
+    ok1: (struct){
+    }
+    ok2: (struct){
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }
+    err1: (_|_){
+      // [eval] equalStruct.err1: invalid value {a:1,b:2} (out of bound =={}):
+      //     ./equals.cue:23:8
+      //     ./equals.cue:24:8
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }
+    err2: (_|_){
+      // [eval] equalStruct.err2: invalid value {a:1,b:2} (out of bound !={a:1,b:2}):
+      //     ./equals.cue:27:8
+      //     ./equals.cue:26:8
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }
+  }
   x0: (int){ 5 }
   x1: (int){ 30 }
   b0: (number){ &(>0, <5) }
@@ -730,7 +816,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,110 +1,106 @@
+@@ -1,112 +1,106 @@
  Errors:
 -simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
 -    ./binarystring.cue:27:13
@@ -871,6 +957,8 @@ diff old new
  simplifyBinary.strings.err3.p4: incompatible string bounds <="b" and >"b":
 -    ./binarystring.cue:11:13
      ./binarystring.cue:11:21
+-equalScalar.ok2: invalid left-hand value to '==' (type _|_): equalScalar.ok2: invalid value [1,2] (out of bound ==[1,2]):
+-    ./equals.cue:8:7
 +    ./binarystring.cue:11:13
 +simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
 +    ./binarystring.cue:27:20
@@ -896,10 +984,26 @@ diff old new
 +simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
 +    ./binarystring.cue:36:21
 +    ./binarystring.cue:36:13
+ equalScalar.err1: invalid value 2 (out of bound ==1):
+     ./equals.cue:10:8
+     ./equals.cue:11:8
+@@ -113,12 +107,12 @@
+ equalScalar.err2: invalid value [1,2] (out of bound !=[1,2]):
+     ./equals.cue:14:8
+     ./equals.cue:13:8
+-equalStruct.ok2: invalid value {a:1,b:2} (out of bound =={a:1,b:2}):
+-    ./equals.cue:21:7
+-    ./equals.cue:20:7
+ equalStruct.err1: invalid value {a:1,b:2} (out of bound =={}):
+     ./equals.cue:23:8
+     ./equals.cue:24:8
++equalStruct.err2: invalid value {a:1,b:2} (out of bound !={a:1,b:2}):
++    ./equals.cue:27:8
++    ./equals.cue:26:8
  simplifyExpr.e2: cannot use null for bound >:
      ./in.cue:62:8
  
-@@ -119,13 +115,13 @@
+@@ -133,13 +127,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
@@ -915,7 +1019,7 @@ diff old new
          }
        }
        err2: (_|_){
-@@ -132,13 +128,13 @@
+@@ -146,13 +140,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.float.err2.p1: incompatible number bounds <=1 and >2:
@@ -931,7 +1035,7 @@ diff old new
          }
        }
        err3: (_|_){
-@@ -145,23 +141,23 @@
+@@ -159,23 +153,23 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.float.err3.p1: incompatible number bounds <2 and >=2:
@@ -959,7 +1063,7 @@ diff old new
          }
        }
        ok1: (struct){
-@@ -178,50 +174,50 @@
+@@ -192,50 +186,50 @@
        err1: (_|_){
          // [eval]
          p1: (_|_){
@@ -1046,7 +1150,7 @@ diff old new
          }
        }
        err4: (_|_){
-@@ -228,17 +224,13 @@
+@@ -242,17 +236,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
@@ -1066,7 +1170,7 @@ diff old new
          }
        }
        ok1: (struct){
-@@ -262,13 +254,13 @@
+@@ -276,13 +266,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.strings.err1.p1: incompatible string bounds <"a" and >"b":
@@ -1082,7 +1186,7 @@ diff old new
          }
        }
        err2: (_|_){
-@@ -275,13 +267,13 @@
+@@ -289,13 +279,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.strings.err2.p1: incompatible string bounds <="a" and >"b":
@@ -1098,7 +1202,7 @@ diff old new
          }
        }
        err3: (_|_){
-@@ -288,23 +280,23 @@
+@@ -302,23 +292,23 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.strings.err3.p1: incompatible string bounds <"b" and >="b":
@@ -1126,7 +1230,7 @@ diff old new
          }
        }
        ok1: (struct){
-@@ -331,13 +323,13 @@
+@@ -345,13 +335,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
@@ -1142,7 +1246,7 @@ diff old new
          }
        }
        err2: (_|_){
-@@ -344,13 +336,13 @@
+@@ -358,13 +348,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
@@ -1158,7 +1262,7 @@ diff old new
          }
        }
        err3: (_|_){
-@@ -357,23 +349,23 @@
+@@ -371,23 +361,23 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
@@ -1186,8 +1290,41 @@ diff old new
          }
        }
        ok1: (struct){
--- diff/explanation --
-simplifyBinary.integer.ok2.*: v3 indicates correct type.
+@@ -412,9 +402,7 @@
+   equalScalar: (_|_){
+     // [eval]
+     ok1: (int){ 1 }
+-    ok2: (_|_){
+-      // [eval] equalScalar.ok2: invalid left-hand value to '==' (type _|_): equalScalar.ok2: invalid value [1,2] (out of bound ==[1,2]):
+-      //     ./equals.cue:8:7
++    ok2: (#list){
+       0: (int){ 1 }
+       1: (int){ 2 }
+     }
+@@ -435,10 +423,7 @@
+     // [eval]
+     ok1: (struct){
+     }
+-    ok2: (_|_){
+-      // [eval] equalStruct.ok2: invalid value {a:1,b:2} (out of bound =={a:1,b:2}):
+-      //     ./equals.cue:21:7
+-      //     ./equals.cue:20:7
++    ok2: (struct){
+       a: (int){ 1 }
+       b: (int){ 2 }
+     }
+@@ -449,7 +434,10 @@
+       a: (int){ 1 }
+       b: (int){ 2 }
+     }
+-    err2: (struct){
++    err2: (_|_){
++      // [eval] equalStruct.err2: invalid value {a:1,b:2} (out of bound !={a:1,b:2}):
++      //     ./equals.cue:27:8
++      //     ./equals.cue:26:8
+       a: (int){ 1 }
+       b: (int){ 2 }
+     }
 -- out/eval --
 Errors:
 simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
@@ -1296,6 +1433,20 @@ simplifyBinary.strings.err3.p3: incompatible string bounds <="b" and >"b":
 simplifyBinary.strings.err3.p4: incompatible string bounds <="b" and >"b":
     ./binarystring.cue:11:13
     ./binarystring.cue:11:21
+equalScalar.ok2: invalid left-hand value to '==' (type _|_): equalScalar.ok2: invalid value [1,2] (out of bound ==[1,2]):
+    ./equals.cue:8:7
+equalScalar.err1: invalid value 2 (out of bound ==1):
+    ./equals.cue:10:8
+    ./equals.cue:11:8
+equalScalar.err2: invalid value [1,2] (out of bound !=[1,2]):
+    ./equals.cue:14:8
+    ./equals.cue:13:8
+equalStruct.ok2: invalid value {a:1,b:2} (out of bound =={a:1,b:2}):
+    ./equals.cue:21:7
+    ./equals.cue:20:7
+equalStruct.err1: invalid value {a:1,b:2} (out of bound =={}):
+    ./equals.cue:23:8
+    ./equals.cue:24:8
 simplifyExpr.e2: cannot use null for bound >:
     ./in.cue:62:8
 
@@ -1584,6 +1735,51 @@ Result:
       ok4: (struct){
         p1: (bytes){ &(>='b', <='b') }
       }
+    }
+  }
+  equalScalar: (_|_){
+    // [eval]
+    ok1: (int){ 1 }
+    ok2: (_|_){
+      // [eval] equalScalar.ok2: invalid left-hand value to '==' (type _|_): equalScalar.ok2: invalid value [1,2] (out of bound ==[1,2]):
+      //     ./equals.cue:8:7
+      0: (int){ 1 }
+      1: (int){ 2 }
+    }
+    err1: (_|_){
+      // [eval] equalScalar.err1: invalid value 2 (out of bound ==1):
+      //     ./equals.cue:10:8
+      //     ./equals.cue:11:8
+    }
+    err2: (_|_){
+      // [eval] equalScalar.err2: invalid value [1,2] (out of bound !=[1,2]):
+      //     ./equals.cue:14:8
+      //     ./equals.cue:13:8
+      0: (int){ 1 }
+      1: (int){ 2 }
+    }
+  }
+  equalStruct: (_|_){
+    // [eval]
+    ok1: (struct){
+    }
+    ok2: (_|_){
+      // [eval] equalStruct.ok2: invalid value {a:1,b:2} (out of bound =={a:1,b:2}):
+      //     ./equals.cue:21:7
+      //     ./equals.cue:20:7
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }
+    err1: (_|_){
+      // [eval] equalStruct.err1: invalid value {a:1,b:2} (out of bound =={}):
+      //     ./equals.cue:23:8
+      //     ./equals.cue:24:8
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }
+    err2: (struct){
+      a: (int){ 1 }
+      b: (int){ 2 }
     }
   }
   x0: (int){ 5 }
@@ -1967,6 +2163,56 @@ Result:
       ok4: {
         p1: (>='b' & <='b')
       }
+    }
+  }
+}
+--- equals.cue
+{
+  equalScalar: {
+    ok1: ==1
+    ok1: 1
+    ok2: [
+      1,
+      2,
+    ]
+    ok2: ==[
+      1,
+      2,
+    ]
+    err1: ==1
+    err1: 2
+    err2: [
+      1,
+      2,
+    ]
+    err2: !=[
+      1,
+      2,
+    ]
+  }
+  equalStruct: {
+    ok1: =={}
+    ok1: {}
+    ok2: {
+      a: 1
+      b: 2
+    }
+    ok2: =={
+      a: 1
+      b: 2
+    }
+    err1: =={}
+    err1: {
+      a: 1
+      b: 2
+    }
+    err2: {
+      a: 1
+      b: 2
+    }
+    err2: !={
+      a: 1
+      b: 2
     }
   }
 }

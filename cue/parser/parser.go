@@ -1483,6 +1483,11 @@ func (p *parser) parseUnaryExpr() ast.Expr {
 	}
 
 	switch p.tok {
+	case token.EQL:
+		if !p.experiments.StructCmp {
+			break
+		}
+		fallthrough
 	case token.ADD, token.SUB, token.NOT, token.MUL,
 		token.LSS, token.LEQ, token.GEQ, token.GTR,
 		token.NEQ, token.MAT, token.NMAT:

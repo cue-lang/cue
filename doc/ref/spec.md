@@ -586,7 +586,7 @@ An _atom_ is any value whose only instances are itself and bottom.
 Examples of atoms are `42.0`, `"hello"`, `true`, and `null`.
 
 A value is _concrete_ if it is either an atom, or a struct whose field values
-are all concrete, recursively.
+of regular (non-hidden and non-definition fields) are all concrete, recursively.
 
 CUE's values also include what we normally think of as types, like `string` and
 `float`.
@@ -2324,7 +2324,7 @@ s: "etc. "*3  // "etc. etc. etc. "
 
 ##### Comparison operators
 
-Comparison operators compare two operands and yield an untyped boolean value.
+Comparison operators compare two concrete operands and yield a boolean value.
 
 ```
 ==    equal
@@ -2339,24 +2339,25 @@ Comparison operators compare two operands and yield an untyped boolean value.
 
 <!-- regular expression operator inspired by Bash, Perl, and Ruby. -->
 
-In any comparison, the types of the two operands must unify or one of the
-operands must be null.
+In any comparison, both operands must be concrete; otherwise the result is
+bottom (`_|_`).
 
-The equality operators `==` and `!=` apply to operands that are comparable.
-The ordering operators `<`, `<=`, `>`, and `>=` apply to operands that are ordered.
+If two operands are not comparable with each other, the result is false for `==`
+and true for `!=`.
+The ordering operators `<`, `<=`, `>`, and `>=` apply to operands for which
+an ordering is defined.
 The matching operators `=~` and `!~` apply to a string and a regular
 expression operand.
 These terms and the result of the comparisons are defined as follows:
 
-- Null is comparable with itself and any other type.
-  Two null values are always equal, null is unequal with anything else.
+- Null is comparable and equal to itself only.
 - Boolean values are comparable.
   Two boolean values are equal if they are either both true or both false.
 - Integer values are comparable and ordered, in the usual way.
 - Floating-point values are comparable and ordered, as per the definitions
   for binary coded decimals in the IEEE-754-2008 standard.
-- Floating-point numbers may be compared with integers; the comparison is
-  performed as if the integer was first converted to a floating-point number.
+- Floating-point numbers are comparable and ordered with respect to integers
+  by first converting the integer to a floating-point value.
 - String and bytes values are comparable and ordered lexically byte-wise.
 - Structs are comparable but not ordered. Two structs are equal if they have the
   same set of regular field labels and the corresponding values are recursively

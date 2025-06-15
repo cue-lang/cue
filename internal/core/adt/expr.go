@@ -502,10 +502,10 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state combinedFlags) Value {
 
 	switch k := v.Kind(); k {
 	case IntKind, FloatKind, NumberKind, StringKind, BytesKind:
-	case NullKind:
-		if x.Op != NotEqualOp {
+	case NullKind, StructKind, ListKind:
+		if x.Op != NotEqualOp && x.Op != EqualOp {
 			err := ctx.NewPosf(pos(x.Expr),
-				"cannot use null for bound %s", x.Op)
+				"cannot use %s for bound %s", k, x.Op)
 			return &Bottom{
 				Err:  err,
 				Node: ctx.vertex,
@@ -513,8 +513,8 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state combinedFlags) Value {
 		}
 	default:
 		mask := IntKind | FloatKind | NumberKind | StringKind | BytesKind
-		if x.Op == NotEqualOp {
-			mask |= NullKind
+		if x.Op == NotEqualOp || x.Op == EqualOp {
+			mask |= NullKind | StructKind | ListKind
 		}
 		if k&mask != 0 {
 			ctx.addErrf(IncompleteError, token.NoPos, // TODO(errors): use ctx.pos()?
@@ -652,7 +652,7 @@ func (x *BoundValue) Kind() Kind {
 
 func (x *BoundValue) validate(c *OpContext, y Value) *Bottom {
 	a := y // Can be list or struct.
-	b := c.scalar(x.Value)
+	b := x.Value
 	if c.HasErr() {
 		return c.Err()
 	}

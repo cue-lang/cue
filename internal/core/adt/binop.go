@@ -19,6 +19,11 @@ import (
 	"strings"
 )
 
+var checkConcrete = &ValidateConfig{
+	Concrete: true,
+	Final:    true,
+}
+
 // BinOp handles all operations except AndOp and OrOp. This includes processing
 // unary comparators such as '<4' and '=~"foo"'.
 //
@@ -27,20 +32,18 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 	leftKind := left.Kind()
 	rightKind := right.Kind()
 
-	const msg = "non-concrete value '%v' to operation '%s'"
-	if left.Concreteness() > Concrete {
-		return &Bottom{
-			Code: IncompleteError,
-			Err:  c.Newf(msg, left, op),
-			Node: c.vertex,
-		}
+	if err := ValidateValue(c, left, checkConcrete); err != nil {
+		const msg = "invalid left-hand value to '%s' (type %s): %v"
+		// TODO: Wrap bottom instead of using NewErrf?
+		b := c.NewErrf(msg, op, left.Kind(), err.Err)
+		b.Code = err.Code
+		return b
 	}
-	if right.Concreteness() > Concrete {
-		return &Bottom{
-			Code: IncompleteError,
-			Err:  c.Newf(msg, right, op),
-			Node: c.vertex,
-		}
+	if err := ValidateValue(c, right, checkConcrete); err != nil {
+		const msg = "invalid right-hand value to '%s' (type %s): %v"
+		b := c.NewErrf(msg, op, left.Kind(), err.Err)
+		b.Code = err.Code
+		return b
 	}
 
 	if err := CombineErrors(c.src, left, right); err != nil {
@@ -70,20 +73,9 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			// n := c.newNum()
 			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
 
-		case leftKind == ListKind && rightKind == ListKind:
-			x := c.Elems(left)
-			y := c.Elems(right)
-			if len(x) != len(y) {
-				return c.newBool(false)
-			}
-			for i, e := range x {
-				a, _ := c.concrete(nil, e, op)
-				b, _ := c.concrete(nil, y[i], op)
-				if !test(c, EqualOp, a, b) {
-					return c.newBool(false)
-				}
-			}
-			return c.newBool(true)
+		case leftKind == ListKind && rightKind == ListKind,
+			leftKind == StructKind && rightKind == StructKind:
+			return c.newBool(Equal(c, left, right, RegularOnly|IgnoreOptional))
 		}
 
 	case NotEqualOp:
@@ -108,20 +100,9 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			// n := c.newNum()
 			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
 
-		case leftKind == ListKind && rightKind == ListKind:
-			x := c.Elems(left)
-			y := c.Elems(right)
-			if len(x) != len(y) {
-				return c.newBool(true)
-			}
-			for i, e := range x {
-				a, _ := c.concrete(nil, e, op)
-				b, _ := c.concrete(nil, y[i], op)
-				if !test(c, EqualOp, a, b) {
-					return c.newBool(true)
-				}
-			}
-			return c.newBool(false)
+		case leftKind == ListKind && rightKind == ListKind,
+			leftKind == StructKind && rightKind == StructKind:
+			return c.newBool(!Equal(c, left, right, RegularOnly|IgnoreOptional))
 		}
 
 	case LessThanOp, LessEqualOp, GreaterEqualOp, GreaterThanOp:

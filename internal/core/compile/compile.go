@@ -1000,6 +1000,11 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 				Op:  adt.OpFromToken(n.Op),
 				X:   c.expr(n.X),
 			}
+		case token.EQL:
+			if !c.experiments.StructCmp {
+				return c.errf(n, "unsupported unary operator %q", n.Op)
+			}
+			fallthrough
 		case token.GEQ, token.GTR, token.LSS, token.LEQ,
 			token.NEQ, token.MAT, token.NMAT:
 			return &adt.BoundExpr{

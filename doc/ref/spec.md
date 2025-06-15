@@ -586,7 +586,7 @@ An _atom_ is any value whose only instances are itself and bottom.
 Examples of atoms are `42.0`, `"hello"`, `true`, and `null`.
 
 A value is _concrete_ if it is either an atom, or a struct whose field values
-are all concrete, recursively.
+of regular (non-hidden and non-definition fields) are all concrete, recursively.
 
 CUE's values also include what we normally think of as types, like `string` and
 `float`.
@@ -2324,7 +2324,7 @@ s: "etc. "*3  // "etc. etc. etc. "
 
 ##### Comparison operators
 
-Comparison operators compare two operands and yield an untyped boolean value.
+Comparison operators compare two concrete operands and yield a boolean value.
 
 ```
 ==    equal
@@ -2336,39 +2336,47 @@ Comparison operators compare two operands and yield an untyped boolean value.
 =~    matches regular expression
 !~    does not match regular expression
 ```
-
 <!-- regular expression operator inspired by Bash, Perl, and Ruby. -->
 
-In any comparison, the types of the two operands must unify or one of the
-operands must be null.
+In any comparison, both operands must be concrete; otherwise the result is
+bottom (`_|_`).
 
-The equality operators `==` and `!=` apply to operands that are comparable.
-The ordering operators `<`, `<=`, `>`, and `>=` apply to operands that are ordered.
-The matching operators `=~` and `!~` apply to a string and a regular
-expression operand.
-These terms and the result of the comparisons are defined as follows:
+The equality operators `==` and `!=` can be applied to any two concrete
+operands.
+The ordering operators `<`, `<=`, `>`, and `>=` apply only to operands of the
+same ordered type (numeric, string, or bytes).
+The matching operators `=~` and `!~` apply to a string and a regular expression
+operand.
 
-- Null is comparable with itself and any other type.
-  Two null values are always equal, null is unequal with anything else.
-- Boolean values are comparable.
-  Two boolean values are equal if they are either both true or both false.
-- Integer values are comparable and ordered, in the usual way.
-- Floating-point values are comparable and ordered, as per the definitions
-  for binary coded decimals in the IEEE-754-2008 standard.
-- Floating-point numbers may be compared with integers; the comparison is
-  performed as if the integer was first converted to a floating-point number.
-- String and bytes values are comparable and ordered lexically byte-wise.
-- Structs are comparable but not ordered. Two structs are equal if they have the
-  same set of regular field labels and the corresponding values are recursively
-  equal. Only regular fields are considered in the comparison; field order and
-  closedness are irrelevant.
-- Lists are comparable but not ordered. Two lists are equal if they have the
-  same length and their corresponding elements are recursively equal.
-- The regular expression syntax is the one accepted by RE2,
-  described in https://github.com/google/re2/wiki/Syntax,
-  except for `\C`.
-- `s =~ r` is true if `s` matches the regular expression `r`.
-- `s !~ r` is true if `s` does not match regular expression `r`.
+For equality comparisons (`==` and `!=`):
+
+- Two values of different basic types are always unequal, except for integers
+  and floating-point numbers (see below).
+- Null values are equal only to other null values.
+- Boolean values are equal if they are both true or both false.
+- Numeric values are equal if they represent the same number.
+  When comparing an integer with a floating-point number, the integer is first
+  converted to floating-point.
+- String values are equal if they contain the same sequence of bytes.
+- Bytes values are equal if they contain the same sequence of bytes.
+- Struct values are equal if they have the same set of regular field labels
+  and the corresponding values are recursively equal. Only regular fields are
+  considered; field order and closedness are irrelevant.
+- List values are equal if they have the same length and their corresponding
+  elements are recursively equal.
+
+For ordering comparisons (`<`, `<=`, `>`, `>=`):
+
+- Numeric values are ordered by their numeric value, with integer-to-float
+  conversion as described above.
+- String values are ordered lexically byte-wise.
+- Bytes values are ordered lexically byte-wise.
+
+For pattern matching (`=~`, `!~`):
+
+- The regular expression syntax is that accepted by RE2 (https://github.com/google/re2/wiki/Syntax), except for `\C`.
+- `s =~ r` is true if string `s` matches regular expression `r`.
+- `s !~ r` is true if string `s` does not match regular expression `r`.
 
 <!--- TODO: consider the following
 - For regular expression, named capture groups are interpreted as CUE references

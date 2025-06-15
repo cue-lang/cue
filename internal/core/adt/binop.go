@@ -53,11 +53,15 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 	switch op {
 	case EqualOp:
 		switch {
+		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
+			// n := c.newNum()
+			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
+
+		case leftKind != rightKind:
+			return c.newBool(false)
+
 		case leftKind == NullKind && rightKind == NullKind:
 			return c.newBool(true)
-
-		case leftKind == NullKind || rightKind == NullKind:
-			return c.newBool(false)
 
 		case leftKind == BoolKind:
 			return c.newBool(c.BoolValue(left) == c.BoolValue(right))
@@ -69,10 +73,6 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 		case leftKind == BytesKind:
 			return cmpTonode(c, op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op)))
 
-		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
-			// n := c.newNum()
-			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
-
 		case leftKind == ListKind && rightKind == ListKind,
 			leftKind == StructKind && rightKind == StructKind:
 			return c.newBool(Equal(c, left, right, RegularOnly|IgnoreOptional))
@@ -80,11 +80,15 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 	case NotEqualOp:
 		switch {
+		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
+			// n := c.newNum()
+			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
+
+		case leftKind != rightKind:
+			return c.newBool(true)
+
 		case leftKind == NullKind && rightKind == NullKind:
 			return c.newBool(false)
-
-		case leftKind == NullKind || rightKind == NullKind:
-			return c.newBool(true)
 
 		case leftKind == BoolKind:
 			return c.newBool(c.boolValue(left, op) != c.boolValue(right, op))
@@ -95,10 +99,6 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 		case leftKind == BytesKind:
 			return cmpTonode(c, op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op)))
-
-		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
-			// n := c.newNum()
-			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
 
 		case leftKind == ListKind && rightKind == ListKind,
 			leftKind == StructKind && rightKind == StructKind:

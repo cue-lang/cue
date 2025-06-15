@@ -987,7 +987,7 @@ A _bound_, syntactically a [unary expression](#operands), defines
 a logically infinite disjunction of concrete values represented as a single comparison.
 For example, `>= 2` represents the infinite disjunction `2|3|4|5|6|7|…`.
 
-For any [comparison operator](#comparison-operators) `op` except `==`,
+For any [comparison operator](#comparison-operators) `op`,
 `op a` is the disjunction of every `x` such that `x op a`.
 
 
@@ -1002,7 +1002,8 @@ int & 2 & >1.0 & <3.0   // _|_
 2.5 & >=(int & 1) & <5  // _|_
 >=0 & <=7 & >=3 & <=10  // >=3 & <=7
 !=null & 1              // 1
->=5 & <=5               // 5
+==[1, 2] & [1]          // _|_
+!=[1, 2] & [1]          // [1]
 ```
 
 

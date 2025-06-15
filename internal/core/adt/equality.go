@@ -75,7 +75,7 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 		return false
 	}
 
-	maxArcType := ArcMember
+	maxArcType := ArcRequired
 	if flags&CheckStructural != 0 {
 		// Do not ignore optional fields
 		// TODO(required): consider making this unconditional

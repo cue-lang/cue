@@ -42,6 +42,31 @@ func Validate(ctx *OpContext, v *Vertex, cfg *ValidateConfig) *Bottom {
 	return x.err
 }
 
+// ValidateValue checks that a value has certain properties. The value must have
+// been evaluated.
+func ValidateValue(ctx *OpContext, v Value, cfg *ValidateConfig) *Bottom {
+	if cfg == nil {
+		cfg = &ValidateConfig{}
+	}
+
+	if v.Concreteness() > Concrete {
+		return &Bottom{
+			Code: IncompleteError,
+			Err:  ctx.Newf("non-concrete value '%v'", v),
+			Node: ctx.vertex,
+		}
+	}
+
+	if x, ok := v.(*Vertex); ok {
+		if v.Kind()&(StructKind|ListKind) != 0 {
+			x.Finalize(ctx)
+		}
+		return Validate(ctx, x, cfg)
+	}
+
+	return nil
+}
+
 type validator struct {
 	ValidateConfig
 	ctx          *OpContext

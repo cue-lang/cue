@@ -43,15 +43,15 @@ f: true
   f: (0 == 0.0)
 }
 -- out/eval/stats --
-Leaks:  2
-Freed:  7
-Reused: 5
-Allocs: 4
+Leaks:  0
+Freed:  9
+Reused: 6
+Allocs: 3
 Retain: 2
 
 Unifications: 9
 Conjuncts:    9
-Disjuncts:    9
+Disjuncts:    11
 -- out/eval --
 (struct){
   a: (bool){ true }

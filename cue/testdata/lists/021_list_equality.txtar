@@ -496,14 +496,14 @@ fne11: false
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  244
-Reused: 239
+Freed:  276
+Reused: 271
 Allocs: 5
-Retain: 100
+Retain: 116
 
-Unifications: 244
-Conjuncts:    244
-Disjuncts:    344
+Unifications: 276
+Conjuncts:    284
+Disjuncts:    392
 -- out/eval --
 (struct){
   eq0: (bool){ true }
@@ -554,6 +554,12 @@ Disjuncts:    344
   fne9: (bool){ true }
   fne10: (bool){ true }
   fne11: (bool){ true }
-  eqIncomplete1: (bool){ false }
-  neIncomplete1: (bool){ true }
+  eqIncomplete1: (_|_){
+    // [incomplete] eqIncomplete1: invalid right-hand value to '==' (type list): 0: incomplete value string:
+    //     ./in.cue:61:16
+  }
+  neIncomplete1: (_|_){
+    // [incomplete] neIncomplete1: invalid right-hand value to '!=' (type list): 0: incomplete value string:
+    //     ./in.cue:63:16
+  }
 }

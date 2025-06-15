@@ -2324,7 +2324,7 @@ s: "etc. "*3  // "etc. etc. etc. "
 
 ##### Comparison operators
 
-Comparison operators compare two operands and yield an untyped boolean value.
+Comparison operators compare two concrete operands and yield a boolean value.
 
 ```
 ==    equal
@@ -2339,23 +2339,21 @@ Comparison operators compare two operands and yield an untyped boolean value.
 
 <!-- regular expression operator inspired by Bash, Perl, and Ruby. -->
 
-In any comparison, the types of the two operands must unify or one of the
-operands must be null.
-
-The equality operators `==` and `!=` apply to operands that are comparable.
+The equality operators `==` and `!=` apply to any concrete values.
+If two operands are not comparable with each other, the result is false for `==`
+and true for `!=`.
 The ordering operators `<`, `<=`, `>`, and `>=` apply to operands that are ordered.
 The matching operators `=~` and `!~` apply to a string and a regular
 expression operand.
 These terms and the result of the comparisons are defined as follows:
 
-- Null is comparable with itself and any other type.
-  Two null values are always equal, null is unequal with anything else.
+- Null is comparable and equal to itself only.
 - Boolean values are comparable.
   Two boolean values are equal if they are either both true or both false.
 - Integer values are comparable and ordered, in the usual way.
 - Floating-point values are comparable and ordered, as per the definitions
   for binary coded decimals in the IEEE-754-2008 standard.
-  Floating-point numbers may be compared with integers; the comparison is
+- Floating-point numbers may be compared with integers; the comparison is
   performed as if the integer was first converted to a floating-point number.
 - String and bytes values are comparable and ordered lexically byte-wise.
 - Struct are comparable, only regular fields are involved in a comparison.

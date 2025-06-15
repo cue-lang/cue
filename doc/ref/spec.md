@@ -2344,13 +2344,15 @@ In any comparison, the types of the two operands must unify or one of the
 operands must be null.
 
 The equality operators `==` and `!=` apply to operands that are comparable.
-The ordering operators `<`, `<=`, `>`, and `>=` apply to operands that are ordered.
+The operands may be of different types, in which case the result is false
+for `==` and true for `!=`.
+The ordering operators `<`, `<=`, `>`, and `>=` apply to operands that are ordered and of the same type.
 The matching operators `=~` and `!~` apply to a string and a regular
 expression operand.
 These terms and the result of the comparisons are defined as follows:
 
-- Null is comparable with itself and any other type.
-  Two null values are always equal, null is unequal with anything else.
+- Null is comparable.
+  Null is equal to itself only.
 - Boolean values are comparable.
   Two boolean values are equal if they are either both true or both false.
 - Integer values are comparable and ordered, in the usual way.

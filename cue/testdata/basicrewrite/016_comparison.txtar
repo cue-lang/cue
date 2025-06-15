@@ -553,20 +553,24 @@ err: _|_ // invalid operation 2 == "s" (mismatched types int and string)
   }
 }
 -- out/eval/stats --
-Leaks:  65
-Freed:  229
-Reused: 223
-Allocs: 71
-Retain: 113
+Leaks:  37
+Freed:  451
+Reused: 445
+Allocs: 43
+Retain: 177
 
-Unifications: 282
-Conjuncts:    314
-Disjuncts:    342
--- out/eval --
+Unifications: 465
+Conjuncts:    543
+Disjuncts:    628
+-- out/evalalpha --
 Errors:
 err: invalid operands 2 and "s" to '==' (type int and string):
     ./in.cue:9:6
     ./in.cue:9:11
+lists.err1: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
+    ./lists.cue:23:8
+lists.err4: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
+    ./lists.cue:27:8
 structs.eq.t1: invalid operands {} and {} to '==' (type struct and struct):
     ./structs.cue:3:9
     ./structs.cue:3:15
@@ -589,7 +593,7 @@ structs.eq.t6: invalid operands {a:1} and {a:1} to '==' (type struct and struct)
 structs.eq.t7: invalid operands {} and {} to '==' (type struct and struct):
     ./structs.cue:9:9
     ./structs.cue:9:28
-structs.eq.t8: invalid operands {a:_t8l} and {a:(3|*1)} to '==' (type struct and struct):
+structs.eq.t8: invalid operands {a:*1 | 2 | 3} and {a:*1 | 3} to '==' (type struct and struct):
     ./structs.cue:11:9
     ./structs.cue:11:22
 structs.eq.f1: invalid operands {a:1,b:"foo"} and {a:2,b:"foo"} to '==' (type struct and struct):
@@ -616,30 +620,13 @@ structs.eq.f7: invalid operands {a:1,b?:2} and {a:1,b:2} to '==' (type struct an
 structs.eq.f8: invalid operands {a:1} and {a:1,b:2} to '==' (type struct and struct):
     ./structs.cue:21:9
     ./structs.cue:21:25
-structs.eq.f9: invalid operands {a:(*1|2|3)} and {a:_f9r} to '==' (type struct and struct):
+structs.eq.f9: invalid operands {a:*1 | 2 | 3} and {a:*2 | 3 | 4} to '==' (type struct and struct):
     ./structs.cue:23:9
     ./structs.cue:23:28
-structs.eq.err1: invalid operands {a!:int} and {a!:int} to '==' (type struct and struct):
-    ./structs.cue:26:8
-    ./structs.cue:26:21
-structs.eq.err2: invalid operands {a!:int} and {a!:1} to '==' (type struct and struct):
-    ./structs.cue:27:11
-    ./structs.cue:27:24
-structs.eq.err3: invalid operands {a:int} and {a:string} to '==' (type struct and struct):
-    ./structs.cue:28:11
-    ./structs.cue:28:23
-structs.eq.err4: invalid operands {a:(1 / 0)} and {a:1} to '==' (type struct and struct):
+structs.eq.err4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
     ./structs.cue:29:11
-    ./structs.cue:29:23
-structs.eq.err5: invalid operands {a:1} and {a:(int & string)} to '==' (type struct and struct):
+structs.eq.err5: invalid right-hand value to '==' (type struct): a: conflicting values int and string (mismatched types int and string):
     ./structs.cue:30:11
-    ./structs.cue:30:21
-structs.eq.err6: invalid operands {a!:1} and {a:1} to '==' (type struct and struct):
-    ./structs.cue:31:8
-    ./structs.cue:31:19
-structs.eq.err7: invalid operands {a:1} and {a!:2} to '==' (type struct and struct):
-    ./structs.cue:32:8
-    ./structs.cue:32:18
 structs.eq.net1: invalid operands {a:1} and {a:2} to '!=' (type struct and struct):
     ./structs.cue:36:8
     ./structs.cue:36:18
@@ -704,13 +691,14 @@ Result:
     //     ./in.cue:9:6
     //     ./in.cue:9:11
   }
-  lists: (struct){
+  lists: (_|_){
+    // [eval]
     t1: (bool){ true }
     t2: (bool){ true }
     t3: (bool){ true }
     t4: (bool){ true }
     t5: (bool){ true }
-    t6: (bool){ false }
+    t6: (bool){ true }
     t7: (bool){ true }
     t8: (bool){ true }
     f1: (bool){ false }
@@ -719,12 +707,24 @@ Result:
     f4: (bool){ false }
     f5: (bool){ false }
     f6: (bool){ false }
-    err1: (bool){ false }
-    err2: (bool){ false }
+    err1: (_|_){
+      // [eval] lists.err1: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
+      //     ./lists.cue:23:8
+    }
+    err2: (_|_){
+      // [incomplete] lists.err2: invalid left-hand value to '==' (type list): 0: incomplete value int:
+      //     ./lists.cue:24:8
+    }
     _e3l: (struct){
     }
-    err3: (bool){ false }
-    err4: (bool){ false }
+    err3: (_|_){
+      // [incomplete] lists.err3: invalid left-hand value to '==' (type list): 0: undefined field: b:
+      //     ./lists.cue:26:8
+    }
+    err4: (_|_){
+      // [eval] lists.err4: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
+      //     ./lists.cue:27:8
+    }
     net1: (bool){ true }
     nef1: (bool){ false }
   }
@@ -770,7 +770,7 @@ Result:
       }
       _t8l: (int){ |(*(int){ 1 }, (int){ 2 }, (int){ 3 }) }
       t8: (_|_){
-        // [eval] structs.eq.t8: invalid operands {a:_t8l} and {a:(3|*1)} to '==' (type struct and struct):
+        // [eval] structs.eq.t8: invalid operands {a:*1 | 2 | 3} and {a:*1 | 3} to '==' (type struct and struct):
         //     ./structs.cue:11:9
         //     ./structs.cue:11:22
       }
@@ -816,44 +816,37 @@ Result:
       }
       _f9r: (int){ |(*(int){ 2 }, (int){ 3 }, (int){ 4 }) }
       f9: (_|_){
-        // [eval] structs.eq.f9: invalid operands {a:(*1|2|3)} and {a:_f9r} to '==' (type struct and struct):
+        // [eval] structs.eq.f9: invalid operands {a:*1 | 2 | 3} and {a:*2 | 3 | 4} to '==' (type struct and struct):
         //     ./structs.cue:23:9
         //     ./structs.cue:23:28
       }
       err1: (_|_){
-        // [eval] structs.eq.err1: invalid operands {a!:int} and {a!:int} to '==' (type struct and struct):
+        // [incomplete] structs.eq.err1: invalid left-hand value to '==' (type struct): a: field is required but not present:
         //     ./structs.cue:26:8
-        //     ./structs.cue:26:21
       }
       err2: (_|_){
-        // [eval] structs.eq.err2: invalid operands {a!:int} and {a!:1} to '==' (type struct and struct):
+        // [incomplete] structs.eq.err2: invalid left-hand value to '==' (type struct): a: field is required but not present:
         //     ./structs.cue:27:11
-        //     ./structs.cue:27:24
       }
       err3: (_|_){
-        // [eval] structs.eq.err3: invalid operands {a:int} and {a:string} to '==' (type struct and struct):
+        // [incomplete] structs.eq.err3: invalid left-hand value to '==' (type struct): a: incomplete value int:
         //     ./structs.cue:28:11
-        //     ./structs.cue:28:23
       }
       err4: (_|_){
-        // [eval] structs.eq.err4: invalid operands {a:(1 / 0)} and {a:1} to '==' (type struct and struct):
+        // [eval] structs.eq.err4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
         //     ./structs.cue:29:11
-        //     ./structs.cue:29:23
       }
       err5: (_|_){
-        // [eval] structs.eq.err5: invalid operands {a:1} and {a:(int & string)} to '==' (type struct and struct):
+        // [eval] structs.eq.err5: invalid right-hand value to '==' (type struct): a: conflicting values int and string (mismatched types int and string):
         //     ./structs.cue:30:11
-        //     ./structs.cue:30:21
       }
       err6: (_|_){
-        // [eval] structs.eq.err6: invalid operands {a!:1} and {a:1} to '==' (type struct and struct):
+        // [incomplete] structs.eq.err6: invalid left-hand value to '==' (type struct): a: field is required but not present:
         //     ./structs.cue:31:8
-        //     ./structs.cue:31:19
       }
       err7: (_|_){
-        // [eval] structs.eq.err7: invalid operands {a:1} and {a!:2} to '==' (type struct and struct):
+        // [incomplete] structs.eq.err7: invalid right-hand value to '==' (type struct): a: field is required but not present:
         //     ./structs.cue:32:8
-        //     ./structs.cue:32:18
       }
       net1: (_|_){
         // [eval] structs.eq.net1: invalid operands {a:1} and {a:2} to '!=' (type struct and struct):
@@ -940,7 +933,492 @@ Result:
       //     ./typediff.cue:23:14
       //     ./typediff.cue:23:24
     }
-    recursive1e: (bool){ false }
+    recursive1e: (_|_){
+      // [incomplete] diffTypes.recursive1e: invalid left-hand value to '==' (type list): 0: incomplete value int:
+      //     ./typediff.cue:26:15
+    }
+    recursive2f: (bool){ false }
+    recursive3t: (bool){ true }
+    recursive4f: (bool){ false }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -2,9 +2,9 @@
+ err: invalid operands 2 and "s" to '==' (type int and string):
+     ./in.cue:9:6
+     ./in.cue:9:11
+-lists.err1: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
++lists.err1: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
+     ./lists.cue:23:8
+-lists.err4: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
++lists.err4: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
+     ./lists.cue:27:8
+ structs.eq.t1: invalid operands {} and {} to '==' (type struct and struct):
+     ./structs.cue:3:9
+@@ -58,9 +58,9 @@
+ structs.eq.f9: invalid operands {a:*1 | 2 | 3} and {a:*2 | 3 | 4} to '==' (type struct and struct):
+     ./structs.cue:23:9
+     ./structs.cue:23:28
+-structs.eq.err4: invalid left-hand value to '==' (type _|_): structs.eq.a: failed arithmetic: division by zero:
++structs.eq.err4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
+     ./structs.cue:29:11
+-structs.eq.err5: invalid right-hand value to '==' (type struct): structs.eq.a: conflicting values int and string (mismatched types int and string):
++structs.eq.err5: invalid right-hand value to '==' (type struct): a: conflicting values int and string (mismatched types int and string):
+     ./structs.cue:30:11
+ structs.eq.net1: invalid operands {a:1} and {a:2} to '!=' (type struct and struct):
+     ./structs.cue:36:8
+@@ -143,21 +143,21 @@
+     f5: (bool){ false }
+     f6: (bool){ false }
+     err1: (_|_){
+-      // [eval] lists.err1: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
++      // [eval] lists.err1: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
+       //     ./lists.cue:23:8
+     }
+     err2: (_|_){
+-      // [incomplete] lists.err2: invalid left-hand value to '==' (type list): lists.0: incomplete value int:
++      // [incomplete] lists.err2: invalid left-hand value to '==' (type list): 0: incomplete value int:
+       //     ./lists.cue:24:8
+     }
+     _e3l: (struct){
+     }
+     err3: (_|_){
+-      // [incomplete] lists.err3: invalid left-hand value to '==' (type list): lists.0: undefined field: b:
++      // [incomplete] lists.err3: invalid left-hand value to '==' (type list): 0: undefined field: b:
+       //     ./lists.cue:26:8
+     }
+     err4: (_|_){
+-      // [eval] lists.err4: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
++      // [eval] lists.err4: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
+       //     ./lists.cue:27:8
+     }
+     net1: (bool){ true }
+@@ -256,31 +256,31 @@
+         //     ./structs.cue:23:28
+       }
+       err1: (_|_){
+-        // [incomplete] structs.eq.err1: invalid left-hand value to '==' (type struct): structs.eq.a: field is required but not present:
++        // [incomplete] structs.eq.err1: invalid left-hand value to '==' (type struct): a: field is required but not present:
+         //     ./structs.cue:26:8
+       }
+       err2: (_|_){
+-        // [incomplete] structs.eq.err2: invalid left-hand value to '==' (type struct): structs.eq.a: field is required but not present:
++        // [incomplete] structs.eq.err2: invalid left-hand value to '==' (type struct): a: field is required but not present:
+         //     ./structs.cue:27:11
+       }
+       err3: (_|_){
+-        // [incomplete] structs.eq.err3: invalid left-hand value to '==' (type struct): structs.eq.a: incomplete value int:
++        // [incomplete] structs.eq.err3: invalid left-hand value to '==' (type struct): a: incomplete value int:
+         //     ./structs.cue:28:11
+       }
+       err4: (_|_){
+-        // [eval] structs.eq.err4: invalid left-hand value to '==' (type _|_): structs.eq.a: failed arithmetic: division by zero:
++        // [eval] structs.eq.err4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
+         //     ./structs.cue:29:11
+       }
+       err5: (_|_){
+-        // [eval] structs.eq.err5: invalid right-hand value to '==' (type struct): structs.eq.a: conflicting values int and string (mismatched types int and string):
++        // [eval] structs.eq.err5: invalid right-hand value to '==' (type struct): a: conflicting values int and string (mismatched types int and string):
+         //     ./structs.cue:30:11
+       }
+       err6: (_|_){
+-        // [incomplete] structs.eq.err6: invalid left-hand value to '==' (type struct): structs.eq.a: field is required but not present:
++        // [incomplete] structs.eq.err6: invalid left-hand value to '==' (type struct): a: field is required but not present:
+         //     ./structs.cue:31:8
+       }
+       err7: (_|_){
+-        // [incomplete] structs.eq.err7: invalid right-hand value to '==' (type struct): structs.eq.a: field is required but not present:
++        // [incomplete] structs.eq.err7: invalid right-hand value to '==' (type struct): a: field is required but not present:
+         //     ./structs.cue:32:8
+       }
+       net1: (_|_){
+@@ -369,7 +369,7 @@
+       //     ./typediff.cue:23:24
+     }
+     recursive1e: (_|_){
+-      // [incomplete] diffTypes.recursive1e: invalid left-hand value to '==' (type list): diffTypes.0: incomplete value int:
++      // [incomplete] diffTypes.recursive1e: invalid left-hand value to '==' (type list): 0: incomplete value int:
+       //     ./typediff.cue:26:15
+     }
+     recursive2f: (bool){ false }
+-- out/eval --
+Errors:
+err: invalid operands 2 and "s" to '==' (type int and string):
+    ./in.cue:9:6
+    ./in.cue:9:11
+lists.err1: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
+    ./lists.cue:23:8
+lists.err4: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
+    ./lists.cue:27:8
+structs.eq.t1: invalid operands {} and {} to '==' (type struct and struct):
+    ./structs.cue:3:9
+    ./structs.cue:3:15
+structs.eq.t2: invalid operands {a:1,b:"foo"} and {a:1,b:"foo"} to '==' (type struct and struct):
+    ./structs.cue:4:9
+    ./structs.cue:4:29
+structs.eq.t3: invalid operands {a:1,b:2} and {b:2,a:1} to '==' (type struct and struct):
+    ./structs.cue:5:9
+    ./structs.cue:5:25
+structs.eq.t4: invalid operands {a:{x:1,y:2}} and {a:{x:1,y:2}} to '==' (type struct and struct):
+    ./structs.cue:6:9
+    ./structs.cue:6:30
+structs.eq.t5: invalid operands {a:1,b:2,c:3,d:4} and {a:1,b:2,c:3,d:4} to '==' (type struct and struct):
+    ./structs.cue:7:9
+    ./structs.cue:7:10
+    ./structs.cue:7:42
+structs.eq.t6: invalid operands {a:1} and {a:1} to '==' (type struct and struct):
+    ./structs.cue:8:9
+    ./structs.cue:8:25
+structs.eq.t7: invalid operands {} and {} to '==' (type struct and struct):
+    ./structs.cue:9:9
+    ./structs.cue:9:28
+structs.eq.t8: invalid operands {a:*1 | 2 | 3} and {a:*1 | 3} to '==' (type struct and struct):
+    ./structs.cue:11:9
+    ./structs.cue:11:22
+structs.eq.f1: invalid operands {a:1,b:"foo"} and {a:2,b:"foo"} to '==' (type struct and struct):
+    ./structs.cue:14:9
+    ./structs.cue:14:29
+structs.eq.f2: invalid operands {a:1,b:"foo"} and {a:1,c:"foo"} to '==' (type struct and struct):
+    ./structs.cue:15:9
+    ./structs.cue:15:29
+structs.eq.f3: invalid operands {a:{x:1}} and {a:{x:2}} to '==' (type struct and struct):
+    ./structs.cue:16:9
+    ./structs.cue:16:24
+structs.eq.f4: invalid operands {a:1,b:2} and {a:1} to '==' (type struct and struct):
+    ./structs.cue:17:9
+    ./structs.cue:17:25
+structs.eq.f5: invalid operands {} and {a:1} to '==' (type struct and struct):
+    ./structs.cue:18:9
+    ./structs.cue:18:15
+structs.eq.f6: invalid operands {a:1} and 1 to '==' (type struct and int):
+    ./structs.cue:19:9
+    ./structs.cue:19:19
+structs.eq.f7: invalid operands {a:1,b?:2} and {a:1,b:2} to '==' (type struct and struct):
+    ./structs.cue:20:9
+    ./structs.cue:20:26
+structs.eq.f8: invalid operands {a:1} and {a:1,b:2} to '==' (type struct and struct):
+    ./structs.cue:21:9
+    ./structs.cue:21:25
+structs.eq.f9: invalid operands {a:*1 | 2 | 3} and {a:*2 | 3 | 4} to '==' (type struct and struct):
+    ./structs.cue:23:9
+    ./structs.cue:23:28
+structs.eq.err4: invalid left-hand value to '==' (type _|_): structs.eq.a: failed arithmetic: division by zero:
+    ./structs.cue:29:11
+structs.eq.err5: invalid right-hand value to '==' (type struct): structs.eq.a: conflicting values int and string (mismatched types int and string):
+    ./structs.cue:30:11
+structs.eq.net1: invalid operands {a:1} and {a:2} to '!=' (type struct and struct):
+    ./structs.cue:36:8
+    ./structs.cue:36:18
+structs.eq.nef1: invalid operands {a:2} and {a:2} to '!=' (type struct and struct):
+    ./structs.cue:37:8
+    ./structs.cue:37:18
+diffTypes.num_diff: invalid operands 2 and "s" to '==' (type int and string):
+    ./typediff.cue:3:13
+    ./typediff.cue:3:18
+diffTypes.str_diff: cannot use 2 (type int) as type string:
+    ./typediff.cue:4:13
+    ./typediff.cue:4:20
+diffTypes.bool_diff: cannot use 2 (type int) as type bool:
+    ./typediff.cue:5:13
+    ./typediff.cue:5:21
+diffTypes.struct_diff: invalid operands {a:1} and "s" to '==' (type struct and string):
+    ./typediff.cue:6:15
+    ./typediff.cue:6:25
+diffTypes.num_list: invalid operands 5 and [5] to '==' (type int and list):
+    ./typediff.cue:9:15
+    ./typediff.cue:9:20
+diffTypes.str_list: cannot use ["a","b"] (type list) as type string:
+    ./typediff.cue:10:15
+    ./typediff.cue:10:23
+diffTypes.bool_list: cannot use [true] (type list) as type bool:
+    ./typediff.cue:11:15
+    ./typediff.cue:11:23
+diffTypes.struct_list: invalid operands {a:1} and [{a:1}] to '==' (type struct and list):
+    ./typediff.cue:12:15
+    ./typediff.cue:12:25
+diffTypes.list_num: invalid operands [1,2] and 3 to '==' (type list and int):
+    ./typediff.cue:15:15
+    ./typediff.cue:15:25
+diffTypes.list_str: invalid operands [1,2] and "ab" to '==' (type list and string):
+    ./typediff.cue:16:15
+    ./typediff.cue:16:25
+diffTypes.list_bool: invalid operands [true] and false to '==' (type list and bool):
+    ./typediff.cue:17:15
+    ./typediff.cue:17:25
+diffTypes.list_struct: invalid operands [1,2] and {a:1} to '==' (type list and struct):
+    ./typediff.cue:18:15
+    ./typediff.cue:18:25
+diffTypes.n_list_num: invalid operands [1,2] and 3 to '!=' (type list and int):
+    ./typediff.cue:22:14
+    ./typediff.cue:22:24
+diffTypes.n_list_str: invalid operands [1,2] and "ab" to '!=' (type list and string):
+    ./typediff.cue:23:14
+    ./typediff.cue:23:24
+
+Result:
+(_|_){
+  // [eval]
+  lss: (bool){ true }
+  leq: (bool){ true }
+  eql: (bool){ true }
+  neq: (bool){ true }
+  gtr: (bool){ true }
+  geq: (bool){ true }
+  seq: (bool){ true }
+  err: (_|_){
+    // [eval] err: invalid operands 2 and "s" to '==' (type int and string):
+    //     ./in.cue:9:6
+    //     ./in.cue:9:11
+  }
+  lists: (_|_){
+    // [eval]
+    t1: (bool){ true }
+    t2: (bool){ true }
+    t3: (bool){ true }
+    t4: (bool){ true }
+    t5: (bool){ true }
+    t6: (bool){ true }
+    t7: (bool){ true }
+    t8: (bool){ true }
+    f1: (bool){ false }
+    f2: (bool){ false }
+    f3: (bool){ false }
+    f4: (bool){ false }
+    f5: (bool){ false }
+    f6: (bool){ false }
+    err1: (_|_){
+      // [eval] lists.err1: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
+      //     ./lists.cue:23:8
+    }
+    err2: (_|_){
+      // [incomplete] lists.err2: invalid left-hand value to '==' (type list): lists.0: incomplete value int:
+      //     ./lists.cue:24:8
+    }
+    _e3l: (struct){
+    }
+    err3: (_|_){
+      // [incomplete] lists.err3: invalid left-hand value to '==' (type list): lists.0: undefined field: b:
+      //     ./lists.cue:26:8
+    }
+    err4: (_|_){
+      // [eval] lists.err4: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
+      //     ./lists.cue:27:8
+    }
+    net1: (bool){ true }
+    nef1: (bool){ false }
+  }
+  structs: (_|_){
+    // [eval]
+    eq: (_|_){
+      // [eval]
+      t1: (_|_){
+        // [eval] structs.eq.t1: invalid operands {} and {} to '==' (type struct and struct):
+        //     ./structs.cue:3:9
+        //     ./structs.cue:3:15
+      }
+      t2: (_|_){
+        // [eval] structs.eq.t2: invalid operands {a:1,b:"foo"} and {a:1,b:"foo"} to '==' (type struct and struct):
+        //     ./structs.cue:4:9
+        //     ./structs.cue:4:29
+      }
+      t3: (_|_){
+        // [eval] structs.eq.t3: invalid operands {a:1,b:2} and {b:2,a:1} to '==' (type struct and struct):
+        //     ./structs.cue:5:9
+        //     ./structs.cue:5:25
+      }
+      t4: (_|_){
+        // [eval] structs.eq.t4: invalid operands {a:{x:1,y:2}} and {a:{x:1,y:2}} to '==' (type struct and struct):
+        //     ./structs.cue:6:9
+        //     ./structs.cue:6:30
+      }
+      t5: (_|_){
+        // [eval] structs.eq.t5: invalid operands {a:1,b:2,c:3,d:4} and {a:1,b:2,c:3,d:4} to '==' (type struct and struct):
+        //     ./structs.cue:7:9
+        //     ./structs.cue:7:10
+        //     ./structs.cue:7:42
+      }
+      t6: (_|_){
+        // [eval] structs.eq.t6: invalid operands {a:1} and {a:1} to '==' (type struct and struct):
+        //     ./structs.cue:8:9
+        //     ./structs.cue:8:25
+      }
+      t7: (_|_){
+        // [eval] structs.eq.t7: invalid operands {} and {} to '==' (type struct and struct):
+        //     ./structs.cue:9:9
+        //     ./structs.cue:9:28
+      }
+      _t8l: (int){ |(*(int){ 1 }, (int){ 2 }, (int){ 3 }) }
+      t8: (_|_){
+        // [eval] structs.eq.t8: invalid operands {a:*1 | 2 | 3} and {a:*1 | 3} to '==' (type struct and struct):
+        //     ./structs.cue:11:9
+        //     ./structs.cue:11:22
+      }
+      f1: (_|_){
+        // [eval] structs.eq.f1: invalid operands {a:1,b:"foo"} and {a:2,b:"foo"} to '==' (type struct and struct):
+        //     ./structs.cue:14:9
+        //     ./structs.cue:14:29
+      }
+      f2: (_|_){
+        // [eval] structs.eq.f2: invalid operands {a:1,b:"foo"} and {a:1,c:"foo"} to '==' (type struct and struct):
+        //     ./structs.cue:15:9
+        //     ./structs.cue:15:29
+      }
+      f3: (_|_){
+        // [eval] structs.eq.f3: invalid operands {a:{x:1}} and {a:{x:2}} to '==' (type struct and struct):
+        //     ./structs.cue:16:9
+        //     ./structs.cue:16:24
+      }
+      f4: (_|_){
+        // [eval] structs.eq.f4: invalid operands {a:1,b:2} and {a:1} to '==' (type struct and struct):
+        //     ./structs.cue:17:9
+        //     ./structs.cue:17:25
+      }
+      f5: (_|_){
+        // [eval] structs.eq.f5: invalid operands {} and {a:1} to '==' (type struct and struct):
+        //     ./structs.cue:18:9
+        //     ./structs.cue:18:15
+      }
+      f6: (_|_){
+        // [eval] structs.eq.f6: invalid operands {a:1} and 1 to '==' (type struct and int):
+        //     ./structs.cue:19:9
+        //     ./structs.cue:19:19
+      }
+      f7: (_|_){
+        // [eval] structs.eq.f7: invalid operands {a:1,b?:2} and {a:1,b:2} to '==' (type struct and struct):
+        //     ./structs.cue:20:9
+        //     ./structs.cue:20:26
+      }
+      f8: (_|_){
+        // [eval] structs.eq.f8: invalid operands {a:1} and {a:1,b:2} to '==' (type struct and struct):
+        //     ./structs.cue:21:9
+        //     ./structs.cue:21:25
+      }
+      _f9r: (int){ |(*(int){ 2 }, (int){ 3 }, (int){ 4 }) }
+      f9: (_|_){
+        // [eval] structs.eq.f9: invalid operands {a:*1 | 2 | 3} and {a:*2 | 3 | 4} to '==' (type struct and struct):
+        //     ./structs.cue:23:9
+        //     ./structs.cue:23:28
+      }
+      err1: (_|_){
+        // [incomplete] structs.eq.err1: invalid left-hand value to '==' (type struct): structs.eq.a: field is required but not present:
+        //     ./structs.cue:26:8
+      }
+      err2: (_|_){
+        // [incomplete] structs.eq.err2: invalid left-hand value to '==' (type struct): structs.eq.a: field is required but not present:
+        //     ./structs.cue:27:11
+      }
+      err3: (_|_){
+        // [incomplete] structs.eq.err3: invalid left-hand value to '==' (type struct): structs.eq.a: incomplete value int:
+        //     ./structs.cue:28:11
+      }
+      err4: (_|_){
+        // [eval] structs.eq.err4: invalid left-hand value to '==' (type _|_): structs.eq.a: failed arithmetic: division by zero:
+        //     ./structs.cue:29:11
+      }
+      err5: (_|_){
+        // [eval] structs.eq.err5: invalid right-hand value to '==' (type struct): structs.eq.a: conflicting values int and string (mismatched types int and string):
+        //     ./structs.cue:30:11
+      }
+      err6: (_|_){
+        // [incomplete] structs.eq.err6: invalid left-hand value to '==' (type struct): structs.eq.a: field is required but not present:
+        //     ./structs.cue:31:8
+      }
+      err7: (_|_){
+        // [incomplete] structs.eq.err7: invalid right-hand value to '==' (type struct): structs.eq.a: field is required but not present:
+        //     ./structs.cue:32:8
+      }
+      net1: (_|_){
+        // [eval] structs.eq.net1: invalid operands {a:1} and {a:2} to '!=' (type struct and struct):
+        //     ./structs.cue:36:8
+        //     ./structs.cue:36:18
+      }
+      nef1: (_|_){
+        // [eval] structs.eq.nef1: invalid operands {a:2} and {a:2} to '!=' (type struct and struct):
+        //     ./structs.cue:37:8
+        //     ./structs.cue:37:18
+      }
+    }
+  }
+  diffTypes: (_|_){
+    // [eval]
+    num_diff: (_|_){
+      // [eval] diffTypes.num_diff: invalid operands 2 and "s" to '==' (type int and string):
+      //     ./typediff.cue:3:13
+      //     ./typediff.cue:3:18
+    }
+    str_diff: (_|_){
+      // [eval] diffTypes.str_diff: cannot use 2 (type int) as type string:
+      //     ./typediff.cue:4:13
+      //     ./typediff.cue:4:20
+    }
+    bool_diff: (_|_){
+      // [eval] diffTypes.bool_diff: cannot use 2 (type int) as type bool:
+      //     ./typediff.cue:5:13
+      //     ./typediff.cue:5:21
+    }
+    struct_diff: (_|_){
+      // [eval] diffTypes.struct_diff: invalid operands {a:1} and "s" to '==' (type struct and string):
+      //     ./typediff.cue:6:15
+      //     ./typediff.cue:6:25
+    }
+    num_list: (_|_){
+      // [eval] diffTypes.num_list: invalid operands 5 and [5] to '==' (type int and list):
+      //     ./typediff.cue:9:15
+      //     ./typediff.cue:9:20
+    }
+    str_list: (_|_){
+      // [eval] diffTypes.str_list: cannot use ["a","b"] (type list) as type string:
+      //     ./typediff.cue:10:15
+      //     ./typediff.cue:10:23
+    }
+    bool_list: (_|_){
+      // [eval] diffTypes.bool_list: cannot use [true] (type list) as type bool:
+      //     ./typediff.cue:11:15
+      //     ./typediff.cue:11:23
+    }
+    struct_list: (_|_){
+      // [eval] diffTypes.struct_list: invalid operands {a:1} and [{a:1}] to '==' (type struct and list):
+      //     ./typediff.cue:12:15
+      //     ./typediff.cue:12:25
+    }
+    list_num: (_|_){
+      // [eval] diffTypes.list_num: invalid operands [1,2] and 3 to '==' (type list and int):
+      //     ./typediff.cue:15:15
+      //     ./typediff.cue:15:25
+    }
+    list_str: (_|_){
+      // [eval] diffTypes.list_str: invalid operands [1,2] and "ab" to '==' (type list and string):
+      //     ./typediff.cue:16:15
+      //     ./typediff.cue:16:25
+    }
+    list_bool: (_|_){
+      // [eval] diffTypes.list_bool: invalid operands [true] and false to '==' (type list and bool):
+      //     ./typediff.cue:17:15
+      //     ./typediff.cue:17:25
+    }
+    list_struct: (_|_){
+      // [eval] diffTypes.list_struct: invalid operands [1,2] and {a:1} to '==' (type list and struct):
+      //     ./typediff.cue:18:15
+      //     ./typediff.cue:18:25
+    }
+    list_null: (bool){ false }
+    n_list_num: (_|_){
+      // [eval] diffTypes.n_list_num: invalid operands [1,2] and 3 to '!=' (type list and int):
+      //     ./typediff.cue:22:14
+      //     ./typediff.cue:22:24
+    }
+    n_list_str: (_|_){
+      // [eval] diffTypes.n_list_str: invalid operands [1,2] and "ab" to '!=' (type list and string):
+      //     ./typediff.cue:23:14
+      //     ./typediff.cue:23:24
+    }
+    recursive1e: (_|_){
+      // [incomplete] diffTypes.recursive1e: invalid left-hand value to '==' (type list): diffTypes.0: incomplete value int:
+      //     ./typediff.cue:26:15
+    }
     recursive2f: (bool){ false }
     recursive3t: (bool){ true }
     recursive4f: (bool){ false }

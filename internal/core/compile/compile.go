@@ -1001,7 +1001,7 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 				X:   c.expr(n.X),
 			}
 		case token.GEQ, token.GTR, token.LSS, token.LEQ,
-			token.NEQ, token.MAT, token.NMAT:
+			token.EQL, token.NEQ, token.MAT, token.NMAT:
 			return &adt.BoundExpr{
 				Src:  n,
 				Op:   adt.OpFromToken(n.Op),

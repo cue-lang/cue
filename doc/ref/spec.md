@@ -2355,10 +2355,15 @@ These terms and the result of the comparisons are defined as follows:
 - Integer values are comparable and ordered, in the usual way.
 - Floating-point values are comparable and ordered, as per the definitions
   for binary coded decimals in the IEEE-754-2008 standard.
-- Floating point numbers may be compared with integers.
+- Floating-point numbers may be compared with integers; the comparison is
+  performed as if the integer was first converted to a floating-point number.
 - String and bytes values are comparable and ordered lexically byte-wise.
-- Struct are not comparable.
-- Lists are not comparable.
+- Structs are comparable but not ordered. Two structs are equal if they have the
+  same set of regular field labels and the corresponding values are recursively
+  equal. Only regular fields are considered in the comparison; field order and
+  closedness are irrelevant.
+- Lists are comparable but not ordered. Two lists are equal if they have the
+  same length and their corresponding elements are recursively equal.
 - The regular expression syntax is the one accepted by RE2,
   described in https://github.com/google/re2/wiki/Syntax,
   except for `\C`.

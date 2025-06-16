@@ -102,6 +102,12 @@ func TestModuleFetch(t *testing.T) {
 			})
 			return
 		}
+		if inst.Module != "" {
+			// Sanity check that the module file is present in the instance.
+			qt.Assert(t, qt.Not(qt.IsNil(inst.ModuleFile)))
+			qt.Assert(t, qt.Equals(inst.ModuleFile.Module, inst.Module))
+			qt.Assert(t, qt.Equals(inst.ModuleFile.Language.Version, "v0.8.0"))
+		}
 		v := ctx.BuildInstance(inst)
 		if err := v.Validate(); err != nil {
 			t.Fatal(err)

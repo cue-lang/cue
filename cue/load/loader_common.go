@@ -248,6 +248,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 			q.ImportPath = p.ImportPath + ":" + pkg
 			q.Root = p.Root
 			q.Module = p.Module
+			q.ModuleFile = p.ModuleFile
 			fp.pkgs[pkg] = q
 		}
 		p = q

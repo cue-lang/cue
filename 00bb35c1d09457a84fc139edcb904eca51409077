@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c73f6057_c304bb8c",
+        "filename": "internal/core/toposort/graph_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-16T14:11:30Z",
+      "side": 1,
+      "message": "Is it good practice to import it as\n\n```\n   rand \"math/rand/v2\"\n```\n\nso it\u0027s crystal clear to readers and humans that the name of the package is `rand`, not `v2`, or is that not idiomatic?",
+      "revId": "00bb35c1d09457a84fc139edcb904eca51409077",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

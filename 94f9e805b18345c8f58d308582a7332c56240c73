@@ -33,6 +33,24 @@
       "message": "*Perhaps* clarify that that\u0027s the CUE package name; not the (possibly mutated) Go package name?",
       "revId": "94f9e805b18345c8f58d308582a7332c56240c73",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "021de3e7_fd04509e",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-16T14:30:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "480ca096_5c75ce54",
+      "revId": "94f9e805b18345c8f58d308582a7332c56240c73",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

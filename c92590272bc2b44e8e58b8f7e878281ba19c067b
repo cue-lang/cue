@@ -16,6 +16,24 @@
       "message": "Was this removal intended, given that the comment was added at the same time as the current help text?",
       "revId": "c92590272bc2b44e8e58b8f7e878281ba19c067b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6d0f284_0ea2ee5b",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-16T14:30:30Z",
+      "side": 0,
+      "message": "yep indeed. I did write the help text above in an earlier CL, which is complete enough for now. the TODO was written when the help text was just one sentence.",
+      "parentUuid": "997ece2e_a361792b",
+      "revId": "c92590272bc2b44e8e58b8f7e878281ba19c067b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

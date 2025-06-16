@@ -302,6 +302,9 @@ If an environment variable is unset or empty, sensible default setting is used.
 			and bringing a better disjunction algorithm.
 		cmdreferencepkg (default true)
 			Require referencing imported tool packages to declare "cue cmd" tasks.
+		keepvalidators (default true)
+			Prevent validators from simplifying into concrete values.
+			See: https://cuelang.org/discussion/3775
 
 	CUE_DEBUG
 		Comma-separated list of debug flags to enable or disable, such as:

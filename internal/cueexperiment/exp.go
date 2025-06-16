@@ -7,11 +7,12 @@ import (
 )
 
 // Flags holds the set of global CUE_EXPERIMENT flags. It is initialized by Init.
+var Flags Config
+
+// Config holds the set of known CUE_EXPERIMENT flags.
 //
 // When adding, deleting, or modifying entries below,
 // update cmd/cue/cmd/help.go as well for `cue help environment`.
-var Flags Config
-
 type Config struct {
 	// EvalV3 enables the new CUE evaluator, addressing performance issues
 	// and bringing better algorithms for disjunctions, closedness, and cycles.
@@ -27,13 +28,11 @@ type Config struct {
 	// and enabled by default in the upcoming v0.14 release.
 	CmdReferencePkg bool `envflag:"default:true"`
 
-	// Validators currently do not simplify to concrete values, even if their
-	// concrete value could be derived. For instance, >=1 & <=1 will evaluate
-	// to 1. Since https://github.com/cue-lang/cue/discussions/3775 was
-	// implemented, this is not longer supported.
+	// KeepValidators prevents validators from simplifying into concrete values,
+	// even if their concrete value could be derived, such as `>=1 & <=1` to `1`.
+	// See the proposal at https://cuelang.org/discussion/3775.
 	//
-	// To get the old behavior, set the flag to false. We do not expect support
-	// for this to be long lived.
+	// This experiment is introduced in the upcoming v0.14 release, already on by default.
 	KeepValidators bool `envflag:"default:true"`
 
 	// The flags below describe completed experiments; they can still be set

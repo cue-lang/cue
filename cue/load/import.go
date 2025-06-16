@@ -317,6 +317,7 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 	// p.ImportPath = string(dir) // compute unique ID.
 	p.Root = l.cfg.ModuleRoot
 	p.Module = l.cfg.Module
+	p.ModuleFile = l.cfg.modFile
 
 	var err errors.Error
 	if path != cleanImport(path) {
@@ -402,6 +403,7 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	i.ImportPath = string(p)
 	i.Root = l.cfg.ModuleRoot
 	i.Module = modPath
+	i.ModuleFile = l.cfg.modFile
 
 	return i
 }

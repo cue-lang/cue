@@ -472,6 +472,7 @@ func (c *Config) newErrInstance(err error) *build.Instance {
 	i := c.Context.NewInstance("", nil)
 	i.Root = c.ModuleRoot
 	i.Module = c.Module
+	i.ModuleFile = c.modFile
 	i.Err = errors.Promote(err, "")
 	return i
 }

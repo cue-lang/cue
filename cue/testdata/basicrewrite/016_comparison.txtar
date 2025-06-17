@@ -172,6 +172,17 @@ diffTypes: {
 	iNe3: {a: 1} != {a: _int}
 	iNe4: {a: _int} != {a: 1}
 }
+-- incomplete.cue --
+incomplete: carryOver: {
+	t1: {
+		#foo: {
+			a: [...]
+			b: [1]
+			incomplete: true & (a == b)
+		}
+		ok: #foo & {a: [1]}
+	}
+}
 -- out/compile --
 --- in.cue
 {
@@ -184,6 +195,29 @@ diffTypes: {
     tGeq: (2.0 >= 2)
     tGtr: !(2 > 3)
     tExpr: (("a" + "b") == "ab")
+  }
+}
+--- incomplete.cue
+{
+  incomplete: {
+    carryOver: {
+      t1: {
+        #foo: {
+          a: [
+            ...,
+          ]
+          b: [
+            1,
+          ]
+          incomplete: (true & (〈0;a〉 == 〈0;b〉))
+        }
+        ok: (〈0;#foo〉 & {
+          a: [
+            1,
+          ]
+        })
+      }
+    }
   }
 }
 --- lists.cue
@@ -753,16 +787,19 @@ diffTypes: {
 }
 -- out/eval/stats --
 Leaks:  54
-Freed:  644
-Reused: 639
+Freed:  657
+Reused: 652
 Allocs: 59
 Retain: 281
 
-Unifications: 675
-Conjuncts:    839
-Disjuncts:    925
+Unifications: 688
+Conjuncts:    860
+Disjuncts:    938
 -- out/evalalpha --
 Errors:
+incomplete.carryOver.t1.#foo.incomplete: conflicting values false and true:
+    ./incomplete.cue:6:16
+    ./incomplete.cue:6:24
 lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
     ./lists.cue:24:19
 lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
@@ -783,6 +820,67 @@ Result:
     tGeq: (bool){ true }
     tGtr: (bool){ true }
     tExpr: (bool){ true }
+  }
+  incomplete: (_|_){
+    // [eval]
+    carryOver: (_|_){
+      // [eval]
+      t1: (_|_){
+        // [eval]
+        #foo: (_|_){
+          // [eval]
+          a: (list){
+          }
+          b: (#list){
+            0: (int){ 1 }
+          }
+          incomplete: (_|_){
+            // [eval] incomplete.carryOver.t1.#foo.incomplete: conflicting values false and true:
+            //     ./incomplete.cue:6:16
+            //     ./incomplete.cue:6:24
+          }
+        }
+        ok: (#struct){
+          a: (#list){
+            0: (int){ 1 }
+          }
+          b: (#list){
+            0: (int){ 1 }
+          }
+          incomplete: (bool){ true }
+        }
+      }
+    }
+    _int: (int){ int }
+    _string: (string){ string }
+    iErr1: (_|_){
+      // [incomplete] incomplete.iErr1: invalid left-hand value to '==' (type struct): a: field is required but not present:
+      //     ./structs.cue:70:9
+    }
+    iErr2: (_|_){
+      // [incomplete] incomplete.iErr2: invalid left-hand value to '==' (type struct): a: field is required but not present:
+      //     ./structs.cue:71:9
+    }
+    eErr3: (_|_){
+      // [incomplete] incomplete.eErr3: invalid left-hand value to '==' (type struct): a: incomplete value int:
+      //     ./structs.cue:72:9
+    }
+    eErr4: (_|_){
+      // [eval] incomplete.eErr4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
+      //     ./structs.cue:73:9
+    }
+    eErr5: (_|_){
+      // [eval] incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values int and string (mismatched types int and string):
+      //     ./structs.cue:75:9
+    }
+    iErr6: (_|_){
+      // [incomplete] incomplete.iErr6: invalid left-hand value to '==' (type struct): a: field is required but not present:
+      //     ./structs.cue:76:9
+    }
+    eErr7: (_|_){
+      // [incomplete] incomplete.eErr7: invalid right-hand value to '==' (type struct): a: field is required but not present:
+      //     ./structs.cue:77:9
+    }
   }
   lists: (_|_){
     // [eval]
@@ -870,39 +968,6 @@ Result:
     f3: (bool){ false }
     f4: (bool){ false }
   }
-  incomplete: (_|_){
-    // [eval]
-    _int: (int){ int }
-    _string: (string){ string }
-    iErr1: (_|_){
-      // [incomplete] incomplete.iErr1: invalid left-hand value to '==' (type struct): a: field is required but not present:
-      //     ./structs.cue:70:9
-    }
-    iErr2: (_|_){
-      // [incomplete] incomplete.iErr2: invalid left-hand value to '==' (type struct): a: field is required but not present:
-      //     ./structs.cue:71:9
-    }
-    eErr3: (_|_){
-      // [incomplete] incomplete.eErr3: invalid left-hand value to '==' (type struct): a: incomplete value int:
-      //     ./structs.cue:72:9
-    }
-    eErr4: (_|_){
-      // [eval] incomplete.eErr4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
-      //     ./structs.cue:73:9
-    }
-    eErr5: (_|_){
-      // [eval] incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values int and string (mismatched types int and string):
-      //     ./structs.cue:75:9
-    }
-    iErr6: (_|_){
-      // [incomplete] incomplete.iErr6: invalid left-hand value to '==' (type struct): a: field is required but not present:
-      //     ./structs.cue:76:9
-    }
-    eErr7: (_|_){
-      // [incomplete] incomplete.eErr7: invalid right-hand value to '==' (type struct): a: field is required but not present:
-      //     ./structs.cue:77:9
-    }
-  }
   diffTypes: (struct){
     fScalar1: (bool){ false }
     fScalar2: (bool){ false }
@@ -954,8 +1019,10 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,11 @@
- Errors:
+@@ -2,13 +2,13 @@
+ incomplete.carryOver.t1.#foo.incomplete: conflicting values false and true:
+     ./incomplete.cue:6:16
+     ./incomplete.cue:6:24
 -lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
 +lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
      ./lists.cue:24:19
@@ -970,24 +1037,7 @@ diff old new
      ./structs.cue:75:9
  
  Result:
-@@ -38,13 +38,13 @@
-     f5: (bool){ false }
-     f6: (bool){ false }
-     eErrPassthrough: (_|_){
--      // [eval] lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
-+      // [eval] lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
-       //     ./lists.cue:24:19
--      // lists.eErrPassthrough: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
-+      // lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
-       //     ./lists.cue:28:19
-     }
-     eIncompat: (_|_){
--      // [incomplete] lists.eIncompat: invalid left-hand value to '==' (type list): lists.0: incomplete value int:
-+      // [incomplete] lists.eIncompat: invalid left-hand value to '==' (type list): 0: incomplete value int:
-       //     ./lists.cue:25:13
-     }
-     _e3l: (struct){
-@@ -111,31 +111,31 @@
+@@ -56,31 +56,31 @@
      _int: (int){ int }
      _string: (string){ string }
      iErr1: (_|_){
@@ -1026,7 +1076,24 @@ diff old new
        //     ./structs.cue:77:9
      }
    }
-@@ -158,11 +158,11 @@
+@@ -102,13 +102,13 @@
+     f5: (bool){ false }
+     f6: (bool){ false }
+     eErrPassthrough: (_|_){
+-      // [eval] lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
++      // [eval] lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
+       //     ./lists.cue:24:19
+-      // lists.eErrPassthrough: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
++      // lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
+       //     ./lists.cue:28:19
+     }
+     eIncompat: (_|_){
+-      // [incomplete] lists.eIncompat: invalid left-hand value to '==' (type list): lists.0: incomplete value int:
++      // [incomplete] lists.eIncompat: invalid left-hand value to '==' (type list): 0: incomplete value int:
+       //     ./lists.cue:25:13
+     }
+     _e3l: (struct){
+@@ -189,11 +189,11 @@
      _int: (int){ int }
      _string: (string){ string }
      iRecursive1: (_|_){
@@ -1040,7 +1107,7 @@ diff old new
        //     ./typediff.cue:33:15
      }
      fRecursive3: (bool){ false }
-@@ -169,19 +169,19 @@
+@@ -200,19 +200,19 @@
      tRecursive4: (bool){ true }
      fRecursive5: (bool){ false }
      eNe1: (_|_){
@@ -1066,6 +1133,9 @@ diff old new
    }
 -- out/eval --
 Errors:
+incomplete.carryOver.t1.#foo.incomplete: conflicting values false and true:
+    ./incomplete.cue:6:16
+    ./incomplete.cue:6:24
 lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
     ./lists.cue:24:19
 lists.eErrPassthrough: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
@@ -1086,6 +1156,67 @@ Result:
     tGeq: (bool){ true }
     tGtr: (bool){ true }
     tExpr: (bool){ true }
+  }
+  incomplete: (_|_){
+    // [eval]
+    carryOver: (_|_){
+      // [eval]
+      t1: (_|_){
+        // [eval]
+        #foo: (_|_){
+          // [eval]
+          a: (list){
+          }
+          b: (#list){
+            0: (int){ 1 }
+          }
+          incomplete: (_|_){
+            // [eval] incomplete.carryOver.t1.#foo.incomplete: conflicting values false and true:
+            //     ./incomplete.cue:6:16
+            //     ./incomplete.cue:6:24
+          }
+        }
+        ok: (#struct){
+          a: (#list){
+            0: (int){ 1 }
+          }
+          b: (#list){
+            0: (int){ 1 }
+          }
+          incomplete: (bool){ true }
+        }
+      }
+    }
+    _int: (int){ int }
+    _string: (string){ string }
+    iErr1: (_|_){
+      // [incomplete] incomplete.iErr1: invalid left-hand value to '==' (type struct): incomplete.a: field is required but not present:
+      //     ./structs.cue:70:9
+    }
+    iErr2: (_|_){
+      // [incomplete] incomplete.iErr2: invalid left-hand value to '==' (type struct): incomplete.a: field is required but not present:
+      //     ./structs.cue:71:9
+    }
+    eErr3: (_|_){
+      // [incomplete] incomplete.eErr3: invalid left-hand value to '==' (type struct): incomplete.a: incomplete value int:
+      //     ./structs.cue:72:9
+    }
+    eErr4: (_|_){
+      // [eval] incomplete.eErr4: invalid left-hand value to '==' (type _|_): incomplete.a: failed arithmetic: division by zero:
+      //     ./structs.cue:73:9
+    }
+    eErr5: (_|_){
+      // [eval] incomplete.eErr5: invalid right-hand value to '==' (type struct): incomplete.a: conflicting values int and string (mismatched types int and string):
+      //     ./structs.cue:75:9
+    }
+    iErr6: (_|_){
+      // [incomplete] incomplete.iErr6: invalid left-hand value to '==' (type struct): incomplete.a: field is required but not present:
+      //     ./structs.cue:76:9
+    }
+    eErr7: (_|_){
+      // [incomplete] incomplete.eErr7: invalid right-hand value to '==' (type struct): incomplete.a: field is required but not present:
+      //     ./structs.cue:77:9
+    }
   }
   lists: (_|_){
     // [eval]
@@ -1172,39 +1303,6 @@ Result:
     f2: (bool){ false }
     f3: (bool){ false }
     f4: (bool){ false }
-  }
-  incomplete: (_|_){
-    // [eval]
-    _int: (int){ int }
-    _string: (string){ string }
-    iErr1: (_|_){
-      // [incomplete] incomplete.iErr1: invalid left-hand value to '==' (type struct): incomplete.a: field is required but not present:
-      //     ./structs.cue:70:9
-    }
-    iErr2: (_|_){
-      // [incomplete] incomplete.iErr2: invalid left-hand value to '==' (type struct): incomplete.a: field is required but not present:
-      //     ./structs.cue:71:9
-    }
-    eErr3: (_|_){
-      // [incomplete] incomplete.eErr3: invalid left-hand value to '==' (type struct): incomplete.a: incomplete value int:
-      //     ./structs.cue:72:9
-    }
-    eErr4: (_|_){
-      // [eval] incomplete.eErr4: invalid left-hand value to '==' (type _|_): incomplete.a: failed arithmetic: division by zero:
-      //     ./structs.cue:73:9
-    }
-    eErr5: (_|_){
-      // [eval] incomplete.eErr5: invalid right-hand value to '==' (type struct): incomplete.a: conflicting values int and string (mismatched types int and string):
-      //     ./structs.cue:75:9
-    }
-    iErr6: (_|_){
-      // [incomplete] incomplete.iErr6: invalid left-hand value to '==' (type struct): incomplete.a: field is required but not present:
-      //     ./structs.cue:76:9
-    }
-    eErr7: (_|_){
-      // [incomplete] incomplete.eErr7: invalid right-hand value to '==' (type struct): incomplete.a: field is required but not present:
-      //     ./structs.cue:77:9
-    }
   }
   diffTypes: (struct){
     fScalar1: (bool){ false }

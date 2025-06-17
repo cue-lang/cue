@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76f9e28c_f3d6c441",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-17T07:41:09Z",
+      "side": 1,
+      "message": "LGTM with some suggestions for a few more test cases.",
+      "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa7e3189_484cb531",
+        "filename": "cue/testdata/basicrewrite/016_comparison.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-17T07:41:09Z",
+      "side": 1,
+      "message": "Could we have some test cases that include hidden fields and definitions, please?\n(I _think_ they don\u0027t count towards equality, but we should have the test cases regardless).\n\nAlso embedded scalars.",
+      "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc91384f_8f480535",
+        "filename": "cue/testdata/basicrewrite/016_comparison.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-17T07:41:09Z",
+      "side": 1,
+      "message": "I thought this is supposed to be becoming valid now?\n\nAlso, it would be good to have some indication in the field as to the expected test result, even if it might seem obvious, as the tests above do.",
+      "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e05fca93_64aec45c",
+        "filename": "cue/testdata/basicrewrite/016_comparison.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-17T07:41:09Z",
+      "side": 1,
+      "message": "Let\u0027s have some negated tests with noncrete elements too.\n\nSpecifically, I could see that `[1, 2] !\u003d [int]` might return true when it should be an error, because it would be easy to write logic that just says things are unequal when the list lengths are unequal. Or... maybe it _shouldn\u0027t_ be an error, I\u0027m not actually totally sure!",
+      "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34f3328d_6783f186",
+        "filename": "cue/testdata/lists/021_list_equality.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-17T07:41:09Z",
+      "side": 1,
+      "message": "Again, it would be really nice to have some indication in the name as to what result is expected.",
+      "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

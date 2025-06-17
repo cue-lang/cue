@@ -107,11 +107,10 @@ func TestModuleFetch(t *testing.T) {
 			})
 			return
 		}
-
 		writeInstanceInfo(t.T, t.Writer("instance-info"), inst, 0)
 		qt.Assert(t, qt.Not(qt.IsNil(inst.ModuleFile)))
 		qt.Assert(t, qt.Equals(inst.ModuleFile.QualifiedModule(), inst.Module))
-		qt.Assert(t, qt.Equals(inst.ModuleFile.Language.Version, "v0.8.0"))
+		qt.Assert(t, qt.Equals(inst.ModuleFile.Language.Version, "v0.9.0-main"))
 		v := ctx.BuildInstance(inst)
 		if err := v.Validate(); err != nil {
 			t.Fatal(err)
@@ -122,18 +121,20 @@ func TestModuleFetch(t *testing.T) {
 
 func writeInstanceInfo(t *testing.T, w io.Writer, inst *build.Instance, depth int) {
 	m := inst.Module
+	versionStr := ""
 	if m == "" {
 		m = "<none>"
 		qt.Assert(t, qt.IsNil(inst.ModuleFile))
 	} else {
 		qt.Assert(t, qt.Not(qt.IsNil(inst.ModuleFile)))
 		qt.Assert(t, qt.Equals(inst.ModuleFile.QualifiedModule(), inst.Module))
+		versionStr = fmt.Sprintf(" version=%v", inst.ModuleFile.Language.Version)
 	}
 	errStr := ""
 	if inst.Err != nil {
 		errStr = fmt.Sprintf(" err=%v", inst.Err)
 	}
-	fmt.Fprintf(w, "%s%s module=%s%s\n", strings.Repeat("\t", depth), inst.ImportPath, m, errStr)
+	fmt.Fprintf(w, "%s%s module=%s%s%s\n", strings.Repeat("\t", depth), inst.ImportPath, m, versionStr, errStr)
 	for _, inst := range inst.Imports {
 		writeInstanceInfo(t, w, inst, depth+1)
 	}

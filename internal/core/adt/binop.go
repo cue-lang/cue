@@ -73,7 +73,8 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			// n := c.newNum()
 			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
 
-		case leftKind == ListKind && rightKind == ListKind:
+		case leftKind == ListKind && rightKind == ListKind,
+			leftKind == StructKind && rightKind == StructKind:
 			return c.newBool(Equal(c, left, right, RegularOnly|IgnoreOptional))
 		}
 
@@ -99,7 +100,8 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			// n := c.newNum()
 			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
 
-		case leftKind == ListKind && rightKind == ListKind:
+		case leftKind == ListKind && rightKind == ListKind,
+			leftKind == StructKind && rightKind == StructKind:
 			return c.newBool(!Equal(c, left, right, RegularOnly|IgnoreOptional))
 		}
 

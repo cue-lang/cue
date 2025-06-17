@@ -44,6 +44,13 @@ type File struct {
 	// TODO: we could later use it for enabling testing features, such as
 	// testing-specific builtins.
 	Testing bool `experiment:"since:v0.13.0"`
+
+	// StructCmp enables comparison of structs. This also defines the ==
+	// operator to be defined on all values. For instance, comparing `1` and
+	// "foo" will return false, whereas previously it would return an error.
+	//
+	// Proposal was defined in https://cuelang.org/issue/2358.
+	StructCmp bool `experiment:"since:v0.14.0"`
 }
 
 // NewFile parses the given comma-separated list of experiments for

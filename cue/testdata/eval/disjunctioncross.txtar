@@ -103,18 +103,18 @@ issue3967: error: local: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  291
+Leaks:  294
 Freed:  0
 Reused: 0
-Allocs: 291
+Allocs: 294
 Retain: 0
 
-Unifications: 165
-Conjuncts:    379
-Disjuncts:    74
+Unifications: 162
+Conjuncts:    394
+Disjuncts:    80
 
-CloseIDElems: 1476
-NumCloseIDs: 91
+CloseIDElems: 1504
+NumCloseIDs: 94
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -132,18 +132,18 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 8
-+Leaks:  291
++Leaks:  294
 +Freed:  0
 +Reused: 0
-+Allocs: 291
++Allocs: 294
 +Retain: 0
 +
-+Unifications: 165
-+Conjuncts:    379
-+Disjuncts:    74
++Unifications: 162
++Conjuncts:    394
++Disjuncts:    80
 +
-+CloseIDElems: 1476
-+NumCloseIDs: 91
++CloseIDElems: 1504
++NumCloseIDs: 94
 -- out/eval/stats --
 Leaks:  16
 Freed:  292
@@ -205,7 +205,12 @@ NumCloseIDs: 8
           }) }
       }
       #Application: (#struct){
-        oneOrTwo: (#struct){ |((#struct){
+        oneOrTwo: (#struct){ |(*(#struct){
+            kind: (string){ "two" }
+            two: (#struct){
+              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
+            }
+          }, (#struct){
             kind: (string){ "one" }
             one: (#struct){
               oneField: (string){ "value" }
@@ -255,15 +260,25 @@ NumCloseIDs: 8
   fieldDiscriminator: (struct){
     crossing: (struct){
       out: (#struct){
-        oneOrTwo: (#struct){
-          two: (#struct){
-            optional?: (string){ string }
-          }
-          kind: (string){ "two" }
-        }
+        oneOrTwo: (#struct){ |(*(#struct){
+            two: (#struct){
+              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
+            }
+            kind: (string){ "two" }
+          }, (#struct){
+            two: (#struct){
+              optional?: (string){ string }
+            }
+            kind: (string){ "two" }
+          }) }
       }
       #Application: (#struct){
-        oneOrTwo: (#struct){ |((#struct){
+        oneOrTwo: (#struct){ |(*(#struct){
+            kind: (string){ "two" }
+            two: (#struct){
+              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
+            }
+          }, (#struct){
             kind: (string){ "one" }
             one: (#struct){
               oneField: (string){ "value" }
@@ -365,56 +380,7 @@ NumCloseIDs: 8
 diff old new
 --- old
 +++ new
-@@ -45,12 +45,7 @@
-           }) }
-       }
-       #Application: (#struct){
--        oneOrTwo: (#struct){ |(*(#struct){
--            kind: (string){ "two" }
--            two: (#struct){
--              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
--            }
--          }, (#struct){
-+        oneOrTwo: (#struct){ |((#struct){
-             kind: (string){ "one" }
-             one: (#struct){
-               oneField: (string){ "value" }
-@@ -100,25 +95,15 @@
-   fieldDiscriminator: (struct){
-     crossing: (struct){
-       out: (#struct){
--        oneOrTwo: (#struct){ |(*(#struct){
--            two: (#struct){
--              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
--            }
--            kind: (string){ "two" }
--          }, (#struct){
--            two: (#struct){
--              optional?: (string){ string }
--            }
--            kind: (string){ "two" }
--          }) }
--      }
--      #Application: (#struct){
--        oneOrTwo: (#struct){ |(*(#struct){
--            kind: (string){ "two" }
--            two: (#struct){
--              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
--            }
--          }, (#struct){
-+        oneOrTwo: (#struct){
-+          two: (#struct){
-+            optional?: (string){ string }
-+          }
-+          kind: (string){ "two" }
-+        }
-+      }
-+      #Application: (#struct){
-+        oneOrTwo: (#struct){ |((#struct){
-             kind: (string){ "one" }
-             one: (#struct){
-               oneField: (string){ "value" }
-@@ -168,45 +153,48 @@
+@@ -168,45 +168,48 @@
    issue3967: (struct){
      error: (struct){
        nested: (struct){

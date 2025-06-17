@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "475cf88c_e739eacc",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-17T10:38:40Z",
+      "side": 1,
+      "message": "I would document this branch - it\u0027s not obvious to me why this matters",
+      "revId": "e57acf142b91bff82ab2cae9767ff772c80d4c87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

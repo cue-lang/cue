@@ -1,0 +1,143 @@
+-- in.cue --
+import "encoding/yaml"
+
+issue3972: {
+	// yaml uses Syntax to convert CUE to YAML. Ensure that unresolved values
+	// are properly handled.
+	output: out0: "static" // has to go first
+
+	input: inputStatic: "static"
+	if false {
+		input: inputNever: "never"
+	}
+
+	derived: derivedStatic: "static"
+	if false {
+		derived: derivedNever: input.inputNever
+	}
+
+	_out1: [for svc, _ in derived {svc}]
+	output: out1: yaml.Marshal(_out1)
+
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  10
+Reused: 3
+Allocs: 7
+Retain: 2
+
+Unifications: 10
+Conjuncts:    12
+Disjuncts:    12
+
+CloseIDElems: 0
+NumCloseIDs: 2
+-- out/evalalpha --
+Errors:
+issue3972.output.out1: error in call to encoding/yaml.Marshal: BUG: non-stringifiable *adt.scheduler:
+    ./in.cue:19:16
+
+Result:
+(_|_){
+  // [eval]
+  issue3972: (_|_){
+    // [eval]
+    output: (_|_){
+      // [eval]
+      out0: (string){ "static" }
+      out1: (_|_){
+        // [eval] issue3972.output.out1: error in call to encoding/yaml.Marshal: BUG: non-stringifiable *adt.scheduler:
+        //     ./in.cue:19:16
+      }
+    }
+    input: (struct){
+      inputStatic: (string){ "static" }
+    }
+    derived: (struct){
+      derivedStatic: (string){ "static" }
+    }
+    _out1: (#list){
+      0: (string){ "derivedStatic" }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,8 +1,19 @@
+-(struct){
+-  issue3972: (struct){
+-    output: (struct){
++Errors:
++issue3972.output.out1: error in call to encoding/yaml.Marshal: BUG: non-stringifiable *adt.scheduler:
++    ./in.cue:19:16
++
++Result:
++(_|_){
++  // [eval]
++  issue3972: (_|_){
++    // [eval]
++    output: (_|_){
++      // [eval]
+       out0: (string){ "static" }
+-      out1: (string){ "- derivedStatic\n" }
++      out1: (_|_){
++        // [eval] issue3972.output.out1: error in call to encoding/yaml.Marshal: BUG: non-stringifiable *adt.scheduler:
++        //     ./in.cue:19:16
++      }
+     }
+     input: (struct){
+       inputStatic: (string){ "static" }
+-- out/eval --
+(struct){
+  issue3972: (struct){
+    output: (struct){
+      out0: (string){ "static" }
+      out1: (string){ "- derivedStatic\n" }
+    }
+    input: (struct){
+      inputStatic: (string){ "static" }
+    }
+    derived: (struct){
+      derivedStatic: (string){ "static" }
+    }
+    _out1: (#list){
+      0: (string){ "derivedStatic" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  issue3972: {
+    output: {
+      out0: "static"
+    }
+    input: {
+      inputStatic: "static"
+    }
+    if false {
+      input: {
+        inputNever: "never"
+      }
+    }
+    derived: {
+      derivedStatic: "static"
+    }
+    if false {
+      derived: {
+        derivedNever: 〈2;input〉.inputNever
+      }
+    }
+    _out1: [
+      for svc, _ in 〈1;derived〉 {
+        〈1;svc〉
+      },
+    ]
+    output: {
+      out1: 〈import;"encoding/yaml"〉.Marshal(〈1;_out1〉)
+    }
+  }
+}

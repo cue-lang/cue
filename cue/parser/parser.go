@@ -34,8 +34,8 @@ type parser struct {
 	scanner scanner.Scanner
 
 	// Tracing/debugging
-	mode      mode // parsing mode
-	trace     bool // == (mode & Trace != 0)
+	cfg       Config
+	trace     bool // == (cfg.Mode & Trace != 0)
 	panicking bool // set if we are bailing out due to too many errors.
 	indent    int  // indentation used for tracing output
 
@@ -72,14 +72,12 @@ type parser struct {
 	version int
 }
 
-func (p *parser) init(filename string, src []byte, mode []Option) {
-	for _, f := range mode {
-		f(p)
-	}
+func (p *parser) init(filename string, src []byte, opts []Option) {
+	p.cfg = NewConfig().Apply(opts...)
 	p.file = token.NewFile(filename, -1, len(src))
 
 	var m scanner.Mode
-	if p.mode&parseCommentsMode != 0 {
+	if p.cfg.Mode&ParseComments != 0 {
 		m = scanner.ScanComments
 	}
 	eh := func(pos token.Pos, msg string, args []interface{}) {
@@ -87,7 +85,7 @@ func (p *parser) init(filename string, src []byte, mode []Option) {
 	}
 	p.scanner.Init(p.file, src, eh, m)
 
-	p.trace = p.mode&traceMode != 0 // for convenience (p.trace is used frequently)
+	p.trace = p.cfg.Mode&Trace != 0 // for convenience (p.trace is used frequently)
 
 	p.comments = &commentState{pos: -1}
 
@@ -422,7 +420,7 @@ func (p *parser) errf(pos token.Pos, msg string, args ...interface{}) {
 	// If AllErrors is not set, discard errors reported on the same line
 	// as the last recorded error and stop parsing if there are more than
 	// 10 errors.
-	if p.mode&allErrorsMode == 0 {
+	if p.cfg.Mode&AllErrors == 0 {
 		errors := errors.Errors(p.errors)
 		n := len(errors)
 		if n > 0 && errors[n-1].Position().Line() == ePos.Line() {
@@ -608,7 +606,7 @@ func (p *parser) parseOperand() (expr ast.Expr) {
 		return p.parseList()
 
 	case token.FUNC:
-		if p.mode&parseFuncsMode != 0 {
+		if p.cfg.Mode&ParseFuncs != 0 {
 			return p.parseFunc()
 		} else {
 			return p.parseKeyIdent()
@@ -1719,7 +1717,7 @@ func (p *parser) parseFile() *ast.File {
 		var name *ast.Ident
 		p.expect(token.IDENT)
 		name = p.parseIdent()
-		if name.Name == "_" && p.mode&declarationErrorsMode != 0 {
+		if name.Name == "_" && p.cfg.Mode&DeclarationErrors != 0 {
 			p.errf(p.pos, "invalid package name _")
 		}
 		if isDefinition(name) {
@@ -1739,13 +1737,13 @@ func (p *parser) parseFile() *ast.File {
 		p.consumeDeclComma()
 	}
 
-	if p.mode&packageClauseOnlyMode == 0 {
+	if p.cfg.Mode&PackageClauseOnly == 0 {
 		// import decls
 		for p.tok == token.IDENT && p.lit == "import" {
 			decls = append(decls, p.parseImports())
 		}
 
-		if p.mode&importsOnlyMode == 0 {
+		if p.cfg.Mode&ImportsOnly == 0 {
 			// rest of package decls
 			// TODO: loop and allow multiple expressions.
 			decls = append(decls, p.parseFieldList()...)

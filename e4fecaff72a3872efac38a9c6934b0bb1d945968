@@ -84,6 +84,23 @@
       "message": "Again, it would be really nice to have some indication in the name as to what result is expected.",
       "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "947456df_9f63a565",
+        "filename": "cue/testdata/lists/021_list_equality.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-17T08:04:48Z",
+      "side": 1,
+      "message": "It would also be good to have a check that a equality check against an open list is not necessarily final:\n\n```\n#foo: {\n    a: [...]\n    b: [1]\n    c: true \u0026 (a \u003d\u003d b)\n}\n```\n\nThe above should not be a final error, but:\n\n```\n#foo: {\n    a: []\n    b: [1]\n    c: true \u0026 (a \u003d\u003d b)\n}\n```\n\nshould be AFAICS.",
+      "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

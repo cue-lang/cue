@@ -16,6 +16,24 @@
       "message": "This being the full reproducer, I\u0027d also add the reduced version for the sake of future debugging.",
       "revId": "bd84118934d9f6fa3d3df8813f01f116c29ac2aa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c01b2ef_f73e6fe8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-17T17:46:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35e2c429_98aade48",
+      "revId": "bd84118934d9f6fa3d3df8813f01f116c29ac2aa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

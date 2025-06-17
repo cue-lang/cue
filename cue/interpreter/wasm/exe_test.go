@@ -134,8 +134,9 @@ func dirInstance(t *testing.T, name string) *build.Instance {
 	return inst
 }
 
-func loadFile(filename string, src any) (*ast.File, error) {
-	return parser.ParseFile(filename, src, parser.ParseFuncs)
+func loadFile(filename string, src any, cfg parser.Config) (*ast.File, error) {
+	cfg = cfg.Apply(parser.ParseFuncs)
+	return parser.ParseFile(filename, src, cfg)
 }
 
 func must[T any](v T, err error) func(t *testing.T) T {

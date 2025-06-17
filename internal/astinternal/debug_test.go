@@ -44,7 +44,7 @@ func TestDebugPrint(t *testing.T) {
 				continue
 			}
 
-			f, err := parser.ParseFile(file.Name, file.Data, parser.ParseComments)
+			f, err := parser.ParseFile(file.Name, file.Data, parser.ParseComments, parser.Version("v0.13.0"))
 			qt.Assert(t, qt.IsNil(err))
 
 			// The full syntax tree, as printed by default.

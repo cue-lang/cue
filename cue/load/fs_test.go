@@ -37,7 +37,7 @@ func TestIOFS(t *testing.T) {
 		Overlay: overlay,
 	})
 	qt.Assert(t, qt.IsNil(err))
-	ffsys := fsys.ioFS(dir)
+	ffsys := fsys.ioFS(dir, "v0.12.0")
 	err = fstest.TestFS(ffsys, append(slices.Clip(onDiskFiles), overlayFiles...)...)
 	qt.Assert(t, qt.IsNil(err))
 	checked := make(map[string]bool)

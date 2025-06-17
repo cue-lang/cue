@@ -44,15 +44,12 @@ func defaultConfig() (*config, error) {
 	}
 	return &config{
 		loadCfg: &load.Config{
-			ParseFile: func(name string, src interface{}) (*ast.File, error) {
-				options := []parser.Option{
-					parser.ParseComments,
-				}
+			ParseFile: func(name string, src interface{}, cfg parser.Config) (*ast.File, error) {
 				cuedebug.Init()
 				if cuedebug.Flags.ParserTrace {
-					options = append(options, parser.Trace)
+					cfg = cfg.Apply(parser.Trace)
 				}
-				return parser.ParseFile(name, src, options...)
+				return parser.ParseFile(name, src, cfg)
 			},
 			Registry: reg,
 		},

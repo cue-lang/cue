@@ -17,6 +17,8 @@ package adt
 import (
 	"bytes"
 	"strings"
+
+	"cuelang.org/go/cue/token"
 )
 
 var checkConcrete = &ValidateConfig{
@@ -24,11 +26,26 @@ var checkConcrete = &ValidateConfig{
 	Final:    true,
 }
 
+// errOnDiffType is a special value that is used as a source to BinOp to
+// indicate that the operation is not supported for the operands of different
+// kinds.
+var errOnDiffType = &UnaryExpr{}
+
 // BinOp handles all operations except AndOp and OrOp. This includes processing
 // unary comparators such as '<4' and '=~"foo"'.
 //
+// The node argument is the adt node corresponding to the binary expression. It
+// is used to determine the source position of the operation, which in turn is
+// used to determine the experiment context.
+//
 // BinOp returns nil if not both left and right are concrete.
-func BinOp(c *OpContext, op Op, left, right Value) Value {
+func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
+	var p token.Pos
+	if node != nil {
+		if src := node.Source(); src != nil {
+			p = src.Pos()
+		}
+	}
 	leftKind := left.Kind()
 	rightKind := right.Kind()
 
@@ -75,6 +92,10 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 		case leftKind == ListKind && rightKind == ListKind:
 			return c.newBool(Equal(c, left, right, RegularOnly|IgnoreOptional))
+
+		case !p.Experiment().StructCmp:
+		case leftKind == StructKind && rightKind == StructKind:
+			return c.newBool(Equal(c, left, right, RegularOnly|IgnoreOptional))
 		}
 
 	case NotEqualOp:
@@ -100,6 +121,10 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
 
 		case leftKind == ListKind && rightKind == ListKind:
+			return c.newBool(!Equal(c, left, right, RegularOnly|IgnoreOptional))
+
+		case !p.Experiment().StructCmp:
+		case leftKind == StructKind && rightKind == StructKind:
 			return c.newBool(!Equal(c, left, right, RegularOnly|IgnoreOptional))
 		}
 

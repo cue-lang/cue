@@ -32,6 +32,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/mod/module"
@@ -345,14 +346,14 @@ var _ module.ReadCUEFS = (*ioFS)(nil)
 // reading and updating the syntax file cache, which
 // is shared with the cache used by the [fileSystem.getCUESyntax]
 // method.
-func (fs *ioFS) ReadCUEFile(path string) (*ast.File, error) {
+func (fs *ioFS) ReadCUEFile(path string, cfg parser.Config) (*ast.File, error) {
 	fpath, err := fs.absPathFromFSPath(path)
 	if err != nil {
 		return nil, err
 	}
 	cache := fs.fs.fileCache
 	cache.mu.Lock()
-	entry, ok := cache.entries[fpath]
+	entry, ok := cache.entries[cfg][fpath]
 	cache.mu.Unlock()
 	if ok {
 		return entry.file, entry.err
@@ -370,7 +371,7 @@ func (fs *ioFS) ReadCUEFile(path string) (*ast.File, error) {
 		if err != nil {
 			cache.mu.Lock()
 			defer cache.mu.Unlock()
-			cache.entries[fpath] = fileCacheEntry{nil, err}
+			cache.setEntry(cfg, fpath, fileCacheEntry{nil, err})
 			return nil, err
 		}
 	}
@@ -379,7 +380,16 @@ func (fs *ioFS) ReadCUEFile(path string) (*ast.File, error) {
 		Encoding: build.CUE,
 		//		Form:     build.Schema,
 		Source: data,
-	})
+	}, cfg)
+}
+
+func (fs *fileCache) setEntry(cfg parser.Config, fpath string, e fileCacheEntry) {
+	m := fs.entries[cfg]
+	if m == nil {
+		m = make(map[string]fileCacheEntry)
+		fs.entries[cfg] = m
+	}
+	m[fpath] = e
 }
 
 // ioFSFile implements [io/fs.File] for the overlay filesystem.
@@ -433,7 +443,7 @@ func (f *ioFSFile) ReadDir(n int) ([]iofs.DirEntry, error) {
 	return entries, err
 }
 
-func (fs *fileSystem) getCUESyntax(bf *build.File) (*ast.File, error) {
+func (fs *fileSystem) getCUESyntax(bf *build.File, cfg parser.Config) (*ast.File, error) {
 	fs.fileCache.mu.Lock()
 	defer fs.fileCache.mu.Unlock()
 	if bf.Encoding != build.CUE {
@@ -443,16 +453,18 @@ func (fs *fileSystem) getCUESyntax(bf *build.File) (*ast.File, error) {
 	// check and update the syntax cache.
 	useCache := bf.Form == "" && bf.Interpretation == ""
 	if useCache {
-		if syntax, ok := fs.fileCache.entries[bf.Filename]; ok {
+		if syntax, ok := fs.fileCache.entries[cfg][bf.Filename]; ok {
 			return syntax.file, syntax.err
 		}
 	}
-	d := encoding.NewDecoder(fs.fileCache.ctx, bf, &fs.fileCache.config)
+	encodingCfg := fs.fileCache.config
+	encodingCfg.ParserConfig = cfg
+	d := encoding.NewDecoder(fs.fileCache.ctx, bf, &encodingCfg)
 	defer d.Close()
 	// Note: CUE files can never have multiple file parts.
 	f, err := d.File(), d.Err()
 	if useCache {
-		fs.fileCache.entries[bf.Filename] = fileCacheEntry{f, err}
+		fs.fileCache.setEntry(cfg, bf.Filename, fileCacheEntry{f, err})
 	}
 	return f, err
 }
@@ -465,7 +477,7 @@ func newFileCache(c *Config) *fileCache {
 			ParseFile: c.ParseFile,
 		},
 		ctx:     cuecontext.New(),
-		entries: make(map[string]fileCacheEntry),
+		entries: make(map[parser.Config]map[string]fileCacheEntry),
 	}
 }
 
@@ -474,7 +486,7 @@ type fileCache struct {
 	config  encoding.Config
 	ctx     *cue.Context
 	mu      sync.Mutex
-	entries map[string]fileCacheEntry
+	entries map[parser.Config]map[string]fileCacheEntry
 }
 
 type fileCacheEntry struct {

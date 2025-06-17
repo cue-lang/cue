@@ -82,6 +82,12 @@ func (cfg Config) Apply(opts ...Option) Config {
 	return cfg
 }
 
+// Config reports whether cfg is valid; that
+// is, it has been created with [NewConfig].
+func (cfg Config) IsValid() bool {
+	return cfg.alwaysTrue
+}
+
 // optionFunc implements [Option] for a function.
 type optionFunc func(cfg *Config)
 
@@ -134,6 +140,9 @@ func (m Mode) apply(c *Config) {
 // Version specifies the language version to use when parsing
 // the CUE. The argument must be a valid semantic version, as
 // checked by [semver.IsValid].
+//
+// The version will be recorded in the [ast.File] returned
+// from [ParseFile].
 func Version(v string) Option {
 	if !semver.IsValid(v) {
 		panic(fmt.Errorf("invalid language version %q", v))

@@ -26,6 +26,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modload"
@@ -247,7 +248,7 @@ func loadPackagesFromArgs(
 			// not a CUE file; assume it has no imports for now.
 			continue
 		}
-		syntax, err := cfg.fileSystem.getCUESyntax(f)
+		syntax, err := cfg.fileSystem.getCUESyntax(f, parser.NewConfig().Apply(parser.ImportsOnly))
 		if err != nil {
 			return nil, fmt.Errorf("cannot get syntax for %q: %w", f.Filename, err)
 		}

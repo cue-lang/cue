@@ -186,7 +186,55 @@ diffTypes: {
 	iNe3: {a: 1} != {a: _int}
 	iNe4: {a: _int} != {a: 1}
 }
+-- carryover.cue --
+carryOver: {
+	t1: {
+		#foo: {
+			a: [...]
+			b: [1]
+			iErr: true & (a == b) // recoverable error
+		}
+		ok: #foo & {a: [1]}
+	}
+	t2: {
+		#foo: {
+			a: []
+			b: [1]
+			eErr: true & (a == b) // irrecoverable error
+		}
+	}
+}
 -- out/compile --
+--- carryover.cue
+{
+  carryOver: {
+    t1: {
+      #foo: {
+        a: [
+          ...,
+        ]
+        b: [
+          1,
+        ]
+        iErr: (true & (〈0;a〉 == 〈0;b〉))
+      }
+      ok: (〈0;#foo〉 & {
+        a: [
+          1,
+        ]
+      })
+    }
+    t2: {
+      #foo: {
+        a: []
+        b: [
+          1,
+        ]
+        eErr: (true & (〈0;a〉 == 〈0;b〉))
+      }
+    }
+  }
+}
 --- in.cue
 {
   numbers: {
@@ -784,16 +832,22 @@ diffTypes: {
 }
 -- out/eval/stats --
 Leaks:  54
-Freed:  659
-Reused: 654
+Freed:  678
+Reused: 673
 Allocs: 59
 Retain: 287
 
-Unifications: 690
-Conjuncts:    857
-Disjuncts:    946
+Unifications: 709
+Conjuncts:    884
+Disjuncts:    965
 -- out/evalalpha --
 Errors:
+carryOver.t1.#foo.iErr: conflicting values false and true:
+    ./carryover.cue:6:10
+    ./carryover.cue:6:18
+carryOver.t2.#foo.eErr: conflicting values false and true:
+    ./carryover.cue:14:10
+    ./carryover.cue:14:18
 lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
     ./lists.cue:24:19
 lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
@@ -806,6 +860,50 @@ incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting
 Result:
 (_|_){
   // [eval]
+  carryOver: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      #foo: (_|_){
+        // [eval]
+        a: (list){
+        }
+        b: (#list){
+          0: (int){ 1 }
+        }
+        iErr: (_|_){
+          // [eval] carryOver.t1.#foo.iErr: conflicting values false and true:
+          //     ./carryover.cue:6:10
+          //     ./carryover.cue:6:18
+        }
+      }
+      ok: (#struct){
+        a: (#list){
+          0: (int){ 1 }
+        }
+        b: (#list){
+          0: (int){ 1 }
+        }
+        iErr: (bool){ true }
+      }
+    }
+    t2: (_|_){
+      // [eval]
+      #foo: (_|_){
+        // [eval]
+        a: (#list){
+        }
+        b: (#list){
+          0: (int){ 1 }
+        }
+        eErr: (_|_){
+          // [eval] carryOver.t2.#foo.eErr: conflicting values false and true:
+          //     ./carryover.cue:14:10
+          //     ./carryover.cue:14:18
+        }
+      }
+    }
+  }
   numbers: (struct){
     tLss: (bool){ true }
     tLeq: (bool){ true }
@@ -988,8 +1086,10 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,11 @@
- Errors:
+@@ -5,13 +5,13 @@
+ carryOver.t2.#foo.eErr: conflicting values false and true:
+     ./carryover.cue:14:10
+     ./carryover.cue:14:18
 -lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
 +lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
      ./lists.cue:24:19
@@ -1004,7 +1104,7 @@ diff old new
      ./structs.cue:79:9
  
  Result:
-@@ -38,13 +38,13 @@
+@@ -88,13 +88,13 @@
      f5: (bool){ false }
      f6: (bool){ false }
      eErrPassthrough: (_|_){
@@ -1021,7 +1121,7 @@ diff old new
        //     ./lists.cue:25:13
      }
      _e3l: (struct){
-@@ -112,31 +112,31 @@
+@@ -162,31 +162,31 @@
      _int: (int){ int }
      _string: (string){ string }
      iErr1: (_|_){
@@ -1060,7 +1160,7 @@ diff old new
        //     ./structs.cue:81:9
      }
      tNe1: (bool){ true }
-@@ -161,11 +161,11 @@
+@@ -211,11 +211,11 @@
      _int: (int){ int }
      _string: (string){ string }
      iRecursive1: (_|_){
@@ -1074,7 +1174,7 @@ diff old new
        //     ./typediff.cue:35:15
      }
      fRecursive3: (bool){ false }
-@@ -172,19 +172,19 @@
+@@ -222,19 +222,19 @@
      tRecursive4: (bool){ true }
      fRecursive5: (bool){ false }
      eNe1: (_|_){
@@ -1100,6 +1200,12 @@ diff old new
    }
 -- out/eval --
 Errors:
+carryOver.t1.#foo.iErr: conflicting values false and true:
+    ./carryover.cue:6:10
+    ./carryover.cue:6:18
+carryOver.t2.#foo.eErr: conflicting values false and true:
+    ./carryover.cue:14:10
+    ./carryover.cue:14:18
 lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
     ./lists.cue:24:19
 lists.eErrPassthrough: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
@@ -1112,6 +1218,50 @@ incomplete.eErr5: invalid right-hand value to '==' (type struct): incomplete.a: 
 Result:
 (_|_){
   // [eval]
+  carryOver: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      #foo: (_|_){
+        // [eval]
+        a: (list){
+        }
+        b: (#list){
+          0: (int){ 1 }
+        }
+        iErr: (_|_){
+          // [eval] carryOver.t1.#foo.iErr: conflicting values false and true:
+          //     ./carryover.cue:6:10
+          //     ./carryover.cue:6:18
+        }
+      }
+      ok: (#struct){
+        a: (#list){
+          0: (int){ 1 }
+        }
+        b: (#list){
+          0: (int){ 1 }
+        }
+        iErr: (bool){ true }
+      }
+    }
+    t2: (_|_){
+      // [eval]
+      #foo: (_|_){
+        // [eval]
+        a: (#list){
+        }
+        b: (#list){
+          0: (int){ 1 }
+        }
+        eErr: (_|_){
+          // [eval] carryOver.t2.#foo.eErr: conflicting values false and true:
+          //     ./carryover.cue:14:10
+          //     ./carryover.cue:14:18
+        }
+      }
+    }
+  }
   numbers: (struct){
     tLss: (bool){ true }
     tLeq: (bool){ true }

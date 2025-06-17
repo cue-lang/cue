@@ -100,13 +100,11 @@ func (r *Runtime) SetDebugOptions(flags *cuedebug.Config) {
 }
 
 // SetGlobalExperiments that apply to language evaluation.
+// It does not set the version.
 func (r *Runtime) SetGlobalExperiments(flags *cueexperiment.Config) {
 	r.simplifyValidators = !flags.KeepValidators
-	if flags.EvalV3 {
-		r.SetVersion(internal.EvalV3)
-	} else {
-		r.SetVersion(internal.EvalV2)
-	}
+	// Do not set version as this is already set by NewWithSettings or
+	// SetVersion.
 }
 
 // IsInitialized reports whether the runtime has been initialized.

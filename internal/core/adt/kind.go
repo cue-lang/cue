@@ -22,7 +22,7 @@ import (
 
 // Concreteness is a measure of the level of concreteness of a value, where
 // lower values mean more concrete.
-type Concreteness int
+type Concreteness uint8
 
 const (
 	BottomLevel Concreteness = iota

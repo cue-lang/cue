@@ -216,7 +216,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 	// Note: when path is "-" (stdin), it will already have
 	// been read and file.Source set to the resulting data
 	// by setFileSource.
-	pf, perr := fp.c.fileSystem.getCUESyntax(file)
+	pf, perr := fp.c.fileSystem.getCUESyntax(file, fp.c.parserConfig)
 	if perr != nil {
 		badFile(errors.Promote(perr, "add failed"))
 		return

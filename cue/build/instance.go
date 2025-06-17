@@ -182,10 +182,14 @@ func (inst *Instance) Context() *Context {
 }
 
 func (inst *Instance) parse(name string, src interface{}) (*ast.File, error) {
-	if inst.ctxt != nil && inst.ctxt.parseFunc != nil {
-		return inst.ctxt.parseFunc(name, src)
+	cfg := parser.NewConfig(parser.ParseComments)
+	if inst.ModuleFile != nil && inst.ModuleFile.Language != nil {
+		cfg = cfg.Apply(parser.Version(inst.ModuleFile.Language.Version))
 	}
-	return parser.ParseFile(name, src, parser.ParseComments)
+	if inst.ctxt != nil && inst.ctxt.parseFunc != nil {
+		return inst.ctxt.parseFunc(name, src, cfg)
+	}
+	return parser.ParseFile(name, src, cfg)
 }
 
 // LookupImport defines a mapping from an ImportSpec's ImportPath to Instance.

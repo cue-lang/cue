@@ -16,6 +16,24 @@
       "message": "I would document this branch - it\u0027s not obvious to me why this matters",
       "revId": "e57acf142b91bff82ab2cae9767ff772c80d4c87",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba4c945b_0dda2cd8",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-17T14:55:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "475cf88c_e739eacc",
+      "revId": "e57acf142b91bff82ab2cae9767ff772c80d4c87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

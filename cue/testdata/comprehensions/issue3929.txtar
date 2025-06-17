@@ -1,0 +1,444 @@
+-- in.cue --
+package main
+
+import "strings"
+
+cronjob: [string]: #CronjobConfig
+
+#CronjobConfig: {
+	#PodConfig
+}
+
+#PodConfig: {
+	#ContainerConfig
+}
+
+#ContainerConfig: {
+	image:           string
+	imagePullPolicy: "IfNotPresent" | "Always" | "Never"
+	if image != _|_ {
+		if strings.HasSuffix(image, ":latest") == true {
+			imagePullPolicy: "IfNotPresent" | *"Always" | "Never"
+		}
+		if strings.HasSuffix(image, ":latest") != true {
+			imagePullPolicy: *"IfNotPresent" | "Always" | "Never"
+		}
+	}
+}
+
+_#cronjob: {
+	c=_config: #CronjobConfig
+
+	out: spec: jobTemplate: spec: template: _#pod & {_config: c}
+}
+
+_#pod: {
+	c=_config: #PodConfig
+
+	spec: containers: [{
+		_#container & {
+			_config: c
+		}
+	}]
+}
+
+_#container: {
+	c=_config: #ContainerConfig
+
+	imagePullPolicy: c.imagePullPolicy
+}
+
+cronjob: "foobar": image: "foobar:latest"
+
+for k, v in cronjob {
+	objects: cronjob: "\(k)": (_#cronjob & {_config: v}).out
+}
+-- out/evalalpha/stats --
+Leaks:  109
+Freed:  0
+Reused: 0
+Allocs: 109
+Retain: 0
+
+Unifications: 62
+Conjuncts:    188
+Disjuncts:    45
+
+CloseIDElems: 1631
+NumCloseIDs: 84
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,12 @@
+-Leaks:  2
+-Freed:  584
+-Reused: 565
+-Allocs: 21
+-Retain: 72
+-
+-Unifications: 85
+-Conjuncts:    834
+-Disjuncts:    623
+-
+-CloseIDElems: 0
+-NumCloseIDs: 24
++Leaks:  109
++Freed:  0
++Reused: 0
++Allocs: 109
++Retain: 0
++
++Unifications: 62
++Conjuncts:    188
++Disjuncts:    45
++
++CloseIDElems: 1631
++NumCloseIDs: 84
+-- out/eval/stats --
+Leaks:  2
+Freed:  584
+Reused: 565
+Allocs: 21
+Retain: 72
+
+Unifications: 85
+Conjuncts:    834
+Disjuncts:    623
+
+CloseIDElems: 0
+NumCloseIDs: 24
+-- out/evalalpha --
+(struct){
+  cronjob: (struct){
+    foobar: (#struct){
+      image: (string){ "foobar:latest" }
+      imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
+    }
+  }
+  #CronjobConfig: (#struct){
+    image: (string){ string }
+    imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+  }
+  #PodConfig: (#struct){
+    image: (string){ string }
+    imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+  }
+  #ContainerConfig: (#struct){
+    image: (string){ string }
+    imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+  }
+  _#cronjob(:main): (#struct){
+    _config(:main): ~(#CronjobConfig)
+    out: (#struct){
+      spec: (#struct){
+        jobTemplate: (#struct){
+          spec: (#struct){
+            template: (#struct){
+              _config(:main): (#struct){
+                image: (string){ string }
+                imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+              }
+              spec: (#struct){
+                containers: (#list){
+                  0: (#struct){
+                    _config(:main): (#struct){
+                      image: (string){ string }
+                      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+                    }
+                    imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  _#pod(:main): (#struct){
+    _config(:main): ~(#PodConfig)
+    spec: (#struct){
+      containers: (#list){
+        0: (#struct){
+          _config(:main): (#struct){
+            image: (string){ string }
+            imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+          }
+          imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+        }
+      }
+    }
+  }
+  _#container(:main): (#struct){
+    _config(:main): ~(#ContainerConfig)
+    imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+  }
+  objects: (struct){
+    cronjob: (struct){
+      foobar: (#struct){
+        spec: (#struct){
+          jobTemplate: (#struct){
+            spec: (#struct){
+              template: (#struct){
+                _config(:main): (#struct){
+                  image: (string){ "foobar:latest" }
+                  imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
+                }
+                spec: (#struct){
+                  containers: (#list){
+                    0: (#struct){
+                      _config(:main): (#struct){
+                        image: (string){ "foobar:latest" }
+                        imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+                      }
+                      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -18,10 +18,7 @@
+     imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+   }
+   _#cronjob(:main): (#struct){
+-    _config(:main): (#struct){
+-      image: (string){ string }
+-      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+-    }
++    _config(:main): ~(#CronjobConfig)
+     out: (#struct){
+       spec: (#struct){
+         jobTemplate: (#struct){
+@@ -49,10 +46,7 @@
+     }
+   }
+   _#pod(:main): (#struct){
+-    _config(:main): (#struct){
+-      image: (string){ string }
+-      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+-    }
++    _config(:main): ~(#PodConfig)
+     spec: (#struct){
+       containers: (#list){
+         0: (#struct){
+@@ -66,18 +60,15 @@
+     }
+   }
+   _#container(:main): (#struct){
+-    _config(:main): (#struct){
+-      image: (string){ string }
+-      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+-    }
++    _config(:main): ~(#ContainerConfig)
+     imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+   }
+   objects: (struct){
+     cronjob: (struct){
+-      foobar: (struct){
+-        spec: (struct){
+-          jobTemplate: (struct){
+-            spec: (struct){
++      foobar: (#struct){
++        spec: (#struct){
++          jobTemplate: (#struct){
++            spec: (#struct){
+               template: (#struct){
+                 _config(:main): (#struct){
+                   image: (string){ "foobar:latest" }
+@@ -88,9 +79,9 @@
+                     0: (#struct){
+                       _config(:main): (#struct){
+                         image: (string){ "foobar:latest" }
+-                        imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
++                        imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+                       }
+-                      imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
++                      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+                     }
+                   }
+                 }
+-- out/eval --
+(struct){
+  cronjob: (struct){
+    foobar: (#struct){
+      image: (string){ "foobar:latest" }
+      imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
+    }
+  }
+  #CronjobConfig: (#struct){
+    image: (string){ string }
+    imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+  }
+  #PodConfig: (#struct){
+    image: (string){ string }
+    imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+  }
+  #ContainerConfig: (#struct){
+    image: (string){ string }
+    imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+  }
+  _#cronjob(:main): (#struct){
+    _config(:main): (#struct){
+      image: (string){ string }
+      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+    }
+    out: (#struct){
+      spec: (#struct){
+        jobTemplate: (#struct){
+          spec: (#struct){
+            template: (#struct){
+              _config(:main): (#struct){
+                image: (string){ string }
+                imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+              }
+              spec: (#struct){
+                containers: (#list){
+                  0: (#struct){
+                    _config(:main): (#struct){
+                      image: (string){ string }
+                      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+                    }
+                    imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  _#pod(:main): (#struct){
+    _config(:main): (#struct){
+      image: (string){ string }
+      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+    }
+    spec: (#struct){
+      containers: (#list){
+        0: (#struct){
+          _config(:main): (#struct){
+            image: (string){ string }
+            imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+          }
+          imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+        }
+      }
+    }
+  }
+  _#container(:main): (#struct){
+    _config(:main): (#struct){
+      image: (string){ string }
+      imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+    }
+    imagePullPolicy: (string){ |((string){ "IfNotPresent" }, (string){ "Always" }, (string){ "Never" }) }
+  }
+  objects: (struct){
+    cronjob: (struct){
+      foobar: (struct){
+        spec: (struct){
+          jobTemplate: (struct){
+            spec: (struct){
+              template: (#struct){
+                _config(:main): (#struct){
+                  image: (string){ "foobar:latest" }
+                  imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
+                }
+                spec: (#struct){
+                  containers: (#list){
+                    0: (#struct){
+                      _config(:main): (#struct){
+                        image: (string){ "foobar:latest" }
+                        imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
+                      }
+                      imagePullPolicy: (string){ |(*(string){ "Always" }, (string){ "IfNotPresent" }, (string){ "Never" }) }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  cronjob: {
+    [string]: 〈1;#CronjobConfig〉
+  }
+  #CronjobConfig: {
+    〈1;#PodConfig〉
+  }
+  #PodConfig: {
+    〈1;#ContainerConfig〉
+  }
+  #ContainerConfig: {
+    image: string
+    imagePullPolicy: ("IfNotPresent"|"Always"|"Never")
+    if (〈0;image〉 != _|_(explicit error (_|_ literal) in source)) {
+      if (〈import;strings〉.HasSuffix(〈1;image〉, ":latest") == true) {
+        imagePullPolicy: ("IfNotPresent"|*"Always"|"Never")
+      }
+      if (〈import;strings〉.HasSuffix(〈1;image〉, ":latest") != true) {
+        imagePullPolicy: (*"IfNotPresent"|"Always"|"Never")
+      }
+    }
+  }
+  _#cronjob: {
+    _config: 〈1;#CronjobConfig〉
+    out: {
+      spec: {
+        jobTemplate: {
+          spec: {
+            template: (〈5;_#pod〉 & {
+              _config: 〈5;_config〉
+            })
+          }
+        }
+      }
+    }
+  }
+  _#pod: {
+    _config: 〈1;#PodConfig〉
+    spec: {
+      containers: [
+        {
+          (〈4;_#container〉 & {
+            _config: 〈4;_config〉
+          })
+        },
+      ]
+    }
+  }
+  _#container: {
+    _config: 〈1;#ContainerConfig〉
+    imagePullPolicy: 〈0;_config〉.imagePullPolicy
+  }
+  cronjob: {
+    foobar: {
+      image: "foobar:latest"
+    }
+  }
+  for k, v in 〈0;cronjob〉 {
+    objects: {
+      cronjob: {
+        "\(〈3;k〉)": (〈4;_#cronjob〉 & {
+          _config: 〈4;v〉
+        }).out
+      }
+    }
+  }
+}

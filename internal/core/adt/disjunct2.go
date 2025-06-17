@@ -506,11 +506,26 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 
 	// TODO(perf): do not set to nil, but rather maintain an index to unwind
 	// to avoid allocting new arrays.
+	// TODO: ideally, we move unresolved tasks to the original vertex for
+	// disambiguated disjuncts.
 	saved := n.ctx.blocking
 	n.ctx.blocking = nil
 	defer func() { n.ctx.blocking = saved }()
 
+	// We forward the original base value to the disjunct. This allows for
+	// lookups with the disjunct to the original value.
+	var savedBase BaseValue
+	if !orig.IsDisjunct {
+		savedBase = orig.BaseValue
+		defer func() { orig.BaseValue = savedBase }()
+	}
+
 	d := oc.cloneRoot(n)
+
+	// This mechanism only works if the original is not a disjunct.
+	if !orig.IsDisjunct {
+		orig.BaseValue = d.node
+	}
 
 	n.ctx.pushOverlay(n.node, oc.vertexMap)
 	defer n.ctx.popOverlay()

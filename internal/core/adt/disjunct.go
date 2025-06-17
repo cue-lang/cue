@@ -551,7 +551,7 @@ func clone(v Vertex) Vertex {
 // not + maybe -> def
 // not + def   -> def
 
-type defaultMode int
+type defaultMode uint8
 
 const (
 	maybeDefault defaultMode = iota

@@ -24,6 +24,7 @@ import (
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/modpkgload"
 )
@@ -134,7 +135,11 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 // addFiles populates p.Files by reading CUE syntax from p.BuildFiles.
 func (l *loader) addFiles(p *build.Instance) {
 	for _, bf := range p.BuildFiles {
-		f, err := l.cfg.fileSystem.getCUESyntax(bf)
+		cfg := l.cfg.parserConfig
+		if p.ModuleFile != nil {
+			cfg = cfg.Apply(parser.Version(p.ModuleFile.Language.Version))
+		}
+		f, err := l.cfg.fileSystem.getCUESyntax(bf, cfg)
 		if err != nil {
 			p.ReportError(errors.Promote(err, "load"))
 		}

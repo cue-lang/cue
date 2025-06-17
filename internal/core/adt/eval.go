@@ -308,7 +308,7 @@ func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 		switch len(n.disjuncts) {
 		case 0:
 		case 1:
-			x := n.disjuncts[0].result
+			x := *n.disjuncts[0].result
 			x.state = nil
 			x.cyclicReferences = n.node.cyclicReferences
 			*v = x
@@ -973,13 +973,12 @@ func (n *nodeContext) createDisjunct() *Disjunction {
 	p := 0
 	hasDefaults := false
 	for i, x := range n.disjuncts {
-		v := new(Vertex)
-		*v = x.result
+		v := *x.result
 		v.state = nil
 		switch x.defaultMode {
 		case isDefault:
 			a[i] = a[p]
-			a[p] = v
+			a[p] = &v
 			p++
 			hasDefaults = true
 
@@ -987,7 +986,7 @@ func (n *nodeContext) createDisjunct() *Disjunction {
 			hasDefaults = true
 			fallthrough
 		case maybeDefault:
-			a[i] = v
+			a[i] = &v
 		}
 	}
 	// TODO: disambiguate based on concrete values.
@@ -1102,11 +1101,11 @@ type nodeContext struct {
 	hasDisjunction bool
 
 	// snapshot holds the last value of the vertex before calling postDisjunct.
-	snapshot Vertex
+	snapshot *Vertex
 
 	// Result holds the last evaluated value of the vertex after calling
 	// postDisjunct.
-	result Vertex
+	result *Vertex
 }
 
 type conjunct struct {

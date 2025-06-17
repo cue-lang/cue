@@ -166,9 +166,9 @@ func (n *nodeContext) expandDisjuncts(
 	// save nodeContext.
 
 	if recursive || len(n.disjunctions) > 0 {
-		n.snapshot = clone(*n.node)
+		n.snapshot = clone(n.node)
 	} else {
-		n.snapshot = *n.node
+		n.snapshot = n.node
 	}
 
 	defaultOffset := len(n.usedDefault)
@@ -206,8 +206,9 @@ func (n *nodeContext) expandDisjuncts(
 
 		if recursive {
 			*n = m
-			n.result = *n.node // XXX: n.result = snapshotVertex(n.node)?
-			n.node = &n.result
+			nn := *n.node
+			n.result = &nn // XXX: n.result = snapshotVertex(n.node)?
+			n.node = n.result
 			n.disjuncts = append(n.disjuncts, n)
 		}
 		if n.node.BaseValue == nil {
@@ -246,7 +247,7 @@ func (n *nodeContext) expandDisjuncts(
 				case d.expr != nil:
 					for _, v := range d.expr.Values {
 						cn := dn.clone()
-						*cn.node = clone(dn.snapshot)
+						*cn.node = *clone(dn.snapshot)
 						cn.node.state = cn
 
 						c := MakeConjunct(d.env, v.Val, d.cloneID)
@@ -271,7 +272,7 @@ func (n *nodeContext) expandDisjuncts(
 				case d.value != nil:
 					for i, v := range d.value.Values {
 						cn := dn.clone()
-						*cn.node = clone(dn.snapshot)
+						*cn.node = *clone(dn.snapshot)
 						cn.node.state = cn
 
 						cn.addValueConjunct(d.env, v, d.cloneID)
@@ -425,7 +426,7 @@ func (n *nodeContext) expandDisjuncts(
 				if last {
 					flags |= IgnoreOptional
 				}
-				if Equal(n.ctx, &v.result, &d.result, flags) {
+				if Equal(n.ctx, v.result, d.result, flags) {
 					m := maybeDefault
 					for _, u := range d.usedDefault {
 						m = combineDefault(m, u.nestedMode)
@@ -497,7 +498,9 @@ func mode(hasDefault, marked bool) defaultMode {
 // and can be used as is, or Structs is assumed to not yet be computed at the
 // time that a clone is needed and must be nil. Conjuncts no longer needed and
 // can become nil. All other fields can be copied shallowly.
-func clone(v Vertex) Vertex {
+func clone(v *Vertex) *Vertex {
+	v2 := *v
+	v = &v2
 	v.state = nil
 	if a := v.Arcs; len(a) > 0 {
 		v.Arcs = make([]*Vertex, len(a))
@@ -515,7 +518,7 @@ func clone(v Vertex) Vertex {
 				a := *arc
 				a.state = arc.state.clone()
 				a.state.node = &a
-				a.state.snapshot = clone(a)
+				a.state.snapshot = clone(arc)
 				v.Arcs[i] = &a
 			}
 		}

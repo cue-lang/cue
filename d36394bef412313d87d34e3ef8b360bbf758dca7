@@ -33,6 +33,24 @@
       "message": "I don\u0027t understand why this function exists: it doesn\u0027t seem to be used anywhere, and the description is almost identical to that of `Validate`.",
       "revId": "d36394bef412313d87d34e3ef8b360bbf758dca7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d7b9842_ffb0c189",
+        "filename": "internal/core/adt/validate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-17T17:36:57Z",
+      "side": 1,
+      "message": "Moved to the CL where it is first used.",
+      "parentUuid": "6732d2b6_9ef569b9",
+      "revId": "d36394bef412313d87d34e3ef8b360bbf758dca7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,3 +1,6 @@
+-- cue.mod/module.cue --
+module: "x.test"
+language: version: "v0.13.0"
 -- off.cue --
 off: __test_experiment("off")
 

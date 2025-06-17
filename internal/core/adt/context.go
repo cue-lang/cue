@@ -418,7 +418,17 @@ func (c *OpContext) PopArcAndLabel(saved *Vertex) {
 //
 // Should only be used to insert Conjuncts. TODO: perhaps only return Conjuncts
 // and error.
-func (c *OpContext) Resolve(x Conjunct, r Resolver) (*Vertex, *Bottom) {
+func (c *OpContext) Resolve(x Conjunct, r Resolver) (v *Vertex, b *Bottom) {
+	defer func() {
+		x := recover()
+		switch x.(type) {
+		case nil:
+		case *scheduler:
+			b = c.NewErrf("unresolved value %s", r)
+		default:
+			panic(x)
+		}
+	}()
 	return c.resolveState(x, r, final(finalized, allKnown))
 }
 

@@ -27,12 +27,13 @@ package build
 
 import (
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/parser"
 )
 
 // A Context keeps track of state of building instances and caches work.
 type Context struct {
 	loader    LoadFunc
-	parseFunc func(str string, src interface{}) (*ast.File, error)
+	parseFunc func(str string, src interface{}, cfg parser.Config) (*ast.File, error)
 
 	initialized bool
 
@@ -119,6 +120,6 @@ func Loader(f LoadFunc) Option {
 // to change the effective file contents or the behavior of the parser,
 // or to modify the syntax tree. For example, changing the backwards
 // compatibility.
-func ParseFile(f func(filename string, src interface{}) (*ast.File, error)) Option {
+func ParseFile(f func(filename string, src interface{}, cfg parser.Config) (*ast.File, error)) Option {
 	return func(c *Context) { c.parseFunc = f }
 }

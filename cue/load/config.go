@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/mod/modconfig"
@@ -149,6 +150,11 @@ type Config struct {
 	// equal to Module.
 	modFile *modfile.File
 
+	// parserConfig holds the configuration that will be passed
+	// when parsing CUE files. It includes the version from
+	// the module file.
+	parserConfig parser.Config
+
 	// Package defines the name of the package to be loaded. If this is not set,
 	// the package must be uniquely defined from its context. Special values:
 	//    _    load files without a package
@@ -266,7 +272,7 @@ type Config struct {
 	// An application may supply a custom implementation of ParseFile to change
 	// the effective file contents or the behavior of the parser, or to modify
 	// the syntax tree.
-	ParseFile func(name string, src interface{}) (*ast.File, error)
+	ParseFile func(name string, src interface{}, cfg parser.Config) (*ast.File, error)
 
 	// Overlay provides a mapping of absolute file paths to file contents.  If
 	// the file with the given path already exists, the parser will use the
@@ -368,8 +374,8 @@ func (c Config) complete() (cfg *Config, err error) {
 	}
 	if c.SkipImports {
 		// We should never use the registry in SkipImports mode
-		// but nil it out to be sure.
-		c.Registry = nil
+		// but make it always return an error just to be sure.
+		c.Registry = errorRegistry{errors.New("unexpected use of registry in SkipImports mode")}
 	} else if c.Registry == nil {
 		registry, err := modconfig.NewRegistry(&modconfig.Config{
 			Env: c.Env,
@@ -382,6 +388,7 @@ func (c Config) complete() (cfg *Config, err error) {
 		}
 		c.Registry = registry
 	}
+	c.parserConfig = parser.NewConfig().Apply(parser.ParseComments)
 	if err := c.loadModule(); err != nil {
 		return nil, err
 	}
@@ -438,6 +445,7 @@ func (c *Config) loadModule() error {
 		return errors.Newf(token.NoPos, "inconsistent modules: got %q, want %q", mf.Module, c.Module)
 	}
 	c.Module = mf.QualifiedModule()
+	c.parserConfig.Apply(parser.Version(c.modFile.Language.Version))
 	return nil
 }
 

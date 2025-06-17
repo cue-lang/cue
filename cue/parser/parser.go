@@ -1753,8 +1753,9 @@ func (p *parser) parseFile() *ast.File {
 	p.closeList()
 
 	f := &ast.File{
-		Imports: p.imports,
-		Decls:   decls,
+		Imports:         p.imports,
+		Decls:           decls,
+		LanguageVersion: p.cfg.Version,
 	}
 	c.closeNode(p, f)
 	return f

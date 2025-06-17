@@ -228,7 +228,10 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 		// A notable FS implementation that does this is the one
 		// provided by cue/load, allowing that package to cache
 		// the parsed CUE.
-		syntax, err = cueFS.ReadCUEFile(fpath)
+		// TODO maybe we should make the options here match
+		// the default parser options used by cue/load for better
+		// cache behavior.
+		syntax, err = cueFS.ReadCUEFile(fpath, parser.NewConfig().Apply(parser.ImportsOnly))
 		if err != nil && !errors.Is(err, errors.ErrUnsupported) {
 			return "", yield(pf, err)
 		}

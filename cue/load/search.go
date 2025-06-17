@@ -358,7 +358,7 @@ func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string
 			// there's only one package in the current directory but the last
 			// component of its package path does not match its name.
 			return appendExpandedUnqualifiedPackagePath(pkgPaths, origp, ip, pkgQual, module.SourceLoc{
-				FS:  c.fileSystem.ioFS(moduleRoot),
+				FS:  c.fileSystem.ioFS(moduleRoot, c.languageVersion()),
 				Dir: ".",
 			}, c.Module, tg)
 		}
@@ -371,7 +371,7 @@ func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string
 		return nil, fmt.Errorf("pattern not allowed in external package path %q", origp)
 	}
 	return appendExpandedWildcardPackagePath(pkgPaths, ip, pkgQual, module.SourceLoc{
-		FS:  c.fileSystem.ioFS(moduleRoot),
+		FS:  c.fileSystem.ioFS(moduleRoot, c.languageVersion()),
 		Dir: ".",
 	}, c.Module, tg)
 }

@@ -109,6 +109,7 @@ for k, v in input if v > 2 {
 		}
 	}
 	Imports: []*ast.ImportSpec{}
+	LanguageVersion: "v0.13.0"
 }
 -- out/debugprint/comprehensions.cue/omitempty-strings --
 *ast.File{
@@ -175,4 +176,5 @@ for k, v in input if v > 2 {
 			}
 		}
 	}
+	LanguageVersion: "v0.13.0"
 }

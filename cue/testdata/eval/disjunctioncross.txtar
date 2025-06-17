@@ -103,18 +103,18 @@ issue3967: error: local: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  282
+Leaks:  291
 Freed:  0
 Reused: 0
-Allocs: 282
+Allocs: 291
 Retain: 0
 
-Unifications: 162
-Conjuncts:    364
-Disjuncts:    68
+Unifications: 165
+Conjuncts:    379
+Disjuncts:    74
 
-CloseIDElems: 1555
-NumCloseIDs: 88
+CloseIDElems: 1476
+NumCloseIDs: 91
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -132,18 +132,18 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 8
-+Leaks:  282
++Leaks:  291
 +Freed:  0
 +Reused: 0
-+Allocs: 282
++Allocs: 291
 +Retain: 0
 +
-+Unifications: 162
-+Conjuncts:    364
-+Disjuncts:    68
++Unifications: 165
++Conjuncts:    379
++Disjuncts:    74
 +
-+CloseIDElems: 1555
-+NumCloseIDs: 88
++CloseIDElems: 1476
++NumCloseIDs: 91
 -- out/eval/stats --
 Leaks:  16
 Freed:  292
@@ -205,12 +205,12 @@ NumCloseIDs: 8
           }) }
       }
       #Application: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
+        oneOrTwo: (#struct){ |((#struct){
             kind: (string){ "one" }
             one: (#struct){
               oneField: (string){ "value" }
             }
-          }, *(#struct){
+          }, (#struct){
             kind: (string){ "two" }
             two: (#struct){
               optional?: (string){ string }
@@ -234,11 +234,16 @@ NumCloseIDs: 8
       }
       #Application: (#struct){
         oneOrTwo: (#struct){ |(*(#struct){
+            kind: (string){ "two" }
+            two: (#struct){
+              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
+            }
+          }, (#struct){
             kind: (string){ "one" }
             one: (#struct){
               oneField: (string){ "value" }
             }
-          }, *(#struct){
+          }, (#struct){
             kind: (string){ "two" }
             two: (#struct){
               optional?: (string){ string }
@@ -258,12 +263,12 @@ NumCloseIDs: 8
         }
       }
       #Application: (#struct){
-        oneOrTwo: (#struct){ |(*(#struct){
+        oneOrTwo: (#struct){ |((#struct){
             kind: (string){ "one" }
             one: (#struct){
               oneField: (string){ "value" }
             }
-          }, *(#struct){
+          }, (#struct){
             kind: (string){ "two" }
             two: (#struct){
               optional?: (string){ string }
@@ -273,20 +278,30 @@ NumCloseIDs: 8
     }
     local: (struct){
       out: (#struct){
-        oneOrTwo: (#struct){
-          two: (#struct){
-            optional?: (string){ string }
-          }
-          kind: (string){ "two" }
-        }
+        oneOrTwo: (#struct){ |(*(#struct){
+            two: (#struct){
+              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
+            }
+            kind: (string){ "two" }
+          }, (#struct){
+            two: (#struct){
+              optional?: (string){ string }
+            }
+            kind: (string){ "two" }
+          }) }
       }
       #Application: (#struct){
         oneOrTwo: (#struct){ |(*(#struct){
+            kind: (string){ "two" }
+            two: (#struct){
+              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
+            }
+          }, (#struct){
             kind: (string){ "one" }
             one: (#struct){
               oneField: (string){ "value" }
             }
-          }, *(#struct){
+          }, (#struct){
             kind: (string){ "two" }
             two: (#struct){
               optional?: (string){ string }
@@ -350,90 +365,21 @@ NumCloseIDs: 8
 diff old new
 --- old
 +++ new
-@@ -46,49 +46,39 @@
+@@ -45,12 +45,7 @@
+           }) }
        }
        #Application: (#struct){
-         oneOrTwo: (#struct){ |(*(#struct){
--            kind: (string){ "two" }
--            two: (#struct){
--              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
--            }
--          }, (#struct){
--            kind: (string){ "one" }
--            one: (#struct){
--              oneField: (string){ "value" }
--            }
--          }, (#struct){
--            kind: (string){ "two" }
--            two: (#struct){
--              optional?: (string){ string }
--            }
--          }) }
--      }
--    }
--    local: (struct){
--      out: (#struct){
 -        oneOrTwo: (#struct){ |(*(#struct){
 -            kind: (string){ "two" }
 -            two: (#struct){
 -              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
 -            }
 -          }, (#struct){
--            kind: (string){ "two" }
--            two: (#struct){
--              optional?: (string){ string }
--            }
--          }) }
--      }
--      #Application: (#struct){
--        oneOrTwo: (#struct){ |(*(#struct){
--            kind: (string){ "two" }
--            two: (#struct){
--              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
--            }
--          }, (#struct){
--            kind: (string){ "one" }
--            one: (#struct){
--              oneField: (string){ "value" }
--            }
--          }, (#struct){
-+            kind: (string){ "one" }
-+            one: (#struct){
-+              oneField: (string){ "value" }
-+            }
-+          }, *(#struct){
-+            kind: (string){ "two" }
-+            two: (#struct){
-+              optional?: (string){ string }
-+            }
-+          }) }
-+      }
-+    }
-+    local: (struct){
-+      out: (#struct){
-+        oneOrTwo: (#struct){ |(*(#struct){
-+            kind: (string){ "two" }
-+            two: (#struct){
-+              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
-+            }
-+          }, (#struct){
-+            kind: (string){ "two" }
-+            two: (#struct){
-+              optional?: (string){ string }
-+            }
-+          }) }
-+      }
-+      #Application: (#struct){
-+        oneOrTwo: (#struct){ |(*(#struct){
-+            kind: (string){ "one" }
-+            one: (#struct){
-+              oneField: (string){ "value" }
-+            }
-+          }, *(#struct){
-             kind: (string){ "two" }
-             two: (#struct){
-               optional?: (string){ string }
-@@ -100,63 +90,43 @@
++        oneOrTwo: (#struct){ |((#struct){
+             kind: (string){ "one" }
+             one: (#struct){
+               oneField: (string){ "value" }
+@@ -100,25 +95,15 @@
    fieldDiscriminator: (struct){
      crossing: (struct){
        out: (#struct){
@@ -456,44 +402,6 @@ diff old new
 -              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
 -            }
 -          }, (#struct){
--            kind: (string){ "one" }
--            one: (#struct){
--              oneField: (string){ "value" }
--            }
--          }, (#struct){
--            kind: (string){ "two" }
--            two: (#struct){
--              optional?: (string){ string }
--            }
--          }) }
--      }
--    }
--    local: (struct){
--      out: (#struct){
--        oneOrTwo: (#struct){ |(*(#struct){
--            two: (#struct){
--              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
--            }
--            kind: (string){ "two" }
--          }, (#struct){
--            two: (#struct){
--              optional?: (string){ string }
--            }
--            kind: (string){ "two" }
--          }) }
--      }
--      #Application: (#struct){
--        oneOrTwo: (#struct){ |(*(#struct){
--            kind: (string){ "two" }
--            two: (#struct){
--              optional: (string){ |(*(string){ "optional set" }, (string){ string }) }
--            }
--          }, (#struct){
--            kind: (string){ "one" }
--            one: (#struct){
--              oneField: (string){ "value" }
--            }
--          }, (#struct){
 +        oneOrTwo: (#struct){
 +          two: (#struct){
 +            optional?: (string){ string }
@@ -502,39 +410,11 @@ diff old new
 +        }
 +      }
 +      #Application: (#struct){
-+        oneOrTwo: (#struct){ |(*(#struct){
-+            kind: (string){ "one" }
-+            one: (#struct){
-+              oneField: (string){ "value" }
-+            }
-+          }, *(#struct){
-+            kind: (string){ "two" }
-+            two: (#struct){
-+              optional?: (string){ string }
-+            }
-+          }) }
-+      }
-+    }
-+    local: (struct){
-+      out: (#struct){
-+        oneOrTwo: (#struct){
-+          two: (#struct){
-+            optional?: (string){ string }
-+          }
-+          kind: (string){ "two" }
-+        }
-+      }
-+      #Application: (#struct){
-+        oneOrTwo: (#struct){ |(*(#struct){
-+            kind: (string){ "one" }
-+            one: (#struct){
-+              oneField: (string){ "value" }
-+            }
-+          }, *(#struct){
-             kind: (string){ "two" }
-             two: (#struct){
-               optional?: (string){ string }
-@@ -168,45 +138,48 @@
++        oneOrTwo: (#struct){ |((#struct){
+             kind: (string){ "one" }
+             one: (#struct){
+               oneField: (string){ "value" }
+@@ -168,45 +153,48 @@
    issue3967: (struct){
      error: (struct){
        nested: (struct){

@@ -504,6 +504,12 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 
 	n.scheduler.blocking = n.scheduler.blocking[:0]
 
+	// TODO(perf): do not set to nil, but rather maintain an index to unwind
+	// to avoid allocting new arrays.
+	saved := n.ctx.blocking
+	n.ctx.blocking = nil
+	defer func() { n.ctx.blocking = saved }()
+
 	d := oc.cloneRoot(n)
 
 	n.ctx.pushOverlay(n.node, oc.vertexMap)
@@ -525,12 +531,6 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 	d.scheduleConjunct(c, c.CloseInfo)
 
 	oc.unlinkOverlay()
-
-	// TODO(perf): do not set to nil, but rather maintain an index to unwind
-	// to avoid allocting new arrays.
-	saved := n.ctx.blocking
-	n.ctx.blocking = nil
-	defer func() { n.ctx.blocking = saved }()
 
 	d.defaultMode = n.defaultMode
 	d.origDefaultMode = m

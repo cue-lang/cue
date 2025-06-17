@@ -167,6 +167,23 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 
 		for _, t := range n.tasks {
 			ctx.rewriteComprehension(t)
+
+			t.node = ctx.vertexMap.deref(t.node.node).state
+
+			if t.blockedOn != nil {
+				before := t.blockedOn.node.node
+				after := ctx.vertexMap.deref(before)
+				// Tasks that are blocked on nodes outside the current scope
+				// of the disjunction should should be added to blocking queues.
+				if before == after {
+					continue
+				}
+				s := &after.state.scheduler
+				t.blockedOn = s
+				s.blocking = append(s.blocking, t)
+				s.ctx.blocking = append(s.ctx.blocking, t)
+				s.needs |= t.blockCondition
+			}
 		}
 	}
 
@@ -203,7 +220,6 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 	v := &Vertex{}
 	*v = *x
 	ctx.vertexMap[x] = v
-
 	x.overlay = v
 
 	ctx.vertices = append(ctx.vertices, x)
@@ -329,20 +345,11 @@ func (ctx *overlayContext) cloneScheduler(dst, src *nodeContext) {
 	for _, t := range ss.tasks {
 		switch t.state {
 		case taskWAITING:
-			// Do not unblock previously blocked tasks, unless they are
-			// associated with this node.
-			// TODO: an edge case is when a task is blocked on another node
-			// within the same disjunction. We could solve this by associating
-			// each nodeContext with a unique ID (like a generation counter) for
-			// the disjunction.
-			if t.node != src || t.blockedOn != ss {
-				break
-			}
 			t.defunct = true
 			t := ctx.cloneTask(t, ds, ss)
 			ds.tasks = append(ds.tasks, t)
-			ds.blocking = append(ds.blocking, t)
-			ctx.ctx.blocking = append(ctx.ctx.blocking, t)
+			// We add this task to ds.blocking and ctx.ctx.blocking in
+			// cloneRoot, after its node references have been rewritten.
 
 		case taskREADY:
 			t.defunct = true
@@ -378,6 +385,7 @@ func (ctx *overlayContext) cloneTask(t *task, dst, src *scheduler) *task {
 		completes:      t.completes,
 		unblocked:      t.unblocked,
 		blockCondition: t.blockCondition,
+		blockedOn:      t.blockedOn, // will be rewritten later
 		err:            t.err,
 		env:            env,
 		x:              t.x,
@@ -389,13 +397,6 @@ func (ctx *overlayContext) cloneTask(t *task, dst, src *scheduler) *task {
 		// known.
 		comp: t.comp,
 		leaf: t.leaf,
-	}
-
-	if t.blockedOn != nil {
-		if t.blockedOn != src {
-			panic("invalid scheduler")
-		}
-		d.blockedOn = dst
 	}
 
 	return d

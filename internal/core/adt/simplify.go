@@ -279,7 +279,7 @@ func opInfo(op Op) (cmp Op, norm int) {
 }
 
 func test(ctx *OpContext, op Op, a, b Value) bool {
-	if b, ok := BinOp(ctx, op, a, b).(*Bool); ok {
+	if b, ok := BinOp(ctx, nil, op, a, b).(*Bool); ok {
 		return b.B
 	}
 	return false

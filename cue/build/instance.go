@@ -183,7 +183,7 @@ func (inst *Instance) Context() *Context {
 
 func (inst *Instance) parse(name string, src interface{}) (*ast.File, error) {
 	if inst.ctxt != nil && inst.ctxt.parseFunc != nil {
-		return inst.ctxt.parseFunc(name, src)
+		return inst.ctxt.parseFunc(name, src, parser.NewConfig().Apply(parser.ParseComments))
 	}
 	return parser.ParseFile(name, src, parser.ParseComments)
 }

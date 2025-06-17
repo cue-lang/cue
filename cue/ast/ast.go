@@ -951,8 +951,9 @@ type File struct {
 	Filename string
 	Decls    []Decl // top-level declarations; or nil
 
-	Imports    []*ImportSpec // imports in this file
-	Unresolved []*Ident      // unresolved identifiers in this file
+	Imports         []*ImportSpec // imports in this file
+	Unresolved      []*Ident      // unresolved identifiers in this file
+	LanguageVersion string        // The language version as configured by [parser.ParseFile].
 
 	comments
 }

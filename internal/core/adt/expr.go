@@ -657,7 +657,7 @@ func (x *BoundValue) validate(c *OpContext, y Value) *Bottom {
 		return c.Err()
 	}
 
-	switch v := BinOp(c, x.Op, a, b).(type) {
+	switch v := BinOp(c, x, x.Op, a, b).(type) {
 	case *Bottom:
 		return v
 
@@ -1379,7 +1379,7 @@ func (x *BinaryExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		return err
 	}
 
-	return BinOp(c, x.Op, left, right)
+	return BinOp(c, x, x.Op, left, right)
 }
 
 func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flags combinedFlags) (r Value) {

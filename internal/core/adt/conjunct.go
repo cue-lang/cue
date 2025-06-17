@@ -653,7 +653,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		n.updateCyclicStatusV3(id)
 
 		if y := n.scalar; y != nil {
-			if b, ok := BinOp(ctx, EqualOp, x, y).(*Bool); !ok || !b.B {
+			if b, ok := BinOp(ctx, errOnDiffType, EqualOp, x, y).(*Bool); !ok || !b.B {
 				n.reportConflict(x, y, x.Kind(), y.Kind(), n.scalarID, id)
 			}
 			break

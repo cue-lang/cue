@@ -113,6 +113,17 @@ diffTypes: {
 	recursive3t: [...int] == [...string]
 	recursive4f: [1, "a"] == [1, 2]
 }
+-- incomplete.cue --
+incomplete: carryOver: {
+	t1: {
+		#foo: {
+			a: [...]
+			b: [1]
+			incomplete: true & (a == b)
+		}
+		ok: #foo & {a: [1]}
+	}
+}
 -- out/def --
 lss: true
 leq: true
@@ -136,6 +147,29 @@ err: _|_ // invalid operation 2 == "s" (mismatched types int and string)
   geq: (2.0 >= 2)
   seq: (("a" + "b") == "ab")
   err: (2 == "s")
+}
+--- incomplete.cue
+{
+  incomplete: {
+    carryOver: {
+      t1: {
+        #foo: {
+          a: [
+            ...,
+          ]
+          b: [
+            1,
+          ]
+          incomplete: (true & (〈0;a〉 == 〈0;b〉))
+        }
+        ok: (〈0;#foo〉 & {
+          a: [
+            1,
+          ]
+        })
+      }
+    }
+  }
 }
 --- lists.cue
 {
@@ -554,16 +588,19 @@ err: _|_ // invalid operation 2 == "s" (mismatched types int and string)
 }
 -- out/eval/stats --
 Leaks:  37
-Freed:  451
-Reused: 445
+Freed:  465
+Reused: 459
 Allocs: 43
 Retain: 177
 
-Unifications: 465
-Conjuncts:    543
-Disjuncts:    628
+Unifications: 479
+Conjuncts:    564
+Disjuncts:    642
 -- out/evalalpha --
 Errors:
+incomplete.carryOver.t1.#foo.incomplete: conflicting values false and true:
+    ./incomplete.cue:6:16
+    ./incomplete.cue:6:24
 lists.err1: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
     ./lists.cue:23:8
 lists.err4: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
@@ -584,6 +621,37 @@ Result:
   geq: (bool){ true }
   seq: (bool){ true }
   err: (bool){ false }
+  incomplete: (_|_){
+    // [eval]
+    carryOver: (_|_){
+      // [eval]
+      t1: (_|_){
+        // [eval]
+        #foo: (_|_){
+          // [eval]
+          a: (list){
+          }
+          b: (#list){
+            0: (int){ 1 }
+          }
+          incomplete: (_|_){
+            // [eval] incomplete.carryOver.t1.#foo.incomplete: conflicting values false and true:
+            //     ./incomplete.cue:6:16
+            //     ./incomplete.cue:6:24
+          }
+        }
+        ok: (#struct){
+          a: (#list){
+            0: (int){ 1 }
+          }
+          b: (#list){
+            0: (int){ 1 }
+          }
+          incomplete: (bool){ true }
+        }
+      }
+    }
+  }
   lists: (_|_){
     // [eval]
     t1: (bool){ true }
@@ -705,8 +773,10 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,11 @@
- Errors:
+@@ -2,13 +2,13 @@
+ incomplete.carryOver.t1.#foo.incomplete: conflicting values false and true:
+     ./incomplete.cue:6:16
+     ./incomplete.cue:6:24
 -lists.err1: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
 +lists.err1: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
      ./lists.cue:23:8
@@ -721,7 +791,7 @@ diff old new
      ./structs.cue:30:11
  
  Result:
-@@ -36,21 +36,21 @@
+@@ -70,21 +70,21 @@
      f5: (bool){ false }
      f6: (bool){ false }
      err1: (_|_){
@@ -747,7 +817,7 @@ diff old new
        //     ./lists.cue:27:8
      }
      net1: (bool){ true }
-@@ -80,31 +80,31 @@
+@@ -114,31 +114,31 @@
        _f9r: (int){ |(*(int){ 2 }, (int){ 3 }, (int){ 4 }) }
        f9: (bool){ false }
        err1: (_|_){
@@ -786,7 +856,7 @@ diff old new
          //     ./structs.cue:32:8
        }
        net1: (bool){ true }
-@@ -128,7 +128,7 @@
+@@ -162,7 +162,7 @@
      n_list_num: (bool){ true }
      n_list_str: (bool){ true }
      recursive1e: (_|_){
@@ -797,6 +867,9 @@ diff old new
      recursive2f: (bool){ false }
 -- out/eval --
 Errors:
+incomplete.carryOver.t1.#foo.incomplete: conflicting values false and true:
+    ./incomplete.cue:6:16
+    ./incomplete.cue:6:24
 lists.err1: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
     ./lists.cue:23:8
 lists.err4: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
@@ -817,6 +890,37 @@ Result:
   geq: (bool){ true }
   seq: (bool){ true }
   err: (bool){ false }
+  incomplete: (_|_){
+    // [eval]
+    carryOver: (_|_){
+      // [eval]
+      t1: (_|_){
+        // [eval]
+        #foo: (_|_){
+          // [eval]
+          a: (list){
+          }
+          b: (#list){
+            0: (int){ 1 }
+          }
+          incomplete: (_|_){
+            // [eval] incomplete.carryOver.t1.#foo.incomplete: conflicting values false and true:
+            //     ./incomplete.cue:6:16
+            //     ./incomplete.cue:6:24
+          }
+        }
+        ok: (#struct){
+          a: (#list){
+            0: (int){ 1 }
+          }
+          b: (#list){
+            0: (int){ 1 }
+          }
+          incomplete: (bool){ true }
+        }
+      }
+    }
+  }
   lists: (_|_){
     // [eval]
     t1: (bool){ true }

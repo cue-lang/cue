@@ -17,80 +17,139 @@
 package parser
 
 import (
+	"fmt"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cueversion"
+	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/internal/source"
 )
 
 // Option specifies a parse option.
-type Option func(p *parser)
+type Option interface {
+	apply(cfg *Config)
+}
 
-var (
-	// PackageClauseOnly causes parsing to stop after the package clause.
-	PackageClauseOnly Option = packageClauseOnly
-	packageClauseOnly        = func(p *parser) {
-		p.mode |= packageClauseOnlyMode
+var _ Option = Config{}
+
+// Config represents the end result of applying a set of options.
+// The zero value is not OK to use: use [NewConfig] to construct
+// a Config value before using it.
+//
+// Config itself implements [Option] by overwriting the
+// entire configuration.
+//
+// Config is comparable.
+type Config struct {
+	// valid is set by NewConfig and is used to check
+	// that a Config has been created correctly.
+	valid bool
+
+	// Mode holds a bitmask of boolean parser options.
+	Mode Mode
+
+	// Version holds the language version to use when
+	// parsing the CUE syntax.
+	Version string
+}
+
+// Ensure that Config is comparable.
+var _ = Config{} == Config{}
+
+// apply implements [Option]
+func (cfg Config) apply(cfg1 *Config) {
+	if !cfg.valid {
+		panic("zero parser.Config value used; use parser.NewConfig!")
 	}
+	*cfg1 = cfg
+}
+
+// NewConfig returns the configuration containing all default values.
+func NewConfig() Config {
+	return Config{
+		valid:   true,
+		Version: cueversion.LanguageVersion(),
+	}
+}
+
+// Apply applies all the given options to cfg and
+// returns the resulting configuration.
+func (cfg Config) Apply(opts ...Option) Config {
+	for _, opt := range opts {
+		opt.apply(&cfg)
+	}
+	return cfg
+}
+
+// optionFunc implements [Option] for a function.
+type optionFunc func(cfg *Config)
+
+func (f optionFunc) apply(cfg *Config) {
+	f(cfg)
+}
+
+// A Mode value is a set of flags (or 0).
+// It controls the amount of source code parsed and other optional
+// parser functionality.
+//
+// Mode implements [Option] by or-ing all its bits
+// with [Config.Mode].
+type Mode uint
+
+const (
+	// PackageClauseOnly causes parsing to stop after the package clause.
+	PackageClauseOnly Mode = 1 << iota
 
 	// ImportsOnly causes parsing to stop parsing after the import declarations.
-	ImportsOnly Option = importsOnly
-	importsOnly        = func(p *parser) {
-		p.mode |= importsOnlyMode
-	}
+	ImportsOnly
 
 	// ParseComments causes comments to be parsed.
-	ParseComments Option = parseComments
-	parseComments        = func(p *parser) {
-		p.mode |= parseCommentsMode
-	}
+	ParseComments
 
 	// ParseFuncs causes function declarations to be parsed.
 	//
 	// This is an experimental function and the API is likely to
 	// change or dissapear.
-	ParseFuncs Option = parseFuncs
-	parseFuncs        = func(p *parser) {
-		p.mode |= parseFuncsMode
-	}
+	ParseFuncs
 
 	// Trace causes parsing to print a trace of parsed productions.
-	Trace    Option = traceOpt
-	traceOpt        = func(p *parser) {
-		p.mode |= traceMode
-	}
+	Trace
 
 	// DeclarationErrors causes parsing to report declaration errors.
-	DeclarationErrors Option = declarationErrors
-	declarationErrors        = func(p *parser) {
-		p.mode |= declarationErrorsMode
-	}
+	DeclarationErrors
 
 	// AllErrors causes all errors to be reported (not just the first 10 on different lines).
-	AllErrors Option = allErrors
-	allErrors        = func(p *parser) {
-		p.mode |= allErrorsMode
-	}
+	AllErrors
 
 	// AllowPartial allows the parser to be used on a prefix buffer.
-	AllowPartial Option = allowPartial
-	allowPartial        = func(p *parser) {
-		p.mode |= partialMode
-	}
+	AllowPartial
 )
+
+// apply implements [Option].
+func (m Mode) apply(c *Config) {
+	c.Mode |= m
+}
+
+// Version specifies the language version to use when parsing
+// the CUE. The argument must be a valid semantic version, as
+// checked by [semver.IsValid].
+func Version(v string) Option {
+	if !semver.IsValid(v) {
+		panic(fmt.Errorf("invalid language version %q", v))
+	}
+	return optionFunc(func(c *Config) {
+		c.Version = v
+	})
+}
 
 // FromVersion specifies until which legacy version the parser should provide
 // backwards compatibility.
+// Deprecated: use [Version] instead.
 func FromVersion(version int) Option {
-	if version >= 0 {
-		version++
-	}
-	// Versions:
-	// <0:  major version 0 (counting -1000 + x, where x = 100*m+p in 0.m.p
-	// >=0: x+1 in 1.x.y
-	return func(p *parser) { p.version = version }
+	return optionFunc(func(cfg *Config) {})
 }
 
 // DeprecationError is a sentinel error to indicate that an error is
@@ -104,41 +163,19 @@ func (e *DeprecationError) Error() string {
 }
 
 const (
-	// Latest specifies the latest version of the parser, effectively setting
-	// the strictest implementation.
-	Latest = latest
+	// Deprecated: see [Version].
+	Latest = 0
 
-	latest = -1000 + (100 * internal.MinorCurrent) + 0
-
-	// FullBackwardCompatibility enables all deprecated features that are
-	// currently still supported by the parser.
-	FullBackwardCompatibility = fullCompatibility
-
-	fullCompatibility = -1000
+	// Deprecated: see [Version].
+	FullBackwardCompatibility = 0
 )
 
 // FileOffset specifies the File position info to use.
 //
 // Deprecated: this has no effect.
 func FileOffset(pos int) Option {
-	return func(p *parser) {}
+	return optionFunc(func(*Config) {})
 }
-
-// A mode value is a set of flags (or 0).
-// They control the amount of source code parsed and other optional
-// parser functionality.
-type mode uint
-
-const (
-	packageClauseOnlyMode mode = 1 << iota // stop parsing after package clause
-	importsOnlyMode                        // stop parsing after import declarations
-	parseCommentsMode                      // parse comments and add them to AST
-	parseFuncsMode                         // parse function declarations (experimental)
-	partialMode
-	traceMode             // print a trace of parsed productions
-	declarationErrorsMode // report declaration errors
-	allErrorsMode         // report all errors (not just the first 10 on different lines)
-)
 
 // ParseFile parses the source code of a single CUE source file and returns
 // the corresponding File node. The source code may be provided via
@@ -228,7 +265,7 @@ func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, erro
 	if p.tok == token.COMMA && p.lit == "\n" {
 		p.next()
 	}
-	if p.mode&partialMode == 0 {
+	if p.cfg.Mode&AllowPartial == 0 {
 		p.expect(token.EOF)
 	}
 

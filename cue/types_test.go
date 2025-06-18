@@ -2611,6 +2611,10 @@ func TestEquals(t *testing.T) {
 		`{ a: 2, b: { 3 } }`,
 		`{ a: { 2 }, b: 3 }`,
 		true,
+	}, {
+		`{a: *1 | 2 | 3}`,
+		`{a: 3 | *1}`,
+		true,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {

@@ -16,6 +16,24 @@
       "message": "perhaps clarify that this is non-nil iff Module is non-empty?",
       "revId": "0d168b21835298f285eb99065b03d42ba91368d4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c52f932_af5da9bd",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T10:38:36Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s possible to guarantee that property as that invariant is maintained by another package (cue/load). I think it\u0027s probably reasonable for callers to check this field directly.",
+      "parentUuid": "df6d489d_d0631e7e",
+      "revId": "0d168b21835298f285eb99065b03d42ba91368d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

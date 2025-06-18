@@ -247,6 +247,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "951d1705_8d07dd81",
+        "filename": "cue/load/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T15:27:17Z",
+      "side": 1,
+      "message": "It will now!",
+      "parentUuid": "92fbc1d1_e9272015",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b8f38f40_744e8bb7",
         "filename": "cue/load/fs.go",
         "patchSetId": 3

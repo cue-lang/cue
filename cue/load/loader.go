@@ -29,10 +29,11 @@ import (
 )
 
 type loader struct {
-	cfg    *Config
-	tagger *tagger
-	stk    importStack
-	pkgs   *modpkgload.Packages
+	cfg          *Config
+	tagger       *tagger
+	stk          importStack
+	pkgs         *modpkgload.Packages
+	modFileCache *modFileCache
 
 	// dirCachedBuildFiles caches the work involved when reading a
 	// directory. It is keyed by directory name. When we descend into
@@ -52,6 +53,7 @@ func newLoader(c *Config, tg *tagger, pkgs *modpkgload.Packages) *loader {
 		cfg:                 c,
 		tagger:              tg,
 		pkgs:                pkgs,
+		modFileCache:        newModFileCache(),
 		dirCachedBuildFiles: make(map[string]cachedDirFiles),
 	}
 }

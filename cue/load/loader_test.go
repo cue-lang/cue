@@ -175,7 +175,7 @@ imports:
 		want: `err:    cannot find package "mod.test/test/hello": no files in package directory with package name "nonexist"
 path:   mod.test/test/hello:nonexist
 module: ""
-root:   $CWD/testdata/testmod
+root:   ""
 dir:    ""
 display:mod.test/test/hello:nonexist`,
 	}, {
@@ -219,7 +219,7 @@ files:
 cannot find package "foo.com/bad-identifier": cannot find module providing package foo.com/bad-identifier
 path:   foo.com/bad-identifier
 module: ""
-root:   $CWD/testdata/testmod
+root:   ""
 dir:    ""
 display:foo.com/bad-identifier`,
 	}, {
@@ -229,7 +229,7 @@ display:foo.com/bad-identifier`,
 		want: `err:    standard library import path "nonexisting" cannot be imported as a CUE package
 path:   nonexisting
 module: ""
-root:   $CWD/testdata/testmod
+root:   ""
 dir:    ""
 display:nonexisting`,
 	}, {
@@ -239,7 +239,7 @@ display:nonexisting`,
 		want: `err:    standard library import path "strconv" cannot be imported as a CUE package
 path:   strconv
 module: ""
-root:   $CWD/testdata/testmod
+root:   ""
 dir:    ""
 display:strconv`,
 	}, {

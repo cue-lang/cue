@@ -2,6 +2,7 @@ package load_test
 
 import (
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -11,6 +12,7 @@ import (
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
@@ -90,7 +92,10 @@ func TestModuleFetch(t *testing.T) {
 		// to remove them.
 		defer modcache.RemoveAll(tmpDir)
 		ctx := cuecontext.New()
-		insts := t.RawInstances()
+		// Note: avoid calling RawInstances with no arguments, because
+		// that loads the top level CUE files directly rather than just
+		// loading the package which is what we want.
+		insts := t.RawInstances(".")
 		if len(insts) != 1 {
 			t.Fatalf("wrong instance count; got %d want 1", len(insts))
 		}
@@ -102,16 +107,34 @@ func TestModuleFetch(t *testing.T) {
 			})
 			return
 		}
-		if inst.Module != "" {
-			// Sanity check that the module file is present in the instance.
-			qt.Assert(t, qt.Not(qt.IsNil(inst.ModuleFile)))
-			qt.Assert(t, qt.Equals(inst.ModuleFile.Module, inst.Module))
-			qt.Assert(t, qt.Equals(inst.ModuleFile.Language.Version, "v0.8.0"))
-		}
+
+		writeInstanceInfo(t.T, t.Writer("instance-info"), inst, 0)
+		qt.Assert(t, qt.Not(qt.IsNil(inst.ModuleFile)))
+		qt.Assert(t, qt.Equals(inst.ModuleFile.QualifiedModule(), inst.Module))
+		qt.Assert(t, qt.Equals(inst.ModuleFile.Language.Version, "v0.8.0"))
 		v := ctx.BuildInstance(inst)
 		if err := v.Validate(); err != nil {
 			t.Fatal(err)
 		}
-		fmt.Fprintf(t, "%v\n", v)
+		fmt.Fprintf(t.Writer("result"), "%v\n", v)
 	})
+}
+
+func writeInstanceInfo(t *testing.T, w io.Writer, inst *build.Instance, depth int) {
+	m := inst.Module
+	if m == "" {
+		m = "<none>"
+		qt.Assert(t, qt.IsNil(inst.ModuleFile))
+	} else {
+		qt.Assert(t, qt.Not(qt.IsNil(inst.ModuleFile)))
+		qt.Assert(t, qt.Equals(inst.ModuleFile.QualifiedModule(), inst.Module))
+	}
+	errStr := ""
+	if inst.Err != nil {
+		errStr = fmt.Sprintf(" err=%v", inst.Err)
+	}
+	fmt.Fprintf(w, "%s%s module=%s%s\n", strings.Repeat("\t", depth), inst.ImportPath, m, errStr)
+	for _, inst := range inst.Imports {
+		writeInstanceInfo(t, w, inst, depth+1)
+	}
 }

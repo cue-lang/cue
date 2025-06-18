@@ -77,6 +77,9 @@ func TestLoadPackages(t *testing.T) {
 						printf("\tmissing: %v\n", errors.As(pkg.Error(), new(*ImportMissingError)))
 					} else {
 						printf("\tmod: %v\n", pkg.Mod())
+						// Sanity check that the module file is available at pkg.ModRoot.
+						_, err := fs.Stat(pkg.ModRoot().FS, path.Join(pkg.ModRoot().Dir, "cue.mod/module.cue"))
+						qt.Assert(t, qt.IsNil(err), qt.Commentf("pkg %q; mod root: %#v", pkg.ImportPath(), pkg.ModRoot()))
 						for _, loc := range pkg.Locations() {
 							printf("\tlocation: %v\n", loc.Dir)
 						}

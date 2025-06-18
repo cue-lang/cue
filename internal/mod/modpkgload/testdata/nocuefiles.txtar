@@ -18,7 +18,9 @@ example.com/blah@v0
 -- main.cue --
 package main
 import "example.com/blah@v0"
-
+-- cue.mod/module.cue --
+module: "main.test@v0"
+language: version: "v0.12.0"
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
 language: version: "v0.8.0"

@@ -41,7 +41,7 @@ import (
 // set. Errors directly related to loading the instance are recorded in this
 // instance, but errors that occur loading dependencies are recorded in these
 // dependencies.
-func Instances(args []string, c *Config) []*build.Instance {
+func Instances(args []string, c *Config) (_a []*build.Instance) {
 	if len(args) == 0 {
 		args = []string{"."}
 	}

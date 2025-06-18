@@ -17,11 +17,48 @@ package cueexperiment
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"reflect"
+	"slices"
+	"sort"
 	"strings"
 
 	"cuelang.org/go/internal/mod/semver"
 )
+
+type expMap struct{ m map[string]bool }
+
+func (m *expMap) add(x ...string) {
+	for _, a := range x {
+		if a == "" {
+			continue
+		}
+		if m.m == nil {
+			m.m = make(map[string]bool)
+		}
+		for _, elem := range strings.Split(a, ",") {
+			m.m[strings.TrimSpace(elem)] = true
+		}
+	}
+}
+
+func (m *expMap) key() string {
+	a := slices.Collect(maps.Keys(m.m))
+	sort.Strings(a)
+	return strings.Join(a, ",")
+}
+
+func (m *expMap) has(x string) bool {
+	return m.m[x]
+}
+
+func (m *expMap) remove(x string) {
+	delete(m.m, x)
+}
+
+func (m *expMap) remaining() map[string]bool {
+	return m.m
+}
 
 // parseConfig initializes the fields in flags from the attached struct field
 // tags as well as the contents of the given string, which is a comma-separated
@@ -33,16 +70,7 @@ import (
 //
 // Names are treated case insensitively. An empty version string indicates the
 // default settings.
-func parseConfig[T any](flags *T, version, experiments string) error {
-	var requested map[string]bool
-	if experiments != "" {
-		if requested == nil {
-			requested = make(map[string]bool)
-		}
-		for _, elem := range strings.Split(experiments, ",") {
-			requested[strings.TrimSpace(elem)] = true
-		}
-	}
+func parseConfig[T any](flags *T, version string, experiments expMap) error {
 	var errs []error
 
 	// Collect the field indices and set the default values.
@@ -51,17 +79,17 @@ func parseConfig[T any](flags *T, version, experiments string) error {
 outer:
 	for i := range ft.NumField() {
 		field := ft.Field(i)
-		name := strings.ToLower(field.Name)
 		if tagStr, ok := field.Tag.Lookup("experiment"); ok {
+			name := strings.ToLower(field.Name)
 			for _, f := range strings.Split(tagStr, ",") {
 				key, rest, _ := strings.Cut(f, ":")
 				switch key {
 				case "since":
 					switch {
-					case !requested[name]:
-					case version == "":
-					case semver.Compare(version, rest) < 0:
-						errs = append(errs, fmt.Errorf("cannot set experiment %q before version %s", name, rest))
+					case !experiments.has(name):
+					case version != "" && semver.Compare(version, rest) < 0:
+						const msg = "cannot set experiment %q before version %s"
+						errs = append(errs, fmt.Errorf(msg, name, rest))
 						continue outer
 					default:
 						fv.Field(i).Set(reflect.ValueOf(true))
@@ -73,8 +101,10 @@ outer:
 					}
 
 				case "rejected":
-					if (version == "" || semver.Compare(version, rest) >= 0) && requested[name] {
-						errs = append(errs, fmt.Errorf("cannot set rejected experiment %q", name))
+					expired := (version == "" || semver.Compare(version, rest) >= 0)
+					if expired && experiments.has(name) {
+						const msg = "cannot set rejected experiment %q"
+						errs = append(errs, fmt.Errorf(msg, name))
 						continue outer
 					}
 
@@ -82,11 +112,11 @@ outer:
 					panic(fmt.Errorf("unknown exp tag %q", f))
 				}
 			}
+			experiments.remove(name)
 		}
-		delete(requested, name)
 	}
 
-	for name := range requested {
+	for name := range experiments.remaining() {
 		errs = append(errs, fmt.Errorf("unknown experiment %q", name))
 	}
 

@@ -49,6 +49,11 @@ func TestParseConfig(t *testing.T) {
 		want:        testFlags{Feature1: true},
 		wantErr:     false,
 	}, {
+		name:        "enable_feature1_no_version",
+		experiments: "feature1",
+		want:        testFlags{Feature1: true, Feature2: true, Feature4: true},
+		wantErr:     false,
+	}, {
 		name:        "feature_not_available_yet",
 		version:     "v0.0.9",
 		experiments: "feature1",
@@ -106,7 +111,9 @@ func TestParseConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var got testFlags
-			err := parseConfig(&got, tt.version, tt.experiments)
+			var m expMap
+			m.add(tt.experiments)
+			err := parseConfig(&got, tt.version, m)
 
 			if tt.wantErr {
 				if err == nil {

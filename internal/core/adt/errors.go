@@ -375,6 +375,17 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 		switch x := arg.(type) {
 		case Node:
 			a = appendNodePositions(a, x)
+			// Wrap nodes in a [fmt.Stringer] which delays the call to [OpContext.Str]
+			// until the error needs to be rendered. This helps avoid work,
+			// as in many cases, errors are created but never shown to the user.
+			//
+			// A Vertex will set an error as its BaseValue via a Bottom node,
+			// which might be this error we are creating.
+			// Using the Vertex directly could then lead to endless recursion.
+			// Make a shallow copy to avoid that.
+			if v, ok := x.(*Vertex); ok {
+				x = clone(v)
+			}
 			args[i] = c.Str(x)
 		case ast.Node:
 			// TODO: ideally the core evaluator should not depend on higher

@@ -1444,12 +1444,24 @@ func (c *OpContext) newList(src ast.Node, parent *Vertex) *Vertex {
 	return c.newInlineVertex(parent, &ListMarker{})
 }
 
-// Str reports a debug string of x.
-func (c *OpContext) Str(x Node) string {
+// String reports a string of x, for use in errors or debugging.
+// Use [OpContext.Str] instead for %s format arguments, as it delays the work.
+func (c *OpContext) String(x Node) string {
 	if c.Format == nil {
 		return fmt.Sprintf("%T", x)
 	}
 	return c.Format(c.Runtime, x)
+}
+
+type stringerFunc func() string
+
+func (f stringerFunc) String() string { return f() }
+
+// Str reports a string of x via a [fmt.Stringer], for use in errors or debugging.
+func (c *OpContext) Str(x Node) fmt.Stringer {
+	return stringerFunc(func() string {
+		return c.String(x)
+	})
 }
 
 // NewList returns a new list for the given values.

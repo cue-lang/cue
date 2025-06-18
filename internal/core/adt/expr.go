@@ -1891,6 +1891,8 @@ func validateWithBuiltin(call *CallContext) *Bottom {
 		return b
 	}
 	// failed:
+	// TODO(mvdan): building this buffer should be part of the error format and arguments,
+	// e.g. any logic needed here can be wrapped in an [fmt.Stringer].
 	var buf bytes.Buffer
 	buf.WriteString(b.qualifiedName(c))
 
@@ -1903,7 +1905,7 @@ func validateWithBuiltin(call *CallContext) *Bottom {
 			if i > 0 {
 				_, _ = buf.WriteString(", ")
 			}
-			buf.WriteString(c.Str(a))
+			buf.WriteString(c.String(a))
 		}
 		buf.WriteString(")")
 	}

@@ -299,9 +299,9 @@ diff old new
 +CloseIDElems: 1080
 +NumCloseIDs: 122
 -- out/eval/stats --
-Leaks:  5
+Leaks:  6
 Freed:  239
-Reused: 232
+Reused: 233
 Allocs: 12
 Retain: 25
 

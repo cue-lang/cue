@@ -33,10 +33,10 @@ original: {
 	out: yaml.Marshal(rule)
 }
 -- out/eval/stats --
-Leaks:  4
+Leaks:  14
 Freed:  17
 Reused: 10
-Allocs: 11
+Allocs: 21
 Retain: 4
 
 Unifications: 21

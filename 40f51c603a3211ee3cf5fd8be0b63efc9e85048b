@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a391f2c_a4c58367",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T10:23:50Z",
+      "side": 1,
+      "message": "Nice.",
+      "revId": "40f51c603a3211ee3cf5fd8be0b63efc9e85048b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe16ad7d_c295270e",
@@ -31,6 +48,23 @@
       "writtenOn": "2025-06-18T07:37:36Z",
       "side": 1,
       "message": "I would personally call this e.g. `usedNewConfig` so that its purpose is clearer",
+      "revId": "40f51c603a3211ee3cf5fd8be0b63efc9e85048b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebb3792a_04ad8426",
+        "filename": "cue/parser/interface.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T10:23:50Z",
+      "side": 1,
+      "message": "hah, that\u0027s neat.",
       "revId": "40f51c603a3211ee3cf5fd8be0b63efc9e85048b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

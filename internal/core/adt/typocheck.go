@@ -883,19 +883,14 @@ func getReqSets(n *nodeContext) reqSets {
 	if n.computedCloseInfo {
 		return n.reqSets
 	}
-	n.reqSets = n.reqSets[:0]
-	n.computedCloseInfo = true
 
 	a := n.reqSets
 	v := n.node
 
-	if p := v.Parent; p != nil {
-		aReq := getReqSets(p.state)
-		if !n.dropParentRequirements {
-			a = append(a, aReq...)
-		}
+	if p := v.Parent; p != nil && !n.dropParentRequirements {
+		a = append(a, getReqSets(p.state)...)
+		a.filterNonRecursive()
 	}
-	a.filterNonRecursive()
 
 	last := len(a) - 1
 
@@ -972,6 +967,7 @@ outer:
 
 	a.filterTop(n.conjunctInfo, parentConjuncts)
 
+	n.computedCloseInfo = true
 	n.reqSets = a
 	return a
 }

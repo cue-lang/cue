@@ -353,7 +353,6 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 		p.Err = errors.Append(p.Err, err)
 		p.Incomplete = true
 	}
-
 	return p
 }
 
@@ -387,11 +386,10 @@ func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath
 }
 
 func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
-	dir, modPath, err := l.absDirFromImportPath(pos, p)
+	dir, mv, modRoot, err := l.absDirFromImportPath(pos, p)
 	i := l.cfg.Context.NewInstance(dir, nil)
 	i.Err = errors.Append(i.Err, err)
 	i.Dir = dir
-
 	parts := ast.ParseImportPath(string(p))
 	i.PkgName = parts.Qualifier
 	if i.PkgName == "" {
@@ -401,9 +399,21 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	}
 	i.DisplayPath = string(p)
 	i.ImportPath = string(p)
-	i.Root = l.cfg.ModuleRoot
-	i.Module = modPath
-	i.ModuleFile = l.cfg.modFile
+	if mv.Path() == "" {
+		return i
+	}
+	mf, err1 := l.modFileCache.modFile(mv, modRoot)
+	if err != nil {
+		i.Err = errors.Append(i.Err, errors.Promote(err1, ""))
+	}
+	root, err1 := absPathForSourceLoc(modRoot)
+	if err != nil {
+		i.Err = errors.Append(i.Err, errors.Promote(err1, ""))
+	} else {
+		i.Root = root
+	}
+	i.Module = mv.Path()
+	i.ModuleFile = mf
 
 	return i
 }
@@ -412,28 +422,31 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 // and a package name. The root directory must be set.
 //
 // The returned directory may not exist.
-func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (dir string, modPath string, _ errors.Error) {
-	dir, modPath, err := l.absDirFromImportPath1(pos, p)
+func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (dir string, mv module.Version, modRoot module.SourceLoc, _ errors.Error) {
+	dir, mv, modRoot, err := l.absDirFromImportPath1(pos, p)
 	if err != nil {
 		// Any error trying to determine the package location
 		// is a PackageError.
-		return "", "", l.errPkgf([]token.Pos{pos}, "%s", err.Error())
+		return "", module.Version{}, module.SourceLoc{}, l.errPkgf([]token.Pos{pos}, "%s", err.Error())
 	}
-	return dir, modPath, nil
+	return dir, mv, modRoot, nil
 }
 
-func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir string, modPath string, err error) {
+func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir string, mv module.Version, modRoot module.SourceLoc, err error) {
+	failf := func(f string, a ...any) (string, module.Version, module.SourceLoc, error) {
+		return "", module.Version{}, module.SourceLoc{}, fmt.Errorf(f, a...)
+	}
 	if p == "" {
-		return "", "", fmt.Errorf("empty import path")
+		return failf("empty import path")
 	}
 	if l.cfg.ModuleRoot == "" {
-		return "", "", fmt.Errorf("cannot import %q (root undefined)", p)
+		return failf("cannot import %q (root undefined)", p)
 	}
 	if isStdlibPackage(string(p)) {
-		return "", "", fmt.Errorf("standard library import path %q cannot be imported as a CUE package", p)
+		return failf("standard library import path %q cannot be imported as a CUE package", p)
 	}
 	if l.pkgs == nil {
-		return "", "", fmt.Errorf("imports are unavailable because there is no cue.mod/module.cue file")
+		return failf("imports are unavailable because there is no cue.mod/module.cue file")
 	}
 	// Extract the package name.
 	parts := ast.ParseImportPath(string(p))
@@ -448,10 +461,10 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 	// should we not be using either the original path or the canonical path?
 	// The unqualified import path should only be used for filepath.FromSlash further below.
 	if pkg == nil {
-		return "", "", fmt.Errorf("no dependency found for package %q", unqualified)
+		return failf("no dependency found for package %q", unqualified)
 	}
 	if err := pkg.Error(); err != nil {
-		return "", "", fmt.Errorf("cannot find package %q: %v", unqualified, err)
+		return failf("cannot find package %q: %v", unqualified, err)
 	}
 	if mv := pkg.Mod(); mv.IsLocal() {
 		// It's a local package that's present inside one or both of the gen, usr or pkg
@@ -462,18 +475,18 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 	} else {
 		locs := pkg.Locations()
 		if len(locs) > 1 {
-			return "", "", fmt.Errorf("package %q unexpectedly found in multiple locations", unqualified)
+			return failf("package %q unexpectedly found in multiple locations", unqualified)
 		}
 		if len(locs) == 0 {
-			return "", "", fmt.Errorf("no location found for package %q", unqualified)
+			return failf("no location found for package %q", unqualified)
 		}
 		var err error
 		absDir, err = absPathForSourceLoc(locs[0])
 		if err != nil {
-			return "", "", fmt.Errorf("cannot determine source directory for package %q: %v", unqualified, err)
+			return failf("cannot determine source directory for package %q: %v", unqualified, err)
 		}
 	}
-	return absDir, pkg.Mod().Path(), nil
+	return absDir, pkg.Mod(), pkg.ModRoot(), nil
 }
 
 func absPathForSourceLoc(loc module.SourceLoc) (string, error) {

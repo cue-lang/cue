@@ -1,4 +1,4 @@
--- out/modfetch --
+-- out/modfetch/result --
 {
 	"bar.com@v0":           "v0.5.0"
 	"baz.org@v0":           "v0.10.1"
@@ -6,6 +6,13 @@
 	main:                   "main"
 	"example.com@v0":       "v0.0.1"
 }
+-- out/modfetch/instance-info --
+main.org@v0:main module=main.org@v0
+	example.com@v0:main module=example.com@v0
+		foo.com/bar/hello module=foo.com/bar/hello@v0
+			bar.com/bar@v0 module=bar.com@v0
+				baz.org@v0:baz module=baz.org@v0
+			baz.org@v0:baz module=baz.org@v0
 -- cue.mod/module.cue --
 module: "main.org"
 language: version: "v0.8.0"

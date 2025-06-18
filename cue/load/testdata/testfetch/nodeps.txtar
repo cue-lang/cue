@@ -1,4 +1,4 @@
--- out/modfetch --
+-- out/modfetch/result --
 {
 	a: "hello"
 }
@@ -10,3 +10,5 @@ language: version: "v0.8.0"
 package main
 
 a: "hello"
+-- out/modfetch/instance-info --
+main.org@v0:main module=main.org@v0

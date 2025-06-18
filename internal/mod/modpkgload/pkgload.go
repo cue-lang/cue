@@ -110,6 +110,7 @@ type Package struct {
 
 	// Populated by [loader.load].
 	mod          module.Version     // module providing package
+	modRoot      module.SourceLoc   // root location of module
 	locs         []module.SourceLoc // location of source code directories
 	err          error              // error loading package
 	imports      []*Package         // packages imported by this one
@@ -154,6 +155,10 @@ func (pkg *Package) Flags() Flags {
 
 func (pkg *Package) Mod() module.Version {
 	return pkg.mod
+}
+
+func (pkg *Package) ModRoot() module.SourceLoc {
+	return pkg.modRoot
 }
 
 // LoadPackages loads information about all the given packages and the
@@ -262,7 +267,7 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		return
 	}
 	pkg.fromExternal = pkg.mod != pkgs.mainModuleVersion
-	pkg.mod, pkg.locs, pkg.err = pkgs.importFromModules(ctx, pkg.path)
+	pkg.mod, pkg.modRoot, pkg.locs, pkg.err = pkgs.importFromModules(ctx, pkg.path)
 	if pkg.err != nil {
 		return
 	}

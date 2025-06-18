@@ -570,7 +570,7 @@ Unifications: 767
 Conjuncts:    1490
 Disjuncts:    78
 
-CloseIDElems: 2611
+CloseIDElems: 1403
 NumCloseIDs: 422
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -599,7 +599,7 @@ diff old new
 +Conjuncts:    1490
 +Disjuncts:    78
 +
-+CloseIDElems: 2611
++CloseIDElems: 1403
 +NumCloseIDs: 422
 -- out/eval/stats --
 Leaks:  116

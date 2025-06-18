@@ -72,7 +72,7 @@ Unifications: 5541
 Conjuncts:    25871
 Disjuncts:    6534
 
-CloseIDElems: 41473
+CloseIDElems: 18527
 NumCloseIDs: 4115
 -- out/evalalpha --
 (struct){
@@ -159,7 +159,7 @@ diff old new
 +Conjuncts:    25871
 +Disjuncts:    6534
 +
-+CloseIDElems: 41473
++CloseIDElems: 18527
 +NumCloseIDs: 4115
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new

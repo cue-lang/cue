@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fce88859_d275bd9c",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T17:30:47Z",
+      "side": 1,
+      "message": "Is this expected?",
+      "revId": "38bebfa85e60d71e8c15d69ef307d6c2521d96f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bee1cab5_37a81149",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T10:43:22Z",
+      "side": 1,
+      "message": "it makes it easy to apply a set of Options to a Config struct, rather than setting them as struct fields: I _think_ it\u0027s worthwhile - we do actually use it in a few places and it seems like it works out OK. Without Apply, I don\u0027t think there\u0027s any way to apply an Option to a Config (unless we made `Option.apply` public, but I don\u0027t think that\u0027s a great idea).",
+      "parentUuid": "283c0bb5_9853b821",
+      "revId": "40f51c603a3211ee3cf5fd8be0b63efc9e85048b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe16ad7d_c295270e",

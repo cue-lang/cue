@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue/scanner"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 // The parser structure holds the parser's internal state.
@@ -32,6 +33,9 @@ type parser struct {
 	file    *token.File
 	errors  errors.Error
 	scanner scanner.Scanner
+
+	expList     []string // list of experiments to enable
+	experiments *cueexperiment.File
 
 	// Tracing/debugging
 	cfg       Config
@@ -752,7 +756,7 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 	for p.tok != token.RBRACE && p.tok != token.EOF {
 		switch p.tok {
 		case token.ATTRIBUTE:
-			list = append(list, p.parseAttribute())
+			list = append(list, p.parseAttribute(false))
 			p.consumeDeclComma()
 
 		case token.ELLIPSIS:
@@ -968,15 +972,22 @@ func (p *parser) parseField() (decl ast.Decl) {
 func (p *parser) parseAttributes() (attrs []*ast.Attribute) {
 	p.openList()
 	for p.tok == token.ATTRIBUTE {
-		attrs = append(attrs, p.parseAttribute())
+		attrs = append(attrs, p.parseAttribute(false))
 	}
 	p.closeList()
 	return attrs
 }
 
-func (p *parser) parseAttribute() *ast.Attribute {
+func (p *parser) parseAttribute(inPreamble bool) *ast.Attribute {
 	c := p.openComments()
 	a := &ast.Attribute{At: p.pos, Text: p.lit}
+
+	if inPreamble {
+		key, body := a.Split()
+		if key == "experiment" {
+			p.expList = append(p.expList, body)
+		}
+	}
 	p.next()
 	c.closeNode(p, a)
 	return a
@@ -1704,8 +1715,18 @@ func (p *parser) parseFile() *ast.File {
 	var decls []ast.Decl
 
 	for p.tok == token.ATTRIBUTE {
-		decls = append(decls, p.parseAttribute())
+		decls = append(decls, p.parseAttribute(true))
 		p.consumeDeclComma()
+	}
+
+	v := p.cfg.Version
+	exp, err := cueexperiment.NewFile(v, p.expList...)
+	if err != nil {
+		e := errors.Wrapf(err, p.pos, "parsing experiments for version %q", v)
+		p.errors = errors.Append(p.errors, e)
+	} else {
+		p.experiments = exp
+		p.file.SetExperiments(exp)
 	}
 
 	// The package clause is not a declaration: it does not appear in any
@@ -1733,7 +1754,7 @@ func (p *parser) parseFile() *ast.File {
 	}
 
 	for p.tok == token.ATTRIBUTE {
-		decls = append(decls, p.parseAttribute())
+		decls = append(decls, p.parseAttribute(false))
 		p.consumeDeclComma()
 	}
 

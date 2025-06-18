@@ -63,6 +63,9 @@ func predeclared(n *ast.Ident) adt.Expr {
 
 	case "__no_sharing":
 		return adt.NoShareSentinel
+
+	case "__test_experiment":
+		return testExperiment
 	}
 
 	if r, ok := predefinedRanges[n.Name]; ok {

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea406d40_e6445ca1",
+        "filename": "cue/testdata/basicrewrite/016_comparison.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T09:08:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa7e3189_484cb531",
+      "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc91384f_8f480535",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-06-17T07:41:09Z",
       "side": 1,
       "message": "I thought this is supposed to be becoming valid now?\n\nAlso, it would be good to have some indication in the field as to the expected test result, even if it might seem obvious, as the tests above do.",
+      "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a78fec1_064c8eb4",
+        "filename": "cue/testdata/basicrewrite/016_comparison.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T09:08:20Z",
+      "side": 1,
+      "message": "Not quite yet. I\u0027m first addressing the other issues. Then the different types results in false will be an experiment only. This is only done in later CLs.",
+      "parentUuid": "bc91384f_8f480535",
       "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b442395e_a30f013e",
+        "filename": "cue/testdata/basicrewrite/016_comparison.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T09:08:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e05fca93_64aec45c",
+      "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34f3328d_6783f186",
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b85441f9_e4429379",
+        "filename": "cue/testdata/lists/021_list_equality.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T09:08:20Z",
+      "side": 1,
+      "message": "It does. I use \"incomplete\" to indicate that something needs to be an incomplete eror.\nBut some are indicated incorrectly, so I have tighten the annotation.",
+      "parentUuid": "34f3328d_6783f186",
+      "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "947456df_9f63a565",
@@ -99,6 +171,24 @@
       "writtenOn": "2025-06-17T08:04:48Z",
       "side": 1,
       "message": "It would also be good to have a check that a equality check against an open list is not necessarily final:\n\n```\n#foo: {\n    a: [...]\n    b: [1]\n    c: true \u0026 (a \u003d\u003d b)\n}\n```\n\nThe above should not be a final error, but:\n\n```\n#foo: {\n    a: []\n    b: [1]\n    c: true \u0026 (a \u003d\u003d b)\n}\n```\n\nshould be AFAICS.",
+      "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f6ca819_29030fa8",
+        "filename": "cue/testdata/lists/021_list_equality.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T09:08:20Z",
+      "side": 1,
+      "message": "I\u0027ve added this in a separate CL now. I\u0027m keeping that as a reminder to add a whole bunch more of related issues. This failure is unrelated to the problem that is being addressed in this chain.",
+      "parentUuid": "947456df_9f63a565",
       "revId": "e4fecaff72a3872efac38a9c6934b0bb1d945968",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

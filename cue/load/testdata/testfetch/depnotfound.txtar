@@ -1,5 +1,5 @@
 -- out/modfetch/error --
-import failed: cannot find package "example.com": cannot fetch example.com@v0.0.1: module example.com@v0.0.1: module not found:
+main.org@v0: import failed: cannot find package "example.com": cannot fetch example.com@v0.0.1: module example.com@v0.0.1: module not found:
     ./main.cue:2:8
 -- cue.mod/module.cue --
 module: "main.org@v0"

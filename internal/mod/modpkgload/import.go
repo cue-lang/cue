@@ -31,11 +31,16 @@ import (
 // If the package is present in exactly one module, importFromModules will
 // return the module, its root directory, and a list of other modules that
 // lexically could have provided the package but did not.
-func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m module.Version, pkgLocs []module.SourceLoc, err error) {
-	fail := func(err error) (module.Version, []module.SourceLoc, error) {
-		return module.Version{}, nil, err
+func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (
+	m module.Version,
+	mroot module.SourceLoc,
+	pkgLocs []module.SourceLoc,
+	err error,
+) {
+	fail := func(err error) (module.Version, module.SourceLoc, []module.SourceLoc, error) {
+		return module.Version{}, module.SourceLoc{}, nil, err
 	}
-	failf := func(format string, args ...interface{}) (module.Version, []module.SourceLoc, error) {
+	failf := func(format string, args ...interface{}) (module.Version, module.SourceLoc, []module.SourceLoc, error) {
 		return fail(fmt.Errorf(format, args...))
 	}
 	// Note: we don't care about the package qualifier at this point
@@ -94,8 +99,9 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 	}
 	if len(localPkgLocs) > 0 {
 		locs = append(locs, PackageLoc{
-			Module: module.MustNewVersion("local", ""),
-			Locs:   localPkgLocs,
+			Module:     module.MustNewVersion("local", ""),
+			ModuleRoot: pkgs.mainModuleLoc,
+			Locs:       localPkgLocs,
 		})
 	}
 
@@ -133,7 +139,7 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 		}
 		if len(locs) == 1 {
 			// We've found the unique module containing the package.
-			return locs[0].Module, locs[0].Locs, nil
+			return locs[0].Module, locs[0].ModuleRoot, locs[0].Locs, nil
 		}
 
 		if mg != nil {
@@ -155,10 +161,11 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 	}
 }
 
-// PackageLoc holds a module version and a location of a package
+// PackageLoc holds a module version and the module root location, and a location of a package
 // within that module.
 type PackageLoc struct {
-	Module module.Version
+	Module     module.Version
+	ModuleRoot module.SourceLoc
 	// Locs holds the source locations of the package. There is always
 	// at least one element; there can be more than one when the
 	// module path is "local" (for exampe packages inside cue.mod/pkg).
@@ -209,8 +216,9 @@ func FindPackageLocations(
 		}
 		if ok {
 			locs = append(locs, PackageLoc{
-				Module: v,
-				Locs:   []module.SourceLoc{loc},
+				Module:     v,
+				ModuleRoot: mloc,
+				Locs:       []module.SourceLoc{loc},
 			})
 		}
 	}

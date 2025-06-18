@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"sort"
 	"sync"
+
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 // -----------------------------------------------------------------------------
@@ -73,6 +75,19 @@ func (p Pos) File() *File {
 		return nil
 	}
 	return p.file
+}
+
+// hiddenPos allows defining methods in Pos that are hidden from public
+// documentation.
+type hiddenPos = Pos
+
+func (p hiddenPos) Experiment() (x cueexperiment.File) {
+	if p.file == nil || p.file.experiments == nil {
+		return x
+	}
+
+	x = *p.file.experiments
+	return x
 }
 
 // TODO(mvdan): The methods below don't need to build an entire Position
@@ -240,6 +255,8 @@ type File struct {
 	// lines and infos are protected by set.mutex
 	lines []index // lines contains the offset of the first character for each line (the first entry is always 0)
 	infos []lineInfo
+
+	experiments *cueexperiment.File
 }
 
 // NewFile returns a new file with the given OS file name. The size provides the
@@ -250,7 +267,15 @@ func NewFile(filename string, deprecatedBase, size int) *File {
 	if deprecatedBase < 0 {
 		deprecatedBase = 1
 	}
-	return &File{sync.RWMutex{}, filename, index(deprecatedBase), index(size), []index{0}, nil}
+	return &File{sync.RWMutex{}, filename, index(deprecatedBase), index(size), []index{0}, nil, nil}
+}
+
+// hiddenFile allows defining methods in File that are hidden from public
+// documentation.
+type hiddenFile = File
+
+func (f *hiddenFile) SetExperiments(experiments *cueexperiment.File) {
+	f.experiments = experiments
 }
 
 // Name returns the file name of file f as registered with AddFile.

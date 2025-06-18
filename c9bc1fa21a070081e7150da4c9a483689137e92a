@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5e39d0e5_c2db05ff",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T07:58:13Z",
+      "side": 1,
+      "message": "Wouldn\u0027t it be more idiomatic to pass the Config as a pointer? Fine either way,though.",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "61cf1c3f_1c973e72",
         "filename": "cmd/cue/cmd/testdata/script/issue3282.txtar",
         "patchSetId": 3
@@ -31,6 +48,125 @@
       "writtenOn": "2025-06-18T07:48:10Z",
       "side": 1,
       "message": "why is this error message changing? the previous error was too verbose - it repeated the import path twice - but now it almost got too short, not mentioning the import path at all.",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec1ee81a_214f8dcf",
+        "filename": "cmd/cue/cmd/testdata/script/issue3282.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T07:58:13Z",
+      "side": 1,
+      "message": "why did this change?",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2f1458a_b77868f8",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 956,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T07:58:13Z",
+      "side": 1,
+      "message": "I perfer not (yet) to expose the language version as a field in ast.File.\n\nUnless you intended me to remove this again. Please clarify this in the comments then.",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a550a2f_7d7ef4fb",
+        "filename": "cue/build/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T07:58:13Z",
+      "side": 1,
+      "message": "Describe how the Config is supposed to be used: I guess users should typically modify it, not fully replace it, to preserve as much of the options passed down. (i.e. suggest use of Apply?)",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ffad23b_01145244",
+        "filename": "cue/load/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T07:58:13Z",
+      "side": 1,
+      "message": "Does this belong in this CL?",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92fbc1d1_e9272015",
+        "filename": "cue/load/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T07:58:13Z",
+      "side": 1,
+      "message": "Will this reply a different version for the modules of dependencies?",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8f38f40_744e8bb7",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T07:58:13Z",
+      "side": 1,
+      "message": "Wouldn\u0027t it make more sense to create a new type that holds both values so you only have to do a lookup once?",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23199abe_cad047de",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T07:58:13Z",
+      "side": 1,
+      "message": "Simpler with a composite type.",
       "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -54,6 +190,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e36d01d2_4f053012",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T07:58:13Z",
+      "side": 1,
+      "message": "Even individual files are still within the scope of a module. I would expect the language version of the module to be used here as well, if exists.",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9037453d_b6804120",
         "filename": "cue/parser/interface.go",
         "patchSetId": 3
@@ -71,6 +224,57 @@
         "endLine": 85,
         "endChar": 9
       },
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "921aa17f_2d2a82ab",
+        "filename": "internal/astinternal/debug_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T07:58:13Z",
+      "side": 1,
+      "message": "There are many tests that show a single language version, but I don\u0027t see any test showing that if modules have different language versions, that the right version is assigned to the file.",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea9c5e13_52fd2f95",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T07:58:13Z",
+      "side": 1,
+      "message": "I don\u0027t see this used?",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b165a52_3d52fec2",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T07:58:13Z",
+      "side": 1,
+      "message": "THis is called from `yieldAllModuleFiles`, so there must be a way to pass the version down from there. But also from PackageFiles the version should be passed.",
       "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

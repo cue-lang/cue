@@ -167,7 +167,6 @@ package adt
 //
 import (
 	"math"
-	"slices"
 
 	"cuelang.org/go/cue/ast"
 )
@@ -726,102 +725,111 @@ func (a reqSets) assert() {
 	}
 }
 
-// replaceIDs replaces defIDs mappings in the receiving reqSets in place.
-//
-// The following rules apply:
-//
-//   - Mapping a typo-checked definition to a new typo-checked definition replaces
-//     the set from the "from" definition in its entirety. It is assumed that the
-//     set is already added to the requirements.
-//
-//   - A mapping from a typo-checked definition to 0 removes the set from the
-//     requirements. This typically comes from _ or ....
-//
-//   - A mapping from an equivalence (non-head) value to 0 removes the
-//     equivalence. This does not change the outcome of typo checking, but
-//     reduces the size of the equivalence list, which helps performance.
-//
-//   - A mapping from an equivalence (non-head) value to a new value widens the
-//     allowed values for the respective set by adding the new value to the
-//     equivalence list.
-//
-// In words;
-// - Definition: if not in embed, create new group
-// - If in active definition, replace old definition
-// - If in embed, replace embed in respective sets. definition starts new group
-// - child definition replaces parent definition
-func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
-	temp := *a
-	temp = temp[:0]
-	buf := ctx.reqSetsBuf[:0]
-outer:
-	for i := 0; i < len(*a); {
-		e := (*a)[i]
-		if e.size != 0 {
-			// If the head is dropped, the entire group is deleted.
-			for _, x := range b {
-				if e.id == x.from && !x.add {
-					i += int(e.size)
-					continue outer
-				}
-			}
-			if len(buf) > 0 {
-				buf[0].size = uint32(len(buf))
-				if len(temp)+len(buf) > i {
-					*a = slices.Replace(*a, len(temp), i, buf...)
-					i = len(temp) + len(buf)
-					temp = (*a)[:i]
-				} else {
-					temp = append(temp, buf...)
-				}
-				buf = buf[:0]
-			}
-		}
-
-		buf = transitiveMapping(ctx, buf, e, b)
-
-		i++
-	}
-	if len(buf) > 0 {
-		buf[0].size = uint32(len(buf))
-		temp = append(temp, buf...)
-	}
-	ctx.reqSetsBuf = buf[:0] // to be reused later on
-	*a = temp
+type replaceInfo struct {
+	skip, delete bool
+	replacements []defID
 }
 
-// TODO: this is a polynomial algorithm. At some point, if this turns out to be
-// a bottleneck, we should consider filtering unnecessary entries and/or using a
-// more efficient algorithm.
-func transitiveMapping(ctx *OpContext, buf reqSets, x reqSet, b []replaceID) reqSets {
-	// Trim subtree for embedded conjunctions.
-	if len(buf) > 0 && buf[0].embed == x.id {
-		return buf
+// replaceIDs transitively applies replacement rules to the requirement sets,
+// modifying the receiver in place.
+//
+// The algorithm uses an efficient, non-recursive Breadth-First Search (BFS)
+// to expand equivalences for each requirement group. It first pre-processes
+// the list of rules into structures for quick lookups:
+//
+//  1. Head Deletion: A rule with `add: false` marks a group for deletion if
+//     its `from` ID matches the group's head.
+//  2. ID Removal: A rule with `to: deleteID` marks the `from` ID to be
+//     excluded from any group.
+//  3. Graph Traversal: All other rules build a replacement graph. The BFS
+//     traverses this graph, starting from a group's initial members, to find
+//     all reachable IDs. Traversal is pruned for branches leading to a removed
+//     ID or into an embedding's scope.
+//
+// Finally, a new group is reconstructed from all the valid IDs found.
+func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
+	if len(b) == 0 {
+		return
 	}
 
-	// do not add duplicates
-	for _, y := range buf {
-		if x.id == y.id {
-			return buf
+	// TODO(mvdan): can we build this map directly instead of a slice?
+	index := ctx.replaceIDsIndex
+	if index == nil {
+		index = make(map[defID]replaceInfo, len(b))
+	}
+	for _, rule := range b {
+		info := index[rule.from]
+		if !rule.add {
+			info.skip = true
 		}
+		if rule.to == deleteID {
+			info.delete = true
+		} else {
+			// All non-delete rules, regardless of the `add` flag, contribute
+			// to the replacement graph.
+			info.replacements = append(info.replacements, rule.to)
+		}
+		index[rule.from] = info
 	}
 
-	buf = append(buf, x)
-	ctx.stats.CloseIDElems++
+	origSets := append(ctx.replaceIDsOrig[:0], *a...)
+	newSets := (*a)[:0]
+	queue := ctx.replaceIDsQueue
+	visited := ctx.replaceIDsVisited
+	if visited == nil {
+		visited = make(map[defID]bool)
+	}
 
-	for _, y := range b {
-		if x.id == y.from {
-			if y.to == deleteID { // do we need this?
-				buf = buf[:len(buf)-1]
-				return buf
+	for i := 0; i < len(origSets); {
+		head := origSets[i]
+		currentGroup := origSets[i : i+int(head.size)]
+		i += int(head.size)
+
+		if index[head.id].skip {
+			continue
+		}
+
+		queue = queue[:0]
+		clear(visited)
+
+		for _, set := range currentGroup {
+			if !index[set.id].delete && !visited[set.id] {
+				visited[set.id] = true
+				queue = append(queue, set)
 			}
-			buf = transitiveMapping(ctx, buf, reqSet{
-				id:   y.to,
-				once: x.once,
-			}, b)
+		}
+
+		for qIdx := 0; qIdx < len(queue); qIdx++ {
+			currentSet := queue[qIdx]
+			ctx.stats.CloseIDElems++
+
+			for _, nextID := range index[currentSet.id].replacements {
+				if !index[nextID].delete && !visited[nextID] {
+					// Trim subtree for embedded conjunctions.
+					if head.embed == nextID {
+						continue
+					}
+					visited[nextID] = true
+					queue = append(queue, reqSet{id: nextID, once: currentSet.once})
+				}
+			}
+		}
+
+		if len(queue) > 0 {
+			queue[0].size = uint32(len(queue))
+			newSets = append(newSets, queue...)
 		}
 	}
-	return buf
+
+	// to be reused later on
+	clear(index)
+	ctx.replaceIDsIndex = index
+	ctx.replaceIDsOrig = origSets[:0]
+	ctx.replaceIDsQueue = queue[:0]
+	clear(visited)
+	ctx.replaceIDsVisited = visited
+
+	*a = newSets
 }
 
 // mergeCloseInfo merges the conjunctInfo of nw that is missing from nv into nv.

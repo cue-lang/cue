@@ -191,7 +191,11 @@ type OpContext struct {
 
 	disjunctStack []disjunctInfo // stack of disjunct IDs
 
-	reqSetsBuf reqSets // reuse a reqSets slice
+	// These fields are reused by [reqSets.replaceIDs] to reduce allocations.
+	replaceIDsIndex   map[defID]replaceInfo
+	replaceIDsOrig    reqSets
+	replaceIDsQueue   reqSets
+	replaceIDsVisited map[defID]bool
 
 	// altPath, if non-empty, provides an alternative path for errors. This is
 	// necessary to get the right path for incomplete errors in the presence of

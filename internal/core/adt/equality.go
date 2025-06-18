@@ -32,6 +32,10 @@ const (
 )
 
 func Equal(ctx *OpContext, v, w Value, flags Flag) bool {
+	if flags&CheckStructural == 0 {
+		v = Default(v)
+		w = Default(w)
+	}
 	if x, ok := v.(*Vertex); ok {
 		return equalVertex(ctx, x, w, flags)
 	}

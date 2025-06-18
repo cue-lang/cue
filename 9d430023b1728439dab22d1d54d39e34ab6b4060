@@ -16,6 +16,24 @@
       "message": "Is it really worth exporting this? it\u0027s never actually used outside of this package AFAICS, and the signature and usage are sufficiently similar to Validate to be confusing, I think.",
       "revId": "9d430023b1728439dab22d1d54d39e34ab6b4060",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6cd707f_06232ec3",
+        "filename": "internal/core/adt/validate.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T17:32:18Z",
+      "side": 1,
+      "message": "Good point. Done.",
+      "parentUuid": "03d3a6c6_d50be154",
+      "revId": "9d430023b1728439dab22d1d54d39e34ab6b4060",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

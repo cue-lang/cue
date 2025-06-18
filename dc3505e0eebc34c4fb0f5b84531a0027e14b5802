@@ -16,6 +16,24 @@
       "message": "Feel free to remove the XXX comment here.",
       "revId": "dc3505e0eebc34c4fb0f5b84531a0027e14b5802",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f3ffff0_5b4577ca",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-18T07:10:43Z",
+      "side": 1,
+      "message": "This code will be deleted along with evalv2 soon, so I\u0027ll leave it for now :)",
+      "parentUuid": "5b290208_1e26435c",
+      "revId": "dc3505e0eebc34c4fb0f5b84531a0027e14b5802",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

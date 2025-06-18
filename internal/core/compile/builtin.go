@@ -239,3 +239,18 @@ func intDivOp(c *adt.OpContext, fn intFunc, name string, args []adt.Value) adt.V
 
 	return fn(c, a, b)
 }
+
+var testExperiment = &adt.Builtin{
+	Name:   "testExperiment",
+	Params: []adt.Param{topParam},
+	Result: adt.TopKind,
+	Func: func(call *adt.CallContext) adt.Expr {
+		args := call.Args()
+
+		if call.Pos().Experiment().Testing {
+			return args[0]
+		} else {
+			return call.OpContext().NewErrf("testing experiment disabled")
+		}
+	},
+}

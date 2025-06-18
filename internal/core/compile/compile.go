@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 // A Scope represents a nested scope of Vertices.
@@ -101,6 +102,8 @@ type compiler struct {
 	upCountOffset int32 // 1 for files; 0 for expressions
 
 	index adt.StringIndexer
+
+	experiments cueexperiment.File
 
 	stack      []frame
 	inSelector int
@@ -278,6 +281,9 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 		if f.PackageName() == "" {
 			continue
 		}
+
+		c.experiments = f.Pos().Experiment()
+
 		for _, d := range f.Decls {
 			if f, ok := d.(*ast.Field); ok {
 				if id, ok := f.Label.(*ast.Ident); ok {

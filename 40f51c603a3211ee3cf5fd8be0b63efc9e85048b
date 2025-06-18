@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26264969_68e449b0",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-18T07:48:10Z",
+      "side": 0,
+      "message": "Thanks for cleaning this up. In the past I had seen this code and wondered what, if anything, it was doing.",
+      "revId": "40f51c603a3211ee3cf5fd8be0b63efc9e85048b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

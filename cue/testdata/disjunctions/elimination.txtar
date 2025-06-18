@@ -1842,15 +1842,6 @@ diff old new
    disambiguateClosed: (struct){
      b: (#struct){ |((#struct){
          x: (bool){ true }
-@@ -181,7 +127,7 @@
-             x: ((null|struct)){ |((struct){
-                 a: (struct){
-                   b: (_|_){
--                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1 & 1 & 1,d:1 & 1 & 1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
-+                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
-                     //     ./in.cue:138:15
-                     //     ./in.cue:124:15
-                     //     ./in.cue:125:12
 @@ -349,10 +295,6 @@
        #type: (#struct){
          fieldName: ((string|struct)){ |((string){ string }, (#struct){
@@ -2905,7 +2896,7 @@ Result:
             x: ((null|struct)){ |((struct){
                 a: (struct){
                   b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1 & 1 & 1,d:1 & 1 & 1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
+                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
                     //     ./in.cue:138:15
                     //     ./in.cue:124:15
                     //     ./in.cue:125:12

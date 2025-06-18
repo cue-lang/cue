@@ -555,15 +555,6 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -31,7 +31,7 @@
-     ./issue3418.cue:10:16
-     ./issue3418.cue:10:18
-     ./issue3418.cue:11:5
--issue3474.structValidator.failAfter.A: invalid value {C:true,B*:if true true} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
-+issue3474.structValidator.failAfter.A: invalid value {C:true,B:true} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
-     ./issue3474.cue:12:5
-     ./issue3474.cue:12:22
-     ./issue3474.cue:13:5
 @@ -51,6 +51,11 @@
      ./issue3474.cue:53:5
      ./issue3474.cue:53:12
@@ -589,15 +580,6 @@ diff old new
        _a: (_|_){
          // [incomplete] issue2098.incomplete1._a: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
          //     ./in.cue:112:6
-@@ -209,7 +212,7 @@
-       failAfter: (_|_){
-         // [eval]
-         A: (_|_){
--          // [eval] issue3474.structValidator.failAfter.A: invalid value {C:true,B*:if true true} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
-+          // [eval] issue3474.structValidator.failAfter.A: invalid value {C:true,B:true} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
-           //     ./issue3474.cue:12:5
-           //     ./issue3474.cue:12:22
-           //     ./issue3474.cue:13:5
 @@ -270,6 +273,11 @@
            //     ./issue3474.cue:53:5
            //     ./issue3474.cue:53:12
@@ -677,7 +659,7 @@ issue3418.t4.x: invalid value "foo" (does not satisfy matchN): conflicting value
     ./issue3418.cue:10:16
     ./issue3418.cue:10:18
     ./issue3418.cue:11:5
-issue3474.structValidator.failAfter.A: invalid value {C:true,B*:if true true} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
+issue3474.structValidator.failAfter.A: invalid value {C:true,B:true} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
     ./issue3474.cue:12:5
     ./issue3474.cue:12:22
     ./issue3474.cue:13:5
@@ -855,7 +837,7 @@ Result:
       failAfter: (_|_){
         // [eval]
         A: (_|_){
-          // [eval] issue3474.structValidator.failAfter.A: invalid value {C:true,B*:if true true} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
+          // [eval] issue3474.structValidator.failAfter.A: invalid value {C:true,B:true} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
           //     ./issue3474.cue:12:5
           //     ./issue3474.cue:12:22
           //     ./issue3474.cue:13:5

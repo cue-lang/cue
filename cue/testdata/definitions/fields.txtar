@@ -866,7 +866,7 @@ diff old new
 -    ./validators.cue:18:6
 -    ./validators.cue:23:5
      ./validators.cue:24:5
--validator.open.data: invalid value {trailingComma:_|_(validator.open.data.trailingComma: field not allowed),#x:{trailingComma?:"all"}} (does not satisfy matchN): 0 matched, expected 1:
+-validator.open.data: invalid value {trailingComma:_|_(validator.open.data.trailingComma: field not allowed),#x:_|_(validator.open.data.trailingComma: field not allowed)} (does not satisfy matchN): 0 matched, expected 1:
 -    ./validators.cue:10:3
 -    ./validators.cue:10:10
 -    ./validators.cue:13:8
@@ -1206,7 +1206,7 @@ diff old new
          }
        }
 -      data: (_|_){
--        // [eval] validator.open.data: invalid value {trailingComma:_|_(validator.open.data.trailingComma: field not allowed),#x:{trailingComma?:"all"}} (does not satisfy matchN): 0 matched, expected 1:
+-        // [eval] validator.open.data: invalid value {trailingComma:_|_(validator.open.data.trailingComma: field not allowed),#x:_|_(validator.open.data.trailingComma: field not allowed)} (does not satisfy matchN): 0 matched, expected 1:
 -        //     ./validators.cue:10:3
 -        //     ./validators.cue:10:10
 -        //     ./validators.cue:13:8
@@ -1318,7 +1318,7 @@ validator.keepClosed.x.c: field not allowed:
     ./validators.cue:18:6
     ./validators.cue:23:5
     ./validators.cue:24:5
-validator.open.data: invalid value {trailingComma:_|_(validator.open.data.trailingComma: field not allowed),#x:{trailingComma?:"all"}} (does not satisfy matchN): 0 matched, expected 1:
+validator.open.data: invalid value {trailingComma:_|_(validator.open.data.trailingComma: field not allowed),#x:_|_(validator.open.data.trailingComma: field not allowed)} (does not satisfy matchN): 0 matched, expected 1:
     ./validators.cue:10:3
     ./validators.cue:10:10
     ./validators.cue:13:8
@@ -1811,7 +1811,7 @@ Result:
         }
       }
       data: (_|_){
-        // [eval] validator.open.data: invalid value {trailingComma:_|_(validator.open.data.trailingComma: field not allowed),#x:{trailingComma?:"all"}} (does not satisfy matchN): 0 matched, expected 1:
+        // [eval] validator.open.data: invalid value {trailingComma:_|_(validator.open.data.trailingComma: field not allowed),#x:_|_(validator.open.data.trailingComma: field not allowed)} (does not satisfy matchN): 0 matched, expected 1:
         //     ./validators.cue:10:3
         //     ./validators.cue:10:10
         //     ./validators.cue:13:8

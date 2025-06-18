@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "82a310e0_9562743a",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T15:23:02Z",
+      "side": 1,
+      "message": "I\u0027m not entirely sure either way! I thought it worked marginally better as a by-value type, given that it\u0027s used as a key in maps etc, but happy to switch back.",
+      "parentUuid": "5e39d0e5_c2db05ff",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "61cf1c3f_1c973e72",
         "filename": "cmd/cue/cmd/testdata/script/issue3282.txtar",
         "patchSetId": 3
@@ -69,6 +87,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "92f3b26c_ac05f024",
+        "filename": "cmd/cue/cmd/testdata/script/issue3282.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T15:23:02Z",
+      "side": 1,
+      "message": "It\u0027s changed for a somewhat subtle reason: we are now passing parser options into the `ReadCUEFile` method, and the imports-reading code only needs the imports, so it passes `parser.ImportsOnly` as an option, which causes parsing to stop at the package clause, so now the imports-reading code doesn\u0027t see the syntax error that\u0027s after the package clause, so we get to a later error path.\n\nAt least the source locations do point directly to the offending import path, so I think that\u0027s probably OK: error messages all need improvement though, but that seems to me like an orthogonal concern here, given that this is an existing error message.",
+      "parentUuid": "61cf1c3f_1c973e72",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c92d638a_ea8a3038",
+        "filename": "cmd/cue/cmd/testdata/script/issue3282.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T15:23:02Z",
+      "side": 1,
+      "message": "See above.",
+      "parentUuid": "ec1ee81a_214f8dcf",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e2f1458a_b77868f8",
@@ -82,6 +136,24 @@
       "writtenOn": "2025-06-18T07:58:13Z",
       "side": 1,
       "message": "I perfer not (yet) to expose the language version as a field in ast.File.\n\nUnless you intended me to remove this again. Please clarify this in the comments then.",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4bad4f7c_a374e48b",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 956,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T15:23:02Z",
+      "side": 1,
+      "message": "Clarified.",
+      "parentUuid": "e2f1458a_b77868f8",
       "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d7696a2_c46cccb1",
+        "filename": "cue/build/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T15:23:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a550a2f_7d7ef4fb",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7ffad23b_01145244",
@@ -116,6 +206,24 @@
       "writtenOn": "2025-06-18T07:58:13Z",
       "side": 1,
       "message": "Does this belong in this CL?",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e881904a_2ade4d43",
+        "filename": "cue/load/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T15:23:02Z",
+      "side": 1,
+      "message": "It was a necessary fix (having a nil registry in this case caused the module reading code to read in legacy mode which didn\u0027t parse the language version), but I can move it into another CL if you like.",
+      "parentUuid": "7ffad23b_01145244",
       "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -150,6 +258,24 @@
       "writtenOn": "2025-06-18T07:58:13Z",
       "side": 1,
       "message": "Wouldn\u0027t it make more sense to create a new type that holds both values so you only have to do a lookup once?",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aceb4ce5_7dfdaf71",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T15:23:02Z",
+      "side": 1,
+      "message": "I did think about that. The reason I went with this approach was that there are likely many paths but very few distinct config values, so we\u0027ll save space and probably have better cache behaviour by having smaller keys in the larger map. That said, that\u0027s probably just premature optimisation!",
+      "parentUuid": "b8f38f40_744e8bb7",
       "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -201,6 +327,24 @@
       "writtenOn": "2025-06-18T07:58:13Z",
       "side": 1,
       "message": "Even individual files are still within the scope of a module. I would expect the language version of the module to be used here as well, if exists.",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b454f80_c3378825",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T15:23:02Z",
+      "side": 1,
+      "message": "Interesting thought. So if I do `cue export . /tmp/x.cue`, `/tmp/x.cue` should be parsed according to the version of the module for the current directory?\nI can definitely see arguments both ways for that - technically it\u0027s not really part of the same module but we\u0027ve not got anything else to go on.",
+      "parentUuid": "e36d01d2_4f053012",
       "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -262,6 +406,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eeed3967_10ac02e9",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T15:23:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea9c5e13_52fd2f95",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b165a52_3d52fec2",
@@ -275,6 +437,24 @@
       "writtenOn": "2025-06-18T07:58:13Z",
       "side": 1,
       "message": "THis is called from `yieldAllModuleFiles`, so there must be a way to pass the version down from there. But also from PackageFiles the version should be passed.",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8642f2ff_b3dc38af",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T15:23:02Z",
+      "side": 1,
+      "message": "I\u0027ve arranged so that now the underlying filesystem (which is per-module) knows the module version and can set that when reading the file.",
+      "parentUuid": "7b165a52_3d52fec2",
       "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

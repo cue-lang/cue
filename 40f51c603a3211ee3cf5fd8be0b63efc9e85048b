@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "71ed493f_358594b9",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T15:23:02Z",
+      "side": 0,
+      "message": "We may want it, but given that it doesn\u0027t do anything currently, I suspect it\u0027s better to just remove it for now and redesign/add it later when we actually have a concrete need for it. At least now we have _some_ way of choosing the syntax (with language.version) which we didn\u0027t before. If we do add this feature again, I\u0027d probably say the right spelling for this is as an encoding option rather than as an env var, but I don\u0027t think we need to decide on it now.",
+      "parentUuid": "f1349038_9096b2b1",
+      "revId": "40f51c603a3211ee3cf5fd8be0b63efc9e85048b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5ff06081_9f787ce8",
         "filename": "cmd/cue/cmd/common.go",
         "patchSetId": 3

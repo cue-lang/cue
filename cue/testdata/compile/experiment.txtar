@@ -1,0 +1,41 @@
+-- off.cue --
+off: __test_experiment("off")
+
+-- on.cue --
+@experiment(testing)
+
+on: __test_experiment("on")
+
+-- out/compile --
+--- off.cue
+{
+  off: testExperiment("off")
+}
+--- on.cue
+{
+  on: testExperiment("on")
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  3
+Reused: 1
+Allocs: 2
+Retain: 0
+
+Unifications: 3
+Conjuncts:    4
+Disjuncts:    3
+-- out/eval --
+Errors:
+off: testing experiment disabled:
+    ./off.cue:1:6
+
+Result:
+(_|_){
+  // [eval]
+  off: (_|_){
+    // [eval] off: testing experiment disabled:
+    //     ./off.cue:1:6
+  }
+  on: (string){ "on" }
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9d6faf0_659d2b8a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-18T17:10:32Z",
+      "side": 1,
+      "message": "I don\u0027t fully understand the new algorithm, but it is good Unity passes, looks good in principle, and with you also passing over it seems worth it.",
+      "revId": "c62d7ff315bbccefd1aa8e027cc3cf515afc3a9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

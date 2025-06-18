@@ -167,7 +167,6 @@ package adt
 //
 import (
 	"math"
-	"slices"
 
 	"cuelang.org/go/cue/ast"
 )
@@ -750,78 +749,101 @@ func (a reqSets) assert() {
 // - If in active definition, replace old definition
 // - If in embed, replace embed in respective sets. definition starts new group
 // - child definition replaces parent definition
+//
+// The algorithm works as follows:
+//  1. Pre-processing: All replacement rules are collected. Rules with `add:false`
+//     mark potential group heads for deletion. Rules pointing to `deleteID` mark
+//     their `from` ID for direct removal. All other rules build a replacement
+//     graph for traversal.
+//  2. Group-by-Group Iteration: The function iterates through the original
+//     reqSets, processing one requirement group at a time.
+//  3. Transitive Closure via BFS: For each group, it performs a BFS traversal
+//     starting with the group's initial members (excluding any marked for
+//     direct deletion). This efficiently finds all reachable, valid IDs.
+//  4. Reconstruction: A new group is built from the valid members found during
+//     the traversal.
 func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
-	temp := *a
-	temp = temp[:0]
-	buf := ctx.reqSetsBuf[:0]
-outer:
-	for i := 0; i < len(*a); {
-		e := (*a)[i]
-		if e.size != 0 {
-			// If the head is dropped, the entire group is deleted.
-			for _, x := range b {
-				if e.id == x.from && !x.add {
-					i += int(e.size)
-					continue outer
+	if len(b) == 0 {
+		return
+	}
+
+	skipHeads := make(map[defID]bool)
+	replacements := make(map[defID][]defID)
+	directDeletes := make(map[defID]bool)
+
+	for _, rule := range b {
+		if !rule.add {
+			skipHeads[rule.from] = true
+		}
+		if rule.to == deleteID {
+			directDeletes[rule.from] = true
+		} else {
+			// All non-delete rules, regardless of the `add` flag, contribute
+			// to the replacement graph.
+			replacements[rule.from] = append(replacements[rule.from], rule.to)
+		}
+	}
+
+	origSets := append(ctx.replaceIDsOrig[:0], *a...)
+	newSets := (*a)[:0]
+	queue := ctx.replaceIDsQueue
+	visited := ctx.replaceIDsVisited
+	if visited == nil {
+		visited = make(map[defID]bool)
+	}
+
+	for i := 0; i < len(origSets); {
+		head := origSets[i]
+		currentGroup := origSets[i : i+int(head.size)]
+		i += int(head.size)
+
+		if skipHeads[head.id] {
+			continue
+		}
+
+		queue = queue[:0]
+		clear(visited)
+
+		for _, set := range currentGroup {
+			if !directDeletes[set.id] && !visited[set.id] {
+				visited[set.id] = true
+				queue = append(queue, set)
+			}
+		}
+
+		for qIdx := 0; qIdx < len(queue); qIdx++ {
+			currentSet := queue[qIdx]
+			ctx.stats.CloseIDElems++
+
+			nextIDs, found := replacements[currentSet.id]
+			if !found {
+				continue
+			}
+			for _, nextID := range nextIDs {
+				if !directDeletes[nextID] && !visited[nextID] {
+					// Trim subtree for embedded conjunctions.
+					if head.embed == nextID {
+						continue
+					}
+					visited[nextID] = true
+					queue = append(queue, reqSet{id: nextID, once: currentSet.once})
 				}
 			}
-			if len(buf) > 0 {
-				buf[0].size = uint32(len(buf))
-				if len(temp)+len(buf) > i {
-					*a = slices.Replace(*a, len(temp), i, buf...)
-					i = len(temp) + len(buf)
-					temp = (*a)[:i]
-				} else {
-					temp = append(temp, buf...)
-				}
-				buf = buf[:0]
-			}
 		}
 
-		buf = transitiveMapping(ctx, buf, e, b)
-
-		i++
-	}
-	if len(buf) > 0 {
-		buf[0].size = uint32(len(buf))
-		temp = append(temp, buf...)
-	}
-	ctx.reqSetsBuf = buf[:0] // to be reused later on
-	*a = temp
-}
-
-// TODO: this is a polynomial algorithm. At some point, if this turns out to be
-// a bottleneck, we should consider filtering unnecessary entries and/or using a
-// more efficient algorithm.
-func transitiveMapping(ctx *OpContext, buf reqSets, x reqSet, b []replaceID) reqSets {
-	// Trim subtree for embedded conjunctions.
-	if len(buf) > 0 && buf[0].embed == x.id {
-		return buf
-	}
-
-	// do not add duplicates
-	for _, y := range buf {
-		if x.id == y.id {
-			return buf
+		if len(queue) > 0 {
+			queue[0].size = uint32(len(queue))
+			newSets = append(newSets, queue...)
 		}
 	}
 
-	buf = append(buf, x)
-	ctx.stats.CloseIDElems++
+	// to be reused later on
+	ctx.replaceIDsOrig = origSets[:0]
+	ctx.replaceIDsQueue = queue[:0]
+	clear(visited)
+	ctx.replaceIDsVisited = visited
 
-	for _, y := range b {
-		if x.id == y.from {
-			if y.to == deleteID { // do we need this?
-				buf = buf[:len(buf)-1]
-				return buf
-			}
-			buf = transitiveMapping(ctx, buf, reqSet{
-				id:   y.to,
-				once: x.once,
-			}, b)
-		}
-	}
-	return buf
+	*a = newSets
 }
 
 // mergeCloseInfo merges the conjunctInfo of nw that is missing from nv into nv.

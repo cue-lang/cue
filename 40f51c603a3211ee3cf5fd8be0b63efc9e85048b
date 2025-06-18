@@ -72,6 +72,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "d2cec434_6023c913",
+        "filename": "cue/parser/interface.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-18T10:43:57Z",
+      "side": 1,
+      "message": "Done, but I went with \"valid\" instead, after a moment\u0027s thought.",
+      "parentUuid": "fe16ad7d_c295270e",
+      "revId": "40f51c603a3211ee3cf5fd8be0b63efc9e85048b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ebb3792a_04ad8426",
         "filename": "cue/parser/interface.go",
         "patchSetId": 2

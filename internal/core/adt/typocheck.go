@@ -167,6 +167,7 @@ package adt
 //
 import (
 	"math"
+	"slices"
 
 	"cuelang.org/go/cue/ast"
 )
@@ -530,17 +531,18 @@ func (n *nodeContext) checkTypos() {
 		return
 	}
 
-	required := getReqSets(n)
-	if len(required) == 0 {
+	baseRequired := getReqSets(n)
+	if len(baseRequired) == 0 {
 		return
 	}
 
-	// TODO(perf): reuse buffers via OpContext
-	requiredCopy := make(reqSets, 0, len(required))
-	var replacements []replaceID
+	// Get all replacement rules from the parent level and above,
+	// and pre-calculate the result of applying these common rules once.
+	if replacements := n.getReplacements(); len(replacements) > 0 {
+		baseRequired.replaceIDs(ctx, replacements...)
+	}
 
 	var err *Bottom
-	// outer:
 	for _, a := range v.Arcs {
 		f := a.Label
 
@@ -548,10 +550,13 @@ func (n *nodeContext) checkTypos() {
 		a = a.DerefDisjunct()
 		na := a.state
 
-		replacements = na.getReplacements(replacements[:0])
-		required := append(requiredCopy[:0], required...)
-		// do the right thing in appendRequired either way.
-		required.replaceIDs(n.ctx, replacements...)
+		required := baseRequired
+		// If the field has its own rules, apply them as a delta.
+		// This requires a copy to not pollute the base for the next iteration.
+		if len(na.replaceIDs) > 0 {
+			required = slices.Clone(required)
+			required.replaceIDs(ctx, na.replaceIDs...)
+		}
 
 		required.filterSets(func(a []reqSet) bool {
 			if hasParentEllipsis(a, n.conjunctInfo) {
@@ -875,7 +880,7 @@ outer2:
 	}
 }
 
-func (n *nodeContext) getReplacements(a []replaceID) []replaceID {
+func (n *nodeContext) getReplacements() (a []replaceID) {
 	for p := n.node; p != nil && p.state != nil; p = p.Parent {
 		a = append(a, p.state.replaceIDs...)
 	}

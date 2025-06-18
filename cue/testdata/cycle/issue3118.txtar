@@ -36,7 +36,7 @@ Unifications: 19
 Conjuncts:    48
 Disjuncts:    0
 
-CloseIDElems: 6
+CloseIDElems: 3
 NumCloseIDs: 3
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -62,7 +62,7 @@ diff old new
 +Conjuncts:    48
 +Disjuncts:    0
 +
-+CloseIDElems: 6
++CloseIDElems: 3
 +NumCloseIDs: 3
 -- out/eval/stats --
 Leaks:  0

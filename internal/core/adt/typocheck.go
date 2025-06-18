@@ -536,12 +536,6 @@ func (n *nodeContext) checkTypos() {
 		return
 	}
 
-	// Get all replacement rules from the parent level and above,
-	// and pre-calculate the result of applying these common rules once.
-	if replacements := n.getReplacements(); len(replacements) > 0 {
-		baseRequired.replaceIDs(ctx, replacements...)
-	}
-
 	var err *Bottom
 	for _, a := range v.Arcs {
 		f := a.Label
@@ -878,13 +872,6 @@ outer2:
 			}
 		}
 	}
-}
-
-func (n *nodeContext) getReplacements() (a []replaceID) {
-	for p := n.node; p != nil && p.state != nil; p = p.Parent {
-		a = append(a, p.state.replaceIDs...)
-	}
-	return a
 }
 
 // getReqSets initializes, if necessary, and returns the reqSets for n.

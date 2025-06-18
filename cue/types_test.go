@@ -2890,7 +2890,7 @@ func TestValueLookup(t *testing.T) {
 				t.Errorf("exists: got %v; want %v", got, tc.notExists)
 			}
 
-			got := cue.ValueCtx(v).Str(cue.ValueVertex(v))
+			got := cue.ValueCtx(v).String(cue.ValueVertex(v))
 			if tc.str == "" {
 				t.Fatalf("str empty, got %q", got)
 			}

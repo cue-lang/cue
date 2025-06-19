@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22e98de6_f543fba0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:56:33Z",
+      "side": 1,
+      "message": "I think the wording could use a bit of improvement here.",
+      "revId": "c320d7242213f58e5e811baf5294bb6fe65e2ec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97964756_f7a7f013",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 2342,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:56:33Z",
+      "side": 1,
+      "message": "This isn\u0027t true any more.",
+      "revId": "c320d7242213f58e5e811baf5294bb6fe65e2ec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2670e25_94467ce8",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 2346,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:56:33Z",
+      "side": 1,
+      "message": "This conflicts with the rule below that floats may be compared to ints. Which one applies?",
+      "revId": "c320d7242213f58e5e811baf5294bb6fe65e2ec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf06cbd7_194c25d6",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 2348,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:56:33Z",
+      "side": 1,
+      "message": "Likewise, this rule doesn\u0027t work for float/int.",
+      "revId": "c320d7242213f58e5e811baf5294bb6fe65e2ec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b459247c_7bf59329",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 2354,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:56:33Z",
+      "side": 1,
+      "message": "```suggestion\n- Null is comparable and equal only to itself.\n```\n\n?",
+      "range": {
+        "startLine": 2353,
+        "startChar": 2,
+        "endLine": 2354,
+        "endChar": 31
+      },
+      "revId": "c320d7242213f58e5e811baf5294bb6fe65e2ec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

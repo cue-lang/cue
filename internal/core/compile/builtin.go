@@ -118,7 +118,7 @@ var andBuiltin = &adt.Builtin{
 	Result: adt.IntKind,
 	RawFunc: func(call *adt.CallContext) adt.Value {
 		c := call.OpContext()
-		arg := call.Expr(0)
+		arg := call.Arg(0)
 
 		list := c.RawElems(arg)
 		if len(list) == 0 {

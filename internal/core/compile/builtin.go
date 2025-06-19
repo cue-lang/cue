@@ -15,6 +15,8 @@
 package compile
 
 import (
+	"strings"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
@@ -25,11 +27,56 @@ import (
 const supportedByLen = adt.StructKind | adt.BytesKind | adt.StringKind | adt.ListKind
 
 var (
+	stringParam = adt.Param{Value: &adt.BasicType{K: adt.StringKind}}
 	structParam = adt.Param{Value: &adt.BasicType{K: adt.StructKind}}
 	listParam   = adt.Param{Value: &adt.BasicType{K: adt.ListKind}}
 	intParam    = adt.Param{Value: &adt.BasicType{K: adt.IntKind}}
 	topParam    = adt.Param{Value: &adt.BasicType{K: adt.TopKind}}
 )
+
+var errorBuiltin = &adt.Builtin{
+	Name:   "error",
+	Params: []adt.Param{stringParam},
+	Result: adt.BottomKind,
+	RawFunc: func(call *adt.CallContext) adt.Value {
+		ctx := call.OpContext()
+		// TODO: allow expressions: if Interpolation, convert into a format
+		// string and allow expressions to be unevaluated. Or use expr(),
+		// intercept, and unwrap. Alternatively, unwrap arguments and
+		// keep literal if error.
+		arg := call.Expr(0)
+
+		var b *adt.Bottom
+
+		switch x := arg.(type) {
+		case *adt.Interpolation:
+			var args []any
+			var w strings.Builder
+			for i := 0; i < len(x.Parts); i++ {
+				v := x.Parts[i]
+				w.WriteString(v.(*adt.String).Str)
+				if i++; i >= len(x.Parts) {
+					break
+				}
+				w.WriteString("%v")
+				y := call.Eval(x.Parts[i])
+				if err := ctx.Err(); err != nil {
+					args = append(args, x.Parts[i])
+				} else {
+					args = append(args, y)
+				}
+			}
+			b = call.Errf(w.String(), args...)
+		default:
+			msg := call.Arg(0)
+			b = call.Errf("%s", msg)
+		}
+
+		_ = arg
+		b.Code = adt.UserError
+		return b
+	},
+}
 
 var lenBuiltin = &adt.Builtin{
 	Name:   "len",

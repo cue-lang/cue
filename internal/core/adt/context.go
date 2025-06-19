@@ -706,6 +706,10 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 		if arc == nil {
 			return nil, c.ci
 		}
+		if arc.Internal() && c.isDevVersion() {
+			mode := state.conditions()
+			state = final(partial, mode|allTasksCompleted)
+		}
 		orig := arc
 		// TODO(deref): what is the right level of dereferencing here?
 		// DerefValue seems to work too.

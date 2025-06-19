@@ -69,13 +69,13 @@ func (c *CallContext) Args() []Value {
 	return c.args
 }
 
-// Expr returns the nth argument expression. The value is evaluated and any
+// Arg returns the nth argument expression. The value is evaluated and any
 // cycle information is accumulated in the context. This allows cycles in
 // arguments to be detected.
 //
 // This method of getting an argument should be used when the argument is used
 // as a schema and may contain cycles.
-func (c *CallContext) Expr(i int) Value {
+func (c *CallContext) Arg(i int) Value {
 	// If the call context represents a validator call, the argument will be
 	// offset by 1.
 	if c.isValidator {

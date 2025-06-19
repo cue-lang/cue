@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3dffe41_fac1fc12",
+        "filename": "cue/testdata/basicrewrite/016_comparison.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:25:06Z",
+      "side": 1,
+      "message": "unnecessary newline?",
+      "revId": "9f65a4f32acf4e13d78601331a05856e68275ba1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e35ea5c4_997145bd",
+        "filename": "internal/core/adt/binop.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:25:06Z",
+      "side": 1,
+      "message": "It would be good to document what the node argument is here.",
+      "revId": "9f65a4f32acf4e13d78601331a05856e68275ba1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

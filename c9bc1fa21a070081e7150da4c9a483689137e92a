@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4ea2b94_a725ad99",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-19T13:32:01Z",
+      "side": 1,
+      "message": "If we expect the struct to be largeish, I would pass it by pointer. Otherwise this seems okay.",
+      "parentUuid": "82a310e0_9562743a",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61cf1c3f_1c973e72",
@@ -230,6 +248,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f2537a6e_a9536e6f",
+        "filename": "cue/load/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-19T13:32:01Z",
+      "side": 1,
+      "message": "Ideally, usually. Will help with bisecting and all.",
+      "parentUuid": "e881904a_2ade4d43",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "92fbc1d1_e9272015",
         "filename": "cue/load/config.go",
         "patchSetId": 3
@@ -312,6 +348,24 @@
       "side": 1,
       "message": "I did think about that. The reason I went with this approach was that there are likely many paths but very few distinct config values, so we\u0027ll save space and probably have better cache behaviour by having smaller keys in the larger map. That said, that\u0027s probably just premature optimisation!",
       "parentUuid": "b8f38f40_744e8bb7",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f00ff9d_6b7555ba",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-19T13:32:01Z",
+      "side": 1,
+      "message": "I\u0027m not convinced that it is really faster. It is just more complicated with two maps.",
+      "parentUuid": "aceb4ce5_7dfdaf71",
       "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

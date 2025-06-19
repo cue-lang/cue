@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "773e2bdc_fa9283c4",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-19T13:32:01Z",
+      "side": 1,
+      "message": "why is this commented out? Add a TODO if necessary.",
+      "revId": "361537e95ef0b92f697bc18da732292e70da399a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40976dfc_d71d90a8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:21:42Z",
+      "side": 1,
+      "message": "Perhaps worth a bit more clarification?",
+      "revId": "4305fcbc9dfaf8dfd93d654070d87a44e3f96e19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "951c03b6_676b1bba",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 2360,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:21:42Z",
+      "side": 1,
+      "message": "Again, this should say what the actual semantics are:\npresumably, structs are equal if each has exactly the same number of regular fields, all of which are equal.",
+      "revId": "4305fcbc9dfaf8dfd93d654070d87a44e3f96e19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63955d07_67aff97a",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 2362,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:21:42Z",
+      "side": 1,
+      "message": "As with structs, it would be nice to explicitly state the semantics.",
+      "revId": "4305fcbc9dfaf8dfd93d654070d87a44e3f96e19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

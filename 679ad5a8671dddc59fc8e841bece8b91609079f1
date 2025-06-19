@@ -34,6 +34,24 @@
       "parentUuid": "5a030c63_f7776ca6",
       "revId": "679ad5a8671dddc59fc8e841bece8b91609079f1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "303f5527_ffda708b",
+        "filename": "internal/core/adt/equality.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T13:56:31Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c8199ade_f2de0602",
+      "revId": "679ad5a8671dddc59fc8e841bece8b91609079f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

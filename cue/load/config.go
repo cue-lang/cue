@@ -368,8 +368,8 @@ func (c Config) complete() (cfg *Config, err error) {
 	}
 	if c.SkipImports {
 		// We should never use the registry in SkipImports mode
-		// but nil it out to be sure.
-		c.Registry = nil
+		// but make it always return an error just to be sure.
+		c.Registry = errorRegistry{errors.New("unexpected use of registry in SkipImports mode")}
 	} else if c.Registry == nil {
 		registry, err := modconfig.NewRegistry(&modconfig.Config{
 			Env: c.Env,

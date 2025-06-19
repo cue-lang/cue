@@ -1806,6 +1806,9 @@ func (x *Builtin) call(call *CallContext) Expr {
 		c.IsValidator = saved
 	}()
 
+	if x.RawFunc != nil {
+		return x.RawFunc(call)
+	}
 	return x.Func(call)
 }
 

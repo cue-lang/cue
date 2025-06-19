@@ -48,8 +48,13 @@ const (
 	// An EvalError is a fatal evaluation error.
 	EvalError ErrorCode = iota // eval
 
-	// A UserError is a fatal error originating from the user.
+	// A UserError is a fatal error originating from the user using the error
+	// builtin.
 	UserError // user
+
+	// A LegacyUserError is a fatal error originating from the user using the
+	// _|_ token, which we intend to phase out.
+	LegacyUserError // user
 
 	// StructuralCycleError means a structural cycle was found. Structural
 	// cycles are permanent errors, but they are not passed up recursively,
@@ -108,7 +113,7 @@ func (b *Bottom) IsIncomplete() bool {
 // isLiteralBottom reports whether x is an error originating from a user.
 func isLiteralBottom(x Expr) bool {
 	b, ok := x.(*Bottom)
-	return ok && b.Code == UserError
+	return ok && b.Code == LegacyUserError
 }
 
 // isError reports whether v is an error or nil.

@@ -923,7 +923,7 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 	case *ast.BottomLit:
 		return &adt.Bottom{
 			Src:  n,
-			Code: adt.UserError,
+			Code: adt.LegacyUserError,
 			Err:  errors.Newf(n.Pos(), "explicit error (_|_ literal) in source"),
 		}
 

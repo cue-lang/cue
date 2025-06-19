@@ -16,6 +16,24 @@
       "message": "I still don\u0027t understand why we\u0027re doing this if it has no visible behaviour changes.",
       "revId": "679ad5a8671dddc59fc8e841bece8b91609079f1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8199ade_f2de0602",
+        "filename": "internal/core/adt/equality.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-19T10:51:30Z",
+      "side": 1,
+      "message": "It will break a lot of tests in an upcoming change, if we don\u0027t also change this. \n\nWe could, of course, merge these two CLs, but I wanted to be able to bisect to the point if this particular change broken anything.",
+      "parentUuid": "5a030c63_f7776ca6",
+      "revId": "679ad5a8671dddc59fc8e841bece8b91609079f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -33,6 +33,24 @@
       "message": "why is this commented out? Add a TODO if necessary.",
       "revId": "361537e95ef0b92f697bc18da732292e70da399a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c54f647_1c26b0b7",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T13:52:49Z",
+      "side": 1,
+      "message": "Debugging remnant: should not have been commented out. Unfortunately it\u0027s not possible to observe the difference this makes because it only makes a difference to the cueimports code which only looks at the imports and doesn\u0027t keep the file around anywhere.",
+      "parentUuid": "773e2bdc_fa9283c4",
+      "revId": "361537e95ef0b92f697bc18da732292e70da399a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

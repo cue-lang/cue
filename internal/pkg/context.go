@@ -56,7 +56,7 @@ func (c *CallCtxt) Do() bool {
 // However, this only makes sense if functions also use the same OpContext for
 // further evaluation. We should enforce as we port the old calls.
 func (c *CallCtxt) Schema(i int) Schema {
-	v := c.Expr(i)
+	v := c.Arg(i)
 	return value.Make(c.ctx, v)
 }
 

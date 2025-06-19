@@ -32,13 +32,10 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
 )
-
-var requestedVersion = os.Getenv("CUE_SYNTAX_OVERRIDE")
 
 func defaultConfig() (*config, error) {
 	reg, err := getCachedRegistry()
@@ -48,15 +45,7 @@ func defaultConfig() (*config, error) {
 	return &config{
 		loadCfg: &load.Config{
 			ParseFile: func(name string, src interface{}) (*ast.File, error) {
-				version := internal.APIVersionSupported
-				if requestedVersion != "" {
-					switch {
-					case strings.HasPrefix(requestedVersion, "v0.1"):
-						version = -1000 + 100
-					}
-				}
 				options := []parser.Option{
-					parser.FromVersion(version),
 					parser.ParseComments,
 				}
 				cuedebug.Init()

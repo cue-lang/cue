@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de8bbbdd_1979dd6a",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-19T13:20:48Z",
+      "side": 1,
+      "message": "I generally don\u0027t like nesting functions that much, as it makes debugging harder. But seems harmless in this case.",
+      "parentUuid": "73979634_28bd656f",
+      "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4b55cc64_4b53e13a",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-06-19T10:10:20Z",
       "side": 1,
       "message": "remaining?",
+      "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd819376_7b587df1",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-19T13:20:48Z",
+      "side": 1,
+      "message": "Removed, if that helps. With remaining I mean the keys that have not yet been \"consumed\" by parseConfig.",
+      "parentUuid": "4b55cc64_4b53e13a",
       "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "780721d0_dde5e512",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-19T13:20:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b102f3f8_5e94066c",
+      "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ddd4bfd6_48cff5ca",
@@ -82,6 +136,24 @@
       "writtenOn": "2025-06-19T10:10:20Z",
       "side": 1,
       "message": "it\u0027s a bit weird that all the methods on expMap are defined on the pointer type (including the read-only methods) but we\u0027re accepting a value type here. I\u0027m not really convinced that the expMap type is worth having at all tbh.",
+      "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "032b9ecf_e8a814bc",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-19T13:20:48Z",
+      "side": 1,
+      "message": "Replaced expMap with a single function to parse expriments.\n\nThe keys() function is now inlined in the followup CL which used it.",
+      "parentUuid": "ddd4bfd6_48cff5ca",
       "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

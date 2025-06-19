@@ -2671,6 +2671,21 @@ b: "Hello \( a )!" // Hello World!
 
 Builtin functions are predeclared. They are called like any other function.
 
+### `error`
+The `error` builtin allows users to create custom error values with a specified
+message.
+User-generated errors can be included in disjunctions; if at least one disjunct
+is valid, any user errors are ignored.
+However, if all disjuncts fail, all user error messages are reported together.
+
+`error` takes a single string argument. If this argument is a literal
+interpolation, it will be extra resilient: if any of the arguments to the
+interpolation fail, they will be printed as an expression. This allows failing
+expressions to be a part of the error message.
+
+```
+a: 1/0 | error("infinity and beyond!: \(1/0)")
+```
 
 ### `len`
 

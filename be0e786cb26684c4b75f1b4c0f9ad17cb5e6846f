@@ -173,6 +173,24 @@
       "message": "Looks like we allow `accepted` without a version: perhaps have a test case for that too? Similarly for the other keywords.",
       "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce16a94b_a8768507",
+        "filename": "internal/cueexperiment/parse_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-19T13:47:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd748951_d6fba07b",
+      "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

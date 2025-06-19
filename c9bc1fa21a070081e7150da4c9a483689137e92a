@@ -263,6 +263,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5158c42_17c3bff4",
+        "filename": "cue/load/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T12:02:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "951d1705_8d07dd81",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8f38f40_744e8bb7",
@@ -311,6 +329,24 @@
       "writtenOn": "2025-06-18T07:58:13Z",
       "side": 1,
       "message": "Simpler with a composite type.",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a49f52ec_1eae4288",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T12:02:37Z",
+      "side": 1,
+      "message": "As above.",
+      "parentUuid": "23199abe_cad047de",
       "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -367,6 +403,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1dd9b1e6_3bc708c9",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T12:02:37Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "8b454f80_c3378825",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3146066_a3d7c1a5",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T12:02:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25acb6bd_7a680d18",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9037453d_b6804120",
@@ -390,6 +462,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3544ddd1_2b1f6f29",
+        "filename": "cue/parser/interface.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T12:02:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9037453d_b6804120",
+      "range": {
+        "startLine": 85,
+        "startChar": 3,
+        "endLine": 85,
+        "endChar": 9
+      },
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "921aa17f_2d2a82ab",
@@ -403,6 +499,24 @@
       "writtenOn": "2025-06-18T07:58:13Z",
       "side": 1,
       "message": "There are many tests that show a single language version, but I don\u0027t see any test showing that if modules have different language versions, that the right version is assigned to the file.",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "055cbc16_79a25e11",
+        "filename": "internal/astinternal/debug_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T12:02:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "921aa17f_2d2a82ab",
       "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -473,6 +587,24 @@
       "side": 1,
       "message": "I\u0027ve arranged so that now the underlying filesystem (which is per-module) knows the module version and can set that when reading the file.",
       "parentUuid": "7b165a52_3d52fec2",
+      "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "725cd587_4ea1eb24",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T12:02:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8642f2ff_b3dc38af",
       "revId": "c9bc1fa21a070081e7150da4c9a483689137e92a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

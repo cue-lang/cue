@@ -15,6 +15,8 @@
 package compile
 
 import (
+	"strings"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
@@ -25,11 +27,58 @@ import (
 const supportedByLen = adt.StructKind | adt.BytesKind | adt.StringKind | adt.ListKind
 
 var (
+	stringParam = adt.Param{Value: &adt.BasicType{K: adt.StringKind}}
 	structParam = adt.Param{Value: &adt.BasicType{K: adt.StructKind}}
 	listParam   = adt.Param{Value: &adt.BasicType{K: adt.ListKind}}
 	intParam    = adt.Param{Value: &adt.BasicType{K: adt.IntKind}}
 	topParam    = adt.Param{Value: &adt.BasicType{K: adt.TopKind}}
 )
+
+// error is a special builtin that allows users to create a custom error
+// message. If the argument is an interpolation, it will be evaluated and if it
+// results in an error, the argument will be inserted as an expression.
+var errorBuiltin = &adt.Builtin{
+	Name:   "error",
+	Params: []adt.Param{stringParam},
+	Result: adt.BottomKind,
+	RawFunc: func(call *adt.CallContext) adt.Value {
+		ctx := call.OpContext()
+		arg := call.Expr(0)
+
+		var b *adt.Bottom
+
+		switch x := arg.(type) {
+		case *adt.Interpolation:
+			var args []any
+			var w strings.Builder
+			for i := 0; i < len(x.Parts); i++ {
+				v := x.Parts[i]
+				w.WriteString(v.(*adt.String).Str)
+				if i++; i >= len(x.Parts) {
+					break
+				}
+				w.WriteString("%v")
+				y := call.OpContext().EvaluateKeepState(x.Parts[i])
+				if err := ctx.Err(); err != nil {
+					args = append(args, x.Parts[i])
+				} else if y.Concreteness() == adt.Concrete &&
+					y.Kind()&adt.NumberKind|adt.StringKind|adt.BytesKind|adt.BoolKind != 0 {
+					args = append(args, ctx.ToString(y))
+				} else {
+					args = append(args, y)
+				}
+			}
+			b = call.Errf(w.String(), args...)
+		default:
+			msg := call.Arg(0)
+			b = call.Errf("%s", msg)
+		}
+
+		_ = arg
+		b.Code = adt.UserError
+		return b
+	},
+}
 
 var lenBuiltin = &adt.Builtin{
 	Name:   "len",

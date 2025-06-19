@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20818ee3_e17b8580",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-19T13:33:16Z",
+      "side": 1,
+      "message": "Removing my earlier review as it is out of date, and Marcel is reviewing now.",
+      "revId": "361537e95ef0b92f697bc18da732292e70da399a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "773e2bdc_fa9283c4",

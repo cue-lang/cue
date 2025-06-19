@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af26e76e_cfa6e291",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:10:20Z",
+      "side": 1,
+      "message": "LGTM modulo a few minor suggestions.",
+      "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73979634_28bd656f",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:10:20Z",
+      "side": 1,
+      "message": "or just\n```\nreturn strings.Join(slices.Sorted(maps.Keys(m.m))\n```",
+      "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b55cc64_4b53e13a",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:10:20Z",
+      "side": 1,
+      "message": "remaining?",
+      "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b102f3f8_5e94066c",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:10:20Z",
+      "side": 1,
+      "message": "Maybe mention that version should be the current CUE language version? (at least, I think that\u0027s the case)",
+      "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddd4bfd6_48cff5ca",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:10:20Z",
+      "side": 1,
+      "message": "it\u0027s a bit weird that all the methods on expMap are defined on the pointer type (including the read-only methods) but we\u0027re accepting a value type here. I\u0027m not really convinced that the expMap type is worth having at all tbh.",
+      "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd748951_d6fba07b",
+        "filename": "internal/cueexperiment/parse_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T10:10:20Z",
+      "side": 1,
+      "message": "Looks like we allow `accepted` without a version: perhaps have a test case for that too? Similarly for the other keywords.",
+      "revId": "be0e786cb26684c4b75f1b4c0f9ad17cb5e6846f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

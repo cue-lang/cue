@@ -91,6 +91,26 @@ func (c *CallContext) Arg(i int) Value {
 	return c.ctx.EvaluateKeepState(x)
 }
 
+func (c *CallContext) Eval(x Expr) Value {
+	return c.ctx.EvaluateKeepState(x)
+}
+
+// Expr returns the nth argument expression and returned as is.
+func (c *CallContext) Expr(i int) Expr {
+	// If the call context represents a validator call, the argument will be
+	// offset by 1.
+	if c.isValidator {
+		if i == 0 {
+			c.Errf("Expr may not be called for 0th argument of validator")
+			return nil
+		}
+		i--
+	}
+	x := c.call.Args[i]
+
+	return x
+}
+
 func (c *CallContext) Errf(format string, args ...interface{}) *Bottom {
 	return c.ctx.NewErrf(format, args...)
 }

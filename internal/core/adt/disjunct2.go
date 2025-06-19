@@ -467,12 +467,23 @@ func combineDefault2(a, b defaultMode, dropsDefaultA, dropsDefaultB bool) defaul
 // collectErrors collects errors from a failed disjunctions.
 func (n *nodeContext) collectErrors(dn *envDisjunct) (errs *Bottom) {
 	code := EvalError
+	hasUserError := false
 	for _, d := range dn.disjuncts {
 		if b := d.err; b != nil {
-			n.disjunctErrs = append(n.disjunctErrs, b)
 			if b.Code > code {
 				code = b.Code
 			}
+			switch {
+			case b.Code == UserError:
+				if !hasUserError {
+					n.disjunctErrs = n.disjunctErrs[:0]
+				}
+				hasUserError = true
+
+			case hasUserError:
+				continue
+			}
+			n.disjunctErrs = append(n.disjunctErrs, b)
 		}
 	}
 

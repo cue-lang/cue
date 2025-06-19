@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5fe2980_65b07151",
+        "filename": "cue/testdata/eval/bounds.txtar",
+        "patchSetId": 9
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-19T11:01:25Z",
+      "side": 1,
+      "message": "Maybe include some noncrete values as test cases too?",
+      "revId": "34174b59422f919d2a2be22c71cb7e20f8fc8fdb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7ec5115_b73aaa9b",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2676,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-20T09:17:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1dfdfd0b_b46244c6",
+      "range": {
+        "startLine": 2676,
+        "startChar": 0,
+        "endLine": 2676,
+        "endChar": 5
+      },
+      "revId": "d43bed6a8b50f14085702b7e587a7da1223d0234",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "002bdabe_00026163",
@@ -41,6 +65,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6d709e0_337e45d2",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2679,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-20T09:17:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "002bdabe_00026163",
+      "revId": "d43bed6a8b50f14085702b7e587a7da1223d0234",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ba43285_e9e95f38",
@@ -54,6 +96,30 @@
       "writtenOn": "2025-06-19T21:38:05Z",
       "side": 1,
       "message": "typo? did you mean to use a semicolon?",
+      "range": {
+        "startLine": 2682,
+        "startChar": 41,
+        "endLine": 2682,
+        "endChar": 42
+      },
+      "revId": "d43bed6a8b50f14085702b7e587a7da1223d0234",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3312a79c_bc75f96a",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2682,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-20T09:17:25Z",
+      "side": 1,
+      "message": "I virtually never intend to use a semicolon, but I intended a colon. :)",
+      "parentUuid": "5ba43285_e9e95f38",
       "range": {
         "startLine": 2682,
         "startChar": 41,

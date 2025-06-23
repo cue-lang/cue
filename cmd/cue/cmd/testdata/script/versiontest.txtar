@@ -1,0 +1,74 @@
+env CUE_REGISTRY=localhost:33463
+env CUE_CACHE_DIR=$WORK/.cache
+exec cue mod registry $CUE_REGISTRY &
+cd m1
+exec cue mod publish v0.0.0
+cd ../main1
+! exec cue vet
+stderr 'some custom error'
+
+cd ../m2
+exec cue mod publish v0.0.0
+cd ../main2
+! exec cue vet
+stderr 'builtin "error" is not available in version v0.12.0'
+
+-- main1/cue.mod/module.cue --
+module: "other.example/x"
+language: {
+    version: "v0.12.0"
+}
+deps: {
+    "test.example/m1@v0": {
+        v:       "v0.0.0"
+        default: true
+    }
+}
+-- main1/x.cue --
+package x
+
+import "test.example/m1"
+
+x: int | string | m1.err("some custom error")
+x: true
+
+-- m1/cue.mod/module.cue --
+module: "test.example/m1"
+language: {
+    version: "v0.14.0"
+}
+source: kind: "self"
+-- m1/m.cue --
+package m1
+
+err: error
+
+-- main2/cue.mod/module.cue --
+module: "other.example/x"
+language: {
+    version: "v0.12.0"
+}
+deps: {
+    "test.example/m2@v0": {
+        v:       "v0.0.0"
+        default: true
+    }
+}
+-- main2/x.cue --
+package x
+
+import "test.example/m2"
+
+x: int | string | m2.err("some custom error")
+x: false
+
+-- m2/cue.mod/module.cue --
+module: "test.example/m2"
+language: {
+    version: "v0.12.0"
+}
+source: kind: "self"
+-- m2/m.cue --
+package m2
+
+err: error

@@ -1,3 +1,6 @@
+-- cue.mod/module.cue --
+module: "cuelang.org/error"
+language: version: "v0.14.0"
 -- in.cue --
 selection: {
 	dropError: 1 | error("drop me")

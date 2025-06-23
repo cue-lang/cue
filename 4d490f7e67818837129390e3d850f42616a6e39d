@@ -16,6 +16,24 @@
       "message": "This doesn\u0027t say what the actual semantics are. For example, it would be within the letter of the rule here to say that `1 \u003d\u003d 1.0` is false. Maybe better to say \"floating point numbers may be compared with integers: the result is as if the integer was first converted to floating point\" ?",
       "revId": "4d490f7e67818837129390e3d850f42616a6e39d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7bd4e27_7ed956f2",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2358,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-23T15:32:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eccc6218_3bf93d8c",
+      "revId": "4d490f7e67818837129390e3d850f42616a6e39d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

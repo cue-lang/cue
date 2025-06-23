@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a81df133_598c2a15",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-23T19:32:48Z",
+      "side": 1,
+      "message": "I\u0027ve made some suggestions for alternative wording.\n\nMaybe thinking too much into the future, it might be worth thinking about other types too. Not all values in CUE are one of the kinds enumerated in the comparison text. For example, what about func values? These currently get an error when compared for equality but unify together fine. And I think it\u0027s quite possible that we might be able to have custom types provided by plugins in the future. I have an idea for how this could be worded, but not entirely sure it\u0027s worth doing now.",
+      "revId": "20b4193d3173904aff633e16588c6eabcb84ef58",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8410d1d0_a299fe06",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2343,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-23T19:32:48Z",
+      "side": 1,
+      "message": "Here\u0027s a stab at a rephrasing. I decided that it\u0027s probably important to make \"kind\" (could also call it \"type\") a bit more of an explicit thing, because \"type\" is a bit of a fluid concept in CUE and I don\u0027t believe there\u0027s anywhere else that defines it in a way that\u0027s useful here. It also enables a bit of simplification because we can do away with some of the float/int special-casing in favour of using `number`.\n\nNote: I\u0027ve also deliberately split the `string` and `bytes` cases because it\u0027s otherwise very easy to misread (as I did) that it\u0027s possible to compare a `string` value with a `bytes` value.\n\n```\nIn any comparison, both operands must be concrete; otherwise the result is\nbottom (`_|_`).\n\nWhen comparing concrete operands, first the _kind_ of each operand is\nconsidered, defined as which of the following can be successfully\nunified with the operand: `null`, `bool`, `number`, `string`, `bytes`, `{...}`, `[...]`.\n\nWhen the kinds are different, the result is false for `\u003d\u003d`, true for `!\u003d`,\nand an error (bottom) for ordering comparisons (`\u003c`, `\u003c\u003d`, `\u003e`, `\u003e\u003d`).\nOtherwise comparison is made on a kind-by-kind basis; ordering comparisons\nare only allowed when the kind is ordered:\n\n- Null is equal only to itself.\n- Boolean values are equal if they are either both true or both false.\n- Numeric values are ordered and comparable according to their numeric value;\n  if one number is floating point, the other is first converted to a floating-point\n  value too, then they are compared as per the definitions\n  for binary coded decimals in the IEEE-754-2008 standard.\n- String values are ordered and compared lexically byte-wise.\n- Bytes values are ordered and compared lexically byte-wise.\n- Struct values are equal if they have the same set of regular field labels\n  and the corresponding values are recursively equal. Only regular\n  fields are considered in the comparison; field order and closedness\n  are irrelevant.\n- List values are equal if they have the same length and their corresponding\nelements are recursively equal.\n```",
+      "parentUuid": "dc73a0dd_e69c42a3",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e78d45f4_6db5a74a",
         "filename": "doc/ref/spec.md",
         "patchSetId": 10
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "I don\u0027t read it the same way. To me it means that the operator is defined for operands on which an ordering is defined. THis is not the case for `1\u003c\"2\"`.\n \nNote that this did not change with this change. It is also the language adopted by Go, so there is precendence.\n\nI changed the language a tiny bit in the hope to clarify this, but not sure it is an improvement, really.",
       "parentUuid": "e78d45f4_6db5a74a",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7a9b16f_2bf52a9a",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2345,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-23T19:32:48Z",
+      "side": 1,
+      "message": "Go only allows comparing of values where one is assignable to the other, but that\u0027s not the case here. We could say \"ordered with respect to one another\" but that a bit circular. Perhaps my stab at a rephrasing of the whole thing above makes this a bit clearer?",
+      "parentUuid": "220252c5_c70ee63d",
       "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dc73a0dd_e69c42a3",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2343,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-23T15:54:26Z",
+      "side": 1,
+      "message": "It is all a matter of definition, isn\u0027t it. I think the concept of comparable is still useful. But I\u0027m open to a suggestion of new terminology. I cna\u0027t think of anything better now.",
+      "parentUuid": "b4b2b098_f839e192",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e78d45f4_6db5a74a",
         "filename": "doc/ref/spec.md",
         "patchSetId": 10
@@ -31,6 +49,24 @@
       "writtenOn": "2025-06-19T14:22:09Z",
       "side": 1,
       "message": "This still doesn\u0027t seem quite right to me. That would imply that 1\u003c\"2\" is OK, but I\u0027m pretty sure it\u0027s not.",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "220252c5_c70ee63d",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2345,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-23T15:54:26Z",
+      "side": 1,
+      "message": "I don\u0027t read it the same way. To me it means that the operator is defined for operands on which an ordering is defined. THis is not the case for `1\u003c\"2\"`.\n \nNote that this did not change with this change. It is also the language adopted by Go, so there is precendence.\n\nI changed the language a tiny bit in the hope to clarify this, but not sure it is an improvement, really.",
+      "parentUuid": "e78d45f4_6db5a74a",
       "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -10,7 +10,7 @@ jobs:
       run:
         shell: bash --noprofile --norc -euo pipefail {0}
     if: ${{github.repository == 'cue-lang/cue'}}
-    runs-on: ubuntu-24.04
+    runs-on: namespace-profile-ubuntu-24-04-amd64-8x16
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb00403d_08ad247b",
+        "filename": "cue/testdata/builtins/error.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-23T17:48:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "816cce96_f0e3b4ce",
+      "revId": "89150ea91daf72aff76c8e1e27ad904fe7ec0814",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "37c86af7_bfe31f3f",
@@ -69,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75b88ffa_8ed21ac0",
+        "filename": "internal/core/adt/call.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-23T17:48:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "37c86af7_bfe31f3f",
+      "revId": "89150ea91daf72aff76c8e1e27ad904fe7ec0814",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0585372b_013d6713",
@@ -82,6 +118,24 @@
       "writtenOn": "2025-06-23T10:44:13Z",
       "side": 1,
       "message": "I think you want to convert this to a string, because otherwise it gets formatted as a quoted string, unlike when it\u0027s an interpolated string.\nI don\u0027t _think_ that\u0027s desirable.",
+      "revId": "89150ea91daf72aff76c8e1e27ad904fe7ec0814",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdc686b8_06405ec6",
+        "filename": "internal/core/compile/builtin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-23T17:48:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0585372b_013d6713",
       "revId": "89150ea91daf72aff76c8e1e27ad904fe7ec0814",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -53,6 +53,12 @@ type File struct {
 	StructCmp bool `experiment:"since:v0.14.0"`
 }
 
+// LanguageVersion returns the language version of the file or "" if no language
+// version is associated with it.
+func (f *File) LanguageVersion() string {
+	return f.version
+}
+
 // NewFile parses the given comma-separated list of experiments for
 // the given version and returns a PerFile struct with the experiments enabled.
 // A empty version indicates the default version.

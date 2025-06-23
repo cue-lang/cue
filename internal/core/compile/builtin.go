@@ -38,7 +38,9 @@ var (
 // message. If the argument is an interpolation, it will be evaluated and if it
 // results in an error, the argument will be inserted as an expression.
 var errorBuiltin = &adt.Builtin{
-	Name:   "error",
+	Name:  "error",
+	Added: "v0.14.0",
+
 	Params: []adt.Param{stringParam},
 	Result: adt.BottomKind,
 	RawFunc: func(call *adt.CallContext) adt.Value {

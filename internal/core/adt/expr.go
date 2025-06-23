@@ -1669,6 +1669,9 @@ type Builtin struct {
 	// TODO: consider merging Func and RawFunc into a single field again.
 	RawFunc func(call *CallContext) Value
 
+	// Added indicates as of which language version this builtin can be used.
+	Added string
+
 	Package Feature
 	Name    string
 }

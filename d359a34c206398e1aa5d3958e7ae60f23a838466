@@ -16,6 +16,24 @@
       "message": "LGTM except it would be good to have a sanity check test in cmd/cue that checks what happens when a versioned builtin is used across module boundaries with different versions.",
       "revId": "d359a34c206398e1aa5d3958e7ae60f23a838466",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0254b1cc_a5444069",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-23T17:49:33Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "c9b3ef8f_ce361e6d",
+      "revId": "d359a34c206398e1aa5d3958e7ae60f23a838466",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

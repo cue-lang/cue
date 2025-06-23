@@ -4,9 +4,9 @@ package base
 
 import (
 	"encoding/json"
-	"list"
 	"strings"
 	"strconv"
+
 	"cue.dev/x/githubactions"
 )
 
@@ -68,7 +68,7 @@ installGo: {
 checkoutCode: {
 	#actionsCheckout: githubactions.#Step & {
 		name: "Checkout code"
-		uses: "actions/checkout@v4"
+		uses: "actions/checkout@v4" // TODO(mvdan): switch to namespacelabs/nscloud-cache-action@v1 once Windows supports caching
 
 		// "pull_request_target" builds will by default use a merge commit,
 		// testing the PR's HEAD merged on top of the master branch.
@@ -151,105 +151,27 @@ curlGitHubAPI: {
 	"""#
 }
 
-setupGoActionsCaches: {
-	// #readonly determines whether we ever want to write the cache back. The
-	// writing of a cache back (for any given cache key) should only happen on a
-	// protected branch. But running a workflow on a protected branch often
-	// implies that we want to skip the cache to ensure we catch flakes early.
-	// Hence the concept of clearing the testcache to ensure we catch flakes
-	// early can be defaulted based on #readonly. In the general case the two
-	// concepts are orthogonal, hence they are kept as two parameters, even
-	// though in our case we could get away with a single parameter that
-	// encapsulates our needs.
-	#readonly:       *false | bool
-	#cleanTestCache: *!#readonly | bool
-	#goVersion:      string
-	#additionalCacheDirs: [...string]
-	#os: string
+setupGoActionsCaches: [
+	// Our runner profiles on Namespace are already configured to only update
+	// the cache when they run from one of the protected branches.
+	githubactions.#Step & {
+		uses: "namespacelabs/nscloud-cache-action@v1"
+		with: cache: "go"
+	},
 
-	let goModCacheDirID = "go-mod-cache-dir"
-	let goCacheDirID = "go-cache-dir"
-
-	// cacheDirs is a convenience variable that includes
-	// GitHub expressions that represent the directories
-	// that participate in Go caching.
-	let cacheDirs = list.Concat([[
-		"${{ steps.\(goModCacheDirID).outputs.dir }}/cache/download",
-		"${{ steps.\(goCacheDirID).outputs.dir }}",
-	], #additionalCacheDirs])
-
-	let cacheRestoreKeys = "\(#os)-\(#goVersion)"
-
-	let cacheStep = githubactions.#Step & {
-		with: {
-			path: strings.Join(cacheDirs, "\n")
-
-			// GitHub actions caches are immutable. Therefore, use a key which is
-			// unique, but allow the restore to fallback to the most recent cache.
-			// The result is then saved under the new key which will benefit the
-			// next build. Restore keys are only set if the step is restore.
-			key:            "\(cacheRestoreKeys)-${{ github.run_id }}"
-			"restore-keys": cacheRestoreKeys
-		}
-	}
-
-	let readWriteCacheExpr = "(\(isProtectedBranch) || \(isTestDefaultBranch))"
-
-	// pre is the list of steps required to establish and initialise the correct
-	// caches for Go-based workflows.
-	[
-		// TODO: once https://github.com/actions/setup-go/issues/54 is fixed,
-		// we could use `go env` outputs from the setup-go step.
-		githubactions.#Step & {
-			name: "Get go mod cache directory"
-			id:   goModCacheDirID
-			run:  #"echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}"#
-		},
-		githubactions.#Step & {
-			name: "Get go build/test cache directory"
-			id:   goCacheDirID
-			run:  #"echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}"#
-		},
-
-		// Only if we are not running in readonly mode do we want a step that
-		// uses actions/cache (read and write). Even then, the use of the write
-		// step should be predicated on us running on a protected branch. Because
-		// it's impossible for anything else to write such a cache.
-		if !#readonly {
-			cacheStep & {
-				if:   readWriteCacheExpr
-				uses: "actions/cache@v4"
-			}
-		},
-
-		cacheStep & {
-			// If we are readonly, there is no condition on when we run this step.
-			// It should always be run, becase there is no alternative. But if we
-			// are not readonly, then we need to predicate this step on us not
-			// being on a protected branch.
-			if !#readonly {
-				if: "! \(readWriteCacheExpr)"
-			}
-
-			uses: "actions/cache/restore@v4"
-		},
-
-		if #cleanTestCache {
-			// All tests on protected branches should skip the test cache.  The
-			// canonical way to do this is with -count=1. However, we want the
-			// resulting test cache to be valid and current so that subsequent CLs
-			// in the trybot repo can leverage the updated cache. Therefore, we
-			// instead perform a clean of the testcache.
-			//
-			// Critically we only want to do this in the main repo, not the trybot
-			// repo.
-			githubactions.#Step & {
-				if:  "github.repository == '\(githubRepositoryPath)' && (\(isProtectedBranch) || github.ref == 'refs/heads/\(testDefaultBranch)')"
-				run: "go clean -testcache"
-			}
-		},
-	]
-}
+	// All tests on protected branches should skip the test cache.  The
+	// canonical way to do this is with -count=1. However, we want the
+	// resulting test cache to be valid and current so that subsequent CLs
+	// in the trybot repo can leverage the updated cache. Therefore, we
+	// instead perform a clean of the testcache.
+	//
+	// Critically we only want to do this in the main repo, not the trybot
+	// repo.
+	githubactions.#Step & {
+		if:  "github.repository == '\(githubRepositoryPath)' && (\(isProtectedBranch) || \(isTestDefaultBranch))"
+		run: "go clean -testcache"
+	},
+]
 
 // isProtectedBranch is an expression that evaluates to true if the
 // job is running as a result of pushing to one of protectedBranchPatterns.

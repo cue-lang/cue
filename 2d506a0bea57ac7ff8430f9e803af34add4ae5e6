@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4cf8b9d3_396903d8",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 2678,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-23T10:30:47Z",
+      "side": 1,
+      "message": "What if there are several `error` calls in a disjunct?",
+      "revId": "2d506a0bea57ac7ff8430f9e803af34add4ae5e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

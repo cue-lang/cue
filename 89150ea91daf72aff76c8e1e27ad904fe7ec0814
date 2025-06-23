@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "757b1285_5431202d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-23T10:44:13Z",
+      "side": 1,
+      "message": "LGTM except the quoting of error messages seems a little inconsistent.",
+      "revId": "89150ea91daf72aff76c8e1e27ad904fe7ec0814",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "816cce96_f0e3b4ce",
+        "filename": "cue/testdata/builtins/error.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-23T10:44:13Z",
+      "side": 1,
+      "message": "It seems a bit odd that this is quoted.",
+      "revId": "89150ea91daf72aff76c8e1e27ad904fe7ec0814",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "37c86af7_bfe31f3f",
@@ -14,6 +48,23 @@
       "writtenOn": "2025-06-23T10:36:46Z",
       "side": 1,
       "message": "I can\u0027t parse this sentence.",
+      "revId": "89150ea91daf72aff76c8e1e27ad904fe7ec0814",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0585372b_013d6713",
+        "filename": "internal/core/compile/builtin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-23T10:44:13Z",
+      "side": 1,
+      "message": "I think you want to convert this to a string, because otherwise it gets formatted as a quoted string, unlike when it\u0027s an interpolated string.\nI don\u0027t _think_ that\u0027s desirable.",
       "revId": "89150ea91daf72aff76c8e1e27ad904fe7ec0814",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

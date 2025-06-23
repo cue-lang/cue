@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6b4316cb_6f7b2fb4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-23T10:52:36Z",
+      "side": 1,
+      "message": "One other thing. There\u0027s something odd going on: I experimented to see what would happen if I used the `error` builtin across module boundaries and I got a panic.\nHere\u0027s a reproducer:\n\n```\nenv CUE_REGISTRY\u003dlocalhost:33463\nenv CUE_CACHE_DIR\u003d$WORK/.cache\nexec cue mod registry $CUE_REGISTRY \u0026\ncd m\nexec cue mod publish v0.0.0\ncd ../main\n! exec cue vet\nstderr \u0027some custom error\u0027\n\n-- main/cue.mod/module.cue --\nmodule: \"other.example/x\"\nlanguage: {\n\tversion: \"v0.12.0\"\n}\ndeps: {\n\t\"test.example/m@v0\": {\n\t\tv:       \"v0.0.0\"\n\t\tdefault: true\n\t}\n}\n-- main/x.cue --\npackage x\n\nimport \"test.example/m\"\n\nx: int | string | m.err(\"some custom error\")\n\n-- m/cue.mod/module.cue --\nmodule: \"test.example/m\"\nlanguage: {\n\tversion: \"v0.14.0\"\n}\nsource: kind: \"self\"\n-- m/m.cue --\npackage m\n\nerr: error\n```\n\n\nI get this panic:\n\n```\npanic({0xf64320?, 0x1984a00?})\n\t/home/rogpeppe/go/src/runtime/panic.go:802 +0x168 fp\u003d0xc0004abef8 sp\u003d0xc0004abe48 pc\u003d0x47aac8\ncuelang.org/go/internal/core/adt.runTask.func1()\n\t/home/rogpeppe/src/cuelabs/cue2/internal/core/adt/sched.go:685 +0x76 fp\u003d0xc0004abf20 sp\u003d0xc0004abef8 pc\u003d0x8aad16\npanic({0xf64320?, 0x1984a00?})\n\t/home/rogpeppe/go/src/runtime/panic.go:783 +0x132 fp\u003d0xc0004abfd0 sp\u003d0xc0004abf20 pc\u003d0x47aa92\ncuelang.org/go/internal/core/adt.runTask.func1()\n\t/home/rogpeppe/src/cuelabs/cue2/internal/core/adtts: exit 1\n/sched.go:685 +0x76 fp\u003d0xc0004abff8 sp\u003d0xc0004abfd0 pc\u003d0x8aad16\npanic({0xf64320?, 0x1984a00?})\n\t/home/rogpeppe/go/src/runtime/panic.go:783 +0x132 fp\u003d0xc0004ac0a8 sp\u003d0xc0004abff8 pc\u003d0x47aa92\nruntime.panicmem(...)\n\t/home/rogpeppe/go/src/runtime/panic.go:262\nruntime.sigpanic()\n\t/home/rogpeppe/go/src/runtime/signal_unix.go:925 +0x359 fp\u003d0xc0004ac108 sp\u003d0xc0004ac0a8 pc\u003d0x47cfd9\ncuelang.org/go/internal/core/adt.(*Builtin).call(0x19b2640, 0xc000448580)\n\t/home/rogpeppe/src/cuelabs/cue2/internal/core/adt/expr.go:1812 +0x7de fp\u003d0xc0004ac290 sp\u003d0xc0004ac108 pc\u003d0x89da3e\ncuelang.org/go/internal/core/adt.(*CallExpr).evaluate(0xc00044b3e0, 0xc000342008, 0x80400)\n\t/home/rogpeppe/src/cuelabs/cue2/internal/core/adt/expr.go:1641 +0xb30 fp\u003d0xc0004ac438 sp\u003d0xc0004ac290 pc\u003d0x89c970\n```",
+      "revId": "89150ea91daf72aff76c8e1e27ad904fe7ec0814",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "816cce96_f0e3b4ce",
         "filename": "cue/testdata/builtins/error.txtar",
         "patchSetId": 4

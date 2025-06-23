@@ -40,12 +40,6 @@ workflows: trybot: _repo.bashWorkflow & {
 			strategy:  _testStrategy
 			"runs-on": "${{ matrix.runner }}"
 
-			let _setupGoActionsCaches = _repo.setupGoActionsCaches & {
-				#goVersion: goVersionVal
-				#os:        runnerOSVal
-				_
-			}
-
 			let installGo = _repo.installGo & {
 				#setupGo: with: "go-version": goVersionVal
 				_
@@ -63,7 +57,9 @@ workflows: trybot: _repo.bashWorkflow & {
 
 				// cachePre must come after installing Node and Go, because the cache locations
 				// are established by running each tool.
-				for v in _setupGoActionsCaches {v},
+				for v in _repo.setupGoActionsCaches {v & {
+					if: string | *"\(matrixRunner) != '\(_repo.windowsMachine)'" // TODO(mvdan): remove the condition once Windows supports caching
+				}},
 
 				_repo.loginCentralRegistry,
 
@@ -92,8 +88,6 @@ workflows: trybot: _repo.bashWorkflow & {
 		}
 	}
 
-	let runnerOS = "runner.os"
-	let runnerOSVal = "${{ \(runnerOS) }}"
 	let matrixRunner = "matrix.runner"
 	let goVersion = "matrix.go-version"
 	let goVersionVal = "${{ \(goVersion) }}"

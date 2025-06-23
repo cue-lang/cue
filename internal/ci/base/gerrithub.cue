@@ -244,6 +244,7 @@ evictCaches: bashWorkflow & {
 			steps: [
 				for v in checkoutCode {v},
 
+				// TODO(mvdan): remove once we've fully moved to Namespace runners.
 				githubactions.#Step & {
 					name: "Delete caches"
 					run:  """

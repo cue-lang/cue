@@ -181,6 +181,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "387ae4c2_aaeb48e1",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2345,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-24T10:29:12Z",
+      "side": 1,
+      "message": "It is just comparable at two different levels. The operator is called _equality_. And it defines the outcome if two values are not comparable to be false, instead of bottom. I think that is fine. I don\u0027t think the definition of `kind` is correct, and it is also another concept that does not add much.\n\nI\u0027ve changed the working back to equality to avoid the double use.\n\nSo we now have comparsion operators for the complete collection. Then the groups of these operators use diferent names again. All there behavior is defined in terms of their relations.\n\nSo we still have \"ordering\" operators vs the \"ordered\" relation, but that was as it was before and is not really part of this change.\n\nCompare this with the \"equality\" operators vs the \"comparable\" relation, which is more distinct.",
+      "parentUuid": "68c88a9c_74fa3edb",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e0a088f2_2157bcc5",
         "filename": "doc/ref/spec.md",
         "patchSetId": 10
@@ -192,6 +210,24 @@
       "writtenOn": "2025-06-19T14:22:09Z",
       "side": 1,
       "message": "Now that all concrete values are comparable, I don\u0027t think it makes sense to define comparability on a type-by-type basis, other than for special cases such as float and int.",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cb85f18_15e84f05",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2350,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-24T10:29:12Z",
+      "side": 1,
+      "message": "I\u0027ve emphasized the term equality operators again. By definition, not all values are comparable. Equality is just defined to return false for non-comparable values.",
+      "parentUuid": "e0a088f2_2157bcc5",
       "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "661f937c_fb3fea15",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2343,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-24T07:26:25Z",
+      "side": 1,
+      "message": "I still think the older definition is neater: we are already defining the relation, do there is no need for another concept like kind. We just need to consider whether the relationship is defined.",
+      "parentUuid": "8410d1d0_a299fe06",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e78d45f4_6db5a74a",
         "filename": "doc/ref/spec.md",
         "patchSetId": 10
@@ -103,6 +121,24 @@
       "side": 1,
       "message": "Go only allows comparing of values where one is assignable to the other, but that\u0027s not the case here. We could say \"ordered with respect to one another\" but that a bit circular. Perhaps my stab at a rephrasing of the whole thing above makes this a bit clearer?",
       "parentUuid": "220252c5_c70ee63d",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90688548_4b36421c",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2345,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-24T07:26:25Z",
+      "side": 1,
+      "message": "Here we have a \"comparable\" relationship and there result is false if this relationship is undefined. I don\u0027t see how that is different. The only somewhat confusing part is that the comparison _operator_ is defined even if two values are not comparable. So maybe we want to change the name. But in principle I like expressing things in terms of relationships more than introducing antoher concept.",
+      "parentUuid": "f7a9b16f_2bf52a9a",
       "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

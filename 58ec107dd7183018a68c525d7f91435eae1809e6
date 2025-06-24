@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fd3599c5_f418620f",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2343,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-24T07:41:56Z",
+      "side": 1,
+      "message": "ISTM that we\u0027re already using a concept like \"kind\" even if we\u0027re not calling it out explicitly: each case that\u0027s explicitly enumerated is a \"kind\" and we\u0027re implicitly saying that values matching that case follow that rule when compared to others that also match that case, but values matching different cases compare false.\n\nWe need to say somehow that values of different basic types compare unequal, but given there\u0027s no real concept of \"basic type\" in CUE, how do we do that?",
+      "parentUuid": "661f937c_fb3fea15",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e78d45f4_6db5a74a",
         "filename": "doc/ref/spec.md",
         "patchSetId": 10
@@ -139,6 +157,24 @@
       "side": 1,
       "message": "Here we have a \"comparable\" relationship and there result is false if this relationship is undefined. I don\u0027t see how that is different. The only somewhat confusing part is that the comparison _operator_ is defined even if two values are not comparable. So maybe we want to change the name. But in principle I like expressing things in terms of relationships more than introducing antoher concept.",
       "parentUuid": "f7a9b16f_2bf52a9a",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68c88a9c_74fa3edb",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2345,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-24T07:41:56Z",
+      "side": 1,
+      "message": "\u003e The only somewhat confusing part is that the comparison operator is defined even if two values are not comparable\n\nYes, I think that\u0027s indeed confusing. It seems odd to say that it\u0027s OK to compare \"incomparable\" values with one another.",
+      "parentUuid": "90688548_4b36421c",
       "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

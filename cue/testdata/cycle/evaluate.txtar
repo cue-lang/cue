@@ -374,9 +374,7 @@ Result:
     }
   }
   issue3978: (struct){
-    a: (_|_){
-      // [cycle] issue3978.a: cycle error referencing missing:
-      //     ./self.cue:3:11
+    a: (struct){
     }
   }
 }
@@ -600,7 +598,7 @@ diff old new
      }
    }
    closeFail: (_|_){
-@@ -207,25 +179,27 @@
+@@ -207,21 +179,21 @@
      }
      x: (_|_){
        // [eval]
@@ -627,13 +625,6 @@ diff old new
      }
    }
    issue3978: (struct){
--    a: (struct){
-+    a: (_|_){
-+      // [cycle] issue3978.a: cycle error referencing missing:
-+      //     ./self.cue:3:11
-     }
-   }
- }
 -- diff/explanation --
 embedCycle: technically not a structural cycle, so V3 result
 is okay or even an improvement.

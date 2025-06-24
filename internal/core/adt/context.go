@@ -706,10 +706,13 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 		if arc == nil {
 			return nil, c.ci
 		}
-		if arc.Internal() && c.isDevVersion() {
-			mode := state.conditions()
-			state = final(partial, mode|allTasksCompleted)
-		}
+		// TODO(3977): register internal nodes for later verifications. The
+		// following limits the possibility of some common and useful cycles.
+		//
+		// if arc.Internal() && c.isDevVersion() {
+		//  mode := state.conditions()
+		//  state = final(partial, mode|allTasksCompleted)
+		// }
 		orig := arc
 		// TODO(deref): what is the right level of dereferencing here?
 		// DerefValue seems to work too.

@@ -138,7 +138,7 @@ Result:
   }
   issue3437: (struct){
     r: (_|_){
-      // [cycle] issue3437.r: cycle error referencing a:
+      // [incomplete] issue3437.r: undefined field: a:
       //     ./issue3437.cue:2:9
     }
     d: (struct){
@@ -1071,13 +1071,13 @@ Result:
   }
 }
 -- out/evalalpha/stats --
-Leaks:  2072
+Leaks:  2073
 Freed:  0
 Reused: 0
-Allocs: 2072
+Allocs: 2073
 Retain: 0
 
-Unifications: 766
+Unifications: 767
 Conjuncts:    2012
 Disjuncts:    736
 
@@ -1097,13 +1097,13 @@ diff old new
 -Unifications: 48
 -Conjuncts:    150
 -Disjuncts:    111
-+Leaks:  2072
++Leaks:  2073
 +Freed:  0
 +Reused: 0
-+Allocs: 2072
++Allocs: 2073
 +Retain: 0
 +
-+Unifications: 766
++Unifications: 767
 +Conjuncts:    2012
 +Disjuncts:    736
 +
@@ -1235,7 +1235,7 @@ diff old new
    issue3437: (struct){
      r: (_|_){
 -      // [incomplete] issue3437.r: cycle error referencing a:
-+      // [cycle] issue3437.r: cycle error referencing a:
++      // [incomplete] issue3437.r: undefined field: a:
        //     ./issue3437.cue:2:9
      }
      d: (struct){

@@ -16,6 +16,24 @@
       "message": "nit: linkify via https://cuelang.org/cl/1217228",
       "revId": "2921fd15af35a13c5c91afb541bb2e3e6d9273ca",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a836523_51978641",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-24T11:56:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cbdb539_e07f5c5f",
+      "revId": "2921fd15af35a13c5c91afb541bb2e3e6d9273ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

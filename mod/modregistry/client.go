@@ -251,25 +251,22 @@ func (c *Client) ModuleVersions(ctx context.Context, m string) (_req []string, _
 	}
 	// Note: do not use c.repoName because that always expects
 	// a module path with a major version.
-	iter := loc.Registry.Tags(ctx, loc.Repository, "")
-	var _err error
-	iter(func(tag string, err error) bool {
+	for tag, err := range loc.Registry.Tags(ctx, loc.Repository, "") {
 		if err != nil {
-			_err = err
-			return false
+			if !isNotExist(err) {
+				return nil, fmt.Errorf("module %v: %w", m, err)
+			}
+			continue
 		}
 		vers, ok := strings.CutPrefix(tag, loc.Tag)
 		if !ok || !semver.IsValid(vers) {
-			return true
+			continue
 		}
 		if !hasMajor || semver.Major(vers) == major {
 			versions = append(versions, vers)
 		}
-		return true
-	})
-	if _err != nil && !isNotExist(_err) {
-		return nil, fmt.Errorf("module %v: %w", m, _err)
 	}
+
 	semver.Sort(versions)
 	return versions, nil
 }

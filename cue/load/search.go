@@ -486,7 +486,7 @@ func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp s
 // Note:
 // * We know that pattern contains "..."
 // * We know that pattern is relative to the module root
-func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern ast.ImportPath, pkgQual string, mainModRoot module.SourceLoc, mainModPath string, tg *tagger) (_ []resolvedPackageArg, _err error) {
+func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern ast.ImportPath, pkgQual string, mainModRoot module.SourceLoc, mainModPath string, tg *tagger) ([]resolvedPackageArg, error) {
 	modIpath := ast.ParseImportPath(mainModPath)
 	// Find directory to begin the scan.
 	// Could be smarter but this one optimization is enough for now,
@@ -519,18 +519,17 @@ func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern as
 
 	var prevFile modimports.ModuleFile
 	var prevImportPath ast.ImportPath
-	iter := modimports.AllModuleFiles(mainModRoot.FS, dir)
-	iter(func(f modimports.ModuleFile, err error) bool {
+	for f, err := range modimports.AllModuleFiles(mainModRoot.FS, dir) {
 		if err != nil {
-			return false
+			break
 		}
 		if err := shouldBuildFile(f.Syntax, tg.tagIsSet); err != nil {
 			// Later build logic should pick up and report the same error.
-			return true
+			continue
 		}
 		pkgName := f.Syntax.PackageName()
 		if !isSelected(pkgName) {
-			return true
+			continue
 		}
 		if pkgName == "" {
 			pkgName = "_"
@@ -549,7 +548,6 @@ func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern as
 		if ip == prevImportPath {
 			// TODO(rog): this isn't sufficient for full deduplication: we can get an alternation of different
 			// package names within the same directory. We'll need to maintain a map.
-			return true
 		}
 		if pkgQual == "" {
 			// Note: we can look at the previous item only rather than maintaining a map
@@ -558,7 +556,7 @@ func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern as
 			if prevFile.FilePath != "" && prevImportPath.Path == ip.Path && ip.Qualifier != prevImportPath.Qualifier {
 				// A wildcard isn't currently allowed to match multiple packages
 				// in a single directory.
-				_err = &MultiplePackageError{
+				return nil, &MultiplePackageError{
 					Dir:      path.Dir(f.FilePath),
 					Packages: []string{prevImportPath.Qualifier, ip.Qualifier},
 					Files: []string{
@@ -566,14 +564,12 @@ func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern as
 						path.Base(f.FilePath),
 					},
 				}
-				return false
 			}
 		}
 		pkgPaths = append(pkgPaths, resolvedPackageArg{ip.String(), ip.String()})
 		prevFile, prevImportPath = f, ip
-		return true
-	})
-	return pkgPaths, _err
+	}
+	return pkgPaths, nil
 }
 
 // cutModulePrefix strips the given module path from p and reports whether p is inside mod.

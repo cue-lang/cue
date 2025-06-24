@@ -33,29 +33,23 @@ type ModuleFile struct {
 // AllImports returns a sorted list of all the package paths
 // imported by the module files produced by modFilesIter
 // in canonical form.
-func AllImports(modFilesIter iter.Seq2[ModuleFile, error]) (_ []string, retErr error) {
+func AllImports(modFilesIter iter.Seq2[ModuleFile, error]) ([]string, error) {
 	pkgPaths := make(map[string]bool)
-	modFilesIter(func(mf ModuleFile, err error) bool {
+	for mf, err := range modFilesIter {
 		if err != nil {
-			retErr = fmt.Errorf("cannot read %q: %v", mf.FilePath, err)
-			return false
+			return nil, fmt.Errorf("cannot read %q: %v", mf.FilePath, err)
 		}
 		// TODO look at build tags and omit files with "ignore" tags.
 		for _, imp := range mf.Syntax.Imports {
 			pkgPath, err := strconv.Unquote(imp.Path.Value)
 			if err != nil {
 				// TODO location formatting
-				retErr = fmt.Errorf("invalid import path %q in %s", imp.Path.Value, mf.FilePath)
-				return false
+				return nil, fmt.Errorf("invalid import path %q in %s", imp.Path.Value, mf.FilePath)
 			}
 			// Canonicalize the path.
 			pkgPath = ast.ParseImportPath(pkgPath).Canonical().String()
 			pkgPaths[pkgPath] = true
 		}
-		return true
-	})
-	if retErr != nil {
-		return nil, retErr
 	}
 	return slices.Sorted(maps.Keys(pkgPaths)), nil
 }

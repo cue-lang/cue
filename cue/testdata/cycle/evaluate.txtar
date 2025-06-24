@@ -115,6 +115,13 @@ printCycle: {
 		}
 	}
 }
+-- self.cue --
+issue3978: {
+	a: self={
+		if self.missing != _|_ {
+		}
+	}
+}
 -- out/evalalpha/stats --
 Leaks:  119
 Freed:  0
@@ -156,17 +163,17 @@ diff old new
 +NumCloseIDs: 26
 -- out/eval/stats --
 Leaks:  48
-Freed:  127
-Reused: 120
+Freed:  129
+Reused: 122
 Allocs: 55
 Retain: 138
 
-Unifications: 163
-Conjuncts:    299
-Disjuncts:    192
+Unifications: 165
+Conjuncts:    302
+Disjuncts:    194
 
 CloseIDElems: 0
-NumCloseIDs: 5
+NumCloseIDs: 6
 -- out/evalalpha --
 Errors:
 closeCycle.c: structural cycle
@@ -364,6 +371,12 @@ Result:
       X: (_|_){
         // [structural cycle] printCycle.a.X: structural cycle
       }
+    }
+  }
+  issue3978: (struct){
+    a: (_|_){
+      // [cycle] issue3978.a: cycle error referencing missing:
+      //     ./self.cue:3:11
     }
   }
 }
@@ -587,7 +600,7 @@ diff old new
      }
    }
    closeFail: (_|_){
-@@ -207,21 +179,21 @@
+@@ -207,25 +179,27 @@
      }
      x: (_|_){
        // [eval]
@@ -611,6 +624,13 @@ diff old new
 +      X: (_|_){
 +        // [structural cycle] printCycle.a.X: structural cycle
 +      }
+     }
+   }
+   issue3978: (struct){
+-    a: (struct){
++    a: (_|_){
++      // [cycle] issue3978.a: cycle error referencing missing:
++      //     ./self.cue:3:11
      }
    }
  }
@@ -844,6 +864,10 @@ Result:
       //     ./in.cue:113:6
     }
   }
+  issue3978: (struct){
+    a: (struct){
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -979,6 +1003,14 @@ Result:
     a: {
       X: 〈1;a〉
       if 〈0;X〉 {}
+    }
+  }
+}
+--- self.cue
+{
+  issue3978: {
+    a: {
+      if (〈1〉.missing != _|_(explicit error (_|_ literal) in source)) {}
     }
   }
 }

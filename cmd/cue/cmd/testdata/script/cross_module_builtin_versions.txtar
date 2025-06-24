@@ -1,15 +1,20 @@
-env CUE_REGISTRY=localhost:33463
+# Test that even when a builtin is not available
+# in the main module's language version, it is
+# still available in dependencies with newer versions.
+#
+# Note: the error builtin was not available until v0.14.0.
+
+memregistry CUE_REGISTRY
 env CUE_CACHE_DIR=$WORK/.cache
-exec cue mod registry $CUE_REGISTRY &
-cd m1
+cd $WORK/m1
 exec cue mod publish v0.0.0
-cd ../main1
+cd $WORK/main1
 ! exec cue vet
 stderr 'some custom error'
 
-cd ../m2
+cd $WORK/m2
 exec cue mod publish v0.0.0
-cd ../main2
+cd $WORK/main2
 ! exec cue vet
 stderr 'builtin "error" is not available in version v0.12.0'
 

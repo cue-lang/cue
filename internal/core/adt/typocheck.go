@@ -774,10 +774,6 @@ func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
 	origSets := append(ctx.replaceIDsOrig[:0], *a...)
 	newSets := (*a)[:0]
 	queue := ctx.replaceIDsQueue
-	visited := ctx.replaceIDsVisited
-	if visited == nil {
-		visited = make(map[defID]bool)
-	}
 
 	for i := 0; i < len(origSets); {
 		head := origSets[i]
@@ -789,7 +785,10 @@ func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
 		}
 
 		queue = queue[:0]
-		clear(visited)
+		// TODO(mvdan): allocating a new map every time is wasteful in terms of memory,
+		// but reusing a map is ~6% slower as `clear` is not particularly fast.
+		// See: https://github.com/golang/go/issues/70617
+		visited := make(map[defID]bool)
 
 		for _, set := range currentGroup {
 			if !index[set.id].delete && !visited[set.id] {
@@ -825,8 +824,6 @@ func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
 	ctx.replaceIDsIndex = index
 	ctx.replaceIDsOrig = origSets[:0]
 	ctx.replaceIDsQueue = queue[:0]
-	clear(visited)
-	ctx.replaceIDsVisited = visited
 
 	*a = newSets
 }

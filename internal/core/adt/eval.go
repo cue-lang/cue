@@ -1071,6 +1071,8 @@ type nodeContext struct {
 	conjunctInfo []conjunctInfo
 	reqSets      reqSets
 
+	reqSetsCopy reqSets
+
 	// Checks is a list of conjuncts, as we need to preserve the context in
 	// which it was evaluated. The conjunct is always a validator (and thus
 	// a Value). We need to keep track of the CloseInfo, however, to be able

@@ -170,6 +170,7 @@ import (
 	"slices"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/u32set"
 )
 
 type defID uint32
@@ -776,7 +777,8 @@ func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
 	queue := ctx.replaceIDsQueue
 	visited := ctx.replaceIDsVisited
 	if visited == nil {
-		visited = make(map[defID]bool)
+		visited = u32set.New(32)
+		ctx.replaceIDsVisited = visited
 	}
 
 	for i := 0; i < len(origSets); {
@@ -789,11 +791,11 @@ func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
 		}
 
 		queue = queue[:0]
-		clear(visited)
+		visited.Clear()
 
 		for _, set := range currentGroup {
-			if !index[set.id].delete && !visited[set.id] {
-				visited[set.id] = true
+			if !index[set.id].delete && !visited.Has(uint32(set.id)) {
+				visited.Add(uint32(set.id))
 				queue = append(queue, set)
 			}
 		}
@@ -803,12 +805,12 @@ func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
 			ctx.stats.CloseIDElems++
 
 			for _, nextID := range index[currentSet.id].replacements {
-				if !index[nextID].delete && !visited[nextID] {
+				if !index[nextID].delete && !visited.Has(uint32(nextID)) {
 					// Trim subtree for embedded conjunctions.
 					if head.embed == nextID {
 						continue
 					}
-					visited[nextID] = true
+					visited.Add(uint32(nextID))
 					queue = append(queue, reqSet{id: nextID, once: currentSet.once})
 				}
 			}
@@ -825,8 +827,7 @@ func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
 	ctx.replaceIDsIndex = index
 	ctx.replaceIDsOrig = origSets[:0]
 	ctx.replaceIDsQueue = queue[:0]
-	clear(visited)
-	ctx.replaceIDsVisited = visited
+	visited.Clear()
 
 	*a = newSets
 }

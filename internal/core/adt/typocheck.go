@@ -167,7 +167,6 @@ package adt
 //
 import (
 	"math"
-	"slices"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/intset"
@@ -537,6 +536,7 @@ func (n *nodeContext) checkTypos() {
 		return
 	}
 
+	reqSetsCopy := n.reqSetsCopy
 	var err *Bottom
 	for _, a := range v.Arcs {
 		f := a.Label
@@ -549,8 +549,13 @@ func (n *nodeContext) checkTypos() {
 		// If the field has its own rules, apply them as a delta.
 		// This requires a copy to not pollute the base for the next iteration.
 		if len(na.replaceIDs) > 0 {
-			required = slices.Clone(required)
+			if reqSetsCopy == nil {
+				reqSetsCopy = make(reqSets, 0, len(baseRequired)*2) // more often than not, replaceIDs needs to add elements
+			}
+			required = reqSetsCopy[:len(baseRequired)]
+			copy(required, baseRequired)
 			required.replaceIDs(ctx, na.replaceIDs...)
+			reqSetsCopy = required[:0] // replaceIDs may grow the slice further; reuse that too
 		}
 
 		required.filterSets(func(a []reqSet) bool {
@@ -588,6 +593,8 @@ func (n *nodeContext) checkTypos() {
 	if err != nil {
 		n.AddChildError(err) // TODO: should not be necessary.
 	}
+
+	n.reqSetsCopy = reqSetsCopy
 }
 
 // hasEvidenceForAll reports whether there is evidence in a set of
@@ -889,6 +896,7 @@ func getReqSets(n *nodeContext) reqSets {
 	v := n.node
 
 	if p := v.Parent; p != nil && !n.dropParentRequirements {
+		// TODO(perf): this append here can get expensive for some projects with deeply nested structs.
 		a = append(a, getReqSets(p.state)...)
 		a.filterNonRecursive()
 	}

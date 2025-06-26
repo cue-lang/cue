@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuedebug"
+	"cuelang.org/go/internal/intset"
 )
 
 // Runtime defines an interface for low-level representation conversion and
@@ -195,7 +196,7 @@ type OpContext struct {
 	replaceIDsIndex   map[defID]replaceInfo
 	replaceIDsOrig    reqSets
 	replaceIDsQueue   reqSets
-	replaceIDsVisited map[defID]bool
+	replaceIDsVisited *intset.Set[defID]
 
 	// altPath, if non-empty, provides an alternative path for errors. This is
 	// necessary to get the right path for incomplete errors in the presence of

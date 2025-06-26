@@ -167,7 +167,6 @@ package adt
 //
 import (
 	"math"
-	"slices"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/intset"
@@ -536,6 +535,7 @@ func (n *nodeContext) checkTypos() {
 	if len(baseRequired) == 0 {
 		return
 	}
+	var requiredCopy reqSets // reuse a slice when making copies of baseRequired below
 
 	var err *Bottom
 	for _, a := range v.Arcs {
@@ -549,8 +549,13 @@ func (n *nodeContext) checkTypos() {
 		// If the field has its own rules, apply them as a delta.
 		// This requires a copy to not pollute the base for the next iteration.
 		if len(na.replaceIDs) > 0 {
-			required = slices.Clone(required)
+			if requiredCopy == nil {
+				requiredCopy = make(reqSets, 0, len(required)*2) // more often than not, replaceIDs needs to add elements
+			}
+			copy(requiredCopy[:len(required)], required)
+			required = requiredCopy
 			required.replaceIDs(ctx, na.replaceIDs...)
+			requiredCopy = required[:0] // replaceIDs may grow the slice further; reuse that too
 		}
 
 		required.filterSets(func(a []reqSet) bool {

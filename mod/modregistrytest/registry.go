@@ -491,7 +491,7 @@ func (c *moduleContent) init(versDir string) error {
 		if found {
 			return fmt.Errorf("multiple module.cue files")
 		}
-		mod := strings.ReplaceAll(modf.ModulePath(), "/", "_") + "_"
+		mod := strings.ReplaceAll(modf.ModuleRootPath(), "/", "_") + "_"
 		vers := strings.TrimPrefix(versDir, mod)
 		if len(vers) == len(versDir) {
 			return fmt.Errorf("module path %q in module.cue does not match directory %q", modf.QualifiedModule(), versDir)

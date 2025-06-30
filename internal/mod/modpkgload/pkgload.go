@@ -266,11 +266,11 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		pkg.inStd = true
 		return
 	}
-	pkg.fromExternal = pkg.mod != pkgs.mainModuleVersion
 	pkg.mod, pkg.modRoot, pkg.locs, pkg.err = pkgs.importFromModules(ctx, pkg.path)
 	if pkg.err != nil {
 		return
 	}
+	pkg.fromExternal = pkg.mod != pkgs.mainModuleVersion
 	if pkgs.mainModuleVersion.Path() == pkg.mod.Path() {
 		pkgs.applyPkgFlags(pkg, PkgInAll)
 	}

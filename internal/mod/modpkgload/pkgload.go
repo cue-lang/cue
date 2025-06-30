@@ -182,6 +182,9 @@ func LoadPackages(
 	rootPkgPaths []string,
 	shouldIncludePkgFile func(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool,
 ) *Packages {
+	if shouldIncludePkgFile == nil {
+		shouldIncludePkgFile = func(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool { return true }
+	}
 	pkgs := &Packages{
 		mainModuleVersion:    module.MustNewVersion(mainModulePath, ""),
 		mainModuleLoc:        mainModuleLoc,

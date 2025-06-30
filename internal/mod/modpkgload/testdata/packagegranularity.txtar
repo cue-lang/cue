@@ -10,7 +10,7 @@ main.test@v0:main
 main.test@v0:main
 	flags: inAll,isRoot,fromRoot,importsLoaded
 	mod: main.test@v0
-	external: true
+	external: false
 	location: .
 	imports:
 		example.com/blah@v0
@@ -29,7 +29,7 @@ main.test@v0:main
 main.test@v0:main
 	flags: inAll,isRoot,fromRoot,importsLoaded
 	mod: main.test@v0
-	external: true
+	external: false
 	location: .
 	imports:
 		example.com/blah@v0

@@ -479,15 +479,15 @@ func TestParse(t *testing.T) {
 			path, vers, ok := strings.Cut(f.Module, "@")
 			if ok {
 				qt.Assert(t, qt.Equals(f.QualifiedModule(), f.Module))
-				qt.Assert(t, qt.Equals(f.ModulePath(), path))
+				qt.Assert(t, qt.Equals(f.ModuleRootPath(), path))
 				qt.Assert(t, qt.Equals(f.MajorVersion(), vers))
 			} else if f.Module == "" {
 				qt.Assert(t, qt.Equals(f.QualifiedModule(), ""))
-				qt.Assert(t, qt.Equals(f.ModulePath(), ""))
+				qt.Assert(t, qt.Equals(f.ModuleRootPath(), ""))
 				qt.Assert(t, qt.Equals(f.MajorVersion(), ""))
 			} else {
 				qt.Assert(t, qt.Equals(f.QualifiedModule(), f.Module+"@v0"))
-				qt.Assert(t, qt.Equals(f.ModulePath(), f.Module))
+				qt.Assert(t, qt.Equals(f.ModuleRootPath(), f.Module))
 				qt.Assert(t, qt.Equals(f.MajorVersion(), "v0"))
 			}
 			for p, m := range test.wantModVersionForPkg {

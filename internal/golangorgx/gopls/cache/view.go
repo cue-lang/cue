@@ -443,7 +443,7 @@ func (s *Snapshot) initialize(ctx context.Context, firstAttempt bool) {
 				continue
 			}
 			rootDir := filepath.Dir(filepath.Dir(modURI.Path()))
-			scopes = append(scopes, moduleLoadScope{dir: rootDir, modulePath: parsed.ModulePath()})
+			scopes = append(scopes, moduleLoadScope{dir: rootDir, modulePath: parsed.ModuleRootPath()})
 		}
 	} else {
 		scopes = append(scopes, viewLoadScope{})

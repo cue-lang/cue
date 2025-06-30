@@ -79,9 +79,9 @@ func (f *File) QualifiedModule() string {
 	return f.Module + "@v0"
 }
 
-// ModulePath returns the path part of the module without
+// ModuleRootPath returns the path part of the module without
 // its major version suffix.
-func (f *File) ModulePath() string {
+func (f *File) ModuleRootPath() string {
 	path, _, _ := ast.SplitPackageVersion(f.QualifiedModule())
 	return path
 }

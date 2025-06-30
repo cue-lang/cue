@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "edd97e63_6681a1a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-30T12:56:27Z",
+      "side": 1,
+      "message": "It doesn\u0027t look like this is sparse, unless I\u0027m missing something. This could lead to inefficiencies. But we can deal with it then.",
+      "revId": "ba96979b98882f6284b937877a9e1df62cae25c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e4d8cda_7354ca49",
+        "filename": "internal/intset/set.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-06-30T12:56:27Z",
+      "side": 1,
+      "message": "Maybe switch AI to American spelling?",
+      "revId": "ba96979b98882f6284b937877a9e1df62cae25c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

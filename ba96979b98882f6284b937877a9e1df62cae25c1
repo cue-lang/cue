@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccc20a3f_c53c410a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-30T14:05:05Z",
+      "side": 1,
+      "message": "It\u0027s definitely sparse: it\u0027s a regular single level hash table with linear probing, using bit masking for the hash, which isn\u0027t great in general but works OK for this use case. The O(1) clear time is implemented by using generations: a given entry is considered \"present\" if its slot matches the current generation.\n\nI updated the comments to try to make that a bit clearer.",
+      "parentUuid": "edd97e63_6681a1a0",
+      "revId": "ba96979b98882f6284b937877a9e1df62cae25c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9e4d8cda_7354ca49",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-06-30T12:56:27Z",
       "side": 1,
       "message": "Maybe switch AI to American spelling?",
+      "revId": "ba96979b98882f6284b937877a9e1df62cae25c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6cd919d_ea815116",
+        "filename": "internal/intset/set.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-30T14:05:05Z",
+      "side": 1,
+      "message": "Fixed spelling.",
+      "parentUuid": "9e4d8cda_7354ca49",
       "revId": "ba96979b98882f6284b937877a9e1df62cae25c1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eef9a480_1e496ada",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-30T14:40:50Z",
+      "side": 1,
+      "message": "LGTM modulo some concern about a possible panic and a few other minor thoughts.",
+      "revId": "5b20c7220c955cd451a8a9c8503d221788783a1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25e1b8e8_dd4594da",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1074,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-30T14:40:50Z",
+      "side": 1,
+      "message": "It would be quite nice to have a doc comment explaining the role of this field: is it storing actual useful data or just there to amortize allocations?",
+      "revId": "5b20c7220c955cd451a8a9c8503d221788783a1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8b3ac08_25c4e1f3",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 552,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-30T14:40:50Z",
+      "side": 1,
+      "message": "What if reqSetsCopy is non-nil but isn\u0027t as long as baseRequired?\nIf that\u0027s possible then it looks like this would panic. If not, perhaps\nadd a comment stating why we know it\u0027s not possible?",
+      "revId": "5b20c7220c955cd451a8a9c8503d221788783a1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f8186f9_b8d1344f",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 555,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-06-30T14:40:50Z",
+      "side": 1,
+      "message": "The original code was so simple here that it might be nice to keep some record of that, because the logic it\u0027s replaced with is not entirely trivial to see through.",
+      "revId": "5b20c7220c955cd451a8a9c8503d221788783a1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

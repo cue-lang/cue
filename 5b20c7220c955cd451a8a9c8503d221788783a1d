@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa4fe512_d04c9e93",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-06-30T15:03:00Z",
+      "side": 1,
+      "message": "Joel clarified last week that this patch doesn\u0027t really help, so I don\u0027t think I will pursue this for now. I just forgot to come back here and mark it as such.",
+      "revId": "5b20c7220c955cd451a8a9c8503d221788783a1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "25e1b8e8_dd4594da",

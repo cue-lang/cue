@@ -16,6 +16,24 @@
       "message": "I\u0027m a bit surprised there\u0027s not a single case when `external` is true. Worth adding one, perhaps?",
       "revId": "02c93b2870d427ae5dea97b382aeed4874cccad5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f0b4aa2_aa5de257",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-01T15:07:55Z",
+      "side": 1,
+      "message": "I think I must be misunderstanding: there are lots of tests where the one local module is `external: false`, and all the other modules are `external: true`. Am I missing something?",
+      "parentUuid": "c69141e5_e6b8f949",
+      "revId": "02c93b2870d427ae5dea97b382aeed4874cccad5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -904,6 +904,8 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, init func(*state)) (ex
 		if s.schemaVersion == VersionKubernetesCRD && s.isRoot {
 			// The root of a CRD is always a resource, so treat it as if it contained
 			// the x-kubernetes-embedded-resource keyword
+			// TODO remove this behavior now that we have an explicit
+			// ExtractCRDs function which does a better job at doing this.
 			c := constraintMap["x-kubernetes-embedded-resource"]
 			if c.phase != pass {
 				continue

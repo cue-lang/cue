@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87c94a4b_b10b22d7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-01T14:44:38Z",
+      "side": 1,
+      "message": "LGTM modulo one minor suggestion.",
+      "revId": "6dc425497bbdab09ea51bef23eccd0a1a7fca00d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "747757b6_b11b116b",
+        "filename": "internal/mod/modpkgload/pkgload_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-01T14:44:38Z",
+      "side": 1,
+      "message": "I don\u0027t think I\u0027d put the question mark here - it makes it look like an optional field! (and other bool-valued fields don\u0027t have a question mark).",
+      "revId": "6dc425497bbdab09ea51bef23eccd0a1a7fca00d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

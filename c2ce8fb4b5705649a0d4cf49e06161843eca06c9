@@ -16,6 +16,24 @@
       "message": "Slightly surprised/dismayed by the fact that no test results changed with this having changed. Might be kinda nice to have a test that does, given that `cue mod tidy` seems to rely on this behaviour, so we\u0027re clearly not covering something. But np if it\u0027s tricky to do.",
       "revId": "c2ce8fb4b5705649a0d4cf49e06161843eca06c9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fa9bfab_d3b8b7d7",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-01T13:22:21Z",
+      "side": 1,
+      "message": "At a minimum, the cuelsp tests will (eventually) cover this. But I\u0027ll try to add an explicit test for this now.",
+      "parentUuid": "545b9ac3_dab4c406",
+      "revId": "c2ce8fb4b5705649a0d4cf49e06161843eca06c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

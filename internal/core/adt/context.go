@@ -1091,7 +1091,7 @@ func (c *OpContext) typeErrorAs(v Value, k Kind, as interface{}) {
 	}
 }
 
-var emptyNode = &Vertex{}
+var emptyNode = &Vertex{status: finalized}
 
 func pos(x Node) token.Pos {
 	if x.Source() == nil {

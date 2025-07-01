@@ -34,6 +34,24 @@
       "parentUuid": "545b9ac3_dab4c406",
       "revId": "c2ce8fb4b5705649a0d4cf49e06161843eca06c9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65cc8d3d_025b626f",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-01T14:39:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7fa9bfab_d3b8b7d7",
+      "revId": "c2ce8fb4b5705649a0d4cf49e06161843eca06c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

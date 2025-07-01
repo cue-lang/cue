@@ -7,6 +7,7 @@ main.test@v0:main
 main.test@v0:main
 	flags: inAll,isRoot,fromRoot,importsLoaded
 	mod: main.test@v0
+	external: false
 	location: .
 	imports:
 		example.com/blah@v0
@@ -24,12 +25,14 @@ main.test@v0:main
 main.test@v0:main
 	flags: inAll,isRoot,fromRoot,importsLoaded
 	mod: main.test@v0
+	external: false
 	location: .
 	imports:
 		example.com/blah@v0
 example.com/blah@v0
 	flags: inAll,isRoot,fromRoot,importsLoaded
 	mod: example.com@v0.0.1
+	external: true
 	location: _registry/example.com_v0.0.1/blah
 	imports:
 		foo.com/bar/hello/goodbye@v0

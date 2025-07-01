@@ -75,3 +75,35 @@ _embeddedResource: {
 		...
 	}
 }
+-- out/decodeCRD/extractCRD/0/v1 --
+package v1
+
+_embeddedResource
+apiVersion?: string
+kind?:       string
+metadata?: {}
+r1?: {
+	_embeddedResource
+	...
+}
+r2?: {
+	_embeddedResource
+	foo?: string
+}
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?: {
+		...
+	}
+}
+apiVersion: "example.com/v1"
+kind:       "MyApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]: string
+	annotations?: [string]: string
+	...
+}

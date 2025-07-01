@@ -56,6 +56,7 @@ type ImportPath struct {
 func (parts ImportPath) Canonical() ImportPath {
 	q := impliedQualifier(parts.Path)
 	if q == "" {
+		parts.ExplicitQualifier = parts.Qualifier != ""
 		return parts
 	}
 	if q == parts.Qualifier {

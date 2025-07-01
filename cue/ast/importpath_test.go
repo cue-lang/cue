@@ -230,6 +230,18 @@ var canonicalWithManuallyConstructedImportPathTests = []struct {
 		ExplicitQualifier: true,
 	},
 	wantString: "foo.com/bar:other",
+}, {
+	testName: "HostOnly",
+	ip: ImportPath{
+		Path:      "foo.com",
+		Qualifier: "bar",
+	},
+	want: ImportPath{
+		Path:              "foo.com",
+		Qualifier:         "bar",
+		ExplicitQualifier: true,
+	},
+	wantString: "foo.com:bar",
 }}
 
 func TestCanonicalWithManuallyConstructedImportPath(t *testing.T) {

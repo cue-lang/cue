@@ -1,0 +1,141 @@
+#version: k8sCRD
+
+-- schema.yaml --
+- apiVersion: apiextensions.k8s.io/v1
+  kind: CustomResourceDefinition
+  metadata:
+    name: myapps.example.com
+  spec:
+    group: example.com
+    scope: Namespaced
+    names:
+      kind: MyApp
+      singular: myapp
+      plural: myapps
+    versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            intField:
+              type: number
+              format: uint32
+    - name: v2alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            otherField:
+              type: string
+- apiVersion: apiextensions.k8s.io/v1
+  kind: CustomResourceDefinition
+  metadata:
+    # name must be in the form: <plural>.<group>
+    name: myapps.example.com
+  spec:
+    group: other.com
+    scope: Namespaced
+    names:
+      kind: OtherApp
+      singular: myapp
+      plural: myapps
+    versions:
+    - name: v6
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            intField:
+              type: number
+              format: uint32
+-- out/decodeCRD/extractCRD/0/v1 --
+package v1
+
+_embeddedResource
+spec?: {
+	...
+}
+intField?: uint32
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?: {
+		...
+	}
+}
+apiVersion: "example.com/v1"
+kind:       "MyApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]: string
+	annotations?: [string]: string
+	...
+}
+-- out/decodeCRD/extractCRD/0/v2alpha1 --
+package v2alpha1
+
+_embeddedResource
+spec?: {
+	...
+}
+otherField?: string
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?: {
+		...
+	}
+}
+apiVersion: "example.com/v2alpha1"
+kind:       "MyApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]: string
+	annotations?: [string]: string
+	...
+}
+-- out/decodeCRD/extractCRD/1/v6 --
+package v6
+
+_embeddedResource
+spec?: {
+	...
+}
+intField?: uint32
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?: {
+		...
+	}
+}
+apiVersion: "other.com/v6"
+kind:       "OtherApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]: string
+	annotations?: [string]: string
+	...
+}

@@ -7,12 +7,14 @@ main.test@v0:main
 main.test@v0:main
 	flags: inAll,isRoot,fromRoot,importsLoaded
 	mod: main.test@v0
+	external?: true
 	location: .
 	imports:
 		other.com/blah
 other.com/blah
 	flags: inAll,isRoot,fromRoot,importsLoaded
 	mod: local
+	external?: true
 	location: cue.mod/gen/other.com/blah
 	location: cue.mod/usr/other.com/blah
 	location: cue.mod/pkg/other.com/blah

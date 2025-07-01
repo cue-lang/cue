@@ -195,6 +195,15 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 	return
 }
 
+func TestIssue3985(t *testing.T) {
+	// We run the evaluator twice with different versions of the evaluator. Each
+	// results in the use of emptyNode. Ensure that the it does not get
+	// assigned a nodeContext.
+	cuecontext.New().CompileString(`a!: _, b: [for c in a if a != _|_ {}]`)
+
+	cuecontext.New(cuecontext.EvaluatorVersion(cuecontext.EvalV2)).CompileString(`matchN(0, [_|_]) & []`)
+}
+
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
 	adt.DebugDeps = true

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "491d330e_a829383d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-01T13:11:40Z",
+      "side": 1,
+      "message": "I agree with the name change in principle but still better to avoid API breakage when it\u0027s easily avoided IMHO. +2 assuming that\u0027s avoided.",
+      "revId": "eb9e90ecfd9295fa823a5f814bc13cf368378436",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f51fce6c_4cbe7a65",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-01T13:11:40Z",
+      "side": 1,
+      "message": "I know this is in an internal package but in fact it\u0027s public API (mod/modfile.File is an alias for internal/mod/modfiledata.File), so given that we don\u0027t have a pressing need, I\u0027d suggest leading `ModulePath` in place, forwarding to `ModuleRootPath` and deprecate it, so we don\u0027t have easily-avoided API breakage.",
+      "revId": "eb9e90ecfd9295fa823a5f814bc13cf368378436",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

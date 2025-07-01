@@ -43,3 +43,5 @@
 ERROR:
 additionalProperties may not be combined with properties in Kubernetes CRD:
     schema.json:21:21
+-- out/decodeCRD/extractCRD/error --
+additionalProperties may not be combined with properties in Kubernetes CRD

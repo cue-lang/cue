@@ -33,6 +33,24 @@
       "message": "I know this is in an internal package but in fact it\u0027s public API (mod/modfile.File is an alias for internal/mod/modfiledata.File), so given that we don\u0027t have a pressing need, I\u0027d suggest leading `ModulePath` in place, forwarding to `ModuleRootPath` and deprecate it, so we don\u0027t have easily-avoided API breakage.",
       "revId": "eb9e90ecfd9295fa823a5f814bc13cf368378436",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f77232aa_a8d44869",
+        "filename": "internal/mod/modfiledata/modfile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-01T14:17:31Z",
+      "side": 1,
+      "message": "Done.\n\nThough both modfiledata and modfile carry the warning:\n\n```\n// WARNING: THIS PACKAGE IS EXPERIMENTAL.\n// ITS API MAY CHANGE AT ANY TIME.\n```",
+      "parentUuid": "f51fce6c_4cbe7a65",
+      "revId": "eb9e90ecfd9295fa823a5f814bc13cf368378436",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

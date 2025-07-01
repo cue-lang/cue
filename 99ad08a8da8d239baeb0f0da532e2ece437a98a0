@@ -16,6 +16,24 @@
       "message": "set this explicitly to EvalV3 so that it\u0027s not dependent on the current default",
       "revId": "99ad08a8da8d239baeb0f0da532e2ece437a98a0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39e0576d_23b44adf",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-01T16:44:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fddf4632_b932dd45",
+      "revId": "99ad08a8da8d239baeb0f0da532e2ece437a98a0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

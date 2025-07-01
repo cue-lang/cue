@@ -18,8 +18,10 @@ import (
 	"bytes"
 	"fmt"
 	"io/fs"
+	"maps"
 	"net/url"
 	"path"
+	"slices"
 	"strings"
 	"testing"
 
@@ -129,9 +131,6 @@ func TestDecode(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err := v.Err(); err != nil {
-			t.Fatal(err)
-		}
 
 		w := t.Writer("extract")
 		expr, err := jsonschema.Extract(v, cfg)
@@ -234,9 +233,56 @@ func TestDecode(t *testing.T) {
 	})
 }
 
+func TestDecodeCRD(t *testing.T) {
+	test := cuetxtar.TxTarTest{
+		Root:   "./testdata/txtar",
+		Name:   "decodeCRD",
+		Matrix: cuetdtest.FullMatrix,
+	}
+	test.Run(t, func(t *cuetxtar.Test) {
+		if versStr, ok := t.Value("version"); !ok || versStr != "k8sCRD" {
+			t.Skip("test not relevant to CRDs")
+		}
+
+		ctx := t.CueContext()
+
+		fsys, err := txtar.FS(t.Archive)
+		if err != nil {
+			t.Fatal(err)
+		}
+		v, err := readSchema(ctx, fsys)
+		if err != nil {
+			t.Fatal(err)
+		}
+		crds, err := jsonschema.ExtractCRDs(v, &jsonschema.CRDConfig{})
+		if err != nil {
+			w := t.Writer("extractCRD/error")
+			fmt.Fprintf(w, "%v\n", err)
+			return
+		}
+		for i, crd := range crds {
+			if crd == nil {
+				t.Fatal("nil crd")
+			}
+			for _, version := range slices.Sorted(maps.Keys(crd.Versions)) {
+				w := t.Writer(fmt.Sprintf("extractCRD/%d/%s", i, version))
+				f := crd.Versions[version]
+				b, err := format.Node(f, format.Simplify())
+				if err != nil {
+					t.Fatal(errors.Details(err, nil))
+				}
+				b = append(bytes.TrimSpace(b), '\n')
+				w.Write(b)
+				// TODO test that schema actually works.
+			}
+		}
+	})
+}
+
 func readSchema(ctx *cue.Context, fsys fs.FS) (cue.Value, error) {
 	jsonData, jsonErr := fs.ReadFile(fsys, "schema.json")
 	yamlData, yamlErr := fs.ReadFile(fsys, "schema.yaml")
+	var v cue.Value
 	switch {
 	case jsonErr == nil && yamlErr == nil:
 		return cue.Value{}, fmt.Errorf("cannot define both schema.json and schema.yaml")
@@ -245,15 +291,20 @@ func readSchema(ctx *cue.Context, fsys fs.FS) (cue.Value, error) {
 		if err != nil {
 			return cue.Value{}, err
 		}
-		return ctx.BuildExpr(expr), nil
+		v = ctx.BuildExpr(expr)
 	case yamlErr == nil:
 		file, err := yaml.Extract("schema.yaml", yamlData)
 		if err != nil {
 			return cue.Value{}, err
 		}
-		return ctx.BuildFile(file), nil
+		v = ctx.BuildFile(file)
+	default:
+		return cue.Value{}, fmt.Errorf("no schema.yaml or schema.json file found for test")
 	}
-	return cue.Value{}, fmt.Errorf("no schema.yaml or schema.json file found for test")
+	if err := v.Err(); err != nil {
+		return cue.Value{}, err
+	}
+	return v, nil
 }
 
 func TestMapURL(t *testing.T) {

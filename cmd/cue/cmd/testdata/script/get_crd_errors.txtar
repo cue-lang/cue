@@ -1,0 +1,62 @@
+# Test error cases and edge cases for CRD conversion
+
+# Test no arguments
+! exec cue get crd
+stderr 'must specify at least one file'
+
+# Test non-existent file
+! exec cue get crd nonexistent.yaml
+stderr 'could not find file'
+
+# Test invalid YAML
+! exec cue get crd invalid.yaml
+stderr 'invalid.yaml: did not find expected node content'
+
+# Test YAML with no CRDs.
+exec cue get crd non-crd.yaml
+# Should succeed but create no files since no matching CRDs
+! exists example.com
+
+# Test CRD with no matching group
+exec cue get crd --group nonexistent.com sample-crd.yaml
+# Should succeed but create no files
+! exists nonexistent.com
+! exists example.com
+
+-- sample-crd.yaml --
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: foos.example.com
+spec:
+  group: example.com
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              replicas:
+                type: integer
+              image:
+                type: string
+  scope: Namespaced
+  names:
+    plural: foos
+    singular: foo
+    kind: Foo
+
+-- invalid.yaml --
+}
+-- non-crd.yaml --
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-config
+data:
+  key: value

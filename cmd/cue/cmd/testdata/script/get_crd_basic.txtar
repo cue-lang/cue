@@ -1,0 +1,260 @@
+# Test basic CRD conversion functionality
+
+# Test single CRD conversion
+exec cue get crd --group example.com sample-crd.yaml
+cmp v1/foo.cue foo.cue.golden
+
+# Test multiple CRDs with group filtering
+exec cue get crd --group example.com multi-crd.yaml
+cmp v1/foo.cue foo-multi.cue.golden
+cmp v1beta1/bar.cue bar.cue.golden
+exec cue vet ./v1
+
+# Verify that CRDs from other groups are not created
+! exists other.com/v1/other.cue
+
+# Check that it's an error if we don't specify a group.
+! exec cue get crd multi-crd.yaml
+stderr 'multiple CRD groups found: example.com other.com'
+
+-- sample-crd.yaml --
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: foos.example.com
+spec:
+  group: example.com
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              replicas:
+                type: integer
+                minimum: 1
+                description: "Number of replicas"
+              image:
+                type: string
+                description: "Container image"
+            required:
+            - replicas
+            - image
+          status:
+            type: object
+            properties:
+              ready:
+                type: boolean
+                description: "Whether the resource is ready"
+  scope: Namespaced
+  names:
+    plural: foos
+    singular: foo
+    kind: Foo
+    shortNames:
+    - f
+
+-- multi-crd.yaml --
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: foos.example.com
+spec:
+  group: example.com
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              replicas:
+                type: integer
+                minimum: 1
+              image:
+                type: string
+            required:
+            - replicas
+            - image
+  scope: Namespaced
+  names:
+    plural: foos
+    singular: foo
+    kind: Foo
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: bars.example.com
+spec:
+  group: example.com
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              size:
+                type: string
+                enum: ["small", "medium", "large"]
+              enabled:
+                type: boolean
+                default: true
+            required:
+            - size
+          status:
+            type: object
+            properties:
+              phase:
+                type: string
+              ready:
+                type: boolean
+  scope: Cluster
+  names:
+    plural: bars
+    singular: bar
+    kind: Bar
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: others.other.com
+spec:
+  group: other.com
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              config:
+                type: string
+  scope: Namespaced
+  names:
+    plural: others
+    singular: other
+    kind: Other
+
+-- foo.cue.golden --
+package v1
+
+#Foo: {
+	_embeddedResource
+	"spec"?: {
+		// Number of replicas
+		"replicas"!: int & >=1
+
+		// Container image
+		"image"!: string
+	}
+	"status"?: {
+		// Whether the resource is ready
+		"ready"?: bool
+	}
+
+	_embeddedResource: {
+		"apiVersion"!: string
+		"kind"!:       string
+		"metadata"?: {
+			...
+		}
+	}
+	apiVersion: "example.com/v1"
+	kind:       "Foo"
+	metadata!: {
+		"name"!:      string
+		"namespace"!: string
+		"labels"?: {
+			[string]: string
+		}
+		"annotations"?: {
+			[string]: string
+		}
+		...
+	}
+}
+-- foo-multi.cue.golden --
+package v1
+
+#Foo: {
+	_embeddedResource
+	"spec"?: {
+		"replicas"!: int & >=1
+		"image"!:    string
+	}
+
+	_embeddedResource: {
+		"apiVersion"!: string
+		"kind"!:       string
+		"metadata"?: {
+			...
+		}
+	}
+	apiVersion: "example.com/v1"
+	kind:       "Foo"
+	metadata!: {
+		"name"!:      string
+		"namespace"!: string
+		"labels"?: {
+			[string]: string
+		}
+		"annotations"?: {
+			[string]: string
+		}
+		...
+	}
+}
+-- bar.cue.golden --
+package v1beta1
+
+#Bar: {
+	_embeddedResource
+	"spec"?: {
+		"size"!:    "small" | "medium" | "large"
+		"enabled"?: bool
+	}
+	"status"?: {
+		"phase"?: string
+		"ready"?: bool
+	}
+
+	_embeddedResource: {
+		"apiVersion"!: string
+		"kind"!:       string
+		"metadata"?: {
+			...
+		}
+	}
+	apiVersion: "example.com/v1beta1"
+	kind:       "Bar"
+	metadata!: {
+		"name"!:      string
+		"namespace"?: string
+		"labels"?: {
+			[string]: string
+		}
+		"annotations"?: {
+			[string]: string
+		}
+		...
+	}
+}

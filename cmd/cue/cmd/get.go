@@ -37,5 +37,6 @@ For information on native CUE modules:
 `,
 	})
 	cmd.AddCommand(newGoCmd(c))
+	cmd.AddCommand(newCRDCmd(c))
 	return cmd
 }

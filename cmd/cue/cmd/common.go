@@ -492,6 +492,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 
 	builds := loadFromArgs(args, cfg.loadCfg)
 	if builds == nil {
+		panic("wtf?")
 		return nil, errors.Newf(token.NoPos, "invalid args")
 	}
 

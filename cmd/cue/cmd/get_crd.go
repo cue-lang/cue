@@ -1,0 +1,244 @@
+// Copyright 2025 The CUE Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package cmd
+
+import (
+	"fmt"
+	"log"
+	"maps"
+	"os"
+	"path/filepath"
+	"slices"
+	"strings"
+
+	"github.com/spf13/cobra"
+
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/load"
+	"cuelang.org/go/encoding/jsonschema"
+	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/encoding"
+)
+
+func newCRDCmd(c *Command) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "crd <files>",
+		Short: "add Kubernetes CRD dependencies to the current module",
+		Long: `crd converts Kubernetes Custom Resource Definitions (CRDs)
+to CUE packages.
+
+It reads all the argument files and creates a version package
+in the current directory for each CRD found that matches the group
+specified by the --group flag, as determined by the spec.group field.
+
+If the --group flag is not provided, then all the CRDs found must have the same group.
+
+Each package contains a definition named after the spec.names.kind field in
+each extracted CRD.
+
+Example:
+    cue get crd --group example.com ./crds/*.yaml
+    curl https://raw.githubusercontent.com/example/crd.yaml | cue get crd yaml: -
+`,
+		RunE: mkRunE(c, runCRD),
+	}
+
+	cmd.Flags().StringP(string(flagGroup), "g", "", "CRD group to filter by")
+	return cmd
+}
+
+func runCRD(cmd *Command, args []string) error {
+	group := flagGroup.String(cmd)
+	if len(args) == 0 {
+		return fmt.Errorf("must specify at least one file")
+	}
+	insts := load.Instances(args, nil)
+	if len(insts) != 1 {
+		if len(insts) > 1 {
+			return fmt.Errorf("cannot specify multiple packages to cue get crd")
+		}
+		// Can't happen?
+		return fmt.Errorf("no files or packages specified")
+	}
+	inst := insts[0]
+	if inst.Err != nil {
+		return inst.Err
+	}
+	if !inst.User {
+		// TODO remove this restriction?
+		return fmt.Errorf("input must be individual files not packages")
+	}
+	groups := make(map[string]bool)
+	autoGroup := group == ""
+	for _, f := range inst.OrphanedFiles {
+		d := encoding.NewDecoder(cmd.ctx, f, nil)
+		for ; !d.Done(); d.Next() {
+			v := cmd.ctx.BuildFile(d.File())
+			if err := v.Err(); err != nil {
+				return err
+			}
+			crds, err := jsonschema.ExtractCRDs(v, nil)
+			if err != nil {
+				// TODO include the filename of the original in the error message?
+				return err
+			}
+			for _, crd := range crds {
+				if autoGroup {
+					groups[crd.Data.Spec.Group] = true
+					if group == "" {
+						group = crd.Data.Spec.Group
+					} else if crd.Data.Spec.Group != group {
+						// We'll generate the error later when we know all the groups involved.
+						continue
+					}
+				} else if crd.Data.Spec.Group != group {
+					continue
+				}
+				for version, file := range crd.Versions {
+					// TODO there's a potential security issue if the version or kind
+					// contain a path separator.
+					newf := &ast.File{
+						Decls: []ast.Decl{
+							&ast.Package{
+								Name: ast.NewIdent(version),
+							},
+							&ast.Field{
+								Label: ast.NewIdent("#" + crd.Data.Spec.Names.Kind),
+								Value: internal.ToExpr(file),
+							},
+						},
+					}
+					data, err := format.Node(newf)
+					if err != nil {
+						return err
+					}
+					if err := os.MkdirAll(version, 0o777); err != nil {
+						return err
+					}
+					log.Printf("writing %s", filepath.Join(version, crd.Data.Spec.Names.Singular+".cue"))
+					if err := os.WriteFile(filepath.Join(version, crd.Data.Spec.Names.Singular+".cue"), data, 0o666); err != nil {
+						return err
+					}
+				}
+			}
+		}
+		if err := d.Err(); err != nil {
+			return err
+		}
+	}
+	if autoGroup && len(groups) > 1 {
+		return fmt.Errorf("multiple CRD groups found: %v", strings.Join(slices.Sorted(maps.Keys(groups)), " "))
+	}
+	return nil
+}
+
+//	builds := loadFromArgs(args, nil)
+//
+//	b, err := parseArgs(cmd, args, &config{mode: filetypes.Input})
+//	if err != nil {
+//		return err
+//	}
+//	iter := b.instances()
+//	defer iter.close()
+//	for iter.scan() {
+//		v := iter.value()
+//		log.Printf("got %v", v)
+//	}
+//	if err := iter.err(); err != nil {
+//		return err
+//	}
+//	return nil
+//}
+
+//
+//func generateCUEPackage(ctx *cue.Context, crd *CRDSpec) error {
+//	// Create directory structure: <group>/<version>/
+//	for _, version := range crd.Spec.Versions {
+//		pkgDir := filepath.Join(crd.Spec.Group, version.Name)
+//		if err := os.MkdirAll(pkgDir, 0755); err != nil {
+//			return fmt.Errorf("failed to create directory %s: %w", pkgDir, err)
+//		}
+//
+//		// Generate CUE file for this version
+//		fileName := fmt.Sprintf("%s.cue", strings.ToLower(crd.Spec.Names.Kind))
+//		filePath := filepath.Join(pkgDir, fileName)
+//
+//		if err := generateCUEFile(cmd, crd, version.Name, filePath); err != nil {
+//			return fmt.Errorf("failed to generate CUE file %s: %w", filePath, err)
+//		}
+//
+//		fmt.Printf("Generated %s\n", filePath)
+//	}
+//
+//	return nil
+//}
+//
+//func generateCUEFile(ctx *cue.Context, crd *CRDSpec, versionName, filePath string) error {
+//	// Find the version schema
+//	var versionSchema interface{}
+//	for _, v := range crd.Spec.Versions {
+//		if v.Name == versionName {
+//			versionSchema = v.Schema.OpenAPIV3Schema
+//			break
+//		}
+//	}
+//
+//	if versionSchema == nil {
+//		return fmt.Errorf("schema not found for version %s", versionName)
+//	}
+//
+//	// Convert OpenAPI schema to CUE value
+//	schemaValue := cmd.ctx.Encode(versionSchema)
+//
+//	// Use the new ExtractCRD function from jsonschema package
+//	config := &jsonschema.Config{
+//		PkgName:        versionName,
+//		StrictFeatures: false,
+//		StrictKeywords: true,
+//		DefaultVersion: jsonschema.VersionKubernetesCRD,
+//	}
+//
+//	f, err := jsonschema.ExtractCRD(schemaValue, config, crd.Spec.Names.Kind, crd.Spec.Group, versionName, crd.Spec.Scope)
+//	if err != nil {
+//		return fmt.Errorf("failed to extract CRD schema: %w", err)
+//	}
+//
+//	// Format and write the file
+//	formatted, err := format.Node(f)
+//	if err != nil {
+//		return fmt.Errorf("failed to format CUE file: %w", err)
+//	}
+//
+//	return os.WriteFile(filePath, formatted, 0644)
+//}
+//
+//func downloadURL(url string) ([]byte, error) {
+//	resp, err := http.Get(url)
+//	if err != nil {
+//		return nil, err
+//	}
+//	defer resp.Body.Close()
+//
+//	if resp.StatusCode != http.StatusOK {
+//		return nil, fmt.Errorf("HTTP error: %s", resp.Status)
+//	}
+//
+//	data, err := io.ReadAll(resp.Body)
+//	if err != nil {
+//		return nil, fmt.Errorf("error fetching %s: %v", url, err)
+//	}
+//	return data, err
+//}

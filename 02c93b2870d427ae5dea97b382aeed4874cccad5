@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c69141e5_e6b8f949",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-01T14:46:23Z",
+      "side": 1,
+      "message": "I\u0027m a bit surprised there\u0027s not a single case when `external` is true. Worth adding one, perhaps?",
+      "revId": "02c93b2870d427ae5dea97b382aeed4874cccad5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

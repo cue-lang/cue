@@ -1,0 +1,147 @@
+# Test complex CRD schemas with nested objects and arrays
+
+exec cue get crd --group myapp.com complex-crd.yaml
+cmp v1/database.cue database.cue.golden
+
+-- complex-crd.yaml --
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: databases.myapp.com
+spec:
+  group: myapp.com
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              engine:
+                type: string
+                enum: ["postgres", "mysql", "mongodb"]
+              version:
+                type: string
+                pattern: '^[0-9]+\.[0-9]+$'
+              replicas:
+                type: integer
+                minimum: 1
+                maximum: 10
+              resources:
+                type: object
+                properties:
+                  cpu:
+                    type: string
+                  memory:
+                    type: string
+                  storage:
+                    type: string
+                required:
+                - cpu
+                - memory
+              config:
+                type: object
+                additionalProperties:
+                  type: string
+              backups:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    schedule:
+                      type: string
+                    retention:
+                      type: string
+                  required:
+                  - schedule
+            required:
+            - engine
+            - version
+            - replicas
+            - resources
+          status:
+            type: object
+            properties:
+              phase:
+                type: string
+                enum: ["Pending", "Running", "Failed"]
+              conditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    status:
+                      type: string
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+              endpoint:
+                type: string
+              readyReplicas:
+                type: integer
+  scope: Namespaced
+  names:
+    plural: databases
+    singular: database
+    kind: Database
+
+-- database.cue.golden --
+package v1
+
+#Database: {
+	_embeddedResource
+	"spec"?: {
+		"engine"!:   "postgres" | "mysql" | "mongodb"
+		"version"!:  =~"^[0-9]+\\.[0-9]+$"
+		"replicas"!: int & >=1 & <=10
+		"resources"!: {
+			"cpu"!:     string
+			"memory"!:  string
+			"storage"?: string
+		}
+		"config"?: {
+			[string]: string
+		}
+		"backups"?: [...{
+			"schedule"!:  string
+			"retention"?: string
+		}]
+	}
+	"status"?: {
+		"phase"?: "Pending" | "Running" | "Failed"
+		"conditions"?: [...{
+			"type"?:               string
+			"status"?:             string
+			"lastTransitionTime"?: time.Time
+		}]
+		"endpoint"?:      string
+		"readyReplicas"?: int
+	}
+
+	_embeddedResource: {
+		"apiVersion"!: string
+		"kind"!:       string
+		"metadata"?: {
+			...
+		}
+	}
+	apiVersion: "myapp.com/v1"
+	kind:       "Database"
+	metadata!: {
+		"name"!:      string
+		"namespace"!: string
+		"labels"?: {
+			[string]: string
+		}
+		"annotations"?: {
+			[string]: string
+		}
+		...
+	}
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "545b9ac3_dab4c406",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-01T13:15:09Z",
+      "side": 1,
+      "message": "Slightly surprised/dismayed by the fact that no test results changed with this having changed. Might be kinda nice to have a test that does, given that `cue mod tidy` seems to rely on this behaviour, so we\u0027re clearly not covering something. But np if it\u0027s tricky to do.",
+      "revId": "c2ce8fb4b5705649a0d4cf49e06161843eca06c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

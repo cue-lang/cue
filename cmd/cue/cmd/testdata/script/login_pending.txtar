@@ -1,3 +1,5 @@
+[short] skip 'cue login tests sleep for a minimum of 1s per the RFC'
+
 # Test that `cue login` succeeds with the device flow
 # when the device login is authorized after the first polling request.
 

@@ -159,22 +159,14 @@ setupGoActionsCaches: [
 		with: cache: "go"
 	},
 
-	// All tests on protected branches should skip the test cache.  The
-	// canonical way to do this is with -count=1. However, we want the
-	// resulting test cache to be valid and current so that subsequent CLs
-	// in the trybot repo can leverage the updated cache. Therefore, we
-	// instead perform a clean of the testcache.
+	// All tests on protected branches should skip the test cache,
+	// which helps spot test flakes and bugs hidden by the caching.
 	//
-	// Critically we only want to do this in the main repo, not the trybot
-	// repo.
-	//
-	// TODO(mvdan): rethink for Namespace, where trimming the cache size is irrelevant.
-	// A better approach there is likely to set GOFLAGS=-count=1 for "go test",
-	// assuming that does not interfere with other commands like "go vet",
-	// as -count=1 is the canonical way to disable test caching.
+	// Critically, we don't skip the test cache on the trybot repo,
+	// so that the testing of CLs can rely on an up to date test cache.
 	githubactions.#Step & {
 		if:  "github.repository == '\(githubRepositoryPath)' && (\(isProtectedBranch) || \(isTestDefaultBranch))"
-		run: "go clean -testcache"
+		run: "go env -w GOFLAGS=-count=1"
 	},
 ]
 

@@ -62,6 +62,11 @@ jobs:
         run: |-
           go env -w GOTOOLCHAIN=local
 
+          case $(go env GOARCH) in
+          amd64) go env -w GOAMD64=v3 ;;   # 2013 and later; makes `go test -race` 15% faster
+          arm64) go env -w GOARM64=v8.6 ;; # Apple M2 and later
+          esac
+
           # Dump env for good measure
           go env
       - name: Setup qemu

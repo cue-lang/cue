@@ -1,3 +1,5 @@
+[short] skip 'cue login tests sleep for a minimum of 1s per the RFC'
+
 # Test that `cue login` fails when given an error
 # such as a device_code being expired.
 

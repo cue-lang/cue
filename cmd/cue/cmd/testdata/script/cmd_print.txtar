@@ -1,3 +1,5 @@
+[short] skip 'this test uses sleeps'
+
 exec cue cmd print
 cmp stdout expect-stdout
 

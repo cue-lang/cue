@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24953bbf_6eed663c",
+        "filename": "internal/core/adt/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-02T10:14:51Z",
+      "side": 1,
+      "message": "reflow: no need to make comments exceed the max columns.",
+      "revId": "22162e4cce66612bf9c0e360362fca7eceb7b489",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2dd7b53_31ce1b38",
+        "filename": "internal/core/adt/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-02T10:14:51Z",
+      "side": 1,
+      "message": "clone is very specifically for (evalv2) disjunctions. This code will be removed and also will not give the right semantics when taking out of context. For one, clone is not guaranteed to be a shallow copy. In general, it is not a good idea to reuse code for purposes for which it is not intended, as this is rather error prone.",
+      "revId": "22162e4cce66612bf9c0e360362fca7eceb7b489",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

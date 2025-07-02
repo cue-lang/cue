@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ada1a27_f4f6a59c",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-02T16:24:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a58aa91_3cc9b8be",
+      "range": {
+        "startLine": 71,
+        "startChar": 56,
+        "endLine": 71,
+        "endChar": 90
+      },
+      "revId": "312ef0adce04bff4b3819ed64433da9e97002db9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5d206cf3_6d567d7a",
@@ -37,6 +61,24 @@
       "writtenOn": "2025-06-27T08:09:52Z",
       "side": 1,
       "message": "This will work for now, but goes somewhat against our plan of \"just let the cache fill up and then reset\". I\u0027d suggest we mark a TODO here for a better approach to running with/without test cache.",
+      "revId": "312ef0adce04bff4b3819ed64433da9e97002db9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6487cbb0_3c344684",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-02T16:24:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d206cf3_6d567d7a",
       "revId": "312ef0adce04bff4b3819ed64433da9e97002db9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

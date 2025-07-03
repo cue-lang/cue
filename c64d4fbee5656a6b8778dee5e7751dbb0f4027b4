@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78fcff24_2afe2509",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-03T11:41:05Z",
+      "side": 1,
+      "message": "Please can you document/link to why this is the correct location?\n\nIt being a temp path doesn\u0027t feel right. But if you know it to be right, please can you explain why/where we know this?",
+      "revId": "c64d4fbee5656a6b8778dee5e7751dbb0f4027b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "99d2c5c7_6fdd9b96",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-03T16:32:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa4c242b_0ba791c3",
+      "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef5cf015_8883c302",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-03T16:17:16Z",
       "side": 1,
       "message": "This summary makes it sound like you\u0027re adding packages as dependencies to the current module, which isn\u0027t what is happening. how about:\n\n\u003e convert Kubernetes CRDs to packages in the current module",
+      "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50af9539_f9a7ad8a",
+        "filename": "cmd/cue/cmd/get_crd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-03T16:32:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef5cf015_8883c302",
       "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e11d16b_92d32b55",
+        "filename": "cmd/cue/cmd/get_crd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-03T16:32:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e0aa9dc9_ede911b0",
+      "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a16a46e7_07706fbe",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-07-03T16:17:16Z",
       "side": 1,
       "message": "are you asking, or saying? if you\u0027re asking this should be a TODO; if you\u0027re saying, I assume this should be a panic or at least say \"please file a bug\"",
+      "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "debe49a1_2a968f4f",
+        "filename": "cmd/cue/cmd/get_crd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-03T16:32:05Z",
+      "side": 1,
+      "message": "I converted it to a TODO. Best to keep the check and error for consistency with the rest of cmd/cue but I\u0027m fairly sure it\u0027s unreachable.",
+      "parentUuid": "a16a46e7_07706fbe",
       "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f200620_e751d5c4",
+        "filename": "cmd/cue/cmd/get_crd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-03T16:32:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab829666_1e15d192",
+      "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d582b7b0_779b3bc5",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-07-03T16:17:16Z",
       "side": 1,
       "message": "nit: join with the line above to remove one indentation level below",
+      "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d461d30_278f52fe",
+        "filename": "cmd/cue/cmd/get_crd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-03T16:32:05Z",
+      "side": 1,
+      "message": "I prefer to keep all fields on their own line in general; I find it more readable and consistent to do that: conversely I find it slower and more awkward to read when there\u0027s a mix between the two styles.",
+      "parentUuid": "d582b7b0_779b3bc5",
       "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1f230fa_9c4ff5d5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-03T14:15:28Z",
+      "side": 1,
+      "message": "Seems ok, but why is this not detected automatically?",
+      "revId": "2f54b85a95e9a5f58782be4b8ad3fe7c3fdedda3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -35,6 +35,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"golang.org/x/sync/errgroup"
+
 	"cuelang.org/go/encoding/jsonschema/internal/externaltest"
 )
 
@@ -59,24 +61,45 @@ func main() {
 }
 
 func doVendor(commit string) error {
-	// Fetch a commit from GitHub via their archive ZIP endpoint, which is a lot faster
-	// than git cloning just to retrieve a single commit's files.
-	// See: https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#download-a-repository-archive-zip
-	zipURL := fmt.Sprintf("https://github.com/json-schema-org/JSON-Schema-Test-Suite/archive/%s.zip", commit)
-	log.Printf("fetching %s", zipURL)
-	resp, err := http.Get(zipURL)
-	if err != nil {
+	// Reading the old test data and fetching a zip file for the upstream data can be done in parallel.
+	// This is useful as each operation takes hundreds of milliseconds.
+	g := new(errgroup.Group)
+	var oldTests map[string][]*externaltest.Schema
+	g.Go(func() error {
+		log.Printf("reading old test data")
+		var err error
+		oldTests, err = externaltest.ReadTestDir(testDir)
+		if err != nil && !errors.Is(err, externaltest.ErrNotFound) {
+			return err
+		}
+		return nil
+	})
+	var fsys fs.FS
+	g.Go(func() error {
+		// Fetch a commit from GitHub via their archive ZIP endpoint, which is a lot faster
+		// than git cloning just to retrieve a single commit's files.
+		// See: https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#download-a-repository-archive-zip
+		zipURL := fmt.Sprintf("https://github.com/json-schema-org/JSON-Schema-Test-Suite/archive/%s.zip", commit)
+		log.Printf("fetching %s", zipURL)
+		resp, err := http.Get(zipURL)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		zipBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		zipr, err := zip.NewReader(bytes.NewReader(zipBytes), int64(len(zipBytes)))
+		if err != nil {
+			return err
+		}
+		// Note that GitHub produces archives with a top-level directory representing
+		// the name of the repository and the version which was retrieved.
+		fsys, err = fs.Sub(zipr, fmt.Sprintf("JSON-Schema-Test-Suite-%s/tests", commit))
 		return err
-	}
-	defer resp.Body.Close()
-	zipBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	log.Printf("reading old test data")
-	oldTests, err := externaltest.ReadTestDir(testDir)
-	if err != nil && !errors.Is(err, externaltest.ErrNotFound) {
+	})
+	if err := g.Wait(); err != nil {
 		return err
 	}
 
@@ -85,17 +108,7 @@ func doVendor(commit string) error {
 	if err := os.RemoveAll(testSubdir); err != nil {
 		return err
 	}
-	zipr, err := zip.NewReader(bytes.NewReader(zipBytes), int64(len(zipBytes)))
-	if err != nil {
-		return err
-	}
-	// Note that GitHub produces archives with a top-level directory representing
-	// the name of the repository and the version which was retrieved.
-	fsys, err := fs.Sub(zipr, fmt.Sprintf("JSON-Schema-Test-Suite-%s/tests", commit))
-	if err != nil {
-		return err
-	}
-	err = fs.WalkDir(fsys, ".", func(filename string, d fs.DirEntry, err error) error {
+	if err := fs.WalkDir(fsys, ".", func(filename string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -121,8 +134,7 @@ func doVendor(commit string) error {
 			return err
 		}
 		return nil
-	})
-	if err != nil {
+	}); err != nil {
 		return err
 	}
 

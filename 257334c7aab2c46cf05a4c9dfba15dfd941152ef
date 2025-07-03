@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa4c242b_0ba791c3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-03T16:17:16Z",
+      "side": 1,
+      "message": "do we want some sort of TODO in the code for URL support, or are we leaving that for the foreseeable future until a user asks for it?",
+      "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef5cf015_8883c302",
+        "filename": "cmd/cue/cmd/get_crd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-03T16:17:16Z",
+      "side": 1,
+      "message": "This summary makes it sound like you\u0027re adding packages as dependencies to the current module, which isn\u0027t what is happening. how about:\n\n\u003e convert Kubernetes CRDs to packages in the current module",
+      "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0aa9dc9_ede911b0",
+        "filename": "cmd/cue/cmd/get_crd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-03T16:17:16Z",
+      "side": 1,
+      "message": "nit: for consistency with markdown and our other help texts, leave an empty line before the indented blockquote\n\n(and indent with tabs, again for consistency)",
+      "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a16a46e7_07706fbe",
+        "filename": "cmd/cue/cmd/get_crd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-03T16:17:16Z",
+      "side": 1,
+      "message": "are you asking, or saying? if you\u0027re asking this should be a TODO; if you\u0027re saying, I assume this should be a panic or at least say \"please file a bug\"",
+      "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab829666_1e15d192",
+        "filename": "cmd/cue/cmd/get_crd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-03T16:17:16Z",
+      "side": 1,
+      "message": "why? can you expand on this TODO? otherwise we will forget the context.",
+      "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d582b7b0_779b3bc5",
+        "filename": "cmd/cue/cmd/get_crd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-03T16:17:16Z",
+      "side": 1,
+      "message": "nit: join with the line above to remove one indentation level below",
+      "revId": "257334c7aab2c46cf05a4c9dfba15dfd941152ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

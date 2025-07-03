@@ -159,9 +159,15 @@ curlGitHubAPI: {
 setupGoActionsCaches: [
 	// Our runner profiles on Namespace are already configured to only update
 	// the cache when they run from one of the protected branches.
+	// We cache for Go (GOCACHE and GOMODCACHE) and staticcheck.
 	githubactions.#Step & {
 		uses: "namespacelabs/nscloud-cache-action@v1"
-		with: cache: "go"
+		with: {
+			cache: "go"
+			path: """
+				${{ runner.temp }}/staticcheck
+				"""
+		}
 	},
 
 	// All tests on protected branches should skip the test cache,

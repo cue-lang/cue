@@ -185,6 +185,7 @@ workflows: trybot: _repo.bashWorkflow & {
 			with: {
 				version:      "2025.1" // Pin a version for determinism.
 				"install-go": false    // We install Go ourselves.
+				"use-cache":  false    // We use a volume cache instead.
 			}
 		},
 	]

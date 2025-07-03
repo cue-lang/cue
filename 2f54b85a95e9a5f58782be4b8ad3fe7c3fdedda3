@@ -16,6 +16,24 @@
       "message": "Seems ok, but why is this not detected automatically?",
       "revId": "2f54b85a95e9a5f58782be4b8ad3fe7c3fdedda3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79b97279_bc6799e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-03T14:41:28Z",
+      "side": 1,
+      "message": "Go doesn\u0027t infer the architecture level automatically, not by default and not via any opt-in flag or env var that I can see. The defaults for GOAMD64 and GOARM64 are both static to the lowest level, v1 and v8.0 respectively: https://go.dev/wiki/MinimumRequirements#architectures\n\nI think the reason the defaults are the way they are is for portability. You don\u0027t want an amd64 v3 machine building for a v1 machine to not work out of the box. However, I don\u0027t know why they don\u0027t support an \"auto\" or \"native\" mode; I\u0027ll ask.",
+      "parentUuid": "a1f230fa_9c4ff5d5",
+      "revId": "2f54b85a95e9a5f58782be4b8ad3fe7c3fdedda3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

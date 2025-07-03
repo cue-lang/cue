@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7c30a54_c2983f9d",
+        "filename": "encoding/jsonschema/crd.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-03T11:33:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "277d23e3_11753f22",
+      "revId": "9f4bee3eb402674b3f961cde8151e3317b56d30e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef65842a_843b12e9",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-02T09:11:54Z",
       "side": 1,
       "message": "I wonder if we should use a slightly more specific name here, like CRDResult or ExtractedCRD. Otherwise we might be in a pickle if down the line we want to add more CRD APIs in this package, and we\u0027ve taken a fairly generic name here.",
+      "revId": "9f4bee3eb402674b3f961cde8151e3317b56d30e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f2f4099_61e46a34",
+        "filename": "encoding/jsonschema/crd.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-03T11:33:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef65842a_843b12e9",
       "revId": "9f4bee3eb402674b3f961cde8151e3317b56d30e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "d28982c2_c483e622",
+        "filename": "encoding/jsonschema/crd.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-03T11:33:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97f13796_632f2474",
+      "revId": "9f4bee3eb402674b3f961cde8151e3317b56d30e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "23ad505b_5b9b2b8a",
         "filename": "encoding/jsonschema/crd.go",
         "patchSetId": 4
@@ -65,6 +119,24 @@
       "writtenOn": "2025-07-02T09:11:54Z",
       "side": 1,
       "message": "I feel like I\u0027ve seen this code before :) I assume this is largely moved from the services repo.",
+      "revId": "9f4bee3eb402674b3f961cde8151e3317b56d30e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46e86a0f_ba7ee284",
+        "filename": "encoding/jsonschema/crd.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-03T11:33:59Z",
+      "side": 1,
+      "message": "Indeed so.",
+      "parentUuid": "23ad505b_5b9b2b8a",
       "revId": "9f4bee3eb402674b3f961cde8151e3317b56d30e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -266,10 +266,10 @@ diff old new
 +CloseIDElems: 1039
 +NumCloseIDs: 122
 -- out/eval/stats --
-Leaks:  12
-Freed:  266
-Reused: 260
-Allocs: 18
+Leaks:  6
+Freed:  272
+Reused: 261
+Allocs: 17
 Retain: 36
 
 Unifications: 252

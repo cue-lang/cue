@@ -46,11 +46,7 @@ func (v *Vertex) getBareState(c *OpContext) *nodeContext {
 	if v.state == nil {
 		v.state = c.newNodeContext(v)
 		v.state.initBare()
-		v.state.refCount = 1
 	}
-
-	// An additional refCount for the current user.
-	v.state.refCount += 1
 
 	// TODO: see if we can get rid of ref counting after new evaluator is done:
 	// the recursive nature of the new evaluator should make this unnecessary.
@@ -155,9 +151,12 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 	// TODO(evalv3): find something more principled.
 	n := v.getState(c)
 	if n == nil {
-		v.status = finalized
 		return true // already completed
 	}
+
+	n.refCount++
+	defer func() { n.refCount-- }()
+	// defer n.retainProcess().releaseProcess()
 
 	// TODO(perf): reintroduce freeing once we have the lifetime under control.
 	// Right now this is not managed anyway, so we prevent bugs by disabling it.
@@ -460,10 +459,13 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 		n.node.ClosedRecursive = true
 	}
 
-	n.node.updateStatus(finalized)
-
 	if checkTypos {
 		n.checkTypos()
+	}
+
+	if v.status != finalized {
+		v.updateStatus(finalized)
+		v.free()
 	}
 
 	return n.meets(needs)
@@ -835,6 +837,8 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 		v.Arcs = append(v.Arcs, arc)
 		arcState = arc.getState(c) // TODO: consider using getBareState.
 	}
+
+	// TODO(refcount): arcstate
 
 	if arcState != nil && (!arcState.meets(needTasksDone) || !arcState.meets(arcTypeKnown)) {
 		arcState.completePending(attemptOnly)

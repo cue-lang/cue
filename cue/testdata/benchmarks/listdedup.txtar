@@ -33,10 +33,10 @@ C: #steps: #Script & {mount: [B]}
 
 #ref: {a: 1} | {b: 2}
 -- out/evalalpha/stats --
-Leaks:  96
-Freed:  0
-Reused: 0
-Allocs: 96
+Leaks:  28
+Freed:  68
+Reused: 45
+Allocs: 51
 Retain: 0
 
 Unifications: 40
@@ -476,10 +476,10 @@ diff old new
 -Unifications: 18724
 -Conjuncts:    100730
 -Disjuncts:    24097
-+Leaks:  96
-+Freed:  0
-+Reused: 0
-+Allocs: 96
++Leaks:  28
++Freed:  68
++Reused: 45
++Allocs: 51
 +Retain: 0
 +
 +Unifications: 40

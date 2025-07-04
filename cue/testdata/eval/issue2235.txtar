@@ -142,11 +142,11 @@ diff old new
 +CloseIDElems: 1109
 +NumCloseIDs: 34
 -- out/eval/stats --
-Leaks:  20
-Freed:  84
-Reused: 79
-Allocs: 25
-Retain: 68
+Leaks:  3
+Freed:  101
+Reused: 84
+Allocs: 20
+Retain: 72
 
 Unifications: 104
 Conjuncts:    271

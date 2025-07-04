@@ -44,10 +44,10 @@ issue1837: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  28
-Freed:  0
-Reused: 0
-Allocs: 28
+Leaks:  2
+Freed:  26
+Reused: 9
+Allocs: 19
 Retain: 0
 
 Unifications: 28
@@ -61,7 +61,7 @@ diff old new
 --- old
 +++ new
 @@ -1,12 +1,12 @@
--Leaks:  2
+ Leaks:  2
 -Freed:  30
 -Reused: 25
 -Allocs: 7
@@ -73,10 +73,9 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 3
-+Leaks:  28
-+Freed:  0
-+Reused: 0
-+Allocs: 28
++Freed:  26
++Reused: 9
++Allocs: 19
 +Retain: 0
 +
 +Unifications: 28

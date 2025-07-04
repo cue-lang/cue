@@ -48,8 +48,8 @@ j: 1
   j: 1
 }
 -- out/evalalpha/stats --
-Leaks:  34
-Freed:  0
+Leaks:  1
+Freed:  33
 Reused: 0
 Allocs: 34
 Retain: 0
@@ -7595,8 +7595,8 @@ diff old new
 -Reused: 3258
 -Allocs: 10
 -Retain: 2803
-+Leaks:  34
-+Freed:  0
++Leaks:  1
++Freed:  33
 +Reused: 0
 +Allocs: 34
 +Retain: 0

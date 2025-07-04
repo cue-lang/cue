@@ -51,10 +51,10 @@ issue3851: t2: {
 	}
 }
 -- out/eval/stats --
-Leaks:  6
-Freed:  90
-Reused: 79
-Allocs: 17
+Leaks:  0
+Freed:  96
+Reused: 83
+Allocs: 13
 Retain: 2
 
 Unifications: 60

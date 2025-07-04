@@ -26,10 +26,10 @@ examples: eg3: {
     end: 10.0
 }
 -- out/evalalpha/stats --
-Leaks:  19
-Freed:  0
-Reused: 0
-Allocs: 19
+Leaks:  2
+Freed:  17
+Reused: 10
+Allocs: 9
 Retain: 0
 
 Unifications: 19
@@ -52,10 +52,10 @@ diff old new
 -Unifications: 18
 -Conjuncts:    354
 -Disjuncts:    19
-+Leaks:  19
-+Freed:  0
-+Reused: 0
-+Allocs: 19
++Leaks:  2
++Freed:  17
++Reused: 10
++Allocs: 9
 +Retain: 0
 +
 +Unifications: 19

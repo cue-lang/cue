@@ -26,10 +26,10 @@ let root_1 = root
 root_2: root
 root_3: root
 -- out/evalalpha/stats --
-Leaks:  64
-Freed:  0
-Reused: 0
-Allocs: 64
+Leaks:  42
+Freed:  22
+Reused: 7
+Allocs: 57
 Retain: 0
 
 Unifications: 43
@@ -52,10 +52,10 @@ diff old new
 -Unifications: 559
 -Conjuncts:    1046
 -Disjuncts:    976
-+Leaks:  64
-+Freed:  0
-+Reused: 0
-+Allocs: 64
++Leaks:  42
++Freed:  22
++Reused: 7
++Allocs: 57
 +Retain: 0
 +
 +Unifications: 43

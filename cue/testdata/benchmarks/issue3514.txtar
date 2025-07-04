@@ -36,14 +36,14 @@ _schema: {
     #timezone: or([for i in list.Range(0, 571, 1) {"\(i)"}])
 }
 -- out/evalalpha/stats --
-Leaks:  3645
-Freed:  0
-Reused: 0
-Allocs: 3645
+Leaks:  3551
+Freed:  95
+Reused: 91
+Allocs: 3555
 Retain: 0
 
-Unifications: 69
-Conjuncts:    7053
+Unifications: 70
+Conjuncts:    7054
 Disjuncts:    2386
 
 CloseIDElems: 35
@@ -62,14 +62,14 @@ diff old new
 -Unifications: 189
 -Conjuncts:    92950
 -Disjuncts:    31139
-+Leaks:  3645
-+Freed:  0
-+Reused: 0
-+Allocs: 3645
++Leaks:  3551
++Freed:  95
++Reused: 91
++Allocs: 3555
 +Retain: 0
 +
-+Unifications: 69
-+Conjuncts:    7053
++Unifications: 70
++Conjuncts:    7054
 +Disjuncts:    2386
 +
 +CloseIDElems: 35

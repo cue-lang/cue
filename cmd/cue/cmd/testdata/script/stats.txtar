@@ -51,7 +51,7 @@ contents overwritten
         "Conjuncts": 8,
         "CloseIDElems": 0,
         "NumCloseIDs": 2,
-        "Freed": 0,
+        "Freed": 3,
         "Reused": 0,
         "Allocs": 6,
         "Retained": 0
@@ -69,7 +69,7 @@ CUE: {
 	Conjuncts:    8
 	CloseIDElems: 0
 	NumCloseIDs:  2
-	Freed:        0
+	Freed:        3
 	Reused:       0
 	Allocs:       6
 	Retained:     0
@@ -86,7 +86,7 @@ CUE:
   Conjuncts: 8
   CloseIDElems: 0
   NumCloseIDs: 2
-  Freed: 0
+  Freed: 3
   Reused: 0
   Allocs: 6
   Retained: 0
@@ -102,7 +102,7 @@ Go:
         "Conjuncts": 8,
         "CloseIDElems": 0,
         "NumCloseIDs": 2,
-        "Freed": 0,
+        "Freed": 3,
         "Reused": 0,
         "Allocs": 6,
         "Retained": 0

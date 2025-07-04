@@ -2,6 +2,8 @@
 
 name: TryBot
 "on":
+  schedule:
+    - cron: 0 2 * * *
   push:
     branches:
       - ci/test
@@ -82,7 +84,7 @@ jobs:
 
           # Dump env for good measure
           go env
-      - if: matrix.runner != 'namespace-profile-windows-2022-amd64-8x16'
+      - if: github.event_name != 'schedule' && matrix.runner != 'namespace-profile-windows-2022-amd64-8x16'
         uses: namespacelabs/nscloud-cache-action@v1
         with:
           cache: go

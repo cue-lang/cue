@@ -145,7 +145,7 @@ checkoutCode: {
 
 earlyChecks: githubactions.#Step & {
 	name: "Early git and code sanity checks"
-	run:  *"go run cuelang.org/go/internal/ci/checks@v0.11.0-0.dev.0.20240903133435-46fb300df650" | string
+	run:  *"go run cuelang.org/go/internal/ci/checks@v0.13.2" | string
 }
 
 curlGitHubAPI: {

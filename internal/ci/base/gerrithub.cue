@@ -5,17 +5,19 @@ package base
 import (
 	"encoding/json"
 	"strings"
+
 	"cue.dev/x/githubactions"
 )
 
 // trybotWorkflows is a template for trybot-based repos
 trybotWorkflows: {
 	(trybot.key): githubactions.#Workflow & {
+		// Triggering a trybot job via a workflow_dispatch can be a useful way
+		// to manually or automatically start a job without needing to git push.
 		on: workflow_dispatch: {}
 	}
 	"\(trybot.key)_dispatch":    trybotDispatchWorkflow
 	"push_tip_to_\(trybot.key)": pushTipToTrybotWorkflow
-	"evict_caches":              evictCaches
 }
 
 #dispatch: {
@@ -202,133 +204,6 @@ pushTipToTrybotWorkflow: bashWorkflow & {
 		]
 	}
 
-}
-
-// evictCaches removes "old" GitHub actions caches from the main repo and the
-// accompanying trybot  The job is only run in the main repo, because
-// that is the only place where the credentials exist.
-//
-// The GitHub actions caches in the main and trybot repos can get large. So
-// large in fact we got the following warning from GitHub:
-//
-//   "Approaching total cache storage limit (34.5 GB of 10 GB Used)"
-//
-// Yes, you did read that right.
-//
-// Not only does this have the effect of causing us to breach "limits" it also
-// means that we can't be sure that individual caches are not bloated.
-//
-// Fix that by purging the actions caches on a daily basis at 0200, followed 15
-// mins later by a re-run of the tip trybots to repopulate the caches so they
-// are warm and minimal.
-//
-// In testing with @mvdan, this resulted in cache sizes for Linux dropping from
-// ~1GB to ~125MB. This is a considerable saving.
-//
-// Note this currently removes all cache entries, regardless of whether they
-// are go-related or not. We should revisit this later.
-evictCaches: bashWorkflow & {
-	name: "Evict caches"
-
-	on: {
-		schedule: [
-			{cron: "0 2 * * *"},
-		]
-	}
-
-	jobs: {
-		test: {
-			// We only want to run this in the main repo
-			if:        "${{github.repository == '\(githubRepositoryPath)'}}"
-			"runs-on": linuxMachine
-			steps: [
-				for v in checkoutCode {v},
-
-				// TODO(mvdan): remove once we've fully moved to Namespace runners.
-				githubactions.#Step & {
-					name: "Delete caches"
-					run:  """
-						echo ${{ secrets.\(botGitHubUserTokenSecretsKey) }} | gh auth login --with-token
-						for i in \(githubRepositoryURL) \(trybotRepositoryURL)
-						do
-							echo "Evicting caches for $i"
-							gh cache delete --repo $i --all --succeed-on-no-caches
-						done
-						"""
-				},
-
-				githubactions.#Step & {
-					name: "Trigger workflow runs to repopulate caches"
-					let branchPatterns = strings.Join(protectedBranchPatterns, " ")
-
-					run: """
-						# Prepare git for pushes to trybot repo. Note
-						# because we have already checked out code we don't
-						# need origin. Fetch origin default branch for later use
-						git config user.name \(botGitHubUser)
-						git config user.email \(botGitHubUserEmail)
-						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
-						git remote add trybot \(trybotRepositoryURL)
-
-						# Now trigger the most recent workflow run on each of the default branches.
-						# We do this by listing all the branches on the main repo and finding those
-						# which match the protected branch patterns (globs).
-						for j in $(\(curlGitHubAPI) -f https://api.github.com/repos/\(githubRepositoryPath)/branches | jq -r '.[] | .name')
-						do
-							for i in \(branchPatterns)
-							do
-								if [[ "$j" != $i ]]; then
-									continue
-								fi
-
-								echo Branch: $j
-								sha=$(\(curlGitHubAPI) "https://api.github.com/repos/\(githubRepositoryPath)/commits/$j" | jq -r '.sha')
-								echo Latest commit: $sha
-
-								echo "Trigger workflow on \(githubRepositoryPath)"
-								\(curlGitHubAPI) --fail-with-body -X POST https://api.github.com/repos/\(githubRepositoryPath)/actions/workflows/\(trybot.key+workflowFileExtension)/dispatches -d "{\\"ref\\":\\"$j\\"}"
-
-								# Ensure that the trybot repo has the latest commit for
-								# this branch.  If the force-push results in a commit
-								# being pushed, that will trigger the trybot workflows
-								# so we don't need to do anything, otherwise we need to
-								# trigger the most recent commit on that branch
-								git remote -v
-								git fetch origin refs/heads/$j
-								git log -1 FETCH_HEAD
-
-								success=false
-								for try in {1..20}; do
-									echo "Push to trybot try $try"
-									exitCode=0; push="$(git push -f trybot FETCH_HEAD:$j 2>&1)" || exitCode=$?
-									echo "$push"
-									if [[ $exitCode -eq 0 ]]; then
-										success=true
-										break
-									fi
-									sleep 1
-								done
-								if ! $success; then
-									echo "Giving up"
-									exit 1
-								fi
-
-								if echo "$push" | grep up-to-date
-								then
-									# We are up-to-date, i.e. the push did nothing, hence we need to trigger a workflow_dispatch
-									# in the trybot repo.
-									echo "Trigger workflow on \(trybotRepositoryPath)"
-									\(curlGitHubAPI) --fail-with-body -X POST https://api.github.com/repos/\(trybotRepositoryPath)/actions/workflows/\(trybot.key+workflowFileExtension)/dispatches -d "{\\"ref\\":\\"$j\\"}"
-								else
-									echo "Force-push to \(trybotRepositoryPath) did work; nothing to do"
-								fi
-							done
-						done
-						"""
-				},
-			]
-		}
-	}
 }
 
 writeNetrcFile: githubactions.#Step & {

@@ -2016,8 +2016,8 @@ f1000: f999
   f1000: 〈0;f999〉
 }
 -- out/evalalpha/stats --
-Leaks:  1001
-Freed:  0
+Leaks:  1
+Freed:  1000
 Reused: 0
 Allocs: 1001
 Retain: 0
@@ -3037,8 +3037,8 @@ diff old new
 -Freed:  1001
 -Reused: 999
 -Allocs: 2
-+Leaks:  1001
-+Freed:  0
++Leaks:  1
++Freed:  1000
 +Reused: 0
 +Allocs: 1001
  Retain: 0

@@ -132,10 +132,10 @@ issue3591: missing: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  212
-Freed:  0
-Reused: 0
-Allocs: 212
+Leaks:  78
+Freed:  134
+Reused: 119
+Allocs: 93
 Retain: 0
 
 Unifications: 139
@@ -149,10 +149,10 @@ diff old new
 --- old
 +++ new
 @@ -1,12 +1,12 @@
--Leaks:  28
--Freed:  215
--Reused: 203
--Allocs: 40
+-Leaks:  24
+-Freed:  219
+-Reused: 207
+-Allocs: 36
 -Retain: 160
 -
 -Unifications: 167
@@ -161,10 +161,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 3
-+Leaks:  212
-+Freed:  0
-+Reused: 0
-+Allocs: 212
++Leaks:  78
++Freed:  134
++Reused: 119
++Allocs: 93
 +Retain: 0
 +
 +Unifications: 139
@@ -174,10 +174,10 @@ diff old new
 +CloseIDElems: 279
 +NumCloseIDs: 89
 -- out/eval/stats --
-Leaks:  28
-Freed:  215
-Reused: 203
-Allocs: 40
+Leaks:  24
+Freed:  219
+Reused: 207
+Allocs: 36
 Retain: 160
 
 Unifications: 167

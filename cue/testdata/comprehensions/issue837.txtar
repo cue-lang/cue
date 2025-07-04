@@ -64,10 +64,10 @@
 
 #ServiceManifest: #Manifest & {ref: kind: "service"}
 -- out/evalalpha/stats --
-Leaks:  85
-Freed:  0
-Reused: 0
-Allocs: 85
+Leaks:  36
+Freed:  49
+Reused: 35
+Allocs: 50
 Retain: 0
 
 Unifications: 61
@@ -396,10 +396,10 @@ diff old new
 -Unifications: 107
 -Conjuncts:    243
 -Disjuncts:    170
-+Leaks:  85
-+Freed:  0
-+Reused: 0
-+Allocs: 85
++Leaks:  36
++Freed:  49
++Reused: 35
++Allocs: 50
 +Retain: 0
 +
 +Unifications: 61

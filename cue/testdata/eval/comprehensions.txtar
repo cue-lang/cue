@@ -119,10 +119,10 @@ issue3691: structuralCycle: {
 	}
 }
 -- out/eval/stats --
-Leaks:  9
-Freed:  72
-Reused: 66
-Allocs: 15
+Leaks:  4
+Freed:  77
+Reused: 69
+Allocs: 12
 Retain: 19
 
 Unifications: 81

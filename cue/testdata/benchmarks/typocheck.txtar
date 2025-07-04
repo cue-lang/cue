@@ -21,10 +21,10 @@ _input: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  703
-Freed:  0
-Reused: 0
-Allocs: 703
+Leaks:  4
+Freed:  699
+Reused: 301
+Allocs: 402
 Retain: 0
 
 Unifications: 703
@@ -50,10 +50,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 4
-+Leaks:  703
-+Freed:  0
-+Reused: 0
-+Allocs: 703
++Leaks:  4
++Freed:  699
++Reused: 301
++Allocs: 402
 +Retain: 0
 +
 +Unifications: 703

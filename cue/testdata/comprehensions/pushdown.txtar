@@ -2316,10 +2316,10 @@ diff old new
          }
          _specConfig: (_){ _ }
 -- out/evalalpha/stats --
-Leaks:  748
-Freed:  0
-Reused: 0
-Allocs: 748
+Leaks:  220
+Freed:  528
+Reused: 490
+Allocs: 258
 Retain: 0
 
 Unifications: 638
@@ -2333,10 +2333,10 @@ diff old new
 --- old
 +++ new
 @@ -1,12 +1,12 @@
--Leaks:  74
--Freed:  602
--Reused: 597
--Allocs: 79
+-Leaks:  18
+-Freed:  658
+-Reused: 646
+-Allocs: 30
 -Retain: 132
 -
 -Unifications: 624
@@ -2345,10 +2345,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 107
-+Leaks:  748
-+Freed:  0
-+Reused: 0
-+Allocs: 748
++Leaks:  220
++Freed:  528
++Reused: 490
++Allocs: 258
 +Retain: 0
 +
 +Unifications: 638
@@ -2358,10 +2358,10 @@ diff old new
 +CloseIDElems: 527
 +NumCloseIDs: 292
 -- out/eval/stats --
-Leaks:  74
-Freed:  602
-Reused: 597
-Allocs: 79
+Leaks:  18
+Freed:  658
+Reused: 646
+Allocs: 30
 Retain: 132
 
 Unifications: 624

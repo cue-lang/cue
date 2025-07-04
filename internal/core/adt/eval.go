@@ -1100,6 +1100,12 @@ type nodeContext struct {
 	// is split off. TODO: find something more principled.
 	hasDisjunction bool
 
+	// parentRefCount is used to track the refcount for the parent Vertex.
+	// This is, in principle, unnecessary, but prevents a refcount from being
+	// inadvertently decremented, which can have serious consequences that are
+	// hard to debug.
+	isDisjunct bool
+
 	// snapshot holds the last value of the vertex before calling postDisjunct.
 	snapshot *Vertex
 
@@ -1290,6 +1296,8 @@ func (n *nodeContext) addNotify(v *Vertex) {
 }
 
 func (n *nodeContext) clone() *nodeContext {
+	unreachableForDev(n.ctx)
+
 	d := n.ctx.newNodeContext(n.node)
 
 	d.refCount++
@@ -1331,16 +1339,20 @@ func (n *nodeContext) clone() *nodeContext {
 }
 
 func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
-	if n := c.freeListNode; n != nil {
+	var n *nodeContext
+	if n = c.freeListNode; n != nil {
 		c.stats.Reused++
 		c.freeListNode = n.nextFree
 
+		n.scheduler.clear()
+		n.scheduler.ctx = c
+
 		*n = nodeContext{
-			scheduler: scheduler{ctx: c},
-			node:      node,
+			node: node,
 			nodeContextState: nodeContextState{
 				kind: TopKind,
 			},
+			scheduler:          n.scheduler,
 			arcMap:             n.arcMap[:0],
 			conjuncts:          n.conjuncts[:0],
 			cyclicConjuncts:    n.cyclicConjuncts[:0],
@@ -1365,23 +1377,25 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			buffer:             n.buffer[:0],
 		}
 		n.scheduler.clear()
-		n.scheduler.node = n
-		n.underlying = node
+	} else {
+		c.stats.Allocs++
 
-		return n
+		n = &nodeContext{
+			scheduler: scheduler{
+				ctx: c,
+			},
+			node: node,
+
+			nodeContextState: nodeContextState{kind: TopKind},
+		}
 	}
-	c.stats.Allocs++
 
-	n := &nodeContext{
-		scheduler: scheduler{
-			ctx: c,
-		},
-		node: node,
-
-		nodeContextState: nodeContextState{kind: TopKind},
-	}
 	n.scheduler.node = n
 	n.underlying = node
+	if p := node.Parent; p != nil && p.state != nil {
+		n.isDisjunct = p.state.isDisjunct
+	}
+
 	return n
 }
 
@@ -1436,6 +1450,7 @@ func (n *nodeContext) free() {
 }
 
 func (c *OpContext) freeNodeContext(n *nodeContext) {
+	n.node.state = nil
 	c.stats.Freed++
 	n.nextFree = c.freeListNode
 	c.freeListNode = n

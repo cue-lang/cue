@@ -48,10 +48,10 @@ noOpt: true
   }
 }
 -- out/evalalpha/stats --
-Leaks:  36
-Freed:  0
-Reused: 0
-Allocs: 36
+Leaks:  26
+Freed:  10
+Reused: 4
+Allocs: 32
 Retain: 0
 
 Unifications: 22
@@ -69,10 +69,10 @@ diff old new
 -Freed:  12
 -Reused: 3
 -Allocs: 9
-+Leaks:  36
-+Freed:  0
-+Reused: 0
-+Allocs: 36
++Leaks:  26
++Freed:  10
++Reused: 4
++Allocs: 32
  Retain: 0
  
 -Unifications: 10

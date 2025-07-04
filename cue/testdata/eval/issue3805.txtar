@@ -169,10 +169,10 @@ tabcatsExample: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  250
-Freed:  0
-Reused: 0
-Allocs: 250
+Leaks:  128
+Freed:  122
+Reused: 102
+Allocs: 148
 Retain: 0
 
 Unifications: 182
@@ -195,10 +195,10 @@ diff old new
 -Unifications: 1373
 -Conjuncts:    3626
 -Disjuncts:    1548
-+Leaks:  250
-+Freed:  0
-+Reused: 0
-+Allocs: 250
++Leaks:  128
++Freed:  122
++Reused: 102
++Allocs: 148
 +Retain: 0
 +
 +Unifications: 182

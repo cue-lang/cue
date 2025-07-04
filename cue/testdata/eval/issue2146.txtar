@@ -40,10 +40,10 @@ p2: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  139
-Freed:  0
-Reused: 0
-Allocs: 139
+Leaks:  101
+Freed:  38
+Reused: 26
+Allocs: 113
 Retain: 0
 
 Unifications: 79
@@ -66,10 +66,10 @@ diff old new
 -Unifications: 173
 -Conjuncts:    557
 -Disjuncts:    189
-+Leaks:  139
-+Freed:  0
-+Reused: 0
-+Allocs: 139
++Leaks:  101
++Freed:  38
++Reused: 26
++Allocs: 113
 +Retain: 0
 +
 +Unifications: 79

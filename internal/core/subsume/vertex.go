@@ -149,6 +149,9 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		if b == nil {
 			// y.f is optional
 			if !aOpt {
+				s.missing = f
+				s.gt = a
+				s.lt = y
 				s.errf("required field is optional in subsumed value: %v", f)
 				return false
 			}
@@ -170,11 +173,11 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 			continue
 		}
 
-		s.missing = f
 		s.gt = a
-		s.lt = y
+		s.lt = b
 
-		s.errf("field %v not present in %v", f, y)
+		s.errf("%v%s does not subsume %v%s", a, a.ArcType.Suffix(), b, b.ArcType.Suffix())
+
 		return false
 	}
 
@@ -350,6 +353,9 @@ func (s *subsumer) verticesDev(x, y *adt.Vertex) bool {
 		b := y.Lookup(f)
 		if b == nil {
 			if !isConstraint {
+				s.missing = f
+				s.gt = a
+				s.lt = y
 				s.errf("regular field is constraint in subsumed value: %v", f)
 				return false
 			}
@@ -373,11 +379,10 @@ func (s *subsumer) verticesDev(x, y *adt.Vertex) bool {
 			continue
 		}
 
-		s.missing = f
 		s.gt = a
-		s.lt = y
+		s.lt = b
 
-		s.errf("field %v not present in %v", f, y)
+		s.errf("%v%s does not subsume %v%s", a, a.ArcType.Suffix(), b, b.ArcType.Suffix())
 		return false
 	}
 

@@ -1,0 +1,697 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98be7b09_18263321",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Publishing WIP review comments. Looking great so far, mostly just style, naming and doc nits.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52c7a21c_41d16aff",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "As this functionality is clearly targeted only at the LSP, maybe it should go inside `internal/lsp` or some other clearly-LSP location?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d24b8a4_1610a679",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "I wonder if there\u0027s merit in using just a single robustio package in our code. mod/modcache imports go-internal/robustio, which seems like it\u0027s probably a subset of this one, so maybe we should copy golangorgx/tools/robustio to internal/robustio and use it everywhere?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38952178_26a0e99a",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Maybe add a doc comment briefly explaining the role of this type? In particular I\u0027d like to understand how the role of this type differs from that of io/fs.File (and specifically why this doesn\u0027t embed/implement io/fs.File).",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50926957_3a06b8bb",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Perhaps document what it does before documenting the caveats? Also, given that this is a method on the `File` interface, maybe just `ReadCUE` might be a better name, and then it\u0027s more easily distinguishable from `module.ReadCUEFS.ReadCUEFile` which I thought this was implementing for a few moments.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f8f34e0_7a4b3613",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "doc comment please. Presumably this is some kind of incrementing modification version, but it would be good to say so.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35194655_6a0d649b",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Personally I might be inclined to be a little less safe and just say \"you can append to but not otherwise modify the slice\". But maybe I like to live too dangerously.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a0545e9_54b5dd03",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "I\u0027m not sure I\u0027ve seen this style before and Go doc comments are conventionally full sentences. FWIW I\u0027d probably write it like\nthis, although I appreciate it\u0027s more redundant.\n\n```suggestion\n// URI implements [File.URI].\n```\n\nA shorter alternative that\u0027s still a valid sentence:\n\n```suggestion\n// Implement [File.URI].\n```",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c16912be_7ccdb813",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "```suggestion\n// (cache/fs_memoized.go in the gopls repo). CueCacheFS is also designed to bridge the\n```\n\u003e",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e10ac17_27d991ee",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "```suggestion\n// Note that CueCacheFS will return errors when reading files which are\n```",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80973d65_fabf2ff0",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "nit: Go names usually fully capitalise acronyms and CUE is technically an acronym.\n```suggestion\ntype CUECacheFS struct {\n```\n\nditto for other occurrences.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b879a59a_7ca401d6",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "I don\u0027t understand how/why we can have multiple file entries for a single file ID. Maybe some explanation here might help?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87d024eb_3e1cba21",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "doc comment please. Does this actually need to be a public API?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be636589_09311797",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "AFAICS x.Encloses(x) is true for all x, so I think this could be just\n```suggestion\n\t\t\tif uri.Encloses(file.uri) {\n```\n\nor is just just a simple optimisation?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62ce9616_3fb46bf9",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "I don\u0027t understand why we\u0027re purging all files for a particular when one of the paths corresponding to that id (i guess they\u0027re all hard-linked or aliased via shared-parent symlinks?) happens not to be found. Also, by the name of this type, it\u0027s about CUE files, not directories, so when might it happen that one \"encloses\" another?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d35e2dd2_b85cf23e",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "doc comment please.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08f21342_da6383a0",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Technically I think this could end up removing a legitimate entry for another URI.\nFor example, we\u0027ve got two concurrent reads for different URIs that have the same file ID. They both find there\u0027s no entry, and unlock at similar times; then they both read the file successfully; then one adds its entry and unlocks; then the other one comes along and overwrites the original.\n\nMaybe this is a sufficiently rare case and the resulting extra cache miss isn\u0027t considered a problem: in this case, I\u0027d suggest adding a TODO or comment mentioning this. \n\nAlternatively, maybe check the cache again to make sure something hasn\u0027t been added in the meantime.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf95b9ba_33da1a93",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Or just return early:\n\n```suggestion\n\t\treturn nil, err\n```",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b98a2ea_74f26350",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "This could use some docs. I _think_ that root is an absolute filesystem path, but that\u0027s not initially clear. From the perspective of CueCacheFS, it seems like maybe it should take a protocol.DocumentURI but perhaps that\u0027s not appropriate for directories?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a7261d0_5acea455",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "\"provides implementations of\" sounds a bit like you can call methods to obtain those implementations, but AFAICS this type does actually implement all the mentioned interfaces.\n\n```suggestion\n// RootedCueCacheFS is a wrapper over [CueCacheFS] that\n// implements [iofs.FS], [iofs.ReadDirFS], [iofs.ReadFileFS],\n// [iofs.StatFS], [module.OSRootFS], and [module.ReadCUEFS]\n```",
+      "range": {
+        "startLine": 275,
+        "startChar": 0,
+        "endLine": 277,
+        "endChar": 0
+      },
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de685b6f_262de45a",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Why is this type exported? I don\u0027t see any constructors, and ISTM that it\u0027s probably not a great idea for clients to type assert to it.\n\nDitto for RootedOverlayFS.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fc5551d_6157ef19",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Given that this doesn\u0027t actually reference fs, maybe define it as a standalone function?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ac10219_6c814679",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Brief description of what the function actually does. Presumably `components` holds the path components etc.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27cf4406_dbd32ca4",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "```suggestion\n//   - If creating, then fs.mu must be held in write-mode. Otherwise read-mode is fine.\n```\n?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b67f0413_0ca27448",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "This is such a common property of Go functions that I don\u0027t think it\u0027s even worth stating.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f60be6a6_e4806aee",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "It might be nicer to say positive things about the error: this doesn\u0027t say anything about what errors _are_ actually returned and when.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "400f7a1b_ea0cbc08",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "That\u0027s not a requirement 😊\n\n\n```suggestion\n//   - fs.mu is not locked by this goroutine.\n```\n?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a3984c8_d738b10d",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "again, I think this isn\u0027t worth stating.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4882ed18_dc0678d8",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "It\u0027s kind of odd that this method is implemented twice but there\u0027s no interface type that defines it. Regardless, it could use a doc comment.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64b9ffc4_299c9ab5",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Maybe nice to say what the function actually does as well as describing its properties?\n\n\n```suggestion\n// View calls the given function once with a txn argument that can be\n// used to atomically access read-only data from fs, and must not be\n// used after the function returns.\n//\n// This method may be called concurrently.\n//\n// Multiple read-only transactions may run in parallel, but read-only\n// and read-write transactions are mutually exclusive. Note that nested\n// transactions of any sort are not supported, and will probably\n// deadlock.\n\nfunc (fs *OverlayFS) View(fun func(txn *OverlayFSROTxn) error) error {\n```",
+      "range": {
+        "startLine": 344,
+        "startChar": 1,
+        "endLine": 349,
+        "endChar": 1
+      },
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a46d7c9_94d10e45",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Similar suggestion to above.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2348b9a_a7d25f64",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "doc comment please.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ec6b66f_7d68e0f1",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "```suggestion\n// Get is like [ReadFile] but it *only* returns a file if it\u0027s present\n// in the overlay itself. It does not, under any\n// circumstances, access the underlying [CueCacheFS].\nfunc (txn *OverlayFSROTxn) Get(uri protocol.DocumentURI) (File, error) {\n```",
+      "range": {
+        "startLine": 382,
+        "startChar": 0,
+        "endLine": 384,
+        "endChar": 0
+      },
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbea906a_45306825",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Again, nice to describe the actual semantics directly?\n\n```suggestion\n// WalkFiles invokes fun on all the files present in the overlay. It\n// stops walking if fun returns an error.\n//\n// It does not, under any circumstances, access the underlying\n// CueCacheFS. The function only gets passed files, never directories.\n// All files in a directory will be processed before any subdirectories;\n// no other ordering guarantees are made.\nfunc (txn *OverlayFSROTxn) WalkFiles(fun func(File) error, uri protocol.DocumentURI) error {\n```",
+      "range": {
+        "startLine": 398,
+        "startChar": 0,
+        "endLine": 403,
+        "endChar": 0
+      },
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89bbd659_8a62056d",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Alternatively, and almost certainly cheaper, just iterate over entry.entries twice, once checking IsDir, the other checking !IsDir. No need to make a slice AFAICS.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a2ba538_a4acde07",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "doc comment please.\n\nFWIW I find these names somewhat cryptic.\nGiven that there\u0027s almost certainly only one entity in this package that will allow transactions, how about `TxnRW` and `TxnRO` so we don\u0027t get 5 acronym letters jammed together?\n\nOr maybe... could have `Txn` (the full mutable API) and `ReadOnlyTxn`.\n\n\n\n\n\n```suggestion\ntype TxnRW struct {\n```",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09f901ed_d143523e",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Some of those parameters aren\u0027t totally clear to me. What is \"version\", for example.\n\nAlso, should make it clear that this takes ownership of content but does not modify it.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "324cdc17_d59c68ee",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "```suggestion\n// RootedOverlayFS is a wrapper over [OverlayFS] that\n// implements [iofs.FS], [iofs.ReadDirFS], [iofs.ReadFileFS],\n// [iofs.StatFS], [module.OSRootFS], and [module.ReadCUEFS].\ntype RootedOverlayFS struct {\n```",
+      "range": {
+        "startLine": 514,
+        "startChar": 0,
+        "endLine": 517,
+        "endChar": 0
+      },
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fb9e1cb_dff0a71b",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-04T17:44:17Z",
+      "side": 1,
+      "message": "Note to self: this is as far as I\u0027ve got with the review!",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

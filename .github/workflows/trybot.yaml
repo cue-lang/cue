@@ -107,7 +107,9 @@ jobs:
         env:
           GORACE: atexit_sleep_ms=10
         run: go test -race ./...
-      - if: (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-ubuntu-24-04-amd64-8x16')
+      - if: |-
+          (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-ubuntu-24-04-amd64-8x16')
         name: Test on 32 bits
         env:
           GOARCH: "386"

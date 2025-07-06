@@ -231,11 +231,13 @@ workflows: trybot: _repo.bashWorkflow & {
 		// Ensure that the entire build and all tests succeed on a 32-bit platform as well.
 		// This should catch if any of the code or test cases rely on bit sizes,
 		// such as int being 64 bits, which could cause portability bugs for 32-bit platforms.
-		// While GOARCH=386 isn't particularly popular anymore, it can run on an amd64 machine,
-		// and the Linux runners on GitHub Actions use amd64.
+		// While GOARCH=386 isn't particularly popular anymore, it can run on our amd64 Linux runner.
 		//
 		// Running just the short tests is enough for now.
-		if:   _isLatestLinux
+		// We skip this step when testing CLs and PRs, as Linux on the latest Go is the slowest
+		// job in the matrix due to the use of `go test -race`. 32-bit bugs should be rare,
+		// so them only getting caught once a patch is merged into master is not a big problem.
+		if:   "(\(_repo.isProtectedBranch) || \(_repo.isTestDefaultBranch)) && \(_isLatestLinux)"
 		name: "Test on 32 bits"
 		env: GOARCH: "386"
 		run: "go test -short ./..."

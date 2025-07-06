@@ -151,7 +151,9 @@ jobs:
           version: "2025.1"
           install-go: false
           use-cache: false
-      - if: (matrix.go-version == '1.24.x' && matrix.runner == 'ns-ubuntu-amd64')
+      - if: |-
+          (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'ns-ubuntu-amd64')
         name: Check all git tags are available
         run: |-
           cd $(mktemp -d)

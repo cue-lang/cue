@@ -193,12 +193,12 @@ workflows: trybot: _repo.bashWorkflow & {
 
 	_checkTags: githubactions.#Step & {
 		// Ensure that GitHub and Gerrit agree on the full list of available tags.
-		// This way, if there is any discrepancy, we will get a useful go-cmp diff.
+		// This way, if there is any discrepancy, we will get a useful diff.
 		//
 		// We use `git ls-remote` to list all tags from each remote git repository
 		// because it does not depend on custom REST API endpoints and is very fast.
 		// Note that it sorts tag names as strings, which is not the best, but works OK.
-		if:   _isLatestLinux
+		if:   "(\(_repo.isProtectedBranch) || \(_repo.isTestDefaultBranch)) && \(_isLatestLinux)"
 		name: "Check all git tags are available"
 		run: """
 			cd $(mktemp -d)

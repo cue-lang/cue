@@ -26,9 +26,9 @@ protectedBranchPatterns: [defaultBranch, releaseBranchPattern]
 botGitHubUser:      "cueckoo"
 botGitHubUserEmail: "cueckoo@gmail.com"
 
-linuxMachine:   "namespace-profile-ubuntu-24-04-amd64-8x16"
-macosMachine:   "namespace-profile-macos-15-arm64-6x14"
-windowsMachine: "namespace-profile-windows-2022-amd64-8x16"
+linuxMachine:   "ns-ubuntu-amd64"
+macosMachine:   "ns-macos-arm64"
+windowsMachine: "ns-windows-amd64"
 
 // Use the latest Go version for extra checks,
 // such as running tests with the data race detector.

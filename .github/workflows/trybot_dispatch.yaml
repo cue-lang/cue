@@ -11,7 +11,7 @@ jobs:
     defaults:
       run:
         shell: bash --noprofile --norc -euo pipefail {0}
-    runs-on: namespace-profile-ubuntu-24-04-amd64-8x16
+    runs-on: ns-ubuntu-amd64
     if: ${{ ((github.ref == 'refs/heads/ci/test') && false) || github.event.client_payload.type == 'trybot' }}
     steps:
       - name: Write netrc file for cueckoo Gerrithub

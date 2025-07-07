@@ -84,6 +84,9 @@ func TestLoadPackages(t *testing.T) {
 						for _, loc := range pkg.Locations() {
 							printf("\tlocation: %v\n", loc.Dir)
 						}
+						for _, file := range pkg.Files() {
+							printf("\tfile: %v: %v\n", file.FilePath, file.Syntax.PackageName())
+						}
 						if imps := pkg.Imports(); len(imps) > 0 {
 							printf("\timports:\n")
 							for _, imp := range imps {

@@ -17,6 +17,7 @@ main.test@v0:main
 	mod: main.test@v0
 	external: false
 	location: .
+	file: main.cue: main
 	imports:
 		example.com/blah
 example.com/blah
@@ -24,6 +25,7 @@ example.com/blah
 	mod: local
 	external: true
 	location: cue.mod/gen/example.com/blah
+	file: cue.mod/gen/example.com/blah/x.cue: blah
 -- test1/initial-requirements --
 main.test@v0
 example.com@v0.0.1
@@ -36,6 +38,7 @@ main.test@v0:main
 	mod: main.test@v0
 	external: false
 	location: .
+	file: main.cue: main
 	imports:
 		example.com/blah
 example.com/blah

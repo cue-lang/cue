@@ -70,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b7a6154_40e987b3",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T12:47:24Z",
+      "side": 1,
+      "message": "As discussed, I\u0027ll do a subsequent CL where I unify and update these.",
+      "parentUuid": "2d24b8a4_1610a679",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "38952178_26a0e99a",
@@ -854,6 +872,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6eca2307_f0791382",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T12:47:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ac10219_6c814679",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27cf4406_dbd32ca4",
@@ -867,6 +903,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "```suggestion\n//   - If creating, then fs.mu must be held in write-mode. Otherwise read-mode is fine.\n```\n?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2edc3ff_c9895af8",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T12:47:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27cf4406_dbd32ca4",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -888,6 +942,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a87333d6_30f304d6",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T12:47:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b67f0413_0ca27448",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f60be6a6_e4806aee",
@@ -901,6 +973,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "It might be nicer to say positive things about the error: this doesn\u0027t say anything about what errors _are_ actually returned and when.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ceb5929e_1abcf5c8",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T12:47:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f60be6a6_e4806aee",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -922,6 +1012,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bc1adab_20e9ec4a",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T12:47:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "400f7a1b_ea0cbc08",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8a3984c8_d738b10d",
@@ -935,6 +1043,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "again, I think this isn\u0027t worth stating.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1bcd14f_51611227",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T12:47:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a3984c8_d738b10d",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

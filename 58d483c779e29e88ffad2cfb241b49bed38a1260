@@ -51,6 +51,24 @@
       "message": "go through the use of root and be careful about if root originally had windows drive paths in it.",
       "revId": "58d483c779e29e88ffad2cfb241b49bed38a1260",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3c10b52_896e164e",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T12:47:24Z",
+      "side": 1,
+      "message": "I\u0027m pretty sure I had this the wrong way around - I now think protocol.URIFromPath wants a filepath, not a path. I really wish path and filepath were different types...",
+      "parentUuid": "f956898b_794108f1",
+      "revId": "58d483c779e29e88ffad2cfb241b49bed38a1260",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

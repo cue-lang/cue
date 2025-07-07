@@ -71,7 +71,6 @@ func TestTopologicalSort(t *testing.T) {
 						t.Fatal(err)
 					}
 					_, _ = t.Write(b)
-					fmt.Fprintln(t)
 				}
 			})
 		})

@@ -122,6 +122,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4e719f6f_505b475c",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T08:25:16Z",
+      "side": 1,
+      "message": "Ideally, I\u0027d like to keep it in line with ReadFileFS, which states \"The caller is permitted to modify the returned byte slice\".",
+      "parentUuid": "35194655_6a0d649b",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7a0545e9_54b5dd03",
         "filename": "internal/fscache/fs_cache.go",
         "patchSetId": 9
@@ -133,6 +151,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "I\u0027m not sure I\u0027ve seen this style before and Go doc comments are conventionally full sentences. FWIW I\u0027d probably write it like\nthis, although I appreciate it\u0027s more redundant.\n\n```suggestion\n// URI implements [File.URI].\n```\n\nA shorter alternative that\u0027s still a valid sentence:\n\n```suggestion\n// Implement [File.URI].\n```",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c27fdb1_179f545a",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T08:25:16Z",
+      "side": 1,
+      "message": "This is something we should discuss. My goals are:\n\n1. there\u0027s no sensible way in an editor (that I know of) to find out why a method exists, when it exists to satisfy an interface. So I want to point to that interface.\n2. I don\u0027t want to invent my own documentation, nor c+p docs from the interface. Pointing to the interface seems like the most sensible thing to do.\n\nAs to your suggestion, I\u0027m 100% happy to make it more valid english, but I can\u0027t get doc links of the form [A.B] to work, and I really want \"jump to dfn\" to work on these, which they do as I have them.",
+      "parentUuid": "7a0545e9_54b5dd03",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -239,6 +275,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2be55c86_0833d241",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T08:25:16Z",
+      "side": 1,
+      "message": "Done - this was a brain fart rather than an attempt at an optimisation. Elsewhere in the lsp code, I rely (and make notes on!) the fact Encloses includes \u003d\u003d",
+      "parentUuid": "be636589_09311797",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "62ce9616_3fb46bf9",
@@ -252,6 +306,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "I don\u0027t understand why we\u0027re purging all files for a particular when one of the paths corresponding to that id (i guess they\u0027re all hard-linked or aliased via shared-parent symlinks?) happens not to be found. Also, by the name of this type, it\u0027s about CUE files, not directories, so when might it happen that one \"encloses\" another?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "775fceb4_1711e31f",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T08:25:16Z",
+      "side": 1,
+      "message": "I\u0027m not 100% sure I understand your comment.\n\n`cueFilesByID` maps node IDs to lists of equivalent files - this is the same design as the upstream gopls (and it\u0027s undocumented there...). I assume this is to handle symlinks etc in directory paths where you could otherwise get a lot of duplication going on.\n\nThere are cases in lsp where we call ReadFile on the cuecachefs without knowing if the uri refers to a file or a directory. Indeed, we do this intentionally when we receive a notification from the editor of some deletion event (which could be a file or a directory - we don\u0027t actually know). If it was a directory, we want to purge all uris within that directory, to tidy up the cache.\n\nFor any given node ID, there can be many File(s). We just want to delete the ones enclosed by the provided uri. I think my code achieves that. But, I\u0027ve also just spotted there is a `slices.DeleteFunc` so I\u0027ll rewrite mine to use that.",
+      "parentUuid": "62ce9616_3fb46bf9",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -303,6 +375,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "Or just return early:\n\n```suggestion\n\t\treturn nil, err\n```",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d03aad0_d214da9a",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T08:25:16Z",
+      "side": 1,
+      "message": "Doh. This was unthinking c+p from upstream. Done.",
+      "parentUuid": "cf95b9ba_33da1a93",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -377,6 +467,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "Given that this doesn\u0027t actually reference fs, maybe define it as a standalone function?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8e9db43_3a90fe21",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T08:25:16Z",
+      "side": 1,
+      "message": "I went back and forth on this. There are very important differences between this implementation and the one on rootedoverlayfs, so I wanted to keep them in different namespaces.",
+      "parentUuid": "3fc5551d_6157ef19",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -616,6 +724,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "Alternatively, and almost certainly cheaper, just iterate over entry.entries twice, once checking IsDir, the other checking !IsDir. No need to make a slice AFAICS.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bc94246_e50efe6d",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T08:25:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89bbd659_8a62056d",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

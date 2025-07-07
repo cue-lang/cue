@@ -24,11 +24,9 @@ import (
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
@@ -64,12 +62,6 @@ func TestEvalV2(t *testing.T) {
 }
 
 func TestEvalV3(t *testing.T) {
-	// TODO: remove use of externalDeps for processing. Currently, enabling
-	// this would fix some issues, but also introduce some closedness bugs.
-	// As a first step, we should ensure that the temporary hack of using
-	// externalDeps to agitate pending dependencies is replaced with a
-	// dedicated mechanism.
-	//
 	adt.DebugDeps = true // check unmatched dependencies.
 
 	cuedebug.Init()
@@ -85,42 +77,11 @@ func TestEvalV3(t *testing.T) {
 		test.ToDo = nil
 	}
 
-	var ran, skipped, errorCount int
-
+	var errorCount int
 	test.Run(t, func(t *cuetxtar.Test) {
-		if reason := skipFiles(t.Instance().Files...); reason != "" {
-			skipped++
-			t.Skip(reason)
-		}
-		ran++
-
 		errorCount += runEvalTest(t, internal.EvalV3, flags)
 	})
-
-	t.Logf("ran: %d, skipped: %d, nodeErrors: %d",
-		ran, skipped, errorCount)
-}
-
-// skipFiles returns true if the given files contain CUE that is not yet handled
-// by the development version of the evaluator.
-func skipFiles(a ...*ast.File) (reason string) {
-	// Skip disjunctions.
-	fn := func(n ast.Node) bool {
-		switch x := n.(type) {
-		case *ast.BinaryExpr:
-			if x.Op == token.OR {
-				// Uncomment to disable disjunction testing.
-				// NOTE: keep around until implementation of disjunctions
-				// is complete.
-				// reason = "disjunctions"
-			}
-		}
-		return true
-	}
-	for _, f := range a {
-		ast.Walk(f, fn, nil)
-	}
-	return reason
+	t.Logf("nodeErrors: %d", errorCount)
 }
 
 func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cuedebug.Config) (errorCount int) {

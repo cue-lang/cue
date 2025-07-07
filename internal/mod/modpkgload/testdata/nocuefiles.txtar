@@ -10,6 +10,7 @@ main.test@v0:main
 	mod: main.test@v0
 	external: false
 	location: .
+	file: main.cue: main
 	imports:
 		example.com/blah@v0
 example.com/blah@v0

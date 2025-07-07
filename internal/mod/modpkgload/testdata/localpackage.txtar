@@ -9,6 +9,7 @@ main.test@v0:main
 	mod: main.test@v0
 	external: false
 	location: .
+	file: main.cue: main
 	imports:
 		other.com/blah
 other.com/blah
@@ -16,6 +17,7 @@ other.com/blah
 	mod: local
 	external: true
 	location: cue.mod/gen/other.com/blah
+	file: cue.mod/gen/other.com/blah/x.cue: blah
 -- main.cue --
 package main
 import "other.com/blah"

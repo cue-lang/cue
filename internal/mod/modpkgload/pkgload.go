@@ -109,8 +109,9 @@ type Package struct {
 	flags atomicLoadPkgFlags
 
 	// Populated by [loader.load].
-	mod          module.Version     // module providing package
-	modRoot      module.SourceLoc   // root location of module
+	mod          module.Version   // module providing package
+	modRoot      module.SourceLoc // root location of module
+	files        []modimports.ModuleFile
 	locs         []module.SourceLoc // location of source code directories
 	err          error              // error loading package
 	imports      []*Package         // packages imported by this one
@@ -131,6 +132,10 @@ func (pkg *Package) FromExternalModule() bool {
 
 func (pkg *Package) Locations() []module.SourceLoc {
 	return pkg.locs
+}
+
+func (pkg *Package) Files() []modimports.ModuleFile {
+	return pkg.files
 }
 
 func (pkg *Package) Error() error {
@@ -295,6 +300,7 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 	importsMap := make(map[string]bool)
 	foundPackageFile := false
 	excludedPackageFiles := 0
+	var files []modimports.ModuleFile
 	for _, loc := range pkg.locs {
 		// Layer an iterator whose yield function keeps track of whether we have seen
 		// a single valid CUE file in the package directory.
@@ -311,6 +317,7 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 					return true
 				}
 				foundPackageFile = true
+				files = append(files, mf)
 				return yield(mf, err)
 			})
 		}
@@ -331,6 +338,7 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		}
 		return
 	}
+	pkg.files = files
 	// Make the algorithm deterministic for tests.
 	imports := slices.Sorted(maps.Keys(importsMap))
 

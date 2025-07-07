@@ -66,7 +66,6 @@ func TestCompile(t *testing.T) {
 				Cwd: t.Dir,
 			}))
 		}
-		fmt.Fprintln(t)
 	})
 }
 

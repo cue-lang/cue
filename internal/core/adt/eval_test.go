@@ -190,8 +190,6 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 	}
 
 	t.Write(debug.AppendNode(nil, r, v, &debug.Config{Cwd: t.Dir}))
-	fmt.Fprintln(t)
-
 	return
 }
 

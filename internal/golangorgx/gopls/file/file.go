@@ -19,12 +19,11 @@ import (
 // Or perhaps if mod/work parsing is moved outside of the memoize cache,
 // a notion of Identity simply isn't needed.
 type Identity struct {
-	URI  protocol.DocumentURI
-	Hash Hash // digest of file contents
+	URI protocol.DocumentURI
 }
 
 func (id Identity) String() string {
-	return fmt.Sprintf("%s%s", id.URI, id.Hash)
+	return fmt.Sprintf("%s", id.URI)
 }
 
 // A FileHandle represents the URI, content, hash, and optional

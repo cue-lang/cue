@@ -87,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9491a7f0_8bc3d5d9",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9a01741_2be78f37",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50926957_3a06b8bb",
@@ -104,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74f8b8ad_28863f69",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50926957_3a06b8bb",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f8f34e0_7a4b3613",
@@ -117,6 +153,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "doc comment please. Presumably this is some kind of incrementing modification version, but it would be good to say so.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bc6e266_d755c26b",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f8f34e0_7a4b3613",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -156,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "81002402_8fe27f0d",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e719f6f_505b475c",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a0545e9_54b5dd03",
@@ -191,6 +263,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5dcffcce_ba13d3fc",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c27fdb1_179f545a",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c16912be_7ccdb813",
@@ -204,6 +294,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "```suggestion\n// (cache/fs_memoized.go in the gopls repo). CueCacheFS is also designed to bridge the\n```\n\u003e",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "090f4c33_36cb5a69",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c16912be_7ccdb813",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -225,6 +333,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "670913fc_f39459c1",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e10ac17_27d991ee",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "80973d65_fabf2ff0",
@@ -238,6 +364,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "nit: Go names usually fully capitalise acronyms and CUE is technically an acronym.\n```suggestion\ntype CUECacheFS struct {\n```\n\nditto for other occurrences.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4735868_3199b3c1",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80973d65_fabf2ff0",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -259,6 +403,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bebc40c2_75ce857b",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b879a59a_7ca401d6",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87d024eb_3e1cba21",
@@ -272,6 +434,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "doc comment please. Does this actually need to be a public API?",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "762e7302_226a7e49",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87d024eb_3e1cba21",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -381,6 +561,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc61edcc_8ddffb5a",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d35e2dd2_b85cf23e",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08f21342_da6383a0",
@@ -394,6 +592,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "Technically I think this could end up removing a legitimate entry for another URI.\nFor example, we\u0027ve got two concurrent reads for different URIs that have the same file ID. They both find there\u0027s no entry, and unlock at similar times; then they both read the file successfully; then one adds its entry and unlocks; then the other one comes along and overwrites the original.\n\nMaybe this is a sufficiently rare case and the resulting extra cache miss isn\u0027t considered a problem: in this case, I\u0027d suggest adding a TODO or comment mentioning this. \n\nAlternatively, maybe check the cache again to make sure something hasn\u0027t been added in the meantime.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3384949_54bc239e",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "08f21342_da6383a0",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -463,6 +679,30 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "\"provides implementations of\" sounds a bit like you can call methods to obtain those implementations, but AFAICS this type does actually implement all the mentioned interfaces.\n\n```suggestion\n// RootedCueCacheFS is a wrapper over [CueCacheFS] that\n// implements [iofs.FS], [iofs.ReadDirFS], [iofs.ReadFileFS],\n// [iofs.StatFS], [module.OSRootFS], and [module.ReadCUEFS]\n```",
+      "range": {
+        "startLine": 275,
+        "startChar": 0,
+        "endLine": 277,
+        "endChar": 0
+      },
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e10ac7a_a3b1918b",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a7261d0_5acea455",
       "range": {
         "startLine": 275,
         "startChar": 0,
@@ -662,6 +902,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "66d4489f_16c9f2a3",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4882ed18_dc0678d8",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64b9ffc4_299c9ab5",
@@ -675,6 +933,30 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "Maybe nice to say what the function actually does as well as describing its properties?\n\n\n```suggestion\n// View calls the given function once with a txn argument that can be\n// used to atomically access read-only data from fs, and must not be\n// used after the function returns.\n//\n// This method may be called concurrently.\n//\n// Multiple read-only transactions may run in parallel, but read-only\n// and read-write transactions are mutually exclusive. Note that nested\n// transactions of any sort are not supported, and will probably\n// deadlock.\n\nfunc (fs *OverlayFS) View(fun func(txn *OverlayFSROTxn) error) error {\n```",
+      "range": {
+        "startLine": 344,
+        "startChar": 1,
+        "endLine": 349,
+        "endChar": 1
+      },
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "383433b3_9f4f2971",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "64b9ffc4_299c9ab5",
       "range": {
         "startLine": 344,
         "startChar": 1,
@@ -702,6 +984,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "766dc0e4_0ccfce3a",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a46d7c9_94d10e45",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2348b9a_a7d25f64",
@@ -715,6 +1015,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "doc comment please.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "421053fe_8fb515f9",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2348b9a_a7d25f64",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -742,6 +1060,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2acaf56_7ef39aee",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ec6b66f_7d68e0f1",
+      "range": {
+        "startLine": 382,
+        "startChar": 0,
+        "endLine": 384,
+        "endChar": 0
+      },
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fbea906a_45306825",
@@ -755,6 +1097,30 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "Again, nice to describe the actual semantics directly?\n\n```suggestion\n// WalkFiles invokes fun on all the files present in the overlay. It\n// stops walking if fun returns an error.\n//\n// It does not, under any circumstances, access the underlying\n// CueCacheFS. The function only gets passed files, never directories.\n// All files in a directory will be processed before any subdirectories;\n// no other ordering guarantees are made.\nfunc (txn *OverlayFSROTxn) WalkFiles(fun func(File) error, uri protocol.DocumentURI) error {\n```",
+      "range": {
+        "startLine": 398,
+        "startChar": 0,
+        "endLine": 403,
+        "endChar": 0
+      },
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7430d136_ace3d2da",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fbea906a_45306825",
       "range": {
         "startLine": 398,
         "startChar": 0,
@@ -817,6 +1183,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0fbdae1f_ba3aa113",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a2ba538_a4acde07",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "09f901ed_d143523e",
@@ -834,6 +1218,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "afd1e7b1_03a47617",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09f901ed_d143523e",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "324cdc17_d59c68ee",
@@ -847,6 +1249,30 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "```suggestion\n// RootedOverlayFS is a wrapper over [OverlayFS] that\n// implements [iofs.FS], [iofs.ReadDirFS], [iofs.ReadFileFS],\n// [iofs.StatFS], [module.OSRootFS], and [module.ReadCUEFS].\ntype RootedOverlayFS struct {\n```",
+      "range": {
+        "startLine": 514,
+        "startChar": 0,
+        "endLine": 517,
+        "endChar": 0
+      },
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "501ba97a_ff507de8",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "324cdc17_d59c68ee",
       "range": {
         "startLine": 514,
         "startChar": 0,

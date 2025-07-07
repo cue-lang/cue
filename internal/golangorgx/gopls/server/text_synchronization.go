@@ -7,20 +7,15 @@ package server
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"maps"
 	"sync"
 
-	"cuelang.org/go/internal/golangorgx/gopls/cache"
-	"cuelang.org/go/internal/golangorgx/gopls/cache/metadata"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
-	"cuelang.org/go/internal/golangorgx/tools/xcontext"
 )
 
 // ModificationSource identifies the origin of a change.
@@ -176,27 +171,6 @@ func (s *server) DidClose(ctx context.Context, params *protocol.DidCloseTextDocu
 	}, FromDidClose)
 }
 
-// This exists temporarily for facilitating integration tests. TODO(ms): remove when possible.
-func logFilesToPackage(ctx context.Context, s *server, modifications []file.Modification) {
-	uriToSnapshot := make(map[protocol.DocumentURI]map[protocol.DocumentURI][]metadata.ImportPath)
-	for _, mod := range modifications {
-		snapshot, release, err := s.session.SnapshotOf(ctx, mod.URI)
-		if err != nil {
-			continue
-		}
-		uriToSnapshot[mod.URI] = maps.Clone(snapshot.MetadataGraph().FilesToPackage)
-		release()
-	}
-	bs, err := json.Marshal(uriToSnapshot)
-	if err != nil {
-		return
-	}
-	s.client.LogMessage(ctx, &protocol.LogMessageParams{
-		Type:    protocol.Debug,
-		Message: string(bs),
-	})
-}
-
 func (s *server) didModifyFiles(ctx context.Context, modifications []file.Modification, cause ModificationSource) error {
 	// wg guards two conditions:
 	//  1. didModifyFiles is complete
@@ -211,14 +185,6 @@ func (s *server) didModifyFiles(ctx context.Context, modifications []file.Modifi
 	wg.Add(1)
 	defer wg.Done()
 
-	if s.Options().VerboseWorkDoneProgress {
-		work := s.progress.Start(ctx, DiagnosticWorkTitle(cause), "Calculating file diagnostics...", nil, nil)
-		go func() {
-			wg.Wait()
-			work.End(ctx, "Done.")
-		}()
-	}
-
 	s.stateMu.Lock()
 	if s.state >= serverShutDown {
 		// This state check does not prevent races below, and exists only to
@@ -229,57 +195,7 @@ func (s *server) didModifyFiles(ctx context.Context, modifications []file.Modifi
 	}
 	s.stateMu.Unlock()
 
-	// If the set of changes included directories, expand those directories
-	// to their files.
-	modifications = s.session.ExpandModificationsToDirectories(ctx, modifications)
-
-	viewsToDiagnose, err := s.session.DidModifyFiles(ctx, modifications)
-	if err != nil {
-		return err
-	}
-
-	// golang/go#50267: diagnostics should be re-sent after each change.
-	for _, mod := range modifications {
-		s.mustPublishDiagnostics(mod.URI)
-	}
-
-	modCtx, modID := s.needsDiagnosis(ctx, viewsToDiagnose)
-
-	wg.Add(1)
-	go func() {
-		s.diagnoseChangedViews(modCtx, modID, viewsToDiagnose, cause)
-		wg.Done()
-		// Temporary exposure of internal behaviour for testing only. TODO(ms): remove when possible.
-		logFilesToPackage(ctx, s, modifications)
-	}()
-
-	// After any file modifications, we need to update our watched files,
-	// in case something changed. Compute the new set of directories to watch,
-	// and if it differs from the current set, send updated registrations.
-	return s.updateWatchedDirectories(ctx)
-}
-
-// needsDiagnosis records the given views as needing diagnosis, returning the
-// context and modification id to use for said diagnosis.
-//
-// Only the keys of viewsToDiagnose are used; the changed files are irrelevant.
-func (s *server) needsDiagnosis(ctx context.Context, viewsToDiagnose map[*cache.View][]protocol.DocumentURI) (context.Context, uint64) {
-	s.modificationMu.Lock()
-	defer s.modificationMu.Unlock()
-	if s.cancelPrevDiagnostics != nil {
-		s.cancelPrevDiagnostics()
-	}
-	modCtx := xcontext.Detach(ctx)
-	modCtx, s.cancelPrevDiagnostics = context.WithCancel(modCtx)
-	s.lastModificationID++
-	modID := s.lastModificationID
-
-	for v := range viewsToDiagnose {
-		if needs, ok := s.viewsToDiagnose[v]; !ok || needs < modID {
-			s.viewsToDiagnose[v] = modID
-		}
-	}
-	return modCtx, modID
+	return nil
 }
 
 // DiagnosticWorkTitle returns the title of the diagnostic work resulting from a
@@ -302,10 +218,7 @@ func (s *server) changedText(ctx context.Context, uri protocol.DocumentURI, chan
 }
 
 func (s *server) applyIncrementalChanges(ctx context.Context, uri protocol.DocumentURI, changes []protocol.TextDocumentContentChangeEvent) ([]byte, error) {
-	fh, err := s.session.ReadFile(ctx, uri)
-	if err != nil {
-		return nil, err
-	}
+	var fh file.Handle // HACK to make it compile
 	content, err := fh.Content()
 	if err != nil {
 		return nil, fmt.Errorf("%w: file not found (%v)", jsonrpc2.ErrInternal, err)

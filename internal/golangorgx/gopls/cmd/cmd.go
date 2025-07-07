@@ -21,16 +21,12 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"cuelang.org/go/internal/golangorgx/gopls/cache"
-	"cuelang.org/go/internal/golangorgx/gopls/debug"
-	"cuelang.org/go/internal/golangorgx/gopls/filecache"
 	"cuelang.org/go/internal/golangorgx/gopls/lsprpc"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 	"cuelang.org/go/internal/golangorgx/gopls/server"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/util/browser"
-	bugpkg "cuelang.org/go/internal/golangorgx/gopls/util/bug"
 	"cuelang.org/go/internal/golangorgx/gopls/util/constraints"
 	"cuelang.org/go/internal/golangorgx/tools/diff"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
@@ -229,12 +225,6 @@ func isZeroValue(f *flag.Flag, value string) bool {
 // If no arguments are passed it will invoke the server sub command, as a
 // temporary measure for compatibility.
 func (app *Application) Run(ctx context.Context, args ...string) error {
-	// In the category of "things we can do while waiting for the Go command":
-	// Pre-initialize the filecache, which takes ~50ms to hash the gopls
-	// executable, and immediately runs a gc.
-	filecache.Start()
-
-	ctx = debug.WithInstance(ctx, app.OCAgent)
 	if len(args) == 0 {
 		s := flag.NewFlagSet(app.Name(), flag.ExitOnError)
 		return tool.Run(ctx, s, &app.Serve, args)
@@ -263,8 +253,6 @@ func (app *Application) Commands() []tool.Application {
 func (app *Application) mainCommands() []tool.Application {
 	return []tool.Application{
 		&app.Serve,
-		&version{app: app},
-		&bug{app: app},
 		&help{app: app},
 		&apiJSON{app: app},
 		&licenses{app: app},
@@ -296,7 +284,7 @@ func (app *Application) connect(ctx context.Context, onProgress func(*protocol.P
 	case app.Remote == "":
 		client := newClient(app, onProgress)
 		options := settings.DefaultOptions(app.options)
-		server := server.New(cache.NewSession(ctx, cache.New(nil)), client, options)
+		server := server.New(client, options)
 		conn := newConnection(server, client)
 		if err := conn.initialize(protocol.WithClient(ctx, client), app.options); err != nil {
 			return nil, err
@@ -796,7 +784,7 @@ func (f *cmdFile) spanRange(s span) (protocol.Range, error) {
 	// requires querying the file system, and we don't want
 	// to do that.
 	if !strings.EqualFold(filepath.Base(string(f.mapper.URI)), filepath.Base(string(s.URI()))) {
-		return protocol.Range{}, bugpkg.Errorf("mapper is for file %q instead of %q", f.mapper.URI, s.URI())
+		return protocol.Range{}, fmt.Errorf("mapper is for file %q instead of %q", f.mapper.URI, s.URI())
 	}
 	start, err := pointPosition(f.mapper, s.Start())
 	if err != nil {

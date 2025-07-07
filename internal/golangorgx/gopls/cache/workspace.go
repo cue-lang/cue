@@ -21,7 +21,7 @@ func isGoWork(uri protocol.DocumentURI) bool {
 }
 
 // goWorkModules returns the URIs of go.mod files named by the go.work file.
-func goWorkModules(ctx context.Context, gowork protocol.DocumentURI, fs file.Source) (map[protocol.DocumentURI]unit, error) {
+func goWorkModules(ctx context.Context, gowork protocol.DocumentURI, fs file.Source) (map[protocol.DocumentURI]struct{}, error) {
 	fh, err := fs.ReadFile(ctx, gowork)
 	if err != nil {
 		return nil, err // canceled
@@ -47,15 +47,15 @@ func goWorkModules(ctx context.Context, gowork protocol.DocumentURI, fs file.Sou
 // goWorkOrModPaths, which is a slice of paths as contained in a go.work 'use'
 // directive or go.mod 'replace' directive (and which therefore may use either
 // '/' or '\' as a path separator).
-func localModFiles(relativeTo string, goWorkOrModPaths []string) map[protocol.DocumentURI]unit {
-	modFiles := make(map[protocol.DocumentURI]unit)
+func localModFiles(relativeTo string, goWorkOrModPaths []string) map[protocol.DocumentURI]struct{} {
+	modFiles := make(map[protocol.DocumentURI]struct{})
 	for _, path := range goWorkOrModPaths {
 		modDir := filepath.FromSlash(path)
 		if !filepath.IsAbs(modDir) {
 			modDir = filepath.Join(relativeTo, modDir)
 		}
 		modURI := protocol.URIFromPath(filepath.Join(modDir, "go.mod"))
-		modFiles[modURI] = unit{}
+		modFiles[modURI] = struct{}{}
 	}
 	return modFiles
 }
@@ -68,7 +68,7 @@ func isGoMod(uri protocol.DocumentURI) bool {
 // goModModules returns the URIs of "workspace" go.mod files defined by a
 // go.mod file. This set is defined to be the given go.mod file itself, as well
 // as the modfiles of any locally replaced modules in the go.mod file.
-func goModModules(ctx context.Context, gomod protocol.DocumentURI, fs file.Source) (map[protocol.DocumentURI]unit, error) {
+func goModModules(ctx context.Context, gomod protocol.DocumentURI, fs file.Source) (map[protocol.DocumentURI]struct{}, error) {
 	fh, err := fs.ReadFile(ctx, gomod)
 	if err != nil {
 		return nil, err // canceled
@@ -90,7 +90,7 @@ func goModModules(ctx context.Context, gomod protocol.DocumentURI, fs file.Sourc
 		}
 	}
 	modFiles := localModFiles(dir, localReplaces)
-	modFiles[gomod] = unit{}
+	modFiles[gomod] = struct{}{}
 	return modFiles, nil
 }
 
@@ -110,3 +110,18 @@ var errExhausted = errors.New("exhausted")
 // Note: per golang/go#56496, the previous limit of 1M files was too slow, at
 // which point this limit was decreased to 100K.
 const fileLimit = 100_000
+
+// checkPathValid performs an OS-specific path validity check. The
+// implementation varies for filesystems that are case-insensitive
+// (e.g. macOS, Windows), and for those that disallow certain file
+// names (e.g. path segments ending with a period on Windows, or
+// reserved names such as "com"; see
+// https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file).
+var checkPathValid = defaultCheckPathValid
+
+// CheckPathValid checks whether a directory is suitable as a workspace folder.
+func CheckPathValid(dir string) error { return checkPathValid(dir) }
+
+func defaultCheckPathValid(path string) error {
+	return nil
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cabf342_e8cd31c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-07T15:49:05Z",
+      "side": 1,
+      "message": "Ideally we don\u0027t disable the tests at any point along the way, but I get that in this point in time this may be really hard to avoid. SGTM given that your plan is for the following commits to undo this.",
+      "revId": "8308363b4840150774164990c96986b820be3576",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

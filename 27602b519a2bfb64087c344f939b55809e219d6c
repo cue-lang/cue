@@ -666,6 +666,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae9356e2_83f671b5",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:11:22Z",
+      "side": 1,
+      "message": "Done; I can see arguments either way re the API choice. I think it\u0027s slightly nicer to leave it as a filepath - it would mean you could (if you wanted to), create a CUECacheFS and immediately convert it to an fs.FS without having to worry about URIs at all. But I also accept this isn\u0027t an existing, nor necessarily anticipated, use case.",
+      "parentUuid": "4b98a2ea_74f26350",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a7261d0_5acea455",
@@ -726,6 +744,24 @@
       "writtenOn": "2025-07-04T17:44:17Z",
       "side": 1,
       "message": "Why is this type exported? I don\u0027t see any constructors, and ISTM that it\u0027s probably not a great idea for clients to type assert to it.\n\nDitto for RootedOverlayFS.",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2f299f7_396793c3",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T11:11:22Z",
+      "side": 1,
+      "message": "Done. Both can safely be moved to unexported.",
+      "parentUuid": "de685b6f_262de45a",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

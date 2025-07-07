@@ -513,12 +513,6 @@ func NoOutstandingWork(ignore func(title, msg string) bool) Expectation {
 	}
 }
 
-// IgnoreTelemetryPromptWork may be used in conjunction with NoOutStandingWork
-// to ignore the telemetry prompt.
-func IgnoreTelemetryPromptWork(title, msg string) bool {
-	return title == server.TelemetryPromptWorkTitle
-}
-
 // NoErrorLogs asserts that the client has not received any log messages of
 // error severity.
 func NoErrorLogs() Expectation {

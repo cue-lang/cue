@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"cuelang.org/go/internal/golangorgx/gopls/cache"
-	"cuelang.org/go/internal/golangorgx/gopls/debug"
 	"cuelang.org/go/internal/golangorgx/gopls/lsprpc"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
@@ -180,9 +179,6 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 				defer cancel()
 			}
 
-			// TODO(rfindley): do we need an instance at all? Can it be removed?
-			ctx = debug.WithInstance(ctx, "off")
-
 			rootDir := filepath.Join(r.tempDir, filepath.FromSlash(t.Name()))
 			if err := os.MkdirAll(rootDir, 0755); err != nil {
 				t.Fatal(err)
@@ -313,7 +309,7 @@ func (s *loggingFramer) printBuffers(testname string, w io.Writer) {
 
 // defaultServer handles the Default execution mode.
 func (r *Runner) defaultServer(optsHook func(*settings.Options)) jsonrpc2.StreamServer {
-	return lsprpc.NewStreamServer(cache.New(r.store), false, optsHook)
+	return lsprpc.NewStreamServer(cache.New(), false, optsHook)
 }
 
 // experimentalServer handles the Experimental execution mode.
@@ -322,15 +318,14 @@ func (r *Runner) experimentalServer(optsHook func(*settings.Options)) jsonrpc2.S
 		optsHook(o)
 		o.EnableAllExperiments()
 	}
-	return lsprpc.NewStreamServer(cache.New(nil), false, options)
+	return lsprpc.NewStreamServer(cache.New(), false, options)
 }
 
 // forwardedServer handles the Forwarded execution mode.
 func (r *Runner) forwardedServer(optsHook func(*settings.Options)) jsonrpc2.StreamServer {
 	r.tsOnce.Do(func() {
 		ctx := context.Background()
-		ctx = debug.WithInstance(ctx, "off")
-		ss := lsprpc.NewStreamServer(cache.New(nil), false, optsHook)
+		ss := lsprpc.NewStreamServer(cache.New(), false, optsHook)
 		r.ts = servertest.NewTCPServer(ctx, ss, nil)
 	})
 	return newForwarder("tcp", r.ts.Addr)

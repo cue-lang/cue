@@ -11,18 +11,14 @@ import (
 	"fmt"
 	"io"
 
-	"cuelang.org/go/internal/golangorgx/gopls/telemetry"
-	"cuelang.org/go/internal/golangorgx/gopls/util/bug"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
-	jsonrpc2_v2 "cuelang.org/go/internal/golangorgx/tools/jsonrpc2_v2"
 	"cuelang.org/go/internal/golangorgx/tools/xcontext"
 )
 
 var (
 	// RequestCancelledError should be used when a request is cancelled early.
-	RequestCancelledError   = jsonrpc2.NewError(-32800, "JSON RPC cancelled")
-	RequestCancelledErrorV2 = jsonrpc2_v2.NewError(-32800, "JSON RPC cancelled")
+	RequestCancelledError = jsonrpc2.NewError(-32800, "JSON RPC cancelled")
 )
 
 type ClientCloser interface {
@@ -71,40 +67,10 @@ func (c clientConn) Call(ctx context.Context, method string, params interface{},
 	return err
 }
 
-func ClientDispatcherV2(conn *jsonrpc2_v2.Connection) ClientCloser {
-	return &clientDispatcher{clientConnV2{conn}}
-}
-
-type clientConnV2 struct {
-	conn *jsonrpc2_v2.Connection
-}
-
-func (c clientConnV2) Close() error {
-	return c.conn.Close()
-}
-
-func (c clientConnV2) Notify(ctx context.Context, method string, params interface{}) error {
-	return c.conn.Notify(ctx, method, params)
-}
-
-func (c clientConnV2) Call(ctx context.Context, method string, params interface{}, result interface{}) error {
-	call := c.conn.Call(ctx, method, params)
-	err := call.Await(ctx, result)
-	if ctx.Err() != nil {
-		detached := xcontext.Detach(ctx)
-		c.conn.Notify(detached, "$/cancelRequest", &CancelParams{ID: call.ID().Raw()})
-	}
-	return err
-}
-
 // ServerDispatcher returns a Server that dispatches LSP requests across the
 // given jsonrpc2 connection.
 func ServerDispatcher(conn jsonrpc2.Conn) Server {
 	return &serverDispatcher{sender: clientConn{conn}}
-}
-
-func ServerDispatcherV2(conn *jsonrpc2_v2.Connection) Server {
-	return &serverDispatcher{sender: clientConnV2{conn}}
 }
 
 type serverDispatcher struct {
@@ -125,32 +91,6 @@ func ClientHandler(client Client, handler jsonrpc2.Handler) jsonrpc2.Handler {
 	}
 }
 
-func ClientHandlerV2(client Client) jsonrpc2_v2.Handler {
-	return jsonrpc2_v2.HandlerFunc(func(ctx context.Context, req *jsonrpc2_v2.Request) (interface{}, error) {
-		if ctx.Err() != nil {
-			return nil, RequestCancelledErrorV2
-		}
-		req1 := req2to1(req)
-		var (
-			result interface{}
-			resErr error
-		)
-		replier := func(_ context.Context, res interface{}, err error) error {
-			if err != nil {
-				resErr = err
-				return nil
-			}
-			result = res
-			return nil
-		}
-		_, err := clientDispatch(ctx, client, replier, req1)
-		if err != nil {
-			return nil, err
-		}
-		return result, resErr
-	})
-}
-
 func ServerHandler(server Server, handler jsonrpc2.Handler) jsonrpc2.Handler {
 	return func(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
 		if ctx.Err() != nil {
@@ -163,57 +103,6 @@ func ServerHandler(server Server, handler jsonrpc2.Handler) jsonrpc2.Handler {
 		}
 		return handler(ctx, reply, req)
 	}
-}
-
-func ServerHandlerV2(server Server) jsonrpc2_v2.Handler {
-	return jsonrpc2_v2.HandlerFunc(func(ctx context.Context, req *jsonrpc2_v2.Request) (interface{}, error) {
-		if ctx.Err() != nil {
-			return nil, RequestCancelledErrorV2
-		}
-		req1 := req2to1(req)
-		var (
-			result interface{}
-			resErr error
-		)
-		replier := func(_ context.Context, res interface{}, err error) error {
-			if err != nil {
-				resErr = err
-				return nil
-			}
-			result = res
-			return nil
-		}
-		_, err := serverDispatch(ctx, server, replier, req1)
-		if err != nil {
-			return nil, err
-		}
-		return result, resErr
-	})
-}
-
-func req2to1(req2 *jsonrpc2_v2.Request) jsonrpc2.Request {
-	if req2.ID.IsValid() {
-		raw := req2.ID.Raw()
-		var idv1 jsonrpc2.ID
-		switch v := raw.(type) {
-		case int64:
-			idv1 = jsonrpc2.NewIntID(v)
-		case string:
-			idv1 = jsonrpc2.NewStringID(v)
-		default:
-			panic(fmt.Sprintf("unsupported ID type %T", raw))
-		}
-		req1, err := jsonrpc2.NewCall(idv1, req2.Method, req2.Params)
-		if err != nil {
-			panic(err)
-		}
-		return req1
-	}
-	req1, err := jsonrpc2.NewNotification(req2.Method, req2.Params)
-	if err != nil {
-		panic(err)
-	}
-	return req1
 }
 
 func Handlers(handler jsonrpc2.Handler) jsonrpc2.Handler {
@@ -296,18 +185,4 @@ func NonNilSlice[T comparable](x []T) []T {
 		return []T{}
 	}
 	return x
-}
-
-func recoverHandlerPanic(method string) {
-	// Report panics in the handler goroutine,
-	// unless we have enabled the monitor,
-	// which reports all crashes.
-	if !telemetry.CrashMonitorSupported() {
-		defer func() {
-			if x := recover(); x != nil {
-				bug.Reportf("panic in %s request", method)
-				panic(x)
-			}
-		}()
-	}
 }

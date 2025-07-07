@@ -15,10 +15,7 @@ import (
 	"time"
 
 	"cuelang.org/go/internal/golangorgx/gopls/cache"
-	"cuelang.org/go/internal/golangorgx/gopls/debug"
 	"cuelang.org/go/internal/golangorgx/gopls/lsprpc"
-	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/golangorgx/gopls/telemetry"
 	"cuelang.org/go/internal/golangorgx/tools/fakenet"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/golangorgx/tools/tool"
@@ -32,8 +29,6 @@ type Serve struct {
 	Port        int           `flag:"port" help:"port on which to run gopls for debugging purposes"`
 	Address     string        `flag:"listen" help:"address on which to listen for remote connections. If prefixed by 'unix;', the subsequent address is assumed to be a unix domain socket. Otherwise, TCP is used."`
 	IdleTimeout time.Duration `flag:"listen.timeout" help:"when used with -listen, shut down the server when there are no connected clients for this duration"`
-	Trace       bool          `flag:"rpc.trace" help:"print the full rpc trace in lsp inspector format"`
-	Debug       string        `flag:"debug" help:"serve debug information on the supplied address"`
 
 	RemoteListenTimeout time.Duration `flag:"remote.listen.timeout" help:"when used with -remote=auto, the -listen.timeout value used to start the daemon"`
 	RemoteDebug         string        `flag:"remote.debug" help:"when used with -remote=auto, the -debug value used to start the daemon"`
@@ -78,23 +73,11 @@ func (s *Serve) remoteArgs(network, address string) []string {
 // Run configures a server based on the flags, and then runs it.
 // It blocks until the server shuts down.
 func (s *Serve) Run(ctx context.Context, args ...string) error {
-	telemetry.Upload()
-
 	if len(args) > 0 {
 		return tool.CommandLineErrorf("server does not take arguments, got %v", args)
 	}
 
-	di := debug.GetInstance(ctx)
 	isDaemon := s.Address != "" || s.Port != 0
-	if di != nil {
-		closeLog, err := di.SetLogFile(s.Logfile, isDaemon)
-		if err != nil {
-			return err
-		}
-		defer closeLog()
-		di.ServerAddress = s.Address
-		di.Serve(ctx, s.Debug)
-	}
 	var ss jsonrpc2.StreamServer
 	if s.app.Remote != "" {
 		var err error
@@ -103,7 +86,7 @@ func (s *Serve) Run(ctx context.Context, args ...string) error {
 			return fmt.Errorf("creating forwarder: %w", err)
 		}
 	} else {
-		ss = lsprpc.NewStreamServer(cache.New(nil), isDaemon, s.app.options)
+		ss = lsprpc.NewStreamServer(cache.New(), isDaemon, s.app.options)
 	}
 
 	var network, addr string
@@ -137,9 +120,6 @@ func (s *Serve) Run(ctx context.Context, args ...string) error {
 		return jsonrpc2.ListenAndServe(ctx, network, addr, ss, s.IdleTimeout)
 	}
 	stream := jsonrpc2.NewHeaderStream(fakenet.NewConn("stdio", os.Stdin, os.Stdout))
-	if s.Trace && di != nil {
-		stream = protocol.LoggingStream(stream, di.LogWriter)
-	}
 	conn := jsonrpc2.NewConn(stream)
 	err := ss.ServeStream(ctx, conn)
 	if errors.Is(err, io.EOF) {

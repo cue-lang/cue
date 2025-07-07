@@ -7,21 +7,14 @@ package cmd
 // This file defines the help, bug, version, api-json, licenses commands.
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"net/url"
 	"os"
-	"sort"
 	"strings"
 
-	"cuelang.org/go/internal/golangorgx/gopls/debug"
-	"cuelang.org/go/internal/golangorgx/gopls/filecache"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"cuelang.org/go/internal/golangorgx/gopls/util/browser"
-	goplsbug "cuelang.org/go/internal/golangorgx/gopls/util/bug"
 	"cuelang.org/go/internal/golangorgx/tools/tool"
 )
 
@@ -71,144 +64,6 @@ func (h *help) Run(ctx context.Context, args ...string) error {
 	// when it sees the -h flag.
 	fs := flag.NewFlagSet(cmd.Name(), flag.ExitOnError)
 	return tool.Run(ctx, fs, h.app, append(args[:len(args):len(args)], "-h"))
-}
-
-// version implements the version command.
-type version struct {
-	JSON bool `flag:"json" help:"outputs in json format."`
-
-	app *Application
-}
-
-func (v *version) Name() string      { return "version" }
-func (v *version) Parent() string    { return v.app.Name() }
-func (v *version) Usage() string     { return "" }
-func (v *version) ShortHelp() string { return "print the gopls version information" }
-func (v *version) DetailedHelp(f *flag.FlagSet) {
-	fmt.Fprint(f.Output(), ``)
-	printFlagDefaults(f)
-}
-
-// Run prints version information to stdout.
-func (v *version) Run(ctx context.Context, args ...string) error {
-	var mode = debug.PlainText
-	if v.JSON {
-		mode = debug.JSON
-	}
-
-	return debug.PrintVersionInfo(ctx, os.Stdout, v.app.verbose(), mode)
-}
-
-// bug implements the bug command.
-type bug struct {
-	app *Application
-}
-
-func (b *bug) Name() string      { return "bug" }
-func (b *bug) Parent() string    { return b.app.Name() }
-func (b *bug) Usage() string     { return "" }
-func (b *bug) ShortHelp() string { return "report a bug in gopls" }
-func (b *bug) DetailedHelp(f *flag.FlagSet) {
-	fmt.Fprint(f.Output(), ``)
-	printFlagDefaults(f)
-}
-
-const goplsBugPrefix = "x/tools/gopls: <DESCRIBE THE PROBLEM>"
-const goplsBugHeader = `ATTENTION: Please answer these questions BEFORE submitting your issue. Thanks!
-
-#### What did you do?
-If possible, provide a recipe for reproducing the error.
-A complete runnable program is good.
-A link on play.golang.org is better.
-A failing unit test is the best.
-
-#### What did you expect to see?
-
-
-#### What did you see instead?
-
-
-`
-
-// Run collects some basic information and then prepares an issue ready to
-// be reported.
-func (b *bug) Run(ctx context.Context, args ...string) error {
-	// This undocumented environment variable allows
-	// the cmd integration test (and maintainers) to
-	// trigger a call to bug.Report.
-	if msg := os.Getenv("TEST_GOPLS_BUG"); msg != "" {
-		filecache.Start() // register bug handler
-		goplsbug.Report(msg)
-		return nil
-	}
-
-	// Enumerate bug reports, grouped and sorted.
-	_, reports := filecache.BugReports()
-	sort.Slice(reports, func(i, j int) bool {
-		x, y := reports[i], reports[i]
-		if x.Key != y.Key {
-			return x.Key < y.Key // ascending key order
-		}
-		return y.AtTime.Before(x.AtTime) // most recent first
-	})
-	keyDenom := make(map[string]int) // key is "file:line"
-	for _, report := range reports {
-		keyDenom[report.Key]++
-	}
-
-	// Privacy: the content of 'public' will be posted to GitHub
-	// to populate an issue textarea. Even though the user must
-	// submit the form to share the information with the world,
-	// merely populating the form causes us to share the
-	// information with GitHub itself.
-	//
-	// For that reason, we cannot write private information to
-	// public, such as bug reports, which may quote source code.
-	public := &bytes.Buffer{}
-	fmt.Fprint(public, goplsBugHeader)
-	if len(reports) > 0 {
-		fmt.Fprintf(public, "#### Internal errors\n\n")
-		fmt.Fprintf(public, "Gopls detected %d internal errors, %d distinct:\n",
-			len(reports), len(keyDenom))
-		for key, denom := range keyDenom {
-			fmt.Fprintf(public, "- %s (%d)\n", key, denom)
-		}
-		fmt.Fprintf(public, "\nPlease copy the full information printed by `gopls bug` here, if you are comfortable sharing it.\n\n")
-	}
-	debug.PrintVersionInfo(ctx, public, true, debug.Markdown)
-	body := public.String()
-	title := strings.Join(args, " ")
-	if !strings.HasPrefix(title, goplsBugPrefix) {
-		title = goplsBugPrefix + title
-	}
-	if !browser.Open("https://github.com/golang/go/issues/new?title=" + url.QueryEscape(title) + "&body=" + url.QueryEscape(body)) {
-		fmt.Print("Please file a new issue at golang.org/issue/new using this template:\n\n")
-		fmt.Print(body)
-	}
-
-	// Print bug reports to stdout (not GitHub).
-	keyNum := make(map[string]int)
-	for _, report := range reports {
-		fmt.Printf("-- %v -- \n", report.AtTime)
-
-		// Append seq number (e.g. " (1/2)") for repeated keys.
-		var seq string
-		if denom := keyDenom[report.Key]; denom > 1 {
-			keyNum[report.Key]++
-			seq = fmt.Sprintf(" (%d/%d)", keyNum[report.Key], denom)
-		}
-
-		// Privacy:
-		// - File and Stack may contain the name of the user that built gopls.
-		// - Description may contain names of the user's packages/files/symbols.
-		fmt.Printf("%s:%d: %s%s\n\n", report.File, report.Line, report.Description, seq)
-		fmt.Printf("%s\n\n", report.Stack)
-	}
-	if len(reports) > 0 {
-		fmt.Printf("Please copy the above information into the GitHub issue, if you are comfortable sharing it.\n")
-	}
-
-	return nil
 }
 
 type apiJSON struct {

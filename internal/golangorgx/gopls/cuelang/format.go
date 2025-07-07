@@ -22,7 +22,6 @@ import (
 
 	cueformat "cuelang.org/go/cue/format"
 
-	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/tools/diff"
@@ -30,7 +29,7 @@ import (
 )
 
 // FormatCUE formats a CUE file with a given range.
-func FormatCUE(ctx context.Context, snapshot *cache.Snapshot, fh file.Handle) ([]protocol.TextEdit, error) {
+func FormatCUE(ctx context.Context, fh file.Handle) ([]protocol.TextEdit, error) {
 	ctx, done := event.Start(ctx, "source.FormatCUE")
 	defer done()
 

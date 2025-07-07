@@ -21,6 +21,7 @@ func TestMain(m *testing.M) {
 // works, or fails, as expected, due to various combinations of
 // WorkspaceFolders and the RootURI being set or unset.
 func TestWorkspaceFoldersRootURI(t *testing.T) {
+	t.Skip("cuelsp disabled")
 	const filesOneModule = `
 -- cue.mod/module.cue --
 module: "mod.example/b"
@@ -158,6 +159,7 @@ package a
 // the workspace folder does not correspond to the root of a CUE module. In
 // this case there is simply no CUE module.
 func TestNoContainingModule(t *testing.T) {
+	t.Skip("cuelsp disabled")
 	const files = `
 -- a.cue --
 package a
@@ -174,6 +176,7 @@ package a
 // this case, the parent directory corresponds to the root of CUE module, but
 // the workspace folder itself corresponds to a subdirectory in the CUE module.
 func TestWorkspaceFolderWithCUEModInParent(t *testing.T) {
+	t.Skip("cuelsp disabled")
 	const files = `
 -- cue.mod/module.cue --
 -- a/a.cue --

@@ -5,12 +5,9 @@
 package cache
 
 import (
-	"reflect"
 	"strconv"
 	"sync/atomic"
 
-	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
-	"cuelang.org/go/internal/golangorgx/tools/imports"
 	"cuelang.org/go/internal/golangorgx/tools/memoize"
 )
 
@@ -20,21 +17,11 @@ import (
 // Both the fset and store may be nil, but if store is non-nil so must be fset
 // (and they must always be used together), otherwise it may be possible to get
 // cached data referencing token.Pos values not mapped by the FileSet.
-func New(store *memoize.Store) *Cache {
+func New() *Cache {
 	index := atomic.AddInt64(&cacheIndex, 1)
 
-	if store == nil {
-		store = &memoize.Store{}
-	}
-
 	c := &Cache{
-		id:         strconv.FormatInt(index, 10),
-		store:      store,
-		memoizedFS: newMemoizedFS(),
-		modCache: &sharedModCache{
-			caches: make(map[string]*imports.DirInfoCache),
-			timers: make(map[string]*refreshTimer),
-		},
+		id: strconv.FormatInt(index, 10),
 	}
 	return c
 }
@@ -51,26 +38,8 @@ type Cache struct {
 	// consider removing it, replacing current uses with a simpler futures cache,
 	// as we've done for e.g. type-checked packages.
 	store *memoize.Store
-
-	// memoizedFS holds a shared file.Source that caches reads.
-	//
-	// Reads are invalidated when *any* session gets a didChangeWatchedFile
-	// notification. This is fine: it is the responsibility of memoizedFS to hold
-	// our best knowledge of the current file system state.
-	*memoizedFS
-
-	// modCache holds the
-	modCache *sharedModCache
 }
 
 var cacheIndex, sessionIndex, viewIndex int64
 
-func (c *Cache) ID() string                     { return c.id }
-func (c *Cache) MemStats() map[reflect.Type]int { return c.store.Stats() }
-
-// FileStats returns information about the set of files stored in the cache.
-// It is intended for debugging only.
-func (c *Cache) FileStats() (stats command.FileStats) {
-	stats.Total, stats.Largest, stats.Errs = c.fileStats()
-	return
-}
+func (c *Cache) ID() string { return c.id }

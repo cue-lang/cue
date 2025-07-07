@@ -11,6 +11,7 @@ import (
 )
 
 func TestEditing(t *testing.T) {
+	t.Skip("cuelsp disabled")
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"

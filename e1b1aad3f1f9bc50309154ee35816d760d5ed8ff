@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fa37e87_f22dc421",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T14:02:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e29413e5_751c860b",
+      "revId": "e1b1aad3f1f9bc50309154ee35816d760d5ed8ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91cb82db_4f48e334",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-07T13:50:57Z",
       "side": 1,
       "message": "```suggestion\n// Name implements [iofs.FileInfo] and [iofs.DirEntry]\n```",
+      "revId": "e1b1aad3f1f9bc50309154ee35816d760d5ed8ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "623a8484_49d593eb",
+        "filename": "internal/lsp/fscache/fs_overlay.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T14:02:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91cb82db_4f48e334",
       "revId": "e1b1aad3f1f9bc50309154ee35816d760d5ed8ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1402224c_0687c9ea",
+        "filename": "internal/lsp/fscache/fs_overlay.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T14:02:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf481ff8_8d9a3009",
+      "revId": "e1b1aad3f1f9bc50309154ee35816d760d5ed8ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d2fc1477_64c4a7c3",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a334026_5492b5aa",
+        "filename": "internal/lsp/fscache/fs_overlay.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 474,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T14:02:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d2fc1477_64c4a7c3",
+      "revId": "e1b1aad3f1f9bc50309154ee35816d760d5ed8ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7bd5ffaa_19a5e7d5",
@@ -82,6 +154,24 @@
       "writtenOn": "2025-07-07T13:50:57Z",
       "side": 1,
       "message": "```suggestion\n// mergeSort merges as and bs into a single slice\n// sorted by name, discarding elements of bs when\n// they\u0027re duplicated in as.\n//\n// Invariant: as and bs must both be sorted by Name,\n```\n\n?",
+      "revId": "e1b1aad3f1f9bc50309154ee35816d760d5ed8ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08d65fc8_c455afd2",
+        "filename": "internal/lsp/fscache/fs_overlay.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 685,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T14:02:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7bd5ffaa_19a5e7d5",
       "revId": "e1b1aad3f1f9bc50309154ee35816d760d5ed8ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

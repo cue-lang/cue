@@ -71,6 +71,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d9a01741_2be78f37",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T09:51:04Z",
+      "side": 1,
+      "message": "rename to FileHandle; borrow doc comments from upstream.",
+      "parentUuid": "38952178_26a0e99a",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "50926957_3a06b8bb",
         "filename": "internal/fscache/fs_cache.go",
         "patchSetId": 9
@@ -328,6 +346,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dba4db47_040ba5f7",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T09:51:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "775fceb4_1711e31f",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d35e2dd2_b85cf23e",
@@ -485,6 +521,24 @@
       "side": 1,
       "message": "I went back and forth on this. There are very important differences between this implementation and the one on rootedoverlayfs, so I wanted to keep them in different namespaces.",
       "parentUuid": "3fc5551d_6157ef19",
+      "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea412f1b_2762782b",
+        "filename": "internal/fscache/fs_overlay.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T09:51:04Z",
+      "side": 1,
+      "message": "Done; but add docs.",
+      "parentUuid": "e8e9db43_3a90fe21",
       "revId": "27602b519a2bfb64087c344f939b55809e219d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

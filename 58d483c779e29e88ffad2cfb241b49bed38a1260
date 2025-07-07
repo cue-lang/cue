@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "744de694_696ad99e",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T09:51:04Z",
+      "side": 1,
+      "message": "add comment here that uri could be a dir, and we want to purge anything under it.",
+      "revId": "58d483c779e29e88ffad2cfb241b49bed38a1260",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f956898b_794108f1",
+        "filename": "internal/fscache/fs_cache.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-07T09:51:04Z",
+      "side": 1,
+      "message": "go through the use of root and be careful about if root originally had windows drive paths in it.",
+      "revId": "58d483c779e29e88ffad2cfb241b49bed38a1260",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

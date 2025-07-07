@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e29413e5_751c860b",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-07T13:50:57Z",
+      "side": 1,
+      "message": "```suggestion\nfunc NewCUECachedFS() *CUECacheFS {\n```",
+      "revId": "e1b1aad3f1f9bc50309154ee35816d760d5ed8ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91cb82db_4f48e334",
+        "filename": "internal/lsp/fscache/fs_overlay.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-07T13:50:57Z",
+      "side": 1,
+      "message": "```suggestion\n// Name implements [iofs.FileInfo] and [iofs.DirEntry]\n```",
+      "revId": "e1b1aad3f1f9bc50309154ee35816d760d5ed8ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf481ff8_8d9a3009",
+        "filename": "internal/lsp/fscache/fs_overlay.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-07T13:50:57Z",
+      "side": 1,
+      "message": "```suggestion\n// getDirLocked searches the fs for a directory by following the path\n```",
+      "revId": "e1b1aad3f1f9bc50309154ee35816d760d5ed8ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2fc1477_64c4a7c3",
+        "filename": "internal/lsp/fscache/fs_overlay.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 474,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-07T13:50:57Z",
+      "side": 1,
+      "message": "```suggestion\n// The version parameter is the file version, as defined by the LSP\n```",
+      "revId": "e1b1aad3f1f9bc50309154ee35816d760d5ed8ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bd5ffaa_19a5e7d5",
+        "filename": "internal/lsp/fscache/fs_overlay.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 685,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-07T13:50:57Z",
+      "side": 1,
+      "message": "```suggestion\n// mergeSort merges as and bs into a single slice\n// sorted by name, discarding elements of bs when\n// they\u0027re duplicated in as.\n//\n// Invariant: as and bs must both be sorted by Name,\n```\n\n?",
+      "revId": "e1b1aad3f1f9bc50309154ee35816d760d5ed8ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

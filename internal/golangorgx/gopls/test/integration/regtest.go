@@ -13,7 +13,6 @@ import (
 	"testing"
 	"time"
 
-	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/cmd"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/tools/gocommand"
@@ -71,11 +70,11 @@ func (r configuredRunner) Run(t *testing.T, files string, f TestFunc) {
 	// when an arbitrary string (e.g. "foo.") is used as a subtest
 	// name, on a platform with filename restrictions (e.g. no
 	// trailing period on Windows).
-	tmp := t.TempDir()
-	if err := cache.CheckPathValid(tmp); err != nil {
-		t.Logf("Warning: testing.T.TempDir(%s) is not valid as a workspace folder: %s",
-			tmp, err)
-	}
+	// tmp := t.TempDir()
+	// if err := cache.CheckPathValid(tmp); err != nil {
+	// 	t.Logf("Warning: testing.T.TempDir(%s) is not valid as a workspace folder: %s",
+	// 		tmp, err)
+	// }
 
 	runner.Run(t, files, f, r.opts...)
 }

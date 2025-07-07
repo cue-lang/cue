@@ -63,6 +63,15 @@ type decoder struct {
 
 	// forceNewline ensures that the next position will be on a new line.
 	forceNewline bool
+
+	// anchorFields contains the anchors that are gathered as we walk the YAML nodes.
+	// these are only added to the AST when we're done processing the whole document.
+	anchorFields []ast.Field
+	// anchorNames map anchor nodes to their names.
+	anchorNames map[*yaml.Node]string
+	// anchorTakenNames keeps track of anchor names that have been taken.
+	// It is used to ensure unique anchor names.
+	anchorTakenNames map[string]struct{}
 }
 
 // TODO(mvdan): this can be io.Reader really, except that token.Pos is offset-based,
@@ -82,9 +91,11 @@ func NewDecoder(filename string, b []byte) *decoder {
 	tokFile := token.NewFile(filename, 0, len(b)+1)
 	tokFile.SetLinesForContent(b)
 	return &decoder{
-		tokFile:     tokFile,
-		tokLines:    append(tokFile.Lines(), len(b)),
-		yamlDecoder: *yaml.NewDecoder(bytes.NewReader(b)),
+		tokFile:          tokFile,
+		tokLines:         append(tokFile.Lines(), len(b)),
+		yamlDecoder:      *yaml.NewDecoder(bytes.NewReader(b)),
+		anchorNames:      make(map[*yaml.Node]string),
+		anchorTakenNames: make(map[string]struct{}),
 	}
 }
 
@@ -150,7 +161,7 @@ func (d *decoder) Decode() (ast.Expr, error) {
 		return nil, err
 	}
 	d.yamlNonEmpty = true
-	return d.extract(&yn)
+	return d.extract(&yn, true)
 }
 
 // Unmarshal parses a single YAML value to a CUE expression.
@@ -175,24 +186,35 @@ func Unmarshal(filename string, data []byte) (ast.Expr, error) {
 	return n, nil
 }
 
-func (d *decoder) extract(yn *yaml.Node) (ast.Expr, error) {
-	d.addHeadCommentsToPending(yn)
-	var expr ast.Expr
-	var err error
+func (d *decoder) extractNoAnchor(yn *yaml.Node, isTopLevel bool) (ast.Expr, error) {
 	switch yn.Kind {
 	case yaml.DocumentNode:
-		expr, err = d.document(yn)
+		return d.document(yn)
 	case yaml.SequenceNode:
-		expr, err = d.sequence(yn)
+		return d.sequence(yn)
 	case yaml.MappingNode:
-		expr, err = d.mapping(yn)
+		return d.mapping(yn, isTopLevel)
 	case yaml.ScalarNode:
-		expr, err = d.scalar(yn)
+		return d.scalar(yn)
 	case yaml.AliasNode:
-		expr, err = d.alias(yn)
+		return d.referenceAlias(yn)
 	default:
 		return nil, d.posErrorf(yn, "unknown yaml node kind: %d", yn.Kind)
 	}
+}
+
+func (d *decoder) extract(yn *yaml.Node, isTopLevel bool) (ast.Expr, error) {
+	d.addHeadCommentsToPending(yn)
+
+	var expr ast.Expr
+	var err error
+
+	if yn.Anchor == "" {
+		expr, err = d.extractNoAnchor(yn, isTopLevel)
+	} else {
+		expr, err = d.anchor(yn, isTopLevel)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -323,7 +345,39 @@ func (d *decoder) document(yn *yaml.Node) (ast.Expr, error) {
 	if n := len(yn.Content); n != 1 {
 		return nil, d.posErrorf(yn, "yaml document nodes are meant to have one content node but have %d", n)
 	}
-	return d.extract(yn.Content[0])
+
+	expr, err := d.extract(yn.Content[0], true)
+	if err != nil {
+		return nil, err
+	}
+
+	return d.addAnchorNodes(expr)
+}
+
+// addAnchorNodes prepends anchor nodes at the top of the document.
+func (d *decoder) addAnchorNodes(expr ast.Expr) (ast.Expr, error) {
+	elements := []ast.Decl{}
+
+	for _, field := range d.anchorFields {
+		elements = append(elements, &field)
+	}
+
+	switch x := expr.(type) {
+	case *ast.StructLit:
+		x.Elts = append(elements, x.Elts...)
+	case *ast.ListLit:
+		if len(elements) > 0 {
+			expr = &ast.StructLit{
+				Elts: append(elements, x),
+			}
+		}
+	default:
+		// If the whole YAML document is not a map / seq, then it can't have anchors.
+		// maybe assert that `anchorFields` is empty?
+		break
+	}
+
+	return expr, nil
 }
 
 func (d *decoder) sequence(yn *yaml.Node) (ast.Expr, error) {
@@ -339,7 +393,7 @@ func (d *decoder) sequence(yn *yaml.Node) (ast.Expr, error) {
 	closeSameLine := true
 	for _, c := range yn.Content {
 		d.forceNewline = multiline
-		elem, err := d.extract(c)
+		elem, err := d.extract(c, false)
 		if err != nil {
 			return nil, err
 		}
@@ -353,14 +407,14 @@ func (d *decoder) sequence(yn *yaml.Node) (ast.Expr, error) {
 	return list, nil
 }
 
-func (d *decoder) mapping(yn *yaml.Node) (ast.Expr, error) {
+func (d *decoder) mapping(yn *yaml.Node, isTopLevel bool) (ast.Expr, error) {
 	strct := &ast.StructLit{}
 	multiline := false
 	if len(yn.Content) > 0 {
 		multiline = yn.Line < yn.Content[len(yn.Content)-1].Line
 	}
 
-	if err := d.insertMap(yn, strct, multiline, false); err != nil {
+	if err := d.insertMap(yn, strct, multiline, false, isTopLevel); err != nil {
 		return nil, err
 	}
 	// TODO(mvdan): moving these positions above insertMap breaks a few tests, why?
@@ -373,7 +427,7 @@ func (d *decoder) mapping(yn *yaml.Node) (ast.Expr, error) {
 	return strct, nil
 }
 
-func (d *decoder) insertMap(yn *yaml.Node, m *ast.StructLit, multiline, mergeValues bool) error {
+func (d *decoder) insertMap(yn *yaml.Node, m *ast.StructLit, multiline, mergeValues bool, isTopLevel bool) error {
 	l := len(yn.Content)
 outer:
 	for i := 0; i < l; i += 2 {
@@ -404,7 +458,7 @@ outer:
 				f := decl.(*ast.Field)
 				name, _, err := ast.LabelName(f.Label)
 				if err == nil && name == key {
-					f.Value, err = d.extract(yv)
+					f.Value, err = d.extract(yv, false)
 					if err != nil {
 						return err
 					}
@@ -413,11 +467,18 @@ outer:
 			}
 		}
 
-		value, err := d.extract(yv)
+		value, err := d.extract(yv, false)
 		if err != nil {
 			return err
 		}
 		field.Value = value
+
+		if isTopLevel {
+			for _, field := range d.anchorFields {
+				m.Elts = append(m.Elts, &field)
+			}
+			d.anchorFields = nil
+		}
 
 		m.Elts = append(m.Elts, field)
 	}
@@ -427,9 +488,9 @@ outer:
 func (d *decoder) merge(yn *yaml.Node, m *ast.StructLit, multiline bool) error {
 	switch yn.Kind {
 	case yaml.MappingNode:
-		return d.insertMap(yn, m, multiline, true)
+		return d.insertMap(yn, m, multiline, true, false)
 	case yaml.AliasNode:
-		return d.insertMap(yn.Alias, m, multiline, true)
+		return d.insertMap(yn.Alias, m, multiline, true, false)
 	case yaml.SequenceNode:
 		// Step backwards as earlier nodes take precedence.
 		for _, c := range slices.Backward(yn.Content) {
@@ -457,7 +518,7 @@ func (d *decoder) label(yn *yaml.Node) (ast.Label, error) {
 		if yn.Alias.Kind != yaml.ScalarNode {
 			return nil, d.posErrorf(yn, "invalid map key: %v", yn.Alias.ShortTag())
 		}
-		expr, err = d.alias(yn)
+		expr, err = d.inlineAlias(yn)
 		value = yn.Alias.Value
 	default:
 		return nil, d.posErrorf(yn, "invalid map key: %v", yn.ShortTag())
@@ -628,7 +689,10 @@ func (d *decoder) makeNum(yn *yaml.Node, val string, kind token.Token) (expr ast
 	return expr
 }
 
-func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
+// inlineAlias expands an alias node in place, returning the expanded node.
+// Sometimes we have to resort to this, for example when the alias
+// is inside a map key, since CUE does not support structs as map keys.
+func (d *decoder) inlineAlias(yn *yaml.Node) (ast.Expr, error) {
 	if d.extractingAliases[yn] {
 		// TODO this could actually be allowed in some circumstances.
 		return nil, d.posErrorf(yn, "anchor %q value contains itself", yn.Value)
@@ -638,9 +702,57 @@ func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
 	}
 	d.extractingAliases[yn] = true
 	var node ast.Expr
-	node, err := d.extract(yn.Alias)
+	node, err := d.extractNoAnchor(yn.Alias, false)
 	delete(d.extractingAliases, yn)
 	return node, err
+}
+
+// referenceAlias replaces an alias with a reference to the identifier of its anchor.
+func (d *decoder) referenceAlias(yn *yaml.Node) (ast.Expr, error) {
+	anchor, ok := d.anchorNames[yn.Alias]
+	if !ok {
+		return nil, d.posErrorf(yn, "anchor %q not found", yn.Alias.Anchor)
+	}
+
+	return &ast.Ident{
+		NamePos: d.pos(yn),
+		Name:    anchor,
+	}, nil
+}
+
+func (d *decoder) anchor(yn *yaml.Node, isTopLevel bool) (ast.Expr, error) {
+	var anchorIdent string
+
+	// Pick a non-conflicting anchor name.
+	for i := 1; ; i++ {
+		if i == 1 {
+			anchorIdent = "#" + yn.Anchor
+		} else {
+			anchorIdent = "#" + yn.Anchor + "_" + strconv.Itoa(i)
+		}
+		if _, ok := d.anchorTakenNames[anchorIdent]; !ok {
+			d.anchorTakenNames[anchorIdent] = struct{}{}
+			break
+		}
+	}
+	d.anchorNames[yn] = anchorIdent
+
+	// Process the node itself, but don't put it into the AST just yet,
+	// store it for later to be used as an anchor identifier.
+	pos := d.pos(yn)
+	expr, err := d.extractNoAnchor(yn, isTopLevel)
+	if err != nil {
+		return nil, err
+	}
+	d.anchorFields = append(d.anchorFields, ast.Field{
+		Label: &ast.Ident{Name: anchorIdent},
+		Value: expr,
+	})
+
+	return &ast.Ident{
+		NamePos: pos,
+		Name:    anchorIdent,
+	}, nil
 }
 
 func labelStr(l ast.Label) string {

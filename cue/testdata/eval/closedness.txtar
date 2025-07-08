@@ -780,15 +780,15 @@ diff old new
 --- old
 +++ new
 @@ -1,12 +1,12 @@
--Leaks:  21
+-Leaks:  19
 -Freed:  864
 -Reused: 856
--Allocs: 29
--Retain: 95
+-Allocs: 27
+-Retain: 93
 -
--Unifications: 879
--Conjuncts:    2170
--Disjuncts:    960
+-Unifications: 877
+-Conjuncts:    2168
+-Disjuncts:    958
 -
 -CloseIDElems: 0
 -NumCloseIDs: 1
@@ -805,15 +805,15 @@ diff old new
 +CloseIDElems: 1301
 +NumCloseIDs: 578
 -- out/eval/stats --
-Leaks:  21
+Leaks:  19
 Freed:  864
 Reused: 856
-Allocs: 29
-Retain: 95
+Allocs: 27
+Retain: 93
 
-Unifications: 879
-Conjuncts:    2170
-Disjuncts:    960
+Unifications: 877
+Conjuncts:    2168
+Disjuncts:    958
 
 CloseIDElems: 0
 NumCloseIDs: 1

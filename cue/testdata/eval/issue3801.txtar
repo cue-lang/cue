@@ -97,54 +97,54 @@ issue3801: nonRooted: full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  266
+Leaks:  228
 Freed:  0
 Reused: 0
-Allocs: 266
+Allocs: 228
 Retain: 0
 
-Unifications: 181
-Conjuncts:    346
-Disjuncts:    16
+Unifications: 164
+Conjuncts:    317
+Disjuncts:    14
 
-CloseIDElems: 99
-NumCloseIDs: 83
+CloseIDElems: 74
+NumCloseIDs: 78
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
--Leaks:  237
--Freed:  408
--Reused: 402
--Allocs: 243
--Retain: 430
+-Leaks:  98
+-Freed:  260
+-Reused: 254
+-Allocs: 104
+-Retain: 121
 -
--Unifications: 599
--Conjuncts:    1319
--Disjuncts:    762
-+Leaks:  266
+-Unifications: 332
+-Conjuncts:    783
+-Disjuncts:    373
++Leaks:  228
 +Freed:  0
 +Reused: 0
-+Allocs: 266
++Allocs: 228
 +Retain: 0
 +
-+Unifications: 181
-+Conjuncts:    346
-+Disjuncts:    16
++Unifications: 164
++Conjuncts:    317
++Disjuncts:    14
 +
-+CloseIDElems: 99
-+NumCloseIDs: 83
++CloseIDElems: 74
++NumCloseIDs: 78
 -- out/eval/stats --
-Leaks:  237
-Freed:  408
-Reused: 402
-Allocs: 243
-Retain: 430
+Leaks:  98
+Freed:  260
+Reused: 254
+Allocs: 104
+Retain: 121
 
-Unifications: 599
-Conjuncts:    1319
-Disjuncts:    762
+Unifications: 332
+Conjuncts:    783
+Disjuncts:    373
 -- out/evalalpha --
 (struct){
   issue3801: (struct){

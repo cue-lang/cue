@@ -32,15 +32,15 @@ m: #step & {
 	if: _#isReleaseTag
 }
 -- out/eval/stats --
-Leaks:  18
+Leaks:  16
 Freed:  17
 Reused: 13
-Allocs: 22
-Retain: 34
+Allocs: 20
+Retain: 30
 
-Unifications: 26
-Conjuncts:    60
-Disjuncts:    42
+Unifications: 24
+Conjuncts:    58
+Disjuncts:    40
 -- diff/explanation --
 New evaluator should ultimately disallow new definitions in closed structs
 and not allow #pattern in #step

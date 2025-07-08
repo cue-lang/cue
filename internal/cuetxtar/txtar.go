@@ -329,6 +329,9 @@ func loadWithConfig(a *txtar.Archive, dir string, cfg load.Config, args ...strin
 		overlay[filepath.Join(dir, f.Name)] = load.FromBytes(f.Data)
 	}
 
+	// Don't walk the chain of parent directories; this busts Go's test cache,
+	// and also leads to loading the root module "cuelang.org/go" repeatedly for no reason.
+	cfg.ModuleRoot = "."
 	cfg.Dir = dir
 	cfg.Overlay = overlay
 

@@ -193,6 +193,7 @@ func Wrapf(err error, p token.Pos, format string, args ...interface{}) Error {
 // If child is list of Errors, the result will itself be a list of errors
 // where child is a subordinate error of each parent.
 func Wrap(parent Error, child error) Error {
+	//log.Printf("wrap %#v over %#v", parent, child)
 	if child == nil {
 		return parent
 	}
@@ -222,14 +223,6 @@ func (e *wrapped) Error() string {
 	default:
 		return fmt.Sprintf("%s: %s", msg, e.wrap)
 	}
-}
-
-func (e *wrapped) Is(target error) bool {
-	return Is(e.main, target)
-}
-
-func (e *wrapped) As(target interface{}) bool {
-	return As(e.main, target)
 }
 
 func (e *wrapped) Msg() (format string, args []interface{}) {
@@ -286,7 +279,11 @@ func (e *posError) Path() []string              { return nil }
 func (e *posError) InputPositions() []token.Pos { return nil }
 func (e *posError) Position() token.Pos         { return e.pos }
 
-// Append combines two errors, flattening Lists as necessary.
+// Append combines two errors, flattening lists as necessary.
+//
+// Note: this may mutate a if it is already a list, so
+// must not be used if a might have been shared across multiple
+// goroutines.
 func Append(a, b Error) Error {
 	switch x := a.(type) {
 	case nil:
@@ -362,19 +359,19 @@ func (p list) As(target interface{}) bool {
 	return false
 }
 
-// AddNewf adds an Error with given position and error message to an List.
-func (p *list) AddNewf(pos token.Pos, msg string, args ...interface{}) {
+// addNewf adds an Error with given position and error message to an List.
+func (p *list) addNewf(pos token.Pos, msg string, args ...interface{}) {
 	err := &posError{pos: pos, Message: Message{format: msg, args: args}}
 	*p = append(*p, err)
 }
 
 // Add adds an Error with given position and error message to an List.
-func (p *list) Add(err Error) {
+func (p *list) add(err Error) {
 	*p = appendToList(*p, err)
 }
 
 // Reset resets an List to no errors.
-func (p *list) Reset() { *p = (*p)[:0] }
+func (p *list) reset() { *p = (*p)[:0] }
 
 // Sanitize sorts multiple errors and removes duplicates on a best effort basis.
 // If err represents a single or no error, it returns the error as is.
@@ -397,14 +394,14 @@ func (p list) sanitize() list {
 		return p
 	}
 	a := slices.Clone(p)
-	a.RemoveMultiples()
+	a.removeMultiples()
 	return a
 }
 
-// Sort sorts an List. *posError entries are sorted by position,
+// sort sorts an List. *posError entries are sorted by position,
 // other errors are sorted by error message, and before any *posError
 // entry.
-func (p list) Sort() {
+func (p list) sort() {
 	slices.SortFunc(p, func(a, b Error) int {
 		if c := comparePosWithNoPosFirst(a.Position(), b.Position()); c != 0 {
 			return c
@@ -417,9 +414,9 @@ func (p list) Sort() {
 	})
 }
 
-// RemoveMultiples sorts an List and removes all but the first error per line.
-func (p *list) RemoveMultiples() {
-	p.Sort()
+// removeMultiples sorts an List and removes all but the first error per line.
+func (p *list) removeMultiples() {
+	p.sort()
 	*p = slices.CompactFunc(*p, approximateEqual)
 }
 
@@ -532,9 +529,12 @@ func writeErr(w io.Writer, err Error, cfg *Config) {
 	}
 
 	for {
+		//log.Printf("unwrapping %T", err)
 		u := errors.Unwrap(err)
+		//log.Printf("unwrapped to %#v", u)
 
 		msg, args := err.Msg()
+		//log.Printf("msg %q; args %q", msg, args)
 
 		// Just like [printError] does when printing one position per line,
 		// make sure that any position formatting arguments print as relative paths.
@@ -597,6 +597,7 @@ func printError(w io.Writer, err error, cfg *Config) {
 	}
 
 	positions := Positions(err)
+	//log.Printf("%d positions for %#v", len(positions), err)
 	if len(positions) == 0 {
 		fprintf(w, "\n")
 		return

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a13b620_fd8a15ed",
+        "filename": "internal/golangorgx/gopls/lsprpc/autostart_posix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-08T12:50:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "411ce9e8_6600c66c",
+      "revId": "3587440b1df23892b77a71cae38f4971aa0b93a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a24449cf_eda716b6",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-08T10:56:54Z",
       "side": 1,
       "message": "nit: this would have to be \"cue path\", not \"cuelsp path\" or \"cue lsp path\". the `cue` binary is ultimately what we\u0027re after.",
+      "revId": "3587440b1df23892b77a71cae38f4971aa0b93a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c785cf0_1a894b1f",
+        "filename": "internal/golangorgx/gopls/lsprpc/lsprpc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-08T12:50:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a24449cf_eda716b6",
       "revId": "3587440b1df23892b77a71cae38f4971aa0b93a9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

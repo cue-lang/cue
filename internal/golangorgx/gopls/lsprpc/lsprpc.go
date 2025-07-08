@@ -46,9 +46,7 @@ type streamServer struct {
 	serverForTest protocol.Server
 }
 
-// NewStreamServer creates a StreamServer using the shared cache. If
-// withTelemetry is true, each session is instrumented with telemetry that
-// records RPC statistics.
+// NewStreamServer creates a StreamServer using the shared cache.
 func NewStreamServer(cache *cache.Cache, daemon bool, optionsFunc func(*settings.Options)) jsonrpc2.StreamServer {
 	return &streamServer{cache: cache, daemon: daemon, optionsOverrides: optionsFunc}
 }
@@ -70,17 +68,11 @@ func (s *streamServer) ServeStream(ctx context.Context, conn jsonrpc2.Conn) erro
 			event.Error(ctx, "error shutting down", err)
 		}
 	}()
-	executable, err := os.Executable()
-	if err != nil {
-		log.Printf("error getting gopls path: %v", err)
-		executable = ""
-	}
 	ctx = protocol.WithClient(ctx, client)
 	conn.Go(ctx,
 		protocol.Handlers(
-			handshaker("unknown", executable, s.daemon,
-				protocol.ServerHandler(svr,
-					jsonrpc2.MethodNotFound))))
+			handshaker("unknown", s.daemon,
+				protocol.ServerHandler(svr, jsonrpc2.MethodNotFound))))
 	if s.daemon {
 		log.Printf("Session %s: connected", "unknown")
 		defer log.Printf("Session %s: exited", "unknown")
@@ -89,12 +81,12 @@ func (s *streamServer) ServeStream(ctx context.Context, conn jsonrpc2.Conn) erro
 	return conn.Err()
 }
 
-// A forwarder is a jsonrpc2.StreamServer that handles an LSP stream by
-// forwarding it to a remote. This is used when the gopls process started by
-// the editor is in the `-remote` mode, which means it finds and connects to a
-// separate gopls daemon. In these cases, we still want the forwarder gopls to
-// be instrumented with telemetry, and want to be able to in some cases hijack
-// the jsonrpc2 connection with the daemon.
+// A forwarder is a jsonrpc2.StreamServer that handles an LSP stream
+// by forwarding it to a remote. This is used when the cuelsp process
+// started by the editor is in the `-remote` mode, which means it
+// finds and connects to a separate cuelsp daemon. In these cases, we
+// still want the forwarder cuelsp to in some cases hijack the
+// jsonrpc2 connection with the daemon.
 type forwarder struct {
 	dialer *autoDialer
 
@@ -128,13 +120,13 @@ func QueryServerState(ctx context.Context, addr string) (any, error) {
 		return nil, err
 	}
 	var state serverState
-	if err := protocol.Call(ctx, serverConn, sessionsMethod, nil, &state); err != nil {
+	if err := protocol.Call(ctx, serverConn, serversMethod, nil, &state); err != nil {
 		return nil, fmt.Errorf("querying server state: %w", err)
 	}
 	return &state, nil
 }
 
-// dialRemote is used for making calls into the gopls daemon. addr should be a
+// dialRemote is used for making calls into the cuelsp daemon. addr should be a
 // URL, possibly on the synthetic 'auto' network (e.g. tcp://..., unix://...,
 // or auto://...).
 func dialRemote(ctx context.Context, addr string) (jsonrpc2.Conn, error) {
@@ -142,7 +134,7 @@ func dialRemote(ctx context.Context, addr string) (jsonrpc2.Conn, error) {
 	if network == autoNetwork {
 		gp, err := os.Executable()
 		if err != nil {
-			return nil, fmt.Errorf("getting gopls path: %w", err)
+			return nil, fmt.Errorf("getting cuelsp path: %w", err)
 		}
 		network, address = autoNetworkAddress(gp, address)
 	}
@@ -227,32 +219,16 @@ func (f *forwarder) ServeStream(ctx context.Context, clientConn jsonrpc2.Conn) e
 func (f *forwarder) handshake(ctx context.Context) {
 	// This call to os.Executable is redundant, and will be eliminated by the
 	// transition to the V2 API.
-	goplsPath, err := os.Executable()
-	if err != nil {
-		event.Error(ctx, "getting executable for handshake", err)
-		goplsPath = ""
-	}
-	var (
-		hreq = handshakeRequest{
-			ServerID:  f.serverID,
-			GoplsPath: goplsPath,
-		}
-		hresp handshakeResponse
-	)
+	hreq := handshakeRequest{ServerID: f.serverID}
+	var hresp handshakeResponse
 	if err := protocol.Call(ctx, f.serverConn, handshakeMethod, hreq, &hresp); err != nil {
 		// TODO(rfindley): at some point in the future we should return an error
 		// here.  Handshakes have become functional in nature.
-		event.Error(ctx, "forwarder: gopls handshake failed", err)
-	}
-	if hresp.GoplsPath != goplsPath {
-		event.Error(ctx, "", fmt.Errorf("forwarder: gopls path mismatch: forwarder is %q, remote is %q", goplsPath, hresp.GoplsPath))
+		event.Error(ctx, "forwarder: cuelsp handshake failed", err)
 	}
 	event.Log(ctx, "New server",
 		tag.NewServer.Of(f.serverID),
-		tag.Logfile.Of(hresp.Logfile),
-		tag.DebugAddress.Of(hresp.DebugAddr),
-		tag.GoplsPath.Of(hresp.GoplsPath),
-		tag.ClientID.Of(hresp.SessionID),
+		tag.ServerID.Of(hresp.ServerID),
 	)
 }
 
@@ -266,57 +242,35 @@ func ConnectToRemote(ctx context.Context, addr string) (net.Conn, error) {
 
 // A handshakeRequest identifies a client to the LSP server.
 type handshakeRequest struct {
-	// ServerID is the ID of the server on the client. This should usually be 0.
+	// ServerID is the ID of the server on the client. This should
+	// usually be 0.
 	ServerID string `json:"serverID"`
-	// Logfile is the location of the clients log file.
-	Logfile string `json:"logfile"`
-	// DebugAddr is the client debug address.
-	DebugAddr string `json:"debugAddr"`
-	// GoplsPath is the path to the Gopls binary running the current client
-	// process.
-	GoplsPath string `json:"goplsPath"`
 }
 
-// A handshakeResponse is returned by the LSP server to tell the LSP client
-// information about its session.
+// A handshakeResponse is returned by the LSP server to tell the LSP
+// client information about its server.
 type handshakeResponse struct {
-	// SessionID is the server session associated with the client.
-	SessionID string `json:"sessionID"`
-	// Logfile is the location of the server logs.
-	Logfile string `json:"logfile"`
-	// DebugAddr is the server debug address.
-	DebugAddr string `json:"debugAddr"`
-	// GoplsPath is the path to the Gopls binary running the current server
-	// process.
-	GoplsPath string `json:"goplsPath"`
+	// ServerID is the server server associated with the client.
+	ServerID string `json:"serverID"`
 }
 
-// clientSession identifies a current client LSP session on the server. Note
-// that it looks similar to handshakeResposne, but in fact 'Logfile' and
-// 'DebugAddr' now refer to the client.
-type clientSession struct {
-	SessionID string `json:"sessionID"`
-	Logfile   string `json:"logfile"`
-	DebugAddr string `json:"debugAddr"`
+// clientServer identifies a current client LSP server on the
+// server.
+type clientServer struct {
+	ServerID string `json:"serverID"`
 }
 
-// serverState holds information about the gopls daemon process, including its
-// debug information and debug information of all of its current connected
-// clients.
+// serverState holds information about the cuelsp daemon process.
 type serverState struct {
-	Logfile         string          `json:"logfile"`
-	DebugAddr       string          `json:"debugAddr"`
-	GoplsPath       string          `json:"goplsPath"`
-	CurrentClientID string          `json:"currentClientID"`
-	Clients         []clientSession `json:"clients"`
+	CurrentServerID string `json:"currentServerID"`
 }
 
 const (
-	handshakeMethod = "gopls/handshake"
-	sessionsMethod  = "gopls/sessions"
+	handshakeMethod = "cuelsp/handshake"
+	serversMethod   = "cuelsp/servers"
 )
 
-func handshaker(svrID string, goplsPath string, logHandshakes bool, handler jsonrpc2.Handler) jsonrpc2.Handler {
+func handshaker(svrID string, logHandshakes bool, handler jsonrpc2.Handler) jsonrpc2.Handler {
 	return func(ctx context.Context, reply jsonrpc2.Replier, r jsonrpc2.Request) error {
 		switch r.Method() {
 		case handshakeMethod:
@@ -326,30 +280,25 @@ func handshaker(svrID string, goplsPath string, logHandshakes bool, handler json
 			var req handshakeRequest
 			if err := json.Unmarshal(r.Params(), &req); err != nil {
 				if logHandshakes {
-					log.Printf("Error processing handshake for session %s: %v", svrID, err)
+					log.Printf("Error processing handshake for server %s: %v", svrID, err)
 				}
 				sendError(ctx, reply, err)
 				return nil
 			}
 			if logHandshakes {
-				log.Printf("Session %s: got handshake. Logfile: %q, Debug addr: %q", svrID, req.Logfile, req.DebugAddr)
+				log.Printf("Server %s: got handshake.", svrID)
 			}
-			event.Log(ctx, "Handshake session update",
-				tag.DebugAddress.Of(req.DebugAddr),
-				tag.Logfile.Of(req.Logfile),
+			event.Log(ctx, "Handshake server update",
 				tag.ServerID.Of(req.ServerID),
-				tag.GoplsPath.Of(req.GoplsPath),
 			)
 			resp := handshakeResponse{
-				SessionID: svrID,
-				GoplsPath: goplsPath,
+				ServerID: svrID,
 			}
 			return reply(ctx, resp, nil)
 
-		case sessionsMethod:
+		case serversMethod:
 			resp := serverState{
-				GoplsPath:       goplsPath,
-				CurrentClientID: svrID,
+				CurrentServerID: svrID,
 			}
 			return reply(ctx, resp, nil)
 		}
@@ -364,7 +313,7 @@ func sendError(ctx context.Context, reply jsonrpc2.Replier, err error) {
 	}
 }
 
-// ParseAddr parses the address of a gopls remote.
+// ParseAddr parses the address of a cuelsp remote.
 // TODO(rFindley): further document this syntax, and allow URI-style remote
 // addresses such as "auto://...".
 func ParseAddr(listen string) (network string, address string) {

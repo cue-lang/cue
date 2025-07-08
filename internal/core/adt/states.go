@@ -318,7 +318,8 @@ func (v *Vertex) allChildConjunctsKnown() bool {
 		return true
 	}
 
-	if v.Status() == finalized {
+	// TODO(refcount): allow partial processed?
+	if v.Status() == finalized || (v.state == nil && v.status != unprocessed) {
 		// This can happen, for instance, if this is called on a parent of a
 		// rooted node that is marked as a parent for a dynamic node.
 		// In practice this should be handled by the caller, but we add this

@@ -330,10 +330,10 @@ issue3838: {
 	}).results
 }
 -- out/eval/stats --
-Leaks:  29
-Freed:  207
-Reused: 201
-Allocs: 35
+Leaks:  13
+Freed:  223
+Reused: 214
+Allocs: 22
 Retain: 104
 
 Unifications: 220

@@ -1,9 +1,9 @@
 #Issue: 3633
 -- out/evalalpha/stats --
-Leaks:  2031
-Freed:  0
-Reused: 0
-Allocs: 2031
+Leaks:  1
+Freed:  2030
+Reused: 1798
+Allocs: 233
 Retain: 0
 
 Unifications: 401
@@ -21,10 +21,10 @@ diff old new
 -Freed:  3595
 -Reused: 3575
 -Allocs: 20
-+Leaks:  2031
-+Freed:  0
-+Reused: 0
-+Allocs: 2031
++Leaks:  1
++Freed:  2030
++Reused: 1798
++Allocs: 233
  Retain: 0
  
 -Unifications: 885

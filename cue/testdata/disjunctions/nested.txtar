@@ -46,10 +46,10 @@ issue3635: reduced_noshare: {
 	d: 1
 }
 -- out/evalalpha/stats --
-Leaks:  88
-Freed:  0
-Reused: 0
-Allocs: 88
+Leaks:  6
+Freed:  82
+Reused: 67
+Allocs: 21
 Retain: 0
 
 Unifications: 52
@@ -72,10 +72,10 @@ diff old new
 -Unifications: 83
 -Conjuncts:    310
 -Disjuncts:    165
-+Leaks:  88
-+Freed:  0
-+Reused: 0
-+Allocs: 88
++Leaks:  6
++Freed:  82
++Reused: 67
++Allocs: 21
 +Retain: 0
 +
 +Unifications: 52

@@ -69,10 +69,10 @@ issue3946: reduced:{
 	}
 }
 -- out/eval/stats --
-Leaks:  10
-Freed:  51
-Reused: 45
-Allocs: 16
+Leaks:  0
+Freed:  61
+Reused: 51
+Allocs: 10
 Retain: 6
 
 Unifications: 57

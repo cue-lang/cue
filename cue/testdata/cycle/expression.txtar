@@ -96,10 +96,10 @@ t2total: {
 	for _, v in t2 {v}
 }
 -- out/evalalpha/stats --
-Leaks:  58
-Freed:  0
-Reused: 0
-Allocs: 58
+Leaks:  0
+Freed:  58
+Reused: 43
+Allocs: 15
 Retain: 0
 
 Unifications: 58
@@ -113,15 +113,13 @@ diff old new
 --- old
 +++ new
 @@ -1,12 +1,12 @@
--Leaks:  0
--Freed:  58
+ Leaks:  0
+ Freed:  58
 -Reused: 49
 -Allocs: 9
 -Retain: 71
-+Leaks:  58
-+Freed:  0
-+Reused: 0
-+Allocs: 58
++Reused: 43
++Allocs: 15
 +Retain: 0
  
  Unifications: 58

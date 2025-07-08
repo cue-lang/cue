@@ -111,8 +111,8 @@ issue3486: {
 	}
 }
 -- out/eval/stats --
-Leaks:  4
-Freed:  78
+Leaks:  2
+Freed:  80
 Reused: 74
 Allocs: 8
 Retain: 3

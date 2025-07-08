@@ -78,10 +78,10 @@ let _schema_1 = schema
   let _schema_1#2 = 〈0;schema〉
 }
 -- out/evalalpha/stats --
-Leaks:  17
-Freed:  0
-Reused: 0
-Allocs: 17
+Leaks:  0
+Freed:  17
+Reused: 3
+Allocs: 14
 Retain: 0
 
 Unifications: 17
@@ -104,10 +104,10 @@ diff old new
 -Unifications: 50
 -Conjuncts:    102
 -Disjuncts:    54
-+Leaks:  17
-+Freed:  0
-+Reused: 0
-+Allocs: 17
++Leaks:  0
++Freed:  17
++Reused: 3
++Allocs: 14
 +Retain: 0
 +
 +Unifications: 17

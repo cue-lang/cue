@@ -742,6 +742,8 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 
 		if c.isDevVersion() {
 			if s := arc.getState(c); s != nil {
+				defer n.retainProcess().releaseProcess()
+
 				origNeeds := state.conditions()
 				needs := origNeeds | arcTypeKnown
 				runMode := state.runMode()
@@ -880,6 +882,8 @@ func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 
 	if c.isDevVersion() {
 		if n := v.getState(c); n != nil {
+			defer n.retainProcess().releaseProcess()
+
 			// A lookup counts as new structure. See the commend in Section
 			// "Lookups in inline cycles" in cycle.go.
 			if !c.ci.IsCyclic || v.Label.IsLet() {

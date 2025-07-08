@@ -217,6 +217,7 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 		return x.overlay
 	}
 
+	// TODO(mem-mgmt): use free list for Vertex allocation.
 	v := &Vertex{}
 	*v = *x
 	ctx.vertexMap[x] = v
@@ -290,11 +291,11 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 
 	d := n.ctx.newNodeContext(n.node)
 	d.underlying = n.underlying
+	d.isDisjunct = true
+
 	if n.underlying == nil {
 		panic("unexpected nil underlying")
 	}
-
-	d.refCount++
 
 	d.ctx = n.ctx
 	d.node = n.node

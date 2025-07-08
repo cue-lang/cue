@@ -11,10 +11,10 @@ resolveAcrossDisjunct: nested: {
 	a: b: #B: int
 }
 -- out/evalalpha/stats --
-Leaks:  48
-Freed:  0
-Reused: 0
-Allocs: 48
+Leaks:  2
+Freed:  46
+Reused: 14
+Allocs: 34
 Retain: 0
 
 Unifications: 12
@@ -32,10 +32,10 @@ diff old new
 -Freed:  44
 -Reused: 32
 -Allocs: 12
-+Leaks:  48
-+Freed:  0
-+Reused: 0
-+Allocs: 48
++Leaks:  2
++Freed:  46
++Reused: 14
++Allocs: 34
  Retain: 0
  
 -Unifications: 32

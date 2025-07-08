@@ -3,10 +3,10 @@ import "list"
 
 a: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y})
 -- out/evalalpha/stats --
-Leaks:  15
-Freed:  0
-Reused: 0
-Allocs: 15
+Leaks:  0
+Freed:  15
+Reused: 4
+Allocs: 11
 Retain: 0
 
 Unifications: 15
@@ -20,15 +20,13 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
--Leaks:  0
--Freed:  15
+ Leaks:  0
+ Freed:  15
 -Reused: 10
 -Allocs: 5
 -Retain: 2
-+Leaks:  15
-+Freed:  0
-+Reused: 0
-+Allocs: 15
++Reused: 4
++Allocs: 11
 +Retain: 0
  
  Unifications: 15

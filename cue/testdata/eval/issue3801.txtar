@@ -97,17 +97,17 @@ issue3801: nonRooted: full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  221
-Freed:  0
-Reused: 0
-Allocs: 221
+Leaks:  75
+Freed:  146
+Reused: 133
+Allocs: 88
 Retain: 0
 
 Unifications: 157
 Conjuncts:    310
 Disjuncts:    14
 
-CloseIDElems: 74
+CloseIDElems: 62
 NumCloseIDs: 78
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -123,17 +123,17 @@ diff old new
 -Unifications: 332
 -Conjuncts:    783
 -Disjuncts:    373
-+Leaks:  221
-+Freed:  0
-+Reused: 0
-+Allocs: 221
++Leaks:  75
++Freed:  146
++Reused: 133
++Allocs: 88
 +Retain: 0
 +
 +Unifications: 157
 +Conjuncts:    310
 +Disjuncts:    14
 +
-+CloseIDElems: 74
++CloseIDElems: 62
 +NumCloseIDs: 78
 -- out/eval/stats --
 Leaks:  98

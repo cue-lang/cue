@@ -24,15 +24,12 @@ import (
 // Serve is a struct that exposes the configurable parts of the LSP server as
 // flags, in the right form for tool.Main to consume.
 type Serve struct {
-	Logfile     string        `flag:"logfile" help:"filename to log to. if value is \"auto\", then logging to a default output file is enabled"`
 	Mode        string        `flag:"mode" help:"no effect"`
 	Port        int           `flag:"port" help:"port on which to run cuelsp for debugging purposes"`
 	Address     string        `flag:"listen" help:"address on which to listen for remote connections. If prefixed by 'unix;', the subsequent address is assumed to be a unix domain socket. Otherwise, TCP is used."`
 	IdleTimeout time.Duration `flag:"listen.timeout" help:"when used with -listen, shut down the server when there are no connected clients for this duration"`
 
 	RemoteListenTimeout time.Duration `flag:"remote.listen.timeout" help:"when used with -remote=auto, the -listen.timeout value used to start the daemon"`
-	RemoteDebug         string        `flag:"remote.debug" help:"when used with -remote=auto, the -debug value used to start the daemon"`
-	RemoteLogfile       string        `flag:"remote.logfile" help:"when used with -remote=auto, the -logfile value used to start the daemon"`
 
 	app *Application
 }
@@ -58,14 +55,8 @@ func (s *Serve) remoteArgs(network, address string) []string {
 	args := []string{"serve",
 		"-listen", fmt.Sprintf(`%s;%s`, network, address),
 	}
-	if s.RemoteDebug != "" {
-		args = append(args, "-debug", s.RemoteDebug)
-	}
 	if s.RemoteListenTimeout != 0 {
 		args = append(args, "-listen.timeout", s.RemoteListenTimeout.String())
-	}
-	if s.RemoteLogfile != "" {
-		args = append(args, "-logfile", s.RemoteLogfile)
 	}
 	return args
 }

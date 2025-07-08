@@ -13,8 +13,8 @@ import (
 	"strings"
 
 	"cuelang.org/go/internal/golangorgx/tools/gocommand"
-	"cuelang.org/go/internal/golangorgx/tools/robustio"
 	"cuelang.org/go/internal/golangorgx/tools/testenv"
+	"cuelang.org/go/internal/robustio"
 	"golang.org/x/tools/txtar"
 )
 

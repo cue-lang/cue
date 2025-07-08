@@ -15,7 +15,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/golangorgx/tools/robustio"
+	"cuelang.org/go/internal/robustio"
 	"cuelang.org/go/mod/module"
 )
 

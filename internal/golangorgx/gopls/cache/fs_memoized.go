@@ -14,7 +14,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
-	"cuelang.org/go/internal/golangorgx/tools/robustio"
+	"cuelang.org/go/internal/robustio"
 )
 
 // A memoizedFS is a file source that memoizes reads, to reduce IO.

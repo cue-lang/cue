@@ -1,10 +1,6 @@
-//go:build !windows
-
 package workspace
 
 import (
-	"fmt"
-	"path/filepath"
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/hooks"
@@ -21,7 +17,6 @@ func TestMain(m *testing.M) {
 // works, or fails, as expected, due to various combinations of
 // WorkspaceFolders and the RootURI being set or unset.
 func TestWorkspaceFoldersRootURI(t *testing.T) {
-	t.Skip("cuelsp disabled")
 	const filesOneModule = `
 -- cue.mod/module.cue --
 module: "mod.example/b"
@@ -63,7 +58,7 @@ package a
 			name: "no workspace folders, no rooturi",
 			opts: []RunOption{
 				WorkspaceFolders(),
-				InitializeError("initialize: got 0 WorkspaceFolders; expected 1"),
+				InitializeError("initialize: no WorkspaceFolders"),
 			},
 			files:         filesOneModule,
 			expectSuccess: false,
@@ -99,26 +94,13 @@ package a
 			expectSuccess: true,
 		},
 		{
-			// cue lsp does not currently support multiple workspace folders.
+			// cue lsp supports multiple workspace folders.
 			name: "multiple folders, one module",
 			opts: []RunOption{
 				WorkspaceFolders("a", "b"),
-				InitializeError("initialize: got 2 WorkspaceFolders; expected 1"),
 			},
 			files:         filesOneModule,
-			expectSuccess: false,
-		},
-		{
-			// cue lsp does not currently support multiple workspace
-			// folders, even if they correctly refer to different
-			// modules.
-			name: "multiple folders, two modules",
-			opts: []RunOption{
-				WorkspaceFolders("a", "b"),
-				InitializeError("initialize: got 2 WorkspaceFolders; expected 1"),
-			},
-			files:         filesTwoModules,
-			expectSuccess: false,
+			expectSuccess: true,
 		},
 	}
 
@@ -153,40 +135,3 @@ package a
 // folder. This is possible in VSCode at least. We currently implement the
 // error handling in vscode-cue in that instance but perhaps it should live in
 // 'cue lsp'.
-
-// TestNoContainingModule verifies that user is shown an error message in the
-// case that they open a .cue file in the context of a workspace folder where
-// the workspace folder does not correspond to the root of a CUE module. In
-// this case there is simply no CUE module.
-func TestNoContainingModule(t *testing.T) {
-	t.Skip("cuelsp disabled")
-	const files = `
--- a.cue --
-package a
-`
-	WithOptions().Run(t, files, func(t *testing.T, env *Env) {
-		want := fmt.Sprintf("WorkspaceFolder %s does not correspond to a CUE module", env.Sandbox.Workdir.RootURI().Path())
-		env.Await(ShownMessage(want))
-	})
-}
-
-// TestNoContainingModule verifies that user is shown an error message in the
-// case that they open a .cue file in the context of a workspace folder where
-// the workspace folder does not correspond to the root of a CUE module. In
-// this case, the parent directory corresponds to the root of CUE module, but
-// the workspace folder itself corresponds to a subdirectory in the CUE module.
-func TestWorkspaceFolderWithCUEModInParent(t *testing.T) {
-	t.Skip("cuelsp disabled")
-	const files = `
--- cue.mod/module.cue --
--- a/a.cue --
-package a
-`
-	WithOptions(
-		WorkspaceFolders("a"),
-	).Run(t, files, func(t *testing.T, env *Env) {
-		workspaceFolder := filepath.Join(env.Sandbox.Workdir.RootURI().Path(), "a")
-		want := fmt.Sprintf("WorkspaceFolder %s does not correspond to a CUE module", workspaceFolder)
-		env.Await(ShownMessage(want))
-	})
-}

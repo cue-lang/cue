@@ -77,7 +77,11 @@ func (s *Serve) Run(ctx context.Context, args ...string) error {
 			return fmt.Errorf("creating forwarder: %w", err)
 		}
 	} else {
-		ss = lsprpc.NewStreamServer(cache.New(), isDaemon, s.app.options)
+		cache, err := cache.NewCache(nil)
+		if err != nil {
+			return err
+		}
+		ss = lsprpc.NewStreamServer(cache, isDaemon, s.app.options)
 	}
 
 	var network, addr string

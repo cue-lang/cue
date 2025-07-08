@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"path"
 	"path/filepath"
@@ -273,11 +274,7 @@ func makeSettings(sandbox *Sandbox, config EditorConfig, scopeURI *protocol.URI)
 				closestSettings = settings
 			}
 		}
-		if closestSettings != nil {
-			for k, v := range closestSettings {
-				settings[k] = v
-			}
-		}
+		maps.Copy(settings, closestSettings)
 	}
 
 	return settings

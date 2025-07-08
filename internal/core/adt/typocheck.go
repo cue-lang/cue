@@ -432,6 +432,7 @@ func (n *nodeContext) newReq(id CloseInfo, kind defIDType) CloseInfo {
 
 // AddOpenConjunct adds w as a conjunct of v and disables typo checking for w,
 // even if it is a definition.
+// This is called from UnifyAccept only.
 func (v *Vertex) AddOpenConjunct(ctx *OpContext, w *Vertex) {
 	n := v.getBareState(ctx)
 	ci := n.injectEmbedNode(w, CloseInfo{})
@@ -544,6 +545,13 @@ func (n *nodeContext) checkTypos() {
 		// TODO(mem): child states of uncompleted nodes must have a state.
 		a = a.DerefDisjunct()
 		na := a.state
+		// TODO(refcount): remove: cache in Vertex?
+		if na == nil {
+			// A node may be evaluated twice, for instance when processing
+			// validators. In this case, the closedness will already have been
+			// checked and the nodeContext may already be nil.
+			continue
+		}
 
 		required := baseRequired
 		// If the field has its own rules, apply them as a delta.

@@ -1412,9 +1412,7 @@ Result:
   issue2545: (_|_){
     // [structural cycle]
     #A: (#struct){
-      B?: (_|_){
-        // [structural cycle]
-      }
+      B?: ~(issue2545.#B)
     }
     #B: (_|_){
       // [structural cycle]
@@ -2258,17 +2256,21 @@ diff old new
        }
      }
    }
-@@ -815,9 +780,6 @@
+@@ -813,12 +778,7 @@
+   issue2545: (_|_){
+     // [structural cycle]
      #A: (#struct){
-       B?: (_|_){
-         // [structural cycle]
+-      B?: (_|_){
+-        // [structural cycle]
 -        A: (_|_){
 -          // [structural cycle] issue2545.#A.B.A: structural cycle
 -        }
-       }
+-      }
++      B?: ~(issue2545.#B)
      }
      #B: (_|_){
-@@ -863,11 +825,9 @@
+       // [structural cycle]
+@@ -863,11 +823,9 @@
        // [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
        //     ./in.cue:412:5
        //     ./in.cue:413:5
@@ -2283,7 +2285,7 @@ diff old new
        }
      }
      b: (_|_){
-@@ -874,11 +834,9 @@
+@@ -874,11 +832,9 @@
        // [eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
        //     ./in.cue:415:5
        //     ./in.cue:416:5
@@ -2298,7 +2300,7 @@ diff old new
        }
      }
    }
-@@ -892,11 +850,10 @@
+@@ -892,11 +848,10 @@
          //     ./in.cue:420:10
          //     ./in.cue:421:6
          // e4.a.0.0: 2 errors in empty disjunction:
@@ -2312,7 +2314,7 @@ diff old new
          //     ./in.cue:420:10
          //     ./in.cue:421:6
          0: (struct){
-@@ -912,12 +869,11 @@
+@@ -912,12 +867,11 @@
          //     ./in.cue:423:6
          //     ./in.cue:424:10
          // e4.b.0.0: 2 errors in empty disjunction:
@@ -2327,7 +2329,7 @@ diff old new
          //     ./in.cue:424:10
          0: (struct){
            c: (int){ 1 }
-@@ -945,17 +901,16 @@
+@@ -945,17 +899,16 @@
          // [eval]
          0: (_|_){
            // [eval] nestedList.v1e.y.0: 4 errors in empty disjunction:
@@ -2350,7 +2352,7 @@ diff old new
            1: (int){ 1 }
          }
          1: (int){ 1 }
-@@ -967,17 +922,16 @@
+@@ -967,17 +920,16 @@
          // [eval]
          0: (_|_){
            // [eval] nestedList.v2e.y.0: 4 errors in empty disjunction:
@@ -2373,7 +2375,7 @@ diff old new
            1: (int){ 1 }
          }
          1: (int){ 1 }
-@@ -1031,7 +985,10 @@
+@@ -1031,7 +983,10 @@
          head: (int){ 3 }
          tail: (struct){
            head: (int){ 4 }
@@ -2385,7 +2387,7 @@ diff old new
          }
        }
      }
-@@ -1045,7 +1002,10 @@
+@@ -1045,7 +1000,10 @@
        head: (int){ 2 }
        tail: (struct){
          head: (int){ 3 }
@@ -2397,7 +2399,7 @@ diff old new
        }
      }
    }
-@@ -1059,8 +1019,12 @@
+@@ -1059,8 +1017,12 @@
        head: (int){ 2 }
        tail: (struct){ |((struct){
            head: (int){ 3 }
@@ -2412,7 +2414,7 @@ diff old new
          }, (struct){
            head: (int){ 3 }
          }) }
-@@ -1082,9 +1046,7 @@
+@@ -1082,9 +1044,7 @@
        // [structural cycle]
        f: (_|_){
          // [structural cycle]
@@ -2423,7 +2425,7 @@ diff old new
        }
        g: (_|_){
          // [structural cycle]
-@@ -1105,10 +1067,7 @@
+@@ -1105,10 +1065,7 @@
            x: (_){ _ }
            y: (_){ _ }
          }
@@ -2435,7 +2437,7 @@ diff old new
        }
      }
      t2: (struct){
-@@ -1121,10 +1080,7 @@
+@@ -1121,10 +1078,7 @@
            x: (_){ _ }
            y: (_){ _ }
          }
@@ -2447,7 +2449,7 @@ diff old new
        }
      }
      t3: (struct){
-@@ -1139,16 +1095,8 @@
+@@ -1139,16 +1093,8 @@
            y: (_){ _ }
            z: (_){ _ }
          }
@@ -2466,7 +2468,7 @@ diff old new
        }
      }
      t4: (struct){
-@@ -1164,51 +1112,11 @@
+@@ -1164,51 +1110,11 @@
              y: (_){ _ }
              z: (_){ _ }
            }
@@ -2523,7 +2525,7 @@ diff old new
        }
      }
      t5: (struct){
-@@ -1219,18 +1127,8 @@
+@@ -1219,18 +1125,8 @@
          }
        }
        C: (struct){
@@ -2544,7 +2546,7 @@ diff old new
        }
      }
    }
-@@ -1253,19 +1151,19 @@
+@@ -1253,19 +1149,19 @@
      }
    }
    n4: (struct){

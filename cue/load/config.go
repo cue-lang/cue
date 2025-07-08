@@ -18,8 +18,10 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -416,6 +418,19 @@ func (c *Config) loadModule() error {
 	if cerr != nil {
 		// If we could not load cue.mod/module.cue, check whether the reason was
 		// a legacy cue.mod file and give the user a clear error message.
+		//
+		// Common case: the file does not exist. Avoid an extra stat
+		// syscall using the error code when we can.
+		//
+		// TODO(mvdan): we can remove this in mid 2026, once we can safely assume that
+		// practically all cue.mod files have vanished.
+		if errors.Is(cerr, fs.ErrNotExist) && runtime.GOOS != "windows" {
+			// The file definitely does not exist. On Windows unfortunately due
+			// to https://github.com/golang/go/issues/46734
+			// we can't tell the difference between "does not exist"
+			// and "is not a directory", hence the special casing.
+			return nil
+		}
 		info, cerr2 := c.fileSystem.stat(modDir)
 		if cerr2 == nil && !info.IsDir() {
 			return fmt.Errorf("cue.mod files are no longer supported; use cue.mod/module.cue")

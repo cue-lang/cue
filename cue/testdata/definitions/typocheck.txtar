@@ -560,57 +560,57 @@ issue3964: full: {
 	#Used: used: string
 }
 -- out/evalalpha/stats --
-Leaks:  938
+Leaks:  910
 Freed:  0
 Reused: 0
-Allocs: 938
+Allocs: 910
 Retain: 0
 
-Unifications: 767
-Conjuncts:    1490
-Disjuncts:    78
+Unifications: 752
+Conjuncts:    1467
+Disjuncts:    76
 
-CloseIDElems: 1403
-NumCloseIDs: 422
+CloseIDElems: 1378
+NumCloseIDs: 419
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,12 +1,12 @@
--Leaks:  116
--Freed:  1077
--Reused: 1063
--Allocs: 130
--Retain: 386
+-Leaks:  47
+-Freed:  951
+-Reused: 937
+-Allocs: 61
+-Retain: 226
 -
--Unifications: 1061
--Conjuncts:    2232
--Disjuncts:    1407
+-Unifications: 886
+-Conjuncts:    1918
+-Disjuncts:    1157
 -
 -CloseIDElems: 0
 -NumCloseIDs: 3
-+Leaks:  938
++Leaks:  910
 +Freed:  0
 +Reused: 0
-+Allocs: 938
++Allocs: 910
 +Retain: 0
 +
-+Unifications: 767
-+Conjuncts:    1490
-+Disjuncts:    78
++Unifications: 752
++Conjuncts:    1467
++Disjuncts:    76
 +
-+CloseIDElems: 1403
-+NumCloseIDs: 422
++CloseIDElems: 1378
++NumCloseIDs: 419
 -- out/eval/stats --
-Leaks:  116
-Freed:  1077
-Reused: 1063
-Allocs: 130
-Retain: 386
+Leaks:  47
+Freed:  951
+Reused: 937
+Allocs: 61
+Retain: 226
 
-Unifications: 1061
-Conjuncts:    2232
-Disjuncts:    1407
+Unifications: 886
+Conjuncts:    1918
+Disjuncts:    1157
 
 CloseIDElems: 0
 NumCloseIDs: 3

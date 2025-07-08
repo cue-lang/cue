@@ -36,15 +36,15 @@ simplified: {
 	out: #struct & {}
 }
 -- out/eval/stats --
-Leaks:  1
+Leaks:  0
 Freed:  43
 Reused: 34
-Allocs: 10
-Retain: 4
+Allocs: 9
+Retain: 3
 
-Unifications: 36
-Conjuncts:    70
-Disjuncts:    47
+Unifications: 35
+Conjuncts:    69
+Disjuncts:    46
 -- out/evalalpha --
 Errors:
 eliminated.x: 2 errors in empty disjunction:

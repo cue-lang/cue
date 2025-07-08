@@ -141,10 +141,10 @@ issue3178: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  72
-Freed:  0
-Reused: 0
-Allocs: 72
+Leaks:  4
+Freed:  68
+Reused: 52
+Allocs: 20
 Retain: 0
 
 Unifications: 72
@@ -158,15 +158,15 @@ diff old new
 --- old
 +++ new
 @@ -1,12 +1,12 @@
--Leaks:  14
--Freed:  58
--Reused: 51
--Allocs: 21
+-Leaks:  0
+-Freed:  72
+-Reused: 64
+-Allocs: 8
 -Retain: 15
-+Leaks:  72
-+Freed:  0
-+Reused: 0
-+Allocs: 72
++Leaks:  4
++Freed:  68
++Reused: 52
++Allocs: 20
 +Retain: 0
  
  Unifications: 72
@@ -181,10 +181,10 @@ diff old new
 +CloseIDElems: 107
 +NumCloseIDs: 54
 -- out/eval/stats --
-Leaks:  14
-Freed:  58
-Reused: 51
-Allocs: 21
+Leaks:  0
+Freed:  72
+Reused: 64
+Allocs: 8
 Retain: 15
 
 Unifications: 72

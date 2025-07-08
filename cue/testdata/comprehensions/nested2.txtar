@@ -108,10 +108,10 @@ Y: x: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  50
-Freed:  0
-Reused: 0
-Allocs: 50
+Leaks:  1
+Freed:  49
+Reused: 31
+Allocs: 19
 Retain: 0
 
 Unifications: 50
@@ -137,10 +137,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 10
-+Leaks:  50
-+Freed:  0
-+Reused: 0
-+Allocs: 50
++Leaks:  1
++Freed:  49
++Reused: 31
++Allocs: 19
 +Retain: 0
 +
 +Unifications: 50

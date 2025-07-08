@@ -1071,10 +1071,10 @@ Result:
   }
 }
 -- out/evalalpha/stats --
-Leaks:  2073
-Freed:  0
-Reused: 0
-Allocs: 2073
+Leaks:  340
+Freed:  1733
+Reused: 246
+Allocs: 1827
 Retain: 0
 
 Unifications: 767
@@ -1097,10 +1097,10 @@ diff old new
 -Unifications: 48
 -Conjuncts:    150
 -Disjuncts:    111
-+Leaks:  2073
-+Freed:  0
-+Reused: 0
-+Allocs: 2073
++Leaks:  340
++Freed:  1733
++Reused: 246
++Allocs: 1827
 +Retain: 0
 +
 +Unifications: 767

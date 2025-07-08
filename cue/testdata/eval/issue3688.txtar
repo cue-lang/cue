@@ -83,10 +83,10 @@ examples: eg3: in: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  90
-Freed:  0
-Reused: 0
-Allocs: 90
+Leaks:  25
+Freed:  65
+Reused: 53
+Allocs: 37
 Retain: 0
 
 Unifications: 41
@@ -109,10 +109,10 @@ diff old new
 -Unifications: 82
 -Conjuncts:    246
 -Disjuncts:    139
-+Leaks:  90
-+Freed:  0
-+Reused: 0
-+Allocs: 90
++Leaks:  25
++Freed:  65
++Reused: 53
++Allocs: 37
 +Retain: 0
 +
 +Unifications: 41

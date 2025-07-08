@@ -76,8 +76,8 @@ reg: 4
   }
 }
 -- out/eval/stats --
-Leaks:  3
-Freed:  11
+Leaks:  2
+Freed:  12
 Reused: 7
 Allocs: 7
 Retain: 2

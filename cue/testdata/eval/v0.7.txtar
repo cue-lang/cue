@@ -743,10 +743,10 @@ Result:
   }
 }
 -- out/evalalpha/stats --
-Leaks:  286
-Freed:  0
-Reused: 0
-Allocs: 286
+Leaks:  6
+Freed:  280
+Reused: 246
+Allocs: 40
 Retain: 0
 
 Unifications: 273
@@ -1211,10 +1211,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 5
-+Leaks:  286
-+Freed:  0
-+Reused: 0
-+Allocs: 286
++Leaks:  6
++Freed:  280
++Reused: 246
++Allocs: 40
 +Retain: 0
 +
 +Unifications: 273

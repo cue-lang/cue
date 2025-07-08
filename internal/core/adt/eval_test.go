@@ -50,22 +50,21 @@ func TestEvalV2(t *testing.T) {
 	}
 
 	cuedebug.Init()
-	flags := cuedebug.Flags
+	dbg := cuedebug.Flags
+	cueexperiment.Init()
+	exp := cueexperiment.Flags
 
 	if *todo {
 		test.ToDo = nil
 	}
 
 	test.Run(t, func(tc *cuetxtar.Test) {
-		runEvalTest(tc, internal.EvalV2, flags)
+		runEvalTest(tc, internal.EvalV2, dbg, exp)
 	})
 }
 
 func TestEvalV3(t *testing.T) {
 	adt.DebugDeps = true // check unmatched dependencies.
-
-	cuedebug.Init()
-	flags := cuedebug.Flags
 
 	test := cuetxtar.TxTarTest{
 		Root:     "../../../cue/testdata",
@@ -73,20 +72,28 @@ func TestEvalV3(t *testing.T) {
 		Fallback: "eval", // Allow eval golden files to pass these tests.
 	}
 
+	cuedebug.Init()
+	dbg := cuedebug.Flags
+	cueexperiment.Init()
+	exp := cueexperiment.Flags
+
 	if *todo {
 		test.ToDo = nil
 	}
 
 	var errorCount int
 	test.Run(t, func(t *cuetxtar.Test) {
-		errorCount += runEvalTest(t, internal.EvalV3, flags)
+		errorCount += runEvalTest(t, internal.EvalV3, dbg, exp)
 	})
 	t.Logf("nodeErrors: %d", errorCount)
 }
 
-func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cuedebug.Config) (errorCount int) {
+func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedebug.Config, exp cueexperiment.Config) (errorCount int) {
+	exp.KeepValidators = !t.HasTag("simplifyValidators")
+
 	a := t.Instance()
-	r := runtime.NewWithSettings(version, flags)
+	r := runtime.NewWithSettings(version, dbg)
+	r.SetGlobalExperiments(&exp)
 
 	v, err := r.Build(nil, a)
 	if err != nil {
@@ -96,9 +103,6 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 
 	e := eval.New(r)
 	ctx := e.NewContext(v)
-	ctx.Version = version
-	ctx.Config = flags
-	ctx.SimplifyValidators = t.HasTag("simplifyValidators")
 	v.Finalize(ctx)
 
 	switch counts := ctx.Stats(); {

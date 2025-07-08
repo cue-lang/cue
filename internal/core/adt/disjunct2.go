@@ -321,6 +321,12 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 			// this for now.
 		}
 
+		if i > 0 {
+			for _, n := range cross {
+				n.freeDisjunct()
+			}
+		}
+
 		// switch up buffers.
 		cross, results = results, cross[:0]
 	}
@@ -564,7 +570,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 	v.unify(n.ctx, allKnown, mode, true)
 
 	if err := d.getErrorAll(); err != nil && !isCyclePlaceholder(err) {
-		d.free()
+		d.freeDisjunct()
 		return nil, err
 	}
 
@@ -743,8 +749,8 @@ outer:
 		if x.defaultMode == isDefault {
 			xn.defaultMode = isDefault
 		}
-		// TODO: x.free()
 		mergeCloseInfo(xn, x)
+		x.freeDisjunct()
 		return a
 	}
 

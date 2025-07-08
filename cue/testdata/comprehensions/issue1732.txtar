@@ -122,10 +122,10 @@ foo: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  96
-Freed:  0
-Reused: 0
-Allocs: 96
+Leaks:  11
+Freed:  85
+Reused: 54
+Allocs: 42
 Retain: 0
 
 Unifications: 82
@@ -151,10 +151,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 8
-+Leaks:  96
-+Freed:  0
-+Reused: 0
-+Allocs: 96
++Leaks:  11
++Freed:  85
++Reused: 54
++Allocs: 42
 +Retain: 0
 +
 +Unifications: 82

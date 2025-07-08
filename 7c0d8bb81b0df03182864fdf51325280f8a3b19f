@@ -34,6 +34,24 @@
       "parentUuid": "e45d58e7_3b917011",
       "revId": "7c0d8bb81b0df03182864fdf51325280f8a3b19f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da32acdc_c875bd3f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-08T12:34:23Z",
+      "side": 1,
+      "message": "ack; definitely don\u0027t want to block things if we agree on the final state",
+      "parentUuid": "1f8001cc_2b822dda",
+      "revId": "7c0d8bb81b0df03182864fdf51325280f8a3b19f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

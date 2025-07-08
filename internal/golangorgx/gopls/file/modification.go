@@ -11,16 +11,20 @@ type Modification struct {
 	URI    protocol.DocumentURI
 	Action Action
 
-	// OnDisk is true if a watched file is changed on disk.
-	// If true, Version will be -1 and Text will be nil.
+	// OnDisk is true if a watched file is changed on disk. If true,
+	// Version will be -1 and Text will be nil.
 	OnDisk bool
 
-	// Version will be -1 and Text will be nil when they are not supplied,
-	// specifically on textDocument/didClose and for on-disk changes.
+	// Version should not be used when the modification is an on-disk
+	// modification.
 	Version int32
-	Text    []byte
 
-	// LanguageID is only sent from the language client on textDocument/didOpen.
+	// ContentChanges will be nil when they are not supplied,
+	// specifically on textDocument/didClose and for on-disk changes.
+	ContentChanges []protocol.TextDocumentContentChangeEvent
+
+	// LanguageID is only sent from the language client on
+	// textDocument/didOpen.
 	LanguageID string
 }
 

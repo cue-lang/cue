@@ -36,7 +36,8 @@ var (
 	NewServer = keys.NewString("new_server", "A new server was added")
 	EndServer = keys.NewString("end_server", "A server was shut down")
 
-	ServerID = keys.NewString("server", "The server ID an event is related to")
+	ServerID    = keys.NewString("server", "The server ID an event is related to")
+	WorkspaceID = keys.NewString("workspace_id", "")
 
 	Level = keys.NewInt("level", "The logging level")
 )

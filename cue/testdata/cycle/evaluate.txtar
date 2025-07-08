@@ -140,15 +140,15 @@ diff old new
 --- old
 +++ new
 @@ -1,12 +1,12 @@
--Leaks:  48
+-Leaks:  47
 -Freed:  129
 -Reused: 122
--Allocs: 55
--Retain: 138
+-Allocs: 54
+-Retain: 137
 -
--Unifications: 165
--Conjuncts:    302
--Disjuncts:    194
+-Unifications: 164
+-Conjuncts:    298
+-Disjuncts:    193
 -
 -CloseIDElems: 0
 -NumCloseIDs: 6
@@ -165,15 +165,15 @@ diff old new
 +CloseIDElems: 7
 +NumCloseIDs: 47
 -- out/eval/stats --
-Leaks:  48
+Leaks:  47
 Freed:  129
 Reused: 122
-Allocs: 55
-Retain: 138
+Allocs: 54
+Retain: 137
 
-Unifications: 165
-Conjuncts:    302
-Disjuncts:    194
+Unifications: 164
+Conjuncts:    298
+Disjuncts:    193
 
 CloseIDElems: 0
 NumCloseIDs: 6

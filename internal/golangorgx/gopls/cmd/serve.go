@@ -26,7 +26,7 @@ import (
 type Serve struct {
 	Logfile     string        `flag:"logfile" help:"filename to log to. if value is \"auto\", then logging to a default output file is enabled"`
 	Mode        string        `flag:"mode" help:"no effect"`
-	Port        int           `flag:"port" help:"port on which to run gopls for debugging purposes"`
+	Port        int           `flag:"port" help:"port on which to run cuelsp for debugging purposes"`
 	Address     string        `flag:"listen" help:"address on which to listen for remote connections. If prefixed by 'unix;', the subsequent address is assumed to be a unix domain socket. Otherwise, TCP is used."`
 	IdleTimeout time.Duration `flag:"listen.timeout" help:"when used with -listen, shut down the server when there are no connected clients for this duration"`
 
@@ -44,7 +44,7 @@ func (s *Serve) ShortHelp() string {
 	return "run a server for Go code using the Language Server Protocol"
 }
 func (s *Serve) DetailedHelp(f *flag.FlagSet) {
-	fmt.Fprint(f.Output(), `  gopls [flags] [server-flags]
+	fmt.Fprint(f.Output(), `  cuelsp [flags] [server-flags]
 
 The server communicates using JSONRPC2 on stdin and stdout, and is intended to be run directly as
 a child of an editor process.
@@ -95,7 +95,7 @@ func (s *Serve) Run(ctx context.Context, args ...string) error {
 	}
 	if s.Port != 0 {
 		network = "tcp"
-		// TODO(adonovan): should gopls ever be listening on network
+		// TODO(adonovan): should cuelsp ever be listening on network
 		// sockets, or only local ones?
 		//
 		// Ian says this was added in anticipation of
@@ -115,8 +115,8 @@ func (s *Serve) Run(ctx context.Context, args ...string) error {
 		addr = fmt.Sprintf(":%v", s.Port)
 	}
 	if addr != "" {
-		log.Printf("cue lsp daemon: listening on %s network, address %s...", network, addr)
-		defer log.Printf("cue lsp daemon: exiting")
+		log.Printf("cuelsp daemon: listening on %s network, address %s...", network, addr)
+		defer log.Printf("cuelsp daemon: exiting")
 		return jsonrpc2.ListenAndServe(ctx, network, addr, ss, s.IdleTimeout)
 	}
 	stream := jsonrpc2.NewHeaderStream(fakenet.NewConn("stdio", os.Stdin, os.Stdout))

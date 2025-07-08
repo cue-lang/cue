@@ -31,9 +31,9 @@ func (h *help) DetailedHelp(f *flag.FlagSet) {
 	fmt.Fprint(f.Output(), `
 
 Examples:
-$ gopls help                         # main gopls help message
-$ gopls help remote                  # help on 'remote' command
-$ gopls help remote sessions         # help on 'remote sessions' subcommand
+$ cuelsp help                         # main cuelsp help message
+$ cuelsp help remote                  # help on 'remote' command
+$ cuelsp help remote sessions         # help on 'remote sessions' subcommand
 `)
 	printFlagDefaults(f)
 }
@@ -59,7 +59,7 @@ func (h *help) Run(ctx context.Context, args ...string) error {
 		}
 	}
 
-	// 'gopls help cmd subcmd' is equivalent to 'gopls cmd subcmd -h'.
+	// 'cuelsp help cmd subcmd' is equivalent to 'cuelsp cmd subcmd -h'.
 	// The flag package prints the usage information (defined by tool.Run)
 	// when it sees the -h flag.
 	fs := flag.NewFlagSet(cmd.Name(), flag.ExitOnError)
@@ -73,7 +73,7 @@ type apiJSON struct {
 func (j *apiJSON) Name() string      { return "api-json" }
 func (j *apiJSON) Parent() string    { return j.app.Name() }
 func (j *apiJSON) Usage() string     { return "" }
-func (j *apiJSON) ShortHelp() string { return "print JSON describing gopls API" }
+func (j *apiJSON) ShortHelp() string { return "print JSON describing cuelsp API" }
 func (j *apiJSON) DetailedHelp(f *flag.FlagSet) {
 	fmt.Fprint(f.Output(), ``)
 	printFlagDefaults(f)

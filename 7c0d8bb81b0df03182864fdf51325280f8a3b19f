@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e45d58e7_3b917011",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-08T10:52:08Z",
+      "side": 1,
+      "message": "SGTM but are we not naming this `cue lsp` rather than a separate `cuelsp` binary? I think we should consistently use `cue lsp` to avoid confusion, but I don\u0027t hold that strongly.",
+      "revId": "7c0d8bb81b0df03182864fdf51325280f8a3b19f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

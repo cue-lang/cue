@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"cuelang.org/go/internal/golangorgx/tools/robustio"
 	"cuelang.org/go/internal/mod/modresolve"
+	"cuelang.org/go/internal/robustio"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"golang.org/x/oauth2"
 )

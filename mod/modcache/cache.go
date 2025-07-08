@@ -13,8 +13,8 @@ import (
 	"path/filepath"
 
 	"github.com/rogpeppe/go-internal/lockedfile"
-	"github.com/rogpeppe/go-internal/robustio"
 
+	"cuelang.org/go/internal/robustio"
 	"cuelang.org/go/mod/module"
 )
 

@@ -300,54 +300,54 @@ value0: Only: [{UseSectionName: true}]
   }
 }
 -- out/evalalpha/stats --
-Leaks:  2293
+Leaks:  1642
 Freed:  0
 Reused: 0
-Allocs: 2293
+Allocs: 1642
 Retain: 0
 
-Unifications: 623
-Conjuncts:    2667
-Disjuncts:    637
+Unifications: 502
+Conjuncts:    1947
+Disjuncts:    461
 
-CloseIDElems: 12068
-NumCloseIDs: 835
+CloseIDElems: 8682
+NumCloseIDs: 598
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
--Leaks:  245
--Freed:  446592
--Reused: 446567
--Allocs: 270
--Retain: 3132
+-Leaks:  237
+-Freed:  327955
+-Reused: 327930
+-Allocs: 262
+-Retain: 2657
 -
--Unifications: 190593
--Conjuncts:    642054
--Disjuncts:    449487
-+Leaks:  2293
+-Unifications: 140273
+-Conjuncts:    468967
+-Disjuncts:    330375
++Leaks:  1642
 +Freed:  0
 +Reused: 0
-+Allocs: 2293
++Allocs: 1642
 +Retain: 0
 +
-+Unifications: 623
-+Conjuncts:    2667
-+Disjuncts:    637
++Unifications: 502
++Conjuncts:    1947
++Disjuncts:    461
 +
-+CloseIDElems: 12068
-+NumCloseIDs: 835
++CloseIDElems: 8682
++NumCloseIDs: 598
 -- out/eval/stats --
-Leaks:  245
-Freed:  446592
-Reused: 446567
-Allocs: 270
-Retain: 3132
+Leaks:  237
+Freed:  327955
+Reused: 327930
+Allocs: 262
+Retain: 2657
 
-Unifications: 190593
-Conjuncts:    642054
-Disjuncts:    449487
+Unifications: 140273
+Conjuncts:    468967
+Disjuncts:    330375
 -- out/evalalpha --
 (struct){
   #FinDefSetElemType: (#struct){

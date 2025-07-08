@@ -76,14 +76,14 @@ diff old new
 +++ new
 @@ -1,12 +1,12 @@
 -Leaks:  90
--Freed:  746
--Reused: 742
+-Freed:  684
+-Reused: 680
 -Allocs: 94
--Retain: 1363
+-Retain: 1359
 -
--Unifications: 828
--Conjuncts:    3306
--Disjuncts:    1475
+-Unifications: 766
+-Conjuncts:    3242
+-Disjuncts:    1409
 -
 -CloseIDElems: 0
 -NumCloseIDs: 12
@@ -101,14 +101,14 @@ diff old new
 +NumCloseIDs: 535
 -- out/eval/stats --
 Leaks:  90
-Freed:  746
-Reused: 742
+Freed:  684
+Reused: 680
 Allocs: 94
-Retain: 1363
+Retain: 1359
 
-Unifications: 828
-Conjuncts:    3306
-Disjuncts:    1475
+Unifications: 766
+Conjuncts:    3242
+Disjuncts:    1409
 
 CloseIDElems: 0
 NumCloseIDs: 12

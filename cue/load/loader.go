@@ -81,23 +81,6 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	// ModInit() // TODO: support modules
 	pkg := l.cfg.Context.NewInstance(l.cfg.Dir, nil)
 
-	for _, bf := range files {
-		f := bf.Filename
-		if f == "-" {
-			continue
-		}
-		if !filepath.IsAbs(f) {
-			f = filepath.Join(l.cfg.Dir, f)
-		}
-		fi, err := l.cfg.fileSystem.stat(f)
-		if err != nil {
-			return l.cfg.newErrInstance(errors.Wrapf(err, token.NoPos, "could not find file %v", f))
-		}
-		if fi.IsDir() {
-			return l.cfg.newErrInstance(errors.Newf(token.NoPos, "file is a directory %v", f))
-		}
-	}
-
 	fp := newFileProcessor(l.cfg, pkg, l.tagger)
 	if l.cfg.Package == "*" {
 		fp.allPackages = true

@@ -12,7 +12,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 )
 
-// format implements the format verb for gopls.
+// format implements the format verb for cuelsp.
 type format struct {
 	EditFlags
 	app *Application
@@ -28,7 +28,7 @@ The arguments supplied may be simple file names, or ranges within files.
 
 Example: reformat this file:
 
-	$ gopls format -w internal/cmd/check.go
+	$ cuelsp format -w internal/cmd/check.go
 
 format-flags:
 `)

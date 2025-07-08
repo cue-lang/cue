@@ -16,7 +16,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/event"
 )
 
-// autoNetwork is the pseudo network type used to signal that gopls should use
+// autoNetwork is the pseudo network type used to signal that cuelsp should use
 // automatic discovery to resolve a remote address.
 const autoNetwork = "auto"
 
@@ -36,12 +36,12 @@ func newAutoDialer(rawAddr string, argFunc func(network, addr string) []string) 
 	d.network, d.addr = ParseAddr(rawAddr)
 	if d.network == autoNetwork {
 		d.isAuto = true
-		bin, err := os.Executable()
+		cuePath, err := os.Executable()
 		if err != nil {
 			return nil, fmt.Errorf("getting executable: %w", err)
 		}
-		d.executable = bin
-		d.network, d.addr = autoNetworkAddress(bin, d.addr)
+		d.executable = cuePath
+		d.network, d.addr = autoNetworkAddress(cuePath, d.addr)
 	}
 	return &d, nil
 }

@@ -34,22 +34,22 @@ func daemonizePosix(cmd *exec.Cmd) {
 
 // autoNetworkAddressPosix resolves an id on the 'auto' pseduo-network to a
 // real network and address. On unix, this uses unix domain sockets.
-func autoNetworkAddressPosix(goplsPath, id string) (network string, address string) {
+func autoNetworkAddressPosix(cuePath, id string) (network string, address string) {
 	// Especially when doing local development or testing, it's important that
-	// the remote gopls instance we connect to is running the same binary as our
+	// the remote cuelsp instance we connect to is running the same binary as our
 	// forwarder. So we encode a short hash of the binary path into the daemon
 	// socket name. If possible, we also include the buildid in this hash, to
 	// account for long-running processes where the binary has been subsequently
 	// rebuilt.
 	h := sha256.New()
-	cmd := exec.Command("go", "tool", "buildid", goplsPath)
+	cmd := exec.Command("go", "tool", "buildid", cuePath)
 	cmd.Stdout = h
 	var pathHash []byte
 	if err := cmd.Run(); err == nil {
 		pathHash = h.Sum(nil)
 	} else {
 		log.Printf("error getting current buildid: %v", err)
-		sum := sha256.Sum256([]byte(goplsPath))
+		sum := sha256.Sum256([]byte(cuePath))
 		pathHash = sum[:]
 	}
 	shortHash := fmt.Sprintf("%x", pathHash)[:6]
@@ -57,7 +57,7 @@ func autoNetworkAddressPosix(goplsPath, id string) (network string, address stri
 	if user == "" {
 		user = "shared"
 	}
-	basename := filepath.Base(goplsPath)
+	basename := filepath.Base(cuePath)
 	idComponent := ""
 	if id != "" {
 		idComponent = "-" + id

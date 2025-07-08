@@ -562,6 +562,18 @@ func LogMatching(typ protocol.MessageType, re string, count int, atLeast bool) E
 	}
 }
 
+// LogExactf asserts that the client has received a log message of
+// type typ which contains exactly the string created by
+// fmt.Sprintf(format, args...) a certain number of times.
+//
+// It is a convenience wrapper around [LogMatching], using
+// [regexp.QuoteMeta] and fmt.Sprintf. Note the string/regexp is not
+// anchored to the beginning or end of any log message, so this
+// behaves like [strings.Contains] rather than ==.
+func LogExactf(typ protocol.MessageType, count int, atLeast bool, format string, args ...any) Expectation {
+	return LogMatching(typ, regexp.QuoteMeta(fmt.Sprintf(format, args...)), count, atLeast)
+}
+
 // NoLogMatching asserts that the client has not received a log message
 // of type typ matching the regexp re. If re is an empty string, any log
 // message is considered a match.
@@ -589,6 +601,12 @@ func NoLogMatching(typ protocol.MessageType, re string) Expectation {
 		Check:       check,
 		Description: fmt.Sprintf("no log message matching %q", re),
 	}
+}
+
+// NoLogExactf is a convenience wrapper around [NoLogMatching], in the
+// same way that [LogExactf] is a wrapper around [LogMatching].
+func NoLogExactf(typ protocol.MessageType, format string, args ...any) Expectation {
+	return NoLogMatching(typ, regexp.QuoteMeta(fmt.Sprintf(format, args...)))
 }
 
 // FileWatchMatching expects that a file registration matches re.

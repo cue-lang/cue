@@ -266,8 +266,7 @@ func (app *Application) internalCommands() []tool.Application {
 func (app *Application) featureCommands() []tool.Application {
 	return []tool.Application{
 		&format{app: app},
-		newRemote(app, ""),
-		newRemote(app, "inspect"),
+		newRemote(app),
 	}
 }
 

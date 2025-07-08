@@ -26,7 +26,7 @@ func newRemote(app *Application) *remote {
 	return &remote{
 		app: app,
 		subcommands: subcommands{
-			&listSessions{app: app},
+			&listWorkspaces{app: app},
 			&startDebugging{app: app},
 		},
 	}
@@ -39,38 +39,38 @@ func (r *remote) ShortHelp() string {
 	return "interact with the cuelsp daemon"
 }
 
-// listSessions is an inspect subcommand to list current sessions.
-type listSessions struct {
+// listWorkspaces is an inspect subcommand to list current workspaces.
+type listWorkspaces struct {
 	app *Application
 }
 
-func (c *listSessions) Name() string   { return "sessions" }
-func (c *listSessions) Parent() string { return c.app.Name() }
-func (c *listSessions) Usage() string  { return "" }
-func (c *listSessions) ShortHelp() string {
-	return "print information about current cuelsp sessions"
+func (c *listWorkspaces) Name() string   { return "workspaces" }
+func (c *listWorkspaces) Parent() string { return c.app.Name() }
+func (c *listWorkspaces) Usage() string  { return "" }
+func (c *listWorkspaces) ShortHelp() string {
+	return "print information about current cuelsp workspaces"
 }
 
-const listSessionsExamples = `
+const listWorkspacesExamples = `
 Examples:
 
-1) list sessions for the default daemon:
+1) list workspaces for the default daemon:
 
-$ cuelsp -remote=auto remote sessions
+$ cuelsp -remote=auto remote workspaces
 or just
-$ cuelsp remote sessions
+$ cuelsp remote workspaces
 
-2) list sessions for a specific daemon:
+2) list workspaces for a specific daemon:
 
-$ cuelsp -remote=localhost:8082 remote sessions
+$ cuelsp -remote=localhost:8082 remote workspaces
 `
 
-func (c *listSessions) DetailedHelp(f *flag.FlagSet) {
-	fmt.Fprint(f.Output(), listSessionsExamples)
+func (c *listWorkspaces) DetailedHelp(f *flag.FlagSet) {
+	fmt.Fprint(f.Output(), listWorkspacesExamples)
 	printFlagDefaults(f)
 }
 
-func (c *listSessions) Run(ctx context.Context, args ...string) error {
+func (c *listWorkspaces) Run(ctx context.Context, args ...string) error {
 	remote := c.app.Remote
 	if remote == "" {
 		remote = "auto"

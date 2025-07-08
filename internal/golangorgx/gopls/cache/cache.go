@@ -5,41 +5,37 @@
 package cache
 
 import (
-	"strconv"
-	"sync/atomic"
-
-	"cuelang.org/go/internal/golangorgx/tools/memoize"
+	"cuelang.org/go/internal/lsp/fscache"
+	"cuelang.org/go/internal/mod/modpkgload"
+	"cuelang.org/go/internal/mod/modrequirements"
+	"cuelang.org/go/mod/modconfig"
 )
 
-// New Creates a new cache for gopls operation results, using the given file
-// set, shared store, and session options.
-//
-// Both the fset and store may be nil, but if store is non-nil so must be fset
-// (and they must always be used together), otherwise it may be possible to get
-// cached data referencing token.Pos values not mapped by the FileSet.
-func New() *Cache {
-	index := atomic.AddInt64(&cacheIndex, 1)
-
-	c := &Cache{
-		id: strconv.FormatInt(index, 10),
+// New creates a new Cache.
+func New() (*Cache, error) {
+	modcfg := &modconfig.Config{
+		ClientType: "cuelsp",
 	}
-	return c
+	var err error
+	registry, err := modconfig.NewRegistry(modcfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Cache{
+		fs:       fscache.NewCUECachedFS(),
+		registry: registry,
+	}, nil
 }
 
-// A Cache holds content that is shared across multiple gopls sessions.
+// A Cache holds content that is shared across multiple cuelsp
+// client/editor connections.
 type Cache struct {
-	id string
-
-	// store holds cached calculations.
-	//
-	// TODO(rfindley): at this point, these are not important, as we've moved our
-	// content-addressable cache to the file system (the filecache package). It
-	// is unlikely that this shared cache provides any shared value. We should
-	// consider removing it, replacing current uses with a simpler futures cache,
-	// as we've done for e.g. type-checked packages.
-	store *memoize.Store
+	fs       *fscache.CUECacheFS
+	registry modregistry
 }
 
-var cacheIndex, sessionIndex, viewIndex int64
-
-func (c *Cache) ID() string { return c.id }
+type modregistry interface {
+	modrequirements.Registry
+	modpkgload.Registry
+}

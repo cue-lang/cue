@@ -34,6 +34,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	_ "cuelang.org/go/pkg"
 )
@@ -107,6 +108,12 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 
 	switch counts := ctx.Stats(); {
 	case version == internal.DevVersion:
+		hasDiff := false
+		for _, f := range t.Archive.Files {
+			if f.Name == "out/evalalpha/stats" {
+				hasDiff = true
+			}
+		}
 		for _, f := range t.Archive.Files {
 			if f.Name != "out/eval/stats" {
 				continue
@@ -118,6 +125,12 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 
 			// TODO: do something more principled.
 			switch {
+			case hasDiff || cuetest.ForceUpdateGoldenFiles:
+				// With CUE_UPDATE=force, we update the stats file
+				// unconditionally.
+				// NOTE: if the reuse of force clashes too much with other uses,
+				// we could also introduce a different enum value for this.
+				fallthrough
 			case orig.Disjuncts < counts.Disjuncts,
 				orig.Disjuncts > counts.Disjuncts*5 &&
 					counts.Disjuncts > 20,

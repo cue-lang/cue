@@ -4,9 +4,9 @@
 ! exec cue get crd
 stderr 'must specify at least one file'
 
-# Test non-existent file
+# Test non-existent file; different errors on unix vs windows
 ! exec cue get crd nonexistent.yaml
-stderr 'could not find file'
+stderr 'no such file or directory|cannot find the file specified'
 
 # Test invalid YAML
 ! exec cue get crd invalid.yaml

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package cmd handles the gopls command line.
+// Package cmd handles the cuelsp command line.
 // It contains a handler for each of the modes, along with all the flag handling
 // and the command line output format.
 package cmd
@@ -105,7 +105,7 @@ func New(options func(*settings.Options)) *Application {
 }
 
 // Name implements tool.Application returning the binary name.
-func (app *Application) Name() string { return "gopls" }
+func (app *Application) Name() string { return "cuelsp" }
 
 // Usage implements tool.Application returning empty extra argument usage.
 func (app *Application) Usage() string { return "" }
@@ -122,14 +122,14 @@ func (app *Application) DetailedHelp(f *flag.FlagSet) {
 	defer w.Flush()
 
 	fmt.Fprint(w, `
-gopls is a Go language server.
+cuelsp is a CUE language server.
 
 It is typically used with an editor to provide language features. When no
-command is specified, gopls will default to the 'serve' command. The language
-features can also be accessed via the gopls command-line interface.
+command is specified, cuelsp will default to the 'serve' command. The language
+features can also be accessed via the cuelsp command-line interface.
 
 Usage:
-  gopls help [<subject>]
+  cuelsp help [<subject>]
 
 Command:
 `)
@@ -239,7 +239,7 @@ func (app *Application) Run(ctx context.Context, args ...string) error {
 	return tool.CommandLineErrorf("Unknown command %v", command)
 }
 
-// Commands returns the set of commands supported by the gopls tool on the
+// Commands returns the set of commands supported by the cuelsp tool on the
 // command line.
 // The command is specified by the first non flag argument.
 func (app *Application) Commands() []tool.Application {
@@ -276,7 +276,7 @@ var (
 	internalConnections = make(map[string]*connection)
 )
 
-// connect creates and initializes a new in-process gopls session.
+// connect creates and initializes a new in-process cuelsp session.
 //
 // If onProgress is set, it is called for each new progress notification.
 func (app *Application) connect(ctx context.Context, onProgress func(*protocol.ProgressParams)) (*connection, error) {
@@ -360,7 +360,7 @@ type connection struct {
 	client *cmdClient
 }
 
-// cmdClient defines the protocol.Client interface behavior of the gopls CLI tool.
+// cmdClient defines the protocol.Client interface behavior of the cuelsp CLI tool.
 type cmdClient struct {
 	app        *Application
 	onProgress func(*protocol.ProgressParams)
@@ -448,7 +448,7 @@ func (c *cmdClient) WorkspaceFolders(ctx context.Context) ([]protocol.WorkspaceF
 func (c *cmdClient) Configuration(ctx context.Context, p *protocol.ParamConfiguration) ([]interface{}, error) {
 	results := make([]interface{}, len(p.Items))
 	for i, item := range p.Items {
-		if item.Section != "gopls" {
+		if item.Section != "cuelsp" {
 			continue
 		}
 		m := map[string]interface{}{

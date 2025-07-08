@@ -50,7 +50,7 @@ func (r *remote) Name() string {
 func (r *remote) Parent() string { return r.app.Name() }
 
 func (r *remote) ShortHelp() string {
-	short := "interact with the gopls daemon"
+	short := "interact with the cuelsp daemon"
 	if r.alias != "" {
 		short += " (deprecated: use 'remote')"
 	}
@@ -66,7 +66,7 @@ func (c *listSessions) Name() string   { return "sessions" }
 func (c *listSessions) Parent() string { return c.app.Name() }
 func (c *listSessions) Usage() string  { return "" }
 func (c *listSessions) ShortHelp() string {
-	return "print information about current gopls sessions"
+	return "print information about current cuelsp sessions"
 }
 
 const listSessionsExamples = `
@@ -74,13 +74,13 @@ Examples:
 
 1) list sessions for the default daemon:
 
-$ gopls -remote=auto remote sessions
+$ cuelsp -remote=auto remote sessions
 or just
-$ gopls remote sessions
+$ cuelsp remote sessions
 
 2) list sessions for a specific daemon:
 
-$ gopls -remote=localhost:8082 remote sessions
+$ cuelsp -remote=localhost:8082 remote sessions
 `
 
 func (c *listSessions) DetailedHelp(f *flag.FlagSet) {
@@ -120,13 +120,13 @@ Examples:
 
 1) start a debug server for the default daemon, on an arbitrary port:
 
-$ gopls -remote=auto remote debug
+$ cuelsp -remote=auto remote debug
 or just
-$ gopls remote debug
+$ cuelsp remote debug
 
 2) start for a specific daemon, on a specific port:
 
-$ gopls -remote=localhost:8082 remote debug localhost:8083
+$ cuelsp -remote=localhost:8082 remote debug localhost:8083
 `
 
 func (c *startDebugging) DetailedHelp(f *flag.FlagSet) {

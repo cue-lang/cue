@@ -16,6 +16,7 @@ package cuecontext
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/go-quicktest/qt"
@@ -64,19 +65,42 @@ func TestAPI(t *testing.T) {
 // TestConcurrency tests whether concurrent use of an index is allowed.
 // This test only functions well with the --race flag.
 func TestConcurrency(t *testing.T) {
+	var wg sync.WaitGroup
 	c := New()
+	wg.Add(2)
 	go func() {
 		c.CompileString(`
 		package foo
 		a: 1
 		`)
+		wg.Done()
 	}()
 	go func() {
 		c.CompileString(`
 		package bar
 		a: 2
 		`)
+		wg.Done()
 	}()
+	wg.Wait()
+}
+
+// Separate contexts should be able to load standard library imports without races.
+func TestConcurrentImports(t *testing.T) {
+	var wg sync.WaitGroup
+	wg.Add(5)
+	for range 5 {
+		go func() {
+			ctx := New()
+			ctx.CompileString(`
+				import "strings"
+
+				out: strings.ToUpper("foo")
+			`)
+			wg.Done()
+		}()
+	}
+	wg.Wait()
 }
 
 func TestEvalVersion(t *testing.T) {

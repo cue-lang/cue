@@ -70,7 +70,12 @@ func (p *Package) MustCompile(ctx *adt.OpContext, importPath string) *adt.Vertex
 	if len(p.Native) > 0 {
 		obj.AddConjunct(adt.MakeRootConjunct(nil, st))
 	}
-	for _, b := range p.Native {
+	for _, bref := range p.Native {
+		// Make a copy of each Builtin object; otherwise concurrent use by separate
+		// contexts will lead to data races when setting [Builtin.Pkg] below.
+		// TODO(perf): avoid copying the builtins, e.g. by using a sync.Once.
+		b := *bref
+
 		b.Pkg = pkgLabel
 
 		f := ctx.StringLabel(b.Name) // never starts with _
@@ -79,7 +84,7 @@ func (p *Package) MustCompile(ctx *adt.OpContext, importPath string) *adt.Vertex
 		if b.Const != "" {
 			v = mustParseConstBuiltin(ctx, b.Name, b.Const)
 		} else {
-			v = ToBuiltin(b)
+			v = ToBuiltin(&b)
 		}
 		st.Decls = append(st.Decls, &adt.Field{
 			Label: f,

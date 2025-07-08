@@ -16,6 +16,24 @@
       "message": "SGTM but are we not naming this `cue lsp` rather than a separate `cuelsp` binary? I think we should consistently use `cue lsp` to avoid confusion, but I don\u0027t hold that strongly.",
       "revId": "7c0d8bb81b0df03182864fdf51325280f8a3b19f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f8001cc_2b822dda",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-08T12:32:38Z",
+      "side": 1,
+      "message": "I think I will do a later CL in which I nuke all the internal/golangorgx/gopls/cmd/ stuff and move whatever needs to survive into cmd/cue. Does that sound reasonable to you?",
+      "parentUuid": "e45d58e7_3b917011",
+      "revId": "7c0d8bb81b0df03182864fdf51325280f8a3b19f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

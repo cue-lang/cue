@@ -209,7 +209,9 @@ func processComprehension(ctx *OpContext, t *task, mode runMode) {
 
 	err := n.processComprehension(y, 0)
 	t.err = CombineErrors(nil, t.err, err)
-	t.comp.vertex.state.addBottom(err)
+	if t.comp.vertex.state != nil {
+		t.comp.vertex.state.addBottom(err)
+	}
 }
 
 func processDisjunctions(c *OpContext, t *task, mode runMode) {

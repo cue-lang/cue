@@ -23,8 +23,8 @@ bar:  hex.EncodedLen(len)
 -- out/legacy-debug --
 <0>{foo: <1>.Decode (<2>.data), data: bytes, len: int, bar: <3>.EncodedLen (<2>.len)}
 -- out/evalalpha/stats --
-Leaks:  5
-Freed:  0
+Leaks:  0
+Freed:  5
 Reused: 0
 Allocs: 5
 Retain: 0
@@ -37,13 +37,11 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  0
--Freed:  5
+ Leaks:  0
+ Freed:  5
 -Reused: 2
 -Allocs: 3
 -Retain: 5
-+Leaks:  5
-+Freed:  0
 +Reused: 0
 +Allocs: 5
 +Retain: 0

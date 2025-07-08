@@ -8,8 +8,8 @@ if #E["y"] != _|_ {
 #E: [_]: bool
 #E: x:   true
 -- out/eval/stats --
-Leaks:  1
-Freed:  4
+Leaks:  0
+Freed:  5
 Reused: 1
 Allocs: 4
 Retain: 2

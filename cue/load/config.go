@@ -20,6 +20,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
+	"syscall"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -416,8 +418,25 @@ func (c *Config) loadModule() error {
 	if cerr != nil {
 		// If we could not load cue.mod/module.cue, check whether the reason was
 		// a legacy cue.mod file and give the user a clear error message.
-		info, cerr2 := c.fileSystem.stat(modDir)
-		if cerr2 == nil && !info.IsDir() {
+		//
+		// Trying to open cue.mod/module.cue when cue.mod is a regular file
+		// will result in a "not a directory" error on most OSes like Linux and Mac.
+		// The portable way to do this is via an extra stat call,
+		// which is unfortunate as loading CUE files without a module is fairly common.
+		//
+		// On Windows, due to https://github.com/golang/go/issues/46734,
+		// any "does not exist" error is equal to ENOTDIR, so we can't differentiate the two
+		// without doing the extra stat call, so we still do it there.
+		//
+		// TODO(mvdan): we can remove this in mid 2026, once we can safely assume that
+		// practically all cue.mod files have vanished.
+		if errors.Is(cerr, syscall.ENOTDIR) {
+			if runtime.GOOS == "windows" {
+				info, cerr2 := c.fileSystem.stat(modDir)
+				if cerr2 != nil || info.IsDir() {
+					return nil
+				}
+			}
 			return fmt.Errorf("cue.mod files are no longer supported; use cue.mod/module.cue")
 		}
 		return nil

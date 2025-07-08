@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 	"testing"
 
 	"golang.org/x/tools/txtar"
@@ -44,6 +45,7 @@ var (
 
 // TestEvalV2 tests the old implementation of the evaluator.
 func TestEvalV2(t *testing.T) {
+	t.Parallel()
 	test := cuetxtar.TxTarTest{
 		Root: "../../../cue/testdata",
 		Name: "eval",
@@ -58,12 +60,14 @@ func TestEvalV2(t *testing.T) {
 		test.ToDo = nil
 	}
 
-	test.Run(t, func(tc *cuetxtar.Test) {
-		runEvalTest(tc, internal.EvalV2, dbg, exp)
+	test.Run(t, func(t *cuetxtar.Test) {
+		t.Parallel()
+		runEvalTest(t, internal.EvalV2, dbg, exp)
 	})
 }
 
 func TestEvalV3(t *testing.T) {
+	t.Parallel()
 	adt.DebugDeps = true // check unmatched dependencies.
 
 	test := cuetxtar.TxTarTest{
@@ -81,14 +85,15 @@ func TestEvalV3(t *testing.T) {
 		test.ToDo = nil
 	}
 
-	var errorCount int
+	var errorCount atomic.Int64
 	test.Run(t, func(t *cuetxtar.Test) {
-		errorCount += runEvalTest(t, internal.EvalV3, dbg, exp)
+		t.Parallel()
+		errorCount.Add(runEvalTest(t, internal.EvalV3, dbg, exp))
 	})
-	t.Logf("nodeErrors: %d", errorCount)
+	t.Logf("nodeErrors: %d", errorCount.Load())
 }
 
-func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedebug.Config, exp cueexperiment.Config) (errorCount int) {
+func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedebug.Config, exp cueexperiment.Config) (errorCount int64) {
 	exp.KeepValidators = !t.HasTag("simplifyValidators")
 
 	a := t.Instance()

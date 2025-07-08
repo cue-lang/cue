@@ -6,7 +6,7 @@ stderr 'must specify at least one file'
 
 # Test non-existent file
 ! exec cue get crd nonexistent.yaml
-stderr 'could not find file'
+stderr 'no such file or directory'
 
 # Test invalid YAML
 ! exec cue get crd invalid.yaml

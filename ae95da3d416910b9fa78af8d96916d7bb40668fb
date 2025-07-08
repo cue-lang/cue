@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e6a3656_91ca0a08",
+        "filename": "internal/cueconfig/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-08T11:58:49Z",
+      "side": 1,
+      "message": "In passing, maybe consolidate imports into the usual three groups (stdlib, external, module-local) ?",
+      "revId": "ae95da3d416910b9fa78af8d96916d7bb40668fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ebb1427_e155ef91",
+        "filename": "internal/robustio/robustio_posix.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-08T11:58:49Z",
+      "side": 1,
+      "message": "Maybe use `unix` tag as suggested in the TODO that\u0027s just been removed?",
+      "revId": "ae95da3d416910b9fa78af8d96916d7bb40668fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

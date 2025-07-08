@@ -699,6 +699,11 @@ func appendDisjunct(ctx *OpContext, a []*nodeContext, x *nodeContext) []*nodeCon
 	// (overlayed) closeContexts are identical.
 outer:
 	for _, xn := range a {
+		// TODO: for some reason, r may already have been added to dst in some
+		// cases, so we need to check for this.
+		if xn == x {
+			return a
+		}
 		xv := xn.node.DerefValue()
 		if xv.status != finalized || nv.status != finalized {
 			// Partial node

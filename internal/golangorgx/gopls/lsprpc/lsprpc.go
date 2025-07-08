@@ -39,11 +39,11 @@ type streamServer struct {
 	// daemon controls whether or not to log new connections.
 	daemon bool
 
-	// optionsOverrides is passed to newly created sessions.
+	// optionsOverrides is passed to newly created workspaces.
 	optionsOverrides func(*settings.Options)
 
 	// serverForTest may be set to a test fake for testing.
-	serverForTest protocol.Server
+	serverForTest server.ServerWithID
 }
 
 // NewStreamServer creates a StreamServer using the shared cache.
@@ -58,24 +58,30 @@ func (s *streamServer) ServeStream(ctx context.Context, conn jsonrpc2.Conn) erro
 	svr := s.serverForTest
 	if svr == nil {
 		options := settings.DefaultOptions(s.optionsOverrides)
-		svr = server.New(client, options)
+		svr = server.New(s.cache, client, options)
 	}
+	svrID := svr.ID()
 	// Clients may or may not send a shutdown message. Make sure the server is
 	// shut down.
-	// TODO(rFindley): this shutdown should perhaps be on a disconnected context.
-	defer func() {
-		if err := svr.Shutdown(ctx); err != nil {
-			event.Error(ctx, "error shutting down", err)
-		}
-	}()
+	//
+	// TODO(ms): temporarily disabled because it introduces a
+	// data-race: this is a moment of genuine concurrency. It would be
+	// much better to inject the shutdown message onto the end of the
+	// jsonrpc2 stream somehow. For now, there's nothing important to
+	// do for shutdown, so disabling this is fine, and it solves the
+	// data-race. It's possible we could get away with moving the
+	// <-conn.Done() call within the defer, prior to the Shutdown call
+	// - that would provide the necessary memory barries. TBD.
+	//
+	// defer svr.Shutdown(ctx)
 	ctx = protocol.WithClient(ctx, client)
 	conn.Go(ctx,
 		protocol.Handlers(
-			handshaker("unknown", s.daemon,
+			handshaker(svrID, s.daemon,
 				protocol.ServerHandler(svr, jsonrpc2.MethodNotFound))))
 	if s.daemon {
-		log.Printf("Session %s: connected", "unknown")
-		defer log.Printf("Session %s: exited", "unknown")
+		log.Printf("Server %s: connected", svrID)
+		defer log.Printf("Server %s: exited", svrID)
 	}
 	<-conn.Done()
 	return conn.Err()

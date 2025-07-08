@@ -309,23 +309,35 @@ func (s *loggingFramer) printBuffers(testname string, w io.Writer) {
 
 // defaultServer handles the Default execution mode.
 func (r *Runner) defaultServer(optsHook func(*settings.Options)) jsonrpc2.StreamServer {
-	return lsprpc.NewStreamServer(cache.New(), false, optsHook)
+	c, err := cache.NewCache(nil)
+	if err != nil {
+		panic(err)
+	}
+	return lsprpc.NewStreamServer(c, false, optsHook)
 }
 
 // experimentalServer handles the Experimental execution mode.
 func (r *Runner) experimentalServer(optsHook func(*settings.Options)) jsonrpc2.StreamServer {
+	c, err := cache.NewCache(nil)
+	if err != nil {
+		panic(err)
+	}
 	options := func(o *settings.Options) {
 		optsHook(o)
 		o.EnableAllExperiments()
 	}
-	return lsprpc.NewStreamServer(cache.New(), false, options)
+	return lsprpc.NewStreamServer(c, false, options)
 }
 
 // forwardedServer handles the Forwarded execution mode.
 func (r *Runner) forwardedServer(optsHook func(*settings.Options)) jsonrpc2.StreamServer {
 	r.tsOnce.Do(func() {
+		c, err := cache.NewCache(nil)
+		if err != nil {
+			panic(err)
+		}
 		ctx := context.Background()
-		ss := lsprpc.NewStreamServer(cache.New(), false, optsHook)
+		ss := lsprpc.NewStreamServer(c, false, optsHook)
 		r.ts = servertest.NewTCPServer(ctx, ss, nil)
 	})
 	return newForwarder("tcp", r.ts.Addr)

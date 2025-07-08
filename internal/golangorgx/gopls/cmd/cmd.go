@@ -21,6 +21,7 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/lsprpc"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
@@ -283,7 +284,11 @@ func (app *Application) connect(ctx context.Context, onProgress func(*protocol.P
 	case app.Remote == "":
 		client := newClient(app, onProgress)
 		options := settings.DefaultOptions(app.options)
-		server := server.New(client, options)
+		cache, err := cache.NewCache(nil)
+		if err != nil {
+			return nil, err
+		}
+		server := server.New(cache, client, options)
 		conn := newConnection(server, client)
 		if err := conn.initialize(protocol.WithClient(ctx, client), app.options); err != nil {
 			return nil, err

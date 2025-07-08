@@ -16,7 +16,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/event"
 )
 
-// autoNetwork is the pseudo network type used to signal that gopls should use
+// autoNetwork is the pseudo network type used to signal that cuelsp should use
 // automatic discovery to resolve a remote address.
 const autoNetwork = "auto"
 

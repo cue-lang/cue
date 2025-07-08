@@ -1333,12 +1333,16 @@ func (n *nodeContext) clone() *nodeContext {
 }
 
 func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
-	if n := c.freeListNode; n != nil {
+	var n *nodeContext
+	if n = c.freeListNode; n != nil {
 		c.stats.Reused++
 		c.freeListNode = n.nextFree
 
+		n.scheduler.clear()
+		n.scheduler.ctx = c
+
 		*n = nodeContext{
-			scheduler: scheduler{ctx: c},
+			scheduler: n.scheduler,
 			node:      node,
 			nodeContextState: nodeContextState{
 				kind: TopKind,
@@ -1367,21 +1371,19 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			buffer:             n.buffer[:0],
 		}
 		n.scheduler.clear()
-		n.scheduler.node = n
-		n.underlying = node
+	} else {
+		c.stats.Allocs++
 
-		return n
+		n = &nodeContext{
+			scheduler: scheduler{
+				ctx: c,
+			},
+			node: node,
+
+			nodeContextState: nodeContextState{kind: TopKind},
+		}
 	}
-	c.stats.Allocs++
 
-	n := &nodeContext{
-		scheduler: scheduler{
-			ctx: c,
-		},
-		node: node,
-
-		nodeContextState: nodeContextState{kind: TopKind},
-	}
 	n.scheduler.node = n
 	n.underlying = node
 	return n

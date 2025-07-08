@@ -1290,6 +1290,8 @@ func (n *nodeContext) addNotify(v *Vertex) {
 }
 
 func (n *nodeContext) clone() *nodeContext {
+	unreachableForDev(n.ctx)
+
 	d := n.ctx.newNodeContext(n.node)
 
 	d.refCount++

@@ -2,8 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:build plan9
-// +build plan9
+//go:build unix
 
 package robustio
 
@@ -18,9 +17,9 @@ func getFileID(filename string) (FileID, time.Time, error) {
 	if err != nil {
 		return FileID{}, time.Time{}, err
 	}
-	dir := fi.Sys().(*syscall.Dir)
+	stat := fi.Sys().(*syscall.Stat_t)
 	return FileID{
-		device: uint64(dir.Type)<<32 | uint64(dir.Dev),
-		inode:  dir.Qid.Path,
+		device: uint64(stat.Dev), // (int32 on darwin, uint64 on linux)
+		inode:  stat.Ino,
 	}, fi.ModTime(), nil
 }

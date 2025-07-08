@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fd2ecbb_8180e07a",
+        "filename": "internal/cueconfig/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-08T12:07:44Z",
+      "side": 1,
+      "message": "Hmm. My editor sorts them all out on save. But I agree, this one looks odd. A manual goimports call has sorted it out. Done.",
+      "parentUuid": "6e6a3656_91ca0a08",
+      "revId": "ae95da3d416910b9fa78af8d96916d7bb40668fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3ebb1427_e155ef91",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-08T11:58:49Z",
       "side": 1,
       "message": "Maybe use `unix` tag as suggested in the TODO that\u0027s just been removed?",
+      "revId": "ae95da3d416910b9fa78af8d96916d7bb40668fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c87994a_bb8842bf",
+        "filename": "internal/robustio/robustio_posix.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-08T12:07:44Z",
+      "side": 1,
+      "message": "Ok, I didn\u0027t know how much we want to keep it verbatim vs upstream or not. Done.",
+      "parentUuid": "3ebb1427_e155ef91",
       "revId": "ae95da3d416910b9fa78af8d96916d7bb40668fb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

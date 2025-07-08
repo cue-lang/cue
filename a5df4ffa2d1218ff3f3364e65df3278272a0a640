@@ -56,6 +56,30 @@
       },
       "revId": "a5df4ffa2d1218ff3f3364e65df3278272a0a640",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c45abf5_df4ff0a4",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-08T20:44:41Z",
+      "side": 1,
+      "message": "this didn\u0027t quite work to avoid the stat calls on unix; we need errors.Is rather than os.IsNotExist due to the error wrapping. with that, it does work.\n\nI also resurrected the TODO; I think it\u0027s valuable as I don\u0027t think we should keep the warning here forever.\n\nthanks!",
+      "parentUuid": "99afcb47_336db494",
+      "range": {
+        "startLine": 418,
+        "startChar": 0,
+        "endLine": 444,
+        "endChar": 0
+      },
+      "revId": "a5df4ffa2d1218ff3f3364e65df3278272a0a640",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

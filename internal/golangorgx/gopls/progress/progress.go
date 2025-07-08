@@ -24,10 +24,11 @@ import (
 
 // NewTracker returns a new Tracker that reports progress to the
 // specified client.
-func NewTracker(client protocol.Client) *Tracker {
+func NewTracker(client protocol.Client, supportsWorkDoneProgress bool) *Tracker {
 	return &Tracker{
-		client:     client,
-		inProgress: make(map[protocol.ProgressToken]*WorkDone),
+		client:                   client,
+		supportsWorkDoneProgress: supportsWorkDoneProgress,
+		inProgress:               make(map[protocol.ProgressToken]*WorkDone),
 	}
 }
 
@@ -38,16 +39,6 @@ type Tracker struct {
 
 	mu         sync.Mutex
 	inProgress map[protocol.ProgressToken]*WorkDone
-}
-
-// SetSupportsWorkDoneProgress sets whether the client supports "work done"
-// progress reporting. It must be set before using the tracker.
-//
-// TODO(rfindley): fix this broken initialization pattern.
-// Also: do we actually need the fall-back progress behavior using ShowMessage?
-// Surely ShowMessage notifications are too noisy to be worthwhile.
-func (t *Tracker) SetSupportsWorkDoneProgress(b bool) {
-	t.supportsWorkDoneProgress = b
 }
 
 // SupportsWorkDoneProgress reports whether the tracker supports work done
@@ -219,6 +210,12 @@ func (wd *WorkDone) Report(ctx context.Context, message string, percentage float
 	if err != nil {
 		event.Error(ctx, "reporting progress", err)
 	}
+}
+
+// EndAsync reports a workdone completion back to the client,
+// asynchronously. It spawns a new go-routine to call [WorkDone.End].
+func (wd *WorkDone) EndAsync(ctx context.Context, message string) {
+	go wd.End(ctx, message)
 }
 
 // End reports a workdone completion back to the client.

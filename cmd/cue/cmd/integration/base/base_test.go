@@ -1,5 +1,3 @@
-//go:build !windows
-
 package feature
 
 import (
@@ -16,7 +14,6 @@ func TestMain(m *testing.M) {
 }
 
 func TestFormatFile(t *testing.T) {
-	t.Skip("cuelsp disabled")
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example"

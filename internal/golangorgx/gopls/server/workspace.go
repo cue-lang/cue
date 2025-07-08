@@ -6,39 +6,99 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"sync"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 )
 
+// AddFolders gets called from Initialized, and from
+// DidChangeWorkspaceFolders, to add the specified set of
+// WorkspaceFolders to the session.
+func (s *server) AddFolders(ctx context.Context, folders map[protocol.WorkspaceFolder]protocol.DocumentURI) error {
+	if s.Options().VerboseWorkDoneProgress {
+		work := s.progress.Start(ctx, DiagnosticWorkTitle(FromInitialWorkspaceLoad), "Calculating diagnostics for initial workspace load...", nil, nil)
+		defer work.EndAsync(ctx, "Done.")
+	}
+
+	folderErrs := make(map[protocol.DocumentURI]error)
+
+	for folder, uri := range folders {
+		wf, err := s.workspace.EnsureFolder(uri, folder.Name)
+		if err != nil {
+			folderErrs[uri] = err
+			continue
+		}
+		options, err := s.fetchFolderOptions(ctx, uri)
+		if err != nil {
+			folderErrs[uri] = err
+			continue
+		}
+		wf.UpdateOptions(options)
+	}
+
+	if len(folderErrs) > 0 {
+		errMsg := "Error loading workspace folders:\n"
+		for uri, err := range folderErrs {
+			errMsg += fmt.Sprintf("failed to load view for %s: %v\n", uri, err)
+		}
+		return errors.New(errMsg)
+	}
+
+	// Register for file watching notifications, if they are supported.
+	return s.UpdateWatchedFiles(ctx)
+}
+
 func (s *server) DidChangeWorkspaceFolders(ctx context.Context, params *protocol.DidChangeWorkspaceFoldersParams) error {
-	// Per the comment in [server.Initialize], we only support a single
-	// WorkspaceFolder for now. More precisely, the call to Initialize must have
-	// a single WorkspaceFolder. Therefore a notification via
-	// DidChangeWorkspaceFolders must not cause that folder to change (because
-	// that is the invariant we are maintaining for now).
-	//
-	// So for now we simply error in case there is any DidChangeWorkspaceFolders
-	// notification, rather than trying to be smart and work out "has the folder
-	// change?". If this proves to be too simplistic or restrictive, then we can
-	// revisit as part of removing this constraint.
-	//
-	// When we do add such support, we need to be how/if/where logic for
-	// deduping views comes in.
-	//
-	// Ensure this logic is consistent with [server.Initialize].
-	return fmt.Errorf("cue lsp only supports a single WorkspaceFolder for now")
+	for _, folder := range params.Event.Removed {
+		dir, err := protocol.ParseDocumentURI(folder.URI)
+		if err != nil {
+			return fmt.Errorf("invalid folder %q: %v", folder.URI, err)
+		}
+		s.workspace.RemoveFolder(dir)
+	}
+	validFolders, err := validateWorkspaceFolders(params.Event.Added)
+	if err == nil {
+		err = s.AddFolders(ctx, validFolders)
+	}
+	// DidChangeWorkspaceFolders is a notification, so if there's an
+	// error, we show it rather than return it.
+	if err != nil {
+		s.client.ShowMessage(ctx, &protocol.ShowMessageParams{Type: protocol.Error, Message: err.Error()})
+	}
+	return nil
 }
 
 func (s *server) DidChangeConfiguration(ctx context.Context, _ *protocol.DidChangeConfigurationParams) error {
 	ctx, done := event.Start(ctx, "lsp.Server.didChangeConfiguration")
 	defer done()
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	defer wg.Done()
+	if s.Options().VerboseWorkDoneProgress {
+		work := s.progress.Start(ctx, DiagnosticWorkTitle(FromDidChangeConfiguration), "Calculating diagnostics...", nil, nil)
+		defer work.EndAsync(ctx, "Done.")
+	}
 
+	// Apply any changes to the session-level settings.
+	options, err := s.fetchFolderOptions(ctx, "")
+	// DidChangeConfiguration is a notification, so if there's an
+	// error, we show it rather than return it.
+	if err != nil {
+		s.client.ShowMessage(ctx, &protocol.ShowMessageParams{Type: protocol.Error, Message: err.Error()})
+		return nil
+	}
+	s.SetOptions(options)
+
+	fetchFolderOptions := func(dir protocol.DocumentURI) (*settings.Options, error) {
+		return s.fetchFolderOptions(ctx, dir)
+	}
+	err = s.workspace.UpdateFolderOptions(fetchFolderOptions)
+	// DidChangeConfiguration is a notification, so if there's an
+	// error, we show it rather than return it.
+	if err != nil {
+		s.client.ShowMessage(ctx, &protocol.ShowMessageParams{Type: protocol.Error, Message: err.Error()})
+		return nil
+	}
 	return nil
 }

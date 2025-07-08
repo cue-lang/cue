@@ -5,17 +5,14 @@
 package server
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
-	"sync"
 
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
-	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 )
 
 // ModificationSource identifies the origin of a change.
@@ -39,10 +36,6 @@ const (
 
 	// FromDidChangeConfiguration is from a didChangeConfiguration notification.
 	FromDidChangeConfiguration
-
-	// FromRegenerateCgo refers to file modifications caused by regenerating
-	// the cgo sources for the workspace.
-	FromRegenerateCgo
 
 	// FromInitialWorkspaceLoad refers to the loading of all packages in the
 	// workspace when the view is first created.
@@ -73,8 +66,6 @@ func (m ModificationSource) String() string {
 		return "saved files"
 	case FromDidClose:
 		return "close files"
-	case FromRegenerateCgo:
-		return "regenerate cgo"
 	case FromInitialWorkspaceLoad:
 		return "initial workspace load"
 	case FromCheckUpgrades:
@@ -86,116 +77,111 @@ func (m ModificationSource) String() string {
 	}
 }
 
+var openRange = &protocol.Range{
+	Start: protocol.Position{Line: 0, Character: 0},
+	End:   protocol.Position{Line: 0, Character: 0},
+}
+
 func (s *server) DidOpen(ctx context.Context, params *protocol.DidOpenTextDocumentParams) error {
 	ctx, done := event.Start(ctx, "lsp.Server.didOpen", tag.URI.Of(params.TextDocument.URI))
 	defer done()
 
-	uri := params.TextDocument.URI
-
 	// TODO(myitcv): we need to report an error/problem/something in case the user opens a file
 	// that is not part of the CUE module. For now we will not support that, because it massively
 	// opens up a can of worms in terms of single-file support, ad hoc workspaces etc.
+	//
+	// TODO(ms) Compare with the upstream gopls which potentially adds a
+	// new workspacefolder if there are currently none.
 
-	modifications := []file.Modification{{
-		URI:        uri,
-		Action:     file.Open,
-		Version:    params.TextDocument.Version,
-		Text:       []byte(params.TextDocument.Text),
-		LanguageID: params.TextDocument.LanguageID,
+	mods := []file.Modification{{
+		URI:            params.TextDocument.URI,
+		Action:         file.Open,
+		Version:        params.TextDocument.Version,
+		ContentChanges: []protocol.TextDocumentContentChangeEvent{{Range: openRange, Text: params.TextDocument.Text}},
+		LanguageID:     params.TextDocument.LanguageID,
 	}}
-	return s.didModifyFiles(ctx, modifications, FromDidOpen)
+	return s.didModifyFiles(ctx, mods, FromDidOpen)
 }
 
 func (s *server) DidChange(ctx context.Context, params *protocol.DidChangeTextDocumentParams) error {
 	ctx, done := event.Start(ctx, "lsp.Server.didChange", tag.URI.Of(params.TextDocument.URI))
 	defer done()
 
-	uri := params.TextDocument.URI
-	text, err := s.changedText(ctx, uri, params.ContentChanges)
-	if err != nil {
-		return err
-	}
-	c := file.Modification{
-		URI:     uri,
-		Action:  file.Change,
-		Version: params.TextDocument.Version,
-		Text:    text,
-	}
-	if err := s.didModifyFiles(ctx, []file.Modification{c}, FromDidChange); err != nil {
-		return err
-	}
-	return nil
+	mods := []file.Modification{{
+		URI:            params.TextDocument.URI,
+		Action:         file.Change,
+		Version:        params.TextDocument.Version,
+		ContentChanges: params.ContentChanges,
+	}}
+	return s.didModifyFiles(ctx, mods, FromDidChange)
 }
 
 func (s *server) DidChangeWatchedFiles(ctx context.Context, params *protocol.DidChangeWatchedFilesParams) error {
 	ctx, done := event.Start(ctx, "lsp.Server.didChangeWatchedFiles")
 	defer done()
 
-	var modifications []file.Modification
-	for _, change := range params.Changes {
-		action := changeTypeToFileAction(change.Type)
-		modifications = append(modifications, file.Modification{
+	modifications := make([]file.Modification, len(params.Changes))
+	for i, change := range params.Changes {
+		modifications[i] = file.Modification{
 			URI:    change.URI,
-			Action: action,
+			Action: ChangeTypeToFileAction(change.Type),
 			OnDisk: true,
-		})
+		}
 	}
 	return s.didModifyFiles(ctx, modifications, FromDidChangeWatchedFiles)
-}
-
-func (s *server) DidSave(ctx context.Context, params *protocol.DidSaveTextDocumentParams) error {
-	ctx, done := event.Start(ctx, "lsp.Server.didSave", tag.URI.Of(params.TextDocument.URI))
-	defer done()
-
-	c := file.Modification{
-		URI:    params.TextDocument.URI,
-		Action: file.Save,
-	}
-	if params.Text != nil {
-		c.Text = []byte(*params.Text)
-	}
-	return s.didModifyFiles(ctx, []file.Modification{c}, FromDidSave)
 }
 
 func (s *server) DidClose(ctx context.Context, params *protocol.DidCloseTextDocumentParams) error {
 	ctx, done := event.Start(ctx, "lsp.Server.didClose", tag.URI.Of(params.TextDocument.URI))
 	defer done()
 
-	return s.didModifyFiles(ctx, []file.Modification{
-		{
-			URI:     params.TextDocument.URI,
-			Action:  file.Close,
-			Version: -1,
-			Text:    nil,
-		},
-	}, FromDidClose)
+	mods := []file.Modification{{
+		URI:    params.TextDocument.URI,
+		Action: file.Close,
+	}}
+	return s.didModifyFiles(ctx, mods, FromDidClose)
+}
+
+func (s *server) DidSave(ctx context.Context, params *protocol.DidSaveTextDocumentParams) error {
+	ctx, done := event.Start(ctx, "lsp.Server.didSave", tag.URI.Of(params.TextDocument.URI))
+	defer done()
+
+	// In [server.Initialize], we explicitly tell the client to not
+	// sent us the file text on save. So here we completely ignore
+	// params.Text.
+	mods := []file.Modification{{
+		URI:    params.TextDocument.URI,
+		Action: file.Save,
+	}}
+	return s.didModifyFiles(ctx, mods, FromDidSave)
 }
 
 func (s *server) didModifyFiles(ctx context.Context, modifications []file.Modification, cause ModificationSource) error {
-	// wg guards two conditions:
-	//  1. didModifyFiles is complete
-	//  2. the goroutine diagnosing changes on behalf of didModifyFiles is
-	//     complete, if it was started
-	//
-	// Both conditions must be satisfied for the purpose of testing: we don't
-	// want to observe the completion of change processing until we have received
-	// all diagnostics as well as all server->client notifications done on behalf
-	// of this function.
-	var wg sync.WaitGroup
-	wg.Add(1)
-	defer wg.Done()
+	if s.Options().VerboseWorkDoneProgress {
+		work := s.progress.Start(ctx, DiagnosticWorkTitle(cause), "Calculating file diagnostics...", nil, nil)
+		defer work.EndAsync(ctx, "Done.")
+	}
 
-	s.stateMu.Lock()
-	if s.state >= serverShutDown {
-		// This state check does not prevent races below, and exists only to
-		// produce a better error message. The actual race to the cache should be
-		// guarded by Session.viewMu.
-		s.stateMu.Unlock()
+	if s.state == serverShutDown {
+		// This state check does not prevent races below, and exists
+		// only to produce a better error message.
 		return errors.New("server is shut down")
 	}
-	s.stateMu.Unlock()
 
-	return nil
+	err := s.workspace.DidModifyFiles(ctx, modifications)
+	if err != nil {
+		// didModifyFiles is only called by notification handlers. So
+		// any errors should be shown, rather than returned.
+		s.client.ShowMessage(ctx, &protocol.ShowMessageParams{Type: protocol.Error, Message: err.Error()})
+		return nil
+	}
+
+	// golang/go#50267: diagnostics should be re-sent after each change.
+
+	// After any file modifications, we need to update our watched files,
+	// in case something changed. Compute the new set of directories to watch,
+	// and if it differs from the current set, send updated registrations.
+	return s.UpdateWatchedFiles(ctx)
 }
 
 // DiagnosticWorkTitle returns the title of the diagnostic work resulting from a
@@ -204,56 +190,16 @@ func DiagnosticWorkTitle(cause ModificationSource) string {
 	return fmt.Sprintf("diagnosing %v", cause)
 }
 
-func (s *server) changedText(ctx context.Context, uri protocol.DocumentURI, changes []protocol.TextDocumentContentChangeEvent) ([]byte, error) {
-	if len(changes) == 0 {
-		return nil, fmt.Errorf("%w: no content changes provided", jsonrpc2.ErrInternal)
-	}
-
-	// Check if the client sent the full content of the file.
-	// We accept a full content change even if the server expected incremental changes.
-	if len(changes) == 1 && changes[0].Range == nil && changes[0].RangeLength == 0 {
-		return []byte(changes[0].Text), nil
-	}
-	return s.applyIncrementalChanges(ctx, uri, changes)
-}
-
-func (s *server) applyIncrementalChanges(ctx context.Context, uri protocol.DocumentURI, changes []protocol.TextDocumentContentChangeEvent) ([]byte, error) {
-	var fh file.Handle // HACK to make it compile
-	content, err := fh.Content()
-	if err != nil {
-		return nil, fmt.Errorf("%w: file not found (%v)", jsonrpc2.ErrInternal, err)
-	}
-	for _, change := range changes {
-		// TODO(adonovan): refactor to use diff.Apply, which is robust w.r.t.
-		// out-of-order or overlapping changes---and much more efficient.
-
-		// Make sure to update mapper along with the content.
-		m := protocol.NewMapper(uri, content)
-		if change.Range == nil {
-			return nil, fmt.Errorf("%w: unexpected nil range for change", jsonrpc2.ErrInternal)
-		}
-		start, end, err := m.RangeOffsets(*change.Range)
-		if err != nil {
-			return nil, err
-		}
-		if end < start {
-			return nil, fmt.Errorf("%w: invalid range for content change", jsonrpc2.ErrInternal)
-		}
-		var buf bytes.Buffer
-		buf.Write(content[:start])
-		buf.WriteString(change.Text)
-		buf.Write(content[end:])
-		content = buf.Bytes()
-	}
-	return content, nil
-}
-
-func changeTypeToFileAction(ct protocol.FileChangeType) file.Action {
+// ChangeTypeToFileAction converts a [protocol.FileChangeType] to a
+// [file.Action]. FileChangeTypes are used in watched file
+// notifications, and file actions are used within the broader
+// [file.Modification] type.
+func ChangeTypeToFileAction(ct protocol.FileChangeType) file.Action {
 	switch ct {
-	case protocol.Changed:
-		return file.Change
 	case protocol.Created:
 		return file.Create
+	case protocol.Changed:
+		return file.Change
 	case protocol.Deleted:
 		return file.Delete
 	}

@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8b43b1e_984dc205",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-08T16:40:12Z",
+      "side": 1,
+      "message": "I\u0027d prefer to avoid the syscall import when possible, and I _think_ it is possible.",
+      "revId": "a5df4ffa2d1218ff3f3364e65df3278272a0a640",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99afcb47_336db494",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-08T16:40:12Z",
+      "side": 1,
+      "message": "I\u0027m really not that keen on using syscall in general, and I think we can avoid it here without significant performance penalty. Note that we _don\u0027t_ need the case of opening cue.mod/module.cue when cue.mod is a file to be cheap. The important thing is that the \"does not exist\" case is cheap when it can be.\n\nSo:\n\n\n\n```suggestion\n\tif cerr !\u003d nil {\n\t\t// If we could not load cue.mod/module.cue, check whether the reason was\n\t\t// a legacy cue.mod file and give the user a clear error message.\n\t\t//\n\t\t// Common case: the file does not exist. Avoid an extra stat\n\t\t// syscall using the error code when we can.\n\t\tif os.IsNotExist(cerr) \u0026\u0026 runtime.GOOS !\u003d \"windows\" {\n\t\t\t// The file definitely does not exist. On Windows unfortunately due\n\t\t\t// to https://github.com/golang/go/issues/46734\n\t\t\t// we can\u0027t tell the difference between \"does not exist\"\n\t\t\t// and \"is not a directory\", hence the special casing.\n\t\t\treturn nil\n\t\t}\n\t\tinfo, cerr2 :\u003d c.fileSystem.stat(modDir)\n\t\tif cerr2 \u003d\u003d nil \u0026\u0026 !info.IsDir() {\n\t\t\treturn fmt.Errorf(\"cue.mod files are no longer supported; use cue.mod/module.cue\")\n\t\t}\n\t\treturn nil\n\t}\n```",
+      "range": {
+        "startLine": 418,
+        "startChar": 0,
+        "endLine": 444,
+        "endChar": 0
+      },
+      "revId": "a5df4ffa2d1218ff3f3364e65df3278272a0a640",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

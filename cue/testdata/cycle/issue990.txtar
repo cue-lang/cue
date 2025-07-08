@@ -80,17 +80,17 @@ out: #sub & {#p: _test.s1}
 -- diff/todo/p3 --
 Reordering
 -- out/evalalpha/stats --
-Leaks:  876
-Freed:  0
-Reused: 0
-Allocs: 876
+Leaks:  217
+Freed:  659
+Reused: 609
+Allocs: 267
 Retain: 0
 
 Unifications: 328
 Conjuncts:    1403
 Disjuncts:    110
 
-CloseIDElems: 20961
+CloseIDElems: 20936
 NumCloseIDs: 448
 -- out/evalalpha --
 (struct){
@@ -338,17 +338,17 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 4
-+Leaks:  876
-+Freed:  0
-+Reused: 0
-+Allocs: 876
++Leaks:  217
++Freed:  659
++Reused: 609
++Allocs: 267
 +Retain: 0
 +
 +Unifications: 328
 +Conjuncts:    1403
 +Disjuncts:    110
 +
-+CloseIDElems: 20961
++CloseIDElems: 20936
 +NumCloseIDs: 448
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new

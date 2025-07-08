@@ -406,6 +406,10 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) {
 		}
 	}
 
+	// TODO(mem): keeping track of notifications seems to be unnecessary. Still
+	// consider it when we are reclaiming Vertex as well.
+	//  s := v.getBareState(n.ctx) s.notifyCount++
+
 	// TODO: it should not be necessary to register for notifications for
 	// let expressions, so we could also filter for !n.node.Label.IsLet().
 	// However, somehow this appears to result in slightly better error

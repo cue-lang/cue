@@ -39,10 +39,10 @@ reduced: t1: {
 	a: x: y: V: x: y: V: {}
 }
 -- out/evalalpha/stats --
-Leaks:  121
-Freed:  0
-Reused: 0
-Allocs: 121
+Leaks:  1
+Freed:  120
+Reused: 98
+Allocs: 23
 Retain: 0
 
 Unifications: 120
@@ -57,13 +57,12 @@ diff old new
 +++ new
 @@ -1,9 +1,12 @@
 -Leaks:  0
--Freed:  120
++Leaks:  1
+ Freed:  120
 -Reused: 107
 -Allocs: 13
-+Leaks:  121
-+Freed:  0
-+Reused: 0
-+Allocs: 121
++Reused: 98
++Allocs: 23
  Retain: 0
  
  Unifications: 120

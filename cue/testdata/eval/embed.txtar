@@ -121,10 +121,10 @@ closednessInversion: {
 	}
 }
 -- out/eval/stats --
-Leaks:  1
-Freed:  115
-Reused: 105
-Allocs: 11
+Leaks:  0
+Freed:  116
+Reused: 106
+Allocs: 10
 Retain: 7
 
 Unifications: 110

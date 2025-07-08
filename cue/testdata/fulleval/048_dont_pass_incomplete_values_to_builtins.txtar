@@ -13,8 +13,8 @@ foo:   json.Marshal(input)
 -- out/legacy-debug --
 <0>{input: string, foo: <1>.Marshal (<2>.input)}
 -- out/evalalpha/stats --
-Leaks:  3
-Freed:  0
+Leaks:  0
+Freed:  3
 Reused: 0
 Allocs: 3
 Retain: 0
@@ -27,12 +27,10 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  0
--Freed:  3
+ Leaks:  0
+ Freed:  3
 -Reused: 1
 -Allocs: 2
-+Leaks:  3
-+Freed:  0
 +Reused: 0
 +Allocs: 3
  Retain: 0

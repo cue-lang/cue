@@ -368,6 +368,9 @@ func (v *Vertex) IsDefined(c *OpContext) bool {
 	if v.isDefined() {
 		return true
 	}
+	if v.Parent != nil && v.Parent.status == finalized {
+		return false
+	}
 	v.Finalize(c)
 	return v.isDefined()
 }

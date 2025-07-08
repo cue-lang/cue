@@ -955,9 +955,7 @@ Result:
       p1: (_|_){
         // [structural cycle]
         D: (struct){
-          a?: (_|_){
-            // [structural cycle]
-          }
+          a?: ~(brokenRing.t1.p1.T)
         }
         T: (_|_){
           // [structural cycle]
@@ -1162,17 +1160,21 @@ diff old new
                  }
                }
              }
-@@ -379,9 +368,6 @@
+@@ -377,12 +366,7 @@
+       p1: (_|_){
+         // [structural cycle]
          D: (struct){
-           a?: (_|_){
-             // [structural cycle]
+-          a?: (_|_){
+-            // [structural cycle]
 -            b: (_|_){
 -              // [structural cycle] brokenRing.t1.p1.D.a.b: structural cycle
 -            }
-           }
+-          }
++          a?: ~(brokenRing.t1.p1.T)
          }
          T: (_|_){
-@@ -393,11 +379,7 @@
+           // [structural cycle]
+@@ -393,11 +377,7 @@
        }
        p2: (struct){
          T: (struct){
@@ -1185,7 +1187,7 @@ diff old new
          }
          D: (struct){
            a?: (_|_){
-@@ -431,12 +413,7 @@
+@@ -431,12 +411,7 @@
        // [structural cycle]
        D: (_|_){
          // [structural cycle]

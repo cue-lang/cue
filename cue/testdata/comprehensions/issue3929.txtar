@@ -87,10 +87,10 @@ full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  153
-Freed:  0
-Reused: 0
-Allocs: 153
+Leaks:  6
+Freed:  147
+Reused: 114
+Allocs: 39
 Retain: 0
 
 Unifications: 96
@@ -104,8 +104,8 @@ diff old new
 --- old
 +++ new
 @@ -1,12 +1,12 @@
--Leaks:  3
--Freed:  652
+-Leaks:  2
+-Freed:  653
 -Reused: 632
 -Allocs: 23
 -Retain: 93
@@ -116,10 +116,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 30
-+Leaks:  153
-+Freed:  0
-+Reused: 0
-+Allocs: 153
++Leaks:  6
++Freed:  147
++Reused: 114
++Allocs: 39
 +Retain: 0
 +
 +Unifications: 96
@@ -129,8 +129,8 @@ diff old new
 +CloseIDElems: 838
 +NumCloseIDs: 101
 -- out/eval/stats --
-Leaks:  3
-Freed:  652
+Leaks:  2
+Freed:  653
 Reused: 632
 Allocs: 23
 Retain: 93

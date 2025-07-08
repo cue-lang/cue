@@ -1012,7 +1012,21 @@ type arcKey struct {
 // checks should only be performed once the full value is known.
 type nodeContext struct {
 	nextFree *nodeContext
+
+	// refCount:
+	// evalv2: keeps track of all current usages of the node, such that the
+	//    node can be freed when the counter reaches zero.
+	// evalv3: keeps track of the number points in the code where this
+	//.   nodeContext is used for processing. A nodeContext that is being
+	//.   processed may not be freed yet.
 	refCount int
+
+	// isDisjunct indicates whether this nodeContext is used in a disjunction.
+	// Disjunction cross products may call mergeCloseInfo, which assumes all
+	// closedness information, which is stored in the nodeContext, is still
+	// valid. This means that we need to follow a different approach for freeing
+	// disjunctions.
+	isDisjunct bool
 
 	// Keep node out of the nodeContextState to make them more accessible
 	// for source-level debuggers.
@@ -1386,6 +1400,9 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 
 	n.scheduler.node = n
 	n.underlying = node
+	if p := node.Parent; p != nil && p.state != nil {
+		n.isDisjunct = p.state.isDisjunct
+	}
 	return n
 }
 
@@ -1439,7 +1456,16 @@ func (n *nodeContext) free() {
 	}
 }
 
+// freeNodeContext unconditionally adds a nodeContext to the free pool. The
+// status should only be called for nodes with status finalized. Non-rooted
+// vertex values, however, the status may be different. But also unprocessed
+// nodes may have an uninitialized nodeContext. TODO(mem): this latter should be
+// fixed.
+//
+// We leave it up to the caller to ensure it is safe to free the nodeContext for
+// a given status.
 func (c *OpContext) freeNodeContext(n *nodeContext) {
+	n.node.state = nil
 	c.stats.Freed++
 	n.nextFree = c.freeListNode
 	c.freeListNode = n

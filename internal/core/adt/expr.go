@@ -976,6 +976,7 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	_, isGroup := expr.(*ConjunctGroup)
 	ctx.Assertf(pos(expr), !isGroup, "unexpected number of expressions")
 
+	// TODO(mem): add counter for let cache usage.
 	key := cacheKey{expr, arc}
 	v, ok := e.cache[key]
 	if !ok {

@@ -21,10 +21,10 @@ b: json.Marshal(foo)
 -- out/legacy-debug --
 <0>{a: <1>.Marshal (<2>{a: string}), foo: <3>{a: 3, b: <4>.foo.c}, b: <1>.Marshal (<4>.foo)}
 -- out/evalalpha/stats --
-Leaks:  8
-Freed:  0
-Reused: 0
-Allocs: 8
+Leaks:  0
+Freed:  8
+Reused: 2
+Allocs: 6
 Retain: 0
 
 Unifications: 8
@@ -35,15 +35,14 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  0
+ Leaks:  0
 -Freed:  16
 -Reused: 12
 -Allocs: 4
 -Retain: 5
-+Leaks:  8
-+Freed:  0
-+Reused: 0
-+Allocs: 8
++Freed:  8
++Reused: 2
++Allocs: 6
 +Retain: 0
  
 -Unifications: 16

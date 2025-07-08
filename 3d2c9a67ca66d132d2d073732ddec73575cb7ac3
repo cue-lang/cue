@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43f19709_5dc1bb05",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-08T16:43:38Z",
+      "side": 1,
+      "message": "This reads a bit ambiguously.\n\n```suggestion\nHowever, this is unnecessary; we parse the files immediately afterwards,\n```",
+      "revId": "3d2c9a67ca66d132d2d073732ddec73575cb7ac3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -37,6 +37,8 @@ import (
 //	Command: Capitalized verb phrase with no period
 //
 //	Longer description here...
+//
+// TODO(ms): this needs adjusting for cue.
 type Interface interface {
 	// ApplyFix: Apply a fix
 	//

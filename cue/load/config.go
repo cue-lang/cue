@@ -20,6 +20,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"syscall"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -416,8 +417,15 @@ func (c *Config) loadModule() error {
 	if cerr != nil {
 		// If we could not load cue.mod/module.cue, check whether the reason was
 		// a legacy cue.mod file and give the user a clear error message.
-		info, cerr2 := c.fileSystem.stat(modDir)
-		if cerr2 == nil && !info.IsDir() {
+		//
+		// Trying to open cue.mod/module.cue when cue.mod is a regular file
+		// will result in a "not a directory" error on all major operating systems.
+		// The portable way to do this would be via an extra stat call,
+		// which is unfortunate as loading CUE files without a module is fairly common.
+		//
+		// TODO(mvdan): we can remove this in mid 2026, once we can safely assume that
+		// practically all cue.mod files have vanished.
+		if errors.Is(cerr, syscall.ENOTDIR) {
 			return fmt.Errorf("cue.mod files are no longer supported; use cue.mod/module.cue")
 		}
 		return nil

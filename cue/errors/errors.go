@@ -224,14 +224,6 @@ func (e *wrapped) Error() string {
 	}
 }
 
-func (e *wrapped) Is(target error) bool {
-	return Is(e.main, target)
-}
-
-func (e *wrapped) As(target interface{}) bool {
-	return As(e.main, target)
-}
-
 func (e *wrapped) Msg() (format string, args []interface{}) {
 	return e.main.Msg()
 }
@@ -273,7 +265,7 @@ func Promote(err error, msg string) Error {
 
 var _ Error = &posError{}
 
-// In an List, an error is represented by an *posError.
+// In a list, an error is represented by an *posError.
 // The position Pos, if valid, points to the beginning of
 // the offending token, and the error condition is described
 // by Msg.
@@ -286,7 +278,11 @@ func (e *posError) Path() []string              { return nil }
 func (e *posError) InputPositions() []token.Pos { return nil }
 func (e *posError) Position() token.Pos         { return e.pos }
 
-// Append combines two errors, flattening Lists as necessary.
+// Append combines two errors, flattening lists as necessary.
+//
+// Note: this may mutate a if it is already a list, so
+// must not be used if a might have been shared across multiple
+// goroutines.
 func Append(a, b Error) Error {
 	switch x := a.(type) {
 	case nil:
@@ -299,7 +295,7 @@ func Append(a, b Error) Error {
 }
 
 // Errors reports the individual errors associated with an error, which is
-// the error itself if there is only one or, if the underlying type is List,
+// the error itself if there is only one or, if the underlying type is list,
 // its individual elements. If the given error is not an Error, it will be
 // promoted to one.
 func Errors(err error) []Error {
@@ -362,19 +358,11 @@ func (p list) As(target interface{}) bool {
 	return false
 }
 
-// AddNewf adds an Error with given position and error message to an List.
-func (p *list) AddNewf(pos token.Pos, msg string, args ...interface{}) {
+// addNewf adds an Error with given position and error message to an list.
+func (p *list) addNewf(pos token.Pos, msg string, args ...interface{}) {
 	err := &posError{pos: pos, Message: Message{format: msg, args: args}}
 	*p = append(*p, err)
 }
-
-// Add adds an Error with given position and error message to an List.
-func (p *list) Add(err Error) {
-	*p = appendToList(*p, err)
-}
-
-// Reset resets an List to no errors.
-func (p *list) Reset() { *p = (*p)[:0] }
 
 // Sanitize sorts multiple errors and removes duplicates on a best effort basis.
 // If err represents a single or no error, it returns the error as is.
@@ -397,14 +385,14 @@ func (p list) sanitize() list {
 		return p
 	}
 	a := slices.Clone(p)
-	a.RemoveMultiples()
+	a.removeMultiples()
 	return a
 }
 
-// Sort sorts an List. *posError entries are sorted by position,
+// sort sorts a list. *posError entries are sorted by position,
 // other errors are sorted by error message, and before any *posError
 // entry.
-func (p list) Sort() {
+func (p list) sort() {
 	slices.SortFunc(p, func(a, b Error) int {
 		if c := comparePosWithNoPosFirst(a.Position(), b.Position()); c != 0 {
 			return c
@@ -417,9 +405,9 @@ func (p list) Sort() {
 	})
 }
 
-// RemoveMultiples sorts an List and removes all but the first error per line.
-func (p *list) RemoveMultiples() {
-	p.Sort()
+// removeMultiples sorts a list and removes all but the first error per line.
+func (p *list) removeMultiples() {
+	p.sort()
 	*p = slices.CompactFunc(*p, approximateEqual)
 }
 
@@ -432,8 +420,14 @@ func approximateEqual(a, b Error) bool {
 	return comparePosWithNoPosFirst(aPos, bPos) == 0 && slices.Compare(a.Path(), b.Path()) == 0
 }
 
-// An List implements the error interface.
+// A list implements the error interface by returning the
+// string for the first error in the list.
 func (p list) Error() string {
+	// TODO in general Error.Msg does not include the message
+	// from errors that are wrapped (see [wrapped.Msg] which does
+	// not include any text from the wrapped error, so this implementation
+	// of Error means that we might lose information when
+	// just printing an error list with regular %v.
 	format, args := p.Msg()
 	return fmt.Sprintf(format, args...)
 }
@@ -499,7 +493,7 @@ type Config struct {
 var zeroConfig = &Config{}
 
 // Print is a utility function that prints a list of errors to w,
-// one error per line, if the err parameter is an List. Otherwise
+// one error per line, if the err parameter is a list. Otherwise
 // it prints the err string.
 func Print(w io.Writer, err error, cfg *Config) {
 	if cfg == nil {

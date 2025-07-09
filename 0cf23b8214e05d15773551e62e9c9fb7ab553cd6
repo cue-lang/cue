@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be5bd0cf_3d5bd36c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T13:00:43Z",
+      "side": 1,
+      "message": "Do we want inline comments in packages like trim and subsume where they call Finalize, as a reminder for why they are necessary now?",
+      "revId": "0cf23b8214e05d15773551e62e9c9fb7ab553cd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

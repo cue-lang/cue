@@ -1,0 +1,232 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0dd6671_44956552",
+        "filename": "cue/testdata/cycle/constraints.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 1172,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:19:50Z",
+      "side": 1,
+      "message": "is this change expected?",
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb5b9a7d_fb5183bf",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 2268,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:19:50Z",
+      "side": 1,
+      "message": "ditto; not sure if these changes are expected",
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ded6dc05_bea90060",
+        "filename": "cue/testdata/definitions/typocheck.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 652,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:19:50Z",
+      "side": 1,
+      "message": "is this change expected?",
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23411b15_c9ec2a08",
+        "filename": "internal/core/adt/mem.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:19:50Z",
+      "side": 1,
+      "message": "nit: I\u0027d say \"allocations\" as otherwise it seems like you\u0027re talking about CUE values, i.e. cue.Value. or perhaps \"allocated values\"?",
+      "range": {
+        "startLine": 18,
+        "startChar": 3,
+        "endLine": 18,
+        "endChar": 9
+      },
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61837893_8c8f0da9",
+        "filename": "internal/core/adt/mem.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:19:50Z",
+      "side": 1,
+      "message": "missing \"is\"?",
+      "range": {
+        "startLine": 18,
+        "startChar": 23,
+        "endLine": 18,
+        "endChar": 46
+      },
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e9ab9ff_23d61303",
+        "filename": "internal/core/adt/mem.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:19:50Z",
+      "side": 1,
+      "message": "document?",
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59dfbe2d_c039e81f",
+        "filename": "internal/core/adt/mem.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:19:50Z",
+      "side": 1,
+      "message": "\"force\" is always true; am I missing something?",
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f781c61_3c191aa3",
+        "filename": "internal/core/adt/mem.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:19:50Z",
+      "side": 1,
+      "message": "I\u0027d briefly document these three fields for clarity",
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0474c3fb_ba7df224",
+        "filename": "internal/core/adt/mem.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:19:50Z",
+      "side": 1,
+      "message": "should \"disjunct\" here be deleted?",
+      "range": {
+        "startLine": 72,
+        "startChar": 41,
+        "endLine": 72,
+        "endChar": 65
+      },
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96290611_fc532abe",
+        "filename": "internal/core/adt/mem.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:19:50Z",
+      "side": 1,
+      "message": "of v and?",
+      "range": {
+        "startLine": 80,
+        "startChar": 41,
+        "endLine": 80,
+        "endChar": 49
+      },
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a65b6a2a_d00eb731",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 554,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:19:50Z",
+      "side": 1,
+      "message": "this was part of another commit before, no? did you join it on purpose?",
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fe922b7_cb6056eb",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:19:50Z",
+      "side": 1,
+      "message": "does this need a TODO?",
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -11,10 +11,10 @@ regularFields: {
 	err4: {x: 1, y: 2}
 }
 -- out/evalalpha/stats --
-Leaks:  64
-Freed:  58
-Reused: 46
-Allocs: 76
+Leaks:  32
+Freed:  106
+Reused: 92
+Allocs: 46
 Retain: 0
 
 Unifications: 98
@@ -33,10 +33,10 @@ diff old new
 -Reused: 69
 -Allocs: 29
 -Retain: 24
-+Leaks:  64
-+Freed:  58
-+Reused: 46
-+Allocs: 76
++Leaks:  32
++Freed:  106
++Reused: 92
++Allocs: 46
 +Retain: 0
  
  Unifications: 98

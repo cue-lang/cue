@@ -7,8 +7,8 @@ a: "t"
 b: _|_
 b: "t"
 -- out/evalalpha/stats --
-Leaks:  1
-Freed:  3
+Leaks:  0
+Freed:  4
 Reused: 0
 Allocs: 4
 Retain: 0
@@ -22,11 +22,12 @@ diff old new
 +++ new
 @@ -1,9 +1,9 @@
 -Leaks:  5
-+Leaks:  1
- Freed:  3
+-Freed:  3
 -Reused: 1
 -Allocs: 7
 -Retain: 5
++Leaks:  0
++Freed:  4
 +Reused: 0
 +Allocs: 4
 +Retain: 0

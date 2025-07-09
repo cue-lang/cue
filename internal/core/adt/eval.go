@@ -1044,6 +1044,11 @@ type nodeContext struct {
 
 	scheduler
 
+	// toFree keeps track of inlined vertices that potentially need to be freed
+	// after processing the node. This is used to avoid memory leaks when an
+	// inlined node is only partially processed to obtain a result.
+	toFree []*Vertex
+
 	// Below are slices that need to be managed when cloning and reclaiming
 	// nodeContexts for reuse. We want to ensure that, instead of setting
 	// slices to nil, we truncate the existing buffers so that they do not
@@ -1315,6 +1320,7 @@ func (n *nodeContext) clone() *nodeContext {
 
 	d.nodeContextState = n.nodeContextState
 
+	d.toFree = append(d.toFree, n.toFree...)
 	d.arcMap = append(d.arcMap, n.arcMap...)
 	d.notify = append(d.notify, n.notify...)
 	d.sharedIDs = append(d.sharedIDs, n.sharedIDs...)
@@ -1361,6 +1367,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			nodeContextState: nodeContextState{
 				kind: TopKind,
 			},
+			toFree:             n.toFree[:0],
 			arcMap:             n.arcMap[:0],
 			conjuncts:          n.conjuncts[:0],
 			cyclicConjuncts:    n.cyclicConjuncts[:0],

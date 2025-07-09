@@ -310,6 +310,10 @@ func (ctx *OpContext) newInlineVertex(parent *Vertex, v BaseValue, a ...Conjunct
 		ArcType:   ArcMember,
 		Conjuncts: a,
 	}
+	if len(ctx.freeScope) > 0 {
+		state := ctx.freeScope[len(ctx.freeScope)-1]
+		state.toFree = append(state.toFree, n)
+	}
 	if !ctx.isDevVersion() {
 		n.Parent = parent
 	}

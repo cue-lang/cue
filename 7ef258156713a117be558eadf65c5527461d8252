@@ -16,6 +16,24 @@
       "message": "Possibly only want to do this in the main repo?",
       "revId": "7ef258156713a117be558eadf65c5527461d8252",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2611bc7e_91f9d3dc",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T11:50:21Z",
+      "side": 1,
+      "message": "agreed - will do in a separate patch to un-break CI first",
+      "parentUuid": "7f16045a_f7362c41",
+      "revId": "7ef258156713a117be558eadf65c5527461d8252",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

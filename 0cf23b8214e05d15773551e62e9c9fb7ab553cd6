@@ -16,6 +16,24 @@
       "message": "Do we want inline comments in packages like trim and subsume where they call Finalize, as a reminder for why they are necessary now?",
       "revId": "0cf23b8214e05d15773551e62e9c9fb7ab553cd6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a70afcd_0abe0972",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-09T17:02:19Z",
+      "side": 1,
+      "message": "To me the Finalize itself is a reminder. So I don\u0027t think it is really necessary.",
+      "parentUuid": "be5bd0cf_3d5bd36c",
+      "revId": "0cf23b8214e05d15773551e62e9c9fb7ab553cd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -110,10 +110,10 @@ weaveExtraField: {
 	f1: { out: 2 }
 }
 -- out/evalalpha/stats --
-Leaks:  112
-Freed:  340
-Reused: 295
-Allocs: 157
+Leaks:  0
+Freed:  452
+Reused: 407
+Allocs: 45
 Retain: 0
 
 Unifications: 452
@@ -127,13 +127,15 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
- Leaks:  112
- Freed:  340
+-Leaks:  112
+-Freed:  340
 -Reused: 308
 -Allocs: 144
 -Retain: 428
-+Reused: 295
-+Allocs: 157
++Leaks:  0
++Freed:  452
++Reused: 407
++Allocs: 45
 +Retain: 0
  
  Unifications: 452

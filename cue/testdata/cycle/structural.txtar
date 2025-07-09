@@ -577,10 +577,10 @@ resolveToAncestor: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  57
-Freed:  761
-Reused: 688
-Allocs: 130
+Leaks:  27
+Freed:  791
+Reused: 718
+Allocs: 100
 Retain: 0
 
 Unifications: 552
@@ -606,10 +606,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 20
-+Leaks:  57
-+Freed:  761
-+Reused: 688
-+Allocs: 130
++Leaks:  27
++Freed:  791
++Reused: 718
++Allocs: 100
 +Retain: 0
 +
 +Unifications: 552

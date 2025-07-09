@@ -560,14 +560,14 @@ issue3964: full: {
 	#Used: used: string
 }
 -- out/evalalpha/stats --
-Leaks:  95
-Freed:  774
-Reused: 735
-Allocs: 134
+Leaks:  31
+Freed:  841
+Reused: 785
+Allocs: 87
 Retain: 0
 
-Unifications: 711
-Conjuncts:    1420
+Unifications: 713
+Conjuncts:    1422
 Disjuncts:    76
 
 CloseIDElems: 1370
@@ -589,14 +589,14 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 3
-+Leaks:  95
-+Freed:  774
-+Reused: 735
-+Allocs: 134
++Leaks:  31
++Freed:  841
++Reused: 785
++Allocs: 87
 +Retain: 0
 +
-+Unifications: 711
-+Conjuncts:    1420
++Unifications: 713
++Conjuncts:    1422
 +Disjuncts:    76
 +
 +CloseIDElems: 1370

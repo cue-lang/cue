@@ -101,8 +101,8 @@ multipleErrors: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  1
-Freed:  78
+Leaks:  0
+Freed:  79
 Reused: 60
 Allocs: 19
 Retain: 0
@@ -127,8 +127,8 @@ diff old new
 -Unifications: 103
 -Conjuncts:    255
 -Disjuncts:    150
-+Leaks:  1
-+Freed:  78
++Leaks:  0
++Freed:  79
 +Reused: 60
 +Allocs: 19
 +Retain: 0

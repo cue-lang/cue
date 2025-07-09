@@ -214,13 +214,13 @@ nonConcrete: {
 }
 -- out/evalalpha/stats --
 Leaks:  0
-Freed:  191
-Reused: 134
+Freed:  205
+Reused: 148
 Allocs: 57
 Retain: 0
 
-Unifications: 191
-Conjuncts:    351
+Unifications: 197
+Conjuncts:    357
 Disjuncts:    0
 
 CloseIDElems: 0
@@ -231,18 +231,21 @@ diff old new
 +++ new
 @@ -1,9 +1,12 @@
  Leaks:  0
- Freed:  191
+-Freed:  191
 -Reused: 186
 -Allocs: 5
 -Retain: 7
-+Reused: 134
-+Allocs: 57
-+Retain: 0
- 
- Unifications: 191
+-
+-Unifications: 191
 -Conjuncts:    511
 -Disjuncts:    200
-+Conjuncts:    351
++Freed:  205
++Reused: 148
++Allocs: 57
++Retain: 0
++
++Unifications: 197
++Conjuncts:    357
 +Disjuncts:    0
 +
 +CloseIDElems: 0

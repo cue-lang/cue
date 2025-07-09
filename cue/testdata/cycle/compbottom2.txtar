@@ -329,6 +329,48 @@ issue3838: {
 		_test: assert: invoke: "foo"
 	}).results
 }
+-- out/evalalpha/stats --
+Leaks:  42
+Freed:  190
+Reused: 175
+Allocs: 57
+Retain: 0
+
+Unifications: 206
+Conjuncts:    343
+Disjuncts:    16
+
+CloseIDElems: 121
+NumCloseIDs: 112
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,12 @@
+-Leaks:  13
+-Freed:  223
+-Reused: 214
+-Allocs: 22
+-Retain: 104
+-
+-Unifications: 220
+-Conjuncts:    279
+-Disjuncts:    302
+-
+-CloseIDElems: 0
+-NumCloseIDs: 57
++Leaks:  42
++Freed:  190
++Reused: 175
++Allocs: 57
++Retain: 0
++
++Unifications: 206
++Conjuncts:    343
++Disjuncts:    16
++
++CloseIDElems: 121
++NumCloseIDs: 112
 -- out/eval/stats --
 Leaks:  13
 Freed:  223

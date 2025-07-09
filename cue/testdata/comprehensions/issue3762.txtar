@@ -77,6 +77,48 @@ reference: {
 		ok: true
 	}
 }
+-- out/evalalpha/stats --
+Leaks:  23
+Freed:  57
+Reused: 45
+Allocs: 35
+Retain: 0
+
+Unifications: 71
+Conjuncts:    107
+Disjuncts:    0
+
+CloseIDElems: 55
+NumCloseIDs: 25
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,12 @@
+-Leaks:  4
+-Freed:  63
+-Reused: 55
+-Allocs: 12
+-Retain: 11
+-
+-Unifications: 67
+-Conjuncts:    88
+-Disjuncts:    74
+-
+-CloseIDElems: 0
+-NumCloseIDs: 10
++Leaks:  23
++Freed:  57
++Reused: 45
++Allocs: 35
++Retain: 0
++
++Unifications: 71
++Conjuncts:    107
++Disjuncts:    0
++
++CloseIDElems: 55
++NumCloseIDs: 25
 -- out/eval/stats --
 Leaks:  4
 Freed:  63

@@ -10,6 +10,42 @@ regularFields: {
 	err3: {x: 2, y: 5}
 	err4: {x: 1, y: 2}
 }
+-- out/evalalpha/stats --
+Leaks:  64
+Freed:  58
+Reused: 46
+Allocs: 76
+Retain: 0
+
+Unifications: 98
+Conjuncts:    154
+Disjuncts:    0
+
+CloseIDElems: 24
+NumCloseIDs: 48
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+-Leaks:  24
+-Freed:  74
+-Reused: 69
+-Allocs: 29
+-Retain: 24
++Leaks:  64
++Freed:  58
++Reused: 46
++Allocs: 76
++Retain: 0
+ 
+ Unifications: 98
+ Conjuncts:    154
+-Disjuncts:    98
++Disjuncts:    0
++
++CloseIDElems: 24
++NumCloseIDs: 48
 -- out/eval/stats --
 Leaks:  24
 Freed:  74

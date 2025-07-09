@@ -101,14 +101,14 @@ multipleErrors: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  83
+Leaks:  79
 Freed:  0
 Reused: 0
-Allocs: 83
+Allocs: 79
 Retain: 0
 
-Unifications: 79
-Conjuncts:    101
+Unifications: 75
+Conjuncts:    97
 Disjuncts:    4
 
 CloseIDElems: 2
@@ -127,14 +127,14 @@ diff old new
 -Unifications: 103
 -Conjuncts:    255
 -Disjuncts:    150
-+Leaks:  83
++Leaks:  79
 +Freed:  0
 +Reused: 0
-+Allocs: 83
++Allocs: 79
 +Retain: 0
 +
-+Unifications: 79
-+Conjuncts:    101
++Unifications: 75
++Conjuncts:    97
 +Disjuncts:    4
 +
 +CloseIDElems: 2

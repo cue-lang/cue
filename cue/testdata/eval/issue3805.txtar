@@ -169,14 +169,14 @@ tabcatsExample: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  250
+Leaks:  239
 Freed:  0
 Reused: 0
-Allocs: 250
+Allocs: 239
 Retain: 0
 
-Unifications: 182
-Conjuncts:    295
+Unifications: 171
+Conjuncts:    284
 Disjuncts:    16
 
 CloseIDElems: 1618
@@ -195,14 +195,14 @@ diff old new
 -Unifications: 1373
 -Conjuncts:    3626
 -Disjuncts:    1548
-+Leaks:  250
++Leaks:  239
 +Freed:  0
 +Reused: 0
-+Allocs: 250
++Allocs: 239
 +Retain: 0
 +
-+Unifications: 182
-+Conjuncts:    295
++Unifications: 171
++Conjuncts:    284
 +Disjuncts:    16
 +
 +CloseIDElems: 1618

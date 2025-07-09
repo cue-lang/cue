@@ -395,10 +395,10 @@ issue3731: full: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  159
-Freed:  157
-Reused: 140
-Allocs: 176
+Leaks:  5
+Freed:  311
+Reused: 273
+Allocs: 43
 Retain: 0
 
 Unifications: 246
@@ -421,10 +421,10 @@ diff old new
 -Unifications: 539
 -Conjuncts:    1663
 -Disjuncts:    943
-+Leaks:  159
-+Freed:  157
-+Reused: 140
-+Allocs: 176
++Leaks:  5
++Freed:  311
++Reused: 273
++Allocs: 43
 +Retain: 0
 +
 +Unifications: 246

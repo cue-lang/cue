@@ -724,14 +724,12 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 		// TODO: is this indirect necessary?
 		// arc = arc.Indirect()
 
-		n := arc.state
 		if c.isDevVersion() {
-			n = arc.getState(c)
-			if n != nil {
+			if n := arc.getState(c); n != nil {
 				c.ci, _ = n.detectCycleV3(arc, nil, x, c.ci)
 			}
 		} else {
-			if n != nil {
+			if n := arc.state; n != nil {
 				c.ci, _ = n.markCycle(arc, nil, x, c.ci)
 			}
 		}
@@ -742,7 +740,7 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 
 		if c.isDevVersion() {
 			if s := arc.getState(c); s != nil {
-				defer n.retainProcess().releaseProcess()
+				defer s.retainProcess().releaseProcess()
 
 				origNeeds := state.conditions()
 				needs := origNeeds | arcTypeKnown
@@ -751,7 +749,7 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 				switch runMode {
 				case finalize:
 					arc.unify(c, needs, attemptOnly, true) // to set scalar
-					arc.state.freeze(needs)
+					s.freeze(needs)
 				case attemptOnly:
 					arc.unify(c, needs, attemptOnly, true) // to set scalar
 

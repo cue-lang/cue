@@ -100,10 +100,10 @@ for clusterName, cluster in clusters {
 
 clusters: foo: {}
 -- out/evalalpha/stats --
-Leaks:  3
-Freed:  66
-Reused: 26
-Allocs: 43
+Leaks:  1
+Freed:  68
+Reused: 28
+Allocs: 41
 Retain: 0
 
 Unifications: 69
@@ -117,7 +117,7 @@ diff old new
 --- old
 +++ new
 @@ -1,12 +1,12 @@
- Leaks:  3
+-Leaks:  3
 -Freed:  101
 -Reused: 84
 -Allocs: 20
@@ -129,9 +129,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 14
-+Freed:  66
-+Reused: 26
-+Allocs: 43
++Leaks:  1
++Freed:  68
++Reused: 28
++Allocs: 41
 +Retain: 0
 +
 +Unifications: 69

@@ -81,10 +81,10 @@ issue3415: reduced: {
 	a: *0 | number
 }
 -- out/evalalpha/stats --
-Leaks:  17
-Freed:  391
-Reused: 262
-Allocs: 146
+Leaks:  15
+Freed:  393
+Reused: 264
+Allocs: 144
 Retain: 0
 
 Unifications: 97
@@ -110,10 +110,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 1
-+Leaks:  17
-+Freed:  391
-+Reused: 262
-+Allocs: 146
++Leaks:  15
++Freed:  393
++Reused: 264
++Allocs: 144
 +Retain: 0
 +
 +Unifications: 97

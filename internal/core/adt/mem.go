@@ -125,6 +125,11 @@ func (c *OpContext) reclaimTempBuffers(v *Vertex) {
 func (r reclaimer) reclaim(v *Vertex) bool {
 	n := v.state
 	if n != nil {
+		for _, v := range n.toFree {
+			r.ctx.reclaimRecursive(v)
+		}
+		n.toFree = n.toFree[:0]
+
 		if !r.guard {
 			r.reclaimBaseValueBuffers(v)
 		} else if n.isDisjunct {

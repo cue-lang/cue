@@ -318,6 +318,48 @@ issue3891: full: {
 		foo: *_input.sub1.sub2 | _
 	}
 }
+-- out/evalalpha/stats --
+Leaks:  90
+Freed:  585
+Reused: 518
+Allocs: 157
+Retain: 0
+
+Unifications: 294
+Conjuncts:    810
+Disjuncts:    241
+
+CloseIDElems: 231
+NumCloseIDs: 132
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,12 @@
+-Leaks:  40
+-Freed:  837
+-Reused: 825
+-Allocs: 52
+-Retain: 130
+-
+-Unifications: 506
+-Conjuncts:    1619
+-Disjuncts:    936
+-
+-CloseIDElems: 0
+-NumCloseIDs: 2
++Leaks:  90
++Freed:  585
++Reused: 518
++Allocs: 157
++Retain: 0
++
++Unifications: 294
++Conjuncts:    810
++Disjuncts:    241
++
++CloseIDElems: 231
++NumCloseIDs: 132
 -- out/eval/stats --
 Leaks:  40
 Freed:  837

@@ -1,0 +1,718 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b788793_68e3bc55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "LGTM so far. Publishing WIP review.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22d5deaf_dc9840be",
+        "filename": "internal/golangorgx/gopls/cache/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "Alternatively, require a registry and avoid the error return, pushing the onus on the caller to create the registry instance.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddfdf69d_88bb21cc",
+        "filename": "internal/golangorgx/gopls/cache/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "FWIW I\u0027d still go with Go-idiomatic `cache.New` rather than `cache.NewCache` even when there are other New functions around.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0095da9f_38fdb383",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n// NewWorkspaceFolder creates a new workspace folder. The fetchFolderOptions func is\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7d5896d_ed299ac3",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n// NewWorkspaceFolder updates this folder\u0027s options according\n// to the options returned from the given function.\n```\n\nBut I don\u0027t really understand why this is being passed a function rather than just having:\n```\nfunc (wf *WorkspaceFolder) UpdateOptions(opts *settings.Options) error\n```\nand exposing `wf.dir` with a method, such as `WorkspaceFolder.URI`, which seems like it might be a clearer API to me.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "646d52a1_eccb3ce7",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n// FileWatchingGlobPatterns adds a pattern for watching the\n// folder to the given patterns map and reports whether\n// this folder requires subdirectories to be watched explicitly.\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45a6dd29_990d472c",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "How/why is that assumed here?",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db2baf5f_b1b4db07",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "I\u0027m not a stickler for defining string constant names in general, but this does seem like one decent candidate.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b4db25d_996be419",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "How about putting all the immutable fields at the top, followed by all the mutable fields? When we could just have a comment to that effect: each field would only need to document when it\u0027s updated if appropriate.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef086038_d4439682",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n\t// dirtyFiles holds dirty files within the module\u0027s packages only:\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a95f20f_0ef7fd5e",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n\treturn \u0026Module{\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "366b5527_fda9c4e3",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n// is dirty. Reports whether the module ends up in a splendid status.\n```\n?",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb421daf_a75c55f1",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "doc comment?",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "990fb687_f0509f7a",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "ISTM that maybe ReloadModule would be better off returning an error which we could return here. That way one might get to know _why_ the module is invalid (e.g. it\u0027s been deleted).",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd6cde92_43762728",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n// FindPackagesOrModulesForFile searches for the given file in both the module itself, and\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f0feda3_0afafb5e",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "This sentence doesn\u0027t parse.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad564b1d_64af0128",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "Useful comment!\n\nAIUI file _can\u0027t_ be a/b.cue because that\u0027s not a valid `file:///` URI, right? Maybe worth using valid values just to avoid confusion.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "727a6d75_843bc127",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "This functionality seems a bit odd: in general this method is about files not directories, with this one exception. Not saying it\u0027s wrong, just gives me pause.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b0a5afb_267cedd1",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n\t// Search also for descendent packages that might\n\t// include the file by virtue of the ancestor-import-path pattern.\n```\n?",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "813a1a47_3f4127b3",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n// the module. If a dirty file has changed package, that new package\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e94d9ae8_2a1527aa",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "I guess another possibility might be:\n\n    for ; len(pkgsToLoadWorklist) \u003e 0; pkgsToLoadWorklist \u003d pkgsToLoadWorklist[1:] {\n        pkg :\u003d pkgsToLoadWorklist[0]\n\nto make it clear we really are just using it as a worklist.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55e4c10c_2a9ec525",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t// TODO: if packages contains ip, then we should\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c014ce6e_7c493a4c",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t\t// Both new and old pkgs import ip. Noop.\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ad88d97_8cdcb3f1",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "Isn\u0027t this directory outside of the module root?\n\n(thinking of the doc comment for ActiveFilesAndDirs:\n\n```\n        // If a directory contains an active file then that directory is an\n\t// active directory, as are all of its ancestors, up to the module\n\t// root (inclusive).\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa5baec3_894e624e",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "Conventionally we use US spelling.\n\n\n```suggestion\n// NormalizeImportPath is used to normalise and canonicalise import\n```\n\nAlso, the fact that this _only_ works properly on paths from modpkgload.Package, which is really only an implementation detail\nof this package AIUI, makes me think that this probably isn\u0027t\na good method to expose publically.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "624cd9b2_39e46297",
+        "filename": "internal/golangorgx/gopls/cache/package.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n\t// Encloses reports whether the file is enclosed by the package\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98b0a814_86e4dae9",
+        "filename": "internal/golangorgx/gopls/cache/package.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "This doc doesn\u0027t say what it actually does, which is particularly necessary here as the name sounds like it\u0027s returning the active files and directories, but it doesn\u0027t actually return anything!\n\nMaybe:\n\n```\n    // ActiveFilesAndDirs adds entries for the package or module\u0027s active files\n    // and directories to the given files or dirs maps respectively.\n    // An \"active\" file is... etc\n```\n\nIt is a somewhat odd API, I have to say - I\u0027d be inclined to return freshly made maps with the active files and directories in (or maybe some kind of iterator to avoid the temporary map allocations), but I\u0027m guessing performance is important here.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b863329_022df047",
+        "filename": "internal/golangorgx/gopls/cache/package.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n// Package models a single CUE package within a CUE module.\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f190ecae_8b107eeb",
+        "filename": "internal/golangorgx/gopls/cache/package.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "Again, maybe split the fields into immutable at the top followed by mutable?",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ae3caa9_22d643b3",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "it\u0027d be nice to document this too.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4c8595a_31eed558",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n// within this workspace. The name is for display purposes only and does not\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7eb9b69a_e280ed96",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n// required to watch for changes and notify the server of them, in order to\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe71cc5a_462a6ee0",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "This seems like a dupe of docs from the similar interface method.\n\n```suggestion\n// activeFilesAndDirs functions similarly to packageOrModule.ActiveFilesOrDirs.\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de58d7d0_0cc239de",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t// But if we have a update for a file in that parent directory\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9c55c4d_dd873351",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t// So if we know the file is open in the editor (i.e. fh !\u003d\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a135f3f3_18eb2743",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t// nil) and we fail to find an existing package whose \"leaf\"\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad85f80f_850667a9",
+        "filename": "internal/golangorgx/gopls/server/initialize.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "```suggestion\n// Initialized is the handler for the async message from the client. The\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdf5374a_67d7e437",
+        "filename": "internal/golangorgx/gopls/server/options.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "SetOptions _does_ modify the options, but I don\u0027t think we\u0027re saying you can\u0027t call SetOptions twice here.\n\n```suggestion\n// The caller must not subsequently modify the contents\n// of opts.\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d465dc27_8caee054",
+        "filename": "internal/golangorgx/gopls/server/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "document this method? What _is_ an ID in this context?",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed443e48_dd5522b7",
+        "filename": "internal/golangorgx/gopls/server/text_synchronization.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "I don\u0027t really understand why this has to be done in a goroutine rather than just a defer. Maybe add a comment explaining that?",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cca38963_5efbf34e",
+        "filename": "internal/golangorgx/gopls/server/text_synchronization.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "doc comment please",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb61af7a_74fd8cc6",
+        "filename": "internal/golangorgx/gopls/server/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T15:32:17Z",
+      "side": 1,
+      "message": "Note to self: this is as far as I\u0027ve got in the review!",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

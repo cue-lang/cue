@@ -852,7 +852,7 @@ func isEqualNodeValue(x, y *nodeContext) bool {
 		return false
 	}
 	if len(x.tasks) != x.taskPos || len(y.tasks) != y.taskPos {
-		if len(x.tasks) != len(y.tasks) {
+		if len(x.tasks) != len(y.tasks) || x.taskPos != y.taskPos {
 			return false
 		}
 	}
@@ -874,7 +874,7 @@ func isEqualNodeValue(x, y *nodeContext) bool {
 
 	for i, t := range x.tasks[x.taskPos:] {
 		s := y.tasks[i]
-		if s.x != t.x {
+		if !cmpExpr(x.ctx, s.env, t.env, s.x, t.x) {
 			return false
 		}
 	}
@@ -898,6 +898,57 @@ func isEqualValue[P ComparableValue](ctx *OpContext, x, y P) bool {
 	}
 
 	return Equal(ctx, x, y, CheckStructural)
+}
+
+func cmpExpr(c *OpContext, ex, ey *Environment, x, y Node) bool {
+	if x == y {
+		return true
+	}
+
+	switch x := x.(type) {
+	case Value:
+		y, ok := y.(Value)
+		if !ok {
+			return false
+		}
+		return Equal(c, x, y, 0)
+
+	case *FieldReference:
+		y, ok := y.(*FieldReference)
+		if !ok {
+			return false
+		}
+		if x.Label != y.Label {
+			return false
+		}
+
+		vx := ex.up(c, x.UpCount).Vertex
+		vy := ey.up(c, y.UpCount).Vertex
+
+		return vx == vy
+
+	case *SelectorExpr:
+		y, ok := y.(*SelectorExpr)
+		if !ok {
+			return false
+		}
+		if x.Sel != y.Sel {
+			return false
+		}
+		return cmpExpr(c, ex, ey, x.X, y.X)
+
+	case *IndexExpr:
+		y, ok := y.(*IndexExpr)
+		if !ok {
+			return false
+		}
+		if cmpExpr(c, ex, ey, x.Index, y.Index) {
+			return false
+		}
+		return cmpExpr(c, ex, ey, x.X, y.X)
+	}
+
+	return false
 }
 
 // IsFromDisjunction reports whether any conjunct of v was a disjunction.

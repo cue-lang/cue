@@ -148,7 +148,15 @@ import (
 )
 
 func filesV3(files []*ast.File, val cue.Value, cfg *Config) error {
-	dir := val.BuildInstance().Dir
+	if err := val.Err(); err != nil {
+		return err
+	}
+	inst := val.BuildInstance()
+	if inst == nil {
+		// Should not be nil, but just in case.
+		return errors.Newf(val.Pos(), "trim: not a build instance")
+	}
+	dir := inst.Dir
 	dir = strings.TrimRight(dir, string(os.PathSeparator)) +
 		string(os.PathSeparator)
 

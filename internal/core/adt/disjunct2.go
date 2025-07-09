@@ -267,7 +267,11 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 	var outerRunMode runMode
 	for p := n.node; p != nil; p = p.Parent {
 		if p.IsDisjunct {
-			outerRunMode = p.state.runMode
+			if p.state == nil {
+				outerRunMode = finalize
+			} else {
+				outerRunMode = p.state.runMode
+			}
 			break
 		}
 	}

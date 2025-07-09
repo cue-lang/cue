@@ -264,6 +264,14 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 		// TODO: disjunctions may benefit from evaluation as much prematurely
 		// as possible, as this increases the chances of premature failure.
 		// We should consider doing a recursive "attemptOnly" evaluation here.
+		// for _, a := range v.Arcs {
+		// 	if a.ArcType == ArcMember {
+		// 		if n := a.getState(c); n != nil {
+		// 			n.completeAllArcs(allKnown, attemptOnly, false)
+		// 		}
+		// 	}
+		// }
+
 		return false
 	}
 
@@ -446,6 +454,12 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 	//
 	n.incDepth()
 	defer n.decDepth()
+
+	// if pc := n.node.PatternConstraints; pc != nil {
+	// 	for _, c := range pc.Pairs {
+	// 		c.Constraint.unify(n.ctx, allKnown, attemptOnly, checkTypos)
+	// 	}
+	// }
 
 	// TODO: find more strategic place to set ClosedRecursive and get rid
 	// of helper fields.
@@ -726,6 +740,8 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 // separate mode. This will allow us to descend with more precision to only
 // visit arcs that still need to be resolved.
 func (n *nodeContext) completePending(mode runMode) {
+	// defer n.retainProcess().releaseProcess()
+
 	for _, a := range n.node.Arcs {
 		state := a.getState(n.ctx)
 		if state != nil {
@@ -835,6 +851,8 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 		v.Arcs = append(v.Arcs, arc)
 		arcState = arc.getState(c) // TODO: consider using getBareState.
 	}
+
+	// TODO(refcount): arcstate
 
 	if arcState != nil && (!arcState.meets(needTasksDone) || !arcState.meets(arcTypeKnown)) {
 		arcState.completePending(attemptOnly)

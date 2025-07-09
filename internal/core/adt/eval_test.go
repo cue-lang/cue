@@ -71,6 +71,7 @@ func TestEvalV3(t *testing.T) {
 		Root:     "../../../cue/testdata",
 		Name:     "evalalpha",
 		Fallback: "eval", // Allow eval golden files to pass these tests.
+		ToDo:     map[string]string{},
 	}
 
 	cuedebug.Init()
@@ -184,6 +185,7 @@ func TestIssue3985(t *testing.T) {
 
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
+	t.Skip()
 	adt.DebugDeps = true
 	// adt.OpenGraphs = true
 
@@ -198,12 +200,51 @@ func TestX(t *testing.T) {
 	version = internal.DevVersion // comment to use default implementation.
 
 	in := `
--- cue.mod/module.cue --
-module: "mod.test"
-
-language: version: "v0.9.0"
-
 -- in.cue --
+// benchmarks/issue1684: disjunctions
+// benchmarks/chain: fanout large
+// benchmarks/issue3514:
+// benchmarks/issue3633: disjunctions
+// benchmarks/sort
+// builtins/matchn: disjunctions not pruned.
+// eval/notify: disjunctions not pruned.
+
+
+import "list"
+
+out: Foo & { sub: Foo }
+
+Foo: {
+	sub: Foo | {a: b: _}
+	a: {
+		b: _
+		for _, w in list.FlattenN([b], 1) {}
+	}
+}
+
+// 3514
+// updates: {}
+// matchIf(
+// 	null | {"enable-beta-ecosystems"!: true, b: string}
+// 	_,
+// 	{ "updates"?:  [...] | {...} }
+// )
+
+// TODO: benchmark:
+// Exponential growth should not happen
+// X: {}
+// Y: X | {[string]: Y}
+// Y: X | {[string]: Y}
+// Y: X | {[string]: Y}
+// Y: X | {[string]: Y}
+// Y: X | {[string]: Y}
+// // 2, 6, 10, 14, 18, 22
+// x: Y & { a: "100" }
+// 6, 18, 38, 74, 142, 274
+// 4, 12, 28, 60, 124, 252. *2+4
+
+// 1, 2, 4, 7, 11, 16, 22,
+
 	`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {

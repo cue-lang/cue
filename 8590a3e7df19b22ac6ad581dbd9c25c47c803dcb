@@ -16,6 +16,24 @@
       "message": "Again, probably only want/need to do this from the main repo",
       "revId": "8590a3e7df19b22ac6ad581dbd9c25c47c803dcb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1892d2e4_5dd67b21",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T11:51:30Z",
+      "side": 1,
+      "message": "same - I\u0027ll do this in a follow-up patch",
+      "parentUuid": "9fe6f565_e2d7a58f",
+      "revId": "8590a3e7df19b22ac6ad581dbd9c25c47c803dcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34d19ab4_b48ac77a",
+        "filename": "internal/pkg/builtin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-09T07:58:21Z",
+      "side": 1,
+      "message": "Strings are currently converted in a global map. So theoretically this could be converted already. But I understand it is a bit tricky.\n\nHowever, we could use a sync.Once instead of creating a copy of the Builtin. I know it is not much reduction of allocation, but it is something.\n\nEither way, though. If you want to keep it like this, I would perhaps add a TODO(perf) comment.",
+      "revId": "d78ba77c68cba7c0f80745415affd830880953d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

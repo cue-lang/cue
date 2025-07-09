@@ -665,7 +665,10 @@ func runTask(t *task, mode runMode) {
 		// TODO: should we mark this as a cycle?
 	}
 
+	ctx.freeScope = append(ctx.freeScope, t.node)
 	defer func() {
+		ctx.freeScope = ctx.freeScope[:len(ctx.freeScope)-1]
+
 		if n := t.node; n.toComplete {
 			n.toComplete = false
 			n.completeNodeTasks(attemptOnly)

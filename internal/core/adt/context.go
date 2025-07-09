@@ -125,6 +125,15 @@ type OpContext struct {
 	// with an optional depth counter.
 	toFinalize []*Vertex
 
+	// freeScope tracks the nodeContexts that are currently responsible for
+	// allocating new inlined vertices. Only nodes within the current scope can
+	// refer to any values allocated within an inline node, which means it is
+	// safe to reuse the nodeContext when all values have been processed.
+	//
+	// TODO(mem): we can mark Vertex nodes as being used in sharing and then
+	// free them too if they are not used.
+	freeScope []*nodeContext
+
 	// These fields are used associate scratch fields for computing closedness
 	// of a Vertex. These fields could have been included in StructInfo (like
 	// Tomabechi's unification algorithm), but we opted for an indirection to

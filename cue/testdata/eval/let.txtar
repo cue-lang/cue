@@ -502,10 +502,10 @@ diff old new
    _parent_configs: (struct){
      PARENT: (bool){ true }
 -- out/evalalpha/stats --
-Leaks:  58
-Freed:  141
-Reused: 121
-Allocs: 78
+Leaks:  41
+Freed:  158
+Reused: 138
+Allocs: 61
 Retain: 0
 
 Unifications: 166
@@ -520,9 +520,11 @@ diff old new
 +++ new
 @@ -1,12 +1,12 @@
 -Leaks:  52
--Freed:  158
++Leaks:  41
+ Freed:  158
 -Reused: 149
--Allocs: 61
++Reused: 138
+ Allocs: 61
 -Retain: 184
 -
 -Unifications: 196
@@ -531,10 +533,6 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 11
-+Leaks:  58
-+Freed:  141
-+Reused: 121
-+Allocs: 78
 +Retain: 0
 +
 +Unifications: 166

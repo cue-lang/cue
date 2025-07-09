@@ -649,7 +649,7 @@ func (n *nodeContext) finalizeDisjunctions() {
 
 	// The conjuncts will have too much information. Better have no
 	// information than incorrect information.
-	v.Arcs = nil
+	v.clearArcs(n.ctx)
 	v.ChildErrors = nil
 }
 

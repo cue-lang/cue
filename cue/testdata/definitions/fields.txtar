@@ -257,14 +257,14 @@ issue3491: {
 	b: #Extra: {}
 }
 -- out/evalalpha/stats --
-Leaks:  244
+Leaks:  238
 Freed:  0
 Reused: 0
-Allocs: 244
+Allocs: 238
 Retain: 0
 
-Unifications: 241
-Conjuncts:    428
+Unifications: 235
+Conjuncts:    422
 Disjuncts:    0
 
 CloseIDElems: 215
@@ -286,14 +286,14 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 2
-+Leaks:  244
++Leaks:  238
 +Freed:  0
 +Reused: 0
-+Allocs: 244
++Allocs: 238
 +Retain: 0
 +
-+Unifications: 241
-+Conjuncts:    428
++Unifications: 235
++Conjuncts:    422
 +Disjuncts:    0
 +
 +CloseIDElems: 215

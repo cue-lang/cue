@@ -40,14 +40,14 @@ issue3610: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  802
+Leaks:  799
 Freed:  0
 Reused: 0
-Allocs: 802
+Allocs: 799
 Retain: 0
 
-Unifications: 22
-Conjuncts:    843
+Unifications: 19
+Conjuncts:    823
 Disjuncts:    618
 
 CloseIDElems: 42
@@ -61,17 +61,17 @@ diff old new
 -Freed:  367
 -Reused: 356
 -Allocs: 11
-+Leaks:  802
++Leaks:  799
 +Freed:  0
 +Reused: 0
-+Allocs: 802
++Allocs: 799
  Retain: 0
  
 -Unifications: 133
 -Conjuncts:    866
 -Disjuncts:    367
-+Unifications: 22
-+Conjuncts:    843
++Unifications: 19
++Conjuncts:    823
 +Disjuncts:    618
 +
 +CloseIDElems: 42

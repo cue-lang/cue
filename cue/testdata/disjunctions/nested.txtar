@@ -46,18 +46,18 @@ issue3635: reduced_noshare: {
 	d: 1
 }
 -- out/evalalpha/stats --
-Leaks:  111
+Leaks:  88
 Freed:  0
 Reused: 0
-Allocs: 111
+Allocs: 88
 Retain: 0
 
-Unifications: 63
-Conjuncts:    143
-Disjuncts:    44
+Unifications: 52
+Conjuncts:    118
+Disjuncts:    32
 
-CloseIDElems: 43
-NumCloseIDs: 21
+CloseIDElems: 41
+NumCloseIDs: 19
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -72,18 +72,18 @@ diff old new
 -Unifications: 83
 -Conjuncts:    310
 -Disjuncts:    165
-+Leaks:  111
++Leaks:  88
 +Freed:  0
 +Reused: 0
-+Allocs: 111
++Allocs: 88
 +Retain: 0
 +
-+Unifications: 63
-+Conjuncts:    143
-+Disjuncts:    44
++Unifications: 52
++Conjuncts:    118
++Disjuncts:    32
 +
-+CloseIDElems: 43
-+NumCloseIDs: 21
++CloseIDElems: 41
++NumCloseIDs: 19
 -- out/eval/stats --
 Leaks:  0
 Freed:  159

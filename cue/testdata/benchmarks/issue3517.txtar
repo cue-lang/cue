@@ -54,14 +54,14 @@ ts: this={
 	timeSpan: start: this.#tasks.t1.timeSpan.start
 }
 -- out/evalalpha/stats --
-Leaks:  49
+Leaks:  45
 Freed:  0
 Reused: 0
-Allocs: 49
+Allocs: 45
 Retain: 0
 
-Unifications: 49
-Conjuncts:    123
+Unifications: 45
+Conjuncts:    119
 Disjuncts:    0
 
 CloseIDElems: 12
@@ -80,14 +80,14 @@ diff old new
 -Unifications: 51
 -Conjuncts:    801
 -Disjuncts:    73
-+Leaks:  49
++Leaks:  45
 +Freed:  0
 +Reused: 0
-+Allocs: 49
++Allocs: 45
 +Retain: 0
 +
-+Unifications: 49
-+Conjuncts:    123
++Unifications: 45
++Conjuncts:    119
 +Disjuncts:    0
 +
 +CloseIDElems: 12

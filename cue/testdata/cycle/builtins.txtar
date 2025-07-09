@@ -255,18 +255,18 @@ issue3634: reduced: {
 	out: len(#D & list.Repeat([#D & { a: b: 1 }], 1)[0])
 }
 -- out/evalalpha/stats --
-Leaks:  478
+Leaks:  448
 Freed:  0
 Reused: 0
-Allocs: 478
+Allocs: 448
 Retain: 0
 
-Unifications: 407
-Conjuncts:    745
-Disjuncts:    42
+Unifications: 389
+Conjuncts:    712
+Disjuncts:    30
 
-CloseIDElems: 161
-NumCloseIDs: 190
+CloseIDElems: 158
+NumCloseIDs: 187
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -281,18 +281,18 @@ diff old new
 -Unifications: 441
 -Conjuncts:    821
 -Disjuncts:    537
-+Leaks:  478
++Leaks:  448
 +Freed:  0
 +Reused: 0
-+Allocs: 478
++Allocs: 448
 +Retain: 0
 +
-+Unifications: 407
-+Conjuncts:    745
-+Disjuncts:    42
++Unifications: 389
++Conjuncts:    712
++Disjuncts:    30
 +
-+CloseIDElems: 161
-+NumCloseIDs: 190
++CloseIDElems: 158
++NumCloseIDs: 187
 -- out/eval/stats --
 Leaks:  25
 Freed:  446

@@ -441,12 +441,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 	n.incDepth()
 	defer n.decDepth()
 
-	if pc := n.node.PatternConstraints; pc != nil {
-		for _, c := range pc.Pairs {
-			c.Constraint.unify(n.ctx, allKnown, attemptOnly, checkTypos)
-		}
-	}
-
 	// TODO: find more strategic place to set ClosedRecursive and get rid
 	// of helper fields.
 	blockClose := n.hasTop

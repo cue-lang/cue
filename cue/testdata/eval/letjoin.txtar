@@ -132,18 +132,18 @@ issue3591: missing: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  212
+Leaks:  193
 Freed:  0
 Reused: 0
-Allocs: 212
+Allocs: 193
 Retain: 0
 
-Unifications: 139
-Conjuncts:    353
-Disjuncts:    36
+Unifications: 124
+Conjuncts:    328
+Disjuncts:    32
 
 CloseIDElems: 279
-NumCloseIDs: 89
+NumCloseIDs: 87
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -161,18 +161,18 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 3
-+Leaks:  212
++Leaks:  193
 +Freed:  0
 +Reused: 0
-+Allocs: 212
++Allocs: 193
 +Retain: 0
 +
-+Unifications: 139
-+Conjuncts:    353
-+Disjuncts:    36
++Unifications: 124
++Conjuncts:    328
++Disjuncts:    32
 +
 +CloseIDElems: 279
-+NumCloseIDs: 89
++NumCloseIDs: 87
 -- out/eval/stats --
 Leaks:  28
 Freed:  215

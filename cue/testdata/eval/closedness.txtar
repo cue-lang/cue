@@ -763,14 +763,14 @@ issue3332: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  1024
+Leaks:  802
 Freed:  0
 Reused: 0
-Allocs: 1024
+Allocs: 802
 Retain: 0
 
-Unifications: 995
-Conjuncts:    2131
+Unifications: 773
+Conjuncts:    1909
 Disjuncts:    2
 
 CloseIDElems: 1301
@@ -792,14 +792,14 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 1
-+Leaks:  1024
++Leaks:  802
 +Freed:  0
 +Reused: 0
-+Allocs: 1024
++Allocs: 802
 +Retain: 0
 +
-+Unifications: 995
-+Conjuncts:    2131
++Unifications: 773
++Conjuncts:    1909
 +Disjuncts:    2
 +
 +CloseIDElems: 1301

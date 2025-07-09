@@ -87,14 +87,14 @@ full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  154
+Leaks:  153
 Freed:  0
 Reused: 0
-Allocs: 154
+Allocs: 153
 Retain: 0
 
-Unifications: 97
-Conjuncts:    266
+Unifications: 96
+Conjuncts:    265
 Disjuncts:    53
 
 CloseIDElems: 838
@@ -116,14 +116,14 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 30
-+Leaks:  154
++Leaks:  153
 +Freed:  0
 +Reused: 0
-+Allocs: 154
++Allocs: 153
 +Retain: 0
 +
-+Unifications: 97
-+Conjuncts:    266
++Unifications: 96
++Conjuncts:    265
 +Disjuncts:    53
 +
 +CloseIDElems: 838

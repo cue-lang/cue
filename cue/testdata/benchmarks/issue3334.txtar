@@ -43,14 +43,14 @@ Schema: {
 	nullable?: bool
 }
 -- out/evalalpha/stats --
-Leaks:  982
+Leaks:  784
 Freed:  0
 Reused: 0
-Allocs: 982
+Allocs: 784
 Retain: 0
 
-Unifications: 650
-Conjuncts:    995
+Unifications: 452
+Conjuncts:    797
 Disjuncts:    310
 
 CloseIDElems: 0
@@ -69,14 +69,14 @@ diff old new
 -Unifications: 245
 -Conjuncts:    425
 -Disjuncts:    402
-+Leaks:  982
++Leaks:  784
 +Freed:  0
 +Reused: 0
-+Allocs: 982
++Allocs: 784
 +Retain: 0
 +
-+Unifications: 650
-+Conjuncts:    995
++Unifications: 452
++Conjuncts:    797
 +Disjuncts:    310
 +
 +CloseIDElems: 0

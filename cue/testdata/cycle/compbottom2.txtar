@@ -330,10 +330,10 @@ issue3838: {
 	}).results
 }
 -- out/evalalpha/stats --
-Leaks:  23
-Freed:  209
-Reused: 194
-Allocs: 38
+Leaks:  22
+Freed:  210
+Reused: 195
+Allocs: 37
 Retain: 0
 
 Unifications: 206
@@ -359,10 +359,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 57
-+Leaks:  23
-+Freed:  209
-+Reused: 194
-+Allocs: 38
++Leaks:  22
++Freed:  210
++Reused: 195
++Allocs: 37
 +Retain: 0
 +
 +Unifications: 206

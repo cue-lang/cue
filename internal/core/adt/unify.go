@@ -246,7 +246,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 		v.ClosedRecursive = w.ClosedRecursive
 		v.status = w.status
 		v.ChildErrors = CombineErrors(nil, v.ChildErrors, w.ChildErrors)
-		v.Arcs = nil
+		v.clearArcs(c)
 		if w.status == finalized {
 			return true
 		}
@@ -370,8 +370,8 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 	if w != v {
 		// Clear value fields that are now referred to in the dereferenced
 		// value (w).
+		v.clearArcs(c)
 		v.ChildErrors = nil
-		v.Arcs = nil
 
 		if n.completed&(subFieldsProcessed) == 0 {
 			// Ensure the shared node is processed to the requested level. This is

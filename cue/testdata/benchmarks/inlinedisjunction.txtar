@@ -14,8 +14,8 @@
 x: #def
 x: c: "foo"
 -- out/evalalpha/stats --
-Leaks:  1
-Freed:  111
+Leaks:  0
+Freed:  112
 Reused: 98
 Allocs: 14
 Retain: 0
@@ -49,12 +49,11 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
--Leaks:  0
+ Leaks:  0
 -Freed:  4674
 -Reused: 3903
 -Allocs: 771
-+Leaks:  1
-+Freed:  111
++Freed:  112
 +Reused: 98
 +Allocs: 14
  Retain: 0

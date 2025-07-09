@@ -61,10 +61,10 @@ fib12: (fib & {n: 12}).out // Error
   }).out
 }
 -- out/evalalpha/stats --
-Leaks:  29
-Freed:  81
-Reused: 66
-Allocs: 44
+Leaks:  11
+Freed:  99
+Reused: 81
+Allocs: 29
 Retain: 0
 
 Unifications: 100
@@ -143,10 +143,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 46
-+Leaks:  29
-+Freed:  81
-+Reused: 66
-+Allocs: 44
++Leaks:  11
++Freed:  99
++Reused: 81
++Allocs: 29
 +Retain: 0
 +
 +Unifications: 100

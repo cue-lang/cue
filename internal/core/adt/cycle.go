@@ -1191,6 +1191,9 @@ func (n *nodeContext) reportCycleError() {
 		// TODO: probably, this should have the referenced arc.
 	}
 	n.setBaseValue(CombineErrors(nil, n.node.Value(), b))
+	// TODO(mem): might still be processing, so only use this when we
+	// exclude processed nodes.
+	// n.node.clearArcs(n.ctx)
 	n.node.Arcs = nil
 }
 

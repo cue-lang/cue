@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7abac3e1_3e587a40",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 559,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T12:45:50Z",
+      "side": 1,
+      "message": "in fact this change has to have zero effect, otherwise this selector here would cause a panic...",
+      "revId": "93720b4dddba90f04396cec92d34c0d50bdf96fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

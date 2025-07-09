@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b117bbbe_55f8796c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T09:58:56Z",
+      "side": 1,
+      "message": "Still LGTM, thanks for the tweak",
+      "revId": "6a57805d9bba36890884b656fc8544a79fd9acea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

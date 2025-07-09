@@ -405,10 +405,10 @@ issue3941: full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  28
-Freed:  874
-Reused: 828
-Allocs: 74
+Leaks:  2
+Freed:  900
+Reused: 849
+Allocs: 53
 Retain: 0
 
 Unifications: 551
@@ -1465,10 +1465,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 16
-+Leaks:  28
-+Freed:  874
-+Reused: 828
-+Allocs: 74
++Leaks:  2
++Freed:  900
++Reused: 849
++Allocs: 53
 +Retain: 0
 +
 +Unifications: 551

@@ -36,8 +36,8 @@ t2: {
 	f: d & e & d & e
 }
 -- out/evalalpha/stats --
-Leaks:  4
-Freed:  65
+Leaks:  0
+Freed:  69
 Reused: 42
 Allocs: 27
 Retain: 0
@@ -53,12 +53,11 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
--Leaks:  0
+ Leaks:  0
 -Freed:  121
 -Reused: 107
 -Allocs: 14
-+Leaks:  4
-+Freed:  65
++Freed:  69
 +Reused: 42
 +Allocs: 27
  Retain: 0

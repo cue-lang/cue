@@ -59,10 +59,10 @@ full: {
 	{#Foo}
 }
 -- out/evalalpha/stats --
-Leaks:  36
-Freed:  303
-Reused: 281
-Allocs: 58
+Leaks:  0
+Freed:  339
+Reused: 305
+Allocs: 34
 Retain: 0
 
 Unifications: 171
@@ -85,10 +85,10 @@ diff old new
 -Unifications: 183
 -Conjuncts:    344
 -Disjuncts:    237
-+Leaks:  36
-+Freed:  303
-+Reused: 281
-+Allocs: 58
++Leaks:  0
++Freed:  339
++Reused: 305
++Allocs: 34
 +Retain: 0
 +
 +Unifications: 171

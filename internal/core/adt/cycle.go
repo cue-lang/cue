@@ -684,7 +684,7 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 				//		c: a: int
 				//
 				// This is equivalent to a reference cycle.
-				if r.Depth == n.node.state.depth {
+				if r.Depth == n.depth {
 					return ci, true
 				}
 				ci.Refs = nil

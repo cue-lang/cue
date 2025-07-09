@@ -92,10 +92,10 @@ nestedWithSelfReference: t2: {
 	x: foo: disallowed: 5
 }
 -- out/evalalpha/stats --
-Leaks:  3
-Freed:  270
-Reused: 232
-Allocs: 41
+Leaks:  0
+Freed:  273
+Reused: 234
+Allocs: 39
 Retain: 0
 
 Unifications: 183
@@ -118,10 +118,10 @@ diff old new
 -Unifications: 261
 -Conjuncts:    504
 -Disjuncts:    266
-+Leaks:  3
-+Freed:  270
-+Reused: 232
-+Allocs: 41
++Leaks:  0
++Freed:  273
++Reused: 234
++Allocs: 39
 +Retain: 0
 +
 +Unifications: 183

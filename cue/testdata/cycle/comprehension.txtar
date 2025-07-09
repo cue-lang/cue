@@ -405,18 +405,18 @@ issue3941: full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  996
+Leaks:  902
 Freed:  0
 Reused: 0
-Allocs: 996
+Allocs: 902
 Retain: 0
 
-Unifications: 625
-Conjuncts:    1705
-Disjuncts:    202
+Unifications: 551
+Conjuncts:    1605
+Disjuncts:    182
 
-CloseIDElems: 2867
-NumCloseIDs: 709
+CloseIDElems: 2861
+NumCloseIDs: 703
 -- out/evalalpha --
 Errors:
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
@@ -1465,18 +1465,18 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 16
-+Leaks:  996
++Leaks:  902
 +Freed:  0
 +Reused: 0
-+Allocs: 996
++Allocs: 902
 +Retain: 0
 +
-+Unifications: 625
-+Conjuncts:    1705
-+Disjuncts:    202
++Unifications: 551
++Conjuncts:    1605
++Disjuncts:    182
 +
-+CloseIDElems: 2867
-+NumCloseIDs: 709
++CloseIDElems: 2861
++NumCloseIDs: 703
 -- out/eval/stats --
 Leaks:  75
 Freed:  1383

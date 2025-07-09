@@ -146,15 +146,15 @@ x: a0: {}
   }
 }
 -- out/evalalpha/stats --
-Leaks:  162
+Leaks:  82
 Freed:  0
 Reused: 0
-Allocs: 162
+Allocs: 82
 Retain: 0
 
-Unifications: 6
-Conjuncts:    261
-Disjuncts:    156
+Unifications: 4
+Conjuncts:    143
+Disjuncts:    78
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -164,18 +164,16 @@ diff old new
 -Freed:  82
 -Reused: 74
 -Allocs: 8
-+Leaks:  162
++Leaks:  82
 +Freed:  0
 +Reused: 0
-+Allocs: 162
++Allocs: 82
  Retain: 0
  
--Unifications: 4
--Conjuncts:    143
+ Unifications: 4
+ Conjuncts:    143
 -Disjuncts:    82
-+Unifications: 6
-+Conjuncts:    261
-+Disjuncts:    156
++Disjuncts:    78
 -- out/eval/stats --
 Leaks:  0
 Freed:  82

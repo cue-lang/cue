@@ -39,18 +39,18 @@ reduced: t1: {
 	a: x: y: V: x: y: V: {}
 }
 -- out/evalalpha/stats --
-Leaks:  212
+Leaks:  121
 Freed:  0
 Reused: 0
-Allocs: 212
+Allocs: 121
 Retain: 0
 
-Unifications: 211
-Conjuncts:    441
+Unifications: 120
+Conjuncts:    309
 Disjuncts:    0
 
 CloseIDElems: 584
-NumCloseIDs: 85
+NumCloseIDs: 67
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -60,21 +60,20 @@ diff old new
 -Freed:  120
 -Reused: 107
 -Allocs: 13
-+Leaks:  212
++Leaks:  121
 +Freed:  0
 +Reused: 0
-+Allocs: 212
++Allocs: 121
  Retain: 0
  
--Unifications: 120
+ Unifications: 120
 -Conjuncts:    320
 -Disjuncts:    120
-+Unifications: 211
-+Conjuncts:    441
++Conjuncts:    309
 +Disjuncts:    0
 +
 +CloseIDElems: 584
-+NumCloseIDs: 85
++NumCloseIDs: 67
 -- out/eval/stats --
 Leaks:  0
 Freed:  120

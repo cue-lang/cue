@@ -92,18 +92,18 @@ nestedWithSelfReference: t2: {
 	x: foo: disallowed: 5
 }
 -- out/evalalpha/stats --
-Leaks:  356
+Leaks:  273
 Freed:  0
 Reused: 0
-Allocs: 356
+Allocs: 273
 Retain: 0
 
-Unifications: 230
-Conjuncts:    360
-Disjuncts:    12
+Unifications: 183
+Conjuncts:    298
+Disjuncts:    6
 
-CloseIDElems: 579
-NumCloseIDs: 106
+CloseIDElems: 525
+NumCloseIDs: 88
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -118,18 +118,18 @@ diff old new
 -Unifications: 261
 -Conjuncts:    504
 -Disjuncts:    266
-+Leaks:  356
++Leaks:  273
 +Freed:  0
 +Reused: 0
-+Allocs: 356
++Allocs: 273
 +Retain: 0
 +
-+Unifications: 230
-+Conjuncts:    360
-+Disjuncts:    12
++Unifications: 183
++Conjuncts:    298
++Disjuncts:    6
 +
-+CloseIDElems: 579
-+NumCloseIDs: 106
++CloseIDElems: 525
++NumCloseIDs: 88
 -- out/eval/stats --
 Leaks:  61
 Freed:  214

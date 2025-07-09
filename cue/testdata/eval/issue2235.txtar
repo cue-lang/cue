@@ -100,18 +100,18 @@ for clusterName, cluster in clusters {
 
 clusters: foo: {}
 -- out/evalalpha/stats --
-Leaks:  92
+Leaks:  69
 Freed:  0
 Reused: 0
-Allocs: 92
+Allocs: 69
 Retain: 0
 
-Unifications: 92
-Conjuncts:    169
+Unifications: 69
+Conjuncts:    129
 Disjuncts:    0
 
 CloseIDElems: 150
-NumCloseIDs: 34
+NumCloseIDs: 28
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -129,18 +129,18 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 14
-+Leaks:  92
++Leaks:  69
 +Freed:  0
 +Reused: 0
-+Allocs: 92
++Allocs: 69
 +Retain: 0
 +
-+Unifications: 92
-+Conjuncts:    169
++Unifications: 69
++Conjuncts:    129
 +Disjuncts:    0
 +
 +CloseIDElems: 150
-+NumCloseIDs: 34
++NumCloseIDs: 28
 -- out/eval/stats --
 Leaks:  20
 Freed:  84

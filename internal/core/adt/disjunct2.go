@@ -779,7 +779,9 @@ func equalPartialNode(ctx *OpContext, x, y *Vertex) bool {
 	default:
 		// Assume patterns are in the same order.
 		for i, p := range cx.Pairs {
-			if !Equal(ctx, p.Constraint, cy.Pairs[i].Constraint, 0) {
+			p.Constraint.Finalize(ctx)
+			cy.Pairs[i].Constraint.Finalize(ctx)
+			if !Equal(ctx, p.Constraint, cy.Pairs[i].Constraint, CheckStructural) {
 				return false
 			}
 		}

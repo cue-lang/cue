@@ -82,6 +82,45 @@ examples: eg3: in: {
     }
   }
 }
+-- out/evalalpha/stats --
+Leaks:  90
+Freed:  0
+Reused: 0
+Allocs: 90
+Retain: 0
+
+Unifications: 41
+Conjuncts:    139
+Disjuncts:    22
+
+CloseIDElems: 14
+NumCloseIDs: 43
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+-Leaks:  15
+-Freed:  105
+-Reused: 99
+-Allocs: 21
+-Retain: 37
+-
+-Unifications: 82
+-Conjuncts:    246
+-Disjuncts:    139
++Leaks:  90
++Freed:  0
++Reused: 0
++Allocs: 90
++Retain: 0
++
++Unifications: 41
++Conjuncts:    139
++Disjuncts:    22
++
++CloseIDElems: 14
++NumCloseIDs: 43
 -- out/eval/stats --
 Leaks:  15
 Freed:  105

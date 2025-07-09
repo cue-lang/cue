@@ -137,8 +137,8 @@ c: [c[1], c[0]]
   }
 }
 -- out/evalalpha/stats --
-Leaks:  1
-Freed:  58
+Leaks:  0
+Freed:  59
 Reused: 38
 Allocs: 21
 Retain: 0
@@ -154,7 +154,7 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
- Leaks:  1
+-Leaks:  1
 -Freed:  57
 -Reused: 46
 -Allocs: 12
@@ -163,7 +163,8 @@ diff old new
 -Unifications: 48
 -Conjuncts:    285
 -Disjuncts:    88
-+Freed:  58
++Leaks:  0
++Freed:  59
 +Reused: 38
 +Allocs: 21
 +Retain: 0

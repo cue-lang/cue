@@ -103,10 +103,10 @@ issue3967: error: local: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  14
-Freed:  280
-Reused: 256
-Allocs: 38
+Leaks:  8
+Freed:  286
+Reused: 260
+Allocs: 34
 Retain: 0
 
 Unifications: 162
@@ -132,10 +132,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 8
-+Leaks:  14
-+Freed:  280
-+Reused: 256
-+Allocs: 38
++Leaks:  8
++Freed:  286
++Reused: 260
++Allocs: 34
 +Retain: 0
 +
 +Unifications: 162

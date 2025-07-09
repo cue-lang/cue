@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82bc35ec_1702fecd",
+        "filename": "internal/robustio/robustio_js.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T10:19:22Z",
+      "side": 1,
+      "message": "FWIW I tend to prefer to add a `//go:build` line even when it\u0027s redundant with respect to the filename, because knowing that the filename is special requires knowing all the possible build tags, but `go:build` makes it clear that it _is_ guarded.",
+      "revId": "c13484fbbd5060d4467ee8d8e262151630bded4b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

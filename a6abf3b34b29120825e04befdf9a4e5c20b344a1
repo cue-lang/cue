@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6afe438_e58a035b",
+        "filename": "internal/robustio/robustio_plan9.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-09T10:19:22Z",
+      "side": 0,
+      "message": "Similarly I\u0027d leave this in place.",
+      "revId": "a6abf3b34b29120825e04befdf9a4e5c20b344a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

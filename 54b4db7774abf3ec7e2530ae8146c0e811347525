@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b6f81ff_496c9d0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:22:01Z",
+      "side": 1,
+      "message": "Ah, I see this answers a couple of the questions I had in the earlier CL. Perhaps mention that in its commit message.",
+      "revId": "54b4db7774abf3ec7e2530ae8146c0e811347525",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

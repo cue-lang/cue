@@ -319,10 +319,10 @@ issue3891: full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  48
-Freed:  627
-Reused: 560
-Allocs: 115
+Leaks:  16
+Freed:  659
+Reused: 590
+Allocs: 85
 Retain: 0
 
 Unifications: 294
@@ -348,10 +348,10 @@ diff old new
 -
 -CloseIDElems: 0
 -NumCloseIDs: 2
-+Leaks:  48
-+Freed:  627
-+Reused: 560
-+Allocs: 115
++Leaks:  16
++Freed:  659
++Reused: 590
++Allocs: 85
 +Retain: 0
 +
 +Unifications: 294

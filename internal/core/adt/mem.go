@@ -191,3 +191,10 @@ func (r reclaimer) reclaimBaseValueBuffers(v *Vertex) {
 		}
 	}
 }
+
+func (v *Vertex) clearArcs(c *OpContext) {
+	for _, arc := range v.Arcs {
+		c.reclaimRecursive(arc)
+	}
+	v.Arcs = v.Arcs[:0]
+}

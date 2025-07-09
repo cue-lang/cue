@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fe6f565_e2d7a58f",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-09T11:32:44Z",
+      "side": 1,
+      "message": "Again, probably only want/need to do this from the main repo",
+      "revId": "8590a3e7df19b22ac6ad581dbd9c25c47c803dcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

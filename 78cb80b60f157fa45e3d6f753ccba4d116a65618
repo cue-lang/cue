@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e84078c8_a70c0a21",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1048,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-09T19:47:59Z",
+      "side": 1,
+      "message": "unfinished sentence?",
+      "revId": "78cb80b60f157fa45e3d6f753ccba4d116a65618",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

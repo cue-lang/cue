@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d00aab8e_3fba6f8d",
+        "filename": "cue/testdata/benchmarks/issue3514.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-10T14:06:50Z",
+      "side": 1,
+      "message": "yikes!",
+      "revId": "0c84f3d02ab77a4b96f2de1693862443cf675e64",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

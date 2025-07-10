@@ -33,6 +33,24 @@
       "message": "I also would be fine removing this log message. But either way.",
       "revId": "37d3d21a10d55126dca44527eb4ec92422d7bb52",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64b9f87f_f3cab6dd",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-10T11:18:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f06d10a8_7842800b",
+      "revId": "37d3d21a10d55126dca44527eb4ec92422d7bb52",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

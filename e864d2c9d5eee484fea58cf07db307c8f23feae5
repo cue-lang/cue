@@ -270,6 +270,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5d5fe62_ad2fcca0",
+        "filename": "internal/core/adt/mem.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-10T09:27:32Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "1a9b5d73_68bb2285",
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f781c61_3c191aa3",
@@ -430,6 +448,24 @@
       "side": 1,
       "message": "Yes, based on your comment. I believe I left a comment there:\n\nin that CL this was indeed a noop. In this CL it will cause a crash if it is not added. So I moved it here instead.",
       "parentUuid": "a65b6a2a_d00eb731",
+      "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37b89a21_7c7fe1cc",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 554,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-10T09:27:32Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "61d86a7c_efda31bc",
       "revId": "e864d2c9d5eee484fea58cf07db307c8f23feae5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

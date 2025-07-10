@@ -16,6 +16,24 @@
       "message": "Why move these? Perhaps avoid the noise",
       "revId": "45449722e3521c43a7b41734f491379fa4c3f2ca",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "465b0850_48a2c5a9",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-10T13:59:21Z",
+      "side": 0,
+      "message": "Ha, because I initially removed them thinking they were redundant with respect to Unwrap but then realised they weren\u0027t and clearly added them back in the wrong place :) Fixed.",
+      "parentUuid": "3f6191e6_fafb1afd",
+      "revId": "45449722e3521c43a7b41734f491379fa4c3f2ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

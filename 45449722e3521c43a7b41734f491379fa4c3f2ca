@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f6191e6_fafb1afd",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-10T12:54:43Z",
+      "side": 0,
+      "message": "Why move these? Perhaps avoid the noise",
+      "revId": "45449722e3521c43a7b41734f491379fa4c3f2ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

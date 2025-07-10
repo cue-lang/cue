@@ -373,8 +373,15 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	}
 	n.arcMap = append(n.arcMap, key)
 
-	if !n.node.nonRooted || n.node.IsDynamic {
-		if state := arc.getBareState(n.ctx); state != nil {
+	if arc.Parent != nil && (!n.node.nonRooted || n.node.IsDynamic) {
+		// If the arc has a parent that for which the field conjuncts are not
+		// fully known yet, we may not have collected all conjuncts yet. In that
+		// case we need ot add n to the notification list of arc to ensure
+		// we will get the notifications in the future.
+		pState := arc.Parent.getState(n.ctx)
+		state := arc.getBareState(n.ctx)
+		if pState != nil && state != nil &&
+			!pState.meets(allAncestorsProcessed|fieldConjunctsKnown) {
 			state.addNotify2(n.node, closeInfo)
 		}
 	}

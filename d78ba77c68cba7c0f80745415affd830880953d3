@@ -16,6 +16,24 @@
       "message": "Strings are currently converted in a global map. So theoretically this could be converted already. But I understand it is a bit tricky.\n\nHowever, we could use a sync.Once instead of creating a copy of the Builtin. I know it is not much reduction of allocation, but it is something.\n\nEither way, though. If you want to keep it like this, I would perhaps add a TODO(perf) comment.",
       "revId": "d78ba77c68cba7c0f80745415affd830880953d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "259a3812_48b213aa",
+        "filename": "internal/pkg/builtin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-10T11:18:32Z",
+      "side": 1,
+      "message": "left a TODO as you suggest. I\u0027m not quite sure what you mean by the sync.Once, and it feels like an optimization should be split up from the data race fix anyway.",
+      "parentUuid": "34d19ab4_b48ac77a",
+      "revId": "d78ba77c68cba7c0f80745415affd830880953d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

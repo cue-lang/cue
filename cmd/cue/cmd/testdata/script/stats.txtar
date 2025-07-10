@@ -48,6 +48,7 @@ contents overwritten
         "EvalVersion": 3,
         "Unifications": 4,
         "Disjuncts": 2,
+        "Notifications": 0,
         "Conjuncts": 8,
         "CloseIDElems": 0,
         "NumCloseIDs": 2,
@@ -63,16 +64,17 @@ contents overwritten
 }
 -- out/stats.cue --
 CUE: {
-	EvalVersion:  3
-	Unifications: 4
-	Disjuncts:    2
-	Conjuncts:    8
-	CloseIDElems: 0
-	NumCloseIDs:  2
-	Freed:        6
-	Reused:       0
-	Allocs:       6
-	Retained:     0
+	EvalVersion:   3
+	Unifications:  4
+	Disjuncts:     2
+	Notifications: 0
+	Conjuncts:     8
+	CloseIDElems:  0
+	NumCloseIDs:   2
+	Freed:         6
+	Reused:        0
+	Allocs:        6
+	Retained:      0
 }
 Go: {
 	AllocBytes:   300456
@@ -83,6 +85,7 @@ CUE:
   EvalVersion: 3
   Unifications: 4
   Disjuncts: 2
+  Notifications: 0
   Conjuncts: 8
   CloseIDElems: 0
   NumCloseIDs: 2
@@ -99,6 +102,7 @@ Go:
         "EvalVersion": 3,
         "Unifications": 4,
         "Disjuncts": 2,
+        "Notifications": 0,
         "Conjuncts": 8,
         "CloseIDElems": 0,
         "NumCloseIDs": 2,

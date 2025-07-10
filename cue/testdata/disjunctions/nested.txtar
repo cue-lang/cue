@@ -55,6 +55,7 @@ Retain: 0
 Unifications: 52
 Conjuncts:    118
 Disjuncts:    32
+Notifications: 11
 
 CloseIDElems: 41
 NumCloseIDs: 19
@@ -62,7 +63,7 @@ NumCloseIDs: 19
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,12 @@
+@@ -1,9 +1,13 @@
 -Leaks:  0
 -Freed:  159
 -Reused: 145
@@ -81,6 +82,7 @@ diff old new
 +Unifications: 52
 +Conjuncts:    118
 +Disjuncts:    32
++Notifications: 11
 +
 +CloseIDElems: 41
 +NumCloseIDs: 19

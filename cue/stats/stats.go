@@ -54,6 +54,12 @@ type Counts struct {
 	// should allow for near-linear processing.
 	Disjuncts int64
 
+	// Notifications counts how often a Vertex is added to the notification
+	// queue. This is typically only the case when a Vertex is involved in
+	// some kind of cycle, so this should be relatively low in practice
+	// compared to the number of unifications.
+	Notifications int64 // Number of notifications sent to nodes.
+
 	// Conjuncts is an estimate of the number of conjunctions processed during
 	// the calls to Unify. This includes the conjuncts added in the compilation
 	// phase as well as the derivative conjuncts inserted from other nodes
@@ -102,6 +108,7 @@ func (c *Counts) Add(other Counts) {
 	c.Unifications += other.Unifications
 	c.Conjuncts += other.Conjuncts
 	c.Disjuncts += other.Disjuncts
+	c.Notifications += other.Notifications
 
 	c.CloseIDElems += other.CloseIDElems
 	c.NumCloseIDs += other.NumCloseIDs
@@ -116,6 +123,7 @@ func (c Counts) Since(start Counts) Counts {
 	c.Unifications -= start.Unifications
 	c.Conjuncts -= start.Conjuncts
 	c.Disjuncts -= start.Disjuncts
+	c.Notifications -= start.Notifications
 	c.CloseIDElems -= start.CloseIDElems
 	c.NumCloseIDs -= start.NumCloseIDs
 
@@ -147,7 +155,8 @@ Retain: {{.Retained}}
 
 Unifications: {{.Unifications}}
 Conjuncts:    {{.Conjuncts}}
-Disjuncts:    {{.Disjuncts}}{{if .NumCloseIDs}}
+Disjuncts:    {{.Disjuncts}}{{if .Notifications}}
+Notifications: {{.Notifications}}{{end}}{{if .NumCloseIDs}}
 
 CloseIDElems: {{.CloseIDElems}}
 NumCloseIDs: {{.NumCloseIDs}}{{end}}`))

@@ -414,6 +414,7 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) {
 	// let expressions, so we could also filter for !n.node.Label.IsLet().
 	// However, somehow this appears to result in slightly better error
 	// messages.
+	n.ctx.stats.Notifications++
 
 	n.notify = append(n.notify, receiver{v})
 }

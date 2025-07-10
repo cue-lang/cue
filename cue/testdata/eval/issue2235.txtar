@@ -109,7 +109,7 @@ Retain: 0
 Unifications: 69
 Conjuncts:    129
 Disjuncts:    0
-Notifications: 5
+Notifications: 1
 
 CloseIDElems: 150
 NumCloseIDs: 28
@@ -139,7 +139,7 @@ diff old new
 +Unifications: 69
 +Conjuncts:    129
 +Disjuncts:    0
-+Notifications: 5
++Notifications: 1
 +
 +CloseIDElems: 150
 +NumCloseIDs: 28

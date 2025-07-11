@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba0702a8_95d582a0",
+        "filename": "internal/golangorgx/gopls/server/workspace.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-11T08:31:43Z",
+      "side": 1,
+      "message": "I\u0027m not sure a panic is appropriate here: the data has come from an external source so this is violating a protocol-level invariant, not an in-program invariant. And we _can_ easily return an error here. Alternatively, perhaps use a different type for the `URI` field that does check this invariant. Currently the docs for `protocol.URI` say that it \"is an arbitrary URL (e.g. https), not necessarily a file\".",
+      "revId": "653f0b1fb9be30b35aba68a028e1fa467f07d247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca92342c_ed669a05",
+        "filename": "internal/golangorgx/gopls/server/workspace.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-11T08:31:43Z",
+      "side": 1,
+      "message": "I find myself in some tension here: in general Go errors start with lower case and don\u0027t contain newlines (or at least don\u0027t _finish_ with a newline). I\u0027m assuming that we\u0027re forming a user-facing error message here that does benefit from a more human-friendly format when presented individually though. I\u0027m wondering if it might be better to use some custom error type that presents both a Go-like error string _and_ a presentation-oriented string (potentially deriving the former from the latter). WDYT?",
+      "revId": "653f0b1fb9be30b35aba68a028e1fa467f07d247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2256085f_d39517ac",
+        "filename": "internal/golangorgx/gopls/server/workspace.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-11T08:31:43Z",
+      "side": 1,
+      "message": "Why is this an error rather than a warning?",
+      "revId": "653f0b1fb9be30b35aba68a028e1fa467f07d247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bee375d4_ee8803e8",
+        "filename": "internal/golangorgx/gopls/server/workspace.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-11T08:31:43Z",
+      "side": 1,
+      "message": "Similar comment as elsewhere: why bother with the waitgroup rather than:\n\n```\ndefer work.End(ctx, \"Done.\")\n```",
+      "revId": "653f0b1fb9be30b35aba68a028e1fa467f07d247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

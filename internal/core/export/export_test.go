@@ -39,6 +39,7 @@ import (
 )
 
 func TestDefinition(t *testing.T) {
+	t.Parallel()
 	test := cuetxtar.TxTarTest{
 		Root:   "./testdata/main",
 		Name:   "definition",
@@ -46,6 +47,7 @@ func TestDefinition(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
+		t.Parallel()
 		r := t.Runtime()
 		a := t.Instance()
 

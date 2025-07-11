@@ -37,6 +37,7 @@ import (
 )
 
 func TestSelfContained(t *testing.T) {
+	t.Parallel()
 	test := cuetxtar.TxTarTest{
 		Name: "self",
 		Root: "./testdata/selfcontained",
@@ -53,6 +54,7 @@ func TestSelfContained(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
+		t.Parallel()
 		r := t.CueContext()
 
 		a := t.Instances()
@@ -141,7 +143,7 @@ func patch(t *testing.T, r *cue.Context, orig *txtar.Archive, f *ast.File) cue.V
 
 func doDiff(t *testing.T, v, w cue.Value) {
 	var bb bytes.Buffer
-	p := diff.Schema
+	p := *diff.Schema
 	p.SkipHidden = true
 	d, script := p.Diff(v, w)
 	if d != diff.Identity {

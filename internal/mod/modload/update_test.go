@@ -20,10 +20,12 @@ import (
 )
 
 func TestUpdateVersions(t *testing.T) {
+	t.Parallel()
 	files, err := filepath.Glob("testdata/updateversions/*.txtar")
 	qt.Assert(t, qt.IsNil(err))
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
+			t.Parallel()
 			ar, err := txtar.ParseFile(f)
 			qt.Assert(t, qt.IsNil(err))
 			tfs, err := txtar.FS(ar)

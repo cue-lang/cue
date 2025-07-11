@@ -309,6 +309,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f89db885_06e314d5",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T08:26:18Z",
+      "side": 1,
+      "message": "modFileURI is the URI of the module.cue file. So this is really the justification for the whole \"packagoOrModule\" stuff - if the editor opens a cue.mod/module.cue file, it belongs to the module, not any package. And that\u0027s why I need to be able to treat modules and packages interchangeably in a few places.",
+      "parentUuid": "727a6d75_843bc127",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8b0a5afb_267cedd1",
         "filename": "internal/golangorgx/gopls/cache/module.go",
         "patchSetId": 6

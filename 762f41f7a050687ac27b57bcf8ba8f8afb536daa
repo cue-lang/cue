@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87dd0576_2ebf1cf6",
+        "filename": "internal/golangorgx/gopls/cache/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Went the other way - removed the parameter given that in all the call-sites, I was explicitly passing nil.",
+      "parentUuid": "22d5deaf_dc9840be",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ddfdf69d_88bb21cc",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1291c073_fadf3bd7",
+        "filename": "internal/golangorgx/gopls/cache/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ddfdf69d_88bb21cc",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0095da9f_38fdb383",
@@ -65,6 +101,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "```suggestion\n// NewWorkspaceFolder creates a new workspace folder. The fetchFolderOptions func is\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d31d7d2_031e0f28",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0095da9f_38fdb383",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -88,6 +142,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef5788fb_190f7aec",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Discussed this morning. Actually, the WorkspaceFolder one is the easier one to change because the call site is in the same pkg, so it\u0027s straight-forward to rework. But I\u0027ve left alone the call from `server.DidChangeConfiguration` to `s.workspace.UpdateFolderOptions` because to rework that would require exposing all the folders from within a workspace, which I don\u0027t like much.",
+      "parentUuid": "e7d5896d_ed299ac3",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "646d52a1_eccb3ce7",
         "filename": "internal/golangorgx/gopls/cache/folder.go",
         "patchSetId": 6
@@ -99,6 +171,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "```suggestion\n// FileWatchingGlobPatterns adds a pattern for watching the\n// folder to the given patterns map and reports whether\n// this folder requires subdirectories to be watched explicitly.\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4174f5d8_5e68d34b",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "646d52a1_eccb3ce7",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a0c5e69_95ef47dc",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Reworked.",
+      "parentUuid": "45a6dd29_990d472c",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db2baf5f_b1b4db07",
@@ -133,6 +241,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "I\u0027m not a stickler for defining string constant names in general, but this does seem like one decent candidate.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "914f5e28_05407f85",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db2baf5f_b1b4db07",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -154,6 +280,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e33d1a2_7143f2ab",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b4db25d_996be419",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef086038_d4439682",
@@ -167,6 +311,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "```suggestion\n\t// dirtyFiles holds dirty files within the module\u0027s packages only:\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16e0d6e1_87afa225",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef086038_d4439682",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -188,6 +350,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9b7e208_60b9b7b3",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a95f20f_0ef7fd5e",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "366b5527_fda9c4e3",
@@ -201,6 +381,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "```suggestion\n// is dirty. Reports whether the module ends up in a splendid status.\n```\n?",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cacfa8d5_31847809",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "366b5527_fda9c4e3",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -222,6 +420,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf020d6a_0ba0277e",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb421daf_a75c55f1",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "990fb687_f0509f7a",
@@ -235,6 +451,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "ISTM that maybe ReloadModule would be better off returning an error which we could return here. That way one might get to know _why_ the module is invalid (e.g. it\u0027s been deleted).",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "882abf69_59e27716",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "990fb687_f0509f7a",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -256,6 +490,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "06dc364b_0203b3f0",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd6cde92_43762728",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1f0feda3_0afafb5e",
@@ -273,6 +525,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6653d80d_a7364aa1",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f0feda3_0afafb5e",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad564b1d_64af0128",
@@ -286,6 +556,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "Useful comment!\n\nAIUI file _can\u0027t_ be a/b.cue because that\u0027s not a valid `file:///` URI, right? Maybe worth using valid values just to avoid confusion.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e4ffa03_5b9130ec",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad564b1d_64af0128",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -325,6 +613,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bedc8837_155ab738",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f89db885_06e314d5",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b0a5afb_267cedd1",
@@ -338,6 +644,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "```suggestion\n\t// Search also for descendent packages that might\n\t// include the file by virtue of the ancestor-import-path pattern.\n```\n?",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb043726_9b764148",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b0a5afb_267cedd1",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -359,6 +683,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "400d8cca_7e498977",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "813a1a47_3f4127b3",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e94d9ae8_2a1527aa",
@@ -372,6 +714,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "I guess another possibility might be:\n\n    for ; len(pkgsToLoadWorklist) \u003e 0; pkgsToLoadWorklist \u003d pkgsToLoadWorklist[1:] {\n        pkg :\u003d pkgsToLoadWorklist[0]\n\nto make it clear we really are just using it as a worklist.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "426d9cc3_a8b8312c",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e94d9ae8_2a1527aa",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -393,6 +753,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ea38a6e_01c33406",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55e4c10c_2a9ec525",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c014ce6e_7c493a4c",
@@ -406,6 +784,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "```suggestion\n\t\t\t\t// Both new and old pkgs import ip. Noop.\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9ffbf58_e43f2007",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c014ce6e_7c493a4c",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -427,6 +823,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ceb0c90_f3335756",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "modFileURI is the module.cue file uri.",
+      "parentUuid": "5ad88d97_8cdcb3f1",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa5baec3_894e624e",
@@ -440,6 +854,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "Conventionally we use US spelling.\n\n\n```suggestion\n// NormalizeImportPath is used to normalise and canonicalise import\n```\n\nAlso, the fact that this _only_ works properly on paths from modpkgload.Package, which is really only an implementation detail\nof this package AIUI, makes me think that this probably isn\u0027t\na good method to expose publically.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d5af17c_13c4f771",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa5baec3_894e624e",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -461,6 +893,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3f3074f_54e19ca2",
+        "filename": "internal/golangorgx/gopls/cache/package.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "624cd9b2_39e46297",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "98b0a814_86e4dae9",
@@ -474,6 +924,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "This doc doesn\u0027t say what it actually does, which is particularly necessary here as the name sounds like it\u0027s returning the active files and directories, but it doesn\u0027t actually return anything!\n\nMaybe:\n\n```\n    // ActiveFilesAndDirs adds entries for the package or module\u0027s active files\n    // and directories to the given files or dirs maps respectively.\n    // An \"active\" file is... etc\n```\n\nIt is a somewhat odd API, I have to say - I\u0027d be inclined to return freshly made maps with the active files and directories in (or maybe some kind of iterator to avoid the temporary map allocations), but I\u0027m guessing performance is important here.",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0113202a_adc33fd1",
+        "filename": "internal/golangorgx/gopls/cache/package.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98b0a814_86e4dae9",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -495,6 +963,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0633c20f_bcd1da80",
+        "filename": "internal/golangorgx/gopls/cache/package.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b863329_022df047",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f190ecae_8b107eeb",
@@ -508,6 +994,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "Again, maybe split the fields into immutable at the top followed by mutable?",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcd7913c_ab05e3dc",
+        "filename": "internal/golangorgx/gopls/cache/package.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f190ecae_8b107eeb",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -529,6 +1033,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b21dd98_4b2f1a95",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ae3caa9_22d643b3",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4c8595a_31eed558",
@@ -542,6 +1064,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "```suggestion\n// within this workspace. The name is for display purposes only and does not\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10ba9cb0_e4a2a98f",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4c8595a_31eed558",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -563,6 +1103,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "acaa5f37_44580350",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7eb9b69a_e280ed96",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe71cc5a_462a6ee0",
@@ -576,6 +1134,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "This seems like a dupe of docs from the similar interface method.\n\n```suggestion\n// activeFilesAndDirs functions similarly to packageOrModule.ActiveFilesOrDirs.\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bfdaf88_f805a65e",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe71cc5a_462a6ee0",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -597,6 +1173,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c56eb6a5_e8ad31fc",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de58d7d0_0cc239de",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9c55c4d_dd873351",
@@ -610,6 +1204,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "```suggestion\n\t\t// So if we know the file is open in the editor (i.e. fh !\u003d\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8061d8f2_86d31780",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9c55c4d_dd873351",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -631,6 +1243,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ddb2eb2_965ff803",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Thank you - I think I have a blind spot on \"who\u0027s\" vs \"whose\".",
+      "parentUuid": "a135f3f3_18eb2743",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad85f80f_850667a9",
@@ -644,6 +1274,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "```suggestion\n// Initialized is the handler for the async message from the client. The\n```",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "533429d5_e5ea9ea3",
+        "filename": "internal/golangorgx/gopls/server/initialize.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad85f80f_850667a9",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -665,6 +1313,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "951740b6_741c3c95",
+        "filename": "internal/golangorgx/gopls/server/options.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cdf5374a_67d7e437",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d465dc27_8caee054",
@@ -682,6 +1348,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b1992f9_896a9ae1",
+        "filename": "internal/golangorgx/gopls/server/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d465dc27_8caee054",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ed443e48_dd5522b7",
@@ -695,6 +1379,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "I don\u0027t really understand why this has to be done in a goroutine rather than just a defer. Maybe add a comment explaining that?",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2803ab3f_92a8f421",
+        "filename": "internal/golangorgx/gopls/server/text_synchronization.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Investigate work.End and if it\u0027s *always* called from within a new thread, maybe make work.End spawn its own thread.",
+      "parentUuid": "ed443e48_dd5522b7",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -729,6 +1431,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "Note to self: this is as far as I\u0027ve got in the review!",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "153a9246_8ff151ec",
+        "filename": "internal/golangorgx/gopls/server/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T10:56:20Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "fb61af7a_74fd8cc6",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

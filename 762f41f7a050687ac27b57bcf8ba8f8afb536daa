@@ -158,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f08a4757_c6801adf",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T11:41:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef5788fb_190f7aec",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "646d52a1_eccb3ce7",

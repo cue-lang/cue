@@ -1401,6 +1401,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6981cf5_ad0c971b",
+        "filename": "internal/golangorgx/gopls/server/text_synchronization.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T11:41:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2803ab3f_92a8f421",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cca38963_5efbf34e",
@@ -1414,6 +1432,24 @@
       "writtenOn": "2025-07-09T15:32:17Z",
       "side": 1,
       "message": "doc comment please",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b143704_7ad60607",
+        "filename": "internal/golangorgx/gopls/server/text_synchronization.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T11:41:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cca38963_5efbf34e",
       "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

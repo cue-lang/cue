@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4d0bc5d_7f088fd1",
+        "filename": "internal/golangorgx/gopls/server/workspace.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T11:41:20Z",
+      "side": 1,
+      "message": "https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspaceFolder defines a workspace folder as having a URI and not a DocumentURI.\nhttps://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#documentUri doesn\u0027t really make it clear, but I suspect the intention is that documentUri refers only to documents/files, and not directories/folders, and this is why the WorkspaceFolder uses uri and not DocumentURI. So I will fix the validation to be consistent.",
+      "parentUuid": "ba0702a8_95d582a0",
+      "revId": "653f0b1fb9be30b35aba68a028e1fa467f07d247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ca92342c_ed669a05",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-11T08:31:43Z",
       "side": 1,
       "message": "I find myself in some tension here: in general Go errors start with lower case and don\u0027t contain newlines (or at least don\u0027t _finish_ with a newline). I\u0027m assuming that we\u0027re forming a user-facing error message here that does benefit from a more human-friendly format when presented individually though. I\u0027m wondering if it might be better to use some custom error type that presents both a Go-like error string _and_ a presentation-oriented string (potentially deriving the former from the latter). WDYT?",
+      "revId": "653f0b1fb9be30b35aba68a028e1fa467f07d247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14ce4126_9a1ae4b2",
+        "filename": "internal/golangorgx/gopls/server/workspace.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T11:41:20Z",
+      "side": 1,
+      "message": "For the moment, I\u0027m going to leave it as-is.\nI\u0027ve just done a pass over all the handlers to make sure they\u0027re being consistent about sending messages to the client when the handler is for an async message.\nCurrently, we tend to bail as soon as we encounter a single error. Indeed this \"folderErrs\" thing is the only place I know of where we accumulate several errors for the benefit of the user. In time, I imagine we might do this sort of thing more, and at that point it would make sense to introduce a UserErrorMessage type or similar. I think.",
+      "parentUuid": "ca92342c_ed669a05",
       "revId": "653f0b1fb9be30b35aba68a028e1fa467f07d247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4dd77fee_a222cc8c",
+        "filename": "internal/golangorgx/gopls/server/workspace.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T11:41:20Z",
+      "side": 1,
+      "message": "I think I\u0027ve decided it should be returned.",
+      "parentUuid": "2256085f_d39517ac",
+      "revId": "653f0b1fb9be30b35aba68a028e1fa467f07d247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bee375d4_ee8803e8",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-07-11T08:31:43Z",
       "side": 1,
       "message": "Similar comment as elsewhere: why bother with the waitgroup rather than:\n\n```\ndefer work.End(ctx, \"Done.\")\n```",
+      "revId": "653f0b1fb9be30b35aba68a028e1fa467f07d247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "394d0866_f9f91b94",
+        "filename": "internal/golangorgx/gopls/server/workspace.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-11T11:41:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bee375d4_ee8803e8",
       "revId": "653f0b1fb9be30b35aba68a028e1fa467f07d247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

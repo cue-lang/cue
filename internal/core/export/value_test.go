@@ -37,6 +37,7 @@ var exclude = map[string]string{
 }
 
 func TestValue(t *testing.T) {
+	t.Parallel()
 	const debugValue = `
 -- in.cue --
 if false {
@@ -57,6 +58,7 @@ if false {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
+		t.Parallel()
 		r := t.Runtime()
 		a := t.Instance()
 
@@ -70,7 +72,7 @@ if false {
 		ctx := eval.NewContext(r, v)
 		v.Finalize(ctx)
 
-		all := export.All
+		all := *export.All
 		all.ShowErrors = true
 
 		evalWithOptions := export.Profile{

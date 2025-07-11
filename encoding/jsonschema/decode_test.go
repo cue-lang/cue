@@ -67,12 +67,14 @@ import (
 // As a special case, when this is "openapi", OpenAPI extraction
 // mode is enabled.
 func TestDecode(t *testing.T) {
+	t.Parallel()
 	test := cuetxtar.TxTarTest{
 		Root:   "./testdata/txtar",
 		Name:   "decode",
 		Matrix: cuetdtest.FullMatrix,
 	}
 	test.Run(t, func(t *cuetxtar.Test) {
+		t.Parallel()
 		ctx := t.CueContext()
 
 		fsys, err := txtar.FS(t.Archive)
@@ -237,6 +239,7 @@ func TestDecode(t *testing.T) {
 }
 
 func TestDecodeCRD(t *testing.T) {
+	t.Parallel()
 	test := cuetxtar.TxTarTest{
 		Root:   "./testdata/txtar",
 		Name:   "decodeCRD",
@@ -246,6 +249,7 @@ func TestDecodeCRD(t *testing.T) {
 		if versStr, ok := t.Value("version"); !ok || versStr != "k8sCRD" {
 			t.Skip("test not relevant to CRDs")
 		}
+		t.Parallel()
 
 		ctx := t.CueContext()
 
@@ -308,6 +312,7 @@ func readSchema(ctx *cue.Context, fsys fs.FS) (cue.Value, error) {
 }
 
 func TestMapURL(t *testing.T) {
+	t.Parallel()
 	v := cuecontext.New().CompileString(`
 type: "object"
 properties: x: $ref: "https://something.test/foo#/definitions/blah"
@@ -355,6 +360,7 @@ cannot determine CUE location for JSON Schema location id=https://something.test
 }
 
 func TestMapRef(t *testing.T) {
+	t.Parallel()
 	v := cuecontext.New().CompileString(`
 type: "object"
 $id: "https://this.test"
@@ -400,6 +406,7 @@ x?: blah.#Foo.bar
 }
 
 func TestMapRefExternalRefForInternalSchema(t *testing.T) {
+	t.Parallel()
 	v := cuecontext.New().CompileString(`
 type: "object"
 $id: "https://this.test"

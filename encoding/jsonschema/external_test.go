@@ -49,6 +49,7 @@ const testDir = "testdata/external"
 // TestExternal runs the externally defined JSON Schema test suite,
 // as defined in https://github.com/json-schema-org/JSON-Schema-Test-Suite.
 func TestExternal(t *testing.T) {
+	t.Parallel()
 	tests, err := externaltest.ReadTestDir(testDir)
 	qt.Assert(t, qt.IsNil(err))
 
@@ -56,10 +57,12 @@ func TestExternal(t *testing.T) {
 	// t.Parallel and still guarantee that all tests have completed
 	// by the end.
 	cuetdtest.SmallMatrix.Run(t, "tests", func(t *testing.T, m *cuetdtest.M) {
+		t.Parallel()
 		// Run tests in deterministic order so we get some consistency between runs.
 		for _, filename := range slices.Sorted(maps.Keys(tests)) {
 			schemas := tests[filename]
 			t.Run(testName(filename), func(t *testing.T) {
+				t.Parallel()
 				for _, s := range schemas {
 					t.Run(testName(s.Description), func(t *testing.T) {
 						runExternalSchemaTests(t, m, filename, s)

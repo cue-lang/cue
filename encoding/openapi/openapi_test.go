@@ -33,6 +33,7 @@ var (
 )
 
 func TestGenerateOpenAPI(t *testing.T) {
+	t.Parallel()
 	test := cuetxtar.TxTarTest{
 		Root:   "./testdata",
 		Name:   t.Name(),
@@ -68,6 +69,7 @@ func TestGenerateOpenAPI(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
+		t.Parallel()
 		a := t.Instance()
 		ctx := t.CueContext()
 		v := ctx.BuildInstance(a)

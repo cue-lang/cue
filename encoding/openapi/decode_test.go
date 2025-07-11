@@ -49,6 +49,7 @@ import (
 //
 // Set CUE_UPDATE=1 to update test files with the corresponding output.
 func TestDecode(t *testing.T) {
+	t.Parallel()
 	err := filepath.WalkDir("testdata/script", func(fullpath string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -58,6 +59,7 @@ func TestDecode(t *testing.T) {
 		}
 
 		t.Run(fullpath, func(t *testing.T) {
+			t.Parallel()
 			a, err := txtar.ParseFile(fullpath)
 			if err != nil {
 				t.Fatal(err)

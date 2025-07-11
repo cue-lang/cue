@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfc2b4c0_8ef31bb8",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-11T12:03:20Z",
+      "side": 1,
+      "message": "```suggestion\n// UpdateOptions sets the folders options to opts. The caller\n// should not modify the contents of opts after calling this method.\n```",
+      "revId": "20d7c480838c317bd16b521b2f41a946686bcad0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69e6eda6_f57e3731",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-11T12:03:20Z",
+      "side": 1,
+      "message": "ha, this change doesn\u0027t make any difference from my p.o.v. - I was more thinking of a global-scope constant. But I don\u0027t care much at all.",
+      "revId": "20d7c480838c317bd16b521b2f41a946686bcad0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

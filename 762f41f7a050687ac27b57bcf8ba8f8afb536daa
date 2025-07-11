@@ -176,6 +176,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "68c38b78_adf771f7",
+        "filename": "internal/golangorgx/gopls/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-11T12:03:20Z",
+      "side": 1,
+      "message": "From my p.o.v., the UpdateFolderOptions API is much more justifiable, so LGTM.",
+      "parentUuid": "f08a4757_c6801adf",
+      "revId": "762f41f7a050687ac27b57bcf8ba8f8afb536daa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "646d52a1_eccb3ce7",

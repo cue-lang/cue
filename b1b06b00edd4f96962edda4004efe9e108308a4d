@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60b47a93_137f4c42",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-11T12:03:20Z",
+      "side": 1,
+      "message": "LGTM modulo a few extra minor nits, thanks!",
+      "revId": "b1b06b00edd4f96962edda4004efe9e108308a4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61bfdc34_76c21b5c",
+        "filename": "internal/golangorgx/gopls/cache/workspace.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-11T12:03:20Z",
+      "side": 1,
+      "message": "```suggestion\n\t// message with type debug.\n```",
+      "revId": "b1b06b00edd4f96962edda4004efe9e108308a4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

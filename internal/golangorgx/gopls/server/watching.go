@@ -21,8 +21,19 @@ import (
 	"path/filepath"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/golangorgx/gopls/util/maps"
 )
+
+func sameKeys[K comparable, V1, V2 any](x map[K]V1, y map[K]V2) bool {
+	if len(x) != len(y) {
+		return false
+	}
+	for k := range x {
+		if _, ok := y[k]; !ok {
+			return false
+		}
+	}
+	return true
+}
 
 // UpdateWatchedFiles compares the current set of directories to watch
 // with the previously registered set of directories. If the set of directories
@@ -37,7 +48,7 @@ func (s *server) UpdateWatchedFiles(ctx context.Context) error {
 	}
 
 	// Nothing to do if the set of workspace directories is unchanged.
-	if maps.SameKeys(s.watchedGlobPatterns, patterns) {
+	if sameKeys(s.watchedGlobPatterns, patterns) {
 		return nil
 	}
 

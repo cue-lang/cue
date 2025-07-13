@@ -7,7 +7,6 @@ cmp stdout expect-stdout
 run also
 run
 true
-
 SUCCESS
 -- after_tool.cue --
 package home
@@ -15,6 +14,7 @@ package home
 import (
 	"tool/exec"
 	"tool/cli"
+	"strconv"
 	"strings"
 )
 
@@ -26,24 +26,25 @@ top3: cli.Print & { text: "don't", $after: top2 }
 command: after: {
 	group: {
 		t1: exec.Run & {
-			cmd: ["sh", "-c", "sleep 2; date +%s"]
+			cmd: ["testcmd", "sleep_and_print", "100ms", "UNIX_MILLI"]
 			stdout: string
 			$after: top1
 		}
 		t2: exec.Run & {
-			cmd: ["sh", "-c", "date +%s"]
+			cmd: ["testcmd", "sleep_and_print", "0ms", "UNIX_MILLI"]
 			stdout: string
 			$after: t1
 		}
 	}
-	t3: exec.Run & {
-		cmd: ["sh", "-c", "a=\(strings.TrimSpace(group.t1.stdout));b=\(strings.TrimSpace(group.t2.stdout));if [ $a -le $b ]; then echo 'true'; fi"]
-		stdout: string
+	t3: cli.Print & {
+		text: strconv.FormatBool(
+			strconv.Atoi(strings.TrimSpace(group.t1.stdout)) <
+				strconv.Atoi(strings.TrimSpace(group.t2.stdout))
+			)
 	}
-	t4: cli.Print & { text: t3.stdout }
-	t5: cli.Print & {
+	t4: cli.Print & {
 		text: "SUCCESS"
-		$after: [ group, t4 ]
+		$after: [group, t3]
 	}
 }
 

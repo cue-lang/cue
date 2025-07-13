@@ -18,11 +18,11 @@ import (
 
 command: print: {
 	runs: t1: exec.Run & {
-		cmd: ["sh", "-c", "sleep 1; echo t1"]
+		cmd: ["testcmd", "sleep_and_print", "100ms", "t1"]
 		stdout: string
 	}
 	runs: t2: exec.Run & {
-		cmd: ["sh", "-c", "sleep 1; echo t2"]
+		cmd: ["testcmd", "sleep_and_print", "100ms", "t2"]
 		stdout: string
 	}
 	print: cli.Print & {

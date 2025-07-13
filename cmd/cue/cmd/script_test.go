@@ -528,10 +528,29 @@ func testCmd() {
 		}
 		check(fmt.Errorf("timed out waiting for %s to exist", toWait))
 	case "exitcode":
+		// Used to test various non-zero exit status codes.
 		if len(args) > 0 {
 			code, err := strconv.Atoi(args[0])
 			check(err)
 			os.Exit(code)
+		}
+	case "sleep_and_print":
+		// Used to test slow exec.Run commands in `cue cmd`.
+		// It sleeps a given [time.Duration] string, and then prints messages one per line.
+		// As a special case, the message UNIX_MILLI prints the current Unix time in milliseconds.
+		if len(args) < 1 {
+			check(fmt.Errorf("usage: sleep_and_print duration [msg...]\n"))
+		}
+		d, err := time.ParseDuration(args[0])
+		check(err)
+		time.Sleep(d)
+
+		for _, msg := range args[1:] {
+			if msg == "UNIX_MILLI" {
+				fmt.Println(time.Now().UTC().UnixMilli())
+			} else {
+				fmt.Println(msg)
+			}
 		}
 	default:
 		check(fmt.Errorf("unknown command: %q\n", cmd))

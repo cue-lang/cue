@@ -16,6 +16,24 @@
       "message": "I wonder why VisitLeafConjuncts isn\u0027t catching this already. If there\u0027s a good reason for that, perhaps leave a brief comment as a reminder?",
       "revId": "f7493adef2f2fe6f7a46179f22c10653cebd9991",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24c8490f_945d2780",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-14T13:26:53Z",
+      "side": 1,
+      "message": "It would seem that if a vertex\u0027s basevalue is a disjunction, it does follow that the disjunction appears in the vertex\u0027s conjuncts. As such, VisitLeafConjuncts doesn\u0027t find the disjunction or its branches.",
+      "parentUuid": "69fd2bca_291e530a",
+      "revId": "f7493adef2f2fe6f7a46179f22c10653cebd9991",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

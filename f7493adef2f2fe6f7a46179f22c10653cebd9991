@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69fd2bca_291e530a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-14T13:21:21Z",
+      "side": 1,
+      "message": "I wonder why VisitLeafConjuncts isn\u0027t catching this already. If there\u0027s a good reason for that, perhaps leave a brief comment as a reminder?",
+      "revId": "f7493adef2f2fe6f7a46179f22c10653cebd9991",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

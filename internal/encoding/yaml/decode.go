@@ -162,7 +162,7 @@ func (d *decoder) Decode() (ast.Expr, error) {
 		return nil, err
 	}
 	d.yamlNonEmpty = true
-	return d.extract(&yn)
+	return d.extract(&yn, true)
 }
 
 // Unmarshal parses a single YAML value to a CUE expression.
@@ -187,14 +187,14 @@ func Unmarshal(filename string, data []byte) (ast.Expr, error) {
 	return n, nil
 }
 
-func (d *decoder) extractNoAnchor(yn *yaml.Node) (ast.Expr, error) {
+func (d *decoder) extractNoAnchor(yn *yaml.Node, isTopLevel bool) (ast.Expr, error) {
 	switch yn.Kind {
 	case yaml.DocumentNode:
 		return d.document(yn)
 	case yaml.SequenceNode:
 		return d.sequence(yn)
 	case yaml.MappingNode:
-		return d.mapping(yn)
+		return d.mapping(yn, isTopLevel)
 	case yaml.ScalarNode:
 		return d.scalar(yn)
 	case yaml.AliasNode:
@@ -204,16 +204,16 @@ func (d *decoder) extractNoAnchor(yn *yaml.Node) (ast.Expr, error) {
 	}
 }
 
-func (d *decoder) extract(yn *yaml.Node) (ast.Expr, error) {
+func (d *decoder) extract(yn *yaml.Node, isTopLevel bool) (ast.Expr, error) {
 	d.addHeadCommentsToPending(yn)
 
 	var expr ast.Expr
 	var err error
 
 	if yn.Anchor == "" {
-		expr, err = d.extractNoAnchor(yn)
+		expr, err = d.extractNoAnchor(yn, isTopLevel)
 	} else {
-		expr, err = d.anchor(yn)
+		expr, err = d.anchor(yn, isTopLevel)
 	}
 
 	if err != nil {
@@ -347,7 +347,7 @@ func (d *decoder) document(yn *yaml.Node) (ast.Expr, error) {
 		return nil, d.posErrorf(yn, "yaml document nodes are meant to have one content node but have %d", n)
 	}
 
-	expr, err := d.extract(yn.Content[0])
+	expr, err := d.extract(yn.Content[0], true)
 	if err != nil {
 		return nil, err
 	}
@@ -394,7 +394,7 @@ func (d *decoder) sequence(yn *yaml.Node) (ast.Expr, error) {
 	closeSameLine := true
 	for _, c := range yn.Content {
 		d.forceNewline = multiline
-		elem, err := d.extract(c)
+		elem, err := d.extract(c, false)
 		if err != nil {
 			return nil, err
 		}
@@ -408,14 +408,14 @@ func (d *decoder) sequence(yn *yaml.Node) (ast.Expr, error) {
 	return list, nil
 }
 
-func (d *decoder) mapping(yn *yaml.Node) (ast.Expr, error) {
+func (d *decoder) mapping(yn *yaml.Node, isTopLevel bool) (ast.Expr, error) {
 	strct := &ast.StructLit{}
 	multiline := false
 	if len(yn.Content) > 0 {
 		multiline = yn.Line < yn.Content[len(yn.Content)-1].Line
 	}
 
-	if err := d.insertMap(yn, strct, multiline, false); err != nil {
+	if err := d.insertMap(yn, strct, multiline, false, isTopLevel); err != nil {
 		return nil, err
 	}
 	// TODO(mvdan): moving these positions above insertMap breaks a few tests, why?
@@ -428,7 +428,7 @@ func (d *decoder) mapping(yn *yaml.Node) (ast.Expr, error) {
 	return strct, nil
 }
 
-func (d *decoder) insertMap(yn *yaml.Node, m *ast.StructLit, multiline, mergeValues bool) error {
+func (d *decoder) insertMap(yn *yaml.Node, m *ast.StructLit, multiline, mergeValues bool, isTopLevel bool) error {
 	l := len(yn.Content)
 outer:
 	for i := 0; i < l; i += 2 {
@@ -459,7 +459,7 @@ outer:
 				f := decl.(*ast.Field)
 				name, _, err := ast.LabelName(f.Label)
 				if err == nil && name == key {
-					f.Value, err = d.extract(yv)
+					f.Value, err = d.extract(yv, false)
 					if err != nil {
 						return err
 					}
@@ -468,11 +468,18 @@ outer:
 			}
 		}
 
-		value, err := d.extract(yv)
+		value, err := d.extract(yv, false)
 		if err != nil {
 			return err
 		}
 		field.Value = value
+
+		if isTopLevel {
+			for _, field := range d.anchorFields {
+				m.Elts = append(m.Elts, &field)
+			}
+			d.anchorFields = nil
+		}
 
 		m.Elts = append(m.Elts, field)
 	}
@@ -482,9 +489,9 @@ outer:
 func (d *decoder) merge(yn *yaml.Node, m *ast.StructLit, multiline bool) error {
 	switch yn.Kind {
 	case yaml.MappingNode:
-		return d.insertMap(yn, m, multiline, true)
+		return d.insertMap(yn, m, multiline, true, false)
 	case yaml.AliasNode:
-		return d.insertMap(yn.Alias, m, multiline, true)
+		return d.insertMap(yn.Alias, m, multiline, true, false)
 	case yaml.SequenceNode:
 		// Step backwards as earlier nodes take precedence.
 		for _, c := range slices.Backward(yn.Content) {
@@ -706,7 +713,7 @@ func (d *decoder) inlineAlias(yn *yaml.Node) (ast.Expr, error) {
 	}
 	d.extractingAliases[yn] = true
 	var node ast.Expr
-	node, err := d.extractNoAnchor(yn.Alias)
+	node, err := d.extractNoAnchor(yn.Alias, false)
 	delete(d.extractingAliases, yn)
 	return node, err
 }
@@ -724,7 +731,7 @@ func (d *decoder) referenceAlias(yn *yaml.Node) (ast.Expr, error) {
 	}, nil
 }
 
-func (d *decoder) anchor(yn *yaml.Node) (ast.Expr, error) {
+func (d *decoder) anchor(yn *yaml.Node, isTopLevel bool) (ast.Expr, error) {
 	var anchorIdent string
 
 	// Pick a non-conflicting anchor name.
@@ -744,7 +751,7 @@ func (d *decoder) anchor(yn *yaml.Node) (ast.Expr, error) {
 	// Process the node itself, but don't put it into the AST just yet,
 	// store it for later to be used as an anchor identifier.
 	pos := d.pos(yn)
-	expr, err := d.extractNoAnchor(yn)
+	expr, err := d.extractNoAnchor(yn, isTopLevel)
 	if err != nil {
 		return nil, err
 	}

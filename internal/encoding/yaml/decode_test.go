@@ -475,8 +475,8 @@ Null: 1
 	{
 		"a: &x 1\nb: &y 2\nc: *x\nd: *y\n",
 		`#x: 1
-#y: 2
 a:  #x
+#y: 2
 b:  #y
 c:  #x
 d:  #y`,
@@ -820,9 +820,9 @@ a:
 	{
 		"First occurrence: &anchor Foo\nSecond occurrence: *anchor\nOverride anchor: &anchor Bar\nReuse anchor: *anchor\n",
 		`#anchor:             "Foo"
-#anchor_2:           "Bar"
 "First occurrence":  #anchor
 "Second occurrence": #anchor
+#anchor_2:           "Bar"
 "Override anchor":   #anchor_2
 "Reuse anchor":      #anchor_2`,
 	},

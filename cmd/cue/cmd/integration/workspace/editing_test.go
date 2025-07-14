@@ -17,6 +17,8 @@ language: version: "v0.11.0"
 -- a/a.cue --
 package a
 
+import "strings"
+
 v1: int
 
 -- a/d/d.cue --
@@ -46,11 +48,14 @@ v3: a.v1
 			)
 			env.OpenFile("a/a.cue")
 			env.Await(
+				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Reloaded", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 For file %v/a/a.cue found [Package dir=%v/a importPath=mod.example/x/a@v0]", rootURI, rootURI, rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/a@v0]", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dir=%v/a importPath=mod.example/x/a@v0", rootURI, rootURI),
+				// We do not load stdlib packages
+				NoLogExactf(protocol.Debug, "module=mod.example/x@v0 Loaded Package dir= importPath=strings"),
 			)
 		})
 	})
@@ -63,6 +68,7 @@ v3: a.v1
 			)
 			env.OpenFile("b/c/c.cue")
 			env.Await(
+				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Reloaded", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 For file %v/b/c/c.cue found [Package dir=%v/b/c importPath=mod.example/x/b/c@v0:b]", rootURI, rootURI, rootURI),
@@ -82,6 +88,7 @@ v3: a.v1
 			// disk, but has not been opened in the editor.
 			env.WriteWorkspaceFile("b/b.cue", "package b\n\nv2: int\n")
 			env.Await(
+				env.DoneWithChangeWatchedFiles(),
 				LogExactf(protocol.Debug, 2, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/b/c@v0:b]", rootURI),
 				LogExactf(protocol.Debug, 2, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dir=%v/b/c importPath=mod.example/x/b/c@v0:b", rootURI, rootURI),
 				// We still do not load the parent/same package
@@ -98,6 +105,7 @@ v3: a.v1
 			)
 			env.OpenFile("b/c/c.cue")
 			env.Await(
+				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Reloaded", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 For file %v/b/c/c.cue found [Package dir=%v/b/c importPath=mod.example/x/b/c@v0:b]", rootURI, rootURI, rootURI),
@@ -111,6 +119,7 @@ v3: a.v1
 			// a.cue, we should see a reload of x/a and x/b/c:b
 			env.WriteWorkspaceFile("a/a.cue", "package a\n\nv1: string\n")
 			env.Await(
+				env.DoneWithChangeWatchedFiles(),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/a@v0 mod.example/x/b/c@v0:b]", rootURI),
 				LogExactf(protocol.Debug, 2, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dir=%v/a importPath=mod.example/x/a@v0", rootURI, rootURI),
 				LogExactf(protocol.Debug, 2, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dir=%v/b/c importPath=mod.example/x/b/c@v0:b", rootURI, rootURI),
@@ -123,6 +132,7 @@ v3: a.v1
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.OpenFile("b/b.cue")
 			env.Await(
+				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 For file %v/b/b.cue found [Package dir=%v/b importPath=mod.example/x/b@v0]", rootURI, rootURI, rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/b@v0]", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dir=%v/b importPath=mod.example/x/b@v0", rootURI, rootURI),
@@ -132,6 +142,7 @@ v3: a.v1
 			// Now open the child/same package
 			env.OpenFile("b/c/c.cue")
 			env.Await(
+				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 For file %v/b/c/c.cue found [Package dir=%v/b/c importPath=mod.example/x/b/c@v0:b]", rootURI, rootURI, rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/b/c@v0:b]", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dir=%v/b/c importPath=mod.example/x/b/c@v0:b", rootURI, rootURI),
@@ -140,6 +151,7 @@ v3: a.v1
 			// package from "b" to "bz"
 			env.EditBuffer("b/b.cue", fake.NewEdit(0, 9, 0, 9, "z"))
 			env.Await(
+				env.DoneWithChange(),
 				// We should see a single reload of both existing packages:
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/b/c@v0:b mod.example/x/b@v0]", rootURI),
 				// The load of mod.example/x/b@v0 will have failed, so we should see a new pkg search for b.cue:
@@ -151,6 +163,7 @@ v3: a.v1
 			// A further edit of b/b.cue should now cause package x/b:bz to be reloaded, but x/b/c:b does not get reloaded:
 			env.EditBuffer("b/b.cue", fake.NewEdit(2, 0, 2, 0, "w"))
 			env.Await(
+				env.DoneWithChange(),
 				// Now 2 loads of x/b:bz
 				LogExactf(protocol.Debug, 2, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/b@v0:bz]", rootURI),
 				LogExactf(protocol.Debug, 2, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dir=%v/b importPath=mod.example/x/b@v0:bz", rootURI, rootURI),
@@ -165,12 +178,14 @@ v3: a.v1
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.OpenFile("a/a.cue")
 			env.Await(
+				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 For file %v/a/a.cue found [Package dir=%v/a importPath=mod.example/x/a@v0]", rootURI, rootURI, rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/a@v0]", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dir=%v/a importPath=mod.example/x/a@v0", rootURI, rootURI),
 			)
 			env.OpenFile("a/d/d.cue")
 			env.Await(
+				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 For file %v/a/d/d.cue found [Package dir=%v/a/d importPath=mod.example/x/a/d@v0:e]", rootURI, rootURI, rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/a/d@v0:e]", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dir=%v/a/d importPath=mod.example/x/a/d@v0:e", rootURI, rootURI),
@@ -179,6 +194,7 @@ v3: a.v1
 			// become the same package as a/d/d.cue
 			env.EditBuffer("a/a.cue", fake.NewEdit(0, 8, 0, 9, "e"))
 			env.Await(
+				env.DoneWithChange(),
 				// We should first see a reload of x/a, which will fail.
 				LogExactf(protocol.Debug, 2, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/a@v0]", rootURI),
 				// There'll then be a new search and it should find both packages.

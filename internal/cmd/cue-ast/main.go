@@ -58,6 +58,11 @@ See 'cue help inputs' as well.
 		flag.Usage()
 		os.Exit(1)
 	}
+	lcfg := &load.Config{
+		// cue-ast only cares about syntax trees; loading the imports just causes
+		// extra work and may lead to errors we don't care about.
+		SkipImports: true,
+	}
 	name, args := os.Args[1], os.Args[2:]
 	switch name {
 	case "print":
@@ -96,7 +101,7 @@ See 'cue help inputs' as well.
 		// more clearly separating the AST for each file?
 		// [ast.File.Filename] already has the full filename,
 		// but as one of the first fields it's not a great separator.
-		insts := load.Instances(flag.Args(), &load.Config{})
+		insts := load.Instances(flag.Args(), lcfg)
 		for _, inst := range insts {
 			if err := inst.Err; err != nil {
 				log.Fatal(errors.Details(err, nil))
@@ -112,7 +117,7 @@ See 'cue help inputs' as well.
 
 		var jointImports []*ast.ImportSpec
 		var jointFields []ast.Decl
-		insts := load.Instances(flag.Args(), &load.Config{})
+		insts := load.Instances(flag.Args(), lcfg)
 		if len(insts) != 1 {
 			log.Fatal("joining multiple instances is not possible yet")
 		}

@@ -1391,12 +1391,20 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 	match := op != EqualOp // non-error case
 
 	c.inValidator++
-	// Note that evalState may call yield, so we need to balance the counter
-	// with a defer.
-	defer func() { c.inValidator-- }()
+	// NOTE: https://cuelang.org/cl/1208898 broke an evalv2 user on Unity.
+	// For the time being, reverting the change just for evalv2 allows them
+	// to continue using the old evaluator on the latest CUE version.
+	if c.isDevVersion() {
+		// Note that evalState may call yield, so we need to balance the counter
+		// with a defer.
+		defer func() { c.inValidator-- }()
+	}
 	req := flags
 	req = final(state, needTasksDone)
 	v := c.evalState(x, req)
+	if !c.isDevVersion() {
+		c.inValidator--
+	}
 	u, _ := c.getDefault(v)
 	u = Unwrap(u)
 

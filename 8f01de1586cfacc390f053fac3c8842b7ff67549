@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d28aac13_842e6aeb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-14T14:45:45Z",
+      "side": 1,
+      "message": "Perhaps you want e.g. FromMainModule as \"not from an external module AND not from the standard library\".",
+      "revId": "8f01de1586cfacc390f053fac3c8842b7ff67549",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9ac43f55_7d9fcfba",
         "filename": "cmd/cue/cmd/integration/workspace/editing_test.go",
         "patchSetId": 1
@@ -14,6 +31,24 @@
       "writtenOn": "2025-07-14T14:41:11Z",
       "side": 1,
       "message": "I was trying to provoke the NoLogExactf expectation to fail, but the test was unexpectedly passing. It became clear to me that I needed to add a number of these \"DoneWith...\" calls otherwise the expectations were being met far too quickly - essentially racing with the LSP server. The \"DoneWith...\" calls make the (fake)client/editor wait for processing to be finished, at which point the negative expectations actually make sense (and in this case, the NoLogExactf would fail without this fix).",
+      "revId": "8f01de1586cfacc390f053fac3c8842b7ff67549",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8924002_178a9219",
+        "filename": "cmd/cue/cmd/integration/workspace/editing_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-14T14:45:45Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9ac43f55_7d9fcfba",
       "revId": "8f01de1586cfacc390f053fac3c8842b7ff67549",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

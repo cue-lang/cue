@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9fb19a6_26128d9c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-14T14:52:31Z",
+      "side": 1,
+      "message": "Indeed. If I find myself repeating this test, I\u0027ll abstract it out.",
+      "parentUuid": "d28aac13_842e6aeb",
+      "revId": "8f01de1586cfacc390f053fac3c8842b7ff67549",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ac43f55_7d9fcfba",

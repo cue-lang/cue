@@ -536,6 +536,16 @@ func (t *trimmerV3) findDisjunctions(v *adt.Vertex) {
 			v, v.Kind(), v.BaseValue, v.BaseValue)
 		t.inc()
 
+		if disj, ok := v.BaseValue.(*adt.Disjunction); ok {
+			t.logf("found disjunction in basevalue")
+			for i, val := range disj.Values {
+				t.logf("branch %d", i)
+				if v, ok := val.(*adt.Vertex); ok {
+					branches = append(branches, v)
+				}
+			}
+		}
+
 		v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 			switch disj := c.Elem().(type) {
 			case *adt.Disjunction:

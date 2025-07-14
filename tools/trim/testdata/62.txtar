@@ -1,0 +1,46 @@
+Disjunctions. Even if the disjunction is within an explicit
+unification, we need to discover the disjunction and make sure we
+ignore all its content so that it cannot "win" over some discriminator
+field. See also 63.
+
+Note that v2 gets this wrong.
+
+-- a.cue --
+#a: x: int
+#b: ({x: 5} | {x: 7}) & #a
+out: #b & {x: 5}
+-- out/trim-v3 --
+== a.cue
+#a: x: int
+#b: ({x: 5} | {x: 7}) & #a
+out: #b & {x: 5}
+-- diff/-out/trim-v3<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,4 @@
+ == a.cue
+ #a: x: int
+ #b: ({x: 5} | {x: 7}) & #a
+-out: #b & {}
++out: #b & {x: 5}
+-- out/trim-v3-noshare --
+== a.cue
+#a: x: int
+#b: ({x: 5} | {x: 7}) & #a
+out: #b & {x: 5}
+-- diff/-out/trim-v3-noshare<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,4 @@
+ == a.cue
+ #a: x: int
+ #b: ({x: 5} | {x: 7}) & #a
+-out: #b & {}
++out: #b & {x: 5}
+-- out/trim --
+== a.cue
+#a: x: int
+#b: ({x: 5} | {x: 7}) & #a
+out: #b & {}

@@ -314,7 +314,7 @@ func (m *Module) ReloadPackages() error {
 	// within this module, we should track all of them.
 	pkgsImportsWorklist := make(map[*Package]*modpkgload.Package)
 	for _, loadedPkg := range loadedPkgs.All() {
-		if loadedPkg.FromExternalModule() {
+		if loadedPkg.FromExternalModule() || modpkgload.IsStdlibPackage(loadedPkg.ImportPath()) {
 			// Because we don't currently support "replace" in module.cue
 			// files, we cannot have one local module importing another
 			// local module. Therefore, there's no need to attempt to
@@ -491,7 +491,7 @@ func (m *Module) normalizeImportPath(importPath string) ast.ImportPath {
 	}
 
 	ip := ast.ParseImportPath(importPath).Canonical()
-	if ip.Version != "" {
+	if ip.Version != "" || modpkgload.IsStdlibPackage(importPath) {
 		return ip
 	}
 

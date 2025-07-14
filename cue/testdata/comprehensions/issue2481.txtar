@@ -71,11 +71,11 @@ full: {
 	}
 }
 -- out/eval/stats --
-Leaks:  2
-Freed:  24
+Leaks:  3
+Freed:  23
 Reused: 17
 Allocs: 9
-Retain: 57
+Retain: 58
 
 Unifications: 26
 Conjuncts:    50

@@ -181,6 +181,11 @@ type OpContext struct {
 	// instance when comparing against bottom.
 	inValidator int
 
+	// inChainedClause indicates that we are currently evaluating a chained
+	// comprehension clause (not the first clause in a comprehension). This
+	// is used to relax cycle detection for chained clauses.
+	inChainedClause int
+
 	// The current call is a validator. A builtin may return a boolean false
 	// along with an error message describing a validation error. If the latter
 	// is wrapped in an internal.ValidationError, it will only be interpreted
@@ -402,6 +407,24 @@ func (c *OpContext) PopState(s frame) *Bottom {
 	c.src = s.src
 	c.ci = s.ci
 	return err
+}
+
+// PushChainedClause marks the beginning of a chained comprehension clause
+// evaluation context, which relaxes cycle detection.
+func (c *OpContext) PushChainedClause() {
+	c.inChainedClause++
+}
+
+// PopChainedClause marks the end of a chained comprehension clause evaluation
+// context.
+func (c *OpContext) PopChainedClause() {
+	c.inChainedClause--
+}
+
+// IsInChainedClause returns true if we are currently evaluating a chained
+// comprehension clause (not the first clause in a comprehension).
+func (c *OpContext) IsInChainedClause() bool {
+	return c.inChainedClause > 0
 }
 
 // PushArc signals c that arc v is currently being processed for the purpose

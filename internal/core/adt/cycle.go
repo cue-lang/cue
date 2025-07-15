@@ -802,7 +802,7 @@ func (n *nodeContext) hasAncestorV3(arc *Vertex) bool {
 
 func (n *nodeContext) hasOnlyCyclicConjuncts() bool {
 	return (n.hasAncestorCycle && !n.hasNonCycle) ||
-		(n.hasAnyCyclicConjunct && !n.hasNonCyclic)
+		(n.hasAnyCyclicConjunct && !n.hasNonCyclic && !n.ctx.IsInChainedClause())
 }
 
 // setOptionalV3 marks a conjunct as being optional. The nodeContext is

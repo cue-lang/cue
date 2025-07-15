@@ -43,8 +43,6 @@ Errors:
 conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
     ./in.cue:9:5
     ./in.cue:9:28
-structural cycle:
-    ./in.cue:9:24
 
 Result:
 (_|_){
@@ -66,8 +64,6 @@ Result:
         // [eval] conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
         //     ./in.cue:9:5
         //     ./in.cue:9:28
-        // structural cycle:
-        //     ./in.cue:9:24
         0: (_){ _ }
       }
     }

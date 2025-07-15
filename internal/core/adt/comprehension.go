@@ -341,6 +341,15 @@ func (s *compState) yield(env *Environment) (ok bool) {
 	dst := s.comp.Clauses[s.i]
 	saved := c.PushState(env, dst.Source())
 
+	// For chained comprehension clauses in dev version, we need to be more
+	// permissive about cycle detection. Mark this as a chained clause context
+	// to allow the clause yielder to handle cycles more appropriately.
+	isChainedClause := s.i > 0
+	if isChainedClause && c.isDevVersion() {
+		c.PushChainedClause()
+		defer c.PopChainedClause()
+	}
+
 	s.i++
 	dst.yield(s)
 	s.i--

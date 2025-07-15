@@ -107,6 +107,58 @@ Y: x: {
 		if true { M: {} }
 	}
 }
+-- issue3940.cue --
+// Test chained comprehension clauses (without braces)
+issue3940: reduced: {
+	X
+	a: b: X
+	a: b: a: b: {y: X}
+
+	X: {
+		a: {}
+
+		objects: {
+			for v in a
+			for _ in ({} & v).objects {
+			}
+		}
+	}
+}
+
+// Test nested comprehensions (with braces) - should work as before
+issue3940: reduced: {
+	X
+	a: b: X
+	a: b: a: b: {y: X}
+
+	X: {
+		a: {}
+
+		objects: {
+			for v in a
+			for _ in ({} & v).objects {
+			}
+		}
+	}
+}
+
+issue3940: let: {
+	X
+	a: b: X
+	a: b: a: b: {y: X}
+
+	X: {
+		a: {}
+
+		objects: {
+			for v in a
+			let x = ({} & v)
+			for _ in x.objects {
+			}
+		}
+	}
+}
+
 -- out/evalalpha/stats --
 Leaks:  1
 Freed:  49

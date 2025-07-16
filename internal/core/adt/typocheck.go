@@ -612,7 +612,7 @@ func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) boo
 			continue
 		}
 
-		if !hasEvidenceForOne(a, i, conjuncts) {
+		if !n.hasEvidenceForOne(a, i, conjuncts) {
 			if n.ctx.LogEval > 0 {
 				n.Logf("DENIED BY %d", a[i].id)
 			}
@@ -624,14 +624,12 @@ func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) boo
 
 // hasEvidenceForOne reports whether a single typo-checked set has evidence for
 // any of its defIDs.
-func hasEvidenceForOne(all reqSets, i uint32, conjuncts []conjunctInfo) bool {
+func (n *nodeContext) hasEvidenceForOne(all reqSets, i uint32, conjuncts []conjunctInfo) bool {
 	a := all[i : i+all[i].size]
 
-	for _, c := range conjuncts {
-		for _, ri := range a {
-			if c.id == ri.id {
-				return true
-			}
+	for _, x := range conjuncts {
+		if n.containsDefID(requirement(a), x.id) {
+			return true
 		}
 	}
 
@@ -649,11 +647,9 @@ func hasEvidenceForOne(all reqSets, i uint32, conjuncts []conjunctInfo) bool {
 
 outer:
 	for _, c := range conjuncts {
-		for _, x := range embedScope {
-			if x.id == c.embed {
-				// Within the scope of the embedding.
-				continue outer
-			}
+		if n.containsDefID(requirement(embedScope), c.embed) {
+			// Within the scope of the embedding.
+			continue outer
 		}
 
 		if len(outerScope) == 0 || a[0].parent == 0 {
@@ -663,10 +659,17 @@ outer:
 		// If this conjunct is within the outer struct, but outside the
 		// embedding scope, this means it was "added" and we do not have
 		// to verify it within the embedding scope.
-		for _, x := range outerScope {
-			if x.id == c.id {
-				return true
-			}
+		if n.containsDefID(requirement(outerScope), c.id) {
+			return true
+		}
+	}
+	return false
+}
+
+func (n *nodeContext) containsDefID(node requirement, child defID) bool {
+	for _, ri := range node {
+		if child == ri.id {
+			return true
 		}
 	}
 	return false
@@ -957,10 +960,8 @@ outer:
 	if allowedInClosed(v.Label) {
 		n.filterSets(&a, func(n *nodeContext, a requirement) bool {
 			for _, c := range n.conjunctInfo {
-				for _, e := range a {
-					if c.id == e.id {
-						return true // keep the set
-					}
+				if n.containsDefID(requirement(a), c.id) {
+					return true // keep the set
 				}
 			}
 			return false // discard the set
@@ -986,10 +987,7 @@ func (n *nodeContext) filterTop(a *reqSets, conjuncts, parentConjuncts []conjunc
 		var f conjunctFlags
 		hasAny := false
 		for _, c := range conjuncts {
-			for _, e := range a {
-				if e.id != c.id {
-					continue
-				}
+			if n.containsDefID(requirement(a), c.id) {
 				hasAny = true
 				flags := c.flags
 				if c.id < a[0].id {
@@ -1020,10 +1018,8 @@ func hasParentEllipsis(n *nodeContext, a requirement, conjuncts []conjunctInfo) 
 		if !c.flags.hasEllipsis() {
 			continue
 		}
-		for _, e := range a {
-			if e.id == c.id {
-				return true
-			}
+		if n.containsDefID(requirement(a), c.id) {
+			return true
 		}
 	}
 	return false

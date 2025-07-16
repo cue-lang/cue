@@ -23,7 +23,7 @@ installGo: {
 		name: "Install Go"
 		uses: "actions/setup-go@v5"
 		with: {
-			// We do our own caching in setupGoActionsCaches.
+			// We do our own caching in setupCaches.
 			cache:        false
 			"go-version": string
 		}
@@ -148,12 +148,14 @@ curlGitHubAPI: {
 	"""#
 }
 
-setupGoActionsCaches: [
+setupCaches: [
 	// Our runner profiles on Namespace are already configured to only update
 	// the cache when they run from one of the protected branches.
 	// We cache for Go (GOCACHE and GOMODCACHE) and for staticcheck,
 	// noting that staticcheck-action puts STATICCHECK_CACHE under runner.temp.
 	githubactions.#Step & {
+		// We skip the cache entirely on the nightly runs, to catch flakes.
+		if: "github.event_name != 'schedule' && matrix.runner != '\(windowsMachine)'"
 		uses: "namespacelabs/nscloud-cache-action@v1"
 		with: {
 			cache: "go"

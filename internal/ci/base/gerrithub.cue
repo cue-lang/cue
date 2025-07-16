@@ -12,9 +12,13 @@ import (
 // trybotWorkflows is a template for trybot-based repos
 trybotWorkflows: {
 	(trybot.key): githubactions.#Workflow & {
-		// Triggering a trybot job via a workflow_dispatch can be a useful way
-		// to manually or automatically start a job without needing to git push.
-		on: workflow_dispatch: {}
+		on: {
+			// Run nightly at 2am UTC without a cache to catch flakes.
+			schedule: [{cron: "0 2 * * *"}]
+			// Triggering a trybot job via a workflow_dispatch can be a useful way
+			// to manually or automatically start a job without needing to git push.
+			workflow_dispatch: {}
+		}
 	}
 	"\(trybot.key)_dispatch":    trybotDispatchWorkflow
 	"push_tip_to_\(trybot.key)": pushTipToTrybotWorkflow

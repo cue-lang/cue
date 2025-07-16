@@ -217,7 +217,7 @@ func (v *Vertex) insertConjunct(ctx *OpContext, c Conjunct, id CloseInfo, mode A
 		// be possible that different Vertices refer to the same conjuncts. In
 		// this case, we need to ensure that the current defID also considers
 		// the ID associated with the original insertion in its set.
-		n.addReplacement(replaceID{from: id.defID, to: srcRef, add: true})
+		n.addReplacement(replaceID{from: id.defID, to: srcRef})
 	}
 
 	if v.isInProgress() {

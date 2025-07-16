@@ -450,9 +450,6 @@ func (m *mermaidContext) vertexInfo(vc *mermaidVertex, recursive bool) {
 				indentOnNewline(node, 3)
 				dropID := fmt.Sprintf("%s_drop_%d", m.vertexID(v), i)
 				flags := ""
-				if r.add {
-					flags = "+"
-				}
 				fmt.Fprintf(node, "%s((%d->%d%s))\n", dropID, r.from, r.to, flags)
 			}
 			indentOnNewline(node, 2)

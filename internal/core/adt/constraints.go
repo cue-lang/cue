@@ -104,7 +104,7 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 				src := x.CloseInfo.defID
 				dst := c.CloseInfo.defID
 				found = true
-				n.addReplacement(replaceID{from: dst, to: src, add: true})
+				n.addReplacement(replaceID{from: dst, to: src})
 				return false
 			}
 			return true

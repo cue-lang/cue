@@ -88,6 +88,8 @@ Unifications: 60
 Conjuncts:    120
 Disjuncts:    78
 
+MisalignedConjunct: 2
+
 NumCloseIDs: 3
 -- out/run/t2 --
 graph TD
@@ -124,6 +126,8 @@ Unifications: 61
 Conjuncts:    127
 Disjuncts:    79
 
+MisalignedConjunct: 2
+
 NumCloseIDs: 3
 -- out/run/stats/totals --
 Leaks:  0
@@ -135,5 +139,7 @@ Retain: 10
 Unifications: 121
 Conjuncts:    247
 Disjuncts:    157
+
+MisalignedConjunct: 4
 
 NumCloseIDs: 6

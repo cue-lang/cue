@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9dc3d4b1_8cf5beab",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-16T14:22:42Z",
+      "side": 1,
+      "message": "These are _definitely_ superfluous.",
+      "revId": "0b9a143b13d54273acb70fece374ad42b00e52d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

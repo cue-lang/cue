@@ -26,65 +26,13 @@ func TestReplaceIDs(t *testing.T) {
 		replace  []replaceID
 		expected reqSets
 	}{{
-		name: "replace single set",
-		reqSets: reqSets{
-			{id: 1, size: 1},
-		},
-		replace: []replaceID{
-			{from: 1, to: 2},
-		},
-		// The group was already added as a requirement, so the original group
-		// should be deleted.
-		expected: reqSets{},
-	}, {
 		name: "empty result",
 		reqSets: reqSets{
 			{id: 1, size: 1},
 		},
 		replace: []replaceID{
-			{from: 1, to: deleteID, add: true},
+			{from: 1, to: deleteID},
 		},
-	}, {
-		name: "replace first set",
-		reqSets: reqSets{
-			{id: 1, size: 2},
-			{id: 2},
-			{id: 3, size: 2},
-			{id: 4},
-		},
-		replace: []replaceID{
-			{from: 1, to: 5},
-		},
-		expected: reqSets{
-			{id: 3, size: 2},
-			{id: 4},
-		},
-	}, {
-		name: "replace last set",
-		reqSets: reqSets{
-			{id: 1, size: 2},
-			{id: 2},
-			{id: 3, size: 2},
-			{id: 4},
-		},
-		replace: []replaceID{
-			{from: 3, to: 5},
-		},
-		expected: reqSets{
-			{id: 1, size: 2},
-			{id: 2},
-		},
-	}, {
-		name: "replace multiple ids",
-		reqSets: reqSets{
-			{id: 1, size: 1},
-			{id: 2, size: 1},
-		},
-		replace: []replaceID{
-			{from: 1, to: 3},
-			{from: 2, to: 4},
-		},
-		expected: reqSets{},
 	}, {
 		name: "replace with zero id",
 		reqSets: reqSets{
@@ -141,7 +89,7 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 1, size: 1},
 		},
 		replace: []replaceID{
-			{from: 1, to: 2, add: true},
+			{from: 1, to: 2},
 		},
 		expected: reqSets{
 			{id: 1, size: 2},
@@ -154,8 +102,8 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 3, size: 1},
 		},
 		replace: []replaceID{
-			{from: 3, to: 4, add: true},
-			{from: 1, to: 2, add: true},
+			{from: 3, to: 4},
+			{from: 1, to: 2},
 		},
 		expected: reqSets{
 			{id: 1, size: 2},
@@ -167,7 +115,7 @@ func TestReplaceIDs(t *testing.T) {
 		name:    "add new id to empty set",
 		reqSets: reqSets{},
 		replace: []replaceID{
-			{from: 0, to: 1, add: true},
+			{from: 0, to: 1},
 		},
 		expected: reqSets{},
 	}, {
@@ -176,7 +124,7 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 1, size: 1},
 		},
 		replace: []replaceID{
-			{from: 2, to: 3, add: true},
+			{from: 2, to: 3},
 		},
 		expected: reqSets{
 			{id: 1, size: 1},
@@ -188,7 +136,7 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 3, size: 1},
 		},
 		replace: []replaceID{
-			{from: 1, to: 2, add: true},
+			{from: 1, to: 2},
 			{from: 1, to: deleteID},
 		},
 		expected: reqSets{
@@ -202,7 +150,7 @@ func TestReplaceIDs(t *testing.T) {
 		},
 		replace: []replaceID{
 			{from: 1, to: deleteID},
-			{from: 1, to: 2, add: true},
+			{from: 1, to: 2},
 		},
 		expected: reqSets{
 			{id: 3, size: 1},
@@ -215,9 +163,9 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 1},
 		},
 		replace: []replaceID{
-			{from: 1, to: 2, add: true},
-			{from: 2, to: 3, add: true},
-			{from: 3, to: 4, add: true},
+			{from: 1, to: 2},
+			{from: 2, to: 3},
+			{from: 3, to: 4},
 		},
 		expected: reqSets{
 			{id: 1, size: 4},
@@ -236,9 +184,9 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 1, size: 1},
 		},
 		replace: []replaceID{
-			{from: 1, to: 3, add: true},
-			{from: 2, to: 1, add: true},
-			{from: 3, to: 2, add: true},
+			{from: 1, to: 3},
+			{from: 2, to: 1},
+			{from: 3, to: 2},
 		},
 		expected: reqSets{
 			{id: 4, size: 1},
@@ -256,9 +204,9 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 1},
 		},
 		replace: []replaceID{
-			{from: 1, to: 3, add: true},
-			{from: 2, to: 1, add: true},
-			{from: 3, to: 2, add: true},
+			{from: 1, to: 3},
+			{from: 2, to: 1},
+			{from: 3, to: 2},
 		},
 		expected: reqSets{
 			{id: 1, size: 3},
@@ -270,47 +218,6 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 2},
 		},
 	}, {
-		name: "add and drop",
-		reqSets: reqSets{
-			// A main group needs to be fully deleted in case of a replacement.
-			// This corresponds to that #B can be dropped as a requirement
-			// for `c` in `#B: c: #A` when replacing it with #A.
-			{id: 1, size: 1}, // add to this set.
-			{id: 2, size: 2}, // drop this set.
-			// A replacement of an equivalent id should just add the new id.
-			// This corresponds to embeddings being additive.
-			{id: 1},
-		},
-		replace: []replaceID{
-			// A main group needs to be fully deleted in case of a replacement.
-			// This corresponds to that #B can be dropped as a requirement
-			// for `c` in `#B: c: #A` when replacing it with #A.
-			{from: 1, to: 3, add: true},
-			// A replacement of an equivalent id should just add the new id.
-			// This corresponds to embeddings being additive.
-			{from: 2, to: 3},
-		},
-		expected: reqSets{
-			{id: 1, size: 2},
-			{id: 3},
-		},
-	}, {
-		name: "drop and add",
-		reqSets: reqSets{
-			{id: 1, size: 1},
-			{id: 2, size: 2},
-			{id: 1},
-		},
-		replace: []replaceID{
-			{from: 1, to: 3},
-			{from: 1, to: 3, add: true},
-		},
-		expected: reqSets{
-			{id: 2, size: 3},
-			{id: 1},
-			{id: 3},
-		},
-	}, {
 		name: "cycle",
 		reqSets: []reqSet{
 			{id: 1, size: 1},
@@ -319,11 +226,11 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 4, size: 1, embed: 2},
 		},
 		replace: []replaceID{
-			{from: 1, to: 2, add: true}, // , headOnly: true},
-			{from: 2, to: 3, add: true},
-			{from: 2, to: 4, add: true},
-			{from: 3, to: 1, add: true},
-			{from: 4, to: 1, add: true},
+			{from: 1, to: 2}, // , headOnly: true},
+			{from: 2, to: 3},
+			{from: 2, to: 4},
+			{from: 3, to: 1},
+			{from: 4, to: 1},
 		},
 		expected: reqSets{
 			{id: 1, size: 4},
@@ -345,9 +252,9 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 3, size: 1, embed: 2},
 		},
 		replace: []replaceID{
-			{from: 1, to: 2, add: true},
-			{from: 2, to: 3, add: true},
-			{from: 3, to: 1, add: true},
+			{from: 1, to: 2},
+			{from: 2, to: 3},
+			{from: 3, to: 1},
 		},
 		expected: reqSets{
 			{id: 3, size: 2, embed: 2},
@@ -362,11 +269,11 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 8, size: 1, embed: 6},
 		},
 		replace: []replaceID{
-			{from: 5, to: 6, add: true},
-			{from: 6, to: 7, add: true},
-			{from: 6, to: 8, add: true},
-			{from: 7, to: 0, add: true},
-			{from: 8, to: 0, add: true},
+			{from: 5, to: 6},
+			{from: 6, to: 7},
+			{from: 6, to: 8},
+			{from: 7, to: 0},
+			{from: 8, to: 0},
 		},
 		expected: reqSets{
 			{id: 5, size: 4},
@@ -389,12 +296,12 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 9, size: 1, embed: 7},
 		},
 		replace: []replaceID{
-			{from: 5, to: 6, add: true},
-			{from: 6, to: 7, add: true},
-			{from: 7, to: 8, add: true},
-			{from: 7, to: 9, add: true},
-			{from: 8, to: 6, add: true},
-			{from: 9, to: 6, add: true},
+			{from: 5, to: 6},
+			{from: 6, to: 7},
+			{from: 7, to: 8},
+			{from: 7, to: 9},
+			{from: 8, to: 6},
+			{from: 9, to: 6},
 		},
 		expected: reqSets{
 			{id: 5, size: 5},
@@ -427,16 +334,16 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 14, size: 1, embed: 10},
 		},
 		replace: []replaceID{
-			{from: 8, to: 9, add: true},
-			{from: 8, to: 10, add: true},
-			{from: 9, to: 11, add: true},
-			{from: 11, to: 8, add: true},
-			{from: 9, to: 12, add: true},
-			{from: 12, to: 8, add: true},
-			{from: 10, to: 13, add: true},
-			{from: 13, to: 8, add: true},
-			{from: 10, to: 14, add: true},
-			{from: 14, to: 8, add: true},
+			{from: 8, to: 9},
+			{from: 8, to: 10},
+			{from: 9, to: 11},
+			{from: 11, to: 8},
+			{from: 9, to: 12},
+			{from: 12, to: 8},
+			{from: 10, to: 13},
+			{from: 13, to: 8},
+			{from: 10, to: 14},
+			{from: 14, to: 8},
 		},
 		expected: reqSets{
 			{id: 8, size: 7},

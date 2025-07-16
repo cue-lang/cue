@@ -262,7 +262,6 @@ func (c conjunctFlags) hasEllipsis() bool {
 type replaceID struct {
 	from defID
 	to   defID
-	add  bool // If true, add to the set. If false, replace from with to.
 }
 
 func (n *nodeContext) addReplacement(x replaceID) {
@@ -366,7 +365,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 			// If we need to activate an enclosing embed group, and the added
 			// resolver was already before, we need to allocate a new ID and
 			// add the original ID to the set of the new one.
-			n.addReplacement(replaceID{from: next, to: dstID, add: true})
+			n.addReplacement(replaceID{from: next, to: dstID})
 		}
 		dstID = next
 
@@ -383,7 +382,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 	srcID := id.defID
 	id.defID = dstID
 
-	n.addReplacement(replaceID{from: srcID, to: dstID, add: true})
+	n.addReplacement(replaceID{from: srcID, to: dstID})
 
 	return id
 }
@@ -400,7 +399,7 @@ func (c *OpContext) subField(ci CloseInfo) CloseInfo {
 
 func (n *nodeContext) newReq(id CloseInfo, kind defIDType) CloseInfo {
 	dstID := n.ctx.getNextDefID()
-	n.addReplacement(replaceID{from: id.defID, to: dstID, add: true})
+	n.addReplacement(replaceID{from: id.defID, to: dstID})
 
 	parent := id.defID
 	id.defID = dstID
@@ -767,9 +766,6 @@ func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
 	}
 	for _, rule := range b {
 		info := index[rule.from]
-		if !rule.add {
-			info.skip = true
-		}
 		if rule.to == deleteID {
 			info.delete = true
 		} else {

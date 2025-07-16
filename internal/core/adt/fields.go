@@ -211,13 +211,14 @@ func (v *Vertex) insertConjunct(ctx *OpContext, c Conjunct, id CloseInfo, mode A
 		v.addConjunctUnchecked(c)
 		added = true
 	} else if srcRef := c2.CloseInfo.defID; srcRef != 0 {
+		// TODO: do we need this replacement?
 		// Most duplicates are deduped in insertVertexConjuncts by deduping the
 		// reference that brings in conjuncts in the first place. However, with
 		// API calls, and in some cases possibly with structure sharing, it may
 		// be possible that different Vertices refer to the same conjuncts. In
 		// this case, we need to ensure that the current defID also considers
 		// the ID associated with the original insertion in its set.
-		n.addReplacement(replaceID{from: id.defID, to: srcRef})
+		// n.addReplacement(replaceID{from: id.defID, to: srcRef})
 	}
 
 	if v.isInProgress() {

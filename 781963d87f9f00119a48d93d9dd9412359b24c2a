@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c83de85_c5e3a12c",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-16T19:23:51Z",
+      "side": 1,
+      "message": "Hmm this doesn\u0027t feel like it belongs here.\n\nThis set of steps could well be used in a scenario which has no matrix, and runs nothing on a cron schedule.",
+      "revId": "781963d87f9f00119a48d93d9dd9412359b24c2a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e918405a_dff43fcc",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-16T19:23:51Z",
+      "side": 1,
+      "message": "Feels like the caveat regarding `schedule` and matrix runner should be \"added\" here.\n\nWhich means you\u0027ll need to parameterise the \"list of steps\"\n\nThis, incidentally, is one of the sharp edges associated with lists and composition. \n\nHappy to chat through what looks \"best\" here.",
+      "revId": "781963d87f9f00119a48d93d9dd9412359b24c2a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

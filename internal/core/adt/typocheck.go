@@ -560,8 +560,8 @@ func (n *nodeContext) checkTypos() {
 			required.replaceIDs(ctx, na.replaceIDs...)
 		}
 
-		required.filterSets(func(a []reqSet) bool {
-			if hasParentEllipsis(a, n.conjunctInfo) {
+		n.filterSets(&required, func(n *nodeContext, a requirement) bool {
+			if hasParentEllipsis(n, a, n.conjunctInfo) {
 				a[0].removed = true
 			}
 			return true
@@ -679,6 +679,8 @@ outer:
 // elements, size indicates the number of entries in the set, including the
 // head. For non-head elements, size is 0.
 type reqSets []reqSet
+
+type requirement []reqSet
 
 // A single reqID might be satisfied by multiple defIDs, if the definition
 // associated with the reqID embeds other definitions, for instance. In this
@@ -894,7 +896,7 @@ func getReqSets(n *nodeContext) reqSets {
 
 	if p := v.Parent; p != nil && !n.dropParentRequirements {
 		a = append(a, getReqSets(p.state)...)
-		a.filterNonRecursive()
+		n.filterNonRecursive(&a)
 	}
 
 	last := len(a) - 1
@@ -953,9 +955,9 @@ outer:
 	// If 'v' is a hidden field, then all reqSets in 'a' for which there is no
 	// corresponding entry in conjunctInfo should be removed from 'a'.
 	if allowedInClosed(v.Label) {
-		a.filterSets(func(a []reqSet) bool {
-			for _, e := range a {
-				for _, c := range n.conjunctInfo {
+		n.filterSets(&a, func(n *nodeContext, a requirement) bool {
+			for _, c := range n.conjunctInfo {
+				for _, e := range a {
 					if c.id == e.id {
 						return true // keep the set
 					}
@@ -970,7 +972,7 @@ outer:
 		parentConjuncts = p.state.conjunctInfo
 	}
 
-	a.filterTop(n.conjunctInfo, parentConjuncts)
+	n.filterTop(&a, n.conjunctInfo, parentConjuncts)
 
 	n.computedCloseInfo = true
 	n.reqSets = a
@@ -979,12 +981,12 @@ outer:
 
 // If there is a top or ellipsis for all supported conjuncts, we have
 // evidence that this node can be dropped.
-func (a *reqSets) filterTop(conjuncts, parentConjuncts []conjunctInfo) (openLevel bool) {
-	a.filterSets(func(a []reqSet) bool {
+func (n *nodeContext) filterTop(a *reqSets, conjuncts, parentConjuncts []conjunctInfo) (openLevel bool) {
+	n.filterSets(a, func(n *nodeContext, a requirement) bool {
 		var f conjunctFlags
 		hasAny := false
-		for _, e := range a {
-			for _, c := range conjuncts {
+		for _, c := range conjuncts {
+			for _, e := range a {
 				if e.id != c.id {
 					continue
 				}
@@ -999,7 +1001,7 @@ func (a *reqSets) filterTop(conjuncts, parentConjuncts []conjunctInfo) (openLeve
 		if (f.hasTop() && !f.hasStruct()) || f.forceOpen() {
 			return false
 		}
-		if !hasAny && hasParentEllipsis(a, parentConjuncts) {
+		if !hasAny && hasParentEllipsis(n, a, parentConjuncts) {
 			a[0].removed = true
 		}
 		return true
@@ -1013,7 +1015,7 @@ func (a *reqSets) filterTop(conjuncts, parentConjuncts []conjunctInfo) (openLeve
 // TODO: this is currently called twice. Consider an approach where we only need
 // to filter this once for each node. Luckily we can avoid quadratic checks
 // for any conjunct that is not an ellipsis, which is most.
-func hasParentEllipsis(a reqSets, conjuncts []conjunctInfo) bool {
+func hasParentEllipsis(n *nodeContext, a requirement, conjuncts []conjunctInfo) bool {
 	for _, c := range conjuncts {
 		if !c.flags.hasEllipsis() {
 			continue
@@ -1027,8 +1029,8 @@ func hasParentEllipsis(a reqSets, conjuncts []conjunctInfo) bool {
 	return false
 }
 
-func (a *reqSets) filterNonRecursive() {
-	a.filterSets(func(e []reqSet) bool {
+func (n *nodeContext) filterNonRecursive(a *reqSets) {
+	n.filterSets(a, func(n *nodeContext, e requirement) bool {
 		x := e[0]
 		if x.once { //  || x.id == 0
 			e[0].ignored = true
@@ -1038,13 +1040,13 @@ func (a *reqSets) filterNonRecursive() {
 }
 
 // filter keeps all reqSets e in a for which f(e) and removes the rest.
-func (a *reqSets) filterSets(f func(e []reqSet) bool) {
+func (n *nodeContext) filterSets(a *reqSets, f func(n *nodeContext, e requirement) bool) {
 	temp := (*a)[:0]
 	for i := 0; i < len(*a); {
 		e := (*a)[i]
 		set := (*a)[i : i+int(e.size)]
 
-		if f(set) {
+		if f(n, requirement(set)) {
 			temp = append(temp, set...)
 		}
 

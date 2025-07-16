@@ -68,7 +68,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 			steps: [
 				writeNetrcFile,
 
-				githubactions.#Step & {
+				{
 					name: "Write fake payload"
 					id:   "payload"
 					if:   "github.repository == '\(githubRepositoryPath)' && \(isTestDefaultBranch)"
@@ -97,7 +97,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 				for v in cases {
 					let localBranchExpr = "local_${{ \(v.expr).targetBranch }}"
 					let targetBranchExpr = "${{ \(v.expr).targetBranch }}"
-					githubactions.#Step & {
+					{
 						name: "Trigger \(trybot.name) (\(v.nameSuffix))"
 						if:   "github.event.client_payload.type \(v.condition) '\(trybot.key)'"
 						run:  """
@@ -172,7 +172,7 @@ pushTipToTrybotWorkflow: bashWorkflow & {
 	jobs: push: {
 		steps: [
 			writeNetrcFile,
-			githubactions.#Step & {
+			{
 				name: "Push tip to trybot"
 				run:  """
 						mkdir tmpgit

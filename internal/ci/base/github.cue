@@ -51,27 +51,25 @@ installGo: {
 	[
 		#setupGo,
 
-		{
-			githubactions.#Step & {
-				name: "Set common go env vars"
-				run: """
-					go env -w GOTOOLCHAIN=local
+		githubactions.#Step & {
+			name: "Set common go env vars"
+			run: """
+				go env -w GOTOOLCHAIN=local
 
-					case $(go env GOARCH) in
-					amd64) go env -w GOAMD64=v3 ;;   # 2013 and later; makes `go test -race` 15% faster
-					arm64) go env -w GOARM64=v8.6 ;; # Apple M2 and later
-					esac
+				case $(go env GOARCH) in
+				amd64) go env -w GOAMD64=v3 ;;   # 2013 and later; makes `go test -race` 15% faster
+				arm64) go env -w GOARM64=v8.6 ;; # Apple M2 and later
+				esac
 
-					# Dump env for good measure
-					go env
-					"""
-			}
+				# Dump env for good measure
+				go env
+				"""
 		},
 	]
 }
 
-checkoutCode: {
-	#actionsCheckout: githubactions.#Step & {
+checkoutCode: [...githubactions.#Step] & [
+	{
 		name: "Checkout code"
 		uses: "actions/checkout@v4" // TODO(mvdan): switch to namespacelabs/nscloud-checkout-action@v1 once Windows supports caching
 
@@ -84,64 +82,58 @@ checkoutCode: {
 			ref:           "${{ github.event.pull_request.head.sha }}"
 			"fetch-depth": 0 // see the docs below
 		}
-	}
+	},
 
-	[
-		#actionsCheckout,
+	// Restore modified times to work around https://go.dev/issues/58571,
+	// as otherwise we would get lots of unnecessary Go test cache misses.
+	// Note that this action requires actions/checkout to use a fetch-depth of 0.
+	// Since this is a third-party action which runs arbitrary code,
+	// we pin a commit hash for v2 to be in control of code updates.
+	// Also note that git-restore-mtime does not update all directories,
+	// per the bug report at https://github.com/MestreLion/git-tools/issues/47,
+	// so we first reset all directory timestamps to a static time as a fallback.
+	// TODO(mvdan): May be unnecessary once the Go bug above is fixed.
+	{
+		name: "Reset git directory modification times"
+		run:  "touch -t 202211302355 $(find * -type d)"
+	},
+	{
+		name: "Restore git file modification times"
+		uses: "chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe"
+	},
 
-		// Restore modified times to work around https://go.dev/issues/58571,
-		// as otherwise we would get lots of unnecessary Go test cache misses.
-		// Note that this action requires actions/checkout to use a fetch-depth of 0.
-		// Since this is a third-party action which runs arbitrary code,
-		// we pin a commit hash for v2 to be in control of code updates.
-		// Also note that git-restore-mtime does not update all directories,
-		// per the bug report at https://github.com/MestreLion/git-tools/issues/47,
-		// so we first reset all directory timestamps to a static time as a fallback.
-		// TODO(mvdan): May be unnecessary once the Go bug above is fixed.
-		githubactions.#Step & {
-			name: "Reset git directory modification times"
-			run:  "touch -t 202211302355 $(find * -type d)"
-		},
-		githubactions.#Step & {
-			name: "Restore git file modification times"
-			uses: "chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe"
-		},
+	{
+		name: "Try to extract \(dispatchTrailer)"
+		id:   dispatchTrailerStepID
+		run:  """
+			x="$(git log -1 --pretty='%(trailers:key=\(dispatchTrailer),valueonly)')"
+			if [[ "$x" == "" ]]
+			then
+			   # Some steps rely on the presence or otherwise of the Dispatch-Trailer.
+			   # We know that we don't have a Dispatch-Trailer in this situation,
+			   # hence we use the JSON value null in order to represent that state.
+			   # This means that GitHub expressions can determine whether a Dispatch-Trailer
+			   # is present or not by checking whether the fromJSON() result of the
+			   # output from this step is the JSON value null or not.
+			   x=null
+			fi
+			echo "\(_dispatchTrailerDecodeStepOutputVar)<<EOD" >> $GITHUB_OUTPUT
+			echo "$x" >> $GITHUB_OUTPUT
+			echo "EOD" >> $GITHUB_OUTPUT
+			"""
+	},
 
-		{
-			githubactions.#Step & {
-				name: "Try to extract \(dispatchTrailer)"
-				id:   dispatchTrailerStepID
-				run:  """
-					x="$(git log -1 --pretty='%(trailers:key=\(dispatchTrailer),valueonly)')"
-					if [[ "$x" == "" ]]
-					then
-					   # Some steps rely on the presence or otherwise of the Dispatch-Trailer.
-					   # We know that we don't have a Dispatch-Trailer in this situation,
-					   # hence we use the JSON value null in order to represent that state.
-					   # This means that GitHub expressions can determine whether a Dispatch-Trailer
-					   # is present or not by checking whether the fromJSON() result of the
-					   # output from this step is the JSON value null or not.
-					   x=null
-					fi
-					echo "\(_dispatchTrailerDecodeStepOutputVar)<<EOD" >> $GITHUB_OUTPUT
-					echo "$x" >> $GITHUB_OUTPUT
-					echo "EOD" >> $GITHUB_OUTPUT
-					"""
-			}
-		},
-
-		// Safety nets to flag if we ever have a Dispatch-Trailer slip through the
-		// net and make it to master
-		githubactions.#Step & {
-			name: "Check we don't have \(dispatchTrailer) on a protected branch"
-			if:   "\(isProtectedBranch) && \(containsDispatchTrailer)"
-			run:  """
-				echo "\(_dispatchTrailerVariable) contains \(dispatchTrailer) but we are on a protected branch"
-				false
-				"""
-		},
-	]
-}
+	// Safety nets to flag if we ever have a Dispatch-Trailer slip through the
+	// net and make it to master
+	{
+		name: "Check we don't have \(dispatchTrailer) on a protected branch"
+		if:   "\(isProtectedBranch) && \(containsDispatchTrailer)"
+		run:  """
+			echo "\(_dispatchTrailerVariable) contains \(dispatchTrailer) but we are on a protected branch"
+			false
+			"""
+	},
+]
 
 earlyChecks: githubactions.#Step & {
 	name: "Early git and code sanity checks"

@@ -15,6 +15,8 @@
 // package github declares the workflows for this project.
 package github
 
+import "cue.dev/x/githubactions"
+
 // Note: the name of the workflows (and hence the corresponding .yaml filenames)
 // correspond to the environment variable names for gerritstatusupdater.
 // Therefore, this filename must only be change in combination with also
@@ -34,10 +36,7 @@ package github
 // We explicitly use close() here instead of a definition in order that we can
 // cue export the github package as a test.
 workflows: close({
-	// Adding this constraint here, whilst clear for the reader,
-	// blows out evaluation time. This will be fixed as part of
-	// the performance work which is covered under various issues.
-	// [string]: json.#Workflow
+	[string]: githubactions.#Workflow
 
 	_repo.trybotWorkflows
 

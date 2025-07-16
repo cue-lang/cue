@@ -24,7 +24,6 @@ workflows: trybot: _repo.bashWorkflow & {
 	name: _repo.trybot.name
 
 	on: {
-		schedule: [{cron: "0 2 * * *"}] // Run nightly at 2am UTC without a cache to catch flakes
 		push: {
 			branches: list.Concat([[_repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches
 			"tags-ignore": [_repo.releaseTagPattern]
@@ -53,14 +52,8 @@ workflows: trybot: _repo.bashWorkflow & {
 
 			steps: [
 				for v in _repo.checkoutCode {v},
-
 				for v in installGo {v},
-
-				for v in _repo.setupGoActionsCaches {v & {
-					// We skip the cache entirely on the nightly runs, to catch flakes.
-					// TODO(mvdan): remove the windowsMachine condition once Windows supports caching
-					if: string | *"github.event_name != 'schedule' && \(matrixRunner) != '\(_repo.windowsMachine)'"
-				}},
+				for v in _repo.setupCaches {v},
 
 				_repo.loginCentralRegistry,
 

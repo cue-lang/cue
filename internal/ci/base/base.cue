@@ -62,7 +62,9 @@ cueCommand: *"cue" | string
 
 workflowFileExtension: ".yaml"
 
-linuxMachine: string
+linuxMachine:   string | *"ns-linux-amd64"
+macosMachine:   string | *"ns-macos-arm64"
+windowsMachine: string | *"ns-windows-amd64"
 
 codeReview: #codeReview & {
 	github: githubRepositoryURL

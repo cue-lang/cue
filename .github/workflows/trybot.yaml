@@ -2,8 +2,6 @@
 
 name: TryBot
 "on":
-  schedule:
-    - cron: 0 2 * * *
   push:
     branches:
       - ci/test
@@ -12,6 +10,8 @@ name: TryBot
     tags-ignore:
       - v*
   pull_request_target: {}
+  schedule:
+    - cron: 0 2 * * *
   workflow_dispatch: {}
 jobs:
   test:

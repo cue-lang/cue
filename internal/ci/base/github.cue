@@ -4,6 +4,7 @@ package base
 
 import (
 	"encoding/json"
+	"list"
 	"strings"
 	"strconv"
 
@@ -23,7 +24,7 @@ installGo: {
 		name: "Install Go"
 		uses: "actions/setup-go@v5"
 		with: {
-			// We do our own caching in setupGoActionsCaches.
+			// We do our own caching in setupCaches.
 			cache:        false
 			"go-version": string
 		}
@@ -148,31 +149,51 @@ curlGitHubAPI: {
 	"""#
 }
 
-setupGoActionsCaches: [
-	// Our runner profiles on Namespace are already configured to only update
-	// the cache when they run from one of the protected branches.
-	// We cache for Go (GOCACHE and GOMODCACHE) and for staticcheck,
-	// noting that staticcheck-action puts STATICCHECK_CACHE under runner.temp.
-	githubactions.#Step & {
-		uses: "namespacelabs/nscloud-cache-action@v1"
-		with: {
-			cache: "go"
-			path: """
-				${{ runner.temp }}/staticcheck
-				"""
-		}
-	},
+// setupCaches sets up a cache volume for the rest of the job.
+// Our runner profiles on Namespace are already configured to only update
+// the cache when they run from one of the protected branches.
+//
+// We cache for Go (GOCACHE and GOMODCACHE) and for staticcheck by default,
+// as the majority of our repos use Go with staticcheck,
+// noting that staticcheck-action puts STATICCHECK_CACHE under runner.temp.
+// These default caches are harmless for repos not using Go or staticcheck.
+// TODO(mvdan): move away from staticcheck-action once we require Go 1.24 or later.
+setupCaches: {
+	#additionalCaches: [...string] // with.cache
 
-	// All tests on protected branches should skip the test cache,
-	// which helps spot test flakes and bugs hidden by the caching.
-	//
-	// Critically, we don't skip the test cache on the trybot repo,
-	// so that the testing of CLs can rely on an up to date test cache.
-	githubactions.#Step & {
-		if:  "github.repository == '\(githubRepositoryPath)' && (\(isProtectedBranch) || \(isTestDefaultBranch))"
-		run: "go env -w GOFLAGS=-count=1"
-	},
-]
+	#additionalCachePaths: [...string] // with.path
+
+	[
+		githubactions.#Step & {
+			// We skip the cache entirely on the nightly runs, to catch flakes.
+			// Note that this conditional is just a no-op for jobs without a nightly schedule.
+			// TODO(mvdan): remove the windowsMachine condition once Windows supports caching on Namespace.
+			if:   "github.event_name != 'schedule' && matrix.runner != '\(windowsMachine)'"
+			uses: "namespacelabs/nscloud-cache-action@v1"
+			with: {
+				cache: "go"
+				for name in #additionalCaches {
+					cache: name
+				}
+
+				let cachePaths = list.Concat([[
+					"${{ runner.temp }}/staticcheck",
+				], #additionalCachePaths])
+				path: strings.Join(cachePaths, "\n")
+			}
+		},
+
+		// All tests on protected branches should skip the test cache,
+		// which helps spot test flakes and bugs hidden by the caching.
+		//
+		// Critically, we don't skip the test cache on the trybot repo,
+		// so that the testing of CLs can rely on an up to date test cache.
+		githubactions.#Step & {
+			if:  "github.repository == '\(githubRepositoryPath)' && (\(isProtectedBranch) || \(isTestDefaultBranch))"
+			run: "go env -w GOFLAGS=-count=1"
+		},
+	]
+}
 
 // isProtectedBranch is an expression that evaluates to true if the
 // job is running as a result of pushing to one of protectedBranchPatterns.

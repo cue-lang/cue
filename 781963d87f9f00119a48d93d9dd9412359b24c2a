@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e537c354_9b1eae46",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-17T04:40:35Z",
+      "side": 1,
+      "message": "Per Discord, instead perhaps something like:\n\n```\nsetupCaches: {\n    cacheSetup: _\n\n    out: [\n        // Our runner profiles on Namespace are already configured to only update\n        // the cache when they run from one of the protected branches.\n        // We cache for Go (GOCACHE and GOMODCACHE) and for staticcheck,\n        // noting that staticcheck-action puts STATICCHECK_CACHE under runner.temp.\n        githubactions.#Step \u0026 cacheSetup \u0026 {\n            // We skip the cache entirely on the nightly runs, to catch flakes.\n            if:   \"github.event_name !\u003d \u0027schedule\u0027 \u0026\u0026 matrix.runner !\u003d \u0027\\(windowsMachine)\u0027\"\n            uses: \"namespacelabs/nscloud-cache-action@v1\"\n            with: {\n                cache: \"go\"\n                path: \"\"\"\n                    ${{ runner.temp }}/staticcheck\n                    \"\"\"\n            }\n        },\n\n        // All tests on protected branches should skip the test cache,\n        // which helps spot test flakes and bugs hidden by the caching.\n        //\n        // Critically, we don\u0027t skip the test cache on the trybot repo,\n        // so that the testing of CLs can rely on an up to date test cache.\n        githubactions.#Step \u0026 {\n            if:  \"github.repository \u003d\u003d \u0027\\(githubRepositoryPath)\u0027 \u0026\u0026 (\\(isProtectedBranch) || \\(isTestDefaultBranch))\"\n            run: \"go env -w GOFLAGS\u003d-count\u003d1\"\n        },\n    ]\n}\n```",
+      "parentUuid": "4c83de85_c5e3a12c",
+      "revId": "781963d87f9f00119a48d93d9dd9412359b24c2a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e918405a_dff43fcc",
         "filename": "internal/ci/github/trybot.cue",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-16T19:23:51Z",
       "side": 1,
       "message": "Feels like the caveat regarding `schedule` and matrix runner should be \"added\" here.\n\nWhich means you\u0027ll need to parameterise the \"list of steps\"\n\nThis, incidentally, is one of the sharp edges associated with lists and composition. \n\nHappy to chat through what looks \"best\" here.",
+      "revId": "781963d87f9f00119a48d93d9dd9412359b24c2a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fbb9f5f_944f57e7",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-17T04:40:35Z",
+      "side": 1,
+      "message": "... where my other suggestion is used as:\n\n```\n(setupCaches \u0026 {\n    cacheSetup: {\n        if: \"github.event_name !\u003d \u0027schedule\u0027 \u0026\u0026 matrix.runner !\u003d \u0027\\(windowsMachine)\u0027\"\n    }\n}).out\n```",
+      "parentUuid": "e918405a_dff43fcc",
       "revId": "781963d87f9f00119a48d93d9dd9412359b24c2a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

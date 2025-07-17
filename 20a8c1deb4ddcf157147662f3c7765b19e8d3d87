@@ -16,6 +16,24 @@
       "message": "is this change needed?",
       "revId": "20a8c1deb4ddcf157147662f3c7765b19e8d3d87",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fcdd938_822005b5",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 913,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-17T15:07:39Z",
+      "side": 1,
+      "message": "Ah, it was a leftover from a counter experiment. Reverted.",
+      "parentUuid": "b5d68562_7485eedb",
+      "revId": "20a8c1deb4ddcf157147662f3c7765b19e8d3d87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

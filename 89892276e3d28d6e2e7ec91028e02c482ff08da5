@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9fc68f3_5c06a4d5",
+        "filename": "internal/ci/cue.mod/module.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-17T10:48:09Z",
+      "side": 1,
+      "message": "I think you meant to spell this:\n\n```\ngithub.com/cue-lang/tmp/...\n```",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 48
+      },
+      "revId": "89892276e3d28d6e2e7ec91028e02c482ff08da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

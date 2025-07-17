@@ -420,7 +420,8 @@ NumCloseIDs: 703
 
 ConjunctInfos:       1114
 MaxConjunctInfos:    10
-MaxReqSets:          157
+MaxReqSets:          12
+MaxRedirect:         1
 -- out/evalalpha --
 Errors:
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
@@ -1456,7 +1457,7 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,16 @@
+@@ -1,11 +1,17 @@
 -Leaks:  74
 -Freed:  1384
 -Reused: 1358
@@ -1483,7 +1484,8 @@ diff old new
 +
 +ConjunctInfos:       1114
 +MaxConjunctInfos:    10
-+MaxReqSets:          157
++MaxReqSets:          12
++MaxRedirect:         1
 -- out/eval/stats --
 Leaks:  74
 Freed:  1384

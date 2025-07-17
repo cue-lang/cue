@@ -140,7 +140,7 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 	tests := []struct {
 		name      string
 		mode      Mode
-		getServer func(func(*settings.Options)) jsonrpc2.StreamServer
+		getServer func(runConfig, func(*settings.Options)) jsonrpc2.StreamServer
 	}{
 		{"default", Default, r.defaultServer},
 		{"forwarded", Forwarded, r.forwardedServer},
@@ -205,7 +205,7 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 				}
 			}()
 
-			ss := tc.getServer(r.OptionsHook)
+			ss := tc.getServer(config, r.OptionsHook)
 
 			framer := jsonrpc2.NewRawStream
 			ls := &loggingFramer{}
@@ -308,8 +308,8 @@ func (s *loggingFramer) printBuffers(testname string, w io.Writer) {
 }
 
 // defaultServer handles the Default execution mode.
-func (r *Runner) defaultServer(optsHook func(*settings.Options)) jsonrpc2.StreamServer {
-	c, err := cache.New()
+func (r *Runner) defaultServer(config runConfig, optsHook func(*settings.Options)) jsonrpc2.StreamServer {
+	c, err := newCache(config)
 	if err != nil {
 		panic(err)
 	}
@@ -317,8 +317,8 @@ func (r *Runner) defaultServer(optsHook func(*settings.Options)) jsonrpc2.Stream
 }
 
 // experimentalServer handles the Experimental execution mode.
-func (r *Runner) experimentalServer(optsHook func(*settings.Options)) jsonrpc2.StreamServer {
-	c, err := cache.New()
+func (r *Runner) experimentalServer(config runConfig, optsHook func(*settings.Options)) jsonrpc2.StreamServer {
+	c, err := newCache(config)
 	if err != nil {
 		panic(err)
 	}
@@ -330,9 +330,15 @@ func (r *Runner) experimentalServer(optsHook func(*settings.Options)) jsonrpc2.S
 }
 
 // forwardedServer handles the Forwarded execution mode.
-func (r *Runner) forwardedServer(optsHook func(*settings.Options)) jsonrpc2.StreamServer {
+func (r *Runner) forwardedServer(config runConfig, optsHook func(*settings.Options)) jsonrpc2.StreamServer {
+	if config.reg != nil {
+		// This is because the server may be long-lived and used for
+		// several tests, possibly even in parallel. So we cannot allow
+		// tests to attempt to reconfigure the server.
+		panic("explicit registry cannot be set for separate process execution mode")
+	}
 	r.tsOnce.Do(func() {
-		c, err := cache.New()
+		c, err := newCache(config)
 		if err != nil {
 			panic(err)
 		}
@@ -343,15 +349,26 @@ func (r *Runner) forwardedServer(optsHook func(*settings.Options)) jsonrpc2.Stre
 	return newForwarder("tcp", r.ts.Addr)
 }
 
+func newCache(config runConfig) (*cache.Cache, error) {
+	if config.reg == nil {
+		return cache.New()
+	} else {
+		return cache.NewWithRegistry(config.reg), nil
+	}
+}
+
 // runTestAsGoplsEnvvar triggers TestMain to run gopls instead of running
 // tests. It's a trick to allow tests to find a binary to use to start a gopls
 // subprocess.
 const runTestAsGoplsEnvvar = "_GOPLS_TEST_BINARY_RUN_AS_GOPLS"
 
 // separateProcessServer handles the SeparateProcess execution mode.
-func (r *Runner) separateProcessServer(optsHook func(*settings.Options)) jsonrpc2.StreamServer {
+func (r *Runner) separateProcessServer(config runConfig, optsHook func(*settings.Options)) jsonrpc2.StreamServer {
 	if runtime.GOOS != "linux" {
 		panic("separate process execution mode is only supported on linux")
+	}
+	if config.reg != nil {
+		panic("explicit registry cannot be set for separate process execution mode")
 	}
 
 	r.startRemoteOnce.Do(func() {

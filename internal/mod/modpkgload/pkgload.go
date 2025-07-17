@@ -130,6 +130,10 @@ func (pkg *Package) FromExternalModule() bool {
 	return pkg.fromExternal
 }
 
+func (pkg *Package) IsStdlibPackage() bool {
+	return pkg.inStd
+}
+
 func (pkg *Package) Locations() []module.SourceLoc {
 	return pkg.locs
 }

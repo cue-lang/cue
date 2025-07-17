@@ -171,7 +171,6 @@ Conjuncts:    {{.Conjuncts}}
 Disjuncts:    {{.Disjuncts}}{{if .Notifications}}
 Notifications: {{.Notifications}}{{end}}{{if .NumCloseIDs}}
 
-CloseIDElems: {{.CloseIDElems}}
 NumCloseIDs: {{.NumCloseIDs}}{{end}}{{if or (ge .MaxReqSets 150) (ge .MaxConjunctInfos 8)}}
 
 ConjunctInfos:       {{.ConjunctInfos}}

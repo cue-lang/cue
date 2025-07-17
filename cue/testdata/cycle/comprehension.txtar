@@ -416,7 +416,6 @@ Conjuncts:    1605
 Disjuncts:    182
 Notifications: 14
 
-CloseIDElems: 2861
 NumCloseIDs: 703
 
 ConjunctInfos:       1114
@@ -1457,7 +1456,7 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,17 @@
+@@ -1,11 +1,16 @@
 -Leaks:  74
 -Freed:  1384
 -Reused: 1358
@@ -1468,7 +1467,6 @@ diff old new
 -Conjuncts:    2973
 -Disjuncts:    1704
 -
--CloseIDElems: 0
 -NumCloseIDs: 16
 +Leaks:  2
 +Freed:  900
@@ -1481,7 +1479,6 @@ diff old new
 +Disjuncts:    182
 +Notifications: 14
 +
-+CloseIDElems: 2861
 +NumCloseIDs: 703
 +
 +ConjunctInfos:       1114
@@ -1498,7 +1495,6 @@ Unifications: 970
 Conjuncts:    2973
 Disjuncts:    1704
 
-CloseIDElems: 0
 NumCloseIDs: 16
 -- diff/explanation --
 B.a.children: now correctly marked as incomplete

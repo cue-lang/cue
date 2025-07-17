@@ -1674,7 +1674,6 @@ Conjuncts:    5024
 Disjuncts:    1615
 Notifications: 15
 
-CloseIDElems: 16288
 NumCloseIDs: 1515
 
 ConjunctInfos:       2033
@@ -1684,7 +1683,7 @@ MaxReqSets:          234
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,17 @@
+@@ -1,11 +1,16 @@
 -Leaks:  56
 -Freed:  1788
 -Reused: 1774
@@ -1695,7 +1694,6 @@ diff old new
 -Conjuncts:    3139
 -Disjuncts:    1942
 -
--CloseIDElems: 0
 -NumCloseIDs: 130
 +Leaks:  0
 +Freed:  3149
@@ -1708,7 +1706,6 @@ diff old new
 +Disjuncts:    1615
 +Notifications: 15
 +
-+CloseIDElems: 16288
 +NumCloseIDs: 1515
 +
 +ConjunctInfos:       2033
@@ -1725,7 +1722,6 @@ Unifications: 759
 Conjuncts:    3139
 Disjuncts:    1942
 
-CloseIDElems: 0
 NumCloseIDs: 130
 -- out/eval --
 (struct){

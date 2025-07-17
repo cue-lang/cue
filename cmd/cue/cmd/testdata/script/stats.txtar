@@ -50,11 +50,11 @@ contents overwritten
         "Disjuncts": 2,
         "Notifications": 0,
         "Conjuncts": 8,
-        "CloseIDElems": 0,
         "NumCloseIDs": 2,
         "ConjunctInfos": 6,
         "MaxConjunctInfos": 2,
         "MaxReqSets": 0,
+        "MaxRedirect": 0,
         "Freed": 6,
         "Reused": 0,
         "Allocs": 6,
@@ -72,11 +72,11 @@ CUE: {
 	Disjuncts:        2
 	Notifications:    0
 	Conjuncts:        8
-	CloseIDElems:     0
 	NumCloseIDs:      2
 	ConjunctInfos:    6
 	MaxConjunctInfos: 2
 	MaxReqSets:       0
+	MaxRedirect:      0
 	Freed:            6
 	Reused:           0
 	Allocs:           6
@@ -93,11 +93,11 @@ CUE:
   Disjuncts: 2
   Notifications: 0
   Conjuncts: 8
-  CloseIDElems: 0
   NumCloseIDs: 2
   ConjunctInfos: 6
   MaxConjunctInfos: 2
   MaxReqSets: 0
+  MaxRedirect: 0
   Freed: 6
   Reused: 0
   Allocs: 6
@@ -113,11 +113,11 @@ Go:
         "Disjuncts": 2,
         "Notifications": 0,
         "Conjuncts": 8,
-        "CloseIDElems": 0,
         "NumCloseIDs": 2,
         "ConjunctInfos": 6,
         "MaxConjunctInfos": 2,
         "MaxReqSets": 0,
+        "MaxRedirect": 0,
         "Freed": 6,
         "Reused": 0,
         "Allocs": 6,

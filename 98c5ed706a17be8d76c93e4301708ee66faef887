@@ -50,6 +50,24 @@
       "message": "This makes me think that we should just add the registry argument to `cache.New` (required) and do the registry initialisation in this package.",
       "revId": "98c5ed706a17be8d76c93e4301708ee66faef887",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "229a84bb_5c2ff6f8",
+        "filename": "internal/golangorgx/gopls/test/integration/runner.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-17T15:38:56Z",
+      "side": 1,
+      "message": "There are a couple of other users of cache.New(). I think it\u0027s nice to have the cache able to specify the modconfig, rather than exporting that responsibility to the other call sites. I could be persuaded either way. I have a feeling this code might change a bunch anyway over the next few weeks so it\u0027ll probably settle down.",
+      "parentUuid": "bbca8da8_e0f293f0",
+      "revId": "98c5ed706a17be8d76c93e4301708ee66faef887",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

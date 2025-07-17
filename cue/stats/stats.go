@@ -69,8 +69,12 @@ type Counts struct {
 	// algorithmic behavior.
 	Conjuncts int64
 
-	CloseIDElems int64
-	NumCloseIDs  int64
+	// Typo checking counters
+	CloseIDElems     int64 // Size of ReqSet
+	NumCloseIDs      int64 // Number of close IDs used
+	ConjunctInfos    int64 // Number of conjunct infos created
+	MaxConjunctInfos int64 // Maximum number of conjunct infos in a node
+	MaxReqSets       int64 // Number of replace IDs processed
 
 	// Buffer counters
 	//
@@ -112,6 +116,13 @@ func (c *Counts) Add(other Counts) {
 
 	c.CloseIDElems += other.CloseIDElems
 	c.NumCloseIDs += other.NumCloseIDs
+	c.ConjunctInfos += other.ConjunctInfos
+	if other.MaxConjunctInfos > c.MaxConjunctInfos {
+		c.MaxConjunctInfos = other.MaxConjunctInfos
+	}
+	if other.MaxReqSets > c.MaxReqSets {
+		c.MaxReqSets = other.MaxReqSets
+	}
 
 	c.Freed += other.Freed
 	c.Retained += other.Retained
@@ -126,6 +137,8 @@ func (c Counts) Since(start Counts) Counts {
 	c.Notifications -= start.Notifications
 	c.CloseIDElems -= start.CloseIDElems
 	c.NumCloseIDs -= start.NumCloseIDs
+
+	c.ConjunctInfos -= start.ConjunctInfos
 
 	c.Freed -= start.Freed
 	c.Retained -= start.Retained
@@ -159,7 +172,11 @@ Disjuncts:    {{.Disjuncts}}{{if .Notifications}}
 Notifications: {{.Notifications}}{{end}}{{if .NumCloseIDs}}
 
 CloseIDElems: {{.CloseIDElems}}
-NumCloseIDs: {{.NumCloseIDs}}{{end}}`))
+NumCloseIDs: {{.NumCloseIDs}}{{end}}{{if or (ge .MaxReqSets 150) (ge .MaxConjunctInfos 8)}}
+
+ConjunctInfos:       {{.ConjunctInfos}}
+MaxConjunctInfos:    {{.MaxConjunctInfos}}{{if .MaxReqSets}}
+MaxReqSets:          {{.MaxReqSets}}{{end}}{{end}}`))
 })
 
 func (s Counts) String() string {

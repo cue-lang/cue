@@ -19,9 +19,9 @@ import (
 	"encoding/yaml"
 	"tool/file"
 
-	"cuelang.org/go/internal/ci/base"
-	"cuelang.org/go/internal/ci/repo"
-	"cuelang.org/go/internal/ci/github"
+	"github.com/cue-tmp/scratch/internal/ci/base"
+	"github.com/cue-tmp/scratch/internal/ci/repo"
+	"github.com/cue-tmp/scratch/internal/ci/github"
 )
 
 // For the commands below, note we use simple yet hacky path resolution, rather

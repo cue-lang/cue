@@ -10,7 +10,7 @@ import (
 	"tool/os"
 	"tool/cli"
 
-	"cuelang.org/go/internal/ci/repo"
+	"github.com/cue-tmp/scratch/internal/ci/repo"
 )
 
 command: release: {

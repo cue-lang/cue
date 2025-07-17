@@ -29,7 +29,6 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuedebug"
-	"cuelang.org/go/internal/intset"
 )
 
 // Runtime defines an interface for low-level representation conversion and
@@ -110,7 +109,10 @@ type OpContext struct {
 
 	nest int
 
-	nextDefID defID // used in typocheck.go
+	// used in typocheck.go
+	nextDefID    defID       // next available defID
+	containments []defID     // parent relations
+	redirects    []replaceID // reusable buffer used in containsDefID
 
 	stats        stats.Counts
 	freeListNode *nodeContext
@@ -207,12 +209,6 @@ type OpContext struct {
 	currentDisjunctionID int // sequence number for call to processDisjunctions
 
 	disjunctStack []disjunctInfo // stack of disjunct IDs
-
-	// These fields are reused by [reqSets.replaceIDs] to reduce allocations.
-	replaceIDsIndex   map[defID]replaceInfo
-	replaceIDsOrig    reqSets
-	replaceIDsQueue   reqSets
-	replaceIDsVisited *intset.Set[defID]
 
 	// altPath, if non-empty, provides an alternative path for errors. This is
 	// necessary to get the right path for incomplete errors in the presence of

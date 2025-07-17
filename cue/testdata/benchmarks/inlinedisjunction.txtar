@@ -28,7 +28,7 @@ NumCloseIDs: 23
 
 ConjunctInfos:       99
 MaxConjunctInfos:    12
-MaxReqSets:          33
+MaxReqSets:          12
 -- out/eval --
 (struct){
   #def: (#struct){ |((#struct){
@@ -72,7 +72,7 @@ diff old new
 +
 +ConjunctInfos:       99
 +MaxConjunctInfos:    12
-+MaxReqSets:          33
++MaxReqSets:          12
 -- out/eval/stats --
 Leaks:  0
 Freed:  4674

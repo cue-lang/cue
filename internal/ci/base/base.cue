@@ -20,7 +20,7 @@
 //
 //     package workflows
 //
-//     import "cuelang.org/go/internal/ci/base"
+//     import "github.com/cue-lang/tmp/internal/ci/base"
 //
 //     // Create an instance of base
 //     _base: base & core { params: {

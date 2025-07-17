@@ -34,11 +34,7 @@
 				"data": {
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "ignores arrays",
@@ -125,11 +121,7 @@
 					"foo": 1,
 					"quux": 2
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "missing other dependency",
@@ -137,22 +129,14 @@
 					"bar": 1,
 					"quux": 2
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "missing both dependencies",
 				"data": {
 					"quux": 1
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -194,11 +178,7 @@
 					"foo": "quux",
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "wrong type other",
@@ -206,11 +186,7 @@
 					"foo": 2,
 					"bar": "quux"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "wrong type both",
@@ -218,11 +194,7 @@
 					"foo": "quux",
 					"bar": "quux"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -247,11 +219,7 @@
 				"data": {
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "object with both properties is invalid",
@@ -259,11 +227,7 @@
 					"foo": 1,
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "empty object is valid",
@@ -325,11 +289,7 @@
 					"foo\nbar": 1,
 					"foo": 2
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid object 2",
@@ -337,33 +297,21 @@
 					"foo\tbar": 1,
 					"a": 2
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid object 3",
 				"data": {
 					"foo'bar": 1
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid object 4",
 				"data": {
 					"foo\"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

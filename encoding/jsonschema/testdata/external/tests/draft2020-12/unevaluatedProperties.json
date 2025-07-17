@@ -938,8 +938,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"dependentSchemas\" not yet implemented (and 1 more errors)",
-			"v3": "extract error: keyword \"dependentSchemas\" not yet implemented (and 1 more errors)"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -2499,8 +2499,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"dependentSchemas\" not yet implemented (and 1 more errors)",
-			"v3": "extract error: keyword \"dependentSchemas\" not yet implemented (and 1 more errors)"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{

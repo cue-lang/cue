@@ -15,6 +15,7 @@
 package jsonschema
 
 import (
+	"fmt"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -127,17 +128,143 @@ func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 	s.hasAdditionalProperties = true
 }
 
+// constraintDependencies is used to implement all of the dependencies,
+// dependentSchemas and dependentRequired keywords.
 func constraintDependencies(key string, n cue.Value, s *state) {
-	// Schema and property dependencies.
-	// TODO: the easiest implementation is with comprehensions.
-	// The nicer implementation is with disjunctions. This has to be done
-	// at the very end, replacing properties.
-	/*
-		*{ property?: _|_ } | {
-			property: _
-			schema
+	allowSchemas := false
+	allowRequired := false
+	switch key {
+	case "dependencies":
+		allowSchemas = true
+		allowRequired = true
+	case "dependentSchemas":
+		allowSchemas = true
+	case "dependentRequired":
+		allowRequired = true
+	}
+
+	if n.Kind() != cue.StructKind {
+		s.errf(n, `"%q expected an object, found %v`, key, n.Kind())
+		return
+	}
+	// Our approach here is to make an outer-level struct which contains
+	// all the fields we wish to test for as optional fields; then we add
+	// a comprehension for each dependencies entry that tests for presence
+	// and adds an appropriate constraint.
+	//
+	// e.g.
+	// 	"dependencies": {
+	//		"x": ["a", "b"],
+	//		"y": {"maxProperties": 4}
+	//	}
+	//
+	// is translated to:
+	//
+	// 	{
+	// 		x?: _
+	// 		if x != _|_ {
+	// 			a!: _
+	// 			b!: _
+	// 		}
+	// 		y?: _
+	// 		if y != _|_ {
+	// 			struct.MaxFields(4)
+	// 		}
+	// 	}
+
+	obj := s.object(n)
+	count := 0
+	s.processMap(n, func(key string, n cue.Value) {
+		var ident *ast.Ident
+		// TODO we could potentially avoid declaring the field
+		// by checking whether there's a field already in
+		// scope with the correct name.
+		var label ast.Label
+		if ast.IsValidIdent(key) {
+			// TODO if the inner schema
+			// contains a reference to some outer-level entity that
+			// has the same identifier then this will stop that
+			// from working correctly. It would be nice if astutil.Sanitize
+			// was clever enough to deal with this kind of alias issue.
+			// Possible workaround:
+			// - always make a local alias
+			// - always make a local alias when the value is a schema but not when
+			// 	it's a list
+			// - when the value is a schema, generate it and then inspect the
+			// resulting syntax to check for references.
+			// - fix astutil.Sanitize
+			ident = ast.NewIdent(key)
+			label = ident
+		} else {
+			ident = ast.NewIdent(fmt.Sprintf("_t%d", count))
+			count++
+			label = &ast.Alias{
+				Ident: ident,
+				Expr:  ast.NewString(key),
+			}
 		}
-	*/
+		obj.Elts = append(obj.Elts, &ast.Field{
+			Label:      label,
+			Constraint: token.OPTION,
+			Value:      ast.NewIdent("_"),
+		})
+		var consequence *ast.StructLit
+		switch n.Kind() {
+		case cue.ListKind:
+			if !allowRequired {
+				s.errf(n, "expected schema but got %v", n.Kind())
+				return
+			}
+			required := &ast.StructLit{}
+			for i, _ := n.List(); i.Next(); {
+				f, ok := s.strValue(i.Value())
+				if !ok {
+					return
+				}
+				required.Elts = append(required.Elts, &ast.Field{
+					Label:      ast.NewString(f),
+					Constraint: token.NOT,
+					Value:      ast.NewIdent("_"),
+				})
+			}
+			consequence = required
+
+		case cue.StructKind, cue.BoolKind:
+			if !allowSchemas {
+				s.errf(n, "expected schema but got %v", n.Kind())
+				return
+			}
+			switch s := s.schema(n).(type) {
+			case *ast.StructLit:
+				consequence = s
+			default:
+				consequence = &ast.StructLit{
+					Elts: []ast.Decl{
+						&ast.EmbedDecl{
+							Expr: s,
+						},
+					},
+				}
+			}
+		default:
+			s.errf(n, "dependency value must be array or schema. found %v", n.Kind())
+			return
+		}
+		obj.Elts = append(obj.Elts, &ast.Comprehension{
+			Clauses: []ast.Clause{
+				&ast.IfClause{
+					Condition: ast.NewBinExpr(token.NEQ, ident, &ast.BottomLit{}),
+				},
+			},
+			Value: consequence,
+		},
+			// Note: include an empty struct literal so that the comprehension
+			// does cause the struct to allow non-struct values.
+			// See https://cuelang.org/issue/3994
+			&ast.StructLit{},
+		)
+	})
+
 }
 
 func constraintMaxProperties(key string, n cue.Value, s *state) {

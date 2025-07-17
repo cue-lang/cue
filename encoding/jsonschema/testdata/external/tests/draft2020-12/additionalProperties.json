@@ -272,10 +272,6 @@
 			},
 			"additionalProperties": false
 		},
-		"skip": {
-			"v2": "extract error: keyword \"dependentSchemas\" not yet implemented",
-			"v3": "extract error: keyword \"dependentSchemas\" not yet implemented"
-		},
 		"tests": [
 			{
 				"description": "additionalProperties doesn't consider dependentSchemas",
@@ -284,8 +280,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -293,11 +289,7 @@
 				"data": {
 					"bar": ""
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "additionalProperties can't see bar even when foo2 is present",
@@ -307,8 +299,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v3": "unexpected success"
 				}
 			}
 		]

@@ -86,6 +86,24 @@
       "parentUuid": "a1f9051a_10031b74",
       "revId": "7d7c38e1d3ac77e0c966f6b21905848128d5f314",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2370e9e7_6e8906d6",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-17T12:55:48Z",
+      "side": 1,
+      "message": "Actually, no. mod.Version is empty in the case of the main module, whereas path has the @v0 suffix, which is what I need.",
+      "parentUuid": "861a86dd_2eb6708f",
+      "revId": "7d7c38e1d3ac77e0c966f6b21905848128d5f314",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

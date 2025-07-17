@@ -28,7 +28,7 @@ import (
 // configures one workspace. A workspace may have several workspace
 // folders [WorkspaceFolder].
 type Workspace struct {
-	registry  modregistry // shared with other Workspaces
+	registry  Registry // shared with other Workspaces
 	fs        *fscache.CUECacheFS
 	overlayFS *fscache.OverlayFS
 

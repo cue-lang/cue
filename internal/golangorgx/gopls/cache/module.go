@@ -35,7 +35,7 @@ import (
 type Module struct {
 	// immutable fields: all set at construction only
 
-	registry modregistry
+	registry Registry
 	fs       *fscache.OverlayFS
 
 	debugLog func(string)
@@ -76,7 +76,7 @@ type Module struct {
 // NewModule creates a new Module. The CUE module itself (that is, the
 // cue.mod/module.cue file) is not loaded until [Module.ReloadModule]
 // is called.
-func NewModule(modFileUri protocol.DocumentURI, registry modregistry, overlayFS *fscache.OverlayFS, debugLog func(string)) *Module {
+func NewModule(modFileUri protocol.DocumentURI, registry Registry, overlayFS *fscache.OverlayFS, debugLog func(string)) *Module {
 	return &Module{
 		rootURI:    modFileUri.Dir().Dir(),
 		modFileURI: modFileUri,

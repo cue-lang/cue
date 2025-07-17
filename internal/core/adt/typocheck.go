@@ -167,7 +167,6 @@ package adt
 //
 import (
 	"math"
-	"slices"
 
 	"cuelang.org/go/cue/ast"
 )
@@ -573,11 +572,6 @@ func (n *nodeContext) checkTypos() {
 		}
 
 		required := baseRequired
-		// If the field has its own rules, apply them as a delta.
-		// This requires a copy to not pollute the base for the next iteration.
-		if len(na.replaceIDs) > 0 {
-			required = slices.Clone(required)
-		}
 
 		n.filterSets(&required, func(n *nodeContext, a *reqSet) bool {
 			if hasParentEllipsis(n, a, n.conjunctInfo) {

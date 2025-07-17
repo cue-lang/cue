@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b86de57_be1499be",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-17T15:09:01Z",
+      "side": 1,
+      "message": "I\u0027m thinking of just leaving them. Should be fine.",
+      "revId": "ab0eedda02364a2e9cd761f739925f0c485f12f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

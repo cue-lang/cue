@@ -70,11 +70,11 @@ type Counts struct {
 	Conjuncts int64
 
 	// Typo checking counters
-	CloseIDElems     int64 // Size of ReqSet
 	NumCloseIDs      int64 // Number of close IDs used
 	ConjunctInfos    int64 // Number of conjunct infos created
 	MaxConjunctInfos int64 // Maximum number of conjunct infos in a node
-	MaxReqSets       int64 // Number of replace IDs processed
+	MaxReqSets       int64 // Maximum number of requirement sets
+	MaxRedirect      int64 // Maximum number of redirects in containsDefID
 
 	// Buffer counters
 	//
@@ -114,7 +114,6 @@ func (c *Counts) Add(other Counts) {
 	c.Disjuncts += other.Disjuncts
 	c.Notifications += other.Notifications
 
-	c.CloseIDElems += other.CloseIDElems
 	c.NumCloseIDs += other.NumCloseIDs
 	c.ConjunctInfos += other.ConjunctInfos
 	if other.MaxConjunctInfos > c.MaxConjunctInfos {
@@ -122,6 +121,9 @@ func (c *Counts) Add(other Counts) {
 	}
 	if other.MaxReqSets > c.MaxReqSets {
 		c.MaxReqSets = other.MaxReqSets
+	}
+	if other.MaxRedirect > c.MaxRedirect {
+		c.MaxRedirect = other.MaxRedirect
 	}
 
 	c.Freed += other.Freed
@@ -135,10 +137,11 @@ func (c Counts) Since(start Counts) Counts {
 	c.Conjuncts -= start.Conjuncts
 	c.Disjuncts -= start.Disjuncts
 	c.Notifications -= start.Notifications
-	c.CloseIDElems -= start.CloseIDElems
 	c.NumCloseIDs -= start.NumCloseIDs
-
 	c.ConjunctInfos -= start.ConjunctInfos
+
+	// For max values, we don't subtract since they represent peaks
+	// c.MaxConjunctInfos and c.MaxReqSets and c.MaxRedirect remain as-is
 
 	c.Freed -= start.Freed
 	c.Retained -= start.Retained
@@ -171,11 +174,12 @@ Conjuncts:    {{.Conjuncts}}
 Disjuncts:    {{.Disjuncts}}{{if .Notifications}}
 Notifications: {{.Notifications}}{{end}}{{if .NumCloseIDs}}
 
-NumCloseIDs: {{.NumCloseIDs}}{{end}}{{if or (ge .MaxReqSets 150) (ge .MaxConjunctInfos 8)}}
+NumCloseIDs: {{.NumCloseIDs}}{{end}}{{if or (ge .MaxReqSets 150) (ge .MaxConjunctInfos 8) (ge .MaxRedirect 2)}}
 
 ConjunctInfos:       {{.ConjunctInfos}}
 MaxConjunctInfos:    {{.MaxConjunctInfos}}{{if .MaxReqSets}}
-MaxReqSets:          {{.MaxReqSets}}{{end}}{{end}}`))
+MaxReqSets:          {{.MaxReqSets}}{{end}}{{if .MaxRedirect}}
+MaxRedirect:         {{.MaxRedirect}}{{end}}{{end}}`))
 })
 
 func (s Counts) String() string {

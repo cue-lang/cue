@@ -573,7 +573,7 @@ func (n *nodeContext) checkTypos() {
 
 		required := baseRequired
 
-		n.filterSets(&required, func(n *nodeContext, a requirement) bool {
+		n.filterSets(&required, func(n *nodeContext, a *reqSet) bool {
 			if hasParentEllipsis(n, a, n.conjunctInfo) {
 				a.removed = true
 			}
@@ -637,7 +637,7 @@ func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) boo
 func (n *nodeContext) hasEvidenceForOne(all reqSets, i uint32, conjuncts []conjunctInfo) bool {
 	a := all[i]
 	for _, x := range conjuncts {
-		if n.containsDefID(&a, x.id) {
+		if n.containsDefID(a.id, x.id) {
 			return true
 		}
 	}
@@ -656,7 +656,7 @@ func (n *nodeContext) hasEvidenceForOne(all reqSets, i uint32, conjuncts []conju
 
 outer:
 	for _, c := range conjuncts {
-		if n.containsDefID(&embedScope, c.embed) {
+		if n.containsDefID(embedScope.id, c.embed) {
 			// Within the scope of the embedding.
 			continue outer
 		}
@@ -668,14 +668,14 @@ outer:
 		// If this conjunct is within the outer struct, but outside the
 		// embedding scope, this means it was "added" and we do not have
 		// to verify it within the embedding scope.
-		if n.containsDefID(&outerScope, c.id) {
+		if n.containsDefID(outerScope.id, c.id) {
 			return true
 		}
 	}
 	return false
 }
 
-func (n *nodeContext) containsDefID(node requirement, child defID) bool {
+func (n *nodeContext) containsDefID(node, child defID) bool {
 	// TODO(perf): cache result
 	// TODO(perf): we could keep track of the minimum defID that could map so
 	// that we can use this to bail out early.
@@ -692,7 +692,7 @@ func (n *nodeContext) containsDefID(node requirement, child defID) bool {
 		c.stats.MaxRedirect = int64(len(c.redirects))
 	}
 
-	return n.containsDefIDRec(node.id, child)
+	return n.containsDefIDRec(node, child)
 }
 
 func (n *nodeContext) containsDefIDRec(node, child defID) bool {
@@ -727,8 +727,6 @@ func (n *nodeContext) containsDefIDRec(node, child defID) bool {
 // elements, size indicates the number of entries in the set, including the
 // head. For non-head elements, size is 0.
 type reqSets []reqSet
-
-type requirement *reqSet
 
 // A single reqID might be satisfied by multiple defIDs, if the definition
 // associated with the reqID embeds other definitions, for instance. In this
@@ -879,9 +877,9 @@ outer:
 	// If 'v' is a hidden field, then all reqSets in 'a' for which there is no
 	// corresponding entry in conjunctInfo should be removed from 'a'.
 	if allowedInClosed(v.Label) {
-		n.filterSets(&a, func(n *nodeContext, a requirement) bool {
+		n.filterSets(&a, func(n *nodeContext, a *reqSet) bool {
 			for _, c := range n.conjunctInfo {
-				if n.containsDefID(requirement(a), c.id) {
+				if n.containsDefID(a.id, c.id) {
 					return true // keep the set
 				}
 			}
@@ -907,12 +905,12 @@ outer:
 // If there is a top or ellipsis for all supported conjuncts, we have
 // evidence that this node can be dropped.
 func (n *nodeContext) filterTop(a *reqSets, conjuncts, parentConjuncts []conjunctInfo) (openLevel bool) {
-	n.filterSets(a, func(n *nodeContext, a requirement) bool {
+	n.filterSets(a, func(n *nodeContext, a *reqSet) bool {
 		var f conjunctFlags
 		hasAny := false
 
 		for _, c := range conjuncts {
-			if n.containsDefID(requirement(a), c.id) {
+			if n.containsDefID(a.id, c.id) {
 				hasAny = true
 				flags := c.flags
 				if c.id < a.id {
@@ -938,12 +936,12 @@ func (n *nodeContext) filterTop(a *reqSets, conjuncts, parentConjuncts []conjunc
 // TODO: this is currently called twice. Consider an approach where we only need
 // to filter this once for each node. Luckily we can avoid quadratic checks
 // for any conjunct that is not an ellipsis, which is most.
-func hasParentEllipsis(n *nodeContext, a requirement, conjuncts []conjunctInfo) bool {
+func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) bool {
 	for _, c := range conjuncts {
 		if !c.flags.hasEllipsis() {
 			continue
 		}
-		if n.containsDefID(requirement(a), c.id) {
+		if n.containsDefID(a.id, c.id) {
 			return true
 		}
 	}
@@ -951,7 +949,7 @@ func hasParentEllipsis(n *nodeContext, a requirement, conjuncts []conjunctInfo) 
 }
 
 func (n *nodeContext) filterNonRecursive(a *reqSets) {
-	n.filterSets(a, func(n *nodeContext, e requirement) bool {
+	n.filterSets(a, func(n *nodeContext, e *reqSet) bool {
 		x := e
 		if x.once { //  || x.id == 0
 			e.ignored = true
@@ -961,12 +959,12 @@ func (n *nodeContext) filterNonRecursive(a *reqSets) {
 }
 
 // filter keeps all reqSets e in a for which f(e) and removes the rest.
-func (n *nodeContext) filterSets(a *reqSets, f func(n *nodeContext, e requirement) bool) {
+func (n *nodeContext) filterSets(a *reqSets, f func(n *nodeContext, e *reqSet) bool) {
 	temp := (*a)[:0]
 	for i := range *a {
 		set := (*a)[i]
 
-		if f(n, requirement(&set)) {
+		if f(n, &set) {
 			temp = append(temp, set)
 		}
 	}

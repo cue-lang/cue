@@ -1676,11 +1676,15 @@ Notifications: 15
 
 CloseIDElems: 16288
 NumCloseIDs: 1515
+
+ConjunctInfos:       2033
+MaxConjunctInfos:    6
+MaxReqSets:          234
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,13 @@
+@@ -1,12 +1,17 @@
 -Leaks:  56
 -Freed:  1788
 -Reused: 1774
@@ -1706,6 +1710,10 @@ diff old new
 +
 +CloseIDElems: 16288
 +NumCloseIDs: 1515
++
++ConjunctInfos:       2033
++MaxConjunctInfos:    6
++MaxReqSets:          234
 -- out/eval/stats --
 Leaks:  56
 Freed:  1788

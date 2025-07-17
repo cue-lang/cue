@@ -26,6 +26,10 @@ Disjuncts:    58
 
 CloseIDElems: 129
 NumCloseIDs: 23
+
+ConjunctInfos:       99
+MaxConjunctInfos:    12
+MaxReqSets:          33
 -- out/eval --
 (struct){
   #def: (#struct){ |((#struct){
@@ -48,7 +52,7 @@ NumCloseIDs: 23
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,12 @@
+@@ -1,9 +1,16 @@
  Leaks:  0
 -Freed:  4674
 -Reused: 3903
@@ -67,6 +71,10 @@ diff old new
 +
 +CloseIDElems: 129
 +NumCloseIDs: 23
++
++ConjunctInfos:       99
++MaxConjunctInfos:    12
++MaxReqSets:          33
 -- out/eval/stats --
 Leaks:  0
 Freed:  4674

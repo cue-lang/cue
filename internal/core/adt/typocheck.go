@@ -288,12 +288,17 @@ func (n *nodeContext) updateConjunctInfo(k Kind, id CloseInfo, flags conjunctFla
 			return
 		}
 	}
+	n.ctx.stats.ConjunctInfos++
 	n.conjunctInfo = append(n.conjunctInfo, conjunctInfo{
 		id:    id.defID,
 		embed: id.enclosingEmbed,
 		kind:  k,
 		flags: flags,
 	})
+	if len(n.conjunctInfo) > int(n.ctx.stats.MaxConjunctInfos) {
+		n.ctx.stats.MaxConjunctInfos = int64(len(n.conjunctInfo))
+	}
+
 }
 
 // addResolver adds a resolver to typo checking. Both definitions and
@@ -862,6 +867,12 @@ outer:
 			}
 		}
 		nv.conjunctInfo = append(nv.conjunctInfo, wci)
+		if nw.ctx != nil {
+			nw.ctx.stats.ConjunctInfos++
+			if len(nw.conjunctInfo) > int(nw.ctx.stats.MaxConjunctInfos) {
+				nw.ctx.stats.MaxConjunctInfos = int64(len(nw.conjunctInfo))
+			}
+		}
 	}
 
 outer2:
@@ -898,7 +909,8 @@ func getReqSets(n *nodeContext) reqSets {
 	v := n.node
 
 	if p := v.Parent; p != nil && !n.dropParentRequirements {
-		a = append(a, getReqSets(p.state)...)
+		x := getReqSets(p.state)
+		a = append(a, x...)
 		n.filterNonRecursive(&a)
 	}
 
@@ -976,6 +988,9 @@ outer:
 	n.filterTop(&a, n.conjunctInfo, parentConjuncts)
 
 	n.computedCloseInfo = true
+	if int64(len(a)) > n.ctx.stats.MaxReqSets {
+		n.ctx.stats.MaxReqSets = int64(len(a))
+	}
 	n.reqSets = a
 	return a
 }

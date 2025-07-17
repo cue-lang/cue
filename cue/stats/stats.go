@@ -73,7 +73,8 @@ type Counts struct {
 	NumCloseIDs      int64 // Number of close IDs used
 	ConjunctInfos    int64 // Number of conjunct infos created
 	MaxConjunctInfos int64 // Maximum number of conjunct infos in a node
-	MaxReqSets       int64 // Number of replace IDs processed
+	MaxReqSets       int64 // Maximum number of requirement sets
+	MaxRedirect      int64 // Maximum number of redirects in containsDefID
 
 	// Exception counters
 	//
@@ -145,6 +146,9 @@ func (c *Counts) Add(other Counts) {
 	if other.MaxReqSets > c.MaxReqSets {
 		c.MaxReqSets = other.MaxReqSets
 	}
+	if other.MaxRedirect > c.MaxRedirect {
+		c.MaxRedirect = other.MaxRedirect
+	}
 
 	c.Freed += other.Freed
 	c.Retained += other.Retained
@@ -161,8 +165,10 @@ func (c Counts) Since(start Counts) Counts {
 	c.MisalignedConjunct -= start.MisalignedConjunct
 	c.MisalignedConstraint -= start.MisalignedConstraint
 	c.NumCloseIDs -= start.NumCloseIDs
-
 	c.ConjunctInfos -= start.ConjunctInfos
+
+	// For max values, we don't subtract since they represent peaks
+	// c.MaxConjunctInfos and c.MaxReqSets and c.MaxRedirect remain as-is
 
 	c.Freed -= start.Freed
 	c.Retained -= start.Retained
@@ -199,11 +205,12 @@ GenerationMismatch: {{.GenerationMismatch}}{{end}}{{if .MisalignedConjunct}}
 MisalignedConjunct: {{.MisalignedConjunct}}{{end}}{{if .MisalignedConstraint}}
 MisalignedConstraint: {{.MisalignedConstraint}}{{end}}{{end}}{{if .NumCloseIDs}}
 
-NumCloseIDs: {{.NumCloseIDs}}{{end}}{{if or (ge .MaxReqSets 150) (ge .MaxConjunctInfos 8)}}
+NumCloseIDs: {{.NumCloseIDs}}{{end}}{{if or (ge .MaxReqSets 150) (ge .MaxConjunctInfos 8) (ge .MaxRedirect 2)}}
 
 ConjunctInfos:       {{.ConjunctInfos}}
 MaxConjunctInfos:    {{.MaxConjunctInfos}}{{if .MaxReqSets}}
-MaxReqSets:          {{.MaxReqSets}}{{end}}{{end}}`))
+MaxReqSets:          {{.MaxReqSets}}{{end}}{{if .MaxRedirect}}
+MaxRedirect:         {{.MaxRedirect}}{{end}}{{end}}`))
 })
 
 func (s Counts) String() string {

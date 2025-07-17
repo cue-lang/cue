@@ -98,11 +98,16 @@ Conjuncts:    265
 Disjuncts:    53
 
 NumCloseIDs: 101
+
+ConjunctInfos:       157
+MaxConjunctInfos:    6
+MaxReqSets:          13
+MaxRedirect:         3
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,11 @@
+@@ -1,11 +1,16 @@
 -Leaks:  2
 -Freed:  653
 -Reused: 632
@@ -125,6 +130,11 @@ diff old new
 +Disjuncts:    53
 +
 +NumCloseIDs: 101
++
++ConjunctInfos:       157
++MaxConjunctInfos:    6
++MaxReqSets:          13
++MaxRedirect:         3
 -- out/eval/stats --
 Leaks:  2
 Freed:  653

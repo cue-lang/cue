@@ -5,6 +5,7 @@
 package integration
 
 import (
+	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 )
@@ -20,6 +21,7 @@ type runConfig struct {
 	//
 	// TODO(myitcv): is there a better place for this?
 	initializeErrorMatches string
+	reg                    cache.Registry
 }
 
 func defaultConfig() runConfig {
@@ -179,5 +181,13 @@ func InGOPATH() RunOption {
 func MessageResponder(f func(*protocol.ShowMessageRequestParams) (*protocol.MessageActionItem, error)) RunOption {
 	return optionSetter(func(opts *runConfig) {
 		opts.editor.MessageResponder = f
+	})
+}
+
+// Registry configures the server to use the provided [cache.Registry]
+// instead of the default registry.
+func Registry(reg cache.Registry) RunOption {
+	return optionSetter(func(opts *runConfig) {
+		opts.reg = reg
 	})
 }

@@ -16,26 +16,32 @@ func New() (*Cache, error) {
 	modcfg := &modconfig.Config{
 		ClientType: "cuelsp",
 	}
-	var err error
-	registry, err := modconfig.NewRegistry(modcfg)
+	reg, err := modconfig.NewRegistry(modcfg)
 	if err != nil {
 		return nil, err
 	}
+	return NewWithRegistry(reg), nil
+}
 
+// NewWithRegistry creates a new cache, using the specified registry.
+func NewWithRegistry(reg Registry) *Cache {
+	if reg == nil {
+		panic("nil registry")
+	}
 	return &Cache{
 		fs:       fscache.NewCUECachedFS(),
-		registry: registry,
-	}, nil
+		registry: reg,
+	}
 }
 
 // A Cache holds content that is shared across multiple cuelsp
 // client/editor connections.
 type Cache struct {
 	fs       *fscache.CUECacheFS
-	registry modregistry
+	registry Registry
 }
 
-type modregistry interface {
+type Registry interface {
 	modrequirements.Registry
 	modpkgload.Registry
 }

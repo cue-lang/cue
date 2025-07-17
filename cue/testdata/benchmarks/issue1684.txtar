@@ -73,6 +73,11 @@ Conjuncts:    22751
 Disjuncts:    6534
 
 NumCloseIDs: 4115
+
+ConjunctInfos:       7501
+MaxConjunctInfos:    4
+MaxReqSets:          12
+MaxRedirect:         5
 -- out/evalalpha --
 (struct){
   #Secret: (#struct){
@@ -140,7 +145,7 @@ NumCloseIDs: 4115
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,11 @@
+@@ -1,9 +1,16 @@
 -Leaks:  0
 -Freed:  1064333
 -Reused: 1064282
@@ -159,6 +164,11 @@ diff old new
 +Disjuncts:    6534
 +
 +NumCloseIDs: 4115
++
++ConjunctInfos:       7501
++MaxConjunctInfos:    4
++MaxReqSets:          12
++MaxRedirect:         5
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

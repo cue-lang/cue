@@ -314,12 +314,13 @@ NumCloseIDs: 556
 
 ConjunctInfos:       676
 MaxConjunctInfos:    7
-MaxReqSets:          211
+MaxReqSets:          15
+MaxRedirect:         6
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,15 @@
+@@ -1,9 +1,16 @@
 -Leaks:  237
 -Freed:  327955
 -Reused: 327930
@@ -343,7 +344,8 @@ diff old new
 +
 +ConjunctInfos:       676
 +MaxConjunctInfos:    7
-+MaxReqSets:          211
++MaxReqSets:          15
++MaxRedirect:         6
 -- out/eval/stats --
 Leaks:  237
 Freed:  327955

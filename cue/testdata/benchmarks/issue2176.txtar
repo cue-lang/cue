@@ -68,7 +68,6 @@ Unifications: 375
 Conjuncts:    1332
 Disjuncts:    8
 
-CloseIDElems: 5337
 NumCloseIDs: 535
 
 ConjunctInfos:       856
@@ -78,7 +77,7 @@ MaxReqSets:          91
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,16 @@
+@@ -1,11 +1,15 @@
 -Leaks:  90
 -Freed:  684
 -Reused: 680
@@ -89,7 +88,6 @@ diff old new
 -Conjuncts:    3242
 -Disjuncts:    1409
 -
--CloseIDElems: 0
 -NumCloseIDs: 12
 +Leaks:  32
 +Freed:  415
@@ -101,7 +99,6 @@ diff old new
 +Conjuncts:    1332
 +Disjuncts:    8
 +
-+CloseIDElems: 5337
 +NumCloseIDs: 535
 +
 +ConjunctInfos:       856
@@ -118,7 +115,6 @@ Unifications: 766
 Conjuncts:    3242
 Disjuncts:    1409
 
-CloseIDElems: 0
 NumCloseIDs: 12
 -- out/evalalpha --
 (struct){

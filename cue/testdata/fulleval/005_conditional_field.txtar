@@ -63,7 +63,6 @@ Unifications: 7
 Conjuncts:    7
 Disjuncts:    7
 
-CloseIDElems: 0
 NumCloseIDs: 3
 -- out/evalalpha --
 (struct){

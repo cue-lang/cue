@@ -80,7 +80,6 @@ Conjuncts:    254
 Disjuncts:    152
 Notifications: 5
 
-CloseIDElems: 225
 NumCloseIDs: 43
 -- out/evalalpha --
 Errors:
@@ -161,7 +160,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,13 @@
+@@ -1,11 +1,12 @@
 -Leaks:  9
 -Freed:  68
 -Reused: 59
@@ -172,7 +171,6 @@ diff old new
 -Conjuncts:    135
 -Disjuncts:    86
 -
--CloseIDElems: 0
 -NumCloseIDs: 1
 +Leaks:  4
 +Freed:  240
@@ -185,7 +183,6 @@ diff old new
 +Disjuncts:    152
 +Notifications: 5
 +
-+CloseIDElems: 225
 +NumCloseIDs: 43
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -253,7 +250,6 @@ Unifications: 45
 Conjuncts:    135
 Disjuncts:    86
 
-CloseIDElems: 0
 NumCloseIDs: 1
 -- diff/todo/p3 --
 Missing error position.

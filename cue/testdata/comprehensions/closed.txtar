@@ -121,7 +121,6 @@ Unifications: 68
 Conjuncts:    118
 Disjuncts:    81
 
-CloseIDElems: 0
 NumCloseIDs: 14
 -- out/evalalpha --
 Errors:

@@ -22,6 +22,30 @@
       },
       "revId": "89892276e3d28d6e2e7ec91028e02c482ff08da5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4729cb78_b6ced78b",
+        "filename": "internal/ci/cue.mod/module.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-17T10:54:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c9fc68f3_5c06a4d5",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 48
+      },
+      "revId": "89892276e3d28d6e2e7ec91028e02c482ff08da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

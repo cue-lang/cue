@@ -310,7 +310,6 @@ Unifications: 333
 Conjuncts:    1653
 Disjuncts:    405
 
-CloseIDElems: 7658
 NumCloseIDs: 556
 
 ConjunctInfos:       676
@@ -320,7 +319,7 @@ MaxReqSets:          211
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,16 @@
+@@ -1,9 +1,15 @@
 -Leaks:  237
 -Freed:  327955
 -Reused: 327930
@@ -340,7 +339,6 @@ diff old new
 +Conjuncts:    1653
 +Disjuncts:    405
 +
-+CloseIDElems: 7658
 +NumCloseIDs: 556
 +
 +ConjunctInfos:       676

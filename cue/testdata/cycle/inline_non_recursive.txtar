@@ -105,7 +105,6 @@ Conjuncts:    376
 Disjuncts:    0
 Notifications: 1
 
-CloseIDElems: 10
 NumCloseIDs: 169
 -- out/evalalpha --
 Errors:
@@ -243,7 +242,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,13 @@
+@@ -1,9 +1,12 @@
 -Leaks:  309
 -Freed:  437
 -Reused: 429
@@ -264,7 +263,6 @@ diff old new
 +Disjuncts:    0
 +Notifications: 1
 +
-+CloseIDElems: 10
 +NumCloseIDs: 169
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new

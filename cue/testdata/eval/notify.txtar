@@ -1082,13 +1082,12 @@ Conjuncts:    2012
 Disjuncts:    736
 Notifications: 5
 
-CloseIDElems: 0
 NumCloseIDs: 241
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,13 @@
+@@ -1,9 +1,12 @@
 -Leaks:  34
 -Freed:  97
 -Reused: 85
@@ -1109,7 +1108,6 @@ diff old new
 +Disjuncts:    736
 +Notifications: 5
 +
-+CloseIDElems: 0
 +NumCloseIDs: 241
 -- out/eval/stats --
 Leaks:  34

@@ -267,13 +267,12 @@ Unifications: 236
 Conjuncts:    423
 Disjuncts:    0
 
-CloseIDElems: 215
 NumCloseIDs: 122
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,12 @@
+@@ -1,11 +1,11 @@
 -Leaks:  5
 +Leaks:  1
  Freed:  239
@@ -285,7 +284,6 @@ diff old new
 -Conjuncts:    441
 -Disjuncts:    263
 -
--CloseIDElems: 0
 -NumCloseIDs: 2
 +Reused: 213
 +Allocs: 27
@@ -295,7 +293,6 @@ diff old new
 +Conjuncts:    423
 +Disjuncts:    0
 +
-+CloseIDElems: 215
 +NumCloseIDs: 122
 -- out/eval/stats --
 Leaks:  5
@@ -308,7 +305,6 @@ Unifications: 244
 Conjuncts:    441
 Disjuncts:    263
 
-CloseIDElems: 0
 NumCloseIDs: 2
 -- out/evalalpha --
 Errors:

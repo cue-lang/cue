@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63c2fe04_9afcf051",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-17T13:58:20Z",
+      "side": 1,
+      "message": "It may be useful to \"git blame\" to see why we added these in the first place. If the change came as a fix with its own regression test, then that regression test passing would be a pretty good signal that it\u0027s OK.",
+      "revId": "efc31959a84532e4160995e5c977596c4d8c0635",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

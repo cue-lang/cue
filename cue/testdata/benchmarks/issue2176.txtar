@@ -70,11 +70,15 @@ Disjuncts:    8
 
 CloseIDElems: 5337
 NumCloseIDs: 535
+
+ConjunctInfos:       856
+MaxConjunctInfos:    28
+MaxReqSets:          91
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,12 @@
+@@ -1,12 +1,16 @@
 -Leaks:  90
 -Freed:  684
 -Reused: 680
@@ -99,6 +103,10 @@ diff old new
 +
 +CloseIDElems: 5337
 +NumCloseIDs: 535
++
++ConjunctInfos:       856
++MaxConjunctInfos:    28
++MaxReqSets:          91
 -- out/eval/stats --
 Leaks:  90
 Freed:  684

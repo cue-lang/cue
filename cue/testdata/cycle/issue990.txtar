@@ -92,6 +92,10 @@ Disjuncts:    110
 
 CloseIDElems: 20936
 NumCloseIDs: 448
+
+ConjunctInfos:       996
+MaxConjunctInfos:    5
+MaxReqSets:          158
 -- out/evalalpha --
 (struct){
   #AC: (#struct){
@@ -325,7 +329,7 @@ NumCloseIDs: 448
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,12 @@
+@@ -1,12 +1,16 @@
 -Leaks:  6
 -Freed:  3232
 -Reused: 3213
@@ -350,6 +354,10 @@ diff old new
 +
 +CloseIDElems: 20936
 +NumCloseIDs: 448
++
++ConjunctInfos:       996
++MaxConjunctInfos:    5
++MaxReqSets:          158
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

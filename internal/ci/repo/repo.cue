@@ -4,7 +4,7 @@
 package repo
 
 import (
-	"cuelang.org/go/internal/ci/base"
+	"github.com/cue-lang/tmp/internal/ci/base"
 )
 
 base

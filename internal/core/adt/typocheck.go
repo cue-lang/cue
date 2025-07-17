@@ -170,7 +170,6 @@ import (
 	"slices"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/internal/intset"
 )
 
 type defID uint32
@@ -204,6 +203,12 @@ const deleteID defID = math.MaxUint32
 func (c *OpContext) getNextDefID() defID {
 	c.stats.NumCloseIDs++
 	c.nextDefID++
+
+	if len(c.containments) == 0 {
+		c.containments = make([]defID, 1, 16)
+	}
+	c.containments = append(c.containments, 0)
+
 	return c.nextDefID
 }
 
@@ -268,6 +273,12 @@ func (n *nodeContext) addReplacement(x replaceID) {
 	if x.from == x.to {
 		return
 	}
+
+	if x.from < x.to && n.ctx.containments[x.to] == 0 {
+		n.ctx.containments[x.to] = x.from
+		return
+	}
+
 	// TODO: we currently may compute n.reqSets too early in some rare
 	// circumstances. We clear the set if it needs to be recomputed.
 	n.computedCloseInfo = false
@@ -301,7 +312,6 @@ func (n *nodeContext) updateConjunctInfo(k Kind, id CloseInfo, flags conjunctFla
 	if len(n.conjunctInfo) > int(n.ctx.stats.MaxConjunctInfos) {
 		n.ctx.stats.MaxConjunctInfos = int64(len(n.conjunctInfo))
 	}
-
 }
 
 // addResolver adds a resolver to typo checking. Both definitions and
@@ -567,12 +577,11 @@ func (n *nodeContext) checkTypos() {
 		// This requires a copy to not pollute the base for the next iteration.
 		if len(na.replaceIDs) > 0 {
 			required = slices.Clone(required)
-			required.replaceIDs(ctx, na.replaceIDs...)
 		}
 
 		n.filterSets(&required, func(n *nodeContext, a requirement) bool {
 			if hasParentEllipsis(n, a, n.conjunctInfo) {
-				a[0].removed = true
+				a.removed = true
 			}
 			return true
 		})
@@ -589,7 +598,7 @@ func (n *nodeContext) checkTypos() {
 			continue
 		}
 
-		if n.hasEvidenceForAll(required, na.conjunctInfo) {
+		if na.hasEvidenceForAll(required, na.conjunctInfo) {
 			continue
 		}
 
@@ -611,18 +620,15 @@ func (n *nodeContext) checkTypos() {
 // conjuncts for each of the typo-checked structs represented by
 // the reqSets.
 func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) bool {
-	for i := uint32(0); int(i) < len(a); i += a[i].size {
-		if a[i].size == 0 {
-			panic("unexpected set length")
-		}
-		if a[i].ignored {
+	for i, rs := range a {
+		if rs.ignored {
 			continue
 		}
-		if a[i].removed {
+		if rs.removed {
 			continue
 		}
 
-		if !n.hasEvidenceForOne(a, i, conjuncts) {
+		if !n.hasEvidenceForOne(a, uint32(i), conjuncts) {
 			if n.ctx.LogEval > 0 {
 				n.Logf("DENIED BY %d", a[i].id)
 			}
@@ -635,41 +641,40 @@ func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) boo
 // hasEvidenceForOne reports whether a single typo-checked set has evidence for
 // any of its defIDs.
 func (n *nodeContext) hasEvidenceForOne(all reqSets, i uint32, conjuncts []conjunctInfo) bool {
-	a := all[i : i+all[i].size]
-
+	a := all[i]
 	for _, x := range conjuncts {
-		if n.containsDefID(requirement(a), x.id) {
+		if n.containsDefID(&a, x.id) {
 			return true
 		}
 	}
 
-	embedScope := all.lookupSet(a[0].embed)
+	embedScope, ok := all.lookupSet(a.embed)
 
-	if len(embedScope) == 0 {
+	if !ok {
 		return false
 	}
 
-	outerScope := all.lookupSet(a[0].parent)
+	outerScope, ok := all.lookupSet(a.parent)
 
-	if len(outerScope) > 0 && outerScope[0].removed {
+	if ok && outerScope.removed {
 		return true
 	}
 
 outer:
 	for _, c := range conjuncts {
-		if n.containsDefID(requirement(embedScope), c.embed) {
+		if n.containsDefID(&embedScope, c.embed) {
 			// Within the scope of the embedding.
 			continue outer
 		}
 
-		if len(outerScope) == 0 || a[0].parent == 0 {
+		if !ok || a.parent == 0 {
 			return true
 		}
 
 		// If this conjunct is within the outer struct, but outside the
 		// embedding scope, this means it was "added" and we do not have
 		// to verify it within the embedding scope.
-		if n.containsDefID(requirement(outerScope), c.id) {
+		if n.containsDefID(&outerScope, c.id) {
 			return true
 		}
 	}
@@ -677,12 +682,48 @@ outer:
 }
 
 func (n *nodeContext) containsDefID(node requirement, child defID) bool {
-	for _, ri := range node {
-		if child == ri.id {
-			return true
+	// TODO(perf): cache result
+	// TODO(perf): we could keep track of the minimum defID that could map so
+	// that we can use this to bail out early.
+	c := n.ctx
+	c.redirects = c.redirects[:0]
+	for n := n; n != nil; n = n.node.Parent.state {
+		c.redirects = append(c.redirects, n.replaceIDs...)
+		if n.node.Parent == nil {
+			break
 		}
 	}
-	return false
+
+	if int64(len(c.redirects)) > c.stats.MaxRedirect {
+		c.stats.MaxRedirect = int64(len(c.redirects))
+	}
+
+	return n.containsDefIDRec(node.id, child)
+}
+
+func (n *nodeContext) containsDefIDRec(node, child defID) bool {
+	c := n.ctx
+
+	// NOTE: this loop is O(H)
+	for p := child; p != 0; p = c.containments[p] {
+		if p == node {
+			return true
+		}
+
+		// TODO(perf): can be binary search if we keep redirects sorted. Also, p
+		// should be monotonically decreasing, so we could use this to direct
+		// the binary search or-- at the very least--to only have to pass the
+		// array once.
+		for _, r := range c.redirects {
+			if r.to == p && r.from != child {
+				if n.containsDefIDRec(node, r.from) {
+					return true
+				}
+			}
+		}
+	}
+
+	return child == node
 }
 
 // reqSets defines a set of sets of defIDs that can each satisfy a required id.
@@ -693,7 +734,7 @@ func (n *nodeContext) containsDefID(node requirement, child defID) bool {
 // head. For non-head elements, size is 0.
 type reqSets []reqSet
 
-type requirement []reqSet
+type requirement *reqSet
 
 // A single reqID might be satisfied by multiple defIDs, if the definition
 // associated with the reqID embeds other definitions, for instance. In this
@@ -706,10 +747,7 @@ type requirement []reqSet
 type reqSet struct {
 	id     defID
 	parent defID
-	// size is the number of elements in the set. This is only set for the head.
-	// Entries with equivalence IDs have size set to 0.
-	size  uint32
-	embed defID // TODO(flatclose): can be removed later.
+	embed  defID // TODO(flatclose): can be removed later.
 	// once indicates that a reqSet closes only one level, i.e. closedness
 	// is the result of a close()
 	once bool
@@ -725,129 +763,6 @@ type reqSet struct {
 	// we still need to track the group memberships for embeddings or enclosing
 	// structs.
 	removed bool
-}
-
-// assert checks the invariants of a reqSets. It can be used for debugging.
-func (a reqSets) assert() {
-	for i := 0; i < len(a); {
-		e := a[i]
-		if e.size == 0 {
-			panic("head element with 0 size")
-		}
-		if i+int(e.size) > len(a) {
-			panic("set extends beyond end of slice")
-		}
-		for j := 1; j < int(e.size); j++ {
-			if a[i+j].size != 0 {
-				panic("non-head element with non-zero size")
-			}
-		}
-
-		i += int(e.size)
-	}
-}
-
-type replaceInfo struct {
-	skip, delete bool
-	replacements []defID
-}
-
-// replaceIDs transitively applies replacement rules to the requirement sets,
-// modifying the receiver in place.
-//
-// The algorithm uses an efficient, non-recursive Breadth-First Search (BFS)
-// to expand equivalences for each requirement group. It first pre-processes
-// the list of rules into structures for quick lookups:
-//
-//  1. Head Deletion: A rule with `add: false` marks a group for deletion if
-//     its `from` ID matches the group's head.
-//  2. ID Removal: A rule with `to: deleteID` marks the `from` ID to be
-//     excluded from any group.
-//  3. Graph Traversal: All other rules build a replacement graph. The BFS
-//     traverses this graph, starting from a group's initial members, to find
-//     all reachable IDs. Traversal is pruned for branches leading to a removed
-//     ID or into an embedding's scope.
-//
-// Finally, a new group is reconstructed from all the valid IDs found.
-func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
-	if len(b) == 0 {
-		return
-	}
-
-	// TODO(mvdan): can we build this map directly instead of a slice?
-	index := ctx.replaceIDsIndex
-	if index == nil {
-		index = make(map[defID]replaceInfo, len(b))
-	}
-	for _, rule := range b {
-		info := index[rule.from]
-		if rule.to == deleteID {
-			info.delete = true
-		} else {
-			// All non-delete rules, regardless of the `add` flag, contribute
-			// to the replacement graph.
-			info.replacements = append(info.replacements, rule.to)
-		}
-		index[rule.from] = info
-	}
-
-	origSets := append(ctx.replaceIDsOrig[:0], *a...)
-	newSets := (*a)[:0]
-	queue := ctx.replaceIDsQueue
-	visited := ctx.replaceIDsVisited
-	if visited == nil {
-		visited = intset.New[defID](32)
-		ctx.replaceIDsVisited = visited
-	}
-
-	for i := 0; i < len(origSets); {
-		head := origSets[i]
-		currentGroup := origSets[i : i+int(head.size)]
-		i += int(head.size)
-
-		if index[head.id].skip {
-			continue
-		}
-
-		queue = queue[:0]
-		visited.Clear()
-
-		for _, set := range currentGroup {
-			if !index[set.id].delete && !visited.Has(set.id) {
-				visited.Add(set.id)
-				queue = append(queue, set)
-			}
-		}
-
-		for qIdx := 0; qIdx < len(queue); qIdx++ {
-			currentSet := queue[qIdx]
-
-			for _, nextID := range index[currentSet.id].replacements {
-				if !index[nextID].delete && !visited.Has(nextID) {
-					// Trim subtree for embedded conjunctions.
-					if head.embed == nextID {
-						continue
-					}
-					visited.Add(nextID)
-					queue = append(queue, reqSet{id: nextID, once: currentSet.once})
-				}
-			}
-		}
-
-		if len(queue) > 0 {
-			queue[0].size = uint32(len(queue))
-			newSets = append(newSets, queue...)
-		}
-	}
-
-	// to be reused later on
-	clear(index)
-	ctx.replaceIDsIndex = index
-	ctx.replaceIDsOrig = origSets[:0]
-	ctx.replaceIDsQueue = queue[:0]
-	visited.Clear()
-
-	*a = newSets
 }
 
 // mergeCloseInfo merges the conjunctInfo of nw that is missing from nv into nv.
@@ -947,7 +862,6 @@ outer:
 			once:    once,
 			ignored: y.ignore,
 			embed:   y.embed,
-			size:    1,
 		})
 
 		if y.parent != 0 && !y.ignore {
@@ -967,8 +881,6 @@ outer:
 			}
 		}
 	}
-
-	a.replaceIDs(n.ctx, n.replaceIDs...)
 
 	// If 'v' is a hidden field, then all reqSets in 'a' for which there is no
 	// corresponding entry in conjunctInfo should be removed from 'a'.
@@ -1004,11 +916,12 @@ func (n *nodeContext) filterTop(a *reqSets, conjuncts, parentConjuncts []conjunc
 	n.filterSets(a, func(n *nodeContext, a requirement) bool {
 		var f conjunctFlags
 		hasAny := false
+
 		for _, c := range conjuncts {
 			if n.containsDefID(requirement(a), c.id) {
 				hasAny = true
 				flags := c.flags
-				if c.id < a[0].id {
+				if c.id < a.id {
 					flags &^= cHasStruct
 				}
 				f |= flags
@@ -1018,7 +931,7 @@ func (n *nodeContext) filterTop(a *reqSets, conjuncts, parentConjuncts []conjunc
 			return false
 		}
 		if !hasAny && hasParentEllipsis(n, a, parentConjuncts) {
-			a[0].removed = true
+			a.removed = true
 		}
 		return true
 	})
@@ -1045,9 +958,9 @@ func hasParentEllipsis(n *nodeContext, a requirement, conjuncts []conjunctInfo) 
 
 func (n *nodeContext) filterNonRecursive(a *reqSets) {
 	n.filterSets(a, func(n *nodeContext, e requirement) bool {
-		x := e[0]
+		x := e
 		if x.once { //  || x.id == 0
-			e[0].ignored = true
+			e.ignored = true
 		}
 		return true // keep the entry
 	})
@@ -1056,27 +969,24 @@ func (n *nodeContext) filterNonRecursive(a *reqSets) {
 // filter keeps all reqSets e in a for which f(e) and removes the rest.
 func (n *nodeContext) filterSets(a *reqSets, f func(n *nodeContext, e requirement) bool) {
 	temp := (*a)[:0]
-	for i := 0; i < len(*a); {
-		e := (*a)[i]
-		set := (*a)[i : i+int(e.size)]
+	for i := range *a {
+		set := (*a)[i]
 
-		if f(n, requirement(set)) {
-			temp = append(temp, set...)
+		if f(n, requirement(&set)) {
+			temp = append(temp, set)
 		}
-
-		i += int(e.size)
 	}
 	*a = temp
 }
 
 // lookupSet returns the set in a with the given id or nil if no such set.
-func (a reqSets) lookupSet(id defID) reqSets {
+func (a reqSets) lookupSet(id defID) (reqSet, bool) {
 	if id != 0 {
-		for i := uint32(0); int(i) < len(a); i += a[i].size {
+		for i := range a {
 			if a[i].id == id {
-				return a[i : i+a[i].size]
+				return a[i], true
 			}
 		}
 	}
-	return nil
+	return reqSet{}, false
 }

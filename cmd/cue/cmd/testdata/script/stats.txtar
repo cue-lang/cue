@@ -54,6 +54,7 @@ contents overwritten
         "ConjunctInfos": 6,
         "MaxConjunctInfos": 2,
         "MaxReqSets": 0,
+        "MaxRedirect": 0,
         "GenerationMismatch": 0,
         "MisalignedConjunct": 0,
         "MisalignedConstraint": 0,
@@ -78,6 +79,7 @@ CUE: {
 	ConjunctInfos:        6
 	MaxConjunctInfos:     2
 	MaxReqSets:           0
+	MaxRedirect:          0
 	GenerationMismatch:   0
 	MisalignedConjunct:   0
 	MisalignedConstraint: 0
@@ -101,6 +103,7 @@ CUE:
   ConjunctInfos: 6
   MaxConjunctInfos: 2
   MaxReqSets: 0
+  MaxRedirect: 0
   GenerationMismatch: 0
   MisalignedConjunct: 0
   MisalignedConstraint: 0
@@ -123,6 +126,7 @@ Go:
         "ConjunctInfos": 6,
         "MaxConjunctInfos": 2,
         "MaxReqSets": 0,
+        "MaxRedirect": 0,
         "GenerationMismatch": 0,
         "MisalignedConjunct": 0,
         "MisalignedConstraint": 0,

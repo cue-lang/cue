@@ -314,7 +314,7 @@ func (m *Module) ReloadPackages() error {
 	// within this module, we should track all of them.
 	pkgsImportsWorklist := make(map[*Package]*modpkgload.Package)
 	for _, loadedPkg := range loadedPkgs.All() {
-		if loadedPkg.FromExternalModule() || modpkgload.IsStdlibPackage(loadedPkg.ImportPath()) {
+		if loadedPkg.FromExternalModule() || loadedPkg.IsStdlibPackage() {
 			// Because we don't currently support "replace" in module.cue
 			// files, we cannot have one local module importing another
 			// local module. Therefore, there's no need to attempt to
@@ -327,7 +327,7 @@ func (m *Module) ReloadPackages() error {
 			continue
 		}
 
-		ip := m.normalizeImportPath(loadedPkg.ImportPath())
+		ip := m.normalizeImportPath(loadedPkg)
 
 		if loadedPkg.Error() != nil {
 			// It could be that the last file within this package was
@@ -399,11 +399,11 @@ func (m *Module) ReloadPackages() error {
 		clear(imports)
 		if oldPkg != nil {
 			for _, i := range oldPkg.Imports() {
-				imports[m.normalizeImportPath(i.ImportPath())] = struct{}{}
+				imports[m.normalizeImportPath(i)] = struct{}{}
 			}
 		}
 		for _, i := range pkg.pkg.Imports() {
-			ip := m.normalizeImportPath(i.ImportPath())
+			ip := m.normalizeImportPath(i)
 			if _, found := imports[ip]; found {
 				// Both new and old pkgs import ip. Noop.
 				delete(imports, ip)
@@ -485,21 +485,26 @@ func (m *Module) ActiveFilesAndDirs(files map[protocol.DocumentURI][]packageOrMo
 // file. This means it could be missing the major version suffix. We
 // always want all import paths to be canonical, and with non-empty
 // major versions.
-func (m *Module) normalizeImportPath(importPath string) ast.ImportPath {
+func (m *Module) normalizeImportPath(pkg *modpkgload.Package) ast.ImportPath {
 	if err := m.ReloadModule(); err != nil {
-		panic("ParseLocalImportPath can only be used when the module is valid")
+		panic("normalizeImportPath can only be used when the module is valid")
 	}
 
-	ip := ast.ParseImportPath(importPath).Canonical()
-	if ip.Version != "" || modpkgload.IsStdlibPackage(importPath) {
+	ip := ast.ParseImportPath(pkg.ImportPath()).Canonical()
+	if ip.Version != "" || pkg.IsStdlibPackage() {
 		return ip
 	}
 
-	vers, ok := m.modFile.ModuleForImportPath(importPath)
-	if !ok {
-		panic(fmt.Sprintf("ParseLocalImportPath in module %v, unable to parse import path %v", m.modFile.QualifiedModule(), importPath))
+	mod := pkg.Mod()
+	if !mod.IsValid() {
+		panic(fmt.Sprintf("normalizeImportPath in module %v, unable to normalize import path %v", m.modFile.QualifiedModule(), pkg.ImportPath()))
 	}
 
-	_, ip.Version, _ = ast.SplitPackageVersion(vers.Path())
+	// Favour extracting the major version from path over
+	// semver.Major(mod.Version) because for an import of a package
+	// within this module, the mod.Version is left blank, but the
+	// mod.Path will have a major version suffix.
+	_, ip.Version, _ = ast.SplitPackageVersion(mod.Path())
+
 	return ip
 }

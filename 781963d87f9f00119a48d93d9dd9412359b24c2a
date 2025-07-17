@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "778ece3c_e0d39d10",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-17T08:26:42Z",
+      "side": 1,
+      "message": "as agreed, the condition is harmless when the job has no cron schedule, so it\u0027s fine to hard-code for now, for the sake of reusing it.",
+      "parentUuid": "e537c354_9b1eae46",
+      "revId": "781963d87f9f00119a48d93d9dd9412359b24c2a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e918405a_dff43fcc",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "... where my other suggestion is used as:\n\n```\n(setupCaches \u0026 {\n    cacheSetup: {\n        if: \"github.event_name !\u003d \u0027schedule\u0027 \u0026\u0026 matrix.runner !\u003d \u0027\\(windowsMachine)\u0027\"\n    }\n}).out\n```",
       "parentUuid": "e918405a_dff43fcc",
+      "revId": "781963d87f9f00119a48d93d9dd9412359b24c2a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e6a11fd_4fbe1c2d",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-17T08:26:42Z",
+      "side": 1,
+      "message": "as agreed, I have added notes about the \"schedule\" condition and caching of Go and staticcheck being harmless when those are unused.",
+      "parentUuid": "2fbb9f5f_944f57e7",
       "revId": "781963d87f9f00119a48d93d9dd9412359b24c2a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

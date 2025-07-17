@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f82478c_88d292b0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-17T15:24:30Z",
+      "side": 1,
+      "message": "LGTM with a couple of thoughts.",
+      "revId": "98c5ed706a17be8d76c93e4301708ee66faef887",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "545c0ff7_f0a08b2d",
+        "filename": "cmd/cue/cmd/integration/workspace/imports_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-17T15:24:30Z",
+      "side": 1,
+      "message": "As discussed online, I have a mild preference for avoiding this copypasta and using the actual registry code.",
+      "revId": "98c5ed706a17be8d76c93e4301708ee66faef887",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbca8da8_e0f293f0",
+        "filename": "internal/golangorgx/gopls/test/integration/runner.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-17T15:24:30Z",
+      "side": 1,
+      "message": "This makes me think that we should just add the registry argument to `cache.New` (required) and do the registry initialisation in this package.",
+      "revId": "98c5ed706a17be8d76c93e4301708ee66faef887",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

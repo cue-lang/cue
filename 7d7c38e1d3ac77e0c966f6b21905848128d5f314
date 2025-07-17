@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "200145b4_ad1e5a5a",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-17T10:47:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "37fc00f7_788a5ed1",
+      "revId": "7d7c38e1d3ac77e0c966f6b21905848128d5f314",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a1f9051a_10031b74",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-07-17T10:41:23Z",
       "side": 1,
       "message": "or `semver.Major(mod.Version())` ?",
+      "revId": "7d7c38e1d3ac77e0c966f6b21905848128d5f314",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "861a86dd_2eb6708f",
+        "filename": "internal/golangorgx/gopls/cache/module.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-17T10:47:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1f9051a_10031b74",
       "revId": "7d7c38e1d3ac77e0c966f6b21905848128d5f314",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

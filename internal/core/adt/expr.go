@@ -1044,7 +1044,7 @@ func (x *SelectorExpr) Source() ast.Node {
 }
 
 func (x *SelectorExpr) resolve(c *OpContext, state combinedFlags) *Vertex {
-	n := c.node(x, x.X, x.Sel.IsRegular(), require(partial, needFieldSetKnown))
+	n := c.node(x, x.X, x.Sel.IsRegular(), require(partial, needFieldSetKnown), false)
 	if n == emptyNode {
 		return n
 	}
@@ -1080,7 +1080,7 @@ func (x *IndexExpr) Source() ast.Node {
 
 func (x *IndexExpr) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	// TODO: support byte index.
-	n := ctx.node(x, x.X, true, require(partial, needFieldSetKnown))
+	n := ctx.node(x, x.X, true, require(partial, needFieldSetKnown), false)
 	i := ctx.value(x.Index, require(partial, scalarKnown))
 	if n == emptyNode {
 		return n
@@ -2089,7 +2089,7 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 	// TODO: always get the vertex. This allows a whole bunch of trickery
 	// down the line.
 	c.inDetached++
-	v := c.unifyNode(x, state)
+	v := c.unifyNode(x, state, true)
 	c.inDetached--
 
 	node, ok := v.(*Vertex)
@@ -2198,7 +2198,7 @@ func (x *ForClause) yield(s *compState) {
 		if c.isDevVersion() {
 			// TODO(evalv3): See comment in StructLit.evaluate.
 			if state := a.getState(c); state != nil {
-				state.process(arcTypeKnown, attemptOnly)
+				state.process(arcTypeKnown, s.mode)
 			}
 		} else {
 			if !a.isDefined() {
@@ -2278,7 +2278,8 @@ func (x *IfClause) Source() ast.Node {
 
 func (x *IfClause) yield(s *compState) {
 	ctx := s.ctx
-	if ctx.BoolValue(ctx.value(x.Condition, require(s.state, scalarKnown))) {
+	flags := combineMode(scalarKnown, s.mode)
+	if ctx.BoolValue(ctx.value(x.Condition, flags)) {
 		s.yield(ctx.e)
 	}
 }

@@ -847,7 +847,7 @@ func (c *OpContext) wrapCycleError(src ast.Node, b *Bottom) *Bottom {
 // unifyNode returns a possibly partially evaluated node value.
 //
 // TODO: maybe return *Vertex, *Bottom
-func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
+func (c *OpContext) unifyNode(expr Expr, state combinedFlags, isComp bool) (result Value) {
 	savedSrc := c.src
 	c.src = expr.Source()
 	err := c.errs
@@ -885,6 +885,29 @@ func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 	switch x := expr.(type) {
 	case Value:
 		return x
+
+	case *BinaryExpr:
+		env := c.Env(0)
+		if x.Op == AndOp {
+			v := c.newInlineVertex(nil, nil, makeAnonymousConjunct(env, x, c.ci.Refs))
+
+			// Do not fully evaluate the Vertex: if it is embedded within a
+			// struct with arcs that are referenced from within this expression,
+			// it will end up adding "locked" fields, resulting in an error.
+			// It will be the responsibility of the "caller" to get the result
+			// to the required state. If the struct is already dynamic, we will
+			// evaluate the struct regardless to ensure that cycle reporting
+			// keeps working.
+			if (!isComp && env.Vertex.IsDynamic) || c.inValidator > 0 {
+				v.Finalize(c)
+			} else {
+				v.CompleteArcsOnly(c)
+			}
+
+			return v
+		}
+
+		return x.evaluate(c, state)
 
 	case Evaluator:
 		return x.evaluate(c, state)
@@ -1135,7 +1158,7 @@ func pos(x Node) token.Pos {
 }
 
 // node is called by SelectorExpr.resolve and IndexExpr.resolve.
-func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *Vertex {
+func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags, isComp bool) *Vertex {
 	// Do not treat inline structs as closed by default if within a schema.
 	// See comment at top of scheduleVertexConjuncts.
 	if _, ok := x.(Resolver); !ok {
@@ -1146,7 +1169,7 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *V
 
 	// TODO: always get the vertex. This allows a whole bunch of trickery
 	// down the line.
-	v := c.unifyNode(x, state)
+	v := c.unifyNode(x, state, isComp)
 
 	v, ok := c.getDefault(v)
 	if !ok {

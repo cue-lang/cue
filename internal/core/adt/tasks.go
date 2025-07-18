@@ -207,7 +207,7 @@ func processComprehension(ctx *OpContext, t *task, mode runMode) {
 		expr:             t.x,
 	}
 
-	err := n.processComprehension(y, 0)
+	err := n.processComprehension(y, 0, mode)
 	t.err = CombineErrors(nil, t.err, err)
 	if t.comp.vertex.state != nil {
 		t.comp.vertex.state.addBottom(err)

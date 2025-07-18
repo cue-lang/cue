@@ -301,6 +301,7 @@ type compState struct {
 	i     int
 	f     YieldFunc
 	state vertexStatus
+	mode  runMode
 }
 
 // yield evaluates a Comprehension within the given Environment and calls
@@ -317,6 +318,7 @@ func (c *OpContext) yield(
 		comp:  comp,
 		f:     f,
 		state: state.vertexStatus(),
+		mode:  state.runMode(),
 	}
 	y := comp.Clauses[0]
 
@@ -364,7 +366,7 @@ func (s *compState) yield(env *Environment) (ok bool) {
 // injectComprehension evaluates and inserts embeddings. It first evaluates all
 // embeddings before inserting the results to ensure that the order of
 // evaluation does not matter.
-func (n *nodeContext) injectComprehensions(state vertexStatus) (progress bool) {
+func (n *nodeContext) injectComprehensions(state vertexStatus, mode runMode) (progress bool) {
 	unreachableForDev(n.ctx)
 
 	workRemaining := false
@@ -375,7 +377,7 @@ func (n *nodeContext) injectComprehensions(state vertexStatus) (progress bool) {
 		if d.self || d.inserted {
 			continue
 		}
-		if err := n.processComprehension(d, state); err != nil {
+		if err := n.processComprehension(d, state, mode); err != nil {
 			// TODO:  Detect that the nodes are actually equal
 			if err.ForCycle && err.Value == n.node {
 				n.selfComprehensions = append(n.selfComprehensions, *d)
@@ -421,7 +423,7 @@ func (n *nodeContext) injectSelfComprehensions(state vertexStatus) {
 
 	// We use variables, instead of range, as the list may grow dynamically.
 	for i := 0; i < len(n.selfComprehensions); i++ {
-		n.processComprehension(&n.selfComprehensions[i], state)
+		n.processComprehension(&n.selfComprehensions[i], state, 0)
 	}
 	n.selfComprehensions = n.selfComprehensions[:0] // Signal that all work is done.
 }
@@ -429,7 +431,7 @@ func (n *nodeContext) injectSelfComprehensions(state vertexStatus) {
 // processComprehension processes a single Comprehension conjunct.
 // It returns an incomplete error if there was one. Fatal errors are
 // processed as a "successfully" completed computation.
-func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bottom {
+func (n *nodeContext) processComprehension(d *envYield, state vertexStatus, mode runMode) *Bottom {
 	ctx := n.ctx
 
 	// Compute environments, if needed.
@@ -439,7 +441,8 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 			envs = append(envs, env)
 		}
 
-		if err := ctx.yield(d.vertex, d.env, d.comp, oldOnly(state), f); err != nil {
+		flags := combineMode(needFieldSetKnown, mode)
+		if err := ctx.yield(d.vertex, d.env, d.comp, flags, f); err != nil {
 			if err.IsIncomplete() {
 				return err
 			}

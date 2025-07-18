@@ -2391,7 +2391,7 @@ func (n *nodeContext) expandOne(state vertexStatus) (done bool) {
 		return true
 	}
 
-	if progress = n.injectComprehensions(state); progress {
+	if progress = n.injectComprehensions(state, 0); progress {
 		return true
 	}
 

@@ -783,7 +783,21 @@ func (v *Vertex) ToDataSingle() *Vertex {
 // ToDataAll returns a new v where v and all its descendents contain only
 // the regular fields.
 func (v *Vertex) ToDataAll(ctx *OpContext) *Vertex {
-	v.Finalize(ctx)
+	// Create a map to track processed vertices to avoid duplicate processing
+	processed := make(map[*Vertex]*Vertex)
+
+	// TODO(evalv3): for EvalV3 we could call finalize only here.
+
+	return v.toDataAllRec(ctx, processed)
+}
+
+func (v *Vertex) toDataAllRec(ctx *OpContext, processed map[*Vertex]*Vertex) *Vertex {
+	// Check if this vertex has already been processed
+	if result, exists := processed[v]; exists {
+		return result
+	}
+
+	v.Finalize(ctx) // Needed recursively for eval v2.
 
 	arcs := make([]*Vertex, 0, len(v.Arcs))
 	for _, a := range v.Arcs {
@@ -791,17 +805,16 @@ func (v *Vertex) ToDataAll(ctx *OpContext) *Vertex {
 			continue
 		}
 		if a.Label.IsRegular() {
-			arcs = append(arcs, a.ToDataAll(ctx))
+			arcs = append(arcs, a.toDataAllRec(ctx, processed))
 		}
 	}
 	w := *v
 	w.state = nil
 	w.status = finalized
 
-	w.BaseValue = toDataAll(ctx, w.BaseValue)
+	w.BaseValue = toDataAllBaseValue(ctx, w.BaseValue, processed)
 	w.Arcs = arcs
 	w.isData = true
-	w.Conjuncts = slices.Clone(v.Conjuncts)
 
 	// Converting to dat drops constraints and non-regular fields. This means
 	// that the domain on which they are defined is reduced, which will change
@@ -815,21 +828,33 @@ func (v *Vertex) ToDataAll(ctx *OpContext) *Vertex {
 	for _, s := range w.Structs {
 		s.Disable = true
 	}
+
+	w.Conjuncts = slices.Clone(v.Conjuncts)
+
 	for i, c := range w.Conjuncts {
 		if v, _ := c.x.(Value); v != nil {
-			w.Conjuncts[i].x = toDataAll(ctx, v).(Value)
+			w.Conjuncts[i].x = toDataAllBaseValue(ctx, v, processed).(Value)
 		}
+		// Always reset all CloseInfo fields to zero. Normally only the top
+		// conjuncts matter and get inserted and conjuncts of recursive arcs
+		// never come in play. ToDataAll is an exception.
+		w.Conjuncts[i].CloseInfo.defID = 0
+		w.Conjuncts[i].CloseInfo.outerID = 0
+		w.Conjuncts[i].CloseInfo.enclosingEmbed = 0
 	}
+
+	// Store the processed vertex before returning
+	processed[v] = &w
 	return &w
 }
 
-func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
+func toDataAllBaseValue(ctx *OpContext, v BaseValue, processed map[*Vertex]*Vertex) BaseValue {
 	switch x := v.(type) {
 	default:
 		return x
 
 	case *Vertex:
-		return x.ToDataAll(ctx)
+		return x.toDataAllRec(ctx, processed)
 
 	case *Disjunction:
 		d := *x
@@ -839,7 +864,7 @@ func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
 		switch x.NumDefaults {
 		case 0:
 		case 1:
-			return toDataAll(ctx, values[0])
+			return toDataAllBaseValue(ctx, values[0], processed)
 		default:
 			values = values[:x.NumDefaults]
 		}
@@ -847,7 +872,7 @@ func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
 		for i, v := range values {
 			switch x := v.(type) {
 			case *Vertex:
-				d.Values[i] = x.ToDataAll(ctx)
+				d.Values[i] = x.toDataAllRec(ctx, processed)
 			default:
 				d.Values[i] = x
 			}
@@ -859,7 +884,7 @@ func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
 		c.Values = make([]Value, len(x.Values))
 		for i, v := range x.Values {
 			// This case is okay because the source is of type Value.
-			c.Values[i] = toDataAll(ctx, v).(Value)
+			c.Values[i] = toDataAllBaseValue(ctx, v, processed).(Value)
 		}
 		return &c
 	}

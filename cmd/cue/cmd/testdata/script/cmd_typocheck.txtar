@@ -1,0 +1,47 @@
+# This test exposes "misaligned conjunct" issues with the typo check algorithm.
+# Ensure that this does not lead to a crash or incorrect results.
+
+# With the old evaluator.
+env CUE_EXPERIMENT=evalv3=0
+exec cue cmd main .
+
+# With the new evaluator.
+env CUE_EXPERIMENT=evalv3=1
+exec cue cmd main .
+
+-- data.cue --
+package p
+
+_config: #Config & {
+    enabled: true
+    versionList: [{Name: "foo", Version: "v1.2.3"}]
+}
+output: _config.versionMap["foo"]
+#Config: {
+    enabled!: bool
+    versionList:  _
+    versionMap:  (#TransformVersions & {"versionList": versionList}).versionMap
+}
+#Artifact: {
+    Name!:    string
+    Version!: string
+}
+#TransformVersions: {
+    versionList: [...#Artifact]
+    versionMap: {
+        for index, artifact in versionList {
+            (artifact.Name): artifact.Version
+        }
+    }
+}
+-- main_tool.cue --
+package p
+
+import (
+    "encoding/yaml"
+    "tool/cli"
+)
+
+command: main: cli.Print & {
+    text: yaml.Marshal(output)
+}

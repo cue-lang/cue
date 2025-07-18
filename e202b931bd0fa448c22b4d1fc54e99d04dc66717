@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ce2241b_32fedc31",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-18T08:21:36Z",
+      "side": 1,
+      "message": "nit: if you indent the continuations of the bullet points with two spaces, it really helps with plaintext readability. also please stick to the typical line length limit (76) for commit messages.",
+      "revId": "e202b931bd0fa448c22b4d1fc54e99d04dc66717",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bca68e51_a523fe31",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-18T08:21:36Z",
+      "side": 1,
+      "message": "nit: weird way to cut this sentence, no?",
+      "revId": "e202b931bd0fa448c22b4d1fc54e99d04dc66717",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b39f1a19_6f0fac92",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-18T08:21:36Z",
+      "side": 1,
+      "message": "nit: mixing tabs and spaces",
+      "revId": "e202b931bd0fa448c22b4d1fc54e99d04dc66717",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0734d6a2_749df41c",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-18T08:21:36Z",
+      "side": 1,
+      "message": "do we want filed issues for these TODOs, so we can milestone/assign/track them better?",
+      "revId": "e202b931bd0fa448c22b4d1fc54e99d04dc66717",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b01bfb96_86309dc9",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-18T08:21:36Z",
+      "side": 1,
+      "message": "did you mean \"disallow\" here?",
+      "range": {
+        "startLine": 272,
+        "startChar": 29,
+        "endLine": 272,
+        "endChar": 34
+      },
+      "revId": "e202b931bd0fa448c22b4d1fc54e99d04dc66717",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

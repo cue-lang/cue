@@ -20,7 +20,7 @@ root: {
 	}
 	convert: exec.Run & {
 		stdin: get.response.body
-		cmd:   "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
+		cmd:   "cue-fake import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
 	}
 }
 -- out/run/errors --
@@ -65,7 +65,7 @@ graph TD
 -- out/run/t2/value --
 {
 	$id: "tool/exec.Run"
-	cmd: "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
+	cmd: "cue-fake import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
 	env: {} | []
 	stderr:      null
 	stdin:       GET.response.body & (*null | string | bytes)
@@ -120,7 +120,7 @@ graph TD
 -- out/run/t3/value --
 {
 	$id: "tool/exec.Run"
-	cmd: "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
+	cmd: "cue-fake import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
 	env: {}
 	stdout:  "foo"
 	stderr:  null

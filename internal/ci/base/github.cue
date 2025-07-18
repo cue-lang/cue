@@ -171,15 +171,15 @@ setupCaches: {
 			if:   "github.event_name != 'schedule' && matrix.runner != '\(windowsMachine)'"
 			uses: "namespacelabs/nscloud-cache-action@v1"
 			with: {
-				cache: "go"
-				for name in #additionalCaches {
-					cache: name
-				}
-
+				let cacheModes = list.Concat([[
+					"go",
+				], #additionalCaches])
 				let cachePaths = list.Concat([[
 					"${{ runner.temp }}/staticcheck",
 				], #additionalCachePaths])
-				path: strings.Join(cachePaths, "\n")
+
+				cache: strings.Join(cacheModes, "\n")
+				path:  strings.Join(cachePaths, "\n")
 			}
 		},
 

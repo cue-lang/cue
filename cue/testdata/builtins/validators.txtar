@@ -211,16 +211,25 @@ issue3678: {
 	y: x
 	x: #X
 }
+issue3981: matchWithClose: {
+	out: {
+		close({
+			f1: matchN(1, [#openStruct])
+		})
+		#openStruct: {...}
+	}
+	out: f1: foo: ["bar"]
+}
 -- out/eval/stats --
-Leaks:  4
-Freed:  177
-Reused: 170
-Allocs: 11
-Retain: 23
+Leaks:  5
+Freed:  190
+Reused: 182
+Allocs: 13
+Retain: 26
 
-Unifications: 181
-Conjuncts:    327
-Disjuncts:    202
+Unifications: 195
+Conjuncts:    351
+Disjuncts:    218
 
 NumCloseIDs: 8
 -- out/evalalpha --
@@ -549,6 +558,19 @@ Result:
       c: (string){ "c" }
     }
   }
+  issue3981: (struct){
+    matchWithClose: (struct){
+      out: (#struct){
+        #openStruct: (#struct){
+        }
+        f1: (struct){
+          foo: (#list){
+            0: (string){ "bar" }
+          }
+        }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -624,6 +646,24 @@ diff old new
        c: (string){ "c" }
      }
    }
+@@ -318,13 +326,13 @@
+   issue3981: (struct){
+     matchWithClose: (struct){
+       out: (#struct){
++        #openStruct: (#struct){
++        }
+         f1: (struct){
+           foo: (#list){
+             0: (string){ "bar" }
+           }
+         }
+-        #openStruct: (#struct){
+-        }
+       }
+     }
+   }
+-- diff/todo/p2 --
+issue3981: topo sort regression
 -- out/eval --
 Errors:
 issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):
@@ -942,6 +982,19 @@ Result:
       c: (string){ "c" }
     }
   }
+  issue3981: (struct){
+    matchWithClose: (struct){
+      out: (#struct){
+        f1: (struct){
+          foo: (#list){
+            0: (string){ "bar" }
+          }
+        }
+        #openStruct: (#struct){
+        }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -1234,5 +1287,26 @@ Result:
     y: 〈0;#X〉
     y: 〈0;x〉
     x: 〈0;#X〉
+  }
+  issue3981: {
+    matchWithClose: {
+      out: {
+        close({
+          f1: matchN(1, [
+            〈2;#openStruct〉,
+          ])
+        })
+        #openStruct: {
+          ...
+        }
+      }
+      out: {
+        f1: {
+          foo: [
+            "bar",
+          ]
+        }
+      }
+    }
   }
 }

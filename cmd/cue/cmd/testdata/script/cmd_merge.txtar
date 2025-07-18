@@ -1,0 +1,38 @@
+# This test exposes "misaligned conjunct" issues with the typo check algorithm.
+# Ensure that this does not lead to a crash or incorrect results.
+
+# With the old evaluator.
+env CUE_EXPERIMENT=evalv3=0
+exec cue cmd main ./...
+
+# With the new evaluator.
+env CUE_EXPERIMENT=evalv3=1
+exec cue cmd main ./...
+
+-- data.cue --
+package p
+
+#Schema1: f1: #Schema2
+#Schema2: f2?: #Schema3
+#Schema3: f3?: #Schema4
+#Schema4: f4?: {...}
+
+a1: #Schema1 & {
+    f1: f2: f3: f4: values
+}
+values: v1: v2: [{v3: ["v4"]}]
+-- nested/data.cue --
+package p
+-- main_tool.cue --
+package p
+
+import (
+    "encoding/json"
+    "tool/cli"
+)
+
+objects: [{a1}]
+
+command: main: cli.Print & {
+    text: json.Marshal(objects)
+}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "da685fc2_cbd23851",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-18T10:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ce2241b_32fedc31",
+      "revId": "e202b931bd0fa448c22b4d1fc54e99d04dc66717",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bca68e51_a523fe31",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-18T08:21:36Z",
       "side": 1,
       "message": "nit: weird way to cut this sentence, no?",
+      "revId": "e202b931bd0fa448c22b4d1fc54e99d04dc66717",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abd034c9_7aac73db",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-18T10:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bca68e51_a523fe31",
       "revId": "e202b931bd0fa448c22b4d1fc54e99d04dc66717",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8ab3400_93354ebf",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-18T10:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b39f1a19_6f0fac92",
+      "revId": "e202b931bd0fa448c22b4d1fc54e99d04dc66717",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0734d6a2_749df41c",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "100e76eb_180aec21",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-18T10:47:08Z",
+      "side": 1,
+      "message": "As discussed online, it\u0027s probably OK to leave this as a TODO alongside the many other TODOs in this package (there\u0027s no existing issue for `self`)",
+      "parentUuid": "0734d6a2_749df41c",
+      "revId": "e202b931bd0fa448c22b4d1fc54e99d04dc66717",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b01bfb96_86309dc9",
@@ -82,6 +154,30 @@
       "writtenOn": "2025-07-18T08:21:36Z",
       "side": 1,
       "message": "did you mean \"disallow\" here?",
+      "range": {
+        "startLine": 272,
+        "startChar": 29,
+        "endLine": 272,
+        "endChar": 34
+      },
+      "revId": "e202b931bd0fa448c22b4d1fc54e99d04dc66717",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fba0c506_2252460d",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-18T10:47:08Z",
+      "side": 1,
+      "message": "indeed. done.",
+      "parentUuid": "b01bfb96_86309dc9",
       "range": {
         "startLine": 272,
         "startChar": 29,

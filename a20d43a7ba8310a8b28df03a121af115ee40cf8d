@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "695ecfc9_4b81f861",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-07-18T08:12:16Z",
+      "side": 1,
+      "message": "LGTM. ISTR doing something like this myself to avoid this issue. Could maybe add a test? Another thing to test would be whether it\u0027ll work OK with unused imports too.",
+      "revId": "a20d43a7ba8310a8b28df03a121af115ee40cf8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

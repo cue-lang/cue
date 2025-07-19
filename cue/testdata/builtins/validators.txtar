@@ -222,14 +222,14 @@ issue3981: matchWithClose: {
 }
 -- out/eval/stats --
 Leaks:  5
-Freed:  190
-Reused: 182
+Freed:  205
+Reused: 197
 Allocs: 13
 Retain: 26
 
-Unifications: 195
-Conjuncts:    351
-Disjuncts:    218
+Unifications: 210
+Conjuncts:    366
+Disjuncts:    233
 
 NumCloseIDs: 8
 -- out/evalalpha --

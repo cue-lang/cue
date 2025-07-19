@@ -19,14 +19,14 @@ c: "dog"
 <0>{a: "after", b: _|_(strings.ContainsAny ("c"):invalid value "dog" (does not satisfy strings.ContainsAny("c"))), c: "dog"}
 -- out/eval/stats --
 Leaks:  0
-Freed:  4
-Reused: 2
-Allocs: 2
+Freed:  8
+Reused: 5
+Allocs: 3
 Retain: 0
 
-Unifications: 4
-Conjuncts:    8
-Disjuncts:    4
+Unifications: 8
+Conjuncts:    12
+Disjuncts:    8
 -- out/eval --
 Errors:
 b: invalid value "dog" (does not satisfy strings.ContainsAny("c")):

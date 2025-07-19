@@ -242,14 +242,14 @@ issue3925: full: {
 }
 -- out/eval/stats --
 Leaks:  4
-Freed:  308
-Reused: 296
+Freed:  311
+Reused: 299
 Allocs: 16
 Retain: 183
 
-Unifications: 288
-Conjuncts:    1650
-Disjuncts:    472
+Unifications: 291
+Conjuncts:    1653
+Disjuncts:    475
 
 NumCloseIDs: 5
 -- out/eval --
@@ -743,13 +743,13 @@ Result:
 }
 -- out/evalalpha/stats --
 Leaks:  0
-Freed:  286
-Reused: 252
+Freed:  288
+Reused: 254
 Allocs: 34
 Retain: 0
 
-Unifications: 273
-Conjuncts:    599
+Unifications: 275
+Conjuncts:    601
 Disjuncts:    10
 Notifications: 10
 
@@ -1210,13 +1210,13 @@ diff old new
 -
 -NumCloseIDs: 5
 +Leaks:  0
-+Freed:  286
-+Reused: 252
++Freed:  288
++Reused: 254
 +Allocs: 34
 +Retain: 0
 +
-+Unifications: 273
-+Conjuncts:    599
++Unifications: 275
++Conjuncts:    601
 +Disjuncts:    10
 +Notifications: 10
 +

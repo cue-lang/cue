@@ -301,18 +301,18 @@ value0: Only: [{UseSectionName: true}]
 }
 -- out/evalalpha/stats --
 Leaks:  107
-Freed:  1309
-Reused: 1226
+Freed:  1323
+Reused: 1240
 Allocs: 190
 Retain: 0
 
-Unifications: 333
-Conjuncts:    1653
+Unifications: 347
+Conjuncts:    1667
 Disjuncts:    405
 
 NumCloseIDs: 556
 
-ConjunctInfos:       676
+ConjunctInfos:       690
 MaxConjunctInfos:    7
 MaxReqSets:          15
 MaxRedirect:         6
@@ -322,40 +322,40 @@ diff old new
 +++ new
 @@ -1,9 +1,16 @@
 -Leaks:  237
--Freed:  327955
--Reused: 327930
+-Freed:  327983
+-Reused: 327958
 -Allocs: 262
 -Retain: 2657
 -
--Unifications: 140273
--Conjuncts:    468967
--Disjuncts:    330375
+-Unifications: 140301
+-Conjuncts:    468995
+-Disjuncts:    330403
 +Leaks:  107
-+Freed:  1309
-+Reused: 1226
++Freed:  1323
++Reused: 1240
 +Allocs: 190
 +Retain: 0
 +
-+Unifications: 333
-+Conjuncts:    1653
++Unifications: 347
++Conjuncts:    1667
 +Disjuncts:    405
 +
 +NumCloseIDs: 556
 +
-+ConjunctInfos:       676
++ConjunctInfos:       690
 +MaxConjunctInfos:    7
 +MaxReqSets:          15
 +MaxRedirect:         6
 -- out/eval/stats --
 Leaks:  237
-Freed:  327955
-Reused: 327930
+Freed:  327983
+Reused: 327958
 Allocs: 262
 Retain: 2657
 
-Unifications: 140273
-Conjuncts:    468967
-Disjuncts:    330375
+Unifications: 140301
+Conjuncts:    468995
+Disjuncts:    330403
 -- out/evalalpha --
 (struct){
   #FinDefSetElemType: (#struct){

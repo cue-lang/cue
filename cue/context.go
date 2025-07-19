@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/types"
 )
 
 // A Context is used for creating CUE [Value] objects.
@@ -364,6 +365,8 @@ func NilIsAny(isAny bool) EncodeOption {
 // through the Err method.
 func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
 	switch v := x.(type) {
+	case types.DynamicValue:
+		return newValueRoot(v.C.Runtime.(*runtime.Runtime), v.C, v.V)
 	case adt.Value:
 		return newValueRoot(c.runtime(), c.ctx(), v)
 	}

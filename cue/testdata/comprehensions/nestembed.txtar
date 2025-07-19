@@ -19,14 +19,14 @@ New_infra: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  18
-Reused: 14
+Freed:  22
+Reused: 18
 Allocs: 4
 Retain: 0
 
-Unifications: 18
-Conjuncts:    26
-Disjuncts:    18
+Unifications: 22
+Conjuncts:    30
+Disjuncts:    22
 
 NumCloseIDs: 1
 -- out/evalalpha --

@@ -77,7 +77,11 @@ func Vertex(v cue.Value) *adt.Vertex {
 
 // Make wraps cue.MakeValue.
 func Make(ctx *adt.OpContext, v adt.Value) cue.Value {
-	return (*cue.Context)(nil).Encode(types.DynamicValue{C: ctx, V: v})
+	return (*cue.Context)(nil).Encode(types.RuntimeValue{C: ctx, V: v})
+}
+
+func MakeAny(ctx *adt.OpContext, v any) cue.Value {
+	return (*cue.Context)(nil).Encode(types.RuntimeAnyValue{C: ctx, V: v})
 }
 
 // UnifyBuiltin returns the given Value unified with the given builtin template.

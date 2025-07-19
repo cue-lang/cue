@@ -248,15 +248,19 @@ func (c *Context) CompileBytes(b []byte, options ...BuildOption) Value {
 // 	return c.compile(c.runtime().Compile("", b))
 // }
 
+func makeV(c *adt.OpContext, v adt.Value) Value {
+	x := newValueRoot(c.Runtime.(*runtime.Runtime), c, v)
+	adt.AddStats(c)
+	return x
+}
+
 func (c *Context) make(v *adt.Vertex) Value {
 	opCtx := newContext(c.runtime())
 	// TODO: this is currently needed to ensure that node is properly recognized
 	// as evaluated. Not dereferencing nodes, however, will have the benefit of
 	// retaining more information. Remove the indirection when the code will be
 	// able to properly handle this.
-	x := newValueRoot(c.runtime(), opCtx, v)
-	adt.AddStats(opCtx)
-	return x
+	return makeV(opCtx, v)
 }
 
 // An EncodeOption defines options for the various encoding-related methods of
@@ -364,16 +368,21 @@ func NilIsAny(isAny bool) EncodeOption {
 // encode such a value results in the returned value being an error, accessible
 // through the Err method.
 func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
+	var ctx *adt.OpContext
 	switch v := x.(type) {
-	case types.DynamicValue:
+	case types.RuntimeAnyValue:
+		ctx = v.C
+		x = v.V
+	case types.RuntimeValue:
 		return newValueRoot(v.C.Runtime.(*runtime.Runtime), v.C, v.V)
 	case adt.Value:
 		return newValueRoot(c.runtime(), c.ctx(), v)
+	default:
+		ctx = c.ctx()
 	}
 	var options encodeOptions
 	options.process(option)
 
-	ctx := c.ctx()
 	// TODO: is true the right default?
 	expr := convert.GoValueToValue(ctx, x, options.nilIsTop)
 	var n *adt.Vertex
@@ -384,7 +393,7 @@ func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
 		n.AddConjunct(adt.MakeRootConjunct(nil, expr))
 	}
 	n.Finalize(ctx)
-	return c.make(n)
+	return makeV(ctx, n)
 }
 
 // Encode converts a Go type to a CUE [Value].

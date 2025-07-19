@@ -24,9 +24,14 @@ type Value struct {
 	V *adt.Vertex
 }
 
-type DynamicValue struct {
+type RuntimeValue struct {
 	C *adt.OpContext
 	V adt.Value
+}
+
+type RuntimeAnyValue struct {
+	C *adt.OpContext
+	V any
 }
 
 type Interface interface {

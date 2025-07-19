@@ -166,9 +166,11 @@ package adt
 // type.
 //
 import (
+	"log"
 	"math"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 )
 
 type defID uint32
@@ -207,6 +209,10 @@ func (c *OpContext) getNextDefID() defID {
 		c.containments = make([]defID, 1, 16)
 	}
 	c.containments = append(c.containments, 0)
+
+	if len(c.containments)-1 != int(c.nextDefID) {
+		panic("internal error: nextDefID does not match length of containments")
+	}
 
 	return c.nextDefID
 }
@@ -290,7 +296,6 @@ func (n *nodeContext) updateConjunctInfo(k Kind, id CloseInfo, flags conjunctFla
 	if n.ctx.OpenDef {
 		return
 	}
-
 	for i, c := range n.conjunctInfo {
 		if c.id == id.defID {
 			n.conjunctInfo[i].kind &= k
@@ -671,10 +676,15 @@ outer:
 }
 
 func (n *nodeContext) containsDefID(node, child defID) bool {
+	c := n.ctx
+
+	if int(child) >= len(c.containments) {
+		log.Panicf("containsDefID: child out of range: %d >= %d", child, len(c.containments))
+	}
+
 	// TODO(perf): cache result
 	// TODO(perf): we could keep track of the minimum defID that could map so
 	// that we can use this to bail out early.
-	c := n.ctx
 	c.redirects = c.redirects[:0]
 	for n := n; n != nil; n = n.node.Parent.state {
 		c.redirects = append(c.redirects, n.replaceIDs...)
@@ -976,4 +986,84 @@ func (a reqSets) lookupSet(id defID) (reqSet, bool) {
 		}
 	}
 	return reqSet{}, false
+}
+
+// conjunctInfoChecker holds the state for checking conjunct infos
+type conjunctInfoChecker struct {
+	ctx   *OpContext
+	patch bool
+	errs  errors.Error
+}
+
+// CheckNoConjunctInfos recursively checks that all arcs in the given vertex
+// do not have conjunctInfos in their nodeContext. This is used for debugging
+// and validation purposes. If patch is true, it will zero out defIDs instead
+// of returning an error. Returns a list of all errors found.
+func CheckNoConjunctInfos(ctx *OpContext, v *Vertex, patch bool) errors.Error {
+	c := &conjunctInfoChecker{
+		ctx:   ctx,
+		patch: patch,
+	}
+	c.check(v)
+	return c.errs
+}
+
+func (c *conjunctInfoChecker) check(v *Vertex) {
+	if v == nil {
+		return
+	}
+
+	// Save current vertex for error context
+	origVertex := c.ctx.vertex
+	c.ctx.vertex = v
+	defer func() { c.ctx.vertex = origVertex }()
+
+	if v.status != finalized {
+		b := c.ctx.NewErrf("vertex %v is unprocessed", v.Label)
+		c.errs = errors.Append(c.errs, b.Err)
+	}
+
+	// Check current vertex's nodeContext
+	if state := v.state; state != nil {
+		if v.state.generation != c.ctx.generation {
+			b := c.ctx.NewErrf("vertex %v has generation %d, expected %d. status: %v #conjunctInfos: %d", v.Label, v.state.generation, c.ctx.generation, v.status, len(state.conjunctInfo))
+			c.errs = errors.Append(c.errs, b.Err)
+		}
+	}
+
+	// Check BaseValue if it's a vertex
+	switch base := v.BaseValue.(type) {
+	case *Vertex:
+		c.check(base)
+	case *Disjunction:
+		for _, disjunct := range base.Values {
+			if dv, ok := disjunct.(*Vertex); ok {
+				c.check(dv)
+			}
+		}
+	}
+
+	// Check all arcs
+	for _, arc := range v.Arcs {
+		c.check(arc)
+	}
+
+	// Check conjuncts
+	for i := range v.Conjuncts {
+		conj := &v.Conjuncts[i]
+		if cv, ok := conj.x.(*Vertex); ok {
+			c.check(cv)
+		}
+		if conj.CloseInfo.defID != 0 {
+			if c.patch {
+				// Zero out the CloseInfo fields
+				conj.CloseInfo.defID = 0
+				conj.CloseInfo.enclosingEmbed = 0
+				conj.CloseInfo.outerID = 0
+			} else {
+				b := c.ctx.NewErrf("non-zero defID %v %d", v.Label, conj.CloseInfo.defID)
+				c.errs = errors.Append(c.errs, b.Err)
+			}
+		}
+	}
 }

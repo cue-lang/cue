@@ -96,7 +96,7 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 	vertex.Finalize(ctx)
 	err := adt.CheckNoConjunctInfos(ctx, vertex, true)
 	if err != nil {
-		log.Panic(errors.Details(err, nil))
+		log.Println(errors.Details(err, nil))
 	}
 
 	// TODO: validate allowing incomplete.
@@ -110,7 +110,7 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 	_, vertex = value.ToInternal(v)
 	err = adt.CheckNoConjunctInfos(ctx, vertex, true)
 	if err != nil {
-		log.Panic(errors.Details(err, nil))
+		log.Println(errors.Details(err, nil))
 	}
 
 	// Ensure there is at least one tool file.

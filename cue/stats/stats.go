@@ -76,6 +76,12 @@ type Counts struct {
 	MaxReqSets       int64 // Maximum number of requirement sets
 	MaxRedirect      int64 // Maximum number of redirects in containsDefID
 
+	// Exception counters
+	//
+	// These counters track exceptional conditions that occur during evaluation.
+
+	GenerationMismatch int64 // Number of exceptional unification cases
+
 	// Buffer counters
 	//
 	// Each unification and disjunct operation is associated with an object
@@ -114,6 +120,8 @@ func (c *Counts) Add(other Counts) {
 	c.Disjuncts += other.Disjuncts
 	c.Notifications += other.Notifications
 
+	c.GenerationMismatch += other.GenerationMismatch
+
 	c.NumCloseIDs += other.NumCloseIDs
 	c.ConjunctInfos += other.ConjunctInfos
 	if other.MaxConjunctInfos > c.MaxConjunctInfos {
@@ -137,6 +145,7 @@ func (c Counts) Since(start Counts) Counts {
 	c.Conjuncts -= start.Conjuncts
 	c.Disjuncts -= start.Disjuncts
 	c.Notifications -= start.Notifications
+	c.GenerationMismatch -= start.GenerationMismatch
 	c.NumCloseIDs -= start.NumCloseIDs
 	c.ConjunctInfos -= start.ConjunctInfos
 
@@ -172,7 +181,9 @@ Retain: {{.Retained}}
 Unifications: {{.Unifications}}
 Conjuncts:    {{.Conjuncts}}
 Disjuncts:    {{.Disjuncts}}{{if .Notifications}}
-Notifications: {{.Notifications}}{{end}}{{if .NumCloseIDs}}
+Notifications: {{.Notifications}}{{end}}{{if .GenerationMismatch}}
+
+GenerationMismatch: {{.GenerationMismatch}}{{end}}{{if .NumCloseIDs}}
 
 NumCloseIDs: {{.NumCloseIDs}}{{end}}{{if or (ge .MaxReqSets 150) (ge .MaxConjunctInfos 8) (ge .MaxRedirect 2)}}
 

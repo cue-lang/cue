@@ -222,7 +222,7 @@ func Merge(inst ...*Instance) *Instance {
 	v.Finalize(ctx)
 	err := adt.CheckNoConjunctInfos(ctx, v, false)
 	if err != nil {
-		log.Panic(errors.Details(err, nil))
+		log.Println(errors.Details(err, nil))
 	}
 
 	p := addInst(i.index, &Instance{

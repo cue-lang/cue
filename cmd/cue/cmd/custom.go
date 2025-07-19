@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -32,6 +33,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/cueexperiment"
 	itask "cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
@@ -88,11 +90,27 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 		return nil, errors.New("no commands defined")
 	}
 
+	v := tools.Value()
+	r, vertex := value.ToInternal(v)
+	ctx := eval.NewContext(r, vertex)
+	vertex.Finalize(ctx)
+	err := adt.CheckNoConjunctInfos(ctx, vertex, true)
+	if err != nil {
+		log.Println(errors.Details(err, nil))
+	}
+
 	// TODO: validate allowing incomplete.
 	cmds := tools.Lookup(typ)
 	o := cmds.Lookup(name)
 	if !o.Exists() {
 		return nil, o.Err()
+	}
+
+	v = cmds.Value()
+	_, vertex = value.ToInternal(v)
+	err = adt.CheckNoConjunctInfos(ctx, vertex, true)
+	if err != nil {
+		log.Println(errors.Details(err, nil))
 	}
 
 	// Ensure there is at least one tool file.

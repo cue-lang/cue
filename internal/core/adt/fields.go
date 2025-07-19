@@ -233,7 +233,7 @@ func (v *Vertex) insertConjunct(ctx *OpContext, c Conjunct, id CloseInfo, mode A
 		// TODO: we should probably only notify a conjunct once the root of the
 		// conjunct group is completed. This will make it easier to "stitch" the
 		// conjunct trees together, as its correctness will be guaranteed.
-		rec.v.state.scheduleConjunct(c, id)
+		rec.v.state.scheduleConjunct(c, rec.c)
 	}
 
 	return

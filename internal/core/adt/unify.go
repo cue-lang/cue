@@ -145,6 +145,12 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 		return false
 	}
 
+	if n := v.state; n != nil && n.ctx.generation != c.generation {
+		v.state = nil
+		v.status = finalized
+		// TODO: add to free list.
+	}
+
 	// Note that the state of a node can be removed before the node is.
 	// This happens with the close builtin, for instance.
 	// See TestFromAPI in pkg export.

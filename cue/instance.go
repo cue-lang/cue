@@ -15,6 +15,8 @@
 package cue
 
 import (
+	"log"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -212,9 +214,16 @@ func Merge(inst ...*Instance) *Instance {
 
 	for _, i := range inst {
 		w := i.Value()
-		v.AddConjunct(adt.MakeRootConjunct(nil, w.v.ToDataAll(ctx)))
+		_ = adt.CheckNoConjunctInfos(ctx, w.v, false)
+		x := w.v.ToDataAll(ctx)
+		_ = adt.CheckNoConjunctInfos(ctx, x, false)
+		v.AddConjunct(adt.MakeRootConjunct(nil, x))
 	}
 	v.Finalize(ctx)
+	err := adt.CheckNoConjunctInfos(ctx, v, false)
+	if err != nil {
+		log.Panic(errors.Details(err, nil))
+	}
 
 	p := addInst(i.index, &Instance{
 		root: v,

@@ -1013,6 +1013,10 @@ type arcKey struct {
 type nodeContext struct {
 	nextFree *nodeContext
 
+	// generation is assigned the generation of the OpContext upon creation.
+	// This allows checking that we are not using stale nodeContexts.
+	generation uint64
+
 	// refCount:
 	// evalv2: keeps track of all current usages of the node, such that the
 	//    node can be freed when the counter reaches zero.
@@ -1405,6 +1409,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 		}
 	}
 
+	n.generation = c.generation
 	n.scheduler.node = n
 	n.underlying = node
 	if p := node.Parent; p != nil && p.state != nil {

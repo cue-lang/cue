@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"sync/atomic"
 
 	"github.com/cockroachdb/apd/v3"
 	"golang.org/x/text/encoding/unicode"
@@ -58,6 +59,8 @@ type Config struct {
 	Format func(Runtime, Node) string
 }
 
+var contextGeneration uint64
+
 // New creates an operation context.
 func New(v *Vertex, cfg *Config) *OpContext {
 	if cfg.Runtime == nil {
@@ -65,6 +68,7 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	}
 
 	ctx := &OpContext{
+		generation:  atomic.AddUint64(&contextGeneration, 1),
 		Runtime:     cfg.Runtime,
 		Format:      cfg.Format,
 		vertex:      v,
@@ -74,6 +78,9 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	ctx.stats.EvalVersion = ctx.Version
 	if v != nil {
 		ctx.e = &Environment{Up: nil, Vertex: v}
+	}
+	if ctx.LogEval > 0 {
+		ctx.Logf(v, "New context at generation %d", ctx.generation)
 	}
 	return ctx
 }
@@ -144,7 +151,7 @@ type OpContext struct {
 	// TODO(perf): have two generations: one for each pass of the closedness
 	// algorithm, so that the results of the first pass can be reused for all
 	// features of a node.
-	generation int
+	generation uint64
 	closed     map[*closeInfo]*closeStats
 	todo       *closeStats
 

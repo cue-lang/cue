@@ -1056,6 +1056,12 @@ func addConjuncts(ctx *OpContext, dst *Vertex, src Value) {
 }
 
 func (v *Vertex) Finalize(c *OpContext) {
+	if v.state != nil {
+		// TODO(concurrency): OpContext is not thread-safe, so this breaks the
+		// API contract. Ideally, this should never happen. Find some other
+		// way.
+		c = v.state.ctx
+	}
 	// Saving and restoring the error context prevents v from panicking in
 	// case the caller did not handle existing errors in the context.
 	err := c.errs

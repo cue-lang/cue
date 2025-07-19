@@ -69,6 +69,7 @@ package flow
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 	"sync/atomic"
 
@@ -226,6 +227,14 @@ func (c *Controller) addErr(err error, msg string) {
 func New(cfg *Config, inst cue.InstanceOrValue, f TaskFunc) *Controller {
 	v := inst.Value()
 	ctx := eval.NewContext(value.ToInternal(v))
+
+	_, vertex := value.ToInternal(v)
+	vertex.Finalize(ctx)
+	_ = adt.CheckNoConjunctInfos(ctx, vertex, true)
+	err := adt.CheckNoConjunctInfos(ctx, vertex, false)
+	if err != nil {
+		log.Panic(errors.Details(err, nil))
+	}
 
 	c := &Controller{
 		isTask: f,

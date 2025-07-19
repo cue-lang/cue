@@ -309,7 +309,7 @@ type closeStats struct {
 	// the other fields of this closeStats value are only valid if generation
 	// is equal to the generation in OpContext. This allows for lazy
 	// initialization of closeStats.
-	generation int
+	generation uint64
 
 	// These counts keep track of how many required child nodes need to be
 	// completed before this node is accepted.

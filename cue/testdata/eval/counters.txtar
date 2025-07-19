@@ -250,10 +250,10 @@ issue3824: panic: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  6
-Freed:  233
-Reused: 181
-Allocs: 58
+Leaks:  14
+Freed:  225
+Reused: 177
+Allocs: 62
 Retain: 0
 
 Unifications: 182
@@ -267,20 +267,20 @@ diff old new
 +++ new
 @@ -1,11 +1,11 @@
 -Leaks:  0
--Freed:  166
--Reused: 153
+-Freed:  180
+-Reused: 167
 -Allocs: 13
 -Retain: 38
 -
--Unifications: 138
--Conjuncts:    254
--Disjuncts:    204
+-Unifications: 152
+-Conjuncts:    268
+-Disjuncts:    218
 -
 -NumCloseIDs: 16
-+Leaks:  6
-+Freed:  233
-+Reused: 181
-+Allocs: 58
++Leaks:  14
++Freed:  225
++Reused: 177
++Allocs: 62
 +Retain: 0
 +
 +Unifications: 182

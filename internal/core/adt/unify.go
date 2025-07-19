@@ -145,6 +145,17 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 		return false
 	}
 
+	if n := v.state; n != nil && n.ctx.generation != c.generation {
+		v.state = nil // TODO: add to free list.
+		v.status = finalized
+		for _, c := range v.Conjuncts {
+			c.CloseInfo.defID = 0
+			c.CloseInfo.enclosingEmbed = 0
+			c.CloseInfo.outerID = 0
+		}
+		c.stats.GenerationMismatch++
+	}
+
 	// Note that the state of a node can be removed before the node is.
 	// This happens with the close builtin, for instance.
 	// See TestFromAPI in pkg export.

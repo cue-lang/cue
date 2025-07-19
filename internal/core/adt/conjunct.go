@@ -363,7 +363,8 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		closeInfo = n.addResolver(arc, closeInfo, true)
 	}
 	c.CloseInfo.defID = closeInfo.defID
-	c.CloseInfo.outerID = closeInfo.defID
+	c.CloseInfo.outerID = closeInfo.outerID
+	c.CloseInfo.enclosingEmbed = closeInfo.enclosingEmbed
 
 	key := arcKey{arc, ciKey}
 	for _, k := range n.arcMap {
@@ -409,6 +410,7 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) {
 
 	for _, r := range n.notify {
 		if r.v == v {
+			// TODO: might need to add replacement here.
 			return
 		}
 	}
@@ -423,7 +425,7 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) {
 	// messages.
 	n.ctx.stats.Notifications++
 
-	n.notify = append(n.notify, receiver{v})
+	n.notify = append(n.notify, receiver{v, c})
 }
 
 // Literal conjuncts

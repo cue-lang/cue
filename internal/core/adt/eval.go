@@ -1280,6 +1280,7 @@ type nodeContextState struct {
 // v is equal to cc.src._cc in V3.
 type receiver struct {
 	v *Vertex
+	c CloseInfo
 }
 
 // Logf substitutes args in format. Arguments of type Feature, Value, and Expr
@@ -1304,7 +1305,7 @@ func (n *nodeContext) addNotify(v *Vertex) {
 	unreachableForDev(n.ctx)
 
 	if v != nil && !n.node.hasAllConjuncts {
-		n.notify = append(n.notify, receiver{v})
+		n.notify = append(n.notify, receiver{v: v})
 	}
 }
 

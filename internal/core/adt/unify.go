@@ -146,6 +146,14 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 	}
 
 	if n := v.state; n != nil && n.ctx.generation != c.generation {
+		// TODO: we could clear the closedness information.
+		// v.state = nil
+		// v.status = finalized
+		// for _, c := range v.Conjuncts {
+		// 	c.CloseInfo.defID = 0
+		// 	c.CloseInfo.enclosingEmbed = 0
+		// 	c.CloseInfo.outerID = 0
+		// }
 		c.stats.GenerationMismatch++
 	}
 
@@ -467,6 +475,17 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 	if checkTypos {
 		n.checkTypos()
 	}
+
+	// After this we no longer need the defIDs of the conjuncts. By clearing
+	// them we ensure that we do not have rogue index values into the
+	// [OpContext.containments].
+	// for i := range n.node.Conjuncts {
+	// 	// Consider if this is necessary now we have generations.
+	// 	c := &n.node.Conjuncts[i]
+	// 	c.CloseInfo.defID = 0
+	// 	c.CloseInfo.enclosingEmbed = 0
+	// 	c.CloseInfo.outerID = 0
+	// }
 
 	v.updateStatus(finalized)
 

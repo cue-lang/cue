@@ -83,6 +83,18 @@ type Counts struct {
 	// with a different generation than the one it was created in.
 	GenerationMismatch int64 // Number of exceptional unification cases
 
+	// MisalignedConjunct indicates the number of conjuncts that were dropped
+	// because they were not aligned with the current generation of the context.
+	// Generally this likely happens because a previously finalized vertex is
+	// unified in as a value, not constraint, in which case it is okay to
+	// ignore closedness info. If it were included as a scheme, top-level
+	// conjuncts would be unified and mapped to a local tree.
+	MisalignedConjunct int64
+
+	// MisalignedConstraint indicates the number of constraints that were not
+	// aligned. This is more likely to be a bug.
+	MisalignedConstraint int64
+
 	// Buffer counters
 	//
 	// Each unification and disjunct operation is associated with an object
@@ -122,6 +134,8 @@ func (c *Counts) Add(other Counts) {
 	c.Notifications += other.Notifications
 
 	c.GenerationMismatch += other.GenerationMismatch
+	c.MisalignedConjunct += other.MisalignedConjunct
+	c.MisalignedConstraint += other.MisalignedConstraint
 
 	c.NumCloseIDs += other.NumCloseIDs
 	c.ConjunctInfos += other.ConjunctInfos
@@ -144,6 +158,8 @@ func (c Counts) Since(start Counts) Counts {
 	c.Disjuncts -= start.Disjuncts
 	c.Notifications -= start.Notifications
 	c.GenerationMismatch -= start.GenerationMismatch
+	c.MisalignedConjunct -= start.MisalignedConjunct
+	c.MisalignedConstraint -= start.MisalignedConstraint
 	c.NumCloseIDs -= start.NumCloseIDs
 
 	c.ConjunctInfos -= start.ConjunctInfos
@@ -177,9 +193,11 @@ Retain: {{.Retained}}
 Unifications: {{.Unifications}}
 Conjuncts:    {{.Conjuncts}}
 Disjuncts:    {{.Disjuncts}}{{if .Notifications}}
-Notifications: {{.Notifications}}{{end}}{{if .GenerationMismatch}}
-
-GenerationMismatch: {{.GenerationMismatch}}{{end}}{{if .NumCloseIDs}}
+Notifications: {{.Notifications}}{{end}}{{if or .GenerationMismatch .MisalignedConjunct .MisalignedConstraint}}
+{{if .GenerationMismatch}}
+GenerationMismatch: {{.GenerationMismatch}}{{end}}{{if .MisalignedConjunct}}
+MisalignedConjunct: {{.MisalignedConjunct}}{{end}}{{if .MisalignedConstraint}}
+MisalignedConstraint: {{.MisalignedConstraint}}{{end}}{{end}}{{if .NumCloseIDs}}
 
 NumCloseIDs: {{.NumCloseIDs}}{{end}}{{if or (ge .MaxReqSets 150) (ge .MaxConjunctInfos 8)}}
 

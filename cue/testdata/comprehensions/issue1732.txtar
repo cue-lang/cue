@@ -170,6 +170,8 @@ Unifications: 111
 Conjuncts:    249
 Disjuncts:    126
 
+MisalignedConjunct: 60
+
 NumCloseIDs: 8
 -- out/evalalpha --
 (struct){

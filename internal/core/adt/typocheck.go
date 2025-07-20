@@ -280,7 +280,10 @@ func (n *nodeContext) updateConjunctInfo(k Kind, id CloseInfo, flags conjunctFla
 	if n.ctx.OpenDef {
 		return
 	}
-
+	if id.defID != 0 && id.opID != n.ctx.opID {
+		n.ctx.stats.MisalignedConjunct++
+		return
+	}
 	for i, c := range n.conjunctInfo {
 		if c.id == id.defID {
 			n.conjunctInfo[i].kind &= k
@@ -385,6 +388,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 		})
 	}
 	srcID := id.defID
+	id.opID = n.ctx.opID
 	id.defID = dstID
 
 	n.addReplacement(replaceID{from: srcID, to: dstID})
@@ -407,6 +411,7 @@ func (n *nodeContext) newReq(id CloseInfo, kind defIDType) CloseInfo {
 	n.addReplacement(replaceID{from: id.defID, to: dstID})
 
 	parent := id.defID
+	id.opID = n.ctx.opID
 	id.defID = dstID
 
 	switch kind {

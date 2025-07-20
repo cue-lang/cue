@@ -503,13 +503,13 @@ diff old new
      PARENT: (bool){ true }
 -- out/evalalpha/stats --
 Leaks:  41
-Freed:  158
-Reused: 138
+Freed:  159
+Reused: 139
 Allocs: 61
 Retain: 0
 
-Unifications: 166
-Conjuncts:    315
+Unifications: 167
+Conjuncts:    316
 Disjuncts:    10
 Notifications: 3
 
@@ -520,10 +520,11 @@ diff old new
 +++ new
 @@ -1,13 +1,12 @@
 -Leaks:  52
-+Leaks:  41
- Freed:  158
+-Freed:  158
 -Reused: 149
-+Reused: 138
++Leaks:  41
++Freed:  159
++Reused: 139
  Allocs: 61
 -Retain: 184
 -
@@ -536,22 +537,22 @@ diff old new
 -NumCloseIDs: 11
 +Retain: 0
 +
-+Unifications: 166
-+Conjuncts:    315
++Unifications: 167
++Conjuncts:    316
 +Disjuncts:    10
 +Notifications: 3
 +
 +NumCloseIDs: 107
 -- out/eval/stats --
 Leaks:  52
-Freed:  158
-Reused: 149
+Freed:  159
+Reused: 150
 Allocs: 61
 Retain: 184
 
-Unifications: 196
-Conjuncts:    365
-Disjuncts:    241
+Unifications: 197
+Conjuncts:    366
+Disjuncts:    242
 
 MisalignedConjunct: 74
 

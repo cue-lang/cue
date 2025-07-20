@@ -22,14 +22,14 @@ i: list.Repeat(["b"], 3)
 j: strings.Join(i, "")
 -- out/eval/stats --
 Leaks:  2
-Freed:  36
-Reused: 31
+Freed:  47
+Reused: 42
 Allocs: 7
 Retain: 6
 
-Unifications: 38
-Conjuncts:    45
-Disjuncts:    42
+Unifications: 49
+Conjuncts:    56
+Disjuncts:    53
 -- out/eval --
 (struct){
   a: (string){ "est" }

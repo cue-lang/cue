@@ -225,13 +225,13 @@ issue3903: noshare: {
 }
 -- out/evalalpha/stats --
 Leaks:  2
-Freed:  229
-Reused: 205
+Freed:  233
+Reused: 209
 Allocs: 26
 Retain: 0
 
-Unifications: 220
-Conjuncts:    408
+Unifications: 224
+Conjuncts:    412
 Disjuncts:    6
 Notifications: 1
 
@@ -255,27 +255,27 @@ diff old new
 -
 -NumCloseIDs: 7
 +Leaks:  2
-+Freed:  229
-+Reused: 205
++Freed:  233
++Reused: 209
 +Allocs: 26
 +Retain: 0
 +
-+Unifications: 220
-+Conjuncts:    408
++Unifications: 224
++Conjuncts:    412
 +Disjuncts:    6
 +Notifications: 1
 +
 +NumCloseIDs: 104
 -- out/eval/stats --
 Leaks:  6
-Freed:  272
-Reused: 261
+Freed:  276
+Reused: 265
 Allocs: 17
 Retain: 36
 
-Unifications: 252
-Conjuncts:    523
-Disjuncts:    305
+Unifications: 256
+Conjuncts:    527
+Disjuncts:    309
 
 MisalignedConjunct: 36
 

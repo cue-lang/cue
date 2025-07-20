@@ -28,17 +28,17 @@ diff old new
 +++ new
 @@ -1,9 +1,9 @@
  Leaks:  0
--Freed:  3
--Reused: 1
--Allocs: 2
+-Freed:  8
+-Reused: 5
+-Allocs: 3
 +Freed:  4
 +Reused: 0
 +Allocs: 4
  Retain: 0
  
--Unifications: 3
--Conjuncts:    7
--Disjuncts:    3
+-Unifications: 8
+-Conjuncts:    12
+-Disjuncts:    8
 +Unifications: 4
 +Conjuncts:    4
 +Disjuncts:    0

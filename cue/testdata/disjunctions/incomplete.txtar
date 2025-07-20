@@ -66,14 +66,14 @@ issue3680: t2: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  98
-Reused: 88
+Freed:  106
+Reused: 96
 Allocs: 10
 Retain: 0
 
-Unifications: 56
-Conjuncts:    132
-Disjuncts:    98
+Unifications: 64
+Conjuncts:    140
+Disjuncts:    106
 -- out/eval --
 (struct){
   issue700: (struct){

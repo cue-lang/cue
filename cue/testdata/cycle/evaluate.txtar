@@ -124,13 +124,13 @@ issue3978: {
 }
 -- out/evalalpha/stats --
 Leaks:  8
-Freed:  116
-Reused: 93
+Freed:  117
+Reused: 94
 Allocs: 31
 Retain: 0
 
-Unifications: 104
-Conjuncts:    151
+Unifications: 105
+Conjuncts:    152
 Disjuncts:    5
 
 NumCloseIDs: 47
@@ -138,7 +138,7 @@ NumCloseIDs: 47
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,11 @@
+@@ -1,13 +1,11 @@
 -Leaks:  47
 -Freed:  129
 -Reused: 122
@@ -149,28 +149,30 @@ diff old new
 -Conjuncts:    298
 -Disjuncts:    193
 -
+-MisalignedConjunct: 1
+-
 -NumCloseIDs: 6
 +Leaks:  8
-+Freed:  116
-+Reused: 93
++Freed:  117
++Reused: 94
 +Allocs: 31
 +Retain: 0
 +
-+Unifications: 104
-+Conjuncts:    151
++Unifications: 105
++Conjuncts:    152
 +Disjuncts:    5
 +
 +NumCloseIDs: 47
 -- out/eval/stats --
 Leaks:  47
-Freed:  129
-Reused: 122
+Freed:  133
+Reused: 126
 Allocs: 54
 Retain: 137
 
-Unifications: 164
-Conjuncts:    298
-Disjuncts:    193
+Unifications: 168
+Conjuncts:    302
+Disjuncts:    197
 
 MisalignedConjunct: 1
 

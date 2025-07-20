@@ -346,7 +346,7 @@ NumCloseIDs: 112
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,12 @@
+@@ -1,13 +1,12 @@
 -Leaks:  13
 -Freed:  223
 -Reused: 214
@@ -356,6 +356,8 @@ diff old new
 -Unifications: 220
 -Conjuncts:    279
 -Disjuncts:    302
+-
+-MisalignedConjunct: 20
 -
 -NumCloseIDs: 57
 +Leaks:  22

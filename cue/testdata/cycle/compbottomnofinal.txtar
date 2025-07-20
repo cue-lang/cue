@@ -375,14 +375,14 @@ diff old new
 +++ new
 @@ -1,11 +1,12 @@
 -Leaks:  10
--Freed:  105
--Reused: 95
+-Freed:  119
+-Reused: 109
 -Allocs: 20
 -Retain: 302
 -
--Unifications: 115
--Conjuncts:    244
--Disjuncts:    215
+-Unifications: 129
+-Conjuncts:    258
+-Disjuncts:    229
 -
 -NumCloseIDs: 48
 +Leaks:  44
@@ -399,14 +399,14 @@ diff old new
 +NumCloseIDs: 76
 -- out/eval/stats --
 Leaks:  10
-Freed:  105
-Reused: 95
+Freed:  119
+Reused: 109
 Allocs: 20
 Retain: 302
 
-Unifications: 115
-Conjuncts:    244
-Disjuncts:    215
+Unifications: 129
+Conjuncts:    258
+Disjuncts:    229
 
 NumCloseIDs: 48
 -- out/evalalpha --

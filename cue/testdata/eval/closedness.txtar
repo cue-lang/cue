@@ -764,13 +764,13 @@ issue3332: {
 
 -- out/evalalpha/stats --
 Leaks:  3
-Freed:  803
-Reused: 758
+Freed:  804
+Reused: 759
 Allocs: 48
 Retain: 0
 
-Unifications: 775
-Conjuncts:    1911
+Unifications: 776
+Conjuncts:    1912
 Disjuncts:    2
 
 NumCloseIDs: 578
@@ -791,26 +791,26 @@ diff old new
 -
 -NumCloseIDs: 1
 +Leaks:  3
-+Freed:  803
-+Reused: 758
++Freed:  804
++Reused: 759
 +Allocs: 48
 +Retain: 0
 +
-+Unifications: 775
-+Conjuncts:    1911
++Unifications: 776
++Conjuncts:    1912
 +Disjuncts:    2
 +
 +NumCloseIDs: 578
 -- out/eval/stats --
 Leaks:  19
-Freed:  864
-Reused: 856
+Freed:  866
+Reused: 858
 Allocs: 27
 Retain: 93
 
-Unifications: 877
-Conjuncts:    2168
-Disjuncts:    958
+Unifications: 879
+Conjuncts:    2170
+Disjuncts:    960
 
 NumCloseIDs: 1
 -- out/eval --

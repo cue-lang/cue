@@ -816,7 +816,6 @@ func (a *reqSets) replaceIDs(ctx *OpContext, b ...replaceID) {
 
 		for qIdx := 0; qIdx < len(queue); qIdx++ {
 			currentSet := queue[qIdx]
-			ctx.stats.CloseIDElems++
 
 			for _, nextID := range index[currentSet.id].replacements {
 				if !index[nextID].delete && !visited.Has(nextID) {

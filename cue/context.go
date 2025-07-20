@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/types"
 )
 
 // A Context is used for creating CUE [Value] objects.
@@ -247,15 +248,19 @@ func (c *Context) CompileBytes(b []byte, options ...BuildOption) Value {
 // 	return c.compile(c.runtime().Compile("", b))
 // }
 
+func makeV(c *adt.OpContext, v adt.Value) Value {
+	x := newValueRoot(c.Runtime.(*runtime.Runtime), c, v)
+	adt.AddStats(c)
+	return x
+}
+
 func (c *Context) make(v *adt.Vertex) Value {
 	opCtx := newContext(c.runtime())
 	// TODO: this is currently needed to ensure that node is properly recognized
 	// as evaluated. Not dereferencing nodes, however, will have the benefit of
 	// retaining more information. Remove the indirection when the code will be
 	// able to properly handle this.
-	x := newValueRoot(c.runtime(), opCtx, v)
-	adt.AddStats(opCtx)
-	return x
+	return makeV(opCtx, v)
 }
 
 // An EncodeOption defines options for the various encoding-related methods of
@@ -364,6 +369,8 @@ func NilIsAny(isAny bool) EncodeOption {
 // through the Err method.
 func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
 	switch v := x.(type) {
+	case types.RuntimeValue:
+		return makeV(v.C, v.V)
 	case adt.Value:
 		return newValueRoot(c.runtime(), c.ctx(), v)
 	}

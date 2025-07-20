@@ -14,14 +14,14 @@ r: #foo & {
 }
 -- out/eval/stats --
 Leaks:  2
-Freed:  19
-Reused: 13
+Freed:  21
+Reused: 15
 Allocs: 8
 Retain: 10
 
-Unifications: 21
-Conjuncts:    52
-Disjuncts:    29
+Unifications: 23
+Conjuncts:    54
+Disjuncts:    31
 -- out/eval --
 (struct){
   #d: (#struct){

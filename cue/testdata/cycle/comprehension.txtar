@@ -1495,6 +1495,8 @@ Unifications: 970
 Conjuncts:    2973
 Disjuncts:    1704
 
+MisalignedConjunct: 268
+
 NumCloseIDs: 16
 -- diff/explanation --
 B.a.children: now correctly marked as incomplete

@@ -2698,6 +2698,8 @@ Unifications: 1435
 Conjuncts:    4154
 Disjuncts:    2979
 
+MisalignedConjunct: 44
+
 NumCloseIDs: 10
 -- diff/todo/p2 --
 noChildError.issue1808.#type: one disjunction options eliminated due to earlier detected structural cycle. May be okay, but investigate.

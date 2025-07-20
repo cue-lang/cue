@@ -188,6 +188,8 @@ Unifications: 72
 Conjuncts:    127
 Disjuncts:    83
 
+MisalignedConjunct: 27
+
 NumCloseIDs: 20
 -- out/evalalpha --
 Errors:

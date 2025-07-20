@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7975e2a9_3a8d72a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-20T10:13:40Z",
+      "side": 1,
+      "message": "Investigate regression in compbottom.txtar",
+      "revId": "21edc19fa0bb39f7cd5e97ab30b8ebe41bb76d11",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

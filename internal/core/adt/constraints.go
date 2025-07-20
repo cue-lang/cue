@@ -101,10 +101,15 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 		found := false
 		constraint.VisitLeafConjuncts(func(x Conjunct) bool {
 			if x.x == c.x && x.Env.Up == c.Env.Up && x.Env.Vertex == c.Env.Vertex {
-				src := x.CloseInfo.defID
-				dst := c.CloseInfo.defID
 				found = true
-				n.addReplacement(replaceID{from: dst, to: src})
+				if c.CloseInfo.opID == n.ctx.generation {
+					// TODO: do we need this replacement?
+					src := x.CloseInfo.defID
+					dst := c.CloseInfo.defID
+					n.addReplacement(replaceID{from: dst, to: src})
+				} else {
+					n.ctx.stats.MisalignedConstraint++
+				}
 				return false
 			}
 			return true

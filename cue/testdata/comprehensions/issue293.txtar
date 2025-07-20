@@ -41,6 +41,8 @@ Unifications: 19
 Conjuncts:    33
 Disjuncts:    20
 
+MisalignedConjunct: 1
+
 NumCloseIDs: 4
 -- out/evalalpha --
 Errors:

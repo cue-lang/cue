@@ -362,6 +362,12 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	default:
 		closeInfo = n.addResolver(arc, closeInfo, true)
 	}
+	if closeInfo.defID != 0 && closeInfo.opID != n.ctx.generation {
+		// Since the closeInfo is local, this should never happen.s
+		panic("generation mismatch: " +
+			fmt.Sprintf("%#v != %#v", closeInfo.opID, n.ctx.generation))
+	}
+	c.CloseInfo.opID = closeInfo.opID
 	c.CloseInfo.defID = closeInfo.defID
 	c.CloseInfo.outerID = closeInfo.outerID
 	c.CloseInfo.enclosingEmbed = closeInfo.enclosingEmbed

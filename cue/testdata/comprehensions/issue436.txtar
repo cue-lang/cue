@@ -30,6 +30,8 @@ Unifications: 13
 Conjuncts:    44
 Disjuncts:    25
 
+MisalignedConjunct: 1
+
 NumCloseIDs: 3
 -- out/eval --
 (struct){

@@ -106,6 +106,7 @@ type CloseInfo struct {
 	*closeInfo // old implementation (TODO: remove)
 	// defID is a unique ID to track anything that gets inserted from this
 	// Conjunct.
+	opID           uint64 // generation of this conjunct, used for sanity check.
 	defID          defID
 	enclosingEmbed defID // Tracks an embedding within a struct.
 	outerID        defID // Tracks the {} that should be closed after unifying.

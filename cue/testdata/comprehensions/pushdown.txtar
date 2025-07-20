@@ -2365,6 +2365,8 @@ Unifications: 624
 Conjuncts:    1004
 Disjuncts:    756
 
+MisalignedConjunct: 151
+
 NumCloseIDs: 107
 -- diff/explanation --
 cyclicError: improved error message.

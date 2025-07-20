@@ -54,6 +54,7 @@ contents overwritten
         "ConjunctInfos": 6,
         "MaxConjunctInfos": 2,
         "MaxReqSets": 0,
+        "GenerationMismatch": 0,
         "Freed": 6,
         "Reused": 0,
         "Allocs": 6,
@@ -66,19 +67,20 @@ contents overwritten
 }
 -- out/stats.cue --
 CUE: {
-	EvalVersion:      3
-	Unifications:     4
-	Disjuncts:        2
-	Notifications:    0
-	Conjuncts:        8
-	NumCloseIDs:      2
-	ConjunctInfos:    6
-	MaxConjunctInfos: 2
-	MaxReqSets:       0
-	Freed:            6
-	Reused:           0
-	Allocs:           6
-	Retained:         0
+	EvalVersion:        3
+	Unifications:       4
+	Disjuncts:          2
+	Notifications:      0
+	Conjuncts:          8
+	NumCloseIDs:        2
+	ConjunctInfos:      6
+	MaxConjunctInfos:   2
+	MaxReqSets:         0
+	GenerationMismatch: 0
+	Freed:              6
+	Reused:             0
+	Allocs:             6
+	Retained:           0
 }
 Go: {
 	AllocBytes:   300456
@@ -95,6 +97,7 @@ CUE:
   ConjunctInfos: 6
   MaxConjunctInfos: 2
   MaxReqSets: 0
+  GenerationMismatch: 0
   Freed: 6
   Reused: 0
   Allocs: 6
@@ -114,6 +117,7 @@ Go:
         "ConjunctInfos": 6,
         "MaxConjunctInfos": 2,
         "MaxReqSets": 0,
+        "GenerationMismatch": 0,
         "Freed": 6,
         "Reused": 0,
         "Allocs": 6,

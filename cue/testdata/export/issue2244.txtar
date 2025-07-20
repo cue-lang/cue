@@ -33,14 +33,14 @@ m: #step & {
 }
 -- out/eval/stats --
 Leaks:  16
-Freed:  17
-Reused: 13
+Freed:  49
+Reused: 45
 Allocs: 20
 Retain: 30
 
-Unifications: 24
-Conjuncts:    58
-Disjuncts:    40
+Unifications: 56
+Conjuncts:    90
+Disjuncts:    72
 -- diff/explanation --
 New evaluator should ultimately disallow new definitions in closed structs
 and not allow #pattern in #step

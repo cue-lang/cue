@@ -571,19 +571,19 @@ issue4004: {
 }
 -- out/evalalpha/stats --
 Leaks:  11
-Freed:  870
-Reused: 810
+Freed:  878
+Reused: 818
 Allocs: 71
 Retain: 0
 
-Unifications: 722
-Conjuncts:    1450
+Unifications: 730
+Conjuncts:    1458
 Disjuncts:    76
 Notifications: 8
 
 NumCloseIDs: 435
 
-ConjunctInfos:       1056
+ConjunctInfos:       1064
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2
@@ -593,43 +593,43 @@ diff old new
 +++ new
 @@ -1,11 +1,17 @@
 -Leaks:  47
--Freed:  960
--Reused: 946
+-Freed:  968
+-Reused: 954
 -Allocs: 61
 -Retain: 227
 -
--Unifications: 895
--Conjuncts:    1959
--Disjuncts:    1167
+-Unifications: 903
+-Conjuncts:    1967
+-Disjuncts:    1175
 -
 -NumCloseIDs: 3
 +Leaks:  11
-+Freed:  870
-+Reused: 810
++Freed:  878
++Reused: 818
 +Allocs: 71
 +Retain: 0
 +
-+Unifications: 722
-+Conjuncts:    1450
++Unifications: 730
++Conjuncts:    1458
 +Disjuncts:    76
 +Notifications: 8
 +
 +NumCloseIDs: 435
 +
-+ConjunctInfos:       1056
++ConjunctInfos:       1064
 +MaxConjunctInfos:    5
 +MaxReqSets:          9
 +MaxRedirect:         2
 -- out/eval/stats --
 Leaks:  47
-Freed:  960
-Reused: 946
+Freed:  968
+Reused: 954
 Allocs: 61
 Retain: 227
 
-Unifications: 895
-Conjuncts:    1959
-Disjuncts:    1167
+Unifications: 903
+Conjuncts:    1967
+Disjuncts:    1175
 
 NumCloseIDs: 3
 -- out/evalalpha --

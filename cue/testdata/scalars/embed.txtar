@@ -153,13 +153,13 @@ selfRefInEmbed: t1: {
 
 -- out/evalalpha/stats --
 Leaks:  1
-Freed:  135
-Reused: 114
+Freed:  136
+Reused: 115
 Allocs: 22
 Retain: 0
 
-Unifications: 126
-Conjuncts:    284
+Unifications: 127
+Conjuncts:    285
 Disjuncts:    4
 Notifications: 12
 
@@ -170,40 +170,40 @@ diff old new
 +++ new
 @@ -1,13 +1,12 @@
 -Leaks:  10
--Freed:  130
--Reused: 123
+-Freed:  131
+-Reused: 124
 -Allocs: 17
 -Retain: 57
 -
--Unifications: 136
--Conjuncts:    304
--Disjuncts:    173
+-Unifications: 137
+-Conjuncts:    305
+-Disjuncts:    174
 -
 -MisalignedConjunct: 1
 -
 -NumCloseIDs: 2
 +Leaks:  1
-+Freed:  135
-+Reused: 114
++Freed:  136
++Reused: 115
 +Allocs: 22
 +Retain: 0
 +
-+Unifications: 126
-+Conjuncts:    284
++Unifications: 127
++Conjuncts:    285
 +Disjuncts:    4
 +Notifications: 12
 +
 +NumCloseIDs: 124
 -- out/eval/stats --
 Leaks:  10
-Freed:  130
-Reused: 123
+Freed:  131
+Reused: 124
 Allocs: 17
 Retain: 57
 
-Unifications: 136
-Conjuncts:    304
-Disjuncts:    173
+Unifications: 137
+Conjuncts:    305
+Disjuncts:    174
 
 MisalignedConjunct: 1
 

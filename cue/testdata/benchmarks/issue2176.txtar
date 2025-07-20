@@ -59,18 +59,18 @@ output: {
 }
 -- out/evalalpha/stats --
 Leaks:  32
-Freed:  415
-Reused: 257
+Freed:  669
+Reused: 511
 Allocs: 190
 Retain: 0
 
-Unifications: 375
-Conjuncts:    1332
+Unifications: 629
+Conjuncts:    1586
 Disjuncts:    8
 
 NumCloseIDs: 535
 
-ConjunctInfos:       856
+ConjunctInfos:       1110
 MaxConjunctInfos:    28
 MaxReqSets:          26
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -79,43 +79,43 @@ diff old new
 +++ new
 @@ -1,13 +1,15 @@
 -Leaks:  90
--Freed:  684
--Reused: 680
+-Freed:  1484
+-Reused: 1480
 -Allocs: 94
 -Retain: 1359
 -
--Unifications: 766
--Conjuncts:    3242
--Disjuncts:    1409
+-Unifications: 1566
+-Conjuncts:    4042
+-Disjuncts:    2209
 -
 -MisalignedConjunct: 1216
 -
 -NumCloseIDs: 12
 +Leaks:  32
-+Freed:  415
-+Reused: 257
++Freed:  669
++Reused: 511
 +Allocs: 190
 +Retain: 0
 +
-+Unifications: 375
-+Conjuncts:    1332
++Unifications: 629
++Conjuncts:    1586
 +Disjuncts:    8
 +
 +NumCloseIDs: 535
 +
-+ConjunctInfos:       856
++ConjunctInfos:       1110
 +MaxConjunctInfos:    28
 +MaxReqSets:          26
 -- out/eval/stats --
 Leaks:  90
-Freed:  684
-Reused: 680
+Freed:  1484
+Reused: 1480
 Allocs: 94
 Retain: 1359
 
-Unifications: 766
-Conjuncts:    3242
-Disjuncts:    1409
+Unifications: 1566
+Conjuncts:    4042
+Disjuncts:    2209
 
 MisalignedConjunct: 1216
 

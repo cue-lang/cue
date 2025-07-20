@@ -102,13 +102,13 @@ multipleErrors: {
 }
 -- out/evalalpha/stats --
 Leaks:  0
-Freed:  79
-Reused: 60
+Freed:  86
+Reused: 67
 Allocs: 19
 Retain: 0
 
-Unifications: 75
-Conjuncts:    97
+Unifications: 82
+Conjuncts:    104
 Disjuncts:    4
 
 NumCloseIDs: 9
@@ -118,35 +118,35 @@ diff old new
 +++ new
 @@ -1,9 +1,11 @@
 -Leaks:  8
--Freed:  115
--Reused: 110
+-Freed:  134
+-Reused: 129
 -Allocs: 13
 -Retain: 58
 -
--Unifications: 103
--Conjuncts:    255
--Disjuncts:    150
+-Unifications: 122
+-Conjuncts:    274
+-Disjuncts:    169
 +Leaks:  0
-+Freed:  79
-+Reused: 60
++Freed:  86
++Reused: 67
 +Allocs: 19
 +Retain: 0
 +
-+Unifications: 75
-+Conjuncts:    97
++Unifications: 82
++Conjuncts:    104
 +Disjuncts:    4
 +
 +NumCloseIDs: 9
 -- out/eval/stats --
 Leaks:  8
-Freed:  115
-Reused: 110
+Freed:  134
+Reused: 129
 Allocs: 13
 Retain: 58
 
-Unifications: 103
-Conjuncts:    255
-Disjuncts:    150
+Unifications: 122
+Conjuncts:    274
+Disjuncts:    169
 -- out/evalalpha --
 Errors:
 badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:

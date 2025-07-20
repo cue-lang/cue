@@ -780,14 +780,14 @@ diff old new
 +++ new
 @@ -1,11 +1,11 @@
 -Leaks:  19
--Freed:  864
--Reused: 856
+-Freed:  866
+-Reused: 858
 -Allocs: 27
 -Retain: 93
 -
--Unifications: 877
--Conjuncts:    2168
--Disjuncts:    958
+-Unifications: 879
+-Conjuncts:    2170
+-Disjuncts:    960
 -
 -NumCloseIDs: 1
 +Leaks:  3

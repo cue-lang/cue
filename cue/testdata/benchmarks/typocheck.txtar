@@ -42,25 +42,21 @@ diff old new
 +++ new
 @@ -1,13 +1,15 @@
  Leaks:  0
--Freed:  700
--Reused: 594
+ Freed:  706
+-Reused: 600
 -Allocs: 106
 -Retain: 108
--
--Unifications: 700
--Conjuncts:    1302
--Disjuncts:    807
++Reused: 304
++Allocs: 402
++Retain: 0
+ 
+ Unifications: 706
+ Conjuncts:    1308
+-Disjuncts:    813
 -
 -MisalignedConjunct: 696
 -
 -NumCloseIDs: 4
-+Freed:  706
-+Reused: 304
-+Allocs: 402
-+Retain: 0
-+
-+Unifications: 706
-+Conjuncts:    1308
 +Disjuncts:    0
 +
 +NumCloseIDs: 212

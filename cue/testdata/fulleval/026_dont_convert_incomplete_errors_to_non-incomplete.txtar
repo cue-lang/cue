@@ -58,18 +58,18 @@ diff old new
 +++ new
 @@ -1,9 +1,9 @@
  Leaks:  0
--Freed:  17
--Reused: 12
--Allocs: 5
+-Freed:  27
+-Reused: 21
+-Allocs: 6
 -Retain: 75
 +Freed:  19
 +Reused: 2
 +Allocs: 17
 +Retain: 0
  
--Unifications: 17
--Conjuncts:    71
--Disjuncts:    82
+-Unifications: 27
+-Conjuncts:    81
+-Disjuncts:    92
 +Unifications: 19
 +Conjuncts:    19
 +Disjuncts:    0

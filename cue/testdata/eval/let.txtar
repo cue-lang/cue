@@ -520,17 +520,16 @@ diff old new
 +++ new
 @@ -1,13 +1,12 @@
 -Leaks:  52
--Freed:  158
--Reused: 149
 +Leaks:  41
-+Freed:  159
+ Freed:  159
+-Reused: 150
 +Reused: 139
  Allocs: 61
 -Retain: 184
 -
--Unifications: 196
--Conjuncts:    365
--Disjuncts:    241
+-Unifications: 197
+-Conjuncts:    366
+-Disjuncts:    242
 -
 -MisalignedConjunct: 74
 -

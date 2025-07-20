@@ -295,14 +295,14 @@ diff old new
 +NumCloseIDs: 187
 -- out/eval/stats --
 Leaks:  25
-Freed:  467
-Reused: 455
+Freed:  470
+Reused: 458
 Allocs: 37
 Retain: 99
 
-Unifications: 462
-Conjuncts:    842
-Disjuncts:    558
+Unifications: 465
+Conjuncts:    845
+Disjuncts:    561
 -- out/evalalpha --
 Errors:
 noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:

@@ -13851,14 +13851,14 @@ diff old new
 +++ new
 @@ -1,9 +1,11 @@
  Leaks:  0
--Freed:  3927
--Reused: 3921
+-Freed:  3928
+-Reused: 3922
 -Allocs: 6
 -Retain: 1
 -
--Unifications: 3927
--Conjuncts:    4952
--Disjuncts:    3928
+-Unifications: 3928
+-Conjuncts:    4953
+-Disjuncts:    3929
 +Freed:  948
 +Reused: 43
 +Allocs: 905

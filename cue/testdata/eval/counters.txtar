@@ -267,14 +267,14 @@ diff old new
 +++ new
 @@ -1,13 +1,11 @@
 -Leaks:  0
--Freed:  166
--Reused: 153
+-Freed:  180
+-Reused: 167
 -Allocs: 13
 -Retain: 38
 -
--Unifications: 138
--Conjuncts:    254
--Disjuncts:    204
+-Unifications: 152
+-Conjuncts:    268
+-Disjuncts:    218
 -
 -MisalignedConjunct: 10
 -

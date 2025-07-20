@@ -50,7 +50,6 @@ contents overwritten
         "Disjuncts": 2,
         "Notifications": 0,
         "Conjuncts": 8,
-        "CloseIDElems": 0,
         "NumCloseIDs": 2,
         "ConjunctInfos": 6,
         "MaxConjunctInfos": 2,
@@ -72,7 +71,6 @@ CUE: {
 	Disjuncts:        2
 	Notifications:    0
 	Conjuncts:        8
-	CloseIDElems:     0
 	NumCloseIDs:      2
 	ConjunctInfos:    6
 	MaxConjunctInfos: 2
@@ -93,7 +91,6 @@ CUE:
   Disjuncts: 2
   Notifications: 0
   Conjuncts: 8
-  CloseIDElems: 0
   NumCloseIDs: 2
   ConjunctInfos: 6
   MaxConjunctInfos: 2
@@ -113,7 +110,6 @@ Go:
         "Disjuncts": 2,
         "Notifications": 0,
         "Conjuncts": 8,
-        "CloseIDElems": 0,
         "NumCloseIDs": 2,
         "ConjunctInfos": 6,
         "MaxConjunctInfos": 2,

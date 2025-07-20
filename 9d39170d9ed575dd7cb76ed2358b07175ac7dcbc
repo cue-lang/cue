@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66964b91_c71d1fb5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-20T10:26:54Z",
+      "side": 1,
+      "message": "I might want to change generation to opID to more clearly explain what it is.",
+      "revId": "9d39170d9ed575dd7cb76ed2358b07175ac7dcbc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

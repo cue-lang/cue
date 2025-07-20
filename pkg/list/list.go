@@ -327,20 +327,22 @@ func MatchN(list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error)
 	return matchN(c, list, n, matchValue)
 }
 
+var finalCfg = &adt.ValidateConfig{
+	Final: true,
+}
+
 // matchN is the actual implementation of MatchN.
 func matchN(c *adt.OpContext, list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error) {
 	var nmatch int64
 	for _, w := range list {
 		vx := adt.Unify(c, value.Vertex(matchValue), value.Vertex(w))
-		x := value.Make(c, vx)
-		if x.Validate(cue.Final()) == nil {
+
+		if adt.Validate(c, vx, finalCfg) == nil {
 			nmatch++
 		}
 	}
 
-	ctx := value.Context(c)
-
-	if err := n.Unify(ctx.Encode(nmatch)).Err(); err != nil {
+	if err := n.Unify(value.MakeAny(c, nmatch)).Err(); err != nil {
 		return false, pkg.ValidationError{B: &adt.Bottom{
 			Code: adt.EvalError,
 			Err: errors.Newf(

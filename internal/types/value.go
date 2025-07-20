@@ -29,6 +29,11 @@ type RuntimeValue struct {
 	V adt.Value
 }
 
+type RuntimeAnyValue struct {
+	C *adt.OpContext
+	V any
+}
+
 type Interface interface {
 	Core(v *Value)
 }

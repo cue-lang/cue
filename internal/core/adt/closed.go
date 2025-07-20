@@ -309,7 +309,7 @@ type closeStats struct {
 	// the other fields of this closeStats value are only valid if generation
 	// is equal to the generation in OpContext. This allows for lazy
 	// initialization of closeStats.
-	generation int
+	generation uint64
 
 	// These counts keep track of how many required child nodes need to be
 	// completed before this node is accepted.
@@ -352,7 +352,7 @@ func Accept(ctx *OpContext, n *Vertex, f Feature) (found, required bool) {
 	if ctx.isDevVersion() {
 		return n.accept(ctx, f), true
 	}
-	ctx.generation++
+	ctx.opID++
 	ctx.todo = nil
 
 	var optionalTypes OptionalType
@@ -488,8 +488,8 @@ func getScratch(ctx *OpContext, s *closeInfo) *closeStats {
 		m[s] = x
 	}
 
-	if x.generation != ctx.generation {
-		*x = closeStats{generation: ctx.generation}
+	if x.generation != ctx.opID {
+		*x = closeStats{generation: ctx.opID}
 	}
 
 	return x

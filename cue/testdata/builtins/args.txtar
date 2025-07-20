@@ -16,14 +16,14 @@ issue3584: reduced: t2: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  14
-Reused: 5
+Freed:  21
+Reused: 12
 Allocs: 9
 Retain: 1
 
-Unifications: 10
-Conjuncts:    17
-Disjuncts:    15
+Unifications: 17
+Conjuncts:    24
+Disjuncts:    22
 -- out/eval --
 (struct){
   issue3584: (struct){

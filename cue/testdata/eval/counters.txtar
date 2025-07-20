@@ -251,13 +251,13 @@ issue3824: panic: {
 }
 -- out/evalalpha/stats --
 Leaks:  6
-Freed:  215
-Reused: 163
+Freed:  233
+Reused: 181
 Allocs: 58
 Retain: 0
 
-Unifications: 164
-Conjuncts:    267
+Unifications: 182
+Conjuncts:    285
 Disjuncts:    36
 
 NumCloseIDs: 60
@@ -265,7 +265,7 @@ NumCloseIDs: 60
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,11 @@
+@@ -1,13 +1,11 @@
 -Leaks:  0
 -Freed:  166
 -Reused: 153
@@ -276,28 +276,30 @@ diff old new
 -Conjuncts:    254
 -Disjuncts:    204
 -
+-MisalignedConjunct: 10
+-
 -NumCloseIDs: 16
 +Leaks:  6
-+Freed:  215
-+Reused: 163
++Freed:  233
++Reused: 181
 +Allocs: 58
 +Retain: 0
 +
-+Unifications: 164
-+Conjuncts:    267
++Unifications: 182
++Conjuncts:    285
 +Disjuncts:    36
 +
 +NumCloseIDs: 60
 -- out/eval/stats --
 Leaks:  0
-Freed:  166
-Reused: 153
+Freed:  180
+Reused: 167
 Allocs: 13
 Retain: 38
 
-Unifications: 138
-Conjuncts:    254
-Disjuncts:    204
+Unifications: 152
+Conjuncts:    268
+Disjuncts:    218
 
 MisalignedConjunct: 10
 

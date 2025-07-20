@@ -24,6 +24,11 @@ type Value struct {
 	V *adt.Vertex
 }
 
+type RuntimeValue struct {
+	C *adt.OpContext
+	V adt.Value
+}
+
 type Interface interface {
 	Core(v *Value)
 }

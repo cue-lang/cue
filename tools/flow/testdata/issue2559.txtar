@@ -60,26 +60,26 @@ graph TD
 }
 -- out/run/t1/stats --
 Leaks:  0
-Freed:  25577
-Reused: 25557
+Freed:  25599
+Reused: 25579
 Allocs: 20
 Retain: 337
 
-Unifications: 18345
-Conjuncts:    76395
-Disjuncts:    25826
+Unifications: 18367
+Conjuncts:    76417
+Disjuncts:    25848
 
 NumCloseIDs: 72
 -- out/run/stats/totals --
 Leaks:  0
-Freed:  25577
-Reused: 25557
+Freed:  25599
+Reused: 25579
 Allocs: 20
 Retain: 337
 
-Unifications: 18345
-Conjuncts:    76395
-Disjuncts:    25826
+Unifications: 18367
+Conjuncts:    76417
+Disjuncts:    25848
 
 NumCloseIDs: 72
 -- out/run/t2 --

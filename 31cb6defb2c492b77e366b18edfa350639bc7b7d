@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "323cf9bf_80afbe2d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-20T13:07:28Z",
+      "side": 1,
+      "message": "Now we have a separate parent graph to represents sets, we don\u0027t have to keep entries tagged as \"removed\". But in that case we still need to copy. Instead, we could perhaps call getReqSet instead and use the buffer there, or copy the parent buffer to the buffer in na.",
+      "revId": "31cb6defb2c492b77e366b18edfa350639bc7b7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

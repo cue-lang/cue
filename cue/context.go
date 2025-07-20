@@ -368,16 +368,21 @@ func NilIsAny(isAny bool) EncodeOption {
 // encode such a value results in the returned value being an error, accessible
 // through the Err method.
 func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
+	var ctx *adt.OpContext
 	switch v := x.(type) {
+	case types.RuntimeAnyValue:
+		ctx = v.C
+		x = v.V
 	case types.RuntimeValue:
 		return makeV(v.C, v.V)
 	case adt.Value:
 		return newValueRoot(c.runtime(), c.ctx(), v)
+	default:
+		ctx = c.ctx()
 	}
 	var options encodeOptions
 	options.process(option)
 
-	ctx := c.ctx()
 	// TODO: is true the right default?
 	expr := convert.GoValueToValue(ctx, x, options.nilIsTop)
 	var n *adt.Vertex
@@ -388,7 +393,7 @@ func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
 		n.AddConjunct(adt.MakeRootConjunct(nil, expr))
 	}
 	n.Finalize(ctx)
-	return c.make(n)
+	return makeV(ctx, n)
 }
 
 // Encode converts a Go type to a CUE [Value].

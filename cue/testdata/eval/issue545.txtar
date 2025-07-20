@@ -54,17 +54,17 @@ diff old new
 +++ new
 @@ -1,9 +1,12 @@
  Leaks:  0
--Freed:  121
--Reused: 107
+-Freed:  126
+-Reused: 112
 -Allocs: 14
 +Freed:  71
 +Reused: 44
 +Allocs: 27
  Retain: 0
  
--Unifications: 65
--Conjuncts:    205
--Disjuncts:    121
+-Unifications: 70
+-Conjuncts:    210
+-Disjuncts:    126
 +Unifications: 31
 +Conjuncts:    81
 +Disjuncts:    16

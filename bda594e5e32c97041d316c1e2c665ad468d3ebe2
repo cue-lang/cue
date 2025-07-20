@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa16b3a1_5dbc831c",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_typocheck.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-20T11:33:55Z",
+      "side": 1,
+      "message": "Include a brief description at the top of this testscript?",
+      "revId": "bda594e5e32c97041d316c1e2c665ad468d3ebe2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

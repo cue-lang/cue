@@ -75,13 +75,13 @@ x:
 <0>{x: <1>C{s: "myname", out: "myname"}, #T: <2>C{s: string, out: <3>.Execute ("{{.s}}",<4>C{s: <5>.s})}, #V: <6>C{s: string, out: <7>.Marshal (<8>C{s: <9>.s})}, #U: <10>C{s: string, out: <11>.Marshal (<12>C{s: <13>.s})}}
 -- out/evalalpha/stats --
 Leaks:  0
-Freed:  21
-Reused: 12
-Allocs: 9
+Freed:  23
+Reused: 13
+Allocs: 10
 Retain: 0
 
-Unifications: 21
-Conjuncts:    24
+Unifications: 23
+Conjuncts:    26
 Disjuncts:    0
 
 NumCloseIDs: 3
@@ -91,34 +91,34 @@ diff old new
 +++ new
 @@ -1,9 +1,11 @@
  Leaks:  0
--Freed:  45
--Reused: 39
+-Freed:  51
+-Reused: 45
 -Allocs: 6
 -Retain: 17
 -
--Unifications: 45
--Conjuncts:    77
--Disjuncts:    62
-+Freed:  21
-+Reused: 12
-+Allocs: 9
+-Unifications: 51
+-Conjuncts:    83
+-Disjuncts:    68
++Freed:  23
++Reused: 13
++Allocs: 10
 +Retain: 0
 +
-+Unifications: 21
-+Conjuncts:    24
++Unifications: 23
++Conjuncts:    26
 +Disjuncts:    0
 +
 +NumCloseIDs: 3
 -- out/eval/stats --
 Leaks:  0
-Freed:  45
-Reused: 39
+Freed:  51
+Reused: 45
 Allocs: 6
 Retain: 17
 
-Unifications: 45
-Conjuncts:    77
-Disjuncts:    62
+Unifications: 51
+Conjuncts:    83
+Disjuncts:    68
 -- out/evalalpha --
 (struct){
   x: (#struct){

@@ -91,14 +91,14 @@ diff old new
 +++ new
 @@ -1,9 +1,11 @@
  Leaks:  0
--Freed:  45
--Reused: 39
+-Freed:  51
+-Reused: 45
 -Allocs: 6
 -Retain: 17
 -
--Unifications: 45
--Conjuncts:    77
--Disjuncts:    62
+-Unifications: 51
+-Conjuncts:    83
+-Disjuncts:    68
 +Freed:  23
 +Reused: 13
 +Allocs: 10

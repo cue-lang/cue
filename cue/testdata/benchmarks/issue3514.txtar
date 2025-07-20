@@ -37,13 +37,13 @@ _schema: {
 }
 -- out/evalalpha/stats --
 Leaks:  12
-Freed:  3590
-Reused: 2436
+Freed:  3596
+Reused: 2442
 Allocs: 1166
 Retain: 0
 
-Unifications: 50
-Conjuncts:    7010
+Unifications: 56
+Conjuncts:    7016
 Disjuncts:    2362
 Notifications: 2
 
@@ -54,36 +54,36 @@ diff old new
 +++ new
 @@ -1,9 +1,12 @@
 -Leaks:  27
--Freed:  31092
--Reused: 30511
+-Freed:  31173
+-Reused: 30592
 -Allocs: 608
 -Retain: 47
 -
--Unifications: 189
--Conjuncts:    92950
--Disjuncts:    31139
+-Unifications: 270
+-Conjuncts:    93031
+-Disjuncts:    31220
 +Leaks:  12
-+Freed:  3590
-+Reused: 2436
++Freed:  3596
++Reused: 2442
 +Allocs: 1166
 +Retain: 0
 +
-+Unifications: 50
-+Conjuncts:    7010
++Unifications: 56
++Conjuncts:    7016
 +Disjuncts:    2362
 +Notifications: 2
 +
 +NumCloseIDs: 5733
 -- out/eval/stats --
 Leaks:  27
-Freed:  31092
-Reused: 30511
+Freed:  31173
+Reused: 30592
 Allocs: 608
 Retain: 47
 
-Unifications: 189
-Conjuncts:    92950
-Disjuncts:    31139
+Unifications: 270
+Conjuncts:    93031
+Disjuncts:    31220
 -- out/eval --
 (struct){
   _data: (struct){

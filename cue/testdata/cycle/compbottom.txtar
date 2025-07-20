@@ -256,14 +256,14 @@ medium: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  85
-Reused: 73
+Freed:  105
+Reused: 93
 Allocs: 12
 Retain: 200
 
-Unifications: 85
-Conjuncts:    152
-Disjuncts:    194
+Unifications: 105
+Conjuncts:    172
+Disjuncts:    214
 
 MisalignedConjunct: 3
 
@@ -282,22 +282,28 @@ NumCloseIDs: 24
       }
     }
     p2: (struct){
-      #aux: (#struct){
-        message: (string){ "message: hello" }
+      #aux: (_|_){
+        // [incomplete] simple.p2.#aux.message: cyclic reference to field message:
+        //     ./in.cue:23:4
       }
-      X: (string){ "message: hello" }
+      X: (_|_){
+        // [incomplete] simple.p2.X: undefined field: message:
+        //     ./in.cue:33:11
+      }
       Y: (struct){
-        message: (string){ "hello" }
       }
     }
     p3: (struct){
-      #aux: (#struct){
-        message: (string){ "message: hello" }
+      #aux: (_|_){
+        // [incomplete] simple.p3.#aux.message: cyclic reference to field message:
+        //     ./in.cue:38:4
       }
       Y: (struct){
-        message: (string){ "hello" }
       }
-      X: (string){ "message: hello" }
+      X: (_|_){
+        // [incomplete] simple.p3.X: undefined field: message:
+        //     ./in.cue:48:11
+      }
     }
     p4: (struct){
       X: (string){ "message: hello" }
@@ -309,22 +315,28 @@ NumCloseIDs: 24
       }
     }
     p5: (struct){
-      #aux: (#struct){
-        message: (string){ "message: hello" }
+      #aux: (_|_){
+        // [incomplete] simple.p5.#aux.message: cyclic reference to field message:
+        //     ./in.cue:68:4
       }
-      X: (string){ "message: hello" }
+      X: (_|_){
+        // [incomplete] simple.p5.X: undefined field: message:
+        //     ./in.cue:76:11
+      }
       Y: (struct){
-        message: (string){ "hello" }
       }
     }
     p6: (struct){
-      #aux: (#struct){
-        message: (string){ "message: hello" }
+      #aux: (_|_){
+        // [incomplete] simple.p6.#aux.message: cyclic reference to field message:
+        //     ./in.cue:83:4
       }
       Y: (struct){
-        message: (string){ "hello" }
       }
-      X: (string){ "message: hello" }
+      X: (_|_){
+        // [incomplete] simple.p6.X: undefined field: message:
+        //     ./in.cue:92:11
+      }
     }
   }
   medium: (struct){
@@ -355,7 +367,6 @@ NumCloseIDs: 24
         host: (string){ "mod.test" }
       }
       #Y: (#struct){
-        userinfo: (string){ "user" }
         host: (string){ "mod.test" }
       }
     }
@@ -370,7 +381,6 @@ NumCloseIDs: 24
         host: (string){ "mod.test" }
       }
       #Y: (#struct){
-        userinfo: (string){ "user" }
         host: (string){ "mod.test" }
       }
     }
@@ -385,7 +395,6 @@ NumCloseIDs: 24
         host: (string){ "mod.test" }
       }
       #Y: (#struct){
-        userinfo: (string){ "user" }
         host: (string){ "mod.test" }
       }
     }
@@ -395,11 +404,97 @@ NumCloseIDs: 24
 diff old new
 --- old
 +++ new
-@@ -84,38 +84,38 @@
-         host: (string){ "mod.test" }
+@@ -11,22 +11,28 @@
+       }
+     }
+     p2: (struct){
+-      #aux: (#struct){
+-        message: (string){ "message: hello" }
+-      }
+-      X: (string){ "message: hello" }
+-      Y: (struct){
+-        message: (string){ "hello" }
+-      }
+-    }
+-    p3: (struct){
+-      #aux: (#struct){
+-        message: (string){ "message: hello" }
+-      }
+-      Y: (struct){
+-        message: (string){ "hello" }
+-      }
+-      X: (string){ "message: hello" }
++      #aux: (_|_){
++        // [incomplete] simple.p2.#aux.message: cyclic reference to field message:
++        //     ./in.cue:23:4
++      }
++      X: (_|_){
++        // [incomplete] simple.p2.X: undefined field: message:
++        //     ./in.cue:33:11
++      }
++      Y: (struct){
++      }
++    }
++    p3: (struct){
++      #aux: (_|_){
++        // [incomplete] simple.p3.#aux.message: cyclic reference to field message:
++        //     ./in.cue:38:4
++      }
++      Y: (struct){
++      }
++      X: (_|_){
++        // [incomplete] simple.p3.X: undefined field: message:
++        //     ./in.cue:48:11
++      }
+     }
+     p4: (struct){
+       X: (string){ "message: hello" }
+@@ -38,22 +44,28 @@
+       }
+     }
+     p5: (struct){
+-      #aux: (#struct){
+-        message: (string){ "message: hello" }
+-      }
+-      X: (string){ "message: hello" }
+-      Y: (struct){
+-        message: (string){ "hello" }
++      #aux: (_|_){
++        // [incomplete] simple.p5.#aux.message: cyclic reference to field message:
++        //     ./in.cue:68:4
++      }
++      X: (_|_){
++        // [incomplete] simple.p5.X: undefined field: message:
++        //     ./in.cue:76:11
++      }
++      Y: (struct){
+       }
+     }
+     p6: (struct){
+-      #aux: (#struct){
+-        message: (string){ "message: hello" }
+-      }
+-      Y: (struct){
+-        message: (string){ "hello" }
+-      }
+-      X: (string){ "message: hello" }
++      #aux: (_|_){
++        // [incomplete] simple.p6.#aux.message: cyclic reference to field message:
++        //     ./in.cue:83:4
++      }
++      Y: (struct){
++      }
++      X: (_|_){
++        // [incomplete] simple.p6.X: undefined field: message:
++        //     ./in.cue:92:11
++      }
+     }
+   }
+   medium: (struct){
+@@ -85,37 +97,34 @@
        }
        #Y: (#struct){
--        host: (string){ "mod.test" }
+         host: (string){ "mod.test" }
 -        userinfo: (string){ "user" }
 -      }
 -    }
@@ -431,8 +526,6 @@ diff old new
 -      #Y: (#struct){
 -        host: (string){ "mod.test" }
 -        userinfo: (string){ "user" }
-+        userinfo: (string){ "user" }
-+        host: (string){ "mod.test" }
 +      }
 +    }
 +    p3: (struct){
@@ -446,7 +539,6 @@ diff old new
 +        host: (string){ "mod.test" }
 +      }
 +      #Y: (#struct){
-+        userinfo: (string){ "user" }
 +        host: (string){ "mod.test" }
 +      }
 +    }
@@ -461,7 +553,6 @@ diff old new
 +        host: (string){ "mod.test" }
 +      }
 +      #Y: (#struct){
-+        userinfo: (string){ "user" }
 +        host: (string){ "mod.test" }
        }
      }

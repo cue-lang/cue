@@ -24,13 +24,13 @@ bar:  hex.EncodedLen(len)
 <0>{foo: <1>.Decode (<2>.data), data: bytes, len: int, bar: <3>.EncodedLen (<2>.len)}
 -- out/evalalpha/stats --
 Leaks:  0
-Freed:  5
-Reused: 0
-Allocs: 5
+Freed:  7
+Reused: 1
+Allocs: 6
 Retain: 0
 
-Unifications: 5
-Conjuncts:    5
+Unifications: 7
+Conjuncts:    7
 Disjuncts:    0
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -38,29 +38,31 @@ diff old new
 +++ new
 @@ -1,9 +1,9 @@
  Leaks:  0
- Freed:  5
--Reused: 2
--Allocs: 3
+-Freed:  15
+-Reused: 11
+-Allocs: 4
 -Retain: 5
-+Reused: 0
-+Allocs: 5
++Freed:  7
++Reused: 1
++Allocs: 6
 +Retain: 0
  
- Unifications: 5
--Conjuncts:    13
--Disjuncts:    10
-+Conjuncts:    5
+-Unifications: 15
+-Conjuncts:    23
+-Disjuncts:    20
++Unifications: 7
++Conjuncts:    7
 +Disjuncts:    0
 -- out/eval/stats --
 Leaks:  0
-Freed:  5
-Reused: 2
-Allocs: 3
+Freed:  15
+Reused: 11
+Allocs: 4
 Retain: 5
 
-Unifications: 5
-Conjuncts:    13
-Disjuncts:    10
+Unifications: 15
+Conjuncts:    23
+Disjuncts:    20
 -- out/eval --
 (struct){
   foo: (_|_){

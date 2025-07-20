@@ -256,13 +256,13 @@ issue3634: reduced: {
 }
 -- out/evalalpha/stats --
 Leaks:  40
-Freed:  466
-Reused: 438
+Freed:  468
+Reused: 440
 Allocs: 68
 Retain: 0
 
-Unifications: 427
-Conjuncts:    750
+Unifications: 429
+Conjuncts:    752
 Disjuncts:    30
 Notifications: 4
 
@@ -273,36 +273,36 @@ diff old new
 +++ new
 @@ -1,9 +1,12 @@
 -Leaks:  25
--Freed:  446
--Reused: 434
+-Freed:  470
+-Reused: 458
 -Allocs: 37
 -Retain: 99
 -
--Unifications: 441
--Conjuncts:    821
--Disjuncts:    537
+-Unifications: 465
+-Conjuncts:    845
+-Disjuncts:    561
 +Leaks:  40
-+Freed:  466
-+Reused: 438
++Freed:  468
++Reused: 440
 +Allocs: 68
 +Retain: 0
 +
-+Unifications: 427
-+Conjuncts:    750
++Unifications: 429
++Conjuncts:    752
 +Disjuncts:    30
 +Notifications: 4
 +
 +NumCloseIDs: 187
 -- out/eval/stats --
 Leaks:  25
-Freed:  467
-Reused: 455
+Freed:  470
+Reused: 458
 Allocs: 37
 Retain: 99
 
-Unifications: 462
-Conjuncts:    842
-Disjuncts:    558
+Unifications: 465
+Conjuncts:    845
+Disjuncts:    561
 -- out/evalalpha --
 Errors:
 noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:

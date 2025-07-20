@@ -138,7 +138,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 					counts.Disjuncts > 20,
 				orig.Conjuncts > counts.Conjuncts*2,
 				counts.Notifications > 10,
-				counts.CloseIDElems > 1000,
+				counts.NumCloseIDs > 100,
 				counts.Leaks()-orig.Leaks() > 17,
 				counts.Allocs-orig.Allocs > 50:
 				// For now, we only care about disjuncts.

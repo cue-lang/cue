@@ -70,7 +70,6 @@ type Counts struct {
 	Conjuncts int64
 
 	// Typo checking counters
-	CloseIDElems     int64 // Size of ReqSet
 	NumCloseIDs      int64 // Number of close IDs used
 	ConjunctInfos    int64 // Number of conjunct infos created
 	MaxConjunctInfos int64 // Maximum number of conjunct infos in a node
@@ -114,7 +113,6 @@ func (c *Counts) Add(other Counts) {
 	c.Disjuncts += other.Disjuncts
 	c.Notifications += other.Notifications
 
-	c.CloseIDElems += other.CloseIDElems
 	c.NumCloseIDs += other.NumCloseIDs
 	c.ConjunctInfos += other.ConjunctInfos
 	if other.MaxConjunctInfos > c.MaxConjunctInfos {
@@ -135,7 +133,6 @@ func (c Counts) Since(start Counts) Counts {
 	c.Conjuncts -= start.Conjuncts
 	c.Disjuncts -= start.Disjuncts
 	c.Notifications -= start.Notifications
-	c.CloseIDElems -= start.CloseIDElems
 	c.NumCloseIDs -= start.NumCloseIDs
 
 	c.ConjunctInfos -= start.ConjunctInfos

@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fc8fc397_230b0270",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-21T21:21:13Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "bdb46892_0bb32cd5",
+      "revId": "04e6d8894b33bd07dfa352257e7a5c83d9ac62e5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0123e090_0e004e2f",
         "filename": "internal/core/adt/context.go",
         "patchSetId": 11
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-21T07:40:04Z",
       "side": 1,
       "message": "call this something a bit more obvious to clarify it\u0027s a buffer, like redirectsBuf",
+      "revId": "04e6d8894b33bd07dfa352257e7a5c83d9ac62e5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bfb01b6_474447a3",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-21T21:21:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0123e090_0e004e2f",
       "revId": "04e6d8894b33bd07dfa352257e7a5c83d9ac62e5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -48,6 +84,24 @@
       "writtenOn": "2025-07-21T07:40:04Z",
       "side": 1,
       "message": "just to double check - if containments started with len\u003d\u003d0 here, it will end up with len\u003d\u003d2 and two zero elements. I imagine you wanted it to end up with one \"0\" element rather than two?",
+      "revId": "04e6d8894b33bd07dfa352257e7a5c83d9ac62e5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d21f04b_b262fff8",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-21T21:21:13Z",
+      "side": 1,
+      "message": "Yes, this. is correct as is. The \"zero\" index is a bit special and the default for non-referenced and non-embedded nodes. To keep indexing simpler, we add one additional element upon initialization.\nAdded comment.",
+      "parentUuid": "c157149c_6efa9b4a",
       "revId": "04e6d8894b33bd07dfa352257e7a5c83d9ac62e5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

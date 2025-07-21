@@ -16,6 +16,24 @@
       "message": "delete the intset package too? AFAICT it will be unused with this change. I\u0027d personally delete now, as we don\u0027t have another immediate use for it, and bring it back from the git history if it\u0027s needed again.",
       "revId": "d7619c499ed2199344b10eb5a4e19e2d392ec5a8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d118ba68_1bed5aec",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-21T21:21:13Z",
+      "side": 0,
+      "message": "Weird, not sure why it showed up. It should have been removed already, of course, and it is gone in my client.",
+      "parentUuid": "f36cef76_08d31b9a",
+      "revId": "d7619c499ed2199344b10eb5a4e19e2d392ec5a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

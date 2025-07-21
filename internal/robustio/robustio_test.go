@@ -30,6 +30,10 @@ func checkOSLink(t *testing.T, err error) {
 }
 
 func TestFileInfo(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test which uses long sleeps")
+	}
+
 	// A nonexistent file has no ID.
 	nonexistent := filepath.Join(t.TempDir(), "nonexistent")
 	if _, _, err := robustio.GetFileID(nonexistent); err == nil {

@@ -16,6 +16,24 @@
       "message": "make this an atomic.Uint64, then it\u0027s impossible to use it directly without sync/atomic APIs, preventing misuse or human error",
       "revId": "1c3403765560255d8ca0d0fd244d584a6a37e0da",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4776d7d_591cee63",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-21T10:06:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22bf1bcd_6e6ea4e8",
+      "revId": "1c3403765560255d8ca0d0fd244d584a6a37e0da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdb46892_0bb32cd5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-21T07:40:04Z",
+      "side": 1,
+      "message": "This commit message should be longer:\n* Expand a bit on how the new algorithm is better; for example, why do we not need replaceIDs anymore?\n* Explain that performance is the main motivator, and how we see a ~3x improvement in 3981\n* Explain that memory usage should also be significantly lower\n* Explain whether we expect any changes in behavior or not\n* Explain how it uncovered existing bugs in the previous closedness algorithm, which were fixed by the use of generation IDs, and why the previous algorithm did not cause panics or errors due to those bugs",
+      "revId": "04e6d8894b33bd07dfa352257e7a5c83d9ac62e5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0123e090_0e004e2f",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-21T07:40:04Z",
+      "side": 1,
+      "message": "call this something a bit more obvious to clarify it\u0027s a buffer, like redirectsBuf",
+      "revId": "04e6d8894b33bd07dfa352257e7a5c83d9ac62e5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c157149c_6efa9b4a",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-21T07:40:04Z",
+      "side": 1,
+      "message": "just to double check - if containments started with len\u003d\u003d0 here, it will end up with len\u003d\u003d2 and two zero elements. I imagine you wanted it to end up with one \"0\" element rather than two?",
+      "revId": "04e6d8894b33bd07dfa352257e7a5c83d9ac62e5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

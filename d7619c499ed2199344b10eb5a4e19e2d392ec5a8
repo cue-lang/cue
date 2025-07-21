@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72bdc20d_6f17f191",
+        "filename": "cue/stats/stats.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-21T07:32:56Z",
+      "side": 1,
+      "message": "nit: I would not say both \"generally\" and \"likely\" at the same time",
+      "range": {
+        "startLine": 88,
+        "startChar": 4,
+        "endLine": 88,
+        "endChar": 26
+      },
+      "revId": "d7619c499ed2199344b10eb5a4e19e2d392ec5a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e5e30a3_290c9cb0",
+        "filename": "cue/stats/stats.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-21T07:32:56Z",
+      "side": 1,
+      "message": "did you mean schema?",
+      "range": {
+        "startLine": 90,
+        "startChar": 53,
+        "endLine": 90,
+        "endChar": 59
+      },
+      "revId": "d7619c499ed2199344b10eb5a4e19e2d392ec5a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8533e54e_3b73a6da",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-21T07:32:56Z",
+      "side": 1,
+      "message": "typo at the end?",
+      "revId": "d7619c499ed2199344b10eb5a4e19e2d392ec5a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

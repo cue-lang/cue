@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8f8bcb6_c01185bb",
+        "filename": "internal/value/value.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-22T07:17:21Z",
+      "side": 1,
+      "message": "can we do better than `any` here?",
+      "revId": "d08d9df78aa2ffdb6cae3d9a7c89cd9c83bc2256",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

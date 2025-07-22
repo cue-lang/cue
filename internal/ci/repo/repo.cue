@@ -26,6 +26,9 @@ protectedBranchPatterns: [defaultBranch, releaseBranchPattern]
 botGitHubUser:      "cueckoo"
 botGitHubUserEmail: "cueckoo@gmail.com"
 
+// The tests on this repository are pretty CPU-intensive.
+linuxMachine: base.linuxLargeMachine
+
 // Use the latest Go version for extra checks,
 // such as running tests with the data race detector.
 // This may be a release candidate if we are late into a Go release cycle.

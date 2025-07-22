@@ -21,7 +21,7 @@ workflows: tip_triggers: _repo.bashWorkflow & {
 	name: "Triggers on push to tip"
 	on: push: branches: [_repo.defaultBranch, _repo.testDefaultBranch]
 	jobs: push: {
-		"runs-on": _repo.linuxMachine
+		"runs-on": _repo.linuxSmallMachine
 		if:        "${{github.repository == '\(_repo.githubRepositoryPath)'}}"
 		steps: [
 			_repo.repositoryDispatch & {

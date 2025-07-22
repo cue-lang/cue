@@ -47,7 +47,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 	}
 	jobs: {
 		(trybot.key): {
-			"runs-on": linuxMachine
+			"runs-on": linuxSmallMachine
 
 			let goodDummyData = [if json.Marshal(#dummyDispatch) != _|_ {true}, false][0]
 
@@ -165,7 +165,7 @@ pushTipToTrybotWorkflow: bashWorkflow & {
 		push: branches: protectedBranchPatterns
 	}
 	jobs: push: {
-		"runs-on": linuxMachine
+		"runs-on": linuxSmallMachine
 		if:        "${{github.repository == '\(githubRepositoryPath)'}}"
 	}
 

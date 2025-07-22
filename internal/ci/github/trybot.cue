@@ -159,29 +159,17 @@ workflows: trybot: _repo.bashWorkflow & {
 		// For now, to save CI resources, just run the checks on one matrix job.
 		if: _isLatestLinux
 	}] & [
+		_repo.goChecks,
 		{
-			name: "Go checks"
-			// Also ensure that the end-to-end tests in ./internal/_e2e, which are only run
+			name: "Verify the end-to-end tests still build"
+			// Ensure that the end-to-end tests in ./internal/_e2e, which are only run
 			// on pushes to protected branches, still build correctly before merging.
-			//
-			// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
-			run: """
-				go vet ./...
-				go mod tidy
-				(cd internal/_e2e && go test -run=-)
-				"""
-		}, {
-			name: "staticcheck"
-			// TODO(mvdan): once we can do 'go tool staticcheck' with Go 1.24+,
-			// then using this action is probably no longer worthwhile.
-			// Note that we should then persist staticcheck's cache too.
-			uses: "dominikh/staticcheck-action@v1"
-			with: {
-				version:      "2025.1" // Pin a version for determinism.
-				"install-go": false    // We install Go ourselves.
-				"use-cache":  false    // We use a volume cache instead.
-			}
+			"working-directory": "./internal/_e2e"
+			run: "go test -run=-"
 		},
+		// Note that we don't want tooling dependencies in the go.mod file,
+		// given how many downstreams rely on the cue module having few dependencies.
+		_repo.staticcheck & {#modfile: "tools.mod"},
 	]
 
 	_checkTags: githubactions.#Step & {

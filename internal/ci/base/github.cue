@@ -153,11 +153,10 @@ curlGitHubAPI: {
 // Our runner profiles on Namespace are already configured to only update
 // the cache when they run from one of the protected branches.
 //
-// We cache for Go (GOCACHE and GOMODCACHE) and for staticcheck by default,
-// as the majority of our repos use Go with staticcheck,
-// noting that staticcheck-action puts STATICCHECK_CACHE under runner.temp.
-// These default caches are harmless for repos not using Go or staticcheck.
-// TODO(mvdan): move away from staticcheck-action once we require Go 1.24 or later.
+// We cache for Go (GOCACHE and GOMODCACHE) by default, as most repos use it.
+// These default caches are harmless for repos not using Go.
+//
+// Note that `${NSC_CACHE_PATH}` (`/cache`) is always mounted as a cache volume.
 setupCaches: {
 	#additionalCaches: [...string] // with.cache
 
@@ -175,11 +174,15 @@ setupCaches: {
 					"go",
 				], #additionalCaches])
 				let cachePaths = list.Concat([[
-					"${{ runner.temp }}/staticcheck",
+					// nothing here for now.
 				], #additionalCachePaths])
 
-				cache: strings.Join(cacheModes, "\n")
-				path:  strings.Join(cachePaths, "\n")
+				if len(cacheModes) > 0 {
+					cache: strings.Join(cacheModes, "\n")
+				}
+				if len(cachePaths) > 0 {
+					path:  strings.Join(cachePaths, "\n")
+				}
 			}
 		},
 
@@ -193,6 +196,29 @@ setupCaches: {
 			run: "go env -w GOFLAGS=-count=1"
 		},
 	]
+}
+
+// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
+goChecks: githubactions.#Step & {
+	run: """
+		go mod tidy -diff
+		go vet ./...
+		"""
+}
+
+staticcheck: githubactions.#Step & {
+	#modfile: string | *"" // an optional -modfile flag to not use the main go.mod
+	let gotool = [
+		if #modfile != "" {
+		    "go tool -modfile=\(#modfile)"
+		},
+		"go tool",
+	][0]
+
+	// TODO(mvdan): swap "/cache" for "${{ env.NSC_CACHE_PATH }}" once Namespace wires up that env var
+	// for the workspace environment. See: https://discord.com/channels/975088590705012777/1397128547797176340
+	env: STATICCHECK_CACHE: "/cache/staticcheck" // persist its cache
+	run: "\(gotool) staticcheck ./..."
 }
 
 // isProtectedBranch is an expression that evaluates to true if the

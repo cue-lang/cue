@@ -58,7 +58,9 @@ botGerritHubUserEmail:              *botGitHubUserEmail | string
 unprivilegedBotGitHubUser:                               "not" + botGitHubUser
 unprivilegedBotGitHubUserCentralRegistryTokenSecretsKey: *(strings.ToUpper(unprivilegedBotGitHubUser) + "_CUE_TOKEN") | string
 
-cueCommand: *"cue" | string
+// Most repositories will already be a Go module, so they can use a tool dependency.
+// Others can override this string with e.g. `cue` from the `setup-cue` action.
+cueCommand: *"go tool cue" | string
 
 workflowFileExtension: ".yaml"
 
@@ -85,6 +87,12 @@ linuxMachine: string | *linuxSmallMachine
 // so it's actually fine if we always use "large" MacOS and Windows machines.
 macosMachine:   string | *"ns-macos-arm64"
 windowsMachine: string | *"ns-windows-amd64"
+
+// Use the latest Go version for extra checks,
+// such as running tests with the data race detector.
+latestGo: "1.24.x"
+// Some repositories also want to ensure that the previous version works.
+previousGo: "1.23.x"
 
 codeReview: #codeReview & {
 	github: githubRepositoryURL

@@ -38,7 +38,7 @@ workflows: release: _repo.bashWorkflow & {
 		branches: list.Concat([[_repo.testDefaultBranch], _repo.protectedBranchPatterns])
 	}
 	jobs: goreleaser: {
-		"runs-on": _repo.linuxMachine
+		"runs-on": _repo.linuxSmallMachine
 		if:        "${{github.repository == '\(_repo.githubRepositoryPath)'}}"
 
 		let installGo = _repo.installGo & {

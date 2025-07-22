@@ -62,7 +62,27 @@ cueCommand: *"cue" | string
 
 workflowFileExtension: ".yaml"
 
-linuxMachine:   string | *"ns-linux-amd64"
+// Linux is used by lots of repositories for many workflows,
+// so each repository can decide which jobs really need larger machines.
+// Note that using a larger machine with more CPUs and memory lowers
+// the amount of jobs that can be run concurrently at once.
+//
+// At the time of writing, "small" is 4 CPUs and 8GiB of memory
+// and "large" is 8 CPUs and 16GiB of memory.
+// With our concurrency limit for Linux at 64 CPUs and 128 GiB,
+// using "small" rather than "large" allows 16 rather than 8 jobs at once.
+linuxSmallMachine: "ns-linux-amd64-small"
+linuxLargeMachine: "ns-linux-amd64-large"
+
+// By default, the main "trybot" test job is run on the small machine.
+// Note that cheap workflows, or those which don't keep a human waiting,
+// should always use linuxSmallMachine.
+linuxMachine: string | *linuxSmallMachine
+
+// MacOS on Namespace doesn't really provide small machines,
+// as the smallest is 6 CPUs and 14 GiB on M2 hardware.
+// Most repos only test on Linux - it's just the cue repo now -
+// so it's actually fine if we always use "large" MacOS and Windows machines.
 macosMachine:   string | *"ns-macos-arm64"
 windowsMachine: string | *"ns-windows-amd64"
 

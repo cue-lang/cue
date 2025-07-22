@@ -16,7 +16,7 @@ jobs:
     defaults:
       run:
         shell: bash --noprofile --norc -euo pipefail {0}
-    runs-on: ns-linux-amd64
+    runs-on: ns-linux-amd64-small
     if: ${{github.repository == 'cue-lang/cue'}}
     steps:
       - name: Checkout code

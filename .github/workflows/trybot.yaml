@@ -88,7 +88,6 @@ jobs:
         uses: namespacelabs/nscloud-cache-action@v1
         with:
           cache: go
-          path: ${{ runner.temp }}/staticcheck
       - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test'))
@@ -139,18 +138,17 @@ jobs:
           cd internal/_e2e
           go test -race
       - if: (matrix.go-version == '1.24.x' && matrix.runner == 'ns-linux-amd64-large')
-        name: Go checks
         run: |-
+          go mod tidy -diff
           go vet ./...
-          go mod tidy
-          (cd internal/_e2e && go test -run=-)
       - if: (matrix.go-version == '1.24.x' && matrix.runner == 'ns-linux-amd64-large')
-        name: staticcheck
-        uses: dominikh/staticcheck-action@v1
-        with:
-          version: "2025.1"
-          install-go: false
-          use-cache: false
+        name: Verify the end-to-end tests still build
+        run: go test -run=-
+        working-directory: ./internal/_e2e
+      - if: (matrix.go-version == '1.24.x' && matrix.runner == 'ns-linux-amd64-large')
+        env:
+          STATICCHECK_CACHE: ${{ env.NSC_CACHE_PATH }}/staticcheck
+        run: go tool -modfile=tools.mod staticcheck ./...
       - if: |-
           (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'ns-linux-amd64-large')

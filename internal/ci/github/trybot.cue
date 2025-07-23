@@ -37,11 +37,17 @@ workflows: trybot: _repo.bashWorkflow & {
 
 	jobs: {
 		test: {
-			strategy:  _testStrategy
-			"runs-on": "${{ matrix.runner }}"
+			strategy: {
+				"fail-fast": false
+				matrix: {
+					runner: [_repo.linuxMachine, _repo.macosMachine, _repo.windowsMachine]
+					"go-version": [_repo.previousGo, _repo.latestGo]
+				}
+			}
+			"runs-on": "${{ \(_repo.matrixRunner) }}"
 
 			let installGo = _repo.installGo & {
-				#setupGo: with: "go-version": goVersionVal
+				#setupGo: with: "go-version": "${{ \(_repo.matrixGoVersion) }}"
 				_
 			}
 
@@ -60,10 +66,10 @@ workflows: trybot: _repo.bashWorkflow & {
 				_repo.earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
 					// so we only need to run them on one of the matrix jobs.
-					if: _isLatestLinux
+					if: _repo.isLatestGoLinux
 				},
 				_goTest & {
-					if: "\(_repo.isProtectedBranch) || !\(_isLatestLinux)"
+					if: "\(_repo.isProtectedBranch) || !\(_repo.isLatestGoLinux)"
 				},
 				_goTestRace,
 				_goTest32bit,
@@ -82,30 +88,12 @@ workflows: trybot: _repo.bashWorkflow & {
 		}
 	}
 
-	let matrixRunner = "matrix.runner"
-	let goVersion = "matrix.go-version"
-	let goVersionVal = "${{ \(goVersion) }}"
-
-	_testStrategy: {
-		"fail-fast": false
-		matrix: {
-			"go-version": [_repo.previousGo, _repo.latestGo]
-			runner: [_repo.linuxMachine, _repo.macosMachine, _repo.windowsMachine]
-		}
-	}
-
-	// _isLatestLinux returns a GitHub expression that evaluates to true if the job
-	// is running on Linux with the latest version of Go. This expression is often
-	// used to run certain steps just once per CI workflow, to avoid duplicated
-	// work.
-	_isLatestLinux: "(\(goVersion) == '\(_repo.latestGo)' && \(matrixRunner) == '\(_repo.linuxMachine)')"
-
 	_goGenerate: githubactions.#Step & {
 		name: "Generate"
 		run:  "go generate ./..."
 		// The Go version corresponds to the precise version specified in
 		// the matrix. Skip windows for now until we work out why re-gen is flaky
-		if: _isLatestLinux
+		if: _repo.isLatestGoLinux
 	}
 
 	_goTest: githubactions.#Step & {
@@ -117,7 +105,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// The end-to-end tests require a github token secret and are a bit slow,
 		// so we only run them on pushes to protected branches and on one
 		// environment in the source repo.
-		if: "github.repository == '\(_repo.githubRepositoryPath)' && (\(_repo.isProtectedBranch) || \(_repo.isTestDefaultBranch)) && \(_isLatestLinux)"
+		if: "github.repository == '\(_repo.githubRepositoryPath)' && (\(_repo.isProtectedBranch) || \(_repo.isTestDefaultBranch)) && \(_repo.isLatestGoLinux)"
 	}] & [
 		// Two setup steps per the upstream docs:
 		// https://github.com/google-github-actions/setup-gcloud#service-account-key-json
@@ -157,7 +145,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// However, CUE does not have any such build tags yet, and we don't use
 		// dependencies that vary wildly between platforms.
 		// For now, to save CI resources, just run the checks on one matrix job.
-		if: _isLatestLinux
+		if: _repo.isLatestGoLinux
 	}] & [
 		_repo.goChecks,
 		{
@@ -179,7 +167,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// We use `git ls-remote` to list all tags from each remote git repository
 		// because it does not depend on custom REST API endpoints and is very fast.
 		// Note that it sorts tag names as strings, which is not the best, but works OK.
-		if:   "(\(_repo.isProtectedBranch) || \(_repo.isTestDefaultBranch)) && \(_isLatestLinux)"
+		if:   "(\(_repo.isProtectedBranch) || \(_repo.isTestDefaultBranch)) && \(_repo.isLatestGoLinux)"
 		name: "Check all git tags are available"
 		run: """
 			cd $(mktemp -d)
@@ -202,7 +190,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// Windows and Mac on CI are slower than Linux, and most data races are not specific
 		// to any OS or Go version in particular, so only run all tests with -race on Linux
 		// to not slow down CI unnecessarily.
-		if:   _isLatestLinux
+		if:   _repo.isLatestGoLinux
 		name: "Test with -race"
 		env: GORACE: "atexit_sleep_ms=10" // Otherwise every Go package being tested sleeps for 1s; see https://go.dev/issues/20364.
 		run: "go test -race ./..."
@@ -218,7 +206,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// We skip this step when testing CLs and PRs, as Linux on the latest Go is the slowest
 		// job in the matrix due to the use of `go test -race`. 32-bit bugs should be rare,
 		// so them only getting caught once a patch is merged into master is not a big problem.
-		if:   "(\(_repo.isProtectedBranch) || \(_repo.isTestDefaultBranch)) && \(_isLatestLinux)"
+		if:   "(\(_repo.isProtectedBranch) || \(_repo.isTestDefaultBranch)) && \(_repo.isLatestGoLinux)"
 		name: "Test on 32 bits"
 		env: GOARCH: "386"
 		run: "go test -short ./..."

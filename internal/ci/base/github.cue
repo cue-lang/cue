@@ -19,14 +19,25 @@ bashWorkflow: githubactions.#Workflow & {
 	jobs: [string]: defaults: run: shell: "bash --noprofile --norc -euo pipefail {0}"
 }
 
+// These are useful for workflows where we use a matrix over different OS runners
+// or multiple Go versions. Note that the matrix names must match.
+matrixRunner:    "matrix.runner"
+matrixGoVersion: "matrix.go-version"
+
+// isLatestGoLinux is a GitHub expression that evaluates to true if the job
+// is running on Linux with the latest version of Go. This expression is often
+// used to run certain steps just once per CI workflow, to avoid duplicated work.
+isLatestGoLinux: "(\(matrixGoVersion) == '\(latestGo)' && \(matrixRunner) == '\(linuxMachine)')"
+
 installGo: {
 	#setupGo: githubactions.#Step & {
 		name: "Install Go"
 		uses: "actions/setup-go@v5"
 		with: {
 			// We do our own caching in setupCaches.
-			cache:        false
-			"go-version": string
+			cache: false
+			// Allow overriding when using matrixGoVersion.
+			"go-version": string | *latestGo
 		}
 	}
 

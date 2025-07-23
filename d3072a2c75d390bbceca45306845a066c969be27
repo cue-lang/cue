@@ -16,6 +16,24 @@
       "message": "Where do we check if this is tidy?",
       "revId": "d3072a2c75d390bbceca45306845a066c969be27",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65a43b79_1a6683d2",
+        "filename": "tools.mod",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-23T10:12:05Z",
+      "side": 1,
+      "message": "manually checked for now, as it\u0027s basically a proof of concept at the moment. I\u0027ve added a TODO to check tidyness in CI at a later time once we\u0027re sure we\u0027re sticking with this model.",
+      "parentUuid": "f8fa6514_7919a4f0",
+      "revId": "d3072a2c75d390bbceca45306845a066c969be27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

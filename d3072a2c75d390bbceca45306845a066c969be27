@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8fa6514_7919a4f0",
+        "filename": "tools.mod",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-23T10:04:04Z",
+      "side": 1,
+      "message": "Where do we check if this is tidy?",
+      "revId": "d3072a2c75d390bbceca45306845a066c969be27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

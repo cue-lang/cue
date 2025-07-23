@@ -21,13 +21,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go-version:
-          - 1.23.x
-          - 1.24.x
         runner:
           - ns-linux-amd64-large
           - ns-macos-arm64
           - ns-windows-amd64
+        go-version:
+          - 1.23.x
+          - 1.24.x
     runs-on: ${{ matrix.runner }}
     if: |-
       (contains(github.event.head_commit.message, '

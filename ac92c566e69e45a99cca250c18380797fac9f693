@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0feef309_c9627cd4",
+        "filename": "internal/ci/github/release.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-23T09:58:23Z",
+      "side": 1,
+      "message": "For CUE this is actually not a trivial amount of work, as GoReleaser builds a matrix of artefacts. So it might be worth using the large machine here. Not release because releases are relatively infrequent compared to day-to-day CLs.",
+      "revId": "ac92c566e69e45a99cca250c18380797fac9f693",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

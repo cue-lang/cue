@@ -19,14 +19,27 @@ bashWorkflow: githubactions.#Workflow & {
 	jobs: [string]: defaults: run: shell: "bash --noprofile --norc -euo pipefail {0}"
 }
 
+// These are useful for workflows where we use a matrix over different OS runners
+// or multiple Go versions. Note that the matrix names must match.
+matrixRunnerName:    "runner"
+matrixRunnerExpr:    "matrix.\(matrixRunnerName)"
+matrixGoVersionName: "go-version"
+matrixGoVersionExpr: "matrix.\(matrixGoVersionName)"
+
+// isLatestGoLinux is a GitHub expression that evaluates to true if the job
+// is running on Linux with the latest version of Go. This expression is often
+// used to run certain steps just once per CI workflow, to avoid duplicated work.
+isLatestGoLinux: "(\(matrixGoVersionExpr) == '\(latestGo)' && \(matrixRunnerExpr) == '\(linuxMachine)')"
+
 installGo: {
 	#setupGo: githubactions.#Step & {
 		name: "Install Go"
 		uses: "actions/setup-go@v5"
 		with: {
 			// We do our own caching in setupCaches.
-			cache:        false
-			"go-version": string
+			cache: false
+			// Allow overriding when using matrixGoVersionExpr.
+			"go-version": string | *latestGo
 		}
 	}
 
@@ -167,7 +180,7 @@ setupCaches: {
 			// We skip the cache entirely on the nightly runs, to catch flakes.
 			// Note that this conditional is just a no-op for jobs without a nightly schedule.
 			// TODO(mvdan): remove the windowsMachine condition once Windows supports caching on Namespace.
-			if:   "github.event_name != 'schedule' && matrix.runner != '\(windowsMachine)'"
+			if:   "github.event_name != 'schedule' && \(matrixRunnerExpr) != '\(windowsMachine)'"
 			uses: "namespacelabs/nscloud-cache-action@v1"
 			with: {
 				let cacheModes = list.Concat([[
@@ -181,7 +194,7 @@ setupCaches: {
 					cache: strings.Join(cacheModes, "\n")
 				}
 				if len(cachePaths) > 0 {
-					path:  strings.Join(cachePaths, "\n")
+					path: strings.Join(cachePaths, "\n")
 				}
 			}
 		},
@@ -210,7 +223,7 @@ staticcheck: githubactions.#Step & {
 	#modfile: string | *"" // an optional -modfile flag to not use the main go.mod
 	let gotool = [
 		if #modfile != "" {
-		    "go tool -modfile=\(#modfile)"
+			"go tool -modfile=\(#modfile)"
 		},
 		"go tool",
 	][0]

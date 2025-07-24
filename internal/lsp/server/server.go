@@ -13,11 +13,11 @@ import (
 	"strconv"
 	"sync/atomic"
 
-	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/progress"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/tools/event"
+	"cuelang.org/go/internal/lsp/cache"
 )
 
 var serverIDCounter int64

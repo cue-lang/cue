@@ -23,7 +23,7 @@ import (
 //
 // Formatting implements [protocol.Server]
 func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormattingParams) ([]protocol.TextEdit, error) {
-	ctx, done := event.Start(ctx, "lsp.Server.formatting", tag.URI.Of(params.TextDocument.URI))
+	_, done := event.Start(ctx, "lsp.Server.formatting", tag.URI.Of(params.TextDocument.URI))
 	defer done()
 
 	uri := params.TextDocument.URI
@@ -31,6 +31,7 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 	if err != nil {
 		return nil, err
 	} else if mod == nil {
+		//lint:ignore ST1005 Errors that go back to the editor can enjoy grammar.
 		return nil, fmt.Errorf("No module found for %v", uri)
 	}
 

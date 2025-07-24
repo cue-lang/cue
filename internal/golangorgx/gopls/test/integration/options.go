@@ -5,9 +5,9 @@
 package integration
 
 import (
-	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
+	"cuelang.org/go/internal/lsp/cache"
 )
 
 type runConfig struct {

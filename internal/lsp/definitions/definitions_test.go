@@ -1,3 +1,17 @@
+// Copyright 2025 CUE Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package definitions_test
 
 import (
@@ -6,15 +20,17 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/lsp/definitions"
 	"github.com/go-quicktest/qt"
+	"github.com/rogpeppe/go-internal/txtar"
 )
 
 type testCase struct {
 	name         string
-	prog         string
+	archive      string
 	expectations map[*position][]*position
 }
 
@@ -23,8 +39,19 @@ type testCases []testCase
 func (tcs testCases) run(t *testing.T) {
 	for _, tc := range tcs {
 		t.Run(tc.name, func(t *testing.T) {
-			ast, err := parser.ParseFile(tc.name, tc.prog, parser.ParseComments)
-			qt.Assert(t, qt.IsNil(err))
+			var files []*ast.File
+			filesByName := make(map[string]*ast.File)
+
+			ar := txtar.Parse([]byte(tc.archive))
+			qt.Assert(t, qt.IsTrue(len(ar.Files) > 0))
+
+			for _, fh := range ar.Files {
+				ast, err := parser.ParseFile(fh.Name, fh.Data, parser.ParseComments)
+				ast.Pos().File().SetContent(fh.Data)
+				qt.Assert(t, qt.IsNil(err))
+				files = append(files, ast)
+				filesByName[fh.Name] = ast
+			}
 
 			allPositions := make(map[*position]struct{})
 			for from, tos := range tc.expectations {
@@ -33,26 +60,27 @@ func (tcs testCases) run(t *testing.T) {
 					allPositions[to] = struct{}{}
 				}
 			}
-			file := ast.Pos().File()
+
 			for pos := range allPositions {
-				if pos.filename == "" {
-					pos.filename = tc.name
+				if pos.filename == "" && len(files) == 1 {
+					pos.filename = files[0].Filename
 				}
-				pos.determineOffset(file, tc.prog)
+				pos.determineOffset(filesByName[pos.filename].Pos().File())
 			}
 
 			// It's deliberate that we allow the expectations to be a
 			// subset of what is resolved. However, for each expectation,
 			// the resolutions must match exactly (reordering permitted).
 
-			dfns := definitions.Analyse(ast)
-			fdfns := dfns.ForFile(tc.name)
-			qt.Assert(t, qt.IsNotNil(fdfns))
+			dfns := definitions.Analyse(files...)
 			for posFrom, positionsWant := range tc.expectations {
 				if positionsWant == nil {
 					continue
 				}
 				offset := posFrom.offset
+
+				fdfns := dfns.ForFile(posFrom.filename)
+				qt.Assert(t, qt.IsNotNil(fdfns))
 
 				nodesGot := fdfns.ForOffset(offset)
 				positionsGot := make([]token.Position, len(nodesGot))
@@ -74,7 +102,6 @@ func (tcs testCases) run(t *testing.T) {
 }
 
 func cmpTokenPositions(a, b token.Position) int {
-	// Deliberately avoid using the offset field as it may not be specified
 	if c := cmp.Compare(a.Filename, b.Filename); c != 0 {
 		return c
 	}
@@ -82,7 +109,6 @@ func cmpTokenPositions(a, b token.Position) int {
 }
 
 func cmpPositions(a, b *position) int {
-	// Deliberately avoid using the offset field as it may not be specified
 	if c := cmp.Compare(a.filename, b.filename); c != 0 {
 		return c
 	}
@@ -107,15 +133,28 @@ func ln(i, n int, str string) *position {
 	}
 }
 
-func (p *position) determineOffset(file *token.File, prog string) {
-	// lines is the cumulative offset of the start of each line
+// Convenience constructor to make a new [position] with the given
+// line number (1-based), for the n-th (1-based) occurrence of str
+// within file f.
+func fln(filename string, i, n int, str string) *position {
+	return &position{
+		filename: filename,
+		line:     i,
+		n:        n,
+		str:      str,
+	}
+}
+
+func (p *position) determineOffset(file *token.File) {
+	// lines is the (cumulative) byte-offset of the start of each line
 	lines := file.Lines()
 	startOffset := lines[p.line-1]
 	endOffset := file.Size()
 	if len(lines) > p.line {
 		endOffset = lines[p.line]
 	}
-	line := prog[startOffset:endOffset]
+	content := string(file.Content())
+	line := content[startOffset:endOffset]
 	n := p.n
 	for i := range line {
 		if strings.HasPrefix(line[i:], p.str) {
@@ -132,8 +171,35 @@ func (p *position) determineOffset(file *token.File, prog string) {
 func TestSimple(t *testing.T) {
 	testCases{
 		{
+			name: "selector - implicit - via top",
+			archive: `-- a.cue --
+x: y: a.b
+a: b: 5
+a: b: 6
+`,
+			expectations: map[*position][]*position{
+				ln(1, 1, "a"): {ln(2, 1, "a"), ln(3, 1, "a")},
+				ln(1, 1, "b"): {ln(2, 1, "b"), ln(3, 1, "b")},
+			},
+		},
+		{
+			name: "selector - implicit - via non-top",
+			archive: `-- a.cue --
+w: {
+	x: y: a.b
+	a: b: 5
+}
+w: a: b: 6
+`,
+			expectations: map[*position][]*position{
+				ln(2, 1, "a"): {ln(3, 1, "a"), ln(5, 1, "a")},
+				ln(2, 1, "b"): {ln(3, 1, "b"), ln(5, 1, "b")},
+			},
+		},
+		{
 			name: "pointer chasing - implicit",
-			prog: `x1: f: 3
+			archive: `-- a.cue --
+x1: f: 3
 x2: f: 4
 y: x1
 y: x2
@@ -153,7 +219,8 @@ out2: z.f
 
 		{
 			name: "pointer chasing - explicit",
-			prog: `x1: f: 3
+			archive: `-- a.cue --
+x1: f: 3
 x2: f: 4
 y: x1 & x2
 z: y
@@ -172,7 +239,8 @@ out2: z.f
 
 		{
 			name: "embedding",
-			prog: `x: y: z: 3
+			archive: `-- a.cue --
+x: y: z: 3
 o: { p: 4, x.y }
 `,
 			expectations: map[*position][]*position{
@@ -187,7 +255,8 @@ func TestInline(t *testing.T) {
 	testCases{
 		{
 			name: "struct selector",
-			prog: `a: {in: {x: 5}, out: in}.out.x`,
+			archive: `-- a.cue --
+a: {in: {x: 5}, out: in}.out.x`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "in"):  {ln(1, 1, "in")},
 				ln(1, 2, "out"): {ln(1, 1, "out")},
@@ -196,7 +265,8 @@ func TestInline(t *testing.T) {
 		},
 		{
 			name: "list index",
-			prog: `a: [7, {b: 3}, true][1].b`,
+			archive: `-- a.cue --
+a: [7, {b: 3}, true][1].b`,
 			// We do not attempt any sort of resolution via dynamic
 			// indices.
 			expectations: map[*position][]*position{
@@ -206,7 +276,8 @@ func TestInline(t *testing.T) {
 		},
 		{
 			name: "disjunction internal",
-			prog: `a: ({b: c, c: 3} | {c: 4}).c`,
+			archive: `-- a.cue --
+a: ({b: c, c: 3} | {c: 4}).c`,
 			expectations: map[*position][]*position{
 				ln(1, 1, "c"): {ln(1, 2, "c")},
 				ln(1, 4, "c"): {ln(1, 2, "c"), ln(1, 3, "c")},
@@ -219,7 +290,8 @@ func TestCycles(t *testing.T) {
 	testCases{
 		{
 			name: "cycle - simple 2",
-			prog: `a: b
+			archive: `-- a.cue --
+a: b
 b: a`,
 			expectations: map[*position][]*position{
 				ln(1, 1, "b"): {ln(2, 1, "b")},
@@ -228,7 +300,8 @@ b: a`,
 		},
 		{
 			name: "cycle - simple 3",
-			prog: `a: b
+			archive: `-- a.cue --
+a: b
 b: c
 c: a`,
 			expectations: map[*position][]*position{
@@ -241,14 +314,16 @@ c: a`,
 		// there's no reason we can't resolve them.
 		{
 			name: "structural - simple",
-			prog: `a: b: c: a`,
+			archive: `-- a.cue --
+a: b: c: a`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "a"): {ln(1, 1, "a")},
 			},
 		},
 		{
 			name: "structural - simple - selector",
-			prog: `a: b: c: a.b`,
+			archive: `-- a.cue --
+a: b: c: a.b`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "a"): {ln(1, 1, "a")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
@@ -256,7 +331,8 @@ c: a`,
 		},
 		{
 			name: "structural - complex",
-			prog: `y: [string]: b: y
+			archive: `-- a.cue --
+y: [string]: b: y
 x: y
 x: c: x
 `,
@@ -273,7 +349,8 @@ func TestAliases(t *testing.T) {
 	testCases{
 		{
 			name: "plain label - internal",
-			prog: `l=a: {b: 3, c: l.b}`,
+			archive: `-- a.cue --
+l=a: {b: 3, c: l.b}`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "a")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
@@ -281,7 +358,8 @@ func TestAliases(t *testing.T) {
 		},
 		{
 			name: "plain label - internal - implicit",
-			prog: `l=a: b: 3
+			archive: `-- a.cue --
+l=a: b: 3
 a: c: l.b`,
 			expectations: map[*position][]*position{
 				ln(2, 1, "l"): {ln(1, 1, "a"), ln(2, 1, "a")},
@@ -290,7 +368,8 @@ a: c: l.b`,
 		},
 		{
 			name: "plain label - internal - implicit - reversed",
-			prog: `a: b: 3
+			archive: `-- a.cue --
+a: b: 3
 l=a: c: l.b`,
 			expectations: map[*position][]*position{
 				ln(2, 2, "l"): {ln(1, 1, "a"), ln(2, 1, "a")},
@@ -299,7 +378,8 @@ l=a: c: l.b`,
 		},
 		{
 			name: "plain label - external",
-			prog: `l=a: b: 3
+			archive: `-- a.cue --
+l=a: b: 3
 c: l.b`,
 			expectations: map[*position][]*position{
 				ln(2, 1, "l"): {ln(1, 1, "a")},
@@ -308,8 +388,31 @@ c: l.b`,
 		},
 
 		{
+			name: "plain label - scoping",
+			archive: `-- a.cue --
+a: {
+	l=b: {c: l.d, d: 3}
+	e: l.d
+}
+a: f: l.d
+h: a.l
+`,
+			expectations: map[*position][]*position{
+				ln(2, 2, "l"): {ln(2, 1, "b")},
+				ln(2, 1, "d"): {ln(2, 2, "d")},
+				ln(3, 1, "l"): {ln(2, 1, "b")},
+				ln(3, 1, "d"): {ln(2, 2, "d")},
+				ln(5, 1, "l"): {},
+				ln(5, 1, "d"): {},
+				ln(6, 1, "a"): {ln(1, 1, "a"), ln(5, 1, "a")},
+				ln(6, 1, "l"): {},
+			},
+		},
+
+		{
 			name: "dynamic label - internal",
-			prog: `l=(a): {b: 3, c: l.b}`,
+			archive: `-- a.cue --
+l=(a): {b: 3, c: l.b}`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "(")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
@@ -317,7 +420,8 @@ c: l.b`,
 		},
 		{
 			name: "dynamic label - internal - implicit",
-			prog: `l=(a): b: 3
+			archive: `-- a.cue --
+l=(a): b: 3
 (a): c: l.b`,
 			// We do not attempt to compute equivalence of
 			// expressions. Therefore we don't consider the two `(a)`
@@ -329,7 +433,8 @@ c: l.b`,
 		},
 		{
 			name: "dynamic label - internal - implicit - reversed",
-			prog: `(a): b: 3
+			archive: `-- a.cue --
+(a): b: 3
 l=(a): c: l.b`,
 			// Because we don't compute equivalence of expressions, we do
 			// not link the two `(a)` keys, and so we cannot resolve the
@@ -341,7 +446,8 @@ l=(a): c: l.b`,
 		},
 		{
 			name: "dynamic label - external",
-			prog: `l=(a): b: 3
+			archive: `-- a.cue --
+l=(a): b: 3
 c: l.b`,
 			expectations: map[*position][]*position{
 				ln(2, 1, "l"): {ln(1, 1, ("("))},
@@ -351,7 +457,8 @@ c: l.b`,
 
 		{
 			name: "pattern label - internal",
-			prog: `l=[a]: {b: 3, c: l.b}`,
+			archive: `-- a.cue --
+l=[a]: {b: 3, c: l.b}`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "[")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
@@ -359,7 +466,8 @@ c: l.b`,
 		},
 		{
 			name: "pattern label - internal - implicit",
-			prog: `l=[a]: b: 3
+			archive: `-- a.cue --
+l=[a]: b: 3
 [a]: c: l.b`,
 			// We do not attempt to compute equivalence of
 			// patterns. Therefore we don't consider the two `[a]`
@@ -373,7 +481,8 @@ c: l.b`,
 		},
 		{
 			name: "pattern label - internal - implicit - reversed",
-			prog: `[a]: b: 3
+			archive: `-- a.cue --
+[a]: b: 3
 l=[a]: c: l.b`,
 			// Again, the two [a] patterns are not merged. The l of l.b
 			// can be resolved, but not the b.
@@ -384,7 +493,8 @@ l=[a]: c: l.b`,
 		},
 		{
 			name: "pattern label - external",
-			prog: `l=[a]: b: 3
+			archive: `-- a.cue --
+l=[a]: b: 3
 c: l.b`,
 			// This type of alias is only visible within the key's
 			// value. So the use of l.b in c does not resolve.
@@ -396,7 +506,8 @@ c: l.b`,
 
 		{
 			name: "pattern expr - internal",
-			prog: `[l=a]: {b: 3, c: l, d: l.b}`,
+			archive: `-- a.cue --
+[l=a]: {b: 3, c: l, d: l.b}`,
 			// This type of alias binds l to the key. So c: l will work,
 			// but for the b in d: l.b there is no resolution.
 			expectations: map[*position][]*position{
@@ -407,7 +518,8 @@ c: l.b`,
 		},
 		{
 			name: "pattern expr - internal - implicit",
-			prog: `[l=a]: b: 3
+			archive: `-- a.cue --
+[l=a]: b: 3
 [a]: c: l`,
 			// We do not attempt to compute equivalence of
 			// patterns. Therefore we don't consider the two `[a]`
@@ -420,7 +532,8 @@ c: l.b`,
 		},
 		{
 			name: "pattern expr - external",
-			prog: `[l=a]: b: 3
+			archive: `-- a.cue --
+[l=a]: b: 3
 c: l`,
 			// This type of alias is only visible within the key's
 			// value. So the use of l.b in c does not resolve.
@@ -431,17 +544,19 @@ c: l`,
 
 		{
 			name: "expr - internal",
-			prog: `a: l={b: 3, c: l.b}`,
+			archive: `-- a.cue --
+a: l={b: 3, c: l.b}`,
 			expectations: map[*position][]*position{
-				ln(1, 2, "l"): {ln(1, 1, "a")},
+				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 			},
 		},
 		{
 			name: "expr - internal - explicit",
-			prog: `a: l={b: 3} & {c: l.b}`,
+			archive: `-- a.cue --
+a: l={b: 3} & {c: l.b}`,
 			expectations: map[*position][]*position{
-				ln(1, 2, "l"): {ln(1, 1, "a")},
+				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 			},
 		},
@@ -449,15 +564,17 @@ c: l`,
 			name: "expr - internal - explicit - paren",
 			// The previous test case works because it's parsed like
 			// this:
-			prog: `a: l=({b: 3} & {c: l.b})`,
+			archive: `-- a.cue --
+a: l=({b: 3} & {c: l.b})`,
 			expectations: map[*position][]*position{
-				ln(1, 2, "l"): {ln(1, 1, "a")},
+				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 			},
 		},
 		{
 			name: "expr - external",
-			prog: `a: l={b: 3}
+			archive: `-- a.cue --
+a: l={b: 3}
 c: l.b`,
 			// This type of alias is only visible within the value.
 			expectations: map[*position][]*position{
@@ -472,7 +589,8 @@ func TestDisjunctions(t *testing.T) {
 	testCases{
 		{
 			name: "simple",
-			prog: `d: {a: b: 3} | {a: b: 4, c: 5}
+			archive: `-- a.cue --
+d: {a: b: 3} | {a: b: 4, c: 5}
 o: d.a.b
 p: d.c
 `,
@@ -486,7 +604,8 @@ p: d.c
 		},
 		{
 			name: "inline",
-			prog: `d: ({a: b: 3} | {a: b: 4}) & {c: 5}
+			archive: `-- a.cue --
+d: ({a: b: 3} | {a: b: 4}) & {c: 5}
 o: d.a.b
 p: d.c
 `,
@@ -500,7 +619,8 @@ p: d.c
 		},
 		{
 			name: "chained",
-			prog: `d1: {a: 1} | {a: 2}
+			archive: `-- a.cue --
+d1: {a: 1} | {a: 2}
 d2: {a: 3} | {a: 4}
 o: (d1 & d2).a
 `,
@@ -510,7 +630,8 @@ o: (d1 & d2).a
 		},
 		{
 			name: "selected",
-			prog: `d: {x: 17} | string
+			archive: `-- a.cue --
+d: {x: 17} | string
 r: d & {x: int}
 out: r.x
 `,
@@ -522,7 +643,8 @@ out: r.x
 		},
 		{
 			name: "scopes",
-			prog: `c: {a: b} | {b: 3}
+			archive: `-- a.cue --
+c: {a: b} | {b: 3}
 b: 7
 d: c.b
 `,
@@ -534,7 +656,8 @@ d: c.b
 		},
 		{
 			name: "looping",
-			prog: `a: {b: c.d, d: 3} | {d: 4}
+			archive: `-- a.cue --
+a: {b: c.d, d: 3} | {d: 4}
 c: a
 `,
 			expectations: map[*position][]*position{
@@ -550,7 +673,8 @@ func TestComprehensions(t *testing.T) {
 	testCases{
 		{
 			name: "if",
-			prog: `a: 17
+			archive: `-- a.cue --
+a: 17
 b: 3
 if a < 10 {
 	c: b
@@ -562,7 +686,8 @@ if a < 10 {
 		},
 		{
 			name: "let",
-			prog: `a: b: c: 17
+			archive: `-- a.cue --
+a: b: c: 17
 let x=a.b
 y: x.c
 `,
@@ -574,8 +699,26 @@ y: x.c
 			},
 		},
 		{
+			name: "let - scoped",
+			archive: `-- a.cue --
+a: {
+	let b=17
+	c: b
+}
+a: d: b
+o: a.b
+`,
+			expectations: map[*position][]*position{
+				ln(3, 1, "b"): {ln(2, 1, "b")},
+				ln(5, 1, "b"): {},
+				ln(6, 1, "a"): {ln(1, 1, "a"), ln(5, 1, "a")},
+				ln(6, 1, "b"): {},
+			},
+		},
+		{
 			name: "for",
-			prog: `a: { x: 1, y: 2, z: 3}
+			archive: `-- a.cue --
+a: { x: 1, y: 2, z: 3}
 b: { x: 4, y: 5, z: 6}
 o: {
 	for k, v in a {
@@ -590,6 +733,179 @@ o: {
 				ln(5, 1, "v"): {ln(4, 1, "v")},
 				ln(5, 1, "b"): {ln(2, 1, "b")},
 				ln(5, 2, "k"): {ln(4, 1, "k")},
+			},
+		},
+	}.run(t)
+}
+
+func TestFileScopes(t *testing.T) {
+	testCases{
+		{
+			name: "package top - single",
+			archive: `-- a.cue --
+package x
+
+foo: true
+-- b.cue --
+package x
+
+bar: foo
+`,
+			expectations: map[*position][]*position{
+				fln("b.cue", 3, 1, "foo"): {fln("a.cue", 3, 1, "foo")},
+			},
+		},
+		{
+			name: "package top - multiple",
+			archive: `-- a.cue --
+package x
+
+foo: true
+-- b.cue --
+package x
+
+foo: false
+-- c.cue --
+package x
+
+bar: foo
+foo: _
+`,
+			expectations: map[*position][]*position{
+				fln("c.cue", 3, 1, "foo"): {fln("a.cue", 3, 1, "foo"), fln("b.cue", 3, 1, "foo"), fln("c.cue", 4, 1, "foo")},
+			},
+		},
+		{
+			name: "non-top",
+			archive: `-- a.cue --
+package x
+
+foo: {bar: true, baz: bar}
+-- b.cue --
+package x
+
+foo: {qux: bar}
+`,
+			expectations: map[*position][]*position{
+				fln("a.cue", 3, 2, "bar"): {fln("a.cue", 3, 1, "bar")},
+				fln("b.cue", 3, 1, "bar"): {},
+			},
+		},
+		{
+			name: "non-top - implicit",
+			archive: `-- a.cue --
+package x
+
+foo: bar: true
+foo: baz: bar
+-- b.cue --
+package x
+
+foo: qux: bar
+-- c.cue --
+package x
+
+foo: qux: foo.bar
+`,
+			expectations: map[*position][]*position{
+				fln("a.cue", 4, 1, "bar"): {},
+				fln("b.cue", 3, 1, "bar"): {},
+				fln("c.cue", 3, 2, "foo"): {fln("a.cue", 3, 1, "foo"), fln("a.cue", 4, 1, "foo"), fln("b.cue", 3, 1, "foo"), fln("c.cue", 3, 1, "foo")},
+				fln("c.cue", 3, 1, "bar"): {fln("a.cue", 3, 1, "bar")},
+			},
+		},
+		{
+			name: "package top - let",
+			archive: `-- a.cue --
+package x
+
+let a = 5
+q: a
+-- b.cue --
+package x
+
+r: a
+-- c.cue --
+package x
+
+let a = true
+s: a
+`,
+			expectations: map[*position][]*position{
+				fln("a.cue", 4, 1, "a"): {fln("a.cue", 3, 1, "a")},
+				fln("b.cue", 3, 1, "a"): {},
+				fln("c.cue", 4, 1, "a"): {fln("c.cue", 3, 1, "a")},
+			},
+		},
+		{
+			name: "selector",
+			archive: `-- a.cue --
+package x
+
+w: {
+	x: y: a.b
+	a: b: 5
+}
+-- b.cue --
+package x
+
+w: a: b: 6
+`,
+			expectations: map[*position][]*position{
+				fln("a.cue", 4, 1, "a"): {fln("a.cue", 5, 1, "a"), fln("b.cue", 3, 1, "a")},
+				fln("a.cue", 4, 1, "b"): {fln("a.cue", 5, 1, "b"), fln("b.cue", 3, 1, "b")},
+			},
+		},
+		{
+			name: "xxx",
+			archive: `-- a.cue --
+package x
+
+w: a: {b: a}
+-- b.cue --
+package x
+
+w: a: {}
+`,
+			expectations: map[*position][]*position{
+				fln("a.cue", 3, 2, "a"): {fln("a.cue", 3, 1, "a"), fln("b.cue", 3, 1, "a")},
+			},
+		},
+		{
+			name: "aliases",
+			archive: `-- a.cue --
+package x
+
+a: {
+	X=b: {c: true}
+	d: X.c
+}
+-- b.cue --
+package x
+
+a: {
+	b: {c: false}
+}
+-- c.cue --
+package x
+
+a: {
+	e: X.c
+}
+-- d.cue --
+package x
+
+a: {
+	X=f: {c: 5}
+	g: X
+}
+`,
+			expectations: map[*position][]*position{
+				fln("a.cue", 5, 1, "X"): {fln("a.cue", 4, 1, "b"), fln("b.cue", 4, 1, "b")},
+				fln("a.cue", 5, 1, "c"): {fln("a.cue", 4, 1, "c"), fln("b.cue", 4, 1, "c")},
+				fln("c.cue", 4, 1, "X"): {},
+				fln("c.cue", 4, 1, "c"): {},
+				fln("d.cue", 5, 1, "X"): {fln("d.cue", 4, 1, "f")},
 			},
 		},
 	}.run(t)

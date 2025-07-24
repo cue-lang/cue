@@ -1,8 +1,21 @@
+// Copyright 2025 CUE Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package definitions
 
 import (
 	"fmt"
-	"slices"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
@@ -11,57 +24,74 @@ import (
 )
 
 type Definitions struct {
+	pkgScope   *scope
 	byFilename map[string]*FileDefinitions
 }
 
 func Analyse(files ...*ast.File) *Definitions {
 	dfns := &Definitions{
-		byFilename: make(map[string]*FileDefinitions),
+		byFilename: make(map[string]*FileDefinitions, len(files)),
 	}
-	root := dfns.newScope(nil, nil)
+
+	pkgScope := dfns.newScope(nil, nil, nil, nil)
+	dfns.pkgScope = pkgScope
+	navigable := &navigableScope{}
 
 	for _, file := range files {
+		pkgScope.newScope(nil, file, navigable)
 		dfns.byFilename[file.Filename] = &FileDefinitions{
-			root:        root,
+			pkgScope:    pkgScope,
 			resolutions: make([][]ast.Node, file.End().Offset()),
 			File:        file.Pos().File(),
 		}
-		root.unprocessed = append(root.unprocessed, file)
 	}
 
 	return dfns
+}
+
+func (dfns *Definitions) newScope(parent *scope, key ast.Node, unprocessed ast.Node, navigable *navigableScope) *scope {
+	if navigable == nil {
+		navigable = &navigableScope{}
+	}
+	s := &scope{
+		dfns:      dfns,
+		parent:    parent,
+		navigable: navigable,
+	}
+	if unprocessed != nil {
+		s.unprocessed = []ast.Node{unprocessed}
+	}
+	if key != nil {
+		s.key = key
+		s.addRange(key)
+	}
+	return s
+}
+
+func (dfns *Definitions) addResolution(start token.Pos, length int, targets []*scope) {
+	if len(targets) == 0 {
+		return
+	}
+
+	startPosition := start.Position()
+	filename := startPosition.Filename
+	offsets := dfns.byFilename[filename].resolutions
+	startOffset := startPosition.Offset
+	var keys []ast.Node
+	for _, scope := range targets {
+		keys = append(keys, scope.key)
+	}
+	for i := range length {
+		offsets[startOffset+i] = keys
+	}
 }
 
 func (dfns *Definitions) ForFile(filename string) *FileDefinitions {
 	return dfns.byFilename[filename]
 }
 
-func (dfns *Definitions) newScope(parent *scope, key ast.Node, unprocessed ...ast.Node) *scope {
-	s := &scope{
-		dfns:        dfns,
-		parent:      parent,
-		unprocessed: unprocessed,
-		fields:      make(map[string]*scope),
-	}
-	if key != nil {
-		s.keys = []ast.Node{key}
-		s.addRange(key)
-	}
-	return s
-}
-
-func (dfns *Definitions) addResolution(start token.Pos, length int, targets []ast.Node) {
-	startPosition := start.Position()
-	filename := startPosition.Filename
-	offsets := dfns.byFilename[filename].resolutions
-	startOffset := startPosition.Offset
-	for i := range length {
-		offsets[startOffset+i] = append(offsets[startOffset+i], targets...)
-	}
-}
-
 type FileDefinitions struct {
-	root        *scope
+	pkgScope    *scope
 	resolutions [][]ast.Node
 	File        *token.File
 }
@@ -77,10 +107,10 @@ func (fdfns *FileDefinitions) ForOffset(offset int) []ast.Node {
 	fdfns.resolutions[offset] = []ast.Node{}
 
 	filename := fdfns.File.Name()
-	root := fdfns.root
-	root.eval()
+	pkgScope := fdfns.pkgScope
+	pkgScope.eval()
 	seen := make(map[*scope]struct{})
-	worklist := []*scope{root}
+	worklist := []*scope{pkgScope}
 	for len(worklist) > 0 {
 		s := worklist[0]
 		worklist = worklist[1:]
@@ -98,6 +128,8 @@ func (fdfns *FileDefinitions) ForOffset(offset int) []ast.Node {
 		}
 	}
 
+	//pkgScope.dump(1)
+
 	return fdfns.resolutions[offset]
 }
 
@@ -111,63 +143,78 @@ type scope struct {
 	// this scope. For example, if a scope represents `a: {}` then
 	// keyPositions will hold the location of the `a`. Due to implicit
 	// unification, keyPositions may contain several positions.
-	keys []ast.Node
+	key  ast.Node
+	name string
 	// resolvesTo points to the scopes reachable from nodes which are
 	// embedded within this scope.
-	resolvesTo []*scope
-	aliases    []string
-	allScopes  []*scope
-	fields     map[string]*scope
-	ranges     map[string]*rangeset.RangeSet
+	resolvesTo      []*scope
+	allScopes       []*scope
+	lexicalBindings map[string][]*scope
+
+	// shared
+	navigable *navigableScope
 }
 
-func (s *scope) addRange(n ast.Node) {
-	if s.ranges == nil {
-		s.ranges = make(map[string]*rangeset.RangeSet)
-	}
-	start := n.Pos().Position()
-	end := n.End().Position()
-	rs, found := s.ranges[start.Filename]
-	if !found {
-		rs = rangeset.NewRangeSet()
-		s.ranges[start.Filename] = rs
-	}
-	rs.Add(start.Offset, end.Offset)
-}
-
-func (s *scope) contains(filename string, offset int) bool {
-	rs, found := s.ranges[filename]
-	return found && rs.Contains(offset)
-}
-
-func (s *scope) newScope(key ast.Node, unprocessed ...ast.Node) *scope {
-	r := s.dfns.newScope(s, key, unprocessed...)
+func (s *scope) newScope(key ast.Node, unprocessed ast.Node, navigable *navigableScope) *scope {
+	r := s.dfns.newScope(s, key, unprocessed, navigable)
 	s.allScopes = append(s.allScopes, r)
 	return r
 }
 
 func (s *scope) dump(depth int) {
-	fmt.Printf("%*sScope %p\n", depth*3, "", s)
-	fmt.Printf("%*s Ranges %v\n", depth*3, "", s.ranges)
+	fmt.Printf("%*sScope %p (name: %q)\n", depth*3, "", s, s.name)
+	navigable := s.navigable
+	fmt.Printf("%*s Ranges %v\n", depth*3, "", navigable.ranges)
 
-	if len(s.aliases) != 0 {
-		fmt.Printf("%*s Aliases: %v\n", depth*3, "", s.aliases)
-	}
-
-	if len(s.fields) != 0 {
-		fmt.Printf("%*s Fields:\n", depth*3, "")
-		for name, r := range s.fields {
+	if len(navigable.bindings) > 0 {
+		fmt.Printf("%*s Navigable: %p\n", depth*3, "", s.navigable)
+		for name, bindings := range navigable.bindings {
 			fmt.Printf("%*s  %s:\n", depth*3, "", name)
-			r.dump(depth + 1)
+			for _, binding := range bindings {
+				binding.dump(depth + 1)
+			}
 		}
 	}
 
-	if len(s.allScopes) != 0 {
+	if len(s.lexicalBindings) > 0 {
+		fmt.Printf("%*s Lexical:\n", depth*3, "")
+		for name, bindings := range s.lexicalBindings {
+			fmt.Printf("%*s  %s:\n", depth*3, "", name)
+			for _, binding := range bindings {
+				binding.dump(depth + 1)
+			}
+		}
+	}
+
+	if len(s.allScopes) > 0 {
 		fmt.Printf("%*s All scopes:\n", depth*3, "")
 		for _, r := range s.allScopes {
 			r.dump(depth + 1)
 		}
 	}
+}
+
+type navigableScope struct {
+	bindings map[string][]*scope
+	ranges   *rangeset.FilenameRangeSet
+}
+
+func (s *scope) addRange(n ast.Node) {
+	start := n.Pos().Position()
+	end := n.End().Position()
+
+	rs := s.navigable.ranges
+	if rs == nil {
+		rs = rangeset.NewFilenameRangeSet()
+		s.navigable.ranges = rs
+	}
+
+	rs.Add(start.Filename, start.Offset, end.Offset)
+}
+
+func (s *scope) contains(filename string, offset int) bool {
+	ranges := s.navigable.ranges
+	return s == s.dfns.pkgScope || (ranges != nil && ranges.Contains(filename, offset))
 }
 
 func (s *scope) eval() {
@@ -180,7 +227,7 @@ func (s *scope) eval() {
 
 	var embeddedResolvable, resolvable []ast.Expr
 
-	for len(unprocessed) != 0 {
+	for len(unprocessed) > 0 {
 		n := unprocessed[0]
 		unprocessed = unprocessed[1:]
 
@@ -205,10 +252,10 @@ func (s *scope) eval() {
 				}
 				ip := ast.ParseImportPath(str).Canonical()
 				if ip.Qualifier != "" {
-					s.ensureField(ip.Qualifier, n)
+					s.ensureLexicalBinding(ip.Qualifier, n, nil)
 				}
 			} else {
-				s.ensureField(n.Name.Name, n)
+				s.ensureLexicalBinding(n.Name.Name, n, nil)
 			}
 
 		case *ast.StructLit:
@@ -244,17 +291,16 @@ func (s *scope) eval() {
 			case token.AND:
 				unprocessed = append(unprocessed, n.X, n.Y)
 			case token.OR:
-				lhs := s.newScope(nil, n.X)
-				rhs := s.newScope(nil, n.Y)
+				lhs := s.newScope(nil, n.X, nil)
+				rhs := s.newScope(nil, n.Y, nil)
 				s.resolvesTo = append(s.resolvesTo, lhs, rhs)
 			default:
 				resolvable = append(resolvable, n.X, n.Y)
 			}
 
 		case *ast.Alias:
-			// X=e
-			s.aliases = append(s.aliases, n.Ident.Name)
-			unprocessed = append(unprocessed, n.Expr)
+			// X=e (the old deprecated alias syntax)
+			s.ensureLexicalBinding(n.Ident.Name, n.Ident, n.Expr)
 
 		case *ast.Ellipsis:
 			unprocessed = append(unprocessed, n.Type)
@@ -268,7 +314,7 @@ func (s *scope) eval() {
 		case *ast.Comprehension:
 			parent := s
 			for _, clause := range n.Clauses {
-				cur := parent.newScope(nil, clause)
+				cur := parent.newScope(nil, clause, nil)
 				// We need to make sure that the comprehension value
 				// (i.e. body) and all subsequent clauses, can be reached
 				// by traversing through all clauses. The simplest way to
@@ -278,42 +324,42 @@ func (s *scope) eval() {
 				parent = cur
 			}
 			if parent != s {
-				parent.newScope(nil, n.Value)
+				parent.newScope(nil, n.Value, nil)
 			}
 
 		case *ast.IfClause:
 			unprocessed = append(unprocessed, n.Condition)
 
 		case *ast.LetClause:
-			s.ensureField(n.Ident.Name, n.Ident, n.Expr)
+			s.ensureLexicalBinding(n.Ident.Name, n.Ident, n.Expr)
 
 		case *ast.ForClause:
 			if n.Key != nil {
-				s.ensureField(n.Key.Name, n.Key)
+				s.ensureLexicalBinding(n.Key.Name, n.Key, nil)
 			}
 			if n.Value != nil {
-				s.ensureField(n.Value.Name, n.Value)
+				s.ensureLexicalBinding(n.Value.Name, n.Value, nil)
 			}
 			resolvable = append(resolvable, n.Source)
 
 		case *ast.Field:
-			l := n.Label
+			label := n.Label
 
-			alias, isAlias := l.(*ast.Alias)
+			alias, isAlias := label.(*ast.Alias)
 			if isAlias {
 				if expr, ok := alias.Expr.(ast.Label); ok {
-					l = expr
+					label = expr
 				}
 			}
 
-			var field *scope
-			switch l := l.(type) {
+			var binding *scope
+			switch label := label.(type) {
 			case *ast.Ident:
-				field = s.ensureField(l.Name, l, n.Value)
+				binding = s.ensureNavigableBinding(label.Name, label, n.Value)
 			case *ast.BasicLit:
-				field = s.ensureField(l.Value, l, n.Value)
+				binding = s.ensureNavigableBinding(label.Value, label, n.Value)
 			default:
-				field = s.newScope(l, n.Value)
+				binding = s.newScope(label, n.Value, nil)
 			}
 
 			if isAlias {
@@ -321,40 +367,41 @@ func (s *scope) eval() {
 				case *ast.ListLit:
 					// X=[e]: field
 					// X is only visible within field
-					field.aliases = append(field.aliases, alias.Ident.Name)
+					wrapper := s.newScope(nil, nil, nil)
+					wrapper.appendLexicalBinding(alias.Ident.Name, binding)
+					binding.parent = wrapper
 				case ast.Label:
 					// X=ident: field
 					// X="basic": field
 					// X="\(e)": field
 					// X=(e): field
 					// X is visible within s
-					s.fields[alias.Ident.Name] = field
+					s.appendLexicalBinding(alias.Ident.Name, binding)
 				}
 			}
 
-			switch l := l.(type) {
+			switch label := label.(type) {
 			case *ast.Interpolation:
-				resolvable = append(resolvable, l.Elts...)
+				resolvable = append(resolvable, label.Elts...)
 			case *ast.ParenExpr:
-				// Although the spec supports this, the parser doesn't seem to.
-				// if alias, ok := l.X.(*ast.Alias); ok {
-				// 	// (X=e): field
-				// 	// X is visible within s
-				// 	s.ensureField(alias.Ident.Name, alias.Ident, alias.Expr)
-				// } else {
-				resolvable = append(resolvable, l.X)
-				// }
+				if alias, ok := label.X.(*ast.Alias); ok {
+					// (X=e): field
+					// X is only visible within field.
+					// Although the spec supports this, the parser doesn't seem to.
+					wrapper := s.newScope(nil, nil, nil)
+					wrapper.ensureLexicalBinding(alias.Ident.Name, alias.Ident, alias.Expr)
+					binding.parent = wrapper
+				} else {
+					resolvable = append(resolvable, label.X)
+				}
 			case *ast.ListLit:
-				for _, elt := range l.Elts {
+				for _, elt := range label.Elts {
 					if alias, ok := elt.(*ast.Alias); ok {
 						// [X=e]: field
-						// X is only visible within field. Given that X
-						// refers to the field's key and not the field's
-						// value, we can't treat X as an alias for the
-						// field, and so we inject a wrapping scope instead:
-						wrapper := s.newScope(nil)
-						wrapper.ensureField(alias.Ident.Name, alias.Ident, alias.Expr)
-						field.parent = wrapper
+						// X is only visible within field.
+						wrapper := s.newScope(nil, nil, nil)
+						wrapper.ensureLexicalBinding(alias.Ident.Name, alias.Ident, alias.Expr)
+						binding.parent = wrapper
 					} else {
 						resolvable = append(resolvable, elt)
 					}
@@ -372,16 +419,12 @@ func (s *scope) eval() {
 	}
 }
 
-func (s *scope) resolve(e ast.Expr) (scopes []*scope) {
+func (s *scope) resolve(e ast.Expr) []*scope {
 	switch e := e.(type) {
 	case *ast.Ident:
-		resolved := s.resolvePathRoot(e)
-		if resolved == nil {
-			return nil
-		} else {
-			s.dfns.addResolution(e.NamePos, len(e.Name), resolved.keys)
-			return []*scope{resolved}
-		}
+		scopes := s.resolvePathRoot(e.Name)
+		s.dfns.addResolution(e.NamePos, len(e.Name), scopes)
+		return scopes
 
 	case *ast.SelectorExpr:
 		resolved := s.resolve(e.X)
@@ -389,6 +432,7 @@ func (s *scope) resolve(e ast.Expr) (scopes []*scope) {
 			return nil
 		}
 		scopesSet := make(map[*scope]struct{})
+		navigableScopesSet := make(map[*navigableScope]struct{})
 		for len(resolved) > 0 {
 			r := resolved[0]
 			resolved = resolved[1:]
@@ -396,6 +440,7 @@ func (s *scope) resolve(e ast.Expr) (scopes []*scope) {
 				continue
 			}
 			scopesSet[r] = struct{}{}
+			navigableScopesSet[r.navigable] = struct{}{}
 			r.eval()
 			resolved = append(resolved, r.resolvesTo...)
 		}
@@ -409,22 +454,18 @@ func (s *scope) resolve(e ast.Expr) (scopes []*scope) {
 			return nil
 		}
 
-		for r := range scopesSet {
-			if field, found := r.fields[name]; found {
-				scopes = append(scopes, field)
-				s.dfns.addResolution(e.Sel.Pos(), len(name), field.keys)
-			}
+		var results []*scope
+		for navigable := range navigableScopesSet {
+			results = append(results, navigable.bindings[name]...)
 		}
-		if len(scopes) == 0 {
-			return nil
-		}
-		return scopes
+		s.dfns.addResolution(e.Sel.Pos(), len(name), results)
+		return results
 
 	case *ast.IndexExpr:
 		return append(s.resolve(e.X), s.resolve(e.Index)...)
 
 	case *ast.StructLit, *ast.ListLit:
-		return []*scope{s.newScope(nil, e)}
+		return []*scope{s.newScope(nil, e, nil)}
 
 	case *ast.ParenExpr:
 		return s.resolve(e.X)
@@ -439,33 +480,59 @@ func (s *scope) resolve(e ast.Expr) (scopes []*scope) {
 	return nil
 }
 
-func (s *scope) resolvePathRoot(ident *ast.Ident) *scope {
-	name := ident.Name
-	for ancestor := s; ancestor != nil; ancestor = ancestor.parent {
-		if slices.Contains(ancestor.aliases, name) {
-			return ancestor
+func (s *scope) resolvePathRoot(name string) []*scope {
+	pkgScope := s.dfns.pkgScope
+	for ; s != nil; s = s.parent {
+		if bindings, found := s.lexicalBindings[name]; found {
+			if len(bindings) == 1 && bindings[0].name != "" {
+				// name has been resolved to an alias. Switch to the real
+				// name.
+				return s.navigable.bindings[bindings[0].name]
+			} else {
+				return bindings
+			}
 		}
-		if field, found := ancestor.fields[name]; found {
-			return field
+		if s.parent == pkgScope {
+			// pkgScope is the parent of the fileScopes. If we've got
+			// this far, we're allowed to inspect the (shared) navigable
+			// bindings directly without having to go via our
+			// lexicalBindings.
+			return s.navigable.bindings[name]
 		}
 	}
 	return nil
 }
 
-func (s *scope) ensureField(name string, key ast.Node, unprocessed ...ast.Node) *scope {
-	field, found := s.fields[name]
-	if found {
-		field.unprocessed = append(field.unprocessed, unprocessed...)
-
-		if key != nil {
-			if !slices.Contains(field.keys, key) {
-				field.keys = append(field.keys, key)
-			}
-		}
-
-	} else {
-		field = s.newScope(key, unprocessed...)
-		s.fields[name] = field
+func (s *scope) ensureNavigableBinding(name string, key ast.Node, unprocessed ast.Node) *scope {
+	navigableBindings := s.navigable.bindings
+	if navigableBindings == nil {
+		navigableBindings = make(map[string][]*scope)
+		s.navigable.bindings = navigableBindings
 	}
-	return field
+
+	var navigable *navigableScope
+	bindings, found := navigableBindings[name]
+	if found {
+		navigable = bindings[0].navigable
+	}
+	binding := s.newScope(key, unprocessed, navigable)
+	binding.name = name
+
+	navigableBindings[name] = append(bindings, binding)
+	s.appendLexicalBinding(name, binding)
+
+	return binding
+}
+
+func (s *scope) ensureLexicalBinding(name string, key ast.Node, unprocessed ast.Node) *scope {
+	binding := s.newScope(key, unprocessed, nil)
+	s.appendLexicalBinding(name, binding)
+	return binding
+}
+
+func (s *scope) appendLexicalBinding(name string, binding *scope) {
+	if s.lexicalBindings == nil {
+		s.lexicalBindings = make(map[string][]*scope)
+	}
+	s.lexicalBindings[name] = append(s.lexicalBindings[name], binding)
 }

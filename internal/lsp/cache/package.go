@@ -20,6 +20,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/lsp/definitions"
 	"cuelang.org/go/internal/mod/modpkgload"
 )
 
@@ -83,6 +84,8 @@ type Package struct {
 
 	// status of this Package.
 	status status
+
+	definitions *definitions.Definitions
 }
 
 func NewPackage(module *Module, importPath ast.ImportPath, dir protocol.DocumentURI) *Package {
@@ -99,7 +102,7 @@ func (pkg *Package) String() string {
 
 // MarkFileDirty implements [packageOrModule]
 func (pkg *Package) MarkFileDirty(file protocol.DocumentURI) {
-	pkg.status = dirty
+	pkg.setStatus(dirty)
 	pkg.module.dirtyFiles[file] = struct{}{}
 }
 
@@ -143,4 +146,72 @@ func (pkg *Package) RemoveImportedBy(importer *Package) {
 	pkg.importedBy = slices.DeleteFunc(pkg.importedBy, func(p *Package) bool {
 		return p == importer
 	})
+}
+
+func (pkg *Package) setStatus(status status) {
+	if pkg.status == status {
+		return
+	}
+	pkg.status = status
+
+	if status != splendid {
+		return
+	}
+
+	files := pkg.pkg.Files()
+	astFiles := make([]*ast.File, len(files))
+	for i, f := range files {
+		astFiles[i] = f.Syntax
+	}
+	// definitions.Analyse does almost no work - calculation of
+	// resolutions is done lazily. So no need to launch go-routines
+	// here.
+	pkg.definitions = definitions.Analyse(astFiles...)
+}
+
+func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) []protocol.Location {
+	dfns := pkg.definitions
+	if dfns == nil {
+		return nil
+	}
+
+	fdfns := dfns.ForFile(uri.Path())
+	if fdfns == nil {
+		pkg.module.debugLog("file not found")
+		return nil
+	}
+	file := fdfns.File
+	lines := file.Lines()
+	line := int(pos.Line)
+	if line < 0 {
+		line = 0
+	} else if line >= len(lines) {
+		line = len(lines) - 1
+	}
+	// TODO: lsp positions can be utf-16 or utf-8 based. Need to be
+	// much more careful than this when doing maths.
+	offset := lines[line] + int(pos.Character)
+	nodes := fdfns.ForOffset(offset)
+	if len(nodes) == 0 {
+		return nil
+	}
+	locations := make([]protocol.Location, len(nodes))
+	for i, node := range nodes {
+		startPos := node.Pos().Position()
+		endPos := node.End().Position()
+		locations[i] = protocol.Location{
+			URI: protocol.URIFromPath(startPos.Filename),
+			Range: protocol.Range{
+				Start: protocol.Position{
+					Line:      uint32(startPos.Line - 1),
+					Character: uint32(startPos.Column - 1),
+				},
+				End: protocol.Position{
+					Line:      uint32(endPos.Line - 1),
+					Character: uint32(endPos.Column - 1),
+				},
+			},
+		}
+	}
+	return locations
 }

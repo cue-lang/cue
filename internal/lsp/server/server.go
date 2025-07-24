@@ -13,11 +13,11 @@ import (
 	"strconv"
 	"sync/atomic"
 
-	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/progress"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/tools/event"
+	"cuelang.org/go/internal/lsp/cache"
 )
 
 var serverIDCounter int64
@@ -139,7 +139,7 @@ func (s *server) Shutdown(ctx context.Context) error {
 //
 // This is asynchronous - it does not get a response.
 func (s *server) Exit(ctx context.Context) error {
-	ctx, done := event.Start(ctx, "lsp.Server.exit")
+	_, done := event.Start(ctx, "lsp.Server.exit")
 	defer done()
 
 	s.client.Close()

@@ -4,9 +4,9 @@ import (
 	"io/fs"
 	"testing"
 
-	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	"cuelang.org/go/internal/lsp/cache"
 	"cuelang.org/go/mod/modcache"
 	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modregistrytest"

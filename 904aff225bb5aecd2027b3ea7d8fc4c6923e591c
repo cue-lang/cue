@@ -16,6 +16,24 @@
       "message": "in the commit message, perhaps mention that you\u0027re fixing a few valid staticcheck errors as well",
       "revId": "904aff225bb5aecd2027b3ea7d8fc4c6923e591c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fba6b18a_28cae5e4",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-24T15:50:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c2d2e09_ddcbd821",
+      "revId": "904aff225bb5aecd2027b3ea7d8fc4c6923e591c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

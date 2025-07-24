@@ -17,9 +17,11 @@ package cache
 import (
 	"fmt"
 	"slices"
+	"sync"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/lsp/definitions"
 	"cuelang.org/go/internal/mod/modpkgload"
 )
 
@@ -83,6 +85,10 @@ type Package struct {
 
 	// status of this Package.
 	status status
+
+	definitionsLock    sync.Mutex
+	definitionsVersion int
+	definitions        *definitions.Definitions
 }
 
 func NewPackage(module *Module, importPath ast.ImportPath, dir protocol.DocumentURI) *Package {
@@ -99,7 +105,7 @@ func (pkg *Package) String() string {
 
 // MarkFileDirty implements [packageOrModule]
 func (pkg *Package) MarkFileDirty(file protocol.DocumentURI) {
-	pkg.status = dirty
+	pkg.setStatus(dirty)
 	pkg.module.dirtyFiles[file] = struct{}{}
 }
 
@@ -143,4 +149,85 @@ func (pkg *Package) RemoveImportedBy(importer *Package) {
 	pkg.importedBy = slices.DeleteFunc(pkg.importedBy, func(p *Package) bool {
 		return p == importer
 	})
+}
+
+func (pkg *Package) setStatus(status status) {
+	if pkg.status == status {
+		return
+	}
+	pkg.status = status
+	pkg.definitionsLock.Lock()
+	pkg.definitionsVersion++
+	dfnVersion := pkg.definitionsVersion
+	pkg.definitionsLock.Unlock()
+
+	if status != splendid {
+		return
+	}
+
+	files := pkg.pkg.Files()
+	astFiles := make([]*ast.File, len(files))
+	for i, f := range files {
+		astFiles[i] = f.Syntax
+	}
+	go func() {
+		dfns := definitions.Analyse(astFiles...)
+
+		pkg.definitionsLock.Lock()
+		defer pkg.definitionsLock.Unlock()
+
+		if dfnVersion != pkg.definitionsVersion {
+			return
+		}
+		pkg.definitions = dfns
+	}()
+}
+
+func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) []protocol.Location {
+	pkg.definitionsLock.Lock()
+	dfns := pkg.definitions
+	pkg.definitionsLock.Unlock()
+	if dfns == nil {
+		return nil
+	}
+
+	file, resolutions := dfns.ForFile(uri.Path())
+	if file == nil {
+		pkg.module.debugLog("file not found")
+		return nil
+	}
+	lines := file.Lines()
+	line := int(pos.Line)
+	if line < 0 {
+		line = 0
+	} else if line >= len(lines) {
+		line = len(lines) - 1
+	}
+	offset := lines[line] + int(pos.Character)
+	if offset >= len(resolutions) {
+		return nil
+	}
+	nodes := resolutions[offset]
+	if len(nodes) == 0 {
+		return nil
+	}
+	locations := make([]protocol.Location, len(nodes))
+	for i, node := range nodes {
+		startPos := node.Pos().Position()
+		endPos := node.Pos().Position()
+		locations[i] = protocol.Location{
+			URI: protocol.URIFromPath(startPos.Filename),
+			Range: protocol.Range{
+				Start: protocol.Position{
+					Line:      uint32(startPos.Line - 1),
+					Character: uint32(startPos.Column - 1),
+				},
+				End: protocol.Position{
+					Line:      uint32(endPos.Line - 1),
+					Character: uint32(endPos.Column - 1),
+				},
+			},
+		}
+	}
+	return locations
 }

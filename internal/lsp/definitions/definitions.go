@@ -10,8 +10,14 @@ import (
 )
 
 type Definitions struct {
-	byFilename map[string][][]ast.Node
+	byFilename map[string]*FileDefinitions
 	root       *scope
+}
+
+type FileDefinitions struct {
+	root        *scope
+	resolutions [][]ast.Node
+	File        *token.File
 }
 
 type scope struct {
@@ -36,31 +42,39 @@ type scope struct {
 
 func Analyse(files ...*ast.File) *Definitions {
 	dfns := &Definitions{
-		byFilename: make(map[string][][]ast.Node),
+		byFilename: make(map[string]*FileDefinitions),
 	}
 	root := dfns.newScope(nil, nil)
 	dfns.root = root
 
 	for _, file := range files {
-		dfns.byFilename[file.Filename] = make([][]ast.Node, file.End().Offset())
+		dfns.byFilename[file.Filename] = &FileDefinitions{
+			root:        root,
+			resolutions: make([][]ast.Node, file.End().Offset()),
+			File:        file.Pos().File(),
+		}
 		root.unprocessed = append(root.unprocessed, file)
 	}
 
 	return dfns
 }
 
-func (dfns *Definitions) ForFileOffset(filename string, offset int) []ast.Node {
-	if offset < 0 {
+func (dfns *Definitions) ForFile(filename string) *FileDefinitions {
+	return dfns.byFilename[filename]
+}
+
+func (fdfns *FileDefinitions) ForOffset(offset int) []ast.Node {
+	if offset < 0 || offset >= len(fdfns.resolutions) {
 		return nil
 	}
-
-	resolutions := dfns.byFilename[filename]
-	nodes := resolutions[offset]
-	if len(nodes) > 0 {
+	nodes := fdfns.resolutions[offset]
+	if nodes != nil {
 		return nodes
 	}
+	fdfns.resolutions[offset] = []ast.Node{}
 
-	root := dfns.root
+	filename := fdfns.File.Name()
+	root := fdfns.root
 	root.eval()
 	seen := make(map[*scope]struct{})
 	worklist := []*scope{root}
@@ -81,7 +95,7 @@ func (dfns *Definitions) ForFileOffset(filename string, offset int) []ast.Node {
 		}
 	}
 
-	return resolutions[offset]
+	return fdfns.resolutions[offset]
 }
 
 func (dfns *Definitions) newScope(parent *scope, key ast.Node, unprocessed ...ast.Node) *scope {
@@ -333,7 +347,7 @@ func (s *scope) eval() {
 func (dfns *Definitions) addResolution(start token.Pos, length int, targets []ast.Node) {
 	startPosition := start.Position()
 	filename := startPosition.Filename
-	offsets := dfns.byFilename[filename]
+	offsets := dfns.byFilename[filename].resolutions
 	startOffset := startPosition.Offset
 	for i := range length {
 		offsets[startOffset+i] = append(offsets[startOffset+i], targets...)

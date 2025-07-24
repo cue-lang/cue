@@ -25,7 +25,6 @@ func (tcs testCases) run(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ast, err := parser.ParseFile(tc.name, tc.prog, parser.ParseComments)
 			qt.Assert(t, qt.IsNil(err))
-			dfns := definitions.Analyse(ast)
 
 			allPositions := make(map[*position]struct{})
 			for from, tos := range tc.expectations {
@@ -36,6 +35,9 @@ func (tcs testCases) run(t *testing.T) {
 			}
 			file := ast.Pos().File()
 			for pos := range allPositions {
+				if pos.filename == "" {
+					pos.filename = tc.name
+				}
 				pos.determineOffset(file, tc.prog)
 			}
 
@@ -43,18 +45,16 @@ func (tcs testCases) run(t *testing.T) {
 			// subset of what is resolved. However, for each expectation,
 			// the resolutions must match exactly (reordering permitted).
 
+			dfns := definitions.Analyse(ast)
+			fdfns := dfns.ForFile(tc.name)
+			qt.Assert(t, qt.IsNotNil(fdfns))
 			for posFrom, positionsWant := range tc.expectations {
 				if positionsWant == nil {
 					continue
 				}
 				offset := posFrom.offset
-				for _, pos := range positionsWant {
-					if pos.filename == "" {
-						pos.filename = tc.name
-					}
-				}
 
-				nodesGot := dfns.ForFileOffset(tc.name, offset)
+				nodesGot := fdfns.ForOffset(offset)
 				positionsGot := make([]token.Position, len(nodesGot))
 				for i, node := range nodesGot {
 					positionsGot[i] = node.Pos().Position()

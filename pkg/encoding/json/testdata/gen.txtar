@@ -14,6 +14,8 @@ validate: t2: schema: {a: <3}
 validate: disjunctionRequired: schema: {a!: int} | {b!: int}
 validate: disjunctionClosed: schema: close({a: int}) | close({b: int})
 
+validate: invalidDisjuntion: schema: {a: 1 | 2}
+
 // Issue #2395
 validate: enforceRequired: {
 	str: "{}"
@@ -96,14 +98,16 @@ unmarshalStream: {
 }
 -- out/json --
 Errors:
+validate.invalidDisjuntion.result: error in call to encoding/json.Validate: 2 errors in empty disjunction::
+    ./in.cue:6:10
 validate.t2.result: error in call to encoding/json.Validate: invalid value 10 (out of bound <3):
     ./in.cue:6:10
     ./in.cue:9:27
     json.Validate:1:6
 unmarshal.trailingInvalid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
-    ./in.cue:47:11
+    ./in.cue:49:11
 unmarshal.trailingValid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
-    ./in.cue:47:11
+    ./in.cue:49:11
 
 Result:
 import "encoding/json"
@@ -140,6 +144,13 @@ validate: {
 			b: int
 		}
 		result: true
+	}
+	invalidDisjuntion: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a: 1 | 2
+		}
+		result: _|_ // validate.invalidDisjuntion.result: error in call to encoding/json.Validate: validate.invalidDisjuntion.result.a: 2 errors in empty disjunction: (and 2 more errors)
 	}
 
 	// Issue #2395

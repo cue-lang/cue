@@ -862,19 +862,15 @@ func (e *Editor) setBufferContentLocked(ctx context.Context, path string, dirty 
 
 // GoToDefinition jumps to the definition of the symbol at the given position
 // in an open buffer. It returns the location of the resulting jump.
-func (e *Editor) Definition(ctx context.Context, loc protocol.Location) (protocol.Location, error) {
+func (e *Editor) Definition(ctx context.Context, loc protocol.Location) ([]protocol.Location, error) {
 	if err := e.checkBufferLocation(loc); err != nil {
-		return protocol.Location{}, err
+		return nil, err
 	}
 	params := &protocol.DefinitionParams{}
 	params.TextDocument.URI = loc.URI
 	params.Position = loc.Range.Start
 
-	resp, err := e.Server.Definition(ctx, params)
-	if err != nil {
-		return protocol.Location{}, fmt.Errorf("definition: %w", err)
-	}
-	return e.extractFirstLocation(ctx, resp)
+	return e.Server.Definition(ctx, params)
 }
 
 // TypeDefinition jumps to the type definition of the symbol at the given

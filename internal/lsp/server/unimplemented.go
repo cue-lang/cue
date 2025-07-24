@@ -34,10 +34,6 @@ func (s *server) Declaration(context.Context, *protocol.DeclarationParams) (*pro
 	return nil, notImplemented("Declaration")
 }
 
-func (s *server) Definition(ctx context.Context, params *protocol.DefinitionParams) (_ []protocol.Location, rerr error) {
-	return nil, notImplemented("Definition")
-}
-
 func (s *server) Diagnostic(context.Context, *string) (*string, error) {
 	return nil, notImplemented("Diagnostic")
 }

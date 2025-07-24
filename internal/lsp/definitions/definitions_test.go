@@ -26,7 +26,7 @@ func (tcs testCases) run(t *testing.T) {
 			ast, err := parser.ParseFile(tc.name, tc.prog, parser.ParseComments)
 			qt.Assert(t, qt.IsNil(err))
 			dfns := definitions.Analyse(ast)
-			resolutions := dfns.ForFile(tc.name)
+			_, resolutions := dfns.ForFile(tc.name)
 			t.Log(resolutions)
 
 			allPositions := make(map[*position]struct{})

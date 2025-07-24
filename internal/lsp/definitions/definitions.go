@@ -9,8 +9,13 @@ import (
 )
 
 type Definitions struct {
-	byFile map[string][][]token.Position
+	byFile map[string]resolutions
 	root   *scope
+}
+
+type resolutions struct {
+	positions [][]token.Position
+	file      *token.File
 }
 
 type scope struct {
@@ -34,13 +39,16 @@ type scope struct {
 
 func Analyse(files ...*ast.File) *Definitions {
 	dfns := &Definitions{
-		byFile: make(map[string][][]token.Position),
+		byFile: make(map[string]resolutions),
 	}
 	root := dfns.newScope(nil, token.NoPos)
 	dfns.root = root
 
 	for _, file := range files {
-		dfns.byFile[file.Filename] = make([][]token.Position, file.End().Offset())
+		dfns.byFile[file.Filename] = resolutions{
+			positions: make([][]token.Position, file.End().Offset()),
+			file:      file.Pos().File(),
+		}
 		root.unprocessed = append(root.unprocessed, file)
 		root.keyPositions = append(root.keyPositions, file.Pos().Position())
 	}
@@ -49,8 +57,12 @@ func Analyse(files ...*ast.File) *Definitions {
 	return dfns
 }
 
-func (dfns *Definitions) ForFile(file string) [][]token.Position {
-	return dfns.byFile[file]
+func (dfns *Definitions) ForFile(file string) (*token.File, [][]token.Position) {
+	r, found := dfns.byFile[file]
+	if !found {
+		return nil, nil
+	}
+	return r.file, r.positions
 }
 
 func (dfns *Definitions) newScope(parent *scope, keyPos token.Pos, unprocessed ...ast.Node) *scope {
@@ -278,7 +290,7 @@ func (s *scope) eval() {
 func (dfns *Definitions) addResolution(start token.Pos, length int, targets []token.Position) {
 	startPosition := start.Position()
 	filename := startPosition.Filename
-	offsets := dfns.byFile[filename]
+	offsets := dfns.byFile[filename].positions
 	startOffset := startPosition.Offset
 	for i := range length {
 		offsets[startOffset+i] = append(offsets[startOffset+i], targets...)

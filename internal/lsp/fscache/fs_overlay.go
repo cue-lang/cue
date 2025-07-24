@@ -59,7 +59,8 @@ func (entry *overlayFileEntry) ReadCUE(config parser.Config) (*ast.File, error) 
 		return nil, nil
 	}
 
-	ast, err := parser.ParseFile(bf.Filename, bf.Source, config, parser.ParseComments)
+	config.Mode = parser.ParseComments
+	ast, err := parser.ParseFile(bf.Filename, bf.Source, config)
 	if err != nil {
 		return nil, err
 	}

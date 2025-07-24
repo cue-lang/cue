@@ -21,12 +21,12 @@ import (
 	"path"
 
 	"cuelang.org/go/internal/cueversion"
-	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/progress"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
+	"cuelang.org/go/internal/lsp/cache"
 )
 
 func validateWorkspaceFolders(folders []protocol.WorkspaceFolder) (map[protocol.WorkspaceFolder]protocol.DocumentURI, error) {

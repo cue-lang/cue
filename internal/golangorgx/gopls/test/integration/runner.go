@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/lsprpc"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
@@ -30,6 +29,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/memoize"
 	"cuelang.org/go/internal/golangorgx/tools/testenv"
 	"cuelang.org/go/internal/golangorgx/tools/xcontext"
+	"cuelang.org/go/internal/lsp/cache"
 	"github.com/go-quicktest/qt"
 )
 

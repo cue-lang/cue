@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/golangorgx/gopls/server"
+	"cuelang.org/go/internal/lsp/server"
 	"github.com/google/go-cmp/cmp"
 )
 

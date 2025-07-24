@@ -30,6 +30,8 @@ validate: #test & {
 validatePartial: #test & {
 	fn: yaml.ValidatePartial
 }
+
+invalidDisjuntion: yaml.Validate("a: 3", {a: 1 | 2})
 -- diff/todo --
 missing position
 -- out/yaml --
@@ -48,6 +50,8 @@ validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate):
     ./in.cue:17:11
 #test.t2.ok2: cannot call non-function fn (type _):
     ./in.cue:18:11
+invalidDisjuntion: error in call to encoding/yaml.Validate: 2 errors in empty disjunction::
+    ./in.cue:33:20
 
 Result:
 import "encoding/yaml"
@@ -115,3 +119,4 @@ validatePartial: {
 		ok2: "'foo'"
 	}
 }
+invalidDisjuntion: _|_ // invalidDisjuntion: error in call to encoding/yaml.Validate: invalidDisjuntion.a: 2 errors in empty disjunction:

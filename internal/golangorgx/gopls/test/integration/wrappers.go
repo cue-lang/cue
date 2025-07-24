@@ -165,17 +165,15 @@ func (e *Env) SaveBufferWithoutActions(name string) {
 	}
 }
 
-// GoToDefinition goes to definition in the editor, calling t.Fatal on any
-// error. It returns the path and position of the resulting jump.
-//
-// TODO(rfindley): rename this to just 'Definition'.
-func (e *Env) GoToDefinition(loc protocol.Location) protocol.Location {
+// Definition goes to definitions in the editor, calling t.Fatal on any
+// error. It returns the paths and positions of the resulting jump.
+func (e *Env) Definition(loc protocol.Location) []protocol.Location {
 	e.T.Helper()
-	loc, err := e.Editor.Definition(e.Ctx, loc)
+	locs, err := e.Editor.Definition(e.Ctx, loc)
 	if err != nil {
 		e.T.Fatal(err)
 	}
-	return loc
+	return locs
 }
 
 func (e *Env) TypeDefinition(loc protocol.Location) protocol.Location {

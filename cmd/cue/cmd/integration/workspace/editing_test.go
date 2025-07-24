@@ -6,6 +6,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
+	"github.com/go-quicktest/qt"
 )
 
 func TestEditing(t *testing.T) {
@@ -38,6 +39,7 @@ import "mod.example/x/a"
 
 v2: "hi"
 v3: a.v1
+v4: v2
 `
 
 	t.Run("open - one package only", func(t *testing.T) {
@@ -207,6 +209,41 @@ v3: a.v1
 				LogExactf(protocol.Debug, 2, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dir=%v/a/d importPath=mod.example/x/a/d@v0:e", rootURI, rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dir=%v/a importPath=mod.example/x/a@v0:e", rootURI, rootURI),
 			)
+		})
+	})
+
+	t.Run("jump to definition", func(t *testing.T) {
+		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+			rootURI := env.Sandbox.Workdir.RootURI()
+			env.Await(
+				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+			)
+			env.OpenFile("b/c/c.cue")
+			env.Await(
+				env.DoneWithOpen(),
+			)
+			locs := env.Definition(protocol.Location{
+				URI: rootURI + "/b/c/c.cue",
+				Range: protocol.Range{
+					Start: protocol.Position{Line: 6, Character: 4},
+				},
+			})
+			qt.Assert(t, qt.ContentEquals(locs, []protocol.Location{
+				{
+					URI: rootURI + "/b/b.cue",
+					Range: protocol.Range{
+						Start: protocol.Position{Line: 2, Character: 0},
+						End:   protocol.Position{Line: 2, Character: 2},
+					},
+				},
+				{
+					URI: rootURI + "/b/c/c.cue",
+					Range: protocol.Range{
+						Start: protocol.Position{Line: 4, Character: 0},
+						End:   protocol.Position{Line: 4, Character: 2},
+					},
+				},
+			}))
 		})
 	})
 }

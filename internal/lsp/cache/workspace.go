@@ -424,7 +424,7 @@ func (w *Workspace) updateOverlays(modifications []file.Modification) (map[proto
 			case file.Change:
 				fh, err = txn.Get(mod.URI)
 
-				if errors.Is(fs.ErrNotExist, err) {
+				if errors.Is(err, fs.ErrNotExist) {
 					return fmt.Errorf("updateOverlays: modifying unopened overlay %v", mod.URI)
 				} else if err != nil {
 					return err
@@ -505,7 +505,7 @@ func (w *Workspace) updateOverlays(modifications []file.Modification) (map[proto
 			// buffer.
 			_, err := txn.Get(mod.URI)
 
-			if mod.Action == file.Delete && errors.Is(fs.ErrInvalid, err) {
+			if mod.Action == file.Delete && errors.Is(err, fs.ErrInvalid) {
 				// this is fine: this error means the delete is a delete
 				// of a directory, not a file. We should still add this to
 				// updatedFiles because (a) just because it was a
@@ -515,7 +515,7 @@ func (w *Workspace) updateOverlays(modifications []file.Modification) (map[proto
 				// if it turns out this is/was a directory on disk.
 				updatedFiles[mod.URI] = nil
 
-			} else if errors.Is(fs.ErrNotExist, err) {
+			} else if errors.Is(err, fs.ErrNotExist) {
 				// If the uri exists in the overlays then we ignore the
 				// on-disk modification because the overlays always trumps
 				// disk. But here, the uri does not exist in the

@@ -19,7 +19,9 @@ import (
 	"slices"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/lsp/definitions"
 	"cuelang.org/go/internal/mod/modpkgload"
 )
 
@@ -83,6 +85,9 @@ type Package struct {
 
 	// status of this Package.
 	status status
+
+	definitions *definitions.Definitions
+	mappers     map[*token.File]*protocol.Mapper
 }
 
 func NewPackage(module *Module, importPath ast.ImportPath, dir protocol.DocumentURI) *Package {
@@ -99,7 +104,7 @@ func (pkg *Package) String() string {
 
 // MarkFileDirty implements [packageOrModule]
 func (pkg *Package) MarkFileDirty(file protocol.DocumentURI) {
-	pkg.status = dirty
+	pkg.setStatus(dirty)
 	pkg.module.dirtyFiles[file] = struct{}{}
 }
 
@@ -143,4 +148,79 @@ func (pkg *Package) RemoveImportedBy(importer *Package) {
 	pkg.importedBy = slices.DeleteFunc(pkg.importedBy, func(p *Package) bool {
 		return p == importer
 	})
+}
+
+func (pkg *Package) setStatus(status status) {
+	if pkg.status == status {
+		return
+	}
+	pkg.status = status
+
+	if status != splendid {
+		return
+	}
+
+	files := pkg.pkg.Files()
+	mappers := make(map[*token.File]*protocol.Mapper)
+	astFiles := make([]*ast.File, len(files))
+	for i, f := range files {
+		astFiles[i] = f.Syntax
+		uri := pkg.module.rootURI + protocol.DocumentURI("/"+f.FilePath)
+		file := f.Syntax.Pos().File()
+		mappers[file] = protocol.NewMapper(uri, file.Content())
+	}
+	// definitions.Analyse does almost no work - calculation of
+	// resolutions is done lazily. So no need to launch go-routines
+	// here.
+	pkg.mappers = mappers
+	pkg.definitions = definitions.Analyse(astFiles...)
+}
+
+func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) []protocol.Location {
+	dfns := pkg.definitions
+	if dfns == nil {
+		return nil
+	}
+
+	fdfns := dfns.ForFile(uri.Path())
+	if fdfns == nil {
+		pkg.module.debugLog("file not found")
+		return nil
+	}
+
+	mapper := pkg.mappers[fdfns.File]
+	if mapper == nil {
+		pkg.module.debugLog("mapper not found: " + string(uri))
+		return nil
+	}
+
+	offset, err := mapper.PositionOffset(pos)
+	if err != nil {
+		pkg.module.debugLog(err.Error())
+		return nil
+	}
+
+	nodes := fdfns.ForOffset(offset)
+	if len(nodes) == 0 {
+		return nil
+	}
+
+	locations := make([]protocol.Location, len(nodes))
+	for i, node := range nodes {
+		startPos := node.Pos().Position()
+		endPos := node.End().Position()
+
+		mapper := pkg.mappers[node.Pos().File()]
+		r, err := mapper.OffsetRange(startPos.Offset, endPos.Offset)
+		if err != nil {
+			pkg.module.debugLog(err.Error())
+			return nil
+		}
+
+		locations[i] = protocol.Location{
+			URI:   protocol.URIFromPath(startPos.Filename),
+			Range: r,
+		}
+	}
+	return locations
 }

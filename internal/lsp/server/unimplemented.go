@@ -12,6 +12,7 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
+	"cuelang.org/go/internal/lsp/cache"
 )
 
 func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionParams) ([]protocol.CodeAction, error) {
@@ -35,7 +36,27 @@ func (s *server) Declaration(context.Context, *protocol.DeclarationParams) (*pro
 }
 
 func (s *server) Definition(ctx context.Context, params *protocol.DefinitionParams) (_ []protocol.Location, rerr error) {
-	return nil, notImplemented("Definition")
+	uri := params.TextDocument.URI
+	mod, err := s.workspace.FindModuleForFile(uri)
+	if err != nil {
+		return nil, err
+	} else if mod == nil {
+		//lint:ignore ST1005 Errors that go back to the editor can enjoy grammar.
+		return nil, fmt.Errorf("No module found for %v", uri)
+	}
+	pkgs, err := mod.FindPackagesOrModulesForFile(uri)
+	if err != nil {
+		return nil, err
+	} else if len(pkgs) == 0 {
+		//lint:ignore ST1005 Errors that go back to the editor can enjoy grammar.
+		return nil, fmt.Errorf("No pkgs found for %v", uri)
+	}
+	pkg, ok := pkgs[0].(*cache.Package)
+	if !ok {
+		//lint:ignore ST1005 Errors that go back to the editor can enjoy grammar.
+		return nil, fmt.Errorf("No pkgs found for %v", uri)
+	}
+	return pkg.Definition(uri, params.Position), nil
 }
 
 func (s *server) Diagnostic(context.Context, *string) (*string, error) {

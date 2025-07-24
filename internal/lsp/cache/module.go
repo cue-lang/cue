@@ -131,7 +131,7 @@ func (m *Module) ReloadModule() error {
 		delete(m.dirtyFiles, m.modFileURI)
 		for _, pkg := range m.packages {
 			// TODO: might want to become smarter at this.
-			pkg.status = dirty
+			pkg.setStatus(dirty)
 		}
 		m.debugLog(fmt.Sprintf("%v Reloaded", m))
 		return nil
@@ -377,7 +377,7 @@ func (m *Module) ReloadPackages() error {
 		// the import graph later.
 		pkgsImportsWorklist[pkg] = pkg.pkg
 		pkg.pkg = loadedPkg
-		pkg.status = splendid
+		pkg.setStatus(splendid)
 		m.debugLog(fmt.Sprintf("%v Loaded %v", m, pkg))
 
 		if len(dirtyFiles) != 0 {

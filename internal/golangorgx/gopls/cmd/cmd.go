@@ -21,17 +21,17 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/lsprpc"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
-	"cuelang.org/go/internal/golangorgx/gopls/server"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/util/browser"
 	"cuelang.org/go/internal/golangorgx/gopls/util/constraints"
 	"cuelang.org/go/internal/golangorgx/tools/diff"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/golangorgx/tools/tool"
+	"cuelang.org/go/internal/lsp/cache"
+	"cuelang.org/go/internal/lsp/server"
 )
 
 // Application is the main application as passed to tool.Main

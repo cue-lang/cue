@@ -57,10 +57,10 @@ func Validate(c *adt.OpContext, b []byte, v cue.Value) (bool, error) {
 		// 	return false, err
 		// }
 		vx := adt.Unify(c, value.Vertex(x), value.Vertex(v))
+		x = value.Make(c, vx)
 		if err := x.Err(); err != nil {
 			return false, err
 		}
-		x = value.Make(c, vx)
 
 		if err := x.Validate(cue.Concrete(true)); err != nil {
 			// Strip error codes: incomplete errors are terminal in this case.

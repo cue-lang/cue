@@ -796,24 +796,24 @@ Result:
       }
     }
     yamlVal: (_|_){
-      // [eval]
+      // [structural cycle]
       t1: (_|_){
-        // [eval]
+        // [structural cycle]
         x: (_|_){
-          // [eval]
+          // [structural cycle]
           y: (_|_){
-            // [eval] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
+            // [structural cycle] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
             //     ./yamlcycle.cue:24:8
             //     ./yamlcycle.cue:25:8
           }
         }
       }
       t2: (_|_){
-        // [eval]
+        // [structural cycle]
         x: (_|_){
-          // [eval]
+          // [structural cycle]
           y: (_|_){
-            // [eval] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
+            // [structural cycle] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
             //     ./yamlcycle.cue:30:8
             //     ./yamlcycle.cue:31:8
             //     ./yamlcycle.cue:32:8
@@ -823,25 +823,25 @@ Result:
       }
     }
     yamlFun: (_|_){
-      // [eval]
+      // [structural cycle]
       t1: (struct){
         x: (struct){
           y?: (bool){ true }
         }
       }
       t2: (_|_){
-        // [eval]
+        // [structural cycle]
         z: (_|_){
-          // [eval]
+          // [structural cycle]
           y: (_|_){
-            // [eval] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
+            // [structural cycle] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
             //     ./yamlcycle.cue:41:8
           }
         }
         x: (_|_){
-          // [eval]
+          // [structural cycle]
           y: (_|_){
-            // [eval] selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
+            // [structural cycle] selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
             //     ./yamlcycle.cue:41:8
           }
         }
@@ -1178,31 +1178,31 @@ diff old new
      yamlVal: (_|_){
 @@ -466,25 +494,33 @@
        t1: (_|_){
-         // [eval]
+         // [structural cycle]
          x: (_|_){
--          // [eval] selfCycle.yamlVal.t1.x.y.y: structural cycle:
+-          // [structural cycle] selfCycle.yamlVal.t1.x.y.y: structural cycle:
 -          //     ./yamlcycle.cue:24:22
 -        }
 -      }
 -      t2: (_|_){
--        // [eval]
+-        // [structural cycle]
 -        x: (_|_){
--          // [eval] selfCycle.yamlVal.t2.x.y.y: structural cycle:
+-          // [structural cycle] selfCycle.yamlVal.t2.x.y.y: structural cycle:
 -          //     ./yamlcycle.cue:32:22
-+          // [eval]
++          // [structural cycle]
 +          y: (_|_){
-+            // [eval] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
++            // [structural cycle] selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
 +            //     ./yamlcycle.cue:24:8
 +            //     ./yamlcycle.cue:25:8
 +          }
 +        }
 +      }
 +      t2: (_|_){
-+        // [eval]
++        // [structural cycle]
 +        x: (_|_){
-+          // [eval]
++          // [structural cycle]
 +          y: (_|_){
-+            // [eval] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
++            // [structural cycle] selfCycle.yamlVal.t2.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
 +            //     ./yamlcycle.cue:30:8
 +            //     ./yamlcycle.cue:31:8
 +            //     ./yamlcycle.cue:32:8
@@ -1212,7 +1212,7 @@ diff old new
        }
      }
      yamlFun: (_|_){
-       // [eval]
+       // [structural cycle]
 -      t1: (_|_){
 -        // [structural cycle]
 -        x: (_|_){
@@ -1226,23 +1226,23 @@ diff old new
        t2: (_|_){
 @@ -492,13 +528,16 @@
          z: (_|_){
-           // [eval]
+           // [structural cycle]
            y: (_|_){
--            // [eval] selfCycle.yamlFun.t2.x.y.y: structural cycle:
+-            // [structural cycle] selfCycle.yamlFun.t2.x.y.y: structural cycle:
 -            //     ./yamlcycle.cue:41:28
 -          }
 -        }
 -        x: (_|_){
--          // [eval] selfCycle.yamlFun.t2.x.y.y: structural cycle:
+-          // [structural cycle] selfCycle.yamlFun.t2.x.y.y: structural cycle:
 -          //     ./yamlcycle.cue:41:28
-+            // [eval] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
++            // [structural cycle] selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
 +            //     ./yamlcycle.cue:41:8
 +          }
 +        }
 +        x: (_|_){
-+          // [eval]
++          // [structural cycle]
 +          y: (_|_){
-+            // [eval] selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
++            // [structural cycle] selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cycle:
 +            //     ./yamlcycle.cue:41:8
 +          }
          }
@@ -1730,24 +1730,24 @@ Result:
       }
     }
     yamlVal: (_|_){
-      // [eval]
+      // [structural cycle]
       t1: (_|_){
-        // [eval]
+        // [structural cycle]
         x: (_|_){
-          // [eval] selfCycle.yamlVal.t1.x.y.y: structural cycle:
+          // [structural cycle] selfCycle.yamlVal.t1.x.y.y: structural cycle:
           //     ./yamlcycle.cue:24:22
         }
       }
       t2: (_|_){
-        // [eval]
+        // [structural cycle]
         x: (_|_){
-          // [eval] selfCycle.yamlVal.t2.x.y.y: structural cycle:
+          // [structural cycle] selfCycle.yamlVal.t2.x.y.y: structural cycle:
           //     ./yamlcycle.cue:32:22
         }
       }
     }
     yamlFun: (_|_){
-      // [eval]
+      // [structural cycle]
       t1: (_|_){
         // [structural cycle]
         x: (_|_){
@@ -1756,16 +1756,16 @@ Result:
         }
       }
       t2: (_|_){
-        // [eval]
+        // [structural cycle]
         z: (_|_){
-          // [eval]
+          // [structural cycle]
           y: (_|_){
-            // [eval] selfCycle.yamlFun.t2.x.y.y: structural cycle:
+            // [structural cycle] selfCycle.yamlFun.t2.x.y.y: structural cycle:
             //     ./yamlcycle.cue:41:28
           }
         }
         x: (_|_){
-          // [eval] selfCycle.yamlFun.t2.x.y.y: structural cycle:
+          // [structural cycle] selfCycle.yamlFun.t2.x.y.y: structural cycle:
           //     ./yamlcycle.cue:41:28
         }
       }

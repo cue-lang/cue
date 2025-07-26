@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77ed8c74_5666592c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-26T16:36:20Z",
+      "side": 1,
+      "message": "FYI I think you actually meant #4006 here, and in the test case.",
+      "revId": "af9c8f7b547eb127f13bf7def4bdad94cb9a1464",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

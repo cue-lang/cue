@@ -16,6 +16,24 @@
       "message": "unfinished sentence?",
       "revId": "78cb80b60f157fa45e3d6f753ccba4d116a65618",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f2749aa_228ce0f6",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1048,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-26T17:15:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e84078c8_a70c0a21",
+      "revId": "78cb80b60f157fa45e3d6f753ccba4d116a65618",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

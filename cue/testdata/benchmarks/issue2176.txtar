@@ -77,7 +77,7 @@ MaxReqSets:          26
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,15 @@
+@@ -1,13 +1,15 @@
 -Leaks:  90
 -Freed:  684
 -Reused: 680
@@ -87,6 +87,8 @@ diff old new
 -Unifications: 766
 -Conjuncts:    3242
 -Disjuncts:    1409
+-
+-MisalignedConjunct: 1216
 -
 -NumCloseIDs: 12
 +Leaks:  32

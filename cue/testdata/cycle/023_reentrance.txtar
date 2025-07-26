@@ -129,7 +129,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,11 @@
+@@ -1,13 +1,11 @@
 -Leaks:  16
 -Freed:  180
 -Reused: 170
@@ -139,6 +139,8 @@ diff old new
 -Unifications: 196
 -Conjuncts:    464
 -Disjuncts:    268
+-
+-MisalignedConjunct: 19
 -
 -NumCloseIDs: 46
 +Leaks:  11

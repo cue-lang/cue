@@ -25,16 +25,17 @@ items: list.Sort(#GroupListAgain, {
 }
 #Rule: expr: string
 -- out/evalalpha --
-Errors:
-items: error in call to list.Sort: runtime error: index out of range [8] with length 4:
-    ./in.cue:3:8
-
-Result:
-(_|_){
-  // [eval]
-  items: (_|_){
-    // [eval] items: error in call to list.Sort: runtime error: index out of range [8] with length 4:
-    //     ./in.cue:3:8
+(struct){
+  items: (#list){
+    0: ~(#GroupList.2)
+    1: ~(#GroupList.1)
+    2: (#struct){ |(*(#struct){
+        kind: (string){ "9_last" }
+      }, (#struct){
+        kind!: (string){ string }
+        rules?: (list){
+        }
+      }) }
   }
   #GroupListAgain: (#list){
     0: (#struct){ |(*(#struct){
@@ -139,16 +140,16 @@ Result:
 }
 -- out/evalalpha/stats --
 Leaks:  0
-Freed:  58
-Reused: 31
+Freed:  61
+Reused: 34
 Allocs: 27
 Retain: 0
 
-Unifications: 44
-Conjuncts:    76
+Unifications: 47
+Conjuncts:    80
 Disjuncts:    6
 
-NumCloseIDs: 8
+NumCloseIDs: 9
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -163,16 +164,16 @@ diff old new
 -Unifications: 135
 -Conjuncts:    273
 -Disjuncts:    165
-+Freed:  58
-+Reused: 31
++Freed:  61
++Reused: 34
 +Allocs: 27
 +Retain: 0
 +
-+Unifications: 44
-+Conjuncts:    76
++Unifications: 47
++Conjuncts:    80
 +Disjuncts:    6
 +
-+NumCloseIDs: 8
++NumCloseIDs: 9
 -- out/eval/stats --
 Leaks:  0
 Freed:  159
@@ -187,9 +188,9 @@ Disjuncts:    165
 diff old new
 --- old
 +++ new
-@@ -1,34 +1,13 @@
--(struct){
--  items: (#list){
+@@ -1,28 +1,8 @@
+ (struct){
+   items: (#list){
 -    0: (#struct){
 -      kind: (string){ "1_first" }
 -      rules: (#list){
@@ -213,26 +214,13 @@ diff old new
 -      }
 -    }
 -    2: (#struct){ |(*(struct){
--        kind: (string){ "9_last" }
--      }, (#struct){
--        kind!: (string){ string }
--        rules?: (list){
--        }
--      }) }
-+Errors:
-+items: error in call to list.Sort: runtime error: index out of range [8] with length 4:
-+    ./in.cue:3:8
-+
-+Result:
-+(_|_){
-+  // [eval]
-+  items: (_|_){
-+    // [eval] items: error in call to list.Sort: runtime error: index out of range [8] with length 4:
-+    //     ./in.cue:3:8
-   }
-   #GroupListAgain: (#list){
-     0: (#struct){ |(*(#struct){
-@@ -38,28 +17,8 @@
++    0: ~(#GroupList.2)
++    1: ~(#GroupList.1)
++    2: (#struct){ |(*(#struct){
+         kind: (string){ "9_last" }
+       }, (#struct){
+         kind!: (string){ string }
+@@ -38,28 +18,8 @@
          rules?: (list){
          }
        }) }

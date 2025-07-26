@@ -325,6 +325,10 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 		return id
 	}
 
+	if id.opID != 0 && id.opID != n.ctx.opID {
+		return id
+	}
+
 	closeOuter := (id.FromDef && id.FromEmbed) || v.ClosedNonRecursive
 
 	if closeOuter && !forceIgnore {
@@ -688,9 +692,12 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 	// that we can use this to bail out early.
 	c := n.ctx
 	c.redirectsBuf = c.redirectsBuf[:0]
-	for n := n; n != nil; n = n.node.Parent.state {
-		c.redirectsBuf = append(c.redirectsBuf, n.replaceIDs...)
-		if n.node.Parent == nil {
+	for p := n; p != nil; p = p.node.Parent.state {
+		if p.opID != n.opID {
+			break
+		}
+		c.redirectsBuf = append(c.redirectsBuf, p.replaceIDs...)
+		if p.node.Parent == nil {
 			break
 		}
 	}

@@ -1457,7 +1457,7 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,17 @@
+@@ -1,13 +1,17 @@
 -Leaks:  74
 -Freed:  1384
 -Reused: 1358
@@ -1467,6 +1467,8 @@ diff old new
 -Unifications: 970
 -Conjuncts:    2973
 -Disjuncts:    1704
+-
+-MisalignedConjunct: 268
 -
 -NumCloseIDs: 16
 +Leaks:  2

@@ -107,7 +107,7 @@ MaxRedirect:         3
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,16 @@
+@@ -1,13 +1,16 @@
 -Leaks:  2
 -Freed:  653
 -Reused: 632
@@ -117,6 +117,8 @@ diff old new
 -Unifications: 132
 -Conjuncts:    966
 -Disjuncts:    708
+-
+-MisalignedConjunct: 293
 -
 -NumCloseIDs: 30
 +Leaks:  0

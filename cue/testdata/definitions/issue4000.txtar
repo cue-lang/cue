@@ -32,14 +32,14 @@ _items: [#VMRuleList]
 #TypeMeta: kind: string | *"default"
 -- out/evalalpha --
 Errors:
-items: error in call to list.Sort: runtime error: index out of range [13] with length 8:
+items: error in call to list.Sort: runtime error: index out of range [13] with length 6:
     ./in.cue:3:8
 
 Result:
 (_|_){
   // [eval]
   items: (_|_){
-    // [eval] items: error in call to list.Sort: runtime error: index out of range [13] with length 8:
+    // [eval] items: error in call to list.Sort: runtime error: index out of range [13] with length 6:
     //     ./in.cue:3:8
   }
   #List: (#struct){
@@ -169,14 +169,14 @@ diff old new
 +++ new
 @@ -1,9 +1,11 @@
  Leaks:  0
--Freed:  159
--Reused: 147
--Allocs: 12
--Retain: 6
+-Freed:  152
+-Reused: 137
+-Allocs: 15
+-Retain: 9
 -
--Unifications: 135
--Conjuncts:    273
--Disjuncts:    165
+-Unifications: 116
+-Conjuncts:    257
+-Disjuncts:    161
 +Freed:  52
 +Reused: 20
 +Allocs: 32
@@ -201,165 +201,116 @@ Disjuncts:    161
 diff old new
 --- old
 +++ new
-@@ -1,103 +1,62 @@
+@@ -1,85 +1,22 @@
 -(struct){
 -  items: (#list){
+-    0: (#struct){
+-      spec: (#list){
+-        0: (#struct){
+-          rules: (#list){
+-            0: (#struct){
+-              expr: (string){ "x" }
+-            }
+-          }
+-        }
+-      }
+-      kind: (string){ |(*(string){ "default" }, (string){ string }) }
+-    }
+-    1: (#struct){
+-      spec: (#list){
+-        0: (#struct){
+-          rules: (#list){
+-            0: (#struct){
+-              expr: (string){ "y" }
+-            }
+-          }
+-        }
+-      }
+-      kind: (string){ |(*(string){ "default" }, (string){ string }) }
+-    }
 +Errors:
-+items: error in call to list.Sort: runtime error: index out of range [13] with length 8:
++items: error in call to list.Sort: runtime error: index out of range [13] with length 6:
 +    ./in.cue:3:8
 +
 +Result:
 +(_|_){
 +  // [eval]
 +  items: (_|_){
-+    // [eval] items: error in call to list.Sort: runtime error: index out of range [13] with length 8:
++    // [eval] items: error in call to list.Sort: runtime error: index out of range [13] with length 6:
 +    //     ./in.cue:3:8
-+  }
-+  #List: (#struct){
-+    items: (#list){
+   }
+   #List: (#struct){
+     items: (#list){
+-      0: (#struct){
+-        spec: (#list){
+-          0: (#struct){
+-            rules: (#list){
+-              0: (#struct){
+-                expr: (string){ "x" }
+-              }
+-            }
+-          }
+-        }
+-        kind: (string){ |(*(string){ "default" }, (string){ string }) }
+-      }
+-      1: (#struct){
+-        spec: (#list){
+-          0: (#struct){
+-            rules: (#list){
+-              0: (#struct){
+-                expr: (string){ "y" }
+-              }
+-            }
+-          }
+-        }
+-        kind: (string){ |(*(string){ "default" }, (string){ string }) }
+-      }
 +      0: ~(#VMRuleList.0)
 +      1: ~(#VMRuleList.1)
-+    }
-+  }
-+  _items: (#list){
-+    0: ~(#VMRuleList)
-+  }
-+  #VMRuleList: (#list){
-     0: (#struct){
--      kind: (string){ "1_first" }
--      rules: (#list){
--        0: (#struct){
--          expr: (string){ "c" }
--        }
--        1: (#struct){
--          expr: (string){ "d" }
--        }
--      }
--    }
--    1: (#struct){
--      kind: (string){ "2_second" }
--      rules: (#list){
--        0: (#struct){
--          expr: (string){ "a" }
--        }
--        1: (#struct){
--          expr: (string){ "b" }
--        }
--      }
--    }
--    2: (#struct){ |(*(struct){
--        kind: (string){ "9_last" }
--      }, (#struct){
--        kind!: (string){ string }
--        rules?: (list){
--        }
--      }) }
--  }
--  #GroupListAgain: (#list){
--    0: (#struct){ |(*(#struct){
--        kind: (string){ "9_last" }
--      }, (#struct){
--        kind!: (string){ string }
--        rules?: (list){
--        }
--      }) }
--    1: (#struct){
--      kind: (string){ "2_second" }
--      rules: (#list){
--        0: (#struct){
--          expr: (string){ "a" }
--        }
--        1: (#struct){
--          expr: (string){ "b" }
--        }
--      }
--    }
--    2: (#struct){
--      kind: (string){ "1_first" }
--      rules: (#list){
--        0: (#struct){
--          expr: (string){ "c" }
--        }
--        1: (#struct){
--          expr: (string){ "d" }
--        }
--      }
--    }
--  }
--  #GroupList: (#list){
--    0: (#struct){ |(*(#struct){
--        kind: (string){ "9_last" }
--      }, (#struct){
--        kind!: (string){ string }
--        rules?: (list){
--        }
--      }) }
--    1: (#struct){
--      kind: (string){ "2_second" }
--      rules: (#list){
--        0: (#struct){
--          expr: (string){ "a" }
--        }
--        1: (#struct){
--          expr: (string){ "b" }
--        }
--      }
--    }
--    2: (#struct){
--      kind: (string){ "1_first" }
--      rules: (#list){
--        0: (#struct){
--          expr: (string){ "c" }
--        }
--        1: (#struct){
--          expr: (string){ "d" }
--        }
--      }
--    }
--  }
--  #Group: (#struct){
--    kind!: (string){ string }
--    rules?: (list){
-+      spec: (#list){
-+        0: (#struct){
-+          rules: (#list){
-+            0: (#struct){
-+              expr: (string){ "x" }
-+            }
-+          }
-+        }
-+      }
-+      kind: (string){ |(*(string){ "default" }, (string){ string }) }
-+    }
-+    1: (#struct){
-+      spec: (#list){
-+        0: (#struct){
-+          rules: (#list){
-+            0: (#struct){
-+              expr: (string){ "y" }
-+            }
-+          }
-+        }
-+      }
-+      kind: (string){ |(*(string){ "default" }, (string){ string }) }
-+    }
-+  }
-+  #RuleGroup: (#struct){
-+    rules: (list){
      }
    }
-   #Rule: (#struct){
+   _items: (#list){
+-    0: (#list){
+-      0: (#struct){
+-        spec: (#list){
+-          0: (#struct){
+-            rules: (#list){
+-              0: (#struct){
+-                expr: (string){ "x" }
+-              }
+-            }
+-          }
+-        }
+-        kind: (string){ |(*(string){ "default" }, (string){ string }) }
+-      }
+-      1: (#struct){
+-        spec: (#list){
+-          0: (#struct){
+-            rules: (#list){
+-              0: (#struct){
+-                expr: (string){ "y" }
+-              }
+-            }
+-          }
+-        }
+-        kind: (string){ |(*(string){ "default" }, (string){ string }) }
+-      }
+-    }
++    0: ~(#VMRuleList)
+   }
+   #VMRuleList: (#list){
+     0: (#struct){
+@@ -115,9 +52,9 @@
      expr: (string){ string }
    }
-+  #VMRule: (#struct){
-+    spec: (list){
-+    }
+   #VMRule: (#struct){
+-    kind: (string){ |(*(string){ "default" }, (string){ string }) }
+     spec: (list){
+     }
 +    kind: (string){ |(*(string){ "default" }, (string){ string }) }
-+  }
-+  #TypeMeta: (#struct){
-+    kind: (string){ |(*(string){ "default" }, (string){ string }) }
-+  }
- }
+   }
+   #TypeMeta: (#struct){
+     kind: (string){ |(*(string){ "default" }, (string){ string }) }
 -- out/eval --
 (struct){
   items: (#list){

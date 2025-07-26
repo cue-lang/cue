@@ -699,14 +699,14 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 		c.stats.MaxRedirect = int64(len(c.redirectsBuf))
 	}
 
-	return n.containsDefIDRec(node, child)
+	return n.containsDefIDRec(node, child, child)
 }
 
-func (n *nodeContext) containsDefIDRec(node, child defID) bool {
+func (n *nodeContext) containsDefIDRec(node, child, start defID) bool {
 	c := n.ctx
 
 	// NOTE: this loop is O(H)
-	for p := child; p != 0; p = c.containments[p] {
+	for p := child; p != 0; {
 		if p == node {
 			return true
 		}
@@ -717,10 +717,16 @@ func (n *nodeContext) containsDefIDRec(node, child defID) bool {
 		// array once.
 		for _, r := range c.redirectsBuf {
 			if r.to == p && r.from != child {
-				if n.containsDefIDRec(node, r.from) {
+				if n.containsDefIDRec(node, r.from, start) {
 					return true
 				}
 			}
+		}
+
+		p = c.containments[p]
+		if p == start {
+			// We won't match node we haven't already after one cycle.
+			return false
 		}
 	}
 

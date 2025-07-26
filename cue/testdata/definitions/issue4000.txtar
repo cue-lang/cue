@@ -1,0 +1,369 @@
+-- in.cue --
+import "list"
+
+items: list.Sort(#GroupListAgain, {
+	x:    {}
+	y:    {}
+	less: x.kind < y.kind
+})
+
+#GroupListAgain: list.Concat([#GroupList])
+
+#GroupList: [...*{kind: "9_last"} | #Group] & [{
+	// empty element
+}, {
+	kind: "2_second"
+	rules: [{expr: "a"}, {expr: "b"}]
+}, {
+	kind: "1_first"
+	rules: [{expr: "c"}, {expr: "d"}]
+}]
+
+#Group: {
+	kind!:  string
+	rules?: [...#Rule]
+}
+#Rule: expr: string
+-- out/evalalpha --
+Errors:
+items: error in call to list.Sort: runtime error: index out of range [8] with length 4:
+    ./in.cue:3:8
+
+Result:
+(_|_){
+  // [eval]
+  items: (_|_){
+    // [eval] items: error in call to list.Sort: runtime error: index out of range [8] with length 4:
+    //     ./in.cue:3:8
+  }
+  #GroupListAgain: (#list){
+    0: (#struct){ |(*(#struct){
+        kind: (string){ "9_last" }
+      }, (#struct){
+        kind!: (string){ string }
+        rules?: (list){
+        }
+      }) }
+    1: ~(#GroupList.1)
+    2: ~(#GroupList.2)
+  }
+  #GroupList: (#list){
+    0: (#struct){ |(*(#struct){
+        kind: (string){ "9_last" }
+      }, (#struct){
+        kind!: (string){ string }
+        rules?: (list){
+        }
+      }) }
+    1: (#struct){
+      kind: (string){ "2_second" }
+      rules: (#list){
+        0: (#struct){
+          expr: (string){ "a" }
+        }
+        1: (#struct){
+          expr: (string){ "b" }
+        }
+      }
+    }
+    2: (#struct){
+      kind: (string){ "1_first" }
+      rules: (#list){
+        0: (#struct){
+          expr: (string){ "c" }
+        }
+        1: (#struct){
+          expr: (string){ "d" }
+        }
+      }
+    }
+  }
+  #Group: (#struct){
+    kind!: (string){ string }
+    rules?: (list){
+    }
+  }
+  #Rule: (#struct){
+    expr: (string){ string }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  items: 〈import;list〉.Sort(〈0;#GroupListAgain〉, {
+    x: {}
+    y: {}
+    less: (〈0;x〉.kind < 〈0;y〉.kind)
+  })
+  #GroupListAgain: 〈import;list〉.Concat([
+    〈1;#GroupList〉,
+  ])
+  #GroupList: ([
+    ...(*{
+      kind: "9_last"
+    }|〈1;#Group〉),
+  ] & [
+    {},
+    {
+      kind: "2_second"
+      rules: [
+        {
+          expr: "a"
+        },
+        {
+          expr: "b"
+        },
+      ]
+    },
+    {
+      kind: "1_first"
+      rules: [
+        {
+          expr: "c"
+        },
+        {
+          expr: "d"
+        },
+      ]
+    },
+  ])
+  #Group: {
+    kind!: string
+    rules?: [
+      ...〈2;#Rule〉,
+    ]
+  }
+  #Rule: {
+    expr: string
+  }
+}
+-- out/evalalpha/stats --
+Leaks:  0
+Freed:  58
+Reused: 31
+Allocs: 27
+Retain: 0
+
+Unifications: 44
+Conjuncts:    76
+Disjuncts:    6
+
+NumCloseIDs: 8
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,11 @@
+ Leaks:  0
+-Freed:  159
+-Reused: 147
+-Allocs: 12
+-Retain: 6
+-
+-Unifications: 135
+-Conjuncts:    273
+-Disjuncts:    165
++Freed:  58
++Reused: 31
++Allocs: 27
++Retain: 0
++
++Unifications: 44
++Conjuncts:    76
++Disjuncts:    6
++
++NumCloseIDs: 8
+-- out/eval/stats --
+Leaks:  0
+Freed:  159
+Reused: 147
+Allocs: 12
+Retain: 6
+
+Unifications: 135
+Conjuncts:    273
+Disjuncts:    165
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,34 +1,13 @@
+-(struct){
+-  items: (#list){
+-    0: (#struct){
+-      kind: (string){ "1_first" }
+-      rules: (#list){
+-        0: (#struct){
+-          expr: (string){ "c" }
+-        }
+-        1: (#struct){
+-          expr: (string){ "d" }
+-        }
+-      }
+-    }
+-    1: (#struct){
+-      kind: (string){ "2_second" }
+-      rules: (#list){
+-        0: (#struct){
+-          expr: (string){ "a" }
+-        }
+-        1: (#struct){
+-          expr: (string){ "b" }
+-        }
+-      }
+-    }
+-    2: (#struct){ |(*(struct){
+-        kind: (string){ "9_last" }
+-      }, (#struct){
+-        kind!: (string){ string }
+-        rules?: (list){
+-        }
+-      }) }
++Errors:
++items: error in call to list.Sort: runtime error: index out of range [8] with length 4:
++    ./in.cue:3:8
++
++Result:
++(_|_){
++  // [eval]
++  items: (_|_){
++    // [eval] items: error in call to list.Sort: runtime error: index out of range [8] with length 4:
++    //     ./in.cue:3:8
+   }
+   #GroupListAgain: (#list){
+     0: (#struct){ |(*(#struct){
+@@ -38,28 +17,8 @@
+         rules?: (list){
+         }
+       }) }
+-    1: (#struct){
+-      kind: (string){ "2_second" }
+-      rules: (#list){
+-        0: (#struct){
+-          expr: (string){ "a" }
+-        }
+-        1: (#struct){
+-          expr: (string){ "b" }
+-        }
+-      }
+-    }
+-    2: (#struct){
+-      kind: (string){ "1_first" }
+-      rules: (#list){
+-        0: (#struct){
+-          expr: (string){ "c" }
+-        }
+-        1: (#struct){
+-          expr: (string){ "d" }
+-        }
+-      }
+-    }
++    1: ~(#GroupList.1)
++    2: ~(#GroupList.2)
+   }
+   #GroupList: (#list){
+     0: (#struct){ |(*(#struct){
+-- out/eval --
+(struct){
+  items: (#list){
+    0: (#struct){
+      kind: (string){ "1_first" }
+      rules: (#list){
+        0: (#struct){
+          expr: (string){ "c" }
+        }
+        1: (#struct){
+          expr: (string){ "d" }
+        }
+      }
+    }
+    1: (#struct){
+      kind: (string){ "2_second" }
+      rules: (#list){
+        0: (#struct){
+          expr: (string){ "a" }
+        }
+        1: (#struct){
+          expr: (string){ "b" }
+        }
+      }
+    }
+    2: (#struct){ |(*(struct){
+        kind: (string){ "9_last" }
+      }, (#struct){
+        kind!: (string){ string }
+        rules?: (list){
+        }
+      }) }
+  }
+  #GroupListAgain: (#list){
+    0: (#struct){ |(*(#struct){
+        kind: (string){ "9_last" }
+      }, (#struct){
+        kind!: (string){ string }
+        rules?: (list){
+        }
+      }) }
+    1: (#struct){
+      kind: (string){ "2_second" }
+      rules: (#list){
+        0: (#struct){
+          expr: (string){ "a" }
+        }
+        1: (#struct){
+          expr: (string){ "b" }
+        }
+      }
+    }
+    2: (#struct){
+      kind: (string){ "1_first" }
+      rules: (#list){
+        0: (#struct){
+          expr: (string){ "c" }
+        }
+        1: (#struct){
+          expr: (string){ "d" }
+        }
+      }
+    }
+  }
+  #GroupList: (#list){
+    0: (#struct){ |(*(#struct){
+        kind: (string){ "9_last" }
+      }, (#struct){
+        kind!: (string){ string }
+        rules?: (list){
+        }
+      }) }
+    1: (#struct){
+      kind: (string){ "2_second" }
+      rules: (#list){
+        0: (#struct){
+          expr: (string){ "a" }
+        }
+        1: (#struct){
+          expr: (string){ "b" }
+        }
+      }
+    }
+    2: (#struct){
+      kind: (string){ "1_first" }
+      rules: (#list){
+        0: (#struct){
+          expr: (string){ "c" }
+        }
+        1: (#struct){
+          expr: (string){ "d" }
+        }
+      }
+    }
+  }
+  #Group: (#struct){
+    kind!: (string){ string }
+    rules?: (list){
+    }
+  }
+  #Rule: (#struct){
+    expr: (string){ string }
+  }
+}

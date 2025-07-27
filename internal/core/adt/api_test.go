@@ -33,7 +33,7 @@ type editConfig struct {
 // Modifying values can cause a mix of non-finalized nodes as children of
 // a finalized parent. Ensure that this does not cause issues.
 func TestAPIModifyingValues(t *testing.T) {
-	ctx := cuecontext.New(cuecontext.CUE_DEBUG("logeval=1"))
+	ctx := cuecontext.New()
 
 	v := ctx.CompileString(`
         edits: [{

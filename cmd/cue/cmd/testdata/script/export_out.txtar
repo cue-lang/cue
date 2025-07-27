@@ -1,0 +1,41 @@
+# Issue #4004
+#
+# Ensure that notifications are not sent when a value has been completed.
+
+# evalv2
+env CUE_EXPERIMENT=evalv3=0
+exec cue export -e out --out yaml in.cue
+cmp stdout stdout_evalv2
+
+# evalv3
+env CUE_EXPERIMENT=evalv3=1
+exec cue export -e out --out yaml in.cue
+cmp stdout stdout_evalv3
+
+-- in.cue --
+_byKind: [string]: _
+for obj in (#JobBranch & {_in: image: "foo"}).out {
+	_byKind: (obj.kind): obj
+}
+
+out: [for obj in _byKind {obj}]
+
+#JobBranch: {
+	IN=_in: _
+	out: [(#JobLeaf & {_in: IN}).out]
+}
+#JobLeaf: {
+	_in: _
+	out: {
+		kind: "Job"
+		spec: image: _in.image
+	}
+}
+-- stdout_evalv2 --
+- kind: Job
+  spec:
+    image: foo
+-- stdout_evalv3 --
+- kind: Job
+  spec:
+    image: foo

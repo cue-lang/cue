@@ -322,6 +322,10 @@ func TestDecode(t *testing.T) {
 		dst:   &Unmarshalers{},
 		want:  Unmarshalers{NetIP: nil},
 	}, {
+		value: `{Value: 1.99769313499e+508}`,
+		dst:   new(StructWithFloat),
+		want:  StructWithFloat{bigFloat("1.99769313499e+508")},
+	}, {
 		value: "{name: \"John Doe\"}",
 		dst:   new(Custom),
 		want: Custom{
@@ -377,6 +381,10 @@ func TestDecodeIntoCUEValue(t *testing.T) {
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(fmt.Sprint(v), "int"))
 	})
+}
+
+type StructWithFloat struct {
+	Value *big.Float
 }
 
 type Custom struct {

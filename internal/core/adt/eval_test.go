@@ -44,8 +44,12 @@ var (
 )
 
 // TestEvalV2 tests the old implementation of the evaluator.
+// Note that [TestEvalV3] with CUE_UPDATE=1 assumes it runs after this test
+// for the sake of comparing results between the two evaluator versions.
+// As such, these two tests are not parallel at the top level.
+//
+// Note that this also means that CUE_UPDATE=1 is broken under `go test -shuffle`.
 func TestEvalV2(t *testing.T) {
-	t.Parallel()
 	test := cuetxtar.TxTarTest{
 		Root: "../../../cue/testdata",
 		Name: "eval",
@@ -67,7 +71,6 @@ func TestEvalV2(t *testing.T) {
 }
 
 func TestEvalV3(t *testing.T) {
-	t.Parallel()
 	adt.DebugDeps = true // check unmatched dependencies.
 
 	test := cuetxtar.TxTarTest{

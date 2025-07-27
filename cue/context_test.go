@@ -141,6 +141,34 @@ bar: [
 	}
 }
 
+func TestEncode(t *testing.T) {
+	type testCase struct {
+		name    string
+		x       interface{}
+		wantErr string
+		out     string
+	}
+	testCases := []testCase{{
+		name: "CustomMarshaler",
+		x:    CustomMarshaler{Name: "John"},
+		out:  `{name: "John"}`,
+	}, {
+		name:    "CustomMarshaler/Error",
+		x:       CustomMarshaler{ShouldError: true, Name: "John"},
+		wantErr: "cue.Marshaler: .*",
+	}}
+	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
+		v := cuecontext.New().Encode(tc.x)
+		if tc.wantErr != "" {
+			qt.Assert(t, qt.ErrorMatches(v.Err(), tc.wantErr))
+			return
+		}
+		qt.Assert(t, qt.IsNil(v.Err()))
+		got := fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
+		t.Equal(got, tc.out)
+	})
+}
+
 func TestEncodeType(t *testing.T) {
 	type testCase struct {
 		name    string
@@ -179,6 +207,9 @@ func TestEncodeType(t *testing.T) {
 		name:    "chan",
 		x:       chan int(nil),
 		wantErr: `unsupported Go type \(chan int\)`,
+	}, {
+		name: "CustomMarshaler",
+		x:    CustomMarshaler{Name: "John"},
 	}}
 	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 		v := cuecontext.New().EncodeType(tc.x)
@@ -197,4 +228,18 @@ func TestContextCheck(t *testing.T) {
 		var c cue.Context
 		c.CompileString("1")
 	}, `.*use cuecontext\.New.*`))
+}
+
+var _ cue.Marshaler = (*CustomMarshaler)(nil)
+
+type CustomMarshaler struct {
+	Name        string
+	ShouldError bool
+}
+
+func (m CustomMarshaler) MarshalCUE(ctx *cue.Context) (cue.Value, error) {
+	if m.ShouldError {
+		return cue.Value{}, fmt.Errorf("error")
+	}
+	return ctx.CompileString("{name: \"" + m.Name + "\"}"), nil
 }

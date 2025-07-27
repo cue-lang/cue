@@ -31,6 +31,11 @@ import (
 	"cuelang.org/go/internal/core/export"
 )
 
+// Marshaler is the interface implemented by types that can marshal themselves into a CUE value.
+type Marshaler interface {
+	MarshalCUE(context *Context) (Value, error)
+}
+
 // Unmarshaler is the interface implemented by types that can unmarshal themselves from a CUE value. While input can be
 // assumed to be a valid Value, there is no guarantee there are no errors or that the value is complete.
 type Unmarshaler interface {

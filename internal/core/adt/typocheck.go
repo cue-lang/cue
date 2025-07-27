@@ -850,7 +850,7 @@ func getReqSets(n *nodeContext) reqSets {
 		return n.reqSets
 	}
 
-	a := n.reqSets
+	a := slices.Clip(n.reqSets)
 	v := n.node
 
 	if p := v.Parent; p != nil && !n.dropParentRequirements {

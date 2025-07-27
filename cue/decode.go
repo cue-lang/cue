@@ -35,6 +35,14 @@ import (
 // Decode initializes the value pointed to by x with Value v.
 // An error is returned if x is nil or not a pointer.
 //
+// If x implements any of these interfaces, they will be used for decoding
+// in the following order of precedence:
+//  1. Unmarshaler
+//  2. json.Unmarshaler
+//  3. encoding.TextUnmarshaler
+//
+// If x is a struct, this same applies to all of its fields (matching the behavior of json.Unmarshal)
+//
 // If x is a struct, Decode will validate the constraints specified in the field tags.
 //
 // If x contains a [Value], that part of x will be set to the value
@@ -116,7 +124,12 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 		}
 	}
 
-	ij, it, x := indirect(x, v.IsNull())
+	ic, ij, it, x := indirect(x, v.IsNull())
+
+	if ic != nil {
+		d.addErr(ic.UnmarshalCUE(v))
+		return
+	}
 
 	if ij != nil {
 		b, err := v.MarshalJSON()
@@ -856,7 +869,7 @@ func simpleLetterEqualFold(s, t []byte) bool {
 // If it encounters an Unmarshaler, indirect stops and returns that.
 // If decodingNull is true, indirect stops at the first settable pointer so it
 // can be set to nil.
-func indirect(v reflect.Value, decodingNull bool) (json.Unmarshaler, encoding.TextUnmarshaler, reflect.Value) {
+func indirect(v reflect.Value, decodingNull bool) (Unmarshaler, json.Unmarshaler, encoding.TextUnmarshaler, reflect.Value) {
 	// Issue #24153 indicates that it is generally not a guaranteed property
 	// that you may round-trip a reflect.Value by calling Value.Addr().Elem()
 	// and expect the value to still be settable for values derived from
@@ -909,12 +922,15 @@ func indirect(v reflect.Value, decodingNull bool) (json.Unmarshaler, encoding.Te
 			v.Set(reflect.New(v.Type().Elem()))
 		}
 		if v.Type().NumMethod() > 0 && v.CanInterface() {
+			if u, ok := v.Interface().(Unmarshaler); ok {
+				return u, nil, nil, v
+			}
 			if u, ok := v.Interface().(json.Unmarshaler); ok {
-				return u, nil, v
+				return nil, u, nil, v
 			}
 			if !decodingNull {
 				if u, ok := v.Interface().(encoding.TextUnmarshaler); ok {
-					return nil, u, v
+					return nil, nil, u, v
 				}
 			}
 		}
@@ -926,5 +942,5 @@ func indirect(v reflect.Value, decodingNull bool) (json.Unmarshaler, encoding.Te
 			v = v.Elem()
 		}
 	}
-	return nil, nil, v
+	return nil, nil, nil, v
 }

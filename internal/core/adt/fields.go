@@ -238,6 +238,12 @@ func (v *Vertex) insertConjunct(ctx *OpContext, c Conjunct, id CloseInfo, mode A
 		// TODO: we should probably only notify a conjunct once the root of the
 		// conjunct group is completed. This will make it easier to "stitch" the
 		// conjunct trees together, as its correctness will be guaranteed.
+		if rec.v.state == nil || rec.v.status == finalized {
+			// TODO: alternatively prevent nodes from being finalized when they
+			// still may receive notifications.
+			ctx.stats.SkippedNotification++
+			continue
+		}
 		rec.v.state.scheduleConjunct(c, rec.c)
 	}
 

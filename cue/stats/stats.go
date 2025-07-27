@@ -96,6 +96,12 @@ type Counts struct {
 	// aligned. This is more likely to be a bug.
 	MisalignedConstraint int64
 
+	// SkippedNotification indicates the number of notifications that were
+	// skipped because the value was already finalized. This may miss conjuncts
+	// when it occurs during evaluation, but it may also be triggered during
+	// dependency analysis, in which case it is benign.
+	SkippedNotification int64
+
 	// Buffer counters
 	//
 	// Each unification and disjunct operation is associated with an object
@@ -137,6 +143,7 @@ func (c *Counts) Add(other Counts) {
 	c.GenerationMismatch += other.GenerationMismatch
 	c.MisalignedConjunct += other.MisalignedConjunct
 	c.MisalignedConstraint += other.MisalignedConstraint
+	c.SkippedNotification += other.SkippedNotification
 
 	c.NumCloseIDs += other.NumCloseIDs
 	c.ConjunctInfos += other.ConjunctInfos
@@ -164,6 +171,7 @@ func (c Counts) Since(start Counts) Counts {
 	c.GenerationMismatch -= start.GenerationMismatch
 	c.MisalignedConjunct -= start.MisalignedConjunct
 	c.MisalignedConstraint -= start.MisalignedConstraint
+	c.SkippedNotification -= start.SkippedNotification
 	c.NumCloseIDs -= start.NumCloseIDs
 	c.ConjunctInfos -= start.ConjunctInfos
 
@@ -199,11 +207,12 @@ Retain: {{.Retained}}
 Unifications: {{.Unifications}}
 Conjuncts:    {{.Conjuncts}}
 Disjuncts:    {{.Disjuncts}}{{if .Notifications}}
-Notifications: {{.Notifications}}{{end}}{{if or .GenerationMismatch .MisalignedConjunct .MisalignedConstraint}}
+Notifications: {{.Notifications}}{{end}}{{if or .GenerationMismatch .MisalignedConjunct .MisalignedConstraint .SkippedNotification}}
 {{if .GenerationMismatch}}
 GenerationMismatch: {{.GenerationMismatch}}{{end}}{{if .MisalignedConjunct}}
 MisalignedConjunct: {{.MisalignedConjunct}}{{end}}{{if .MisalignedConstraint}}
-MisalignedConstraint: {{.MisalignedConstraint}}{{end}}{{end}}{{if .NumCloseIDs}}
+MisalignedConstraint: {{.MisalignedConstraint}}{{end}}{{if .SkippedNotification}}
+SkippedNotification: {{.SkippedNotification}}{{end}}{{end}}{{if .NumCloseIDs}}
 
 NumCloseIDs: {{.NumCloseIDs}}{{end}}{{if or (ge .MaxReqSets 150) (ge .MaxConjunctInfos 8) (ge .MaxRedirect 2)}}
 

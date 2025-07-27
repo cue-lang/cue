@@ -58,6 +58,7 @@ contents overwritten
         "GenerationMismatch": 0,
         "MisalignedConjunct": 0,
         "MisalignedConstraint": 0,
+        "SkippedNotification": 0,
         "Freed": 6,
         "Reused": 0,
         "Allocs": 6,
@@ -83,6 +84,7 @@ CUE: {
 	GenerationMismatch:   0
 	MisalignedConjunct:   0
 	MisalignedConstraint: 0
+	SkippedNotification:  0
 	Freed:                6
 	Reused:               0
 	Allocs:               6
@@ -107,6 +109,7 @@ CUE:
   GenerationMismatch: 0
   MisalignedConjunct: 0
   MisalignedConstraint: 0
+  SkippedNotification: 0
   Freed: 6
   Reused: 0
   Allocs: 6
@@ -130,6 +133,7 @@ Go:
         "GenerationMismatch": 0,
         "MisalignedConjunct": 0,
         "MisalignedConstraint": 0,
+        "SkippedNotification": 0,
         "Freed": 6,
         "Reused": 0,
         "Allocs": 6,

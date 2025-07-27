@@ -300,14 +300,19 @@ func TestDecode(t *testing.T) {
 		value: `-1.99769313499e+508`,
 		dst:   new(*big.Float),
 		want:  bigFloat(`-1.99769313499e+508`),
-	}, {
-		value: "{name: \"John Doe\"}",
-		dst:   new(Custom),
-		want: Custom{
-			UnmarshalCalled: true,
-			Name:            "John Doe",
-		},
-	}}
+	},
+		{
+			value: `{Value: 1.99769313499e+508}`,
+			dst:   new(StructWithFloat),
+			want:  StructWithFloat{bigFloat("1.99769313499e+508")},
+		}, {
+			value: "{name: \"John Doe\"}",
+			dst:   new(Custom),
+			want: Custom{
+				UnmarshalCalled: true,
+				Name:            "John Doe",
+			},
+		}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
 			err := getValue(m, tc.value).Decode(tc.dst)
@@ -356,6 +361,10 @@ func TestDecodeIntoCUEValue(t *testing.T) {
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(fmt.Sprint(v), "int"))
 	})
+}
+
+type StructWithFloat struct {
+	Value *big.Float
 }
 
 type Custom struct {

@@ -16,6 +16,24 @@
       "message": "FYI I think you actually meant #4006 here, and in the test case.",
       "revId": "af9c8f7b547eb127f13bf7def4bdad94cb9a1464",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d8a26cb_51342fc8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-07-27T08:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77ed8c74_5666592c",
+      "revId": "af9c8f7b547eb127f13bf7def4bdad94cb9a1464",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

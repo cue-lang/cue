@@ -31,6 +31,10 @@ import (
 	"cuelang.org/go/internal/core/export"
 )
 
+type Marshaler interface {
+	MarshalCUE(context *Context) (Value, error)
+}
+
 // root.
 type instanceData struct {
 	Root  bool

@@ -31,6 +31,12 @@ import (
 	"cuelang.org/go/internal/core/export"
 )
 
+// Unmarshaler is the interface implemented by types that can unmarshal themselves from a CUE value. While input can be
+// assumed to be a valid Value, there is no guarantee there are no errors or that the value is complete.
+type Unmarshaler interface {
+	UnmarshalCUE(v Value) error
+}
+
 // root.
 type instanceData struct {
 	Root  bool

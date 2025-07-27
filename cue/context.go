@@ -370,10 +370,27 @@ func (c *Context) Encode(x any, option ...EncodeOption) Value {
 	var options encodeOptions
 	options.process(option)
 
+	m, ok := x.(Marshaler)
+	if ok {
+		return encodeCustom(c, m)
+	}
 	ctx := c.ctx()
 	// TODO: is true the right default?
 	val := convert.FromGoValue(ctx, x, options.nilIsTop)
 	n := adt.ToVertex(val) // we know val is finalized
+	n.Finalize(ctx)
+	return c.make(n)
+}
+
+func encodeCustom(c *Context, x Marshaler) Value {
+	v, err := x.MarshalCUE(c)
+	if err == nil {
+		return v
+	}
+	ctx := c.ctx()
+	ctx.AddErr(errors.Promote(err, "cue.Marshaler"))
+	n := &adt.Vertex{}
+	n.AddConjunct(adt.MakeRootConjunct(nil, ctx.AddErr(errors.Promote(err, "cue.Marshaler"))))
 	n.Finalize(ctx)
 	return c.make(n)
 }

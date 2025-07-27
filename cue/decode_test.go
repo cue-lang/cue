@@ -300,6 +300,13 @@ func TestDecode(t *testing.T) {
 		value: `-1.99769313499e+508`,
 		dst:   new(*big.Float),
 		want:  bigFloat(`-1.99769313499e+508`),
+	}, {
+		value: "{name: \"John Doe\"}",
+		dst:   new(Custom),
+		want: Custom{
+			UnmarshalCalled: true,
+			Name:            "John Doe",
+		},
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
@@ -349,6 +356,21 @@ func TestDecodeIntoCUEValue(t *testing.T) {
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(fmt.Sprint(v), "int"))
 	})
+}
+
+type Custom struct {
+	UnmarshalCalled bool
+	Name            string
+}
+
+func (c *Custom) UnmarshalCUE(v cue.Value) error {
+	name, err := v.LookupPath(cue.ParsePath("name")).String()
+	if err == nil {
+		c.UnmarshalCalled = true
+		c.Name = name
+	}
+
+	return err
 }
 
 type Duration struct {

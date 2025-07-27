@@ -838,10 +838,7 @@ func (v *Vertex) toDataAllRec(ctx *OpContext, processed map[*Vertex]*Vertex) *Ve
 		// Always reset all CloseInfo fields to zero. Normally only the top
 		// conjuncts matter and get inserted and conjuncts of recursive arcs
 		// never come in play. ToDataAll is an exception.
-		w.Conjuncts[i].CloseInfo.opID = 0
-		w.Conjuncts[i].CloseInfo.defID = 0
-		w.Conjuncts[i].CloseInfo.outerID = 0
-		w.Conjuncts[i].CloseInfo.enclosingEmbed = 0
+		w.Conjuncts[i].CloseInfo = w.Conjuncts[i].CloseInfo.clearCloseCheck()
 	}
 
 	// Store the processed vertex before returning

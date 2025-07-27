@@ -421,7 +421,21 @@ func (c *OpContext) subField(ci CloseInfo) CloseInfo {
 	return ci
 }
 
+// clearCloseCheck clears the CloseInfo for a node, so that it is not
+// considered for typo checking.
+func (id CloseInfo) clearCloseCheck() CloseInfo {
+	id.opID = 0
+	id.defID = 0
+	id.enclosingEmbed = 0
+	id.outerID = 0
+	return id
+}
+
 func (n *nodeContext) newReq(id CloseInfo, kind defIDType) CloseInfo {
+	if id.defID != 0 && id.opID != n.ctx.opID {
+		return id.clearCloseCheck()
+	}
+
 	dstID := n.ctx.getNextDefID()
 	n.addReplacement(replaceID{from: id.defID, to: dstID})
 

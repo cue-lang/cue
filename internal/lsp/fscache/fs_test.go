@@ -10,10 +10,13 @@ import (
 	"testing/fstest"
 	"time"
 
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/fscache"
 	"github.com/go-quicktest/qt"
 )
+
+const fileContent = "package foo\n\nx: true"
 
 func TestCUECacheFSURI(t *testing.T) {
 	_, _, onDiskFilesAbs := setup(t)
@@ -23,7 +26,13 @@ func TestCUECacheFSURI(t *testing.T) {
 		uri := protocol.URIFromPath(f)
 		fh, err := fs.ReadFile(uri)
 		qt.Assert(t, qt.IsNil(err))
-		qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(f)))
+		qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(fileContent)))
+		ast, err := fh.ReadCUE(parser.NewConfig(parser.ImportsOnly))
+		qt.Assert(t, qt.IsNil(err))
+		// 2 decls: 1 for the package one for x, because the
+		// [parser.ImportsOnly] mode is modified to
+		// [parser.ParseComments].
+		qt.Assert(t, qt.Equals(len(ast.Decls), 2))
 	}
 }
 
@@ -73,7 +82,13 @@ func TestOverlayFSURI(t *testing.T) {
 		if i == 0 {
 			qt.Assert(t, qt.DeepEquals(fh.Content(), content))
 		} else {
-			qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(f)))
+			qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(fileContent)))
+			ast, err := fh.ReadCUE(parser.NewConfig(parser.ImportsOnly))
+			qt.Assert(t, qt.IsNil(err))
+			// 2 decls: 1 for the package one for x, because the
+			// [parser.ImportsOnly] mode is modified to
+			// [parser.ParseComments].
+			qt.Assert(t, qt.Equals(len(ast.Decls), 2))
 		}
 	}
 }
@@ -133,7 +148,7 @@ func setup(t *testing.T) (dir string, onDiskFiles, onDiskFilesAbs []string) {
 		onDiskFilesAbs[i] = filepath.Join(dir, filepath.FromSlash(f))
 	}
 	for _, f := range onDiskFilesAbs {
-		writeFile(t, f, f)
+		writeFile(t, f, fileContent)
 	}
 	forceMFTUpdateOnWindows(t, dir)
 	return dir, onDiskFiles, onDiskFilesAbs

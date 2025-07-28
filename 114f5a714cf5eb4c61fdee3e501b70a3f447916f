@@ -86,6 +86,24 @@
       "message": "Ditto here regarding `\"go-version\"` - having a \"constant\" in the base repo would be cleaner too.",
       "revId": "114f5a714cf5eb4c61fdee3e501b70a3f447916f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c60705db_1bc7055f",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-28T14:41:38Z",
+      "side": 1,
+      "message": "done; I went with the suffix \"Name\" versus \"Expr\"",
+      "parentUuid": "46f7b26c_ee305082",
+      "revId": "114f5a714cf5eb4c61fdee3e501b70a3f447916f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

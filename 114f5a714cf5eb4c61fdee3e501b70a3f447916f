@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "64a0758e_d89ee418",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-28T14:31:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b73f0b2_fea1eb1e",
+      "revId": "114f5a714cf5eb4c61fdee3e501b70a3f447916f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ca25ebb9_32ce0dec",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-07-28T10:36:05Z",
       "side": 1,
       "message": "FYI you should use `matrixGoVersion` in some way here to ensure consistency with the references to the field.",
+      "revId": "114f5a714cf5eb4c61fdee3e501b70a3f447916f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b46c60f_f0d72e5e",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-07-28T14:31:17Z",
+      "side": 1,
+      "message": "I\u0027m afraid not; this is the name of the input that setup-go takes, so it just happens to align with the name we chose, but the two are not the same.",
+      "parentUuid": "ca25ebb9_32ce0dec",
       "revId": "114f5a714cf5eb4c61fdee3e501b70a3f447916f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

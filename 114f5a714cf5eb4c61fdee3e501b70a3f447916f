@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b73f0b2_fea1eb1e",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-28T10:36:05Z",
+      "side": 1,
+      "message": "The pattern I\u0027ve followed elsewhere is to name these identifiers with an `Expr` suffix, so it\u0027s clear it\u0027s a string that is a GitHub expression.",
+      "revId": "114f5a714cf5eb4c61fdee3e501b70a3f447916f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca25ebb9_32ce0dec",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-28T10:36:05Z",
+      "side": 1,
+      "message": "FYI you should use `matrixGoVersion` in some way here to ensure consistency with the references to the field.",
+      "revId": "114f5a714cf5eb4c61fdee3e501b70a3f447916f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46f7b26c_ee305082",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-07-28T10:36:05Z",
+      "side": 1,
+      "message": "Ditto here regarding `\"go-version\"` - having a \"constant\" in the base repo would be cleaner too.",
+      "revId": "114f5a714cf5eb4c61fdee3e501b70a3f447916f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

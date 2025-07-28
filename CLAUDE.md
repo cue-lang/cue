@@ -21,6 +21,7 @@ go build ./cmd/cue
 
 ```bash
 # Run all tests
+# Any change to the repo should run all tests to ensure correctness.
 go test ./...
 
 # Run tests for a specific package
@@ -62,7 +63,7 @@ go fmt ./...
 - `/internal/core/` - Core evaluation engine
   - `adt/` - Core data structures and algorithms
   - `compile/` - Compilation logic
-  - `eval/` - Evaluation engine
+  - `dep/` - Dependency analysis
   - `export/` - Export functionality
 
 ### Command-Line Tool
@@ -90,7 +91,7 @@ go fmt ./...
 - Single commit per PR/CL model
 - Requires DCO (Developer Certificate of Origin) sign-off
 - Both GitHub PRs and GerritHub CLs are supported
-- Changes must be linked to a GitHub issue (except trivial changes)
+- Changes should be linked to a GitHub issue (except trivial changes)
 
 ### Module Information
 - Module: `cuelang.org/go`

@@ -34,6 +34,10 @@ type FileHandle interface {
 	// only one config value is used for each file: if you change the
 	// config value and re-read the file, you will not receive back an
 	// updated [ast.File].
+	//
+	// Additionally, in order to ensure the first parse of a file does
+	// not cause the cache to contain a partial AST, ReadCUE
+	// unconditionally sets config.Mode to [parser.ParseComments].
 	ReadCUE(config parser.Config) (*ast.File, error)
 	// Version returns the file version, as defined by the LSP client.
 	Version() int32
@@ -75,7 +79,8 @@ func (entry *diskFileEntry) ReadCUE(config parser.Config) (*ast.File, error) {
 		return nil, nil
 	}
 
-	ast, err := parser.ParseFile(bf.Filename, bf.Source, config, parser.ParseComments)
+	config.Mode = parser.ParseComments
+	ast, err := parser.ParseFile(bf.Filename, bf.Source, config)
 	if err != nil {
 		return nil, err
 	}

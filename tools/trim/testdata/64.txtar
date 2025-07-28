@@ -1,0 +1,55 @@
+Disjunctions.
+
+If line 2 wasn't present,
+
+out: #Schema & {type: "A"}
+
+correctly gets simplified to
+
+out: #Schema & _
+
+because of the default.
+
+However, with line 2 present, simplifying `out` in the same way is incorrect.
+
+Note that v2 gets this wrong.
+
+-- a.cue --
+#Schema: {type: *"A" | string}
+#Schema: {type: "A"} | {type: "CNAME"}
+out: #Schema & {type: "A"}
+-- out/trim-v3 --
+== a.cue
+#Schema: {type: *"A" | string}
+#Schema: {type: "A"} | {type: "CNAME"}
+out: #Schema & {type: "A"}
+-- diff/-out/trim-v3<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,4 @@
+ == a.cue
+ #Schema: {type: *"A" | string}
+ #Schema: {type: "A"} | {type: "CNAME"}
+-out: #Schema & {}
++out: #Schema & {type: "A"}
+-- out/trim-v3-noshare --
+== a.cue
+#Schema: {type: *"A" | string}
+#Schema: {type: "A"} | {type: "CNAME"}
+out: #Schema & {type: "A"}
+-- diff/-out/trim-v3-noshare<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,4 @@
+ == a.cue
+ #Schema: {type: *"A" | string}
+ #Schema: {type: "A"} | {type: "CNAME"}
+-out: #Schema & {}
++out: #Schema & {type: "A"}
+-- out/trim --
+== a.cue
+#Schema: {type: *"A" | string}
+#Schema: {type: "A"} | {type: "CNAME"}
+out: #Schema & {}

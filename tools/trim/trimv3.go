@@ -728,7 +728,7 @@ func (t *trimmerV3) findRedundancies(v *adt.Vertex, keepAll bool) {
 			}
 		}
 
-		if disj, ok := expr.(*adt.DisjunctionExpr); ok && disj.HasDefaults {
+		if disj, ok := expr.(*adt.DisjunctionExpr); !nm.ignoreConjunct && ok && disj.HasDefaults {
 			defaultCount := 0
 			matchingDefaultCount := 0
 			for _, branch := range disj.Values {

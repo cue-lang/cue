@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"os"
 	pathpkg "path"
 	"path/filepath"
 	"slices"
@@ -258,6 +259,16 @@ func setFileSource(cfg *Config, f *build.File) error {
 		return nil
 	}
 	fullPath := f.Filename
+
+	// If the input file is standard input or a non-regular file,
+	// such as a named pipe or a device file, we can only read it once.
+	// Given that later on we may consume the source multiple times,
+	// such as first to only parse the imports and later to parse the whole file,
+	// read the whole file here upfront and buffer the bytes.
+	//
+	// TODO(perf): this causes an upfront "stat" syscall for every input file,
+	// which is wasteful given that in the majority of cases we deal with regular files.
+	// Consider doing the buffering the first time we open the file later on.
 	if fullPath == "-" {
 		b, err := io.ReadAll(cfg.stdin())
 		if err != nil {
@@ -266,6 +277,19 @@ func setFileSource(cfg *Config, f *build.File) error {
 		f.Source = b
 		return nil
 	}
+	info, err := os.Stat(fullPath)
+	if err != nil {
+		return err
+	}
+	if !info.Mode().IsRegular() {
+		b, err := os.ReadFile(fullPath)
+		if err != nil {
+			return err
+		}
+		f.Source = b
+		return nil
+	}
+
 	if !filepath.IsAbs(fullPath) {
 		fullPath = filepath.Join(cfg.Dir, fullPath)
 		// Ensure that encoding.NewDecoder will work correctly.

@@ -18,7 +18,7 @@ cmp stdout export.stdout
 [!unix] stop # /dev/stdin is not present on Windows
 stdin other
 exec cue export cue: /dev/stdin
-cmp stdout export-broken.stdout
+cmp stdout export.stdout
 
 -- cue.mod/module.cue --
 module: "foo.test"
@@ -29,5 +29,3 @@ foo: "bar"
 {
     "foo": "bar"
 }
--- export-broken.stdout --
-{}

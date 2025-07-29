@@ -85,6 +85,7 @@ func (entry *diskFileEntry) ReadCUE(config parser.Config) (*ast.File, error) {
 		return nil, err
 	}
 	entry.ast = ast
+	ast.Pos().File().SetContent(entry.content)
 
 	return entry.ast, nil
 }

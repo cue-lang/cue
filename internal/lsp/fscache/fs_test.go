@@ -33,6 +33,7 @@ func TestCUECacheFSURI(t *testing.T) {
 		// [parser.ImportsOnly] mode is modified to
 		// [parser.ParseComments].
 		qt.Assert(t, qt.Equals(len(ast.Decls), 2))
+		qt.Assert(t, qt.DeepEquals(ast.Pos().File().Content(), []byte(fileContent)))
 	}
 }
 
@@ -89,6 +90,7 @@ func TestOverlayFSURI(t *testing.T) {
 			// [parser.ImportsOnly] mode is modified to
 			// [parser.ParseComments].
 			qt.Assert(t, qt.Equals(len(ast.Decls), 2))
+			qt.Assert(t, qt.DeepEquals(ast.Pos().File().Content(), []byte(fileContent)))
 		}
 	}
 }

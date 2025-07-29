@@ -34,10 +34,22 @@ import (
 // Perhaps it doesn't work for imported packages? It seems to me like it should.
 _goos: string | *path.Unix @tag(os,var=os)
 
+// uniqueWorkflowNames enforces that workflow names are unique,
+// since we use them to uniquely identify workflow runs depicted in GitHub events,
+// such as "TryBot" or "Unity".
+uniqueWorkflowNames: self={
+	_uniqueWorkflowNames: {
+		for basename, workflow in self {
+			(workflow.name): basename
+		}
+	}
+}
+
 // writeWorkflows regenerates the GitHub workflow YAML definitions.
 writeWorkflows: {
 	#in: {
 		workflows: [string]: githubactions.#Workflow
+		workflows: uniqueWorkflowNames
 	}
 	_dir: path.FromSlash("../../.github/workflows", path.Unix)
 	

@@ -21,8 +21,6 @@ import (
 
 // The trybot workflow.
 workflows: trybot: _repo.bashWorkflow & {
-	name: _repo.trybot.name
-
 	on: {
 		push: {
 			branches: list.Concat([[_repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches

@@ -39,6 +39,7 @@ workflows: close({
 	[string]: githubactions.#Workflow
 
 	_repo.trybotWorkflows
+	_repo.uniqueWorkflowNames
 
 	release:      _
 	tip_triggers: _

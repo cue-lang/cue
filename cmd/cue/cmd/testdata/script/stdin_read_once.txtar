@@ -1,0 +1,33 @@
+# Issue 4009
+# cue/load parses input CUE files more than once; for example,
+# first to only parse the imports, and later to parse the whole file.
+# Reading an input file multiple times only works if it's a regular file.
+# Make sure that the various ways to consume stdin do not attempt
+# to open or read the file more than once.
+
+# Sanity check: use the regular file.
+exec cue export cue: other
+cmp stdout export.stdout
+
+# Use Go's os.Stdin directly.
+stdin other
+exec cue export cue: -
+cmp stdout export.stdout
+
+# Use /dev/stdin, a device file pointing to stdin.
+[!unix] stop # /dev/stdin is not present on Windows
+stdin other
+exec cue export cue: /dev/stdin
+cmp stdout export-broken.stdout
+
+-- cue.mod/module.cue --
+module: "foo.test"
+language: version: "v0.13.0"
+-- other --
+foo: "bar"
+-- export.stdout --
+{
+    "foo": "bar"
+}
+-- export-broken.stdout --
+{}

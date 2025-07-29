@@ -15,6 +15,7 @@
 package parser
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 	"testing"
@@ -753,6 +754,10 @@ bar: 2
 			}
 			if got != tc.out {
 				t.Errorf("\ngot  %q;\nwant %q", got, tc.out)
+			}
+			content := f.Pos().File().Content()
+			if !bytes.Equal(content, []byte(tc.in)) {
+				t.Errorf("\ngot  %q;\nwant %q", string(content), tc.in)
 			}
 		})
 	}

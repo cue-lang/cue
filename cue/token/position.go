@@ -252,9 +252,10 @@ type File struct {
 	base index
 	size index // file size as provided to AddFile
 
-	// lines and infos are protected by set.mutex
-	lines []index // lines contains the offset of the first character for each line (the first entry is always 0)
-	infos []lineInfo
+	// lines, infos, and content are protected by set.mutex
+	lines   []index // lines contains the offset of the first character for each line (the first entry is always 0)
+	infos   []lineInfo
+	content []byte
 
 	experiments *cueexperiment.File
 }
@@ -267,7 +268,13 @@ func NewFile(filename string, deprecatedBase, size int) *File {
 	if deprecatedBase < 0 {
 		deprecatedBase = 1
 	}
-	return &File{sync.RWMutex{}, filename, index(deprecatedBase), index(size), []index{0}, nil, nil}
+	return &File{
+		mutex: sync.RWMutex{},
+		name:  filename,
+		base:  index(deprecatedBase),
+		size:  index(size),
+		lines: []index{0},
+	}
 }
 
 // hiddenFile allows defining methods in File that are hidden from public
@@ -377,7 +384,10 @@ func (f *File) SetLines(lines []int) bool {
 	return true
 }
 
-// SetLinesForContent sets the line offsets for the given file content.
+// SetLinesForContent sets the line offsets for the given file
+// content, and sets the file's content. The content must not be
+// altered after this call.
+//
 // It ignores position-altering //line comments.
 func (f *File) SetLinesForContent(content []byte) {
 	var lines []index
@@ -392,10 +402,27 @@ func (f *File) SetLinesForContent(content []byte) {
 		}
 	}
 
-	// set lines table
+	// set lines table and content
 	f.mutex.Lock()
 	f.lines = lines
+	f.content = content
 	f.mutex.Unlock()
+}
+
+// SetContent sets the file's content. The content must not be altered
+// after this call.
+func (f *hiddenFile) SetContent(content []byte) {
+	f.mutex.Lock()
+	f.content = content
+	f.mutex.Unlock()
+}
+
+// Content retrievs the file's content, which may be nil. The returned
+// content must not be altered.
+func (f *hiddenFile) Content() []byte {
+	f.mutex.RLock()
+	defer f.mutex.RUnlock()
+	return f.content
 }
 
 // A lineInfo object describes alternative file and line number

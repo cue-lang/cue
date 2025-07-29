@@ -12,6 +12,7 @@ import (
 // trybotWorkflows is a template for trybot-based repos
 trybotWorkflows: {
 	(trybot.key): githubactions.#Workflow & {
+		name: trybot.name
 		on: {
 			// Run nightly at 2am UTC without a cache to catch flakes.
 			schedule: [{cron: "0 2 * * *"}]

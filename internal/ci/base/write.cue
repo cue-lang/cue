@@ -39,6 +39,13 @@ writeWorkflows: {
 	#in: {
 		workflows: [string]: githubactions.#Workflow
 	}
+	// Since we use the workflow names as unique IDs like TryBot or Unity
+	// to identify workflow runs depicted in GitHub events, enforce their uniqueness.
+	_uniqueWorkflowNames: {
+		for basename, workflow in #in.workflows {
+			(workflow.name): basename
+		}
+	}
 	_dir: path.FromSlash("../../.github/workflows", path.Unix)
 	
 	remove: {

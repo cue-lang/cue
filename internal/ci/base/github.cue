@@ -171,9 +171,10 @@ curlGitHubAPI: {
 //
 // Note that `${NSC_CACHE_PATH}` (`/cache`) is always mounted as a cache volume.
 setupCaches: {
-	#additionalCaches: [...string] // with.cache
-
-	#additionalCachePaths: [...string] // with.path
+	#in: {
+		additionalCaches: [...string] // with.cache
+		additionalCachePaths: [...string] // with.path
+	}
 
 	[
 		githubactions.#Step & {
@@ -185,10 +186,10 @@ setupCaches: {
 			with: {
 				let cacheModes = list.Concat([[
 					"go",
-				], #additionalCaches])
+				], #in.additionalCaches])
 				let cachePaths = list.Concat([[
 					// nothing here for now.
-				], #additionalCachePaths])
+				], #in.additionalCachePaths])
 
 				if len(cacheModes) > 0 {
 					cache: strings.Join(cacheModes, "\n")
@@ -220,10 +221,10 @@ goChecks: githubactions.#Step & {
 }
 
 staticcheck: githubactions.#Step & {
-	#modfile: string | *"" // an optional -modfile flag to not use the main go.mod
+	#in: modfile: string | *"" // an optional -modfile flag to not use the main go.mod
 	let gotool = [
-		if #modfile != "" {
-			"go tool -modfile=\(#modfile)"
+		if #in.modfile != "" {
+			"go tool -modfile=\(#in.modfile)"
 		},
 		"go tool",
 	][0]

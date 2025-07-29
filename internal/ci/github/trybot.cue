@@ -157,7 +157,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		},
 		// Note that we don't want tooling dependencies in the go.mod file,
 		// given how many downstreams rely on the cue module having few dependencies.
-		_repo.staticcheck & {#modfile: "internal/tools.mod"},
+		_repo.staticcheck & {#in: modfile: "internal/tools.mod"},
 	]
 
 	_checkTags: githubactions.#Step & {

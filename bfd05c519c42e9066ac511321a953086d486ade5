@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95371c01_d933fb23",
+        "filename": "cue/load/import.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-07-29T15:25:18Z",
+      "side": 1,
+      "message": "personal(?) nit: I had to read \"standard input\" a few times before I realised it meant stdin. To me, the \"stdin\" term is more meaningful than \"standard input\".",
+      "revId": "bfd05c519c42e9066ac511321a953086d486ade5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -107,7 +107,7 @@ codeReview: #codeReview & {
 // crucial. As such, we assert specific values for the keys here rather than
 // just deriving values from the human-readable names.
 //
-// trybot.name is by the trybot GitHub workflow and by gerritstatusupdater as
+// trybot.name is used by the trybot GitHub workflow and by gerritstatusupdater as
 // an identifier in the status updates that are posted as reviews for this
 // workflows, but also as the result label key, e.g.  "TryBot-Result" would be
 // the result label key for the "TryBot" workflow. This name also shows up in

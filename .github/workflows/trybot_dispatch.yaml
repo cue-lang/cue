@@ -1,4 +1,4 @@
-# Code generated internal/ci/ci_tool.cue; DO NOT EDIT.
+# Code generated internal/ci/base/write.cue; DO NOT EDIT.
 
 name: Dispatch trybot
 "on":

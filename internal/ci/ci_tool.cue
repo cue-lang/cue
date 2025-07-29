@@ -15,60 +15,16 @@
 package ci
 
 import (
-	"path"
-	"encoding/yaml"
-	"tool/file"
-
-	"github.com/cue-lang/tmp/internal/ci/base"
 	"github.com/cue-lang/tmp/internal/ci/repo"
 	"github.com/cue-lang/tmp/internal/ci/github"
 )
 
-// For the commands below, note we use simple yet hacky path resolution, rather
-// than anything that might derive the module root using go list or similar, in
-// order that we have zero dependencies.  This is important because this CUE
-// package is "vendored" to an external dependency so that that unity can
-// re-run and verify these steps as part of the test suite that runs against
-// new CUE versions.
-
-_goos: string @tag(os,var=os)
-
-// gen.workflows regenerates the GitHub workflow Yaml definitions.
-//
 // See internal/ci/gen.go for details on how this step fits into the sequence
 // of generating our CI workflow definitions, and updating various txtar tests
 // with files from that process.
+
 command: gen: {
-	_dir: path.FromSlash("../../.github/workflows", path.Unix)
+	workflows: repo.writeWorkflows & {#in: workflows: github.workflows}
 
-	workflows: {
-		remove: {
-			glob: file.Glob & {
-				glob: path.Join([_dir, "*" + base.workflowFileExtension], _goos)
-				files: [...string]
-			}
-			for _, _filename in glob.files {
-				"delete \(_filename)": file.RemoveAll & {
-					path: _filename
-				}
-			}
-		}
-		for _workflowName, _workflow in github.workflows {
-			let _filename = _workflowName + repo.workflowFileExtension
-			"generate \(_filename)": file.Create & {
-				$after: [for v in remove {v}]
-				filename: path.Join([_dir, _filename], _goos)
-				let donotedit = repo.doNotEditMessage & {#generatedBy: "internal/ci/ci_tool.cue", _}
-				contents: "# \(donotedit)\n\n\(yaml.Marshal(_workflow))"
-			}
-		}
-	}
-}
-
-command: gen: codereviewcfg: file.Create & {
-	_dir: path.FromSlash("../../", path.Unix)
-	filename: path.Join([_dir, "codereview.cfg"], _goos)
-	let res = repo.toCodeReviewCfg & {#input: repo.codeReview, _}
-	let donotedit = repo.doNotEditMessage & {#generatedBy: "internal/ci/ci_tool.cue", _}
-	contents: "# \(donotedit)\n\n\(res)\n"
+	codereviewCfg: repo.writeCodereviewCfg
 }

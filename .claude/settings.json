@@ -1,0 +1,36 @@
+{
+  "allowedTools": [
+    {
+      "tool": "Bash",
+      "patterns": [
+        "go test*",
+        "go build*",
+        "go list*",
+        "go fmt*",
+        "find*",
+        "grep*",
+        "ls*",
+        "tail*",
+        "awk*",
+        "git status*",
+        "git log*",
+        "git show*",
+        "git diff*",
+        "git branch*",
+        "git ls-files*",
+        "git ls-tree*",
+        "git rev-parse*",
+        "git describe*",
+        "git config --get*",
+        "git config --list*",
+        "git add*",
+        "true",
+        "echo*",
+        "go run ./cmd/cue eval*",
+        "go run ./cmd/cue export*",
+        "go run ./cmd/cue def*"
+      ],
+      "decision": "allow"
+    }
+  ]
+}

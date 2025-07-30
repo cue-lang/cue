@@ -243,74 +243,66 @@ issue3990: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  24
-Freed:  395
-Reused: 353
-Allocs: 66
+Leaks:  16
+Freed:  360
+Reused: 308
+Allocs: 68
 Retain: 0
 
-Unifications: 392
-Conjuncts:    720
+Unifications: 326
+Conjuncts:    611
 Disjuncts:    0
-Notifications: 7
+Notifications: 5
 
-NumCloseIDs: 213
+NumCloseIDs: 185
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,13 +1,12 @@
--Leaks:  44
--Freed:  697
--Reused: 684
--Allocs: 57
--Retain: 120
+-Leaks:  102
+-Freed:  491
+-Reused: 481
+-Allocs: 112
+-Retain: 243
 -
--Unifications: 741
--Conjuncts:    1617
--Disjuncts:    808
+-Unifications: 593
+-Conjuncts:    1381
+-Disjuncts:    717
 -
 -MisalignedConjunct: 48
 -
--NumCloseIDs: 101
-+Leaks:  24
-+Freed:  395
-+Reused: 353
-+Allocs: 66
+-NumCloseIDs: 61
++Leaks:  16
++Freed:  360
++Reused: 308
++Allocs: 68
 +Retain: 0
 +
-+Unifications: 392
-+Conjuncts:    720
++Unifications: 326
++Conjuncts:    611
 +Disjuncts:    0
-+Notifications: 7
++Notifications: 5
 +
-+NumCloseIDs: 213
++NumCloseIDs: 185
 -- out/eval/stats --
-Leaks:  44
-Freed:  697
-Reused: 684
-Allocs: 57
-Retain: 120
+Leaks:  102
+Freed:  491
+Reused: 481
+Allocs: 112
+Retain: 243
 
-Unifications: 741
-Conjuncts:    1617
-Disjuncts:    808
+Unifications: 593
+Conjuncts:    1381
+Disjuncts:    717
 
 MisalignedConjunct: 48
 
-NumCloseIDs: 101
+NumCloseIDs: 61
 -- out/evalalpha --
 Errors:
-y: structural cycle:
-    ./issue3940.cue:12:14
-y: structural cycle:
-    ./issue3940.cue:29:14
-structural cycle:
-    ./issue3940.cue:40:28
-structural cycle:
-    ./issue3940.cue:98:16
-exportObjs.deployment._names: adding field data not allowed as field set was already referenced:
-    ./issue3990.cue:22:15
+objects: undefined field: objects:
+    ./issue3940.cue:98:48
 
 Result:
 (_|_){
@@ -376,9 +368,8 @@ Result:
     }
   }
   issue3940: (_|_){
-    // [structural cycle]
-    reduced1: (_|_){
-      // [structural cycle]
+    // [eval]
+    reduced1: (struct){
       a: (struct){
         b: (struct){
           a: (struct){
@@ -399,12 +390,11 @@ Result:
         }
       }
       objects: (_|_){
-        // [structural cycle] y: structural cycle:
-        //     ./issue3940.cue:12:14
+        // [incomplete] objects: undefined field: objects:
+        //     ./issue3940.cue:12:22
       }
     }
-    reduced2: (_|_){
-      // [structural cycle]
+    reduced2: (struct){
       a: (struct){
         b: (struct){
           a: (struct){
@@ -425,14 +415,12 @@ Result:
         }
       }
       objects: (_|_){
-        // [structural cycle] y: structural cycle:
-        //     ./issue3940.cue:29:14
+        // [incomplete] objects: undefined field: objects:
+        //     ./issue3940.cue:29:22
       }
     }
-    reduced3: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
+    reduced3: (struct){
+      a: (struct){
         i: (struct){
           x: (struct){
             i: (struct){
@@ -443,8 +431,8 @@ Result:
           }
         }
         o: (_|_){
-          // [structural cycle] structural cycle:
-          //     ./issue3940.cue:40:28
+          // [incomplete] o: undefined field: o:
+          //     ./issue3940.cue:40:36
         }
       }
       E: (struct){
@@ -480,9 +468,9 @@ Result:
       }
     }
     full: (_|_){
-      // [structural cycle]
+      // [eval]
       out: (_|_){
-        // [structural cycle]
+        // [eval]
         _imports: (#list){
           0: (#struct){
             objects: (#struct){
@@ -625,8 +613,8 @@ Result:
         _objects: (#struct){
         }
         objects: (_|_){
-          // [structural cycle] structural cycle:
-          //     ./issue3940.cue:98:16
+          // [eval] objects: undefined field: objects:
+          //     ./issue3940.cue:98:48
         }
       }
       _branch: (struct){
@@ -774,9 +762,7 @@ Result:
       }
     }
   }
-  issue3990: (_|_){
-    // [eval] exportObjs.deployment._names: adding field data not allowed as field set was already referenced:
-    //     ./issue3990.cue:22:15
+  issue3990: (struct){
     _imports: (#list){
       0: ~(issue3990._noVolumes)
       1: ~(issue3990._someVolumes)
@@ -818,6 +804,25 @@ Result:
         //     ./issue3990.cue:21:21
       }
     }
+    someVolumes: (struct){
+      volumes: (#list){
+        0: (struct){
+          name: (string){ "data" }
+        }
+      }
+      _names: (struct){
+        data: (string){ "data" }
+      }
+      volumeNames: (#list){
+        0: (string){ "data" }
+      }
+    }
+    noVolumes: (struct){
+      volumes: (#list){
+      }
+      _names: (struct){
+      }
+    }
   }
   T: (int){ 1 }
   let X#1multi = 〈1;C〉.M
@@ -833,19 +838,11 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,18 @@
+@@ -1,4 +1,10 @@
 -(struct){
 +Errors:
-+y: structural cycle:
-+    ./issue3940.cue:12:14
-+y: structural cycle:
-+    ./issue3940.cue:29:14
-+structural cycle:
-+    ./issue3940.cue:40:28
-+structural cycle:
-+    ./issue3940.cue:98:16
-+exportObjs.deployment._names: adding field data not allowed as field set was already referenced:
-+    ./issue3990.cue:22:15
++objects: undefined field: objects:
++    ./issue3940.cue:98:48
 +
 +Result:
 +(_|_){
@@ -853,85 +850,43 @@ diff old new
    given: (struct){
      INC: (struct){
        USD: (float){ 2.0 }
-@@ -59,18 +73,15 @@
+@@ -59,18 +65,14 @@
        }
      }
    }
 -  issue3940: (struct){
--    reduced1: (struct){
--      a: (struct){
--        b: (struct){
--          a: (struct){
--            b: (struct){
++  issue3940: (_|_){
++    // [eval]
+     reduced1: (struct){
+       a: (struct){
+         b: (struct){
+           a: (struct){
+             b: (struct){
 -              y: (struct){
 -                a: (struct){
 -                }
 -                objects: (struct){
 -                }
 -              }
-+  issue3940: (_|_){
-+    // [structural cycle]
-+    reduced1: (_|_){
-+      // [structural cycle]
-+      a: (struct){
-+        b: (struct){
-+          a: (struct){
-+            b: (struct){
 +              y: ~(issue3940.reduced1.X)
              }
            }
            objects: (_|_){
-@@ -86,21 +97,17 @@
-         }
-       }
-       objects: (_|_){
--        // [incomplete] objects: undefined field: objects:
--        //     ./issue3940.cue:12:22
--      }
--    }
--    reduced2: (struct){
--      a: (struct){
--        b: (struct){
--          a: (struct){
--            b: (struct){
+@@ -95,12 +97,7 @@
+         b: (struct){
+           a: (struct){
+             b: (struct){
 -              y: (struct){
 -                a: (struct){
 -                }
 -                objects: (struct){
 -                }
 -              }
-+        // [structural cycle] y: structural cycle:
-+        //     ./issue3940.cue:12:14
-+      }
-+    }
-+    reduced2: (_|_){
-+      // [structural cycle]
-+      a: (struct){
-+        b: (struct){
-+          a: (struct){
-+            b: (struct){
 +              y: ~(issue3940.reduced2.X)
              }
            }
            objects: (_|_){
-@@ -116,27 +123,26 @@
-         }
-       }
-       objects: (_|_){
--        // [incomplete] objects: undefined field: objects:
--        //     ./issue3940.cue:29:22
--      }
--    }
--    reduced3: (struct){
--      a: (struct){
-+        // [structural cycle] y: structural cycle:
-+        //     ./issue3940.cue:29:14
-+      }
-+    }
-+    reduced3: (_|_){
-+      // [structural cycle]
-+      a: (_|_){
-+        // [structural cycle]
+@@ -125,18 +122,15 @@
          i: (struct){
            x: (struct){
              i: (struct){
@@ -949,12 +904,12 @@ diff old new
          }
 -        o: (#list){
 +        o: (_|_){
-+          // [structural cycle] structural cycle:
-+          //     ./issue3940.cue:40:28
++          // [incomplete] o: undefined field: o:
++          //     ./issue3940.cue:40:36
          }
        }
        E: (struct){
-@@ -151,12 +157,7 @@
+@@ -151,12 +145,7 @@
          b: (struct){
            a: (struct){
              b: (struct){
@@ -968,7 +923,7 @@ diff old new
              }
            }
            objects: (_|_){
-@@ -176,19 +177,14 @@
+@@ -176,19 +165,14 @@
          //     ./issue3940.cue:54:15
        }
      }
@@ -982,9 +937,9 @@ diff old new
 -        _objects: (#struct){
 -        }
 +    full: (_|_){
-+      // [structural cycle]
++      // [eval]
 +      out: (_|_){
-+        // [structural cycle]
++        // [eval]
          _imports: (#list){
 -          0: (struct){
 -            objects: (struct){
@@ -995,7 +950,7 @@ diff old new
                  #conf: (#struct){
                  }
                  region: (_|_){
-@@ -198,9 +194,9 @@
+@@ -198,9 +182,9 @@
                }
              }
              imports: (#list){
@@ -1008,7 +963,7 @@ diff old new
                      #conf: (#struct){
                      }
                      region: (_|_){
-@@ -210,8 +206,6 @@
+@@ -210,8 +194,6 @@
                    }
                  }
                  #export: (#struct){
@@ -1017,7 +972,7 @@ diff old new
                    _objects: (#struct){
                      leaf: (#struct){
                        #conf: (#struct){
-@@ -222,6 +216,8 @@
+@@ -222,6 +204,8 @@
                        }
                      }
                    }
@@ -1026,7 +981,7 @@ diff old new
                    _imports: (list){
                    }
                    objects: (#list){
-@@ -240,8 +236,6 @@
+@@ -240,8 +224,6 @@
                }
              }
              #export: (#struct){
@@ -1035,7 +990,7 @@ diff old new
                _objects: (#struct){
                  branch: (#struct){
                    #conf: (#struct){
-@@ -265,8 +259,6 @@
+@@ -265,8 +247,6 @@
                      }
                    }
                    #export: (#struct){
@@ -1044,7 +999,7 @@ diff old new
                      _objects: (#struct){
                        leaf: (#struct){
                          #conf: (#struct){
-@@ -277,6 +269,8 @@
+@@ -277,6 +257,8 @@
                          }
                        }
                      }
@@ -1053,7 +1008,7 @@ diff old new
                      _imports: (list){
                      }
                      objects: (#list){
-@@ -294,6 +288,8 @@
+@@ -294,6 +276,8 @@
                    }
                  }
                }
@@ -1062,7 +1017,7 @@ diff old new
                objects: (#list){
                  0: (#struct){
                    branch: (#struct){
-@@ -319,27 +315,16 @@
+@@ -319,27 +303,16 @@
              }
            }
          }
@@ -1095,12 +1050,12 @@ diff old new
 +        _objects: (#struct){
 +        }
 +        objects: (_|_){
-+          // [structural cycle] structural cycle:
-+          //     ./issue3940.cue:98:16
++          // [eval] objects: undefined field: objects:
++          //     ./issue3940.cue:98:48
          }
        }
        _branch: (struct){
-@@ -354,50 +339,9 @@
+@@ -354,50 +327,9 @@
            }
          }
          imports: (#list){
@@ -1154,7 +1109,7 @@ diff old new
            _objects: (#struct){
              branch: (#struct){
                #conf: (#struct){
-@@ -421,8 +365,6 @@
+@@ -421,8 +353,6 @@
                  }
                }
                #export: (#struct){
@@ -1163,7 +1118,7 @@ diff old new
                  _objects: (#struct){
                    leaf: (#struct){
                      #conf: (#struct){
-@@ -433,6 +375,8 @@
+@@ -433,6 +363,8 @@
                      }
                    }
                  }
@@ -1172,7 +1127,7 @@ diff old new
                  _imports: (list){
                  }
                  objects: (#list){
-@@ -450,6 +394,8 @@
+@@ -450,6 +382,8 @@
                }
              }
            }
@@ -1181,7 +1136,7 @@ diff old new
            objects: (#list){
              0: (#struct){
                branch: (#struct){
-@@ -486,8 +432,6 @@
+@@ -486,8 +420,6 @@
            }
          }
          #export: (#struct){
@@ -1190,7 +1145,7 @@ diff old new
            _objects: (#struct){
              leaf: (#struct){
                #conf: (#struct){
-@@ -498,6 +442,8 @@
+@@ -498,6 +430,8 @@
                }
              }
            }
@@ -1199,14 +1154,9 @@ diff old new
            _imports: (list){
            }
            objects: (#list){
-@@ -526,45 +472,20 @@
-       }
-     }
+@@ -528,43 +462,16 @@
    }
--  issue3990: (struct){
-+  issue3990: (_|_){
-+    // [eval] exportObjs.deployment._names: adding field data not allowed as field set was already referenced:
-+    //     ./issue3990.cue:22:15
+   issue3990: (struct){
      _imports: (#list){
 -      0: (struct){
 -        name: (string){ "noVolumes" }
@@ -1253,7 +1203,7 @@ diff old new
            }
          }
        }
-@@ -573,6 +494,11 @@
+@@ -573,6 +480,11 @@
        name: (string){ "someVolumes" }
        exportObjs: (struct){
          deployment: (struct){
@@ -1265,7 +1215,7 @@ diff old new
            _names: (struct){
              data: (string){ "data" }
            }
-@@ -579,11 +505,6 @@
+@@ -579,11 +491,6 @@
            volumeNames: (#list){
              0: (string){ "data" }
            }
@@ -1277,7 +1227,7 @@ diff old new
          }
        }
      }
-@@ -595,25 +516,6 @@
+@@ -595,13 +502,12 @@
          //     ./issue3990.cue:21:21
        }
      }
@@ -1287,22 +1237,31 @@ diff old new
 -      volumes: (#list){
 -      }
 -    }
--    someVolumes: (struct){
--      _names: (struct){
--        data: (string){ "data" }
--      }
--      volumeNames: (#list){
--        0: (string){ "data" }
--      }
+     someVolumes: (struct){
++      volumes: (#list){
++        0: (struct){
++          name: (string){ "data" }
++        }
++      }
+       _names: (struct){
+         data: (string){ "data" }
+       }
+@@ -608,10 +514,11 @@
+       volumeNames: (#list){
+         0: (string){ "data" }
+       }
 -      volumes: (#list){
 -        0: (struct){
 -          name: (string){ "data" }
 -        }
--      }
--    }
++    }
++    noVolumes: (struct){
++      volumes: (#list){
++      }
++      _names: (struct){
+       }
+     }
    }
-   T: (int){ 1 }
-   let X#1multi = 〈1;C〉.M
 -- out/eval --
 (struct){
   given: (struct){

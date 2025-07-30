@@ -151,6 +151,8 @@ func (n *nodeContext) insertComprehension(
 	if !n.ctx.isDevVersion() {
 		ci = ci.SpawnEmbed(c)
 		ci.closeInfo.span |= ComprehensionSpan
+	} else {
+		ci.setOptionalV3(nil)
 	}
 
 	node := n.node.DerefDisjunct()

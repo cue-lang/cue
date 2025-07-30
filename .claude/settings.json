@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go test:*)",
+      "Bash(go build:*)",
+      "Bash(go list:*)",
+      "Bash(go fmt:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(tail:*)",
+      "Bash(awk:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git diff:*)",
+      "Bash(git branch:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git describe:*)",
+      "Bash(git config --get:*)",
+      "Bash(git config --list:*)",
+      "Bash(git add:*)",
+      "Bash(true:)",
+      "Bash(echo:*)",
+      "Bash(go run:./cmd/cue eval*)",
+      "Bash(go run:./cmd/cue export*)",
+      "Bash(go run:./cmd/cue def*)"
+    ],
+    "deny": [
+      "Bash(go:* -exec*)",
+      "Bash(go:* -toolexec*)"
+    ]
+  }
+}

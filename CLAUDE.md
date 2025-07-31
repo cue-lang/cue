@@ -89,7 +89,9 @@ go fmt ./...
 
 ### Contribution Model
 - Single commit per PR/CL model
+- Uses `git codereview` workflow for managing changes
 - Requires DCO (Developer Certificate of Origin) sign-off
+- Do not add "Co-Authored-By: Claude <noreply@anthropic.com>" as this confuses our DCO check.
 - Both GitHub PRs and GerritHub CLs are supported
 - Changes should be linked to a GitHub issue (except trivial changes)
 

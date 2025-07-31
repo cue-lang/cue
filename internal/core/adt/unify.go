@@ -672,7 +672,11 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 		ctx := n.ctx
 		f := ctx.PushState(c.env, c.expr.Source())
 
-		v := ctx.evalState(c.expr, oldOnly(finalized))
+		v := ctx.evalState(c.expr, combinedFlags{
+			status:    finalized,
+			condition: allKnown,
+			mode:      ignore,
+		})
 		v, _ = ctx.getDefault(v)
 		v = Unwrap(v)
 
@@ -781,8 +785,8 @@ func root(v *Vertex) *Vertex {
 
 func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFlags) *Vertex {
 	task := c.current()
-	needs := flags.conditions()
-	runMode := flags.runMode()
+	needs := flags.condition
+	runMode := flags.mode
 
 	v = v.DerefValue()
 

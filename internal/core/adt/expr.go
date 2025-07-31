@@ -495,7 +495,11 @@ func (x *BoundExpr) Source() ast.Node {
 func (x *BoundExpr) evaluate(ctx *OpContext, state combinedFlags) Value {
 	// scalarKnown is used here to ensure we know the value. The result does
 	// not have to be concrete, though.
-	v := ctx.value(x.Expr, require(partial, scalarKnown))
+	v := ctx.value(x.Expr, combinedFlags{
+		status:    partial,
+		condition: scalarKnown,
+		mode:      yield,
+	})
 	if isError(v) {
 		return v
 	}
@@ -859,7 +863,11 @@ func (x *DynamicReference) Source() ast.Node {
 func (x *DynamicReference) EvaluateLabel(ctx *OpContext, env *Environment) Feature {
 	env = env.up(ctx, x.UpCount)
 	frame := ctx.PushState(env, x.Src)
-	v := ctx.value(x.Label, require(partial, scalarKnown))
+	v := ctx.value(x.Label, combinedFlags{
+		status:    partial,
+		condition: scalarKnown,
+		mode:      yield,
+	})
 	ctx.PopState(frame)
 	return ctx.Label(x, v)
 }
@@ -867,7 +875,11 @@ func (x *DynamicReference) EvaluateLabel(ctx *OpContext, env *Environment) Featu
 func (x *DynamicReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	e := ctx.Env(x.UpCount)
 	frame := ctx.PushState(e, x.Src)
-	v := ctx.value(x.Label, require(partial, scalarKnown))
+	v := ctx.value(x.Label, combinedFlags{
+		status:    partial,
+		condition: scalarKnown,
+		mode:      yield,
+	})
 	ctx.PopState(frame)
 	f := ctx.Label(x.Label, v)
 	return ctx.lookup(e.Vertex, pos(x), f, state)
@@ -1044,7 +1056,11 @@ func (x *SelectorExpr) Source() ast.Node {
 }
 
 func (x *SelectorExpr) resolve(c *OpContext, state combinedFlags) *Vertex {
-	n := c.node(x, x.X, x.Sel.IsRegular(), require(partial, needFieldSetKnown))
+	n := c.node(x, x.X, x.Sel.IsRegular(), combinedFlags{
+		status:    partial,
+		condition: needFieldSetKnown,
+		mode:      yield,
+	})
 	if n == emptyNode {
 		return n
 	}
@@ -1080,8 +1096,16 @@ func (x *IndexExpr) Source() ast.Node {
 
 func (x *IndexExpr) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	// TODO: support byte index.
-	n := ctx.node(x, x.X, true, require(partial, needFieldSetKnown))
-	i := ctx.value(x.Index, require(partial, scalarKnown))
+	n := ctx.node(x, x.X, true, combinedFlags{
+		status:    partial,
+		condition: needFieldSetKnown,
+		mode:      yield,
+	})
+	i := ctx.value(x.Index, combinedFlags{
+		status:    partial,
+		condition: scalarKnown,
+		mode:      yield,
+	})
 	if n == emptyNode {
 		return n
 	}
@@ -1130,7 +1154,11 @@ func (x *SliceExpr) Source() ast.Node {
 func (x *SliceExpr) evaluate(c *OpContext, state combinedFlags) Value {
 	// TODO: strides
 
-	v := c.value(x.X, require(partial, fieldSetKnown))
+	v := c.value(x.X, combinedFlags{
+		status:    partial,
+		condition: fieldSetKnown,
+		mode:      yield,
+	})
 	const as = "slice index"
 
 	switch v := v.(type) {
@@ -1147,10 +1175,18 @@ func (x *SliceExpr) evaluate(c *OpContext, state combinedFlags) Value {
 			hi = uint64(len(v.Arcs))
 		)
 		if x.Lo != nil {
-			lo = c.uint64(c.value(x.Lo, require(partial, scalarKnown)), as)
+			lo = c.uint64(c.value(x.Lo, combinedFlags{
+				status:    partial,
+				condition: scalarKnown,
+				mode:      yield,
+			}), as)
 		}
 		if x.Hi != nil {
-			hi = c.uint64(c.value(x.Hi, require(partial, scalarKnown)), as)
+			hi = c.uint64(c.value(x.Hi, combinedFlags{
+				status:    partial,
+				condition: scalarKnown,
+				mode:      yield,
+			}), as)
 			if hi > uint64(len(v.Arcs)) {
 				return c.NewErrf("index %d out of range", hi)
 			}
@@ -1191,10 +1227,18 @@ func (x *SliceExpr) evaluate(c *OpContext, state combinedFlags) Value {
 			hi = uint64(len(v.B))
 		)
 		if x.Lo != nil {
-			lo = c.uint64(c.value(x.Lo, require(partial, scalarKnown)), as)
+			lo = c.uint64(c.value(x.Lo, combinedFlags{
+				status:    partial,
+				condition: scalarKnown,
+				mode:      yield,
+			}), as)
 		}
 		if x.Hi != nil {
-			hi = c.uint64(c.value(x.Hi, require(partial, scalarKnown)), as)
+			hi = c.uint64(c.value(x.Hi, combinedFlags{
+				status:    partial,
+				condition: scalarKnown,
+				mode:      yield,
+			}), as)
 			if hi > uint64(len(v.B)) {
 				return c.NewErrf("index %d out of range", hi)
 			}
@@ -1230,7 +1274,11 @@ func (x *Interpolation) Source() ast.Node {
 func (x *Interpolation) evaluate(c *OpContext, state combinedFlags) Value {
 	buf := bytes.Buffer{}
 	for _, e := range x.Parts {
-		v := c.value(e, require(partial, scalarKnown))
+		v := c.value(e, combinedFlags{
+			status:    partial,
+			condition: scalarKnown,
+			mode:      yield,
+		})
 		if x.K == BytesKind {
 			buf.Write(c.ToBytes(v))
 		} else {
@@ -1274,7 +1322,11 @@ func (x *UnaryExpr) evaluate(c *OpContext, state combinedFlags) Value {
 	if !c.concreteIsPossible(x.Op, x.X) {
 		return nil
 	}
-	v := c.value(x.X, require(partial, scalarKnown))
+	v := c.value(x.X, combinedFlags{
+		status:    partial,
+		condition: scalarKnown,
+		mode:      yield,
+	})
 	if isError(v) {
 		return v
 	}
@@ -1384,7 +1436,7 @@ func (x *BinaryExpr) evaluate(c *OpContext, state combinedFlags) Value {
 }
 
 func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flags combinedFlags) (r Value) {
-	state := flags.vertexStatus()
+	state := flags.status
 
 	s := c.PushState(env, src)
 
@@ -1400,7 +1452,11 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 		defer func() { c.inValidator-- }()
 	}
 	req := flags
-	req = final(state, needTasksDone)
+	req = combinedFlags{
+		status:    state,
+		condition: needTasksDone,
+		mode:      finalize,
+	}
 	v := c.evalState(x, req)
 	if !c.isDevVersion() {
 		c.inValidator--
@@ -1428,7 +1484,11 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 			return nil
 
 		case IncompleteError:
-			c.evalState(x, oldOnly(finalized))
+			c.evalState(x, combinedFlags{
+				status:    finalized,
+				condition: allKnown,
+				mode:      ignore,
+			})
 
 			// We have a nonmonotonic use of a failure. Referenced fields should
 			// not be added anymore.
@@ -1501,7 +1561,11 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 			match = op == EqualOp
 		}
 
-		c.evalState(x, require(state, needTasksDone))
+		c.evalState(x, combinedFlags{
+			status:    state,
+			condition: needTasksDone,
+			mode:      yield,
+		})
 	}
 
 	c.PopState(s)
@@ -1554,7 +1618,11 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		call: x,
 	}
 
-	fun := c.value(x.Fun, require(partial, concreteKnown))
+	fun := c.value(x.Fun, combinedFlags{
+		status:    partial,
+		condition: concreteKnown,
+		mode:      yield,
+	})
 	switch f := fun.(type) {
 	case *Builtin:
 		call.builtin = f
@@ -1602,11 +1670,15 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		c.errs = nil
 		// XXX: XXX: clear id.closeContext per argument and remove from runTask?
 
-		runMode := state.runMode()
-		cond := state.conditions()
+		runMode := state.mode
+		cond := state.condition
 		var expr Value
 		if call.builtin.NonConcrete {
-			state = combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
+			state = combinedFlags{
+				status:    state.status,
+				condition: cond,
+				mode:      runMode,
+			}
 			expr = c.evalState(a, state)
 		} else {
 			cond |= fieldSetKnown | concreteKnown
@@ -1618,7 +1690,11 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 			if runMode == finalize {
 				cond |= disjunctionTask
 			}
-			state = combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
+			state = combinedFlags{
+				status:    state.status,
+				condition: cond,
+				mode:      runMode,
+			}
 			expr = c.value(a, state)
 		}
 
@@ -1651,7 +1727,7 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 	if result == nil {
 		return nil
 	}
-	v, ci := c.evalStateCI(result, state.withVertexStatus(partial))
+	v, ci := c.evalStateCI(result, combinedFlags{status: partial, condition: state.condition, mode: state.mode})
 	c.ci = ci
 	return v
 }
@@ -2084,7 +2160,11 @@ func (x *ForClause) Source() ast.Node {
 }
 
 func (c *OpContext) forSource(x Expr) *Vertex {
-	state := attempt(conjuncts, needFieldSetKnown)
+	state := combinedFlags{
+		status:    conjuncts,
+		condition: needFieldSetKnown,
+		mode:      attemptOnly,
+	}
 
 	// TODO: always get the vertex. This allows a whole bunch of trickery
 	// down the line.
@@ -2100,7 +2180,7 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 		// more robust by moving to a pure call-by-need mechanism, for instance.
 		// TODO: using attemptOnly here will remove the cyclic reference error
 		// of comprehension.t1.ok (which also errors in V2),
-		node.unify(c, state.conditions(), finalize, true)
+		node.unify(c, state.condition, finalize, true)
 	}
 
 	v, ok = c.getDefault(v)
@@ -2278,7 +2358,11 @@ func (x *IfClause) Source() ast.Node {
 
 func (x *IfClause) yield(s *compState) {
 	ctx := s.ctx
-	if ctx.BoolValue(ctx.value(x.Condition, require(s.state, scalarKnown))) {
+	if ctx.BoolValue(ctx.value(x.Condition, combinedFlags{
+		status:    s.state,
+		condition: scalarKnown,
+		mode:      yield,
+	})) {
 		s.yield(ctx.e)
 	}
 }

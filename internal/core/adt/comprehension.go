@@ -316,7 +316,7 @@ func (c *OpContext) yield(
 		ctx:   c,
 		comp:  comp,
 		f:     f,
-		state: state.vertexStatus(),
+		state: state.status,
 	}
 	y := comp.Clauses[0]
 
@@ -430,7 +430,11 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 			envs = append(envs, env)
 		}
 
-		if err := ctx.yield(d.vertex, d.env, d.comp, oldOnly(state), f); err != nil {
+		if err := ctx.yield(d.vertex, d.env, d.comp, combinedFlags{
+			status:    state,
+			condition: allKnown,
+			mode:      ignore,
+		}, f); err != nil {
 			if err.IsIncomplete() {
 				return err
 			}

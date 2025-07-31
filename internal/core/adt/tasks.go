@@ -236,7 +236,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 
 		switch x := elem.(type) {
 		case *Comprehension:
-			err := c.yield(nil, t.env, x, 0, func(e *Environment) {
+			err := c.yield(nil, t.env, x, combinedFlags{status: partial, mode: mode}, func(e *Environment) {
 				label, err := MakeLabel(x.Source(), index, IntLabel)
 				n.addErr(err)
 				index++

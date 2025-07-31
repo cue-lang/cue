@@ -22,9 +22,3 @@ func unreachableForDev(c *OpContext) {
 		panic("unreachable for development version")
 	}
 }
-
-type combinedFlags struct {
-	status    vertexStatus
-	condition condition
-	mode      runMode
-}

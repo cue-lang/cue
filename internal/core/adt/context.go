@@ -266,11 +266,7 @@ func (c *OpContext) Env(upCount int32) *Environment {
 
 func (c *OpContext) relNode(upCount int32) *Vertex {
 	e := c.e.up(c, upCount)
-	c.unify(e.Vertex, combinedFlags{
-		status:    partial,
-		condition: allKnown,
-		mode:      ignore,
-	})
+	c.unify(e.Vertex, partial, allKnown, ignore)
 	return e.Vertex
 }
 
@@ -450,17 +446,13 @@ func (c *OpContext) Resolve(x Conjunct, r Resolver) (v *Vertex, b *Bottom) {
 			panic(x)
 		}
 	}()
-	return c.resolveState(x, r, combinedFlags{
-		status:    finalized,
-		condition: allKnown,
-		mode:      finalize,
-	})
+	return c.resolveState(x, r, finalized, allKnown, finalize)
 }
 
-func (c *OpContext) resolveState(x Conjunct, r Resolver, state combinedFlags) (*Vertex, *Bottom) {
+func (c *OpContext) resolveState(x Conjunct, r Resolver, status vertexStatus, cond condition, mode runMode) (*Vertex, *Bottom) {
 	s := c.PushConjunct(x)
 
-	arc := r.resolve(c, state)
+	arc := r.resolve(c, status, cond, mode)
 
 	err := c.PopState(s)
 	if err != nil {
@@ -482,11 +474,7 @@ func (c *OpContext) resolveState(x Conjunct, r Resolver, state combinedFlags) (*
 func (c *OpContext) Lookup(env *Environment, r Resolver) (*Vertex, *Bottom) {
 	s := c.PushState(env, r.Source())
 
-	arc := r.resolve(c, combinedFlags{
-		status:    partial,
-		condition: allKnown,
-		mode:      ignore,
-	})
+	arc := r.resolve(c, partial, allKnown, ignore)
 
 	err := c.PopState(s)
 
@@ -532,12 +520,7 @@ func (c *OpContext) Validate(check Conjunct, value Value) *Bottom {
 func (c *OpContext) concrete(env *Environment, x Expr, msg interface{}) (result Value, complete bool) {
 	s := c.PushState(env, x.Source())
 
-	state := combinedFlags{
-		status:    partial,
-		condition: concreteKnown,
-		mode:      yield,
-	}
-	w := c.evalState(x, state)
+	w := c.evalState(x, partial, concreteKnown, yield)
 	_ = c.PopState(s)
 
 	w, ok := c.getDefault(w)
@@ -597,11 +580,7 @@ func (c *OpContext) getDefault(v Value) (result Value, ok bool) {
 func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete bool) {
 	s := c.PushState(env, x.Source())
 
-	val := c.evalState(x, combinedFlags{
-		status:    partial,
-		condition: concreteKnown,
-		mode:      finalize,
-	})
+	val := c.evalState(x, partial, concreteKnown, finalize)
 
 	complete = true
 
@@ -634,11 +613,7 @@ func (c *OpContext) EvaluateKeepState(x Expr) (result Value) {
 	src := c.src
 	c.src = x.Source()
 
-	result, ci := c.evalStateCI(x, combinedFlags{
-		status:    partial,
-		condition: concreteKnown,
-		mode:      finalize,
-	})
+	result, ci := c.evalStateCI(x, partial, concreteKnown, finalize)
 
 	c.src = src
 	c.ci = ci
@@ -646,11 +621,11 @@ func (c *OpContext) EvaluateKeepState(x Expr) (result Value) {
 	return result
 }
 
-func (c *OpContext) evaluateRec(v Conjunct, state combinedFlags) Value {
+func (c *OpContext) evaluateRec(v Conjunct, status vertexStatus, cond condition, mode runMode) Value {
 	x := v.Expr()
 	s := c.PushConjunct(v)
 
-	val := c.evalState(x, state)
+	val := c.evalState(x, status, cond, mode)
 	if val == nil {
 		// Be defensive: this never happens, but just in case.
 		Assertf(c, false, "nil return value: unspecified error")
@@ -668,20 +643,20 @@ func (c *OpContext) evaluateRec(v Conjunct, state combinedFlags) Value {
 // value evaluates expression v within the current environment. The result may
 // be nil if the result is incomplete. value leaves errors untouched to that
 // they can be collected by the caller.
-func (c *OpContext) value(x Expr, state combinedFlags) (result Value) {
-	v := c.evalState(x, state)
+func (c *OpContext) value(x Expr, status vertexStatus, cond condition, mode runMode) (result Value) {
+	v := c.evalState(x, status, cond, mode)
 
 	v, _ = c.getDefault(v)
 	v = Unwrap(v)
 	return v
 }
 
-func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
-	result, _ = c.evalStateCI(v, state)
+func (c *OpContext) evalState(v Expr, status vertexStatus, cond condition, mode runMode) (result Value) {
+	result, _ = c.evalStateCI(v, status, cond, mode)
 	return result
 }
 
-func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci CloseInfo) {
+func (c *OpContext) evalStateCI(v Expr, status vertexStatus, cond condition, mode runMode) (result Value, ci CloseInfo) {
 	savedSrc := c.src
 	c.src = v.Source()
 	err := c.errs
@@ -698,7 +673,7 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 				switch b.Code {
 				case IncompleteError:
 				case CycleError:
-					if state.status == partial || c.isDevVersion() {
+					if status == partial || c.isDevVersion() {
 						break
 					}
 					fallthrough
@@ -732,11 +707,11 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 		return x, c.ci
 
 	case Evaluator:
-		v := x.evaluate(c, state)
+		v := x.evaluate(c, status, cond, mode)
 		return v, c.ci
 
 	case Resolver:
-		arc := x.resolve(c, state)
+		arc := x.resolve(c, status, cond, mode)
 		if c.HasErr() {
 			return nil, c.ci
 		}
@@ -778,9 +753,9 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 			if s := arc.getState(c); s != nil {
 				defer s.retainProcess().releaseProcess()
 
-				origNeeds := state.condition
+				origNeeds := cond
 				needs := origNeeds | arcTypeKnown
-				runMode := state.mode
+				runMode := mode
 
 				switch runMode {
 				case finalize:
@@ -819,13 +794,13 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 						break
 					}
 
-					v := c.evaluate(arc, x, state)
+					v := c.evaluate(arc, x, status, cond, mode)
 
 					return v, c.ci
 				}
 			}
 		}
-		v := c.evaluate(arc, x, state)
+		v := c.evaluate(arc, x, status, cond, mode)
 
 		return v, c.ci
 
@@ -851,7 +826,7 @@ func (c *OpContext) wrapCycleError(src ast.Node, b *Bottom) *Bottom {
 // unifyNode returns a possibly partially evaluated node value.
 //
 // TODO: maybe return *Vertex, *Bottom
-func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
+func (c *OpContext) unifyNode(expr Expr, status vertexStatus, cond condition, mode runMode) (result Value) {
 	savedSrc := c.src
 	c.src = expr.Source()
 	err := c.errs
@@ -891,10 +866,10 @@ func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 		return x
 
 	case Evaluator:
-		return x.evaluate(c, state)
+		return x.evaluate(c, status, cond, mode)
 
 	case Resolver:
-		v = x.resolve(c, state)
+		v = x.resolve(c, status, cond, mode)
 
 	default:
 		// This can only happen, really, if v == nil, which is not allowed.
@@ -939,20 +914,20 @@ func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 			}
 		}
 	} else {
-		if v.isUndefined() || state.status > v.Status() {
-			c.unify(v, state)
+		if v.isUndefined() || status > v.Status() {
+			c.unify(v, status, cond, mode)
 		}
 	}
 
 	return v
 }
 
-func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFlags) *Vertex {
+func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, status vertexStatus, cond condition, mode runMode) *Vertex {
 	if c.isDevVersion() {
-		return x.lookup(c, pos, l, flags)
+		return x.lookup(c, pos, l, status, cond, mode)
 	}
 
-	state := flags.status
+	state := status
 
 	if l == InvalidLabel || x == nil {
 		// TODO: is it possible to have an invalid label here? Maybe through the
@@ -1022,13 +997,9 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFl
 		// hasAllConjuncts, but that are finalized too early, get conjuncts
 		// processed beforehand.
 		if state > a.status {
-			c.unify(a, combinedFlags{
-				status: state,
-			})
+			c.unify(a, state, 0, 0)
 		} else if a.state != nil {
-			c.unify(a, combinedFlags{
-				status: partial,
-			})
+			c.unify(a, partial, 0, 0)
 		}
 
 		// TODO(refRequired): see comment in unify.go:Vertex.lookup near the
@@ -1143,7 +1114,7 @@ func pos(x Node) token.Pos {
 }
 
 // node is called by SelectorExpr.resolve and IndexExpr.resolve.
-func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *Vertex {
+func (c *OpContext) node(orig Node, x Expr, scalar bool, status vertexStatus, cond condition, mode runMode) *Vertex {
 	// Do not treat inline structs as closed by default if within a schema.
 	// See comment at top of scheduleVertexConjuncts.
 	if _, ok := x.(Resolver); !ok {
@@ -1154,7 +1125,7 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *V
 
 	// TODO: always get the vertex. This allows a whole bunch of trickery
 	// down the line.
-	v := c.unifyNode(x, state)
+	v := c.unifyNode(x, status, cond, mode)
 
 	v, ok := c.getDefault(v)
 	if !ok {

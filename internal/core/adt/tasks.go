@@ -84,7 +84,10 @@ func init() {
 func processExpr(ctx *OpContext, t *task, mode runMode) {
 	x := t.x.(Expr)
 
-	state := combineMode(concreteKnown, mode)
+	state := combinedFlags{
+		condition: concreteKnown,
+		mode:      mode,
+	}
 	v, ci := ctx.evalStateCI(x, state)
 	if ci.CycleType == IsCyclic && t.node.node.IsPatternConstraint {
 		// This is an optional cycle that we will ignore.
@@ -101,7 +104,10 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	// be conclusive, we could avoid triggering evaluating disjunctions. This
 	// would be a pretty significant rework, though.
 
-	arc := r.resolve(ctx, combineMode(fieldSetKnown, mode))
+	arc := r.resolve(ctx, combinedFlags{
+		condition: fieldSetKnown,
+		mode:      mode,
+	})
 	// TODO: ensure that resolve always returns one of these two.
 	if arc == nil || arc == emptyNode {
 		// TODO: yield instead?
@@ -147,7 +153,10 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 
 	field := t.x.(*DynamicField)
 
-	v := ctx.value(field.Key, combineMode(scalarValue, mode))
+	v := ctx.value(field.Key, combinedFlags{
+		condition: scalarValue,
+		mode:      mode,
+	})
 	if v == nil {
 		return
 	}
@@ -184,7 +193,10 @@ func processPatternConstraint(ctx *OpContext, t *task, mode runMode) {
 
 	// Note that the result may be a disjunction. Be sure to not take the
 	// default value as we want to retain the options of the disjunction.
-	v := ctx.evalState(field.Filter, require(0, scalarValue))
+	v := ctx.evalState(field.Filter, combinedFlags{
+		condition: scalarValue,
+		mode:      yield,
+	})
 	if v == nil {
 		return
 	}

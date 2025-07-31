@@ -266,7 +266,11 @@ func (c *OpContext) Env(upCount int32) *Environment {
 
 func (c *OpContext) relNode(upCount int32) *Vertex {
 	e := c.e.up(c, upCount)
-	c.unify(e.Vertex, oldOnly(partial))
+	c.unify(e.Vertex, combinedFlags{
+		status:    partial,
+		condition: allKnown,
+		mode:      ignore,
+	})
 	return e.Vertex
 }
 
@@ -446,7 +450,11 @@ func (c *OpContext) Resolve(x Conjunct, r Resolver) (v *Vertex, b *Bottom) {
 			panic(x)
 		}
 	}()
-	return c.resolveState(x, r, final(finalized, allKnown))
+	return c.resolveState(x, r, combinedFlags{
+		status:    finalized,
+		condition: allKnown,
+		mode:      finalize,
+	})
 }
 
 func (c *OpContext) resolveState(x Conjunct, r Resolver, state combinedFlags) (*Vertex, *Bottom) {
@@ -474,7 +482,11 @@ func (c *OpContext) resolveState(x Conjunct, r Resolver, state combinedFlags) (*
 func (c *OpContext) Lookup(env *Environment, r Resolver) (*Vertex, *Bottom) {
 	s := c.PushState(env, r.Source())
 
-	arc := r.resolve(c, oldOnly(partial))
+	arc := r.resolve(c, combinedFlags{
+		status:    partial,
+		condition: allKnown,
+		mode:      ignore,
+	})
 
 	err := c.PopState(s)
 
@@ -520,7 +532,11 @@ func (c *OpContext) Validate(check Conjunct, value Value) *Bottom {
 func (c *OpContext) concrete(env *Environment, x Expr, msg interface{}) (result Value, complete bool) {
 	s := c.PushState(env, x.Source())
 
-	state := require(partial, concreteKnown)
+	state := combinedFlags{
+		status:    partial,
+		condition: concreteKnown,
+		mode:      yield,
+	}
 	w := c.evalState(x, state)
 	_ = c.PopState(s)
 
@@ -581,7 +597,11 @@ func (c *OpContext) getDefault(v Value) (result Value, ok bool) {
 func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete bool) {
 	s := c.PushState(env, x.Source())
 
-	val := c.evalState(x, final(partial, concreteKnown))
+	val := c.evalState(x, combinedFlags{
+		status:    partial,
+		condition: concreteKnown,
+		mode:      finalize,
+	})
 
 	complete = true
 
@@ -614,7 +634,11 @@ func (c *OpContext) EvaluateKeepState(x Expr) (result Value) {
 	src := c.src
 	c.src = x.Source()
 
-	result, ci := c.evalStateCI(x, final(partial, concreteKnown))
+	result, ci := c.evalStateCI(x, combinedFlags{
+		status:    partial,
+		condition: concreteKnown,
+		mode:      finalize,
+	})
 
 	c.src = src
 	c.ci = ci
@@ -674,7 +698,7 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 				switch b.Code {
 				case IncompleteError:
 				case CycleError:
-					if state.vertexStatus() == partial || c.isDevVersion() {
+					if state.status == partial || c.isDevVersion() {
 						break
 					}
 					fallthrough
@@ -754,9 +778,9 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 			if s := arc.getState(c); s != nil {
 				defer s.retainProcess().releaseProcess()
 
-				origNeeds := state.conditions()
+				origNeeds := state.condition
 				needs := origNeeds | arcTypeKnown
-				runMode := state.runMode()
+				runMode := state.mode
 
 				switch runMode {
 				case finalize:
@@ -915,7 +939,7 @@ func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 			}
 		}
 	} else {
-		if v.isUndefined() || state.vertexStatus() > v.Status() {
+		if v.isUndefined() || state.status > v.Status() {
 			c.unify(v, state)
 		}
 	}
@@ -928,7 +952,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFl
 		return x.lookup(c, pos, l, flags)
 	}
 
-	state := flags.vertexStatus()
+	state := flags.status
 
 	if l == InvalidLabel || x == nil {
 		// TODO: is it possible to have an invalid label here? Maybe through the
@@ -998,9 +1022,13 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFl
 		// hasAllConjuncts, but that are finalized too early, get conjuncts
 		// processed beforehand.
 		if state > a.status {
-			c.unify(a, deprecated(c, state))
+			c.unify(a, combinedFlags{
+				status: state,
+			})
 		} else if a.state != nil {
-			c.unify(a, deprecated(c, partial))
+			c.unify(a, combinedFlags{
+				status: partial,
+			})
 		}
 
 		// TODO(refRequired): see comment in unify.go:Vertex.lookup near the

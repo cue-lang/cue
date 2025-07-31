@@ -71,10 +71,10 @@ var incompleteSentinel = &Bottom{
 // error.
 //
 // TODO: return *Vertex
-func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
+func (c *OpContext) evaluate(v *Vertex, r Resolver, status vertexStatus, cond condition, mode runMode) Value {
 	if v.isUndefined() {
 		// Use node itself to allow for cycle detection.
-		c.unify(v, state)
+		c.unify(v, status, cond, mode)
 
 		if v.ArcType == ArcPending {
 			if v.status == evaluating {
@@ -154,10 +154,9 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 // state can be used to indicate to which extent processing should continue.
 // state == finalized means it is evaluated to completion. See vertexStatus
 // for more details.
-func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
+func (c *OpContext) unify(v *Vertex, status vertexStatus, cond condition, mode runMode) {
 	if c.isDevVersion() {
-		requires, mode := flags.condition, flags.mode
-		v.unify(c, requires, mode, true)
+		v.unify(c, cond, mode, true)
 		return
 	}
 
@@ -176,7 +175,7 @@ func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 	n := v.getNodeContext(c, 1)
 	defer v.freeNode(n)
 
-	state := flags.status
+	state := status
 
 	// TODO(cycle): verify this happens in all cases when we need it.
 	if n != nil && v.Parent != nil && v.Parent.state != nil {
@@ -482,11 +481,7 @@ func (n *nodeContext) postDisjunct(state vertexStatus) {
 		for n.maybeSetCache(); n.expandOne(state); n.maybeSetCache() {
 		}
 
-		if !n.addLists(combinedFlags{
-			status:    state,
-			condition: allKnown,
-			mode:      ignore,
-		}) {
+		if !n.addLists(state, allKnown, ignore) {
 			break
 		}
 	}
@@ -845,11 +840,7 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 
 			wasVoid := a.ArcType == ArcPending
 
-			ctx.unify(a, combinedFlags{
-				status:    finalized,
-				condition: allKnown,
-				mode:      ignore,
-			})
+			ctx.unify(a, finalized, allKnown, ignore)
 
 			if a.ArcType == ArcPending {
 				continue
@@ -910,11 +901,7 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 			// TODO(errors): make Validate return bottom and generate
 			// optimized conflict message. Also track and inject IDs
 			// to determine origin location.s
-			v := ctx.evalState(c.expr, combinedFlags{
-				status:    finalized,
-				condition: allKnown,
-				mode:      ignore,
-			})
+			v := ctx.evalState(c.expr, finalized, allKnown, ignore)
 			v, _ = ctx.getDefault(v)
 			v = Unwrap(v)
 
@@ -1839,11 +1826,7 @@ func (n *nodeContext) evalExpr(v Conjunct, state vertexStatus) {
 		if state == finalized {
 			state = conjuncts
 		}
-		arc, err := ctx.resolveState(v, x, combinedFlags{
-			status:    state,
-			condition: allKnown,
-			mode:      ignore,
-		})
+		arc, err := ctx.resolveState(v, x, state, allKnown, ignore)
 		if err != nil && (!err.IsIncomplete() || err.Permanent) {
 			n.addBottom(err)
 			break
@@ -1880,11 +1863,7 @@ func (n *nodeContext) evalExpr(v Conjunct, state vertexStatus) {
 	case Evaluator:
 		// Interpolation, UnaryExpr, BinaryExpr, CallExpr
 		// Could be unify?
-		val := ctx.evaluateRec(v, combinedFlags{
-			status:    partial,
-			condition: allKnown,
-			mode:      ignore,
-		})
+		val := ctx.evaluateRec(v, partial, allKnown, ignore)
 		if b, ok := val.(*Bottom); ok &&
 			b.IsIncomplete() {
 			n.exprs = append(n.exprs, envExpr{v, b})
@@ -2000,11 +1979,7 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 		// is necessary to prevent lookups in unevaluated structs.
 		// TODO(cycles): this can probably most easily be fixed with a
 		// having a more recursive implementation.
-		n.ctx.unify(arc, combinedFlags{
-			status:    partial,
-			condition: allKnown,
-			mode:      ignore,
-		})
+		n.ctx.unify(arc, partial, allKnown, ignore)
 	}
 
 	// Don't add conjuncts if a node is referring to itself.
@@ -2458,11 +2433,7 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 		x := d.field.Key
 		// Push state to capture and remove errors.
 		s := ctx.PushState(d.env, x.Source())
-		v := ctx.evalState(x, combinedFlags{
-			status:    finalized,
-			condition: allKnown,
-			mode:      ignore,
-		})
+		v := ctx.evalState(x, finalized, allKnown, ignore)
 		b := ctx.PopState(s)
 
 		if b != nil && b.IsIncomplete() {
@@ -2503,7 +2474,7 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 //
 // TODO(embeddedScalars): for embedded scalars, there should be another pass
 // of evaluation expressions after expanding lists.
-func (n *nodeContext) addLists(state combinedFlags) (progress bool) {
+func (n *nodeContext) addLists(status vertexStatus, cond condition, mode runMode) (progress bool) {
 	if len(n.lists) == 0 && len(n.vLists) == 0 {
 		return false
 	}
@@ -2578,7 +2549,7 @@ outer:
 		for j, elem := range l.list.Elems {
 			switch x := elem.(type) {
 			case *Comprehension:
-				err := c.yield(nil, l.env, x, state, func(e *Environment) {
+				err := c.yield(nil, l.env, x, status, cond, mode, func(e *Environment) {
 					label, err := MakeLabel(x.Source(), index, IntLabel)
 					n.addErr(err)
 					index++

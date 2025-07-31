@@ -129,11 +129,7 @@ func (e *Environment) evalCached(c *OpContext, x Expr) Value {
 		// Save and restore errors to ensure that only relevant errors are
 		// associated with the cash.
 		err := c.errs
-		v = c.evalState(x, combinedFlags{
-			status:    partial,
-			condition: allKnown,
-			mode:      yield,
-		}) // TODO: should this be finalized?
+		v = c.evalState(x, partial, allKnown, yield) // TODO: should this be finalized?
 		c.e, c.src = env, src
 		c.errs = err
 		if b, ok := v.(*Bottom); !ok || !b.IsIncomplete() {
@@ -1062,29 +1058,17 @@ func (v *Vertex) Finalize(c *OpContext) {
 	// case the caller did not handle existing errors in the context.
 	err := c.errs
 	c.errs = nil
-	c.unify(v, combinedFlags{
-		status:    finalized,
-		condition: allKnown,
-		mode:      finalize,
-	})
+	c.unify(v, finalized, allKnown, finalize)
 	c.errs = err
 }
 
 // CompleteArcs ensures the set of arcs has been computed.
 func (v *Vertex) CompleteArcs(c *OpContext) {
-	c.unify(v, combinedFlags{
-		status:    conjuncts,
-		condition: allKnown,
-		mode:      finalize,
-	})
+	c.unify(v, conjuncts, allKnown, finalize)
 }
 
 func (v *Vertex) CompleteArcsOnly(c *OpContext) {
-	c.unify(v, combinedFlags{
-		status:    conjuncts,
-		condition: fieldSetKnown,
-		mode:      finalize,
-	})
+	c.unify(v, conjuncts, fieldSetKnown, finalize)
 }
 
 func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {

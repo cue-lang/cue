@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e43ca4f_1d026bcc",
+        "filename": "CLAUDE.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-01T07:32:14Z",
+      "side": 1,
+      "message": "we could teach our DCO check about it if we wish to have this in the git history.",
+      "revId": "9629257ad6d2ffc0c52852602683b937c092ae8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

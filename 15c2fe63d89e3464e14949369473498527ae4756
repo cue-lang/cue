@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19de0ddf_8f2e024c",
+        "filename": "internal/core/adt/dev.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-01T08:57:40Z",
+      "side": 1,
+      "message": "nit: I\u0027d personally remove the lines with zero values",
+      "revId": "15c2fe63d89e3464e14949369473498527ae4756",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

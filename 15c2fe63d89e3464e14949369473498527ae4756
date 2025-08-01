@@ -16,6 +16,24 @@
       "message": "nit: I\u0027d personally remove the lines with zero values",
       "revId": "15c2fe63d89e3464e14949369473498527ae4756",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05218453_2f80916f",
+        "filename": "internal/core/adt/dev.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-01T10:21:30Z",
+      "side": 1,
+      "message": "I instructed it to do so, but only halfway in the process. :) Done.",
+      "parentUuid": "19de0ddf_8f2e024c",
+      "revId": "15c2fe63d89e3464e14949369473498527ae4756",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcc8e440_4743b988",
+        "filename": ".claude/settings.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-01T09:29:34Z",
+      "side": 1,
+      "message": "Feel free to add.",
+      "parentUuid": "cefa7e33_74014ead",
+      "revId": "ef3c3de991165d3245473369787bffe407b4f5a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae512438_ead098f2",

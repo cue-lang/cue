@@ -34,6 +34,24 @@
       "parentUuid": "5e43ca4f_1d026bcc",
       "revId": "9629257ad6d2ffc0c52852602683b937c092ae8f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e893aba2_702ab529",
+        "filename": "CLAUDE.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-01T09:25:43Z",
+      "side": 1,
+      "message": "we can discuss on monday, I\u0027m happy either way.",
+      "parentUuid": "26ead994_1d6fdf9e",
+      "revId": "9629257ad6d2ffc0c52852602683b937c092ae8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

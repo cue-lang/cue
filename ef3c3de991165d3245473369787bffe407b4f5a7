@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cefa7e33_74014ead",
+        "filename": ".claude/settings.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-01T09:25:12Z",
+      "side": 1,
+      "message": "neat. I\u0027m sure there are more, but this is a start.",
+      "parentUuid": "a737fae8_8bd742ca",
+      "revId": "ef3c3de991165d3245473369787bffe407b4f5a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae512438_ead098f2",
@@ -119,6 +137,24 @@
       "side": 1,
       "message": "This was suggested by Claude Code, and I didn\u0027t want to deviate from the standard.\n\nBut it turns out that this format is now deprecated. Claude has trouble keeping up with its own pace of change, apparently!\n\nUpdated all to new format that addresses this.",
       "parentUuid": "d2afdb93_ad7fdb71",
+      "revId": "ef3c3de991165d3245473369787bffe407b4f5a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68cafb74_684b260e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-01T09:25:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2d86b01a_533cae41",
       "revId": "ef3c3de991165d3245473369787bffe407b4f5a7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

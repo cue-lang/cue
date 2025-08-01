@@ -16,6 +16,24 @@
       "message": "We may not want to do this step.",
       "revId": "9ba8d0a508f382da33acf92275d15e884baaa222",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bfa7802_0727a5cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-01T08:59:43Z",
+      "side": 1,
+      "message": "yeah this is an interesting change, and perhaps a good one to do once we\u0027re done with the v2 to v3 transition and backports. but for now, this is likely to cause too much churn.",
+      "parentUuid": "f3d6897f_ce2824bd",
+      "revId": "9ba8d0a508f382da33acf92275d15e884baaa222",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

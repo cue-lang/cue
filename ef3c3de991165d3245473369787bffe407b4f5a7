@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f7fd454_f64afe86",
+        "filename": ".claude/settings.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-01T07:31:02Z",
+      "side": 1,
+      "message": "many of these commands can run arbitrary code, for example `go build -toolexec\u003d\"cat /usr/passwd\"` or `go test -exec\u003d\"curl https://foo.com\"`, but I assume we don\u0027t need to worry about this.",
+      "revId": "ef3c3de991165d3245473369787bffe407b4f5a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae512438_ead098f2",
+        "filename": ".claude/settings.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-01T07:31:02Z",
+      "side": 1,
+      "message": "how are \"echo\" and \"true\" helpful?",
+      "revId": "ef3c3de991165d3245473369787bffe407b4f5a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "a9d2369a_d9d7dce9",
@@ -14,6 +48,23 @@
       "writtenOn": "2025-08-01T07:17:39Z",
       "side": 1,
       "message": "This is security sensitive, so please consider whether these are safe to add.",
+      "revId": "ef3c3de991165d3245473369787bffe407b4f5a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2afdb93_ad7fdb71",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-01T07:31:02Z",
+      "side": 1,
+      "message": "Shouldn\u0027t the patterns be e.g. `foo *` rather than `foo*`? We want to e.g. allow `ls -la`, but not `lsdifferentcommand`",
       "revId": "ef3c3de991165d3245473369787bffe407b4f5a7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

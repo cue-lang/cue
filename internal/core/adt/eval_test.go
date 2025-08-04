@@ -50,23 +50,21 @@ var (
 //
 // Note that this also means that CUE_UPDATE=1 is broken under `go test -shuffle`.
 func TestEvalV2(t *testing.T) {
+	t.Skip("TODO: this will become the main test after EvalV3 promotes")
 	test := cuetxtar.TxTarTest{
 		Root: "../../../cue/testdata",
 		Name: "eval",
 	}
-
 	cuedebug.Init()
 	dbg := cuedebug.Flags
 	cueexperiment.Init()
 	exp := cueexperiment.Flags
-
 	if *todo {
 		test.ToDo = nil
 	}
-
 	test.Run(t, func(t *cuetxtar.Test) {
 		t.Parallel()
-		runEvalTest(t, internal.EvalV2, dbg, exp)
+		runEvalTest(t, internal.EvalV3, dbg, exp)
 	})
 }
 
@@ -186,7 +184,6 @@ func TestIssue3985(t *testing.T) {
 	// assigned a nodeContext.
 	cuecontext.New(cuecontext.EvaluatorVersion(cuecontext.EvalV3)).CompileString(`a!: _, b: [for c in a if a != _|_ {}]`)
 
-	cuecontext.New(cuecontext.EvaluatorVersion(cuecontext.EvalV2)).CompileString(`matchN(0, [_|_]) & []`)
 }
 
 // TestX is for debugging. Do not delete.
@@ -201,8 +198,7 @@ func TestX(t *testing.T) {
 	cueexperiment.Init()
 	exps := cueexperiment.Flags
 
-	version := internal.DefaultVersion
-	version = internal.DevVersion // comment to use default implementation.
+	version := internal.EvalV3
 
 	in := `
 -- cue.mod/module.cue --

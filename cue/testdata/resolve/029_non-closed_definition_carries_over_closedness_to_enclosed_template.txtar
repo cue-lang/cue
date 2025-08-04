@@ -100,7 +100,7 @@ c: #R & {
     ]
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  23
 Reused: 18
@@ -165,7 +165,7 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -226,7 +226,7 @@ diff old new
          a: (int){ int }
 -- diff/todo/p3 --
 Missing error positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 a.v.b: field not allowed:
     ./in.cue:2:12

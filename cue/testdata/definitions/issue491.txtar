@@ -34,7 +34,7 @@ z: #PrestepNewUser & {
 		}]
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  45
 Reused: 36
@@ -44,7 +44,7 @@ Retain: 1
 Unifications: 29
 Conjuncts:    71
 Disjuncts:    46
--- out/eval --
+-- out/evalv2 --
 (struct){
   #Prestep: (#struct){
     Args: (_){ |(*(null){ null }, (_){ _ }) }

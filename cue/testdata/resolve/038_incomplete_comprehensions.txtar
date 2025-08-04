@@ -45,7 +45,7 @@ B: A & {
     ]
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  11
 Reused: 6
@@ -59,7 +59,7 @@ Disjuncts:    16
 MisalignedConjunct: 4
 
 NumCloseIDs: 4
--- out/eval --
+-- out/evalv2 --
 (struct){
   A: (_|_){
     // [incomplete] A: cannot range over src (incomplete type _):

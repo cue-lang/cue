@@ -27,7 +27,7 @@ c: c
   b: (〈0;a〉.x|"b")
   c: (〈0;a〉["x"]|"c")
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  8
 Reused: 5
@@ -37,7 +37,7 @@ Retain: 0
 Unifications: 4
 Conjuncts:    8
 Disjuncts:    8
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (null){ null }
   b: (string){ "b" }

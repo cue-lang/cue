@@ -29,7 +29,7 @@ e: _|_ // expression in interpolation must evaluate to a number kind or string (
   r: _
   e: "\([])"
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  1
 Freed:  8
 Reused: 6
@@ -39,7 +39,7 @@ Retain: 12
 Unifications: 9
 Conjuncts:    16
 Disjuncts:    19
--- out/eval --
+-- out/evalv2 --
 Errors:
 e: invalid interpolation: cannot use [] (type list) as type (bool|string|bytes|number):
     ./in.cue:7:4

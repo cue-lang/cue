@@ -69,7 +69,7 @@ A:
     }
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  14
 Reused: 8
@@ -121,7 +121,7 @@ diff old new
      }
 -- diff/explanation --
 reordering
--- out/eval --
+-- out/evalv2 --
 (struct){
   z: (struct){
     a: (struct){

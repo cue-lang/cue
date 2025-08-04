@@ -13,7 +13,7 @@ b: #A & {
 	c: 3
 	d: 4
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  46
 Reused: 39
@@ -123,7 +123,7 @@ diff old new
 Missing error positions.
 -- diff/explanation --
 Dropping e? is correct.
--- out/eval --
+-- out/evalv2 --
 Errors:
 b: 2 errors in empty disjunction:
 b.c: field not allowed:

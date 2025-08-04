@@ -43,7 +43,7 @@ conflictRangingOverSelf: {
 		}
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  1
 Freed:  28
 Reused: 22
@@ -150,7 +150,7 @@ diff old new
    }
 -- diff/todo/p2 --
 Missing error message.
--- out/eval --
+-- out/evalv2 --
 Errors:
 conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
     ./in.cue:36:9

@@ -100,7 +100,7 @@ a: _|_ // field "f3" not allowed in closed struct
     }
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  10
 Freed:  18
 Reused: 15
@@ -198,7 +198,7 @@ diff old new
    }
 -- diff/todo/p2 --
 error positions
--- out/eval --
+-- out/evalv2 --
 Errors:
 #E.f3: field not allowed:
     ./in.cue:1:5

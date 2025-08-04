@@ -10,7 +10,7 @@ x: {
 	#Schema
 	#Schema: close({ a: b: int})
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  4
 Freed:  14
 Reused: 9
@@ -20,7 +20,7 @@ Retain: 6
 Unifications: 18
 Conjuncts:    32
 Disjuncts:    20
--- out/eval --
+-- out/evalv2 --
 (#struct){
   c: (string){ "foo" }
   a: (#struct){

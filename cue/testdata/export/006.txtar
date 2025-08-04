@@ -23,7 +23,7 @@ e: a.t[2:3]
     e: 〈0;a〉.t[2:3]
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  8
 Reused: 5
@@ -33,7 +33,7 @@ Retain: 0
 Unifications: 8
 Conjuncts:    14
 Disjuncts:    8
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (struct){
     b: (float){ 2.0 }

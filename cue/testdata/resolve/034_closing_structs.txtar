@@ -61,7 +61,7 @@ Conjuncts:    125
 Disjuncts:    0
 
 NumCloseIDs: 38
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
+-- diff/-out/evalalpha/stats<==>+out/evalv2/stats --
 diff old new
 --- old
 +++ new
@@ -86,7 +86,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 38
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  15
 Freed:  35
 Reused: 32
@@ -148,7 +148,7 @@ Disjuncts:    50
   }
   ctct: ~(ct)
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -161,7 +161,7 @@ diff old new
 -  }
 +  ctct: ~(ct)
  }
--- out/eval --
+-- out/evalv2 --
 (struct){
   op: (struct){
     x: (int){ int }

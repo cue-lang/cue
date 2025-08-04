@@ -181,7 +181,7 @@ diff old new
 +Disjuncts:    12
 +
 +NumCloseIDs: 17
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  152
 Reused: 137
@@ -297,7 +297,7 @@ diff old new
    }
    #TypeMeta: (#struct){
      kind: (string){ |(*(string){ "default" }, (string){ string }) }
--- out/eval --
+-- out/evalv2 --
 (struct){
   items: (#list){
     0: (#struct){

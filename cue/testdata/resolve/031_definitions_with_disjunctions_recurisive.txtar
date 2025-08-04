@@ -47,7 +47,7 @@
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  11
 Reused: 5
@@ -57,7 +57,7 @@ Retain: 0
 Unifications: 9
 Conjuncts:    13
 Disjuncts:    11
--- out/eval --
+-- out/evalv2 --
 (struct){
   #Foo: (#struct){
     x: (#struct){ |((#struct){

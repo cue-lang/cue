@@ -82,7 +82,7 @@ diff old new
 +Disjuncts:    32
 +
 +NumCloseIDs: 19
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  159
 Reused: 145
@@ -92,7 +92,7 @@ Retain: 62
 Unifications: 83
 Conjuncts:    310
 Disjuncts:    165
--- out/eval --
+-- out/evalv2 --
 (struct){
   issue3635: (struct){
     case1: (struct){

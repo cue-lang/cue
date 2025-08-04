@@ -346,7 +346,7 @@ diff old new
 +MaxConjunctInfos:    7
 +MaxReqSets:          15
 +MaxRedirect:         6
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  237
 Freed:  327955
 Reused: 327930
@@ -2113,7 +2113,7 @@ diff old new
          }
          let INO#6 = (#struct){
            UseSectionName: (bool){ true }
--- out/eval --
+-- out/evalv2 --
 (struct){
   #FinDefSetElemType: (#struct){
     #Type: (_){ _ }

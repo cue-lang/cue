@@ -296,7 +296,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 122
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  5
 Freed:  239
 Reused: 232
@@ -1259,7 +1259,7 @@ all: error positions and reordering.
 -- diff/explanation --
 issue1830: the new evaluator correctly rejects inserting new fields in a closed struct
 err.t(1|2): bug fixes.
--- out/eval --
+-- out/evalv2 --
 Errors:
 err.t1.a.disallowed: field not allowed:
     ./in.cue:133:10

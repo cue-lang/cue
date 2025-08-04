@@ -142,7 +142,7 @@ diff old new
 +Notifications: 1
 +
 +NumCloseIDs: 28
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  3
 Freed:  101
 Reused: 84
@@ -395,7 +395,7 @@ diff old new
          y: (struct){
 -- diff/todo/p2 --
 Different, but okay, error message, but missing some positions
--- out/eval --
+-- out/evalv2 --
 (struct){
   shorewallParams: (#struct){
     KUBERNETES_FOO_INGRESS_ADMIN: (#list){

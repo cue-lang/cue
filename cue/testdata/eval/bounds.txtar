@@ -248,7 +248,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 4
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  191
 Reused: 186
@@ -1434,7 +1434,7 @@ diff old new
      }
      eErr6: (_|_){
        // [incomplete] nonConcrete.eErr6: non-concrete value _int for bound ==:
--- out/eval --
+-- out/evalv2 --
 Errors:
 nonConcrete.eErr5: conflicting values =="foo" and int (mismatched types string and int):
     ./equals.cue:32:8

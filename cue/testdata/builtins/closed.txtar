@@ -138,7 +138,7 @@ diff old new
 +MaxConjunctInfos:    5
 +MaxReqSets:          6
 +MaxRedirect:         2
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  61
 Freed:  214
 Reused: 208
@@ -723,7 +723,7 @@ diff old new
 -- diff/todo/p3 --
 Reordering
 Let differs.
--- out/eval --
+-- out/evalv2 --
 Errors:
 b.x: field not allowed:
     ./in.cue:1:10

@@ -16,7 +16,7 @@ if bar.missing == "x" {
     foo: 〈0;let _bar#1〉
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  1
 Freed:  4
 Reused: 1
@@ -28,7 +28,7 @@ Conjuncts:    5
 Disjuncts:    6
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 Errors:
 undefined field: missing:
     ./in.cue:4:8

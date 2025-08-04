@@ -97,7 +97,7 @@ invalidPattern: {
 	[=~"BAD)" & =~"x"]: string
 	y: 123
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  1
 Freed:  61
 Reused: 56
@@ -209,7 +209,7 @@ Result:
 }
 -- diff/explanation --
 The new evaluator correctly points out that the pattern matching regular expression has invalid syntax.
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -236,7 +236,7 @@ diff old new
      y: (int){ 123 }
    }
  }
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (struct){
     bar: (string){ "bar" }

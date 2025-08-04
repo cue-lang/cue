@@ -71,7 +71,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 67
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  120
 Reused: 107
@@ -300,7 +300,7 @@ diff old new
                x: (struct){
                  y: (struct){
                    V: (struct){
--- out/eval --
+-- out/evalv2 --
 (struct){
   #T: (#struct){
     config: (_){ _ }

@@ -38,7 +38,7 @@ ti: t & {
     c: int
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  13
 Reused: 9
@@ -48,7 +48,7 @@ Retain: 2
 Unifications: 13
 Conjuncts:    33
 Disjuncts:    15
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (struct){
     c: (int){ 5 }

@@ -48,7 +48,7 @@ fact2: #MCS & {
     uc: 〈0;lc〉
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  15
 Reused: 8
@@ -92,7 +92,7 @@ diff old new
    #MultiCaseString: (#struct){
      lc: (string){ string }
      uc: (string){ string }
--- out/eval --
+-- out/evalv2 --
 (struct){
   y: (string){ "foo" }
   x: (string){ "foo" }

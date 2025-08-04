@@ -13,7 +13,7 @@ t2: {
 	}
 	a: #R & {pos: "a"}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  15
 Reused: 11
@@ -23,7 +23,7 @@ Retain: 0
 Unifications: 15
 Conjuncts:    29
 Disjuncts:    15
--- out/eval --
+-- out/evalv2 --
 (struct){
   t1: (struct){
     #R: (#struct){

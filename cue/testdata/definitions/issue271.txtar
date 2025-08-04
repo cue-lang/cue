@@ -6,7 +6,7 @@ x: {
 	a: "hello"
 	b: "foo"
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  6
 Reused: 3
@@ -62,7 +62,7 @@ diff old new
    }
 -- diff/todo/p2 --
 Positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 x.b: field not allowed:
     ./in.cue:1:5

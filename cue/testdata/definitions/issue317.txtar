@@ -35,7 +35,7 @@ Something: {
 	}
 }
 x: Something & #Deployment
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  52
 Reused: 45
@@ -45,7 +45,7 @@ Retain: 0
 Unifications: 46
 Conjuncts:    122
 Disjuncts:    52
--- out/eval --
+-- out/evalv2 --
 (struct){
   #T: (#struct){
     #Schema: (#struct){

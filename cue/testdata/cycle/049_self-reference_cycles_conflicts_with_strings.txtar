@@ -24,7 +24,7 @@ a: {
     x: "hey"
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  4
 Reused: 0
@@ -34,7 +34,7 @@ Retain: 1
 Unifications: 4
 Conjuncts:    5
 Disjuncts:    5
--- out/eval --
+-- out/evalv2 --
 Errors:
 a.x: conflicting values "hey!?" and "hey":
     ./in.cue:2:5

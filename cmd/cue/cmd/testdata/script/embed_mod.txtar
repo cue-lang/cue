@@ -1,6 +1,6 @@
 exec cue mod tidy
 exec cue eval ./acme/foo
-cmp stdout out/eval
+cmp stdout out/evalv2
 
 -- cue.mod/module.cue --
 module: "main.org@v0"
@@ -38,7 +38,7 @@ package e
 a: _ @embed(file=foo.txt)
 -- _registry/example.com_e_v0.0.1/foo.txt --
 hello
--- out/eval --
+-- out/evalv2 --
 a: {
     x: 34
 }

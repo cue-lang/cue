@@ -172,7 +172,7 @@ diff old new
 +Disjuncts:    32
 +
 +NumCloseIDs: 87
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  24
 Freed:  219
 Reused: 207
@@ -496,7 +496,7 @@ diff old new
      }
 -- diff/todo/p4 --
 Reduce conjunct group size. Semantically correct, though.
--- out/eval --
+-- out/evalv2 --
 (struct){
   t1: (struct){
     x: (struct){

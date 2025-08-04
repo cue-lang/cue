@@ -13,7 +13,7 @@ b: {
     interpolation: "more \(leaf_ref)"
     leaf_ref: leaf
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  11
 Reused: 7
@@ -90,7 +90,7 @@ diff old new
  }
 -- diff/todo/p2 --
 Missing positions / reordering.
--- out/eval --
+-- out/evalv2 --
 Errors:
 a.c: field not allowed:
     ./in.cue:1:4

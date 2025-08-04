@@ -23,7 +23,7 @@ r: {
     c: 〈1;r〉["a"]
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  5
 Reused: 2
@@ -33,7 +33,7 @@ Retain: 0
 Unifications: 5
 Conjuncts:    5
 Disjuncts:    5
--- out/eval --
+-- out/evalv2 --
 (struct){
   r: (struct){
     a?: (int){ 3 }

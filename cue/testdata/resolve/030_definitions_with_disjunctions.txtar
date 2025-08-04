@@ -57,7 +57,7 @@ baz: #Foo & {
     b: 2
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  33
 Reused: 28
@@ -97,7 +97,7 @@ Result:
     field: (int){ int }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -149,7 +149,7 @@ Missing error positions and reorderings.
 -- diff/explanation --
 bar.b: removed in new evaluator. This is correct. In the old
 evaluator this addition was spurious.
--- out/eval --
+-- out/evalv2 --
 Errors:
 bar.c: field not allowed:
     ./in.cue:1:7

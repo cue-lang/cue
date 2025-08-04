@@ -1488,7 +1488,7 @@ diff old new
 +MaxConjunctInfos:    10
 +MaxReqSets:          12
 +MaxRedirect:         1
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  74
 Freed:  1384
 Reused: 1358
@@ -1504,7 +1504,7 @@ MisalignedConjunct: 268
 NumCloseIDs: 16
 -- diff/explanation --
 B.a.children: now correctly marked as incomplete
--- out/eval --
+-- out/evalv2 --
 Errors:
 selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
 issue2310.original.#sub.#_1.#_1.#_1: structural cycle:

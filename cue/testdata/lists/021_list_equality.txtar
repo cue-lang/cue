@@ -504,7 +504,7 @@ Retain: 0
 Unifications: 244
 Conjuncts:    244
 Disjuncts:    0
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
+-- diff/-out/evalalpha/stats<==>+out/evalv2/stats --
 diff old new
 --- old
 +++ new
@@ -525,7 +525,7 @@ diff old new
 +Unifications: 244
 +Conjuncts:    244
 +Disjuncts:    0
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  276
 Reused: 271
@@ -535,7 +535,7 @@ Retain: 116
 Unifications: 276
 Conjuncts:    284
 Disjuncts:    392
--- out/eval --
+-- out/evalv2 --
 (struct){
   eq0: (bool){ true }
   eq1: (bool){ true }

@@ -35,7 +35,7 @@ m:  _|_ // invalid operation -false (- bool)
   p: +true
   m: -false
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  10
 Reused: 8
@@ -45,7 +45,7 @@ Retain: 0
 Unifications: 10
 Conjuncts:    14
 Disjuncts:    10
--- out/eval --
+-- out/evalv2 --
 Errors:
 b: invalid operand int ('!' requires concrete value):
     ./in.cue:7:6

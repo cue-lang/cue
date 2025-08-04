@@ -220,7 +220,7 @@ issue3981: matchWithClose: {
 	}
 	out: f1: foo: ["bar"]
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  5
 Freed:  190
 Reused: 182
@@ -666,7 +666,7 @@ diff old new
    }
 -- diff/todo/p2 --
 issue3981: topo sort regression
--- out/eval --
+-- out/evalv2 --
 Errors:
 issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):
     ./issue3474.cue:53:5

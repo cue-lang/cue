@@ -30,7 +30,7 @@ missingFieldNestedInInterpolation: {
 	// a location, ensure it doesn't alphabetically sort and pick `c` instead.
 	r2: "\(a.d.c)"
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  17
 Reused: 14
@@ -40,7 +40,7 @@ Retain: 0
 Unifications: 17
 Conjuncts:    29
 Disjuncts:    17
--- out/eval --
+-- out/evalv2 --
 Errors:
 missingFieldClosed.r: undefined field: b:
     ./references.cue:8:8

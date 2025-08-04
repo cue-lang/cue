@@ -91,7 +91,7 @@ diff old new
 +Disjuncts:    22
 +
 +NumCloseIDs: 24
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  113
 Reused: 102
@@ -206,7 +206,7 @@ diff old new
          #def: (#struct){
            foo: (string){ "global value" }
          }
--- out/eval --
+-- out/evalv2 --
 (struct){
   issue3850: (struct){
     full: (struct){

@@ -3849,7 +3849,7 @@ diff old new
    }
    i: (#list){
      0: (int){ 1 }
--- out/eval --
+-- out/evalv2 --
 (struct){
   f: (#list){
     0: (#list){
@@ -7606,7 +7606,7 @@ diff old new
 +Unifications: 34
 +Conjuncts:    34
 +Disjuncts:    0
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  3268
 Reused: 3258

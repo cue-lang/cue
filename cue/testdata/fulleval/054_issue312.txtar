@@ -30,7 +30,7 @@ a: 2
     〈2;y〉
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  1
 Freed:  8
 Reused: 3
@@ -44,7 +44,7 @@ Disjuncts:    9
 MisalignedConjunct: 3
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 (struct){
   y: ((int|struct)){ |(*(int){ 1 }, (struct){
       a: (int){ 2 }

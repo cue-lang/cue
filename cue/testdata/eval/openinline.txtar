@@ -79,7 +79,7 @@ package example
 #D: a: 1
 #E: #D & {b: 1}
 
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  18
 Freed:  73
 Reused: 69
@@ -242,7 +242,7 @@ diff old new
        }
      }
      x: (int){ 1 }
--- out/eval --
+-- out/evalv2 --
 Errors:
 outerErr.usingClose.t1.version.major: field not allowed:
     ./in.cue:19:8

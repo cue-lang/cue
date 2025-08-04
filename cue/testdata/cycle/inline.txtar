@@ -431,7 +431,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 204
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  286
 Freed:  253
 Reused: 248
@@ -441,7 +441,7 @@ Retain: 994
 Unifications: 539
 Conjuncts:    1663
 Disjuncts:    943
--- out/eval --
+-- out/evalv2 --
 Errors:
 expanded1.hasCycle.root._a.input._a.input: structural cycle:
     ./inlineexpand.cue:11:11

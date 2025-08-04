@@ -19,7 +19,7 @@ subject: {
 #computeF1040: in:      #ReturnData
 #ReturnData: taxPayer?: #TaxPayer
 #TaxPayer: self?:       _
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  35
 Reused: 26
@@ -149,7 +149,7 @@ diff old new
    }
    #TaxPayer: (#struct){
      self?: (_){ _ }
--- out/eval --
+-- out/evalv2 --
 (struct){
   _taxPayer(:p): (struct){
     self: (struct){

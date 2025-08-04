@@ -22,7 +22,7 @@ package x
 	name:    string
 	address: string
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  20
 Reused: 14
@@ -32,7 +32,7 @@ Retain: 2
 Unifications: 18
 Conjuncts:    31
 Disjuncts:    22
--- out/eval --
+-- out/evalv2 --
 (struct){
   #a: (#struct){ |((#struct){
       name: (string){ string }

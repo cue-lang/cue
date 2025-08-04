@@ -10,7 +10,7 @@ foo: #Foo & {
 	x: "hello"
 	y: "goodbye"
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  7
 Reused: 4
@@ -69,7 +69,7 @@ diff old new
    }
 -- diff/todo/p2 --
 Positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 foo.y: field not allowed:
     ./in.cue:1:7

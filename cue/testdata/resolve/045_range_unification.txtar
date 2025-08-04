@@ -130,7 +130,7 @@ n5: 2.5
   n4: ((>=0.0 & <=0.1) & 0.09999)
   n5: ((>=1 & <=5) & 2.5)
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  36
 Reused: 34
@@ -245,7 +245,7 @@ Result:
   n4: (float){ 0.09999 }
   n5: (float){ 2.5 }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -327,7 +327,7 @@ diff old new
    n4: (float){ 0.09999 }
 -- diff/todo/p3 --
 Reordering of error messages.
--- out/eval --
+-- out/evalv2 --
 Errors:
 b14: incompatible number bounds <=5 and >=6:
     ./in.cue:29:6

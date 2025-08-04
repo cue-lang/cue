@@ -58,7 +58,7 @@ Junk: {
     ]
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  15
 Reused: 9
@@ -133,7 +133,7 @@ diff old new
      }
 -- diff/todo/p3 --
 missing error positions
--- out/eval --
+-- out/evalv2 --
 Errors:
 listOfCloseds.0.b: field not allowed:
     ./in.cue:2:18

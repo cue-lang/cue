@@ -29,7 +29,7 @@ Rem: rem(*5 | string, 2)
   Quo: quo((*5|string), 2)
   Rem: rem((*5|string), 2)
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  45
 Reused: 40
@@ -63,7 +63,7 @@ diff old new
    }
    And: (int){ 1 }
    Or: (int){ 1 }
--- out/eval --
+-- out/evalv2 --
 (struct){
   Len: (int){ 3 }
   Close: (struct){

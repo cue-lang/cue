@@ -19,7 +19,7 @@ match: a & {
 not: a & {
 	val: "other"
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  25
 Reused: 20
@@ -33,7 +33,7 @@ Disjuncts:    25
 MisalignedConjunct: 1
 
 NumCloseIDs: 3
--- out/eval --
+-- out/evalv2 --
 (struct){
   #a: (#struct){
     val: (string){ string }

@@ -62,7 +62,7 @@ diff old new
 +Disjuncts:    21
 +
 +NumCloseIDs: 1
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  8
 Freed:  965
 Reused: 951
@@ -1347,7 +1347,7 @@ diff old new
 +  root_2: ~(root)
 +  root_3: ~(root)
  }
--- out/eval --
+-- out/evalv2 --
 Errors:
 root_2: structural cycle:
     ./in.cue:19:18

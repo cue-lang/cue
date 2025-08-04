@@ -71,7 +71,7 @@ e: _|_ // conflicting values 1 and {a: 3} (mismatched types int and struct)
     a: 3
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  15
 Reused: 12
@@ -129,7 +129,7 @@ diff old new
  }
 -- diff/explanation --
 An extra error messages that is correct, but not required.
--- out/eval --
+-- out/evalv2 --
 Errors:
 e: conflicting values 1 and {a:3} (mismatched types int and struct):
     ./in.cue:7:5

@@ -284,7 +284,7 @@ issue1116: {
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  3
 Freed:  112
 Reused: 107
@@ -459,7 +459,7 @@ NumCloseIDs: 4
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -579,7 +579,7 @@ diff old new
        #a: (#list){
          0: (string){ "a" }
          1: (string){ "b" }
--- out/eval --
+-- out/evalv2 --
 (struct){
   a1list: (#list){
     0: (int){ 1 }

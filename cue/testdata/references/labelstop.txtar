@@ -3,7 +3,7 @@ alongside other fields.
 -- in.cue --
 {[X=string]: baz: X}
 bar: {}
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  3
 Reused: 0
@@ -13,7 +13,7 @@ Retain: 0
 Unifications: 3
 Conjuncts:    5
 Disjuncts:    3
--- out/eval --
+-- out/evalv2 --
 (struct){
   bar: (struct){
     baz: (string){ "bar" }

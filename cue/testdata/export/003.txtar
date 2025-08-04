@@ -26,7 +26,7 @@
 {
   "hello\nworld"
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  1
 Reused: 0
@@ -36,5 +36,5 @@ Retain: 0
 Unifications: 1
 Conjuncts:    2
 Disjuncts:    1
--- out/eval --
+-- out/evalv2 --
 (string){ "hello\nworld" }

@@ -89,7 +89,7 @@ e7: def["b"]
   }
   e7: 〈0;def〉["b"]
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  10
 Freed:  32
 Reused: 26
@@ -186,7 +186,7 @@ Result:
     #b: (int){ 3 }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -258,7 +258,7 @@ diff old new
    def: (struct){
 -- diff/todo/p3 --
 Error messages slightly different.
--- out/eval --
+-- out/evalv2 --
 Errors:
 c: invalid list index "3" (type string):
     ./in.cue:3:20

@@ -179,7 +179,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 54
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  72
 Reused: 64
@@ -484,7 +484,7 @@ v0.7 fixes bugs in v0.6:
 - comprehension.t1 should be at most an incomplete error, as it is fixable.
   Arguably they should pass, though, as there is a predictable path to its
   resolution.
--- out/eval --
+-- out/evalv2 --
 Errors:
 comprehension.moreSpecific.err.a: field z not allowed by earlier comprehension or reference cycle
 comprehension.t1.ok.p0.x: field z not allowed by earlier comprehension or reference cycle

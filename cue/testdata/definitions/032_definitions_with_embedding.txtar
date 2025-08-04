@@ -77,7 +77,7 @@
     }
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  20
 Reused: 16
@@ -182,7 +182,7 @@ diff old new
    }
 -- diff/todo/p2 --
 Reordering / missing positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 #e1.a.d: field not allowed:
     ./in.cue:2:5

@@ -89,6 +89,6 @@ bad1: comprehension values not allowed in this position:
     }
   }
 }
--- out/eval --
+-- out/evalv2 --
 bad1: comprehension values not allowed in this position:
     ./in.cue:24:8

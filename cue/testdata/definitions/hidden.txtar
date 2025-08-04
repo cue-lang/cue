@@ -31,7 +31,7 @@ g: f._val
 package pkg
 
 #D: {_val: f: 3}
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  1
 Freed:  29
 Reused: 24
@@ -167,7 +167,7 @@ diff old new
  }
 -- diff/todo/p2 --
 Reordering / missing positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 e._name.c: field not allowed:
     ./in.cue:6:9

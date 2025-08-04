@@ -57,7 +57,7 @@ d: invalid operand >=2 ('*' requires concrete value):
     ...,
   ]
 }
--- out/eval --
+-- out/evalv2 --
 l3: invalid operand <=2 ('*' requires concrete value):
     ./in.cue:1:5
 l4: invalid operand <=2 ('*' requires concrete value):

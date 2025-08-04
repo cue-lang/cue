@@ -371,7 +371,7 @@ diff old new
 +MaxConjunctInfos:    6
 +MaxReqSets:          7
 +MaxRedirect:         2
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  40
 Freed:  837
 Reused: 825
@@ -998,7 +998,7 @@ Missing error positions.
   It is probably okay to show name and val fields with original values, as long
   as it is made clear that f does not unify with disjunctions and positions are
   conveyed properly.
--- out/eval --
+-- out/evalv2 --
 Errors:
 f: 2 errors in empty disjunction:
 f.name: conflicting values "int" and "str":

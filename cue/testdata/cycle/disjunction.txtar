@@ -49,7 +49,7 @@ issue3042: {
 		}
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  199
 Reused: 181
@@ -59,7 +59,7 @@ Retain: 0
 Unifications: 93
 Conjuncts:    280
 Disjuncts:    199
--- out/eval --
+-- out/evalv2 --
 Errors:
 cycle.a: structural cycle
 

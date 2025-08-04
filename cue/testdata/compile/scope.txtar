@@ -116,7 +116,7 @@ diff old new
 +Notifications: 2
 +
 +NumCloseIDs: 13
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  48
 Reused: 45
@@ -182,7 +182,7 @@ diff old new
 Structural cycle reported in different location. Seems fine, as
 ultimately we need to print the paths of the cycle anyway.
 Now also reports a position.
--- out/eval --
+-- out/evalv2 --
 Errors:
 schema.next: structural cycle
 

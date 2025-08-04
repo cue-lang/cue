@@ -24,7 +24,7 @@ e: 1
   d: (〈0;b〉 & 〈0;a〉)
   e: (*1|*1)
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  24
 Reused: 17
@@ -34,7 +34,7 @@ Retain: 0
 Unifications: 6
 Conjuncts:    30
 Disjuncts:    24
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (int){ |(*(int){ 1 }, (int){ int }) }
   b: (int){ |(*(int){ 3 }, (int){ int }) }

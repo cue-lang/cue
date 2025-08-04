@@ -12,7 +12,7 @@ a: >=0 & <=10 & !=1
     a: ((>=0 & <=10) & !=1)
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  2
 Reused: 0
@@ -22,7 +22,7 @@ Retain: 0
 Unifications: 2
 Conjuncts:    5
 Disjuncts:    2
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (number){ &(>=0, <=10, !=1) }
 }

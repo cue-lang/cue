@@ -91,7 +91,7 @@ issue3828: full: {
 		}
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  4
 Freed:  76
 Reused: 67
@@ -286,7 +286,7 @@ diff old new
  }
 -- diff/todo/p2 --
 Added near-duplicate message
--- out/eval --
+-- out/evalv2 --
 Errors:
 invalid interpolation: conflicting values 2 and 1:
     ./in.cue:12:28

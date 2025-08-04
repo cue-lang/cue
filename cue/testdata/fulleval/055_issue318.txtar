@@ -39,7 +39,7 @@
     vy: 〈0;arg〉.y
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  8
 Reused: 4
@@ -49,7 +49,7 @@ Retain: 0
 Unifications: 8
 Conjuncts:    9
 Disjuncts:    8
--- out/eval --
+-- out/evalv2 --
 Errors:
 #T.out1: invalid interpolation: undefined field: y:
     ./in.cue:3:8

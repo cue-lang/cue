@@ -71,7 +71,7 @@ diff old new
 -Disjuncts:    82
 +Conjuncts:    17
 +Disjuncts:    0
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  17
 Reused: 12
@@ -169,7 +169,7 @@ diff old new
      }
    }
    n2: (_|_){
--- out/eval --
+-- out/evalv2 --
 (struct){
   n1: (struct){
     min: (_|_){

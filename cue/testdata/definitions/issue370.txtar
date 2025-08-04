@@ -19,7 +19,7 @@ c2: #C2 & {
 	c1
 	age: 5
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  11
 Reused: 8
@@ -69,7 +69,7 @@ diff old new
  }
 -- diff/explanation --
 Reordering
--- out/eval --
+-- out/evalv2 --
 (struct){
   #C1: (#struct){
     name: (string){ string }

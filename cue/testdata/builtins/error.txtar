@@ -25,7 +25,7 @@ indirect: {
 	x: error
 	y: x("msg")
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  30
 Reused: 25
@@ -170,7 +170,7 @@ diff old new
        //     ./in.cue:18:41
        //     ./in.cue:13:9
        //     ./in.cue:18:77
--- out/eval --
+-- out/evalv2 --
 Errors:
 selection.twoUserErrors: 3 errors in empty disjunction:
 selection.twoUserErrors: conflicting values 2 and 1:

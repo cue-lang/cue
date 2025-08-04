@@ -27,7 +27,7 @@ issue3571: {
 		#in: _
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  54
 Reused: 42
@@ -96,7 +96,7 @@ Disjuncts:    73
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -208,7 +208,7 @@ diff old new
          }
          f?: (_){ _ }
        }
--- out/eval --
+-- out/evalv2 --
 (struct){
   simplified: (#struct){
     in: (#struct){

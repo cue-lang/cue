@@ -24,7 +24,7 @@ foo: [{type: "string"}] & [...#Value]
 foo: [{type: "string"}] & [...#Value]
 foo: [{type: "float"}] & [...#Value]
 foo: [{type: "float"}] & [...#Value]
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  16
 Reused: 10
@@ -96,7 +96,7 @@ diff old new
          //     ./in.cue:5:14
 -- diff/explanation --
 Improved and simplified error message which can be detected before disjunction.
--- out/eval --
+-- out/evalv2 --
 Errors:
 foo.0: 2 errors in empty disjunction:
 foo.0.type: conflicting values "int" and "float":

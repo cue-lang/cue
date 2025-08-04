@@ -24,7 +24,7 @@ y: _|_ // ; empty disjunction: conflicting values 2 and 3
     a: 3
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  11
 Reused: 6
@@ -104,7 +104,7 @@ Missing error positions.
 -- diff/explanation --
 It is okay to show field a as long as the error is clear and points to the
 violating disjunction.
--- out/eval --
+-- out/evalv2 --
 Errors:
 y: 2 errors in empty disjunction:
 y.a: conflicting values 1 and 3:

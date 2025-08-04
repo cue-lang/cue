@@ -9,7 +9,7 @@ issue595: {
 		files: cfg.nam
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  6
 Reused: 1
@@ -21,7 +21,7 @@ Conjuncts:    6
 Disjuncts:    6
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 Errors:
 issue595.files: undefined field: nam:
     ./in.cue:8:14

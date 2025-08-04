@@ -34,7 +34,7 @@ many: #complex & {
 notbad: many & {
 	things: hola: peso: 2
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  81
 Reused: 74
@@ -44,7 +44,7 @@ Retain: 0
 Unifications: 41
 Conjuncts:    134
 Disjuncts:    81
--- out/eval --
+-- out/evalv2 --
 (struct){
   #simple: (#struct){
     peso: (int){ |(*(int){ 1 }, (int){ int }) }

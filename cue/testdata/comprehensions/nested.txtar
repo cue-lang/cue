@@ -58,7 +58,7 @@ for k, v in deployment {
 		]
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  45
 Reused: 26
@@ -72,7 +72,7 @@ Disjuncts:    75
 MisalignedConjunct: 5
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 (struct){
   service: (struct){
     "node-exporter": (struct){

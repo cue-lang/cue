@@ -220,7 +220,7 @@ s3:
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  62
 Reused: 55
@@ -356,7 +356,7 @@ diff old new
    }
 -- diff/explanation --
 Reordering.
--- out/eval --
+-- out/evalv2 --
 (struct){
   math: (struct){
     p1: (struct){

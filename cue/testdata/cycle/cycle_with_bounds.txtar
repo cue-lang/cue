@@ -19,7 +19,7 @@ foo: 1
   bar: 0
   foo: 1
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  4
 Reused: 1
@@ -29,7 +29,7 @@ Retain: 1
 Unifications: 4
 Conjuncts:    9
 Disjuncts:    4
--- out/eval --
+-- out/evalv2 --
 (struct){
   #Value: (int){ int }
   foo: (int){ 1 }

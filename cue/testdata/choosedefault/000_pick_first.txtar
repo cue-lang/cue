@@ -43,7 +43,7 @@ b: {
     })
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  11
 Reused: 5
@@ -53,7 +53,7 @@ Retain: 0
 Unifications: 6
 Conjuncts:    11
 Disjuncts:    11
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: ((bool|int|string)){ |(*(int){ 5 }, (string){ "a" }, (bool){ true }) }
   b: (struct){

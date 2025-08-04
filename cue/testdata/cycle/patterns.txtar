@@ -24,7 +24,7 @@ issue3326: {
 	_self
 	x: [1]
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  7
 Reused: 2
@@ -75,7 +75,7 @@ diff old new
 +    a: (int){ int }
 +  }
  }
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (struct){
     a: (int){ int }

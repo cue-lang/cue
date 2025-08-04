@@ -617,7 +617,7 @@ diff old new
 +Disjuncts:    149
 +
 +NumCloseIDs: 177
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  16
 Freed:  843
 Reused: 831
@@ -2598,7 +2598,7 @@ b10.c.d: position now allows b: string as well. This is correct. This is mostly
 fieldsSumInfinite.issue3310: evalv3 correctly spots a structural cycle,
    where evalv2 computes an incorrect result without erroring.
 issue2545: a regression in evalv2 around v0.6 is fixed in evalv3.
--- out/eval --
+-- out/evalv2 --
 Errors:
 a1.f.0: structural cycle
 a3.f.g: structural cycle

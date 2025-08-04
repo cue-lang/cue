@@ -406,7 +406,7 @@ diff old new
 +Disjuncts:    8
 +
 +NumCloseIDs: 17
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  16
 Freed:  117
 Reused: 108
@@ -416,7 +416,7 @@ Retain: 53
 Unifications: 107
 Conjuncts:    243
 Disjuncts:    170
--- out/eval --
+-- out/evalv2 --
 Errors:
 #Configure.service.description.role: undefined field: role:
     ./in.cue:40:19

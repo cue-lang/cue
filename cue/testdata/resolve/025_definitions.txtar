@@ -115,7 +115,7 @@ mixedRec: {
     Mixed: string
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  28
 Reused: 24
@@ -182,7 +182,7 @@ Result:
     Mixed: (string){ string }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -246,7 +246,7 @@ diff old new
    Mixed: (string){ string }
 -- diff/todo/p2 --
 Positions / reordering.
--- out/eval --
+-- out/evalv2 --
 Errors:
 foo.feild: field not allowed:
     ./in.cue:1:7

@@ -116,7 +116,7 @@ e1: [..._|_ // conflicting values int and float (mismatched types int and float)
     ...float,
   ]
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  3
 Freed:  33
 Reused: 29
@@ -174,7 +174,7 @@ Result:
   e1: (list){
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -196,7 +196,7 @@ diff old new
      0: (struct){
      }
      1: (struct){
--- out/eval --
+-- out/evalv2 --
 Errors:
 e0: incompatible list lengths (1 and 2)
 

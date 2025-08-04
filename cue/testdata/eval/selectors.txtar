@@ -16,7 +16,7 @@ g: {
 	a: "foo-bar": c: 3
 	b: a."foo-bar".c
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  18
 Reused: 13
@@ -26,7 +26,7 @@ Retain: 0
 Unifications: 18
 Conjuncts:    27
 Disjuncts:    18
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (int){ 1 }
   b: (int){ 2 }

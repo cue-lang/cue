@@ -20,7 +20,7 @@ issue3972: {
 	output: out1: yaml.Marshal(_out1)
 
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  10
 Reused: 3
@@ -32,7 +32,7 @@ Conjuncts:    12
 Disjuncts:    12
 
 NumCloseIDs: 2
--- out/eval --
+-- out/evalv2 --
 (struct){
   issue3972: (struct){
     output: (struct){

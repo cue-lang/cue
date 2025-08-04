@@ -40,7 +40,7 @@ b: {
 		"\(x.text)": {text: x.text}
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  283
 Reused: 275
@@ -54,7 +54,7 @@ Disjuncts:    283
 MisalignedConjunct: 33
 
 NumCloseIDs: 2
--- out/eval --
+-- out/evalv2 --
 (struct){
   list: (#list){
     0: (int){ 0 }

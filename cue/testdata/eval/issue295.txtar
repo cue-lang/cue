@@ -13,7 +13,7 @@ p: f: 9
     f: 9
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  1
 Freed:  3
 Reused: 0
@@ -23,7 +23,7 @@ Retain: 1
 Unifications: 4
 Conjuncts:    7
 Disjuncts:    4
--- out/eval --
+-- out/evalv2 --
 (struct){
   p: (#struct){
     f: (int){ 9 }

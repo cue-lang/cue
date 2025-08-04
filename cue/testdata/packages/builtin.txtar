@@ -4,7 +4,7 @@ import "x/y"
 foo: [
 	y,
 ]
--- out/eval --
+-- out/evalv2 --
 builtin package "x/y" undefined:
     ./x.cue:1:8
 -- out/compile --

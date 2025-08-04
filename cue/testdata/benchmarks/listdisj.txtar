@@ -124,7 +124,7 @@ diff old new
 +  v: ~(#T)
 +  #X: ~(#T)
  }
--- out/eval --
+-- out/evalv2 --
 (struct){
   #T: (list){
     0: (string){ "d" }
@@ -147,7 +147,7 @@ diff old new
 }
 -- diff/explanation --
 Differences fully due to rendered structure sharing.
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  447
 Reused: 439

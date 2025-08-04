@@ -7,7 +7,7 @@ root: input: foo: {
     spec: replicas: 1
 }
 {root.input.foo.#deps}
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  13
 Reused: 4
@@ -17,7 +17,7 @@ Retain: 4
 Unifications: 11
 Conjuncts:    20
 Disjuncts:    17
--- out/eval --
+-- out/evalv2 --
 (#struct){
   root: (#struct){
     input: (struct){

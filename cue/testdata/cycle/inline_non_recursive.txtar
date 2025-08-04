@@ -307,7 +307,7 @@ issue1708.k30: no longer evaluates. Not the worst, but would ideally be fixed.
 -- diff/todo/p3 --
 Error positions.
 Incorrect path due to structure sharing.
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  309
 Freed:  437
 Reused: 429
@@ -317,7 +317,7 @@ Retain: 1074
 Unifications: 746
 Conjuncts:    2813
 Disjuncts:    1485
--- out/eval --
+-- out/evalv2 --
 Errors:
 issue3182.first.t2.x.b: structural cycle
 

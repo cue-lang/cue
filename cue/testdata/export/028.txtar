@@ -36,7 +36,7 @@ a: []
     ]
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  8
 Reused: 1
@@ -46,7 +46,7 @@ Retain: 0
 Unifications: 6
 Conjuncts:    9
 Disjuncts:    8
--- out/eval --
+-- out/evalv2 --
 (struct){
   #FindInMap: (#struct){
     #: (#struct){

@@ -110,7 +110,7 @@ issue3486: {
 		}
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  80
 Reused: 74
@@ -344,7 +344,7 @@ diff old new
 Missing error positions.
 -- diff/explanation --
 dedupTodo.out.c: the new evaluator correctly marks this as closed.
--- out/eval --
+-- out/evalv2 --
 Errors:
 disallowed.vErr.d: field not allowed:
     ./in.cue:26:6

@@ -7,7 +7,7 @@ A: close({
 B: A & {
 	c: 3
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  8
 Reused: 5
@@ -71,7 +71,7 @@ diff old new
 positions
 -- diff/todo/p3 --
 Reordering
--- out/eval --
+-- out/evalv2 --
 Errors:
 B.c: field not allowed:
     ./test.cue:1:10

@@ -266,7 +266,7 @@ diff old new
 +Disjuncts:    610
 +
 +NumCloseIDs: 96
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  1141
 Reused: 1122
@@ -1025,7 +1025,7 @@ diff old new
      }
      #Obj: (#struct){
        spec: (#struct){ |(*(#struct){
--- out/eval --
+-- out/evalv2 --
 Errors:
 full.Bar.resource.spec: 6 errors in empty disjunction:
 full.Bar.resource.spec.minBar: 2 errors in empty disjunction:

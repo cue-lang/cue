@@ -782,7 +782,7 @@ diffTypes: {
     })
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  54
 Freed:  659
 Reused: 654
@@ -1098,7 +1098,7 @@ diff old new
        //     ./typediff.cue:43:8
      }
    }
--- out/eval --
+-- out/evalv2 --
 Errors:
 lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
     ./lists.cue:24:19

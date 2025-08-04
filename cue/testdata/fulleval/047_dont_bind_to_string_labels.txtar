@@ -36,7 +36,7 @@ y:
     z: 〈1;x〉
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  5
 Reused: 2
@@ -46,7 +46,7 @@ Retain: 0
 Unifications: 5
 Conjuncts:    6
 Disjuncts:    5
--- out/eval --
+-- out/evalv2 --
 (struct){
   x: (int){ 1 }
   y: (struct){

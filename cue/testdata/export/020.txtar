@@ -12,7 +12,7 @@ a: ""
 b: 0
 -- out/json --
 {"a":"","b":0}
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  3
 Reused: 1
@@ -22,7 +22,7 @@ Retain: 0
 Unifications: 3
 Conjuncts:    4
 Disjuncts:    3
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (string){ "" }
   b: (int){ 0 }

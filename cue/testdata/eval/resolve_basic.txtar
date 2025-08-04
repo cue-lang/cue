@@ -8,7 +8,7 @@ d: {
 e: d & {
 	x: 5
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  9
 Reused: 6
@@ -18,7 +18,7 @@ Retain: 0
 Unifications: 9
 Conjuncts:    16
 Disjuncts:    9
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (int){ 1 }
   b: (int){ 2 }

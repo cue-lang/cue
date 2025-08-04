@@ -81,7 +81,7 @@ job:
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  14
 Reused: 8
@@ -91,7 +91,7 @@ Retain: 0
 Unifications: 10
 Conjuncts:    22
 Disjuncts:    14
--- out/eval --
+-- out/evalv2 --
 (struct){
   job: (struct){
     list: (struct){

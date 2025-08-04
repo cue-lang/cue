@@ -40,7 +40,7 @@ issue3905: full: {
 		}
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  3
 Freed:  57
 Reused: 47
@@ -161,7 +161,7 @@ diff old new
        }
      }
    }
--- out/eval --
+-- out/evalv2 --
 (struct){
   issue3905: (struct){
     reduced: (#struct){

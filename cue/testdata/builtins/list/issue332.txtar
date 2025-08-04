@@ -12,7 +12,7 @@ import "list"
 r: #foo & {
 	#x: "hello"
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  19
 Reused: 13
@@ -22,7 +22,7 @@ Retain: 10
 Unifications: 21
 Conjuncts:    52
 Disjuncts:    29
--- out/eval --
+-- out/evalv2 --
 (struct){
   #d: (#struct){
     #x: (string){ string }

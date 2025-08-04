@@ -123,7 +123,7 @@ issue3599: let: {
 	{ } | { a:  B | 1, let B = 1&2 }
 	{  } | {  }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  6
 Freed:  181
 Reused: 171
@@ -478,7 +478,7 @@ Missing error positions.
 The additional "field not allowed" error is correct and a message corresponding
 to one of the conjuncts failing.
 issue516.x.match: changes are okay and arguably better.
--- out/eval --
+-- out/evalv2 --
 Errors:
 issue516.x: 2 errors in empty disjunction:
 issue516.x.match: field not allowed:

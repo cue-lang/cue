@@ -51,7 +51,7 @@ diff old new
 +Unifications: 8
 +Conjuncts:    8
 +Disjuncts:    0
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  16
 Reused: 12
@@ -61,7 +61,7 @@ Retain: 5
 Unifications: 16
 Conjuncts:    24
 Disjuncts:    21
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (_|_){
     // [incomplete] cannot convert incomplete value "string" to JSON:

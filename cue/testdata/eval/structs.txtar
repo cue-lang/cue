@@ -2,7 +2,7 @@
 import "struct"
 
 v: {a: struct.MaxFields(2) & {}}.a
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  2
 Reused: 0
@@ -12,7 +12,7 @@ Retain: 2
 Unifications: 4
 Conjuncts:    7
 Disjuncts:    4
--- out/eval --
+-- out/evalv2 --
 (struct){
   v: (struct){
   }

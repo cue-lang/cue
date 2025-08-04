@@ -75,7 +75,7 @@ wp: v & {
     b: 100
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  21
 Reused: 18
@@ -85,7 +85,7 @@ Retain: 0
 Unifications: 21
 Conjuncts:    53
 Disjuncts:    21
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (struct){
     b: (int){ int }

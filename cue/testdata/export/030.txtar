@@ -87,7 +87,7 @@ diff old new
 +Disjuncts:    10
 +
 +NumCloseIDs: 4
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  70
 Reused: 59
@@ -129,7 +129,7 @@ diff old new
      "#Foo": (int){ 2 }
 -- diff/todo/p2 --
 Structural cycle eliminated too soon?
--- out/eval --
+-- out/evalv2 --
 (struct){
   #Foo: (#struct){
     sgl: (string){ string }

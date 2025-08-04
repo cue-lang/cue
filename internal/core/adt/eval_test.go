@@ -52,7 +52,7 @@ var (
 func TestEvalV2(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root: "../../../cue/testdata",
-		Name: "eval",
+		Name: "evalv2",
 	}
 
 	cuedebug.Init()
@@ -76,7 +76,7 @@ func TestEvalV3(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root:     "../../../cue/testdata",
 		Name:     "evalalpha",
-		Fallback: "eval", // Allow eval golden files to pass these tests.
+		Fallback: "evalv2", // Allow evalv2 golden files to pass these tests.
 	}
 
 	cuedebug.Init()
@@ -120,7 +120,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 			}
 		}
 		for _, f := range t.Archive.Files {
-			if f.Name != "out/eval/stats" {
+			if f.Name != "out/evalv2/stats" {
 				continue
 			}
 			c := cuecontext.New()

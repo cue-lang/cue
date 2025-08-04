@@ -76,7 +76,7 @@ diff old new
 +Disjuncts:    12
 +
 +NumCloseIDs: 38
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  18
 Freed:  171
 Reused: 163
@@ -246,7 +246,7 @@ diff old new
        all: (#list){
          0: (int){ 3 }
          1: (int){ 2 }
--- out/eval --
+-- out/evalv2 --
 (struct){
   p1: (struct){
     #A: (#struct){ |(*(#struct){

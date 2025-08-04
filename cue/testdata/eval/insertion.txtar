@@ -139,7 +139,7 @@ diff old new
 +Notifications: 13
 +
 +NumCloseIDs: 54
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  8
 Freed:  59
 Reused: 54
@@ -149,7 +149,7 @@ Retain: 24
 Unifications: 67
 Conjuncts:    163
 Disjuncts:    73
--- out/eval --
+-- out/evalv2 --
 (struct){
   embeddingDirect: (struct){
     t1: (string){

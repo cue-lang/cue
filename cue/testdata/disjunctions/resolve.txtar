@@ -44,7 +44,7 @@ diff old new
 +Disjuncts:    12
 +
 +NumCloseIDs: 6
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  44
 Reused: 32
@@ -54,7 +54,7 @@ Retain: 0
 Unifications: 32
 Conjuncts:    67
 Disjuncts:    44
--- out/eval --
+-- out/evalv2 --
 (struct){
   resolveAcrossDisjunct: (struct){
     t1: (struct){ |((struct){

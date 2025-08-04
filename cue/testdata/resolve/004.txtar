@@ -36,7 +36,7 @@ b:
   }
   b: _
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  5
 Reused: 2
@@ -46,7 +46,7 @@ Retain: 0
 Unifications: 5
 Conjuncts:    11
 Disjuncts:    5
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (struct){
     d: (int){ 1 }

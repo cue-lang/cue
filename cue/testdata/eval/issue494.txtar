@@ -14,7 +14,7 @@ c: ben: [{}]
 #d: ben: [{}]
 
 d: #d
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  26
 Reused: 21
@@ -81,7 +81,7 @@ diff old new
 -  }
 +  d: ~(#d)
  }
--- out/eval --
+-- out/evalv2 --
 (struct){
   _Q: (#list){
     0: (struct){

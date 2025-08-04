@@ -109,7 +109,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 3
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  45
 Reused: 39
@@ -162,7 +162,7 @@ diff old new
      }
    }
    #V: (#struct){
--- out/eval --
+-- out/evalv2 --
 (struct){
   x: (#struct){
     s: (string){ "myname" }

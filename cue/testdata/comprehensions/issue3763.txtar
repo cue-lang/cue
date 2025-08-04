@@ -48,7 +48,7 @@ full: {
 
 	_cl: l: {}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  4
 Freed:  66
 Reused: 58
@@ -183,7 +183,7 @@ diff old new
      B: (#list){
      }
    }
--- out/eval --
+-- out/evalv2 --
 (struct){
   full: (struct){
     _core_v1: (struct){

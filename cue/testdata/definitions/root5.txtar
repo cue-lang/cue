@@ -13,7 +13,7 @@ x: {
 	a: b: "foo"
 	c: "foo"
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  20
 Reused: 14
@@ -76,7 +76,7 @@ diff old new
      #Schema: (#struct){
        a?: (#struct){
          b?: (string){ string }
--- out/eval --
+-- out/evalv2 --
 (#struct){
   _schema: (#struct){
     a?: (#struct){

@@ -750,7 +750,7 @@ diff old new
          }
        }
      }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  6
 Freed:  3232
 Reused: 3213
@@ -764,7 +764,7 @@ Disjuncts:    3258
 MisalignedConjunct: 4502
 
 NumCloseIDs: 4
--- out/eval --
+-- out/evalv2 --
 (struct){
   #AC: (#struct){
     k: (string){ "simple" }

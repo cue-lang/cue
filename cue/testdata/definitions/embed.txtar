@@ -73,7 +73,7 @@ reclose3: {
 		Something: 4
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  63
 Reused: 56
@@ -284,7 +284,7 @@ diff old new
 -- diff/todo/p3 --
 Reordering
 Missing error positions
--- out/eval --
+-- out/evalv2 --
 Errors:
 reclose1.z.d: field not allowed:
     ./in.cue:28:6

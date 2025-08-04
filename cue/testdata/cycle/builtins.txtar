@@ -293,7 +293,7 @@ diff old new
 +Notifications: 4
 +
 +NumCloseIDs: 187
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  25
 Freed:  446
 Reused: 434
@@ -1265,7 +1265,7 @@ diff old new
    }
 -- diff/todo/p2 --
 issue3443: Sort out differences in reporting of cycles.
--- out/eval --
+-- out/evalv2 --
 Errors:
 noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
     ./cycle.cue:4:7

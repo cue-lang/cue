@@ -67,7 +67,7 @@ t3: {
 		"hello": n: "blah"
 	}
 }
--- out/eval --
+-- out/evalv2 --
 t2.z.hello: unreferenced alias or let clause q:
     ./issue1960.cue:15:3
 -- out/compile --

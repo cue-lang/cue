@@ -17,7 +17,7 @@ t1: {
 
 	x: #d1 & #d2
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  15
 Reused: 10
@@ -110,7 +110,7 @@ diff old new
      }
 -- diff/todo/p2 --
 Positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 t0.v: conflicting values int and string (mismatched types int and string):
     ./in.cue:1:4

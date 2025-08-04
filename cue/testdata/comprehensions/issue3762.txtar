@@ -118,7 +118,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 25
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  4
 Freed:  63
 Reused: 55
@@ -267,7 +267,7 @@ diff old new
          vms: (string){ "hello" }
        }
        _a: (struct){
--- out/eval --
+-- out/evalv2 --
 (struct){
   full: (struct){
     kube: (struct){

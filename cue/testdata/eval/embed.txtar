@@ -120,7 +120,7 @@ closednessInversion: {
 		a: b: c: "d"
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  116
 Reused: 106
@@ -728,7 +728,7 @@ diff old new
 -- diff/explanation --
 Reordering
 fieldNotAllowed: This was not correctly enforced in evalv2.
--- out/eval --
+-- out/evalv2 --
 (struct){
   #A: (#struct){
     a: (int){ int }

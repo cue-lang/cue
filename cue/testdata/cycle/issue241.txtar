@@ -23,7 +23,7 @@ cell: b: _
 
 a: cell.a
 b: cell.b
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  47
 Reused: 39
@@ -71,7 +71,7 @@ diff old new
    Foo: (int){ 1 }
 -- diff/explanation --
 error is now symmetric
--- out/eval --
+-- out/evalv2 --
 (struct){
   #Value: (int){ |((int){ 0 }, (int){ 1 }) }
   foo: (_|_){

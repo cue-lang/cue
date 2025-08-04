@@ -46,7 +46,7 @@ issue3977: inlineLet: {
 
 	err: p.out
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  9
 Freed:  48
 Reused: 43
@@ -193,7 +193,7 @@ diff old new
        }
 -- diff/explanation --
 evalv3 correctly fails on all places marked with "err"
--- out/eval --
+-- out/evalv2 --
 Errors:
 x: conflicting values 2 and 1:
     ./in.cue:20:14

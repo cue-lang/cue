@@ -148,7 +148,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 39
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  50
 Reused: 45
@@ -162,7 +162,7 @@ Disjuncts:    57
 MisalignedConjunct: 21
 
 NumCloseIDs: 10
--- out/eval --
+-- out/evalv2 --
 (struct){
   given: (struct){
     INC: (struct){

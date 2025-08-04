@@ -32,7 +32,7 @@ original: {
 	}
 	out: yaml.Marshal(rule)
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  4
 Freed:  17
 Reused: 10
@@ -42,7 +42,7 @@ Retain: 4
 Unifications: 21
 Conjuncts:    39
 Disjuncts:    21
--- out/eval --
+-- out/evalv2 --
 (struct){
   simplified: (struct){
     x: (struct){

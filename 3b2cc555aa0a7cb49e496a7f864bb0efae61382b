@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "086b5cee_c5ac8eb0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-08-04T13:20:49Z",
+      "side": 1,
+      "message": "I\u0027ll defer to you on when this kind of thing could/should be being surfaced as an end-to-end test in the fake editor.",
+      "revId": "3b2cc555aa0a7cb49e496a7f864bb0efae61382b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -128,8 +128,7 @@ func testVisit(t *testing.T, w io.Writer, ctxt *adt.OpContext, v *adt.Vertex, cf
 
 // DO NOT REMOVE: for Testing purposes.
 func TestX(t *testing.T) {
-	version := internal.DefaultVersion
-	// version = internal.DevVersion // Uncomment for eval V3
+	version := internal.EvalV3
 	flags := cuedebug.Config{
 		Sharing: true,
 		LogEval: 1,

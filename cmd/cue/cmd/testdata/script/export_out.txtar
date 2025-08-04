@@ -2,13 +2,6 @@
 #
 # Ensure that notifications are not sent when a value has been completed.
 
-# evalv2
-env CUE_EXPERIMENT=evalv3=0
-exec cue export -e out --out yaml in.cue
-cmp stdout stdout_evalv2
-
-# evalv3
-env CUE_EXPERIMENT=evalv3=1
 exec cue export -e out --out yaml in.cue
 cmp stdout stdout_evalv3
 
@@ -31,10 +24,6 @@ out: [for obj in _byKind {obj}]
 		spec: image: _in.image
 	}
 }
--- stdout_evalv2 --
-- kind: Job
-  spec:
-    image: foo
 -- stdout_evalv3 --
 - kind: Job
   spec:

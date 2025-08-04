@@ -1,12 +1,6 @@
 # This test exposes "misaligned conjunct" issues with the typo check algorithm.
 # Ensure that this does not lead to a crash or incorrect results.
 
-# With the old evaluator.
-env CUE_EXPERIMENT=evalv3=0
-exec cue cmd main ./...
-
-# With the new evaluator.
-env CUE_EXPERIMENT=evalv3=1
 exec cue cmd main ./...
 
 -- data.cue --

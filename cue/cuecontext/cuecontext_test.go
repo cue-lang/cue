@@ -120,7 +120,6 @@ func TestEvalVersion(t *testing.T) {
 		test(New(EvaluatorVersion(EvalStable)), internal.EvalV3)
 		// We currently don't have an experimental version, so it's the current version.
 		test(New(EvaluatorVersion(EvalExperiment)), internal.EvalV3)
-		test(New(EvaluatorVersion(EvalV2)), internal.EvalV2)
 		test(New(EvaluatorVersion(EvalV3)), internal.EvalV3)
 	}
 
@@ -131,10 +130,4 @@ func TestEvalVersion(t *testing.T) {
 
 	testFixedVersions()
 
-	// Turning off the evalv3 experiment switches the default back to EvalV2.
-	cueexperiment.Flags.EvalV3 = false
-	test(New(), internal.EvalV2)
-	test(New(EvaluatorVersion(EvalDefault)), internal.EvalV2)
-
-	testFixedVersions()
 }

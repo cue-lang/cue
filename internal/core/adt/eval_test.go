@@ -43,33 +43,6 @@ var (
 	todo = flag.Bool("todo", false, "run tests marked with #todo-compile")
 )
 
-// TestEvalV2 tests the old implementation of the evaluator.
-// Note that [TestEvalV3] with CUE_UPDATE=1 assumes it runs after this test
-// for the sake of comparing results between the two evaluator versions.
-// As such, these two tests are not parallel at the top level.
-//
-// Note that this also means that CUE_UPDATE=1 is broken under `go test -shuffle`.
-func TestEvalV2(t *testing.T) {
-	test := cuetxtar.TxTarTest{
-		Root: "../../../cue/testdata",
-		Name: "eval",
-	}
-
-	cuedebug.Init()
-	dbg := cuedebug.Flags
-	cueexperiment.Init()
-	exp := cueexperiment.Flags
-
-	if *todo {
-		test.ToDo = nil
-	}
-
-	test.Run(t, func(t *cuetxtar.Test) {
-		t.Parallel()
-		runEvalTest(t, internal.EvalV2, dbg, exp)
-	})
-}
-
 func TestEvalV3(t *testing.T) {
 	adt.DebugDeps = true // check unmatched dependencies.
 
@@ -186,7 +159,6 @@ func TestIssue3985(t *testing.T) {
 	// assigned a nodeContext.
 	cuecontext.New(cuecontext.EvaluatorVersion(cuecontext.EvalV3)).CompileString(`a!: _, b: [for c in a if a != _|_ {}]`)
 
-	cuecontext.New(cuecontext.EvaluatorVersion(cuecontext.EvalV2)).CompileString(`matchN(0, [_|_]) & []`)
 }
 
 // TestX is for debugging. Do not delete.
@@ -201,8 +173,7 @@ func TestX(t *testing.T) {
 	cueexperiment.Init()
 	exps := cueexperiment.Flags
 
-	version := internal.DefaultVersion
-	version = internal.DevVersion // comment to use default implementation.
+	version := internal.EvalV3
 
 	in := `
 -- cue.mod/module.cue --

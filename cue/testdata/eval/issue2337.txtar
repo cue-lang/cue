@@ -73,7 +73,7 @@ issue2473: two: {
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  19
 Reused: 13
@@ -167,7 +167,7 @@ diff old new
        env: (string){ "prod" }
        env2: (string){ "prod" }
        example: (string){ "prod" }
--- out/eval --
+-- out/evalv2 --
 (struct){
   simple: (_|_){
     // [incomplete] simple: cannot add field x: was already used:

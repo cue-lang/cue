@@ -77,7 +77,7 @@ raw: true
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  15
 Reused: 11
@@ -139,7 +139,7 @@ diff old new
  }
 -- diff/todo/p3 --
 Reordering
--- out/eval --
+-- out/evalv2 --
 (struct){
   #emb: (#struct){
     a: (int){ 1 }

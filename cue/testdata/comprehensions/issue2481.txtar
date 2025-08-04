@@ -70,7 +70,7 @@ full: {
 		"username": "foo"
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  3
 Freed:  23
 Reused: 17
@@ -84,7 +84,7 @@ Disjuncts:    56
 MisalignedConjunct: 5
 
 NumCloseIDs: 3
--- out/eval --
+-- out/evalv2 --
 Errors:
 out: cannot combine regular field "val" with "b":
     ./in.cue:33:2

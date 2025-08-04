@@ -57,7 +57,7 @@ i: false
   }))
   err: (1 & 2)
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  21
 Reused: 16
@@ -67,7 +67,7 @@ Retain: 4
 Unifications: 21
 Conjuncts:    28
 Disjuncts:    21
--- out/eval --
+-- out/evalv2 --
 Errors:
 err: conflicting values 2 and 1:
     ./in.cue:12:6

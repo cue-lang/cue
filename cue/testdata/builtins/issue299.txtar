@@ -4,7 +4,7 @@ import "list"
 x: list.UniqueItems
 x: [string, ...string]
 x: ["x", "x"]
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  2
 Reused: 0
@@ -14,7 +14,7 @@ Retain: 0
 Unifications: 2
 Conjuncts:    5
 Disjuncts:    3
--- out/eval --
+-- out/evalv2 --
 Errors:
 x: invalid value ["x","x"] (does not satisfy list.UniqueItems): equal value ("x") at position 0 and 1:
     ./in.cue:3:4

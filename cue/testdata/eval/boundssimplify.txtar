@@ -162,7 +162,7 @@ simplifyBinary: integer: {
   ok3: p3: <3 & >=2
   ok3: p4: <=3 & >2
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  148
 Reused: 143
@@ -1126,7 +1126,7 @@ diff old new
        ok1: (struct){
 -- diff/explanation --
 simplifyBinary.integer.ok2.*: v3 indicates correct type.
--- out/eval --
+-- out/evalv2 --
 Errors:
 simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
     ./binarystring.cue:27:13

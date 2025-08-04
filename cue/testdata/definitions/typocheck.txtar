@@ -620,7 +620,7 @@ diff old new
 +MaxConjunctInfos:    5
 +MaxReqSets:          9
 +MaxRedirect:         2
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  47
 Freed:  960
 Reused: 946
@@ -2717,7 +2717,7 @@ and.transitive(WithEmbed)?.out.ok: unexpected error
 issue3833.evalv2Issue: now catches an invalid field that was previously allowed.
 Note that this is not the same field as the one reported in the issue. This is a
 correct fix relative to evalv2.
--- out/eval --
+-- out/evalv2 --
 Errors:
 and.transitive.err.out.err: field not allowed:
     ./in.cue:42:5

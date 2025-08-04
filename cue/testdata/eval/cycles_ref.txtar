@@ -7,7 +7,7 @@ c: d & {b: 2}
 d: e
 e: {a: 1}
 e: c
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  12
 Reused: 7
@@ -47,7 +47,7 @@ diff old new
    e: (struct){
      a: (int){ 1 }
      b: (int){ 2 }
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (int){ 200 }
   b: (int){ 100 }

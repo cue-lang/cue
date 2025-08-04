@@ -20,7 +20,7 @@ ifScalarNested: {
 	if _#cond {{{5}}}
 
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  7
 Reused: 4
@@ -56,7 +56,7 @@ Result:
     _#cond: (bool){ true }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -77,7 +77,7 @@ diff old new
      _#cond: (bool){ true }
 -- diff/todo/p2 --
 Missing error positions
--- out/eval --
+-- out/evalv2 --
 Errors:
 ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):
     ./in.cue:10:2

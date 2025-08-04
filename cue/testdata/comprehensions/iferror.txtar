@@ -146,7 +146,7 @@ issue1972: {
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  43
 Reused: 35
@@ -294,7 +294,7 @@ diff old new
 issue1972: "field not allowed" are somewhat correct (it is also a list), but
 are already covered by the other error message and should be elided.
 This may lead to a large number of errors otherwise.
--- out/eval --
+-- out/evalv2 --
 Errors:
 issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
     ./in.cue:54:12

@@ -801,7 +801,7 @@ diff old new
 +Disjuncts:    2
 +
 +NumCloseIDs: 578
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  19
 Freed:  864
 Reused: 856
@@ -813,7 +813,7 @@ Conjuncts:    2168
 Disjuncts:    958
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 Errors:
 a.q.e: field not allowed:
     ./in.cue:1:5

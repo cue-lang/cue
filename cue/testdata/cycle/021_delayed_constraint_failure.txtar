@@ -22,7 +22,7 @@ b: _|_ // conflicting values 210 and 200
   x: 100
   x: (〈0;x〉 + 1)
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  4
 Reused: 1
@@ -32,7 +32,7 @@ Retain: 1
 Unifications: 4
 Conjuncts:    5
 Disjuncts:    4
--- out/eval --
+-- out/evalv2 --
 Errors:
 b: conflicting values 210 and 200:
     ./in.cue:2:4

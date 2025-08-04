@@ -78,7 +78,7 @@ diff old new
 +Disjuncts:    310
 +
 +NumCloseIDs: 21
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  401
 Reused: 388
@@ -1431,7 +1431,7 @@ diff old new
      additionalProperties?: (_){ |((null){ null }, (_){ _ }) }
      patternProperties?: (struct){
      }
--- out/eval --
+-- out/evalv2 --
 (struct){
   x: (struct){
     properties: (struct){

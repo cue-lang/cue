@@ -9,7 +9,7 @@ t2: a: {
 
 	foo?: int
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  9
 Reused: 4
@@ -19,7 +19,7 @@ Retain: 1
 Unifications: 9
 Conjuncts:    9
 Disjuncts:    10
--- out/eval --
+-- out/evalv2 --
 (struct){
   t1: (struct){
     a: (struct){

@@ -2689,7 +2689,7 @@ diff old new
 +Notifications: 4
 +
 +NumCloseIDs: 319
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  9
 Freed:  2856
 Reused: 2841
@@ -2714,7 +2714,7 @@ preserveClosedness.medium.p*: discarding of default is correct.
 issue1417: new evaluator fixes known bug
 issue3149: new evaluator fixes known bug
 issue770: new evaluator fixes a bug in "c" and "coo" where defaults did not apply correctly.
--- out/eval --
+-- out/evalv2 --
 Errors:
 issue1417.ids.2: 2 errors in empty disjunction:
 issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:

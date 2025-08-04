@@ -62,7 +62,7 @@ e3: _|_ // conflicting values !="a" and <5 (mismatched types string and number)
   e2: ("foo" !~ true)
   e3: (!="a" & <5)
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  16
 Reused: 14
@@ -72,7 +72,7 @@ Retain: 0
 Unifications: 16
 Conjuncts:    25
 Disjuncts:    16
--- out/eval --
+-- out/evalv2 --
 Errors:
 e3: conflicting values !="a" and <5 (mismatched types string and number):
     ./in.cue:22:5

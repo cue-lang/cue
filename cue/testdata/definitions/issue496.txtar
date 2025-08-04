@@ -8,7 +8,7 @@
 }
 
 l: #N
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  8
 Reused: 4
@@ -43,7 +43,7 @@ diff old new
 -  }
 +  l: ~(#N)
  }
--- out/eval --
+-- out/evalv2 --
 (struct){
   #A: (_){ _ }
   #N: (#struct){

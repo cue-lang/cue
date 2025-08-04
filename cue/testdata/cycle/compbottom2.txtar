@@ -372,7 +372,7 @@ diff old new
 +Notifications: 2
 +
 +NumCloseIDs: 112
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  13
 Freed:  223
 Reused: 214
@@ -774,7 +774,7 @@ diff old new
 -- diff/explanation --
 self.isConcreteFail: t1: int value is not an error.
 self.isNotConcrete: t1: int value is not an error.
--- out/eval --
+-- out/evalv2 --
 (struct){
   self: (struct){
     fail: (struct){

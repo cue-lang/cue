@@ -19,7 +19,7 @@ object: #Leaf & {}
 		}
 	}
 }
--- out/eval --
+-- out/evalv2 --
 (struct){
   object: (#struct){
     extra?: (#struct){
@@ -40,7 +40,7 @@ object: #Leaf & {}
     more?: (int){ int }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  11
 Reused: 5

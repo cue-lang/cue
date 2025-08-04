@@ -106,7 +106,7 @@ diff old new
 +ConjunctInfos:       856
 +MaxConjunctInfos:    28
 +MaxReqSets:          26
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  90
 Freed:  684
 Reused: 680
@@ -859,7 +859,7 @@ diff old new
      }
 -- diff/todo/p2 --
 let unique_combinations: not marked as multi. Seems benign, but should be fixed.
--- out/eval --
+-- out/evalv2 --
 (struct){
   #Datastream: (#struct){
     message: (string){ strings.MinRunes(4) }

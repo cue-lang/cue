@@ -54,7 +54,7 @@ MyIP: [10, 10, 10, 10]
     10,
   ])
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  56
 Reused: 50
@@ -64,7 +64,7 @@ Retain: 1
 Unifications: 47
 Conjuncts:    106
 Disjuncts:    57
--- out/eval --
+-- out/evalv2 --
 (struct){
   IP: (#list){
     0: (int){ &(>=0, <=255, int) }

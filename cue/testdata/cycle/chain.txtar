@@ -1705,7 +1705,7 @@ diff old new
 +Notifications: 15
 +
 +NumCloseIDs: 1515
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  56
 Freed:  1788
 Reused: 1774
@@ -1719,7 +1719,7 @@ Disjuncts:    1942
 MisalignedConjunct: 289
 
 NumCloseIDs: 130
--- out/eval --
+-- out/evalv2 --
 (struct){
   chain: (struct){
     t1: (struct){

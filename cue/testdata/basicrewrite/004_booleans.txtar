@@ -23,7 +23,7 @@ e: _|_ // conflicting values true and false
   e: true
   e: !true
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  4
 Reused: 2
@@ -33,7 +33,7 @@ Retain: 0
 Unifications: 4
 Conjuncts:    7
 Disjuncts:    4
--- out/eval --
+-- out/evalv2 --
 Errors:
 e: conflicting values false and true:
     ./in.cue:5:4

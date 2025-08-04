@@ -19,7 +19,7 @@ yy: 2
 package baz
 
 xx: 1
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  1
 Freed:  6
 Reused: 3
@@ -49,7 +49,7 @@ diff old new
  }
 -- diff/todo/p3 --
 Reordering
--- out/eval --
+-- out/evalv2 --
 (struct){
   xx: (int){ 1 }
   yy: (int){ 2 }

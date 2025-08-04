@@ -56,7 +56,7 @@ b1: {
     c: string
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  21
 Reused: 14
@@ -134,7 +134,7 @@ diff old new
      d: (_|_){
 -- diff/todo/p3 --
 Reordering
--- out/eval --
+-- out/evalv2 --
 (struct){
   l: (#list){
     0: (struct){

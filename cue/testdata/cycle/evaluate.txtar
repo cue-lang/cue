@@ -163,7 +163,7 @@ diff old new
 +Disjuncts:    5
 +
 +NumCloseIDs: 47
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  47
 Freed:  129
 Reused: 122
@@ -631,7 +631,7 @@ diff old new
 -- diff/explanation --
 embedCycle: technically not a structural cycle, so V3 result
 is okay or even an improvement.
--- out/eval --
+-- out/evalv2 --
 Errors:
 closeCycle.a: structural cycle
 closeCycle.b.d: structural cycle

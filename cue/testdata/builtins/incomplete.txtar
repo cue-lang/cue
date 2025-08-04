@@ -137,7 +137,7 @@ diff old new
 +Disjuncts:    4
 +
 +NumCloseIDs: 9
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  8
 Freed:  115
 Reused: 110
@@ -383,7 +383,7 @@ diff old new
      }
    }
    badListType: (_|_){
--- out/eval --
+-- out/evalv2 --
 Errors:
 badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
     ./in.cue:79:11

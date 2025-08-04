@@ -118,7 +118,7 @@ issue3691: structuralCycle: {
 		}
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  4
 Freed:  77
 Reused: 69
@@ -331,7 +331,7 @@ diff old new
          }
 -- diff/todo/p2 --
 Missing error positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
     ./issue3691.cue:4:15

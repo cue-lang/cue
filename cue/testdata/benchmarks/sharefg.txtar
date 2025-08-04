@@ -144,7 +144,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 238
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  112
 Freed:  340
 Reused: 308
@@ -1294,7 +1294,7 @@ diff old new
      }
      f1: (struct){
        out: (int){ 2 }
--- out/eval --
+-- out/evalv2 --
 (struct){
   binexpr: (struct){
     f1: (struct){

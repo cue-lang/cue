@@ -10,7 +10,7 @@
 #Both: #App | #Atom
 
 t1: #Both & {body: 3}
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  24
 Reused: 19
@@ -63,7 +63,7 @@ diff old new
    #Both: (#struct){
      body: (_){ _ }
      other: (#struct){
--- out/eval --
+-- out/evalv2 --
 (struct){
   #Artifact: (#struct){
     body: (_){ _ }

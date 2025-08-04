@@ -84,7 +84,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 9
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  30
 Reused: 25
@@ -98,7 +98,7 @@ Disjuncts:    29
 MisalignedConjunct: 1
 
 NumCloseIDs: 3
--- out/eval --
+-- out/evalv2 --
 (struct){
   s: (string){ string }
   e1: (_|_){

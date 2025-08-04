@@ -202,7 +202,7 @@ reference: {
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  66
 Reused: 58
@@ -358,7 +358,7 @@ diff old new
          }
 -- diff/todo/p2 --
 Missing position.
--- out/eval --
+-- out/evalv2 --
 (_|_){
   // [eval]
   self: (struct){

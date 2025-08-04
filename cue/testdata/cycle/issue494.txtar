@@ -23,7 +23,7 @@ f: ben: [{}]
 
 g: [rn=string]: _Q[0:len(a[rn])]
 g: ben: [{}, {}]
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  43
 Reused: 38
@@ -147,7 +147,7 @@ diff old new
        }
 -- diff/todo/p2 --
 error path moved
--- out/eval --
+-- out/evalv2 --
 Errors:
 f.ben: incompatible list lengths (1 and 2)
 g.ben: incompatible list lengths (1 and 2)

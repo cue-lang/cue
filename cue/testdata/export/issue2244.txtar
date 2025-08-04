@@ -31,7 +31,7 @@ _#isReleaseTag: _#matchPattern & {#pattern: "refs/tags/v*", _}
 m: #step & {
 	if: _#isReleaseTag
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  16
 Freed:  17
 Reused: 13
@@ -80,7 +80,7 @@ diff old new
      //     ./in.cue:11:6
      //     ./in.cue:8:12
      #pattern: (string){ string }
--- out/eval --
+-- out/evalv2 --
 (struct){
   _#matchPattern(:x): (_|_){
     // [incomplete] _#matchPattern: error in call to strings.HasSuffix: non-concrete value string:

@@ -19,7 +19,7 @@ results: _
 for _, manifest in manifests {
 	results: manifest
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  22
 Reused: 15
@@ -33,7 +33,7 @@ Disjuncts:    22
 MisalignedConjunct: 9
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 (struct){
   key: (string){ "app01" }
   manifests: (#list){

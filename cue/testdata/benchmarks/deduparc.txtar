@@ -30,7 +30,7 @@ foo: #Value
 foo: #Value
 foo: #Value
 foo: #Value
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  11
 Reused: 6
@@ -40,7 +40,7 @@ Retain: 0
 Unifications: 7
 Conjuncts:    29
 Disjuncts:    11
--- out/eval --
+-- out/evalv2 --
 (struct){
   #Value: (#struct){ |((#struct){
       type: (string){ "float" }

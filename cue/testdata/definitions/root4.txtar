@@ -6,7 +6,7 @@ _hidden: {
 	notAllowed: true
 }
 allowed: true
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  9
 Reused: 5
@@ -72,7 +72,7 @@ diff old new
      //     ./in.cue:5:2
    }
  }
--- out/eval --
+-- out/evalv2 --
 Errors:
 notAllowed: field not allowed:
     ./in.cue:1:1

@@ -167,7 +167,7 @@ z3:  z1-3 & 8
   z3: (〈0;z1〉 - 3)
   z3: 8
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  52
 Reused: 44
@@ -387,7 +387,7 @@ diff old new
    }
    z1: (int){ |((int){ 11 }, (int){ 13 }) }
    z2: (int){ 10 }
--- out/eval --
+-- out/evalv2 --
 Errors:
 xe3: conflicting values 7 and 6:
     ./in.cue:43:6

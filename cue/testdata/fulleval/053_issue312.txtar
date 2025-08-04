@@ -18,7 +18,7 @@ for x in [1] *close({}) | {
 {}
 -- out/legacy-debug --
 <0>{ <1>for _, x in [1] yield <2>{}, (*close (<3>{}) | <4>{[]: <5>(_: string)->null, })}
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  3
 Reused: 0
@@ -30,7 +30,7 @@ Conjuncts:    8
 Disjuncts:    5
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 (struct){ |(*(#struct){
   }, (struct){
   }) }

@@ -397,7 +397,7 @@ diff old new
 +Notifications: 4
 +
 +NumCloseIDs: 76
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  10
 Freed:  105
 Reused: 95
@@ -986,7 +986,7 @@ diff old new
    }
 -- diff/todo/p2 --
 error message: no mention of cycle path
--- out/eval --
+-- out/evalv2 --
 (struct){
   minimal: (struct){
     a: (_|_){

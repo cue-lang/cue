@@ -290,7 +290,7 @@ diff old new
 +Disjuncts:    36
 +
 +NumCloseIDs: 60
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  166
 Reused: 153
@@ -586,7 +586,7 @@ diff old new
          a: (struct){
            b: (_){ _ }
          }
--- out/eval --
+-- out/evalv2 --
 (struct){
   issue3750: (struct){
     original: (struct){

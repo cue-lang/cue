@@ -141,7 +141,7 @@ diff old new
 +Disjuncts:    80
 +
 +NumCloseIDs: 94
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  16
 Freed:  292
 Reused: 281
@@ -459,7 +459,7 @@ diff old new
            }
          }
        }
--- out/eval --
+-- out/evalv2 --
 (struct){
   #OneOrTwo: (#struct){ |((#struct){
       kind: (string){ "one" }

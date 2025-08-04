@@ -1,4 +1,3 @@
-# TODO(evalv3): Foo.foo shows too much "unrolling" compared to evalv2.
 
 exec cue eval ./rec.cue -O
 cmp stdout expect-stdout

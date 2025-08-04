@@ -42,7 +42,7 @@ import "list"
 	do:   "f2"
 	from: #c1
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  73
 Reused: 58
@@ -182,7 +182,7 @@ diff old new
  }
 -- diff/todo/p3 --
 Reordering
--- out/eval --
+-- out/evalv2 --
 (struct){
   #d1: (#struct){
     as: (list){

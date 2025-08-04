@@ -86,7 +86,7 @@ a: 0
 b: 1
 c: 2
 d: 3
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  78
 Reused: 68
@@ -96,7 +96,7 @@ Retain: 18
 Unifications: 26
 Conjuncts:    181
 Disjuncts:    82
--- out/eval --
+-- out/evalv2 --
 (struct){
   #size: (int){ 2 }
   #CellValue: (int){ |((int){ 0 }, (int){ 1 }, (int){ 2 }, (int){ 3 }) }

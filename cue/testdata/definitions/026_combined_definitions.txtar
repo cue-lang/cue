@@ -114,7 +114,7 @@ d1: #D1 & {
     a: int
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  29
 Reused: 24
@@ -240,7 +240,7 @@ diff old new
 Missing positions
 -- diff/todo/p3 --
 Reordering
--- out/eval --
+-- out/evalv2 --
 Errors:
 #D4.env.b: field not allowed:
     ./in.cue:26:7

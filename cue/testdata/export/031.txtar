@@ -22,7 +22,7 @@ B: A & ([10] | [192])
     ]))
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  8
 Reused: 3
@@ -32,7 +32,7 @@ Retain: 0
 Unifications: 6
 Conjuncts:    13
 Disjuncts:    8
--- out/eval --
+-- out/evalv2 --
 (struct){
   A: (#list){
     0: (int){ &(>=0, int) }

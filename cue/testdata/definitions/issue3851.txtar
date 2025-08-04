@@ -14,7 +14,7 @@ out: #Output & {
 		}
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  48
 Reused: 39
@@ -63,7 +63,7 @@ diff old new
          sub3: (struct){
            let _let#1 = (string){ "bar" }
            foo: (string){ "bar" }
--- out/eval --
+-- out/evalv2 --
 (struct){
   #App: (#struct){
     name?: (string){ string }

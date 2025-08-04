@@ -58,7 +58,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 3
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  18
 Reused: 12
@@ -285,7 +285,7 @@ diff old new
        }
      }
    }
--- out/eval --
+-- out/evalv2 --
 (struct){
   #TimeSpan: (#struct){
     start: (_|_){

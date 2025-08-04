@@ -161,7 +161,7 @@ diff old new
 +Disjuncts:    6
 +
 +NumCloseIDs: 38
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  3
 Freed:  118
 Reused: 103
@@ -495,7 +495,7 @@ diff old new
 -- diff/todo/p2 --
 #Flux.charts.foo.global.auth0.enabled: missing error
   The error messages should say which expression was incomplete!!!
--- out/eval --
+-- out/evalv2 --
 (struct){
   networkingv1: (struct){
     metav1: (struct){

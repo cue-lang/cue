@@ -99,7 +99,7 @@ panic1: {
 	out: #TypeFoo | #TypeBar
 	out: objs["obj1"].type
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  152
 Reused: 141
@@ -109,7 +109,7 @@ Retain: 12
 Unifications: 108
 Conjuncts:    237
 Disjuncts:    154
--- out/eval --
+-- out/evalv2 --
 (struct){
   cyclicalInsertInDisjunction: (struct){
     ok1: (struct){

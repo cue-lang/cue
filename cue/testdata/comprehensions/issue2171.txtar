@@ -20,7 +20,7 @@ for k, v in do {do: (k): v}
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  3
 Reused: 0
@@ -32,7 +32,7 @@ Conjuncts:    5
 Disjuncts:    3
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 (struct){
   do: (struct){
     hello: (struct){

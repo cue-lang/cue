@@ -17,7 +17,7 @@ c: a & b
   b: (*"b"|"a")
   c: (〈0;a〉 & 〈0;b〉)
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  14
 Reused: 7
@@ -27,7 +27,7 @@ Retain: 0
 Unifications: 4
 Conjuncts:    17
 Disjuncts:    14
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (string){ |(*(string){ "a" }, (string){ "b" }) }
   b: (string){ |(*(string){ "b" }, (string){ "a" }) }

@@ -98,7 +98,7 @@ jobs3: _|_ // field "fooTest1" not allowed in closed struct
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  19
 Reused: 15
@@ -230,7 +230,7 @@ diff old new
  }
 -- diff/todo/p2 --
 Missing error positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 jobs1.foo1: field not allowed:
     ./in.cue:6:8

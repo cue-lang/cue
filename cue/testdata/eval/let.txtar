@@ -542,7 +542,7 @@ diff old new
 +Notifications: 3
 +
 +NumCloseIDs: 107
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  52
 Freed:  158
 Reused: 149
@@ -556,7 +556,7 @@ Disjuncts:    241
 MisalignedConjunct: 74
 
 NumCloseIDs: 11
--- out/eval --
+-- out/evalv2 --
 Errors:
 indirectReference.y: conflicting values 2 and 1:
     ./incomprehension.cue:42:7

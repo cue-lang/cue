@@ -1,7 +1,7 @@
 -- in.cue --
 root: input: #deps: root: {}
 {root.input.#deps}
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  5
 Reused: 0
@@ -11,7 +11,7 @@ Retain: 3
 Unifications: 5
 Conjuncts:    9
 Disjuncts:    8
--- out/eval --
+-- out/evalv2 --
 (#struct){
   root: (#struct){
     input: (struct){

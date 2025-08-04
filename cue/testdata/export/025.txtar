@@ -38,7 +38,7 @@ c: *1 | 2
     c: (*1|2)
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  5
 Freed:  6
 Reused: 2
@@ -48,7 +48,7 @@ Retain: 10
 Unifications: 9
 Conjuncts:    16
 Disjuncts:    16
--- out/eval --
+-- out/evalv2 --
 (struct){
   b: (_|_){
     // [incomplete] b: invalid non-ground value int (must be concrete int):

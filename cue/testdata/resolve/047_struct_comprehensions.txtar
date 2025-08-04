@@ -75,7 +75,7 @@ reg: 4
     "\(〈1;k〉)": 〈1;v〉
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  12
 Reused: 7
@@ -89,7 +89,7 @@ Disjuncts:    13
 MisalignedConjunct: 5
 
 NumCloseIDs: 2
--- out/eval --
+-- out/evalv2 --
 (struct){
   obj: (struct){
     foo: (struct){

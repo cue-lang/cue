@@ -9,7 +9,7 @@ foo: #foo & {
 
 	#name: "baz"
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  8
 Reused: 5
@@ -50,7 +50,7 @@ diff old new
 Reordering.
 -- diff/explanation --
 New evaluator should ultimately disallow new definitions in closed structs.
--- out/eval --
+-- out/evalv2 --
 (struct){
   #foo: (#struct){
     name: (string){ string }

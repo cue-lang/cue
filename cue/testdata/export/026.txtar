@@ -26,7 +26,7 @@ raw: true
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  1
 Reused: 0
@@ -38,6 +38,6 @@ Conjuncts:    2
 Disjuncts:    1
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 (struct){
 }

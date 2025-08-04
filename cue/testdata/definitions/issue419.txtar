@@ -14,7 +14,7 @@ l: [...#X]
 l: [
 	{b: "bar"},
 ]
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  17
 Reused: 12
@@ -24,7 +24,7 @@ Retain: 0
 Unifications: 13
 Conjuncts:    25
 Disjuncts:    17
--- out/eval --
+-- out/evalv2 --
 (struct){
   #A: (#struct){
     a: (string){ string }

@@ -113,7 +113,7 @@ cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let cl
     }
   }
 }
--- out/eval --
+-- out/evalv2 --
 cycles.a.let[].c.c: cyclic references in let clause or alias:
     ./in.cue:5:15
 cycles.b.let[].c.c: cyclic references in let clause or alias:

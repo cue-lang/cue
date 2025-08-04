@@ -34,7 +34,7 @@ a
     5,
   ]
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  11
 Reused: 8
@@ -44,7 +44,7 @@ Retain: 0
 Unifications: 11
 Conjuncts:    11
 Disjuncts:    11
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (struct){
     key: (string){ "value" }

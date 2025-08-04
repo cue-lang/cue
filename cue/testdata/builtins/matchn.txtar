@@ -382,7 +382,7 @@ diff old new
 +Disjuncts:    16
 +
 +NumCloseIDs: 483
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  52
 Freed:  951
 Reused: 944
@@ -392,7 +392,7 @@ Retain: 129
 Unifications: 987
 Conjuncts:    1635
 Disjuncts:    1081
--- out/eval --
+-- out/evalv2 --
 Errors:
 closedByDefinition.err5.out.exports: conflicting values null and {exp1:"./main-module.js"} (mismatched types null and struct):
     ./closedness.cue:80:13

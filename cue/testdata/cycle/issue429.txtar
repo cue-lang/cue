@@ -48,7 +48,7 @@ er3: #nonEmptyRange & {
 	min: 5
 	max: 5
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  98
 Reused: 91
@@ -332,7 +332,7 @@ TODO: consider reintroducing bugs.
 Reordering.
 Missing empty disjunction message.
 Missing error positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 er3.min: 2 errors in empty disjunction:
 er3.min: conflicting values 1 and 5:

@@ -99,7 +99,7 @@ o3: o1 & {
 }
 -- out/legacy-debug --
 <0>{a1: <1>{a: (=~"oo" & =~"fo"), b: =~"oo", c: =~"fo"}, a2: <2>{a: "foo", b: =~"oo", c: =~"fo"}, a3: <3>{a: _|_((=~"oo" & "bar"):invalid value "bar" (does not match =~"oo")), b: =~"oo", c: =~"fo"}, o1: <4>{a: string, b: string, c: "bar"}, o2: <5>{a: "foo", b: string, c: "bar"}, o3: <6>{a: _|_(("baz" & "foo"):empty disjunction: conflicting values "baz" and "foo";("bar" & "foo"):empty disjunction: conflicting values "bar" and "foo"), b: "baz", c: "bar"}}
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  6
 Freed:  79
 Reused: 70
@@ -270,7 +270,7 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -304,7 +304,7 @@ diff old new
      }
 -- diff/todo/p2 --
 Missing error positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 o3.a: 2 errors in empty disjunction:
 o3.a: conflicting values "bar" and "foo":

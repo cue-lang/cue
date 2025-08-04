@@ -32,7 +32,7 @@ c: d & {
     b?: 4
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  14
 Reused: 9
@@ -76,7 +76,7 @@ diff old new
        a: (int){ 1 }
 -- diff/todo/p3 --
 Missing error position.
--- out/eval --
+-- out/evalv2 --
 (struct){
   d: (struct){ |((struct){
       a: (int){ 1 }

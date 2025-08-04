@@ -43,7 +43,7 @@ sameValues: CmustBeA: {
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  25
 Reused: 15
@@ -101,7 +101,7 @@ diff old new
      }
    }
  }
--- out/eval --
+-- out/evalv2 --
 (struct){
   sameValues: (struct){
     SmustBeF: (struct){

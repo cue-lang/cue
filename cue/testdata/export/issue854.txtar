@@ -24,7 +24,7 @@ package c
 {
   theb: 〈import;"mod.test/b"〉.name
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  4
 Freed:  2
 Reused: 0
@@ -34,7 +34,7 @@ Retain: 8
 Unifications: 6
 Conjuncts:    8
 Disjuncts:    8
--- out/eval --
+-- out/evalv2 --
 (struct){
   theb: (_|_){
     // [incomplete] b: undefined field: c:

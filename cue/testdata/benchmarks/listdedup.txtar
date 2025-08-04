@@ -302,7 +302,7 @@ diff old new
        b: (int){ 2 }
      }) }
    #ref: (#struct){ |((#struct){
--- out/eval --
+-- out/evalv2 --
 (struct){
   A: (#struct){ |((#struct){
       #steps: (#struct){
@@ -495,7 +495,7 @@ diff old new
 +MaxConjunctInfos:    6
 +MaxReqSets:          9
 +MaxRedirect:         2
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  24096
 Reused: 24051

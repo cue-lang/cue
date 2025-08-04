@@ -42,7 +42,7 @@ f: true
   e: (null == [])
   f: (0 == 0.0)
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  9
 Reused: 6
@@ -52,7 +52,7 @@ Retain: 2
 Unifications: 9
 Conjuncts:    9
 Disjuncts:    11
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (bool){ true }
   b: (bool){ true }

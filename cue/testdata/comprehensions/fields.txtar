@@ -58,7 +58,7 @@ issue560: {
 		tags_str: "b {c}"
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  1
 Freed:  29
 Reused: 24
@@ -138,7 +138,7 @@ diff old new
    issue560: (struct){
 -- diff/todo/p2 --
 Near-duplicate message
--- out/eval --
+-- out/evalv2 --
 (struct){
   dynamic: (struct){
     foo: (int){ 1 }

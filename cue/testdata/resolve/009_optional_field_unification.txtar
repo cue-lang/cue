@@ -61,7 +61,7 @@ g1: 1
   "g\(1)"?: 1
   "g\(2)"?: 2
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  11
 Reused: 8
@@ -71,7 +71,7 @@ Retain: 0
 Unifications: 11
 Conjuncts:    19
 Disjuncts:    11
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (struct){
     foo?: (string){ string }

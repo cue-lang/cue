@@ -68,7 +68,7 @@ issue3946: reduced:{
 		_inputs: input1: name: "input1"
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  61
 Reused: 51
@@ -207,7 +207,7 @@ diff old new
        }
      }
      #Tags: (#struct){
--- out/eval --
+-- out/evalv2 --
 (struct){
   full: (struct){
     out: (struct){

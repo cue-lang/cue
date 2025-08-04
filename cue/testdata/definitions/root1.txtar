@@ -3,7 +3,7 @@
 root1: 1
 #Root1: x: {}
 #Root1 & { }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  5
 Reused: 2
@@ -13,7 +13,7 @@ Retain: 1
 Unifications: 5
 Conjuncts:    8
 Disjuncts:    6
--- out/eval --
+-- out/evalv2 --
 (#struct){
   root1: (int){ 1 }
   #Root1: (#struct){

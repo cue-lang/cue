@@ -97,7 +97,7 @@ diff old new
 +Notifications: 6
 +
 +NumCloseIDs: 69
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  24
 Freed:  207
 Reused: 200
@@ -459,7 +459,7 @@ diff old new
 +  }
 +  isTrue: (bool){ true }
  }
--- out/eval --
+-- out/evalv2 --
 (struct){
   X: (struct){
     _a: (struct){

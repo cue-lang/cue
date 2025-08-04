@@ -163,7 +163,7 @@ e9:   _|_ // conflicting values >"a" and <1 (mismatched types string and number)
   e8: (>11 & <=11)
   e9: (>"a" & <1)
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  50
 Reused: 47
@@ -309,7 +309,7 @@ Result:
     //     ./in.cue:64:12
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -425,7 +425,7 @@ diff old new
 Reordering
 -- diff/explanation --
 f7 changed from number to float. This is a bug fix.
--- out/eval --
+-- out/evalv2 --
 Errors:
 e1: conflicting values null and !=null (mismatched types null and (bool|string|bytes|func|list|struct|number)):
     ./in.cue:56:5

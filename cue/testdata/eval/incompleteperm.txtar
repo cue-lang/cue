@@ -19,7 +19,7 @@ permanentlyIncompleteOperandsDisjunct: {
 issue680: (>10 * 2) & 0
 
 issue405: >=100 <= 200
--- out/eval --
+-- out/evalv2 --
 permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
     ./in.cue:3:5
 permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):

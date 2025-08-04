@@ -193,7 +193,7 @@ diff old new
      //     ./in.cue:8:38
 -- diff/todo/p3 --
 Note that it is okay for fib2 to fail.
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  16
 Freed:  180
 Reused: 170
@@ -207,7 +207,7 @@ Disjuncts:    268
 MisalignedConjunct: 19
 
 NumCloseIDs: 46
--- out/eval --
+-- out/evalv2 --
 Errors:
 structural cycle:
     ./in.cue:3:25

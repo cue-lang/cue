@@ -12,7 +12,7 @@ a: [_|_, // conflicting values 3 and 4
     ]
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  3
 Reused: 0
@@ -61,7 +61,7 @@ diff old new
      }
 -- diff/todo/p2 --
 Missing error positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 a.0: conflicting values 4 and 3:
     ./in.cue:1:1

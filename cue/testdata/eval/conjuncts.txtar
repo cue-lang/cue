@@ -239,7 +239,7 @@ diff old new
        let data#2 = (struct){
          f1: (string){ "foo" }
        }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  9
 Freed:  68
 Reused: 59
@@ -256,7 +256,7 @@ Missing error position.
 -- diff/explanation --
 conjunct.t3: this used to be broken, but is now fixed.
 issue2355.export: correctly closing in new evaluator.
--- out/eval --
+-- out/evalv2 --
 Errors:
 issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
     ./issue2351.cue:2:15

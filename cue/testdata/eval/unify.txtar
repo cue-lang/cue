@@ -12,7 +12,7 @@ a: d: {
 a: [Name=string]: {#info: {
 	X: "foo"
 }}
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  8
 Reused: 3
@@ -22,7 +22,7 @@ Retain: 1
 Unifications: 8
 Conjuncts:    19
 Disjuncts:    9
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (struct){
     d: (#struct){

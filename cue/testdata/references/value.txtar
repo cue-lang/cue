@@ -10,7 +10,7 @@ valueCycle: b: X=3 + X
 
 // Issue #1003
 listValueAlias: X = [1, 2, X[0]]
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  13
 Reused: 9
@@ -44,7 +44,7 @@ Disjuncts:    13
     2: (int){ 1 }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -59,7 +59,7 @@ diff old new
      }
    }
    listValueAlias: (#list){
--- out/eval --
+-- out/evalv2 --
 (struct){
   structShorthand: (struct){
     b: (int){ 3 }

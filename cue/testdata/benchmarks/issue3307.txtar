@@ -57,7 +57,7 @@ diff old new
 +Disjuncts:    0
  
  NumCloseIDs: 1
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  21
 Reused: 16
@@ -69,7 +69,7 @@ Conjuncts:    3
 Disjuncts:    93
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 (_|_){
   // [incomplete] incomplete bool: _
   _request: (struct){

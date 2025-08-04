@@ -56,7 +56,7 @@ val2: #def2
     val2: 〈0;#def2〉
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  23
 Reused: 18
@@ -121,7 +121,7 @@ diff old new
 -  }
 +  val2: ~(#def2)
  }
--- out/eval --
+-- out/evalv2 --
 (struct){
   reg: (struct){
     foo: (int){ 1 }

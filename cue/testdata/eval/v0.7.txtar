@@ -240,7 +240,7 @@ issue3925: full: {
 		out: (name): lateYAML: yaml.Marshal(input.config[input.name])
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  4
 Freed:  308
 Reused: 296
@@ -254,7 +254,7 @@ Disjuncts:    472
 MisalignedConjunct: 5
 
 NumCloseIDs: 5
--- out/eval --
+-- out/evalv2 --
 Errors:
 definition.t0.err.d1.env.c: field not allowed:
     ./definition.cue:2:12

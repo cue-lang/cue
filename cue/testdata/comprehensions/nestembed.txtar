@@ -17,7 +17,7 @@ New_infra: {
 		}
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  18
 Reused: 14
@@ -74,7 +74,7 @@ diff old new
 +    aws: ~(useful_infra.aws)
    }
  }
--- out/eval --
+-- out/evalv2 --
 (struct){
   DeleteThis: (#list){
     0: (string){ "this" }

@@ -27,7 +27,7 @@ X: {
 }
 
 Z: X.test_3_XXX.ref
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  24
 Reused: 17
@@ -76,7 +76,7 @@ diff old new
    }
    Z: (string){ "FOO" }
  }
--- out/eval --
+-- out/evalv2 --
 (struct){
   X: (struct){
     #Simple: (#struct){

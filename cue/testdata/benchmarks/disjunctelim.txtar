@@ -75,7 +75,7 @@ diff old new
 +Notifications: 1
 +
 +NumCloseIDs: 3
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  367
 Reused: 356
@@ -85,7 +85,7 @@ Retain: 0
 Unifications: 133
 Conjuncts:    866
 Disjuncts:    367
--- out/eval --
+-- out/evalv2 --
 (struct){
   pat: (struct){ |((struct){
     }, (struct){

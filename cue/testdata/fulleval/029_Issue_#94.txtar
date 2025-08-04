@@ -81,7 +81,7 @@ index: {
     _hidden: 〈1;foo〉["_hidden"]
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  22
 Reused: 19
@@ -95,7 +95,7 @@ Disjuncts:    22
 MisalignedConjunct: 1
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 (struct){
   foo: (struct){
     opt?: (int){ 1 }

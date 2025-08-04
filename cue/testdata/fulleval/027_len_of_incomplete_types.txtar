@@ -62,7 +62,7 @@ diff old new
 +Unifications: 27
 +Conjuncts:    37
 +Disjuncts:    10
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  3
 Freed:  90
 Reused: 84
@@ -72,7 +72,7 @@ Retain: 3
 Unifications: 59
 Conjuncts:    105
 Disjuncts:    93
--- out/eval --
+-- out/evalv2 --
 (struct){
   args: (list){ |(*(#list){
     }, (list){

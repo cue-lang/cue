@@ -57,7 +57,7 @@ str: 5
   "\(〈0;a〉)": 5
   c: 〈0;("\(〈0;a〉)")〉
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  8
 Reused: 4
@@ -67,7 +67,7 @@ Retain: 3
 Unifications: 8
 Conjuncts:    10
 Disjuncts:    9
--- out/eval --
+-- out/evalv2 --
 (struct){
   p: (struct){
   }

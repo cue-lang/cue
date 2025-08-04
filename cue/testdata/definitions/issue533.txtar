@@ -18,7 +18,7 @@ x2: _#x & {
 	Name: "hello"
 	Age:  50
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  11
 Reused: 8
@@ -97,7 +97,7 @@ diff old new
    }
 -- diff/todo/p2 --
 Positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 x1.Age: field not allowed:
     ./in.cue:3:5

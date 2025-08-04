@@ -38,7 +38,7 @@ diff old new
 +Unifications: 4
 +Conjuncts:    6
 +Disjuncts:    0
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  5
 Freed:  3
 Reused: 1
@@ -48,7 +48,7 @@ Retain: 5
 Unifications: 8
 Conjuncts:    14
 Disjuncts:    8
--- out/eval --
+-- out/evalv2 --
 Errors:
 explicit error (_|_ literal) in source:
     ./in.cue:4:4

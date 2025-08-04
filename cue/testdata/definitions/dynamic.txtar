@@ -14,7 +14,7 @@
 
 x: #B & #C
 
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  23
 Reused: 16
@@ -24,7 +24,7 @@ Retain: 1
 Unifications: 19
 Conjuncts:    29
 Disjuncts:    23
--- out/eval --
+-- out/evalv2 --
 (struct){
   #A: (#struct){
     a: (string){ "foo" }

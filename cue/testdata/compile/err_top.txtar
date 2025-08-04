@@ -39,7 +39,7 @@ disallowTopAsLabel: cannot use _ as label:
     a: _
   }
 }
--- out/eval --
+-- out/evalv2 --
 disallowTopAsAlias: cannot use _ as alias or let clause:
     ./in.cue:2:2
 disallowTopAsLet: cannot use _ as alias or let clause:

@@ -68,7 +68,7 @@ hidden: ok1: {
 		"run"!: _
 	}])
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  1
 Freed:  78
 Reused: 70
@@ -320,7 +320,7 @@ diff old new
            run: (string){ "foo bar" }
          }
        }
--- out/eval --
+-- out/evalv2 --
 Errors:
 definition.err1.a.#foo.b: field not allowed:
     ./in.cue:13:15

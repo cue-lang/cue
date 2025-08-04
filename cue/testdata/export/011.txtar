@@ -31,7 +31,7 @@ d: []
     d: 〈0;a〉["b"]
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  5
 Reused: 2
@@ -41,7 +41,7 @@ Retain: 0
 Unifications: 5
 Conjuncts:    8
 Disjuncts:    5
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (struct){
     b: (#list){

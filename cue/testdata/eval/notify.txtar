@@ -1109,7 +1109,7 @@ diff old new
 +Notifications: 5
 +
 +NumCloseIDs: 241
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  34
 Freed:  97
 Reused: 85
@@ -2124,7 +2124,7 @@ diff old new
 -- diff/todo/p2 --
 Investigate differing counts of errors in empty disjunctions. This may
 indicate a performance issue.
--- out/eval --
+-- out/evalv2 --
 Errors:
 t1.p1: 2 errors in empty disjunction:
 t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):

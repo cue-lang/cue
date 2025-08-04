@@ -10,7 +10,7 @@ scalar: {
 	c: {{{number}}}
 	d: number
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  9
 Reused: 6
@@ -20,7 +20,7 @@ Retain: 0
 Unifications: 9
 Conjuncts:    14
 Disjuncts:    9
--- out/eval --
+-- out/evalv2 --
 (struct){
   top: (struct){
     a: (_){ _ }

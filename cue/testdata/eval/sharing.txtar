@@ -266,7 +266,7 @@ diff old new
 +Notifications: 1
 +
 +NumCloseIDs: 104
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  6
 Freed:  272
 Reused: 261
@@ -1019,7 +1019,7 @@ diff old new
        }
 -- diff/todo/p2 --
 issue3903.noshare.foo: should be error free, like with the full version.
--- out/eval --
+-- out/evalv2 --
 Errors:
 shareCycle.t1.Y.x.x: structural cycle
 shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):

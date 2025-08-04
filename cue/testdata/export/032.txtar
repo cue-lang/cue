@@ -20,7 +20,7 @@ foo: 3
     foo: 3
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  2
 Reused: 0
@@ -30,7 +30,7 @@ Retain: 0
 Unifications: 2
 Conjuncts:    4
 Disjuncts:    2
--- out/eval --
+-- out/evalv2 --
 (struct){
   foo: (int){ 3 }
 }

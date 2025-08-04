@@ -25,7 +25,7 @@ intField: {
     2: string
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  7
 Reused: 2
@@ -78,7 +78,7 @@ diff old new
  }
 -- diff/explanation --
 Not including illegal field. Seems fine.
--- out/eval --
+-- out/evalv2 --
 Errors:
 bulkToSelf.a.foo.bar: conflicting values "3" and int (mismatched types string and int):
     ./in.cue:3:18

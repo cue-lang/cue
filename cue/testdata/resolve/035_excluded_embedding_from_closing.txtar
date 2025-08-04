@@ -63,7 +63,7 @@ V: #S & {
     }
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  21
 Reused: 17
@@ -123,7 +123,7 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -186,7 +186,7 @@ diff old new
 -- diff/todo/p2 --
 Positions.
 Reordering.
--- out/eval --
+-- out/evalv2 --
 Errors:
 V.b.extra: field not allowed:
     ./in.cue:6:10

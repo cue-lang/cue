@@ -29,7 +29,7 @@ varNegativeIndex: {
 	n: -1
 	a: [1, 2, 3][n]
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  12
 Freed:  36
 Reused: 33
@@ -131,7 +131,7 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -194,7 +194,7 @@ diff old new
    negativeIndex: (_|_){
 -- diff/todo/p4 --
 Error messages slightly different.
--- out/eval --
+-- out/evalv2 --
 Errors:
 outOfBoundsDisjunction: invalid list index 1 (out of bounds):
     ./in.cue:7:36

@@ -20,7 +20,7 @@ h: strings.Join(list.Repeat(["a"], 3), "")
 
 i: list.Repeat(["b"], 3)
 j: strings.Join(i, "")
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  36
 Reused: 31
@@ -30,7 +30,7 @@ Retain: 6
 Unifications: 38
 Conjuncts:    45
 Disjuncts:    42
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (string){ "est" }
   b: (string){ "est" }

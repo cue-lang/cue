@@ -48,7 +48,7 @@
     Size: 1
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  10
 Reused: 5
@@ -58,7 +58,7 @@ Retain: 0
 Unifications: 8
 Conjuncts:    15
 Disjuncts:    10
--- out/eval --
+-- out/evalv2 --
 (struct){
   #def: (#struct){ |((#struct){
       Type: (string){ "B" }

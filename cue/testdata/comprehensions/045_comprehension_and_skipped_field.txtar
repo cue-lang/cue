@@ -47,7 +47,7 @@ x:
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  3
 Freed:  7
 Reused: 2
@@ -61,7 +61,7 @@ Disjuncts:    12
 MisalignedConjunct: 1
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 (struct){
   x: (struct){
     v: (struct){

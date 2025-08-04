@@ -12,7 +12,7 @@ b: "Count: \(a) times"
     b: "Count: \(〈0;a〉) times"
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  3
 Reused: 1
@@ -22,7 +22,7 @@ Retain: 0
 Unifications: 3
 Conjuncts:    9
 Disjuncts:    3
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (number){ &(>=0, <=10) }
   b: (_|_){

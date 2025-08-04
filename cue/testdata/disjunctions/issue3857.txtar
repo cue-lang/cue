@@ -50,7 +50,7 @@ issue3851: t2: {
 	conf: two: shared: conf.one.shared
 	}
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  96
 Reused: 83
@@ -214,7 +214,7 @@ diff old new
          }
        }
      }
--- out/eval --
+-- out/evalv2 --
 (struct){
   reduced: (struct){
     t1: (struct){

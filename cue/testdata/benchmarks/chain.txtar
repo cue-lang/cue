@@ -2025,7 +2025,7 @@ Retain: 0
 Unifications: 1001
 Conjuncts:    1001
 Disjuncts:    0
--- out/eval --
+-- out/evalv2 --
 (struct){
   f1: (string){ string }
   f2: (string){ string }
@@ -3046,7 +3046,7 @@ diff old new
 -Disjuncts:    1001
 +Conjuncts:    1001
 +Disjuncts:    0
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  1001
 Reused: 999

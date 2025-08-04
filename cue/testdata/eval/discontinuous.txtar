@@ -48,7 +48,7 @@ x: {
     DSpec: {}
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  14
 Reused: 5
@@ -100,7 +100,7 @@ diff old new
    foo: (struct){
 -- diff/explanation --
 Reordering.
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (#list){
     0: (struct){

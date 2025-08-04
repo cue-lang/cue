@@ -123,7 +123,7 @@ diff old new
 +Notifications: 6
 +
 +NumCloseIDs: 39
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  19
 Freed:  430
 Reused: 413
@@ -137,7 +137,7 @@ Disjuncts:    438
 MisalignedConjunct: 3
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalv2 --
 (struct){
   default: (struct){
     y: ((int|struct)){ |(*(int){ 1 }, (struct){

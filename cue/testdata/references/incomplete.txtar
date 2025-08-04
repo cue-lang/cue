@@ -29,7 +29,7 @@ incompleteIndex: {
 	top: _
 	a:   [1][top]
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  1
 Freed:  17
 Reused: 14
@@ -41,7 +41,7 @@ Conjuncts:    26
 Disjuncts:    18
 
 NumCloseIDs: 2
--- out/eval --
+-- out/evalv2 --
 Errors:
 incompleteIndex.a: invalid index top (invalid type _):
     ./in.cue:29:7

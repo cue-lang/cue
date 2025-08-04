@@ -34,7 +34,7 @@ a: #S & {
     }
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  6
 Reused: 2
@@ -89,7 +89,7 @@ diff old new
        a: (int){ int }
 -- diff/todo/p2 --
 Missing positions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 a.v.b: field not allowed:
     ./in.cue:2:12

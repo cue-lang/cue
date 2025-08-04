@@ -90,7 +90,7 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 13
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  2
 Freed:  49
 Reused: 39
@@ -608,7 +608,7 @@ diff old new
 -    }
    }
  }
--- out/eval --
+-- out/evalv2 --
 Errors:
 ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
     ./main.cue:6:12

@@ -24,7 +24,7 @@ c2: _|_ // conflicting values {bar: 1} and 1 (mismatched types struct and int)
     bar: 1
   } & 〈0;c2〉.bar)
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  7
 Reused: 3
@@ -72,7 +72,7 @@ diff old new
  }
 -- diff/todo/p3 --
 Additional error message. Seems okay.
--- out/eval --
+-- out/evalv2 --
 Errors:
 c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
     ./in.cue:2:5

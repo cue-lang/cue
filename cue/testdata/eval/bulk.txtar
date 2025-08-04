@@ -182,7 +182,7 @@ diff old new
 +Notifications: 15
 +
 +NumCloseIDs: 98
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  4
 Freed:  269
 Reused: 250
@@ -839,7 +839,7 @@ the behavior of the new evaluator.
 issue3638: in V2, there was a spurious default marker to disambiguate
 a disjunction that should have already been disambiguated.
 In V3, the disjunction is properly disambiguated.
--- out/eval --
+-- out/evalv2 --
 Errors:
 issue3670.a.not_int: field not allowed:
     ./intpattern.cue:2:6

@@ -5,7 +5,7 @@ c: #R & {
 #R: {
 	w: [{}, ...]
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  9
 Reused: 4
@@ -48,7 +48,7 @@ diff old new
      }
 -- diff/explanation --
 Bug fix. Struct is correctly closed in new evaluator.
--- out/eval --
+-- out/evalv2 --
 (struct){
   c: (#struct){
     w: (#list){

@@ -133,7 +133,7 @@ diff old new
 +Disjuncts:    14
 +
 +NumCloseIDs: 78
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  98
 Freed:  260
 Reused: 254
@@ -460,7 +460,7 @@ diff old new
            ns1: (string){ "foo" }
          }
          #SubOutput: (#struct){
--- out/eval --
+-- out/evalv2 --
 (struct){
   issue3801: (struct){
     let: (struct){

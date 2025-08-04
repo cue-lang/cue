@@ -49,7 +49,7 @@ e7: _|_ // invalid slice index "9" (type string)
     2,
   ][:"9"]
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  8
 Freed:  10
 Reused: 8
@@ -59,7 +59,7 @@ Retain: 8
 Unifications: 18
 Conjuncts:    18
 Disjuncts:    18
--- out/eval --
+-- out/evalv2 --
 Errors:
 e1: index 1 out of range:
     ./in.cue:3:5

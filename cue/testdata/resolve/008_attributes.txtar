@@ -31,7 +31,7 @@ e: _|_ // conflicting attributes for key "foo"
     foo: 1
   })
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  9
 Reused: 6
@@ -41,7 +41,7 @@ Retain: 0
 Unifications: 9
 Conjuncts:    16
 Disjuncts:    9
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (struct){
     foo: (int){ 1 }

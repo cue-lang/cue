@@ -12,7 +12,7 @@ Component: {
 }
 
 hello: #Schema & Component
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  14
 Reused: 9
@@ -22,7 +22,7 @@ Retain: 0
 Unifications: 10
 Conjuncts:    18
 Disjuncts:    14
--- out/eval --
+-- out/evalv2 --
 (struct){
   #Schema: (#struct){
   }

@@ -51,7 +51,7 @@ diff old new
 -Disjuncts:    10
 +Conjuncts:    5
 +Disjuncts:    0
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  5
 Reused: 2
@@ -61,7 +61,7 @@ Retain: 5
 Unifications: 5
 Conjuncts:    13
 Disjuncts:    10
--- out/eval --
+-- out/evalv2 --
 (struct){
   foo: (_|_){
     // [incomplete] foo: error in call to encoding/csv.Decode: non-concrete value bytes:

@@ -122,7 +122,7 @@ z3:  8
   z3: (〈0;z1〉 - 3)
   z3: 8
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  44
 Reused: 36
@@ -251,7 +251,7 @@ diff old new
    xc3: (int){ 6 }
 -- diff/todo/p2 --
 xb*: cycles are not broken if between disjuncts if they are within expressions.
--- out/eval --
+-- out/evalv2 --
 Errors:
 xe3: conflicting values 7 and 6:
     ./in.cue:35:6

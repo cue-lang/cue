@@ -83,7 +83,7 @@ t:
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  14
 Reused: 7
@@ -108,7 +108,7 @@ Disjuncts:    15
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
+-- diff/-out/evalalpha<==>+out/evalv2 --
 diff old new
 --- old
 +++ new
@@ -128,7 +128,7 @@ diff old new
    }
    t: (struct){
      x: (struct){
--- out/eval --
+-- out/evalv2 --
 (struct){
   res: (#list){
     0: (struct){

@@ -72,7 +72,7 @@ e5: [1, 2, 4, _|_, // invalid value 8 (out of bound <=5)
     ...(>=4 & <=5),
   ])
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  4
 Freed:  23
 Reused: 20
@@ -182,7 +182,7 @@ diff old new
    e3: (_|_){
 -- diff/todo/p2 --
 error: more precise message
--- out/eval --
+-- out/evalv2 --
 Errors:
 e: conflicting values 4 and [] (mismatched types int and list):
     ./in.cue:4:8

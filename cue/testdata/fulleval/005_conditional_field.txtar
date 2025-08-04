@@ -52,7 +52,7 @@ d: {
     }
   }
 }
--- out/eval/stats --
+-- out/evalv2/stats --
 Leaks:  0
 Freed:  7
 Reused: 4
@@ -105,7 +105,7 @@ diff old new
 +    }
    }
  }
--- out/eval --
+-- out/evalv2 --
 (struct){
   a: (string){ "foo" }
   b: (bool){ true }

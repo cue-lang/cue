@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76e1ea51_2edb6f95",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 965,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-04T18:20:33Z",
+      "side": 1,
+      "message": "nit: before, we would avoid calling hasParentEllipsis if hasAny was false. is this something we want to keep? it might matter in terms of performance.",
+      "revId": "49bb4495d60d3efcf8b02733fd6e42f3a20d5271",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/ast"
+	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/fscache"
@@ -448,6 +449,11 @@ func (m *Module) ReloadPackages() error {
 	for fileUri := range dirtyFiles {
 		pkgs, err := m.FindPackagesOrModulesForFile(fileUri)
 		if err != nil {
+			if _, ok := err.(cueerrors.Error); ok {
+				// Most likely a syntax error; ignore it.
+				// TODO: this error might become a "diagnostics" message
+				continue
+			}
 			return err
 		}
 		if len(pkgs) != 0 {

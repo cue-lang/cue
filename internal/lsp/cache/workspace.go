@@ -17,6 +17,7 @@ import (
 	"strings"
 	"time"
 
+	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
@@ -374,6 +375,11 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		}
 		pkgs, err := m.FindPackagesOrModulesForFile(uri)
 		if err != nil {
+			if _, ok := err.(cueerrors.Error); ok {
+				// Most likely a syntax error; ignore it.
+				// TODO: this error might become a "diagnostics" message
+				continue
+			}
 			return err
 		}
 		if len(pkgs) != 0 {

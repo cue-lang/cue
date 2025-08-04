@@ -599,7 +599,7 @@ func (n *nodeContext) checkTypos() {
 		}
 
 		n.filterSets(&required, func(n *nodeContext, a *reqSet) bool {
-			if hasParentEllipsis(n, a, n.conjunctInfo) {
+			if id := hasParentEllipsis(n, a, n.conjunctInfo); id != 0 {
 				a.removed = true
 			}
 			return true
@@ -774,6 +774,8 @@ type reqSet struct {
 	id     defID
 	parent defID
 	embed  defID // TODO(flatclose): can be removed later.
+	kind   defIDType
+
 	// once indicates that a reqSet closes only one level, i.e. closedness
 	// is the result of a close()
 	once bool
@@ -888,6 +890,7 @@ outer:
 			once:    once,
 			ignored: y.ignore,
 			embed:   y.embed,
+			kind:    y.kind,
 		})
 
 		if y.parent != 0 && !y.ignore {
@@ -956,9 +959,30 @@ func (n *nodeContext) filterTop(a *reqSets, conjuncts, parentConjuncts []conjunc
 		if (f.hasTop() && !f.hasStruct()) || f.forceOpen() {
 			return false
 		}
-		if !hasAny && hasParentEllipsis(n, a, parentConjuncts) {
-			a.removed = true
+
+		if hasAny && a.kind != defStruct {
+			// fast path.
+			return true
 		}
+
+		switch id := hasParentEllipsis(n, a, parentConjuncts); {
+		case id == 0:
+		case !hasAny:
+			a.removed = true
+		case a.kind != defStruct:
+			// The following logic should only apply to non-structs.
+		default:
+			hasAny = false
+			for _, c := range conjuncts {
+				if n.containsDefID(id, c.id) {
+					hasAny = true
+				}
+			}
+			if !hasAny {
+				a.removed = true
+			}
+		}
+
 		return true
 	})
 	return openLevel
@@ -970,16 +994,16 @@ func (n *nodeContext) filterTop(a *reqSets, conjuncts, parentConjuncts []conjunc
 // TODO: this is currently called twice. Consider an approach where we only need
 // to filter this once for each node. Luckily we can avoid quadratic checks
 // for any conjunct that is not an ellipsis, which is most.
-func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) bool {
+func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) defID {
 	for _, c := range conjuncts {
 		if !c.flags.hasEllipsis() {
 			continue
 		}
 		if n.containsDefID(a.id, c.id) {
-			return true
+			return c.id
 		}
 	}
-	return false
+	return 0
 }
 
 func (n *nodeContext) filterNonRecursive(a *reqSets) {

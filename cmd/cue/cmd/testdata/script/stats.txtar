@@ -24,10 +24,6 @@ cmp stderr out/stderr
 
 # Check that CUE_EXPERIMENT=evalv3 works, and EvalVersion reports the correct value.
 env CUE_STATS_FILE=-
-env CUE_EXPERIMENT=evalv3=0
-exec cue eval x.cue
-stderr -count=1 '"EvalVersion": 2,'
-env CUE_EXPERIMENT=evalv3=1
 exec cue eval x.cue
 stderr -count=1 '"EvalVersion": 3,'
 

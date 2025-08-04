@@ -26,7 +26,7 @@ command: env: {
 	}
 }
 
-// Should fail when the MYTEXT env var is set, but evalv2 did not fail.
+// Should fail when the MYTEXT env var is set.
 command: issue3908: {
 	env: os.Environ
 	_mytext: env.MYTEXT | "fallback"

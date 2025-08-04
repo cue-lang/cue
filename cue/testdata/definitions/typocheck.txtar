@@ -536,6 +536,62 @@ nestedEllipsis: nestedWithPatterns: {
 		objs?: _
 	}
 }
+issue4015: reduced: {
+	#X: { ... }
+	out: {
+		// Embedded schema allows `a: _`. Adding `a` below should not change that.
+		#X
+		a: b: string
+	}
+	out: {
+		a: {
+			c: "h"
+			b: "x"
+		}
+	}
+}
+issue4015: nested: {
+	#X: { foo: {...} }
+	out: {
+		#X
+		foo: a: b: string
+	}
+	out: {
+		foo: a: {
+			c: "h"
+			b: "x"
+		}
+	}
+}
+issue4015: full: {
+	#Schema: {
+		cfg: {
+			foo: {
+				enabled:    bool | *false
+				fooField: string
+			}
+			bar: barField: string
+		}
+		capacity: int | *3
+	}
+
+	#MoreCapacity: {
+		capacity: 30
+		...
+	}
+
+	out: #Schema
+	out: {
+		#MoreCapacity
+		cfg: foo: enabled: true
+	}
+	out: {
+		cfg: {
+			foo: fooField: "h"
+			bar: barField: "x"
+		}
+	}
+}
 -- issue3964.cue --
 issue3964: reduced: {
 	#Output: { #Embedded }
@@ -571,19 +627,19 @@ issue4006: {
 }
 -- out/evalalpha/stats --
 Leaks:  11
-Freed:  870
-Reused: 810
-Allocs: 71
+Freed:  912
+Reused: 851
+Allocs: 72
 Retain: 0
 
-Unifications: 722
-Conjuncts:    1450
-Disjuncts:    76
+Unifications: 756
+Conjuncts:    1520
+Disjuncts:    84
 Notifications: 8
 
-NumCloseIDs: 435
+NumCloseIDs: 445
 
-ConjunctInfos:       1056
+ConjunctInfos:       1109
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2
@@ -593,43 +649,43 @@ diff old new
 +++ new
 @@ -1,11 +1,17 @@
 -Leaks:  47
--Freed:  960
--Reused: 946
+-Freed:  1002
+-Reused: 988
 -Allocs: 61
 -Retain: 227
 -
--Unifications: 895
--Conjuncts:    1959
--Disjuncts:    1167
+-Unifications: 929
+-Conjuncts:    2032
+-Disjuncts:    1209
 -
 -NumCloseIDs: 3
 +Leaks:  11
-+Freed:  870
-+Reused: 810
-+Allocs: 71
++Freed:  912
++Reused: 851
++Allocs: 72
 +Retain: 0
 +
-+Unifications: 722
-+Conjuncts:    1450
-+Disjuncts:    76
++Unifications: 756
++Conjuncts:    1520
++Disjuncts:    84
 +Notifications: 8
 +
-+NumCloseIDs: 435
++NumCloseIDs: 445
 +
-+ConjunctInfos:       1056
++ConjunctInfos:       1109
 +MaxConjunctInfos:    5
 +MaxReqSets:          9
 +MaxRedirect:         2
 -- out/eval/stats --
 Leaks:  47
-Freed:  960
-Reused: 946
+Freed:  1002
+Reused: 988
 Allocs: 61
 Retain: 227
 
-Unifications: 895
-Conjuncts:    1959
-Disjuncts:    1167
+Unifications: 929
+Conjuncts:    2032
+Disjuncts:    1209
 
 NumCloseIDs: 3
 -- out/evalalpha --
@@ -665,6 +721,16 @@ issue3947.full.out.disallowed: field not allowed:
 issue3957.reduced.c.a: field not allowed:
     ./disjunction.cue:9:5
     ./disjunction.cue:10:11
+issue4015.full.out.cfg.bar: field not allowed:
+    ./ellipsis.cue:56:4
+    ./ellipsis.cue:74:4
+issue4015.full.out.cfg.foo.fooField: field not allowed:
+    ./ellipsis.cue:54:5
+    ./ellipsis.cue:73:9
+issue4015.nested.out.foo.a.c: field not allowed:
+    ./ellipsis.cue:44:4
+issue4015.reduced.out.a.c: field not allowed:
+    ./ellipsis.cue:31:4
 embed.normalValidator.x.err: field not allowed:
     ./validators.cue:8:3
     ./validators.cue:13:5
@@ -842,6 +908,90 @@ Result:
         }
         objs?: (#struct){
         }
+      }
+    }
+  }
+  issue4015: (_|_){
+    // [eval]
+    reduced: (_|_){
+      // [eval]
+      #X: (#struct){
+      }
+      out: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval]
+          b: (string){ "x" }
+          c: (_|_){
+            // [eval] issue4015.reduced.out.a.c: field not allowed:
+            //     ./ellipsis.cue:31:4
+          }
+        }
+      }
+    }
+    nested: (_|_){
+      // [eval]
+      #X: (#struct){
+        foo: (#struct){
+        }
+      }
+      out: (_|_){
+        // [eval]
+        foo: (_|_){
+          // [eval]
+          a: (_|_){
+            // [eval]
+            b: (string){ "x" }
+            c: (_|_){
+              // [eval] issue4015.nested.out.foo.a.c: field not allowed:
+              //     ./ellipsis.cue:44:4
+            }
+          }
+        }
+      }
+    }
+    full: (_|_){
+      // [eval]
+      #Schema: (#struct){
+        cfg: (#struct){
+          foo: (#struct){
+            enabled: (bool){ |(*(bool){ false }, (bool){ bool }) }
+            fooField: (string){ string }
+          }
+          bar: (#struct){
+            barField: (string){ string }
+          }
+        }
+        capacity: (int){ |(*(int){ 3 }, (int){ int }) }
+      }
+      #MoreCapacity: (#struct){
+        capacity: (int){ 30 }
+      }
+      out: (_|_){
+        // [eval]
+        cfg: (_|_){
+          // [eval]
+          foo: (_|_){
+            // [eval]
+            enabled: (bool){ true }
+            fooField: (_|_){
+              // [eval] issue4015.full.out.cfg.foo.fooField: field not allowed:
+              //     ./ellipsis.cue:54:5
+              //     ./ellipsis.cue:73:9
+            }
+          }
+          bar: (_|_){
+            // [eval] issue4015.full.out.cfg.bar: field not allowed:
+            //     ./ellipsis.cue:56:4
+            //     ./ellipsis.cue:74:4
+            barField: (_|_){
+              // [eval] issue4015.full.out.cfg.bar.barField: field not allowed:
+              //     ./ellipsis.cue:56:9
+              //     ./ellipsis.cue:74:9
+            }
+          }
+        }
+        capacity: (int){ 30 }
       }
     }
   }
@@ -1875,7 +2025,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,95 +1,38 @@
+@@ -1,95 +1,48 @@
  Errors:
  and.transitive.err.out.err: field not allowed:
 -    ./in.cue:42:5
@@ -1971,13 +2121,23 @@ diff old new
 -    ./validators.cue:16:6
 -    ./validators.cue:21:5
 -    ./validators.cue:22:5
++issue4015.full.out.cfg.bar: field not allowed:
++    ./ellipsis.cue:56:4
++    ./ellipsis.cue:74:4
++issue4015.full.out.cfg.foo.fooField: field not allowed:
++    ./ellipsis.cue:54:5
++    ./ellipsis.cue:73:9
++issue4015.nested.out.foo.a.c: field not allowed:
++    ./ellipsis.cue:44:4
++issue4015.reduced.out.a.c: field not allowed:
++    ./ellipsis.cue:31:4
 +embed.normalValidator.x.err: field not allowed:
 +    ./validators.cue:8:3
 +    ./validators.cue:13:5
  embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
      ./validators.cue:25:5
      ./validators.cue:25:12
-@@ -102,14 +45,12 @@
+@@ -102,14 +55,12 @@
    issue3920: (struct){
      out: (#struct){
        a: (#struct){
@@ -1997,7 +2157,7 @@ diff old new
      }
      #B: (#struct){
        c?: (string){ string }
-@@ -163,10 +104,7 @@
+@@ -163,10 +114,7 @@
          allowed?: (string){ string }
          disallowed: (_|_){
            // [eval] issue3947.full.out.disallowed: field not allowed:
@@ -2008,7 +2168,7 @@ diff old new
          }
        }
      }
-@@ -178,15 +116,9 @@
+@@ -178,15 +126,9 @@
        c: (_|_){
          // [eval]
          a: (_|_){
@@ -2025,7 +2185,7 @@ diff old new
          }
          b?: (string){ string }
        }
-@@ -259,9 +191,6 @@
+@@ -259,9 +201,6 @@
      }
      nestedWithPatterns: (struct){
        out: (#struct){
@@ -2035,7 +2195,7 @@ diff old new
          objs: (#struct){
            obj1: (#struct){
              extra: (string){ "foo" }
-@@ -268,6 +197,9 @@
+@@ -268,6 +207,9 @@
              name?: (int){ int }
            }
          }
@@ -2045,7 +2205,115 @@ diff old new
        }
        #Schema: (#struct){
          #meta: (#struct){
-@@ -358,14 +290,11 @@
+@@ -278,32 +220,47 @@
+       }
+     }
+   }
+-  issue4015: (struct){
+-    reduced: (struct){
+-      #X: (#struct){
+-      }
+-      out: (#struct){
+-        a: (struct){
++  issue4015: (_|_){
++    // [eval]
++    reduced: (_|_){
++      // [eval]
++      #X: (#struct){
++      }
++      out: (_|_){
++        // [eval]
++        a: (_|_){
++          // [eval]
+           b: (string){ "x" }
+-          c: (string){ "h" }
+-        }
+-      }
+-    }
+-    nested: (struct){
+-      #X: (#struct){
+-        foo: (#struct){
+-        }
+-      }
+-      out: (#struct){
+-        foo: (#struct){
+-          a: (struct){
++          c: (_|_){
++            // [eval] issue4015.reduced.out.a.c: field not allowed:
++            //     ./ellipsis.cue:31:4
++          }
++        }
++      }
++    }
++    nested: (_|_){
++      // [eval]
++      #X: (#struct){
++        foo: (#struct){
++        }
++      }
++      out: (_|_){
++        // [eval]
++        foo: (_|_){
++          // [eval]
++          a: (_|_){
++            // [eval]
+             b: (string){ "x" }
+-            c: (string){ "h" }
+-          }
+-        }
+-      }
+-    }
+-    full: (struct){
++            c: (_|_){
++              // [eval] issue4015.nested.out.foo.a.c: field not allowed:
++              //     ./ellipsis.cue:44:4
++            }
++          }
++        }
++      }
++    }
++    full: (_|_){
++      // [eval]
+       #Schema: (#struct){
+         cfg: (#struct){
+           foo: (#struct){
+@@ -319,14 +276,28 @@
+       #MoreCapacity: (#struct){
+         capacity: (int){ 30 }
+       }
+-      out: (#struct){
+-        cfg: (#struct){
+-          foo: (#struct){
++      out: (_|_){
++        // [eval]
++        cfg: (_|_){
++          // [eval]
++          foo: (_|_){
++            // [eval]
+             enabled: (bool){ true }
+-            fooField: (string){ "h" }
+-          }
+-          bar: (#struct){
+-            barField: (string){ "x" }
++            fooField: (_|_){
++              // [eval] issue4015.full.out.cfg.foo.fooField: field not allowed:
++              //     ./ellipsis.cue:54:5
++              //     ./ellipsis.cue:73:9
++            }
++          }
++          bar: (_|_){
++            // [eval] issue4015.full.out.cfg.bar: field not allowed:
++            //     ./ellipsis.cue:56:4
++            //     ./ellipsis.cue:74:4
++            barField: (_|_){
++              // [eval] issue4015.full.out.cfg.bar.barField: field not allowed:
++              //     ./ellipsis.cue:56:9
++              //     ./ellipsis.cue:74:9
++            }
+           }
+         }
+         capacity: (int){ 30 }
+@@ -413,14 +384,11 @@
        }
        a: (_|_){
          // [eval]
@@ -2061,7 +2329,7 @@ diff old new
        }
      }
      andInStruct: (_|_){
-@@ -375,14 +304,11 @@
+@@ -430,14 +398,11 @@
        }
        a: (_|_){
          // [eval]
@@ -2077,7 +2345,7 @@ diff old new
        }
      }
      embedDefWithEmbedding: (_|_){
-@@ -392,15 +318,11 @@
+@@ -447,15 +412,11 @@
        }
        a: (_|_){
          // [eval]
@@ -2094,7 +2362,7 @@ diff old new
        }
      }
      embedComprehension: (_|_){
-@@ -410,16 +332,11 @@
+@@ -465,16 +426,11 @@
        }
        a: (_|_){
          // [eval]
@@ -2112,7 +2380,7 @@ diff old new
        }
      }
      fieldWithAnd: (_|_){
-@@ -430,9 +347,6 @@
+@@ -485,9 +441,6 @@
          // [eval]
          err: (_|_){
            // [eval] embed.fieldWithAnd.a.err: field not allowed:
@@ -2122,7 +2390,7 @@ diff old new
            //     ./in.cue:20:13
          }
        }
-@@ -443,20 +357,15 @@
+@@ -498,20 +451,15 @@
          a: (int){ int }
        }
        B: (struct){
@@ -2148,7 +2416,7 @@ diff old new
        }
      }
      andEmbed: (_|_){
-@@ -472,17 +381,11 @@
+@@ -527,17 +475,11 @@
        }
        d: (_|_){
          // [eval]
@@ -2167,7 +2435,7 @@ diff old new
        }
      }
      nonDef: (struct){
-@@ -491,12 +394,12 @@
+@@ -546,12 +488,12 @@
            a: (string){ string }
          }
          #Y: (#struct){
@@ -2184,7 +2452,7 @@ diff old new
          }
        }
      }
-@@ -506,12 +409,12 @@
+@@ -561,12 +503,12 @@
            Name: (string){ string }
          }
          #Step: (#struct){
@@ -2201,7 +2469,7 @@ diff old new
          }
          out: (#struct){
            Name: (string){ "foo" }
-@@ -521,21 +424,15 @@
+@@ -576,21 +518,15 @@
      }
      withIndirect: (_|_){
        // [eval]
@@ -2228,7 +2496,7 @@ diff old new
      }
      normalValidator: (_|_){
        // [eval]
-@@ -545,20 +442,18 @@
+@@ -600,20 +536,18 @@
        }
        x: (_|_){
          // [eval]
@@ -2253,7 +2521,7 @@ diff old new
          #X: (_){
            matchN(0, (#list){
            })
-@@ -565,17 +460,10 @@
+@@ -620,17 +554,10 @@
            a?: (int){ int }
            b?: (int){ int }
          }
@@ -2275,7 +2543,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -594,10 +482,7 @@
+@@ -649,10 +576,7 @@
            // [eval]
            b: (_|_){
              // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
@@ -2286,7 +2554,7 @@ diff old new
              //     ./validators.cue:28:8
              // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
              //     ./validators.cue:25:5
-@@ -654,16 +539,11 @@
+@@ -709,16 +633,11 @@
          }
          out: (_|_){
            // [eval]
@@ -2304,7 +2572,7 @@ diff old new
          }
        }
      }
-@@ -696,17 +576,11 @@
+@@ -751,17 +670,11 @@
          }
          out: (_|_){
            // [eval]
@@ -2323,7 +2591,7 @@ diff old new
          }
        }
      }
-@@ -752,8 +626,8 @@
+@@ -807,8 +720,8 @@
              //     ./issue3832.cue:8:16
            }
            outFirstName: (_|_){
@@ -2334,7 +2602,7 @@ diff old new
            }
          }
        }
-@@ -763,35 +637,27 @@
+@@ -818,35 +731,27 @@
          }, (#struct){
            pass: (#struct){
              let self#2 = (_|_){
@@ -2380,7 +2648,7 @@ diff old new
        pass: (#struct){
          let self#2 = (#struct){
            firstName: (string){ "Sam" }
-@@ -798,20 +664,24 @@
+@@ -853,20 +758,24 @@
          }
          outFirstName: (string){ "Sam" }
        }
@@ -2419,7 +2687,7 @@ diff old new
      ok: (struct){
        out: (#struct){
          a: (#struct){
-@@ -832,11 +702,18 @@
+@@ -887,11 +796,18 @@
          b: (string){ "foo" }
        }
      }
@@ -2443,7 +2711,7 @@ diff old new
          }
        }
        #A: (#struct){
-@@ -907,12 +784,8 @@
+@@ -962,12 +878,8 @@
          globalField: (string){ string }
        }
        #Context: (#struct){
@@ -2458,7 +2726,7 @@ diff old new
        }
        out: (struct){
          ingress: (#struct){
-@@ -940,22 +813,22 @@
+@@ -995,22 +907,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2497,7 +2765,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -965,22 +838,22 @@
+@@ -1020,22 +932,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2536,7 +2804,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -995,11 +868,7 @@
+@@ -1050,11 +962,7 @@
          }
        }
        #JobConfig: (#struct){
@@ -2549,7 +2817,7 @@ diff old new
          job: (#struct){
            image: (string){ "foo:v1" }
            vcs: (string){ "git" }
-@@ -1063,7 +932,7 @@
+@@ -1118,7 +1026,7 @@
          }
        }
        out: (#struct){
@@ -2558,7 +2826,7 @@ diff old new
            input: (#struct){
              image: (string){ "someimage" }
              env: (string){ "FOO" }
-@@ -1095,11 +964,11 @@
+@@ -1150,11 +1058,11 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2575,7 +2843,7 @@ diff old new
            e: (string){ "foo" }
            f: (int){ 1 }
          }
-@@ -1132,24 +1001,16 @@
+@@ -1187,24 +1095,16 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2610,7 +2878,7 @@ diff old new
      }
    }
    issue3934: (struct){
-@@ -1236,7 +1097,7 @@
+@@ -1291,7 +1191,7 @@
            op: (string){ "add" }
            path: (string){ "/metadata" }
            value: (_|_){
@@ -2619,7 +2887,7 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -1265,38 +1126,11 @@
+@@ -1320,38 +1220,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -2660,7 +2928,7 @@ diff old new
          let base#7 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -1315,7 +1149,7 @@
+@@ -1370,7 +1243,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
                value: (_|_){
@@ -2669,7 +2937,7 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
-@@ -1339,6 +1173,19 @@
+@@ -1394,6 +1267,19 @@
              }
            }
          }
@@ -2689,7 +2957,7 @@ diff old new
        }
      }
      out: (#struct){
-@@ -1368,17 +1215,8 @@
+@@ -1423,17 +1309,8 @@
              //     ./validators.cue:36:17
              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
              //     ./validators.cue:33:22
@@ -2995,6 +3263,61 @@ Result:
         }
         objs?: (#struct){
         }
+      }
+    }
+  }
+  issue4015: (struct){
+    reduced: (struct){
+      #X: (#struct){
+      }
+      out: (#struct){
+        a: (struct){
+          b: (string){ "x" }
+          c: (string){ "h" }
+        }
+      }
+    }
+    nested: (struct){
+      #X: (#struct){
+        foo: (#struct){
+        }
+      }
+      out: (#struct){
+        foo: (#struct){
+          a: (struct){
+            b: (string){ "x" }
+            c: (string){ "h" }
+          }
+        }
+      }
+    }
+    full: (struct){
+      #Schema: (#struct){
+        cfg: (#struct){
+          foo: (#struct){
+            enabled: (bool){ |(*(bool){ false }, (bool){ bool }) }
+            fooField: (string){ string }
+          }
+          bar: (#struct){
+            barField: (string){ string }
+          }
+        }
+        capacity: (int){ |(*(int){ 3 }, (int){ int }) }
+      }
+      #MoreCapacity: (#struct){
+        capacity: (int){ 30 }
+      }
+      out: (#struct){
+        cfg: (#struct){
+          foo: (#struct){
+            enabled: (bool){ true }
+            fooField: (string){ "h" }
+          }
+          bar: (#struct){
+            barField: (string){ "x" }
+          }
+        }
+        capacity: (int){ 30 }
       }
     }
   }
@@ -4294,6 +4617,89 @@ Result:
           name?: int
         }
         objs?: _
+      }
+    }
+  }
+  issue4015: {
+    reduced: {
+      #X: {
+        ...
+      }
+      out: {
+        〈1;#X〉
+        a: {
+          b: string
+        }
+      }
+      out: {
+        a: {
+          c: "h"
+          b: "x"
+        }
+      }
+    }
+  }
+  issue4015: {
+    nested: {
+      #X: {
+        foo: {
+          ...
+        }
+      }
+      out: {
+        〈1;#X〉
+        foo: {
+          a: {
+            b: string
+          }
+        }
+      }
+      out: {
+        foo: {
+          a: {
+            c: "h"
+            b: "x"
+          }
+        }
+      }
+    }
+  }
+  issue4015: {
+    full: {
+      #Schema: {
+        cfg: {
+          foo: {
+            enabled: (bool|*false)
+            fooField: string
+          }
+          bar: {
+            barField: string
+          }
+        }
+        capacity: (int|*3)
+      }
+      #MoreCapacity: {
+        capacity: 30
+        ...
+      }
+      out: 〈0;#Schema〉
+      out: {
+        〈1;#MoreCapacity〉
+        cfg: {
+          foo: {
+            enabled: true
+          }
+        }
+      }
+      out: {
+        cfg: {
+          foo: {
+            fooField: "h"
+          }
+          bar: {
+            barField: "x"
+          }
+        }
       }
     }
   }

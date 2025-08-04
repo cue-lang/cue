@@ -3005,9 +3005,9 @@ field1 is an int.
 		}, {
 			val:  v1,
 			path: "baz field1",
-			doc: `comment from bar on field 1
+			doc: `comment from baz on field 1
 
-comment from baz on field 1
+comment from bar on field 1
 `,
 			// New evaluaotor orders the comments differently (arguably better).
 			skip: true,
@@ -3030,7 +3030,7 @@ Another Foo.
 		}}
 		for _, tc := range testCases {
 			if tc.skip {
-				m.TODO_V3(t) // P2: reordering
+				m.SKIP_V2(t) // P2: reordering
 			}
 			t.Run("field:"+tc.path, func(t *testing.T) {
 				v := tc.val.Lookup(strings.Split(tc.path, " ")...)
@@ -3189,7 +3189,7 @@ func TestMarshalJSON(t *testing.T) {
 	}, {
 		// Issue #326
 		value: `x: "\(string)": "v"`,
-		err:   `x: invalid interpolation`,
+		err:   `x: key value of dynamic field must be concrete, found _|_(invalid interpolation: x: non-concrete value string (type string)) (and 1 more errors)`,
 	}, {
 		// Issue #326
 		value: `x: "\(bool)": "v"`,
@@ -3232,7 +3232,7 @@ func TestMarshalJSON(t *testing.T) {
 	}}
 	for i, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, m *cuetdtest.M) {
-			m.TODO_V3(t) // P1: wrong output
+			m.SKIP_V2(t)
 
 			val := getValue(m, tc.value)
 			b, err := val.MarshalJSON()

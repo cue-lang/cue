@@ -94,7 +94,7 @@ func (m Matrix) Do(t *testing.T, f func(t *testing.T, m *M)) {
 	}
 }
 
-func (m *M) TODO_V2(t testing.TB) {
+func (m *M) SKIP_V2(t testing.TB) {
 	if m.version == internal.EvalV2 {
 		t.Skip("Skipping v2")
 	}

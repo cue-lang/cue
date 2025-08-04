@@ -36,7 +36,7 @@ func TestValidate(t *testing.T) {
 		lookup string
 		cfg    *adt.ValidateConfig
 
-		todo_v3 bool
+		skip_v2 bool
 	}
 	testCases := []testCase{{
 		name: "no error, but not concrete, even with definition label",
@@ -119,7 +119,7 @@ y: conflicting values 4 and 2:
 		`,
 	}, {
 		// TODO: different error position
-		todo_v3: true,
+		skip_v2: true,
 
 		name: "disallow cycle",
 		cfg:  &adt.ValidateConfig{DisallowCycles: true},
@@ -127,18 +127,18 @@ y: conflicting values 4 and 2:
 		y: x + 1
 		x: y - 1
 		`,
-		out: "cycle\ncycle error:\n    test:2:6",
+		out: "cycle\ny: cycle with field: x:\n    test:2:6\nx: cycle with field: y:\n    test:3:6",
 	}, {
-		// TODO: different error position
-		todo_v3: true,
+		skip_v2: true,
 
+		// TODO: different error position
 		name: "disallow cycle",
 		cfg:  &adt.ValidateConfig{DisallowCycles: true},
 		in: `
 		a: b - 100
 		b: a + 100
 		c: [c[1], c[0]]		`,
-		out: "cycle\ncycle error:\n    test:2:6",
+		out: "cycle\na: cycle with field: b:\n    test:2:6\nb: cycle with field: a:\n    test:3:6",
 	}, {
 		name: "treat cycles as incomplete when not disallowing",
 		cfg:  &adt.ValidateConfig{},
@@ -268,9 +268,10 @@ y: conflicting values 4 and 2:
 			#Def: a: x!: int
 			b: #Def
 			`,
-		out: "incomplete\nb.a.x: field is required but not present:\n    test:2:13\n    test:3:7",
+		// TODO: \n    test:3:7",
+		out: "incomplete\nb.a.x: field is required but not present:\n    test:2:13",
 
-		todo_v3: true, // missing position
+		skip_v2: true, // missing position
 	}, {
 		// Issue #3864: issue resulting from structure sharing.
 		name: "attribute incomplete values in definitions to concrete path",
@@ -293,8 +294,8 @@ y: conflicting values 4 and 2:
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
-		if tc.todo_v3 {
-			t.M.TODO_V3(t) // P1: cycle error missing? Other error.
+		if tc.skip_v2 {
+			t.M.SKIP_V2(t) // skip
 		}
 		r := t.M.Runtime()
 		ctx := eval.NewContext(r, nil)

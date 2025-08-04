@@ -1258,7 +1258,7 @@ func TestValues(t *testing.T) {
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *subsumeTest) {
 		t.Update(cuetest.UpdateGoldenFiles)
-		t.M.TODO_V2(t)
+		t.M.SKIP_V2(t)
 
 		if tc.in == "" {
 			t.Skip("empty test case")

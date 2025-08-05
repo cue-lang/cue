@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf442493_5c8baec6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-08-05T13:04:43Z",
+      "side": 1,
+      "message": "Excellent explanation, thank you.",
+      "revId": "4c2a54d6fe15bbcb7eb3a4fdc3d25518907164ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

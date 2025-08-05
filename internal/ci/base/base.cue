@@ -88,6 +88,13 @@ linuxMachine: string | *linuxSmallMachine
 macosMachine:   string | *"ns-macos-arm64"
 windowsMachine: string | *"ns-windows-amd64"
 
+// Append this suffix to "runs-on" to prevent workflows from sharing the default caches
+// for the repository and runner profile. For example, this is useful so that
+// a "tip_triggers" workflow on the cue repo to push to rebuild tip.cuelang.org
+// does not share cache volumes with the main "trybot" workflow, which makes much heavier
+// use of the cache. Mixing the two would lead to less effective cache updates.
+overrideCacheTagDispatch: ";overrides.cache-tag=cue-dispatch-workflow"
+
 // Use the latest Go version for extra checks,
 // such as running tests with the data race detector.
 latestGo: "1.24.x"

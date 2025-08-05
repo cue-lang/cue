@@ -16,7 +16,6 @@ package subsume_test
 
 import (
 	"regexp"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -44,8 +43,6 @@ func TestValues(t *testing.T) {
 		err  string
 		in   string
 		mode int
-
-		skip_v2 bool // Bug only exists in v2. Won't fix.
 	}
 	testCases := []subsumeTest{
 		// Top subsumes everything
@@ -89,65 +86,65 @@ func TestValues(t *testing.T) {
 		// Nothing besides top subsumed top
 		9: {
 			in:  `a: null,    b: _`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		10: {
 			in:  `a: int, b: _`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		11: {
 			in:  `a: 1,       b: _`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		12: {
 			in:  `a: float, b: _`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		13: {
 			in:  `a: "s",     b: _`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		14: {
 			in:  `a: {},      b: _`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		15: {
 			in:  `a: [],      b: _`,
-			err: "subsumption failed",
+			err: "list does not subsume _ (type _) (and 1 more errors)",
 		},
 		16: {
 			in:  `a: _|_ ,      b: _`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		// Bottom subsumes nothing except bottom itself.
 		17: {
 			in:  `a: _|_, b: null `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		18: {
 			in:  `a: _|_, b: int `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		19: {
 			in:  `a: _|_, b: 1 `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		20: {
 			in:  `a: _|_, b: float `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		21: {
 			in:  `a: _|_, b: "s" `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		22: {
 			in:  `a: _|_, b: {} `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		23: {
 			in:  `a: _|_, b: [] `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		24: {
 			in:  ` a: _|_, b: _|_ `,
@@ -199,11 +196,11 @@ func TestValues(t *testing.T) {
 		},
 		35: {
 			in:  `a: null, b: 1 `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		36: {
 			in:  `a: 1,    b: null `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		37: {
@@ -212,7 +209,7 @@ func TestValues(t *testing.T) {
 		},
 		38: {
 			in:  `a: true, b: false `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		39: {
@@ -221,7 +218,7 @@ func TestValues(t *testing.T) {
 		},
 		40: {
 			in:  `a: "a",    b: "b" `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		41: {
 			in:  ` a: string, b: "a" `,
@@ -229,7 +226,7 @@ func TestValues(t *testing.T) {
 		},
 		42: {
 			in:  `a: "a",    b: string `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		// Number typing (TODO)
@@ -271,15 +268,15 @@ func TestValues(t *testing.T) {
 		},
 		46: {
 			in:  `a: 1.0, b: 1 `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		47: {
 			in:  `a: 1, b: 1.0 `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		48: {
 			in:  `a: 3, b: 3.0`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		49: {
 			in:  `a: int, b: 1`,
@@ -295,11 +292,11 @@ func TestValues(t *testing.T) {
 		},
 		52: {
 			in:  `a: float, b: 1`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		53: {
 			in:  `a: int, b: 1.0`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		54: {
 			in:  `a: int, b: int`,
@@ -340,15 +337,15 @@ func TestValues(t *testing.T) {
 
 		70: {
 			in:  `a: {a:1}, b: {}`,
-			err: "subsumption failed",
+			err: "regular field is constraint in subsumed value: a (and 1 more errors)",
 		},
 		71: {
 			in:  `a: {a:1, b:1}, b: {a:1}`,
-			err: "subsumption failed",
+			err: "regular field is constraint in subsumed value: b (and 1 more errors)",
 		},
 		72: {
 			in:  `a: {s: { a:1} }, b: { s: {}}`,
-			err: "subsumption failed",
+			err: "regular field is constraint in subsumed value: a (and 2 more errors)",
 		},
 
 		84: {
@@ -370,7 +367,7 @@ func TestValues(t *testing.T) {
 		},
 		88: {
 			in:  `a: int, b: 1 | 2 | 3.1`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		89: {
@@ -380,7 +377,7 @@ func TestValues(t *testing.T) {
 
 		90: {
 			in:  `a: int, b: 1 | 2 | 3.1`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		91: {
 			in:  `a: 1 | 2, b: 1`,
@@ -392,7 +389,7 @@ func TestValues(t *testing.T) {
 		},
 		93: {
 			in:  `a: 1 | 2, b: 3`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		// 147: {subsumes: true, in: ` a: 7080, b: *7080 | int`, mode: subChoose},
@@ -400,7 +397,7 @@ func TestValues(t *testing.T) {
 		// Defaults
 		150: {
 			in:  `a: number | *1, b: number | *2`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		151: {
 			in:  `a: number | *2, b: number | *2`,
@@ -412,7 +409,7 @@ func TestValues(t *testing.T) {
 		},
 		153: {
 			in:  `a: int | *2, b: int | *2.0`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		154: {
 			in:  `a: number | *2 | *3, b: number | *2`,
@@ -446,7 +443,7 @@ func TestValues(t *testing.T) {
 		},
 		175: {
 			in:  `a: >1, b: >=1`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		176: {
 			in:  `a: >=1, b: >=1`,
@@ -462,7 +459,7 @@ func TestValues(t *testing.T) {
 		},
 		179: {
 			in:  `a: <1, b: <=1`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		180: {
 			in:  `a: <=1, b: <=1`,
@@ -475,12 +472,12 @@ func TestValues(t *testing.T) {
 		},
 		182: {
 			in:  `a: !=1, b: !=2`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		183: {
 			in:  `a: !=1, b: <=1`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		184: {
 			in:  `a: !=1, b: <1`,
@@ -488,7 +485,7 @@ func TestValues(t *testing.T) {
 		},
 		185: {
 			in:  `a: !=1, b: >=1`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		186: {
 			in:  `a: !=1, b: <1`,
@@ -510,19 +507,19 @@ func TestValues(t *testing.T) {
 
 		195: {
 			in:  `a: >=2, b: !=2`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		196: {
 			in:  `a: >2, b: !=2`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		197: {
 			in:  `a: <2, b: !=2`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		198: {
 			in:  `a: <=2, b: !=2`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		200: {
@@ -531,11 +528,11 @@ func TestValues(t *testing.T) {
 		},
 		201: {
 			in:  `a: =~"foo", b: =~"bar"`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		202: {
 			in:  `a: =~"foo1", b: =~"foo"`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		203: {
@@ -544,22 +541,22 @@ func TestValues(t *testing.T) {
 		},
 		204: {
 			in:  `a: !~"foo", b: !~"bar"`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		205: {
 			in:  `a: !~"foo", b: !~"foo1"`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		// The following is could be true, but we will not go down the rabbit
 		// hold of trying to prove subsumption of regular expressions.
 		210: {
 			in:  `a: =~"foo", b: =~"foo1"`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		211: {
 			in:  `a: !~"foo1", b: !~"foo"`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		220: {
@@ -568,7 +565,7 @@ func TestValues(t *testing.T) {
 		},
 		221: {
 			in:  `a: <5, b: 5`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		222: {
 			in:  `a: <=5, b: 5`,
@@ -576,7 +573,7 @@ func TestValues(t *testing.T) {
 		},
 		223: {
 			in:  `a: <=5.0, b: 5.00000001`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		224: {
 			in:  `a: >5, b: 6`,
@@ -584,7 +581,7 @@ func TestValues(t *testing.T) {
 		},
 		225: {
 			in:  `a: >5, b: 5`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		226: {
 			in:  `a: >=5, b: 5`,
@@ -592,7 +589,7 @@ func TestValues(t *testing.T) {
 		},
 		227: {
 			in:  `a: >=5, b: 4`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		228: {
 			in:  `a: !=5, b: 6`,
@@ -600,15 +597,15 @@ func TestValues(t *testing.T) {
 		},
 		229: {
 			in:  `a: !=5, b: 5`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		230: {
 			in:  `a: !=5.0, b: 5.0`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		231: {
 			in:  `a: !=5.0, b: 5`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		250: {
@@ -617,7 +614,7 @@ func TestValues(t *testing.T) {
 		},
 		251: {
 			in:  `a: =~ #"^\d{3}$"#, b: "1234"`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		252: {
 			in:  `a: !~ #"^\d{3}$"#, b: "1234"`,
@@ -625,7 +622,7 @@ func TestValues(t *testing.T) {
 		},
 		253: {
 			in:  `a: !~ #"^\d{3}$"#, b: "123"`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		// Conjunctions
@@ -635,7 +632,7 @@ func TestValues(t *testing.T) {
 		},
 		301: {
 			in:  `a: >0, b: >=0 & <=100`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		310: {
@@ -648,7 +645,7 @@ func TestValues(t *testing.T) {
 		},
 		312: {
 			in:  `a: !=2 & !=4, b: >3`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		313: {
 			in:  `a: !=2 & !=4, b: >5`,
@@ -657,7 +654,7 @@ func TestValues(t *testing.T) {
 
 		314: {
 			in:  `a: >=0 & <=100, b: >=0 & <=150`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		315: {
 			in:  `a: >=0 & <=150, b: >=0 & <=100`,
@@ -671,7 +668,7 @@ func TestValues(t *testing.T) {
 		},
 		331: {
 			in:  `a: >8, b: >10 | 8`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		// Optional fields
@@ -684,11 +681,11 @@ func TestValues(t *testing.T) {
 		//
 		400: {
 			in:  `a: {foo: 1}, b: {}`,
-			err: "subsumption failed",
+			err: "regular field is constraint in subsumed value: foo (and 1 more errors)",
 		},
 		401: {
 			in:  `a: {foo?: 1}, b: {}`,
-			err: "subsumption failed",
+			err: "field foo not present in {} (and 1 more errors)",
 		},
 		402: {
 			in:  `a: {}, b: {foo: 1}`,
@@ -713,24 +710,24 @@ func TestValues(t *testing.T) {
 		},
 		407: {
 			in:  `a: {foo: 1}, b: {foo?: 1}`,
-			err: "subsumption failed",
+			err: "field foo not present in {foo?:1} (and 1 more errors)",
 		},
 
 		408: {
 			in:  `a: {foo: 1}, b: {foo: 2}`,
-			err: "subsumption failed",
+			err: "field foo not present in {foo:2} (and 1 more errors)",
 		},
 		409: {
 			in:  `a: {foo?: 1}, b: {foo: 2}`,
-			err: "subsumption failed",
+			err: "field foo not present in {foo:2} (and 1 more errors)",
 		},
 		410: {
 			in:  `a: {foo?: 1}, b: {foo?: 2}`,
-			err: "subsumption failed",
+			err: "field foo not present in {foo?:2} (and 1 more errors)",
 		},
 		411: {
 			in:  `a: {foo: 1}, b: {foo?: 2}`,
-			err: "subsumption failed",
+			err: "field foo not present in {foo?:2} (and 1 more errors)",
 		},
 
 		412: {
@@ -747,24 +744,24 @@ func TestValues(t *testing.T) {
 		},
 		415: {
 			in:  `a: {foo: number}, b: {foo?: 2}`,
-			err: "subsumption failed",
+			err: "field foo not present in {foo?:2} (and 1 more errors)",
 		},
 
 		416: {
 			in:  `a: {foo: 1}, b: {foo: number}`,
-			err: "subsumption failed",
+			err: "field foo not present in {foo:number} (and 1 more errors)",
 		},
 		417: {
 			in:  `a: {foo?: 1}, b: {foo: number}`,
-			err: "subsumption failed",
+			err: "field foo not present in {foo:number} (and 1 more errors)",
 		},
 		418: {
 			in:  `a: {foo?: 1}, b: {foo?: number}`,
-			err: "subsumption failed",
+			err: "field foo not present in {foo?:number} (and 1 more errors)",
 		},
 		419: {
 			in:  `a: {foo: 1}, b: {foo?: number}`,
-			err: "subsumption failed",
+			err: "field foo not present in {foo?:number} (and 1 more errors)",
 		},
 
 		// The one exception of the rule: there is no value of foo that can be
@@ -778,44 +775,39 @@ func TestValues(t *testing.T) {
 
 		430: {
 			in:  `a: {[_]: 4}, b: {[_]: int}`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		431: {
-			in:      `a: {[_]: int}, b: {[_]: 2}`,
-			skip_v2: true,
-			err:     "",
+			in:  `a: {[_]: int}, b: {[_]: 2}`,
+			err: "",
 		},
 		432: {
-			in:      `a: {[string]: int, [<"m"]: 3}, b: {[string]: 2, [<"m"]: 3}`,
-			skip_v2: true,
-			err:     "",
+			in:  `a: {[string]: int, [<"m"]: 3}, b: {[string]: 2, [<"m"]: 3}`,
+			err: "",
 		},
 		433: {
-			in:      `a: {[<"m"]: 3, [string]: int}, b: {[string]: 2, [<"m"]: 3}`,
-			skip_v2: true,
-			err:     "",
+			in:  `a: {[<"m"]: 3, [string]: int}, b: {[string]: 2, [<"m"]: 3}`,
+			err: "",
 		},
 		434: {
 			in:  `a: {[<"n"]: 3, [string]: int}, b: {[string]: 2, [<"m"]: 3}`,
-			err: "subsumption failed",
+			err: "value not an instance: inexact subsumption",
 		},
 		435: {
 			// both sides unify to a single string pattern.
-			in:      `a: {[string]: <5, [string]: int}, b: {[string]: <=3, [string]: 3}`,
-			skip_v2: true,
-			err:     "",
+			in:  `a: {[string]: <5, [string]: int}, b: {[string]: <=3, [string]: 3}`,
+			err: "",
 		},
 		436: {
 			// matches because bottom is subsumed by >5
-			in:      `a: {[string]: >5}, b: {[string]: 1, [string]: 2}`,
-			skip_v2: true,
-			err:     "",
+			in:  `a: {[string]: >5}, b: {[string]: 1, [string]: 2}`,
+			err: "",
 		},
 		437: {
 			// subsumption gives up if a has more pattern constraints than b.
 			// TODO: support this?
 			in:  `a: {[_]: >5, [>"b"]: int}, b: {[_]: 6}`,
-			err: "subsumption failed",
+			err: "value not an instance: inexact subsumption",
 		},
 		438: {
 			in:  `a: {}, b: {[_]: 6}`,
@@ -852,7 +844,7 @@ func TestValues(t *testing.T) {
 		},
 		463: {
 			in:  `a: {1, #foo: number}, b: {1, #foo?: 1}`,
-			err: "subsumption failed",
+			err: "field #foo not present in 1 (and 1 more errors)",
 		},
 
 		464: {
@@ -861,15 +853,15 @@ func TestValues(t *testing.T) {
 		},
 		465: {
 			in:  `a: {int, #foo: 1}, b: {1, #foo: number}`,
-			err: "subsumption failed",
+			err: "field #foo not present in 1 (and 1 more errors)",
 		},
 		466: {
 			in:  `a: {1, #foo: number}, b: {int, #foo: 1}`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		467: {
 			in:  `a: {1, #foo: 1}, b: {int, #foo: number}`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		// Lists
@@ -883,11 +875,11 @@ func TestValues(t *testing.T) {
 		},
 		508: {
 			in:  `a: [1], b: [2] `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		509: {
 			in:  `a: [1], b: [2, 3] `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		510: {
 			in:  `a: [{b: string}], b: [{b: "foo"}] `,
@@ -899,33 +891,33 @@ func TestValues(t *testing.T) {
 		},
 		512: {
 			in:  `a: [{b: "foo"}], b: [{b: string}] `,
-			err: "subsumption failed",
+			err: "field b not present in {b:string} (and 1 more errors)",
 		},
 		513: {
 			in:  `a: [{b: string}], b: [{b: "foo"}, ...{b: "foo"}] `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		520: {
 			in:  `a: [_, int, ...], b: [int, string, ...string] `,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		// Closed structs.
 		600: {
 			in:  `a: close({}), b: {a: 1}`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		601: {
 			in:  `a: close({a: 1}), b: {a: 1}`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		602: {
 			in:  `a: close({a: 1, b: 1}), b: {a: 1}`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		603: {
 			in:  `a: {a: 1}, b: close({})`,
-			err: "subsumption failed",
+			err: "regular field is constraint in subsumed value: a (and 1 more errors)",
 		},
 		604: {
 			in:  `a: {a: 1}, b: close({a: 1})`,
@@ -941,7 +933,7 @@ func TestValues(t *testing.T) {
 		},
 		607: {
 			in:  `a: close({b: 1}), b: close({b?: 1})`,
-			err: "subsumption failed",
+			err: "field b not present in {b?:1} (and 1 more errors)",
 		},
 		608: {
 			in:  `a: {}, b: close({})`,
@@ -959,7 +951,7 @@ func TestValues(t *testing.T) {
 		// New in new evaluator.
 		611: {
 			in:  `a: close({foo?:1}), b: close({bar?: 1})`,
-			err: "subsumption failed",
+			err: "field not allowed in closed struct: bar (and 1 more errors)",
 		},
 		612: {
 			in:  `a: {foo?:1}, b: close({bar?: 1})`,
@@ -973,11 +965,11 @@ func TestValues(t *testing.T) {
 		// Definitions are not regular fields.
 		630: {
 			in:  `a: {#a: 1}, b: {a: 1}`,
-			err: "subsumption failed",
+			err: "regular field is constraint in subsumed value: #a (and 1 more errors)",
 		},
 		631: {
 			in:  `a: {a: 1}, b: {#a: 1}`,
-			err: "subsumption failed",
+			err: "regular field is constraint in subsumed value: a (and 1 more errors)",
 		},
 
 		// Subsuming final values.
@@ -999,12 +991,12 @@ func TestValues(t *testing.T) {
 		703: {
 			in:   `a: close({["foo"]: 1}), b: {bar: 1}`,
 			mode: subFinal,
-			err:  "subsumption failed",
+			err:  "field not allowed in closed struct: bar (and 1 more errors)",
 		},
 		704: {
 			in:   `a: {foo: 1}, b: {foo?: 1}`,
 			mode: subFinal,
-			err:  "subsumption failed",
+			err:  "field foo not present in {foo?:1} (and 1 more errors)",
 		},
 		705: {
 			in:   `a: close({}), b: {foo?: 1}`,
@@ -1024,7 +1016,7 @@ func TestValues(t *testing.T) {
 		708: {
 			in:   `a: {[string]: 1}, b: {foo: 2}`,
 			mode: subFinal,
-			err:  "subsumption failed",
+			err:  "value not an instance",
 		},
 		709: {
 			in:   `a: {}, b: close({foo?: 1})`,
@@ -1034,7 +1026,7 @@ func TestValues(t *testing.T) {
 		710: {
 			in:   `a: {foo: [...string]}, b: {}`,
 			mode: subFinal,
-			err:  "subsumption failed",
+			err:  "regular field is constraint in subsumed value: foo (and 1 more errors)",
 		},
 
 		// Schema values
@@ -1048,7 +1040,7 @@ func TestValues(t *testing.T) {
 		804: {
 			in:   `a: {foo: 1}, b: {foo?: 1}`,
 			mode: subSchema,
-			err:  "subsumption failed",
+			err:  "field foo not present in {foo?:1} (and 1 more errors)",
 		},
 		805: {
 			in:   `a: close({}), b: {foo?: 1}`,
@@ -1068,7 +1060,7 @@ func TestValues(t *testing.T) {
 		808: {
 			in:   `a: {[string]: 1}, b: {foo: 2}`,
 			mode: subSchema,
-			err:  "subsumption failed",
+			err:  "value not an instance",
 		},
 		809: {
 			in:   `a: {}, b: close({foo?: 1})`,
@@ -1091,7 +1083,7 @@ func TestValues(t *testing.T) {
 		},
 		953: {
 			in:  `a: [], b: [...]`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		954: {
@@ -1104,7 +1096,7 @@ func TestValues(t *testing.T) {
 		},
 		956: {
 			in:  `a: [2], b: [int]`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		957: {
 			in:  `a: [int], b: [int]`,
@@ -1121,7 +1113,7 @@ func TestValues(t *testing.T) {
 		},
 		960: {
 			in:  `a: [...2], b: [int]`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		961: {
 			in:  `a: [...int], b: [int]`,
@@ -1130,28 +1122,28 @@ func TestValues(t *testing.T) {
 
 		962: {
 			in:  `a: [2], b: [...2]`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		963: {
 			in:  `a: [int], b: [...2]`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		964: {
 			in:  `a: [2], b: [...int]`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		965: {
 			in:  `a: [int], b: [...int]`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		966: {
 			in:  `a: [...int], b: ["foo"]`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 		967: {
 			in:  `a: ["foo"], b: [...int]`,
-			err: "subsumption failed",
+			err: "value not an instance",
 		},
 
 		// Defaults:
@@ -1183,74 +1175,66 @@ func TestValues(t *testing.T) {
 	}
 
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)
-	for i, tc := range testCases {
+
+	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *subsumeTest) {
+		t.M.TODO_V2(t)
+
 		if tc.in == "" {
-			continue
+			t.Skip("empty test case")
 		}
+
 		m := re.FindStringSubmatch(strings.Join(strings.Split(tc.in, "\n"), ""))
 		const cutset = "\n ,"
 		key := strings.Trim(m[1], cutset) + " ⊑ " + strings.Trim(m[2], cutset)
+		// Log descriptive name for debugging
+		t.Log(key)
 
-		cuetdtest.FullMatrix.Run(t, strconv.Itoa(i)+"/"+key, func(t *testing.T, m *cuetdtest.M) {
-			if tc.skip_v2 && m.IsDefault() {
-				t.Skipf("skipping v2 test")
-			}
-			r := m.Runtime()
+		r := t.M.Runtime()
 
-			file, err := parser.ParseFile("subsume", tc.in)
-			if err != nil {
-				t.Fatal(err)
-			}
+		file, err := parser.ParseFile("subsume", tc.in)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-			root, errs := compile.Files(nil, r, "", file)
-			if errs != nil {
-				t.Fatal(errs)
-			}
+		root, errs := compile.Files(nil, r, "", file)
+		if errs != nil {
+			t.Fatal(errs)
+		}
 
-			ctx := eval.NewContext(r, root)
-			root.Finalize(ctx)
+		ctx := eval.NewContext(r, root)
+		root.Finalize(ctx)
 
-			// Use low-level lookup to avoid evaluation.
-			var a, b adt.Value
-			for _, arc := range root.Arcs {
-				switch arc.Label {
-				case ctx.StringLabel("a"):
-					a = arc
-				case ctx.StringLabel("b"):
-					b = arc
-				}
+		// Use low-level lookup to avoid evaluation.
+		var a, b adt.Value
+		for _, arc := range root.Arcs {
+			switch arc.Label {
+			case ctx.StringLabel("a"):
+				a = arc
+			case ctx.StringLabel("b"):
+				b = arc
 			}
+		}
 
-			switch tc.mode {
-			case subNone:
-				err = subsume.Value(ctx, a, b)
-			case subSchema:
-				err = subsume.API.Value(ctx, a, b)
-			// TODO: see comments above.
-			// case subNoOptional:
-			// 	err = IgnoreOptional.Value(ctx, a, b)
-			case subDefaults:
-				p := subsume.Profile{Defaults: true}
-				err = p.Value(ctx, a, b)
-			case subFinal:
-				err = subsume.Final.Value(ctx, a, b)
-			}
-			var gotErr string
-			if err != nil {
-				gotErr = err.Error()
-			}
+		switch tc.mode {
+		case subNone:
+			err = subsume.Value(ctx, a, b)
+		case subSchema:
+			err = subsume.API.Value(ctx, a, b)
+		// TODO: see comments above.
+		// case subNoOptional:
+		// 	err = IgnoreOptional.Value(ctx, a, b)
+		case subDefaults:
+			p := subsume.Profile{Defaults: true}
+			err = p.Value(ctx, a, b)
+		case subFinal:
+			err = subsume.Final.Value(ctx, a, b)
+		}
 
-			if tc.err == "" {
-				// Expected success
-				if err != nil {
-					t.Errorf("got error %q; want success", gotErr)
-				}
-			} else {
-				// Expected failure - just check that we got any error
-				if err == nil {
-					t.Errorf("got success; want failure")
-				}
-			}
-		})
-	}
+		var gotErr string
+		if err != nil {
+			gotErr = err.Error()
+		}
+
+		t.Equal(gotErr, tc.err)
+	})
 }

@@ -16,6 +16,24 @@
       "message": "This means we catch things quite late. \n\nI think you should create a constraint that is unified with `workflows` in `internal/ci/github/workflows.cue` to shift left on this check.\n\nThat said, this code does not need to change; it\u0027s just an earlier check \"at eval time\" as opposed to \"at cue cmd time\"",
       "revId": "4800b9dfe15dbeffccd546b7c33d1ae725b0f083",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75a6b61e_cf144060",
+        "filename": "internal/ci/base/write.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-05T12:57:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9dc67291_5acc9de5",
+      "revId": "4800b9dfe15dbeffccd546b7c33d1ae725b0f083",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

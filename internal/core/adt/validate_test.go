@@ -35,8 +35,6 @@ func TestValidate(t *testing.T) {
 		out    string
 		lookup string
 		cfg    *adt.ValidateConfig
-
-		skip_v2 bool
 	}
 	testCases := []testCase{{
 		name: "no error, but not concrete, even with definition label",
@@ -119,8 +117,6 @@ y: conflicting values 4 and 2:
 		`,
 	}, {
 		// TODO: different error position
-		skip_v2: true,
-
 		name: "disallow cycle",
 		cfg:  &adt.ValidateConfig{DisallowCycles: true},
 		in: `
@@ -129,8 +125,6 @@ y: conflicting values 4 and 2:
 		`,
 		out: "cycle\ny: cycle with field: x:\n    test:2:6\nx: cycle with field: y:\n    test:3:6",
 	}, {
-		skip_v2: true,
-
 		// TODO: different error position
 		name: "disallow cycle",
 		cfg:  &adt.ValidateConfig{DisallowCycles: true},
@@ -270,8 +264,6 @@ y: conflicting values 4 and 2:
 			`,
 		// TODO: \n    test:3:7",
 		out: "incomplete\nb.a.x: field is required but not present:\n    test:2:13",
-
-		skip_v2: true, // missing position
 	}, {
 		// Issue #3864: issue resulting from structure sharing.
 		name: "attribute incomplete values in definitions to concrete path",
@@ -294,9 +286,6 @@ y: conflicting values 4 and 2:
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
-		if tc.skip_v2 {
-			t.M.SKIP_V2(t) // skip
-		}
 		r := t.M.Runtime()
 		ctx := eval.NewContext(r, nil)
 

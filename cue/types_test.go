@@ -3029,9 +3029,6 @@ Another Foo.
 `,
 		}}
 		for _, tc := range testCases {
-			if tc.skip {
-				m.SKIP_V2(t) // P2: reordering
-			}
 			t.Run("field:"+tc.path, func(t *testing.T) {
 				v := tc.val.Lookup(strings.Split(tc.path, " ")...)
 				doc := docStr(v.Doc())
@@ -3232,8 +3229,6 @@ func TestMarshalJSON(t *testing.T) {
 	}}
 	for i, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, m *cuetdtest.M) {
-			m.SKIP_V2(t)
-
 			val := getValue(m, tc.value)
 			b, err := val.MarshalJSON()
 			checkFatal(t, err, tc.err, "init")

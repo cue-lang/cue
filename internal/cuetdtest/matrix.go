@@ -57,25 +57,36 @@ const DefaultVersion = "v2"
 
 type Matrix []M
 
-var FullMatrix Matrix = []M{{
-	name:    DefaultVersion,
-	version: internal.EvalV2,
-}, {
-	name:     "v3",
-	fallback: "v2",
-	version:  internal.EvalV3,
-	Flags:    cuedebug.Config{Sharing: true},
-}, {
-	name:     "v3-noshare",
-	fallback: "v2",
-	version:  internal.EvalV3,
-}}
+var (
+	evalv2 = M{
+		name:    DefaultVersion,
+		version: internal.EvalV2,
+	}
+	evalv3 = M{
+		name:     "v3",
+		fallback: "v2",
+		version:  internal.EvalV3,
+		Flags:    cuedebug.Config{Sharing: true},
+	}
+	evalv3NoShare = M{
+		name:     "v3-noshare",
+		fallback: "v2",
+		version:  internal.EvalV3,
+	}
+)
 
-var SmallMatrix Matrix = FullMatrix[:2]
+var FullMatrix Matrix = []M{
+	evalv3,
+	evalv3NoShare,
+}
 
-var DefaultOnlyMatrix Matrix = FullMatrix[:1]
+var SmallMatrix Matrix = []M{evalv3}
 
-var DevOnlyMatrix Matrix = FullMatrix[1:2]
+var DefaultOnlyMatrix Matrix = []M{evalv3}
+
+var DevOnlyMatrix Matrix = []M{evalv3}
+
+var EvalV2OnlyMatrix Matrix = []M{evalv2}
 
 // Run runs a subtest with the given name that
 // invokes a further subtest for each configuration in the matrix.
@@ -91,12 +102,6 @@ func (m Matrix) Do(t *testing.T, f func(t *testing.T, m *M)) {
 		t.Run(c.name, func(t *testing.T) {
 			f(t, &c)
 		})
-	}
-}
-
-func (m *M) SKIP_V2(t testing.TB) {
-	if m.version == internal.EvalV2 {
-		t.Skip("Skipping v2")
 	}
 }
 

@@ -49,59 +49,188 @@ func TestValues(t *testing.T) {
 	}
 	testCases := []subsumeTest{
 		// Top subsumes everything
-		0: {subsumes: true, in: `a: _, b: _ `},
-		1: {subsumes: true, in: `a: _, b: null `},
-		2: {subsumes: true, in: `a: _, b: int `},
-		3: {subsumes: true, in: `a: _, b: 1 `},
-		4: {subsumes: true, in: `a: _, b: float `},
-		5: {subsumes: true, in: `a: _, b: "s" `},
-		6: {subsumes: true, in: `a: _, b: {} `},
-		7: {subsumes: true, in: `a: _, b: []`},
-		8: {subsumes: true, in: `a: _, b: _|_ `},
+		0: {
+			in:       `a: _, b: _ `,
+			subsumes: true,
+		},
+		1: {
+			in:       `a: _, b: null `,
+			subsumes: true,
+		},
+		2: {
+			in:       `a: _, b: int `,
+			subsumes: true,
+		},
+		3: {
+			in:       `a: _, b: 1 `,
+			subsumes: true,
+		},
+		4: {
+			in:       `a: _, b: float `,
+			subsumes: true,
+		},
+		5: {
+			in:       `a: _, b: "s" `,
+			subsumes: true,
+		},
+		6: {
+			in:       `a: _, b: {} `,
+			subsumes: true,
+		},
+		7: {
+			in:       `a: _, b: []`,
+			subsumes: true,
+		},
+		8: {
+			in:       `a: _, b: _|_ `,
+			subsumes: true,
+		},
 
 		// Nothing besides top subsumed top
-		9:  {subsumes: false, in: `a: null,    b: _`},
-		10: {subsumes: false, in: `a: int, b: _`},
-		11: {subsumes: false, in: `a: 1,       b: _`},
-		12: {subsumes: false, in: `a: float, b: _`},
-		13: {subsumes: false, in: `a: "s",     b: _`},
-		14: {subsumes: false, in: `a: {},      b: _`},
-		15: {subsumes: false, in: `a: [],      b: _`},
-		16: {subsumes: false, in: `a: _|_ ,      b: _`},
+		9: {
+			in:       `a: null,    b: _`,
+			subsumes: false,
+		},
+		10: {
+			in:       `a: int, b: _`,
+			subsumes: false,
+		},
+		11: {
+			in:       `a: 1,       b: _`,
+			subsumes: false,
+		},
+		12: {
+			in:       `a: float, b: _`,
+			subsumes: false,
+		},
+		13: {
+			in:       `a: "s",     b: _`,
+			subsumes: false,
+		},
+		14: {
+			in:       `a: {},      b: _`,
+			subsumes: false,
+		},
+		15: {
+			in:       `a: [],      b: _`,
+			subsumes: false,
+		},
+		16: {
+			in:       `a: _|_ ,      b: _`,
+			subsumes: false,
+		},
 
 		// Bottom subsumes nothing except bottom itself.
-		17: {subsumes: false, in: `a: _|_, b: null `},
-		18: {subsumes: false, in: `a: _|_, b: int `},
-		19: {subsumes: false, in: `a: _|_, b: 1 `},
-		20: {subsumes: false, in: `a: _|_, b: float `},
-		21: {subsumes: false, in: `a: _|_, b: "s" `},
-		22: {subsumes: false, in: `a: _|_, b: {} `},
-		23: {subsumes: false, in: `a: _|_, b: [] `},
-		24: {subsumes: true, in: ` a: _|_, b: _|_ `},
+		17: {
+			in:       `a: _|_, b: null `,
+			subsumes: false,
+		},
+		18: {
+			in:       `a: _|_, b: int `,
+			subsumes: false,
+		},
+		19: {
+			in:       `a: _|_, b: 1 `,
+			subsumes: false,
+		},
+		20: {
+			in:       `a: _|_, b: float `,
+			subsumes: false,
+		},
+		21: {
+			in:       `a: _|_, b: "s" `,
+			subsumes: false,
+		},
+		22: {
+			in:       `a: _|_, b: {} `,
+			subsumes: false,
+		},
+		23: {
+			in:       `a: _|_, b: [] `,
+			subsumes: false,
+		},
+		24: {
+			in:       ` a: _|_, b: _|_ `,
+			subsumes: true,
+		},
 
 		// All values subsume bottom
-		25: {subsumes: true, in: `a: null,    b: _|_`},
-		26: {subsumes: true, in: `a: int, b: _|_`},
-		27: {subsumes: true, in: `a: 1,       b: _|_`},
-		28: {subsumes: true, in: `a: float, b: _|_`},
-		29: {subsumes: true, in: `a: "s",     b: _|_`},
-		30: {subsumes: true, in: `a: {},      b: _|_`},
-		31: {subsumes: true, in: `a: [],      b: _|_`},
-		32: {subsumes: true, in: `a: true,    b: _|_`},
-		33: {subsumes: true, in: `a: _|_,       b: _|_`},
+		25: {
+			in:       `a: null,    b: _|_`,
+			subsumes: true,
+		},
+		26: {
+			in:       `a: int, b: _|_`,
+			subsumes: true,
+		},
+		27: {
+			in:       `a: 1,       b: _|_`,
+			subsumes: true,
+		},
+		28: {
+			in:       `a: float, b: _|_`,
+			subsumes: true,
+		},
+		29: {
+			in:       `a: "s",     b: _|_`,
+			subsumes: true,
+		},
+		30: {
+			in:       `a: {},      b: _|_`,
+			subsumes: true,
+		},
+		31: {
+			in:       `a: [],      b: _|_`,
+			subsumes: true,
+		},
+		32: {
+			in:       `a: true,    b: _|_`,
+			subsumes: true,
+		},
+		33: {
+			in:       `a: _|_,       b: _|_`,
+			subsumes: true,
+		},
 
 		// null subsumes only null
-		34: {subsumes: true, in: ` a: null, b: null `},
-		35: {subsumes: false, in: `a: null, b: 1 `},
-		36: {subsumes: false, in: `a: 1,    b: null `},
+		34: {
+			in:       ` a: null, b: null `,
+			subsumes: true,
+		},
+		35: {
+			in:       `a: null, b: 1 `,
+			subsumes: false,
+		},
+		36: {
+			in:       `a: 1,    b: null `,
+			subsumes: false,
+		},
 
-		37: {subsumes: true, in: ` a: true, b: true `},
-		38: {subsumes: false, in: `a: true, b: false `},
+		37: {
+			in:       ` a: true, b: true `,
+			subsumes: true,
+		},
+		38: {
+			in:       `a: true, b: false `,
+			subsumes: false,
+		},
 
-		39: {subsumes: true, in: ` a: "a",    b: "a" `},
-		40: {subsumes: false, in: `a: "a",    b: "b" `},
-		41: {subsumes: true, in: ` a: string, b: "a" `},
-		42: {subsumes: false, in: `a: "a",    b: string `},
+		39: {
+			in:       ` a: "a",    b: "a" `,
+			subsumes: true,
+		},
+		40: {
+			in:       `a: "a",    b: "b" `,
+			subsumes: false,
+		},
+		41: {
+			in:       ` a: string, b: "a" `,
+			subsumes: true,
+		},
+		42: {
+			in:       `a: "a",    b: string `,
+			subsumes: false,
+		},
 
 		// Number typing (TODO)
 		//
@@ -128,134 +257,422 @@ func TestValues(t *testing.T) {
 		// t: (x) -> number; cue.IsInteger(a) && a > 0
 		// type x number: cue.IsInteger(x) && x > 0
 		// x: typeOf(number); cue.IsInteger(x) && x > 0
-		43: {subsumes: true, in: `a: 1, b: 1 `},
-		44: {subsumes: true, in: `a: 1.0, b: 1.0 `},
-		45: {subsumes: true, in: `a: 3.0, b: 3.0 `},
-		46: {subsumes: false, in: `a: 1.0, b: 1 `},
-		47: {subsumes: false, in: `a: 1, b: 1.0 `},
-		48: {subsumes: false, in: `a: 3, b: 3.0`},
-		49: {subsumes: true, in: `a: int, b: 1`},
-		50: {subsumes: true, in: `a: int, b: int & 1`},
-		51: {subsumes: true, in: `a: float, b: 1.0`},
-		52: {subsumes: false, in: `a: float, b: 1`},
-		53: {subsumes: false, in: `a: int, b: 1.0`},
-		54: {subsumes: true, in: `a: int, b: int`},
-		55: {subsumes: true, in: `a: number, b: int`},
+		43: {
+			in:       `a: 1, b: 1 `,
+			subsumes: true,
+		},
+		44: {
+			in:       `a: 1.0, b: 1.0 `,
+			subsumes: true,
+		},
+		45: {
+			in:       `a: 3.0, b: 3.0 `,
+			subsumes: true,
+		},
+		46: {
+			in:       `a: 1.0, b: 1 `,
+			subsumes: false,
+		},
+		47: {
+			in:       `a: 1, b: 1.0 `,
+			subsumes: false,
+		},
+		48: {
+			in:       `a: 3, b: 3.0`,
+			subsumes: false,
+		},
+		49: {
+			in:       `a: int, b: 1`,
+			subsumes: true,
+		},
+		50: {
+			in:       `a: int, b: int & 1`,
+			subsumes: true,
+		},
+		51: {
+			in:       `a: float, b: 1.0`,
+			subsumes: true,
+		},
+		52: {
+			in:       `a: float, b: 1`,
+			subsumes: false,
+		},
+		53: {
+			in:       `a: int, b: 1.0`,
+			subsumes: false,
+		},
+		54: {
+			in:       `a: int, b: int`,
+			subsumes: true,
+		},
+		55: {
+			in:       `a: number, b: int`,
+			subsumes: true,
+		},
 
 		// Structs
-		64: {subsumes: true, in: `a: {}, b: {}`},
-		65: {subsumes: true, in: `a: {}, b: {a: 1}`},
-		66: {subsumes: true, in: `a: {a:1}, b: {a:1, b:1}`},
-		67: {subsumes: true, in: `a: {s: { a:1} }, b: { s: { a:1, b:2 }}`},
-		68: {subsumes: true, in: `a: {}, b: {}`},
+		64: {
+			in:       `a: {}, b: {}`,
+			subsumes: true,
+		},
+		65: {
+			in:       `a: {}, b: {a: 1}`,
+			subsumes: true,
+		},
+		66: {
+			in:       `a: {a:1}, b: {a:1, b:1}`,
+			subsumes: true,
+		},
+		67: {
+			in:       `a: {s: { a:1} }, b: { s: { a:1, b:2 }}`,
+			subsumes: true,
+		},
+		68: {
+			in:       `a: {}, b: {}`,
+			subsumes: true,
+		},
 		// TODO: allow subsumption of unevaluated values?
 		// ref not yet evaluated and not structurally equivalent
-		69: {subsumes: true, in: `a: {}, b: {} & c, c: {}`},
+		69: {
+			in:       `a: {}, b: {} & c, c: {}`,
+			subsumes: true,
+		},
 
-		70: {subsumes: false, in: `a: {a:1}, b: {}`},
-		71: {subsumes: false, in: `a: {a:1, b:1}, b: {a:1}`},
-		72: {subsumes: false, in: `a: {s: { a:1} }, b: { s: {}}`},
+		70: {
+			in:       `a: {a:1}, b: {}`,
+			subsumes: false,
+		},
+		71: {
+			in:       `a: {a:1, b:1}, b: {a:1}`,
+			subsumes: false,
+		},
+		72: {
+			in:       `a: {s: { a:1} }, b: { s: {}}`,
+			subsumes: false,
+		},
 
-		84: {subsumes: true, in: `a: 1 | 2, b: 2 | 1`},
-		85: {subsumes: true, in: `a: 1 | 2, b: 1 | 2`},
+		84: {
+			in:       `a: 1 | 2, b: 2 | 1`,
+			subsumes: true,
+		},
+		85: {
+			in:       `a: 1 | 2, b: 1 | 2`,
+			subsumes: true,
+		},
 
-		86: {subsumes: true, in: `a: number, b: 2 | 1`},
-		87: {subsumes: true, in: `a: number, b: 2 | 1`},
-		88: {subsumes: false, in: `a: int, b: 1 | 2 | 3.1`},
+		86: {
+			in:       `a: number, b: 2 | 1`,
+			subsumes: true,
+		},
+		87: {
+			in:       `a: number, b: 2 | 1`,
+			subsumes: true,
+		},
+		88: {
+			in:       `a: int, b: 1 | 2 | 3.1`,
+			subsumes: false,
+		},
 
-		89: {subsumes: true, in: `a: float | number, b: 1 | 2 | 3.1`},
+		89: {
+			in:       `a: float | number, b: 1 | 2 | 3.1`,
+			subsumes: true,
+		},
 
-		90: {subsumes: false, in: `a: int, b: 1 | 2 | 3.1`},
-		91: {subsumes: true, in: `a: 1 | 2, b: 1`},
-		92: {subsumes: true, in: `a: 1 | 2, b: 2`},
-		93: {subsumes: false, in: `a: 1 | 2, b: 3`},
+		90: {
+			in:       `a: int, b: 1 | 2 | 3.1`,
+			subsumes: false,
+		},
+		91: {
+			in:       `a: 1 | 2, b: 1`,
+			subsumes: true,
+		},
+		92: {
+			in:       `a: 1 | 2, b: 2`,
+			subsumes: true,
+		},
+		93: {
+			in:       `a: 1 | 2, b: 3`,
+			subsumes: false,
+		},
 
 		// 147: {subsumes: true, in: ` a: 7080, b: *7080 | int`, mode: subChoose},
 
 		// Defaults
-		150: {subsumes: false, in: `a: number | *1, b: number | *2`},
-		151: {subsumes: true, in: `a: number | *2, b: number | *2`},
-		152: {subsumes: true, in: `a: int | *float, b: int | *2.0`},
-		153: {subsumes: false, in: `a: int | *2, b: int | *2.0`},
-		154: {subsumes: true, in: `a: number | *2 | *3, b: number | *2`},
-		155: {subsumes: true, in: `a: number, b: number | *2`},
+		150: {
+			in:       `a: number | *1, b: number | *2`,
+			subsumes: false,
+		},
+		151: {
+			in:       `a: number | *2, b: number | *2`,
+			subsumes: true,
+		},
+		152: {
+			in:       `a: int | *float, b: int | *2.0`,
+			subsumes: true,
+		},
+		153: {
+			in:       `a: int | *2, b: int | *2.0`,
+			subsumes: false,
+		},
+		154: {
+			in:       `a: number | *2 | *3, b: number | *2`,
+			subsumes: true,
+		},
+		155: {
+			in:       `a: number, b: number | *2`,
+			subsumes: true,
+		},
 
 		// Bounds
-		170: {subsumes: true, in: `a: >=2, b: >=2`},
-		171: {subsumes: true, in: `a: >=1, b: >=2`},
-		172: {subsumes: true, in: `a: >0, b: >=2`},
-		173: {subsumes: true, in: `a: >1, b: >1`},
-		174: {subsumes: true, in: `a: >=1, b: >1`},
-		175: {subsumes: false, in: `a: >1, b: >=1`},
-		176: {subsumes: true, in: `a: >=1, b: >=1`},
-		177: {subsumes: true, in: `a: <1, b: <1`},
-		178: {subsumes: true, in: `a: <=1, b: <1`},
-		179: {subsumes: false, in: `a: <1, b: <=1`},
-		180: {subsumes: true, in: `a: <=1, b: <=1`},
+		170: {
+			in:       `a: >=2, b: >=2`,
+			subsumes: true,
+		},
+		171: {
+			in:       `a: >=1, b: >=2`,
+			subsumes: true,
+		},
+		172: {
+			in:       `a: >0, b: >=2`,
+			subsumes: true,
+		},
+		173: {
+			in:       `a: >1, b: >1`,
+			subsumes: true,
+		},
+		174: {
+			in:       `a: >=1, b: >1`,
+			subsumes: true,
+		},
+		175: {
+			in:       `a: >1, b: >=1`,
+			subsumes: false,
+		},
+		176: {
+			in:       `a: >=1, b: >=1`,
+			subsumes: true,
+		},
+		177: {
+			in:       `a: <1, b: <1`,
+			subsumes: true,
+		},
+		178: {
+			in:       `a: <=1, b: <1`,
+			subsumes: true,
+		},
+		179: {
+			in:       `a: <1, b: <=1`,
+			subsumes: false,
+		},
+		180: {
+			in:       `a: <=1, b: <=1`,
+			subsumes: true,
+		},
 
-		181: {subsumes: true, in: `a: !=1, b: !=1`},
-		182: {subsumes: false, in: `a: !=1, b: !=2`},
+		181: {
+			in:       `a: !=1, b: !=1`,
+			subsumes: true,
+		},
+		182: {
+			in:       `a: !=1, b: !=2`,
+			subsumes: false,
+		},
 
-		183: {subsumes: false, in: `a: !=1, b: <=1`},
-		184: {subsumes: true, in: `a: !=1, b: <1`},
-		185: {subsumes: false, in: `a: !=1, b: >=1`},
-		186: {subsumes: true, in: `a: !=1, b: <1`},
+		183: {
+			in:       `a: !=1, b: <=1`,
+			subsumes: false,
+		},
+		184: {
+			in:       `a: !=1, b: <1`,
+			subsumes: true,
+		},
+		185: {
+			in:       `a: !=1, b: >=1`,
+			subsumes: false,
+		},
+		186: {
+			in:       `a: !=1, b: <1`,
+			subsumes: true,
+		},
 
-		187: {subsumes: true, in: `a: !=1, b: <=0`},
-		188: {subsumes: true, in: `a: !=1, b: >=2`},
-		189: {subsumes: true, in: `a: !=1, b: >1`},
+		187: {
+			in:       `a: !=1, b: <=0`,
+			subsumes: true,
+		},
+		188: {
+			in:       `a: !=1, b: >=2`,
+			subsumes: true,
+		},
+		189: {
+			in:       `a: !=1, b: >1`,
+			subsumes: true,
+		},
 
-		195: {subsumes: false, in: `a: >=2, b: !=2`},
-		196: {subsumes: false, in: `a: >2, b: !=2`},
-		197: {subsumes: false, in: `a: <2, b: !=2`},
-		198: {subsumes: false, in: `a: <=2, b: !=2`},
+		195: {
+			in:       `a: >=2, b: !=2`,
+			subsumes: false,
+		},
+		196: {
+			in:       `a: >2, b: !=2`,
+			subsumes: false,
+		},
+		197: {
+			in:       `a: <2, b: !=2`,
+			subsumes: false,
+		},
+		198: {
+			in:       `a: <=2, b: !=2`,
+			subsumes: false,
+		},
 
-		200: {subsumes: true, in: `a: =~"foo", b: =~"foo"`},
-		201: {subsumes: false, in: `a: =~"foo", b: =~"bar"`},
-		202: {subsumes: false, in: `a: =~"foo1", b: =~"foo"`},
+		200: {
+			in:       `a: =~"foo", b: =~"foo"`,
+			subsumes: true,
+		},
+		201: {
+			in:       `a: =~"foo", b: =~"bar"`,
+			subsumes: false,
+		},
+		202: {
+			in:       `a: =~"foo1", b: =~"foo"`,
+			subsumes: false,
+		},
 
-		203: {subsumes: true, in: `a: !~"foo", b: !~"foo"`},
-		204: {subsumes: false, in: `a: !~"foo", b: !~"bar"`},
-		205: {subsumes: false, in: `a: !~"foo", b: !~"foo1"`},
+		203: {
+			in:       `a: !~"foo", b: !~"foo"`,
+			subsumes: true,
+		},
+		204: {
+			in:       `a: !~"foo", b: !~"bar"`,
+			subsumes: false,
+		},
+		205: {
+			in:       `a: !~"foo", b: !~"foo1"`,
+			subsumes: false,
+		},
 
 		// The following is could be true, but we will not go down the rabbit
 		// hold of trying to prove subsumption of regular expressions.
-		210: {subsumes: false, in: `a: =~"foo", b: =~"foo1"`},
-		211: {subsumes: false, in: `a: !~"foo1", b: !~"foo"`},
+		210: {
+			in:       `a: =~"foo", b: =~"foo1"`,
+			subsumes: false,
+		},
+		211: {
+			in:       `a: !~"foo1", b: !~"foo"`,
+			subsumes: false,
+		},
 
-		220: {subsumes: true, in: `a: <5, b: 4`},
-		221: {subsumes: false, in: `a: <5, b: 5`},
-		222: {subsumes: true, in: `a: <=5, b: 5`},
-		223: {subsumes: false, in: `a: <=5.0, b: 5.00000001`},
-		224: {subsumes: true, in: `a: >5, b: 6`},
-		225: {subsumes: false, in: `a: >5, b: 5`},
-		226: {subsumes: true, in: `a: >=5, b: 5`},
-		227: {subsumes: false, in: `a: >=5, b: 4`},
-		228: {subsumes: true, in: `a: !=5, b: 6`},
-		229: {subsumes: false, in: `a: !=5, b: 5`},
-		230: {subsumes: false, in: `a: !=5.0, b: 5.0`},
-		231: {subsumes: false, in: `a: !=5.0, b: 5`},
+		220: {
+			in:       `a: <5, b: 4`,
+			subsumes: true,
+		},
+		221: {
+			in:       `a: <5, b: 5`,
+			subsumes: false,
+		},
+		222: {
+			in:       `a: <=5, b: 5`,
+			subsumes: true,
+		},
+		223: {
+			in:       `a: <=5.0, b: 5.00000001`,
+			subsumes: false,
+		},
+		224: {
+			in:       `a: >5, b: 6`,
+			subsumes: true,
+		},
+		225: {
+			in:       `a: >5, b: 5`,
+			subsumes: false,
+		},
+		226: {
+			in:       `a: >=5, b: 5`,
+			subsumes: true,
+		},
+		227: {
+			in:       `a: >=5, b: 4`,
+			subsumes: false,
+		},
+		228: {
+			in:       `a: !=5, b: 6`,
+			subsumes: true,
+		},
+		229: {
+			in:       `a: !=5, b: 5`,
+			subsumes: false,
+		},
+		230: {
+			in:       `a: !=5.0, b: 5.0`,
+			subsumes: false,
+		},
+		231: {
+			in:       `a: !=5.0, b: 5`,
+			subsumes: false,
+		},
 
-		250: {subsumes: true, in: `a: =~ #"^\d{3}$"#, b: "123"`},
-		251: {subsumes: false, in: `a: =~ #"^\d{3}$"#, b: "1234"`},
-		252: {subsumes: true, in: `a: !~ #"^\d{3}$"#, b: "1234"`},
-		253: {subsumes: false, in: `a: !~ #"^\d{3}$"#, b: "123"`},
+		250: {
+			in:       `a: =~ #"^\d{3}$"#, b: "123"`,
+			subsumes: true,
+		},
+		251: {
+			in:       `a: =~ #"^\d{3}$"#, b: "1234"`,
+			subsumes: false,
+		},
+		252: {
+			in:       `a: !~ #"^\d{3}$"#, b: "1234"`,
+			subsumes: true,
+		},
+		253: {
+			in:       `a: !~ #"^\d{3}$"#, b: "123"`,
+			subsumes: false,
+		},
 
 		// Conjunctions
-		300: {subsumes: true, in: `a: >0, b: >=2 & <=100`},
-		301: {subsumes: false, in: `a: >0, b: >=0 & <=100`},
+		300: {
+			in:       `a: >0, b: >=2 & <=100`,
+			subsumes: true,
+		},
+		301: {
+			in:       `a: >0, b: >=0 & <=100`,
+			subsumes: false,
+		},
 
-		310: {subsumes: true, in: `a: >=0 & <=100, b: 10`},
-		311: {subsumes: true, in: `a: >=0 & <=100, b: >=0 & <=100`},
-		312: {subsumes: false, in: `a: !=2 & !=4, b: >3`},
-		313: {subsumes: true, in: `a: !=2 & !=4, b: >5`},
+		310: {
+			in:       `a: >=0 & <=100, b: 10`,
+			subsumes: true,
+		},
+		311: {
+			in:       `a: >=0 & <=100, b: >=0 & <=100`,
+			subsumes: true,
+		},
+		312: {
+			in:       `a: !=2 & !=4, b: >3`,
+			subsumes: false,
+		},
+		313: {
+			in:       `a: !=2 & !=4, b: >5`,
+			subsumes: true,
+		},
 
-		314: {subsumes: false, in: `a: >=0 & <=100, b: >=0 & <=150`},
-		315: {subsumes: true, in: `a: >=0 & <=150, b: >=0 & <=100`},
+		314: {
+			in:       `a: >=0 & <=100, b: >=0 & <=150`,
+			subsumes: false,
+		},
+		315: {
+			in:       `a: >=0 & <=150, b: >=0 & <=100`,
+			subsumes: true,
+		},
 
 		// Disjunctions
-		330: {subsumes: true, in: `a: >5, b: >10 | 8`},
-		331: {subsumes: false, in: `a: >8, b: >10 | 8`},
+		330: {
+			in:       `a: >5, b: >10 | 8`,
+			subsumes: true,
+		},
+		331: {
+			in:       `a: >8, b: >10 | 8`,
+			subsumes: false,
+		},
 
 		// Optional fields
 		// Optional fields defined constraints on fields that are not yet
@@ -265,72 +682,145 @@ func TestValues(t *testing.T) {
 		// field that is not defined in B, the addition of an incompatible
 		// value of that field in B can cause A and B to no longer unify.
 		//
-		400: {subsumes: false, in: `a: {foo: 1}, b: {}`},
-		401: {subsumes: false, in: `a: {foo?: 1}, b: {}`},
-		402: {subsumes: true, in: `a: {}, b: {foo: 1}`},
-		403: {subsumes: true, in: `a: {}, b: {foo?: 1}`},
+		400: {
+			in:       `a: {foo: 1}, b: {}`,
+			subsumes: false,
+		},
+		401: {
+			in:       `a: {foo?: 1}, b: {}`,
+			subsumes: false,
+		},
+		402: {
+			in:       `a: {}, b: {foo: 1}`,
+			subsumes: true,
+		},
+		403: {
+			in:       `a: {}, b: {foo?: 1}`,
+			subsumes: true,
+		},
 
-		404: {subsumes: true, in: `a: {foo: 1}, b: {foo: 1}`},
-		405: {subsumes: true, in: `a: {foo?: 1}, b: {foo: 1}`},
-		406: {subsumes: true, in: `a: {foo?: 1}, b: {foo?: 1}`},
-		407: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`},
+		404: {
+			in:       `a: {foo: 1}, b: {foo: 1}`,
+			subsumes: true,
+		},
+		405: {
+			in:       `a: {foo?: 1}, b: {foo: 1}`,
+			subsumes: true,
+		},
+		406: {
+			in:       `a: {foo?: 1}, b: {foo?: 1}`,
+			subsumes: true,
+		},
+		407: {
+			in:       `a: {foo: 1}, b: {foo?: 1}`,
+			subsumes: false,
+		},
 
-		408: {subsumes: false, in: `a: {foo: 1}, b: {foo: 2}`},
-		409: {subsumes: false, in: `a: {foo?: 1}, b: {foo: 2}`},
-		410: {subsumes: false, in: `a: {foo?: 1}, b: {foo?: 2}`},
-		411: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 2}`},
+		408: {
+			in:       `a: {foo: 1}, b: {foo: 2}`,
+			subsumes: false,
+		},
+		409: {
+			in:       `a: {foo?: 1}, b: {foo: 2}`,
+			subsumes: false,
+		},
+		410: {
+			in:       `a: {foo?: 1}, b: {foo?: 2}`,
+			subsumes: false,
+		},
+		411: {
+			in:       `a: {foo: 1}, b: {foo?: 2}`,
+			subsumes: false,
+		},
 
-		412: {subsumes: true, in: `a: {foo: number}, b: {foo: 2}`},
-		413: {subsumes: true, in: `a: {foo?: number}, b: {foo: 2}`},
-		414: {subsumes: true, in: `a: {foo?: number}, b: {foo?: 2}`},
-		415: {subsumes: false, in: `a: {foo: number}, b: {foo?: 2}`},
+		412: {
+			in:       `a: {foo: number}, b: {foo: 2}`,
+			subsumes: true,
+		},
+		413: {
+			in:       `a: {foo?: number}, b: {foo: 2}`,
+			subsumes: true,
+		},
+		414: {
+			in:       `a: {foo?: number}, b: {foo?: 2}`,
+			subsumes: true,
+		},
+		415: {
+			in:       `a: {foo: number}, b: {foo?: 2}`,
+			subsumes: false,
+		},
 
-		416: {subsumes: false, in: `a: {foo: 1}, b: {foo: number}`},
-		417: {subsumes: false, in: `a: {foo?: 1}, b: {foo: number}`},
-		418: {subsumes: false, in: `a: {foo?: 1}, b: {foo?: number}`},
-		419: {subsumes: false, in: `a: {foo: 1}, b: {foo?: number}`},
+		416: {
+			in:       `a: {foo: 1}, b: {foo: number}`,
+			subsumes: false,
+		},
+		417: {
+			in:       `a: {foo?: 1}, b: {foo: number}`,
+			subsumes: false,
+		},
+		418: {
+			in:       `a: {foo?: 1}, b: {foo?: number}`,
+			subsumes: false,
+		},
+		419: {
+			in:       `a: {foo: 1}, b: {foo?: number}`,
+			subsumes: false,
+		},
 
 		// The one exception of the rule: there is no value of foo that can be
 		// added to b which would cause the unification of a and b to fail.
 		// So an optional field with a value of top is equivalent to not
 		// defining one at all.
-		420: {subsumes: true, in: `a: {foo?: _}, b: {}`},
-
-		430: {subsumes: false, in: `a: {[_]: 4}, b: {[_]: int}`},
-		431: {subsumes: true, in: `a: {[_]: int}, b: {[_]: 2}`, skip_v2: true},
-		432: {
+		420: {
+			in:       `a: {foo?: _}, b: {}`,
 			subsumes: true,
+		},
+
+		430: {
+			in:       `a: {[_]: 4}, b: {[_]: int}`,
+			subsumes: false,
+		},
+		431: {
+			in:       `a: {[_]: int}, b: {[_]: 2}`,
+			skip_v2:  true,
+			subsumes: true,
+		},
+		432: {
 			in:       `a: {[string]: int, [<"m"]: 3}, b: {[string]: 2, [<"m"]: 3}`,
 			skip_v2:  true,
+			subsumes: true,
 		},
 		433: {
-			subsumes: true,
 			in:       `a: {[<"m"]: 3, [string]: int}, b: {[string]: 2, [<"m"]: 3}`,
 			skip_v2:  true,
+			subsumes: true,
 		},
 		434: {
-			subsumes: false,
 			in:       `a: {[<"n"]: 3, [string]: int}, b: {[string]: 2, [<"m"]: 3}`,
+			subsumes: false,
 		},
 		435: {
-			subsumes: true,
 			// both sides unify to a single string pattern.
-			in:      `a: {[string]: <5, [string]: int}, b: {[string]: <=3, [string]: 3}`,
-			skip_v2: true,
+			in:       `a: {[string]: <5, [string]: int}, b: {[string]: <=3, [string]: 3}`,
+			skip_v2:  true,
+			subsumes: true,
 		},
 		436: {
-			subsumes: true,
 			// matches because bottom is subsumed by >5
-			in:      `a: {[string]: >5}, b: {[string]: 1, [string]: 2}`,
-			skip_v2: true,
+			in:       `a: {[string]: >5}, b: {[string]: 1, [string]: 2}`,
+			skip_v2:  true,
+			subsumes: true,
 		},
 		437: {
-			subsumes: false,
 			// subsumption gives up if a has more pattern constraints than b.
 			// TODO: support this?
-			in: `a: {[_]: >5, [>"b"]: int}, b: {[_]: 6}`,
+			in:       `a: {[_]: >5, [>"b"]: int}, b: {[_]: 6}`,
+			subsumes: false,
 		},
-		438: {subsumes: true, in: `a: {}, b: {[_]: 6}`},
+		438: {
+			in:       `a: {}, b: {[_]: 6}`,
+			subsumes: true,
+		},
 
 		// TODO: the subNoOptional mode used to be used by the equality check.
 		// Now this has its own implementation it is no longer necessary. Keep
@@ -348,107 +838,348 @@ func TestValues(t *testing.T) {
 		// 448: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subNoOptional},
 
 		// embedded scalars
-		460: {subsumes: true, in: `a: {1, #foo: number}, b: {1, #foo: 1}`},
-		461: {subsumes: true, in: `a: {1, #foo?: number}, b: {1, #foo: 1}`},
-		462: {subsumes: true, in: `a: {1, #foo?: number}, b: {1, #foo?: 1}`},
-		463: {subsumes: false, in: `a: {1, #foo: number}, b: {1, #foo?: 1}`},
+		460: {
+			in:       `a: {1, #foo: number}, b: {1, #foo: 1}`,
+			subsumes: true,
+		},
+		461: {
+			in:       `a: {1, #foo?: number}, b: {1, #foo: 1}`,
+			subsumes: true,
+		},
+		462: {
+			in:       `a: {1, #foo?: number}, b: {1, #foo?: 1}`,
+			subsumes: true,
+		},
+		463: {
+			in:       `a: {1, #foo: number}, b: {1, #foo?: 1}`,
+			subsumes: false,
+		},
 
-		464: {subsumes: true, in: `a: {int, #foo: number}, b: {1, #foo: 1}`},
-		465: {subsumes: false, in: `a: {int, #foo: 1}, b: {1, #foo: number}`},
-		466: {subsumes: false, in: `a: {1, #foo: number}, b: {int, #foo: 1}`},
-		467: {subsumes: false, in: `a: {1, #foo: 1}, b: {int, #foo: number}`},
+		464: {
+			in:       `a: {int, #foo: number}, b: {1, #foo: 1}`,
+			subsumes: true,
+		},
+		465: {
+			in:       `a: {int, #foo: 1}, b: {1, #foo: number}`,
+			subsumes: false,
+		},
+		466: {
+			in:       `a: {1, #foo: number}, b: {int, #foo: 1}`,
+			subsumes: false,
+		},
+		467: {
+			in:       `a: {1, #foo: 1}, b: {int, #foo: number}`,
+			subsumes: false,
+		},
 
 		// Lists
-		506: {subsumes: true, in: `a: [], b: [] `},
-		507: {subsumes: true, in: `a: [1], b: [1] `},
-		508: {subsumes: false, in: `a: [1], b: [2] `},
-		509: {subsumes: false, in: `a: [1], b: [2, 3] `},
-		510: {subsumes: true, in: `a: [{b: string}], b: [{b: "foo"}] `},
-		511: {subsumes: true, in: `a: [...{b: string}], b: [{b: "foo"}] `},
-		512: {subsumes: false, in: `a: [{b: "foo"}], b: [{b: string}] `},
-		513: {subsumes: false, in: `a: [{b: string}], b: [{b: "foo"}, ...{b: "foo"}] `},
-		520: {subsumes: false, in: `a: [_, int, ...], b: [int, string, ...string] `},
+		506: {
+			in:       `a: [], b: [] `,
+			subsumes: true,
+		},
+		507: {
+			in:       `a: [1], b: [1] `,
+			subsumes: true,
+		},
+		508: {
+			in:       `a: [1], b: [2] `,
+			subsumes: false,
+		},
+		509: {
+			in:       `a: [1], b: [2, 3] `,
+			subsumes: false,
+		},
+		510: {
+			in:       `a: [{b: string}], b: [{b: "foo"}] `,
+			subsumes: true,
+		},
+		511: {
+			in:       `a: [...{b: string}], b: [{b: "foo"}] `,
+			subsumes: true,
+		},
+		512: {
+			in:       `a: [{b: "foo"}], b: [{b: string}] `,
+			subsumes: false,
+		},
+		513: {
+			in:       `a: [{b: string}], b: [{b: "foo"}, ...{b: "foo"}] `,
+			subsumes: false,
+		},
+		520: {
+			in:       `a: [_, int, ...], b: [int, string, ...string] `,
+			subsumes: false,
+		},
 
 		// Closed structs.
-		600: {subsumes: false, in: `a: close({}), b: {a: 1}`},
-		601: {subsumes: false, in: `a: close({a: 1}), b: {a: 1}`},
-		602: {subsumes: false, in: `a: close({a: 1, b: 1}), b: {a: 1}`},
-		603: {subsumes: false, in: `a: {a: 1}, b: close({})`},
-		604: {subsumes: true, in: `a: {a: 1}, b: close({a: 1})`},
-		605: {subsumes: true, in: `a: {a: 1}, b: close({a: 1, b: 1})`},
-		606: {subsumes: true, in: `a: close({b?: 1}), b: close({b: 1})`},
-		607: {subsumes: false, in: `a: close({b: 1}), b: close({b?: 1})`},
-		608: {subsumes: true, in: `a: {}, b: close({})`},
-		609: {subsumes: true, in: `a: {}, b: close({foo?: 1})`},
-		610: {subsumes: true, in: `a: {foo?:1}, b: close({})`},
+		600: {
+			in:       `a: close({}), b: {a: 1}`,
+			subsumes: false,
+		},
+		601: {
+			in:       `a: close({a: 1}), b: {a: 1}`,
+			subsumes: false,
+		},
+		602: {
+			in:       `a: close({a: 1, b: 1}), b: {a: 1}`,
+			subsumes: false,
+		},
+		603: {
+			in:       `a: {a: 1}, b: close({})`,
+			subsumes: false,
+		},
+		604: {
+			in:       `a: {a: 1}, b: close({a: 1})`,
+			subsumes: true,
+		},
+		605: {
+			in:       `a: {a: 1}, b: close({a: 1, b: 1})`,
+			subsumes: true,
+		},
+		606: {
+			in:       `a: close({b?: 1}), b: close({b: 1})`,
+			subsumes: true,
+		},
+		607: {
+			in:       `a: close({b: 1}), b: close({b?: 1})`,
+			subsumes: false,
+		},
+		608: {
+			in:       `a: {}, b: close({})`,
+			subsumes: true,
+		},
+		609: {
+			in:       `a: {}, b: close({foo?: 1})`,
+			subsumes: true,
+		},
+		610: {
+			in:       `a: {foo?:1}, b: close({})`,
+			subsumes: true,
+		},
 
 		// New in new evaluator.
-		611: {subsumes: false, in: `a: close({foo?:1}), b: close({bar?: 1})`},
-		612: {subsumes: true, in: `a: {foo?:1}, b: close({bar?: 1})`},
-		613: {subsumes: true, in: `a: {foo?:1}, b: close({bar: 1})`},
+		611: {
+			in:       `a: close({foo?:1}), b: close({bar?: 1})`,
+			subsumes: false,
+		},
+		612: {
+			in:       `a: {foo?:1}, b: close({bar?: 1})`,
+			subsumes: true,
+		},
+		613: {
+			in:       `a: {foo?:1}, b: close({bar: 1})`,
+			subsumes: true,
+		},
 
 		// Definitions are not regular fields.
-		630: {subsumes: false, in: `a: {#a: 1}, b: {a: 1}`},
-		631: {subsumes: false, in: `a: {a: 1}, b: {#a: 1}`},
+		630: {
+			in:       `a: {#a: 1}, b: {a: 1}`,
+			subsumes: false,
+		},
+		631: {
+			in:       `a: {a: 1}, b: {#a: 1}`,
+			subsumes: false,
+		},
 
 		// Subsuming final values.
-		700: {subsumes: true, in: `a: [string]: 1, b: {foo: 1}`, mode: subFinal},
-		701: {subsumes: true, in: `a: [string]: int, b: {foo: 1}`, mode: subFinal},
-		702: {subsumes: true, in: `a: {["foo"]: int}, b: {foo: 1}`, mode: subFinal},
-		703: {subsumes: false, in: `a: close({["foo"]: 1}), b: {bar: 1}`, mode: subFinal},
-		704: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`, mode: subFinal},
-		705: {subsumes: true, in: `a: close({}), b: {foo?: 1}`, mode: subFinal},
-		706: {subsumes: true, in: `a: close({}), b: close({foo?: 1})`, mode: subFinal},
-		707: {subsumes: true, in: `a: {}, b: close({})`, mode: subFinal},
-		708: {subsumes: false, in: `a: {[string]: 1}, b: {foo: 2}`, mode: subFinal},
-		709: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subFinal},
-		710: {subsumes: false, in: `a: {foo: [...string]}, b: {}`, mode: subFinal},
+		700: {
+			in:       `a: [string]: 1, b: {foo: 1}`,
+			mode:     subFinal,
+			subsumes: true,
+		},
+		701: {
+			in:       `a: [string]: int, b: {foo: 1}`,
+			mode:     subFinal,
+			subsumes: true,
+		},
+		702: {
+			in:       `a: {["foo"]: int}, b: {foo: 1}`,
+			mode:     subFinal,
+			subsumes: true,
+		},
+		703: {
+			in:       `a: close({["foo"]: 1}), b: {bar: 1}`,
+			mode:     subFinal,
+			subsumes: false,
+		},
+		704: {
+			in:       `a: {foo: 1}, b: {foo?: 1}`,
+			mode:     subFinal,
+			subsumes: false,
+		},
+		705: {
+			in:       `a: close({}), b: {foo?: 1}`,
+			mode:     subFinal,
+			subsumes: true,
+		},
+		706: {
+			in:       `a: close({}), b: close({foo?: 1})`,
+			mode:     subFinal,
+			subsumes: true,
+		},
+		707: {
+			in:       `a: {}, b: close({})`,
+			mode:     subFinal,
+			subsumes: true,
+		},
+		708: {
+			in:       `a: {[string]: 1}, b: {foo: 2}`,
+			mode:     subFinal,
+			subsumes: false,
+		},
+		709: {
+			in:       `a: {}, b: close({foo?: 1})`,
+			mode:     subFinal,
+			subsumes: true,
+		},
+		710: {
+			in:       `a: {foo: [...string]}, b: {}`,
+			mode:     subFinal,
+			subsumes: false,
+		},
 
 		// Schema values
-		800: {subsumes: true, in: `a: close({}), b: {foo: 1}`, mode: subSchema},
+		800: {
+			in:       `a: close({}), b: {foo: 1}`,
+			mode:     subSchema,
+			subsumes: true,
+		},
 		// TODO(eval): FIX
 		// 801: {subsumes: true, in: `a: {[string]: int}, b: {foo: 1}`, mode: subSchema},
-		804: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`, mode: subSchema},
-		805: {subsumes: true, in: `a: close({}), b: {foo?: 1}`, mode: subSchema},
-		806: {subsumes: true, in: `a: close({}), b: close({foo?: 1})`, mode: subSchema},
-		807: {subsumes: true, in: `a: {}, b: close({})`, mode: subSchema},
-		808: {subsumes: false, in: `a: {[string]: 1}, b: {foo: 2}`, mode: subSchema},
-		809: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subSchema},
+		804: {
+			in:       `a: {foo: 1}, b: {foo?: 1}`,
+			mode:     subSchema,
+			subsumes: false,
+		},
+		805: {
+			in:       `a: close({}), b: {foo?: 1}`,
+			mode:     subSchema,
+			subsumes: true,
+		},
+		806: {
+			in:       `a: close({}), b: close({foo?: 1})`,
+			mode:     subSchema,
+			subsumes: true,
+		},
+		807: {
+			in:       `a: {}, b: close({})`,
+			mode:     subSchema,
+			subsumes: true,
+		},
+		808: {
+			in:       `a: {[string]: 1}, b: {foo: 2}`,
+			mode:     subSchema,
+			subsumes: false,
+		},
+		809: {
+			in:       `a: {}, b: close({foo?: 1})`,
+			mode:     subSchema,
+			subsumes: true,
+		},
 
 		// Lists
-		950: {subsumes: true, in: `a: [], b: []`},
-		951: {subsumes: true, in: `a: [...], b: []`},
-		952: {subsumes: true, in: `a: [...], b: [...]`},
-		953: {subsumes: false, in: `a: [], b: [...]`},
+		950: {
+			in:       `a: [], b: []`,
+			subsumes: true,
+		},
+		951: {
+			in:       `a: [...], b: []`,
+			subsumes: true,
+		},
+		952: {
+			in:       `a: [...], b: [...]`,
+			subsumes: true,
+		},
+		953: {
+			in:       `a: [], b: [...]`,
+			subsumes: false,
+		},
 
-		954: {subsumes: true, in: `a: [2], b: [2]`},
-		955: {subsumes: true, in: `a: [int], b: [2]`},
-		956: {subsumes: false, in: `a: [2], b: [int]`},
-		957: {subsumes: true, in: `a: [int], b: [int]`},
+		954: {
+			in:       `a: [2], b: [2]`,
+			subsumes: true,
+		},
+		955: {
+			in:       `a: [int], b: [2]`,
+			subsumes: true,
+		},
+		956: {
+			in:       `a: [2], b: [int]`,
+			subsumes: false,
+		},
+		957: {
+			in:       `a: [int], b: [int]`,
+			subsumes: true,
+		},
 
-		958: {subsumes: true, in: `a: [...2], b: [2]`},
-		959: {subsumes: true, in: `a: [...int], b: [2]`},
-		960: {subsumes: false, in: `a: [...2], b: [int]`},
-		961: {subsumes: true, in: `a: [...int], b: [int]`},
+		958: {
+			in:       `a: [...2], b: [2]`,
+			subsumes: true,
+		},
+		959: {
+			in:       `a: [...int], b: [2]`,
+			subsumes: true,
+		},
+		960: {
+			in:       `a: [...2], b: [int]`,
+			subsumes: false,
+		},
+		961: {
+			in:       `a: [...int], b: [int]`,
+			subsumes: true,
+		},
 
-		962: {subsumes: false, in: `a: [2], b: [...2]`},
-		963: {subsumes: false, in: `a: [int], b: [...2]`},
-		964: {subsumes: false, in: `a: [2], b: [...int]`},
-		965: {subsumes: false, in: `a: [int], b: [...int]`},
+		962: {
+			in:       `a: [2], b: [...2]`,
+			subsumes: false,
+		},
+		963: {
+			in:       `a: [int], b: [...2]`,
+			subsumes: false,
+		},
+		964: {
+			in:       `a: [2], b: [...int]`,
+			subsumes: false,
+		},
+		965: {
+			in:       `a: [int], b: [...int]`,
+			subsumes: false,
+		},
 
-		966: {subsumes: false, in: `a: [...int], b: ["foo"]`},
-		967: {subsumes: false, in: `a: ["foo"], b: [...int]`},
+		966: {
+			in:       `a: [...int], b: ["foo"]`,
+			subsumes: false,
+		},
+		967: {
+			in:       `a: ["foo"], b: [...int]`,
+			subsumes: false,
+		},
 
 		// Defaults:
 		// TODO: for the purpose of v0.2 compatibility these
 		// evaluate to true. Reconsider before making this package
 		// public.
-		970: {subsumes: true, in: `a: [], b: [...int]`, mode: subDefaults},
-		971: {subsumes: true, in: `a: [2], b: [2, ...int]`, mode: subDefaults},
+		970: {
+			in:       `a: [], b: [...int]`,
+			mode:     subDefaults,
+			subsumes: true,
+		},
+		971: {
+			in:       `a: [2], b: [2, ...int]`,
+			mode:     subDefaults,
+			subsumes: true,
+		},
 
 		// Final
-		980: {subsumes: true, in: `a: [], b: [...int]`, mode: subFinal},
-		981: {subsumes: true, in: `a: [2], b: [2, ...int]`, mode: subFinal},
+		980: {
+			in:       `a: [], b: [...int]`,
+			mode:     subFinal,
+			subsumes: true,
+		},
+		981: {
+			in:       `a: [2], b: [2, ...int]`,
+			mode:     subFinal,
+			subsumes: true,
+		},
 	}
 
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)

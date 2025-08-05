@@ -53,10 +53,6 @@ workflows: release: _repo.bashWorkflow & {
 				uses: "docker/setup-qemu-action@v3"
 			},
 			{
-				name: "Set up Docker Buildx"
-				uses: "docker/setup-buildx-action@v3"
-			},
-			{
 				name: "Docker Login"
 				uses: "docker/login-action@v3"
 				with: {

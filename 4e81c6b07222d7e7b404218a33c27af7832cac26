@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc449164_c0637305",
+        "filename": ".claude/settings.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-05T12:33:28Z",
+      "side": 1,
+      "message": "FWIW this command is for arbitrary API calls, so this breaks the \"read-only\" aspect you mention in the commit message.",
+      "revId": "4e81c6b07222d7e7b404218a33c27af7832cac26",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

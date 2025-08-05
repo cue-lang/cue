@@ -43,6 +43,12 @@ import (
 	"golang.org/x/tools/txtar"
 )
 
+// We are removing any references to evalv2 in the testing infrastructure.
+// However, in the evaluator test, we will keep the evalv2 outputs around for
+// a while to be able to compare the outputs of the two versions.
+// TODO: at some point we should promote evalv3 to the default version.
+const EvalV2 = "v2"
+
 // A TxTarTest represents a test run that process all CUE tests in the txtar
 // format rooted in a given directory. See the [Test] documentation for
 // more details.
@@ -351,11 +357,11 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 		test := *x
 		if s := m.Fallback(); s != "" {
 			test.Fallback = test.Name
-			if s != cuetdtest.DefaultVersion {
+			if s != "v2" {
 				test.Fallback += "-" + s
 			}
 		}
-		if s := m.Name(); s != cuetdtest.DefaultVersion {
+		if s := m.Name(); s != "v2" {
 			test.Name += "-" + s
 		}
 		test.run(t, m, func(tc *Test) {
@@ -468,10 +474,6 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				if tc.HasTag("skip-" + tc.Name()) {
 					t.Skip()
 				}
-			} else if tc.HasTag("skip-v2") && strings.Contains(t.Name(), "EvalV2") {
-				// Temporary hack since internal/core/adt uses TestEvalV2 rather than [cuetdtest.Matrix].
-				// TODO(mvdan): clean this up.
-				t.Skip()
 			}
 			if msg, ok := x.Skip[testName]; ok {
 				t.Skip(msg)

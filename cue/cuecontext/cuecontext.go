@@ -77,10 +77,6 @@ const (
 	// currently [EvalV3]. Note that this version may change without notice.
 	EvalExperiment EvalVersion = internal.DevVersion
 
-	// EvalV2 is the previous version of the evaluator. It was introduced in CUE
-	// version 0.3 and is being maintained until 2024.
-	EvalV2 EvalVersion = internal.EvalV2
-
 	// EvalV3 is the current version of the evaluator. It was introduced in 2024
 	// and brought a new disjunction algorithm, a new closedness algorithm, a
 	// new core scheduler, and adds performance enhancements like structure sharing.

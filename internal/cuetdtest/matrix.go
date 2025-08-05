@@ -53,15 +53,13 @@ func (t *M) Runtime() *runtime.Runtime {
 }
 
 // TODO(mvdan): the default should now be evalv3.
+// We keep it to be v2 for now, as a lot of tests still assume the evalv2 output
+// is the "golden output". We will phase that out incrementally.
 const DefaultVersion = "v2"
 
 type Matrix []M
 
 var (
-	evalv2 = M{
-		name:    DefaultVersion,
-		version: internal.EvalV2,
-	}
 	evalv3 = M{
 		name:     "v3",
 		fallback: "v2",
@@ -85,8 +83,6 @@ var SmallMatrix Matrix = []M{evalv3}
 var DefaultOnlyMatrix Matrix = []M{evalv3}
 
 var DevOnlyMatrix Matrix = []M{evalv3}
-
-var EvalV2OnlyMatrix Matrix = []M{evalv2}
 
 // Run runs a subtest with the given name that
 // invokes a further subtest for each configuration in the matrix.

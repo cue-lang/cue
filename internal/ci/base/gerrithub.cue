@@ -48,7 +48,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 	}
 	jobs: {
 		(trybot.key): {
-			"runs-on": linuxSmallMachine
+			"runs-on": linuxSmallMachine + overrideCacheTagDispatch
 
 			let goodDummyData = [if json.Marshal(#dummyDispatch) != _|_ {true}, false][0]
 
@@ -165,16 +165,12 @@ pushTipToTrybotWorkflow: bashWorkflow & {
 	on: {
 		push: branches: protectedBranchPatterns
 	}
-	jobs: push: {
-		"runs-on": linuxSmallMachine
-		if:        "${{github.repository == '\(githubRepositoryPath)'}}"
-	}
-
 	name: "Push tip to \(trybot.key)"
-
 	concurrency: "push_tip_to_trybot"
 
 	jobs: push: {
+		"runs-on": linuxSmallMachine + overrideCacheTagDispatch
+		if:        "${{github.repository == '\(githubRepositoryPath)'}}"
 		steps: [
 			writeNetrcFile,
 			{

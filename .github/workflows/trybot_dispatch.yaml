@@ -11,7 +11,7 @@ jobs:
     defaults:
       run:
         shell: bash --noprofile --norc -euo pipefail {0}
-    runs-on: ns-linux-amd64-small;overrides.cache-tag=cue-dispatch-workflow
+    runs-on: namespace-profile-linux-amd64;overrides.cache-tag=cue-dispatch-workflow
     if: ${{ ((github.ref == 'refs/heads/ci/test') && false) || github.event.client_payload.type == 'trybot' }}
     steps:
       - name: Write netrc file for cueckoo Gerrithub

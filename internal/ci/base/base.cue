@@ -73,8 +73,12 @@ workflowFileExtension: ".yaml"
 // and "large" is 8 CPUs and 16GiB of memory.
 // With our concurrency limit for Linux at 64 CPUs and 128 GiB,
 // using "small" rather than "large" allows 16 rather than 8 jobs at once.
-linuxSmallMachine: "ns-linux-amd64-small"
-linuxLargeMachine: "ns-linux-amd64-large"
+//
+// TODO(mvdan): use aliases again once they can work with the "overrides.cache-tag" suffix below.
+// linuxSmallMachine: "ns-linux-amd64-small"
+// linuxLargeMachine: "ns-linux-amd64-large"
+linuxSmallMachine: "namespace-profile-linux-amd64"
+linuxLargeMachine: "namespace-profile-linux-amd64-large"
 
 // By default, the main "trybot" test job is run on the small machine.
 // Note that cheap workflows, or those which don't keep a human waiting,

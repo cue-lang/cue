@@ -19,6 +19,7 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
@@ -110,8 +111,11 @@ func TestValues(t *testing.T) {
 			err: "value not an instance",
 		},
 		{
-			in:  `a: [],      b: _`,
-			err: "list does not subsume _ (type _) (and 1 more errors)",
+			in: `a: [],      b: _`,
+			err: `
+				list does not subsume _ (type _):
+				    subsume:1:16
+				value not an instance`,
 		},
 		{
 			in:  `a: _|_ ,      b: _`,
@@ -337,16 +341,24 @@ func TestValues(t *testing.T) {
 		},
 
 		{
-			in:  `a: {a:1}, b: {}`,
-			err: "regular field is constraint in subsumed value: a (and 1 more errors)",
+			in: `a: {a:1}, b: {}`,
+			err: `
+				regular field is constraint in subsumed value: a
+				value not an instance`,
 		},
 		{
-			in:  `a: {a:1, b:1}, b: {a:1}`,
-			err: "regular field is constraint in subsumed value: b (and 1 more errors)",
+			in: `a: {a:1, b:1}, b: {a:1}`,
+			err: `
+				regular field is constraint in subsumed value: b
+				value not an instance`,
 		},
 		{
-			in:  `a: {s: { a:1} }, b: { s: {}}`,
-			err: "regular field is constraint in subsumed value: a (and 2 more errors)",
+			in: `a: {s: { a:1} }, b: { s: {}}`,
+			err: `
+				field s not present in {s:{}}:
+				    subsume:1:21
+				missing field "s"
+				regular field is constraint in subsumed value: a`,
 		},
 
 		{
@@ -681,12 +693,17 @@ func TestValues(t *testing.T) {
 		// value of that field in B can cause A and B to no longer unify.
 		//
 		{
-			in:  `a: {foo: 1}, b: {}`,
-			err: "regular field is constraint in subsumed value: foo (and 1 more errors)",
+			in: `a: {foo: 1}, b: {}`,
+			err: `
+				regular field is constraint in subsumed value: foo
+				value not an instance`,
 		},
 		{
-			in:  `a: {foo?: 1}, b: {}`,
-			err: "field foo not present in {} (and 1 more errors)",
+			in: `a: {foo?: 1}, b: {}`,
+			err: `
+				field foo not present in {}:
+				    subsume:1:18
+				missing field "foo"`,
 		},
 		{
 			in:  `a: {}, b: {foo: 1}`,
@@ -710,25 +727,40 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 		{
-			in:  `a: {foo: 1}, b: {foo?: 1}`,
-			err: `field foo not present in {foo?:1} (and 1 more errors)`,
+			in: `a: {foo: 1}, b: {foo?: 1}`,
+			err: `
+				field foo not present in {foo?:1}:
+				    subsume:1:17
+				missing field "foo"`,
 		},
 
 		{
-			in:  `a: {foo: 1}, b: {foo: 2}`,
-			err: `field foo not present in {foo:2} (and 1 more errors)`,
+			in: `a: {foo: 1}, b: {foo: 2}`,
+			err: `
+				field foo not present in {foo:2}:
+				    subsume:1:17
+				missing field "foo"`,
 		},
 		{
-			in:  `a: {foo?: 1}, b: {foo: 2}`,
-			err: `field foo not present in {foo:2} (and 1 more errors)`,
+			in: `a: {foo?: 1}, b: {foo: 2}`,
+			err: `
+				field foo not present in {foo:2}:
+				    subsume:1:18
+				missing field "foo"`,
 		},
 		{
-			in:  `a: {foo?: 1}, b: {foo?: 2}`,
-			err: `field foo not present in {foo?:2} (and 1 more errors)`,
+			in: `a: {foo?: 1}, b: {foo?: 2}`,
+			err: `
+				field foo not present in {foo?:2}:
+				    subsume:1:18
+				missing field "foo"`,
 		},
 		{
-			in:  `a: {foo: 1}, b: {foo?: 2}`,
-			err: `field foo not present in {foo?:2} (and 1 more errors)`,
+			in: `a: {foo: 1}, b: {foo?: 2}`,
+			err: `
+				field foo not present in {foo?:2}:
+				    subsume:1:17
+				missing field "foo"`,
 		},
 
 		{
@@ -744,25 +776,40 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 		{
-			in:  `a: {foo: number}, b: {foo?: 2}`,
-			err: `field foo not present in {foo?:2} (and 1 more errors)`,
+			in: `a: {foo: number}, b: {foo?: 2}`,
+			err: `
+				field foo not present in {foo?:2}:
+				    subsume:1:22
+				missing field "foo"`,
 		},
 
 		{
-			in:  `a: {foo: 1}, b: {foo: number}`,
-			err: `field foo not present in {foo:number} (and 1 more errors)`,
+			in: `a: {foo: 1}, b: {foo: number}`,
+			err: `
+				field foo not present in {foo:number}:
+				    subsume:1:17
+				missing field "foo"`,
 		},
 		{
-			in:  `a: {foo?: 1}, b: {foo: number}`,
-			err: `field foo not present in {foo:number} (and 1 more errors)`,
+			in: `a: {foo?: 1}, b: {foo: number}`,
+			err: `
+				field foo not present in {foo:number}:
+				    subsume:1:18
+				missing field "foo"`,
 		},
 		{
-			in:  `a: {foo?: 1}, b: {foo?: number}`,
-			err: `field foo not present in {foo?:number} (and 1 more errors)`,
+			in: `a: {foo?: 1}, b: {foo?: number}`,
+			err: `
+				field foo not present in {foo?:number}:
+				    subsume:1:18
+				missing field "foo"`,
 		},
 		{
-			in:  `a: {foo: 1}, b: {foo?: number}`,
-			err: `field foo not present in {foo?:number} (and 1 more errors)`,
+			in: `a: {foo: 1}, b: {foo?: number}`,
+			err: `
+				field foo not present in {foo?:number}:
+				    subsume:1:17
+				missing field "foo"`,
 		},
 
 		// The one exception of the rule: there is no value of foo that can be
@@ -844,8 +891,12 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 		{
-			in:  `a: {1, #foo: number}, b: {1, #foo?: 1}`,
-			err: `field #foo not present in 1 (and 1 more errors)`,
+			in: `a: {1, #foo: number}, b: {1, #foo?: 1}`,
+			err: `
+				field #foo not present in 1:
+				    subsume:1:26
+				    subsume:1:27
+				missing field "#foo"`,
 		},
 
 		{
@@ -853,8 +904,12 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 		{
-			in:  `a: {int, #foo: 1}, b: {1, #foo: number}`,
-			err: `field #foo not present in 1 (and 1 more errors)`,
+			in: `a: {int, #foo: 1}, b: {1, #foo: number}`,
+			err: `
+				field #foo not present in 1:
+				    subsume:1:23
+				    subsume:1:24
+				missing field "#foo"`,
 		},
 		{
 			in:  `a: {1, #foo: number}, b: {int, #foo: 1}`,
@@ -891,8 +946,11 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 		{
-			in:  `a: [{b: "foo"}], b: [{b: string}] `,
-			err: `field b not present in {b:string} (and 1 more errors)`,
+			in: `a: [{b: "foo"}], b: [{b: string}] `,
+			err: `
+				field b not present in {b:string}:
+				    subsume:1:22
+				missing field "b"`,
 		},
 		{
 			in:  `a: [{b: string}], b: [{b: "foo"}, ...{b: "foo"}] `,
@@ -917,8 +975,10 @@ func TestValues(t *testing.T) {
 			err: "value not an instance",
 		},
 		{
-			in:  `a: {a: 1}, b: close({})`,
-			err: "regular field is constraint in subsumed value: a (and 1 more errors)",
+			in: `a: {a: 1}, b: close({})`,
+			err: `
+				regular field is constraint in subsumed value: a
+				value not an instance`,
 		},
 		{
 			in:  `a: {a: 1}, b: close({a: 1})`,
@@ -933,8 +993,11 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 		{
-			in:  `a: close({b: 1}), b: close({b?: 1})`,
-			err: `field b not present in {b?:1} (and 1 more errors)`,
+			in: `a: close({b: 1}), b: close({b?: 1})`,
+			err: `
+				field b not present in {b?:1}:
+				    subsume:1:22
+				missing field "b"`,
 		},
 		{
 			in:  `a: {}, b: close({})`,
@@ -951,8 +1014,10 @@ func TestValues(t *testing.T) {
 
 		// New in new evaluator.
 		{
-			in:  `a: close({foo?:1}), b: close({bar?: 1})`,
-			err: "field not allowed in closed struct: bar (and 1 more errors)",
+			in: `a: close({foo?:1}), b: close({bar?: 1})`,
+			err: `
+				field not allowed in closed struct: bar
+				value not an instance`,
 		},
 		{
 			in:  `a: {foo?:1}, b: close({bar?: 1})`,
@@ -965,12 +1030,16 @@ func TestValues(t *testing.T) {
 
 		// Definitions are not regular fields.
 		{
-			in:  `a: {#a: 1}, b: {a: 1}`,
-			err: "regular field is constraint in subsumed value: #a (and 1 more errors)",
+			in: `a: {#a: 1}, b: {a: 1}`,
+			err: `
+				regular field is constraint in subsumed value: #a
+				value not an instance`,
 		},
 		{
-			in:  `a: {a: 1}, b: {#a: 1}`,
-			err: "regular field is constraint in subsumed value: a (and 1 more errors)",
+			in: `a: {a: 1}, b: {#a: 1}`,
+			err: `
+				regular field is constraint in subsumed value: a
+				value not an instance`,
 		},
 
 		// Subsuming final values.
@@ -992,12 +1061,17 @@ func TestValues(t *testing.T) {
 		{
 			in:   `a: close({["foo"]: 1}), b: {bar: 1}`,
 			mode: subFinal,
-			err:  "field not allowed in closed struct: bar (and 1 more errors)",
+			err: `
+				field not allowed in closed struct: bar
+				value not an instance`,
 		},
 		{
 			in:   `a: {foo: 1}, b: {foo?: 1}`,
 			mode: subFinal,
-			err:  `field foo not present in {foo?:1} (and 1 more errors)`,
+			err: `
+				field foo not present in {foo?:1}:
+				    subsume:1:17
+				missing field "foo"`,
 		},
 		{
 			in:   `a: close({}), b: {foo?: 1}`,
@@ -1027,7 +1101,9 @@ func TestValues(t *testing.T) {
 		{
 			in:   `a: {foo: [...string]}, b: {}`,
 			mode: subFinal,
-			err:  "regular field is constraint in subsumed value: foo (and 1 more errors)",
+			err: `
+				regular field is constraint in subsumed value: foo
+				value not an instance`,
 		},
 
 		// Schema values
@@ -1041,7 +1117,10 @@ func TestValues(t *testing.T) {
 		{
 			in:   `a: {foo: 1}, b: {foo?: 1}`,
 			mode: subSchema,
-			err:  `field foo not present in {foo?:1} (and 1 more errors)`,
+			err: `
+				field foo not present in {foo?:1}:
+				    subsume:1:17
+				missing field "foo"`,
 		},
 		{
 			in:   `a: close({}), b: {foo?: 1}`,
@@ -1234,7 +1313,11 @@ func TestValues(t *testing.T) {
 
 		var gotErr string
 		if err != nil {
-			gotErr = err.Error()
+			gotErr = strings.TrimSpace(errors.Details(err, nil))
+			if strings.Contains(gotErr, "\n") {
+				gotErr = "\n" + gotErr
+				gotErr = strings.Replace(gotErr, "\n", "\n\t\t\t\t", -1)
+			}
 		}
 
 		t.Equal(gotErr, tc.err)

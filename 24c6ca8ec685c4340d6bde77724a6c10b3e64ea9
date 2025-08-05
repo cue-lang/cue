@@ -16,6 +16,24 @@
       "message": "isn\u0027t this now redundant with TODO_V2 above?",
       "revId": "24c6ca8ec685c4340d6bde77724a6c10b3e64ea9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c59eefb9_7b95c88e",
+        "filename": "internal/core/subsume/value_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1201,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-05T15:58:30Z",
+      "side": 1,
+      "message": "Pretty much. Removed the field and code.",
+      "parentUuid": "161c6774_4979397b",
+      "revId": "24c6ca8ec685c4340d6bde77724a6c10b3e64ea9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

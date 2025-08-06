@@ -87,23 +87,7 @@ func (v *Vertex) IsRecursivelyClosed() bool {
 	return v.ClosedRecursive || v.IsInOneOf(DefinitionSpan)
 }
 
-type closeNodeType uint8
-
-const (
-	// a closeRef node is created when there is a non-definition reference.
-	closeRef closeNodeType = iota
-
-	// closeDef indicates this node was introduced as a result of referencing
-	// a definition.
-	closeDef
-
-	// closeEmbed indicates this node was added as a result of an embedding.
-	closeEmbed
-)
-
-// TODO: merge with closeInfo: this is a leftover of the refactoring.
 type CloseInfo struct {
-	*closeInfo // old implementation (TODO: remove)
 	// defID is a unique ID to track anything that gets inserted from this
 	// Conjunct.
 	opID           uint64 // generation of this conjunct, used for sanity check.
@@ -138,24 +122,15 @@ type CloseInfo struct {
 }
 
 func (c CloseInfo) Location() Node {
-	if c.closeInfo == nil {
-		return nil
-	}
-	return c.closeInfo.location
+	return nil
 }
 
 func (c CloseInfo) span() SpanType {
-	if c.closeInfo == nil {
-		return 0
-	}
-	return c.closeInfo.span
+	return 0
 }
 
 func (c CloseInfo) RootSpanType() SpanType {
-	if c.closeInfo == nil {
-		return 0
-	}
-	return c.root
+	return 0
 }
 
 // IsInOneOf reports whether c is contained within any of the span types in the
@@ -167,78 +142,16 @@ func (c CloseInfo) IsInOneOf(t SpanType) bool {
 // TODO(perf): remove: error positions should always be computed on demand
 // in dedicated error types.
 func (c *CloseInfo) AddPositions(ctx *OpContext) {
-	for s := c.closeInfo; s != nil; s = s.parent {
-		if loc := s.location; loc != nil {
-			ctx.AddPosition(loc)
-		}
-	}
+	c.AncestorPositions(func(n Node) {
+		ctx.AddPosition(n)
+	})
 }
 
-// TODO(perf): use on StructInfo. Then if parent and expression are the same
-// it is possible to use cached value.
-func (c CloseInfo) SpawnEmbed(x Node) CloseInfo {
-	c.closeInfo = &closeInfo{
-		parent:   c.closeInfo,
-		location: x,
-		mode:     closeEmbed,
-		root:     EmbeddingSpan,
-		span:     c.span() | EmbeddingSpan,
-	}
-	return c
-}
-
-// SpawnGroup is used for structs that contain embeddings that may end up
-// closing the struct. This is to force that `b` is not allowed in
-//
-//	a: {#foo} & {b: int}
-func (c CloseInfo) SpawnGroup(x Expr) CloseInfo {
-	c.closeInfo = &closeInfo{
-		parent:   c.closeInfo,
-		location: x,
-		span:     c.span(),
-	}
-	return c
-}
-
-// SpawnSpan is used to track that a value is introduced by a comprehension
-// or constraint. Definition and embedding spans are introduced with SpawnRef
-// and SpawnEmbed, respectively.
-func (c CloseInfo) SpawnSpan(x Node, t SpanType) CloseInfo {
-	c.closeInfo = &closeInfo{
-		parent:   c.closeInfo,
-		location: x,
-		root:     t,
-		span:     c.span() | t,
-	}
-	return c
-}
-
-func (c CloseInfo) SpawnRef(arc *Vertex, isDef bool, x Expr) CloseInfo {
-	span := c.span()
-	found := false
-	if !isDef {
-		xnode := Node(x) // Optimization so we're comparing identical interface types.
-		// TODO: make this work for non-definitions too.
-		for p := c.closeInfo; p != nil; p = p.parent {
-			if p.span == span && p.location == xnode {
-				found = true
-				break
-			}
-		}
-	}
-	if !found {
-		c.closeInfo = &closeInfo{
-			parent:   c.closeInfo,
-			location: x,
-			span:     span,
-		}
-	}
-	if isDef {
-		c.mode = closeDef
-		c.closeInfo.root = DefinitionSpan
-		c.closeInfo.span |= DefinitionSpan
-	}
-	return c
+// AncestorPositions calls f for each parent of c, starting with the most
+// immediate parent. This is used to add positions to errors that are
+// associated with a CloseInfo.
+func (c *CloseInfo) AncestorPositions(f func(Node)) {
+	// TODO(evalv3): track positions
 }
 
 // IsDef reports whether an expressions is a reference that references a
@@ -277,54 +190,6 @@ const (
 	ComprehensionSpan
 	DefinitionSpan
 )
-
-type closeInfo struct {
-	// location records the expression that led to this node's introduction.
-	location Node
-
-	// The parent node in the tree.
-	parent *closeInfo
-
-	// TODO(performance): if references are chained, we could have a separate
-	// parent pointer to skip the chain.
-
-	// mode indicates whether this node was added as part of an embedding,
-	// definition or non-definition reference.
-	mode closeNodeType
-
-	// noCheck means this struct is irrelevant for closedness checking. This can
-	// happen when:
-	//  - it is a sibling of a new definition.
-	noCheck bool // don't process for inclusion info
-
-	root SpanType
-	span SpanType
-}
-
-// closeStats holds the administrative fields for a closeInfo value. Each
-// closeInfo is associated with a single closeStats value per unification
-// operator. This association is done through an OpContext. This allows the
-// same value to be used in multiple concurrent unification operations.
-// NOTE: there are other parts of the algorithm that are not thread-safe yet.
-type closeStats struct {
-	// the other fields of this closeStats value are only valid if generation
-	// is equal to the generation in OpContext. This allows for lazy
-	// initialization of closeStats.
-	generation uint64
-
-	// These counts keep track of how many required child nodes need to be
-	// completed before this node is accepted.
-	requiredCount int
-	acceptedCount int
-
-	// accepted is set if this node is accepted.
-	accepted bool
-
-	required bool
-
-	inTodoList bool // true if added to todo list.
-	next       *closeStats
-}
 
 // isClosed reports whether v is closed at this level (so not recursively).
 func isClosed(v *Vertex) bool {

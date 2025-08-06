@@ -143,9 +143,7 @@ type OpContext struct {
 	// TODO(perf): have two generations: one for each pass of the closedness
 	// algorithm, so that the results of the first pass can be reused for all
 	// features of a node.
-	opID   uint64
-	closed map[*closeInfo]*closeStats
-	todo   *closeStats
+	opID uint64
 
 	// evalDepth indicates the current depth of evaluation. It is used to
 	// detect structural cycles and their severity.s

@@ -223,8 +223,8 @@ func addPositions(err *ValueError, c Conjunct) {
 			addPositions(err, c)
 		}
 	}
-	if c.CloseInfo.closeInfo != nil {
-		err.AddPosition(c.CloseInfo.location)
+	if p := c.CloseInfo.Location(); p != nil {
+		err.AddPosition(p)
 	}
 }
 
@@ -235,8 +235,8 @@ func NewRequiredNotPresentError(ctx *OpContext, v *Vertex) *Bottom {
 		if f, ok := c.x.(*Field); ok && f.ArcType == ArcRequired {
 			err.AddPosition(c.x)
 		}
-		if c.CloseInfo.closeInfo != nil {
-			err.AddPosition(c.CloseInfo.location)
+		if p := c.CloseInfo.Location(); p != nil {
+			err.AddPosition(p)
 		}
 		return true
 	})
@@ -324,11 +324,9 @@ func (v *ValueError) AddPosition(n Node) {
 }
 
 func (v *ValueError) AddClosedPositions(c CloseInfo) {
-	for s := c.closeInfo; s != nil; s = s.parent {
-		if loc := s.location; loc != nil {
-			v.AddPosition(loc)
-		}
-	}
+	c.AncestorPositions(func(n Node) {
+		v.AddPosition(n)
+	})
 }
 
 func (c *OpContext) errNode() *Vertex {

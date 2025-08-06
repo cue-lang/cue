@@ -160,10 +160,9 @@ outer:
 		if (flags&IgnoreOptional != 0) && !s.StructLit.HasOptional() {
 			continue
 		}
-		if s.span()&DefinitionSpan == 0 {
-			if !s.StructLit.HasOptional() {
-				continue
-			}
+		// span() always returns 0 after EvalV2 removal, so this check is always true
+		if !s.StructLit.HasOptional() {
+			continue
 		}
 		for _, t := range y.Structs {
 			if s.StructLit == t.StructLit {

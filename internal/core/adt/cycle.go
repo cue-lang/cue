@@ -691,6 +691,10 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 				return ci, false
 			}
 
+			if n.hasNonCycle && n.hasNonCyclic && r.Depth != n.depth {
+				return ci, false
+			}
+
 			return n.markCyclicPathV3(arc, env, x, ci)
 		}
 		if equalDeref(r.Node, n.node) && r.Ref == x && arc.nonRooted {

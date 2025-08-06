@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c04cfb20_ed4d6cd4",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 557,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T16:03:47Z",
+      "side": 1,
+      "message": "Ahh, you\u0027re thinking of:\n```\n{\n  {_b: int, a: _b}\n  c: _b\n  _b: 4\n}\n```\n?\n\nMy testing shows the `_b`s do get merged, and _b in `a: _b` does resolve to both. Though this is definitely on the edge of the difference between just resolution, and full evaluation - maybe you have an example where I\u0027m definitely doing the wrong thing?",
+      "parentUuid": "7c689620_c9482f6b",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "673dac55_22e4b681",
         "filename": "internal/lsp/definitions/definitions.go",
         "patchSetId": 17
@@ -133,6 +151,24 @@
       "writtenOn": "2025-08-06T15:44:07Z",
       "side": 1,
       "message": "Why skip the test if there are no wanted positions? Surely we want to be able to test the logic when an identifier doesn\u0027t resolve to anything?",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24589a25_a3b135de",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T16:03:47Z",
+      "side": 1,
+      "message": "This is the deliberate difference between nil and the empty list. There are plenty of cases where I explicitly test for the empty list, but as the nearby comment notes, it\u0027s also deliberate the the test does not need to capture every possible resolution.\n\nBut maybe we\u0027re talking past each other and you\u0027ve spotted something that I\u0027m missing?",
+      "parentUuid": "44c79f00_a24e2c29",
       "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

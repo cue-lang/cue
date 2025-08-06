@@ -819,6 +819,24 @@
       "message": "Maybe add a perf TODO to avoid the allocation if the slice isn\u0027t growing in length?\nI think it wouldn\u0027t be hard to reuse the existing slice.\n\nIn fact, how about just doing it? something like this perhaps?\n\n```\n    rs.ranges \u003d rs.ranges[:i]\n    rs.ranges \u003d slices.Grow(rs.ranges, 1+len(suffix))\n    rs.ranges \u003d rs.ranges[:len(prefix)+1+len(suffix))\n    copy(rs.ranges[i+1:], suffix)\n    rs.ranges[i] \u003d newRange\n```\n\nI think this could potentially be a significant improvement for the (perhaps most common?) case that non-overlapping increasing ranges are added sequentially in order, in which case it\u0027ll be equivalent to append I think.",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5eba3077_37f7d4a6",
+        "filename": "internal/lsp/rangeset/rangeset.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T16:03:47Z",
+      "side": 1,
+      "message": "Completely agree. BTW, this is where this code came from https://g.co/gemini/share/154f705da179\nPretty sure collectively we\u0027ve spent more time on this than if I\u0027d just written it manually from scratch.",
+      "parentUuid": "a5a074ef_175c6c8d",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

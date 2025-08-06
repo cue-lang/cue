@@ -16,6 +16,24 @@
       "message": "this edit feels backwards. this branch is unreachable for v3, so the entire branch should be removed.",
       "revId": "f89e90c1660f207d45a9bb29be09417b43dc0a8a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c564f7a_eb9adfc6",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1515,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-06T18:01:22Z",
+      "side": 0,
+      "message": "Good catch!",
+      "parentUuid": "27540515_dd7c12f5",
+      "revId": "f89e90c1660f207d45a9bb29be09417b43dc0a8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

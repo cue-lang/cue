@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d210acb_5f835242",
+        "filename": "encoding/xml/koala/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-06T18:01:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "feb8c532_e254fc1f",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc98f585_41727259",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-08-06T11:38:45Z",
       "side": 1,
       "message": "this godoc was left behind; is the AI struggling with that perhaps?",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68040c52_928d71c3",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 837,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-06T18:01:22Z",
+      "side": 1,
+      "message": "Indeed it is. It was removed later, but removing it here instead.",
+      "parentUuid": "bc98f585_41727259",
       "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8be2405d_786b809b",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-06T18:01:22Z",
+      "side": 1,
+      "message": "It is indeed a bogus change. clone is v2 only, though and will be removed in a subsequent CL, so for simplicity I\u0027m inclined to leave as is.",
+      "parentUuid": "eaf009ef_365eb2c2",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8c223e8_20415b6e",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-08-06T11:38:45Z",
       "side": 1,
       "message": "another godoc-like string that should be removed?",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0e29084_3c7c6a02",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-06T18:01:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8c223e8_20415b6e",
       "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38f7a909_17dfd911",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1023,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-06T18:01:22Z",
+      "side": 1,
+      "message": "This is removed later, but removed here now.",
+      "parentUuid": "ec6e1105_e170774b",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "827e2a81_cf09aee1",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-08-06T11:38:45Z",
       "side": 1,
       "message": "is this comment still relevant?",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03f02854_986cea88",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 883,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-06T18:01:22Z",
+      "side": 1,
+      "message": "It has nothing to do with the code below, so I\u0027ll leave it for now as it is not related to the change.",
+      "parentUuid": "827e2a81_cf09aee1",
       "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fcfff2a_d008a6aa",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 907,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-06T18:01:22Z",
+      "side": 1,
+      "message": "Somewhat. I left it with a NOTE",
+      "parentUuid": "a244f1a6_cdce0cb0",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "21929116_fdd8152a",
@@ -133,6 +259,24 @@
       "writtenOn": "2025-08-06T11:38:45Z",
       "side": 1,
       "message": "I don\u0027t understand this change. surely we can remove the second condition entirely.",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7f46926_ba3dd398",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-06T18:01:22Z",
+      "side": 1,
+      "message": "Ah, this is indeed necessary. Because of the changes, TestScheduler now crashes. Previously, TestScheduler was erroneously set to EvalV2. I\u0027ll move this to a separate CL to make the relationship clear.",
+      "parentUuid": "21929116_fdd8152a",
       "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

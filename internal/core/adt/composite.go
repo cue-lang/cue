@@ -1423,8 +1423,7 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 func findConjunct(cs []Conjunct, c Conjunct) (int, Conjunct) {
 	for i, x := range cs {
 		// TODO: disregard certain fields from comparison (e.g. Refs)?
-		if x.CloseInfo.closeInfo == c.CloseInfo.closeInfo && // V2
-			x.x == c.x &&
+		if x.x == c.x &&
 			x.Env.Up == c.Env.Up && x.Env.Vertex == c.Env.Vertex {
 			return i, x
 		}

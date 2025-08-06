@@ -124,65 +124,6 @@ func (o *StructLit) Init(ctx *OpContext) {
 		return
 	}
 	o.initialized = true
-
-	if ctx.isDevVersion() {
-		return
-	}
-
-	for _, d := range o.Decls {
-		switch x := d.(type) {
-		case *Field:
-			if o.fieldIndex(x.Label) < 0 {
-				o.Fields = append(o.Fields, FieldInfo{Label: x.Label})
-			}
-			if x.ArcType > ArcMember {
-				o.types |= HasField
-			}
-
-		case *LetField:
-			if o.fieldIndex(x.Label) >= 0 {
-				panic("duplicate let identifier")
-			}
-			o.Fields = append(o.Fields, FieldInfo{Label: x.Label})
-
-		case *DynamicField:
-			o.Dynamic = append(o.Dynamic, x)
-			o.types |= HasDynamic
-
-		case Expr:
-			o.HasEmbed = true
-
-		case *Comprehension:
-			o.HasEmbed = true
-
-		case *LetClause:
-			o.HasEmbed = true
-
-		case *BulkOptionalField:
-			o.Bulk = append(o.Bulk, x)
-			o.types |= HasPattern
-			switch x.Filter.(type) {
-			case *BasicType, *Top:
-			default:
-				o.types |= HasComplexPattern
-			}
-
-		case *Ellipsis:
-			switch x.Value.(type) {
-			case nil, *Top:
-				o.IsOpen = true
-				o.types |= IsOpen
-
-			default:
-				// TODO: consider only adding for non-top.
-				o.types |= HasAdditional
-			}
-			o.Additional = append(o.Additional, x)
-
-		default:
-			panic("unreachable")
-		}
-	}
 }
 
 func (o *StructLit) fieldIndex(f Feature) int {
@@ -940,9 +881,6 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	// No need to Unify n, as Let references can only result from evaluating
 	// an expression within n, in which case evaluation must already have
 	// started.
-	if n.status < evaluating && !ctx.isDevVersion() {
-		panic("unexpected node state < Evaluating")
-	}
 
 	arc := ctx.lookup(n, pos(x), x.Label, state)
 	if arc == nil {
@@ -967,9 +905,6 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 
 	// We should only partly finalize the result here as it is not safe to
 	// finalize any references made by the let.
-	if !ctx.isDevVersion() {
-		arc.Finalize(ctx)
-	}
 	b := arc.Bottom()
 	if !arc.MultiLet && (b == nil || isCyclePlaceholder(b)) {
 		return arc
@@ -1008,22 +943,17 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 		}
 		v = n
 		e.cache[key] = n
-		if ctx.isDevVersion() {
-			// TODO(mem): enable again once we implement memory management.
-			// nc := n.getState(ctx)
-			// TODO: unlike with the old evaluator, we do not allow the first
-			// cycle to be skipped. Doing so can lead to hanging evaluation.
-			// As the cycle detection works slightly differently in the new
-			// evaluator (and is not entirely completed), this can happen. We
-			// should revisit this once we have completed the structural cycle
-			// detection.
-			// nc.hasNonCycle = true
-			// Allow a first cycle to be skipped.
-			// nc.free()
-		} else {
-			nc := n.getNodeContext(ctx, 0)
-			nc.hasNonCycle = true // Allow a first cycle to be skipped.
-		}
+		// TODO(mem): enable again once we implement memory management.
+		// nc := n.getState(ctx)
+		// TODO: unlike with the old evaluator, we do not allow the first
+		// cycle to be skipped. Doing so can lead to hanging evaluation.
+		// As the cycle detection works slightly differently in the new
+		// evaluator (and is not entirely completed), this can happen. We
+		// should revisit this once we have completed the structural cycle
+		// detection.
+		// nc.hasNonCycle = true
+		// Allow a first cycle to be skipped.
+		// nc.free()
 
 		// Parents cannot add more conjuncts to a let expression, so set of
 		// conjuncts is always complete.
@@ -1064,12 +994,6 @@ func (x *SelectorExpr) resolve(c *OpContext, state combinedFlags) *Vertex {
 	if n == emptyNode {
 		return n
 	}
-	if n.status == partial && !c.isDevVersion() {
-		if b := n.state.incompleteErrors(false); b != nil && b.Code < CycleError {
-			c.AddBottom(b)
-			return n
-		}
-	}
 	// TODO(eval): dynamic nodes should be fully evaluated here as the result
 	// will otherwise be discarded and there will be no other chance to check
 	// the struct is valid.
@@ -1108,12 +1032,6 @@ func (x *IndexExpr) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	})
 	if n == emptyNode {
 		return n
-	}
-	if n.status == partial && !ctx.isDevVersion() {
-		if b := n.state.incompleteErrors(false); b != nil && b.Code < CycleError {
-			ctx.AddBottom(b)
-			return n
-		}
 	}
 	// TODO(eval): dynamic nodes should be fully evaluated here as the result
 	// will otherwise be discarded and there will be no other chance to check
@@ -1443,23 +1361,15 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 	match := op != EqualOp // non-error case
 
 	c.inValidator++
-	// NOTE: https://cuelang.org/cl/1208898 broke an evalv2 user on Unity.
-	// For the time being, reverting the change just for evalv2 allows them
-	// to continue using the old evaluator on the latest CUE version.
-	if c.isDevVersion() {
-		// Note that evalState may call yield, so we need to balance the counter
-		// with a defer.
-		defer func() { c.inValidator-- }()
-	}
+	// Note that evalState may call yield, so we need to balance the counter
+	// with a defer.
+	defer func() { c.inValidator-- }()
 	req := combinedFlags{
 		status:    state,
 		condition: needTasksDone,
 		mode:      finalize,
 	}
 	v := c.evalState(x, req)
-	if !c.isDevVersion() {
-		c.inValidator--
-	}
 	u, _ := c.getDefault(v)
 	u = Unwrap(u)
 
@@ -1512,8 +1422,6 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 			break
 		}
 		if v.status == evaluatingArcs {
-			unreachableForDev(c) // Eval V2 logic
-
 			// We have a cycle, which may be an error. Cycle errors may occur
 			// in chains that are themselves not a cycle. It suffices to check
 			// for non-monotonic results at the end for this particular path.
@@ -2172,7 +2080,7 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 	c.inDetached--
 
 	node, ok := v.(*Vertex)
-	if ok && c.isDevVersion() {
+	if ok {
 		// We do not request to "yield" here, but rather rely on the
 		// call-by-need behavior in combination with the freezing mechanism.
 		// TODO: this seems a bit fragile. At some point we need to make this
@@ -2229,16 +2137,14 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 			return emptyNode
 		}
 	}
-	if c.isDevVersion() {
-		kind := v.Kind()
-		// At this point it is possible that the Vertex represents an incomplete
-		// struct or list, which is the case if it may be struct or list, but
-		// is also at least some other type, such as is the case with top.
-		if kind&(StructKind|ListKind) != 0 && kind != StructKind && kind != ListKind {
-			c.addErrf(IncompleteError, pos(x),
-				"cannot range over %s (incomplete type %s)", x, kind)
-			return emptyNode
-		}
+	kind := v.Kind()
+	// At this point it is possible that the Vertex represents an incomplete
+	// struct or list, which is the case if it may be struct or list, but
+	// is also at least some other type, such as is the case with top.
+	if kind&(StructKind|ListKind) != 0 && kind != StructKind && kind != ListKind {
+		c.addErrf(IncompleteError, pos(x),
+			"cannot range over %s (incomplete type %s)", x, kind)
+		return emptyNode
 	}
 
 	return node
@@ -2248,25 +2154,8 @@ func (x *ForClause) yield(s *compState) {
 	c := s.ctx
 	n := c.forSource(x.Src)
 
-	if c.isDevVersion() {
-		if s := n.getState(c); s != nil {
-			s.freeze(fieldSetKnown)
-		}
-	} else {
-		if n.status == evaluating && !n.LockArcs {
-			c.AddBottom(&Bottom{
-				Code:     CycleError,
-				ForCycle: true,
-				Value:    n,
-				Node:     n,
-				Err:      errors.Newf(pos(x.Src), "comprehension source references itself"),
-			})
-			return
-		}
-		if c.HasErr() {
-			return
-		}
-		n.LockArcs = true
+	if s := n.getState(c); s != nil {
+		s.freeze(fieldSetKnown)
 	}
 
 	for _, a := range n.Arcs {
@@ -2274,18 +2163,9 @@ func (x *ForClause) yield(s *compState) {
 			continue
 		}
 
-		if c.isDevVersion() {
-			// TODO(evalv3): See comment in StructLit.evaluate.
-			if state := a.getState(c); state != nil {
-				state.process(arcTypeKnown, attemptOnly)
-			}
-		} else {
-			if !a.isDefined() {
-				a.Finalize(c)
-			}
-			if !a.definitelyExists() {
-				continue
-			}
+		// See comment in StructLit.evaluate.
+		if state := a.getState(c); state != nil {
+			state.process(arcTypeKnown, attemptOnly)
 		}
 
 		switch a.ArcType {

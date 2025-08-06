@@ -318,9 +318,6 @@ func (ctx *OpContext) newInlineVertex(parent *Vertex, v BaseValue, a ...Conjunct
 		state := ctx.freeScope[len(ctx.freeScope)-1]
 		state.toFree = append(state.toFree, n)
 	}
-	if !ctx.isDevVersion() {
-		n.Parent = parent
-	}
 	if ctx.inDetached > 0 {
 		n.anonymous = true
 	}
@@ -350,7 +347,7 @@ func (v *Vertex) updateArcType(t ArcType) {
 			return
 		}
 	}
-	if v.Parent != nil && v.Parent.ArcType == ArcPending && v.Parent.state != nil && v.Parent.state.ctx.isDevVersion() {
+	if v.Parent != nil && v.Parent.ArcType == ArcPending && v.Parent.state != nil {
 		// TODO: check that state is always non-nil.
 		v.Parent.state.unshare()
 	}
@@ -984,23 +981,19 @@ func Unify(c *OpContext, a, b Value) *Vertex {
 	// early enough to error on schemas used for validation.
 	if n := c.vertex; n != nil {
 		v.Parent = n.Parent
-		if c.isDevVersion() {
-			v.Label = n.Label // this doesn't work in V2
-		}
+		v.Label = n.Label
 	}
 
 	addConjuncts(c, v, a)
 	addConjuncts(c, v, b)
 
-	if c.isDevVersion() {
-		s := v.getState(c)
-		// As this is a new node, we should drop all the requirements from
-		// parent nodes, as these will not be aligned with the reinsertion
-		// of the conjuncts.
-		s.dropParentRequirements = true
-		if p := c.vertex; p != nil && p.state != nil && s != nil {
-			s.hasNonCyclic = p.state.hasNonCyclic
-		}
+	s := v.getState(c)
+	// As this is a new node, we should drop all the requirements from
+	// parent nodes, as these will not be aligned with the reinsertion
+	// of the conjuncts.
+	s.dropParentRequirements = true
+	if p := c.vertex; p != nil && p.state != nil && s != nil {
+		s.hasNonCyclic = p.state.hasNonCyclic
 	}
 
 	v.Finalize(c)
@@ -1315,15 +1308,6 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 	}
 
 	// Go backwards to simulate old implementation.
-	if !ctx.isDevVersion() {
-		for i := len(v.Structs) - 1; i >= 0; i-- {
-			s := v.Structs[i]
-			if s.Disable {
-				continue
-			}
-			s.MatchAndInsert(ctx, arc)
-		}
-	}
 
 	// This is the equivalent for the new implementation.
 	if pcs := v.PatternConstraints; pcs != nil {
@@ -1411,33 +1395,7 @@ func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew 
 		return arc, false
 	}
 
-	if c.isDevVersion() {
-		return nil, false
-	}
-
-	if v.LockArcs {
-		// TODO(errors): add positions.
-		if f.IsInt() {
-			c.addErrf(EvalError, token.NoPos,
-				"element at index %v not allowed by earlier comprehension or reference cycle", f)
-		} else {
-			c.addErrf(EvalError, token.NoPos,
-				"field %v not allowed by earlier comprehension or reference cycle", f)
-		}
-	}
-	// TODO: consider setting Dynamic here from parent.
-	arc = &Vertex{
-		Parent:    v,
-		Label:     f,
-		ArcType:   t,
-		nonRooted: v.IsDynamic || v.Label.IsLet() || v.nonRooted,
-		anonymous: v.anonymous || v.Label.IsLet(),
-	}
-	v.Arcs = append(v.Arcs, arc)
-	if t == ArcPending {
-		v.hasPendingArc = true
-	}
-	return arc, true
+	return nil, false
 }
 
 func (v *Vertex) Source() ast.Node {
@@ -1511,67 +1469,8 @@ func findConjunct(cs []Conjunct, c Conjunct) (int, Conjunct) {
 	return -1, Conjunct{}
 }
 
-func (n *nodeContext) addConjunction(c Conjunct, index int) {
-	unreachableForDev(n.ctx)
-
-	// NOTE: This does not split binary expressions for comprehensions.
-	// TODO: split for comprehensions and rewrap?
-	if x, ok := c.Elem().(*BinaryExpr); ok && x.Op == AndOp {
-		c.x = x.X
-		n.conjuncts = append(n.conjuncts, conjunct{C: c, index: index})
-		c.x = x.Y
-		n.conjuncts = append(n.conjuncts, conjunct{C: c, index: index})
-	} else {
-		n.conjuncts = append(n.conjuncts, conjunct{C: c, index: index})
-	}
-}
-
 func (v *Vertex) addConjunctUnchecked(c Conjunct) {
-	index := len(v.Conjuncts)
 	v.Conjuncts = append(v.Conjuncts, c)
-	if n := v.state; n != nil && !n.ctx.isDevVersion() {
-		// TODO(notify): consider this as a central place to send out
-		// notifications. At the moment this is not necessary, but it may
-		// be if we move the notification mechanism outside of the path of
-		// running tasks.
-		n.addConjunction(c, index)
-
-		// TODO: can we remove notifyConjunct here? This method is only
-		// used if either Unprocessed is 0, in which case there will be no
-		// notification recipients, or for "pushed down" comprehensions,
-		// which should also have been added at an earlier point.
-		n.notifyConjunct(c)
-	}
-}
-
-// addConjunctDynamic adds a conjunct to a vertex and immediately evaluates
-// it, whilst doing the same for any vertices on the notify list, recursively.
-func (n *nodeContext) addConjunctDynamic(c Conjunct) {
-	unreachableForDev(n.ctx)
-
-	n.node.Conjuncts = append(n.node.Conjuncts, c)
-	n.addExprConjunct(c, partial)
-	n.notifyConjunct(c)
-
-}
-
-func (n *nodeContext) notifyConjunct(c Conjunct) {
-	unreachableForDev(n.ctx)
-
-	for _, rec := range n.notify {
-		arc := rec.v
-		if !arc.hasConjunct(c) {
-			if arc.state == nil {
-				// TODO: continuing here is likely to result in a faulty
-				// (incomplete) configuration. But this may be okay. The
-				// CUE_DEBUG=0 flag disables this assertion.
-				n.ctx.Assertf(n.ctx.pos(), !n.ctx.Strict, "unexpected nil state")
-				n.ctx.addErrf(0, n.ctx.pos(), "cannot add to field %v", arc.Label)
-				continue
-			}
-			arc.state.addConjunctDynamic(c)
-		}
-	}
 }
 
 func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *StructInfo {

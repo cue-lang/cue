@@ -70,21 +70,10 @@ package adt
 // TODO(errors): return a dedicated ConflictError that can track original
 // positions on demand.
 
-// IsInOneOf reports whether any of the Structs associated with v is contained
-// within any of the span types in the given mask.
-func (v *Vertex) IsInOneOf(mask SpanType) bool {
-	for _, s := range v.Structs {
-		if s.CloseInfo.IsInOneOf(mask) {
-			return true
-		}
-	}
-	return false
-}
-
 // IsRecursivelyClosed returns true if this value is either a definition or unified
 // with a definition.
 func (v *Vertex) IsRecursivelyClosed() bool {
-	return v.ClosedRecursive || v.IsInOneOf(DefinitionSpan)
+	return v.ClosedRecursive
 }
 
 type CloseInfo struct {
@@ -123,20 +112,6 @@ type CloseInfo struct {
 
 func (c CloseInfo) Location() Node {
 	return nil
-}
-
-func (c CloseInfo) span() SpanType {
-	return 0
-}
-
-func (c CloseInfo) RootSpanType() SpanType {
-	return 0
-}
-
-// IsInOneOf reports whether c is contained within any of the span types in the
-// given mask.
-func (c CloseInfo) IsInOneOf(t SpanType) bool {
-	return c.span()&t != 0
 }
 
 // TODO(perf): remove: error positions should always be computed on demand
@@ -192,7 +167,7 @@ func isClosed(v *Vertex) bool {
 	}
 	// TODO(evalv3): this can be removed once we delete the evalv2 code.
 	for _, s := range v.Structs {
-		if s.IsClosed || s.IsInOneOf(DefinitionSpan) {
+		if s.IsClosed {
 			return true
 		}
 	}

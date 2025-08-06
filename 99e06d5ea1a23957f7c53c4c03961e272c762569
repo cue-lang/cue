@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d4d8424_e80b0fd0",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "810d717c_43c64a1a",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26d499fd_5aa0f491",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-08-06T10:51:10Z",
       "side": 1,
       "message": "I think I\u0027m a bit confused between the notion of \"path\" and that of \"expression\". Here, ISTM that \"expression\" could be used instead of \"path\", but it seems like you\u0027re wanting to think about paths in a separate way from general expressions. Maybe worth teasing apart that distinction a little?\n\nSpecifically, you talk about paths like the above, but you also talk about a path within a scope, and those two things feel somewhat different to me.\n\n\"path reference\" ?\n\"reference\" ?\n\"path expression\" ?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5dd65f94_6e5c4f38",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "I actually don\u0027t mention expressions at all. In this text, I do only want to talk about expressions which are paths. I\u0027ve made some changes to explain exactly what I mean by path, which should help. Although in this text and its examples, I only have paths with idents as their first element, this evaluator does cope fine with other expressions as the first element - e.g. function pattern, things like `(a \u0026 b).c` etc.",
+      "parentUuid": "26d499fd_5aa0f491",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -71,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7725983f_3c8be715",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "I think, in this context, \"dynamic scope\" is the way to go. To me at least, a \"lexical scope\" is just a subset of the more general world of scope types.",
+      "parentUuid": "261c01d6_705f7f80",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fb643252_a6bc9623",
         "filename": "internal/lsp/definitions/definitions.go",
         "patchSetId": 16
@@ -82,6 +136,24 @@
       "writtenOn": "2025-08-06T10:51:10Z",
       "side": 1,
       "message": "```suggestion\n// When a scope is evaluated, each of these nodes is unpacked. An\n```\n\n?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d63bbe8_df8f4a6a",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb643252_a6bc9623",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "822da0c0_9d93d05f",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee9eff29_a22cbb5c",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4ef22aa6_7ba05014",
@@ -116,6 +206,24 @@
       "writtenOn": "2025-08-06T10:51:10Z",
       "side": 1,
       "message": "```suggestion\n// exists for the field\u0027s name, and add the field\u0027s value to the binding\u0027s\n```",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24dbb13b_8355415c",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ef22aa6_7ba05014",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6a93ce5_d358a332",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "I\u0027ll make it clearer. In general, I treat path as one or more elements. The first element of a path can be (almost?) any expr. Which, thinking about it, helps me understand your queries about expr vs path.",
+      "parentUuid": "4ab8d4fa_51656fc7",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c6c0ac5_37aa589f",
@@ -150,6 +276,24 @@
       "writtenOn": "2025-08-06T10:51:10Z",
       "side": 1,
       "message": "```suggestion\n// guaranteed that the binding contains its complete set of nodes before\n```",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "946fdc8b_67fcd4a0",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c6c0ac5_37aa589f",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -171,6 +315,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "531b34d0_d2fa8f6c",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "path. y.a is a path. It is also an expression, but I never talk about expressions here.",
+      "parentUuid": "8eed55be_fc611814",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9320b54e_b7b7d8ad",
@@ -188,6 +350,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4380251f_84bad0e0",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "Why? I never talk about expressions. If I do, then I then have to start saying \"oh it doesn\u0027t evaluate expressions in general, like 1+2\". I think it\u0027s much cleaner to stick only to talking about paths, even though the first element of a path does not have to be an ident, and can be other types of expression, some of which this evaluator interprets.",
+      "parentUuid": "9320b54e_b7b7d8ad",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "503cb6cd_bd6f592c",
@@ -201,6 +381,24 @@
       "writtenOn": "2025-08-06T10:51:10Z",
       "side": 1,
       "message": "Not innermost? Ah, no, because we\u0027re not talking about lexical scopes here. I found that a bit confusing and added some thoughts about the term \"scope\" above.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afe513b1_47fe3b4f",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "503cb6cd_bd6f592c",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -224,6 +422,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5108052e_029416b4",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "I think I\u0027ve made this better?",
+      "parentUuid": "94c8f4f4_6942bcb1",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "39afd984_329119dc",
         "filename": "internal/lsp/definitions/definitions.go",
         "patchSetId": 16
@@ -235,6 +451,24 @@
       "writtenOn": "2025-08-06T10:51:10Z",
       "side": 1,
       "message": "What does a rangeset \"moving\" mean?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ca91752_eae08128",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39afd984_329119dc",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -273,6 +507,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e0762bb_6fc85c96",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "Hmm, if we have a scope built for `a: b` (or `a: {b}`) then the key will be the ident `a`. When the scope is evaluated, the ident `b` will be encountered, it\u0027ll be resolved to another scope, and that scope will be stored in the `resolvesTo` field.\n\nThere are cases where there is no key though. For example, `x: {a: 3}.a`. Here, when the outer scope is evaluated, we will once again attempt to resolve `{a: 3}.a` (it\u0027s an \"embedded\" path). The first element of this path is a structlit, and we\u0027ll create a fresh scope for it which itself has no key.\n\nI\u0027ll improve this comment.",
+      "parentUuid": "f724cec8_d2b6a120",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c3440dae_d3e1acf7",
@@ -286,6 +538,24 @@
       "writtenOn": "2025-08-06T10:51:10Z",
       "side": 1,
       "message": "perhaps a little more readable with a helper:\n\n```\n    printf :\u003d func(f string, a ...any) {\n        fmt.Printf(\"%*s%s\\n\", depth*3, \"\", fmt.Sprintf(f, a...))\n    }\n```",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9e07358_6903f20a",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T15:41:17Z",
+      "side": 1,
+      "message": "Yes, that\u0027s a lot nicer!",
+      "parentUuid": "c3440dae_d3e1acf7",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

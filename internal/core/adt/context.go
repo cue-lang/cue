@@ -85,14 +85,6 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	return ctx
 }
 
-// See also: [unreachableForDev]
-func (c *OpContext) isDevVersion() bool {
-	if c.Version == internal.EvalVersionUnset {
-		panic("OpContext was not provided with an evaluator version")
-	}
-	return c.Version == internal.DevVersion
-}
-
 // An OpContext implements CUE's unification operation. It only
 // operates on values that are created with the Runtime with which an OpContext
 // is associated. An OpContext is not goroutine safe and only one goroutine may
@@ -490,12 +482,6 @@ func (c *OpContext) Lookup(env *Environment, r Resolver) (*Vertex, *Bottom) {
 
 	err := c.PopState(s)
 
-	if arc != nil && !c.isDevVersion() {
-		// TODO(deref): lookup should probably not use DerefValue, but
-		// rather only dereference disjunctions.
-		arc = arc.DerefValue()
-	}
-
 	return arc, err
 }
 
@@ -698,10 +684,7 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 				switch b.Code {
 				case IncompleteError:
 				case CycleError:
-					if state.status == partial || c.isDevVersion() {
-						break
-					}
-					fallthrough
+					break
 				default:
 					result = b
 				}
@@ -746,7 +729,7 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 		// TODO(3977): register internal nodes for later verifications. The
 		// following limits the possibility of some common and useful cycles.
 		//
-		// if arc.Internal() && c.isDevVersion() {
+		// if arc.Internal() {
 		//  mode := state.conditions()
 		//  state = final(partial, mode|allTasksCompleted)
 		// }
@@ -760,69 +743,57 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 		// TODO: is this indirect necessary?
 		// arc = arc.Indirect()
 
-		if c.isDevVersion() {
-			if n := arc.getState(c); n != nil {
-				c.ci, _ = n.detectCycleV3(arc, nil, x, c.ci)
-			}
-		} else {
-			if n := arc.state; n != nil {
-				c.ci, _ = n.markCycle(arc, nil, x, c.ci)
-			}
+		if n := arc.getState(c); n != nil {
+			c.ci, _ = n.detectCycleV3(arc, nil, x, c.ci)
 		}
 
-		if !c.isDevVersion() {
-			c.ci.Inline = true
-		}
+		if s := arc.getState(c); s != nil {
+			defer s.retainProcess().releaseProcess()
 
-		if c.isDevVersion() {
-			if s := arc.getState(c); s != nil {
-				defer s.retainProcess().releaseProcess()
+			origNeeds := state.condition
+			needs := origNeeds | arcTypeKnown
+			runMode := state.mode
 
-				origNeeds := state.condition
-				needs := origNeeds | arcTypeKnown
-				runMode := state.mode
+			switch runMode {
+			case finalize:
+				arc.unify(c, needs, attemptOnly, true) // to set scalar
+				s.freeze(needs)
+			case attemptOnly:
+				arc.unify(c, needs, attemptOnly, true) // to set scalar
 
-				switch runMode {
-				case finalize:
-					arc.unify(c, needs, attemptOnly, true) // to set scalar
-					s.freeze(needs)
-				case attemptOnly:
-					arc.unify(c, needs, attemptOnly, true) // to set scalar
+			case yield:
+				arc.unify(c, needs, runMode, true) // to set scalar
 
-				case yield:
-					arc.unify(c, needs, runMode, true) // to set scalar
+				evaluating := arc.status == evaluating
 
-					evaluating := arc.status == evaluating
-
-					// We cannot resolve a value that represents an unresolved
-					// disjunction.
-					if evaluating && orig != arc && arc.IsDisjunct {
-						task := c.current()
-						if origNeeds == scalarKnown && !orig.state.meets(scalarKnown) {
-							orig.state.defaultAttemptInCycle = task.node.node
-							task.waitFor(&orig.state.scheduler, needs)
-							s.yield()
-							panic("unreachable")
-						}
-						err := c.Newf("unresolved disjunction: %v", x)
-						b := &Bottom{Code: CycleError, Err: err}
-						return b, c.ci
+				// We cannot resolve a value that represents an unresolved
+				// disjunction.
+				if evaluating && orig != arc && arc.IsDisjunct {
+					task := c.current()
+					if origNeeds == scalarKnown && !orig.state.meets(scalarKnown) {
+						orig.state.defaultAttemptInCycle = task.node.node
+						task.waitFor(&orig.state.scheduler, needs)
+						s.yield()
+						panic("unreachable")
 					}
-
-					hasCycleBreakingValue := s.hasFieldValue ||
-						!isCyclePlaceholder(arc.BaseValue)
-
-					if evaluating && !hasCycleBreakingValue {
-						err := c.Newf("cycle with field: %v", x)
-						b := &Bottom{Code: CycleError, Err: err}
-						c.AddBottom(b)
-						break
-					}
-
-					v := c.evaluate(arc, x, state)
-
-					return v, c.ci
+					err := c.Newf("unresolved disjunction: %v", x)
+					b := &Bottom{Code: CycleError, Err: err}
+					return b, c.ci
 				}
+
+				hasCycleBreakingValue := s.hasFieldValue ||
+					!isCyclePlaceholder(arc.BaseValue)
+
+				if evaluating && !hasCycleBreakingValue {
+					err := c.Newf("cycle with field: %v", x)
+					b := &Bottom{Code: CycleError, Err: err}
+					c.AddBottom(b)
+					break
+				}
+
+				v := c.evaluate(arc, x, state)
+
+				return v, c.ci
 			}
 		}
 		v := c.evaluate(arc, x, state)
@@ -914,33 +885,27 @@ func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 	// TODO: is this indirect necessary?
 	// v = v.Indirect()
 
-	if c.isDevVersion() {
-		if n := v.getState(c); n != nil {
-			defer n.retainProcess().releaseProcess()
+	if n := v.getState(c); n != nil {
+		defer n.retainProcess().releaseProcess()
 
-			// A lookup counts as new structure. See the commend in Section
-			// "Lookups in inline cycles" in cycle.go.
-			if !c.ci.IsCyclic || v.Label.IsLet() {
-				// TODO: fix! Setting this when we are not structure sharing can
-				// cause some hangs. We are conservative and not set this in
-				// this case, with the potential that some configurations will
-				// break. It is probably related to let.
-				n.hasNonCycle = true
-			}
-
-			// Always yield to not get spurious errors.
-			n.process(arcTypeKnown, yield)
-			// It is possible that the node is only midway through
-			// evaluating a disjunction. In this case, we want to ensure
-			// that disjunctions are finalized, so that disjunction shows
-			// up in BaseValue.
-			if len(n.disjuncts) > 0 {
-				n.node.unify(c, arcTypeKnown, yield, false)
-			}
+		// A lookup counts as new structure. See the commend in Section
+		// "Lookups in inline cycles" in cycle.go.
+		if !c.ci.IsCyclic || v.Label.IsLet() {
+			// TODO: fix! Setting this when we are not structure sharing can
+			// cause some hangs. We are conservative and not set this in
+			// this case, with the potential that some configurations will
+			// break. It is probably related to let.
+			n.hasNonCycle = true
 		}
-	} else {
-		if v.isUndefined() || state.status > v.Status() {
-			c.unify(v, state)
+
+		// Always yield to not get spurious errors.
+		n.process(arcTypeKnown, yield)
+		// It is possible that the node is only midway through
+		// evaluating a disjunction. In this case, we want to ensure
+		// that disjunctions are finalized, so that disjunction shows
+		// up in BaseValue.
+		if len(n.disjuncts) > 0 {
+			n.node.unify(c, arcTypeKnown, yield, false)
 		}
 	}
 
@@ -948,153 +913,7 @@ func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 }
 
 func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFlags) *Vertex {
-	if c.isDevVersion() {
-		return x.lookup(c, pos, l, flags)
-	}
-
-	state := flags.status
-
-	if l == InvalidLabel || x == nil {
-		// TODO: is it possible to have an invalid label here? Maybe through the
-		// API?
-		return &Vertex{}
-	}
-
-	// var kind Kind
-	// if x.BaseValue != nil {
-	// 	kind = x.BaseValue.Kind()
-	// }
-
-	switch x.BaseValue.(type) {
-	case *StructMarker:
-		if l.Typ() == IntLabel {
-			c.addErrf(0, pos, "invalid struct selector %v (type int)", l)
-			return nil
-		}
-
-	case *ListMarker:
-		switch {
-		case l.Typ() == IntLabel:
-			switch {
-			case l.Index() < 0:
-				c.addErrf(0, pos, "invalid list index %v (index must be non-negative)", l)
-				return nil
-			case l.Index() > len(x.Arcs):
-				c.addErrf(0, pos, "invalid list index %v (out of bounds)", l)
-				return nil
-			}
-
-		case l.IsDef(), l.IsHidden(), l.IsLet():
-
-		default:
-			c.addErrf(0, pos, "invalid list index %v (type string)", l)
-			return nil
-		}
-
-	case nil:
-		// c.addErrf(IncompleteError, pos, "incomplete value %s", x)
-		// return nil
-
-	case *Bottom:
-
-	default:
-		kind := x.BaseValue.Kind()
-		if kind&(ListKind|StructKind) != 0 {
-			// c.addErrf(IncompleteError, pos,
-			// 	"cannot look up %s in incomplete type %s (type %s)",
-			// 	l, x.Source(), kind)
-			// return nil
-		} else if !l.IsDef() && !l.IsHidden() && !l.IsLet() {
-			c.addErrf(0, pos,
-				"invalid selector %v for value of type %s", l, kind)
-			return nil
-		}
-	}
-
-	a := x.Lookup(l)
-
-	var hasCycle bool
-
-	if a != nil {
-		// Ensure that a's status is at least of the required level. Otherwise,
-		// ensure that any remaining unprocessed conjuncts are processed by
-		// calling c.Unify(a, Partial). The ensures that need to rely on
-		// hasAllConjuncts, but that are finalized too early, get conjuncts
-		// processed beforehand.
-		if state > a.status {
-			c.unify(a, combinedFlags{
-				status: state,
-			})
-		} else if a.state != nil {
-			c.unify(a, combinedFlags{
-				status: partial,
-			})
-		}
-
-		// TODO(refRequired): see comment in unify.go:Vertex.lookup near the
-		// namesake TODO.
-		if a.ArcType == ArcOptional {
-			code := IncompleteError
-			if hasCycle {
-				code = CycleError
-			}
-			label := l.SelectorString(c.Runtime)
-			c.AddBottom(&Bottom{
-				Code:      code,
-				Permanent: x.status >= conjuncts,
-				Err: c.NewPosf(pos,
-					"cannot reference optional field: %s", label),
-				Node: x,
-			})
-		}
-	} else {
-		if x.state != nil {
-			x.state.assertInitialized()
-
-			for _, e := range x.state.exprs {
-				if isCyclePlaceholder(e.err) {
-					hasCycle = true
-				}
-			}
-		}
-		code := IncompleteError
-		// As long as we have incomplete information, we cannot mark the
-		// inability to look up a field as "final", as it may resolve down the
-		// line.
-		permanent := x.status >= conjuncts
-		if m, _ := x.BaseValue.(*ListMarker); m != nil && !m.IsOpen {
-			permanent = true
-		}
-		if (state > partial || permanent) && !x.Accept(c, l) {
-			code = 0
-		} else if hasCycle {
-			code = CycleError
-		}
-		// TODO: if the struct was a literal struct, we can also treat it as
-		// closed and make this a permanent error.
-		label := l.SelectorString(c.Runtime)
-
-		// TODO(errors): add path reference and make message
-		//       "undefined field %s in %s"
-		var err *ValueError
-		switch {
-		case isCyclePlaceholder(x.BaseValue):
-			err = c.NewPosf(pos, "cycle error referencing %s", label)
-			permanent = false
-		case l.IsInt():
-			err = c.NewPosf(pos, "index out of range [%d] with length %d",
-				l.Index(), len(x.Elems()))
-		default:
-			err = c.NewPosf(pos, "undefined field: %s", label)
-		}
-		c.AddBottom(&Bottom{
-			Code:      code,
-			Permanent: permanent,
-			Err:       err,
-			Node:      x,
-		})
-	}
-	return a
+	return x.lookup(c, pos, l, flags)
 }
 
 func (c *OpContext) undefinedFieldError(v *Vertex, code ErrorCode) {
@@ -1199,7 +1018,7 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *V
 		// while traversing values. Not evaluating the node here could lead
 		// to a lookup in an unevaluated node, resulting in erroneously failing
 		// lookups.
-		if c.isDevVersion() && nv.nonRooted {
+		if nv.nonRooted {
 			nv.CompleteArcsOnly(c)
 		}
 	default:

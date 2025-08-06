@@ -14,7 +14,7 @@
 
 // Package koala converts XML to and from CUE, as described in the proposal for the [koala] encoding.
 // This encoding is inspired by the [BadgerFish] convention for translating XML to JSON.
-// It differs from this to better fit CUE syntax, (as "$" and "@" are special characters), 
+// It differs from this to better fit CUE syntax, (as "$" and "@" are special characters),
 // and for improved readability, as described in the koala proposal.
 //
 // XML elements are modeled as CUE structs, their attributes are modeled as struct fields

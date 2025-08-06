@@ -63,7 +63,8 @@ func (o *StructInfo) MatchAndInsert(c *OpContext, arc *Vertex) {
 			// MatchAndInsert after the renewed implementation of disjunctions.
 			saved := arc.BaseValue
 			arc.BaseValue = cycle
-			match := matchBulk(c, env, b, f, label)
+			pattern := env.evalCached(c, b.Filter)
+			match := matchPatternValue(c, pattern, f, label)
 			arc.BaseValue = saved
 
 			if match {
@@ -87,68 +88,4 @@ func (o *StructInfo) MatchAndInsert(c *OpContext, arc *Vertex) {
 		// TODO: consider moving in above block (2 lines up).
 		arc.AddConjunct(MakeConjunct(env, x, info))
 	}
-}
-
-// matchBulk reports whether feature f matches the filter of x. It evaluation of
-// the filter is erroneous, it returns false and the error will  be set in c.
-func matchBulk(c *OpContext, env *Environment, p *BulkOptionalField, f Feature, label Value) bool {
-	unreachableForDev(c)
-
-	v := env.evalCached(c, p.Filter)
-	v = Unwrap(v)
-
-	// Fast-track certain cases.
-	switch x := v.(type) {
-	case *Bottom:
-		if x == cycle {
-			err := c.NewPosf(pos(p.Filter), "cyclic pattern constraint")
-			for _, c := range c.vertex.Conjuncts {
-				err.AddPosition(c.Elem())
-			}
-			c.AddBottom(&Bottom{
-				Err:  err,
-				Node: c.vertex,
-			})
-		}
-		if c.errs == nil {
-			c.AddBottom(x)
-		}
-		return false
-	case *Top:
-		return true
-
-	case *BasicType:
-		return x.K&StringKind != 0
-
-	case *BoundValue:
-		switch x.Kind() {
-		case StringKind:
-			if label == nil {
-				return false
-			}
-			str := label.(*String).Str
-			return x.validateStr(c, str)
-
-		case IntKind:
-			return x.validateInt(c, int64(f.Index()))
-		}
-	}
-
-	if label == nil {
-		return false
-	}
-
-	n := Vertex{
-		IsDynamic: true,
-	}
-	m := MakeConjunct(env, v, c.ci)
-	n.AddConjunct(m)
-	n.AddConjunct(MakeConjunct(m.Env, label, c.ci))
-
-	c.inConstraint++
-	n.Finalize(c)
-	c.inConstraint--
-
-	b, _ := n.BaseValue.(*Bottom)
-	return b == nil
 }

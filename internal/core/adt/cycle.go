@@ -819,44 +819,6 @@ func (c *CloseInfo) setOptionalV3(n *nodeContext) {
 	}
 }
 
-// markCycle checks whether the reference x is cyclic. There are two cases:
-//  1. it was previously used in this conjunct, and
-//  2. it directly references a parent node.
-//
-// Other inputs:
-//
-//	arc      the reference to which x points
-//	env, ci  the components of the Conjunct from which x originates
-//
-// A cyclic node is added to a queue for later processing if no evidence of a
-// non-cyclic node has so far been found. updateCyclicStatus processes delayed
-// nodes down the line once such evidence is found.
-//
-// If a cycle is the result of "inline" processing (an expression referencing
-// itself), an error is reported immediately.
-//
-// It returns the CloseInfo with tracked cyclic conjuncts updated, and
-// whether or not its processing should be skipped, which is the case either if
-// the conjunct seems to be fully cyclic so far or if there is a valid reference
-// cycle.
-
-func getNonCyclicCount(c Conjunct) int {
-	switch a, ok := c.x.(*ConjunctGroup); {
-	case ok:
-		count := 0
-		for _, c := range *a {
-			count += getNonCyclicCount(c)
-		}
-		return count
-
-	case !c.CloseInfo.IsCyclic:
-		return 1
-
-	default:
-		return 0
-	}
-}
-
 // updateCyclicStatusV3 looks for proof of non-cyclic conjuncts to override
 // a structural cycle.
 func (n *nodeContext) updateCyclicStatusV3(c CloseInfo) {
@@ -881,14 +843,6 @@ func assertStructuralCycleV3(n *nodeContext) bool {
 	n.cyclicConjuncts = n.cyclicConjuncts[:0]
 
 	if n.hasOnlyCyclicConjuncts() {
-		n.reportCycleError()
-		return true
-	}
-	return false
-}
-
-func assertStructuralCycle(n *nodeContext) bool {
-	if n.hasAnyCyclicConjunct && !n.hasNonCycle {
 		n.reportCycleError()
 		return true
 	}

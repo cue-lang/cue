@@ -15,8 +15,6 @@
 package adt
 
 import (
-	"slices"
-
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
@@ -94,47 +92,12 @@ type envDisjunct struct {
 	src       Node
 	disjuncts []disjunct
 
-	// fields for old evaluator
-
-	expr        *DisjunctionExpr
-	value       *Disjunction
-	hasDefaults bool
-
 	// These are used for book keeping, tracking whether any of the
 	// disjuncts marked with a default marker remains after unification.
 	// If no default is used, all other elements are treated as "maybeDefault".
 	// Otherwise, elements are treated as is.
 	parentDefaultUsed bool
 	childDefaultUsed  bool
-}
-
-func (n *nodeContext) addDisjunction(env *Environment, x *DisjunctionExpr, cloneID CloseInfo) {
-
-	// TODO: precompute
-	numDefaults := 0
-	for _, v := range x.Values {
-		isDef := v.Default // || n.hasDefaults(env, v.Val)
-		if isDef {
-			numDefaults++
-		}
-	}
-
-	n.disjunctions = append(n.disjunctions, envDisjunct{
-		env:         env,
-		cloneID:     cloneID,
-		expr:        x,
-		hasDefaults: numDefaults > 0,
-	})
-}
-
-func (n *nodeContext) addDisjunctionValue(env *Environment, x *Disjunction, cloneID CloseInfo) {
-	n.disjunctions = append(n.disjunctions, envDisjunct{
-		env:         env,
-		cloneID:     cloneID,
-		value:       x,
-		hasDefaults: x.HasDefaults,
-	})
-
 }
 
 func (n *nodeContext) makeError() {
@@ -168,46 +131,6 @@ func mode(hasDefault, marked bool) defaultMode {
 		mode = notDefault
 	}
 	return mode
-}
-
-// clone makes a shallow copy of a Vertex. The purpose is to create different
-// disjuncts from the same Vertex under computation. This allows the conjuncts
-// of an arc to be reset to a previous position and the reuse of earlier
-// computations.
-//
-// Notes: only Arcs need to be copied recursively. Either the arc is finalized
-// and can be used as is, or Structs is assumed to not yet be computed at the
-// time that a clone is needed and must be nil. Conjuncts no longer needed and
-// can become nil. All other fields can be copied shallowly.
-func clone(v *Vertex) *Vertex {
-	v2 := *v
-	v = &v2
-	v.state = nil
-	if a := v.Arcs; len(a) > 0 {
-		v.Arcs = make([]*Vertex, len(a))
-		for i, arc := range a {
-			switch arc.status {
-			case finalized:
-				v.Arcs[i] = arc
-
-			case unprocessed:
-				a := *arc
-				v.Arcs[i] = &a
-				a.Conjuncts = slices.Clone(arc.Conjuncts)
-
-			default:
-				a := *arc
-				a.state = nil // State will be recreated when needed
-				v.Arcs[i] = &a
-			}
-		}
-	}
-
-	if a := v.Structs; len(a) > 0 {
-		v.Structs = slices.Clone(a)
-	}
-
-	return v
 }
 
 // Default rules from spec:

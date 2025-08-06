@@ -51,11 +51,6 @@ func (c *OpContext) Stats() *stats.Counts {
 // 	return e.NewContext(v)
 // }
 
-var incompleteSentinel = &Bottom{
-	Code: IncompleteError,
-	Err:  errors.Newf(token.NoPos, "incomplete"),
-}
-
 // evaluate returns the evaluated value associated with v. It may return a
 // partial result. That is, if v was not yet unified, it may return a
 // concrete value that must be the result assuming the configuration has no
@@ -143,55 +138,6 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 	requires, mode := flags.condition, flags.mode
 	v.unify(c, requires, mode, true)
-}
-
-// finalizeDisjuncts: incomplete errors are kept around and not removed early.
-// This call filters the incomplete errors and removes them
-//
-// This also collects all errors of empty disjunctions. These cannot be
-// collected during the finalization state of individual disjuncts. Care should
-// be taken to only call this after all disjuncts have been finalized.
-func (n *nodeContext) finalizeDisjuncts() {
-	a := n.disjuncts
-	if len(a) == 0 {
-		return
-	}
-	k := 0
-	for i, d := range a {
-		switch d.finalDone() {
-		case true:
-			a[k], a[i] = d, a[k]
-			k++
-		default:
-			if err := d.getErr(); err != nil {
-				n.disjunctErrs = append(n.disjunctErrs, err)
-			}
-		}
-		d.free()
-	}
-	if k == 0 {
-		n.makeError()
-	}
-	n.disjuncts = a[:k]
-}
-
-func (n *nodeContext) doNotify() {
-	if n.errs == nil || len(n.notify) == 0 {
-		return
-	}
-	for _, rec := range n.notify {
-		v := rec.v
-		if v.state == nil {
-			if b := v.Bottom(); b != nil {
-				v.BaseValue = CombineErrors(nil, b, n.errs)
-			} else {
-				v.BaseValue = n.errs
-			}
-		} else {
-			v.state.addBottom(n.errs)
-		}
-	}
-	n.notify = n.notify[:0]
 }
 
 // validateValue checks collected bound validators and checks them against
@@ -317,39 +263,6 @@ func isCyclePlaceholder(v BaseValue) bool {
 		v = a.DerefValue().BaseValue
 	}
 	return v == cycle
-}
-
-func (n *nodeContext) createDisjunct() *Disjunction {
-	a := make([]Value, len(n.disjuncts))
-	p := 0
-	hasDefaults := false
-	for i, x := range n.disjuncts {
-		v := *x.result
-		v.state = nil
-		switch x.defaultMode {
-		case isDefault:
-			a[i] = a[p]
-			a[p] = &v
-			p++
-			hasDefaults = true
-
-		case notDefault:
-			hasDefaults = true
-			fallthrough
-		case maybeDefault:
-			a[i] = &v
-		}
-	}
-	// TODO: disambiguate based on concrete values.
-	// TODO: consider not storing defaults.
-	// if p > 0 {
-	// 	a = a[:p]
-	// }
-	return &Disjunction{
-		Values:      a,
-		NumDefaults: p,
-		HasDefaults: hasDefaults,
-	}
 }
 
 type arcKey struct {
@@ -625,9 +538,6 @@ type nodeContextState struct {
 	// to process. This is used to avoids processing a conjunct twice in some
 	// cases where there is an evaluation cycle.
 	conjunctsPos int
-	// conjunctsPartialPos is like conjunctsPos, but for the 'partial' phase
-	// of processing where conjuncts are only processed as concrete scalars.
-	conjunctsPartialPos int
 }
 
 // A receiver receives notifications.
@@ -843,28 +753,6 @@ func (n *nodeContext) updateNodeType(k Kind, v Expr, id CloseInfo) bool {
 	return kind != BottomKind
 }
 
-func (n *nodeContext) done() bool {
-	// TODO(v0.7): verify that done() is checking for the right conditions in
-	// the new evaluator implementation.
-	return len(n.dynamicFields) == 0 &&
-		len(n.comprehensions) == 0 &&
-		len(n.exprs) == 0
-}
-
-// finalDone is like done, but allows for cycle errors, which can be ignored
-// as they essentially indicate a = a & _.
-func (n *nodeContext) finalDone() bool {
-	// TODO(v0.7): update for new evaluator?
-	for _, x := range n.exprs {
-		if x.err.Code != CycleError {
-			return false
-		}
-	}
-	return len(n.dynamicFields) == 0 &&
-		len(n.comprehensions) == 0 &&
-		len(n.selfComprehensions) == 0
-}
-
 // hasErr is used to determine if an evaluation path, for instance a single
 // path after expanding all disjunctions, has an error.
 func (n *nodeContext) hasErr() bool {
@@ -1008,21 +896,6 @@ func valueError(v Value) *ValueError {
 		return nil
 	}
 	return err
-}
-
-// TODO(perf): if an arc is the only arc with that label added to a Vertex, and
-// if there are no conjuncts of optional fields to be added, then the arc could
-// be added as is until any of these conditions change. This would allow
-// structure sharing in many cases. One should be careful, however, to
-// recursively track arcs of previously unified evaluated vertices ot make this
-// optimization meaningful.
-//
-// An alternative approach to avoid evaluating optional arcs (if we take that
-// route) is to not recursively evaluate those arcs, even for Finalize. This is
-// possible as it is not necessary to evaluate optional arcs to evaluate
-// disjunctions.
-func (n *nodeContext) insertField(f Feature, mode ArcType, x Conjunct) *Vertex {
-	return n.insertArc(f, mode, x, x.CloseInfo, true)
 }
 
 func (n *nodeContext) insertFieldUnchecked(f Feature, mode ArcType, x Conjunct) *Vertex {

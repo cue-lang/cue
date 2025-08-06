@@ -211,13 +211,6 @@ type OpContext struct {
 func (c *OpContext) CloseInfo() CloseInfo         { return c.ci }
 func (c *OpContext) UpdateCloseInfo(ci CloseInfo) { c.ci = ci }
 
-func (n *nodeContext) skipNonMonotonicChecks() bool {
-	if n.ctx.inConstraint > 0 {
-		return false
-	}
-	return n.ctx.inDisjunct > 0
-}
-
 func (c *OpContext) Pos() token.Pos {
 	if c.src == nil {
 		return token.NoPos
@@ -632,25 +625,6 @@ func (c *OpContext) EvaluateKeepState(x Expr) (result Value) {
 	return result
 }
 
-func (c *OpContext) evaluateRec(v Conjunct, state combinedFlags) Value {
-	x := v.Expr()
-	s := c.PushConjunct(v)
-
-	val := c.evalState(x, state)
-	if val == nil {
-		// Be defensive: this never happens, but just in case.
-		Assertf(c, false, "nil return value: unspecified error")
-		val = &Bottom{
-			Code: IncompleteError,
-			Err:  c.Newf("UNANTICIPATED ERROR"),
-			Node: c.vertex,
-		}
-	}
-	_ = c.PopState(s)
-
-	return val
-}
-
 // value evaluates expression v within the current environment. The result may
 // be nil if the result is incomplete. value leaves errors untouched to that
 // they can be collected by the caller.
@@ -1063,16 +1037,6 @@ func (c *OpContext) list(v Value) *Vertex {
 		return emptyNode
 	}
 	return x
-}
-
-func (c *OpContext) scalar(v Value) Value {
-	v = Unwrap(v)
-	switch v.(type) {
-	case *Null, *Bool, *Num, *String, *Bytes:
-	default:
-		c.typeError(v, ScalarKinds)
-	}
-	return v
 }
 
 var zero = &Num{K: NumberKind}

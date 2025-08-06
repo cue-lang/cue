@@ -21,10 +21,3 @@ package adt
 // stored in slice. References to other CloseDefs are indices within this slice.
 // Together they define the top of the tree of the expression tree of how
 // conjuncts combine together (a canopy).
-
-// isComplexStruct reports whether the Closed information should be copied as a
-// subtree into the parent node using InsertSubtree. If not, the conjuncts can
-// just be inserted at the current ID.
-func isComplexStruct(ctx *OpContext, v *Vertex) bool {
-	return v.IsClosedStruct()
-}

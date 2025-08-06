@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cdaf63f_44b65702",
+        "filename": "internal/core/adt/closed2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-06T13:04:32Z",
+      "side": 1,
+      "message": "remove this file entirely now?",
+      "revId": "74be08b018bf48d81db452a1319c38967b4d0ce8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

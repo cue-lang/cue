@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "feb8c532_e254fc1f",
+        "filename": "encoding/xml/koala/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-06T11:38:45Z",
+      "side": 1,
+      "message": "even though this is correct, I\u0027d suggest reverting, to keep the git history less confusing",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc98f585_41727259",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 837,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-06T11:38:45Z",
+      "side": 1,
+      "message": "this godoc was left behind; is the AI struggling with that perhaps?",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eaf009ef_365eb2c2",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-06T11:38:45Z",
+      "side": 1,
+      "message": "this change feels not as simple as the others, is it on purpose?",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8c223e8_20415b6e",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-06T11:38:45Z",
+      "side": 1,
+      "message": "another godoc-like string that should be removed?",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec6e1105_e170774b",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1023,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-06T11:38:45Z",
+      "side": 1,
+      "message": "is this TODO still relevant?",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "827e2a81_cf09aee1",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 883,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-06T11:38:45Z",
+      "side": 1,
+      "message": "is this comment still relevant?",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a244f1a6_cdce0cb0",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 907,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-06T11:38:45Z",
+      "side": 1,
+      "message": "is this comment still relevant?",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21929116_fdd8152a",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-06T11:38:45Z",
+      "side": 1,
+      "message": "I don\u0027t understand this change. surely we can remove the second condition entirely.",
+      "revId": "800632898e3d3db8d0875b2b99fff05ff1ba7e54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

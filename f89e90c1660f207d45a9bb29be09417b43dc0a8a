@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27540515_dd7c12f5",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1515,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-06T11:38:45Z",
+      "side": 0,
+      "message": "this edit feels backwards. this branch is unreachable for v3, so the entire branch should be removed.",
+      "revId": "f89e90c1660f207d45a9bb29be09417b43dc0a8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

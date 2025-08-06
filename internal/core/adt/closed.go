@@ -326,10 +326,6 @@ type closeStats struct {
 	next       *closeStats
 }
 
-func (c *closeInfo) isClosed() bool {
-	return c.mode == closeDef
-}
-
 // isClosed reports whether v is closed at this level (so not recursively).
 func isClosed(v *Vertex) bool {
 	// We could have used IsRecursivelyClosed here, but (effectively)

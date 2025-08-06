@@ -21,7 +21,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 )
 
 // TODO: unanswered questions about structural cycles:
@@ -467,13 +466,6 @@ func (a ArcType) String() string {
 	return fmt.Sprintf("ArcType(%d)", a)
 }
 
-// definitelyExists reports whether an arc is a constraint or member arc.
-// TODO: we should check that users of this call ensure there are no
-// ArcPendings.
-func (v *Vertex) definitelyExists() bool {
-	return v.ArcType < ArcPending
-}
-
 // ConstraintFromToken converts a given AST constraint token to the
 // corresponding ArcType.
 func ConstraintFromToken(t token.Token) ArcType {
@@ -536,15 +528,6 @@ type StructInfo struct {
 	Disable bool
 
 	Embedding bool
-}
-
-// TODO(perf): this could be much more aggressive for eliminating structs that
-// are immaterial for closing.
-func (s *StructInfo) useForAccept() bool {
-	if c := s.closeInfo; c != nil {
-		return !c.noCheck
-	}
-	return true
 }
 
 // vertexStatus indicates the evaluation progress of a Vertex.
@@ -1011,38 +994,31 @@ func addConjuncts(ctx *OpContext, dst *Vertex, src Value) {
 	c := MakeConjunct(nil, src, closeInfo)
 
 	if v, ok := src.(*Vertex); ok {
-		if ctx.Version == internal.EvalV2 {
-			if v.ClosedRecursive {
-				var root CloseInfo
-				c.CloseInfo = root.SpawnRef(v, v.ClosedRecursive, nil)
-			}
-		} else {
-			// By default, all conjuncts in a node are considered to be not
-			// mutually closed. This means that if one of the arguments to Unify
-			// closes, but is acquired to embedding, the closeness information
-			// is disregarded. For instance, for Unify(a, b) where a and b are
-			//
-			//		a:  {#D, #D: d: f: int}
-			//		b:  {d: e: 1}
-			//
-			// we expect 'e' to be not allowed.
-			//
-			// In order to do so, we wrap the outer conjunct in a separate
-			// scope that will be closed in the presence of closed embeddings
-			// independently from the other conjuncts.
-			n := dst.getBareState(ctx)
-			c.CloseInfo = n.splitScope(c.CloseInfo)
+		// By default, all conjuncts in a node are considered to be not
+		// mutually closed. This means that if one of the arguments to Unify
+		// closes, but is acquired to embedding, the closeness information
+		// is disregarded. For instance, for Unify(a, b) where a and b are
+		//
+		//		a:  {#D, #D: d: f: int}
+		//		b:  {d: e: 1}
+		//
+		// we expect 'e' to be not allowed.
+		//
+		// In order to do so, we wrap the outer conjunct in a separate
+		// scope that will be closed in the presence of closed embeddings
+		// independently from the other conjuncts.
+		n := dst.getBareState(ctx)
+		c.CloseInfo = n.splitScope(c.CloseInfo)
 
-			// Even if a node is marked as ClosedRecursive, it may be that this
-			// is the first node that references a definition.
-			// We approximate this to see if the path leading up to this
-			// value is a defintion. This is not fully accurate. We could
-			// investigate the closedness information contained in the parent.
-			for p := v; p != nil; p = p.Parent {
-				if p.Label.IsDef() {
-					c.CloseInfo.TopDef = true
-					break
-				}
+		// Even if a node is marked as ClosedRecursive, it may be that this
+		// is the first node that references a definition.
+		// We approximate this to see if the path leading up to this
+		// value is a defintion. This is not fully accurate. We could
+		// investigate the closedness information contained in the parent.
+		for p := v; p != nil; p = p.Parent {
+			if p.Label.IsDef() {
+				c.CloseInfo.TopDef = true
+				break
 			}
 		}
 	}

@@ -91,7 +91,6 @@ var lenBuiltin = &adt.Builtin{
 
 		v := args[0]
 		if x, ok := v.(*adt.Vertex); ok {
-			x.LockArcs = true
 			switch x.BaseValue.(type) {
 			case nil:
 				// This should not happen, but be defensive.

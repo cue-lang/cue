@@ -138,12 +138,9 @@ func (w *printer) printShared(v0 *adt.Vertex) (x *adt.Vertex, ok bool) {
 	// but rather to the original arc that subsequently points to a
 	// disjunct.
 	v0 = v0.DerefDisjunct()
-	isCyclic := v0.IsCyclic
 	s, ok := v0.BaseValue.(*adt.Vertex)
 	v1 := v0.DerefValue()
 	useReference := v0.IsShared && !v1.Internal()
-	isCyclic = isCyclic || v1.IsCyclic
-	_ = isCyclic
 	// NOTE(debug): use this line instead of the following to expand shared
 	// cases where it is safe to do so.
 	// if useReference && isCyclic && ok && len(v.Arcs) > 0 {

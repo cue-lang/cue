@@ -12,13 +12,12 @@ func _() {
 	_ = x[evaluating-1]
 	_ = x[partial-2]
 	_ = x[conjuncts-3]
-	_ = x[evaluatingArcs-4]
-	_ = x[finalized-5]
+	_ = x[finalized-4]
 }
 
-const _vertexStatus_name = "unprocessedevaluatingpartialconjunctsevaluatingArcsfinalized"
+const _vertexStatus_name = "unprocessedevaluatingpartialconjunctsfinalized"
 
-var _vertexStatus_index = [...]uint8{0, 11, 21, 28, 37, 51, 60}
+var _vertexStatus_index = [...]uint8{0, 11, 21, 28, 37, 46}
 
 func (i vertexStatus) String() string {
 	if i < 0 || i >= vertexStatus(len(_vertexStatus_index)-1) {

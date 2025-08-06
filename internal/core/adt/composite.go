@@ -196,11 +196,6 @@ type Vertex struct {
 	// the per-Environment value cache.
 	MultiLet bool
 
-	// After this is set, no more arcs may be added during evaluation. This is
-	// set, for instance, after a Vertex is used as a source for comprehensions,
-	// or any other operation that relies on the set of arcs being constant.
-	LockArcs bool
-
 	// IsDynamic signifies whether this struct is computed as part of an
 	// expression and not part of the static evaluation tree.
 	// Used for cycle detection.
@@ -232,11 +227,6 @@ type Vertex struct {
 	// If a node is shared, the user should be careful with traversal.
 	// The debug printer, for instance, takes extra care not to print in a loop.
 	IsShared bool
-
-	// IsCyclic is true if a node is cyclic, for instance if its value is
-	// a cyclic reference to a shared node or if the value is a conjunction
-	// of which at least one value is cyclic (not yet supported).
-	IsCyclic bool
 
 	// ArcType indicates the level of optionality of this arc.
 	ArcType ArcType
@@ -542,16 +532,6 @@ const (
 	// conjuncts is the state reached when all conjuncts have been evaluated,
 	// but without recursively processing arcs.
 	conjuncts
-
-	// evaluatingArcs indicates that the arcs of the Vertex are currently being
-	// evaluated. If this is encountered it indicates a structural cycle.
-	// Value does not have to be nil
-	evaluatingArcs
-
-	// TODO: introduce a "frozen" state. Right now a node may marked and used
-	// as finalized, before all tasks have completed. We should introduce a
-	// frozen state that simply checks that all remaining tasks are idempotent
-	// and errors if they are not.
 
 	// finalized means that this node is fully evaluated and that the results
 	// are save to use without further consideration.

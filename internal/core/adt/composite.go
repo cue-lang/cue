@@ -173,11 +173,6 @@ type Vertex struct {
 	// status indicates the evaluation progress of this vertex.
 	status vertexStatus
 
-	// hasAllConjuncts indicates that the set of conjuncts is complete.
-	// This is the case if the conjuncts of all its ancestors have been
-	// processed.
-	hasAllConjuncts bool
-
 	// isData indicates that this Vertex is to be interpreted as data: pattern
 	// and additional constraints, as well as optional fields, should be
 	// ignored.
@@ -229,9 +224,6 @@ type Vertex struct {
 	// the for source of comprehensions and let fields or let clauses.
 	anonymous bool
 
-	// hasPendingArc is set if this Vertex has a void arc (e.g. for comprehensions)
-	hasPendingArc bool
-
 	// IsDisjunct indicates this Vertex is a disjunct resulting from a
 	// disjunction evaluation.
 	IsDisjunct bool
@@ -248,10 +240,6 @@ type Vertex struct {
 
 	// ArcType indicates the level of optionality of this arc.
 	ArcType ArcType
-
-	// cyclicReferences is a linked list of internal references pointing to this
-	// Vertex. This is used to shorten the path of some structural cycles.
-	cyclicReferences *RefNode
 
 	// BaseValue is the value associated with this vertex. For lists and structs
 	// this is a sentinel value indicating its kind.
@@ -625,7 +613,6 @@ func (v *Vertex) updateStatus(s vertexStatus) {
 // received all their conjuncts as well, after which this node will have been
 // notified of these conjuncts.
 func (v *Vertex) setParentDone() {
-	v.hasAllConjuncts = true
 	// Could set "Conjuncts" flag of arc at this point.
 	if n := v.state; n != nil && len(n.conjuncts) == n.conjunctsPos {
 		for _, a := range v.Arcs {

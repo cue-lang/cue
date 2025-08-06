@@ -805,7 +805,7 @@ func mergeCloseInfo(nv, nw *nodeContext) {
 	if w == nil {
 		return
 	}
-	// Merge missing closeInfos
+	// Merge missing conjunct infos
 outer:
 	for _, wci := range nw.conjunctInfo {
 		for _, vci := range nv.conjunctInfo {

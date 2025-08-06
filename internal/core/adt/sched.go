@@ -603,8 +603,8 @@ type task struct {
 
 	// The Conjunct processed by this task.
 	env *Environment
-	id  CloseInfo // TODO: rename to closeInfo?
-	x   Node      // The conjunct Expression or Value.
+	id  CloseInfo
+	x   Node // The conjunct Expression or Value.
 
 	// For Comprehensions:
 	comp *envComprehension

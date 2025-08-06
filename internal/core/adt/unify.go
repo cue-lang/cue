@@ -27,6 +27,10 @@ func (v *Vertex) isInitialized() bool {
 
 func (n *nodeContext) assertInitialized() {
 	if n != nil && n.ctx.isDevVersion() {
+		if n.node == nil {
+			// Can happen for unit tests.
+			return
+		}
 		if v := n.node; !v.isInitialized() {
 			panic(fmt.Sprintf("vertex %p not initialized", v))
 		}

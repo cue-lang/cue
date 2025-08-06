@@ -324,14 +324,7 @@ type nodeContext struct {
 	conjuncts       []conjunct
 	cyclicConjuncts []cyclicConjunct
 
-	dynamicFields      []envDynamic
-	comprehensions     []envYield
-	selfComprehensions []envYield // comprehensions iterating over own struct.
-
-	// Expression conjuncts
-	lists  []envList
-	vLists []*Vertex
-	exprs  []envExpr
+	dynamicFields []envDynamic
 
 	// These fields are used to track type checking.
 	reqDefIDs    []refInfo
@@ -350,12 +343,6 @@ type nodeContext struct {
 
 	// Disjunction handling
 	disjunctions []envDisjunct
-
-	// usedDefault indicates the for each of possibly multiple parent
-	// disjunctions whether it is unified with a default disjunct or not.
-	// This is then later used to determine whether a disjunction should
-	// be treated as a marked disjunction.
-	usedDefault []defaultInfo
 
 	// disjuncts holds disjuncts that evaluated to a non-bottom value.
 	// TODO: come up with a better name.
@@ -536,17 +523,6 @@ func (n *nodeContext) Logf(format string, args ...interface{}) {
 	n.ctx.Logf(n.node, format, args...)
 }
 
-type defaultInfo struct {
-	// parentMode indicates whether this values was used as a default value,
-	// based on the parent mode.
-	parentMode defaultMode
-
-	// The result of default evaluation for a nested disjunction.
-	nestedMode defaultMode
-
-	origMode defaultMode
-}
-
 func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 	var n *nodeContext
 	if n = c.freeListNode; n != nil {
@@ -562,29 +538,23 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			nodeContextState: nodeContextState{
 				kind: TopKind,
 			},
-			toFree:             n.toFree[:0],
-			arcMap:             n.arcMap[:0],
-			conjuncts:          n.conjuncts[:0],
-			cyclicConjuncts:    n.cyclicConjuncts[:0],
-			notify:             n.notify[:0],
-			sharedIDs:          n.sharedIDs[:0],
-			checks:             n.checks[:0],
-			postChecks:         n.postChecks[:0],
-			dynamicFields:      n.dynamicFields[:0],
-			comprehensions:     n.comprehensions[:0],
-			selfComprehensions: n.selfComprehensions[:0],
-			lists:              n.lists[:0],
-			vLists:             n.vLists[:0],
-			exprs:              n.exprs[:0],
-			reqDefIDs:          n.reqDefIDs[:0],
-			replaceIDs:         n.replaceIDs[:0],
-			conjunctInfo:       n.conjunctInfo[:0],
-			reqSets:            n.reqSets[:0],
-			disjunctions:       n.disjunctions[:0],
-			usedDefault:        n.usedDefault[:0],
-			disjunctErrs:       n.disjunctErrs[:0],
-			disjuncts:          n.disjuncts[:0],
-			buffer:             n.buffer[:0],
+			toFree:          n.toFree[:0],
+			arcMap:          n.arcMap[:0],
+			conjuncts:       n.conjuncts[:0],
+			cyclicConjuncts: n.cyclicConjuncts[:0],
+			notify:          n.notify[:0],
+			sharedIDs:       n.sharedIDs[:0],
+			checks:          n.checks[:0],
+			postChecks:      n.postChecks[:0],
+			dynamicFields:   n.dynamicFields[:0],
+			reqDefIDs:       n.reqDefIDs[:0],
+			replaceIDs:      n.replaceIDs[:0],
+			conjunctInfo:    n.conjunctInfo[:0],
+			reqSets:         n.reqSets[:0],
+			disjunctions:    n.disjunctions[:0],
+			disjunctErrs:    n.disjunctErrs[:0],
+			disjuncts:       n.disjuncts[:0],
+			buffer:          n.buffer[:0],
 		}
 		n.scheduler.clear()
 	} else {
@@ -826,16 +796,6 @@ type envDynamic struct {
 	field *DynamicField
 	id    CloseInfo
 	err   *Bottom
-}
-
-type envList struct {
-	env     *Environment
-	list    *ListLit
-	n       int64 // recorded length after evaluator
-	elipsis *Ellipsis
-	id      CloseInfo
-	ignore  bool // has a self-referencing comprehension and is postponed
-	self    bool // was added as a postponed self-referencing comprehension
 }
 
 type envCheck struct {

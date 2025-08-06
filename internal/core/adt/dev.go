@@ -17,12 +17,6 @@ package adt
 // This file contains types to help in the transition from the old to new
 // evaluation model.
 
-func unreachableForDev(c *OpContext) {
-	if c.isDevVersion() {
-		panic("unreachable for development version")
-	}
-}
-
 type combinedFlags struct {
 	status    vertexStatus
 	condition condition

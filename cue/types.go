@@ -1661,12 +1661,9 @@ func (v hiddenValue) Template() func(label string) Value {
 		return nil
 	}
 
-	// Implementation for the old evaluator.
-	types := v.v.OptionalTypes()
-	switch {
-	case types&(adt.HasAdditional|adt.HasPattern) != 0:
-	case v.v.PatternConstraints != nil:
-	default:
+	// Simplified after removing OptionalTypes.
+	// Check if there are pattern constraints.
+	if v.v.PatternConstraints == nil {
 		return nil
 	}
 

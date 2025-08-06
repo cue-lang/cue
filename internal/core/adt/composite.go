@@ -1109,19 +1109,6 @@ func Unwrap(v Value) Value {
 	return x.Value()
 }
 
-// OptionalType is a bit field of the type of optional constraints in use by an
-// Acceptor.
-type OptionalType int8
-
-const (
-	HasField          OptionalType = 1 << iota // X: T
-	HasDynamic                                 // (X): T or "\(X)": T
-	HasPattern                                 // [X]: T
-	HasComplexPattern                          // anything but a basic type
-	HasAdditional                              // ...T
-	IsOpen                                     // Defined for all fields
-)
-
 func (v *Vertex) Kind() Kind {
 	// This is possible when evaluating comprehensions. It is potentially
 	// not known at this time what the type is.
@@ -1135,14 +1122,6 @@ func (v *Vertex) Kind() Kind {
 	default:
 		return TopKind
 	}
-}
-
-func (v *Vertex) OptionalTypes() OptionalType {
-	var mask OptionalType
-	for _, s := range v.Structs {
-		mask |= s.OptionalTypes()
-	}
-	return mask
 }
 
 // IsOptional reports whether a field is explicitly defined as optional,

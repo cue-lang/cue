@@ -90,9 +90,6 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 		if x.IsClosedList() != y.IsClosedList() {
 			return false
 		}
-		if !equalClosed(ctx, x, y, flags) {
-			return false
-		}
 	}
 
 	skipRegular := flags&RegularOnly != 0
@@ -139,39 +136,6 @@ loop2:
 	}
 
 	return equalTerminal(ctx, v, w, flags)
-}
-
-// equalClosed tests if x and y have the same set of close information.
-// TODO: the following refinements are possible:
-//   - unify optional fields and equate the optional fields
-//   - do the same for pattern constraints, where the pattern constraints
-//     are collated by pattern equality.
-//   - a further refinement would collate patterns by ranges.
-//
-// For all these refinements it would be necessary to have well-working
-// structure sharing so as to not repeatedly recompute optional arcs.
-func equalClosed(ctx *OpContext, x, y *Vertex, flags Flag) bool {
-	return verifyStructs(x, y, flags) && verifyStructs(y, x, flags)
-}
-
-func verifyStructs(x, y *Vertex, flags Flag) bool {
-outer:
-	for _, s := range x.Structs {
-		if (flags&IgnoreOptional != 0) && !s.StructLit.HasOptional() {
-			continue
-		}
-		// span() always returns 0 after EvalV2 removal, so this check is always true
-		if !s.StructLit.HasOptional() {
-			continue
-		}
-		for _, t := range y.Structs {
-			if s.StructLit == t.StructLit {
-				continue outer
-			}
-		}
-		return false
-	}
-	return true
 }
 
 func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {

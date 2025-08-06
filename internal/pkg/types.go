@@ -67,14 +67,12 @@ func (s *Struct) IsOpen() bool {
 	if !s.node.IsClosedStruct() {
 		return true
 	}
-	// Technically this is not correct, but it is in the context of where
-	// it is used.
+	// Check for pattern constraints which indicate openness.
 	if s.node.PatternConstraints != nil && len(s.node.PatternConstraints.Pairs) > 0 {
 		return true
 	}
-	// The equivalent code for the old implementation.
-	ot := s.node.OptionalTypes()
-	return ot&^adt.HasDynamic != 0
+	// After removing OptionalTypes, we rely on other checks for openness.
+	return false
 }
 
 // NumConstraintFields reports the number of explicit optional and required

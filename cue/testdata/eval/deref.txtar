@@ -1,0 +1,196 @@
+-- in.cue --
+issue4011: full: {
+	let _hugoEnvironments = {
+		default:    "_default"
+		production: "production"
+	}
+
+	site: cls: _
+	site: [_]: {
+		fs: {
+			Create: {
+				for envID, envName in _hugoEnvironments
+				let envConfig = hugo[envID]
+				if envConfig != _|_ {
+					config: Contents: envConfig
+				}
+			}
+		}
+
+		hugo: _
+	}
+
+	site: [_]: hugo: production: {}
+}
+issue4011: reduced: {
+	result: {
+		for envName in ["foo"]
+		let env = envs[envName]
+		if env != _|_ {
+			(envName): true
+		}
+	}
+	envs: foo: {}
+}
+-- out/eval/stats --
+Leaks:  5
+Freed:  22
+Reused: 12
+Allocs: 15
+Retain: 17
+
+Unifications: 27
+Conjuncts:    33
+Disjuncts:    37
+
+MisalignedConjunct: 4
+
+NumCloseIDs: 2
+-- out/evalalpha --
+(struct){
+  issue4011: (struct){
+    full: (struct){
+      let _hugoEnvironments#1 = (struct){
+        default: (string){ "_default" }
+        production: (string){ "production" }
+      }
+      site: (struct){
+        cls: (struct){
+          fs: (struct){
+            Create: (_|_){
+              // [cycle] cycle error
+            }
+          }
+          hugo: (struct){
+            production: (struct){
+            }
+          }
+        }
+      }
+    }
+    reduced: (struct){
+      result: (_|_){
+        // [cycle] cycle error
+      }
+      envs: (struct){
+        foo: (struct){
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -8,11 +8,8 @@
+       site: (struct){
+         cls: (struct){
+           fs: (struct){
+-            Create: (struct){
+-              config: (struct){
+-                Contents: (struct){
+-                }
+-              }
++            Create: (_|_){
++              // [cycle] cycle error
+             }
+           }
+           hugo: (struct){
+@@ -23,8 +20,8 @@
+       }
+     }
+     reduced: (struct){
+-      result: (struct){
+-        foo: (bool){ true }
++      result: (_|_){
++        // [cycle] cycle error
+       }
+       envs: (struct){
+         foo: (struct){
+-- out/eval --
+(struct){
+  issue4011: (struct){
+    full: (struct){
+      let _hugoEnvironments#1 = (struct){
+        default: (string){ "_default" }
+        production: (string){ "production" }
+      }
+      site: (struct){
+        cls: (struct){
+          fs: (struct){
+            Create: (struct){
+              config: (struct){
+                Contents: (struct){
+                }
+              }
+            }
+          }
+          hugo: (struct){
+            production: (struct){
+            }
+          }
+        }
+      }
+    }
+    reduced: (struct){
+      result: (struct){
+        foo: (bool){ true }
+      }
+      envs: (struct){
+        foo: (struct){
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  issue4011: {
+    full: {
+      let _hugoEnvironments#1 = {
+        default: "_default"
+        production: "production"
+      }
+      site: {
+        cls: _
+      }
+      site: {
+        [_]: {
+          fs: {
+            Create: {
+              for envID, envName in 〈4;let _hugoEnvironments#1〉 let envConfig = 〈3;hugo〉[〈0;envID〉] if (〈0;envConfig〉 != _|_(explicit error (_|_ literal) in source)) {
+                config: {
+                  Contents: 〈2;envConfig〉
+                }
+              }
+            }
+          }
+          hugo: _
+        }
+      }
+      site: {
+        [_]: {
+          hugo: {
+            production: {}
+          }
+        }
+      }
+    }
+  }
+  issue4011: {
+    reduced: {
+      result: {
+        for _, envName in [
+          "foo",
+        ] let env = 〈2;envs〉[〈0;envName〉] if (〈0;env〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈2;envName〉: true
+        }
+      }
+      envs: {
+        foo: {}
+      }
+    }
+  }
+}

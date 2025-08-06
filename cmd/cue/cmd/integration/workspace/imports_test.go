@@ -25,7 +25,8 @@ package x
 `)))
 
 	qt.Assert(t, qt.IsNil(err))
-	reg := newRegistry(t, registryFS)
+	reg, cacheDir := newRegistry(t, registryFS)
+	t.Log(cacheDir)
 
 	const files = `
 -- cue.mod/module.cue --
@@ -47,6 +48,7 @@ import "example.com/foo/x"
 			RootURIAsDefaultFolder(), Registry(reg), Modes(DefaultModes()&^Forwarded),
 		).Run(t, files, func(t *testing.T, env *Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
+			cacheURI := protocol.URIFromPath(cacheDir) + "/mod/extract"
 			env.Await(
 				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			)
@@ -58,12 +60,16 @@ import "example.com/foo/x"
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 For file %v/a/a.cue found [Package dir=%v/a importPath=example.com/bar/a@v0]", rootURI, rootURI, rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loading packages [example.com/bar/a@v0]", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dir=%v/a importPath=example.com/bar/a@v0", rootURI, rootURI),
+				// A module is created for the imported module.
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=unknown Created", cacheURI),
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Reloaded", cacheURI),
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Loaded Package dir=%v/example.com/foo@v0.0.1/x importPath=example.com/foo/x@v0", cacheURI, cacheURI),
 			)
 		})
 	})
 }
 
-func newRegistry(t *testing.T, fsys fs.FS) cache.Registry {
+func newRegistry(t *testing.T, fsys fs.FS) (cache.Registry, string) {
 	t.Helper()
 	fsys, err := fs.Sub(fsys, "_registry")
 	qt.Assert(t, qt.IsNil(err))
@@ -86,5 +92,5 @@ func newRegistry(t *testing.T, fsys fs.FS) cache.Registry {
 	}
 	reg, err := modconfig.NewRegistry(modcfg)
 	qt.Assert(t, qt.IsNil(err))
-	return reg
+	return reg, cacheDir
 }

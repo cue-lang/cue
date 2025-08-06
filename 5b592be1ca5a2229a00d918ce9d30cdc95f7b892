@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bad58c7_dc5262dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-06T09:19:40Z",
+      "side": 1,
+      "message": "LGTM assuming we\u0027re OK with the new outputs, and no TODOs are needed",
+      "revId": "5b592be1ca5a2229a00d918ce9d30cdc95f7b892",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -87,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "195f8db9_a5821365",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-06T16:34:50Z",
+      "side": 1,
+      "message": "Brilliant, thank you, especially for the test. You\u0027re right - I believe the OR behaviour is correct and the AND is not.",
+      "parentUuid": "673dac55_22e4b681",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d5180d86_0466b18c",

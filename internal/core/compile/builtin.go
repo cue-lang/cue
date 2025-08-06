@@ -18,7 +18,6 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -144,21 +143,12 @@ var closeBuiltin = &adt.Builtin{
 		if !ok {
 			return c.NewErrf("struct argument must be concrete")
 		}
-		var v *adt.Vertex
-		if c.Version == internal.DevVersion {
-			// TODO(evalv3) this is a rather convoluted and inefficient way to
-			// accomplish signaling vertex should be closed. In most cases, it
-			// would suffice to set IsClosed in the CloseInfo. However, that
-			// does not cover all code paths. Consider simplifying this.
-			v = c.Wrap(s, c.CloseInfo())
-			v.ClosedNonRecursive = true
-		} else {
-			if m, ok := s.BaseValue.(*adt.StructMarker); ok && m.NeedClose {
-				return s
-			}
-			v = s.Clone()
-			v.BaseValue = &adt.StructMarker{NeedClose: true}
-		}
+		// TODO(evalv3) this is a rather convoluted and inefficient way to
+		// accomplish signaling vertex should be closed. In most cases, it
+		// would suffice to set IsClosed in the CloseInfo. However, that
+		// does not cover all code paths. Consider simplifying this.
+		v := c.Wrap(s, c.CloseInfo())
+		v.ClosedNonRecursive = true
 		return v
 	},
 }

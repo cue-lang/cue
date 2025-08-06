@@ -23,7 +23,6 @@ import (
 	"sort"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/types"
@@ -56,48 +55,7 @@ func (s *valueSorter) Less(i, j int) bool {
 		return false
 	}
 
-	if s.ctx.Version == internal.DevVersion {
-		return s.lessNew(i, j)
-	}
-
-	var x, y types.Value
-	s.a[i].Core(&x)
-	s.a[j].Core(&y)
-
-	// Save the state of all relevant arcs and restore later for the
-	// next comparison.
-	saveCmp := *s.cmp
-	saveLess := *s.less
-	saveX := *s.x
-	saveY := *s.y
-
-	s.x.InsertConjunctsFrom(x.V)
-	s.y.InsertConjunctsFrom(y.V)
-
-	// TODO(perf): if we can determine that the comparator values for
-	// x and y are idempotent (no arcs and a basevalue being top or
-	// a struct or list marker), then we do not need to reevaluate the input.
-	// In that case, we can use the below code instead of the above two loops
-	// setting the conjuncts. This may improve performance significantly.
-	//
-	// s.x.BaseValue = x.V.BaseValue
-	// s.x.Arcs = x.V.Arcs
-	// s.y.BaseValue = y.V.BaseValue
-	// s.y.Arcs = y.V.Arcs
-
-	s.less.Finalize(s.ctx)
-	isLess := s.ctx.BoolValue(s.less)
-	if b := s.less.Err(s.ctx); b != nil && s.err == nil {
-		s.err = b.Err
-		return true
-	}
-
-	*s.less = saveLess
-	*s.cmp = saveCmp
-	*s.x = saveX
-	*s.y = saveY
-
-	return isLess
+	return s.lessNew(i, j)
 }
 
 func (s *valueSorter) lessNew(i, j int) bool {

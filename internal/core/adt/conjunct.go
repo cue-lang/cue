@@ -340,10 +340,8 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	ciKey := closeInfo
 	ciKey.Refs = nil
 	ciKey.Inline = false
-	if n.ctx.isDevVersion() {
-		// No need to key on CloseInfo with evalv3.
-		ciKey = CloseInfo{}
-	}
+	// No need to key on CloseInfo with evalv3.
+	ciKey = CloseInfo{}
 
 	// Also check arc.Label: definitions themselves do not have the FromDef to
 	// reflect their closedness. This means that if we are structure sharing, we

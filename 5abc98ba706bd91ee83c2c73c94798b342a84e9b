@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1a0710e_43c0f86d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "This should give you a bit more to chew on. It\u0027s pretty close (and looks brill in general), but I think I\u0027d like a check over again before it lands.",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85c90b64_8b3ef7f6",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "Using test coverage shows various omissions here (imports, interpolations, unary expressions, etc): it would be good to be a bit more comprehensive given that it\u0027s easy to do that.",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c689620_c9482f6b",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 557,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be introducing a new lexical scope?",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "673dac55_22e4b681",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "I don\u0027t understand why this is different from token.AND: there\u0027s no scoping difference between those two operations AFAIK.\n\nAnd indeed, it looks like there is an issue with the existing AND logic: it fails on this test:\n\n```\n\t\t\tarchive: `-- a.cue --\nc: {a: b} \u0026 {b: 3}\nb: 7\nd: c.b\n`,\n\t\t\texpectations: map[*position][]*position{\n\t\t\t\tln(1, 1, \"b\"): {ln(2, 1, \"b\")},\n\t\t\t\tln(3, 1, \"c\"): {ln(1, 1, \"c\")},\n\t\t\t\tln(3, 1, \"b\"): {ln(1, 2, \"b\")},\n\t\t\t},\n```\n\nSpecifically that first `b` reference incorrectly resolves to the `b` in the second struct literal.\n\nI think probably both AND and OR need the same lexical scope treatment (but I still don\u0027t quite understand what\u0027s going on there tbh).",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5180d86_0466b18c",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 719,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "perhaps say something about what the returned slice actually represents?",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99cd5ede_51b678b9",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "I\u0027d be tempted to put the tests first (the thing we really care about seeing most) and all the helper stuff afterwards.",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ed74397_1aef334f",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "This checks the results for some chosen offsets. However, ISTM that it would be nicer to have a more comprehensive test that checks the results for every single file offset within the test while using essentially the same test data.\nThis would require a slight change in the data representation: a position currently represents a single offset within the file, but is invariably defined with respect to a string, and hence could be used to define a range (all the characters in the string). So you\u0027d just need to range through all the offsets in all the files: if an offset doesn\u0027t overlap with any \"expectation\" range, we expect an empty result.\n\nThis potentially gives a bunch more coverage without much extra effort.",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44c79f00_a24e2c29",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "Why skip the test if there are no wanted positions? Surely we want to be able to test the logic when an identifier doesn\u0027t resolve to anything?",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1cf9934_e80da0d6",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "This produces a really unhelpful error when there\u0027s a mismatch in length (we don\u0027t get to see anything of the actual contents). I\u0027d suggest mapping the elements to something in common between both before comparing.\n\nTo potentially save you a bit of work, here\u0027s a diff of the changes that I made to do this when playing with the logic locally: https://gist.github.com/rogpeppe/c63255834b2eb5095c3468d6d55b927b\n\nUpdate: it also doesn\u0027t print the \"from\" offset on failure, which is also important information.",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "178999b1_39e1e6bb",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "I\u0027d like to see some tests involving string-literal fields. For example, I think that the results of the below should be the same as the first test in this table, but they don\u0027t seem to be:\n\n```\nx: y: a.b\na: b: 5\n\"a\": b: 6\n```",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "300f6750_5dc78c50",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "nit: it\u0027s nice when the test name as printed by `go test` is a literal match for the test name as defined in the code; that makes it easier to copy/paste a search term for the test. In practice, that means avoiding spaces because they\u0027re translated to underscores.\n\nSo I\u0027d probably use names in this style (trying to keep your hierarchy intact)\n\n\n```suggestion\n\t\t\tname: \"Selector_Implicit_ViaRoot\",\n```",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9445152f_dafdc4fe",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "It would be nice to see some test cases involving list literals too.\n\nFor example:\n\n```\nx: [{a: 5}, {b, 6}]\ny: x[0].a\n```\n\n```\nx: [... {a!: int}]\ny: int\nz: x[y].a\n```",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

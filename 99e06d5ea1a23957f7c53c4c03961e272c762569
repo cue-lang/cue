@@ -475,6 +475,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "46c2c4e6_899739d5",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "Always having a slice (24 bytes) for each byte in the file seems somewhat extravagant. What percentage of a file is usually used for go-to-definition? I suspect a map might be more appropriate.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3b78d624_a2f1ad6d",
         "filename": "internal/lsp/definitions/definitions.go",
         "patchSetId": 16
@@ -486,6 +503,114 @@
       "writtenOn": "2025-08-06T10:51:10Z",
       "side": 1,
       "message": "It would perhaps be nice to describe briefly what the arguments mean.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be933cff_e8a9dd73",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "Trivial allocation reduction:\n\n```suggestion\n\tkeys :\u003d make([]ast.Node, len(targets))\n\tfor i, scope :\u003d range targets {\n\t\tkeys[i] \u003d scope.key\n\t}\n```",
+      "range": {
+        "startLine": 321,
+        "startChar": 0,
+        "endLine": 325,
+        "endChar": 0
+      },
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b92e30c9_0cfe3652",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "```suggestion\n// FileDefinitions provides methods to resolve file offsets within a\n```",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5f723c6_d756b55c",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "```suggestion\n// certain file to their definitions.\n```",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e69e0cd9_379dc4ed",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "Maybe document that this is indexed by file offset.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "431830b7_5a225075",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "Maybe make it clear that the file offset is in bytes?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfcc34dd_3b9568d8",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "debugging remnant?",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -556,6 +681,142 @@
       "side": 1,
       "message": "Yes, that\u0027s a lot nicer!",
       "parentUuid": "c3440dae_d3e1acf7",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa464a85_41e76091",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "```suggestion\n// eval evaluates the lexicalScope lazily. Evaluation is not\n```",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e20e14f_5bcbd58b",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "called before? called after?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f35104f_7edb7686",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "I don\u0027t _think_ there\u0027s any need to invoke Canonical here.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84c1eecb_88b111b2",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "Using an invalid identifier for the label seems... questionable, but maybe it\u0027s fine.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1e2372d_c089897d",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "or just omit.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8e6cb4b_ae23ed71",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 604,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "What about the function (n.Fun) itself?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07fb79b2_d1fa6804",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 763,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "I might be missing something here, but ISTM this could probably use some special handling for when the argument is a string literal. For example, when a field isn\u0027t a valid identifier, it\u0027s not possible to write a reference to it as a selector: it must be an index expression.\n\nFor example:\n\n```\n   x: \"a b\": z: 5\n   y: x[\"a b\"].z\n```\nthe `.z` reference should probably end up at the `z: 5` field, but I suspect it won\u0027t.\n\nFeel free to add a TODO or a comment explaining why this does actually work as above.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5a074ef_175c6c8d",
+        "filename": "internal/lsp/rangeset/rangeset.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T15:44:07Z",
+      "side": 1,
+      "message": "Maybe add a perf TODO to avoid the allocation if the slice isn\u0027t growing in length?\nI think it wouldn\u0027t be hard to reuse the existing slice.\n\nIn fact, how about just doing it? something like this perhaps?\n\n```\n    rs.ranges \u003d rs.ranges[:i]\n    rs.ranges \u003d slices.Grow(rs.ranges, 1+len(suffix))\n    rs.ranges \u003d rs.ranges[:len(prefix)+1+len(suffix))\n    copy(rs.ranges[i+1:], suffix)\n    rs.ranges[i] \u003d newRange\n```\n\nI think this could potentially be a significant improvement for the (perhaps most common?) case that non-overlapping increasing ranges are added sequentially in order, in which case it\u0027ll be equivalent to append I think.",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

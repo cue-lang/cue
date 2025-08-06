@@ -11,18 +11,22 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"time"
 
+	"cuelang.org/go/cue/ast"
 	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/lsp/fscache"
+	"cuelang.org/go/internal/mod/modpkgload"
+	"cuelang.org/go/mod/module"
 )
 
 // Workspace corresponds to an LSP Workspace. Each LSP client/editor
@@ -48,7 +52,7 @@ type Workspace struct {
 	// possible, we keep code that deals with workspace folders
 	// separate from code which deals with cue modules+packages.
 	folders []*WorkspaceFolder
-	modules []*Module
+	modules map[protocol.DocumentURI]*Module
 
 	// These are cached values. Do not use these directly, instead, use
 	// [Workspace.ActiveFilesAndDirs]
@@ -62,6 +66,7 @@ func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
 		fs:        cache.fs,
 		overlayFS: fscache.NewOverlayFS(cache.fs),
 		debugLog:  debugLog,
+		modules:   make(map[protocol.DocumentURI]*Module),
 	}
 }
 
@@ -205,6 +210,9 @@ func (w *Workspace) FileWatchingGlobPatterns(ctx context.Context) map[protocol.R
 	return patterns
 }
 
+// invalidateActiveFilesAndDirs clears the cached activeFiles and
+// activeDirs values, ensuring that the next call to
+// [Workspace.activeFilesAndDirs] will calculate fresh values.
 func (w *Workspace) invalidateActiveFilesAndDirs() {
 	w.activeFiles = nil
 	w.activeDirs = nil
@@ -579,12 +587,23 @@ func (w *Workspace) FindModuleForFile(file protocol.DocumentURI) (*Module, error
 	return nil, nil
 }
 
-// newModule creates a new module, adding it to the list of modules
+// ensureModule returns the existing module for the given module root,
+// or if there is none, creates and returns a new module.
+func (w *Workspace) ensureModule(rootUri protocol.DocumentURI) *Module {
+	m, found := w.modules[rootUri]
+	if !found {
+		m = w.newModule(rootUri + "/cue.mod/module.cue")
+		w.modules[rootUri] = m
+	}
+	return m
+}
+
+// newModule creates a new module, adding it to the set of modules
 // within this workspace.
 func (w *Workspace) newModule(modFileUri protocol.DocumentURI) *Module {
-	m := NewModule(modFileUri, w.registry, w.overlayFS, w.debugLog)
+	m := NewModule(modFileUri, w)
 	w.debugLog(fmt.Sprintf("%v Created", m))
-	w.modules = append(w.modules, m)
+	w.modules[m.rootURI] = m
 	w.invalidateActiveFilesAndDirs()
 	return m
 }
@@ -592,29 +611,241 @@ func (w *Workspace) newModule(modFileUri protocol.DocumentURI) *Module {
 // reloadModules reloads all modules in the workspace. If a module
 // cannot be reloaded, it is removed from the workspace.
 func (w *Workspace) reloadModules() {
-	modules := make([]*Module, 0, len(w.modules))
+	modules := w.modules
 	changed := false
-	for _, m := range w.modules {
+	for _, m := range modules {
 		err := m.ReloadModule()
-		if err == nil {
-			modules = append(modules, m)
-		} else {
+		if err != nil {
 			changed = true
+			delete(modules, m.rootURI)
 		}
 	}
 	if changed {
-		w.modules = modules
 		w.invalidateActiveFilesAndDirs()
 	}
 }
 
-// reloadPackages asks every module in the workspace to reload all
-// their open dirty packages.
+// reloadPackages reloads all dirty packages across all modules. A
+// package may be dirty because one of its own files has changed, or
+// because a module that it imports is dirty.
+//
+// The goal is to reach a point where all dirty files have been loaded
+// into at least one (re)loaded package.
+//
+// If a previously-loaded package now cannot be loaded (perhaps all
+// its files have been deleted) then the package will be deleted from
+// its module. If a dirty file has changed package, that new package
+// will be created and loaded. Imports are followed, and may result in
+// new packages and even new modules, being added to the workspace.
 func (w *Workspace) reloadPackages() error {
-	for _, m := range w.modules {
-		if err := m.ReloadPackages(); err != nil {
+	modules := w.modules
+	modulesChanged := false
+
+	// We need to merge together all the packages from every module
+	// (even if the module has no work to do) so that we can correctly
+	// build/update the inverted package import graph, across modules.
+	allPackages := make(map[ast.ImportPath]*Package)
+	var loadedPkgs []*modpkgload.Package
+	allDirtyFiles := make(map[protocol.DocumentURI]*Module)
+
+	// A package in one module may import packages from different
+	// modules. We need to process and manage all such packages and
+	// modules. Therefore, whilst we ask the modules themselves to do
+	// the (re)loading of any dirty packages, we accumulate all the
+	// loaded packages here, and process them all together.
+	for _, m := range modules {
+		maps.Copy(allPackages, m.packages)
+
+		pkgs, err := m.loadDirtyPackages()
+		if err != nil {
+			modulesChanged = true
+			delete(modules, m.rootURI)
+			continue
+		}
+		if pkgs == nil {
+			// No dirty packages within the module.
+			continue
+		}
+
+		// We need to track all packages that are loaded, so we use
+		// pkgs.All() and not pkgs.Roots().
+		loadedPkgs = append(loadedPkgs, pkgs.All()...)
+		for fileUri := range m.dirtyFiles {
+			allDirtyFiles[fileUri] = m
+		}
+	}
+
+	// Process the results of loading the all the dirty packages from
+	// all the modules. We need to do this in two passes to ensure we
+	// create all necessary packages before trying to build/update the
+	// inverted import graph.
+	processedPkgs := make(map[ast.ImportPath]struct{})
+	pkgsImportsWorklist := make(map[*Package]*modpkgload.Package)
+	for _, loadedPkg := range loadedPkgs {
+		if loadedPkg.IsStdlibPackage() {
+			continue
+		}
+		ip := normalizeImportPath(loadedPkg)
+
+		// The same package can appear multiple times in loadedPkgs, for
+		// several reasons. Firstly, two different packages in different
+		// modules could each import the same third package.
+		//
+		// Secondly, even within the same module, we can get multiple
+		// instances of the same package. Imagine some cue file in
+		// package foo.com/x has "import foo.com/y" in it. Imagine that
+		// we knew that both packages x and y are dirty, so when we
+		// called modpkgload.LoadPackages, we had pkgPaths set to
+		// [foo.com/x@v0, foo.com/y@v0]. Because modpkgload.LoadPackages
+		// does not normalize import paths, we end up with two loadings
+		// of y - one from the explicit pkgPath foo.com/y@v0, and one
+		// from the import foo.com/y (the different spelling is the
+		// critical thing).
+		//
+		// So we need to test whether we've already seen this package in
+		// the results of this load. If we have, we can skip.
+		if _, seen := processedPkgs[ip]; seen {
+			continue
+		}
+		processedPkgs[ip] = struct{}{}
+
+		modRoot := loadedPkg.ModRoot()
+		modFS, ok := modRoot.FS.(module.OSRootFS)
+		if !ok {
+			panic(fmt.Sprintf("%v Unable to load module because fs is not an OSRootFS %v", loadedPkg.Mod().Path(), modRoot.FS))
+		}
+		modRootPath := filepath.Join(modFS.OSRoot(), filepath.FromSlash(modRoot.Dir))
+		modRootURI := protocol.URIFromPath(modRootPath)
+
+		m := w.ensureModule(modRootURI)
+		if err := m.ReloadModule(); err != nil {
+			modulesChanged = true
+			delete(modules, modRootURI)
+			continue
+		}
+
+		if loadedPkg.Error() != nil {
+			// It could be that the last file within this package was
+			// deleted, so attempting to load it will create an error. So
+			// the correct thing to do now is just remove any record of
+			// the pkg.
+			//
+			// TODO: if packages contains ip, then we should probably
+			// look at its importedBy field as that would tell us about
+			// packages that now have dangling imports.
+			delete(allPackages, ip)
+			delete(m.packages, ip)
+			continue
+		}
+
+		pkg, found := m.packages[ip]
+		if !found {
+			// Every package contains cue sources from one "leaf"
+			// directory and optionally any ancestor directory. Here we
+			// determine that "leaf" directory:
+			dirUri := protocol.DocumentURI("")
+			for _, loc := range loadedPkg.Locations() {
+				uri := protocol.DocumentURI(string(modRootURI) + "/" + loc.Dir)
+				if dirUri == "" || dirUri.Encloses(uri) {
+					dirUri = uri
+				}
+			}
+			pkg = NewPackage(m, ip, dirUri)
+			m.packages[ip] = pkg
+			allPackages[ip] = pkg
+		}
+		// Capture the old loadedPkg (if it exists) so we can correct
+		// the import graph later.
+		pkgsImportsWorklist[pkg] = pkg.pkg
+		pkg.pkg = loadedPkg
+		pkg.setStatus(splendid)
+		w.debugLog(fmt.Sprintf("%v Loaded %v", m, pkg))
+
+		if len(allDirtyFiles) != 0 {
+			for _, file := range loadedPkg.Files() {
+				fileUri := protocol.DocumentURI(string(modRootURI) + "/" + file.FilePath)
+				m, found := allDirtyFiles[fileUri]
+				if found {
+					delete(allDirtyFiles, fileUri)
+					delete(m.dirtyFiles, fileUri)
+					if len(allDirtyFiles) == 0 {
+						break
+					}
+				}
+			}
+		}
+	}
+
+	if modulesChanged {
+		w.invalidateActiveFilesAndDirs()
+	}
+
+	// 2nd pass: create/correct inverted import graph now that all
+	// necessary Packages exist. pkgsImportsWorklist will only contain
+	// local packages (i.e. packages within this module)
+	imports := make(map[ast.ImportPath]struct{})
+	for pkg, oldPkg := range pkgsImportsWorklist {
+		clear(imports)
+		if oldPkg != nil {
+			for _, i := range oldPkg.Imports() {
+				imports[normalizeImportPath(i)] = struct{}{}
+			}
+		}
+		for _, i := range pkg.pkg.Imports() {
+			ip := normalizeImportPath(i)
+			if _, found := imports[ip]; found {
+				// Both new and old pkgs import ip. Noop.
+				delete(imports, ip)
+			} else if importedPkg, found := allPackages[ip]; found {
+				// Only new pkg imports ip. Add the back-pointer.
+				importedPkg.EnsureImportedBy(pkg)
+			}
+		}
+		for ip := range imports {
+			if importedPkg, found := allPackages[ip]; found {
+				// Only old pkg imports ip. Remove the back-pointer.
+				importedPkg.RemoveImportedBy(pkg)
+			}
+		}
+	}
+	// Note that there's a potential memory leak here: we might load a
+	// package "foo" because it's imported by "bar". If "bar" is edited
+	// so that it no longer imports "foo" then we'll notice that, and
+	// our "foo" Package will get updated so that its importedBy field
+	// is empty. But we never currently remove the "foo" package from
+	// its module. Ideally, we should keep track within each Package of
+	// the number of its files open in the editor/client. If that drops
+	// to zero, and the importedBy field is empty, then we should
+	// remove the package from the module. TODO.
+
+	// We need to watch out for when a dirty file moves package, either
+	// to an existing package which we've not reloaded, or to a package
+	// that we've never loaded. In both cases, the file will still be
+	// within this module.
+	repeatReload := false
+	for fileUri, m := range allDirtyFiles {
+		pkgs, err := m.FindPackagesOrModulesForFile(fileUri)
+		if err != nil {
+			if _, ok := err.(cueerrors.Error); ok {
+				// Most likely a syntax error; ignore it.
+				// TODO: this error might become a "diagnostics" message
+				continue
+			}
 			return err
 		}
+		if len(pkgs) != 0 {
+			for _, pkg := range pkgs {
+				pkg.MarkFileDirty(fileUri)
+			}
+			repeatReload = true
+		}
+		// if len(pkgs) == 0 and no error, then it means the file had no
+		// package declaration. For the time being, we're ignoring
+		// that. TODO something better
+	}
+
+	if repeatReload {
+		return w.reloadPackages()
 	}
 	return nil
 }

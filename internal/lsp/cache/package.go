@@ -163,24 +163,28 @@ func (pkg *Package) setStatus(status status) {
 	}
 	pkg.status = status
 
-	if status != splendid {
-		return
-	}
+	switch status {
+	case dirty:
+		for _, importer := range pkg.importedBy {
+			importer.setStatus(dirty)
+		}
 
-	files := pkg.pkg.Files()
-	mappers := make(map[*token.File]*protocol.Mapper, len(files))
-	astFiles := make([]*ast.File, len(files))
-	for i, f := range files {
-		astFiles[i] = f.Syntax
-		uri := pkg.module.rootURI + protocol.DocumentURI("/"+f.FilePath)
-		file := f.Syntax.Pos().File()
-		mappers[file] = protocol.NewMapper(uri, file.Content())
+	case splendid:
+		files := pkg.pkg.Files()
+		mappers := make(map[*token.File]*protocol.Mapper, len(files))
+		astFiles := make([]*ast.File, len(files))
+		for i, f := range files {
+			astFiles[i] = f.Syntax
+			uri := pkg.module.rootURI + protocol.DocumentURI("/"+f.FilePath)
+			file := f.Syntax.Pos().File()
+			mappers[file] = protocol.NewMapper(uri, file.Content())
+		}
+		// definitions.Analyse does almost no work - calculation of
+		// resolutions is done lazily. So no need to launch go-routines
+		// here. Similarly, the creation of a mapper is lazy.
+		pkg.mappers = mappers
+		pkg.definitions = definitions.Analyse(astFiles...)
 	}
-	// definitions.Analyse does almost no work - calculation of
-	// resolutions is done lazily. So no need to launch go-routines
-	// here. Similarly, the creation of a mapper is lazy.
-	pkg.mappers = mappers
-	pkg.definitions = definitions.Analyse(astFiles...)
 }
 
 // Definition attempts to treat the given uri and position as a file
@@ -194,21 +198,23 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 		return nil
 	}
 
+	w := pkg.module.workspace
+
 	fdfns := dfns.ForFile(uri.Path())
 	if fdfns == nil {
-		pkg.module.debugLog("file not found")
+		w.debugLog("file not found")
 		return nil
 	}
 
 	srcMapper := mappers[fdfns.File.Pos().File()]
 	if srcMapper == nil {
-		pkg.module.debugLog("mapper not found: " + string(uri))
+		w.debugLog("mapper not found: " + string(uri))
 		return nil
 	}
 
 	offset, err := srcMapper.PositionOffset(pos)
 	if err != nil {
-		pkg.module.debugLog(err.Error())
+		w.debugLog(err.Error())
 		return nil
 	}
 
@@ -225,7 +231,7 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 		targetMapper := mappers[target.Pos().File()]
 		r, err := targetMapper.OffsetRange(startPos.Offset, endPos.Offset)
 		if err != nil {
-			pkg.module.debugLog(err.Error())
+			w.debugLog(err.Error())
 			return nil
 		}
 

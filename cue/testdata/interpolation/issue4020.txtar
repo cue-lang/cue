@@ -1,0 +1,45 @@
+#name: issue4020
+#evalPartial
+-- in.cue --
+// Test for issue #4020: let bindings in string interpolation should not cause cycle errors
+deploymentEnv: {
+    envScript: [
+        for v in _env let v = _env["RECAPTCHA_SITE_KEY"] {"\(v)"},
+    ]
+
+    _env: {
+        RECAPTCHA_SITE_KEY: *"" | _
+    }
+}
+-- out/def --
+deploymentEnv: {
+	envScript: [""]
+	_env: {
+		RECAPTCHA_SITE_KEY: *"" | _
+	}
+}
+-- out/eval --
+(struct){
+  deploymentEnv: (struct){
+    envScript: (#list){
+      0: (string){ "" }
+    }
+    _env: (struct){
+      RECAPTCHA_SITE_KEY: (_){ |(*(string){ "" }, (_){ _ }) }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  deploymentEnv: {
+    envScript: [
+      for _, v in 〈1;_env〉 let v = 〈2;_env〉["RECAPTCHA_SITE_KEY"] {
+        "\(〈1;v〉)"
+      },
+    ]
+    _env: {
+      RECAPTCHA_SITE_KEY: (*""|_)
+    }
+  }
+}

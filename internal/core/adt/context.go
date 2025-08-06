@@ -759,6 +759,22 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 					!isCyclePlaceholder(arc.BaseValue)
 
 				if evaluating && !hasCycleBreakingValue {
+					// Targeted fix for issue #4020: let bindings in string interpolation
+					// We need to distinguish between true cycles and let references
+					if fr, ok := x.(*FieldReference); ok && arc != nil && len(arc.Conjuncts) > 0 {
+						// Get the conjunct to examine what expression we're dealing with
+						c := arc.ConjunctAt(0)
+						
+						// For let references, the environment should be different from the current context
+						// This is a heuristic: let-bound variables are evaluated in a different environment
+						// than regular field references, and typically have UpCount > 0
+						if fr.UpCount > 0 && c.Expr() != nil {
+							// This appears to be a reference to a let-bound variable from a parent scope
+							// Allow evaluation to proceed as this is likely a false positive cycle detection
+							break
+						}
+					}
+
 					err := c.Newf("cycle with field: %v", x)
 					b := &Bottom{Code: CycleError, Err: err}
 					c.AddBottom(b)

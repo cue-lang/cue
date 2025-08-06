@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9956e55c_edbfbee5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-08-06T20:46:41Z",
+      "side": 1,
+      "message": "@mpvl@gmail.com - please feel free to take this over. It\u0027s literally a straight suggestion from Claude, so might well need your input.",
+      "revId": "32fc22ff20bb68c66babe5a217af90a7733007f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

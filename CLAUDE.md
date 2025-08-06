@@ -90,6 +90,7 @@ go fmt ./...
 ### Contribution Model
 - Single commit per PR/CL model
 - Uses `git codereview` workflow for managing changes
+- Runs `cueckoo runtrybot [CL|commit]` to kick off CI testing.
 - Requires DCO (Developer Certificate of Origin) sign-off
 - Both GitHub PRs and GerritHub CLs are supported
 - Changes should be linked to a GitHub issue (except trivial changes)

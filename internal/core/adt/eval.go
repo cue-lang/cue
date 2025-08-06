@@ -51,11 +51,6 @@ func (c *OpContext) Stats() *stats.Counts {
 // 	return e.NewContext(v)
 // }
 
-var incompleteSentinel = &Bottom{
-	Code: IncompleteError,
-	Err:  errors.Newf(token.NoPos, "incomplete"),
-}
-
 // evaluate returns the evaluated value associated with v. It may return a
 // partial result. That is, if v was not yet unified, it may return a
 // concrete value that must be the result assuming the configuration has no
@@ -249,39 +244,6 @@ func isCyclePlaceholder(v BaseValue) bool {
 		v = a.DerefValue().BaseValue
 	}
 	return v == cycle
-}
-
-func (n *nodeContext) createDisjunct() *Disjunction {
-	a := make([]Value, len(n.disjuncts))
-	p := 0
-	hasDefaults := false
-	for i, x := range n.disjuncts {
-		v := *x.result
-		v.state = nil
-		switch x.defaultMode {
-		case isDefault:
-			a[i] = a[p]
-			a[p] = &v
-			p++
-			hasDefaults = true
-
-		case notDefault:
-			hasDefaults = true
-			fallthrough
-		case maybeDefault:
-			a[i] = &v
-		}
-	}
-	// TODO: disambiguate based on concrete values.
-	// TODO: consider not storing defaults.
-	// if p > 0 {
-	// 	a = a[:p]
-	// }
-	return &Disjunction{
-		Values:      a,
-		NumDefaults: p,
-		HasDefaults: hasDefaults,
-	}
 }
 
 type arcKey struct {
@@ -557,9 +519,6 @@ type nodeContextState struct {
 	// to process. This is used to avoids processing a conjunct twice in some
 	// cases where there is an evaluation cycle.
 	conjunctsPos int
-	// conjunctsPartialPos is like conjunctsPos, but for the 'partial' phase
-	// of processing where conjuncts are only processed as concrete scalars.
-	conjunctsPartialPos int
 }
 
 // A receiver receives notifications.
@@ -775,28 +734,6 @@ func (n *nodeContext) updateNodeType(k Kind, v Expr, id CloseInfo) bool {
 	return kind != BottomKind
 }
 
-func (n *nodeContext) done() bool {
-	// TODO(v0.7): verify that done() is checking for the right conditions in
-	// the new evaluator implementation.
-	return len(n.dynamicFields) == 0 &&
-		len(n.comprehensions) == 0 &&
-		len(n.exprs) == 0
-}
-
-// finalDone is like done, but allows for cycle errors, which can be ignored
-// as they essentially indicate a = a & _.
-func (n *nodeContext) finalDone() bool {
-	// TODO(v0.7): update for new evaluator?
-	for _, x := range n.exprs {
-		if x.err.Code != CycleError {
-			return false
-		}
-	}
-	return len(n.dynamicFields) == 0 &&
-		len(n.comprehensions) == 0 &&
-		len(n.selfComprehensions) == 0
-}
-
 // hasErr is used to determine if an evaluation path, for instance a single
 // path after expanding all disjunctions, has an error.
 func (n *nodeContext) hasErr() bool {
@@ -940,10 +877,6 @@ func valueError(v Value) *ValueError {
 		return nil
 	}
 	return err
-}
-
-func (n *nodeContext) insertField(f Feature, mode ArcType, x Conjunct) *Vertex {
-	return n.insertArc(f, mode, x, x.CloseInfo, true)
 }
 
 func (n *nodeContext) insertFieldUnchecked(f Feature, mode ArcType, x Conjunct) *Vertex {

@@ -819,23 +819,6 @@ func (c *CloseInfo) setOptionalV3(n *nodeContext) {
 	}
 }
 
-func getNonCyclicCount(c Conjunct) int {
-	switch a, ok := c.x.(*ConjunctGroup); {
-	case ok:
-		count := 0
-		for _, c := range *a {
-			count += getNonCyclicCount(c)
-		}
-		return count
-
-	case !c.CloseInfo.IsCyclic:
-		return 1
-
-	default:
-		return 0
-	}
-}
-
 // updateCyclicStatusV3 looks for proof of non-cyclic conjuncts to override
 // a structural cycle.
 func (n *nodeContext) updateCyclicStatusV3(c CloseInfo) {
@@ -860,14 +843,6 @@ func assertStructuralCycleV3(n *nodeContext) bool {
 	n.cyclicConjuncts = n.cyclicConjuncts[:0]
 
 	if n.hasOnlyCyclicConjuncts() {
-		n.reportCycleError()
-		return true
-	}
-	return false
-}
-
-func assertStructuralCycle(n *nodeContext) bool {
-	if n.hasAnyCyclicConjunct && !n.hasNonCycle {
 		n.reportCycleError()
 		return true
 	}

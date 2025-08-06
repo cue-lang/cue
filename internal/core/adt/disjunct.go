@@ -92,47 +92,12 @@ type envDisjunct struct {
 	src       Node
 	disjuncts []disjunct
 
-	// fields for old evaluator
-
-	expr        *DisjunctionExpr
-	value       *Disjunction
-	hasDefaults bool
-
 	// These are used for book keeping, tracking whether any of the
 	// disjuncts marked with a default marker remains after unification.
 	// If no default is used, all other elements are treated as "maybeDefault".
 	// Otherwise, elements are treated as is.
 	parentDefaultUsed bool
 	childDefaultUsed  bool
-}
-
-func (n *nodeContext) addDisjunction(env *Environment, x *DisjunctionExpr, cloneID CloseInfo) {
-
-	// TODO: precompute
-	numDefaults := 0
-	for _, v := range x.Values {
-		isDef := v.Default // || n.hasDefaults(env, v.Val)
-		if isDef {
-			numDefaults++
-		}
-	}
-
-	n.disjunctions = append(n.disjunctions, envDisjunct{
-		env:         env,
-		cloneID:     cloneID,
-		expr:        x,
-		hasDefaults: numDefaults > 0,
-	})
-}
-
-func (n *nodeContext) addDisjunctionValue(env *Environment, x *Disjunction, cloneID CloseInfo) {
-	n.disjunctions = append(n.disjunctions, envDisjunct{
-		env:         env,
-		cloneID:     cloneID,
-		value:       x,
-		hasDefaults: x.HasDefaults,
-	})
-
 }
 
 func (n *nodeContext) makeError() {

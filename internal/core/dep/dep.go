@@ -17,7 +17,6 @@ package dep
 
 import (
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -414,13 +413,7 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 		reference = c.topRef
 	}
 
-	inspect := false
-
-	if c.ctxt.Version == internal.DevVersion {
-		inspect = v.IsDetached() || !v.MayAttach()
-	} else {
-		inspect = !v.Rooted()
-	}
+	inspect := v.IsDetached() || !v.MayAttach()
 
 	if inspect {
 		// TODO: there is currently no way to inspect where a non-rooted node
@@ -489,9 +482,8 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 
 	c.numRefs++
 
-	if c.ctxt.Version == internal.DevVersion {
-		v.Finalize(c.ctxt)
-	}
+	// Note: we did not finalize in V2.
+	v.Finalize(c.ctxt)
 
 	d := Dependency{
 		Node:      v,

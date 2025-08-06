@@ -148,11 +148,6 @@ func (n *nodeContext) insertComprehension(
 
 	x := c.Value
 
-	if !n.ctx.isDevVersion() {
-		ci = ci.SpawnEmbed(c)
-		ci.closeInfo.span |= ComprehensionSpan
-	}
-
 	node := n.node.DerefDisjunct()
 
 	var decls []Decl
@@ -187,12 +182,8 @@ func (n *nodeContext) insertComprehension(
 				}
 
 				conjunct := MakeConjunct(env, c, ci)
-				if n.ctx.isDevVersion() {
-					n.assertInitialized()
-					n.insertArc(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
-				} else {
-					n.insertFieldUnchecked(f.Label, ArcPending, conjunct)
-				}
+				n.assertInitialized()
+				n.insertArc(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
 
 				fields = append(fields, f)
 
@@ -215,11 +206,7 @@ func (n *nodeContext) insertComprehension(
 				conjunct := MakeConjunct(env, c, ci)
 				n.assertInitialized()
 				arc := n.insertFieldUnchecked(f.Label, ArcMember, conjunct)
-				if n.ctx.isDevVersion() {
-					arc.MultiLet = true
-				} else {
-					arc.MultiLet = f.IsMulti
-				}
+				arc.MultiLet = true // NOTE: v2 was f.IsMulti
 
 				fields = append(fields, f)
 
@@ -280,19 +267,9 @@ func (n *nodeContext) insertComprehension(
 		}
 	}
 
-	if n.ctx.isDevVersion() {
-		t := n.scheduleTask(handleComprehension, env, x, ci)
-		t.comp = ec
-		t.leaf = c
-	} else {
-		n.comprehensions = append(n.comprehensions, envYield{
-			envComprehension: ec,
-			leaf:             c,
-			env:              env,
-			id:               ci,
-			expr:             x,
-		})
-	}
+	t := n.scheduleTask(handleComprehension, env, x, ci)
+	t.comp = ec
+	t.leaf = c
 }
 
 type compState struct {
@@ -350,71 +327,6 @@ func (s *compState) yield(env *Environment) (ok bool) {
 		return false
 	}
 	return !c.HasErr()
-}
-
-// injectComprehension evaluates and inserts embeddings. It first evaluates all
-// embeddings before inserting the results to ensure that the order of
-// evaluation does not matter.
-func (n *nodeContext) injectComprehensions(state vertexStatus) (progress bool) {
-	unreachableForDev(n.ctx)
-
-	workRemaining := false
-
-	// We use variables, instead of range, as the list may grow dynamically.
-	for i := 0; i < len(n.comprehensions); i++ {
-		d := &n.comprehensions[i]
-		if d.self || d.inserted {
-			continue
-		}
-		if err := n.processComprehension(d, state); err != nil {
-			// TODO:  Detect that the nodes are actually equal
-			if err.ForCycle && err.Value == n.node {
-				n.selfComprehensions = append(n.selfComprehensions, *d)
-				progress = true
-				d.self = true
-				return
-			}
-
-			d.err = err
-			workRemaining = true
-
-			continue
-
-			// TODO: add this when it can be done without breaking other
-			// things.
-			//
-			// // Add comprehension to ensure incomplete error is inserted.
-			// // This ensures that the error is reported in the Vertex
-			// // where the comprehension was defined, and not just in the
-			// // node below. This, in turn, is necessary to support
-			// // certain logic, like export, that expects to be able to
-			// // detect an "incomplete" error at the first level where it
-			// // is necessary.
-			// n := d.node.getNodeContext(ctx)
-			// n.addBottom(err)
-
-		}
-		progress = true
-	}
-
-	if !workRemaining {
-		n.comprehensions = n.comprehensions[:0] // Signal that all work is done.
-	}
-
-	return progress
-}
-
-// injectSelfComprehensions processes comprehensions that were earlier marked
-// as iterating over the node in which they are defined. Such comprehensions
-// are legal as long as they do not modify the arc set of the node.
-func (n *nodeContext) injectSelfComprehensions(state vertexStatus) {
-	unreachableForDev(n.ctx)
-
-	// We use variables, instead of range, as the list may grow dynamically.
-	for i := 0; i < len(n.selfComprehensions); i++ {
-		n.processComprehension(&n.selfComprehensions[i], state)
-	}
-	n.selfComprehensions = n.selfComprehensions[:0] // Signal that all work is done.
 }
 
 // processComprehension processes a single Comprehension conjunct.
@@ -503,11 +415,7 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 
 		env = linkChildren(env, d.leaf)
 
-		if ctx.isDevVersion() {
-			n.scheduleConjunct(Conjunct{env, d.expr, id}, id)
-		} else {
-			n.addExprConjunct(Conjunct{env, d.expr, id}, state)
-		}
+		n.scheduleConjunct(Conjunct{env, d.expr, id}, id)
 	}
 
 	return nil

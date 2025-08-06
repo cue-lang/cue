@@ -16,6 +16,24 @@
       "message": "remove this file entirely now?",
       "revId": "74be08b018bf48d81db452a1319c38967b4d0ce8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9aebe05c_8592939c",
+        "filename": "internal/core/adt/closed2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-06T14:24:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6cdaf63f_44b65702",
+      "revId": "74be08b018bf48d81db452a1319c38967b4d0ce8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

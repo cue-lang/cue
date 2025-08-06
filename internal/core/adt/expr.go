@@ -60,8 +60,6 @@ type StructLit struct {
 	initialized     bool
 	isComprehension bool
 
-	types OptionalType
-
 	// administrative fields like hasreferences.
 	// hasReferences bool
 }
@@ -73,10 +71,6 @@ func (o *StructLit) IsFile() bool {
 
 type FieldInfo struct {
 	Label Feature
-}
-
-func (x *StructLit) HasOptional() bool {
-	return x.types&(HasPattern|HasAdditional) != 0
 }
 
 func (x *StructLit) Source() ast.Node { return x.Src }
@@ -114,29 +108,11 @@ func (x *StructLit) evaluate(c *OpContext, state combinedFlags) Value {
 	return v
 }
 
-// TODO: remove this method
-func (o *StructLit) MarkField(f Feature) {
-	o.Fields = append(o.Fields, FieldInfo{Label: f})
-}
-
 func (o *StructLit) Init(ctx *OpContext) {
 	if o.initialized {
 		return
 	}
 	o.initialized = true
-}
-
-func (o *StructLit) fieldIndex(f Feature) int {
-	for i := range o.Fields {
-		if o.Fields[i].Label == f {
-			return i
-		}
-	}
-	return -1
-}
-
-func (o *StructLit) OptionalTypes() OptionalType {
-	return o.types
 }
 
 // FIELDS

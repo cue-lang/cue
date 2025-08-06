@@ -1,0 +1,293 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "622188dd_1c0b6a90",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "WIP review; just looked at the doc comment so far.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "810d717c_43c64a1a",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "Maybe better phrased in the third person, as we\u0027re talking about the\ncode here rather than the author/maintainer?\n\ne.g. \nFor example, it does not test field names\n\nIt does not compute the names of...",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26d499fd_5aa0f491",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "I think I\u0027m a bit confused between the notion of \"path\" and that of \"expression\". Here, ISTM that \"expression\" could be used instead of \"path\", but it seems like you\u0027re wanting to think about paths in a separate way from general expressions. Maybe worth teasing apart that distinction a little?\n\nSpecifically, you talk about paths like the above, but you also talk about a path within a scope, and those two things feel somewhat different to me.\n\n\"path reference\" ?\n\"reference\" ?\n\"path expression\" ?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "261c01d6_705f7f80",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "FWIW I find this definition of \"scope\" a bit confusing when juxtaposed with the usual definition of lexical scopes. It\u0027s perhaps more akin to a struct or object value than a regular scope?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb643252_a6bc9623",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "```suggestion\n// When a scope is evaluated, each of these nodes is unpacked. An\n```\n\n?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee9eff29_a22cbb5c",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "```suggestion\n// encountered, it ensures that within the current scope, a binding\n```\n\nand similarly in other places.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ef22aa6_7ba05014",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "```suggestion\n// exists for the field\u0027s name, and add the field\u0027s value to the binding\u0027s\n```",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ab8d4fa_51656fc7",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "I\u0027m not sure exactly what \"this\" refers to here. Is it \"path\", in which case maybe be explicit?\n\n\n\n```suggestion\n// If the scope contains a path, the path will correspond either to the\n```\n\nAlso, for me, a path is a multi-component thing, but I _think_ that here a \"path\" is just empty or a single entry. Perhaps then:\n\n```suggestion\n// If the scope contains an entry, the entry will correspond either to the\n```\n\n?\n\nOr maybe \"key\" is better than \"entry\"?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c6c0ac5_37aa589f",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "```suggestion\n// guaranteed that the binding contains its complete set of nodes before\n```",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8eed55be_fc611814",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "path or expression? I\u0027m not entirely sure what a path is anymore 😉",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9320b54e_b7b7d8ad",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "Again, maybe \"expression\" rather than \"path\" ?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "503cb6cd_bd6f592c",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "Not innermost? Ah, no, because we\u0027re not talking about lexical scopes here. I found that a bit confusing and added some thoughts about the term \"scope\" above.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94c8f4f4_6942bcb1",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "This introduction of the idea of \"navigible scope\" gives me pause and makes me think once more that the notion of \"scope\" used elsewhere here could be clarified or renamed, because I think that it does in general correspond to \"navigible scope\" AIUI, but I\u0027m not _totally_ sure of that.\n\nPerhaps the \"navigible scope/binding\" concept could do with introducing up front at the start?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39afd984_329119dc",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "What does a rangeset \"moving\" mean?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b78d624_a2f1ad6d",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "It would perhaps be nice to describe briefly what the arguments mean.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f724cec8_d2b6a120",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "Perhaps clarify what this is when the scope is embedded? (presumably nil, but I\u0027m not entirely sure).",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3440dae_d3e1acf7",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-06T10:51:10Z",
+      "side": 1,
+      "message": "perhaps a little more readable with a helper:\n\n```\n    printf :\u003d func(f string, a ...any) {\n        fmt.Printf(\"%*s%s\\n\", depth*3, \"\", fmt.Sprintf(f, a...))\n    }\n```",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

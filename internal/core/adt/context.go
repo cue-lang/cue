@@ -764,6 +764,7 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 				return v, c.ci
 			}
 		}
+		arc = arc.DerefValue()
 		v := c.evaluate(arc, x, state)
 
 		return v, c.ci

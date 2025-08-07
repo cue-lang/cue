@@ -390,9 +390,11 @@ Errors:
 f: 2 errors in empty disjunction:
 f.name: conflicting values "int" and "str":
     ./in.cue:5:8
+    ./in.cue:15:4
     ./in.cue:15:15
 f.val: conflicting values 3 and string (mismatched types int and string):
     ./in.cue:9:8
+    ./in.cue:15:4
     ./in.cue:15:27
 issue3606.data: 2 errors in empty disjunction:
 issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
@@ -521,9 +523,11 @@ Result:
     // [eval] f: 2 errors in empty disjunction:
     // f.name: conflicting values "int" and "str":
     //     ./in.cue:5:8
+    //     ./in.cue:15:4
     //     ./in.cue:15:15
     // f.val: conflicting values 3 and string (mismatched types int and string):
     //     ./in.cue:9:8
+    //     ./in.cue:15:4
     //     ./in.cue:15:27
     name: (string){ "str" }
     val: (int){ 3 }
@@ -871,19 +875,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,11 +2,9 @@
- f: 2 errors in empty disjunction:
- f.name: conflicting values "int" and "str":
-     ./in.cue:5:8
--    ./in.cue:15:4
-     ./in.cue:15:15
- f.val: conflicting values 3 and string (mismatched types int and string):
-     ./in.cue:9:8
--    ./in.cue:15:4
-     ./in.cue:15:27
- issue3606.data: 2 errors in empty disjunction:
- issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
-@@ -14,8 +12,6 @@
+@@ -14,8 +14,6 @@
      ./dependencies.cue:6:6
  issue3606.data.notAllowed: field not allowed:
      ./dependencies.cue:3:3
@@ -892,7 +884,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -29,14 +25,7 @@
+@@ -29,14 +27,7 @@
        //     ./dependencies.cue:6:6
        // issue3606.data.notAllowed: field not allowed:
        //     ./dependencies.cue:3:3
@@ -908,15 +900,8 @@ diff old new
      }
      #S: ((string|struct)){ |((string){ string }, (#struct){
        }) }
-@@ -144,19 +133,12 @@
-     // [eval] f: 2 errors in empty disjunction:
-     // f.name: conflicting values "int" and "str":
-     //     ./in.cue:5:8
--    //     ./in.cue:15:4
-     //     ./in.cue:15:15
-     // f.val: conflicting values 3 and string (mismatched types int and string):
-     //     ./in.cue:9:8
--    //     ./in.cue:15:4
+@@ -151,12 +142,7 @@
+     //     ./in.cue:15:4
      //     ./in.cue:15:27
      name: (string){ "str" }
 -    val: (_|_){
@@ -929,7 +914,7 @@ diff old new
    }
    e1: (struct){
      a: ((null|struct)){ |((null){ null }, (struct){
-@@ -268,8 +250,8 @@
+@@ -268,8 +254,8 @@
      e: (struct){
        foobar: (#struct){
          b: (#struct){
@@ -939,7 +924,7 @@ diff old new
          }
        }
      }
-@@ -279,10 +261,7 @@
+@@ -279,10 +265,7 @@
        x: (int){ 0 }
      }
      inList1: (struct){
@@ -951,7 +936,7 @@ diff old new
      }
      inList2: (struct){
        x: (int){ 0 }
-@@ -402,7 +381,7 @@
+@@ -402,7 +385,7 @@
            let Ok#2 = (bool){ true }
          }, (#struct){
            _ok: (bool){ true }
@@ -960,7 +945,7 @@ diff old new
            x: (bool){ true }
          }) }
        bar: (#struct){ |((#struct){
-@@ -437,9 +416,7 @@
+@@ -437,9 +420,7 @@
    issue3891: (struct){
      reduced: (struct){
        x: (_){ |(*(int){ 1 }, (_){ _ }) }
@@ -971,7 +956,7 @@ diff old new
        b: (struct){
          y: (int){ 1 }
        }
-@@ -475,14 +452,14 @@
+@@ -475,14 +456,14 @@
      }
      full: (struct){
        out: (#struct){

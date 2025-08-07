@@ -975,7 +975,7 @@ func addConjuncts(ctx *OpContext, dst *Vertex, src Value) {
 		// scope that will be closed in the presence of closed embeddings
 		// independently from the other conjuncts.
 		n := dst.getBareState(ctx)
-		c.CloseInfo = n.splitScope(c.CloseInfo)
+		c.CloseInfo = n.splitScope(nil, c.CloseInfo)
 
 		// Even if a node is marked as ClosedRecursive, it may be that this
 		// is the first node that references a definition.

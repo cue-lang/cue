@@ -355,9 +355,9 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		closeInfo.FromDef = true
 		closeInfo.TopDef = false
 
-		closeInfo = n.addResolver(arc, closeInfo, false)
+		closeInfo = n.addResolver(c.x, arc, closeInfo, false)
 	default:
-		closeInfo = n.addResolver(arc, closeInfo, true)
+		closeInfo = n.addResolver(c.x, arc, closeInfo, true)
 	}
 	if closeInfo.defID != 0 && closeInfo.opID == n.ctx.opID {
 		c.CloseInfo.opID = closeInfo.opID
@@ -448,7 +448,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 			// If this is a definition, it will be repeated in the evaluation.
 			if !x.IsFromDisjunction() {
-				id = n.addResolver(x, id, false)
+				id = n.addResolver(v, x, id, false)
 			}
 		}
 		if _, ok := x.BaseValue.(*StructMarker); ok {
@@ -568,7 +568,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 				if err := valueError(v); err != nil {
 					err.AddPosition(v)
 					err.AddPosition(n.upperBound)
-					err.AddClosedPositions(id)
+					err.AddClosedPositions(n.ctx, id)
 				}
 				n.upperBound = nil
 				n.insertValueConjunct(env, v, id)
@@ -582,7 +582,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 				if err := valueError(v); err != nil {
 					err.AddPosition(v)
 					err.AddPosition(n.lowerBound)
-					err.AddClosedPositions(id)
+					err.AddClosedPositions(n.ctx, id)
 				}
 				n.lowerBound = nil
 				n.insertValueConjunct(env, v, id)
@@ -684,7 +684,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			if err := valueError(u); err != nil {
 				err.AddPosition(n.lowerBound)
 				err.AddPosition(n.upperBound)
-				err.AddClosedPositions(id)
+				err.AddClosedPositions(n.ctx, id)
 			}
 			n.lowerBound = nil
 			n.upperBound = nil

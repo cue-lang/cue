@@ -226,6 +226,7 @@ Result:
         //     ./select.cue:8:15
         // select.indirect.#Job.req: field is required but not present:
         //     ./select.cue:8:8
+        //     ./select.cue:8:19
         //     ./select.cue:11:2
         opt: (_){ _ }
       }
@@ -294,14 +295,6 @@ diff old new
    }
    issue3182: (_|_){
      // [structural cycle]
-@@ -116,7 +117,6 @@
-         //     ./select.cue:8:15
-         // select.indirect.#Job.req: field is required but not present:
-         //     ./select.cue:8:8
--        //     ./select.cue:8:19
-         //     ./select.cue:11:2
-         opt: (_){ _ }
-       }
 -- diff/todo/p2 --
 issue1708.k30: no longer evaluates. Not the worst, but would ideally be fixed.
 -- diff/todo/p3 --

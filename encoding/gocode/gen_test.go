@@ -25,6 +25,8 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/encoding/gocode/testdata/pkg1"
 	"cuelang.org/go/encoding/gocode/testdata/pkg2"
+	"cuelang.org/go/internal/cuetdtest"
+	"cuelang.org/go/internal/cuetest"
 )
 
 type validator interface {
@@ -32,12 +34,13 @@ type validator interface {
 }
 
 func TestPackages(t *testing.T) {
-
-	testCases := []struct {
+	type testCase struct {
 		name  string
 		value validator
-		want  string
-	}{{
+		want  string `test:"update"`
+	}
+
+	testCases := []testCase{{
 		name:  "failing int",
 		value: pkg2.PickMe(4),
 		want:  "invalid value 4 (out of bound >5):\n    pkg2/instance.cue:x:x",
@@ -72,6 +75,7 @@ conflicting values null and {A:<=10,B:(=~"cat"|*"dog"),O?:OtherStruct,I:"cuelang
 O: 2 errors in empty disjunction:
 O: conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encoding/gocode/testdata/pkg2".PickMe} (mismatched types null and struct):
     pkg1/instance.cue:x:x
+    pkg1/instance.cue:x:x
 O.A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
     pkg1/instance.cue:x:x
     _:1:4
@@ -87,6 +91,7 @@ conflicting values null and {A:<=10,B:(=~"cat"|*"dog"),O?:OtherStruct,I:"cuelang
 O: 2 errors in empty disjunction:
 O: conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encoding/gocode/testdata/pkg2".PickMe} (mismatched types null and struct):
     pkg1/instance.cue:x:x
+    pkg1/instance.cue:x:x
 O.P: invalid value 4 (out of bound >5):
     pkg2/instance.cue:x:x
 `,
@@ -97,17 +102,19 @@ O.P: invalid value 4 (out of bound >5):
 			B: "dog",
 			I: &pkg2.ImportMe{A: 1000, B: "a"},
 		},
-		want: "nil",
+		want: `nil`,
 	}}
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			got := strings.TrimSpace(errStr(tc.value.Validate()))
-			want := strings.TrimSpace(tc.want)
-			if got != want {
-				t.Errorf("got:\n%q\nwant:\n%q", got, want)
-			}
-		})
-	}
+
+	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
+		t.Update(cuetest.UpdateGoldenFiles)
+
+		got := errStr(tc.value.Validate())
+		// The expected values in the test table have extra whitespace, but we trim both
+		// sides for comparison. We need to store the trimmed version back for auto-update.
+		got = strings.TrimSpace(got)
+		tc.want = strings.TrimSpace(tc.want)
+		t.Equal(got, tc.want)
+	})
 }
 
 func errStr(err error) string {

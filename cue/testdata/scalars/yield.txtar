@@ -35,6 +35,8 @@ NumCloseIDs: 3
 -- out/evalalpha --
 Errors:
 ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):
+    ./in.cue:7:19
+    ./in.cue:10:2
     ./in.cue:10:13
     ./in.cue:12:2
 
@@ -47,6 +49,8 @@ Result:
   }
   ifScalarConflict: (_|_){
     // [eval] ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):
+    //     ./in.cue:7:19
+    //     ./in.cue:10:2
     //     ./in.cue:10:13
     //     ./in.cue:12:2
     _#cond: (bool){ true }
@@ -60,21 +64,21 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,6 +1,5 @@
+@@ -1,5 +1,6 @@
  Errors:
  ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):
--    ./in.cue:10:2
++    ./in.cue:7:19
+     ./in.cue:10:2
      ./in.cue:10:13
      ./in.cue:12:2
- 
-@@ -13,7 +12,6 @@
+@@ -13,6 +14,7 @@
    }
    ifScalarConflict: (_|_){
      // [eval] ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):
--    //     ./in.cue:10:2
++    //     ./in.cue:7:19
+     //     ./in.cue:10:2
      //     ./in.cue:10:13
      //     ./in.cue:12:2
-     _#cond: (bool){ true }
 -- diff/todo/p2 --
 Missing error positions
 -- out/eval --

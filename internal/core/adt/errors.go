@@ -212,7 +212,7 @@ func CombineErrors(src ast.Node, x, y Value) *Bottom {
 	}
 }
 
-func addPositions(err *ValueError, c Conjunct) {
+func addPositions(ctx *OpContext, err *ValueError, c Conjunct) {
 	switch x := c.x.(type) {
 	case *Field:
 		// if x.ArcType == ArcRequired {
@@ -220,10 +220,10 @@ func addPositions(err *ValueError, c Conjunct) {
 		// }
 	case *ConjunctGroup:
 		for _, c := range *x {
-			addPositions(err, c)
+			addPositions(ctx, err, c)
 		}
 	}
-	if p := c.CloseInfo.Location(); p != nil {
+	if p := c.CloseInfo.Location(ctx); p != nil {
 		err.AddPosition(p)
 	}
 }
@@ -235,7 +235,7 @@ func NewRequiredNotPresentError(ctx *OpContext, v *Vertex) *Bottom {
 		if f, ok := c.x.(*Field); ok && f.ArcType == ArcRequired {
 			err.AddPosition(c.x)
 		}
-		if p := c.CloseInfo.Location(); p != nil {
+		if p := c.CloseInfo.Location(ctx); p != nil {
 			err.AddPosition(p)
 		}
 		return true
@@ -254,7 +254,7 @@ func newRequiredFieldInComprehensionError(ctx *OpContext, x *ForClause, v *Verte
 	err := ctx.Newf("missing required field in for comprehension: %v", v.Label)
 	err.AddPosition(x.Src)
 	v.VisitLeafConjuncts(func(c Conjunct) bool {
-		addPositions(err, c)
+		addPositions(ctx, err, c)
 		return true
 	})
 	return &Bottom{
@@ -323,8 +323,8 @@ func (v *ValueError) AddPosition(n Node) {
 	}
 }
 
-func (v *ValueError) AddClosedPositions(c CloseInfo) {
-	c.AncestorPositions(func(n Node) {
+func (v *ValueError) AddClosedPositions(ctx *OpContext, c CloseInfo) {
+	c.AncestorPositions(ctx, func(n Node) {
 		v.AddPosition(n)
 	})
 }

@@ -106,14 +106,17 @@ type CloseInfo struct {
 	CycleInfo
 }
 
-func (c CloseInfo) Location() Node {
-	return nil
+func (c CloseInfo) Location(ctx *OpContext) Node {
+	if c.opID != ctx.opID || c.defID == 0 {
+		return nil
+	}
+	return ctx.containments[c.defID].n
 }
 
 // TODO(perf): remove: error positions should always be computed on demand
 // in dedicated error types.
 func (c *CloseInfo) AddPositions(ctx *OpContext) {
-	c.AncestorPositions(func(n Node) {
+	c.AncestorPositions(ctx, func(n Node) {
 		ctx.AddPosition(n)
 	})
 }
@@ -121,8 +124,13 @@ func (c *CloseInfo) AddPositions(ctx *OpContext) {
 // AncestorPositions calls f for each parent of c, starting with the most
 // immediate parent. This is used to add positions to errors that are
 // associated with a CloseInfo.
-func (c *CloseInfo) AncestorPositions(f func(Node)) {
-	// TODO(evalv3): track positions
+func (c *CloseInfo) AncestorPositions(ctx *OpContext, f func(Node)) {
+	if c.opID != ctx.opID {
+		return
+	}
+	for p := c.defID; p != 0; p = ctx.containments[p].id {
+		f(ctx.containments[p].n)
+	}
 }
 
 // IsDef reports whether an expressions is a reference that references a

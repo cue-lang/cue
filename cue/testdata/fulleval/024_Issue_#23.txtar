@@ -39,9 +39,11 @@ Errors:
 y: 2 errors in empty disjunction:
 y.a: conflicting values 1 and 3:
     ./in.cue:1:12
+    ./in.cue:2:4
     ./in.cue:2:12
 y.a: conflicting values 2 and 3:
     ./in.cue:1:21
+    ./in.cue:2:4
     ./in.cue:2:12
 
 Result:
@@ -56,9 +58,11 @@ Result:
     // [eval] y: 2 errors in empty disjunction:
     // y.a: conflicting values 1 and 3:
     //     ./in.cue:1:12
+    //     ./in.cue:2:4
     //     ./in.cue:2:12
     // y.a: conflicting values 2 and 3:
     //     ./in.cue:1:21
+    //     ./in.cue:2:4
     //     ./in.cue:2:12
     a: (int){ 3 }
   }
@@ -67,35 +71,16 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,11 +2,9 @@
- y: 2 errors in empty disjunction:
- y.a: conflicting values 1 and 3:
-     ./in.cue:1:12
--    ./in.cue:2:4
-     ./in.cue:2:12
- y.a: conflicting values 2 and 3:
-     ./in.cue:1:21
--    ./in.cue:2:4
-     ./in.cue:2:12
- 
- Result:
-@@ -21,17 +19,10 @@
-     // [eval] y: 2 errors in empty disjunction:
-     // y.a: conflicting values 1 and 3:
-     //     ./in.cue:1:12
--    //     ./in.cue:2:4
-     //     ./in.cue:2:12
-     // y.a: conflicting values 2 and 3:
+@@ -27,11 +27,6 @@
      //     ./in.cue:1:21
--    //     ./in.cue:2:4
--    //     ./in.cue:2:12
+     //     ./in.cue:2:4
+     //     ./in.cue:2:12
 -    a: (_|_){
 -      // [eval] y.a: conflicting values 2 and 3:
 -      //     ./in.cue:1:21
 -      //     ./in.cue:2:4
 -      //     ./in.cue:2:12
 -    }
-+    //     ./in.cue:2:12
 +    a: (int){ 3 }
    }
  }

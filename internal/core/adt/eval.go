@@ -612,7 +612,7 @@ func (n *nodeContext) reportConflict(
 	err.AddPosition(v1)
 	err.AddPosition(v2)
 	for _, id := range ids {
-		err.AddClosedPositions(id)
+		err.AddClosedPositions(ctx, id)
 	}
 
 	n.addErr(err)
@@ -650,7 +650,7 @@ func (n *nodeContext) reportFieldMismatch(
 	}
 
 	for _, ci := range id {
-		err.AddClosedPositions(ci)
+		err.AddClosedPositions(ctx, ci)
 	}
 
 	n.addErr(err)

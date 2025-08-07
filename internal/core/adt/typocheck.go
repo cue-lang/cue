@@ -200,15 +200,20 @@ func (d defIDType) String() string {
 
 const deleteID defID = math.MaxUint32
 
-func (c *OpContext) getNextDefID() defID {
+type containment struct {
+	id defID
+	n  Node
+}
+
+func (c *OpContext) getNextDefID(n Node) defID {
 	c.stats.NumCloseIDs++
 	c.nextDefID++
 
 	if len(c.containments) == 0 {
 		// Our ID starts at 1. Create an extra element for the zero value.
-		c.containments = make([]defID, 1, 16)
+		c.containments = make([]containment, 1, 16)
 	}
-	c.containments = append(c.containments, 0)
+	c.containments = append(c.containments, containment{id: 0, n: n})
 
 	return c.nextDefID
 }
@@ -275,8 +280,8 @@ func (n *nodeContext) addReplacement(x replaceID) {
 		return
 	}
 
-	if x.from < x.to && n.ctx.containments[x.to] == 0 {
-		n.ctx.containments[x.to] = x.from
+	if x.from < x.to && n.ctx.containments[x.to].id == 0 {
+		n.ctx.containments[x.to].id = x.from
 		return
 	}
 
@@ -320,7 +325,7 @@ func (n *nodeContext) updateConjunctInfo(k Kind, id CloseInfo, flags conjunctFla
 // multiple times to a single node. As we only want to insert each conjunct
 // once, we need to ensure that within all contexts a single ID assigned to such
 // a resolver is tracked.
-func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) CloseInfo {
+func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, forceIgnore bool) CloseInfo {
 	if n.ctx.OpenDef {
 		return id
 	}
@@ -383,7 +388,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 	}
 
 	if dstID == 0 || id.enclosingEmbed != 0 {
-		next := n.ctx.getNextDefID()
+		next := n.ctx.getNextDefID(p)
 		if dstID != 0 {
 			// If we need to activate an enclosing embed group, and the added
 			// resolver was already before, we need to allocate a new ID and
@@ -431,12 +436,12 @@ func (id CloseInfo) clearCloseCheck() CloseInfo {
 	return id
 }
 
-func (n *nodeContext) newReq(id CloseInfo, kind defIDType) CloseInfo {
+func (n *nodeContext) newReq(p Node, id CloseInfo, kind defIDType) CloseInfo {
 	if id.defID != 0 && id.opID != n.ctx.opID {
 		return id.clearCloseCheck()
 	}
 
-	dstID := n.ctx.getNextDefID()
+	dstID := n.ctx.getNextDefID(p)
 	n.addReplacement(replaceID{from: id.defID, to: dstID})
 
 	parent := id.defID
@@ -506,7 +511,7 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 		}
 	}
 
-	return n.newReq(id, defEmbedding)
+	return n.newReq(x, id, defEmbedding)
 }
 
 // splitStruct is used to mark the outer struct of a field in which embeddings
@@ -546,11 +551,11 @@ func (n *nodeContext) splitStruct(s *StructLit, id CloseInfo) CloseInfo {
 		return id
 	}
 
-	return n.splitScope(id)
+	return n.splitScope(s, id)
 }
 
-func (n *nodeContext) splitScope(id CloseInfo) CloseInfo {
-	return n.newReq(id, defStruct)
+func (n *nodeContext) splitScope(p Node, id CloseInfo) CloseInfo {
+	return n.newReq(p, id, defStruct)
 }
 
 func (n *nodeContext) checkTypos() {
@@ -744,7 +749,7 @@ func (n *nodeContext) containsDefIDRec(node, child, start defID) bool {
 			}
 		}
 
-		p = c.containments[p]
+		p = c.containments[p].id
 		if p == start {
 			// We won't match node we haven't already after one cycle.
 			return false

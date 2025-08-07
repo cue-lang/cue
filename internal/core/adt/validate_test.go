@@ -35,6 +35,8 @@ func TestValidate(t *testing.T) {
 		out    string
 		lookup string
 		cfg    *adt.ValidateConfig
+
+		skipNoShare bool
 	}
 	testCases := []testCase{{
 		name: "no error, but not concrete, even with definition label",
@@ -262,8 +264,9 @@ y: conflicting values 4 and 2:
 			#Def: a: x!: int
 			b: #Def
 			`,
-		// TODO: \n    test:3:7",
-		out: "incomplete\nb.a.x: field is required but not present:\n    test:2:13",
+		// TODO: \n    test:3:7", only works without structure sharing.
+		out:         "incomplete\nb.a.x: field is required but not present:\n    test:2:13",
+		skipNoShare: true,
 	}, {
 		// Issue #3864: issue resulting from structure sharing.
 		name: "attribute incomplete values in definitions to concrete path",
@@ -286,6 +289,10 @@ y: conflicting values 4 and 2:
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
+		if tc.skipNoShare {
+			t.M.TODO_NoSharing(t)
+		}
+
 		r := t.M.Runtime()
 		ctx := eval.NewContext(r, nil)
 

@@ -160,11 +160,17 @@ keepDescending: t2: {
 -- out/evalalpha --
 Errors:
 indirectReference.y: conflicting values 2 and 1:
+    ./incomprehension.cue:41:20
     ./incomprehension.cue:42:7
     ./incomprehension.cue:42:10
+    ./incomprehension.cue:43:2
+    ./incomprehension.cue:44:6
 indirectReference.y: conflicting values 3 and 1:
+    ./incomprehension.cue:41:20
     ./incomprehension.cue:42:7
     ./incomprehension.cue:42:13
+    ./incomprehension.cue:43:2
+    ./incomprehension.cue:44:6
 
 Result:
 (_|_){
@@ -275,36 +281,60 @@ Result:
     }
     y: (_|_){
       // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:41:20
       //     ./incomprehension.cue:42:7
       //     ./incomprehension.cue:42:10
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
       // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:41:20
       //     ./incomprehension.cue:42:7
       //     ./incomprehension.cue:42:13
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
     }
     let X#1Dmulti = (〈0;y〉 * 4)
     "0": (_|_){
       // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:41:20
       //     ./incomprehension.cue:42:7
       //     ./incomprehension.cue:42:10
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
       // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:41:20
       //     ./incomprehension.cue:42:7
       //     ./incomprehension.cue:42:13
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
     }
     "1": (_|_){
       // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:41:20
       //     ./incomprehension.cue:42:7
       //     ./incomprehension.cue:42:10
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
       // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:41:20
       //     ./incomprehension.cue:42:7
       //     ./incomprehension.cue:42:13
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
     }
     "2": (_|_){
       // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:41:20
       //     ./incomprehension.cue:42:7
       //     ./incomprehension.cue:42:10
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
       // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:41:20
       //     ./incomprehension.cue:42:7
       //     ./incomprehension.cue:42:13
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
     }
   }
   nestedFor: (struct){
@@ -392,21 +422,20 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,13 +2,9 @@
+@@ -1,10 +1,12 @@
+ Errors:
  indirectReference.y: conflicting values 2 and 1:
++    ./incomprehension.cue:41:20
      ./incomprehension.cue:42:7
      ./incomprehension.cue:42:10
--    ./incomprehension.cue:43:2
--    ./incomprehension.cue:44:6
+     ./incomprehension.cue:43:2
+     ./incomprehension.cue:44:6
  indirectReference.y: conflicting values 3 and 1:
++    ./incomprehension.cue:41:20
      ./incomprehension.cue:42:7
      ./incomprehension.cue:42:13
--    ./incomprehension.cue:43:2
--    ./incomprehension.cue:44:6
- 
- Result:
- (_|_){
-@@ -105,7 +101,7 @@
+     ./incomprehension.cue:43:2
+@@ -105,7 +107,7 @@
        1: (int){ 2 }
        2: (int){ 3 }
      }
@@ -415,10 +444,12 @@ diff old new
      "0": (int){ 2 }
      "1": (int){ 2 }
      "2": (int){ 2 }
-@@ -121,61 +117,34 @@
+@@ -119,35 +121,28 @@
+     }
+     y: (_|_){
        // [eval] indirectReference.y: conflicting values 2 and 1:
-       //     ./incomprehension.cue:42:7
-       //     ./incomprehension.cue:42:10
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:10
 -      //     ./incomprehension.cue:43:2
 -      //     ./incomprehension.cue:44:6
 -      // indirectReference.y: conflicting values 3 and 1:
@@ -439,59 +470,75 @@ diff old new
 -      //     ./incomprehension.cue:43:2
 -      //     ./incomprehension.cue:44:6
 -    }
++      //     ./incomprehension.cue:41:20
++      //     ./incomprehension.cue:42:7
++      //     ./incomprehension.cue:42:10
++      //     ./incomprehension.cue:43:2
++      //     ./incomprehension.cue:44:6
 +      // indirectReference.y: conflicting values 3 and 1:
++      //     ./incomprehension.cue:41:20
 +      //     ./incomprehension.cue:42:7
 +      //     ./incomprehension.cue:42:13
++      //     ./incomprehension.cue:43:2
++      //     ./incomprehension.cue:44:6
 +    }
 +    let X#1Dmulti = (〈0;y〉 * 4)
      "0": (_|_){
        // [eval] indirectReference.y: conflicting values 2 and 1:
-       //     ./incomprehension.cue:42:7
-       //     ./incomprehension.cue:42:10
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:10
 -      //     ./incomprehension.cue:43:2
 -      //     ./incomprehension.cue:44:6
 -      // indirectReference.y: conflicting values 3 and 1:
--      //     ./incomprehension.cue:42:7
--      //     ./incomprehension.cue:42:13
--      //     ./incomprehension.cue:43:2
--      //     ./incomprehension.cue:44:6
-+      // indirectReference.y: conflicting values 3 and 1:
++      //     ./incomprehension.cue:41:20
 +      //     ./incomprehension.cue:42:7
-+      //     ./incomprehension.cue:42:13
++      //     ./incomprehension.cue:42:10
++      //     ./incomprehension.cue:43:2
++      //     ./incomprehension.cue:44:6
++      // indirectReference.y: conflicting values 3 and 1:
++      //     ./incomprehension.cue:41:20
+       //     ./incomprehension.cue:42:7
+       //     ./incomprehension.cue:42:13
+       //     ./incomprehension.cue:43:2
+@@ -155,11 +150,13 @@
      }
      "1": (_|_){
        // [eval] indirectReference.y: conflicting values 2 and 1:
-       //     ./incomprehension.cue:42:7
-       //     ./incomprehension.cue:42:10
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:10
 -      //     ./incomprehension.cue:43:2
 -      //     ./incomprehension.cue:44:6
 -      // indirectReference.y: conflicting values 3 and 1:
--      //     ./incomprehension.cue:42:7
--      //     ./incomprehension.cue:42:13
--      //     ./incomprehension.cue:43:2
--      //     ./incomprehension.cue:44:6
-+      // indirectReference.y: conflicting values 3 and 1:
++      //     ./incomprehension.cue:41:20
 +      //     ./incomprehension.cue:42:7
-+      //     ./incomprehension.cue:42:13
++      //     ./incomprehension.cue:42:10
++      //     ./incomprehension.cue:43:2
++      //     ./incomprehension.cue:44:6
++      // indirectReference.y: conflicting values 3 and 1:
++      //     ./incomprehension.cue:41:20
+       //     ./incomprehension.cue:42:7
+       //     ./incomprehension.cue:42:13
+       //     ./incomprehension.cue:43:2
+@@ -167,11 +164,13 @@
      }
      "2": (_|_){
        // [eval] indirectReference.y: conflicting values 2 and 1:
-       //     ./incomprehension.cue:42:7
-       //     ./incomprehension.cue:42:10
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:10
 -      //     ./incomprehension.cue:43:2
 -      //     ./incomprehension.cue:44:6
 -      // indirectReference.y: conflicting values 3 and 1:
--      //     ./incomprehension.cue:42:7
--      //     ./incomprehension.cue:42:13
--      //     ./incomprehension.cue:43:2
--      //     ./incomprehension.cue:44:6
-+      // indirectReference.y: conflicting values 3 and 1:
++      //     ./incomprehension.cue:41:20
 +      //     ./incomprehension.cue:42:7
-+      //     ./incomprehension.cue:42:13
-     }
-   }
-   nestedFor: (struct){
-@@ -234,8 +203,8 @@
++      //     ./incomprehension.cue:42:10
++      //     ./incomprehension.cue:43:2
++      //     ./incomprehension.cue:44:6
++      // indirectReference.y: conflicting values 3 and 1:
++      //     ./incomprehension.cue:41:20
+       //     ./incomprehension.cue:42:7
+       //     ./incomprehension.cue:42:13
+       //     ./incomprehension.cue:43:2
+@@ -234,8 +233,8 @@
        b: (string){ "e" }
      }
      let T#23multi = 〈1;v〉

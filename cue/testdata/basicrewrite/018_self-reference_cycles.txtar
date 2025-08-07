@@ -205,6 +205,7 @@ Disjuncts:    88
         // [incomplete] oneway.t2.a: 2 errors in empty disjunction:
         // oneway.t2.a: conflicting values 1 and 3:
         //     ./disjunction.cue:3:13
+        //     ./disjunction.cue:7:9
         //     ./disjunction.cue:8:12
         // oneway.t2.a: non-concrete value <3 in operand to +:
         //     ./disjunction.cue:4:12
@@ -353,15 +354,7 @@ diff old new
      }
      t2: (struct){
        a: (_|_){
-@@ -13,7 +19,6 @@
-         // [incomplete] oneway.t2.a: 2 errors in empty disjunction:
-         // oneway.t2.a: conflicting values 1 and 3:
-         //     ./disjunction.cue:3:13
--        //     ./disjunction.cue:7:9
-         //     ./disjunction.cue:8:12
-         // oneway.t2.a: non-concrete value <3 in operand to +:
-         //     ./disjunction.cue:4:12
-@@ -25,57 +30,70 @@
+@@ -25,57 +31,70 @@
    issue3669: (struct){
      #Schema: (#struct){
        two: (_|_){
@@ -462,7 +455,7 @@ diff old new
        }
        y: (#struct){
          b: (float){ 700.00 }
-@@ -85,28 +103,38 @@
+@@ -85,28 +104,38 @@
      reduced2: (struct){
        x: (#struct){
          start: (float){ 900.0 }

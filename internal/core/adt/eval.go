@@ -319,9 +319,6 @@ type nodeContext struct {
 	// closedness information is correctly computed in such cases.
 	sharedIDs []CloseInfo
 
-	// Conjuncts holds a reference to the Vertex Arcs that still need
-	// processing. It does NOT need to be copied.
-	conjuncts       []conjunct
 	cyclicConjuncts []cyclicConjunct
 
 	// These fields are used to track type checking.
@@ -351,16 +348,6 @@ type nodeContext struct {
 	// instead of in nodeContextState as it should be cleared when a disjunction
 	// is split off. TODO: find something more principled.
 	hasDisjunction bool
-}
-
-type conjunct struct {
-	C Conjunct
-
-	// done marks that this conjunct has been inserted. This prevents a
-	// conjunct from being processed more than once, for instance, when
-	// insertConjuncts is called more than once for the same node.
-	done  bool
-	index int // index of the original conjunct in Vertex.Conjuncts
 }
 
 type nodeContextState struct {
@@ -489,13 +476,6 @@ type nodeContextState struct {
 	lowerBound *BoundValue // > or >=
 	upperBound *BoundValue // < or <=
 	errs       *Bottom
-
-	// Slice positions
-
-	// conjunctsPos is an index into conjuncts indicating the next conjunct
-	// to process. This is used to avoids processing a conjunct twice in some
-	// cases where there is an evaluation cycle.
-	conjunctsPos int
 }
 
 // A receiver receives notifications.
@@ -530,7 +510,6 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			},
 			toFree:          n.toFree[:0],
 			arcMap:          n.arcMap[:0],
-			conjuncts:       n.conjuncts[:0],
 			cyclicConjuncts: n.cyclicConjuncts[:0],
 			notify:          n.notify[:0],
 			sharedIDs:       n.sharedIDs[:0],

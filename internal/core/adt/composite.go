@@ -594,7 +594,7 @@ func (v *Vertex) updateStatus(s vertexStatus) {
 // notified of these conjuncts.
 func (v *Vertex) setParentDone() {
 	// Could set "Conjuncts" flag of arc at this point.
-	if n := v.state; n != nil && len(n.conjuncts) == n.conjunctsPos {
+	if n := v.state; n != nil {
 		for _, a := range v.Arcs {
 			a.setParentDone()
 		}

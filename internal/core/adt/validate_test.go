@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/cuetdtest"
+	"cuelang.org/go/internal/cuetest"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -45,7 +46,9 @@ func TestValidate(t *testing.T) {
 		#foo: { use: string }
 		`,
 		lookup: "#foo",
-		out:    "incomplete\n#foo.use: incomplete value string:\n    test:2:16",
+		out: `incomplete
+				#foo.use: incomplete value string:
+				    test:2:16`,
 	}, {
 		name: "definitions not considered for completeness",
 		cfg:  &adt.ValidateConfig{Concrete: true},
@@ -68,20 +71,29 @@ func TestValidate(t *testing.T) {
 		in: `
 		1 & 2
 		`,
-		out: "eval\nconflicting values 2 and 1:\n    test:2:3\n    test:2:7",
+		out: `eval
+				conflicting values 2 and 1:
+				    test:2:3
+				    test:2:7`,
 	}, {
 		name: "evaluation error in field",
 		in: `
 		x: 1 & 2
 		`,
-		out: "eval\nx: conflicting values 2 and 1:\n    test:2:6\n    test:2:10",
+		out: `eval
+				x: conflicting values 2 and 1:
+				    test:2:6
+				    test:2:10`,
 	}, {
 		name: "first error",
 		in: `
 		x: 1 & 2
 		y: 2 & 4
 		`,
-		out: "eval\nx: conflicting values 2 and 1:\n    test:2:6\n    test:2:10",
+		out: `eval
+				x: conflicting values 2 and 1:
+				    test:2:6
+				    test:2:10`,
 	}, {
 		name: "all errors",
 		cfg:  &adt.ValidateConfig{AllErrors: true},
@@ -90,12 +102,12 @@ func TestValidate(t *testing.T) {
 		y: 2 & 4
 		`,
 		out: `eval
-x: conflicting values 2 and 1:
-    test:2:6
-    test:2:10
-y: conflicting values 4 and 2:
-    test:3:6
-    test:3:10`,
+				x: conflicting values 2 and 1:
+				    test:2:6
+				    test:2:10
+				y: conflicting values 4 and 2:
+				    test:3:6
+				    test:3:10`,
 	}, {
 		name: "incomplete",
 		cfg:  &adt.ValidateConfig{Concrete: true},
@@ -103,7 +115,10 @@ y: conflicting values 4 and 2:
 		y: 2 + x
 		x: string
 		`,
-		out: "incomplete\ny: non-concrete value string in operand to +:\n    test:2:6\n    test:3:6",
+		out: `incomplete
+				y: non-concrete value string in operand to +:
+				    test:2:6
+				    test:3:6`,
 	}, {
 		name: "allowed incomplete cycle",
 		in: `
@@ -125,7 +140,11 @@ y: conflicting values 4 and 2:
 		y: x + 1
 		x: y - 1
 		`,
-		out: "cycle\ny: cycle with field: x:\n    test:2:6\nx: cycle with field: y:\n    test:3:6",
+		out: `cycle
+				y: cycle with field: x:
+				    test:2:6
+				x: cycle with field: y:
+				    test:3:6`,
 	}, {
 		// TODO: different error position
 		name: "disallow cycle",
@@ -134,7 +153,11 @@ y: conflicting values 4 and 2:
 		a: b - 100
 		b: a + 100
 		c: [c[1], c[0]]		`,
-		out: "cycle\na: cycle with field: b:\n    test:2:6\nb: cycle with field: a:\n    test:3:6",
+		out: `cycle
+				a: cycle with field: b:
+				    test:2:6
+				b: cycle with field: a:
+				    test:3:6`,
 	}, {
 		name: "treat cycles as incomplete when not disallowing",
 		cfg:  &adt.ValidateConfig{},
@@ -151,7 +174,10 @@ y: conflicting values 4 and 2:
 		y: string
 		x: 1 & 2
 		`,
-		out: "eval\nx: conflicting values 2 and 1:\n    test:3:6\n    test:3:10",
+		out: `eval
+				x: conflicting values 2 and 1:
+				    test:3:6
+				    test:3:10`,
 	}, {
 		name: "consider defaults for concreteness",
 		cfg:  &adt.ValidateConfig{Concrete: true},
@@ -176,7 +202,9 @@ y: conflicting values 4 and 2:
 			a: int
 		}
 		`,
-		out: "incomplete\nx.a: incomplete value int:\n    test:3:7",
+		out: `incomplete
+				x.a: incomplete value int:
+				    test:3:7`,
 	}, {
 		name: "pick up non-concrete value in default",
 		cfg:  &adt.ValidateConfig{Concrete: true},
@@ -185,7 +213,8 @@ y: conflicting values 4 and 2:
 				a: 1 | 2
 			}
 			`,
-		out: "incomplete\nx.a: incomplete value 1 | 2",
+		out: `incomplete
+				x.a: incomplete value 1 | 2`,
 	}, {
 		name: "required field not present",
 		cfg:  &adt.ValidateConfig{Final: true},
@@ -196,7 +225,9 @@ y: conflicting values 4 and 2:
 				height: 1.80
 			}
 			`,
-		out: "incomplete\nPerson.name: field is required but not present:\n    test:3:5",
+		out: `incomplete
+				Person.name: field is required but not present:
+				    test:3:5`,
 	}, {
 		name: "allow required fields in definitions",
 		cfg:  &adt.ValidateConfig{Concrete: true},
@@ -231,7 +262,9 @@ y: conflicting values 4 and 2:
 				x: {bar: 2}
 				x: string | {foo!: string}
 			`,
-		out: "incomplete\nx.foo: field is required but not present:\n    test:3:18",
+		out: `incomplete
+				x.foo: field is required but not present:
+				    test:3:18`,
 	}, {
 		name: "disallow incomplete error with final",
 		cfg:  &adt.ValidateConfig{Final: true},
@@ -239,7 +272,10 @@ y: conflicting values 4 and 2:
 			x: y + 1
 			y: int
 				`,
-		out: "incomplete\nx: non-concrete value int in operand to +:\n    test:2:7\n    test:3:7",
+		out: `incomplete
+				x: non-concrete value int in operand to +:
+				    test:2:7
+				    test:3:7`,
 	}, {
 		name: "allow incomplete error with final while in definition",
 		cfg:  &adt.ValidateConfig{Final: true},
@@ -265,7 +301,9 @@ y: conflicting values 4 and 2:
 			b: #Def
 			`,
 		// TODO: \n    test:3:7", only works without structure sharing.
-		out:         "incomplete\nb.a.x: field is required but not present:\n    test:2:13",
+		out: `incomplete
+				b.a.x: field is required but not present:
+				    test:2:13`,
 		skipNoShare: true,
 	}, {
 		// Issue #3864: issue resulting from structure sharing.
@@ -285,10 +323,12 @@ y: conflicting values 4 and 2:
 				x: y: "dev"
 			}
 		`,
-		out: "incomplete\nconfig.v.x.y: incomplete value string:\n    test:2:11",
-	}}
+		out: `incomplete
+				config.v.x.y: incomplete value string:
+				    test:2:11`}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
+		t.Update(cuetest.UpdateGoldenFiles)
 		if tc.skipNoShare {
 			t.M.TODO_NoSharing(t)
 		}
@@ -318,6 +358,8 @@ y: conflicting values 4 and 2:
 		}
 
 		got := strings.TrimSpace(w.String())
+		got = strings.ReplaceAll(got, "\n", "\n\t\t\t\t")
+		t.Equal(got, tc.out)
 		if tc.out != got {
 			t.Error(cmp.Diff(tc.out, got))
 		}

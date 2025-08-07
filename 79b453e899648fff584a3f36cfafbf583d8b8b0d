@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "9647834c_b4cf2ec3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-07T18:08:16Z",
+      "side": 1,
+      "message": "Sure, done. We only had the \"deprecated\" feature covered via envflag unit tests.",
+      "parentUuid": "c7fc6a2e_2aa06ca8",
+      "revId": "79b453e899648fff584a3f36cfafbf583d8b8b0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "607e45aa_422823b7",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1

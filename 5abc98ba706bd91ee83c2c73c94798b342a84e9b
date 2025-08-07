@@ -227,6 +227,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ad68b3c_2f900cb2",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T08:15:50Z",
+      "side": 1,
+      "message": "I must be misunderstanding you.\n\nAs you say, there are no tests where the positionsWant is explicitly set to nil....\nOh! The penny just dropped. This code is indeed a hang-over from when the expectations was a list, so lots of nil values. It later changed into a map, and yes this code can be removed now. Sorry for the confusion.",
+      "parentUuid": "863862c8_62fd7cf8",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d1cf9934_e80da0d6",

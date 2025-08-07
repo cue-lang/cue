@@ -42,27 +42,6 @@ type PatternConstraint struct {
 	Constraint *Vertex
 }
 
-// insertListEllipsis inserts the given list ellipsis as a pattern constraint on
-// n, applying it to all elements at indexes >= offset.
-func (n *nodeContext) insertListEllipsis(offset int, ellipsis Conjunct) {
-	ctx := n.ctx
-
-	var p Value
-	if offset == 0 {
-		p = &BasicType{
-			Src: ellipsis.Field().Source(),
-			K:   IntKind,
-		}
-	} else {
-		p = &BoundValue{
-			Src:   nil, // TODO: field source.
-			Op:    GreaterEqualOp,
-			Value: ctx.NewInt64(int64(offset)),
-		}
-	}
-	n.insertConstraint(p, ellipsis)
-}
-
 // insertConstraint ensures a given pattern constraint is present in the
 // constraints of n and reports whether the pair was added newly.
 //

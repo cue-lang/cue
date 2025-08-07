@@ -91,13 +91,6 @@ type envDisjunct struct {
 
 	src       Node
 	disjuncts []disjunct
-
-	// These are used for book keeping, tracking whether any of the
-	// disjuncts marked with a default marker remains after unification.
-	// If no default is used, all other elements are treated as "maybeDefault".
-	// Otherwise, elements are treated as is.
-	parentDefaultUsed bool
-	childDefaultUsed  bool
 }
 
 func (n *nodeContext) makeError() {

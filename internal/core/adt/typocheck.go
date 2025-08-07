@@ -166,7 +166,6 @@ package adt
 // type.
 //
 import (
-	"math"
 	"slices"
 
 	"cuelang.org/go/cue/ast"
@@ -197,8 +196,6 @@ func (d defIDType) String() string {
 		return "*"
 	}
 }
-
-const deleteID defID = math.MaxUint32
 
 type containment struct {
 	id defID

@@ -43,34 +43,19 @@ type StructLit struct {
 
 	// TODO: record the merge order somewhere.
 
-	// The below fields are redundant to Decls and are computed with Init.
+	// IsOpen is kept as it's used by ListMarker and some validations
+	IsOpen bool // has a ...
 
-	// field marks the optional conjuncts of all explicit Fields.
-	// Required Fields are marked as empty
-	Fields []FieldInfo
+	// initialized is kept as it's used in the Init method and unify.go
+	initialized bool
 
-	Dynamic []*DynamicField
-
-	// excluded are all literal fields that already exist.
-	Bulk []*BulkOptionalField
-
-	Additional      []*Ellipsis
-	HasEmbed        bool
-	IsOpen          bool // has a ...
-	initialized     bool
+	// isComprehension is kept as it's used in comprehension.go and conjunct.go
 	isComprehension bool
-
-	// administrative fields like hasreferences.
-	// hasReferences bool
 }
 
 func (o *StructLit) IsFile() bool {
 	_, ok := o.Src.(*ast.File)
 	return ok
-}
-
-type FieldInfo struct {
-	Label Feature
 }
 
 func (x *StructLit) Source() ast.Node { return x.Src }

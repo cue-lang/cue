@@ -92,6 +92,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6cb1982_0eeb78db",
+        "filename": "internal/cueexperiment/exp_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-07T15:37:31Z",
+      "side": 1,
+      "message": "this is not unrelated. the test used to rely on `evalv3\u003d0` to check that we can disable a test. but this change is explicitly about forbidding that. hence I need to use a different experiment in this smoke test.\n\nmentioned that in the commit message for full clarity.",
+      "parentUuid": "343c1408_1646a516",
+      "range": {
+        "startLine": 11,
+        "startChar": 45,
+        "endLine": 11,
+        "endChar": 61
+      },
+      "revId": "79b453e899648fff584a3f36cfafbf583d8b8b0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7470cfcd_7d732cb8",
@@ -105,6 +129,24 @@
       "writtenOn": "2025-08-07T12:32:11Z",
       "side": 1,
       "message": "Ditto.",
+      "revId": "79b453e899648fff584a3f36cfafbf583d8b8b0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f89ebbc4_98587c7e",
+        "filename": "internal/cueexperiment/exp_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-07T15:37:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7470cfcd_7d732cb8",
       "revId": "79b453e899648fff584a3f36cfafbf583d8b8b0d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

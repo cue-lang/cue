@@ -366,14 +366,13 @@ Retain: 0
 Unifications: 120
 Conjuncts:    140
 Disjuncts:    0
-Notifications: 4
 
 NumCloseIDs: 76
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,12 @@
+@@ -1,11 +1,11 @@
 -Leaks:  10
 -Freed:  105
 -Reused: 95
@@ -394,7 +393,6 @@ diff old new
 +Unifications: 120
 +Conjuncts:    140
 +Disjuncts:    0
-+Notifications: 4
 +
 +NumCloseIDs: 76
 -- out/eval/stats --

@@ -168,24 +168,36 @@ _typeTests: [...#typeTest] & [
 ]
 -- cuetest/fail_check.stderr --
 fail.both."16_IntList".types.IntList.0: conflicting values "foo" and int (mismatched types string and int):
+    ./cuetest/all.cue:20:1
+    ./cuetest/all.cue:27:2
+    ./cuetest/all.cue:28:56
     ./cuetest/all.cue:67:40
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
     ./root/types.cue:26:23
 fail.both."16_IntList".types.IntList.1: conflicting values "bar" and int (mismatched types string and int):
+    ./cuetest/all.cue:20:1
+    ./cuetest/all.cue:27:2
+    ./cuetest/all.cue:28:56
     ./cuetest/all.cue:67:47
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
     ./root/types.cue:26:23
 fail.both."20_IntMap".types.IntMap.one: conflicting values "x" and int (mismatched types string and int):
+    ./cuetest/all.cue:20:1
+    ./cuetest/all.cue:27:2
+    ./cuetest/all.cue:28:56
     ./cuetest/all.cue:71:47
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
     ./root/types.cue:28:29
 fail.both."20_IntMap".types.IntMap.two: conflicting values "y" and int (mismatched types string and int):
+    ./cuetest/all.cue:20:1
+    ./cuetest/all.cue:27:2
+    ./cuetest/all.cue:28:56
     ./cuetest/all.cue:71:59
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
@@ -196,14 +208,23 @@ fail.both."37_NonEmptyString".types.NonEmptyString: conflicting values string an
     ./cuetest/all.cue:27:2
     ./cuetest/all.cue:28:56
     ./cuetest/all.cue:89:43
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:9:8
+    ./root/root.cue:13:10
     ./root/types.cue:38:23
 fail.both."40_NonEmptyString".types.NonEmptyString: conflicting values string and [1,2,3] (mismatched types string and list):
     ./cuetest/all.cue:20:1
     ./cuetest/all.cue:27:2
     ./cuetest/all.cue:28:56
     ./cuetest/all.cue:92:43
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:9:8
+    ./root/root.cue:13:10
     ./root/types.cue:38:23
 fail.both."42_LinkedList".types.LinkedList.next: conflicting values "x" and {item?:_,next?:#linkedList} (mismatched types string and struct):
+    ./cuetest/all.cue:20:1
+    ./cuetest/all.cue:27:2
+    ./cuetest/all.cue:28:56
     ./cuetest/all.cue:94:50
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
@@ -216,6 +237,10 @@ fail.both."44_GraphNode".types.GraphNode.edges: conflicting values [...#graphNod
     ./cuetest/all.cue:27:2
     ./cuetest/all.cue:28:56
     ./cuetest/all.cue:96:51
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:9:8
+    ./root/root.cue:13:10
+    ./root/types.cue:41:23
     ./root/types.cue:50:10
 fail.both.notList: conflicting values [1,2,3] and {embedded2?:int} (mismatched types list and struct):
     ./cuetest/all.cue:5:24
@@ -235,12 +260,18 @@ fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
     ./cuetest/all.cue:62:30
 fail.cue."29_NullOrStruct".types.NullOrStruct: 2 errors in empty disjunction:
 fail.cue."29_NullOrStruct".types.NullOrStruct: conflicting values "foo" and null (mismatched types string and null):
+    ./cuetest/all.cue:20:1
+    ./cuetest/all.cue:24:2
+    ./cuetest/all.cue:25:55
     ./cuetest/all.cue:81:43
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
     ./root/types.cue:35:23
 fail.cue."29_NullOrStruct".types.NullOrStruct: conflicting values "foo" and {foo?:int} (mismatched types string and struct):
+    ./cuetest/all.cue:20:1
+    ./cuetest/all.cue:24:2
+    ./cuetest/all.cue:25:55
     ./cuetest/all.cue:81:43
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
@@ -248,12 +279,18 @@ fail.cue."29_NullOrStruct".types.NullOrStruct: conflicting values "foo" and {foo
     ./root/types.cue:35:30
 fail.cue."32_NullOrString".types.NullOrString: 2 errors in empty disjunction:
 fail.cue."32_NullOrString".types.NullOrString: conflicting values 123 and null (mismatched types int and null):
+    ./cuetest/all.cue:20:1
+    ./cuetest/all.cue:24:2
+    ./cuetest/all.cue:25:55
     ./cuetest/all.cue:84:43
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8
     ./root/root.cue:13:10
     ./root/types.cue:36:23
 fail.cue."32_NullOrString".types.NullOrString: conflicting values 123 and string (mismatched types int and string):
+    ./cuetest/all.cue:20:1
+    ./cuetest/all.cue:24:2
+    ./cuetest/all.cue:25:55
     ./cuetest/all.cue:84:43
     ./cuetest/fail_check.cue:7:17
     ./root/root.cue:9:8

@@ -689,6 +689,7 @@ func (n *nodeContext) updateNodeType(k Kind, v Expr, id CloseInfo) bool {
 		n.kindExpr = v
 	}
 	n.kind = kind
+	n.kindID = id
 	return kind != BottomKind
 }
 

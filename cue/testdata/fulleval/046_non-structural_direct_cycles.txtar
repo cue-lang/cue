@@ -39,6 +39,7 @@ Errors:
 c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
     ./in.cue:2:5
     ./in.cue:2:16
+    ./in.cue:2:21
 
 Result:
 (_|_){
@@ -53,6 +54,7 @@ Result:
     // [eval] c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
     //     ./in.cue:2:5
     //     ./in.cue:2:16
+    //     ./in.cue:2:21
     bar: (_|_){// 1
     }
   }
@@ -61,11 +63,20 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -16,6 +16,7 @@
+@@ -2,6 +2,7 @@
+ c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
+     ./in.cue:2:5
+     ./in.cue:2:16
++    ./in.cue:2:21
+ 
+ Result:
+ (_|_){
+@@ -16,6 +17,8 @@
      // [eval] c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
      //     ./in.cue:2:5
      //     ./in.cue:2:16
 -    bar: (int){ 1 }
++    //     ./in.cue:2:21
 +    bar: (_|_){// 1
 +    }
    }

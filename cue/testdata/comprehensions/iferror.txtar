@@ -163,6 +163,8 @@ NumCloseIDs: 7
 -- out/evalalpha --
 Errors:
 issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+    ./in.cue:53:8
+    ./in.cue:55:3
     ./in.cue:61:8
     ./in.cue:63:11
 wrongConcreteType: cannot use 2 (type int) as type bool:
@@ -228,6 +230,8 @@ Result:
     // [eval]
     err1: (_|_){
       // [eval] issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+      //     ./in.cue:53:8
+      //     ./in.cue:55:3
       //     ./in.cue:61:8
       //     ./in.cue:63:11
       #patchs: (_|_){// []
@@ -245,17 +249,19 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,7 @@
+@@ -1,7 +1,9 @@
  Errors:
 -issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
 -    ./in.cue:54:12
 +issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
++    ./in.cue:53:8
++    ./in.cue:55:3
      ./in.cue:61:8
 +    ./in.cue:63:11
  wrongConcreteType: cannot use 2 (type int) as type bool:
      ./in.cue:4:2
      ./in.cue:1:8
-@@ -8,8 +8,6 @@
+@@ -8,8 +10,6 @@
  wrongType: cannot use int (type int) as type bool:
      ./in.cue:10:2
      ./in.cue:1:14
@@ -264,13 +270,15 @@ diff old new
  
  Result:
  (_|_){
-@@ -66,17 +64,17 @@
+@@ -66,17 +66,19 @@
    issue1972: (_|_){
      // [eval]
      err1: (_|_){
 -      // [eval] issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
 -      //     ./in.cue:54:12
 +      // [eval] issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
++      //     ./in.cue:53:8
++      //     ./in.cue:55:3
        //     ./in.cue:61:8
 -      // issue1972.err1: invalid list index someCondition (type string):
 -      //     ./in.cue:65:6

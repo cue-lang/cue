@@ -14,6 +14,12 @@
 
 x: #B & #C
 
+-- evalv3regress.cue --
+chained: x: {
+	(a.b): "foo"
+	(x.hello): "true"
+	a: b: "hello"
+}
 -- out/eval/stats --
 Leaks:  0
 Freed:  23
@@ -24,6 +30,89 @@ Retain: 1
 Unifications: 19
 Conjuncts:    29
 Disjuncts:    23
+-- out/evalalpha --
+Errors:
+chained.x: conflicting values "foo" and {a.b:"foo",x.hello:"true",a:{b:"hello"}} (mismatched types string and struct):
+    ./evalv3regress.cue:1:13
+    ./evalv3regress.cue:2:9
+
+Result:
+(_|_){
+  // [eval]
+  chained: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval] chained.x: conflicting values "foo" and {a.b:"foo",x.hello:"true",a:{b:"hello"}} (mismatched types string and struct):
+      //     ./evalv3regress.cue:1:13
+      //     ./evalv3regress.cue:2:9
+      a: (_|_){
+        // [cycle] cycle error
+      }
+      hello: (_|_){
+        // [cycle] cycle error
+      }
+    }
+  }
+  #A: (#struct){
+    a: (string){ "foo" }
+    foo: (int){ 3 }
+  }
+  #B: (#struct){
+    a: (#struct){
+      b: (#struct){
+        c: (string){ string }
+        d: (int){ 2 }
+      }
+    }
+  }
+  #C: (#struct){
+    a: (#struct){
+      b: (#struct){
+        c: (string){ |(*(string){ "d" }, (string){ string }) }
+        d: (int){ 2 }
+      }
+    }
+  }
+  x: (#struct){
+    a: (#struct){
+      b: (#struct){
+        c: (string){ |(*(string){ "d" }, (string){ string }) }
+        d: (int){ 2 }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,25 @@
+-(struct){
++Errors:
++chained.x: conflicting values "foo" and {a.b:"foo",x.hello:"true",a:{b:"hello"}} (mismatched types string and struct):
++    ./evalv3regress.cue:1:13
++    ./evalv3regress.cue:2:9
++
++Result:
++(_|_){
++  // [eval]
++  chained: (_|_){
++    // [eval]
++    x: (_|_){
++      // [eval] chained.x: conflicting values "foo" and {a.b:"foo",x.hello:"true",a:{b:"hello"}} (mismatched types string and struct):
++      //     ./evalv3regress.cue:1:13
++      //     ./evalv3regress.cue:2:9
++      a: (_|_){
++        // [cycle] cycle error
++      }
++      hello: (_|_){
++        // [cycle] cycle error
++      }
++    }
++  }
+   #A: (#struct){
+     a: (string){ "foo" }
+     foo: (int){ 3 }
 -- out/eval --
 (struct){
   #A: (#struct){
@@ -56,6 +145,18 @@ Disjuncts:    23
   }
 }
 -- out/compile --
+--- evalv3regress.cue
+{
+  chained: {
+    x: {
+      〈0;a〉.b: "foo"
+      〈1;x〉.hello: "true"
+      a: {
+        b: "hello"
+      }
+    }
+  }
+}
 --- in.cue
 {
   #A: {

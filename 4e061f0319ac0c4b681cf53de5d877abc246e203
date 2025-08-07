@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4aae98d8_f01f914d",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_after.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-07T17:02:36Z",
+      "side": 1,
+      "message": "I\u0027m not convinced this is the right fix. ISTM that the correct fix is actually to make `strconv.Atoi` independent of architecture word length, and ideally it should work on arbitrarily large integers too.",
+      "revId": "4e061f0319ac0c4b681cf53de5d877abc246e203",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

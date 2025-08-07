@@ -324,8 +324,6 @@ type nodeContext struct {
 	conjuncts       []conjunct
 	cyclicConjuncts []cyclicConjunct
 
-	dynamicFields []envDynamic
-
 	// These fields are used to track type checking.
 	reqDefIDs    []refInfo
 	replaceIDs   []replaceID
@@ -347,20 +345,12 @@ type nodeContext struct {
 	// disjuncts holds disjuncts that evaluated to a non-bottom value.
 	// TODO: come up with a better name.
 	disjuncts    []*nodeContext
-	buffer       []*nodeContext
 	disjunctErrs []*Bottom
 
 	// hasDisjunction marks wither any disjunct was added. It is listed here
 	// instead of in nodeContextState as it should be cleared when a disjunction
 	// is split off. TODO: find something more principled.
 	hasDisjunction bool
-
-	// snapshot holds the last value of the vertex before calling postDisjunct.
-	snapshot *Vertex
-
-	// Result holds the last evaluated value of the vertex after calling
-	// postDisjunct.
-	result *Vertex
 }
 
 type conjunct struct {
@@ -546,7 +536,6 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			sharedIDs:       n.sharedIDs[:0],
 			checks:          n.checks[:0],
 			postChecks:      n.postChecks[:0],
-			dynamicFields:   n.dynamicFields[:0],
 			reqDefIDs:       n.reqDefIDs[:0],
 			replaceIDs:      n.replaceIDs[:0],
 			conjunctInfo:    n.conjunctInfo[:0],
@@ -554,7 +543,6 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			disjunctions:    n.disjunctions[:0],
 			disjunctErrs:    n.disjunctErrs[:0],
 			disjuncts:       n.disjuncts[:0],
-			buffer:          n.buffer[:0],
 		}
 		n.scheduler.clear()
 	} else {
@@ -784,18 +772,6 @@ func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
 	}
 
 	return v
-}
-
-type envExpr struct {
-	c   Conjunct
-	err *Bottom
-}
-
-type envDynamic struct {
-	env   *Environment
-	field *DynamicField
-	id    CloseInfo
-	err   *Bottom
 }
 
 type envCheck struct {

@@ -300,11 +300,10 @@ func TestValidate(t *testing.T) {
 			#Def: a: x!: int
 			b: #Def
 			`,
-		// TODO: \n    test:3:7", only works without structure sharing.
 		out: `incomplete
 				b.a.x: field is required but not present:
-				    test:2:13`,
-		skipNoShare: true,
+				    test:2:13
+				    test:3:7`,
 	}, {
 		// Issue #3864: issue resulting from structure sharing.
 		name: "attribute incomplete values in definitions to concrete path",
@@ -325,14 +324,16 @@ func TestValidate(t *testing.T) {
 		`,
 		out: `incomplete
 				config.v.x.y: incomplete value string:
-				    test:2:11`}}
+				    test:2:11
+				    test:3:11`,
+		skipNoShare: true,
+	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
 		t.Update(cuetest.UpdateGoldenFiles)
 		if tc.skipNoShare {
 			t.M.TODO_NoSharing(t)
 		}
-
 		r := t.M.Runtime()
 		ctx := eval.NewContext(r, nil)
 

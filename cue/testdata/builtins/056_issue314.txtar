@@ -146,6 +146,7 @@ Disjuncts:    62
       // [incomplete] #U.out: error in call to encoding/yaml.Marshal: incomplete value string:
       //     ./in.cue:26:7
       //     ./in.cue:25:7
+      //     ./in.cue:26:26
     }
   }
 }
@@ -162,6 +163,14 @@ diff old new
      }
    }
    #V: (#struct){
+@@ -24,6 +24,7 @@
+       // [incomplete] #U.out: error in call to encoding/yaml.Marshal: incomplete value string:
+       //     ./in.cue:26:7
+       //     ./in.cue:25:7
++      //     ./in.cue:26:26
+     }
+   }
+ }
 -- out/eval --
 (struct){
   x: (#struct){

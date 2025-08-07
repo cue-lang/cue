@@ -16,6 +16,24 @@
       "message": "Previously, I was traversing the (inverted) import graph at the start of (what was) Module.ReloadPackage. I\u0027ve changed that so that we traverse it here, in setStatus. This makes life slightly easier when the import graph spans across modules.",
       "revId": "0cc327bc761b1c6899e38967fdd77fb4e4b53888",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "292f5bbb_57625570",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-07T12:14:31Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7aea34c1_60cdc2fb",
+      "revId": "0cc327bc761b1c6899e38967fdd77fb4e4b53888",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

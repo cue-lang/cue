@@ -16,6 +16,24 @@
       "message": "All of this code has moved, often verbatim, into Workspace.reloadPackages.",
       "revId": "74bcf199187c2e6c4fa5598e741964d2505b5866",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d17c4ae_534b4322",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-07T12:14:31Z",
+      "side": 0,
+      "message": "Acknowledged",
+      "parentUuid": "dca1e197_05e8647a",
+      "revId": "74bcf199187c2e6c4fa5598e741964d2505b5866",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

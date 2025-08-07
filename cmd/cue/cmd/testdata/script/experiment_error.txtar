@@ -1,0 +1,28 @@
+# An entirely unknown flag. Note that this may be a flag
+# which only exists in later CUE versions.
+env CUE_EXPERIMENT=unknown
+! exec cue export in.cue
+cmp stderr unknown.stderr
+
+# Setting a deprecated flag to its final value is OK,
+# for the sake of not breaking users unnecessarily.
+env CUE_EXPERIMENT=evalv3=1
+exec cue export in.cue
+cmp stdout export.stdout
+
+# Changing a deprecated flag's final value is not allowed,
+# as the experiment is complete and the old code is often gone.
+env CUE_EXPERIMENT=evalv3=0
+! exec cue export in.cue
+cmp stderr deprecated.stderr
+
+-- in.cue --
+foo: "bar"
+-- export.stdout --
+{
+    "foo": "bar"
+}
+-- unknown.stderr --
+cannot parse CUE_EXPERIMENT: unknown flag "unknown"
+-- deprecated.stderr --
+cannot parse CUE_EXPERIMENT: cannot change default value of deprecated flag "evalv3"

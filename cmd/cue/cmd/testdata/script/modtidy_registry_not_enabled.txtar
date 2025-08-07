@@ -1,6 +1,0 @@
-env CUE_EXPERIMENT=modules=0
-
-! exec cue mod tidy
-cmp stderr want-stderr
--- want-stderr --
-cannot parse CUE_EXPERIMENT: cannot change default value of deprecated flag "modules"

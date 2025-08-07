@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9060b77a_92ff5c5f",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 557,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-07T08:02:29Z",
+      "side": 1,
+      "message": "I guess I don\u0027t understand _why_ there\u0027s no need to start a lexical scope in this case, given that a struct literal does in fact introduce a new lexical scope AIUI.\n\nAnd I see the lexical scope logic inside the `token.OR` logic and I don\u0027t understand why it should be needed and wonder if it\u0027s there because of the lack of lexical scope logic in the struct-lit case.\n\nAnd, yes, it does seem definitely on the edge of full evaluation.\n\nHere\u0027s an example which is maybe questionable:\n\n```\n{\n\t{_a: int, b: _a}\n\t_a: 2\n} \u0026 {\n\t_a: \u003e1\n}\n```\nin this case, it resolves that first `_a` expression to all the `_a` field definitions. I can\u0027t work out if that\u0027s weird or not: after all, those fields do all end up merged, but on the other hand it\u0027s hard for me to justify saying that the `_a` reference is _actually_ referring to that `_a` field in a struct in a totally different lexical scope.\n\nMaybe this is where the kind of results should be different for the first element (lexical scope) and subsequent elements in the path (navigible/dynamic/object scope)",
+      "parentUuid": "c04cfb20_ed4d6cd4",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "673dac55_22e4b681",
         "filename": "internal/lsp/definitions/definitions.go",
         "patchSetId": 17
@@ -187,6 +205,24 @@
       "side": 1,
       "message": "This is the deliberate difference between nil and the empty list. There are plenty of cases where I explicitly test for the empty list, but as the nearby comment notes, it\u0027s also deliberate the the test does not need to capture every possible resolution.\n\nBut maybe we\u0027re talking past each other and you\u0027ve spotted something that I\u0027m missing?",
       "parentUuid": "44c79f00_a24e2c29",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "863862c8_62fd7cf8",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-07T08:02:29Z",
+      "side": 1,
+      "message": "I\u0027m fairly sure there are actually no cases where you have an explicit nil (and there are no implicit nils because we\u0027re dealing with a map not a slice): I removed this logic and all the tests passed.",
+      "parentUuid": "24589a25_a3b135de",
       "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

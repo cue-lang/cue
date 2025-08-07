@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb9aa353_4f92e810",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-07T11:53:08Z",
+      "side": 1,
+      "message": "needs a \"Fixes #3142\" too.",
+      "revId": "9853eecd48416793a63e93453e689b7a525f7538",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

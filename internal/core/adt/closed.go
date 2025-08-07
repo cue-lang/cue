@@ -165,12 +165,6 @@ func isClosed(v *Vertex) bool {
 	if v.ClosedRecursive || v.ClosedNonRecursive {
 		return true
 	}
-	// TODO(evalv3): this can be removed once we delete the evalv2 code.
-	for _, s := range v.Structs {
-		if s.IsClosed {
-			return true
-		}
-	}
 	return false
 }
 

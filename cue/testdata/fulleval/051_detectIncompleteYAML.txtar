@@ -74,6 +74,53 @@ Retain: 0
 Unifications: 17
 Conjuncts:    32
 Disjuncts:    17
+-- out/evalalpha --
+(struct){
+  #Spec: (#struct){
+    _vars(:foobar): (#struct){
+      something: (string){ string }
+    }
+    data: (#struct){
+      #foo: (#struct){
+        use: (string){ string }
+      }
+      baz: (_|_){
+        // [incomplete] #Spec.data.baz: non-concrete argument 0:
+        //     ./in.cue:11:11
+      }
+      foobar: (_|_){
+        // [incomplete] #Spec.data.foobar: error in call to encoding/yaml.Marshal: incomplete value string:
+        //     ./in.cue:12:11
+        //     ./in.cue:6:21
+        //     ./in.cue:9:9
+      }
+    }
+  }
+  Val: (#struct){
+    _vars(:foobar): (#struct){
+      something: (string){ "var-string" }
+    }
+    data: (#struct){
+      #foo: (#struct){
+        use: (string){ "var-string" }
+      }
+      baz: (string){ "var-string\n" }
+      foobar: (string){ "use: var-string\n" }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -15,6 +15,7 @@
+         // [incomplete] #Spec.data.foobar: error in call to encoding/yaml.Marshal: incomplete value string:
+         //     ./in.cue:12:11
+         //     ./in.cue:6:21
++        //     ./in.cue:9:9
+       }
+     }
+   }
 -- out/eval --
 (struct){
   #Spec: (#struct){

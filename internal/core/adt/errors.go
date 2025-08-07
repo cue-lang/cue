@@ -228,9 +228,12 @@ func addPositions(ctx *OpContext, err *ValueError, c Conjunct) {
 	}
 }
 
-func NewRequiredNotPresentError(ctx *OpContext, v *Vertex) *Bottom {
+func NewRequiredNotPresentError(ctx *OpContext, v *Vertex, morePositions ...Node) *Bottom {
 	saved := ctx.PushArc(v)
 	err := ctx.Newf("field is required but not present")
+	for _, p := range morePositions {
+		err.AddPosition(p)
+	}
 	v.VisitLeafConjuncts(func(c Conjunct) bool {
 		if f, ok := c.x.(*Field); ok && f.ArcType == ArcRequired {
 			err.AddPosition(c.x)

@@ -1959,11 +1959,14 @@ Result:
           b1: (_|_){
             // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
             // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
+            //     ./validators.cue:32:7
             //     ./validators.cue:33:7
             //     ./validators.cue:35:17
             // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
             // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
+            //     ./validators.cue:32:7
             //     ./validators.cue:33:11
+            //     ./validators.cue:35:24
             //     ./validators.cue:36:17
             // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
             //     ./validators.cue:33:22
@@ -2795,7 +2798,18 @@ diff old new
        }
      }
      out: (#struct){
-@@ -1423,17 +1276,8 @@
+@@ -1415,25 +1268,19 @@
+           b1: (_|_){
+             // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
+             // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
++            //     ./validators.cue:32:7
+             //     ./validators.cue:33:7
+             //     ./validators.cue:35:17
+             // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
+             // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
++            //     ./validators.cue:32:7
+             //     ./validators.cue:33:11
++            //     ./validators.cue:35:24
              //     ./validators.cue:36:17
              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
              //     ./validators.cue:33:22

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "416eb9ec_6c50f5c3",
+        "filename": "internal/core/adt/validate_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-07T14:23:41Z",
+      "side": 1,
+      "message": "is this still needed now?",
+      "revId": "82bf0ac68bbae3800884bda36e89c8ae44241e9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

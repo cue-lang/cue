@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73097772_34833dca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-07T15:55:19Z",
+      "side": 1,
+      "message": "To be merged once all backports are ready and we\u0027re doing the release.",
+      "revId": "c32de09e68c2128e7520084fd0615303e4363b57",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

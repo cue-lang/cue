@@ -38,8 +38,8 @@ command: after: {
 	}
 	t3: cli.Print & {
 		text: strconv.FormatBool(
-			strconv.Atoi(strings.TrimSpace(group.t1.stdout)) <
-				strconv.Atoi(strings.TrimSpace(group.t2.stdout))
+			strconv.ParseInt(strings.TrimSpace(group.t1.stdout), 10, 64) <
+				strconv.ParseInt(strings.TrimSpace(group.t2.stdout), 10, 64)
 			)
 	}
 	t4: cli.Print & {

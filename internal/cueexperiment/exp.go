@@ -14,25 +14,18 @@ var Flags Config
 // When adding, deleting, or modifying entries below,
 // update cmd/cue/cmd/help.go as well for `cue help environment`.
 type Config struct {
-	// EvalV3 enables the new CUE evaluator, addressing performance issues
-	// and bringing better algorithms for disjunctions, closedness, and cycles.
-	//
-	// This experiment was introduced in v0.9.0 (2024-06),
-	// and enabled by default in v0.13.0 (2025-05).
-	EvalV3 bool `envflag:"default:true"`
-
 	// CmdReferencePkg requires referencing an imported tool package to declare tasks.
 	// Otherwise, declaring tasks via "$id" or "kind" string fields is allowed.
 	//
 	// This experiment was introduced in v0.13.0 (2025-05),
-	// and enabled by default in the upcoming v0.14 release.
+	// and enabled by default in v0.14.0 (2025-08).
 	CmdReferencePkg bool `envflag:"default:true"`
 
 	// KeepValidators prevents validators from simplifying into concrete values,
 	// even if their concrete value could be derived, such as `>=1 & <=1` to `1`.
 	// See the proposal at https://cuelang.org/discussion/3775.
 	//
-	// This experiment is introduced in the upcoming v0.14 release, already on by default.
+	// This experiment is introduced in v0.14.0 (2025-08), already on by default.
 	KeepValidators bool `envflag:"default:true"`
 
 	// The flags below describe completed experiments; they can still be set
@@ -69,7 +62,7 @@ type Config struct {
 	//
 	// This experiment was introduced in v0.10.0 (2024-08),
 	// enabled by default in v0.12.0 (2025-01),
-	// and deprecated in the upcoming v0.14 release.
+	// and deprecated in v0.14.0 (2025-08).
 	Embed bool `envflag:"deprecated,default:true"`
 
 	// TopoSort enables topological sorting of struct fields.
@@ -77,8 +70,16 @@ type Config struct {
 	//
 	// This experiment was introduced in v0.11.0 (2024-11)
 	// enabled by default in v0.12.0 (2025-01),
-	// and deprecated in the upcoming v0.14 release.
+	// and deprecated in v0.14.0 (2025-08).
 	TopoSort bool `envflag:"deprecated,default:true"`
+
+	// EvalV3 enables the new CUE evaluator, addressing performance issues
+	// and bringing better algorithms for disjunctions, closedness, and cycles.
+	//
+	// This experiment was introduced in v0.9.0 (2024-06),
+	// enabled by default in v0.13.0 (2025-05),
+	// and deprecated in the upcoming v0.15 release.
+	EvalV3 bool `envflag:"deprecated,default:true"`
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

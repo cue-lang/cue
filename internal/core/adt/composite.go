@@ -852,9 +852,6 @@ func isFinal(v Value, isClosed bool) bool {
 	case *Vertex:
 		closed := isClosed || x.ClosedNonRecursive || x.ClosedRecursive
 
-		// TODO(evalv3): this is for V2 compatibility. Remove once V2 is gone.
-		closed = closed || x.IsClosedList() || x.IsClosedStruct()
-
 		// This also dereferences the value.
 		if v, ok := x.BaseValue.(Value); ok {
 			return isFinal(v, closed)

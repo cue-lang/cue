@@ -175,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e92733c_f48e32ea",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T11:12:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99cd5ede_51b678b9",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ed74397_1aef334f",
@@ -280,6 +298,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "043125f1_e720a3b7",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T11:12:12Z",
+      "side": 1,
+      "message": "Many thanks - I had been mildly irritated by this, but not sufficiently enough to actually do anything about it!",
+      "parentUuid": "d1cf9934_e80da0d6",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "178999b1_39e1e6bb",
@@ -310,6 +346,24 @@
       "writtenOn": "2025-08-06T15:44:07Z",
       "side": 1,
       "message": "nit: it\u0027s nice when the test name as printed by `go test` is a literal match for the test name as defined in the code; that makes it easier to copy/paste a search term for the test. In practice, that means avoiding spaces because they\u0027re translated to underscores.\n\nSo I\u0027d probably use names in this style (trying to keep your hierarchy intact)\n\n\n```suggestion\n\t\t\tname: \"Selector_Implicit_ViaRoot\",\n```",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ee1f1d4_d4067977",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T11:12:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "300f6750_5dc78c50",
       "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

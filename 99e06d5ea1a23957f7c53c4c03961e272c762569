@@ -837,6 +837,24 @@
       "parentUuid": "a5a074ef_175c6c8d",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f84ca40_ac5cb8de",
+        "filename": "internal/lsp/rangeset/rangeset.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T11:12:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5eba3077_37f7d4a6",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

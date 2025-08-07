@@ -880,10 +880,6 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 			// arcType be known at this point, but that does not seem to work.
 			// Revisit once we have the structural cycle detection in place.
 
-			// TODO: should we avoid notifying ArcPending vertices here?
-			if task != nil {
-				arcState.addNotify2(task.node.node, task.id)
-			}
 			if arc.ArcType == ArcPending {
 				return arcReturn
 			}

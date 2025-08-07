@@ -635,7 +635,7 @@ Retain: 0
 Unifications: 756
 Conjuncts:    1520
 Disjuncts:    84
-Notifications: 8
+Notifications: 7
 
 NumCloseIDs: 445
 
@@ -668,7 +668,7 @@ diff old new
 +Unifications: 756
 +Conjuncts:    1520
 +Disjuncts:    84
-+Notifications: 8
++Notifications: 7
 +
 +NumCloseIDs: 445
 +

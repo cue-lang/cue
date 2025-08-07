@@ -904,6 +904,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a38efab_11c518cc",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T15:37:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f35104f_7edb7686",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "84c1eecb_88b111b2",
@@ -917,6 +935,24 @@
       "writtenOn": "2025-08-06T15:44:07Z",
       "side": 1,
       "message": "Using an invalid identifier for the label seems... questionable, but maybe it\u0027s fine.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a53fef75_d37b8818",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T15:37:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84c1eecb_88b111b2",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -969,6 +1005,24 @@
       "writtenOn": "2025-08-06T15:44:07Z",
       "side": 1,
       "message": "What about the function (n.Fun) itself?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb011272_0dc9f768",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 604,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T15:37:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8e6cb4b_ae23ed71",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

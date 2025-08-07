@@ -77,8 +77,6 @@ type envComprehension struct {
 
 	// runtime-related fields
 
-	err *Bottom
-
 	// envs holds all the environments that define a single "yield" result in
 	// combination with the comprehension struct.
 	envs []*Environment // nil: unprocessed, non-nil: done.
@@ -98,8 +96,6 @@ type envYield struct {
 
 	// Values specific to the field corresponding to this envYield
 
-	// This envYield was added to selfComprehensions
-	self bool
 	// This envYield was successfully executed and the resulting conjuncts were
 	// added.
 	inserted bool

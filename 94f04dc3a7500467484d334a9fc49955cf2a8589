@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0ec451c_70f0d129",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-07T10:31:47Z",
+      "side": 1,
+      "message": "I prefer to remove only the things for now that really are a result of v2.",
+      "revId": "94f04dc3a7500467484d334a9fc49955cf2a8589",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

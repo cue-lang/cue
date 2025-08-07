@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "acf7a093_ddf86f12",
+        "filename": "internal/core/adt/validate_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-07T07:54:27Z",
+      "side": 1,
+      "message": "do you mean \"with\", given it\u0027s skipped without?",
+      "range": {
+        "startLine": 267,
+        "startChar": 39,
+        "endLine": 267,
+        "endChar": 46
+      },
+      "revId": "9f8df88538c3169ddc2d6d1ddcff5ba5b0bc3fb5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

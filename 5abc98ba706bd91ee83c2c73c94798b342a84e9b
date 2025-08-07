@@ -351,6 +351,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c5e2e03_4dec0549",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T15:52:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "178999b1_39e1e6bb",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "300f6750_5dc78c50",

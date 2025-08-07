@@ -1044,6 +1044,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a9c4ca2_1b999aea",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 763,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T15:52:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07fb79b2_d1fa6804",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5a074ef_175c6c8d",

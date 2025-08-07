@@ -104,6 +104,8 @@ Disjuncts:    73
 Errors:
 ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
     ./main.cue:6:12
+    ./main.cue:37:12
+    ./main.cue:49:7
     ./main.cue:50:19
 
 Result:
@@ -229,16 +231,22 @@ Result:
           end: (_|_){
             // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
             //     ./main.cue:6:12
+            //     ./main.cue:37:12
+            //     ./main.cue:49:7
             //     ./main.cue:50:19
           }
           duration: (_|_){
             // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
             //     ./main.cue:6:12
+            //     ./main.cue:37:12
+            //     ./main.cue:49:7
             //     ./main.cue:50:19
           }
           start: (_|_){
             // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
             //     ./main.cue:6:12
+            //     ./main.cue:37:12
+            //     ./main.cue:49:7
             //     ./main.cue:50:19
           }
         }
@@ -251,16 +259,22 @@ Result:
           end: (_|_){
             // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
             //     ./main.cue:6:12
+            //     ./main.cue:37:12
+            //     ./main.cue:49:7
             //     ./main.cue:50:19
           }
           duration: (_|_){
             // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
             //     ./main.cue:6:12
+            //     ./main.cue:37:12
+            //     ./main.cue:49:7
             //     ./main.cue:50:19
           }
           start: (_|_){
             // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
             //     ./main.cue:6:12
+            //     ./main.cue:37:12
+            //     ./main.cue:49:7
             //     ./main.cue:50:19
           }
         }
@@ -272,22 +286,30 @@ Result:
       start: (_|_){
         // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
         //     ./main.cue:6:12
+        //     ./main.cue:37:12
+        //     ./main.cue:49:7
         //     ./main.cue:50:19
       }
       duration: (_|_){
         // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
         //     ./main.cue:6:12
+        //     ./main.cue:37:12
+        //     ./main.cue:49:7
         //     ./main.cue:50:19
       }
       end: (_|_){
         // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
         //     ./main.cue:6:12
+        //     ./main.cue:37:12
+        //     ./main.cue:49:7
         //     ./main.cue:50:19
       }
     }
     tasks: (_|_){
       // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
       //     ./main.cue:6:12
+      //     ./main.cue:37:12
+      //     ./main.cue:49:7
       //     ./main.cue:50:19
     }
   }
@@ -296,17 +318,17 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,6 @@
+@@ -1,8 +1,7 @@
  Errors:
  ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
      ./main.cue:6:12
 -    ./main.cue:17:12
 -    ./main.cue:35:6
--    ./main.cue:49:7
++    ./main.cue:37:12
+     ./main.cue:49:7
      ./main.cue:50:19
  
- Result:
-@@ -11,36 +8,37 @@
+@@ -11,36 +10,37 @@
    // [eval]
    #TimeSpan: (#struct){
      start: (_|_){
@@ -365,7 +387,7 @@ diff old new
    }
    #TaskSet: (#struct){
      action: (string){ string }
-@@ -48,41 +46,38 @@
+@@ -48,41 +48,38 @@
      }
      tasks: (#list){
      }
@@ -435,7 +457,7 @@ diff old new
        }
      }
    }
-@@ -89,22 +84,33 @@
+@@ -89,22 +86,33 @@
    #T2: (#struct){
      action: (string){ "Task 2" }
      timeSpan: (#struct){
@@ -485,7 +507,7 @@ diff old new
        }
      }
    }
-@@ -113,66 +119,73 @@
+@@ -113,66 +121,93 @@
      action: (string){ "Task 1 and Task 2" }
      #tasks: (_|_){
        // [eval]
@@ -497,16 +519,22 @@ diff old new
 +          end: (_|_){
 +            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
 +            //     ./main.cue:6:12
++            //     ./main.cue:37:12
++            //     ./main.cue:49:7
 +            //     ./main.cue:50:19
 +          }
 +          duration: (_|_){
 +            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
 +            //     ./main.cue:6:12
++            //     ./main.cue:37:12
++            //     ./main.cue:49:7
 +            //     ./main.cue:50:19
 +          }
 +          start: (_|_){
 +            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
 +            //     ./main.cue:6:12
++            //     ./main.cue:37:12
++            //     ./main.cue:49:7
 +            //     ./main.cue:50:19
 +          }
 +        }
@@ -524,16 +552,22 @@ diff old new
 +          end: (_|_){
 +            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
 +            //     ./main.cue:6:12
++            //     ./main.cue:37:12
++            //     ./main.cue:49:7
 +            //     ./main.cue:50:19
 +          }
 +          duration: (_|_){
 +            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
 +            //     ./main.cue:6:12
++            //     ./main.cue:37:12
++            //     ./main.cue:49:7
 +            //     ./main.cue:50:19
 +          }
 +          start: (_|_){
 +            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
 +            //     ./main.cue:6:12
++            //     ./main.cue:37:12
++            //     ./main.cue:49:7
 +            //     ./main.cue:50:19
 +          }
 +        }
@@ -558,16 +592,22 @@ diff old new
 +      start: (_|_){
 +        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
 +        //     ./main.cue:6:12
++        //     ./main.cue:37:12
++        //     ./main.cue:49:7
 +        //     ./main.cue:50:19
 +      }
 +      duration: (_|_){
 +        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
 +        //     ./main.cue:6:12
++        //     ./main.cue:37:12
++        //     ./main.cue:49:7
 +        //     ./main.cue:50:19
 +      }
 +      end: (_|_){
 +        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
 +        //     ./main.cue:6:12
++        //     ./main.cue:37:12
++        //     ./main.cue:49:7
 +        //     ./main.cue:50:19
        }
      }
@@ -576,7 +616,8 @@ diff old new
        //     ./main.cue:6:12
 -      //     ./main.cue:17:12
 -      //     ./main.cue:35:6
--      //     ./main.cue:49:7
++      //     ./main.cue:37:12
+       //     ./main.cue:49:7
        //     ./main.cue:50:19
      }
 -    timeSpan: (_|_){

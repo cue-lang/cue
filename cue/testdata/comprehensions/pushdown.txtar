@@ -1002,7 +1002,9 @@ embed.fail4.p: field not allowed:
 issue3535.regular.foo.regular: field not allowed:
     ./issue3535.cue:22:4
 issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+    ./issue3729.cue:8:32
     ./issue3729.cue:9:9
+    ./issue3729.cue:10:2
     ./issue3729.cue:11:9
 noStackOverflowStructCycle.#list.tail: structural cycle
 noStackOverflowStructCycle.list.tail: structural cycle
@@ -1750,7 +1752,9 @@ Result:
       // [eval]
       root: (_|_){
         // [eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+        //     ./issue3729.cue:8:32
         //     ./issue3729.cue:9:9
+        //     ./issue3729.cue:10:2
         //     ./issue3729.cue:11:9
         #sub1?: (#struct){
           #sub2: (bool){ true }
@@ -1953,7 +1957,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,39 +1,19 @@
+@@ -1,25 +1,13 @@
  Errors:
  embed.fail1.p: field not allowed:
 -    ./in.cue:37:9
@@ -1976,9 +1980,11 @@ diff old new
      ./issue3535.cue:22:4
 -    ./issue3535.cue:25:7
  issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
++    ./issue3729.cue:8:32
      ./issue3729.cue:9:9
--    ./issue3729.cue:10:2
+     ./issue3729.cue:10:2
      ./issue3729.cue:11:9
+@@ -26,14 +14,8 @@
  noStackOverflowStructCycle.#list.tail: structural cycle
  noStackOverflowStructCycle.list.tail: structural cycle
  provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -1993,7 +1999,7 @@ diff old new
      ./in.cue:591:9
  fieldMismatch.a: cannot combine regular field "x" with 2:
      ./in.cue:152:7
-@@ -79,8 +59,8 @@
+@@ -79,8 +61,8 @@
    }
    fail: (struct){
      a: (_|_){
@@ -2004,7 +2010,7 @@ diff old new
      }
    }
    embed: (_|_){
-@@ -89,10 +69,6 @@
+@@ -89,10 +71,6 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail1.p: field not allowed:
@@ -2015,7 +2021,7 @@ diff old new
          //     ./in.cue:46:4
          //     ./in.cue:49:9
        }
-@@ -121,12 +97,11 @@
+@@ -121,12 +99,11 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail4.p: field not allowed:
@@ -2032,7 +2038,7 @@ diff old new
        }
      }
      #C4: (#struct){
-@@ -207,13 +182,10 @@
+@@ -207,13 +184,10 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -2050,7 +2056,7 @@ diff old new
      }
      t2: (_|_){
        // [eval]
-@@ -229,10 +201,7 @@
+@@ -229,10 +203,7 @@
            // [eval]
            d: (_|_){
              // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -2061,7 +2067,7 @@ diff old new
            }
          }
          b: (bool){ true }
-@@ -263,9 +232,22 @@
+@@ -263,9 +234,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -2087,7 +2093,7 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -279,24 +261,9 @@
+@@ -279,24 +263,9 @@
          }
        }
      }
@@ -2115,7 +2121,7 @@ diff old new
    }
    closedCheck: (struct){
      success1: (struct){
-@@ -399,13 +366,7 @@
+@@ -399,13 +368,7 @@
            }
          }
        }
@@ -2130,7 +2136,7 @@ diff old new
        #F: (#struct){
          e: (bool){ bool }
          f: (_|_){
-@@ -422,17 +383,11 @@
+@@ -422,17 +385,11 @@
          }
        }
        E: (_|_){
@@ -2149,7 +2155,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -443,17 +398,11 @@
+@@ -443,17 +400,11 @@
          }
        }
        E: (_|_){
@@ -2168,7 +2174,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -576,9 +525,6 @@
+@@ -576,9 +527,6 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -2178,7 +2184,7 @@ diff old new
              //     ./in.cue:591:9
            }
          }
-@@ -602,13 +548,13 @@
+@@ -602,13 +550,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -2196,7 +2202,7 @@ diff old new
          }
        }
      }
-@@ -645,9 +591,8 @@
+@@ -645,9 +593,8 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -2208,7 +2214,7 @@ diff old new
      }
    }
    errorPropagation: (_|_){
-@@ -705,10 +650,10 @@
+@@ -705,10 +652,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -2221,7 +2227,7 @@ diff old new
        }
      }
      regular: (_|_){
-@@ -721,16 +666,11 @@
+@@ -721,16 +668,11 @@
        foo: (_|_){
          // [eval]
          kind: (string){ "foo" }
@@ -2240,7 +2246,7 @@ diff old new
          }
        }
      }
-@@ -742,10 +682,10 @@
+@@ -742,10 +684,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -2253,15 +2259,15 @@ diff old new
        }
      }
    }
-@@ -816,7 +756,6 @@
+@@ -815,6 +757,7 @@
+       // [eval]
        root: (_|_){
          // [eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
++        //     ./issue3729.cue:8:32
          //     ./issue3729.cue:9:9
--        //     ./issue3729.cue:10:2
+         //     ./issue3729.cue:10:2
          //     ./issue3729.cue:11:9
-         #sub1?: (#struct){
-           #sub2: (bool){ true }
-@@ -864,14 +803,7 @@
+@@ -864,14 +807,7 @@
      }
      full: (struct){
        #Application: (#struct){
@@ -2277,7 +2283,7 @@ diff old new
        }
        #ApplicationSpec: (#struct){
          syncPolicy?: ((null|struct)){ |((null){ null }, (#struct){
-@@ -907,10 +839,10 @@
+@@ -907,10 +843,10 @@
    issue3935: (struct){
      reduced: (struct){
        out: (#struct){
@@ -2289,7 +2295,7 @@ diff old new
        }
        #A: (#struct){
          y: (#struct){
-@@ -928,14 +860,12 @@
+@@ -928,14 +864,12 @@
        out: (#struct){
          spec: (#struct){
            name: (string){ "foo" }
@@ -2306,7 +2312,7 @@ diff old new
        }
        #SchemaOther: (#struct){
          spec: (#struct){
-@@ -950,7 +880,7 @@
+@@ -950,7 +884,7 @@
            config!: (_){ _ }
          }
          namespace: (_|_){

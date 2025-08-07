@@ -60,9 +60,13 @@ Disjuncts:    68
 Errors:
 x: conflicting values 2 and 1:
     ./in.cue:20:14
+    ./in.cue:22:8
+    ./in.cue:26:8
     ./in.cue:26:19
 x: conflicting values 4 and 1:
     ./in.cue:20:14
+    ./in.cue:22:8
+    ./in.cue:26:8
     ./in.cue:26:23
 x: 2 errors in empty disjunction::
     ./in.cue:23:8
@@ -101,9 +105,13 @@ Result:
       err: (_|_){
         // [eval] x: conflicting values 2 and 1:
         //     ./in.cue:20:14
+        //     ./in.cue:22:8
+        //     ./in.cue:26:8
         //     ./in.cue:26:19
         // x: conflicting values 4 and 1:
         //     ./in.cue:20:14
+        //     ./in.cue:22:8
+        //     ./in.cue:26:8
         //     ./in.cue:26:23
         // x: 2 errors in empty disjunction::
         //     ./in.cue:23:8
@@ -124,11 +132,13 @@ Result:
         x: (_|_){
           // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
           //     ./in.cue:38:14
+          //     ./in.cue:40:8
           //     ./in.cue:43:6
         }
         out: (_|_){
           // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
           //     ./in.cue:38:14
+          //     ./in.cue:40:8
           //     ./in.cue:43:6
         }
       }
@@ -140,35 +150,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,13 +1,9 @@
- Errors:
- x: conflicting values 2 and 1:
-     ./in.cue:20:14
--    ./in.cue:22:8
--    ./in.cue:26:8
-     ./in.cue:26:19
- x: conflicting values 4 and 1:
-     ./in.cue:20:14
--    ./in.cue:22:8
--    ./in.cue:26:8
-     ./in.cue:26:23
- x: 2 errors in empty disjunction::
-     ./in.cue:23:8
-@@ -46,13 +42,9 @@
-       err: (_|_){
-         // [eval] x: conflicting values 2 and 1:
-         //     ./in.cue:20:14
--        //     ./in.cue:22:8
--        //     ./in.cue:26:8
-         //     ./in.cue:26:19
-         // x: conflicting values 4 and 1:
-         //     ./in.cue:20:14
--        //     ./in.cue:22:8
--        //     ./in.cue:26:8
-         //     ./in.cue:26:23
-         // x: 2 errors in empty disjunction::
-         //     ./in.cue:23:8
-@@ -71,15 +63,13 @@
+@@ -71,13 +71,13 @@
        let p#1 = (_|_){
          // [eval]
          x: (_|_){
@@ -179,18 +161,16 @@ diff old new
 -        }
 -        out: (_|_){
 -          // [eval] issue3977.inlineLet.p.x: conflicting values 2 and 1:
--          //     ./in.cue:38:14
--          //     ./in.cue:40:8
 +          // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
 +          //     ./in.cue:38:14
++          //     ./in.cue:40:8
 +          //     ./in.cue:43:6
 +        }
 +        out: (_|_){
 +          // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
-+          //     ./in.cue:38:14
+           //     ./in.cue:38:14
+           //     ./in.cue:40:8
            //     ./in.cue:43:6
-         }
-       }
 -- diff/explanation --
 evalv3 correctly fails on all places marked with "err"
 -- out/eval --

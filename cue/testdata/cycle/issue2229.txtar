@@ -42,6 +42,7 @@ issue2229: reduced_fail: X={
 Errors:
 conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
     ./in.cue:9:5
+    ./in.cue:9:24
     ./in.cue:9:28
 structural cycle:
     ./in.cue:9:24
@@ -65,6 +66,7 @@ Result:
       y: (_|_){
         // [eval] conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
         //     ./in.cue:9:5
+        //     ./in.cue:9:24
         //     ./in.cue:9:28
         // structural cycle:
         //     ./in.cue:9:24

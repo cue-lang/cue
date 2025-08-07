@@ -639,19 +639,25 @@ b12b.#list.tail: structural cycle
 b13.root.a.0.0: structural cycle
 b14.root.b.1.1: structural cycle
 b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
+    ./in.cue:55:5
     ./in.cue:55:12
     ./in.cue:56:8
+    ./in.cue:56:9
 b4.cond1.x.y.0: structural cycle
 b4.cond2.x.y.0: structural cycle
 b4.x.y.0: structural cycle
 b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
+    ./in.cue:94:5
     ./in.cue:94:13
     ./in.cue:94:14
+    ./in.cue:95:9
 b6.x.a.0: structural cycle
 b7.a.0: structural cycle
 b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
+    ./in.cue:99:5
     ./in.cue:99:11
     ./in.cue:100:5
+    ./in.cue:100:6
 c1.a.c.c: structural cycle
 d1.r: structural cycle
 d2.a.b.c.d.t: structural cycle
@@ -675,6 +681,7 @@ e4.a.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct
     ./in.cue:421:6
     ./in.cue:421:7
 e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
+    ./in.cue:420:6
     ./in.cue:420:10
     ./in.cue:421:6
 e4.b.0: 4 errors in empty disjunction:
@@ -687,23 +694,30 @@ e4.b.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct
     ./in.cue:423:7
 e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
     ./in.cue:423:6
+    ./in.cue:424:6
     ./in.cue:424:10
 issue2545.#B.A: structural cycle
 nestedList.v1e.y.0: 4 errors in empty disjunction:
 nestedList.v1e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
     ./in.cue:438:11
+    ./in.cue:439:6
     ./in.cue:439:11
 nestedList.v1e.y.0.0: 2 errors in empty disjunction:
 nestedList.v1e.y.0.0: conflicting values [2] and int (mismatched types list and int):
+    ./in.cue:438:7
     ./in.cue:438:11
+    ./in.cue:439:6
     ./in.cue:439:12
 nestedList.v2e.y.0: 4 errors in empty disjunction:
 nestedList.v2e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
+    ./in.cue:443:6
     ./in.cue:443:11
     ./in.cue:444:11
 nestedList.v2e.y.0.0: 2 errors in empty disjunction:
 nestedList.v2e.y.0.0: conflicting values [2] and int (mismatched types list and int):
+    ./in.cue:443:6
     ./in.cue:443:12
+    ./in.cue:444:7
     ./in.cue:444:11
 p2.#T.a.b.link: structural cycle
 p3.#U.#T.a.b.link: structural cycle
@@ -829,8 +843,10 @@ Result:
       // [eval]
       0: (_|_){
         // [eval] b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
+        //     ./in.cue:55:5
         //     ./in.cue:55:12
         //     ./in.cue:56:8
+        //     ./in.cue:56:9
         0: (_|_){// 〈1;y〉
         }
       }
@@ -900,8 +916,10 @@ Result:
         // [eval]
         0: (_|_){
           // [eval] b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
+          //     ./in.cue:94:5
           //     ./in.cue:94:13
           //     ./in.cue:94:14
+          //     ./in.cue:95:9
           0: (_|_){// 1 & 〈1;a〉
           }
         }
@@ -925,8 +943,10 @@ Result:
         // [eval]
         0: (_|_){
           // [eval] b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
+          //     ./in.cue:99:5
           //     ./in.cue:99:11
           //     ./in.cue:100:5
+          //     ./in.cue:100:6
           0: (_|_){// 〈1;a〉
           }
         }
@@ -1486,6 +1506,7 @@ Result:
         //     ./in.cue:421:6
         //     ./in.cue:421:7
         // e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
+        //     ./in.cue:420:6
         //     ./in.cue:420:10
         //     ./in.cue:421:6
         0: (struct){
@@ -1506,6 +1527,7 @@ Result:
         //     ./in.cue:423:7
         // e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
         //     ./in.cue:423:6
+        //     ./in.cue:424:6
         //     ./in.cue:424:10
         0: (struct){
           c: (int){ 1 }
@@ -1535,10 +1557,13 @@ Result:
           // [eval] nestedList.v1e.y.0: 4 errors in empty disjunction:
           // nestedList.v1e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
           //     ./in.cue:438:11
+          //     ./in.cue:439:6
           //     ./in.cue:439:11
           // nestedList.v1e.y.0.0: 2 errors in empty disjunction:
           // nestedList.v1e.y.0.0: conflicting values [2] and int (mismatched types list and int):
+          //     ./in.cue:438:7
           //     ./in.cue:438:11
+          //     ./in.cue:439:6
           //     ./in.cue:439:12
           // nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
           //     ./in.cue:438:6
@@ -1555,11 +1580,14 @@ Result:
         0: (_|_){
           // [eval] nestedList.v2e.y.0: 4 errors in empty disjunction:
           // nestedList.v2e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
+          //     ./in.cue:443:6
           //     ./in.cue:443:11
           //     ./in.cue:444:11
           // nestedList.v2e.y.0.0: 2 errors in empty disjunction:
           // nestedList.v2e.y.0.0: conflicting values [2] and int (mismatched types list and int):
+          //     ./in.cue:443:6
           //     ./in.cue:443:12
+          //     ./in.cue:444:7
           //     ./in.cue:444:11
           // nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
           //     ./in.cue:444:6
@@ -1803,27 +1831,30 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -4,22 +4,24 @@
+@@ -4,6 +4,11 @@
  b12b.#list.tail: structural cycle
  b13.root.a.0.0: structural cycle
  b14.root.b.1.1: structural cycle
 +b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
++    ./in.cue:55:5
 +    ./in.cue:55:12
 +    ./in.cue:56:8
++    ./in.cue:56:9
  b4.cond1.x.y.0: structural cycle
  b4.cond2.x.y.0: structural cycle
  b4.x.y.0: structural cycle
- b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
--    ./in.cue:94:5
+@@ -12,14 +17,17 @@
      ./in.cue:94:13
      ./in.cue:94:14
--    ./in.cue:95:9
+     ./in.cue:95:9
 -b6.b.a.0.0: structural cycle
  b6.x.a.0: structural cycle
  b7.a.0: structural cycle
 +b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
++    ./in.cue:99:5
 +    ./in.cue:99:11
 +    ./in.cue:100:5
++    ./in.cue:100:6
  c1.a.c.c: structural cycle
 -d1.a.b.c.d.t: structural cycle
 +d1.r: structural cycle
@@ -1834,7 +1865,7 @@ diff old new
  e1.a.c: structural cycle
  e1.b.c: structural cycle
  e2.a.c: structural cycle
-@@ -27,21 +29,18 @@
+@@ -27,18 +35,16 @@
  e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
      ./in.cue:412:5
      ./in.cue:413:5
@@ -1854,11 +1885,8 @@ diff old new
 +    ./in.cue:421:6
      ./in.cue:421:7
  e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
--    ./in.cue:420:6
-     ./in.cue:420:10
-     ./in.cue:421:6
- e4.b.0: 4 errors in empty disjunction:
-@@ -49,48 +48,45 @@
+     ./in.cue:420:6
+@@ -49,9 +55,9 @@
      ./in.cue:423:6
      ./in.cue:424:10
  e4.b.0.0: 2 errors in empty disjunction:
@@ -1869,31 +1897,41 @@ diff old new
 -    ./in.cue:424:5
  e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
      ./in.cue:423:6
--    ./in.cue:424:6
+     ./in.cue:424:6
+@@ -58,39 +64,43 @@
      ./in.cue:424:10
  issue2545.#B.A: structural cycle
  nestedList.v1e.y.0: 4 errors in empty disjunction:
 -nestedList.v1e.y.0: conflicting values int and [[2],1] (mismatched types int and list):
+-    ./in.cue:438:11
 +nestedList.v1e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
-     ./in.cue:438:11
++    ./in.cue:438:11
++    ./in.cue:439:6
      ./in.cue:439:11
  nestedList.v1e.y.0.0: 2 errors in empty disjunction:
 -nestedList.v1e.y.0.0: conflicting values int and [2] (mismatched types int and list):
+-    ./in.cue:438:11
 +nestedList.v1e.y.0.0: conflicting values [2] and int (mismatched types list and int):
-     ./in.cue:438:11
++    ./in.cue:438:7
++    ./in.cue:438:11
++    ./in.cue:439:6
      ./in.cue:439:12
 -nestedList.v1e.y.0.0: incompatible list lengths (1 and 2)
  nestedList.v2e.y.0: 4 errors in empty disjunction:
 -nestedList.v2e.y.0: conflicting values int and [[2],1] (mismatched types int and list):
 +nestedList.v2e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
++    ./in.cue:443:6
      ./in.cue:443:11
      ./in.cue:444:11
  nestedList.v2e.y.0.0: 2 errors in empty disjunction:
 -nestedList.v2e.y.0.0: conflicting values int and [2] (mismatched types int and list):
 +nestedList.v2e.y.0.0: conflicting values [2] and int (mismatched types list and int):
++    ./in.cue:443:6
      ./in.cue:443:12
-     ./in.cue:444:11
+-    ./in.cue:444:11
 -nestedList.v2e.y.0.0: incompatible list lengths (1 and 2)
++    ./in.cue:444:7
++    ./in.cue:444:11
  p2.#T.a.b.link: structural cycle
  p3.#U.#T.a.b.link: structural cycle
  p5.#T.a.0.link: structural cycle
@@ -1921,7 +1959,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -101,13 +97,9 @@
+@@ -101,13 +111,9 @@
        // [structural cycle]
        X: (_|_){
          // [structural cycle]
@@ -1938,7 +1976,7 @@ diff old new
          }
        }
      }
-@@ -161,10 +153,7 @@
+@@ -161,10 +167,7 @@
    a7: (struct){
      a: (string){ "foo" }
      b: (struct){
@@ -1950,7 +1988,7 @@ diff old new
        y: (string){ "foo" }
      }
      c: (struct){
-@@ -201,11 +190,15 @@
+@@ -201,11 +204,17 @@
      }
    }
    b4: (_|_){
@@ -1964,28 +2002,26 @@ diff old new
 +      // [eval]
 +      0: (_|_){
 +        // [eval] b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
++        //     ./in.cue:55:5
 +        //     ./in.cue:55:12
 +        //     ./in.cue:56:8
++        //     ./in.cue:56:9
 +        0: (_|_){// 〈1;y〉
 +        }
        }
      }
      x: (_|_){
-@@ -273,12 +266,9 @@
-         // [eval]
-         0: (_|_){
-           // [eval] b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
--          //     ./in.cue:94:5
+@@ -277,8 +286,7 @@
            //     ./in.cue:94:13
            //     ./in.cue:94:14
--          //     ./in.cue:95:9
+           //     ./in.cue:95:9
 -          0: (_|_){
 -            // [structural cycle] b6.b.a.0.0: structural cycle
 +          0: (_|_){// 1 & 〈1;a〉
            }
          }
        }
-@@ -294,11 +284,18 @@
+@@ -294,11 +302,20 @@
      }
    }
    b7: (_|_){
@@ -2001,15 +2037,17 @@ diff old new
 +        // [eval]
 +        0: (_|_){
 +          // [eval] b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
++          //     ./in.cue:99:5
 +          //     ./in.cue:99:11
 +          //     ./in.cue:100:5
++          //     ./in.cue:100:6
 +          0: (_|_){// 〈1;a〉
 +          }
 +        }
        }
      }
      a: (_|_){
-@@ -309,9 +306,7 @@
+@@ -309,9 +326,7 @@
      }
    }
    b8: (struct){
@@ -2020,7 +2058,7 @@ diff old new
      a: (struct){
        f: (string){ string }
      }
-@@ -337,7 +332,7 @@
+@@ -337,7 +352,7 @@
      #ref: (#struct){
        ref: (string){ string }
      }
@@ -2029,7 +2067,7 @@ diff old new
          c: (#list){
            0: ((string|struct)){ |((string){ string }, (#struct){
                ref: (string){ string }
-@@ -360,7 +355,13 @@
+@@ -360,7 +375,13 @@
          }) }
      }
      c: (#struct){
@@ -2044,7 +2082,7 @@ diff old new
      }
      d: (struct){
        d: (struct){
-@@ -370,9 +371,7 @@
+@@ -370,9 +391,7 @@
    }
    b11: (struct){
      #list: (#struct){
@@ -2055,7 +2093,7 @@ diff old new
      }
    }
    b12: (struct){
-@@ -389,7 +388,11 @@
+@@ -389,7 +408,11 @@
            value: (int){ 3 }
            tail: (#struct){
              value: (int){ 4 }
@@ -2068,7 +2106,7 @@ diff old new
              sum: (int){ 4 }
            }
            sum: (int){ 7 }
-@@ -461,10 +464,7 @@
+@@ -461,10 +484,7 @@
            link: (#struct){
              a: (#struct){
                two: (#struct){
@@ -2080,7 +2118,7 @@ diff old new
                }
              }
            }
-@@ -538,10 +538,7 @@
+@@ -538,10 +558,7 @@
            link: (#struct){
              a: (#list){
                0: (#struct){
@@ -2092,7 +2130,7 @@ diff old new
                }
              }
            }
-@@ -632,47 +629,27 @@
+@@ -632,47 +649,27 @@
              // [structural cycle]
              h: (int){ int }
              t: (_|_){
@@ -2157,7 +2195,7 @@ diff old new
          c: (_|_){
            // [structural cycle]
            d: (_|_){
-@@ -699,28 +676,25 @@
+@@ -699,28 +696,25 @@
      }
      x: (_|_){
        // [structural cycle]
@@ -2191,7 +2229,7 @@ diff old new
        #List: (#struct){
          Next: (null){ null }
        }
-@@ -729,9 +703,7 @@
+@@ -729,9 +723,7 @@
        // [structural cycle]
        t1: (struct){
          #Foo: (#struct){
@@ -2202,7 +2240,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -739,10 +711,7 @@
+@@ -739,10 +731,7 @@
          Foo: (_|_){
            // [structural cycle]
            ref: (_|_){
@@ -2214,7 +2252,7 @@ diff old new
            }
          }
        }
-@@ -749,9 +718,7 @@
+@@ -749,9 +738,7 @@
      }
      comprehension: (struct){
        #list: (#struct){
@@ -2225,7 +2263,7 @@ diff old new
        }
      }
    }
-@@ -777,8 +744,7 @@
+@@ -777,8 +764,7 @@
        }
      }
      let _schema_1#1 = (_|_){
@@ -2235,7 +2273,7 @@ diff old new
      }
    }
    fieldsSumInfinite: (_|_){
-@@ -789,7 +755,8 @@
+@@ -789,7 +775,8 @@
        fries: (float){ 2.00 }
        sprite: (float){ 1.00 }
        total: (_|_){
@@ -2245,7 +2283,7 @@ diff old new
        }
      }
    }
-@@ -804,9 +771,7 @@
+@@ -804,9 +791,7 @@
        head: (int){ 3 }
        tail: (struct){
          head: (int){ 2 }
@@ -2256,7 +2294,7 @@ diff old new
        }
      }
    }
-@@ -813,12 +778,7 @@
+@@ -813,12 +798,7 @@
    issue2545: (_|_){
      // [structural cycle]
      #A: (#struct){
@@ -2270,7 +2308,7 @@ diff old new
      }
      #B: (_|_){
        // [structural cycle]
-@@ -863,11 +823,9 @@
+@@ -863,11 +843,9 @@
        // [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
        //     ./in.cue:412:5
        //     ./in.cue:413:5
@@ -2285,7 +2323,7 @@ diff old new
        }
      }
      b: (_|_){
-@@ -874,11 +832,9 @@
+@@ -874,11 +852,9 @@
        // [eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
        //     ./in.cue:415:5
        //     ./in.cue:416:5
@@ -2300,7 +2338,7 @@ diff old new
        }
      }
    }
-@@ -892,11 +848,10 @@
+@@ -892,8 +868,8 @@
          //     ./in.cue:420:10
          //     ./in.cue:421:6
          // e4.a.0.0: 2 errors in empty disjunction:
@@ -2310,11 +2348,8 @@ diff old new
 +        //     ./in.cue:421:6
          //     ./in.cue:421:7
          // e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
--        //     ./in.cue:420:6
-         //     ./in.cue:420:10
-         //     ./in.cue:421:6
-         0: (struct){
-@@ -912,12 +867,11 @@
+         //     ./in.cue:420:6
+@@ -912,9 +888,9 @@
          //     ./in.cue:423:6
          //     ./in.cue:424:10
          // e4.b.0.0: 2 errors in empty disjunction:
@@ -2325,22 +2360,24 @@ diff old new
 -        //     ./in.cue:424:5
          // e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
          //     ./in.cue:423:6
--        //     ./in.cue:424:6
-         //     ./in.cue:424:10
-         0: (struct){
-           c: (int){ 1 }
-@@ -945,17 +899,16 @@
+         //     ./in.cue:424:6
+@@ -945,17 +921,19 @@
          // [eval]
          0: (_|_){
            // [eval] nestedList.v1e.y.0: 4 errors in empty disjunction:
 -          // nestedList.v1e.y.0: conflicting values int and [[2],1] (mismatched types int and list):
+-          //     ./in.cue:438:11
 +          // nestedList.v1e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
-           //     ./in.cue:438:11
++          //     ./in.cue:438:11
++          //     ./in.cue:439:6
            //     ./in.cue:439:11
            // nestedList.v1e.y.0.0: 2 errors in empty disjunction:
 -          // nestedList.v1e.y.0.0: conflicting values int and [2] (mismatched types int and list):
+-          //     ./in.cue:438:11
 +          // nestedList.v1e.y.0.0: conflicting values [2] and int (mismatched types list and int):
-           //     ./in.cue:438:11
++          //     ./in.cue:438:7
++          //     ./in.cue:438:11
++          //     ./in.cue:439:6
            //     ./in.cue:439:12
 -          // nestedList.v1e.y.0.0: incompatible list lengths (1 and 2)
 -          0: (#list){
@@ -2352,30 +2389,34 @@ diff old new
            1: (int){ 1 }
          }
          1: (int){ 1 }
-@@ -967,17 +920,16 @@
+@@ -967,17 +945,19 @@
          // [eval]
          0: (_|_){
            // [eval] nestedList.v2e.y.0: 4 errors in empty disjunction:
 -          // nestedList.v2e.y.0: conflicting values int and [[2],1] (mismatched types int and list):
 +          // nestedList.v2e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
++          //     ./in.cue:443:6
            //     ./in.cue:443:11
            //     ./in.cue:444:11
            // nestedList.v2e.y.0.0: 2 errors in empty disjunction:
 -          // nestedList.v2e.y.0.0: conflicting values int and [2] (mismatched types int and list):
 +          // nestedList.v2e.y.0.0: conflicting values [2] and int (mismatched types list and int):
++          //     ./in.cue:443:6
            //     ./in.cue:443:12
-           //     ./in.cue:444:11
+-          //     ./in.cue:444:11
 -          // nestedList.v2e.y.0.0: incompatible list lengths (1 and 2)
 -          0: (#list){
 -            0: (int){ 2 }
 -          }
++          //     ./in.cue:444:7
++          //     ./in.cue:444:11
 +          // nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
 +          //     ./in.cue:444:6
 +          0: (list){ list }
            1: (int){ 1 }
          }
          1: (int){ 1 }
-@@ -1031,7 +983,10 @@
+@@ -1031,7 +1011,10 @@
          head: (int){ 3 }
          tail: (struct){
            head: (int){ 4 }
@@ -2387,7 +2428,7 @@ diff old new
          }
        }
      }
-@@ -1045,7 +1000,10 @@
+@@ -1045,7 +1028,10 @@
        head: (int){ 2 }
        tail: (struct){
          head: (int){ 3 }
@@ -2399,7 +2440,7 @@ diff old new
        }
      }
    }
-@@ -1059,8 +1017,12 @@
+@@ -1059,8 +1045,12 @@
        head: (int){ 2 }
        tail: (struct){ |((struct){
            head: (int){ 3 }
@@ -2414,7 +2455,7 @@ diff old new
          }, (struct){
            head: (int){ 3 }
          }) }
-@@ -1082,9 +1044,7 @@
+@@ -1082,9 +1072,7 @@
        // [structural cycle]
        f: (_|_){
          // [structural cycle]
@@ -2425,7 +2466,7 @@ diff old new
        }
        g: (_|_){
          // [structural cycle]
-@@ -1105,10 +1065,7 @@
+@@ -1105,10 +1093,7 @@
            x: (_){ _ }
            y: (_){ _ }
          }
@@ -2437,7 +2478,7 @@ diff old new
        }
      }
      t2: (struct){
-@@ -1121,10 +1078,7 @@
+@@ -1121,10 +1106,7 @@
            x: (_){ _ }
            y: (_){ _ }
          }
@@ -2449,7 +2490,7 @@ diff old new
        }
      }
      t3: (struct){
-@@ -1139,16 +1093,8 @@
+@@ -1139,16 +1121,8 @@
            y: (_){ _ }
            z: (_){ _ }
          }
@@ -2468,7 +2509,7 @@ diff old new
        }
      }
      t4: (struct){
-@@ -1164,51 +1110,11 @@
+@@ -1164,51 +1138,11 @@
              y: (_){ _ }
              z: (_){ _ }
            }
@@ -2525,7 +2566,7 @@ diff old new
        }
      }
      t5: (struct){
-@@ -1219,18 +1125,8 @@
+@@ -1219,18 +1153,8 @@
          }
        }
        C: (struct){
@@ -2546,7 +2587,7 @@ diff old new
        }
      }
    }
-@@ -1253,19 +1149,19 @@
+@@ -1253,19 +1177,19 @@
      }
    }
    n4: (struct){

@@ -74,6 +74,7 @@ module: conflicting values 123 and "" (mismatched types int and string):
     cuelang.org/go/mod/modfile/schema.cue:56:22
 module: conflicting values 123 and string (mismatched types int and string):
     $CWD/testdata/badmod/cue.mod/module.cue:2:9
+    cuelang.org/go/mod/modfile/schema.cue:56:12
     cuelang.org/go/mod/modfile/schema.cue:98:12
 path:   ""
 module: ""

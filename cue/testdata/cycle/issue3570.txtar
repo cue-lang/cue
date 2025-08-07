@@ -19,9 +19,11 @@ Errors:
 conflicting values 25 and {foo:(25|44)} (mismatched types int and struct):
     ./in.cue:1:6
     ./in.cue:1:11
+    ./in.cue:2:1
 conflicting values 44 and {foo:(25|44)} (mismatched types int and struct):
     ./in.cue:1:6
     ./in.cue:1:16
+    ./in.cue:2:1
 
 Result:
 (_|_){
@@ -29,9 +31,11 @@ Result:
   // conflicting values 25 and {foo:(25|44)} (mismatched types int and struct):
   //     ./in.cue:1:6
   //     ./in.cue:1:11
+  //     ./in.cue:2:1
   // conflicting values 44 and {foo:(25|44)} (mismatched types int and struct):
   //     ./in.cue:1:6
   //     ./in.cue:1:16
+  //     ./in.cue:2:1
   foo: (struct){
     foo: (_){ _ }
   }

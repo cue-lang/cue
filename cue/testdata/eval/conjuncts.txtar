@@ -84,7 +84,10 @@ NumCloseIDs: 43
 -- out/evalalpha --
 Errors:
 param: conflicting values [{}] and "foo" (mismatched types list and string):
+    ./issue2351.cue:1:17
     ./issue2351.cue:2:15
+    ./issue2351.cue:3:2
+    ./issue2351.cue:4:10
     ./issue2351.cue:4:19
 
 Result:
@@ -120,7 +123,10 @@ Result:
     // [eval]
     let: (_|_){
       // [eval] param: conflicting values [{}] and "foo" (mismatched types list and string):
+      //     ./issue2351.cue:1:17
       //     ./issue2351.cue:2:15
+      //     ./issue2351.cue:3:2
+      //     ./issue2351.cue:4:10
       //     ./issue2351.cue:4:19
       let _param#1 = (string){ "foo" }
     }
@@ -188,16 +194,18 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,6 @@
+@@ -1,7 +1,9 @@
  Errors:
 -issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
 +param: conflicting values [{}] and "foo" (mismatched types list and string):
++    ./issue2351.cue:1:17
      ./issue2351.cue:2:15
--    ./issue2351.cue:3:2
+     ./issue2351.cue:3:2
++    ./issue2351.cue:4:10
      ./issue2351.cue:4:19
  
  Result:
-@@ -22,14 +21,13 @@
+@@ -22,14 +24,13 @@
          string
          #early: (string){ |(*(string){ "X" }, (string){ string }) }
        }) }
@@ -219,18 +227,20 @@ diff old new
    }
    handleComprehensions: (struct){
      #sub2: (int){ 2 }
-@@ -37,9 +35,8 @@
+@@ -37,9 +38,11 @@
    issue2351: (_|_){
      // [eval]
      let: (_|_){
 -      // [eval] issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
 +      // [eval] param: conflicting values [{}] and "foo" (mismatched types list and string):
++      //     ./issue2351.cue:1:17
        //     ./issue2351.cue:2:15
--      //     ./issue2351.cue:3:2
+       //     ./issue2351.cue:3:2
++      //     ./issue2351.cue:4:10
        //     ./issue2351.cue:4:19
        let _param#1 = (string){ "foo" }
      }
-@@ -67,7 +64,7 @@
+@@ -67,7 +70,7 @@
          }
        }
      }

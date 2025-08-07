@@ -61,7 +61,9 @@ NumCloseIDs: 7
 Errors:
 conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
     ./in.cue:36:9
+    ./in.cue:39:5
     ./in.cue:40:3
+    ./in.cue:41:9
 circularFor.#list: cannot range over tail != null (found bool, want list or struct):
     ./in.cue:12:12
 intField: integer fields not supported:
@@ -101,7 +103,9 @@ Result:
       age: (_|_){
         // [eval] conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
         //     ./in.cue:36:9
+        //     ./in.cue:39:5
         //     ./in.cue:40:3
+        //     ./in.cue:41:9
       }
     }
   }
@@ -110,15 +114,15 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,7 +2,6 @@
+@@ -1,6 +1,7 @@
+ Errors:
  conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
      ./in.cue:36:9
++    ./in.cue:39:5
      ./in.cue:40:3
--    ./in.cue:41:9
+     ./in.cue:41:9
  circularFor.#list: cannot range over tail != null (found bool, want list or struct):
-     ./in.cue:12:12
- intField: integer fields not supported:
-@@ -13,9 +12,7 @@
+@@ -13,9 +14,7 @@
    // [eval]
    circularIf: (struct){
      #list: (#struct){
@@ -129,7 +133,7 @@ diff old new
      }
    }
    circularFor: (_|_){
-@@ -35,10 +32,6 @@
+@@ -35,10 +34,6 @@
    intField: (_|_){
      // [eval] intField: integer fields not supported:
      //     ./in.cue:27:4
@@ -140,14 +144,14 @@ diff old new
    }
    conflictRangingOverSelf: (_|_){
      // [eval]
-@@ -49,7 +42,6 @@
+@@ -48,6 +43,7 @@
+       age: (_|_){
          // [eval] conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
          //     ./in.cue:36:9
++        //     ./in.cue:39:5
          //     ./in.cue:40:3
--        //     ./in.cue:41:9
+         //     ./in.cue:41:9
        }
-     }
-   }
 -- diff/todo/p2 --
 Missing error message.
 -- out/eval --

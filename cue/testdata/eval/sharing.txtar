@@ -286,6 +286,7 @@ shareCycle.t1.Y.x.x: structural cycle
 shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
     ./sharecycle.cue:8:6
     ./sharecycle.cue:9:5
+    ./sharecycle.cue:10:11
 shareCycle.t3.Y.x.x: structural cycle
 
 Result:
@@ -650,6 +651,7 @@ Result:
           // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
           //     ./sharecycle.cue:8:6
           //     ./sharecycle.cue:9:5
+          //     ./sharecycle.cue:10:11
           x: (_|_){// (〈1;#X〉 & 〈1;Y〉)
           }
         }
@@ -675,16 +677,15 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -3,8 +3,6 @@
- shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
+@@ -4,7 +4,6 @@
      ./sharecycle.cue:8:6
      ./sharecycle.cue:9:5
--    ./sharecycle.cue:10:11
+     ./sharecycle.cue:10:11
 -shareCycle.t2.Y.x.x: structural cycle
  shareCycle.t3.Y.x.x: structural cycle
  
  Result:
-@@ -27,102 +25,75 @@
+@@ -27,102 +26,75 @@
            }
          }
          #Config1: (#struct){
@@ -856,7 +857,7 @@ diff old new
          }
          Config: (#struct){
            cfg: (#struct){
-@@ -148,24 +119,13 @@
+@@ -148,24 +120,13 @@
          }
        }
        #Config1: (#struct){
@@ -884,7 +885,7 @@ diff old new
        }
        #Config: (#struct){
          cfg: (#struct){
-@@ -173,12 +133,7 @@
+@@ -173,12 +134,7 @@
            }
          }
        }
@@ -898,7 +899,7 @@ diff old new
        out: (#struct){
          sch: (#struct){
            cfg: (#struct){
-@@ -247,9 +202,7 @@
+@@ -247,9 +203,7 @@
    }
    debug: (struct){
      sharingOn: (struct){
@@ -909,7 +910,7 @@ diff old new
        b: (struct){
          c: (int){ 1 }
        }
-@@ -293,14 +246,12 @@
+@@ -293,14 +247,12 @@
            name: (string){ "foo" }
          }, (null){ null }) }
        let _inputList#2 = (#list){
@@ -930,7 +931,7 @@ diff old new
        }
        _template: (struct){
          input: (struct){
-@@ -324,14 +275,14 @@
+@@ -324,14 +276,14 @@
            name: (string){ "foo" }
          }, (null){ null }) }
        let _inputList#3 = (#list){
@@ -953,7 +954,7 @@ diff old new
        }
        _template: (struct){
          input: (struct){
-@@ -345,9 +296,13 @@
+@@ -345,9 +297,13 @@
        }
        foo: (struct){
          input: (struct){
@@ -970,7 +971,7 @@ diff old new
        }
      }
    }
-@@ -356,17 +311,13 @@
+@@ -356,17 +312,13 @@
        a: (struct){
          b: (struct){
            c: (struct){
@@ -994,7 +995,7 @@ diff old new
        }
        Y: (struct){
          c: (struct){
-@@ -384,10 +335,7 @@
+@@ -384,10 +336,7 @@
        }
      }
      #Deployment: (#struct){
@@ -1006,11 +1007,10 @@ diff old new
      }
      #ObjectMeta: (#struct){
        name?: (#struct){
-@@ -419,9 +367,7 @@
-           // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
+@@ -420,8 +369,7 @@
            //     ./sharecycle.cue:8:6
            //     ./sharecycle.cue:9:5
--          //     ./sharecycle.cue:10:11
+           //     ./sharecycle.cue:10:11
 -          x: (_|_){
 -            // [structural cycle] shareCycle.t2.Y.x.x: structural cycle
 +          x: (_|_){// (〈1;#X〉 & 〈1;Y〉)

@@ -490,6 +490,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "925fa490_d7b5236e",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T12:29:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46c2c4e6_899739d5",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3b78d624_a2f1ad6d",
@@ -530,6 +548,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c83f0e53_68f77037",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T12:29:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be933cff_e8a9dd73",
+      "range": {
+        "startLine": 321,
+        "startChar": 0,
+        "endLine": 325,
+        "endChar": 0
+      },
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b92e30c9_0cfe3652",
@@ -543,6 +585,24 @@
       "writtenOn": "2025-08-06T15:44:07Z",
       "side": 1,
       "message": "```suggestion\n// FileDefinitions provides methods to resolve file offsets within a\n```",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd02bce6_db877cbe",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T12:29:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b92e30c9_0cfe3652",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -564,6 +624,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c2e1915_0fa5d6cd",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T12:29:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5f723c6_d756b55c",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e69e0cd9_379dc4ed",
@@ -577,6 +655,24 @@
       "writtenOn": "2025-08-06T15:44:07Z",
       "side": 1,
       "message": "Maybe document that this is indexed by file offset.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fb8104b_7f6365c1",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T12:29:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e69e0cd9_379dc4ed",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -598,6 +694,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c25ee6e3_8c3e564a",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T12:29:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "431830b7_5a225075",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cfcc34dd_3b9568d8",
@@ -611,6 +725,24 @@
       "writtenOn": "2025-08-06T15:44:07Z",
       "side": 1,
       "message": "debugging remnant?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6dd6e5ca_e2cd6a4a",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T12:29:52Z",
+      "side": 1,
+      "message": "Yes. I am very happy to remove. But this is also the most sensible place to call dump, and I\u0027m not sure that that\u0027s obvious, which is why I left this here. Your call.",
+      "parentUuid": "cfcc34dd_3b9568d8",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -702,6 +834,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8264b00c_4fa2f175",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T12:29:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa464a85_41e76091",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e20e14f_5bcbd58b",
@@ -715,6 +865,24 @@
       "writtenOn": "2025-08-06T15:44:07Z",
       "side": 1,
       "message": "called before? called after?",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a167642b_bf1b1119",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T12:29:52Z",
+      "side": 1,
+      "message": "Just testing. Done.",
+      "parentUuid": "6e20e14f_5bcbd58b",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -766,6 +934,24 @@
       "writtenOn": "2025-08-06T15:44:07Z",
       "side": 1,
       "message": "or just omit.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41b2487e_f4d4b40c",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-07T12:29:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b1e2372d_c089897d",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

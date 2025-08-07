@@ -31,26 +31,13 @@ Unifications: 19
 Conjuncts:    29
 Disjuncts:    23
 -- out/evalalpha --
-Errors:
-chained.x: conflicting values "foo" and {a.b:"foo",x.hello:"true",a:{b:"hello"}} (mismatched types string and struct):
-    ./evalv3regress.cue:1:13
-    ./evalv3regress.cue:2:9
-
-Result:
-(_|_){
-  // [eval]
-  chained: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval] chained.x: conflicting values "foo" and {a.b:"foo",x.hello:"true",a:{b:"hello"}} (mismatched types string and struct):
-      //     ./evalv3regress.cue:1:13
-      //     ./evalv3regress.cue:2:9
-      a: (_|_){
-        // [cycle] cycle error
+(struct){
+  chained: (struct){
+    x: (struct){
+      a: (struct){
+        b: (string){ "hello" }
       }
-      hello: (_|_){
-        // [cycle] cycle error
-      }
+      hello: (string){ "foo" }
     }
   }
   #A: (#struct){
@@ -86,28 +73,14 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,25 @@
--(struct){
-+Errors:
-+chained.x: conflicting values "foo" and {a.b:"foo",x.hello:"true",a:{b:"hello"}} (mismatched types string and struct):
-+    ./evalv3regress.cue:1:13
-+    ./evalv3regress.cue:2:9
-+
-+Result:
-+(_|_){
-+  // [eval]
-+  chained: (_|_){
-+    // [eval]
-+    x: (_|_){
-+      // [eval] chained.x: conflicting values "foo" and {a.b:"foo",x.hello:"true",a:{b:"hello"}} (mismatched types string and struct):
-+      //     ./evalv3regress.cue:1:13
-+      //     ./evalv3regress.cue:2:9
-+      a: (_|_){
-+        // [cycle] cycle error
+@@ -1,4 +1,12 @@
+ (struct){
++  chained: (struct){
++    x: (struct){
++      a: (struct){
++        b: (string){ "hello" }
 +      }
-+      hello: (_|_){
-+        // [cycle] cycle error
-+      }
++      hello: (string){ "foo" }
 +    }
 +  }
    #A: (#struct){

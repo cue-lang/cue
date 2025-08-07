@@ -73,12 +73,20 @@ type validator struct {
 	err          *Bottom
 	inDefinition int
 
+	sharedPositions []Node
+
 	// shared vertices should be visited at least once if referenced by
 	// a non-definition.
 	// TODO: we could also keep track of the number of references to a
 	// shared vertex. This would allow us to report more than a single error
 	// per shared vertex.
 	visited map[*Vertex]bool
+}
+
+func (v *validator) addPositions(err *ValueError) {
+	for _, p := range v.sharedPositions {
+		err.AddPosition(p)
+	}
 }
 
 func (v *validator) checkConcrete() bool {
@@ -104,6 +112,17 @@ func (v *validator) validate(x *Vertex) {
 
 	y := x
 
+	if x.IsShared {
+		saved := v.sharedPositions
+		// assume there is always a single conjunct: multiple references either
+		// result in the same shared value, or no sharing. And there has to be
+		// at least one to be able to share in the first place.
+		c, n := x.SingleConjunct()
+		if n >= 1 {
+			v.sharedPositions = append(v.sharedPositions, c.Elem())
+		}
+		defer func() { v.sharedPositions = saved }()
+	}
 	// Dereference values, but only those that are not shared. This includes let
 	// values. This prevents us from processing structure-shared nodes more than
 	// once and prevents potential cycles.
@@ -146,9 +165,11 @@ func (v *validator) validate(x *Vertex) {
 		x = x.Default()
 		if !IsConcrete(x) {
 			x := x.Value()
+			err := v.ctx.Newf("incomplete value %v", x)
+			v.addPositions(err)
 			v.add(&Bottom{
 				Code: IncompleteError,
-				Err:  v.ctx.Newf("incomplete value %v", x),
+				Err:  err,
 			})
 		}
 	}
@@ -156,7 +177,7 @@ func (v *validator) validate(x *Vertex) {
 	for _, a := range x.Arcs {
 		if a.ArcType == ArcRequired && v.Final && v.inDefinition == 0 {
 			v.ctx.PushArcAndLabel(a)
-			v.add(NewRequiredNotPresentError(v.ctx, a))
+			v.add(NewRequiredNotPresentError(v.ctx, a, v.sharedPositions...))
 			v.ctx.PopArcAndLabel(a)
 			continue
 		}

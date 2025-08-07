@@ -1003,10 +1003,7 @@ func (v Value) Pos() token.Pos {
 			return true
 		}
 		p = pp
-		// Prefer struct conjuncts with actual fields.
-		if s, ok := x.(*adt.StructLit); ok && len(s.Fields) > 0 {
-			return false
-		}
+		// TODO: Prefer struct conjuncts with actual fields.
 		return true
 	})
 	return p

@@ -337,7 +337,6 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 
 	ciKey := closeInfo
 	ciKey.Refs = nil
-	ciKey.Inline = false
 	// No need to key on CloseInfo with evalv3.
 	ciKey = CloseInfo{}
 

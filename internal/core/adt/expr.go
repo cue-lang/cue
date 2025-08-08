@@ -334,12 +334,9 @@ func (x *ListMarker) Kind() Kind       { return ListKind }
 func (x *ListMarker) node()            {}
 
 type StructMarker struct {
-	// NeedClose is used to signal that the evaluator should close this struct.
-	// It is only set by the close builtin.
-	// TODO(evalv3: remove this field. Once we removed this, and also introduced
-	// open by default lists, we can get rid of StructMarker and ListMarker
+	// TODO: once we introduce open by default lists,
+	// we can get rid of StructMarker and ListMarker
 	// in its entirety in favor of using type bit masks.
-	NeedClose bool
 }
 
 func (x *StructMarker) Source() ast.Node { return nil }

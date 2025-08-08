@@ -1117,7 +1117,7 @@ func (v *Vertex) IsClosedStruct() bool {
 	// if v.HasEllipsis {
 	// 	return false
 	// }
-	switch x := v.BaseValue.(type) {
+	switch v.BaseValue.(type) {
 	default:
 		return false
 
@@ -1125,10 +1125,6 @@ func (v *Vertex) IsClosedStruct() bool {
 		return v.ClosedRecursive && !v.HasEllipsis
 
 	case *StructMarker:
-		if x.NeedClose {
-			return true
-		}
-
 	case *Disjunction:
 	}
 	return isClosed(v)

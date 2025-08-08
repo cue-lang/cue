@@ -216,19 +216,17 @@ func (n *nodeContext) scheduleDisjunction(d envDisjunct) {
 }
 
 func initArcs(ctx *OpContext, v *Vertex) bool {
-	ok := true
 	for _, a := range v.Arcs {
 		s := a.getState(ctx)
 		if s != nil && s.errs != nil {
-			ok = false
 			if a.ArcType == ArcMember {
-				break
+				return false
 			}
 		} else if !initArcs(ctx, a) {
-			ok = false
+			return false
 		}
 	}
-	return ok
+	return true
 }
 
 func (n *nodeContext) processDisjunctions() *Bottom {

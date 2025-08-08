@@ -124,7 +124,8 @@ type OpContext struct {
 	// TODO: remove this again once we have a proper way of detecting references
 	// across optional boundaries in hasAncestorV3. We can probably do this
 	// with an optional depth counter.
-	toFinalize []*Vertex
+	// See the TODO in unify.go for toFinalize.
+	// toFinalize []*Vertex
 
 	// freeScope tracks the nodeContexts that are currently responsible for
 	// allocating new inlined vertices. Only nodes within the current scope can

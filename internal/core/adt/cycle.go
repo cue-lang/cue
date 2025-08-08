@@ -883,35 +883,6 @@ func (n *nodeContext) decDepth() {
 	n.ctx.evalDepth--
 }
 
-// markOptional marks that we are about to process an "optional element" that
-// allows errors. In these cases, structural cycles are not "terminal".
-//
-// Examples of such constructs are:
-//
-// Optional fields:
-//
-//	a: b?: a
-//
-// Pattern constraints:
-//
-//	a: [string]: a
-//
-// Disjunctions:
-//
-//	a: b: null | a
-//
-// A call to markOptional should be paired with a call to unmarkOptional.
-func (n *nodeContext) markOptional() (saved int) {
-	saved = n.ctx.evalDepth
-	n.ctx.optionalMark = n.ctx.evalDepth
-	return saved
-}
-
-// See markOptional.
-func (n *nodeContext) unmarkOptional(saved int) {
-	n.ctx.optionalMark = saved
-}
-
 // markDepth assigns the current evaluation depth to the receiving node.
 // Any previously assigned depth is saved and returned and should be restored
 // using unmarkDepth after processing n.

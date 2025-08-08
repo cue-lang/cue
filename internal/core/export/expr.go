@@ -297,15 +297,8 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 }
 
 func (e *conjuncts) wrapCloseIfNecessary(s *ast.StructLit, v *adt.Vertex) ast.Expr {
-	if !e.hasEllipsis && v != nil {
-		if v.ClosedNonRecursive {
-			// Eval V3 logic
-			return ast.NewCall(ast.NewIdent("close"), s)
-		}
-		if st, ok := v.BaseValue.(*adt.StructMarker); ok && st.NeedClose {
-			// Eval V2 logic
-			return ast.NewCall(ast.NewIdent("close"), s)
-		}
+	if !e.hasEllipsis && v != nil && v.ClosedNonRecursive {
+		return ast.NewCall(ast.NewIdent("close"), s)
 	}
 	return s
 }

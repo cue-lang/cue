@@ -582,10 +582,6 @@ type CycleInfo struct {
 	// TODO: make this a method and use CycleType == IsCyclic after V2 is removed.
 	IsCyclic bool
 
-	// Inline is used to detect expressions referencing themselves, for instance:
-	//     {x: out, out: x}.out
-	Inline bool
-
 	// TODO(perf): pack this in with CloseInfo. Make an uint32 pointing into
 	// a buffer maintained in OpContext, using a mark-release mechanism.
 	Refs *RefNode
@@ -870,8 +866,7 @@ func (n *nodeContext) reportCycleError() {
 func makeAnonymousConjunct(env *Environment, x Expr, refs *RefNode) Conjunct {
 	return Conjunct{
 		env, x, CloseInfo{CycleInfo: CycleInfo{
-			Inline: true,
-			Refs:   refs,
+			Refs: refs,
 		}},
 	}
 }

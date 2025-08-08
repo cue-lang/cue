@@ -150,11 +150,6 @@ type OpContext struct {
 	// detect structural cycles and their severity.s
 	evalDepth int
 
-	// optionalMark indicates the evalDepth at which the last optional field,
-	// pattern constraint or other construct that may contain errors was
-	// encountered. A value of 0 indicates we are not within such field.
-	optionalMark int
-
 	// holdID is a unique identifier for the current "hole", a choice of
 	// disjunct to be made when processing disjunctions.
 	holeID int

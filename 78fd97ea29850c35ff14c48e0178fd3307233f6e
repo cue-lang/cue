@@ -52,6 +52,24 @@
       "parentUuid": "e3f03851_93cc49fe",
       "revId": "78fd97ea29850c35ff14c48e0178fd3307233f6e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c789a9d8_9e52e2f4",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-08T15:08:34Z",
+      "side": 0,
+      "message": "I suspect this is an edge case that isn\u0027t directly covered by a test case. I don\u0027t know what markDepth does or why well enough to say.",
+      "parentUuid": "1f70453b_2b5843f5",
+      "revId": "78fd97ea29850c35ff14c48e0178fd3307233f6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

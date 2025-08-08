@@ -158,15 +158,6 @@ type OpContext struct {
 	// disjunct to be made when processing disjunctions.
 	holeID int
 
-	// inDisjunct indicates that non-monotonic checks should be skipped.
-	// This is used if we want to do some extra work to eliminate disjunctions
-	// early. The result of unification should be thrown away if this check is
-	// used.
-	//
-	// TODO: replace this with a mechanism to determine the correct set (per
-	// conjunct) of StructInfos to include in closedness checking.
-	inDisjunct int
-
 	// inDetached indicates that inline structs evaluated in the current context
 	// should never be shared. This is the case, for instance, with the source
 	// for the for clause in a comprehension.

@@ -822,9 +822,7 @@ func (c *CloseInfo) setOptionalV3(n *nodeContext) {
 // updateCyclicStatusV3 looks for proof of non-cyclic conjuncts to override
 // a structural cycle.
 func (n *nodeContext) updateCyclicStatusV3(c CloseInfo) {
-	if n.ctx.inDisjunct == 0 {
-		n.hasFieldValue = true
-	}
+	n.hasFieldValue = true
 	if !c.IsCyclic {
 		n.hasNonCycle = true
 		for _, c := range n.cyclicConjuncts {

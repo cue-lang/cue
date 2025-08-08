@@ -129,9 +129,8 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		}
 		for _, dv := range x.Values {
 			d.disjuncts = append(d.disjuncts, disjunct{
-				expr:      dv.Val,
-				isDefault: dv.Default,
-				mode:      mode(x.HasDefaults, dv.Default),
+				expr: dv.Val,
+				mode: mode(x.HasDefaults, dv.Default),
 			})
 		}
 		n.scheduleDisjunction(d)
@@ -531,9 +530,8 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		}
 		for i, dv := range x.Values {
 			d.disjuncts = append(d.disjuncts, disjunct{
-				expr:      dv,
-				isDefault: i < x.NumDefaults,
-				mode:      mode(x.HasDefaults, i < x.NumDefaults),
+				expr: dv,
+				mode: mode(x.HasDefaults, i < x.NumDefaults),
 			})
 		}
 		n.scheduleDisjunction(d)

@@ -201,8 +201,7 @@ type disjunct struct {
 	expr Expr
 	err  *Bottom
 
-	isDefault bool
-	mode      defaultMode
+	mode defaultMode
 }
 
 func (n *nodeContext) scheduleDisjunction(d envDisjunct) {

@@ -123,6 +123,33 @@ issue3599: let: {
 	{ } | { a:  B | 1, let B = 1&2 }
 	{  } | {  }
 }
+-- optionalerror.cue --
+issue4022: reduced: {
+	#NonNamespaced: metadata: namespace?: _|_
+	#NullOrNonNamespaced: int | #NonNamespaced
+	out: #NullOrNonNamespaced
+	out: #NonNamespaced
+	out: metadata: {}
+}
+issue4022: full: {
+	#NonNamespaced: {
+		metadata: {
+			name!:      string
+			namespace?: _|_
+			...
+		}
+		...
+	}
+
+	#NullOrNonNamespaced: null | #NonNamespaced
+
+	out: #NullOrNonNamespaced
+	out: #NonNamespaced
+	out: {
+		metadata: name: "foo"
+		apiVersion: "v1"
+	}
+}
 -- out/eval/stats --
 Leaks:  6
 Freed:  181
@@ -139,6 +166,14 @@ MisalignedConjunct: 1
 NumCloseIDs: 11
 -- out/evalalpha --
 Errors:
+issue4022.full.out.apiVersion: field not allowed:
+    ./optionalerror.cue:24:3
+issue4022.full.out.metadata: field not allowed:
+    ./optionalerror.cue:10:3
+    ./optionalerror.cue:23:3
+issue4022.reduced.out.metadata: field not allowed:
+    ./optionalerror.cue:2:18
+    ./optionalerror.cue:6:7
 issue516.x: 2 errors in empty disjunction:
 issue516.x.match: field not allowed:
     ./in.cue:23:5
@@ -356,13 +391,93 @@ Result:
         }
       }) }
   }
+  issue4022: (_|_){
+    // [eval]
+    reduced: (_|_){
+      // [eval]
+      #NonNamespaced: (#struct){
+        metadata: (#struct){
+          namespace?: (_|_){
+            // [user] explicit error (_|_ literal) in source:
+            //     ./optionalerror.cue:2:40
+          }
+        }
+      }
+      #NullOrNonNamespaced: ((int|struct)){ |((int){ int }, (#struct){
+          metadata: (#struct){
+            namespace?: (_|_){
+              // [user] explicit error (_|_ literal) in source:
+              //     ./optionalerror.cue:2:40
+            }
+          }
+        }) }
+      out: (_|_){
+        // [eval]
+        metadata: (_|_){
+          // [eval] issue4022.reduced.out.metadata: field not allowed:
+          //     ./optionalerror.cue:2:18
+          //     ./optionalerror.cue:6:7
+          namespace?: (_|_){
+            // [user] explicit error (_|_ literal) in source:
+            //     ./optionalerror.cue:2:40
+          }
+        }
+      }
+    }
+    full: (_|_){
+      // [eval]
+      #NonNamespaced: (#struct){
+        metadata: (#struct){
+          name!: (string){ string }
+          namespace?: (_|_){
+            // [user] explicit error (_|_ literal) in source:
+            //     ./optionalerror.cue:12:16
+          }
+        }
+      }
+      #NullOrNonNamespaced: ((null|struct)){ |((null){ null }, (#struct){
+          metadata: (#struct){
+            name!: (string){ string }
+            namespace?: (_|_){
+              // [user] explicit error (_|_ literal) in source:
+              //     ./optionalerror.cue:12:16
+            }
+          }
+        }) }
+      out: (_|_){
+        // [eval]
+        metadata: (_|_){
+          // [eval] issue4022.full.out.metadata: field not allowed:
+          //     ./optionalerror.cue:10:3
+          //     ./optionalerror.cue:23:3
+          name: (string){ "foo" }
+          namespace?: (_|_){
+            // [user] explicit error (_|_ literal) in source:
+            //     ./optionalerror.cue:12:16
+          }
+        }
+        apiVersion: (_|_){
+          // [eval] issue4022.full.out.apiVersion: field not allowed:
+          //     ./optionalerror.cue:24:3
+        }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,8 @@
+@@ -1,12 +1,16 @@
  Errors:
++issue4022.full.out.apiVersion: field not allowed:
++    ./optionalerror.cue:24:3
++issue4022.full.out.metadata: field not allowed:
++    ./optionalerror.cue:10:3
++    ./optionalerror.cue:23:3
++issue4022.reduced.out.metadata: field not allowed:
++    ./optionalerror.cue:2:18
++    ./optionalerror.cue:6:7
  issue516.x: 2 errors in empty disjunction:
  issue516.x.match: field not allowed:
 -    ./in.cue:20:6
@@ -374,7 +489,7 @@ diff old new
      ./in.cue:23:21
  issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
      ./in.cue:2:11
-@@ -19,10 +15,7 @@
+@@ -19,10 +23,7 @@
    issue570: (_|_){
      // [eval]
      results: (_|_){
@@ -386,7 +501,7 @@ diff old new
        result: (_|_){
          // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
          //     ./in.cue:2:11
-@@ -29,7 +22,6 @@
+@@ -29,7 +30,6 @@
          //     ./in.cue:3:19
          //     ./in.cue:12:12
        }
@@ -394,7 +509,7 @@ diff old new
      }
      #Output: (#struct){ |((#struct){
          result: (_){ _ }
-@@ -40,7 +32,9 @@
+@@ -40,7 +40,9 @@
          result: (list){
          }
        }, (#struct){
@@ -405,7 +520,7 @@ diff old new
          }
          error: (string){ string }
        }) }
-@@ -59,18 +53,10 @@
+@@ -59,18 +61,10 @@
      x: (_|_){
        // [eval] issue516.x: 2 errors in empty disjunction:
        // issue516.x.match: field not allowed:
@@ -425,7 +540,7 @@ diff old new
          metrics: (struct){
            foo: (struct){
            }
-@@ -136,13 +122,11 @@
+@@ -136,13 +130,11 @@
      reduced: (struct){
        list: (_|_){
          // [incomplete] issue3581.reduced.list: 2 errors in empty disjunction:
@@ -442,7 +557,7 @@ diff old new
        }
        c: (_){ _ }
      }
-@@ -186,6 +170,7 @@
+@@ -186,6 +178,7 @@
        p1: (struct){ |((struct){
            a?: (_|_){
              // [eval] issue3599.reduced.p1.a: conflicting values 2 and 1:
@@ -450,7 +565,7 @@ diff old new
              //     ./issue3599.cue:32:2
              //     ./issue3599.cue:32:9
              //     ./issue3599.cue:32:11
-@@ -194,6 +179,7 @@
+@@ -194,6 +187,7 @@
            a: (string){ string }
            b?: (_|_){
              // [eval] issue3599.reduced.p1.b: conflicting values 2 and 1:
@@ -458,7 +573,7 @@ diff old new
              //     ./issue3599.cue:32:2
              //     ./issue3599.cue:32:35
              //     ./issue3599.cue:32:37
-@@ -202,6 +188,7 @@
+@@ -202,6 +196,7 @@
        p2: (struct){ |((struct){
            a?: (_|_){
              // [eval] issue3599.reduced.p2.a: conflicting values 2 and 1:
@@ -466,7 +581,7 @@ diff old new
              //     ./issue3599.cue:37:2
              //     ./issue3599.cue:37:9
              //     ./issue3599.cue:37:11
-@@ -210,6 +197,7 @@
+@@ -210,6 +205,7 @@
            a: (string){ string }
            b?: (_|_){
              // [eval] issue3599.reduced.p2.b: conflicting values 2 and 1:
@@ -474,7 +589,7 @@ diff old new
              //     ./issue3599.cue:37:2
              //     ./issue3599.cue:37:35
              //     ./issue3599.cue:37:37
-@@ -221,6 +209,7 @@
+@@ -221,6 +217,7 @@
          a: (int){ 1 }
          let B#1 = (_|_){
            // [eval] issue3599.let.B: conflicting values 2 and 1:
@@ -482,6 +597,83 @@ diff old new
            //     ./issue3599.cue:40:2
            //     ./issue3599.cue:40:29
            //     ./issue3599.cue:40:31
+@@ -227,4 +224,76 @@
+         }
+       }) }
+   }
++  issue4022: (_|_){
++    // [eval]
++    reduced: (_|_){
++      // [eval]
++      #NonNamespaced: (#struct){
++        metadata: (#struct){
++          namespace?: (_|_){
++            // [user] explicit error (_|_ literal) in source:
++            //     ./optionalerror.cue:2:40
++          }
++        }
++      }
++      #NullOrNonNamespaced: ((int|struct)){ |((int){ int }, (#struct){
++          metadata: (#struct){
++            namespace?: (_|_){
++              // [user] explicit error (_|_ literal) in source:
++              //     ./optionalerror.cue:2:40
++            }
++          }
++        }) }
++      out: (_|_){
++        // [eval]
++        metadata: (_|_){
++          // [eval] issue4022.reduced.out.metadata: field not allowed:
++          //     ./optionalerror.cue:2:18
++          //     ./optionalerror.cue:6:7
++          namespace?: (_|_){
++            // [user] explicit error (_|_ literal) in source:
++            //     ./optionalerror.cue:2:40
++          }
++        }
++      }
++    }
++    full: (_|_){
++      // [eval]
++      #NonNamespaced: (#struct){
++        metadata: (#struct){
++          name!: (string){ string }
++          namespace?: (_|_){
++            // [user] explicit error (_|_ literal) in source:
++            //     ./optionalerror.cue:12:16
++          }
++        }
++      }
++      #NullOrNonNamespaced: ((null|struct)){ |((null){ null }, (#struct){
++          metadata: (#struct){
++            name!: (string){ string }
++            namespace?: (_|_){
++              // [user] explicit error (_|_ literal) in source:
++              //     ./optionalerror.cue:12:16
++            }
++          }
++        }) }
++      out: (_|_){
++        // [eval]
++        metadata: (_|_){
++          // [eval] issue4022.full.out.metadata: field not allowed:
++          //     ./optionalerror.cue:10:3
++          //     ./optionalerror.cue:23:3
++          name: (string){ "foo" }
++          namespace?: (_|_){
++            // [user] explicit error (_|_ literal) in source:
++            //     ./optionalerror.cue:12:16
++          }
++        }
++        apiVersion: (_|_){
++          // [eval] issue4022.full.out.apiVersion: field not allowed:
++          //     ./optionalerror.cue:24:3
++        }
++      }
++    }
++  }
+ }
 -- diff/todo/p3 --
 Missing error positions.
 -- diff/explanation --
@@ -907,6 +1099,45 @@ Result:
         let B#1 = (1 & 2)
       })
       ({}|{})
+    }
+  }
+}
+--- optionalerror.cue
+{
+  issue4022: {
+    reduced: {
+      #NonNamespaced: {
+        metadata: {
+          namespace?: _|_(explicit error (_|_ literal) in source)
+        }
+      }
+      #NullOrNonNamespaced: (int|〈0;#NonNamespaced〉)
+      out: 〈0;#NullOrNonNamespaced〉
+      out: 〈0;#NonNamespaced〉
+      out: {
+        metadata: {}
+      }
+    }
+  }
+  issue4022: {
+    full: {
+      #NonNamespaced: {
+        metadata: {
+          name!: string
+          namespace?: _|_(explicit error (_|_ literal) in source)
+          ...
+        }
+        ...
+      }
+      #NullOrNonNamespaced: (null|〈0;#NonNamespaced〉)
+      out: 〈0;#NullOrNonNamespaced〉
+      out: 〈0;#NonNamespaced〉
+      out: {
+        metadata: {
+          name: "foo"
+        }
+        apiVersion: "v1"
+      }
     }
   }
 }

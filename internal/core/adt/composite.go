@@ -110,38 +110,6 @@ func (e *Environment) up(ctx *OpContext, count int32) *Environment {
 	return e
 }
 
-type ID int32
-
-// evalCached is used to look up dynamic field pattern constraint expressions.
-func (e *Environment) evalCached(c *OpContext, x Expr) Value {
-	if v, ok := x.(Value); ok {
-		return v
-	}
-	key := cacheKey{x, nil}
-	v, ok := e.cache[key]
-	if !ok {
-		if e.cache == nil {
-			e.cache = map[cacheKey]Value{}
-		}
-		env, src := c.e, c.src
-		c.e, c.src = e, x.Source()
-		// Save and restore errors to ensure that only relevant errors are
-		// associated with the cash.
-		err := c.errs
-		v = c.evalState(x, combinedFlags{
-			status:    partial,
-			condition: allKnown,
-			mode:      yield,
-		}) // TODO: should this be finalized?
-		c.e, c.src = env, src
-		c.errs = err
-		if b, ok := v.(*Bottom); !ok || !b.IsIncomplete() {
-			e.cache[key] = v
-		}
-	}
-	return v
-}
-
 // A Vertex is a node in the value tree. It may be a leaf or internal node.
 // It may have arcs to represent elements of a fully evaluated struct or list.
 //

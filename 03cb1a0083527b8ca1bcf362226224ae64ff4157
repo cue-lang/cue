@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "060905ec_a82b6ff8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-08T16:43:05Z",
+      "side": 1,
+      "message": "You may want to consider returning an apd.Decimal instead so that the value does not have to be converted again.",
+      "revId": "03cb1a0083527b8ca1bcf362226224ae64ff4157",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc599afd_2ac098ef",
+        "filename": "pkg/strconv/testdata/gen.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-08T16:43:05Z",
+      "side": 1,
+      "message": "trailing whitespace.",
+      "revId": "03cb1a0083527b8ca1bcf362226224ae64ff4157",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -290,17 +290,6 @@ type Num struct {
 func (x *Num) Source() ast.Node { return x.Src }
 func (x *Num) Kind() Kind       { return x.K }
 
-// TODO: do we still need this?
-// func (x *Num) Specialize(k Kind) Value {
-// 	k = k & x.K
-// 	if k == x.K {
-// 		return x
-// 	}
-// 	y := *x
-// 	y.K = k
-// 	return &y
-// }
-
 // String is a string value. It can be used as a Value and Expr.
 type String struct {
 	Src ast.Node
@@ -373,17 +362,6 @@ func (x *BasicType) Source() ast.Node {
 	return x.Src
 }
 func (x *BasicType) Kind() Kind { return x.K }
-
-// TODO: do we still need this?
-// func (x *BasicType) Specialize(k Kind) Value {
-// 	k = x.K & k
-// 	if k == x.K {
-// 		return x
-// 	}
-// 	y := *x
-// 	y.K = k
-// 	return &y
-// }
 
 // TODO: should we use UnaryExpr for Bound now we have BoundValue?
 

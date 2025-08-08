@@ -195,9 +195,8 @@ func (n *nodeContext) scheduleStruct(env *Environment,
 
 	s.Init(n.ctx)
 
-	// TODO: do we still need to AddStruct and do we still need to Disable?
-	parent := n.node.AddStruct(s, childEnv, ci)
-	parent.Disable = true // disable until processing is done.
+	// TODO: do we still need to AddStruct?
+	n.node.AddStruct(s, childEnv, ci)
 	ci.IsClosed = false
 
 	// TODO(perf): precompile whether struct has embedding.
@@ -275,9 +274,6 @@ loop1:
 		n.aStruct = s
 		n.aStructID = ci
 	}
-
-	// TODO: probably no longer necessary.
-	parent.Disable = false
 }
 
 // scheduleVertexConjuncts injects the conjuncst of src n. If src was not fully

@@ -34,6 +34,24 @@
       "parentUuid": "d499c426_a250a727",
       "revId": "78fd97ea29850c35ff14c48e0178fd3307233f6e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f70453b_2b5843f5",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-08-08T15:07:07Z",
+      "side": 0,
+      "message": "How did the trybots pass?",
+      "parentUuid": "e3f03851_93cc49fe",
+      "revId": "78fd97ea29850c35ff14c48e0178fd3307233f6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

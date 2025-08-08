@@ -70,6 +70,24 @@
       "parentUuid": "1f70453b_2b5843f5",
       "revId": "78fd97ea29850c35ff14c48e0178fd3307233f6e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75e6636f_4d013770",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-08T15:11:50Z",
+      "side": 0,
+      "message": "re-added the line, but with a \"do we still need this\" TODO.",
+      "parentUuid": "c789a9d8_9e52e2f4",
+      "revId": "78fd97ea29850c35ff14c48e0178fd3307233f6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -84,10 +84,6 @@ type CloseInfo struct {
 	enclosingEmbed defID // Tracks an embedding within a struct.
 	outerID        defID // Tracks the {} that should be closed after unifying.
 
-	// IsClosed is true if this conjunct represents a single level of closing
-	// as indicated by the closed builtin.
-	IsClosed bool
-
 	// FromEmbed indicates whether this conjunct was inserted because of an
 	// embedding.  This flag is sticky: it will be set for conjuncts created
 	// from fields defined by this conjunct.

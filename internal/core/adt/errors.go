@@ -99,9 +99,8 @@ type Bottom struct {
 	Node *Vertex
 }
 
-func (x *Bottom) Source() ast.Node        { return x.Src }
-func (x *Bottom) Kind() Kind              { return BottomKind }
-func (x *Bottom) Specialize(k Kind) Value { return x } // XXX remove
+func (x *Bottom) Source() ast.Node { return x.Src }
+func (x *Bottom) Kind() Kind       { return BottomKind }
 
 func (b *Bottom) IsIncomplete() bool {
 	if b == nil {

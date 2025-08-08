@@ -16,6 +16,24 @@
       "message": "Can you really remove markDepth? I thought that was still used.",
       "revId": "78fd97ea29850c35ff14c48e0178fd3307233f6e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3f03851_93cc49fe",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-08T15:06:38Z",
+      "side": 0,
+      "message": "yikes - this is human error. I meant to delete one line, not two!",
+      "parentUuid": "d499c426_a250a727",
+      "revId": "78fd97ea29850c35ff14c48e0178fd3307233f6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

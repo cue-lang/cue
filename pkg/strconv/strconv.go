@@ -74,32 +74,87 @@ func ParseUint(s string, base int, bitSize int) (uint64, error) {
 }
 
 // ParseInt interprets a string s in the given base (0, 2 to 36) and
-// bit size (0 to 64) and returns the corresponding value i.
+// bit size and returns the corresponding value i.
 //
 // If the base argument is 0, the true base is implied by the string's
 // prefix: 2 for "0b", 8 for "0" or "0o", 16 for "0x", and 10 otherwise.
 // Also, for argument base 0 only, underscore characters are permitted
 // as defined by the Go syntax for integer literals.
 //
-// The bitSize argument specifies the integer type
-// that the result must fit into. Bit sizes 0, 8, 16, 32, and 64
-// correspond to int, int8, int16, int32, and int64.
-// If bitSize is below 0 or above 64, an error is returned.
+// The bitSize argument specifies the integer type that the result must fit into.
+// If bitSize is 0, the result is unconstrained (unlimited precision).
+// If bitSize is positive, the result must fit in a signed integer of that many bits.
+// If bitSize is negative, an error is returned.
 //
 // The errors that ParseInt returns have concrete type *NumError
 // and include err.Num = s. If s is empty or contains invalid
-// digits, err.Err = ErrSyntax and the returned value is 0;
+// digits, err.Err = ErrSyntax and the returned value is nil;
 // if the value corresponding to s cannot be represented by a
 // signed integer of the given size, err.Err = ErrRange and the
 // returned value is the maximum magnitude integer of the
 // appropriate bitSize and sign.
-func ParseInt(s string, base int, bitSize int) (i int64, err error) {
-	return strconv.ParseInt(s, base, bitSize)
+func ParseInt(s string, base int, bitSize int) (*big.Int, error) {
+	if bitSize < 0 {
+		return nil, &strconv.NumError{
+			Func: "ParseInt",
+			Num:  s,
+			Err:  strconv.ErrRange,
+		}
+	}
+
+	// Parse the number using big.Int to handle arbitrary precision
+	i := new(big.Int)
+	i, ok := i.SetString(s, base)
+	if !ok {
+		return nil, &strconv.NumError{
+			Func: "ParseInt",
+			Num:  s,
+			Err:  strconv.ErrSyntax,
+		}
+	}
+
+	// If bitSize is 0, return unlimited precision result
+	if bitSize == 0 {
+		return i, nil
+	}
+
+	// Check if the value fits in the specified bit size
+	// For signed integers, the range is [-2^(bitSize-1), 2^(bitSize-1)-1]
+	maxBits := bitSize - 1                                // One bit for sign
+	max := new(big.Int).Lsh(big.NewInt(1), uint(maxBits)) // 2^(bitSize-1)
+	min := new(big.Int).Neg(max)                          // -2^(bitSize-1)
+	max.Sub(max, big.NewInt(1))                           // 2^(bitSize-1) - 1
+
+	if i.Cmp(min) < 0 || i.Cmp(max) > 0 {
+		// Return the clamped value (maximum magnitude with correct sign)
+		var result *big.Int
+		if i.Sign() < 0 {
+			result = new(big.Int).Set(min)
+		} else {
+			result = new(big.Int).Set(max)
+		}
+		return result, &strconv.NumError{
+			Func: "ParseInt",
+			Num:  s,
+			Err:  strconv.ErrRange,
+		}
+	}
+
+	return i, nil
 }
 
 // Atoi is equivalent to ParseInt(s, 10, 0), converted to type int.
-func Atoi(s string) (int, error) {
-	return strconv.Atoi(s)
+func Atoi(s string) (*big.Int, error) {
+	i := new(big.Int)
+	i, ok := i.SetString(s, 10)
+	if !ok {
+		return nil, &strconv.NumError{
+			Func: "Atoi",
+			Num:  s,
+			Err:  strconv.ErrSyntax,
+		}
+	}
+	return i, nil
 }
 
 // FormatFloat converts the floating-point number f to a string,

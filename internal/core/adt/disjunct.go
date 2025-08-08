@@ -87,8 +87,8 @@ type envDisjunct struct {
 	cloneID CloseInfo
 	holeID  int
 
-	// fields for new evaluator
-
+	// TODO: src is set but never used. It seems like it should be used
+	// in either [nodeContext.crossProduct] or [nodeContext.collectErrors]?
 	src       Node
 	disjuncts []disjunct
 }

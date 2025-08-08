@@ -385,8 +385,8 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 // crossProduct computes the cross product of the disjuncts of a disjunction
 // with an existing set of results.
 func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, mode runMode) []*nodeContext {
+	// TODO: do we still need this? removing it does not break any tests.
 	defer n.unmarkDepth(n.markDepth())
-	defer n.unmarkOptional(n.markOptional())
 
 	// TODO(perf): use a pre-allocated buffer in n.ctx. Note that the actual
 	// buffer may grow and has a max size of len(cross) * len(dn.disjuncts).

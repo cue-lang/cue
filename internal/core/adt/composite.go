@@ -503,9 +503,6 @@ type StructInfo struct {
 	// or nil if this is a root structure.
 	// Embed   *StructInfo
 	// Context *RefInfo // the location from which this struct originates.
-	Disable bool
-
-	Embedding bool
 }
 
 // vertexStatus indicates the evaluation progress of a Vertex.
@@ -773,12 +770,6 @@ func (v *Vertex) toDataAllRec(ctx *OpContext, processed map[*Vertex]*Vertex) *Ve
 	// in general and JSON specifically, is not closed.
 	w.ClosedRecursive = false
 	w.ClosedNonRecursive = false
-
-	// TODO(perf): this is not strictly necessary for evaluation, but it can
-	// hurt performance greatly. Drawback is that it may disable ordering.
-	for _, s := range w.Structs {
-		s.Disable = true
-	}
 
 	w.Conjuncts = slices.Clone(v.Conjuncts)
 

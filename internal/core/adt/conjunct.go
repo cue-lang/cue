@@ -125,7 +125,6 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 			env:     env,
 			cloneID: id,
 			holeID:  n.ctx.holeID,
-			src:     x,
 		}
 		for _, dv := range x.Values {
 			d.disjuncts = append(d.disjuncts, disjunct{
@@ -520,7 +519,6 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			env:     env,
 			cloneID: id,
 			holeID:  n.ctx.holeID,
-			src:     x,
 		}
 		for i, dv := range x.Values {
 			d.disjuncts = append(d.disjuncts, disjunct{

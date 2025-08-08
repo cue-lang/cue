@@ -87,9 +87,6 @@ type envDisjunct struct {
 	cloneID CloseInfo
 	holeID  int
 
-	// fields for new evaluator
-
-	src       Node
 	disjuncts []disjunct
 }
 

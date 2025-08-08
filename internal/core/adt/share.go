@@ -63,11 +63,12 @@ func (n *nodeContext) finalizeSharing() {
 	case *Vertex:
 		if n.shareCycleType == NoCycle {
 			v.Finalize(n.ctx)
-		} else if !v.isFinal() {
-			// TODO: ideally we just handle cycles in optional chains directly,
-			// rather than relying on this mechanism. This requires us to add
-			// a mechanism to detect that.
-			n.ctx.toFinalize = append(n.ctx.toFinalize, v)
+			// See the TODO in unify.go for toFinalize.
+			// } else if !v.isFinal() {
+			// 	// TODO: ideally we just handle cycles in optional chains directly,
+			// 	// rather than relying on this mechanism. This requires us to add
+			// 	// a mechanism to detect that.
+			// 	n.ctx.toFinalize = append(n.ctx.toFinalize, v)
 		}
 		// If state.parent is non-nil, we determined earlier that this Vertex
 		// is not rooted and that it can safely be shared. Because it is

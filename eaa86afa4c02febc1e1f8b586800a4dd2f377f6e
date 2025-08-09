@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c09e90a7_bb887cb1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-09T23:25:42Z",
+      "side": 1,
+      "message": "Note the CI failures. The trybots are I assume easy to fix for you. The Unity failure I can help investigate next week once the trybots are happy and the test changes look reasonable.",
+      "revId": "eaa86afa4c02febc1e1f8b586800a4dd2f377f6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "670678ce_07da6287",
+        "filename": "cue/testdata/eval/required.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-09T23:25:42Z",
+      "side": 1,
+      "message": "surely these changes are wrong?",
+      "revId": "eaa86afa4c02febc1e1f8b586800a4dd2f377f6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b17222a8_c20ef14d",
+        "filename": "cue/testdata/eval/required.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-09T23:25:42Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "eaa86afa4c02febc1e1f8b586800a4dd2f377f6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

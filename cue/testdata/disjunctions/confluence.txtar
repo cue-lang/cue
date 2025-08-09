@@ -1,0 +1,69 @@
+-- in.cue --
+import (
+	"net"
+	"strings"
+)
+issue3993: reduced: {
+	x: net.IPv4 | =~"fail"
+	x: { if net.IPv4(x) {=~"^10\\." } }
+	x: "10.10.10.10"
+}
+
+issue3993: full: {
+	addr!: string & (net.IPv4 | net.IPv6)
+	if net.IPv4(addr) {
+		addr: strings.HasPrefix("10.")
+	}
+	if net.IPv6(addr) {
+		addr: strings.HasPrefix("2a02:")
+	}
+	addr: "10.10.10.10"
+}
+-- out/evalalpha --
+(struct){
+  issue3993: (struct){
+    reduced: (struct){
+      x: (_|_){
+        // [cycle] issue3993.reduced.x: invalid left-hand value to '=~' (type _|_): issue3993.reduced.x: unresolved disjunction: x:
+        //     ./in.cue:6:16
+        // issue3993.reduced.x: 2 errors in empty disjunction::
+        //     ./in.cue:7:19
+      }
+    }
+    full: (_|_){
+      // [cycle] issue3993.full: unresolved disjunction: addr:
+      //     ./in.cue:13:14
+      // issue3993.full: unresolved disjunction: addr:
+      //     ./in.cue:16:14
+      // issue3993.full.addr: 2 errors in empty disjunction::
+      //     ./in.cue:16:14
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  issue3993: {
+    reduced: {
+      x: (〈import;net〉.IPv4|=~"fail")
+      x: {
+        if 〈import;net〉.IPv4(〈1;x〉) {
+          =~"^10\\."
+        }
+      }
+      x: "10.10.10.10"
+    }
+  }
+  issue3993: {
+    full: {
+      addr!: (string & (〈import;net〉.IPv4|〈import;net〉.IPv6))
+      if 〈import;net〉.IPv4(〈0;addr〉) {
+        addr: 〈import;strings〉.HasPrefix("10.")
+      }
+      if 〈import;net〉.IPv6(〈0;addr〉) {
+        addr: 〈import;strings〉.HasPrefix("2a02:")
+      }
+      addr: "10.10.10.10"
+    }
+  }
+}

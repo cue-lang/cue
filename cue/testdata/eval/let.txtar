@@ -157,6 +157,13 @@ keepDescending: t2: {
 		X: Y: strings.Join([], "")
 	}
 }
+-- interpolation.cue --
+issue4022: full: {
+	envScript: [ for v in _env let v = _env["KEY"] {"\(v)"} ]
+	_env: {
+		KEY: *"" | _
+	}
+}
 -- out/evalalpha --
 Errors:
 indirectReference.y: conflicting values 2 and 1:
@@ -358,6 +365,16 @@ Result:
       "2": (int){ 2 }
     }
   }
+  issue4022: (struct){
+    full: (struct){
+      envScript: (#list){
+        0: (string){ "" }
+      }
+      _env: (struct){
+        KEY: (_){ |(*(string){ "" }, (_){ _ }) }
+      }
+    }
+  }
   keepDescending: (struct){
     t1: (struct){
       ec: (struct){
@@ -538,7 +555,24 @@ diff old new
        //     ./incomprehension.cue:42:7
        //     ./incomprehension.cue:42:13
        //     ./incomprehension.cue:43:2
-@@ -234,8 +233,8 @@
+@@ -199,6 +198,16 @@
+       "2": (int){ 2 }
+     }
+   }
++  issue4022: (struct){
++    full: (struct){
++      envScript: (#list){
++        0: (string){ "" }
++      }
++      _env: (struct){
++        KEY: (_){ |(*(string){ "" }, (_){ _ }) }
++      }
++    }
++  }
+   keepDescending: (struct){
+     t1: (struct){
+       ec: (struct){
+@@ -234,8 +243,8 @@
        b: (string){ "e" }
      }
      let T#23multi = 〈1;v〉
@@ -549,29 +583,27 @@ diff old new
    _parent_configs: (struct){
      PARENT: (bool){ true }
 -- out/evalalpha/stats --
-Leaks:  41
-Freed:  158
-Reused: 138
-Allocs: 61
+Leaks:  43
+Freed:  166
+Reused: 145
+Allocs: 64
 Retain: 0
 
-Unifications: 166
-Conjuncts:    315
-Disjuncts:    10
+Unifications: 174
+Conjuncts:    326
+Disjuncts:    12
 Notifications: 3
 
-NumCloseIDs: 107
+NumCloseIDs: 109
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,13 +1,12 @@
 -Leaks:  52
-+Leaks:  41
- Freed:  158
+-Freed:  158
 -Reused: 149
-+Reused: 138
- Allocs: 61
+-Allocs: 61
 -Retain: 184
 -
 -Unifications: 196
@@ -581,14 +613,18 @@ diff old new
 -MisalignedConjunct: 74
 -
 -NumCloseIDs: 11
++Leaks:  43
++Freed:  166
++Reused: 145
++Allocs: 64
 +Retain: 0
 +
-+Unifications: 166
-+Conjuncts:    315
-+Disjuncts:    10
++Unifications: 174
++Conjuncts:    326
++Disjuncts:    12
 +Notifications: 3
 +
-+NumCloseIDs: 107
++NumCloseIDs: 109
 -- out/eval/stats --
 Leaks:  52
 Freed:  158
@@ -983,6 +1019,21 @@ Result:
         }
       }
       "\(〈1;k〉)": 〈0;let X#1E〉
+    }
+  }
+}
+--- interpolation.cue
+{
+  issue4022: {
+    full: {
+      envScript: [
+        for _, v in 〈1;_env〉 let v = 〈2;_env〉["KEY"] {
+          "\(〈1;v〉)"
+        },
+      ]
+      _env: {
+        KEY: (*""|_)
+      }
     }
   }
 }

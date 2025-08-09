@@ -23,20 +23,10 @@ issue3993: full: {
 (struct){
   issue3993: (struct){
     reduced: (struct){
-      x: (_|_){
-        // [cycle] issue3993.reduced.x: invalid left-hand value to '=~' (type _|_): issue3993.reduced.x: unresolved disjunction: x:
-        //     ./in.cue:6:16
-        // issue3993.reduced.x: 2 errors in empty disjunction::
-        //     ./in.cue:7:19
-      }
+      x: (string){ "10.10.10.10" }
     }
-    full: (_|_){
-      // [cycle] issue3993.full: unresolved disjunction: addr:
-      //     ./in.cue:13:14
-      // issue3993.full: unresolved disjunction: addr:
-      //     ./in.cue:16:14
-      // issue3993.full.addr: 2 errors in empty disjunction::
-      //     ./in.cue:16:14
+    full: (struct){
+      addr: (string){ "10.10.10.10" }
     }
   }
 }

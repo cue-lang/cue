@@ -74,7 +74,25 @@ reference: {
 		a!: 1
 	}
 }
+-- issue3992.cue --
+@experiment(structcmp)
 
+import "encoding/json"
+
+issue3992: {
+	#Foo: {
+		if true {
+			foo!: int
+		}
+	}
+	x:    #Foo
+	xFoo: #Foo.foo
+
+	y: json.Marshal(x)
+
+	z:    #Foo == ""
+	zFoo: #Foo.foo == ""
+}
 -- out/compile --
 --- in.cue
 {
@@ -202,6 +220,21 @@ reference: {
     }
   }
 }
+--- issue3992.cue
+{
+  issue3992: {
+    #Foo: {
+      if true {
+        foo!: int
+      }
+    }
+    x: 〈0;#Foo〉
+    xFoo: 〈0;#Foo〉.foo
+    y: 〈import;"encoding/json"〉.Marshal(〈0;x〉)
+    z: (〈0;#Foo〉 == "")
+    zFoo: (〈0;#Foo〉.foo == "")
+  }
+}
 -- out/eval/stats --
 Leaks:  0
 Freed:  66
@@ -319,6 +352,26 @@ Disjuncts:    76
       }
     }
   }
+  issue3992: (struct){
+    #Foo: (#struct){
+      foo!: (int){ int }
+    }
+    x: ~(issue3992.#Foo)
+    xFoo: (int){ int }
+    y: (_|_){
+      // [incomplete] issue3992.#Foo.foo: field is required but not present
+    }
+    z: (_|_){
+      // [incomplete] issue3992.z: invalid left-hand value to '==' (type struct): issue3992.#Foo.foo: field is required but not present:
+      //     ./issue3992.cue:16:8
+    }
+    zFoo: (_|_){
+      // [incomplete] issue3992.zFoo: non-concrete value int in operand to ==:
+      //     ./issue3992.cue:17:8
+      //     ./issue3992.cue:7:3
+      //     ./issue3992.cue:8:10
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -356,6 +409,31 @@ diff old new
          #Foo: (#struct){
            a!: (int){ int }
          }
+@@ -110,4 +104,24 @@
+       }
+     }
+   }
++  issue3992: (struct){
++    #Foo: (#struct){
++      foo!: (int){ int }
++    }
++    x: ~(issue3992.#Foo)
++    xFoo: (int){ int }
++    y: (_|_){
++      // [incomplete] issue3992.#Foo.foo: field is required but not present
++    }
++    z: (_|_){
++      // [incomplete] issue3992.z: invalid left-hand value to '==' (type struct): issue3992.#Foo.foo: field is required but not present:
++      //     ./issue3992.cue:16:8
++    }
++    zFoo: (_|_){
++      // [incomplete] issue3992.zFoo: non-concrete value int in operand to ==:
++      //     ./issue3992.cue:17:8
++      //     ./issue3992.cue:7:3
++      //     ./issue3992.cue:8:10
++    }
++  }
+ }
 -- diff/todo/p2 --
 Missing position.
 -- out/eval --

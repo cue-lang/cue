@@ -610,6 +610,7 @@ func (c *OpContext) EvaluateKeepState(x Expr) (result Value) {
 // be nil if the result is incomplete. value leaves errors untouched to that
 // they can be collected by the caller.
 func (c *OpContext) value(x Expr, state combinedFlags) (result Value) {
+	state.concrete = true
 	v := c.evalState(x, state)
 
 	v, _ = c.getDefault(v)
@@ -720,6 +721,9 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 				arc.unify(c, needs, runMode, true) // to set scalar
 
 				evaluating := arc.status == evaluating
+				if state.concrete && orig != arc && orig.state != nil && orig.state.meets(scalarKnown) && IsRecursivelyConcrete(arc) {
+					evaluating = false
+				}
 
 				// We cannot resolve a value that represents an unresolved
 				// disjunction.

@@ -21,4 +21,5 @@ type combinedFlags struct {
 	status    vertexStatus
 	condition condition
 	mode      runMode
+	concrete  bool
 }

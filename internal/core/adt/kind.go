@@ -53,6 +53,26 @@ func IsConcrete(v Value) bool {
 	return v.Concreteness() <= Concrete
 }
 
+// IsRecursivelyConcrete checks that v is a scalar or that all regular fields
+// have concrete values, recursively.
+func IsRecursivelyConcrete(v *Vertex) bool {
+	for _, a := range v.Arcs {
+		if !a.Label.IsRegular() {
+			continue
+		}
+		switch a.ArcType {
+		case ArcMember:
+		case ArcRequired:
+			return false
+		}
+
+		if !IsRecursivelyConcrete(a) {
+			return false
+		}
+	}
+	return v.IsConcrete()
+}
+
 // Kind reports the Value kind.
 type Kind uint16
 

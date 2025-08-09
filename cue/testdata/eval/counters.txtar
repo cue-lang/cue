@@ -434,8 +434,9 @@ NumCloseIDs: 16
   }
   issue3780: (struct){
     panic1: (_|_){
-      // [incomplete] issue3780.panic1: incomplete bool: bool:
-      //     ./issue3780.cue:5:10
+      // [incomplete] issue3780.panic1: cannot reference required field: param:
+      //     ./issue3780.cue:6:5
+      //     ./issue3780.cue:3:20
       objs: (#struct){
       }
       param!: (bool){ bool }
@@ -586,6 +587,18 @@ diff old new
          a: (struct){
            b: (_){ _ }
          }
+@@ -103,8 +127,9 @@
+   }
+   issue3780: (struct){
+     panic1: (_|_){
+-      // [incomplete] issue3780.panic1: incomplete bool: bool:
+-      //     ./issue3780.cue:5:10
++      // [incomplete] issue3780.panic1: cannot reference required field: param:
++      //     ./issue3780.cue:6:5
++      //     ./issue3780.cue:3:20
+       objs: (#struct){
+       }
+       param!: (bool){ bool }
 -- out/eval --
 (struct){
   issue3750: (struct){

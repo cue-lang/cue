@@ -302,10 +302,18 @@ Disjuncts:    76
         #Foo: (#struct){
           a!: (int){ int }
         }
-        b: (int){ int }
+        b: (_|_){
+          // [incomplete] reference.toWithinDefinition.p1.b: cannot reference required field: a:
+          //     ./in.cue:43:11
+          //     ./in.cue:42:9
+        }
       }
       p2: (struct){
-        b: (int){ int }
+        b: (_|_){
+          // [incomplete] reference.toWithinDefinition.p2.b: cannot reference required field: a:
+          //     ./in.cue:46:11
+          //     ./in.cue:47:9
+        }
         #Foo: (#struct){
           a!: (int){ int }
         }
@@ -317,10 +325,18 @@ Disjuncts:    76
           a!: (int){ int }
         }
         b: ~(reference.toFieldFromDefinition.p1.#Foo)
-        c: (int){ int }
+        c: (_|_){
+          // [incomplete] reference.toFieldFromDefinition.p1.c: cannot reference required field: a:
+          //     ./in.cue:52:8
+          //     ./in.cue:50:9
+        }
       }
       p2: (struct){
-        c: (int){ int }
+        c: (_|_){
+          // [incomplete] reference.toFieldFromDefinition.p2.c: cannot reference required field: a:
+          //     ./in.cue:55:8
+          //     ./in.cue:57:9
+        }
         b: ~(reference.toFieldFromDefinition.p2.#Foo)
         #Foo: (#struct){
           a!: (int){ int }
@@ -332,10 +348,18 @@ Disjuncts:    76
         x: (struct){
           y!: (_){ _ }
         }
-        b: (_){ _ }
+        b: (_|_){
+          // [incomplete] reference.toNonDefinition.p1.b: cannot reference required field: y:
+          //     ./in.cue:61:8
+          //     ./in.cue:60:6
+        }
       }
       p2: (struct){
-        b: (_){ _ }
+        b: (_|_){
+          // [incomplete] reference.toNonDefinition.p2.b: cannot reference required field: y:
+          //     ./in.cue:64:8
+          //     ./in.cue:65:6
+        }
         x: (struct){
           y!: (_){ _ }
         }
@@ -344,10 +368,18 @@ Disjuncts:    76
     toConcrete: (struct){
       p1: (struct){
         a!: (int){ 1 }
-        b: (int){ 2 }
+        b: (_|_){
+          // [incomplete] reference.toConcrete.p1.b: cannot reference required field: a:
+          //     ./in.cue:69:6
+          //     ./in.cue:67:18
+        }
       }
       p2: (struct){
-        b: (int){ 2 }
+        b: (_|_){
+          // [incomplete] reference.toConcrete.p2.b: cannot reference required field: a:
+          //     ./in.cue:72:6
+          //     ./in.cue:71:18
+        }
         a!: (int){ 1 }
       }
     }
@@ -357,19 +389,23 @@ Disjuncts:    76
       foo!: (int){ int }
     }
     x: ~(issue3992.#Foo)
-    xFoo: (int){ int }
+    xFoo: (_|_){
+      // [incomplete] issue3992.xFoo: cannot reference required field: foo:
+      //     ./issue3992.cue:12:13
+      //     ./issue3992.cue:6:8
+    }
     y: (_|_){
-      // [incomplete] issue3992.#Foo.foo: field is required but not present
+      // [incomplete] issue3992.#Foo.foo: field is required but not present:
+      //     ./issue3992.cue:7:3
     }
     z: (_|_){
       // [incomplete] issue3992.z: invalid left-hand value to '==' (type struct): issue3992.#Foo.foo: field is required but not present:
       //     ./issue3992.cue:16:8
     }
     zFoo: (_|_){
-      // [incomplete] issue3992.zFoo: non-concrete value int in operand to ==:
-      //     ./issue3992.cue:17:8
-      //     ./issue3992.cue:7:3
-      //     ./issue3992.cue:8:10
+      // [incomplete] issue3992.zFoo: cannot reference required field: foo:
+      //     ./issue3992.cue:17:13
+      //     ./issue3992.cue:6:8
     }
   }
 }
@@ -386,7 +422,30 @@ diff old new
          }
          b!: (int){ int }
        }
-@@ -70,16 +68,12 @@
+@@ -56,10 +54,18 @@
+         #Foo: (#struct){
+           a!: (int){ int }
+         }
+-        b: (int){ int }
+-      }
+-      p2: (struct){
+-        b: (int){ int }
++        b: (_|_){
++          // [incomplete] reference.toWithinDefinition.p1.b: cannot reference required field: a:
++          //     ./in.cue:43:11
++          //     ./in.cue:42:9
++        }
++      }
++      p2: (struct){
++        b: (_|_){
++          // [incomplete] reference.toWithinDefinition.p2.b: cannot reference required field: a:
++          //     ./in.cue:46:11
++          //     ./in.cue:47:9
++        }
+         #Foo: (#struct){
+           a!: (int){ int }
+         }
+@@ -70,16 +76,20 @@
          #Foo: (#struct){
            a!: (int){ int }
          }
@@ -401,38 +460,95 @@ diff old new
 -          a!: (int){ int }
 -        }
 +        b: ~(reference.toFieldFromDefinition.p1.#Foo)
-+        c: (int){ int }
++        c: (_|_){
++          // [incomplete] reference.toFieldFromDefinition.p1.c: cannot reference required field: a:
++          //     ./in.cue:52:8
++          //     ./in.cue:50:9
++        }
 +      }
 +      p2: (struct){
-+        c: (int){ int }
++        c: (_|_){
++          // [incomplete] reference.toFieldFromDefinition.p2.c: cannot reference required field: a:
++          //     ./in.cue:55:8
++          //     ./in.cue:57:9
++        }
 +        b: ~(reference.toFieldFromDefinition.p2.#Foo)
          #Foo: (#struct){
            a!: (int){ int }
          }
-@@ -110,4 +104,24 @@
-       }
-     }
-   }
+@@ -90,10 +100,18 @@
+         x: (struct){
+           y!: (_){ _ }
+         }
+-        b: (_){ _ }
+-      }
+-      p2: (struct){
+-        b: (_){ _ }
++        b: (_|_){
++          // [incomplete] reference.toNonDefinition.p1.b: cannot reference required field: y:
++          //     ./in.cue:61:8
++          //     ./in.cue:60:6
++        }
++      }
++      p2: (struct){
++        b: (_|_){
++          // [incomplete] reference.toNonDefinition.p2.b: cannot reference required field: y:
++          //     ./in.cue:64:8
++          //     ./in.cue:65:6
++        }
+         x: (struct){
+           y!: (_){ _ }
+         }
+@@ -102,12 +120,44 @@
+     toConcrete: (struct){
+       p1: (struct){
+         a!: (int){ 1 }
+-        b: (int){ 2 }
+-      }
+-      p2: (struct){
+-        b: (int){ 2 }
+-        a!: (int){ 1 }
+-      }
++        b: (_|_){
++          // [incomplete] reference.toConcrete.p1.b: cannot reference required field: a:
++          //     ./in.cue:69:6
++          //     ./in.cue:67:18
++        }
++      }
++      p2: (struct){
++        b: (_|_){
++          // [incomplete] reference.toConcrete.p2.b: cannot reference required field: a:
++          //     ./in.cue:72:6
++          //     ./in.cue:71:18
++        }
++        a!: (int){ 1 }
++      }
++    }
++  }
 +  issue3992: (struct){
 +    #Foo: (#struct){
 +      foo!: (int){ int }
 +    }
 +    x: ~(issue3992.#Foo)
-+    xFoo: (int){ int }
++    xFoo: (_|_){
++      // [incomplete] issue3992.xFoo: cannot reference required field: foo:
++      //     ./issue3992.cue:12:13
++      //     ./issue3992.cue:6:8
++    }
 +    y: (_|_){
-+      // [incomplete] issue3992.#Foo.foo: field is required but not present
++      // [incomplete] issue3992.#Foo.foo: field is required but not present:
++      //     ./issue3992.cue:7:3
 +    }
 +    z: (_|_){
 +      // [incomplete] issue3992.z: invalid left-hand value to '==' (type struct): issue3992.#Foo.foo: field is required but not present:
 +      //     ./issue3992.cue:16:8
 +    }
 +    zFoo: (_|_){
-+      // [incomplete] issue3992.zFoo: non-concrete value int in operand to ==:
-+      //     ./issue3992.cue:17:8
-+      //     ./issue3992.cue:7:3
-+      //     ./issue3992.cue:8:10
-+    }
-+  }
++      // [incomplete] issue3992.zFoo: cannot reference required field: foo:
++      //     ./issue3992.cue:17:13
++      //     ./issue3992.cue:6:8
+     }
+   }
  }
 -- diff/todo/p2 --
 Missing position.

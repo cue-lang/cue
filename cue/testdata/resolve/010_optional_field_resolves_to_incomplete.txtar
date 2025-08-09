@@ -33,6 +33,39 @@ Retain: 0
 Unifications: 5
 Conjuncts:    5
 Disjuncts:    5
+-- out/evalalpha --
+(struct){
+  r: (struct){
+    a?: (int){ 3 }
+    b: (_|_){
+      // [incomplete] r.b: cannot reference optional field: a:
+      //     ./in.cue:3:6
+      //     ./in.cue:1:4
+    }
+    c: (_|_){
+      // [incomplete] r.c: cannot reference optional field: a:
+      //     ./in.cue:4:8
+      //     ./in.cue:1:4
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -4,10 +4,12 @@
+     b: (_|_){
+       // [incomplete] r.b: cannot reference optional field: a:
+       //     ./in.cue:3:6
++      //     ./in.cue:1:4
+     }
+     c: (_|_){
+       // [incomplete] r.c: cannot reference optional field: a:
+       //     ./in.cue:4:8
++      //     ./in.cue:1:4
+     }
+   }
+ }
 -- out/eval --
 (struct){
   r: (struct){

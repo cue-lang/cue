@@ -205,6 +205,7 @@ Disjuncts:    373
           output: (_|_){
             // [incomplete] issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace:
             //     ./nested.cue:43:24
+            //     ./nested.cue:40:14
           }
         }
         #JSONOp: (#struct){ |((#struct){
@@ -338,6 +339,7 @@ Disjuncts:    373
           output: (_|_){
             // [incomplete] issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace:
             //     ./nested.cue:88:12
+            //     ./nested.cue:84:14
           }
         }
         #Base: (#struct){
@@ -362,7 +364,15 @@ diff old new
                  //     ./nested.cue:29:25
                  //     ./nested.cue:25:12
                }
-@@ -72,38 +72,11 @@
+@@ -59,6 +59,7 @@
+           output: (_|_){
+             // [incomplete] issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace:
+             //     ./nested.cue:43:24
++            //     ./nested.cue:40:14
+           }
+         }
+         #JSONOp: (#struct){ |((#struct){
+@@ -72,38 +73,11 @@
          #Main: (#struct){
            namespace: (string){ string }
            output: (_|_){
@@ -403,7 +413,7 @@ diff old new
              let base#8 = (#struct){
                someMsg: (string){ string }
                obs: (#struct){ |(*(#struct){
-@@ -122,7 +95,7 @@
+@@ -122,7 +96,7 @@
                    op: (string){ "add" }
                    path: (string){ "/metadata" }
                    value: (_|_){
@@ -412,7 +422,7 @@ diff old new
                      //     ./nested.cue:29:25
                      //     ./nested.cue:25:12
                    }
-@@ -146,6 +119,19 @@
+@@ -146,6 +120,19 @@
                  }
                }
              }
@@ -432,7 +442,7 @@ diff old new
            }
          }
          out: (#struct){
-@@ -175,7 +161,7 @@
+@@ -175,7 +162,7 @@
              }
            }
          }
@@ -441,7 +451,7 @@ diff old new
            #base: (#struct){
              val0: (string){ string }
              msgObj: (string){ string }
-@@ -192,13 +178,12 @@
+@@ -192,13 +179,12 @@
          #Output: (#struct){
            namespace: (string){ string }
            output: (_|_){
@@ -460,6 +470,14 @@ diff old new
            ns1: (string){ "foo" }
          }
          #SubOutput: (#struct){
+@@ -207,6 +193,7 @@
+           output: (_|_){
+             // [incomplete] issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace:
+             //     ./nested.cue:88:12
++            //     ./nested.cue:84:14
+           }
+         }
+         #Base: (#struct){
 -- out/eval --
 (struct){
   issue3801: (struct){

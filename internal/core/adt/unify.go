@@ -916,25 +916,21 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 	}
 
 	switch arc.ArcType {
-	case ArcMember, ArcRequired:
+	case ArcMember:
 		return arcReturn
 
-	case ArcOptional:
-		// Technically, this failure also applies to required fields. We assume
-		// however, that if a reference field that is made regular will already
-		// result in an error, so that piling up another error is not strictly
-		// necessary. Note that the spec allows for eliding an error if it is
-		// guaranteed another error is generated elsewhere. This does not
-		// properly cover the case where a reference is made directly within the
-		// definition, but this is fine for the purpose it serves.
-		// TODO(refRequired): revisit whether referencing required fields should
-		// fail.
+	case ArcOptional, ArcRequired:
+		kind := "optional"
+		if arc.ArcType == ArcRequired {
+			kind = "required"
+		}
 		label := f.SelectorString(c.Runtime)
+		err := c.NewPosf(pos, "cannot reference %s field: %s", kind, label)
+		addFieldPositions(c, err, v)
 		b := &Bottom{
 			Code: IncompleteError,
 			Node: v,
-			Err: c.NewPosf(pos,
-				"cannot reference optional field: %s", label),
+			Err:  err,
 		}
 		c.AddBottom(b)
 		// TODO: yield failure

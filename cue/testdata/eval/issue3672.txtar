@@ -301,18 +301,18 @@ value0: Only: [{UseSectionName: true}]
 }
 -- out/evalalpha/stats --
 Leaks:  107
-Freed:  1309
-Reused: 1226
+Freed:  1286
+Reused: 1203
 Allocs: 190
 Retain: 0
 
-Unifications: 333
-Conjuncts:    1653
-Disjuncts:    405
+Unifications: 316
+Conjuncts:    1611
+Disjuncts:    401
 
-NumCloseIDs: 556
+NumCloseIDs: 539
 
-ConjunctInfos:       676
+ConjunctInfos:       650
 MaxConjunctInfos:    7
 MaxReqSets:          15
 MaxRedirect:         6
@@ -331,18 +331,18 @@ diff old new
 -Conjuncts:    468967
 -Disjuncts:    330375
 +Leaks:  107
-+Freed:  1309
-+Reused: 1226
++Freed:  1286
++Reused: 1203
 +Allocs: 190
 +Retain: 0
 +
-+Unifications: 333
-+Conjuncts:    1653
-+Disjuncts:    405
++Unifications: 316
++Conjuncts:    1611
++Disjuncts:    401
 +
-+NumCloseIDs: 556
++NumCloseIDs: 539
 +
-+ConjunctInfos:       676
++ConjunctInfos:       650
 +MaxConjunctInfos:    7
 +MaxReqSets:          15
 +MaxRedirect:         6
@@ -388,21 +388,11 @@ Disjuncts:    330375
   }
   #mkFinDefSet: (#struct){
     #Definition!: ~(#FinDefSetDefinition)
-    #Type: (#struct){ |((#struct){
-        AllBut: (list){
-        }
-        let xs#1 = (#list){
-        }
-        let str#2 = (string){ "" }
-        orgSyntax: (string){ "AllBut []" }
-      }, (#struct){
-        Only: (list){
-        }
-        let xs#3 = (#list){
-        }
-        let str#4 = (string){ "" }
-        orgSyntax: (string){ "Only []" }
-      }) }
+    #Type: (_|_){
+      // [incomplete] cannot reference required field: #Definition:
+      //     ./x.cue:22:25
+      //     ./x.cue:20:15
+    }
   }
   #ConfigText: ((string|struct)){ |((string){ string }, (#struct){
       UseSectionName: (bool){ true }
@@ -864,7 +854,7 @@ diff old new
      #Alternatives: (#struct){
        allBut: (#struct){
          AllBut: (list){
-@@ -34,33 +28,7 @@
+@@ -34,48 +28,12 @@
      }
    }
    #mkFinDefSet: (#struct){
@@ -895,11 +885,31 @@ diff old new
 -        }
 -      }
 -    }
+-    #Type: (#struct){ |((#struct){
+-        AllBut: (list){
+-        }
+-        let xs#1 = (#list){
+-        }
+-        let str#2 = (string){ "" }
+-        orgSyntax: (string){ "AllBut []" }
+-      }, (#struct){
+-        Only: (list){
+-        }
+-        let xs#3 = (#list){
+-        }
+-        let str#4 = (string){ "" }
+-        orgSyntax: (string){ "Only []" }
+-      }) }
 +    #Definition!: ~(#FinDefSetDefinition)
-     #Type: (#struct){ |((#struct){
-         AllBut: (list){
-         }
-@@ -196,8 +164,41 @@
++    #Type: (_|_){
++      // [incomplete] cannot reference required field: #Definition:
++      //     ./x.cue:22:25
++      //     ./x.cue:20:15
++    }
+   }
+   #ConfigText: ((string|struct)){ |((string){ string }, (#struct){
+       UseSectionName: (bool){ true }
+@@ -196,8 +154,41 @@
              }) }
          }) }
        _output: (_|_){
@@ -942,7 +952,7 @@ diff old new
        }
      }
    }
-@@ -290,8 +291,41 @@
+@@ -290,8 +281,41 @@
            }) }
        }) }
      orgSyntax: (_|_){
@@ -985,7 +995,7 @@ diff old new
      }
    }
    value0: (#struct){
-@@ -304,1171 +338,131 @@
+@@ -304,1171 +328,131 @@
        0: (string){
          "UseSectionName"
          let INL#9 = (_|_){
@@ -2254,7 +2264,7 @@ diff old new
            //     ./x.cue:77:13
            //     ./x.cue:77:18
            //     ./x.cue:96:3
-@@ -1479,7 +473,9 @@
+@@ -1479,7 +463,9 @@
            //     ./x.cue:118:38
            //     ./x.cue:123:9
            //     ./x.cue:124:16

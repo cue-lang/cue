@@ -1849,7 +1849,11 @@ Result:
         }
       }
       #B: (#struct){
-        x: (_){ _ }
+        x: (_|_){
+          // [incomplete] issue3935.reduced.#B.x: cannot reference required field: y:
+          //     ./issue3935.cue:9:7
+          //     ./issue3935.cue:7:6
+        }
         y!: (#struct){
           x!: (_){ _ }
         }
@@ -1879,10 +1883,14 @@ Result:
           config!: (_){ _ }
         }
         namespace: (_|_){
-          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined as _specConfig is incomplete (type _):
-          //     ./issue3935.cue:36:15
+          // [incomplete] issue3935.full.#SchemaSelected.namespace: undefined field: namespace:
+          //     ./issue3935.cue:36:27
         }
-        _specConfig: (_){ _ }
+        _specConfig: (_|_){
+          // [incomplete] issue3935.full.#SchemaSelected._specConfig: cannot reference required field: spec:
+          //     ./issue3935.cue:39:16
+          //     ./issue3935.cue:29:19
+        }
       }
     }
   }
@@ -2295,7 +2303,20 @@ diff old new
        }
        #A: (#struct){
          y: (#struct){
-@@ -928,14 +864,12 @@
+@@ -918,7 +854,11 @@
+         }
+       }
+       #B: (#struct){
+-        x: (_){ _ }
++        x: (_|_){
++          // [incomplete] issue3935.reduced.#B.x: cannot reference required field: y:
++          //     ./issue3935.cue:9:7
++          //     ./issue3935.cue:7:6
++        }
+         y!: (#struct){
+           x!: (_){ _ }
+         }
+@@ -928,14 +868,12 @@
        out: (#struct){
          spec: (#struct){
            name: (string){ "foo" }
@@ -2312,15 +2333,25 @@ diff old new
        }
        #SchemaOther: (#struct){
          spec: (#struct){
-@@ -950,7 +884,7 @@
+@@ -950,10 +888,14 @@
            config!: (_){ _ }
          }
          namespace: (_|_){
 -          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined (_specConfig is incomplete):
-+          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined as _specConfig is incomplete (type _):
-           //     ./issue3935.cue:36:15
-         }
-         _specConfig: (_){ _ }
+-          //     ./issue3935.cue:36:15
+-        }
+-        _specConfig: (_){ _ }
++          // [incomplete] issue3935.full.#SchemaSelected.namespace: undefined field: namespace:
++          //     ./issue3935.cue:36:27
++        }
++        _specConfig: (_|_){
++          // [incomplete] issue3935.full.#SchemaSelected._specConfig: cannot reference required field: spec:
++          //     ./issue3935.cue:39:16
++          //     ./issue3935.cue:29:19
++        }
+       }
+     }
+   }
 -- out/evalalpha/stats --
 Leaks:  45
 Freed:  642

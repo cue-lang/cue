@@ -19,6 +19,49 @@ Retain: 1
 Unifications: 9
 Conjuncts:    9
 Disjuncts:    10
+-- out/evalalpha --
+(struct){
+  t1: (struct){
+    a: (struct){
+      foo?: (int){ int }
+      b: (_|_){
+        // [incomplete] t1.a.b: cannot reference optional field: foo:
+        //     ./in.cue:4:5
+        //     ./in.cue:1:8
+      }
+    }
+  }
+  t2: (struct){
+    a: (struct){
+      b: (_|_){
+        // [incomplete] t2.a.b: cannot reference optional field: foo:
+        //     ./in.cue:7:5
+        //     ./in.cue:6:8
+      }
+      foo?: (int){ int }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -5,6 +5,7 @@
+       b: (_|_){
+         // [incomplete] t1.a.b: cannot reference optional field: foo:
+         //     ./in.cue:4:5
++        //     ./in.cue:1:8
+       }
+     }
+   }
+@@ -13,6 +14,7 @@
+       b: (_|_){
+         // [incomplete] t2.a.b: cannot reference optional field: foo:
+         //     ./in.cue:7:5
++        //     ./in.cue:6:8
+       }
+       foo?: (int){ int }
+     }
 -- out/eval --
 (struct){
   t1: (struct){

@@ -95,6 +95,68 @@ Disjuncts:    22
 MisalignedConjunct: 1
 
 NumCloseIDs: 1
+-- out/evalalpha --
+(struct){
+  foo: (struct){
+    opt?: (int){ 1 }
+    txt: (int){ 2 }
+    #def: (int){ 3 }
+    regular: (int){ 4 }
+    _hidden: (int){ 5 }
+  }
+  comp: (struct){
+    txt: (int){ 2 }
+    regular: (int){ 4 }
+  }
+  select: (struct){
+    opt: (_|_){
+      // [incomplete] select.opt: cannot reference optional field: opt:
+      //     ./in.cue:10:15
+      //     ./in.cue:1:6
+    }
+    txt: (int){ 2 }
+    #def: (int){ 3 }
+    regular: (int){ 4 }
+    _hidden: (int){ 5 }
+  }
+  index: (struct){
+    opt: (_|_){
+      // [incomplete] index.opt: cannot reference optional field: opt:
+      //     ./in.cue:17:15
+      //     ./in.cue:1:6
+    }
+    txt: (int){ 2 }
+    #def: (_|_){
+      // [incomplete] index.#def: undefined field: "#def":
+      //     ./in.cue:19:15
+    }
+    regular: (int){ 4 }
+    _hidden: (_|_){
+      // [incomplete] index._hidden: undefined field: "_hidden":
+      //     ./in.cue:21:15
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -14,6 +14,7 @@
+     opt: (_|_){
+       // [incomplete] select.opt: cannot reference optional field: opt:
+       //     ./in.cue:10:15
++      //     ./in.cue:1:6
+     }
+     txt: (int){ 2 }
+     #def: (int){ 3 }
+@@ -24,6 +25,7 @@
+     opt: (_|_){
+       // [incomplete] index.opt: cannot reference optional field: opt:
+       //     ./in.cue:17:15
++      //     ./in.cue:1:6
+     }
+     txt: (int){ 2 }
+     #def: (_|_){
 -- out/eval --
 (struct){
   foo: (struct){

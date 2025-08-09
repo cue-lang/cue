@@ -99,6 +99,7 @@ Disjuncts:    189
           0: (_|_){
             // [incomplete] p1.#A.list.0: cannot reference optional field: x:
             //     ./in.cue:6:15
+            //     ./in.cue:2:6
           }
           1: (int){ 1 }
         }
@@ -112,10 +113,12 @@ Disjuncts:    189
           0: (_|_){
             // [incomplete] p1.#A.list.0: cannot reference optional field: x:
             //     ./in.cue:6:15
+            //     ./in.cue:2:6
           }
           1: (_|_){
             // [incomplete] p1.#A.list.1: cannot reference optional field: y:
             //     ./in.cue:6:18
+            //     ./in.cue:2:6
           }
         }
         all: (#list){
@@ -129,6 +132,7 @@ Disjuncts:    189
         1: (_|_){
           // [incomplete] p1.a.list.1: cannot reference optional field: y:
           //     ./in.cue:6:18
+          //     ./in.cue:15:5
         }
       }
       all: (#list){
@@ -143,6 +147,7 @@ Disjuncts:    189
         1: (_|_){
           // [incomplete] p1.b.list.1: cannot reference optional field: y:
           //     ./in.cue:6:18
+          //     ./in.cue:16:5
         }
       }
       all: (#list){
@@ -161,6 +166,7 @@ Disjuncts:    189
           0: (_|_){
             // [incomplete] p2.#A.list.0: cannot reference optional field: x:
             //     ./in.cue:23:15
+            //     ./in.cue:19:6
           }
           1: (int){ 1 }
         }
@@ -174,10 +180,12 @@ Disjuncts:    189
           0: (_|_){
             // [incomplete] p2.#A.list.0: cannot reference optional field: x:
             //     ./in.cue:23:15
+            //     ./in.cue:19:6
           }
           1: (_|_){
             // [incomplete] p2.#A.list.1: cannot reference optional field: y:
             //     ./in.cue:23:18
+            //     ./in.cue:19:6
           }
         }
         all: (#list){
@@ -213,32 +221,165 @@ Disjuncts:    189
 diff old new
 --- old
 +++ new
-@@ -49,10 +49,13 @@
-     b: (#struct){
-       x: (int){ 3 }
-       y?: (int){ int }
+@@ -10,23 +10,26 @@
+           0: (_|_){
+             // [incomplete] p1.#A.list.0: cannot reference optional field: x:
+             //     ./in.cue:6:15
+-          }
+-          1: (int){ 1 }
+-        }
+-        all: (#list){
+-          0: (int){ 1 }
+-        }
+-      }, (#struct){
+-        x?: (int){ int }
+-        y?: (int){ int }
+-        let list#1 = (#list){
+-          0: (_|_){
+-            // [incomplete] p1.#A.list.0: cannot reference optional field: x:
+-            //     ./in.cue:6:15
++            //     ./in.cue:2:6
++          }
++          1: (int){ 1 }
++        }
++        all: (#list){
++          0: (int){ 1 }
++        }
++      }, (#struct){
++        x?: (int){ int }
++        y?: (int){ int }
++        let list#1 = (#list){
++          0: (_|_){
++            // [incomplete] p1.#A.list.0: cannot reference optional field: x:
++            //     ./in.cue:6:15
++            //     ./in.cue:2:6
+           }
+           1: (_|_){
+             // [incomplete] p1.#A.list.1: cannot reference optional field: y:
+             //     ./in.cue:6:18
++            //     ./in.cue:2:6
+           }
+         }
+         all: (#list){
+@@ -40,19 +43,24 @@
+         1: (_|_){
+           // [incomplete] p1.a.list.1: cannot reference optional field: y:
+           //     ./in.cue:6:18
+-        }
+-      }
+-      all: (#list){
+-        0: (int){ 3 }
+-      }
+-    }
+-    b: (#struct){
+-      x: (int){ 3 }
+-      y?: (int){ int }
 -      let list#1multi = [
 -        〈1;x〉,
 -        〈1;y〉,
 -      ]
++          //     ./in.cue:15:5
++        }
++      }
++      all: (#list){
++        0: (int){ 3 }
++      }
++    }
++    b: (#struct){
++      x: (int){ 3 }
++      y?: (int){ int }
 +      let list#1 = (#list){
 +        0: (int){ 3 }
 +        1: (_|_){
 +          // [incomplete] p1.b.list.1: cannot reference optional field: y:
 +          //     ./in.cue:6:18
++          //     ./in.cue:16:5
 +        }
 +      }
        all: (#list){
          0: (int){ 3 }
        }
-@@ -106,10 +109,10 @@
-     b: (#struct){
-       x: (int){ 3 }
-       y: (int){ 2 }
+@@ -69,47 +77,50 @@
+           0: (_|_){
+             // [incomplete] p2.#A.list.0: cannot reference optional field: x:
+             //     ./in.cue:23:15
+-          }
+-          1: (int){ 1 }
+-        }
+-        all: (#list){
+-          0: (int){ 1 }
+-        }
+-      }, (#struct){
+-        x?: (int){ int }
+-        y?: (int){ int }
+-        let list#2 = (#list){
+-          0: (_|_){
+-            // [incomplete] p2.#A.list.0: cannot reference optional field: x:
+-            //     ./in.cue:23:15
++            //     ./in.cue:19:6
++          }
++          1: (int){ 1 }
++        }
++        all: (#list){
++          0: (int){ 1 }
++        }
++      }, (#struct){
++        x?: (int){ int }
++        y?: (int){ int }
++        let list#2 = (#list){
++          0: (_|_){
++            // [incomplete] p2.#A.list.0: cannot reference optional field: x:
++            //     ./in.cue:23:15
++            //     ./in.cue:19:6
+           }
+           1: (_|_){
+             // [incomplete] p2.#A.list.1: cannot reference optional field: y:
+             //     ./in.cue:23:18
+-          }
+-        }
+-        all: (#list){
+-        }
+-      }) }
+-    a: (#struct){
+-      x: (int){ 3 }
+-      y: (int){ 2 }
+-      let list#2 = (#list){
+-        0: (int){ 3 }
+-        1: (int){ 2 }
+-      }
+-      all: (#list){
+-        0: (int){ 3 }
+-        1: (int){ 2 }
+-      }
+-    }
+-    b: (#struct){
+-      x: (int){ 3 }
+-      y: (int){ 2 }
 -      let list#2multi = [
 -        〈1;x〉,
 -        〈1;y〉,
 -      ]
++            //     ./in.cue:19:6
++          }
++        }
++        all: (#list){
++        }
++      }) }
++    a: (#struct){
++      x: (int){ 3 }
++      y: (int){ 2 }
++      let list#2 = (#list){
++        0: (int){ 3 }
++        1: (int){ 2 }
++      }
++      all: (#list){
++        0: (int){ 3 }
++        1: (int){ 2 }
++      }
++    }
++    b: (#struct){
++      x: (int){ 3 }
++      y: (int){ 2 }
 +      let list#2 = (#list){
 +        0: (int){ 3 }
 +        1: (int){ 2 }

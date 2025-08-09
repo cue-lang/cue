@@ -633,13 +633,13 @@ Allocs: 72
 Retain: 0
 
 Unifications: 756
-Conjuncts:    1520
+Conjuncts:    1519
 Disjuncts:    84
 Notifications: 8
 
-NumCloseIDs: 445
+NumCloseIDs: 444
 
-ConjunctInfos:       1109
+ConjunctInfos:       1108
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2
@@ -666,13 +666,13 @@ diff old new
 +Retain: 0
 +
 +Unifications: 756
-+Conjuncts:    1520
++Conjuncts:    1519
 +Disjuncts:    84
 +Notifications: 8
 +
-+NumCloseIDs: 445
++NumCloseIDs: 444
 +
-+ConjunctInfos:       1109
++ConjunctInfos:       1108
 +MaxConjunctInfos:    5
 +MaxReqSets:          9
 +MaxRedirect:         2
@@ -1389,7 +1389,7 @@ Result:
         }, (#struct){
           pass: (#struct){
             let self#2 = (_|_){
-              // [incomplete] issue3832.#T._assert.pass.self: undefined field: self:
+              // [eval] issue3832.#T._assert.pass.self: undefined field: self:
               //     ./issue3832.cue:8:19
             }
             outFirstName: (_|_){
@@ -1865,6 +1865,7 @@ Result:
       output: (_|_){
         // [incomplete] full.#JSONPatch.output: cannot reference optional field: namespace:
         //     ./large.cue:21:24
+        //     ./large.cue:18:14
       }
     }
     #JSONOp: (#struct){ |((#struct){
@@ -2449,7 +2450,7 @@ diff old new
              let self#2 = (_|_){
 -              // [incomplete] issue3832.#T._assert.pass.self: in.self undefined (in is incomplete):
 -              //     ./issue3832.cue:8:16
-+              // [incomplete] issue3832.#T._assert.pass.self: undefined field: self:
++              // [eval] issue3832.#T._assert.pass.self: undefined field: self:
 +              //     ./issue3832.cue:8:19
              }
              outFirstName: (_|_){
@@ -2728,7 +2729,15 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -1320,38 +1187,11 @@
+@@ -1307,6 +1174,7 @@
+       output: (_|_){
+         // [incomplete] full.#JSONPatch.output: cannot reference optional field: namespace:
+         //     ./large.cue:21:24
++        //     ./large.cue:18:14
+       }
+     }
+     #JSONOp: (#struct){ |((#struct){
+@@ -1320,38 +1188,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -2769,7 +2778,7 @@ diff old new
          let base#7 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -1370,7 +1210,7 @@
+@@ -1370,7 +1211,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
                value: (_|_){
@@ -2778,7 +2787,7 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
-@@ -1394,6 +1234,19 @@
+@@ -1394,6 +1235,19 @@
              }
            }
          }
@@ -2798,7 +2807,7 @@ diff old new
        }
      }
      out: (#struct){
-@@ -1415,25 +1268,19 @@
+@@ -1415,25 +1269,19 @@
            b1: (_|_){
              // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
              // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):

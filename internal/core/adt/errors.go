@@ -234,16 +234,7 @@ func NewRequiredNotPresentError(ctx *OpContext, v *Vertex, morePositions ...Node
 	for _, p := range morePositions {
 		err.AddPosition(p)
 	}
-	v.VisitLeafConjuncts(func(c Conjunct) bool {
-		if f, ok := c.x.(*Field); ok && f.ArcType == ArcRequired {
-			err.AddPosition(c.x)
-		}
-		if p := c.CloseInfo.Location(ctx); p != nil {
-			err.AddPosition(p)
-		}
-		return true
-	})
-
+	addFieldPositions(ctx, err, v)
 	b := &Bottom{
 		Code: IncompleteError,
 		Err:  err,
@@ -251,6 +242,20 @@ func NewRequiredNotPresentError(ctx *OpContext, v *Vertex, morePositions ...Node
 	}
 	ctx.PopArc(saved)
 	return b
+}
+
+func addFieldPositions(ctx *OpContext, err *ValueError, v *Vertex) {
+	v.VisitLeafConjuncts(func(c Conjunct) bool {
+		if f, ok := c.x.(*Field); ok && f.ArcType != ArcMember {
+			err.AddPosition(c.x)
+		} else if x := c.Elem(); x != nil {
+			err.AddPosition(x)
+		}
+		if p := c.CloseInfo.Location(ctx); p != nil {
+			err.AddPosition(p)
+		}
+		return true
+	})
 }
 
 func newRequiredFieldInComprehensionError(ctx *OpContext, x *ForClause, v *Vertex) *Bottom {

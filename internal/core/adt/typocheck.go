@@ -857,7 +857,7 @@ func getReqSets(n *nodeContext) reqSets {
 		return n.reqSets
 	}
 
-	a := n.reqSets
+	a := n.reqSets[:0]
 	v := n.node
 
 	if p := v.Parent; p != nil && !n.dropParentRequirements {

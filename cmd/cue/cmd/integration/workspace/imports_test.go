@@ -22,6 +22,9 @@ module: "example.com/foo@v0"
 language: version: "v0.11.0"
 -- _registry/example.com_foo_v0.0.1/x/y.cue --
 package x
+
+y: a.b
+a: b: z: 3
 `)))
 
 	qt.Assert(t, qt.IsNil(err))
@@ -41,6 +44,9 @@ deps: {
 package a
 
 import "example.com/foo/x"
+
+v: x
+w: v.y.z
 `
 
 	t.Run("open", func(t *testing.T) {
@@ -63,8 +69,42 @@ import "example.com/foo/x"
 				// A module is created for the imported module.
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=unknown Created", cacheURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Reloaded", cacheURI),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Loaded Package dir=%v/example.com/foo@v0.0.1/x importPath=example.com/foo/x@v0", cacheURI, cacheURI),
+				// This will happen twice: first as an external package,
+				// which then has to be repeated because of the partial
+				// file parsing that the modcache does.
+				LogExactf(protocol.Debug, 2, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Loaded Package dir=%v/example.com/foo@v0.0.1/x importPath=example.com/foo/x@v0", cacheURI, cacheURI),
 			)
+		})
+	})
+
+	t.Run("jump to definition - inter module", func(t *testing.T) {
+		WithOptions(
+			RootURIAsDefaultFolder(), Registry(reg), Modes(DefaultModes()&^Forwarded),
+		).Run(t, files, func(t *testing.T, env *Env) {
+			rootURI := env.Sandbox.Workdir.RootURI()
+			cacheURI := protocol.URIFromPath(cacheDir) + "/mod/extract"
+			env.Await(
+				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+			)
+			env.OpenFile("a/a.cue")
+			env.Await(
+				env.DoneWithOpen(),
+			)
+			locs := env.Definition(protocol.Location{
+				URI: rootURI + "/a/a.cue",
+				Range: protocol.Range{
+					Start: protocol.Position{Line: 5, Character: 7},
+				},
+			})
+			qt.Assert(t, qt.ContentEquals(locs, []protocol.Location{
+				{
+					URI: cacheURI + "/example.com/foo@v0.0.1/x/y.cue",
+					Range: protocol.Range{
+						Start: protocol.Position{Line: 3, Character: 6},
+						End:   protocol.Position{Line: 3, Character: 7},
+					},
+				},
+			}))
 		})
 	})
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ac43699_14782688",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-11T07:43:47Z",
+      "side": 1,
+      "message": "You may not want to add this until v0.15, though. It can\u0027t hurt to keep it.",
+      "revId": "ce33f545cd6f8e78b6fe76cc0c86026880b636f3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

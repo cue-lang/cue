@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bb39e69_4a9a119d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-11T13:40:16Z",
+      "side": 1,
+      "message": "LGTM with a few remaining small nits, thanks!",
+      "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "798c5261_c71e04c7",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-11T13:40:16Z",
+      "side": 1,
+      "message": "This could be a bit clearer: if astNode corresponds to \"a node from the AST\", what does it mean for multiple nodes to \"make up\" this astNode ? Is it actually the nodes that are embedded directly in the astNode ?",
+      "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "430c5f0c_38a2c3dd",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-11T13:40:16Z",
+      "side": 1,
+      "message": "It would be nice to explain exactly what a \"binding\" is: i.e. a lexical name binding - otherwise the reader (me not so long ago :) ) is left wondering what the difference between a \"binding\" and a \"field\" is.",
+      "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73c59eab_7d6df8dd",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-11T13:40:16Z",
+      "side": 1,
+      "message": "```suggestion\n// newAstNode creates a new [astNode] which is a child of the current\n```\n\nAlso, it would be good to explain the arguments a bit. If the astNode corresponds to a node in the AST, which of the ast.Node arguments is it?",
+      "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70076684_254deef2",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-11T13:40:16Z",
+      "side": 1,
+      "message": "From a naive point of view, this begs the question of why this range isn\u0027t already covered by the node that the astNode was created with.",
+      "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27ed6bb4_b48fdf91",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 895,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-11T13:40:16Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t// an ident and not a basiclit. But that ident can\n```",
+      "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

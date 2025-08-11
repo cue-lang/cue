@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e5cdeab_2ffcec07",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-11T17:41:25Z",
+      "side": 1,
+      "message": "nit: consistent capitalization: Go tends to spell acronyms in all-caps.\n\n```suggestion\n\t\t\t\t\tfileURI :\u003d protocol.DocumentURI(string(modRootURI) + \"/\" + file.FilePath)\n```",
+      "revId": "b4837a5bb030dbb4d3c47514af0077352f856bbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

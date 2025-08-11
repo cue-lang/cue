@@ -123,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9870561_ff932fb0",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-11T10:50:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7725983f_3c8be715",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb643252_a6bc9623",
@@ -438,6 +456,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce572a9a_7715a3e7",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-11T10:50:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5108052e_029416b4",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "39afd984_329119dc",
@@ -521,6 +557,24 @@
       "writtenOn": "2025-08-06T10:51:10Z",
       "side": 1,
       "message": "It would perhaps be nice to describe briefly what the arguments mean.",
+      "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79dcb9b1_5fa05bb3",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-11T10:50:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b78d624_a2f1ad6d",
       "revId": "99e06d5ea1a23957f7c53c4c03961e272c762569",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

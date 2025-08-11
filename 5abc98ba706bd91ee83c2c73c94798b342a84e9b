@@ -158,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "166edd24_48410a9d",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 719,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-11T10:50:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5180d86_0466b18c",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "99cd5ede_51b678b9",
@@ -417,6 +435,24 @@
       "writtenOn": "2025-08-06T15:44:07Z",
       "side": 1,
       "message": "It would be nice to see some test cases involving list literals too.\n\nFor example:\n\n```\nx: [{a: 5}, {b, 6}]\ny: x[0].a\n```\n\n```\nx: [... {a!: int}]\ny: int\nz: x[y].a\n```",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6190689a_5d89787d",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-11T10:50:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9445152f_dafdc4fe",
       "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

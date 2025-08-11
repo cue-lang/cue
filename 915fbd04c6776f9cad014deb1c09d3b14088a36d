@@ -16,6 +16,24 @@
       "message": "Why not just call ParseInt(s, 10, 0)? You avoid deduplicating 0 lines, and I doubt there is a dfference in performance.",
       "revId": "915fbd04c6776f9cad014deb1c09d3b14088a36d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00f70630_edd4f4c8",
+        "filename": "pkg/strconv/strconv.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-11T17:01:41Z",
+      "side": 1,
+      "message": "Yeah, good point. Slightly complicated by the name of the function in the error message but still better, probably. Saves two lines anyway.",
+      "parentUuid": "cecd669f_f1da3b12",
+      "revId": "915fbd04c6776f9cad014deb1c09d3b14088a36d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

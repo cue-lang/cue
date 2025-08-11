@@ -1125,7 +1125,7 @@ func (tcs testCases) run(t *testing.T) {
 				pos.determineOffset(filesByName[pos.filename].Pos().File())
 			}
 
-			dfns := definitions.Analyse(files...)
+			dfns := definitions.Analyse(nil, files...)
 			ranges := rangeset.NewFilenameRangeSet()
 
 			for posFrom, positionsWant := range tc.expectations {

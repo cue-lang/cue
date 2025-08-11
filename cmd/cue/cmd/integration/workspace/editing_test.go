@@ -246,4 +246,32 @@ v4: v2
 			}))
 		})
 	})
+
+	t.Run("jump to definition - inter package", func(t *testing.T) {
+		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+			rootURI := env.Sandbox.Workdir.RootURI()
+			env.Await(
+				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+			)
+			env.OpenFile("b/c/c.cue")
+			env.Await(
+				env.DoneWithOpen(),
+			)
+			locs := env.Definition(protocol.Location{
+				URI: rootURI + "/b/c/c.cue",
+				Range: protocol.Range{
+					Start: protocol.Position{Line: 5, Character: 6},
+				},
+			})
+			qt.Assert(t, qt.ContentEquals(locs, []protocol.Location{
+				{
+					URI: rootURI + "/a/a.cue",
+					Range: protocol.Range{
+						Start: protocol.Position{Line: 4, Character: 0},
+						End:   protocol.Position{Line: 4, Character: 2},
+					},
+				},
+			}))
+		})
+	})
 }

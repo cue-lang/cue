@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cecd669f_f1da3b12",
+        "filename": "pkg/strconv/strconv.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-11T16:37:03Z",
+      "side": 1,
+      "message": "Why not just call ParseInt(s, 10, 0)? You avoid deduplicating 0 lines, and I doubt there is a dfference in performance.",
+      "revId": "915fbd04c6776f9cad014deb1c09d3b14088a36d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -87,6 +87,24 @@
       "message": "trailing whitespace.",
       "revId": "03cb1a0083527b8ca1bcf362226224ae64ff4157",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70af09b6_8d0dfe72",
+        "filename": "pkg/strconv/testdata/gen.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-11T17:22:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc599afd_2ac098ef",
+      "revId": "03cb1a0083527b8ca1bcf362226224ae64ff4157",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

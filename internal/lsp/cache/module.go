@@ -51,7 +51,8 @@ type Module struct {
 
 	// packages are the loaded packages within the module. Packages are
 	// only loaded on demand, so there may well be other unloaded
-	// packages within this module.
+	// packages within this module. You must make sure changes to this
+	// map are mirrored to the workspace's packages map.
 	packages map[ast.ImportPath]*Package
 
 	// status of this Module
@@ -225,6 +226,7 @@ func (m *Module) FindPackagesOrModulesForFile(file protocol.DocumentURI) ([]pack
 	if !found {
 		pkg = NewPackage(m, ip, dirUri)
 		m.packages[ip] = pkg
+		w.packages[ip] = pkg
 	}
 	pkgs := []packageOrModule{pkg}
 	// Search also for descendent packages that might include the file

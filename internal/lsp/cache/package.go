@@ -170,20 +170,42 @@ func (pkg *Package) setStatus(status status) {
 		}
 
 	case splendid:
-		files := pkg.pkg.Files()
+		w := pkg.module.workspace
+		for file := range pkg.mappers {
+			delete(w.mappers, file)
+		}
+
+		modpkg := pkg.pkg
+		files := modpkg.Files()
 		mappers := make(map[*token.File]*protocol.Mapper, len(files))
 		astFiles := make([]*ast.File, len(files))
 		for i, f := range files {
 			astFiles[i] = f.Syntax
 			uri := pkg.module.rootURI + protocol.DocumentURI("/"+f.FilePath)
 			file := f.Syntax.Pos().File()
-			mappers[file] = protocol.NewMapper(uri, file.Content())
+			mapper := protocol.NewMapper(uri, file.Content())
+			mappers[file] = mapper
+			w.mappers[file] = mapper
+		}
+		forPackage := func(importPath string) *definitions.Definitions {
+			for _, imported := range modpkg.Imports() {
+				if imported.ImportPath() != importPath {
+					continue
+				}
+				ip := normalizeImportPath(imported)
+				importedPkg, found := w.packages[ip]
+				if !found {
+					return nil
+				}
+				return importedPkg.definitions
+			}
+			return nil
 		}
 		// definitions.Analyse does almost no work - calculation of
 		// resolutions is done lazily. So no need to launch go-routines
 		// here. Similarly, the creation of a mapper is lazy.
 		pkg.mappers = mappers
-		pkg.definitions = definitions.Analyse(astFiles...)
+		pkg.definitions = definitions.Analyse(forPackage, astFiles...)
 	}
 }
 
@@ -193,12 +215,12 @@ func (pkg *Package) setStatus(status status) {
 // nodes.
 func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) []protocol.Location {
 	dfns := pkg.definitions
-	mappers := pkg.mappers
-	if dfns == nil || mappers == nil {
+	if dfns == nil {
 		return nil
 	}
 
 	w := pkg.module.workspace
+	mappers := w.mappers
 
 	fdfns := dfns.ForFile(uri.Path())
 	if fdfns == nil {
@@ -228,7 +250,12 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 		startPos := target.Pos().Position()
 		endPos := target.End().Position()
 
-		targetMapper := mappers[target.Pos().File()]
+		targetFile := target.Pos().File()
+		targetMapper := mappers[targetFile]
+		if targetMapper == nil {
+			w.debugLog("mapper not found: " + targetFile.Name())
+			return nil
+		}
 		r, err := targetMapper.OffsetRange(startPos.Offset, endPos.Offset)
 		if err != nil {
 			w.debugLog(err.Error())

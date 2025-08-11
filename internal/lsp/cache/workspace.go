@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -20,6 +19,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	cueerrors "cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
@@ -51,8 +51,10 @@ type Workspace struct {
 	// WorkspaceFolder could contain several modules. As much as
 	// possible, we keep code that deals with workspace folders
 	// separate from code which deals with cue modules+packages.
-	folders []*WorkspaceFolder
-	modules map[protocol.DocumentURI]*Module
+	folders  []*WorkspaceFolder
+	modules  map[protocol.DocumentURI]*Module
+	packages map[ast.ImportPath]*Package
+	mappers  map[*token.File]*protocol.Mapper
 
 	// These are cached values. Do not use these directly, instead, use
 	// [Workspace.ActiveFilesAndDirs]
@@ -67,6 +69,8 @@ func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
 		overlayFS: fscache.NewOverlayFS(cache.fs),
 		debugLog:  debugLog,
 		modules:   make(map[protocol.DocumentURI]*Module),
+		packages:  make(map[ast.ImportPath]*Package),
+		mappers:   make(map[*token.File]*protocol.Mapper),
 	}
 }
 
@@ -641,10 +645,6 @@ func (w *Workspace) reloadPackages() error {
 	modules := w.modules
 	modulesChanged := false
 
-	// We need to merge together all the packages from every module
-	// (even if the module has no work to do) so that we can correctly
-	// build/update the inverted package import graph, across modules.
-	allPackages := make(map[ast.ImportPath]*Package)
 	var loadedPkgs []*modpkgload.Package
 	allDirtyFiles := make(map[protocol.DocumentURI]*Module)
 
@@ -654,8 +654,6 @@ func (w *Workspace) reloadPackages() error {
 	// the (re)loading of any dirty packages, we accumulate all the
 	// loaded packages here, and process them all together.
 	for _, m := range modules {
-		maps.Copy(allPackages, m.packages)
-
 		pkgs, err := m.loadDirtyPackages()
 		if err != nil {
 			modulesChanged = true
@@ -733,8 +731,8 @@ func (w *Workspace) reloadPackages() error {
 			// TODO: if packages contains ip, then we should probably
 			// look at its importedBy field as that would tell us about
 			// packages that now have dangling imports.
-			delete(allPackages, ip)
 			delete(m.packages, ip)
+			delete(w.packages, ip)
 			continue
 		}
 
@@ -752,7 +750,7 @@ func (w *Workspace) reloadPackages() error {
 			}
 			pkg = NewPackage(m, ip, dirUri)
 			m.packages[ip] = pkg
-			allPackages[ip] = pkg
+			w.packages[ip] = pkg
 		}
 		// Capture the old loadedPkg (if it exists) so we can correct
 		// the import graph later.
@@ -796,13 +794,13 @@ func (w *Workspace) reloadPackages() error {
 			if _, found := imports[ip]; found {
 				// Both new and old pkgs import ip. Noop.
 				delete(imports, ip)
-			} else if importedPkg, found := allPackages[ip]; found {
+			} else if importedPkg, found := w.packages[ip]; found {
 				// Only new pkg imports ip. Add the back-pointer.
 				importedPkg.EnsureImportedBy(pkg)
 			}
 		}
 		for ip := range imports {
-			if importedPkg, found := allPackages[ip]; found {
+			if importedPkg, found := w.packages[ip]; found {
 				// Only old pkg imports ip. Remove the back-pointer.
 				importedPkg.RemoveImportedBy(pkg)
 			}

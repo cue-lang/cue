@@ -261,6 +261,8 @@ import (
 	"cuelang.org/go/internal/lsp/rangeset"
 )
 
+type DefinitionsForPackageFunc func(importPath string) *Definitions
+
 // Definitions provides methods to resolve file offsets to their
 // definitions.
 type Definitions struct {
@@ -268,6 +270,7 @@ type Definitions struct {
 	pkgNode *astNode
 	// byFilename maps file names to [FileDefinitions]
 	byFilename map[string]*FileDefinitions
+	forPackage DefinitionsForPackageFunc
 }
 
 // Analyse creates and performs initial configuration of a new
@@ -276,9 +279,13 @@ type Definitions struct {
 // package. The set of files cannot be modified after construction;
 // instead, construction is cheap, so the intention is you replace the
 // whole Definitions value.
-func Analyse(files ...*ast.File) *Definitions {
+func Analyse(forPackage DefinitionsForPackageFunc, files ...*ast.File) *Definitions {
+	if forPackage == nil {
+		forPackage = func(importPath string) *Definitions { return nil }
+	}
 	dfns := &Definitions{
 		byFilename: make(map[string]*FileDefinitions, len(files)),
+		forPackage: forPackage,
 	}
 
 	pkgNode := dfns.newAstNode(nil, nil, nil, nil)
@@ -863,6 +870,22 @@ func navigateBindingsByName(navigables []*navigableBindings, name string) []*nav
 		for _, node := range nav.contributingNodes {
 			node.eval()
 			navigables = append(navigables, node.resolvesTo...)
+
+			if spec, ok := node.key.(*ast.ImportSpec); ok {
+				str, err := strconv.Unquote(spec.Path.Value)
+				if err != nil {
+					continue
+				}
+				dfns := node.dfns.forPackage(str)
+				if dfns == nil {
+					continue
+				}
+				pkgNode := dfns.pkgNode
+				pkgNode.eval()
+				for _, node := range pkgNode.allChildren {
+					navigables = append(navigables, node.navigable)
+				}
+			}
 		}
 	}
 

@@ -205,50 +205,6 @@ diff old new
      ./issue2351.cue:4:19
  
  Result:
-@@ -22,14 +24,13 @@
-         string
-         #early: (string){ |(*(string){ "X" }, (string){ string }) }
-       }) }
--    t3: (_|_){
--      // [incomplete] conjunct.t3: 2 errors in empty disjunction:
--      // conjunct.t3: cannot add field #early: was already used:
--      //     ./in.cue:6:2
--      // conjunct.t3: cannot add field #early: was already used:
--      //     ./in.cue:15:2
--      #early: (string){ |(*(string){ "X" }, (string){ string }) }
--    }
-+    t3: (string){ |(*(string){
-+        "X"
-+        #early: (string){ |(*(string){ "X" }, (string){ string }) }
-+      }, (string){
-+        string
-+        #early: (string){ |(*(string){ "X" }, (string){ string }) }
-+      }) }
-   }
-   handleComprehensions: (struct){
-     #sub2: (int){ 2 }
-@@ -37,9 +38,11 @@
-   issue2351: (_|_){
-     // [eval]
-     let: (_|_){
--      // [eval] issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
-+      // [eval] param: conflicting values [{}] and "foo" (mismatched types list and string):
-+      //     ./issue2351.cue:1:17
-       //     ./issue2351.cue:2:15
-       //     ./issue2351.cue:3:2
-+      //     ./issue2351.cue:4:10
-       //     ./issue2351.cue:4:19
-       let _param#1 = (string){ "foo" }
-     }
-@@ -67,7 +70,7 @@
-         }
-       }
-     }
--    export: (struct){
-+    export: (#struct){
-       let data#2 = (struct){
-         f1: (string){ "foo" }
-       }
 -- out/eval/stats --
 Leaks:  9
 Freed:  68
@@ -291,14 +247,13 @@ Result:
         string
         #early: (string){ |(*(string){ "X" }, (string){ string }) }
       }) }
-    t3: (_|_){
-      // [incomplete] conjunct.t3: 2 errors in empty disjunction:
-      // conjunct.t3: cannot add field #early: was already used:
-      //     ./in.cue:6:2
-      // conjunct.t3: cannot add field #early: was already used:
-      //     ./in.cue:15:2
-      #early: (string){ |(*(string){ "X" }, (string){ string }) }
-    }
+    t3: (string){ |(*(string){
+        "X"
+        #early: (string){ |(*(string){ "X" }, (string){ string }) }
+      }, (string){
+        string
+        #early: (string){ |(*(string){ "X" }, (string){ string }) }
+      }) }
   }
   handleComprehensions: (struct){
     #sub2: (int){ 2 }
@@ -306,9 +261,11 @@ Result:
   issue2351: (_|_){
     // [eval]
     let: (_|_){
-      // [eval] issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
+      // [eval] param: conflicting values [{}] and "foo" (mismatched types list and string):
+      //     ./issue2351.cue:1:17
       //     ./issue2351.cue:2:15
       //     ./issue2351.cue:3:2
+      //     ./issue2351.cue:4:10
       //     ./issue2351.cue:4:19
       let _param#1 = (string){ "foo" }
     }
@@ -336,7 +293,7 @@ Result:
         }
       }
     }
-    export: (struct){
+    export: (#struct){
       let data#2 = (struct){
         f1: (string){ "foo" }
       }

@@ -1957,7 +1957,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,25 +1,13 @@
+@@ -1,22 +1,10 @@
  Errors:
  embed.fail1.p: field not allowed:
 -    ./in.cue:37:9
@@ -1978,12 +1978,8 @@ diff old new
 -    ./issue3535.cue:19:12
 -    ./issue3535.cue:21:3
      ./issue3535.cue:22:4
--    ./issue3535.cue:25:7
  issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
-+    ./issue3729.cue:8:32
-     ./issue3729.cue:9:9
-     ./issue3729.cue:10:2
-     ./issue3729.cue:11:9
+     ./issue3729.cue:8:32
 @@ -26,14 +14,8 @@
  noStackOverflowStructCycle.#list.tail: structural cycle
  noStackOverflowStructCycle.list.tail: structural cycle
@@ -1999,17 +1995,6 @@ diff old new
      ./in.cue:591:9
  fieldMismatch.a: cannot combine regular field "x" with 2:
      ./in.cue:152:7
-@@ -79,8 +61,8 @@
-   }
-   fail: (struct){
-     a: (_|_){
--      // [cycle] fail.a: cycle with field a.b:
--      //     ./in.cue:30:6
-+      // [incomplete] fail.a.b: cyclic reference to field b:
-+      //     ./in.cue:30:3
-     }
-   }
-   embed: (_|_){
 @@ -89,10 +71,6 @@
        // [eval]
        p: (_|_){
@@ -2021,42 +2006,18 @@ diff old new
          //     ./in.cue:46:4
          //     ./in.cue:49:9
        }
-@@ -121,12 +99,11 @@
-       // [eval]
-       p: (_|_){
-         // [eval] embed.fail4.p: field not allowed:
--        //     ./in.cue:82:9
--        //     ./in.cue:83:7
--        //     ./in.cue:84:9
--        //     ./in.cue:85:3
-         //     ./in.cue:87:4
--        q: (int){ 1 }
-+        q: (_|_){
-+          // [eval] embed.fail4.p.q: field not allowed:
-+          //     ./in.cue:87:7
-+        }
-       }
-     }
-     #C4: (#struct){
-@@ -207,13 +184,10 @@
+@@ -206,8 +184,8 @@
          b: (bool){ bool }
        }
        x: (#struct){
 -        c: (int){ 4 }
 -        b: (bool){ true }
--      }
--      y: (#struct){
--        c: (int){ 4 }
--        b: (bool){ true }
--      }
 +        b: (bool){ true }
 +        c: (int){ 4 }
-+      }
-+      y: ~(provideIncompleteSuccess.t1.x)
+       }
+       y: ~(provideIncompleteSuccess.t1.x)
      }
-     t2: (_|_){
-       // [eval]
-@@ -229,10 +203,7 @@
+@@ -225,10 +203,7 @@
            // [eval]
            d: (_|_){
              // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -2067,114 +2028,7 @@ diff old new
            }
          }
          b: (bool){ true }
-@@ -263,9 +234,22 @@
-   }
-   cyclicError: (struct){
-     a: (_|_){
--      // [cycle] cycle error
--    }
--    c: (struct){
-+      // [incomplete] cyclicError.a: incomplete bool: bool:
-+      //     ./in.cue:245:6
-+      x: (_|_){
-+        // [incomplete] cyclicError.a: incomplete bool: bool:
-+        //     ./in.cue:245:6
-+      }
-+      y: (_|_){
-+        // [incomplete] cyclicError.a: incomplete bool: bool:
-+        //     ./in.cue:245:6
-+      }
-+      b: (struct){
-+      }
-+    }
-+    c: (_|_){
-+      // [incomplete] cyclicError.a: incomplete bool: bool:
-+      //     ./in.cue:245:6
-     }
-   }
-   midwayReferences: (struct){
-@@ -279,24 +263,9 @@
-         }
-       }
-     }
--    b: (struct){
--      y: (struct){
--        z: (struct){
--          a: (int){ 1 }
--          b: (int){ 2 }
--        }
--      }
--    }
--    c: (struct){
--      z: (struct){
--        a: (int){ 1 }
--        b: (int){ 2 }
--      }
--    }
--    d: (struct){
--      a: (int){ 1 }
--      b: (int){ 2 }
--    }
-+    b: ~(midwayReferences.a.x)
-+    c: ~(midwayReferences.a.x.y)
-+    d: ~(midwayReferences.a.x.y.z)
-   }
-   closedCheck: (struct){
-     success1: (struct){
-@@ -399,13 +368,7 @@
-           }
-         }
-       }
--      E: (#struct){
--        e: (bool){ bool }
--        f: (_|_){
--          // [incomplete] voidEliminationSuccess.derefRef2.E.f: operand e of '!' not concrete (was bool):
--          //     ./in.cue:402:7
--        }
--      }
-+      E: ~(voidEliminationSuccess.derefRef2.#F)
-       #F: (#struct){
-         e: (bool){ bool }
-         f: (_|_){
-@@ -422,17 +385,11 @@
-         }
-       }
-       E: (_|_){
--        // [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction::
--        //     ./in.cue:407:28
-+        // [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction:
-         // voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
-         //     ./in.cue:417:7
-         // voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
-         //     ./in.cue:420:7
--        g: (bool){ bool }
--        h: (_|_){
--          // [incomplete] voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
--          //     ./in.cue:420:7
--        }
-       }
-     }
-     derefDisj2: (struct){
-@@ -443,17 +400,11 @@
-         }
-       }
-       E: (_|_){
--        // [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction::
--        //     ./in.cue:425:28
-+        // [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction:
-         // voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
-         //     ./in.cue:435:7
-         // voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
-         //     ./in.cue:438:7
--        g: (bool){ bool }
--        h: (_|_){
--          // [incomplete] voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
--          //     ./in.cue:438:7
--        }
-       }
-     }
-     bulk1: (struct){
-@@ -576,9 +527,6 @@
+@@ -552,9 +527,6 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -2184,7 +2038,7 @@ diff old new
              //     ./in.cue:591:9
            }
          }
-@@ -602,13 +550,13 @@
+@@ -578,13 +550,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -2202,88 +2056,7 @@ diff old new
          }
        }
      }
-@@ -645,9 +593,8 @@
-     _c: (struct){
-       y: (int){ 1 }
-     }
--    a: (_|_){
--      // [cycle] nestedWithDynamicFieldOK.a: circular dependency in evaluation of conditionals: "\(〈1;k〉)" changed after evaluation:
--      //     ./issue2113.cue:19:7
-+    a: (struct){
-+      y: (int){ 1 }
-     }
-   }
-   errorPropagation: (_|_){
-@@ -705,10 +652,10 @@
-       }
-       foo: (#struct){
-         kind: (string){ "foo" }
--        output: (#struct){
--        }
-         _hidden: (struct){
-         }
-+        output: (#struct){
-+        }
-       }
-     }
-     regular: (_|_){
-@@ -721,16 +668,11 @@
-       foo: (_|_){
-         // [eval]
-         kind: (string){ "foo" }
--        output: (#struct){
--        }
-         regular: (_|_){
-           // [eval] issue3535.regular.foo.regular: field not allowed:
--          //     ./issue3535.cue:15:6
--          //     ./issue3535.cue:19:7
--          //     ./issue3535.cue:19:12
--          //     ./issue3535.cue:21:3
-           //     ./issue3535.cue:22:4
--          //     ./issue3535.cue:25:7
-+        }
-+        output: (#struct){
-         }
-       }
-     }
-@@ -742,10 +684,10 @@
-       }
-       foo: (#struct){
-         kind: (string){ "foo" }
--        output: (#struct){
--        }
-         #def: (#struct){
-         }
-+        output: (#struct){
-+        }
-       }
-     }
-   }
-@@ -815,6 +757,7 @@
-       // [eval]
-       root: (_|_){
-         // [eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
-+        //     ./issue3729.cue:8:32
-         //     ./issue3729.cue:9:9
-         //     ./issue3729.cue:10:2
-         //     ./issue3729.cue:11:9
-@@ -864,14 +807,7 @@
-     }
-     full: (struct){
-       #Application: (#struct){
--        spec: (#struct){
--          syncPolicy?: ((null|struct)){ |((null){ null }, (#struct){
--              automated?: ((null|struct)){ |((null){ null }, (#struct){
--                  prune?: (bool){ bool }
--                  selfHeal?: (bool){ bool }
--                }) }
--            }) }
--        }
-+        spec: ~(issue3729.full.#ApplicationSpec)
-       }
-       #ApplicationSpec: (#struct){
-         syncPolicy?: ((null|struct)){ |((null){ null }, (#struct){
-@@ -907,10 +843,10 @@
+@@ -871,10 +843,10 @@
    issue3935: (struct){
      reduced: (struct){
        out: (#struct){
@@ -2295,32 +2068,6 @@ diff old new
        }
        #A: (#struct){
          y: (#struct){
-@@ -928,14 +864,12 @@
-       out: (#struct){
-         spec: (#struct){
-           name: (string){ "foo" }
--          config: (struct){
-+          config: (#struct){
-             namespace: (string){ "bar" }
-           }
-         }
-         namespace: (string){ "bar" }
--        _specConfig: (#struct){
--          namespace: (string){ "bar" }
--        }
-+        _specConfig: ~(issue3935.full.out.spec.config)
-       }
-       #SchemaOther: (#struct){
-         spec: (#struct){
-@@ -950,7 +884,7 @@
-           config!: (_){ _ }
-         }
-         namespace: (_|_){
--          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined (_specConfig is incomplete):
-+          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined as _specConfig is incomplete (type _):
-           //     ./issue3935.cue:36:15
-         }
-         _specConfig: (_){ _ }
 -- out/evalalpha/stats --
 Leaks:  45
 Freed:  642
@@ -2400,8 +2147,8 @@ issue3535.regular.foo.regular: field not allowed:
     ./issue3535.cue:19:12
     ./issue3535.cue:21:3
     ./issue3535.cue:22:4
-    ./issue3535.cue:25:7
 issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+    ./issue3729.cue:8:32
     ./issue3729.cue:9:9
     ./issue3729.cue:10:2
     ./issue3729.cue:11:9
@@ -2461,8 +2208,8 @@ Result:
   }
   fail: (struct){
     a: (_|_){
-      // [cycle] fail.a: cycle with field a.b:
-      //     ./in.cue:30:6
+      // [incomplete] fail.a.b: cyclic reference to field b:
+      //     ./in.cue:30:3
     }
   }
   embed: (_|_){
@@ -2503,12 +2250,11 @@ Result:
       // [eval]
       p: (_|_){
         // [eval] embed.fail4.p: field not allowed:
-        //     ./in.cue:82:9
-        //     ./in.cue:83:7
-        //     ./in.cue:84:9
-        //     ./in.cue:85:3
         //     ./in.cue:87:4
-        q: (int){ 1 }
+        q: (_|_){
+          // [eval] embed.fail4.p.q: field not allowed:
+          //     ./in.cue:87:7
+        }
       }
     }
     #C4: (#struct){
@@ -2592,10 +2338,7 @@ Result:
         c: (int){ 4 }
         b: (bool){ true }
       }
-      y: (#struct){
-        c: (int){ 4 }
-        b: (bool){ true }
-      }
+      y: ~(provideIncompleteSuccess.t1.x)
     }
     t2: (_|_){
       // [eval]
@@ -2645,9 +2388,22 @@ Result:
   }
   cyclicError: (struct){
     a: (_|_){
-      // [cycle] cycle error
+      // [incomplete] cyclicError.a: incomplete bool: bool:
+      //     ./in.cue:245:6
+      x: (_|_){
+        // [incomplete] cyclicError.a: incomplete bool: bool:
+        //     ./in.cue:245:6
+      }
+      y: (_|_){
+        // [incomplete] cyclicError.a: incomplete bool: bool:
+        //     ./in.cue:245:6
+      }
+      b: (struct){
+      }
     }
-    c: (struct){
+    c: (_|_){
+      // [incomplete] cyclicError.a: incomplete bool: bool:
+      //     ./in.cue:245:6
     }
   }
   midwayReferences: (struct){
@@ -2661,24 +2417,9 @@ Result:
         }
       }
     }
-    b: (struct){
-      y: (struct){
-        z: (struct){
-          a: (int){ 1 }
-          b: (int){ 2 }
-        }
-      }
-    }
-    c: (struct){
-      z: (struct){
-        a: (int){ 1 }
-        b: (int){ 2 }
-      }
-    }
-    d: (struct){
-      a: (int){ 1 }
-      b: (int){ 2 }
-    }
+    b: ~(midwayReferences.a.x)
+    c: ~(midwayReferences.a.x.y)
+    d: ~(midwayReferences.a.x.y.z)
   }
   closedCheck: (struct){
     success1: (struct){
@@ -2781,13 +2522,7 @@ Result:
           }
         }
       }
-      E: (#struct){
-        e: (bool){ bool }
-        f: (_|_){
-          // [incomplete] voidEliminationSuccess.derefRef2.E.f: operand e of '!' not concrete (was bool):
-          //     ./in.cue:402:7
-        }
-      }
+      E: ~(voidEliminationSuccess.derefRef2.#F)
       #F: (#struct){
         e: (bool){ bool }
         f: (_|_){
@@ -2804,17 +2539,11 @@ Result:
         }
       }
       E: (_|_){
-        // [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction::
-        //     ./in.cue:407:28
+        // [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction:
         // voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
         //     ./in.cue:417:7
         // voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
         //     ./in.cue:420:7
-        g: (bool){ bool }
-        h: (_|_){
-          // [incomplete] voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
-          //     ./in.cue:420:7
-        }
       }
     }
     derefDisj2: (struct){
@@ -2825,17 +2554,11 @@ Result:
         }
       }
       E: (_|_){
-        // [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction::
-        //     ./in.cue:425:28
+        // [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction:
         // voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
         //     ./in.cue:435:7
         // voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
         //     ./in.cue:438:7
-        g: (bool){ bool }
-        h: (_|_){
-          // [incomplete] voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
-          //     ./in.cue:438:7
-        }
       }
     }
     bulk1: (struct){
@@ -3027,9 +2750,8 @@ Result:
     _c: (struct){
       y: (int){ 1 }
     }
-    a: (_|_){
-      // [cycle] nestedWithDynamicFieldOK.a: circular dependency in evaluation of conditionals: "\(〈1;k〉)" changed after evaluation:
-      //     ./issue2113.cue:19:7
+    a: (struct){
+      y: (int){ 1 }
     }
   }
   errorPropagation: (_|_){
@@ -3087,9 +2809,9 @@ Result:
       }
       foo: (#struct){
         kind: (string){ "foo" }
-        output: (#struct){
-        }
         _hidden: (struct){
+        }
+        output: (#struct){
         }
       }
     }
@@ -3103,16 +2825,11 @@ Result:
       foo: (_|_){
         // [eval]
         kind: (string){ "foo" }
-        output: (#struct){
-        }
         regular: (_|_){
           // [eval] issue3535.regular.foo.regular: field not allowed:
-          //     ./issue3535.cue:15:6
-          //     ./issue3535.cue:19:7
-          //     ./issue3535.cue:19:12
-          //     ./issue3535.cue:21:3
           //     ./issue3535.cue:22:4
-          //     ./issue3535.cue:25:7
+        }
+        output: (#struct){
         }
       }
     }
@@ -3124,9 +2841,9 @@ Result:
       }
       foo: (#struct){
         kind: (string){ "foo" }
-        output: (#struct){
-        }
         #def: (#struct){
+        }
+        output: (#struct){
         }
       }
     }
@@ -3197,6 +2914,7 @@ Result:
       // [eval]
       root: (_|_){
         // [eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+        //     ./issue3729.cue:8:32
         //     ./issue3729.cue:9:9
         //     ./issue3729.cue:10:2
         //     ./issue3729.cue:11:9
@@ -3246,14 +2964,7 @@ Result:
     }
     full: (struct){
       #Application: (#struct){
-        spec: (#struct){
-          syncPolicy?: ((null|struct)){ |((null){ null }, (#struct){
-              automated?: ((null|struct)){ |((null){ null }, (#struct){
-                  prune?: (bool){ bool }
-                  selfHeal?: (bool){ bool }
-                }) }
-            }) }
-        }
+        spec: ~(issue3729.full.#ApplicationSpec)
       }
       #ApplicationSpec: (#struct){
         syncPolicy?: ((null|struct)){ |((null){ null }, (#struct){
@@ -3310,14 +3021,12 @@ Result:
       out: (#struct){
         spec: (#struct){
           name: (string){ "foo" }
-          config: (struct){
+          config: (#struct){
             namespace: (string){ "bar" }
           }
         }
         namespace: (string){ "bar" }
-        _specConfig: (#struct){
-          namespace: (string){ "bar" }
-        }
+        _specConfig: ~(issue3935.full.out.spec.config)
       }
       #SchemaOther: (#struct){
         spec: (#struct){
@@ -3332,7 +3041,7 @@ Result:
           config!: (_){ _ }
         }
         namespace: (_|_){
-          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined (_specConfig is incomplete):
+          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined as _specConfig is incomplete (type _):
           //     ./issue3935.cue:36:15
         }
         _specConfig: (_){ _ }

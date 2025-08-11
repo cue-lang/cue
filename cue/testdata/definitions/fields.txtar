@@ -881,24 +881,6 @@ diff old new
  
  Result:
  (_|_){
-@@ -77,7 +32,7 @@
-     // [eval]
-     t1: (struct){
-       c: (#list){
--        0: (struct){
-+        0: (#struct){
-           b: (int){ int }
-         }
-       }
-@@ -86,7 +41,7 @@
-     }
-     t2: (struct){
-       #A: (_){ _ }
--      l: (struct){
-+      l: (#struct){
-         f: (string){ "hi" }
-       }
-     }
 @@ -116,11 +71,11 @@
          }
        }
@@ -927,43 +909,7 @@ diff old new
            //     ./in.cue:41:5
          }
        }
-@@ -170,16 +121,7 @@
-       }
-     }
-     t8: (struct){
--      foo: (#struct){
--        a: (#struct){
--          b: (#struct){
--            c: (#struct){
--              C: (int){ 1 }
--              D: (int){ 2 }
--            }
--          }
--        }
--      }
-+      foo: ~(ok.t8.#X)
-       #X: (#struct){
-         a: (#struct){
-           b: (#struct){
-@@ -193,7 +135,7 @@
-     }
-     t9: (struct){
-       c: (#list){
--        0: (struct){
-+        0: (#struct){
-           b: (int){ int }
-         }
-       }
-@@ -202,7 +144,7 @@
-     }
-     t10: (struct){
-       #A: (_){ _ }
--      l: (struct){
-+      l: (#struct){
-         f: (string){ "hi" }
-       }
-     }
-@@ -232,11 +174,11 @@
+@@ -223,11 +174,11 @@
          }
        }
        W: (#struct){
@@ -980,7 +926,7 @@ diff old new
          }
        }
      }
-@@ -250,10 +192,6 @@
+@@ -241,10 +192,6 @@
          // [eval]
          c: (_|_){
            // [eval] ok.t13.x.c: field not allowed:
@@ -991,22 +937,7 @@ diff old new
            //     ./in.cue:112:5
          }
        }
-@@ -277,13 +215,11 @@
-       }
-       a: (_|_){
-         // [eval]
--        a: (int){ 2 }
-         disallowed: (_|_){
-           // [eval] err.t1.a.disallowed: field not allowed:
--          //     ./in.cue:133:10
--          //     ./in.cue:134:5
-           //     ./in.cue:135:5
-         }
-+        a: (int){ 2 }
-       }
-     }
-     t2: (_|_){
-@@ -297,14 +233,11 @@
+@@ -286,14 +233,11 @@
          // [eval]
          c: (_|_){
            // [eval]
@@ -1022,7 +953,7 @@ diff old new
          }
        }
      }
-@@ -318,8 +251,6 @@
+@@ -307,8 +251,6 @@
            // [eval]
            c: (_|_){
              // [eval] err.t3.p1.a.c: field not allowed:
@@ -1031,7 +962,7 @@ diff old new
              //     ./in.cue:147:5
            }
          }
-@@ -336,8 +267,6 @@
+@@ -325,8 +267,6 @@
              // [eval]
              c: (_|_){
                // [eval] err.t3.p2.a.b.c: field not allowed:
@@ -1040,7 +971,7 @@ diff old new
                //     ./in.cue:153:8
              }
            }
-@@ -350,54 +279,47 @@
+@@ -339,54 +279,47 @@
          // [eval]
          b: (_|_){
            // [eval]
@@ -1128,7 +1059,7 @@ diff old new
          }
        }
      }
-@@ -447,17 +369,12 @@
+@@ -436,17 +369,12 @@
                // [eval]
                e: (_|_){
                  // [eval]
@@ -1148,7 +1079,7 @@ diff old new
                }
              }
            }
-@@ -471,13 +388,11 @@
+@@ -460,13 +388,11 @@
        }
        a: (_|_){
          // [eval]
@@ -1163,7 +1094,7 @@ diff old new
        }
      }
      t8: (_|_){
-@@ -491,14 +406,11 @@
+@@ -480,14 +406,11 @@
          // [eval]
          c: (_|_){
            // [eval]
@@ -1179,64 +1110,7 @@ diff old new
          }
        }
      }
-@@ -512,11 +424,11 @@
-       }
-     }
-     egs: (struct){
--      x1: (struct){
-+      x1: (#struct){
-         name: (string){ "blah" }
-         age1: (int){ 5 }
-       }
--      x2: (struct){
-+      x2: (#struct){
-         name: (string){ "blah" }
-         age2: (int){ 5 }
-       }
-@@ -540,8 +452,7 @@
-   }
-   validator: (_|_){
-     // [eval]
--    open: (_|_){
--      // [eval]
-+    open: (struct){
-       #Schema: (_){
-         matchN(1, (#list){
-           0: (_|_){// 〈1;#x〉
-@@ -551,28 +462,10 @@
-           trailingComma?: (string){ "all" }
-         }
-       }
--      data: (_|_){
--        // [eval] validator.open.data: invalid value {trailingComma:_|_(validator.open.data.trailingComma: field not allowed),#x:_|_(validator.open.data.trailingComma: field not allowed)} (does not satisfy matchN): 0 matched, expected 1:
--        //     ./validators.cue:10:3
--        //     ./validators.cue:10:10
--        //     ./validators.cue:13:8
--        //     ./validators.cue:14:8
--        // validator.open.data.trailingComma: field not allowed:
--        //     ./validators.cue:10:3
--        //     ./validators.cue:9:11
--        //     ./validators.cue:13:8
--        //     ./validators.cue:14:8
--        trailingComma: (_|_){
--          // [eval] validator.open.data.trailingComma: field not allowed:
--          //     ./validators.cue:10:3
--          //     ./validators.cue:9:11
--          //     ./validators.cue:13:8
--          //     ./validators.cue:14:8
--        }
--        #x: (_|_){
--          // [eval]
--          trailingComma?: (_|_){// "all"
--          }
-+      data: (#struct){
-+        trailingComma: (string){ "all" }
-+        #x: (#struct){
-+          trailingComma?: (string){ "all" }
-         }
-       }
-     }
-@@ -584,14 +477,13 @@
+@@ -554,14 +477,13 @@
        }
        x: (_|_){
          // [eval]
@@ -1339,7 +1213,7 @@ Result:
     // [eval]
     t1: (struct){
       c: (#list){
-        0: (struct){
+        0: (#struct){
           b: (int){ int }
         }
       }
@@ -1348,7 +1222,7 @@ Result:
     }
     t2: (struct){
       #A: (_){ _ }
-      l: (struct){
+      l: (#struct){
         f: (string){ "hi" }
       }
     }
@@ -1432,16 +1306,7 @@ Result:
       }
     }
     t8: (struct){
-      foo: (#struct){
-        a: (#struct){
-          b: (#struct){
-            c: (#struct){
-              C: (int){ 1 }
-              D: (int){ 2 }
-            }
-          }
-        }
-      }
+      foo: ~(ok.t8.#X)
       #X: (#struct){
         a: (#struct){
           b: (#struct){
@@ -1455,7 +1320,7 @@ Result:
     }
     t9: (struct){
       c: (#list){
-        0: (struct){
+        0: (#struct){
           b: (int){ int }
         }
       }
@@ -1464,7 +1329,7 @@ Result:
     }
     t10: (struct){
       #A: (_){ _ }
-      l: (struct){
+      l: (#struct){
         f: (string){ "hi" }
       }
     }
@@ -1539,13 +1404,11 @@ Result:
       }
       a: (_|_){
         // [eval]
-        a: (int){ 2 }
         disallowed: (_|_){
           // [eval] err.t1.a.disallowed: field not allowed:
-          //     ./in.cue:133:10
-          //     ./in.cue:134:5
           //     ./in.cue:135:5
         }
+        a: (int){ 2 }
       }
     }
     t2: (_|_){
@@ -1774,11 +1637,11 @@ Result:
       }
     }
     egs: (struct){
-      x1: (struct){
+      x1: (#struct){
         name: (string){ "blah" }
         age1: (int){ 5 }
       }
-      x2: (struct){
+      x2: (#struct){
         name: (string){ "blah" }
         age2: (int){ 5 }
       }
@@ -1802,8 +1665,7 @@ Result:
   }
   validator: (_|_){
     // [eval]
-    open: (_|_){
-      // [eval]
+    open: (struct){
       #Schema: (_){
         matchN(1, (#list){
           0: (_|_){// 〈1;#x〉
@@ -1813,28 +1675,10 @@ Result:
           trailingComma?: (string){ "all" }
         }
       }
-      data: (_|_){
-        // [eval] validator.open.data: invalid value {trailingComma:_|_(validator.open.data.trailingComma: field not allowed),#x:_|_(validator.open.data.trailingComma: field not allowed)} (does not satisfy matchN): 0 matched, expected 1:
-        //     ./validators.cue:10:3
-        //     ./validators.cue:10:10
-        //     ./validators.cue:13:8
-        //     ./validators.cue:14:8
-        // validator.open.data.trailingComma: field not allowed:
-        //     ./validators.cue:10:3
-        //     ./validators.cue:9:11
-        //     ./validators.cue:13:8
-        //     ./validators.cue:14:8
-        trailingComma: (_|_){
-          // [eval] validator.open.data.trailingComma: field not allowed:
-          //     ./validators.cue:10:3
-          //     ./validators.cue:9:11
-          //     ./validators.cue:13:8
-          //     ./validators.cue:14:8
-        }
-        #x: (_|_){
-          // [eval]
-          trailingComma?: (_|_){// "all"
-          }
+      data: (#struct){
+        trailingComma: (string){ "all" }
+        #x: (#struct){
+          trailingComma?: (string){ "all" }
         }
       }
     }

@@ -230,132 +230,6 @@ Retain: 10
 Unifications: 62
 Conjuncts:    105
 Disjuncts:    70
--- out/evalalpha --
-(struct){
-  math: (struct){
-    p1: (struct){
-      a: (int){ 100 }
-      b: (int){ 200 }
-    }
-    p2: (struct){
-      a: (int){ 100 }
-      b: (int){ 200 }
-    }
-    p3: (struct){
-      b: (int){ 200 }
-      a: (int){ 100 }
-    }
-    p4: (struct){
-      b: (int){ 200 }
-      a: (int){ 100 }
-    }
-    p5: (struct){
-      b: (int){ 200 }
-      a: (int){ 100 }
-    }
-    p6: (struct){
-      b: (int){ 200 }
-      a: (int){ 100 }
-    }
-  }
-  a: (int){ 100 }
-  list: (struct){
-    t0: (struct){
-      c: (#list){
-        0: (_){ _ }
-      }
-    }
-    t1: (struct){
-      p1: (struct){
-        c: (#list){
-          0: (int){ 100 }
-          1: (int){ 100 }
-        }
-      }
-      p2: (struct){
-        c: (#list){
-          0: (int){ 100 }
-          1: (int){ 100 }
-        }
-      }
-    }
-  }
-  nodes: (struct){
-    t1: (struct){
-      p1: (struct){
-        s1: (struct){
-          a: (int){ 1 }
-        }
-      }
-      p2: (struct){
-        s1: (struct){
-          a: (int){ 1 }
-        }
-      }
-    }
-    t2: (struct){
-      s1: (struct){
-        a: (int){ 1 }
-        b: (int){ 2 }
-      }
-      s2: (struct){
-        b: (int){ 2 }
-        a: (int){ 1 }
-      }
-    }
-    t3: (struct){
-      s1: (struct){
-        a: (int){ 1 }
-        b: (int){ 2 }
-        c: (int){ 3 }
-      }
-      s2: (struct){
-        b: (int){ 2 }
-        c: (int){ 3 }
-        a: (int){ 1 }
-      }
-      s3: (struct){
-        c: (int){ 3 }
-        a: (int){ 1 }
-        b: (int){ 2 }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -73,18 +73,18 @@
-     t3: (struct){
-       s1: (struct){
-         a: (int){ 1 }
--        c: (int){ 3 }
--        b: (int){ 2 }
--      }
--      s2: (struct){
--        b: (int){ 2 }
--        a: (int){ 1 }
--        c: (int){ 3 }
-+        b: (int){ 2 }
-+        c: (int){ 3 }
-+      }
-+      s2: (struct){
-+        b: (int){ 2 }
-+        c: (int){ 3 }
-+        a: (int){ 1 }
-       }
-       s3: (struct){
-         c: (int){ 3 }
--        b: (int){ 2 }
--        a: (int){ 1 }
-+        a: (int){ 1 }
-+        b: (int){ 2 }
-       }
-     }
-   }
--- diff/explanation --
-Reordering.
 -- out/eval --
 (struct){
   math: (struct){
@@ -432,18 +306,18 @@ Reordering.
     t3: (struct){
       s1: (struct){
         a: (int){ 1 }
-        c: (int){ 3 }
         b: (int){ 2 }
+        c: (int){ 3 }
       }
       s2: (struct){
         b: (int){ 2 }
-        a: (int){ 1 }
         c: (int){ 3 }
+        a: (int){ 1 }
       }
       s3: (struct){
         c: (int){ 3 }
-        b: (int){ 2 }
         a: (int){ 1 }
+        b: (int){ 2 }
       }
     }
   }

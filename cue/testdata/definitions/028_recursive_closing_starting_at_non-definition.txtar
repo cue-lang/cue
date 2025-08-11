@@ -79,46 +79,6 @@ Retain: 0
 Unifications: 14
 Conjuncts:    21
 Disjuncts:    14
--- out/evalalpha --
-(struct){
-  z: (struct){
-    a: (struct){
-      #B: (#struct){
-        c: (#struct){
-          d: (int){ 1 }
-          f: (int){ 1 }
-        }
-      }
-    }
-  }
-  A: (struct){
-    a: (struct){
-      #B: (#struct){
-        c: (#struct){
-          e: (int){ 2 }
-          d: (int){ 1 }
-          f: (int){ 1 }
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -13,9 +13,9 @@
-     a: (struct){
-       #B: (#struct){
-         c: (#struct){
--          d: (int){ 1 }
--          f: (int){ 1 }
-           e: (int){ 2 }
-+          d: (int){ 1 }
-+          f: (int){ 1 }
-         }
-       }
-     }
 -- diff/explanation --
 reordering
 -- out/eval --
@@ -137,9 +97,9 @@ reordering
     a: (struct){
       #B: (#struct){
         c: (#struct){
+          e: (int){ 2 }
           d: (int){ 1 }
           f: (int){ 1 }
-          e: (int){ 2 }
         }
       }
     }

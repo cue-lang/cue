@@ -1119,34 +1119,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,13 +1,6 @@
- Errors:
--selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
--issue2310.original.#sub.#_1.#_1.#_1: structural cycle:
--    ./in.cue:318:62
--issue2310.original.#sub._#X.3.#_1.#_1.#_1: structural cycle:
--    ./in.cue:318:62
--issue2310.reduced.res.#X.3.#str.#str.#str: structural cycle:
--    ./in.cue:347:21
--issue2310.reduced.res.#str.#str.#str: structural cycle:
--    ./in.cue:347:21
-+selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
-+    ./in.cue:122:14
- 
- Result:
- (_|_){
-@@ -27,7 +20,9 @@
-   B: (struct){
-     a: (struct){
-       parent: (string){ "" }
--      children: (#list){
-+      children: (_|_){
-+        // [incomplete] B.a.children: cannot range over v.children (incomplete type list):
-+        //     ./in.cue:24:40
-       }
-     }
-   }
-@@ -60,17 +55,12 @@
+@@ -55,12 +55,12 @@
        }
      }
      _e: (#struct){
@@ -1154,12 +1127,7 @@ diff old new
 -      }
 -      f2: (#struct){
 -        a: (#struct){
--          t: (#struct){
--            f1: (#struct){
--            }
--            f2: (#struct){
--            }
--          }
+-          t: ~(issue1666.#E)
 -        }
 +      f2: (#struct){
 +        a: (#struct){
@@ -1170,183 +1138,7 @@ diff old new
        }
      }
      e: (#struct){
-@@ -84,12 +74,7 @@
-       }
-       f2: (#struct){
-         a: (#struct){
--          t: (#struct){
--            f1: (#struct){
--            }
--            f2: (#struct){
--            }
--          }
-+          t: ~(issue1666.#E)
-         }
-       }
-     }
-@@ -135,9 +120,9 @@
-     insertionError: (_|_){
-       // [eval]
-       A: (_|_){
--        // [eval] selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
-+        // [eval] selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
-+        //     ./in.cue:122:14
-         foo: (int){ 1 }
--        foo3: (int){ 1 }
-       }
-     }
-     acrossOr: (struct){
-@@ -405,10 +390,8 @@
-   issue2367: (struct){
-     a: (_){ _ }
-   }
--  issue2310: (_|_){
--    // [structural cycle]
--    original: (_|_){
--      // [structural cycle]
-+  issue2310: (struct){
-+    original: (struct){
-       #s: (_|_){
-         // [incomplete] issue2310.original.#s: error in call to strings.Replace: non-concrete value string:
-         //     ./in.cue:318:46
-@@ -418,14 +401,128 @@
-         #_3: (string){ string }
-       }
-       #sub: (_|_){
--        // [structural cycle] issue2310.original.#sub.#_1.#_1.#_1: structural cycle:
--        //     ./in.cue:318:62
--      }
--      res: (_|_){
--        // [structural cycle] issue2310.original.#sub.#_1.#_1.#_1: structural cycle:
--        //     ./in.cue:318:62
--        // issue2310.original.#sub._#X.3.#_1.#_1.#_1: structural cycle:
--        //     ./in.cue:318:62
-+        // [incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-+        //     ./in.cue:318:46
-+        //     ./in.cue:318:12
-+        #a: (string){ string }
-+        _#X: (#list){
-+          0: (string){ string }
-+          1: (_|_){
-+            // [incomplete] issue2310.original.#sub._#X.1: error in call to strings.Replace: non-concrete value string:
-+            //     ./in.cue:318:46
-+            //     ./in.cue:318:12
-+            #_1: (string){ string }
-+            #_2: (string){ "a" }
-+            #_3: (string){ "b" }
-+          }
-+          2: (_|_){
-+            // [incomplete] issue2310.original.#sub._#X.2.#_1: error in call to strings.Replace: non-concrete value string:
-+            //     ./in.cue:318:46
-+            //     ./in.cue:318:12
-+            #_1: (_|_){
-+              // [incomplete] issue2310.original.#sub._#X.2.#_1: error in call to strings.Replace: non-concrete value string:
-+              //     ./in.cue:318:46
-+              //     ./in.cue:318:12
-+              #_1: (string){ string }
-+              #_2: (string){ "a" }
-+              #_3: (string){ "b" }
-+            }
-+            #_2: (string){ "c" }
-+            #_3: (string){ "d" }
-+          }
-+          3: (_|_){
-+            // [incomplete] issue2310.original.#sub._#X.3.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-+            //     ./in.cue:318:46
-+            //     ./in.cue:318:12
-+            #_1: (_|_){
-+              // [incomplete] issue2310.original.#sub._#X.3.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-+              //     ./in.cue:318:46
-+              //     ./in.cue:318:12
-+              #_1: (_|_){
-+                // [incomplete] issue2310.original.#sub._#X.3.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-+                //     ./in.cue:318:46
-+                //     ./in.cue:318:12
-+                #_1: (string){ string }
-+                #_2: (string){ "a" }
-+                #_3: (string){ "b" }
-+              }
-+              #_2: (string){ "c" }
-+              #_3: (string){ "d" }
-+            }
-+            #_2: (string){ "e" }
-+            #_3: (string){ "f" }
-+          }
-+        }
-+        #_1: (_|_){
-+          // [incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-+          //     ./in.cue:318:46
-+          //     ./in.cue:318:12
-+          #_1: (_|_){
-+            // [incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
-+            //     ./in.cue:318:46
-+            //     ./in.cue:318:12
-+            #_1: (string){ string }
-+            #_2: (string){ "a" }
-+            #_3: (string){ "b" }
-+          }
-+          #_2: (string){ "c" }
-+          #_3: (string){ "d" }
-+        }
-+        #_2: (string){ "e" }
-+        #_3: (string){ "f" }
-+      }
-+      res: (string){
-+        "bbb"
-+        #a: (string){ "aaa" }
-+        _#X: (#list){
-+          0: (string){ "aaa" }
-+          1: (string){
-+            "bbb"
-+            #_1: (string){ "aaa" }
-+            #_2: (string){ "a" }
-+            #_3: (string){ "b" }
-+          }
-+          2: (string){
-+            "bbb"
-+            #_1: (string){
-+              "bbb"
-+              #_1: (string){ "aaa" }
-+              #_2: (string){ "a" }
-+              #_3: (string){ "b" }
-+            }
-+            #_2: (string){ "c" }
-+            #_3: (string){ "d" }
-+          }
-+          3: (string){
-+            "bbb"
-+            #_1: (string){
-+              "bbb"
-+              #_1: (string){
-+                "bbb"
-+                #_1: (string){ "aaa" }
-+                #_2: (string){ "a" }
-+                #_3: (string){ "b" }
-+              }
-+              #_2: (string){ "c" }
-+              #_3: (string){ "d" }
-+            }
-+            #_2: (string){ "e" }
-+            #_3: (string){ "f" }
-+          }
-+        }
-+        #_1: (string){
-+          "bbb"
-+          #_1: (string){
-+            "bbb"
-+            #_1: (string){ "aaa" }
-+            #_2: (string){ "a" }
-+            #_3: (string){ "b" }
-+          }
-+          #_2: (string){ "c" }
-+          #_3: (string){ "d" }
-+        }
-+        #_2: (string){ "e" }
-+        #_3: (string){ "f" }
-       }
-       #subs: (#list){
-         0: (_|_){
-@@ -432,33 +529,62 @@
+@@ -529,25 +529,25 @@
            // [incomplete] issue2310.original.#subs.0: error in call to strings.Replace: non-concrete value string:
            //     ./in.cue:318:46
            //     ./in.cue:318:12
@@ -1373,86 +1165,10 @@ diff old new
 -          #_1: (string){ string }
            #_2: (string){ "e" }
            #_3: (string){ "f" }
--        }
--      }
--    }
--    reduced: (_|_){
--      // [structural cycle]
--      res: (_|_){
--        // [structural cycle] issue2310.reduced.res.#str.#str.#str: structural cycle:
--        //     ./in.cue:347:21
 +          #_1: (string){ string }
-+        }
-+      }
-+    }
-+    reduced: (struct){
-+      res: (string){
-+        "Xaaa"
-+        #X: (#list){
-+          0: (string){ "X" }
-+          1: (string){
-+            "Xa"
-+            #str: (string){ "X" }
-+          }
-+          2: (string){
-+            "Xaa"
-+            #str: (string){
-+              "Xa"
-+              #str: (string){ "X" }
-+            }
-+          }
-+          3: (string){
-+            "Xaaa"
-+            #str: (string){
-+              "Xaa"
-+              #str: (string){
-+                "Xa"
-+                #str: (string){ "X" }
-+              }
-+            }
-+          }
-+        }
-+        #str: (string){
-+          "Xaa"
-+          #str: (string){
-+            "Xa"
-+            #str: (string){ "X" }
-+          }
-+        }
-       }
-       #s: (_|_){
-         // [incomplete] issue2310.reduced.#s: non-concrete value string in operand to +:
-@@ -496,9 +622,6 @@
-     }
-     full: (struct){
-       s1: (#struct){
--        _local: (#list){
--          0: (string){ "s1 local" }
--        }
-         _deps: (#list){
-           0: (#struct){
-             _local: (#list){
-@@ -511,6 +634,9 @@
-             }
-           }
          }
-+        _local: (#list){
-+          0: (string){ "s1 local" }
-+        }
-         objs: (#list){
-           0: (string){ "s1 local" }
-           1: (string){ "s2 local" }
-@@ -542,9 +668,7 @@
-         name: (string){ string }
        }
-       #Resource: (#struct){
--        metadata: (#struct){
--          name: (string){ string }
--        }
-+        metadata: ~(issue3941.full.#Metadata)
-       }
-       out: (struct){
-         _metadata: (struct){
+     }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -1506,15 +1222,8 @@ NumCloseIDs: 16
 B.a.children: now correctly marked as incomplete
 -- out/eval --
 Errors:
-selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
-issue2310.original.#sub.#_1.#_1.#_1: structural cycle:
-    ./in.cue:318:62
-issue2310.original.#sub._#X.3.#_1.#_1.#_1: structural cycle:
-    ./in.cue:318:62
-issue2310.reduced.res.#X.3.#str.#str.#str: structural cycle:
-    ./in.cue:347:21
-issue2310.reduced.res.#str.#str.#str: structural cycle:
-    ./in.cue:347:21
+selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
+    ./in.cue:122:14
 
 Result:
 (_|_){
@@ -1534,7 +1243,9 @@ Result:
   B: (struct){
     a: (struct){
       parent: (string){ "" }
-      children: (#list){
+      children: (_|_){
+        // [incomplete] B.a.children: cannot range over v.children (incomplete type list):
+        //     ./in.cue:24:40
       }
     }
   }
@@ -1571,12 +1282,7 @@ Result:
       }
       f2: (#struct){
         a: (#struct){
-          t: (#struct){
-            f1: (#struct){
-            }
-            f2: (#struct){
-            }
-          }
+          t: ~(issue1666.#E)
         }
       }
     }
@@ -1591,12 +1297,7 @@ Result:
       }
       f2: (#struct){
         a: (#struct){
-          t: (#struct){
-            f1: (#struct){
-            }
-            f2: (#struct){
-            }
-          }
+          t: ~(issue1666.#E)
         }
       }
     }
@@ -1642,9 +1343,9 @@ Result:
     insertionError: (_|_){
       // [eval]
       A: (_|_){
-        // [eval] selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
+        // [eval] selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
+        //     ./in.cue:122:14
         foo: (int){ 1 }
-        foo3: (int){ 1 }
       }
     }
     acrossOr: (struct){
@@ -1912,10 +1613,8 @@ Result:
   issue2367: (struct){
     a: (_){ _ }
   }
-  issue2310: (_|_){
-    // [structural cycle]
-    original: (_|_){
-      // [structural cycle]
+  issue2310: (struct){
+    original: (struct){
       #s: (_|_){
         // [incomplete] issue2310.original.#s: error in call to strings.Replace: non-concrete value string:
         //     ./in.cue:318:46
@@ -1925,14 +1624,128 @@ Result:
         #_3: (string){ string }
       }
       #sub: (_|_){
-        // [structural cycle] issue2310.original.#sub.#_1.#_1.#_1: structural cycle:
-        //     ./in.cue:318:62
+        // [incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
+        //     ./in.cue:318:46
+        //     ./in.cue:318:12
+        #a: (string){ string }
+        _#X: (#list){
+          0: (string){ string }
+          1: (_|_){
+            // [incomplete] issue2310.original.#sub._#X.1: error in call to strings.Replace: non-concrete value string:
+            //     ./in.cue:318:46
+            //     ./in.cue:318:12
+            #_1: (string){ string }
+            #_2: (string){ "a" }
+            #_3: (string){ "b" }
+          }
+          2: (_|_){
+            // [incomplete] issue2310.original.#sub._#X.2.#_1: error in call to strings.Replace: non-concrete value string:
+            //     ./in.cue:318:46
+            //     ./in.cue:318:12
+            #_1: (_|_){
+              // [incomplete] issue2310.original.#sub._#X.2.#_1: error in call to strings.Replace: non-concrete value string:
+              //     ./in.cue:318:46
+              //     ./in.cue:318:12
+              #_1: (string){ string }
+              #_2: (string){ "a" }
+              #_3: (string){ "b" }
+            }
+            #_2: (string){ "c" }
+            #_3: (string){ "d" }
+          }
+          3: (_|_){
+            // [incomplete] issue2310.original.#sub._#X.3.#_1.#_1: error in call to strings.Replace: non-concrete value string:
+            //     ./in.cue:318:46
+            //     ./in.cue:318:12
+            #_1: (_|_){
+              // [incomplete] issue2310.original.#sub._#X.3.#_1.#_1: error in call to strings.Replace: non-concrete value string:
+              //     ./in.cue:318:46
+              //     ./in.cue:318:12
+              #_1: (_|_){
+                // [incomplete] issue2310.original.#sub._#X.3.#_1.#_1: error in call to strings.Replace: non-concrete value string:
+                //     ./in.cue:318:46
+                //     ./in.cue:318:12
+                #_1: (string){ string }
+                #_2: (string){ "a" }
+                #_3: (string){ "b" }
+              }
+              #_2: (string){ "c" }
+              #_3: (string){ "d" }
+            }
+            #_2: (string){ "e" }
+            #_3: (string){ "f" }
+          }
+        }
+        #_1: (_|_){
+          // [incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
+          //     ./in.cue:318:46
+          //     ./in.cue:318:12
+          #_1: (_|_){
+            // [incomplete] issue2310.original.#sub.#_1.#_1: error in call to strings.Replace: non-concrete value string:
+            //     ./in.cue:318:46
+            //     ./in.cue:318:12
+            #_1: (string){ string }
+            #_2: (string){ "a" }
+            #_3: (string){ "b" }
+          }
+          #_2: (string){ "c" }
+          #_3: (string){ "d" }
+        }
+        #_2: (string){ "e" }
+        #_3: (string){ "f" }
       }
-      res: (_|_){
-        // [structural cycle] issue2310.original.#sub.#_1.#_1.#_1: structural cycle:
-        //     ./in.cue:318:62
-        // issue2310.original.#sub._#X.3.#_1.#_1.#_1: structural cycle:
-        //     ./in.cue:318:62
+      res: (string){
+        "bbb"
+        #a: (string){ "aaa" }
+        _#X: (#list){
+          0: (string){ "aaa" }
+          1: (string){
+            "bbb"
+            #_1: (string){ "aaa" }
+            #_2: (string){ "a" }
+            #_3: (string){ "b" }
+          }
+          2: (string){
+            "bbb"
+            #_1: (string){
+              "bbb"
+              #_1: (string){ "aaa" }
+              #_2: (string){ "a" }
+              #_3: (string){ "b" }
+            }
+            #_2: (string){ "c" }
+            #_3: (string){ "d" }
+          }
+          3: (string){
+            "bbb"
+            #_1: (string){
+              "bbb"
+              #_1: (string){
+                "bbb"
+                #_1: (string){ "aaa" }
+                #_2: (string){ "a" }
+                #_3: (string){ "b" }
+              }
+              #_2: (string){ "c" }
+              #_3: (string){ "d" }
+            }
+            #_2: (string){ "e" }
+            #_3: (string){ "f" }
+          }
+        }
+        #_1: (string){
+          "bbb"
+          #_1: (string){
+            "bbb"
+            #_1: (string){ "aaa" }
+            #_2: (string){ "a" }
+            #_3: (string){ "b" }
+          }
+          #_2: (string){ "c" }
+          #_3: (string){ "d" }
+        }
+        #_2: (string){ "e" }
+        #_3: (string){ "f" }
       }
       #subs: (#list){
         0: (_|_){
@@ -1961,11 +1774,40 @@ Result:
         }
       }
     }
-    reduced: (_|_){
-      // [structural cycle]
-      res: (_|_){
-        // [structural cycle] issue2310.reduced.res.#str.#str.#str: structural cycle:
-        //     ./in.cue:347:21
+    reduced: (struct){
+      res: (string){
+        "Xaaa"
+        #X: (#list){
+          0: (string){ "X" }
+          1: (string){
+            "Xa"
+            #str: (string){ "X" }
+          }
+          2: (string){
+            "Xaa"
+            #str: (string){
+              "Xa"
+              #str: (string){ "X" }
+            }
+          }
+          3: (string){
+            "Xaaa"
+            #str: (string){
+              "Xaa"
+              #str: (string){
+                "Xa"
+                #str: (string){ "X" }
+              }
+            }
+          }
+        }
+        #str: (string){
+          "Xaa"
+          #str: (string){
+            "Xa"
+            #str: (string){ "X" }
+          }
+        }
       }
       #s: (_|_){
         // [incomplete] issue2310.reduced.#s: non-concrete value string in operand to +:
@@ -2003,9 +1845,6 @@ Result:
     }
     full: (struct){
       s1: (#struct){
-        _local: (#list){
-          0: (string){ "s1 local" }
-        }
         _deps: (#list){
           0: (#struct){
             _local: (#list){
@@ -2017,6 +1856,9 @@ Result:
               0: (string){ "s2 local" }
             }
           }
+        }
+        _local: (#list){
+          0: (string){ "s1 local" }
         }
         objs: (#list){
           0: (string){ "s1 local" }
@@ -2049,9 +1891,7 @@ Result:
         name: (string){ string }
       }
       #Resource: (#struct){
-        metadata: (#struct){
-          name: (string){ string }
-        }
+        metadata: ~(issue3941.full.#Metadata)
       }
       out: (struct){
         _metadata: (struct){

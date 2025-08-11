@@ -160,7 +160,7 @@ Disjuncts:    154
   }
   eliminateOpenVariant: (struct){
     ok: (struct){
-      c: (#struct){ |((struct){
+      c: (struct){ |((struct){
           a: (int){ 1 }
         }, (#struct){
           a: (int){ 1 }
@@ -171,16 +171,8 @@ Disjuncts:    154
     }
   }
   cyclicSelfElimination: (struct){
-    ok: (_|_){
-      // [incomplete] cyclicSelfElimination.ok: 2 errors in empty disjunction:
-      // cyclicSelfElimination.ok: conflicting values 1 and {y:(1|{y:1}),y} (mismatched types int and struct):
-      //     ./in.cue:68:28
-      //     ./in.cue:70:5
-      // cyclicSelfElimination.ok: cannot add field y: was already used:
-      //     ./in.cue:70:10
-      y: ((int|struct)){ |((int){ 1 }, (struct){
-          y: (int){ 1 }
-        }) }
+    ok: (struct){
+      y: (int){ 1 }
     }
   }
   panic1: (struct){
@@ -317,35 +309,7 @@ Disjuncts:    154
 diff old new
 --- old
 +++ new
-@@ -48,7 +48,7 @@
-   }
-   eliminateOpenVariant: (struct){
-     ok: (struct){
--      c: (#struct){ |((struct){
-+      c: (struct){ |((struct){
-           a: (int){ 1 }
-         }, (#struct){
-           a: (int){ 1 }
-@@ -59,16 +59,8 @@
-     }
-   }
-   cyclicSelfElimination: (struct){
--    ok: (_|_){
--      // [incomplete] cyclicSelfElimination.ok: 2 errors in empty disjunction:
--      // cyclicSelfElimination.ok: conflicting values 1 and {y:(1|{y:1}),y} (mismatched types int and struct):
--      //     ./in.cue:68:28
--      //     ./in.cue:70:5
--      // cyclicSelfElimination.ok: cannot add field y: was already used:
--      //     ./in.cue:70:10
--      y: ((int|struct)){ |((int){ 1 }, (struct){
--          y: (int){ 1 }
--        }) }
-+    ok: (struct){
-+      y: (int){ 1 }
-     }
-   }
-   panic1: (struct){
-@@ -77,8 +69,8 @@
+@@ -69,8 +69,8 @@
        foo_field: (string){ string }
      }
      #TypeBar: (#struct){
@@ -355,7 +319,7 @@ diff old new
      }
      #TypeBar2: (#struct){
        name: (string){ "bar" }
-@@ -85,21 +77,21 @@
+@@ -77,21 +77,21 @@
      }
      objs: (struct){
        obj1: (struct){

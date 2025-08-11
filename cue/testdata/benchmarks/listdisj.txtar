@@ -84,7 +84,7 @@ diff old new
 +Unifications: 14
 +Conjuncts:    22
 +Disjuncts:    4
--- out/evalalpha --
+-- out/eval --
 (struct){
   #T: (list){
     0: (string){ "d" }
@@ -94,56 +94,6 @@ diff old new
   z: ~(#T)
   v: ~(#T)
   #X: ~(#T)
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -2,19 +2,9 @@
-   #T: (list){
-     0: (string){ "d" }
-   }
--  x: (list){
--    0: (string){ "d" }
--  }
--  y: (list){
--    0: (string){ "d" }
--  }
--  z: (list){
--    0: (string){ "d" }
--  }
--  v: (list){
--    0: (string){ "d" }
--  }
--  #X: (list){
--    0: (string){ "d" }
--  }
-+  x: ~(#T)
-+  y: ~(#T)
-+  z: ~(#T)
-+  v: ~(#T)
-+  #X: ~(#T)
- }
--- out/eval --
-(struct){
-  #T: (list){
-    0: (string){ "d" }
-  }
-  x: (list){
-    0: (string){ "d" }
-  }
-  y: (list){
-    0: (string){ "d" }
-  }
-  z: (list){
-    0: (string){ "d" }
-  }
-  v: (list){
-    0: (string){ "d" }
-  }
-  #X: (list){
-    0: (string){ "d" }
-  }
 }
 -- diff/explanation --
 Differences fully due to rendered structure sharing.

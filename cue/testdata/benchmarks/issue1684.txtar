@@ -78,69 +78,6 @@ ConjunctInfos:       7501
 MaxConjunctInfos:    4
 MaxReqSets:          12
 MaxRedirect:         5
--- out/evalalpha --
-(struct){
-  #Secret: (#struct){
-    $secret: (#struct){
-      id: (string){ string }
-      _id: (string){ string }
-    }
-  }
-  #secrets: (#struct){ |((#struct){
-      $secret: (#struct){
-        id: (string){ string }
-        _id: (string){ string }
-      }
-    }, (#struct){
-    }) }
-  out: (#struct){
-    FOO: (#struct){
-      $secret: (#struct){
-        id: (string){ "100" }
-        _id: (string){ "100" }
-      }
-    }
-    ONE: (#struct){
-      TWO: (#struct){
-        THREE: (#struct){
-          $secret: (#struct){
-            id: (string){ "123" }
-            _id: (string){ "123" }
-          }
-        }
-      }
-    }
-  }
-  nestedCross: (struct){
-    closed: (struct){
-      #D: (#struct){ |((#struct){
-          id: (string){ string }
-        }, (#struct){
-        }) }
-    }
-    open: (struct){
-      D: (struct){ |((struct){
-          id: (string){ string }
-        }, (struct){
-        }) }
-    }
-  }
-  nestedClosed: (struct){
-    passing: (struct){
-      D: (struct){ |((struct){
-          id: (struct){
-          }
-        }, (struct){
-          id: (struct){ |((struct){
-              id: (struct){
-              }
-            }, (struct){
-            }) }
-        }, (struct){
-        }) }
-    }
-  }
-}
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -169,47 +106,6 @@ diff old new
 +MaxConjunctInfos:    4
 +MaxReqSets:          12
 +MaxRedirect:         5
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -56,36 +56,6 @@
-             }, (struct){
-             }) }
-         }, (struct){
--          id: (struct){ |((struct){
--              id: (struct){
--              }
--            }, (struct){
--            }) }
--        }, (struct){
--          id: (struct){ |((struct){
--              id: (struct){
--              }
--            }, (struct){
--            }) }
--        }, (struct){
--          id: (struct){ |((struct){
--              id: (struct){
--              }
--            }, (struct){
--            }) }
--        }, (struct){
--          id: (struct){ |((struct){
--              id: (struct){
--              }
--            }, (struct){
--            }) }
--        }, (struct){
--          id: (struct){ |((struct){
--              id: (struct){
--              }
--            }, (struct){
--            }) }
--        }, (struct){
-         }) }
-     }
-   }
 -- diff/explanation --
 New algorithm is better at trimming recursive disjunctions.
 Note that the old closedness implementation of V3 was able to reduce this to
@@ -279,36 +175,6 @@ Disjuncts:    1064333
       D: (struct){ |((struct){
           id: (struct){
           }
-        }, (struct){
-          id: (struct){ |((struct){
-              id: (struct){
-              }
-            }, (struct){
-            }) }
-        }, (struct){
-          id: (struct){ |((struct){
-              id: (struct){
-              }
-            }, (struct){
-            }) }
-        }, (struct){
-          id: (struct){ |((struct){
-              id: (struct){
-              }
-            }, (struct){
-            }) }
-        }, (struct){
-          id: (struct){ |((struct){
-              id: (struct){
-              }
-            }, (struct){
-            }) }
-        }, (struct){
-          id: (struct){ |((struct){
-              id: (struct){
-              }
-            }, (struct){
-            }) }
         }, (struct){
           id: (struct){ |((struct){
               id: (struct){

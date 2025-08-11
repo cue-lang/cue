@@ -69,8 +69,51 @@ func ParseFloat(s string, bitSize int) (float64, error) {
 const IntSize = 64
 
 // ParseUint is like ParseInt but for unsigned numbers.
-func ParseUint(s string, base int, bitSize int) (uint64, error) {
-	return strconv.ParseUint(s, base, bitSize)
+func ParseUint(s string, base int, bitSize int) (*big.Int, error) {
+	if bitSize < 0 {
+		return nil, &strconv.NumError{
+			Func: "ParseUint",
+			Num:  s,
+			Err:  strconv.ErrRange,
+		}
+	}
+
+	// Parse the number using big.Int to handle arbitrary precision
+	i := new(big.Int)
+	i, ok := i.SetString(s, base)
+	if !ok {
+		return nil, &strconv.NumError{
+			Func: "ParseUint",
+			Num:  s,
+			Err:  strconv.ErrSyntax,
+		}
+	}
+
+	// Check if the value is negative (not allowed for unsigned)
+	if i.Sign() < 0 {
+		return nil, &strconv.NumError{
+			Func: "ParseUint",
+			Num:  s,
+			Err:  strconv.ErrRange,
+		}
+	}
+
+	// If bitSize is 0, return unlimited precision result
+	if bitSize == 0 {
+		return i, nil
+	}
+
+	// Check if the value fits in the specified bit size
+	// For unsigned integers, the range is [0, 2^bitSize-1]
+	if i.BitLen() <= bitSize {
+		return i, nil
+	}
+
+	return nil, &strconv.NumError{
+		Func: "ParseUint",
+		Num:  s,
+		Err:  strconv.ErrRange,
+	}
 }
 
 // ParseInt interprets a string s in the given base (0, 2 to 36) and

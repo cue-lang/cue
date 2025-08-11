@@ -35,47 +35,6 @@ Retain: 0
 Unifications: 7
 Conjuncts:    9
 Disjuncts:    7
--- out/evalalpha --
-Errors:
-bulkToSelf.a.foo.bar: conflicting values "3" and int (mismatched types string and int):
-    ./in.cue:3:18
-    ./in.cue:4:18
-intField: integer fields not supported:
-    ./in.cue:8:3
-
-Result:
-(_|_){
-  // [eval]
-  bulkToSelf: (_|_){
-    // [eval]
-    a: (_|_){
-      // [eval]
-      foo: (_|_){
-        // [eval]
-        bar: (_|_){
-          // [eval] bulkToSelf.a.foo.bar: conflicting values "3" and int (mismatched types string and int):
-          //     ./in.cue:3:18
-          //     ./in.cue:4:18
-        }
-      }
-    }
-  }
-  intField: (_|_){
-    // [eval] intField: integer fields not supported:
-    //     ./in.cue:8:3
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -25,6 +25,5 @@
-   intField: (_|_){
-     // [eval] intField: integer fields not supported:
-     //     ./in.cue:8:3
--    2: (string){ string }
-   }
- }
 -- diff/explanation --
 Not including illegal field. Seems fine.
 -- out/eval --
@@ -106,6 +65,5 @@ Result:
   intField: (_|_){
     // [eval] intField: integer fields not supported:
     //     ./in.cue:8:3
-    2: (string){ string }
   }
 }

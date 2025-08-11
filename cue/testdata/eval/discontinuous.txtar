@@ -58,54 +58,12 @@ Retain: 9
 Unifications: 14
 Conjuncts:    23
 Disjuncts:    23
--- out/evalalpha --
-(struct){
-  a: (#list){
-    0: (struct){
-      name: (string){ "http" }
-      port: (int){ 8080 }
-    }
-  }
-  foo: (struct){
-    bar: (struct){
-      baz: (#list){
-        0: (struct){
-          port: (int){ 8080 }
-        }
-      }
-    }
-  }
-  x: (struct){
-    D: (struct){
-      bar: (struct){
-      }
-    }
-    DSpec: (struct){
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,8 +1,8 @@
- (struct){
-   a: (#list){
-     0: (struct){
--      port: (int){ 8080 }
-       name: (string){ "http" }
-+      port: (int){ 8080 }
-     }
-   }
-   foo: (struct){
--- diff/explanation --
-Reordering.
 -- out/eval --
 (struct){
   a: (#list){
     0: (struct){
-      port: (int){ 8080 }
       name: (string){ "http" }
+      port: (int){ 8080 }
     }
   }
   foo: (struct){

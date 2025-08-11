@@ -453,7 +453,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,34 +1,10 @@
+@@ -1,11 +1,7 @@
  Errors:
  issue3670.a.not_int: field not allowed:
 -    ./intpattern.cue:2:6
@@ -464,31 +464,8 @@ diff old new
 -    ./in.cue:19:5
      ./in.cue:19:11
  t2.c.z: field not allowed:
--    ./in.cue:23:6
--    ./in.cue:27:5
      ./in.cue:27:11
--patternCycle.issue2109.p1.countries: cyclic pattern constraint:
--    ./issue2109.cue:11:15
--    ./issue2109.cue:10:13
--patternCycle.issue2109.p2.countries: cyclic pattern constraint:
--    ./issue2109.cue:15:15
--    ./issue2109.cue:17:13
--patternCycle.issue2109.p3.countries: cyclic pattern constraint:
--    ./issue2109.cue:21:15
--    ./issue2109.cue:22:13
--patternCycle.t1.p1.countries: cyclic pattern constraint:
--    ./issue2109.cue:27:15
--    ./issue2109.cue:26:13
--patternCycle.t1.p2.countries: cyclic pattern constraint:
--    ./issue2109.cue:33:15
--    ./issue2109.cue:32:13
--patternCycle.t1.p3.countries: cyclic pattern constraint:
--    ./issue2109.cue:37:15
--    ./issue2109.cue:38:13
- 
- Result:
- (_|_){
-@@ -41,16 +17,16 @@
+@@ -21,16 +17,16 @@
      }
    }
    d: (struct){
@@ -510,7 +487,7 @@ diff old new
    }
    t1: (_|_){
      // [eval]
-@@ -63,8 +39,6 @@
+@@ -43,8 +39,6 @@
        // [eval]
        z: (_|_){
          // [eval] t1.c.z: field not allowed:
@@ -519,7 +496,7 @@ diff old new
          //     ./in.cue:19:11
        }
      }
-@@ -80,8 +54,6 @@
+@@ -60,8 +54,6 @@
        // [eval]
        z: (_|_){
          // [eval] t2.c.z: field not allowed:
@@ -528,7 +505,7 @@ diff old new
          //     ./in.cue:27:11
        }
      }
-@@ -94,94 +66,56 @@
+@@ -74,8 +66,6 @@
        // [eval]
        not_int: (_|_){
          // [eval] issue3670.a.not_int: field not allowed:
@@ -537,58 +514,10 @@ diff old new
          //     ./intpattern.cue:4:5
        }
      }
-   }
-   dual: (_){ _ }
--  patternCycle: (_|_){
--    // [eval]
--    issue2109: (_|_){
--      // [eval]
--      p1: (_|_){
--        // [eval]
--        countries: (_|_){
--          // [eval] patternCycle.issue2109.p1.countries: cyclic pattern constraint:
--          //     ./issue2109.cue:11:15
--          //     ./issue2109.cue:10:13
--          0: (string){ "US" }
--          1: (string){ "GB" }
--          2: (string){ "AU" }
--        }
--        FlagsURLs: (struct){
--        }
--      }
--      p2: (_|_){
--        // [eval]
--        FlagsURLs: (struct){
--        }
--        countries: (_|_){
--          // [eval] patternCycle.issue2109.p2.countries: cyclic pattern constraint:
--          //     ./issue2109.cue:15:15
--          //     ./issue2109.cue:17:13
--          0: (_|_){// "US"
--          }
--          1: (_|_){// "GB"
--          }
--          2: (_|_){// "AU"
--          }
--        }
--      }
--      p3: (_|_){
--        // [eval]
--        FlagsURLs: (struct){
--        }
--        countries: (_|_){
--          // [eval] patternCycle.issue2109.p3.countries: cyclic pattern constraint:
--          //     ./issue2109.cue:21:15
--          //     ./issue2109.cue:22:13
--          0: (_|_){// "US"
--          }
--          1: (_|_){// "GB"
--          }
--          2: (_|_){// "AU"
--          }
--        }
--      }
--    }
+@@ -111,37 +101,21 @@
+         }
+       }
+     }
 -    t1: (_|_){
 -      // [eval]
 -      p1: (_|_){
@@ -620,36 +549,6 @@ diff old new
 -          //     ./issue2109.cue:37:15
 -          //     ./issue2109.cue:38:13
 -        }
-+  patternCycle: (struct){
-+    issue2109: (struct){
-+      p1: (struct){
-+        countries: (#list){
-+          0: (string){ "US" }
-+          1: (string){ "GB" }
-+          2: (string){ "AU" }
-+        }
-+        FlagsURLs: (struct){
-+        }
-+      }
-+      p2: (struct){
-+        FlagsURLs: (struct){
-+        }
-+        countries: (#list){
-+          0: (string){ "US" }
-+          1: (string){ "GB" }
-+          2: (string){ "AU" }
-+        }
-+      }
-+      p3: (struct){
-+        FlagsURLs: (struct){
-+        }
-+        countries: (#list){
-+          0: (string){ "US" }
-+          1: (string){ "GB" }
-+          2: (string){ "AU" }
-+        }
-+      }
-+    }
 +    t1: (struct){
 +      p1: (struct){
 +        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
@@ -668,7 +567,7 @@ diff old new
        }
      }
    }
-@@ -206,20 +140,17 @@
+@@ -166,20 +140,17 @@
          }
        }
        #Kubernetes: (#struct){
@@ -700,7 +599,7 @@ diff old new
            }
          }
        }
-@@ -232,60 +163,8 @@
+@@ -192,60 +163,8 @@
            }, (list){
            }) }
        }
@@ -762,7 +661,7 @@ diff old new
          Routes: (#struct){
            route: (#struct){
              default: (#struct){
-@@ -299,6 +178,36 @@
+@@ -259,6 +178,36 @@
              }
            }
          }
@@ -799,7 +698,7 @@ diff old new
        }
      }
      reduced: (struct){
-@@ -310,12 +219,9 @@
+@@ -270,12 +219,9 @@
          }
        }
        out: (struct){
@@ -815,7 +714,7 @@ diff old new
        }
        #x: (#struct){ |(*(#struct){
            b: (int){ 2 }
-@@ -332,12 +238,9 @@
+@@ -292,12 +238,9 @@
          }
        }
        out: (struct){
@@ -850,27 +749,7 @@ t1.c.z: field not allowed:
     ./in.cue:19:5
     ./in.cue:19:11
 t2.c.z: field not allowed:
-    ./in.cue:23:6
-    ./in.cue:27:5
     ./in.cue:27:11
-patternCycle.issue2109.p1.countries: cyclic pattern constraint:
-    ./issue2109.cue:11:15
-    ./issue2109.cue:10:13
-patternCycle.issue2109.p2.countries: cyclic pattern constraint:
-    ./issue2109.cue:15:15
-    ./issue2109.cue:17:13
-patternCycle.issue2109.p3.countries: cyclic pattern constraint:
-    ./issue2109.cue:21:15
-    ./issue2109.cue:22:13
-patternCycle.t1.p1.countries: cyclic pattern constraint:
-    ./issue2109.cue:27:15
-    ./issue2109.cue:26:13
-patternCycle.t1.p2.countries: cyclic pattern constraint:
-    ./issue2109.cue:33:15
-    ./issue2109.cue:32:13
-patternCycle.t1.p3.countries: cyclic pattern constraint:
-    ./issue2109.cue:37:15
-    ./issue2109.cue:38:13
 
 Result:
 (_|_){
@@ -943,16 +822,10 @@ Result:
     }
   }
   dual: (_){ _ }
-  patternCycle: (_|_){
-    // [eval]
-    issue2109: (_|_){
-      // [eval]
-      p1: (_|_){
-        // [eval]
-        countries: (_|_){
-          // [eval] patternCycle.issue2109.p1.countries: cyclic pattern constraint:
-          //     ./issue2109.cue:11:15
-          //     ./issue2109.cue:10:13
+  patternCycle: (struct){
+    issue2109: (struct){
+      p1: (struct){
+        countries: (#list){
           0: (string){ "US" }
           1: (string){ "GB" }
           2: (string){ "AU" }
@@ -960,36 +833,22 @@ Result:
         FlagsURLs: (struct){
         }
       }
-      p2: (_|_){
-        // [eval]
+      p2: (struct){
         FlagsURLs: (struct){
         }
-        countries: (_|_){
-          // [eval] patternCycle.issue2109.p2.countries: cyclic pattern constraint:
-          //     ./issue2109.cue:15:15
-          //     ./issue2109.cue:17:13
-          0: (_|_){// "US"
-          }
-          1: (_|_){// "GB"
-          }
-          2: (_|_){// "AU"
-          }
+        countries: (#list){
+          0: (string){ "US" }
+          1: (string){ "GB" }
+          2: (string){ "AU" }
         }
       }
-      p3: (_|_){
-        // [eval]
+      p3: (struct){
         FlagsURLs: (struct){
         }
-        countries: (_|_){
-          // [eval] patternCycle.issue2109.p3.countries: cyclic pattern constraint:
-          //     ./issue2109.cue:21:15
-          //     ./issue2109.cue:22:13
-          0: (_|_){// "US"
-          }
-          1: (_|_){// "GB"
-          }
-          2: (_|_){// "AU"
-          }
+        countries: (#list){
+          0: (string){ "US" }
+          1: (string){ "GB" }
+          2: (string){ "AU" }
         }
       }
     }

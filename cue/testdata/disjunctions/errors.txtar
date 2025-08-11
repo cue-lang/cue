@@ -527,47 +527,7 @@ diff old new
        }
        c: (_){ _ }
      }
-@@ -186,6 +170,7 @@
-       p1: (struct){ |((struct){
-           a?: (_|_){
-             // [eval] issue3599.reduced.p1.a: conflicting values 2 and 1:
-+            //     ./issue3599.cue:31:25
-             //     ./issue3599.cue:32:2
-             //     ./issue3599.cue:32:9
-             //     ./issue3599.cue:32:11
-@@ -194,6 +179,7 @@
-           a: (string){ string }
-           b?: (_|_){
-             // [eval] issue3599.reduced.p1.b: conflicting values 2 and 1:
-+            //     ./issue3599.cue:31:25
-             //     ./issue3599.cue:32:2
-             //     ./issue3599.cue:32:35
-             //     ./issue3599.cue:32:37
-@@ -202,6 +188,7 @@
-       p2: (struct){ |((struct){
-           a?: (_|_){
-             // [eval] issue3599.reduced.p2.a: conflicting values 2 and 1:
-+            //     ./issue3599.cue:35:25
-             //     ./issue3599.cue:37:2
-             //     ./issue3599.cue:37:9
-             //     ./issue3599.cue:37:11
-@@ -210,6 +197,7 @@
-           a: (string){ string }
-           b?: (_|_){
-             // [eval] issue3599.reduced.p2.b: conflicting values 2 and 1:
-+            //     ./issue3599.cue:35:25
-             //     ./issue3599.cue:37:2
-             //     ./issue3599.cue:37:35
-             //     ./issue3599.cue:37:37
-@@ -221,6 +209,7 @@
-         a: (int){ 1 }
-         let B#1 = (_|_){
-           // [eval] issue3599.let.B: conflicting values 2 and 1:
-+          //     ./issue3599.cue:39:17
-           //     ./issue3599.cue:40:2
-           //     ./issue3599.cue:40:29
-           //     ./issue3599.cue:40:31
-@@ -227,4 +216,62 @@
+@@ -232,4 +216,62 @@
          }
        }) }
    }
@@ -630,8 +590,6 @@ diff old new
 +    }
 +  }
  }
--- diff/todo/p3 --
-Missing error positions.
 -- diff/explanation --
 The additional "field not allowed" error is correct and a message corresponding
 to one of the conjuncts failing.
@@ -825,6 +783,7 @@ Result:
       p1: (struct){ |((struct){
           a?: (_|_){
             // [eval] issue3599.reduced.p1.a: conflicting values 2 and 1:
+            //     ./issue3599.cue:31:25
             //     ./issue3599.cue:32:2
             //     ./issue3599.cue:32:9
             //     ./issue3599.cue:32:11
@@ -833,6 +792,7 @@ Result:
           a: (string){ string }
           b?: (_|_){
             // [eval] issue3599.reduced.p1.b: conflicting values 2 and 1:
+            //     ./issue3599.cue:31:25
             //     ./issue3599.cue:32:2
             //     ./issue3599.cue:32:35
             //     ./issue3599.cue:32:37
@@ -841,6 +801,7 @@ Result:
       p2: (struct){ |((struct){
           a?: (_|_){
             // [eval] issue3599.reduced.p2.a: conflicting values 2 and 1:
+            //     ./issue3599.cue:35:25
             //     ./issue3599.cue:37:2
             //     ./issue3599.cue:37:9
             //     ./issue3599.cue:37:11
@@ -849,6 +810,7 @@ Result:
           a: (string){ string }
           b?: (_|_){
             // [eval] issue3599.reduced.p2.b: conflicting values 2 and 1:
+            //     ./issue3599.cue:35:25
             //     ./issue3599.cue:37:2
             //     ./issue3599.cue:37:35
             //     ./issue3599.cue:37:37
@@ -860,6 +822,7 @@ Result:
         a: (int){ 1 }
         let B#1 = (_|_){
           // [eval] issue3599.let.B: conflicting values 2 and 1:
+          //     ./issue3599.cue:39:17
           //     ./issue3599.cue:40:2
           //     ./issue3599.cue:40:29
           //     ./issue3599.cue:40:31

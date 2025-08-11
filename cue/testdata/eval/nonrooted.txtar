@@ -56,123 +56,6 @@ Retain: 27
 Unifications: 47
 Conjuncts:    87
 Disjuncts:    68
--- out/evalalpha --
-Errors:
-x: conflicting values 2 and 1:
-    ./in.cue:20:14
-    ./in.cue:22:8
-    ./in.cue:26:8
-    ./in.cue:26:19
-x: conflicting values 4 and 1:
-    ./in.cue:20:14
-    ./in.cue:22:8
-    ./in.cue:26:8
-    ./in.cue:26:23
-x: 2 errors in empty disjunction::
-    ./in.cue:23:8
-
-Result:
-(_|_){
-  // [eval]
-  issue3977: (_|_){
-    // [eval]
-    inlineExpr: (struct){
-      #NetworkID: (int){ 1 }
-      #fn: (#struct){
-        x: (int){ 1 }
-        out: (int){ 2 }
-      }
-      err: (int){ 3 }
-    }
-    inlineDisj1: (struct){
-      #NetworkID: (string){ |((string){ "2" }, (string){ "3" }, (string){ "4" }) }
-      #fn: (#struct){
-        x: (string){ |((string){ "2" }, (string){ "3" }, (string){ "4" }) }
-        out: (_|_){
-          // [incomplete] issue3977.inlineDisj1.#fn.out: invalid interpolation: unresolved disjunction "2" | "3" | "4" (type string):
-          //     ./in.cue:14:8
-        }
-      }
-      err: (string){ "value=invalid" }
-    }
-    inlineDisj2: (_|_){
-      // [eval]
-      #NetworkID: (int){ 1 }
-      #fn: (#struct){
-        x: (int){ 1 }
-        out: (int){ 11 }
-      }
-      err: (_|_){
-        // [eval] x: conflicting values 2 and 1:
-        //     ./in.cue:20:14
-        //     ./in.cue:22:8
-        //     ./in.cue:26:8
-        //     ./in.cue:26:19
-        // x: conflicting values 4 and 1:
-        //     ./in.cue:20:14
-        //     ./in.cue:22:8
-        //     ./in.cue:26:8
-        //     ./in.cue:26:23
-        // x: 2 errors in empty disjunction::
-        //     ./in.cue:23:8
-      }
-    }
-    inlineDisj3: (struct){
-      #NetworkID: (int){ 1 }
-      #fn: (#struct){
-        x: (int){ 1 }
-        out: (int){ 11 }
-      }
-      err: (int){ 11 }
-    }
-    inlineLet: (struct){
-      #NetworkID: (int){ 1 }
-      let p#1 = (_|_){
-        // [eval]
-        x: (_|_){
-          // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
-          //     ./in.cue:38:14
-          //     ./in.cue:40:8
-          //     ./in.cue:43:6
-        }
-        out: (_|_){
-          // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
-          //     ./in.cue:38:14
-          //     ./in.cue:40:8
-          //     ./in.cue:43:6
-        }
-      }
-      err: (int){ 12 }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -71,13 +71,13 @@
-       let p#1 = (_|_){
-         // [eval]
-         x: (_|_){
--          // [eval] issue3977.inlineLet.p.x: conflicting values 2 and 1:
--          //     ./in.cue:38:14
--          //     ./in.cue:40:8
--          //     ./in.cue:43:6
--        }
--        out: (_|_){
--          // [eval] issue3977.inlineLet.p.x: conflicting values 2 and 1:
-+          // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
-+          //     ./in.cue:38:14
-+          //     ./in.cue:40:8
-+          //     ./in.cue:43:6
-+        }
-+        out: (_|_){
-+          // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
-           //     ./in.cue:38:14
-           //     ./in.cue:40:8
-           //     ./in.cue:43:6
--- diff/explanation --
-evalv3 correctly fails on all places marked with "err"
 -- out/eval --
 Errors:
 x: conflicting values 2 and 1:
@@ -247,13 +130,13 @@ Result:
       let p#1 = (_|_){
         // [eval]
         x: (_|_){
-          // [eval] issue3977.inlineLet.p.x: conflicting values 2 and 1:
+          // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
           //     ./in.cue:38:14
           //     ./in.cue:40:8
           //     ./in.cue:43:6
         }
         out: (_|_){
-          // [eval] issue3977.inlineLet.p.x: conflicting values 2 and 1:
+          // [eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
           //     ./in.cue:38:14
           //     ./in.cue:40:8
           //     ./in.cue:43:6

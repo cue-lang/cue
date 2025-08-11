@@ -261,13 +261,7 @@ definition.t0.err.d1.env.c: field not allowed:
     ./definition.cue:3:11
     ./definition.cue:4:6
 definition.t1.err.a.c: field not allowed:
-    ./definition.cue:8:5
     ./definition.cue:9:5
-    ./definition.cue:11:6
-mutual.t4.ok.p0.z: cannot add to field b
-mutual.t4.ok.p0.z: cannot add to field c
-mutual.t4.ok.p4.z: cannot add to field b
-mutual.t4.ok.p4.z: cannot add to field c
 
 Result:
 (_|_){
@@ -276,12 +270,7 @@ Result:
     t1: (struct){
       ok: (struct){
         s3: (string){ strings.ContainsAny("dd") }
-        s4: (_|_){
-          // [incomplete] mutualBuiltin.t1.ok.s4: invalid value "dd" (does not satisfy strings.ContainsAny(strings.ContainsAny("dd"))): error in call to strings.ContainsAny: non-concrete value string:
-          //     ./builtins.cue:6:6
-          //     ./builtins.cue:5:6
-          //     ./builtins.cue:7:6
-        }
+        s4: (string){ "dd" }
       }
     }
     t2: (struct){
@@ -381,8 +370,8 @@ Result:
             a: (int){ int }
           }
           x: (#struct){
-            a: (int){ int }
             c: (int){ int }
+            a: (int){ int }
           }
         }
         p2: (struct){
@@ -390,14 +379,14 @@ Result:
             a: (int){ int }
           }
           x: (#struct){
-            a: (int){ int }
             c: (int){ int }
+            a: (int){ int }
           }
         }
         p3: (struct){
           x: (#struct){
-            a: (int){ int }
             c: (int){ int }
+            a: (int){ int }
           }
           #A: (#struct){
             a: (int){ int }
@@ -405,8 +394,8 @@ Result:
         }
         p4: (struct){
           x: (#struct){
-            a: (int){ int }
             c: (int){ int }
+            a: (int){ int }
           }
           #A: (#struct){
             a: (int){ int }
@@ -429,14 +418,7 @@ Result:
     }
     t2: (struct){
       ok: (struct){
-        foo: (#struct){
-          a: (#struct){
-            b: (#struct){
-              C: (int){ 1 }
-              D: (int){ 2 }
-            }
-          }
-        }
+        foo: ~(dynamic.t2.ok.#X)
         #X: (#struct){
           a: (#struct){
             b: (#struct){
@@ -490,8 +472,7 @@ Result:
       }
     }
   }
-  mutual: (_|_){
-    // [eval]
+  mutual: (struct){
     t0: (struct){
       ok: (struct){
         c: (struct){
@@ -558,15 +539,10 @@ Result:
         }
       }
     }
-    t4: (_|_){
-      // [eval]
-      ok: (_|_){
-        // [eval]
-        p0: (_|_){
-          // [eval]
-          z: (_|_){
-            // [eval] mutual.t4.ok.p0.z: cannot add to field b
-            // mutual.t4.ok.p0.z: cannot add to field c
+    t4: (struct){
+      ok: (struct){
+        p0: (struct){
+          z: (struct){
             d: (struct){
               a: (int){ 1 }
               b: (int){ 2 }
@@ -576,16 +552,15 @@ Result:
           }
           x: (struct){
             b: (struct){
-              a: (int){ 1 }
               d: (struct){
                 b: (int){ 2 }
               }
+              a: (int){ 1 }
+              b: (int){ 2 }
             }
           }
           y: (struct){
-            c: (struct){
-              a: (int){ 1 }
-            }
+            c: ~(mutual.t4.ok.p0.z.d)
           }
         }
         p1: (struct){
@@ -607,10 +582,7 @@ Result:
             b: (int){ 2 }
           }
           y: (struct){
-            c: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
+            c: ~(mutual.t4.ok.p1.z.d)
           }
         }
         p2: (struct){
@@ -624,10 +596,7 @@ Result:
             }
           }
           y: (struct){
-            c: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
+            c: ~(mutual.t4.ok.p2.z.d)
           }
           z: (struct){
             d: (struct){
@@ -644,30 +613,24 @@ Result:
               d: (struct){
                 b: (int){ 2 }
               }
-              b: (int){ 2 }
               a: (int){ 1 }
+              b: (int){ 2 }
             }
           }
           y: (struct){
-            c: (struct){
-              b: (int){ 2 }
-              a: (int){ 1 }
-            }
+            c: ~(mutual.t4.ok.p3.z.d)
           }
           z: (struct){
             d: (struct){
-              b: (int){ 2 }
               a: (int){ 1 }
+              b: (int){ 2 }
             }
-            b: (int){ 2 }
             a: (int){ 1 }
+            b: (int){ 2 }
           }
         }
-        p4: (_|_){
-          // [eval]
-          z: (_|_){
-            // [eval] mutual.t4.ok.p4.z: cannot add to field b
-            // mutual.t4.ok.p4.z: cannot add to field c
+        p4: (struct){
+          z: (struct){
             d: (struct){
               a: (int){ 1 }
               b: (int){ 2 }
@@ -681,12 +644,11 @@ Result:
                 b: (int){ 2 }
               }
               a: (int){ 1 }
+              b: (int){ 2 }
             }
           }
           y: (struct){
-            c: (struct){
-              a: (int){ 1 }
-            }
+            c: ~(mutual.t4.ok.p4.z.d)
           }
         }
         p5: (struct){
@@ -695,23 +657,20 @@ Result:
               d: (struct){
                 b: (int){ 2 }
               }
-              b: (int){ 2 }
               a: (int){ 1 }
+              b: (int){ 2 }
             }
           }
           y: (struct){
-            c: (struct){
-              b: (int){ 2 }
-              a: (int){ 1 }
-            }
+            c: ~(mutual.t4.ok.p5.z.d)
           }
           z: (struct){
             d: (struct){
-              b: (int){ 2 }
               a: (int){ 1 }
+              b: (int){ 2 }
             }
-            b: (int){ 2 }
             a: (int){ 1 }
+            b: (int){ 2 }
           }
         }
         check: (struct){
@@ -733,10 +692,7 @@ Result:
             b: (int){ 2 }
           }
           y: (struct){
-            c: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
+            c: ~(mutual.t4.ok.check.z.d)
           }
         }
       }
@@ -1229,38 +1185,16 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,16 +1,8 @@
+@@ -1,8 +1,6 @@
  Errors:
  definition.t0.err.d1.env.c: field not allowed:
 -    ./definition.cue:2:12
      ./definition.cue:3:11
 -    ./definition.cue:4:6
  definition.t1.err.a.c: field not allowed:
--    ./definition.cue:8:5
      ./definition.cue:9:5
--    ./definition.cue:11:6
--mutual.t4.ok.p0.z: cannot add to field b
--mutual.t4.ok.p0.z: cannot add to field c
--mutual.t4.ok.p4.z: cannot add to field b
--mutual.t4.ok.p4.z: cannot add to field c
  
- Result:
- (_|_){
-@@ -19,12 +11,7 @@
-     t1: (struct){
-       ok: (struct){
-         s3: (string){ strings.ContainsAny("dd") }
--        s4: (_|_){
--          // [incomplete] mutualBuiltin.t1.ok.s4: invalid value "dd" (does not satisfy strings.ContainsAny(strings.ContainsAny("dd"))): error in call to strings.ContainsAny: non-concrete value string:
--          //     ./builtins.cue:6:6
--          //     ./builtins.cue:5:6
--          //     ./builtins.cue:7:6
--        }
-+        s4: (string){ "dd" }
-       }
-     }
-     t2: (struct){
-@@ -92,9 +79,7 @@
+@@ -81,9 +79,7 @@
              // [eval]
              c: (_|_){
                // [eval] definition.t0.err.d1.env.c: field not allowed:
@@ -1270,7 +1204,7 @@ diff old new
              }
            }
          }
-@@ -108,9 +93,7 @@
+@@ -97,9 +93,7 @@
            // [eval]
            c: (_|_){
              // [eval] definition.t1.err.a.c: field not allowed:
@@ -1280,389 +1214,6 @@ diff old new
            }
          }
          #A: (#struct){
-@@ -124,32 +107,32 @@
-             a: (int){ int }
-           }
-           x: (#struct){
--            a: (int){ int }
--            c: (int){ int }
--          }
--        }
--        p2: (struct){
--          #A: (#struct){
--            a: (int){ int }
--          }
--          x: (#struct){
--            a: (int){ int }
--            c: (int){ int }
--          }
--        }
--        p3: (struct){
--          x: (#struct){
--            a: (int){ int }
--            c: (int){ int }
--          }
--          #A: (#struct){
--            a: (int){ int }
--          }
--        }
--        p4: (struct){
--          x: (#struct){
--            a: (int){ int }
--            c: (int){ int }
-+            c: (int){ int }
-+            a: (int){ int }
-+          }
-+        }
-+        p2: (struct){
-+          #A: (#struct){
-+            a: (int){ int }
-+          }
-+          x: (#struct){
-+            c: (int){ int }
-+            a: (int){ int }
-+          }
-+        }
-+        p3: (struct){
-+          x: (#struct){
-+            c: (int){ int }
-+            a: (int){ int }
-+          }
-+          #A: (#struct){
-+            a: (int){ int }
-+          }
-+        }
-+        p4: (struct){
-+          x: (#struct){
-+            c: (int){ int }
-+            a: (int){ int }
-           }
-           #A: (#struct){
-             a: (int){ int }
-@@ -172,14 +155,7 @@
-     }
-     t2: (struct){
-       ok: (struct){
--        foo: (#struct){
--          a: (#struct){
--            b: (#struct){
--              C: (int){ 1 }
--              D: (int){ 2 }
--            }
--          }
--        }
-+        foo: ~(dynamic.t2.ok.#X)
-         #X: (#struct){
-           a: (#struct){
-             b: (#struct){
-@@ -233,8 +209,7 @@
-       }
-     }
-   }
--  mutual: (_|_){
--    // [eval]
-+  mutual: (struct){
-     t0: (struct){
-       ok: (struct){
-         c: (struct){
-@@ -301,135 +276,116 @@
-         }
-       }
-     }
--    t4: (_|_){
--      // [eval]
--      ok: (_|_){
--        // [eval]
--        p0: (_|_){
--          // [eval]
--          z: (_|_){
--            // [eval] mutual.t4.ok.p0.z: cannot add to field b
--            // mutual.t4.ok.p0.z: cannot add to field c
--            d: (struct){
--              a: (int){ 1 }
--              b: (int){ 2 }
--            }
--            a: (int){ 1 }
--            b: (int){ 2 }
--          }
--          x: (struct){
--            b: (struct){
--              a: (int){ 1 }
--              d: (struct){
--                b: (int){ 2 }
--              }
--            }
--          }
--          y: (struct){
--            c: (struct){
--              a: (int){ 1 }
--            }
--          }
--        }
--        p1: (struct){
--          x: (struct){
--            b: (struct){
--              d: (struct){
--                b: (int){ 2 }
--              }
--              a: (int){ 1 }
--              b: (int){ 2 }
--            }
--          }
--          z: (struct){
--            d: (struct){
--              a: (int){ 1 }
--              b: (int){ 2 }
--            }
--            a: (int){ 1 }
--            b: (int){ 2 }
--          }
--          y: (struct){
--            c: (struct){
--              a: (int){ 1 }
--              b: (int){ 2 }
--            }
--          }
--        }
--        p2: (struct){
--          x: (struct){
--            b: (struct){
--              d: (struct){
--                b: (int){ 2 }
--              }
--              a: (int){ 1 }
--              b: (int){ 2 }
--            }
--          }
--          y: (struct){
--            c: (struct){
--              a: (int){ 1 }
--              b: (int){ 2 }
--            }
--          }
--          z: (struct){
--            d: (struct){
--              a: (int){ 1 }
--              b: (int){ 2 }
--            }
--            a: (int){ 1 }
--            b: (int){ 2 }
--          }
--        }
--        p3: (struct){
--          x: (struct){
--            b: (struct){
--              d: (struct){
--                b: (int){ 2 }
--              }
--              b: (int){ 2 }
--              a: (int){ 1 }
--            }
--          }
--          y: (struct){
--            c: (struct){
--              b: (int){ 2 }
--              a: (int){ 1 }
--            }
--          }
--          z: (struct){
--            d: (struct){
--              b: (int){ 2 }
--              a: (int){ 1 }
--            }
--            b: (int){ 2 }
--            a: (int){ 1 }
--          }
--        }
--        p4: (_|_){
--          // [eval]
--          z: (_|_){
--            // [eval] mutual.t4.ok.p4.z: cannot add to field b
--            // mutual.t4.ok.p4.z: cannot add to field c
--            d: (struct){
--              a: (int){ 1 }
--              b: (int){ 2 }
--            }
--            a: (int){ 1 }
--            b: (int){ 2 }
--          }
--          x: (struct){
--            b: (struct){
--              d: (struct){
--                b: (int){ 2 }
--              }
--              a: (int){ 1 }
--            }
--          }
--          y: (struct){
--            c: (struct){
--              a: (int){ 1 }
--            }
-+    t4: (struct){
-+      ok: (struct){
-+        p0: (struct){
-+          z: (struct){
-+            d: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+            a: (int){ 1 }
-+            b: (int){ 2 }
-+          }
-+          x: (struct){
-+            b: (struct){
-+              d: (struct){
-+                b: (int){ 2 }
-+              }
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+          }
-+          y: (struct){
-+            c: ~(mutual.t4.ok.p0.z.d)
-+          }
-+        }
-+        p1: (struct){
-+          x: (struct){
-+            b: (struct){
-+              d: (struct){
-+                b: (int){ 2 }
-+              }
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+          }
-+          z: (struct){
-+            d: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+            a: (int){ 1 }
-+            b: (int){ 2 }
-+          }
-+          y: (struct){
-+            c: ~(mutual.t4.ok.p1.z.d)
-+          }
-+        }
-+        p2: (struct){
-+          x: (struct){
-+            b: (struct){
-+              d: (struct){
-+                b: (int){ 2 }
-+              }
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+          }
-+          y: (struct){
-+            c: ~(mutual.t4.ok.p2.z.d)
-+          }
-+          z: (struct){
-+            d: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+            a: (int){ 1 }
-+            b: (int){ 2 }
-+          }
-+        }
-+        p3: (struct){
-+          x: (struct){
-+            b: (struct){
-+              d: (struct){
-+                b: (int){ 2 }
-+              }
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+          }
-+          y: (struct){
-+            c: ~(mutual.t4.ok.p3.z.d)
-+          }
-+          z: (struct){
-+            d: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+            a: (int){ 1 }
-+            b: (int){ 2 }
-+          }
-+        }
-+        p4: (struct){
-+          z: (struct){
-+            d: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+            a: (int){ 1 }
-+            b: (int){ 2 }
-+          }
-+          x: (struct){
-+            b: (struct){
-+              d: (struct){
-+                b: (int){ 2 }
-+              }
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+          }
-+          y: (struct){
-+            c: ~(mutual.t4.ok.p4.z.d)
-           }
-         }
-         p5: (struct){
-@@ -438,23 +394,20 @@
-               d: (struct){
-                 b: (int){ 2 }
-               }
--              b: (int){ 2 }
--              a: (int){ 1 }
--            }
--          }
--          y: (struct){
--            c: (struct){
--              b: (int){ 2 }
--              a: (int){ 1 }
--            }
--          }
--          z: (struct){
--            d: (struct){
--              b: (int){ 2 }
--              a: (int){ 1 }
--            }
--            b: (int){ 2 }
--            a: (int){ 1 }
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+          }
-+          y: (struct){
-+            c: ~(mutual.t4.ok.p5.z.d)
-+          }
-+          z: (struct){
-+            d: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+            a: (int){ 1 }
-+            b: (int){ 2 }
-           }
-         }
-         check: (struct){
-@@ -476,10 +429,7 @@
-             b: (int){ 2 }
-           }
-           y: (struct){
--            c: (struct){
--              a: (int){ 1 }
--              b: (int){ 2 }
--            }
-+            c: ~(mutual.t4.ok.check.z.d)
-           }
-         }
-       }
--- diff/explanation --
-Bug fixes
 -- diff/todo/p2 --
 Reordering / positions.
 -- out/compile --

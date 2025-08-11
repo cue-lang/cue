@@ -33,7 +33,7 @@ Retain: 7
 Unifications: 11
 Conjuncts:    101
 Disjuncts:    47
--- out/evalalpha --
+-- out/eval --
 (struct){
   #Value: (int){ |((int){ 0 }, (int){ 1 }) }
   foo: (_|_){
@@ -41,42 +41,6 @@ Disjuncts:    47
     //     ./in.cue:1:13
     //     ./in.cue:5:6
     //     ./in.cue:6:6
-  }
-  bar: (int){ |((int){ 0 }, (int){ 1 }) }
-  Foo: (int){ 1 }
-  Bar: (int){ 0 }
-  cell: (struct){
-    a: (int){ 0 }
-    b: (int){ 1 }
-  }
-  a: (int){ 0 }
-  b: (int){ 1 }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,8 +1,10 @@
- (struct){
-   #Value: (int){ |((int){ 0 }, (int){ 1 }) }
-   foo: (_|_){
--    // [incomplete] foo: unresolved disjunction 0 | 1 (type int):
--    //     ./in.cue:4:6
-+    // [cycle] foo: cycle across unresolved disjunction referenced by bar:
-+    //     ./in.cue:1:13
-+    //     ./in.cue:5:6
-+    //     ./in.cue:6:6
-   }
-   bar: (int){ |((int){ 0 }, (int){ 1 }) }
-   Foo: (int){ 1 }
--- diff/explanation --
-error is now symmetric
--- out/eval --
-(struct){
-  #Value: (int){ |((int){ 0 }, (int){ 1 }) }
-  foo: (_|_){
-    // [incomplete] foo: unresolved disjunction 0 | 1 (type int):
-    //     ./in.cue:4:6
   }
   bar: (int){ |((int){ 0 }, (int){ 1 }) }
   Foo: (int){ 1 }

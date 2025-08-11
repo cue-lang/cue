@@ -15,46 +15,13 @@ Retain: 1
 Unifications: 9
 Conjuncts:    14
 Disjuncts:    10
--- out/evalalpha --
-(struct){
-  c: (#struct){
-    w: (#list){
-      0: (#struct){
-      }
-      1: (#struct){
-        b: (int){ int }
-      }
-    }
-  }
-  #R: (#struct){
-    w: (list){
-      0: (#struct){
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -3,7 +3,7 @@
-     w: (#list){
-       0: (#struct){
-       }
--      1: (struct){
-+      1: (#struct){
-         b: (int){ int }
-       }
-     }
--- diff/explanation --
-Bug fix. Struct is correctly closed in new evaluator.
 -- out/eval --
 (struct){
   c: (#struct){
     w: (#list){
       0: (#struct){
       }
-      1: (struct){
+      1: (#struct){
         b: (int){ int }
       }
     }

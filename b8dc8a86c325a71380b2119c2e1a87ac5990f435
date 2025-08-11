@@ -16,6 +16,24 @@
       "message": "Fields named src are often used for position information in this codebase. It may be good to check what evalv2 did with it and replicated this in evalv3.",
       "revId": "b8dc8a86c325a71380b2119c2e1a87ac5990f435",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bec98daa_db04f723",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-11T08:07:09Z",
+      "side": 1,
+      "message": "I had to go all the way back to v0.11.0 to find the last use of this field:\n\n```\n// collectErrors collects errors from a failed disjunctions.\nfunc (n *nodeContext) collectErrors(dn *envDisjunct) (errs *Bottom) {\n\tfor _, d :\u003d range dn.disjuncts {\n\t\tif d.err !\u003d nil {\n\t\t\terrs \u003d CombineErrors(dn.src.Source(), errs, d.err)\n\t\t}\n\t}\n\treturn errs\n}\n```\n\nThis was part of an evalv2 code path. v0.12.0 and newer versions got rid of this bit of code.\n\nI read through the latest code and I thought this would be the right patch for master, however, it makes no difference to any of our tests:\n\n```\ndiff --git internal/core/adt/disjunct2.go internal/core/adt/disjunct2.go\nindex bc276c8a..19a5e4e7 100644\n--- internal/core/adt/disjunct2.go\n+++ internal/core/adt/disjunct2.go\n@@ -408,6 +408,7 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m\n \n \t\t\tif err !\u003d nil {\n \t\t\t\t// TODO: store more error context\n+\t\t\t\terr.Src \u003d dn.src.Source()\n \t\t\t\tdn.disjuncts[j].err \u003d err\n \t\t\t\tcontinue\n \t\t\t}\n```\n\nMy second attempt was the following - again, no difference whatsoever.\n\n```\ndiff --git internal/core/adt/disjunct2.go internal/core/adt/disjunct2.go\nindex bc276c8a..282bef57 100644\n--- internal/core/adt/disjunct2.go\n+++ internal/core/adt/disjunct2.go\n@@ -499,6 +499,7 @@ func (n *nodeContext) collectErrors(dn *envDisjunct) (errs *Bottom) {\n \t\tErr:  n.disjunctError(),\n \t\tNode: n.node,\n \t}\n+\tb.Src \u003d dn.src.Source()\n \treturn b\n }\n```",
+      "parentUuid": "123e256a_8b4bce21",
+      "revId": "b8dc8a86c325a71380b2119c2e1a87ac5990f435",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

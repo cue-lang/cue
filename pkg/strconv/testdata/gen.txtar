@@ -38,6 +38,21 @@ t30: strconv.ParseInt("FF", 16, 8)       // hex max int8
 t31: strconv.ParseInt("100", 16, 8)      // hex overflow int8
 t32: strconv.ParseInt("invalid", 10, 8)  // syntax error
 t33: strconv.ParseInt("123", 10, -1)     // negative bitSize error
+// Test ParseUint with various bit widths
+t34: strconv.ParseUint("255", 10, 8)      // max uint8
+t35: strconv.ParseUint("256", 10, 8)      // overflow uint8
+t36: strconv.ParseUint("0", 10, 8)        // min uint8
+t37: strconv.ParseUint("511", 10, 9)      // fits in 9 bits
+t38: strconv.ParseUint("512", 10, 9)      // overflow 9 bits
+t39: strconv.ParseUint("1000", 10, 0)     // unlimited precision
+t40: strconv.ParseUint("999999999999999999999999999999", 10, 0) // huge unlimited
+t41: strconv.ParseUint("7", 10, 3)        // 3-bit unsigned: range [0, 7]
+t42: strconv.ParseUint("8", 10, 3)        // overflow 3-bit
+t43: strconv.ParseUint("FF", 16, 8)       // hex parsing max uint8
+t44: strconv.ParseUint("100", 16, 8)      // hex overflow uint8
+t45: strconv.ParseUint("invalid", 10, 8)  // syntax error
+t46: strconv.ParseUint("123", 10, -1)     // negative bitSize error
+t47: strconv.ParseUint("-1", 10, 8)       // negative value error
 -- out/strconv-v3 --
 Errors:
 t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat:
@@ -69,6 +84,20 @@ t32: error in call to strconv.ParseInt: strconv.ParseInt: parsing "invalid": inv
     ./in.cue:36:6
 t33: error in call to strconv.ParseInt: strconv.ParseInt: parsing "123": value out of range:
     ./in.cue:37:6
+t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range:
+    ./in.cue:40:6
+t38: error in call to strconv.ParseUint: strconv.ParseUint: parsing "512": value out of range:
+    ./in.cue:43:6
+t42: error in call to strconv.ParseUint: strconv.ParseUint: parsing "8": value out of range:
+    ./in.cue:47:6
+t44: error in call to strconv.ParseUint: strconv.ParseUint: parsing "100": value out of range:
+    ./in.cue:49:6
+t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax:
+    ./in.cue:50:6
+t46: error in call to strconv.ParseUint: strconv.ParseUint: parsing "123": value out of range:
+    ./in.cue:51:6
+t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range:
+    ./in.cue:52:6
 
 Result:
 t1:  "40"
@@ -106,6 +135,21 @@ t30: _|_ // t30: error in call to strconv.ParseInt: strconv.ParseInt: parsing "F
 t31: _|_ // t31: error in call to strconv.ParseInt: strconv.ParseInt: parsing "100": value out of range
 t32: _|_ // t32: error in call to strconv.ParseInt: strconv.ParseInt: parsing "invalid": invalid syntax
 t33: _|_ // t33: error in call to strconv.ParseInt: strconv.ParseInt: parsing "123": value out of range
+// Test ParseUint with various bit widths
+t34: 255
+t35: _|_ // t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range
+t36: 0
+t37: 511
+t38: _|_ // t38: error in call to strconv.ParseUint: strconv.ParseUint: parsing "512": value out of range
+t39: 1000
+t40: 999999999999999999999999999999
+t41: 7
+t42: _|_ // t42: error in call to strconv.ParseUint: strconv.ParseUint: parsing "8": value out of range
+t43: 255
+t44: _|_ // t44: error in call to strconv.ParseUint: strconv.ParseUint: parsing "100": value out of range
+t45: _|_ // t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax
+t46: _|_ // t46: error in call to strconv.ParseUint: strconv.ParseUint: parsing "123": value out of range
+t47: _|_ // t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range
 -- diff/-out/strconv-v3<==>+out/strconv --
 diff old new
 --- old
@@ -200,3 +244,18 @@ t13: 170141183460469231731687303715884105728
 t14: -170141183460469231731687303715884105728
 t15: 123
 t16: _|_ // t16: strconv.Atoi: parsing "invalid": invalid syntax
+// Test ParseUint with various bit widths
+t34: 255
+t35: _|_ // t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range
+t36: 0
+t37: 511
+t38: _|_ // t38: error in call to strconv.ParseUint: strconv.ParseUint: parsing "512": value out of range
+t39: 1000
+t40: 999999999999999999999999999999
+t41: 7
+t42: _|_ // t42: error in call to strconv.ParseUint: strconv.ParseUint: parsing "8": value out of range
+t43: 255
+t44: _|_ // t44: error in call to strconv.ParseUint: strconv.ParseUint: parsing "100": value out of range
+t45: _|_ // t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax
+t46: _|_ // t46: error in call to strconv.ParseUint: strconv.ParseUint: parsing "123": value out of range
+t47: _|_ // t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range

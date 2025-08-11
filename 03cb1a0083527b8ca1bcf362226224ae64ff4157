@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "563bb5de_8b87c2ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-11T15:45:47Z",
+      "side": 1,
+      "message": "I looked into this, but apd.Decimal doesn\u0027t support conversion of strings from arbitrary bases like ParseInt requires, so we\u0027d have to start with big.Int anyway, so it seems like there would be minimal advantage to doing this.",
+      "parentUuid": "7e58530f_1cf22671",
+      "revId": "03cb1a0083527b8ca1bcf362226224ae64ff4157",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bc599afd_2ac098ef",
         "filename": "pkg/strconv/testdata/gen.txtar",
         "patchSetId": 2

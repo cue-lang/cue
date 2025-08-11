@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ef2914d_c2e36644",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-11T14:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "798c5261_c71e04c7",
+      "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "430c5f0c_38a2c3dd",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-08-11T13:40:16Z",
       "side": 1,
       "message": "It would be nice to explain exactly what a \"binding\" is: i.e. a lexical name binding - otherwise the reader (me not so long ago :) ) is left wondering what the difference between a \"binding\" and a \"field\" is.",
+      "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "756d37bd_70810c58",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-11T14:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "430c5f0c_38a2c3dd",
       "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20a982d9_8d29101d",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-11T14:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "73c59eab_7d6df8dd",
+      "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70076684_254deef2",
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c3f8d3c_9ef3e0a4",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-11T14:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70076684_254deef2",
+      "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27ed6bb4_b48fdf91",
@@ -99,6 +171,24 @@
       "writtenOn": "2025-08-11T13:40:16Z",
       "side": 1,
       "message": "```suggestion\n\t\t\t// an ident and not a basiclit. But that ident can\n```",
+      "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b9d1338_9eec894f",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 895,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-11T14:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27ed6bb4_b48fdf91",
       "revId": "fd764c2f57a6037c8c43bdbe379112fc7f6e76de",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16fd2e9b_bdcfbff7",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-11T14:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "85c90b64_8b3ef7f6",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c689620_c9482f6b",
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "\u003e And I see the lexical scope logic inside the token.OR logic and I don\u0027t understand why it should be needed and wonder if it\u0027s there because of the lack of lexical scope logic in the struct-lit case.\n\nMy thinking is this:\n\na: whatever\n\nis the same as\n\na: {whatever}\n\nSo, when we encounter a field, the field value has to have its own scope. It may well be the case that the value is a structlit. There\u0027s no need for double-wrapping.\n\nSo in general, I\u0027ve taken the approach that the parent context is always responsible for determining when a new scope is needed, and so when you\u0027re in a scope, you just keep unpacking until you get to things (e.g. fields) where you know for certain that you need to create new scopes.\n\nIt\u0027s possible this could all be changed to what you\u0027re thinking, which is that structlit et al are themselves responsible for making their own scopes. There danger that without the flattening effect that we currently have, getting the navigable scopes lined up might become much harder. Consider:\n\n```\nx: {{{{a: 3}}}}\nx: a: int\ny: x.a\n```\n\nWe need the x.a to resolve to both `a: int` and `a: 3`. Flattening out the structlits is the easy way to do this.\n\n\nIn the case of disjunction (and now conjunction too), this is the other side of the coin. The code is currently (unpushed):\n\n```\ncase token.AND, token.OR:\n\tlhs :\u003d ls.newLexicalScope(nil, n.X, nil)\n\trhs :\u003d ls.newLexicalScope(nil, n.Y, nil)\n\tls.resolvesTo \u003d append(ls.resolvesTo, lhs, rhs)\n```\n\nIt is necessary that bindings with X or Y do not pollute the parent, and do not pollute (nor are visible) to each other. For example:\n\n```\na: {b: c, c: 5} | {c: true}\nx: a.c\n```\n\nThe structlits do not create their own scopes, but the binary op does. This ensures that the `b: c` from the lhs, does not resolve the `c` to the `c: true` in the rhs.\n\nBecause both of the new scopes are added to the parent\u0027s `resolvesTo` field, the `a.c` path is able to find both definitions of `c`.\n\nSo essentially, I think the scope creation has been unrolled one loop, or something, so that we can flatten nested embedded scopes. I hope it\u0027s safe to do that, but I don\u0027t really have any proof!",
       "parentUuid": "9060b77a_92ff5c5f",
+      "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8dfdeb15_9082f914",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 557,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-11T14:47:32Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8c135cf9_b3375f62",
       "revId": "5abc98ba706bd91ee83c2c73c94798b342a84e9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

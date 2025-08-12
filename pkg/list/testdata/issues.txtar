@@ -100,7 +100,7 @@ issue3416: sumSecond: {
 }
 -- out/list-v3 --
 Errors:
-0: invalid operands 2 and {num:6} to '+' (type int and struct):
+issue3541.0: invalid operands 2 and {num:6} to '+' (type int and struct):
     ./in.cue:53:3
     ./in.cue:35:9
     ./in.cue:36:10
@@ -128,7 +128,7 @@ issue1404: {
 	a:   *1 | 2
 	sum: 1
 }
-issue3541: _|_ // 0: invalid operands 2 and {num:6} to '+' (type int and struct)
+issue3541: _|_ // issue3541.0: invalid operands 2 and {num:6} to '+' (type int and struct)
 issue2594: {
 	sumFirst: {
 		#Def: {
@@ -180,7 +180,7 @@ diff old new
 -    ./in.cue:75:6
 -issue3416.sumFirst.a.b: field y not allowed by earlier comprehension or reference cycle
 -issue3416.sumFirst.a.b: field z not allowed by earlier comprehension or reference cycle
-+0: invalid operands 2 and {num:6} to '+' (type int and struct):
++issue3541.0: invalid operands 2 and {num:6} to '+' (type int and struct):
 +    ./in.cue:53:3
 +    ./in.cue:35:9
 +    ./in.cue:36:10
@@ -192,7 +192,7 @@ diff old new
  	sum: 1
  }
 -issue3541: {}
-+issue3541: _|_ // 0: invalid operands 2 and {num:6} to '+' (type int and struct)
++issue3541: _|_ // issue3541.0: invalid operands 2 and {num:6} to '+' (type int and struct)
  issue2594: {
  	sumFirst: {
  		#Def: {

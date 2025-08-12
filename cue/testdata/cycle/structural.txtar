@@ -731,7 +731,7 @@ resolveToAncestor.t2.X.b: structural cycle
 shortPathFail.elipsis.t2.Foo.ref: structural cycle
 withLetFail.schema.next: structural cycle
 z1.z.g.h: structural cycle
-3: structural cycle:
+fieldsSumInfinite.issue3310.3: structural cycle:
     ./in.cue:371:9
 nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
     ./in.cue:438:6
@@ -1411,7 +1411,7 @@ Result:
       fries: (float){ 2.00 }
       sprite: (float){ 1.00 }
       total: (_|_){
-        // [structural cycle] 3: structural cycle:
+        // [structural cycle] fieldsSumInfinite.issue3310.3: structural cycle:
         //     ./in.cue:371:9
       }
     }
@@ -1956,7 +1956,7 @@ diff old new
 -    ./in.cue:301:26
 -d3.x.indirect: structural cycle:
 -    ./in.cue:316:12
-+3: structural cycle:
++fieldsSumInfinite.issue3310.3: structural cycle:
 +    ./in.cue:371:9
 +nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
 +    ./in.cue:438:6
@@ -2284,7 +2284,7 @@ diff old new
        sprite: (float){ 1.00 }
        total: (_|_){
 -        // [structural cycle]
-+        // [structural cycle] 3: structural cycle:
++        // [structural cycle] fieldsSumInfinite.issue3310.3: structural cycle:
 +        //     ./in.cue:371:9
        }
      }

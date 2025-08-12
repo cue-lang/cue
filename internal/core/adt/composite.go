@@ -254,6 +254,7 @@ func equalDeref(a, b *Vertex) bool {
 // which there is no CUE path defined from the root Vertex.
 func (ctx *OpContext) newInlineVertex(parent *Vertex, v BaseValue, a ...Conjunct) *Vertex {
 	n := &Vertex{
+		Parent:    parent,
 		BaseValue: v,
 		IsDynamic: true,
 		ArcType:   ArcMember,

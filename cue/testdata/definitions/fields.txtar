@@ -257,8 +257,8 @@ issue3491: {
 	b: #Extra: {}
 }
 -- out/evalalpha/stats --
-Leaks:  1
-Freed:  239
+Leaks:  2
+Freed:  238
 Reused: 213
 Allocs: 27
 Retain: 0
@@ -274,8 +274,7 @@ diff old new
 +++ new
 @@ -1,13 +1,11 @@
 -Leaks:  5
-+Leaks:  1
- Freed:  239
+-Freed:  239
 -Reused: 232
 -Allocs: 12
 -Retain: 25
@@ -287,6 +286,8 @@ diff old new
 -MisalignedConjunct: 4
 -
 -NumCloseIDs: 2
++Leaks:  2
++Freed:  238
 +Reused: 213
 +Allocs: 27
 +Retain: 0

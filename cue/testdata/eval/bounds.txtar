@@ -213,10 +213,10 @@ nonConcrete: {
 	eErr6: "foo"
 }
 -- out/evalalpha/stats --
-Leaks:  0
-Freed:  205
-Reused: 148
-Allocs: 57
+Leaks:  6
+Freed:  199
+Reused: 142
+Allocs: 63
 Retain: 0
 
 Unifications: 197
@@ -229,7 +229,7 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,11 @@
- Leaks:  0
+-Leaks:  0
 -Freed:  191
 -Reused: 186
 -Allocs: 5
@@ -238,9 +238,10 @@ diff old new
 -Unifications: 191
 -Conjuncts:    511
 -Disjuncts:    200
-+Freed:  205
-+Reused: 148
-+Allocs: 57
++Leaks:  6
++Freed:  199
++Reused: 142
++Allocs: 63
 +Retain: 0
 +
 +Unifications: 197

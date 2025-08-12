@@ -154,8 +154,8 @@ selfRefInEmbed: t1: {
 -- out/evalalpha/stats --
 Leaks:  1
 Freed:  135
-Reused: 114
-Allocs: 22
+Reused: 113
+Allocs: 23
 Retain: 0
 
 Unifications: 126
@@ -184,8 +184,8 @@ diff old new
 -NumCloseIDs: 2
 +Leaks:  1
 +Freed:  135
-+Reused: 114
-+Allocs: 22
++Reused: 113
++Allocs: 23
 +Retain: 0
 +
 +Unifications: 126

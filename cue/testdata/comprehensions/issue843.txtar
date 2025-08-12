@@ -53,33 +53,67 @@ Unifications: 57
 Conjuncts:    138
 Disjuncts:    80
 -- out/evalalpha --
-(struct){
-  #d1: (#struct){
+Errors:
+#d2.#c.0.from.#c.0: 2 errors in empty disjunction:
+#d1.#c.0.0: field not allowed:
+    ./in.cue:10:10
+    ./in.cue:10:23
+#d1.#c.0.1: field not allowed:
+    ./in.cue:10:10
+    ./in.cue:10:31
+#d2.#c.0.from.#c.0.0: field not allowed:
+    ./in.cue:10:10
+    ./in.cue:10:23
+#d2.#c.0.from.#c.0.1: field not allowed:
+    ./in.cue:10:10
+    ./in.cue:10:31
+
+Result:
+(_|_){
+  // [eval]
+  #d1: (_|_){
+    // [eval]
     as: (list){
     }
-    #c: (#list){
-      0: (#struct){
-        as: (#list){
-          0: (string){ "go" }
+    #c: (_|_){
+      // [eval]
+      0: (_|_){
+        // [eval]
+        as: (_|_){
+          // [eval] #d1.#c.0.0: field not allowed:
+          //     ./in.cue:10:10
+          //     ./in.cue:10:23
+          // #d1.#c.0.1: field not allowed:
+          //     ./in.cue:10:10
+          //     ./in.cue:10:31
         }
         do: (string){ "f1" }
       }
     }
   }
-  #d2: (#struct){
+  #d2: (_|_){
+    // [eval]
     p: (string){ |(*(string){ "." }, (string){ string }) }
-    #c: (#list){
-      0: (#struct){
-        from: (#struct){
+    #c: (_|_){
+      // [eval]
+      0: (_|_){
+        // [eval]
+        from: (_|_){
+          // [eval]
           as: (#list){
             0: (string){ |(*(string){ "." }, (string){ string }) }
           }
-          #c: (#list){
-            0: (#struct){
-              as: (#list){
-                0: (string){ "go" }
-                1: (string){ |(*(string){ "." }, (string){ string }) }
-              }
+          #c: (_|_){
+            // [eval]
+            0: (_|_){
+              // [eval] #d2.#c.0.from.#c.0: 2 errors in empty disjunction:
+              // #d2.#c.0.from.#c.0.0: field not allowed:
+              //     ./in.cue:10:10
+              //     ./in.cue:10:23
+              // #d2.#c.0.from.#c.0.1: field not allowed:
+              //     ./in.cue:10:10
+              //     ./in.cue:10:31
+              as: (list){ list }
               do: (string){ "f1" }
             }
           }
@@ -115,47 +149,104 @@ Disjuncts:    80
 diff old new
 --- old
 +++ new
-@@ -4,10 +4,10 @@
-     }
-     #c: (#list){
-       0: (#struct){
--        do: (string){ "f1" }
-         as: (#list){
-           0: (string){ "go" }
-         }
-+        do: (string){ "f1" }
-       }
-     }
-   }
-@@ -15,21 +15,21 @@
-     p: (string){ |(*(string){ "." }, (string){ string }) }
-     #c: (#list){
-       0: (#struct){
--        do: (string){ "f2" }
-         from: (#struct){
-+          as: (#list){
-+            0: (string){ |(*(string){ "." }, (string){ string }) }
-+          }
-           #c: (#list){
-             0: (#struct){
--              do: (string){ "f1" }
-               as: (#list){
-                 0: (string){ "go" }
-                 1: (string){ |(*(string){ "." }, (string){ string }) }
-               }
-+              do: (string){ "f1" }
-             }
-           }
--          as: (#list){
--            0: (string){ |(*(string){ "." }, (string){ string }) }
--          }
+@@ -1,35 +1,69 @@
+-(struct){
+-  #d1: (#struct){
+-    as: (list){
+-    }
+-    #c: (#list){
+-      0: (#struct){
++Errors:
++#d2.#c.0.from.#c.0: 2 errors in empty disjunction:
++#d1.#c.0.0: field not allowed:
++    ./in.cue:10:10
++    ./in.cue:10:23
++#d1.#c.0.1: field not allowed:
++    ./in.cue:10:10
++    ./in.cue:10:31
++#d2.#c.0.from.#c.0.0: field not allowed:
++    ./in.cue:10:10
++    ./in.cue:10:23
++#d2.#c.0.from.#c.0.1: field not allowed:
++    ./in.cue:10:10
++    ./in.cue:10:31
++
++Result:
++(_|_){
++  // [eval]
++  #d1: (_|_){
++    // [eval]
++    as: (list){
++    }
++    #c: (_|_){
++      // [eval]
++      0: (_|_){
++        // [eval]
++        as: (_|_){
++          // [eval] #d1.#c.0.0: field not allowed:
++          //     ./in.cue:10:10
++          //     ./in.cue:10:23
++          // #d1.#c.0.1: field not allowed:
++          //     ./in.cue:10:10
++          //     ./in.cue:10:31
++        }
+         do: (string){ "f1" }
+-        as: (#list){
+-          0: (string){ "go" }
 -        }
+-      }
+-    }
+-  }
+-  #d2: (#struct){
++      }
++    }
++  }
++  #d2: (_|_){
++    // [eval]
+     p: (string){ |(*(string){ "." }, (string){ string }) }
+-    #c: (#list){
+-      0: (#struct){
+-        do: (string){ "f2" }
+-        from: (#struct){
+-          #c: (#list){
+-            0: (#struct){
+-              do: (string){ "f1" }
+-              as: (#list){
+-                0: (string){ "go" }
+-                1: (string){ |(*(string){ "." }, (string){ string }) }
+-              }
+-            }
+-          }
++    #c: (_|_){
++      // [eval]
++      0: (_|_){
++        // [eval]
++        from: (_|_){
++          // [eval]
+           as: (#list){
+             0: (string){ |(*(string){ "." }, (string){ string }) }
+           }
+-        }
++          #c: (_|_){
++            // [eval]
++            0: (_|_){
++              // [eval] #d2.#c.0.from.#c.0: 2 errors in empty disjunction:
++              // #d2.#c.0.from.#c.0.0: field not allowed:
++              //     ./in.cue:10:10
++              //     ./in.cue:10:23
++              // #d2.#c.0.from.#c.0.1: field not allowed:
++              //     ./in.cue:10:10
++              //     ./in.cue:10:31
++              as: (list){ list }
++              do: (string){ "f1" }
++            }
++          }
 +        }
 +        do: (string){ "f2" }
        }
      }
    }
-@@ -44,11 +44,7 @@
+@@ -44,11 +78,7 @@
        }
      }, (#struct){
        do: (string){ "f2" }
@@ -168,7 +259,7 @@ diff old new
      }) }
    #f1: (#struct){
      do: (string){ "f1" }
-@@ -57,10 +53,6 @@
+@@ -57,10 +87,6 @@
    }
    #f2: (#struct){
      do: (string){ "f2" }

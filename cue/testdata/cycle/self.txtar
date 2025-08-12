@@ -282,9 +282,9 @@ expr.error1.a: conflicting values 4 and 3:
 expr.error2.a: conflicting values 4 and 3:
     ./in.cue:8:5
     ./in.cue:9:5
-0: structural cycle:
+listConcat.error1.0: structural cycle:
     ./in.cue:13:5
-1: structural cycle:
+listConcat.error2.1: structural cycle:
     ./in.cue:17:5
 
 Result:
@@ -314,14 +314,14 @@ Result:
     error1: (_|_){
       // [structural cycle]
       a: (_|_){
-        // [structural cycle] 0: structural cycle:
+        // [structural cycle] listConcat.error1.0: structural cycle:
         //     ./in.cue:13:5
       }
     }
     error2: (_|_){
       // [structural cycle]
       a: (_|_){
-        // [structural cycle] 1: structural cycle:
+        // [structural cycle] listConcat.error2.1: structural cycle:
         //     ./in.cue:17:5
       }
     }
@@ -632,9 +632,9 @@ diff old new
  expr.error2.a: conflicting values 4 and 3:
      ./in.cue:8:5
      ./in.cue:9:5
-+0: structural cycle:
++listConcat.error1.0: structural cycle:
 +    ./in.cue:13:5
-+1: structural cycle:
++listConcat.error2.1: structural cycle:
 +    ./in.cue:17:5
  
  Result:
@@ -654,14 +654,14 @@ diff old new
 -        // [structural cycle]
 -        0: (string){ "1" }
 -        1: (string){ "2" }
-+        // [structural cycle] 0: structural cycle:
++        // [structural cycle] listConcat.error1.0: structural cycle:
 +        //     ./in.cue:13:5
 +      }
 +    }
 +    error2: (_|_){
 +      // [structural cycle]
 +      a: (_|_){
-+        // [structural cycle] 1: structural cycle:
++        // [structural cycle] listConcat.error2.1: structural cycle:
 +        //     ./in.cue:17:5
        }
      }

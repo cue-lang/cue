@@ -44,42 +44,6 @@ Disjuncts:    40
 -- diff/explanation --
 New evaluator should ultimately disallow new definitions in closed structs
 and not allow #pattern in #step
--- out/evalalpha --
-(struct){
-  _#matchPattern(:x): (_|_){
-    // [incomplete] error in call to strings.HasSuffix: non-concrete value string:
-    //     ./in.cue:11:6
-    //     ./in.cue:8:12
-    #pattern: (string){ string }
-  }
-  _#isReleaseTag(:x): (string){
-    "refs/tags/v"
-    #pattern: (string){ "refs/tags/v*" }
-    let prefix#1 = (string){ "refs/tags/v" }
-  }
-  #step: (#struct){
-    if: ((string|number)){ |((number){ number }, (string){ string }) }
-  }
-  m: (#struct){
-    if: (string){
-      "refs/tags/v"
-      #pattern: (string){ "refs/tags/v*" }
-      let prefix#1 = (string){ "refs/tags/v" }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,6 +1,6 @@
- (struct){
-   _#matchPattern(:x): (_|_){
--    // [incomplete] _#matchPattern: error in call to strings.HasSuffix: non-concrete value string:
-+    // [incomplete] error in call to strings.HasSuffix: non-concrete value string:
-     //     ./in.cue:11:6
-     //     ./in.cue:8:12
-     #pattern: (string){ string }
 -- out/eval --
 (struct){
   _#matchPattern(:x): (_|_){

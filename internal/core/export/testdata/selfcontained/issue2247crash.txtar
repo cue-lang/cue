@@ -2,6 +2,40 @@
 -- x.cue --
 a: _
 b: [a][0]
+-- out/self-v3/default --
+a: _
+b: Index0
+
+//cue:path: 0
+let Index0 = a
+-- diff/-out/self-v3/default<==>+out/self/default --
+diff old new
+--- old
++++ new
+@@ -1,2 +1,5 @@
+ a: _
+-b: [a][0]
++b: Index0
++
++//cue:path: 0
++let Index0 = a
+-- out/self-v3-noshare/default --
+a: _
+b: Index0
+
+//cue:path: 0
+let Index0 = a
+-- diff/-out/self-v3-noshare/default<==>+out/self/default --
+diff old new
+--- old
++++ new
+@@ -1,2 +1,5 @@
+ a: _
+-b: [a][0]
++b: Index0
++
++//cue:path: 0
++let Index0 = a
 -- out/self/default --
 a: _
 b: [a][0]

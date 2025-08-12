@@ -16,6 +16,24 @@
       "message": "nit: consistent capitalization: Go tends to spell acronyms in all-caps.\n\n```suggestion\n\t\t\t\t\tfileURI :\u003d protocol.DocumentURI(string(modRootURI) + \"/\" + file.FilePath)\n```",
       "revId": "b4837a5bb030dbb4d3c47514af0077352f856bbd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb839060_dd2450b4",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-12T07:50:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "1e5cdeab_2ffcec07",
+      "revId": "b4837a5bb030dbb4d3c47514af0077352f856bbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

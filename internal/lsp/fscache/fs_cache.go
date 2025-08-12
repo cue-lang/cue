@@ -95,7 +95,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (ast *ast.File, cfg parser
 
 	for _, cfg = range []parser.Config{parseComments, importsOnly} {
 		ast, err = parser.ParseFile(bf.Filename, content, cfg)
-		if err == nil {
+		if ast != nil {
 			break
 		}
 	}

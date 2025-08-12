@@ -22,8 +22,25 @@ import (
 	"cuelang.org/go/internal/lsp/cache"
 )
 
-func (s *server) Definition(ctx context.Context, params *protocol.DefinitionParams) (_ []protocol.Location, rerr error) {
+func (s *server) Definition(ctx context.Context, params *protocol.DefinitionParams) ([]protocol.Location, error) {
 	uri := params.TextDocument.URI
+	pkg, err := s.packageForURI(uri)
+	if err != nil {
+		return nil, err
+	}
+	return pkg.Definition(uri, params.Position), nil
+}
+
+func (s *server) Completion(ctx context.Context, params *protocol.CompletionParams) (*protocol.CompletionList, error) {
+	uri := params.TextDocument.URI
+	pkg, err := s.packageForURI(uri)
+	if err != nil {
+		return nil, err
+	}
+	return pkg.Completion(uri, params.Position), nil
+}
+
+func (s *server) packageForURI(uri protocol.DocumentURI) (*cache.Package, error) {
 	mod, err := s.workspace.FindModuleForFile(uri)
 	if err != nil {
 		return nil, err
@@ -38,12 +55,16 @@ func (s *server) Definition(ctx context.Context, params *protocol.DefinitionPara
 	}
 	// The first package will be the "most specific". I.e. the package
 	// with root at the same directory as the file itself. There's
-	// definitely an argument that we should be calling Definition for
-	// all packages, and merging the results. This would find
-	// definitions that exist due to ancestor imports. TODO
+	// maybe an argument that we should be calling e.g. Completion on
+	// all the packages, and merging the results. This would find
+	// definitions that exist due to ancestor imports, but these are
+	// descendant packages from the pov of the file on which Completion
+	// has just been called. For example, pkgs[0] could have import
+	// path foo.com/x:a and a package with import path foo.com/x/y/z:a
+	// could also exist in pkgs.
 	pkg, ok := pkgs[0].(*cache.Package)
 	if !ok {
 		return nil, fmt.Errorf("no pkgs found for %v", uri)
 	}
-	return pkg.Definition(uri, params.Position), nil
+	return pkg, nil
 }

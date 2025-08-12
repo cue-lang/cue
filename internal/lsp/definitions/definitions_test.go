@@ -1053,6 +1053,30 @@ a: {
 				fln("d.cue", 5, 1, "X"): {fln("d.cue", 4, 1, "f")},
 			},
 		},
+
+		{
+			name: "Resolve_Import",
+			archive: `-- a.cue --
+package a
+
+x: 12
+-- b.cue --
+package b
+
+import "a"
+
+y: a
+z: y.x
+-- c.cue --
+package a
+`,
+			expectations: map[*position][]*position{
+				fln("b.cue", 3, 1, `"a"`): {fln("a.cue", 1, 1, "package a"), fln("c.cue", 1, 1, "package a")},
+				fln("b.cue", 5, 1, "a"):   {fln("b.cue", 3, 1, `"a"`)},
+				fln("b.cue", 6, 1, "y"):   {fln("b.cue", 5, 1, "y")},
+				fln("b.cue", 6, 1, "x"):   {fln("a.cue", 3, 1, "x")},
+			},
+		},
 	}.run(t)
 }
 
@@ -1069,16 +1093,19 @@ func (tcs testCases) run(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			var files []*ast.File
 			filesByName := make(map[string]*ast.File)
+			filesByPkg := make(map[string][]*ast.File)
 
 			ar := txtar.Parse([]byte(tc.archive))
 			qt.Assert(t, qt.IsTrue(len(ar.Files) > 0))
 
 			for _, fh := range ar.Files {
-				ast, err := parser.ParseFile(fh.Name, fh.Data, parser.ParseComments)
-				ast.Pos().File().SetContent(fh.Data)
+				fileAst, err := parser.ParseFile(fh.Name, fh.Data, parser.ParseComments)
+				fileAst.Pos().File().SetContent(fh.Data)
 				qt.Assert(t, qt.IsNil(err))
-				files = append(files, ast)
-				filesByName[fh.Name] = ast
+				files = append(files, fileAst)
+				filesByName[fh.Name] = fileAst
+				pkgName := fileAst.PackageName()
+				filesByPkg[pkgName] = append(filesByPkg[pkgName], fileAst)
 			}
 
 			var allPositions []*position
@@ -1094,15 +1121,29 @@ func (tcs testCases) run(t *testing.T) {
 				pos.determineOffset(filesByName[pos.filename].Pos().File())
 			}
 
-			dfns := definitions.Analyse(nil, files...)
+			dfnsByFilename := make(map[string]*definitions.FileDefinitions)
+			dfnsByPkgName := make(map[string]*definitions.Definitions)
+			forPackage := func(importPath string) *definitions.Definitions {
+				return dfnsByPkgName[importPath]
+			}
+
+			for pkgName, files := range filesByPkg {
+				dfns := definitions.Analyse(forPackage, files...)
+				dfnsByPkgName[pkgName] = dfns
+				for _, fileAst := range files {
+					dfnsByFilename[fileAst.Filename] = dfns.ForFile(fileAst.Filename)
+				}
+			}
+
 			ranges := rangeset.NewFilenameRangeSet()
 
 			for posFrom, positionsWant := range tc.expectations {
-				fdfns := dfns.ForFile(posFrom.filename)
+				filename := posFrom.filename
+				fdfns := dfnsByFilename[filename]
 				qt.Assert(t, qt.IsNotNil(fdfns))
 
 				offset := posFrom.offset
-				ranges.Add(posFrom.filename, offset, offset+len(posFrom.str))
+				ranges.Add(filename, offset, offset+len(posFrom.str))
 
 				for i := range len(posFrom.str) {
 					// Test every offset within the "from" token
@@ -1126,7 +1167,7 @@ func (tcs testCases) run(t *testing.T) {
 			// expectations, resolve to nothing.
 			for _, fileAst := range files {
 				filename := fileAst.Filename
-				fdfns := dfns.ForFile(filename)
+				fdfns := dfnsByFilename[filename]
 				for i := range fileAst.Pos().File().Content() {
 					if ranges.Contains(filename, i) {
 						continue

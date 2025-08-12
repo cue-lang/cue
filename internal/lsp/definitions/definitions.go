@@ -672,15 +672,15 @@ func (n *astNode) eval() {
 				// We need to make sure that the comprehension value
 				// (i.e. body) and all subsequent clauses, can be reached
 				// by traversing through all clauses. The simplest way to
-				// do this is just to include the whole range of n within
-				// each descendent.
+				// do this is just to include the whole range of node
+				// within each descendent.
 				cur.addRange(node)
-				cur.eval()
+				parent.resolvesTo = append(parent.resolvesTo, cur.navigable)
 				parent = cur
 			}
 			if parent != n {
 				child := parent.newAstNode(nil, node.Value, nil)
-				n.resolvesTo = append(n.resolvesTo, child.navigable)
+				parent.resolvesTo = append(parent.resolvesTo, child.navigable)
 			}
 
 		case *ast.IfClause:

@@ -867,6 +867,7 @@ func (w *Workspace) reloadPackages() error {
 			for _, pkg := range pkgs {
 				pkg.MarkFileDirty(fileUri)
 			}
+			w.invalidateActiveFilesAndDirs()
 			repeatReload = true
 		}
 		// if len(pkgs) == 0 and no error, then it means the file had no

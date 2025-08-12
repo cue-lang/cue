@@ -253,6 +253,9 @@ func equalDeref(a, b *Vertex) bool {
 // newInlineVertex creates a Vertex that is needed for computation, but for
 // which there is no CUE path defined from the root Vertex.
 func (ctx *OpContext) newInlineVertex(parent *Vertex, v BaseValue, a ...Conjunct) *Vertex {
+	// TODO: parent is an unused parameter here. Setting [Vertex.Parent] to it
+	// improves paths in a bunch of errors, fixing regressions compared to evalv2.
+	// However, it also breaks a few tests. Perhaps try with evalv4.
 	n := &Vertex{
 		BaseValue: v,
 		IsDynamic: true,

@@ -321,14 +321,17 @@ func Analyse(forPackage DefinitionsForPackageFunc, files ...*ast.File) *Definiti
 	}
 
 	pkgNode := dfns.newAstNode(nil, nil, nil, nil)
+	pkgNode.fieldsAllowed = true
 	dfns.pkgNode = pkgNode
 	navigable := &navigableBindings{}
 
 	for _, file := range files {
-		pkgNode.newAstNode(nil, file, navigable)
+		fileNode := pkgNode.newAstNode(nil, file, navigable)
+		fileNode.fieldsAllowed = true
 		dfns.byFilename[file.Filename] = &FileDefinitions{
 			pkgNode:     pkgNode,
-			resolutions: make(map[int][]*navigableBindings),
+			definitions: make(map[int][]*navigableBindings),
+			completions: make(map[int]*completionResolutions),
 			File:        file,
 		}
 	}
@@ -367,25 +370,6 @@ func (dfns *Definitions) newAstNode(parent *astNode, key ast.Node, unprocessed a
 	return s
 }
 
-// addResolution records that the target navigableBindings are the
-// definitions for the file and all offsets between the start and end
-// positions. Existing definitions for those offsets are overwritten
-// without warning.
-func (dfns *Definitions) addResolution(start, end token.Pos, targets []*navigableBindings) {
-	if len(targets) == 0 || start == token.NoPos || end == token.NoPos {
-		return
-	}
-
-	startPosition := start.Position()
-	filename := startPosition.Filename
-	resolutions := dfns.byFilename[filename].resolutions
-
-	endOffset := end.Position().Offset
-	for offset := startPosition.Offset; offset < endOffset; offset++ {
-		resolutions[offset] = targets
-	}
-}
-
 // ForFile looks up the [FileDefinitions] for the given filename.
 func (dfns *Definitions) ForFile(filename string) *FileDefinitions {
 	return dfns.byFilename[filename]
@@ -396,22 +380,43 @@ func (dfns *Definitions) ForFile(filename string) *FileDefinitions {
 type FileDefinitions struct {
 	// pkgNode is the package-level astNode containing this file
 	pkgNode *astNode
-	// resolutions caches the definitions that have been computed
+	// definitions caches the definitions that have been computed
 	// during evaluation. This ensures that subsequent calls to
-	// [ForOffset] for a given offset are O(1). The map key is the byte
-	// offset within the file.
-	resolutions map[int][]*navigableBindings
+	// [evalForOffset] for a given offset are O(1). The map key is the
+	// byte offset within the file.
+	definitions map[int][]*navigableBindings
+	// completions is the same as definitions, but for completions.
+	completions map[int]*completionResolutions
 	// File is the original [ast.File] that was passed to [Analyse].
 	File *ast.File
 }
 
-// ForOffset reports the definitions that the file offset (number of
+// completionResolutions models the various different types of
+// completions that are available for a given location, alongside
+// various file coordinates which are essential for the LSP to
+// instruct the client correctly for editing the source.
+type completionResolutions struct {
+	embedNavigables []*navigableBindings
+	embedNode       *astNode
+	fieldNavigables []*navigableBindings
+	startOffset     int
+	fieldEndOffset  int
+	embedEndOffset  int
+}
+
+// DefinitionsForOffset reports the definitions that the file offset (number of
 // bytes from the start of the file) resolves to.
-func (fdfns *FileDefinitions) ForOffset(offset int) []ast.Node {
-	navigables := fdfns.evalForOffset(offset)
+func (fdfns *FileDefinitions) DefinitionsForOffset(offset int) []ast.Node {
+	definitions := fdfns.definitions
+	navs, found := definitions[offset]
+	if !found {
+		definitions[offset] = []*navigableBindings{}
+		fdfns.evalForOffset(offset)
+		navs = definitions[offset]
+	}
 
 	var nodes []ast.Node
-	for _, nav := range navigables {
+	for _, nav := range navs {
 		for _, n := range nav.contributingNodes {
 			if n.key != nil {
 				nodes = append(nodes, n.key)
@@ -422,23 +427,72 @@ func (fdfns *FileDefinitions) ForOffset(offset int) []ast.Node {
 	return nodes
 }
 
-// evalForOffset evaluates from the pkgNode, evaluating only child
-// astNodes that contain the given file-byte-offset. It returns all
-// navigableBindings that have been found from resolving the symbol at
-// offset. This result is cached, so subsequent calls for the same
-// offset will be O(1). Due to the nature of evaluation it is also
-// likely subsequent calls for very similar offsets are also O(1).
-func (fdfns *FileDefinitions) evalForOffset(offset int) []*navigableBindings {
-	if offset < 0 {
-		return nil
-	}
-	resolutions := fdfns.resolutions
-	navigables, found := resolutions[offset]
-	if found {
-		return navigables
+// CompletionsForOffset reports the set of strings that can form a new
+// path element following the path element indicated by the offset
+// (number of bytes from the start of the file).
+func (fdfns *FileDefinitions) CompletionsForOffset(offset int) (fields, embeds []string, startOffset, fieldEndOffset, embedEndOffset int) {
+	completions := fdfns.completions
+	resolutions, found := completions[offset]
+	if !found {
+		completions[offset] = &completionResolutions{}
+		fdfns.evalForOffset(offset)
+		resolutions = completions[offset]
 	}
 
-	resolutions[offset] = []*navigableBindings{}
+	namesSet := make(map[string]struct{})
+	if navs := resolutions.fieldNavigables; len(navs) > 0 {
+		navigableSet := expandNavigables(navs)
+		for nav := range navigableSet {
+			for name := range nav.bindings {
+				if !strings.HasPrefix(name, "__") {
+					namesSet[name] = struct{}{}
+				}
+			}
+		}
+	}
+	fields = slices.Collect(maps.Keys(namesSet))
+	slices.Sort(fields)
+
+	clear(namesSet)
+	if navs := resolutions.embedNavigables; len(navs) > 0 {
+		navigableSet := expandNavigables(navs)
+
+		for nav := range navigableSet {
+			for name := range nav.bindings {
+				if !strings.HasPrefix(name, "__") && ast.IsValidIdent(name) {
+					namesSet[name] = struct{}{}
+				}
+			}
+		}
+	}
+
+	for node := resolutions.embedNode; node != nil; node = node.parent {
+		for name := range node.bindings {
+			if !strings.HasPrefix(name, "__") && ast.IsValidIdent(name) {
+				namesSet[name] = struct{}{}
+			}
+		}
+		if node.isFileNode() {
+			// Include the package bindings
+			for name := range node.navigable.bindings {
+				if !strings.HasPrefix(name, "__") && ast.IsValidIdent(name) {
+					namesSet[name] = struct{}{}
+				}
+			}
+		}
+	}
+	embeds = slices.Collect(maps.Keys(namesSet))
+	slices.Sort(embeds)
+
+	return fields, embeds, resolutions.startOffset, resolutions.fieldEndOffset, resolutions.embedEndOffset
+}
+
+// evalForOffset evaluates from the pkgNode, evaluating only child
+// astNodes that contain the given file-byte-offset.
+func (fdfns *FileDefinitions) evalForOffset(offset int) {
+	if offset < 0 {
+		return
+	}
 
 	filename := fdfns.File.Filename
 	pkgNode := fdfns.pkgNode
@@ -463,8 +517,6 @@ func (fdfns *FileDefinitions) evalForOffset(offset int) []*navigableBindings {
 	}
 
 	//pkgNode.dump(1)
-
-	return resolutions[offset]
 }
 
 // astNode corresponds to a node from the AST. An astNode can be
@@ -519,7 +571,8 @@ type astNode struct {
 	// ranges tracks the file ranges covered by this astNode
 	ranges *rangeset.FilenameRangeSet
 	// ellipses contains navigableBindings for ellipsis patterns.
-	ellipses []*navigableBindings
+	ellipses      []*navigableBindings
+	fieldsAllowed bool
 }
 
 // newAstNode creates a new [astNodes] which is a child of the current
@@ -619,6 +672,95 @@ type navigableBindings struct {
 	name string
 }
 
+// addDefinition records that the target navigableBindings are the
+// definitions for the file and all offsets between the start and end
+// positions. Existing definitions for those offsets are overwritten
+// without warning.
+func (n *astNode) addDefinition(start, end token.Pos, targets []*navigableBindings) {
+	if len(targets) == 0 || start == token.NoPos || end == token.NoPos {
+		return
+	}
+
+	startPosition := start.Position()
+	filename := startPosition.Filename
+	resolutions := n.dfns.byFilename[filename].definitions
+
+	endOffset := end.Position().Offset
+	for offset := startPosition.Offset; offset < endOffset; offset++ {
+		resolutions[offset] = targets
+	}
+}
+
+// addEmbedCompletions records that both node (and all its parents)
+// and targets are considered to contain bindings which should be
+// offered as completions for any completion request between the start
+// and end positions.
+//
+// The first element of a path must resolve lexically (if it's an
+// ident). For this, the node parameter is provided, and all its
+// ancestors are also considered. For subsequent elements of a path,
+// the targets parameter is provided, which contains all the
+// navigables resulting from resolving the prior elements of the
+// selector.
+//
+// For a non-first path element, the start position will include the
+// . so that completions are presented as soon as the user types
+// ".". The startOffset parameter contains the position of the start
+// of the existing path element so that the LSP server can send
+// completions to the client that correctly edit the existing path.
+func (n *astNode) addEmbedCompletions(start, end token.Pos, node *astNode, targets []*navigableBindings, startOffset token.Pos) {
+	if (len(targets) == 0 && node == nil) || start == token.NoPos || end == token.NoPos {
+		return
+	}
+
+	startPosition := start.Position()
+	filename := startPosition.Filename
+	resolutions := n.dfns.byFilename[filename].completions
+
+	endOffset := end.Position().Offset
+	for offset := startPosition.Offset; offset < endOffset; offset++ {
+		r, found := resolutions[offset]
+		if !found {
+			r = &completionResolutions{}
+			resolutions[offset] = r
+		}
+		r.embedNavigables = targets
+		r.embedNode = node
+		r.embedEndOffset = endOffset
+		r.startOffset = startOffset.Position().Offset
+	}
+}
+
+// addFieldCompletions records that the target navigableBindings are
+// considered to contain bindings which should be offered at
+// completions for any completion request between the start and end
+// positions. colonPos contains the position of the colon which
+// follows the existing field name (probably slightly beyond the end
+// position), and is used to ensure that when the LSP server suggests
+// completions to the client, those completions correctly edit the
+// existing field.
+func (n *astNode) addFieldCompletions(start, end token.Pos, targets []*navigableBindings, colonPos token.Pos) {
+	if len(targets) == 0 || start == token.NoPos || end == token.NoPos {
+		return
+	}
+
+	startPosition := start.Position()
+	filename := startPosition.Filename
+	resolutions := n.dfns.byFilename[filename].completions
+
+	endOffset := end.Position().Offset
+	for offset := startPosition.Offset; offset < endOffset; offset++ {
+		r, found := resolutions[offset]
+		if !found {
+			r = &completionResolutions{}
+			resolutions[offset] = r
+		}
+		r.fieldNavigables = targets
+		r.fieldEndOffset = colonPos.Position().Offset
+		r.startOffset = startPosition.Offset
+	}
+}
+
 // addRange records that the astNode covers the range from the node's
 // start file-offset to its end file-offset. Because the AST is
 // non-recursive in a few areas (e.g. comprehensions), it's sometimes
@@ -691,6 +833,7 @@ func (n *astNode) eval() {
 			for _, decl := range node.Decls {
 				unprocessed = append(unprocessed, decl)
 			}
+			n.fieldsAllowed = true
 
 		case *ast.Package:
 			// Package declarations must be added to the pkgDecls
@@ -748,13 +891,14 @@ func (n *astNode) eval() {
 				for _, child := range dfns.pkgNode.allChildren {
 					child.eval()
 				}
-				n.dfns.addResolution(path.Pos(), path.End(), []*navigableBindings{dfns.pkgDecls})
+				n.addDefinition(path.Pos(), path.End(), []*navigableBindings{dfns.pkgDecls})
 			}
 
 		case *ast.StructLit:
 			for _, elt := range node.Elts {
 				unprocessed = append(unprocessed, elt)
 			}
+			n.fieldsAllowed = true
 
 		case *ast.ListLit:
 			for i, elt := range node.Elts {
@@ -772,6 +916,7 @@ func (n *astNode) eval() {
 					Value:    elt,
 				})
 			}
+			n.fieldsAllowed = false
 
 		case *ast.Interpolation:
 			resolvable = append(resolvable, node.Elts...)
@@ -849,6 +994,11 @@ func (n *astNode) eval() {
 
 			childTail := childExpr.newAstNode(nil, comprehensionTail, nil)
 			n.resolvesTo = append(n.resolvesTo, childTail.navigable)
+			if _, ok := comprehensionTail.(*ast.Comprehension); !ok {
+				// If it's not a comprehension, then it must be the
+				// body. In which case the body resolves back to us.
+				childTail.resolvesTo = append(childTail.resolvesTo, n.navigable)
+			}
 
 		case *ast.ForClause:
 			comprehensionTail := comprehensionsStash[node]
@@ -866,6 +1016,11 @@ func (n *astNode) eval() {
 
 			childTail := childBinding.newAstNode(nil, comprehensionTail, nil)
 			n.resolvesTo = append(n.resolvesTo, childTail.navigable)
+			if _, ok := comprehensionTail.(*ast.Comprehension); !ok {
+				// If it's not a comprehension, then it must be the
+				// body. In which case the body resolves back to us.
+				childTail.resolvesTo = append(childTail.resolvesTo, n.navigable)
+			}
 
 		case *ast.LetClause:
 			// A let clause might or might not be within a comprehension.
@@ -883,6 +1038,11 @@ func (n *astNode) eval() {
 
 				childTail := childBinding.newAstNode(nil, comprehensionTail, nil)
 				n.resolvesTo = append(n.resolvesTo, childTail.navigable)
+				if _, ok := comprehensionTail.(*ast.Comprehension); !ok {
+					// If it's not a comprehension, then it must be the
+					// body. In which case the body resolves back to us.
+					childTail.resolvesTo = append(childTail.resolvesTo, n.navigable)
+				}
 			} else {
 				// We're not within a wider comprehension: the binding
 				// must be added to the current node n because we need to
@@ -903,11 +1063,11 @@ func (n *astNode) eval() {
 			var binding *astNode
 			switch label := label.(type) {
 			case *ast.Ident:
-				binding = n.ensureNavigableBinding(label.Name, label, node.Value)
+				binding = n.ensureNavigableBinding(label.Name, label, node.Value, node.TokenPos)
 			case *ast.BasicLit:
 				name, _, err := ast.LabelName(label)
 				if err == nil {
-					binding = n.ensureNavigableBinding(name, label, node.Value)
+					binding = n.ensureNavigableBinding(name, label, node.Value, node.TokenPos)
 				} else {
 					binding = n.newAstNode(label, node.Value, nil)
 				}
@@ -964,11 +1124,11 @@ func (n *astNode) eval() {
 	}
 
 	for _, expr := range embeddedResolvable {
-		nodes := n.resolve(expr)
+		nodes := n.resolve(expr, true)
 		n.resolvesTo = append(n.resolvesTo, nodes...)
 	}
 	for _, expr := range resolvable {
-		n.resolve(expr)
+		n.resolve(expr, false)
 	}
 }
 
@@ -976,54 +1136,53 @@ func (n *astNode) eval() {
 // bindings. It is a slice because a single expression may resolve to
 // several unrelated navigable bindings. For example the expression `x
 // & y`.
-func (n *astNode) resolve(e ast.Expr) []*navigableBindings {
+func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
 	switch e := e.(type) {
 	case *fieldDeclExpr:
-		var names []string
 		parent := n.parent
-		ancestor := parent.navigable
-		for ; ancestor != nil && ancestor.name != ""; ancestor = ancestor.parent {
-			names = append(names, ancestor.name)
-		}
-		if ancestor == nil || len(names) == 0 {
-			return nil
-		}
-		navs := []*navigableBindings{ancestor}
-		for _, name := range slices.Backward(names) {
-			navs = navigateBindingsByName(navs, name)
-		}
 		key := parent.key
-		n.dfns.addResolution(key.Pos(), key.End(), navs)
+		navs := expandNavigableViaAncestralPath(parent.navigable.parent)
+		n.addFieldCompletions(key.Pos(), key.End(), navs, e.colonPos.Add(1))
+
+		navs = expandNavigableViaAncestralPath(parent.navigable)
+		n.addDefinition(key.Pos(), key.End(), navs)
 		return navs
 
 	case *ast.Ident:
+		if maybeField && n.fieldsAllowed {
+			n.addFieldCompletions(e.Pos(), e.End(), expandNavigableViaAncestralPath(n.navigable), e.End())
+		}
+		n.addEmbedCompletions(e.Pos(), e.End(), n, nil, e.Pos())
 		root := n.resolvePathRoot(e.Name)
 		if root == nil {
 			return nil
 		}
 		navs := []*navigableBindings{root}
-		n.dfns.addResolution(e.Pos(), e.End(), navs)
+		n.addDefinition(e.Pos(), e.End(), navs)
 		return navs
 
 	case *ast.SelectorExpr:
-		resolved := n.resolve(e.X)
+		resolved := n.resolve(e.X, false)
+		// use e.X.End() rather than sel.Pos() because starting at
+		// e.X.End() will include the "."
 		sel := e.Sel
+		n.addEmbedCompletions(e.X.End(), sel.End(), nil, resolved, sel.Pos())
 		name, _, err := ast.LabelName(sel)
 		if err != nil {
 			return nil
 		}
 
 		results := navigateBindingsByName(resolved, name)
-		n.dfns.addResolution(sel.Pos(), sel.End(), results)
+		n.addDefinition(sel.Pos(), sel.End(), results)
 		return results
 
 	case *ast.IndexExpr:
-		resolved := n.resolve(e.X)
+		resolved := n.resolve(e.X, false)
 		lit, ok := e.Index.(*ast.BasicLit)
 		if !ok {
 			// If it's a path/ident etc, we don't attempt to calculate
 			// the dynamic index.
-			n.resolve(e.Index)
+			n.resolve(e.Index, false)
 			return nil
 		}
 		name := "__" + lit.Value
@@ -1036,7 +1195,7 @@ func (n *astNode) resolve(e ast.Expr) []*navigableBindings {
 		}
 
 		results := navigateBindingsByName(resolved, name)
-		n.dfns.addResolution(e.Lbrack, e.Rbrack.Add(1), results)
+		n.addDefinition(e.Lbrack, e.Rbrack.Add(1), results)
 		return results
 
 	default:
@@ -1092,6 +1251,21 @@ func expandNavigables(navigables []*navigableBindings) map[*navigableBindings]st
 		}
 	}
 	return navigableSet
+}
+
+// expandNavigableViaAncestralPath calculates the set of
+// navigableBindings with which the argument is unified. Note this is
+// imperfect: for example it will not attempt to explore patterns.
+func expandNavigableViaAncestralPath(nav *navigableBindings) []*navigableBindings {
+	var names []string
+	for ; nav != nil && nav.name != ""; nav = nav.parent {
+		names = append(names, nav.name)
+	}
+	navs := []*navigableBindings{nav}
+	for _, name := range slices.Backward(names) {
+		navs = navigateBindingsByName(navs, name)
+	}
+	return navs
 }
 
 // navigateBindingsByName maximally expands the set of bindings, and
@@ -1177,7 +1351,7 @@ func (n *astNode) isFileNode() bool {
 // ensureNavigableBinding creates and returns a new [astNode],
 // locating and using the appropriate shared [navigableBindings] for
 // the given name. The new node is stored in the node's bindings.
-func (n *astNode) ensureNavigableBinding(name string, key ast.Label, unprocessed ast.Node) *astNode {
+func (n *astNode) ensureNavigableBinding(name string, key ast.Label, unprocessed ast.Node, colonPos token.Pos) *astNode {
 	// Search via our own shared navigable bindings. This is a
 	// criticial step that ensures that we continue to correctly share
 	// navigableBindings even as astNodes diverge. For example:
@@ -1203,12 +1377,12 @@ func (n *astNode) ensureNavigableBinding(name string, key ast.Label, unprocessed
 	binding := n.newAstNode(key, unprocessed, nav)
 
 	if !strings.HasPrefix(name, "__") {
-		// If binding name starts with __ then we assume we're
-		// artificially created it when converting a list's elements to
-		// struct fields. A list element doesn't have a key in the
-		// source, so there's no need to add a fieldDeclExpr for
-		// resolving that key.
-		expr := &fieldDeclExpr{position: key}
+		// If binding name starts with __ then we assume we artificially
+		// created it when converting a list's elements to struct
+		// fields. A list element doesn't have a key in the source, so
+		// there's no need to add a fieldDeclExpr for resolving that
+		// key.
+		expr := &fieldDeclExpr{position: key, colonPos: colonPos}
 		binding.newAstNode(key, expr, nil)
 	}
 
@@ -1236,6 +1410,7 @@ func (n *astNode) newBinding(name string, key ast.Node, unprocessed ast.Node) *a
 // appendBinding stores the binding under the given name in the
 // current astNode only.
 func (n *astNode) appendBinding(name string, binding *astNode) {
+	binding.fieldsAllowed = true
 	if n.bindings == nil {
 		n.bindings = make(map[string][]*astNode)
 	}
@@ -1250,6 +1425,9 @@ type fieldDeclExpr struct {
 	// Always nil: make the struct implement [ast.Expr]
 	ast.Expr
 	position ast.Node
+	// colonPos is the position of the colon that follows the field's
+	// label.
+	colonPos token.Pos
 }
 
 var _ ast.Node = (*fieldDeclExpr)(nil)

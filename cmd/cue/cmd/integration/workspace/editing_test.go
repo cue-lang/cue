@@ -222,13 +222,7 @@ v4: v2
 			env.Await(
 				env.DoneWithOpen(),
 			)
-			locs := env.Definition(protocol.Location{
-				URI: rootURI + "/b/c/c.cue",
-				Range: protocol.Range{
-					Start: protocol.Position{Line: 6, Character: 4},
-				},
-			})
-			qt.Assert(t, qt.ContentEquals(locs, []protocol.Location{
+			want := []protocol.Location{
 				{
 					URI: rootURI + "/b/b.cue",
 					Range: protocol.Range{
@@ -243,7 +237,24 @@ v4: v2
 						End:   protocol.Position{Line: 4, Character: 2},
 					},
 				},
-			}))
+			}
+			locs := env.Definition(protocol.Location{
+				URI: rootURI + "/b/c/c.cue",
+				Range: protocol.Range{
+					Start: protocol.Position{Line: 6, Character: 4},
+				},
+			})
+			qt.Assert(t, qt.ContentEquals(locs, want))
+			locs = env.Definition(protocol.Location{
+				URI: rootURI + "/b/c/c.cue",
+				Range: protocol.Range{
+					// This places this cursor after v2 so it's testing
+					// that we decrement the character offset by one if
+					// there are no results.
+					Start: protocol.Position{Line: 6, Character: 6},
+				},
+			})
+			qt.Assert(t, qt.ContentEquals(locs, want))
 		})
 	})
 

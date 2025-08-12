@@ -30,7 +30,7 @@ import (
 )
 
 func TestDefinitions(t *testing.T) {
-	testCases{
+	testCasesDfn{
 		{
 			name: "Selector_Implicit_ViaRoot",
 			archive: `-- a.cue --
@@ -1734,15 +1734,15 @@ z: x: 5
 	}.run(t)
 }
 
-type testCase struct {
+type testCaseDfn struct {
 	name         string
 	archive      string
 	expectations map[*position][]*position
 }
 
-type testCases []testCase
+type testCasesDfn []testCaseDfn
 
-func (tcs testCases) run(t *testing.T) {
+func (tcs testCasesDfn) run(t *testing.T) {
 	for _, tc := range tcs {
 		t.Run(tc.name, func(t *testing.T) {
 			var files []*ast.File
@@ -1805,7 +1805,7 @@ func (tcs testCases) run(t *testing.T) {
 				for i := range len(posFrom.str) {
 					// Test every offset within the "from" token
 					offset := offset + i
-					nodesGot := fdfns.ForOffset(offset)
+					nodesGot := fdfns.DefinitionsForOffset(offset)
 					fileOffsetsGot := make([]fileOffset, len(nodesGot))
 					for j, node := range nodesGot {
 						fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
@@ -1833,7 +1833,7 @@ func (tcs testCases) run(t *testing.T) {
 					if ranges.Contains(filename, i) {
 						continue
 					}
-					nodesGot := fdfns.ForOffset(i)
+					nodesGot := fdfns.DefinitionsForOffset(i)
 					fileOffsetsGot := make([]fileOffset, len(nodesGot))
 					for j, node := range nodesGot {
 						fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())

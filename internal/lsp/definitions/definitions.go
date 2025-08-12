@@ -254,6 +254,8 @@ package definitions
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 	"strconv"
 
 	"cuelang.org/go/cue/ast"
@@ -296,7 +298,7 @@ func Analyse(forPackage DefinitionsForPackageFunc, files ...*ast.File) *Definiti
 		pkgNode.newAstNode(nil, file, navigable)
 		dfns.byFilename[file.Filename] = &FileDefinitions{
 			pkgNode:     pkgNode,
-			resolutions: make(map[int][]ast.Node),
+			resolutions: make(map[int][]*navigableBindings),
 			File:        file,
 		}
 	}
@@ -344,16 +346,8 @@ func (dfns *Definitions) addResolution(start token.Pos, length int, targets []*n
 	filename := startPosition.Filename
 	resolutions := dfns.byFilename[filename].resolutions
 	startOffset := startPosition.Offset
-	var keys []ast.Node
-	for _, nav := range targets {
-		for _, lex := range nav.contributingNodes {
-			if lex.key != nil {
-				keys = append(keys, lex.key)
-			}
-		}
-	}
 	for i := range length {
-		resolutions[startOffset+i] = keys
+		resolutions[startOffset+i] = targets
 	}
 }
 
@@ -369,7 +363,7 @@ type FileDefinitions struct {
 	// resolutions caches the results of previous lookups, ensuring
 	// that subsequent calls to [ForOffset] for a given offset are
 	// O(1). The map key is the byte offset within the file.
-	resolutions map[int][]ast.Node
+	resolutions map[int][]*navigableBindings
 	// File is the original [ast.File] that was passed to [Analyse].
 	File *ast.File
 }
@@ -377,15 +371,48 @@ type FileDefinitions struct {
 // ForOffset reports the definitions that the file offset (number of
 // bytes from the start of the file) resolves to.
 func (fdfns *FileDefinitions) ForOffset(offset int) []ast.Node {
+	navigables := fdfns.computeForOffset(offset)
+
+	var nodes []ast.Node
+	for _, nav := range navigables {
+		for _, n := range nav.contributingNodes {
+			if n.key == nil {
+				continue
+			}
+			nodes = append(nodes, n.key)
+		}
+	}
+
+	return nodes
+}
+
+func (fdfns *FileDefinitions) CompletionsForOffset(offset int) []string {
+	navigables := fdfns.computeForOffset(offset)
+	navigableSet := expandNavigables(navigables)
+
+	stringsSet := make(map[string]struct{})
+	for nav := range navigableSet {
+		for name := range nav.bindings {
+			stringsSet[name] = struct{}{}
+		}
+	}
+
+	strings := slices.Collect(maps.Keys(stringsSet))
+	slices.Sort(strings)
+	return strings
+}
+
+func (fdfns *FileDefinitions) computeForOffset(offset int) []*navigableBindings {
 	if offset < 0 {
 		return nil
 	}
 	resolutions := fdfns.resolutions
-	nodes, found := resolutions[offset]
+	navigables, found := resolutions[offset]
 	if found {
-		return nodes
+		return navigables
 	}
-	resolutions[offset] = []ast.Node{}
+
+	resolutions[offset] = []*navigableBindings{}
 
 	filename := fdfns.File.Filename
 	pkgNode := fdfns.pkgNode
@@ -850,11 +877,7 @@ func (n *astNode) resolve(e ast.Expr) []*navigableBindings {
 	return nil
 }
 
-// navigateBindingsByName maximally expands the set of bindings by
-// transitively traversing resolvesTo fields of their contributing
-// nodes. Every navigable binding within this expanded set is then
-// indexed by the name, and the accumulated results returned.
-func navigateBindingsByName(navigables []*navigableBindings, name string) []*navigableBindings {
+func expandNavigables(navigables []*navigableBindings) map[*navigableBindings]struct{} {
 	if len(navigables) == 0 {
 		return nil
 	}
@@ -888,6 +911,15 @@ func navigateBindingsByName(navigables []*navigableBindings, name string) []*nav
 			}
 		}
 	}
+	return navigableSet
+}
+
+// navigateBindingsByName maximally expands the set of bindings by
+// transitively traversing resolvesTo fields of their contributing
+// nodes. Every navigable binding within this expanded set is then
+// indexed by the name, and the accumulated results returned.
+func navigateBindingsByName(navigables []*navigableBindings, name string) []*navigableBindings {
+	navigableSet := expandNavigables(navigables)
 
 	var results []*navigableBindings
 	for navigable := range navigableSet {

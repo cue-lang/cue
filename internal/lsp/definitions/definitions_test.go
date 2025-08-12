@@ -16,6 +16,7 @@ package definitions_test
 
 import (
 	"cmp"
+	"fmt"
 	"slices"
 	"strings"
 	"testing"
@@ -38,7 +39,7 @@ x: y: a.b
 a: b: 5
 a: b: 6
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "a"): {ln(2, 1, "a"), ln(3, 1, "a")},
 				ln(1, 1, "b"): {ln(2, 1, "b"), ln(3, 1, "b")},
 
@@ -48,6 +49,16 @@ a: b: 6
 				ln(2, 1, "b"): {self, ln(3, 1, "b")},
 				ln(3, 1, "a"): {self, ln(2, 1, "a")},
 				ln(3, 1, "b"): {self, ln(2, 1, "b")},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "x"):  {"a", "x"},
+				ln(1, 1, "y"):  {"a", "x", "y"},
+				ln(1, 1, "a"):  {"a", "x", "y"},
+				ln(1, 1, ".b"): {"b"},
+				ln(2, 1, "a"):  {"a", "x"},
+				ln(2, 1, "b"):  {"a", "x", "b"},
+				ln(3, 1, "a"):  {"a", "x"},
+				ln(3, 1, "b"):  {"a", "x", "b"},
 			},
 		},
 		{
@@ -59,7 +70,8 @@ w: {
 }
 w: a: b: 6
 `,
-			expectations: map[*position][]*position{
+
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "a"): {ln(3, 1, "a"), ln(5, 1, "a")},
 				ln(2, 1, "b"): {ln(3, 1, "b"), ln(5, 1, "b")},
 
@@ -71,6 +83,18 @@ w: a: b: 6
 				ln(5, 1, "a"): {self, ln(3, 1, "a")},
 				ln(5, 1, "b"): {self, ln(3, 1, "b")},
 				ln(5, 1, "w"): {self, ln(1, 1, "w")},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "w"):  {"w"},
+				ln(2, 1, "x"):  {"a", "w", "x"},
+				ln(2, 1, "y"):  {"a", "w", "x", "y"},
+				ln(2, 1, "a"):  {"a", "w", "x", "y"},
+				ln(2, 1, ".b"): {"b"},
+				ln(3, 1, "a"):  {"a", "w", "x"},
+				ln(3, 1, "b"):  {"a", "b", "w", "x"},
+				ln(5, 1, "w"):  {"w"},
+				ln(5, 1, "a"):  {"a", "w", "x"},
+				ln(5, 1, "b"):  {"a", "b", "w", "x"},
 			},
 		},
 		{
@@ -84,7 +108,7 @@ z: y
 out1: z
 out2: z.f
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(3, 1, "x1"): {ln(1, 1, "x1")},
 				ln(4, 1, "x2"): {ln(2, 1, "x2")},
 				ln(5, 1, "y"):  {ln(3, 1, "y"), ln(4, 1, "y")},
@@ -102,6 +126,23 @@ out2: z.f
 				ln(6, 1, "out1"): {self},
 				ln(7, 1, "out2"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "x1"):   {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(1, 1, "f"):    {"f", "out1", "out2", "x1", "x2", "y", "z"},
+				ln(2, 1, "x2"):   {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(2, 1, "f"):    {"f", "out1", "out2", "x1", "x2", "y", "z"},
+				ln(3, 1, "y"):    {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(3, 1, "x1"):   {"f", "out1", "out2", "x1", "x2", "y", "z"},
+				ln(4, 1, "y"):    {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(4, 1, "x2"):   {"f", "out1", "out2", "x1", "x2", "y", "z"},
+				ln(5, 1, "z"):    {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(5, 1, "y"):    {"f", "out1", "out2", "x1", "x2", "y", "z"},
+				ln(6, 1, "out1"): {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(6, 1, "z"):    {"f", "out1", "out2", "x1", "x2", "y", "z"},
+				ln(7, 1, "out2"): {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(7, 1, "z"):    {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(7, 1, ".f"):   {"f"},
+			},
 		},
 
 		{
@@ -114,7 +155,7 @@ z: y
 out1: z
 out2: z.f
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(3, 1, "x1"): {ln(1, 1, "x1")},
 				ln(3, 1, "x2"): {ln(2, 1, "x2")},
 				ln(4, 1, "y"):  {ln(3, 1, "y")},
@@ -131,6 +172,22 @@ out2: z.f
 				ln(5, 1, "out1"): {self},
 				ln(6, 1, "out2"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "x1"):   {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(1, 1, "f"):    {"f", "out1", "out2", "x1", "x2", "y", "z"},
+				ln(2, 1, "x2"):   {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(2, 1, "f"):    {"f", "out1", "out2", "x1", "x2", "y", "z"},
+				ln(3, 1, "y"):    {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(3, 1, "x1"):   {"f", "out1", "out2", "x1", "x2", "y", "z"},
+				ln(3, 1, "x2"):   {"f", "out1", "out2", "x1", "x2", "y", "z"},
+				ln(4, 1, "z"):    {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(4, 1, "y"):    {"f", "out1", "out2", "x1", "x2", "y", "z"},
+				ln(5, 1, "out1"): {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(5, 1, "z"):    {"f", "out1", "out2", "x1", "x2", "y", "z"},
+				ln(6, 1, "out2"): {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(6, 1, "z"):    {"out1", "out2", "x1", "x2", "y", "z"},
+				ln(6, 1, ".f"):   {"f"},
+			},
 		},
 
 		{
@@ -144,7 +201,7 @@ a: c & d
 
 y: a.b
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "a"): {ln(5, 1, "a")},
 				ln(1, 1, "b"): {ln(3, 1, "b"), ln(4, 1, "b")},
 
@@ -165,6 +222,22 @@ y: a.b
 				ln(5, 1, "a"): {self},
 				ln(7, 1, "y"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "x"):   {"a", "c", "d", "x", "y"},
+				ln(1, 1, "a"):   {"a", "c", "d", "x", "y"},
+				ln(1, 1, ".b"):  {"b"},
+				ln(3, 1, "c"):   {"a", "c", "d", "x", "y"},
+				ln(3, 1, "b"):   {"a", "b", "c", "d", "x", "y"},
+				ln(4, 1, "d"):   {"a", "c", "d", "x", "y"},
+				ln(4, 1, "b"):   {"a", "b", "c", "d", "x", "y"},
+				ln(4, 1, "int"): {"a", "b", "c", "d", "x", "y"},
+				ln(5, 1, "a"):   {"a", "c", "d", "x", "y"},
+				ln(5, 1, "c"):   {"a", "b", "c", "d", "x", "y"},
+				ln(5, 1, "d"):   {"a", "b", "c", "d", "x", "y"},
+				ln(7, 1, "y"):   {"a", "c", "d", "x", "y"},
+				ln(7, 1, "a"):   {"a", "c", "d", "x", "y"},
+				ln(7, 1, ".b"):  {"b"},
+			},
 		},
 
 		{
@@ -174,7 +247,7 @@ x: y: z: 3
 o: { p: 4, x.y }
 q: o.z
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "x"): {ln(1, 1, "x")},
 				ln(2, 1, "y"): {ln(1, 1, "y")},
 				ln(3, 1, "o"): {ln(2, 1, "o")},
@@ -187,6 +260,18 @@ q: o.z
 				ln(2, 1, "p"): {self},
 				ln(3, 1, "q"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "x"):  {"o", "q", "x"},
+				ln(1, 1, "y"):  {"o", "q", "x", "y"},
+				ln(1, 1, "z"):  {"o", "q", "x", "y", "z"},
+				ln(2, 1, "o"):  {"o", "q", "x"},
+				ln(2, 1, "p"):  {"o", "p", "q", "x", "z"},
+				ln(2, 1, "x"):  {"o", "p", "q", "x", "z"},
+				ln(2, 1, ".y"): {"y"},
+				ln(3, 1, "q"):  {"o", "q", "x"},
+				ln(3, 1, "o"):  {"o", "q", "x"},
+				ln(3, 1, ".z"): {"p", "z"},
+			},
 		},
 
 		{
@@ -196,7 +281,7 @@ x: y: a.b
 a: b: 5
 "a": b: 6
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "a"): {ln(2, 1, "a"), ln(3, 1, `"a"`)},
 				ln(1, 1, "b"): {ln(2, 1, "b"), ln(3, 1, "b")},
 
@@ -207,6 +292,16 @@ a: b: 5
 				ln(3, 1, `"a"`): {self, ln(2, 1, "a")},
 				ln(3, 1, "b"):   {self, ln(2, 1, "b")},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "x"):     {"a", "x"},
+				ln(1, 1, "y"):     {"a", "x", "y"},
+				ln(1, 1, "a"):     {"a", "x", "y"},
+				ln(1, 1, ".b"):    {"b"},
+				ln(2, 1, "a"):     {"a", "x"},
+				ln(2, 1, "b"):     {"a", "b", "x"},
+				ln(3, 1, "\"a\""): {"a", "x"},
+				ln(3, 1, "b"):     {"a", "b", "x"},
+			},
 		},
 
 		{
@@ -214,7 +309,7 @@ a: b: 5
 			archive: `-- a.cue --
 x: [{a: 5}, {b: 6}]
 y: x[1].b`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "x"):   {ln(1, 1, "x")},
 				ln(2, 1, "[1]"): {ln(1, 2, "{")},
 				ln(2, 1, "b"):   {ln(1, 1, "b")},
@@ -225,6 +320,14 @@ y: x[1].b`,
 
 				ln(2, 1, "y"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "x"):  {"x", "y"},
+				ln(1, 1, "a"):  {"a", "x", "y"},
+				ln(1, 1, "b"):  {"b", "x", "y"},
+				ln(2, 1, "y"):  {"x", "y"},
+				ln(2, 1, "x"):  {"x", "y"},
+				ln(2, 1, ".b"): {"b"},
+			},
 		},
 
 		{
@@ -232,7 +335,7 @@ y: x[1].b`,
 			archive: `-- a.cue --
 x: [{a: 5}, {b: 6}, ...{a: 4}]
 y: x[17].a`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "x"):    {ln(1, 1, "x")},
 				ln(2, 1, "[17]"): {ln(1, 1, "...")},
 				ln(2, 1, "a"):    {ln(1, 2, "a")},
@@ -244,6 +347,15 @@ y: x[17].a`,
 
 				ln(2, 1, "y"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "x"):  {"x", "y"},
+				ln(1, 1, "a"):  {"a", "x", "y"},
+				ln(1, 1, "b"):  {"b", "x", "y"},
+				ln(1, 2, "a"):  {"a", "x", "y"},
+				ln(2, 1, "y"):  {"x", "y"},
+				ln(2, 1, "x"):  {"x", "y"},
+				ln(2, 1, ".a"): {"a"},
+			},
 		},
 
 		{
@@ -252,7 +364,7 @@ y: x[17].a`,
 x: [{a: 5}, {b: 6}, ...z]
 y: x[17].a
 z: a: 4`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "z"):    {ln(3, 1, "z")},
 				ln(2, 1, "x"):    {ln(1, 1, "x")},
 				ln(2, 1, "[17]"): {ln(1, 1, "...")},
@@ -267,6 +379,17 @@ z: a: 4`,
 				ln(3, 1, "z"): {self},
 				ln(3, 1, "a"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "x"):  {"x", "y", "z"},
+				ln(1, 1, "a"):  {"a", "x", "y", "z"},
+				ln(1, 1, "b"):  {"b", "x", "y", "z"},
+				ln(1, 1, "z"):  {"a", "x", "y", "z"},
+				ln(2, 1, "y"):  {"x", "y", "z"},
+				ln(2, 1, "x"):  {"x", "y", "z"},
+				ln(2, 1, ".a"): {"a"},
+				ln(3, 1, "z"):  {"x", "y", "z"},
+				ln(3, 1, "a"):  {"a", "x", "y", "z"},
+			},
 		},
 
 		{
@@ -278,7 +401,7 @@ z: a: int
 o: x & y
 p: o[0].a
 q: o[3].a`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "z"):   {ln(3, 1, "z")},
 				ln(4, 1, "x"):   {ln(1, 1, "x")},
 				ln(4, 1, "y"):   {ln(2, 1, "y")},
@@ -303,15 +426,36 @@ q: o[3].a`,
 				ln(5, 1, "p"): {self},
 				ln(6, 1, "q"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "x"):   {"o", "p", "q", "x", "y", "z"},
+				ln(1, 1, "a"):   {"a", "o", "p", "q", "x", "y", "z"},
+				ln(1, 1, "b"):   {"b", "o", "p", "q", "x", "y", "z"},
+				ln(1, 2, "a"):   {"a", "o", "p", "q", "x", "y", "z"},
+				ln(2, 1, "y"):   {"o", "p", "q", "x", "y", "z"},
+				ln(2, 1, "z"):   {"a", "o", "p", "q", "x", "y", "z"},
+				ln(3, 1, "z"):   {"o", "p", "q", "x", "y", "z"},
+				ln(3, 1, "a"):   {"a", "o", "p", "q", "x", "y", "z"},
+				ln(3, 1, "int"): {"a", "o", "p", "q", "x", "y", "z"},
+				ln(4, 1, "o"):   {"o", "p", "q", "x", "y", "z"},
+				ln(4, 1, "x"):   {"o", "p", "q", "x", "y", "z"},
+				ln(4, 1, "y"):   {"o", "p", "q", "x", "y", "z"},
+				ln(5, 1, "p"):   {"o", "p", "q", "x", "y", "z"},
+				ln(5, 1, "o"):   {"o", "p", "q", "x", "y", "z"},
+				ln(5, 1, ".a"):  {"a"},
+				ln(6, 1, "q"):   {"o", "p", "q", "x", "y", "z"},
+				ln(6, 1, "o"):   {"o", "p", "q", "x", "y", "z"},
+				ln(6, 1, ".a"):  {"a"},
+			},
 		},
 
 		{
 			name: "StringLit_Conjunction",
 			archive: `-- a.cue --
 c: {a: b, "b": x: 3} & {b: x: 3, z: b.x}
-b: 7
-d: c.b.x`,
-			expectations: map[*position][]*position{
+b: e: 7
+d: c.b.x
+`,
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "b"): {ln(2, 1, "b")},
 				ln(1, 4, "b"): {ln(1, 1, `"b"`), ln(1, 3, "b")},
 				ln(1, 3, "x"): {ln(1, 1, "x"), ln(1, 2, "x")},
@@ -328,7 +472,26 @@ d: c.b.x`,
 				ln(1, 3, "b"):   {self, ln(1, 1, `"b"`)},
 
 				ln(2, 1, "b"): {self},
+				ln(2, 1, "e"): {self},
 				ln(3, 1, "d"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "c"):     {"b", "c", "d"},
+				ln(1, 1, "a"):     {"a", "b", "c", "d", "z"},
+				ln(1, 1, "b"):     {"a", "b", "c", "d", "e", "z"},
+				ln(1, 1, "\"b\""): {"a", "b", "c", "d", "z"},
+				ln(1, 1, "x"):     {"a", "b", "c", "d", "x", "z"},
+				ln(1, 3, "b"):     {"a", "b", "c", "d", "z"},
+				ln(1, 2, "x"):     {"a", "b", "c", "d", "x", "z"},
+				ln(1, 1, "z"):     {"a", "b", "c", "d", "z"},
+				ln(1, 4, "b"):     {"a", "b", "c", "d", "z"},
+				ln(1, 1, ".x"):    {"x"},
+				ln(2, 1, "b"):     {"b", "c", "d"},
+				ln(2, 1, "e"):     {"b", "c", "d", "e"},
+				ln(3, 1, "d"):     {"b", "c", "d"},
+				ln(3, 1, "c"):     {"b", "c", "d"},
+				ln(3, 1, ".b"):    {"a", "b", "z"},
+				ln(3, 1, ".x"):    {"x"},
 			},
 		},
 		{
@@ -341,7 +504,7 @@ b: {
     a: 12
   }
 }`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(4, 1, "b"): {ln(1, 1, "b")},
 				ln(4, 1, "a"): {ln(2, 1, "a")},
 
@@ -350,6 +513,15 @@ b: {
 				ln(3, 1, `"b"`): {self},
 				ln(4, 1, "c"):   {self},
 				ln(5, 1, "a"):   {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "b"):     {"b"},
+				ln(2, 1, "a"):     {"a", "b"},
+				ln(3, 1, "\"b\""): {"a", "b"},
+				ln(4, 1, "c"):     {"a", "b", "c"},
+				ln(4, 1, "b"):     {"a", "b", "c"},
+				ln(4, 1, ".a"):    {"a", "b"},
+				ln(5, 1, "a"):     {"a", "b", "c"},
 			},
 		},
 		{
@@ -363,7 +535,7 @@ b: {
   }
   b: _
 }`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(4, 1, "b"): {ln(3, 1, `"b"`), ln(7, 1, "b")},
 				ln(4, 1, "a"): {ln(5, 1, "a")},
 
@@ -373,6 +545,17 @@ b: {
 				ln(4, 1, "c"):   {self},
 				ln(5, 1, "a"):   {self},
 				ln(7, 1, "b"):   {self, ln(3, 1, `"b"`)},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "b"):   {"b"},
+				ln(2, 1, "a"):   {"a", "b"},
+				ln(3, 1, `"b"`): {"a", "b"},
+				ln(4, 1, "c"):   {"a", "b", "c"},
+				ln(4, 1, "b"):   {"a", "b", "c"},
+				ln(4, 1, ".a"):  {"a", "c"},
+				ln(5, 1, "a"):   {"a", "b", "c"},
+				ln(7, 1, "b"):   {"a", "b"},
+				ln(7, 1, "_"):   {"a", "b", "c"},
 			},
 		},
 		{
@@ -386,7 +569,7 @@ b: {
   }
 }
 b: b: _`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(4, 1, "b"): {ln(1, 1, "b"), ln(8, 1, "b")},
 				ln(4, 1, "a"): {ln(2, 1, "a")},
 
@@ -399,13 +582,25 @@ b: b: _`,
 				ln(8, 1, "b"): {self, ln(1, 1, "b")},
 				ln(8, 2, "b"): {self, ln(3, 1, `"b"`)},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "b"):     {"b"},
+				ln(2, 1, "a"):     {"a", "b"},
+				ln(3, 1, "\"b\""): {"a", "b"},
+				ln(4, 1, "c"):     {"a", "b", "c"},
+				ln(4, 1, "b"):     {"a", "b", "c"},
+				ln(4, 1, ".a"):    {"a", "b"},
+				ln(5, 1, "a"):     {"a", "b", "c"},
+				ln(8, 1, "b"):     {"b"},
+				ln(8, 2, "b"):     {"a", "b"},
+				ln(8, 1, "_"):     {"a", "b", "c"},
+			},
 		},
 
 		{
 			name: "Inline_Struct_Selector",
 			archive: `-- a.cue --
 a: {in: {x: 5}, out: in}.out.x`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "in"):  {ln(1, 1, "in")},
 				ln(1, 2, "out"): {ln(1, 1, "out")},
 				ln(1, 2, "x"):   {ln(1, 1, "x")},
@@ -415,18 +610,32 @@ a: {in: {x: 5}, out: in}.out.x`,
 				ln(1, 1, "x"):   {self},
 				ln(1, 1, "out"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "a"):    {"a"},
+				ln(1, 1, "in"):   {"a", "in", "out"},
+				ln(1, 1, "x"):    {"a", "in", "out", "x"},
+				ln(1, 1, "out"):  {"a", "in", "out"},
+				ln(1, 2, "in"):   {"a", "in", "out", "x"},
+				ln(1, 1, ".out"): {"in", "out"},
+				ln(1, 1, ".x"):   {"x"},
+			},
 		},
 		{
 			name: "Inline_List_Index_LiteralConst",
 			archive: `-- a.cue --
 a: [7, {b: 3}, true][1].b`,
 			// If the index is a literal const we do resolve it.
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "[1]"): {ln(1, 1, "{")},
 				ln(1, 2, "b"):   {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "b"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "a"):  {"a"},
+				ln(1, 1, "b"):  {"a", "b"},
+				ln(1, 1, ".b"): {"b"},
 			},
 		},
 		{
@@ -436,7 +645,7 @@ a: [7, {b: 3}, true][n].b
 n: 1
 `,
 			// Even the slightest indirection defeats indexing
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "["): {},
 				ln(1, 1, "n"): {ln(2, 1, "n")},
 				ln(1, 1, "]"): {},
@@ -447,13 +656,19 @@ n: 1
 
 				ln(2, 1, "n"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "a"): {"a", "n"},
+				ln(1, 1, "b"): {"a", "b", "n"},
+				ln(1, 1, "n"): {"a", "n"},
+				ln(2, 1, "n"): {"a", "n"},
+			},
 		},
 		{
 			name: "StringLit_Struct_Index_LiteralConst",
 			archive: `-- a.cue --
 x: "a b": z: 5
 y: x["a b"].z`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "x"):       {ln(1, 1, "x")},
 				ln(2, 1, `["a b"]`): {ln(1, 1, `"a b"`)},
 				ln(2, 1, "z"):       {ln(1, 1, "z")},
@@ -464,12 +679,20 @@ y: x["a b"].z`,
 
 				ln(2, 1, "y"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "x"):       {"x", "y"},
+				ln(1, 1, "\"a b\""): {"a b", "x", "y"},
+				ln(1, 1, "z"):       {"a b", "x", "y", "z"},
+				ln(2, 1, "y"):       {"x", "y"},
+				ln(2, 1, "x"):       {"x", "y"},
+				ln(2, 1, ".z"):      {"z"},
+			},
 		},
 		{
 			name: "Inline_Disjunction_Internal",
 			archive: `-- a.cue --
 a: ({b: c, c: 3} | {c: 4}).c`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "c"): {ln(1, 2, "c")},
 				ln(1, 4, "c"): {ln(1, 2, "c"), ln(1, 3, "c")},
 
@@ -478,6 +701,14 @@ a: ({b: c, c: 3} | {c: 4}).c`,
 				ln(1, 2, "c"): {self},
 				ln(1, 3, "c"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "a"):  {"a"},
+				ln(1, 1, "b"):  {"a", "b", "c"},
+				ln(1, 1, "c"):  {"a", "b", "c"},
+				ln(1, 2, "c"):  {"a", "b", "c"},
+				ln(1, 3, "c"):  {"a", "b", "c"},
+				ln(1, 1, ".c"): {"b", "c"},
+			},
 		},
 
 		{
@@ -485,12 +716,18 @@ a: ({b: c, c: 3} | {c: 4}).c`,
 			archive: `-- a.cue --
 a: b
 b: a`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "b"): {ln(2, 1, "b")},
 				ln(2, 1, "a"): {ln(1, 1, "a")},
 
 				ln(1, 1, "a"): {self},
 				ln(2, 1, "b"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "a"): {"a", "b"},
+				ln(1, 1, "b"): {"a", "b"},
+				ln(2, 1, "b"): {"a", "b"},
+				ln(2, 1, "a"): {"a", "b"},
 			},
 		},
 		{
@@ -499,7 +736,7 @@ b: a`,
 a: b
 b: c
 c: a`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "b"): {ln(2, 1, "b")},
 				ln(2, 1, "c"): {ln(3, 1, "c")},
 				ln(3, 1, "a"): {ln(1, 1, "a")},
@@ -508,6 +745,14 @@ c: a`,
 				ln(2, 1, "b"): {self},
 				ln(3, 1, "c"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "a"): {"a", "b", "c"},
+				ln(1, 1, "b"): {"a", "b", "c"},
+				ln(2, 1, "b"): {"a", "b", "c"},
+				ln(2, 1, "c"): {"a", "b", "c"},
+				ln(3, 1, "c"): {"a", "b", "c"},
+				ln(3, 1, "a"): {"a", "b", "c"},
+			},
 		},
 		// These "structural" cycles are errors in the evaluator. But
 		// there's no reason we can't resolve them.
@@ -515,25 +760,38 @@ c: a`,
 			name: "Cycle_Structural_Simple",
 			archive: `-- a.cue --
 a: b: c: a`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "a"): {ln(1, 1, "a")},
 
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "a"): {"a"},
+				ln(1, 1, "b"): {"a", "b"},
+				ln(1, 1, "c"): {"a", "b", "c"},
+				ln(1, 2, "a"): {"a", "b", "c"},
+			},
 		},
 		{
 			name: "Structural_Simple_Selector",
 			archive: `-- a.cue --
 a: b: c: a.b`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "a"): {ln(1, 1, "a")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "a"):  {"a"},
+				ln(1, 1, "b"):  {"a", "b"},
+				ln(1, 1, "c"):  {"a", "b", "c"},
+				ln(1, 2, "a"):  {"a", "b", "c"},
+				ln(1, 1, ".b"): {"b"},
 			},
 		},
 		{
@@ -543,7 +801,7 @@ y: [string]: b: y
 x: y
 x: c: x
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "y"): {ln(1, 1, "y")},
 				ln(2, 1, "y"): {ln(1, 1, "y")},
 				ln(3, 2, "x"): {ln(2, 1, "x"), ln(3, 1, "x")},
@@ -556,13 +814,24 @@ x: c: x
 				ln(3, 1, "x"): {self, ln(2, 1, "x")},
 				ln(3, 1, "c"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "y"):      {"x", "y"},
+				ln(1, 1, "string"): {"x", "y"},
+				ln(1, 1, "b"):      {"b", "x", "y"},
+				ln(1, 2, "y"):      {"b", "x", "y"},
+				ln(2, 1, "x"):      {"x", "y"},
+				ln(2, 1, "y"):      {"c", "x", "y"},
+				ln(3, 1, "x"):      {"x", "y"},
+				ln(3, 1, "c"):      {"c", "x", "y"},
+				ln(3, 2, "x"):      {"c", "x", "y"},
+			},
 		},
 
 		{
 			name: "Alias_Plain_Label_Internal",
 			archive: `-- a.cue --
 l=a: {b: 3, c: l.b}`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "a")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
@@ -570,13 +839,17 @@ l=a: {b: 3, c: l.b}`,
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 2, "l"): {"b", "c"},
+				ln(1, 1, "}"): {"b", "c"},
+			},
 		},
 		{
 			name: "Alias_Plain_Label_Internal_Implicit",
 			archive: `-- a.cue --
 l=a: b: 3
 a: c: l.b`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "l"): {ln(1, 1, "a"), ln(2, 1, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
 
@@ -586,13 +859,16 @@ a: c: l.b`,
 				ln(2, 1, "a"): {self, ln(1, 1, "a")},
 				ln(2, 1, "c"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(2, 1, "l"): {"b", "c"},
+			},
 		},
 		{
 			name: "Alias_Plain_Label_Internal_Implicit_Reversed",
 			archive: `-- a.cue --
 a: b: 3
 l=a: c: l.b`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 2, "l"): {ln(1, 1, "a"), ln(2, 1, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
 
@@ -602,13 +878,16 @@ l=a: c: l.b`,
 				ln(2, 1, "a"): {self, ln(1, 1, "a")},
 				ln(2, 1, "c"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(2, 2, "l"): {"b", "c"},
+			},
 		},
 		{
 			name: "Alias_Plain_Label_External",
 			archive: `-- a.cue --
 l=a: b: 3
 c: l.b`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "l"): {ln(1, 1, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
 
@@ -616,6 +895,9 @@ c: l.b`,
 				ln(1, 1, "b"): {self},
 
 				ln(2, 1, "c"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(2, 1, "l"): {"b"},
 			},
 		},
 
@@ -629,7 +911,7 @@ a: {
 a: f: l.d
 h: a.l
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 2, "l"): {ln(2, 1, "b")},
 				ln(2, 1, "d"): {ln(2, 2, "d")},
 				ln(3, 1, "l"): {ln(2, 1, "b")},
@@ -651,18 +933,29 @@ h: a.l
 
 				ln(6, 1, "h"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(2, 2, "l"): {"c", "d"},
+				ln(2, 1, "}"): {"c", "d"},
+				ln(3, 1, "l"): {"c", "d"},
+				ln(4, 1, "}"): {"b", "e"},
+				ln(6, 1, "a"): {"b", "e", "f"},
+			},
 		},
 
 		{
 			name: "Alias_Dynamic_Label_Internal",
 			archive: `-- a.cue --
 l=(a): {b: 3, c: l.b}`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "(")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 2, "l"): {"b", "c"},
+				ln(1, 1, "}"): {"b", "c"},
 			},
 		},
 		{
@@ -673,12 +966,15 @@ l=(a): b: 3
 			// We do not attempt to compute equivalence of
 			// expressions. Therefore we don't consider the two `(a)`
 			// keys to be the same.
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "l"): {ln(1, 1, "(")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(2, 1, "l"): {"b"},
 			},
 		},
 		{
@@ -689,12 +985,15 @@ l=(a): c: l.b`,
 			// Because we don't compute equivalence of expressions, we do
 			// not link the two `(a)` keys, and so we cannot resolve the
 			// b in l.b.
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 2, "l"): {ln(2, 1, "(")},
 				ln(2, 1, "b"): {},
 
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(2, 2, "l"): {"c"},
 			},
 		},
 		{
@@ -702,12 +1001,15 @@ l=(a): c: l.b`,
 			archive: `-- a.cue --
 l=(a): b: 3
 c: l.b`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "l"): {ln(1, 1, ("("))},
 				ln(2, 1, "b"): {ln(1, 1, ("b"))},
 
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(2, 1, "l"): {"b"},
 			},
 		},
 
@@ -715,12 +1017,16 @@ c: l.b`,
 			name: "Alias_Pattern_Label_Internal",
 			archive: `-- a.cue --
 l=[a]: {b: 3, c: l.b}`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "[")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 2, "l"): {"b", "c"},
+				ln(1, 1, "}"): {"b", "c"},
 			},
 		},
 		{
@@ -733,7 +1039,7 @@ l=[a]: b: 3
 			// patterns to be the same. Because this style of alias is
 			// only visible within the key's value, no part of l.b can be
 			// resolved.
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "l"): {},
 				ln(2, 1, "b"): {},
 
@@ -748,12 +1054,15 @@ l=[a]: b: 3
 l=[a]: c: l.b`,
 			// Again, the two [a] patterns are not merged. The l of l.b
 			// can be resolved, but not the b.
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 2, "l"): {ln(2, 1, "[")},
 				ln(2, 1, "b"): {},
 
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(2, 2, "l"): {"c"},
 			},
 		},
 		{
@@ -763,7 +1072,7 @@ l=[a]: b: 3
 c: l.b`,
 			// This type of alias is only visible within the key's
 			// value. So the use of l.b in c does not resolve.
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "l"): {},
 				ln(2, 1, "b"): {},
 
@@ -778,7 +1087,7 @@ c: l.b`,
 [l=a]: {b: 3, c: l, d: l.b}`,
 			// This type of alias binds l to the key. So c: l will work,
 			// but for the b in d: l.b there is no resolution.
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 3, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {},
@@ -786,6 +1095,9 @@ c: l.b`,
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 				ln(1, 1, "d"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"b", "c", "d"},
 			},
 		},
 		{
@@ -798,7 +1110,7 @@ c: l.b`,
 			// patterns to be the same. Because this style of alias is
 			// only visible within the key's value, no part of l.b can be
 			// resolved.
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "l"): {},
 
 				ln(1, 1, "b"): {self},
@@ -812,7 +1124,7 @@ c: l.b`,
 c: l`,
 			// This type of alias is only visible within the key's
 			// value. So the use of l.b in c does not resolve.
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "l"): {},
 
 				ln(1, 1, "b"): {self},
@@ -824,7 +1136,7 @@ c: l`,
 			name: "Alias_Expr_Internal",
 			archive: `-- a.cue --
 a: l={b: 3, c: l.b}`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
@@ -832,18 +1144,27 @@ a: l={b: 3, c: l.b}`,
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 2, "l"): {"b", "c"},
+				ln(1, 1, "}"): {"b", "c"},
+			},
 		},
 		{
 			name: "Alias_Expr_Internal_Explicit",
 			archive: `-- a.cue --
 a: l={b: 3} & {c: l.b}`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"b"},
+				ln(1, 2, "l"): {"b", "c"},
+				ln(1, 2, "}"): {"c"},
 			},
 		},
 		{
@@ -852,13 +1173,19 @@ a: l={b: 3} & {c: l.b}`,
 			// this:
 			archive: `-- a.cue --
 a: l=({b: 3} & {c: l.b})`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"b"},
+				ln(1, 2, "l"): {"b", "c"},
+				ln(1, 2, "}"): {"c"},
+				ln(1, 1, ")"): {"b", "c"},
 			},
 		},
 		{
@@ -867,7 +1194,7 @@ a: l=({b: 3} & {c: l.b})`,
 a: l={b: 3}
 c: l.b`,
 			// This type of alias is only visible within the value.
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "l"): {},
 				ln(2, 1, "b"): {},
 
@@ -876,6 +1203,9 @@ c: l.b`,
 
 				ln(2, 1, "c"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"b"},
+			},
 		},
 
 		{
@@ -883,7 +1213,7 @@ c: l.b`,
 			archive: `-- a.cue --
 a: n=(2 * (div(n, 2))) | error("\(n) is not even")
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "n"): {ln(1, 1, "n")},
 				ln(1, 3, "n"): {ln(1, 1, "n")},
 
@@ -896,12 +1226,15 @@ a: n=(2 * (div(n, 2))) | error("\(n) is not even")
 			archive: `-- a.cue --
 c: (f({a: b, b: 3})).g
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "b"): {ln(1, 2, "b")},
 
 				ln(1, 1, "c"): {self},
 				ln(1, 1, "a"): {self},
 				ln(1, 2, "b"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"a", "b"},
 			},
 		},
 
@@ -912,7 +1245,7 @@ d: {a: b: 3} | {a: b: 4, c: 5}
 o: d.a.b
 p: d.c
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "d"): {ln(1, 1, "d")},
 				ln(2, 1, "a"): {ln(1, 1, "a"), ln(1, 2, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b"), ln(1, 2, "b")},
@@ -928,6 +1261,13 @@ p: d.c
 
 				ln(2, 1, "o"): {self},
 				ln(3, 1, "p"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"a"},
+				ln(1, 2, "}"): {"a", "c"},
+				ln(2, 1, "d"): {"a", "c"},
+				ln(2, 1, "a"): {"b"},
+				ln(3, 1, "d"): {"a", "c"},
 			},
 		},
 		{
@@ -937,7 +1277,7 @@ d: ({a: b: 3} | {a: b: 4}) & {c: 5}
 o: d.a.b
 p: d.c
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "d"): {ln(1, 1, "d")},
 				ln(2, 1, "a"): {ln(1, 1, "a"), ln(1, 2, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b"), ln(1, 2, "b")},
@@ -954,6 +1294,15 @@ p: d.c
 				ln(2, 1, "o"): {self},
 				ln(3, 1, "p"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"a"},
+				ln(1, 2, "}"): {"a"},
+				ln(1, 1, ")"): {"a"},
+				ln(1, 3, "}"): {"c"},
+				ln(2, 1, "d"): {"a", "c"},
+				ln(2, 1, "a"): {"b"},
+				ln(3, 1, "d"): {"a", "c"},
+			},
 		},
 		{
 			name: "Disjunction_Chained",
@@ -962,7 +1311,7 @@ d1: {a: 1} | {a: 2}
 d2: {a: 3} | {a: 4}
 o: (d1 & d2).a
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(3, 1, "d1"): {ln(1, 1, "d1")},
 				ln(3, 1, "d2"): {ln(2, 1, "d2")},
 				ln(3, 1, "a"):  {ln(1, 1, "a"), ln(1, 2, "a"), ln(2, 1, "a"), ln(2, 2, "a")},
@@ -977,6 +1326,15 @@ o: (d1 & d2).a
 
 				ln(3, 1, "o"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"):  {"a"},
+				ln(1, 2, "}"):  {"a"},
+				ln(2, 1, "}"):  {"a"},
+				ln(2, 2, "}"):  {"a"},
+				ln(3, 1, "d1"): {"a"},
+				ln(3, 1, "d2"): {"a"},
+				ln(3, 1, ")"):  {"a"},
+			},
 		},
 		{
 			name: "Disjunction_Selected",
@@ -985,7 +1343,7 @@ d: {x: 17} | string
 r: d & {x: int}
 out: r.x
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "d"): {ln(1, 1, "d")},
 				ln(3, 1, "r"): {ln(2, 1, "r")},
 				ln(3, 1, "x"): {ln(1, 1, "x"), ln(2, 1, "x")},
@@ -998,6 +1356,12 @@ out: r.x
 
 				ln(3, 1, "out"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"x"},
+				ln(2, 1, "d"): {"x"},
+				ln(2, 1, "}"): {"x"},
+				ln(3, 1, "r"): {"x"},
+			},
 		},
 		{
 			name: "Disjunction_Scopes",
@@ -1006,7 +1370,7 @@ c: {a: b} | {b: 3}
 b: 7
 d: c.b
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "b"): {ln(2, 1, "b")},
 				ln(3, 1, "c"): {ln(1, 1, "c")},
 				ln(3, 1, "b"): {ln(1, 2, "b")},
@@ -1018,6 +1382,11 @@ d: c.b
 				ln(2, 1, "b"): {self},
 				ln(3, 1, "d"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"a"},
+				ln(1, 2, "}"): {"b"},
+				ln(3, 1, "c"): {"a", "b"},
+			},
 		},
 		{
 			name: "Disjunction_Looping",
@@ -1025,7 +1394,7 @@ d: c.b
 a: {b: c.d, d: 3} | {d: 4}
 c: a
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "c"): {ln(2, 1, "c")},
 				ln(1, 1, "d"): {ln(1, 2, "d"), ln(1, 3, "d")},
 				ln(2, 1, "a"): {ln(1, 1, "a")},
@@ -1037,6 +1406,12 @@ c: a
 
 				ln(2, 1, "c"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "c"): {"b", "d"},
+				ln(1, 1, "}"): {"b", "d"},
+				ln(1, 2, "}"): {"d"},
+				ln(2, 1, "a"): {"b", "d"},
+			},
 		},
 
 		{
@@ -1046,7 +1421,7 @@ c: {a: b} & {b: 3}
 b: 7
 d: c.b
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "b"): {ln(2, 1, "b")},
 				ln(3, 1, "c"): {ln(1, 1, "c")},
 				ln(3, 1, "b"): {ln(1, 2, "b")},
@@ -1057,6 +1432,11 @@ d: c.b
 
 				ln(2, 1, "b"): {self},
 				ln(3, 1, "d"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"a"},
+				ln(1, 2, "}"): {"b"},
+				ln(3, 1, "c"): {"a", "b"},
 			},
 		},
 		{
@@ -1069,7 +1449,7 @@ x: {
 	a: >1
 }
 y: x.a`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 2, "a"): {ln(2, 1, "a"), ln(3, 1, "a"), ln(5, 1, "a")},
 				ln(7, 1, "x"): {ln(1, 1, "x")},
 				ln(7, 1, "a"): {ln(2, 1, "a"), ln(3, 1, "a"), ln(5, 1, "a")},
@@ -1083,6 +1463,12 @@ y: x.a`,
 				ln(5, 1, "a"): {self, ln(2, 1, "a"), ln(3, 1, "a")},
 				ln(7, 1, "y"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(2, 1, "}"): {"a", "b"},
+				ln(4, 1, "}"): {"a", "b"},
+				ln(6, 1, "}"): {"a"},
+				ln(7, 1, "x"): {"a", "b"},
+			},
 		},
 		{
 			name: "Conjunction_EvenMoreScopes",
@@ -1090,7 +1476,7 @@ y: x.a`,
 c: {a: b, b: x: 3} & {b: x: 3, z: b.x}
 b: 7
 d: c.b.x`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "b"): {ln(1, 2, "b"), ln(1, 3, "b")},
 				ln(1, 4, "b"): {ln(1, 2, "b"), ln(1, 3, "b")},
 				ln(1, 3, "x"): {ln(1, 1, "x"), ln(1, 2, "x")},
@@ -1109,6 +1495,14 @@ d: c.b.x`,
 				ln(2, 1, "b"): {self},
 				ln(3, 1, "d"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "b"): {"x"},
+				ln(1, 1, "}"): {"a", "b"},
+				ln(1, 4, "b"): {"x"},
+				ln(1, 2, "}"): {"z", "b"},
+				ln(3, 1, "c"): {"a", "b", "z"},
+				ln(3, 1, "b"): {"x"},
+			},
 		},
 
 		{
@@ -1116,12 +1510,17 @@ d: c.b.x`,
 			archive: `-- a.cue --
 b: ({a: 6} & {a: int}).a
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 3, "a"): {ln(1, 1, "a"), ln(1, 2, "a")},
 
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "a"): {self, ln(1, 2, "a")},
 				ln(1, 2, "a"): {self, ln(1, 1, "a")},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"a"},
+				ln(1, 2, "}"): {"a"},
+				ln(1, 1, ")"): {"a"},
 			},
 		},
 
@@ -1131,7 +1530,7 @@ b: ({a: 6} & {a: int}).a
 c: ({a: 6, d: a} + {b: a}).g
 a: 12
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "a"): {ln(1, 1, "a")},
 				ln(1, 3, "a"): {ln(2, 1, "a")},
 
@@ -1141,6 +1540,10 @@ a: 12
 				ln(1, 1, "b"): {self},
 
 				ln(2, 1, "a"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"a", "d"},
+				ln(1, 2, "}"): {"b"},
 			},
 		},
 
@@ -1152,7 +1555,7 @@ import "magic"
 x: magic.Merlin(y)
 y: "wand"
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(3, 1, "magic"):  {ln(1, 1, `"magic"`)},
 				ln(3, 1, "Merlin"): {},
 				ln(3, 1, "y"):      {ln(4, 1, "y")},
@@ -1168,7 +1571,7 @@ import wand "magic"
 
 x: wand.foo
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(3, 1, "wand"): {ln(1, 1, "wand")},
 				ln(3, 1, "foo"):  {},
 				ln(3, 1, "x"):    {self},
@@ -1183,7 +1586,7 @@ b: c
 c: x: true
 d: "4+\(a) > 0?\(b.x)"
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "c"): {ln(3, 1, "c")},
 				ln(4, 1, "a"): {ln(1, 1, "a")},
 				ln(4, 1, "b"): {ln(2, 1, "b")},
@@ -1195,6 +1598,10 @@ d: "4+\(a) > 0?\(b.x)"
 				ln(3, 1, "x"): {self},
 				ln(4, 1, "d"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(2, 1, "c"): {"x"},
+				ln(4, 1, "b"): {"x"},
+			},
 		},
 		{
 			name: "Interpolation_Field",
@@ -1202,7 +1609,7 @@ d: "4+\(a) > 0?\(b.x)"
 a: 5
 "five\(a)": hello
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "a"): {ln(1, 1, "a")},
 
 				ln(1, 1, "a"): {self},
@@ -1214,7 +1621,7 @@ a: 5
 y: "\({a: 3, b: a}.b) \(a)"
 a: 12
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 2, "a"): {ln(1, 1, "a")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 				ln(1, 3, "a"): {ln(2, 1, "a")},
@@ -1224,6 +1631,9 @@ a: 12
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "a"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"a", "b"},
+			},
 		},
 
 		{
@@ -1232,7 +1642,7 @@ a: 12
 x: "💩" + y
 y: "sticks"
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "y"): {ln(2, 1, "y")},
 
 				ln(1, 1, "x"): {self},
@@ -1245,7 +1655,7 @@ y: "sticks"
 x: {"💩": "sticks"}
 y: x["💩"]
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "x"):     {ln(1, 1, "x")},
 				ln(2, 1, `["💩"]`): {ln(1, 1, `"💩"`)},
 
@@ -1254,6 +1664,10 @@ y: x["💩"]
 
 				ln(2, 1, "y"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"💩"},
+				ln(2, 1, "x"): {"💩"},
+			},
 		},
 		{
 			name: "MultiByte_Selector",
@@ -1261,7 +1675,7 @@ y: x["💩"]
 x: {"💩": "sticks"}
 y: x."💩"
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "x"):   {ln(1, 1, "x")},
 				ln(2, 1, `"💩"`): {ln(1, 1, `"💩"`)},
 
@@ -1269,6 +1683,10 @@ y: x."💩"
 				ln(1, 1, `"💩"`): {self},
 
 				ln(2, 1, "y"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"): {"💩"},
+				ln(2, 1, "x"): {"💩"},
 			},
 		},
 
@@ -1284,7 +1702,7 @@ l=x: {
 	z: l.c
 }
 y: x.c`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(4, 1, "a"): {ln(1, 1, "a")},
 				ln(5, 1, "b"): {ln(2, 1, "b")},
 				ln(7, 1, "l"): {ln(3, 1, "x")},
@@ -1299,6 +1717,12 @@ y: x.c`,
 				ln(7, 1, "z"): {self},
 				ln(9, 1, "y"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(6, 1, "}"): {"c"},
+				ln(7, 1, "l"): {"c", "z"},
+				ln(8, 1, "}"): {"c", "z"},
+				ln(9, 1, "x"): {"c", "z"},
+			},
 		},
 		{
 			name: "Comprehension_Let",
@@ -1307,7 +1731,7 @@ a: b: c: 17
 let x=a.b
 y: x.c
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "a"): {ln(1, 1, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
 				ln(3, 1, "x"): {ln(2, 1, "x")},
@@ -1318,6 +1742,11 @@ y: x.c
 				ln(1, 1, "c"): {self},
 
 				ln(3, 1, "y"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(2, 1, "a"): {"b"},
+				ln(2, 1, "b"): {"c"},
+				ln(3, 1, "x"): {"c"},
 			},
 		},
 		{
@@ -1330,7 +1759,7 @@ a: {
 a: d: b
 o: a.b
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(3, 1, "b"): {ln(2, 1, "b")},
 				ln(5, 1, "b"): {},
 				ln(6, 1, "a"): {ln(1, 1, "a"), ln(5, 1, "a")},
@@ -1343,6 +1772,10 @@ o: a.b
 				ln(5, 1, "d"): {self},
 
 				ln(6, 1, "o"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(4, 1, "}"): {"c"},
+				ln(6, 1, "a"): {"c", "d"},
 			},
 		},
 		{
@@ -1359,7 +1792,7 @@ o: {
 q: o.p
 r: o.k
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(4, 1, "k"):  {},
 				ln(4, 1, "v"):  {},
 				ln(4, 1, "a"):  {ln(1, 1, "a")},
@@ -1388,18 +1821,31 @@ r: o.k
 				ln(9, 1, "q"):  {self},
 				ln(10, 1, "r"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "}"):  {"x", "y", "z"},
+				ln(2, 1, "}"):  {"x", "y", "z"},
+				ln(4, 1, "a"):  {"x", "y", "z"},
+				ln(5, 1, "b"):  {"x", "y", "z"},
+				ln(7, 1, "}"):  {"p"},
+				ln(8, 1, "}"):  {"p"},
+				ln(9, 1, "o"):  {"p"},
+				ln(10, 1, "o"): {"p"},
+			},
 		},
 		{
 			name: "Comprehension_For_ForwardsReference",
 			archive: `-- a.cue --
 for a, b in foo.bar {}
 foo: bar: "baz"`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(1, 1, "foo"): {ln(2, 1, "foo")},
 				ln(1, 1, "bar"): {ln(2, 1, "bar")},
 
 				ln(2, 1, "foo"): {self},
 				ln(2, 1, "bar"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(1, 1, "foo"): {"bar"},
 			},
 		},
 		{
@@ -1410,13 +1856,17 @@ x: {
 }
 k: {}
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 2, "k"): {ln(4, 1, "k")},
 				ln(2, 3, "k"): {ln(2, 1, "k")},
 
 				ln(1, 1, "x"): {self},
 				ln(2, 2, "v"): {self},
 				ln(4, 1, "k"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(2, 1, "}"): {"v"},
+				ln(3, 1, "}"): {"v"},
 			},
 		},
 		{
@@ -1428,7 +1878,7 @@ let x = x+1 {
     {h: x}
 }]
 i: g[0].h`,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 2, "x"): {ln(1, 1, "x")},
 				ln(3, 2, "x"): {ln(2, 1, "x")},
 				ln(4, 1, "x"): {ln(3, 1, "x")},
@@ -1440,6 +1890,11 @@ i: g[0].h`,
 				ln(6, 1, "[0]"): {ln(1, 1, "for")},
 				ln(6, 1, "h"):   {ln(4, 1, "h")},
 			},
+			expectCompletions: map[*position][]string{
+				ln(4, 1, "}"): {"h"},
+				ln(5, 1, "}"): {"h"},
+				ln(6, 1, "]"): {"h"},
+			},
 		},
 
 		{
@@ -1448,7 +1903,7 @@ i: g[0].h`,
 #x: y: #z: 3
 o: #x & #x.y.z
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(2, 1, "#x"): {ln(1, 1, "#x")},
 				ln(2, 2, "#x"): {ln(1, 1, "#x")},
 				ln(2, 1, "y"):  {ln(1, 1, "y")},
@@ -1458,6 +1913,11 @@ o: #x & #x.y.z
 				ln(1, 1, "#z"): {self},
 
 				ln(2, 1, "o"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				ln(2, 1, "#x"): {"y"},
+				ln(2, 2, "#x"): {"y"},
+				ln(2, 1, "y"):  {"#z"},
 			},
 		},
 
@@ -1472,7 +1932,7 @@ package x
 
 bar: foo
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				fln("b.cue", 3, 1, "foo"): {fln("a.cue", 3, 1, "foo")},
 
 				fln("a.cue", 3, 1, "foo"): {self},
@@ -1495,7 +1955,7 @@ package x
 bar: foo
 foo: _
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				fln("c.cue", 3, 1, "foo"): {fln("a.cue", 3, 1, "foo"), fln("b.cue", 3, 1, "foo"), fln("c.cue", 4, 1, "foo")},
 
 				fln("a.cue", 3, 1, "foo"): {self, fln("b.cue", 3, 1, "foo"), fln("c.cue", 4, 1, "foo")},
@@ -1516,7 +1976,7 @@ package x
 
 foo: {qux: bar}
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				fln("a.cue", 3, 2, "bar"): {fln("a.cue", 3, 1, "bar")},
 				fln("b.cue", 3, 1, "bar"): {},
 
@@ -1526,6 +1986,10 @@ foo: {qux: bar}
 
 				fln("b.cue", 3, 1, "foo"): {self, fln("a.cue", 3, 1, "foo")},
 				fln("b.cue", 3, 1, "qux"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				fln("a.cue", 3, 1, "}"): {"bar", "baz"},
+				fln("b.cue", 3, 1, "}"): {"qux"},
 			},
 		},
 		{
@@ -1544,7 +2008,7 @@ package x
 
 foo: qux: foo.bar
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				fln("a.cue", 4, 1, "bar"): {},
 				fln("b.cue", 3, 1, "bar"): {},
 				fln("c.cue", 3, 2, "foo"): {fln("a.cue", 3, 1, "foo"), fln("a.cue", 4, 1, "foo"), fln("b.cue", 3, 1, "foo"), fln("c.cue", 3, 1, "foo")},
@@ -1560,6 +2024,9 @@ foo: qux: foo.bar
 
 				fln("c.cue", 3, 1, "foo"): {self, fln("a.cue", 3, 1, "foo"), fln("a.cue", 4, 1, "foo"), fln("b.cue", 3, 1, "foo")},
 				fln("c.cue", 3, 1, "qux"): {self, fln("b.cue", 3, 1, "qux")},
+			},
+			expectCompletions: map[*position][]string{
+				fln("c.cue", 3, 2, "foo"): {"bar", "baz", "qux"},
 			},
 		},
 		{
@@ -1579,7 +2046,7 @@ package x
 let a = true
 s: a
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				fln("a.cue", 4, 1, "a"): {fln("a.cue", 3, 1, "a")},
 				fln("b.cue", 3, 1, "a"): {},
 				fln("c.cue", 4, 1, "a"): {fln("c.cue", 3, 1, "a")},
@@ -1603,7 +2070,7 @@ package x
 
 w: a: b: 6
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				fln("a.cue", 4, 1, "a"): {fln("a.cue", 5, 1, "a"), fln("b.cue", 3, 1, "a")},
 				fln("a.cue", 4, 1, "b"): {fln("a.cue", 5, 1, "b"), fln("b.cue", 3, 1, "b")},
 
@@ -1616,6 +2083,10 @@ w: a: b: 6
 				fln("b.cue", 3, 1, "w"): {self, fln("a.cue", 3, 1, "w")},
 				fln("b.cue", 3, 1, "a"): {self, fln("a.cue", 5, 1, "a")},
 				fln("b.cue", 3, 1, "b"): {self, fln("a.cue", 5, 1, "b")},
+			},
+			expectCompletions: map[*position][]string{
+				fln("a.cue", 4, 1, "a"): {"b"},
+				fln("a.cue", 6, 1, "}"): {"a", "x"},
 			},
 		},
 		{
@@ -1647,7 +2118,7 @@ a: {
 	g: X
 }
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				fln("a.cue", 5, 1, "X"): {fln("a.cue", 4, 1, "b"), fln("b.cue", 4, 1, "b")},
 				fln("a.cue", 5, 1, "c"): {fln("a.cue", 4, 1, "c"), fln("b.cue", 4, 1, "c")},
 				fln("c.cue", 4, 1, "X"): {},
@@ -1671,6 +2142,20 @@ a: {
 				fln("d.cue", 4, 1, "c"): {self},
 				fln("d.cue", 5, 1, "g"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				fln("a.cue", 4, 1, "}"): {"c"},
+				fln("a.cue", 5, 1, "X"): {"c"},
+				fln("a.cue", 6, 1, "}"): {"b", "d"},
+
+				fln("b.cue", 4, 1, "}"): {"c"},
+				fln("b.cue", 5, 1, "}"): {"b"},
+
+				fln("c.cue", 5, 1, "}"): {"e"},
+
+				fln("d.cue", 4, 1, "}"): {"c"},
+				fln("d.cue", 5, 1, "X"): {"c"},
+				fln("d.cue", 6, 1, "}"): {"f", "g"},
+			},
 		},
 
 		{
@@ -1689,7 +2174,7 @@ z: y.x
 -- c.cue --
 package a
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				fln("b.cue", 3, 1, `"a"`): {fln("a.cue", 1, 1, "package a"), fln("c.cue", 1, 1, "package a")},
 				fln("b.cue", 5, 1, "a"):   {fln("b.cue", 3, 1, `"a"`)},
 				fln("b.cue", 6, 1, "y"):   {fln("b.cue", 5, 1, "y")},
@@ -1699,6 +2184,10 @@ package a
 
 				fln("b.cue", 5, 1, "y"): {self},
 				fln("b.cue", 6, 1, "z"): {self},
+			},
+			expectCompletions: map[*position][]string{
+				fln("b.cue", 5, 1, "a"): {"x"},
+				fln("b.cue", 6, 1, "y"): {"x"},
 			},
 		},
 
@@ -1711,7 +2200,7 @@ x: y
 y: x: z
 z: x: 5
 `,
-			expectations: map[*position][]*position{
+			expectDefinitions: map[*position][]*position{
 				ln(3, 1, "y"): {ln(4, 1, "y")},
 				ln(4, 1, "z"): {ln(5, 1, "z")},
 
@@ -1730,14 +2219,19 @@ z: x: 5
 				ln(4, 1, "y"): {self},
 				ln(5, 1, "z"): {self},
 			},
+			expectCompletions: map[*position][]string{
+				ln(3, 1, "y"): {"x"},
+				ln(4, 1, "z"): {"x"},
+			},
 		},
 	}.run(t)
 }
 
 type testCase struct {
-	name         string
-	archive      string
-	expectations map[*position][]*position
+	name              string
+	archive           string
+	expectDefinitions map[*position][]*position
+	expectCompletions map[*position][]string
 }
 
 type testCases []testCase
@@ -1763,9 +2257,12 @@ func (tcs testCases) run(t *testing.T) {
 			}
 
 			var allPositions []*position
-			for from, tos := range tc.expectations {
+			for from, tos := range tc.expectDefinitions {
 				allPositions = append(allPositions, from)
 				allPositions = append(allPositions, tos...)
+			}
+			for from := range tc.expectCompletions {
+				allPositions = append(allPositions, from)
 			}
 
 			for _, pos := range allPositions {
@@ -1792,57 +2289,201 @@ func (tcs testCases) run(t *testing.T) {
 				}
 			}
 
-			ranges := rangeset.NewFilenameRangeSet()
-
-			for posFrom, positionsWant := range tc.expectations {
-				filename := posFrom.filename
-				fdfns := dfnsByFilename[filename]
-				qt.Assert(t, qt.IsNotNil(fdfns))
-
-				offset := posFrom.offset
-				ranges.Add(filename, offset, offset+len(posFrom.str))
-
-				for i := range len(posFrom.str) {
-					// Test every offset within the "from" token
-					offset := offset + i
-					nodesGot := fdfns.ForOffset(offset)
-					fileOffsetsGot := make([]fileOffset, len(nodesGot))
-					for j, node := range nodesGot {
-						fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
-					}
-					fileOffsetsWant := make([]fileOffset, len(positionsWant))
-					for j, p := range positionsWant {
-						if p == self {
-							fileOffsetsWant[j] = posFrom.fileOffset()
-						} else {
-							fileOffsetsWant[j] = p.fileOffset()
-						}
-					}
-					slices.SortFunc(fileOffsetsGot, cmpFileOffsets)
-					slices.SortFunc(fileOffsetsWant, cmpFileOffsets)
-					qt.Assert(t, qt.DeepEquals(fileOffsetsGot, fileOffsetsWant), qt.Commentf("from %#v(+%d)", posFrom, i))
-				}
-			}
-
-			// Test that all offsets not explicitly mentioned in
-			// expectations, resolve to nothing.
-			for _, fileAst := range files {
-				filename := fileAst.Filename
-				fdfns := dfnsByFilename[filename]
-				for i := range fileAst.Pos().File().Content() {
-					if ranges.Contains(filename, i) {
-						continue
-					}
-					nodesGot := fdfns.ForOffset(i)
-					fileOffsetsGot := make([]fileOffset, len(nodesGot))
-					for j, node := range nodesGot {
-						fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
-					}
-					qt.Assert(t, qt.DeepEquals(fileOffsetsGot, []fileOffset{}), qt.Commentf("file: %q, offset: %d", filename, i))
-				}
-			}
+			tc.testDefinitions(t, files, dfnsByFilename)
+			tc.testCompletions(t, files, dfnsByFilename)
+			// To update the completions, uncomment the following line and run:
+			// go test -v -run TestDefinitions/./.ompletions > /tmp/completions.txt
+			// then inspect the file and update the tests accordingly
+			tc.dumpCompletions(t, files, dfnsByFilename)
 		})
 	}
+}
+
+func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, dfnsByFilename map[string]*definitions.FileDefinitions) {
+	t.Run("definitions", func(t *testing.T) {
+		ranges := rangeset.NewFilenameRangeSet()
+
+		for posFrom, positionsWant := range tc.expectDefinitions {
+			filename := posFrom.filename
+			fdfns := dfnsByFilename[filename]
+			qt.Check(t, qt.IsNotNil(fdfns))
+
+			offset := posFrom.offset
+			ranges.Add(filename, offset, offset+len(posFrom.str))
+
+			for i := range len(posFrom.str) {
+				// Test every offset within the "from" token
+				offset := offset + i
+				nodesGot := fdfns.DefinitionsForOffset(offset)
+				fileOffsetsGot := make([]fileOffset, len(nodesGot))
+				for j, node := range nodesGot {
+					fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
+				}
+				fileOffsetsWant := make([]fileOffset, len(positionsWant))
+				for j, p := range positionsWant {
+					if p == self {
+						fileOffsetsWant[j] = posFrom.fileOffset()
+					} else {
+						fileOffsetsWant[j] = p.fileOffset()
+					}
+				}
+				slices.SortFunc(fileOffsetsGot, cmpFileOffsets)
+				slices.SortFunc(fileOffsetsWant, cmpFileOffsets)
+				qt.Check(t, qt.DeepEquals(fileOffsetsGot, fileOffsetsWant), qt.Commentf("from %#v(+%d)", posFrom, i))
+			}
+		}
+
+		// Test that all offsets not explicitly mentioned in
+		// expectations, resolve to nothing.
+		for _, fileAst := range files {
+			filename := fileAst.Filename
+			fdfns := dfnsByFilename[filename]
+			for i := range fileAst.Pos().File().Content() {
+				if ranges.Contains(filename, i) {
+					continue
+				}
+				nodesGot := fdfns.DefinitionsForOffset(i)
+				fileOffsetsGot := make([]fileOffset, len(nodesGot))
+				for j, node := range nodesGot {
+					fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
+				}
+				qt.Check(t, qt.DeepEquals(fileOffsetsGot, []fileOffset{}), qt.Commentf("file: %q, offset: %d", filename, i))
+			}
+		}
+	})
+}
+
+func (tc *testCase) testCompletions(t *testing.T, files []*ast.File, dfnsByFilename map[string]*definitions.FileDefinitions) {
+	t.Run("completions", func(t *testing.T) {
+		ranges := rangeset.NewFilenameRangeSet()
+
+		for posFrom, completionsWant := range tc.expectCompletions {
+			slices.Sort(completionsWant)
+			filename := posFrom.filename
+			fdfns := dfnsByFilename[filename]
+			qt.Check(t, qt.IsNotNil(fdfns))
+
+			offset := posFrom.offset
+			ranges.Add(filename, offset, offset+len(posFrom.str))
+
+			for i := range len(posFrom.str) {
+				// Test every offset within the "from" token
+				offset := offset + i
+				completionsGot := fdfns.CompletionsForOffset(offset)
+				qt.Check(t, qt.DeepEquals(completionsGot, completionsWant), qt.Commentf("from %#v", posFrom))
+			}
+		}
+
+		// Test that all offsets not explicitly mentioned in
+		// expectations, complete to nothing.
+		for _, fileAst := range files {
+			filename := fileAst.Filename
+			fdfns := dfnsByFilename[filename]
+
+			for i := range fileAst.Pos().File().Content() {
+				if ranges.Contains(filename, i) {
+					continue
+				}
+				completionsGot := fdfns.CompletionsForOffset(i)
+				qt.Check(t, qt.DeepEquals(completionsGot, nil), qt.Commentf("file: %q, offset: %d", filename, i))
+			}
+		}
+	})
+}
+
+func (tc *testCase) dumpCompletions(t *testing.T, files []*ast.File, dfnsByFilename map[string]*definitions.FileDefinitions) {
+	t.Run("dumpCompletions", func(t *testing.T) {
+		for _, fileAst := range files {
+			filename := fileAst.Filename
+			fdfns := dfnsByFilename[filename]
+			content := fileAst.Pos().File().Content()
+
+			fields := strings.FieldsFunc(string(content), func(r rune) bool {
+				switch r {
+				case ' ', ':', '\n', '.', '{', '}', '[', ']', ',':
+					return true
+				default:
+					return false
+				}
+			})
+
+			offsetMap := make(map[int]*position, len(fields))
+			fieldPerLine := make(map[string]int)
+			lineNum := 1
+			lineStartOffset := 0
+
+			for line := range strings.Lines(string(content)) {
+				lineLen := len(line)
+				clear(fieldPerLine)
+				column := 0
+				for len(fields) > 0 {
+					field := fields[0]
+					columnRel := strings.Index(line, field)
+					if columnRel == -1 {
+						break
+					}
+
+					fields = fields[1:]
+					line = line[columnRel+len(field):]
+
+					column += columnRel
+					offset := lineStartOffset + column
+					column += len(field)
+					// if it's a path element (not the root) then include
+					// the dot. E.g. .y in x.y. But if it's an ellipsis
+					// (e.g. ...z) then leave the z alone.
+					if offset > 0 && content[offset-1] == '.' && (offset == 1 || content[offset-2] != '.') {
+						field = "." + field
+						offset--
+					}
+
+					for start := range field {
+						field := field[start:]
+						fieldPerLine[field]++
+						for end := range field[1:] {
+							field := field[:end+1]
+							fieldPerLine[field]++
+						}
+					}
+					n := fieldPerLine[field]
+
+					offsetMap[offset] = fln(filename, lineNum, n, field)
+				}
+
+				lineNum++
+				lineStartOffset += lineLen
+			}
+
+			var strs []string
+			for i := range content {
+				completionsGot := fdfns.CompletionsForOffset(i)
+				if len(completionsGot) > 0 {
+					p, found := offsetMap[i]
+					if found {
+						strs = append(strs, completionString(files, p, completionsGot))
+					}
+				}
+			}
+
+			if len(strs) > 0 {
+				t.Log("\n" + strings.Join(strs, "\n"))
+			}
+		}
+	})
+}
+
+func completionString(files []*ast.File, posFrom *position, completionsGot []string) string {
+	if len(completionsGot) == 0 {
+		return ""
+	}
+	msg := ""
+	if len(files) == 1 {
+		msg = fmt.Sprintf(`ln(%d, %d, %q): `, posFrom.line, posFrom.n, posFrom.str)
+	} else {
+		msg = fmt.Sprintf(`fln(%q, %d, %d, %q): `, posFrom.filename, posFrom.line, posFrom.n, posFrom.str)
+	}
+	msg += `{"` + strings.Join(completionsGot, `", "`) + `"},`
+	return msg
 }
 
 type fileOffset struct {
@@ -1867,6 +2508,10 @@ type position struct {
 	n        int
 	str      string
 	offset   int
+}
+
+func (p *position) String() string {
+	return fmt.Sprintf(`fln(%q, %d, %d, %q)`, p.filename, p.line, p.n, p.str)
 }
 
 func (p position) fileOffset() fileOffset {

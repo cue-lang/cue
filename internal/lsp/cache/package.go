@@ -17,6 +17,7 @@ package cache
 import (
 	"fmt"
 	"slices"
+	"strconv"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -259,7 +260,7 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 			return nil
 		}
 
-		targets = fdfns.ForOffset(offset)
+		targets = fdfns.DefinitionsForOffset(offset)
 		if len(targets) > 0 {
 			break
 		}
@@ -291,4 +292,71 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 		}
 	}
 	return locations
+}
+
+// Completion attempts to treat the given uri and position as a file
+// coordinate to some path element, from which subsequent path
+// elements can be suggested.
+func (pkg *Package) Completion(uri protocol.DocumentURI, pos protocol.Position) *protocol.CompletionList {
+	dfns := pkg.definitions
+	if dfns == nil {
+		return nil
+	}
+
+	w := pkg.module.workspace
+	mappers := w.mappers
+
+	fdfns := dfns.ForFile(uri.Path())
+	if fdfns == nil {
+		w.debugLog("file not found")
+		return nil
+	}
+
+	srcMapper := mappers[fdfns.File.Pos().File()]
+	if srcMapper == nil {
+		w.debugLog("mapper not found: " + string(uri))
+		return nil
+	}
+
+	offset, err := srcMapper.PositionOffset(pos)
+	if err != nil {
+		w.debugLog(err.Error())
+		return nil
+	}
+	content := fdfns.File.Pos().File().Content()
+	// The cursor can be after the last character of the file.
+	offset = min(offset, len(content)-1)
+	if offset > 0 && content[offset] == '\n' {
+		offset--
+	}
+	if offset > 0 && content[offset] == '\r' {
+		offset--
+	}
+	if offset > 0 && content[offset] == ':' {
+		// could this possibly be wrong? if there was a ";" in a quoted
+		// ident perhaps?
+		offset--
+	}
+
+	strs := fdfns.CompletionsForOffset(offset)
+	if len(strs) == 0 {
+		return nil
+	}
+
+	completions := make([]protocol.CompletionItem, len(strs))
+	for i, str := range strs {
+		completions[i] = protocol.CompletionItem{
+			Label: str,
+			Kind:  protocol.FieldCompletion,
+			// TODO: we can add in documentation for each item if we can
+			// find it.
+		}
+		if !ast.IsValidIdent(str) {
+			completions[i].InsertText = strconv.Quote(str)
+		}
+	}
+
+	return &protocol.CompletionList{
+		Items: completions,
+	}
 }

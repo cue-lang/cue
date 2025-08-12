@@ -12,11 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package eval contains the high level CUE evaluation strategy.
-//
-// CUE allows for a significant amount of freedom in order of evaluation due to
-// the commutativity of the unification operation. This package implements one
-// of the possible strategies.
 package adt
 
 // TODO:

@@ -268,6 +268,9 @@ type DefinitionsForPackageFunc func(importPath string) *Definitions
 type Definitions struct {
 	// pkgNode is the top level (or root) lexical scope
 	pkgNode *astNode
+	// pkgDecls is shared between (so therefore contains) all package
+	// declarations across every file passed to [Analyse].
+	pkgDecls *navigableBindings
 	// byFilename maps file names to [FileDefinitions]
 	byFilename map[string]*FileDefinitions
 	forPackage DefinitionsForPackageFunc
@@ -284,6 +287,7 @@ func Analyse(forPackage DefinitionsForPackageFunc, files ...*ast.File) *Definiti
 		forPackage = func(importPath string) *Definitions { return nil }
 	}
 	dfns := &Definitions{
+		pkgDecls:   &navigableBindings{},
 		byFilename: make(map[string]*FileDefinitions, len(files)),
 		forPackage: forPackage,
 	}
@@ -554,7 +558,7 @@ func (n *astNode) addRange(node ast.Node) {
 // is the pkgNode) always contain every file-offset.
 func (n *astNode) contains(filename string, offset int) bool {
 	ranges := n.ranges
-	return n.parent == n.dfns.pkgNode || (ranges != nil && ranges.Contains(filename, offset))
+	return n.isFileNode() || (ranges != nil && ranges.Contains(filename, offset))
 }
 
 // eval evaluates the astNode lazily. Evaluation is not recursive: it
@@ -584,23 +588,60 @@ func (n *astNode) eval() {
 				unprocessed = append(unprocessed, decl)
 			}
 
+		case *ast.Package:
+			// Package declarations must be added to the pkgDecls
+			// navigable, so that they can all be found when resolving
+			// imports of this package, in some other package.
+			n.newAstNode(node, nil, n.dfns.pkgDecls)
+
 		case *ast.ImportDecl:
 			for _, spec := range node.Specs {
 				unprocessed = append(unprocessed, spec)
 			}
 
 		case *ast.ImportSpec:
-			if node.Name == nil {
+			// We process import specs twice, for laziness reasons: we
+			// avoid the possibility that evaluating a filenode would
+			// lookup every imported package and evaluate its filenodes
+			// (which themselves might do the same...).
+			if n.isFileNode() {
+				// 1) At the filenode level, we create appropriate
+				// file-scope bindings, but also pass the spec as the
+				// unprocessed value to a fresh child node;
+				if node.Name == nil {
+					str, err := strconv.Unquote(node.Path.Value)
+					if err != nil {
+						continue
+					}
+					ip := ast.ParseImportPath(str)
+					if ip.Qualifier != "" {
+						n.newBinding(ip.Qualifier, node, node)
+					}
+				} else {
+					n.newBinding(node.Name.Name, node, node)
+				}
+
+			} else {
+				// 2) In that child node, we lookup the package imported,
+				// ensure the package declarations have been processed,
+				// and add a resolution to them.
 				str, err := strconv.Unquote(node.Path.Value)
 				if err != nil {
 					continue
 				}
-				ip := ast.ParseImportPath(str)
-				if ip.Qualifier != "" {
-					n.newBinding(ip.Qualifier, node, nil)
+				dfns := n.dfns.forPackage(str)
+				if dfns == nil {
+					continue
 				}
-			} else {
-				n.newBinding(node.Name.Name, node, nil)
+				// Eval the pkgNode and its immediate children only (which
+				// will be filenodes). This is enough to ensure the
+				// package declarations have been found and added to the
+				// pkgDecls.
+				dfns.pkgNode.eval()
+				for _, child := range dfns.pkgNode.allChildren {
+					child.eval()
+				}
+				n.dfns.addResolution(node.Path.Pos(), len(str)+2, []*navigableBindings{dfns.pkgDecls})
 			}
 
 		case *ast.StructLit:
@@ -908,7 +949,6 @@ func navigateBindingsByName(navigables []*navigableBindings, name string) []*nav
 // subsequent path elements, we search the navigable bindings (see the
 // [astNode.resolve] method).
 func (n *astNode) resolvePathRoot(name string) *navigableBindings {
-	pkgNode := n.dfns.pkgNode
 	for ; n != nil; n = n.parent {
 		if bindings, found := n.bindings[name]; found {
 			if len(bindings) == 1 {
@@ -950,14 +990,19 @@ func (n *astNode) resolvePathRoot(name string) *navigableBindings {
 			}
 			return nav
 		}
-		if n.parent == pkgNode {
-			// pkgNode is the parent of the fileNodes. If we've got this
-			// far, we're allowed to inspect the (shared) navigable
-			// bindings directly without having to go via our bindings.
+		if n.isFileNode() {
+			// If we've got this far, we're allowed to inspect the
+			// (shared) navigable bindings directly without having to go
+			// via our bindings.
 			return n.navigable.bindings[name]
 		}
 	}
 	return nil
+}
+
+// isFileNode reports if this node's parent is the pkgNode.
+func (n *astNode) isFileNode() bool {
+	return n.parent == n.dfns.pkgNode
 }
 
 // ensureNavigableBinding creates and returns a new [astNode],

@@ -29,7 +29,7 @@ import (
 	"github.com/rogpeppe/go-internal/txtar"
 )
 
-func TestSimple(t *testing.T) {
+func TestDefinitions(t *testing.T) {
 	testCases{
 		{
 			name: "Selector_Implicit_ViaRoot",
@@ -185,13 +185,9 @@ q: o[3].a`,
 				ln(6, 1, "a"):   {ln(1, 2, "a"), ln(3, 1, "a")},
 			},
 		},
-	}.run(t)
-}
 
-func TestStringLitFields(t *testing.T) {
-	testCases{
 		{
-			name: "Conjunction",
+			name: "StringLit_Conjunction",
 			archive: `-- a.cue --
 c: {a: b, "b": x: 3} & {b: x: 3, z: b.x}
 b: 7
@@ -206,7 +202,7 @@ d: c.b.x`,
 			},
 		},
 		{
-			name: "Nested",
+			name: "StringLit_Nested",
 			archive: `-- a.cue --
 b: {
   a: 7
@@ -221,7 +217,7 @@ b: {
 			},
 		},
 		{
-			name: "Nested_Promotion",
+			name: "StringLit_Nested_Promotion",
 			archive: `-- a.cue --
 b: {
   a: 7
@@ -237,7 +233,7 @@ b: {
 			},
 		},
 		{
-			name: "Nested_RedHerring",
+			name: "StringLit_Nested_RedHerring",
 			archive: `-- a.cue --
 b: {
   a: 7
@@ -252,13 +248,9 @@ b: b: _`,
 				ln(4, 1, "a"): {ln(2, 1, "a")},
 			},
 		},
-	}.run(t)
-}
 
-func TestInline(t *testing.T) {
-	testCases{
 		{
-			name: "Struct_Selector",
+			name: "Inline_Struct_Selector",
 			archive: `-- a.cue --
 a: {in: {x: 5}, out: in}.out.x`,
 			expectations: map[*position][]*position{
@@ -268,7 +260,7 @@ a: {in: {x: 5}, out: in}.out.x`,
 			},
 		},
 		{
-			name: "List_Index_LiteralConst",
+			name: "Inline_List_Index_LiteralConst",
 			archive: `-- a.cue --
 a: [7, {b: 3}, true][1].b`,
 			// If the index is a literal const we do resolve it.
@@ -278,7 +270,7 @@ a: [7, {b: 3}, true][1].b`,
 			},
 		},
 		{
-			name: "List_Index_Dynamic",
+			name: "Inline_List_Index_Dynamic",
 			archive: `-- a.cue --
 a: [7, {b: 3}, true][n].b
 n: 1
@@ -292,7 +284,7 @@ n: 1
 			},
 		},
 		{
-			name: "Struct_Index_LiteralConst",
+			name: "StringLit_Struct_Index_LiteralConst",
 			archive: `-- a.cue --
 x: "a b": z: 5
 y: x["a b"].z`,
@@ -303,7 +295,7 @@ y: x["a b"].z`,
 			},
 		},
 		{
-			name: "Disjunction_Internal",
+			name: "Inline_Disjunction_Internal",
 			archive: `-- a.cue --
 a: ({b: c, c: 3} | {c: 4}).c`,
 			expectations: map[*position][]*position{
@@ -311,11 +303,7 @@ a: ({b: c, c: 3} | {c: 4}).c`,
 				ln(1, 4, "c"): {ln(1, 2, "c"), ln(1, 3, "c")},
 			},
 		},
-	}.run(t)
-}
 
-func TestCycles(t *testing.T) {
-	testCases{
 		{
 			name: "Cycle_Simple2",
 			archive: `-- a.cue --
@@ -341,7 +329,7 @@ c: a`,
 		// These "structural" cycles are errors in the evaluator. But
 		// there's no reason we can't resolve them.
 		{
-			name: "Structural_Simple",
+			name: "Cycle_Structural_Simple",
 			archive: `-- a.cue --
 a: b: c: a`,
 			expectations: map[*position][]*position{
@@ -358,7 +346,7 @@ a: b: c: a.b`,
 			},
 		},
 		{
-			name: "Structural_Complex",
+			name: "Cycle_Structural_Complex",
 			archive: `-- a.cue --
 y: [string]: b: y
 x: y
@@ -370,13 +358,9 @@ x: c: x
 				ln(3, 2, "x"): {ln(2, 1, "x"), ln(3, 1, "x")},
 			},
 		},
-	}.run(t)
-}
 
-func TestAliases(t *testing.T) {
-	testCases{
 		{
-			name: "Plain_Label_Internal",
+			name: "Alias_Plain_Label_Internal",
 			archive: `-- a.cue --
 l=a: {b: 3, c: l.b}`,
 			expectations: map[*position][]*position{
@@ -385,7 +369,7 @@ l=a: {b: 3, c: l.b}`,
 			},
 		},
 		{
-			name: "Plain_Label_Internal_Implicit",
+			name: "Alias_Plain_Label_Internal_Implicit",
 			archive: `-- a.cue --
 l=a: b: 3
 a: c: l.b`,
@@ -395,7 +379,7 @@ a: c: l.b`,
 			},
 		},
 		{
-			name: "Plain_Label_Internal_Implicit_Reversed",
+			name: "Alias_Plain_Label_Internal_Implicit_Reversed",
 			archive: `-- a.cue --
 a: b: 3
 l=a: c: l.b`,
@@ -405,7 +389,7 @@ l=a: c: l.b`,
 			},
 		},
 		{
-			name: "Plain_Label_External",
+			name: "Alias_Plain_Label_External",
 			archive: `-- a.cue --
 l=a: b: 3
 c: l.b`,
@@ -416,7 +400,7 @@ c: l.b`,
 		},
 
 		{
-			name: "Plain_Label_Scoping",
+			name: "Alias_Plain_Label_Scoping",
 			archive: `-- a.cue --
 a: {
 	l=b: {c: l.d, d: 3}
@@ -438,7 +422,7 @@ h: a.l
 		},
 
 		{
-			name: "Dynamic_Label_Internal",
+			name: "Alias_Dynamic_Label_Internal",
 			archive: `-- a.cue --
 l=(a): {b: 3, c: l.b}`,
 			expectations: map[*position][]*position{
@@ -447,7 +431,7 @@ l=(a): {b: 3, c: l.b}`,
 			},
 		},
 		{
-			name: "Dynamic_Label_Internal_Implicit",
+			name: "Alias_Dynamic_Label_Internal_Implicit",
 			archive: `-- a.cue --
 l=(a): b: 3
 (a): c: l.b`,
@@ -460,7 +444,7 @@ l=(a): b: 3
 			},
 		},
 		{
-			name: "Dynamic_Label_Internal_Implicit_Reversed",
+			name: "Alias_Dynamic_Label_Internal_Implicit_Reversed",
 			archive: `-- a.cue --
 (a): b: 3
 l=(a): c: l.b`,
@@ -473,7 +457,7 @@ l=(a): c: l.b`,
 			},
 		},
 		{
-			name: "Dynamic_Label_External",
+			name: "Alias_Dynamic_Label_External",
 			archive: `-- a.cue --
 l=(a): b: 3
 c: l.b`,
@@ -484,7 +468,7 @@ c: l.b`,
 		},
 
 		{
-			name: "Pattern_Label_Internal",
+			name: "Alias_Pattern_Label_Internal",
 			archive: `-- a.cue --
 l=[a]: {b: 3, c: l.b}`,
 			expectations: map[*position][]*position{
@@ -493,7 +477,7 @@ l=[a]: {b: 3, c: l.b}`,
 			},
 		},
 		{
-			name: "Pattern_Label_Internal_Implicit",
+			name: "Alias_Pattern_Label_Internal_Implicit",
 			archive: `-- a.cue --
 l=[a]: b: 3
 [a]: c: l.b`,
@@ -508,7 +492,7 @@ l=[a]: b: 3
 			},
 		},
 		{
-			name: "Pattern_Label_Internal_Implicit_Reversed",
+			name: "Alias_Pattern_Label_Internal_Implicit_Reversed",
 			archive: `-- a.cue --
 [a]: b: 3
 l=[a]: c: l.b`,
@@ -520,7 +504,7 @@ l=[a]: c: l.b`,
 			},
 		},
 		{
-			name: "Pattern_Label_External",
+			name: "Alias_Pattern_Label_External",
 			archive: `-- a.cue --
 l=[a]: b: 3
 c: l.b`,
@@ -533,7 +517,7 @@ c: l.b`,
 		},
 
 		{
-			name: "Pattern_Expr_Internal",
+			name: "Alias_Pattern_Expr_Internal",
 			archive: `-- a.cue --
 [l=a]: {b: 3, c: l, d: l.b}`,
 			// This type of alias binds l to the key. So c: l will work,
@@ -545,7 +529,7 @@ c: l.b`,
 			},
 		},
 		{
-			name: "Pattern_Expr_Internal_Implicit",
+			name: "Alias_Pattern_Expr_Internal_Implicit",
 			archive: `-- a.cue --
 [l=a]: b: 3
 [a]: c: l`,
@@ -559,7 +543,7 @@ c: l.b`,
 			},
 		},
 		{
-			name: "Pattern_Expr_External",
+			name: "Alias_Pattern_Expr_External",
 			archive: `-- a.cue --
 [l=a]: b: 3
 c: l`,
@@ -571,7 +555,7 @@ c: l`,
 		},
 
 		{
-			name: "Expr_Internal",
+			name: "Alias_Expr_Internal",
 			archive: `-- a.cue --
 a: l={b: 3, c: l.b}`,
 			expectations: map[*position][]*position{
@@ -580,7 +564,7 @@ a: l={b: 3, c: l.b}`,
 			},
 		},
 		{
-			name: "Expr_Internal_Explicit",
+			name: "Alias_Expr_Internal_Explicit",
 			archive: `-- a.cue --
 a: l={b: 3} & {c: l.b}`,
 			expectations: map[*position][]*position{
@@ -589,7 +573,7 @@ a: l={b: 3} & {c: l.b}`,
 			},
 		},
 		{
-			name: "Expr_Internal_Explicit_Paren",
+			name: "Alias_Expr_Internal_Explicit_Paren",
 			// The previous test case works because it's parsed like
 			// this:
 			archive: `-- a.cue --
@@ -600,7 +584,7 @@ a: l=({b: 3} & {c: l.b})`,
 			},
 		},
 		{
-			name: "Expr_External",
+			name: "Alias_Expr_External",
 			archive: `-- a.cue --
 a: l={b: 3}
 c: l.b`,
@@ -610,13 +594,9 @@ c: l.b`,
 				ln(2, 1, "b"): {},
 			},
 		},
-	}.run(t)
-}
 
-func TestDisjunctions(t *testing.T) {
-	testCases{
 		{
-			name: "Simple",
+			name: "Disjunction_Simple",
 			archive: `-- a.cue --
 d: {a: b: 3} | {a: b: 4, c: 5}
 o: d.a.b
@@ -631,7 +611,7 @@ p: d.c
 			},
 		},
 		{
-			name: "Inline",
+			name: "Disjunction_Inline",
 			archive: `-- a.cue --
 d: ({a: b: 3} | {a: b: 4}) & {c: 5}
 o: d.a.b
@@ -646,7 +626,7 @@ p: d.c
 			},
 		},
 		{
-			name: "Chained",
+			name: "Disjunction_Chained",
 			archive: `-- a.cue --
 d1: {a: 1} | {a: 2}
 d2: {a: 3} | {a: 4}
@@ -659,7 +639,7 @@ o: (d1 & d2).a
 			},
 		},
 		{
-			name: "Selected",
+			name: "Disjunction_Selected",
 			archive: `-- a.cue --
 d: {x: 17} | string
 r: d & {x: int}
@@ -672,7 +652,7 @@ out: r.x
 			},
 		},
 		{
-			name: "Scopes",
+			name: "Disjunction_Scopes",
 			archive: `-- a.cue --
 c: {a: b} | {b: 3}
 b: 7
@@ -685,7 +665,7 @@ d: c.b
 			},
 		},
 		{
-			name: "Looping",
+			name: "Disjunction_Looping",
 			archive: `-- a.cue --
 a: {b: c.d, d: 3} | {d: 4}
 c: a
@@ -696,13 +676,9 @@ c: a
 				ln(2, 1, "a"): {ln(1, 1, "a")},
 			},
 		},
-	}.run(t)
-}
 
-func TestConjunctions(t *testing.T) {
-	testCases{
 		{
-			name: "Scopes",
+			name: "Conjunction_Scopes",
 			archive: `-- a.cue --
 c: {a: b} & {b: 3}
 b: 7
@@ -715,7 +691,7 @@ d: c.b
 			},
 		},
 		{
-			name: "MoreScopes",
+			name: "Conjunction_MoreScopes",
 			archive: `-- a.cue --
 x: {
 	{a: int, b: a}
@@ -731,7 +707,7 @@ y: x.a`,
 			},
 		},
 		{
-			name: "EvenMoreScopes",
+			name: "Conjunction_EvenMoreScopes",
 			archive: `-- a.cue --
 c: {a: b, b: x: 3} & {b: x: 3, z: b.x}
 b: 7
@@ -745,13 +721,9 @@ d: c.b.x`,
 				ln(3, 1, "x"): {ln(1, 1, "x"), ln(1, 2, "x")},
 			},
 		},
-	}.run(t)
-}
 
-func TestImports(t *testing.T) {
-	testCases{
 		{
-			name: "Builtin_Call",
+			name: "Import_Builtin_Call",
 			archive: `-- a.cue --
 import "magic"
 
@@ -765,7 +737,7 @@ y: "wand"
 			},
 		},
 		{
-			name: "alias",
+			name: "Import_alias",
 			archive: `-- a.cue --
 import wand "magic"
 
@@ -776,13 +748,9 @@ x: wand.foo
 				ln(3, 1, "foo"):  {},
 			},
 		},
-	}.run(t)
-}
 
-func TestInterpolation(t *testing.T) {
-	testCases{
 		{
-			name: "simple",
+			name: "Interpolation_Simple",
 			archive: `-- a.cue --
 a: 5
 b: c
@@ -797,7 +765,7 @@ d: "4+\(a) > 0?\(b.x)"
 			},
 		},
 		{
-			name: "field",
+			name: "Interpolation_Field",
 			archive: `-- a.cue --
 a: 5
 "five\(a)": hello
@@ -806,13 +774,9 @@ a: 5
 				ln(2, 1, "a"): {ln(1, 1, "a")},
 			},
 		},
-	}.run(t)
-}
 
-func TestMultiByte(t *testing.T) {
-	testCases{
 		{
-			name: "Expression",
+			name: "MultiByte_Expression",
 			archive: `-- a.cue --
 x: "💩" + y
 y: "sticks"
@@ -822,7 +786,7 @@ y: "sticks"
 			},
 		},
 		{
-			name: "Index",
+			name: "MultiByte_Index",
 			archive: `-- a.cue --
 x: {"💩": "sticks"}
 y: x["💩"]
@@ -833,7 +797,7 @@ y: x["💩"]
 			},
 		},
 		{
-			name: "Selector",
+			name: "MultiByte_Selector",
 			archive: `-- a.cue --
 x: {"💩": "sticks"}
 y: x."💩"
@@ -843,13 +807,9 @@ y: x."💩"
 				ln(2, 1, `"💩"`): {ln(1, 1, `"💩"`)},
 			},
 		},
-	}.run(t)
-}
 
-func TestComprehensions(t *testing.T) {
-	testCases{
 		{
-			name: "If",
+			name: "Comprehension_If",
 			archive: `-- a.cue --
 a: 17
 b: 3
@@ -870,7 +830,7 @@ y: x.c`,
 			},
 		},
 		{
-			name: "Let",
+			name: "Comprehension_Let",
 			archive: `-- a.cue --
 a: b: c: 17
 let x=a.b
@@ -884,7 +844,7 @@ y: x.c
 			},
 		},
 		{
-			name: "Let_Scoped",
+			name: "Comprehension_Let_Scoped",
 			archive: `-- a.cue --
 a: {
 	let b=17
@@ -901,7 +861,7 @@ o: a.b
 			},
 		},
 		{
-			name: "For",
+			name: "Comprehension_For",
 			archive: `-- a.cue --
 a: { x: 1, y: 2, z: 3}
 b: { x: 4, y: 5, z: 6}
@@ -926,13 +886,9 @@ q: o.p
 				ln(9, 1, "p"): {ln(6, 1, "p")},
 			},
 		},
-	}.run(t)
-}
 
-func TestFileScopes(t *testing.T) {
-	testCases{
 		{
-			name: "Package_Top_Single",
+			name: "MultiFile_Package_Top_Single",
 			archive: `-- a.cue --
 package x
 
@@ -947,7 +903,7 @@ bar: foo
 			},
 		},
 		{
-			name: "Package_Top_Multiple",
+			name: "MultiFile_Package_Top_Multiple",
 			archive: `-- a.cue --
 package x
 
@@ -967,7 +923,7 @@ foo: _
 			},
 		},
 		{
-			name: "NonTop",
+			name: "MultiFile_NonTop",
 			archive: `-- a.cue --
 package x
 
@@ -983,7 +939,7 @@ foo: {qux: bar}
 			},
 		},
 		{
-			name: "NonTop_Implicit",
+			name: "MultiFile_NonTop_Implicit",
 			archive: `-- a.cue --
 package x
 
@@ -1006,7 +962,7 @@ foo: qux: foo.bar
 			},
 		},
 		{
-			name: "Package_Top_Let",
+			name: "MultiFile_Package_Top_Let",
 			archive: `-- a.cue --
 package x
 
@@ -1029,7 +985,7 @@ s: a
 			},
 		},
 		{
-			name: "Selector",
+			name: "MultiFile_Selector",
 			archive: `-- a.cue --
 package x
 
@@ -1048,7 +1004,7 @@ w: a: b: 6
 			},
 		},
 		{
-			name: "Aliases",
+			name: "MultiFile_Aliases",
 			archive: `-- a.cue --
 package x
 

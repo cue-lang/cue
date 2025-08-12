@@ -423,7 +423,7 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) {
 
 // Literal conjuncts
 
-// NoSharingSentinel is a sentinel value that is used to disable sharing of
+// NoShareSentinel is a sentinel value that is used to disable sharing of
 // nodes. We make this an error to make it clear that we discard the value.
 var NoShareSentinel = &Bottom{
 	Err: errors.Newf(token.NoPos, "no sharing"),

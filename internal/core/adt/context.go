@@ -256,7 +256,7 @@ func (c *OpContext) concreteIsPossible(op Op, x Expr) bool {
 	return true
 }
 
-// Assert that the given expression can evaluate to a concrete value.
+// AssertConcreteIsPossible reports whether the given expression can evaluate to a concrete value.
 func AssertConcreteIsPossible(op Op, x Expr) bool {
 	switch v := x.(type) {
 	case *Bottom:

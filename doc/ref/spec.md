@@ -2683,13 +2683,24 @@ User-generated errors can be included in disjunctions; if at least one disjunct
 is valid, any user errors are ignored.
 However, if all disjuncts fail, all user error messages are reported together.
 
-`error` takes a single string argument. If this argument is a literal
-interpolation, it will be extra resilient: if any of the arguments to the
-interpolation fail, they will be printed as an expression. This allows failing
-expressions to be a part of the error message.
+`error` takes a single string argument:
 
 ```
-a: 1/0 | error("infinity and beyond!: \(1/0)")
+a: 1/0 | error("infinity and beyond!")
+```
+
+If the argument is a string literal that contains interpolations
+then it will be handled with extra resilience:
+if any interpolation fails to evaluate
+then the source expression for that interpolation will be inserted into the
+string as written,
+rather than being evaluated,
+and evaluation of the error message will not cause an additional failure.
+This allows failing or potentially-failing expressions to be used in an error
+message:
+
+```
+b: 1/0 | error("infinity and beyond!: \(1/0)")
 ```
 
 ### `len`

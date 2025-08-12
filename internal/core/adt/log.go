@@ -25,7 +25,7 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-// Assert panics if the condition is false. Assert can be used to check for
+// Assertf panics if the condition is false. Assertf can be used to check for
 // conditions that are considers to break an internal variant or unexpected
 // condition, but that nonetheless probably will be handled correctly down the
 // line. For instance, a faulty condition could lead to error being caught

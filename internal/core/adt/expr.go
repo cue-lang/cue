@@ -1859,7 +1859,7 @@ func validateWithBuiltin(call *CallContext) *Bottom {
 	}
 }
 
-// A Disjunction represents a disjunction, where each disjunct may or may not
+// A DisjunctionExpr represents a disjunction, where each disjunct may or may not
 // be marked as a default.
 type DisjunctionExpr struct {
 	Src    *ast.BinaryExpr
@@ -1906,8 +1906,8 @@ func (x *Conjunction) Kind() Kind {
 	return k
 }
 
-// A disjunction is a disjunction of values. It is the result of expanding
-// a DisjunctionExpr if the expression cannot be represented as a single value.
+// A Disjunction is a disjunction of values. It is the result of expanding
+// a [DisjunctionExpr] if the expression cannot be represented as a single value.
 type Disjunction struct {
 	Src ast.Expr
 

@@ -623,7 +623,7 @@ type cyclicConjunct struct {
 	arc *Vertex // cached Vertex
 }
 
-// CycleType indicates the type of cycle detected. The CyclicType is associated
+// CyclicType indicates the type of cycle detected. The CyclicType is associated
 // with a conjunct and may only increase in value for child conjuncts.
 type CyclicType uint8
 

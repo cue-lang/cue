@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b172d6b3_9ebbbd96",
+        "filename": "cue/testdata/benchmarks/issue1684.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-12T16:29:51Z",
+      "side": 1,
+      "message": "do we want to delete diff/explanation entries too? at least it makes little sense for them to exist when there is no diff anymore.",
+      "revId": "8f2f18f6142f92dd72246e339fb4ebab37ff3983",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e724881c_19853804",
+        "filename": "cue/testdata/disjunctions/errors.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 596,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-12T16:29:51Z",
+      "side": 1,
+      "message": "ditto; there are a handful of these.",
+      "revId": "8f2f18f6142f92dd72246e339fb4ebab37ff3983",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79fa20b9_a3c45613",
+        "filename": "cue/testdata/eval/v0.7.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1218,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-12T16:29:51Z",
+      "side": 1,
+      "message": "is this resolved then?",
+      "revId": "8f2f18f6142f92dd72246e339fb4ebab37ff3983",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

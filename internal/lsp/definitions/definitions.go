@@ -254,7 +254,9 @@ package definitions
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -301,7 +303,7 @@ func Analyse(forPackage DefinitionsForPackageFunc, files ...*ast.File) *Definiti
 		pkgNode.newAstNode(nil, file, navigable)
 		dfns.byFilename[file.Filename] = &FileDefinitions{
 			pkgNode:     pkgNode,
-			resolutions: make(map[int][]ast.Node),
+			resolutions: make(map[int][]*navigableBindings),
 			File:        file,
 		}
 	}
@@ -322,6 +324,9 @@ func Analyse(forPackage DefinitionsForPackageFunc, files ...*ast.File) *Definiti
 func (dfns *Definitions) newAstNode(parent *astNode, key ast.Node, unprocessed ast.Node, navigable *navigableBindings) *astNode {
 	if navigable == nil {
 		navigable = &navigableBindings{}
+		if parent != nil {
+			navigable.parent = parent.navigable
+		}
 	}
 	s := &astNode{
 		dfns:        dfns,
@@ -338,27 +343,21 @@ func (dfns *Definitions) newAstNode(parent *astNode, key ast.Node, unprocessed a
 }
 
 // addResolution records that the target navigableBindings are the
-// definitions for the file and offset of the start token, and its
-// given length.
-func (dfns *Definitions) addResolution(start token.Pos, length int, targets []*navigableBindings) {
-	if len(targets) == 0 {
+// definitions for the file and all offsets between the start and end
+// positions. Existing definitions for those offsets are overwritten
+// without warning.
+func (dfns *Definitions) addResolution(start, end token.Pos, targets []*navigableBindings) {
+	if len(targets) == 0 || start == token.NoPos || end == token.NoPos {
 		return
 	}
 
 	startPosition := start.Position()
 	filename := startPosition.Filename
 	resolutions := dfns.byFilename[filename].resolutions
-	startOffset := startPosition.Offset
-	var keys []ast.Node
-	for _, nav := range targets {
-		for _, lex := range nav.contributingNodes {
-			if lex.key != nil {
-				keys = append(keys, lex.key)
-			}
-		}
-	}
-	for i := range length {
-		resolutions[startOffset+i] = keys
+
+	endOffset := end.Position().Offset
+	for offset := startPosition.Offset; offset < endOffset; offset++ {
+		resolutions[offset] = targets
 	}
 }
 
@@ -371,10 +370,11 @@ func (dfns *Definitions) ForFile(filename string) *FileDefinitions {
 // certain file to their definitions.
 type FileDefinitions struct {
 	pkgNode *astNode
-	// resolutions caches the results of previous lookups, ensuring
-	// that subsequent calls to [ForOffset] for a given offset are
-	// O(1). The map key is the byte offset within the file.
-	resolutions map[int][]ast.Node
+	// resolutions caches the definitions that have been computed
+	// during evaluation. This ensures that subsequent calls to
+	// [ForOffset] for a given offset are O(1). The map key is the byte
+	// offset within the file.
+	resolutions map[int][]*navigableBindings
 	// File is the original [ast.File] that was passed to [Analyse].
 	File *ast.File
 }
@@ -382,15 +382,38 @@ type FileDefinitions struct {
 // ForOffset reports the definitions that the file offset (number of
 // bytes from the start of the file) resolves to.
 func (fdfns *FileDefinitions) ForOffset(offset int) []ast.Node {
+	navigables := fdfns.evalForOffset(offset)
+
+	var nodes []ast.Node
+	for _, nav := range navigables {
+		for _, n := range nav.contributingNodes {
+			if n.key == nil {
+				continue
+			}
+			nodes = append(nodes, n.key)
+		}
+	}
+
+	return nodes
+}
+
+// evalForOffset evaluates from the pkgNode, evaluating only child
+// astNodes that contain the given file-byte-offset. It returns all
+// navigableBindings that have been found from resolving the symbol at
+// offset. This result is cached, so subsequent calls for the same
+// offset will be O(1). Due to the nature of evaluation it is also
+// likely subsequent calls for very similar offsets are also O(1).
+func (fdfns *FileDefinitions) evalForOffset(offset int) []*navigableBindings {
 	if offset < 0 {
 		return nil
 	}
 	resolutions := fdfns.resolutions
-	nodes, found := resolutions[offset]
+	navigables, found := resolutions[offset]
 	if found {
-		return nodes
+		return navigables
 	}
-	resolutions[offset] = []ast.Node{}
+
+	resolutions[offset] = []*navigableBindings{}
 
 	filename := fdfns.File.Filename
 	pkgNode := fdfns.pkgNode
@@ -442,14 +465,6 @@ type astNode struct {
 	// expression. For example in the path {a: 3, b: a}.b, a node with
 	// no key will be created, containing the structlit {a: 3, b: a}.
 	key ast.Node
-	// An astNode may have several names. For example, if a node is the
-	// result of a field with an alias, e.g. l=x: e, then in its parent
-	// node it'll be stored (in the bindings field) under both l and
-	// x. This name field contains only the navigable name, in this
-	// case x. Sometimes, a node will have no navigable name, e.g. a
-	// let declaration, which exists only as a lexical binding and not
-	// a navigable binding.
-	name string
 	// resolvesTo points to the navigable bindings this node resolves
 	// to, due to embedded paths. For example, in x: {y.z}, whatever
 	// node y.z resolves to, its navigable bindings will be stored in
@@ -497,13 +512,13 @@ func (n *astNode) dump(depth int) {
 		fmt.Printf("%*s%s\n", depth*3, "", fmt.Sprintf(f, a...))
 	}
 
-	printf("Node %p (name: %q)", n, n.name)
+	printf("Node %p", n)
 	printf(" Ranges %v", n.ranges)
 
-	navigable := n.navigable
-	if len(navigable.bindings) > 0 {
-		printf(" Navigable: %p", n.navigable)
-		for name, bindings := range navigable.bindings {
+	nav := n.navigable
+	if len(nav.bindings) > 0 {
+		printf(" Navigable: %p %q", nav, nav.name)
+		for name, bindings := range nav.bindings {
 			printf("  %s: %p", name, bindings)
 		}
 	}
@@ -529,9 +544,11 @@ func (n *astNode) dump(depth int) {
 // A navigableBindings groups together nodes. The zero value is ready
 // for use.
 type navigableBindings struct {
+	parent            *navigableBindings
 	bindings          map[string]*navigableBindings
 	ellipses          []*navigableBindings
 	contributingNodes []*astNode
+	name              string
 }
 
 // addRange records that the astNode covers the range from the node's
@@ -628,7 +645,8 @@ func (n *astNode) eval() {
 				// ImportSpec, we lookup the package imported, ensure the
 				// package declarations have been processed, and add a
 				// resolution to them.
-				str, err := strconv.Unquote(node.Path.Value)
+				path := node.Path
+				str, err := strconv.Unquote(path.Value)
 				if err != nil {
 					continue
 				}
@@ -644,7 +662,7 @@ func (n *astNode) eval() {
 				for _, child := range dfns.pkgNode.allChildren {
 					child.eval()
 				}
-				n.dfns.addResolution(node.Path.Pos(), len(str)+2, []*navigableBindings{dfns.pkgDecls})
+				n.dfns.addResolution(path.Pos(), path.End(), []*navigableBindings{dfns.pkgDecls})
 			}
 
 		case *ast.StructLit:
@@ -662,7 +680,7 @@ func (n *astNode) eval() {
 				// immediately be converted into bindings via the
 				// *ast.Field case below.
 				unprocessed = append(unprocessed, &ast.Field{
-					Label:    &ast.Ident{NamePos: elt.Pos(), Name: fmt.Sprint(i)},
+					Label:    &ast.Ident{NamePos: elt.Pos(), Name: "__" + fmt.Sprint(i)},
 					TokenPos: elt.Pos(),
 					Token:    token.COLON,
 					Value:    elt,
@@ -706,7 +724,7 @@ func (n *astNode) eval() {
 			resolvable = append(resolvable, node.Fun)
 			resolvable = append(resolvable, node.Args...)
 
-		case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr:
+		case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr, *RangeWrappedExpr:
 			embeddedResolvable = append(embeddedResolvable, node.(ast.Expr))
 
 		case *ast.Comprehension:
@@ -830,29 +848,42 @@ func (n *astNode) eval() {
 // & y`.
 func (n *astNode) resolve(e ast.Expr) []*navigableBindings {
 	switch e := e.(type) {
+	case *RangeWrappedExpr:
+		var names []string
+		ancestor := n.parent.navigable
+		for ; ancestor != nil && ancestor.name != ""; ancestor = ancestor.parent {
+			names = append(names, ancestor.name)
+		}
+		if ancestor == nil || len(names) == 0 {
+			return nil
+		}
+		slices.Reverse(names)
+		navs := []*navigableBindings{ancestor}
+		for _, name := range names {
+			navs = navigateBindingsByName(navs, name)
+		}
+		n.dfns.addResolution(e.Pos(), e.End(), navs)
+		return navs
+
 	case *ast.Ident:
 		root := n.resolvePathRoot(e.Name)
 		if root == nil {
 			return nil
 		}
-		nav := []*navigableBindings{root}
-		n.dfns.addResolution(e.NamePos, len(e.Name), nav)
-		return nav
+		navs := []*navigableBindings{root}
+		n.dfns.addResolution(e.Pos(), e.End(), navs)
+		return navs
 
 	case *ast.SelectorExpr:
 		resolved := n.resolve(e.X)
-		name, isIdent, err := ast.LabelName(e.Sel)
+		sel := e.Sel
+		name, _, err := ast.LabelName(sel)
 		if err != nil {
 			return nil
 		}
 
 		results := navigateBindingsByName(resolved, name)
-		nameLen := len(name)
-		if !isIdent {
-			// If it's not an ident, then it is quoted.
-			nameLen += 2
-		}
-		n.dfns.addResolution(e.Sel.Pos(), nameLen, results)
+		n.dfns.addResolution(sel.Pos(), sel.End(), results)
 		return results
 
 	case *ast.IndexExpr:
@@ -864,7 +895,7 @@ func (n *astNode) resolve(e ast.Expr) []*navigableBindings {
 			n.resolve(e.Index)
 			return nil
 		}
-		name := lit.Value
+		name := "__" + lit.Value
 		if lit.Kind != token.INT {
 			var err error
 			name, _, err = ast.LabelName(lit)
@@ -874,8 +905,7 @@ func (n *astNode) resolve(e ast.Expr) []*navigableBindings {
 		}
 
 		results := navigateBindingsByName(resolved, name)
-		spanLen := e.Rbrack.Offset() - e.Lbrack.Offset() + 1
-		n.dfns.addResolution(e.Lbrack, spanLen, results)
+		n.dfns.addResolution(e.Lbrack, e.Rbrack.Add(1), results)
 		return results
 
 	case *ast.StructLit, *ast.ListLit:
@@ -894,11 +924,12 @@ func (n *astNode) resolve(e ast.Expr) []*navigableBindings {
 	return nil
 }
 
-// navigateBindingsByName maximally expands the set of bindings by
-// transitively traversing resolvesTo fields of their contributing
-// nodes. Every navigable binding within this expanded set is then
-// indexed by the name, and the accumulated results returned.
-func navigateBindingsByName(navigables []*navigableBindings, name string) []*navigableBindings {
+// expandNavigables maximally expands the provided set of navigables:
+// transitively inspecting all the astNodes that contribute to each
+// navigable, evaluating them and their resolvesTo navigables. This
+// expands a set of navigables to every navigable that can be reached
+// (transitively) via embedding.
+func expandNavigables(navigables []*navigableBindings) map[*navigableBindings]struct{} {
 	if len(navigables) == 0 {
 		return nil
 	}
@@ -932,6 +963,14 @@ func navigateBindingsByName(navigables []*navigableBindings, name string) []*nav
 			}
 		}
 	}
+	return navigableSet
+}
+
+// navigateBindingsByName maximally expands the set of bindings, and
+// indexes every member of the expanded set by the name, and the
+// accumulated results returned.
+func navigateBindingsByName(navigables []*navigableBindings, name string) []*navigableBindings {
+	navigableSet := expandNavigables(navigables)
 
 	var results []*navigableBindings
 	for navigable := range navigableSet {
@@ -954,18 +993,18 @@ func navigateBindingsByName(navigables []*navigableBindings, name string) []*nav
 func (n *astNode) resolvePathRoot(name string) *navigableBindings {
 	for ; n != nil; n = n.parent {
 		if bindings, found := n.bindings[name]; found {
+			nav := bindings[0].navigable
 			if len(bindings) == 1 {
-				binding := bindings[0]
-				if binding.name == "" {
+				if nav.name == "" {
 					// name has been resolved to an alias (or comprehension
 					// binding, dynamic field, pattern etc). Crucially, it
 					// doesn't have a "navigable" name.
-					return binding.navigable
-				} else if binding.name != name {
+					return nav
+				} else if nav.name != name {
 					// name has been resolved to an alias which had a
 					// normal ident or basiclit field name. Switch to that
 					// name.
-					return n.navigable.bindings[binding.name]
+					return n.navigable.bindings[nav.name]
 				}
 			}
 
@@ -973,19 +1012,10 @@ func (n *astNode) resolvePathRoot(name string) *navigableBindings {
 			// an ident and not a basiclit. But that ident can come from
 			// any of the (potentially many) matching bindings!
 			identFound := false
-			var nav *navigableBindings
 			for _, binding := range bindings {
-				if nav == nil {
-					nav = binding.navigable
-				} else if nav != binding.navigable {
-					// Invariant: all bindings associated with the same
-					// name within an astNode must share the same navigable
-					// bindings. This should be guaranteed by construction,
-					// but we test it here just in case.
-					panic(fmt.Sprintf("Different navigable bindings for name: %q", name))
-				}
 				if _, ok := binding.key.(*ast.Ident); ok {
 					identFound = true
+					break
 				}
 			}
 			if !identFound {
@@ -1012,7 +1042,7 @@ func (n *astNode) isFileNode() bool {
 // ensureNavigableBinding creates and returns a new [astNode],
 // locating and using the appropriate shared [navigableBindings] for
 // the given name. The new node is stored in the node's bindings.
-func (n *astNode) ensureNavigableBinding(name string, key ast.Node, unprocessed ast.Node) *astNode {
+func (n *astNode) ensureNavigableBinding(name string, key ast.Label, unprocessed ast.Node) *astNode {
 	// Search via our own shared navigable bindings. This is a
 	// criticial step that ensures that we continue to correctly share
 	// navigableBindings even as astNodes diverge. For example:
@@ -1033,15 +1063,25 @@ func (n *astNode) ensureNavigableBinding(name string, key ast.Node, unprocessed 
 		n.navigable.bindings = bindings
 	}
 
-	// Search for the navigable for the new binding.
-	navigable, found := bindings[name]
-	binding := n.newAstNode(key, unprocessed, navigable)
-	binding.name = name
+	// Search for the nav for the new binding.
+	nav, found := bindings[name]
+	binding := n.newAstNode(key, unprocessed, nav)
+
+	if !strings.HasPrefix(name, "__") {
+		expr := &RangeWrappedExpr{
+			Expr:     ast.NewIdent(name),
+			position: key,
+		}
+		binding.newAstNode(key, expr, nil)
+	}
 
 	if !found {
 		// If the new binding has a new navigable, store it in our
 		// bindings, under name.
+		binding.navigable.name = name
 		bindings[name] = binding.navigable
+	} else if name != binding.navigable.name {
+		panic(fmt.Sprintf("Navigable name is %q but it should be %q", binding.navigable.name, name))
 	}
 	n.appendBinding(name, binding)
 
@@ -1063,4 +1103,19 @@ func (n *astNode) appendBinding(name string, binding *astNode) {
 		n.bindings = make(map[string][]*astNode)
 	}
 	n.bindings[name] = append(n.bindings[name], binding)
+}
+
+type RangeWrappedExpr struct {
+	ast.Expr
+	position ast.Node
+}
+
+var _ ast.Node = (*RangeWrappedExpr)(nil)
+
+func (w *RangeWrappedExpr) Pos() token.Pos {
+	return w.position.Pos()
+}
+
+func (w *RangeWrappedExpr) End() token.Pos {
+	return w.position.End()
 }

@@ -41,6 +41,13 @@ a: b: 6
 			expectations: map[*position][]*position{
 				ln(1, 1, "a"): {ln(2, 1, "a"), ln(3, 1, "a")},
 				ln(1, 1, "b"): {ln(2, 1, "b"), ln(3, 1, "b")},
+
+				ln(1, 1, "x"): {self},
+				ln(1, 1, "y"): {self},
+				ln(2, 1, "a"): {self, ln(3, 1, "a")},
+				ln(2, 1, "b"): {self, ln(3, 1, "b")},
+				ln(3, 1, "a"): {self, ln(2, 1, "a")},
+				ln(3, 1, "b"): {self, ln(2, 1, "b")},
 			},
 		},
 		{
@@ -55,6 +62,15 @@ w: a: b: 6
 			expectations: map[*position][]*position{
 				ln(2, 1, "a"): {ln(3, 1, "a"), ln(5, 1, "a")},
 				ln(2, 1, "b"): {ln(3, 1, "b"), ln(5, 1, "b")},
+
+				ln(1, 1, "w"): {self, ln(5, 1, "w")},
+				ln(2, 1, "x"): {self},
+				ln(2, 1, "y"): {self},
+				ln(3, 1, "a"): {self, ln(5, 1, "a")},
+				ln(3, 1, "b"): {self, ln(5, 1, "b")},
+				ln(5, 1, "a"): {self, ln(3, 1, "a")},
+				ln(5, 1, "b"): {self, ln(3, 1, "b")},
+				ln(5, 1, "w"): {self, ln(1, 1, "w")},
 			},
 		},
 		{
@@ -75,6 +91,16 @@ out2: z.f
 				ln(6, 1, "z"):  {ln(5, 1, "z")},
 				ln(7, 1, "z"):  {ln(5, 1, "z")},
 				ln(7, 1, "f"):  {ln(1, 1, "f"), ln(2, 1, "f")},
+
+				ln(1, 1, "x1"):   {self},
+				ln(1, 1, "f"):    {self},
+				ln(2, 1, "x2"):   {self},
+				ln(2, 1, "f"):    {self},
+				ln(3, 1, "y"):    {self, ln(4, 1, "y")},
+				ln(4, 1, "y"):    {self, ln(3, 1, "y")},
+				ln(5, 1, "z"):    {self},
+				ln(6, 1, "out1"): {self},
+				ln(7, 1, "out2"): {self},
 			},
 		},
 
@@ -95,6 +121,15 @@ out2: z.f
 				ln(5, 1, "z"):  {ln(4, 1, "z")},
 				ln(6, 1, "z"):  {ln(4, 1, "z")},
 				ln(6, 1, "f"):  {ln(1, 1, "f"), ln(2, 1, "f")},
+
+				ln(1, 1, "x1"):   {self},
+				ln(1, 1, "f"):    {self},
+				ln(2, 1, "x2"):   {self},
+				ln(2, 1, "f"):    {self},
+				ln(3, 1, "y"):    {self},
+				ln(4, 1, "z"):    {self},
+				ln(5, 1, "out1"): {self},
+				ln(6, 1, "out2"): {self},
 			},
 		},
 
@@ -110,6 +145,13 @@ q: o.z
 				ln(2, 1, "y"): {ln(1, 1, "y")},
 				ln(3, 1, "o"): {ln(2, 1, "o")},
 				ln(3, 1, "z"): {ln(1, 1, "z")},
+
+				ln(1, 1, "x"): {self},
+				ln(1, 1, "y"): {self},
+				ln(1, 1, "z"): {self},
+				ln(2, 1, "o"): {self},
+				ln(2, 1, "p"): {self},
+				ln(3, 1, "q"): {self},
 			},
 		},
 
@@ -123,6 +165,13 @@ a: b: 5
 			expectations: map[*position][]*position{
 				ln(1, 1, "a"): {ln(2, 1, "a"), ln(3, 1, `"a"`)},
 				ln(1, 1, "b"): {ln(2, 1, "b"), ln(3, 1, "b")},
+
+				ln(1, 1, "x"):   {self},
+				ln(1, 1, "y"):   {self},
+				ln(2, 1, "a"):   {self, ln(3, 1, `"a"`)},
+				ln(2, 1, "b"):   {self, ln(3, 1, "b")},
+				ln(3, 1, `"a"`): {self, ln(2, 1, "a")},
+				ln(3, 1, "b"):   {self, ln(2, 1, "b")},
 			},
 		},
 
@@ -135,6 +184,12 @@ y: x[1].b`,
 				ln(2, 1, "x"):   {ln(1, 1, "x")},
 				ln(2, 1, "[1]"): {ln(1, 2, "{")},
 				ln(2, 1, "b"):   {ln(1, 1, "b")},
+
+				ln(1, 1, "x"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+
+				ln(2, 1, "y"): {self},
 			},
 		},
 
@@ -147,6 +202,13 @@ y: x[17].a`,
 				ln(2, 1, "x"):    {ln(1, 1, "x")},
 				ln(2, 1, "[17]"): {ln(1, 1, "...")},
 				ln(2, 1, "a"):    {ln(1, 2, "a")},
+
+				ln(1, 1, "x"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 2, "a"): {self},
+
+				ln(2, 1, "y"): {self},
 			},
 		},
 
@@ -161,6 +223,15 @@ z: a: 4`,
 				ln(2, 1, "x"):    {ln(1, 1, "x")},
 				ln(2, 1, "[17]"): {ln(1, 1, "...")},
 				ln(2, 1, "a"):    {ln(3, 1, "a")},
+
+				ln(1, 1, "x"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+
+				ln(2, 1, "y"): {self},
+
+				ln(3, 1, "z"): {self},
+				ln(3, 1, "a"): {self},
 			},
 		},
 
@@ -183,6 +254,20 @@ q: o[3].a`,
 				ln(6, 1, "o"):   {ln(4, 1, "o")},
 				ln(6, 1, "[3]"): {ln(1, 1, "..."), ln(2, 1, "...")},
 				ln(6, 1, "a"):   {ln(1, 2, "a"), ln(3, 1, "a")},
+
+				ln(1, 1, "x"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 2, "a"): {self},
+
+				ln(2, 1, "y"): {self},
+
+				ln(3, 1, "z"): {self},
+				ln(3, 1, "a"): {self},
+
+				ln(4, 1, "o"): {self},
+				ln(5, 1, "p"): {self},
+				ln(6, 1, "q"): {self},
 			},
 		},
 
@@ -199,6 +284,17 @@ d: c.b.x`,
 				ln(3, 1, "c"): {ln(1, 1, "c")},
 				ln(3, 1, "b"): {ln(1, 1, `"b"`), ln(1, 3, "b")},
 				ln(3, 1, "x"): {ln(1, 1, "x"), ln(1, 2, "x")},
+
+				ln(1, 1, "a"):   {self},
+				ln(1, 1, "c"):   {self},
+				ln(1, 1, "x"):   {self, ln(1, 2, "x")},
+				ln(1, 1, "z"):   {self},
+				ln(1, 1, `"b"`): {self, ln(1, 3, "b")},
+				ln(1, 2, "x"):   {self, ln(1, 1, "x")},
+				ln(1, 3, "b"):   {self, ln(1, 1, `"b"`)},
+
+				ln(2, 1, "b"): {self},
+				ln(3, 1, "d"): {self},
 			},
 		},
 		{
@@ -214,6 +310,12 @@ b: {
 			expectations: map[*position][]*position{
 				ln(4, 1, "b"): {ln(1, 1, "b")},
 				ln(4, 1, "a"): {ln(2, 1, "a")},
+
+				ln(1, 1, "b"):   {self},
+				ln(2, 1, "a"):   {self},
+				ln(3, 1, `"b"`): {self},
+				ln(4, 1, "c"):   {self},
+				ln(5, 1, "a"):   {self},
 			},
 		},
 		{
@@ -230,6 +332,13 @@ b: {
 			expectations: map[*position][]*position{
 				ln(4, 1, "b"): {ln(3, 1, `"b"`), ln(7, 1, "b")},
 				ln(4, 1, "a"): {ln(5, 1, "a")},
+
+				ln(1, 1, "b"):   {self},
+				ln(2, 1, "a"):   {self},
+				ln(3, 1, `"b"`): {self, ln(7, 1, "b")},
+				ln(4, 1, "c"):   {self},
+				ln(5, 1, "a"):   {self},
+				ln(7, 1, "b"):   {self, ln(3, 1, `"b"`)},
 			},
 		},
 		{
@@ -246,6 +355,15 @@ b: b: _`,
 			expectations: map[*position][]*position{
 				ln(4, 1, "b"): {ln(1, 1, "b"), ln(8, 1, "b")},
 				ln(4, 1, "a"): {ln(2, 1, "a")},
+
+				ln(1, 1, "b"):   {self, ln(8, 1, "b")},
+				ln(2, 1, "a"):   {self},
+				ln(3, 1, `"b"`): {self, ln(8, 2, "b")},
+				ln(4, 1, "c"):   {self},
+				ln(5, 1, "a"):   {self},
+
+				ln(8, 1, "b"): {self, ln(1, 1, "b")},
+				ln(8, 2, "b"): {self, ln(3, 1, `"b"`)},
 			},
 		},
 
@@ -257,6 +375,11 @@ a: {in: {x: 5}, out: in}.out.x`,
 				ln(1, 2, "in"):  {ln(1, 1, "in")},
 				ln(1, 2, "out"): {ln(1, 1, "out")},
 				ln(1, 2, "x"):   {ln(1, 1, "x")},
+
+				ln(1, 1, "a"):   {self},
+				ln(1, 1, "in"):  {self},
+				ln(1, 1, "x"):   {self},
+				ln(1, 1, "out"): {self},
 			},
 		},
 		{
@@ -267,6 +390,9 @@ a: [7, {b: 3}, true][1].b`,
 			expectations: map[*position][]*position{
 				ln(1, 1, "[1]"): {ln(1, 1, "{")},
 				ln(1, 2, "b"):   {ln(1, 1, "b")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
 			},
 		},
 		{
@@ -281,6 +407,11 @@ n: 1
 				ln(1, 1, "n"): {ln(2, 1, "n")},
 				ln(1, 1, "]"): {},
 				ln(1, 2, "b"): {},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+
+				ln(2, 1, "n"): {self},
 			},
 		},
 		{
@@ -292,6 +423,12 @@ y: x["a b"].z`,
 				ln(2, 1, "x"):       {ln(1, 1, "x")},
 				ln(2, 1, `["a b"]`): {ln(1, 1, `"a b"`)},
 				ln(2, 1, "z"):       {ln(1, 1, "z")},
+
+				ln(1, 1, "x"):     {self},
+				ln(1, 1, `"a b"`): {self},
+				ln(1, 1, "z"):     {self},
+
+				ln(2, 1, "y"): {self},
 			},
 		},
 		{
@@ -301,6 +438,11 @@ a: ({b: c, c: 3} | {c: 4}).c`,
 			expectations: map[*position][]*position{
 				ln(1, 1, "c"): {ln(1, 2, "c")},
 				ln(1, 4, "c"): {ln(1, 2, "c"), ln(1, 3, "c")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 2, "c"): {self},
+				ln(1, 3, "c"): {self},
 			},
 		},
 
@@ -312,6 +454,9 @@ b: a`,
 			expectations: map[*position][]*position{
 				ln(1, 1, "b"): {ln(2, 1, "b")},
 				ln(2, 1, "a"): {ln(1, 1, "a")},
+
+				ln(1, 1, "a"): {self},
+				ln(2, 1, "b"): {self},
 			},
 		},
 		{
@@ -324,6 +469,10 @@ c: a`,
 				ln(1, 1, "b"): {ln(2, 1, "b")},
 				ln(2, 1, "c"): {ln(3, 1, "c")},
 				ln(3, 1, "a"): {ln(1, 1, "a")},
+
+				ln(1, 1, "a"): {self},
+				ln(2, 1, "b"): {self},
+				ln(3, 1, "c"): {self},
 			},
 		},
 		// These "structural" cycles are errors in the evaluator. But
@@ -334,6 +483,10 @@ c: a`,
 a: b: c: a`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "a"): {ln(1, 1, "a")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
 			},
 		},
 		{
@@ -343,6 +496,10 @@ a: b: c: a.b`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "a"): {ln(1, 1, "a")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
 			},
 		},
 		{
@@ -356,6 +513,14 @@ x: c: x
 				ln(1, 2, "y"): {ln(1, 1, "y")},
 				ln(2, 1, "y"): {ln(1, 1, "y")},
 				ln(3, 2, "x"): {ln(2, 1, "x"), ln(3, 1, "x")},
+
+				ln(1, 1, "y"): {self},
+				ln(1, 1, "b"): {self},
+
+				ln(2, 1, "x"): {self, ln(3, 1, "x")},
+
+				ln(3, 1, "x"): {self, ln(2, 1, "x")},
+				ln(3, 1, "c"): {self},
 			},
 		},
 
@@ -366,6 +531,10 @@ l=a: {b: 3, c: l.b}`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "a")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
 			},
 		},
 		{
@@ -376,6 +545,12 @@ a: c: l.b`,
 			expectations: map[*position][]*position{
 				ln(2, 1, "l"): {ln(1, 1, "a"), ln(2, 1, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
+
+				ln(1, 1, "a"): {self, ln(2, 1, "a")},
+				ln(1, 1, "b"): {self},
+
+				ln(2, 1, "a"): {self, ln(1, 1, "a")},
+				ln(2, 1, "c"): {self},
 			},
 		},
 		{
@@ -386,6 +561,12 @@ l=a: c: l.b`,
 			expectations: map[*position][]*position{
 				ln(2, 2, "l"): {ln(1, 1, "a"), ln(2, 1, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
+
+				ln(1, 1, "a"): {self, ln(2, 1, "a")},
+				ln(1, 1, "b"): {self},
+
+				ln(2, 1, "a"): {self, ln(1, 1, "a")},
+				ln(2, 1, "c"): {self},
 			},
 		},
 		{
@@ -396,6 +577,11 @@ c: l.b`,
 			expectations: map[*position][]*position{
 				ln(2, 1, "l"): {ln(1, 1, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+
+				ln(2, 1, "c"): {self},
 			},
 		},
 
@@ -418,6 +604,18 @@ h: a.l
 				ln(5, 1, "d"): {},
 				ln(6, 1, "a"): {ln(1, 1, "a"), ln(5, 1, "a")},
 				ln(6, 1, "l"): {},
+				ln(1, 1, "a"): {self, ln(5, 1, "a")},
+
+				ln(2, 1, "b"): {self},
+				ln(2, 1, "c"): {self},
+				ln(2, 2, "d"): {self},
+
+				ln(3, 1, "e"): {self},
+
+				ln(5, 1, "a"): {self, ln(1, 1, "a")},
+				ln(5, 1, "f"): {self},
+
+				ln(6, 1, "h"): {self},
 			},
 		},
 
@@ -428,6 +626,9 @@ l=(a): {b: 3, c: l.b}`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "(")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
+
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
 			},
 		},
 		{
@@ -441,6 +642,9 @@ l=(a): b: 3
 			expectations: map[*position][]*position{
 				ln(2, 1, "l"): {ln(1, 1, "(")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
+
+				ln(1, 1, "b"): {self},
+				ln(2, 1, "c"): {self},
 			},
 		},
 		{
@@ -454,6 +658,9 @@ l=(a): c: l.b`,
 			expectations: map[*position][]*position{
 				ln(2, 2, "l"): {ln(2, 1, "(")},
 				ln(2, 1, "b"): {},
+
+				ln(1, 1, "b"): {self},
+				ln(2, 1, "c"): {self},
 			},
 		},
 		{
@@ -464,6 +671,9 @@ c: l.b`,
 			expectations: map[*position][]*position{
 				ln(2, 1, "l"): {ln(1, 1, ("("))},
 				ln(2, 1, "b"): {ln(1, 1, ("b"))},
+
+				ln(1, 1, "b"): {self},
+				ln(2, 1, "c"): {self},
 			},
 		},
 
@@ -474,6 +684,9 @@ l=[a]: {b: 3, c: l.b}`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "[")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
+
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
 			},
 		},
 		{
@@ -489,6 +702,9 @@ l=[a]: b: 3
 			expectations: map[*position][]*position{
 				ln(2, 1, "l"): {},
 				ln(2, 1, "b"): {},
+
+				ln(1, 1, "b"): {self},
+				ln(2, 1, "c"): {self},
 			},
 		},
 		{
@@ -501,6 +717,9 @@ l=[a]: c: l.b`,
 			expectations: map[*position][]*position{
 				ln(2, 2, "l"): {ln(2, 1, "[")},
 				ln(2, 1, "b"): {},
+
+				ln(1, 1, "b"): {self},
+				ln(2, 1, "c"): {self},
 			},
 		},
 		{
@@ -513,6 +732,9 @@ c: l.b`,
 			expectations: map[*position][]*position{
 				ln(2, 1, "l"): {},
 				ln(2, 1, "b"): {},
+
+				ln(1, 1, "b"): {self},
+				ln(2, 1, "c"): {self},
 			},
 		},
 
@@ -526,6 +748,10 @@ c: l.b`,
 				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 3, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {},
+
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
+				ln(1, 1, "d"): {self},
 			},
 		},
 		{
@@ -540,6 +766,9 @@ c: l.b`,
 			// resolved.
 			expectations: map[*position][]*position{
 				ln(2, 1, "l"): {},
+
+				ln(1, 1, "b"): {self},
+				ln(2, 1, "c"): {self},
 			},
 		},
 		{
@@ -551,6 +780,9 @@ c: l`,
 			// value. So the use of l.b in c does not resolve.
 			expectations: map[*position][]*position{
 				ln(2, 1, "l"): {},
+
+				ln(1, 1, "b"): {self},
+				ln(2, 1, "c"): {self},
 			},
 		},
 
@@ -561,6 +793,10 @@ a: l={b: 3, c: l.b}`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
 			},
 		},
 		{
@@ -570,6 +806,10 @@ a: l={b: 3} & {c: l.b}`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
 			},
 		},
 		{
@@ -581,6 +821,10 @@ a: l=({b: 3} & {c: l.b})`,
 			expectations: map[*position][]*position{
 				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
 			},
 		},
 		{
@@ -592,6 +836,11 @@ c: l.b`,
 			expectations: map[*position][]*position{
 				ln(2, 1, "l"): {},
 				ln(2, 1, "b"): {},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+
+				ln(2, 1, "c"): {self},
 			},
 		},
 
@@ -608,6 +857,16 @@ p: d.c
 				ln(2, 1, "b"): {ln(1, 1, "b"), ln(1, 2, "b")},
 				ln(3, 1, "d"): {ln(1, 1, "d")},
 				ln(3, 1, "c"): {ln(1, 1, "c")},
+
+				ln(1, 1, "d"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 2, "a"): {self},
+				ln(1, 2, "b"): {self},
+				ln(1, 1, "c"): {self},
+
+				ln(2, 1, "o"): {self},
+				ln(3, 1, "p"): {self},
 			},
 		},
 		{
@@ -623,6 +882,16 @@ p: d.c
 				ln(2, 1, "b"): {ln(1, 1, "b"), ln(1, 2, "b")},
 				ln(3, 1, "d"): {ln(1, 1, "d")},
 				ln(3, 1, "c"): {ln(1, 1, "c")},
+
+				ln(1, 1, "d"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 2, "a"): {self},
+				ln(1, 2, "b"): {self},
+				ln(1, 1, "c"): {self},
+
+				ln(2, 1, "o"): {self},
+				ln(3, 1, "p"): {self},
 			},
 		},
 		{
@@ -636,6 +905,16 @@ o: (d1 & d2).a
 				ln(3, 1, "d1"): {ln(1, 1, "d1")},
 				ln(3, 1, "d2"): {ln(2, 1, "d2")},
 				ln(3, 1, "a"):  {ln(1, 1, "a"), ln(1, 2, "a"), ln(2, 1, "a"), ln(2, 2, "a")},
+
+				ln(1, 1, "d1"): {self},
+				ln(1, 1, "a"):  {self},
+				ln(1, 2, "a"):  {self},
+
+				ln(2, 1, "d2"): {self},
+				ln(2, 1, "a"):  {self},
+				ln(2, 2, "a"):  {self},
+
+				ln(3, 1, "o"): {self},
 			},
 		},
 		{
@@ -649,6 +928,14 @@ out: r.x
 				ln(2, 1, "d"): {ln(1, 1, "d")},
 				ln(3, 1, "r"): {ln(2, 1, "r")},
 				ln(3, 1, "x"): {ln(1, 1, "x"), ln(2, 1, "x")},
+
+				ln(1, 1, "d"): {self},
+				ln(1, 1, "x"): {self}, // note non-symmetric!
+
+				ln(2, 1, "r"): {self},
+				ln(2, 1, "x"): {self, ln(1, 1, "x")},
+
+				ln(3, 1, "out"): {self},
 			},
 		},
 		{
@@ -662,6 +949,13 @@ d: c.b
 				ln(1, 1, "b"): {ln(2, 1, "b")},
 				ln(3, 1, "c"): {ln(1, 1, "c")},
 				ln(3, 1, "b"): {ln(1, 2, "b")},
+
+				ln(1, 1, "c"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 2, "b"): {self},
+
+				ln(2, 1, "b"): {self},
+				ln(3, 1, "d"): {self},
 			},
 		},
 		{
@@ -674,6 +968,13 @@ c: a
 				ln(1, 1, "c"): {ln(2, 1, "c")},
 				ln(1, 1, "d"): {ln(1, 2, "d"), ln(1, 3, "d")},
 				ln(2, 1, "a"): {ln(1, 1, "a")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 2, "d"): {self},
+				ln(1, 3, "d"): {self},
+
+				ln(2, 1, "c"): {self},
 			},
 		},
 
@@ -688,6 +989,13 @@ d: c.b
 				ln(1, 1, "b"): {ln(2, 1, "b")},
 				ln(3, 1, "c"): {ln(1, 1, "c")},
 				ln(3, 1, "b"): {ln(1, 2, "b")},
+
+				ln(1, 1, "c"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 2, "b"): {self},
+
+				ln(2, 1, "b"): {self},
+				ln(3, 1, "d"): {self},
 			},
 		},
 		{
@@ -704,6 +1012,15 @@ y: x.a`,
 				ln(2, 2, "a"): {ln(2, 1, "a"), ln(3, 1, "a"), ln(5, 1, "a")},
 				ln(7, 1, "x"): {ln(1, 1, "x")},
 				ln(7, 1, "a"): {ln(2, 1, "a"), ln(3, 1, "a"), ln(5, 1, "a")},
+
+				ln(1, 1, "x"): {self},
+
+				ln(2, 1, "a"): {self, ln(3, 1, "a"), ln(5, 1, "a")},
+				ln(2, 1, "b"): {self},
+
+				ln(3, 1, "a"): {self, ln(2, 1, "a"), ln(5, 1, "a")},
+				ln(5, 1, "a"): {self, ln(2, 1, "a"), ln(3, 1, "a")},
+				ln(7, 1, "y"): {self},
 			},
 		},
 		{
@@ -719,6 +1036,17 @@ d: c.b.x`,
 				ln(3, 1, "c"): {ln(1, 1, "c")},
 				ln(3, 1, "b"): {ln(1, 2, "b"), ln(1, 3, "b")},
 				ln(3, 1, "x"): {ln(1, 1, "x"), ln(1, 2, "x")},
+
+				ln(1, 1, "c"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 2, "b"): {self, ln(1, 3, "b")},
+				ln(1, 1, "x"): {self, ln(1, 2, "x")},
+				ln(1, 3, "b"): {self, ln(1, 2, "b")},
+				ln(1, 2, "x"): {self, ln(1, 1, "x")},
+				ln(1, 1, "z"): {self},
+
+				ln(2, 1, "b"): {self},
+				ln(3, 1, "d"): {self},
 			},
 		},
 
@@ -734,6 +1062,9 @@ y: "wand"
 				ln(3, 1, "magic"):  {ln(1, 1, `"magic"`)},
 				ln(3, 1, "Merlin"): {},
 				ln(3, 1, "y"):      {ln(4, 1, "y")},
+
+				ln(3, 1, "x"): {self},
+				ln(4, 1, "y"): {self},
 			},
 		},
 		{
@@ -746,6 +1077,7 @@ x: wand.foo
 			expectations: map[*position][]*position{
 				ln(3, 1, "wand"): {ln(1, 1, "wand")},
 				ln(3, 1, "foo"):  {},
+				ln(3, 1, "x"):    {self},
 			},
 		},
 
@@ -762,6 +1094,12 @@ d: "4+\(a) > 0?\(b.x)"
 				ln(4, 1, "a"): {ln(1, 1, "a")},
 				ln(4, 1, "b"): {ln(2, 1, "b")},
 				ln(4, 1, "x"): {ln(3, 1, "x")},
+
+				ln(1, 1, "a"): {self},
+				ln(2, 1, "b"): {self},
+				ln(3, 1, "c"): {self},
+				ln(3, 1, "x"): {self},
+				ln(4, 1, "d"): {self},
 			},
 		},
 		{
@@ -772,6 +1110,8 @@ a: 5
 `,
 			expectations: map[*position][]*position{
 				ln(2, 1, "a"): {ln(1, 1, "a")},
+
+				ln(1, 1, "a"): {self},
 			},
 		},
 
@@ -783,6 +1123,9 @@ y: "sticks"
 `,
 			expectations: map[*position][]*position{
 				ln(1, 1, "y"): {ln(2, 1, "y")},
+
+				ln(1, 1, "x"): {self},
+				ln(2, 1, "y"): {self},
 			},
 		},
 		{
@@ -794,6 +1137,11 @@ y: x["💩"]
 			expectations: map[*position][]*position{
 				ln(2, 1, "x"):     {ln(1, 1, "x")},
 				ln(2, 1, `["💩"]`): {ln(1, 1, `"💩"`)},
+
+				ln(1, 1, "x"):   {self},
+				ln(1, 1, `"💩"`): {self},
+
+				ln(2, 1, "y"): {self},
 			},
 		},
 		{
@@ -805,6 +1153,11 @@ y: x."💩"
 			expectations: map[*position][]*position{
 				ln(2, 1, "x"):   {ln(1, 1, "x")},
 				ln(2, 1, `"💩"`): {ln(1, 1, `"💩"`)},
+
+				ln(1, 1, "x"):   {self},
+				ln(1, 1, `"💩"`): {self},
+
+				ln(2, 1, "y"): {self},
 			},
 		},
 
@@ -827,6 +1180,13 @@ y: x.c`,
 				ln(7, 1, "c"): {ln(5, 1, "c")},
 				ln(9, 1, "x"): {ln(3, 1, "x")},
 				ln(9, 1, "c"): {ln(5, 1, "c")},
+
+				ln(1, 1, "a"): {self},
+				ln(2, 1, "b"): {self},
+				ln(3, 1, "x"): {self},
+				ln(5, 1, "c"): {self},
+				ln(7, 1, "z"): {self},
+				ln(9, 1, "y"): {self},
 			},
 		},
 		{
@@ -841,6 +1201,12 @@ y: x.c
 				ln(2, 1, "b"): {ln(1, 1, "b")},
 				ln(3, 1, "x"): {ln(2, 1, "x")},
 				ln(3, 1, "c"): {ln(1, 1, "c")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
+
+				ln(3, 1, "y"): {self},
 			},
 		},
 		{
@@ -858,6 +1224,14 @@ o: a.b
 				ln(5, 1, "b"): {},
 				ln(6, 1, "a"): {ln(1, 1, "a"), ln(5, 1, "a")},
 				ln(6, 1, "b"): {},
+
+				ln(1, 1, "a"): {self, ln(5, 1, "a")},
+				ln(3, 1, "c"): {self},
+
+				ln(5, 1, "a"): {self, ln(1, 1, "a")},
+				ln(5, 1, "d"): {self},
+
+				ln(6, 1, "o"): {self},
 			},
 		},
 		{
@@ -887,6 +1261,21 @@ r: o.k
 				ln(9, 1, "p"):  {ln(6, 1, "p")},
 				ln(10, 1, "o"): {ln(3, 1, "o")},
 				ln(10, 1, "k"): {},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "x"): {self},
+				ln(1, 1, "y"): {self},
+				ln(1, 1, "z"): {self},
+
+				ln(2, 1, "b"): {self},
+				ln(2, 1, "x"): {self},
+				ln(2, 1, "y"): {self},
+				ln(2, 1, "z"): {self},
+
+				ln(3, 1, "o"):  {self},
+				ln(6, 1, "p"):  {self},
+				ln(9, 1, "q"):  {self},
+				ln(10, 1, "r"): {self},
 			},
 		},
 		{
@@ -897,6 +1286,9 @@ foo: bar: "baz"`,
 			expectations: map[*position][]*position{
 				ln(1, 1, "foo"): {ln(2, 1, "foo")},
 				ln(1, 1, "bar"): {ln(2, 1, "bar")},
+
+				ln(2, 1, "foo"): {self},
+				ln(2, 1, "bar"): {self},
 			},
 		},
 
@@ -913,6 +1305,9 @@ bar: foo
 `,
 			expectations: map[*position][]*position{
 				fln("b.cue", 3, 1, "foo"): {fln("a.cue", 3, 1, "foo")},
+
+				fln("a.cue", 3, 1, "foo"): {self},
+				fln("b.cue", 3, 1, "bar"): {self},
 			},
 		},
 		{
@@ -933,6 +1328,12 @@ foo: _
 `,
 			expectations: map[*position][]*position{
 				fln("c.cue", 3, 1, "foo"): {fln("a.cue", 3, 1, "foo"), fln("b.cue", 3, 1, "foo"), fln("c.cue", 4, 1, "foo")},
+
+				fln("a.cue", 3, 1, "foo"): {self, fln("b.cue", 3, 1, "foo"), fln("c.cue", 4, 1, "foo")},
+				fln("b.cue", 3, 1, "foo"): {self, fln("a.cue", 3, 1, "foo"), fln("c.cue", 4, 1, "foo")},
+
+				fln("c.cue", 3, 1, "bar"): {self},
+				fln("c.cue", 4, 1, "foo"): {self, fln("a.cue", 3, 1, "foo"), fln("b.cue", 3, 1, "foo")},
 			},
 		},
 		{
@@ -949,6 +1350,13 @@ foo: {qux: bar}
 			expectations: map[*position][]*position{
 				fln("a.cue", 3, 2, "bar"): {fln("a.cue", 3, 1, "bar")},
 				fln("b.cue", 3, 1, "bar"): {},
+
+				fln("a.cue", 3, 1, "foo"): {self, fln("b.cue", 3, 1, "foo")},
+				fln("a.cue", 3, 1, "bar"): {self},
+				fln("a.cue", 3, 1, "baz"): {self},
+
+				fln("b.cue", 3, 1, "foo"): {self, fln("a.cue", 3, 1, "foo")},
+				fln("b.cue", 3, 1, "qux"): {self},
 			},
 		},
 		{
@@ -972,6 +1380,17 @@ foo: qux: foo.bar
 				fln("b.cue", 3, 1, "bar"): {},
 				fln("c.cue", 3, 2, "foo"): {fln("a.cue", 3, 1, "foo"), fln("a.cue", 4, 1, "foo"), fln("b.cue", 3, 1, "foo"), fln("c.cue", 3, 1, "foo")},
 				fln("c.cue", 3, 1, "bar"): {fln("a.cue", 3, 1, "bar")},
+
+				fln("a.cue", 3, 1, "foo"): {self, fln("a.cue", 4, 1, "foo"), fln("b.cue", 3, 1, "foo"), fln("c.cue", 3, 1, "foo")},
+				fln("a.cue", 3, 1, "bar"): {self},
+				fln("a.cue", 4, 1, "foo"): {self, fln("a.cue", 3, 1, "foo"), fln("b.cue", 3, 1, "foo"), fln("c.cue", 3, 1, "foo")},
+				fln("a.cue", 4, 1, "baz"): {self},
+
+				fln("b.cue", 3, 1, "foo"): {self, fln("a.cue", 3, 1, "foo"), fln("a.cue", 4, 1, "foo"), fln("c.cue", 3, 1, "foo")},
+				fln("b.cue", 3, 1, "qux"): {self, fln("c.cue", 3, 1, "qux")},
+
+				fln("c.cue", 3, 1, "foo"): {self, fln("a.cue", 3, 1, "foo"), fln("a.cue", 4, 1, "foo"), fln("b.cue", 3, 1, "foo")},
+				fln("c.cue", 3, 1, "qux"): {self, fln("b.cue", 3, 1, "qux")},
 			},
 		},
 		{
@@ -995,6 +1414,10 @@ s: a
 				fln("a.cue", 4, 1, "a"): {fln("a.cue", 3, 1, "a")},
 				fln("b.cue", 3, 1, "a"): {},
 				fln("c.cue", 4, 1, "a"): {fln("c.cue", 3, 1, "a")},
+
+				fln("a.cue", 4, 1, "q"): {self},
+				fln("b.cue", 3, 1, "r"): {self},
+				fln("c.cue", 4, 1, "s"): {self},
 			},
 		},
 		{
@@ -1014,6 +1437,16 @@ w: a: b: 6
 			expectations: map[*position][]*position{
 				fln("a.cue", 4, 1, "a"): {fln("a.cue", 5, 1, "a"), fln("b.cue", 3, 1, "a")},
 				fln("a.cue", 4, 1, "b"): {fln("a.cue", 5, 1, "b"), fln("b.cue", 3, 1, "b")},
+
+				fln("a.cue", 3, 1, "w"): {self, fln("b.cue", 3, 1, "w")},
+				fln("a.cue", 4, 1, "x"): {self},
+				fln("a.cue", 4, 1, "y"): {self},
+				fln("a.cue", 5, 1, "a"): {self, fln("b.cue", 3, 1, "a")},
+				fln("a.cue", 5, 1, "b"): {self, fln("b.cue", 3, 1, "b")},
+
+				fln("b.cue", 3, 1, "w"): {self, fln("a.cue", 3, 1, "w")},
+				fln("b.cue", 3, 1, "a"): {self, fln("a.cue", 5, 1, "a")},
+				fln("b.cue", 3, 1, "b"): {self, fln("a.cue", 5, 1, "b")},
 			},
 		},
 		{
@@ -1051,6 +1484,23 @@ a: {
 				fln("c.cue", 4, 1, "X"): {},
 				fln("c.cue", 4, 1, "c"): {},
 				fln("d.cue", 5, 1, "X"): {fln("d.cue", 4, 1, "f")},
+
+				fln("a.cue", 3, 1, "a"): {self, fln("b.cue", 3, 1, "a"), fln("c.cue", 3, 1, "a"), fln("d.cue", 3, 1, "a")},
+				fln("a.cue", 4, 1, "b"): {self, fln("b.cue", 4, 1, "b")},
+				fln("a.cue", 4, 1, "c"): {self, fln("b.cue", 4, 1, "c")},
+				fln("a.cue", 5, 1, "d"): {self},
+
+				fln("b.cue", 3, 1, "a"): {self, fln("a.cue", 3, 1, "a"), fln("c.cue", 3, 1, "a"), fln("d.cue", 3, 1, "a")},
+				fln("b.cue", 4, 1, "b"): {self, fln("a.cue", 4, 1, "b")},
+				fln("b.cue", 4, 1, "c"): {self, fln("a.cue", 4, 1, "c")},
+
+				fln("c.cue", 3, 1, "a"): {self, fln("a.cue", 3, 1, "a"), fln("b.cue", 3, 1, "a"), fln("d.cue", 3, 1, "a")},
+				fln("c.cue", 4, 1, "e"): {self},
+
+				fln("d.cue", 3, 1, "a"): {self, fln("a.cue", 3, 1, "a"), fln("b.cue", 3, 1, "a"), fln("c.cue", 3, 1, "a")},
+				fln("d.cue", 4, 1, "f"): {self},
+				fln("d.cue", 4, 1, "c"): {self},
+				fln("d.cue", 5, 1, "g"): {self},
 			},
 		},
 
@@ -1075,6 +1525,41 @@ package a
 				fln("b.cue", 5, 1, "a"):   {fln("b.cue", 3, 1, `"a"`)},
 				fln("b.cue", 6, 1, "y"):   {fln("b.cue", 5, 1, "y")},
 				fln("b.cue", 6, 1, "x"):   {fln("a.cue", 3, 1, "x")},
+
+				fln("a.cue", 3, 1, "x"): {self},
+
+				fln("b.cue", 5, 1, "y"): {self},
+				fln("b.cue", 6, 1, "z"): {self},
+			},
+		},
+
+		{
+			name: "Fields",
+			archive: `-- a.cue --
+x: x: x: 3
+x: x: x: 4
+x: y
+y: x: z
+z: x: 5
+`,
+			expectations: map[*position][]*position{
+				ln(3, 1, "y"): {ln(4, 1, "y")},
+				ln(4, 1, "z"): {ln(5, 1, "z")},
+
+				ln(1, 1, "x"): {self, ln(2, 1, "x"), ln(3, 1, "x")},
+				ln(2, 1, "x"): {self, ln(1, 1, "x"), ln(3, 1, "x")},
+				ln(3, 1, "x"): {self, ln(1, 1, "x"), ln(2, 1, "x")},
+
+				ln(1, 2, "x"): {self, ln(2, 2, "x"), ln(4, 1, "x")},
+				ln(2, 2, "x"): {self, ln(1, 2, "x"), ln(4, 1, "x")},
+				ln(4, 1, "x"): {self}, // note non-symmetric!
+
+				ln(1, 3, "x"): {self, ln(2, 3, "x"), ln(5, 1, "x")},
+				ln(2, 3, "x"): {self, ln(1, 3, "x"), ln(5, 1, "x")},
+				ln(5, 1, "x"): {self}, // note non-symmetric!
+
+				ln(4, 1, "y"): {self},
+				ln(5, 1, "z"): {self},
 			},
 		},
 	}.run(t)
@@ -1115,6 +1600,9 @@ func (tcs testCases) run(t *testing.T) {
 			}
 
 			for _, pos := range allPositions {
+				if pos == self {
+					continue
+				}
 				if pos.filename == "" && len(files) == 1 {
 					pos.filename = files[0].Filename
 				}
@@ -1155,11 +1643,15 @@ func (tcs testCases) run(t *testing.T) {
 					}
 					fileOffsetsWant := make([]fileOffset, len(positionsWant))
 					for j, p := range positionsWant {
-						fileOffsetsWant[j] = p.fileOffset()
+						if p == self {
+							fileOffsetsWant[j] = posFrom.fileOffset()
+						} else {
+							fileOffsetsWant[j] = p.fileOffset()
+						}
 					}
 					slices.SortFunc(fileOffsetsGot, cmpFileOffsets)
 					slices.SortFunc(fileOffsetsWant, cmpFileOffsets)
-					qt.Assert(t, qt.DeepEquals(fileOffsetsGot, fileOffsetsWant))
+					qt.Assert(t, qt.DeepEquals(fileOffsetsGot, fileOffsetsWant), qt.Commentf("from %#v(+%d)", posFrom, i))
 				}
 			}
 
@@ -1256,3 +1748,8 @@ func (p *position) determineOffset(file *token.File) {
 	}
 	panic("Failed to determine offset")
 }
+
+// self is a convenience singleton which can be freely used in
+// expectation values to refer to that expectation's key. Typically
+// used to indicate a field's key should resolve to itself.
+var self = &position{}

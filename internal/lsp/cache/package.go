@@ -292,3 +292,69 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 	}
 	return locations
 }
+
+func (pkg *Package) Completion(uri protocol.DocumentURI, pos protocol.Position) *protocol.CompletionList {
+	dfns := pkg.definitions
+	if dfns == nil {
+		return nil
+	}
+
+	w := pkg.module.workspace
+	mappers := w.mappers
+
+	fdfns := dfns.ForFile(uri.Path())
+	if fdfns == nil {
+		w.debugLog("file not found")
+		return nil
+	}
+
+	srcMapper := mappers[fdfns.File.Pos().File()]
+	if srcMapper == nil {
+		w.debugLog("mapper not found: " + string(uri))
+		return nil
+	}
+
+	content := fdfns.File.Pos().File().Content()
+
+	// exclusive
+	/* offsetSuffixEnd */
+	_, err := srcMapper.PositionOffset(pos)
+	if err != nil {
+		w.debugLog(err.Error())
+		return nil
+	}
+	offset := 0
+	// suffix := ""
+	for pos.Character > 0 {
+		offset, err = srcMapper.PositionOffset(pos)
+		if err != nil {
+			w.debugLog(err.Error())
+			return nil
+		}
+		if offset >= 0 && offset < len(content) && content[offset] == '.' {
+			// suffix = string(content[offset+1 : offsetSuffixEnd])
+			offset -= 1
+			break
+		}
+		pos.Character--
+	}
+
+	strs := fdfns.CompletionsForOffset(offset)
+	if len(strs) == 0 {
+		return nil
+	}
+
+	fmt.Println(strs)
+
+	completions := make([]protocol.CompletionItem, len(strs))
+	for i, str := range strs {
+		completions[i] = protocol.CompletionItem{
+			Label: str,
+			Kind:  protocol.TextCompletion,
+		}
+	}
+
+	return &protocol.CompletionList{
+		Items: completions,
+	}
+}

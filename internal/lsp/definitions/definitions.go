@@ -422,6 +422,22 @@ func (fdfns *FileDefinitions) ForOffset(offset int) []ast.Node {
 	return nodes
 }
 
+func (fdfns *FileDefinitions) CompletionsForOffset(offset int) []string {
+	navigables := fdfns.evalForOffset(offset)
+	navigableSet := expandNavigables(navigables)
+
+	stringsSet := make(map[string]struct{})
+	for nav := range navigableSet {
+		for name := range nav.bindings {
+			stringsSet[name] = struct{}{}
+		}
+	}
+
+	strings := slices.Collect(maps.Keys(stringsSet))
+	slices.Sort(strings)
+	return strings
+}
+
 // evalForOffset evaluates from the pkgNode, evaluating only child
 // astNodes that contain the given file-byte-offset. It returns all
 // navigableBindings that have been found from resolving the symbol at

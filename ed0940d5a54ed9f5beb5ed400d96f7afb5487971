@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d2c8d9f_baacef30",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-12T13:30:58Z",
+      "side": 1,
+      "message": "FWIW you can also do `StringLit/Nested` which is equivalent to running as sub-tests.",
+      "revId": "ed0940d5a54ed9f5beb5ed400d96f7afb5487971",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -193,28 +193,17 @@ func (n *nodeContext) validateValue(state vertexStatus) {
 	if v != nil && IsConcrete(v) {
 		// Also check when we already have errors as we may find more
 		// serious errors and would like to know about all errors anyway.
-
-		if n.lowerBound != nil {
-			c := MakeRootConjunct(nil, n.lowerBound)
-			if b := ctx.Validate(c, v); b != nil {
-				// TODO(errors): make Validate return boolean and generate
-				// optimized conflict message. Also track and inject IDs
-				// to determine origin location.s
-				if e, _ := b.Err.(*ValueError); e != nil {
-					e.AddPosition(n.lowerBound)
-					e.AddPosition(v)
-				}
-				n.addBottom(b)
+		for _, bound := range []*BoundValue{n.lowerBound, n.upperBound} {
+			if bound == nil {
+				continue
 			}
-		}
-		if n.upperBound != nil {
-			c := MakeRootConjunct(nil, n.upperBound)
+			c := MakeRootConjunct(nil, bound)
 			if b := ctx.Validate(c, v); b != nil {
 				// TODO(errors): make Validate return boolean and generate
 				// optimized conflict message. Also track and inject IDs
 				// to determine origin location.s
 				if e, _ := b.Err.(*ValueError); e != nil {
-					e.AddPosition(n.upperBound)
+					e.AddPosition(bound)
 					e.AddPosition(v)
 				}
 				n.addBottom(b)

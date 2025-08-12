@@ -554,33 +554,23 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		n.updateCyclicStatusV3(id)
 
 		switch x.Op {
-		case LessThanOp, LessEqualOp:
-			if y := n.upperBound; y != nil {
+		case LessThanOp, LessEqualOp, GreaterThanOp, GreaterEqualOp:
+			bound := &n.upperBound
+			if x.Op == GreaterThanOp || x.Op == GreaterEqualOp {
+				bound = &n.lowerBound
+			}
+			if y := *bound; y != nil {
 				v := SimplifyBounds(ctx, n.kind, x, y)
 				if err := valueError(v); err != nil {
 					err.AddPosition(v)
-					err.AddPosition(n.upperBound)
+					err.AddPosition(*bound)
 					err.AddClosedPositions(n.ctx, id)
 				}
-				n.upperBound = nil
+				*bound = nil
 				n.insertValueConjunct(env, v, id)
 				return
 			}
-			n.upperBound = x
-
-		case GreaterThanOp, GreaterEqualOp:
-			if y := n.lowerBound; y != nil {
-				v := SimplifyBounds(ctx, n.kind, x, y)
-				if err := valueError(v); err != nil {
-					err.AddPosition(v)
-					err.AddPosition(n.lowerBound)
-					err.AddClosedPositions(n.ctx, id)
-				}
-				n.lowerBound = nil
-				n.insertValueConjunct(env, v, id)
-				return
-			}
-			n.lowerBound = x
+			*bound = x
 
 		case EqualOp, NotEqualOp, MatchOp, NotMatchOp:
 			// This check serves as simplifier, but also to remove duplicates.

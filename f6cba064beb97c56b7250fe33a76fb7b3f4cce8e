@@ -16,6 +16,24 @@
       "message": "FWIW I found the \"I\" confusing because it\u0027s a valid identifier character (yeah, I know you\u0027ve just talked about \"I-beams\" but...).\n\n```suggestion\npath element, e.g. `x.y|.z`, the user might well expect jump-to-definition\n```",
       "revId": "f6cba064beb97c56b7250fe33a76fb7b3f4cce8e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ffca70d_0cd778fe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-12T15:51:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "608d02b0_31fe37a5",
+      "revId": "f6cba064beb97c56b7250fe33a76fb7b3f4cce8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

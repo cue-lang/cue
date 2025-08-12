@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f844501_c397374a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-08-12T13:59:25Z",
+      "side": 1,
+      "message": "PTAL. This was motivagted by my misunderstandings when reading about `error()`. \n\nI intended this as a neutral rewording of this section, neither adding to nor weakening specified behaviour; but I\u0027m conscious that\n\n\u003e inserted into the string **as written**\n\n... might not meet this aim. Let me know what you think.",
+      "revId": "b505b675de1360a2fa1a46a63da0b34b882be063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

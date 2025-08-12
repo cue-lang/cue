@@ -26,10 +26,6 @@ func (s *server) ColorPresentation(context.Context, *protocol.ColorPresentationP
 	return nil, notImplemented("ColorPresentation")
 }
 
-func (s *server) Completion(ctx context.Context, params *protocol.CompletionParams) (_ *protocol.CompletionList, rerr error) {
-	return nil, notImplemented("Completion")
-}
-
 func (s *server) Declaration(context.Context, *protocol.DeclarationParams) (*protocol.Or_textDocument_declaration, error) {
 	return nil, notImplemented("Declaration")
 }

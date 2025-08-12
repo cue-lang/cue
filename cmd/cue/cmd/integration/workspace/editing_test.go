@@ -268,18 +268,39 @@ v4: v2
 			env.Await(
 				env.DoneWithOpen(),
 			)
+
 			locs := env.Definition(protocol.Location{
 				URI: rootURI + "/b/c/c.cue",
 				Range: protocol.Range{
+					// a.|v1
 					Start: protocol.Position{Line: 5, Character: 6},
 				},
 			})
 			qt.Assert(t, qt.ContentEquals(locs, []protocol.Location{
 				{
 					URI: rootURI + "/a/a.cue",
+					// v1
 					Range: protocol.Range{
 						Start: protocol.Position{Line: 4, Character: 0},
 						End:   protocol.Position{Line: 4, Character: 2},
+					},
+				},
+			}))
+
+			locs = env.Definition(protocol.Location{
+				URI: rootURI + "/b/c/c.cue",
+				// import |"mod.example/x/a"
+				Range: protocol.Range{
+					Start: protocol.Position{Line: 2, Character: 7},
+				},
+			})
+			qt.Assert(t, qt.ContentEquals(locs, []protocol.Location{
+				{
+					URI: rootURI + "/a/a.cue",
+					// package a
+					Range: protocol.Range{
+						Start: protocol.Position{Line: 0, Character: 0},
+						End:   protocol.Position{Line: 0, Character: 9},
 					},
 				},
 			}))

@@ -234,13 +234,29 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 		return nil
 	}
 
-	offset, err := srcMapper.PositionOffset(pos)
-	if err != nil {
-		w.debugLog(err.Error())
-		return nil
+	var targets []ast.Node
+	// If ForOffset returns no results, and if it's safe to do so, we
+	// back off the Character offset (column number) by 1 and try
+	// again. This can help when the caret symbol is a | and is placed
+	// straight after the end of a path element.
+	posAdj := []uint32{0, 1}
+	if pos.Character == 0 {
+		posAdj = posAdj[:1]
 	}
+	for _, adj := range posAdj {
+		pos := pos
+		pos.Character -= adj
+		offset, err := srcMapper.PositionOffset(pos)
+		if err != nil {
+			w.debugLog(err.Error())
+			return nil
+		}
 
-	targets := fdfns.ForOffset(offset)
+		targets = fdfns.ForOffset(offset)
+		if len(targets) > 0 {
+			break
+		}
+	}
 	if len(targets) == 0 {
 		return nil
 	}

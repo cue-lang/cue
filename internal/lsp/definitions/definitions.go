@@ -590,17 +590,39 @@ func (n *astNode) eval() {
 			}
 
 		case *ast.ImportSpec:
-			if node.Name == nil {
+			if n.parent == n.dfns.pkgNode {
+				if node.Name == nil {
+					str, err := strconv.Unquote(node.Path.Value)
+					if err != nil {
+						continue
+					}
+					ip := ast.ParseImportPath(str)
+					if ip.Qualifier != "" {
+						n.newBinding(ip.Qualifier, node.Path, node)
+					}
+				} else {
+					n.newBinding(node.Name.Name, node.Path, node)
+				}
+
+			} else {
 				str, err := strconv.Unquote(node.Path.Value)
 				if err != nil {
 					continue
 				}
-				ip := ast.ParseImportPath(str)
-				if ip.Qualifier != "" {
-					n.newBinding(ip.Qualifier, node, nil)
+				dfns := n.dfns.forPackage(str)
+				if dfns == nil {
+					continue
 				}
-			} else {
-				n.newBinding(node.Name.Name, node, nil)
+				pkgDeclsNav := &navigableBindings{}
+				for _, fdfns := range dfns.byFilename {
+					for _, decl := range fdfns.File.Decls {
+						if pkgDecl, ok := decl.(*ast.Package); ok {
+							dfns.pkgNode.newAstNode(pkgDecl, nil, pkgDeclsNav)
+							break
+						}
+					}
+				}
+				n.dfns.addResolution(node.Path.Pos(), len(str), []*navigableBindings{pkgDeclsNav})
 			}
 
 		case *ast.StructLit:

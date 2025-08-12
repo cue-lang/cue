@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package validate collects errors from an evaluated Vertex.
 package adt
 
 type ValidateConfig struct {

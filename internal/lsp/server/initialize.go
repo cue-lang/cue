@@ -94,6 +94,9 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 		},
 
 		Capabilities: protocol.ServerCapabilities{
+			CompletionProvider: &protocol.CompletionOptions{
+				TriggerCharacters: []string{"."},
+			},
 			DefinitionProvider:         &protocol.Or_ServerCapabilities_definitionProvider{Value: true},
 			DocumentFormattingProvider: &protocol.Or_ServerCapabilities_documentFormattingProvider{Value: true},
 			TextDocumentSync: &protocol.TextDocumentSyncOptions{

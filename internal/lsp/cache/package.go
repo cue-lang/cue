@@ -17,6 +17,7 @@ package cache
 import (
 	"fmt"
 	"slices"
+	"strconv"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -260,7 +261,7 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 			return nil
 		}
 
-		targets = fdfns.ForOffset(offset)
+		targets = fdfns.DefinitionsForOffset(offset)
 		if len(targets) > 0 {
 			break
 		}
@@ -292,4 +293,129 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 		}
 	}
 	return locations
+}
+
+// Completion attempts to treat the given uri and position as a file
+// coordinate to some path element, from which subsequent path
+// elements can be suggested.
+func (pkg *Package) Completion(uri protocol.DocumentURI, pos protocol.Position) *protocol.CompletionList {
+	dfns := pkg.definitions
+	if dfns == nil {
+		return nil
+	}
+
+	w := pkg.module.workspace
+	mappers := w.mappers
+
+	fdfns := dfns.ForFile(uri.Path())
+	if fdfns == nil {
+		w.debugLog("file not found")
+		return nil
+	}
+
+	tokFile := fdfns.File.Pos().File()
+	srcMapper := mappers[tokFile]
+	if srcMapper == nil {
+		w.debugLog("mapper not found: " + string(uri))
+		return nil
+	}
+
+	offset, err := srcMapper.PositionOffset(pos)
+	if err != nil {
+		w.debugLog(err.Error())
+		return nil
+	}
+	content := tokFile.Content()
+	// The cursor can be after the last character of the file, hence
+	// len(content), and not len(content)-1.
+	offset = min(offset, len(content))
+
+	// Use offset-1 because the cursor is always one beyond what we want.
+	fields, embeds, startOffset, fieldEndOffset, embedEndOffset := fdfns.CompletionsForOffset(offset - 1)
+
+	startOffset = min(startOffset, len(content))
+	fieldEndOffset = min(fieldEndOffset, len(content))
+	embedEndOffset = min(embedEndOffset, len(content))
+
+	// According to the LSP spec, TextEdits must be on the same line as
+	// offset (the cursor position), and must include offset. If we're
+	// in the middle of a selector that's spread over several lines
+	// (possibly accidentally), we can't perform an edit.  E.g. (with
+	// the cursor position as | ):
+	//
+	//	x: a.|
+	//	y: _
+	//
+	// Here, the parser will treat this as "x: a.y, _" (and raise an
+	// error because it got a : where it expected a newline or ,
+	// ). Completions that we offer here will want to try to replace y,
+	// but the cursor is on the previous line. It's also very unlikely
+	// this is what the user wants. So in this case, we just treat it
+	// as a simple insert at the cursor position.
+	if startOffset > offset {
+		startOffset = offset
+		fieldEndOffset = offset
+		embedEndOffset = offset
+	}
+
+	totalLen := len(fields) + len(embeds)
+	if totalLen == 0 {
+		return nil
+	}
+	sortTextLen := len(fmt.Sprint(totalLen))
+
+	completions := make([]protocol.CompletionItem, totalLen)
+
+	if len(fields) > 0 {
+		fieldRange, rangeErr := srcMapper.OffsetRange(startOffset, fieldEndOffset)
+		if rangeErr != nil {
+			w.debugLog(rangeErr.Error())
+		}
+		for i, name := range fields {
+			if !ast.IsValidIdent(name) {
+				name = strconv.Quote(name)
+			}
+			completions[i] = protocol.CompletionItem{
+				Label: name,
+				Kind:  protocol.FieldCompletion,
+				// TODO: we can add in documentation for each item if we can
+				// find it.
+				SortText: fmt.Sprintf("%0*d", sortTextLen, i),
+			}
+			if rangeErr == nil {
+				completions[i].TextEdit = &protocol.TextEdit{
+					Range:   fieldRange,
+					NewText: name + ":",
+				}
+			}
+		}
+	}
+
+	if len(embeds) > 0 {
+		embedRange, rangeErr := srcMapper.OffsetRange(startOffset, embedEndOffset)
+		if rangeErr != nil {
+			w.debugLog(rangeErr.Error())
+		}
+		offset = len(fields)
+		for i, name := range embeds {
+			i += offset
+			completions[i] = protocol.CompletionItem{
+				Label: name,
+				Kind:  protocol.VariableCompletion,
+				// TODO: we can add in documentation for each item if we can
+				// find it.
+				SortText: fmt.Sprintf("%0*d", sortTextLen, i),
+			}
+			if rangeErr == nil {
+				completions[i].TextEdit = &protocol.TextEdit{
+					Range:   embedRange,
+					NewText: name,
+				}
+			}
+		}
+	}
+
+	return &protocol.CompletionList{
+		Items: completions,
+	}
 }

@@ -66,10 +66,11 @@ func TestOverlayFSURI(t *testing.T) {
 
 	content := []byte("hello world")
 	now := time.Now()
+	pathModifiedAbs := onDiskFilesAbs[0]
 
 	fs := fscache.NewOverlayFS(fscache.NewCUECachedFS())
 	err := fs.Update(func(txn *fscache.UpdateTxn) error {
-		uri := protocol.URIFromPath(onDiskFilesAbs[0])
+		uri := protocol.URIFromPath(pathModifiedAbs)
 		_, err := txn.Get(uri)
 		qt.Assert(t, qt.ErrorIs(err, iofs.ErrNotExist))
 
@@ -79,7 +80,6 @@ func TestOverlayFSURI(t *testing.T) {
 	})
 	qt.Assert(t, qt.IsNil(err))
 
-	pathModifiedAbs := onDiskFilesAbs[0]
 	err = fs.View(func(txn *fscache.ViewTxn) error {
 		uri := protocol.URIFromPath(pathModifiedAbs)
 		fh, err := txn.Get(uri)
@@ -101,9 +101,9 @@ func TestOverlayFSURI(t *testing.T) {
 		if f == pathModifiedAbs {
 			qt.Assert(t, qt.DeepEquals(fh.Content(), content))
 			ast, cfg, err := fh.ReadCUE(parser.NewConfig())
-			qt.Assert(t, qt.IsNil(err))
-			qt.Assert(t, qt.Equals(cfg.Mode, parser.ImportsOnly))
-			qt.Assert(t, qt.Equals(len(ast.Decls), 0))
+			qt.Assert(t, qt.IsNotNil(err))
+			qt.Assert(t, qt.Equals(cfg.Mode, parser.ParseComments))
+			qt.Assert(t, qt.Equals(len(ast.Decls), 2))
 
 		} else if strings.HasSuffix(f, "bad.cue") {
 			qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(fileContentBad)))

@@ -872,18 +872,31 @@ o: {
 	}
 }
 q: o.p
+r: o.k
 `,
 			expectations: map[*position][]*position{
-				ln(4, 1, "k"): {},
-				ln(4, 1, "v"): {},
-				ln(4, 1, "a"): {ln(1, 1, "a")},
-				ln(5, 1, "k"): {ln(4, 1, "k")},
-				ln(5, 1, "v"): {ln(4, 1, "v")},
-				ln(5, 1, "b"): {ln(2, 1, "b")},
-				ln(5, 2, "k"): {ln(4, 1, "k")},
-				ln(6, 1, "v"): {ln(4, 1, "v")},
-				ln(9, 1, "o"): {ln(3, 1, "o")},
-				ln(9, 1, "p"): {ln(6, 1, "p")},
+				ln(4, 1, "k"):  {},
+				ln(4, 1, "v"):  {},
+				ln(4, 1, "a"):  {ln(1, 1, "a")},
+				ln(5, 1, "k"):  {ln(4, 1, "k")},
+				ln(5, 1, "v"):  {ln(4, 1, "v")},
+				ln(5, 1, "b"):  {ln(2, 1, "b")},
+				ln(5, 2, "k"):  {ln(4, 1, "k")},
+				ln(6, 1, "v"):  {ln(4, 1, "v")},
+				ln(9, 1, "o"):  {ln(3, 1, "o")},
+				ln(9, 1, "p"):  {ln(6, 1, "p")},
+				ln(10, 1, "o"): {ln(3, 1, "o")},
+				ln(10, 1, "k"): {},
+			},
+		},
+		{
+			name: "Comprehension_For_ForwardsReference",
+			archive: `-- a.cue --
+for a, b in foo.bar {}
+foo: bar: "baz"`,
+			expectations: map[*position][]*position{
+				ln(1, 1, "foo"): {ln(2, 1, "foo")},
+				ln(1, 1, "bar"): {ln(2, 1, "bar")},
 			},
 		},
 

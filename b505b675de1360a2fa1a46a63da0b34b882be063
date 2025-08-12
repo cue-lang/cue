@@ -16,6 +16,23 @@
       "message": "PTAL. This was motivagted by my misunderstandings when reading about `error()`. \n\nI intended this as a neutral rewording of this section, neither adding to nor weakening specified behaviour; but I\u0027m conscious that\n\n\u003e inserted into the string **as written**\n\n... might not meet this aim. Let me know what you think.",
       "revId": "b505b675de1360a2fa1a46a63da0b34b882be063",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcce158f_b877df22",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-12T16:31:04Z",
+      "side": 1,
+      "message": "I\u0027ll leave to Marcel to review, given that the spec is rather important.",
+      "revId": "b505b675de1360a2fa1a46a63da0b34b882be063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

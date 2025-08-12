@@ -174,29 +174,18 @@ import (
 
 type defID uint32
 
+//go:generate go run golang.org/x/tools/cmd/stringer -type=defIDType -linecomment
+
 type defIDType int8
 
 const (
 	// defIDTypeUnknown indicates that the ID is not a definition.
-	defIDTypeUnknown defIDType = iota
+	defIDTypeUnknown defIDType = iota // *
 
-	defEmbedding
-	defReference
-	defStruct
+	defEmbedding // E
+	defReference // D
+	defStruct    // S
 )
-
-func (d defIDType) String() string {
-	switch d {
-	case defEmbedding:
-		return "E"
-	case defReference:
-		return "D"
-	case defStruct:
-		return "S"
-	default:
-		return "*"
-	}
-}
 
 const deleteID defID = math.MaxUint32
 

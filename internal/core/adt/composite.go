@@ -362,6 +362,8 @@ func (v *Vertex) MayAttach() bool {
 	return !v.Label.IsLet() && !v.anonymous
 }
 
+//go:generate go run golang.org/x/tools/cmd/stringer -type=ArcType -trimprefix=Arc
+
 type ArcType uint8
 
 const (
@@ -395,22 +397,6 @@ const (
 	// structure sharing, among other things.
 	// We could also define types for required fields and potentially lets.
 )
-
-func (a ArcType) String() string {
-	switch a {
-	case ArcMember:
-		return "Member"
-	case ArcOptional:
-		return "Optional"
-	case ArcRequired:
-		return "Required"
-	case ArcPending:
-		return "Pending"
-	case ArcNotPresent:
-		return "NotPresent"
-	}
-	return fmt.Sprintf("ArcType(%d)", a)
-}
 
 // ConstraintFromToken converts a given AST constraint token to the
 // corresponding ArcType.

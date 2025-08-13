@@ -136,12 +136,15 @@ func (src *Client) Mirror(ctx context.Context, dst *Client, mv module.Version) e
 	// We've uploaded all the blobs referenced by the manifest; now
 	// we can upload the manifest itself.
 	if _, err := dstLoc.Registry.ResolveManifest(ctx, dstLoc.Repository, m.manifestDigest); err == nil {
-		return nil
+		// Manifest already exists, but we still need to check for referrers
+		return src.mirrorReferrers(ctx, dst, m.loc, dstLoc, m.manifestDigest)
 	}
 	if _, err := dstLoc.Registry.PushManifest(ctx, dstLoc.Repository, dstLoc.Tag, m.manifestContents, ocispec.MediaTypeImageManifest); err != nil {
 		return nil
 	}
-	return nil
+
+	// Mirror any referrers that point to this manifest
+	return src.mirrorReferrers(ctx, dst, m.loc, dstLoc, m.manifestDigest)
 }
 
 func mirrorBlob(ctx context.Context, srcLoc, dstLoc RegistryLocation, desc ocispec.Descriptor) error {
@@ -161,6 +164,72 @@ func mirrorBlob(ctx context.Context, srcLoc, dstLoc RegistryLocation, desc ocisp
 	if _, err := dstLoc.Registry.PushBlob(ctx, dstLoc.Repository, desc, r); err != nil {
 		return err
 	}
+	return nil
+}
+
+// mirrorReferrers mirrors all referrers that point to the given manifest digest.
+func (src *Client) mirrorReferrers(ctx context.Context, dst *Client, srcLoc, dstLoc RegistryLocation, manifestDigest ociregistry.Digest) error {
+	var g errgroup.Group
+
+	// Iterate through all referrers that point to this manifest
+	for referrerDesc, err := range srcLoc.Registry.Referrers(ctx, srcLoc.Repository, manifestDigest, "") {
+		if err != nil {
+			return fmt.Errorf("failed to get referrers: %w", err)
+		}
+
+		g.Go(func() error {
+			return src.mirrorReferrer(ctx, dst, srcLoc, dstLoc, referrerDesc)
+		})
+	}
+
+	return g.Wait()
+}
+
+// mirrorReferrer mirrors a single referrer manifest and its associated blobs.
+func (src *Client) mirrorReferrer(ctx context.Context, dst *Client, srcLoc, dstLoc RegistryLocation, referrerDesc ocispec.Descriptor) error {
+	// Check if the referrer manifest already exists in the destination
+	if _, err := dstLoc.Registry.ResolveManifest(ctx, dstLoc.Repository, referrerDesc.Digest); err == nil {
+		// Manifest already exists, nothing to do
+		return nil
+	}
+
+	// Get the referrer manifest from source
+	r, err := srcLoc.Registry.GetManifest(ctx, srcLoc.Repository, referrerDesc.Digest)
+	if err != nil {
+		return fmt.Errorf("failed to get referrer manifest %s: %w", referrerDesc.Digest, err)
+	}
+	defer r.Close()
+
+	manifestData, err := io.ReadAll(r)
+	if err != nil {
+		return fmt.Errorf("failed to read referrer manifest %s: %w", referrerDesc.Digest, err)
+	}
+
+	// Parse the manifest to get the blobs it references
+	manifest, err := unmarshalManifest(manifestData, r.Descriptor().MediaType)
+	if err != nil {
+		return fmt.Errorf("failed to parse referrer manifest %s: %w", referrerDesc.Digest, err)
+	}
+
+	// Mirror all blobs referenced by this referrer manifest (excluding Subject)
+	var g errgroup.Group
+	g.Go(func() error {
+		return mirrorBlob(ctx, srcLoc, dstLoc, manifest.Config)
+	})
+	for _, desc := range manifest.Layers {
+		g.Go(func() error {
+			return mirrorBlob(ctx, srcLoc, dstLoc, desc)
+		})
+	}
+	if err := g.Wait(); err != nil {
+		return fmt.Errorf("failed to mirror blobs for referrer %s: %w", referrerDesc.Digest, err)
+	}
+
+	// Push the referrer manifest itself (without a tag, just by content)
+	if _, err := dstLoc.Registry.PushManifest(ctx, dstLoc.Repository, "", manifestData, r.Descriptor().MediaType); err != nil {
+		return fmt.Errorf("failed to push referrer manifest %s: %w", referrerDesc.Digest, err)
+	}
+
 	return nil
 }
 

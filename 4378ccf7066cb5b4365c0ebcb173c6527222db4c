@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "305bb5fe_46f57ba5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-13T14:18:49Z",
+      "side": 1,
+      "message": "I forgot, unfortunately. I _think_ I found it while debugging something else, but I\u0027m not sure.",
+      "parentUuid": "1c34b6e4_5d0f1e82",
+      "revId": "4378ccf7066cb5b4365c0ebcb173c6527222db4c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "2bdd1e98_986fb227",

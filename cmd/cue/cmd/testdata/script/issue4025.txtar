@@ -1,0 +1,26 @@
+exec cue export -e files.foo --out yaml in.cue
+cmp stdout out/stdout
+
+-- in.cue --
+let input = {input1: inputName: "foo"}
+
+files: (_AllFiles & {_in: input})._out
+
+_AllFiles: {
+	_in: _
+	_out: {
+		for _, v in _in {
+			(_OneFile & {
+				_in: v
+			})._out
+		}
+	}
+}
+
+_OneFile: {
+	_in: _
+	_out: "\(_in.inputName)": name: _in.inputName
+}
+
+-- out/stdout --
+name: foo

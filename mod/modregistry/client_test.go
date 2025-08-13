@@ -17,6 +17,7 @@ package modregistry
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -28,6 +29,9 @@ import (
 	"time"
 
 	"github.com/go-quicktest/qt"
+	digest "github.com/opencontainers/go-digest"
+	specs "github.com/opencontainers/image-spec/specs-go"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
 	"golang.org/x/tools/txtar"
 
@@ -439,3 +443,143 @@ func (fi txtarFileInfo) Mode() os.FileMode {
 func (fi txtarFileInfo) ModTime() time.Time { return time.Time{} }
 func (fi txtarFileInfo) IsDir() bool        { return false }
 func (fi txtarFileInfo) Sys() interface{}   { return nil }
+
+func TestMirrorWithReferrers(t *testing.T) {
+	const testMod = `
+-- cue.mod/module.cue --
+module: "example.com/module@v1"
+language: version: "v0.8.0"
+
+-- x.cue --
+x: 42
+`
+	ctx := context.Background()
+	mv := module.MustParseVersion("example.com/module@v1.2.3")
+
+	// Create registry and client
+	reg := ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true})
+	c := NewClient(reg)
+	zipData := putModule(t, c, mv, testMod)
+
+	// Get the module and its manifest digest
+	m, err := c.GetModule(ctx, mv)
+	qt.Assert(t, qt.IsNil(err))
+	manifestDigest := m.ManifestDigest()
+
+	// Create a referrer manifest that points to the module's manifest
+	referrerBlob1 := []byte("referrer content 1")
+	referrerBlob2 := []byte("referrer content 2")
+
+	// Use the module base path as repository (singleResolver uses mpath parameter)
+	repo := mv.BasePath()
+
+	blob1Desc := ocispec.Descriptor{
+		Digest:    digest.FromBytes(referrerBlob1),
+		Size:      int64(len(referrerBlob1)),
+		MediaType: "application/octet-stream",
+	}
+	blob1Desc, err = reg.PushBlob(ctx, repo, blob1Desc, bytes.NewReader(referrerBlob1))
+	qt.Assert(t, qt.IsNil(err))
+
+	blob2Desc := ocispec.Descriptor{
+		Digest:    digest.FromBytes(referrerBlob2),
+		Size:      int64(len(referrerBlob2)),
+		MediaType: "application/octet-stream",
+	}
+	blob2Desc, err = reg.PushBlob(ctx, repo, blob2Desc, bytes.NewReader(referrerBlob2))
+	qt.Assert(t, qt.IsNil(err))
+
+	// Create a scratch config blob
+	configBlob := []byte("{}")
+	configDesc := ocispec.Descriptor{
+		Digest:    digest.FromBytes(configBlob),
+		Size:      int64(len(configBlob)),
+		MediaType: "application/vnd.example.config.v1+json",
+	}
+	configDesc, err = reg.PushBlob(ctx, repo, configDesc, bytes.NewReader(configBlob))
+	qt.Assert(t, qt.IsNil(err))
+
+	// Create a referrer manifest
+	referrerManifest := ocispec.Manifest{
+		Versioned: specs.Versioned{
+			SchemaVersion: 2,
+		},
+		MediaType:    ocispec.MediaTypeImageManifest,
+		ArtifactType: "application/vnd.example.signature.v1",
+		Config:       configDesc,
+		Layers: []ocispec.Descriptor{
+			blob1Desc,
+			blob2Desc,
+		},
+		Subject: &ocispec.Descriptor{
+			Digest:    manifestDigest,
+			Size:      int64(len(m.manifestContents)),
+			MediaType: ocispec.MediaTypeImageManifest,
+		},
+	}
+
+	// Marshal and push the referrer manifest
+	referrerManifestData, err := json.Marshal(&referrerManifest)
+	qt.Assert(t, qt.IsNil(err))
+
+	_, err = reg.PushManifest(ctx, repo, "", referrerManifestData, ocispec.MediaTypeImageManifest)
+	qt.Assert(t, qt.IsNil(err))
+
+	// Now test mirroring to a new client
+	reg2 := ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true})
+	c2 := NewClient(reg2)
+	err = c.Mirror(ctx, c2, mv)
+	qt.Assert(t, qt.IsNil(err))
+
+	// Verify the module was mirrored
+	m2, err := c2.GetModule(ctx, mv)
+	qt.Assert(t, qt.IsNil(err))
+
+	r, err := m2.GetZip(ctx)
+	qt.Assert(t, qt.IsNil(err))
+	data, err := io.ReadAll(r)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(data, zipData))
+
+	// Verify that referrers were also mirrored
+	// Use the same repository pattern for the destination
+
+	// Check that the referrer manifests exist in the destination
+	referrerCount := 0
+	for referrerDesc, err := range reg2.Referrers(ctx, repo, manifestDigest, "") {
+		qt.Assert(t, qt.IsNil(err))
+		referrerCount++
+
+		// Verify we can get the referrer manifest
+		mr, err := reg2.GetManifest(ctx, repo, referrerDesc.Digest)
+		qt.Assert(t, qt.IsNil(err))
+		defer mr.Close()
+
+		referrerManifestBytes, err := io.ReadAll(mr)
+		qt.Assert(t, qt.IsNil(err))
+
+		var gotReferrerManifest ocispec.Manifest
+		err = json.Unmarshal(referrerManifestBytes, &gotReferrerManifest)
+		qt.Assert(t, qt.IsNil(err))
+
+		// Verify the referrer has the correct subject
+		qt.Assert(t, qt.Not(qt.IsNil(gotReferrerManifest.Subject)))
+		qt.Assert(t, qt.Equals(gotReferrerManifest.Subject.Digest, manifestDigest))
+
+		// Verify the referrer blobs were also mirrored
+		for _, layer := range gotReferrerManifest.Layers {
+			br, err := reg2.GetBlob(ctx, repo, layer.Digest)
+			qt.Assert(t, qt.IsNil(err))
+			blobData, err := io.ReadAll(br)
+			br.Close()
+			qt.Assert(t, qt.IsNil(err))
+
+			// Check that it matches one of our original blobs
+			matches := bytes.Equal(blobData, referrerBlob1) || bytes.Equal(blobData, referrerBlob2)
+			qt.Assert(t, qt.IsTrue(matches), qt.Commentf("blob data doesn't match any expected referrer blob"))
+		}
+	}
+
+	// We should have found exactly one referrer
+	qt.Assert(t, qt.Equals(referrerCount, 1))
+}

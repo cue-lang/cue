@@ -14,7 +14,10 @@ var (
 	jsonPtrUnesc = strings.NewReplacer("~0", "~", "~1", "/")
 )
 
-func jsonPointerFromTokens(tokens iter.Seq[string]) string {
+// JSONPointerFromTokens returns a JSON Pointer formed from
+// the unquoted tokens in the given sequence. Any
+// slash (/) or tilde (~) characters will be escaped appropriately.
+func JSONPointerFromTokens(tokens iter.Seq[string]) string {
 	var buf strings.Builder
 	for tok := range tokens {
 		buf.WriteByte('/')
@@ -23,7 +26,10 @@ func jsonPointerFromTokens(tokens iter.Seq[string]) string {
 	return buf.String()
 }
 
-func jsonPointerTokens(p string) iter.Seq[string] {
+// JSONPointerTokens returns a sequence of all the
+// unquoted path elements (tokens) of the given JSON
+// Pointer.
+func JSONPointerTokens(p string) iter.Seq[string] {
 	return func(yield func(string) bool) {
 		needUnesc := strings.IndexByte(p, '~') >= 0
 		for len(p) > 0 {

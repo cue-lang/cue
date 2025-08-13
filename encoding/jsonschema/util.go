@@ -159,8 +159,20 @@ func labelForSelector(sel cue.Selector) (ast.Label, error) {
 	}
 }
 
-func cuePathToJSONPointer(p cue.Path) string {
-	return jsonPointerFromTokens(func(yield func(s string) bool) {
+func mustCUEPathToJSONPointer(p cue.Path) string {
+	s, err := CUEPathToJSONPointer(p)
+	if err != nil {
+		panic(err)
+	}
+	return s
+}
+
+// CUEPathToJSONPointer returns a JSON Pointer equivalent to the
+// given path. It returns an error if the path contains an element
+// that cannot be represented as a JSON Pointer.
+func CUEPathToJSONPointer(p cue.Path) (string, error) {
+	var err error
+	s := JSONPointerFromTokens(func(yield func(s string) bool) {
 		for _, sel := range p.Selectors() {
 			var token string
 			switch sel.Type() {
@@ -169,13 +181,20 @@ func cuePathToJSONPointer(p cue.Path) string {
 			case cue.IndexLabel:
 				token = strconv.Itoa(sel.Index())
 			default:
-				panic(fmt.Errorf("cannot convert selector %v to JSON pointer", sel))
+				if err == nil {
+					err = fmt.Errorf("cannot convert selector %v to JSON pointer", sel)
+					continue
+				}
 			}
 			if !yield(token) {
 				return
 			}
 		}
 	})
+	if err != nil {
+		return "", err
+	}
+	return s, nil
 }
 
 // relPath returns the path to v relative to root,

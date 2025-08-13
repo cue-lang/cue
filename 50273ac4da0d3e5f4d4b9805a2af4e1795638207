@@ -16,6 +16,24 @@
       "message": "I generally prefer not to use stringer that much anymore as I find it a bit burdensome.",
       "revId": "50273ac4da0d3e5f4d4b9805a2af4e1795638207",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f30feb9a_6c9989d6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-13T09:46:14Z",
+      "side": 1,
+      "message": "burdensome in what way? it\u0027s entirely transparent behind `go generate`, no? the extra files are perhaps unfortunate, but I find that\u0027s a minor downside compared to the automation we gain.",
+      "parentUuid": "b451e975_d2c4371d",
+      "revId": "50273ac4da0d3e5f4d4b9805a2af4e1795638207",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

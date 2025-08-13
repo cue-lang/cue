@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f55c15c4_525a6fc6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-13T09:51:48Z",
+      "side": 1,
+      "message": "I\u0027m generally not that bothered about small blocks of repetitive code, as it often makes things more readable. And it makes it a bit harder to trace where upperbound and lowerbound are set. But I\u0027m okay either way.",
+      "revId": "2aa8e2baa2bbeb6762c32552957f40609a826752",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

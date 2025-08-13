@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "22bcddc7_71c09a8c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-13T11:27:18Z",
+      "side": 1,
+      "message": "Done, except for the go1.25-guarded functionality, which we can add when jsontext is supported by default, as discussed online.",
+      "parentUuid": "5f4691a3_1816bb30",
+      "revId": "aabe6cebad43b5c624c4b11eebafff39efd04e33",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9c2fefb7_75d77b0c",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-08-13T10:49:00Z",
       "side": 1,
       "message": "I meant \"as opposed to `CUEPathToJSONPointer`\", of course!",
+      "parentUuid": "9c2fefb7_75d77b0c",
+      "revId": "aabe6cebad43b5c624c4b11eebafff39efd04e33",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2205266_c7e999a3",
+        "filename": "encoding/jsonschema/util.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-13T11:27:18Z",
+      "side": 1,
+      "message": "Done",
       "parentUuid": "9c2fefb7_75d77b0c",
       "revId": "aabe6cebad43b5c624c4b11eebafff39efd04e33",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c34b6e4_5d0f1e82",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-13T14:17:05Z",
+      "side": 1,
+      "message": "perhaps mention how you found this issue, because otherwise it\u0027s unclear if it came from a user, or from an issue, or from your own investigation.",
+      "revId": "4378ccf7066cb5b4365c0ebcb173c6527222db4c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bdd1e98_986fb227",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-13T14:17:05Z",
+      "side": 1,
+      "message": "Marked as resolved.",
+      "revId": "4378ccf7066cb5b4365c0ebcb173c6527222db4c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

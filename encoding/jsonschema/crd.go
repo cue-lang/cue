@@ -25,6 +25,10 @@ type ExtractedCRD struct {
 	// version.
 	Versions map[string]*ast.File
 
+	// VersionToPath maps each version to the path
+	// within Source containing the schema for that version.
+	VersionToPath map[string]cue.Path
+
 	// Data holds chosen fields extracted from the source CRD document.
 	Data *CRDSpec
 
@@ -49,7 +53,14 @@ func ExtractCRDs(data cue.Value, cfg *CRDConfig) ([]*ExtractedCRD, error) {
 	crds := make([]*ExtractedCRD, len(crdInfos))
 	for crdIndex, crd := range crdInfos {
 		versions := make(map[string]*ast.File)
+		versionToPath := make(map[string]cue.Path)
 		for i, version := range crd.Spec.Versions {
+			versionToPath[version.Name] = cue.MakePath(
+				cue.Str("spec"),
+				cue.Str("versions"),
+				cue.Index(i),
+				cue.Str("schema"),
+			)
 			f, err := Extract(crdValues[crdIndex], &Config{
 				PkgName: version.Name,
 				// There are several kubernetes-related keywords that aren't implemented yet
@@ -102,9 +113,10 @@ func ExtractCRDs(data cue.Value, cfg *CRDConfig) ([]*ExtractedCRD, error) {
 			versions[version.Name] = f
 		}
 		crds[crdIndex] = &ExtractedCRD{
-			Versions: versions,
-			Data:     crdInfos[crdIndex],
-			Source:   crdValues[crdIndex],
+			Versions:      versions,
+			VersionToPath: versionToPath,
+			Data:          crdInfos[crdIndex],
+			Source:        crdValues[crdIndex],
 		}
 	}
 	return crds, nil

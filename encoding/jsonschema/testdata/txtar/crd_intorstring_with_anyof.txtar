@@ -45,6 +45,70 @@ _embeddedResource: {
 		...
 	}
 }
+-- out/decodeCRD-v3/extractCRD/0/v1 --
+#path spec.versions[0].schema
+package v1
+
+_embeddedResource
+spec?: matchN(>=1, [int, string]) & (int | string)
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?: {
+		...
+	}
+}
+apiVersion: "example.com/v1"
+kind:       "MyApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]: string
+	annotations?: [string]: string
+	...
+}
+-- diff/-out/decodeCRD-v3/extractCRD/0/v1<==>+out/decodeCRD/extractCRD/0/v1 --
+diff old new
+--- old
++++ new
+@@ -1,3 +1,4 @@
++#path spec.versions[0].schema
+ package v1
+ 
+ _embeddedResource
+-- out/decodeCRD-v3-noshare/extractCRD/0/v1 --
+#path spec.versions[0].schema
+package v1
+
+_embeddedResource
+spec?: matchN(>=1, [int, string]) & (int | string)
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?: {
+		...
+	}
+}
+apiVersion: "example.com/v1"
+kind:       "MyApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]: string
+	annotations?: [string]: string
+	...
+}
+-- diff/-out/decodeCRD-v3-noshare/extractCRD/0/v1<==>+out/decodeCRD/extractCRD/0/v1 --
+diff old new
+--- old
++++ new
+@@ -1,3 +1,4 @@
++#path spec.versions[0].schema
+ package v1
+ 
+ _embeddedResource
 -- out/decodeCRD/extractCRD/0/v1 --
 package v1
 

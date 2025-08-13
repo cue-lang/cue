@@ -270,6 +270,7 @@ func TestDecodeCRD(t *testing.T) {
 		for i, crd := range crds {
 			for _, version := range slices.Sorted(maps.Keys(crd.Versions)) {
 				w := t.Writer(fmt.Sprintf("extractCRD/%d/%s", i, version))
+				fmt.Fprintf(w, "#path %v\n", crd.VersionToPath[version])
 				f := crd.Versions[version]
 				b, err := format.Node(f, format.Simplify())
 				if err != nil {

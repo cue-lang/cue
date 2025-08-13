@@ -16,6 +16,23 @@
       "message": "Oops, this was my mistake.",
       "revId": "edaafe777a529a5f98163520784a44f480e4b064",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66e70f61_db95b7f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-08-13T18:02:48Z",
+      "side": 1,
+      "message": "@mvdan@mvdan.cc Please submit at your convenience. I don\u0027t have that right in this repo.",
+      "revId": "edaafe777a529a5f98163520784a44f480e4b064",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

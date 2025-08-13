@@ -17,12 +17,12 @@ package jsonschema
 import (
 	"fmt"
 	"slices"
-	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/json"
 )
 
 // TODO a bunch of stuff in this file is potentially suitable
@@ -159,23 +159,12 @@ func labelForSelector(sel cue.Selector) (ast.Label, error) {
 	}
 }
 
-func cuePathToJSONPointer(p cue.Path) string {
-	return jsonPointerFromTokens(func(yield func(s string) bool) {
-		for _, sel := range p.Selectors() {
-			var token string
-			switch sel.Type() {
-			case cue.StringLabel:
-				token = sel.Unquoted()
-			case cue.IndexLabel:
-				token = strconv.Itoa(sel.Index())
-			default:
-				panic(fmt.Errorf("cannot convert selector %v to JSON pointer", sel))
-			}
-			if !yield(token) {
-				return
-			}
-		}
-	})
+func mustCUEPathToJSONPointer(p cue.Path) string {
+	ptr, err := json.PointerFromCUEPath(p)
+	if err != nil {
+		panic(err)
+	}
+	return string(ptr)
 }
 
 // relPath returns the path to v relative to root,

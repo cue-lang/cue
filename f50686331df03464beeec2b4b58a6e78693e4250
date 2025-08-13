@@ -16,6 +16,24 @@
       "message": "hmm, a bit odd that we were still doing Sprintf here to manually build a json path. do we still do that anywhere else?",
       "revId": "f50686331df03464beeec2b4b58a6e78693e4250",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50174581_695b9729",
+        "filename": "encoding/jsonschema/crd.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-13T10:43:35Z",
+      "side": 1,
+      "message": "Not in this package at least.",
+      "parentUuid": "9c0e2f9a_e374bb96",
+      "revId": "f50686331df03464beeec2b4b58a6e78693e4250",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

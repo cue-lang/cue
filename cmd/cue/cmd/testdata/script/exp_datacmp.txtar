@@ -1,0 +1,67 @@
+# Complains when fewer than 2 data file inputs are provided
+! exec cue exp datacmp 1a.yml
+stderr 'requires at least 2 arg\(s\), only received 1'
+
+# Compares 2 equivalent YAML files silently
+exec cue exp datacmp 1a.yml 1b.yaml
+! stderr .
+! stdout .
+
+# Compares 3 equivalent data files silently
+exec cue exp datacmp 1a.yml 1.json 1.toml
+! stderr .
+! stdout .
+
+# Notices when 2 different data files are compared
+! exec cue exp datacmp 1a.yml 2.yml
+stderr 'b: conflicting values 2 and "two" \(mismatched types int and string\):'
+
+# Can handle text files when they equivalent
+exec cue exp datacmp 3a.txt 3b.txt
+! stderr .
+! stdout .
+
+# Notices when text files are different
+! exec cue exp datacmp 3a.txt 4.txt
+stderr 'conflicting values'
+
+-- 1a.yml --
+a: 1
+b: 2
+c:
+  - 1
+  - 2
+  - 3
+-- 1b.yaml --
+c:
+  - 1
+  - 2
+  - 3
+b: 2
+a: 1
+-- 1.json --
+{
+    "b": 2,
+    "c": [
+        1,
+        2,
+        3
+    ],
+    "a": 1
+}
+-- 1.toml --
+a = 1
+b = 2
+c = [1, 2, 3]
+-- 2.yml --
+a: 1
+b: "two"
+-- 3a.txt --
+Hello, world!
+I'm a multi-line text file.
+-- 3b.txt --
+Hello, world!
+I'm a multi-line text file.
+-- 4.txt --
+Hello, world!
+I'm ALSO a multi-line text file.

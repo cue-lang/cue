@@ -16,6 +16,24 @@
       "message": "I\u0027m generally not that bothered about small blocks of repetitive code, as it often makes things more readable. And it makes it a bit harder to trace where upperbound and lowerbound are set. But I\u0027m okay either way.",
       "revId": "2aa8e2baa2bbeb6762c32552957f40609a826752",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3228a90c_7c9ff4b7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-13T09:53:10Z",
+      "side": 1,
+      "message": "I agree that for small bits of code this is not as bad, but given how careful we need to be with human mistakes in the core evaluator code, I still prefer to avoid duplicating a dozen lines of code if we can. And we can avoid it rather easily.",
+      "parentUuid": "f55c15c4_525a6fc6",
+      "revId": "2aa8e2baa2bbeb6762c32552957f40609a826752",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

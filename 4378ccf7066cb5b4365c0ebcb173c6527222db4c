@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "d0055b24_790afbf6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-13T14:19:20Z",
+      "side": 1,
+      "message": "Ack; not the end of the world.",
+      "parentUuid": "305bb5fe_46f57ba5",
+      "revId": "4378ccf7066cb5b4365c0ebcb173c6527222db4c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2bdd1e98_986fb227",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2

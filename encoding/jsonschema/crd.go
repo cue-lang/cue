@@ -68,7 +68,7 @@ func ExtractCRDs(data cue.Value, cfg *CRDConfig) ([]*ExtractedCRD, error) {
 				// There are several kubernetes-related keywords that aren't implemented yet
 				StrictFeatures: false,
 				StrictKeywords: true,
-				Root:           "#" + cuePathToJSONPointer(rootPath),
+				Root:           "#" + mustCUEPathToJSONPointer(rootPath),
 				SingleRoot:     true,
 				DefaultVersion: VersionKubernetesCRD,
 			})

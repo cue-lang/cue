@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/internal"
 )
 
@@ -45,7 +46,7 @@ func parseRootRef(str string) (cue.Path, error) {
 	// (technically a trailing slash `/` means there's an empty
 	// final element).
 	u.Fragment = strings.TrimSuffix(u.Fragment, "/")
-	fragmentParts := slices.Collect(jsonPointerTokens(u.Fragment))
+	fragmentParts := slices.Collect(json.Pointer(u.Fragment).Tokens())
 	var selectors []cue.Selector
 	for _, r := range fragmentParts {
 		if i, err := strconv.ParseUint(r, 10, 64); err == nil && strconv.FormatUint(i, 10) == r {
@@ -63,7 +64,7 @@ func parseRootRef(str string) (cue.Path, error) {
 var errRefNotFound = errors.New("JSON Pointer reference not found")
 
 func lookupJSONPointer(v cue.Value, p string) (cue.Value, error) {
-	for part := range jsonPointerTokens(p) {
+	for part := range json.Pointer(p).Tokens() {
 		// Note: a JSON Pointer doesn't distinguish between indexing
 		// and struct lookup. We have to use the value itself to decide
 		// which operation is appropriate.
@@ -160,7 +161,7 @@ func defaultMapRef(
 ) (importPath string, path cue.Path, err error) {
 	var fragment string
 	if loc.IsLocal {
-		fragment = cuePathToJSONPointer(loc.Path)
+		fragment = mustCUEPathToJSONPointer(loc.Path)
 	} else {
 		// It's external: use mapURLFn.
 		u := ref(*loc.ID)
@@ -175,7 +176,7 @@ func defaultMapRef(
 	if len(fragment) > 0 && fragment[0] != '/' {
 		return "", cue.Path{}, fmt.Errorf("anchors (%s) not supported", fragment)
 	}
-	parts := slices.Collect(jsonPointerTokens(fragment))
+	parts := slices.Collect(json.Pointer(fragment).Tokens())
 	labels, err := mapFn(token.Pos{}, parts)
 	if err != nil {
 		return "", cue.Path{}, err
@@ -202,8 +203,8 @@ func defaultMap(p token.Pos, a []string) ([]ast.Label, error) {
 		// TODO this is needlessly inefficient, as we're putting something
 		// back together that was already joined before defaultMap was
 		// invoked. This does avoid dual implementations though.
-		p := jsonPointerFromTokens(slices.Values(a))
-		return []ast.Label{ast.NewIdent("_#defs"), ast.NewString(p)}, nil
+		p := json.PointerFromTokens(slices.Values(a))
+		return []ast.Label{ast.NewIdent("_#defs"), ast.NewString(string(p))}, nil
 	}
 	name := a[1]
 	if ast.IsValidIdent(name) &&

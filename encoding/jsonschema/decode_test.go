@@ -270,6 +270,11 @@ func TestDecodeCRD(t *testing.T) {
 		for i, crd := range crds {
 			for _, version := range slices.Sorted(maps.Keys(crd.Versions)) {
 				w := t.Writer(fmt.Sprintf("extractCRD/%d/%s", i, version))
+				schemaPath := crd.VersionToPath[version]
+				fmt.Fprintf(w, "#path %v\n", schemaPath)
+				// Sanity check that the path does actually resolve.
+				schemav := crd.Source.LookupPath(schemaPath)
+				qt.Check(t, qt.IsTrue(schemav.Exists()))
 				f := crd.Versions[version]
 				b, err := format.Node(f, format.Simplify())
 				if err != nil {

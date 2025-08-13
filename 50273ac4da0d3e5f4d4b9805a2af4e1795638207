@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b451e975_d2c4371d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-13T09:45:17Z",
+      "side": 1,
+      "message": "I generally prefer not to use stringer that much anymore as I find it a bit burdensome.",
+      "revId": "50273ac4da0d3e5f4d4b9805a2af4e1795638207",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

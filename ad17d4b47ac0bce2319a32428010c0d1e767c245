@@ -16,6 +16,24 @@
       "message": "add a `// TODO(go1.26)` as a reminder to alias `jsontext.Pointer`?",
       "revId": "ad17d4b47ac0bce2319a32428010c0d1e767c245",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e3b9060_e5a7a2c6",
+        "filename": "encoding/json/pointer.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-13T11:31:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e047d5f_201a9e27",
+      "revId": "ad17d4b47ac0bce2319a32428010c0d1e767c245",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

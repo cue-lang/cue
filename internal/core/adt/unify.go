@@ -193,7 +193,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 	// Note that if mode is final, we will guarantee that the conditions for
 	// this if clause are met down the line. So we assume this is already the
 	// case and set the signal accordingly if so.
-	if !v.Rooted() || v.Parent.allChildConjunctsKnown() || mode == finalize {
+	if !v.Rooted() || v.Parent.allChildConjunctsKnown(c) || mode == finalize {
 		n.signal(allAncestorsProcessed)
 	}
 
@@ -539,7 +539,7 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 		}
 	}
 
-	if v.IsDynamic || v.Label.IsLet() || v.Parent.allChildConjunctsKnown() {
+	if v.IsDynamic || v.Label.IsLet() || v.Parent.allChildConjunctsKnown(n.ctx) {
 		n.signal(allAncestorsProcessed)
 	}
 

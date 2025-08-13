@@ -87,19 +87,14 @@ type Generator = Config
 
 // Gen generates the set OpenAPI schema for all top-level types of the
 // given instance.
+//
+// Deprecated: use [Generate].
 func Gen(inst cue.InstanceOrValue, c *Config) ([]byte, error) {
-	if c == nil {
-		c = defaultConfig
-	}
-	all, err := schemas(c, inst)
+	f, err := Generate(inst, c)
 	if err != nil {
 		return nil, err
 	}
-	top, err := c.compose(inst, all)
-	if err != nil {
-		return nil, err
-	}
-	topValue := inst.Value().Context().BuildExpr(top)
+	topValue := inst.Value().Context().BuildFile(f)
 	if err := topValue.Err(); err != nil {
 		return nil, err
 	}

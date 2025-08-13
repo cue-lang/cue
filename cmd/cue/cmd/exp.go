@@ -44,7 +44,8 @@ func newExpGenGoTypesCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gengotypes",
 		Short: "generate Go types from CUE definitions",
-		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
+		Long: `
+WARNING: THIS COMMAND IS EXPERIMENTAL.
 
 gengotypes generates Go type definitions from exported CUE definitions.
 

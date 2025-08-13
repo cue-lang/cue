@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3501154c_0762c1ad",
+        "filename": "mod/modregistry/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-13T12:15:41Z",
+      "side": 1,
+      "message": "nit: this comment feels superfluous. I\u0027ve found AI to be a bit overly verbose with comments.",
+      "revId": "3107580babf3820e0294bb5d4ec8b71ef3b0071f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c03d66c4_1a385a1f",
+        "filename": "mod/modregistry/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-13T12:15:41Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "3107580babf3820e0294bb5d4ec8b71ef3b0071f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

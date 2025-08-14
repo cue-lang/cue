@@ -374,10 +374,7 @@ func TestX(t *testing.T) {
 		check(os.WriteFile(name, f.Data, 0666))
 	}
 
-	cwd, err := os.Getwd()
-	check(err)
-	defer func() { _ = os.Chdir(cwd) }()
-	_ = os.Chdir(tmpdir)
+	t.Chdir(tmpdir)
 
 	for s := bufio.NewScanner(bytes.NewReader(a.Comment)); s.Scan(); {
 		cmd := s.Text()

@@ -55,8 +55,7 @@
 //
 // By default, a glob pattern that matches no files results in an error. When
 // allowEmptyGlob is present, a glob pattern with no matches will return an
-// empty struct instead of an error. This option only applies to glob patterns,
-// not single file embedding.
+// empty struct instead of an error. This option is only supported with glob patterns.
 //
 // # Limitations
 //

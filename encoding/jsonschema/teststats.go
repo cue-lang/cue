@@ -36,7 +36,7 @@ const testDir = "testdata/external"
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: teststats version\n")
-		fmt.Fprintf(os.Stderr, "\nList all failed tests for the given evaluator version (e.g. v2 or v3)\n")
+		fmt.Fprintf(os.Stderr, "\nList all failed tests for the given evaluator version (e.g. v3)\n")
 		os.Exit(2)
 	}
 	flag.Parse()

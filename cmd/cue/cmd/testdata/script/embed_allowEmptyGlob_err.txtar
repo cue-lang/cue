@@ -1,4 +1,4 @@
-# Test that glob patterns with no matches fail when allowEmptyGlob is not set
+# Test failure cases relating to allowEmptyGlob.
 
 ! exec cue eval
 ! stdout .
@@ -19,6 +19,8 @@ noMatches: _ @embed(glob="missing/*.json")
 // This should also fail because allowEmptyGlob is not present.
 alsoNoMatches: _ @embed(glob="nonexistent/*.yaml")
 
+// This should fail because allowEmptyGlob must be specified alongside
+// a glob pattern.
 noGlobField: _ @embed(file="foo",allowEmptyGlob)
 
 -- out/err --
@@ -27,4 +29,4 @@ noGlobField: _ @embed(file="foo",allowEmptyGlob)
 @embed: no matches for glob pattern "nonexistent/*.yaml":
     ./test.cue:9:18
 @embed: allowEmptyGlob must be specified with a glob field:
-    ./test.cue:11:16
+    ./test.cue:13:16

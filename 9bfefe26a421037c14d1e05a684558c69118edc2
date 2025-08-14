@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3eff0502_5a20f743",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-14T16:52:14Z",
+      "side": 1,
+      "message": "I don\u0027t think I\u0027d ever be able to remember the spelling of `allowZeroGlobMatches`.\n\nMaybe `allowEmptyGlob` ? At least then we\u0027re directly referring to the \"glob\" word itself.\n\nI\u0027ve gone with that for now.",
+      "parentUuid": "a8d759d5_64d89c1d",
+      "revId": "9bfefe26a421037c14d1e05a684558c69118edc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "731bfd43_3fdc84fd",
@@ -58,6 +76,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25030c62_fc798860",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-14T16:52:14Z",
+      "side": 1,
+      "message": "\u003e Hm, but you can embed a whole directory without globbing, no? so \"single file\" is perhaps confusing.\n\nI don\u0027t believe we support that. And if we did, we\u0027d probably use a `dir\u003d` directive rather than the current `file\u003d` directive for single files.\n\nYeah, I agree it should probably be an error when used without a `glob` directive.",
+      "parentUuid": "731bfd43_3fdc84fd",
+      "range": {
+        "startLine": 59,
+        "startChar": 3,
+        "endLine": 59,
+        "endChar": 28
+      },
+      "revId": "9bfefe26a421037c14d1e05a684558c69118edc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ef493ce_85df4ea1",
@@ -71,6 +113,24 @@
       "writtenOn": "2025-08-14T16:29:06Z",
       "side": 1,
       "message": "just let the rest of the logic continue? AFAICT it will do the same anyway; `len(matches)\u003d\u003d0` so the first loop doesn\u0027t run, and then `len(dirs)\u003d\u003d0` so the second loop doesn\u0027t run either.\n\nI know this is still a sort of shortcut, but given it should be a rare edge case anyway, I don\u0027t think skipping one allocation should be a worry at all.",
+      "revId": "9bfefe26a421037c14d1e05a684558c69118edc2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d35e88dc_1a996d9a",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-14T16:52:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ef493ce_85df4ea1",
       "revId": "9bfefe26a421037c14d1e05a684558c69118edc2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

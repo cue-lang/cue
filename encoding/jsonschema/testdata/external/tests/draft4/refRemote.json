@@ -5,7 +5,6 @@
 			"$ref": "http://localhost:1234/integer.json"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/integer.json:integer\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/integer.json:integer\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -14,7 +13,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -23,7 +21,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -35,7 +32,6 @@
 			"$ref": "http://localhost:1234/subSchemas.json#/definitions/integer"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -44,7 +40,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -53,7 +48,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -65,7 +59,6 @@
 			"$ref": "http://localhost:1234/subSchemas.json#/definitions/refToInteger"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -74,7 +67,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -83,7 +75,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -101,7 +92,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/baseUriChange/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/baseUriChange/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -114,7 +104,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -127,7 +116,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -154,7 +142,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/baseUriChangeFolder/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/baseUriChangeFolder/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -167,7 +154,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -180,7 +166,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -211,7 +196,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/baseUriChangeFolderInSubschema/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/baseUriChangeFolderInSubschema/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -224,7 +208,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -237,7 +220,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -255,7 +237,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/name.json:name\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/name.json:name\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -266,7 +247,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -277,7 +257,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -290,7 +269,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -302,7 +280,6 @@
 			"$ref": "http://localhost:1234/locationIndependentIdentifierDraft4.json#/definitions/refToInteger"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/locationIndependentIdentifierDraft4.json:locationIndependentIdentifierDraft4\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/locationIndependentIdentifierDraft4.json:locationIndependentIdentifierDraft4\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -311,7 +288,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -320,7 +296,6 @@
 				"data": "foo",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

@@ -42,7 +42,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 5 more errors)",
 			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 5 more errors)"
 		},
 		"tests": [
@@ -55,7 +54,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -68,7 +66,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

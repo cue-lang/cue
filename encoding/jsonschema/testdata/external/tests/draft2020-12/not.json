@@ -278,18 +278,12 @@
 				"data": [
 					"foo"
 				],
-				"valid": true,
-				"skip": {
-					"v2": "invalid value [\"foo\"] (does not satisfy matchN): 0 matched, expected 0:\n    generated.cue:3:1\n    generated.cue:1:1\n    generated.cue:3:8\n    instance.json:1:1\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "empty array is valid",
 				"data": [],
-				"valid": true,
-				"skip": {
-					"v2": "invalid value [] (does not satisfy matchN): 0 matched, expected 0:\n    generated.cue:3:1\n    generated.cue:1:1\n    generated.cue:3:8\n    instance.json:1:1\n"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -327,7 +321,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
@@ -338,7 +331,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -349,7 +341,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

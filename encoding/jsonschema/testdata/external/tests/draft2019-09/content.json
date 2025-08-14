@@ -96,7 +96,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"contentSchema\" not yet implemented",
 			"v3": "extract error: keyword \"contentSchema\" not yet implemented"
 		},
 		"tests": [
@@ -105,7 +104,6 @@
 				"data": "eyJmb28iOiAiYmFyIn0K",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -114,7 +112,6 @@
 				"data": "eyJib28iOiAyMCwgImZvbyI6ICJiYXoifQ==",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -123,7 +120,6 @@
 				"data": "eyJib28iOiAyMH0=",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -132,7 +128,6 @@
 				"data": "e30=",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -141,7 +136,6 @@
 				"data": "W10=",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -150,7 +144,6 @@
 				"data": "ezp9Cg==",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -159,7 +152,6 @@
 				"data": "{}",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -168,7 +160,6 @@
 				"data": 100,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

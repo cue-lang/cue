@@ -336,7 +336,6 @@
 				"data": 0.0,
 				"valid": true,
 				"skip": {
-					"v2": "conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n",
 					"v3": "conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n"
 				}
 			}
@@ -374,7 +373,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "0: conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:3:1\n    generated.cue:3:2\n    instance.json:1:2\n",
 					"v3": "0: conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:3:1\n    generated.cue:3:2\n    instance.json:1:2\n"
 				}
 			}
@@ -404,7 +402,6 @@
 				"data": 1.0,
 				"valid": true,
 				"skip": {
-					"v2": "conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n",
 					"v3": "conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n"
 				}
 			}
@@ -442,7 +439,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "0: conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:3:1\n    generated.cue:3:2\n    instance.json:1:2\n",
 					"v3": "0: conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:3:1\n    generated.cue:3:2\n    instance.json:1:2\n"
 				}
 			}

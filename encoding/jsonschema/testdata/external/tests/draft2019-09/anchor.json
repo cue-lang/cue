@@ -12,7 +12,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot determine CUE location for JSON Schema location id=https://cue.jsonschema.invalid#foo: anchors (foo) not supported (and 3 more errors)",
 			"v3": "extract error: cannot determine CUE location for JSON Schema location id=https://cue.jsonschema.invalid#foo: anchors (foo) not supported (and 3 more errors)"
 		},
 		"tests": [
@@ -21,7 +20,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -30,7 +28,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -50,7 +47,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2019-09/bar#foo: anchors (foo) not supported (and 3 more errors)",
 			"v3": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2019-09/bar#foo: anchors (foo) not supported (and 3 more errors)"
 		},
 		"tests": [
@@ -59,7 +55,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -68,7 +63,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -93,7 +87,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2019-09/nested.json#foo: anchors (foo) not supported (and 3 more errors)",
 			"v3": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2019-09/nested.json#foo: anchors (foo) not supported (and 3 more errors)"
 		},
 		"tests": [
@@ -102,7 +95,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -111,7 +103,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -141,7 +132,6 @@
 			"$ref": "child1#my_anchor"
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$anchor\" not yet implemented (and 5 more errors)",
 			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 5 more errors)"
 		},
 		"tests": [
@@ -150,7 +140,6 @@
 				"data": "a",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -159,7 +148,6 @@
 				"data": 1,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

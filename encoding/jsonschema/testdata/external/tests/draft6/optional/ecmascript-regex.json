@@ -359,8 +359,7 @@
 			"pattern": "\\p{Letter}cole"
 		},
 		"skip": {
-			"v2": "extract error: unsupported regexp character class in \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`",
-			"v3": "extract error: unsupported regexp character class in \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`"
+			"v2": "extract error: unsupported regexp character class in \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`"
 		},
 		"tests": [
 			{
@@ -368,8 +367,7 @@
 				"data": "Les hivers de mon enfance etaient des saisons longues, longues. Nous vivions en trois lieux: l'ecole, l'eglise et la patinoire; mais la vraie vie etait sur la patinoire.",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			},
 			{
@@ -377,8 +375,7 @@
 				"data": "Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur la patinoire.",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			},
 			{
@@ -386,8 +383,7 @@
 				"data": "Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur la patinoire.",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			},
 			{
@@ -395,8 +391,7 @@
 				"data": "LES HIVERS DE MON ENFANCE ÉTAIENT DES SAISONS LONGUES, LONGUES. NOUS VIVIONS EN TROIS LIEUX: L'ÉCOLE, L'ÉGLISE ET LA PATINOIRE; MAIS LA VRAIE VIE ÉTAIT SUR LA PATINOIRE.",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			}
 		]
@@ -481,8 +476,7 @@
 			"pattern": "^\\p{digit}+$"
 		},
 		"skip": {
-			"v2": "extract error: unsupported regexp character class in \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`",
-			"v3": "extract error: unsupported regexp character class in \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`"
+			"v2": "extract error: unsupported regexp character class in \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`"
 		},
 		"tests": [
 			{
@@ -490,8 +484,7 @@
 				"data": "42",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			},
 			{
@@ -499,8 +492,7 @@
 				"data": "-%#",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			},
 			{
@@ -508,8 +500,7 @@
 				"data": "৪২",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			}
 		]
@@ -524,8 +515,7 @@
 			"additionalProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported regexp character class in \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`",
-			"v3": "extract error: unsupported regexp character class in \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`"
+			"v2": "extract error: unsupported regexp character class in \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`"
 		},
 		"tests": [
 			{
@@ -535,8 +525,7 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			},
 			{
@@ -546,8 +535,7 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			},
 			{
@@ -557,8 +545,7 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			},
 			{
@@ -568,8 +555,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			}
 		]
@@ -690,8 +676,7 @@
 			"additionalProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported regexp character class in \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`",
-			"v3": "extract error: unsupported regexp character class in \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`"
+			"v2": "extract error: unsupported regexp character class in \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`"
 		},
 		"tests": [
 			{
@@ -701,8 +686,7 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			},
 			{
@@ -712,8 +696,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			},
 			{
@@ -723,8 +706,7 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "could not compile schema"
 				}
 			}
 		]

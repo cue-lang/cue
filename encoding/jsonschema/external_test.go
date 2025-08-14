@@ -86,7 +86,6 @@ func TestExternal(t *testing.T) {
 var rxCharacterClassCategoryAlias = regexp.MustCompile(`\\p{(Cased_Letter|Close_Punctuation|Combining_Mark|Connector_Punctuation|Control|Currency_Symbol|Dash_Punctuation|Decimal_Number|Enclosing_Mark|Final_Punctuation|Format|Initial_Punctuation|Letter|Letter_Number|Line_Separator|Lowercase_Letter|Mark|Math_Symbol|Modifier_Letter|Modifier_Symbol|Nonspacing_Mark|Number|Open_Punctuation|Other|Other_Letter|Other_Number|Other_Punctuation|Other_Symbol|Paragraph_Separator|Private_Use|Punctuation|Separator|Space_Separator|Spacing_Mark|Surrogate|Symbol|Titlecase_Letter|Unassigned|Uppercase_Letter|cntrl|digit|punct)}`)
 
 var supportsCharacterClassCategoryAlias = func() bool {
-	//lint:ignore SA1000 this regular expression is meant to fail to compile on Go 1.24 and earlier
 	_, err := regexp.Compile(`\p{Letter}`)
 	return err == nil
 }()

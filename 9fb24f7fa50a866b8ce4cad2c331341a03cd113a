@@ -1,0 +1,146 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc208333_7ba7a93e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-14T10:08:39Z",
+      "side": 1,
+      "message": "LGTM with some minor comment nits, thanks!",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b42f745_34054d58",
+        "filename": "cmd/cue/cmd/integration/workspace/editing_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-14T10:08:39Z",
+      "side": 1,
+      "message": "I quite like the `|` to represent the selection, so maybe\n\n```suggestion\n\t\t\t\t\t// |v1|\n```\n\n?",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3c6cdf8_b66b126c",
+        "filename": "cmd/cue/cmd/integration/workspace/editing_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-14T10:08:39Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t\t\t// |package a|\n```",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "289b119a_04a98264",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-14T10:08:39Z",
+      "side": 1,
+      "message": "I had to think a bit about this. Perhaps something like this instead?\n\n```suggestion\n\t// pkgDecls represents the package struct itself.\n\t// It\u0027s shared between (so therefore contains) the\n\t// fields in every file passed to [Analyse].\n\tpkgDecls *navigableBindings\n```",
+      "range": {
+        "startLine": 271,
+        "startChar": 0,
+        "endLine": 273,
+        "endChar": 0
+      },
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a851b73_9f64de3f",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-14T10:08:39Z",
+      "side": 1,
+      "message": "It would be kinda nice to have some testing for this in the definitions package itself (because the tests there are more readable in general), but is that a bit hard to arrange?",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca5b4ce4_63fda633",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 608,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-14T10:08:39Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t\t// 1) At the filenode level. the first time we\u0027ve seen the ImportSpec, we create appropriate\n```",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2c926e8_29ed8bc3",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 625,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-14T10:08:39Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t\t// 2) In that child node, the second time we\u0027re seeing the ImportSpec, we lookup the package imported,\n```",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39061c67_2a38e132",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1003,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-14T10:08:39Z",
+      "side": 1,
+      "message": "This comment repeats exactly what the logic below says but\ndoesn\u0027t say anything about what it actually means.\n\nHow about this?\n\n```suggestion\n// isFileNode reports whether n is a top-level child of\n// the package.\n```",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b805c92c_88e141d0",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-14T13:48:22Z",
+      "side": 0,
+      "message": "This TODO still seems relevant.",
+      "revId": "64b75f03c825741e41c852d9d009fbb3268a8f96",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

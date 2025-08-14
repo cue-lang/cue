@@ -127,7 +127,6 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:10:12\n",
 			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:10:12\n"
 		},
 		"tests": [
@@ -161,7 +160,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -203,7 +201,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -240,7 +237,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -269,7 +265,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -301,7 +296,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -321,7 +315,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -461,7 +454,6 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "5 errors in empty disjunction:\nconflicting values [] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nconflicting values bool and [] (mismatched types bool and list):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values null and [] (mismatched types null and list):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values number and [] (mismatched types number and list):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values string and [] (mismatched types string and list):\n    generated.cue:3:24\n    instance.json:1:1\n",
 					"v3": "7 errors in empty disjunction:\nconflicting values [] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nincompatible list lengths (0 and 4):\n    generated.cue:3:33\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n"
 				}
 			},
@@ -472,7 +464,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "5 errors in empty disjunction:\nconflicting values [1] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nconflicting values bool and [1] (mismatched types bool and list):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values null and [1] (mismatched types null and list):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values number and [1] (mismatched types number and list):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values string and [1] (mismatched types string and list):\n    generated.cue:3:24\n    instance.json:1:1\n",
 					"v3": "7 errors in empty disjunction:\nconflicting values [1] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nincompatible list lengths (1 and 4):\n    generated.cue:3:33\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n"
 				}
 			},
@@ -484,7 +475,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "5 errors in empty disjunction:\nconflicting values [1,2] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nconflicting values bool and [1,2] (mismatched types bool and list):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values null and [1,2] (mismatched types null and list):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values number and [1,2] (mismatched types number and list):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values string and [1,2] (mismatched types string and list):\n    generated.cue:3:24\n    instance.json:1:1\n",
 					"v3": "7 errors in empty disjunction:\nconflicting values [1,2] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1,2] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1,2] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1,2] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1,2] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nincompatible list lengths (2 and 4):\n    generated.cue:3:33\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n"
 				}
 			},
@@ -497,7 +487,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "6 errors in empty disjunction:\nconflicting values [1,2,3] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nconflicting values bool and [1,2,3] (mismatched types bool and list):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values null and [1,2,3] (mismatched types null and list):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values number and [1,2,3] (mismatched types number and list):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values string and [1,2,3] (mismatched types string and list):\n    generated.cue:3:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n",
 					"v3": "6 errors in empty disjunction:\nconflicting values [1,2,3] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1,2,3] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1,2,3] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1,2,3] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1,2,3] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n"
 				}
 			},
@@ -572,7 +561,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "6 errors in empty disjunction:\nconflicting values [\"x\",2,3] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:60\n    instance.json:1:1\nconflicting values bool and [\"x\",2,3] (mismatched types bool and list):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values null and [\"x\",2,3] (mismatched types null and list):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values number and [\"x\",2,3] (mismatched types number and list):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values string and [\"x\",2,3] (mismatched types string and list):\n    generated.cue:3:24\n    instance.json:1:1\n0: conflicting values \"x\" and int (mismatched types string and int):\n    generated.cue:3:1\n    generated.cue:3:50\n    generated.cue:3:53\n    instance.json:1:2\n",
 					"v3": "6 errors in empty disjunction:\nconflicting values \"x\" and int (mismatched types string and int):\n    generated.cue:3:1\n    generated.cue:3:53\n    instance.json:1:2\nconflicting values [\"x\",2,3] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [\"x\",2,3] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [\"x\",2,3] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [\"x\",2,3] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [\"x\",2,3] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:60\n    instance.json:1:1\n"
 				}
 			},
@@ -612,7 +600,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "6 errors in empty disjunction:\nconflicting values [null] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:55\n    instance.json:1:1\nconflicting values bool and [null] (mismatched types bool and list):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values null and [null] (mismatched types null and list):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values number and [null] (mismatched types number and list):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values string and [null] (mismatched types string and list):\n    generated.cue:3:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:3:48\n",
 					"v3": "6 errors in empty disjunction:\nconflicting values [null] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [null] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [null] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [null] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [null] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:55\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:3:48\n"
 				}
 			}

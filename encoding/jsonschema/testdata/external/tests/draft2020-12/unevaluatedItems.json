@@ -6,7 +6,6 @@
 			"unevaluatedItems": true
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -15,7 +14,6 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -26,7 +24,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -39,7 +36,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -48,7 +44,6 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -59,7 +54,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -74,7 +68,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -83,7 +76,6 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -94,7 +86,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -105,7 +96,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -121,7 +111,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -133,7 +122,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -151,7 +139,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -162,7 +149,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -174,7 +160,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -193,7 +178,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -205,7 +189,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -223,7 +206,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -238,7 +220,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -251,7 +232,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -279,7 +259,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -291,7 +270,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -304,7 +282,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -327,7 +304,6 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -339,7 +315,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -351,7 +326,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -363,7 +337,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -386,7 +359,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -397,7 +369,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -410,7 +381,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -435,7 +405,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
@@ -446,7 +415,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -459,7 +427,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -496,7 +463,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -508,7 +474,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -521,7 +486,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -534,7 +498,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -548,7 +511,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -584,7 +546,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -596,7 +557,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -609,7 +569,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -637,7 +596,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -649,7 +607,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -694,7 +651,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -707,7 +663,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -721,7 +676,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -735,7 +689,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -750,7 +703,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -766,7 +718,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -775,7 +726,6 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -786,7 +736,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -815,7 +764,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
@@ -827,7 +775,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -840,7 +787,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -869,7 +815,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
@@ -881,7 +826,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -894,7 +838,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -937,7 +880,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 7 more errors)",
 			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 7 more errors)"
 		},
 		"tests": [
@@ -949,7 +891,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -962,7 +903,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -984,7 +924,6 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -995,7 +934,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1031,7 +969,6 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -1044,7 +981,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1058,7 +994,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1077,7 +1012,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -1089,7 +1023,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1101,7 +1034,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1114,7 +1046,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1141,7 +1072,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -1156,7 +1086,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1171,7 +1100,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1203,7 +1131,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -1212,7 +1139,6 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1224,7 +1150,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1239,7 +1164,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1255,7 +1179,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1267,7 +1190,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1279,7 +1201,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1294,7 +1215,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1309,7 +1229,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1322,7 +1241,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -1331,7 +1249,6 @@
 				"data": true,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1340,7 +1257,6 @@
 				"data": 123,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1349,7 +1265,6 @@
 				"data": 1.0,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1358,7 +1273,6 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1367,7 +1281,6 @@
 				"data": "foo",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1376,7 +1289,6 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1391,7 +1303,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -1402,7 +1313,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1422,7 +1332,6 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
 			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
@@ -1433,7 +1342,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1444,7 +1352,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

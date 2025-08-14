@@ -106,18 +106,14 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 		t.Skipf("skipping test for unknown schema version %v", versStr)
 	}
 
-	// The upcoming Go 1.25 implements Unicode category aliases in regular expressions,
-	// such that e.g. \p{Letter} begins working on Go tip and 1.25 pre-releases.
-	// Our tests must run on the latest two stable Go versions, currently 1.23 and 1.24,
-	// where such character classes lead to schema compilation errors.
+	// Go 1.25.0 implements Unicode category aliases in regular expressions,
+	// and so e.g. \p{Letter} did not work on Go 1.24.x releases.
+	// Our tests must run on the latest two stable Go versions, currently 1.24 and 1.25,
+	// where such character classes lead to schema compilation errors on 1.24.
 	//
-	// As a temporary compromise, only run these tests on the broken and older Go versions.
-	// With the testdata files being updated with the latest stable Go, 1.24,
-	// this results in testdata reflecting what most Go users see with the latest Go,
-	// while we are still able to use `go test` normally with Go tip.
-	// TODO: swap around to expect the fixed behavior once Go 1.25.0 is released.
+	// As a temporary compromise, only run these tests on Go 1.25 or later.
 	// TODO: get rid of this whole thing once we require Go 1.25 or later in the future.
-	if rxCharacterClassCategoryAlias.Match(s.Schema) && supportsCharacterClassCategoryAlias {
+	if rxCharacterClassCategoryAlias.Match(s.Schema) && !supportsCharacterClassCategoryAlias {
 		t.Skip("regexp character classes for Unicode category aliases work only on Go 1.25 and later")
 	}
 

@@ -19,7 +19,7 @@ import (
 	"strings"
 )
 
-//go:generate go run golang.org/x/tools/cmd/stringer -type=Version -linecomment
+//go:generate go tool stringer -type=Version -linecomment
 
 type Version int
 

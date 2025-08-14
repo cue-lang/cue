@@ -45,7 +45,6 @@
 				"data": "http://example.com/dictionary/{term:1}/{term",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},

@@ -7,7 +7,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:4:3\n",
 			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:4:3\n"
 		},
 		"tests": [
@@ -19,7 +18,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -31,7 +29,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -40,7 +37,6 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -54,7 +50,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -63,7 +58,6 @@
 				"data": "foobar",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -72,7 +66,6 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -102,7 +95,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},

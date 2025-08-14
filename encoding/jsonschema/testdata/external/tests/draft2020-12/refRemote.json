@@ -6,7 +6,6 @@
 			"$ref": "http://localhost:1234/draft2020-12/integer.json"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/integer.json:integer\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/integer.json:integer\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -15,7 +14,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -24,7 +22,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -37,7 +34,6 @@
 			"$ref": "http://localhost:1234/draft2020-12/subSchemas.json#/$defs/integer"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -46,7 +42,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -55,7 +50,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -68,7 +62,6 @@
 			"$ref": "http://localhost:1234/draft2020-12/locationIndependentIdentifier.json#foo"
 		},
 		"skip": {
-			"v2": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2020-12/locationIndependentIdentifier.json#foo: anchors (foo) not supported",
 			"v3": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2020-12/locationIndependentIdentifier.json#foo: anchors (foo) not supported"
 		},
 		"tests": [
@@ -77,7 +70,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -86,7 +78,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -99,7 +90,6 @@
 			"$ref": "http://localhost:1234/draft2020-12/subSchemas.json#/$defs/refToInteger"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -108,7 +98,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -117,7 +106,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -136,7 +124,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/baseUriChange/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/baseUriChange/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -149,7 +136,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -162,7 +148,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -190,7 +175,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot determine package name from import path \"localhost:1234/draft2020-12/baseUriChangeFolder/\"",
 			"v3": "extract error: cannot determine package name from import path \"localhost:1234/draft2020-12/baseUriChangeFolder/\""
 		},
 		"tests": [
@@ -203,7 +187,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -216,7 +199,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -248,7 +230,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot determine package name from import path \"localhost:1234/draft2020-12/baseUriChangeFolderInSubschema/\"",
 			"v3": "extract error: cannot determine package name from import path \"localhost:1234/draft2020-12/baseUriChangeFolderInSubschema/\""
 		},
 		"tests": [
@@ -261,7 +242,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -274,7 +254,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -293,7 +272,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/name-defs.json:schema\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/name-defs.json:schema\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -304,7 +282,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -315,7 +292,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -328,7 +304,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -342,7 +317,6 @@
 			"$ref": "ref-and-defs.json"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/ref-and-defs.json:schema\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/ref-and-defs.json:schema\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -353,7 +327,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -364,7 +337,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -377,7 +349,6 @@
 			"$ref": "http://localhost:1234/draft2020-12/locationIndependentIdentifier.json#/$defs/refToInteger"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/locationIndependentIdentifier.json:locationIndependentIdentifier\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/locationIndependentIdentifier.json:locationIndependentIdentifier\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -386,7 +357,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -395,7 +365,6 @@
 				"data": "foo",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -413,7 +382,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/nested/foo-ref-string.json:schema\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/nested/foo-ref-string.json:schema\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -426,7 +394,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -439,7 +406,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -452,7 +418,6 @@
 			"$ref": "http://localhost:1234/different-id-ref-string.json"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/different-id-ref-string.json:schema\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/different-id-ref-string.json:schema\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -461,7 +426,6 @@
 				"data": 1,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -470,7 +434,6 @@
 				"data": "foo",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -483,7 +446,6 @@
 			"$ref": "http://localhost:1234/urn-ref-string.json"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/urn-ref-string.json:schema\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/urn-ref-string.json:schema\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -492,7 +454,6 @@
 				"data": 1,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -501,7 +462,6 @@
 				"data": "foo",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -514,7 +474,6 @@
 			"$ref": "http://localhost:1234/nested-absolute-ref-to-string.json"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/nested-absolute-ref-to-string.json:schema\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/nested-absolute-ref-to-string.json:schema\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -523,7 +482,6 @@
 				"data": 1,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -532,7 +490,6 @@
 				"data": "foo",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -545,7 +502,6 @@
 			"$ref": "http://localhost:1234/draft2020-12/detached-ref.json#/$defs/foo"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/detached-ref.json:schema\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/detached-ref.json:schema\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -554,7 +510,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -563,7 +518,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

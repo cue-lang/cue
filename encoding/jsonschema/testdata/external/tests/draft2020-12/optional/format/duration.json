@@ -46,7 +46,6 @@
 				"data": "PT1D",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -55,7 +54,6 @@
 				"data": "P",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -64,7 +62,6 @@
 				"data": "P1YT",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -73,7 +70,6 @@
 				"data": "PT",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -82,7 +78,6 @@
 				"data": "P2D1Y",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -91,7 +86,6 @@
 				"data": "P1D2H",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -100,7 +94,6 @@
 				"data": "P2S",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -149,7 +142,6 @@
 				"data": "P1Y2W",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -158,7 +150,6 @@
 				"data": "P২Y",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -167,7 +158,6 @@
 				"data": "P1",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			}

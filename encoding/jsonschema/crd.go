@@ -9,7 +9,7 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-//go:generate go run cuelang.org/go/cmd/cue exp gengotypes .
+//go:generate go tool cue exp gengotypes .
 
 //go:embed crd.cue
 var crdCUE []byte

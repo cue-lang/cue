@@ -92,7 +92,7 @@ jobs:
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test'))
         run: go env -w GOFLAGS=-count=1
-      - run: go run cuelang.org/go/cmd/cue login --token=${{ secrets.NOTCUECKOO_CUE_TOKEN }}
+      - run: go tool cue login --token=${{ secrets.NOTCUECKOO_CUE_TOKEN }}
       - if: (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: Early git and code sanity checks
         run: go run ./internal/ci/checks

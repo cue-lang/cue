@@ -18,7 +18,7 @@ import (
 	_ "embed"
 )
 
-//go:generate go run golang.org/x/tools/cmd/stringer -type=TagType -linecomment
+//go:generate go tool stringer -type=TagType -linecomment
 
 type TagType int
 

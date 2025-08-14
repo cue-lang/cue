@@ -14,4 +14,4 @@
 
 package ci
 
-//go:generate go run cuelang.org/go/cmd/cue cmd gen
+//go:generate go tool cue cmd gen

@@ -312,7 +312,7 @@ func mermaidGraph(c *Controller) string {
 // tasks that send updates.
 type State int
 
-//go:generate go run golang.org/x/tools/cmd/stringer -type=State
+//go:generate go tool stringer -type=State
 
 const (
 	// Waiting indicates a task is blocked on input from another task.

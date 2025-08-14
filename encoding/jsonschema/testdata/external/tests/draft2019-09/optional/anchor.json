@@ -34,7 +34,6 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$anchor\" not yet implemented (and 3 more errors)",
 			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
@@ -46,7 +45,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -57,7 +55,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -66,7 +63,6 @@
 				"data": "a string to match #/$defs/anchor_in_enum",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -75,7 +71,6 @@
 				"data": 1,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

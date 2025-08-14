@@ -7,7 +7,6 @@
 			"format": "ipv4"
 		},
 		"skip": {
-			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-false.json\": $schema URI not recognized (and 1 more errors)",
 			"v3": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-false.json\": $schema URI not recognized (and 1 more errors)"
 		},
 		"tests": [
@@ -16,7 +15,6 @@
 				"data": "127.0.0.1",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -25,7 +23,6 @@
 				"data": "not-an-ipv4",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -39,7 +36,6 @@
 			"format": "ipv4"
 		},
 		"skip": {
-			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-true.json\": $schema URI not recognized (and 1 more errors)",
 			"v3": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-true.json\": $schema URI not recognized (and 1 more errors)"
 		},
 		"tests": [
@@ -48,7 +44,6 @@
 				"data": "127.0.0.1",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -57,7 +52,6 @@
 				"data": "not-an-ipv4",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

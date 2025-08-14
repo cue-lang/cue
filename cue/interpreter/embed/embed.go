@@ -241,7 +241,7 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 		return nil, errors.Promote(err, "failed to match glob")
 	}
 	if len(matches) == 0 {
-		return nil, errors.Newf(c.pos, "no matches for glob pattern %q", glob)
+		//		return nil, errors.Newf(c.pos, "no matches for glob pattern %q", glob)
 	}
 
 	dirs := make(map[string]string)

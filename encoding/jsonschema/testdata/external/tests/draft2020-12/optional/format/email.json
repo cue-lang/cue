@@ -46,7 +46,6 @@
 				"data": "2962",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -95,7 +94,6 @@
 				"data": ".test@example.com",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -104,7 +102,6 @@
 				"data": "test.@example.com",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -118,7 +115,6 @@
 				"data": "te..st@example.com",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -127,7 +123,6 @@
 				"data": "joe.bloggs@invalid=domain.com",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -136,7 +131,6 @@
 				"data": "joe.bloggs@[127.0.0.300]",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			}

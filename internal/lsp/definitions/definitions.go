@@ -335,6 +335,9 @@ func (dfns *Definitions) newAstNode(parent *astNode, key ast.Node, unprocessed a
 	if key != nil {
 		s.key = key
 		s.addRange(key)
+		start := key.Pos()
+		length := key.End().Position().Offset - start.Position().Offset
+		dfns.addResolution(start, length, []*navigableBindings{s.navigable})
 	}
 	return s
 }

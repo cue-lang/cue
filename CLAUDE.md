@@ -97,7 +97,7 @@ go fmt ./...
 
 ### Module Information
 - Module: `cuelang.org/go`
-- Requires Go 1.23 or later
+- Requires Go 1.24 or later
 - Uses Go modules for dependency management
 
 ### Important Conventions

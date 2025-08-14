@@ -3,7 +3,7 @@
 // TODO(mvdan): once we stabilize on this model, have CI ensure this module is tidy too.
 module test/tools
 
-go 1.23.0
+go 1.24.0
 
 tool honnef.co/go/tools/cmd/staticcheck
 

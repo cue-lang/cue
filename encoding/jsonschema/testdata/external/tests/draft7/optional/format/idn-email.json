@@ -45,7 +45,6 @@
 				"data": "2962",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -59,7 +58,6 @@
 				"data": "2962",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			}

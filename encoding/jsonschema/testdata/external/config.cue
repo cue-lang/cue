@@ -4,9 +4,9 @@ package external
 
 // TODO use recursive globbing when it's available.
 
-allTests: _	@embed(glob=tests/*/*.json)
-allTests: _	@embed(glob=tests/*/*/*.json)
-allTests: _	@embed(glob=tests/*/*/*/*.json)
+allTests: _	@embed(glob=tests/*/*.json, allowEmptyGlob)
+allTests: _	@embed(glob=tests/*/*/*.json, allowEmptyGlob)
+allTests: _	@embed(glob=tests/*/*/*/*.json, allowEmptyGlob)
 
 allTests: [_]: [... #Schema]
 #Schema: {
@@ -43,6 +43,5 @@ allTests: [_]: [... #Schema]
 //
 // If all fields are empty, the skip field itself should be omitted.
 #Skip: {
-	v2?: string
 	v3?: string
 }

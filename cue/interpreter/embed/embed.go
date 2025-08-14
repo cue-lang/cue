@@ -51,6 +51,13 @@
 // the list of supported types. This field is required if a file extension is
 // unknown, or if a wildcard is used for the file extension in the glob pattern.
 //
+// allowEmpty
+//
+// By default, a glob pattern that matches no files results in an error. When
+// allowEmpty is present, a glob pattern with no matches will return an
+// empty struct instead of an error. This option only applies to glob patterns,
+// not single file embedding.
+//
 // # Limitations
 //
 // The embed interpreter currently does not support:
@@ -79,6 +86,10 @@
 //	// include all files in the y directory as a map of file paths to binary
 //	// data. The entries are unified into the same map as above.
 //	files: _ @embed(glob=y/*.*, type=binary)
+//
+//	// include all YAML files in the z directory, but allow empty result
+//	// if no files match (returns empty struct instead of error)
+//	optionalFiles: _ @embed(glob=z/*.yaml, allowEmpty)
 package embed
 
 import (
@@ -169,6 +180,11 @@ func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (
 		return nil, errors.Promote(err, "invalid type argument")
 	}
 
+	allowEmpty, err := a.Flag(0, "allowEmpty")
+	if err != nil {
+		return nil, errors.Promote(err, "invalid allowEmpty argument")
+	}
+
 	c.opCtx = adt.NewContext((*runtime.Runtime)(c.runtime), nil)
 
 	pos := a.Pos
@@ -194,7 +210,7 @@ func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (
 		return c.processFile(file, typ, scope)
 
 	default: // glob != "":
-		return c.processGlob(glob, typ, scope)
+		return c.processGlob(glob, typ, allowEmpty, scope)
 	}
 }
 
@@ -212,7 +228,7 @@ func (c *compiler) processFile(file, scope string, schema adt.Value) (adt.Expr, 
 	return c.decodeFile(file, scope, schema)
 }
 
-func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, errors.Error) {
+func (c *compiler) processGlob(glob, scope string, allowEmpty bool, schema adt.Value) (adt.Expr, errors.Error) {
 	glob, ce := c.clean(glob)
 	if ce != nil {
 		return nil, ce
@@ -241,7 +257,11 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 		return nil, errors.Promote(err, "failed to match glob")
 	}
 	if len(matches) == 0 {
-		return nil, errors.Newf(c.pos, "no matches for glob pattern %q", glob)
+		if !allowEmpty {
+			return nil, errors.Newf(c.pos, "no matches for glob pattern %q", glob)
+		}
+		// Return empty struct when allowEmpty is present and no matches found
+		return &adt.StructLit{}, nil
 	}
 
 	dirs := make(map[string]string)

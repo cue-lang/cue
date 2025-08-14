@@ -244,6 +244,12 @@ which inserts one field per file matched:
 
 Note that "**" glob patterns are not supported at this time.
 
+By default, a glob pattern that matches no files results in an error.
+To allow empty results, use the "allowEmpty" option:
+
+	c: _ @embed(glob=optional/*.json, allowEmpty)
+	c: [string]: {...}
+
 If the file extension in "file" or "glob" does not imply a file type,
 it must be specified with the "type" encoding as shown above.
 See the "filetypes" help topic for more.

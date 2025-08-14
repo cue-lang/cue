@@ -644,6 +644,42 @@ line two.\
 			]
 			`,
 	}, {
+		name: "ArrayTablesSubtableDuplicateKey",
+		input: `
+			[[foo]]
+			[foo.subtable]
+			name = "bar"
+			[[foo]]
+			[foo.subtable]
+			name = "bar"
+			`,
+		wantCUE: `
+			foo: [
+				{
+					subtable: {
+						name: "bar"
+					}
+				},
+				{
+					subtable: {
+						name: "bar"
+					}
+				}
+			]
+			`,
+	}, {
+		name: "ArrayTablesSubtableActualDuplicate",
+		input: `
+			[[foo]]
+			[foo.subtable]
+			name = "bar"
+			[foo.subtable]
+			`,
+		wantErr: `
+				duplicate key: foo.subtable:
+				    test.toml:4:2
+				`,
+	}, {
 		name: "ArrayTablesNested",
 		input: `
 			[[foo]]

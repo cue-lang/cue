@@ -293,7 +293,6 @@
 			"$ref": "http://json-schema.org/draft-07/schema#"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: package \"json-schema.org/draft-07/schema\" imported but not defined in :\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: package \"json-schema.org/draft-07/schema\" imported but not defined in :\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -304,7 +303,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -315,7 +313,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -411,7 +408,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:4:8\n",
 			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:4:8\n"
 		},
 		"tests": [
@@ -420,7 +416,6 @@
 				"data": "foo",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -590,7 +585,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: $id URI may not contain a fragment (and 3 more errors)",
 			"v3": "extract error: $id URI may not contain a fragment (and 3 more errors)"
 		},
 		"tests": [
@@ -599,7 +593,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -608,7 +601,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -631,7 +623,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: $id URI may not contain a fragment (and 3 more errors)",
 			"v3": "extract error: $id URI may not contain a fragment (and 3 more errors)"
 		},
 		"tests": [
@@ -640,7 +631,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -649,7 +639,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -677,7 +666,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: $id URI may not contain a fragment (and 3 more errors)",
 			"v3": "extract error: $id URI may not contain a fragment (and 3 more errors)"
 		},
 		"tests": [
@@ -686,7 +674,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -695,7 +682,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1107,7 +1093,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot determine CUE location for JSON Schema location id=urn:uuid:deadbeef-1234-ff00-00ff-4321feebdaed#something: anchors (something) not supported (and 3 more errors)",
 			"v3": "extract error: cannot determine CUE location for JSON Schema location id=urn:uuid:deadbeef-1234-ff00-00ff-4321feebdaed#something: anchors (something) not supported (and 3 more errors)"
 		},
 		"tests": [
@@ -1118,7 +1103,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1129,7 +1113,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1151,7 +1134,6 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: package \"example.com/ref/if\" imported but not defined in :\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: package \"example.com/ref/if\" imported but not defined in :\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -1160,7 +1142,6 @@
 				"data": "foo",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1169,7 +1150,6 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1191,7 +1171,6 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: package \"example.com/ref/then\" imported but not defined in :\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: package \"example.com/ref/then\" imported but not defined in :\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -1200,7 +1179,6 @@
 				"data": "foo",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1209,7 +1187,6 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1231,7 +1208,6 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: package \"example.com/ref/else\" imported but not defined in :\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: package \"example.com/ref/else\" imported but not defined in :\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -1240,7 +1216,6 @@
 				"data": "foo",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1249,7 +1224,6 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

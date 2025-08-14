@@ -47,7 +47,6 @@
 			"pattern": "^\\cC$"
 		},
 		"skip": {
-			"v2": "extract error: invalid regexp \"^\\\\cC$\": error parsing regexp: invalid escape sequence: `\\c`",
 			"v3": "extract error: invalid regexp \"^\\\\cC$\": error parsing regexp: invalid escape sequence: `\\c`"
 		},
 		"tests": [
@@ -56,7 +55,6 @@
 				"data": "\\cC",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -65,7 +63,6 @@
 				"data": "\u0003",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -79,7 +76,6 @@
 			"pattern": "^\\cc$"
 		},
 		"skip": {
-			"v2": "extract error: invalid regexp \"^\\\\cc$\": error parsing regexp: invalid escape sequence: `\\c`",
 			"v3": "extract error: invalid regexp \"^\\\\cc$\": error parsing regexp: invalid escape sequence: `\\c`"
 		},
 		"tests": [
@@ -88,7 +84,6 @@
 				"data": "\\cc",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -97,7 +92,6 @@
 				"data": "\u0003",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -216,7 +210,6 @@
 				"data": "\u000b",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
 					"v3": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
@@ -230,7 +223,6 @@
 				"data": " ",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
 					"v3": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
@@ -239,7 +231,6 @@
 				"data": "\ufeff",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
 					"v3": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
@@ -253,7 +244,6 @@
 				"data": "\u2029",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
 					"v3": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
@@ -262,7 +252,6 @@
 				"data": " ",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
 					"v3": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
@@ -301,7 +290,6 @@
 				"data": "\u000b",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -315,7 +303,6 @@
 				"data": " ",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -324,7 +311,6 @@
 				"data": "\ufeff",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -338,7 +324,6 @@
 				"data": "\u2029",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -347,7 +332,6 @@
 				"data": " ",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -369,46 +353,26 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"pattern": "\\p{Letter}cole"
 		},
-		"skip": {
-			"v2": "extract error: unsupported regexp character class in \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`",
-			"v3": "extract error: unsupported regexp character class in \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`"
-		},
 		"tests": [
 			{
 				"description": "ascii character in json string",
 				"data": "Les hivers de mon enfance etaient des saisons longues, longues. Nous vivions en trois lieux: l'ecole, l'eglise et la patinoire; mais la vraie vie etait sur la patinoire.",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "literal unicode character in json string",
 				"data": "Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur la patinoire.",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "unicode character in hex format in string",
 				"data": "Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur la patinoire.",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "unicode matching is case-sensitive",
 				"data": "LES HIVERS DE MON ENFANCE ÉTAIENT DES SAISONS LONGUES, LONGUES. NOUS VIVIONS EN TROIS LIEUX: L'ÉCOLE, L'ÉGLISE ET LA PATINOIRE; MAIS LA VRAIE VIE ÉTAIT SUR LA PATINOIRE.",
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -495,37 +459,21 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"pattern": "^\\p{digit}+$"
 		},
-		"skip": {
-			"v2": "extract error: unsupported regexp character class in \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`",
-			"v3": "extract error: unsupported regexp character class in \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`"
-		},
 		"tests": [
 			{
 				"description": "ascii digits",
 				"data": "42",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ascii non-digits",
 				"data": "-%#",
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)",
 				"data": "৪২",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -539,54 +487,34 @@
 			},
 			"additionalProperties": false
 		},
-		"skip": {
-			"v2": "extract error: unsupported regexp character class in \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`",
-			"v3": "extract error: unsupported regexp character class in \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`"
-		},
 		"tests": [
 			{
 				"description": "ascii character in json string",
 				"data": {
 					"l'ecole": "pas de vraie vie"
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "literal unicode character in json string",
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "unicode character in hex format in string",
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "unicode matching is case-sensitive",
 				"data": {
 					"L'ÉCOLE": "PAS DE VRAIE VIE"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -709,43 +637,27 @@
 			},
 			"additionalProperties": false
 		},
-		"skip": {
-			"v2": "extract error: unsupported regexp character class in \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`",
-			"v3": "extract error: unsupported regexp character class in \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`"
-		},
 		"tests": [
 			{
 				"description": "ascii digits",
 				"data": {
 					"42": "life, the universe, and everything"
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ascii non-digits",
 				"data": {
 					"-%#": "spending the year dead for tax reasons"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)",
 				"data": {
 					"৪২": "khajit has wares if you have coin"
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	}

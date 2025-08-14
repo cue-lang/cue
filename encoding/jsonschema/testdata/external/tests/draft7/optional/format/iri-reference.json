@@ -55,7 +55,6 @@
 				"data": "\\\\WINDOWS\\filëßåré",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -74,7 +73,6 @@
 				"data": "#ƒräg\\mênt",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			}

@@ -174,7 +174,7 @@ import (
 
 type defID uint32
 
-//go:generate go run golang.org/x/tools/cmd/stringer -type=defIDType -linecomment
+//go:generate go tool stringer -type=defIDType -linecomment
 
 type defIDType int8
 

@@ -13,7 +13,7 @@ type Logger interface {
 
 type EventKind int
 
-//go:generate go run golang.org/x/tools/cmd/stringer -type=EventKind -linecomment
+//go:generate go tool stringer -type=EventKind -linecomment
 
 const (
 	NoEvent                EventKind = iota

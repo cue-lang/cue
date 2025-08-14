@@ -42,7 +42,7 @@ import (
 // control flow. No other aspects of an error may influence control flow.
 type ErrorCode int8
 
-//go:generate go run golang.org/x/tools/cmd/stringer -type=ErrorCode -linecomment
+//go:generate go tool stringer -type=ErrorCode -linecomment
 
 const (
 	// An EvalError is a fatal evaluation error.

@@ -176,7 +176,7 @@ func (s schedState) String() string {
 // runMode indicates how to proceed after a condition could not be met.
 type runMode uint8
 
-//go:generate go run golang.org/x/tools/cmd/stringer -type=runMode
+//go:generate go tool stringer -type=runMode
 
 const (
 	// ignore indicates that the new evaluator should not do any processing.

@@ -365,7 +365,7 @@ func (v *Vertex) MayAttach() bool {
 	return !v.Label.IsLet() && !v.anonymous
 }
 
-//go:generate go run golang.org/x/tools/cmd/stringer -type=ArcType -trimprefix=Arc
+//go:generate go tool stringer -type=ArcType -trimprefix=Arc
 
 type ArcType uint8
 
@@ -465,7 +465,7 @@ type StructInfo struct {
 // vertexStatus indicates the evaluation progress of a Vertex.
 type vertexStatus int8
 
-//go:generate go run golang.org/x/tools/cmd/stringer -type=vertexStatus
+//go:generate go tool stringer -type=vertexStatus
 
 const (
 	// unprocessed indicates a Vertex has not been processed before.

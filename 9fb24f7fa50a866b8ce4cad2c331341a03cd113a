@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c382b45_234e0d5c",
+        "filename": "cmd/cue/cmd/integration/workspace/editing_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-14T11:07:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b42f745_34054d58",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a3c6cdf8_b66b126c",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-08-14T10:08:39Z",
       "side": 1,
       "message": "```suggestion\n\t\t\t\t\t// |package a|\n```",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a7ed8ce_80ff9d9e",
+        "filename": "cmd/cue/cmd/integration/workspace/editing_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-14T11:07:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a3c6cdf8_b66b126c",
       "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -75,6 +111,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e415f33_49dd5726",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-14T11:07:07Z",
+      "side": 1,
+      "message": "It doesn\u0027t represent the package struct. Only the package decls within the struct. I\u0027ve reworded.",
+      "parentUuid": "289b119a_04a98264",
+      "range": {
+        "startLine": 271,
+        "startChar": 0,
+        "endLine": 273,
+        "endChar": 0
+      },
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a851b73_9f64de3f",
@@ -88,6 +148,24 @@
       "writtenOn": "2025-08-14T10:08:39Z",
       "side": 1,
       "message": "It would be kinda nice to have some testing for this in the definitions package itself (because the tests there are more readable in general), but is that a bit hard to arrange?",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc5328aa_bb85789a",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-14T11:07:07Z",
+      "side": 1,
+      "message": "Actually I think I can do that. Hold your horses.",
+      "parentUuid": "1a851b73_9f64de3f",
       "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -109,6 +187,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e65c03a_cacc0a5d",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 608,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-14T11:07:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ca5b4ce4_63fda633",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2c926e8_29ed8bc3",
@@ -126,6 +222,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "720aa6ba_e25f5cfc",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 625,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-14T11:07:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f2c926e8_29ed8bc3",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "39061c67_2a38e132",
@@ -139,6 +253,24 @@
       "writtenOn": "2025-08-14T10:08:39Z",
       "side": 1,
       "message": "This comment repeats exactly what the logic below says but\ndoesn\u0027t say anything about what it actually means.\n\nHow about this?\n\n```suggestion\n// isFileNode reports whether n is a top-level child of\n// the package.\n```",
+      "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "356fdc1a_1c829e07",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1003,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-14T11:07:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39061c67_2a38e132",
       "revId": "9fb24f7fa50a866b8ce4cad2c331341a03cd113a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

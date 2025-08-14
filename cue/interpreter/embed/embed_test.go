@@ -87,6 +87,11 @@ func TestFSGlob(t *testing.T) {
 		},
 		pattern:   "foo[/x]bar",
 		wantError: `syntax error in pattern`,
+	}, {
+		testName: "EmptyPatternMatches",
+		paths:    []string{},
+		pattern:  "*.txt",
+		want:     nil,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.testName, func(t *testing.T) {

@@ -43,6 +43,5 @@ allTests: [_]: [... #Schema]
 //
 // If all fields are empty, the skip field itself should be omitted.
 #Skip: {
-	v2?: string
 	v3?: string
 }

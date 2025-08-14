@@ -16,7 +16,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)",
 			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
@@ -28,7 +27,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -40,7 +38,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -63,7 +60,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)",
 			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
@@ -75,7 +71,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -87,7 +82,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -110,7 +104,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot determine CUE location for JSON Schema location id=https://test.json-schema.org/ref-dynamicAnchor-same-schema/root#items: anchors (items) not supported (and 3 more errors)",
 			"v3": "extract error: cannot determine CUE location for JSON Schema location id=https://test.json-schema.org/ref-dynamicAnchor-same-schema/root#items: anchors (items) not supported (and 3 more errors)"
 		},
 		"tests": [
@@ -122,7 +115,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -134,7 +126,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -167,7 +158,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)",
 			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)"
 		},
 		"tests": [
@@ -179,7 +169,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -191,7 +180,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -225,7 +213,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)",
 			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)"
 		},
 		"tests": [
@@ -237,7 +224,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -249,7 +235,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -286,7 +271,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)",
 			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)"
 		},
 		"tests": [
@@ -298,7 +282,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -310,7 +293,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -343,7 +325,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$anchor\" not yet implemented (and 5 more errors)",
 			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 5 more errors)"
 		},
 		"tests": [
@@ -355,7 +336,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -388,7 +368,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)",
 			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)"
 		},
 		"tests": [
@@ -400,7 +379,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -434,7 +412,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 7 more errors)",
 			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 7 more errors)"
 		},
 		"tests": [
@@ -446,7 +423,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -488,7 +464,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)",
 			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)"
 		},
 		"tests": [
@@ -504,7 +479,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -520,7 +494,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -562,7 +535,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)",
 			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)"
 		},
 		"tests": [
@@ -578,7 +550,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -645,7 +616,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 7 more errors)",
 			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 7 more errors)"
 		},
 		"tests": [
@@ -659,7 +629,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -673,7 +642,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -687,7 +655,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -701,7 +668,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -748,7 +714,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 7 more errors)",
 			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 7 more errors)"
 		},
 		"tests": [
@@ -757,7 +722,6 @@
 				"data": "a string",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -766,7 +730,6 @@
 				"data": 42,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -775,7 +738,6 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -791,7 +753,6 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)",
 			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
@@ -806,7 +767,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -821,7 +781,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -847,7 +806,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)",
 			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
@@ -858,7 +816,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -873,7 +830,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -888,7 +844,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -920,7 +875,6 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)",
 			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
@@ -931,7 +885,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -946,7 +899,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -961,7 +913,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -993,7 +944,6 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)",
 			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
@@ -1004,7 +954,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1019,7 +968,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1034,7 +982,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1046,7 +993,6 @@
 			"$ref": "http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/foo"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/detached-dynamicref.json:schema\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/detached-dynamicref.json:schema\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -1055,7 +1001,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1064,7 +1009,6 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1088,7 +1032,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)",
 			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
@@ -1099,7 +1042,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1110,7 +1052,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -1159,7 +1100,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 5 more errors)",
 			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 5 more errors)"
 		},
 		"tests": [
@@ -1172,7 +1112,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -1185,7 +1124,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

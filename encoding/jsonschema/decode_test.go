@@ -88,10 +88,6 @@ func TestDecode(t *testing.T) {
 
 		cfg := &jsonschema.Config{}
 
-		if t.HasTag("brokenInV2") && t.M.Name() == "v2" {
-			t.Skip("skipping because test is broken under the v2 evaluator")
-		}
-
 		if versStr, ok := t.Value("version"); ok {
 			// TODO most schemas have neither an explicit $schema or a #version
 			// tag, so when we update the default version, they could break.

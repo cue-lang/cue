@@ -7,7 +7,6 @@
 			"$ref": "http://localhost:1234/draft2020-12/prefixItems.json"
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/prefixItems.json:prefixItems\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/prefixItems.json:prefixItems\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -21,7 +20,6 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -35,7 +33,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -57,7 +54,6 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft7/ignore-dependentRequired.json:schema\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft7/ignore-dependentRequired.json:schema\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -69,7 +65,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

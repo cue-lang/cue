@@ -15,7 +15,6 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/dependentRequired.json:dependentRequired\":\n    generated.cue:1:8\n",
 			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/dependentRequired.json:dependentRequired\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
@@ -27,7 +26,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -39,7 +37,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

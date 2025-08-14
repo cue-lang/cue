@@ -15,7 +15,6 @@
 				"data": "{:}",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -42,7 +41,6 @@
 				"data": "eyJmb28iOi%iYmFyIn0K",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -70,7 +68,6 @@
 				"data": "ezp9Cg==",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -79,7 +76,6 @@
 				"data": "{}",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},

@@ -1,0 +1,30 @@
+# Test that glob patterns with no matches fail when allowEmptyGlob is not set
+
+! exec cue eval
+! stdout .
+cmp stderr out/err
+
+-- cue.mod/module.cue --
+module: "cue.example"
+language: version: "v0.11.0"
+
+-- test.cue --
+@extern(embed)
+
+package foo
+
+// This should fail because no files match and allowEmptyGlob is not present.
+noMatches: _ @embed(glob="missing/*.json")
+
+// This should also fail because allowEmptyGlob is not present.
+alsoNoMatches: _ @embed(glob="nonexistent/*.yaml")
+
+noGlobField: _ @embed(file="foo",allowEmptyGlob)
+
+-- out/err --
+@embed: no matches for glob pattern "missing/*.json":
+    ./test.cue:6:14
+@embed: no matches for glob pattern "nonexistent/*.yaml":
+    ./test.cue:9:18
+@embed: allowEmptyGlob must be specified with a glob field:
+    ./test.cue:11:16

@@ -26,8 +26,8 @@ jobs:
           - ns-macos-arm64
           - ns-windows-amd64
         go-version:
-          - 1.23.x
           - 1.24.x
+          - 1.25.x
     runs-on: ${{ matrix.runner }}
     if: |-
       (contains(github.event.head_commit.message, '
@@ -93,22 +93,22 @@ jobs:
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test'))
         run: go env -w GOFLAGS=-count=1
       - run: go run cuelang.org/go/cmd/cue login --token=${{ secrets.NOTCUECKOO_CUE_TOKEN }}
-      - if: (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+      - if: (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: Early git and code sanity checks
         run: go run ./internal/ci/checks
       - if: |-
           ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || !(matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+          Dispatch-Trailer: {"type":"')))) || !(matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: Test
         run: go test ./...
-      - if: (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+      - if: (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: Test with -race
         env:
           GORACE: atexit_sleep_ms=10
         run: go test -race ./...
       - if: |-
           (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: Test on 32 bits
         env:
           GOARCH: "386"
@@ -118,40 +118,40 @@ jobs:
       - id: auth
         if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: gcloud auth for end-to-end tests
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.E2E_GCLOUD_KEY }}
       - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: gcloud setup for end-to-end tests
         uses: google-github-actions/setup-gcloud@v2
       - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: End-to-end test
         env:
           CUE_TEST_TOKEN: ${{ secrets.E2E_PORCUEPINE_CUE_TOKEN }}
         run: |-
           cd internal/_e2e
           go test -race
-      - if: (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+      - if: (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         run: |-
           go mod tidy -diff
           go vet ./...
-      - if: (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+      - if: (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: Verify the end-to-end tests still build
         run: go test -run=-
         working-directory: ./internal/_e2e
-      - if: (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+      - if: (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         env:
           STATICCHECK_CACHE: /cache/staticcheck
         run: go tool -modfile=internal/tools.mod staticcheck ./...
       - if: |-
           (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: Check all git tags are available
         run: |-
           cd $(mktemp -d)
@@ -167,7 +167,7 @@ jobs:
           	echo "Did you forget about refs/attic branches? https://github.com/cue-lang/cue/wiki/Notes-for-project-maintainers"
           	exit 1
           fi
-      - if: (matrix.go-version == '1.24.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
+      - if: (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: Generate
         run: go generate ./...
       - if: always()

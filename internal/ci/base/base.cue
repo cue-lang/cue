@@ -101,9 +101,9 @@ overrideCacheTagDispatch: ";overrides.cache-tag=cue-dispatch-workflow"
 
 // Use the latest Go version for extra checks,
 // such as running tests with the data race detector.
-latestGo: "1.24.x"
+latestGo: "1.25.x"
 // Some repositories also want to ensure that the previous version works.
-previousGo: "1.23.x"
+previousGo: "1.24.x"
 
 codeReview: #codeReview & {
 	github: githubRepositoryURL

@@ -74,7 +74,7 @@ href="mailto:security@cuelang.org">security@cuelang.org</a>.
 The code contribution process used by the CUE project is a little different from
 that used by other open source projects.  We assume you have a basic
 understanding of [`git`](https://git-scm.com/) and [Go](https://golang.org)
-(1.23 or later).
+(1.24 or later).
 
 The first thing to decide is whether you want to contribute a code change via
 GitHub or GerritHub. Both workflows are fully supported, and whilst GerritHub is

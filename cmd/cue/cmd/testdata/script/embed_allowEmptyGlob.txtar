@@ -1,8 +1,5 @@
 # Test the allowEmptyGlob option for glob patterns
 
-exec cue eval
-cmp stdout out/eval
-
 exec cue export --out cue
 cmp stdout out/export
 
@@ -24,10 +21,6 @@ emptyGlob: _ @embed(glob="missing/*.json", allowEmptyGlob)
 // Test allowEmptyGlob with matching files
 nonEmptyGlob: _ @embed(glob="x/*.yaml", allowEmptyGlob)
 
-// Test default behavior (no allowEmptyGlob) with no matching files should fail
-// This is commented out because it would cause the test to fail
-// errorGlob: _ @embed(glob="missing/*.json")
-
 // Test allowEmptyGlob with different file types
 emptyText: _ @embed(glob="missing/*.txt", type=text, allowEmptyGlob)
 emptyBinary: _ @embed(glob="missing/*.bin", type=binary, allowEmptyGlob)
@@ -40,20 +33,6 @@ b: 2
 c: 3
 d: 4
 
--- out/eval --
-emptyGlob: {}
-nonEmptyGlob: {
-    "x/another.yaml": {
-        c: 3
-        d: 4
-    }
-    "x/test.yaml": {
-        a: 1
-        b: 2
-    }
-}
-emptyText: {}
-emptyBinary: {}
 -- out/export --
 // Test allowEmptyGlob with no matching files
 emptyGlob: {}

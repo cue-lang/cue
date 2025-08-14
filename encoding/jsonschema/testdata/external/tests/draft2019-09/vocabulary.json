@@ -12,7 +12,6 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2019-09/metaschema-no-validation.json\": $schema URI not recognized (and 1 more errors)",
 			"v3": "extract error: invalid $schema URL \"http://localhost:1234/draft2019-09/metaschema-no-validation.json\": $schema URI not recognized (and 1 more errors)"
 		},
 		"tests": [
@@ -23,7 +22,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -34,7 +32,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -45,7 +42,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -58,7 +54,6 @@
 			"type": "number"
 		},
 		"skip": {
-			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2019-09/metaschema-optional-vocabulary.json\": $schema URI not recognized",
 			"v3": "extract error: invalid $schema URL \"http://localhost:1234/draft2019-09/metaschema-optional-vocabulary.json\": $schema URI not recognized"
 		},
 		"tests": [
@@ -67,7 +62,6 @@
 				"data": "foobar",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -76,7 +70,6 @@
 				"data": 20,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}

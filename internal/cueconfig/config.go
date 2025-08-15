@@ -31,8 +31,6 @@ type Logins struct {
 type RegistryLogin struct {
 	// These fields mirror [oauth2.Token].
 	// We don't directly reference the type so we can be in control of our file format.
-	// Note that Expiry is a pointer, so omitempty can work as intended.
-	// TODO(mvdan): drop the pointer once we can use json's omitzero: https://go.dev/issue/45669
 	// Note that we store Expiry at rest as an absolute timestamp in UTC,
 	// rather than the ExpiresIn field following the RFC's wire format,
 	// a duration in seconds relative to the current time which is not useful at rest.
@@ -43,7 +41,7 @@ type RegistryLogin struct {
 
 	RefreshToken string `json:"refresh_token,omitempty"`
 
-	Expiry *time.Time `json:"expiry,omitempty"`
+	Expiry time.Time `json:"expiry,omitzero"`
 }
 
 func LoginConfigPath(getenv func(string) string) (string, error) {
@@ -201,25 +199,19 @@ func RegistryOAuthConfig(host modresolve.Host) oauth2.Config {
 // changed between reading and writing the file.
 
 func TokenFromLogin(login RegistryLogin) *oauth2.Token {
-	tok := &oauth2.Token{
+	return &oauth2.Token{
 		AccessToken:  login.AccessToken,
 		TokenType:    login.TokenType,
 		RefreshToken: login.RefreshToken,
+		Expiry:       login.Expiry,
 	}
-	if login.Expiry != nil {
-		tok.Expiry = *login.Expiry
-	}
-	return tok
 }
 
 func LoginFromToken(tok *oauth2.Token) RegistryLogin {
-	login := RegistryLogin{
+	return RegistryLogin{
 		AccessToken:  tok.AccessToken,
 		TokenType:    tok.TokenType,
 		RefreshToken: tok.RefreshToken,
+		Expiry:       tok.Expiry,
 	}
-	if !tok.Expiry.IsZero() {
-		login.Expiry = &tok.Expiry
-	}
-	return login
 }

@@ -232,7 +232,6 @@ package bar
 		reg.host = u.Host
 	}
 
-	expiry := time.Now()
 	logins := &cueconfig.Logins{
 		Registries: map[string]cueconfig.RegistryLogin{},
 	}
@@ -242,7 +241,7 @@ package bar
 			AccessToken:  fmt.Sprintf("access_%d_x", i),
 			TokenType:    "Bearer",
 			RefreshToken: "refresh_x",
-			Expiry:       &expiry,
+			Expiry:       time.Now(),
 		}
 		if registryConf != "" {
 			registryConf += ","

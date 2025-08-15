@@ -15,13 +15,10 @@
 package cmd
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"runtime"
 	"runtime/debug"
-	"testing"
 
 	"github.com/spf13/cobra"
 
@@ -38,21 +35,14 @@ func newVersionCmd(c *Command) *cobra.Command {
 	return cmd
 }
 
-// version can be set at build time to inject cmd/cue's version string,
-// particularly necessary when building a release locally.
-// See the top-level README.md for more details.
-var version string
-
 func runVersion(cmd *Command, args []string) error {
 	w := cmd.OutOrStdout()
 
-	// read in build info
-	bi, ok := readBuildInfo()
+	bi, ok := debug.ReadBuildInfo()
 	if !ok {
-		// shouldn't happen
 		return errors.New("unknown error reading build-info")
 	}
-	fmt.Fprintf(w, "cue version %s\n\n", cueModuleVersion())
+	fmt.Fprintf(w, "cue version %s\n\n", cueversion.ModuleVersion())
 	fmt.Fprintf(w, "go version %s\n", runtime.Version())
 	bi.Settings = append(bi.Settings, debug.BuildSetting{
 		Key:   "cue.lang.version",
@@ -73,32 +63,4 @@ func runVersion(cmd *Command, args []string) error {
 		fmt.Fprintf(w, "%16s %s\n", s.Key, s.Value)
 	}
 	return nil
-}
-
-// cueModuleVersion returns the version of the cuelang.org/go module as much
-// as can reasonably be determined. If no version can be determined,
-// it returns the empty string.
-func cueModuleVersion() string {
-	if v := version; v != "" {
-		// The global version variable has been configured via ldflags.
-		return v
-	}
-	return cueversion.ModuleVersion()
-}
-
-func readBuildInfo() (*debug.BuildInfo, bool) {
-	bi, ok := debug.ReadBuildInfo()
-	if !ok || !testing.Testing() {
-		return bi, ok
-	}
-	// test-based overrides
-	if v := os.Getenv("CUE_VERSION_TEST_CFG"); v != "" {
-		var extra []debug.BuildSetting
-		if err := json.Unmarshal([]byte(v), &extra); err != nil {
-			// It's only for tests, so panic is OK.
-			panic(err)
-		}
-		bi.Settings = append(bi.Settings, extra...)
-	}
-	return bi, true
 }

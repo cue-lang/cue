@@ -63,10 +63,14 @@ type Workspace struct {
 }
 
 func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
+	overlayFS := fscache.NewOverlayFS(cache.fs)
 	return &Workspace{
-		registry:  cache.registry,
+		registry: &registryWrapper{
+			Registry:  cache.registry,
+			overlayFS: overlayFS,
+		},
 		fs:        cache.fs,
-		overlayFS: fscache.NewOverlayFS(cache.fs),
+		overlayFS: overlayFS,
 		debugLog:  debugLog,
 		modules:   make(map[protocol.DocumentURI]*Module),
 		packages:  make(map[ast.ImportPath]*Package),
@@ -768,38 +772,18 @@ func (w *Workspace) reloadPackages() error {
 		// the import graph later.
 		pkgsImportsWorklist[pkg] = pkg.pkg
 		pkg.pkg = loadedPkg
+		pkg.setStatus(splendid)
 		w.debugLog(fmt.Sprintf("%v Loaded %v", m, pkg))
 
-		if loadedPkg.FromExternalModule() {
-			// We process all the non-external packages first, and we
-			// don't process the same package (by ImportPath) twice. So
-			// if we're here, we know that this is the first occurrence
-			// of this ip in loadedPkgs, and that this package was not
-			// directly loaded, because we can only have reached it via
-			// the imports of some other package. This means it's not
-			// necessarily dirty. If this is the first time we've created
-			// a [Package] for it then it'll be dirty, and we must repeat
-			// the (re)load because its files could be in the module
-			// cache, and that code parses the package declaration and
-			// imports only, so we can't trust the ASTs we would find via
-			// loadedPkg.Files()[0].Syntax, thus we need to directly load
-			// it.
-			if pkg.status != splendid {
-				repeatReload = true
-			}
-		} else {
-			pkg.setStatus(splendid)
-
-			if len(allDirtyFiles) != 0 {
-				for _, file := range loadedPkg.Files() {
-					fileUri := protocol.DocumentURI(string(modRootURI) + "/" + file.FilePath)
-					m, found := allDirtyFiles[fileUri]
-					if found {
-						delete(allDirtyFiles, fileUri)
-						delete(m.dirtyFiles, fileUri)
-						if len(allDirtyFiles) == 0 {
-							break
-						}
+		if len(allDirtyFiles) != 0 {
+			for _, file := range loadedPkg.Files() {
+				fileUri := protocol.DocumentURI(string(modRootURI) + "/" + file.FilePath)
+				m, found := allDirtyFiles[fileUri]
+				if found {
+					delete(allDirtyFiles, fileUri)
+					delete(m.dirtyFiles, fileUri)
+					if len(allDirtyFiles) == 0 {
+						break
 					}
 				}
 			}

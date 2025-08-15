@@ -79,8 +79,12 @@ func (entry *diskFileEntry) ReadCUE(config parser.Config) (*ast.File, error) {
 		return nil, nil
 	}
 
-	config.Mode = parser.ParseComments
-	ast, err := parser.ParseFile(bf.Filename, entry.content, config)
+	configCopy := config
+	configCopy.Mode = parser.ParseComments
+	ast, err := parser.ParseFile(bf.Filename, entry.content, configCopy)
+	if err != nil && config.Mode != configCopy.Mode {
+		ast, err = parser.ParseFile(bf.Filename, entry.content, config)
+	}
 	if err != nil {
 		return nil, err
 	}

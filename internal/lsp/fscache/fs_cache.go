@@ -79,15 +79,28 @@ func (entry *diskFileEntry) ReadCUE(config parser.Config) (*ast.File, error) {
 		return nil, nil
 	}
 
-	config.Mode = parser.ParseComments
-	ast, err := parser.ParseFile(bf.Filename, entry.content, config)
-	if err != nil {
-		return nil, err
-	}
+	configParseAll := config
+	configParseAll.Mode = parser.ParseComments
+	ast, err := parseFile(bf.Filename, entry.content, configParseAll, config)
+
 	entry.ast = ast
 	ast.Pos().File().SetContent(entry.content)
 
-	return entry.ast, nil
+	return ast, err
+}
+
+// parseFile allows multiple attempts to parse the content with
+// different parser configs. The first attempt that succeeds (nil
+// error) is returned. This is useful to allow falling back to, say,
+// ImportsOnly if there are syntax errors further on in the CUE.
+func parseFile(filename string, content []byte, cfgs ...parser.Config) (ast *ast.File, err error) {
+	for _, cfg := range cfgs {
+		ast, err = parser.ParseFile(filename, content, cfg)
+		if err == nil {
+			return ast, err
+		}
+	}
+	return ast, err
 }
 
 // Version implements [FileHandle]

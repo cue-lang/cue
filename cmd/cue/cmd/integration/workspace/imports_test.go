@@ -69,13 +69,8 @@ w: v.y.z
 				// A module is created for the imported module.
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=unknown Created", cacheURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Reloaded", cacheURI),
-			)
-			err := env.Awaiter.Await(env.Ctx,
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Loaded Package dir=%v/example.com/foo@v0.0.1/x importPath=example.com/foo/x@v0", cacheURI, cacheURI),
 			)
-			if err == nil {
-				t.Fatal("Expected non-nil error")
-			}
 		})
 	})
 

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c3df5a6_18131dcf",
+        "filename": "cmd/cue/cmd/testdata/script/embed_allowEmptyGlob.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T11:20:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4868dbc_8c0b27d8",
+      "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42e7ef6b_fe24cc80",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-08-15T09:42:39Z",
       "side": 1,
       "message": "this is covered by the error testscript. why duplicate it here? is this the AI being a bit weird?",
+      "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f380e6ad_bc6a0011",
+        "filename": "cmd/cue/cmd/testdata/script/embed_allowEmptyGlob.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T11:20:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42e7ef6b_fe24cc80",
       "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4aab6e95_717fc673",
+        "filename": "cmd/cue/cmd/testdata/script/embed_allowEmptyGlob_err.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T11:20:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60204b1b_ddb2acce",
+      "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5684c86f_604d6ca2",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-08-15T09:42:39Z",
       "side": 1,
       "message": "document this one briefly too?",
+      "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67ddf325_415bf164",
+        "filename": "cmd/cue/cmd/testdata/script/embed_allowEmptyGlob_err.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T11:20:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5684c86f_604d6ca2",
       "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "34e54857_27b76fbd",
+        "filename": "cmd/cue/cmd/testdata/script/embed_allowEmpty_err.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T11:20:28Z",
+      "side": 1,
+      "message": "hmm, i thought i\u0027d removed it. Done.",
+      "parentUuid": "11404e0a_dd400cdc",
+      "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "93299708_02845022",
@@ -99,6 +189,30 @@
       "writtenOn": "2025-08-15T09:42:39Z",
       "side": 1,
       "message": "I\u0027d just say\n\n\u003e This option is only supported with glob patterns.\n\nto clarify it fails otherwise. We also don\u0027t need the sentence to be longer.",
+      "range": {
+        "startLine": 58,
+        "startChar": 49,
+        "endLine": 58,
+        "endChar": 64
+      },
+      "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d615dc44_237ad623",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T11:20:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "93299708_02845022",
       "range": {
         "startLine": 58,
         "startChar": 49,

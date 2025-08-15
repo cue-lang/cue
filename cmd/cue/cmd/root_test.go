@@ -18,10 +18,13 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"os/exec"
+	"regexp"
 	"strings"
 	"testing"
 
 	"cuelang.org/go/cmd/cue/cmd"
+	"cuelang.org/go/internal/cueversion"
 	"github.com/go-quicktest/qt"
 )
 
@@ -80,4 +83,31 @@ func TestCommand(t *testing.T) {
 		err = c.Execute()
 		qt.Assert(t, qt.IsNil(err))
 	})
+}
+
+func TestVersion(t *testing.T) {
+	// Test whether "cue version" reports the version information we expect.
+	// Note that we can't use the test binary for this purpose,
+	// given that binaries built via "go test" don't get stamped with version information.
+	//
+	// TODO: use "go tool cue", mimicking "go install ./cmd/cue && cue",
+	// once https://go.dev/issue/75033 is resolved.
+	// Until then, "go tool" never stamps the main module version,
+	// and "go run" only does when -buildvcs is explicitly enabled.
+	out, err := exec.Command("go", "run", "-buildvcs=true", "..", "version").CombinedOutput()
+	qt.Assert(t, qt.IsNil(err), qt.Commentf("%s", out))
+
+	got := string(out)
+
+	// The output string is multi-line, and [qt.Matches] anchors the regular expression
+	// like `^(expr)$`, so use `(?s)` to match newlines.
+	qt.Assert(t, qt.Matches(got, `(?s)cue version v0\.\d+\.\d+.*`))
+	qt.Assert(t, qt.Matches(got, `(?s).*\s+go version go1\.\d+.*`))
+	qt.Assert(t, qt.Matches(got, `(?s).*\s+-buildmode\s.*`))
+	qt.Assert(t, qt.Matches(got, `(?s).*\s+GOARCH\s.*`))
+	qt.Assert(t, qt.Matches(got, `(?s).*\s+GOARCH\s.*`))
+	qt.Assert(t, qt.Matches(got, `(?s).*\s+vcs git.*`))
+	qt.Assert(t, qt.Matches(got, `(?s).*\s+vcs.revision\s.*`))
+	qt.Assert(t, qt.Matches(got, `(?s).*\s+vcs.time\s.*`))
+	qt.Assert(t, qt.Matches(got, `(?s).*\s+cue\.lang\.version\s+`+regexp.QuoteMeta(cueversion.LanguageVersion())+`.*`))
 }

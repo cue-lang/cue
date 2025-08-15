@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4868dbc_8c0b27d8",
+        "filename": "cmd/cue/cmd/testdata/script/embed_allowEmptyGlob.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-15T09:42:39Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s worth testing eval vs export, just one of them should be enough",
+      "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42e7ef6b_fe24cc80",
+        "filename": "cmd/cue/cmd/testdata/script/embed_allowEmptyGlob.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-15T09:42:39Z",
+      "side": 1,
+      "message": "this is covered by the error testscript. why duplicate it here? is this the AI being a bit weird?",
+      "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60204b1b_ddb2acce",
+        "filename": "cmd/cue/cmd/testdata/script/embed_allowEmptyGlob_err.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-15T09:42:39Z",
+      "side": 1,
+      "message": "this is not exactly right given noGlobField - I\u0027d either remove or reword to be a bit more general, like \"Test failure cases relating to allowEmptyGlob, such as zero matches when it\u0027s not set, or setting it without a glob pattern.\"",
+      "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5684c86f_604d6ca2",
+        "filename": "cmd/cue/cmd/testdata/script/embed_allowEmptyGlob_err.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-15T09:42:39Z",
+      "side": 1,
+      "message": "document this one briefly too?",
+      "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11404e0a_dd400cdc",
+        "filename": "cmd/cue/cmd/testdata/script/embed_allowEmpty_err.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-15T09:42:39Z",
+      "side": 1,
+      "message": "is this not a duplicate of embed_allowEmptyGlob_err.txtar?",
+      "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93299708_02845022",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-15T09:42:39Z",
+      "side": 1,
+      "message": "I\u0027d just say\n\n\u003e This option is only supported with glob patterns.\n\nto clarify it fails otherwise. We also don\u0027t need the sentence to be longer.",
+      "range": {
+        "startLine": 58,
+        "startChar": 49,
+        "endLine": 58,
+        "endChar": 64
+      },
+      "revId": "ca70749e40f9b1b42792bfc92c19ff844a98e46e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

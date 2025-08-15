@@ -48,11 +48,6 @@ You need [Go 1.24 or later](https://go.dev/doc/install) to install CUE from sour
 	go install cuelang.org/go/cmd/cue@latest
 
 You can also clone the repository and build it directly via `go install ./cmd/cue`.
-Note that local builds [lack version information](https://go.dev/issue/50603),
-so you should inject the version string when building a release, such as:
-
-	git switch -d v0.13.1
-	go install -ldflags='-X cuelang.org/go/cmd/cue/cmd.version=v0.13.1' ./cmd/cue
 
 ### Learning CUE
 

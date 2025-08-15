@@ -8,7 +8,6 @@ import (
 	"runtime/debug"
 	"strings"
 	"sync"
-	"time"
 )
 
 // LanguageVersion returns the CUE language version.
@@ -41,44 +40,8 @@ var moduleVersionOnce = sync.OnceValue(func() string {
 		// module name; it also happens when running the cue tests.
 		return "(no-cue-module)"
 	}
-	version := cueMod.Version
-	if version != "(devel)" {
-		return version
-	}
-	// A specific version was not provided by the buildInfo
-	// so attempt to make our own.
-	var vcsTime time.Time
-	var vcsRevision string
-	for _, s := range bi.Settings {
-		switch s.Key {
-		case "vcs.time":
-			// If the format is invalid, we'll print a zero timestamp.
-			vcsTime, _ = time.Parse(time.RFC3339Nano, s.Value)
-		case "vcs.revision":
-			vcsRevision = s.Value
-			// module.PseudoVersion recommends the revision to be a 12-byte
-			// commit hash prefix, which is what cmd/go uses as well.
-			if len(vcsRevision) > 12 {
-				vcsRevision = vcsRevision[:12]
-			}
-		}
-	}
-	if vcsRevision != "" {
-		version = pseudoVersion(vcsTime, vcsRevision)
-	}
-	return version
+	return cueMod.Version
 })
-
-const pseudoVersionTimestampFormat = "20060102150405"
-
-// pseudoVersion returns a Go-style pseudo-version, given a revision time,
-// and revision identifier (usually a 12-byte commit hash prefix).
-//
-// This code was adapted directly from [golang.org/x/mod/module.PseudoVersion] (@v0.24.0)
-// to avoid adding a dependency on that module from the core CUE packages.
-func pseudoVersion(t time.Time, rev string) string {
-	return fmt.Sprintf("v0.0.0-%s-%s", t.UTC().Format(pseudoVersionTimestampFormat), rev)
-}
 
 func findCUEModule(bi *debug.BuildInfo) *debug.Module {
 	if bi.Main.Path == cueModule {

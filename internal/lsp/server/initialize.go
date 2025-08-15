@@ -92,9 +92,7 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 
 	return &protocol.InitializeResult{
 		ServerInfo: &protocol.ServerInfo{
-			Name: "cuelsp",
-			// NB, this is not strictly the same as "cue version" because
-			// "cue version" allows the version to be set via ldflags.
+			Name:    "cuelsp",
 			Version: cueversion.ModuleVersion(),
 		},
 

@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05a96b9f_a8021463",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T17:21:24Z",
+      "side": 1,
+      "message": "needs to module?",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54276306_8e6e637d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T17:21:24Z",
+      "side": 1,
+      "message": "A few thoughts.",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1277d3fb_132d8e0d",
+        "filename": "cmd/cue/cmd/integration/workspace/imports_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T17:21:24Z",
+      "side": 1,
+      "message": "It would be good to add a failing test in a previous CL that demonstrates the issue, then we can see it pass in this CL.",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04538688_2e04e1e2",
+        "filename": "internal/lsp/cache/registry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T17:21:24Z",
+      "side": 1,
+      "message": "any need to export this?",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "425f0206_8af6f6b5",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T17:21:24Z",
+      "side": 1,
+      "message": "Or just inline, which I personally find a bit clearer because it\u0027s\nobvious there\u0027s no circularity involved then:\n\n```suggestion\n\t\tregistry:  \u0026RegistryWrapper{\n\t\t\tRegistry: cache.registry,\n\t\t\toverlayFS: overlayFS,\n\t\t},\n```",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91fcd811_040fa671",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T17:21:24Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t// Full parsing has failed; try again with the original\n\t\t// config (likely ImportsOnly) which might do better.\n\t\tast, err \u003d parser.ParseFile(bf.Filename, entry.content, config)\n```",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d21678c1_a9a63dcb",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T17:21:24Z",
+      "side": 1,
+      "message": "I\u0027m wondering if you might want to store the ast value anyway, as it can still be valid (with SyntaxError nodes in place) when there\u0027s an error.\n\nIt doesn\u0027t seem quite right to just discard the AST even when there\u0027s some error.\n\nIn fact on further reflection, I\u0027m wondering if `internal/mod/modimports` should just be more resilient when `ParseFile` returns an error if there\u0027s an AST available. That might remove the need for a bunch of this logic, and seem kinda reasonable maybe.",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ee39cdd_8f24c69e",
+        "filename": "internal/lsp/fscache/fs_overlay.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-15T17:21:24Z",
+      "side": 1,
+      "message": "this logic is getting a little complex to duplicate. might be better to have a helper.",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

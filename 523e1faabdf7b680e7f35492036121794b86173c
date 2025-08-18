@@ -16,6 +16,24 @@
       "message": "This will no longer work, which might be a breaking change for some users.\nI\u0027m not saying we shouldn\u0027t do it, but definitely worth calling out as such\nin the commit message and release notes.",
       "revId": "523e1faabdf7b680e7f35492036121794b86173c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a490fcd4_53d38803",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-18T10:41:43Z",
+      "side": 0,
+      "message": "good point, done. I briefly thought about leaving the var where it is, and doing nothing at all, but I didn\u0027t want to give users a false sense of security that it was doing anything at all.",
+      "parentUuid": "46b0403d_25771e3b",
+      "revId": "523e1faabdf7b680e7f35492036121794b86173c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

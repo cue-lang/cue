@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1da976b_3d83c72d",
+        "filename": "cmd/cue/cmd/testdata/script/issue3968.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T15:43:22Z",
+      "side": 1,
+      "message": "I like this error better too.",
+      "revId": "15ae28df68ff422aed640c3a0aa4590f6d4bf5a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89a33ae1_ee83b0ac",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T15:43:22Z",
+      "side": 1,
+      "message": "I think \"it is never nil\" is a bit strong here. It definitely _will_ be nil when there\u0027s an I/O error reading the file. Perhaps we should just document that Syntax and SyntaxError record the result of invoking parser.ParseFile. We should probably also document the semantics of the `error` in the sequence returned by the various iterator functions.",
+      "revId": "15ae28df68ff422aed640c3a0aa4590f6d4bf5a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

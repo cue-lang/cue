@@ -6,7 +6,7 @@ bad_imports.cue: error: string literal not terminated
 bad_lone.cue
 bad_package_imports.cue: error: string literal not terminated
 -- want-imports --
-error: cannot read "bad_imports.cue": string literal not terminated
+error: invalid import path "\"dep1" in bad_imports.cue
 -- bad_imports.cue --
 // Invalid import syntax without a package clause.
 

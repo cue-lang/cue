@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b04d616b_83fc521f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-18T10:42:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "05a96b9f_a8021463",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "54276306_8e6e637d",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -69,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aab08264_b6ed689a",
+        "filename": "internal/lsp/cache/registry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-18T10:42:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "04538688_2e04e1e2",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "425f0206_8af6f6b5",
@@ -86,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4796cb36_388b5438",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-18T10:42:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "425f0206_8af6f6b5",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91fcd811_040fa671",
@@ -99,6 +153,24 @@
       "writtenOn": "2025-08-15T17:21:24Z",
       "side": 1,
       "message": "```suggestion\n\t\t// Full parsing has failed; try again with the original\n\t\t// config (likely ImportsOnly) which might do better.\n\t\tast, err \u003d parser.ParseFile(bf.Filename, entry.content, config)\n```",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a59f4af0_7d98377d",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-18T10:42:19Z",
+      "side": 1,
+      "message": "Well, I did this, but then it disappeared again after refactoring.",
+      "parentUuid": "91fcd811_040fa671",
       "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -133,6 +205,24 @@
       "writtenOn": "2025-08-15T17:21:24Z",
       "side": 1,
       "message": "this logic is getting a little complex to duplicate. might be better to have a helper.",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1c9e2d7_031c8efe",
+        "filename": "internal/lsp/fscache/fs_overlay.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-18T10:42:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ee39cdd_8f24c69e",
       "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

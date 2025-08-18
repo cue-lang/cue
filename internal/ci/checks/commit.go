@@ -89,11 +89,15 @@ func checkCommit(dir string) error {
 	// Forbid @-mentioning any GitHub usernames in commit messages,
 	// as that will lead to notifications which are likely unintended.
 	// If one must include a similar-looking snippet, like @embed(),
-	// they can use markdown backticks or blockquotes to sidestep the issue.
+	// they can be placed inside Markdown's single-line single-backticks
+	// without notifications being generated (e.g. "This uses `@embed()` to ...").
 	//
 	// Note that we parse the body as markdown including git trailers, but that's okay.
 	// Note that GitHub does not interpret mentions in titles, but we still check them
 	// for the sake of being conservative and consistent.
+	//
+	// TODO: this doesn't catch mentions in block quotes, which cause notifications.
+	// cf. https://cuelang.org/issue/4026
 	md := goldmark.New(
 		goldmark.WithExtensions(mdextension.GFM),
 	)
@@ -111,7 +115,7 @@ func checkCommit(dir string) error {
 		case *mdast.Text:
 			text := node.Text(docBody)
 			if m := rxUserMention.FindSubmatch(text); m != nil {
-				return mdast.WalkStop, fmt.Errorf("commit mentions %q; use backquotes or block quoting for code", m[2])
+				return mdast.WalkStop, fmt.Errorf("commit mentions GitHub user %q; enclose code in single backticks", m[2])
 			}
 		}
 		return mdast.WalkContinue, nil

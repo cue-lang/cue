@@ -26,8 +26,9 @@ import "test.example/other1:_x"
 
 _x
 -- d-stderr --
-test.example/d@v0: import failed: cannot find package "test.example/other2": cannot get imports: cannot read "other2/other.cue": invalid package name #x:
+import failed: invalid package name #x:
     ./d/d.cue:3:8
+    ./other2/other.cue:1:11
 -- cue.mod/module.cue --
 module: "test.example"
 language: version: "v0.11.0"

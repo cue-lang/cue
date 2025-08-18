@@ -1263,8 +1263,8 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 
 	case *types.Union:
 		var exprs []cueast.Expr
-		for i := 0; i < typ.Len(); i++ {
-			exprs = append(exprs, e.makeType(typ.Term(i).Type()))
+		for term := range typ.Terms() {
+			exprs = append(exprs, e.makeType(term.Type()))
 		}
 		return cueast.NewBinExpr(cuetoken.OR, exprs...)
 

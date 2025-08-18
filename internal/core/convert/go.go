@@ -420,7 +420,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 			v := &adt.Vertex{}
 
 			t := value.Type()
-			for i := 0; i < value.NumField(); i++ {
+			for i := range value.NumField() {
 				sf := t.Field(i)
 				if sf.PkgPath != "" {
 					continue
@@ -718,7 +718,7 @@ func (c *goConverter) goTypeToValueRec(allowNullDefault bool, t reflect.Type) (e
 		// references. Maybe have a special kind of "hardlink" reference.
 		c.ctx.StoreType(t, obj, nil)
 
-		for i := 0; i < t.NumField(); i++ {
+		for i := range t.NumField() {
 			f := t.Field(i)
 			if f.PkgPath != "" {
 				continue

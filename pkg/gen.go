@@ -335,8 +335,7 @@ func (g *generator) genFunc(fn *types.Func) {
 	args := []string{}
 	vals := []string{}
 	kind := []string{}
-	for i := 0; i < params.Len(); i++ {
-		param := params.At(i)
+	for param := range params.Variables() {
 		typ := param.Type()
 		if typ.String() == "cuelang.org/go/internal/pkg.Schema" {
 			needCallContext = true

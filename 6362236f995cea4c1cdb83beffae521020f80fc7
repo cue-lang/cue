@@ -1,6 +1,137 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d827858_7215f08c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T16:37:51Z",
+      "side": 1,
+      "message": "LGTM modulo a few doc nits.",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eeb1abd7_e1aa82d7",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T16:37:51Z",
+      "side": 1,
+      "message": "it might be nicer to have some CUE that was actually valid.\n\n\n```suggestion\n//\tx₂: y₂: int\n```",
+      "range": {
+        "startLine": 260,
+        "startChar": 0,
+        "endLine": 260,
+        "endChar": 12
+      },
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc9ee4b8_d631c850",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T16:37:51Z",
+      "side": 1,
+      "message": "This suggests that there\u0027s only one root, but presumably there can\nbe many, even within a single file.\n\n```suggestion\n// gathering their names, and stopping when either a root is\n```",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54dbe055_17b8b436",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T16:37:51Z",
+      "side": 1,
+      "message": "```suggestion\n// ancestor, the calculated path is then resolved using the normal\n```",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5321bf89_8373c4bf",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T16:37:51Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\tif n.key !\u003d nil {\n\t\t\t\tnodes \u003d append(nodes, n.key)\n\t\t\t}\n\t\t}\n\t}\n```",
+      "range": {
+        "startLine": 415,
+        "startChar": 0,
+        "endLine": 420,
+        "endChar": 0
+      },
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2dccda68_7a6b2e68",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 585,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T16:37:51Z",
+      "side": 1,
+      "message": "FWIW I still think that \"field\" is a better name than \"binding\" in the context of navigibleBindings, as it corresponds directly to the semantic entity that\u0027s being modelled. And ISTM would make the explanations below easier (for example, it\u0027s obvious why \"let\" doesn\u0027t introduce a name that appears in the navigibleBindings: because it doesn\u0027t define a field).",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0ca6f8f_c8ffc968",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T16:37:51Z",
+      "side": 1,
+      "message": "```suggestion\n\t// because navigableBindings are used for resolving\n```",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "84b8b616_5a92d317",
@@ -14,6 +145,98 @@
       "writtenOn": "2025-08-18T09:55:39Z",
       "side": 1,
       "message": "Turns out I could no longer get away with an invalid identifier in here.",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "301b6c02_7c13235f",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T16:37:51Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "84b8b616_5a92d317",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "858b0b0f_f38acc02",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 932,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T16:37:51Z",
+      "side": 1,
+      "message": "```suggestion\n\t\tnavs :\u003d []*navigableBindings{ancestor}\n\t\tfor _, name :\u003d range slices.Backward(names) {\n\t\t\tnavs \u003d navigateBindingsByName(navs, name)\n```",
+      "range": {
+        "startLine": 929,
+        "startChar": 0,
+        "endLine": 932,
+        "endChar": 0
+      },
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b68fca4_411545f6",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1140,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T16:37:51Z",
+      "side": 1,
+      "message": "Maybe add a comment saying why we\u0027re doing this?",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a8b2ec2_b0a54deb",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1175,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T16:37:51Z",
+      "side": 1,
+      "message": "```suggestion\n// fieldDeclExpr is created so that field declarations keys can be\n```\n\nbut in general this doesn\u0027t tell me much.\nPerhaps something like this might be better?\n\n```\n// fieldDeclExpr is a temporary representation of a field\n// declaration used inside [ensureNavigibleBinding].\n// The position holds the position of the field\u0027s key.\n```",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a9a38c6_cd0b8204",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1179,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-18T16:37:51Z",
+      "side": 1,
+      "message": "```suggestion\n\t// Always nil: make the struct implement [ast.Expr].\n```",
       "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

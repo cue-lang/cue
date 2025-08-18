@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6888364_9dd151c2",
+        "filename": "encoding/openapi/openapi.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-18T16:41:41Z",
+      "side": 1,
+      "message": "Add an empty line above so they are separate paragraphs.",
+      "revId": "78e1740020f7fa005c3aaccc69e87a0e433ebd86",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

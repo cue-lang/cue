@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84b8b616_5a92d317",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-18T09:55:39Z",
+      "side": 1,
+      "message": "Turns out I could no longer get away with an invalid identifier in here.",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

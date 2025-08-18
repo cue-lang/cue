@@ -33,6 +33,24 @@
       "message": "I think \"it is never nil\" is a bit strong here. It definitely _will_ be nil when there\u0027s an I/O error reading the file. Perhaps we should just document that Syntax and SyntaxError record the result of invoking parser.ParseFile. We should probably also document the semantics of the `error` in the sequence returned by the various iterator functions.",
       "revId": "15ae28df68ff422aed640c3a0aa4590f6d4bf5a7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c521de3_d3eb1ecd",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-18T16:23:31Z",
+      "side": 1,
+      "message": "Done. I have added to the docs on some of the iter functions.",
+      "parentUuid": "89a33ae1_ee83b0ac",
+      "revId": "15ae28df68ff422aed640c3a0aa4590f6d4bf5a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

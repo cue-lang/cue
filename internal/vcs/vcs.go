@@ -153,13 +153,8 @@ func homeEnvName() string {
 // which also need to use Go tests with VCS systems.
 // Exposing a test helper is fine for now, given this is an internal package.
 func TestEnv() []string {
-	env := []string{
+	return []string{
 		"PATH=" + os.Getenv("PATH"),
 		homeEnvName() + "=/no-home",
 	}
-	// Must preserve SYSTEMROOT on Windows: https://github.com/golang/go/issues/25513 et al
-	if runtime.GOOS == "windows" {
-		env = append(env, "SYSTEMROOT="+os.Getenv("SYSTEMROOT"))
-	}
-	return env
 }

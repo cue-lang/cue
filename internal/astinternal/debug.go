@@ -196,7 +196,7 @@ func (d *debugPrinter) sliceElems(v reflect.Value, elemType reflect.Type) (anyEl
 
 func (d *debugPrinter) structFields(v reflect.Value) (anyElems bool) {
 	t := v.Type()
-	for i := 0; i < v.NumField(); i++ {
+	for i := range v.NumField() {
 		f := t.Field(i)
 		if !gotoken.IsExported(f.Name) {
 			continue
@@ -295,7 +295,7 @@ func (d *debugPrinter) addNodeRefs(v reflect.Value) {
 		}
 	case reflect.Struct:
 		t := v.Type()
-		for i := 0; i < v.NumField(); i++ {
+		for i := range v.NumField() {
 			f := t.Field(i)
 			if !gotoken.IsExported(f.Name) {
 				continue

@@ -40,7 +40,7 @@ func Parse[T any](flags *T, env string) error {
 	deprecated := make(map[string]bool)
 	fv := reflect.ValueOf(flags).Elem()
 	ft := fv.Type()
-	for i := 0; i < ft.NumField(); i++ {
+	for i := range ft.NumField() {
 		field := ft.Field(i)
 		name := strings.ToLower(field.Name)
 		if tagStr, ok := field.Tag.Lookup("envflag"); ok {

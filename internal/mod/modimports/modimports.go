@@ -25,9 +25,12 @@ type ModuleFile struct {
 	// If there's an error, it might not a be CUE file.
 	FilePath string
 
-	// Syntax includes only the portion of the file up to and including
-	// the imports. It will be nil if there was an error reading the file.
+	// Syntax is the ast.File result from parsing the file. It is never
+	// nil.
 	Syntax *ast.File
+
+	// SyntaxError contains errors produced by the parser.
+	SyntaxError error
 }
 
 // AllImports returns a sorted list of all the package paths
@@ -216,7 +219,7 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 		FilePath: fpath,
 	}
 	var syntax *ast.File
-	var err error
+	var syntaxErr error
 	if cueFS, ok := fsys.(module.ReadCUEFS); ok {
 		// The FS implementation supports reading CUE syntax directly.
 		// A notable FS implementation that does this is the one
@@ -225,9 +228,9 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 		// TODO maybe we should make the options here match
 		// the default parser options used by cue/load for better
 		// cache behavior.
-		syntax, err = cueFS.ReadCUEFile(fpath, parser.NewConfig(parser.ImportsOnly))
-		if err != nil && !errors.Is(err, errors.ErrUnsupported) {
-			return "", yield(pf, err)
+		syntax, syntaxErr = cueFS.ReadCUEFile(fpath, parser.NewConfig(parser.ImportsOnly))
+		if syntax == nil && !errors.Is(syntaxErr, errors.ErrUnsupported) {
+			return "", yield(pf, syntaxErr)
 		}
 	}
 	if syntax == nil {
@@ -252,9 +255,9 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 		}
 		// Add a leading "./" so that a parse error filename is consistent
 		// with the other error filenames created elsewhere in the codebase.
-		syntax, err = parser.ParseFile("./"+fpath, data, parser.ImportsOnly)
-		if err != nil {
-			return "", yield(pf, err)
+		syntax, syntaxErr = parser.ParseFile("./"+fpath, data, parser.ImportsOnly)
+		if syntax == nil {
+			return "", yield(pf, syntaxErr)
 		}
 	}
 
@@ -262,6 +265,7 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 		return "", true
 	}
 	pf.Syntax = syntax
+	pf.SyntaxError = syntaxErr
 	return syntax.PackageName(), yield(pf, nil)
 }
 

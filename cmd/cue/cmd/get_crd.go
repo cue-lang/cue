@@ -26,6 +26,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/encoding/jsonschema"
@@ -127,6 +128,10 @@ func runCRD(cmd *Command, args []string) error {
 								Value: internal.ToExpr(file),
 							},
 						},
+					}
+					// Add appropriate imports.
+					if err := astutil.Sanitize(newf); err != nil {
+						return err
 					}
 					data, err := format.Node(newf)
 					if err != nil {

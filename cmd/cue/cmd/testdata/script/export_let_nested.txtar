@@ -1,0 +1,27 @@
+exec cue export --out yaml -e file repro.cue
+cmp stdout expect-stdout
+
+-- expect-stdout --
+vc1:
+  name: prefix-project-y
+vc2:
+  let2: let3
+-- repro.cue --
+file: _out.file
+_out: (_gen & {}).out
+_gen: {
+	params: projectName: "project-y"
+	components: {
+		comp1: {
+			projectName: params.projectName
+			out: file: vc1: name: "prefix-\(projectName)"
+		}
+		comp2: {
+			let info = {let1: let2: "let3"}
+			out: file: vc2: info["let1"]
+		}
+	}
+	for _, vcfg in components {
+		out: vcfg.out
+	}
+}

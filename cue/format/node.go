@@ -457,6 +457,8 @@ func (f *formatter) nextNeedsFormfeed(n ast.Expr) bool {
 		return f.nextNeedsFormfeed(x.X)
 	case *ast.UnaryExpr:
 		return f.nextNeedsFormfeed(x.X)
+	case *ast.PostfixExpr:
+		return f.nextNeedsFormfeed(x.X)
 	case *ast.BinaryExpr:
 		return f.nextNeedsFormfeed(x.X) || f.nextNeedsFormfeed(x.Y)
 	case *ast.IndexExpr:
@@ -589,6 +591,10 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 			f.print(x.OpPos, x.Op, nooverride)
 			f.expr1(x.X, prec, depth)
 		}
+
+	case *ast.PostfixExpr:
+		f.expr1(x.X, token.HighestPrec, depth)
+		f.print(x.Op, nooverride)
 
 	case *ast.BasicLit:
 		f.print(x.ValuePos, x)

@@ -845,6 +845,28 @@ c: l.b`,
 		},
 
 		{
+			name: "Alias_Expr_Call",
+			archive: `-- a.cue --
+a: n=(2 * (div(n, 2))) | error("\(n) is not even")
+`,
+			expectations: map[*position][]*position{
+				// TERRIBLE! FIXME
+				ln(1, 1, "a"): {self},
+			},
+		},
+
+		{
+			name: "Call_Arg_Expr",
+			archive: `-- a.cue --
+c: (f({a: b, b: 3})).g
+`,
+			expectations: map[*position][]*position{
+				// TERRIBLE! FIXME
+				ln(1, 1, "c"): {self},
+			},
+		},
+
+		{
 			name: "Disjunction_Simple",
 			archive: `-- a.cue --
 d: {a: b: 3} | {a: b: 4, c: 5}
@@ -1051,6 +1073,34 @@ d: c.b.x`,
 		},
 
 		{
+			name: "Conjunction_Selector",
+			archive: `-- a.cue --
+b: ({a: 6} & {a: int}).a
+`,
+			expectations: map[*position][]*position{
+				ln(1, 3, "a"): {ln(1, 1, "a"), ln(1, 2, "a")},
+
+				// TERRIBLE! FIXME
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 2, "a"): {self},
+			},
+		},
+
+		{
+			name: "Binary_Expr",
+			archive: `-- a.cue --
+c: ({a: 6, d: a} + {b: a}).g
+a: 12
+`,
+			expectations: map[*position][]*position{
+				// TERRIBLE! FIXME
+				ln(1, 1, "c"): {self},
+				ln(2, 1, "a"): {self},
+			},
+		},
+
+		{
 			name: "Import_Builtin_Call",
 			archive: `-- a.cue --
 import "magic"
@@ -1112,6 +1162,23 @@ a: 5
 				ln(2, 1, "a"): {ln(1, 1, "a")},
 
 				ln(1, 1, "a"): {self},
+			},
+		},
+		{
+			name: "Interpolation_Expr",
+			archive: `-- a.cue --
+y: "\({a: 3, b: a}.b) \(a)"
+a: 12
+`,
+			expectations: map[*position][]*position{
+				ln(1, 2, "a"): {ln(1, 1, "a")},
+				ln(1, 2, "b"): {ln(1, 1, "b")},
+				ln(1, 3, "a"): {ln(2, 1, "a")},
+
+				ln(1, 1, "y"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(2, 1, "a"): {self},
 			},
 		},
 

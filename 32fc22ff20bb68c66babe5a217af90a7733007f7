@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "647b2bce_28a804e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-08-19T12:42:14Z",
+      "side": 1,
+      "message": "Per https://github.com/cue-lang/cue/issues/4020#issuecomment-3200599484 this was fixed in https://review.gerrithub.io/c/cue-lang/cue/+/1220039",
+      "revId": "32fc22ff20bb68c66babe5a217af90a7733007f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e63c8208_79818322",

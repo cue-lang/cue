@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"slices"
 	"strings"
 
@@ -226,7 +227,6 @@ func (m *Module) FindPackagesOrModulesForFile(file protocol.DocumentURI) ([]pack
 	if !found {
 		pkg = NewPackage(m, ip, dirUri)
 		m.packages[ip] = pkg
-		w.packages[ip] = pkg
 	}
 	pkgs := []packageOrModule{pkg}
 	// Search also for descendent packages that might include the file
@@ -318,4 +318,14 @@ func normalizeImportPath(pkg *modpkgload.Package) ast.ImportPath {
 	_, ip.Version, _ = ast.SplitPackageVersion(mod.Path())
 
 	return ip
+}
+
+// moduleRootURI determines the URI for the package's module root
+// (i.e. the URI of the directory that contains the mod.cue
+// directory). This function will panic if pkg is stdlib.
+func moduleRootURI(pkg *modpkgload.Package) protocol.DocumentURI {
+	modRoot := pkg.ModRoot()
+	modFS := modRoot.FS.(module.OSRootFS)
+	modRootPath := filepath.Join(modFS.OSRoot(), filepath.FromSlash(modRoot.Dir))
+	return protocol.URIFromPath(modRootPath)
 }

@@ -850,7 +850,9 @@ c: l.b`,
 a: n=(2 * (div(n, 2))) | error("\(n) is not even")
 `,
 			expectations: map[*position][]*position{
-				// TERRIBLE! FIXME
+				ln(1, 2, "n"): {ln(1, 1, "n")},
+				ln(1, 3, "n"): {ln(1, 1, "n")},
+
 				ln(1, 1, "a"): {self},
 			},
 		},
@@ -861,8 +863,11 @@ a: n=(2 * (div(n, 2))) | error("\(n) is not even")
 c: (f({a: b, b: 3})).g
 `,
 			expectations: map[*position][]*position{
-				// TERRIBLE! FIXME
+				ln(1, 1, "b"): {ln(1, 2, "b")},
+
 				ln(1, 1, "c"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 2, "b"): {self},
 			},
 		},
 
@@ -1080,10 +1085,9 @@ b: ({a: 6} & {a: int}).a
 			expectations: map[*position][]*position{
 				ln(1, 3, "a"): {ln(1, 1, "a"), ln(1, 2, "a")},
 
-				// TERRIBLE! FIXME
 				ln(1, 1, "b"): {self},
-				ln(1, 1, "a"): {self},
-				ln(1, 2, "a"): {self},
+				ln(1, 1, "a"): {self, ln(1, 2, "a")},
+				ln(1, 2, "a"): {self, ln(1, 1, "a")},
 			},
 		},
 
@@ -1094,8 +1098,14 @@ c: ({a: 6, d: a} + {b: a}).g
 a: 12
 `,
 			expectations: map[*position][]*position{
-				// TERRIBLE! FIXME
+				ln(1, 2, "a"): {ln(1, 1, "a")},
+				ln(1, 3, "a"): {ln(2, 1, "a")},
+
 				ln(1, 1, "c"): {self},
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "d"): {self},
+				ln(1, 1, "b"): {self},
+
 				ln(2, 1, "a"): {self},
 			},
 		},

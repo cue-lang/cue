@@ -16,6 +16,40 @@
       "message": "@mpvl@gmail.com - please feel free to take this over. It\u0027s literally a straight suggestion from Claude, so might well need your input.",
       "revId": "32fc22ff20bb68c66babe5a217af90a7733007f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e63c8208_79818322",
+        "filename": "cue/testdata/interpolation/issue4020.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-19T12:29:31Z",
+      "side": 1,
+      "message": "Usually, if there is no panic, we put the initial test in a separate CL, that the fix is visualized.\n\nFor example, I\u0027m not really seeing what this is fixing. It appears as if this bug is already fixed, unless I\u0027m missing something.",
+      "revId": "32fc22ff20bb68c66babe5a217af90a7733007f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c28070f_d9b0e066",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 768,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-19T12:29:31Z",
+      "side": 1,
+      "message": "Please wrap at 80 chars.",
+      "revId": "32fc22ff20bb68c66babe5a217af90a7733007f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

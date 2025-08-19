@@ -111,6 +111,9 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 		Walk(n.X, before, after)
 		Walk(n.Y, before, after)
 
+	case *PostfixExpr:
+		Walk(n.X, before, after)
+
 	// Declarations
 	case *ImportSpec:
 		if n.Name != nil {

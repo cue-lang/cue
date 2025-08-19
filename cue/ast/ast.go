@@ -731,6 +731,17 @@ type BinaryExpr struct {
 	expr
 }
 
+// A PostfixExpr node represents an expression followed by a postfix operator.
+// Examples: x..., x?, x!!
+type PostfixExpr struct {
+	X     Expr        // expression
+	Op    token.Token // postfix operator
+	OpPos token.Pos   // position of operator
+
+	comments
+	expr
+}
+
 // NewBinExpr creates for list of expressions of length 2 or greater a chained
 // binary expression of the form (((x1 op x2) op x3) ...). For lists of length
 // 1 it returns the expression itself. It panics for empty lists.
@@ -790,6 +801,8 @@ func (x *UnaryExpr) Pos() token.Pos     { return x.OpPos }
 func (x *UnaryExpr) pos() *token.Pos    { return &x.OpPos }
 func (x *BinaryExpr) Pos() token.Pos    { return x.X.Pos() }
 func (x *BinaryExpr) pos() *token.Pos   { return x.X.pos() }
+func (x *PostfixExpr) Pos() token.Pos   { return x.X.Pos() }
+func (x *PostfixExpr) pos() *token.Pos  { return x.X.pos() }
 func (x *BottomLit) Pos() token.Pos     { return x.Bottom }
 func (x *BottomLit) pos() *token.Pos    { return &x.Bottom }
 
@@ -824,7 +837,15 @@ func (x *SliceExpr) End() token.Pos    { return x.Rbrack.Add(1) }
 func (x *CallExpr) End() token.Pos     { return x.Rparen.Add(1) }
 func (x *UnaryExpr) End() token.Pos    { return x.X.End() }
 func (x *BinaryExpr) End() token.Pos   { return x.Y.End() }
-func (x *BottomLit) End() token.Pos    { return x.Bottom.Add(1) }
+func (x *PostfixExpr) End() token.Pos {
+	switch x.Op {
+	case token.ELLIPSIS:
+		return x.OpPos.Add(3) // len("...")
+	default:
+		return x.OpPos.Add(1) // most single-char operators
+	}
+}
+func (x *BottomLit) End() token.Pos { return x.Bottom.Add(1) }
 
 // ----------------------------------------------------------------------------
 // Convenience functions for Idents

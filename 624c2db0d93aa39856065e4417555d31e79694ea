@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49b66782_4b6b8e8a",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T15:25:34Z",
+      "side": 1,
+      "message": "It does, but you have to spend a bit of time trawling to find it: Join calls Clean (which is in the docs). Clean does call FromSlash, right at the end (tailcall). This is not documented, and it\u0027s only the whole string rather than just the 2nd arg to Join, so it\u0027s not exactly equivalent. I.e. I struggle to prove that delaying the call to FromSlash would not alter the behaviour of Join in some way.\nI\u0027ll make the change as you prefer, but this sort of thing always makes me itchy. I would much rather be able to look at our own code and see that we have explicitly done the correct conversions in every spot rather than finding somewhat worrying mixes of paths and filepaths.",
+      "parentUuid": "a444876b_f2031b73",
+      "revId": "624c2db0d93aa39856065e4417555d31e79694ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a89b60f1_24e5e757",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f086304_9ebb21e0",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T15:25:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a89b60f1_24e5e757",
+      "revId": "624c2db0d93aa39856065e4417555d31e79694ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "14306943_e2b54287",
@@ -48,6 +84,30 @@
       "writtenOn": "2025-08-19T15:10:08Z",
       "side": 1,
       "message": "The throwaway variable doesn\u0027t help much here.\n\n```suggestion\n\t\t\t\timportedPkg, found :\u003d w.findPackage(moduleRootURI(imported), ip)\n\t\t\t\tif !found {\n```",
+      "range": {
+        "startLine": 199,
+        "startChar": 0,
+        "endLine": 201,
+        "endChar": 0
+      },
+      "revId": "624c2db0d93aa39856065e4417555d31e79694ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "654f6d02_dff7563b",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T15:25:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14306943_e2b54287",
       "range": {
         "startLine": 199,
         "startChar": 0,

@@ -298,7 +298,7 @@ func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, opti
 }
 
 func (p *protoConverter) doImport(v *proto.Import) error {
-	if v.Filename == "cue/cue.proto" {
+	if p.mapBuiltinPackage(v.Filename) {
 		return nil
 	}
 
@@ -317,10 +317,6 @@ func (p *protoConverter) doImport(v *proto.Import) error {
 		err := errors.Newf(p.toCUEPos(v.Position), "could not find import %q", v.Filename)
 		p.state.addErr(err)
 		return err
-	}
-
-	if !p.mapBuiltinPackage(v.Position, v.Filename, filename == "") {
-		return nil
 	}
 
 	imp, err := p.state.parse(filename, nil)

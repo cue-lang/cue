@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/lsp/fscache"
 	"cuelang.org/go/internal/mod/modpkgload"
-	"cuelang.org/go/mod/module"
 )
 
 // Workspace corresponds to an LSP Workspace. Each LSP client/editor
@@ -51,10 +50,9 @@ type Workspace struct {
 	// WorkspaceFolder could contain several modules. As much as
 	// possible, we keep code that deals with workspace folders
 	// separate from code which deals with cue modules+packages.
-	folders  []*WorkspaceFolder
-	modules  map[protocol.DocumentURI]*Module
-	packages map[ast.ImportPath]*Package
-	mappers  map[*token.File]*protocol.Mapper
+	folders []*WorkspaceFolder
+	modules map[protocol.DocumentURI]*Module
+	mappers map[*token.File]*protocol.Mapper
 
 	// These are cached values. Do not use these directly, instead, use
 	// [Workspace.ActiveFilesAndDirs]
@@ -73,7 +71,6 @@ func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
 		overlayFS: overlayFS,
 		debugLog:  debugLog,
 		modules:   make(map[protocol.DocumentURI]*Module),
-		packages:  make(map[ast.ImportPath]*Package),
 		mappers:   make(map[*token.File]*protocol.Mapper),
 	}
 }
@@ -681,7 +678,11 @@ func (w *Workspace) reloadPackages() error {
 	// all the modules. We need to do this in two passes to ensure we
 	// create all necessary packages before trying to build/update the
 	// inverted import graph.
-	processedPkgs := make(map[ast.ImportPath]struct{})
+	type importPathModRootPair struct {
+		importPath ast.ImportPath
+		modRootURI protocol.DocumentURI
+	}
+	processedPkgs := make(map[importPathModRootPair]struct{})
 	pkgsImportsWorklist := make(map[*Package]*modpkgload.Package)
 	repeatReload := false
 
@@ -691,6 +692,7 @@ func (w *Workspace) reloadPackages() error {
 		}
 
 		ip := normalizeImportPath(loadedPkg)
+		modRootURI := moduleRootURI(loadedPkg)
 
 		// The same package can appear multiple times in loadedPkgs, for
 		// several reasons. Firstly, two different packages in different
@@ -709,18 +711,14 @@ func (w *Workspace) reloadPackages() error {
 		//
 		// So we need to test whether we've already seen this package in
 		// the results of this load. If we have, we can skip.
-		if _, seen := processedPkgs[ip]; seen {
+		key := importPathModRootPair{
+			importPath: ip,
+			modRootURI: modRootURI,
+		}
+		if _, seen := processedPkgs[key]; seen {
 			continue
 		}
-		processedPkgs[ip] = struct{}{}
-
-		modRoot := loadedPkg.ModRoot()
-		modFS, ok := modRoot.FS.(module.OSRootFS)
-		if !ok {
-			panic(fmt.Sprintf("%v Unable to load module because fs is not an OSRootFS %v", loadedPkg.Mod().Path(), modRoot.FS))
-		}
-		modRootPath := filepath.Join(modFS.OSRoot(), filepath.FromSlash(modRoot.Dir))
-		modRootURI := protocol.URIFromPath(modRootPath)
+		processedPkgs[key] = struct{}{}
 
 		m := w.ensureModule(modRootURI)
 		if err := m.ReloadModule(); err != nil {
@@ -739,7 +737,6 @@ func (w *Workspace) reloadPackages() error {
 			// look at its importedBy field as that would tell us about
 			// packages that now have dangling imports.
 			delete(m.packages, ip)
-			delete(w.packages, ip)
 			continue
 		}
 
@@ -757,7 +754,6 @@ func (w *Workspace) reloadPackages() error {
 			}
 			pkg = NewPackage(m, ip, dirUri)
 			m.packages[ip] = pkg
-			w.packages[ip] = pkg
 		}
 		// Capture the old loadedPkg (if it exists) so we can correct
 		// the import graph later.
@@ -788,26 +784,32 @@ func (w *Workspace) reloadPackages() error {
 	// 2nd pass: create/correct inverted import graph now that all
 	// necessary Packages exist. pkgsImportsWorklist will only contain
 	// local packages (i.e. packages within this module)
-	imports := make(map[ast.ImportPath]struct{})
+	imports := make(map[ast.ImportPath]*modpkgload.Package)
 	for pkg, oldPkg := range pkgsImportsWorklist {
 		clear(imports)
 		if oldPkg != nil {
 			for _, i := range oldPkg.Imports() {
-				imports[normalizeImportPath(i)] = struct{}{}
+				if i.IsStdlibPackage() {
+					continue
+				}
+				imports[normalizeImportPath(i)] = i
 			}
 		}
 		for _, i := range pkg.pkg.Imports() {
+			if i.IsStdlibPackage() {
+				continue
+			}
 			ip := normalizeImportPath(i)
 			if _, found := imports[ip]; found {
 				// Both new and old pkgs import ip. Noop.
 				delete(imports, ip)
-			} else if importedPkg, found := w.packages[ip]; found {
+			} else if importedPkg, found := w.findPackage(moduleRootURI(i), ip); found {
 				// Only new pkg imports ip. Add the back-pointer.
 				importedPkg.EnsureImportedBy(pkg)
 			}
 		}
-		for ip := range imports {
-			if importedPkg, found := w.packages[ip]; found {
+		for ip, i := range imports {
+			if importedPkg, found := w.findPackage(moduleRootURI(i), ip); found {
 				// Only old pkg imports ip. Remove the back-pointer.
 				importedPkg.RemoveImportedBy(pkg)
 			}
@@ -852,6 +854,15 @@ func (w *Workspace) reloadPackages() error {
 		return w.reloadPackages()
 	}
 	return nil
+}
+
+func (w *Workspace) findPackage(modRootURI protocol.DocumentURI, ip ast.ImportPath) (*Package, bool) {
+	m, found := w.modules[modRootURI]
+	if !found {
+		return nil, false
+	}
+	pkg, found := m.packages[ip]
+	return pkg, found
 }
 
 func changedText(uri protocol.DocumentURI, content []byte, changes []protocol.TextDocumentContentChangeEvent) ([]byte, error) {

@@ -274,6 +274,7 @@ package definitions
 
 import (
 	"fmt"
+	"maps"
 	"slices"
 	"strconv"
 	"strings"
@@ -764,7 +765,7 @@ func (n *astNode) eval() {
 			unprocessed = append(unprocessed, node.X)
 
 		case *ast.UnaryExpr:
-			resolvable = append(resolvable, node.X)
+			n.newAstNode(nil, node.X, nil)
 
 		case *ast.BinaryExpr:
 			switch node.Op {
@@ -776,7 +777,8 @@ func (n *astNode) eval() {
 				rhs := n.newAstNode(nil, node.Y, nil)
 				n.resolvesTo = append(n.resolvesTo, lhs.navigable, rhs.navigable)
 			default:
-				resolvable = append(resolvable, node.X, node.Y)
+				n.newAstNode(nil, node.X, nil)
+				n.newAstNode(nil, node.Y, nil)
 			}
 
 		case *ast.Alias:
@@ -789,7 +791,9 @@ func (n *astNode) eval() {
 
 		case *ast.CallExpr:
 			resolvable = append(resolvable, node.Fun)
-			resolvable = append(resolvable, node.Args...)
+			for _, arg := range node.Args {
+				n.newAstNode(nil, arg, nil)
+			}
 
 		case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr, *fieldDeclExpr:
 			embeddedResolvable = append(embeddedResolvable, node.(ast.Expr))
@@ -819,13 +823,14 @@ func (n *astNode) eval() {
 			n.newBinding(node.Ident.Name, node.Ident, node.Expr)
 
 		case *ast.ForClause:
+			// This is wrong.
+			unprocessed = append(unprocessed, node.Source)
 			if node.Key != nil {
 				n.newBinding(node.Key.Name, node.Key, nil)
 			}
 			if node.Value != nil {
 				n.newBinding(node.Value.Name, node.Value, nil)
 			}
-			resolvable = append(resolvable, node.Source)
 
 		case *ast.Field:
 			label := node.Label
@@ -976,20 +981,11 @@ func (n *astNode) resolve(e ast.Expr) []*navigableBindings {
 		n.dfns.addResolution(e.Lbrack, e.Rbrack.Add(1), results)
 		return results
 
-	case *ast.StructLit, *ast.ListLit:
-		return []*navigableBindings{n.newAstNode(nil, e, nil).navigable}
-
-	case *ast.ParenExpr:
-		return n.resolve(e.X)
-
-	case *ast.BinaryExpr:
-		switch e.Op {
-		case token.AND, token.OR:
-			return append(n.resolve(e.X), n.resolve(e.Y)...)
-		}
+	default:
+		return slices.Collect(maps.Keys(
+			expandNavigables([]*navigableBindings{n.newAstNode(nil, e, nil).navigable}),
+		))
 	}
-
-	return nil
 }
 
 // expandNavigables maximally expands the provided set of navigables:

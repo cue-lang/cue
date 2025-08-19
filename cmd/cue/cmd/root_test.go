@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -86,6 +87,12 @@ func TestCommand(t *testing.T) {
 }
 
 func TestVersion(t *testing.T) {
+	if info, err := os.Lstat("../../../.git"); err != nil {
+		t.Skip("cue version only includes VCS-derived information when building from a git clone")
+	} else if !info.IsDir() {
+		t.Skip("VCS information is not stamped for git worktrees due to https://go.dev/issue/58218")
+	}
+
 	// Test whether "cue version" reports the version information we expect.
 	// Note that we can't use the test binary for this purpose,
 	// given that binaries built via "go test" don't get stamped with version information.

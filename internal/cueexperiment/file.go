@@ -51,6 +51,12 @@ type File struct {
 	//
 	// Proposal was defined in https://cuelang.org/issue/2358.
 	StructCmp bool `experiment:"since:v0.14.0"`
+
+	// ExplicitOpen enables the postfix ... operator to explicitly open
+	// closed structs, allowing additional fields to be added.
+	//
+	// Proposal was defined in https://github.com/cue-lang/cue/discussions/4032
+	ExplicitOpen bool `experiment:"since:v0.15.0"`
 }
 
 // LanguageVersion returns the language version of the file or "" if no language

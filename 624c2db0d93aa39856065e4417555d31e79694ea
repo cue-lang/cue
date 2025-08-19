@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a444876b_f2031b73",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-19T15:10:08Z",
+      "side": 1,
+      "message": "I\u0027m pretty certain the FromSlash is redundant here: filepath.Join will convert `/` to `\\` as needed.\n\n```suggestion\n\tmodRootPath :\u003d filepath.Join(modFS.OSRoot(), modRoot.Dir)\n```",
+      "revId": "624c2db0d93aa39856065e4417555d31e79694ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a89b60f1_24e5e757",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-19T15:10:08Z",
+      "side": 1,
+      "message": "This should probably be a TODO: it would be great if we _could_ jump into stdlib, whatever that might turn out to mean.",
+      "revId": "624c2db0d93aa39856065e4417555d31e79694ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14306943_e2b54287",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-19T15:10:08Z",
+      "side": 1,
+      "message": "The throwaway variable doesn\u0027t help much here.\n\n```suggestion\n\t\t\t\timportedPkg, found :\u003d w.findPackage(moduleRootURI(imported), ip)\n\t\t\t\tif !found {\n```",
+      "range": {
+        "startLine": 199,
+        "startChar": 0,
+        "endLine": 201,
+        "endChar": 0
+      },
+      "revId": "624c2db0d93aa39856065e4417555d31e79694ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -89,8 +89,6 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 
 	p.file = &ast.File{Filename: filename}
 
-	p.addNames(d.Elements)
-
 	// Parse package definitions.
 	for _, e := range d.Elements {
 		switch x := e.(type) {
@@ -126,6 +124,8 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 			}
 		}
 	}
+
+	p.addNames(d.Elements)
 
 	if name := p.shortName(); name != "" {
 		p.file.Decls = append(p.file.Decls, &ast.Package{Name: ast.NewIdent(name)})
@@ -245,6 +245,9 @@ func (p *protoConverter) addNames(elems []proto.Visitee) {
 		}
 		sym := strings.Join(append(p.path, name), ".")
 		p.symbols[sym] = true
+		qualifiedSym := strings.Join([]string{p.protoPkg, name}, ".")
+		p.symbols[qualifiedSym] = true
+		p.addRef(pos, qualifiedSym, func() ast.Expr { return ast.NewIdent("#" + name) })
 		p.addRef(pos, name, func() ast.Expr { return ast.NewIdent("#" + name) })
 	}
 }

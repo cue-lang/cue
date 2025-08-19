@@ -395,6 +395,20 @@ func (c *OpContext) AddPosition(n Node) {
 	}
 }
 
+// NewErrf creates a *Bottom value and returns it. The returned uses the
+// current source as the point of origin of the error.
+func (c *OpContext) NewErrf(format string, args ...interface{}) *Bottom {
+	// TODO: consider renaming ot NewBottomf: this is now confusing as we also
+	// have Newf.
+	err := c.Newf(format, args...)
+	return &Bottom{
+		Src:  c.src,
+		Err:  err,
+		Code: EvalError,
+		Node: c.vertex,
+	}
+}
+
 func (c *OpContext) Newf(format string, args ...interface{}) *ValueError {
 	return c.NewPosf(c.pos(), format, args...)
 }
@@ -411,6 +425,7 @@ func appendNodePositions(a []token.Pos, n Node) []token.Pos {
 	return a
 }
 
+// NewPosf returns an error recorded at the given position.
 func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *ValueError {
 	err := &ValueError{
 		baseError: baseError{

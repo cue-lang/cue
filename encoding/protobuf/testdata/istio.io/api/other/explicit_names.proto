@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package istio.io.api.other.explicit_names;
+
+message ExplicitMsg {
+  istio.io.api.other.explicit_names.ExplicitNestedMsg nested_msg = 1;
+}
+
+message ExplicitNestedMsg {
+  string value = 1;
+}
+
+

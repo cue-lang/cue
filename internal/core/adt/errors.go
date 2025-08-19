@@ -351,23 +351,25 @@ func (c *OpContext) AddPosition(n Node) {
 	}
 }
 
+// NewErrf creates a *Bottom value and returns it. The returned uses the
+// current source as the point of origin of the error.
+func (c *OpContext) NewErrf(format string, args ...interface{}) *Bottom {
+	// TODO: consider renaming ot NewBottomf: this is now confusing as we also
+	// have Newf.
+	err := c.Newf(format, args...)
+	return &Bottom{
+		Src:  c.src,
+		Err:  err,
+		Code: EvalError,
+		Node: c.vertex,
+	}
+}
+
 func (c *OpContext) Newf(format string, args ...interface{}) *ValueError {
 	return c.NewPosf(c.pos(), format, args...)
 }
 
-func appendNodePositions(a []token.Pos, n Node) []token.Pos {
-	if p := pos(n); p != token.NoPos {
-		a = append(a, p)
-	}
-	if v, ok := n.(*Vertex); ok {
-		v.VisitLeafConjuncts(func(c Conjunct) bool {
-			a = appendNodePositions(a, c.Elem())
-			return true
-		})
-	}
-	return a
-}
-
+// NewPosf returns an error recorded at the given position.
 func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *ValueError {
 	var a []token.Pos
 	if len(c.positions) > 0 {
@@ -418,6 +420,19 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 		altPath: c.makeAltPath(),
 		Message: errors.NewMessagef(format, args...),
 	}
+}
+
+func appendNodePositions(a []token.Pos, n Node) []token.Pos {
+	if p := pos(n); p != token.NoPos {
+		a = append(a, p)
+	}
+	if v, ok := n.(*Vertex); ok {
+		v.VisitLeafConjuncts(func(c Conjunct) bool {
+			a = appendNodePositions(a, c.Elem())
+			return true
+		})
+	}
+	return a
 }
 
 func (c *OpContext) makeAltPath() (a []string) {

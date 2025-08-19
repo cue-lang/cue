@@ -336,12 +336,12 @@ func (c *OpContext) addErr(code ErrorCode, err errors.Error) {
 	})
 }
 
-// AddBottom records an error in OpContext.
+// AddBottom records b as an error in c.
 func (c *OpContext) AddBottom(b *Bottom) {
 	c.errs = CombineErrors(c.src, c.errs, b)
 }
 
-// AddErr records an error in OpContext. It returns errors collected so far.
+// AddErr records err as an error in c. It returns the errors collected so far.
 func (c *OpContext) AddErr(err errors.Error) *Bottom {
 	if err != nil {
 		c.AddBottom(&Bottom{
@@ -350,20 +350,6 @@ func (c *OpContext) AddErr(err errors.Error) *Bottom {
 		})
 	}
 	return c.errs
-}
-
-// NewErrf creates a *Bottom value and returns it. The returned uses the
-// current source as the point of origin of the error.
-func (c *OpContext) NewErrf(format string, args ...interface{}) *Bottom {
-	// TODO: consider renaming ot NewBottomf: this is now confusing as we also
-	// have Newf.
-	err := c.Newf(format, args...)
-	return &Bottom{
-		Src:  c.src,
-		Err:  err,
-		Code: EvalError,
-		Node: c.vertex,
-	}
 }
 
 // AddErrf records an error in OpContext. It returns errors collected so far.

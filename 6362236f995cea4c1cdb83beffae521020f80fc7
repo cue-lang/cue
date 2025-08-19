@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8d1cc48_899324fa",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T10:04:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eeb1abd7_e1aa82d7",
+      "range": {
+        "startLine": 260,
+        "startChar": 0,
+        "endLine": 260,
+        "endChar": 12
+      },
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc9ee4b8_d631c850",
@@ -54,6 +78,24 @@
       "writtenOn": "2025-08-18T16:37:51Z",
       "side": 1,
       "message": "This suggests that there\u0027s only one root, but presumably there can\nbe many, even within a single file.\n\n```suggestion\n// gathering their names, and stopping when either a root is\n```",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f822480_e692c41c",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T10:04:23Z",
+      "side": 1,
+      "message": "No, ultimately the package root is final and there is only one. I\u0027ll reword to add \"package\".",
+      "parentUuid": "cc9ee4b8_d631c850",
       "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -75,6 +117,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ef7ab0c_5e9f237f",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T10:04:23Z",
+      "side": 1,
+      "message": "Sigh. Sometimes I remember to use a spell checker... Sorry!",
+      "parentUuid": "54dbe055_17b8b436",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5321bf89_8373c4bf",
@@ -88,6 +148,30 @@
       "writtenOn": "2025-08-18T16:37:51Z",
       "side": 1,
       "message": "```suggestion\n\t\t\tif n.key !\u003d nil {\n\t\t\t\tnodes \u003d append(nodes, n.key)\n\t\t\t}\n\t\t}\n\t}\n```",
+      "range": {
+        "startLine": 415,
+        "startChar": 0,
+        "endLine": 420,
+        "endChar": 0
+      },
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc9669db_75fd648e",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T10:04:23Z",
+      "side": 1,
+      "message": "I never know which way around to go on this sort of thing. Some people prefer fewer lines of code. Some people prefer less indentation...",
+      "parentUuid": "5321bf89_8373c4bf",
       "range": {
         "startLine": 415,
         "startChar": 0,
@@ -117,6 +201,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dda97d39_91f1fdfb",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 585,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T10:04:23Z",
+      "side": 1,
+      "message": "Yeah, understood. I think there might be another \"big renaming\" in this file in the not too distant future - I\u0027m not convinced by \"navigableBindings\", and I hate \"astNode\" - there are far too many things called node now. I think I could grow to like \"fields\" here.",
+      "parentUuid": "2dccda68_7a6b2e68",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b0ca6f8f_c8ffc968",
         "filename": "internal/lsp/definitions/definitions.go",
         "patchSetId": 3
@@ -128,6 +230,24 @@
       "writtenOn": "2025-08-18T16:37:51Z",
       "side": 1,
       "message": "```suggestion\n\t// because navigableBindings are used for resolving\n```",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "127d2711_607fbd50",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T10:04:23Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "b0ca6f8f_c8ffc968",
       "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -167,6 +287,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "595e15d2_391ad507",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T10:04:23Z",
+      "side": 1,
+      "message": "For posterity: it turns out this claim is untrue. In an earlier version of this code, I was building a SelectorExpr, and that does use ast.LabelName which requires valid idents, so e.g. `x.0.a` wouldn\u0027t work. But in this version of the code, I\u0027m not doing that, so technically we could continue to get away with invalid idents.",
+      "parentUuid": "301b6c02_7c13235f",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "858b0b0f_f38acc02",
@@ -180,6 +318,30 @@
       "writtenOn": "2025-08-18T16:37:51Z",
       "side": 1,
       "message": "```suggestion\n\t\tnavs :\u003d []*navigableBindings{ancestor}\n\t\tfor _, name :\u003d range slices.Backward(names) {\n\t\t\tnavs \u003d navigateBindingsByName(navs, name)\n```",
+      "range": {
+        "startLine": 929,
+        "startChar": 0,
+        "endLine": 932,
+        "endChar": 0
+      },
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "edf4ff0c_68bf1cb9",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 932,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T10:04:23Z",
+      "side": 1,
+      "message": "Oh, wow, slices.Backward. That\u0027s new to me. Thanks.",
+      "parentUuid": "858b0b0f_f38acc02",
       "range": {
         "startLine": 929,
         "startChar": 0,
@@ -207,6 +369,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3f3af0b_85edef31",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1140,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T10:04:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b68fca4_411545f6",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a8b2ec2_b0a54deb",
@@ -224,6 +404,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b827085_6593988e",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1175,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T10:04:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a8b2ec2_b0a54deb",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3a9a38c6_cd0b8204",
@@ -237,6 +435,24 @@
       "writtenOn": "2025-08-18T16:37:51Z",
       "side": 1,
       "message": "```suggestion\n\t// Always nil: make the struct implement [ast.Expr].\n```",
+      "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9e4f3e8_8549f30e",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1179,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T10:04:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a9a38c6_cd0b8204",
       "revId": "6362236f995cea4c1cdb83beffae521020f80fc7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -70,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "11e1d133_98165f1b",
+        "filename": "cmd/cue/cmd/integration/workspace/imports_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-19T09:41:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1277d3fb_132d8e0d",
+      "revId": "52e5b27aabb6fda9235f107e0958fdfb11b08890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "04538688_2e04e1e2",

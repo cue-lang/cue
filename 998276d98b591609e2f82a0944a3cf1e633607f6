@@ -16,6 +16,24 @@
       "message": "nit: use `cue vet -c\u003dtrue` or `cue vet -c\u003dfalse`, as the default mode is weird and confusing.",
       "revId": "998276d98b591609e2f82a0944a3cf1e633607f6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f410f2d_b2480358",
+        "filename": "cmd/cue/cmd/testdata/script/get_crd_complex.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-19T11:57:13Z",
+      "side": 1,
+      "message": "`-c\u003dtrue` is the same as `-c`, right?\nAnd `-c\u003dfalse` will only turn some failures into successes AFAIK, but in the next CL we\u0027re going to fail if `cue vet` fails so ISTM that\u0027s being more defensive.\nIf we want to do that, I\u0027d prefer to do that across all the tests: there are many tests that use `cue vet` without `-c` currently.\n\nSo I\u0027ll leave as is if that\u0027s OK.",
+      "parentUuid": "4fdaee91_940964a8",
+      "revId": "998276d98b591609e2f82a0944a3cf1e633607f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -49,8 +49,16 @@ type File struct {
 	// operator to be defined on all values. For instance, comparing `1` and
 	// "foo" will return false, whereas previously it would return an error.
 	//
-	// Proposal was defined in https://cuelang.org/issue/2358.
+	// Proposal: in https://cuelang.org/issue/2358.
+	// Spec change: https://cuelang.org/cl/1217013
+	// Spec change: https://cuelang.org/cl/1217014
 	StructCmp bool `experiment:"since:v0.14.0"`
+
+	// ExplicitOpen enables the postfix ... operator to explicitly open
+	// closed structs, allowing additional fields to be added.
+	//
+	// Proposal: in https://cue-lang/cue#4032
+	ExplicitOpen bool `experiment:"since:v0.15.0"`
 }
 
 // LanguageVersion returns the language version of the file or "" if no language

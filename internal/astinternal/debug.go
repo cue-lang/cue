@@ -468,6 +468,9 @@ func DebugStr(x interface{}) (out string) {
 		out += DebugStr(v.Y)
 		return out
 
+	case *ast.PostfixExpr:
+		return DebugStr(v.X) + v.Op.String()
+
 	case []*ast.CommentGroup:
 		var a []string
 		for _, c := range v {

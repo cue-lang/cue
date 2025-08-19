@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fdaee91_940964a8",
+        "filename": "cmd/cue/cmd/testdata/script/get_crd_complex.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-19T11:20:32Z",
+      "side": 1,
+      "message": "nit: use `cue vet -c\u003dtrue` or `cue vet -c\u003dfalse`, as the default mode is weird and confusing.",
+      "revId": "998276d98b591609e2f82a0944a3cf1e633607f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

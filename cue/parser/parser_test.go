@@ -765,6 +765,14 @@ bar: 2
 			f6: func(func(bool, bool): bool, func(string, string): string): func(int, func(int, string): int): func(int, string): int
 		`,
 		out: "f0: func(): int, f1: func(int): int, f2: func(int, string): int, f3: func({a: int, b: string}): bool, f4: func(bool, func(int, string): int): string, f5: func(int, int): func(bool, bool): bool, f6: func(func(bool, bool): bool, func(string, string): string): func(int, func(int, string): int): func(int, string): int",
+	}, {
+		desc: "postfix ... operator with experiment",
+		in: `@experiment(explicitopen)
+		x: y...
+		a: foo.bar...
+		b: (c & d)...
+		e: fn()...`,
+		out: "@experiment(explicitopen), x: y..., a: foo.bar..., b: (c&d)..., e: fn()...",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

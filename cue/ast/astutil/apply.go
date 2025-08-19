@@ -386,6 +386,9 @@ func applyCursor(v applyVisitor, c Cursor) {
 		apply(v, c, &n.X)
 		apply(v, c, &n.Y)
 
+	case *ast.PostfixExpr:
+		apply(v, c, &n.X)
+
 	// Declarations
 	case *ast.ImportSpec:
 		if n.Name != nil {

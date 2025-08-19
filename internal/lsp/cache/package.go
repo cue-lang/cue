@@ -191,9 +191,13 @@ func (pkg *Package) setStatus(status status) {
 			for _, imported := range modpkg.Imports() {
 				if imported.ImportPath() != importPath {
 					continue
+				} else if imported.IsStdlibPackage() {
+					// can't jump into stdlib
+					return nil
 				}
 				ip := normalizeImportPath(imported)
-				importedPkg, found := w.packages[ip]
+				modRootURI := moduleRootURI(imported)
+				importedPkg, found := w.findPackage(modRootURI, ip)
 				if !found {
 					return nil
 				}

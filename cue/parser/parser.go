@@ -1485,6 +1485,25 @@ L:
 			x = p.parseIndexOrSlice(p.checkExpr(x))
 		case token.LPAREN:
 			x = p.parseCallOrConversion(p.checkExpr(x))
+		case token.ELLIPSIS:
+			if p.experiments.ExplicitOpen {
+				pos := p.pos
+				c := p.openComments()
+				p.next()
+				x = c.closeExpr(p, &ast.PostfixExpr{
+					X:     p.checkExpr(x),
+					Op:    token.ELLIPSIS,
+					OpPos: pos,
+				})
+			} else {
+				// Consume the token and give a clear error
+				pos := p.pos
+				p.next()
+				err := errors.Newf(pos, "postfix ... operator requires @experiment(explicitopen)")
+				p.errors = errors.Append(p.errors, err)
+				// Return a BadExpr to continue parsing
+				x = &ast.BadExpr{From: pos, To: p.pos}
+			}
 		default:
 			break L
 		}

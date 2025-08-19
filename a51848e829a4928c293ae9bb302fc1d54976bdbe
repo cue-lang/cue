@@ -16,6 +16,23 @@
       "message": "PTAL",
       "revId": "a51848e829a4928c293ae9bb302fc1d54976bdbe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abbfc212_7e04d5e9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-08-19T10:53:27Z",
+      "side": 1,
+      "message": "I\u0027d suggest we hold fire here and instead agree on what first steps we want to take as part of https://github.com/cue-lang/cue/issues/8",
+      "revId": "a51848e829a4928c293ae9bb302fc1d54976bdbe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

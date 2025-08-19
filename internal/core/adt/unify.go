@@ -519,7 +519,14 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 		defer n.ctx.Un(n.ctx.Indentf(n.node, "(%v)", mode))
 	}
 
-	n.assertInitialized()
+	// In attemptOnly mode, don't assert initialization to allow processing
+	// of partially initialized vertices
+	if mode != attemptOnly {
+		n.assertInitialized()
+	} else if n.node != nil && !n.node.isInitialized() {
+		// In attemptOnly mode, skip processing if vertex is not initialized
+		return
+	}
 
 	if n.isCompleting > 0 {
 		return

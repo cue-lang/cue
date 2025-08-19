@@ -313,14 +313,14 @@ func (p *protoConverter) doImport(v *proto.Import) error {
 		break
 	}
 
+	if !p.mapBuiltinPackage(v.Position, v.Filename, filename == "") {
+		return nil
+	}
+
 	if filename == "" {
 		err := errors.Newf(p.toCUEPos(v.Position), "could not find import %q", v.Filename)
 		p.state.addErr(err)
 		return err
-	}
-
-	if !p.mapBuiltinPackage(v.Position, v.Filename, filename == "") {
-		return nil
 	}
 
 	imp, err := p.state.parse(filename, nil)

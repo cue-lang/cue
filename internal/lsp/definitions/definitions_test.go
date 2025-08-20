@@ -1368,6 +1368,47 @@ foo: bar: "baz"`,
 				ln(2, 1, "bar"): {self},
 			},
 		},
+		{
+			name: "Comprehension_For_Scopes",
+			archive: `-- a.cue --
+x: {
+	for k, v in k {v: k}
+}
+k: {}
+`,
+			expectations: map[*position][]*position{
+				// THIS IS WRONG. FIXME
+				ln(2, 2, "k"): {ln(2, 1, "k")},
+				ln(2, 3, "k"): {ln(2, 1, "k")},
+
+				ln(1, 1, "x"): {self},
+				ln(2, 2, "v"): {self},
+				ln(4, 1, "k"): {self},
+			},
+		},
+		{
+			name: "Comprehension_Mixed_Scopes",
+			archive: `-- a.cue --
+g: [for x in [1, 2]
+let x = x+1
+let x = x+1 {
+    {h: x}
+}]
+i: g[0].h`,
+			expectations: map[*position][]*position{
+				// THIS IS WRONG. FIXME
+				ln(2, 2, "x"): {ln(2, 1, "x")},
+				ln(3, 2, "x"): {ln(3, 1, "x")},
+				ln(4, 1, "x"): {ln(3, 1, "x")},
+				ln(6, 1, "g"): {ln(1, 1, "g")},
+
+				ln(1, 1, "g"):   {self},
+				ln(4, 1, "h"):   {self},
+				ln(6, 1, "i"):   {self},
+				ln(6, 1, "[0]"): {ln(1, 1, "f")},
+				ln(6, 1, "h"):   {ln(4, 1, "h")},
+			},
+		},
 
 		{
 			name: "MultiFile_Package_Top_Single",

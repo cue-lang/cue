@@ -1377,8 +1377,7 @@ x: {
 k: {}
 `,
 			expectations: map[*position][]*position{
-				// THIS IS WRONG. FIXME
-				ln(2, 2, "k"): {ln(2, 1, "k")},
+				ln(2, 2, "k"): {ln(4, 1, "k")},
 				ln(2, 3, "k"): {ln(2, 1, "k")},
 
 				ln(1, 1, "x"): {self},

@@ -28,10 +28,6 @@ package a
 import "strings"
 
 v1: int
--- formatted/a/b.cue --
-package a
-
-import "strings"
 -- a/b.cue --
 package a
 
@@ -79,11 +75,7 @@ package a
 			env.FormatBuffer("a/b.cue")
 			content, open := env.Editor.BufferText("a/b.cue")
 			qt.Assert(t, qt.Equals(open, true))
-			// well this is a disaster: the parsing with ParseComments
-			// fails, so it falls back to ImportsOnly, which we don't
-			// realise, but can cheerfully format, and then send back to
-			// the client, wiping out the rest of the file body. FIXME
-			qt.Assert(t, qt.Equals(content, archiveFiles["formatted/a/b.cue"]))
+			qt.Assert(t, qt.Equals(content, archiveFiles["a/b.cue"]))
 		})
 	})
 }

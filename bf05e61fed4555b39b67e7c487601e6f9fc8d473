@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9090f62e_40cac86f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-20T15:27:17Z",
+      "side": 1,
+      "message": "```suggestion\nelement in a selector that we were completely failing to handle.\n```\n\n😄",
+      "revId": "bf05e61fed4555b39b67e7c487601e6f9fc8d473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "caf9669d_de37cde7",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 988,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-20T15:27:17Z",
+      "side": 1,
+      "message": "minor formatting nit: I kinda prefer to match closing parens with the start of the expression, similar to braces.\n\n\n```suggestion\n\t\treturn slices.Collect(\n\t\t\tmaps.Keys(\n\t\t\t\texpandNavigables([]*navigableBindings{n.newAstNode(nil, e, nil).navigable}),\n\t\t\t),\n\t\t)\n\t}\n```\n\nor maybe:\n\n```suggestion\n\t\treturn slices.Collect(maps.Keys(\n\t\t\t\texpandNavigables([]*navigableBindings{n.newAstNode(nil, e, nil).navigable}),\n\t\t))\n\t}\n```",
+      "range": {
+        "startLine": 985,
+        "startChar": 0,
+        "endLine": 988,
+        "endChar": 0
+      },
+      "revId": "bf05e61fed4555b39b67e7c487601e6f9fc8d473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d651d76b_5b26dcbb",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 853,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-20T15:27:17Z",
+      "side": 1,
+      "message": "Thought in passing, if we expect the `a` in `a: 1` to resolve to itself, then perhaps we should also have:\n\n```\nln(1, 1, \"n\"): {self}\n```",
+      "revId": "bf05e61fed4555b39b67e7c487601e6f9fc8d473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

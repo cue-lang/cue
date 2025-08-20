@@ -214,27 +214,48 @@ func (m *Module) FindPackagesOrModulesForFile(file protocol.DocumentURI) ([]pack
 	// NB pkgPath will have a '/' at [0]  because m.rootURI will not have a trailing '/'
 	pkgPath := strings.TrimPrefix(string(dirUri), string(m.rootURI))
 
-	modPath, version, _ := ast.SplitPackageVersion(m.modFile.QualifiedModule())
+	isOldMod := false
+	ip := ast.ImportPath{Qualifier: pkgName}
+	var dirUris []protocol.DocumentURI
+	for _, prefix := range []string{"/cue.mod/gen/", "/cue.mod/pkg/", "/cue.mod/usr/"} {
+		if pkgPathOldMod, wasCut := strings.CutPrefix(pkgPath, prefix); wasCut {
+			isOldMod = true
+			ip.Path = pkgPathOldMod
+			dirUris = []protocol.DocumentURI{
+				m.rootURI + "/cue.mod/gen/" + protocol.DocumentURI(pkgPathOldMod),
+				m.rootURI + "/cue.mod/pkg/" + protocol.DocumentURI(pkgPathOldMod),
+				m.rootURI + "/cue.mod/usr/" + protocol.DocumentURI(pkgPathOldMod),
+			}
+			break
+		}
+	}
 
-	ip := ast.ImportPath{
-		Path:      modPath + pkgPath,
-		Version:   version,
-		Qualifier: pkgName,
-	}.Canonical()
+	if !isOldMod {
+		modPath, version, _ := ast.SplitPackageVersion(m.modFile.QualifiedModule())
+		ip.Path = modPath + pkgPath
+		ip.Version = version
+		dirUris = []protocol.DocumentURI{dirUri}
+	}
+
+	ip = ip.Canonical()
 
 	// the exact package is always needed:
 	pkg, found := m.packages[ip]
 	if !found {
-		pkg = NewPackage(m, ip, dirUri)
+		pkg = NewPackage(m, ip, dirUris)
 		m.packages[ip] = pkg
 	}
 	pkgs := []packageOrModule{pkg}
-	// Search also for descendent packages that might include the file
-	// by virtue of the ancestor-import-path pattern.
-	for _, pkg := range m.packages {
-		pkgIp := pkg.importPath
-		if pkgIp.Qualifier == ip.Qualifier && strings.HasPrefix(pkgIp.Path, ip.Path+"/") {
-			pkgs = append(pkgs, pkg)
+
+	if !isOldMod {
+		// Search also for descendent packages that might include the
+		// file by virtue of the ancestor-import-path pattern. The old
+		// module system never uses ancestor imports.
+		for _, pkg := range m.packages {
+			pkgIp := pkg.importPath
+			if pkgIp.Qualifier == ip.Qualifier && strings.HasPrefix(pkgIp.Path, ip.Path+"/") {
+				pkgs = append(pkgs, pkg)
+			}
 		}
 	}
 
@@ -309,6 +330,12 @@ func normalizeImportPath(pkg *modpkgload.Package) ast.ImportPath {
 	mod := pkg.Mod()
 	if !mod.IsValid() {
 		panic(fmt.Sprintf("unable to normalize import path %v", pkg.ImportPath()))
+
+	} else if mod.IsLocal() {
+		// "local" means it's using the old module system
+		// (cue.mod/{gen|pkg|usr}) and there is no package versioning in
+		// that system.
+		return ip
 	}
 
 	// Favour extracting the major version from path over

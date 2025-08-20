@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "18e7ab07_a7c041b5",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 826,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-20T15:28:17Z",
+      "side": 1,
+      "message": "Given that we\u0027re not fixing this in the next couple of CLs AFAICS, perhaps expand slightly on _why_ this is wrong?",
+      "revId": "bf05e61fed4555b39b67e7c487601e6f9fc8d473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "caf9669d_de37cde7",
         "filename": "internal/lsp/definitions/definitions.go",
         "patchSetId": 1

@@ -1409,6 +1409,25 @@ i: g[0].h`,
 		},
 
 		{
+			name: "Definitions",
+			archive: `-- a.cue --
+#x: y: #z: 3
+o: #x & #x.y.z
+`,
+			expectations: map[*position][]*position{
+				ln(2, 1, "#x"): {ln(1, 1, "#x")},
+				ln(2, 2, "#x"): {ln(1, 1, "#x")},
+				ln(2, 1, "y"):  {ln(1, 1, "y")},
+
+				ln(1, 1, "#x"): {self},
+				ln(1, 1, "y"):  {self},
+				ln(1, 1, "#z"): {self},
+
+				ln(2, 1, "o"): {self},
+			},
+		},
+
+		{
 			name: "MultiFile_Package_Top_Single",
 			archive: `-- a.cue --
 package x

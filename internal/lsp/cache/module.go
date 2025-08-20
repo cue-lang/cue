@@ -159,7 +159,7 @@ func (m *Module) ReadCUEFile(file protocol.DocumentURI) (*ast.File, fscache.File
 		return nil, nil, err
 	}
 	versionOption := parser.Version(m.modFile.Language.Version)
-	parsedFile, err := fh.ReadCUE(parser.NewConfig(versionOption))
+	parsedFile, _, err := fh.ReadCUE(parser.NewConfig(versionOption))
 	if err != nil {
 		return nil, nil, err
 	}

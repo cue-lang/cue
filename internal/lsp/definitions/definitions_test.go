@@ -1377,8 +1377,7 @@ x: {
 k: {}
 `,
 			expectations: map[*position][]*position{
-				// THIS IS WRONG. FIXME
-				ln(2, 2, "k"): {ln(2, 1, "k")},
+				ln(2, 2, "k"): {ln(4, 1, "k")},
 				ln(2, 3, "k"): {ln(2, 1, "k")},
 
 				ln(1, 1, "x"): {self},
@@ -1396,9 +1395,8 @@ let x = x+1 {
 }]
 i: g[0].h`,
 			expectations: map[*position][]*position{
-				// THIS IS WRONG. FIXME
-				ln(2, 2, "x"): {ln(2, 1, "x")},
-				ln(3, 2, "x"): {ln(3, 1, "x")},
+				ln(2, 2, "x"): {ln(1, 1, "x")},
+				ln(3, 2, "x"): {ln(2, 1, "x")},
 				ln(4, 1, "x"): {ln(3, 1, "x")},
 				ln(6, 1, "g"): {ln(1, 1, "g")},
 

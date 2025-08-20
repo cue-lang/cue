@@ -661,6 +661,24 @@ func (n *astNode) eval() {
 	n.unprocessed = nil
 
 	var embeddedResolvable, resolvable []ast.Expr
+	// This maps from clauses we process in this astNode, to the
+	// remains of the corresponding comprehension that should be passed
+	// to some child astNode. See the ast.Comprehension case below.
+	//
+	// Say we have Comprehension{Clauses: [A,B,C], Value: D} in our
+	// list of unprocessed nodes. When we encounter it, clause A will
+	// go into our unprocessed list, and comprehensionsStash[A] =
+	// Comprehension{Clauses: [B,C], Value: D}. Then, when we then
+	// process A, we can find this tail of the comprehension and pass
+	// that to some child astNode.
+	//
+	// The base-case is when we have Comprehension{Clauses: [C], Value:
+	// D} in our list of unprocessed nodes. When we process it, C will
+	// go into our list of unprocessed nodes as normal, and
+	// comprehensionsStash[C] = D. So then when we process C, again
+	// we'll be able to find the tail - D - and pass that to the
+	// appropriate astNode.
+	var comprehensionsStash map[ast.Node]ast.Node
 
 	for len(unprocessed) > 0 {
 		node := unprocessed[0]
@@ -799,37 +817,77 @@ func (n *astNode) eval() {
 			embeddedResolvable = append(embeddedResolvable, node.(ast.Expr))
 
 		case *ast.Comprehension:
-			parent := n
-			for _, clause := range node.Clauses {
-				cur := parent.newAstNode(nil, clause, nil)
-				// We need to make sure that the comprehension value
-				// (i.e. body) and all subsequent clauses, can be reached
-				// by traversing through all clauses. The simplest way to
-				// do this is just to include the whole range of node
-				// within each descendent.
-				cur.addRange(node)
-				parent.resolvesTo = append(parent.resolvesTo, cur.navigable)
-				parent = cur
+			clause := node.Clauses[0]
+			unprocessed = append(unprocessed, clause)
+			// We don't know how many child astNodes we'll need to
+			// process clause. So we stash whatever remains of this
+			// comprehension and can later find it once we've finished
+			// processing our clause.
+			if comprehensionsStash == nil {
+				comprehensionsStash = make(map[ast.Node]ast.Node)
 			}
-			if parent != n {
-				child := parent.newAstNode(nil, node.Value, nil)
-				parent.resolvesTo = append(parent.resolvesTo, child.navigable)
+			if len(node.Clauses) == 1 {
+				// Base-case: we're dealing with the last clause. So that
+				// clause gets processed in this node, and we make sure we
+				// can later use that last clause to find the body (value)
+				// of this comprehension.
+				comprehensionsStash[clause] = node.Value
+			} else {
+				// Non-base-case: we're processing the first clause in
+				// this node, and all that remain go into a copy of the
+				// comprehension, which we find later and pass to an
+				// appropriate child/descendent.
+				nodeCopy := *node
+				nodeCopy.Clauses = node.Clauses[1:]
+				comprehensionsStash[clause] = &nodeCopy
 			}
 
 		case *ast.IfClause:
-			unprocessed = append(unprocessed, node.Condition)
+			comprehensionTail := comprehensionsStash[node]
+			childExpr := n.newAstNode(nil, node.Condition, nil)
+			childExpr.addRange(comprehensionTail)
 
-		case *ast.LetClause:
-			n.newBinding(node.Ident.Name, node.Ident, node.Expr)
+			childTail := childExpr.newAstNode(nil, comprehensionTail, nil)
+			n.resolvesTo = append(n.resolvesTo, childTail.navigable)
 
 		case *ast.ForClause:
-			// This is wrong.
-			unprocessed = append(unprocessed, node.Source)
+			comprehensionTail := comprehensionsStash[node]
+			childExpr := n.newAstNode(nil, node.Source, nil)
+			childExpr.addRange(comprehensionTail)
+
+			childBinding := childExpr.newAstNode(nil, nil, nil)
 			if node.Key != nil {
-				n.newBinding(node.Key.Name, node.Key, nil)
+				childBinding.newBinding(node.Key.Name, node.Key, nil)
 			}
 			if node.Value != nil {
-				n.newBinding(node.Value.Name, node.Value, nil)
+				childBinding.newBinding(node.Value.Name, node.Value, nil)
+			}
+			childBinding.addRange(comprehensionTail)
+
+			childTail := childBinding.newAstNode(nil, comprehensionTail, nil)
+			n.resolvesTo = append(n.resolvesTo, childTail.navigable)
+
+		case *ast.LetClause:
+			// A let clause might or might not be within a comprehension.
+			if comprehensionTail, found := comprehensionsStash[node]; found {
+				// If we're within a wider comprehension, we take care to
+				// make sure the binding is added as a child of the expr,
+				// and thus the expr cannot see its own binding (unlike a
+				// field).
+				childExpr := n.newAstNode(nil, node.Expr, nil)
+				childExpr.addRange(comprehensionTail)
+
+				childBinding := childExpr.newAstNode(nil, nil, nil)
+				childBinding.newBinding(node.Ident.Name, node.Ident, nil)
+				childBinding.addRange(comprehensionTail)
+
+				childTail := childBinding.newAstNode(nil, comprehensionTail, nil)
+				n.resolvesTo = append(n.resolvesTo, childTail.navigable)
+			} else {
+				// If we're not within a wider comprehension, the binding
+				// must be added to the current node n because we need to
+				// be able to find it from the first element of a path.
+				n.newBinding(node.Ident.Name, node.Ident, node.Expr)
 			}
 
 		case *ast.Field:

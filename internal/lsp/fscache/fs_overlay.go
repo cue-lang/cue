@@ -33,8 +33,8 @@ type overlayFileEntry struct {
 	version   int32
 	buildFile *build.File
 
-	mu  sync.Mutex
-	ast *ast.File
+	mu sync.Mutex
+	cueParser
 }
 
 var _ interface {
@@ -46,27 +46,20 @@ var _ interface {
 func (entry *overlayFileEntry) URI() protocol.DocumentURI { return entry.uri }
 
 // ReadCUE implements [FileHandle]
-func (entry *overlayFileEntry) ReadCUE(config parser.Config) (*ast.File, error) {
+func (entry *overlayFileEntry) ReadCUE(config parser.Config) (*ast.File, parser.Config, error) {
 	entry.mu.Lock()
 	defer entry.mu.Unlock()
 
-	if entry.ast != nil {
-		return entry.ast, nil
+	if entry.config.IsValid() {
+		return entry.ast, entry.config, entry.err
 	}
 
 	bf := entry.buildFile
 	if !(bf != nil && bf.Encoding == build.CUE && bf.Form == "" && bf.Interpretation == "") {
-		return nil, nil
+		return nil, parser.Config{}, nil
 	}
 
-	configParseAll := config
-	configParseAll.Mode = parser.ParseComments
-	ast, err := parseFile(bf.Filename, entry.content, configParseAll, config)
-
-	entry.ast = ast
-	ast.Pos().File().SetContent(entry.content)
-
-	return ast, err
+	return entry.parseFile(bf.Filename, entry.content, config)
 }
 
 // Version implements [FileHandle]
@@ -638,7 +631,8 @@ func (fs *rootedOverlayFS) ReadCUEFile(name string, config parser.Config) (*ast.
 	}
 
 	if file, isFile := entry.(*overlayFileEntry); isFile {
-		return file.ReadCUE(config)
+		ast, _, err := file.ReadCUE(config)
+		return ast, err
 	}
 
 	return nil, iofs.ErrInvalid

@@ -323,7 +323,7 @@ func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, forceIgnore b
 		return id
 	}
 
-	closeOuter := (id.FromDef && id.FromEmbed) || v.ClosedNonRecursive
+	closeOuter := id.FromDef && id.FromEmbed
 
 	if closeOuter && !forceIgnore {
 		// Walk up the parent chain of the outer structs to "activate" them.

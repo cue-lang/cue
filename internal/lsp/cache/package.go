@@ -68,10 +68,12 @@ type Package struct {
 	// canonical. It will always have a non-empty major version
 	importPath ast.ImportPath
 
-	// dirURI is the "leaf" directory for the package. The package
-	// consists of cue files in this directory and (optionally) any
-	// ancestor directories only.
-	dirURI protocol.DocumentURI
+	// dirURIs are the "leaf" directories for the package. The package
+	// consists of cue files in these directories and (optionally) any
+	// ancestor directories only. It can contain more than one
+	// directory only if the package is found using the old module
+	// system (cue.mod/{gen|pkg|usr}).
+	dirURIs []protocol.DocumentURI
 
 	// mutable fields:
 
@@ -94,16 +96,17 @@ type Package struct {
 	mappers map[*token.File]*protocol.Mapper
 }
 
-func NewPackage(module *Module, importPath ast.ImportPath, dir protocol.DocumentURI) *Package {
+func NewPackage(module *Module, importPath ast.ImportPath, dirs []protocol.DocumentURI) *Package {
+	slices.Sort(dirs)
 	return &Package{
 		module:     module,
 		importPath: importPath,
-		dirURI:     dir,
+		dirURIs:    dirs,
 	}
 }
 
 func (pkg *Package) String() string {
-	return fmt.Sprintf("Package dir=%v importPath=%v", pkg.dirURI, pkg.importPath)
+	return fmt.Sprintf("Package dirs=%v importPath=%v", pkg.dirURIs, pkg.importPath)
 }
 
 // MarkFileDirty implements [packageOrModule]
@@ -114,7 +117,7 @@ func (pkg *Package) MarkFileDirty(file protocol.DocumentURI) {
 
 // Encloses implements [packageOrModule]
 func (pkg *Package) Encloses(file protocol.DocumentURI) bool {
-	return pkg.dirURI == file.Dir()
+	return slices.Contains(pkg.dirURIs, file.Dir())
 }
 
 // ActiveFilesAndDirs implements [packageOrModule]

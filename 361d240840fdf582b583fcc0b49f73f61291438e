@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1ed9a3d_23ecf055",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 666,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-20T15:53:55Z",
+      "side": 1,
+      "message": "I\u0027ve been trying to understand this logic and I\u0027m struggling. I\u0027m sure it\u0027s right but I can\u0027t get my head around it and perhaps improving this comment could help. Might be best to chat about it so you can see where my stupidity lies!",
+      "revId": "361d240840fdf582b583fcc0b49f73f61291438e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0148da1b_c904a77f",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 667,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-20T15:53:55Z",
+      "side": 1,
+      "message": "```suggestion\n\tvar comprehensionsStash map[ast.Node]ast.Node\n```",
+      "revId": "361d240840fdf582b583fcc0b49f73f61291438e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

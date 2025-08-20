@@ -1368,6 +1368,24 @@ foo: bar: "baz"`,
 				ln(2, 1, "bar"): {self},
 			},
 		},
+		{
+			name: "Comprehension_For_Scopes",
+			archive: `-- a.cue --
+x: {
+	for k, v in k {v: k}
+}
+k: {}
+`,
+			expectations: map[*position][]*position{
+				// THIS IS WRONG. FIXME
+				ln(2, 2, "k"): {ln(2, 1, "k")},
+				ln(2, 3, "k"): {ln(2, 1, "k")},
+
+				ln(1, 1, "x"): {self},
+				ln(2, 2, "v"): {self},
+				ln(4, 1, "k"): {self},
+			},
+		},
 
 		{
 			name: "MultiFile_Package_Top_Single",

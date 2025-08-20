@@ -81,12 +81,12 @@ out: x.y
 		env.Await(
 			env.DoneWithOpen(),
 			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Reloaded", r1RootURI),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 For file %v/a/a.cue found [Package dir=%v/a importPath=example.com/bar/a@v0]", r1RootURI, r1RootURI, r1RootURI),
+			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 For file %v/a/a.cue found [Package dirs=[%v/a] importPath=example.com/bar/a@v0]", r1RootURI, r1RootURI, r1RootURI),
 			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loading packages [example.com/bar/a@v0]", r1RootURI),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dir=%v/a importPath=example.com/bar/a@v0", r1RootURI, r1RootURI),
+			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/a] importPath=example.com/bar/a@v0", r1RootURI, r1RootURI),
 			// A module is created for the imported module.
 			LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Reloaded", cacheURI),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Loaded Package dir=%v/example.com/foo@v0.0.1/x importPath=example.com/foo/x@v0", cacheURI, cacheURI),
+			LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Loaded Package dirs=[%v/example.com/foo@v0.0.1/x] importPath=example.com/foo/x@v0", cacheURI, cacheURI),
 		)
 		// Now open the other a.cue which is in a module of the same
 		// name, and imports a package with the same import path, but
@@ -95,17 +95,17 @@ out: x.y
 		env.Await(
 			env.DoneWithOpen(),
 			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Reloaded", r2RootURI),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 For file %v/a/a.cue found [Package dir=%v/a importPath=example.com/bar/a@v0]", r2RootURI, r2RootURI, r2RootURI),
+			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 For file %v/a/a.cue found [Package dirs=[%v/a] importPath=example.com/bar/a@v0]", r2RootURI, r2RootURI, r2RootURI),
 			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loading packages [example.com/bar/a@v0]", r2RootURI),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dir=%v/a importPath=example.com/bar/a@v0", r2RootURI, r2RootURI),
+			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/a] importPath=example.com/bar/a@v0", r2RootURI, r2RootURI),
 			// A module is created for the imported module.
 			LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo/x@v0.0.1 module=example.com/foo/x@v0 Reloaded", cacheURI),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo/x@v0.0.1 module=example.com/foo/x@v0 Loaded Package dir=%v/example.com/foo/x@v0.0.1/. importPath=example.com/foo/x@v0", cacheURI, cacheURI),
+			LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo/x@v0.0.1 module=example.com/foo/x@v0 Loaded Package dirs=[%v/example.com/foo/x@v0.0.1/.] importPath=example.com/foo/x@v0", cacheURI, cacheURI),
 			// Repeat key assertions from the first OpenFile call to
 			// prove that the r1 package (and imports) has not been
 			// reloaded:
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dir=%v/a importPath=example.com/bar/a@v0", r1RootURI, r1RootURI),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Loaded Package dir=%v/example.com/foo@v0.0.1/x importPath=example.com/foo/x@v0", cacheURI, cacheURI))
+			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/a] importPath=example.com/bar/a@v0", r1RootURI, r1RootURI),
+			LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Loaded Package dirs=[%v/example.com/foo@v0.0.1/x] importPath=example.com/foo/x@v0", cacheURI, cacheURI))
 		// Now perform the same jump-to-dfn from each of the open files:
 		// from the "y" in "out: x.y", which should take us to different
 		// files in the different (yet identically named) imported

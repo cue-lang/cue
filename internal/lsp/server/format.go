@@ -10,6 +10,7 @@ import (
 	"fmt"
 
 	cueformat "cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/parser"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/tools/diff"
@@ -35,11 +36,13 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 		return nil, fmt.Errorf("No module found for %v", uri)
 	}
 
-	parsedFile, fh, err := mod.ReadCUEFile(uri)
+	parsedFile, config, fh, err := mod.ReadCUEFile(uri)
 	if err != nil {
 		return nil, err
 	} else if parsedFile == nil {
 		return nil, fmt.Errorf("%v is not a CUE file", uri)
+	} else if config.Mode != parser.ParseComments {
+		return nil, fmt.Errorf("cannot format %v due to syntax errors", uri)
 	}
 
 	formatted, err := cueformat.Node(parsedFile)

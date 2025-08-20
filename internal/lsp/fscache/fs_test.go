@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"slices"
+	"strings"
 	"testing"
 	"testing/fstest"
 	"time"
@@ -16,7 +17,8 @@ import (
 	"github.com/go-quicktest/qt"
 )
 
-const fileContent = "package foo\n\nx: true"
+const fileContentGood = "package foo\n\nx: true"
+const fileContentBad = "'"
 
 func TestCUECacheFSURI(t *testing.T) {
 	_, _, onDiskFilesAbs := setup(t)
@@ -26,14 +28,28 @@ func TestCUECacheFSURI(t *testing.T) {
 		uri := protocol.URIFromPath(f)
 		fh, err := fs.ReadFile(uri)
 		qt.Assert(t, qt.IsNil(err))
-		qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(fileContent)))
-		ast, err := fh.ReadCUE(parser.NewConfig(parser.ImportsOnly))
-		qt.Assert(t, qt.IsNil(err))
-		// 2 decls: 1 for the package one for x, because the
-		// [parser.ImportsOnly] mode is modified to
-		// [parser.ParseComments].
-		qt.Assert(t, qt.Equals(len(ast.Decls), 2))
-		qt.Assert(t, qt.DeepEquals(ast.Pos().File().Content(), []byte(fileContent)))
+		ast, cfg, err := fh.ReadCUE(parser.NewConfig())
+		qt.Assert(t, qt.IsNotNil(ast))
+
+		if strings.HasSuffix(f, "bad.cue") {
+			qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(fileContentBad)))
+			qt.Assert(t, qt.IsNotNil(err))
+
+			// check that if we attempt to read it again, we still get
+			// the same error back
+			_, _, errAgain := fh.ReadCUE(parser.NewConfig())
+			qt.Assert(t, qt.ErrorMatches(errAgain, err.Error()))
+
+		} else {
+			qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(fileContentGood)))
+			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.Equals(cfg.Mode, parser.ParseComments))
+			// 2 decls: 1 for the package one for x, because the
+			// [parser.ImportsOnly] mode is modified to
+			// [parser.ParseComments].
+			qt.Assert(t, qt.Equals(len(ast.Decls), 2))
+			qt.Assert(t, qt.DeepEquals(ast.Pos().File().Content(), []byte(fileContentGood)))
+		}
 	}
 }
 
@@ -63,8 +79,9 @@ func TestOverlayFSURI(t *testing.T) {
 	})
 	qt.Assert(t, qt.IsNil(err))
 
+	pathModifiedAbs := onDiskFilesAbs[0]
 	err = fs.View(func(txn *fscache.ViewTxn) error {
-		uri := protocol.URIFromPath(onDiskFilesAbs[0])
+		uri := protocol.URIFromPath(pathModifiedAbs)
 		fh, err := txn.Get(uri)
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.DeepEquals(fh.Content(), content))
@@ -76,21 +93,33 @@ func TestOverlayFSURI(t *testing.T) {
 	})
 	qt.Assert(t, qt.IsNil(err))
 
-	for i, f := range onDiskFilesAbs {
+	for _, f := range onDiskFilesAbs {
 		uri := protocol.URIFromPath(f)
 		fh, err := fs.ReadFile(uri)
 		qt.Assert(t, qt.IsNil(err))
-		if i == 0 {
+
+		if f == pathModifiedAbs {
 			qt.Assert(t, qt.DeepEquals(fh.Content(), content))
-		} else {
-			qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(fileContent)))
-			ast, err := fh.ReadCUE(parser.NewConfig(parser.ImportsOnly))
+			ast, cfg, err := fh.ReadCUE(parser.NewConfig())
 			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.Equals(cfg.Mode, parser.ImportsOnly))
+			qt.Assert(t, qt.Equals(len(ast.Decls), 0))
+
+		} else if strings.HasSuffix(f, "bad.cue") {
+			qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(fileContentBad)))
+			_, _, err := fh.ReadCUE(parser.NewConfig())
+			qt.Assert(t, qt.IsNotNil(err))
+
+		} else {
+			qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(fileContentGood)))
+			ast, cfg, err := fh.ReadCUE(parser.NewConfig())
+			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.Equals(cfg.Mode, parser.ParseComments))
 			// 2 decls: 1 for the package one for x, because the
 			// [parser.ImportsOnly] mode is modified to
 			// [parser.ParseComments].
 			qt.Assert(t, qt.Equals(len(ast.Decls), 2))
-			qt.Assert(t, qt.DeepEquals(ast.Pos().File().Content(), []byte(fileContent)))
+			qt.Assert(t, qt.DeepEquals(ast.Pos().File().Content(), []byte(fileContentGood)))
 		}
 	}
 }
@@ -144,13 +173,18 @@ func setup(t *testing.T) (dir string, onDiskFiles, onDiskFilesAbs []string) {
 		"foo/bar/b.cue",
 		"foo/baz.cue",
 		"arble.cue",
+		"bad.cue",
 	}
 	onDiskFilesAbs = make([]string, len(onDiskFiles))
 	for i, f := range onDiskFiles {
 		onDiskFilesAbs[i] = filepath.Join(dir, filepath.FromSlash(f))
 	}
 	for _, f := range onDiskFilesAbs {
-		writeFile(t, f, fileContent)
+		if strings.HasSuffix(f, "bad.cue") {
+			writeFile(t, f, fileContentBad)
+		} else {
+			writeFile(t, f, fileContentGood)
+		}
 	}
 	forceMFTUpdateOnWindows(t, dir)
 	return dir, onDiskFiles, onDiskFilesAbs

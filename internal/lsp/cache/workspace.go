@@ -742,17 +742,38 @@ func (w *Workspace) reloadPackages() error {
 
 		pkg, found := m.packages[ip]
 		if !found {
-			// Every package contains cue sources from one "leaf"
+			// Every package contains cue sources from one* "leaf"
 			// directory and optionally any ancestor directory. Here we
-			// determine that "leaf" directory:
+			// determine that "leaf" directory.
+			//
+			// * In the case the "old modules" system is in use, with the
+			// cue.mod/{gen|pkg|usr} directories, it will be all three
+			// leaf directories, and ancestor imports don't apply.
+			var dirUris []protocol.DocumentURI
 			dirUri := protocol.DocumentURI("")
+		locations:
 			for _, loc := range loadedPkg.Locations() {
+				for _, prefix := range []string{"cue.mod/gen/", "cue.mod/pkg/", "cue.mod/usr/"} {
+					if dirOldMod, wasCut := strings.CutPrefix(loc.Dir, prefix); wasCut {
+						dirUris = []protocol.DocumentURI{
+							m.rootURI + "/cue.mod/gen/" + protocol.DocumentURI(dirOldMod),
+							m.rootURI + "/cue.mod/pkg/" + protocol.DocumentURI(dirOldMod),
+							m.rootURI + "/cue.mod/usr/" + protocol.DocumentURI(dirOldMod),
+						}
+						break locations
+					}
+				}
+
 				uri := protocol.DocumentURI(string(modRootURI) + "/" + loc.Dir)
 				if dirUri == "" || dirUri.Encloses(uri) {
 					dirUri = uri
 				}
 			}
-			pkg = NewPackage(m, ip, dirUri)
+
+			if dirUri != "" {
+				dirUris = []protocol.DocumentURI{dirUri}
+			}
+			pkg = NewPackage(m, ip, dirUris)
 			m.packages[ip] = pkg
 		}
 		// Capture the old loadedPkg (if it exists) so we can correct

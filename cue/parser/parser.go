@@ -579,6 +579,16 @@ func (p *parser) parseIdent() *ast.Ident {
 	return ident
 }
 
+// parseIdentDecl parses an identifier and validates that it's not a reserved
+// double-underscore identifier. Use this for identifier declarations.
+func (p *parser) parseIdentDecl() *ast.Ident {
+	ident := p.parseIdent()
+	if strings.HasPrefix(ident.Name, "__") {
+		p.errf(ident.NamePos, "identifiers starting with '__' are reserved")
+	}
+	return ident
+}
+
 func (p *parser) parseKeyIdent() *ast.Ident {
 	c := p.openComments()
 	pos := p.pos
@@ -795,7 +805,7 @@ func (p *parser) parseLetDecl() (decl ast.Decl, ident *ast.Ident) {
 	}
 	defer func() { c.closeNode(p, decl) }()
 
-	ident = p.parseIdent()
+	ident = p.parseIdentDecl()
 	assign := p.expect(token.BIND)
 	expr := p.parseRHS()
 
@@ -893,6 +903,12 @@ func (p *parser) parseField() (decl ast.Decl) {
 
 	switch p.tok {
 	case token.COLON:
+		// Now we know it's being used as a label, validate double-underscore
+		if ident, ok := label.(*ast.Ident); ok {
+			if strings.HasPrefix(ident.Name, "__") {
+				p.errf(ident.NamePos, "identifiers starting with '__' are reserved")
+			}
+		}
 	case token.COMMA:
 		p.expectComma() // sync parser.
 		fallthrough
@@ -1042,10 +1058,6 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, decl ast.
 		}
 
 	case *ast.Ident:
-		if strings.HasPrefix(x.Name, "__") && !rhs {
-			p.errf(x.NamePos, "identifiers starting with '__' are reserved")
-		}
-
 		expr = p.parseAlias(x)
 		if a, ok := expr.(*ast.Alias); ok {
 			if _, ok = a.Expr.(ast.Label); !ok {
@@ -1126,11 +1138,11 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 
 			var key, value *ast.Ident
 			var colon token.Pos
-			value = p.parseIdent()
+			value = p.parseIdentDecl()
 			if p.tok == token.COMMA {
 				colon = p.expect(token.COMMA)
 				key = value
-				value = p.parseIdent()
+				value = p.parseIdentDecl()
 			}
 			c.pos = 4
 			// params := p.parseParams(nil, ARROW)
@@ -1168,7 +1180,7 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 			c := p.openComments()
 			letPos := p.expect(token.LET)
 
-			ident := p.parseIdent()
+			ident := p.parseIdentDecl()
 			assign := p.expect(token.BIND)
 			expr := p.parseRHS()
 
@@ -1635,7 +1647,7 @@ func (p *parser) parseImportSpec(_ int) *ast.ImportSpec {
 
 	var ident *ast.Ident
 	if p.tok == token.IDENT {
-		ident = p.parseIdent()
+		ident = p.parseIdentDecl()
 		if isDefinition(ident) {
 			p.errf(p.pos, "cannot import package as definition identifier")
 		}

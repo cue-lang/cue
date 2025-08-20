@@ -298,6 +298,31 @@ cannot import package as definition identifier`,
 		__int: 2`,
 		"a: __string, __int: 2\nidentifiers starting with '__' are reserved",
 	}, {
+		"reserved identifiers in let",
+		`let __var = 42
+		a: __var`,
+		"let __var=42, a: __var\nidentifiers starting with '__' are reserved",
+	}, {
+		"reserved identifiers in comprehension",
+		`list: [for __x, y in [1] { __x }]`,
+		"list: [for __x: y in [1] {__x}]\nidentifiers starting with '__' are reserved",
+	}, {
+		"reserved identifiers in comprehension key-value",
+		`list: [for k, __v in {a: 1} { __v }]`,
+		"list: [for k: __v in {a: 1} {__v}]\nidentifiers starting with '__' are reserved",
+	}, {
+		"reserved identifiers in comprehension let",
+		`list: [for x in [1] let __temp = x { __temp }]`,
+		"list: [for x in [1] let __temp=x {__temp}]\nidentifiers starting with '__' are reserved",
+	}, {
+		"predeclared identifiers in struct embedding",
+		`a: { __int }`,
+		"a: {__int}",
+	}, {
+		"non-predeclared identifiers in struct embedding",
+		`a: { __myvar }`,
+		"a: {__myvar}",
+	}, {
 		"empty fields",
 		`
 		"": 3

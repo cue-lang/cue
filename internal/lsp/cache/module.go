@@ -150,20 +150,17 @@ var ErrModuleDeleted = errors.New("Module deleted")
 // extracted from the module's Language.Version field. This will fail
 // if the module's module.cue file is invalid, and ErrModuleInvalid
 // will be returned.
-func (m *Module) ReadCUEFile(file protocol.DocumentURI) (*ast.File, fscache.FileHandle, error) {
+func (m *Module) ReadCUEFile(file protocol.DocumentURI) (*ast.File, parser.Config, fscache.FileHandle, error) {
 	if err := m.ReloadModule(); err != nil {
-		return nil, nil, err
+		return nil, parser.Config{}, nil, err
 	}
 	fh, err := m.workspace.overlayFS.ReadFile(file)
 	if err != nil {
-		return nil, nil, err
+		return nil, parser.Config{}, nil, err
 	}
 	versionOption := parser.Version(m.modFile.Language.Version)
-	parsedFile, _, err := fh.ReadCUE(parser.NewConfig(versionOption))
-	if err != nil {
-		return nil, nil, err
-	}
-	return parsedFile, fh, nil
+	parsedFile, config, err := fh.ReadCUE(parser.NewConfig(versionOption))
+	return parsedFile, config, fh, err
 }
 
 // FindPackagesOrModulesForFile searches for the given file in both
@@ -198,7 +195,7 @@ func (m *Module) FindPackagesOrModulesForFile(file protocol.DocumentURI) ([]pack
 	}
 
 	w := m.workspace
-	parsedFile, _, err := m.ReadCUEFile(file)
+	parsedFile, _, _, err := m.ReadCUEFile(file)
 	if err != nil {
 		return nil, err
 	}

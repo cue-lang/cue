@@ -27,18 +27,13 @@ import (
 type FileHandle interface {
 	// URI is the URI for this file handle.
 	URI() protocol.DocumentURI
-	// ReadCUE attempts to parse the file content as CUE, using the
-	// provided parser config. Note that config is only used if there
-	// is no existing cached [ast.File] value within the
-	// File. Therefore, it is the user's responsibility to ensure that
-	// only one config value is used for each file: if you change the
-	// config value and re-read the file, you will not receive back an
-	// updated [ast.File].
-	//
-	// Additionally, in order to ensure the first parse of a file does
-	// not cause the cache to contain a partial AST, ReadCUE
-	// unconditionally sets config.Mode to [parser.ParseComments].
-	ReadCUE(config parser.Config) (*ast.File, error)
+	// ReadCUE attempts to parse the file content as CUE. The config
+	// supplied governs all parts of the parsing config apart from the
+	// Mode. ReadCUE will forcibly set the Mode first to ParseComments,
+	// and if that fails, to ImportsOnly. The returned config is the
+	// first config that produced no error, or, failing that, the last
+	// config attempted.
+	ReadCUE(config parser.Config) (*ast.File, parser.Config, error)
 	// Version returns the file version, as defined by the LSP client.
 	Version() int32
 	// Content returns the contents of a file. The byte slice returned
@@ -51,13 +46,7 @@ type diskFileEntry struct {
 	uri     protocol.DocumentURI
 	modTime time.Time
 
-	// TODO: will need to add the means to get the buildFile out. And
-	// probably refine the behavioul of err too.
-	content   []byte
-	buildFile *build.File
-
-	mu  sync.Mutex
-	ast *ast.File
+	cueFileParser
 }
 
 var _ FileHandle = (*diskFileEntry)(nil)
@@ -65,42 +54,64 @@ var _ FileHandle = (*diskFileEntry)(nil)
 // URI implements [FileHandle]
 func (entry *diskFileEntry) URI() protocol.DocumentURI { return entry.uri }
 
-// ReadFileFS implements [FileHandle]
-func (entry *diskFileEntry) ReadCUE(config parser.Config) (*ast.File, error) {
-	entry.mu.Lock()
-	defer entry.mu.Unlock()
+type cueFileParser struct {
+	// content and buildFile are immutable
+	content   []byte
+	buildFile *build.File
+	// TODO: will need to add the means to get the buildFile out.
 
-	if entry.ast != nil {
-		return entry.ast, nil
-	}
-
-	bf := entry.buildFile
-	if !(bf != nil && bf.Encoding == build.CUE && bf.Form == "" && bf.Interpretation == "") {
-		return nil, nil
-	}
-
-	configParseAll := config
-	configParseAll.Mode = parser.ParseComments
-	ast, err := parseFile(bf.Filename, entry.content, configParseAll, config)
-
-	entry.ast = ast
-	ast.Pos().File().SetContent(entry.content)
-
-	return ast, err
+	mu     sync.Mutex
+	config parser.Config
+	ast    *ast.File
+	err    error
 }
 
-// parseFile allows multiple attempts to parse the content with
-// different parser configs. The first attempt that succeeds (nil
-// error) is returned. This is useful to allow falling back to, say,
-// ImportsOnly if there are syntax errors further on in the CUE.
-func parseFile(filename string, content []byte, cfgs ...parser.Config) (ast *ast.File, err error) {
-	for _, cfg := range cfgs {
-		ast, err = parser.ParseFile(filename, content, cfg)
+// ReadCUE implements [FileHandle]
+//
+// ReadCUE attempts to parse the content first with
+// [parser.ParseComments], and then [parser.ImportsOnly]. The first
+// attempt that succeeds (nil error) is returned. It is useful to fall
+// back to ImportsOnly if there are syntax errors further on in the
+// CUE.
+func (p *cueFileParser) ReadCUE(config parser.Config) (ast *ast.File, cfg parser.Config, err error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	if p.config.IsValid() {
+		return p.ast, p.config, p.err
+	}
+
+	bf := p.buildFile
+	if !(bf != nil && bf.Encoding == build.CUE && bf.Form == "" && bf.Interpretation == "") {
+		return nil, parser.Config{}, nil
+	}
+
+	content := p.content
+
+	parseComments := parser.NewConfig(config)
+	parseComments.Mode = parser.ParseComments
+	importsOnly := parser.NewConfig(config)
+	importsOnly.Mode = parser.ImportsOnly
+
+	for _, cfg = range []parser.Config{parseComments, importsOnly} {
+		ast, err = parser.ParseFile(bf.Filename, content, cfg)
 		if err == nil {
-			return ast, err
+			break
 		}
 	}
-	return ast, err
+
+	if ast != nil {
+		file := ast.Pos().File()
+		if file != nil {
+			file.SetContent(content)
+		}
+	}
+
+	p.config = cfg
+	p.ast = ast
+	p.err = err
+
+	return ast, cfg, err
 }
 
 // Version implements [FileHandle]
@@ -112,11 +123,15 @@ func (entry *diskFileEntry) Content() []byte { return slices.Clone(entry.content
 func (entry *diskFileEntry) clone() *diskFileEntry {
 	// copy everything apart from the mutex
 	return &diskFileEntry{
-		uri:       entry.uri,
-		modTime:   entry.modTime,
-		content:   entry.content,
-		buildFile: entry.buildFile,
-		ast:       entry.ast,
+		uri:     entry.uri,
+		modTime: entry.modTime,
+		cueFileParser: cueFileParser{
+			content:   entry.content,
+			buildFile: entry.buildFile,
+			config:    entry.config,
+			ast:       entry.ast,
+			err:       entry.err,
+		},
 	}
 }
 
@@ -265,20 +280,21 @@ func readFile(uri protocol.DocumentURI, mtime time.Time) (*diskFileEntry, error)
 	if err != nil {
 		return nil, err
 	}
-	entry := &diskFileEntry{
-		modTime: mtime,
-		uri:     uri,
-		content: content,
-	}
 
 	bf, err := filetypes.ParseFileAndType(filePath, "", filetypes.Input)
 	if err != nil {
 		return nil, err
 	}
 	bf.Source = content
-	entry.buildFile = bf
 
-	return entry, nil
+	return &diskFileEntry{
+		modTime: mtime,
+		uri:     uri,
+		cueFileParser: cueFileParser{
+			content:   content,
+			buildFile: bf,
+		},
+	}, nil
 }
 
 // IoFS implements [RootableFS]
@@ -345,7 +361,8 @@ func (fs *rootedCUECacheFS) ReadCUEFile(name string, config parser.Config) (*ast
 	if err != nil {
 		return nil, err
 	}
-	return fh.ReadCUE(config)
+	ast, _, err := fh.ReadCUE(config)
+	return ast, err
 }
 
 // ReadDir implements [iofs.ReadDirFS]

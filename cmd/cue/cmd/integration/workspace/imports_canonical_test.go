@@ -47,8 +47,15 @@ y: 3
 			Range: protocol.Range{Start: protocol.Position{Line: 4, Character: 7}},
 		}
 
-		// It doesn't work because the spelling of the import with the explicit qualifier.
-		wantTo := []protocol.Location(nil)
+		wantTo := []protocol.Location{
+			{
+				URI: rootURI + "/x/x.cue",
+				Range: protocol.Range{
+					Start: protocol.Position{Line: 2, Character: 0},
+					End:   protocol.Position{Line: 2, Character: 1},
+				},
+			},
+		}
 
 		gotTo := env.Definition(from)
 		qt.Assert(t, qt.ContentEquals(gotTo, wantTo), qt.Commentf("from: %#v", from))

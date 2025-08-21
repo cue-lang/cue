@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2b68723_a01bb293",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-21T14:48:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a048797_fe42805c",
+      "revId": "d29f20ab81b398ff9058de1b2467b3164c2d23f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5936b58_21b86917",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-08-21T13:36:20Z",
       "side": 1,
       "message": "This makes me nervous. We\u0027re updating a mutable value that can be shared between several different diskFileEntries, each with its own mutex. It\u0027s _probably_ fine but at the least it could do with a decent comment explaining why it\u0027s OK.\n\nI\u0027m wondering if we could put the mutex inside `cueParser` and implement the ReadCUE method on that instead. AFAICS the implementation looks (almost?) identical between diskFileEntry and overlayFileEntry, which is presumably why cueParser has been factored out, so this might dedupe a bit more.",
+      "revId": "d29f20ab81b398ff9058de1b2467b3164c2d23f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e566ed0d_81a64179",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-21T14:48:19Z",
+      "side": 1,
+      "message": "I\u0027ve substantially reworked things and added some extra comments. Hopefully I\u0027ve addressed your concerns.",
+      "parentUuid": "e5936b58_21b86917",
       "revId": "d29f20ab81b398ff9058de1b2467b3164c2d23f9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

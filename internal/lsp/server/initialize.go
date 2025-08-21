@@ -16,7 +16,6 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"path"
 
@@ -85,8 +84,6 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 	validFolders, err := validateWorkspaceFolders(folders)
 	if err != nil {
 		return nil, err
-	} else if len(validFolders) == 0 {
-		return nil, errors.New("no WorkspaceFolders")
 	}
 	s.eventuallyUseWorkspaceFolders(validFolders)
 

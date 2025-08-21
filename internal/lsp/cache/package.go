@@ -191,6 +191,7 @@ func (pkg *Package) setStatus(status status) {
 			w.mappers[file] = mapper
 		}
 		forPackage := func(importPath string) *definitions.Definitions {
+			importPath = ast.ParseImportPath(importPath).Canonical().String()
 			for _, imported := range modpkg.Imports() {
 				if imported.ImportPath() != importPath {
 					continue

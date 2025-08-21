@@ -474,26 +474,67 @@ Null: 1
 	// Anchors and aliases.
 	{
 		"a: &x 1\nb: &y 2\nc: *x\nd: *y\n",
-		`a: 1
-b: 2
-c: 1
-d: 2`,
+		`#x: 1
+#y: 2
+a:  #x
+b:  #y
+c:  #x
+d:  #y`,
 	}, {
 		"a: &a {c: 1}\nb: *a",
-		`a: {c: 1}
-b: {
-	c: 1
-}`,
+		`#a: {c: 1}
+a: #a
+b: #a`,
 	}, {
 		"a: &a [1, 2]\nb: *a",
-		"a: [1, 2]\nb: [1, 2]", // TODO: a: [1, 2], b: a
+		"#a: [1, 2]\na: #a\nb: #a",
 	},
 	{
 		`a: &a "b"
 *a : "c"`,
-		`a: "b"
-b: "c"`,
+		`#a: "b"
+a:  #a
+b:  "c"`,
 	},
+	{
+		`- 3
+- &a 4
+- *a`,
+		`#a: 4, [
+	3,
+	#a,
+	#a,
+]`,
+	},
+	// Test nested anchors
+	{
+		`foo: &a
+  bar: &b
+    baz: 1
+a: *a
+b: *b
+`,
+		`#b: {
+	baz: 1
+}
+#a: {
+	bar: #b
+}
+foo: #a
+a:   #a
+b:   #b`,
+	},
+	{
+		`a:
+  - &b c`,
+		`#b: "c"
+a: [#b]`,
+	},
+	// Recursive anchor - make sure we don't infinitely recurse on such input.
+	{"a: &a\n  b: *a\n", `#a: {
+	b: #a
+}
+a: #a`},
 
 	{
 		"foo: ''",
@@ -778,10 +819,12 @@ a:
 	// yaml-test-suite 3GZX: Spec Example 7.1. Alias Nodes
 	{
 		"First occurrence: &anchor Foo\nSecond occurrence: *anchor\nOverride anchor: &anchor Bar\nReuse anchor: *anchor\n",
-		`"First occurrence":  "Foo"
-"Second occurrence": "Foo"
-"Override anchor":   "Bar"
-"Reuse anchor":      "Bar"`,
+		`#anchor:             "Foo"
+#anchor_2:           "Bar"
+"First occurrence":  #anchor
+"Second occurrence": #anchor
+"Override anchor":   #anchor_2
+"Reuse anchor":      #anchor_2`,
 	},
 }
 
@@ -926,7 +969,6 @@ var unmarshalErrorTests = []struct {
 	{"v:\n- [A,", "test.yaml:2: did not find expected node content"},
 	{"a:\n- b: *,", "test.yaml:2: did not find expected alphabetic or numeric character"},
 	{"a: *b\n", "test.yaml: unknown anchor 'b' referenced"},
-	{"a: &a\n  b: *a\n", `test.yaml:2: anchor "a" value contains itself`},
 	{"a: &a { b: c }\n*a : foo", "test.yaml:2: invalid map key: !!map"},
 	{"a: &a [b]\n*a : foo", "test.yaml:2: invalid map key: !!seq"},
 	{"value: -", "test.yaml: block sequence entries are not allowed in this context"},

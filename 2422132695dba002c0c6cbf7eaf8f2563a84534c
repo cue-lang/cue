@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53017091_7fc0860f",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 873,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-21T15:04:12Z",
+      "side": 1,
+      "message": "nit: when the comment is inside an if body, it\u0027s nice to comment as if the condition is indeed true.\n\n```suggestion\n\t\t\t\t// We\u0027re within a wider comprehension: take care to\n```",
+      "revId": "2422132695dba002c0c6cbf7eaf8f2563a84534c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b579b3b3_44474e02",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 887,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-21T15:04:12Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t\t// We\u0027re not within a wider comprehension: the binding\n```",
+      "revId": "2422132695dba002c0c6cbf7eaf8f2563a84534c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc49e3e9_542a0e98",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1406,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-21T15:04:12Z",
+      "side": 1,
+      "message": "I was looking for an identifier named \"f\" but couldn\u0027t find it!\n\n```suggestion\n\t\t\t\tln(6, 1, \"[0]\"): {ln(1, 1, \"for\")},\n```",
+      "revId": "2422132695dba002c0c6cbf7eaf8f2563a84534c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

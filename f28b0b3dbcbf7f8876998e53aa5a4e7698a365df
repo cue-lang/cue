@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d60fcce6_5b97da57",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 908,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-21T15:21:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b6e4de3_16d4448e",
+      "revId": "f28b0b3dbcbf7f8876998e53aa5a4e7698a365df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ffa0376d_7c4b4a40",

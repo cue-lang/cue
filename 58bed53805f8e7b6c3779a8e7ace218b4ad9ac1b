@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19acd651_d8048121",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-21T12:36:08Z",
+      "side": 1,
+      "message": "Perhaps explain why we add all three directories even if the loaded package is only present in one?",
+      "revId": "58bed53805f8e7b6c3779a8e7ace218b4ad9ac1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -33,6 +33,24 @@
       "message": "```suggestion\n\tvar comprehensionsStash map[ast.Node]ast.Node\n```",
       "revId": "361d240840fdf582b583fcc0b49f73f61291438e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9c746b8_2f5ecb31",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 667,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-21T07:50:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0148da1b_c904a77f",
+      "revId": "361d240840fdf582b583fcc0b49f73f61291438e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

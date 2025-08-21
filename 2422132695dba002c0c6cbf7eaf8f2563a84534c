@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7a32252_994e777a",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 873,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-21T15:07:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53017091_7fc0860f",
+      "revId": "2422132695dba002c0c6cbf7eaf8f2563a84534c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b579b3b3_44474e02",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b245c441_b33b5f8d",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 887,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-21T15:07:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b579b3b3_44474e02",
+      "revId": "2422132695dba002c0c6cbf7eaf8f2563a84534c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc49e3e9_542a0e98",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-08-21T15:04:12Z",
       "side": 1,
       "message": "I was looking for an identifier named \"f\" but couldn\u0027t find it!\n\n```suggestion\n\t\t\t\tln(6, 1, \"[0]\"): {ln(1, 1, \"for\")},\n```",
+      "revId": "2422132695dba002c0c6cbf7eaf8f2563a84534c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af06ebd8_4e51d03d",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1406,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-21T15:07:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc49e3e9_542a0e98",
       "revId": "2422132695dba002c0c6cbf7eaf8f2563a84534c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

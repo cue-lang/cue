@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a048797_fe42805c",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-21T13:36:20Z",
+      "side": 1,
+      "message": "I\u0027m not really keen on the name `cueParser` here, as that to me implies more general parser that can parse any piece of CUE, but this is about parsing one single CUE file really.",
+      "revId": "d29f20ab81b398ff9058de1b2467b3164c2d23f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5936b58_21b86917",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-21T13:36:20Z",
+      "side": 1,
+      "message": "This makes me nervous. We\u0027re updating a mutable value that can be shared between several different diskFileEntries, each with its own mutex. It\u0027s _probably_ fine but at the least it could do with a decent comment explaining why it\u0027s OK.\n\nI\u0027m wondering if we could put the mutex inside `cueParser` and implement the ReadCUE method on that instead. AFAICS the implementation looks (almost?) identical between diskFileEntry and overlayFileEntry, which is presumably why cueParser has been factored out, so this might dedupe a bit more.",
+      "revId": "d29f20ab81b398ff9058de1b2467b3164c2d23f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

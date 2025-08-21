@@ -70,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0fd0bd3_a70bf2f8",
+        "filename": "cue/parser/parser_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-21T15:21:30Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "3617beba_332fbd72",
+      "revId": "f28b0b3dbcbf7f8876998e53aa5a4e7698a365df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9cc7e91_c46a85a8",
@@ -83,6 +101,24 @@
       "writtenOn": "2025-08-21T13:22:50Z",
       "side": 1,
       "message": "Need a test for aliases here too.",
+      "revId": "f28b0b3dbcbf7f8876998e53aa5a4e7698a365df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a3035bd_2b3b34d0",
+        "filename": "cue/parser/parser_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-21T15:21:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9cc7e91_c46a85a8",
       "revId": "f28b0b3dbcbf7f8876998e53aa5a4e7698a365df",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6e9776f_000eb1a6",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 666,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-21T14:17:59Z",
+      "side": 1,
+      "message": "Discussed and now substantially reworded. Hopefully much better now.",
+      "parentUuid": "b1ed9a3d_23ecf055",
+      "revId": "361d240840fdf582b583fcc0b49f73f61291438e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0148da1b_c904a77f",

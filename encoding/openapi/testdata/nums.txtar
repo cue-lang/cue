@@ -1,3 +1,4 @@
+#ExpectExtractError: unknown keyword "allOff".*
 -- in.cue --
 import "math"
 

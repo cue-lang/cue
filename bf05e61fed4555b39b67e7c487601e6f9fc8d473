@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52501ee6_2d116c00",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-21T07:48:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9090f62e_40cac86f",
+      "revId": "bf05e61fed4555b39b67e7c487601e6f9fc8d473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18e7ab07_a7c041b5",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-08-20T15:28:17Z",
       "side": 1,
       "message": "Given that we\u0027re not fixing this in the next couple of CLs AFAICS, perhaps expand slightly on _why_ this is wrong?",
+      "revId": "bf05e61fed4555b39b67e7c487601e6f9fc8d473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43d7d758_0deccd68",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 826,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-21T07:48:48Z",
+      "side": 1,
+      "message": "I\u0027m afraid your seeing is mistaken. We do fix this in the next couple of CLs.",
+      "parentUuid": "18e7ab07_a7c041b5",
       "revId": "bf05e61fed4555b39b67e7c487601e6f9fc8d473",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +94,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f18944f6_f6c14e2b",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 988,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-21T07:48:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "caf9669d_de37cde7",
+      "range": {
+        "startLine": 985,
+        "startChar": 0,
+        "endLine": 988,
+        "endChar": 0
+      },
+      "revId": "bf05e61fed4555b39b67e7c487601e6f9fc8d473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d651d76b_5b26dcbb",
@@ -71,6 +131,24 @@
       "writtenOn": "2025-08-20T15:27:17Z",
       "side": 1,
       "message": "Thought in passing, if we expect the `a` in `a: 1` to resolve to itself, then perhaps we should also have:\n\n```\nln(1, 1, \"n\"): {self}\n```",
+      "revId": "bf05e61fed4555b39b67e7c487601e6f9fc8d473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "442ae89c_528f5c4e",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 853,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-21T07:48:48Z",
+      "side": 1,
+      "message": "Yeah, I\u0027ve thought that too. That\u0027s a bigger change I think - there are a few corner cases to work out in that direction. Currently, all aliases, lets, for-variables etc go nowhere, which is \"fine\" because they can\u0027t possibly go anywhere other than themselves ... apart from alias, some of which could. I\u0027ve made a note of it.",
+      "parentUuid": "d651d76b_5b26dcbb",
       "revId": "bf05e61fed4555b39b67e7c487601e6f9fc8d473",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c423d7e3_296e791c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-08-21T10:48:58Z",
+      "side": 1,
+      "message": "Happy with the change. As I mentioned earlier, I think it will be interesting to see off the back of this how many people (if any!) complain about ending up in a situation where they have a CUE file open, but no LSP capabilities and are left wondering \"why\"? Because in that situation, an LSP \"health check\" that allows them to tie back to the files they have open in their editor might be useful. e.g. `x.cue - not part of a workspace folder, hence no LSP\". Then the user can be totally clear. But very happy to implement such a thing if/when people run into that sharp edge.",
+      "revId": "4c81b0eed405b0e1ea7e0cb35d2f05428f2a486b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

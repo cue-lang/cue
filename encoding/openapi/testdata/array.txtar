@@ -1,3 +1,4 @@
+#ExpectExtractError: "items" must be present when the "type" is "array" in OpenAPI 3.0.*
 -- in.cue --
 import "list"
 

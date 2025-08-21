@@ -20,6 +20,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-quicktest/qt"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
@@ -104,7 +106,7 @@ func TestGenerateOpenAPI(t *testing.T) {
 		}
 
 		expectedErr, shouldErr := t.Value("ExpectError")
-		b, err := openapi.Gen(v, &config)
+		f, err := openapi.Generate(v, &config)
 		if err != nil {
 			details := errors.Details(err, nil)
 			if !shouldErr || !strings.Contains(details, expectedErr) {
@@ -112,27 +114,34 @@ func TestGenerateOpenAPI(t *testing.T) {
 			}
 			return
 		}
-
 		if shouldErr {
 			t.Fatal("unexpected success")
 		} else {
-			_, err := openapi.Generate(v, &config)
+			_, err := openapi.Gen(v, &config)
 			if err != nil {
 				t.Fatal(err)
 			}
 		}
-
+		gen := ctx.BuildFile(f)
+		qt.Assert(t, qt.IsNil(gen.Err()))
 		var out bytes.Buffer
-		err = json.Indent(&out, b, "", "   ")
-		if err != nil {
-			t.Fatal(err)
-		}
+		enc := json.NewEncoder(&out)
+		enc.SetEscapeHTML(false)
+		enc.SetIndent("", "   ")
+		err = enc.Encode(gen)
+		qt.Assert(t, qt.IsNil(err))
+		_, err = t.Writer("out.json").Write(out.Bytes())
+		qt.Assert(t, qt.IsNil(err))
 
-		w := t.Writer("out.json")
-		_, err = w.Write(out.Bytes())
-		if err != nil {
-			t.Fatal(err)
+		// Check that we can extract the resulting schema without error.
+		_, err = openapi.Extract(gen, &config)
+		if expectedErr, shouldErr := t.Value("ExpectExtractError"); shouldErr {
+			qt.Assert(t, qt.ErrorMatches(err, expectedErr))
+			return
 		}
+		// TODO check that the resulting schema actually validates some
+		// data values as expected.
+		qt.Assert(t, qt.IsNil(err))
 	})
 }
 

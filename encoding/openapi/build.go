@@ -873,7 +873,7 @@ func (b *builder) listCap(v cue.Value) {
 		// must be type, so okay.
 	case cue.NotEqualOp:
 		i := b.int(a[0])
-		b.setNot("allOff", ast.NewList(
+		b.setNot("allOf", ast.NewList(
 			b.kv("minItems", i),
 			b.kv("maxItems", i),
 		))
@@ -913,7 +913,7 @@ func (b *builder) number(v cue.Value) {
 
 	case cue.NotEqualOp:
 		i := b.big(a[0])
-		b.setNot("allOff", ast.NewList(
+		b.setNot("allOf", ast.NewList(
 			b.kv("minimum", i),
 			b.kv("maximum", i),
 		))

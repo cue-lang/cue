@@ -16,6 +16,24 @@
       "message": "The tests themselves aren\u0027t terrible, just the results!\n\n```suggestion\nlsp/definitions: add tests for broken behavior\n```",
       "revId": "d768a47a1697f49d750cab97bf9417b3f5dfa06f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47712469_e41b1b9b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-21T07:42:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c76e5d2_edd0d2a9",
+      "revId": "d768a47a1697f49d750cab97bf9417b3f5dfa06f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

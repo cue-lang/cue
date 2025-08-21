@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abfa87db_b39a24eb",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1045,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-21T13:22:50Z",
+      "side": 0,
+      "message": "Looks like this is still needed, or its equivalent (and we should have a test for it too!).\nI checked on this branch that \n```\nfoo: __b\u003dbar: {\n\tp: __b.baz\n}\nfoo: bar: baz: 5\n```\nevaluates successfully even though it should not.",
+      "revId": "542de3a1d592477ce796f2f662e726709e1a4595",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

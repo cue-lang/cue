@@ -11,3 +11,7 @@ is enabled.
 ERROR:
 unsupported Perl regexp syntax in "^(?![ \\t\\n]*\\(default(.*)\\))[\\s\\S]*": error parsing regexp: invalid or unsupported Perl syntax: `(?!`:
     schema.json:3:5
+-- out/decode-v3/extract --
+ERROR:
+unsupported Perl regexp syntax in "^(?![ \\t\\n]*\\(default(.*)\\))[\\s\\S]*": error parsing regexp: invalid or unsupported Perl syntax: `(?!`:
+    schema.json:3:5

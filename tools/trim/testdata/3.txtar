@@ -15,9 +15,6 @@ diff old new
  == a.cue
 -x: string
  x: "hi"
--- out/trim-v3-noshare --
-== a.cue
-x: "hi"
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

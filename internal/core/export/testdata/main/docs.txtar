@@ -691,3 +691,63 @@ Reordering.
 		innerField: 1
 	}
 }
+-- out/definition-v3 --
+// foobar defines at least foo.
+package foobar
+
+// A Foo fooses stuff.
+Foo: {
+	// field1 is an int.
+	field1: int
+	field2: int
+
+	// duplicate field comment
+	dup3: int
+}
+
+// foos are instances of Foo.
+foos: {
+	{
+		[string]: Foo
+	}
+	MyFoo: {
+		// local field comment.
+		field1: 0
+
+		// other field comment.
+		field2: 1
+
+		// duplicate field comment
+		dup3: int
+	}
+}
+bar: {
+	// comment from bar on field 1
+	field1: int
+	// comment from bar on field 2
+	field2: int
+}
+baz: bar & {
+	// comment from baz on field 1
+	field1: int
+	field2: int
+}
+sub: {
+	// comment on comprehension
+	if true {
+		// comment inside of if comprehension
+		field1: int
+	}
+
+	// comprehension with nesting.
+	for x in [1]
+	// nested let
+	let y = x
+	// nested for
+	for z in [y]
+
+	// nested if
+	if z == 1 {
+		innerField: y
+	}
+}

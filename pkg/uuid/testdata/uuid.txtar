@@ -123,3 +123,83 @@ urn: {
 toInt: {
 	a: 93651793875903522077150095950593860979557386807737776869062002310283964632724204171313
 }
+-- out/uuid-v3 --
+Errors:
+valid.err.a: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): invalid UUID format:
+    ./in.cue:16:5
+    ./in.cue:26:13
+valid.err.b: invalid value "052ef62d-7223-58b6-a551-c1deee" (does not satisfy uuid.Valid): invalid UUID length: 30:
+    ./in.cue:17:5
+    ./in.cue:26:13
+valid.err.c: invalid value "{123e4567-e89b-12d3-a456-426655440000" (does not satisfy uuid.Valid): invalid UUID length: 37:
+    ./in.cue:18:5
+    ./in.cue:26:13
+parse.err.a: error in call to uuid.Parse: invalid UUID format:
+    ./in.cue:35:13
+parse.err.b: error in call to uuid.Parse: invalid UUID length: 30:
+    ./in.cue:35:13
+parse.err.c: error in call to uuid.Parse: invalid UUID length: 37:
+    ./in.cue:35:13
+
+Result:
+sha1: {
+	a: "052ef62d-7223-58b6-a551-c1deee46d401"
+}
+md5: {
+	a: "d891d69e-ae5c-39e0-9ead-164abd207f1f"
+}
+validTable: {
+	a: "052ef62d-7223-58b6-a551-c1deee46d401"
+	b: "052EF62D-7223-58B6-A551-C1DEEE46D401"
+	c: "urn:uuid:123e4567-e89b-12d3-a456-426655440000"
+	d: "{123e4567-e89b-12d3-a456-426655440000}"
+	e: "123e4567e89b12d3a456426655440000"
+}
+invalidTable: {
+	a: "052ef62d_7223_58b6_a551_c1deee46d401"
+	b: "052ef62d-7223-58b6-a551-c1deee"
+	c: "{123e4567-e89b-12d3-a456-426655440000"
+}
+valid: {
+	ok: {
+		a: "052ef62d-7223-58b6-a551-c1deee46d401"
+		b: "052EF62D-7223-58B6-A551-C1DEEE46D401"
+		c: "urn:uuid:123e4567-e89b-12d3-a456-426655440000"
+		d: "{123e4567-e89b-12d3-a456-426655440000}"
+		e: "123e4567e89b12d3a456426655440000"
+	}
+	err: {
+		a: _|_ // valid.err.a: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): valid.err.a: invalid UUID format
+		b: _|_ // valid.err.b: invalid value "052ef62d-7223-58b6-a551-c1deee" (does not satisfy uuid.Valid): valid.err.b: invalid UUID length: 30
+		c: _|_ // valid.err.c: invalid value "{123e4567-e89b-12d3-a456-426655440000" (does not satisfy uuid.Valid): valid.err.c: invalid UUID length: 37
+	}
+}
+parse: {
+	ok: {
+		a: "052ef62d-7223-58b6-a551-c1deee46d401"
+		b: "052ef62d-7223-58b6-a551-c1deee46d401"
+		c: "123e4567-e89b-12d3-a456-426655440000"
+		d: "123e4567-e89b-12d3-a456-426655440000"
+		e: "123e4567-e89b-12d3-a456-426655440000"
+	}
+	err: {
+		a: _|_ // parse.err.a: error in call to uuid.Parse: invalid UUID format
+		b: _|_ // parse.err.b: error in call to uuid.Parse: invalid UUID length: 30
+		c: _|_ // parse.err.c: error in call to uuid.Parse: invalid UUID length: 37
+	}
+}
+fromInt: {
+	a: "052ef62d-7223-58b6-a551-c1deee46d401"
+}
+variant: {
+	a: 1
+}
+version: {
+	a: 5
+}
+urn: {
+	a: "urn:uuid:052ef62d-7223-58b6-a551-c1deee46d401"
+}
+toInt: {
+	a: 93651793875903522077150095950593860979557386807737776869062002310283964632724204171313
+}

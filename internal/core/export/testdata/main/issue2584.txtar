@@ -202,3 +202,16 @@ Seemingly benign change in error message.
 	}
 	D: {}
 }
+-- out/definition-v3 --
+
+let L = D
+F1: {
+	sub1: {
+		sub2: L
+	}
+}
+F2: {
+	(string): _
+	L
+}
+D: {}

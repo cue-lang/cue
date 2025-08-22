@@ -44,3 +44,18 @@ line  reference                                     path of resulting vertex
 13:   #base                                      => a.#base
 19:   #combined                                  => a.#combined
 14:   X.enabled                                  => a.instance.enabled
+-- out/dependencies-v3/field --
+line  reference    path of resulting vertex
+-- out/dependencies-v3/all --
+line  reference    path of resulting vertex
+4:    outer     => outer
+-- out/dependencies-v3/dynamic --
+line  reference                                     path of resulting vertex
+14:   X.enabled                                  => a.instance.enabled
+4:    outer                                      => outer
+4:    (instance & outer & {enabled: true}).value => a.instance.value
+4:    outer                                      => outer
+5:    val                                        => a.command.alias.val
+13:   #base                                      => a.#base
+19:   #combined                                  => a.#combined
+14:   X.enabled                                  => a.instance.enabled

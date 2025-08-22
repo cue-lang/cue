@@ -557,3 +557,409 @@ Volume: {
 		"//host/share/foo/../bar":                    "//host/share"
 	}
 }
+-- out/path-v3 --
+#OSes: ["unix", "windows", "plan9"]
+#AnyOS: "unix" | "windows" | "plan9"
+Split: {
+	unix: {
+		"/foo/bar/baz": ["/foo/bar/", "baz"]
+		"a/b": ["a/", "b"]
+		"//host/share/foo": ["//host/share/", "foo"]
+		"\\\\host\\share\\foo": ["", "\\\\host\\share\\foo"]
+		"c:/foo/bar": ["c:/foo/", "bar"]
+		"c:\\foo\\bar": ["", "c:\\foo\\bar"]
+	}
+	plan9: {
+		"/foo/bar/baz": ["/foo/bar/", "baz"]
+		"a/b": ["a/", "b"]
+		"//host/share/foo": ["//host/share/", "foo"]
+		"\\\\host\\share\\foo": ["", "\\\\host\\share\\foo"]
+		"c:/foo/bar": ["c:/foo/", "bar"]
+		"c:\\foo\\bar": ["", "c:\\foo\\bar"]
+	}
+	windows: {
+		"/foo/bar/baz": ["/foo/bar/", "baz"]
+		"a/b": ["a/", "b"]
+		"//host/share/foo": ["//host/share/", "foo"]
+		"\\\\host\\share\\foo": ["\\\\host\\share\\", "foo"]
+		"c:/foo/bar": ["c:/foo/", "bar"]
+		"c:\\foo\\bar": ["c:\\foo\\", "bar"]
+	}
+	default: {
+		"/foo/bar/baz": ["/foo/bar/", "baz"]
+		"a/b": ["a/", "b"]
+		"//host/share/foo": ["//host/share/", "foo"]
+		"\\\\host\\share\\foo": ["", "\\\\host\\share\\foo"]
+		"c:/foo/bar": ["c:/foo/", "bar"]
+		"c:\\foo\\bar": ["", "c:\\foo\\bar"]
+	}
+}
+SplitList: {
+	unix: {
+		"a:b": ["a", "b"]
+		"a\u0000b": ["a\u0000b"]
+		"a;b": ["a;b"]
+	}
+	plan9: {
+		"a:b": ["a:b"]
+		"a\u0000b": ["a", "b"]
+		"a;b": ["a;b"]
+	}
+	windows: {
+		"a:b": ["a:b"]
+		"a\u0000b": ["a\u0000b"]
+		"a;b": ["a", "b"]
+	}
+}
+Clean: {
+	unix: {
+		"abc//def//ghi":        "abc/def/ghi"
+		"c:\\abc\\def\\..\\..": "c:\\abc\\def\\..\\.."
+	}
+	plan9: {
+		"abc//def//ghi":        "abc/def/ghi"
+		"c:\\abc\\def\\..\\..": "c:\\abc\\def\\..\\.."
+	}
+	windows: {
+		"abc//def//ghi":        "abc\\def\\ghi"
+		"c:\\abc\\def\\..\\..": "c:\\"
+	}
+	default: {
+		"abc//def//ghi":        "abc/def/ghi"
+		"c:\\abc\\def\\..\\..": "c:\\abc\\def\\..\\.."
+	}
+}
+Match: {
+	unix: {
+		"*c": {
+			abc: true
+		}
+		"*.txt": {
+			"a/b.txt": false
+		}
+		"*.zip": {
+			"c:\\a\\b\\file.zip": true
+		}
+	}
+	plan9: {
+		"*c": {
+			abc: true
+		}
+		"*.txt": {
+			"a/b.txt": false
+		}
+		"*.zip": {
+			"c:\\a\\b\\file.zip": true
+		}
+	}
+	windows: {
+		"*c": {
+			abc: true
+		}
+		"*.txt": {
+			"a/b.txt": true
+		}
+		"*.zip": {
+			"c:\\a\\b\\file.zip": false
+		}
+	}
+	default: {
+		"*c": {
+			abc: true
+		}
+		"*.txt": {
+			"a/b.txt": false
+		}
+		"*.zip": {
+			"c:\\a\\b\\file.zip": true
+		}
+	}
+}
+Slash: {
+	unix: {
+		"": {
+			// should roundtrip
+			to:   ""
+			from: ""
+		}
+		"/": {
+			// should roundtrip
+			to:   "/"
+			from: "/"
+		}
+		"/a/b": {
+			// should roundtrip
+			to:   "/a/b"
+			from: "/a/b"
+		}
+		"/a//b": {
+			// should roundtrip
+			to:   "/a//b"
+			from: "/a//b"
+		}
+	}
+	plan9: {
+		"": {
+			// should roundtrip
+			to:   ""
+			from: ""
+		}
+		"/": {
+			// should roundtrip
+			to:   "/"
+			from: "/"
+		}
+		"/a/b": {
+			// should roundtrip
+			to:   "/a/b"
+			from: "/a/b"
+		}
+		"/a//b": {
+			// should roundtrip
+			to:   "/a//b"
+			from: "/a//b"
+		}
+	}
+	windows: {
+		"": {
+			// should roundtrip
+			to:   ""
+			from: ""
+		}
+		"/": {
+			// should roundtrip
+			to:   "/"
+			from: "\\"
+		}
+		"/a/b": {
+			// should roundtrip
+			to:   "/a/b"
+			from: "\\a\\b"
+		}
+		"/a//b": {
+			// should roundtrip
+			to:   "/a//b"
+			from: "\\a\\\\b"
+		}
+	}
+}
+Ext: {
+	unix: {
+		// Same for all OS-es
+		"path.go":    ".go"
+		"path.pb.go": ".go"
+		"a.dir/b":    ""
+		"a.dir/b.go": ".go"
+		"a.dir/":     ""
+
+		// Differs on Windows.
+		"a.dir\\foo": ".dir\\foo"
+	}
+	plan9: {
+		// Same for all OS-es
+		"path.go":    ".go"
+		"path.pb.go": ".go"
+		"a.dir/b":    ""
+		"a.dir/b.go": ".go"
+		"a.dir/":     ""
+
+		// Differs on Windows.
+		"a.dir\\foo": ".dir\\foo"
+	}
+	windows: {
+		// Same for all OS-es
+		"path.go":    ".go"
+		"path.pb.go": ".go"
+		"a.dir/b":    ""
+		"a.dir/b.go": ".go"
+		"a.dir/":     ""
+
+		// Differs on Windows.
+		"a.dir\\foo": ""
+	}
+	default: {
+		// Same for all OS-es
+		"path.go":    ".go"
+		"path.pb.go": ".go"
+		"a.dir/b":    ""
+		"a.dir/b.go": ".go"
+		"a.dir/":     ""
+
+		// Differs on Windows.
+		"a.dir\\foo": ".dir\\foo"
+	}
+}
+Resolve: {
+	unix: {
+		"a/b/c": {
+			"d/e": "a/b/c/d/e"
+		}
+		"/a/b": {
+			"/c/d": "/c/d"
+		}
+		"c:/a": {
+			"d:\\": "c:/a/d:\\"
+		}
+		"//home/user/foo": {
+			bar:               "/home/user/foo/bar"
+			"//other/abs/foo": "/other/abs/foo"
+		}
+	}
+	plan9: {
+		"a/b/c": {
+			"d/e": "a/b/c/d/e"
+		}
+		"/a/b": {
+			"/c/d": "/c/d"
+		}
+		"c:/a": {
+			"d:\\": "c:/a/d:\\"
+		}
+		"//home/user/foo": {
+			bar:               "/home/user/foo/bar"
+			"//other/abs/foo": "/other/abs/foo"
+		}
+	}
+	windows: {
+		"a/b/c": {
+			"d/e": "a\\b\\c\\d\\e"
+		}
+		"/a/b": {
+			"/c/d": "\\a\\b\\c\\d"
+		}
+		"c:/a": {
+			"d:\\": "d:\\"
+		}
+		"//home/user/foo": {
+			bar:               "\\\\home\\user\\foo\\bar"
+			"//other/abs/foo": "\\\\other\\abs\\foo"
+		}
+	}
+	default: {
+		"a/b/c": {
+			"d/e": "a/b/c/d/e"
+		}
+		"/a/b": {
+			"/c/d": "/c/d"
+		}
+		"c:/a": {
+			"d:\\": "c:/a/d:\\"
+		}
+		"//home/user/foo": {
+			"//other/abs/foo": "/other/abs/foo"
+			bar:               "/home/user/foo/bar"
+		}
+	}
+}
+IsAbs: {
+	unix: {
+		"":                false
+		"/a":              true
+		a:                 false
+		"c:":              false
+		"c:/":             false
+		"c:\\":            false
+		"//home/user/foo": true
+	}
+	plan9: {
+		"":                false
+		"/a":              true
+		a:                 false
+		"c:":              false
+		"c:/":             false
+		"c:\\":            false
+		"//home/user/foo": true
+	}
+	windows: {
+		"":                false
+		"/a":              false
+		a:                 false
+		"c:":              false
+		"c:/":             true
+		"c:\\":            true
+		"//home/user/foo": true
+	}
+	default: {
+		"":                false
+		"/a":              true
+		a:                 false
+		"c:":              false
+		"c:/":             false
+		"c:\\":            false
+		"//home/user/foo": true
+	}
+}
+Volume: {
+	unix: {
+		"c:/foo/bar":                                 ""
+		"c:":                                         ""
+		"2:":                                         ""
+		"":                                           ""
+		"\\\\\\host":                                 ""
+		"\\\\\\host\\":                               ""
+		"\\\\\\host\\share":                          ""
+		"\\\\\\host\\\\share":                        ""
+		"\\\\host":                                   ""
+		"//host":                                     ""
+		"\\\\host\\":                                 ""
+		"//host/":                                    ""
+		"\\\\host\\share":                            ""
+		"//host/share":                               ""
+		"\\\\host\\share\\":                          ""
+		"//host/share/":                              ""
+		"\\\\host\\share\\foo":                       ""
+		"//host/share/foo":                           ""
+		"\\\\host\\share\\\\foo\\\\\\bar\\\\\\\\baz": ""
+		"//host/share//foo///bar////baz":             ""
+		"\\\\host\\share\\foo\\..\\bar":              ""
+		"//host/share/foo/../bar":                    ""
+	}
+	plan9: {
+		"c:/foo/bar":                                 ""
+		"c:":                                         ""
+		"2:":                                         ""
+		"":                                           ""
+		"\\\\\\host":                                 ""
+		"\\\\\\host\\":                               ""
+		"\\\\\\host\\share":                          ""
+		"\\\\\\host\\\\share":                        ""
+		"\\\\host":                                   ""
+		"//host":                                     ""
+		"\\\\host\\":                                 ""
+		"//host/":                                    ""
+		"\\\\host\\share":                            ""
+		"//host/share":                               ""
+		"\\\\host\\share\\":                          ""
+		"//host/share/":                              ""
+		"\\\\host\\share\\foo":                       ""
+		"//host/share/foo":                           ""
+		"\\\\host\\share\\\\foo\\\\\\bar\\\\\\\\baz": ""
+		"//host/share//foo///bar////baz":             ""
+		"\\\\host\\share\\foo\\..\\bar":              ""
+		"//host/share/foo/../bar":                    ""
+	}
+	windows: {
+		"c:/foo/bar":                                 "c:"
+		"c:":                                         "c:"
+		"2:":                                         ""
+		"":                                           ""
+		"\\\\\\host":                                 ""
+		"\\\\\\host\\":                               ""
+		"\\\\\\host\\share":                          ""
+		"\\\\\\host\\\\share":                        ""
+		"\\\\host":                                   ""
+		"//host":                                     ""
+		"\\\\host\\":                                 ""
+		"//host/":                                    ""
+		"\\\\host\\share":                            "\\\\host\\share"
+		"//host/share":                               "//host/share"
+		"\\\\host\\share\\":                          "\\\\host\\share"
+		"//host/share/":                              "//host/share"
+		"\\\\host\\share\\foo":                       "\\\\host\\share"
+		"//host/share/foo":                           "//host/share"
+		"\\\\host\\share\\\\foo\\\\\\bar\\\\\\\\baz": "\\\\host\\share"
+		"//host/share//foo///bar////baz":             "//host/share"
+		"\\\\host\\share\\foo\\..\\bar":              "\\\\host\\share"
+		"//host/share/foo/../bar":                    "//host/share"
+	}
+}

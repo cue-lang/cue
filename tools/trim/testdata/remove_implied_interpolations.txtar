@@ -16,3 +16,12 @@ foo: [string]: {
 foo: entry: {
 	a: "insert"
 }
+-- out/trim-v3 --
+== in.cue
+foo: [string]: {
+	a: string
+	b: "--\(a)--"
+}
+foo: entry: {
+	a: "insert"
+}

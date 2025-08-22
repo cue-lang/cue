@@ -70,3 +70,38 @@ c: {
 		_service_name: "a" // Do not remove!
 	}
 }
+-- out/trim-v3 --
+== in.cue
+import "strings"
+
+// TODO: this would be okay to normalize. Consider whether
+// this makes sense, though.
+a: {
+	service: [ID=_]: name: "a"
+
+	service: foo: shared
+	service: bar: shared
+
+	shared: name: "a"
+}
+
+b: {
+	service: [ID=_]: {
+		name: ID
+	}
+	service: foo: _shared
+	_shared: {
+		name: "foo" // Do not remove!
+	}
+}
+
+c: {
+	service: [ID=_]: {
+		_service_name: *strings.TrimSuffix(ID, "-suffix") | string
+	}
+	service: "a-suffix": _shared
+	service: "b-suffix": _shared
+	_shared: {
+		_service_name: "a" // Do not remove!
+	}
+}

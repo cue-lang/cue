@@ -7,3 +7,8 @@ output: [...t]
 [...{
 	name: string
 }]
+-- out/self-v3/default --
+
+[...{
+	name: string
+}]

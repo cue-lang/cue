@@ -33,3 +33,14 @@ bar?: _#defs."/spec/versions/0/schema/openAPIV3Schema/properties/foo"
 // description of foo
 _#defs: "/spec/versions/0/schema/openAPIV3Schema/properties/foo": string
 ...
+-- out/decode-v3/extract --
+// Something about a CRD.
+// description of foo
+foo?: _#defs."/spec/versions/0/schema/openAPIV3Schema/properties/foo"
+
+// description of bar
+bar?: _#defs."/spec/versions/0/schema/openAPIV3Schema/properties/foo"
+
+// description of foo
+_#defs: "/spec/versions/0/schema/openAPIV3Schema/properties/foo": string
+...

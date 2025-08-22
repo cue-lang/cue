@@ -28,14 +28,6 @@ diff old new
  ]
 -d: [...{name: string, age: 5, age: number}]
 +d: [...{name: string, age: 5}]
--- out/trim-v3-noshare --
-== a.cue
-d: [
-	{name: "jack"},
-	{name: "gill"},
-	{name: "hilbert"},
-]
-d: [...{name: string, age: 5}]
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

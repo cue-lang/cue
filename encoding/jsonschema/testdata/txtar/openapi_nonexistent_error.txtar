@@ -8,3 +8,7 @@ Test what happens when there's an OpenAPI schema that has no
 ERROR:
 root value at path #/components/schemas/ does not exist:
     schema.yaml
+-- out/decode-v3/extract --
+ERROR:
+root value at path #/components/schemas/ does not exist:
+    schema.yaml

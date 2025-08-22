@@ -29,3 +29,17 @@ First: {
 First: {
 	B: "b"
 }
+-- out/trim-v3 --
+== a.cue
+#DefA: A: "a"
+#DefB: B: "b"
+
+First: {
+	#DefA | #DefB
+	B: "b"
+	C: "c"
+}
+
+First: {
+	B: "b"
+}

@@ -109,3 +109,49 @@ shipping_address?: #address
 
 _#defs: "/$defs/person/$defs/int": int
 ...
+-- out/decode-v3/extract --
+import (
+	"acme.com/external.json:external"
+	"acme.com/external-foo.json:schema"
+	schema_9 "acme.com/external-bar.json:schema"
+)
+
+@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+@jsonschema(id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
+person?:           #person
+billing_address?:  #address
+shipping_address?: #address
+
+#: "string-int": int | string
+
+#address: {
+	city?: string
+	...
+}
+
+#int: int
+
+#person: {
+	@jsonschema(id="http://cuelang.org/person.json")
+	name?: string
+	children?: {
+		x?: external._#defs."/properties/foo"
+		a?: _#defs."/$defs/person/$defs/int"
+		b?: _#defs."/$defs/person/$defs/int"
+		c?: #int
+		d?: #address
+		e?: #."string-int"
+		f?: #person
+		g?: external.#foo
+		h?: external._#defs."/properties/foo"
+		i?: external
+		j?: schema
+		k?: schema_9
+		z?: _
+		...
+	}
+	...
+}
+
+_#defs: "/$defs/person/$defs/int": int
+...

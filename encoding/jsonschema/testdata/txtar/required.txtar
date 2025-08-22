@@ -30,3 +30,15 @@ close({
 	y?: number
 	z!: _
 })
+-- out/decode-v3/extract --
+// example jsonschema
+@jsonschema(schema="http://json-schema.org/draft-04/schema#")
+@jsonschema(id="https://example.test/example")
+close({
+	// A required field
+	x!: number
+
+	// An optional field
+	y?: number
+	z!: _
+})

@@ -21,3 +21,14 @@ let S = {
 	a: 1
 	b: 2
 }
+-- out/self-v3/default --
+import "struct"
+
+c: struct.MaxFields(S, 3)
+d: {}
+
+//cue:path: s
+let S = {
+	a: 1
+	b: 2
+}

@@ -6,3 +6,5 @@ import "crypto/md5"
 t1: len(md5.Sum("hash me"))
 -- out/md5 --
 t1: 16
+-- out/md5-v3 --
+t1: 16

@@ -12,3 +12,7 @@ Note: keywords alongside $ref are ignored until 2019-09
 ERROR:
 ignoring keyword "$id" alongside $ref:
     schema.json:3:3
+-- out/decode-v3/extract --
+ERROR:
+ignoring keyword "$id" alongside $ref:
+    schema.json:3:3

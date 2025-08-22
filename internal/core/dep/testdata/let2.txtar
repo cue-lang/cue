@@ -67,3 +67,12 @@ line  reference    path of resulting vertex
 14:   X3.w      => v.w
 20:   Y1        => v
 21:   Y2        => v
+-- out/dependencies-v3/field --
+line  reference    path of resulting vertex
+-- out/dependencies-v3/dynamic --
+line  reference    path of resulting vertex
+12:   X1        => v.w
+13:   X2        => v.w
+14:   X3.w      => v.w
+20:   Y1        => v
+21:   Y2        => v

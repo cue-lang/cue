@@ -29,13 +29,6 @@ diff old new
  a: [string]: x: "hi"
  
  b: [string]: x: string
--- out/trim-v3-noshare --
-== a.cue
-a: [string]: _
-a: [string]: x: "hi"
-
-b: [string]: x: string
-b: [=~".*"]: x: "hi"
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

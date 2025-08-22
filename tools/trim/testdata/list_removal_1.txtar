@@ -24,14 +24,6 @@ diff old new
 -	ports: [{}, {extra: 3}, {}, {}]
 +	ports: [_, {extra: 3}, {}, {}]
  }
--- out/trim-v3-noshare --
-== in.cue
-service: [string]: {
-	ports: [{a: 1}, {a: 1}, ...{extra: 3}]
-}
-service: a: {
-	ports: [_, {extra: 3}, {}, {}]
-}
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

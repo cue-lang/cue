@@ -12,3 +12,9 @@ y: len({
 	let x = {a: 5, a: int}
 	x
 })
+-- out/trim-v3 --
+== a.cue
+y: len({
+	let x = {a: 5, a: int}
+	x
+})

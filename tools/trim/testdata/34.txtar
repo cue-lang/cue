@@ -5,3 +5,7 @@ x: {b: 5} | {b: 6}
 == a.cue
 x: a: string
 x: {b: 5} | {b: 6}
+-- out/trim-v3 --
+== a.cue
+x: a: string
+x: {b: 5} | {b: 6}

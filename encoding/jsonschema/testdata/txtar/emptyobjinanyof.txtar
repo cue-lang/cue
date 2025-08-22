@@ -25,3 +25,8 @@ _
 
 // Specify a shell.
 #shell: matchN(>=1, [string, "bash" | "sh" | "cmd" | "powershell"])
+-- out/decode-v3/extract --
+_
+
+// Specify a shell.
+#shell: matchN(>=1, [string, "bash" | "sh" | "cmd" | "powershell"])

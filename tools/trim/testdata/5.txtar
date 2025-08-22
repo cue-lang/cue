@@ -15,3 +15,9 @@ x: string
 y: "hi"
 z: x
 z: y
+-- out/trim-v3 --
+== a.cue
+x: string
+y: "hi"
+z: x
+z: y

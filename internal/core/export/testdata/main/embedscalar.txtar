@@ -160,3 +160,142 @@ issue718: {
 		#b: 2
 	}
 }
+-- out/doc-v3 --
+[]
+[#top]
+[sub]
+[sub #sub]
+[sub a]
+[sub a #foo]
+[sub b]
+[sub b #bar]
+[sub b #baz]
+[sub b 0]
+[sub b 1]
+[issue718]
+[issue718 #fn]
+[issue718 #fn #a]
+[issue718 #fn #b]
+[issue718 #a]
+[issue718 #b]
+-- out/value-v3 --
+== Simplified
+{
+	sub: {
+		a: 3
+		b: [1, 2]
+	}
+	issue718: 3
+}
+== Raw
+{
+	#top: 4
+	sub: {
+		#sub: 5
+		a: {
+			3
+			#foo: 4
+		}
+		b: {
+			#bar: 5
+			#baz: "foo"
+			[1, 2]
+		}
+	}
+	issue718: {
+		3
+		#fn: {
+			#a + #b
+			#a: int
+			#b: int
+		}
+		#a: 1
+		#b: 2
+	}
+}
+== Final
+{
+	sub: {
+		a: 3
+		b: [1, 2]
+	}
+	issue718: 3
+}
+== All
+{
+	#top: 4
+	sub: {
+		#sub: 5
+		a: {
+			3
+			#foo: 4
+		}
+		b: {
+			#bar: 5
+			#baz: "foo"
+			[1, 2]
+		}
+	}
+	issue718: {
+		3
+		#fn: {
+			#a + #b
+			#a: int
+			#b: int
+		}
+		#a: 1
+		#b: 2
+	}
+}
+== Eval
+{
+	#top: 4
+	sub: {
+		#sub: 5
+		a: {
+			3
+			#foo: 4
+		}
+		b: {
+			#bar: 5
+			#baz: "foo"
+			[1, 2]
+		}
+	}
+	issue718: {
+		3
+		#fn: {
+			#a + #b
+			#a: int
+			#b: int
+		}
+		#a: 1
+		#b: 2
+	}
+}
+-- out/definition-v3-noshare --
+#top: 4
+sub: {
+	#sub: 5
+	a: {
+		3
+		#foo: 4
+	}
+	b: {
+		[1, 2]
+		#bar: 5
+		#baz: "foo"
+	}
+}
+issue718: {
+	#fn & {
+		_
+		#a: 1
+		#b: 2
+	}
+	#fn: {
+		#a + #b
+		#a: int
+		#b: int
+	}
+}

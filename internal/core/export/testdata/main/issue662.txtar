@@ -76,3 +76,45 @@ reordering
 		lineColor?: string
 	}
 }
+-- out/value-v3 --
+== Simplified
+{}
+== Raw
+{
+	#LineConfig: {
+		lineColor?: string
+	}
+	#GraphFieldConfig: {
+		drawStyle?: int
+		lineColor?: string
+	}
+}
+== Final
+{}
+== All
+{
+	#LineConfig: {
+		lineColor?: string
+	}
+	#GraphFieldConfig: {
+		drawStyle?: int
+		lineColor?: string
+	}
+}
+== Eval
+{
+	#LineConfig: {
+		lineColor?: string
+	}
+	#GraphFieldConfig: {
+		drawStyle?: int
+		lineColor?: string
+	}
+}
+-- out/definition-v3-noshare --
+#LineConfig: {
+	lineColor?: string
+}
+#GraphFieldConfig: #LineConfig & {
+	drawStyle?: int
+}

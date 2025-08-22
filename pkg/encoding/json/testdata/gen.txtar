@@ -303,3 +303,210 @@ unmarshalStream: {
 		#result: [1, 2]
 	}
 }
+-- out/json-v3 --
+Errors:
+validate.invalidDisjuntion.result: error in call to encoding/json.Validate: 2 errors in empty disjunction::
+    ./in.cue:6:10
+validate.t2.result: error in call to encoding/json.Validate: invalid value 10 (out of bound <3):
+    ./in.cue:6:10
+    ./in.cue:9:27
+    json.Validate:1:6
+unmarshal.trailingInvalid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
+    ./in.cue:49:11
+unmarshal.trailingValid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
+    ./in.cue:49:11
+
+Result:
+import "encoding/json"
+
+validate: {
+	t1: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			b: string
+		}
+		result: true
+	}
+	t2: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a: <3
+		}
+		result: _|_ // validate.t2.result: error in call to encoding/json.Validate: validate.t2.result.a: invalid value 10 (out of bound <3)
+	}
+	disjunctionRequired: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a!: int
+		} | {
+			b!: int
+		}
+		result: true
+	}
+	disjunctionClosed: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a: int
+		} | {
+			b: int
+		}
+		result: true
+	}
+	invalidDisjuntion: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a: 1 | 2
+		}
+		result: _|_ // validate.invalidDisjuntion.result: error in call to encoding/json.Validate: validate.invalidDisjuntion.result.a: 2 errors in empty disjunction: (and 2 more errors)
+	}
+
+	// Issue #2395
+	enforceRequired: {
+		str: "{}"
+		schema: {
+			x!: int
+		}
+		result: json.Validate(str, schema)
+	}
+}
+issue3932: {
+	f: "{\"name\":\"foo\"}"
+}
+valid: {
+	t1: {
+		"1"
+		#result: json.Valid(string)
+	}
+}
+compact: {
+	t1: {
+		"[1, 2]"
+		#result: "[1,2]"
+	}
+}
+indent: {
+	t1: {
+		"{\"a\": 1, \"b\": 2}"
+		#initial: *"" | string
+		#indent:  *"  " | string
+		#result: """
+			{
+			  "a": 1,
+			  "b": 2
+			}
+			"""
+	}
+}
+unmarshal: {
+	t1: {
+		"1"
+		#result: 1
+	}
+	trailingValid: {
+		#result: _|_ // unmarshal.trailingValid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON
+	}
+	trailingInvalid: {
+		#result: _|_ // unmarshal.trailingInvalid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON
+	}
+}
+marshalStream: {
+	t1: {
+		#result: """
+			{"a":1}
+			{"b":2}
+
+			"""
+		[{
+			a: 1
+		}, {
+			b: 2
+		}]
+	}
+	t2: {
+		#result: """
+			{"a":1}
+			{"b":2}
+
+			"""
+		[{
+			a: 1
+		}, {
+			b: *2 | int
+		}]
+	}
+	t3: {
+		#result: """
+			{"a":"\\\\ \\" & < >"}
+			{"b":""}
+
+			"""
+		[{
+			a: "\\ \" & < >"
+		}, {
+			b: ""
+		}]
+	}
+}
+marshal: {
+	t1: {
+		#result: json.Marshal(X)
+		#x:      int
+		a:       int
+	}
+	t2: {
+		#result: "{\"a\":\"\\\\ \\\" & < >\"}"
+		a:       "\\ \" & < >"
+	}
+}
+htmlEscape: {
+	t1: {
+		"{\"a\":\"\\\\ \\\" & < >\"}"
+		#result: "{\"a\":\"\\\\ \\\" \\u0026 \\u003c \\u003e\"}"
+	}
+	t2: {
+		"""
+		{"a":"\\\\ \\" & < >"}
+		{"b":""}
+
+		"""
+		#result: """
+			{"a":"\\\\ \\" \\u0026 \\u003c \\u003e"}
+			{"b":""}
+
+			"""
+	}
+}
+unmarshalStream: {
+	t1: {
+		"{\"a\": 1}{\"b\": 2}"
+		#result: [{
+			a: 1
+		}, {
+			b: 2
+		}]
+	}
+	t2: {
+		'{"a": 1}{"b": 2}'
+		#result: [{
+			a: 1
+		}, {
+			b: 2
+		}]
+	}
+	empty1: {
+		''
+		#result: []
+	}
+	empty2: {
+		""
+		#result: []
+	}
+	nums1: {
+		'1 2'
+		#result: [1, 2]
+	}
+	nums2: {
+		"1 2"
+		#result: [1, 2]
+	}
+}

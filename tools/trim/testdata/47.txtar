@@ -26,13 +26,3 @@ s: {
 for k, v in s {
 	s: "\(k)": #d
 }
--- out/trim-v3-noshare --
-== a.cue
-s: {
-	x: _
-	y: _
-}
-#d: port: 8080
-for k, v in s {
-	s: "\(k)": #d
-}

@@ -21,3 +21,15 @@ a: {
 
 ["aFoo"]: 3
 aFoo:     _
+-- out/trim-v3 --
+== in.cue
+a: ["aFoo"]: 3
+a: aFoo:     _
+
+a: {
+	{["aFoo"]: 3}
+	aFoo: _
+}
+
+["aFoo"]: 3
+aFoo:     _

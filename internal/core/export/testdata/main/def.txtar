@@ -103,3 +103,94 @@ g: #d
 		f?: 1
 	}
 }
+-- out/doc-v3 --
+[]
+[a]
+[b]
+[c]
+[#d]
+[#d e]
+[#d f]
+[g]
+- Issue #2305
+
+[g e]
+[g f]
+-- out/value-v3 --
+== Simplified
+{
+	a: *2 | int
+	c: {}
+
+	// Issue #2305
+	g: {
+		e!: =~"a"
+	}
+}
+== Raw
+{
+	a:  *2 | int
+	b?: 4 | 5
+	c: {}
+	#d: {
+		e!: =~"a"
+		f?: 1
+	}
+
+	// Issue #2305
+	g: {
+		e!: =~"a"
+		f?: 1
+	}
+}
+== Final
+{
+	a: 2
+	c: {}
+	g: {
+		e!: =~"a"
+	}
+}
+== All
+{
+	a:  *2 | int
+	b?: 4 | 5
+	c: {}
+	#d: {
+		e!: =~"a"
+		f?: 1
+	}
+
+	// Issue #2305
+	g: {
+		e!: =~"a"
+		f?: 1
+	}
+}
+== Eval
+{
+	a:  2
+	b?: 4 | 5
+	c: {}
+	#d: {
+		e!: =~"a"
+		f?: 1
+	}
+	g: {
+		e!: =~"a"
+		f?: 1
+	}
+}
+-- out/definition-v3-noshare --
+a:  int | *2
+b?: 4 | 5
+c: {
+	[string]: int
+}
+#d: {
+	e!: =~"a"
+	f?: 1
+}
+
+// Issue #2305
+g: #d

@@ -10,3 +10,7 @@
 #foo & string
 
 #foo: _
+-- out/decode-v3/extract --
+#foo & string
+
+#foo: _

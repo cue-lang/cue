@@ -26,3 +26,17 @@ shared: {
 a: shared & {
 	param: "key"
 }
+-- out/trim-v3 --
+== in.cue
+configs: {
+	key: 123
+}
+
+shared: {
+	param:   string
+	derived: configs[param]
+}
+
+a: shared & {
+	param: "key"
+}

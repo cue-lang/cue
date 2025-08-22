@@ -27,14 +27,3 @@ for k, v in s {
 	s: (k): d
 	s: (k): portCopy: v.port
 }
--- out/trim-v3-noshare --
-== a.cue
-d: port: 8080
-s: {
-	x: _
-	y: _
-}
-for k, v in s {
-	s: (k): d
-	s: (k): portCopy: v.port
-}

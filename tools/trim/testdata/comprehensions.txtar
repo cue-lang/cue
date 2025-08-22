@@ -31,3 +31,18 @@ a_map: {
 		"second": true
 	}
 }
+-- out/trim-v3 --
+== in.cue
+if true {
+	a_map: {
+		"first": {}
+	}
+}
+
+a_map: {
+	if true {
+		// keep. TODO: allow this to be removed if the dominator includes all
+		// fields unconditionally.
+		"second": true
+	}
+}

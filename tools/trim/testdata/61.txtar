@@ -29,11 +29,6 @@ diff old new
 +b: w: _
  b: a
  a: [string]: x: y: z: 5
--- out/trim-v3-noshare --
-== a.cue
-b: w: _
-b: a
-a: [string]: x: y: z: 5
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

@@ -15,3 +15,5 @@
 }
 -- out/decode/extract --
 bool
+-- out/decode-v3/extract --
+bool

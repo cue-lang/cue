@@ -13,3 +13,9 @@ x: y: 5
 z: {
 	x
 }
+-- out/trim-v3 --
+== a.cue
+x: y: 5
+z: {
+	x
+}

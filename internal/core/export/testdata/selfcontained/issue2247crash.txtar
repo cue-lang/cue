@@ -5,3 +5,6 @@ b: [a][0]
 -- out/self/default --
 a: _
 b: [a][0]
+-- out/self-v3/default --
+a: _
+b: [a][0]

@@ -106,3 +106,42 @@ Retain: 0
 Unifications: 12
 Conjuncts:    20
 Disjuncts:    12
+-- out/run-v3/errors --
+-- out/run-v3/t0 --
+graph TD
+  t0("root.test [Ready]")
+
+-- out/run-v3/t1 --
+graph TD
+  t0("root.test [Terminated]")
+
+-- out/run-v3/t1/value --
+{
+	$id:    "tool/cli.Print"
+	stdout: "foo"
+	text:   "5"
+}
+-- out/run-v3/t1/stats --
+Leaks:  6912
+Freed:  21553
+Reused: 21550
+Allocs: 6915
+Retain: 0
+
+Unifications: 14381
+Conjuncts:    43216
+Disjuncts:    7086
+
+NumCloseIDs: 10743
+-- out/run-v3/stats/totals --
+Leaks:  6912
+Freed:  21553
+Reused: 21550
+Allocs: 6915
+Retain: 0
+
+Unifications: 14381
+Conjuncts:    43216
+Disjuncts:    7086
+
+NumCloseIDs: 10743

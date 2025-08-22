@@ -34,3 +34,19 @@ person?: {
 // a telephone number
 #: "phone number": string
 ...
+-- out/decode-v3/extract --
+// Main schema
+//
+// Specify who you are and all.
+package somepkg
+
+@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+
+// A person is a human being.
+person?: {
+	...
+}
+
+// a telephone number
+#: "phone number": string
+...

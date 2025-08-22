@@ -143,3 +143,84 @@ Disjuncts:    119
 MisalignedConjunct: 4
 
 NumCloseIDs: 6
+-- out/run-v3/errors --
+-- out/run-v3/t0 --
+graph TD
+  t0("root.build.task.mkdir.output [Ready]")
+  t1("root.build.task.#quot;output/dns-records.zone#quot; [Waiting]")
+  t1-->t0
+
+-- out/run-v3/t1 --
+graph TD
+  t0("root.build.task.mkdir.output [Terminated]")
+  t1("root.build.task.#quot;output/dns-records.zone#quot; [Ready]")
+  t1-->t0
+
+-- out/run-v3/t1/value --
+{
+	$id:           "tool/file.Mkdir"
+	path:          "output"
+	createParents: true
+	permissions:   511
+	stdout:        "foo"
+}
+-- out/run-v3/t1/stats --
+Leaks:  0
+Freed:  47
+Reused: 27
+Allocs: 20
+Retain: 0
+
+Unifications: 35
+Conjuncts:    78
+Disjuncts:    12
+
+NumCloseIDs: 12
+-- out/run-v3/t2 --
+graph TD
+  t0("root.build.task.mkdir.output [Terminated]")
+  t1("root.build.task.#quot;output/dns-records.zone#quot; [Terminated]")
+  t1-->t0
+
+-- out/run-v3/t2/value --
+{
+	$after: {
+		$id:           "tool/file.Mkdir"
+		path:          "output"
+		createParents: true
+		permissions:   511
+		stdout:        "foo"
+	}
+	$id:         "tool/file.Create"
+	filename:    "output/dns-records.zone"
+	permissions: 438
+	contents: """
+		kube-vagrant-monitoring-proxy A 127.0.0.1
+
+		"""
+	stdout: "foo"
+}
+-- out/run-v3/t2/stats --
+Leaks:  0
+Freed:  48
+Reused: 48
+Allocs: 0
+Retain: 0
+
+Unifications: 36
+Conjuncts:    84
+Disjuncts:    12
+
+NumCloseIDs: 12
+-- out/run-v3/stats/totals --
+Leaks:  0
+Freed:  95
+Reused: 75
+Allocs: 20
+Retain: 0
+
+Unifications: 71
+Conjuncts:    162
+Disjuncts:    24
+
+NumCloseIDs: 24

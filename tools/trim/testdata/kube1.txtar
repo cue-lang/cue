@@ -64,29 +64,6 @@ diff old new
  }
  
  service: a: {
--- out/trim-v3-noshare --
-== in.cue
-service: [ID=string]: {
-	ports: [...{
-		protocol: *"TCP" | "UDP"
-		extra:    3
-	}]
-}
-
-service: a: {
-	ports: [{
-		name: "a"
-		key:  "bar"
-	}]
-}
-
-service: a: {
-	ports: [{}]
-}
-
-service: a: {
-	ports: [{}]
-}
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

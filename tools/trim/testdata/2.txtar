@@ -8,3 +8,7 @@ string
 == a.cue
 string
 "hi"
+-- out/trim-v3 --
+== a.cue
+string
+"hi"

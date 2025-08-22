@@ -128,3 +128,28 @@ e7?: matchN(>=1, [true, {
 	...
 }])
 ...
+-- out/decode-v3/extract --
+import (
+	"list"
+	"strings"
+)
+
+e0?: int & >=2 & <=3
+e1?: "cover" | "contain"
+
+// none
+e2?: "none"
+e3?: list.UniqueItems() & [_, ...] & [...strings.MinRunes(1)]
+
+// Main authors of the plugin
+e4?: [...string]
+e5?: int & >=0
+e6?: [...=~"^[A-Za-z0-9 _.-]+$"]
+e7?: matchN(>=1, [true, {
+	disableFix?: bool
+	...
+} & {
+	ignoreMediaFeatureNames?: list.UniqueItems() & [_, ...] & [...string]
+	...
+}])
+...

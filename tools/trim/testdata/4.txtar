@@ -6,3 +6,6 @@ z: "hi" & string
 -- out/trim --
 == a.cue
 z: "hi" & string
+-- out/trim-v3 --
+== a.cue
+z: "hi" & string

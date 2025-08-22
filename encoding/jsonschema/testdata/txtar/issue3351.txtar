@@ -82,22 +82,3 @@ _schema: {
 
 	#: "jsone-value": matchN(1, [_schema, [..._schema]])
 }
--- out/decode-v3-noshare/extract --
-// JSON-e templates
-@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
-_schema
-_schema: {
-	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-eXXXX@1.json")
-	$else?: #."jsone-value"
-	$let?: [string]: null | bool | number | string | [...] | {
-		[string]: _schema
-	}
-	$sort?: matchN(>=1, [_schema, [...number]])
-	{[!~"^(\\$else|\\$let|\\$sort)$"]: #."jsone-value"}
-
-	#: "jsone-array": [...#."jsone-value"]
-
-	#: "jsone-object-array": [..._schema]
-
-	#: "jsone-value": matchN(1, [_schema, [..._schema]])
-}

@@ -127,3 +127,95 @@ graph TD
 	stdin:   (*null | string | bytes) & get.response.body
 	success: bool
 }
+-- out/run-v3/errors --
+-- out/run-v3/t0 --
+graph TD
+  t0("root.get [Ready]")
+  t1("root.convert [Waiting]")
+  t1-->t0
+
+-- out/run-v3/t1 --
+graph TD
+  t0("root.get [Terminated]")
+  t1("root.convert [Ready]")
+  t1-->t0
+
+-- out/run-v3/t1/value --
+{
+	$id:    "tool/http.Do"
+	method: "GET"
+	request: {
+		body: ""
+	}
+	url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
+	stdout: "foo"
+}
+-- out/run-v3/t1/stats --
+Leaks:  0
+Freed:  48
+Reused: 29
+Allocs: 19
+Retain: 0
+
+Unifications: 26
+Conjuncts:    59
+Disjuncts:    21
+
+NumCloseIDs: 2
+-- out/run-v3/t2 --
+graph TD
+  t0("root.get [Terminated]")
+  t1("root.convert [Terminated]")
+  t1-->t0
+
+-- out/run-v3/t2/value --
+{
+	$id: "tool/exec.Run"
+	cmd: "cue-fake import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
+	env: {} | []
+	stderr:      null
+	stdin:       GET.response.body & (*null | string | bytes)
+	stdout:      "foo"
+	success:     bool
+	mustSucceed: true
+
+	//cue:path: root.get
+	let GET = {
+		$id:    "tool/http.Do"
+		method: "GET"
+		url:    string
+		request: {
+			body: *bytes | string
+		}
+	} & {
+		request: {
+			body: ""
+		}
+		stdout: "foo"
+		url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
+	}
+}
+-- out/run-v3/t2/stats --
+Leaks:  0
+Freed:  48
+Reused: 47
+Allocs: 1
+Retain: 0
+
+Unifications: 26
+Conjuncts:    64
+Disjuncts:    21
+
+NumCloseIDs: 3
+-- out/run-v3/stats/totals --
+Leaks:  0
+Freed:  96
+Reused: 76
+Allocs: 20
+Retain: 0
+
+Unifications: 52
+Conjuncts:    123
+Disjuncts:    42
+
+NumCloseIDs: 5

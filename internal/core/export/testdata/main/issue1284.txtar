@@ -168,3 +168,48 @@ _|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and 
 }
 == Eval
 _|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
+-- out/doc-v3 --
+[]
+[a0]
+[a0 l]
+[a0 l 0]
+[a0 l 1]
+[a1]
+[a1 l]
+[a1 l 0]
+[a1 l 1]
+[a2]
+[a2 l]
+[a2 l 0]
+[a2 l 1]
+[a3]
+[a3 l]
+[a3 l 0]
+[a3 l 1]
+[a4]
+[a4 l]
+[a4 l #foo]
+[a4 l 0]
+[a4 l 1]
+-- out/definition-v3 --
+a0: {
+	l: ["a", ...] & ["a", "b", ...]
+}
+a1: {
+	l: [...] & ["a", ...] & ["a", "b", ...]
+}
+a2: {
+	l: [...] & ["a", ...] & ["a", "b", ...] & {}
+}
+a3: {
+	l: [...] & ["a", ...] & ["a", "b", ...] & {
+		_
+	}
+}
+a4: {
+	l: [...] & ["a", ...] & ["a", "b", ...] & {
+		@decl(1)
+		_
+		#foo: 1
+	}
+}

@@ -182,3 +182,28 @@ diff old new
 		}
 	}
 }
+-- out/doc-v3 --
+[]
+[x]
+[x y]
+[s]
+[additional]
+[additional env]
+[additional confs]
+-- out/definition-v3 --
+import "strings"
+
+x: {
+	{
+		[string]: int64
+	}
+	y: int
+}
+s: strings.MinRunes(4) & strings.MaxRunes(7)
+additional: {
+	env: _
+	confs: {
+		if env {}
+	}
+	...
+}

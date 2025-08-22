@@ -18,3 +18,5 @@
 }
 -- out/decode/extract --
 matchN(>=1, [bool, number])
+-- out/decode-v3/extract --
+matchN(>=1, [bool, number])

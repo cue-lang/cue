@@ -15,10 +15,6 @@ diff old new
  #D: list: [...{value: number | *1}]
 -d: #D & {}
 +d: #D & {list: [{}]}
--- out/trim-v3-noshare --
-== a.cue
-#D: list: [...{value: number | *1}]
-d: #D & {list: [{}]}
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

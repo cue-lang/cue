@@ -39,20 +39,6 @@ diff old new
 +foo: X1: {
 +	alist: []
 +}
--- out/trim-v3-noshare --
-== a.cue
-#Foo: {
-	id: string
-	...
-}
-
-foo: [ID=_]: #Foo & {
-	id: ID
-}
-
-foo: X1: {
-	alist: []
-}
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

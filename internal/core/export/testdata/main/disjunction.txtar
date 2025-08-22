@@ -49,3 +49,49 @@ c: *(a & b) | 3
 	b: 2
 	c: 1 | 2 | int | 3
 }
+-- out/doc-v3 --
+[]
+[a]
+- Issue #950
+
+[b]
+[c]
+-- out/value-v3 --
+== Simplified
+{
+	// Issue #950
+	a: *1 | int
+	b: *2 | int
+	c: 1 | 2 | int | 3
+}
+== Raw
+{
+	// Issue #950
+	a: *1 | int
+	b: *2 | int
+	c: 1 | 2 | int | 3
+}
+== Final
+{
+	a: 1
+	b: 2
+	c: 1 | 2 | int | 3
+}
+== All
+{
+	// Issue #950
+	a: *1 | int
+	b: *2 | int
+	c: 1 | 2 | int | 3
+}
+== Eval
+{
+	a: 1
+	b: 2
+	c: 1 | 2 | int | 3
+}
+-- out/definition-v3-noshare --
+// Issue #950
+a: *1 | int
+b: *2 | int
+c: *(a & b) | 3

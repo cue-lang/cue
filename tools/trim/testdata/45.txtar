@@ -28,3 +28,17 @@ payments: [{
 payments: [... {
 	currency: *"EUR" | string
 }]
+-- out/trim-v3 --
+== a.cue
+payments: [{
+	price: 110
+}, {
+	price: 204
+}, {
+	price:    35
+	currency: "GBP"
+}]
+
+payments: [... {
+	currency: *"EUR" | string
+}]

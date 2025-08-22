@@ -15,3 +15,11 @@ First: #DefA | #DefB
 First: "b"
 
 First: #DefA | #DefB
+-- out/trim-v3 --
+== a.cue
+#DefA: "a"
+#DefB: "b"
+
+First: "b"
+
+First: #DefA | #DefB

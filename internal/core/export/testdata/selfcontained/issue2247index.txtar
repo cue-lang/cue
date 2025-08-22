@@ -22,3 +22,14 @@ let Index0_1 = {
 		t: string
 	}
 }
+-- out/self-v3/default --
+b:      Index0_1
+c:      Index0_1
+Index0: int
+
+//cue:path: a.0
+let Index0_1 = {
+	s: {
+		t: string
+	}
+}

@@ -22,3 +22,11 @@ b: {
 	x: int
 	c: x
 }
+-- out/trim-v3 --
+== a.cue
+a: x: 5
+b: {
+	a
+	x: int
+	c: x
+}

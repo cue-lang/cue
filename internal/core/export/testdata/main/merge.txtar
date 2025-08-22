@@ -131,3 +131,75 @@ Reordering.
 		#bar: int
 	}
 }
+-- out/value-v3 --
+== Simplified
+{}
+== Raw
+{
+	#A: {
+		_
+		#a: string
+	}
+	#E: _
+	#F: _
+	#G: _
+	#B: {
+		2
+		#a:   string
+		#def: 3
+		#f:   int
+		#bar: int
+	}
+}
+== Final
+{}
+== All
+{
+	#A: {
+		_
+		#a: string
+	}
+	#E: _
+	#F: _
+	#G: _
+	#B: {
+		2
+		#a:   string
+		#def: 3
+		#f:   int
+		#bar: int
+	}
+}
+== Eval
+{
+	#A: {
+		_
+		#a: string
+	}
+	#E: _
+	#F: _
+	#G: _
+	#B: {
+		2
+		#a:   string
+		#def: 3
+		#f:   int
+		#bar: int
+	}
+}
+-- out/definition-v3-noshare --
+#A: {
+	_
+	#a: string
+}
+#E: _
+#F: _
+#G: _
+#B: #A & {
+	#E & #F
+	#G
+	2
+	#f:   int
+	#def: 3
+	#bar: int
+}

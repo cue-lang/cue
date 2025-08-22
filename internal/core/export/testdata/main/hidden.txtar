@@ -57,3 +57,44 @@ a: pkg.#A & {
 {
 	a: {}
 }
+-- out/doc-v3 --
+[]
+[a]
+[a _val]
+[a _#val]
+-- out/value-v3 --
+== Simplified
+{
+	a: {}
+}
+== Raw
+{
+	a: {
+		_val:  3
+		_#val: 6
+	}
+}
+== Final
+{
+	a: {}
+}
+== All
+{
+	a: {
+		_val:  3
+		_#val: 6
+	}
+}
+== Eval
+{
+	a: {}
+}
+-- out/definition-v3-noshare --
+package foo
+
+import "mod.test/pkg"
+
+a: pkg.#A & {
+	_val:  3
+	_#val: 6
+}

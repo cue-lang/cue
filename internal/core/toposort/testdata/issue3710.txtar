@@ -50,3 +50,25 @@ _app2: {
 		}]
 	}
 }
+-- out/TestTopologicalSort/lexicographical=false-v3 --
+{
+	#Exporter: {
+		objects: []
+	}
+	out: {
+		objects: [{
+			leafField: "leaf value"
+		}]
+	}
+}
+-- out/TestTopologicalSort/lexicographical=true-v3 --
+{
+	#Exporter: {
+		objects: []
+	}
+	out: {
+		objects: [{
+			leafField: "leaf value"
+		}]
+	}
+}

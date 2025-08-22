@@ -22,3 +22,12 @@ import "time"
     generated.cue:3:8
     generated.cue:3:20
     test/err-out-of-range.json:2:1
+-- out/decode-v3/extract --
+import "time"
+
+#Date: time.Format("2006-01-02")
+-- out/decode-v3/testerr/err-out-of-range --
+#Date: invalid value "2023-02-30" (does not satisfy time.Format("2006-01-02")): error in call to time.Format: invalid time "2023-02-30":
+    generated.cue:3:8
+    generated.cue:3:20
+    test/err-out-of-range.json:2:1

@@ -16,3 +16,6 @@ components:
 -- out/decode/extract --
 // A User uses something.
 #User: [...string]
+-- out/decode-v3/extract --
+// A User uses something.
+#User: [...string]

@@ -7,3 +7,8 @@ foo: #M
 foo: c: true
 foo: #M
 #M: c?: bool
+-- out/trim-v3 --
+== in.cue
+foo: c: true
+foo: #M
+#M: c?: bool

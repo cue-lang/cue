@@ -75,3 +75,42 @@ _spec: {
 		spec: containers: [{name: _name}]
 	}
 }
+-- out/trim-v3 --
+== a.cue
+deployment: [ID=_]: {
+	apiVersion: "apps/v1"
+	kind:       "Deployment"
+	metadata: name: ID
+	spec: {
+		template: {
+			metadata: labels: {
+				app:       ID
+				component: #Component
+			}
+			// we always have one namesake container
+			spec: containers: [{name: ID}]
+		}
+	}
+}
+
+#Component: string
+
+deployment: [ID=_]: _spec & {
+	_name: ID
+	spec: replicas: *1 | int
+}
+
+_spec: {
+	_name: string
+
+	metadata: name: _name
+	metadata: labels: component: #Component
+	spec: template: {
+		metadata: labels: {
+			app:       _name
+			component: #Component
+			domain:    "prod"
+		}
+		spec: containers: [{name: _name}]
+	}
+}

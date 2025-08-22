@@ -50,3 +50,29 @@ split: {
 		nanosecond: 123456
 	}
 }
+-- out/time-v3 --
+Errors:
+t2: invalid value "no time" (does not satisfy time.Time): error in call to time.Time: invalid time "no time":
+    ./in.cue:4:5
+    ./in.cue:4:17
+
+Result:
+t1: "1937-01-01T12:00:27.87+00:20"
+t2: _|_ // t2: invalid value "no time" (does not satisfy time.Time): t2: error in call to time.Time: invalid time "no time"
+t3: "2017-07-14T02:40:00.000123456Z"
+parse: {
+	t1: "2021-07-01T17:54:00Z"
+	t2: "2021-02-19T00:00:00Z"
+	t3: "2006-01-02T22:04:05Z"
+}
+split: {
+	t1: {
+		year:       2017
+		month:      7
+		day:        14
+		hour:       2
+		minute:     40
+		second:     0
+		nanosecond: 123456
+	}
+}

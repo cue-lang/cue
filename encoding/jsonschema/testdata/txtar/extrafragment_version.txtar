@@ -10,3 +10,7 @@
 @jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
 @jsonschema(id="http://example.test")
 string
+-- out/decode-v3/extract --
+@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+@jsonschema(id="http://example.test")
+string

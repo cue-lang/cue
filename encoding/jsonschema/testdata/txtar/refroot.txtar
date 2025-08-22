@@ -23,3 +23,14 @@ _schema: {
 		...
 	}
 }
+-- out/decode-v3/extract --
+@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+_schema
+_schema: {
+	@jsonschema(id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
+	null | bool | number | string | [...] | {
+		value?: _
+		next?:  _schema
+		...
+	}
+}

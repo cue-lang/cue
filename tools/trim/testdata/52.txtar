@@ -34,15 +34,6 @@ diff old new
 +First: _
  
  First: #DefA | #DefB
--- out/trim-v3-noshare --
-== a.cue
-#DefA: A: "a"
-#DefB: B: "b"
-
-First: B: "b"
-First: _
-
-First: #DefA | #DefB
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

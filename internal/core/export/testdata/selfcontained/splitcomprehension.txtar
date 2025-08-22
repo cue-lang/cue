@@ -34,3 +34,19 @@ a: {
 	k3: "test"
 	v3: 1
 }
+-- out/self-v3/default --
+
+{
+	k2: "test"
+} & {
+	v2: 1
+} & {
+	k4: "test"
+} & {
+	v4: 1
+} & {
+	k1: "test"
+	v1: 1
+	k3: "test"
+	v3: 1
+}

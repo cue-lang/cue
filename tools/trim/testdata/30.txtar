@@ -23,11 +23,6 @@ diff old new
  y: {a: 5}
 -z: x & y & {a: 5}
 +z: x & y & _
--- out/trim-v3-noshare --
-== a.cue
-x: {a: 5}
-y: {a: 5}
-z: x & y & _
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

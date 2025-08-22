@@ -313,3 +313,268 @@ info: {
       }
    }
 }
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "contact": {
+         "url": "https://cuelang.org",
+         "name": "John Doe"
+      },
+      "title": "An OpenAPI testing package.",
+      "version": "v1beta2"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "DefaultStruct": {
+            "type": "object",
+            "properties": {
+               "port": {},
+               "obj": {
+                  "type": "array",
+                  "items": {
+                     "type": "integer"
+                  }
+               }
+            },
+            "default": {
+               "port": 1
+            },
+            "oneOf": [
+               {
+                  "required": [
+                     "port",
+                     "obj"
+                  ]
+               },
+               {
+                  "required": [
+                     "port"
+                  ]
+               }
+            ]
+         },
+         "Enum": {
+            "type": "string",
+            "enum": [
+               "foo",
+               "bar",
+               "baz"
+            ]
+         },
+         "Int32": {
+            "type": "integer",
+            "format": "int32"
+         },
+         "List": {
+            "type": "array",
+            "items": {
+               "type": "number"
+            },
+            "default": [
+               1,
+               2,
+               3
+            ]
+         },
+         "Msg2": {
+            "type": "object",
+            "properties": {
+               "b": {
+                  "type": "number"
+               },
+               "a": {
+                  "type": "string"
+               }
+            },
+            "oneOf": [
+               {
+                  "required": [
+                     "b"
+                  ]
+               },
+               {
+                  "required": [
+                     "a"
+                  ]
+               }
+            ]
+         },
+         "MyMessage": {
+            "description": "MyMessage is my message.",
+            "type": "object",
+            "required": [
+               "foo",
+               "bar"
+            ],
+            "properties": {
+               "port": {
+                  "type": "object",
+                  "required": [
+                     "port",
+                     "obj"
+                  ],
+                  "properties": {
+                     "port": {
+                        "type": "integer"
+                     },
+                     "obj": {
+                        "type": "array",
+                        "items": {
+                           "type": "integer"
+                        }
+                     }
+                  }
+               },
+               "foo": {
+                  "type": "integer",
+                  "minimum": 10,
+                  "exclusiveMinimum": true,
+                  "maximum": 1000,
+                  "exclusiveMaximum": true
+               },
+               "bar": {
+                  "type": "array",
+                  "items": {
+                     "type": "string"
+                  }
+               },
+               "a": {
+                  "description": "Field a.",
+                  "type": "integer",
+                  "enum": [
+                     1
+                  ]
+               },
+               "b": {
+                  "type": "string"
+               }
+            },
+            "oneOf": [
+               {
+                  "required": [
+                     "a"
+                  ]
+               },
+               {
+                  "required": [
+                     "b"
+                  ]
+               }
+            ]
+         },
+         "Port": {
+            "type": "object",
+            "required": [
+               "port",
+               "obj"
+            ],
+            "properties": {
+               "port": {
+                  "type": "integer"
+               },
+               "obj": {
+                  "type": "array",
+                  "items": {
+                     "type": "integer"
+                  }
+               }
+            }
+         },
+         "YourMessage": {
+            "type": "object",
+            "properties": {
+               "b": {},
+               "a": {
+                  "type": "string"
+               }
+            },
+            "oneOf": [
+               {
+                  "required": [
+                     "a"
+                  ]
+               },
+               {
+                  "required": [
+                     "b"
+                  ]
+               },
+               {
+                  "required": [
+                     "b"
+                  ]
+               }
+            ]
+         },
+         "YourMessage2": {
+            "type": "object",
+            "properties": {
+               "a": {
+                  "type": "number"
+               },
+               "c": {
+                  "type": "number"
+               },
+               "e": {
+                  "type": "number"
+               },
+               "f": {
+                  "type": "number"
+               },
+               "d": {
+                  "type": "number"
+               },
+               "b": {
+                  "type": "number"
+               }
+            },
+            "allOf": [
+               {
+                  "oneOf": [
+                     {
+                        "required": [
+                           "a"
+                        ]
+                     },
+                     {
+                        "required": [
+                           "b"
+                        ]
+                     }
+                  ]
+               },
+               {
+                  "oneOf": [
+                     {
+                        "required": [
+                           "c"
+                        ]
+                     },
+                     {
+                        "required": [
+                           "d"
+                        ]
+                     }
+                  ]
+               },
+               {
+                  "oneOf": [
+                     {
+                        "required": [
+                           "e"
+                        ]
+                     },
+                     {
+                        "required": [
+                           "f"
+                        ]
+                     }
+                  ]
+               }
+            ]
+         }
+      }
+   }
+}

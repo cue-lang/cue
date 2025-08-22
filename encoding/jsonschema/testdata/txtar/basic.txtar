@@ -79,3 +79,32 @@ person?: {
 // address stores a postal address
 #address: strings.MinRunes(4) & strings.MaxRunes(20)
 ...
+-- out/decode-v3/extract --
+// Main schema
+//
+// Specify who you are and all.
+
+import "strings"
+
+@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+
+// A person is a human being.
+person?: {
+	name!: string
+
+	// where does this person live?
+	address?: #address
+
+	// A very large comment that will be wrapped after a certain line
+	// length. Let's keep on going and see what happens.
+	children?: [...string]
+	"home phone"?: #."phone number" @deprecated()
+	...
+}
+
+// a telephone number
+#: "phone number": string
+
+// address stores a postal address
+#address: strings.MinRunes(4) & strings.MaxRunes(20)
+...

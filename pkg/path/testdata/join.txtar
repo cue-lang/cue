@@ -201,3 +201,147 @@ Join: {
 		out: "\\\\host\\share\\foo"
 	}]
 }
+-- out/path-v3 --
+joinSingle: "a/b"
+Join: {
+	unix: [{
+		arg: ["a", "b"]
+		out: "a/b"
+	}, {
+		arg: ["a/b", "c/d"]
+		out: "a/b/c/d"
+	}, {
+		arg: ["/"]
+		out: "/"
+	}, {
+		arg: ["a"]
+		out: "a"
+	}, {
+		arg: ["a", "b"]
+		out: "a/b"
+	}, {
+		arg: ["a", ""]
+		out: "a"
+	}, {
+		arg: ["", "b"]
+		out: "b"
+	}, {
+		arg: ["/", "a"]
+		out: "/a"
+	}, {
+		arg: ["/", "a/b"]
+		out: "/a/b"
+	}, {
+		arg: ["/", ""]
+		out: "/"
+	}, {
+		arg: ["//", "a"]
+		out: "/a"
+	}, {
+		arg: ["directory", "file"]
+		out: "directory/file"
+	}, {
+		arg: [#"C:\Windows\"#, #"System32"#]
+		out: "C:\\Windows\\/System32"
+	}, {
+		arg: [#"C:\Windows\"#, #""#]
+		out: "C:\\Windows\\"
+	}, {
+		arg: [#"C:\"#, #"Windows"#]
+		out: "C:\\/Windows"
+	}, {
+		arg: [#"C:"#, #"a\b"#]
+		out: "C:/a\\b"
+	}, {
+		arg: [#"C:"#, #"a"#, #"b"#]
+		out: "C:/a/b"
+	}, {
+		arg: [#"C:"#, #""#, #""#, #"b"#]
+		out: "C:/b"
+	}, {
+		arg: [#"C:"#, #""#]
+		out: "C:"
+	}, {
+		arg: [#"C:"#, #""#, #""#]
+		out: "C:"
+	}, {
+		arg: [#"C:."#, #"a"#]
+		out: "C:./a"
+	}, {
+		arg: [#"C:a"#, #"b"#]
+		out: "C:a/b"
+	}, {
+		arg: [#"\\host\share"#, #"foo"#]
+		out: "\\\\host\\share/foo"
+	}]
+	windows: [{
+		arg: ["a", "b"]
+		out: "a\\b"
+	}, {
+		arg: ["a/b", "c/d"]
+		out: "a\\b\\c\\d"
+	}, {
+		arg: ["/"]
+		out: "\\"
+	}, {
+		arg: ["a"]
+		out: "a"
+	}, {
+		arg: ["a", "b"]
+		out: "a\\b"
+	}, {
+		arg: ["a", ""]
+		out: "a"
+	}, {
+		arg: ["", "b"]
+		out: "b"
+	}, {
+		arg: ["/", "a"]
+		out: "\\a"
+	}, {
+		arg: ["/", "a/b"]
+		out: "\\a\\b"
+	}, {
+		arg: ["/", ""]
+		out: "\\"
+	}, {
+		arg: ["//", "a"]
+		out: "\\a"
+	}, {
+		arg: ["directory", "file"]
+		out: "directory\\file"
+	}, {
+		arg: [#"C:\Windows\"#, #"System32"#]
+		out: "C:\\Windows\\System32"
+	}, {
+		arg: [#"C:\Windows\"#, #""#]
+		out: "C:\\Windows"
+	}, {
+		arg: [#"C:\"#, #"Windows"#]
+		out: "C:\\Windows"
+	}, {
+		arg: [#"C:"#, #"a\b"#]
+		out: "C:a\\b"
+	}, {
+		arg: [#"C:"#, #"a"#, #"b"#]
+		out: "C:a\\b"
+	}, {
+		arg: [#"C:"#, #""#, #""#, #"b"#]
+		out: "C:b"
+	}, {
+		arg: [#"C:"#, #""#]
+		out: "C:."
+	}, {
+		arg: [#"C:"#, #""#, #""#]
+		out: "C:."
+	}, {
+		arg: [#"C:."#, #"a"#]
+		out: "C:a"
+	}, {
+		arg: [#"C:a"#, #"b"#]
+		out: "C:a\\b"
+	}, {
+		arg: [#"\\host\share"#, #"foo"#]
+		out: "\\\\host\\share\\foo"
+	}]
+}

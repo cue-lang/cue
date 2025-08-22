@@ -18,3 +18,12 @@ foo: #Foo & {
 foo: #Foo & {
 	bar: 1
 }
+-- out/trim-v3 --
+== in.cue
+#Foo: {
+	bar: int
+	baz: 2
+}
+foo: #Foo & {
+	bar: 1
+}

@@ -43,17 +43,6 @@ diff old new
 +A: #X & _
 +
 +B: X & _
--- out/trim-v3-noshare --
-== a.cue
-X: {
-	a: 1
-	b: true
-}
-#X: X
-
-A: #X & _
-
-B: X & _
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

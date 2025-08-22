@@ -22,11 +22,6 @@ diff old new
 +let #x = {a: int, b: {c: 5, ...}}
 +y: #x & {a: 4}
 +z: #x & {a: 4, b: {d: "hi"}}
--- out/trim-v3-noshare --
-== a.cue
-let #x = {a: int, b: {c: 5, ...}}
-y: #x & {a: 4}
-z: #x & {a: 4, b: {d: "hi"}}
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

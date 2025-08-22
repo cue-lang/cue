@@ -23,3 +23,10 @@ invalid value "something" (does not satisfy matchN): 2 matched, expected 1:
     generated.cue:1:1
     generated.cue:1:8
     test/err-string.json:1:1
+-- out/decode-v3/extract --
+matchN(1, [string, number | string])
+-- out/decode-v3/testerr/err-string --
+invalid value "something" (does not satisfy matchN): 2 matched, expected 1:
+    generated.cue:1:1
+    generated.cue:1:8
+    test/err-string.json:1:1

@@ -73,3 +73,64 @@ g: 4
 	f: 4
 	g: 4
 }
+-- out/doc-v3 --
+[]
+[a]
+[c]
+[e]
+[g]
+[b]
+[f]
+-- out/definition-v3 --
+a: 1
+b: 1
+c: 2
+e: 3
+f: 4
+g: 4
+-- out/value-v3 --
+== Simplified
+{
+	a: 1
+	b: 1
+	c: 2
+	e: 3
+	f: 4
+	g: 4
+}
+== Raw
+{
+	a: 1
+	b: 1
+	c: 2
+	e: 3
+	f: 4
+	g: 4
+}
+== Final
+{
+	a: 1
+	b: 1
+	c: 2
+	e: 3
+	f: 4
+	g: 4
+}
+== All
+{
+	a: 1
+	b: 1
+	c: 2
+	e: 3
+	f: 4
+	g: 4
+}
+== Eval
+{
+	a: 1
+	b: 1
+	c: 2
+	e: 3
+	f: 4
+	g: 4
+}

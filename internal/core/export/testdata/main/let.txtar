@@ -1435,3 +1435,236 @@ Improved error messages.
 	x: "foo"
 	y: "foo"
 }
+-- out/doc-v3 --
+[]
+[comprehension]
+[comprehension filepath]
+[X]
+[#Foo]
+[complete]
+[complete A]
+[complete x]
+[complete run]
+[complete run a]
+[incomplete]
+[incomplete a]
+[incomplete a x]
+[incomplete a run]
+[incomplete a run a]
+[incomplete b]
+[incomplete b A]
+[incomplete b x]
+[incomplete b run]
+[incomplete b run a]
+[incomplete c]
+[incomplete c A]
+[incomplete c x]
+[incomplete c run]
+[incomplete c run a]
+[incomplete c A]
+[incomplete c x2]
+[incomplete c run2]
+[incomplete c run2 a]
+[incomplete d]
+[incomplete d A]
+[incomplete d x]
+[incomplete d run]
+[incomplete d run a]
+[incomplete d A]
+[incomplete d x2]
+[incomplete d run2]
+[incomplete d run2 a]
+[unresolvedDisjunction]
+[unresolvedDisjunction #TypePrimitive]
+[unresolvedDisjunction #TypePrimitive _args]
+[unresolvedDisjunction #TypePrimitive _args required]
+[unresolvedDisjunction #TypePrimitive Args]
+[unresolvedDisjunction #TypePrimitive Args required]
+[unresolvedDisjunction #TypePrimitive "*"]
+[unresolvedDisjunction #TypeBool]
+[unresolvedDisjunction #TypeBool _args]
+[unresolvedDisjunction #TypeBool _args required]
+[unresolvedDisjunction #TypeBool Args]
+[unresolvedDisjunction #TypeBool Args required]
+[cfgs]
+[cfgs 0]
+[cfgs 0 metadata]
+[cfgs 0 metadata name]
+[cfgs 1]
+[cfgs 1 metadata]
+[cfgs 1 metadata name]
+[filepath]
+[files]
+[scoped]
+[scoped _args]
+[scoped _args required]
+[scoped direct]
+[scoped direct Args]
+[scoped direct Args required]
+[scoped direct a]
+[scoped embed1]
+[scoped embed1 Args]
+[scoped embed1 Args required]
+[scoped embed1 a]
+[scoped embed2]
+[scoped embed2 Args]
+[scoped embed2 Args required]
+[scoped embed2 a]
+[scoped list]
+[scoped list Args]
+[scoped list Args required]
+[scoped list a]
+[scoped list a 0]
+[scoped listStruct]
+[scoped listStruct Args]
+[scoped listStruct Args required]
+[scoped listStruct a]
+[scoped listStruct a 0]
+[scoped listStruct a 0 a]
+[scoped listEmbed]
+[scoped listEmbed Args]
+[scoped listEmbed Args required]
+[scoped listEmbed a]
+[scoped listEmbed a 0]
+[x]
+[Y]
+[y]
+[Y]
+-- out/definition-v3 --
+
+let X = 1 + 1
+let Y = x
+let Y_1 = x
+{
+	cfgs: [for crd in ["one", "two"] {
+		metadata: {
+			name: crd
+		}
+	}]
+	for cfg in cfgs {
+		let filepath = "kind-\(cfg.name)"
+		files: {
+			"\(filepath)": {
+				patches: cfg
+			}
+		}
+	}
+}
+comprehension: {
+	for cfg in [{
+		a: "one"
+	}] {
+		let filepath_1 = "kind-\(cfg.name)"
+		"\(filepath_1)": {
+			patches: cfg
+		}
+	}
+}
+#Foo: X
+complete: {
+	let A = run.a
+	x: "a \(A) z"
+	run: {
+		a: "foo"
+	}
+}
+scoped: {
+	_args: {
+		required: 1
+	}
+	direct: {
+		let Args = _args
+		a: Args.required
+	}
+	embed1: {
+		let Args_1 = _args
+		a: Args_1.required
+	}
+	embed2: {
+		let Args_2 = _args
+		a: Args_2.required
+	}
+	list: {
+		let Args_3 = _args
+		a: [Args_3.required]
+	}
+	listStruct: {
+		let Args_4 = _args
+		a: [{
+			a: Args_4.required
+		}]
+	}
+	listEmbed: {
+		let Args_A = _args
+		a: [Args_A.required]
+	}
+}
+x: "foo"
+incomplete: {
+	a: {
+		x: "a \(run.a) z"
+		run: {
+			a: string
+		}
+	}
+	b: {
+		let A_1 = run.a
+		x: "a \(A_1) z"
+		run: {
+			a: string
+		}
+	}
+	c: {
+		let A_2 = run.a
+		let A_3 = run2.a
+		x:  "a \(A_2) z"
+		x2: "a \(A_3) z"
+		run: {
+			a: string
+		}
+		run2: {
+			a: string
+		}
+	}
+	d: {
+		let A_4 = run.a
+		let A_9 = run2.a
+		x:  "a \(A_4) z"
+		x2: "a \(A_9) z"
+		run: {
+			a: string
+		}
+		run2: {
+			a: string
+		}
+	}
+}
+unresolvedDisjunction: {
+	#TypePrimitive: {
+		let Args_D = _args
+		{
+			"*": {}
+		} | {
+			bool: #TypeBool & {
+				_args: {
+					required: Args_D.required
+				}
+			}
+		}
+		_args: {
+			required: bool
+		}
+	}
+	#TypeBool: {
+		let Args_F = _args
+		_args: {
+			required: bool
+		}
+
+		if !Args_F.required {
+			// `default` sets the default value.
+			default: bool | null
+		}
+	}
+}
+y: Y & Y_1

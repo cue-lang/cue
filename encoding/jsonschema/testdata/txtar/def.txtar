@@ -58,3 +58,23 @@ shipping_address?: #address
 	...
 }
 ...
+-- out/decode-v3/extract --
+@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+@jsonschema(id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
+person?:           #."per-son"
+billing_address?:  #address
+shipping_address?: #address
+
+#: "per-son": {
+	name?: string
+	children?: [...#."per-son"]
+	...
+}
+
+#address: {
+	street_address!: string
+	city!:           string
+	state!:          string
+	...
+}
+...

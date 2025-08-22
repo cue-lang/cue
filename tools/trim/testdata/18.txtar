@@ -4,3 +4,6 @@ x: [...string]
 -- out/trim --
 == a.cue
 x: [...string]
+-- out/trim-v3 --
+== a.cue
+x: [...string]

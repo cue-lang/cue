@@ -22,3 +22,15 @@ let S = {
 	a: 1
 	b: 2
 }
+-- out/self-v3/default --
+import "struct"
+
+// Do not inline `s`, as it makes calls less readable.
+c: struct.MaxFields(S & d, 3)
+d: {}
+
+//cue:path: s
+let S = {
+	a: 1
+	b: 2
+}

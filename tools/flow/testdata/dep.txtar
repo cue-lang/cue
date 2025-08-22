@@ -445,3 +445,389 @@ Retain: 1
 Unifications: 1
 Conjuncts:    1
 Disjuncts:    1
+-- out/run-v3/errors --
+-- out/run-v3/t0 --
+graph TD
+  t0("root.a [Ready]")
+  t1("root.concreteValueInGeneratedSubfield [Waiting]")
+  t1-->t0
+  t2("root.indexReference [Waiting]")
+  t2-->t1
+  t3("root.taskRootReference [Waiting]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Waiting]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Waiting]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Waiting]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run-v3/t1 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Ready]")
+  t1-->t0
+  t2("root.indexReference [Waiting]")
+  t2-->t1
+  t3("root.taskRootReference [Waiting]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Waiting]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Waiting]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Waiting]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run-v3/t1/value --
+{
+	$id: "valToOut"
+	b:   3
+}
+-- out/run-v3/t1/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+-- out/run-v3/t2 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Ready]")
+  t2-->t1
+  t3("root.taskRootReference [Waiting]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Waiting]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Waiting]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Waiting]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run-v3/t2/value --
+{
+	$id: "valToOut"
+	x: {
+		foo: 3
+	}
+	index: int
+}
+-- out/run-v3/t2/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+-- out/run-v3/t3 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Ready]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Waiting]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Waiting]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Waiting]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run-v3/t3/value --
+{
+	$id: "valToOut"
+	x: [0, 1][INDEX]
+
+	//cue:path: root.concreteValueInGeneratedSubfield.index
+	let INDEX = int
+}
+-- out/run-v3/t3/stats --
+Leaks:  3
+Freed:  0
+Reused: 0
+Allocs: 3
+Retain: 0
+
+Unifications: 1
+Conjuncts:    1
+Disjuncts:    0
+-- out/run-v3/t4 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Terminated]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Ready]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Waiting]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Waiting]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run-v3/t4/value --
+{
+	$id: "valToOut"
+	$after: {
+		$id: "valToOut"
+		x: [0, 1][INDEX]
+	}
+	x: 3
+
+	//cue:path: root.concreteValueInGeneratedSubfield.index
+	let INDEX = int
+}
+-- out/run-v3/t4/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+-- out/run-v3/t5 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Terminated]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Terminated]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Ready]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Waiting]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run-v3/t5/value --
+{
+	$id: "valToOut"
+	x:   3
+}
+-- out/run-v3/t5/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+-- out/run-v3/t6 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Terminated]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Terminated]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Terminated]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Ready]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run-v3/t6/value --
+{
+	$id: "valToOut"
+	x: {
+		$id: "valToOut"
+		x:   3
+	}
+	incomplete: _
+}
+-- out/run-v3/t6/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+-- out/run-v3/t7 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Terminated]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Terminated]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Terminated]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Terminated]")
+  t6-->t5
+  t7("root.incompleteList [Ready]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run-v3/t7/value --
+{
+	$id: "valToOut"
+	x: {
+		for x in INCOMPLETE {}
+	}
+
+	//cue:path: root.indirectTaskRootReference.incomplete
+	let INCOMPLETE = _
+}
+-- out/run-v3/t7/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+-- out/run-v3/t8 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Terminated]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Terminated]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Terminated]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Terminated]")
+  t6-->t5
+  t7("root.incompleteList [Terminated]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Ready]")
+  t8-->t7
+
+-- out/run-v3/t8/value --
+{
+	$id: "valToOut"
+	x: [X]
+
+	//cue:path: root.incompleteComprehensionSource.x
+	let X = {
+		for x in INCOMPLETE {}
+	}
+
+	//cue:path: root.indirectTaskRootReference.incomplete
+	let INCOMPLETE = _
+}
+-- out/run-v3/t8/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+-- out/run-v3/t9 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Terminated]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Terminated]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Terminated]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Terminated]")
+  t6-->t5
+  t7("root.incompleteList [Terminated]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Terminated]")
+  t8-->t7
+
+-- out/run-v3/t9/value --
+{
+	$id: "valToOut"
+	x: {
+		foo: [X_1]
+	}
+
+	//cue:path: root.incompleteComprehensionSource.x
+	let X_1 = {
+		for x in INCOMPLETE {}
+	}
+
+	//cue:path: root.indirectTaskRootReference.incomplete
+	let INCOMPLETE = _
+}
+-- out/run-v3/t9/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+-- out/run-v3/stats/totals --
+Leaks:  3
+Freed:  0
+Reused: 0
+Allocs: 3
+Retain: 0
+
+Unifications: 1
+Conjuncts:    1
+Disjuncts:    0

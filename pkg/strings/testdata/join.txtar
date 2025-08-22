@@ -4,3 +4,5 @@ import "strings"
 disjunctDefault:  strings.Join(*["Hello", "World!"] | int, " ")
 -- out/strings --
 disjunctDefault: "Hello World!"
+-- out/strings-v3 --
+disjunctDefault: "Hello World!"

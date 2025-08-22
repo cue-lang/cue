@@ -21,3 +21,13 @@ t4: true
 // should be false
 f1: false
 f2: false
+-- out/math-v3 --
+// should be true
+t1: true
+t2: true
+t3: true
+t4: true
+
+// should be false
+f1: false
+f2: false

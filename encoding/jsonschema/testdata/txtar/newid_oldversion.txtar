@@ -9,3 +9,7 @@
 ERROR:
 keyword "$id" is not supported in JSON schema version http://json-schema.org/draft-04/schema#:
     schema.json:3:3
+-- out/decode-v3/extract --
+ERROR:
+keyword "$id" is not supported in JSON schema version http://json-schema.org/draft-04/schema#:
+    schema.json:3:3

@@ -45,3 +45,27 @@ group: {
 		comp: "\(k)": v
 	}
 }
+-- out/trim-v3 --
+== in.cue
+foo: [string]: {
+	t: [string]: {
+		x: >=0 & <=5
+	}
+}
+
+foo: multipath: {
+	t: [string]: {
+		// Combined with the other constraints, we know the value must be 5 and
+		// thus the entry below can be eliminated. As the evaluator does not
+		// reduce this, we should not eliminate it, though.
+		x: >=5 & <=8 & int
+	}
+
+	t: u: {x: 5}
+}
+
+group: {
+	for k, v in foo {
+		comp: "\(k)": v
+	}
+}

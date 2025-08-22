@@ -17,3 +17,11 @@ _#def: {
 		a: 1
 	}
 }
+-- out/self-v3/default --
+
+_#def
+_#def: {
+	c: {
+		a: 1
+	}
+}

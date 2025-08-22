@@ -24,9 +24,3 @@ if x == 5 {
 	y: "hi"
 }
 x: 5
--- out/trim-v3-noshare --
-== a.cue
-if x == 5 {
-	y: "hi"
-}
-x: 5

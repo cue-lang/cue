@@ -86,3 +86,77 @@ a: {
 		"#def": int
 	}
 }
+-- out/doc-v3 --
+[]
+[#def]
+["#def"]
+[_def]
+[_#def]
+[a]
+[a #def]
+[a "#def"]
+[a _def]
+[a _#def]
+-- out/value-v3 --
+== Simplified
+{
+	"#def": int
+	a: {
+		"#def": int
+	}
+}
+== Raw
+{
+	#def:   int
+	"#def": int
+	_def:   int
+	_#def:  int
+	a: {
+		#def:   int
+		"#def": int
+		_def:   int
+		_#def:  int
+	}
+}
+== Final
+{
+	"#def": int
+	a: {
+		"#def": int
+	}
+}
+== All
+{
+	#def:   int
+	"#def": int
+	_def:   int
+	_#def:  int
+	a: {
+		#def:   int
+		"#def": int
+		_def:   int
+		_#def:  int
+	}
+}
+== Eval
+{
+	#def:   int
+	"#def": int
+	a: {
+		#def:   int
+		"#def": int
+	}
+}
+-- out/definition-v3-noshare --
+package foo
+
+#def:   int
+"#def": int
+_def:   int
+_#def:  int
+a: {
+	#def:   int
+	"#def": int
+	_def:   int
+	_#def:  int
+}

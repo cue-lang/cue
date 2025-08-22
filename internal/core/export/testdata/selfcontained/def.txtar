@@ -14,3 +14,12 @@ let DEF = {
 		a: 1
 	}
 }
+-- out/self-v3/default --
+c: DEF.#x
+
+//cue:path: #def
+let DEF = {
+	#x: {
+		a: 1
+	}
+}

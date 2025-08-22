@@ -51,3 +51,16 @@ f: "a: " + "out"
 g: "a: " + "out"
 s: string
 t: s
+-- out/self-v3/default --
+c: "out"
+// TODO: should most likely resolve to "out", not c, because b points to
+// outside the exported value
+d: c
+e: {
+	s: "foo"
+	t: "bar"
+}
+f: "a: " + "out"
+g: "a: " + "out"
+s: string
+t: s

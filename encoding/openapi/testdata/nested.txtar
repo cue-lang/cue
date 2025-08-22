@@ -44,3 +44,36 @@
       }
    }
 }
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "File comment.",
+      "version": "no version"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Struct": {
+            "type": "object",
+            "properties": {
+               "b": {
+                  "$ref": "#/components/schemas/Struct.T"
+               },
+               "a": {
+                  "$ref": "#/components/schemas/Struct.T"
+               },
+               "c": {
+                  "type": "array",
+                  "items": {
+                     "$ref": "#/components/schemas/Struct.T"
+                  }
+               }
+            }
+         },
+         "Struct.T": {
+            "type": "integer"
+         }
+      }
+   }
+}

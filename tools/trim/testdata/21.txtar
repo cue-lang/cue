@@ -8,3 +8,7 @@ z: close({a: int, b: {c: string}} & {a: 4, b: {c: "hi"}})
 == a.cue
 y: close({a: int, b: {c: string}}) & {a: 4, b: {c: "hi"}}
 z: close({a: int, b: {c: string}} & {a: 4, b: {c: "hi"}})
+-- out/trim-v3 --
+== a.cue
+y: close({a: int, b: {c: string}}) & {a: 4, b: {c: "hi"}}
+z: close({a: int, b: {c: string}} & {a: 4, b: {c: "hi"}})

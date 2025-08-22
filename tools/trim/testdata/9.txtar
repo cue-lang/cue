@@ -37,16 +37,6 @@ diff old new
 +	hilbert: _
  }
  d: [string]: s
--- out/trim-v3-noshare --
-== a.cue
-a: 5
-s: {age: a}
-d: {
-	jack:    _
-	gill:    _
-	hilbert: _
-}
-d: [string]: s
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

@@ -9,3 +9,7 @@
 close({
 	a!: 1
 })
+-- out/decode-v3/extract --
+close({
+	a!: 1
+})

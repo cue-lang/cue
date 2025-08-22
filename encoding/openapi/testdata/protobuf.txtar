@@ -95,3 +95,85 @@
       }
    }
 }
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "Note: This example originally derived from a CUE file converted from protobuf.",
+      "version": "no version"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "HTTPRoute": {
+            "type": "object",
+            "required": [
+               "route"
+            ],
+            "properties": {
+               "route": {
+                  "type": "array",
+                  "items": {
+                     "type": "object",
+                     "required": [
+                        "headers"
+                     ],
+                     "properties": {
+                        "headers": {
+                           "type": "object",
+                           "required": [
+                              "request"
+                           ],
+                           "properties": {
+                              "request": {
+                                 "type": "object"
+                              }
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "HTTPRoute.route.*.headers.HeaderOperations": {
+            "type": "object"
+         },
+         "HTTPRouteDestination": {
+            "type": "object",
+            "required": [
+               "headers"
+            ],
+            "properties": {
+               "headers": {
+                  "type": "object",
+                  "required": [
+                     "request"
+                  ],
+                  "properties": {
+                     "request": {
+                        "type": "object"
+                     }
+                  }
+               }
+            }
+         },
+         "HTTPRouteDestination.headers.HeaderOperations": {
+            "type": "object"
+         },
+         "Headers": {
+            "type": "object",
+            "required": [
+               "request"
+            ],
+            "properties": {
+               "request": {
+                  "type": "object"
+               }
+            }
+         },
+         "Headers.HeaderOperations": {
+            "type": "object"
+         }
+      }
+   }
+}

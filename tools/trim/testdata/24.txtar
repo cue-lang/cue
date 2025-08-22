@@ -9,3 +9,8 @@ z: y & {a: 5}
 let x = close
 let y = x({a: int})
 z: y & {a: 5}
+-- out/trim-v3 --
+== a.cue
+let x = close
+let y = x({a: int})
+z: y & {a: 5}

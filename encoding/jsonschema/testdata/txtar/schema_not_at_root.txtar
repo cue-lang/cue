@@ -14,3 +14,7 @@
 ERROR:
 $schema can only appear at the root in JSON Schema version http://json-schema.org/draft-07/schema#:
     schema.json:6:11
+-- out/decode-v3/extract --
+ERROR:
+$schema can only appear at the root in JSON Schema version http://json-schema.org/draft-07/schema#:
+    schema.json:6:11

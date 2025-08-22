@@ -118,3 +118,20 @@ _#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressB
 	clientCIDR!:    string
 	serverAddress!: string
 }
+-- out/decode-v3/extract --
+_#defs: "/components/schemas/io.k8s.api.apps.v1.Deployment": {
+	apiVersion: "apps/v1"
+	kind:       "Deployment"
+}
+
+_#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions": {
+	apiVersion: "v1"
+	kind:       "APIVersions"
+	serverAddressByClientCIDRs!: [..._#defs."/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR"]
+	versions!: [...string]
+}
+
+_#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR": {
+	clientCIDR!:    string
+	serverAddress!: string
+}

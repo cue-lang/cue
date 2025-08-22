@@ -831,3 +831,140 @@ Reorderings?
 		}
 	}
 }
+-- out/doc-v3 --
+[]
+[fieldAlias]
+[fieldAlias simple]
+[fieldAlias simple "a-b"]
+[fieldAlias simple foo]
+[fieldAlias simple bar]
+[fieldAlias simple "a-c"]
+[fieldAlias cross]
+[fieldAlias cross baz]
+[fieldAlias cross "d-2"]
+[valueAlias]
+[valueAlias merge]
+[valueAlias merge value]
+- Merge fields, rename alias to avoid conflict.
+TODO: merged values can still be simplified.
+
+[valueAlias merge value #value]
+[valueAlias merge value b]
+[valueAlias merge value v]
+[valueAlias merge value v X]
+[valueAlias selfRef]
+[valueAlias selfRef struct]
+[valueAlias selfRef struct a]
+[valueAlias selfRef struct a b]
+[valueAlias selfRef struct a b #foo]
+[valueAlias selfRef struct a b b]
+[valueAlias selfRefValue]
+[valueAlias selfRefValue struct]
+[valueAlias selfRefValue struct a]
+- Note: this resolves to a cycle error, which is considered
+to be equal to "incomplete". As a result, in case of
+non-final evaluation, reference will remain. This is not
+an issue exclusive to value aliases, and falls within the
+range of what is acceptable for now.
+TODO: solve this issue.
+
+[valueAlias selfRefValue pattern]
+[valueAlias selfRefValue pattern a]
+- this triggers the verbatim "adt" path. Note that there
+is no need to rename the variable here as the expression
+was known to compile and is known to be correct.
+
+[issue1308]
+[issue1308 _xA]
+[issue1308 sub]
+[issue1308 sub 0]
+[issue1308 sub 0 _A]
+[issue2374]
+- TODO: these could be merged into a single struct.
+
+[issue2374 a]
+[issue2374 a r]
+[issue2374 a z]
+[issue2374 a b]
+-- out/definition-v3 --
+fieldAlias: {
+	simple: {
+		X="a-b": 4
+		foo:     X
+		bar?:    Y
+		Y="a-c": 5
+	}
+	cross: {
+		baz: 3
+		X="d-2": {
+			E=[D="cue"]: {
+				C="foo3": {
+					name: "xx"
+					foo:  C.name
+					bar:  X
+					baz:  D
+					qux:  E
+				}
+			}
+		}
+	}
+}
+valueAlias: {
+	merge: {
+		// Merge fields, rename alias to avoid conflict.
+		// TODO: merged values can still be simplified.
+		value: X_1={
+			#value: X_1.b & X_1.b
+			b:      2
+			v: {
+				X: 3
+			}
+		}
+	}
+	selfRef: {
+		struct: {
+			a: {
+				b: X_2={
+					#foo: X_2.b
+					b:    2
+				}
+			}
+		}
+	}
+	selfRefValue: {
+		struct: {
+			// Note: this resolves to a cycle error, which is considered
+			// to be equal to "incomplete". As a result, in case of
+			// non-final evaluation, reference will remain. This is not
+			// an issue exclusive to value aliases, and falls within the
+			// range of what is acceptable for now.
+			// TODO: solve this issue.
+			a: X_3=or(X_3)
+		}
+		pattern: {
+			// this triggers the verbatim "adt" path. Note that there
+			// is no need to rename the variable here as the expression
+			// was known to compile and is known to be correct.
+			a: {
+				[string]: X=or(X)
+			}
+		}
+	}
+}
+issue1308: {
+	let _xA = 1
+	sub: [{
+		_A: _xA
+	}]
+}
+
+// TODO: these could be merged into a single struct.
+issue2374: {
+	r_1=[string]: {
+		z: 1
+		b: r_1 | null
+	}
+	a: {
+		r: 0
+	}
+}

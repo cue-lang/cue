@@ -22,3 +22,14 @@ deployment: alertmanager: {
 		emptyDir: {}
 	}]
 }
+-- out/trim-v3 --
+== in.cue
+deployment: [ID=string]: {}
+
+deployment: alertmanager: {
+	empty: {}
+	volumes: [{
+		name: "alertmanager"
+		emptyDir: {}
+	}]
+}

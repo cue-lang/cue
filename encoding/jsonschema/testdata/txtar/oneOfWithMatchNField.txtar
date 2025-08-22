@@ -37,3 +37,17 @@ matchN: invalid value 3 (does not satisfy matchN): 0 matched, expected 1:
     generated.cue:1:12
     generated.cue:1:19
     test/err-nomatch.json:1:12
+-- out/decode-v3/extract --
+"matchN"?: matchN(1, [1, 2])
+...
+-- out/decode-v3/testerr/err-nomatch --
+matchN: conflicting values 1 and 3:
+    generated.cue:1:23
+    test/err-nomatch.json:1:12
+matchN: conflicting values 2 and 3:
+    generated.cue:1:26
+    test/err-nomatch.json:1:12
+matchN: invalid value 3 (does not satisfy matchN): 0 matched, expected 1:
+    generated.cue:1:12
+    generated.cue:1:19
+    test/err-nomatch.json:1:12

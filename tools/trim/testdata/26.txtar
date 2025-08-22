@@ -31,13 +31,6 @@ diff old new
 -b: w: x: y: {}
 +b: w: _
  b: a
--- out/trim-v3-noshare --
-== a.cue
-a: [string]: {
-	x: y: z: 5
-}
-b: w: _
-b: a
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

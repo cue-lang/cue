@@ -130,3 +130,82 @@ let W = {
 		y:                 _hidden2_567475F3
 	}
 }
+-- out/self-v3-noshare/default --
+import (
+	"mod.test/a/pkg"
+	"tool/exec"
+)
+
+// Can be inlined.
+v: pkg.v.v
+
+// Do not simplify because of multiple usages of enclosing struct.
+x: pkg.a.b.c
+y: pkg.a.b
+
+// Cannot simplify because of definition.
+z: pkg.#Def.f
+
+// Two references to package, but since the second is a scalar, it can be
+// hoisted and only one reference remains. So there is still no need for
+// a helper.
+// TODO: fix this to eliminate the helper.
+w:  pkg.w
+wa: pkg.w.a
+
+// Never expand builtin packages.
+run:     exec.Run
+_hidden: int
+-- out/self-v3-noshare/expand_imports --
+import "tool/exec"
+
+// Can be inlined.
+v: {
+	x: 3
+	y: x
+}
+
+// Do not simplify because of multiple usages of enclosing struct.
+x: B.c
+y: B
+
+// Cannot simplify because of definition.
+z: F.#x
+
+// Two references to package, but since the second is a scalar, it can be
+// hoisted and only one reference remains. So there is still no need for
+// a helper.
+// TODO: fix this to eliminate the helper.
+w:  W
+wa: W.a
+
+// Never expand builtin packages.
+run:     exec.Run
+_hidden: int
+
+//cue:path: "mod.test/a/pkg".a.b
+let B = {
+	c: {
+		d: int
+	}
+}
+
+//cue:path: "mod.test/a/pkg".#Def.f
+let F = {
+	#x: {
+		g: int
+	}
+}
+
+//cue:path: "mod.test/a/pkg".w
+let W = {
+	a: _hidden_567475F3
+	_hidden_567475F3: {
+		a: 1
+	}
+	b: 1
+	x: {
+		_hidden2_567475F3: _hidden_567475F3
+		y:                 _hidden2_567475F3
+	}
+}

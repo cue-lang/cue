@@ -737,3 +737,117 @@ Reordering of attributes.
 		b?: "foo" @step(4)
 	}
 }
+-- out/doc-v3 --
+[]
+[a]
+[doNotPropagate]
+[doNotPropagate #A]
+[doNotPropagate a]
+[doNotPropagate #B]
+- Do not accumulated field attributes in embedding.
+
+[doNotPropagate b]
+[embedScalarField]
+[embedScalarField a]
+[embedScalarDecl]
+[embedScalarDecl b0]
+[embedScalarDecl b1]
+[embedScalarDecl b2]
+[dontMergeForDef]
+[dontMergeForDef a]
+[dontMergeForDef b]
+[dontMergeForDef b x]
+[dontMergeForDef c]
+[dontMergeForDef d]
+[comprehensions]
+[comprehensions c1]
+[comprehensions c2]
+[comprehensions c3]
+[dynamicComplex]
+[dynamicComplex a]
+[dynamicComplex b]
+[dynamicComplex foo]
+[dynamicSimple]
+[dynamicSimple a]
+[dynamicSimple b]
+-- out/definition-v3 --
+package bar
+
+@file("foo")
+
+@file("bar")
+a: {
+	@decl(1)
+	@decl(2)
+	@decl(3)
+	@decl(5)
+} @field(2) @field(1) @field(4) @field(3) @field(5)
+doNotPropagate: {
+	#A: {} @attr1()
+	a: #A
+
+	// Do not accumulated field attributes in embedding.
+	#B: {} @attr1()
+	b: #B
+}
+embedScalarField: {
+	a: 2 @attr1() @attr2()
+}
+embedScalarDecl: {
+	b0: {
+		@attr1()
+		2
+	}
+	b1: b0
+	b2: {
+		@attr2()
+		b0
+		2
+	}
+}
+dontMergeForDef: {
+	a: {
+		@decl1()
+	}
+	b: a & {
+		@decl2()
+		x: 1
+	}
+	c: a & {
+		@decl2()
+	}
+	d: {
+		@decl2()
+		a
+	}
+}
+comprehensions: {
+	@step(0)
+	c1: {} @step(1)
+	if true {
+		@step(2c)
+		c2: {
+			@step(2a)
+		} @step(2b)
+	}
+	c3: {} @step(3)
+	if false {
+		@step(4c)
+		c4: {
+			@step(4a)
+		} @step(4b)
+	}
+}
+dynamicComplex: {
+	a:        "foo"
+	(a):      "foo" @step(1)
+	[string]: "foo" @step(2)
+	a?:       "foo" @step(3)
+	b?:       "foo" @step(4)
+
+	if true {}
+}
+dynamicSimple: {
+	a:  "foo" @step(3)
+	b?: "foo" @step(4)
+}

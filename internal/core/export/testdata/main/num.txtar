@@ -82,3 +82,76 @@ numbers: {
 		b: 3.0
 	}
 }
+-- out/doc-v3 --
+[]
+[floats]
+[floats a]
+[floats b]
+[numbers]
+[numbers a]
+[numbers b]
+-- out/definition-v3 --
+floats: {
+	a: 3.0
+	b: 3.0
+}
+numbers: {
+	a: 3
+	b: 3.0
+}
+-- out/value-v3 --
+== Simplified
+{
+	floats: {
+		a: 3.0
+		b: 3.0
+	}
+	numbers: {
+		a: 3
+		b: 3.0
+	}
+}
+== Raw
+{
+	floats: {
+		a: 3.0
+		b: 3.0
+	}
+	numbers: {
+		a: 3
+		b: 3.0
+	}
+}
+== Final
+{
+	floats: {
+		a: 3.0
+		b: 3.0
+	}
+	numbers: {
+		a: 3
+		b: 3.0
+	}
+}
+== All
+{
+	floats: {
+		a: 3.0
+		b: 3.0
+	}
+	numbers: {
+		a: 3
+		b: 3.0
+	}
+}
+== Eval
+{
+	floats: {
+		a: 3.0
+		b: 3.0
+	}
+	numbers: {
+		a: 3
+		b: 3.0
+	}
+}

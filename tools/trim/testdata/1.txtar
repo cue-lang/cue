@@ -8,3 +8,7 @@ doesn't. Possible bug in evaluator.
 == a.cue
 <10
 7
+-- out/trim-v3 --
+== a.cue
+<10
+7

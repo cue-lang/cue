@@ -15,3 +15,11 @@ d: [
 	{name: "hilbert"},
 ]
 d: [...{name: string, age: int}]
+-- out/trim-v3 --
+== a.cue
+d: [
+	{name: "jack", age: 5},
+	{name: "gill", age: >4},
+	{name: "hilbert"},
+]
+d: [...{name: string, age: int}]

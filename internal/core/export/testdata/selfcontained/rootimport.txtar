@@ -41,3 +41,23 @@ let PKG = {
 		b: a
 	}
 }
+-- out/self-v3/default --
+import "mod.test/a/pkg"
+
+a: pkg
+
+// Force no inline.
+b: pkg.v.a
+-- out/self-v3/expand_imports --
+a: PKG
+
+// Force no inline.
+b: PKG.v.a
+
+//cue:path: "mod.test/a/pkg"
+let PKG = {
+	v: {
+		a: int
+		b: a
+	}
+}

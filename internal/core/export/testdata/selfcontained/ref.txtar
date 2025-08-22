@@ -47,3 +47,26 @@ let MAP_1 = {
 
 //cue:path: incomplete2
 let INCOMPLETE2 = string
+-- out/self-v3/default --
+ref1: MAP
+ref2: MAP.foo
+ref3: MAP[INCOMPLETE1]
+ref4: MAP.foo
+ref5: MAP["bar"]
+ref6: MAP_1[INCOMPLETE2]
+
+//cue:path: x.map
+let MAP = {
+	foo: int
+}
+
+//cue:path: incomplete1
+let INCOMPLETE1 = string
+
+//cue:path: y.z.map
+let MAP_1 = {
+	bar: int
+}
+
+//cue:path: incomplete2
+let INCOMPLETE2 = string

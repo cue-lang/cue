@@ -150,3 +150,138 @@ Retain: 0
 Unifications: 60
 Conjuncts:    98
 Disjuncts:    60
+-- out/run-v3/errors --
+-- out/run-v3/t0 --
+graph TD
+  t0("root.a [Ready]")
+  t1("root.b [Ready]")
+  t2("root.c [Ready]")
+  t3("root.d [Waiting]")
+  t3-->t0
+  t3-->t1
+  t3-->t2
+
+-- out/run-v3/t1 --
+graph TD
+  t0("root.a [Running]")
+  t1("root.b [Running]")
+  t2("root.c [Terminated]")
+  t3("root.d [Waiting]")
+  t3-->t0
+  t3-->t1
+  t3-->t2
+
+-- out/run-v3/t1/value --
+{
+	$id: "sequenced"
+	seq: 1
+	val: "baz"
+	out: "baz"
+}
+-- out/run-v3/t1/stats --
+Leaks:  0
+Freed:  20
+Reused: 10
+Allocs: 10
+Retain: 0
+
+Unifications: 20
+Conjuncts:    25
+Disjuncts:    0
+
+NumCloseIDs: 1
+-- out/run-v3/t2 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.b [Running]")
+  t2("root.c [Terminated]")
+  t3("root.d [Waiting]")
+  t3-->t0
+  t3-->t1
+  t3-->t2
+
+-- out/run-v3/t2/value --
+{
+	$id: "sequenced"
+	seq: 2
+	val: "foo"
+	out: "foo"
+}
+-- out/run-v3/t2/stats --
+Leaks:  0
+Freed:  20
+Reused: 20
+Allocs: 0
+Retain: 0
+
+Unifications: 20
+Conjuncts:    30
+Disjuncts:    0
+
+NumCloseIDs: 2
+-- out/run-v3/t3 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.b [Terminated]")
+  t2("root.c [Terminated]")
+  t3("root.d [Ready]")
+  t3-->t0
+  t3-->t1
+  t3-->t2
+
+-- out/run-v3/t3/value --
+{
+	$id: "sequenced"
+	seq: 3
+	val: "bar"
+	out: "bar"
+}
+-- out/run-v3/t3/stats --
+Leaks:  0
+Freed:  20
+Reused: 20
+Allocs: 0
+Retain: 0
+
+Unifications: 20
+Conjuncts:    35
+Disjuncts:    0
+
+NumCloseIDs: 3
+-- out/run-v3/t4 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.b [Terminated]")
+  t2("root.c [Terminated]")
+  t3("root.d [Terminated]")
+  t3-->t0
+  t3-->t1
+  t3-->t2
+
+-- out/run-v3/t4/value --
+{
+	$id: "valToOut"
+	out: "foobarbaz"
+}
+-- out/run-v3/t4/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+-- out/run-v3/stats/totals --
+Leaks:  0
+Freed:  60
+Reused: 50
+Allocs: 10
+Retain: 0
+
+Unifications: 60
+Conjuncts:    90
+Disjuncts:    0
+
+NumCloseIDs: 6

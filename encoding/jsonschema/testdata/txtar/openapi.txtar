@@ -30,3 +30,15 @@ components:
 		null | #PhoneNumber
 	...
 }
+-- out/decode-v3/extract --
+// The number to dial.
+#PhoneNumber: string
+
+// A User uses something.
+#User: {
+	id?:   int
+	name?: string
+	address?:
+		null | #PhoneNumber
+	...
+}

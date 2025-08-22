@@ -20,3 +20,16 @@ t4: """
 	00000000  66 6f 6f                                          |foo|
 
 	"""
+-- out/hex-v3 --
+Errors:
+t3: error in call to encoding/hex.Decode: encoding/hex: invalid byte: U+006F 'o':
+    ./in.cue:5:5
+
+Result:
+t1: "666f6f"
+t2: 'foo'
+t3: _|_ // t3: error in call to encoding/hex.Decode: encoding/hex: invalid byte: U+006F 'o'
+t4: """
+	00000000  66 6f 6f                                          |foo|
+
+	"""

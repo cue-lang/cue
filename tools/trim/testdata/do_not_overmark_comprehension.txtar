@@ -38,20 +38,6 @@ diff old new
  }
  
  group: {
--- out/trim-v3-noshare --
-== in.cue
-foo: multipath: {
-	t: [string]: {x: 5}
-
-	// Don't remove u!
-	t: u: _
-}
-
-group: {
-	for k, v in foo {
-		comp: "\(k)": v
-	}
-}
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

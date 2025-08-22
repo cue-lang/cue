@@ -88,3 +88,15 @@ _#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressB
 	clientCIDR!:    string
 	serverAddress!: string
 }
+-- out/decode-v3/extract --
+_#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions": {
+	serverAddressByClientCIDRs!: [..._#defs."/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR"]
+	versions!: [...string]
+	apiVersion: "v1"
+	kind:       "APIVersions"
+}
+
+_#defs: "/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR": {
+	clientCIDR!:    string
+	serverAddress!: string
+}

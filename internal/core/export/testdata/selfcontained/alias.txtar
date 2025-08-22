@@ -94,3 +94,61 @@ let EXT2 = {
 	}
 	a: int
 }
+-- out/self-v3/default --
+
+{
+	x: string
+	y: x
+
+	// TODO: use with non-concrete value. Right now, this causes the reference
+	// above to not shorten (it will point to b, instead of x, as x won't be
+	// reachable).
+	// Reevaluated after value aliases for embeddings are implemented.
+	z:     "string"
+	X=(z): 4
+	Y="y": "foo"
+	enclosed: {
+		V=x: string
+		y:   enclosed.x
+		z:   V
+
+		// Comment.
+		labelX: X
+		labelY: Y
+	}
+	hoisted: {
+		ext1: EXT
+		ext2: EXT
+		ext3: {
+			two: 2
+			b: {
+				name: "ext1"
+			}
+		}
+		ext4: EXT2
+		ext5: EXT2.a
+	}
+	other: {
+		[INNER=string]: {
+			name: INNER
+		}
+	}
+}
+name: "a"
+
+//cue:path: ext
+let EXT = {
+	one: 1
+	b: {
+		name: "ext"
+	}
+}
+
+//cue:path: ext2
+let EXT2 = {
+	three: 3
+	b: {
+		name: "ext2"
+	}
+	a: int
+}

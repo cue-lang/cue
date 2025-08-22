@@ -128,3 +128,108 @@ nested: {
 	}
 	nested: 1
 }
+-- out/doc-v3 --
+[]
+[dropEmpty]
+[dropEmpty k]
+[dropEmpty #A]
+[dropEmpty #A b]
+[dropEmpty #A d]
+[dropEmpty a]
+[dropEmpty a b]
+[dropEmpty a d]
+[nested]
+-- out/value-v3 --
+== Simplified
+{
+	dropEmpty: {
+		k: "a"
+		a: {
+			b: "c"
+			d: "c"
+		}
+	}
+	nested: 1
+}
+== Raw
+{
+	dropEmpty: {
+		k: "a"
+		#A: {
+			b: !=""
+			d: "\(b)"
+		}
+		a: {
+			b: "c"
+			d: "c"
+		}
+	}
+	nested: 1
+}
+== Final
+{
+	dropEmpty: {
+		k: "a"
+		a: {
+			b: "c"
+			d: "c"
+		}
+	}
+	nested: 1
+}
+== All
+{
+	dropEmpty: {
+		k: "a"
+		#A: {
+			b: !=""
+			d: "\(b)"
+		}
+		a: {
+			b: "c"
+			d: "c"
+		}
+	}
+	nested: 1
+}
+== Eval
+{
+	dropEmpty: {
+		k: "a"
+		#A: {
+			b: !=""
+			d: "\(b)"
+		}
+		a: {
+			b: "c"
+			d: "c"
+		}
+	}
+	nested: 1
+}
+-- out/definition-v3-noshare --
+dropEmpty: {
+	k: "a"
+	#A: {
+		b: !=""
+
+		if k == "a" {
+			d: "\(b)"
+		}
+		if k == "b" {
+			d: ""
+		}
+	}
+	a: #A & {
+		b: "c"
+	}
+}
+nested: {
+	if true
+	if true
+
+	let x = [1]
+	for y in x {
+		y
+	}
+}

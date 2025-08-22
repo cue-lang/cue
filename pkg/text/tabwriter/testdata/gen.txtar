@@ -20,3 +20,13 @@ t2: """
 	aaa bb vv
 
 	"""
+-- out/tabwriter-v3 --
+t1: """
+	a   b  c
+	aaa bb vv
+	"""
+t2: """
+	a   b  c
+	aaa bb vv
+
+	"""

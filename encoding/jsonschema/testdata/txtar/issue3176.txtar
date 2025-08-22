@@ -25,3 +25,13 @@ matchN(1, [{
 	{[=~"^x-"]: string}
 	...
 })
+-- out/decode-v3/extract --
+import "strings"
+
+matchN(1, [{
+	...
+}, strings.MaxRunes(
+	3)]) & (string | {
+	{[=~"^x-"]: string}
+	...
+})

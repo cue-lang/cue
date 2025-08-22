@@ -139,3 +139,78 @@ metadata!: {
 	annotations?: [string]: string
 	...
 }
+-- out/decodeCRD-v3/extractCRD/0/v1 --
+package v1
+
+_embeddedResource
+spec?: {
+	...
+}
+intField?: uint32
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?: {
+		...
+	}
+}
+apiVersion: "example.com/v1"
+kind:       "MyApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]: string
+	annotations?: [string]: string
+	...
+}
+-- out/decodeCRD-v3/extractCRD/0/v2alpha1 --
+package v2alpha1
+
+_embeddedResource
+spec?: {
+	...
+}
+otherField?: string
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?: {
+		...
+	}
+}
+apiVersion: "example.com/v2alpha1"
+kind:       "MyApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]: string
+	annotations?: [string]: string
+	...
+}
+-- out/decodeCRD-v3/extractCRD/1/v6 --
+package v6
+
+_embeddedResource
+spec?: {
+	...
+}
+intField?: uint32
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?: {
+		...
+	}
+}
+apiVersion: "other.com/v6"
+kind:       "OtherApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]: string
+	annotations?: [string]: string
+	...
+}

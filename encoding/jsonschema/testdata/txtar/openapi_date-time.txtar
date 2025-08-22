@@ -11,3 +11,7 @@ components:
 import "time"
 
 #DateTime: time.Time
+-- out/decode-v3/extract --
+import "time"
+
+#DateTime: time.Time

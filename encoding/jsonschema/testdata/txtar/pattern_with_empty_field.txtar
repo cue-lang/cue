@@ -22,3 +22,12 @@
     generated.cue:2:1
     generated.cue:2:12
     test/err-empty-field.json:1:6
+-- out/decode-v3/extract --
+@jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
+{[=~".*"]: string}
+...
+-- out/decode-v3/testerr/err-empty-field --
+"": conflicting values true and string (mismatched types bool and string):
+    generated.cue:2:1
+    generated.cue:2:12
+    test/err-empty-field.json:1:6

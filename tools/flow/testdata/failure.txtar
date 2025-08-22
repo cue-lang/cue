@@ -30,3 +30,21 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
+-- out/run-v3/errors --
+error: task failed: failure
+-- out/run-v3/t0 --
+graph TD
+  t0("root.a [Ready]")
+  t1("root.b [Waiting]")
+  t1-->t0
+
+-- out/run-v3/stats/totals --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0

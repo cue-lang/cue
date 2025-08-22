@@ -15,10 +15,6 @@ diff old new
  [_]: x: "hello"
 -a: {}
 +a: _
--- out/trim-v3-noshare --
-== in.cue
-[_]: x: "hello"
-a: _
 -- diff/-out/trim-v3-noshare<==>+out/trim --
 diff old new
 --- old

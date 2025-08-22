@@ -7,3 +7,5 @@ Test what happens when there's an OpenAPI schema that has no
 -- schema.yaml --
 -- out/decode/extract --
 
+-- out/decode-v3/extract --
+

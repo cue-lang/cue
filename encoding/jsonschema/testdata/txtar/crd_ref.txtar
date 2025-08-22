@@ -36,3 +36,9 @@ keyword "$ref" is not supported in JSON schema version Kubernetes CRD:
     schema.yaml:26:13
 -- out/decodeCRD/extractCRD/error --
 keyword "$ref" is not supported in JSON schema version Kubernetes CRD
+-- out/decodeCRD-v3/extractCRD/error --
+keyword "$ref" is not supported in JSON schema version Kubernetes CRD
+-- out/decode-v3-noshare/extract --
+ERROR:
+keyword "$ref" is not supported in JSON schema version Kubernetes CRD:
+    schema.yaml:26:13

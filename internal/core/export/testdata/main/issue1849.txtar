@@ -162,3 +162,144 @@ encodeB: yaml.Marshal(b.item)
 
 		"""
 }
+-- out/doc-v3 --
+[]
+[a]
+[a item]
+[a item foo]
+[encodeA]
+[b]
+[b item]
+[b item ""]
+[encodeB]
+-- out/value-v3 --
+== Simplified
+{
+	a: {
+		item: {
+			foo: "test"
+		}
+	}
+	encodeA: """
+		foo: test
+
+		"""
+	b: {
+		item: {
+			"": "test"
+		}
+	}
+	encodeB: """
+		"": test
+
+		"""
+}
+== Raw
+{
+	a: {
+		item: {
+			foo: "test"
+		}
+	}
+	encodeA: """
+		foo: test
+
+		"""
+	b: {
+		item: {
+			"": "test"
+		}
+	}
+	encodeB: """
+		"": test
+
+		"""
+}
+== Final
+{
+	a: {
+		item: {
+			foo: "test"
+		}
+	}
+	encodeA: """
+		foo: test
+
+		"""
+	b: {
+		item: {
+			"": "test"
+		}
+	}
+	encodeB: """
+		"": test
+
+		"""
+}
+== All
+{
+	a: {
+		item: {
+			foo: "test"
+		}
+	}
+	encodeA: """
+		foo: test
+
+		"""
+	b: {
+		item: {
+			"": "test"
+		}
+	}
+	encodeB: """
+		"": test
+
+		"""
+}
+== Eval
+{
+	a: {
+		item: {
+			foo: "test"
+		}
+	}
+	encodeA: """
+		foo: test
+
+		"""
+	b: {
+		item: {
+			"": "test"
+		}
+	}
+	encodeB: """
+		"": test
+
+		"""
+}
+-- out/definition-v3-noshare --
+import "encoding/yaml"
+
+a: {
+	for key, value in {
+		test: _
+	} {
+		"item": {
+			foo: key
+		}
+	}
+	item: {}
+}
+encodeA: yaml.Marshal(a.item)
+b: {
+	for key, value in {
+		test: _
+	} {
+		[string]: {
+			"": key
+		}
+	}
+	item: {}
+}
+encodeB: yaml.Marshal(b.item)

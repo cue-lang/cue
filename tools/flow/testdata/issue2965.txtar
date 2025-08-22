@@ -81,3 +81,71 @@ Retain: 0
 Unifications: 23
 Conjuncts:    39
 Disjuncts:    23
+-- out/run-v3/errors --
+-- out/run-v3/t0 --
+graph TD
+  t0("root.prepare [Ready]")
+  t1("root.run [Waiting]")
+  t1-->t0
+
+-- out/run-v3/t1 --
+graph TD
+  t0("root.prepare [Terminated]")
+  t1("root.run [Ready]")
+  t1-->t0
+
+-- out/run-v3/t1/value --
+{
+	$id:    "prepare"
+	stdout: "foo"
+}
+-- out/run-v3/t1/stats --
+Leaks:  0
+Freed:  10
+Reused: 3
+Allocs: 7
+Retain: 0
+
+Unifications: 10
+Conjuncts:    15
+Disjuncts:    0
+
+NumCloseIDs: 1
+-- out/run-v3/t2 --
+graph TD
+  t0("root.prepare [Terminated]")
+  t1("root.run [Terminated]")
+  t1-->t0
+
+-- out/run-v3/t2/value --
+{
+	$id: "run"
+	env: {
+		input: "foo"
+	}
+	stdout: "foo"
+}
+-- out/run-v3/t2/stats --
+Leaks:  0
+Freed:  11
+Reused: 10
+Allocs: 1
+Retain: 0
+
+Unifications: 11
+Conjuncts:    19
+Disjuncts:    0
+
+NumCloseIDs: 1
+-- out/run-v3/stats/totals --
+Leaks:  0
+Freed:  21
+Reused: 13
+Allocs: 8
+Retain: 0
+
+Unifications: 21
+Conjuncts:    34
+Disjuncts:    0
+
+NumCloseIDs: 2

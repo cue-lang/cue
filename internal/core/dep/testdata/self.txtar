@@ -25,3 +25,14 @@ line  reference    path of resulting vertex
 6:    y         => a.b.y
 7:    f         => a.b.x.f
 10:   b         => a.b
+-- out/dependencies-v3/field --
+line  reference    path of resulting vertex
+-- out/dependencies-v3/all --
+line  reference    path of resulting vertex
+5:    m         => m
+-- out/dependencies-v3/dynamic --
+line  reference    path of resulting vertex
+5:    m         => m
+6:    y         => a.b.y
+7:    f         => a.b.x.f
+10:   b         => a.b

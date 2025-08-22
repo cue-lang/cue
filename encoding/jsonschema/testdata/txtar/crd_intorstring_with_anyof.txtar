@@ -67,3 +67,36 @@ metadata!: {
 	annotations?: [string]: string
 	...
 }
+-- out/decodeCRD-v3/extractCRD/0/v1 --
+package v1
+
+_embeddedResource
+spec?: matchN(>=1, [int, string]) & (int | string)
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?: {
+		...
+	}
+}
+apiVersion: "example.com/v1"
+kind:       "MyApp"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]: string
+	annotations?: [string]: string
+	...
+}
+-- out/decode-v3-noshare/extract --
+_embeddedResource
+spec?: matchN(>=1, [int, string]) & (int | string)
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?: {
+		...
+	}
+}

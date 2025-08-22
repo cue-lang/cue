@@ -10,3 +10,7 @@ isn't enabled.
 @jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
 
 _
+-- out/decode-v3/extract --
+@jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
+
+_

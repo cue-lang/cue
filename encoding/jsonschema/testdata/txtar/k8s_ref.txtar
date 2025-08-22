@@ -42,3 +42,8 @@ spec?: _#defs."/x-other"
 foo?:  string
 
 _#defs: "/x-other": string
+-- out/decode-v3/extract --
+spec?: _#defs."/x-other"
+foo?:  string
+
+_#defs: "/x-other": string

@@ -10,3 +10,8 @@ issues1025: {
 	p: *"hello" | string
 	q: "hello"
 }
+-- out/path-v3 --
+issues1025: {
+	p: *"hello" | string
+	q: "hello"
+}

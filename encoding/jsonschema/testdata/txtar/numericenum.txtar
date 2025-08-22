@@ -8,3 +8,5 @@
 }
 -- out/decode/extract --
 1 | 2 | 3
+-- out/decode-v3/extract --
+1 | 2 | 3

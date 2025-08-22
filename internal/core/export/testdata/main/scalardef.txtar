@@ -47,3 +47,33 @@ import pkg2 "mod.test/foo/pkg1"
 	"Hello World!"
 	#pkg1: "World"
 }
+-- out/doc-v3 --
+[]
+[#pkg1]
+-- out/definition-v3 --
+package test
+
+import pkg2 "mod.test/foo/pkg1"
+
+"Hello \(#pkg1)!"
+#pkg1: pkg2.Object
+-- out/value-v3 --
+== Simplified
+"Hello World!"
+== Raw
+{
+	"Hello World!"
+	#pkg1: "World"
+}
+== Final
+"Hello World!"
+== All
+{
+	"Hello World!"
+	#pkg1: "World"
+}
+== Eval
+{
+	"Hello World!"
+	#pkg1: "World"
+}

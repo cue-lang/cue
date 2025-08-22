@@ -40,3 +40,14 @@ close({
 	}
 	numOrList?: matchN(1, [number, [...number]])
 })
+-- out/decode-v3/extract --
+// Main schema
+
+close({
+	// an integer or string.
+	intString?: null | bool | int | string | [...]
+	object?: {
+		...
+	}
+	numOrList?: matchN(1, [number, [...number]])
+})

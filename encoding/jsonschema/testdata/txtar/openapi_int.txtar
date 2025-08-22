@@ -14,3 +14,7 @@ components:
 #Int32: int32
 
 #Int64: int64
+-- out/decode-v3/extract --
+#Int32: int32
+
+#Int64: int64

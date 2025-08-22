@@ -37,3 +37,14 @@ FormatDuration: [{
 	arg: 600000000
 	out: "600ms"
 }]
+-- out/time-v3 --
+FormatDuration: [{
+	arg: 10920000000000
+	out: "3h2m0s"
+}, {
+	arg: 5000000000
+	out: "5s"
+}, {
+	arg: 600000000
+	out: "600ms"
+}]

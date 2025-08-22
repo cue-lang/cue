@@ -81,3 +81,39 @@ info: {
       }
    }
 }
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "Users schema",
+      "version": "v1beta1",
+      "contact": {
+         "name": "The CUE Authors",
+         "url": "https://cuelang.org"
+      }
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "PhoneNumber": {
+            "description": "The number to dial.",
+            "type": "string"
+         },
+         "User": {
+            "description": "A User uses something.",
+            "type": "object",
+            "properties": {
+               "id": {
+                  "type": "integer"
+               },
+               "name": {
+                  "type": "string"
+               },
+               "address": {
+                  "$ref": "#/components/schemas/PhoneNumber"
+               }
+            }
+         }
+      }
+   }
+}

@@ -12,3 +12,11 @@ close({
 		d!: 1
 	})
 })
+-- out/decode-v3/extract --
+close({
+	a!: 1
+	b!: [1, 2, 3]
+	c!: close({
+		d!: 1
+	})
+})

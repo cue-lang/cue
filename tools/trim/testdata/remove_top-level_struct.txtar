@@ -27,3 +27,17 @@ z: {
 		c: "\(k)": v
 	}
 }
+-- out/trim-v3 --
+== in.cue
+a: b: 3
+for k, v in a {
+	c: "\(k)": v
+}
+
+z: {
+
+	a: b: 3
+	for k, v in a {
+		c: "\(k)": v
+	}
+}

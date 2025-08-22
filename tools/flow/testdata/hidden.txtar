@@ -125,3 +125,108 @@ Retain: 0
 Unifications: 46
 Conjuncts:    81
 Disjuncts:    46
+-- out/run-v3/errors --
+-- out/run-v3/t0 --
+graph TD
+  t0("root.a [Ready]")
+  t1("root._b [Waiting]")
+  t1-->t0
+  t2("root.c [Waiting]")
+  t2-->t0
+  t2-->t1
+
+-- out/run-v3/t1 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root._b [Ready]")
+  t1-->t0
+  t2("root.c [Waiting]")
+  t2-->t0
+  t2-->t1
+
+-- out/run-v3/t1/value --
+{
+	$id: "valToOut"
+	val: "foo"
+	out: "foo"
+}
+-- out/run-v3/t1/stats --
+Leaks:  0
+Freed:  20
+Reused: 9
+Allocs: 11
+Retain: 0
+
+Unifications: 20
+Conjuncts:    25
+Disjuncts:    0
+
+NumCloseIDs: 1
+-- out/run-v3/t2 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root._b [Terminated]")
+  t1-->t0
+  t2("root.c [Ready]")
+  t2-->t0
+  t2-->t1
+
+-- out/run-v3/t2/value --
+{
+	$id: "valToOut"
+	$after: {
+		$id: "valToOut"
+		val: "foo"
+		out: "foo"
+	}
+	val: "bar"
+	out: "bar"
+}
+-- out/run-v3/t2/stats --
+Leaks:  0
+Freed:  20
+Reused: 20
+Allocs: 0
+Retain: 0
+
+Unifications: 20
+Conjuncts:    30
+Disjuncts:    0
+
+NumCloseIDs: 2
+-- out/run-v3/t3 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root._b [Terminated]")
+  t1-->t0
+  t2("root.c [Terminated]")
+  t2-->t0
+  t2-->t1
+
+-- out/run-v3/t3/value --
+{
+	$id: "valToOut"
+	out: "foobar"
+}
+-- out/run-v3/t3/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+-- out/run-v3/stats/totals --
+Leaks:  0
+Freed:  40
+Reused: 29
+Allocs: 11
+Retain: 0
+
+Unifications: 40
+Conjuncts:    55
+Disjuncts:    0
+
+NumCloseIDs: 3

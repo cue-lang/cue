@@ -9,3 +9,5 @@
 
 -- out/decode/extract --
 matchN(>=1, [_, _|_])
+-- out/decode-v3/extract --
+matchN(>=1, [_, _|_])

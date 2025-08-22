@@ -42,3 +42,16 @@ matchIf({
 	c?: string
 	...
 }
+-- out/decode-v3/extract --
+@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+@jsonschema(id="https://foo.example/schema")
+matchIf({
+	a!: number
+	...
+}, {
+	b!: number
+	...
+}, _) & {
+	c?: string
+	...
+}

@@ -50,3 +50,25 @@ t3: {
 	l2: ["c", "b", "a", "e"]
 	l3: ["a", "b", "c", "e"]
 }
+-- out/list-v3 --
+t1: {
+	l: ["c", "b", "a"]
+	ls: ["a", "b", "c"]
+	il:  false
+	ils: true
+}
+t2: {
+	l: ["c", "b", "a"]
+	il: false
+	ls: ["a", "b", "c"]
+	ils: true
+}
+t3: {
+	L: ["c", "b", "a", "e", "d"]
+	l: ["c", "b", "a", "e"]
+	il: false
+	ls: ["a", "b", "c", "e"]
+	ils: true
+	l2: ["c", "b", "a", "e"]
+	l3: ["a", "b", "c", "e"]
+}

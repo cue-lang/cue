@@ -2,11 +2,15 @@ exec cue cmd tc1
 stdout 'success!'
 
 ! exec cue cmd tc2
-stderr 'command\.tc2: invalid interpolation: non-concrete value string \(type string\)'
+cmp stderr want-stderr
 
 ! exec cue cmd tc3
 stderr 'command\.tc3: no tasks found'
 
+-- want-stderr --
+command.tc2: invalid interpolation: non-concrete value string (type string):
+    ./p_tool.cue:11:2
+    ./p_tool.cue:5:8
 -- p_tool.cue --
 package p
 

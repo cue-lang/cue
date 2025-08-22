@@ -3186,7 +3186,7 @@ func TestMarshalJSON(t *testing.T) {
 	}, {
 		// Issue #326
 		value: `x: "\(string)": "v"`,
-		err:   `x: key value of dynamic field must be concrete, found _|_(invalid interpolation: x: non-concrete value string (type string)) (and 1 more errors)`,
+		err:   `cue: marshal error: key value of dynamic field must be concrete, found _|_(invalid interpolation: x: non-concrete value string (type string))`,
 	}, {
 		// Issue #326
 		value: `x: "\(bool)": "v"`,
@@ -3895,10 +3895,10 @@ func checkFailed(t *testing.T, err error, str, name string) bool {
 	if err != nil {
 		got := err.Error()
 		if str == "" {
-			t.Fatalf(`err:%s: got %q; want ""`, name, got)
+			t.Fatalf("err:%s:\ngot %q\nwant %q", name, got, "")
 		}
 		if !strings.Contains(got, str) {
-			t.Errorf(`err:%s: got %q; want %q`, name, got, str)
+			t.Errorf("err:%s:\ngot %q\nwant %q", name, got, str)
 		}
 		return false
 	}

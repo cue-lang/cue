@@ -539,7 +539,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: $id URI may not contain a fragment (and 3 more errors)"
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=https://cue.jsonschema.invalid#foo: anchors (foo) not supported (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -582,7 +582,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: $id URI may not contain a fragment (and 3 more errors)"
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/nested.json#foo: anchors (foo) not supported (and 1 more errors)"
 		},
 		"tests": [
 			{

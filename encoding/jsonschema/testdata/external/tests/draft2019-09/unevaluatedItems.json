@@ -807,7 +807,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -858,7 +858,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -919,7 +919,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 7 more errors)"
+			"v3": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
 			{

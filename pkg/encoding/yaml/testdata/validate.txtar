@@ -119,4 +119,4 @@ validatePartial: {
 		ok2: "'foo'"
 	}
 }
-invalidDisjuntion: _|_ // invalidDisjuntion: error in call to encoding/yaml.Validate: invalidDisjuntion.a: 2 errors in empty disjunction: (and 2 more errors)
+invalidDisjuntion: _|_ // error in call to encoding/yaml.Validate

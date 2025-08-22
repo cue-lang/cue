@@ -150,7 +150,7 @@ validate: {
 		schema: {
 			a: 1 | 2
 		}
-		result: _|_ // validate.invalidDisjuntion.result: error in call to encoding/json.Validate: validate.invalidDisjuntion.result.a: 2 errors in empty disjunction: (and 2 more errors)
+		result: _|_ // error in call to encoding/json.Validate
 	}
 
 	// Issue #2395

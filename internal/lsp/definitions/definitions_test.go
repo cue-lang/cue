@@ -146,8 +146,7 @@ y: a.b
 `,
 			expectations: map[*position][]*position{
 				ln(1, 1, "a"): {ln(5, 1, "a")},
-				// This is wrong: the following should be present
-				// ln(1, 1, "b"): {ln(3, 1, "b"), ln(4, 1, "b")},
+				ln(1, 1, "b"): {ln(3, 1, "b"), ln(4, 1, "b")},
 
 				ln(5, 1, "c"): {ln(3, 1, "c")},
 				ln(5, 1, "d"): {ln(4, 1, "d")},

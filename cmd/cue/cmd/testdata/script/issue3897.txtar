@@ -8,9 +8,8 @@ cmp stderr want-stderr
 stderr 'command\.tc3: no tasks found'
 
 -- want-stderr --
-command.tc2: invalid interpolation: non-concrete value string (type string):
+command.tc2: key value of dynamic field must be concrete, found _|_(invalid interpolation: command.tc2: non-concrete value string (type string)):
     ./p_tool.cue:11:2
-    ./p_tool.cue:5:8
 -- p_tool.cue --
 package p
 

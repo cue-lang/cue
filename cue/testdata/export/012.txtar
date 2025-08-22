@@ -22,6 +22,27 @@ Retain: 0
 Unifications: 3
 Conjuncts:    12
 Disjuncts:    7
+-- out/evalalpha --
+(struct){
+  a: ((int|string)){ |(*(string){ "foo" }, *(string){ "bar" }, *(string){ string }, (int){ int }) }
+  b: (_|_){
+    // [incomplete] b: unresolved disjunction *"foo" | *"bar" | *string | int (type (int|string)):
+    //     ./in.cue:1:41
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,7 +1,7 @@
+ (struct){
+   a: ((int|string)){ |(*(string){ "foo" }, *(string){ "bar" }, *(string){ string }, (int){ int }) }
+   b: (_|_){
+-    // [incomplete] b: non-concrete slice subject a:
++    // [incomplete] b: unresolved disjunction *"foo" | *"bar" | *string | int (type (int|string)):
+     //     ./in.cue:1:41
+   }
+ }
 -- out/eval --
 (struct){
   a: ((int|string)){ |(*(string){ "foo" }, *(string){ "bar" }, *(string){ string }, (int){ int }) }

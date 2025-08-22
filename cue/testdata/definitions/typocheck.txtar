@@ -1863,7 +1863,7 @@ Result:
       patch: (list){
       }
       output: (_|_){
-        // [incomplete] full.#JSONPatch.output: cannot reference optional field: namespace:
+        // [incomplete] full.#JSONPatch.output: key value of dynamic field must be concrete, found _|_(full.#JSONPatch.output: cannot reference optional field: namespace):
         //     ./large.cue:21:24
       }
     }
@@ -2728,6 +2728,15 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
+@@ -1305,7 +1172,7 @@
+       patch: (list){
+       }
+       output: (_|_){
+-        // [incomplete] full.#JSONPatch.output: cannot reference optional field: namespace:
++        // [incomplete] full.#JSONPatch.output: key value of dynamic field must be concrete, found _|_(full.#JSONPatch.output: cannot reference optional field: namespace):
+         //     ./large.cue:21:24
+       }
+     }
 @@ -1320,38 +1187,11 @@
      #Main: (#struct){
        namespace: (string){ string }

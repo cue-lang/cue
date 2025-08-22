@@ -99,9 +99,12 @@ t35: error in call to list.Slice: slice bounds out of range:
     ./in.cue:37:6
 t36: error in call to list.Slice: slice bounds out of range:
     ./in.cue:38:6
-t40: error in call to list.Sort: 2 errors in empty disjunction::
+t40: error in call to list.Sort: conflicting values number and {b:2} (mismatched types number and struct):
     ./in.cue:46:6
-    list:13:9
+    ./in.cue:46:25
+    list:8:13
+    list:10:9
+    list:11:9
 t42: invalid list element 0 in argument 0 to call: cannot use value 1 (int) as string:
     ./in.cue:48:6
     ./in.cue:48:24
@@ -109,9 +112,12 @@ t45: cannot use "foo" (type string) as list in argument 1 to list.Sum:
     ./in.cue:51:15
 t49: error in call to list.Take: negative index:
     ./in.cue:55:6
-t54: error in call to list.Sort: 2 errors in empty disjunction::
+t54: error in call to list.Sort: conflicting values number and {b:2} (mismatched types number and struct):
     ./in.cue:60:6
-    list:13:9
+    ./in.cue:60:25
+    list:8:13
+    list:10:9
+    list:11:9
 
 Result:
 t1: 2.5

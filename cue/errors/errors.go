@@ -401,16 +401,7 @@ func (p list) sanitize() list {
 // other errors are sorted by error message, and before any *posError
 // entry.
 func (p list) sort() {
-	slices.SortFunc(p, func(a, b Error) int {
-		if c := comparePosWithNoPosFirst(a.Position(), b.Position()); c != 0 {
-			return c
-		}
-		if c := slices.Compare(a.Path(), b.Path()); c != 0 {
-			return c
-		}
-		return cmp.Compare(a.Error(), b.Error())
-
-	})
+	slices.SortFunc(p, cmpError)
 }
 
 // removeMultiples sorts a list and removes all but the first error per line.
@@ -419,9 +410,30 @@ func (p *list) removeMultiples() {
 	*p = slices.CompactFunc(*p, approximateEqual)
 }
 
+func cmpError(a, b Error) int {
+	aPos, bPos := a.Position(), b.Position()
+	if c := comparePosWithNoPosFirst(aPos, bPos); c != 0 {
+		return c
+	}
+	if c := slices.Compare(a.Path(), b.Path()); c != 0 {
+		return c
+	}
+	aErr, bErr := a.Error(), b.Error()
+	if aPos == token.NoPos || bPos == token.NoPos {
+		return cmp.Compare(aErr, bErr)
+	}
+	// The errors are approximately equal. That means we're going
+	// to throw away one of them. Sort longer error messages first
+	// so that when one message contains another, we'll at least
+	// be guaranteed to keep the longer (most informative) error.
+	if c := cmp.Compare(len(aErr), len(bErr)); c != 0 {
+		return -c
+	}
+	return cmp.Compare(aErr, bErr)
+}
+
 func approximateEqual(a, b Error) bool {
-	aPos := a.Position()
-	bPos := b.Position()
+	aPos, bPos := a.Position(), b.Position()
 	if aPos == token.NoPos || bPos == token.NoPos {
 		return a.Error() == b.Error()
 	}
@@ -446,7 +458,11 @@ func (p list) Msg() (format string, args []interface{}) {
 	case 0:
 		return "no errors", nil
 	case 1:
-		return p[0].Msg()
+		// Note: this is _not_ the same as returning p[0].Msg()
+		// because the message does not necessarily include
+		// as much information as p[0].Error() which will be invoked
+		// by %s.
+		return "%s", []any{p[0]}
 	}
 	return "%s (and %d more errors)", []interface{}{p[0], len(p) - 1}
 }

@@ -45,7 +45,7 @@ diff old new
  }
  
  clusters: [_]: #cluster
--- out/trim-v3-noshare --
+-- out/trim --
 == a.cue
 #IPPool: {
 	cidr: string
@@ -56,35 +56,6 @@ diff old new
 	IPPool: #IPPool & {
 		cidr: podCIDR
 	}
-}
-
-clusters: [_]: #cluster
-
-clusters: vagrant: podCIDR: "abc"
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -5,7 +5,9 @@
- 
- #cluster: {
- 	podCIDR: string
--	IPPool: #IPPool & {}
-+	IPPool: #IPPool & {
-+		cidr: podCIDR
-+	}
- }
- 
- clusters: [_]: #cluster
--- out/trim --
-== a.cue
-#IPPool: {
-	cidr: string
-}
-
-#cluster: {
-	podCIDR: string
-	IPPool: #IPPool & {}
 }
 
 clusters: [_]: #cluster

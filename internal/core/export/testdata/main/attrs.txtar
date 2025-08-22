@@ -643,11 +643,11 @@ Reordering of attributes.
 			@decl1()
 		}
 		b: {
-			@decl1(), @decl2()
+			@decl2(), @decl1()
 			x: 1
 		}
 		c: {
-			@decl1(), @decl2()
+			@decl2(), @decl1()
 		}
 		d: {
 			@decl2(), @decl1()
@@ -708,11 +708,11 @@ Reordering of attributes.
 			@decl1()
 		}
 		b: {
-			@decl1(), @decl2()
+			@decl2(), @decl1()
 			x: 1
 		}
 		c: {
-			@decl1(), @decl2()
+			@decl2(), @decl1()
 		}
 		d: {
 			@decl2(), @decl1()

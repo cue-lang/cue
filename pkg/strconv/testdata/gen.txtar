@@ -224,8 +224,42 @@ t3: cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat:
     ./in.cue:5:31
 t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat:
     ./in.cue:6:31
-t16: strconv.Atoi: parsing "invalid": invalid syntax:
-    ./in.cue:22:5
+t16: error in call to strconv.Atoi: strconv.Atoi: parsing "invalid": invalid syntax:
+    ./in.cue:19:6
+t18: error in call to strconv.ParseInt: strconv.ParseInt: parsing "128": value out of range:
+    ./in.cue:22:6
+t20: error in call to strconv.ParseInt: strconv.ParseInt: parsing "-129": value out of range:
+    ./in.cue:24:6
+t22: error in call to strconv.ParseInt: strconv.ParseInt: parsing "256": value out of range:
+    ./in.cue:26:6
+t25: error in call to strconv.ParseInt: strconv.ParseInt: parsing "7": value out of range:
+    ./in.cue:29:6
+t26: error in call to strconv.ParseInt: strconv.ParseInt: parsing "4": value out of range:
+    ./in.cue:30:6
+t28: error in call to strconv.ParseInt: strconv.ParseInt: parsing "-5": value out of range:
+    ./in.cue:32:6
+t30: error in call to strconv.ParseInt: strconv.ParseInt: parsing "FF": value out of range:
+    ./in.cue:34:6
+t31: error in call to strconv.ParseInt: strconv.ParseInt: parsing "100": value out of range:
+    ./in.cue:35:6
+t32: error in call to strconv.ParseInt: strconv.ParseInt: parsing "invalid": invalid syntax:
+    ./in.cue:36:6
+t33: error in call to strconv.ParseInt: strconv.ParseInt: parsing "123": value out of range:
+    ./in.cue:37:6
+t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range:
+    ./in.cue:40:6
+t38: error in call to strconv.ParseUint: strconv.ParseUint: parsing "512": value out of range:
+    ./in.cue:43:6
+t42: error in call to strconv.ParseUint: strconv.ParseUint: parsing "8": value out of range:
+    ./in.cue:47:6
+t44: error in call to strconv.ParseUint: strconv.ParseUint: parsing "100": value out of range:
+    ./in.cue:49:6
+t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax:
+    ./in.cue:50:6
+t46: error in call to strconv.ParseUint: strconv.ParseUint: parsing "123": value out of range:
+    ./in.cue:51:6
+t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range:
+    ./in.cue:52:6
 
 Result:
 t1:  "40"
@@ -238,12 +272,31 @@ t7:  "40"
 t8:  "170141183460469231731687303715884105728"
 t9:  "Z"
 t10: "0"
+// Test Atoi with large integers
 t11: 2000000000000
 t12: 40000000000000000000
 t13: 170141183460469231731687303715884105728
 t14: -170141183460469231731687303715884105728
 t15: 123
-t16: _|_ // t16: strconv.Atoi: parsing "invalid": invalid syntax
+t16: _|_ // t16: error in call to strconv.Atoi: strconv.Atoi: parsing "invalid": invalid syntax
+// Test ParseInt with various bit widths
+t17: 127
+t18: _|_ // t18: error in call to strconv.ParseInt: strconv.ParseInt: parsing "128": value out of range
+t19: -128
+t20: _|_ // t20: error in call to strconv.ParseInt: strconv.ParseInt: parsing "-129": value out of range
+t21: 255
+t22: _|_ // t22: error in call to strconv.ParseInt: strconv.ParseInt: parsing "256": value out of range
+t23: 1000
+t24: 999999999999999999999999999999
+t25: _|_ // t25: error in call to strconv.ParseInt: strconv.ParseInt: parsing "7": value out of range
+t26: _|_ // t26: error in call to strconv.ParseInt: strconv.ParseInt: parsing "4": value out of range
+t27: -4
+t28: _|_ // t28: error in call to strconv.ParseInt: strconv.ParseInt: parsing "-5": value out of range
+t29: 21
+t30: _|_ // t30: error in call to strconv.ParseInt: strconv.ParseInt: parsing "FF": value out of range
+t31: _|_ // t31: error in call to strconv.ParseInt: strconv.ParseInt: parsing "100": value out of range
+t32: _|_ // t32: error in call to strconv.ParseInt: strconv.ParseInt: parsing "invalid": invalid syntax
+t33: _|_ // t33: error in call to strconv.ParseInt: strconv.ParseInt: parsing "123": value out of range
 // Test ParseUint with various bit widths
 t34: 255
 t35: _|_ // t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range

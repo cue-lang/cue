@@ -124,6 +124,8 @@ line  reference                                               path of resulting 
 14:   q                                                    => q
 15:   {out: q}.out.x                                       => q.x
 18:   q                                                    => q
+18:   {out: r: q}.out                                      => **non-rooted**
+19:   {out: r: c}.out                                      => **non-rooted**
 20:   {out: r: q}.out.r.x                                  => q.x
 21:   {out: {out: r: q}.out}.out.r.x                       => q.x
 22:   {out: {out: r: q}.out.r}.out.x                       => q.x
@@ -145,7 +147,7 @@ line  reference                                               path of resulting 
 108:  strings.Split                                        => "strings".Split
 93:   (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result => #g.result
 113:  msg                                                  => msg
-110:  (extIf & {}).env                                     => extIf.env
+110:  (extIf & {}).env                                     => msg
 -- out/dependencies/dynamic --
 line  reference                          path of resulting vertex
 8:    [c][0]                          => a.b.c
@@ -154,7 +156,9 @@ line  reference                          path of resulting vertex
 13:   {out: q}.out                    => q
 14:   {out: q}.out                    => q
 15:   {out: q}.out.x                  => q.x
+17:   {out: r: s: string}.out         => **non-rooted**
 18:   {out: {out: r: q}.out}.out.r    => q
+18:   {out: r: q}.out                 => **non-rooted**
 19:   {out: {out: r: c}.out}.out.r[0] => a.b.c[0]
 20:   {out: r: q}.out.r.x             => q.x
 21:   {out: {out: r: q}.out}.out.r.x  => q.x
@@ -171,12 +175,16 @@ line  reference                          path of resulting vertex
       out:   other
       other: s // should appear in output
 }.out => s
-45:   regexp.FindNamedSubmatch                             => "regexp".FindNamedSubmatch
-45:   msg                                                  => msg
-51:   regexp.FindNamedSubmatch                             => "regexp".FindNamedSubmatch
-51:   msg                                                  => msg
-57:   regexp.FindNamedSubmatch                             => "regexp".FindNamedSubmatch
-57:   msg                                                  => msg
+45:   regexp.FindNamedSubmatch => "regexp".FindNamedSubmatch
+45:   msg                      => msg
+51:   regexp.FindNamedSubmatch => "regexp".FindNamedSubmatch
+51:   msg                      => msg
+57:   regexp.FindNamedSubmatch => "regexp".FindNamedSubmatch
+57:   msg                      => msg
+62:   {
+      person: strings.ToUpper(msg) // do not report msg
+      out:    "foo"
+}.out => **non-rooted**
 106:  strings.Join                                         => "strings".Join
 106:  strings.Split                                        => "strings".Split
 78:   runs.t1.stdout                                       => a.b.t1.runs.t1.stdout
@@ -186,4 +194,4 @@ line  reference                          path of resulting vertex
 108:  strings.Split                                        => "strings".Split
 93:   (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result => #g.result
 113:  msg                                                  => msg
-110:  (extIf & {}).env                                     => extIf.env
+110:  (extIf & {}).env                                     => msg

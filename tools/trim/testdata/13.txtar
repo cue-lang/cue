@@ -14,17 +14,6 @@ diff old new
  == a.cue
 -x: {a: bool, b: string, ...} & {a: true, b: "hi"}
 +x: _ & {a: true, b: "hi"}
--- out/trim-v3-noshare --
-== a.cue
-x: _ & {a: true, b: "hi"}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,2 +1,2 @@
- == a.cue
--x: {a: bool, b: string, ...} & {a: true, b: "hi"}
-+x: _ & {a: true, b: "hi"}
 -- out/trim --
 == a.cue
-x: {a: bool, b: string, ...} & {a: true, b: "hi"}
+x: _ & {a: true, b: "hi"}

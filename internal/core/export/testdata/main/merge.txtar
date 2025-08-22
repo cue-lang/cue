@@ -71,10 +71,10 @@ Reordering.
 [#F]
 [#G]
 [#B]
-[#B #a]
 [#B #def]
 [#B #f]
 [#B #bar]
+[#B #a]
 -- out/value --
 == Simplified
 {}

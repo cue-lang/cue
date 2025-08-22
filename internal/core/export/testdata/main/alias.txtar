@@ -690,7 +690,7 @@ Reorderings?
 		}
 		selfRefValue: {
 			struct: {
-				a: _|_ // cycle error
+				a: _|_ // valueAlias.selfRefValue.struct.a: incomplete list: _ (and 1 more errors)
 			}
 			pattern: {
 				a: {}

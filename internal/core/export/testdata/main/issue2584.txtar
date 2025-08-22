@@ -50,7 +50,6 @@ in the new evaluator. This is probably for the better.
 [F1 sub1]
 [F1 sub1 sub2]
 [F2]
-[F2 _]
 [D]
 [L]
 -- out/value-v3 --
@@ -171,7 +170,7 @@ Seemingly benign change in error message.
 			sub2: {}
 		}
 	}
-	F2: _|_ // F2: invalid non-ground value string (must be concrete string)
+	F2: _|_ // F2: key value of dynamic field must be concrete, found string
 	D: {}
 }
 == All

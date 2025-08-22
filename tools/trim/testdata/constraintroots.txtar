@@ -168,7 +168,7 @@ diff old new
 +
  	deployment: [string]: spec: []
  }
--- out/trim-v3-noshare --
+-- out/trim --
 == in.cue
 keepPatternConstraintRoot: {
 	if true {
@@ -218,113 +218,6 @@ keepPatternConstraintRootDef: {
 	#Deployment: spec: []
 
 	deployment: name: #Deployment
-
-	deployment: [string]: spec: []
-}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,8 +1,10 @@
- == in.cue
- keepPatternConstraintRoot: {
- 	if true {
--		deployment: "name": {spec: []}
--	}
-+		deployment: "name": _
-+	}
-+
-+	deployment: _
- 
- 	deployment: [string]: spec: []
- }
-@@ -9,8 +11,10 @@
- 
- keepAdditionalRoots: {
- 	if true {
--		deployment: "name": {spec: [1]}
--	}
-+		deployment: "name": _
-+	}
-+
-+	deployment: _
- 
- 	deployment: [string]: spec: [1]
- }
-@@ -17,7 +21,7 @@
- 
- keepPatternConstraintRootSolo: {
- 	if true {
--		deployment: "name": {spec: [1]}
-+		deployment: "name": _
- 	}
- 
- 	deployment: [string]: spec: [1]
-@@ -28,6 +32,8 @@
- 		deployment: "name": {spec: []}
- 	}
- 
-+	deployment: name: spec: []
-+
- 	deployment: indirect
- 
- 	indirect: {{[string]: spec: []}}
-@@ -35,10 +41,12 @@
- 
- keepPatternConstraintRootDef: {
- 	if true {
--		deployment: "name": {spec: []}
-+		deployment: "name": _
- 	}
- 
- 	#Deployment: spec: []
- 
-+	deployment: name: #Deployment
-+
- 	deployment: [string]: spec: []
- }
--- out/trim --
-== in.cue
-keepPatternConstraintRoot: {
-	if true {
-		deployment: "name": {spec: []}
-	}
-
-	deployment: [string]: spec: []
-}
-
-keepAdditionalRoots: {
-	if true {
-		deployment: "name": {spec: [1]}
-	}
-
-	deployment: [string]: spec: [1]
-}
-
-keepPatternConstraintRootSolo: {
-	if true {
-		deployment: "name": {spec: [1]}
-	}
-
-	deployment: [string]: spec: [1]
-}
-
-keepPatternConstraintRootIndirect: {
-	if true {
-		deployment: "name": {spec: []}
-	}
-
-	deployment: indirect
-
-	indirect: {{[string]: spec: []}}
-}
-
-keepPatternConstraintRootDef: {
-	if true {
-		deployment: "name": {spec: []}
-	}
-
-	#Deployment: spec: []
 
 	deployment: [string]: spec: []
 }

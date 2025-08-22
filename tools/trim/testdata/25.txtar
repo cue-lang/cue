@@ -24,7 +24,7 @@ if x == 5 {
 	y: "hi"
 }
 x: 5
--- out/trim-v3-noshare --
+-- out/trim --
 == a.cue
 if x == 5 {
 	y: "hi"

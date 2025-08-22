@@ -41,7 +41,7 @@ diff old new
  }
  a: #def1 & {
  	in1: "test"
--- out/trim-v3-noshare --
+-- out/trim --
 == a.cue
 #def2: {
 	in2: string
@@ -51,33 +51,6 @@ diff old new
 	out: #def2 & {
 		in2: in1
 	}
-}
-a: #def1 & {
-	in1: "test"
-}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -4,7 +4,9 @@
- }
- #def1: {
- 	in1: string
--	out: #def2 & {}
-+	out: #def2 & {
-+		in2: in1
-+	}
- }
- a: #def1 & {
- 	in1: "test"
--- out/trim --
-== a.cue
-#def2: {
-	in2: string
-}
-#def1: {
-	in1: string
-	out: #def2 & {}
 }
 a: #def1 & {
 	in1: "test"

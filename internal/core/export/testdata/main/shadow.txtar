@@ -562,11 +562,11 @@ diff old new
 +_|_ // shadowRef.e1.x.x: structural cycle
 -- out/value --
 == Simplified
-_|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
+_|_ // shadowRef.e1.x.x: structural cycle
 == Raw
-_|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
+_|_ // shadowRef.e1.x.x: structural cycle
 == Final
-_|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
+_|_ // shadowRef.e1.x.x: structural cycle
 == All
 {
 	shadowRef: {
@@ -604,7 +604,7 @@ _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 		}
 		e1: {
 			x: {
-				x: _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
+				x: _|_ // shadowRef.e1.x.x: structural cycle
 			}
 		}
 	}
@@ -702,4 +702,4 @@ _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 	}
 }
 == Eval
-_|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
+_|_ // shadowRef.e1.x.x: structural cycle

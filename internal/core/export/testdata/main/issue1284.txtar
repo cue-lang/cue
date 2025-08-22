@@ -139,11 +139,11 @@ diff old new
 Slightly changed error messages.
 -- out/value --
 == Simplified
-_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
+_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
 == Raw
-_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
+_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
 == Final
-_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
+_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
 == All
 {
 	a0: {
@@ -153,7 +153,7 @@ _|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and 
 		l: ["a", "b", ...]
 	}
 	a2: {
-		l: _|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
+		l: _|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
 	}
 	a3: {
 		l: ["a", "b", ...]
@@ -167,4 +167,4 @@ _|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and 
 	}
 }
 == Eval
-_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
+_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)

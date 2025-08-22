@@ -39,8 +39,8 @@ reordering
 [#LineConfig]
 [#LineConfig lineColor]
 [#GraphFieldConfig]
-[#GraphFieldConfig lineColor]
 [#GraphFieldConfig drawStyle]
+[#GraphFieldConfig lineColor]
 -- out/value --
 == Simplified
 {}

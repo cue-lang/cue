@@ -24,23 +24,8 @@ diff old new
  #b: ({x: 5} | {x: 7}) & #a
 -out: #b & {}
 +out: #b & {x: 5}
--- out/trim-v3-noshare --
-== a.cue
-#a: x: int
-#b: ({x: 5} | {x: 7}) & #a
-out: #b & {x: 5}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,4 +1,4 @@
- == a.cue
- #a: x: int
- #b: ({x: 5} | {x: 7}) & #a
--out: #b & {}
-+out: #b & {x: 5}
 -- out/trim --
 == a.cue
 #a: x: int
 #b: ({x: 5} | {x: 7}) & #a
-out: #b & {}
+out: #b & {x: 5}

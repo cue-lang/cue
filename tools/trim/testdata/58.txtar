@@ -20,23 +20,8 @@ diff old new
  y: z:        6
 -x: a: {}
 +x: a:        _
--- out/trim-v3-noshare --
-== a.cue
-x: [string]: y
-y: z:        6
-x: a:        _
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,4 +1,4 @@
- == a.cue
- x: [string]: y
- y: z:        6
--x: a: {}
-+x: a:        _
 -- out/trim --
 == a.cue
 x: [string]: y
 y: z:        6
-x: a: {}
+x: a:        _

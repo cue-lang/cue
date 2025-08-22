@@ -82,7 +82,7 @@ _schema: {
 
 	#: "jsone-value": matchN(1, [_schema, [..._schema]])
 }
--- out/decode-v3-noshare/extract --
+-- out/decode/extract --
 // JSON-e templates
 @jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
 _schema

@@ -35,7 +35,7 @@ Resources: [Platform=string]: {
 }
 
 Resources: myplatform: {}
--- out/trim-v3-noshare --
+-- out/trim --
 == a.cue
 #ClusterResource: X_Platform: string
 #NamespacedResource: {

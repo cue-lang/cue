@@ -52,23 +52,20 @@ func (t *M) Runtime() *runtime.Runtime {
 	return (*runtime.Runtime)(t.CueContext())
 }
 
-// TODO(mvdan): the default should now be evalv3.
-// We keep it to be v2 for now, as a lot of tests still assume the evalv2 output
-// is the "golden output". We will phase that out incrementally.
-const DefaultVersion = "v2"
+const DefaultVersion = "v3"
 
 type Matrix []M
 
 var (
 	evalv3 = M{
 		name:     "v3",
-		fallback: "v2",
+		fallback: "v3",
 		version:  internal.EvalV3,
 		Flags:    cuedebug.Config{Sharing: true},
 	}
 	evalv3NoShare = M{
 		name:     "v3-noshare",
-		fallback: "v2",
+		fallback: "v3",
 		version:  internal.EvalV3,
 	}
 )

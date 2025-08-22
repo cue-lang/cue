@@ -972,7 +972,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1023,7 +1023,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1087,7 +1087,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 7 more errors)"
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
 			{
@@ -1771,7 +1771,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1936,7 +1936,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 3 more errors)"
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{

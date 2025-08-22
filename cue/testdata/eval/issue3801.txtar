@@ -203,7 +203,7 @@ Disjuncts:    373
           patch: (list){
           }
           output: (_|_){
-            // [incomplete] issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace:
+            // [incomplete] issue3801.let.full.#JSONPatch.output: key value of dynamic field must be concrete, found _|_(issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace):
             //     ./nested.cue:43:24
           }
         }
@@ -336,7 +336,7 @@ Disjuncts:    373
           namespace?: (string){ string }
           patch: (_){ _ }
           output: (_|_){
-            // [incomplete] issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace:
+            // [incomplete] issue3801.nonRooted.full.#SubOutput.output: key value of dynamic field must be concrete, found _|_(issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace):
             //     ./nested.cue:88:12
           }
         }
@@ -362,6 +362,15 @@ diff old new
                  //     ./nested.cue:29:25
                  //     ./nested.cue:25:12
                }
+@@ -57,7 +57,7 @@
+           patch: (list){
+           }
+           output: (_|_){
+-            // [incomplete] issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace:
++            // [incomplete] issue3801.let.full.#JSONPatch.output: key value of dynamic field must be concrete, found _|_(issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace):
+             //     ./nested.cue:43:24
+           }
+         }
 @@ -72,38 +72,11 @@
          #Main: (#struct){
            namespace: (string){ string }
@@ -460,6 +469,15 @@ diff old new
            ns1: (string){ "foo" }
          }
          #SubOutput: (#struct){
+@@ -205,7 +190,7 @@
+           namespace?: (string){ string }
+           patch: (_){ _ }
+           output: (_|_){
+-            // [incomplete] issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace:
++            // [incomplete] issue3801.nonRooted.full.#SubOutput.output: key value of dynamic field must be concrete, found _|_(issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace):
+             //     ./nested.cue:88:12
+           }
+         }
 -- out/eval --
 (struct){
   issue3801: (struct){

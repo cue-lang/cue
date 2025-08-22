@@ -34,7 +34,7 @@
 			]
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 3 more errors)"
+			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{

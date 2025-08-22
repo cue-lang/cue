@@ -134,6 +134,41 @@ out2: z.f
 		},
 
 		{
+			name: "Pointer_Chasing_Forwards_and_Back",
+			archive: `-- a.cue --
+x: a.b
+
+c: b: 5
+d: b: int
+a: c & d
+
+y: a.b
+`,
+			expectations: map[*position][]*position{
+				ln(1, 1, "a"): {ln(5, 1, "a")},
+				// This is wrong: the following should be present
+				// ln(1, 1, "b"): {ln(3, 1, "b"), ln(4, 1, "b")},
+
+				ln(5, 1, "c"): {ln(3, 1, "c")},
+				ln(5, 1, "d"): {ln(4, 1, "d")},
+
+				ln(7, 1, "a"): {ln(5, 1, "a")},
+				ln(7, 1, "b"): {ln(3, 1, "b"), ln(4, 1, "b")},
+
+				ln(1, 1, "x"): {self},
+
+				ln(3, 1, "c"): {self},
+				ln(3, 1, "b"): {self},
+
+				ln(4, 1, "d"): {self},
+				ln(4, 1, "b"): {self},
+
+				ln(5, 1, "a"): {self},
+				ln(7, 1, "y"): {self},
+			},
+		},
+
+		{
 			name: "Embedding",
 			archive: `-- a.cue --
 x: y: z: 3

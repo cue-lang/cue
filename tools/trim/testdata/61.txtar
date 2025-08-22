@@ -19,33 +19,8 @@ a: [string]: x: y: z: 5
 b: w: _
 b: a
 a: [string]: x: y: z: 5
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,4 +1,4 @@
- == a.cue
--b: w: {}
-+b: w: _
- b: a
- a: [string]: x: y: z: 5
--- out/trim-v3-noshare --
-== a.cue
-b: w: _
-b: a
-a: [string]: x: y: z: 5
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,4 +1,4 @@
- == a.cue
--b: w: {}
-+b: w: _
- b: a
- a: [string]: x: y: z: 5
 -- out/trim --
 == a.cue
-b: w: {}
+b: w: _
 b: a
 a: [string]: x: y: z: 5

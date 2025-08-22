@@ -43,12 +43,6 @@ import (
 	"golang.org/x/tools/txtar"
 )
 
-// We are removing any references to evalv2 in the testing infrastructure.
-// However, in the evaluator test, we will keep the evalv2 outputs around for
-// a while to be able to compare the outputs of the two versions.
-// TODO: at some point we should promote evalv3 to the default version.
-const EvalV2 = "v2"
-
 // A TxTarTest represents a test run that process all CUE tests in the txtar
 // format rooted in a given directory. See the [Test] documentation for
 // more details.
@@ -357,11 +351,11 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 		test := *x
 		if s := m.Fallback(); s != "" {
 			test.Fallback = test.Name
-			if s != "v2" {
+			if s != cuetdtest.DefaultVersion {
 				test.Fallback += "-" + s
 			}
 		}
-		if s := m.Name(); s != "v2" {
+		if s := m.Name(); s != cuetdtest.DefaultVersion {
 			test.Name += "-" + s
 		}
 		test.run(t, m, func(tc *Test) {
@@ -521,6 +515,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			// Record ordering of files in the archive to preserve that ordering
 			// later.
 			ordering := maps.Clone(index)
+			diffUsed := make(map[string]bool)
 
 			// Add diff files between fallback and main file. These are added
 			// as regular output files so that they can be updated as well.
@@ -550,7 +545,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 							buf:  bytes.NewBuffer(diff),
 							diff: true,
 						})
-
+						diffUsed[diffName] = true
 					default:
 						// Only update file if anything changes.
 						if _, ok := index[sub.name]; ok {
@@ -634,6 +629,13 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				}
 			}
 			a.Files = files
+			a.Files = slices.DeleteFunc(a.Files, func(f txtar.File) bool {
+				rm := strings.HasPrefix(f.Name, "diff/") && strings.Contains(f.Name, "<==>") && !diffUsed[f.Name]
+				if rm {
+					update = true
+				}
+				return rm
+			})
 
 			if update {
 				slices.SortStableFunc(a.Files, func(i, j txtar.File) int {

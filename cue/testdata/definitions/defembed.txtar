@@ -49,45 +49,6 @@ Result:
     b: (int){ 1 }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,6 @@
- Errors:
- a.c: field not allowed:
--    ./in.cue:1:4
--    ./in.cue:2:2
-     ./in.cue:5:4
--    ./in.cue:7:5
- 
- Result:
- (_|_){
-@@ -10,22 +7,19 @@
-   // [eval]
-   a: (_|_){
-     // [eval]
--    b: (int){ 1 }
-     c: (_|_){
-       // [eval] a.c: field not allowed:
--      //     ./in.cue:1:4
--      //     ./in.cue:2:2
-       //     ./in.cue:5:4
--      //     ./in.cue:7:5
-     }
-+    b: (int){ 1 }
-   }
-   #A: (#struct){
-     b: (int){ 1 }
-   }
-   b: (#struct){
--    b: (int){ 1 }
-     leaf: (string){ "leaf value" }
-     interpolation: (string){ "more leaf value" }
-     leaf_ref: (string){ "leaf value" }
-+    b: (int){ 1 }
-   }
- }
 -- diff/todo/p2 --
 Missing positions / reordering.
 -- out/eval --

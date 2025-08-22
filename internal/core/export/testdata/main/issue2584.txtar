@@ -30,17 +30,6 @@ D: {}
 [F2]
 [D]
 [L]
--- diff/-out/doc-v3<==>+out/doc --
-diff old new
---- old
-+++ new
-@@ -3,6 +3,5 @@
- [F1 sub1]
- [F1 sub1 sub2]
- [F2]
--[F2 _]
- [D]
- [L]
 -- diff/doc/explanation --
 An incomplete dynamic field does not manifest itself as an invalid field
 in the new evaluator. This is probably for the better.
@@ -50,7 +39,6 @@ in the new evaluator. This is probably for the better.
 [F1 sub1]
 [F1 sub1 sub2]
 [F2]
-[F2 _]
 [D]
 [L]
 -- out/value-v3 --
@@ -120,19 +108,6 @@ in the new evaluator. This is probably for the better.
 	}
 	D: {}
 }
--- diff/-out/value-v3<==>+out/value --
-diff old new
---- old
-+++ new
-@@ -33,7 +33,7 @@
- 			sub2: {}
- 		}
- 	}
--	F2: _|_ // F2: invalid non-ground value string (must be concrete string)
-+	F2: _|_ // F2: key value of dynamic field must be concrete, found string
- 	D: {}
- }
- == All
 -- diff/value/todo/p2 --
 Seemingly benign change in error message.
 -- out/value --
@@ -171,7 +146,7 @@ Seemingly benign change in error message.
 			sub2: {}
 		}
 	}
-	F2: _|_ // F2: invalid non-ground value string (must be concrete string)
+	F2: _|_ // F2: key value of dynamic field must be concrete, found string
 	D: {}
 }
 == All

@@ -6,25 +6,6 @@ x: {a: bool, b: string, [>"b"]: int} & {a: true, b: "hi"}
 -- out/trim-v3 --
 == a.cue
 x: {[>"b"]: int} & {a: true, b: "hi"}
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,2 +1,2 @@
- == a.cue
--x: {a: bool, b: string, [>"b"]: int} & {a: true, b: "hi"}
-+x: {[>"b"]: int} & {a: true, b: "hi"}
--- out/trim-v3-noshare --
-== a.cue
-x: {[>"b"]: int} & {a: true, b: "hi"}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,2 +1,2 @@
- == a.cue
--x: {a: bool, b: string, [>"b"]: int} & {a: true, b: "hi"}
-+x: {[>"b"]: int} & {a: true, b: "hi"}
 -- out/trim --
 == a.cue
-x: {a: bool, b: string, [>"b"]: int} & {a: true, b: "hi"}
+x: {[>"b"]: int} & {a: true, b: "hi"}

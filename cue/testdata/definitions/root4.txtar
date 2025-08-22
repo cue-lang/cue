@@ -38,40 +38,6 @@ Result:
     //     ./in.cue:5:2
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,5 @@
- Errors:
- notAllowed: field not allowed:
--    ./in.cue:1:1
--    ./in.cue:1:10
--    ./in.cue:2:1
--    ./in.cue:2:11
-     ./in.cue:5:2
- 
- Result:
-@@ -12,18 +8,14 @@
-   #schema: (#struct){
-     a!: (bool){ bool }
-   }
--  a: (bool){ true }
-   _hidden: (struct){
-     a: (bool){ true }
-     notAllowed: (bool){ true }
-   }
-   allowed: (bool){ true }
-+  a: (bool){ true }
-   notAllowed: (_|_){
-     // [eval] notAllowed: field not allowed:
--    //     ./in.cue:1:1
--    //     ./in.cue:1:10
--    //     ./in.cue:2:1
--    //     ./in.cue:2:11
-     //     ./in.cue:5:2
-   }
- }
 -- out/eval --
 Errors:
 notAllowed: field not allowed:

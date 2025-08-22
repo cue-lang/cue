@@ -7,29 +7,8 @@ a: reference "b" not found:
     ./in.cue:1:4
 == in.cue
 a: b
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,2 +1,4 @@
-+a: reference "b" not found:
-+    ./in.cue:1:4
- == in.cue
- a: b
--- out/trim-v3-noshare --
+-- out/trim --
 a: reference "b" not found:
     ./in.cue:1:4
-== in.cue
-a: b
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,2 +1,4 @@
-+a: reference "b" not found:
-+    ./in.cue:1:4
- == in.cue
- a: b
--- out/trim --
 == in.cue
 a: b

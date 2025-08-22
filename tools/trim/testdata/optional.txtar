@@ -35,20 +35,7 @@ a: [{
 b: #B
 b: bb: _ // c can be removed, bb not.
 #B: bb?: c: 2
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -9,6 +9,6 @@
- 
- #A: annotations?: [string]: string
- 
--b:        #B
--b: bb: {} // c can be removed, bb not.
-+b: #B
-+b: bb: _ // c can be removed, bb not.
- #B: bb?: c: 2
--- out/trim-v3-noshare --
+-- out/trim --
 == a.cue
 package pkg
 
@@ -62,32 +49,4 @@ a: [{
 
 b: #B
 b: bb: _ // c can be removed, bb not.
-#B: bb?: c: 2
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -9,6 +9,6 @@
- 
- #A: annotations?: [string]: string
- 
--b:        #B
--b: bb: {} // c can be removed, bb not.
-+b: #B
-+b: bb: _ // c can be removed, bb not.
- #B: bb?: c: 2
--- out/trim --
-== a.cue
-package pkg
-
-a: [...#A]
-
-a: [{
-	annotations: {}
-}]
-
-#A: annotations?: [string]: string
-
-b:        #B
-b: bb: {} // c can be removed, bb not.
 #B: bb?: c: 2

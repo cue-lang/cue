@@ -15,35 +15,9 @@ out: #b & {x: 5}
 #b: ({x: 5} | {x: 7})
 #b: #a
 out: #b & {x: 5}
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -2,4 +2,4 @@
- #a: x: int
- #b: ({x: 5} | {x: 7})
- #b: #a
--out: #b & {}
-+out: #b & {x: 5}
--- out/trim-v3-noshare --
-== a.cue
-#a: x: int
-#b: ({x: 5} | {x: 7})
-#b: #a
-out: #b & {x: 5}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -2,4 +2,4 @@
- #a: x: int
- #b: ({x: 5} | {x: 7})
- #b: #a
--out: #b & {}
-+out: #b & {x: 5}
 -- out/trim --
 == a.cue
 #a: x: int
 #b: ({x: 5} | {x: 7})
 #b: #a
-out: #b & {}
+out: #b & {x: 5}

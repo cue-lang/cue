@@ -34,30 +34,13 @@ line  reference                path of resulting vertex
 14:   X3.w                  => v.w
 7:    v                     => v
 8:    v                     => v
--- diff/-out/dependencies-v3/all<==>+out/dependencies/all --
-diff old new
---- old
-+++ new
-@@ -1,6 +1,6 @@
--line  reference    path of resulting vertex
--12:   X1        => v.w
--13:   X2        => v.w
--14:   X3.w      => v.w
--7:    v         => v
--8:    v         => v
-+line  reference                path of resulting vertex
-+3:    {c: v}.c.w            => v.w
-+4:    {c: {out: v}.out}.c.w => v.w
-+14:   X3.w                  => v.w
-+7:    v                     => v
-+8:    v                     => v
 -- out/dependencies/all --
-line  reference    path of resulting vertex
-12:   X1        => v.w
-13:   X2        => v.w
-14:   X3.w      => v.w
-7:    v         => v
-8:    v         => v
+line  reference                path of resulting vertex
+3:    {c: v}.c.w            => v.w
+4:    {c: {out: v}.out}.c.w => v.w
+14:   X3.w                  => v.w
+7:    v                     => v
+8:    v                     => v
 -- diff/dependencies-v3/todo/p2 --
 bring in line with evalv2
 -- out/dependencies/dynamic --

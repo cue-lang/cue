@@ -450,44 +450,6 @@ dynamicSimple: {
 		b?: "foo" @step(4)
 	}
 }
--- diff/-out/value-v3<==>+out/value --
-diff old new
---- old
-+++ new
-@@ -150,11 +150,11 @@
- 			@decl1()
- 		}
- 		b: {
--			@decl1(), @decl2()
--			x: 1
--		}
--		c: {
--			@decl1(), @decl2()
-+			@decl2(), @decl1()
-+			x: 1
-+		}
-+		c: {
-+			@decl2(), @decl1()
- 		}
- 		d: {
- 			@decl2(), @decl1()
-@@ -215,11 +215,11 @@
- 			@decl1()
- 		}
- 		b: {
--			@decl1(), @decl2()
--			x: 1
--		}
--		c: {
--			@decl1(), @decl2()
-+			@decl2(), @decl1()
-+			x: 1
-+		}
-+		c: {
-+			@decl2(), @decl1()
- 		}
- 		d: {
- 			@decl2(), @decl1()
 -- diff/value/todo/p3 --
 Reordering of attributes.
 -- out/value --
@@ -643,11 +605,11 @@ Reordering of attributes.
 			@decl1()
 		}
 		b: {
-			@decl1(), @decl2()
+			@decl2(), @decl1()
 			x: 1
 		}
 		c: {
-			@decl1(), @decl2()
+			@decl2(), @decl1()
 		}
 		d: {
 			@decl2(), @decl1()
@@ -708,11 +670,11 @@ Reordering of attributes.
 			@decl1()
 		}
 		b: {
-			@decl1(), @decl2()
+			@decl2(), @decl1()
 			x: 1
 		}
 		c: {
-			@decl1(), @decl2()
+			@decl2(), @decl1()
 		}
 		d: {
 			@decl2(), @decl1()

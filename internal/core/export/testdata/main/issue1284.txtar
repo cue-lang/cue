@@ -103,47 +103,15 @@ _|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
 }
 == Eval
 _|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
--- diff/-out/value-v3<==>+out/value --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
- == Simplified
--_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
-+_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
- == Raw
--_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
-+_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
- == Final
--_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
-+_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
- == All
- {
- 	a0: {
-@@ -13,7 +13,7 @@
- 		l: ["a", "b", ...]
- 	}
- 	a2: {
--		l: _|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
-+		l: _|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
- 	}
- 	a3: {
- 		l: ["a", "b", ...]
-@@ -27,4 +27,4 @@
- 	}
- }
- == Eval
--_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
-+_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
 -- diff/value/todo/p2 --
 Slightly changed error messages.
 -- out/value --
 == Simplified
-_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
+_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
 == Raw
-_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
+_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
 == Final
-_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
+_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
 == All
 {
 	a0: {
@@ -153,7 +121,7 @@ _|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and 
 		l: ["a", "b", ...]
 	}
 	a2: {
-		l: _|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
+		l: _|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
 	}
 	a3: {
 		l: ["a", "b", ...]
@@ -167,4 +135,4 @@ _|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and 
 	}
 }
 == Eval
-_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
+_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)

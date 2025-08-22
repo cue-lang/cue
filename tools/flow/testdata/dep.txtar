@@ -182,15 +182,15 @@ graph TD
 	let INDEX = int
 }
 -- out/run/t3/stats --
-Leaks:  1
+Leaks:  3
 Freed:  0
 Reused: 0
-Allocs: 1
-Retain: 1
+Allocs: 3
+Retain: 0
 
 Unifications: 1
 Conjuncts:    1
-Disjuncts:    1
+Disjuncts:    0
 -- out/run/t4 --
 graph TD
   t0("root.a [Terminated]")
@@ -436,12 +436,12 @@ Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
 -- out/run/stats/totals --
-Leaks:  1
+Leaks:  3
 Freed:  0
 Reused: 0
-Allocs: 1
-Retain: 1
+Allocs: 3
+Retain: 0
 
 Unifications: 1
 Conjuncts:    1
-Disjuncts:    1
+Disjuncts:    0

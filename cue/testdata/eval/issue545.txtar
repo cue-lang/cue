@@ -48,29 +48,6 @@ Disjuncts:    16
 Notifications: 3
 
 NumCloseIDs: 22
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,12 @@
- Leaks:  0
--Freed:  121
--Reused: 107
--Allocs: 14
-+Freed:  69
-+Reused: 42
-+Allocs: 27
- Retain: 0
- 
--Unifications: 65
--Conjuncts:    205
--Disjuncts:    121
-+Unifications: 29
-+Conjuncts:    79
-+Disjuncts:    16
-+Notifications: 3
-+
-+NumCloseIDs: 22
 -- out/eval/stats --
 Leaks:  0
 Freed:  121
@@ -118,39 +95,6 @@ Disjuncts:    121
     f: (string){ time.Time() }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -7,21 +7,21 @@
-       source: (string){ |((string){ =~"^http://" }, (string){ !~"^ssh://" }, (string){ strings.MinRunes(3) }) }
-     }
-     foo: (#struct){
--      #HTTP: (string){ =~"^http://" }
--      #SSH: (string){ !~"^ssh://" }
--      #USER: (string){ strings.MinRunes(3) }
-       source: (string){ "http://blablabla" }
-+      #HTTP: (string){ =~"^http://" }
-+      #SSH: (string){ !~"^ssh://" }
-+      #USER: (string){ strings.MinRunes(3) }
-     }
-     bar: (#struct){
--      #HTTP: (string){ =~"^http://" }
--      #SSH: (string){ !~"^ssh://" }
--      #USER: (string){ strings.MinRunes(3) }
-       source: (#struct){
-+        source: (string){ "http://blablabla" }
-         #HTTP: (string){ =~"^http://" }
-         #SSH: (string){ !~"^ssh://" }
-         #USER: (string){ strings.MinRunes(3) }
--        source: (string){ "http://blablabla" }
-       }
-+      #HTTP: (string){ =~"^http://" }
-+      #SSH: (string){ !~"^ssh://" }
-+      #USER: (string){ strings.MinRunes(3) }
-     }
-   }
-   t2: (struct){
 -- diff/todo/p3 --
 Reordering.
 -- out/eval --

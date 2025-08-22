@@ -174,28 +174,6 @@ Result:
   e1: (list){
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,5 +1,6 @@
- Errors:
--e0: incompatible list lengths (1 and 2)
-+e0: incompatible list lengths (1 and 2):
-+    _:1:2
- 
- Result:
- (_|_){
-@@ -34,7 +35,8 @@
-   t1: (list){
-   }
-   e0: (_|_){
--    // [eval] e0: incompatible list lengths (1 and 2)
-+    // [eval] e0: incompatible list lengths (1 and 2):
-+    //     _:1:2
-     0: (struct){
-     }
-     1: (struct){
 -- out/eval --
 Errors:
 e0: incompatible list lengths (1 and 2)

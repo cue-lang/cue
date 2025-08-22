@@ -672,36 +672,6 @@ Disjuncts:    1298
 Notifications: 4
 
 NumCloseIDs: 319
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,13 +1,12 @@
--Leaks:  9
--Freed:  2856
--Reused: 2841
--Allocs: 24
--Retain: 123
--
--Unifications: 1435
--Conjuncts:    4154
--Disjuncts:    2979
--
--MisalignedConjunct: 44
--
--NumCloseIDs: 10
-+Leaks:  28
-+Freed:  2738
-+Reused: 2635
-+Allocs: 131
-+Retain: 0
-+
-+Unifications: 658
-+Conjuncts:    2752
-+Disjuncts:    1298
-+Notifications: 4
-+
-+NumCloseIDs: 319
 -- out/eval/stats --
 Leaks:  9
 Freed:  2856

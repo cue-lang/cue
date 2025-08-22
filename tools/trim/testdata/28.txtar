@@ -8,29 +8,7 @@ y: len(x)
 == a.cue
 let x = {a: 5}
 y: len(x)
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,3 +1,3 @@
- == a.cue
--let x = {a: 5, a: int}
-+let x = {a: 5}
- y: len(x)
--- out/trim-v3-noshare --
-== a.cue
-let x = {a: 5}
-y: len(x)
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,3 +1,3 @@
- == a.cue
--let x = {a: 5, a: int}
-+let x = {a: 5}
- y: len(x)
 -- out/trim --
 == a.cue
-let x = {a: 5, a: int}
+let x = {a: 5}
 y: len(x)

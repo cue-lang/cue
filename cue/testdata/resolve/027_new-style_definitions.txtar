@@ -88,20 +88,6 @@ Disjuncts:    11
     a: (string){ "foo" }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -4,8 +4,8 @@
-     b: (int){ int }
-   }
-   "#Foo": (#struct){
--    a: (int){ 1 }
-     b: (int){ 1 }
-+    a: (int){ 1 }
-   }
-   bulk: (struct){
-     #def: (int){ 4 }
 -- diff/todo/p3 --
 Reordering
 -- out/eval --

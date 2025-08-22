@@ -36,29 +36,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,6 +1,8 @@
- Errors:
- embed.#x: conflicting values 2 and 1:
-+    ./in.cue:4:13
-     ./in.cue:4:21
-+    ./in.cue:4:25
-     ./in.cue:4:33
- 
- Result:
-@@ -11,7 +13,9 @@
-     // [eval]
-     #x: (_|_){
-       // [eval] embed.#x: conflicting values 2 and 1:
-+      //     ./in.cue:4:13
-       //     ./in.cue:4:21
-+      //     ./in.cue:4:25
-       //     ./in.cue:4:33
-     }
-   }
 -- out/eval --
 Errors:
 embed.#x: conflicting values 2 and 1:

@@ -40,29 +40,6 @@ Disjuncts:    24
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -4,16 +4,8 @@
-     other: (#struct){
-     }
-   }
--  #App: (#struct){
--    body: (_){ _ }
--    other: (#struct){
--    }
--  }
--  #Atom: (#struct){
--    body: (_){ _ }
--    other: (#struct){
--    }
--  }
-+  #App: ~(#Artifact)
-+  #Atom: ~(#Artifact)
-   #Both: (#struct){
-     body: (_){ _ }
-     other: (#struct){
 -- out/eval --
 (struct){
   #Artifact: (#struct){

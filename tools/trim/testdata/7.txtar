@@ -11,34 +11,8 @@ a: [string]: {
 a: [string]: {
 	x: "hi"
 }
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,5 +1,4 @@
- == a.cue
- a: [string]: {
--	x: string
- 	x: "hi"
- }
--- out/trim-v3-noshare --
-== a.cue
-a: [string]: {
-	x: "hi"
-}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,5 +1,4 @@
- == a.cue
- a: [string]: {
--	x: string
- 	x: "hi"
- }
 -- out/trim --
 == a.cue
 a: [string]: {
-	x: string
 	x: "hi"
 }

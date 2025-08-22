@@ -342,36 +342,6 @@ Disjuncts:    16
 Notifications: 2
 
 NumCloseIDs: 112
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,13 +1,12 @@
--Leaks:  13
--Freed:  223
--Reused: 214
--Allocs: 22
--Retain: 104
--
--Unifications: 220
--Conjuncts:    279
--Disjuncts:    302
--
--MisalignedConjunct: 20
--
--NumCloseIDs: 57
-+Leaks:  22
-+Freed:  210
-+Reused: 195
-+Allocs: 37
-+Retain: 0
-+
-+Unifications: 206
-+Conjuncts:    343
-+Disjuncts:    16
-+Notifications: 2
-+
-+NumCloseIDs: 112
 -- out/eval/stats --
 Leaks:  13
 Freed:  223
@@ -659,29 +629,6 @@ NumCloseIDs: 57
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -2,14 +2,14 @@
-   self: (struct){
-     fail: (struct){
-       a: (_|_){
--        // [cycle] self.fail.a: cycle with field a.b:
--        //     ./in.cue:6:7
-+        // [incomplete] self.fail.a.b: cyclic reference to field b:
-+        //     ./in.cue:6:4
-       }
-     }
-     isConcreteFail: (struct){
-       t1: (struct){
--        a: (_|_){
--          // [cycle] cycle error
-+        a: (struct){
-+          b: (int){ 1 }
-         }
-       }
-       t2: (struct){
 -- out/eval --
 (struct){
   self: (struct){

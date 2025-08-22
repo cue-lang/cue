@@ -6,29 +6,7 @@ foo: b: a: 1
 == in.cue
 foo: [string]: a: *1 | int
 foo: b: _
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,3 +1,3 @@
- == in.cue
- foo: [string]: a: *1 | int
--foo: b: {}
-+foo: b: _
--- out/trim-v3-noshare --
-== in.cue
-foo: [string]: a: *1 | int
-foo: b: _
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,3 +1,3 @@
- == in.cue
- foo: [string]: a: *1 | int
--foo: b: {}
-+foo: b: _
 -- out/trim --
 == in.cue
 foo: [string]: a: *1 | int
-foo: b: {}
+foo: b: _

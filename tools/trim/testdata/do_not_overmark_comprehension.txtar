@@ -25,53 +25,13 @@ group: {
 		comp: "\(k)": v
 	}
 }
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -3,7 +3,7 @@
- 	t: [string]: {x: 5}
- 
- 	// Don't remove u!
--	t: u: {}
-+	t: u: _
- }
- 
- group: {
--- out/trim-v3-noshare --
-== in.cue
-foo: multipath: {
-	t: [string]: {x: 5}
-
-	// Don't remove u!
-	t: u: _
-}
-
-group: {
-	for k, v in foo {
-		comp: "\(k)": v
-	}
-}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -3,7 +3,7 @@
- 	t: [string]: {x: 5}
- 
- 	// Don't remove u!
--	t: u: {}
-+	t: u: _
- }
- 
- group: {
 -- out/trim --
 == in.cue
 foo: multipath: {
 	t: [string]: {x: 5}
 
 	// Don't remove u!
-	t: u: {}
+	t: u: _
 }
 
 group: {

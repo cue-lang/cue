@@ -108,26 +108,6 @@ Disjuncts:    15
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,14 +1,6 @@
- (struct){
-   res: (#list){
--    0: (struct){
--      x: (struct){
--        b: (struct){
--          str: (string){ "DDDD" }
--        }
--        a: (string){ "XDDDD" }
--        c: (string){ "X" }
--      }
--    }
-+    0: ~(t)
-   }
-   t: (struct){
-     x: (struct){
 -- out/eval --
 (struct){
   res: (#list){

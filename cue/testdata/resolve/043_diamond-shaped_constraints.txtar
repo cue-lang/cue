@@ -130,40 +130,6 @@ Disjuncts:    16
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -4,20 +4,20 @@
-       a: (int){ 1 }
-     }
-     B: (struct){
--      a: (int){ 1 }
--      b: (int){ 2 }
-+      b: (int){ 2 }
-+      a: (int){ 1 }
-     }
-   }
-   T: (struct){
-     A: (struct){
--      a: (int){ 1 }
--      c: (int){ 3 }
--    }
--    B: (struct){
--      a: (int){ 1 }
--      c: (int){ 3 }
--      b: (int){ 2 }
-+      c: (int){ 3 }
-+      a: (int){ 1 }
-+    }
-+    B: (struct){
-       d: (int){ 4 }
-+      b: (int){ 2 }
-+      c: (int){ 3 }
-+      a: (int){ 1 }
-     }
-   }
- }
 -- diff/todo/p3 --
 Reordering
 -- out/eval --

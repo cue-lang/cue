@@ -177,36 +177,6 @@ NumCloseIDs: 10
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -61,10 +61,7 @@
-     foo: (struct){
-       fooData: (struct){
-         total: (struct){
--          tags: (struct){
--            extra: (struct){
--            }
--          }
-+          tags: ~(related.foo.fooData._hidden)
-         }
-         _hidden: (struct){
-           extra: (struct){
-@@ -72,12 +69,7 @@
-         }
-       }
-       shared: (struct){
--        all_total: (struct){
--          tags: (struct){
--            extra: (struct){
--            }
--          }
--        }
-+        all_total: ~(related.foo.fooData.total)
-       }
-     }
-     #Tags: (#struct){
 -- out/eval --
 (struct){
   full: (struct){

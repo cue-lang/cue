@@ -119,54 +119,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,25 +1,28 @@
--(struct){
-+Errors:
-+simple.x: conflicting values "foo" and "x":
-+    ./in.cue:4:7
-+    ./in.cue:5:7
-+
-+Result:
-+(_|_){
-+  // [eval]
-   simple: (_|_){
--    // [incomplete] simple: cannot add field x: was already used:
--    //     ./in.cue:5:2
--    x: (string){ "x" }
-+    // [eval]
-+    x: (_|_){
-+      // [eval] simple.x: conflicting values "foo" and "x":
-+      //     ./in.cue:4:7
-+      //     ./in.cue:5:7
-+    }
-   }
-   issue2473: (struct){
-     one: (struct){
--      c: (_|_){
--        // [incomplete] issue2473.one: cannot add field env2: was already used:
--        //     ./in.cue:19:7
-+      c: (struct){
-         env: (string){ "prod" }
-         env2: (string){ "prod" }
-       }
--      example: (_|_){
--        // [incomplete] issue2473.one: cannot add field env2: was already used:
--        //     ./in.cue:19:7
--      }
--    }
--    two: (_|_){
--      // [incomplete] issue2473.two: cannot add field env2: was already used:
--      //     ./in.cue:32:4
-+      example: (string){ "prod" }
-+    }
-+    two: (struct){
-       env: (string){ "prod" }
-       env2: (string){ "prod" }
-       example: (string){ "prod" }
 -- out/eval --
 (struct){
   simple: (_|_){

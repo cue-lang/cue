@@ -3028,24 +3028,6 @@ Disjuncts:    0
   f999: (string){ string }
   f1000: (string){ string }
 }
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
- Leaks:  0
- Freed:  1001
--Reused: 999
--Allocs: 2
-+Reused: 0
-+Allocs: 1001
- Retain: 0
- 
- Unifications: 1001
--Conjuncts:    500501
--Disjuncts:    1001
-+Conjuncts:    1001
-+Disjuncts:    0
 -- out/eval/stats --
 Leaks:  0
 Freed:  1001

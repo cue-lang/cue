@@ -110,48 +110,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,6 +1,7 @@
- Errors:
- conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
-     ./in.cue:36:9
-+    ./in.cue:39:5
-     ./in.cue:40:3
-     ./in.cue:41:9
- circularFor.#list: cannot range over tail != null (found bool, want list or struct):
-@@ -13,9 +14,7 @@
-   // [eval]
-   circularIf: (struct){
-     #list: (#struct){
--      tail: ((null|struct)){ |(*(null){ null }, (#struct){
--          tail: (null){ null }
--        }) }
-+      tail: (null){ null }
-     }
-   }
-   circularFor: (_|_){
-@@ -35,10 +34,6 @@
-   intField: (_|_){
-     // [eval] intField: integer fields not supported:
-     //     ./in.cue:27:4
--    0: (struct){
--    }
--    1: (struct){
--    }
-   }
-   conflictRangingOverSelf: (_|_){
-     // [eval]
-@@ -48,6 +43,7 @@
-       age: (_|_){
-         // [eval] conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
-         //     ./in.cue:36:9
-+        //     ./in.cue:39:5
-         //     ./in.cue:40:3
-         //     ./in.cue:41:9
-       }
 -- diff/todo/p2 --
 Missing error message.
 -- out/eval --

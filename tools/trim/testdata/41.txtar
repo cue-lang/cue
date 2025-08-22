@@ -49,24 +49,7 @@ base: #HelmRelease
 	}
 	utils: #HelmUtils
 }
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,10 +1,11 @@
- == a.cue
--base: helm: {}
-+base: helm: values: cacert: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
- base: #HelmRelease
- 
- #HelmRelease: {
- 	helm: {
- 		#WithHelmUtils
-+		values: {...}
- 	}
- }
- 
--- out/trim-v3-noshare --
+-- out/trim --
 == a.cue
 base: helm: values: cacert: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 base: #HelmRelease
@@ -75,45 +58,6 @@ base: #HelmRelease
 	helm: {
 		#WithHelmUtils
 		values: {...}
-	}
-}
-
-#HelmUtils: {
-	cacert?: string | *"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-}
-
-#WithHelmUtils: {
-	values: {
-		utils
-		...
-	}
-	utils: #HelmUtils
-}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,10 +1,11 @@
- == a.cue
--base: helm: {}
-+base: helm: values: cacert: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
- base: #HelmRelease
- 
- #HelmRelease: {
- 	helm: {
- 		#WithHelmUtils
-+		values: {...}
- 	}
- }
- 
--- out/trim --
-== a.cue
-base: helm: {}
-base: #HelmRelease
-
-#HelmRelease: {
-	helm: {
-		#WithHelmUtils
 	}
 }
 

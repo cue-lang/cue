@@ -156,46 +156,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,14 +1,7 @@
- Errors:
- #E.f3: field not allowed:
--    ./in.cue:1:5
--    ./in.cue:27:5
--    ./in.cue:27:10
--    ./in.cue:28:2
-     ./in.cue:29:3
- a.f3: field not allowed:
--    ./in.cue:1:5
--    ./in.cue:3:1
--    ./in.cue:4:5
-     ./in.cue:4:11
- 
- Result:
-@@ -24,9 +17,6 @@
-     f2: (int){ int }
-     f3: (_|_){
-       // [eval] a.f3: field not allowed:
--      //     ./in.cue:1:5
--      //     ./in.cue:3:1
--      //     ./in.cue:4:5
-       //     ./in.cue:4:11
-     }
-   }
-@@ -45,10 +35,6 @@
-     f2: (int){ int }
-     f3: (_|_){
-       // [eval] #E.f3: field not allowed:
--      //     ./in.cue:1:5
--      //     ./in.cue:27:5
--      //     ./in.cue:27:10
--      //     ./in.cue:28:2
-       //     ./in.cue:29:3
-     }
-   }
 -- diff/todo/p2 --
 error positions
 -- out/eval --

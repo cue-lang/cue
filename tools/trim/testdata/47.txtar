@@ -26,7 +26,7 @@ s: {
 for k, v in s {
 	s: "\(k)": #d
 }
--- out/trim-v3-noshare --
+-- out/trim --
 == a.cue
 s: {
 	x: _

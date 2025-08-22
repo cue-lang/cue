@@ -56,25 +56,6 @@ Disjuncts:    9
     a: (int){ int }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -8,4 +8,14 @@
-   c: (struct){
-     a: (int){ int }
-   }
-+  issue3326: (struct){
-+    _self: (struct){
-+      x: (list){
-+      }
-+    }
-+    x: (#list){
-+      0: (int){ 1 }
-+    }
-+    a: (int){ int }
-+  }
- }
 -- out/eval --
 (struct){
   a: (struct){

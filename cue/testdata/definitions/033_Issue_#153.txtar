@@ -102,35 +102,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,11 +1,5 @@
- Errors:
- listOfCloseds.0.b: field not allowed:
--    ./in.cue:2:18
--    ./in.cue:2:21
--    ./in.cue:5:10
--    ./in.cue:13:1
--    ./in.cue:14:18
--    ./in.cue:15:3
-     ./in.cue:16:4
- 
- Result:
-@@ -28,12 +22,6 @@
-       a: (int){ |(*(int){ 0 }, (int){ int }) }
-       b: (_|_){
-         // [eval] listOfCloseds.0.b: field not allowed:
--        //     ./in.cue:2:18
--        //     ./in.cue:2:21
--        //     ./in.cue:5:10
--        //     ./in.cue:13:1
--        //     ./in.cue:14:18
--        //     ./in.cue:15:3
-         //     ./in.cue:16:4
-       }
-     }
 -- diff/todo/p3 --
 missing error positions
 -- out/eval --

@@ -76,22 +76,6 @@ Disjuncts:    31
     uc: (string){ string }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -9,10 +9,7 @@
-     lc: (string){ "foo" }
-     uc: (string){ "foo" }
-   }
--  #MCS: (#struct){
--    lc: (string){ string }
--    uc: (string){ string }
--  }
-+  #MCS: ~(#MultiCaseString)
-   #MultiCaseString: (#struct){
-     lc: (string){ string }
-     uc: (string){ string }
 -- out/eval --
 (struct){
   y: (string){ "foo" }

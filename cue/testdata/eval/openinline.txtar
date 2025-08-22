@@ -200,48 +200,6 @@ Result:
     x: (int){ 1 }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,10 +1,6 @@
- Errors:
- outerErr.usingClose.t1.version.major: field not allowed:
--    ./in.cue:19:8
--    ./in.cue:34:23
-     ./in.cue:35:22
--    ./in.cue:37:7
--    ./in.cue:38:16
- 
- Result:
- (_|_){
-@@ -62,11 +58,7 @@
-           // [eval]
-           major: (_|_){
-             // [eval] outerErr.usingClose.t1.version.major: field not allowed:
--            //     ./in.cue:19:8
--            //     ./in.cue:34:23
-             //     ./in.cue:35:22
--            //     ./in.cue:37:7
--            //     ./in.cue:38:16
-           }
-           minor: (int){ 2 }
-         }
-@@ -106,13 +98,11 @@
-       }
-       #E: (_|_){
-         // [eval]
--        a: (int){ 2 }
-         b: (_|_){
-           // [eval] refFromLet.X.#E.b: field not allowed:
--          //     ./in.cue:61:7
--          //     ./in.cue:62:7
-           //     ./in.cue:62:13
-         }
-+        a: (int){ 2 }
-       }
-     }
-     x: (int){ 1 }
 -- out/eval --
 Errors:
 outerErr.usingClose.t1.version.major: field not allowed:

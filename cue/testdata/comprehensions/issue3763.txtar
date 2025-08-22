@@ -132,57 +132,6 @@ NumCloseIDs: 2
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -11,22 +11,7 @@
-         n1: (struct){
-           _CL: (string){ "l" }
-           _cs: (struct){
--            l: (struct){
--              _ports: (struct){
--                "1": (#struct){
--                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
--                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
--                }
--                "2": (#struct){
--                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
--                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
--                }
--                "3": (#struct){
--                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
--                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
--                }
--              }
--            }
-+            l: ~(full._cl.l)
-           }
-         }
-       }
-@@ -73,17 +58,11 @@
-         y?: (int){ int }
-       }
-     }
--    let Z#3 = (#list){
--      0: (struct){
--        y?: (int){ int }
--      }
--      1: (struct){
--        y?: (int){ int }
--      }
--      2: (struct){
--        y?: (int){ int }
--      }
--    }
-+    let Z#3multi = [
-+      for _, x in 〈2;A〉 {
-+        〈1;x〉
-+      },
-+    ]
-     B: (#list){
-     }
-   }
 -- out/eval --
 (struct){
   full: (struct){

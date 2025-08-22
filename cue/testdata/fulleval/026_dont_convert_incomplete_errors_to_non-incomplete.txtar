@@ -52,25 +52,6 @@ Retain: 0
 Unifications: 17
 Conjuncts:    17
 Disjuncts:    0
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
- Leaks:  0
- Freed:  17
--Reused: 12
--Allocs: 5
--Retain: 75
-+Reused: 0
-+Allocs: 17
-+Retain: 0
- 
- Unifications: 17
--Conjuncts:    71
--Disjuncts:    82
-+Conjuncts:    17
-+Disjuncts:    0
 -- out/eval/stats --
 Leaks:  0
 Freed:  17
@@ -144,31 +125,6 @@ Disjuncts:    82
   num: (number){ <4 }
   is: (bool){ bool }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,12 +1,16 @@
- (struct){
-   n1: (struct){
-     min: (_|_){
--      // [cycle] cycle error
-+      // [cycle] n1.min: cycle with field: max:
-+      //     ./in.cue:3:12
-+      // n1.max: cycle with field: min:
-+      //     ./in.cue:3:23
-     }
-     max: (_|_){
--      // [cycle] cycle error
--      // cycle error:
--      //     ./in.cue:3:22
-+      // [cycle] n1.min: cycle with field: max:
-+      //     ./in.cue:3:12
-+      // n1.max: cycle with field: min:
-+      //     ./in.cue:3:23
-     }
-   }
-   n2: (_|_){
 -- out/eval --
 (struct){
   n1: (struct){

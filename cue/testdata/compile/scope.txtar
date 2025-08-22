@@ -90,32 +90,6 @@ Disjuncts:    0
 Notifications: 2
 
 NumCloseIDs: 13
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,12 @@
--Leaks:  2
--Freed:  48
--Reused: 45
--Allocs: 5
--Retain: 8
--
--Unifications: 50
--Conjuncts:    102
--Disjuncts:    54
-+Leaks:  0
-+Freed:  17
-+Reused: 3
-+Allocs: 14
-+Retain: 0
-+
-+Unifications: 17
-+Conjuncts:    32
-+Disjuncts:    0
-+Notifications: 2
-+
-+NumCloseIDs: 13
 -- out/eval/stats --
 Leaks:  2
 Freed:  48
@@ -165,19 +139,6 @@ Result:
     // [structural cycle]
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -33,7 +33,6 @@
-     }
-   }
-   let _schema_1#2 = (_|_){
--    // [structural cycle] _schema_1: structural cycle:
--    //     ./in.cue:32:8
-+    // [structural cycle]
-   }
- }
 -- diff/todo/p3 --
 Structural cycle reported in different location. Seems fine, as
 ultimately we need to print the paths of the cycle anyway.

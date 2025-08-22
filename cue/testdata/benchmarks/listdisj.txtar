@@ -64,26 +64,6 @@ Retain: 0
 Unifications: 14
 Conjuncts:    22
 Disjuncts:    4
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
- Leaks:  0
--Freed:  447
--Reused: 439
--Allocs: 8
-+Freed:  18
-+Reused: 8
-+Allocs: 10
- Retain: 0
- 
--Unifications: 287
--Conjuncts:    894
--Disjuncts:    447
-+Unifications: 14
-+Conjuncts:    22
-+Disjuncts:    4
 -- out/eval --
 (struct){
   #T: (list){

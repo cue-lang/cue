@@ -105,19 +105,6 @@ Benign change in error message.
 		}
 	}
 }
--- diff/-out/value-v3<==>+out/value --
-diff old new
---- old
-+++ new
-@@ -32,7 +32,7 @@
- 	s: strings.MinRunes(4) & strings.MaxRunes(7)
- 	additional: {
- 		env:   _
--		confs: _|_ // incomplete bool: _
-+		confs: _|_ // additional.confs: incomplete bool: _
- 	}
- }
- == All
 -- out/value --
 == Simplified
 {
@@ -153,7 +140,7 @@ diff old new
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
 		env:   _
-		confs: _|_ // incomplete bool: _
+		confs: _|_ // additional.confs: incomplete bool: _
 	}
 }
 == All

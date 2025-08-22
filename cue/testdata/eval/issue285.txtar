@@ -36,20 +36,6 @@ Disjuncts:    10
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -9,8 +9,8 @@
-   }
-   val: (#struct){
-     myoutput: (#struct){
--      path: (string){ "/output" }
-       content: (string){ "foo" }
-+      path: (string){ "/output" }
-     }
-   }
- }
 -- diff/todo/p3 --
 Reordering
 -- out/eval --

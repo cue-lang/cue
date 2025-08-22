@@ -150,36 +150,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,8 +1,8 @@
- Errors:
--e: conflicting values 4 and [] (mismatched types int and list):
-+e: conflicting values [] and 4 (mismatched types list and int):
-     ./in.cue:4:8
-     ./in.cue:4:13
--e2: invalid list index d (type string):
-+e2: undefined field: d:
-     ./in.cue:5:12
- e3: invalid index -1 (index must be non-negative):
-     ./in.cue:6:8
-@@ -29,12 +29,12 @@
-     2: (int){ 3 }
-   }
-   e: (_|_){
--    // [eval] e: conflicting values 4 and [] (mismatched types int and list):
-+    // [eval] e: conflicting values [] and 4 (mismatched types list and int):
-     //     ./in.cue:4:8
-     //     ./in.cue:4:13
-   }
-   e2: (_|_){
--    // [eval] e2: invalid list index d (type string):
-+    // [eval] e2: undefined field: d:
-     //     ./in.cue:5:12
-   }
-   e3: (_|_){
 -- diff/todo/p2 --
 error: more precise message
 -- out/eval --

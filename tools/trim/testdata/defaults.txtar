@@ -133,105 +133,11 @@ dontEraseDefaultSelection: {
 		verbs: *["a", "b"] | ["c"]
 	}
 }
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,7 +1,7 @@
- == in.cue
- domToSub: {
- 	foo: [string]: a: *1 | int
--	foo: b: {}
-+	foo: b: _
- }
- 
- // Issue #759
--- out/trim-v3-noshare --
-== in.cue
-domToSub: {
-	foo: [string]: a: *1 | int
-	foo: b: _
-}
-
-// Issue #759
-subToDom: {
-	#maybeString: {ip?: string}
-	something: ip: *"default" | string
-	something: #maybeString
-}
-
-// references to definitions of a disjunction should be resolved and counted
-// as dominator nodes.
-resolveDefaults: {
-	#monitor: {
-		kind: "a"
-	} | {
-		kind: "b"
-	}
-
-	monitor: #monitor
-
-	monitor: kind: "a"
-}
-
-issue781: {
-	#monitor_check: {
-		check_name:      string
-		check_interval?: string
-	}
-
-	#monitor_check: {
-		check_type: "nginx_config"
-	} | {
-		check_type: "docker_running"
-		vars: {
-			container_name: string
-		}
-	}
-
-	monitor: {
-		checks: [...#monitor_check]
-	}
-
-	monitor: {
-		checks: [{
-			check_type: "nginx_config"
-			check_name: "nginx_config"
-		}]
-	}
-}
-
-// Issue #801
-// Here the concrete value selects the default from a dominator, after which
-// the dominator becomes an exact match. The exact match should not allow it
-// to be erased, as the exact match is only there because subordinate value
-// was first used to select the default.
-dontEraseDefaultSelection: {
-	rule: _#Rule & {
-		verbs: ["c"]
-	}
-	_#Rule: {
-		verbs: *["a", "b"] | ["c"]
-	}
-}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,7 +1,7 @@
- == in.cue
- domToSub: {
- 	foo: [string]: a: *1 | int
--	foo: b: {}
-+	foo: b: _
- }
- 
- // Issue #759
 -- out/trim --
 == in.cue
 domToSub: {
 	foo: [string]: a: *1 | int
-	foo: b: {}
+	foo: b: _
 }
 
 // Issue #759

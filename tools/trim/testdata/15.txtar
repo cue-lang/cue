@@ -6,25 +6,6 @@ x: [int, int, int] & [9, 8, 7]
 -- out/trim-v3 --
 == a.cue
 x: [_, _, _] & [9, 8, 7]
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,2 +1,2 @@
- == a.cue
--x: [int, int, int] & [9, 8, 7]
-+x: [_, _, _] & [9, 8, 7]
--- out/trim-v3-noshare --
-== a.cue
-x: [_, _, _] & [9, 8, 7]
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,2 +1,2 @@
- == a.cue
--x: [int, int, int] & [9, 8, 7]
-+x: [_, _, _] & [9, 8, 7]
 -- out/trim --
 == a.cue
-x: [int, int, int] & [9, 8, 7]
+x: [_, _, _] & [9, 8, 7]

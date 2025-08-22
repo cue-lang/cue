@@ -6,26 +6,6 @@ x: 7
 -- out/trim-v3 --
 == a.cue
 x: 7
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,3 +1,2 @@
- == a.cue
--x: <10
- x: 7
--- out/trim-v3-noshare --
-== a.cue
-x: 7
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,3 +1,2 @@
- == a.cue
--x: <10
- x: 7
 -- out/trim --
 == a.cue
-x: <10
 x: 7

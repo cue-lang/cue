@@ -48,34 +48,6 @@ Disjuncts:    26
     c: (string){ "foo" }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,5 @@
- (#struct){
--  _schema: (#struct){
--    a?: (#struct){
--      b?: (string){ string }
--    }
--  }
-+  _schema: ~(#Schema)
-   #Schema: (#struct){
-     a?: (#struct){
-       b?: (string){ string }
-@@ -14,11 +10,7 @@
-   }
-   c: (string){ "foo" }
-   x: (#struct){
--    _schema: (#struct){
--      a?: (#struct){
--        b?: (string){ string }
--      }
--    }
-+    _schema: ~(x.#Schema)
-     #Schema: (#struct){
-       a?: (#struct){
-         b?: (string){ string }
 -- out/eval --
 (#struct){
   _schema: (#struct){

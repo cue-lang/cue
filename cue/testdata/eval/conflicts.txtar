@@ -82,26 +82,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -2,6 +2,7 @@
- t0.v: conflicting values int and string (mismatched types int and string):
-     ./in.cue:1:4
-     ./in.cue:2:4
-+    ./in.cue:5:5
-     ./in.cue:5:9
- t1.x.a.b: conflicting values 4 and 3:
-     ./in.cue:10:9
-@@ -20,6 +21,7 @@
-       // [eval] t0.v: conflicting values int and string (mismatched types int and string):
-       //     ./in.cue:1:4
-       //     ./in.cue:2:4
-+      //     ./in.cue:5:5
-       //     ./in.cue:5:9
-     }
-   }
 -- out/eval --
 Errors:
 t0.v: conflicting values int and string (mismatched types int and string):

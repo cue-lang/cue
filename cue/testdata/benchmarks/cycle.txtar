@@ -73,34 +73,6 @@ Disjuncts:    26
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -5,9 +5,7 @@
-       F: (struct){
-         x: (string){ string }
-       }
--      S: (struct){
--        x: (string){ string }
--      }
-+      S: ~(sameValues.SmustBeF.F)
-     }
-     CmustBeA: (struct){
-       A: (struct){
-@@ -15,11 +13,7 @@
-           0: (string){ string }
-         }
-       }
--      C: (struct){
--        x: (#list){
--          0: (string){ string }
--        }
--      }
-+      C: ~(sameValues.CmustBeA.A)
-     }
-   }
- }
 -- out/eval --
 (struct){
   sameValues: (struct){

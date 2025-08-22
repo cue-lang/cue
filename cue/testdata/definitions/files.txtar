@@ -64,28 +64,6 @@ Disjuncts:    26
       }) }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,4 +1,8 @@
- (#struct){
-+  console: (#struct){
-+    color: (string){ "dark" }
-+    ctermbg: (string){ "239" }
-+  }
-   #theme: (#struct){
-     color: (string){ string }
-     ctermbg: (string){ string }
-@@ -20,8 +24,4 @@
-         ctermbg: (string){ "239" }
-       }) }
-   }
--  console: (#struct){
--    color: (string){ "dark" }
--    ctermbg: (string){ "239" }
--  }
- }
 -- diff/todo/p3 --
 Reordering.
 -- out/eval --

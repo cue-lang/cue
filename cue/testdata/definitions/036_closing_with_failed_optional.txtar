@@ -155,30 +155,6 @@ Disjuncts:    29
     a: (int){ int }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,11 +1,17 @@
- (struct){
-   #k1: (#struct){
-     a: (int){ int }
--    b?: (int){ int }
-+    b?: (_|_){
-+      // [eval] #k1.b: field not allowed:
-+      //     ./in.cue:1:15
-+    }
-   }
-   #k2: (#struct){
-     a: (int){ int }
--    b?: (int){ int }
-+    b?: (_|_){
-+      // [eval] #k2.b: field not allowed:
-+      //     ./in.cue:3:20
-+    }
-   }
-   o1: (struct){
-     a?: (_|_){
 -- diff/todo/p2 --
 v1.a: Incorrect path in error message.
 -- diff/todo/p3 --

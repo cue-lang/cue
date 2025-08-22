@@ -107,44 +107,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -41,13 +41,7 @@
-       }
-     }
-   }
--  d: (#struct){
--    ben: (#list){
--      0: (#struct){
--        pos: (int){ 0 }
--      }
--    }
--  }
-+  d: ~(#d)
-   e: (struct){
-     ben: (#list){
-       0: (struct){
-@@ -63,10 +57,6 @@
-     ben: (_|_){
-       // [eval] f.ben: incompatible list lengths (1 and 2)
-       0: (struct){
--        pos: (int){ 0 }
--      }
--      1: (struct){
--        pos: (int){ 1 }
-       }
-     }
-   }
-@@ -75,7 +65,6 @@
-     ben: (_|_){
-       // [eval] g.ben: incompatible list lengths (1 and 2)
-       0: (struct){
--        pos: (int){ 0 }
-       }
-       1: (struct){
-       }
 -- diff/todo/p2 --
 error path moved
 -- out/eval --

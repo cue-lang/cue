@@ -26,25 +26,29 @@ graph TD
 	text:   "03"
 }
 -- out/run/t1/stats --
-Leaks:  8
+Leaks:  6
 Freed:  23
-Reused: 19
-Allocs: 12
-Retain: 24
+Reused: 14
+Allocs: 15
+Retain: 0
 
-Unifications: 27
-Conjuncts:    38
-Disjuncts:    41
+Unifications: 23
+Conjuncts:    34
+Disjuncts:    2
+
+NumCloseIDs: 4
 -- out/run/stats/totals --
-Leaks:  8
+Leaks:  6
 Freed:  23
-Reused: 19
-Allocs: 12
-Retain: 24
+Reused: 14
+Allocs: 15
+Retain: 0
 
-Unifications: 27
-Conjuncts:    38
-Disjuncts:    41
+Unifications: 23
+Conjuncts:    34
+Disjuncts:    2
+
+NumCloseIDs: 4
 -- out/run/t2 --
 graph TD
   t0("root.prepare [Terminated]")

@@ -192,52 +192,12 @@ fail: {
 	// as 'cue vet -c' on otherwise open values.
 	structOrderIrrelevant: _|_ // fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1
 }
--- diff/-out/list-v3<==>+out/list --
-diff old new
---- old
-+++ new
-@@ -2,7 +2,7 @@
- fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
-     ./in.cue:3:21
-     ./in.cue:48:16
--fail.ignoreOptError: invalid value [{a:1},{a:1,b?:_|_(fail.ignoreOptError.1.b: conflicting values int and string (mismatched types int and string))}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
-+fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
-     ./in.cue:3:21
-     ./in.cue:52:18
- fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
-@@ -11,7 +11,7 @@
- fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
-     ./in.cue:3:21
-     ./in.cue:72:30
--fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
-+fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
-     ./in.cue:3:21
-     ./in.cue:45:11
- 
-@@ -98,7 +98,7 @@
- }
- fail: {
- 	ints:    _|_ // fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2
--	structs: _|_ // fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1
-+	structs: _|_ // fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1
- 
- 	// Hidden values do not play a role in the comparisson.
- 	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
-@@ -105,7 +105,7 @@
- 
- 	// This can be a permanent error, as the optional field of the second
- 	// element is erroneous an cannot match.
--	ignoreOptError: _|_ // fail.ignoreOptError: invalid value [{a:1},{a:1,b?:_|_(fail.ignoreOptError.1.b: conflicting values int and string (mismatched types int and string))}] (does not satisfy list.UniqueItems): equal values at position 0 and 1
-+	ignoreOptError: _|_ // fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems): equal values at position 0 and 1
- 
- 	// Struct field order is irrelevant. We simulate finalising
- 	// these values here via close(), which gives the same behaviour
 -- out/list --
 Errors:
 fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:48:16
-fail.ignoreOptError: invalid value [{a:1},{a:1,b?:_|_(fail.ignoreOptError.1.b: conflicting values int and string (mismatched types int and string))}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
+fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:52:18
 fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
@@ -246,7 +206,7 @@ fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal valu
 fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:72:30
-fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
+fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:45:11
 
@@ -333,14 +293,14 @@ incomplete: {
 }
 fail: {
 	ints:    _|_ // fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2
-	structs: _|_ // fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1
+	structs: _|_ // fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1
 
 	// Hidden values do not play a role in the comparisson.
 	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
 
 	// This can be a permanent error, as the optional field of the second
 	// element is erroneous an cannot match.
-	ignoreOptError: _|_ // fail.ignoreOptError: invalid value [{a:1},{a:1,b?:_|_(fail.ignoreOptError.1.b: conflicting values int and string (mismatched types int and string))}] (does not satisfy list.UniqueItems): equal values at position 0 and 1
+	ignoreOptError: _|_ // fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems): equal values at position 0 and 1
 
 	// Struct field order is irrelevant. We simulate finalising
 	// these values here via close(), which gives the same behaviour

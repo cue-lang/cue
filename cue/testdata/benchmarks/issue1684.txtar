@@ -78,34 +78,6 @@ ConjunctInfos:       7501
 MaxConjunctInfos:    4
 MaxReqSets:          12
 MaxRedirect:         5
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,16 @@
--Leaks:  0
--Freed:  1064333
--Reused: 1064282
--Allocs: 51
-+Leaks:  13900
-+Freed:  11177
-+Reused: 11058
-+Allocs: 14019
- Retain: 0
- 
--Unifications: 792123
--Conjuncts:    2480117
--Disjuncts:    1064333
-+Unifications: 3219
-+Conjuncts:    22751
-+Disjuncts:    6534
-+
-+NumCloseIDs: 4115
-+
-+ConjunctInfos:       7501
-+MaxConjunctInfos:    4
-+MaxReqSets:          12
-+MaxRedirect:         5
 -- diff/explanation --
 New algorithm is better at trimming recursive disjunctions.
 Note that the old closedness implementation of V3 was able to reduce this to

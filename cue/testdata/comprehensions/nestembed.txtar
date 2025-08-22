@@ -56,24 +56,6 @@ NumCloseIDs: 1
     aws: ~(useful_infra.aws)
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -18,11 +18,7 @@
-     }
-   }
-   New_infra: (struct){
--    gcp: (struct){
--      cluters: (int){ 10 }
--    }
--    aws: (struct){
--      clusters: (int){ 20 }
--    }
-+    gcp: ~(useful_infra.gcp)
-+    aws: ~(useful_infra.aws)
-   }
- }
 -- out/eval --
 (struct){
   DeleteThis: (#list){

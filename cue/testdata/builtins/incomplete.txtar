@@ -112,31 +112,6 @@ Conjuncts:    97
 Disjuncts:    4
 
 NumCloseIDs: 9
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
--Leaks:  8
--Freed:  115
--Reused: 110
--Allocs: 13
--Retain: 58
--
--Unifications: 103
--Conjuncts:    255
--Disjuncts:    150
-+Leaks:  0
-+Freed:  79
-+Reused: 60
-+Allocs: 19
-+Retain: 0
-+
-+Unifications: 75
-+Conjuncts:    97
-+Disjuncts:    4
-+
-+NumCloseIDs: 9
 -- out/eval/stats --
 Leaks:  8
 Freed:  115
@@ -338,51 +313,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -89,7 +89,7 @@
-         //     ./in.cue:50:17
-       }
-       max: (_|_){
--        // [incomplete] incompleteArgDecimalList.#a.0: operand param of '+' not concrete (was int):
-+        // [incomplete] incompleteArgDecimalList.#a.transformed: operand param of '+' not concrete (was int):
-         //     ./in.cue:50:17
-       }
-     }
-@@ -108,7 +108,7 @@
-         //     ./in.cue:58:16
-       }
-       joined: (_|_){
--        // [incomplete] incompleteArgStringList.#a.0: non-concrete value string in operand to +:
-+        // [incomplete] incompleteArgStringList.#a.transformed: non-concrete value string in operand to +:
-         //     ./in.cue:59:16
-         //     ./in.cue:58:16
-       }
-@@ -129,15 +129,18 @@
-     x: (_|_){
-       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-       //     ./in.cue:72:11
-+      //     ./in.cue:73:11
-     }
-     y: (_){ _ }
-     decimal: (_|_){
-       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-       //     ./in.cue:72:11
--    }
--    str: (_|_){
--      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
--      //     ./in.cue:72:11
-+      //     ./in.cue:73:11
-+    }
-+    str: (_|_){
-+      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-+      //     ./in.cue:72:11
-+      //     ./in.cue:73:11
-     }
-   }
-   badListType: (_|_){
 -- out/eval --
 Errors:
 badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:

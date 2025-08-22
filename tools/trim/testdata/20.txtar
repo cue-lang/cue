@@ -10,37 +10,8 @@ z: #x & {a: 4, b: {c: int, d: "hi"}}
 let #x = {a: int, b: {c: 5, ...}}
 y: #x & {a: 4}
 z: #x & {a: 4, b: {d: "hi"}}
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,4 +1,4 @@
- == a.cue
--let #x = {a: int, b: {c: 5, c: >4, ...}}
--y: #x & {a: 4, b: {c: int}}
--z: #x & {a: 4, b: {c: int, d: "hi"}}
-+let #x = {a: int, b: {c: 5, ...}}
-+y: #x & {a: 4}
-+z: #x & {a: 4, b: {d: "hi"}}
--- out/trim-v3-noshare --
+-- out/trim --
 == a.cue
 let #x = {a: int, b: {c: 5, ...}}
 y: #x & {a: 4}
 z: #x & {a: 4, b: {d: "hi"}}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,4 +1,4 @@
- == a.cue
--let #x = {a: int, b: {c: 5, c: >4, ...}}
--y: #x & {a: 4, b: {c: int}}
--z: #x & {a: 4, b: {c: int, d: "hi"}}
-+let #x = {a: int, b: {c: 5, ...}}
-+y: #x & {a: 4}
-+z: #x & {a: 4, b: {d: "hi"}}
--- out/trim --
-== a.cue
-let #x = {a: int, b: {c: 5, c: >4, ...}}
-y: #x & {a: 4, b: {c: int}}
-z: #x & {a: 4, b: {c: int, d: "hi"}}

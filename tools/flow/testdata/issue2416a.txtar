@@ -79,18 +79,16 @@ graph TD
 }
 -- out/run/t1/stats --
 Leaks:  0
-Freed:  57
-Reused: 48
-Allocs: 9
-Retain: 5
+Freed:  47
+Reused: 27
+Allocs: 20
+Retain: 0
 
-Unifications: 41
-Conjuncts:    101
-Disjuncts:    59
+Unifications: 35
+Conjuncts:    78
+Disjuncts:    12
 
-MisalignedConjunct: 2
-
-NumCloseIDs: 3
+NumCloseIDs: 12
 -- out/run/t2 --
 graph TD
   t0("root.build.task.mkdir.output [Terminated]")
@@ -117,29 +115,25 @@ graph TD
 }
 -- out/run/t2/stats --
 Leaks:  0
-Freed:  58
-Reused: 58
+Freed:  48
+Reused: 48
 Allocs: 0
-Retain: 5
+Retain: 0
 
-Unifications: 42
-Conjuncts:    108
-Disjuncts:    60
+Unifications: 36
+Conjuncts:    84
+Disjuncts:    12
 
-MisalignedConjunct: 2
-
-NumCloseIDs: 3
+NumCloseIDs: 12
 -- out/run/stats/totals --
 Leaks:  0
-Freed:  115
-Reused: 106
-Allocs: 9
-Retain: 10
+Freed:  95
+Reused: 75
+Allocs: 20
+Retain: 0
 
-Unifications: 83
-Conjuncts:    209
-Disjuncts:    119
+Unifications: 71
+Conjuncts:    162
+Disjuncts:    24
 
-MisalignedConjunct: 4
-
-NumCloseIDs: 6
+NumCloseIDs: 24

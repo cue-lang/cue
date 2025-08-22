@@ -21,19 +21,7 @@ service: [string]: {
 service: a: {
 	ports: [_, _]
 }
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -2,4 +2,6 @@
- service: [string]: {
- 	ports: [{a: 1}, {a: 1}, ...{extra: 3}]
- }
--service: a: {}
-+service: a: {
-+	ports: [_, _]
-+}
--- out/trim-v3-noshare --
+-- out/trim --
 == in.cue
 service: [string]: {
 	ports: [{a: 1}, {a: 1}, ...{extra: 3}]
@@ -41,21 +29,3 @@ service: [string]: {
 service: a: {
 	ports: [_, _]
 }
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -2,4 +2,6 @@
- service: [string]: {
- 	ports: [{a: 1}, {a: 1}, ...{extra: 3}]
- }
--service: a: {}
-+service: a: {
-+	ports: [_, _]
-+}
--- out/trim --
-== in.cue
-service: [string]: {
-	ports: [{a: 1}, {a: 1}, ...{extra: 3}]
-}
-service: a: {}

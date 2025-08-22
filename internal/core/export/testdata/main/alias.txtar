@@ -507,19 +507,6 @@ was known to compile and is known to be correct.
 		}
 	}
 }
--- diff/-out/value-v3<==>+out/value --
-diff old new
---- old
-+++ new
-@@ -164,7 +164,7 @@
- 		}
- 		selfRefValue: {
- 			struct: {
--				a: _|_ // cycle error
-+				a: _|_ // valueAlias.selfRefValue.struct.a: incomplete list: _ (and 1 more errors)
- 			}
- 			pattern: {
- 				a: {}
 -- diff/value/explanation --
 Improved error message.
 Reorderings?
@@ -690,7 +677,7 @@ Reorderings?
 		}
 		selfRefValue: {
 			struct: {
-				a: _|_ // cycle error
+				a: _|_ // valueAlias.selfRefValue.struct.a: incomplete list: _ (and 1 more errors)
 			}
 			pattern: {
 				a: {}

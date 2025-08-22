@@ -132,38 +132,6 @@ Result:
     //     ./in.cue:7:13
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,7 +1,7 @@
- Errors:
--e: invalid struct selector 4 (type int):
-+e: index out of range [4] with length 0:
-     ./in.cue:4:16
--h: invalid list index b (type string):
-+h: undefined field: b:
-     ./in.cue:7:13
- 
- Result:
-@@ -14,7 +14,7 @@
-   index: (int){ 2 }
-   mulidx: (int){ 3 }
-   e: (_|_){
--    // [eval] e: invalid struct selector 4 (type int):
-+    // [eval] e: index out of range [4] with length 0:
-     //     ./in.cue:4:16
-   }
-   f: (_|_){
-@@ -26,7 +26,7 @@
-     //     ./in.cue:6:16
-   }
-   h: (_|_){
--    // [eval] h: invalid list index b (type string):
-+    // [eval] h: undefined field: b:
-     //     ./in.cue:7:13
-   }
- }
 -- diff/explanation --
 Better error message for undefined field in new.
 Other error got worse, but this is covered elsewhere.

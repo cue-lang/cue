@@ -167,68 +167,15 @@ issue3416: {
 		}
 	}
 }
--- diff/-out/list-v3<==>+out/list --
-diff old new
---- old
-+++ new
-@@ -1,11 +1,8 @@
- Errors:
--issue2594.sumSecond.x: conflicting values 0 and 6:
--    ./in.cue:71:3
--    ./in.cue:71:12
--    ./in.cue:74:6
--    ./in.cue:75:6
--issue3416.sumFirst.a.b: field y not allowed by earlier comprehension or reference cycle
--issue3416.sumFirst.a.b: field z not allowed by earlier comprehension or reference cycle
-+0: invalid operands 2 and {num:6} to '+' (type int and struct):
-+    ./in.cue:53:3
-+    ./in.cue:35:9
-+    ./in.cue:36:10
- 
- Result:
- issue563: {
-@@ -30,7 +27,7 @@
- 	a:   *1 | 2
- 	sum: 1
- }
--issue3541: {}
-+issue3541: _|_ // 0: invalid operands 2 and {num:6} to '+' (type int and struct)
- issue2594: {
- 	sumFirst: {
- 		#Def: {
-@@ -47,13 +44,18 @@
- 			0
- 			#In: [...number]
- 		}
--		x: _|_ // issue2594.sumSecond.x: conflicting values 0 and 6
-+		x: {
-+			6
-+			#In: [1, 2, 3]
-+		}
- 	}
- }
- issue3416: {
- 	sumFirst: {
- 		a: {
--			b: _|_ // issue3416.sumFirst.a.b: field y not allowed by earlier comprehension or reference cycle (and 1 more errors)
-+			b: {
-+				111
-+			}
- 		}
- 	}
- 	sumSecond: {
 -- diff/explanation --
 issue3541: evalv3 correctly spots an invalid operand error which evalv2 drops on the floor.
 issue2594: evalv3 fixes an ordering issue present in evalv2.
 -- out/list --
 Errors:
-issue2594.sumSecond.x: conflicting values 0 and 6:
-    ./in.cue:71:3
-    ./in.cue:71:12
-    ./in.cue:74:6
-    ./in.cue:75:6
-issue3416.sumFirst.a.b: field y not allowed by earlier comprehension or reference cycle
-issue3416.sumFirst.a.b: field z not allowed by earlier comprehension or reference cycle
+0: invalid operands 2 and {num:6} to '+' (type int and struct):
+    ./in.cue:53:3
+    ./in.cue:35:9
+    ./in.cue:36:10
 
 Result:
 issue563: {
@@ -253,7 +200,7 @@ issue1404: {
 	a:   *1 | 2
 	sum: 1
 }
-issue3541: {}
+issue3541: _|_ // 0: invalid operands 2 and {num:6} to '+' (type int and struct)
 issue2594: {
 	sumFirst: {
 		#Def: {
@@ -270,13 +217,18 @@ issue2594: {
 			0
 			#In: [...number]
 		}
-		x: _|_ // issue2594.sumSecond.x: conflicting values 0 and 6
+		x: {
+			6
+			#In: [1, 2, 3]
+		}
 	}
 }
 issue3416: {
 	sumFirst: {
 		a: {
-			b: _|_ // issue3416.sumFirst.a.b: field y not allowed by earlier comprehension or reference cycle (and 1 more errors)
+			b: {
+				111
+			}
 		}
 	}
 	sumSecond: {

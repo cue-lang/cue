@@ -20,49 +20,12 @@ First: B: "b"
 First: _
 
 First: #DefA | #DefB
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -2,7 +2,7 @@
- #DefA: A: "a"
- #DefB: B: "b"
- 
--First: {}
--First: {}
-+First: B: "b"
-+First: _
- 
- First: #DefA | #DefB
--- out/trim-v3-noshare --
+-- out/trim --
 == a.cue
 #DefA: A: "a"
 #DefB: B: "b"
 
 First: B: "b"
 First: _
-
-First: #DefA | #DefB
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -2,7 +2,7 @@
- #DefA: A: "a"
- #DefB: B: "b"
- 
--First: {}
--First: {}
-+First: B: "b"
-+First: _
- 
- First: #DefA | #DefB
--- out/trim --
-== a.cue
-#DefA: A: "a"
-#DefB: B: "b"
-
-First: {}
-First: {}
 
 First: #DefA | #DefB

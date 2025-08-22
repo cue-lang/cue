@@ -110,33 +110,6 @@ Disjuncts:    15
     a: (int){ 10 }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -6,17 +6,17 @@
-     }
-   }
-   #def: (#struct){
--    a: (int){ 1 }
--    sub: (#struct){
--      f: (int){ 3 }
--    }
-     b: (int){ 2 }
-+    a: (int){ 1 }
-+    sub: (#struct){
-+      f: (int){ 3 }
-+    }
-   }
-   #f: (#struct){
-     a: (int){ 10 }
-   }
-   #e: (#struct){
--    a: (int){ 10 }
-     b: (int){ &(<100, int) }
-+    a: (int){ 10 }
-   }
- }
 -- diff/todo/p3 --
 Reordering
 -- out/eval --

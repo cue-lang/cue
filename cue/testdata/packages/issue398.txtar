@@ -35,18 +35,6 @@ Disjuncts:    8
   yy: (int){ 2 }
   xx: (int){ 1 }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,5 +1,5 @@
- (struct){
--  xx: (int){ 1 }
--  yy: (int){ 2 }
-   zz: (int){ 3 }
-+  yy: (int){ 2 }
-+  xx: (int){ 1 }
- }
 -- diff/todo/p3 --
 Reordering
 -- out/eval --

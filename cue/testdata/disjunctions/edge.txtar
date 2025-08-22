@@ -305,46 +305,6 @@ Disjuncts:    154
       }) }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -69,8 +69,8 @@
-       foo_field: (string){ string }
-     }
-     #TypeBar: (#struct){
--      name: (string){ "bar" }
-       bar_field?: (string){ string }
-+      name: (string){ "bar" }
-     }
-     #TypeBar2: (#struct){
-       name: (string){ "bar" }
-@@ -77,21 +77,21 @@
-     }
-     objs: (struct){
-       obj1: (struct){
--        type: (#struct){ |((#struct){
-+        type: (struct){ |((#struct){
-             name: (string){ "foo" }
-             foo_field: (string){ string }
-           }, (#struct){
--            name: (string){ "bar" }
-             bar_field?: (string){ string }
-+            name: (string){ "bar" }
-           }) }
-       }
-     }
--    out: (#struct){ |((#struct){
-+    out: (struct){ |((#struct){
-         name: (string){ "foo" }
-         foo_field: (string){ string }
-       }, (#struct){
--        name: (string){ "bar" }
-         bar_field?: (string){ string }
-+        name: (string){ "bar" }
-       }) }
-   }
- }
 -- diff/todo/p2 --
 cyclicalInsertInDisjunction.maybe: discrepancy may be okay
 cyclicalInsertInDisjunction.err1: should be an err for the old and new evaluator.

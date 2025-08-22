@@ -18,36 +18,6 @@ a: {inner: {type: "A", value: 0}} & #D
 }
 
 a: {inner: {type: "A"}} & #D
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -6,4 +6,4 @@
- 	}
- }
- 
--a: {inner: {type: "A", value: 0}} & #D
-+a: {inner: {type: "A"}} & #D
--- out/trim-v3-noshare --
-== a.cue
-#D: inner: {
-	type: "A" | "B"
-	if type == "A" {
-		value: number | *0
-	}
-}
-
-a: {inner: {type: "A"}} & #D
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -6,4 +6,4 @@
- 	}
- }
- 
--a: {inner: {type: "A", value: 0}} & #D
-+a: {inner: {type: "A"}} & #D
 -- out/trim --
 == a.cue
 #D: inner: {
@@ -57,4 +27,4 @@ diff old new
 	}
 }
 
-a: {inner: {type: "A", value: 0}} & #D
+a: {inner: {type: "A"}} & #D

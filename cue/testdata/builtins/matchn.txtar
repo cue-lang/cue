@@ -357,31 +357,6 @@ Conjuncts:    1551
 Disjuncts:    16
 
 NumCloseIDs: 483
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
--Leaks:  52
--Freed:  951
--Reused: 944
--Allocs: 59
--Retain: 129
--
--Unifications: 987
--Conjuncts:    1635
--Disjuncts:    1081
-+Leaks:  129
-+Freed:  1059
-+Reused: 1029
-+Allocs: 159
-+Retain: 0
-+
-+Unifications: 971
-+Conjuncts:    1551
-+Disjuncts:    16
-+
-+NumCloseIDs: 483
 -- out/eval/stats --
 Leaks:  52
 Freed:  951
@@ -2380,31 +2355,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -61,10 +61,6 @@
-     ./closedness.cue:36:6
- explicitClose.err1.out.a.baz: field not allowed:
-     ./closedness.cue:33:6
--    ./closedness.cue:32:12
--    ./closedness.cue:33:24
--    ./closedness.cue:33:30
--    ./closedness.cue:35:7
-     ./closedness.cue:36:11
- closedByDefinition.err5.out.exports: invalid value {exp1:"./main-module.js"} (does not satisfy matchN): 0 matched, expected 1:
-     ./closedness.cue:80:13
-@@ -975,8 +971,8 @@
-         run?: (string){ string }
-       }
-       s: (#struct){
--        uses?: (string){ string }
-         run: (string){ "echo hello world" }
-+        uses?: (string){ string }
-       }
-     }
-     simple: (struct){
 -- diff/explanation --
 The old evaluator does not correctly handle ToDataAll if a node is
 mid-evaluation. The new evaluator does.

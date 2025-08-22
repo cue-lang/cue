@@ -109,18 +109,6 @@ Disjuncts:    17
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -15,6 +15,7 @@
-         // [incomplete] #Spec.data.foobar: error in call to encoding/yaml.Marshal: incomplete value string:
-         //     ./in.cue:12:11
-         //     ./in.cue:6:21
-+        //     ./in.cue:9:9
-       }
-     }
-   }
 -- out/eval --
 (struct){
   #Spec: (#struct){

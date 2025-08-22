@@ -38,48 +38,6 @@ things: vagrant: {
 		limits: close({})
 	}
 }
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -14,5 +14,6 @@
- 		requests: {
- 			cpu: "1m"
- 		}
-+		limits: close({})
- 	}
- }
--- out/trim-v3-noshare --
-== a.cue
-things: [_]: {
-	resources: *{
-		requests: {
-			memory: "100M"
-			cpu:    "100m"
-		}
-		limits: requests
-	} | {...}
-}
-
-things: vagrant: {
-	resources: {
-		requests: {
-			cpu: "1m"
-		}
-		limits: close({})
-	}
-}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -14,5 +14,6 @@
- 		requests: {
- 			cpu: "1m"
- 		}
-+		limits: close({})
- 	}
- }
 -- out/trim --
 == a.cue
 things: [_]: {
@@ -97,5 +55,6 @@ things: vagrant: {
 		requests: {
 			cpu: "1m"
 		}
+		limits: close({})
 	}
 }

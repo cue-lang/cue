@@ -38,28 +38,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,8 +1,6 @@
- Errors:
- x.b: field not allowed:
-     ./in.cue:1:5
--    ./in.cue:2:11
--    ./in.cue:3:5
-     ./in.cue:6:2
- 
- Result:
-@@ -17,8 +15,6 @@
-     b: (_|_){
-       // [eval] x.b: field not allowed:
-       //     ./in.cue:1:5
--      //     ./in.cue:2:11
--      //     ./in.cue:3:5
-       //     ./in.cue:6:2
-     }
-   }
 -- diff/todo/p2 --
 Positions.
 -- out/eval --

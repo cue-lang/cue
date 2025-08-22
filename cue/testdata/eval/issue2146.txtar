@@ -51,31 +51,6 @@ Conjuncts:    157
 Disjuncts:    12
 
 NumCloseIDs: 38
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
--Leaks:  18
--Freed:  171
--Reused: 163
--Allocs: 26
--Retain: 18
--
--Unifications: 173
--Conjuncts:    557
--Disjuncts:    189
-+Leaks:  12
-+Freed:  127
-+Reused: 92
-+Allocs: 47
-+Retain: 0
-+
-+Unifications: 79
-+Conjuncts:    157
-+Disjuncts:    12
-+
-+NumCloseIDs: 38
 -- out/eval/stats --
 Leaks:  18
 Freed:  171
@@ -209,43 +184,6 @@ Disjuncts:    189
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -49,10 +49,13 @@
-     b: (#struct){
-       x: (int){ 3 }
-       y?: (int){ int }
--      let list#1multi = [
--        〈1;x〉,
--        〈1;y〉,
--      ]
-+      let list#1 = (#list){
-+        0: (int){ 3 }
-+        1: (_|_){
-+          // [incomplete] p1.b.list.1: cannot reference optional field: y:
-+          //     ./in.cue:6:18
-+        }
-+      }
-       all: (#list){
-         0: (int){ 3 }
-       }
-@@ -106,10 +109,10 @@
-     b: (#struct){
-       x: (int){ 3 }
-       y: (int){ 2 }
--      let list#2multi = [
--        〈1;x〉,
--        〈1;y〉,
--      ]
-+      let list#2 = (#list){
-+        0: (int){ 3 }
-+        1: (int){ 2 }
-+      }
-       all: (#list){
-         0: (int){ 3 }
-         1: (int){ 2 }
 -- out/eval --
 (struct){
   p1: (struct){

@@ -44,21 +44,6 @@ Disjuncts:    13
     2: (int){ 1 }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -11,8 +11,8 @@
-   }
-   valueCycle: (struct){
-     b: (_|_){
--      // [cycle] cycle error:
--      //     ./in.cue:8:18
-+      // [cycle] valueCycle.b: cycle with field: X:
-+      //     ./in.cue:8:22
-     }
-   }
-   listValueAlias: (#list){
 -- out/eval --
 (struct){
   structShorthand: (struct){

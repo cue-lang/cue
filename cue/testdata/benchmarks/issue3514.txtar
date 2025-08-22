@@ -48,32 +48,6 @@ Disjuncts:    2362
 Notifications: 2
 
 NumCloseIDs: 5733
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,12 @@
--Leaks:  27
--Freed:  31092
--Reused: 30511
--Allocs: 608
--Retain: 47
--
--Unifications: 189
--Conjuncts:    92950
--Disjuncts:    31139
-+Leaks:  12
-+Freed:  3590
-+Reused: 2436
-+Allocs: 1166
-+Retain: 0
-+
-+Unifications: 50
-+Conjuncts:    7010
-+Disjuncts:    2362
-+Notifications: 2
-+
-+NumCloseIDs: 5733
 -- out/eval/stats --
 Leaks:  27
 Freed:  31092

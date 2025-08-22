@@ -89,35 +89,6 @@ Conjuncts:    107
 Disjuncts:    0
 
 NumCloseIDs: 25
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,13 +1,11 @@
--Leaks:  4
--Freed:  63
--Reused: 55
--Allocs: 12
--Retain: 11
--
--Unifications: 67
--Conjuncts:    88
--Disjuncts:    74
--
--MisalignedConjunct: 4
--
--NumCloseIDs: 10
-+Leaks:  6
-+Freed:  74
-+Reused: 60
-+Allocs: 20
-+Retain: 0
-+
-+Unifications: 71
-+Conjuncts:    107
-+Disjuncts:    0
-+
-+NumCloseIDs: 25
 -- out/eval/stats --
 Leaks:  4
 Freed:  63
@@ -226,47 +197,6 @@ NumCloseIDs: 10
     ok: (bool){ true }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -6,9 +6,9 @@
-           _CL: (string){ "l" }
-           _cs: (struct){
-             l: (struct){
--              _ba?: (string){ string }
-               opts: (struct){
-               }
-+              _ba?: (string){ string }
-               vms: (#list){
-                 0: (struct){
-                   name: (string){ "hello" }
-@@ -38,9 +38,9 @@
-   reduced: (struct){
-     p1: (struct){
-       _cs: (struct){
--        _ba?: (string){ string }
--        opts: (struct){
--        }
-+        opts: (struct){
-+        }
-+        _ba?: (string){ string }
-         vms: (string){ "hello" }
-       }
-       _a: (struct){
-@@ -61,9 +61,9 @@
-     p2: (struct){
-       x: (int){ 5 }
-       _cs: (struct){
--        _ba?: (string){ string }
--        opts: (struct){
--        }
-+        opts: (struct){
-+        }
-+        _ba?: (string){ string }
-         vms: (string){ "hello" }
-       }
-       _a: (struct){
 -- out/eval --
 (struct){
   full: (struct){

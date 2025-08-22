@@ -12,39 +12,9 @@ g: #x & {a: 5}
 #x: {a: 5, a: int} | {b: 5} | {c: >4}
 h: #x & {b: 5}
 i: #x & {c: 5}
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,5 +1,5 @@
- == a.cue
--g: #x & {}
-+g: #x & {a: 5}
- #x: {a: 5, a: int} | {b: 5} | {c: >4}
--h: #x & {}
-+h: #x & {b: 5}
- i: #x & {c: 5}
--- out/trim-v3-noshare --
+-- out/trim --
 == a.cue
 g: #x & {a: 5}
 #x: {a: 5, a: int} | {b: 5} | {c: >4}
 h: #x & {b: 5}
-i: #x & {c: 5}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,5 +1,5 @@
- == a.cue
--g: #x & {}
-+g: #x & {a: 5}
- #x: {a: 5, a: int} | {b: 5} | {c: >4}
--h: #x & {}
-+h: #x & {b: 5}
- i: #x & {c: 5}
--- out/trim --
-== a.cue
-g: #x & {}
-#x: {a: 5, a: int} | {b: 5} | {c: >4}
-h: #x & {}
 i: #x & {c: 5}

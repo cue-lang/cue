@@ -60,6 +60,8 @@ Result:
     _#cond: (bool){ true }
   }
 }
+-- diff/todo/p2 --
+Missing error positions
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -79,8 +81,6 @@ diff old new
      //     ./in.cue:10:2
      //     ./in.cue:10:13
      //     ./in.cue:12:2
--- diff/todo/p2 --
-Missing error positions
 -- out/eval --
 Errors:
 ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):

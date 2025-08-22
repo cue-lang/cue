@@ -112,55 +112,6 @@ Disjuncts:    81
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -11,7 +11,7 @@
-       }
-       foo: (string){ "bar" }
-     }
--    full: (struct){
-+    full: (#struct){
-       #ReferenceGrantBuilder: (#struct){
-         parameters: (#struct){
-           namespace: (string){ string }
-@@ -19,8 +19,6 @@
-         }
-         referenceGrant: (#struct){
-           foo: (#struct){
--            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
--            kind: (string){ "ReferenceGrant" }
-             metadata: (#struct){
-               name: (string){ |(*(string){ "foo" }, (string){ string }) }
-               namespace: (string){ string }
-@@ -29,6 +27,8 @@
-               annotations?: (#struct){
-               }
-             }
-+            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-+            kind: (string){ "ReferenceGrant" }
-           }
-         }
-       }
-@@ -45,8 +45,6 @@
-         }
-       }
-       foo: (#struct){
--        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
--        kind: (string){ "ReferenceGrant" }
-         metadata: (#struct){
-           name: (string){ |(*(string){ "foo" }, (string){ string }) }
-           namespace: (string){ "foo" }
-@@ -55,6 +53,8 @@
-           annotations?: (#struct){
-           }
-         }
-+        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-+        kind: (string){ "ReferenceGrant" }
-       }
-     }
-   }
 -- out/eval --
 (struct){
   issue3905: (struct){

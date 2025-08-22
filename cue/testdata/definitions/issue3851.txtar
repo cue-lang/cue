@@ -50,19 +50,6 @@ Disjuncts:    48
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -14,7 +14,7 @@
-   out: (#struct){
-     name: (string){ "foo" }
-     sub1: (#struct){
--      sub2: (struct){
-+      sub2: (#struct){
-         sub3: (struct){
-           let _let#1 = (string){ "bar" }
-           foo: (string){ "bar" }
 -- out/eval --
 (struct){
   #App: (#struct){

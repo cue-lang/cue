@@ -85,30 +85,6 @@ Conjuncts:    24
 Disjuncts:    0
 
 NumCloseIDs: 3
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,11 @@
- Leaks:  0
--Freed:  45
--Reused: 39
--Allocs: 6
--Retain: 17
--
--Unifications: 45
--Conjuncts:    77
--Disjuncts:    62
-+Freed:  21
-+Reused: 12
-+Allocs: 9
-+Retain: 0
-+
-+Unifications: 21
-+Conjuncts:    24
-+Disjuncts:    0
-+
-+NumCloseIDs: 3
 -- out/eval/stats --
 Leaks:  0
 Freed:  45
@@ -150,27 +126,6 @@ Disjuncts:    62
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -8,7 +8,7 @@
-     out: (_|_){
-       // [incomplete] #T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
-       //     ./in.cue:14:7
--      //     ./in.cue:15:3
-+      //     ./in.cue:13:2
-     }
-   }
-   #V: (#struct){
-@@ -24,6 +24,7 @@
-       // [incomplete] #U.out: error in call to encoding/yaml.Marshal: incomplete value string:
-       //     ./in.cue:26:7
-       //     ./in.cue:25:7
-+      //     ./in.cue:26:26
-     }
-   }
- }
 -- out/eval --
 (struct){
   x: (#struct){

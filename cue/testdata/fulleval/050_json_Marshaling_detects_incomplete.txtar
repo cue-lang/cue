@@ -30,27 +30,6 @@ Retain: 0
 Unifications: 8
 Conjuncts:    8
 Disjuncts:    0
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
- Leaks:  0
--Freed:  16
--Reused: 12
--Allocs: 4
--Retain: 5
-+Freed:  8
-+Reused: 2
-+Allocs: 6
-+Retain: 0
- 
--Unifications: 16
--Conjuncts:    24
--Disjuncts:    21
-+Unifications: 8
-+Conjuncts:    8
-+Disjuncts:    0
 -- out/eval/stats --
 Leaks:  0
 Freed:  16

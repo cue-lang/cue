@@ -337,23 +337,6 @@ Reordering.
 [errorListDef #Def]
 [errorListDef 0]
 [errorListDef 1]
--- diff/-out/doc-v3<==>+out/doc --
-diff old new
---- old
-+++ new
-@@ -65,10 +65,10 @@
- [y1 x 1]
- [y1 x 2]
- [y1 foo0]
--[y1 bar1]
--[y1 bar2]
- [y1 foo1]
- [y1 foo2]
-+[y1 bar1]
-+[y1 bar2]
- [preserveKeyFieldInComprehension]
- [errorStructDef]
- [errorStructDef a]
 -- out/doc --
 []
 [p1]
@@ -422,10 +405,10 @@ diff old new
 [y1 x 1]
 [y1 x 2]
 [y1 foo0]
-[y1 bar1]
-[y1 bar2]
 [y1 foo1]
 [y1 foo2]
+[y1 bar1]
+[y1 bar2]
 [preserveKeyFieldInComprehension]
 [errorStructDef]
 [errorStructDef a]

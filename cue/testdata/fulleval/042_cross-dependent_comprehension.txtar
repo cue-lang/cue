@@ -61,26 +61,6 @@ NumCloseIDs: 3
   }
   y: ~(x)
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -5,11 +5,8 @@
-     b: (bool){ bool }
-   }
-   x: (#struct){
--    c: (int){ 4 }
--    b: (bool){ true }
--  }
--  y: (#struct){
--    c: (int){ 4 }
--    b: (bool){ true }
--  }
-+    b: (bool){ true }
-+    c: (int){ 4 }
-+  }
-+  y: ~(x)
- }
 -- diff/todo/p3 --
 Reordering
 -- out/eval --

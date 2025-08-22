@@ -117,23 +117,6 @@ sub: {
 - comment inside of if comprehension
 
 [sub innerField]
--- diff/-out/doc-v3<==>+out/doc --
-diff old new
---- old
-+++ new
-@@ -37,10 +37,10 @@
- 
- [baz]
- [baz field1]
--- comment from bar on field 1
--
- - comment from baz on field 1
- 
-+- comment from bar on field 1
-+
- [baz field2]
- - comment from bar on field 2
- 
 -- diff/out/explanation --
 Reordering.
 -- out/doc --
@@ -176,9 +159,9 @@ Reordering.
 
 [baz]
 [baz field1]
-- comment from bar on field 1
-
 - comment from baz on field 1
+
+- comment from bar on field 1
 
 [baz field2]
 - comment from bar on field 2
@@ -447,49 +430,6 @@ sub: {
 		innerField: 1
 	}
 }
--- diff/-out/value-v3<==>+out/value --
-diff old new
---- old
-+++ new
-@@ -33,9 +33,9 @@
- 		field2: int
- 	}
- 	baz: {
--		// comment from bar on field 1
--
--		// comment from baz on field 1
-+		// comment from baz on field 1
-+
-+		// comment from bar on field 1
- 		field1: int
- 		// comment from bar on field 2
- 		field2: int
-@@ -81,9 +81,9 @@
- 		field2: int
- 	}
- 	baz: {
--		// comment from bar on field 1
--
--		// comment from baz on field 1
-+		// comment from baz on field 1
-+
-+		// comment from bar on field 1
- 		field1: int
- 		// comment from bar on field 2
- 		field2: int
-@@ -156,9 +156,9 @@
- 		field2: int
- 	}
- 	baz: {
--		// comment from bar on field 1
--
--		// comment from baz on field 1
-+		// comment from baz on field 1
-+
-+		// comment from bar on field 1
- 		field1: int
- 		// comment from bar on field 2
- 		field2: int
 -- diff/value/explanation --
 Reordering.
 -- out/value --
@@ -528,9 +468,9 @@ Reordering.
 		field2: int
 	}
 	baz: {
-		// comment from bar on field 1
-
 		// comment from baz on field 1
+
+		// comment from bar on field 1
 		field1: int
 		// comment from bar on field 2
 		field2: int
@@ -576,9 +516,9 @@ Reordering.
 		field2: int
 	}
 	baz: {
-		// comment from bar on field 1
-
 		// comment from baz on field 1
+
+		// comment from bar on field 1
 		field1: int
 		// comment from bar on field 2
 		field2: int
@@ -651,9 +591,9 @@ Reordering.
 		field2: int
 	}
 	baz: {
-		// comment from bar on field 1
-
 		// comment from baz on field 1
+
+		// comment from bar on field 1
 		field1: int
 		// comment from bar on field 2
 		field2: int

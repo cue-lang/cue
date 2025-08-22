@@ -13,34 +13,6 @@ service: [_]: {
 }
 
 service: pastrychef: _
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -4,4 +4,4 @@
- 	selector: metadata
- }
- 
--service: pastrychef: selector: {}
-+service: pastrychef: _
--- out/trim-v3-noshare --
-== a.cue
-service: [_]: {
-	metadata: {x: 3}
-	selector: metadata
-}
-
-service: pastrychef: _
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -4,4 +4,4 @@
- 	selector: metadata
- }
- 
--service: pastrychef: selector: {}
-+service: pastrychef: _
 -- out/trim --
 == a.cue
 service: [_]: {
@@ -48,4 +20,4 @@ service: [_]: {
 	selector: metadata
 }
 
-service: pastrychef: selector: {}
+service: pastrychef: _

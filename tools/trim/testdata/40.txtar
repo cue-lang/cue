@@ -6,29 +6,7 @@ d: #D & { list: [{value: 1}] }
 == a.cue
 #D: list: [...{value: number | *1}]
 d: #D & {list: [{}]}
--- diff/-out/trim-v3<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,3 +1,3 @@
- == a.cue
- #D: list: [...{value: number | *1}]
--d: #D & {}
-+d: #D & {list: [{}]}
--- out/trim-v3-noshare --
-== a.cue
-#D: list: [...{value: number | *1}]
-d: #D & {list: [{}]}
--- diff/-out/trim-v3-noshare<==>+out/trim --
-diff old new
---- old
-+++ new
-@@ -1,3 +1,3 @@
- == a.cue
- #D: list: [...{value: number | *1}]
--d: #D & {}
-+d: #D & {list: [{}]}
 -- out/trim --
 == a.cue
 #D: list: [...{value: number | *1}]
-d: #D & {}
+d: #D & {list: [{}]}

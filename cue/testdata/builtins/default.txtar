@@ -51,18 +51,6 @@ Disjuncts:    45
   Quo: (int){ 2 }
   Rem: (int){ 1 }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,6 +1,6 @@
- (struct){
-   Len: (int){ 3 }
--  Close: (struct){
-+  Close: (#struct){
-   }
-   And: (int){ 1 }
-   Or: (int){ 1 }
 -- out/eval --
 (struct){
   Len: (int){ 3 }

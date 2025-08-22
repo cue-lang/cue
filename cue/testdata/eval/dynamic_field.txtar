@@ -242,48 +242,6 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -17,9 +17,7 @@
-   a: (string){ "foo" }
-   e: (int){ 2 }
-   b: (string){ "bar" }
--  c: (struct){
--    a: (int){ 1 }
--  }
-+  c: ~(bar)
-   withError: (_|_){
-     // [eval]
-     issue799: (_|_){
-@@ -81,6 +79,8 @@
-           // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
-           //     ./in.cue:59:8
-           //     ./in.cue:59:11
-+          // noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(invalid interpolation: noCycleError.foo.baz.#ID: non-concrete value string (type string)):
-+          //     ./in.cue:61:22
-         }
-         #ID: (_|_){
-           // [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
-@@ -123,6 +123,9 @@
-       botUser: (string){ "bot1" }
-     }
-   }
-+  bar: (struct){
-+    a: (int){ 1 }
-+  }
-   foo: (struct){
-     b: (struct){
-       c: (struct){
-@@ -130,7 +133,4 @@
-       }
-     }
-   }
--  bar: (struct){
--    a: (int){ 1 }
--  }
- }
 -- diff/todo/p2 --
 Added near-duplicate message
 -- out/eval --

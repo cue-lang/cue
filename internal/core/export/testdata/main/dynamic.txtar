@@ -55,18 +55,6 @@ r1:     "r1"
 ["s-r"]
 ["s-q1"]
 ["s-q1" r1]
--- diff/-out/doc-v3<==>+out/doc --
-diff old new
---- old
-+++ new
-@@ -8,7 +8,6 @@
- [q1]
- [r]
- [r1]
--[_]
- [y]
- ["s-q"]
- ["s-r"]
 -- diff/out/todo/p3 --
 One missing entry is the result of the new evaluator not generating a
 bogus field for a failed dynamic field.
@@ -81,7 +69,6 @@ bogus field for a failed dynamic field.
 [q1]
 [r]
 [r1]
-[_]
 [y]
 ["s-q"]
 ["s-r"]
@@ -186,124 +173,104 @@ _|_ // key value of dynamic field must be concrete, found _|_(cycle error) (and 
 		(r1)!: 3
 	}
 }
--- diff/-out/value-v3<==>+out/value --
-diff old new
---- old
-+++ new
-@@ -1,10 +1,98 @@
- == Simplified
--_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
-+{
-+	x:     string
-+	X=(x): 4
-+	Y=(x): 6
-+	Z="y": int
-+	a: {
-+		labelX: X
-+		labelY: Y
-+		labelZ: Z
-+	}
-+	E=["cue"]: {
-+		name: E | null
-+	}
-+	q:           "q"
-+	q1:          "q1"
-+	r:           "r"
-+	r1:          "r1"
-+	("s-" + q)?: 1
-+	("s-" + r)!: 2
-+	("s-" + q1)?: {
-+		(r1)!: 3
-+	}
-+}
- == Raw
--_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
-+{
-+	x:     string
-+	X=(x): 4
-+	Y=(x): 6
-+	Z="y": int
-+	a: {
-+		labelX: X
-+		labelY: Y
-+		labelZ: Z
-+	}
-+	E=["cue"]: {
-+		name: E | null
-+	}
-+	q:           "q"
-+	q1:          "q1"
-+	r:           "r"
-+	r1:          "r1"
-+	("s-" + q)?: 1
-+	("s-" + r)!: 2
-+	("s-" + q1)?: {
-+		(r1)!: 3
-+	}
-+}
- == Final
--_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
-+_|_ // key value of dynamic field must be concrete, found _|_(cycle error) (and 3 more errors)
- == All
--_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
-+{
-+	x:     string
-+	X=(x): 4
-+	Y=(x): 6
-+	Z="y": int
-+	a: {
-+		labelX: X
-+		labelY: Y
-+		labelZ: Z
-+	}
-+	E=["cue"]: {
-+		name: E | null
-+	}
-+	q:           "q"
-+	q1:          "q1"
-+	r:           "r"
-+	r1:          "r1"
-+	("s-" + q)?: 1
-+	("s-" + r)!: 2
-+	("s-" + q1)?: {
-+		(r1)!: 3
-+	}
-+}
- == Eval
--_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
-+{
-+	x:     string
-+	X=(x): 4
-+	Y=(x): 6
-+	Z="y": int
-+	a: {
-+		labelX: X
-+		labelY: Y
-+		labelZ: Z
-+	}
-+	E=["cue"]: {
-+		name: E | null
-+	}
-+	q:           "q"
-+	q1:          "q1"
-+	r:           "r"
-+	r1:          "r1"
-+	("s-" + q)?: 1
-+	("s-" + r)!: 2
-+	("s-" + q1)?: {
-+		(r1)!: 3
-+	}
-+}
 -- diff/value/todo/p0 --
 Ignored errors?
 -- out/value --
 == Simplified
-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
+{
+	x:     string
+	X=(x): 4
+	Y=(x): 6
+	Z="y": int
+	a: {
+		labelX: X
+		labelY: Y
+		labelZ: Z
+	}
+	E=["cue"]: {
+		name: E | null
+	}
+	q:           "q"
+	q1:          "q1"
+	r:           "r"
+	r1:          "r1"
+	("s-" + q)?: 1
+	("s-" + r)!: 2
+	("s-" + q1)?: {
+		(r1)!: 3
+	}
+}
 == Raw
-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
+{
+	x:     string
+	X=(x): 4
+	Y=(x): 6
+	Z="y": int
+	a: {
+		labelX: X
+		labelY: Y
+		labelZ: Z
+	}
+	E=["cue"]: {
+		name: E | null
+	}
+	q:           "q"
+	q1:          "q1"
+	r:           "r"
+	r1:          "r1"
+	("s-" + q)?: 1
+	("s-" + r)!: 2
+	("s-" + q1)?: {
+		(r1)!: 3
+	}
+}
 == Final
-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
+_|_ // key value of dynamic field must be concrete, found _|_(cycle error) (and 3 more errors)
 == All
-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
+{
+	x:     string
+	X=(x): 4
+	Y=(x): 6
+	Z="y": int
+	a: {
+		labelX: X
+		labelY: Y
+		labelZ: Z
+	}
+	E=["cue"]: {
+		name: E | null
+	}
+	q:           "q"
+	q1:          "q1"
+	r:           "r"
+	r1:          "r1"
+	("s-" + q)?: 1
+	("s-" + r)!: 2
+	("s-" + q1)?: {
+		(r1)!: 3
+	}
+}
 == Eval
-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
+{
+	x:     string
+	X=(x): 4
+	Y=(x): 6
+	Z="y": int
+	a: {
+		labelX: X
+		labelY: Y
+		labelZ: Z
+	}
+	E=["cue"]: {
+		name: E | null
+	}
+	q:           "q"
+	q1:          "q1"
+	r:           "r"
+	r1:          "r1"
+	("s-" + q)?: 1
+	("s-" + r)!: 2
+	("s-" + q1)?: {
+		(r1)!: 3
+	}
+}

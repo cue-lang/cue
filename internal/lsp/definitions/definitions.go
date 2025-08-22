@@ -1056,6 +1056,7 @@ func expandNavigables(navigables []*navigableBindings) map[*navigableBindings]st
 		return nil
 	}
 	navigableSet := make(map[*navigableBindings]struct{})
+	nodesSet := make(map[*astNode]struct{})
 	for len(navigables) > 0 {
 		nav := navigables[0]
 		navigables = navigables[1:]
@@ -1064,9 +1065,21 @@ func expandNavigables(navigables []*navigableBindings) map[*navigableBindings]st
 		}
 		navigableSet[nav] = struct{}{}
 
-		for _, node := range nav.contributingNodes {
+		nodes := slices.Clone(nav.contributingNodes)
+		for len(nodes) > 0 {
+			node := nodes[0]
+			nodes = nodes[1:]
+			if _, seen := nodesSet[node]; seen {
+				continue
+			}
+			nodesSet[node] = struct{}{}
+
 			node.eval()
 			navigables = append(navigables, node.resolvesTo...)
+			// evaluating a node X can add new nodes into X's
+			// navigable.contributingNodes. So we need to make sure we
+			// evaluate and expand into those too.
+			nodes = append(nodes, node.navigable.contributingNodes...)
 
 			if spec, ok := node.key.(*ast.ImportSpec); ok {
 				str, err := strconv.Unquote(spec.Path.Value)

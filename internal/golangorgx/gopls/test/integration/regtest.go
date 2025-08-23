@@ -15,7 +15,6 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/cmd"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"cuelang.org/go/internal/golangorgx/tools/gocommand"
 	"cuelang.org/go/internal/golangorgx/tools/memoize"
 	"cuelang.org/go/internal/golangorgx/tools/testenv"
 	"cuelang.org/go/internal/golangorgx/tools/tool"
@@ -108,9 +107,6 @@ func DefaultModes() Mode {
 
 // Main sets up and tears down the shared integration test state.
 func Main(m *testing.M, hook func(*settings.Options)) {
-	// golang/go#54461: enable additional debugging around hanging Go commands.
-	gocommand.DebugHangingGoCommands = true
-
 	// If this magic environment variable is set, run gopls instead of the test
 	// suite. See the documentation for runTestAsGoplsEnvvar for more details.
 	if os.Getenv(runTestAsGoplsEnvvar) == "true" {

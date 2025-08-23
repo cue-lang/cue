@@ -229,9 +229,6 @@ func (e *Editor) Client() *Client {
 // makeSettings builds the settings map for use in LSP settings RPCs.
 func makeSettings(sandbox *Sandbox, config EditorConfig, scopeURI *protocol.URI) map[string]any {
 	env := make(map[string]string)
-	for k, v := range sandbox.GoEnv() {
-		env[k] = v
-	}
 	for k, v := range config.Env {
 		env[k] = v
 	}

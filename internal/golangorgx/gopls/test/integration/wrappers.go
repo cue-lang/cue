@@ -6,7 +6,6 @@ package integration
 
 import (
 	"encoding/json"
-	"path"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
@@ -271,57 +270,6 @@ func (e *Env) RunGenerate(dir string) {
 	// we help it out here as we need to wait for the generate command to
 	// complete before checking the filesystem.
 	e.CheckForFileChanges()
-}
-
-// RunGoCommand runs the given command in the sandbox's default working
-// directory.
-func (e *Env) RunGoCommand(verb string, args ...string) {
-	e.T.Helper()
-	if err := e.Sandbox.RunGoCommand(e.Ctx, "", verb, args, nil, true); err != nil {
-		e.T.Fatal(err)
-	}
-}
-
-// RunGoCommandInDir is like RunGoCommand, but executes in the given
-// relative directory of the sandbox.
-func (e *Env) RunGoCommandInDir(dir, verb string, args ...string) {
-	e.T.Helper()
-	if err := e.Sandbox.RunGoCommand(e.Ctx, dir, verb, args, nil, true); err != nil {
-		e.T.Fatal(err)
-	}
-}
-
-// RunGoCommandInDirWithEnv is like RunGoCommand, but executes in the given
-// relative directory of the sandbox with the given additional environment variables.
-func (e *Env) RunGoCommandInDirWithEnv(dir string, env []string, verb string, args ...string) {
-	e.T.Helper()
-	if err := e.Sandbox.RunGoCommand(e.Ctx, dir, verb, args, env, true); err != nil {
-		e.T.Fatal(err)
-	}
-}
-
-// GoVersion checks the version of the go command.
-// It returns the X in Go 1.X.
-func (e *Env) GoVersion() int {
-	e.T.Helper()
-	v, err := e.Sandbox.GoVersion(e.Ctx)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return v
-}
-
-// DumpGoSum prints the correct go.sum contents for dir in txtar format,
-// for use in creating integration tests.
-func (e *Env) DumpGoSum(dir string) {
-	e.T.Helper()
-
-	if err := e.Sandbox.RunGoCommand(e.Ctx, dir, "list", []string{"-mod=mod", "..."}, nil, true); err != nil {
-		e.T.Fatal(err)
-	}
-	sumFile := path.Join(dir, "/go.sum")
-	e.T.Log("\n\n-- " + sumFile + " --\n" + e.ReadWorkspaceFile(sumFile))
-	e.T.Fatal("see contents above")
 }
 
 // CheckForFileChanges triggers a manual poll of the workspace for any file

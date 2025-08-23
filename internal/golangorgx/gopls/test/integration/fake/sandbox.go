@@ -5,15 +5,12 @@
 package fake
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"cuelang.org/go/internal/golangorgx/tools/gocommand"
-	"cuelang.org/go/internal/golangorgx/tools/testenv"
 	"cuelang.org/go/internal/robustio"
 	"golang.org/x/tools/txtar"
 )
@@ -21,11 +18,10 @@ import (
 // Sandbox holds a collection of temporary resources to use for working with Go
 // code in tests.
 type Sandbox struct {
-	gopath          string
-	rootdir         string
-	goproxy         string
-	Workdir         *Workdir
-	goCommandRunner gocommand.Runner
+	gopath  string
+	rootdir string
+	goproxy string
+	Workdir *Workdir
 }
 
 // SandboxConfig controls the behavior of a test sandbox. The zero value
@@ -215,85 +211,11 @@ func (sb *Sandbox) GOPATH() string {
 	return sb.gopath
 }
 
-// GoEnv returns the default environment variables that can be used for
-// invoking Go commands in the sandbox.
-func (sb *Sandbox) GoEnv() map[string]string {
-	vars := map[string]string{
-		"GOPATH":           sb.GOPATH(),
-		"GOPROXY":          sb.goproxy,
-		"GO111MODULE":      "",
-		"GOSUMDB":          "off",
-		"GOPACKAGESDRIVER": "off",
-	}
-	if testenv.Go1Point() >= 5 {
-		vars["GOMODCACHE"] = ""
-	}
-	return vars
-}
-
-// goCommandInvocation returns a new gocommand.Invocation initialized with the
-// sandbox environment variables and working directory.
-func (sb *Sandbox) goCommandInvocation() gocommand.Invocation {
-	var vars []string
-	for k, v := range sb.GoEnv() {
-		vars = append(vars, fmt.Sprintf("%s=%s", k, v))
-	}
-	inv := gocommand.Invocation{
-		Env: vars,
-	}
-	// sb.Workdir may be nil if we exited the constructor with errors (we call
-	// Close to clean up any partial state from the constructor, which calls
-	// RunGoCommand).
-	if sb.Workdir != nil {
-		inv.WorkingDir = string(sb.Workdir.RelativeTo)
-	}
-	return inv
-}
-
-// RunGoCommand executes a go command in the sandbox. If checkForFileChanges is
-// true, the sandbox scans the working directory and emits file change events
-// for any file changes it finds.
-func (sb *Sandbox) RunGoCommand(ctx context.Context, dir, verb string, args, env []string, checkForFileChanges bool) error {
-	inv := sb.goCommandInvocation()
-	inv.Verb = verb
-	inv.Args = args
-	inv.Env = append(inv.Env, env...)
-	if dir != "" {
-		inv.WorkingDir = sb.Workdir.AbsPath(dir)
-	}
-	stdout, stderr, _, err := sb.goCommandRunner.RunRaw(ctx, inv)
-	if err != nil {
-		return fmt.Errorf("go command failed (stdout: %s) (stderr: %s): %v", stdout.String(), stderr.String(), err)
-	}
-	// Since running a go command may result in changes to workspace files,
-	// check if we need to send any "watched" file events.
-	//
-	// TODO(rFindley): this side-effect can impact the usability of the sandbox
-	//                 for benchmarks. Consider refactoring.
-	if sb.Workdir != nil && checkForFileChanges {
-		if err := sb.Workdir.CheckForFileChanges(ctx); err != nil {
-			return fmt.Errorf("checking for file changes: %w", err)
-		}
-	}
-	return nil
-}
-
-// GoVersion checks the version of the go command.
-// It returns the X in Go 1.X.
-func (sb *Sandbox) GoVersion(ctx context.Context) (int, error) {
-	inv := sb.goCommandInvocation()
-	return gocommand.GoVersion(ctx, inv, &sb.goCommandRunner)
-}
-
 // Close removes all state associated with the sandbox.
 func (sb *Sandbox) Close() error {
-	var goCleanErr error
-	if sb.gopath != "" {
-		goCleanErr = sb.RunGoCommand(context.Background(), "", "clean", []string{"-modcache"}, nil, false)
-	}
 	err := robustio.RemoveAll(sb.rootdir)
-	if err != nil || goCleanErr != nil {
-		return fmt.Errorf("error(s) cleaning sandbox: cleaning modcache: %v; removing files: %v", goCleanErr, err)
+	if err != nil {
+		return fmt.Errorf("error(s) cleaning sandbox: removing files: %v", err)
 	}
 	return nil
 }

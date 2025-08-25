@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package builtinpkg;
+
+import "google/protobuf/timestamp.proto";
+
+message DefaultPkgTestMsg {
+  google.protobuf.Timestamp observed_at = 1;
+}

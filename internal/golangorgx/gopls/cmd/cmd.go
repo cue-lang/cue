@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -26,7 +27,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/util/browser"
-	"cuelang.org/go/internal/golangorgx/gopls/util/constraints"
 	"cuelang.org/go/internal/golangorgx/tools/diff"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/golangorgx/tools/tool"
@@ -496,7 +496,7 @@ func (cli *cmdClient) applyWorkspaceEdit(edit *protocol.WorkspaceEdit) error {
 				c.RenameFile.NewURI)
 		}
 	}
-	sortSlice(orderedURIs)
+	slices.Sort(orderedURIs)
 	for _, uri := range orderedURIs {
 		f := cli.openFile(uri)
 		if f.err != nil {
@@ -507,10 +507,6 @@ func (cli *cmdClient) applyWorkspaceEdit(edit *protocol.WorkspaceEdit) error {
 		}
 	}
 	return nil
-}
-
-func sortSlice[T constraints.Ordered](slice []T) {
-	sort.Slice(slice, func(i, j int) bool { return slice[i] < slice[j] })
 }
 
 // applyTextEdits applies a list of edits to the mapper file content,

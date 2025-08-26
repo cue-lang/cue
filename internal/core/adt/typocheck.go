@@ -323,7 +323,8 @@ func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, forceIgnore b
 		return id
 	}
 
-	closeOuter := id.FromDef && id.FromEmbed
+	// This can only be true when not using the @experiment(explicitopen).
+	closeOuter := id.FromDef && id.FromEmbed && !id.Opened
 
 	if closeOuter && !forceIgnore {
 		// Walk up the parent chain of the outer structs to "activate" them.
@@ -342,7 +343,7 @@ func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, forceIgnore b
 
 	var ignore bool
 	switch {
-	case forceIgnore:
+	case forceIgnore, id.Opened:
 		// Special mode to always ignore the outer enclosing group.
 		// This is the case, for instance, if a resolver resolves to a
 		// non-definition.
@@ -369,9 +370,15 @@ func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, forceIgnore b
 	}
 
 	dstID := defID(0)
-	for _, x := range n.reqDefIDs {
+	for i, x := range n.reqDefIDs {
 		if x.v == v {
 			dstID = x.id
+			if x.ignore && !ignore {
+				// Override settings of a vertex added by #A...
+				n.reqDefIDs[i].ignore = false
+				n.reqDefIDs[i].parent = id.outerID
+				n.reqDefIDs[i].embed = id.enclosingEmbed
+			}
 			break
 		}
 	}
@@ -490,6 +497,10 @@ func (v *Vertex) AddOpenConjunct(ctx *OpContext, w *Vertex) {
 // We can then say that requirement 3 (node A) holds if all fields contain
 // either label 3, or any field within 1 that is not 2.
 func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
+	if pos(x).Experiment().ExplicitOpen {
+		return id
+	}
+
 	id.FromEmbed = true
 
 	// Filter cases where we do not need to track the definition.
@@ -514,7 +525,7 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 // definition is embedded within a struct. It can be removed if we implement
 // the #A vs #A... semantics.
 func (n *nodeContext) splitStruct(s *StructLit, id CloseInfo) CloseInfo {
-	if n.ctx.OpenDef {
+	if pos(s).Experiment().ExplicitOpen || n.ctx.OpenDef {
 		return id
 	}
 

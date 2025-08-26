@@ -123,6 +123,9 @@ func (w *Visitor) node(n adt.Node) {
 		w.node(x.X)
 		w.node(x.Y)
 
+	case *adt.OpenExpr:
+		w.node(x.X)
+
 	case *adt.CallExpr:
 		w.node(x.Fun)
 		for _, arg := range x.Args {

@@ -155,6 +155,10 @@ type Vertex struct {
 	// level only. This supports the close builtin.
 	ClosedNonRecursive bool
 
+	// Opened is set when a node that is opened with @experiment(explicitopen)
+	// is structure shared. This will override any of the above booleans.
+	OpenedShared bool
+
 	// HasEllipsis indicates that this Vertex is open by means of an ellipsis.
 	// TODO: combine this field with Closed once we removed the old evaluator.
 	HasEllipsis bool
@@ -906,6 +910,10 @@ func addConjuncts(ctx *OpContext, dst *Vertex, src Value) {
 	c := MakeConjunct(nil, src, closeInfo)
 
 	if v, ok := src.(*Vertex); ok {
+		// TODO(v1.0.0): we should determine whether to apply the new semantics
+		// for closedness. However, this is not applicable for a Vertex.
+		// Ultimately, this logic should be removed.
+
 		// By default, all conjuncts in a node are considered to be not
 		// mutually closed. This means that if one of the arguments to Unify
 		// closes, but is acquired to embedding, the closeness information

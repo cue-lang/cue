@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2/servertest"
-	"cuelang.org/go/internal/golangorgx/tools/memoize"
 	"cuelang.org/go/internal/golangorgx/tools/testenv"
 	"cuelang.org/go/internal/golangorgx/tools/xcontext"
 	"cuelang.org/go/internal/lsp/cache"
@@ -113,9 +112,8 @@ type Runner struct {
 	OptionsHook              func(*settings.Options) // if set, use these options when creating gopls sessions
 
 	// Immutable state shared across test invocations
-	goplsPath string         // path to the gopls executable (for SeparateProcess mode)
-	tempDir   string         // shared parent temp directory
-	store     *memoize.Store // shared store
+	goplsPath string // path to the gopls executable (for SeparateProcess mode)
+	tempDir   string // shared parent temp directory
 
 	// Lazily allocated resources
 	tsOnce sync.Once

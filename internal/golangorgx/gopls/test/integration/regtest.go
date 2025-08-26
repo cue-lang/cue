@@ -15,7 +15,6 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/cmd"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"cuelang.org/go/internal/golangorgx/tools/memoize"
 	"cuelang.org/go/internal/golangorgx/tools/testenv"
 	"cuelang.org/go/internal/golangorgx/tools/tool"
 	"cuelang.org/go/internal/lsp/cache"
@@ -130,7 +129,6 @@ func Main(m *testing.M, hook func(*settings.Options)) {
 		PrintGoroutinesOnFailure: *printGoroutinesOnFailure,
 		SkipCleanup:              *skipCleanup,
 		OptionsHook:              hook,
-		store:                    memoize.NewStore(memoize.NeverEvict),
 	}
 
 	runner.goplsPath = *goplsBinaryPath

@@ -33,6 +33,23 @@
       "message": "I\u0027ll leave to Marcel to review, given that the spec is rather important.",
       "revId": "b505b675de1360a2fa1a46a63da0b34b882be063",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af0414f2_81cf6e2a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-08-26T08:48:01Z",
+      "side": 1,
+      "message": "Holding as per offline disucssion.",
+      "revId": "b505b675de1360a2fa1a46a63da0b34b882be063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

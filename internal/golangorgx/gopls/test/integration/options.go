@@ -47,13 +47,6 @@ func (f optionSetter) set(opts *runConfig) {
 	f(opts)
 }
 
-// ProxyFiles configures a file proxy using the given txtar-encoded string.
-func ProxyFiles(txt string) RunOption {
-	return optionSetter(func(opts *runConfig) {
-		opts.sandbox.ProxyFiles = fake.UnpackTxt(txt)
-	})
-}
-
 // Modes configures the execution modes that the test should run in.
 //
 // By default, modes are configured by the test runner. If this option is set,
@@ -166,14 +159,6 @@ func (e EnvVars) set(opts *runConfig) {
 	for k, v := range e {
 		opts.editor.Env[k] = v
 	}
-}
-
-// InGOPATH configures the workspace working directory to be GOPATH, rather
-// than a separate working directory for use with modules.
-func InGOPATH() RunOption {
-	return optionSetter(func(opts *runConfig) {
-		opts.sandbox.InGoPath = true
-	})
 }
 
 // MessageResponder configures the editor to respond to

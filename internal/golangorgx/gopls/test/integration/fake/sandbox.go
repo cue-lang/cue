@@ -18,9 +18,7 @@ import (
 // Sandbox holds a collection of temporary resources to use for working with Go
 // code in tests.
 type Sandbox struct {
-	gopath  string
 	rootdir string
-	goproxy string
 	Workdir *Workdir
 }
 
@@ -36,25 +34,13 @@ type SandboxConfig struct {
 	// For convenience, the special substring "$SANDBOX_WORKDIR" is replaced with
 	// the sandbox's resolved working directory before writing files.
 	Files map[string][]byte
-	// InGoPath specifies that the working directory should be within the
-	// temporary GOPATH.
-	InGoPath bool
 	// Workdir configures the working directory of the Sandbox. It behaves as
 	// follows:
 	//  - if set to an absolute path, use that path as the working directory.
 	//  - if set to a relative path, create and use that path relative to the
 	//    sandbox.
 	//  - if unset, default to a the 'work' subdirectory of the sandbox.
-	//
-	// This option is incompatible with InGoPath or Files.
 	Workdir string
-	// ProxyFiles holds a txtar-encoded archive of files to populate a file-based
-	// Go proxy.
-	ProxyFiles map[string][]byte
-	// GOPROXY is the explicit GOPROXY value that should be used for the sandbox.
-	//
-	// This option is incompatible with ProxyFiles.
-	GOPROXY string
 }
 
 // NewSandbox creates a collection of named temporary resources, with a
@@ -93,22 +79,6 @@ func NewSandbox(config *SandboxConfig) (_ *Sandbox, err error) {
 		}
 	}
 	sb.rootdir = rootDir
-	sb.gopath = filepath.Join(sb.rootdir, "gopath")
-	if err := os.Mkdir(sb.gopath, 0755); err != nil {
-		return nil, err
-	}
-	if config.GOPROXY != "" {
-		sb.goproxy = config.GOPROXY
-	} else {
-		proxydir := filepath.Join(sb.rootdir, "proxy")
-		if err := os.Mkdir(proxydir, 0755); err != nil {
-			return nil, err
-		}
-		sb.goproxy, err = WriteProxy(proxydir, config.ProxyFiles)
-		if err != nil {
-			return nil, err
-		}
-	}
 	// Short-circuit writing the workdir if we're given an absolute path, since
 	// this is used for running in an existing directory.
 	// TODO(findleyr): refactor this to be less of a workaround.
@@ -121,10 +91,7 @@ func NewSandbox(config *SandboxConfig) (_ *Sandbox, err error) {
 	}
 	var workdir string
 	if config.Workdir == "" {
-		if config.InGoPath {
-			// Set the working directory as $GOPATH/src.
-			workdir = filepath.Join(sb.gopath, "src")
-		} else if workdir == "" {
+		if workdir == "" {
 			workdir = filepath.Join(sb.rootdir, "work")
 		}
 	} else {
@@ -170,14 +137,8 @@ func UnpackTxt(txt string) map[string][]byte {
 }
 
 func validateConfig(config SandboxConfig) error {
-	if filepath.IsAbs(config.Workdir) && (len(config.Files) > 0 || config.InGoPath) {
-		return errors.New("absolute Workdir cannot be set in conjunction with Files or InGoPath")
-	}
-	if config.Workdir != "" && config.InGoPath {
-		return errors.New("Workdir cannot be set in conjunction with InGoPath")
-	}
-	if config.GOPROXY != "" && config.ProxyFiles != nil {
-		return errors.New("GOPROXY cannot be set in conjunction with ProxyFiles")
+	if filepath.IsAbs(config.Workdir) && len(config.Files) > 0 {
+		return errors.New("absolute Workdir cannot be set in conjunction with Files")
 	}
 	return nil
 }
@@ -204,11 +165,6 @@ func splitModuleVersionPath(path string) (modulePath, version, suffix string) {
 
 func (sb *Sandbox) RootDir() string {
 	return sb.rootdir
-}
-
-// GOPATH returns the value of the Sandbox GOPATH.
-func (sb *Sandbox) GOPATH() string {
-	return sb.gopath
 }
 
 // Close removes all state associated with the sandbox.

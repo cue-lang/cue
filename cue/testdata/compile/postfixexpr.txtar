@@ -1,0 +1,71 @@
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.15.0"
+
+-- with_experiment.cue --
+@experiment(explicitopen)
+
+#Base: {
+	x: int
+}
+
+// Test postfix ... operator with struct
+a: #Base...
+
+// Test with selector
+b: foo.bar...
+
+// Test with parentheses
+c: (x & y)...
+
+// Test with function call
+d: fn()...
+
+foo: {}
+
+x:  _
+y:  _
+fn: _
+
+-- out/compile --
+--- with_experiment.cue
+{
+  #Base: {
+    x: int
+  }
+  a: 〈0;#Base〉...
+  b: 〈0;foo〉.bar...
+  c: (〈0;x〉 & 〈0;y〉)...
+  d: 〈0;fn〉()...
+  foo: {}
+  x: _
+  y: _
+  fn: _
+}
+-- out/evalalpha --
+Errors:
+d: cannot call non-function fn (type _):
+    ./with_experiment.cue:17:4
+
+Result:
+(_|_){
+  // [eval]
+  #Base: (#struct){
+    x: (int){ int }
+  }
+  a: ~(#Base)
+  b: (_|_){
+    // [incomplete] b: undefined field: bar:
+    //     ./with_experiment.cue:11:8
+  }
+  c: (_){ _ }
+  d: (_|_){
+    // [eval] d: cannot call non-function fn (type _):
+    //     ./with_experiment.cue:17:4
+  }
+  foo: (struct){
+  }
+  x: (_){ _ }
+  y: (_){ _ }
+  fn: (_){ _ }
+}

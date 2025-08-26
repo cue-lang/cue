@@ -204,7 +204,7 @@ func TestX(t *testing.T) {
 -- cue.mod/module.cue --
 module: "mod.test"
 
-language: version: "v0.9.0"
+language: version: "v0.15.0"
 
 -- in.cue --
 	`

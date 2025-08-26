@@ -81,6 +81,15 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		n.unshare()
 		n.insertValueConjunct(env, x, id)
 
+	case *OpenExpr:
+		// This is not strictly necessary, but it ensures the same code path
+		// is taken for references that now have been rewritten to have a ...
+		// suffix.
+		c.x = x.X
+		c.CloseInfo.Opened = true // NOTE: seems unnecessary, but just to be sure.
+		id.Opened = true
+		n.scheduleConjunct(c, id)
+
 	case *BinaryExpr:
 		// NOTE: do not unshare: a conjunction could still allow structure
 		// sharing, such as in the case of `ref & ref`.

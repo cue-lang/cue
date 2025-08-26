@@ -270,6 +270,10 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.node(x.Y)
 		w.string(")")
 
+	case *adt.PostfixExpr:
+		w.node(x.X)
+		w.string(x.Op.String())
+
 	case *adt.CallExpr:
 		w.node(x.Fun)
 		w.string("(")

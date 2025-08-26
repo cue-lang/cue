@@ -113,6 +113,11 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 		// TODO: yield instead?
 		return
 	}
+	ci := ctx.ci
+	if arc.OpenedShared {
+		ci.Opened = true
+	}
+
 	arc = arc.DerefNonDisjunct()
 
 	if ctx.LogEval > 0 {
@@ -120,8 +125,6 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	}
 	// TODO: consider moving after markCycle or removing.
 	d := arc.DerefDisjunct()
-
-	ci := t.updateCI(ctx.ci)
 
 	// A reference that points to itself indicates equality. In that case
 	// we are done computing and we can return the arc as is.

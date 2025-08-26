@@ -99,6 +99,9 @@ type CloseInfo struct {
 	// Like FromDef, but used by APIs to force FromDef to be true.
 	TopDef bool
 
+	// This conjunct was opened by the ... postfix operator.
+	Opened bool
+
 	CycleInfo
 }
 

@@ -228,3 +228,52 @@ done
 		checkPos(t, "3. Position", got3, want)
 	}
 }
+
+// Adapted from https://go-review.googlesource.com/c/go/+/559436
+func TestIssue57490(t *testing.T) {
+	const fsize = 5
+	f := NewFile("f", 1, fsize)
+
+	// out-of-bounds positions must not lead to a panic when calling f.Offset
+	if got := f.Offset(NoPos); got != 0 {
+		t.Fatalf("offset = %d, want %d", got, 0)
+	}
+	if got := f.Offset(Pos{f, toPos(-1)}); got != 0 {
+		t.Fatalf("offset = %d, want %d", got, 0)
+	}
+	if got := f.Offset(Pos{f, toPos(1 + fsize + 1)}); got != fsize {
+		t.Fatalf("offset = %d, want %d", got, fsize)
+	}
+
+	// out-of-bounds offsets must not lead to a panic when calling f.Pos
+	if got := f.Pos(-1, 0); got != (Pos{f, toPos(1)}) {
+		t.Fatalf("pos = %#v, want %d", got, 1)
+	}
+	if got := f.Pos(fsize+1, 0); got != (Pos{f, toPos(1 + fsize)}) {
+		t.Fatalf("pos = %#v, want %d", got, 1+fsize)
+	}
+
+	// out-of-bounds Pos values must not lead to a panic when calling f.Position
+	want := fmt.Sprintf("%s:1:1", f.Name())
+	if got := f.Position(Pos{f, toPos(-1)}).String(); got != want {
+		t.Fatalf("position = %s, want %s", got, want)
+	}
+	want = fmt.Sprintf("%s:1:%d", f.Name(), fsize+1)
+	if got := f.Position(Pos{f, toPos(fsize + 1)}).String(); got != want {
+		t.Fatalf("position = %s, want %s", got, want)
+	}
+
+	// check invariants
+	const xsize = fsize + 5
+	for offset := -xsize; offset < xsize; offset++ {
+		want1 := f.Offset(Pos{f, toPos(index(1 + offset))})
+		if got := f.Offset(f.Pos(offset, 0)); got != want1 {
+			t.Fatalf("offset = %d, want %d", got, want1)
+		}
+
+		want2 := f.Pos(offset, 0)
+		if got := f.Pos(f.Offset(want2), 0); got != want2 {
+			t.Fatalf("pos = %#v, want %#v", got, want2)
+		}
+	}
+}

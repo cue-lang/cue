@@ -1067,6 +1067,20 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 			return &adt.BinaryExpr{Src: n, Op: op, X: x, Y: y} // )
 		}
 
+	case *ast.PostfixExpr:
+		switch n.Op {
+		case token.ELLIPSIS:
+			if c.experiments.ExplicitOpen {
+				return &adt.OpenExpr{
+					Src: n,
+					X:   c.expr(n.X),
+				}
+			}
+			return c.errf(n, "postfix ... operator requires @experiment(explicitopen)")
+		default:
+			return c.errf(n, "unsupported postfix operator %s", n.Op)
+		}
+
 	default:
 		return c.errf(n, "%s values not allowed in this position", ast.Name(n))
 	}

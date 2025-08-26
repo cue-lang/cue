@@ -557,6 +557,10 @@ func (w *printer) node(n adt.Node) {
 		w.node(x.Y)
 		w.string(")")
 
+	case *adt.OpenExpr:
+		w.node(x.X)
+		w.string("...")
+
 	case *adt.CallExpr:
 		w.node(x.Fun)
 		w.string("(")

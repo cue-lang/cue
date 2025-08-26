@@ -1289,6 +1289,26 @@ func (x *BinaryExpr) evaluate(c *OpContext, state combinedFlags) Value {
 	return BinOp(c, x, x.Op, left, right)
 }
 
+// OpenExpr represents the ... operator to disable typo checking.
+//
+// #A...
+type OpenExpr struct {
+	Src *ast.PostfixExpr
+	X   Expr
+}
+
+func (x *OpenExpr) Source() ast.Node {
+	if x.Src == nil {
+		return nil
+	}
+	return x.Src
+}
+
+func (x *OpenExpr) evaluate(c *OpContext, state combinedFlags) Value {
+	c.ci.Opened = true
+	return c.evalState(x.X, state)
+}
+
 func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flags combinedFlags) (r Value) {
 	state := flags.status
 

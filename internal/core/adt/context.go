@@ -708,6 +708,11 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 	case Value:
 		return x, c.ci
 
+	case *PostfixExpr:
+		v, ci := c.evalStateCI(x.X, state)
+		ci.Opened = true
+		return v, ci
+
 	case Evaluator:
 		v := x.evaluate(c, state)
 		return v, c.ci

@@ -1,0 +1,1592 @@
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.15.0"
+
+-- old.cue --
+package foo
+
+#A: a: 1
+Old1: {
+	{
+		#A
+		b: 1
+	}
+}
+
+#Old2: {
+	{
+		#A
+		b: 1
+	}
+}
+
+useNewClosed1: {
+	t1: err: NewClosed1 & {c: 3}
+	t2: ok:  {NewClosed1, c: 3}
+}
+
+useNewClosed2: {
+	t1: err: #NewClosed2 & {c: 3}
+	t2: ok:  {#NewClosed2, c: 3}
+}
+
+useNewOpen1: {
+	t1: ok: NewOpen1 & {c: 3}
+	t2: ok: {NewOpen1, c: 3}
+}
+
+useNewOpen2: {
+	t1: ok: NewOpen2 & {c: 3}
+	t2: ok: {NewOpen2, c: 3}
+}
+
+combineold: {
+	// all {a: 1}
+	a0: ok: #A & NewClosed1
+	a1: ok: {#A, NewClosed1}
+
+	a2: ok: NewClosed1 & NewOpen2
+	a3: ok: {NewClosed1, NewOpen2}
+
+	// all {a: 1, b: 2}
+	b0: ok: Old1 & #NewClosed2
+	b1: ok: #Old2 & #NewClosed2
+
+	c1: ok: {#NewClosed2,  Old1}
+	c2: ok: {#NewClosed2,  #Old2}
+
+	// {a: 1} and {a: 1, b: 2}
+	e0: err: #A & Old1
+	e1: err: #A & #Old2
+	e2: err: #A & #NewClosed2
+	e3: err: #A & NewOpen1
+
+	e4: ok: {#A, Old1}
+	e5: ok: {#A, #Old2}
+	e6: ok: {#A, #NewClosed2}
+	e7: ok: {#A, NewOpen1}
+
+	f0: err: NewClosed1 & Old1
+	f1: err: NewClosed1 & #Old2
+	f2: err: NewClosed1 & #NewClosed2
+	f3: err: NewClosed1 & NewOpen1
+
+	f4: ok: {NewClosed1, Old1}
+	f5: ok: {NewClosed1, #Old2}
+	f6: ok: {NewClosed1, NewClosed1}
+	f7: ok: {NewClosed1, #NewClosed2}
+	f8: ok: {NewClosed1, NewOpen1}
+}
+
+-- new.cue --
+@experiment(explicitopen)
+
+package foo
+
+NewClosed1: {
+	#A
+}
+
+#NewClosed2: {
+	#A...
+	b: 1
+}
+
+NewOpen1: {
+	#A...
+	b: 1
+}
+
+NewOpen2: #A...
+
+useOld1: {
+	t1: err: Old1 & {c: 3}
+	t2: err: {Old1, c: 3} // TODO
+	t3: ok:  {Old1..., c: 3}
+}
+
+useOld2: {
+	t1: err: #Old2 & {c: 3}
+	t2: err: {#Old2, c: 3}
+	t3: ok:  {#Old2..., c: 3}
+}
+
+combinenew: {
+	// all {a: 1}
+	a0: ok: #A & NewClosed1
+	a1: ok: {#A, NewClosed1}
+
+	a2: ok: NewClosed1 & NewOpen2
+	a3: ok: {NewClosed1, NewOpen2}
+	a4: ok: {NewClosed1..., NewOpen2}
+
+	a5: ok: NewOpen2 & NewClosed1
+	a6: ok: {NewOpen2, NewClosed1}
+	a7: ok: {NewOpen2..., NewClosed1}
+
+	// all {a: 1, b: 2}
+	b0: ok: Old1 & #NewClosed2
+	b1: ok: #Old2 & #NewClosed2
+	b2: ok: #NewClosed2 & Old1
+	b3: ok: #NewClosed2 & #Old2
+
+	c1: ok: {#NewClosed2,  Old1}
+	c2: ok: {#NewClosed2,  #Old2}
+	c3: ok: {Old1, #NewClosed2}
+	c4: ok: {#Old2, #NewClosed2}
+
+	d0: ok: {#NewClosed2,  Old1...}
+	d1: ok: {#NewClosed2,  #Old2...}
+	d2: ok: {#NewClosed2...,  Old1}
+	d3: ok: {#NewClosed2...,  #Old2}
+	d4: ok: {#NewClosed2...,  Old1...}
+	d5: ok: {#NewClosed2...,  #Old2...}
+
+	d6: ok: {Old1..., #NewClosed2}
+	d7: ok: {#Old2..., #NewClosed2}
+	d8: ok: {Old1, #NewClosed2...,}
+	d9: ok: {#Old2, #NewClosed2...,}
+	d10: ok: {Old1..., #NewClosed2...,}
+	d11: ok: {#Old2..., #NewClosed2...,}
+
+	// {a: 1} and {a: 1, b: 2}
+	e0: err: #A & Old1
+	e1: err: #A & #Old2
+	e2: err: #A & #NewClosed2
+	e3: err: #A & NewOpen1
+
+	e4: err: {#A, Old1}
+	e5: err: {#A, #Old2}
+	e6: err: {#A, #NewClosed2}
+	e7: err: {#A, NewOpen1}
+
+	e8: ok: {#A..., Old1}
+	e9: ok: {#A..., #Old2}
+	e10: ok: {#A..., #NewClosed2}
+	e11: ok: {#A..., NewOpen1}
+
+	f0: err: NewClosed1 & Old1
+	f1: err: NewClosed1 & #Old2
+	f2: err: NewClosed1 & #NewClosed2
+	f3: err: NewClosed1 & NewOpen1
+	f4: ok: NewClosed1 & NewClosed1
+
+	f5: err: {NewClosed1, Old1}
+	f6: err: {NewClosed1, #Old2}
+	f7: err: {NewClosed1, #NewClosed2}
+	f8: err: {NewClosed1, NewOpen1}
+	f9: ok: {NewClosed1, NewClosed1}
+
+	f9: ok:  {NewClosed1..., Old1}
+	f10: ok: {NewClosed1..., #Old2}
+	f11: ok: {NewClosed1..., NewClosed1}
+	f12: ok: {NewClosed1..., #NewClosed2}
+	f13: ok: {NewClosed1..., NewOpen1}
+
+	f14: err: Old1 & NewClosed1
+	f15: err: #Old2 & NewClosed1
+	f16: err: #NewClosed2 & NewClosed1
+	f17: err: NewOpen1 & NewClosed1
+	f18: ok: NewClosed1 & NewClosed1
+}
+-- out/evalalpha --
+Errors:
+combinenew.e0.err.b: field not allowed:
+    ./old.cue:7:3
+combinenew.e1.err.b: field not allowed:
+    ./old.cue:14:3
+combinenew.e2.err.b: field not allowed:
+    ./new.cue:11:2
+combinenew.e3.err.b: field not allowed:
+    ./new.cue:16:2
+combinenew.e4.err.b: field not allowed:
+    ./old.cue:7:3
+combinenew.e5.err.b: field not allowed:
+    ./old.cue:14:3
+combinenew.e6.err.b: field not allowed:
+    ./new.cue:11:2
+combinenew.e7.err.b: field not allowed:
+    ./new.cue:16:2
+combinenew.f0.err.b: field not allowed:
+    ./old.cue:7:3
+combinenew.f1.err.b: field not allowed:
+    ./old.cue:14:3
+combinenew.f16.err.b: field not allowed:
+    ./new.cue:11:2
+combinenew.f17.err.b: field not allowed:
+    ./new.cue:16:2
+combinenew.f2.err.b: field not allowed:
+    ./new.cue:11:2
+combinenew.f3.err.b: field not allowed:
+    ./new.cue:16:2
+combinenew.f5.err.b: field not allowed:
+    ./old.cue:7:3
+combinenew.f6.err.b: field not allowed:
+    ./old.cue:14:3
+combinenew.f7.err.b: field not allowed:
+    ./new.cue:11:2
+combinenew.f8.err.b: field not allowed:
+    ./new.cue:16:2
+combinenew.f9.ok.b: field not allowed:
+    ./old.cue:7:3
+combineold.e0.err.b: field not allowed:
+    ./old.cue:7:3
+combineold.e1.err.b: field not allowed:
+    ./old.cue:14:3
+combineold.e2.err.b: field not allowed:
+    ./new.cue:11:2
+combineold.e3.err.b: field not allowed:
+    ./new.cue:16:2
+combineold.f0.err.b: field not allowed:
+    ./old.cue:7:3
+combineold.f1.err.b: field not allowed:
+    ./old.cue:14:3
+combineold.f2.err.b: field not allowed:
+    ./new.cue:11:2
+combineold.f3.err.b: field not allowed:
+    ./new.cue:16:2
+useNewClosed1.t1.err.c: field not allowed:
+    ./old.cue:19:25
+useNewClosed2.t1.err.c: field not allowed:
+    ./old.cue:24:26
+useOld1.t1.err.c: field not allowed:
+    ./new.cue:22:19
+useOld1.t2.err.c: field not allowed:
+    ./new.cue:23:18
+useOld2.t1.err.c: field not allowed:
+    ./new.cue:28:20
+useOld2.t2.err.c: field not allowed:
+    ./new.cue:29:19
+
+Result:
+(_|_){
+  // [eval]
+  NewClosed1: (#struct){
+    a: (int){ 1 }
+  }
+  #NewClosed2: (#struct){
+    b: (int){ 1 }
+    a: (int){ 1 }
+  }
+  NewOpen1: (#struct){
+    b: (int){ 1 }
+    a: (int){ 1 }
+  }
+  NewOpen2: ~(#A)
+  useOld1: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        c: (_|_){
+          // [eval] useOld1.t1.err.c: field not allowed:
+          //     ./new.cue:22:19
+        }
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    t2: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        c: (_|_){
+          // [eval] useOld1.t2.err.c: field not allowed:
+          //     ./new.cue:23:18
+        }
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    t3: (struct){
+      ok: (#struct){
+        c: (int){ 3 }
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+  }
+  useOld2: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        c: (_|_){
+          // [eval] useOld2.t1.err.c: field not allowed:
+          //     ./new.cue:28:20
+        }
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    t2: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        c: (_|_){
+          // [eval] useOld2.t2.err.c: field not allowed:
+          //     ./new.cue:29:19
+        }
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    t3: (struct){
+      ok: (#struct){
+        c: (int){ 3 }
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+  }
+  combinenew: (_|_){
+    // [eval]
+    a0: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    a1: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    a2: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    a3: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    a4: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    a5: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    a6: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    a7: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    b0: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    b1: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    b2: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    b3: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    c1: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    c2: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    c3: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    c4: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    d0: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    d1: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    d2: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    d3: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    d4: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    d5: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    d6: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    d7: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    d8: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    d9: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    d10: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    d11: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    e0: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (int){ 1 }
+        b: (_|_){
+          // [eval] combinenew.e0.err.b: field not allowed:
+          //     ./old.cue:7:3
+        }
+      }
+    }
+    e1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (int){ 1 }
+        b: (_|_){
+          // [eval] combinenew.e1.err.b: field not allowed:
+          //     ./old.cue:14:3
+        }
+      }
+    }
+    e2: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (int){ 1 }
+        b: (_|_){
+          // [eval] combinenew.e2.err.b: field not allowed:
+          //     ./new.cue:11:2
+        }
+      }
+    }
+    e3: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (int){ 1 }
+        b: (_|_){
+          // [eval] combinenew.e3.err.b: field not allowed:
+          //     ./new.cue:16:2
+        }
+      }
+    }
+    e4: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (int){ 1 }
+        b: (_|_){
+          // [eval] combinenew.e4.err.b: field not allowed:
+          //     ./old.cue:7:3
+        }
+      }
+    }
+    e5: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (int){ 1 }
+        b: (_|_){
+          // [eval] combinenew.e5.err.b: field not allowed:
+          //     ./old.cue:14:3
+        }
+      }
+    }
+    e6: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (int){ 1 }
+        b: (_|_){
+          // [eval] combinenew.e6.err.b: field not allowed:
+          //     ./new.cue:11:2
+        }
+      }
+    }
+    e7: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (int){ 1 }
+        b: (_|_){
+          // [eval] combinenew.e7.err.b: field not allowed:
+          //     ./new.cue:16:2
+        }
+      }
+    }
+    e8: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+        b: (int){ 1 }
+      }
+    }
+    e9: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+        b: (int){ 1 }
+      }
+    }
+    e10: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+        b: (int){ 1 }
+      }
+    }
+    e11: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+        b: (int){ 1 }
+      }
+    }
+    f0: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combinenew.f0.err.b: field not allowed:
+          //     ./old.cue:7:3
+        }
+        a: (int){ 1 }
+      }
+    }
+    f1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combinenew.f1.err.b: field not allowed:
+          //     ./old.cue:14:3
+        }
+        a: (int){ 1 }
+      }
+    }
+    f2: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combinenew.f2.err.b: field not allowed:
+          //     ./new.cue:11:2
+        }
+        a: (int){ 1 }
+      }
+    }
+    f3: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combinenew.f3.err.b: field not allowed:
+          //     ./new.cue:16:2
+        }
+        a: (int){ 1 }
+      }
+    }
+    f4: (struct){
+      ok: ~(NewClosed1)
+    }
+    f5: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combinenew.f5.err.b: field not allowed:
+          //     ./old.cue:7:3
+        }
+        a: (int){ 1 }
+      }
+    }
+    f6: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combinenew.f6.err.b: field not allowed:
+          //     ./old.cue:14:3
+        }
+        a: (int){ 1 }
+      }
+    }
+    f7: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combinenew.f7.err.b: field not allowed:
+          //     ./new.cue:11:2
+        }
+        a: (int){ 1 }
+      }
+    }
+    f8: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combinenew.f8.err.b: field not allowed:
+          //     ./new.cue:16:2
+        }
+        a: (int){ 1 }
+      }
+    }
+    f9: (_|_){
+      // [eval]
+      ok: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combinenew.f9.ok.b: field not allowed:
+          //     ./old.cue:7:3
+        }
+        a: (int){ 1 }
+      }
+    }
+    f10: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    f11: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    f12: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    f13: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    f14: (struct){
+      err: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    f15: (struct){
+      err: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    f16: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combinenew.f16.err.b: field not allowed:
+          //     ./new.cue:11:2
+        }
+        a: (int){ 1 }
+      }
+    }
+    f17: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combinenew.f17.err.b: field not allowed:
+          //     ./new.cue:16:2
+        }
+        a: (int){ 1 }
+      }
+    }
+    f18: (struct){
+      ok: ~(NewClosed1)
+    }
+  }
+  #A: (#struct){
+    a: (int){ 1 }
+  }
+  Old1: (#struct){
+    b: (int){ 1 }
+    a: (int){ 1 }
+  }
+  #Old2: (#struct){
+    b: (int){ 1 }
+    a: (int){ 1 }
+  }
+  useNewClosed1: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        c: (_|_){
+          // [eval] useNewClosed1.t1.err.c: field not allowed:
+          //     ./old.cue:19:25
+        }
+        a: (int){ 1 }
+      }
+    }
+    t2: (struct){
+      ok: (#struct){
+        c: (int){ 3 }
+        a: (int){ 1 }
+      }
+    }
+  }
+  useNewClosed2: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        c: (_|_){
+          // [eval] useNewClosed2.t1.err.c: field not allowed:
+          //     ./old.cue:24:26
+        }
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    t2: (struct){
+      ok: (#struct){
+        c: (int){ 3 }
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+  }
+  useNewOpen1: (struct){
+    t1: (struct){
+      ok: (#struct){
+        c: (int){ 3 }
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    t2: (struct){
+      ok: (#struct){
+        c: (int){ 3 }
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+  }
+  useNewOpen2: (struct){
+    t1: (struct){
+      ok: (#struct){
+        c: (int){ 3 }
+        a: (int){ 1 }
+      }
+    }
+    t2: (struct){
+      ok: (#struct){
+        c: (int){ 3 }
+        a: (int){ 1 }
+      }
+    }
+  }
+  combineold: (_|_){
+    // [eval]
+    a0: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    a1: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    a2: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    a3: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    b0: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    b1: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    c1: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    c2: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    e0: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (int){ 1 }
+        b: (_|_){
+          // [eval] combineold.e0.err.b: field not allowed:
+          //     ./old.cue:7:3
+        }
+      }
+    }
+    e1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (int){ 1 }
+        b: (_|_){
+          // [eval] combineold.e1.err.b: field not allowed:
+          //     ./old.cue:14:3
+        }
+      }
+    }
+    e2: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (int){ 1 }
+        b: (_|_){
+          // [eval] combineold.e2.err.b: field not allowed:
+          //     ./new.cue:11:2
+        }
+      }
+    }
+    e3: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (int){ 1 }
+        b: (_|_){
+          // [eval] combineold.e3.err.b: field not allowed:
+          //     ./new.cue:16:2
+        }
+      }
+    }
+    e4: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+        b: (int){ 1 }
+      }
+    }
+    e5: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+        b: (int){ 1 }
+      }
+    }
+    e6: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+        b: (int){ 1 }
+      }
+    }
+    e7: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+        b: (int){ 1 }
+      }
+    }
+    f0: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combineold.f0.err.b: field not allowed:
+          //     ./old.cue:7:3
+        }
+        a: (int){ 1 }
+      }
+    }
+    f1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combineold.f1.err.b: field not allowed:
+          //     ./old.cue:14:3
+        }
+        a: (int){ 1 }
+      }
+    }
+    f2: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combineold.f2.err.b: field not allowed:
+          //     ./new.cue:11:2
+        }
+        a: (int){ 1 }
+      }
+    }
+    f3: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] combineold.f3.err.b: field not allowed:
+          //     ./new.cue:16:2
+        }
+        a: (int){ 1 }
+      }
+    }
+    f4: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    f5: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    f6: (struct){
+      ok: (#struct){
+        a: (int){ 1 }
+      }
+    }
+    f7: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+    f8: (struct){
+      ok: (#struct){
+        b: (int){ 1 }
+        a: (int){ 1 }
+      }
+    }
+  }
+}
+-- out/compile --
+--- new.cue
+{
+  NewClosed1: {
+    〈1;#A〉
+  }
+  #NewClosed2: {
+    〈1;#A〉...
+    b: 1
+  }
+  NewOpen1: {
+    〈1;#A〉...
+    b: 1
+  }
+  NewOpen2: 〈0;#A〉...
+  useOld1: {
+    t1: {
+      err: (〈2;Old1〉 & {
+        c: 3
+      })
+    }
+    t2: {
+      err: {
+        〈3;Old1〉
+        c: 3
+      }
+    }
+    t3: {
+      ok: {
+        〈3;Old1〉...
+        c: 3
+      }
+    }
+  }
+  useOld2: {
+    t1: {
+      err: (〈2;#Old2〉 & {
+        c: 3
+      })
+    }
+    t2: {
+      err: {
+        〈3;#Old2〉
+        c: 3
+      }
+    }
+    t3: {
+      ok: {
+        〈3;#Old2〉...
+        c: 3
+      }
+    }
+  }
+  combinenew: {
+    a0: {
+      ok: (〈2;#A〉 & 〈2;NewClosed1〉)
+    }
+    a1: {
+      ok: {
+        〈3;#A〉
+        〈3;NewClosed1〉
+      }
+    }
+    a2: {
+      ok: (〈2;NewClosed1〉 & 〈2;NewOpen2〉)
+    }
+    a3: {
+      ok: {
+        〈3;NewClosed1〉
+        〈3;NewOpen2〉
+      }
+    }
+    a4: {
+      ok: {
+        〈3;NewClosed1〉...
+        〈3;NewOpen2〉
+      }
+    }
+    a5: {
+      ok: (〈2;NewOpen2〉 & 〈2;NewClosed1〉)
+    }
+    a6: {
+      ok: {
+        〈3;NewOpen2〉
+        〈3;NewClosed1〉
+      }
+    }
+    a7: {
+      ok: {
+        〈3;NewOpen2〉...
+        〈3;NewClosed1〉
+      }
+    }
+    b0: {
+      ok: (〈2;Old1〉 & 〈2;#NewClosed2〉)
+    }
+    b1: {
+      ok: (〈2;#Old2〉 & 〈2;#NewClosed2〉)
+    }
+    b2: {
+      ok: (〈2;#NewClosed2〉 & 〈2;Old1〉)
+    }
+    b3: {
+      ok: (〈2;#NewClosed2〉 & 〈2;#Old2〉)
+    }
+    c1: {
+      ok: {
+        〈3;#NewClosed2〉
+        〈3;Old1〉
+      }
+    }
+    c2: {
+      ok: {
+        〈3;#NewClosed2〉
+        〈3;#Old2〉
+      }
+    }
+    c3: {
+      ok: {
+        〈3;Old1〉
+        〈3;#NewClosed2〉
+      }
+    }
+    c4: {
+      ok: {
+        〈3;#Old2〉
+        〈3;#NewClosed2〉
+      }
+    }
+    d0: {
+      ok: {
+        〈3;#NewClosed2〉
+        〈3;Old1〉...
+      }
+    }
+    d1: {
+      ok: {
+        〈3;#NewClosed2〉
+        〈3;#Old2〉...
+      }
+    }
+    d2: {
+      ok: {
+        〈3;#NewClosed2〉...
+        〈3;Old1〉
+      }
+    }
+    d3: {
+      ok: {
+        〈3;#NewClosed2〉...
+        〈3;#Old2〉
+      }
+    }
+    d4: {
+      ok: {
+        〈3;#NewClosed2〉...
+        〈3;Old1〉...
+      }
+    }
+    d5: {
+      ok: {
+        〈3;#NewClosed2〉...
+        〈3;#Old2〉...
+      }
+    }
+    d6: {
+      ok: {
+        〈3;Old1〉...
+        〈3;#NewClosed2〉
+      }
+    }
+    d7: {
+      ok: {
+        〈3;#Old2〉...
+        〈3;#NewClosed2〉
+      }
+    }
+    d8: {
+      ok: {
+        〈3;Old1〉
+        〈3;#NewClosed2〉...
+      }
+    }
+    d9: {
+      ok: {
+        〈3;#Old2〉
+        〈3;#NewClosed2〉...
+      }
+    }
+    d10: {
+      ok: {
+        〈3;Old1〉...
+        〈3;#NewClosed2〉...
+      }
+    }
+    d11: {
+      ok: {
+        〈3;#Old2〉...
+        〈3;#NewClosed2〉...
+      }
+    }
+    e0: {
+      err: (〈2;#A〉 & 〈2;Old1〉)
+    }
+    e1: {
+      err: (〈2;#A〉 & 〈2;#Old2〉)
+    }
+    e2: {
+      err: (〈2;#A〉 & 〈2;#NewClosed2〉)
+    }
+    e3: {
+      err: (〈2;#A〉 & 〈2;NewOpen1〉)
+    }
+    e4: {
+      err: {
+        〈3;#A〉
+        〈3;Old1〉
+      }
+    }
+    e5: {
+      err: {
+        〈3;#A〉
+        〈3;#Old2〉
+      }
+    }
+    e6: {
+      err: {
+        〈3;#A〉
+        〈3;#NewClosed2〉
+      }
+    }
+    e7: {
+      err: {
+        〈3;#A〉
+        〈3;NewOpen1〉
+      }
+    }
+    e8: {
+      ok: {
+        〈3;#A〉...
+        〈3;Old1〉
+      }
+    }
+    e9: {
+      ok: {
+        〈3;#A〉...
+        〈3;#Old2〉
+      }
+    }
+    e10: {
+      ok: {
+        〈3;#A〉...
+        〈3;#NewClosed2〉
+      }
+    }
+    e11: {
+      ok: {
+        〈3;#A〉...
+        〈3;NewOpen1〉
+      }
+    }
+    f0: {
+      err: (〈2;NewClosed1〉 & 〈2;Old1〉)
+    }
+    f1: {
+      err: (〈2;NewClosed1〉 & 〈2;#Old2〉)
+    }
+    f2: {
+      err: (〈2;NewClosed1〉 & 〈2;#NewClosed2〉)
+    }
+    f3: {
+      err: (〈2;NewClosed1〉 & 〈2;NewOpen1〉)
+    }
+    f4: {
+      ok: (〈2;NewClosed1〉 & 〈2;NewClosed1〉)
+    }
+    f5: {
+      err: {
+        〈3;NewClosed1〉
+        〈3;Old1〉
+      }
+    }
+    f6: {
+      err: {
+        〈3;NewClosed1〉
+        〈3;#Old2〉
+      }
+    }
+    f7: {
+      err: {
+        〈3;NewClosed1〉
+        〈3;#NewClosed2〉
+      }
+    }
+    f8: {
+      err: {
+        〈3;NewClosed1〉
+        〈3;NewOpen1〉
+      }
+    }
+    f9: {
+      ok: {
+        〈3;NewClosed1〉
+        〈3;NewClosed1〉
+      }
+    }
+    f9: {
+      ok: {
+        〈3;NewClosed1〉...
+        〈3;Old1〉
+      }
+    }
+    f10: {
+      ok: {
+        〈3;NewClosed1〉...
+        〈3;#Old2〉
+      }
+    }
+    f11: {
+      ok: {
+        〈3;NewClosed1〉...
+        〈3;NewClosed1〉
+      }
+    }
+    f12: {
+      ok: {
+        〈3;NewClosed1〉...
+        〈3;#NewClosed2〉
+      }
+    }
+    f13: {
+      ok: {
+        〈3;NewClosed1〉...
+        〈3;NewOpen1〉
+      }
+    }
+    f14: {
+      err: (〈2;Old1〉 & 〈2;NewClosed1〉)
+    }
+    f15: {
+      err: (〈2;#Old2〉 & 〈2;NewClosed1〉)
+    }
+    f16: {
+      err: (〈2;#NewClosed2〉 & 〈2;NewClosed1〉)
+    }
+    f17: {
+      err: (〈2;NewOpen1〉 & 〈2;NewClosed1〉)
+    }
+    f18: {
+      ok: (〈2;NewClosed1〉 & 〈2;NewClosed1〉)
+    }
+  }
+}
+--- old.cue
+{
+  #A: {
+    a: 1
+  }
+  Old1: {
+    {
+      〈2;#A〉
+      b: 1
+    }
+  }
+  #Old2: {
+    {
+      〈2;#A〉
+      b: 1
+    }
+  }
+  useNewClosed1: {
+    t1: {
+      err: (〈2;NewClosed1〉 & {
+        c: 3
+      })
+    }
+    t2: {
+      ok: {
+        〈3;NewClosed1〉
+        c: 3
+      }
+    }
+  }
+  useNewClosed2: {
+    t1: {
+      err: (〈2;#NewClosed2〉 & {
+        c: 3
+      })
+    }
+    t2: {
+      ok: {
+        〈3;#NewClosed2〉
+        c: 3
+      }
+    }
+  }
+  useNewOpen1: {
+    t1: {
+      ok: (〈2;NewOpen1〉 & {
+        c: 3
+      })
+    }
+    t2: {
+      ok: {
+        〈3;NewOpen1〉
+        c: 3
+      }
+    }
+  }
+  useNewOpen2: {
+    t1: {
+      ok: (〈2;NewOpen2〉 & {
+        c: 3
+      })
+    }
+    t2: {
+      ok: {
+        〈3;NewOpen2〉
+        c: 3
+      }
+    }
+  }
+  combineold: {
+    a0: {
+      ok: (〈2;#A〉 & 〈2;NewClosed1〉)
+    }
+    a1: {
+      ok: {
+        〈3;#A〉
+        〈3;NewClosed1〉
+      }
+    }
+    a2: {
+      ok: (〈2;NewClosed1〉 & 〈2;NewOpen2〉)
+    }
+    a3: {
+      ok: {
+        〈3;NewClosed1〉
+        〈3;NewOpen2〉
+      }
+    }
+    b0: {
+      ok: (〈2;Old1〉 & 〈2;#NewClosed2〉)
+    }
+    b1: {
+      ok: (〈2;#Old2〉 & 〈2;#NewClosed2〉)
+    }
+    c1: {
+      ok: {
+        〈3;#NewClosed2〉
+        〈3;Old1〉
+      }
+    }
+    c2: {
+      ok: {
+        〈3;#NewClosed2〉
+        〈3;#Old2〉
+      }
+    }
+    e0: {
+      err: (〈2;#A〉 & 〈2;Old1〉)
+    }
+    e1: {
+      err: (〈2;#A〉 & 〈2;#Old2〉)
+    }
+    e2: {
+      err: (〈2;#A〉 & 〈2;#NewClosed2〉)
+    }
+    e3: {
+      err: (〈2;#A〉 & 〈2;NewOpen1〉)
+    }
+    e4: {
+      ok: {
+        〈3;#A〉
+        〈3;Old1〉
+      }
+    }
+    e5: {
+      ok: {
+        〈3;#A〉
+        〈3;#Old2〉
+      }
+    }
+    e6: {
+      ok: {
+        〈3;#A〉
+        〈3;#NewClosed2〉
+      }
+    }
+    e7: {
+      ok: {
+        〈3;#A〉
+        〈3;NewOpen1〉
+      }
+    }
+    f0: {
+      err: (〈2;NewClosed1〉 & 〈2;Old1〉)
+    }
+    f1: {
+      err: (〈2;NewClosed1〉 & 〈2;#Old2〉)
+    }
+    f2: {
+      err: (〈2;NewClosed1〉 & 〈2;#NewClosed2〉)
+    }
+    f3: {
+      err: (〈2;NewClosed1〉 & 〈2;NewOpen1〉)
+    }
+    f4: {
+      ok: {
+        〈3;NewClosed1〉
+        〈3;Old1〉
+      }
+    }
+    f5: {
+      ok: {
+        〈3;NewClosed1〉
+        〈3;#Old2〉
+      }
+    }
+    f6: {
+      ok: {
+        〈3;NewClosed1〉
+        〈3;NewClosed1〉
+      }
+    }
+    f7: {
+      ok: {
+        〈3;NewClosed1〉
+        〈3;#NewClosed2〉
+      }
+    }
+    f8: {
+      ok: {
+        〈3;NewClosed1〉
+        〈3;NewOpen1〉
+      }
+    }
+  }
+}

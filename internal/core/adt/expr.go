@@ -1289,6 +1289,33 @@ func (x *BinaryExpr) evaluate(c *OpContext, state combinedFlags) Value {
 	return BinOp(c, x, x.Op, left, right)
 }
 
+// PostfixExpr represents a postfix operator applied to an expression.
+// Examples: x..., x?, x!!
+type PostfixExpr struct {
+	Src *ast.PostfixExpr
+	Op  token.Token
+	X   Expr
+}
+
+func (x *PostfixExpr) Source() ast.Node {
+	if x.Src == nil {
+		return nil
+	}
+	return x.Src
+}
+
+func (x *PostfixExpr) evaluate(c *OpContext, state combinedFlags) Value {
+	switch x.Op {
+	case token.ELLIPSIS:
+		c.ci.Opened = true
+		return c.evalState(x.X, state)
+
+	default:
+		// For future postfix operators, add their evaluation logic here
+		return c.NewErrf("unsupported postfix operator %s", x.Op)
+	}
+}
+
 func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flags combinedFlags) (r Value) {
 	state := flags.status
 

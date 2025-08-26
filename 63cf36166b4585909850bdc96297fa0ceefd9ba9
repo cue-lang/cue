@@ -16,6 +16,24 @@
       "message": "I guess we don\u0027t need the \"debug\" mode to re-introduce panics.",
       "revId": "63cf36166b4585909850bdc96297fa0ceefd9ba9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f62fa2fd_9367e833",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-26T15:26:53Z",
+      "side": 1,
+      "message": "I erred on the side of YAGNI there.",
+      "parentUuid": "b2200e7c_85a90e5e",
+      "revId": "63cf36166b4585909850bdc96297fa0ceefd9ba9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

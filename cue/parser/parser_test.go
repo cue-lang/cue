@@ -966,6 +966,26 @@ func TestIncompleteSelection(t *testing.T) {
 	}
 }
 
+// Adapted from https://go-review.googlesource.com/c/go/+/559436
+func TestIssue57490(t *testing.T) {
+	src := `x: {a: int, b: int}
+y: x.` // program not correctly terminated
+	file, err := ParseFile("", src)
+	if err == nil {
+		t.Fatalf("syntax error expected, but no error reported")
+	}
+
+	// Because of the syntax error, the end position of the field decl
+	// is past the end of the file's position range.
+	funcEnd := file.Decls[1].End()
+
+	tokFile := file.Pos().File()
+	offset := tokFile.Offset(funcEnd)
+	if offset != tokFile.Size() {
+		t.Fatalf("offset = %d, want %d", offset, tokFile.Size())
+	}
+}
+
 // For debugging, do not delete.
 func TestX(t *testing.T) {
 	t.Skip()

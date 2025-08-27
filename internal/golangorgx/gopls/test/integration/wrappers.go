@@ -5,12 +5,12 @@
 package integration
 
 import (
+	"context"
 	"encoding/json"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
-	"cuelang.org/go/internal/golangorgx/tools/xcontext"
 )
 
 // RemoveWorkspaceFile deletes a file on disk but does nothing in the
@@ -528,7 +528,7 @@ func (e *Env) SemanticTokensRange(loc protocol.Location) []fake.SemanticToken {
 // Close shuts down the editor session and cleans up the sandbox directory,
 // calling t.Error on any error.
 func (e *Env) Close() {
-	ctx := xcontext.Detach(e.Ctx)
+	ctx := context.WithoutCancel(e.Ctx)
 	if err := e.Editor.Close(ctx); err != nil {
 		e.T.Errorf("closing editor: %v", err)
 	}

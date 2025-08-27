@@ -27,7 +27,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2/servertest"
 	"cuelang.org/go/internal/golangorgx/tools/testenv"
-	"cuelang.org/go/internal/golangorgx/tools/xcontext"
 	"cuelang.org/go/internal/lsp/cache"
 	"github.com/go-quicktest/qt"
 )
@@ -246,7 +245,7 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 				// the editor: in general we want to clean up before proceeding to the
 				// next test, and if there is a deadlock preventing closing it will
 				// eventually be handled by the `go test` timeout.
-				if err := editor.Close(xcontext.Detach(ctx)); err != nil {
+				if err := editor.Close(context.WithoutCancel(ctx)); err != nil {
 					t.Errorf("closing editor: %v", err)
 				}
 			}()

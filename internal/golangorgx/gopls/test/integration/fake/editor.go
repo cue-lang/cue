@@ -25,7 +25,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/util/pathutil"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2/servertest"
-	"cuelang.org/go/internal/golangorgx/tools/xcontext"
 )
 
 // Editor is a fake client editor.  It keeps track of client state and can be
@@ -152,7 +151,7 @@ func NewEditor(sandbox *Sandbox, config EditorConfig) *Editor {
 //
 //	editor, err := NewEditor(s).Connect(ctx, conn, hooks)
 func (e *Editor) Connect(ctx context.Context, connector servertest.Connector, hooks ClientHooks, skipApplyEdits bool) (*Editor, error) {
-	bgCtx, cancelConn := context.WithCancel(xcontext.Detach(ctx))
+	bgCtx, cancelConn := context.WithCancel(context.WithoutCancel(ctx))
 	conn := connector.Connect(bgCtx)
 	e.cancelConn = cancelConn
 

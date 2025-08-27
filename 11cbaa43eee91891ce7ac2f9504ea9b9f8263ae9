@@ -16,6 +16,24 @@
       "message": "This is just making sure the k isn\u0027t visible from the outside.",
       "revId": "11cbaa43eee91891ce7ac2f9504ea9b9f8263ae9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44a58878_7c059391",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 889,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-27T13:53:23Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "39113627_6097ea3a",
+      "revId": "11cbaa43eee91891ce7ac2f9504ea9b9f8263ae9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

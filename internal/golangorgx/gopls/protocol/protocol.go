@@ -13,7 +13,6 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
-	"cuelang.org/go/internal/golangorgx/tools/xcontext"
 )
 
 var (
@@ -80,7 +79,7 @@ type serverDispatcher struct {
 func ClientHandler(client Client, handler jsonrpc2.Handler) jsonrpc2.Handler {
 	return func(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
 		if ctx.Err() != nil {
-			ctx := xcontext.Detach(ctx)
+			ctx := context.WithoutCancel(ctx)
 			return reply(ctx, nil, RequestCancelledError)
 		}
 		handled, err := clientDispatch(ctx, client, reply, req)
@@ -94,7 +93,7 @@ func ClientHandler(client Client, handler jsonrpc2.Handler) jsonrpc2.Handler {
 func ServerHandler(server Server, handler jsonrpc2.Handler) jsonrpc2.Handler {
 	return func(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
 		if ctx.Err() != nil {
-			ctx := xcontext.Detach(ctx)
+			ctx := context.WithoutCancel(ctx)
 			return reply(ctx, nil, RequestCancelledError)
 		}
 		handled, err := serverDispatch(ctx, server, reply, req)
@@ -126,7 +125,7 @@ func CancelHandler(handler jsonrpc2.Handler) jsonrpc2.Handler {
 				if ctx.Err() != nil && err == nil {
 					err = RequestCancelledError
 				}
-				ctx = xcontext.Detach(ctx)
+				ctx = context.WithoutCancel(ctx)
 				return reply(ctx, resp, err)
 			}
 			return handler(ctx, replyWithDetachedContext, req)
@@ -155,7 +154,7 @@ func Call(ctx context.Context, conn jsonrpc2.Conn, method string, params interfa
 }
 
 func cancelCall(ctx context.Context, sender connSender, id jsonrpc2.ID) {
-	ctx = xcontext.Detach(ctx)
+	ctx = context.WithoutCancel(ctx)
 	ctx, done := event.Start(ctx, "protocol.canceller")
 	defer done()
 	// Note that only *jsonrpc2.ID implements json.Marshaler.

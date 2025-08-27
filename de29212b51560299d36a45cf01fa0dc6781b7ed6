@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6894aa4d_7abdf4f4",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-27T14:00:54Z",
+      "side": 1,
+      "message": "This is a bit of a drive-by fix. Adding this improves symmetry with a similar section around line 402.",
+      "revId": "de29212b51560299d36a45cf01fa0dc6781b7ed6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a86efad_093709c3",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 508,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-27T14:00:54Z",
+      "side": 1,
+      "message": "This has gone back to a slice, because in `maybeAddCompletion`, we need to \"make progress\" to avoid an infinite loop. This means that e.g. for a structlit, we need to start the new astNode with just the elements of structlit and not the structlit itself, so that we don\u0027t loop, calling `maybeAddCompletion`. Making this change causes `newAstNode` and associated methods to have their args swapped around so the last arg can become variadic.",
+      "revId": "de29212b51560299d36a45cf01fa0dc6781b7ed6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8d0d7a1_1a906b43",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-27T14:00:54Z",
+      "side": 0,
+      "message": "this has moved further down because its receiver type has changed.",
+      "revId": "dd1b8df55625d41186962b2071ad40b265c65fe1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

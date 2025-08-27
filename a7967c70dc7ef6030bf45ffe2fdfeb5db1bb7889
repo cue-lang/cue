@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4a18efc_512aa610",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-27T14:20:14Z",
+      "side": 1,
+      "message": "This mirrors the behaviour of modpkgload/modimports where we changed it to always continue provided there is some ast. It turns out that\u0027s the behaviour we want here too.",
+      "revId": "a7967c70dc7ef6030bf45ffe2fdfeb5db1bb7889",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

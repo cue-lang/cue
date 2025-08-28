@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b843d66_bb0e08fb",
+        "filename": "internal/core/toposort/graph_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-28T07:25:48Z",
+      "side": 0,
+      "message": "Curious - this was at one point used - I suspect back when we actually calculated all the cycles (but we later found that was computationally very expensive so removed it).",
+      "revId": "ad025b4353a6ff456689c1d462c72bf33044bf4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

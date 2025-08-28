@@ -64,10 +64,6 @@ unsupported:
 	return fmt.Errorf("cue/format: unsupported node type %T", node)
 }
 
-func isRegularField(tok token.Token) bool {
-	return tok == token.ILLEGAL || tok == token.COLON
-}
-
 // Helper functions for common node lists. They may be empty.
 
 func nestDepth(f *ast.Field) int {
@@ -308,12 +304,7 @@ func (f *formatter) decl(decl ast.Decl) {
 		constraint, _ := internal.ConstraintToken(n)
 		f.label(n.Label, constraint)
 
-		regular := isRegularField(n.Token)
-		if regular {
-			f.print(noblank, nooverride, n.TokenPos, token.COLON)
-		} else {
-			f.print(blank, nooverride, n.Token)
-		}
+		f.print(noblank, nooverride, n.TokenPos, token.COLON)
 		f.visitComments(f.current.pos)
 
 		if mem := f.inlineField(n); mem != nil {
@@ -321,7 +312,7 @@ func (f *formatter) decl(decl ast.Decl) {
 			default:
 				fallthrough
 
-			case regular && f.cfg.simplify:
+			case f.cfg.simplify:
 				f.print(blank, nooverride)
 				f.decl(mem)
 

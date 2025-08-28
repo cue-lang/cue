@@ -90,10 +90,9 @@ func NewMessage(format string, args []interface{}) Message {
 	return NewMessagef(format, args...)
 }
 
-// Msg returns a printf-style format string and its arguments for human
-// consumption.
-func (m *Message) Msg() (format string, args []interface{}) {
-	return m.format, m.args
+// WriteError implements [Error].
+func (m *Message) WriteError(w *strings.Builder, cfg *Config) {
+	fmt.Fprintf(w, m.format, cfg.Transform(m.args)...)
 }
 
 func (m *Message) Error() string {
@@ -118,9 +117,11 @@ type Error interface {
 	// This path may be nil if the error is not associated with such a location.
 	Path() []string
 
-	// Msg returns the unformatted error message and its arguments for human
-	// consumption.
-	Msg() (format string, args []interface{})
+	// WriteError is similar to the [errors.Error] method
+	// except that instead of returning the error as a string,
+	// it writes it to w, respecting the given [Config] when
+	// writing Pos and Position arguments.
+	WriteError(w *strings.Builder, cfg *Config)
 }
 
 // Positions returns all positions returned by an error, sorted
@@ -216,7 +217,7 @@ type wrapped struct {
 }
 
 // Error implements the error interface.
-func (e *wrapped) Error() string {
+func (e *wrapped) Error() (_s string) {
 	switch msg := e.main.Error(); {
 	case e.wrap == nil:
 		return msg
@@ -235,8 +236,21 @@ func (e *wrapped) As(target interface{}) bool {
 	return As(e.main, target)
 }
 
-func (e *wrapped) Msg() (format string, args []interface{}) {
-	return e.main.Msg()
+func (e *wrapped) WriteError(w *strings.Builder, cfg *Config) {
+	oldLen := w.Len()
+	e.main.WriteError(w, cfg)
+	if e.wrap == nil {
+		return
+	}
+	if w.Len() > oldLen {
+		w.WriteString(": ")
+	}
+	switch wrap := e.wrap.(type) {
+	case Error:
+		wrap.WriteError(w, cfg)
+	default:
+		w.WriteString(wrap.Error())
+	}
 }
 
 func (e *wrapped) Path() []string {
@@ -431,24 +445,21 @@ func approximateEqual(a, b Error) bool {
 // A list implements the error interface by returning the
 // string for the first error in the list.
 func (p list) Error() string {
-	// TODO in general Error.Msg does not include the message
-	// from errors that are wrapped (see [wrapped.Msg] which does
-	// not include any text from the wrapped error, so this implementation
-	// of Error means that we might lose information when
-	// just printing an error list with regular %v.
-	format, args := p.Msg()
-	return fmt.Sprintf(format, args...)
+	var buf strings.Builder
+	p.WriteError(&buf, zeroConfig)
+	return buf.String()
 }
 
-// Msg reports the unformatted error message for the first error, if any.
-func (p list) Msg() (format string, args []interface{}) {
-	switch len(p) {
-	case 0:
-		return "no errors", nil
-	case 1:
-		return p[0].Msg()
+func (p list) WriteError(w *strings.Builder, cfg *Config) {
+	p = p.sanitize()
+	if len(p) == 0 {
+		w.WriteString("no errors")
+		return
 	}
-	return "%s (and %d more errors)", []interface{}{p[0], len(p) - 1}
+	writeErr(w, p[0], cfg)
+	if len(p) > 1 {
+		fmt.Fprintf(w, " (and %d more errors)", len(p)-1)
+	}
 }
 
 // Position reports the primary position for the first error, if any.
@@ -507,9 +518,22 @@ func Print(w io.Writer, err error, cfg *Config) {
 	if cfg == nil {
 		cfg = zeroConfig
 	}
-	for _, e := range list(Errors(err)).sanitize() {
-		printError(w, e, cfg)
+
+	var buf *strings.Builder
+	if w1, ok := w.(*strings.Builder); ok {
+		buf = w1
+	} else {
+		buf = new(strings.Builder)
+		defer func() {
+			io.WriteString(w, buf.String())
+		}()
 	}
+	l := list(Errors(err)).sanitize()
+	//	log.Printf("about to print %d errors {", len(l))
+	for _, e := range l {
+		printError(buf, e, cfg)
+	}
+	// log.Printf("}")
 }
 
 // Details is a convenience wrapper for Print to return the error text as a
@@ -527,63 +551,58 @@ func String(err Error) string {
 	return b.String()
 }
 
-func writeErr(w io.Writer, err Error, cfg *Config) {
+func writeErr(w *strings.Builder, err Error, cfg *Config) {
 	if path := strings.Join(err.Path(), "."); path != "" {
-		_, _ = io.WriteString(w, path)
-		_, _ = io.WriteString(w, ": ")
+		w.WriteString(path)
+		w.WriteString(": ")
 	}
 
-	for {
-		u := errors.Unwrap(err)
+	err.WriteError(w, cfg)
+}
 
-		msg, args := err.Msg()
+func (cfg *Config) Transform1(arg any) any {
+	arg, _ = cfg.transform1(arg)
+	return arg
+}
 
-		// Just like [printError] does when printing one position per line,
-		// make sure that any position formatting arguments print as relative paths.
-		//
-		// Note that [Error.Msg] isn't clear about whether we should treat args as read-only,
-		// so we make a copy if we need to replace any arguments.
-		didCopy := false
-		for i, arg := range args {
-			var pos token.Position
-			switch arg := arg.(type) {
-			case token.Pos:
-				pos = arg.Position()
-			case token.Position:
-				pos = arg
-			default:
-				continue
-			}
-			if !didCopy {
-				args = slices.Clone(args)
-				didCopy = true
-			}
-			pos.Filename = relPath(pos.Filename, cfg)
-			args[i] = pos
+// Transform returns the given format arguments transformed
+// so that any position formatting arguments print as relative
+// paths. It does not mutate args.
+func (cfg *Config) Transform(args []any) []any {
+	didCopy := false
+	for i, arg := range args {
+		arg, changed := cfg.transform1(arg)
+		if !changed {
+			continue
 		}
-
-		n, _ := fmt.Fprintf(w, msg, args...)
-
-		if u == nil {
-			break
+		if !didCopy {
+			args = slices.Clone(args)
+			didCopy = true
 		}
-
-		if n > 0 {
-			_, _ = io.WriteString(w, ": ")
-		}
-		err, _ = u.(Error)
-		if err == nil {
-			fmt.Fprint(w, u)
-			break
-		}
+		args[i] = arg
 	}
+	return args
+}
+
+func (cfg *Config) transform1(arg any) (any, bool) {
+	var pos token.Position
+	switch arg := arg.(type) {
+	case token.Pos:
+		pos = arg.Position()
+	case token.Position:
+		pos = arg
+	default:
+		return arg, false
+	}
+	pos.Filename = relPath(pos.Filename, cfg)
+	return pos, true
 }
 
 func defaultFprintf(w io.Writer, format string, args ...interface{}) {
 	fmt.Fprintf(w, format, args...)
 }
 
-func printError(w io.Writer, err error, cfg *Config) {
+func printError(w *strings.Builder, err error, cfg *Config) {
 	if err == nil {
 		return
 	}
@@ -593,16 +612,18 @@ func printError(w io.Writer, err error, cfg *Config) {
 	}
 
 	if e, ok := err.(Error); ok {
+		//		log.Printf("is Error")
 		writeErr(w, e, cfg)
 	} else {
+		//		log.Printf("not Error")
 		fprintf(w, "%v", err)
 	}
-
 	positions := Positions(err)
 	if len(positions) == 0 {
 		fprintf(w, "\n")
 		return
 	}
+	//	log.Printf("has %d positions", len(positions))
 	fprintf(w, ":\n")
 	for _, p := range positions {
 		pos := p.Position()

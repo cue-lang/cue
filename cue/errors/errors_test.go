@@ -17,7 +17,11 @@ package errors
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"testing"
+
+	"cuelang.org/go/cue/token"
+	"github.com/go-quicktest/qt"
 )
 
 // TODO this foundational package could do with a bunch more tests.
@@ -64,4 +68,34 @@ func TestPrintError(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTaskError(t *testing.T) {
+	err := &taskError{
+		Message: NewMessagef("invalid bytes argument"),
+	}
+	err1 := Wrap(err, fmt.Errorf("index out of range"))
+	var buf strings.Builder
+	Print(&buf, err1, nil)
+	qt.Assert(t, qt.Equals(buf.String(), `xxx`))
+}
+
+type taskError struct {
+	Message
+}
+
+var _ Error = &taskError{}
+
+func (t *taskError) Path() (a []string) {
+	return []string{"command", "build"}
+}
+
+func (t *taskError) Position() token.Pos {
+	return token.NoPos
+}
+
+func (t *taskError) InputPositions() (a []token.Pos) {
+	f := token.NewFile("foo.cue", 0, 100)
+	f.AddLine(10)
+	return []token.Pos{f.Pos(1, token.NoRelPos)}
 }

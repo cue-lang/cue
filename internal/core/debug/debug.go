@@ -175,20 +175,21 @@ func (w *printer) popVertex() {
 }
 
 func (w *printer) shortError(errs errors.Error) {
-	for {
-		msg, args := errs.Msg()
-		w.dst = fmt.Appendf(w.dst, msg, args...)
-
-		err := errors.Unwrap(errs)
-		if err == nil {
-			break
-		}
-
-		if errs, _ = err.(errors.Error); errs != nil {
-			w.string(err.Error())
-			break
-		}
-	}
+	w.dst = append(w.dst, errs.Error()...)
+	//	for {
+	//		msg, args := errs.Msg()
+	//		w.dst = fmt.Appendf(w.dst, msg, args...)
+	//
+	//		err := errors.Unwrap(errs)
+	//		if err == nil {
+	//			break
+	//		}
+	//
+	//		if errs, _ = err.(errors.Error); errs != nil {
+	//			w.string(err.Error())
+	//			break
+	//		}
+	//	}
 }
 
 func (w *printer) interpolation(x *adt.Interpolation) {

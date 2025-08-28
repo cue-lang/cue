@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"strings"
 
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
@@ -37,17 +38,13 @@ func (e *protobufError) InputPositions() []token.Pos {
 }
 
 func (e *protobufError) Error() string {
-	if e.path == nil {
-		return fmt.Sprintf("protobuf: %s: %v", e.pos, e.err)
-	}
-	path := strings.Join(e.path, ".")
-	return fmt.Sprintf("protobuf: %s:%s: %v", e.pos, path, e.err)
+	return errors.String(e)
 }
 
 func (e *protobufError) Path() []string {
 	return e.path
 }
 
-func (e *protobufError) Msg() (format string, args []interface{}) {
-	return "error parsing protobuf: %v", []interface{}{e.err}
+func (e *protobufError) WriteError(w *strings.Builder, cfg *errors.Config) {
+	fmt.Fprintf(w, "error parsing protobuf: %v", e.err)
 }

@@ -15,6 +15,8 @@
 package cue
 
 import (
+	"strings"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
@@ -72,11 +74,10 @@ func (e *valueError) InputPositions() []token.Pos {
 	return e.err.Err.InputPositions()
 }
 
-func (e *valueError) Msg() (string, []interface{}) {
-	if e.err.Err == nil {
-		return "", nil
+func (e *valueError) WriteError(w *strings.Builder, cfg *errors.Config) {
+	if e.err.Err != nil {
+		e.err.Err.WriteError(w, cfg)
 	}
-	return e.err.Err.Msg()
 }
 
 func (e *valueError) Path() (a []string) {

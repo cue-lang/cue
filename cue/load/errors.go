@@ -72,8 +72,7 @@ func (e *NoFilesError) Position() token.Pos         { return token.NoPos }
 func (e *NoFilesError) InputPositions() []token.Pos { return nil }
 func (e *NoFilesError) Path() []string              { return nil }
 
-// TODO(localize)
-func (e *NoFilesError) Msg() (string, []interface{}) {
+func (e *NoFilesError) WriteError(w *strings.Builder, cfg *errors.Config) {
 	// Count files beginning with _, which we will pretend don't exist at all.
 	dummy := 0
 	for _, f := range e.Package.IgnoredFiles {
@@ -86,20 +85,15 @@ func (e *NoFilesError) Msg() (string, []interface{}) {
 	path := e.Package.DisplayPath
 
 	if len(e.Package.IgnoredFiles) > dummy {
-		b := strings.Builder{}
-		var args []any
-		b.WriteString("build constraints exclude all CUE files in %s:")
-		args = append(args, token.Position{Filename: path})
+		fmt.Fprintf(w, "build constraints exclude all CUE files in %s:", cfg.Transform1(token.Position{Filename: path}))
 		// CUE files exist, but they were ignored due to build constraints.
 		for _, f := range e.Package.IgnoredFiles {
-			b.WriteString("\n    %s")
-			args = append(args, token.Position{Filename: f.Filename})
+			fmt.Fprintf(w, "\n    %s", cfg.Transform1(token.Position{Filename: f.Filename}))
 			if f.ExcludeReason != nil {
-				b.WriteString(": %v")
-				args = append(args, f.ExcludeReason)
+				fmt.Fprintf(w, ": %v", f.ExcludeReason)
 			}
 		}
-		return b.String(), args
+		return
 	}
 	// if len(e.Package.TestCUEFiles) > 0 {
 	// 	// Test CUE files exist, but we're not interested in them.
@@ -107,12 +101,11 @@ func (e *NoFilesError) Msg() (string, []interface{}) {
 	// 	// to appear at the end of error message.
 	// 	return "no non-test CUE files in " + e.Package.Dir
 	// }
-	return "no CUE files in %s", []any{path}
+	fmt.Fprintf(w, "no CUE files in %s", path)
 }
 
 func (e *NoFilesError) Error() string {
-	format, args := e.Msg()
-	return fmt.Sprintf(format, args...)
+	return errors.String(e)
 }
 
 // MultiplePackageError describes an attempt to build a package composed of
@@ -127,8 +120,8 @@ func (e *MultiplePackageError) Position() token.Pos         { return token.NoPos
 func (e *MultiplePackageError) InputPositions() []token.Pos { return nil }
 func (e *MultiplePackageError) Path() []string              { return nil }
 
-func (e *MultiplePackageError) Msg() (string, []interface{}) {
-	return "found packages %q (%s) and %q (%s) in %q", []interface{}{
+func (e *MultiplePackageError) WriteError(w *strings.Builder, cfg *errors.Config) {
+	fmt.Fprintf(w, "found packages %q (%s) and %q (%s) in %q", cfg.Transform([]any{
 		e.Packages[0],
 		e.Files[0],
 		e.Packages[1],
@@ -136,11 +129,9 @@ func (e *MultiplePackageError) Msg() (string, []interface{}) {
 		// To make sure [cue/errors] prints this directory name as relative,
 		// use a [token.Position] even though it's really only meant for regular source files.
 		token.Position{Filename: e.Dir},
-	}
+	})...)
 }
 
 func (e *MultiplePackageError) Error() string {
-	// Error string limited to two entries for compatibility.
-	format, args := e.Msg()
-	return fmt.Sprintf(format, args...)
+	return errors.String(e)
 }

@@ -1,0 +1,43 @@
+# Issue #2416
+
+# cycle on complete error
+! exec cue cmd build issue2416a_tool.cue
+cmp stderr stderr2416.golden
+
+-- issue2416a_tool.cue --
+package kubecluster
+
+import "tool/file"
+
+Cluster: {}
+
+m: x: Cluster
+m: x: X={
+	foobar: X.name
+	name: "x"
+	foo: string
+}
+
+dnsRecords: _
+
+for _, X in m {
+	dnsRecords: "\(m.x.foo)": "127.0.0.1"
+}
+
+command: build: file.Create & {
+	filename: "output/dns-records.zone"
+	permissions: int | *0o666
+	let lines = [
+		for name, addr in dnsRecords {
+			"\(name) A \(addr)"
+		},
+	]
+	contents: lines[0]
+}
+
+-- stderr2416.golden --
+command.build.contents: invalid bytes argument: index out of range [0] with length 0:
+    ./issue2416a_tool.cue:20:10
+    ./issue2416a_tool.cue:28:2
+    ./issue2416a_tool.cue:28:18
+    tool/file:20:3

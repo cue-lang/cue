@@ -133,6 +133,11 @@ func TestGenerateOpenAPI(t *testing.T) {
 		_, err = t.Writer("out.json").Write(out.Bytes())
 		qt.Assert(t, qt.IsNil(err))
 
+		// Compile from bytes rather than directly from the
+		// output value so that we get source positions
+		// in the error messages.
+		gen = ctx.CompileBytes(out.Bytes(), cue.Filename("out.json"))
+
 		// Check that we can extract the resulting schema without error.
 		_, err = openapi.Extract(gen, &config)
 		if expectedErr, shouldErr := t.Value("ExpectExtractError"); shouldErr {
@@ -141,7 +146,8 @@ func TestGenerateOpenAPI(t *testing.T) {
 		}
 		// TODO check that the resulting schema actually validates some
 		// data values as expected.
-		qt.Assert(t, qt.IsNil(err))
+		t.Logf("source: %q", out.Bytes())
+		qt.Assert(t, qt.IsNil(err), qt.Commentf("details: %v", errors.Details(err, nil)))
 	})
 }
 

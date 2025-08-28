@@ -142,6 +142,7 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 				testFailed(t, m, &test.Skip, test, "could not compile schema")
 			})
 		}
+		t.Logf("extractErr %T", extractErr)
 		testFailed(t, m, &s.Skip, s, fmt.Sprintf("extract error: %v", extractErr))
 		return
 	}
@@ -240,7 +241,7 @@ func testFailed(t *testing.T, m *cuetdtest.M, skipField *externaltest.Skip, p po
 		return
 	}
 	if reason := (*skipField)[m.Name()]; reason != "" {
-		qt.Assert(t, qt.Equals(reason, errStr), qt.Commentf("error message mismatch"))
+		qt.Assert(t, qt.Equals(errStr, reason), qt.Commentf("error message mismatch"))
 		t.Skipf("skipping due to known error: %v", reason)
 	}
 	t.Fatal(errStr)

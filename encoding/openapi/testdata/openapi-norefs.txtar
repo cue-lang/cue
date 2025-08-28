@@ -38,7 +38,7 @@ info: {
 
 #Enum: "foo" | "bar" | "baz"
 
-#List: [...number] | *[1, 2, 3]
+#List: [...number] | [1, 2, 3]
 
 #DefaultStruct: #Port | *{port: 1}
 

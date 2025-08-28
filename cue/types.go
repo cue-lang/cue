@@ -187,10 +187,14 @@ func (e *marshalError) Error() string {
 	return fmt.Sprintf("cue: marshal error: %v", e.err)
 }
 
-func (e *marshalError) Bottom() *adt.Bottom          { return e.b }
-func (e *marshalError) Path() []string               { return e.err.Path() }
-func (e *marshalError) Msg() (string, []interface{}) { return e.err.Msg() }
-func (e *marshalError) Position() token.Pos          { return e.err.Position() }
+func (e *marshalError) Bottom() *adt.Bottom { return e.b }
+func (e *marshalError) Path() []string      { return e.err.Path() }
+func (e *marshalError) WriteError(w *strings.Builder, cfg *errors.Config) {
+	w.WriteString("cue: marshal error: ")
+	e.err.WriteError(w, cfg)
+}
+
+func (e *marshalError) Position() token.Pos { return e.err.Position() }
 func (e *marshalError) InputPositions() []token.Pos {
 	return e.err.InputPositions()
 }

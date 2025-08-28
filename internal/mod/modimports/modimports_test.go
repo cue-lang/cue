@@ -35,7 +35,7 @@ func TestAllPackageFiles(t *testing.T) {
 					fmt.Fprintf(&out, ": error: %v\n", pf.SyntaxError)
 					return true
 				}
-				for _, imp := range pf.Syntax.Imports {
+				for imp := range pf.Syntax.ImportSpecs() {
 					fmt.Fprintf(&out, " %s", imp.Path.Value)
 				}
 				out.WriteString("\n")

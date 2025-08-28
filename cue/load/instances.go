@@ -253,7 +253,7 @@ func loadPackagesFromArgs(
 		if err != nil {
 			return nil, fmt.Errorf("cannot get syntax for %q: %w", f.Filename, err)
 		}
-		for _, imp := range syntax.Imports {
+		for imp := range syntax.ImportSpecs() {
 			pkgPath, err := strconv.Unquote(imp.Path.Value)
 			if err != nil {
 				// Should never happen.

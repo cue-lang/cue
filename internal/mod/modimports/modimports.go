@@ -44,7 +44,7 @@ func AllImports(modFilesIter iter.Seq2[ModuleFile, error]) ([]string, error) {
 			return nil, fmt.Errorf("cannot read %q: %v", mf.FilePath, err)
 		}
 		// TODO look at build tags and omit files with "ignore" tags.
-		for _, imp := range mf.Syntax.Imports {
+		for imp := range mf.Syntax.ImportSpecs() {
 			pkgPath, err := strconv.Unquote(imp.Path.Value)
 			if err != nil {
 				// TODO location formatting

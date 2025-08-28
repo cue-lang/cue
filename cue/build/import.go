@@ -54,7 +54,7 @@ func (inst *Instance) complete() errors.Error {
 	)
 
 	for _, f := range inst.Files {
-		for _, spec := range f.Imports {
+		for spec := range f.ImportSpecs() {
 			quoted := spec.Path.Value
 			path, err := strconv.Unquote(quoted)
 			if err != nil {

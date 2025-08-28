@@ -34,8 +34,8 @@ func ExampleParseFile() {
 	}
 
 	// Print the imports from the file's AST.
-	for _, s := range f.Imports {
-		fmt.Println(s.Path.Value)
+	for spec := range f.ImportSpecs() {
+		fmt.Println(spec.Path.Value)
 	}
 	// Output:
 	// "math"

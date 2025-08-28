@@ -143,12 +143,12 @@ func (r *Runtime) Marshal(values ...InstanceOrValue) (b []byte, err error) {
 		// TODO: support exporting instance
 		file, _ := export.Def(r.runtime(), inst.ID(), i.instance().root)
 		imports := []string{}
-		file.VisitImports(func(i *ast.ImportDecl) {
+		for i := range file.ImportDecls() {
 			for _, spec := range i.Specs {
 				info, _ := astutil.ParseImportSpec(spec)
 				imports = append(imports, info.ID)
 			}
-		})
+		}
 
 		if inst.PkgName != "" {
 			if pkg := internal.Package(file); pkg == nil {

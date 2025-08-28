@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68d4fa1c_aa0b24a8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-28T08:28:18Z",
+      "side": 1,
+      "message": "This makes it sound like the compiler or adt packages end up interpreting the new syntax as if it were `{...}`, which doesn\u0027t seem true. Is this perhaps out of date? If not, I would reword for clarity.\n\nThe way I see it, the new syntax is interpreted via the new boolean fields, so it is handled separately to open structs with ellipses.",
+      "range": {
+        "startLine": 32,
+        "startChar": 15,
+        "endLine": 33,
+        "endChar": 16
+      },
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5aade36f_5326e3d2",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1086,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-28T08:28:18Z",
+      "side": 1,
+      "message": "isn\u0027t this check duplicated with the parser? is it still useful to have?",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

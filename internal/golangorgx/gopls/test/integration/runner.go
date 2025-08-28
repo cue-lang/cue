@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2/servertest"
-	"cuelang.org/go/internal/golangorgx/tools/testenv"
 	"cuelang.org/go/internal/lsp/cache"
 	"github.com/go-quicktest/qt"
 )
@@ -169,7 +168,7 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 				var cancel context.CancelFunc
 				ctx, cancel = context.WithTimeout(ctx, r.Timeout)
 				defer cancel()
-			} else if d, ok := testenv.Deadline(t); ok {
+			} else if d, ok := t.Deadline(); ok {
 				timeout := time.Until(d) * 19 / 20 // Leave an arbitrary 5% for cleanup.
 				var cancel context.CancelFunc
 				ctx, cancel = context.WithTimeout(ctx, timeout)

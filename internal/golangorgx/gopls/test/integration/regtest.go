@@ -15,7 +15,6 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/cmd"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"cuelang.org/go/internal/golangorgx/tools/testenv"
 	"cuelang.org/go/internal/golangorgx/tools/tool"
 	"cuelang.org/go/internal/lsp/cache"
 )
@@ -113,14 +112,6 @@ func Main(m *testing.M, hook func(*settings.Options)) {
 		os.Exit(0)
 	}
 
-	if !testenv.HasExec() {
-		fmt.Printf("skipping all tests: exec not supported on %s/%s\n", runtime.GOOS, runtime.GOARCH)
-		os.Exit(0)
-	}
-
-	// Disable GOPACKAGESDRIVER, as it can cause spurious test failures.
-	os.Setenv("GOPACKAGESDRIVER", "off")
-
 	flag.Parse()
 
 	runner = &Runner{
@@ -150,11 +141,8 @@ func Main(m *testing.M, hook func(*settings.Options)) {
 	defer func() {
 		if err := runner.Close(); err != nil {
 			fmt.Fprintf(os.Stderr, "closing test runner: %v\n", err)
-			// Cleanup is broken in go1.12 and earlier, and sometimes flakes on
-			// Windows due to file locking, but this is OK for our CI.
-			//
-			// Fail on go1.13+, except for windows and android which have shutdown problems.
-			if testenv.Go1Point() >= 13 && runtime.GOOS != "windows" && runtime.GOOS != "android" {
+			// Cleanup sometimes flakes on Windows due to file locking, but this is OK for our CI.
+			if runtime.GOOS != "windows" {
 				os.Exit(1)
 			}
 		}

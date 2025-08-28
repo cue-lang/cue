@@ -18,6 +18,7 @@ package ast
 
 import (
 	"fmt"
+	"iter"
 	"strings"
 
 	"cuelang.org/go/cue/literal"
@@ -984,16 +985,30 @@ outer:
 	return f.Decls[:p]
 }
 
+// VisitImports iterates through the import declarations in the file.
+//
+// Deprecated: use [File.ImportDecls].
 func (f *File) VisitImports(fn func(d *ImportDecl)) {
-	for _, d := range f.Decls {
-		switch x := d.(type) {
-		case *CommentGroup:
-		case *Package:
-		case *Attribute:
-		case *ImportDecl:
-			fn(x)
-		default:
-			return
+	for d := range f.ImportDecls() {
+		fn(d)
+	}
+}
+
+// ImportDecls iterates through the import declarations in the file.
+func (f *File) ImportDecls() iter.Seq[*ImportDecl] {
+	return func(yield func(d *ImportDecl) bool) {
+		for _, d := range f.Decls {
+			switch x := d.(type) {
+			case *CommentGroup:
+			case *Package:
+			case *Attribute:
+			case *ImportDecl:
+				if !yield(x) {
+					return
+				}
+			default:
+				return
+			}
 		}
 	}
 }

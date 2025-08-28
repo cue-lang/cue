@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c92e7b71_096872c5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-28T08:21:39Z",
+      "side": 1,
+      "message": "is IgnoreClosed a previous experiment name?",
+      "revId": "d44e6d56a7e4b96f50f6ce5648370c68b166f1b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "294d6f71_fc4eda7d",
+        "filename": "cue/parser/parser_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 769,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-28T08:21:39Z",
+      "side": 1,
+      "message": "can we add an experiment that shows what happens when using the syntax without the experiment?\n\nwhat about with the experiment tag but with an older CUE language version in cue.mod/module.cue?",
+      "revId": "d44e6d56a7e4b96f50f6ce5648370c68b166f1b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa8612ea_fa0dcea0",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-28T08:21:39Z",
+      "side": 1,
+      "message": "link to the proposal, like with StructCmp?",
+      "revId": "d44e6d56a7e4b96f50f6ce5648370c68b166f1b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -135,16 +135,12 @@ func (mr *modRenamer) renameFile(file *build.File) error {
 	}
 
 	changed := false
-	for _, decl := range syntax.Preamble() {
-		if decl, ok := decl.(*ast.ImportDecl); ok {
-			for _, spec := range decl.Specs {
-				ch, err := mr.rewriteImport(spec)
-				if err != nil {
-					return err
-				}
-				changed = changed || ch
-			}
+	for spec := range syntax.ImportSpecs() {
+		ch, err := mr.rewriteImport(spec)
+		if err != nil {
+			return err
 		}
+		changed = changed || ch
 	}
 	if !changed {
 		return nil

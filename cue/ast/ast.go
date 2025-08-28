@@ -1013,6 +1013,19 @@ func (f *File) ImportDecls() iter.Seq[*ImportDecl] {
 	}
 }
 
+// ImportSpecs iterates through all the import specs from all the import decls in the file.
+func (f *File) ImportSpecs() iter.Seq[*ImportSpec] {
+	return func(yield func(d *ImportSpec) bool) {
+		for d := range f.ImportDecls() {
+			for _, spec := range d.Specs {
+				if !yield(spec) {
+					return
+				}
+			}
+		}
+	}
+}
+
 // PackageName returns the package name associated with this file or "" if no
 // package is associated.
 func (f *File) PackageName() string {

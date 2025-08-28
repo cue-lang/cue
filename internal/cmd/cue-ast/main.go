@@ -126,7 +126,7 @@ See 'cue help inputs' as well.
 			log.Fatal(errors.Details(err, nil))
 		}
 		for _, file := range inst.Files {
-			jointImports = slices.Concat(jointImports, file.Imports)
+			jointImports = slices.Concat(jointImports, slices.Collect(file.ImportSpecs()))
 
 			fields := file.Decls[len(file.Preamble()):]
 			jointFields = slices.Concat(jointFields, fields)

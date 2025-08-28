@@ -170,7 +170,7 @@ func (z *sanitizer) markUsed(s *scope, n *ast.Ident) bool {
 
 func (z *sanitizer) cleanImports() {
 	var fileImports []*ast.ImportSpec
-	z.file.VisitImports(func(decl *ast.ImportDecl) {
+	for decl := range z.file.ImportDecls() {
 		newLen := 0
 		for _, spec := range decl.Specs {
 			if _, ok := z.referenced[spec]; ok {
@@ -180,18 +180,15 @@ func (z *sanitizer) cleanImports() {
 			}
 		}
 		decl.Specs = decl.Specs[:newLen]
-	})
+	}
 	z.file.Imports = fileImports
 	// Ensure that the first import always starts a new section
 	// so that if the file has a comment, it won't be associated with
 	// the import comment rather than the file.
-	first := true
-	z.file.VisitImports(func(decl *ast.ImportDecl) {
-		if first {
-			ast.SetRelPos(decl, token.NewSection)
-			first = false
-		}
-	})
+	for decl := range z.file.ImportDecls() {
+		ast.SetRelPos(decl, token.NewSection)
+		break
+	}
 }
 
 func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {

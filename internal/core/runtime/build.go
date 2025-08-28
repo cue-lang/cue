@@ -57,11 +57,11 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 
 	// Build transitive dependencies.
 	for _, file := range b.Files {
-		file.VisitImports(func(d *ast.ImportDecl) {
+		for d := range file.ImportDecls() {
 			for _, s := range d.Specs {
 				errs = errors.Append(errs, x.buildSpec(cfg, b, s))
 			}
-		})
+		}
 	}
 
 	err := x.ResolveFiles(b)

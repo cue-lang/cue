@@ -424,12 +424,7 @@ func DebugStr(x interface{}) (out string) {
 			out += t.String()
 		}
 		if v.Value != nil {
-			switch v.Token {
-			case token.ILLEGAL, token.COLON:
-				out += ": "
-			default:
-				out += fmt.Sprintf(" %s ", v.Token)
-			}
+			out += ": "
 			out += DebugStr(v.Value)
 			for _, a := range v.Attrs {
 				out += " "

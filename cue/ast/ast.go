@@ -302,6 +302,8 @@ func (a *Attribute) Split() (key, body string) {
 
 // A Field represents a field declaration in a struct.
 type Field struct {
+	// TODO(mvdan): remove the deprecated fields below in early 2026.
+
 	Label Label // must have at least one element.
 	// Deprecated: use [Field.Constraint]
 	Optional   token.Pos

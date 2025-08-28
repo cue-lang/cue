@@ -16,6 +16,23 @@
       "message": "What about reusing UnaryExpr? It\u0027s typically used for prefix expressions rather than postfix expressions, but we could use OpPos to signal that the operator is _after_ the sub-expression.\n\nIf you decide against that, then I would clarify the docs for UnaryExpr and PostfixExpr to clarify that they are similar to each other, but only differ in terms of whether the operator sits before or after the sub-expression.",
       "revId": "437c744a43a6e9d0c00a1223283664d6c7230089",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eac43442_22d07169",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 738,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-28T12:32:50Z",
+      "side": 1,
+      "message": "I\u0027d suggest explicitly documenting the possible values that this can be.",
+      "revId": "437c744a43a6e9d0c00a1223283664d6c7230089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

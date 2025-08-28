@@ -26,6 +26,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0d64a484_7b77552d",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-28T12:33:06Z",
+      "side": 1,
+      "message": "Wouldn\u0027t it be better to be defensive and inspect the token type as well? After all PostfixExpr will be used for other purposes too.\n\nThis is one of those cases that makes me question whether it\u0027s really better to have the more general PostfixExpr rather than specific operations: in general it seems like the various different postfix operators are likely to have quite different semantics without much in common between them, unlikely BinaryOp and UnaryOp, which incorporate many similar operations and hence benefit from the ability to have a single type switch case in common.",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8073fadb_541693b5",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 712,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-28T12:33:06Z",
+      "side": 1,
+      "message": "check the token type?",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47664694_18bc7f06",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1296,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-28T12:33:06Z",
+      "side": 1,
+      "message": "Document the possible values for this?",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5aade36f_5326e3d2",
         "filename": "internal/core/compile/compile.go",
         "patchSetId": 2
@@ -37,6 +88,58 @@
       "writtenOn": "2025-08-28T08:28:18Z",
       "side": 1,
       "message": "isn\u0027t this check duplicated with the parser? is it still useful to have?",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb7f52fa_9b899fee",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1086,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-28T12:33:06Z",
+      "side": 1,
+      "message": "I guess people can manually construct AST nodes, so it seems like it\u0027s worth having to me.",
+      "parentUuid": "5aade36f_5326e3d2",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78681b8a_e1dd5a9d",
+        "filename": "internal/core/debug/compact.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-28T12:33:06Z",
+      "side": 1,
+      "message": "check token type.",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "952d75e1_28e2905f",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-08-28T12:33:06Z",
+      "side": 1,
+      "message": "check token type.",
       "revId": "474a881228569450de347cb30ed486be26967310",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

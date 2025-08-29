@@ -20,6 +20,8 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
+	"cuelang.org/go/mod/modfile"
 )
 
 // Instances modifies all files contained in the given build instances at once.
@@ -28,13 +30,55 @@ import (
 func Instances(a []*build.Instance, o ...Option) errors.Error {
 	cwd, _ := os.Getwd()
 
+	// Parse options to check for upgrade
+	opts := options{}
+	for _, fn := range o {
+		fn(&opts)
+	}
+
 	// Collect all
 	p := processor{
 		instances: a,
 		cwd:       cwd,
 	}
 
-	p.visitAll(func(f *ast.File) { File(f, o...) })
+	done := map[*ast.File]bool{}
+
+	for _, b := range p.instances {
+		var version string
+
+		if b.ModuleFile != nil && b.ModuleFile.Language != nil {
+			version = b.ModuleFile.Language.Version
+		}
+
+		// Update module file language version if upgrading
+		if opts.upgradeVersion != "" && b.ModuleFile != nil {
+			if b.ModuleFile.Language == nil || b.ModuleFile.Language.Version != opts.upgradeVersion {
+				// Update the language version in memory
+				if b.ModuleFile.Language == nil {
+					b.ModuleFile.Language = &modfile.Language{}
+				}
+				b.ModuleFile.Language.Version = opts.upgradeVersion
+
+				// Re-initialize to validate
+				if err := b.ModuleFile.Init(); err != nil {
+					return errors.Wrapf(err, token.NoPos, "fix: failed to validate updated module file")
+				}
+
+			}
+		}
+
+		for _, f := range b.Files {
+			if done[f] {
+				continue
+			}
+			done[f] = true
+			_, err := file(f, version, o...)
+			if err != nil {
+				return err
+			}
+		}
+	}
 
 	return p.err
 }
@@ -44,22 +88,4 @@ type processor struct {
 	cwd       string
 
 	err errors.Error
-}
-
-func (p *processor) visitAll(fn func(f *ast.File)) {
-	if p.err != nil {
-		return
-	}
-
-	done := map[*ast.File]bool{}
-
-	for _, b := range p.instances {
-		for _, f := range b.Files {
-			if done[f] {
-				continue
-			}
-			done[f] = true
-			fn(f)
-		}
-	}
 }

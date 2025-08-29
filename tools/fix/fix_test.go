@@ -27,6 +27,7 @@ func TestFile(t *testing.T) {
 		in       string
 		out      string
 		simplify bool
+		exps     []string
 	}{
 		{
 			name: "rewrite integer division",
@@ -113,6 +114,39 @@ f: list.Repeat([9], 5)
 g: (list.Repeat([9], 5)) + (list.Repeat([10], 6))
 `,
 		},
+
+		{
+			name: "add ellipsis to embeddings (fixExplicitOpen)",
+			exps: []string{"explicitopen"},
+			in: `package foo
+
+#A: a: int
+#B: b: int
+
+X: {
+	#A // foo
+
+	// bar
+	#B
+	b: string
+}
+`,
+			out: `@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+#B: b: int
+
+X: {
+	#A... // foo
+
+	// bar
+	#B...
+	b: string
+}
+`,
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -125,6 +159,9 @@ g: (list.Repeat([9], 5)) + (list.Repeat([10], 6))
 			if tc.simplify {
 				opts = append(opts, Simplify())
 			}
+			if len(tc.exps) > 0 {
+				opts = append(opts, Experiments(tc.exps...))
+			}
 			File(f, opts...)
 
 			b, err := format.Node(f)
@@ -135,9 +172,13 @@ g: (list.Repeat([9], 5)) + (list.Repeat([10], 6))
 			if got != tc.out {
 				t.Errorf("got %v; want %v", got, tc.out)
 			}
-			_, err = parser.ParseFile("rewritten", got, parser.ParseComments)
-			if err != nil {
-				t.Fatal(err)
+			// Skip parsing validation for tests that use experiments that create
+			// syntax that requires the same experiments to parse
+			if len(tc.exps) == 0 {
+				_, err = parser.ParseFile("rewritten", got, parser.ParseComments)
+				if err != nil {
+					t.Fatal(err)
+				}
 			}
 		})
 	}

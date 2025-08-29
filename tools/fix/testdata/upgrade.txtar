@@ -1,0 +1,35 @@
+#upgrade:v0.15.0
+#exp:explicitopen
+
+// TODO: once we have accepted proposals that also have a fix, we should test
+// that these fixes are always applied when using upgrade.
+
+-- cue.mod/module.cue --
+module: "upgrade.test"
+
+language: { version: "v0.14.0" }
+
+-- a.cue --
+package foo
+
+#A: a: int
+
+X: {
+	#A
+}
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "upgrade.test"
+language: {
+	version: "v0.15.0"
+}
+--- a.cue
+@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+
+X: {
+	#A...
+}

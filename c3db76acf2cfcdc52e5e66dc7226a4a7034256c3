@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21b14228_06f838cb",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2025-08-29T13:39:52Z",
+      "side": 1,
+      "message": "Instead of \"parent to\", consider \"parent of\".",
+      "revId": "c3db76acf2cfcdc52e5e66dc7226a4a7034256c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6595375_fb1ac29a",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2025-08-29T13:39:52Z",
+      "side": 1,
+      "message": "Elsewhere, we\u0027ve written \"host filesystem\" for what I think is the same thing you mean here by \"real filesystem\". Are they the same thing?",
+      "revId": "c3db76acf2cfcdc52e5e66dc7226a4a7034256c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

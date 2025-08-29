@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96db0bab_b514a1c6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-29T09:51:30Z",
+      "side": 1,
+      "message": "This is already reviewed and approved by me in the github PR; just need another +2 as I\u0027m now the owner, so mine does not count.",
+      "revId": "e15088bd0c40604ff8f9da88bbeddc73a6a6c56c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

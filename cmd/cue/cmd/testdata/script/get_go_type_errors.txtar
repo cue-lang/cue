@@ -1,6 +1,5 @@
-# Test that we get expected results in the presence of type
-# check errors. In this mode, cue get go proceeds on a best-efforts
-# basis.
+# Test that we get expected results in the presence of typecheck errors.
+# In this mode, cue get go proceeds on a best-effort basis.
 
 exec cue get go --local
 cmp blah_go_gen.cue blah.cue.golden
@@ -9,20 +8,10 @@ cmp blah_go_gen.cue blah.cue.golden
 module mod.test/blah
 
 go 1.14
--- go.mod.golden --
-module mod.test/blah
-
-go 1.14
 -- blah.go --
 package main
 
-import _ "embed"
-
-// go:embed blah.txt
-var blah string
-
-// Syntax error
-type S
+var someInt int = "not an int"
 
 type T struct {
 	Age int

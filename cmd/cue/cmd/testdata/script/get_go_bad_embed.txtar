@@ -1,5 +1,5 @@
-# Test that we get a sensible error message when there is a type
-# checking error in the package that is being 'cue get go'-ed.
+# Test that `cue get go` still works in the presence of embedding errors,
+# as those do not matter for loading Go types.
 
 exec cue get go --local
 cmp blah_go_gen.cue blah.cue.golden
@@ -8,17 +8,13 @@ cmp blah_go_gen.cue blah.cue.golden
 module mod.test/blah
 
 go 1.14
--- go.mod.golden --
-module mod.test/blah
-
-go 1.14
 -- blah.go --
 package main
 
 import _ "embed"
 
-// go:embed blah.txt
-var blah string
+//go:embed missing.txt
+var missing string
 
 type T struct {
 	Age int

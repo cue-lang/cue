@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package istio.io.api.other.full_references;
+
+message FullReferenceMsg {
+  istio.io.api.other.full_references.FullReferenceNestedMsg nested_msg = 1;
+}
+
+message FullReferenceNestedMsg {
+  message FullReferenceDoubleNestedMsg {
+    string value = 1;
+  }
+
+  istio.io.api.other.full_references.FullReferenceNestedMsg.FullReferenceDoubleNestedMsg nested_msg = 1;
+}
+
+

@@ -59,7 +59,6 @@ func parseConfig[T any](flags *T, version string, experiments map[string]bool) e
 	// Collect the field indices and set the default values.
 	fv := reflect.ValueOf(flags).Elem()
 	ft := fv.Type()
-outer:
 	for i := range ft.NumField() {
 		field := ft.Field(i)
 		if tagStr, ok := field.Tag.Lookup("experiment"); ok {
@@ -67,28 +66,26 @@ outer:
 			for _, f := range strings.Split(tagStr, ",") {
 				key, rest, _ := strings.Cut(f, ":")
 				switch key {
-				case "since":
+				case "preview":
 					switch {
 					case !experiments[name]:
 					case version != "" && semver.Compare(version, rest) < 0:
 						const msg = "cannot set experiment %q before version %s"
 						errs = append(errs, fmt.Errorf(msg, name, rest))
-						continue outer
 					default:
 						fv.Field(i).Set(reflect.ValueOf(true))
 					}
 
-				case "accepted":
+				case "stable":
 					if version == "" || semver.Compare(version, rest) >= 0 {
 						fv.Field(i).Set(reflect.ValueOf(true))
 					}
 
-				case "rejected":
+				case "withdrawn":
 					expired := (version == "" || semver.Compare(version, rest) >= 0)
 					if expired && experiments[name] {
 						const msg = "cannot set rejected experiment %q"
 						errs = append(errs, fmt.Errorf(msg, name))
-						continue outer
 					}
 
 				default:

@@ -16,15 +16,15 @@ package fix
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/mod/modfile"
 )
 
 func TestInstances(t *testing.T) {
-	t.Skip()
-
 	test := cuetxtar.TxTarTest{
 		Root: "./testdata",
 		Name: "fixmod",
@@ -32,9 +32,23 @@ func TestInstances(t *testing.T) {
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.Instances("./...")
-		err := Instances(a)
+		opts := []Option{}
+		if exp, ok := t.Value("exp"); ok {
+			opts = append(opts, Experiments(strings.Split(exp, ",")...))
+		}
+		if str, ok := t.Value("upgrade"); ok {
+			opts = append(opts, UpgradeVersion(str))
+		}
+		err := Instances(a, opts...)
 		t.WriteErrors(err)
 		for _, b := range a {
+			// Output module file if it exists and was potentially modified
+			if b.ModuleFile != nil {
+				if data, err := modfile.Format(b.ModuleFile); err == nil {
+					fmt.Fprintln(t, "---", "cue.mod/module.cue")
+					fmt.Fprint(t, string(data))
+				}
+			}
 			for _, f := range b.Files {
 				b, _ := format.Node(f)
 				fmt.Fprintln(t, "---", t.Rel(f.Filename))

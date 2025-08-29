@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/tools/fix"
 	"github.com/spf13/cobra"
 )
@@ -45,6 +46,12 @@ Without any packages, fix applies to all files within a module.
 	cmd.Flags().BoolP(string(flagForce), "f", false,
 		"rewrite even when there are errors")
 
+	cmd.Flags().StringSlice("exp", nil,
+		"list of experiments to port")
+
+	cmd.Flags().String("upgrade", "",
+		"upgrade language version and apply accepted experiments (e.g., --upgrade=v0.16.0)")
+
 	return cmd
 }
 
@@ -52,6 +59,14 @@ func runFixAll(cmd *Command, args []string) error {
 	var opts []fix.Option
 	if flagSimplify.Bool(cmd) {
 		opts = append(opts, fix.Simplify())
+	}
+
+	if exps, err := cmd.Flags().GetStringSlice("exp"); err == nil && len(exps) > 0 {
+		opts = append(opts, fix.Experiments(exps...))
+	}
+
+	if upgradeVersion, err := cmd.Flags().GetString("upgrade"); err == nil && upgradeVersion != "" {
+		opts = append(opts, fix.UpgradeVersion(upgradeVersion))
 	}
 
 	if len(args) == 0 {
@@ -83,6 +98,25 @@ func runFixAll(cmd *Command, args []string) error {
 
 	if errs != nil && flagForce.Bool(cmd) {
 		return errs
+	}
+
+	// Write updated module files to disk if upgrade was requested
+	if upgradeVersion, _ := cmd.Flags().GetString("upgrade"); upgradeVersion != "" {
+		for _, i := range instances {
+			if i.ModuleFile != nil && i.Root != "" {
+				// Format and write the module file
+				data, err := modfile.Format(i.ModuleFile)
+				if err != nil {
+					errs = errors.Append(errs, errors.Wrapf(err, token.NoPos, "failed to format module file"))
+					continue
+				}
+
+				moduleFilePath := filepath.Join(i.Root, "cue.mod", "module.cue")
+				if err := os.WriteFile(moduleFilePath, data, 0666); err != nil {
+					errs = errors.Append(errs, errors.Wrapf(err, token.NoPos, "failed to write module file"))
+				}
+			}
+		}
 	}
 
 	done := map[*ast.File]bool{}

@@ -1,0 +1,54 @@
+
+#exp:explicitopen
+
+-- cue.mod/module.cue --
+module: "early.test"
+
+language: version: "v0.15.0"
+
+-- a.cue --
+package foo
+
+#A: a: int
+
+X: {
+	#A
+}
+-- b.cue --
+// Already tagged, so do not do any changes.
+@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+
+X: {
+	#A
+}
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "early.test"
+language: {
+	version: "v0.15.0"
+}
+--- a.cue
+@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+
+X: {
+	#A...
+}
+--- b.cue
+// Already tagged, so do not do any changes.
+@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+
+X: {
+	#A
+}

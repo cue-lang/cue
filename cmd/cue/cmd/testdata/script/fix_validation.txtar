@@ -1,0 +1,20 @@
+# Test fix command experiment validation
+
+# Test applying unknown experiment fails
+! exec cue fix in.cue --exp=nonexistent
+stderr 'unknown experiment "nonexistent"'
+
+# Test --exp=all works without --upgrade flag
+exec cue fix in.cue --exp=all
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: {
+	version: "v0.15.0"
+}
+
+-- in.cue --
+package foo
+
+#A: a: int

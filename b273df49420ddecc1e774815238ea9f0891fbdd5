@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6a75cfe_7274f823",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-29T11:35:25Z",
+      "side": 1,
+      "message": "See https://github.com/cue-lang/cue/pull/4034 for the background on this. I reviewed the fix, and made some changes on top in PS2.",
+      "revId": "b273df49420ddecc1e774815238ea9f0891fbdd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

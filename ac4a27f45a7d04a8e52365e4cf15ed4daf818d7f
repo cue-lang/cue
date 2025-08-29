@@ -16,6 +16,24 @@
       "message": "I\u0027m guessing you named it ImportsSeq first and later changed it to ImportDecls. In which case this commit comment needs updating?",
       "revId": "ac4a27f45a7d04a8e52365e4cf15ed4daf818d7f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d251779d_c511a0eb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-29T14:47:39Z",
+      "side": 1,
+      "message": "oops, yes, indeed. I moved from ImportsSeq to ImportDecls once I realised I would also need/want an iterator over ImportSpecs.",
+      "parentUuid": "3f4311f5_6eb6154e",
+      "revId": "ac4a27f45a7d04a8e52365e4cf15ed4daf818d7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

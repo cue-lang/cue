@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6af70785_bb1d431d",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-29T13:55:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "21b14228_06f838cb",
+      "revId": "c3db76acf2cfcdc52e5e66dc7226a4a7034256c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b6595375_fb1ac29a",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-08-29T13:39:52Z",
       "side": 1,
       "message": "Elsewhere, we\u0027ve written \"host filesystem\" for what I think is the same thing you mean here by \"real filesystem\". Are they the same thing?",
+      "revId": "c3db76acf2cfcdc52e5e66dc7226a4a7034256c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a9bd736_2d6d988b",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-29T13:55:32Z",
+      "side": 1,
+      "message": "yes; well spotted. done",
+      "parentUuid": "b6595375_fb1ac29a",
       "revId": "c3db76acf2cfcdc52e5e66dc7226a4a7034256c3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

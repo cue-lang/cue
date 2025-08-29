@@ -39,6 +39,30 @@
       },
       "revId": "e55f8fd711ed60d29d570d7c56edc772e71af03b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d55a16be_507bce88",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-29T11:57:41Z",
+      "side": 1,
+      "message": "good point, that\u0027s clearer for sure!",
+      "parentUuid": "18b415c1_9b721b59",
+      "range": {
+        "startLine": 290,
+        "startChar": 0,
+        "endLine": 291,
+        "endChar": 64
+      },
+      "revId": "e55f8fd711ed60d29d570d7c56edc772e71af03b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

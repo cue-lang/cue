@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f4311f5_6eb6154e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-29T14:24:48Z",
+      "side": 1,
+      "message": "I\u0027m guessing you named it ImportsSeq first and later changed it to ImportDecls. In which case this commit comment needs updating?",
+      "revId": "ac4a27f45a7d04a8e52365e4cf15ed4daf818d7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

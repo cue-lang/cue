@@ -277,7 +277,11 @@ func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, opti
 		if k == -1 {
 			i = len(name)
 		}
-		if m, ok := p.scope[0][name[:i]]; ok {
+		curName := name[:i]
+		if local, ok := strings.CutPrefix(curName, p.protoPkg+"."); ok {
+			curName = local
+		}
+		if m, ok := p.scope[0][curName]; ok {
 			if m.pkg != nil {
 				p.imported[m.pkg.qualifiedImportPath()] = true
 			}
@@ -292,6 +296,7 @@ func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, opti
 			ast.SetPos(expr, p.toCUEPos(pos))
 			return expr
 		}
+
 	}
 	failf(pos, "name %q not found", name)
 	return nil

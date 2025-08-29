@@ -1,0 +1,21 @@
+# Test fix command experiment validation
+
+# Test applying experiment too early for version fails
+! exec cue fix . --exp=explicitopen
+cmp stderr out/stderr
+
+-- cue.mod/module.cue --
+module: "early.test"
+
+language: version: "v0.13.0"
+
+-- in.cue --
+package foo
+
+#A: a: int
+
+X: {
+	#A
+}
+-- out/stderr --
+fix: experiment "explicitopen" requires language version v0.15.0 or later, have v0.13.0

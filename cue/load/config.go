@@ -168,6 +168,11 @@ type Config struct {
 	// For example, it is used to determine the main module,
 	// and rooted import paths starting with "./" are relative to it.
 	// If Dir is empty, the current directory is used.
+	//
+	// When using an Overlay with file entries such as "/foo/bar/baz.cue",
+	// you can use an absolute path that is a parent to one of the overlaid files,
+	// such as in this case "/foo" or "/foo/bar", even if these directories
+	// do not exist in the real filesystem.
 	Dir string
 
 	// Tags defines boolean tags or key-value pairs to select files to build
@@ -276,9 +281,14 @@ type Config struct {
 	// the syntax tree.
 	ParseFile func(name string, src interface{}, cfg parser.Config) (*ast.File, error)
 
-	// Overlay provides a mapping of absolute file paths to file contents.  If
-	// the file with the given path already exists, the parser will use the
-	// alternative file contents provided by the map.
+	// Overlay provides a mapping of absolute file paths to file contents,
+	// which are overlaid on top of the host operating system when loading files.
+	//
+	// If an overlaid file already exists in the host filesystem,
+	// the overlaid file contents will be used in its place.
+	// If an overlaid file does not exist in the host filesystem,
+	// the loader assumes that the overlaid file exists with its contents,
+	// and it assumes that all of its parent directories exist too.
 	Overlay map[string]Source
 
 	// Stdin defines an alternative for os.Stdin for the file "-". When used,

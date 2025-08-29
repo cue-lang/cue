@@ -15,8 +15,6 @@
 package cmd
 
 import (
-	"context"
-
 	goplscmd "cuelang.org/go/internal/golangorgx/gopls/cmd"
 	"cuelang.org/go/internal/golangorgx/gopls/hooks"
 	"cuelang.org/go/internal/golangorgx/tools/tool"
@@ -51,6 +49,6 @@ func newLSPCmd(c *Command) *cobra.Command {
 }
 
 func runLSP(cmd *Command, args []string) {
-	ctx := context.Background()
+	ctx := cmd.Context()
 	tool.Main(ctx, goplscmd.New(hooks.Options), args)
 }

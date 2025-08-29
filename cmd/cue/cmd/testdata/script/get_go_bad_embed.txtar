@@ -1,11 +1,8 @@
 # Test that we get a sensible error message when there is a type
 # checking error in the package that is being 'cue get go'-ed.
 
-[golang.org/issue/44287] skip
-
 exec cue get go --local
-exec ls
-cmp cue.mod/gen/mod.test/blah/blah_go_gen.cue blah.cue.golden
+cmp blah_go_gen.cue blah.cue.golden
 
 -- go.mod --
 module mod.test/blah

@@ -16,6 +16,24 @@
       "message": "I\u0027m sure I\u0027m missing something here, but both of those behaviours seem the same. How is \"what one would expect\" different from what\u0027s happening now?",
       "revId": "545337aa19a87da5fab59775f04ca81ce01005ba",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d57d9725_4a877283",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-29T11:56:10Z",
+      "side": 1,
+      "message": "the commit message literally says \"the same behavior\", which is what I expect - no changes :)",
+      "parentUuid": "3897829e_90a7271d",
+      "revId": "545337aa19a87da5fab59775f04ca81ce01005ba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

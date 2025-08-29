@@ -41,6 +41,7 @@ See also:
 	cmd.AddCommand(newModRenameCmd(c))
 	cmd.AddCommand(newModResolveCmd(c))
 	cmd.AddCommand(newModTidyCmd(c))
+	cmd.AddCommand(newModUpgradeCmd(c))
 	cmd.AddCommand(newModUploadCmd(c))
 	return cmd
 }

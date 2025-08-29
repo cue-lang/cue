@@ -1,0 +1,15 @@
+! exec cue fix in.cue --exp=accepted_
+cmp stderr out/stderr
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.15.0"
+
+-- in.cue --
+package foo
+
+a: 1
+
+-- out/stderr --
+fix: experiment "accepted_" is already stable as of language version v0.15.0 - cannot apply fix

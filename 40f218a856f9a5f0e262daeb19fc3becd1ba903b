@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24f6ead1_6e7f5717",
+        "filename": "internal/cmd/cue-ast/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-08-29T14:30:08Z",
+      "side": 1,
+      "message": "hmm, it\u0027s a shame collect only takes a single iter",
+      "revId": "40f218a856f9a5f0e262daeb19fc3becd1ba903b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

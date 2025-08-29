@@ -879,7 +879,7 @@ bar: 2
 			in: `@experiment(explicitopen)
 		x: y...
 		`,
-			out: "\nparsing experiments for version \"v0.14.0\": cannot set experiment \"explicitopen\" before version v0.15.0\nunknown experiment \"explicitopen\"",
+			out: "\nparsing experiments for version \"v0.14.0\": cannot set experiment \"explicitopen\" before version v0.15.0",
 		},
 	}
 	for _, tc := range testCases {

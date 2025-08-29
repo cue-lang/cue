@@ -23,10 +23,10 @@ import (
 func TestParseConfig(t *testing.T) {
 	// Define a test struct with experiment tags
 	type testFlags struct {
-		Feature1 bool `experiment:"since:v0.1.0"`
-		Feature2 bool `experiment:"since:v0.2.0,accepted:v1.0.0"`
-		Feature3 bool `experiment:"since:v0.3.0,rejected:v0.5.0"`
-		Feature4 bool `experiment:"since:v0.1.0,accepted:v0.4.0"`
+		Feature1 bool `experiment:"preview:v0.1.0"`
+		Feature2 bool `experiment:"preview:v0.2.0,stable:v1.0.0"`
+		Feature3 bool `experiment:"preview:v0.3.0,withdrawn:v0.5.0"`
+		Feature4 bool `experiment:"preview:v0.1.0,stable:v0.4.0"`
 	}
 
 	tests := []struct {

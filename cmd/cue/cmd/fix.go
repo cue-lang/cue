@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
@@ -38,12 +39,37 @@ After you update to a new CUE release, fix helps make the necessary changes
 to your program.
 
 Without any packages, fix applies to all files within a module.
+
+
+Experiments
+
+CUE experiments are features that are not yet part of the stable language but
+are being tested for future inclusion. Some of these may introduce backwards
+incompatible changes for which there is a cue fix. The --exp flag is used to
+change a file or package to use the new, experimental semantics. Experiments
+are enabled on a per-file basis.
+
+For example, to enable the "explicitopen" experiment for all files in a package,
+you would run:
+
+	cue fix . --exp=explicitopen
+
+For this to succeed, your current language version must support the experiment.
+If an experiment has not yet been accepted for the current version, an
+@experiment attribute is added in each affected file to mark the transition as
+complete.
+
+The special value --exp=all enables all experimental features that apply to the
+current version.
 `,
 		RunE: mkRunE(c, runFixAll),
 	}
 
 	cmd.Flags().BoolP(string(flagForce), "f", false,
 		"rewrite even when there are errors")
+
+	cmd.Flags().StringSlice("exp", nil,
+		"list of experiments to port")
 
 	return cmd
 }
@@ -54,6 +80,15 @@ func runFixAll(cmd *Command, args []string) error {
 		opts = append(opts, fix.Simplify())
 	}
 
+	if exps, err := cmd.Flags().GetStringSlice("exp"); err == nil && len(exps) > 0 {
+		opts = append(opts, fix.Experiments(exps...))
+	}
+
+	_, errs := fixInstances(cmd, args, flagForce.Bool(cmd), opts...)
+	return errs
+}
+
+func fixInstances(cmd *Command, args []string, force bool, opts ...fix.Option) ([]*build.Instance, errors.Error) {
 	if len(args) == 0 {
 		args = []string{"./..."}
 
@@ -68,7 +103,7 @@ func runFixAll(cmd *Command, args []string) error {
 
 			dir = filepath.Dir(dir)
 			if info, _ := os.Stat(dir); !info.IsDir() {
-				return errors.Newf(token.NoPos, "no module root found")
+				return nil, errors.Newf(token.NoPos, "no module root found")
 			}
 		}
 	}
@@ -81,8 +116,8 @@ func runFixAll(cmd *Command, args []string) error {
 
 	errs := fix.Instances(instances, opts...)
 
-	if errs != nil && flagForce.Bool(cmd) {
-		return errs
+	if errs != nil {
+		return nil, errs
 	}
 
 	done := map[*ast.File]bool{}
@@ -101,7 +136,7 @@ func runFixAll(cmd *Command, args []string) error {
 
 			if f.Filename == "-" {
 				if _, err := cmd.OutOrStdout().Write(b); err != nil {
-					return err
+					return nil, errors.Promote(err, "format")
 				}
 			} else {
 				if err := os.WriteFile(f.Filename, b, 0666); err != nil {
@@ -111,7 +146,7 @@ func runFixAll(cmd *Command, args []string) error {
 		}
 	}
 
-	return errs
+	return instances, nil
 }
 
 func appendDirs(a []string, base string) []string {

@@ -1,0 +1,36 @@
+exec cue fix in.cue --exp=explicitopen
+cmp in.cue expect/out
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.15.0"
+
+-- in.cue --
+package foo
+
+#A: a: int
+#B: b: int
+
+X: {
+	#A // foo
+
+	// bar
+	#B
+	b: string
+}
+-- expect/out --
+@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+#B: b: int
+
+X: {
+	#A... // foo
+
+	// bar
+	#B...
+	b: string
+}

@@ -15,9 +15,13 @@
 package cueexperiment
 
 import (
+	"fmt"
 	"maps"
+	"reflect"
 	"slices"
 	"strings"
+
+	"cuelang.org/go/internal/mod/semver"
 )
 
 // This contains experiments that are configured per file.
@@ -45,6 +49,10 @@ type File struct {
 	// testing-specific builtins.
 	Testing bool `experiment:"since:v0.13.0"`
 
+	// Accepted_ is for testing purposes only. It should be removed when an
+	// experiment is accepted and can be used to test this feature instead.
+	Accepted_ bool `experiment:"since:v0.13.0,accepted:v0.15.0"`
+
 	// StructCmp enables comparison of structs. This also defines the ==
 	// operator to be defined on all values. For instance, comparing `1` and
 	// "foo" will return false, whereas previously it would return an error.
@@ -55,6 +63,10 @@ type File struct {
 	// ExplicitOpen enables the postfix ... operator to explicitly open
 	// closed structs, allowing additional fields to be added.
 	ExplicitOpen bool `experiment:"since:v0.15.0"`
+
+	// Try enables support for try expressions and comprehensions
+	// as described in https://github.com/cue-lang/proposal/blob/main/designs/language/4019-try.md.
+	Try bool `experiment:"since:v0.15.0"`
 }
 
 // LanguageVersion returns the language version of the file or "" if no language
@@ -79,4 +91,210 @@ func NewFile(version string, experiments ...string) (*File, error) {
 		return nil, err
 	}
 	return f, nil
+}
+
+// IsExperimentValid returns true if the experiment exists and can be used
+// for the given version.
+func IsExperimentValid(experiment, version string) bool {
+	expInfo := getExperimentInfo(experiment)
+	if expInfo == nil {
+		return false
+	}
+
+	// Check if experiment is available for this version
+	if version != "" && expInfo.Since != "" {
+		if semver.Compare(version, expInfo.Since) < 0 {
+			return false
+		}
+	}
+
+	// Check if experiment is rejected for this version
+	if expInfo.Rejected != "" {
+		rejected := (version == "" || semver.Compare(version, expInfo.Rejected) >= 0)
+		if rejected {
+			return false
+		}
+	}
+
+	return true
+}
+
+// IsExperimentAccepted returns true if the experiment is accepted (no longer
+// experimental) for the given version.
+func IsExperimentAccepted(experiment, version string) bool {
+	expInfo := getExperimentInfo(experiment)
+	if expInfo == nil {
+		return false
+	}
+
+	if expInfo.Accepted == "" {
+		return false
+	}
+
+	return version == "" || semver.Compare(version, expInfo.Accepted) >= 0
+}
+
+// CanApplyExperimentFix validates whether an experiment fix can be applied
+// to a file with the given version and existing experiments.
+func CanApplyExperimentFix(experiment, version, target string, existingExps *File) error {
+	// DEBUG: Print what we're validating
+	// fmt.Printf("DEBUG: CanApplyExperimentFix(%q, %q)\n", experiment, version)
+
+	// Check if experiment is valid for this version
+	if !IsExperimentValid(experiment, target) {
+		if getExperimentInfo(experiment) == nil {
+			return fmt.Errorf("unknown experiment %q", experiment)
+		}
+
+		expInfo := getExperimentInfo(experiment)
+		if version != "" && expInfo.Since != "" && semver.Compare(target, expInfo.Since) < 0 {
+			return fmt.Errorf("experiment %q requires version %s or later, got %s", experiment, expInfo.Since, version)
+		}
+
+		if expInfo.Rejected != "" {
+			rejected := (version == "" || semver.Compare(target, expInfo.Rejected) >= 0)
+			if rejected {
+				return fmt.Errorf("experiment %q is rejected in version %s", experiment, expInfo.Rejected)
+			}
+		}
+	}
+
+	// Check if experiment is already accepted (cannot fix)
+	if IsExperimentAccepted(experiment, version) {
+		expInfo := getExperimentInfo(experiment)
+		return fmt.Errorf("experiment %q is already accepted as of version %s - cannot apply fix", experiment, expInfo.Accepted)
+	}
+
+	// If file already has the experiment enabled, silently ignore
+	if hasExperiment(experiment, existingExps) {
+		return nil
+	}
+
+	return nil
+}
+
+// GetActiveExperiments returns all experiments that are active (can be enabled)
+// for the given version, but not yet accepted.
+func GetActiveExperiments(originalVersion, targetVersion string) []string {
+	var active []string
+
+	ft := reflect.TypeOf(File{})
+	for i := 0; i < ft.NumField(); i++ {
+		field := ft.Field(i)
+		if tagStr, ok := field.Tag.Lookup("experiment"); ok {
+			name := strings.ToLower(field.Name)
+			expInfo := parseExperimentTag(tagStr)
+
+			// Skip if not yet available for this version
+			if targetVersion != "" && expInfo.Since != "" && semver.Compare(targetVersion, expInfo.Since) < 0 {
+				continue
+			}
+
+			// Skip if already accepted
+			if expInfo.Accepted != "" && (targetVersion == "" || semver.Compare(originalVersion, expInfo.Accepted) >= 0) {
+				continue
+			}
+
+			// Skip if rejected
+			if expInfo.Rejected != "" {
+				continue
+			}
+
+			active = append(active, name)
+		}
+	}
+
+	slices.Sort(active)
+	return active
+}
+
+// GetUpgradeExperiments returns all experiments that are accepted
+// (possibly in later versions), that can be upgraded from the current
+// version (must be lower than accepted) to the desired version.
+func GetUpgradeExperiments(origVersion, targetVersion string) []string {
+	var accepted []string
+	if origVersion == "" {
+		panic("original version is empty")
+	}
+
+	ft := reflect.TypeOf(File{})
+	for i := 0; i < ft.NumField(); i++ {
+		field := ft.Field(i)
+		if tagStr, ok := field.Tag.Lookup("experiment"); ok {
+			name := strings.ToLower(field.Name)
+			expInfo := parseExperimentTag(tagStr)
+
+			if expInfo.Accepted != "" {
+				if semver.Compare(targetVersion, expInfo.Since) >= 0 &&
+					semver.Compare(origVersion, expInfo.Accepted) < 0 {
+					accepted = append(accepted, name)
+				}
+			}
+		}
+	}
+
+	slices.Sort(accepted)
+	return accepted
+}
+
+// ShouldRemoveExperimentAttribute returns true if the experiment attribute
+// should be removed because the experiment is accepted for the given version.
+func ShouldRemoveExperimentAttribute(experiment, version string) bool {
+	return IsExperimentAccepted(experiment, version)
+}
+
+// experimentInfo holds parsed experiment lifecycle information
+type experimentInfo struct {
+	Since    string
+	Accepted string
+	Rejected string
+}
+
+// getExperimentInfo returns experiment lifecycle info for the given experiment name
+func getExperimentInfo(experiment string) *experimentInfo {
+	ft := reflect.TypeOf(File{})
+	for i := 0; i < ft.NumField(); i++ {
+		field := ft.Field(i)
+		if strings.EqualFold(field.Name, experiment) {
+			if tagStr, ok := field.Tag.Lookup("experiment"); ok {
+				return parseExperimentTag(tagStr)
+			}
+		}
+	}
+	return nil
+}
+
+// parseExperimentTag parses experiment tag string into experimentInfo
+func parseExperimentTag(tagStr string) *experimentInfo {
+	info := &experimentInfo{}
+	for f := range strings.SplitSeq(tagStr, ",") {
+		f = strings.TrimSpace(f)
+		key, rest, _ := strings.Cut(f, ":")
+		switch key {
+		case "since":
+			info.Since = rest
+		case "accepted":
+			info.Accepted = rest
+		case "rejected":
+			info.Rejected = rest
+		}
+	}
+	return info
+}
+
+// hasExperiment checks if the given experiment is already enabled in existingExps
+func hasExperiment(experiment string, existingExps *File) bool {
+	if existingExps == nil {
+		return false
+	}
+
+	fv := reflect.ValueOf(existingExps).Elem()
+	ft := fv.Type()
+	for i := 0; i < ft.NumField(); i++ {
+		field := ft.Field(i)
+		if strings.EqualFold(field.Name, experiment) {
+			return fv.Field(i).Bool()
+		}
+	}
+	return false
 }

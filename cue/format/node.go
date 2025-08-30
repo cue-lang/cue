@@ -620,7 +620,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 	case *ast.PostfixExpr:
 		f.expr1(x.X, token.HighestPrec, depth)
-		f.print(x.Op, nooverride)
+		f.print(x.Op)
 
 	case *ast.BasicLit:
 		f.print(x.ValuePos, x)

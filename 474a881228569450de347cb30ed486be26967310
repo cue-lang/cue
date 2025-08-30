@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "76943a35_cc710029",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-30T09:15:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "68d4fa1c_aa0b24a8",
+      "range": {
+        "startLine": 32,
+        "startChar": 15,
+        "endLine": 33,
+        "endChar": 16
+      },
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d64a484_7b77552d",
@@ -37,6 +61,24 @@
       "writtenOn": "2025-08-28T12:33:06Z",
       "side": 1,
       "message": "Wouldn\u0027t it be better to be defensive and inspect the token type as well? After all PostfixExpr will be used for other purposes too.\n\nThis is one of those cases that makes me question whether it\u0027s really better to have the more general PostfixExpr rather than specific operations: in general it seems like the various different postfix operators are likely to have quite different semantics without much in common between them, unlikely BinaryOp and UnaryOp, which incorporate many similar operations and hence benefit from the ability to have a single type switch case in common.",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "baf3d745_0c2ef46d",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-30T09:15:29Z",
+      "side": 1,
+      "message": "At the AST level I still think it is better. At the ADT level it makes more sense to have a dedicated type. Changed.",
+      "parentUuid": "0d64a484_7b77552d",
       "revId": "474a881228569450de347cb30ed486be26967310",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa38b92b_4a12f10f",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 712,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-30T09:15:29Z",
+      "side": 1,
+      "message": "Now OpenExpr, which is exclusively for #A...",
+      "parentUuid": "8073fadb_541693b5",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "47664694_18bc7f06",
@@ -71,6 +131,24 @@
       "writtenOn": "2025-08-28T12:33:06Z",
       "side": 1,
       "message": "Document the possible values for this?",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d03eab7_a994ffc0",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1296,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-30T09:15:29Z",
+      "side": 1,
+      "message": "Now OpenExpr, which is exclusively for #A...",
+      "parentUuid": "47664694_18bc7f06",
       "revId": "474a881228569450de347cb30ed486be26967310",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -110,6 +188,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e88fd33_1974954f",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1086,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-30T09:15:29Z",
+      "side": 1,
+      "message": "indeed.",
+      "parentUuid": "eb7f52fa_9b899fee",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "78681b8a_e1dd5a9d",
@@ -127,6 +223,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c892b1dd_e4946656",
+        "filename": "internal/core/debug/compact.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-30T09:15:29Z",
+      "side": 1,
+      "message": "We don\u0027t do this anywhere else, though. This is just debug printing.\n\nEither way, now OpenExpr, which is exclusively for #A...",
+      "parentUuid": "78681b8a_e1dd5a9d",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "952d75e1_28e2905f",
@@ -140,6 +254,24 @@
       "writtenOn": "2025-08-28T12:33:06Z",
       "side": 1,
       "message": "check token type.",
+      "revId": "474a881228569450de347cb30ed486be26967310",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80dcd47d_91e63eae",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-30T09:15:29Z",
+      "side": 1,
+      "message": "We don\u0027t do this anywhere else, though. This is just debug printing.\n\nEither way, now OpenExpr, which is exclusively for #A...",
+      "parentUuid": "952d75e1_28e2905f",
       "revId": "474a881228569450de347cb30ed486be26967310",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

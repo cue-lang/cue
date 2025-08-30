@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e053fbf9_2d1c579f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-30T08:35:14Z",
+      "side": 1,
+      "message": "I prefer to keep them separate:\n1. It changes how UnaryExpr should be printed, which can be silently ignored. It seems better to just fail.\n2. UnaryExpr and PostfixExpr have very different precedence rules. It seems easier to separate them out, even as concepts.",
+      "parentUuid": "3bfe4923_53f628b4",
+      "revId": "437c744a43a6e9d0c00a1223283664d6c7230089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eac43442_22d07169",
         "filename": "cue/ast/ast.go",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2025-08-28T12:32:50Z",
       "side": 1,
       "message": "I\u0027d suggest explicitly documenting the possible values that this can be.",
+      "revId": "437c744a43a6e9d0c00a1223283664d6c7230089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1adda13_742005a0",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 738,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-30T08:35:14Z",
+      "side": 1,
+      "message": "This is not done anywhere else, but done.",
+      "parentUuid": "eac43442_22d07169",
       "revId": "437c744a43a6e9d0c00a1223283664d6c7230089",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

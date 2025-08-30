@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb427a2f_9c598be4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-30T08:44:38Z",
+      "side": 1,
+      "message": "Yep. Renamed.",
+      "parentUuid": "c92e7b71_096872c5",
+      "revId": "d44e6d56a7e4b96f50f6ce5648370c68b166f1b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "294d6f71_fc4eda7d",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebde3ec4_1ee1467f",
+        "filename": "cue/parser/parser_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 769,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-30T08:44:38Z",
+      "side": 1,
+      "message": "Added without an experiment.\n\nTo add the version would be a substantial change to the test. I\u0027ll add that in a separate CL.",
+      "parentUuid": "294d6f71_fc4eda7d",
+      "revId": "d44e6d56a7e4b96f50f6ce5648370c68b166f1b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa8612ea_fa0dcea0",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-08-28T08:21:39Z",
       "side": 1,
       "message": "link to the proposal, like with StructCmp?",
+      "revId": "d44e6d56a7e4b96f50f6ce5648370c68b166f1b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9efcdbed_3296109f",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-08-30T08:44:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa8612ea_fa0dcea0",
       "revId": "d44e6d56a7e4b96f50f6ce5648370c68b166f1b9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

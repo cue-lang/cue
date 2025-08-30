@@ -361,7 +361,7 @@ func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, forceIgnore b
 		// 			// the embedding.
 		// 			#A & #B
 		// 		}
-		isClosed := id.FromDef || v.ClosedNonRecursive
+		isClosed := id.FromDef || v.ClosedNonRecursive || v.ClosedRecursive
 		ignore = !isClosed
 	default:
 		// In the default case we can disable typo checking this type if it is

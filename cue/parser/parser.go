@@ -1765,6 +1765,8 @@ func (p *parser) parseFile() *ast.File {
 	if err != nil {
 		e := errors.Wrapf(err, p.pos, "parsing experiments for version %q", v)
 		p.errors = errors.Append(p.errors, e)
+		// Do not proceed without setting p.experiments.
+		return nil
 	} else {
 		p.experiments = exp
 		p.file.SetExperiments(exp)

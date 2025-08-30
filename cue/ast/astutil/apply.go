@@ -71,6 +71,9 @@ type Cursor interface {
 	// Unless n is wrapped by ApplyRecursively, Apply does not walk n.
 	InsertBefore(n ast.Node)
 
+	// HasChanged reports whether the cursor has been modified.
+	HasChanged() bool
+
 	self() *cursor
 }
 
@@ -98,6 +101,7 @@ type cursor struct {
 	typ      interface{} // the type of the node
 	index    int         // position of any of the sub types.
 	replaced bool
+	changed  bool
 }
 
 func newCursor(parent Cursor, n ast.Node, typ interface{}) *cursor {
@@ -118,10 +122,11 @@ func fileInfo(c Cursor) (info *info) {
 	return nil
 }
 
-func (c *cursor) self() *cursor  { return c }
-func (c *cursor) Parent() Cursor { return c.parent }
-func (c *cursor) Index() int     { return c.index }
-func (c *cursor) Node() ast.Node { return c.node }
+func (c *cursor) self() *cursor    { return c }
+func (c *cursor) Parent() Cursor   { return c.parent }
+func (c *cursor) Index() int       { return c.index }
+func (c *cursor) Node() ast.Node   { return c.node }
+func (c *cursor) HasChanged() bool { return c.changed }
 
 // Deprecated: use [ast.NewImport] as an [ast.Ident.Node], and then
 // [Sanitize].
@@ -158,6 +163,7 @@ func (c *cursor) Replace(n ast.Node) {
 	if ast.Comments(n) != nil {
 		CopyComments(n, c.node)
 	}
+	c.changed = true
 	if r, ok := n.(recursive); ok {
 		n = r.Node
 	} else {
@@ -244,6 +250,10 @@ func applyDeclList(v applyVisitor, parent Cursor, list []ast.Decl) []ast.Decl {
 			c.decls = append(c.decls, c.node.(ast.Decl))
 		}
 		c.delete = false
+		if c.changed {
+			parent.self().changed = true
+			c.changed = false
+		}
 		for i := 0; i < len(c.process); i++ {
 			x := c.process[i]
 			c.node = x
@@ -282,6 +292,9 @@ func apply[N ast.Node](v applyVisitor, parent Cursor, nodePtr *N) {
 	node := *nodePtr
 	c := newCursor(parent, node, nodePtr)
 	applyCursor(v, c)
+	if c.changed && parent != nil {
+		parent.self().changed = true
+	}
 	if ast.Node(node) != c.node {
 		*nodePtr = c.node.(N)
 	}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4461966_55191fc6",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1769,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-08-30T13:45:31Z",
+      "side": 1,
+      "message": "does this belong in another CL?",
+      "revId": "e82e4c3e9337a6c0431ac78ed8b985b7c2b83e69",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

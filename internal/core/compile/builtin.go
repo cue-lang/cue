@@ -152,6 +152,38 @@ var closeBuiltin = &adt.Builtin{
 	},
 }
 
+var closeAllBuiltin = &adt.Builtin{
+	Name:   "__closeAll",
+	Params: []adt.Param{topParam},
+	Result: adt.TopKind,
+	Func: func(call *adt.CallContext) adt.Expr {
+		c := call.OpContext()
+
+		x := call.Expr(0)
+		switch x.(type) {
+		case *adt.StructLit, *adt.ListLit:
+			if src := x.Source(); src == nil || !src.Pos().Experiment().ExplicitOpen {
+				// Allow usage if explicit open is set
+				return c.NewErrf("__closeAll may only be used when explicitopen is enabled")
+			}
+		default:
+			return c.NewErrf("argument must be a struct or list literal")
+		}
+
+		// must be literal struct
+		args := call.Args()
+
+		s, ok := args[0].(*adt.Vertex)
+		if !ok {
+			return c.NewErrf("struct argument must be concrete")
+		}
+
+		s.ClosedRecursive = true
+
+		return s
+	},
+}
+
 var andBuiltin = &adt.Builtin{
 	Name:   "and",
 	Params: []adt.Param{listParam},

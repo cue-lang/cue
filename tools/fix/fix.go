@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cueexperiment"
 )
 
@@ -278,7 +279,15 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			hasChanges = true
 		}
 		return true
-	}, nil).(*ast.File)
+	}, func(c astutil.Cursor) bool {
+		if c.HasChanged() {
+			if n, ok := c.Node().(*ast.Field); ok && !internal.IsDefinition(n.Label) {
+				ast.SetRelPos(n.Value, token.NoSpace)
+				n.Value = ast.NewCall(ast.NewIdent("__closeAll"), n.Value)
+			}
+		}
+		return true
+	}).(*ast.File)
 
 	return result, hasChanges
 }

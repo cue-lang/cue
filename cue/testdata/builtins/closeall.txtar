@@ -1,0 +1,172 @@
+-- in.cue --
+@experiment(explicitopen)
+
+// Basic usage of __closeAll - makes structs recursively closed
+a: __closeAll({
+	field1: 1
+	nested: {
+		field2: "hello"
+	}
+})
+
+// Test that extra fields are not allowed (should error)
+b: err: a & {extra: "not allowed"}
+
+// Test that nested extra fields are not allowed (should error)
+c: err: a & {
+	field1: 1
+	nested: {
+		field2: "hello"
+		extra: "not allowed"
+	}
+}
+
+// Test with non-struct should error
+d: err: __closeAll("not a struct")
+
+// Test with empty struct
+e: __closeAll({})
+f: err: e & {extra: "not allowed"}  // should error
+
+
+#A: a: int
+g: err: __closeAll(#A)
+-- old.cue --
+// May not be used if explicitopen is not set.
+h: err: __closeAll({})
+
+-- out/compile --
+--- in.cue
+{
+  a: __closeAll({
+    field1: 1
+    nested: {
+      field2: "hello"
+    }
+  })
+  b: {
+    err: (〈1;a〉 & {
+      extra: "not allowed"
+    })
+  }
+  c: {
+    err: (〈1;a〉 & {
+      field1: 1
+      nested: {
+        field2: "hello"
+        extra: "not allowed"
+      }
+    })
+  }
+  d: {
+    err: __closeAll("not a struct")
+  }
+  e: __closeAll({})
+  f: {
+    err: (〈1;e〉 & {
+      extra: "not allowed"
+    })
+  }
+  #A: {
+    a: int
+  }
+  g: {
+    err: __closeAll(〈1;#A〉)
+  }
+}
+--- old.cue
+{
+  h: {
+    err: __closeAll({})
+  }
+}
+-- out/evalalpha --
+Errors:
+b.err.extra: field not allowed:
+    ./in.cue:12:14
+c.err.nested.extra: field not allowed:
+    ./in.cue:19:3
+f.err.extra: field not allowed:
+    ./in.cue:28:14
+d.err: argument must be a struct or list literal:
+    ./in.cue:24:9
+g.err: argument must be a struct or list literal:
+    ./in.cue:32:9
+h.err: __closeAll may only be used when explicitopen is enabled:
+    ./old.cue:2:9
+
+Result:
+(_|_){
+  // [eval]
+  a: (#struct){
+    field1: (int){ 1 }
+    nested: (#struct){
+      field2: (string){ "hello" }
+    }
+  }
+  b: (_|_){
+    // [eval]
+    err: (_|_){
+      // [eval]
+      extra: (_|_){
+        // [eval] b.err.extra: field not allowed:
+        //     ./in.cue:12:14
+      }
+      field1: (int){ 1 }
+      nested: (#struct){
+        field2: (string){ "hello" }
+      }
+    }
+  }
+  c: (_|_){
+    // [eval]
+    err: (_|_){
+      // [eval]
+      field1: (int){ 1 }
+      nested: (_|_){
+        // [eval]
+        field2: (string){ "hello" }
+        extra: (_|_){
+          // [eval] c.err.nested.extra: field not allowed:
+          //     ./in.cue:19:3
+        }
+      }
+    }
+  }
+  d: (_|_){
+    // [eval]
+    err: (_|_){
+      // [eval] d.err: argument must be a struct or list literal:
+      //     ./in.cue:24:9
+    }
+  }
+  e: (#struct){
+  }
+  f: (_|_){
+    // [eval]
+    err: (_|_){
+      // [eval]
+      extra: (_|_){
+        // [eval] f.err.extra: field not allowed:
+        //     ./in.cue:28:14
+      }
+    }
+  }
+  #A: (#struct){
+    a: (int){ int }
+  }
+  g: (_|_){
+    // [eval]
+    err: (_|_){
+      // [eval] g.err: argument must be a struct or list literal:
+      //     ./in.cue:32:9
+    }
+  }
+  h: (_|_){
+    // [eval]
+    err: (_|_){
+      // [eval] h.err: __closeAll may only be used when explicitopen is enabled:
+      //     ./old.cue:2:9
+    }
+  }
+}

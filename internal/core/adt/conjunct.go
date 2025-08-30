@@ -452,6 +452,13 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			if !x.IsFromDisjunction() {
 				id = n.addResolver(v, x, id, false)
 			}
+		} else if x.ClosedRecursive {
+			n.node.ClosedRecursive = true
+
+			// If this is a definition, it will be repeated in the evaluation.
+			if !x.IsFromDisjunction() {
+				id = n.addResolver(v, x, id, false)
+			}
 		}
 		if _, ok := x.BaseValue.(*StructMarker); ok {
 			n.aStruct = x

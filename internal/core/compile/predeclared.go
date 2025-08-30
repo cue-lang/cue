@@ -46,6 +46,8 @@ func predeclared(n *ast.Ident) adt.Expr {
 		return lenBuiltin
 	case "close", "__close":
 		return closeBuiltin
+	case "__closeAll":
+		return closeAllBuiltin
 	case "matchIf", "__matchIf":
 		return matchIfBuiltin
 	case "matchN", "__matchN":

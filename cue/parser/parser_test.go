@@ -24,10 +24,15 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	testCases := []struct{ desc, in, out string }{{
-
-		"ellipsis in structs",
-		`#Def: {
+	type testCase struct {
+		desc    string
+		version string
+		in, out string
+	}
+	testCases := []testCase{
+		{
+			desc: "ellipsis in structs",
+			in: `#Def: {
 			b: "2"
 			...
 		}
@@ -41,22 +46,39 @@ func TestParse(t *testing.T) {
 		_}
 		...
 		`,
-		`#Def: {b: "2", ...}, ..., #Def2: {..., b: "2"}, #Def3: {..., _}, ...`,
-	}, {
-
-		"empty file", "", "",
-	}, {
-		"empty struct", "{}", "{}",
-	}, {
-		"empty structs", "{},{},", "{}, {}",
-	}, {
-		"empty structs; elided comma", "{}\n{}", "{}, {}",
-	}, {
-		"basic lits", `"a","b", 3,3.4,5,2_3`, `"a", "b", 3, 3.4, 5, 2_3`,
-	}, {
-		"keyword basic lits", `true,false,null,for,in,if,let,if`, `true, false, null, for, in, if, let, if`,
-	}, {
-		"keyword basic newline", `
+			out: `#Def: {b: "2", ...}, ..., #Def2: {..., b: "2"}, #Def3: {..., _}, ...`,
+		},
+		{
+			desc: "empty file",
+		},
+		{
+			desc: "empty struct",
+			in:   "{}",
+			out:  "{}",
+		},
+		{
+			desc: "empty structs",
+			in:   "{},{},",
+			out:  "{}, {}",
+		},
+		{
+			desc: "empty structs; elided comma",
+			in:   "{}\n{}",
+			out:  "{}, {}",
+		},
+		{
+			desc: "basic lits",
+			in:   `"a","b", 3,3.4,5,2_3`,
+			out:  `"a", "b", 3, 3.4, 5, 2_3`,
+		},
+		{
+			desc: "keyword basic lits",
+			in:   `true,false,null,for,in,if,let,if`,
+			out:  `true, false, null, for, in, if, let, if`,
+		},
+		{
+			desc: "keyword basic newline",
+			in: `
 		true
 		false
 		null
@@ -65,36 +87,42 @@ func TestParse(t *testing.T) {
 		if
 		let
 		if
-		`, `true, false, null, for, in, if, let, if`,
-	}, {
-		"keywords as labels",
-		`if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6
+		`,
+			out: `true, false, null, for, in, if, let, if`,
+		},
+		{
+			desc: "keywords as labels",
+			in: `if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6
 		for: if: func: let: 3
 		`,
-		`if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6, for: {if: {func: {let: 3}}}`,
-	}, {
-		"keywords as optional labels",
-		`if?: 0, for?: 1, in?: 2, where?: 3, div?: 4, quo?: 5, func?: 6
+			out: `if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6, for: {if: {func: {let: 3}}}`,
+		},
+		{
+			desc: "keywords as optional labels",
+			in: `if?: 0, for?: 1, in?: 2, where?: 3, div?: 4, quo?: 5, func?: 6
 		for?: if?: func?: let?: 3
 		`,
-		`if?: 0, for?: 1, in?: 2, where?: 3, div?: 4, quo?: 5, func?: 6, for?: {if?: {func?: {let?: 3}}}`,
-	}, {
-		"keywords as required labels",
-		`if!: 0, for!: 1, in!: 2, where!: 3, div!: 4, quo!: 5, func!: 6
+			out: `if?: 0, for?: 1, in?: 2, where?: 3, div?: 4, quo?: 5, func?: 6, for?: {if?: {func?: {let?: 3}}}`,
+		},
+		{
+			desc: "keywords as required labels",
+			in: `if!: 0, for!: 1, in!: 2, where!: 3, div!: 4, quo!: 5, func!: 6
 		for!: if!: func!: let!: 3
 		`,
-		`if!: 0, for!: 1, in!: 2, where!: 3, div!: 4, quo!: 5, func!: 6, for!: {if!: {func!: {let!: 3}}}`,
-	}, {
-		"keywords as alias",
-		`if=foo: 0
+			out: `if!: 0, for!: 1, in!: 2, where!: 3, div!: 4, quo!: 5, func!: 6, for!: {if!: {func!: {let!: 3}}}`,
+		},
+		{
+			desc: "keywords as alias",
+			in: `if=foo: 0
 		for=bar: 2
 		let=bar: 3
 		func=baz: 4
 		`,
-		`if=foo: 0, for=bar: 2, let=bar: 3, func=baz: 4`,
-	}, {
-		"keywords as selector",
-		`a : {
+			out: `if=foo: 0, for=bar: 2, let=bar: 3, func=baz: 4`,
+		},
+		{
+			desc: "keywords as selector",
+			in: `a : {
 			if: 0
 			for: 1
 			in: 2
@@ -115,43 +143,48 @@ func TestParse(t *testing.T) {
 			a.float,
 			a.null.if.func.let,
 		]`,
-		`a: {if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6, float: 7, null: {if: {func: {let: 3}}}}, b: [a.if, a.for, a.in, a.where, a.div, a.quo, a.func, a.float, a.null.if.func.let]`,
-	}, {}, {
-		"json",
-		`{
+			out: `a: {if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6, float: 7, null: {if: {func: {let: 3}}}}, b: [a.if, a.for, a.in, a.where, a.div, a.quo, a.func, a.float, a.null.if.func.let]`,
+		},
+		{
+			desc: "json",
+			in: `{
 			"a": 1,
 			"b": "2",
 			"c": 3
 		}`,
-		`{"a": 1, "b": "2", "c": 3}`,
-	}, {
-		"json:extra comma",
-		`{
+			out: `{"a": 1, "b": "2", "c": 3}`,
+		},
+		{
+			desc: "json:extra comma",
+			in: `{
 			"a": 1,
 			"b": "2",
 			"c": 3,
 		}`,
-		`{"a": 1, "b": "2", "c": 3}`,
-	}, {
-		"json:simplified",
-		`{
+			out: `{"a": 1, "b": "2", "c": 3}`,
+		},
+		{
+			desc: "json:simplified",
+			in: `{
 			a: 1
 			b: "2"
 			c: 3
 		}`,
-		`{a: 1, b: "2", c: 3}`,
-	}, {
-		"attributes",
-		`a: 1 @xml(,attr)
+			out: `{a: 1, b: "2", c: 3}`,
+		},
+		{
+			desc: "attributes",
+			in: `a: 1 @xml(,attr)
 		 b: 2 @foo(a,b=4) @go(Foo)
 		 c: {
 			 d: "x" @go(D) @json(,omitempty)
 			 e: "y" @ts(,type=string,"str")
 		 }`,
-		`a: 1 @xml(,attr), b: 2 @foo(a,b=4) @go(Foo), c: {d: "x" @go(D) @json(,omitempty), e: "y" @ts(,type=string,"str")}`,
-	}, {
-		"not emitted",
-		`a: true
+			out: `a: 1 @xml(,attr), b: 2 @foo(a,b=4) @go(Foo), c: {d: "x" @go(D) @json(,omitempty), e: "y" @ts(,type=string,"str")}`,
+		},
+		{
+			desc: "not emitted",
+			in: `a: true
 		 b?: "2"
 		 c?: 3
 
@@ -161,10 +194,11 @@ func TestParse(t *testing.T) {
 		 "g\("en")"?: 4
 		 "h\("en")"!: 4
 		`,
-		`a: true, b?: "2", c?: 3, d!: 2, e: {f!: 3}, "g\("en")"?: 4, "h\("en")"!: 4`,
-	}, {
-		"definition",
-		`#Def: {
+			out: `a: true, b?: "2", c?: 3, d!: 2, e: {f!: 3}, "g\("en")"?: 4, "h\("en")"!: 4`,
+		},
+		{
+			desc: "definition",
+			in: `#Def: {
 			 b: "2"
 			 c: 3
 
@@ -172,41 +206,48 @@ func TestParse(t *testing.T) {
 		}
 		#Def: {}
 		`,
-		`#Def: {b: "2", c: 3, embedding}, #Def: {}`,
-	}, {
-		"one-line embedding",
-		`{ V1, V2 }`,
-		`{V1, V2}`,
-	}, {
-		"selectors",
-		`a.b. "str"`,
-		`a.b."str"`,
-	}, {
-		"selectors",
-		`a.b. "str"`,
-		`a.b."str"`,
-	}, {
-		"faulty bytes selector",
-		`a.b.'str'`,
-		"a.b._\nexpected selector, found 'STRING' 'str'",
-	}, {
-		"faulty multiline string selector",
-		`a.b."""
+			out: `#Def: {b: "2", c: 3, embedding}, #Def: {}`,
+		},
+		{
+			desc: "one-line embedding",
+			in:   `{ V1, V2 }`,
+			out:  `{V1, V2}`,
+		},
+		{
+			desc: "selectors",
+			in:   `a.b. "str"`,
+			out:  `a.b."str"`,
+		},
+		{
+			desc: "selectors (dup)",
+			in:   `a.b. "str"`,
+			out:  `a.b."str"`,
+		},
+		{
+			desc: "faulty bytes selector",
+			in:   `a.b.'str'`,
+			out:  "a.b._\nexpected selector, found 'STRING' 'str'",
+		},
+		{
+			desc: "faulty multiline string selector",
+			in: `a.b."""
 			"""`,
-		"a.b._\nexpected selector, found 'STRING' \"\"\"\n\t\t\t\"\"\"",
-	}, {
-		"expression embedding",
-		`#Def: {
+			out: "a.b._\nexpected selector, found 'STRING' \"\"\"\n\t\t\t\"\"\"",
+		},
+		{
+			desc: "expression embedding",
+			in: `#Def: {
 			a.b.c
 			a > b < c
 			-1<2
 
 			foo: 2
 		}`,
-		`#Def: {a.b.c, a>b<c, -1<2, foo: 2}`,
-	}, {
-		"ellipsis in structs",
-		`#Def: {
+			out: `#Def: {a.b.c, a>b<c, -1<2, foo: 2}`,
+		},
+		{
+			desc: "ellipsis in structs (dup)",
+			in: `#Def: {
 			b: "2"
 			...
 		}
@@ -220,69 +261,79 @@ func TestParse(t *testing.T) {
 		_}
 		...
 		`,
-		`#Def: {b: "2", ...}, ..., #Def2: {..., b: "2"}, #Def3: {..., _}, ...`,
-	}, {
-		"emitted referencing non-emitted",
-		`a: 1
+			out: `#Def: {b: "2", ...}, ..., #Def2: {..., b: "2"}, #Def3: {..., _}, ...`,
+		},
+		{
+			desc: "emitted referencing non-emitted",
+			in: `a: 1
 		 b: "2"
 		 c: 3
 		{ name: b, total: a + b }`,
-		`a: 1, b: "2", c: 3, {name: b, total: a+b}`,
-	}, {
-		"package file",
-		`package k8s
+			out: `a: 1, b: "2", c: 3, {name: b, total: a+b}`,
+		},
+		{
+			desc: "package file",
+			in: `package k8s
 		 {}
 		`,
-		`package k8s, {}`,
-	}, {
-		"invalid package identifier: definition",
-		`package #x`,
-		`package #x
+			out: `package k8s, {}`,
+		},
+		{
+			desc: "invalid package identifier: definition",
+			in:   `package #x`,
+			out: `package #x
 invalid package name #x`,
-	}, {
-		"invalid package identifier: hidden definition",
-		`package _#x`,
-		`package _#x
+		},
+		{
+			desc: "invalid package identifier: hidden definition",
+			in:   `package _#x`,
+			out: `package _#x
 invalid package name _#x`,
-	}, {
-		"invalid import identifier: definition",
-		`import #x "foo"`,
-		`import #x "foo"
+		},
+		{
+			desc: "invalid import identifier: definition",
+			in:   `import #x "foo"`,
+			out: `import #x "foo"
 cannot import package as definition identifier`,
-	}, {
-		"invalid import identifier: hidden definition",
-		`import _#x "foo"`,
-		`import _#x "foo"
+		},
+		{
+			desc: "invalid import identifier: hidden definition",
+			in:   `import _#x "foo"`,
+			out: `import _#x "foo"
 cannot import package as definition identifier`,
-	}, {
-		"imports group",
-		`package k8s
+		},
+		{
+			desc: "imports group",
+			in: `package k8s
 
 		import (
 			a "foo"
 			"bar/baz"
 		)
 		`,
-		`package k8s, import ( a "foo", "bar/baz" )`,
-	}, {
-		"imports single",
-		`package k8s
+			out: `package k8s, import ( a "foo", "bar/baz" )`,
+		},
+		{
+			desc: "imports single",
+			in: `package k8s
 
 		import a "foo"
 		import "bar/baz"
 			`,
-		`package k8s, import a "foo", import "bar/baz"`,
-	}, {
-		"collapsed fields",
-		`a: #b: c?: [Name=_]: d: 1
+			out: `package k8s, import a "foo", import "bar/baz"`,
+		},
+		{
+			desc: "collapsed fields",
+			in: `a: #b: c?: [Name=_]: d: 1
 		"g\("en")"?: 4
 		 // job foo { bar: 1 } // TODO error after foo
 		 job: "foo": [_]: { bar: 1 }
 		`,
-		`a: {#b: {c?: {[Name=_]: {d: 1}}}}, "g\("en")"?: 4, job: {"foo": {[_]: {bar: 1}}}`,
-	}, {
-		"identifiers",
-		`// 	$_: 1,
+			out: `a: {#b: {c?: {[Name=_]: {d: 1}}}}, "g\("en")"?: 4, job: {"foo": {[_]: {bar: 1}}}`,
+		},
+		{
+			desc: "identifiers",
+			in: `// 	$_: 1,
 			a: {b: {c: d}}
 			c: a
 			d: a.b
@@ -291,93 +342,108 @@ cannot import package as definition identifier`,
 			"f": f,
 			[X=_]: X
 		`,
-		"a: {b: {c: d}}, c: a, d: a.b, e: a.b.c, \"f\": f, [X=_]: X",
-	}, {
-		"predeclared identifiers",
-		`a:    __string
+			out: "a: {b: {c: d}}, c: a, d: a.b, e: a.b.c, \"f\": f, [X=_]: X",
+		},
+		{
+			desc: "predeclared identifiers",
+			in: `a:    __string
 		__int: 2`,
-		"a: __string, __int: 2\nidentifiers starting with '__' are reserved",
-	}, {
-		"reserved identifiers in let",
-		`let __var = 42
+			out: "a: __string, __int: 2\nidentifiers starting with '__' are reserved",
+		},
+		{
+			desc: "reserved identifiers in let",
+			in: `let __var = 42
 		a: __var`,
-		"let __var=42, a: __var\nidentifiers starting with '__' are reserved",
-	}, {
-		"reserved identifiers in comprehension",
-		`list: [for __x, y in [1] { __x }]`,
-		"list: [for __x: y in [1] {__x}]\nidentifiers starting with '__' are reserved",
-	}, {
-		"reserved identifiers in comprehension key-value",
-		`list: [for k, __v in {a: 1} { __v }]`,
-		"list: [for k: __v in {a: 1} {__v}]\nidentifiers starting with '__' are reserved",
-	}, {
-		"reserved identifiers in comprehension let",
-		`list: [for x in [1] let __temp = x { __temp }]`,
-		"list: [for x in [1] let __temp=x {__temp}]\nidentifiers starting with '__' are reserved",
-	}, {
-		"predeclared identifiers in struct embedding",
-		`a: { __int }`,
-		"a: {__int}",
-	}, {
-		"non-predeclared identifiers in struct embedding",
-		`a: { __myvar }`,
-		"a: {__myvar}",
-	}, {
-		"reserved identifiers in field alias",
-		`foo: __b=bar: {p: __b.baz}`,
-		"foo: {__b=bar: {p: __b.baz}}\nidentifiers starting with '__' are reserved",
-	}, {
-		"empty fields",
-		`
+			out: "let __var=42, a: __var\nidentifiers starting with '__' are reserved",
+		},
+		{
+			desc: "reserved identifiers in comprehension",
+			in:   `list: [for __x, y in [1] { __x }]`,
+			out:  "list: [for __x: y in [1] {__x}]\nidentifiers starting with '__' are reserved",
+		},
+		{
+			desc: "reserved identifiers in comprehension key-value",
+			in:   `list: [for k, __v in {a: 1} { __v }]`,
+			out:  "list: [for k: __v in {a: 1} {__v}]\nidentifiers starting with '__' are reserved",
+		},
+		{
+			desc: "reserved identifiers in comprehension let",
+			in:   `list: [for x in [1] let __temp = x { __temp }]`,
+			out:  "list: [for x in [1] let __temp=x {__temp}]\nidentifiers starting with '__' are reserved",
+		},
+		{
+			desc: "predeclared identifiers in struct embedding",
+			in:   `a: { __int }`,
+			out:  "a: {__int}",
+		},
+		{
+			desc: "non-predeclared identifiers in struct embedding",
+			in:   `a: { __myvar }`,
+			out:  "a: {__myvar}",
+		},
+		{
+			desc: "reserved identifiers in field alias",
+			in:   `foo: __b=bar: {p: __b.baz}`,
+			out:  "foo: {__b=bar: {p: __b.baz}}\nidentifiers starting with '__' are reserved",
+		},
+		{
+			desc: "empty fields",
+			in: `
 		"": 3
 		`,
-		`"": 3`,
-	}, {
-		"expressions",
-		`	a: (2 + 3) * 5
+			out: `"": 3`,
+		},
+		{
+			desc: "expressions",
+			in: `	a: (2 + 3) * 5
 			b: (2 + 3) + 4
 			c: 2 + 3 + 4
 			d: -1
 			e: !foo
 			f: _|_
 		`,
-		"a: (2+3)*5, b: (2+3)+4, c: 2+3+4, d: -1, e: !foo, f: _|_",
-	}, {
-		"pseudo keyword expressions",
-		`	a: (2 div 3) mod 5
+			out: "a: (2+3)*5, b: (2+3)+4, c: 2+3+4, d: -1, e: !foo, f: _|_",
+		},
+		{
+			desc: "pseudo keyword expressions",
+			in: `	a: (2 div 3) mod 5
 			b: (2 quo 3) rem 4
 			c: 2 div 3 div 4
 		`,
-		"a: (2 div 3) mod 5, b: (2 quo 3) rem 4, c: 2 div 3 div 4",
-	}, {
-		"ranges",
-		`	a: >=1 & <=2
+			out: "a: (2 div 3) mod 5, b: (2 quo 3) rem 4, c: 2 div 3 div 4",
+		},
+		{
+			desc: "ranges",
+			in: `	a: >=1 & <=2
 			b: >2.0  & <= 40.0
 			c: >"a" & <="b"
 			v: (>=1 & <=2) & <=(>=5 & <=10)
 			w: >1 & <=2 & <=3
 			d: >=3T & <=5M
 		`,
-		"a: >=1&<=2, b: >2.0&<=40.0, c: >\"a\"&<=\"b\", v: (>=1&<=2)&<=(>=5&<=10), w: >1&<=2&<=3, d: >=3T&<=5M",
-	}, {
-		"indices",
-		`{
+			out: "a: >=1&<=2, b: >2.0&<=40.0, c: >\"a\"&<=\"b\", v: (>=1&<=2)&<=(>=5&<=10), w: >1&<=2&<=3, d: >=3T&<=5M",
+		},
+		{
+			desc: "indices",
+			in: `{
 			a: b[2]
 			b: c[1:2]
 			c: "asdf"
 			d: c ["a"]
 		}`,
-		`{a: b[2], b: c[1:2], c: "asdf", d: c["a"]}`,
-	}, {
-		"calls",
-		`{
+			out: `{a: b[2], b: c[1:2], c: "asdf", d: c["a"]}`,
+		},
+		{
+			desc: "calls",
+			in: `{
 			a: b(a.b, c.d)
 			b: a.b(c)
 		}`,
-		`{a: b(a.b, c.d), b: a.b(c)}`,
-	}, {
-		"lists",
-		`{
+			out: `{a: b(a.b, c.d), b: a.b(c)}`,
+		},
+		{
+			desc: "lists",
+			in: `{
 			a: [ 1, 2, 3, b, c, ... ]
 			b: [ 1, 2, 3, ],
 			c: [ 1,
@@ -386,27 +452,30 @@ cannot import package as definition identifier`,
 			 ],
 			d: [ 1+2, 2, 4,]
 		}`,
-		`{a: [1, 2, 3, b, c, ...], b: [1, 2, 3], c: [1, 2, 3], d: [1+2, 2, 4]}`,
-	}, {
-		"list types",
-		`{
+			out: `{a: [1, 2, 3, b, c, ...], b: [1, 2, 3], c: [1, 2, 3], d: [1+2, 2, 4]}`,
+		},
+		{
+			desc: "list types",
+			in: `{
 			a: 4*[int]
 			b: <=5*[{a: 5}]
 			c1: [...int]
 			c2: [...]
 			c3: [1, 2, ...int,]
 		}`,
-		`{a: 4*[int], b: <=5*[{a: 5}], c1: [...int], c2: [...], c3: [1, 2, ...int]}`,
-	}, {
-		"list comprehensions",
-		`{
+			out: `{a: 4*[int], b: <=5*[{a: 5}], c1: [...int], c2: [...], c3: [1, 2, ...int]}`,
+		},
+		{
+			desc: "list comprehensions",
+			in: `{
 				y: [1,2,3]
 				b: [for x in y if x == 1 { x }],
 			}`,
-		`{y: [1, 2, 3], b: [for x in y if x==1 {x}]}`,
-	}, {
-		"field comprehensions",
-		`{
+			out: `{y: [1, 2, 3], b: [for x in y if x==1 {x}]}`,
+		},
+		{
+			desc: "field comprehensions",
+			in: `{
 				y: { a: 1, b: 2}
 				a: {
 					for k, v in y if v > 2 {
@@ -414,10 +483,11 @@ cannot import package as definition identifier`,
 					}
 				}
 			 }`,
-		`{y: {a: 1, b: 2}, a: {for k: v in y if v>2 {"\(k)": v}}}`,
-	}, {
-		"nested comprehensions",
-		`{
+			out: `{y: {a: 1, b: 2}, a: {for k: v in y if v>2 {"\(k)": v}}}`,
+		},
+		{
+			desc: "nested comprehensions",
+			in: `{
 			y: { a: 1, b: 2}
 			a: {
 				for k, v in y let x = v+2 if x > 2 {
@@ -425,42 +495,47 @@ cannot import package as definition identifier`,
 				}
 			}
 		}`,
-		`{y: {a: 1, b: 2}, a: {for k: v in y let x=v+2 if x>2 {"\(k)": v}}}`,
-	}, {
-		"let declaration",
-		`{
+			out: `{y: {a: 1, b: 2}, a: {for k: v in y let x=v+2 if x>2 {"\(k)": v}}}`,
+		},
+		{
+			desc: "let declaration",
+			in: `{
 			let X = 42
 			let Y = "42",
 			let Z = 10 + 12
 		}`,
-		`{let X=42, let Y="42", let Z=10+12}`,
-	}, {
-		"duplicates allowed",
-		`{
+			out: `{let X=42, let Y="42", let Z=10+12}`,
+		},
+		{
+			desc: "duplicates allowed",
+			in: `{
 			a: b: 3
 			a: { b: 3 }
 		}`,
-		"{a: {b: 3}, a: {b: 3}}",
-	}, {
-		"templates", // TODO: remove
-		`{
+			out: "{a: {b: 3}, a: {b: 3}}",
+		},
+		{
+			desc: "templates",
+			in: `{
 			[foo=_]: { a: int }
 			a:     { a: 1 }
 		}`,
-		"{[foo=_]: {a: int}, a: {a: 1}}",
-	}, {
-		"value alias",
-		`
+			out: "{[foo=_]: {a: int}, a: {a: 1}}",
+		},
+		{
+			desc: "value alias",
+			in: `
 		{
 			a: X=foo
 			b: Y={foo}
 			c: d: e: X=5
 		}
 		`,
-		`{a: X=foo, b: Y={foo}, c: {d: {e: X=5}}}`,
-	}, {
-		"dynamic labels",
-		`{
+			out: `{a: X=foo, b: Y={foo}, c: {d: {e: X=5}}}`,
+		},
+		{
+			desc: "dynamic labels",
+			in: `{
 			(x): a: int
 			x:   "foo"
 			a: {
@@ -470,18 +545,20 @@ cannot import package as definition identifier`,
 			(x)?: 1
 			y: (x)!: 2
 		}`,
-		`{(x): {a: int}, x: "foo", a: {(a.b)}, (x)?: 1, y: {(x)!: 2}}`,
-	}, {
-		"foo",
-		`[
+			out: `{(x): {a: int}, x: "foo", a: {(a.b)}, (x)?: 1, y: {(x)!: 2}}`,
+		},
+		{
+			desc: "foo",
+			in: `[
 			[1],
 			[1, 2],
 			[1, 2, 3],
 		]`,
-		"[[1], [1, 2], [1, 2, 3]]",
-	}, {
-		"interpolation",
-		`a: "foo \(ident)"
+			out: "[[1], [1, 2], [1, 2, 3]]",
+		},
+		{
+			desc: "interpolation",
+			in: `a: "foo \(ident)"
 		 b: "bar \(bar)  $$$ "
 		 c: "nest \(   { a: "\( nest ) "}.a ) \(5)"
 		 m1: """
@@ -490,10 +567,11 @@ cannot import package as definition identifier`,
 		 m2: '''
 			 \(bar) multi
 			 '''`,
-		`a: "foo \(ident)", b: "bar \(bar)  $$$ ", c: "nest \({a: "\(nest) "}.a) \(5)", ` + "m1: \"\"\"\n\t\t\t multi \\(bar)\n\t\t\t \"\"\", m2: '''\n\t\t\t \\(bar) multi\n\t\t\t '''",
-	}, {
-		"file comments",
-		`// foo
+			out: `a: "foo \(ident)", b: "bar \(bar)  $$$ ", c: "nest \({a: "\(nest) "}.a) \(5)", m1: """` + "\n\t\t\t multi \\(bar)\n\t\t\t \"\"\", m2: '''\n\t\t\t \\(bar) multi\n\t\t\t '''",
+		},
+		{
+			desc: "file comments",
+			in: `// foo
 
 		// uni
 		package foo // uniline
@@ -502,19 +580,20 @@ cannot import package as definition identifier`,
 		// file.2
 
 		`,
-		"<[0// foo] <[d0// uni] [l3// uniline] [3// file.1 // file.2] package foo>>",
-	}, {
-		"line comments",
-		`// doc
+			out: "<[0// foo] <[d0// uni] [l3// uniline] [3// file.1 // file.2] package foo>>",
+		},
+		{
+			desc: "line comments",
+			in: `// doc
 		 a: 5 // line
 		 b: 6 // lineb
 			  // next
-			`, // next is followed by EOF. Ensure it doesn't move to file.
-		"<[d0// doc] [l5// line] a: 5>, " +
-			"<[l5// lineb] [5// next] b: 6>",
-	}, {
-		"alt comments",
-		`// a ...
+			`,
+			out: "<[d0// doc] [l5// line] a: 5>, <[l5// lineb] [5// next] b: 6>",
+		},
+		{
+			desc: "alt comments",
+			in: `// a ...
 		a: 5 // line a
 
 		// about a
@@ -534,21 +613,23 @@ cannot import package as definition identifier`,
 			// about e
 			e: 3
 		`,
-		"<[d0// a ...] [l5// line a] [5// about a] a: 5>, " +
-			"<[d0// b ...] [l2// lineb] [5// about b] b: 6>, " +
-			"<[5// about c] c: 7>, " +
-			"<[d0// about d] d: {<[d0// about e] e>: 3}>",
-	}, {
-		"expr comments",
-		`
+			out: "<[d0// a ...] [l5// line a] [5// about a] a: 5>, " +
+				"<[d0// b ...] [l2// lineb] [5// about b] b: 6>, " +
+				"<[5// about c] c: 7>, " +
+				"<[d0// about d] d: {<[d0// about e] e>: 3}>",
+		},
+		{
+			desc: "expr comments",
+			in: `
 		a: 2 +  // 2 +
 		   3 +  // 3 +
 		   4    // 4
 		   `,
-		"<[l5// 4] a: <[l2// 3 +] <[l2// 2 +] 2+3>+4>>",
-	}, {
-		"composit comments",
-		`a : {
+			out: "<[l5// 4] a: <[l2// 3 +] <[l2// 2 +] 2+3>+4>>",
+		},
+		{
+			desc: "composit comments",
+			in: `a : {
 			a: 1, b: 2, c: 3, d: 4
 			// end
 		}
@@ -572,21 +653,23 @@ cannot import package as definition identifier`,
 			// comment in struct body
 		}
 		`,
-		"a: {a: 1, b: 2, c: 3, <[d5// end] d: 4>}, " +
-			"b: [1, 2, 3, 4, <[d2// end] 5>], " +
-			"c: [1, 2, 3, <[l2// here] 4>, <[l4// here] {a: 3}>, 5, 6, 7, <[l2// and here] 8>], " +
-			"d: {<[l5// Hello] a: 1>, <[d0// Doc] b: 2>}, " +
-			"e1: <[d1// comment in list body] []>, " +
-			"e2: <[d1// comment in struct body] {}>",
-	}, {
-		"attribute comments",
-		`
+			out: "a: {a: 1, b: 2, c: 3, <[d5// end] d: 4>}, " +
+				"b: [1, 2, 3, 4, <[d2// end] 5>], " +
+				"c: [1, 2, 3, <[l2// here] 4>, <[l4// here] {a: 3}>, 5, 6, 7, <[l2// and here] 8>], " +
+				"d: {<[l5// Hello] a: 1>, <[d0// Doc] b: 2>}, " +
+				"e1: <[d1// comment in list body] []>, " +
+				"e2: <[d1// comment in struct body] {}>",
+		},
+		{
+			desc: "attribute comments",
+			in: `
 		a: 1 @a() @b() // d
 		`,
-		`<[l5// d] a: 1 @a() @b()>`,
-	}, {
-		"attribute declarations",
-		`
+			out: `<[l5// d] a: 1 @a() @b()>`,
+		},
+		{
+			desc: "attribute declarations",
+			in: `
 		@foo()
 
 		package bar
@@ -597,24 +680,27 @@ cannot import package as definition identifier`,
 
 		@baz()
 			`,
-		`@foo(), package bar, @bar(), import "strings", @baz()`,
-	}, {
-		"comprehension comments",
-		`
+			out: `@foo(), package bar, @bar(), import "strings", @baz()`,
+		},
+		{
+			desc: "comprehension comments",
+			in: `
 		if X {
 			// Comment 1
 			Field: 2
 			// Comment 2
 		}
 		`,
-		`if X <[d2// Comment 2] {<[d0// Comment 1] Field: 2>}>`,
-	}, {
-		"let comments",
-		`let X = foo // Comment 1`,
-		`<[5// Comment 1] let X=foo>`,
-	}, {
-		"emit comments",
-		`// a comment at the beginning of the file
+			out: `if X <[d2// Comment 2] {<[d0// Comment 1] Field: 2>}>`,
+		},
+		{
+			desc: "let comments",
+			in:   `let X = foo // Comment 1`,
+			out:  `<[5// Comment 1] let X=foo>`,
+		},
+		{
+			desc: "emit comments",
+			in: `// a comment at the beginning of the file
 
 		// a second comment
 
@@ -625,10 +711,11 @@ cannot import package as definition identifier`,
 
 		// a comment at the end of the file
 		`,
-		"<[0// a comment at the beginning of the file] [0// a second comment] <[d0// comment] a: 5>, <[2// a comment at the end of the file] {}>>",
-	}, {
-		"composite comments 2",
-		`
+			out: "<[0// a comment at the beginning of the file] [0// a second comment] <[d0// comment] a: 5>, <[2// a comment at the end of the file] {}>>",
+		},
+		{
+			desc: "composite comments 2",
+			in: `
 	{
 // foo
 
@@ -643,10 +730,11 @@ bar: 2
 	{"name": "next"}   // optional next element
 ]
 `,
-		`{<[0// foo] [d0// fooo] foo: 1>, bar: 2}, [<[l4// each element has a long] {"name": "value"}>, <[l4// optional next element] {"name": "next"}>]`,
-	}, {
-		desc: "field aliasing",
-		in: `
+			out: `{<[0// foo] [d0// fooo] foo: 1>, bar: 2}, [<[l4// each element has a long] {"name": "value"}>, <[l4// optional next element] {"name": "next"}>]`,
+		},
+		{
+			desc: "field aliasing",
+			in: `
 		I="\(k)": v
 		S="foo-bar": w
 		L=foo: x
@@ -657,28 +745,25 @@ bar: 2
 		X1=[X2=<"d"]: { name: X2 }
 		Y1=foo: Y2=bar: [Y1, Y2]
 		`,
-		out: `I="\(k)": v, ` +
-			`S="foo-bar": w, ` +
-			`L=foo: x, ` +
-			`X=[0]: {foo: X|null}, ` +
-			`[Y=string]: {name: Y}, ` +
-			`X1=[X2=<"d"]: {name: X2}, ` +
-			`Y1=foo: {Y2=bar: [Y1, Y2]}`,
-	}, {
-		desc: "allow keyword in expression",
-		in: `
+			out: `I="\(k)": v, S="foo-bar": w, L=foo: x, X=[0]: {foo: X|null}, [Y=string]: {name: Y}, X1=[X2=<"d"]: {name: X2}, Y1=foo: {Y2=bar: [Y1, Y2]}`,
+		},
+		{
+			desc: "allow keyword in expression",
+			in: `
 		foo: in & 2
 		`,
-		out: "foo: in&2",
-	}, {
-		desc: "dot import",
-		in: `
+			out: "foo: in&2",
+		},
+		{
+			desc: "dot import",
+			in: `
 		import . "foo"
 		`,
-		out: "import , \"foo\"\nexpected 'STRING', found '.'",
-	}, {
-		desc: "attributes",
-		in: `
+			out: "import , \"foo\"\nexpected 'STRING', found '.'",
+		},
+		{
+			desc: "attributes (2)",
+			in: `
 		package name
 
 		@t1(v1)
@@ -693,16 +778,18 @@ bar: 2
 			c: 2
 		}
 		`,
-		out: "package name, @t1(v1), {@t2(v2)}, a: {a: 1, @t3(v3), @t4(v4), c: 2}",
-	}, {
-		desc: "Issue #276",
-		in: `
+			out: "package name, @t1(v1), {@t2(v2)}, a: {a: 1, @t3(v3), @t4(v4), c: 2}",
+		},
+		{
+			desc: "Issue #276",
+			in: `
 		a: int=>2
 		`,
-		out: "a: int=>2",
-	}, {
-		desc: "struct comments",
-		in: `
+			out: "a: int=>2",
+		},
+		{
+			desc: "struct comments",
+			in: `
 		struct: {
 			// This is a comment
 
@@ -714,10 +801,11 @@ bar: 2
 
 			// extra comment
 		}`,
-		out: `struct: {<[0// This is a comment] [0// This is a comment] [d0// Another comment] [d5// extra comment] something: {}>}`,
-	}, {
-		desc: "list comments",
-		in: `
+			out: `struct: {<[0// This is a comment] [0// This is a comment] [d0// Another comment] [d5// extra comment] something: {}>}`,
+		},
+		{
+			desc: "list comments",
+			in: `
 		list: [
 			// Comment1
 
@@ -729,10 +817,11 @@ bar: 2
 
 			// Comment 3
 		]`,
-		out: "list: [<[0// Comment1] [0// Comment2] [d0// Another comment] [d3// Comment 3] {}>]",
-	}, {
-		desc: "call comments",
-		in: `
+			out: "list: [<[0// Comment1] [0// Comment2] [d0// Another comment] [d3// Comment 3] {}>]",
+		},
+		{
+			desc: "call comments",
+			in: `
 		funcArg1: foo(
 			{},
 
@@ -743,19 +832,21 @@ bar: 2
 
 			// Comment3
 		)`,
-		out: "funcArg1: foo(<[1// Comment1] {}>, <[d0// Comment2] [d1// Comment3] {}>)",
-	}, {
-		desc: "front-style commas",
-		in: `
+			out: "funcArg1: foo(<[1// Comment1] {}>, <[d0// Comment2] [d1// Comment3] {}>)",
+		},
+		{
+			desc: "front-style commas",
+			in: `
 			frontStyle: { "key": "value"
 				, "key2": "value2"
 				, "foo" : bar
 			}
 			`,
-		out: "frontStyle: {\"key\": \"value\", \"key2\": \"value2\", \"foo\": bar}",
-	}, {
-		desc: "function types",
-		in: `
+			out: "frontStyle: {\"key\": \"value\", \"key2\": \"value2\", \"foo\": bar}",
+		},
+		{
+			desc: "function types",
+			in: `
 			f0: func(): int
 			f1: func(int): int
 			f2: func(int, string): int
@@ -764,22 +855,33 @@ bar: 2
 			f5: func(int, int): func(bool, bool): bool
 			f6: func(func(bool, bool): bool, func(string, string): string): func(int, func(int, string): int): func(int, string): int
 		`,
-		out: "f0: func(): int, f1: func(int): int, f2: func(int, string): int, f3: func({a: int, b: string}): bool, f4: func(bool, func(int, string): int): string, f5: func(int, int): func(bool, bool): bool, f6: func(func(bool, bool): bool, func(string, string): string): func(int, func(int, string): int): func(int, string): int",
-	}, {
-		desc: "postfix ... operator with experiment",
-		in: `@experiment(explicitopen)
+			out: "f0: func(): int, f1: func(int): int, f2: func(int, string): int, f3: func({a: int, b: string}): bool, f4: func(bool, func(int, string): int): string, f5: func(int, int): func(bool, bool): bool, f6: func(func(bool, bool): bool, func(string, string): string): func(int, func(int, string): int): func(int, string): int",
+		},
+		{
+			desc: "postfix ... operator with experiment",
+			in: `@experiment(explicitopen)
 		x: y...
 		a: foo.bar...
 		b: (c & d)...
 		e: fn()...`,
-		out: "@experiment(explicitopen), x: y..., a: foo.bar..., b: (c&d)..., e: fn()...",
-	}, {
-		desc: "postfix ... operator with experiment",
-		in: `
+			out: "@experiment(explicitopen), x: y..., a: foo.bar..., b: (c&d)..., e: fn()...",
+		},
+		{
+			desc: "postfix ... operator with experiment missing",
+			in: `
 		x: y...
 		`,
-		out: "x: <*ast.BadExpr>\npostfix ... operator requires @experiment(explicitopen)",
-	}}
+			out: "x: <*ast.BadExpr>\npostfix ... operator requires @experiment(explicitopen)",
+		},
+		{
+			desc:    "postfix ... operator unsupported version",
+			version: "v0.14.0",
+			in: `@experiment(explicitopen)
+		x: y...
+		`,
+			out: "\nparsing experiments for version \"v0.14.0\": cannot set experiment \"explicitopen\" before version v0.15.0\nunknown experiment \"explicitopen\"",
+		},
+	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			mode := []Option{AllErrors}
@@ -788,6 +890,9 @@ bar: 2
 			}
 			if strings.Contains(tc.desc, "function") {
 				mode = append(mode, ParseFuncs)
+			}
+			if tc.version != "" {
+				mode = append(mode, Version(tc.version))
 			}
 			f, err := ParseFile("input", tc.in, mode...)
 			got := astinternal.DebugStr(f)

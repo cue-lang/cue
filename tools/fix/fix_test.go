@@ -183,3 +183,26 @@ X: {
 		})
 	}
 }
+
+// TestX is for debugging; DO NOT REMOVE.
+func TestX(t *testing.T) {
+	t.Skip("for debugging")
+
+	astFile, parseErr := parser.ParseFile("", `
+	#A: a: int
+	X: {
+		#A
+	}
+	`, parser.ParseComments)
+	if parseErr != nil {
+		t.Fatalf("parse: %v", parseErr)
+	}
+
+	file(astFile, "v0.15.0", Experiments("explicitopen"))
+
+	out, fmtErr := format.Node(astFile)
+	if fmtErr != nil {
+		t.Fatalf("format: %v", fmtErr)
+	}
+	t.Error(string(out))
+}

@@ -38,9 +38,9 @@ package foo
 
 #A: a: int
 
-X: {
+X: __closeAll({
 	#A...
-}
+})
 --- b.cue
 // Already tagged, so do not do any changes.
 @experiment(explicitopen)

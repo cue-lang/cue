@@ -138,13 +138,13 @@ package foo
 #A: a: int
 #B: b: int
 
-X: {
+X: __closeAll({
 	#A... // foo
 
 	// bar
 	#B...
 	b: string
-}
+})
 `,
 		},
 	}

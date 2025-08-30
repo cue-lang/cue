@@ -26,6 +26,6 @@ package foo
 
 #A: a: int
 
-X: {
+X: __closeAll({
 	#A...
-}
+})

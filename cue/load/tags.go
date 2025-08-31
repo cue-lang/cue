@@ -83,14 +83,12 @@ type TagVar struct {
 	Description string
 }
 
-const rfc3339 = "2006-01-02T15:04:05.999999999Z"
-
 // DefaultTagVars creates a new map with a set of supported injection variables.
 func DefaultTagVars() map[string]TagVar {
 	return map[string]TagVar{
 		"now": {
 			Func: func() (ast.Expr, error) {
-				return ast.NewString(time.Now().UTC().Format(rfc3339)), nil
+				return ast.NewString(time.Now().UTC().Format(time.RFC3339Nano)), nil
 			},
 		},
 		"os": {
@@ -125,10 +123,7 @@ func DefaultTagVars() map[string]TagVar {
 		"rand": {
 			Func: func() (ast.Expr, error) {
 				var b [16]byte
-				_, err := rand.Read(b[:])
-				if err != nil {
-					return nil, err
-				}
+				rand.Read(b[:])
 				var hx [34]byte
 				hx[0] = '0'
 				hx[1] = 'x'
@@ -143,8 +138,7 @@ func varToString(s string, err error) (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	x := ast.NewString(s)
-	return x, nil
+	return ast.NewString(s), nil
 }
 
 // A tag binds an identifier to a field to allow passing command-line values.

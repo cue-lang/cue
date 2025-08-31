@@ -73,7 +73,7 @@ href="mailto:security@cuelang.org">security@cuelang.org</a>.
 
 The code contribution process used by the CUE project is a little different from
 that used by other open source projects.  We assume you have a basic
-understanding of [`git`](https://git-scm.com/) and [Go](https://golang.org)
+understanding of [`git`](https://git-scm.com/) and [Go](https://go.dev/)
 (1.24 or later).
 
 The first thing to decide is whether you want to contribute a code change via
@@ -110,7 +110,7 @@ assume all commits you create are signed-off in this way.
 ## Preparing for GitHub Pull Request (PR) Contributions
 
 First-time contributors that are already familiar with the <a
-href="https://guides.github.com/introduction/flow/">GitHub flow</a> are
+href="https://docs.github.com/get-started/quickstart/github-flow">GitHub flow</a> are
 encouraged to use the same process for CUE contributions.  Even though CUE
 maintainers use GerritHub for code review, the GitHub PR workflow is 100%
 supported.
@@ -123,7 +123,7 @@ workflow:
 and [Miscellaneous Topics](#miscellaneous-topics)
 - **Step 1**: Create a GitHub account if you do not have one.
 - **Step 2**:
-  [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the CUE
+  [Fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) the CUE
 project, and clone your fork locally
 
 
@@ -207,7 +207,7 @@ What happens if you accidentally create an additional commit and now have two
 commits on your branch? No worries, you can "squash" commits on a branch to
 create a single commit. See the GitHub documentation on [how to squash commits
 with GitHub
-Desktop](https://docs.github.com/en/desktop/contributing-and-collaborating-using-github-desktop/managing-commits/squashing-commits),
+Desktop](https://docs.github.com/en/desktop/managing-commits/squashing-commits-in-github-desktop),
 or using the [`git` command
 interactively](https://medium.com/@slamflipstrom/a-beginners-guide-to-squashing-commits-with-git-rebase-8185cf6e62ec).
 
@@ -916,5 +916,4 @@ flag will now be implied every time a commit is created.
 ## Code of Conduct
 
 Guidelines for participating in CUE community spaces and a reporting process for
-handling issues can be found in the [Code of
-Conduct](https://cuelang.org/docs/contribution_guidelines/conduct).
+handling issues can be found in the [Code of Conduct](https://cuelang.org/docs/reference/code-of-conduct/).

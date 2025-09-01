@@ -1404,45 +1404,26 @@ D: close({
 
 A struct may contain an _embedded value_, an operand used as a declaration.
 An embedded value of type struct is unified with the struct in which it is
-embedded, but disregarding the restrictions imposed by closed structs.
-So if an embedding resolves to a closed struct, the corresponding enclosing
-struct will also be closed, but may have fields that are not allowed if
-normal rules for closed structs were observed.
+embedded.
+
+Embeddings can be useful for composing larger schemas from smaller ones.
+The order of specification may imply a documented field order.
 
 If an embedded value is not of type struct, the struct may only have
 definitions or hidden fields. Regular fields are not allowed in such case.
 
-The result of `{ A }` is `A` for any `A` (including definitions).
-
 Syntactically, embeddings may be any expression.
 
 ```
-S1: {
-    a: 1
-    b: 2
-    {
-        c: 3
-    }
+#Meta: {
+    kind: string
+    name: string
 }
-// S1 is { a: 1, b: 2, c: 3 }
-
-S2: close({
-    a: 1
-    b: 2
-    {
-        c: 3
-    }
-})
-// same as close(S1)
-
-S3: {
-    a: 1
-    b: 2
-    close({
-        c: 3
-    })
+#Guzzler: {
+    #Meta...
+    volume: number
 }
-// same as S2
+// #Guzzler is { kind: string, name: string, volume: number }
 ```
 
 
@@ -2052,7 +2033,8 @@ PrimaryExpr =
 	Operand |
 	PrimaryExpr Selector |
 	PrimaryExpr Index |
-	PrimaryExpr Arguments .
+	PrimaryExpr Arguments |
+	PrimaryExpr "..." .
 
 Selector       = "." (identifier | simple_string_lit) .
 Index          = "[" Expression "]" .
@@ -2218,6 +2200,39 @@ x: [1, 2] | *[3, 4]
 y: int | *1
 z: x[y]  // 4
 ```
+
+
+### Postfix `...` operator
+
+For a [primary expression](#primary-expressions) `x` that evaluates to a struct
+or list, the postfix expression
+
+```
+x...
+```
+
+denotes an open struct or list that is unified with `x` but allows additional
+fields beyond those defined in `x`. The postfix `...` operator recursively opens
+closed structs or lists, making them extensible.
+
+```
+#A: {
+    field1: string
+    field2: int
+}
+
+// Opens #A to allow additional fields
+openA: #A...
+
+// Can now add fields without constraint violation
+openA: extraField: bool
+```
+
+The result of `x...` is:
+
+- an open struct `x`, if `x` is a struct or list
+- bottom (an error), otherwise
+
 
 ### Operators
 
@@ -2754,6 +2769,15 @@ len([1, 2, ...])     2
 The builtin function `close` converts a partially defined, or open, struct
 to a fully defined, or closed, struct.
 
+### `__closeAll`
+
+The builtin function `__closeAll` recursively converts a partially defined,
+or open, struct to a fully defined, or closed, struct. It is only defined on
+struct and list literals.
+
+This builtin is only defined for the `explicitopen` experiment and is used
+used by `cue fix` to convert legacy CUE code to the new semantics. It should
+not be used by users directly.
 
 ### `and`
 

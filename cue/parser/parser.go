@@ -918,7 +918,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 		case token.IDENT, token.LBRACK, token.LPAREN,
 			token.STRING, token.INTERPOLATION,
 			token.NULL, token.TRUE, token.FALSE,
-			token.FOR, token.IF, token.LET, token.IN:
+			token.FOR, token.IF, token.LET, token.TRY, token.IN:
 			return &ast.EmbedDecl{Expr: expr}
 		}
 		fallthrough
@@ -1009,7 +1009,7 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, decl ast.
 	tok := p.tok
 	switch tok {
 
-	case token.FOR, token.IF:
+	case token.FOR, token.IF, token.TRY:
 		if rhs {
 			expr = p.parseExpr()
 			break
@@ -1182,6 +1182,39 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 
 			clauses = append(clauses, c.closeClause(p, &ast.LetClause{
 				Let:   letPos,
+				Ident: ident,
+				Equal: assign,
+				Expr:  expr,
+			}))
+
+		case token.TRY:
+			c := p.openComments()
+			tryPos := p.expect(token.TRY)
+			if !p.experiments.Try {
+				p.errf(tryPos, "try clause requires @experiment(try)")
+				return nil, c
+			}
+			if first {
+				switch p.tok {
+				case token.COLON, token.BIND, token.OPTION, token.NOT,
+					token.COMMA, token.EOF:
+					return nil, c
+				}
+			}
+
+			var ident *ast.Ident
+			var assign token.Pos
+			var expr ast.Expr
+
+			// Check if this is the second form: try x = expr
+			if p.tok == token.IDENT {
+				ident = p.parseIdentDecl()
+				assign = p.expect(token.BIND)
+				expr = p.parseRHS()
+			}
+
+			clauses = append(clauses, c.closeClause(p, &ast.TryClause{
+				Try:   tryPos,
 				Ident: ident,
 				Equal: assign,
 				Expr:  expr,
@@ -1401,6 +1434,7 @@ func (p *parser) checkExpr(x ast.Expr) ast.Expr {
 	case *ast.CallExpr:
 	case *ast.UnaryExpr:
 	case *ast.BinaryExpr:
+	case *ast.PostfixExpr:
 	default:
 		// all other nodes are not proper expressions
 		p.errorExpected(x.Pos(), "expression")
@@ -1496,6 +1530,23 @@ L:
 				// Return a BadExpr to continue parsing
 				x = &ast.BadExpr{From: pos, To: p.pos}
 			}
+		case token.OPTION:
+			// Check if this is an optional field (next token is :) rather than postfix operator
+			p.peek()
+			if p.peekToken.tok == token.COLON {
+				// This looks like an optional field, not a postfix expression
+				// TODO: when we have symmetry on the LHS w.r.t. references,
+				// this would no longer be an issue.
+				break L
+			}
+			pos := p.pos
+			c := p.openComments()
+			p.next()
+			x = c.closeExpr(p, &ast.PostfixExpr{
+				X:     p.checkExpr(x),
+				Op:    token.OPTION,
+				OpPos: pos,
+			})
 		default:
 			break L
 		}

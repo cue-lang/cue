@@ -1,0 +1,249 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ea82d87_c1aa5562",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "SGTM except I\u0027d replace the names \"since\" and \"valid\" with the consistent use of \"available\".",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28a1c62a_e59096eb",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "nit: inline this var?",
+      "range": {
+        "startLine": 121,
+        "startChar": 2,
+        "endLine": 121,
+        "endChar": 10
+      },
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80abe857_33f0b211",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "I think user-facing errors should say \"language version\" rather than \"version\" for clarity. otherwise, a user with `cue version v0.14.0` but `language: version: \"v0.13.0\"` might be confused as to why an error says\n\n\u003e experiment X requires version v0.14.0",
+      "range": {
+        "startLine": 162,
+        "startChar": 45,
+        "endLine": 162,
+        "endChar": 52
+      },
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a152dca5_7f995aa8",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "I feel like \"have\" would be a better word to use with user-facing errors here",
+      "range": {
+        "startLine": 162,
+        "startChar": 66,
+        "endLine": 162,
+        "endChar": 69
+      },
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc5dbe17_118c2912",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "ditto: inline this var",
+      "range": {
+        "startLine": 166,
+        "startChar": 3,
+        "endLine": 166,
+        "endChar": 11
+      },
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fbc9fb2_c64b74f2",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "invert and continue to unindent the rest",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1673265a_04063d07",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "shouldn\u0027t GetActiveExperiments also panic if the original version is empty?\n\nalso, a nit, but: perhaps be consistent in naming, I see originalVersion and origVersion",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1f0ce83_f767a6b0",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "ditto; invert to unindent",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44681808_c52f0ac9",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "join the two if statements?",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31c1519a_96efca96",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "How about \"Available\" as the name for when an experiment is first introduced and can be turned on? I feel like that\u0027s much clearer. \"since\" is a bit ambiguous - since this version string... what is happening? Also, the other two are also a \"since\" string - \"accepted since\" and \"rejected since\".\n\nAnd of course, update the tags etc.\n\nI\u0027d also find it more intuitive if IsExperimentValid was renamed to IsExperimentAvailable. You even documented it as \"check experiment availability\" :)",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87624bfb_29c5c06d",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "shouldn\u0027t this func reject invalid values, i.e. invalid semver like `since:foobar`?\n\notherwise something like `semver.Compare(\"v0.13.0\", \"foobar\")` could give you a bogus result.",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfa4a93b_2d26d900",
+        "filename": "internal/cueexperiment/file_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "use `strings.Contains` instead of these two. was this AI?",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee47b01d_7af72c4a",
+        "filename": "internal/cueexperiment/file_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:47:02Z",
+      "side": 1,
+      "message": "ditto, use `slices.Equal`",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -20,8 +20,8 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 )
 
 // Object constraints
@@ -114,7 +114,7 @@ func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 		expr, _ := s.schemaState(n, allTypes, func(s *state) {
 			s.preserveUnknownFields = false
 		})
-		f := internal.EmbedStruct(ast.NewStruct(&ast.Field{
+		f := embedStruct(ast.NewStruct(&ast.Field{
 			Label: ast.NewList(ast.NewBinExpr(token.AND, existing...)),
 			Value: expr,
 		}))
@@ -126,6 +126,23 @@ func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 		return
 	}
 	s.hasAdditionalProperties = true
+}
+
+func embedStruct(s *ast.StructLit) *ast.EmbedDecl {
+	e := &ast.EmbedDecl{Expr: s}
+	if len(s.Elts) == 1 {
+		d := s.Elts[0]
+		astutil.CopyPosition(e, d)
+		ast.SetRelPos(d, token.NoSpace)
+		astutil.CopyComments(e, d)
+		ast.SetComments(d, nil)
+		if f, ok := d.(*ast.Field); ok {
+			ast.SetRelPos(f.Label, token.NoSpace)
+		}
+	}
+	s.Lbrace = token.Newline.Pos()
+	s.Rbrace = token.NoSpace.Pos()
+	return e
 }
 
 // constraintDependencies is used to implement all of the dependencies,
@@ -305,7 +322,7 @@ func constraintPatternProperties(key string, n cue.Value, s *state) {
 
 		// We'll make a pattern constraint of the form:
 		// 	[pattern & !~(properties)]: schema
-		f := internal.EmbedStruct(ast.NewStruct(&ast.Field{
+		f := embedStruct(ast.NewStruct(&ast.Field{
 			Label: ast.NewList(ast.NewBinExpr(
 				token.AND,
 				append([]ast.Expr{&ast.UnaryExpr{Op: token.MAT, X: ast.NewString(key)}}, existing...)...,

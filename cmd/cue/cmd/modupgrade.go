@@ -70,18 +70,20 @@ func runModUpgrade(cmd *Command, args []string) error {
 
 	// Write updated module files to disk if upgrade was requested
 	for _, i := range instances {
-		if i.ModuleFile != nil && i.Root != "" {
-			// Format and write the module file
-			data, err := modfile.Format(i.ModuleFile)
-			if err != nil {
-				errs = errors.Append(errs, errors.Wrapf(err, token.NoPos, "failed to format module file"))
-				continue
-			}
+		if i.ModuleFile == nil || i.Root == "" {
+			continue
+		}
 
-			moduleFilePath := filepath.Join(i.Root, "cue.mod", "module.cue")
-			if err := os.WriteFile(moduleFilePath, data, 0666); err != nil {
-				errs = errors.Append(errs, errors.Wrapf(err, token.NoPos, "failed to write module file"))
-			}
+		// Format and write the module file
+		data, err := modfile.Format(i.ModuleFile)
+		if err != nil {
+			errs = errors.Append(errs, errors.Wrapf(err, token.NoPos, "failed to format module file"))
+			continue
+		}
+
+		moduleFilePath := filepath.Join(i.Root, "cue.mod", "module.cue")
+		if err := os.WriteFile(moduleFilePath, data, 0666); err != nil {
+			errs = errors.Append(errs, errors.Wrapf(err, token.NoPos, "failed to write module file"))
 		}
 	}
 

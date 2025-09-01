@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "69bd1ae2_257bd0e2",
+        "filename": "encoding/protobuf/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 727,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T13:50:08Z",
+      "side": 1,
+      "message": "I opted to keep this change as mechanic as possible, i.e. any assignments to Optional and Constraint are exactly mirrored.\n\nBut yes, I do think this matters; parseField sets Optional and Constraint near the end of its func.",
+      "parentUuid": "3057155c_75200e11",
+      "revId": "900eefd2550e754cd28d8b713ad45045f18c3651",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07092571_8047628b",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-01T13:46:17Z",
       "side": 1,
       "message": "either the test or the error message isn\u0027t quite right here. The test will catch required fields too.",
+      "revId": "900eefd2550e754cd28d8b713ad45045f18c3651",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0eb639e4_3260a042",
+        "filename": "internal/encoding/yaml/encode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T13:50:08Z",
+      "side": 1,
+      "message": "it\u0027s the error message being old. we used to only have optional fields; required fields came later. hence the transition from \"optional\" to \"constraint\" in cue/ast.\n\nI tried to also change the message here in PS1, but other bits blew up, and it felt like the changes were involved enough where I needed a separate commit. I reverted that and I\u0027ll try in a separate CL.",
+      "parentUuid": "07092571_8047628b",
       "revId": "900eefd2550e754cd28d8b713ad45045f18c3651",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

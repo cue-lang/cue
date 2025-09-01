@@ -16,6 +16,24 @@
       "message": "perhaps leave a small note comment here, saying that showing a partially bad syntax tree is still useful for e.g. LSP development?",
       "revId": "a8a1d598831737eb6f2d64c1bdf605ee998e8894",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5829ffce_5a307744",
+        "filename": "internal/cmd/cue-ast/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-01T12:08:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c090baf_5a518f42",
+      "revId": "a8a1d598831737eb6f2d64c1bdf605ee998e8894",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

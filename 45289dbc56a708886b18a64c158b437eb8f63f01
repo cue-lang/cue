@@ -88,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c529c8f_e179fcc7",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T18:08:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5828a986_d608fc60",
+      "revId": "45289dbc56a708886b18a64c158b437eb8f63f01",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b23b162_67c673ae",

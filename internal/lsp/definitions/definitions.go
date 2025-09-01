@@ -518,6 +518,8 @@ type astNode struct {
 	navigable *navigableBindings
 	// ranges tracks the file ranges covered by this astNode
 	ranges *rangeset.FilenameRangeSet
+	// ellipses contains navigableBindings for ellipsis patterns.
+	ellipses []*navigableBindings
 }
 
 // newAstNode creates a new [astNodes] which is a child of the current
@@ -592,8 +594,6 @@ type navigableBindings struct {
 	// field-values. This is in contrast to [astNode], where bindings
 	// are not merged: there would be two bindings (astNodes) for x.
 	bindings map[string]*navigableBindings
-	// ellipses contains navigableBindings for ellipsis patterns.
-	ellipses []*navigableBindings
 	// contributingNodes are the astNodes that contribute to this
 	// navigableBindings. It is an invariant that every member of
 	// contributingNodes has its navigable field set to this
@@ -805,7 +805,7 @@ func (n *astNode) eval() {
 
 		case *ast.Ellipsis:
 			child := n.newAstNode(node, node.Type, nil)
-			n.navigable.ellipses = append(n.navigable.ellipses, child.navigable)
+			n.ellipses = append(n.ellipses, child.navigable)
 
 		case *ast.CallExpr:
 			resolvable = append(resolvable, node.Fun)
@@ -1102,11 +1102,18 @@ func navigateBindingsByName(navigables []*navigableBindings, name string) []*nav
 
 	var results []*navigableBindings
 	for navigable := range navigableSet {
-		binding, found := navigable.bindings[name]
+		childNav, found := navigable.bindings[name]
 		if found {
-			results = append(results, binding)
-		} else {
-			results = append(results, navigable.ellipses...)
+			results = append(results, childNav)
+		}
+		for _, node := range navigable.contributingNodes {
+			childNodes, found := node.bindings[name]
+			// if there is a binding, we still add the ellipses if the
+			// binding is for a pattern, alias, comprehension etc.
+			addEllipses := !found || (len(childNodes) == 1 && childNodes[0].navigable != childNav)
+			if addEllipses {
+				results = append(results, node.ellipses...)
+			}
 		}
 	}
 	return results

@@ -687,7 +687,7 @@ func (w *Workspace) reloadPackages() error {
 	repeatReload := false
 
 	for _, loadedPkg := range loadedPkgs {
-		if loadedPkg.IsStdlibPackage() {
+		if isUnhandledPackage(loadedPkg) {
 			continue
 		}
 
@@ -813,14 +813,14 @@ func (w *Workspace) reloadPackages() error {
 		clear(imports)
 		if oldPkg != nil {
 			for _, i := range oldPkg.Imports() {
-				if i.IsStdlibPackage() {
+				if isUnhandledPackage(i) {
 					continue
 				}
 				imports[normalizeImportPath(i)] = i
 			}
 		}
 		for _, i := range pkg.pkg.Imports() {
-			if i.IsStdlibPackage() {
+			if isUnhandledPackage(i) {
 				continue
 			}
 			ip := normalizeImportPath(i)
@@ -887,6 +887,10 @@ func (w *Workspace) findPackage(modRootURI protocol.DocumentURI, ip ast.ImportPa
 	}
 	pkg, found := m.packages[ip]
 	return pkg, found
+}
+
+func isUnhandledPackage(pkg *modpkgload.Package) bool {
+	return pkg.IsStdlibPackage() || !pkg.Mod().IsValid()
 }
 
 func changedText(uri protocol.DocumentURI, content []byte, changes []protocol.TextDocumentContentChangeEvent) ([]byte, error) {

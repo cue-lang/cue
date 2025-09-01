@@ -1405,45 +1405,26 @@ D: close({
 
 A struct may contain an _embedded value_, an operand used as a declaration.
 An embedded value of type struct is unified with the struct in which it is
-embedded, but disregarding the restrictions imposed by closed structs.
-So if an embedding resolves to a closed struct, the corresponding enclosing
-struct will also be closed, but may have fields that are not allowed if
-normal rules for closed structs were observed.
+embedded.
+
+Embeddings can be useful for composing larger schemas from smaller ones.
+The order of specification may imply a documented field order.
 
 If an embedded value is not of type struct, the struct may only have
 definitions or hidden fields. Regular fields are not allowed in such case.
 
-The result of `{ A }` is `A` for any `A` (including definitions).
-
 Syntactically, embeddings may be any expression.
 
 ```
-S1: {
-    a: 1
-    b: 2
-    {
-        c: 3
-    }
+Meta: {
+    kind: string
+    name: string
 }
-// S1 is { a: 1, b: 2, c: 3 }
-
-S2: close({
-    a: 1
-    b: 2
-    {
-        c: 3
-    }
-})
-// same as close(S1)
-
-S3: {
-    a: 1
-    b: 2
-    close({
-        c: 3
-    })
+Guzzler: {
+    Meta...
+    volume: number
 }
-// same as S2
+// Guzzler is { kind: string, name: string, volume: number }
 ```
 
 
@@ -1459,8 +1440,8 @@ to data and are never required to be concrete.
 Referencing a definition will recursively [close](#closed-structs) it.
 That is, a referenced definition will not unify with a struct
 that would add a field anywhere within the definition that it does not
-already define or explicitly allow with a pattern constraint or `...`.
-[Embedding](#embedding) allows bypassing this check.
+already define or explicitly allow with a pattern constraint, `...`,
+or the [spread operator](#spread-operator) (postfix `...`).
 
 If referencing a definition would always result in an error, implementations
 may report this inconsistency at the point of its declaration.
@@ -2072,7 +2053,8 @@ PrimaryExpr =
 	Operand |
 	PrimaryExpr Selector |
 	PrimaryExpr Index |
-	PrimaryExpr Arguments .
+	PrimaryExpr Arguments |
+	PrimaryExpr "..." .
 
 Selector       = "." (identifier | simple_string_lit) .
 Index          = "[" Expression "]" .
@@ -2238,6 +2220,48 @@ x: [1, 2] | *[3, 4]
 y: int | *1
 z: x[y]  // 4
 ```
+
+
+
+### Spread Operator (`...`)
+
+For a [primary expression](#primary-expressions) `x` that evaluates to a struct
+or list, the spread operator
+
+```
+x...
+```
+
+unifies all elements of `x` into the current context disregarding closedness
+rules implied by `x`, recursively.
+The spread operator is a no-op for all other types.
+
+The spread operator can be used to extend a struct or list and it is an error
+for `...` to be applied to anything else.
+
+If `x...` is used within a definition normal closedness rules apply after the
+`x` is unified with any other fields.
+
+```
+#Base: foo: int
+#Def: {
+    #Base... // Unified with other fields within #Def.
+    bar: int
+}
+d: #Def & {baz: 2} // Error: baz is not allowed
+
+// Define a type that matches a collection of derived types.
+#Animal: genus!: string
+
+#Dog: { #Animal..., genus: "canis", says: "bark" }
+#Cat: { #Animal..., genus: "felis", says: "meow" }
+
+// Use #AnyAnimal in schema to allow any value that derives from #Animal.
+#AnyAnimal: { #Animal..., ... }
+
+#Schema: animal: #AnyAnimal // Dog, Cat or any other #Animal.
+```
+
 
 ### Operators
 
@@ -2782,6 +2806,25 @@ len([1, 2, ...])     2
 The builtin function `close` converts a partially defined, or open, struct
 to a fully defined, or closed, struct.
 
+### `__closeAll`
+
+The builtin function `__closeAll` recursively converts a partially defined,
+or open, struct to a fully defined, or closed, struct. It is a no-op for values
+that are not a struct or list.
+
+This builtin is only defined for the `explicitopen` experiment and can be used
+by `cue fix` instead of `__reclose` if it is known for sure a struct needs to be
+reclosed. It should not be used by users directly.
+
+### `__reclose`
+
+The builtin function `__reclose` closes a literal struct if any of its
+embedding that used a spread operator was closed. It is a no-op for all other
+values.
+
+This builtin is only defined for the `explicitopen` experiment and is used
+used by `cue fix` to convert legacy CUE code to the new semantics. It should
+not be used by users directly.
 
 ### `and`
 

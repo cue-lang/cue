@@ -33,6 +33,24 @@
       "message": "Hmm, I wonder whether this one would also be better off in astutil?\n(Why does this box have Resolved ticked by default!?!)",
       "revId": "b0d42c6bee664081ab2edcb751d9d73a46cf74ef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ff8dda4_22b76c15",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-01T15:36:47Z",
+      "side": 1,
+      "message": "Hmm, I know what you\u0027re going to say. I don\u0027t like this though - scattering functionality apart that arguably should be grouped together is bad. Any chance of an internal astutil package?",
+      "parentUuid": "d71feaff_a69df732",
+      "revId": "b0d42c6bee664081ab2edcb751d9d73a46cf74ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

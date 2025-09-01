@@ -67,6 +67,11 @@ type File struct {
 	//
 	// Proposal: in https://cue-lang/cue#4032
 	ExplicitOpen bool `experiment:"since:v0.15.0"`
+
+	// Try enables the try construct for succinct error handling.
+	//
+	// Proposal was defined in https://cue-lang/cue#4019
+	Try bool `experiment:"since:v0.15.0"`
 }
 
 // LanguageVersion returns the language version of the file or "" if no language

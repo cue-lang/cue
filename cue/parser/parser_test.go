@@ -881,7 +881,22 @@ bar: 2
 		`,
 			out: "\nparsing experiments for version \"v0.14.0\": cannot set experiment \"explicitopen\" before version v0.15.0",
 		},
-	}
+		{
+			desc: "try clauses",
+			in: `@experiment(try)
+		{
+			a: [for x in [1, 2] try { x }]
+			b: [for x in [1, 2] try y = x { y }]
+		}`,
+			out: `@experiment(try), {a: [for x in [1, 2] try {x}], b: [for x in [1, 2] try y=x {y}]}`,
+		}, {
+			desc: "postfix ? operator",
+			in: `{
+			a: b?
+			c: d.x?
+		}`,
+			out: `{a: b?, c: d.x?}`,
+		}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			mode := []Option{AllErrors}

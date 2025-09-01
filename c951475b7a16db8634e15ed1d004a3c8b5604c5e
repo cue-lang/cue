@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "f42fab0e_b8d6b0f3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:48:20Z",
+      "side": 1,
+      "message": "Also: this package is called `cueexperiment`, so I feel like repeating \"Experiment\" in all these API names is redundant.\n\nThat is, e.g. `cueexperiment.CanApplyFix` is way better than `cueexperiment.CanApplyExperimentFix`.",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "0ea82d87_c1aa5562",

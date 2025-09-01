@@ -17,6 +17,7 @@ package export
 import (
 	"fmt"
 	"math/rand/v2"
+	"slices"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -220,12 +221,12 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 		if pkgName != "" {
 			pkg.Name = ast.NewIdent(pkgName)
 			fout.Decls = append(fout.Decls, pkg)
-			ast.SetComments(pkg, internal.MergeDocs(pkg.Comments()))
+			ast.SetComments(pkg, mergeDocs(pkg.Comments()))
 		} else {
 			for _, c := range fout.Comments() {
 				ast.AddComment(pkg, c)
 			}
-			ast.SetComments(fout, internal.MergeDocs(pkg.Comments()))
+			ast.SetComments(fout, mergeDocs(pkg.Comments()))
 		}
 	}
 
@@ -241,6 +242,39 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 	}
 
 	return fout
+}
+
+// mergeDocs merges multiple doc comments into one single doc comment.
+func mergeDocs(comments []*ast.CommentGroup) []*ast.CommentGroup {
+	if len(comments) <= 1 || !hasDocComment(comments) {
+		return comments
+	}
+
+	comments1 := make([]*ast.CommentGroup, 0, len(comments))
+	comments1 = append(comments1, nil)
+	var docComment *ast.CommentGroup
+	for _, c := range comments {
+		switch {
+		case !c.Doc:
+			comments1 = append(comments1, c)
+		case docComment == nil:
+			docComment = c
+		default:
+			docComment.List = append(slices.Clip(docComment.List), &ast.Comment{Text: "//"})
+			docComment.List = append(docComment.List, c.List...)
+		}
+	}
+	comments1[0] = docComment
+	return comments1
+}
+
+func hasDocComment(comments []*ast.CommentGroup) bool {
+	for _, c := range comments {
+		if c.Doc {
+			return true
+		}
+	}
+	return false
 }
 
 // Vertex exports evaluated values (data mode).

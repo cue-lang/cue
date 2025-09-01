@@ -16,6 +16,24 @@
       "message": "Noting per my offline comment that the changes originally made here move us from a state of reporting no errors to some. The decision to not fatal all errors was something of a defensive measure in the event of concurrently editing Go and CUE files locally. Which is arguably a situation that takes lower priority vs correctness of behaviour with respect to Go files which are considered \"done\". So very happy with this change.",
       "revId": "4a7652a09bc43daefd5514b799181e925e9f5132",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71899120_83a25b20",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T10:19:13Z",
+      "side": 1,
+      "message": "Indeed - thanks for the context. I agree that your change was an incremental improvement. We just don\u0027t properly test or support working on incomplete go/ast or go/types information, so I think it\u0027s a bad idea to hope it will work OK for people. If we wanted it to work, we\u0027d need very good tests, which is actually quite hard because there are dozens of kinds of syntax and type errors, so there could be many dozens of different kinds of slightly-broken Go type declarations we might need to generate from.",
+      "parentUuid": "02b7934a_44dd2473",
+      "revId": "4a7652a09bc43daefd5514b799181e925e9f5132",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

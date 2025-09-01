@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70cc02bd_861b097f",
+        "filename": "cue/load/tags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-01T08:08:42Z",
+      "side": 1,
+      "message": "I would prefer this to change to a panic on err.\nTo me, a change in documentation is not as \"strong\" as a change in type signature. If the docs changed again, and the old behaviour was restored, then we might fail to notice -- everything would continue to compile. If they had instead changed the type sig to remove the err result, then we\u0027d be spared that problem. They haven\u0027t done that, for backwards compatibility reasons, but it then leaves us in a pickle, because we can\u0027t rely on the type sig to alert us of any regression.\nFor this reason, I would prefer us to be defensive, and panic on err.",
+      "revId": "77170b29121bf5595e6600563497a38b12c644ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -30,7 +30,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
-	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
@@ -448,5 +447,3 @@ func IsEllipsis(x ast.Decl) bool {
 func GenPath(root string) string {
 	return filepath.Join(root, "cue.mod", "gen")
 }
-
-var ErrInexact = errors.New("inexact subsumption")

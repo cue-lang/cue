@@ -16,6 +16,24 @@
       "message": "I actually wonder if these should be in astutil/util.go. It\u0027s more likely to get found in there?",
       "revId": "7a7259c7bbc067ba67ce2e57e29d2ba330266521",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cce0bbf4_216550c3",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T15:28:54Z",
+      "side": 1,
+      "message": "cue/ast/astutil is a public package, so if we move it there, it has to become part of the public and mostly-stable API. I don\u0027t think we need or want to do that as part of un-tangling the internal package.",
+      "parentUuid": "3de8ba76_a5672346",
+      "revId": "7a7259c7bbc067ba67ce2e57e29d2ba330266521",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

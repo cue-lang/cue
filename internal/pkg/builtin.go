@@ -238,14 +238,8 @@ func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 
 		ret = wrapCallErr(call, &adt.Bottom{Err: err})
 	case error:
-		if call.Err == internal.ErrIncomplete {
-			err := ctx.NewErrf("incomplete value")
-			err.Code = adt.IncompleteError
-			ret = err
-		} else {
-			// TODO: store the underlying error explicitly
-			ret = wrapCallErr(call, &adt.Bottom{Err: errors.Promote(err, "")})
-		}
+		// TODO: store the underlying error explicitly
+		ret = wrapCallErr(call, &adt.Bottom{Err: errors.Promote(err, "")})
 	case string, fmt.Stringer:
 		// A string or a stringer likely used as a panic value.
 		ret = wrapCallErr(call, &adt.Bottom{

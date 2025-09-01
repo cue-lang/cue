@@ -87,10 +87,6 @@ func (c Context) Sqrt(d, x *apd.Decimal) (apd.Condition, error) {
 	return res, err
 }
 
-// ErrIncomplete can be used by builtins to signal the evaluation was
-// incomplete.
-var ErrIncomplete = errors.New("incomplete value")
-
 // BaseContext is used as CUE's default context for arbitrary-precision decimals.
 var BaseContext = Context{*apd.BaseContext.WithPrecision(34)}
 

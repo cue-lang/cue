@@ -47,6 +47,11 @@ import "example.com/foo/x"
 
 v: x
 w: v.y.z
+-- b/b.cue --
+package b
+
+import "example.net/bar/doesnotexist" // unknown module
+import "example.com/bar/doesnotexist" // unknown package
 `
 
 	t.Run("open", func(t *testing.T) {
@@ -70,6 +75,26 @@ w: v.y.z
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=unknown Created", cacheURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Reloaded", cacheURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Loaded Package dirs=[%v/example.com/foo@v0.0.1/x] importPath=example.com/foo/x@v0", cacheURI, cacheURI),
+			)
+		})
+	})
+
+	t.Run("open - bad import", func(t *testing.T) {
+		WithOptions(
+			RootURIAsDefaultFolder(), Registry(reg), Modes(DefaultModes()&^Forwarded),
+		).Run(t, files, func(t *testing.T, env *Env) {
+			rootURI := env.Sandbox.Workdir.RootURI()
+			env.Await(
+				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+			)
+			env.OpenFile("b/b.cue")
+			env.Await(
+				env.DoneWithOpen(),
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/b] importPath=example.com/bar/b@v0", rootURI, rootURI),
+				// No module is created for the unfindable imports
+				NoLogExactf(protocol.Debug, "example.net/bar/doesnotexist"),
+				NoLogExactf(protocol.Debug, "example.com/bar/doesnotexist"),
 			)
 		})
 	})

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d16b2ddb_1cf74ca0",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-09-01T13:28:06Z",
+      "side": 1,
+      "message": "nit: this comment is just about still valid, although perhaps slightly less so given that we\u0027ve got two categories of such imports?",
+      "revId": "88825c34d6f12e5ab7a9eda846e43a6b2ef8ba7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

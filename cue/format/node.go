@@ -301,8 +301,7 @@ func (f *formatter) decl(decl ast.Decl) {
 
 	switch n := decl.(type) {
 	case *ast.Field:
-		constraint, _ := internal.ConstraintToken(n)
-		f.label(n.Label, constraint)
+		f.label(n.Label, n.Constraint)
 
 		f.print(noblank, nooverride, n.TokenPos, token.COLON)
 		f.visitComments(f.current.pos)

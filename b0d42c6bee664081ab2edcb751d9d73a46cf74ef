@@ -16,6 +16,23 @@
       "message": "Hmm, I wonder whether this one would also be better off in astutil?",
       "revId": "b0d42c6bee664081ab2edcb751d9d73a46cf74ef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d71feaff_a69df732",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-01T15:33:43Z",
+      "side": 1,
+      "message": "Hmm, I wonder whether this one would also be better off in astutil?\n(Why does this box have Resolved ticked by default!?!)",
+      "revId": "b0d42c6bee664081ab2edcb751d9d73a46cf74ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

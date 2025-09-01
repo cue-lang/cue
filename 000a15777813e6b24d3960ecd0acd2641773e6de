@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d2daa5f_6a9e92c9",
+        "filename": "cue/format/node.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-01T15:21:17Z",
+      "side": 1,
+      "message": "Yes, given the name of this is highly misleading, much better to keep this in its own package and keep it private.",
+      "revId": "000a15777813e6b24d3960ecd0acd2641773e6de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

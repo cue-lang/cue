@@ -23,7 +23,6 @@ import (
 	"bufio"
 	"fmt"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	"github.com/cockroachdb/apd/v3"
@@ -253,39 +252,6 @@ func FileComments(f *ast.File) (docs, rest []*ast.CommentGroup) {
 	}
 
 	return
-}
-
-// MergeDocs merges multiple doc comments into one single doc comment.
-func MergeDocs(comments []*ast.CommentGroup) []*ast.CommentGroup {
-	if len(comments) <= 1 || !hasDocComment(comments) {
-		return comments
-	}
-
-	comments1 := make([]*ast.CommentGroup, 0, len(comments))
-	comments1 = append(comments1, nil)
-	var docComment *ast.CommentGroup
-	for _, c := range comments {
-		switch {
-		case !c.Doc:
-			comments1 = append(comments1, c)
-		case docComment == nil:
-			docComment = c
-		default:
-			docComment.List = append(slices.Clip(docComment.List), &ast.Comment{Text: "//"})
-			docComment.List = append(docComment.List, c.List...)
-		}
-	}
-	comments1[0] = docComment
-	return comments1
-}
-
-func hasDocComment(comments []*ast.CommentGroup) bool {
-	for _, c := range comments {
-		if c.Doc {
-			return true
-		}
-	}
-	return false
 }
 
 // ToExpr converts a node to an expression. If it is a file, it will return

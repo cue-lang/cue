@@ -389,19 +389,6 @@ func IsRegularField(f *ast.Field) bool {
 	return true
 }
 
-// ConstraintToken reports which constraint token (? or !) is associated
-// with a field (if any), taking into account compatibility of deprecated
-// fields.
-func ConstraintToken(f *ast.Field) (t token.Token, ok bool) {
-	if f.Constraint != token.ILLEGAL {
-		return f.Constraint, true
-	}
-	if f.Optional != token.NoPos {
-		return token.OPTION, true
-	}
-	return f.Constraint, false
-}
-
 // SetConstraints sets both the main and deprecated fields of f according to the
 // given constraint token.
 func SetConstraint(f *ast.Field, t token.Token) {

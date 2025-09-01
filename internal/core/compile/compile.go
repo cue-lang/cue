@@ -21,7 +21,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cueexperiment"
@@ -901,7 +900,7 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 	case *ast.ListLit:
 		c.pushScope(nil, 1, n)
 		v := &adt.ListLit{Src: n}
-		elts, ellipsis := internal.ListEllipsis(n)
+		elts, ellipsis := listEllipsis(n)
 		for _, d := range elts {
 			elem := c.elem(d)
 
@@ -1084,6 +1083,20 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 	default:
 		return c.errf(n, "%s values not allowed in this position", ast.Name(n))
 	}
+}
+
+// listEllipsis reports the list type and remaining elements of a list. If we
+// ever relax the usage of ellipsis, this function will likely change. Using
+// this function will ensure keeping correct behavior or causing a compiler failure.
+func listEllipsis(n *ast.ListLit) (elts []ast.Expr, e *ast.Ellipsis) {
+	elts = n.Elts
+	if n := len(elts); n > 0 {
+		var ok bool
+		if e, ok = elts[n-1].(*ast.Ellipsis); ok {
+			elts = elts[:n-1]
+		}
+	}
+	return elts, e
 }
 
 func (c *compiler) assertConcreteIsPossible(src ast.Node, op adt.Op, x adt.Expr) bool {

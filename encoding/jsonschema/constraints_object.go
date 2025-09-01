@@ -389,7 +389,7 @@ func constraintProperties(key string, n cue.Value, s *state) {
 			case *ast.StructLit:
 				obj.Elts = append(obj.Elts, addTag(name, "deprecated", ""))
 			default:
-				f.Attrs = append(f.Attrs, internal.NewAttr("deprecated", ""))
+				f.Attrs = append(f.Attrs, &ast.Attribute{Text: "@deprecated()"})
 			}
 		}
 		obj.Elts = append(obj.Elts, f)

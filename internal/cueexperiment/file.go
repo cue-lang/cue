@@ -60,7 +60,7 @@ type File struct {
 	// Proposal:      https://cuelang.org/issue/2358
 	// Spec change:   https://cuelang.org/cl/1217013
 	// Spec change:   https://cuelang.org/cl/1217014
-	// Needs cue fix: ❌
+	// Needs cue fix: no
 	StructCmp bool `experiment:"preview:v0.14.0"`
 
 	// ExplicitOpen enables the postfix ... operator to explicitly open
@@ -68,7 +68,7 @@ type File struct {
 	//
 	// Proposal:      https://cuelang.org/issue/4032
 	// Spec change:   https://cuelang.org/cl/1221642
-	// Needs cue fix: ✅
+	// Needs cue fix: yes
 	ExplicitOpen bool `experiment:"preview:v0.15.0"`
 }
 

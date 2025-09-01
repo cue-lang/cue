@@ -71,9 +71,6 @@ current version.
 	cmd.Flags().StringSlice("exp", nil,
 		"list of experiments to port")
 
-	cmd.Flags().String("upgrade", "",
-		"upgrade language version and apply accepted experiments (e.g., --upgrade=v0.16.0)")
-
 	return cmd
 }
 
@@ -85,10 +82,6 @@ func runFixAll(cmd *Command, args []string) error {
 
 	if exps, err := cmd.Flags().GetStringSlice("exp"); err == nil && len(exps) > 0 {
 		opts = append(opts, fix.Experiments(exps...))
-	}
-
-	if upgradeVersion, err := cmd.Flags().GetString("upgrade"); err == nil && upgradeVersion != "" {
-		opts = append(opts, fix.UpgradeVersion(upgradeVersion))
 	}
 
 	_, errs := fixInstances(cmd, args, flagForce.Bool(cmd), opts...)

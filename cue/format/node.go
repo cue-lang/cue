@@ -123,7 +123,7 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 				}
 			}
 		}
-		if f.printer.cfg.simplify && internal.IsEllipsis(x) {
+		if f.printer.cfg.simplify && isEllipsis(x) {
 			ellipsis = x
 			continue
 		}
@@ -160,6 +160,33 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 		f.print(f.current.parentSep)
 	}
 	f.after(nil)
+}
+
+// isEllipsis reports whether the declaration can be represented as an ellipsis.
+func isEllipsis(x ast.Decl) bool {
+	// ...
+	if _, ok := x.(*ast.Ellipsis); ok {
+		return true
+	}
+
+	// [string]: _ or [_]: _
+	f, ok := x.(*ast.Field)
+	if !ok {
+		return false
+	}
+	v, ok := f.Value.(*ast.Ident)
+	if !ok || v.Name != "_" {
+		return false
+	}
+	l, ok := f.Label.(*ast.ListLit)
+	if !ok || len(l.Elts) != 1 {
+		return false
+	}
+	i, ok := l.Elts[0].(*ast.Ident)
+	if !ok {
+		return false
+	}
+	return i.Name == "string" || i.Name == "_"
 }
 
 func (f *formatter) walkSpecList(list []*ast.ImportSpec) {

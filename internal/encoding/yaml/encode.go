@@ -267,8 +267,8 @@ func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
 			if !internal.IsRegularField(x) {
 				return nil, errors.Newf(x.TokenPos, "yaml: definition or hidden fields not allowed")
 			}
-			if x.Optional != token.NoPos {
-				return nil, errors.Newf(x.Optional, "yaml: optional fields not allowed")
+			if x.Constraint != token.ILLEGAL {
+				return nil, errors.Newf(x.TokenPos, "yaml: optional fields not allowed")
 			}
 			if hasEmbed {
 				return nil, errors.Newf(x.TokenPos, "yaml: embedding mixed with fields")

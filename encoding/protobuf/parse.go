@@ -530,6 +530,7 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 
 		if !o.required {
 			f.Optional = token.NoSpace.Pos()
+			f.Constraint = token.OPTION
 		}
 
 	case *proto.Enum:
@@ -723,6 +724,7 @@ func (p *protoConverter) oneOf(x *proto.Oneof) {
 			newStruct()
 			oneOf := p.parseField(s, 0, x.Field)
 			oneOf.Optional = token.NoPos
+			oneOf.Constraint = token.ILLEGAL
 
 		case *proto.Comment:
 			cg := comment(x, false)
@@ -762,6 +764,7 @@ func (p *protoConverter) parseField(s *ast.StructLit, i int, x *proto.Field) *as
 
 	if !o.required {
 		f.Optional = token.NoSpace.Pos()
+		f.Constraint = token.OPTION
 	}
 	return f
 }
@@ -796,6 +799,7 @@ func (p *optionParser) parse(options []*proto.Option) {
 			p.message.Elts = append(p.message.Elts, constraint)
 			if !p.required {
 				constraint.Optional = token.NoSpace.Pos()
+				constraint.Constraint = token.OPTION
 			}
 		case "(google.api.field_behavior)":
 			if o.Constant.Source == "REQUIRED" {

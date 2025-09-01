@@ -23,7 +23,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 )
 
 // AppendDebug writes a multi-line Go-like representation of a syntax tree node,
@@ -420,7 +419,7 @@ func DebugStr(x interface{}) (out string) {
 
 	case *ast.Field:
 		out := DebugStr(v.Label)
-		if t, ok := internal.ConstraintToken(v); ok {
+		if t := v.Constraint; t != token.ILLEGAL {
 			out += t.String()
 		}
 		if v.Value != nil {

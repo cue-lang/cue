@@ -254,7 +254,7 @@ package      import
 The following keywords are used in comprehensions.
 
 ```
-for          in           if           let
+for          in           if           try          let
 ```
 
 <!--
@@ -2005,7 +2005,7 @@ PrimaryExpr =
 	PrimaryExpr Selector |
 	PrimaryExpr Index |
 	PrimaryExpr Arguments |
-	PrimaryExpr "..." .
+	PrimaryExpr ( "..." | "?" ).
 
 Selector       = "." (identifier | simple_string_lit) .
 Index          = "[" Expression "]" .
@@ -2620,6 +2620,16 @@ For structs, `for` iterates over all non-optional regular fields.
 An `if` clause, or guard, specifies an expression that terminates the current
 iteration if it evaluates to false.
 
+A `try` clause evaluates an expression and
+binds it to the defined identifier if all references marked with a `?` within
+the expression resolve and terminates the current iteration otherwise. Any field
+reference, selector, or index expression can be followed with a `?` to indicate
+that the entire expression should be ignored if that reference does not resolve
+to a regular field.
+
+If `try` is the last clause in a comprehension the identifier and expression
+may be omitted, whereby `try { expr }` is a shorthand for `try x=expr {x}`.
+
 The `let` clause binds the result of an expression to the defined identifier
 in a new scope.
 
@@ -2643,6 +2653,7 @@ StartClause         = ForClause | GuardClause .
 Clause              = StartClause | LetClause .
 ForClause           = "for" identifier [ "," identifier ] "in" Expression .
 GuardClause         = "if" Expression .
+TryClause           = "try" [ identifier "=" Expression ] .
 LetClause           = "let" identifier "=" Expression .
 ```
 
@@ -2658,6 +2669,25 @@ c: {
     }
 }
 d: { "1": 2, "2": 3, "3": 4 }
+
+data: {
+  a: { q: 1 }
+  b: {}
+}
+
+list: [
+  for k,v in data
+  try x = v.q? {
+    x
+  }
+]
+// result: [1]
+
+list2: [
+  for k,v in data
+  try { v.q? }
+]
+// result: [1]
 ```
 
 

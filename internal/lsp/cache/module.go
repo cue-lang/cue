@@ -326,7 +326,7 @@ func normalizeImportPath(pkg *modpkgload.Package) ast.ImportPath {
 
 	mod := pkg.Mod()
 	if !mod.IsValid() {
-		panic(fmt.Sprintf("unable to normalize import path %v", pkg.ImportPath()))
+		return ip
 
 	} else if mod.IsLocal() {
 		// "local" means it's using the old module system

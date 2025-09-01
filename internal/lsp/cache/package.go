@@ -195,8 +195,9 @@ func (pkg *Package) setStatus(status status) {
 			for _, imported := range modpkg.Imports() {
 				if imported.ImportPath() != importPath {
 					continue
-				} else if imported.IsStdlibPackage() {
-					// can't jump into stdlib (yet!). TODO
+				} else if isUnhandledPackage(imported) {
+					// This includes stdlib packages, which we can't jump
+					// into yet!. TODO
 					return nil
 				}
 				ip := normalizeImportPath(imported)

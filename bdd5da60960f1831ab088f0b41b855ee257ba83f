@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "422645db_47bc3972",
+        "filename": "cmd/cue/cmd/fix.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T13:32:25Z",
+      "side": 1,
+      "message": "remove support for `cue fix --upgrade`, given that this is now under `cue mod upgrade`? also the flag declaration.",
+      "revId": "bdd5da60960f1831ab088f0b41b855ee257ba83f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4269166_27962f56",
+        "filename": "cmd/cue/cmd/modupgrade.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T13:32:25Z",
+      "side": 1,
+      "message": "reverse to unindent the rest?",
+      "revId": "bdd5da60960f1831ab088f0b41b855ee257ba83f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbd31c1d_5edfafa6",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T13:32:25Z",
+      "side": 1,
+      "message": "I\u0027m not too sure about using emojis here :) I\u0027d keep it to plaintext, especially as some terminals rendering the future `cue help experiments` may not like it.",
+      "revId": "bdd5da60960f1831ab088f0b41b855ee257ba83f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

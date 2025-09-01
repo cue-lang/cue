@@ -65,15 +65,16 @@ func _() {
 	_ = x[IN-54]
 	_ = x[LET-55]
 	_ = x[FUNC-56]
-	_ = x[TRUE-57]
-	_ = x[FALSE-58]
-	_ = x[NULL-59]
-	_ = x[keywordEnd-60]
+	_ = x[TRY-57]
+	_ = x[TRUE-58]
+	_ = x[FALSE-59]
+	_ = x[NULL-60]
+	_ = x[keywordEnd-61]
 }
 
-const _Token_name = "ILLEGALEOFCOMMENTATTRIBUTEliteralBegIDENTINTFLOATSTRINGINTERPOLATION_|_literalEndoperatorBeg+-*^/quoremdivmod&|&&||===<>!<-!=<=>==~!~([{,....)]};:?~operatorEndkeywordBegifforinletfunctruefalsenullkeywordEnd"
+const _Token_name = "ILLEGALEOFCOMMENTATTRIBUTEliteralBegIDENTINTFLOATSTRINGINTERPOLATION_|_literalEndoperatorBeg+-*^/quoremdivmod&|&&||===<>!<-!=<=>==~!~([{,....)]};:?~operatorEndkeywordBegifforinletfunctrytruefalsenullkeywordEnd"
 
-var _Token_index = [...]uint8{0, 7, 10, 17, 26, 36, 41, 44, 49, 55, 68, 71, 81, 92, 93, 94, 95, 96, 97, 100, 103, 106, 109, 110, 111, 113, 115, 116, 118, 119, 120, 121, 123, 125, 127, 129, 131, 133, 134, 135, 136, 137, 138, 141, 142, 143, 144, 145, 146, 147, 148, 159, 169, 171, 174, 176, 179, 183, 187, 192, 196, 206}
+var _Token_index = [...]uint8{0, 7, 10, 17, 26, 36, 41, 44, 49, 55, 68, 71, 81, 92, 93, 94, 95, 96, 97, 100, 103, 106, 109, 110, 111, 113, 115, 116, 118, 119, 120, 121, 123, 125, 127, 129, 131, 133, 134, 135, 136, 137, 138, 141, 142, 143, 144, 145, 146, 147, 148, 159, 169, 171, 174, 176, 179, 183, 186, 190, 195, 199, 209}
 
 func (i Token) String() string {
 	idx := int(i) - 0

@@ -951,6 +951,22 @@ bar: 2
 			in: `a~X: {foo: 1}
 	b: X.foo`,
 			out: "a~X: {foo: 1}, b: X.foo\npostfix alias syntax requires @experiment(aliasv2)",
+		},
+		{
+			desc: "try clauses",
+			in: `@experiment(try)
+		{
+			a: [for x in [1, 2] try { x }]
+			b: [for x in [1, 2] try y = x { y }]
+		}`,
+			out: `@experiment(try), {a: [for x in [1, 2] try {x}], b: [for x in [1, 2] try y=x {y}]}`,
+		}, {
+			desc: "postfix ? operator",
+			in: `{
+			a: b?
+			c: d.x?
+		}`,
+			out: `{a: b?, c: d.x?}`,
 		}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

@@ -74,6 +74,11 @@ Available per-file experiments:
     Spec change:   https://cuelang.org/cl/1221642
     Requires cue fix when upgrading
 
+  try (preview: v0.15.0)
+    try enables the try construct for succinct error handling.
+    Proposal:      https://cuelang.org/issue/4019
+    Spec change:   https://cuelang.org/cl/1221644
+
 
 ## Global Experiments
 

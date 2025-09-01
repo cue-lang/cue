@@ -106,6 +106,7 @@ const (
 	LET // let
 	// experimental
 	FUNC // func
+	TRY  // try
 
 	TRUE  // true
 	FALSE // false

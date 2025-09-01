@@ -131,21 +131,6 @@ const (
 	DevVersion    = EvalV3 // TODO(mvdan): rename to EvalExperiment for consistency with cuecontext
 )
 
-// ListEllipsis reports the list type and remaining elements of a list. If we
-// ever relax the usage of ellipsis, this function will likely change. Using
-// this function will ensure keeping correct behavior or causing a compiler
-// failure.
-func ListEllipsis(n *ast.ListLit) (elts []ast.Expr, e *ast.Ellipsis) {
-	elts = n.Elts
-	if n := len(elts); n > 0 {
-		var ok bool
-		if e, ok = elts[n-1].(*ast.Ellipsis); ok {
-			elts = elts[:n-1]
-		}
-	}
-	return elts, e
-}
-
 // Package finds the package declaration from the preamble of a file.
 func Package(f *ast.File) *ast.Package {
 	for _, d := range f.Decls {

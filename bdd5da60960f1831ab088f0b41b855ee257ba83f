@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5c83861_09d618b2",
+        "filename": "cmd/cue/cmd/fix.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T16:57:50Z",
+      "side": 1,
+      "message": "Forgot to remove it. Done",
+      "parentUuid": "422645db_47bc3972",
+      "revId": "bdd5da60960f1831ab088f0b41b855ee257ba83f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4269166_27962f56",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8e692f4_ce935ec5",
+        "filename": "cmd/cue/cmd/modupgrade.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T16:57:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4269166_27962f56",
+      "revId": "bdd5da60960f1831ab088f0b41b855ee257ba83f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbd31c1d_5edfafa6",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-09-01T13:32:25Z",
       "side": 1,
       "message": "I\u0027m not too sure about using emojis here :) I\u0027d keep it to plaintext, especially as some terminals rendering the future `cue help experiments` may not like it.",
+      "revId": "bdd5da60960f1831ab088f0b41b855ee257ba83f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc1213c1_7aa25898",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T16:57:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbd31c1d_5edfafa6",
       "revId": "bdd5da60960f1831ab088f0b41b855ee257ba83f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

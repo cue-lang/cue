@@ -34,6 +34,24 @@
       "parentUuid": "3de8ba76_a5672346",
       "revId": "7a7259c7bbc067ba67ce2e57e29d2ba330266521",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbd23272_72af45e9",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-01T15:35:27Z",
+      "side": 1,
+      "message": "Ugh. Stoopid backwards compatibility rulez. Boo and hiss.",
+      "parentUuid": "cce0bbf4_216550c3",
+      "revId": "7a7259c7bbc067ba67ce2e57e29d2ba330266521",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

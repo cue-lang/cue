@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "385b7e58_7f65a63f",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f488adb2_344b357a",
+      "revId": "45289dbc56a708886b18a64c158b437eb8f63f01",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bee79841_27326e08",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-01T13:13:38Z",
       "side": 1,
       "message": "should this not be `if slices.Equal(options.exps, []string{\"all\"})`? i.e. I don\u0027t think we need or want to support `Experiments(\"all\", \"foo\")` or `Experiemnts(\"all\", \"all\")`, and likewise for the CLI.\n\nYou can also then avoid the Contains logic below.\n\nOr, put another way - you could handle `all` in the `Experiments` option builder, documenting that it\u0027s only accepted as a lone argument, and have it expand `exps` into the full list of accepted experiments upfront.",
+      "revId": "45289dbc56a708886b18a64c158b437eb8f63f01",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d11b742_6d1dee91",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bee79841_27326e08",
       "revId": "45289dbc56a708886b18a64c158b437eb8f63f01",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -65,6 +101,24 @@
       "writtenOn": "2025-09-01T13:13:38Z",
       "side": 1,
       "message": "join these two `if`s?",
+      "revId": "45289dbc56a708886b18a64c158b437eb8f63f01",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7a0bd59_d826e9a0",
+        "filename": "tools/fix/fixall.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T16:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b23b162_67c673ae",
       "revId": "45289dbc56a708886b18a64c158b437eb8f63f01",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

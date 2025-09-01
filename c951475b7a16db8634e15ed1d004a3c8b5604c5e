@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a5c03fe1_7d2f0fd0",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T16:58:05Z",
+      "side": 0,
+      "message": "Because now it returns an error.",
+      "parentUuid": "d5aa8fe0_8d01c488",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4561ade_388eaacb",
         "filename": "tools/fix/fixall_test.go",
         "patchSetId": 4
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-01T13:13:38Z",
       "side": 0,
       "message": "huh, what was this skip doing here?",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b5f1e57_fe641fcd",
+        "filename": "tools/fix/fixall_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T16:58:05Z",
+      "side": 0,
+      "message": "I think it was there as all fixes were removed before and we are now reintroducing them?",
+      "parentUuid": "f4561ade_388eaacb",
       "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

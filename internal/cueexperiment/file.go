@@ -75,6 +75,12 @@ type File struct {
 	// Proposal:      https://cuelang.org/issue/4014
 	// Spec change:   https://cuelang.org/cl/1222377
 	Self bool `experiment:"preview:v0.15.0"`
+
+	// Try enables the try construct for succinct error handling.
+	//
+	// Proposal:      https://cuelang.org/issue/4019
+	// Spec change:   https://cuelang.org/cl/1221644
+	Try bool `experiment:"preview:v0.15.0"`
 }
 
 // LanguageVersion returns the language version of the file or "" if no language

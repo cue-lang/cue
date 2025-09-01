@@ -134,6 +134,12 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 		Walk(n.Ident, before, after)
 		Walk(n.Expr, before, after)
 
+	case *TryClause:
+		if n.Ident != nil {
+			Walk(n.Ident, before, after)
+			Walk(n.Expr, before, after)
+		}
+
 	case *Alias:
 		Walk(n.Ident, before, after)
 		Walk(n.Expr, before, after)

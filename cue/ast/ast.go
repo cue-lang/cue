@@ -644,6 +644,20 @@ type LetClause struct {
 	decl
 }
 
+// A TryClause node represents a try clause in a comprehension.
+// It supports two forms:
+//   - try            (Ident and Expr are nil)
+//   - try x = expr   (Ident and Expr are non-nil)
+type TryClause struct {
+	Try   token.Pos
+	Ident *Ident    // optional variable binding for the second form
+	Equal token.Pos // position of "=" (only valid if Ident is non-nil)
+	Expr  Expr      // expression for the second form (only valid if Ident is non-nil)
+
+	comments
+	clause
+}
+
 // A ParenExpr node represents a parenthesized expression.
 type ParenExpr struct {
 	Lparen token.Pos // position of "("
@@ -789,6 +803,8 @@ func (x *ForClause) Pos() token.Pos     { return x.For }
 func (x *ForClause) pos() *token.Pos    { return &x.For }
 func (x *IfClause) Pos() token.Pos      { return x.If }
 func (x *IfClause) pos() *token.Pos     { return &x.If }
+func (x *TryClause) Pos() token.Pos     { return x.Try }
+func (x *TryClause) pos() *token.Pos    { return &x.Try }
 func (x *ParenExpr) Pos() token.Pos     { return x.Lparen }
 func (x *ParenExpr) pos() *token.Pos    { return &x.Lparen }
 func (x *SelectorExpr) Pos() token.Pos  { return x.X.Pos() }
@@ -829,9 +845,15 @@ func (x *Ellipsis) End() token.Pos {
 	}
 	return x.Ellipsis.Add(3) // len("...")
 }
-func (x *LetClause) End() token.Pos    { return x.Expr.End() }
-func (x *ForClause) End() token.Pos    { return x.Source.End() }
-func (x *IfClause) End() token.Pos     { return x.Condition.End() }
+func (x *LetClause) End() token.Pos { return x.Expr.End() }
+func (x *ForClause) End() token.Pos { return x.Source.End() }
+func (x *IfClause) End() token.Pos  { return x.Condition.End() }
+func (x *TryClause) End() token.Pos {
+	if x.Expr != nil {
+		return x.Expr.End()
+	}
+	return x.Try.Add(3) // len("try")
+}
 func (x *ParenExpr) End() token.Pos    { return x.Rparen.Add(1) }
 func (x *SelectorExpr) End() token.Pos { return x.Sel.End() }
 func (x *IndexExpr) End() token.Pos    { return x.Rbrack.Add(1) }

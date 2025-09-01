@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "484f8f25_be00fbaa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f42fab0e_b8d6b0f3",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "0ea82d87_c1aa5562",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
@@ -48,6 +66,30 @@
       "writtenOn": "2025-09-01T12:47:02Z",
       "side": 1,
       "message": "nit: inline this var?",
+      "range": {
+        "startLine": 121,
+        "startChar": 2,
+        "endLine": 121,
+        "endChar": 10
+      },
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7fffc30_abc3afe1",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "I kind of like naming the condition, but done.",
+      "parentUuid": "28a1c62a_e59096eb",
       "range": {
         "startLine": 121,
         "startChar": 2,
@@ -104,6 +146,54 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ddffdb0_8e2a8817",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80abe857_33f0b211",
+      "range": {
+        "startLine": 162,
+        "startChar": 45,
+        "endLine": 162,
+        "endChar": 52
+      },
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fc64ef6_1cb401e6",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a152dca5_7f995aa8",
+      "range": {
+        "startLine": 162,
+        "startChar": 66,
+        "endLine": 162,
+        "endChar": 69
+      },
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dc5dbe17_118c2912",
@@ -117,6 +207,30 @@
       "writtenOn": "2025-09-01T12:47:02Z",
       "side": 1,
       "message": "ditto: inline this var",
+      "range": {
+        "startLine": 166,
+        "startChar": 3,
+        "endLine": 166,
+        "endChar": 11
+      },
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3b20c6f_b6f04952",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc5dbe17_118c2912",
       "range": {
         "startLine": 166,
         "startChar": 3,
@@ -144,6 +258,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0af551f4_4e0ac9cc",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fbc9fb2_c64b74f2",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1673265a_04063d07",
@@ -163,6 +295,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f5674345_e969d96c",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "Not really: when upgrading there are always two versions involved. With GetActiveExperiments, the empty version means latest. With upgrade that makes no sense.",
+      "parentUuid": "1673265a_04063d07",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d1f0ce83_f767a6b0",
         "filename": "internal/cueexperiment/file.go",
         "patchSetId": 4
@@ -174,6 +324,24 @@
       "writtenOn": "2025-09-01T12:47:02Z",
       "side": 1,
       "message": "ditto; invert to unindent",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c92ddd6e_7d5b0b51",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1f0ce83_f767a6b0",
       "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -197,6 +365,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "56049d8c_6e8d2410",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "I prefer not to overrun 80 characters.",
+      "parentUuid": "44681808_c52f0ac9",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "31c1519a_96efca96",
         "filename": "internal/cueexperiment/file.go",
         "patchSetId": 4
@@ -208,6 +394,24 @@
       "writtenOn": "2025-09-01T12:47:02Z",
       "side": 1,
       "message": "How about \"Available\" as the name for when an experiment is first introduced and can be turned on? I feel like that\u0027s much clearer. \"since\" is a bit ambiguous - since this version string... what is happening? Also, the other two are also a \"since\" string - \"accepted since\" and \"rejected since\".\n\nAnd of course, update the tags etc.\n\nI\u0027d also find it more intuitive if IsExperimentValid was renamed to IsExperimentAvailable. You even documented it as \"check experiment availability\" :)",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db806e5a_a7228331",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "As agreed: Preview -\u003e ( Stable | Withdrawn )",
+      "parentUuid": "31c1519a_96efca96",
       "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -229,6 +433,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08b4a66d_1eec4b1a",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87624bfb_29c5c06d",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bfa4a93b_2d26d900",
@@ -246,6 +468,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d63d9708_0bf4ef74",
+        "filename": "internal/cueexperiment/file_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "Yep. 🙂",
+      "parentUuid": "bfa4a93b_2d26d900",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee47b01d_7af72c4a",
@@ -259,6 +499,24 @@
       "writtenOn": "2025-09-01T12:47:02Z",
       "side": 1,
       "message": "ditto, use `slices.Equal`",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7aa1f2a_afde9aac",
+        "filename": "internal/cueexperiment/file_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T15:49:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee47b01d_7af72c4a",
       "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

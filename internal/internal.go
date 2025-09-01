@@ -293,16 +293,6 @@ func hasDocComment(comments []*ast.CommentGroup) bool {
 	return false
 }
 
-func NewAttr(name, str string) *ast.Attribute {
-	buf := &strings.Builder{}
-	buf.WriteByte('@')
-	buf.WriteString(name)
-	buf.WriteByte('(')
-	buf.WriteString(str)
-	buf.WriteByte(')')
-	return &ast.Attribute{Text: buf.String()}
-}
-
 // ToExpr converts a node to an expression. If it is a file, it will return
 // it as a struct. If is an expression, it will return it as is. Otherwise
 // it panics.

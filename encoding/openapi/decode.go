@@ -106,7 +106,7 @@ func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 
 	// TODO: do we want to store the OpenAPI version?
 	// if version, _ := v.Lookup("openapi").String(); version != "" {
-	// 	add(internal.NewAttr("openapi", "version="+ version))
+	//  add(&ast.Attribute{Text: fmt.Sprintf("@openapi(version=%s)", version)})
 	// }
 
 	if info := v.LookupPath(cue.MakePath(cue.Str("info"))); info.Exists() {

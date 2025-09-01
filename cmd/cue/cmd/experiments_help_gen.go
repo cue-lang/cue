@@ -66,6 +66,11 @@ Available per-file experiments:
     Proposal:      https://cuelang.org/issue/4014
     Spec change:   https://cuelang.org/cl/1222377
 
+  try (preview: v0.15.0)
+    try enables the try construct for succinct error handling.
+    Proposal:      https://cuelang.org/issue/4019
+    Spec change:   https://cuelang.org/cl/1221644
+
 
 ## Global Experiments
 

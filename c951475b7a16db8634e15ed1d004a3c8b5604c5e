@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dbf80f76_81c3a5ef",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T17:10:24Z",
+      "side": 0,
+      "message": "Yes, but the caller still panics.",
+      "parentUuid": "a5c03fe1_7d2f0fd0",
+      "revId": "c951475b7a16db8634e15ed1d004a3c8b5604c5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4561ade_388eaacb",
         "filename": "tools/fix/fixall_test.go",
         "patchSetId": 4

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c090baf_5a518f42",
+        "filename": "internal/cmd/cue-ast/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-01T12:03:51Z",
+      "side": 1,
+      "message": "perhaps leave a small note comment here, saying that showing a partially bad syntax tree is still useful for e.g. LSP development?",
+      "revId": "a8a1d598831737eb6f2d64c1bdf605ee998e8894",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

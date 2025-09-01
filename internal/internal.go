@@ -28,7 +28,6 @@ import (
 	"github.com/cockroachdb/apd/v3"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/token"
 )
 
@@ -147,31 +146,6 @@ func Package(f *ast.File) *ast.Package {
 		}
 	}
 	return nil
-}
-
-func SetPackage(f *ast.File, name string, overwrite bool) {
-	if pkg := Package(f); pkg != nil {
-		if !overwrite || pkg.Name.Name == name {
-			return
-		}
-		ident := ast.NewIdent(name)
-		astutil.CopyMeta(ident, pkg.Name)
-		return
-	}
-
-	decls := make([]ast.Decl, len(f.Decls)+1)
-	k := 0
-	for _, d := range f.Decls {
-		if _, ok := d.(*ast.CommentGroup); ok {
-			decls[k] = d
-			k++
-			continue
-		}
-		break
-	}
-	decls[k] = &ast.Package{Name: ast.NewIdent(name)}
-	copy(decls[k+1:], f.Decls[k:])
-	f.Decls = decls
 }
 
 // NewComment creates a new CommentGroup from the given text.

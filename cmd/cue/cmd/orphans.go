@@ -135,7 +135,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 		if !b.useList && len(b.path) == 0 && !b.useContext {
 			for _, f := range objs {
 				if pkg := b.encConfig.PkgName; pkg != "" {
-					internal.SetPackage(f, pkg, false)
+					setPackage(f, pkg, false)
 				}
 				files = append(files, f)
 			}
@@ -157,6 +157,31 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 		}
 	}
 	return nil
+}
+
+func setPackage(f *ast.File, name string, overwrite bool) {
+	if pkg := internal.Package(f); pkg != nil {
+		if !overwrite || pkg.Name.Name == name {
+			return
+		}
+		ident := ast.NewIdent(name)
+		astutil.CopyMeta(ident, pkg.Name)
+		return
+	}
+
+	decls := make([]ast.Decl, len(f.Decls)+1)
+	k := 0
+	for _, d := range f.Decls {
+		if _, ok := d.(*ast.CommentGroup); ok {
+			decls[k] = d
+			k++
+			continue
+		}
+		break
+	}
+	decls[k] = &ast.Package{Name: ast.NewIdent(name)}
+	copy(decls[k+1:], f.Decls[k:])
+	f.Decls = decls
 }
 
 func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.File) (*ast.File, error) {
@@ -288,7 +313,7 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 	}
 
 	if pkg != "" {
-		internal.SetPackage(f, pkg, false)
+		setPackage(f, pkg, false)
 	}
 
 	if b.useList {

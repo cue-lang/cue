@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3057155c_75200e11",
+        "filename": "encoding/protobuf/parse.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 727,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-01T13:46:17Z",
+      "side": 1,
+      "message": "Hmm, is this really necessary? ILLEGAL is the zero value. It looks to me like parseField() doesn\u0027t set the Constraint field, so I think it should already be ILLEGAL.",
+      "revId": "900eefd2550e754cd28d8b713ad45045f18c3651",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07092571_8047628b",
+        "filename": "internal/encoding/yaml/encode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-01T13:46:17Z",
+      "side": 1,
+      "message": "either the test or the error message isn\u0027t quite right here. The test will catch required fields too.",
+      "revId": "900eefd2550e754cd28d8b713ad45045f18c3651",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

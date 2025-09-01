@@ -90,10 +90,12 @@ See 'cue help inputs' as well.
 				}
 				astf, err := parser.ParseFile(f, data, parser.ParseComments)
 				if err != nil {
-					log.Fatal(errors.Details(err, nil))
+					log.Println(errors.Details(err, nil))
 				}
-				out := astinternal.AppendDebug(nil, astf, cfg)
-				os.Stdout.Write(out)
+				if astf != nil {
+					out := astinternal.AppendDebug(nil, astf, cfg)
+					os.Stdout.Write(out)
+				}
 			}
 			return
 		}

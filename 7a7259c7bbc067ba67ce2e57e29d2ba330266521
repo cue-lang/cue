@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3de8ba76_a5672346",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-01T15:24:46Z",
+      "side": 1,
+      "message": "I actually wonder if these should be in astutil/util.go. It\u0027s more likely to get found in there?",
+      "revId": "7a7259c7bbc067ba67ce2e57e29d2ba330266521",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

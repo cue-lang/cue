@@ -345,6 +345,15 @@ func DebugStr(x interface{}) (out string) {
 		out += DebugStr(v.Expr)
 		return out
 
+	case *ast.TryClause:
+		out := "try"
+		if v.Ident != nil {
+			out += " " + DebugStr(v.Ident)
+			out += "="
+			out += DebugStr(v.Expr)
+		}
+		return out
+
 	case *ast.Alias:
 		out := DebugStr(v.Ident)
 		out += "="

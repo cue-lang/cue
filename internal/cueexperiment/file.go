@@ -70,6 +70,13 @@ type File struct {
 	// Spec change:   https://cuelang.org/cl/1221642
 	// Needs cue fix: ✅
 	ExplicitOpen bool `experiment:"since:v0.15.0"`
+
+	// Try enables the try construct for succinct error handling.
+	//
+	// Proposal:      https://cue-lang/cue#4019
+	// Spec change:   https://cuelang.org/cl/1221644
+	// Needs cue fix: ❌
+	Try bool `experiment:"since:v0.15.0"`
 }
 
 // LanguageVersion returns the language version of the file or "" if no language

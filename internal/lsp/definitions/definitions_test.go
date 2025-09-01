@@ -270,6 +270,42 @@ z: a: 4`,
 		},
 
 		{
+			name: "Ellipsis_Explicit",
+			archive: `-- a.cue --
+l: [...{x: int}]
+d: l & [{x: 3}, {x: 4}]
+`,
+			expectations: map[*position][]*position{
+				ln(2, 1, "l"): {ln(1, 1, "l")},
+
+				ln(1, 1, "l"): {self},
+				ln(1, 1, "x"): {self},
+
+				ln(2, 1, "d"): {self},
+				ln(2, 1, "x"): {self, ln(1, 1, "x")},
+				ln(2, 2, "x"): {self, ln(1, 1, "x")},
+			},
+		},
+
+		{
+			name: "Ellipsis_Implicit",
+			archive: `-- a.cue --
+d: [...{x: int}]
+d: [{x: 3}, {x: 4}]
+`,
+			expectations: map[*position][]*position{
+				ln(1, 1, "d"): {self, ln(2, 1, "d")},
+				ln(1, 1, "x"): {self},
+
+				ln(2, 1, "d"): {self, ln(1, 1, "d")},
+				// This is incorrect: these x fields should also resolve
+				// to the x field in the ellipsis.
+				ln(2, 1, "x"): {self},
+				ln(2, 2, "x"): {self},
+			},
+		},
+
+		{
 			name: "List_Index_Ellipsis_Mixed",
 			archive: `-- a.cue --
 x: [{a: 5}, {b: 6}, ...{a: 4}]

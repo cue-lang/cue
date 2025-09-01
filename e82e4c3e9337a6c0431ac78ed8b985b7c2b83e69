@@ -16,6 +16,24 @@
       "message": "does this belong in another CL?",
       "revId": "e82e4c3e9337a6c0431ac78ed8b985b7c2b83e69",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f05ac0de_198c5492",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1769,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-01T14:19:01Z",
+      "side": 1,
+      "message": "This was done to avoid a panic that the tests unveiled:\n\nbasically, exp could be nil, which means experiments wasn\u0027t set, which caused a crash when checking if an experiment is on.",
+      "parentUuid": "b4461966_55191fc6",
+      "revId": "e82e4c3e9337a6c0431ac78ed8b985b7c2b83e69",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

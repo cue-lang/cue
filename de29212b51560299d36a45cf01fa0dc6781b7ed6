@@ -33,6 +33,24 @@
       "message": "This has gone back to a slice, because in `maybeAddCompletion`, we need to \"make progress\" to avoid an infinite loop. This means that e.g. for a structlit, we need to start the new astNode with just the elements of structlit and not the structlit itself, so that we don\u0027t loop, calling `maybeAddCompletion`. Making this change causes `newAstNode` and associated methods to have their args swapped around so the last arg can become variadic.",
       "revId": "de29212b51560299d36a45cf01fa0dc6781b7ed6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd9789f9_4d787481",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 508,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-02T10:01:40Z",
+      "side": 1,
+      "message": "This became unnecessary and was undone in a later patchset.",
+      "parentUuid": "7a86efad_093709c3",
+      "revId": "de29212b51560299d36a45cf01fa0dc6781b7ed6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

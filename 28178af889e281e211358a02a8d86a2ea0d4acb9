@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "377d8ade_edebb071",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 2202,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-02T09:26:11Z",
+      "side": 1,
+      "message": "nit: avoid the braces for consistency with the other `openA` declaration?",
+      "revId": "28178af889e281e211358a02a8d86a2ea0d4acb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1f2c306_003ef37f",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 2748,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-02T09:26:11Z",
+      "side": 1,
+      "message": "typo?",
+      "range": {
+        "startLine": 2748,
+        "startChar": 55,
+        "endLine": 2748,
+        "endChar": 57
+      },
+      "revId": "28178af889e281e211358a02a8d86a2ea0d4acb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "113fcd27_3b35a0b6",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 2749,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-02T09:26:11Z",
+      "side": 1,
+      "message": "a fully?",
+      "range": {
+        "startLine": 2749,
+        "startChar": 19,
+        "endLine": 2749,
+        "endChar": 24
+      },
+      "revId": "28178af889e281e211358a02a8d86a2ea0d4acb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40e51216_6dc1033e",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-02T12:22:46Z",
+      "side": 1,
+      "message": "Note that although I try hard here to order the completions with fields first, then embeds (SortText really is a *text* field that gets lexicographically sorted...), there is no requirement that editors actually follow this ordering. Both emacs and intellij do not.",
+      "revId": "b3627c871944f5a51428406d13491b5840604f9f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

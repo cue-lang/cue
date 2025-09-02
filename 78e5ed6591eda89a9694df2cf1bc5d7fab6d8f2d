@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5af9d93f_095c1642",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-02T13:15:09Z",
+      "side": 1,
+      "message": "Do not submit until the proposal is accepted.",
+      "revId": "78e5ed6591eda89a9694df2cf1bc5d7fab6d8f2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -46,10 +46,6 @@
       "Bash(go test -run:*)",
       "Bash(go test -race:*)",
       "Bash(go vet:*)"
-    ],
-    "deny": [
-      "Bash(go:* -exec*)",
-      "Bash(go:* -toolexec*)"
     ]
   }
 }

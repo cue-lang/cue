@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad0083e2_a0745feb",
+        "filename": "cue/ast/astutil/apply.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-02T08:49:41Z",
+      "side": 1,
+      "message": "call this Modified to be a bit more direct?\n\nAlso, surely this should also work with InsertBefore, InsertAfter, and Delete? it seems to only be implemented for Replace",
+      "revId": "a42f6b900474399b46a7af1c1730f22a51d70f8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26e1279d_1cfee7b7",
+        "filename": "cue/format/node.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 623,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-02T08:49:41Z",
+      "side": 1,
+      "message": "this change seems unrelated and isn\u0027t being mentioned in the commit message at all",
+      "revId": "a42f6b900474399b46a7af1c1730f22a51d70f8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

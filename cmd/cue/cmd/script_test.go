@@ -50,6 +50,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/semver"
@@ -354,6 +355,10 @@ func TestScript(t *testing.T) {
 // Usage Comment out t.Skip() and set file to test.
 func TestX(t *testing.T) {
 	t.Skip()
+	// adt.OpenGraphs = true
+	// adt.DebugDeps = true
+	cuedebug.Init()
+	cuedebug.Flags.LogEval = 1
 	const path = "./testdata/script/eval_e.txtar"
 
 	check := func(err error) {

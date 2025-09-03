@@ -63,6 +63,15 @@ func (cc *cycleChecker) isCyclic(t *Task) bool {
 }
 
 func (cc *cycleChecker) addCycleError(start *Task) {
+	// If any task in the cycle is marked as a service, don't report
+	// the error. This allows services like http.Serve to have bidirectional
+	// references with other tasks that read from request fields.
+	for _, t := range cc.stack {
+		if t.isService {
+			return
+		}
+	}
+
 	err := &cycleError{}
 
 	for _, t := range cc.stack {

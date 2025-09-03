@@ -1,0 +1,958 @@
+-- in.cue --
+import (
+	"encoding/json"
+	"encoding/openapi"
+)
+
+// Basic schema marshaling test
+basic: {
+	config: openapi.Config & {
+		info: {
+			title:   "Test API"
+			version: "1.0.0"
+		}
+	}
+	version: "3.0.0"
+	schema: {
+		#User: {
+			name: string
+			age:  int
+		}
+	}
+	result: json.Indent(openapi.MarshalSchema(config, version, schema), "", "  ")
+}
+
+// Self-contained schema test
+selfContained: {
+	config: openapi.Config & {
+		info: {
+			title:   "Test API"
+			version: "1.0.0"
+		}
+		selfContained: true
+	}
+	version: "3.0.0"
+	schema: {
+		#Person: {
+			name:    string
+			address: #Address
+		}
+		#Address: {
+			street: string
+			city:   string
+		}
+	}
+	result: json.Indent(openapi.MarshalSchema(config, version, schema), "", "  ")
+}
+
+// Expand references test
+expandReferences: {
+	config: openapi.Config & {
+		info: {
+			title:   "Test API"
+			version: "1.0.0"
+		}
+		expandReferences: true
+	}
+	version: "3.0.0"
+	schema: {
+		#Product: {
+			id:          int
+			name:        string
+			category:    #Category
+			subcategory: #Category
+		}
+		#Category: {
+			name: string
+			id:   int
+		}
+	}
+	result: json.Indent(openapi.MarshalSchema(config, version, schema), "", "  ")
+}
+
+// Test with constraints and validation
+constraints: {
+	config: openapi.Config & {
+		info: {
+			title:   "Validation API"
+			version: "1.0.0"
+		}
+	}
+	version: "3.0.0"
+	schema: {
+		#User: {
+			name:  string & len(_) > 0
+			age:   int & >=0 & <=120
+			email: string & =~"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+		}
+	}
+	result: json.Indent(openapi.MarshalSchema(config, version, schema), "", "  ")
+}
+
+// Test with optional and required fields
+optional: {
+	config: openapi.Config & {
+		info: {
+			title:   "Optional Fields API"
+			version: "1.0.0"
+		}
+	}
+	version: "3.0.0"
+	schema: {
+		#User: {
+			name!:     string
+			age?:      int
+			email?:    string
+			metadata?: {...}
+		}
+	}
+	result: json.Indent(openapi.MarshalSchema(config, version, schema), "", "  ")
+}
+
+// Test with arrays and objects
+collections: {
+	config: openapi.Config & {
+		info: {
+			title:   "Collections API"
+			version: "1.0.0"
+		}
+	}
+	version: "3.0.0"
+	schema: {
+		#UserList: {
+			users: [...#User]
+			total: int
+		}
+		#User: {
+			id:   int
+			name: string
+			tags: [...string]
+		}
+	}
+	result: json.Indent(openapi.MarshalSchema(config, version, schema), "", "  ")
+}
+
+// Test with enums and unions
+enums: {
+	config: openapi.Config & {
+		info: {
+			title:   "Enums API"
+			version: "1.0.0"
+		}
+	}
+	version: "3.0.0"
+	schema: {
+		#Status: "active" | "inactive" | "pending"
+		#Priority: 1 | 2 | 3
+		#Task: {
+			id:       int
+			status:   #Status
+			priority: #Priority
+		}
+	}
+	result: json.Indent(openapi.MarshalSchema(config, version, schema), "", "  ")
+}
+
+// Test error handling - invalid version
+invalidVersion: {
+	config: openapi.Config & {
+		info: {
+			title:   "Test API"
+			version: "1.0.0"
+		}
+	}
+	version: "invalid.version"
+	schema: {
+		#User: {
+			name: string
+		}
+	}
+	result: json.Indent(openapi.MarshalSchema(config, version, schema), "", "  ")
+}
+
+// Test minimal config
+minimal: {
+	config: openapi.Config & {
+		info: {
+			title:   "Minimal API"
+			version: "1.0"
+		}
+	}
+	version: "3.0.0"
+	schema: {
+		#Simple: {
+			value: string
+		}
+	}
+	result: json.Indent(openapi.MarshalSchema(config, version, schema), "", "  ")
+}
+
+// Test with nested structures
+nested: {
+	config: openapi.Config & {
+		info: {
+			title:   "Nested API"
+			version: "1.0.0"
+		}
+	}
+	version: "3.0.0"
+	schema: {
+		#Company: {
+			name: string
+			departments: [...#Department]
+		}
+		#Department: {
+			name: string
+			manager: #Employee
+			employees: [...#Employee]
+		}
+		#Employee: {
+			id:       int
+			name:     string
+			position: string
+		}
+	}
+	result: json.Indent(openapi.MarshalSchema(config, version, schema), "", "  ")
+}
+-- out/openapi-v3 --
+Errors:
+invalidVersion.result: error in call to encoding/openapi.MarshalSchema: unsupported version invalid.version:
+    ./in.cue:169:22
+
+Result:
+import (
+	"encoding/json"
+	"encoding/openapi"
+)
+
+// Basic schema marshaling test
+basic: {
+	config: {
+		info: {
+			title:   "Test API"
+			version: "1.0.0"
+		}
+		selfContained:    *false | bool
+		expandReferences: *false | bool
+	}
+	version: "3.0.0"
+	schema: {
+		#User: {
+			name: string
+			age:  int
+		}
+	}
+	result: """
+		{
+		  "openapi": "3.0.0",
+		  "info": {
+		    "title": "Test API",
+		    "version": "1.0.0"
+		  },
+		  "paths": {},
+		  "components": {
+		    "schemas": {
+		      "User": {
+		        "type": "object",
+		        "required": [
+		          "name",
+		          "age"
+		        ],
+		        "properties": {
+		          "name": {
+		            "type": "string"
+		          },
+		          "age": {
+		            "type": "integer"
+		          }
+		        }
+		      }
+		    }
+		  }
+		}
+		"""
+}
+
+// Self-contained schema test
+selfContained: {
+	config: {
+		info: {
+			title:   "Test API"
+			version: "1.0.0"
+		}
+		selfContained:    true
+		expandReferences: *false | bool
+	}
+	version: "3.0.0"
+	schema: {
+		#Person: {
+			name: string
+			address: {
+				street: string
+				city:   string
+			}
+		}
+		#Address: {
+			street: string
+			city:   string
+		}
+	}
+	result: """
+		{
+		  "openapi": "3.0.0",
+		  "info": {
+		    "title": "Test API",
+		    "version": "1.0.0"
+		  },
+		  "paths": {},
+		  "components": {
+		    "schemas": {
+		      "Address": {
+		        "type": "object",
+		        "required": [
+		          "street",
+		          "city"
+		        ],
+		        "properties": {
+		          "street": {
+		            "type": "string"
+		          },
+		          "city": {
+		            "type": "string"
+		          }
+		        }
+		      },
+		      "Person": {
+		        "type": "object",
+		        "required": [
+		          "name",
+		          "address"
+		        ],
+		        "properties": {
+		          "name": {
+		            "type": "string"
+		          },
+		          "address": {
+		            "$ref": "#/components/schemas/selfContained.schema.Address"
+		          }
+		        }
+		      },
+		      "selfContained.schema.Address": {
+		        "type": "object",
+		        "required": [
+		          "street",
+		          "city"
+		        ],
+		        "properties": {
+		          "street": {
+		            "type": "string"
+		          },
+		          "city": {
+		            "type": "string"
+		          }
+		        }
+		      }
+		    }
+		  }
+		}
+		"""
+}
+
+// Expand references test
+expandReferences: {
+	config: {
+		info: {
+			title:   "Test API"
+			version: "1.0.0"
+		}
+		selfContained:    *false | bool
+		expandReferences: true
+	}
+	version: "3.0.0"
+	schema: {
+		#Product: {
+			id:   int
+			name: string
+			category: {
+				name: string
+				id:   int
+			}
+			subcategory: {
+				name: string
+				id:   int
+			}
+		}
+		#Category: {
+			name: string
+			id:   int
+		}
+	}
+	result: """
+		{
+		  "openapi": "3.0.0",
+		  "info": {
+		    "title": "Test API",
+		    "version": "1.0.0"
+		  },
+		  "paths": {},
+		  "components": {
+		    "schemas": {
+		      "Category": {
+		        "type": "object",
+		        "required": [
+		          "name",
+		          "id"
+		        ],
+		        "properties": {
+		          "name": {
+		            "type": "string"
+		          },
+		          "id": {
+		            "type": "integer"
+		          }
+		        }
+		      },
+		      "Product": {
+		        "type": "object",
+		        "required": [
+		          "id",
+		          "name",
+		          "category",
+		          "subcategory"
+		        ],
+		        "properties": {
+		          "id": {
+		            "type": "integer"
+		          },
+		          "name": {
+		            "type": "string"
+		          },
+		          "category": {
+		            "type": "object",
+		            "required": [
+		              "name",
+		              "id"
+		            ],
+		            "properties": {
+		              "name": {
+		                "type": "string"
+		              },
+		              "id": {
+		                "type": "integer"
+		              }
+		            }
+		          },
+		          "subcategory": {
+		            "type": "object",
+		            "required": [
+		              "name",
+		              "id"
+		            ],
+		            "properties": {
+		              "name": {
+		                "type": "string"
+		              },
+		              "id": {
+		                "type": "integer"
+		              }
+		            }
+		          }
+		        }
+		      }
+		    }
+		  }
+		}
+		"""
+}
+
+// Test with constraints and validation
+constraints: {
+	config: {
+		info: {
+			title:   "Validation API"
+			version: "1.0.0"
+		}
+		selfContained:    *false | bool
+		expandReferences: *false | bool
+	}
+	version: "3.0.0"
+	schema: {
+		#User: {
+			name:  string & len(_) > 0
+			age:   uint & <=120
+			email: =~"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+		}
+	}
+	result: json.Indent(openapi.MarshalSchema(config, version, schema), "", "  ")
+}
+
+// Test with optional and required fields
+optional: {
+	config: {
+		info: {
+			title:   "Optional Fields API"
+			version: "1.0.0"
+		}
+		selfContained:    *false | bool
+		expandReferences: *false | bool
+	}
+	version: "3.0.0"
+	schema: {
+		#User: {
+			name!:  string
+			age?:   int
+			email?: string
+			metadata?: {}
+		}
+	}
+	result: """
+		{
+		  "openapi": "3.0.0",
+		  "info": {
+		    "title": "Optional Fields API",
+		    "version": "1.0.0"
+		  },
+		  "paths": {},
+		  "components": {
+		    "schemas": {
+		      "User": {
+		        "type": "object",
+		        "required": [
+		          "name"
+		        ],
+		        "properties": {
+		          "name": {
+		            "type": "string"
+		          },
+		          "age": {
+		            "type": "integer"
+		          },
+		          "email": {
+		            "type": "string"
+		          },
+		          "metadata": {
+		            "type": "object"
+		          }
+		        }
+		      }
+		    }
+		  }
+		}
+		"""
+}
+
+// Test with arrays and objects
+collections: {
+	config: {
+		info: {
+			title:   "Collections API"
+			version: "1.0.0"
+		}
+		selfContained:    *false | bool
+		expandReferences: *false | bool
+	}
+	version: "3.0.0"
+	schema: {
+		#UserList: {
+			users: [...{
+				id:   int
+				name: string
+				tags: [...string]
+			}]
+			total: int
+		}
+		#User: {
+			id:   int
+			name: string
+			tags: [...string]
+		}
+	}
+	result: """
+		{
+		  "openapi": "3.0.0",
+		  "info": {
+		    "title": "Collections API",
+		    "version": "1.0.0"
+		  },
+		  "paths": {},
+		  "components": {
+		    "schemas": {
+		      "User": {
+		        "type": "object",
+		        "required": [
+		          "id",
+		          "name",
+		          "tags"
+		        ],
+		        "properties": {
+		          "id": {
+		            "type": "integer"
+		          },
+		          "name": {
+		            "type": "string"
+		          },
+		          "tags": {
+		            "type": "array",
+		            "items": {
+		              "type": "string"
+		            }
+		          }
+		        }
+		      },
+		      "UserList": {
+		        "type": "object",
+		        "required": [
+		          "users",
+		          "total"
+		        ],
+		        "properties": {
+		          "users": {
+		            "type": "array",
+		            "items": {
+		              "$ref": "#/components/schemas/collections.schema.User"
+		            }
+		          },
+		          "total": {
+		            "type": "integer"
+		          }
+		        }
+		      },
+		      "collections.schema.User": {
+		        "type": "object",
+		        "required": [
+		          "id",
+		          "name",
+		          "tags"
+		        ],
+		        "properties": {
+		          "id": {
+		            "type": "integer"
+		          },
+		          "name": {
+		            "type": "string"
+		          },
+		          "tags": {
+		            "type": "array",
+		            "items": {
+		              "type": "string"
+		            }
+		          }
+		        }
+		      }
+		    }
+		  }
+		}
+		"""
+}
+
+// Test with enums and unions
+enums: {
+	config: {
+		info: {
+			title:   "Enums API"
+			version: "1.0.0"
+		}
+		selfContained:    *false | bool
+		expandReferences: *false | bool
+	}
+	version: "3.0.0"
+	schema: {
+		#Status:   "active" | "inactive" | "pending"
+		#Priority: 1 | 2 | 3
+		#Task: {
+			id:       int
+			status:   "active" | "inactive" | "pending"
+			priority: 1 | 2 | 3
+		}
+	}
+	result: """
+		{
+		  "openapi": "3.0.0",
+		  "info": {
+		    "title": "Enums API",
+		    "version": "1.0.0"
+		  },
+		  "paths": {},
+		  "components": {
+		    "schemas": {
+		      "Priority": {
+		        "type": "integer",
+		        "enum": [
+		          1,
+		          2,
+		          3
+		        ]
+		      },
+		      "Status": {
+		        "type": "string",
+		        "enum": [
+		          "active",
+		          "inactive",
+		          "pending"
+		        ]
+		      },
+		      "Task": {
+		        "type": "object",
+		        "required": [
+		          "id",
+		          "status",
+		          "priority"
+		        ],
+		        "properties": {
+		          "id": {
+		            "type": "integer"
+		          },
+		          "status": {
+		            "$ref": "#/components/schemas/enums.schema.Status"
+		          },
+		          "priority": {
+		            "$ref": "#/components/schemas/enums.schema.Priority"
+		          }
+		        }
+		      },
+		      "enums.schema.Priority": {
+		        "type": "integer",
+		        "enum": [
+		          1,
+		          2,
+		          3
+		        ]
+		      },
+		      "enums.schema.Status": {
+		        "type": "string",
+		        "enum": [
+		          "active",
+		          "inactive",
+		          "pending"
+		        ]
+		      }
+		    }
+		  }
+		}
+		"""
+}
+
+// Test error handling - invalid version
+invalidVersion: {
+	config: {
+		info: {
+			title:   "Test API"
+			version: "1.0.0"
+		}
+		selfContained:    *false | bool
+		expandReferences: *false | bool
+	}
+	version: "invalid.version"
+	schema: {
+		#User: {
+			name: string
+		}
+	}
+	result: _|_ // invalidVersion.result: error in call to encoding/openapi.MarshalSchema: unsupported version invalid.version
+}
+
+// Test minimal config
+minimal: {
+	config: {
+		info: {
+			title:   "Minimal API"
+			version: "1.0"
+		}
+		selfContained:    *false | bool
+		expandReferences: *false | bool
+	}
+	version: "3.0.0"
+	schema: {
+		#Simple: {
+			value: string
+		}
+	}
+	result: """
+		{
+		  "openapi": "3.0.0",
+		  "info": {
+		    "title": "Minimal API",
+		    "version": "1.0"
+		  },
+		  "paths": {},
+		  "components": {
+		    "schemas": {
+		      "Simple": {
+		        "type": "object",
+		        "required": [
+		          "value"
+		        ],
+		        "properties": {
+		          "value": {
+		            "type": "string"
+		          }
+		        }
+		      }
+		    }
+		  }
+		}
+		"""
+}
+
+// Test with nested structures
+nested: {
+	config: {
+		info: {
+			title:   "Nested API"
+			version: "1.0.0"
+		}
+		selfContained:    *false | bool
+		expandReferences: *false | bool
+	}
+	version: "3.0.0"
+	schema: {
+		#Company: {
+			name: string
+			departments: [...{
+				name: string
+				manager: {
+					id:       int
+					name:     string
+					position: string
+				}
+				employees: [...{
+					id:       int
+					name:     string
+					position: string
+				}]
+			}]
+		}
+		#Department: {
+			name: string
+			manager: {
+				id:       int
+				name:     string
+				position: string
+			}
+			employees: [...{
+				id:       int
+				name:     string
+				position: string
+			}]
+		}
+		#Employee: {
+			id:       int
+			name:     string
+			position: string
+		}
+	}
+	result: """
+		{
+		  "openapi": "3.0.0",
+		  "info": {
+		    "title": "Nested API",
+		    "version": "1.0.0"
+		  },
+		  "paths": {},
+		  "components": {
+		    "schemas": {
+		      "Company": {
+		        "type": "object",
+		        "required": [
+		          "name",
+		          "departments"
+		        ],
+		        "properties": {
+		          "name": {
+		            "type": "string"
+		          },
+		          "departments": {
+		            "type": "array",
+		            "items": {
+		              "$ref": "#/components/schemas/nested.schema.Department"
+		            }
+		          }
+		        }
+		      },
+		      "Department": {
+		        "type": "object",
+		        "required": [
+		          "name",
+		          "manager",
+		          "employees"
+		        ],
+		        "properties": {
+		          "name": {
+		            "type": "string"
+		          },
+		          "manager": {
+		            "$ref": "#/components/schemas/nested.schema.Employee"
+		          },
+		          "employees": {
+		            "type": "array",
+		            "items": {
+		              "$ref": "#/components/schemas/nested.schema.Employee"
+		            }
+		          }
+		        }
+		      },
+		      "Employee": {
+		        "type": "object",
+		        "required": [
+		          "id",
+		          "name",
+		          "position"
+		        ],
+		        "properties": {
+		          "id": {
+		            "type": "integer"
+		          },
+		          "name": {
+		            "type": "string"
+		          },
+		          "position": {
+		            "type": "string"
+		          }
+		        }
+		      },
+		      "nested.schema.Department": {
+		        "type": "object",
+		        "required": [
+		          "name",
+		          "manager",
+		          "employees"
+		        ],
+		        "properties": {
+		          "name": {
+		            "type": "string"
+		          },
+		          "manager": {
+		            "$ref": "#/components/schemas/nested.schema.Employee"
+		          },
+		          "employees": {
+		            "type": "array",
+		            "items": {
+		              "$ref": "#/components/schemas/nested.schema.Employee"
+		            }
+		          }
+		        }
+		      },
+		      "nested.schema.Employee": {
+		        "type": "object",
+		        "required": [
+		          "id",
+		          "name",
+		          "position"
+		        ],
+		        "properties": {
+		          "id": {
+		            "type": "integer"
+		          },
+		          "name": {
+		            "type": "string"
+		          },
+		          "position": {
+		            "type": "string"
+		          }
+		        }
+		      }
+		    }
+		  }
+		}
+		"""
+}

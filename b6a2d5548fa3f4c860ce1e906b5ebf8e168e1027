@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "131b1dd9_e2d6f621",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-03T14:25:09Z",
+      "side": 1,
+      "message": "what about following append\u0027s own syntax, i.e. taking `...Selector` rather than `Selector`? I see little reason to restrict to just one value.",
+      "revId": "b6a2d5548fa3f4c860ce1e906b5ebf8e168e1027",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

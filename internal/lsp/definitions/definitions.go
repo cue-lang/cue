@@ -427,6 +427,31 @@ func (fdfns *FileDefinitions) DefinitionsForOffset(offset int) []ast.Node {
 	return nodes
 }
 
+// DocCommentsForOffset is very similar to DefinitionsForOffset. It
+// reports the doc comments associated with then definitions that the
+// file offset (number of bytes from the start of the file) resolves
+// to.
+func (fdfns *FileDefinitions) DocCommentsForOffset(offset int) map[ast.Node][]*ast.CommentGroup {
+	definitions := fdfns.definitions
+	navs, found := definitions[offset]
+	if !found {
+		definitions[offset] = []*navigableBindings{}
+		fdfns.evalForOffset(offset)
+		navs = definitions[offset]
+	}
+
+	commentsMap := make(map[ast.Node][]*ast.CommentGroup)
+	for _, nav := range navs {
+		for _, n := range nav.contributingNodes {
+			if n.key != nil && len(n.docComments) > 0 {
+				commentsMap[n.key] = n.docComments
+			}
+		}
+	}
+
+	return commentsMap
+}
+
 // CompletionsForOffset reports the set of strings that can form a new
 // path element following the path element indicated by the offset
 // (number of bytes from the start of the file).
@@ -585,6 +610,7 @@ type astNode struct {
 	// fieldsAllowed. Within a ListLit, for example, fields are not
 	// allowed..
 	fieldsAllowed bool
+	docComments   []*ast.CommentGroup
 }
 
 // newAstNode creates a new [astNodes] which is a child of the current
@@ -851,7 +877,8 @@ func (n *astNode) eval() {
 			// Package declarations must be added to the pkgDecls
 			// navigable, so that they can all be found when resolving
 			// imports of this package, in some other package.
-			n.newAstNode(node, nil, n.dfns.pkgDecls)
+			child := n.newAstNode(node, nil, n.dfns.pkgDecls)
+			child.addDocComments(node)
 
 		case *ast.ImportDecl:
 			for _, spec := range node.Specs {
@@ -1086,6 +1113,8 @@ func (n *astNode) eval() {
 			default:
 				binding = n.newAstNode(label, node.Value, nil)
 			}
+
+			binding.addDocComments(node)
 
 			if isAlias {
 				switch alias.Expr.(type) {
@@ -1427,6 +1456,16 @@ func (n *astNode) appendBinding(name string, binding *astNode) {
 		n.bindings = make(map[string][]*astNode)
 	}
 	n.bindings[name] = append(n.bindings[name], binding)
+}
+
+func (n *astNode) addDocComments(node ast.Node) {
+	var comments []*ast.CommentGroup
+	for _, group := range ast.Comments(node) {
+		if group.Doc && len(group.List) > 0 && group.List[0].Pos().Before(node.Pos()) {
+			comments = append(comments, group)
+		}
+	}
+	n.docComments = comments
 }
 
 // fieldDeclExpr is a temporary representation of a field

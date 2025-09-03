@@ -90,10 +90,6 @@ func (s *server) FoldingRange(ctx context.Context, params *protocol.FoldingRange
 	return nil, notImplemented("FoldingRange")
 }
 
-func (s *server) Hover(ctx context.Context, params *protocol.HoverParams) (_ *protocol.Hover, rerr error) {
-	return nil, notImplemented("Hover")
-}
-
 func (s *server) Implementation(ctx context.Context, params *protocol.ImplementationParams) (_ []protocol.Location, rerr error) {
 	return nil, notImplemented("Implementation")
 }

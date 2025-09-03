@@ -223,31 +223,19 @@ func (pkg *Package) setStatus(status status) {
 // ast nodes, and returns the positions of the definitions of those
 // nodes.
 func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) []protocol.Location {
-	dfns := pkg.definitions
-	if dfns == nil {
+	tokFile, fdfns, srcMapper := pkg.definitionsForPosition(uri)
+	if tokFile == nil {
 		return nil
 	}
 
 	w := pkg.module.workspace
 	mappers := w.mappers
 
-	fdfns := dfns.ForFile(uri.Path())
-	if fdfns == nil {
-		w.debugLog("file not found")
-		return nil
-	}
-
-	srcMapper := mappers[fdfns.File.Pos().File()]
-	if srcMapper == nil {
-		w.debugLog("mapper not found: " + string(uri))
-		return nil
-	}
-
 	var targets []ast.Node
-	// If ForOffset returns no results, and if it's safe to do so, we
-	// back off the Character offset (column number) by 1 and try
-	// again. This can help when the caret symbol is a | and is placed
-	// straight after the end of a path element.
+	// If DefinitionsForOffset returns no results, and if it's safe to
+	// do so, we back off the Character offset (column number) by 1 and
+	// try again. This can help when the caret symbol is a | and is
+	// placed straight after the end of a path element.
 	posAdj := []uint32{0, 1}
 	if pos.Character == 0 {
 		posAdj = posAdj[:1]
@@ -258,7 +246,7 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 		offset, err := srcMapper.PositionOffset(pos)
 		if err != nil {
 			w.debugLog(err.Error())
-			return nil
+			continue
 		}
 
 		targets = fdfns.DefinitionsForOffset(offset)
@@ -299,26 +287,12 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 // coordinate to some path element, from which subsequent path
 // elements can be suggested.
 func (pkg *Package) Completion(uri protocol.DocumentURI, pos protocol.Position) *protocol.CompletionList {
-	dfns := pkg.definitions
-	if dfns == nil {
+	tokFile, fdfns, srcMapper := pkg.definitionsForPosition(uri)
+	if tokFile == nil {
 		return nil
 	}
 
 	w := pkg.module.workspace
-	mappers := w.mappers
-
-	fdfns := dfns.ForFile(uri.Path())
-	if fdfns == nil {
-		w.debugLog("file not found")
-		return nil
-	}
-
-	tokFile := fdfns.File.Pos().File()
-	srcMapper := mappers[tokFile]
-	if srcMapper == nil {
-		w.debugLog("mapper not found: " + string(uri))
-		return nil
-	}
 
 	offset, err := srcMapper.PositionOffset(pos)
 	if err != nil {
@@ -364,58 +338,81 @@ func (pkg *Package) Completion(uri protocol.DocumentURI, pos protocol.Position) 
 	}
 	sortTextLen := len(fmt.Sprint(totalLen))
 
-	completions := make([]protocol.CompletionItem, totalLen)
+	completions := make([]protocol.CompletionItem, 0, totalLen)
 
-	if len(fields) > 0 {
-		fieldRange, rangeErr := srcMapper.OffsetRange(startOffset, fieldEndOffset)
+	for _, cs := range []struct {
+		completions   []string
+		endOffset     int
+		kind          protocol.CompletionItemKind
+		newTextSuffix string
+	}{
+		{
+			completions:   fields,
+			endOffset:     fieldEndOffset,
+			kind:          protocol.FieldCompletion,
+			newTextSuffix: ":",
+		},
+		{
+			completions: embeds,
+			endOffset:   embedEndOffset,
+			kind:        protocol.VariableCompletion,
+		},
+	} {
+		if len(cs.completions) == 0 {
+			continue
+		}
+
+		completionRange, rangeErr := srcMapper.OffsetRange(startOffset, cs.endOffset)
 		if rangeErr != nil {
 			w.debugLog(rangeErr.Error())
 		}
-		for i, name := range fields {
+		for _, name := range cs.completions {
 			if !ast.IsValidIdent(name) {
 				name = strconv.Quote(name)
 			}
-			completions[i] = protocol.CompletionItem{
+			item := protocol.CompletionItem{
 				Label:    name,
-				Kind:     protocol.FieldCompletion,
-				SortText: fmt.Sprintf("%0*d", sortTextLen, i),
+				Kind:     cs.kind,
+				SortText: fmt.Sprintf("%0*d", sortTextLen, len(completions)),
 				// TODO: we can add in documentation for each item if we can
 				// find it.
 			}
 			if rangeErr == nil {
-				completions[i].TextEdit = &protocol.TextEdit{
-					Range:   fieldRange,
-					NewText: name + ":",
+				item.TextEdit = &protocol.TextEdit{
+					Range:   completionRange,
+					NewText: name + cs.newTextSuffix,
 				}
 			}
-		}
-	}
-
-	if len(embeds) > 0 {
-		embedRange, rangeErr := srcMapper.OffsetRange(startOffset, embedEndOffset)
-		if rangeErr != nil {
-			w.debugLog(rangeErr.Error())
-		}
-		offset = len(fields)
-		for i, name := range embeds {
-			i += offset
-			completions[i] = protocol.CompletionItem{
-				Label:    name,
-				Kind:     protocol.VariableCompletion,
-				SortText: fmt.Sprintf("%0*d", sortTextLen, i),
-				// TODO: we can add in documentation for each item if we can
-				// find it.
-			}
-			if rangeErr == nil {
-				completions[i].TextEdit = &protocol.TextEdit{
-					Range:   embedRange,
-					NewText: name,
-				}
-			}
+			completions = append(completions, item)
 		}
 	}
 
 	return &protocol.CompletionList{
 		Items: completions,
 	}
+}
+
+func (pkg *Package) definitionsForPosition(uri protocol.DocumentURI) (*token.File, *definitions.FileDefinitions, *protocol.Mapper) {
+	dfns := pkg.definitions
+	if dfns == nil {
+		return nil, nil, nil
+	}
+
+	w := pkg.module.workspace
+	mappers := w.mappers
+
+	fdfns := dfns.ForFile(uri.Path())
+	if fdfns == nil {
+		w.debugLog("file not found")
+		return nil, nil, nil
+	}
+
+	tokFile := fdfns.File.Pos().File()
+	srcMapper := mappers[tokFile]
+	if srcMapper == nil {
+		w.debugLog("mapper not found: " + string(uri))
+		return nil, nil, nil
+	}
+
+	return tokFile, fdfns, srcMapper
 }

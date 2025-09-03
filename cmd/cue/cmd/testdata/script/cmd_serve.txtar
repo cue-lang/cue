@@ -1,0 +1,231 @@
+exec cue cmd serve &
+
+exec sleep 1
+
+[exec:curl] exec curl -X GET http://localhost:8082/test
+[exec:curl] stdout 'ack: using method GET'
+
+[exec:curl] exec curl -X GET http://localhost:8082/authz/alice
+[exec:curl] stdout 'true'
+
+[exec:curl] exec curl -X GET http://localhost:8082/authz/bob
+[exec:curl] stdout 'false'
+
+[exec:curl] exec curl -w '\n' -X GET http://localhost:8082/schema/api/vm?r=research
+[exec:curl] cmp stdout out/vm-research
+
+[exec:curl] exec curl -L 'http://localhost:8082/api/vm?u=alice' -H 'Content-Type: application/json' -d '{"os":"Linux","arch":"x86","mem":10000000000,"disk":20000000000,"public":true}'
+[exec:curl] stdout 'OK'
+
+[exec:curl] exec curl -L 'http://localhost:8082/authz' -H 'Content-Type: application/json' -d '{"user":"alice"}'
+[exec:curl] stdout 'true'
+
+[exec:curl] exec curl -L 'http://localhost:8082/authz' -H 'Content-Type: application/json' -d '{"user":"bob"}'
+[exec:curl] stdout 'false'
+
+stop
+
+-- authz_tool.cue --
+package policy
+
+import "encoding/json"
+
+#Authz: {
+	user!: string
+
+	authz: *false | bool
+
+    authz: allow && !deny
+
+    deny: *false | bool // default(false)
+    allow: *false | bool  // default(true)
+
+    if user == "alice" {
+        allow: true
+    }
+}
+
+command: serve: [=~"^/authz"]: ServeJSON & {
+	request: value: #Authz
+	response: value: request.value.authz
+}
+
+command: serve: "/authz/{user}": {
+	method: "GET"
+	request: value: user: request.pathValues.user
+}
+
+command: serve: "/authz": {
+	method: "POST"
+	request: value: json.Unmarshal(request.body)
+}
+
+-- api_tool.cue --
+package policy
+
+import (
+	"encoding/json"
+	"encoding/openapi"
+)
+
+Machine: {
+	os:     "Windows" | "Linux" | "MacOS"
+	arch:   "x86" | "arm64"
+	mem:    int
+	disk:   int
+	access: {
+		public: bool
+	}
+}
+
+MachineByRole: {
+	admin: Machine
+
+	intern: Machine&{
+		mem:  <=4Gi
+		disk: <=100G
+	}
+
+	research: Machine&{
+		access: public: false
+		os: "Linux" | "Windows"
+	}
+	default: null
+}
+
+Membership: alice: "admin"
+Membership: bob: "research"
+Membership: taylor: "intern"
+
+command: serve: "/schema/api/vm": {
+	routing: method: "GET"
+
+	// Define default for user query parameter.
+	request: from: r: *[""] | [...string]
+
+	let role = request.form.r[0]
+	let X = [// select first
+		if role != "" {
+			config: info: title: "Machine for \(role)"
+			machine: MachineByRole[(*role | "default")]
+		},
+		{
+			config: info: title: "Machine"
+			machine: Machine
+		}, // default
+	][0]
+
+	response: body: json.Indent(
+		openapi.MarshalSchema(X.config, "3.1.0", {#Machine: X.machine}), "", "  ")
+}
+
+command: serve: "/api/vm": {
+	routing: method: "POST"
+
+	// Further constrain user permissions.
+	request: form: u: _
+
+	let user = request.form.u[0]
+	let role = Membership[user]
+
+	// Validate the request to create a new VM against the VM schema.
+	X: Machine
+	X: json.Unmarshal(request.body)
+	X: MachineByRole[role]
+
+	response: {
+		header: "Content-Type": "application/json"
+
+		result: "OK"
+		body:   json.Marshal(result)
+	}
+}
+
+-- server_tool.cue --
+package policy
+
+import (
+	"encoding/json"
+	"tool/http"
+)
+
+command: serve: "/test": http.Serve & {
+	request: _
+	response: body: "ack: using method \(request.method)"
+}
+
+ServeJSON: {
+	response: {
+        value: _
+        body:  json.Marshal(value)
+    }
+}
+
+command: serve: [Prefix= =~"^/"]: http.Serve & {
+	listenAddr: ":8082"
+	routing: path: Prefix
+}
+-- out/vm-research --
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Machine for research"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "Machine": {
+        "type": "object",
+        "required": [
+          "access",
+          "arch",
+          "disk",
+          "mem",
+          "os"
+        ],
+        "properties": {
+          "access": {
+            "type": "object",
+            "properties": {
+              "public": {
+                "type": "boolean"
+              }
+            },
+            "allOf": [
+              {
+                "required": [
+                  "public"
+                ]
+              },
+              {
+                "required": [
+                  "public"
+                ]
+              }
+            ]
+          },
+          "arch": {
+            "type": "string",
+            "enum": [
+              "x86",
+              "arm64"
+            ]
+          },
+          "disk": {
+            "type": "integer"
+          },
+          "mem": {
+            "type": "integer"
+          },
+          "os": {
+            "type": "string",
+            "enum": [
+              "Linux",
+              "Windows"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

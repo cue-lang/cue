@@ -58,7 +58,7 @@ func (c *OpContext) Stats() *stats.Counts {
 // error.
 //
 // TODO: return *Vertex
-func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
+func (c *OpContext) evaluate(v *Vertex, r Resolver, state Flags) Value {
 	if v.isUndefined() {
 		// Use node itself to allow for cycle detection.
 		c.unify(v, state)
@@ -130,7 +130,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 // state can be used to indicate to which extent processing should continue.
 // state == finalized means it is evaluated to completion. See vertexStatus
 // for more details.
-func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
+func (c *OpContext) unify(v *Vertex, flags Flags) {
 	requires, mode := flags.condition, flags.mode
 	v.unify(c, requires, mode, true)
 }

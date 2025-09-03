@@ -60,7 +60,7 @@ func (o *StructLit) IsFile() bool {
 
 func (x *StructLit) Source() ast.Node { return x.Src }
 
-func (x *StructLit) evaluate(c *OpContext, state combinedFlags) Value {
+func (x *StructLit) evaluate(c *OpContext, state Flags) Value {
 	e := c.Env(0)
 	v := c.newInlineVertex(e.Vertex, nil, Conjunct{e, x, c.ci})
 	// evaluate may not finalize a field, as the resulting value may be
@@ -214,7 +214,7 @@ func (x *ListLit) Source() ast.Node {
 	return x.Src
 }
 
-func (x *ListLit) evaluate(c *OpContext, state combinedFlags) Value {
+func (x *ListLit) evaluate(c *OpContext, state Flags) Value {
 	e := c.Env(0)
 	// Pass conditions but at least set fieldSetKnown.
 	v := c.newInlineVertex(e.Vertex, nil, Conjunct{e, x, c.ci})
@@ -367,10 +367,10 @@ func (x *BoundExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *BoundExpr) evaluate(ctx *OpContext, state combinedFlags) Value {
+func (x *BoundExpr) evaluate(ctx *OpContext, state Flags) Value {
 	// scalarKnown is used here to ensure we know the value. The result does
 	// not have to be concrete, though.
-	v := ctx.value(x.Expr, combinedFlags{
+	v := ctx.value(x.Expr, Flags{
 		status:    partial,
 		condition: scalarKnown,
 		mode:      yield,
@@ -623,7 +623,7 @@ func (x *NodeLink) Kind() Kind {
 }
 func (x *NodeLink) Source() ast.Node { return x.Node.Source() }
 
-func (x *NodeLink) resolve(c *OpContext, state combinedFlags) *Vertex {
+func (x *NodeLink) resolve(c *OpContext, state Flags) *Vertex {
 	return x.Node
 }
 
@@ -643,7 +643,7 @@ func (x *FieldReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *FieldReference) resolve(c *OpContext, state combinedFlags) *Vertex {
+func (x *FieldReference) resolve(c *OpContext, state Flags) *Vertex {
 	n := c.relNode(x.UpCount)
 	pos := pos(x)
 	return c.lookup(n, pos, x.Label, state)
@@ -667,7 +667,7 @@ func (x *ValueReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *ValueReference) resolve(c *OpContext, state combinedFlags) *Vertex {
+func (x *ValueReference) resolve(c *OpContext, state Flags) *Vertex {
 	if x.UpCount == 0 {
 		return c.vertex
 	}
@@ -694,7 +694,7 @@ func (x *LabelReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *LabelReference) evaluate(ctx *OpContext, state combinedFlags) Value {
+func (x *LabelReference) evaluate(ctx *OpContext, state Flags) Value {
 	label := ctx.relLabel(x.UpCount)
 	if label == 0 {
 		// There is no label. This may happen if a LabelReference is evaluated
@@ -738,7 +738,7 @@ func (x *DynamicReference) Source() ast.Node {
 func (x *DynamicReference) EvaluateLabel(ctx *OpContext, env *Environment) Feature {
 	env = env.up(ctx, x.UpCount)
 	frame := ctx.PushState(env, x.Src)
-	v := ctx.value(x.Label, combinedFlags{
+	v := ctx.value(x.Label, Flags{
 		status:    partial,
 		condition: scalarKnown,
 		mode:      yield,
@@ -747,10 +747,10 @@ func (x *DynamicReference) EvaluateLabel(ctx *OpContext, env *Environment) Featu
 	return ctx.Label(x, v)
 }
 
-func (x *DynamicReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
+func (x *DynamicReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	e := ctx.Env(x.UpCount)
 	frame := ctx.PushState(e, x.Src)
-	v := ctx.value(x.Label, combinedFlags{
+	v := ctx.value(x.Label, Flags{
 		status:    partial,
 		condition: scalarKnown,
 		mode:      yield,
@@ -780,7 +780,7 @@ func (x *ImportReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *ImportReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
+func (x *ImportReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	path := x.ImportPath.StringValue(ctx)
 	v := ctx.Runtime.LoadImport(path)
 	if v == nil {
@@ -808,7 +808,7 @@ func (x *LetReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
+func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	e := ctx.Env(x.UpCount)
 	n := e.Vertex
 
@@ -921,8 +921,8 @@ func (x *SelectorExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *SelectorExpr) resolve(c *OpContext, state combinedFlags) *Vertex {
-	n := c.node(x, x.X, x.Sel.IsRegular(), combinedFlags{
+func (x *SelectorExpr) resolve(c *OpContext, state Flags) *Vertex {
+	n := c.node(x, x.X, x.Sel.IsRegular(), Flags{
 		status:    partial,
 		condition: needFieldSetKnown,
 		mode:      yield,
@@ -954,14 +954,14 @@ func (x *IndexExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *IndexExpr) resolve(ctx *OpContext, state combinedFlags) *Vertex {
+func (x *IndexExpr) resolve(ctx *OpContext, state Flags) *Vertex {
 	// TODO: support byte index.
-	n := ctx.node(x, x.X, true, combinedFlags{
+	n := ctx.node(x, x.X, true, Flags{
 		status:    partial,
 		condition: needFieldSetKnown,
 		mode:      yield,
 	})
-	i := ctx.value(x.Index, combinedFlags{
+	i := ctx.value(x.Index, Flags{
 		status:    partial,
 		condition: scalarKnown,
 		mode:      yield,
@@ -1005,10 +1005,10 @@ func (x *SliceExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *SliceExpr) evaluate(c *OpContext, state combinedFlags) Value {
+func (x *SliceExpr) evaluate(c *OpContext, state Flags) Value {
 	// TODO: strides
 
-	v := c.value(x.X, combinedFlags{
+	v := c.value(x.X, Flags{
 		status:    partial,
 		condition: fieldSetKnown,
 		mode:      yield,
@@ -1029,14 +1029,14 @@ func (x *SliceExpr) evaluate(c *OpContext, state combinedFlags) Value {
 			hi = uint64(len(v.Arcs))
 		)
 		if x.Lo != nil {
-			lo = c.uint64(c.value(x.Lo, combinedFlags{
+			lo = c.uint64(c.value(x.Lo, Flags{
 				status:    partial,
 				condition: scalarKnown,
 				mode:      yield,
 			}), as)
 		}
 		if x.Hi != nil {
-			hi = c.uint64(c.value(x.Hi, combinedFlags{
+			hi = c.uint64(c.value(x.Hi, Flags{
 				status:    partial,
 				condition: scalarKnown,
 				mode:      yield,
@@ -1081,14 +1081,14 @@ func (x *SliceExpr) evaluate(c *OpContext, state combinedFlags) Value {
 			hi = uint64(len(v.B))
 		)
 		if x.Lo != nil {
-			lo = c.uint64(c.value(x.Lo, combinedFlags{
+			lo = c.uint64(c.value(x.Lo, Flags{
 				status:    partial,
 				condition: scalarKnown,
 				mode:      yield,
 			}), as)
 		}
 		if x.Hi != nil {
-			hi = c.uint64(c.value(x.Hi, combinedFlags{
+			hi = c.uint64(c.value(x.Hi, Flags{
 				status:    partial,
 				condition: scalarKnown,
 				mode:      yield,
@@ -1125,10 +1125,10 @@ func (x *Interpolation) Source() ast.Node {
 	return x.Src
 }
 
-func (x *Interpolation) evaluate(c *OpContext, state combinedFlags) Value {
+func (x *Interpolation) evaluate(c *OpContext, state Flags) Value {
 	buf := bytes.Buffer{}
 	for _, e := range x.Parts {
-		v := c.value(e, combinedFlags{
+		v := c.value(e, Flags{
 			status:    partial,
 			condition: scalarKnown,
 			mode:      yield,
@@ -1172,11 +1172,11 @@ func (x *UnaryExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *UnaryExpr) evaluate(c *OpContext, state combinedFlags) Value {
+func (x *UnaryExpr) evaluate(c *OpContext, state Flags) Value {
 	if !c.concreteIsPossible(x.Op, x.X) {
 		return nil
 	}
-	v := c.value(x.X, combinedFlags{
+	v := c.value(x.X, Flags{
 		status:    partial,
 		condition: scalarKnown,
 		mode:      yield,
@@ -1237,7 +1237,7 @@ func (x *BinaryExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *BinaryExpr) evaluate(c *OpContext, state combinedFlags) Value {
+func (x *BinaryExpr) evaluate(c *OpContext, state Flags) Value {
 	env := c.Env(0)
 	if x.Op == AndOp {
 		v := c.newInlineVertex(nil, nil, makeAnonymousConjunct(env, x, c.ci.Refs))
@@ -1304,12 +1304,12 @@ func (x *OpenExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *OpenExpr) evaluate(c *OpContext, state combinedFlags) Value {
+func (x *OpenExpr) evaluate(c *OpContext, state Flags) Value {
 	c.ci.Opened = true
 	return c.evalState(x.X, state)
 }
 
-func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flags combinedFlags) (r Value) {
+func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flags Flags) (r Value) {
 	state := flags.status
 
 	s := c.PushState(env, src)
@@ -1320,7 +1320,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 	// Note that evalState may call yield, so we need to balance the counter
 	// with a defer.
 	defer func() { c.inValidator-- }()
-	req := combinedFlags{
+	req := Flags{
 		status:    state,
 		condition: needTasksDone,
 		mode:      finalize,
@@ -1349,7 +1349,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 			return nil
 
 		case IncompleteError:
-			c.evalState(x, combinedFlags{
+			c.evalState(x, Flags{
 				status:    finalized,
 				condition: allKnown,
 				mode:      ignore,
@@ -1413,7 +1413,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 			match = op == EqualOp
 		}
 
-		c.evalState(x, combinedFlags{
+		c.evalState(x, Flags{
 			status:    state,
 			condition: needTasksDone,
 			mode:      yield,
@@ -1464,13 +1464,13 @@ func (x *CallExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
+func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 	call := &CallContext{
 		ctx:  c,
 		call: x,
 	}
 
-	fun := c.value(x.Fun, combinedFlags{
+	fun := c.value(x.Fun, Flags{
 		status:    partial,
 		condition: concreteKnown,
 		mode:      yield,
@@ -1526,7 +1526,7 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		cond := state.condition
 		var expr Value
 		if call.builtin.NonConcrete {
-			state = combinedFlags{
+			state = Flags{
 				status:    state.status,
 				condition: cond,
 				mode:      runMode,
@@ -1542,7 +1542,7 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 			if runMode == finalize {
 				cond |= disjunctionTask
 			}
-			state = combinedFlags{
+			state = Flags{
 				status:    state.status,
 				condition: cond,
 				mode:      runMode,
@@ -1579,7 +1579,7 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 	if result == nil {
 		return nil
 	}
-	v, ci := c.evalStateCI(result, combinedFlags{status: partial, condition: state.condition, mode: state.mode})
+	v, ci := c.evalStateCI(result, Flags{status: partial, condition: state.condition, mode: state.mode})
 	c.ci = ci
 	return v
 }
@@ -1886,7 +1886,7 @@ func (x *DisjunctionExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *DisjunctionExpr) evaluate(c *OpContext, state combinedFlags) Value {
+func (x *DisjunctionExpr) evaluate(c *OpContext, state Flags) Value {
 	e := c.Env(0)
 	v := c.newInlineVertex(nil, nil, Conjunct{e, x, c.ci})
 	v.Finalize(c) // TODO: also partial okay?
@@ -2012,7 +2012,7 @@ func (x *ForClause) Source() ast.Node {
 }
 
 func (c *OpContext) forSource(x Expr) *Vertex {
-	state := combinedFlags{
+	state := Flags{
 		status:    conjuncts,
 		condition: needFieldSetKnown,
 		mode:      attemptOnly,
@@ -2182,7 +2182,7 @@ func (x *IfClause) Source() ast.Node {
 
 func (x *IfClause) yield(s *compState) {
 	ctx := s.ctx
-	if ctx.BoolValue(ctx.value(x.Condition, combinedFlags{
+	if ctx.BoolValue(ctx.value(x.Condition, Flags{
 		status:    s.state,
 		condition: scalarKnown,
 		mode:      yield,

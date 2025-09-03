@@ -14,12 +14,16 @@
 
 package adt
 
-// This file contains types to help in the transition from the old to new
-// evaluation model.
+// Flags describe the mode of evaluation for a vertex.
+type Flags struct {
+	// status is a remnant from evalv2, where it used to request a certain
+	// state. It is still used here and there. TODO: remove
+	status vertexStatus
 
-type combinedFlags struct {
-	status    vertexStatus
+	// condition and runmode indicates properties to satisfy for evalv4
 	condition condition
 	mode      runMode
-	concrete  bool
+
+	// concrete indicates whether the result should be concrete.
+	concrete bool
 }

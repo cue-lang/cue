@@ -283,7 +283,7 @@ func (c *OpContext) yield(
 	node *Vertex, // errors are associated with this node
 	env *Environment, // env for field for which this yield is called
 	comp *Comprehension,
-	state combinedFlags,
+	state Flags,
 	f YieldFunc, // called for every result
 ) *Bottom {
 	s := &compState{
@@ -339,7 +339,7 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 			envs = append(envs, env)
 		}
 
-		if err := ctx.yield(d.vertex, d.env, d.comp, combinedFlags{
+		if err := ctx.yield(d.vertex, d.env, d.comp, Flags{
 			status:    state,
 			condition: allKnown,
 			mode:      ignore,

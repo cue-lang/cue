@@ -39,7 +39,7 @@ func Resolve(ctx *OpContext, c Conjunct) *Vertex {
 		v = x
 
 	case Resolver:
-		r, err := ctx.resolveState(c, x, combinedFlags{
+		r, err := ctx.resolveState(c, x, Flags{
 			status:    finalized,
 			condition: allKnown,
 			mode:      attemptOnly,
@@ -112,14 +112,14 @@ type Evaluator interface {
 
 	// evaluate evaluates the underlying expression. If the expression
 	// is incomplete, it may record the error in ctx and return nil.
-	evaluate(ctx *OpContext, state combinedFlags) Value
+	evaluate(ctx *OpContext, state Flags) Value
 }
 
 // A Resolver represents a reference somewhere else within a tree that resolves
 // a value.
 type Resolver interface {
 	Node
-	resolve(ctx *OpContext, state combinedFlags) *Vertex
+	resolve(ctx *OpContext, state Flags) *Vertex
 }
 
 type YieldFunc func(env *Environment)

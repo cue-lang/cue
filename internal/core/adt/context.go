@@ -263,7 +263,7 @@ func (c *OpContext) Env(upCount int32) *Environment {
 
 func (c *OpContext) relNode(upCount int32) *Vertex {
 	e := c.e.up(c, upCount)
-	c.unify(e.Vertex, combinedFlags{
+	c.unify(e.Vertex, Flags{
 		status:    partial,
 		condition: allKnown,
 		mode:      ignore,
@@ -454,14 +454,14 @@ func (c *OpContext) Resolve(x Conjunct, r Resolver) (v *Vertex, b *Bottom) {
 			panic(x)
 		}
 	}()
-	return c.resolveState(x, r, combinedFlags{
+	return c.resolveState(x, r, Flags{
 		status:    finalized,
 		condition: allKnown,
 		mode:      finalize,
 	})
 }
 
-func (c *OpContext) resolveState(x Conjunct, r Resolver, state combinedFlags) (*Vertex, *Bottom) {
+func (c *OpContext) resolveState(x Conjunct, r Resolver, state Flags) (*Vertex, *Bottom) {
 	s := c.PushConjunct(x)
 
 	arc := r.resolve(c, state)
@@ -486,7 +486,7 @@ func (c *OpContext) resolveState(x Conjunct, r Resolver, state combinedFlags) (*
 func (c *OpContext) Lookup(env *Environment, r Resolver) (*Vertex, *Bottom) {
 	s := c.PushState(env, r.Source())
 
-	arc := r.resolve(c, combinedFlags{
+	arc := r.resolve(c, Flags{
 		status:    partial,
 		condition: allKnown,
 		mode:      ignore,
@@ -530,7 +530,7 @@ func (c *OpContext) Validate(check Conjunct, value Value) *Bottom {
 func (c *OpContext) concrete(env *Environment, x Expr, msg interface{}) (result Value, complete bool) {
 	s := c.PushState(env, x.Source())
 
-	state := combinedFlags{
+	state := Flags{
 		status:    partial,
 		condition: concreteKnown,
 		mode:      yield,
@@ -595,7 +595,7 @@ func (c *OpContext) getDefault(v Value) (result Value, ok bool) {
 func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete bool) {
 	s := c.PushState(env, x.Source())
 
-	val := c.evalState(x, combinedFlags{
+	val := c.evalState(x, Flags{
 		status:    partial,
 		condition: concreteKnown,
 		mode:      finalize,
@@ -632,7 +632,7 @@ func (c *OpContext) EvaluateKeepState(x Expr) (result Value) {
 	src := c.src
 	c.src = x.Source()
 
-	result, ci := c.evalStateCI(x, combinedFlags{
+	result, ci := c.evalStateCI(x, Flags{
 		status:    partial,
 		condition: concreteKnown,
 		mode:      finalize,
@@ -647,7 +647,7 @@ func (c *OpContext) EvaluateKeepState(x Expr) (result Value) {
 // value evaluates expression v within the current environment. The result may
 // be nil if the result is incomplete. value leaves errors untouched to that
 // they can be collected by the caller.
-func (c *OpContext) value(x Expr, state combinedFlags) (result Value) {
+func (c *OpContext) value(x Expr, state Flags) (result Value) {
 	state.concrete = true
 	v := c.evalState(x, state)
 
@@ -656,12 +656,12 @@ func (c *OpContext) value(x Expr, state combinedFlags) (result Value) {
 	return v
 }
 
-func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
+func (c *OpContext) evalState(v Expr, state Flags) (result Value) {
 	result, _ = c.evalStateCI(v, state)
 	return result
 }
 
-func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci CloseInfo) {
+func (c *OpContext) evalStateCI(v Expr, state Flags) (result Value, ci CloseInfo) {
 	savedSrc := c.src
 	c.src = v.Source()
 	err := c.errs
@@ -825,7 +825,7 @@ func (c *OpContext) wrapCycleError(src ast.Node, b *Bottom) *Bottom {
 // unifyNode returns a possibly partially evaluated node value.
 //
 // TODO: maybe return *Vertex, *Bottom
-func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
+func (c *OpContext) unifyNode(expr Expr, state Flags) (result Value) {
 	savedSrc := c.src
 	c.src = expr.Source()
 	err := c.errs
@@ -915,7 +915,7 @@ func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 	return v
 }
 
-func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFlags) *Vertex {
+func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags Flags) *Vertex {
 	return x.lookup(c, pos, l, flags)
 }
 
@@ -965,7 +965,7 @@ func pos(x Node) token.Pos {
 }
 
 // node is called by SelectorExpr.resolve and IndexExpr.resolve.
-func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *Vertex {
+func (c *OpContext) node(orig Node, x Expr, scalar bool, state Flags) *Vertex {
 	// Do not treat inline structs as closed by default if within a schema.
 	// See comment at top of scheduleVertexConjuncts.
 	if _, ok := x.(Resolver); !ok {

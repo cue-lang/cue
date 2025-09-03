@@ -84,7 +84,7 @@ func init() {
 func processExpr(ctx *OpContext, t *task, mode runMode) {
 	x := t.x.(Expr)
 
-	state := combinedFlags{
+	state := Flags{
 		condition: concreteKnown,
 		mode:      mode,
 	}
@@ -104,7 +104,7 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	// be conclusive, we could avoid triggering evaluating disjunctions. This
 	// would be a pretty significant rework, though.
 
-	arc := r.resolve(ctx, combinedFlags{
+	arc := r.resolve(ctx, Flags{
 		condition: fieldSetKnown,
 		mode:      mode,
 	})
@@ -156,7 +156,7 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 
 	field := t.x.(*DynamicField)
 
-	v := ctx.value(field.Key, combinedFlags{
+	v := ctx.value(field.Key, Flags{
 		condition: scalarValue,
 		mode:      mode,
 	})
@@ -196,7 +196,7 @@ func processPatternConstraint(ctx *OpContext, t *task, mode runMode) {
 
 	// Note that the result may be a disjunction. Be sure to not take the
 	// default value as we want to retain the options of the disjunction.
-	v := ctx.evalState(field.Filter, combinedFlags{
+	v := ctx.evalState(field.Filter, Flags{
 		condition: scalarValue,
 		mode:      yield,
 	})
@@ -251,7 +251,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 
 		switch x := elem.(type) {
 		case *Comprehension:
-			err := c.yield(nil, t.env, x, combinedFlags{status: partial, mode: mode}, func(e *Environment) {
+			err := c.yield(nil, t.env, x, Flags{status: partial, mode: mode}, func(e *Environment) {
 				label, err := MakeLabel(x.Source(), index, IntLabel)
 				n.addErr(err)
 				index++

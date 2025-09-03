@@ -951,7 +951,7 @@ func (v *Vertex) Finalize(c *OpContext) {
 	// case the caller did not handle existing errors in the context.
 	err := c.errs
 	c.errs = nil
-	c.unify(v, combinedFlags{
+	c.unify(v, Flags{
 		status:    finalized,
 		condition: allKnown,
 		mode:      finalize,
@@ -961,7 +961,7 @@ func (v *Vertex) Finalize(c *OpContext) {
 
 // CompleteArcs ensures the set of arcs has been computed.
 func (v *Vertex) CompleteArcs(c *OpContext) {
-	c.unify(v, combinedFlags{
+	c.unify(v, Flags{
 		status:    conjuncts,
 		condition: allKnown,
 		mode:      finalize,
@@ -969,7 +969,7 @@ func (v *Vertex) CompleteArcs(c *OpContext) {
 }
 
 func (v *Vertex) CompleteArcsOnly(c *OpContext) {
-	c.unify(v, combinedFlags{
+	c.unify(v, Flags{
 		status:    conjuncts,
 		condition: fieldSetKnown,
 		mode:      finalize,

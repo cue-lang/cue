@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20d3477e_f3157c9d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-03T10:54:36Z",
+      "side": 1,
+      "message": "```suggestion\nThis number was used to compare CUE versions to track whether\n```",
+      "range": {
+        "startLine": 11,
+        "startChar": 24,
+        "endLine": 11,
+        "endChar": 31
+      },
+      "revId": "3bb4a3625baf8e4d16458e121f75e517d9c41f30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

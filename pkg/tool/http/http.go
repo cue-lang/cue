@@ -29,6 +29,7 @@ import (
 
 func init() {
 	task.Register("tool/http.Do", newHTTPCmd)
+	task.Register("tool/http.Serve", newServeCmd)
 
 	// For backwards compatibility.
 	task.Register("http", newHTTPCmd)
@@ -176,11 +177,27 @@ func parseHeaders(obj cue.Value, label string) (http.Header, error) {
 	}
 	h := http.Header{}
 	for iter.Next() {
-		str, err := iter.Value().String()
+		key := iter.Selector().Unquoted()
+		val := iter.Value()
+
+		// Handle single string value
+		if s, err := val.String(); err == nil {
+			h.Add(key, s)
+			continue
+		}
+
+		// Each header value is a list of strings [string, ...string]
+		list, err := val.List()
 		if err != nil {
 			return nil, err
 		}
-		h.Add(iter.Selector().Unquoted(), str)
+		for list.Next() {
+			str, err := list.Value().String()
+			if err != nil {
+				return nil, err
+			}
+			h.Add(key, str)
+		}
 	}
 	return h, nil
 }

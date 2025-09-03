@@ -112,6 +112,19 @@ type Runner interface {
 	Run(t *Task, err error) error
 }
 
+// Service is an optional interface that Runner implementations can
+// provide to indicate that the task describes a service. Services are
+// typically long-running tasks (like http.Serve) that produce values
+// at runtime (e.g. requests) that other tasks may depend on.
+//
+// Services are treated specially in the dependency graph:
+//  1. They are excluded from cycle detection filters.
+//  2. Dependencies on services are treated as runtime dependencies,
+//     causing dependent tasks to be deferred until the service runs.
+type Service interface {
+	IsService() bool
+}
+
 // A RunnerFunc runs a Task.
 type RunnerFunc func(t *Task) error
 
@@ -147,6 +160,11 @@ type Config struct {
 	// updated. This includes directly after initialization. The task may be
 	// nil if this call is not the result of a task completing.
 	UpdateFunc func(c *Controller, t *Task) error
+
+	// RunInferredTasks, when true, prevents inferred tasks from being deferred.
+	// This is used by ForkRunLoop where inferred tasks should run immediately
+	// because their inputs are already filled.
+	RunInferredTasks bool
 }
 
 // A Controller defines a set of Tasks to be executed.
@@ -343,10 +361,13 @@ type Task struct {
 	ctxt *adt.OpContext
 	r    Runner
 
-	index  int
-	path   cue.Path
-	key    string
-	labels []adt.Feature
+	index       int
+	path        cue.Path
+	key         string
+	labels      []adt.Feature
+	isService   bool    // if true, this task is a service (excluded from cycles)
+	deferred    bool    // if true, this task is skipped at runtime (discovered from Service)
+	runtimeDeps []*Task // dependencies on Service tasks
 
 	// Dynamic
 	update   adt.Expr
@@ -412,6 +433,19 @@ func (t *Task) addDep(path string, dep *Task) {
 	if dep == nil || dep == t {
 		return
 	}
+	// Skip dependencies on tasks that are services.
+	// These are typically long-running tasks (like http.Serve) that fill
+	// their values at runtime, so waiting for them would cause deadlock.
+	if dep.isService {
+		t.runtimeDeps = append(t.runtimeDeps, dep)
+		return
+	}
+	// Skip dependencies on deferred tasks. These tasks won't run at startup
+	// and are expected to run later via ForkRunLoop.
+	if dep.deferred {
+		return
+	}
+
 	if t.deps == nil {
 		t.deps = map[*Task]bool{}
 		t.pathDeps = map[string][]*Task{}

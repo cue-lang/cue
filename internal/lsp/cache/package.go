@@ -15,9 +15,13 @@
 package cache
 
 import (
+	"cmp"
 	"fmt"
+	"maps"
+	"path/filepath"
 	"slices"
 	"strconv"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -281,6 +285,88 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 		}
 	}
 	return locations
+}
+
+// Hover is very similar to Definiton. It attempts to treat the given
+// uri and position as a file coordinate to some path element that can
+// be resolved to one or more ast nodes, and returns the doc comments
+// attached to those ast nodes.
+func (pkg *Package) Hover(uri protocol.DocumentURI, pos protocol.Position) *protocol.Hover {
+	tokFile, fdfns, srcMapper := pkg.definitionsForPosition(uri)
+	if tokFile == nil {
+		return nil
+	}
+
+	w := pkg.module.workspace
+
+	var comments map[ast.Node][]*ast.CommentGroup
+	// If CommentsForOffset returns no results, and if it's safe to do
+	// so, we back off the Character offset (column number) by 1 and
+	// try again. This can help when the caret symbol is a | and is
+	// placed straight after the end of a path element.
+	posAdj := []uint32{0, 1}
+	if pos.Character == 0 {
+		posAdj = posAdj[:1]
+	}
+	for _, adj := range posAdj {
+		pos := pos
+		pos.Character -= adj
+		offset, err := srcMapper.PositionOffset(pos)
+		if err != nil {
+			w.debugLog(err.Error())
+			continue
+		}
+
+		comments = fdfns.CommentsForOffset(offset)
+		if len(comments) > 0 {
+			break
+		}
+	}
+	if len(comments) == 0 {
+		return nil
+	}
+
+	keys := slices.Collect(maps.Keys(comments))
+	slices.SortFunc(keys, func(a, b ast.Node) int {
+		aPos, bPos := a.Pos().Position(), b.Pos().Position()
+		switch {
+		case aPos.Filename == bPos.Filename:
+			return cmp.Compare(aPos.Offset, bPos.Offset)
+		case aPos.Filename == tokFile.Name():
+			// The current file goes last.
+			return 1
+		case bPos.Filename == tokFile.Name():
+			// The current file goes last.
+			return -1
+		default:
+			return cmp.Compare(aPos.Filename, bPos.Filename)
+		}
+	})
+
+	var strs []string
+	for _, key := range keys {
+		addAnchor := false
+		for _, cg := range comments[key] {
+			text := cg.Text()
+			text = strings.TrimRight(text, "\n")
+			if text == "" {
+				continue
+			}
+			strs = append(strs, text)
+			addAnchor = true
+		}
+		if addAnchor {
+			pos := key.Pos().Position()
+			strs = append(strs, fmt.Sprintf("([%s line %d](%s#L%d))\n", filepath.Base(pos.Filename), pos.Line, protocol.URIFromPath(pos.Filename), pos.Line))
+		}
+	}
+
+	return &protocol.Hover{
+		Contents: protocol.MarkupContent{
+			Kind:  protocol.Markdown,
+			Value: strings.Join(strs, "\n"),
+		},
+	}
 }
 
 // Completion attempts to treat the given uri and position as a file

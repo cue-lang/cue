@@ -427,6 +427,31 @@ func (fdfns *FileDefinitions) DefinitionsForOffset(offset int) []ast.Node {
 	return nodes
 }
 
+// CommentsForOffset is very similar to DefinitionsForOffset. It
+// reports the doc comments associated with then definitions that the
+// file offset (number of bytes from the start of the file) resolves
+// to.
+func (fdfns *FileDefinitions) CommentsForOffset(offset int) map[ast.Node][]*ast.CommentGroup {
+	definitions := fdfns.definitions
+	navs, found := definitions[offset]
+	if !found {
+		definitions[offset] = []*navigableBindings{}
+		fdfns.evalForOffset(offset)
+		navs = definitions[offset]
+	}
+
+	commentsMap := make(map[ast.Node][]*ast.CommentGroup)
+	for _, nav := range navs {
+		for _, n := range nav.contributingNodes {
+			if n.key != nil && len(n.comments) > 0 {
+				commentsMap[n.key] = n.comments
+			}
+		}
+	}
+
+	return commentsMap
+}
+
 // CompletionsForOffset reports the set of strings that can form a new
 // path element following the path element indicated by the offset
 // (number of bytes from the start of the file).
@@ -585,6 +610,7 @@ type astNode struct {
 	// fieldsAllowed. Within a ListLit, for example, fields are not
 	// allowed..
 	fieldsAllowed bool
+	comments      []*ast.CommentGroup
 }
 
 // newAstNode creates a new [astNodes] which is a child of the current
@@ -1086,6 +1112,14 @@ func (n *astNode) eval() {
 			default:
 				binding = n.newAstNode(label, node.Value, nil)
 			}
+
+			var comments []*ast.CommentGroup
+			for _, group := range node.Comments() {
+				if group.Doc && len(group.List) > 0 && group.List[0].Pos().Before(node.Pos()) {
+					comments = append(comments, group)
+				}
+			}
+			binding.comments = comments
 
 			if isAlias {
 				switch alias.Expr.(type) {

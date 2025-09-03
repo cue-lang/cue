@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "55cfffb3_87eda8d1",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-03T14:26:24Z",
+      "side": 1,
+      "message": "Ah, it was a simple hoist before, but it probably crossed paths with other checkins and now reintroduced deleted code.",
+      "parentUuid": "03220bdc_97787416",
+      "revId": "df1f47beaf99a20c40ce461d40856e9d45e43ce4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5a965c34_13b0e220",
         "filename": "internal/task/task.go",
         "patchSetId": 1

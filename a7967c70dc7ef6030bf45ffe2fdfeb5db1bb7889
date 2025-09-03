@@ -34,6 +34,24 @@
       "parentUuid": "b4a18efc_512aa610",
       "revId": "a7967c70dc7ef6030bf45ffe2fdfeb5db1bb7889",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cecf2c1_c5677ac8",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-03T10:44:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "053ad370_318c898d",
+      "revId": "a7967c70dc7ef6030bf45ffe2fdfeb5db1bb7889",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

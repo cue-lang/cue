@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "22ba0192_f09088a2",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-03T10:30:51Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "40e51216_6dc1033e",
+      "revId": "b3627c871944f5a51428406d13491b5840604f9f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7bf92ccd_f4c60e6d",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-09-03T09:27:38Z",
       "side": 1,
       "message": "so we ended up with simply sorting the results as strings? should we document that anywhere?",
+      "revId": "b3627c871944f5a51428406d13491b5840604f9f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e720e16d_8f6da89b",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 485,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-03T10:30:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7bf92ccd_f4c60e6d",
       "revId": "b3627c871944f5a51428406d13491b5840604f9f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3578fa24_0329a41c",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-03T10:30:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66c9ce16_318cfb00",
+      "revId": "b3627c871944f5a51428406d13491b5840604f9f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ac4aed3b_e21e56cf",
@@ -82,6 +136,24 @@
       "writtenOn": "2025-09-03T09:27:38Z",
       "side": 1,
       "message": "FYI, Marcel wrote code to auto-update Go code for unit test tables with CUE_UPDATE\u003d1 in cuetdtest, you might find that useful",
+      "revId": "b3627c871944f5a51428406d13491b5840604f9f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6ae626b_0c06c77f",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 2977,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-03T10:30:51Z",
+      "side": 1,
+      "message": "Yep, that\u0027s on my list of things to look at. There are complications here in that the suggestions are not always perfectly correct (quoted field names with spaces in them need some manual massaging currently).",
+      "parentUuid": "ac4aed3b_e21e56cf",
       "revId": "b3627c871944f5a51428406d13491b5840604f9f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

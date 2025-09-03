@@ -43,17 +43,127 @@
 //		}
 //	}
 //
-//	//  TODO: support serving once we have the cue serve command.
-//	// Serve: {
-//	//  port: int
+//	// Serve launches a task that listens on the given port and serves HTTP
+//	// requests. (EXPERIMENTAL)
 //	//
-//	//  cert: string
-//	//  key:  string
+//	// Serve support HTTP multiplexing. Multiple tasks can be configured to be
+//	// served from the same address. Serve will multiplex these different instances
+//	// based on the serving path and, optionally, method.
 //	//
-//	//  handle: [Pattern=string]: Message & {
-//	//   pattern: Pattern
-//	//  }
-//	// }
+//	// For more details see the documentation of the routing parameters such as
+//	// path and method.
+//	Serve: {
+//		$id: _id
+//		_id: "tool/http.Serve"
+//
+//		listenAddr: *":80" | string
+//
+//		// routing holds the routing information for this request that is used to
+//		// configure this request with the muxer.
+//		//
+//		// Routing is done based on path and methods (TODO: allow host as well)
+//		//
+//		// Literal (that is, non-wildcard) parts of a pattern match the
+//		// corresponding parts of a request case-sensitively.
+//		//
+//		// If no method is given it matches every method. A pattern with the method
+//		// GET matches both GET and HEAD requests. Otherwise, the method must match
+//		// exactly.
+//		//
+//		// TODO: When no host is given, every host is matched. A pattern with a host
+//		// matches URLs on that host only.
+//		//
+//		// A path can include wildcard segments of the form {NAME} or {NAME...}. For
+//		// example, "/b/{bucket}/o/{objectname...}". The wildcard name must be a
+//		// valid Go identifier. Wildcards must be full path segments: they must be
+//		// preceded by a slash and followed by either a slash or the end of the
+//		// string. For example, "/b_{bucket}" is not a valid pattern.
+//		//
+//		// Normally a wildcard matches only a single path segment, ending at the
+//		// next literal slash (not %2F) in the request URL. But if the "..." is
+//		// present, then the wildcard matches the remainder of the URL path,
+//		// including slashes. (Therefore it is invalid for a "..." wildcard to
+//		// appear anywhere but at the end of a pattern.) The match for a wildcard
+//		// can be obtained by calling Request.PathValue with the wildcard's name. A
+//		// trailing slash in a path acts as an anonymous "..." wildcard.
+//		//
+//		// The special wildcard {$} matches only the end of the URL. For example,
+//		// the pattern "/{$}" matches only the path "/", whereas the pattern "/"
+//		// matches every path.
+//		//
+//		// For matching, both pattern paths and incoming request paths are unescaped
+//		// segment by segment. So, for example, the path "/a%2Fb/100%25" is treated
+//		// as having two segments, "a/b" and "100%". The pattern "/a%2fb/" matches
+//		// it, but the pattern "/a/b/" does not.
+//		//
+//		//
+//		// Precedence
+//		//
+//		// If two or more patterns match a request, then the most specific pattern
+//		// takes precedence. A pattern P1 is more specific than P2 if P1 matches a
+//		// strict subset of P2’s requests; that is, if P2 matches all the requests
+//		// of P1 and more. If neither is more specific, then the patterns conflict.
+//		// There is one exception to this rule: if two patterns would otherwise
+//		// conflict and one has a host while the other does not, then the pattern
+//		// with the host takes precedence. If a pattern conflicts with another
+//		// pattern that is already registered the task will panic.
+//		//
+//		// As an example of the general rule, "/images/thumbnails/" is more specific
+//		// than "/images/", so both can be registered. The former matches paths
+//		// beginning with "/images/thumbnails/" and the latter will match any other
+//		// path in the "/images/" subtree.
+//		//
+//		// As another example, consider the patterns "GET /" and "/index.html": both
+//		// match a GET request for "/index.html", but the former pattern matches all
+//		// other GET and HEAD requests, while the latter matches any request for
+//		// "/index.html" that uses a different method. The patterns conflict.
+//		routing: {
+//			// path sets the path to route to. It may include wildcard segments
+//			// as described above.
+//			path: *"/" | =~"^/"
+//
+//			// method optionally sets the HTTP method to match (e.g. "GET" |
+//			// "POST"). If not set, all methods are accepted.
+//			method?: string
+//		}
+//
+//		// TODO:
+//		// - schemes: string // e.g. "http" | "https"
+//		// - TLS
+//
+//		request: {
+//			// method specifies the HTTP method (GET, POST, PUT, etc.).
+//			method: string
+//
+//			// URL specifies either the URI being requested.
+//			url: string
+//
+//			// The body of the request, if any.
+//			body: *bytes | string
+//
+//			// value holds the CUE representation of the body, if applicable,
+//			// based on the content type. For instance, if the content type is JSON,
+//			// this value can be set to `json.Unmarshal(body)`.
+//			value?: _
+//
+//			// pathValue are extracted from the URL path that match the wildcards
+//			// of routing.path.
+//			pathValues: [string]: string
+//
+//			// form contains the parsed form data, including both the URL
+//			// field's query parameters and the PATCH, POST, or PUT form data.
+//			form: [string]: [...string]
+//
+//			header: [string]: string | [...string]
+//			trailer: [string]: string | [...string]
+//		}
+//
+//		response: {
+//			body?: *bytes | string
+//			header?: [string]: string | [...string]
+//			trailer?: [string]: string | [...string]
+//		}
+//	}
 package http
 
 import (
@@ -95,6 +205,30 @@ var p = &pkg.Package{
 			body:       *bytes | string
 			header: [string]: string | [...string]
 			trailer: [string]: string | [...string]
+		}
+	}
+	Serve: {
+		$id:        _id
+		_id:        "tool/http.Serve"
+		listenAddr: *":80" | string
+		routing: {
+			path:    *"/" | =~"^/"
+			method?: string
+		}
+		request: {
+			method: string
+			url:    string
+			body:   *bytes | string
+			value?: _
+			pathValues: [string]: string
+			form: [string]: [...string]
+			header: [string]: string | [...string]
+			trailer: [string]: string | [...string]
+		}
+		response: {
+			body?: *bytes | string
+			header?: [string]: string | [...string]
+			trailer?: [string]: string | [...string]
 		}
 	}
 }`,

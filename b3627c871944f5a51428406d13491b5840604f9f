@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6a47153e_97cc3bcb",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-03T09:27:38Z",
+      "side": 1,
+      "message": "isn\u0027t this change unrelated? I\u0027d either split into another commit, or mention it in the commit message.\n\nperhaps a comment here too, because ignoring errors is often a bug.",
+      "revId": "b3627c871944f5a51428406d13491b5840604f9f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "40e51216_6dc1033e",
         "filename": "internal/lsp/cache/package.go",
         "patchSetId": 13
@@ -14,6 +31,74 @@
       "writtenOn": "2025-09-02T12:22:46Z",
       "side": 1,
       "message": "Note that although I try hard here to order the completions with fields first, then embeds (SortText really is a *text* field that gets lexicographically sorted...), there is no requirement that editors actually follow this ordering. Both emacs and intellij do not.",
+      "revId": "b3627c871944f5a51428406d13491b5840604f9f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bf92ccd_f4c60e6d",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 485,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-03T09:27:38Z",
+      "side": 1,
+      "message": "so we ended up with simply sorting the results as strings? should we document that anywhere?",
+      "revId": "b3627c871944f5a51428406d13491b5840604f9f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66c9ce16_318cfb00",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-03T09:27:38Z",
+      "side": 1,
+      "message": "I just realised that because the map keys are `*position`, and not `position`, you can easily have duplicates and the map won\u0027t complain - because the pointers are different. it would be way nicer if I could look at this map here, and immediately know that there cannot be duplicate entries. any duplicate entry should be a human error, like unintentionally not testing an edge case we do intend to test.",
+      "revId": "b3627c871944f5a51428406d13491b5840604f9f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac4aed3b_e21e56cf",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 2977,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-03T09:27:38Z",
+      "side": 1,
+      "message": "FYI, Marcel wrote code to auto-update Go code for unit test tables with CUE_UPDATE\u003d1 in cuetdtest, you might find that useful",
+      "revId": "b3627c871944f5a51428406d13491b5840604f9f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86b3973a_74d87c71",
+        "filename": "internal/lsp/server/format.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-03T09:27:38Z",
+      "side": 1,
+      "message": "ditto - split or explicitly mention. (there are quite a few of these, so at this point I lean towards splitting, given how large the completion change already is)",
       "revId": "b3627c871944f5a51428406d13491b5840604f9f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

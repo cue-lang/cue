@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f7f7b123_ef72e971",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-03T09:27:38Z",
+      "side": 1,
+      "message": "same as above, I might either split this or mention this in the commit message",
+      "parentUuid": "6894aa4d_7abdf4f4",
+      "revId": "de29212b51560299d36a45cf01fa0dc6781b7ed6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7a86efad_093709c3",
         "filename": "internal/lsp/definitions/definitions.go",
         "patchSetId": 5

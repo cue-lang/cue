@@ -457,6 +457,64 @@ func TestSelectorTypeString(t *testing.T) {
 	}
 }
 
+func TestPathAppend(t *testing.T) {
+	testCases := []struct {
+		name     string
+		path     cue.Path
+		selector cue.Selector
+		want     string
+	}{{
+		name:     "append string to empty path",
+		path:     cue.MakePath(),
+		selector: cue.Str("foo"),
+		want:     "foo",
+	}, {
+		name:     "append string to existing path",
+		path:     cue.MakePath(cue.Str("a")),
+		selector: cue.Str("b"),
+		want:     "a.b",
+	}, {
+		name:     "append index to path",
+		path:     cue.MakePath(cue.Str("list")),
+		selector: cue.Index(0),
+		want:     "list[0]",
+	}, {
+		name:     "append definition to path",
+		path:     cue.MakePath(cue.Str("root")),
+		selector: cue.Def("Foo"),
+		want:     "root.#Foo",
+	}, {
+		name:     "append optional selector",
+		path:     cue.MakePath(cue.Str("a")),
+		selector: cue.Str("b").Optional(),
+		want:     "a.b?",
+	}, {
+		name:     "append required selector",
+		path:     cue.MakePath(cue.Str("a")),
+		selector: cue.Str("b").Required(),
+		want:     "a.b!",
+	}, {
+		name:     "append AnyString",
+		path:     cue.MakePath(cue.Str("map")),
+		selector: cue.AnyString,
+		want:     "map.[_]",
+	}, {
+		name:     "append AnyIndex",
+		path:     cue.MakePath(cue.Str("list")),
+		selector: cue.AnyIndex,
+		want:     "list.[_]",
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := tc.path.Append(tc.selector)
+			if got := result.String(); got != tc.want {
+				t.Errorf("Path.Append().String() = %q, want %q", got, tc.want)
+			}
+		})
+	}
+}
+
 func checkPanic(t *testing.T, wantPanicStr string, f func()) {
 	gotPanicStr := ""
 	func() {

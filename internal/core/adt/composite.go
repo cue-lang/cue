@@ -960,6 +960,15 @@ func (v *Vertex) Finalize(c *OpContext) {
 	c.errs = err
 }
 
+func (v *Vertex) Unify(c *OpContext, flags Flags) {
+	// Saving and restoring the error context prevents v from panicking in
+	// case the caller did not handle existing errors in the context.
+	err := c.errs
+	c.errs = nil
+	c.unify(v, flags)
+	c.errs = err
+}
+
 // CompleteArcs ensures the set of arcs has been computed.
 func (v *Vertex) CompleteArcs(c *OpContext) {
 	c.unify(v, Flags{

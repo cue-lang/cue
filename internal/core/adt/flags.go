@@ -30,3 +30,12 @@ type Flags struct {
 	// checkTypos indicates whether to check for typos (closedness).
 	checkTypos bool
 }
+
+var (
+	FinalizeWithoutTypoCheck = Flags{
+		status:     finalized,
+		condition:  allKnown,
+		mode:       finalize,
+		checkTypos: false,
+	}
+)

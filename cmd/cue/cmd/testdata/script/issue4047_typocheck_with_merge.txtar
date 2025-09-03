@@ -1,0 +1,58 @@
+exec cue cmd main
+cmp stdout out/main
+
+-- cue.mod/module.cue --
+module: "foo.test/main"
+language: version: "v0.13.0"
+-- main_tool.cue --
+package main
+
+import (
+	"encoding/yaml"
+	"list"
+	"tool/cli"
+)
+
+command: main: cli.Print & {
+	text: yaml.MarshalStream(list.Sort(output, {x: _, y: _, less: x.kind < y.kind}))
+}
+-- data.cue --
+package main
+
+#Secret: {
+	#Kind
+	metadata?: {...}
+}
+#Kind: kind?: string
+#Generate: {
+	input!: _
+	secret: #Secret & {
+		kind: "Secret"
+		metadata: name: input.secretName
+	}
+	user: {
+		kind: "User"
+		spec: passwordRef: secret.metadata.name
+	}
+}
+
+output: (_Output & {
+	input: secretName: "secret123"
+}).out
+
+_Output: {
+	input: _
+	_gen: #Generate & {
+		"input": input
+	}
+	out: [_gen.user, _gen.secret]
+}
+-- out/main --
+kind: Secret
+metadata:
+  name: secret123
+---
+kind: User
+spec:
+  passwordRef: secret123
+

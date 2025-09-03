@@ -483,7 +483,7 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 	c.numRefs++
 
 	// Note: we did not finalize in V2.
-	v.Finalize(c.ctxt)
+	v.Unify(c.ctxt, adt.FinalizeWithoutTypoCheck)
 
 	d := Dependency{
 		Node:      v,
@@ -582,7 +582,7 @@ func (c *visitor) evaluateInner(env *adt.Environment, x adt.Expr, r adt.Resolver
 		return
 	}
 	// TODO(perf): one level of  evaluation would suffice.
-	v.Finalize(c.ctxt)
+	v.Unify(c.ctxt, adt.FinalizeWithoutTypoCheck)
 
 	saved := len(c.pathStack)
 	c.pathStack = append(c.pathStack, refEntry{env, r})

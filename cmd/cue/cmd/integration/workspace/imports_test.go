@@ -30,7 +30,6 @@ a: b: z: 3
 
 	qt.Assert(t, qt.IsNil(err))
 	reg, cacheDir := newRegistry(t, registryFS)
-	t.Log(cacheDir)
 
 	const files = `
 -- cue.mod/module.cue --

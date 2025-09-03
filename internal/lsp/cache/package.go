@@ -15,9 +15,13 @@
 package cache
 
 import (
+	"cmp"
 	"fmt"
+	"maps"
+	"path/filepath"
 	"slices"
 	"strconv"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -281,6 +285,84 @@ func (pkg *Package) Definition(uri protocol.DocumentURI, pos protocol.Position) 
 		}
 	}
 	return locations
+}
+
+// Hover is very similar to Definiton. It attempts to treat the given
+// uri and position as a file coordinate to some path element that can
+// be resolved to one or more ast nodes, and returns the doc comments
+// attached to those ast nodes.
+func (pkg *Package) Hover(uri protocol.DocumentURI, pos protocol.Position) *protocol.Hover {
+	tokFile, fdfns, srcMapper := pkg.definitionsForPosition(uri)
+	if tokFile == nil {
+		return nil
+	}
+
+	w := pkg.module.workspace
+
+	var comments map[ast.Node][]*ast.CommentGroup
+	offset, err := srcMapper.PositionOffset(pos)
+	if err != nil {
+		w.debugLog(err.Error())
+		return nil
+	}
+
+	comments = fdfns.DocCommentsForOffset(offset)
+	if len(comments) == 0 {
+		return nil
+	}
+
+	// We sort comments by their location: comments within the same
+	// file are sorted by offset, and across different files by
+	// filepath, with the exception that comments from the current file
+	// come last. The thinking here is that the comments from a remote
+	// file are more likely to be not-already-on-screen.
+	keys := slices.Collect(maps.Keys(comments))
+	slices.SortFunc(keys, func(a, b ast.Node) int {
+		aPos, bPos := a.Pos().Position(), b.Pos().Position()
+		switch {
+		case aPos.Filename == bPos.Filename:
+			return cmp.Compare(aPos.Offset, bPos.Offset)
+		case aPos.Filename == tokFile.Name():
+			// The current file goes last.
+			return 1
+		case bPos.Filename == tokFile.Name():
+			// The current file goes last.
+			return -1
+		default:
+			return cmp.Compare(aPos.Filename, bPos.Filename)
+		}
+	})
+
+	// Because in CUE docs can come from several files (and indeed
+	// packages), it could be confusing if we smush them all together
+	// without showing any provenance. So, for each non-empty comment,
+	// we add a link to that comment as a section-footer. This can help
+	// provide some context for each section of docs.
+	var sb strings.Builder
+	for _, key := range keys {
+		addLink := false
+		for _, cg := range comments[key] {
+			text := cg.Text()
+			text = strings.TrimRight(text, "\n")
+			if text == "" {
+				continue
+			}
+			fmt.Fprintln(&sb, text)
+			addLink = true
+		}
+		if addLink {
+			pos := key.Pos().Position()
+			fmt.Fprintf(&sb, "([%s line %d](%s#L%d))\n\n", filepath.Base(pos.Filename), pos.Line, protocol.URIFromPath(pos.Filename), pos.Line)
+		}
+	}
+
+	docs := strings.TrimRight(sb.String(), "\n")
+	return &protocol.Hover{
+		Contents: protocol.MarkupContent{
+			Kind:  protocol.Markdown,
+			Value: docs,
+		},
+	}
 }
 
 // Completion attempts to treat the given uri and position as a file

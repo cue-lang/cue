@@ -54,6 +54,52 @@ func (c *Controller) initTasks(addStats bool) {
 		}
 	}
 
+	// Calculate deferred tasks (those waiting for runtime inputs).
+	// Only needed if we're not already running inferred tasks.
+	if !c.cfg.RunInferredTasks {
+		changed := true
+		for changed {
+			changed = false
+			for _, t := range c.tasks {
+				if t.deferred {
+					continue
+				}
+
+				// Defer if task has runtime dependencies
+				shouldDefer := len(t.runtimeDeps) > 0
+
+				// Or if task depends on a deferred task (propagation)
+				if !shouldDefer {
+					for d := range t.deps {
+						if d.deferred {
+							shouldDefer = true
+							break
+						}
+					}
+				}
+
+				// Service tasks (like Serve) are never deferred
+				if shouldDefer && !t.isService {
+					t.deferred = true
+					changed = true
+				}
+			}
+		}
+
+		// Prune dependencies: Service tasks shouldn't wait for deferred tasks
+		for _, t := range c.tasks {
+			if t.isService {
+				var kept []*Task
+				for _, d := range t.depTasks {
+					if !d.deferred {
+						kept = append(kept, d)
+					}
+				}
+				t.depTasks = kept
+			}
+		}
+	}
+
 	// Check if there are cycles in the task dependencies.
 	if err := checkCycle(c.tasks); err != nil {
 		c.addErr(err, "cyclic task")
@@ -129,14 +175,19 @@ func (c *Controller) getTask(scope *Task, v cue.Value) *Task {
 		if r != nil {
 			index := len(c.tasks)
 			t = &Task{
-				v:      v,
-				c:      c,
-				r:      r,
-				path:   p,
-				labels: w.Path(),
-				key:    key,
-				index:  index,
-				err:    errs,
+				v:        v,
+				c:        c,
+				r:        r,
+				path:     p,
+				labels:   w.Path(),
+				key:      key,
+				index:    index,
+				err:      errs,
+				valueSeq: -1, // Ensure first updateTaskValue call updates the value
+			}
+			// If the runner declares it is a service, mark the task accordingly.
+			if ce, ok := r.(Service); ok && ce.IsService() {
+				t.isService = true
 			}
 			c.tasks = append(c.tasks, t)
 			c.keys[key] = t

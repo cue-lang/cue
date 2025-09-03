@@ -128,7 +128,7 @@ func TestParseHeaders(t *testing.T) {
 		}
 		`,
 		field: "header",
-		out:   "header.\"1\": cannot use value 'a' (type bytes) as string",
+		out:   "header.\"1\": cannot use value 'a' (type bytes) as list",
 	}, {
 		req: `
 			header: 1

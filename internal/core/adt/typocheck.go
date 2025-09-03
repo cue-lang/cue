@@ -628,7 +628,9 @@ func (n *nodeContext) checkTypos() {
 
 		// TODO: do not descend on optional?
 
-		// openDebugGraph(ctx, a, "NOT ALLOWED") // Uncomment for debugging.
+		if OpenGraphs {
+			openDebugGraph(ctx, a, "NOT ALLOWED") // Uncomment for debugging.
+		}
 
 		if b := ctx.notAllowedError(a); b != nil && a.ArcType <= ArcRequired {
 			err = CombineErrors(nil, err, b)

@@ -165,6 +165,7 @@ func FromVersion(version int) Option {
 // DeprecationError is a sentinel error to indicate that an error is
 // related to an unsupported old CUE syntax.
 type DeprecationError struct {
+	// Deprecated: version integers have been replaced by language versions as semver strings.
 	Version int
 }
 

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03220bdc_97787416",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-03T14:21:41Z",
+      "side": 1,
+      "message": "this legacy failure seems new. mention it in the commit message?",
+      "revId": "df1f47beaf99a20c40ce461d40856e9d45e43ce4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a965c34_13b0e220",
+        "filename": "internal/task/task.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-03T14:21:41Z",
+      "side": 1,
+      "message": "typically error values begin with Err, like ErrLegacy",
+      "revId": "df1f47beaf99a20c40ce461d40856e9d45e43ce4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

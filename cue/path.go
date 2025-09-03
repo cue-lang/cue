@@ -275,6 +275,11 @@ func pathToStrings(p Path) (a []string) {
 	return a
 }
 
+// Append adds sel as a path component to p.
+func (p Path) Append(sel Selector) Path {
+	return Path{path: append(p.path, sel)}
+}
+
 // ParsePath parses a CUE expression into a Path. Any error resulting from
 // this conversion can be obtained by calling Err on the result.
 //

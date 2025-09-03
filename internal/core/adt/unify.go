@@ -120,7 +120,11 @@ func (n *nodeContext) scheduleConjuncts() {
 //	func (v *Vertex) unify@(c *OpContext, needs condition, mode runMode) bool {
 //		return v.unifyC(c, needs, mode, true)
 //	}
-func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos bool) bool {
+func (v *Vertex) unify(c *OpContext, flags Flags) bool {
+	needs := flags.condition
+	mode := flags.mode
+	checkTypos := flags.checkTypos
+
 	if c.LogEval > 0 {
 		defer c.Un(c.Indentf(v, "UNIFY(%x, %v)", needs, mode))
 	}
@@ -236,7 +240,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 		n.process(pendingKnown, attemptOnly)
 		if n.node.ArcType == ArcPending {
 			for _, a := range n.node.Arcs {
-				a.unify(c, needs, attemptOnly, checkTypos)
+				a.unify(c, Flags{condition: needs, mode: attemptOnly, checkTypos: checkTypos})
 			}
 		}
 		// TODO(evalv3): do we need this? Error messages are slightly better,
@@ -305,7 +309,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 		}
 		// We unify here to proactively detect cycles. We do not need to,
 		// nor should we, if have have already found one.
-		v.unify(n.ctx, needs, mode, checkTypos)
+		v.unify(n.ctx, Flags{condition: needs, mode: mode, checkTypos: checkTypos})
 	}
 
 	// At this point, no more conjuncts will be added, so we could decrement
@@ -391,7 +395,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 			// Ensure the shared node is processed to the requested level. This is
 			// typically needed for scalar values.
 			if w.status == unprocessed {
-				w.unify(c, needs, mode, false)
+				w.unify(c, Flags{condition: needs, mode: mode, checkTypos: false})
 			}
 
 			return n.meets(needs)
@@ -420,7 +424,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 
 		// Ensure that shared nodes comply to the same requirements as we
 		// need for the current node.
-		w.unify(c, needs, mode, checkTypos)
+		w.unify(c, Flags{condition: needs, mode: mode, checkTypos: checkTypos})
 
 		return true
 	}
@@ -615,7 +619,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 		a := n.node.Arcs[arcPos]
 		// TODO: Consider skipping lets.
 
-		if !a.unify(n.ctx, needs, mode, checkTypos) {
+		if !a.unify(n.ctx, Flags{condition: needs, mode: mode, checkTypos: checkTypos}) {
 			success = false
 		}
 
@@ -778,7 +782,7 @@ func (n *nodeContext) evalArcTypes(mode runMode) {
 		if a.ArcType != ArcPending {
 			continue
 		}
-		a.unify(n.ctx, arcTypeKnown, mode, false)
+		a.unify(n.ctx, Flags{condition: arcTypeKnown, mode: mode, checkTypos: false})
 		// Ensure the arc is processed up to the desired level
 		if a.ArcType == ArcPending {
 			// TODO: cancel tasks?
@@ -904,11 +908,11 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 			// some values to be remain unevaluated.
 			switch {
 			case needs == arcTypeKnown|fieldSetKnown:
-				arc.unify(c, needs, finalize, false)
+				arc.unify(c, Flags{condition: needs, mode: finalize, checkTypos: false})
 			default:
 				// Now we can't finalize, at least try to get as far as we
 				// can and only yield if we really have to.
-				if !arc.unify(c, needs, attemptOnly, false) {
+				if !arc.unify(c, Flags{condition: needs, mode: attemptOnly, checkTypos: false}) {
 					arcState.process(needs, yield)
 				}
 			}

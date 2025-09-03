@@ -2032,7 +2032,7 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 		// more robust by moving to a pure call-by-need mechanism, for instance.
 		// TODO: using attemptOnly here will remove the cyclic reference error
 		// of comprehension.t1.ok (which also errors in V2),
-		node.unify(c, state.condition, finalize, true)
+		node.unify(c, Flags{condition: state.condition, mode: finalize, checkTypos: true})
 	}
 
 	v, ok = c.getDefault(v)

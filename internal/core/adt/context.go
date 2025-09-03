@@ -755,13 +755,13 @@ func (c *OpContext) evalStateCI(v Expr, state Flags) (result Value, ci CloseInfo
 
 			switch runMode {
 			case finalize:
-				arc.unify(c, needs, attemptOnly, true) // to set scalar
+				arc.unify(c, Flags{condition: needs, mode: attemptOnly, checkTypos: true}) // to set scalar
 				s.freeze(needs)
 			case attemptOnly:
-				arc.unify(c, needs, attemptOnly, true) // to set scalar
+				arc.unify(c, Flags{condition: needs, mode: attemptOnly, checkTypos: true}) // to set scalar
 
 			case yield:
-				arc.unify(c, needs, runMode, true) // to set scalar
+				arc.unify(c, Flags{condition: needs, mode: runMode, checkTypos: true}) // to set scalar
 
 				evaluating := arc.status == evaluating
 				if state.concrete && orig != arc && orig.state != nil && orig.state.meets(scalarKnown) && IsRecursivelyConcrete(arc) {
@@ -908,7 +908,7 @@ func (c *OpContext) unifyNode(expr Expr, state Flags) (result Value) {
 		// that disjunctions are finalized, so that disjunction shows
 		// up in BaseValue.
 		if len(n.disjuncts) > 0 {
-			n.node.unify(c, arcTypeKnown, yield, false)
+			n.node.unify(c, Flags{condition: arcTypeKnown, mode: yield, checkTypos: false})
 		}
 	}
 

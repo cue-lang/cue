@@ -263,6 +263,87 @@ func TestScript(t *testing.T) {
 					fmt.Fprintln(ts.Stdout(), s)
 				}
 			},
+			// curl is a simple HTTP client for testscripts.
+			// Supports: -X METHOD, -H header, -d data, -L (follow redirects), -w format, -f (fail on error)
+			"curl": func(ts *testscript.TestScript, neg bool, args []string) {
+				method := "GET"
+				var headers []string
+				var data string
+				followRedirects := false
+				writeFormat := ""
+				failOnError := false
+
+				var reqURL string
+				for i := 0; i < len(args); i++ {
+					arg := args[i]
+					switch {
+					case arg == "-X" && i+1 < len(args):
+						i++
+						method = args[i]
+					case arg == "-H" && i+1 < len(args):
+						i++
+						headers = append(headers, args[i])
+					case arg == "-d" && i+1 < len(args):
+						i++
+						data = args[i]
+						if method == "GET" {
+							method = "POST"
+						}
+					case arg == "-L":
+						followRedirects = true
+					case arg == "-f":
+						failOnError = true
+					case arg == "-w" && i+1 < len(args):
+						i++
+						writeFormat = args[i]
+					case !strings.HasPrefix(arg, "-"):
+						reqURL = arg
+					}
+				}
+				if reqURL == "" {
+					ts.Fatalf("curl: no URL specified")
+				}
+
+				var body io.Reader
+				if data != "" {
+					body = strings.NewReader(data)
+				}
+				req, err := http.NewRequest(method, reqURL, body)
+				ts.Check(err)
+
+				for _, h := range headers {
+					key, val, _ := strings.Cut(h, ":")
+					req.Header.Add(strings.TrimSpace(key), strings.TrimSpace(val))
+				}
+
+				client := &http.Client{}
+				if !followRedirects {
+					client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+						return http.ErrUseLastResponse
+					}
+				}
+
+				resp, err := client.Do(req)
+				ts.Check(err)
+				defer resp.Body.Close()
+
+				_, err = io.Copy(ts.Stdout(), resp.Body)
+				ts.Check(err)
+
+				// Handle -w format (mainly for adding newline)
+				if writeFormat != "" {
+					fmt.Fprint(ts.Stdout(), strings.ReplaceAll(writeFormat, `\n`, "\n"))
+				}
+
+				// Check for HTTP errors when -f is used
+				failed := failOnError && resp.StatusCode >= 400
+				if failed && !neg {
+					ts.Fatalf("curl: HTTP %d", resp.StatusCode)
+				}
+				if !failed && neg {
+					ts.Fatalf("curl: expected failure but got HTTP %d", resp.StatusCode)
+				}
+			},
 		},
 		Setup: func(e *testscript.Env) error {
 			// If a testscript loads CUE packages but forgot to set up a cue.mod,

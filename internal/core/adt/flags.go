@@ -26,4 +26,7 @@ type Flags struct {
 
 	// concrete indicates whether the result should be concrete.
 	concrete bool
+
+	// checkTypos indicates whether to check for typos (closedness).
+	checkTypos bool
 }

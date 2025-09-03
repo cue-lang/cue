@@ -568,7 +568,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 	d.defaultMode = n.defaultMode
 	d.origDefaultMode = m
 
-	v.unify(n.ctx, allKnown, mode, true)
+	v.unify(n.ctx, Flags{condition: allKnown, mode: mode, checkTypos: true})
 
 	if err := d.getErrorAll(); err != nil && !isCyclePlaceholder(err) {
 		d.freeDisjunct()

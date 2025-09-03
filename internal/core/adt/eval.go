@@ -132,7 +132,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state Flags) Value {
 // for more details.
 func (c *OpContext) unify(v *Vertex, flags Flags) {
 	requires, mode := flags.condition, flags.mode
-	v.unify(c, requires, mode, true)
+	v.unify(c, Flags{condition: requires, mode: mode, checkTypos: true})
 }
 
 // validateValue checks collected bound validators and checks them against

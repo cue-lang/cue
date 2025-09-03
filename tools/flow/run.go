@@ -57,6 +57,11 @@ func (c *Controller) runLoop() {
 
 		// Mark tasks as Ready.
 		for _, t := range c.tasks {
+			// Skip deferred tasks - they're expected to run later
+			// via ForkRunLoop when their inputs become available.
+			if t.deferred {
+				continue
+			}
 			switch t.state {
 			case Waiting:
 				waiting = true

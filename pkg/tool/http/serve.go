@@ -1,0 +1,270 @@
+// Copyright 2023 CUE Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package http
+
+import (
+	"fmt"
+	"io"
+	"log"
+	"net"
+	"net/http"
+	"os"
+	"regexp"
+	"sync"
+
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal/task"
+)
+
+var (
+	muxers = map[string]*http.ServeMux{}
+	// listeners stores net.Listener for each address to enable error checking
+	// before starting the serve goroutine.
+	listeners = map[string]net.Listener{}
+)
+
+func newServeCmd(v cue.Value) (task.Runner, error) {
+	return &listenCmd{}, nil
+}
+
+type listenCmd struct {
+	w    http.ResponseWriter
+	body cue.Path
+}
+
+// IsService indicates that http.Serve acts as a service.
+// Other tasks can reference request fields (which are filled
+// at runtime) without creating a dependency cycle error.
+func (c *listenCmd) IsService() bool {
+	return true
+}
+
+var m sync.Mutex
+
+// valueMu protects cue.Value operations which are not thread-safe.
+// This serializes all request handling, which is not ideal for performance.
+// TODO: remove this lock once cue.Value supports concurrent operations.
+var valueMu sync.Mutex
+
+var (
+	listenPath = cue.ParsePath("listenAddr")
+	pathPath   = cue.ParsePath("routing.path")
+	methodPath = cue.ParsePath("routing.method")
+
+	requestPath        = cue.ParsePath("request")
+	respBodyPath       = cue.ParsePath("response.body")
+	respStatusCodePath = cue.ParsePath("response.statusCode")
+	responsePath       = cue.ParsePath("response")
+)
+
+// httpRequest represents the request data to fill into the CUE value.
+type httpRequest struct {
+	Method     string              `json:"method"`
+	URL        string              `json:"url"`
+	Body       []byte              `json:"body"`
+	Form       map[string][]string `json:"form"`
+	Header     map[string][]string `json:"header"`
+	PathValues map[string]string   `json:"pathValues"`
+}
+
+func (c *listenCmd) Run(ctx *task.Context) (res interface{}, err error) {
+	valueMu.Lock()
+	v := ctx.Obj
+	addr, err := v.LookupPath(listenPath).String()
+	valueMu.Unlock()
+
+	if err != nil {
+		return nil, err
+	}
+
+	m.Lock()
+	mux := muxers[addr]
+	if mux == nil {
+		// Create listener first to catch errors (e.g., port unavailable)
+		// before starting the serve goroutine.
+		ln, err := net.Listen("tcp", addr)
+		if err != nil {
+			m.Unlock()
+			return nil, fmt.Errorf("cannot listen on %s: %w", addr, err)
+		}
+
+		mux = http.NewServeMux()
+		muxers[addr] = mux
+		listeners[addr] = ln
+
+		log.Printf("listening on %v\n", addr)
+
+		// TODO: use Server at some point.
+		go http.Serve(ln, mux)
+	}
+	m.Unlock()
+
+	valueMu.Lock()
+	url := "/"
+	if p := v.LookupPath(pathPath); p.Exists() {
+		url, err = p.String()
+		if err != nil {
+			valueMu.Unlock()
+			return nil, err
+		}
+	}
+
+	vars := extractPathVariables(url)
+
+	if m := v.LookupPath(methodPath); m.Exists() {
+		method, err := m.String()
+		if err != nil {
+			valueMu.Unlock()
+			return nil, err
+		}
+		url = fmt.Sprintf("%s %s", method, url)
+	}
+
+	path := v.Path()
+	valueMu.Unlock()
+
+	log.Printf("adding handler for %v\n", url)
+	mux.HandleFunc(url, func(w http.ResponseWriter, req *http.Request) {
+		err := req.ParseForm()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("cannot parse form: %v", err), http.StatusBadRequest)
+			return
+		}
+
+		data, err := io.ReadAll(req.Body)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("cannot read body: %v", err), http.StatusBadRequest)
+			return
+		}
+
+		pathValues := make(map[string]string)
+		for _, variable := range vars {
+			if s := req.PathValue(variable); s != "" {
+				pathValues[variable] = s
+			}
+		}
+
+		valueMu.Lock()
+		defer valueMu.Unlock()
+
+		reqValue := v.FillPath(requestPath, httpRequest{
+			Method:     req.Method,
+			URL:        req.URL.String(),
+			Body:       data,
+			Form:       req.Form,
+			Header:     req.Header,
+			PathValues: pathValues,
+		})
+
+		handle := &serveCmd{w: w}
+
+		c := req.Context()
+		controller := ctx.ForkRunLoop(c, path, reqValue, handle)
+
+		if err := controller.Run(c); err != nil {
+			cwd, _ := os.Getwd()
+			details := errors.Details(err, &errors.Config{Cwd: cwd, ToSlash: true})
+			// TODO: return JSON-formatted error response for consistency with
+			// successful responses (e.g. {"error": "...", "details": "..."}).
+			http.Error(w, fmt.Sprintf("error handling request: %v", details), http.StatusInternalServerError)
+			return
+		}
+	})
+
+	ctx.BackgroundTask()
+	return nil, nil
+}
+
+// variableRegex is a regular expression to find all instances of {variableName} in a path.
+// It captures the content inside the braces.
+var variableRegex = regexp.MustCompile(`\{([^{}\.]+)(\.\.\.)?\}`)
+
+// extractPathVariables parses a URL pattern string and returns a slice of the variable names.
+// For example, given "/users/{userID}/posts/{postID}", it returns ["userID", "postID"].
+// The special pattern {$} (exact path match in http.ServeMux) is excluded.
+func extractPathVariables(pattern string) []string {
+	matches := variableRegex.FindAllStringSubmatch(pattern, -1)
+	if matches == nil {
+		return nil
+	}
+
+	var variables []string
+	for _, match := range matches {
+		// The first submatch (index 1) is the captured group, which is the variable name.
+		// Skip {$} which is a special http.ServeMux pattern for exact path matching.
+		if name := match[1]; name != "$" {
+			variables = append(variables, name)
+		}
+	}
+	return variables
+}
+
+type serveCmd struct {
+	w    http.ResponseWriter
+	body cue.Path
+}
+
+// IsService indicates that http.Serve should not be reported as part
+// of task cycles during request handling via ForkRunLoop.
+func (c *serveCmd) IsService() bool {
+	return true
+}
+
+func (c *serveCmd) Run(ctx *task.Context) (res interface{}, err error) {
+	v := ctx.Obj
+
+	response := v.LookupPath(responsePath)
+	headers, err := parseHeaders(response, "header")
+	if err != nil {
+		http.Error(c.w, fmt.Sprintf("cannot parse headers: %v", err), http.StatusBadRequest)
+		return nil, err
+	}
+	trailers, err := parseHeaders(response, "trailer")
+	if err != nil {
+		http.Error(c.w, fmt.Sprintf("cannot parse trailers: %v", err), http.StatusBadRequest)
+		return nil, err
+	}
+
+	v = v.LookupPath(respBodyPath)
+
+	b, err := v.Bytes()
+	if err != nil {
+		http.Error(c.w, fmt.Sprintf("cannot encode response: %v", err), http.StatusBadRequest)
+	}
+
+	for k, v := range headers {
+		for _, v := range v {
+			c.w.Header().Set(k, v)
+		}
+	}
+
+	for k, v := range trailers {
+		for _, v := range v {
+			c.w.Header().Set(k, v)
+		}
+	}
+
+	// Set status code if specified, otherwise defaults to 200
+	if sc := ctx.Obj.LookupPath(respStatusCodePath); sc.Exists() {
+		if code, err := sc.Int64(); err == nil {
+			c.w.WriteHeader(int(code))
+		}
+	}
+
+	c.w.Write(b)
+
+	return nil, nil
+}

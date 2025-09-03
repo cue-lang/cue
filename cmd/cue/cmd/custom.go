@@ -22,6 +22,8 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"os/signal"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -223,6 +225,11 @@ func doTasks(cmd *Command, command string, root *cue.Instance) error {
 	// Return early if anything was in error
 	if err := c.Run(cmd.Context()); err != nil {
 		return err
+	}
+	if itask.Background.Load() {
+		signalChan := make(chan os.Signal, 1)
+		signal.Notify(signalChan, os.Interrupt)
+		<-signalChan
 	}
 
 	if !didWork.Load() {

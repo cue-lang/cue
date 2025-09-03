@@ -163,6 +163,33 @@ func (c Context) flowFunc(runner Runner, v cue.Value) flow.RunnerFunc {
 	})
 }
 
+// ForkRunLoop is used to serve an external event. It makes a copy of the
+// configuration that results from the first phase and than patches the
+// task at path to run the given runner, instead of the initialization phase.
+func (c Context) ForkRunLoop(ctx context.Context, path cue.Path, v cue.Value, r Runner) *flow.Controller {
+	cfg := &flow.Config{
+		Root:           path,
+		InferTasks:     true,
+		IgnoreConcrete: true,
+	}
+
+	root := c.Root.FillPath(path, v)
+
+	taskFunc := func(v cue.Value) (flow.Runner, error) {
+		// The node itself has a function to continue.
+		if v.Path().String() == path.String() {
+			return c.flowFunc(r, cue.Value{}), nil
+		}
+		var didWork atomic.Bool
+		// if !didWork.Load() {
+		// 	return nil, fmt.Errorf("%v: no tasks found", cmdPath)
+		// }
+		return c.TaskFunc(&didWork)(v)
+	}
+
+	return flow.New(cfg, root, taskFunc)
+}
+
 // taskError wraps some error values to retain position information about the
 // error.
 type taskError struct {
@@ -209,6 +236,23 @@ type Runner interface {
 	// Runner runs given the current value and returns a new value which is to
 	// be unified with the original result.
 	Run(ctx *Context) (results interface{}, err error)
+}
+
+// Background indicates whether the task is running in the background after
+// finishing.
+var Background atomic.Bool
+
+// BackgroundTask must be used by a task to indicate that it is running in the
+// background.
+// TODO: this is a hack. We should have a better way to indicate this. Also,
+// introduce mechanism to cancel and background tasks, detect when they are
+// done, and collect errors.
+// Maybe do something like put a sync.WaitGroup (or errgroup.Group) inside
+// task.Context and have a way to add to it (perhaps just expose a Go method)
+// and wait for it to complete (in practice you'd probably select on that
+// finishing and os.Interrupt)?
+func (c *Context) BackgroundTask() {
+	Background.Store(true)
 }
 
 // Register registers a task for cue commands.

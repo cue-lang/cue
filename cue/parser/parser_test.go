@@ -925,8 +925,7 @@ func TestStrict(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			mode := []Option{AllErrors, ParseComments, FromVersion(Latest)}
-			_, err := ParseFile("input", tc.in, mode...)
+			_, err := ParseFile("input", tc.in, AllErrors, ParseComments)
 			if err == nil {
 				t.Errorf("unexpected success: %v", tc.in)
 			}

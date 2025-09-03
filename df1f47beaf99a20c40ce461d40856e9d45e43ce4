@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "869490de_c178b4d9",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-03T14:27:27Z",
+      "side": 1,
+      "message": "ah, perhaps it\u0027s a bad git conflict resolution then. perhaps re-do the refactor with master just in case.",
+      "parentUuid": "55cfffb3_87eda8d1",
+      "revId": "df1f47beaf99a20c40ce461d40856e9d45e43ce4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5a965c34_13b0e220",
         "filename": "internal/task/task.go",
         "patchSetId": 1

@@ -183,6 +183,7 @@ func (c *buildContext) isInternal(sel cue.Selector) bool {
 func (b *builder) failf(v cue.Value, format string, args ...interface{}) {
 	panic(&openapiError{
 		errors.NewMessagef(format, args...),
+		v.Err(),
 		cue.MakePath(b.ctx.path...),
 		v.Pos(),
 	})
@@ -692,6 +693,8 @@ func (b *builder) object(v cue.Value) {
 		// TODO: extract format from specific type.
 
 	default:
+		// TODO: consider // TODO(pkg):  wrapping may cause issues in the
+		// builtin package. Seems fine for now though.
 		b.failf(v, "unsupported op %v for object type (%v)", op, v)
 		return
 	}

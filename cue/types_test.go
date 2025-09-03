@@ -2973,7 +2973,6 @@ func TestValueDoc(t *testing.T) {
 			val  cue.Value
 			path string
 			doc  string
-			skip bool
 		}{{
 			val:  v1,
 			path: "foos",
@@ -3009,8 +3008,6 @@ field1 is an int.
 
 comment from bar on field 1
 `,
-			// New evaluaotor orders the comments differently (arguably better).
-			skip: true,
 		}, {
 			val:  v1,
 			path: "baz field2",
@@ -3491,7 +3488,6 @@ func TestPos(t *testing.T) {
 	testCases := []struct {
 		value string
 		pos   string
-		skip  bool
 	}{{
 		value: `
 a: string
@@ -3501,11 +3497,7 @@ a: "foo"`,
 		value: `
 a: x: string
 a: x: "x"`,
-		pos: "2:4",
-
-		// the position of the new evaluator is also correct, and actually
-		// better.
-		skip: true,
+		pos: "3:4",
 	}, {
 		// Prefer struct conjuncts with actual fields.
 		value: `
@@ -3525,10 +3517,6 @@ a: x: y: z: "x"`,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
-			if tc.skip {
-				m.TODO_V3(t) // P3: different position
-			}
-
 			c := m.CueContext()
 			v := c.CompileString(tc.value)
 			v = v.LookupPath(cue.ParsePath("a"))
@@ -3545,7 +3533,6 @@ func TestPathCorrection(t *testing.T) {
 		input  string
 		lookup func(i cue.Value) cue.Value
 		want   string
-		skip   bool
 	}{{
 		input: `
 			a: b: {
@@ -3783,9 +3770,6 @@ func TestPathCorrection(t *testing.T) {
 		},
 	}}
 	for _, tc := range testCases {
-		if tc.skip {
-			continue
-		}
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			ctx := m.CueContext()
 

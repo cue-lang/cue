@@ -83,8 +83,7 @@ func TestLatest(t *testing.T) {
 				if !strings.HasSuffix(f.Name, ".cue") || path.Base(f.Name) == "invalid.cue" {
 					return
 				}
-				v := parser.FromVersion(parser.Latest)
-				_, err := parser.ParseFile(f.Name, f.Data, v)
+				_, err := parser.ParseFile(f.Name, f.Data)
 				if err != nil {
 					w := &bytes.Buffer{}
 					fmt.Fprintf(w, "\n%s:\n", fullpath)

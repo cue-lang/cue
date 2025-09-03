@@ -87,20 +87,6 @@ func (c Context) Sqrt(d, x *apd.Decimal) (apd.Condition, error) {
 // BaseContext is used as CUE's default context for arbitrary-precision decimals.
 var BaseContext = Context{*apd.BaseContext.WithPrecision(34)}
 
-// APIVersionSupported is the back version until which deprecated features
-// are still supported.
-var APIVersionSupported = Version(MinorSupported, PatchSupported)
-
-const (
-	MinorCurrent   = 5
-	MinorSupported = 4
-	PatchSupported = 0
-)
-
-func Version(minor, patch int) int {
-	return -1000 + 100*minor + patch
-}
-
 // EvaluatorVersion is declared here so it can be used everywhere without import cycles,
 // but the canonical documentation lives at [cuelang.org/go/cue/cuecontext.EvalVersion].
 //

@@ -18,6 +18,8 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/pkg"
 )
 
 var _ errors.Error = &openapiError{}
@@ -25,8 +27,18 @@ var _ errors.Error = &openapiError{}
 // implements cue/Error
 type openapiError struct {
 	errors.Message
+	err  error
 	path cue.Path
 	pos  token.Pos
+}
+
+// Bottom implements the Bottomer. By doing so we ensure that logic that
+// checks for an incomplete error can do so, even if wrapped in an openapiError.
+func (e *openapiError) Bottom() *adt.Bottom {
+	if x, ok := e.err.(pkg.Bottomer); ok {
+		return x.Bottom()
+	}
+	return nil
 }
 
 func (e *openapiError) Position() token.Pos {

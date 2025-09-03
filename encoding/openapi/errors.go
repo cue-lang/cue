@@ -25,6 +25,7 @@ var _ errors.Error = &openapiError{}
 // implements cue/Error
 type openapiError struct {
 	errors.Message
+	err  error
 	path cue.Path
 	pos  token.Pos
 }

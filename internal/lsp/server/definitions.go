@@ -40,6 +40,15 @@ func (s *server) Completion(ctx context.Context, params *protocol.CompletionPara
 	return pkg.Completion(uri, params.Position), nil
 }
 
+func (s *server) Hover(ctx context.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
+	uri := params.TextDocument.URI
+	pkg, err := s.packageForURI(uri)
+	if err != nil {
+		return nil, err
+	}
+	return pkg.Hover(uri, params.Position), nil
+}
+
 func (s *server) packageForURI(uri protocol.DocumentURI) (*cache.Package, error) {
 	mod, err := s.workspace.FindModuleForFile(uri)
 	if err != nil {

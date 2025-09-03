@@ -38,7 +38,11 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 
 	parsedFile, config, fh, err := mod.ReadCUEFile(uri)
 	if err != nil {
-		return nil, err
+		s.client.ShowMessage(ctx, &protocol.ShowMessageParams{
+			Type:    protocol.Info,
+			Message: fmt.Sprintf("Cannot format file: %v", err),
+		})
+		return nil, nil
 	} else if parsedFile == nil {
 		s.debugLog(fmt.Sprintf("%v is not a CUE file", uri))
 		return nil, nil

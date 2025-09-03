@@ -126,6 +126,8 @@ func toCUE(name string, x interface{}) (v ast.Expr, err error) {
 		v, err = cuejson.Extract(name, b)
 	}
 	if err != nil {
+		// TODO(pkg):  wrapping may cause issues in the builtin package. Seems
+		// fine for now though.
 		return nil, errors.Wrapf(err, token.NoPos,
 			"openapi: could not encode %s", name)
 	}

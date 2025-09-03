@@ -1,0 +1,347 @@
+exec cue cmd serve &
+
+exec sleep 1
+
+curl -X GET http://localhost:8082/test
+stdout 'ack: using method GET'
+
+curl -X GET http://localhost:8082/one/1/two/i/i
+stdout 'ack: one/1 two/i/i'
+
+curl -X GET http://localhost:8082/authz/alice
+stdout 'true'
+
+curl -X GET http://localhost:8082/authz/bob
+stdout 'false'
+
+curl -w '\n' -X GET http://localhost:8082/schema/api/vm?r=research
+cmp stdout out/vm-research
+
+curl -L 'http://localhost:8082/api/vm?u=alice' -H 'Content-Type: application/json' -d '{"os":"Linux","arch":"x86","mem":10000000000,"disk":20000000000,"access": {"public":true}}'
+stdout 'OK'
+
+curl -L 'http://localhost:8082/authz' -H 'Content-Type: application/json' -d '{"user":"alice"}'
+stdout 'true'
+
+curl -L 'http://localhost:8082/authz' -H 'Content-Type: application/json' -d '{"user":"bob"}'
+stdout 'false'
+
+# Custom status code examples
+
+# Valid request returns 201 Created
+curl -w '\n' -L 'http://localhost:8082/api/vm/create?u=alice' -H 'Content-Type: application/json' -d '{}'
+cmp stdout out/create-201
+
+# Missing required parameter returns 400 Bad Request
+! curl -f -w '\n' -L 'http://localhost:8082/api/vm/create' -H 'Content-Type: application/json' -d '{}'
+cmp stdout out/create-400
+
+# Error cases
+
+# Malformed JSON input
+! curl -f -L 'http://localhost:8082/authz' -H 'Content-Type: application/json' -d 'not valid json'
+cmpenv stdout out/error-malformed-json
+
+# Research user (bob) trying to create a public VM - violates access: public: false constraint
+! curl -f -L 'http://localhost:8082/api/vm?u=bob' -H 'Content-Type: application/json' -d '{"os":"Linux","arch":"x86","mem":10000000000,"disk":20000000000,"access":{"public":true}}'
+cmpenv stdout out/error-public-vm
+
+# Invalid OS value
+! curl -f -L 'http://localhost:8082/api/vm?u=alice' -H 'Content-Type: application/json' -d '{"os":"FreeBSD","arch":"x86","mem":10000000000,"disk":20000000000,"access":{"public":true}}'
+cmpenv stdout out/error-invalid-os
+
+stop
+
+-- authz_tool.cue --
+package vm
+
+import "encoding/json"
+
+#Authz: {
+	user!: string
+
+	authz: *false | bool
+
+    authz: allow && !deny
+
+    deny: *false | bool // default(false)
+    allow: *false | bool  // default(true)
+
+    if user == "alice" {
+        allow: true
+    }
+}
+
+// We have two kinds of authz endpoints: one that takes the user
+// as part of the URL path, and one that takes a JSON body.
+//
+// The main purpose here is to show that requests can be routed based on their
+// method type.
+//
+// This pattern constraint sets up the common aspects for both.
+command: serve: [=~"^/authz"]: ServeJSON & {
+	request: value: #Authz
+	response: value: request.value.authz
+}
+
+// authz returns a boolean indicating whether the user is authorized.
+// The user is specified as part of the URL path.
+command: serve: "/authz/{user}": {
+	method: "GET"
+	request: value: user: request.pathValues.user
+}
+
+// authz returns a boolean indicating whether the user is authorized.
+// The user is specified in the JSON body.
+command: serve: "/authz": {
+	method: "POST"
+	request: value: json.Unmarshal(request.body)
+}
+
+-- api_tool.cue --
+package vm
+
+import (
+	"encoding/json"
+	"encoding/openapi"
+)
+
+//#Machine describes a virtual machine.
+#Machine: {
+	os:     "Windows" | "Linux" | "MacOS"
+	arch:   "x86" | "arm64"
+	mem?:    int
+	disk?:   int
+	access?: {
+		public?: bool
+	}
+}
+
+// MachineByRole defines different machine configurations that are allowed
+// based on user role.
+MachineByRole: {
+	admin: #Machine
+
+	// Interns are only afforded smaller machines.
+	intern: #Machine&{
+		mem?:  <=4Gi
+		disk?: <=100G
+	}
+
+	research: #Machine&{
+		// The research team cannot launch public-facing machines.
+		access?: public?: false
+		os?: "Linux" | "Windows"
+	}
+	default: null
+}
+
+Membership: alice: "admin"
+Membership: bob: "research"
+Membership: taylor: "intern"
+
+// This API gets the allowed VM configurations for a given user defined as
+// OpenAPI. The user is specified as a query parameter.
+// If no user is given, a generic OpenAPI schema for Machine is returned.
+command: serve: "/schema/api/vm": {
+	routing: method: "GET"
+
+	// Define default for user query parameter.
+	request: from: r: *[""] | [...string]
+
+	let role = request.form.r[0]
+	let X = [// select first
+		if role != "" {
+			config: {
+				version: "3.0.0"
+				info: title: "Machine for \(role)"
+			}
+			machine: MachineByRole[(*role | "default")]
+		},
+		{
+			config: {
+				version: "3.0.0"
+				info: title: "Machine"
+			}
+			machine: #Machine
+		}, // default
+	][0]
+
+	response: body: json.Indent(
+		openapi.MarshalSchema(X.config, {#Machine: X.machine}), "", "  ")
+}
+
+// This API simulates creating a new VM for a given user, specified as a query
+// parameter. The machine is requested in the JSON body. It is than checked
+// that the user can actually use the machine.
+command: serve: "/api/vm": {
+	routing: method: "POST"
+
+	// Further constrain user permissions.
+	request: form: u!: [string]
+
+	let user = request.form.u[0]
+	let role = Membership[user]
+
+	// Validate the request to create a new VM against the VM schema.
+	X: #Machine
+	X: json.Unmarshal(request.body)
+	X: MachineByRole[role]
+
+	response: {
+		header: "Content-Type": "application/json"
+
+		result: "OK"
+		body:   json.Marshal(result)
+	}
+}
+
+// This API demonstrates returning custom status codes.
+// It returns 201 Created for successful resource creation and
+// 400 Bad Request when the user parameter is missing.
+command: serve: "/api/vm/create": {
+	routing: method: "POST"
+
+	// Default to empty list if u is not provided
+	request: form: u: *[] | [...string]
+
+	let hasUser = len(request.form.u) > 0
+
+	response: {
+		header: "Content-Type": "application/json"
+
+		// Use a result struct to handle both cases
+		_result: {
+			if hasUser {
+				statusCode: 201
+				data: {
+					status: "created"
+					user:   request.form.u[0]
+				}
+			}
+			if !hasUser {
+				statusCode: 400
+				data: {
+					error: "missing required parameter: u"
+				}
+			}
+		}
+
+		statusCode: _result.statusCode
+		body:       json.Marshal(_result.data)
+	}
+}
+
+-- server_tool.cue --
+package vm
+
+import (
+	"encoding/json"
+	"tool/http"
+)
+
+// Test serves as an endpoint for simple testing.
+command: serve: "/test": http.Serve & {
+	request: _
+	response: body: "ack: using method \(request.method)"
+}
+
+// This endpoint demonstrates capture all path parameters.
+command: serve: "/one/{one}/{two...}": http.Serve & {
+	request: _
+	response: body: "ack: one/\(request.pathValues.one) \(request.pathValues.two)"
+}
+
+
+// ServeJSON is a helper for endpoints that serve JSON.
+ServeJSON: {
+	response: {
+		value!: _
+		body:  json.Marshal(value)
+	}
+}
+
+// All our endpoints serve from the same address.
+// We take the convention that the name of the "subcommand" is the path prefix.
+command: serve: [Prefix=string]: http.Serve & {
+	listenAddr: ":8082"
+	routing: path: Prefix
+}
+-- out/create-201 --
+{"status":"created","user":"alice"}
+-- out/create-400 --
+{"error":"missing required parameter: u"}
+-- out/error-malformed-json --
+error handling request: command.serve."/authz".request.value: error in call to encoding/json.Unmarshal: json: invalid JSON:
+    $WORK/authz_tool.cue:43:18
+
+-- out/error-public-vm --
+error handling request: command.serve."/api/vm".X.access.public: conflicting values false and true:
+    $WORK/api_tool.cue:32:21
+    $WORK/api_tool.cue:88:5
+    json:1:84
+
+-- out/error-invalid-os --
+error handling request: command.serve."/api/vm".X.os: 3 errors in empty disjunction:
+command.serve."/api/vm".X.os: conflicting values "Linux" and "FreeBSD":
+    $WORK/api_tool.cue:10:22
+    $WORK/api_tool.cue:86:5
+    json:1:7
+command.serve."/api/vm".X.os: conflicting values "MacOS" and "FreeBSD":
+    $WORK/api_tool.cue:10:32
+    $WORK/api_tool.cue:86:5
+    json:1:7
+command.serve."/api/vm".X.os: conflicting values "Windows" and "FreeBSD":
+    $WORK/api_tool.cue:10:10
+    $WORK/api_tool.cue:86:5
+    json:1:7
+
+-- out/vm-research --
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Machine for research"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "Machine": {
+        "type": "object",
+        "required": [
+          "arch",
+          "os"
+        ],
+        "properties": {
+          "access": {
+            "type": "object",
+            "properties": {
+              "public": {
+                "type": "boolean"
+              }
+            }
+          },
+          "arch": {
+            "type": "string",
+            "enum": [
+              "x86",
+              "arm64"
+            ]
+          },
+          "disk": {
+            "type": "integer"
+          },
+          "mem": {
+            "type": "integer"
+          },
+          "os": {
+            "type": "string",
+            "enum": [
+              "Linux",
+              "Windows"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -131,8 +131,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state Flags) Value {
 // state == finalized means it is evaluated to completion. See vertexStatus
 // for more details.
 func (c *OpContext) unify(v *Vertex, flags Flags) {
-	requires, mode := flags.condition, flags.mode
-	v.unify(c, Flags{condition: requires, mode: mode, checkTypos: true})
+	v.unify(c, flags)
 }
 
 // validateValue checks collected bound validators and checks them against

@@ -74,7 +74,6 @@ func TestSyntax(t *testing.T) {
 		t: {name: string}
 		output: [ ... {t & x.value}]
 		`,
-		options: o(cue.ResolveReferences(true)),
 		out: `
 {
 	x: {}
@@ -109,8 +108,7 @@ func TestSyntax(t *testing.T) {
 			}
 			a: b: #List
 			`,
-		path:    "a",
-		options: o(cue.ResolveReferences(true)),
+		path: "a",
 		out: `
 {
 	b: _|_ // #List.next: structural cycle (and 1 more errors)
@@ -180,15 +178,15 @@ func TestSyntax(t *testing.T) {
 
 		parameter: replicas: 3
 		`,
-		options: o(cue.ResolveReferences(true)),
+		options: o(cue.Final()),
 		out: `
 {
 	spec: {
 		replicas: 3
 		containers: [{
-			image: *"myimage" | string
+			image: "myimage"
 			name:  "main"
-			envs: [...string]
+			envs: []
 		}]
 		other: {
 			option: int
@@ -213,7 +211,7 @@ if true {
 	out: "\(s)": 3
 }
 	`,
-		options: o(cue.ResolveReferences(true)),
+		options: o(cue.Final()),
 		out: `
 {
 	s: string

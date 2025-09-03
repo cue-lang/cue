@@ -889,7 +889,7 @@ You could file a bug with the above information at:
 	// var expr ast.Expr
 	var err error
 	var f *ast.File
-	if o.concrete || o.final || o.resolveReferences {
+	if o.concrete || o.final {
 		f, err = p.Vertex(v.idx, pkgID, v.v)
 		if err != nil {
 			return bad(`"cuelang.org/go/internal/core/export".Vertex`, err)
@@ -1984,29 +1984,6 @@ func InlineImports(expand bool) Option {
 // non-concrete values are allowed. This is implied by [Concrete].
 func DisallowCycles(disallow bool) Option {
 	return func(p *options) { p.disallowCycles = disallow }
-}
-
-// ResolveReferences forces the evaluation of references when outputting.
-//
-// Deprecated: [Value.Syntax] will now always attempt to resolve dangling references and
-// make the output self-contained. When [Final] or [Concrete] are used,
-// it will already attempt to resolve all references.
-// See also [InlineImports].
-func ResolveReferences(resolve bool) Option {
-	return func(p *options) {
-		p.resolveReferences = resolve
-
-		// ResolveReferences is implemented as a Value printer, rather than
-		// a definition printer, even though it should be more like the latter.
-		// To reflect this we convert incomplete errors to their original
-		// expression.
-		//
-		// TODO: ShowErrors mostly shows incomplete errors, even though this is
-		// just an approximation. There seems to be some inconsistencies as to
-		// when child errors are marked as such, making the conversion somewhat
-		// inconsistent. This option is conservative, though.
-		p.showErrors = true
-	}
 }
 
 // ErrorsAsValues treats errors as a regular value, including them at the

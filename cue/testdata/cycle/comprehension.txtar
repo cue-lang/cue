@@ -2558,6 +2558,30 @@ Result:
     }
   }
 }
+--- issue2229.cue
+{
+  issue2229: {
+    full_ok: {
+      build: (bool|*true)
+      test: (bool|*true)
+      make: [
+        for k, v in 〈2〉 if ((〈0;v〉 & true) != _|_(explicit error (_|_ literal) in source)) {
+          〈1;k〉
+        },
+      ]
+    }
+  }
+  issue2229: {
+    reduced_fail: {
+      x: true
+      y: [
+        for _, v in 〈2〉 if (〈0;v〉 & true) {
+          _
+        },
+      ]
+    }
+  }
+}
 --- issue3903.cue
 {
   issue3903: {

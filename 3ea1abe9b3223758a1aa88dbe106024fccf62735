@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "854c5efd_dd07af94",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-04T11:23:26Z",
+      "side": 0,
+      "message": "this is the cause of the delete-file panic - parsedFile *can* be nil.",
+      "revId": "3ea1abe9b3223758a1aa88dbe106024fccf62735",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff95c584_9ffb799c",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-04T11:23:26Z",
+      "side": 0,
+      "message": "This was the cause of the symlink-related panic.",
+      "revId": "3ea1abe9b3223758a1aa88dbe106024fccf62735",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -37,10 +37,9 @@ import (
 
 func TestVisit(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root: "./testdata",
-		Name: "dependencies",
-		// Matrix: cuetdtest.SmallMatrix,
-		Matrix: cuetdtest.DevOnlyMatrix,
+		Root:   "./testdata",
+		Name:   "dependencies",
+		Matrix: cuetdtest.SmallMatrix,
 
 		ToDo: map[string]string{
 			"dependencies-v3/inline": "error",

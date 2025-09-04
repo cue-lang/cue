@@ -80,9 +80,8 @@ var FullMatrix Matrix = []M{
 
 var SmallMatrix Matrix = []M{evalv3}
 
-var DefaultOnlyMatrix Matrix = []M{evalv3}
-
-var DevOnlyMatrix Matrix = []M{evalv3}
+// Here we could add more matrices when evalv4 eventually comes,
+// as long as their names are clear, like SmallV3Matrix and SmallV4Matrix.
 
 // Run runs a subtest with the given name that
 // invokes a further subtest for each configuration in the matrix.
@@ -98,12 +97,6 @@ func (m Matrix) Do(t *testing.T, f func(t *testing.T, m *M)) {
 		t.Run(c.name, func(t *testing.T) {
 			f(t, &c)
 		})
-	}
-}
-
-func (m *M) TODO_V3(t testing.TB) {
-	if m.version == internal.EvalV3 {
-		t.Skip("Skipping v3")
 	}
 }
 

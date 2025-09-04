@@ -1,3 +1,5 @@
+#expandLetExpr: true
+
 -- in.cue --
 a: {
 	let X = Y
@@ -62,31 +64,35 @@ b.let[]: cyclic references in let clause or alias:
 --- in.cue
 {
   a: {
-    let X#1 = 〈0;let Y#2〉
+    let X#1 = 〈0;let Y#2〉=>〈0;c〉
     let Y#2 = 〈0;c〉
-    b: 〈0;let X#1〉
+    b: 〈0;let X#1〉=>〈0;let Y#2〉=>〈0;c〉
     c: 5
   }
   b: {
-    let X#3 = 〈0;let Y#4〉
-    let Y#4 = 〈0;let X#3〉
-    b: 〈0;let X#3〉
+    let X#3 = 〈0;let Y#4〉=>〈0;let X#3〉=>〈0;let Y#4〉=>_|_(cyclic references in let clause or alias)
+    let Y#4 = 〈0;let X#3〉=>〈0;let Y#4〉=>_|_(cyclic references in let clause or alias)
+    b: 〈0;let X#3〉=>〈0;let Y#4〉=>_|_(cyclic references in let clause or alias)
     c: 5
   }
   fieldOffset: {
     a: {
       p1: {
         let X#5 = {
-          value: 〈1;let Y#6〉
+          value: 〈1;let Y#6〉=>2
         }
         let Y#6 = 2
-        x: 〈0;let X#5〉
+        x: 〈0;let X#5〉=>{
+          value: 〈1;let Y#6〉=>2
+        }
       }
       p2: {
-        x: 〈0;let X#8〉
+        x: 〈0;let X#8〉=>{
+          value: 〈1;let Y#7〉=>2
+        }
         let Y#7 = 2
         let X#8 = {
-          value: 〈1;let Y#7〉
+          value: 〈1;let Y#7〉=>2
         }
       }
     }
@@ -94,18 +100,26 @@ b.let[]: cyclic references in let clause or alias:
       p1: {
         let X#9 = {
           x: {
-            y: 〈2;let Y#A〉
+            y: 〈2;let Y#A〉=>2
           }
         }
         let Y#A = 2
-        x: 〈0;let X#9〉
+        x: 〈0;let X#9〉=>{
+          x: {
+            y: 〈2;let Y#A〉=>2
+          }
+        }
       }
       p2: {
-        x: 〈0;let X#C〉
+        x: 〈0;let X#C〉=>{
+          x: {
+            y: 〈2;let Y#B〉=>2
+          }
+        }
         let Y#B = 2
         let X#C = {
           x: {
-            y: 〈2;let Y#B〉
+            y: 〈2;let Y#B〉=>2
           }
         }
       }
@@ -117,12 +131,24 @@ b.let[]: cyclic references in let clause or alias:
         value: ""
       }
       let _#volmnts#E = {
-        x: 〈1;let _#baz#F〉.value
+        x: 〈1;let _#baz#F〉=>{
+          〈2;let _#bar#D〉=>{
+            value: ""
+          }
+        }.value
       }
       let _#baz#F = {
-        〈1;let _#bar#D〉
+        〈1;let _#bar#D〉=>{
+          value: ""
+        }
       }
-      out: 〈0;let _#volmnts#E〉
+      out: 〈0;let _#volmnts#E〉=>{
+        x: 〈1;let _#baz#F〉=>{
+          〈2;let _#bar#D〉=>{
+            value: ""
+          }
+        }.value
+      }
     }
   }
 }

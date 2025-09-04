@@ -64,6 +64,8 @@ func TestCompile(t *testing.T) {
 			fmt.Fprintln(t, "---", t.Rel(f.Filename))
 			t.Write(debug.AppendNode(nil, r, v.ConjunctAt(i).Elem(), &debug.Config{
 				Cwd: t.Dir,
+
+				ExpandLetExpr: t.Bool("expandLetExpr"),
 			}))
 		}
 	})

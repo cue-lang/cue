@@ -195,7 +195,11 @@ func (m *Module) FindPackagesOrModulesForFile(file protocol.DocumentURI) ([]pack
 	}
 
 	w := m.workspace
-	parsedFile, _, _, _ := m.ReadCUEFile(file)
+	parsedFile, _, _, err := m.ReadCUEFile(file)
+	if parsedFile == nil {
+		w.debugLog(fmt.Sprintf("%v Cannot read file %v, %v", m, file, err))
+		return nil, nil
+	}
 	pkgName := parsedFile.PackageName()
 	if pkgName == "" {
 		// temporarily, we just completely ignore the file if it has no

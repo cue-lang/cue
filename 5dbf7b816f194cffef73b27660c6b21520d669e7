@@ -16,6 +16,24 @@
       "message": "This may break Istio, if they are still using this. But I guess as long as they do not update the module dependency, they\u0027ll be fine.",
       "revId": "5dbf7b816f194cffef73b27660c6b21520d669e7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d31bcbbd_a6b860c1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-04T10:36:48Z",
+      "side": 1,
+      "message": "They haven\u0027t used CUE for about a year now: https://github.com/istio/api/issues/2055#issuecomment-2111298702\n\nAnd indeed I could not find any references to ResolveReferences across their whole org.",
+      "parentUuid": "a630e0f3_01806b4a",
+      "revId": "5dbf7b816f194cffef73b27660c6b21520d669e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

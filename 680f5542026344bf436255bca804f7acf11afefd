@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ea297ea_e77a51c9",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 866,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-04T10:17:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0bc48214_1a8ae072",
+      "revId": "680f5542026344bf436255bca804f7acf11afefd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eff92c5b_dde01306",
@@ -31,6 +49,30 @@
       "writtenOn": "2025-09-04T09:10:19Z",
       "side": 1,
       "message": "Rather than \"cap the capacity\", which is a bit odd, I\u0027d say \"limit the capacity\" or \"lower the capacity\"",
+      "range": {
+        "startLine": 872,
+        "startChar": 5,
+        "endLine": 872,
+        "endChar": 21
+      },
+      "revId": "680f5542026344bf436255bca804f7acf11afefd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a217ce36_4efba495",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 872,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-04T10:17:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eff92c5b_dde01306",
       "range": {
         "startLine": 872,
         "startChar": 5,

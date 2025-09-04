@@ -25,6 +25,11 @@ indirect: {
 	x: error
 	y: x("msg")
 }
+-- issue4001.cue --
+issue4001: {
+	a: "b"
+	a: int | error("error: "+"a='\(a)'")
+}
 -- out/eval/stats --
 Leaks:  0
 Freed:  30
@@ -46,6 +51,8 @@ selection.twoUserErrors: error two:
     ./in.cue:6:44
 indirect.y: msg:
     ./in.cue:22:5
+issue4001.a: error: a='b':
+    ./issue4001.cue:3:11
 
 Result:
 (_|_){
@@ -94,6 +101,13 @@ Result:
       //     ./in.cue:22:5
     }
   }
+  issue4001: (_|_){
+    // [user]
+    a: (_|_){
+      // [user] issue4001.a: error: a='b':
+      //     ./issue4001.cue:3:11
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -113,7 +127,16 @@ diff old new
  selection.useUserError: use me:
      ./in.cue:4:22
  selection.twoUserErrors: error one:
-@@ -23,18 +16,11 @@
+@@ -15,6 +8,8 @@
+     ./in.cue:6:44
+ indirect.y: msg:
+     ./in.cue:22:5
++issue4001.a: error: a='b':
++    ./issue4001.cue:3:11
+ 
+ Result:
+ (_|_){
+@@ -23,18 +18,11 @@
      // [user]
      dropError: (int){ 1 }
      useUserError: (_|_){
@@ -134,7 +157,7 @@ diff old new
        // selection.twoUserErrors: error one:
        //     ./in.cue:6:23
        // selection.twoUserErrors: error two:
-@@ -42,11 +28,7 @@
+@@ -42,11 +30,7 @@
      }
      x: (int){ int }
      dropIncomplete: (_|_){
@@ -147,7 +170,7 @@ diff old new
        //     ./in.cue:9:26
      }
    }
-@@ -56,20 +38,11 @@
+@@ -56,20 +40,11 @@
      }
      world: (string){ "world" }
      substituteAll: (_|_){
@@ -256,6 +279,13 @@ Result:
       //     ./in.cue:22:5
     }
   }
+  issue4001: (_|_){
+    // [user]
+    a: (_|_){
+      // [user] issue4001.a: error: a='b':
+      //     ./issue4001.cue:3:11
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -278,5 +308,12 @@ Result:
   indirect: {
     x: error
     y: 〈0;x〉("msg")
+  }
+}
+--- issue4001.cue
+{
+  issue4001: {
+    a: "b"
+    a: (int|error(("error: " + "a='\(〈0;a〉)'")))
   }
 }

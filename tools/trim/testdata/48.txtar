@@ -1,7 +1,6 @@
 Variant of 47 where the comprehension makes use of the value of the
 key-value pair.
 
-#skip-v2
 -- a.cue --
 d: port: 8080
 s: {

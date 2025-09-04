@@ -10,7 +10,6 @@ required, and so line 2 is redundant.
 
 Contrast with 57.
 
-#skip-v2
 -- a.cue --
 if x == 5 {
 	x: 5

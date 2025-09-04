@@ -5,7 +5,6 @@ would be possible to remove line 4. But we can't because that would
 make line 5 an error - the use of the X_Platform field. So I think
 this is the best we can do.
 
-#skip-v2
 -- a.cue --
 #ClusterResource: X_Platform: string
 #NamespacedResource: {

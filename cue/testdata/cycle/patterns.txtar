@@ -1,5 +1,3 @@
-// Excluded from V2, which no longer passes.
-#skip-v2
 // Lots of cycle-reference goodness.
 
 -- in.cue --

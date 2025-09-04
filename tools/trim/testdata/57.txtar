@@ -28,7 +28,6 @@ Having chosen the winner for x, we then chose the winner for y between
 lines 4 and 7. This is much simpler - we have a tie of 1-1 for the
 seenCounts, and so we just pick line 4 because 4 < 7.
 
-#skip-v2
 -- a.cue --
 if x == 5 {
 	x: 5

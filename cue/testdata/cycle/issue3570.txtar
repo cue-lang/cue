@@ -1,5 +1,4 @@
 // This code caused a panic on evalv2.
-#skip-v2
 -- in.cue --
 foo: foo: 25 | 44
 foo

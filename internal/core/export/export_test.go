@@ -47,7 +47,6 @@ func TestDefinition(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		t.Parallel()
 		r := t.Runtime()
 		a := t.Instance()
 
@@ -56,9 +55,6 @@ func TestDefinition(t *testing.T) {
 			t.Fatal(errs)
 		}
 		v.Finalize(eval.NewContext(r, v))
-
-		// TODO: do we need to evaluate v? In principle not necessary.
-		// v.Finalize(eval.NewContext(r, v))
 
 		file, errs := export.Def(r, "", v)
 		errors.Print(t, errs, nil)

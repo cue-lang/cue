@@ -349,10 +349,25 @@ func (w *Workdir) pollFiles() ([]protocol.FileEvent, error) {
 		if err != nil {
 			return err
 		}
-		// Skip directories and symbolic links (which may be links to directories).
-		//
-		// The latter matters for repos like Kubernetes, which use symlinks.
-		if info.Mode()&(fs.ModeDir|fs.ModeSymlink) != 0 {
+		fpOrig := fp
+		mode := info.Mode()
+		if mode&fs.ModeSymlink != 0 {
+			lp, err := filepath.EvalSymlinks(fp)
+			if err != nil {
+				return err
+			}
+			fp, err = filepath.Abs(lp)
+			if err != nil {
+				return err
+			}
+			info, err = os.Stat(fp)
+			if err != nil {
+				return err
+			}
+			mode = info.Mode()
+		}
+		// Skip directories.
+		if mode&fs.ModeDir != 0 {
 			return nil
 		}
 
@@ -369,7 +384,7 @@ func (w *Workdir) pollFiles() ([]protocol.FileEvent, error) {
 			}
 			id.hash = hashFile(data)
 		}
-		path := w.RelPath(fp)
+		path := w.RelPath(fpOrig)
 		newFiles[path] = id
 
 		if w.files != nil {

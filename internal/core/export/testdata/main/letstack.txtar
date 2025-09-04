@@ -1,0 +1,77 @@
+# Issue #4051
+
+-- issue4051.cue --
+// Must be at root to cause problem
+(N): [{ f1: f2: N }]
+let N = x
+x: "s"
+-- out/doc --
+[]
+[N]
+[x]
+[s]
+- Must be at root to cause problem
+
+[s 0]
+[s 0 f1]
+[s 0 f1 f2]
+-- out/value --
+== Simplified
+{
+	// Must be at root to cause problem
+	s: [{
+		f1: {
+			f2: "s"
+		}
+	}]
+	x: "s"
+}
+== Raw
+{
+	// Must be at root to cause problem
+	s: [{
+		f1: {
+			f2: "s"
+		}
+	}]
+	x: "s"
+}
+== Final
+{
+	s: [{
+		f1: {
+			f2: "s"
+		}
+	}]
+	x: "s"
+}
+== All
+{
+	// Must be at root to cause problem
+	s: [{
+		f1: {
+			f2: "s"
+		}
+	}]
+	x: "s"
+}
+== Eval
+{
+	s: [{
+		f1: {
+			f2: "s"
+		}
+	}]
+	x: "s"
+}
+-- out/definition --
+
+let N = x
+
+// Must be at root to cause problem
+(N): [{
+	f1: {
+		f2: N
+	}
+}]
+x: "s"

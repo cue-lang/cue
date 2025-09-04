@@ -1703,7 +1703,7 @@ func (v Value) Subsume(w Value, opts ...Option) error {
 // TODO: this is likely not correct for V3. There are some cases where this is
 // still used for V3. Transition away from those.
 func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
-	if !parent.IsClosedList() && !parent.IsClosedStruct() {
+	if !parent.IsClosedList() && parent.IsOpenStruct() {
 		return nil
 	}
 

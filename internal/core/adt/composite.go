@@ -1084,13 +1084,29 @@ func (v *Vertex) accepts(ok, required bool) bool {
 	return ok || (!required && !v.ClosedRecursive)
 }
 
+// IsOpenStruct reports whether any field that is not contained within v is allowed.
+//
+// TODO: merge this function with IsClosedStruct and possibly IsClosedList.
+// right now this causes too many issues if we do so.
+func (v *Vertex) IsOpenStruct() bool {
+	// TODO: move this check to IsClosedStruct. Right now this causes too many
+	// changes in the debug output, and it also appears to be not entirely
+	// correct.
+	if v.HasEllipsis {
+		return true
+	}
+	if v.ClosedNonRecursive {
+		return false
+	}
+	if v.IsClosedStruct() {
+		return false
+	}
+	return true
+}
+
 func (v *Vertex) IsClosedStruct() bool {
-	// TODO: uncomment this. This fixes a bunch of closedness bugs
-	// in the old and new evaluator. For compability sake, though, we
-	// keep it as is for now.
-	// if v.Closed {
-	// 	return true
-	// }
+	// TODO: add this check. Right now this causes issues. It will have
+	// to be carefully introduced.
 	// if v.HasEllipsis {
 	// 	return false
 	// }
@@ -1164,15 +1180,7 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 		}
 	}
 
-	// TODO: move this check to IsClosedStruct. Right now this causes too many
-	// changes in the debug output, and it also appears to be not entirely
-	// correct.
-	if v.HasEllipsis {
-		return true
-
-	}
-
-	if !v.IsClosedStruct() || v.Lookup(f) != nil {
+	if v.IsOpenStruct() || v.Lookup(f) != nil {
 		return true
 	}
 

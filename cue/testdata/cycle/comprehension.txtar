@@ -404,28 +404,46 @@ issue3941: full: {
 		}
 	}
 }
+-- issue2229.cue --
+// Caused evalv2 to stack overflow.
+issue2229: full_ok: X={
+	build: bool | *true
+	test:  bool | *true
+
+	make: [ for k, v in X if (v & true) != _|_ { k } ]
+}
+issue2229: reduced_fail: X={
+	x: true
+	y: [ for _, v in X if v & true { _ } ]
+}
 -- out/evalalpha/stats --
 Leaks:  2
-Freed:  900
-Reused: 849
-Allocs: 53
+Freed:  966
+Reused: 914
+Allocs: 54
 Retain: 0
 
-Unifications: 551
-Conjuncts:    1605
-Disjuncts:    182
+Unifications: 583
+Conjuncts:    1712
+Disjuncts:    210
 Notifications: 14
 
-NumCloseIDs: 703
+NumCloseIDs: 730
 
-ConjunctInfos:       1114
+ConjunctInfos:       1168
 MaxConjunctInfos:    10
 MaxReqSets:          12
 MaxRedirect:         1
 -- out/evalalpha --
 Errors:
+conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
+    ./issue2229.cue:10:5
+    ./issue2229.cue:10:24
+    ./issue2229.cue:10:28
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
     ./in.cue:122:14
+structural cycle:
+    ./issue2229.cue:10:24
 
 Result:
 (_|_){
@@ -1024,6 +1042,30 @@ Result:
       }
     }
   }
+  issue2229: (_|_){
+    // [eval]
+    full_ok: (struct){
+      build: (bool){ |(*(bool){ true }, (bool){ bool }) }
+      test: (bool){ |(*(bool){ true }, (bool){ bool }) }
+      make: (#list){
+        0: (string){ "build" }
+        1: (string){ "test" }
+      }
+    }
+    reduced_fail: (_|_){
+      // [eval]
+      x: (bool){ true }
+      y: (_|_){
+        // [eval] conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
+        //     ./issue2229.cue:10:5
+        //     ./issue2229.cue:10:24
+        //     ./issue2229.cue:10:28
+        // structural cycle:
+        //     ./issue2229.cue:10:24
+        0: (_){ _ }
+      }
+    }
+  }
   issue3903: (struct){
     reduced: (struct){
       s1: (#struct){
@@ -1119,7 +1161,20 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -55,12 +55,12 @@
+@@ -1,6 +1,12 @@
+ Errors:
++conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
++    ./issue2229.cue:10:5
++    ./issue2229.cue:10:24
++    ./issue2229.cue:10:28
+ selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
+     ./in.cue:122:14
++structural cycle:
++    ./issue2229.cue:10:24
+ 
+ Result:
+ (_|_){
+@@ -55,12 +61,12 @@
        }
      }
      _e: (#struct){
@@ -1138,7 +1193,7 @@ diff old new
        }
      }
      e: (#struct){
-@@ -529,25 +529,25 @@
+@@ -529,25 +535,25 @@
            // [incomplete] issue2310.original.#subs.0: error in call to strings.Replace: non-concrete value string:
            //     ./in.cue:318:46
            //     ./in.cue:318:12
@@ -1169,6 +1224,37 @@ diff old new
          }
        }
      }
+@@ -599,6 +605,30 @@
+       }
+     }
+   }
++  issue2229: (_|_){
++    // [eval]
++    full_ok: (struct){
++      build: (bool){ |(*(bool){ true }, (bool){ bool }) }
++      test: (bool){ |(*(bool){ true }, (bool){ bool }) }
++      make: (#list){
++        0: (string){ "build" }
++        1: (string){ "test" }
++      }
++    }
++    reduced_fail: (_|_){
++      // [eval]
++      x: (bool){ true }
++      y: (_|_){
++        // [eval] conflicting values true and [for _, v in X if (v & true) {_}] (mismatched types bool and list):
++        //     ./issue2229.cue:10:5
++        //     ./issue2229.cue:10:24
++        //     ./issue2229.cue:10:28
++        // structural cycle:
++        //     ./issue2229.cue:10:24
++        0: (_){ _ }
++      }
++    }
++  }
+   issue3903: (struct){
+     reduced: (struct){
+       s1: (#struct){
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -1188,19 +1274,19 @@ diff old new
 -
 -NumCloseIDs: 16
 +Leaks:  2
-+Freed:  900
-+Reused: 849
-+Allocs: 53
++Freed:  966
++Reused: 914
++Allocs: 54
 +Retain: 0
 +
-+Unifications: 551
-+Conjuncts:    1605
-+Disjuncts:    182
++Unifications: 583
++Conjuncts:    1712
++Disjuncts:    210
 +Notifications: 14
 +
-+NumCloseIDs: 703
++NumCloseIDs: 730
 +
-+ConjunctInfos:       1114
++ConjunctInfos:       1168
 +MaxConjunctInfos:    10
 +MaxReqSets:          12
 +MaxRedirect:         1

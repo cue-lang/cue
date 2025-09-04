@@ -1,5 +1,4 @@
 // This code caused a hang on evalv2.
-#skip-v2
 -- in.cue --
 x
 x: {

@@ -1,0 +1,91 @@
+// Issue 4055: crash variant
+// Issue 4056
+
+-- issue4056.cue --
+import "strings"
+
+issue4056: full: {
+	a: "foo-bar"
+	a: _ | error("error message 1")
+	if strings.HasPrefix(a, "foo") {
+		a: _ | error("error message 2")
+	}
+}
+issue4056: reduced: {
+	a: "x"
+	a: _ | error("a")
+	if len(a) > 0 {
+		a: _ | error("b")
+	}
+}
+variant: {
+	a: "x"
+	a: string | int
+	if len(a) > 0 {
+		a: _
+	}
+}
+-- out/evalalpha --
+Errors:
+variant.a: conflicting values "x" and int (mismatched types string and int):
+    ./issue4056.cue:17:10
+    ./issue4056.cue:18:5
+    ./issue4056.cue:19:14
+issue4056.full.a: error message 1:
+    ./issue4056.cue:5:9
+issue4056.reduced.a: a:
+    ./issue4056.cue:12:9
+
+Result:
+(_|_){
+  // [eval]
+  issue4056: (_|_){
+    // [user]
+    full: (_|_){
+      // [user] issue4056.full.a: error message 1:
+      //     ./issue4056.cue:5:9
+      a: (string){ "foo-bar" }
+    }
+    reduced: (_|_){
+      // [user] issue4056.reduced.a: a:
+      //     ./issue4056.cue:12:9
+      a: (string){ "x" }
+    }
+  }
+  variant: (_|_){
+    // [eval] variant.a: conflicting values "x" and int (mismatched types string and int):
+    //     ./issue4056.cue:17:10
+    //     ./issue4056.cue:18:5
+    //     ./issue4056.cue:19:14
+    a: (string){ "x" }
+  }
+}
+-- out/compile --
+--- issue4056.cue
+{
+  issue4056: {
+    full: {
+      a: "foo-bar"
+      a: (_|error("error message 1"))
+      if 〈import;strings〉.HasPrefix(〈0;a〉, "foo") {
+        a: (_|error("error message 2"))
+      }
+    }
+  }
+  issue4056: {
+    reduced: {
+      a: "x"
+      a: (_|error("a"))
+      if (len(〈0;a〉) > 0) {
+        a: (_|error("b"))
+      }
+    }
+  }
+  variant: {
+    a: "x"
+    a: (string|int)
+    if (len(〈0;a〉) > 0) {
+      a: _
+    }
+  }
+}

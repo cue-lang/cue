@@ -81,8 +81,8 @@ issue3415: reduced: {
 	a: *0 | number
 }
 -- out/evalalpha/stats --
-Leaks:  3
-Freed:  405
+Leaks:  32
+Freed:  376
 Reused: 271
 Allocs: 137
 Retain: 0
@@ -111,8 +111,8 @@ diff old new
 -MisalignedConjunct: 3
 -
 -NumCloseIDs: 1
-+Leaks:  3
-+Freed:  405
++Leaks:  32
++Freed:  376
 +Reused: 271
 +Allocs: 137
 +Retain: 0

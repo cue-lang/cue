@@ -142,10 +142,10 @@ issue3638: compare: {
 	#x: { a: int } | *{ b: 2 }
 }
 -- out/evalalpha/stats --
-Leaks:  0
-Freed:  227
-Reused: 190
-Allocs: 37
+Leaks:  20
+Freed:  207
+Reused: 184
+Allocs: 43
 Retain: 0
 
 Unifications: 154
@@ -172,10 +172,10 @@ diff old new
 -MisalignedConjunct: 30
 -
 -NumCloseIDs: 4
-+Leaks:  0
-+Freed:  227
-+Reused: 190
-+Allocs: 37
++Leaks:  20
++Freed:  207
++Reused: 184
++Allocs: 43
 +Retain: 0
 +
 +Unifications: 154

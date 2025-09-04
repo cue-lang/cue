@@ -300,10 +300,10 @@ value0: Only: [{UseSectionName: true}]
   }
 }
 -- out/evalalpha/stats --
-Leaks:  107
-Freed:  1309
-Reused: 1226
-Allocs: 190
+Leaks:  207
+Freed:  1209
+Reused: 1152
+Allocs: 264
 Retain: 0
 
 Unifications: 333
@@ -330,10 +330,10 @@ diff old new
 -Unifications: 140273
 -Conjuncts:    468967
 -Disjuncts:    330375
-+Leaks:  107
-+Freed:  1309
-+Reused: 1226
-+Allocs: 190
++Leaks:  207
++Freed:  1209
++Reused: 1152
++Allocs: 264
 +Retain: 0
 +
 +Unifications: 333

@@ -55,8 +55,8 @@ v: #T
   #X: 〈0;#T〉
 }
 -- out/evalalpha/stats --
-Leaks:  0
-Freed:  18
+Leaks:  2
+Freed:  16
 Reused: 8
 Allocs: 10
 Retain: 0
@@ -69,11 +69,12 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
- Leaks:  0
+-Leaks:  0
 -Freed:  447
 -Reused: 439
 -Allocs: 8
-+Freed:  18
++Leaks:  2
++Freed:  16
 +Reused: 8
 +Allocs: 10
  Retain: 0

@@ -29,6 +29,41 @@ z: {
 	b: (*"a" | "b") | "c"
 	{a: b} | {b: int}
 }
+-- out/evalalpha/stats --
+Leaks:  22
+Freed:  138
+Reused: 126
+Allocs: 34
+Retain: 0
+
+Unifications: 28
+Conjuncts:    192
+Disjuncts:    130
+
+NumCloseIDs: 16
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,11 @@
+-Leaks:  0
+-Freed:  163
+-Reused: 155
+-Allocs: 8
++Leaks:  22
++Freed:  138
++Reused: 126
++Allocs: 34
+ Retain: 0
+ 
+-Unifications: 29
+-Conjuncts:    198
+-Disjuncts:    163
++Unifications: 28
++Conjuncts:    192
++Disjuncts:    130
++
++NumCloseIDs: 16
 -- out/eval/stats --
 Leaks:  0
 Freed:  163

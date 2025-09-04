@@ -2069,10 +2069,10 @@ diff old new
        #A: (#struct){
          y: (#struct){
 -- out/evalalpha/stats --
-Leaks:  45
-Freed:  642
-Reused: 585
-Allocs: 102
+Leaks:  76
+Freed:  611
+Reused: 566
+Allocs: 121
 Retain: 0
 
 Unifications: 577
@@ -2098,10 +2098,10 @@ diff old new
 -MisalignedConjunct: 151
 -
 -NumCloseIDs: 107
-+Leaks:  45
-+Freed:  642
-+Reused: 585
-+Allocs: 102
++Leaks:  76
++Freed:  611
++Reused: 566
++Allocs: 121
 +Retain: 0
 +
 +Unifications: 577

@@ -763,8 +763,8 @@ issue3332: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  3
-Freed:  803
+Leaks:  5
+Freed:  801
 Reused: 758
 Allocs: 48
 Retain: 0
@@ -790,8 +790,8 @@ diff old new
 -Disjuncts:    958
 -
 -NumCloseIDs: 1
-+Leaks:  3
-+Freed:  803
++Leaks:  5
++Freed:  801
 +Reused: 758
 +Allocs: 48
 +Retain: 0

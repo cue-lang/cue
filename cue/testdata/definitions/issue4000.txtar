@@ -146,10 +146,10 @@ _items: [#VMRuleList]
   }
 }
 -- out/evalalpha/stats --
-Leaks:  0
-Freed:  54
-Reused: 22
-Allocs: 32
+Leaks:  18
+Freed:  36
+Reused: 20
+Allocs: 34
 Retain: 0
 
 Unifications: 38
@@ -162,7 +162,7 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,11 @@
- Leaks:  0
+-Leaks:  0
 -Freed:  152
 -Reused: 137
 -Allocs: 15
@@ -171,9 +171,10 @@ diff old new
 -Unifications: 116
 -Conjuncts:    257
 -Disjuncts:    161
-+Freed:  54
-+Reused: 22
-+Allocs: 32
++Leaks:  18
++Freed:  36
++Reused: 20
++Allocs: 34
 +Retain: 0
 +
 +Unifications: 38

@@ -626,10 +626,10 @@ issue4006: {
 	out: #C & #B
 }
 -- out/evalalpha/stats --
-Leaks:  11
-Freed:  912
-Reused: 851
-Allocs: 72
+Leaks:  47
+Freed:  876
+Reused: 819
+Allocs: 104
 Retain: 0
 
 Unifications: 756
@@ -648,7 +648,7 @@ diff old new
 --- old
 +++ new
 @@ -1,11 +1,17 @@
--Leaks:  47
+ Leaks:  47
 -Freed:  1002
 -Reused: 988
 -Allocs: 61
@@ -659,10 +659,9 @@ diff old new
 -Disjuncts:    1209
 -
 -NumCloseIDs: 3
-+Leaks:  11
-+Freed:  912
-+Reused: 851
-+Allocs: 72
++Freed:  876
++Reused: 819
++Allocs: 104
 +Retain: 0
 +
 +Unifications: 756

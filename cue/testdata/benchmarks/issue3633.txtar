@@ -1,7 +1,7 @@
 #Issue: 3633
 -- out/evalalpha/stats --
-Leaks:  0
-Freed:  2031
+Leaks:  145
+Freed:  1886
 Reused: 1798
 Allocs: 233
 Retain: 0
@@ -16,11 +16,12 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,11 @@
- Leaks:  0
+-Leaks:  0
 -Freed:  3595
 -Reused: 3575
 -Allocs: 20
-+Freed:  2031
++Leaks:  145
++Freed:  1886
 +Reused: 1798
 +Allocs: 233
  Retain: 0

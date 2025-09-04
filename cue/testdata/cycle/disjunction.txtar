@@ -49,6 +49,41 @@ issue3042: {
 		}
 	}
 }
+-- out/evalalpha/stats --
+Leaks:  25
+Freed:  117
+Reused: 74
+Allocs: 68
+Retain: 0
+
+Unifications: 50
+Conjuncts:    158
+Disjuncts:    73
+
+NumCloseIDs: 20
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,11 @@
+-Leaks:  0
+-Freed:  199
+-Reused: 181
+-Allocs: 18
++Leaks:  25
++Freed:  117
++Reused: 74
++Allocs: 68
+ Retain: 0
+ 
+-Unifications: 93
+-Conjuncts:    280
+-Disjuncts:    199
++Unifications: 50
++Conjuncts:    158
++Disjuncts:    73
++
++NumCloseIDs: 20
 -- out/eval/stats --
 Leaks:  0
 Freed:  199

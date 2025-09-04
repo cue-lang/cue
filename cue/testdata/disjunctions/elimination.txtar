@@ -660,10 +660,10 @@ issue3958: t2: {
 	b: (int | *4) & (int | *1) & (int | *3)
 }
 -- out/evalalpha/stats --
-Leaks:  28
-Freed:  2738
-Reused: 2635
-Allocs: 131
+Leaks:  215
+Freed:  2551
+Reused: 2513
+Allocs: 253
 Retain: 0
 
 Unifications: 658
@@ -690,10 +690,10 @@ diff old new
 -MisalignedConjunct: 44
 -
 -NumCloseIDs: 10
-+Leaks:  28
-+Freed:  2738
-+Reused: 2635
-+Allocs: 131
++Leaks:  215
++Freed:  2551
++Reused: 2513
++Allocs: 253
 +Retain: 0
 +
 +Unifications: 658

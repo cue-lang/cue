@@ -80,10 +80,10 @@ out: #sub & {#p: _test.s1}
 -- diff/todo/p3 --
 Reordering
 -- out/evalalpha/stats --
-Leaks:  104
-Freed:  842
-Reused: 775
-Allocs: 171
+Leaks:  238
+Freed:  708
+Reused: 680
+Allocs: 266
 Retain: 0
 
 Unifications: 361
@@ -343,10 +343,10 @@ diff old new
 -MisalignedConjunct: 4502
 -
 -NumCloseIDs: 4
-+Leaks:  104
-+Freed:  842
-+Reused: 775
-+Allocs: 171
++Leaks:  238
++Freed:  708
++Reused: 680
++Allocs: 266
 +Retain: 0
 +
 +Unifications: 361

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "147728a1_4a01f168",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-04T12:04:57Z",
+      "side": 0,
+      "message": "Acknowledged",
+      "parentUuid": "854c5efd_dd07af94",
+      "revId": "3ea1abe9b3223758a1aa88dbe106024fccf62735",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff95c584_9ffb799c",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-04T11:23:26Z",
       "side": 0,
       "message": "This was the cause of the symlink-related panic.",
+      "revId": "3ea1abe9b3223758a1aa88dbe106024fccf62735",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb2a86de_c1eab7aa",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-04T12:04:57Z",
+      "side": 0,
+      "message": "yikes. I\u0027ve done the same mistake many times...",
+      "parentUuid": "ff95c584_9ffb799c",
       "revId": "3ea1abe9b3223758a1aa88dbe106024fccf62735",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

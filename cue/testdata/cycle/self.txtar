@@ -264,6 +264,43 @@ issue1729: t2: {
 	#x: { #x | {} }
 }
 
+-- out/evalalpha/stats --
+Leaks:  34
+Freed:  290
+Reused: 267
+Allocs: 57
+Retain: 0
+
+Unifications: 206
+Conjuncts:    412
+Disjuncts:    100
+
+NumCloseIDs: 80
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,11 @@
+-Leaks:  0
+-Freed:  432
+-Reused: 423
+-Allocs: 9
+-Retain: 15
+-
+-Unifications: 240
+-Conjuncts:    663
+-Disjuncts:    447
++Leaks:  34
++Freed:  290
++Reused: 267
++Allocs: 57
++Retain: 0
++
++Unifications: 206
++Conjuncts:    412
++Disjuncts:    100
++
++NumCloseIDs: 80
 -- out/eval/stats --
 Leaks:  0
 Freed:  432

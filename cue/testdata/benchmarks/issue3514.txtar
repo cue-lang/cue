@@ -36,8 +36,8 @@ _schema: {
     #timezone: or([for i in list.Range(0, 571, 1) {"\(i)"}])
 }
 -- out/evalalpha/stats --
-Leaks:  12
-Freed:  3590
+Leaks:  27
+Freed:  3575
 Reused: 2436
 Allocs: 1166
 Retain: 0
@@ -53,7 +53,7 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
--Leaks:  27
+ Leaks:  27
 -Freed:  31092
 -Reused: 30511
 -Allocs: 608
@@ -62,8 +62,7 @@ diff old new
 -Unifications: 189
 -Conjuncts:    92950
 -Disjuncts:    31139
-+Leaks:  12
-+Freed:  3590
++Freed:  3575
 +Reused: 2436
 +Allocs: 1166
 +Retain: 0

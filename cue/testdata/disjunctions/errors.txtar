@@ -150,6 +150,49 @@ issue4022: full: {
 		apiVersion: "v1"
 	}
 }
+-- out/evalalpha/stats --
+Leaks:  29
+Freed:  209
+Reused: 189
+Allocs: 49
+Retain: 0
+
+Unifications: 116
+Conjuncts:    281
+Disjuncts:    74
+Notifications: 2
+
+NumCloseIDs: 51
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,13 +1,12 @@
+-Leaks:  6
+-Freed:  181
+-Reused: 171
+-Allocs: 16
+-Retain: 34
+-
+-Unifications: 119
+-Conjuncts:    268
+-Disjuncts:    206
+-
+-MisalignedConjunct: 1
+-
+-NumCloseIDs: 11
++Leaks:  29
++Freed:  209
++Reused: 189
++Allocs: 49
++Retain: 0
++
++Unifications: 116
++Conjuncts:    281
++Disjuncts:    74
++Notifications: 2
++
++NumCloseIDs: 51
 -- out/eval/stats --
 Leaks:  6
 Freed:  181

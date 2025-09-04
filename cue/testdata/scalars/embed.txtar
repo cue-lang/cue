@@ -152,10 +152,10 @@ selfRefInEmbed: t1: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  1
-Freed:  135
-Reused: 114
-Allocs: 22
+Leaks:  4
+Freed:  132
+Reused: 111
+Allocs: 25
 Retain: 0
 
 Unifications: 126
@@ -182,10 +182,10 @@ diff old new
 -MisalignedConjunct: 1
 -
 -NumCloseIDs: 2
-+Leaks:  1
-+Freed:  135
-+Reused: 114
-+Allocs: 22
++Leaks:  4
++Freed:  132
++Reused: 111
++Allocs: 25
 +Retain: 0
 +
 +Unifications: 126

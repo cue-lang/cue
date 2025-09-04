@@ -132,10 +132,10 @@ issue3591: missing: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  46
-Freed:  147
-Reused: 130
-Allocs: 63
+Leaks:  54
+Freed:  139
+Reused: 125
+Allocs: 68
 Retain: 0
 
 Unifications: 124
@@ -161,10 +161,10 @@ diff old new
 -MisalignedConjunct: 145
 -
 -NumCloseIDs: 3
-+Leaks:  46
-+Freed:  147
-+Reused: 130
-+Allocs: 63
++Leaks:  54
++Freed:  139
++Reused: 125
++Allocs: 68
 +Retain: 0
 +
 +Unifications: 124

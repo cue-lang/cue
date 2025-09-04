@@ -99,6 +99,45 @@ panic1: {
 	out: #TypeFoo | #TypeBar
 	out: objs["obj1"].type
 }
+-- out/evalalpha/stats --
+Leaks:  18
+Freed:  154
+Reused: 126
+Allocs: 46
+Retain: 0
+
+Unifications: 68
+Conjuncts:    186
+Disjuncts:    47
+Notifications: 9
+
+NumCloseIDs: 49
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+-Leaks:  0
+-Freed:  152
+-Reused: 141
+-Allocs: 11
+-Retain: 12
+-
+-Unifications: 108
+-Conjuncts:    237
+-Disjuncts:    154
++Leaks:  18
++Freed:  154
++Reused: 126
++Allocs: 46
++Retain: 0
++
++Unifications: 68
++Conjuncts:    186
++Disjuncts:    47
++Notifications: 9
++
++NumCloseIDs: 49
 -- out/eval/stats --
 Leaks:  0
 Freed:  152

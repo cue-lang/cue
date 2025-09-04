@@ -56,10 +56,10 @@ issue3875: reduced: {
 	S: {}
 }
 -- out/evalalpha/stats --
-Leaks:  0
-Freed:  142
-Reused: 105
-Allocs: 37
+Leaks:  22
+Freed:  120
+Reused: 97
+Allocs: 45
 Retain: 0
 
 Unifications: 66
@@ -72,7 +72,7 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,11 @@
- Leaks:  0
+-Leaks:  0
 -Freed:  113
 -Reused: 102
 -Allocs: 11
@@ -81,9 +81,10 @@ diff old new
 -Unifications: 97
 -Conjuncts:    182
 -Disjuncts:    123
-+Freed:  142
-+Reused: 105
-+Allocs: 37
++Leaks:  22
++Freed:  120
++Reused: 97
++Allocs: 45
 +Retain: 0
 +
 +Unifications: 66

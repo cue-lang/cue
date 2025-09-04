@@ -1,5 +1,4 @@
-// Causes a stack overflow on evalv2 and evalv3.
-#skip
+// Caused a stack overflow on evalv2.
 -- in.cue --
  let X = {}
 
@@ -28,3 +27,10 @@ for[].a: reference "E" not found:
   }
   [string]: (〈0;(〈0;-〉)〉 + 〈0;-〉)
 }
+-- out/evalalpha --
+unreferenced alias or let clause X:
+    ./in.cue:1:2
+a: reference "Y" not found:
+    ./in.cue:4:12
+for[].a: reference "E" not found:
+    ./in.cue:7:16

@@ -863,12 +863,21 @@ func (c *compiler) labeledExpr(f ast.Decl, lab labeler, expr ast.Expr) adt.Expr 
 
 func (c *compiler) labeledExprAt(k int, f ast.Decl, lab labeler, expr ast.Expr) adt.Expr {
 	saved := c.stack[k]
+	savedStack := c.stack
 
 	c.stack[k].label = lab
 	c.stack[k].field = f
 
+	if k < len(c.stack)-1 {
+		// Limit the capacity, so that if there is growth, we don't overwrite
+		// any values we need to restore later. This shouldn't happen too often,
+		// as this will result in a non-reclaimable allocation.
+		c.stack = c.stack[: k+1 : k+1]
+	}
+
 	value := c.expr(expr)
 
+	c.stack = savedStack
 	c.stack[k] = saved
 	return value
 }

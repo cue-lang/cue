@@ -26,7 +26,7 @@ top3: cli.Print & { text: "don't", $after: top2 }
 command: after: {
 	group: {
 		t1: exec.Run & {
-			cmd: ["testcmd", "sleep_and_print", "100ms", "UNIX_MILLI"]
+			cmd: ["testcmd", "sleep_and_print", "200ms", "UNIX_MILLI"]
 			stdout: string
 			$after: top1
 		}

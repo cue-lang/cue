@@ -123,8 +123,8 @@ type Error interface {
 	Msg() (format string, args []interface{})
 }
 
-// Positions returns all positions returned by an error, sorted
-// by relevance when possible and with duplicates removed.
+// Positions returns the printable positions returned by an error,
+// sorted by relevance when possible and with duplicates removed.
 func Positions(err error) []token.Pos {
 	e := Error(nil)
 	if !errors.As(err, &e) {
@@ -134,13 +134,13 @@ func Positions(err error) []token.Pos {
 	a := make([]token.Pos, 0, 3)
 
 	pos := e.Position()
-	if pos.IsValid() {
+	if pos.File() != nil {
 		a = append(a, pos)
 	}
 	sortOffset := len(a)
 
 	for _, p := range e.InputPositions() {
-		if p.IsValid() && p != pos {
+		if p.File() != nil && p != pos {
 			a = append(a, p)
 		}
 	}
@@ -148,22 +148,8 @@ func Positions(err error) []token.Pos {
 	// TODO if the Error we found wraps another error that itself
 	// has positions, we won't return them here but perhaps we should?
 
-	slices.SortFunc(a[sortOffset:], comparePosWithNoPosFirst)
+	slices.SortFunc(a[sortOffset:], token.Pos.Compare)
 	return slices.Compact(a)
-}
-
-// comparePosWithNoPosFirst wraps [token.Pos.Compare] to place [token.NoPos] first,
-// which is currently required for errors to be sorted correctly.
-// TODO: give all errors valid positions so that we can use the standard sorting directly.
-func comparePosWithNoPosFirst(a, b token.Pos) int {
-	if a == b {
-		return 0
-	} else if a == token.NoPos {
-		return -1
-	} else if b == token.NoPos {
-		return +1
-	}
-	return token.Pos.Compare(a, b)
 }
 
 // Path returns the path of an Error if err is of that type.
@@ -398,18 +384,25 @@ func (p list) sanitize() list {
 }
 
 // sort sorts a list. *posError entries are sorted by position,
-// other errors are sorted by error message, and before any *posError
-// entry.
+// other errors are sorted by error message, and before any *posError entry.
 func (p list) sort() {
 	slices.SortFunc(p, func(a, b Error) int {
-		if c := comparePosWithNoPosFirst(a.Position(), b.Position()); c != 0 {
+		// Any error without a position goes first, unlike [token.Pos.Compare].
+		// TODO: give all errors valid positions so that we can use the standard sorting directly.
+		aPos, bPos := a.Position(), b.Position()
+		if aPos == bPos {
+			// continue below
+		} else if aPos == token.NoPos {
+			return -1
+		} else if bPos == token.NoPos {
+			return +1
+		} else if c := aPos.Compare(bPos); c != 0 {
 			return c
 		}
 		if c := slices.Compare(a.Path(), b.Path()); c != 0 {
 			return c
 		}
 		return cmp.Compare(a.Error(), b.Error())
-
 	})
 }
 

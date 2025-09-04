@@ -12,7 +12,6 @@ cmp stderr stderr.golden
 {"a": 1}
 -- stderr.golden --
 0.a: conflicting values 1 and string (mismatched types int and string):
-    
     ./x.cue:1:1
     ./x.cue:1:9
     ./x.json:1:7

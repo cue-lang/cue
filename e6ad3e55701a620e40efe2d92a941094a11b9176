@@ -16,6 +16,24 @@
       "message": "this Abs is relative to the current directory, i.e. `os.Getwd`, is that the correct thing to do here?",
       "revId": "e6ad3e55701a620e40efe2d92a941094a11b9176",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fdbcfe5_87d96876",
+        "filename": "internal/golangorgx/gopls/test/integration/fake/workdir.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-04T12:10:40Z",
+      "side": 1,
+      "message": "I believe so yes, because the result of EvalSymlinks, if it\u0027s relative, is also relative to the CWD.",
+      "parentUuid": "00ce3970_4720fe68",
+      "revId": "e6ad3e55701a620e40efe2d92a941094a11b9176",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

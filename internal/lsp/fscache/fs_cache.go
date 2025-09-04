@@ -46,7 +46,10 @@ type diskFileEntry struct {
 	uri     protocol.DocumentURI
 	modTime time.Time
 
-	cueFileParser
+	// cueFileParser is a pointer because it is shared between several
+	// file entries (e.g. when symlinks mean you have several uris that
+	// resolve to the same underlying file).
+	*cueFileParser
 }
 
 var _ FileHandle = (*diskFileEntry)(nil)
@@ -119,21 +122,6 @@ func (entry *diskFileEntry) Version() int32 { return -1 }
 
 // Content implements [FileHandle]
 func (entry *diskFileEntry) Content() []byte { return slices.Clone(entry.content) }
-
-func (entry *diskFileEntry) clone() *diskFileEntry {
-	// copy everything apart from the mutex
-	return &diskFileEntry{
-		uri:     entry.uri,
-		modTime: entry.modTime,
-		cueFileParser: cueFileParser{
-			content:   entry.content,
-			buildFile: entry.buildFile,
-			config:    entry.config,
-			ast:       entry.ast,
-			err:       entry.err,
-		},
-	}
-}
 
 // CUECacheFS exists to cache [ast.File] values and thus amortize the
 // cost of parsing cue files. It is not an overlay in any way. Its
@@ -224,8 +212,9 @@ func (fs *CUECacheFS) ReadFile(uri protocol.DocumentURI) (FileHandle, error) {
 		}
 		// No file handle for this exact URI. Create an alias, but share content.
 		if entry == nil {
-			entry := files[0].clone()
-			entry.uri = uri
+			entryCopy := *files[0]
+			entryCopy.uri = uri
+			entry = &entryCopy
 			files = append(files, entry)
 			fs.cueFilesByID[id] = files
 		}
@@ -290,7 +279,7 @@ func readFile(uri protocol.DocumentURI, mtime time.Time) (*diskFileEntry, error)
 	return &diskFileEntry{
 		modTime: mtime,
 		uri:     uri,
-		cueFileParser: cueFileParser{
+		cueFileParser: &cueFileParser{
 			content:   content,
 			buildFile: bf,
 		},

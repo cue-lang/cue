@@ -206,7 +206,9 @@ func (p Pos) Add(n int) Pos {
 	return Pos{p.file, p.offset + toPos(index(n))}
 }
 
-// IsValid reports whether the position is valid.
+// IsValid reports whether the position contains any useful information,
+// meaning either a printable file position to obtain via [Pos.Position],
+// or a relative position to obtain via [Pos.RelPos].
 func (p Pos) IsValid() bool {
 	return p != NoPos
 }

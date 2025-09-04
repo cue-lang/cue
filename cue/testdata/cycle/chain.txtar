@@ -1663,10 +1663,10 @@ diff old new
      }
    }
 -- out/evalalpha/stats --
-Leaks:  0
-Freed:  3149
-Reused: 3076
-Allocs: 73
+Leaks:  152
+Freed:  2997
+Reused: 2937
+Allocs: 212
 Retain: 0
 
 Unifications: 940
@@ -1693,10 +1693,10 @@ diff old new
 -MisalignedConjunct: 289
 -
 -NumCloseIDs: 130
-+Leaks:  0
-+Freed:  3149
-+Reused: 3076
-+Allocs: 73
++Leaks:  152
++Freed:  2997
++Reused: 2937
++Allocs: 212
 +Retain: 0
 +
 +Unifications: 940

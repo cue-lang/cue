@@ -224,10 +224,10 @@ issue3903: noshare: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  2
-Freed:  229
-Reused: 205
-Allocs: 26
+Leaks:  4
+Freed:  227
+Reused: 203
+Allocs: 28
 Retain: 0
 
 Unifications: 220
@@ -254,10 +254,10 @@ diff old new
 -MisalignedConjunct: 36
 -
 -NumCloseIDs: 7
-+Leaks:  2
-+Freed:  229
-+Reused: 205
-+Allocs: 26
++Leaks:  4
++Freed:  227
++Reused: 203
++Allocs: 28
 +Retain: 0
 +
 +Unifications: 220

@@ -417,10 +417,10 @@ issue2229: reduced_fail: X={
 	y: [ for _, v in X if v & true { _ } ]
 }
 -- out/evalalpha/stats --
-Leaks:  2
-Freed:  966
-Reused: 914
-Allocs: 54
+Leaks:  53
+Freed:  915
+Reused: 880
+Allocs: 88
 Retain: 0
 
 Unifications: 583
@@ -1273,10 +1273,10 @@ diff old new
 -MisalignedConjunct: 268
 -
 -NumCloseIDs: 16
-+Leaks:  2
-+Freed:  966
-+Reused: 914
-+Allocs: 54
++Leaks:  53
++Freed:  915
++Reused: 880
++Allocs: 88
 +Retain: 0
 +
 +Unifications: 583

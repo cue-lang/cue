@@ -36,10 +36,10 @@ t2: {
 	f: d & e & d & e
 }
 -- out/evalalpha/stats --
-Leaks:  0
-Freed:  69
-Reused: 42
-Allocs: 27
+Leaks:  7
+Freed:  62
+Reused: 41
+Allocs: 28
 Retain: 0
 
 Unifications: 29
@@ -53,13 +53,14 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,12 @@
- Leaks:  0
+-Leaks:  0
 -Freed:  121
 -Reused: 107
 -Allocs: 14
-+Freed:  69
-+Reused: 42
-+Allocs: 27
++Leaks:  7
++Freed:  62
++Reused: 41
++Allocs: 28
  Retain: 0
  
 -Unifications: 65

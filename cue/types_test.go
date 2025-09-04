@@ -906,7 +906,7 @@ func TestFields(t *testing.T) {
 		res:   `{b:1,}`,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.DevOnlyMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+		cuetdtest.SmallMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
 			f := getValue(m, tc.value)
 
 			obj := f.LookupPath(cue.ParsePath(tc.path))

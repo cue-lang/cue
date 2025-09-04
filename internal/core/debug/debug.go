@@ -38,6 +38,11 @@ type Config struct {
 	Cwd     string
 	Compact bool
 	Raw     bool
+
+	// ExpandLetExpr causes the expression of let reference to be printed.
+	// Note that this may result in large outputs. Use with care.
+	// Only applies if Compact is false.
+	ExpandLetExpr bool
 }
 
 // AppendNode writes a string representation of the node to w.
@@ -513,6 +518,10 @@ func (w *printer) node(n adt.Node) {
 		w.string(";let ")
 		w.label(x.Label)
 		w.string(closeTuple)
+		if w.cfg.ExpandLetExpr {
+			w.string("=>")
+			w.node(x.X)
+		}
 
 	case *adt.SelectorExpr:
 		w.node(x.X)

@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bc48214_1a8ae072",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 866,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-04T09:10:19Z",
+      "side": 1,
+      "message": "I\u0027d name this `savedStack` for clarity",
+      "revId": "680f5542026344bf436255bca804f7acf11afefd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eff92c5b_dde01306",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 872,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-04T09:10:19Z",
+      "side": 1,
+      "message": "Rather than \"cap the capacity\", which is a bit odd, I\u0027d say \"limit the capacity\" or \"lower the capacity\"",
+      "range": {
+        "startLine": 872,
+        "startChar": 5,
+        "endLine": 872,
+        "endChar": 21
+      },
+      "revId": "680f5542026344bf436255bca804f7acf11afefd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

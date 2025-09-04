@@ -51,10 +51,7 @@ Result:
 (_|_){
   // [eval] undefined field: missing:
   //     ./in.cue:4:8
-  foo: (_|_){
-    // [incomplete] undefined field: missing:
-    //     ./in.cue:4:8
-  }
+  foo: (string){ string }
   bar: (#struct){
   }
   let _bar#1multi = 〈1;bar〉
@@ -63,19 +60,10 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -6,8 +6,11 @@
- (_|_){
-   // [eval] undefined field: missing:
-   //     ./in.cue:4:8
--  foo: (string){ string }
-+  foo: (_|_){
-+    // [incomplete] undefined field: missing:
-+    //     ./in.cue:4:8
-+  }
+@@ -9,5 +9,5 @@
+   foo: (string){ string }
    bar: (#struct){
    }
 -  let _bar#1 = (_){ _ }
 +  let _bar#1multi = 〈1;bar〉
  }
--- diff/todo/p2 --
-Let seems to have misplaced error, even though it does not affect outcome.

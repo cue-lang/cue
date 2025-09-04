@@ -64,7 +64,7 @@ func (s *Struct) Len() int {
 
 // IsOpen reports whether s is open or has pattern constraints.
 func (s *Struct) IsOpen() bool {
-	if !s.node.IsClosedStruct() {
+	if s.node.IsOpenStruct() {
 		return true
 	}
 	// Check for pattern constraints which indicate openness.

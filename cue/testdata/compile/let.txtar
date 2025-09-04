@@ -58,68 +58,114 @@ issue767: {
 		out: _#volmnts
 	}
 }
+-- alignstack.cue --
+issue4051: full: {
+	#app: name: "foo"
+
+	let N = #app.name
+
+	out: (N): [{f1: f2: N}]
+}
+issue4051: reduced: {
+	(N): [{ f1: f2: N }]
+	let N = x
+	x: "s"
+}
 -- out/compile --
 b.let[]: cyclic references in let clause or alias:
     ./in.cue:10:10
+--- alignstack.cue
+{
+  issue4051: {
+    full: {
+      #app: {
+        name: "foo"
+      }
+      let N#1 = 〈0;#app〉.name
+      out: {
+        〈1;let N#1〉=>〈4;#app〉.name: [
+          {
+            f1: {
+              f2: 〈4;let N#1〉=>〈4;#app〉.name
+            }
+          },
+        ]
+      }
+    }
+  }
+  issue4051: {
+    reduced: {
+      〈0;let N#2〉=>〈3;x〉: [
+        {
+          f1: {
+            f2: 〈3;let N#2〉=>〈3;x〉
+          }
+        },
+      ]
+      let N#2 = 〈0;x〉
+      x: "s"
+    }
+  }
+}
 --- in.cue
 {
   a: {
-    let X#1 = 〈0;let Y#2〉=>〈0;c〉
-    let Y#2 = 〈0;c〉
-    b: 〈0;let X#1〉=>〈0;let Y#2〉=>〈0;c〉
+    let X#3 = 〈0;let Y#4〉=>〈0;c〉
+    let Y#4 = 〈0;c〉
+    b: 〈0;let X#3〉=>〈0;let Y#4〉=>〈0;c〉
     c: 5
   }
   b: {
-    let X#3 = 〈0;let Y#4〉=>〈0;let X#3〉=>〈0;let Y#4〉=>_|_(cyclic references in let clause or alias)
-    let Y#4 = 〈0;let X#3〉=>〈0;let Y#4〉=>_|_(cyclic references in let clause or alias)
-    b: 〈0;let X#3〉=>〈0;let Y#4〉=>_|_(cyclic references in let clause or alias)
+    let X#5 = 〈0;let Y#6〉=>〈0;let X#5〉=>〈0;let Y#6〉=>_|_(cyclic references in let clause or alias)
+    let Y#6 = 〈0;let X#5〉=>〈0;let Y#6〉=>_|_(cyclic references in let clause or alias)
+    b: 〈0;let X#5〉=>〈0;let Y#6〉=>_|_(cyclic references in let clause or alias)
     c: 5
   }
   fieldOffset: {
     a: {
       p1: {
-        let X#5 = {
-          value: 〈1;let Y#6〉=>2
+        let X#7 = {
+          value: 〈1;let Y#8〉=>2
         }
-        let Y#6 = 2
-        x: 〈0;let X#5〉=>{
-          value: 〈1;let Y#6〉=>2
+        let Y#8 = 2
+        x: 〈0;let X#7〉=>{
+          value: 〈1;let Y#8〉=>2
         }
       }
       p2: {
-        x: 〈0;let X#8〉=>{
-          value: 〈1;let Y#7〉=>2
+        x: 〈0;let X#A〉=>{
+          value: 〈1;let Y#9〉=>2
         }
-        let Y#7 = 2
-        let X#8 = {
-          value: 〈1;let Y#7〉=>2
+        let Y#9 = 2
+        let X#A = {
+          value: 〈1;let Y#9〉=>2
         }
       }
     }
     b: {
       p1: {
-        let X#9 = {
+        let X#B = {
           x: {
-            y: 〈2;let Y#A〉=>2
+            y: 〈2;let Y#C〉=>2
           }
         }
-        let Y#A = 2
-        x: 〈0;let X#9〉=>{
+        let Y#C = 2
+        x: 〈0;let X#B〉=>{
           x: {
-            y: 〈2;let Y#A〉=>2
+            y: 〈2;let Y#C〉=>2
           }
         }
       }
       p2: {
-        x: 〈0;let X#C〉=>{
+        x: 〈0;let X#E〉=>{
           x: {
-            y: 〈2;let Y#B〉=>2
+            y: 〈2;let Y#D〉=>2
           }
         }
-        let Y#B = 2
-        let X#C = {
+        let Y#D = 2
+        let X#E = {
           x: {
-            y: 〈2;let Y#B〉=>2
+            y: 〈2;let Y#D〉=>2
           }
         }
       }
@@ -127,24 +173,24 @@ b.let[]: cyclic references in let clause or alias:
   }
   issue767: {
     #Foo: {
-      let _#bar#D = {
+      let _#bar#F = {
         value: ""
       }
-      let _#volmnts#E = {
-        x: 〈1;let _#baz#F〉=>{
-          〈2;let _#bar#D〉=>{
+      let _#volmnts#10 = {
+        x: 〈1;let _#baz#11〉=>{
+          〈2;let _#bar#F〉=>{
             value: ""
           }
         }.value
       }
-      let _#baz#F = {
-        〈1;let _#bar#D〉=>{
+      let _#baz#11 = {
+        〈1;let _#bar#F〉=>{
           value: ""
         }
       }
-      out: 〈0;let _#volmnts#E〉=>{
-        x: 〈1;let _#baz#F〉=>{
-          〈2;let _#bar#D〉=>{
+      out: 〈0;let _#volmnts#10〉=>{
+        x: 〈1;let _#baz#11〉=>{
+          〈2;let _#bar#F〉=>{
             value: ""
           }
         }.value

@@ -1,0 +1,18 @@
+# The error below shows an empty position line,
+# stemming from the fact that --list constructs a list via a
+# cue/ast.ListLit without printable position information,
+# but crucially, still valid positions due to the presence of a RelPos.
+
+! exec cue vet -c --list x.cue x.json
+cmp stderr stderr.golden
+
+-- x.cue --
+[...{a: string}]
+-- x.json --
+{"a": 1}
+-- stderr.golden --
+0.a: conflicting values 1 and string (mismatched types int and string):
+    
+    ./x.cue:1:1
+    ./x.cue:1:9
+    ./x.json:1:7

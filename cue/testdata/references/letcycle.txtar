@@ -48,43 +48,43 @@ cycles: {
 	}
 }
 -- out/compile --
-cycles.a.let[].c.c: cyclic references in let clause or alias:
+cycles.a.let[].c: cyclic references in let clause or alias:
     ./in.cue:5:15
-cycles.b.let[].c.c: cyclic references in let clause or alias:
+cycles.b.let[].c: cyclic references in let clause or alias:
     ./in.cue:11:15
-cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let clause or alias:
+cycles.issue1042.#Add16.let[].for[].c: cyclic references in let clause or alias:
     ./in.cue:34:45
 --- in.cue
 {
   cycles: {
     a: {
       let A#1 = {
-        c: 〈1;let B#2〉=>〈1;let A#1〉=>{
-          c: 〈2;let B#2〉=>_|_(cyclic references in let clause or alias)
+        c: 〈1;let B#2〉=>〈0;let A#1〉=>{
+          c: 〈1;let B#2〉=>_|_(cyclic references in let clause or alias)
         }
       }
       let B#2 = 〈0;let A#1〉=>{
-        c: 〈2;let B#2〉=>_|_(cyclic references in let clause or alias)
+        c: 〈1;let B#2〉=>_|_(cyclic references in let clause or alias)
       }
       out: 〈0;let A#1〉=>{
-        c: 〈2;let B#2〉=>_|_(cyclic references in let clause or alias)
+        c: 〈1;let B#2〉=>_|_(cyclic references in let clause or alias)
       }
     }
     b: {
       let A#3 = {
         c: 〈1;let B#4〉=>{
-          〈2;let A#3〉=>{
-            c: 〈3;let B#4〉=>_|_(cyclic references in let clause or alias)
+          〈1;let A#3〉=>{
+            c: 〈1;let B#4〉=>_|_(cyclic references in let clause or alias)
           }.c
         }
       }
       let B#4 = {
         〈1;let A#3〉=>{
-          c: 〈3;let B#4〉=>_|_(cyclic references in let clause or alias)
+          c: 〈1;let B#4〉=>_|_(cyclic references in let clause or alias)
         }.c
       }
       out: 〈0;let A#3〉=>{
-        c: 〈3;let B#4〉=>_|_(cyclic references in let clause or alias)
+        c: 〈1;let B#4〉=>_|_(cyclic references in let clause or alias)
       }
     }
     issue1042: {
@@ -113,12 +113,12 @@ cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let cl
               c: 〈4;let carries#6〉=>[
                 false,
                 for _, i in 〈import;list〉.Range(0, 4, 1) {
-                  〈7;let fulladders#5〉=>[
+                  〈3;let fulladders#5〉=>[
                     for _, i in 〈import;list〉.Range(0, 4, 1) {
-                      (〈11;#FullAdder〉 & {
-                        a: 〈11;a〉[〈2;i〉]
-                        b: 〈11;b〉[〈2;i〉]
-                        c: 〈11;let carries#6〉=>_|_(cyclic references in let clause or alias)[〈2;i〉]
+                      (〈4;#FullAdder〉 & {
+                        a: 〈4;a〉[〈2;i〉]
+                        b: 〈4;b〉[〈2;i〉]
+                        c: 〈4;let carries#6〉=>_|_(cyclic references in let clause or alias)[〈2;i〉]
                       })
                     },
                   ][〈1;i〉].carry
@@ -132,10 +132,10 @@ cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let cl
           for _, i in 〈import;list〉.Range(0, 4, 1) {
             〈3;let fulladders#5〉=>[
               for _, i in 〈import;list〉.Range(0, 4, 1) {
-                (〈11;#FullAdder〉 & {
-                  a: 〈11;a〉[〈2;i〉]
-                  b: 〈11;b〉[〈2;i〉]
-                  c: 〈11;let carries#6〉=>_|_(cyclic references in let clause or alias)[〈2;i〉]
+                (〈4;#FullAdder〉 & {
+                  a: 〈4;a〉[〈2;i〉]
+                  b: 〈4;b〉[〈2;i〉]
+                  c: 〈4;let carries#6〉=>_|_(cyclic references in let clause or alias)[〈2;i〉]
                 })
               },
             ][〈1;i〉].carry
@@ -145,10 +145,10 @@ cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let cl
           for _, i in 〈import;list〉.Range(0, 4, 1) {
             〈3;let fulladders#5〉=>[
               for _, i in 〈import;list〉.Range(0, 4, 1) {
-                (〈11;#FullAdder〉 & {
-                  a: 〈11;a〉[〈2;i〉]
-                  b: 〈11;b〉[〈2;i〉]
-                  c: 〈11;let carries#6〉=>_|_(cyclic references in let clause or alias)[〈2;i〉]
+                (〈4;#FullAdder〉 & {
+                  a: 〈4;a〉[〈2;i〉]
+                  b: 〈4;b〉[〈2;i〉]
+                  c: 〈4;let carries#6〉=>_|_(cyclic references in let clause or alias)[〈2;i〉]
                 })
               },
             ][〈1;i〉].sum
@@ -158,6 +158,27 @@ cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let cl
     }
   }
 }
+-- out/evalalpha --
+cycles.a.let[].c: cyclic references in let clause or alias:
+    ./in.cue:5:15
+cycles.b.let[].c: cyclic references in let clause or alias:
+    ./in.cue:11:15
+cycles.issue1042.#Add16.let[].for[].c: cyclic references in let clause or alias:
+    ./in.cue:34:45
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,6 +1,6 @@
+-cycles.a.let[].c.c: cyclic references in let clause or alias:
++cycles.a.let[].c: cyclic references in let clause or alias:
+     ./in.cue:5:15
+-cycles.b.let[].c.c: cyclic references in let clause or alias:
++cycles.b.let[].c: cyclic references in let clause or alias:
+     ./in.cue:11:15
+-cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let clause or alias:
++cycles.issue1042.#Add16.let[].for[].c: cyclic references in let clause or alias:
+     ./in.cue:34:45
 -- out/eval --
 cycles.a.let[].c.c: cyclic references in let clause or alias:
     ./in.cue:5:15

@@ -83,10 +83,10 @@ b.let[]: cyclic references in let clause or alias:
       }
       let N#1 = 〈0;#app〉.name
       out: {
-        〈1;let N#1〉=>〈4;#app〉.name: [
+        〈1;let N#1〉=>〈0;#app〉.name: [
           {
             f1: {
-              f2: 〈4;let N#1〉=>〈4;#app〉.name
+              f2: 〈4;let N#1〉=>〈0;#app〉.name
             }
           },
         ]
@@ -95,10 +95,10 @@ b.let[]: cyclic references in let clause or alias:
   }
   issue4051: {
     reduced: {
-      〈0;let N#2〉=>〈3;x〉: [
+      〈0;let N#2〉=>〈0;x〉: [
         {
           f1: {
-            f2: 〈3;let N#2〉=>〈3;x〉
+            f2: 〈3;let N#2〉=>〈0;x〉
           }
         },
       ]
@@ -178,7 +178,7 @@ b.let[]: cyclic references in let clause or alias:
       }
       let _#volmnts#10 = {
         x: 〈1;let _#baz#11〉=>{
-          〈2;let _#bar#F〉=>{
+          〈1;let _#bar#F〉=>{
             value: ""
           }
         }.value
@@ -190,7 +190,7 @@ b.let[]: cyclic references in let clause or alias:
       }
       out: 〈0;let _#volmnts#10〉=>{
         x: 〈1;let _#baz#11〉=>{
-          〈2;let _#bar#F〉=>{
+          〈1;let _#bar#F〉=>{
             value: ""
           }
         }.value

@@ -425,7 +425,7 @@ func approximateEqual(a, b Error) bool {
 	if aPos == token.NoPos || bPos == token.NoPos {
 		return a.Error() == b.Error()
 	}
-	return comparePosWithNoPosFirst(aPos, bPos) == 0 && slices.Compare(a.Path(), b.Path()) == 0
+	return aPos.Compare(bPos) == 0 && slices.Compare(a.Path(), b.Path()) == 0
 }
 
 // A list implements the error interface by returning the

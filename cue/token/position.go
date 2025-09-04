@@ -143,7 +143,6 @@ func (p Pos) Compare(p2 Pos) int {
 	// Note that CUE doesn't currently use any directives which alter
 	// position information, like Go's //line, so comparing by offset is enough.
 	return cmp.Compare(pos.Offset, pos2.Offset)
-
 }
 
 // NoPos is the zero value for [Pos]; there is no file and line information

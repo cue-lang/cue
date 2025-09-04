@@ -1,3 +1,5 @@
+#expandLetExpr: true
+
 -- in.cue --
 a: {
 	foo: a: 1
@@ -1220,7 +1222,21 @@ Result:
           Routes: {
             route: {
               [_]: {
-                spec!: 〈5;let HTTPROUTESPEC#1〉.#x
+                spec!: 〈5;let HTTPROUTESPEC#1〉=>{
+                  #x: ([
+                    ...{
+                      refs: [
+                        ...{
+                          string
+                        },
+                      ]
+                    },
+                  ]|*[
+                    {
+                      other: []
+                    },
+                  ])
+                }.#x
               }
             }
           }

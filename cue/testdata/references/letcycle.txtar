@@ -1,3 +1,5 @@
+#expandLetExpr: true
+
 -- in.cue --
 import "list"
 
@@ -57,19 +59,33 @@ cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let cl
   cycles: {
     a: {
       let A#1 = {
-        c: 〈1;let B#2〉
+        c: 〈1;let B#2〉=>〈1;let A#1〉=>{
+          c: 〈2;let B#2〉=>_|_(cyclic references in let clause or alias)
+        }
       }
-      let B#2 = 〈0;let A#1〉
-      out: 〈0;let A#1〉
+      let B#2 = 〈0;let A#1〉=>{
+        c: 〈2;let B#2〉=>_|_(cyclic references in let clause or alias)
+      }
+      out: 〈0;let A#1〉=>{
+        c: 〈2;let B#2〉=>_|_(cyclic references in let clause or alias)
+      }
     }
     b: {
       let A#3 = {
-        c: 〈1;let B#4〉
+        c: 〈1;let B#4〉=>{
+          〈2;let A#3〉=>{
+            c: 〈3;let B#4〉=>_|_(cyclic references in let clause or alias)
+          }.c
+        }
       }
       let B#4 = {
-        〈1;let A#3〉.c
+        〈1;let A#3〉=>{
+          c: 〈3;let B#4〉=>_|_(cyclic references in let clause or alias)
+        }.c
       }
-      out: 〈0;let A#3〉
+      out: 〈0;let A#3〉=>{
+        c: 〈3;let B#4〉=>_|_(cyclic references in let clause or alias)
+      }
     }
     issue1042: {
       #FullAdder: {
@@ -94,19 +110,48 @@ cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let cl
             (〈4;#FullAdder〉 & {
               a: 〈4;a〉[〈2;i〉]
               b: 〈4;b〉[〈2;i〉]
-              c: 〈4;let carries#6〉[〈2;i〉]
+              c: 〈4;let carries#6〉=>[
+                false,
+                for _, i in 〈import;list〉.Range(0, 4, 1) {
+                  〈7;let fulladders#5〉=>[
+                    for _, i in 〈import;list〉.Range(0, 4, 1) {
+                      (〈11;#FullAdder〉 & {
+                        a: 〈11;a〉[〈2;i〉]
+                        b: 〈11;b〉[〈2;i〉]
+                        c: 〈11;let carries#6〉=>_|_(cyclic references in let clause or alias)[〈2;i〉]
+                      })
+                    },
+                  ][〈1;i〉].carry
+                },
+              ][〈2;i〉]
             })
           },
         ]
         let carries#6 = [
           false,
           for _, i in 〈import;list〉.Range(0, 4, 1) {
-            〈3;let fulladders#5〉[〈1;i〉].carry
+            〈3;let fulladders#5〉=>[
+              for _, i in 〈import;list〉.Range(0, 4, 1) {
+                (〈11;#FullAdder〉 & {
+                  a: 〈11;a〉[〈2;i〉]
+                  b: 〈11;b〉[〈2;i〉]
+                  c: 〈11;let carries#6〉=>_|_(cyclic references in let clause or alias)[〈2;i〉]
+                })
+              },
+            ][〈1;i〉].carry
           },
         ]
         out: [
           for _, i in 〈import;list〉.Range(0, 4, 1) {
-            〈3;let fulladders#5〉[〈1;i〉].sum
+            〈3;let fulladders#5〉=>[
+              for _, i in 〈import;list〉.Range(0, 4, 1) {
+                (〈11;#FullAdder〉 & {
+                  a: 〈11;a〉[〈2;i〉]
+                  b: 〈11;b〉[〈2;i〉]
+                  c: 〈11;let carries#6〉=>_|_(cyclic references in let clause or alias)[〈2;i〉]
+                })
+              },
+            ][〈1;i〉].sum
           },
         ]
       }

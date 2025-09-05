@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01c7fbd9_996c271b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-05T07:43:39Z",
+      "side": 1,
+      "message": "I\u0027ve noticed that the use of t.Parallel() causes the updating of these tests to be rather flakey. That is why I have been reverting the use of it. Maybe this is one of these instances?",
+      "revId": "c7449c3b9f1a868075cd01f5787ddfc21a10066e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

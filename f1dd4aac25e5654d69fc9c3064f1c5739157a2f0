@@ -16,6 +16,24 @@
       "message": "Perhaps clarify the reason - that it broke tip.cuelang.org, and the following commit will add a test.",
       "revId": "f1dd4aac25e5654d69fc9c3064f1c5739157a2f0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bad67475_82771f95",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-05T13:57:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd1155be_7394f882",
+      "revId": "f1dd4aac25e5654d69fc9c3064f1c5739157a2f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

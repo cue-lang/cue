@@ -216,6 +216,7 @@ func processComprehension(ctx *OpContext, t *task, mode runMode) {
 
 	y := &envYield{
 		envComprehension: t.comp,
+		root:             t.node.node,
 		leaf:             t.leaf,
 		env:              t.env,
 		id:               t.id,

@@ -26,8 +26,10 @@ import (
 // -----------------------------------------------------------------------------
 // Positions
 
-// Position describes an arbitrary source position
-// including the file, line, and column location.
+// Position describes an arbitrary and printable source position within a file,
+// including offset, line, and column location,
+// which can be rendered in a human-friendly text form.
+//
 // A Position is valid if the line number is > 0.
 type Position struct {
 	Filename string // filename, if any
@@ -40,7 +42,7 @@ type Position struct {
 // IsValid reports whether the position is valid.
 func (pos *Position) IsValid() bool { return pos.Line > 0 }
 
-// String returns a string in one of several forms:
+// String returns a human-readable form of a position in one of several forms:
 //
 //	file:line:column    valid position with file name
 //	line:column         valid position without file name
@@ -60,16 +62,18 @@ func (pos Position) String() string {
 	return s
 }
 
-// Pos is a compact encoding of a source position within a file, as well as
-// relative positioning information. It can be converted into a Position for a
-// more convenient, but much larger, representation.
+// Pos is a compact encoding of a source position.
+// When valid, as reported by [Pos.IsValid], this can be either
+// a printable file position to obtain via [Pos.Position],
+// which can be rendered in a human-friendly text form,
+// and/or a relative position to obtain via [Pos.RelPos].
 type Pos struct {
 	file   *File
 	offset int
 }
 
-// File returns the file that contains the position p or nil if there is no
-// such file (for instance for p == NoPos).
+// File returns the file that contains the printable position p
+// or nil if there is no such file (for instance for p == [NoPos]).
 func (p Pos) File() *File {
 	if p.index() == 0 {
 		return nil
@@ -122,6 +126,7 @@ func (p Pos) Position() Position {
 	return p.file.Position(p)
 }
 
+// String returns a human-readable form of a printable position.
 func (p Pos) String() string {
 	return p.Position().String()
 }
@@ -189,7 +194,6 @@ func (p RelPos) Pos() Pos {
 // HasRelPos reports whether p has a relative position.
 func (p Pos) HasRelPos() bool {
 	return p.offset&relMask != 0
-
 }
 
 func (p Pos) Before(q Pos) bool {
@@ -208,7 +212,7 @@ func (p Pos) Add(n int) Pos {
 
 // IsValid reports whether the position contains any useful information,
 // meaning either a printable file position to obtain via [Pos.Position],
-// or a relative position to obtain via [Pos.RelPos].
+// and/or a relative position to obtain via [Pos.RelPos].
 func (p Pos) IsValid() bool {
 	return p != NoPos
 }

@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "17dea000_6d5b7c39",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-05T09:39:31Z",
+      "side": 1,
+      "message": "I think this is fine; I would just like to see this explanation on the Pos type I think. Otherwise (unless I\u0027m missing something), it suddenly appears in various method docs and I can\u0027t see what it actually means.",
+      "parentUuid": "6f5366a1_b0b90fba",
+      "revId": "7032d0d91913a53c44c35894259c43b30a407c22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fa53bf9a_ae119f7a",
         "filename": "cue/token/position.go",
         "patchSetId": 1

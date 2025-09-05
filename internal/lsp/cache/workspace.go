@@ -388,6 +388,11 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		}
 		pkgs, err := m.FindPackagesOrModulesForFile(uri)
 		if err != nil {
+			if err == ErrModuleDeleted {
+				w.removeModule(m)
+				// TODO: something better
+				continue
+			}
 			if _, ok := err.(cueerrors.Error); ok {
 				// Most likely a syntax error; ignore it.
 				// TODO: this error might become a "diagnostics" message
@@ -603,6 +608,10 @@ func (w *Workspace) ensureModule(rootUri protocol.DocumentURI) *Module {
 	return m
 }
 
+func (w *Workspace) removeModule(m *Module) {
+	delete(w.modules, m.rootURI)
+}
+
 // newModule creates a new module, adding it to the set of modules
 // within this workspace.
 func (w *Workspace) newModule(modFileUri protocol.DocumentURI) *Module {
@@ -622,7 +631,7 @@ func (w *Workspace) reloadModules() {
 		err := m.ReloadModule()
 		if err != nil {
 			changed = true
-			delete(modules, m.rootURI)
+			w.removeModule(m)
 		}
 	}
 	if changed {
@@ -658,9 +667,13 @@ func (w *Workspace) reloadPackages() error {
 		pkgs, err := m.loadDirtyPackages()
 		if err != nil {
 			modulesChanged = true
-			delete(modules, m.rootURI)
+			w.removeModule(m)
 			continue
 		}
+		for fileUri := range m.dirtyFiles {
+			allDirtyFiles[fileUri] = m
+		}
+
 		if pkgs == nil {
 			// No dirty packages within the module.
 			continue
@@ -669,9 +682,6 @@ func (w *Workspace) reloadPackages() error {
 		// We need to track all packages that are loaded, so we use
 		// pkgs.All() and not pkgs.Roots().
 		loadedPkgs = append(loadedPkgs, pkgs.All()...)
-		for fileUri := range m.dirtyFiles {
-			allDirtyFiles[fileUri] = m
-		}
 	}
 
 	// Process the results of loading the all the dirty packages from
@@ -723,11 +733,12 @@ func (w *Workspace) reloadPackages() error {
 		m := w.ensureModule(modRootURI)
 		if err := m.ReloadModule(); err != nil {
 			modulesChanged = true
-			delete(modules, modRootURI)
+			w.removeModule(m)
 			continue
 		}
 
-		if loadedPkg.Error() != nil {
+		if err := loadedPkg.Error(); err != nil {
+			w.debugLog(fmt.Sprintf("%v Error when loading %v: %v", m, ip, err))
 			// It could be that the last file within this package was
 			// deleted, so attempting to load it will create an error. So
 			// the correct thing to do now is just remove any record of
@@ -856,6 +867,10 @@ func (w *Workspace) reloadPackages() error {
 	for fileUri, m := range allDirtyFiles {
 		pkgs, err := m.FindPackagesOrModulesForFile(fileUri)
 		if err != nil {
+			if err == ErrModuleDeleted {
+				w.removeModule(m)
+				continue
+			}
 			if _, ok := err.(cueerrors.Error); ok {
 				// Most likely a syntax error; ignore it.
 				// TODO: this error might become a "diagnostics" message
@@ -863,11 +878,27 @@ func (w *Workspace) reloadPackages() error {
 			}
 			return err
 		}
-		if len(pkgs) != 0 {
-			for _, pkg := range pkgs {
-				pkg.MarkFileDirty(fileUri)
+		for _, pkg := range pkgs {
+			pkg, ok := pkg.(*Package)
+			if !ok {
+				continue
 			}
-			w.invalidateActiveFilesAndDirs()
+			key := importPathModRootPair{
+				importPath: pkg.importPath,
+				modRootURI: m.rootURI,
+			}
+			if _, loaded := processedPkgs[key]; loaded {
+				// We've just loaded this pkg. If
+				// FindPackagesOrModulesForFile thinks fileUri belongs in
+				// pkg, but the loading has not done that, then it most
+				// likely means modpkgload hit an error loading that
+				// package. We should *not* try again now otherwise we can
+				// hit an infinite loop.
+				delete(allDirtyFiles, fileUri)
+				delete(m.dirtyFiles, fileUri)
+				continue
+			}
+			pkg.MarkFileDirty(fileUri)
 			repeatReload = true
 		}
 		// if len(pkgs) == 0 and no error, then it means the file had no
@@ -876,6 +907,7 @@ func (w *Workspace) reloadPackages() error {
 	}
 
 	if repeatReload {
+		w.invalidateActiveFilesAndDirs()
 		return w.reloadPackages()
 	}
 	return nil

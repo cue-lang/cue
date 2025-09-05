@@ -6,6 +6,7 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 	"cuelang.org/go/internal/lsp/cache"
 	"cuelang.org/go/mod/modcache"
 	"cuelang.org/go/mod/modconfig"
@@ -52,6 +53,10 @@ package b
 
 import "example.net/bar/doesnotexist" // unknown module
 import "example.com/bar/doesnotexist" // unknown package
+-- c/c.cue --
+package c
+
+import "
 `
 
 	t.Run("open", func(t *testing.T) {
@@ -95,6 +100,33 @@ import "example.com/bar/doesnotexist" // unknown package
 				// Nothing is created for the unfindable imports
 				NoLogExactf(protocol.Debug, "example.net/bar/doesnotexist"),
 				NoLogExactf(protocol.Debug, "example.com/bar/doesnotexist"),
+			)
+		})
+	})
+
+	t.Run("open - bad import syntax", func(t *testing.T) {
+		WithOptions(
+			RootURIAsDefaultFolder(), Registry(reg), Modes(DefaultModes()&^Forwarded),
+		).Run(t, files, func(t *testing.T, env *Env) {
+			rootURI := env.Sandbox.Workdir.RootURI()
+			env.Await(
+				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+			)
+			env.OpenFile("c/c.cue")
+			env.Await(
+				env.DoneWithOpen(),
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loading packages [example.com/bar/c@v0]", rootURI),
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Error when loading example.com/bar/c@v0: cannot get imports", rootURI),
+				// No conclusion of the load:
+				NoLogExactf(protocol.Debug, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/c] importPath=example.com/bar/c@v0", rootURI, rootURI),
+			)
+			// Now edit it to correct the imports line:
+			env.EditBuffer("c/c.cue", fake.NewEdit(2, 7, 2, 7, `"`))
+			env.Await(
+				env.DoneWithChange(),
+				// We should now get the successful package load
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/c] importPath=example.com/bar/c@v0", rootURI, rootURI),
 			)
 		})
 	})

@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6f5366a1_b0b90fba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-05T09:32:13Z",
+      "side": 1,
+      "message": "I came up with \"printable\" in the last CL to mean \"it can be shown to the user as a position\", i.e. it is a valid position that\u0027s more than just a relative position. I.e. it is attached to a file (which could have an empty filename!) and so it has some sort of offset+line+column information.\n\nIn other words, printable \u003d\u003d String returns something useful.\n\nI\u0027m happy to consider alternatives, or to document \"printable\" better, if you have suggestions.",
+      "parentUuid": "0b7857f9_a698c9d0",
+      "revId": "7032d0d91913a53c44c35894259c43b30a407c22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fa53bf9a_ae119f7a",
         "filename": "cue/token/position.go",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-05T09:26:53Z",
       "side": 1,
       "message": "What is going on with your editor and imposing line length on comments?! This block has got narrower, others have got wider!",
+      "revId": "7032d0d91913a53c44c35894259c43b30a407c22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1458cf97_6da40a21",
+        "filename": "cue/token/position.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-05T09:32:13Z",
+      "side": 1,
+      "message": "This is not my editor, this is me: https://sembr.org/\n\nGo tends to follow this too, and so do I. We don\u0027t enforce it as a project, because it can\u0027t really be consistently enforced.\n\nBut as a fallback, I still break long lines around 80-100 characters if needed.",
+      "parentUuid": "fa53bf9a_ae119f7a",
       "revId": "7032d0d91913a53c44c35894259c43b30a407c22",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

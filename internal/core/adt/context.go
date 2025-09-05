@@ -1291,9 +1291,25 @@ func (c *OpContext) newBytes(b []byte) Value {
 	return &Bytes{Src: c.src, B: b}
 }
 
+var (
+	boolFalseNoSrc = &Bool{B: false}
+	boolTrueNoSrc  = &Bool{B: true}
+)
+
 func (c *OpContext) newBool(b bool) Value {
 	if c.HasErr() {
 		return c.Err()
+	}
+	// Creating boolean values is a very common operation,
+	// such as when evaluating unary and binary operators.
+	// A significant portion of the time, no source is attached
+	// to the operation, so we can reuse Bool allocations.
+	if c.src == nil {
+		if b {
+			return boolTrueNoSrc
+		} else {
+			return boolFalseNoSrc
+		}
 	}
 	return &Bool{Src: c.src, B: b}
 }

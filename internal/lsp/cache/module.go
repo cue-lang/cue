@@ -117,12 +117,14 @@ func (m *Module) ReloadModule() error {
 		fh, err := w.overlayFS.ReadFile(m.modFileURI)
 		if err != nil {
 			m.status = deleted
-			return err
+			w.debugLog(fmt.Sprintf("%v Error when reloading module: %v", m, err))
+			return ErrModuleDeleted
 		}
 		modFile, err := modfile.ParseNonStrict(fh.Content(), m.modFileURI.Path())
 		if err != nil {
 			m.status = deleted
-			return err
+			w.debugLog(fmt.Sprintf("%v Error when reloading module: %v", m, err))
+			return ErrModuleDeleted
 		}
 		m.modFile = modFile
 		m.status = splendid
@@ -198,7 +200,7 @@ func (m *Module) FindPackagesOrModulesForFile(file protocol.DocumentURI) ([]pack
 	parsedFile, _, _, err := m.ReadCUEFile(file)
 	if parsedFile == nil {
 		w.debugLog(fmt.Sprintf("%v Cannot read file %v, %v", m, file, err))
-		return nil, nil
+		return nil, err
 	}
 	pkgName := parsedFile.PackageName()
 	if pkgName == "" {

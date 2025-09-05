@@ -16,6 +16,24 @@
       "message": "I\u0027ve noticed that the use of t.Parallel() causes the updating of these tests to be rather flakey. That is why I have been reverting the use of it. Maybe this is one of these instances?",
       "revId": "c7449c3b9f1a868075cd01f5787ddfc21a10066e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1e64522_0ec097d9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-05T07:45:22Z",
+      "side": 1,
+      "message": "I don\u0027t think so, at least in this instance - I thought the same, but I ran it twenty times in a row from a clean master, and all twenty times I got the same diff. I think Roger just forgot to re-run CUE_UPDATE, and CI doesn\u0027t actually enforce/check this.",
+      "parentUuid": "01c7fbd9_996c271b",
+      "revId": "c7449c3b9f1a868075cd01f5787ddfc21a10066e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

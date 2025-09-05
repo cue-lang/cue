@@ -26,16 +26,37 @@ variant: {
 	}
 }
 -- out/evalalpha --
-(struct){
-  issue4056: (struct){
-    full: (struct){
+Errors:
+variant.a: conflicting values "x" and int (mismatched types string and int):
+    ./issue4056.cue:17:10
+    ./issue4056.cue:18:5
+    ./issue4056.cue:19:14
+issue4056.full.a: error message 1:
+    ./issue4056.cue:5:9
+issue4056.reduced.a: a:
+    ./issue4056.cue:12:9
+
+Result:
+(_|_){
+  // [eval]
+  issue4056: (_|_){
+    // [user]
+    full: (_|_){
+      // [user] issue4056.full.a: error message 1:
+      //     ./issue4056.cue:5:9
       a: (string){ "foo-bar" }
     }
-    reduced: (struct){
+    reduced: (_|_){
+      // [user] issue4056.reduced.a: a:
+      //     ./issue4056.cue:12:9
       a: (string){ "x" }
     }
   }
-  variant: (struct){
+  variant: (_|_){
+    // [eval] variant.a: conflicting values "x" and int (mismatched types string and int):
+    //     ./issue4056.cue:17:10
+    //     ./issue4056.cue:18:5
+    //     ./issue4056.cue:19:14
     a: (string){ "x" }
   }
 }

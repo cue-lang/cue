@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6f12863_ed3f3b4f",
+        "filename": "cmd/cue/cmd/integration/workspace/hover_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-05T09:30:16Z",
+      "side": 1,
+      "message": "This is all quite big because this is the first time I\u0027ve built out this infrastructure in these integration tests. Over time, I expect this will be factored out somewhat and used in the other integration tests nearby. It all follows a similar approach as used in the unit tests in definitions_test.go",
+      "revId": "7d9b798995df02e067e836f781801a3bb312d12d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

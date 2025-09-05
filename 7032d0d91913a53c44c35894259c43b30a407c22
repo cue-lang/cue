@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b7857f9_a698c9d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-05T09:26:53Z",
+      "side": 1,
+      "message": "Hmm, my main issue here is I don\u0027t understand what \"printable\" means and why that\u0027s important. What would be a non-printable position?",
+      "revId": "7032d0d91913a53c44c35894259c43b30a407c22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa53bf9a_ae119f7a",
+        "filename": "cue/token/position.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-05T09:26:53Z",
+      "side": 1,
+      "message": "What is going on with your editor and imposing line length on comments?! This block has got narrower, others have got wider!",
+      "revId": "7032d0d91913a53c44c35894259c43b30a407c22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

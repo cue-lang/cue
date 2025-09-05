@@ -25,39 +25,39 @@ variant: {
 		a: _
 	}
 }
+-- pending.cue --
+// Be sure to emit errors for uncompleted pending arcs.
+err: {
+	A: "forty two"
+	if A < 100 {B: true}
+}
 -- out/evalalpha --
 Errors:
-variant.a: conflicting values "x" and int (mismatched types string and int):
-    ./issue4056.cue:17:10
-    ./issue4056.cue:18:5
-    ./issue4056.cue:19:14
-issue4056.full.a: error message 1:
-    ./issue4056.cue:5:9
-issue4056.reduced.a: a:
-    ./issue4056.cue:12:9
+err: invalid operands "forty two" and 100 to '<' (type string and int):
+    ./pending.cue:4:5
+    ./pending.cue:3:5
+    ./pending.cue:4:9
 
 Result:
 (_|_){
   // [eval]
-  issue4056: (_|_){
-    // [user]
-    full: (_|_){
-      // [user] issue4056.full.a: error message 1:
-      //     ./issue4056.cue:5:9
+  issue4056: (struct){
+    full: (struct){
       a: (string){ "foo-bar" }
     }
-    reduced: (_|_){
-      // [user] issue4056.reduced.a: a:
-      //     ./issue4056.cue:12:9
+    reduced: (struct){
       a: (string){ "x" }
     }
   }
-  variant: (_|_){
-    // [eval] variant.a: conflicting values "x" and int (mismatched types string and int):
-    //     ./issue4056.cue:17:10
-    //     ./issue4056.cue:18:5
-    //     ./issue4056.cue:19:14
+  variant: (struct){
     a: (string){ "x" }
+  }
+  err: (_|_){
+    // [eval] err: invalid operands "forty two" and 100 to '<' (type string and int):
+    //     ./pending.cue:4:5
+    //     ./pending.cue:3:5
+    //     ./pending.cue:4:9
+    A: (string){ "forty two" }
   }
 }
 -- out/compile --
@@ -86,6 +86,15 @@ Result:
     a: (string|int)
     if (len(〈0;a〉) > 0) {
       a: _
+    }
+  }
+}
+--- pending.cue
+{
+  err: {
+    A: "forty two"
+    if (〈0;A〉 < 100) {
+      B: true
     }
   }
 }

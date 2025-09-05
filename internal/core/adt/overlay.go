@@ -56,6 +56,9 @@ func newOverlayContext(ctx *OpContext) *overlayContext {
 type overlayContext struct {
 	ctx *OpContext
 
+	// root is the root of the disjunct.
+	root *Vertex
+
 	// vertices holds the original, non-overlay vertices. The overlay for a
 	// vertex v can be obtained by looking up v.cc.overlay.src.
 	vertices []*Vertex
@@ -144,6 +147,7 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 	v := ctx.cloneVertex(root.node)
 	v.IsDisjunct = true
 	v.state.vertexMap = ctx.vertexMap
+	ctx.root = v
 
 	for _, v := range ctx.vertices {
 		v = v.overlay
@@ -432,10 +436,16 @@ func (ctx *overlayContext) mapComprehensionContext(ec *envComprehension) *envCom
 	}
 
 	if ctx.compMap[ec] == nil {
+		vertex := ctx.vertexMap.deref(ec.vertex)
+		// Report the error at the root of the disjunction if otherwise the
+		// error would be reported outside of the disjunction.
+		if vertex == ec.vertex {
+			vertex = ctx.root
+		}
 		x := &envComprehension{
 			comp:    ec.comp,
 			structs: ec.structs,
-			vertex:  ctx.ctx.deref(ec.vertex),
+			vertex:  vertex,
 		}
 		ctx.compMap[ec] = x
 		ec = x

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "793d654a_8061edd5",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-05T07:50:40Z",
+      "side": 0,
+      "message": "theoretically this matters, so I would be inclined not to change this.",
+      "revId": "526afb64e86489a0ac9cb38ce6a83b4b5ccbeeb4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

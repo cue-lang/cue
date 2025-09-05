@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4d6480d_1f46467c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-05T07:50:40Z",
+      "side": 1,
+      "message": "s/poit/point/",
+      "revId": "3eb0cbdff6f0c1f23da80e9bd2a4eba9d301f0dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

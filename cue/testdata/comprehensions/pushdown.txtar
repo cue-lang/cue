@@ -1164,10 +1164,16 @@ Result:
   noStackOverflowStructCycle: (_|_){
     // [structural cycle]
     #list: (_|_){
-      // [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle
+      // [structural cycle]
+      tail: (_|_){
+        // [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle
+      }
     }
     list: (_|_){
-      // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
+      // [structural cycle]
+      tail: (_|_){
+        // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
+      }
     }
   }
   provideIncompleteSuccess: (_|_){
@@ -2006,7 +2012,26 @@ diff old new
          //     ./in.cue:46:4
          //     ./in.cue:49:9
        }
-@@ -206,8 +184,8 @@
+@@ -191,10 +169,16 @@
+   noStackOverflowStructCycle: (_|_){
+     // [structural cycle]
+     #list: (_|_){
+-      // [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle
++      // [structural cycle]
++      tail: (_|_){
++        // [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle
++      }
+     }
+     list: (_|_){
+-      // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
++      // [structural cycle]
++      tail: (_|_){
++        // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
++      }
+     }
+   }
+   provideIncompleteSuccess: (_|_){
+@@ -206,8 +190,8 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -2017,7 +2042,7 @@ diff old new
        }
        y: ~(provideIncompleteSuccess.t1.x)
      }
-@@ -225,10 +203,7 @@
+@@ -225,10 +209,7 @@
            // [eval]
            d: (_|_){
              // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -2028,7 +2053,7 @@ diff old new
            }
          }
          b: (bool){ true }
-@@ -552,9 +527,6 @@
+@@ -552,9 +533,6 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -2038,7 +2063,7 @@ diff old new
              //     ./in.cue:591:9
            }
          }
-@@ -578,13 +550,13 @@
+@@ -578,13 +556,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -2056,7 +2081,7 @@ diff old new
          }
        }
      }
-@@ -871,10 +843,10 @@
+@@ -871,10 +849,10 @@
    issue3935: (struct){
      reduced: (struct){
        out: (#struct){

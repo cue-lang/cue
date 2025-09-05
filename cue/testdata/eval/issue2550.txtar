@@ -49,11 +49,9 @@ undefined field: missing:
 
 Result:
 (_|_){
-  // [eval]
-  foo: (_|_){
-    // [eval] undefined field: missing:
-    //     ./in.cue:4:8
-  }
+  // [eval] undefined field: missing:
+  //     ./in.cue:4:8
+  foo: (string){ string }
   bar: (#struct){
   }
   let _bar#1multi = 〈1;bar〉
@@ -62,24 +60,10 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -4,10 +4,12 @@
- 
- Result:
- (_|_){
--  // [eval] undefined field: missing:
--  //     ./in.cue:4:8
--  foo: (string){ string }
-+  // [eval]
-+  foo: (_|_){
-+    // [eval] undefined field: missing:
-+    //     ./in.cue:4:8
-+  }
+@@ -9,5 +9,5 @@
+   foo: (string){ string }
    bar: (#struct){
    }
 -  let _bar#1 = (_){ _ }
 +  let _bar#1multi = 〈1;bar〉
  }
--- diff/explanation --
-Error is reported at `foo` instead of at top level. This is a result of the
-pushdown semantics of `foo`: the comprehension task is pushed down from top
-level to `foo` and thus the error is reported there.

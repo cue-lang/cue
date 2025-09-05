@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85c8ac02_bb2b158a",
+        "filename": "cue/testdata/disjunctions/propagate_err.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-05T13:55:55Z",
+      "side": 1,
+      "message": "I\u0027d mention the source of this added test in the commit message.",
+      "revId": "7e9b9c8bd42e83d2fabf80be7e91f8e6ac4511b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e86d4f6_5cacb7e4",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-05T13:55:55Z",
+      "side": 1,
+      "message": "did you mean to uncomment or delete this?",
+      "revId": "7e9b9c8bd42e83d2fabf80be7e91f8e6ac4511b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -92,7 +92,6 @@ type envComprehension struct {
 // An envComprehension only needs to be evaluated once for multiple envYields.
 type envYield struct {
 	*envComprehension                // The original comprehension.
-	root              *Vertex        // The root for error reporting.
 	leaf              *Comprehension // The leaf Comprehension
 
 	// Values specific to the field corresponding to this envYield
@@ -352,9 +351,9 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 			// continue to collect other errors.
 			d.done = true
 			d.inserted = true
-			if d.root != nil {
-				d.root.state.addBottom(err)
-				ctx.PopArc(d.root)
+			if d.vertex != nil {
+				d.vertex.state.addBottom(err)
+				ctx.PopArc(d.vertex)
 			}
 			return nil
 		}

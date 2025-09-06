@@ -15,6 +15,8 @@
 package export
 
 import (
+	"slices"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -122,10 +124,8 @@ func nestedField(f *ast.Field) *ast.Field {
 }
 
 func containsDoc(a []*ast.CommentGroup, cg *ast.CommentGroup) bool {
-	for _, c := range a {
-		if c == cg {
-			return true
-		}
+	if slices.Contains(a, cg) {
+		return true
 	}
 
 	for _, c := range a {

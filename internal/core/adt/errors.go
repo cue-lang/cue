@@ -32,6 +32,8 @@ package adt
 //
 
 import (
+	"slices"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	cueformat "cuelang.org/go/cue/format"
@@ -322,10 +324,8 @@ func (v *ValueError) AddPosition(n Node) {
 
 func (v *ValueError) AddPos(p token.Pos) {
 	if p != token.NoPos {
-		for _, q := range v.auxpos {
-			if p == q {
-				return
-			}
+		if slices.Contains(v.auxpos, p) {
+			return
 		}
 		v.auxpos = append(v.auxpos, p)
 	}

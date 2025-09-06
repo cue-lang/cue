@@ -171,10 +171,8 @@ func isOptional(f *reflect.StructField) bool {
 		}
 	} else if tag, ok = f.Tag.Lookup("json"); ok {
 		isOptional = false
-		for _, f := range strings.Split(tag, ",")[1:] {
-			if f == "omitempty" {
-				return true
-			}
+		if slices.Contains(strings.Split(tag, ",")[1:], "omitempty") {
+			return true
 		}
 	}
 	return isOptional
@@ -197,10 +195,8 @@ func isOmitEmpty(f *reflect.StructField) bool {
 	tag, ok := f.Tag.Lookup("json")
 	if ok {
 		isOmitEmpty = false
-		for _, f := range strings.Split(tag, ",")[1:] {
-			if f == "omitempty" {
-				return true
-			}
+		if slices.Contains(strings.Split(tag, ",")[1:], "omitempty") {
+			return true
 		}
 	}
 	return isOmitEmpty

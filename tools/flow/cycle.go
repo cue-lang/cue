@@ -16,6 +16,7 @@ package flow
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -29,10 +30,8 @@ func checkCycle(a []*Task) errors.Error {
 		visited: make([]bool, len(a)),
 		stack:   make([]*Task, 0, len(a)),
 	}
-	for _, t := range a {
-		if cc.isCyclic(t) {
-			break
-		}
+	if slices.ContainsFunc(a, cc.isCyclic) {
+
 	}
 	return cc.err
 }

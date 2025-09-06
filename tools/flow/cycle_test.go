@@ -63,7 +63,7 @@ func TestIsCyclic(t *testing.T) {
 				if d == "" {
 					continue
 				}
-				for _, num := range strings.Split(d, ",") {
+				for num := range strings.SplitSeq(d, ",") {
 					num = strings.TrimSpace(num)
 					if num == "" {
 						continue

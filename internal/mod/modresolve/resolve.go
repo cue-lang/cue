@@ -288,8 +288,8 @@ func ParseCUERegistry(s string, catchAllDefault string) (LocationResolver, error
 	cfg := config{
 		ModuleRegistries: make(map[string]*registryConfig),
 	}
-	parts := strings.Split(s, ",")
-	for _, part := range parts {
+	parts := strings.SplitSeq(s, ",")
+	for part := range parts {
 		key, val, ok := strings.Cut(part, "=")
 		if !ok {
 			if part == "" {

@@ -150,7 +150,7 @@ func (e *encoder) encodeMsg(parent *pbast.Node, v cue.Value) {
 func copyMeta(x *pbast.Node, v cue.Value) {
 	for _, doc := range v.Doc() {
 		s := strings.TrimRight(doc.Text(), "\n")
-		for _, c := range strings.Split(s, "\n") {
+		for c := range strings.SplitSeq(s, "\n") {
 			x.PreComments = append(x.PreComments, "# "+c)
 		}
 	}

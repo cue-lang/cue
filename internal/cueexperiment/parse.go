@@ -31,7 +31,7 @@ func parseExperiments(x ...string) (m map[string]bool) {
 		if m == nil {
 			m = make(map[string]bool)
 		}
-		for _, elem := range strings.Split(a, ",") {
+		for elem := range strings.SplitSeq(a, ",") {
 			m[strings.TrimSpace(elem)] = true
 		}
 	}
@@ -63,7 +63,7 @@ func parseConfig[T any](flags *T, version string, experiments map[string]bool) e
 		field := ft.Field(i)
 		if tagStr, ok := field.Tag.Lookup("experiment"); ok {
 			name := strings.ToLower(field.Name)
-			for _, f := range strings.Split(tagStr, ",") {
+			for f := range strings.SplitSeq(tagStr, ",") {
 				key, rest, _ := strings.Cut(f, ":")
 				switch key {
 				case "preview":

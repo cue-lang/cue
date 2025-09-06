@@ -79,7 +79,7 @@ func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, er
 		}
 
 		// verify that certain elements are still passed.
-		for _, f := range strings.Split(
+		for f := range strings.SplitSeq(
 			"version,title,allOf,anyOf,not,enum,Schema/properties,Schema/items"+
 				"nullable,type", ",") {
 			if fieldFilter.MatchString(f) {

@@ -228,7 +228,7 @@ const (
 
 func (e *extractor) initExclusions(str string) {
 	e.exclude = str
-	for _, re := range strings.Split(str, ",") {
+	for re := range strings.SplitSeq(str, ",") {
 		if re != "" {
 			e.exclusions = append(e.exclusions, regexp.MustCompile(re))
 		}
@@ -1459,7 +1459,7 @@ func (e *extractor) isOptional(f *types.Var, doc *ast.CommentGroup, tag string) 
 		return true
 	}
 
-	for _, line := range strings.Split(doc.Text(), "\n") {
+	for line := range strings.SplitSeq(doc.Text(), "\n") {
 		before, _, _ := strings.Cut(strings.TrimSpace(line), "=")
 		if before == "+optional" {
 			return true

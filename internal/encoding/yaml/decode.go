@@ -208,7 +208,7 @@ func (d *decoder) comments(src string) []*ast.Comment {
 		return nil
 	}
 	var comments []*ast.Comment
-	for _, line := range strings.Split(src, "\n") {
+	for line := range strings.SplitSeq(src, "\n") {
 		if line == "" {
 			continue // yaml.v3 comments have a trailing newline at times
 		}

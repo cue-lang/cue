@@ -878,7 +878,7 @@ You could file a bug with the above information at:
 `
 		cg := &ast.CommentGroup{Doc: true}
 		msg := fmt.Sprintf(format, name, err, p, v)
-		for _, line := range strings.Split(msg, "\n") {
+		for line := range strings.SplitSeq(msg, "\n") {
 			cg.List = append(cg.List, &ast.Comment{Text: "// " + line})
 		}
 		x := &ast.BadExpr{}

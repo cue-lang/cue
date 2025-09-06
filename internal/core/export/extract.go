@@ -19,6 +19,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	"slices"
 )
 
 // ExtractDoc collects documentation strings for a field.
@@ -126,10 +127,8 @@ func nestedField(f *ast.Field) *ast.Field {
 }
 
 func containsDoc(a []*ast.CommentGroup, cg *ast.CommentGroup) bool {
-	for _, c := range a {
-		if c == cg {
-			return true
-		}
+	if slices.Contains(a, cg) {
+		return true
 	}
 
 	for _, c := range a {

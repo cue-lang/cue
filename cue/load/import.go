@@ -64,10 +64,8 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		return []*build.Instance{p}
 	}
 
-	for _, item := range l.stk {
-		if item == p.ImportPath {
-			return retErr(&PackageError{Message: errors.NewMessagef("package import cycle not allowed")})
-		}
+	if slices.Contains(l.stk, p.ImportPath) {
+		return retErr(&PackageError{Message: errors.NewMessagef("package import cycle not allowed")})
 	}
 	l.stk.Push(p.ImportPath)
 	defer l.stk.Pop()

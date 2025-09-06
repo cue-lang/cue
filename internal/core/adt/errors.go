@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	cueformat "cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"slices"
 )
 
 // ErrorCode indicates the type of error. The type of error may influence
@@ -316,10 +317,8 @@ func (v *ValueError) AddPosition(n Node) {
 		return
 	}
 	if p := pos(n); p != token.NoPos {
-		for _, q := range v.auxpos {
-			if p == q {
-				return
-			}
+		if slices.Contains(v.auxpos, p) {
+			return
 		}
 		v.auxpos = append(v.auxpos, p)
 	}

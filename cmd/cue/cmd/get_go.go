@@ -940,10 +940,8 @@ func makeDoc(g *ast.CommentGroup, isDoc bool) *cueast.CommentGroup {
 
 func supportedType(stack []types.Type, t types.Type) (ok bool) {
 	// handle recursive types
-	for _, t0 := range stack {
-		if t0 == t {
-			return true
-		}
+	if slices.Contains(stack, t) {
+		return true
 	}
 	stack = append(stack, t)
 
@@ -1480,10 +1478,8 @@ func hasFlag(tag, key, flag string, offset int) bool {
 		if offset >= len(split) {
 			return false
 		}
-		for _, str := range split[offset:] {
-			if str == flag {
-				return true
-			}
+		if slices.Contains(split[offset:], flag) {
+			return true
 		}
 	}
 	return false

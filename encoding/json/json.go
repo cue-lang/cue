@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -191,11 +192,8 @@ func patchExpr(n ast.Node, patchPos func(n ast.Node)) {
 		case *ast.ListLit:
 			reflow := true
 			if !isLarge {
-				for _, e := range x.Elts {
-					if hasSpaces(e) {
-						reflow = false
-						break
-					}
+				if slices.ContainsFunc(x.Elts, hasSpaces) {
+					reflow = false
 				}
 			}
 			stack = append(stack, info{reflow})

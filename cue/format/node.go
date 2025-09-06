@@ -16,6 +16,7 @@ package format
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -492,10 +493,8 @@ func (f *formatter) nextNeedsFormfeed(n ast.Expr) bool {
 	case *ast.SelectorExpr:
 		return f.nextNeedsFormfeed(x.X)
 	case *ast.CallExpr:
-		for _, arg := range x.Args {
-			if f.nextNeedsFormfeed(arg) {
-				return true
-			}
+		if slices.ContainsFunc(x.Args, f.nextNeedsFormfeed) {
+			return true
 		}
 	}
 	return false

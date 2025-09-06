@@ -233,10 +233,8 @@ func (nm *nodeMeta) markRequired() {
 }
 
 func (nm *nodeMeta) addRequiredBy(e *nodeMeta) {
-	for _, f := range nm.requiredBy {
-		if f == e {
-			return
-		}
+	if slices.Contains(nm.requiredBy, e) {
+		return
 	}
 	nm.requiredBy = append(nm.requiredBy, e)
 }

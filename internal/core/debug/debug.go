@@ -21,6 +21,7 @@ package debug
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -165,11 +166,9 @@ func (w *printer) printShared(v0 *adt.Vertex) (x *adt.Vertex, ok bool) {
 }
 
 func (w *printer) pushVertex(v *adt.Vertex) bool {
-	for _, x := range w.stack {
-		if x == v {
-			w.string("<TODO: unmarked structural cycle>")
-			return false
-		}
+	if slices.Contains(w.stack, v) {
+		w.string("<TODO: unmarked structural cycle>")
+		return false
 	}
 	w.stack = append(w.stack, v)
 	return true

@@ -16,6 +16,7 @@ package parser
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"unicode"
 
@@ -486,10 +487,8 @@ func (p *parser) atComma(context string, follow ...token.Token) bool {
 	if p.tok == token.COMMA {
 		return true
 	}
-	for _, t := range follow {
-		if p.tok == t {
-			return false
-		}
+	if slices.Contains(follow, p.tok) {
+		return false
 	}
 	// TODO: find a way to detect crossing lines now we don't have a semi.
 	if p.lit == "\n" {

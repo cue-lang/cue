@@ -69,6 +69,7 @@ package flow
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 	"sync/atomic"
 
@@ -419,13 +420,7 @@ func (t *Task) addDep(path string, dep *Task) {
 	// Add the dependencies for a given path to the controller. We could compute
 	// this again later, but this ensures there will be no discrepancies.
 	a := t.pathDeps[path]
-	found := false
-	for _, t := range a {
-		if t == dep {
-			found = true
-			break
-		}
-	}
+	found := slices.Contains(a, dep)
 	if !found {
 		t.pathDeps[path] = append(a, dep)
 

@@ -16,6 +16,7 @@ package adt
 
 import (
 	"fmt"
+	"slices"
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -369,10 +370,8 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	}
 
 	key := arcKey{arc, ciKey}
-	for _, k := range n.arcMap {
-		if key == k {
-			return
-		}
+	if slices.Contains(n.arcMap, key) {
+		return
 	}
 	n.arcMap = append(n.arcMap, key)
 

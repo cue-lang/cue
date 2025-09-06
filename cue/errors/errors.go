@@ -342,10 +342,8 @@ func appendToList(a list, err Error) list {
 		}
 		return a
 	default:
-		for _, e := range a {
-			if e == err {
-				return a
-			}
+		if slices.Contains(a, err) {
+			return a
 		}
 		return append(a, err)
 	}

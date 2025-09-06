@@ -49,7 +49,7 @@ func TestRegistry(t *testing.T) {
 func runTest(t *testing.T, registry ociregistry.Interface, script string, ar *txtar.Archive) {
 	ctx := context.Background()
 	client := modregistry.NewClient(registry)
-	for _, line := range strings.Split(script, "\n") {
+	for line := range strings.SplitSeq(script, "\n") {
 		if line == "" || line[0] == '#' {
 			continue
 		}

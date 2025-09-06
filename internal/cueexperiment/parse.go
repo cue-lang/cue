@@ -32,7 +32,7 @@ func parseExperiments(x ...string) (m map[string]bool) {
 		if m == nil {
 			m = make(map[string]bool)
 		}
-		for _, elem := range strings.Split(a, ",") {
+		for elem := range strings.SplitSeq(a, ",") {
 			elem = strings.TrimSpace(elem)
 			m[elem] = true
 		}
@@ -86,7 +86,7 @@ func parseConfig[T any](flags *T, version string, experiments map[string]bool) e
 			name := strings.ToLower(field.Name)
 			explicitlyEnabled, hasExperiment := experiments[name]
 			explicitlyDisabled := hasExperiment && !explicitlyEnabled
-			for _, f := range strings.Split(tagStr, ",") {
+			for f := range strings.SplitSeq(tagStr, ",") {
 				key, rest, _ := strings.Cut(f, ":")
 				switch key {
 				case "preview":

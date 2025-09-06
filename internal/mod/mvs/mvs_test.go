@@ -476,7 +476,7 @@ func Test(t *testing.T) {
 		}
 	}
 
-	for _, line := range strings.Split(tests, "\n") {
+	for line := range strings.SplitSeq(tests, "\n") {
 		line = strings.TrimSpace(line)
 		if strings.HasPrefix(line, "#") || line == "" {
 			continue
@@ -566,7 +566,7 @@ func Test(t *testing.T) {
 		}
 		if len(kf) == 1 && 'A' <= key[0] && key[0] <= 'Z' {
 			var rs []version
-			for _, f := range strings.Fields(val) {
+			for f := range strings.FieldsSeq(val) {
 				r := m(f)
 				if reqs[r] == nil {
 					reqs[r] = []version{}

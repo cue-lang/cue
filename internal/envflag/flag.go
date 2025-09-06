@@ -44,7 +44,7 @@ func Parse[T any](flags *T, env string) error {
 		field := ft.Field(i)
 		name := strings.ToLower(field.Name)
 		if tagStr, ok := field.Tag.Lookup("envflag"); ok {
-			for _, f := range strings.Split(tagStr, ",") {
+			for f := range strings.SplitSeq(tagStr, ",") {
 				key, rest, hasRest := strings.Cut(f, ":")
 				switch key {
 				case "default":
@@ -67,7 +67,7 @@ func Parse[T any](flags *T, env string) error {
 	}
 
 	var errs []error
-	for _, elem := range strings.Split(env, ",") {
+	for elem := range strings.SplitSeq(env, ",") {
 		if elem == "" {
 			// Allow empty elements such as `,somename=true` so that env vars
 			// can be joined together like

@@ -48,7 +48,7 @@ func TestExperimentVersionOrdering(t *testing.T) {
 
 				// Parse all version tags
 				versions := make(map[string]string)
-				for _, part := range strings.Split(tagStr, ",") {
+				for part := range strings.SplitSeq(tagStr, ",") {
 					part = strings.TrimSpace(part)
 					key, value, found := strings.Cut(part, ":")
 					if found {

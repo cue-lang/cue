@@ -189,7 +189,7 @@ func parseScope(scopeStr string) (*scope, error) {
 		subsidiaryBool:   make(map[string]bool),
 		subsidiaryString: make(map[string]string),
 	}
-	for _, tag := range strings.Split(scopeStr, "+") {
+	for tag := range strings.SplitSeq(scopeStr, "+") {
 		tagName, tagVal, hasValue := strings.Cut(tag, "=")
 		switch tagTypes[tagName] {
 		case TagTopLevel:

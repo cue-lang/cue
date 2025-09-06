@@ -161,7 +161,7 @@ func isOptional(f *reflect.StructField) bool {
 		// TODO: only if first field is not empty.
 		_, opt := splitTag(tag)
 		isOptional = false
-		for _, f := range strings.Split(opt, ",") {
+		for f := range strings.SplitSeq(opt, ",") {
 			switch f {
 			case "opt":
 				isOptional = true

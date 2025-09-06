@@ -195,7 +195,7 @@ func parseTag(pos token.Pos, body string) (t *tag, err errors.Error) {
 	}
 
 	if s, ok, _ := a.Lookup(1, "short"); ok {
-		for _, s := range strings.Split(s, "|") {
+		for s := range strings.SplitSeq(s, "|") {
 			if !ast.IsValidIdent(t.key) {
 				return t, errors.Newf(pos, "invalid identifier %q", s)
 			}

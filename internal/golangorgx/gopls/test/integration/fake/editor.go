@@ -380,12 +380,7 @@ func marshalUnmarshal[T any](v any) (T, error) {
 
 // HasCommand reports whether the connected server supports the command with the given ID.
 func (e *Editor) HasCommand(id string) bool {
-	for _, command := range e.serverCapabilities.ExecuteCommandProvider.Commands {
-		if command == id {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(e.serverCapabilities.ExecuteCommandProvider.Commands, id)
 }
 
 // makeWorkspaceFolders creates a slice of workspace folders to use for
@@ -997,11 +992,8 @@ func (e *Editor) applyCodeActions(ctx context.Context, loc protocol.Location, di
 			return 0, fmt.Errorf("empty title for code action")
 		}
 		var match bool
-		for _, o := range only {
-			if action.Kind == o {
-				match = true
-				break
-			}
+		if slices.Contains(only, action.Kind) {
+			match = true
 		}
 		if !match {
 			continue
@@ -1035,11 +1027,8 @@ func (e *Editor) ExecuteCommand(ctx context.Context, params *protocol.ExecuteCom
 	var match bool
 	if e.serverCapabilities.ExecuteCommandProvider != nil {
 		// Ensure that this command was actually listed as a supported command.
-		for _, command := range e.serverCapabilities.ExecuteCommandProvider.Commands {
-			if command == params.Command {
-				match = true
-				break
-			}
+		if slices.Contains(e.serverCapabilities.ExecuteCommandProvider.Commands, params.Command) {
+			match = true
 		}
 	}
 	if !match {

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eccf3aa3_f4d668af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-06T22:28:49Z",
+      "side": 1,
+      "message": "Two bugs uncovered in modernize by this patch:\n\nhttps://github.com/golang/go/issues/74938#issuecomment-3263258931\nhttps://github.com/golang/go/issues/75296",
+      "revId": "c59fbb6c7d5a4d34cac2e05a53db3ae4d8bc4b4b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

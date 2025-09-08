@@ -57,7 +57,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           cache: false
-          go-version: 1.25.0
+          go-version: 1.25.1
       - name: Set common go env vars
         run: |-
           go env -w GOTOOLCHAIN=local
@@ -82,7 +82,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v5
         with:
           install-only: true
-          version: v2.10.2
+          version: v2.12.0
       - name: Run GoReleaser with CUE
         env:
           GITHUB_TOKEN: ${{ secrets.CUECKOO_GITHUB_PAT }}

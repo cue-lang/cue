@@ -15,8 +15,8 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.4
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20250627152318-f293424e46b5
 	github.com/rogpeppe/go-internal v1.14.1
-	github.com/spf13/cobra v1.9.1
-	github.com/spf13/pflag v1.0.7
+	github.com/spf13/cobra v1.10.1
+	github.com/spf13/pflag v1.0.10
 	github.com/tetratelabs/wazero v1.9.0
 	github.com/yuin/goldmark v1.7.12
 	golang.org/x/mod v0.28.0

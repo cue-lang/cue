@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a6644fe_971a561b",
+        "filename": "cmd/cue/cmd/integration/workspace/hover_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-08T10:33:33Z",
+      "side": 1,
+      "message": "That\u0027s really nice - thank you. Done.",
+      "parentUuid": "ca1cbb15_228be4bc",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d0553fe_46215837",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-08T10:02:06Z",
       "side": 1,
       "message": "could you summarize the reasoning behind this? I\u0027d also group the docs, like...\n\n```\ncase A:\n    ...\n\n// This documents cases B and C.\ncase B:\n    ...\ncase C:\n    ...\n\ndefault:\n    ...\n```",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de767bf4_fc717464",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-08T10:33:33Z",
+      "side": 1,
+      "message": "Comment added.\n\nI don\u0027t like that comment positioning - I think it\u0027s misleading. I would never put comments for an `if` like:\n```\n// if true...\nif cont {\n\n// if false...\n} else {\n\n}\n```\n\nFor me, the same approach for switches holds - the comment should be inside the relevant `case`, not outside.",
+      "parentUuid": "1d0553fe_46215837",
       "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87df76c2_7cd3d7f3",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-08T10:33:33Z",
+      "side": 1,
+      "message": "\u003e did we come up with this because CUE can have multiple declarations with separate godocs for a single name\n\nMainly this. My thinking was that having a whole bunch of docs from different files smushed together, without any context that they\u0027re from different files, is a bad idea. I think CUE is quite unique in needing to accommodate this (in Go, the only place I can think of that needs this is pkg docs).\n\nI tested the links in intellij and they do work there - clicking on them correctly instructs the editor to open that file at the right line. Emacs doesn\u0027t do this. Not sure about others, but I get the impression it\u0027s fairly comment for editors to understand these sorts of links.\n\nComment added.",
+      "parentUuid": "d53bcefe_30ca27e8",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e86550b_075928c3",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-09-08T10:02:06Z",
       "side": 1,
       "message": "why not build into a `strings.Builder` directly, rather than first a slice that you then have to join? not that performance is the main worry here, but it seems more straightforward to avoid an extra step.\n\nor if you do think that reasoning about this in terms of lines is best, then I\u0027d suggest that you rename `strs` to `lines`.",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f7d6ad6_005cbe7d",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-08T10:33:33Z",
+      "side": 1,
+      "message": "Agreed - this is better as a strings builder. Done.",
+      "parentUuid": "6e86550b_075928c3",
       "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "435d6321_6693ecd2",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-08T10:33:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8d8e6e7_c4a13360",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0c971f15_6065912c",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-09-08T10:02:06Z",
       "side": 1,
       "message": "document like the others? perhaps name it `docComments` for clarity",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd9f6988_7f6d4093",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 613,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-08T10:33:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c971f15_6065912c",
       "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "006249cb_e99ad6a4",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1461,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-08T10:33:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55d97b12_5a3d1def",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5121c0a_051f3968",
@@ -133,6 +259,30 @@
       "writtenOn": "2025-09-08T10:02:06Z",
       "side": 1,
       "message": "is this ever possible? I\u0027d think that cue/parser can never produce an empty CommentGroup.",
+      "range": {
+        "startLine": 1464,
+        "startChar": 18,
+        "endLine": 1464,
+        "endChar": 37
+      },
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e32ae62_73f87f6b",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1464,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-08T10:33:33Z",
+      "side": 1,
+      "message": "Maybe not, but it\u0027s a high-coupling to an invariant that can\u0027t be enforced by the type system, and it costs very few chars to be defensive about it here.",
+      "parentUuid": "a5121c0a_051f3968",
       "range": {
         "startLine": 1464,
         "startChar": 18,

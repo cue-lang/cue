@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8f078ce_e46314c2",
+        "filename": "cmd/cue/cmd/integration/workspace/formatting_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-08T15:56:19Z",
+      "side": 1,
+      "message": "please bear in mind that this cue/format bug will definitely be fixed at some point in the future. in which case, the test would silently stop doing what it\u0027s meant to do, as the logic to recover from a buggy formatting would no longer kick in.\n\nI still prefer your real test of the actual bug over a fake test where we hook into the LSP or cue/format to simulate broken formatting, for what it\u0027s worth. I\u0027m just not a fan of this test silently changing what it does in the future.\n\nHow about including bad formatting in the input, to check whether the LSP was able to correctly format the code? That would alert us if cue/format is fixed in the future. For example, for an input like `foo:        bar: 3`, we should end up in `foo: bar: 3` if the formatting works correctly.\n\nAt that point I\u0027m not sure what we would do with this test - perhaps replace the input CUE to trigger broken formatting with another bug that still triggers, or perhaps delete the test alongside the code in the LSP to protect against broken formatting, assuming we think cue/format is robust enough.\n\nBut at least we get to notice the change and choose what to do then :)",
+      "revId": "55389e4c1849f414db48b90270717abaed678ff8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

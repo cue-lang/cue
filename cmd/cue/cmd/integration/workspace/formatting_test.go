@@ -3,6 +3,7 @@ package workspace
 import (
 	"testing"
 
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"github.com/go-quicktest/qt"
@@ -36,6 +37,13 @@ package a
  complete
   and utter
    rubbish
+-- a/c.cue --
+package a
+
+out: "A" | // first letter
+	"B" | // second letter
+	"C" | // third letter
+	"D" // fourth letter
 `
 
 	archiveFiles := make(map[string]string)
@@ -76,6 +84,27 @@ package a
 			content, open := env.Editor.BufferText("a/b.cue")
 			qt.Assert(t, qt.Equals(open, true))
 			qt.Assert(t, qt.Equals(content, archiveFiles["a/b.cue"]))
+		})
+	})
+
+	t.Run("format with broken formatter", func(t *testing.T) {
+		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+			rootURI := env.Sandbox.Workdir.RootURI()
+			env.Await(
+				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+			)
+			env.OpenFile("a/c.cue")
+			env.Await(
+				env.DoneWithOpen(),
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dirs=[%v/a] importPath=mod.example/x/a@v0", rootURI, rootURI),
+			)
+			env.FormatBuffer("a/c.cue")
+			content, open := env.Editor.BufferText("a/c.cue")
+			qt.Assert(t, qt.Equals(open, true))
+			// This is the problem: the result of formatting is content
+			// that cannot be parsed.
+			_, err := parser.ParseFile("a/c.cue", content, parser.ParseComments)
+			qt.Assert(t, qt.IsNotNil(err))
 		})
 	})
 }

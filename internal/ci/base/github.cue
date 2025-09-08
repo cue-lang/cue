@@ -34,7 +34,7 @@ isLatestGoLinux: "(\(matrixGoVersionExpr) == '\(latestGo)' && \(matrixRunnerExpr
 installGo: {
 	#setupGo: githubactions.#Step & {
 		name: "Install Go"
-		uses: "actions/setup-go@v5"
+		uses: "actions/setup-go@v6"
 		with: {
 			// We do our own caching in setupCaches.
 			cache: false
@@ -43,33 +43,17 @@ installGo: {
 		}
 	}
 
-	// Why set GOTOOLCHAIN here? As opposed to an environment variable
-	// elsewhere? No perfect answer to this question but here is the thinking:
+	// Set Go env vars here with `go env -w` rather than for an entire workflow,
+	// job, or per step. This keeps the logic close to where we set up Go,
+	// and also prevents setting up Go but forgetting to set up the env vars too.
 	//
-	// Setting the variable here localises it with the installation of Go. Doing
-	// it elsewhere creates distance between the two steps which are
-	// intrinsically related. And it's also hard to do: "when we use this step,
-	// also ensure that we establish an environment variable in the job for
-	// GOTOOLCHAIN".
-	//
-	// Environment variables can only be set at a workflow, job or step level.
-	// Given we currently use a matrix strategy which varies the Go version,
-	// that rules out using an environment variable based approach, because the
-	// Go version is only available at runtime via GitHub actions provided
-	// context. Whether we should instead be templating multiple workflows (i.e.
-	// exploding the matrix ourselves) is a different question, but one that
-	// has performance implications.
-	//
-	// So as clumsy as it is to use a step "template" that includes more than
-	// one step, it's the best option available to us for now.
+	// Note that actions/setup-go since v6 already sets GOTOOLCHAIN=local.
 	[
 		#setupGo,
 
 		githubactions.#Step & {
 			name: "Set common go env vars"
 			run: """
-				go env -w GOTOOLCHAIN=local
-
 				case $(go env GOARCH) in
 				amd64) go env -w GOAMD64=v3 ;;   # 2013 and later; makes `go test -race` 15% faster
 				arm64) go env -w GOARM64=v8.6 ;; # Apple M2 and later

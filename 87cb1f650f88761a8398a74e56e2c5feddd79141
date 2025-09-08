@@ -1,0 +1,146 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca1cbb15_228be4bc",
+        "filename": "cmd/cue/cmd/integration/workspace/hover_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-08T10:02:06Z",
+      "side": 1,
+      "message": "FYI for multi-line strings in Go, I\u0027ve been copying Rog\u0027s idea to use `[1:]` to make the first line a bit more readable:\n\n```\nfoo(`\nthis way the first line\nstarts on its own line\nlike all other lines\n`[1:])\n```",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d0553fe_46215837",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-08T10:02:06Z",
+      "side": 1,
+      "message": "could you summarize the reasoning behind this? I\u0027d also group the docs, like...\n\n```\ncase A:\n    ...\n\n// This documents cases B and C.\ncase B:\n    ...\ncase C:\n    ...\n\ndefault:\n    ...\n```",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d53bcefe_30ca27e8",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-08T10:02:06Z",
+      "side": 1,
+      "message": "out of curiosity, is linking to each of the file positions something that is relatively standard with other LSP servers? does gopls do it?\n\nor did we come up with this because CUE can have multiple declarations with separate godocs for a single name? I wonder what LSPs for other languages like this do.\n\nNot pushing back against this at all - I\u0027m just curious if this is standard practice for languages like CUE, or if we came up with this mechanism ourselves. Either way I\u0027d document our reasoning here.",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e86550b_075928c3",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-08T10:02:06Z",
+      "side": 1,
+      "message": "why not build into a `strings.Builder` directly, rather than first a slice that you then have to join? not that performance is the main worry here, but it seems more straightforward to avoid an extra step.\n\nor if you do think that reasoning about this in terms of lines is best, then I\u0027d suggest that you rename `strs` to `lines`.",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8d8e6e7_c4a13360",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-08T10:02:06Z",
+      "side": 1,
+      "message": "ditto: I\u0027d name this DocCommentsForOffset for clarity",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c971f15_6065912c",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 613,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-08T10:02:06Z",
+      "side": 1,
+      "message": "document like the others? perhaps name it `docComments` for clarity",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55d97b12_5a3d1def",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1461,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-08T10:02:06Z",
+      "side": 1,
+      "message": "ditto, I might name this `addDocComments`",
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5121c0a_051f3968",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1464,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-08T10:02:06Z",
+      "side": 1,
+      "message": "is this ever possible? I\u0027d think that cue/parser can never produce an empty CommentGroup.",
+      "range": {
+        "startLine": 1464,
+        "startChar": 18,
+        "endLine": 1464,
+        "endChar": 37
+      },
+      "revId": "87cb1f650f88761a8398a74e56e2c5feddd79141",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "This is all quite big because this is the first time I\u0027ve built out this infrastructure in these integration tests. Over time, I expect this will be factored out somewhat and used in the other integration tests nearby. It all follows a similar approach as used in the unit tests in definitions_test.go",
       "revId": "7d9b798995df02e067e836f781801a3bb312d12d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "643dd88c_844856c5",
+        "filename": "cmd/cue/cmd/integration/workspace/hover_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-08T10:02:06Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e6f12863_ed3f3b4f",
+      "revId": "7d9b798995df02e067e836f781801a3bb312d12d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

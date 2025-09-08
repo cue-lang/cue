@@ -32,8 +32,7 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 	if err != nil {
 		return nil, err
 	} else if mod == nil {
-		//lint:ignore ST1005 Errors that go back to the editor can enjoy grammar.
-		return nil, fmt.Errorf("No module found for %v", uri)
+		return nil, fmt.Errorf("no module found for %v", uri)
 	}
 
 	parsedFile, config, fh, err := mod.ReadCUEFile(uri)
@@ -62,6 +61,14 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 
 	src := fh.Content()
 	if bytes.Equal(formatted, src) {
+		return nil, nil
+	}
+
+	// Because of bugs in the formatter and/or parser, check that the
+	// result of formatting can be parsed without error.
+	_, err = parser.ParseFile(parsedFile.Filename, formatted, config)
+	if err != nil {
+		s.debugLog(fmt.Sprintf("%v: error when parsing newly formatted source: %v", uri, err))
 		return nil, nil
 	}
 

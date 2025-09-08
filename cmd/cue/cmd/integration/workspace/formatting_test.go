@@ -3,7 +3,6 @@ package workspace
 import (
 	"testing"
 
-	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"github.com/go-quicktest/qt"
@@ -101,10 +100,7 @@ out: "A" | // first letter
 			env.FormatBuffer("a/c.cue")
 			content, open := env.Editor.BufferText("a/c.cue")
 			qt.Assert(t, qt.Equals(open, true))
-			// This is the problem: the result of formatting is content
-			// that cannot be parsed.
-			_, err := parser.ParseFile("a/c.cue", content, parser.ParseComments)
-			qt.Assert(t, qt.IsNotNil(err))
+			qt.Assert(t, qt.Equals(content, archiveFiles["a/c.cue"]))
 		})
 	})
 }

@@ -19,12 +19,12 @@ require (
 	github.com/spf13/pflag v1.0.7
 	github.com/tetratelabs/wazero v1.9.0
 	github.com/yuin/goldmark v1.7.12
-	golang.org/x/mod v0.26.0
-	golang.org/x/net v0.42.0
-	golang.org/x/oauth2 v0.30.0
-	golang.org/x/sync v0.16.0
-	golang.org/x/text v0.27.0
-	golang.org/x/tools v0.35.0
+	golang.org/x/mod v0.28.0
+	golang.org/x/net v0.43.0
+	golang.org/x/oauth2 v0.31.0
+	golang.org/x/sync v0.17.0
+	golang.org/x/text v0.29.0
+	golang.org/x/tools v0.36.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -33,7 +33,7 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
-	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
 

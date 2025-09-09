@@ -849,16 +849,17 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 	o := getOptions(opts)
 
 	p := export.Profile{
-		Simplify:        !o.raw,
-		TakeDefaults:    o.final,
-		ShowOptional:    !o.omitOptional && !o.concrete,
-		ShowDefinitions: !o.omitDefinitions && !o.concrete,
-		ShowHidden:      !o.omitHidden && !o.concrete,
-		ShowAttributes:  !o.omitAttrs,
-		ShowDocs:        o.docs,
-		ShowErrors:      o.showErrors,
-		InlineImports:   o.inlineImports,
-		Fragment:        o.raw,
+		Simplify:         !o.raw,
+		TakeDefaults:     o.final,
+		ShowOptional:     !o.omitOptional && !o.concrete,
+		ShowDefinitions:  !o.omitDefinitions && !o.concrete,
+		ShowHidden:       !o.omitHidden && !o.concrete,
+		ShowAttributes:   !o.omitAttrs,
+		ShowDocs:         o.docs,
+		ShowErrors:       o.showErrors,
+		InlineImports:    o.inlineImports,
+		Fragment:         o.raw,
+		ExpandReferences: o.concrete,
 	}
 
 	pkgID := v.instance().ID()

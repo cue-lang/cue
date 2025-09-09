@@ -17,3 +17,9 @@ line  reference       path of resulting vertex
 line  reference       path of resulting vertex
 4:    json.Marshal => "encoding/json".Marshal
 4:    str          => str
+-- out/dependencies-v3/stats/field --
+// COUNT: 2
+-- out/dependencies-v3/stats/all --
+// COUNT: 4
+-- out/dependencies-v3/stats/dynamic --
+// COUNT: 6

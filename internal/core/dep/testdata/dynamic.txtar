@@ -33,3 +33,9 @@ line  reference    path of resulting vertex
 21:   middle    => middle
 21:   x         => middle.la1
 21:   x         => middle.la2
+-- out/dependencies-v3/stats/field --
+// COUNT: 2
+-- out/dependencies-v3/stats/all --
+// COUNT: 4
+-- out/dependencies-v3/stats/dynamic --
+// COUNT: 8

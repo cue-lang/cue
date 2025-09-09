@@ -35,3 +35,9 @@ line  reference    path of resulting vertex
 5:    d         => d
 5:    x         => c[1]
 5:    d         => d
+-- out/dependencies-v3/stats/field --
+// COUNT: 5
+-- out/dependencies-v3/stats/all --
+// COUNT: 13
+-- out/dependencies-v3/stats/dynamic --
+// COUNT: 23

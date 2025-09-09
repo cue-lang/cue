@@ -196,6 +196,7 @@ func Visit(cfg *Config, c *adt.OpContext, n *adt.Vertex, f VisitFunc) error {
 		all:        cfg.Descend,
 		top:        true,
 		cfgDynamic: cfg.Dynamic,
+		resolved:   map[refEntry]*adt.Vertex{},
 	}
 	return v.visitReusingVisitor(n, true)
 }
@@ -268,6 +269,9 @@ type visitor struct {
 	cfgDynamic bool
 
 	marked marked
+
+	// resolved dedups resolving references to prevent exponential blowup.
+	resolved map[refEntry]*adt.Vertex
 }
 
 type refEntry struct {
@@ -356,10 +360,17 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 
 // markResolve resolves dependencies.
 func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
+	if _, ok := c.resolved[refEntry{env, r}]; ok {
+		// TODO: this seems to still not remove everything. Consider a
+		// different approach.
+		return
+	}
+
 	// Note: it is okay to pass an empty CloseInfo{} here as we assume that
 	// all nodes are finalized already and we need neither closedness nor cycle
 	// checks.
 	ref, _ := c.ctxt.Resolve(adt.MakeConjunct(env, r, adt.CloseInfo{}), r)
+	c.resolved[refEntry{env, r}] = ref
 	c.ctxt.Stats().ResolveDep++
 
 	// TODO: consider the case where an inlined composite literal does not

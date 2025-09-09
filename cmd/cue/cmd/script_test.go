@@ -263,6 +263,8 @@ func TestScript(t *testing.T) {
 			// Note that creating the directory is enough for now,
 			// and we ignore ErrExist since only the first test will succeed.
 			// We can't create the directory before testscript.Run, as it sets up WorkdirRoot.
+			println("WINDOWS WORKDIR", e.WorkDir)
+			return fmt.Errorf("WINDOWS WORKDIR: %q", e.WorkDir)
 			workdirRoot := filepath.Dir(e.WorkDir)
 			if err := os.Mkdir(filepath.Join(workdirRoot, "cue.mod"), 0o777); err != nil && !errors.Is(err, fs.ErrExist) {
 				return err

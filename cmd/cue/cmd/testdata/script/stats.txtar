@@ -55,6 +55,7 @@ contents overwritten
         "MisalignedConjunct": 0,
         "MisalignedConstraint": 0,
         "SkippedNotification": 0,
+        "ResolveDep": 0,
         "Freed": 6,
         "Reused": 0,
         "Allocs": 6,
@@ -81,6 +82,7 @@ CUE: {
 	MisalignedConjunct:   0
 	MisalignedConstraint: 0
 	SkippedNotification:  0
+	ResolveDep:           0
 	Freed:                6
 	Reused:               0
 	Allocs:               6
@@ -106,6 +108,7 @@ CUE:
   MisalignedConjunct: 0
   MisalignedConstraint: 0
   SkippedNotification: 0
+  ResolveDep: 0
   Freed: 6
   Reused: 0
   Allocs: 6
@@ -130,6 +133,7 @@ Go:
         "MisalignedConjunct": 0,
         "MisalignedConstraint": 0,
         "SkippedNotification": 0,
+        "ResolveDep": 0,
         "Freed": 6,
         "Reused": 0,
         "Allocs": 6,

@@ -360,6 +360,7 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 	// all nodes are finalized already and we need neither closedness nor cycle
 	// checks.
 	ref, _ := c.ctxt.Resolve(adt.MakeConjunct(env, r, adt.CloseInfo{}), r)
+	c.ctxt.Stats().ResolveDep++
 
 	// TODO: consider the case where an inlined composite literal does not
 	// resolve, but has references. For instance, {a: k, ref}.b would result

@@ -25,3 +25,9 @@ line  reference    path of resulting vertex
 6:    y         => a.b.y
 7:    f         => a.b.x.f
 10:   b         => a.b
+-- out/dependencies-v3/stats/field --
+// COUNT: 1
+-- out/dependencies-v3/stats/all --
+// COUNT: 7
+-- out/dependencies-v3/stats/dynamic --
+// COUNT: 13

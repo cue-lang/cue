@@ -86,8 +86,12 @@ func TestVisit(t *testing.T) {
 			_, n := value.ToInternal(v)
 			w := t.Writer(tc.name)
 
+			stats := t.Writer("stats/" + tc.name)
+
 			t.Run(tc.name, func(sub *testing.T) {
 				testVisit(sub, w, ctxt, n, tc.cfg)
+				fmt.Fprintf(stats, "// COUNT: %d\n", ctxt.Stats().ResolveDep)
+
 			})
 		}
 	})
@@ -174,4 +178,5 @@ func TestX(t *testing.T) {
 	testVisit(t, w, ctxt, n, cfg)
 
 	t.Error(w.String())
+	t.Error("COUNT", ctxt.Stats().ResolveDep)
 }

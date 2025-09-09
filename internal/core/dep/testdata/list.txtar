@@ -15,3 +15,9 @@ line  reference    path of resulting vertex
 line  reference    path of resulting vertex
 3:    d         => d
 3:    e         => e
+-- out/dependencies-v3/stats/field --
+// COUNT: 0
+-- out/dependencies-v3/stats/all --
+// COUNT: 2
+-- out/dependencies-v3/stats/dynamic --
+// COUNT: 4

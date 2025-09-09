@@ -102,6 +102,11 @@ type Counts struct {
 	// dependency analysis, in which case it is benign.
 	SkippedNotification int64
 
+	// Dependency resolution counters
+
+	// ResolveDep counts the number of resolveDep operations performed.
+	ResolveDep int64
+
 	// Buffer counters
 	//
 	// Each unification and disjunct operation is associated with an object

@@ -1,0 +1,107 @@
+# Check that any commands which don't need to speak to load any
+# dependency modules nor speak to any registry still work
+# when we can't read or write to neither CUE_CACHE_DIR nor CUE_CONFIG_DIR.
+#
+# This can be useful for simple operations to work out of the box
+# in isolated environments where HOME and XDG_CACHE_DIR are unset.
+#
+# Set both env vars to empty values, as well as all the variables used by
+# Go's os.UserCacheDir and os.UserConfigDir to detect a sane default.
+env HOME= USERPROFILE= home=
+env XDG_CACHE_HOME= LocalAppData=
+env XDG_CONFIG_HOME= AppData=
+env CUE_CACHE_DIR=
+env CUE_CONFIG_DIR=
+
+# Working on standalone files and directories should work without a cache or config.
+# TODO(mvdan): fix the ones that don't work currently.
+exec cue version
+exec cue help
+exec cue fmt standalone/foo.cue
+exec cue fmt ./standalone
+! exec cue export standalone/foo.cue
+cmp stderr ${WORK}/no-cache.stderr
+! exec cue export ./standalone
+cmp stderr ${WORK}/no-cache.stderr
+! exec cue vet -c standalone/foo.cue
+cmp stderr ${WORK}/no-cache.stderr
+! exec cue def standalone/foo.cue
+cmp stderr ${WORK}/no-cache.stderr
+
+# Working on modules without any dependencies should work without cache or config.
+# TODO(mvdan): fix the ones that don't work currently.
+cd localmod
+exec cue mod init mod.test/root
+! exec cue mod tidy
+cmp stderr ${WORK}/no-cache.stderr
+! exec cue export .
+cmp stderr ${WORK}/no-cache.stderr
+! exec cue vet -c=false ./...
+cmp stderr ${WORK}/no-cache.stderr
+cd ..
+
+# Working on modules with external dependencies does not work without cache or config.
+cd depmod
+! exec cue export .
+cmp stderr ${WORK}/no-cache.stderr
+! exec cue mod tidy
+cmp stderr ${WORK}/no-cache.stderr
+! exec cue mod get remote.com/bar@v0.2.0
+cmp stderr ${WORK}/no-cache.stderr
+cd ..
+
+# Trying to publish a module does not work without cache or config.
+cd publishmod
+! exec cue login
+cmp stderr ${WORK}/no-config.stderr
+! exec cue mod publish v0.0.1
+cmp stderr ${WORK}/no-cache.stderr
+cd ..
+
+# TODO(mvdan): the cache error should give top-level context; why did we need to use the cache?
+# TODO(mvdan): both errors below should mention the cue env var that can be set as well.
+-- no-cache.stderr --
+cannot determine system cache directory: neither $XDG_CACHE_HOME nor $HOME are defined
+-- no-config.stderr --
+cannot find the path to store CUE registry logins: cannot determine system config directory: neither $XDG_CONFIG_HOME nor $HOME are defined
+-- standalone/foo.cue --
+foo: "bar"
+-- localmod/foo.cue --
+package root
+
+import "mod.test/root/bar"
+
+foo: bar.Bar
+-- localmod/bar/bar.cue --
+package bar
+
+Bar: "imported bar"
+-- depmod/cue.mod --
+module: "mod.test/root"
+language: {
+	version: "v0.13.0"
+}
+deps: {
+	"remote.com/bar@v0": {
+		v:       "v0.1.0"
+		default: true
+	}
+}
+-- depmod/foo.cue --
+package root
+
+import "remote.com/bar"
+
+foo: bar.Bar
+-- publishmod/cue.mod --
+module: "mod.test/root"
+language: {
+	version: "v0.13.0"
+}
+source: {
+	kind: "self"
+}
+-- publishmod/foo.cue --
+package root
+
+foo: "bar"

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b959c320_2adb3058",
+        "filename": "cue/stats/stats.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-09T16:36:33Z",
+      "side": 1,
+      "message": "resolveDep is not a function or method that I can see - should we just summarize this in plain english?",
+      "range": {
+        "startLine": 107,
+        "startChar": 36,
+        "endLine": 107,
+        "endChar": 46
+      },
+      "revId": "40e3137ab19215ed281f25bb317170f636bca107",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

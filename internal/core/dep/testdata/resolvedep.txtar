@@ -1,3 +1,6 @@
+// TODO: note that the output has various *non-rooted** entries. These should
+// probably be eliminated. In general, it seems that the number of dependencies
+// reported is still too large. 
 -- in.cue --
 _input: disjs: [{start: 1}, {}, {}, {},]
 a: b: (_convert & {in: _input}).out
@@ -40,27 +43,9 @@ line  reference                                        path of resulting vertex
 32:   l1                                            => #disjunction.start
 25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
 31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
+32:   l1                                            => **non-rooted**
+33:   l2                                            => **non-rooted**
+34:   l3                                            => **non-rooted**
 8:    (#chainedCompute & {"in": _firstOne.out}).out => #chainedCompute.l4
 2:    (_convert & {in: _input}).out                 => _convert.out
 -- out/dependencies-v3/all --
@@ -68,85 +53,25 @@ line  reference                                        path of resulting vertex
 32:   l1                                            => #disjunction.start
 25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
 31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
+32:   l1                                            => **non-rooted**
+33:   l2                                            => **non-rooted**
+34:   l3                                            => **non-rooted**
 8:    (#chainedCompute & {"in": _firstOne.out}).out => #chainedCompute.l4
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-8:    (#chainedCompute & {"in": _firstOne.out}).out => #chainedCompute.l4
+10:   _computed                                     => **non-rooted**
 2:    (_convert & {in: _input}).out                 => _convert.out
 -- out/dependencies-v3/dynamic --
 line  reference                                        path of resulting vertex
 32:   l1                                            => #disjunction.start
 25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
 31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
-32:   l1                                            => #disjunction.start
-25:   (#selectFirst & {"in": in}).out               => #selectFirst.out
-31:   in.start                                      => #selectFirstOne.out.start
+32:   l1                                            => **non-rooted**
+33:   l2                                            => **non-rooted**
+34:   l3                                            => **non-rooted**
 8:    (#chainedCompute & {"in": _firstOne.out}).out => #chainedCompute.l4
 2:    (_convert & {in: _input}).out                 => _convert.out
 -- out/dependencies-v3/stats/field --
-// COUNT: 84
+// COUNT: 20
 -- out/dependencies-v3/stats/all --
-// COUNT: 250
+// COUNT: 41
 -- out/dependencies-v3/stats/dynamic --
-// COUNT: 334
+// COUNT: 61

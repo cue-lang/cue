@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd4c1b93_33ee4da9",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-09T16:38:45Z",
+      "side": 1,
+      "message": "why is the value a vertex, if we only check for presence here? i.e. a boolean or empty struct value would suffice",
+      "revId": "7c31a05cae859efee16672240e0c1f922e41cee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

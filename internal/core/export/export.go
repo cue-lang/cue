@@ -72,6 +72,10 @@ type Profile struct {
 
 	// InlineImports expands references to non-builtin packages.
 	InlineImports bool
+
+	// ExpandReferences causes all references to be expanded inline. This
+	// disables the ability to prevent billion laughs attacks, so use with care.
+	ExpandReferences bool
 }
 
 var Simplified = &Profile{
@@ -417,7 +421,7 @@ func (e *exporter) initPivot(n *adt.Vertex) {
 	switch {
 	case e.cfg.SelfContained, e.cfg.InlineImports:
 		// Explicitly enabled.
-	case n.Parent == nil, e.cfg.Fragment:
+	case n.Parent == nil, e.cfg.Fragment, e.cfg.ExpandReferences:
 		return
 	}
 	e.initPivotter(n)

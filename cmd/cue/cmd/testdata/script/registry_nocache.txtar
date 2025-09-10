@@ -14,36 +14,30 @@ env CUE_CACHE_DIR=
 env CUE_CONFIG_DIR=
 
 # Working on standalone files and directories should work without a cache or config.
-# TODO(mvdan): fix the ones that don't work currently.
 exec cue version
 exec cue help
 exec cue fmt standalone/foo.cue
 exec cue fmt ./standalone
-! exec cue export standalone/foo.cue
-stderr '^cannot determine system cache directory: '
-! exec cue vet -c standalone/foo.cue
-stderr '^cannot determine system cache directory: '
-! exec cue def standalone/foo.cue
-stderr '^cannot determine system cache directory: '
+exec cue export standalone/foo.cue
+exec cue vet -c standalone/foo.cue
+exec cue def standalone/foo.cue
 
 # Working on modules without any dependencies should work without cache or config.
-# TODO(mvdan): fix the ones that don't work currently.
 cd localmod
 exec cue mod init mod.test/root
-! exec cue mod tidy
-stderr '^cannot determine system cache directory: '
-! exec cue export .
-stderr '^cannot determine system cache directory: '
-! exec cue vet -c=false ./...
-stderr '^cannot determine system cache directory: '
+exec cue mod tidy
+exec cue export .
+exec cue vet -c=false ./...
 cd ..
 
 # Working on modules with external dependencies does not work without cache or config.
+# Note that each command wraps the underlying cache directory error with its own context,
+# so we match a prefix of each error rather than its entirety.
 cd depmod
 ! exec cue export .
-stderr '^cannot determine system cache directory: '
+stderr '^mod\.test/root@v0: import failed: cannot find package "remote\.com/bar": cannot fetch remote\.com/bar@v0\.1\.0: cannot determine system cache directory: '
 ! exec cue mod tidy
-stderr '^cannot determine system cache directory: '
+stderr '^failed to resolve "remote\.com/bar": cannot fetch remote\.com/bar@v0\.1\.0: cannot determine system cache directory: '
 ! exec cue mod get remote.com/bar@v0.2.0
 stderr '^cannot determine system cache directory: '
 cd ..
@@ -54,7 +48,6 @@ cd publishmod
 stderr '^cannot find the path to store CUE registry logins: cannot determine system config directory: '
 ! exec cue mod publish v0.0.1
 stderr '^cannot determine system cache directory: '
-# TODO(mvdan): the cache error should give top-level context; why did we need to use the cache?
 # TODO(mvdan): both errors above should mention the cue env var that can be set as well.
 cd ..
 -- standalone/foo.cue --

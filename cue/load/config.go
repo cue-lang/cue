@@ -15,7 +15,6 @@
 package load
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"io/fs"
@@ -421,18 +420,15 @@ func (c Config) complete() (cfg *Config, err error) {
 	if c.SkipImports {
 		// We should never use the registry in SkipImports mode
 		// but make it always return an error just to be sure.
-		c.Registry = errorRegistry{errors.New("unexpected use of registry in SkipImports mode")}
+		c.Registry = &modconfig.LazyRegistry{New: func() (modconfig.CachedRegistry, error) {
+			return nil, errors.New("unexpected use of registry in SkipImports mode")
+		}}
 	} else if c.Registry == nil {
-		registry, err := modconfig.NewRegistry(&modconfig.Config{
-			Env: c.Env,
-		})
-		if err != nil {
-			// If there's an error in the registry configuration,
-			// don't error immediately, but only when we actually
-			// need to resolve modules.
-			registry = errorRegistry{err}
-		}
-		c.Registry = registry
+		c.Registry = &modconfig.LazyRegistry{New: func() (modconfig.CachedRegistry, error) {
+			return modconfig.NewRegistry(&modconfig.Config{
+				Env: c.Env,
+			})
+		}}
 	}
 	c.parserConfig = parser.NewConfig(parser.ParseComments)
 	if err := c.loadModule(); err != nil {
@@ -618,23 +614,6 @@ func (c *Config) newErrInstance(err error) *build.Instance {
 		i.RootLoc = makeOSFSLoc(c.ModuleRoot, c.pathOS, ov)
 	}
 	return i
-}
-
-// errorRegistry implements [modconfig.Registry] by returning err from all methods.
-type errorRegistry struct {
-	err error
-}
-
-func (r errorRegistry) Requirements(ctx context.Context, m module.Version) ([]module.Version, error) {
-	return nil, r.err
-}
-
-func (r errorRegistry) Fetch(ctx context.Context, m module.Version) (module.SourceLoc, error) {
-	return module.SourceLoc{}, r.err
-}
-
-func (r errorRegistry) ModuleVersions(ctx context.Context, mpath string) ([]string, error) {
-	return nil, r.err
 }
 
 // insideCueModFS reports whether absDir is inside a cue.mod directory

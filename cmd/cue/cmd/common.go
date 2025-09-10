@@ -39,10 +39,6 @@ import (
 )
 
 func defaultConfig() (*config, error) {
-	reg, err := getCachedRegistry()
-	if err != nil {
-		return nil, err
-	}
 	return &config{
 		loadCfg: &load.Config{
 			ParseFile: func(name string, src interface{}, cfg parser.Config) (*ast.File, error) {
@@ -52,7 +48,7 @@ func defaultConfig() (*config, error) {
 				}
 				return parser.ParseFile(name, src, cfg)
 			},
-			Registry: reg,
+			Registry: getLazyRegistry(), // delay any setup errors until we actually need the registry
 		},
 	}, nil
 }

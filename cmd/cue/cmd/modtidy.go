@@ -51,10 +51,7 @@ determine the modules registry.
 }
 
 func runModTidy(cmd *Command, args []string) error {
-	reg, err := getCachedRegistry()
-	if err != nil {
-		return err
-	}
+	reg := getLazyRegistry()
 	ctx := cmd.Context()
 	modRoot, err := findModuleRoot()
 	if err != nil {

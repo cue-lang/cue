@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcd5b16c_1b3cc66e",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-10T12:59:53Z",
+      "side": 1,
+      "message": "I\u0027m not convinced we should ever be calling `stop()`. The docs say it restores the previous signal handlers, which includes setting them back to defaults. That means if a user hammers ctl-c twice, it may be that no graceful shutdown occurs.",
+      "revId": "6a075a4626c377b5c7c4b57c207b5b735e6275e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8db38c52_73a7ef28",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-10T12:59:53Z",
+      "side": 1,
+      "message": "This line isn\u0027t needed? There\u0027s only one send to `returned`, it\u0027s guaranteed to not block, so this defer isn\u0027t needed?",
+      "revId": "6a075a4626c377b5c7c4b57c207b5b735e6275e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e79c620_8956836f",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-10T12:59:53Z",
+      "side": 1,
+      "message": "I\u0027m very happy to be overruled on this - I am fairly allergic to use of context signalling (for someone who cut their teeth on actors, the context signalling design is ... challenging), and as such, I\u0027m very inexperienced on this.\n\nI don\u0027t like this. It seems to me that the design of context signalling is that you just don\u0027t get to know whether or not other go-routines are still running doing tidy-up work due to your context getting cancelled. The design doesn\u0027t support that use-case. It seems to me that if you need to know that, you should be passing around a sync.WaitGroup or something of that nature where you can coordinate across go-routines.",
+      "revId": "6a075a4626c377b5c7c4b57c207b5b735e6275e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

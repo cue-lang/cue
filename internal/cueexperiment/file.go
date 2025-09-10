@@ -70,6 +70,14 @@ type File struct {
 	// Spec change:   https://cuelang.org/cl/1221642
 	// Needs cue fix: yes
 	ExplicitOpen bool `experiment:"preview:v0.15.0"`
+
+	// Self enables the use of 'self' identifier to refer to the enclosing struct.
+	//
+	// Needs cue fix: no
+	//
+	// Proposal:      https://cuelang.org/issue/4014
+	// Spec change:   https://cuelang.org/cl/1222377
+	Self bool `experiment:"preview:v0.15.0"`
 }
 
 // LanguageVersion returns the language version of the file or "" if no language

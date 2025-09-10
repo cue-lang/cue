@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6d675788_72110672",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T11:08:37Z",
+      "side": 1,
+      "message": "```suggestion\nall: modernize -fix -category\u003dslicescontains ./...\n```",
+      "revId": "c59fbb6c7d5a4d34cac2e05a53db3ae4d8bc4b4b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eccf3aa3_f4d668af",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -14,6 +31,23 @@
       "writtenOn": "2025-09-06T22:28:49Z",
       "side": 1,
       "message": "Two bugs uncovered in modernize by this patch:\n\nhttps://github.com/golang/go/issues/74938#issuecomment-3263258931\nhttps://github.com/golang/go/issues/75296",
+      "revId": "c59fbb6c7d5a4d34cac2e05a53db3ae4d8bc4b4b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1bd48ab_b6d274cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T11:08:37Z",
+      "side": 1,
+      "message": "LGTM when tests pass.",
       "revId": "c59fbb6c7d5a4d34cac2e05a53db3ae4d8bc4b4b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

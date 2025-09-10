@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "22130783_a9d49e47",
+        "filename": "cue/ast/astutil/apply.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-10T08:45:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c10b979e_d22194d9",
+      "revId": "a42f6b900474399b46a7af1c1730f22a51d70f8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26e1279d_1cfee7b7",

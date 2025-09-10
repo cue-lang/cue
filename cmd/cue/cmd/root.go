@@ -287,6 +287,37 @@ func New(args []string) (*Command, error) {
 
 // Main runs the cue tool and returns the code for passing to os.Exit.
 func Main() int {
+	// Set up a context which gets cancelled on an interrupt or termination signal.
+	//
+	// Many subcommands like `cue login` and `cue mod tidy` use contexts to cancel work,
+	// such that receiving a SIGTERM signal quickly stops all ongoing work and returns.
+	//
+	// However, the evaluator does not support cancellation just yet,
+	// and it's still useful to have a fallback to exit the cue program if a graceful
+	// shutdown has not happened after a short period of time.
+	// 100ms should be more than enough for any sort of cleanup necessary.
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	returned := make(chan struct{}, 1)
+	defer func() {
+		returned <- struct{}{}
+		stop()
+	}()
+	go func(ctx context.Context) {
+		<-ctx.Done()
+		time.Sleep(100 * time.Millisecond)
+		select {
+		case <-returned:
+			// `go test -race` keeps Go programs alive for a bit once they finish,
+			// as configured via GORACE=atexit_sleep_ms which defaults to 1s.
+			// This gives the goroutine here extra time to run once `Main` has returned;
+			// we don't want that to happen, because if cmd.Run finished,
+			// the sub-command already stopped itself gracefully.
+		default:
+			fmt.Fprintln(os.Stderr, "cue: exiting abruptly after signal")
+			os.Exit(1)
+		}
+	}(ctx) // copy the context; we don't want to race with the writes below.
+
 	start := time.Now()
 	cmd, _ := New(os.Args[1:])
 	// CUE_BENCH makes the cue tool act like a `go test -bench=. -benchmem` benchmark,
@@ -299,8 +330,6 @@ func Main() int {
 		// Don't let anything else be printed to stdout; we're only benchmarking.
 		cmd.SetOutput(io.Discard)
 	}
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
 	ctx = httplog.ContextWithAllowedURLQueryParams(ctx, allowURLQueryParam)
 	if err := cmd.Run(ctx); err != nil {
 		if err != ErrPrintedError {

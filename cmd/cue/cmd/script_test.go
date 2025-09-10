@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package cmd_test
 
 import (
 	"bufio"
@@ -46,6 +46,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/tools/txtar"
 
+	cuecmd "cuelang.org/go/cmd/cue/cmd"
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
@@ -391,7 +392,7 @@ func TestX(t *testing.T) {
 		args, err := shlex.Split(cmd)
 		check(err)
 
-		c, _ := New(args[1:])
+		c, _ := cuecmd.New(args[1:])
 		b := &bytes.Buffer{}
 		c.SetOutput(b)
 		err = c.Run(context.Background())
@@ -410,15 +411,15 @@ func TestMain(m *testing.M) {
 		}
 	}
 	testscript.Main(m, map[string]func(){
-		"cue": func() { os.Exit(Main()) },
+		"cue": func() { os.Exit(cuecmd.Main()) },
 		// Until https://github.com/rogpeppe/go-internal/issues/93 is fixed,
 		// or we have some other way to use "exec" without caring about success,
 		// this is an easy way for us to mimic `? exec cue`.
-		"cue_exitzero": func() { Main() },
+		"cue_exitzero": func() { cuecmd.Main() },
 		"cue_stdinpipe": func() {
 			cwd, _ := os.Getwd()
 			if err := mainStdinPipe(); err != nil {
-				if err != ErrPrintedError { // print errors like Main
+				if err != cuecmd.ErrPrintedError { // print errors like Main
 					errors.Print(os.Stderr, err, &errors.Config{
 						Cwd:     cwd,
 						ToSlash: testing.Testing(),
@@ -489,7 +490,7 @@ func tsExpand(ts *testscript.TestScript, s string) string {
 func mainStdinPipe() error {
 	// Like Main, but sets stdin to a pipe,
 	// to emulate stdin reads like a terminal.
-	cmd, _ := New(os.Args[1:])
+	cmd, _ := cuecmd.New(os.Args[1:])
 	pr, pw, err := os.Pipe()
 	if err != nil {
 		return err

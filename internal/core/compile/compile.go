@@ -336,29 +336,48 @@ func (c *compiler) compileExpr(x ast.Expr) adt.Conjunct {
 // verifyVersion checks whether n is a Builtin and then checks whether the
 // Added version is compatible with the file version registered in c.
 func (c *compiler) verifyVersion(src ast.Node, n adt.Expr) adt.Expr {
-	b, ok := n.(*adt.Builtin)
-	if !ok {
+	var kind, name, added string
+	switch x := n.(type) {
+	default:
+		return n
+
+	case *adt.Builtin:
+		if x.Added == "" {
+			// No version check needed.
+			return n
+		}
+
+		kind = "builtin"
+		name = x.Name
+		added = x.Added
+
+	case *adt.ValueReference:
+		// NOTE: this is always self or __self.
+		kind = "predeclared identifier"
+		name = x.Src.Name
+		// Check if Self experiment is enabled
+		if !c.experiments.Self {
+			return c.errf(src, "%s %q requires @experiment(self)", kind, name)
+		}
+		x.Label = adt.MakeStringLabel(c.index, name)
 		return n
 	}
-	if b.Added == "" {
-		// No version check needed.
-		return n
-	}
+
 	v := c.experiments.LanguageVersion()
 	if v == "" {
 		// We assume "latest" if the file is not associated with a version.
 		return n
 	}
 
-	if semver.Compare(b.Added, v) <= 0 {
+	if semver.Compare(added, v) <= 0 {
 		// The feature is available in the file version.
 		return n
 	}
 
 	// The feature is not available in the file version.
 	// NonConcrete builtins are not allowed in older versions.
-	return c.errf(src, "builtin %q is not available in version %v; "+
-		"it was added in version %q", b.Name, v, b.Added)
+	return c.errf(src, "%s %q is not available in version %v; "+
+		"it was added in version %q", kind, name, v, added)
 }
 
 // resolve assumes that all existing resolutions are legal. Validation should

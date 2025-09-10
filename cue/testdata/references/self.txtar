@@ -1,0 +1,318 @@
+Test various self reference cases.
+
+-- in.cue --
+// Basic self usage - top level
+a: self.b
+b: "hello"
+
+// Nested self usage - should refer to x struct
+x: {
+    y: self.z
+    z: "world"
+}
+
+// Shorthand notation - self should refer to foo struct
+foo: bar: self.baz
+foo: baz: "greeting"
+
+// Multiple levels of nesting
+nested: {
+    level1: {
+        field: self.value
+        value: "level1 value"
+    }
+}
+
+// Self in list context
+listTest: {
+    items: [1, 2, self[0], self[1]]
+    first: 1
+    second: 2
+}
+
+// Self with computed selectors
+computed: {
+    key: "test"
+    value: self["key"]
+}
+
+// Cyclic reference detection
+cycle: self.cycle
+
+-- list.cue --
+import "list"
+
+#IntStrings: {list.Repeat([int, string], div(len(self), 2))}
+listCheck: ok1: #IntStrings
+listCheck: ok1: [1, "foo", 2, "bar"]
+
+listCheck: err: #IntStrings
+listCheck: err: [1, "foo", "bar", 2]
+
+-- withlet.cue --
+withLet: {
+	let X = self
+	foo: 1
+
+	bar: {
+		baz: X.foo
+	}
+}
+-- validator.cue --
+@experiment(structcmp)
+
+validator: {
+	err1: {{{{== (self + 1)}}}}
+	err1: 2
+
+	err2: {== (self + 1)}
+	err2: 2
+}
+
+cyclicErr: {
+	err3: == (self + 1)
+	err3: 4
+}
+
+-- out/evalalpha --
+Errors:
+listCheck.err.2: conflicting values "bar" and int (mismatched types string and int):
+    ./list.cue:3:14
+    ./list.cue:3:15
+    ./list.cue:3:28
+    ./list.cue:7:17
+    ./list.cue:8:28
+listCheck.err.3: conflicting values 2 and string (mismatched types int and string):
+    ./list.cue:3:14
+    ./list.cue:3:15
+    ./list.cue:3:33
+    ./list.cue:7:17
+    ./list.cue:8:35
+validator.err1: invalid value 2 (out of bound ==3):
+    ./validator.cue:4:12
+    ./validator.cue:4:8
+    ./validator.cue:5:8
+validator.err2: invalid value 2 (out of bound ==3):
+    ./validator.cue:7:9
+    ./validator.cue:7:8
+    ./validator.cue:8:8
+cyclicErr.err3: invalid operands {err3:_|_(cyclicErr.err3: invalid operands value at path 'cyclicErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
+    ./validator.cue:12:12
+    ./validator.cue:11:12
+    ./validator.cue:12:19
+
+Result:
+(_|_){
+  // [eval]
+  a: (string){ "hello" }
+  b: (string){ "hello" }
+  x: (struct){
+    y: (string){ "world" }
+    z: (string){ "world" }
+  }
+  foo: (struct){
+    bar: (string){ "greeting" }
+    baz: (string){ "greeting" }
+  }
+  nested: (struct){
+    level1: (struct){
+      field: (string){ "level1 value" }
+      value: (string){ "level1 value" }
+    }
+  }
+  listTest: (struct){
+    items: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 1 }
+      3: (int){ 2 }
+    }
+    first: (int){ 1 }
+    second: (int){ 2 }
+  }
+  computed: (struct){
+    key: (string){ "test" }
+    value: (string){ "test" }
+  }
+  cycle: (_){ _ }
+  #IntStrings: (#list){
+  }
+  listCheck: (_|_){
+    // [eval]
+    ok1: (#list){
+      0: (int){ 1 }
+      1: (string){ "foo" }
+      2: (int){ 2 }
+      3: (string){ "bar" }
+    }
+    err: (_|_){
+      // [eval]
+      0: (int){ 1 }
+      1: (string){ "foo" }
+      2: (_|_){
+        // [eval] listCheck.err.2: conflicting values "bar" and int (mismatched types string and int):
+        //     ./list.cue:3:14
+        //     ./list.cue:3:15
+        //     ./list.cue:3:28
+        //     ./list.cue:7:17
+        //     ./list.cue:8:28
+      }
+      3: (_|_){
+        // [eval] listCheck.err.3: conflicting values 2 and string (mismatched types int and string):
+        //     ./list.cue:3:14
+        //     ./list.cue:3:15
+        //     ./list.cue:3:33
+        //     ./list.cue:7:17
+        //     ./list.cue:8:35
+      }
+    }
+  }
+  validator: (_|_){
+    // [eval]
+    err1: (_|_){
+      // [eval] validator.err1: invalid value 2 (out of bound ==3):
+      //     ./validator.cue:4:12
+      //     ./validator.cue:4:8
+      //     ./validator.cue:5:8
+    }
+    err2: (_|_){
+      // [eval] validator.err2: invalid value 2 (out of bound ==3):
+      //     ./validator.cue:7:9
+      //     ./validator.cue:7:8
+      //     ./validator.cue:8:8
+    }
+  }
+  cyclicErr: (_|_){
+    // [eval]
+    err3: (_|_){
+      // [eval] cyclicErr.err3: invalid operands {err3:_|_(cyclicErr.err3: invalid operands value at path 'cyclicErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
+      //     ./validator.cue:12:12
+      //     ./validator.cue:11:12
+      //     ./validator.cue:12:19
+    }
+  }
+  withLet: (struct){
+    let X#1 = (_|_){
+      // [structural cycle] withLet.X: structural cycle
+    }
+    foo: (int){ 1 }
+    bar: (struct){
+      baz: (int){ 1 }
+    }
+  }
+}
+-- version_test.cue --
+// Test self usage with wrong language version (should fail with v0.14.0)
+language: {
+    version: "v0.14.0"
+}
+
+a: {
+    b: self.c
+    c: 3
+}
+
+-- out/compile/version_test --
+predeclared identifier "self" is not available in version v0.14.0; it was added in version v0.15.0:
+    version_test.cue:6:6
+-- out/compile --
+--- in.cue
+{
+  a: 〈1〉.b
+  b: "hello"
+  x: {
+    y: 〈1〉.z
+    z: "world"
+  }
+  foo: {
+    bar: 〈1〉.baz
+  }
+  foo: {
+    baz: "greeting"
+  }
+  nested: {
+    level1: {
+      field: 〈1〉.value
+      value: "level1 value"
+    }
+  }
+  listTest: {
+    items: [
+      1,
+      2,
+      〈1〉[0],
+      〈1〉[1],
+    ]
+    first: 1
+    second: 2
+  }
+  computed: {
+    key: "test"
+    value: 〈1〉["key"]
+  }
+  cycle: 〈1〉.cycle
+}
+--- list.cue
+{
+  #IntStrings: {
+    〈import;list〉.Repeat([
+      int,
+      string,
+    ], div(len(〈1〉), 2))
+  }
+  listCheck: {
+    ok1: 〈1;#IntStrings〉
+  }
+  listCheck: {
+    ok1: [
+      1,
+      "foo",
+      2,
+      "bar",
+    ]
+  }
+  listCheck: {
+    err: 〈1;#IntStrings〉
+  }
+  listCheck: {
+    err: [
+      1,
+      "foo",
+      "bar",
+      2,
+    ]
+  }
+}
+--- validator.cue
+{
+  validator: {
+    err1: {
+      {
+        {
+          {
+            ==(〈1〉 + 1)
+          }
+        }
+      }
+    }
+    err1: 2
+    err2: {
+      ==(〈1〉 + 1)
+    }
+    err2: 2
+  }
+  cyclicErr: {
+    err3: ==(〈1〉 + 1)
+    err3: 4
+  }
+}
+--- withlet.cue
+{
+  withLet: {
+    let X#1 = 〈1〉
+    foo: 1
+    bar: {
+      baz: 〈1;let X#1〉.foo
+    }
+  }
+}

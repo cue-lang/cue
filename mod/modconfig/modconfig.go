@@ -43,9 +43,11 @@ type Registry interface {
 	ModuleVersions(ctx context.Context, mpath string) ([]string, error)
 }
 
-// CachedRegistry is optionally implemented by a registry that
+// CachedRegistry is optionally implemented by a [Registry] that
 // contains a cache.
 type CachedRegistry interface {
+	Registry
+
 	// FetchFromCache looks up the given module in the cache.
 	// It returns an error that satisfies [errors.Is]([modregistry.ErrNotFound]) if the
 	// module is not present in the cache at this version or if there
@@ -53,13 +55,14 @@ type CachedRegistry interface {
 	FetchFromCache(mv module.Version) (module.SourceLoc, error)
 }
 
-// We don't want to make modload part of the cue/load API,
-// so we define the above type independently, but we want
-// it to be interchangeable, so check that statically here.
 var (
-	_ Registry                  = modload.Registry(nil)
-	_ modload.Registry          = Registry(nil)
-	_ CachedRegistry            = modpkgload.CachedRegistry(nil)
+	// We don't want to make modload part of the cue/load API,
+	// so we define the above type independently, but we want
+	// it to be interchangeable, so check that statically here.
+	_ Registry         = modload.Registry(nil)
+	_ modload.Registry = Registry(nil)
+
+	// [modpkgload.CachedRegistry] is a subset of [CachedRegistry].
 	_ modpkgload.CachedRegistry = CachedRegistry(nil)
 )
 
@@ -355,7 +358,7 @@ func (t *cueLoginsTransport) _init() error {
 // NewRegistry returns an implementation of the Registry
 // interface suitable for passing to [load.Instances].
 // It uses the standard CUE cache directory.
-func NewRegistry(cfg *Config) (Registry, error) {
+func NewRegistry(cfg *Config) (CachedRegistry, error) {
 	cfg = newRef(cfg)
 	resolver, err := NewResolver(cfg)
 	if err != nil {
@@ -366,6 +369,68 @@ func NewRegistry(cfg *Config) (Registry, error) {
 		return nil, err
 	}
 	return modcache.New(modregistry.NewClientWithResolver(resolver), cacheDir)
+}
+
+func NewLazyRegistry(cfg *Config) *LazyRegistry {
+	return &LazyRegistry{New: func() (CachedRegistry, error) {
+		return NewRegistry(cfg)
+	}}
+}
+
+// LazyRegistry implements [CachedRegistry] such that any configuration or setup errors,
+// such as an invalid `CUE_REGISTRY` value or an inaccessible `CUE_CACHE_DIR` directory
+// are only surfaced as fatal errors for the user once the registry is actually needed.
+//
+// Notably, interacting with a CUE registry or the CUE disk caches is not required for many
+// simple scenarios, such as loading and evaluating local files or modules
+// without any external module dependencies.
+type LazyRegistry struct {
+	New func() (CachedRegistry, error)
+
+	once    sync.Once
+	onceReg CachedRegistry
+	onceErr error
+}
+
+var _ CachedRegistry = (*LazyRegistry)(nil)
+
+func (r *LazyRegistry) registry() (CachedRegistry, error) {
+	r.once.Do(func() {
+		r.onceReg, r.onceErr = r.New()
+	})
+	return r.onceReg, r.onceErr
+}
+
+func (r *LazyRegistry) Requirements(ctx context.Context, m module.Version) ([]module.Version, error) {
+	reg, err := r.registry()
+	if err != nil {
+		return nil, err
+	}
+	return reg.Requirements(ctx, m)
+}
+
+func (r *LazyRegistry) Fetch(ctx context.Context, m module.Version) (module.SourceLoc, error) {
+	reg, err := r.registry()
+	if err != nil {
+		return module.SourceLoc{}, err
+	}
+	return reg.Fetch(ctx, m)
+}
+
+func (r *LazyRegistry) FetchFromCache(m module.Version) (module.SourceLoc, error) {
+	reg, err := r.registry()
+	if err != nil {
+		return module.SourceLoc{}, err
+	}
+	return reg.FetchFromCache(m)
+}
+
+func (r *LazyRegistry) ModuleVersions(ctx context.Context, mpath string) ([]string, error) {
+	reg, err := r.registry()
+	if err != nil {
+		return nil, err
+	}
+	return reg.ModuleVersions(ctx, mpath)
 }
 
 func getenvFunc(env []string) func(string) string {

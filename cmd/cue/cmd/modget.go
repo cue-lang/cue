@@ -62,7 +62,7 @@ Note that this command is not yet stable and may be changed.
 }
 
 func runModGet(cmd *Command, args []string) error {
-	reg, err := getCachedRegistry()
+	reg, err := getRegistry()
 	if err != nil {
 		return err
 	}

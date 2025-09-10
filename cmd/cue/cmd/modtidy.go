@@ -54,10 +54,7 @@ Note that this command is not yet stable and may be changed.
 }
 
 func runModTidy(cmd *Command, args []string) error {
-	reg, err := getCachedRegistry()
-	if err != nil {
-		return err
-	}
+	reg := getLazyRegistry()
 	ctx := cmd.Context()
 	modRoot, err := findModuleRoot()
 	if err != nil {

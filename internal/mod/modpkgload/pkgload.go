@@ -26,9 +26,11 @@ type Registry interface {
 	Fetch(ctx context.Context, m module.Version) (module.SourceLoc, error)
 }
 
-// CachedRegistry is optionally implemented by a registry that
+// CachedRegistry is optionally implemented by a [Registry] that
 // implements a cache.
 type CachedRegistry interface {
+	Registry
+
 	// FetchFromCache looks up the given module in the cache.
 	// It returns an error that satisfies [errors.Is]([modregistry.ErrNotFound]) if the
 	// module is not present in the cache at this version or if there

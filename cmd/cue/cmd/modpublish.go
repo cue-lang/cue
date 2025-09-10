@@ -115,7 +115,7 @@ func runModUpload(cmd *Command, args []string) error {
 	// TODO: can we use modload.CheckTidy on the already-parsed modfile.File below?
 	// TODO: we might want to provide a "force" flag to skip this check,
 	// particularly for cases where one has private deps or pushes to a custom registry.
-	reg, err := getCachedRegistry()
+	reg, err := getRegistry()
 	if err != nil {
 		return err
 	}

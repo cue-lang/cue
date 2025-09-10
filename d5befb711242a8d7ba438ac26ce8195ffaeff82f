@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "108395d0_a11de9a5",
+        "filename": "encoding/openapi/build.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T13:14:23Z",
+      "side": 1,
+      "message": "I don\u0027t really understand what\u0027s going on here - maybe add a non-TODO comment explaining why we\u0027re doing it?",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1865e28b_52a291ac",
+        "filename": "pkg/encoding/openapi/openapi.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T13:14:23Z",
+      "side": 1,
+      "message": "It feels a bit odd to have this as `Config` rather than `#Config`. Also, shouldn\u0027t we unify the argument with this, or is it just informational?",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c95612b_9096ea9c",
+        "filename": "pkg/encoding/openapi/openapi.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T13:14:23Z",
+      "side": 1,
+      "message": "```suggestion\n\tinfo?: _\n```\n\n?",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6275da5_4a7ef313",
+        "filename": "pkg/encoding/openapi/openapi.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T13:14:23Z",
+      "side": 1,
+      "message": "I wonder if this package and/or the Marshal function should be documented as being experimental. AFAIK this is the first time we\u0027ve exposed schema-marshaling functionality inside the CUE stdlib, and it definitely represents somewhat of a departure: for example, it brings things such as doc comments inside the CUE data model, and the results of the Marshal function will definitely change significantly over time as the encoding functionality improves.",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f93619d_f4a1ac5e",
+        "filename": "pkg/encoding/openapi/openapi.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T13:14:23Z",
+      "side": 1,
+      "message": "I suspect that the version here should be constrained to `\"v3.0.0\"` as the v3.1.0 support is poor to non-existent (for example we still generate the `nullable` keyword when v3.1.0 is specified, even though it\u0027s not supported for that version).\n\nIn fact, I\u0027d go further and suggest removing the `version` argument entirely, leaving it as a possibility to add in the config struct.",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a45fa2e7_106d8681",
+        "filename": "pkg/encoding/openapi/openapi.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T13:14:23Z",
+      "side": 1,
+      "message": "Could we not define it as a proper struct so that users can see what config elements are supported (and their types) ?",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3daa5543_ca57220f",
+        "filename": "pkg/encoding/openapi/testdata/gen.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T13:14:23Z",
+      "side": 1,
+      "message": "Let\u0027s include a doc comment too, just to show that comments are indeed included in the OpenAPI output.",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

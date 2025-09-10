@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c2bc736_c64074d0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T11:00:47Z",
+      "side": 1,
+      "message": "From my reading of `modernize`, this doesn\u0027t look quite right.\nI suspect this is more like it?\n\n\n```suggestion\nall: modernize -fix -category\u003dstringsseq ./...\n```\n\nPerhaps mention the full command (including full path to `modernize`) in the description?",
+      "revId": "6c0fd09711a8d72d7d2c49cce0c210ed7843f09b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

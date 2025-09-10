@@ -1,0 +1,447 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c63be92a_d9b27e07",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "First pass. I still have some things I\u0027d like to think through, but this should be good to start with 😉",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52883b12_4c3e6915",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "How about avoiding all the `exec:curl` prefixes by doing:\n\n```\n[!exec.curl] skip \u0027no curl command available\u0027\n```\n\nat the start?\n\nAnother possibility might be to write a very small subset of `curl` or something similar as a built-in testscript command.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e686bc6_0f3d89cc",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "I\u0027d like to see some tests showing what happens when",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60ce4133_9b996630",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "As this feels more like a fully-fledged example than just a test, it might be nice to have some explanatory commentary talking about what this is doing and explaining each HTTP method.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df283de9_dea0697b",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "I think we should also include a test for a wildcard `...` last element, such as `/test/{foo...}`. AFAICS currently that doesn\u0027t appear in `pathValues`.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8ce7157_81dbeedc",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "This feels more like a schema than a template to me. I think it\u0027s worth at least trying to maintain schema discipline (i.e. use all required/optional fields) to make that clear, and perhaps name it `#Machine` too.\n\nSame goes for `MachineByRole`.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7da2957_fbf13a9e",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "Presumably we\u0027re wanting to constrain the request so that it always has a `u` parameter here? How about being a bit more explicit about that?\n\n```suggestion\n\trequest: form: u!: [string]\n```\n?",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47f9252a_38792445",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "this needs cue fmt\u0027ing.",
+      "range": {
+        "startLine": 157,
+        "startChar": 0,
+        "endLine": 162,
+        "endChar": 1
+      },
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c4b9cf7_e3718b1d",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "Do you really want the `\u003d~\"^/\"` constraint here? ISTM that it means that if someone inadvertently specifies some path that doesn\u0027t start with `/` (for example `GET /`) that we\u0027ll end up listening on `:80` which is probably not what\u0027s required.\nMaybe either close the struct or perhaps constrain `routing.path` instead.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db33930d_37e17e1a",
+        "filename": "internal/task/task.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "I can\u0027t parse this comment.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33f4c9d6_0c3c2af8",
+        "filename": "internal/task/task.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "We should probably add a `Path.Equal` method.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd75279c_beecf28d",
+        "filename": "internal/task/task.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "How about just returning the new controller? That way the caller can inspect the final value and stats etc. And then this method won\u0027t be the one to actually block, which might make things a bit clearer in the caller.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73b58cfa_94ed5cf6",
+        "filename": "internal/task/task.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "This does indeed feel dubious, and it\u0027s also racy AFAICS (potential for parallel writes) because BackgroundTask is called inside a goroutine. At the very least, I\u0027d suggest putting `Background` inside an `atomic.Bool` and adding a function rather than accessing the variable directly.\n\nOn second thoughts, why isn\u0027t it just as easy to do something like put a `sync.WaitGroup` (or `errgroup.Group`) inside `task.Context` and have a way to add to it (perhaps just expose a `Go` method) and wait for it to complete (in practice you\u0027d probably select on that finishing and os.Interrupt) ?",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2470bf00_15d472fa",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "This sentence is hard to parse.\n```suggestion\n\t// routing configures the HTTP routes that are served.\n```\n?",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 0
+      },
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e15242e_6562e1bd",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "```suggestion\n\t// next literal slash (not %2F) in the request URL. But if \"...\" is\n```",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa1bcb6a_d7c60bdb",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "This seems like a holdover from the Go docs.",
+      "range": {
+        "startLine": 97,
+        "startChar": 20,
+        "endLine": 97,
+        "endChar": 48
+      },
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "014abeea_c34d7e95",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "This doesn\u0027t seem to fit with the docs above which describe the method as being part of the pattern itself.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e601ec9_d9a8ee56",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "This could do with a doc comment, particularly as it\u0027s not entirely clear which parts the user is expected to fill in. I\u0027m also thinking that some/all of these should be required or optional fields rather than regular fields. Maybe factor the whole of this out into a pure schema, say `#Request`?",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1391e62b_5977cccb",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "Can a value hold an empty array? Perhaps:\n\n```suggestion\n\t\tform: [string]: [string, ...string]\n```\n?",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53fbb142_07c13c1a",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "This could do with some documentation. For example, if there\u0027s only a single value for a given header key and no constraint on `header`, will we see a `string` or a `[string]` for that key? I\u0027m somewhat inclined to suggest that we keep things simple and just use `[string, ... string]`. That also seems to fit with the implementation - I can\u0027t see any place where a header is filled in with a scalar string.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36d97fbe_6a0fb344",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "It would be good to clarify whether we\u0027re allowed to have tasks that are run as part of the response. From experimentation, it appears not, but that\u0027s not immediately obvious as we\u0027re running in `cue cmd`.\n\nFor example, this doesn\u0027t work, although one might expect it to:\n\n```\ncommand: serve: \"/test\": http.Serve \u0026 {\n\tlistenAddr: \":8123\"\n\trequest: _\n\tresponse: {\n\t\tx_foo: exec.Run \u0026 {\n\t\t\ttext: [\"echo\", \"xxx \\(json.Marshal(request))\"]\n\t\t}\n\t\tbody: x_foo.stdout\n\t}\n}\n```",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efef706f_cdad61ca",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "As far as I can read the `parseHeaders` code, it doesn\u0027t allow multiple headers in the response, so this should be:\n\n\n\n```suggestion\n\t\theader?: [string]: string\n```\n\nSimilarly for `trailer`.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b99fc4c3_6fe3f273",
+        "filename": "pkg/tool/http/serve.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "Alternatively you could just define a Go struct and fill with that, which turn out a bit simpler.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bf63307_722cdc7b",
+        "filename": "pkg/tool/http/serve.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "If the user inadvertently listens on a port that\u0027s unavailable (for example by forgetting to set `listenAddr`, thus resulting in listening on the usually-privileged port of 80), they will never see the error returned by `ListenAndServe`.\nWhat happens in this case is that the command prints `listening on :80` and blocks forever, even though it is clearly _not_ listening on that port.\n\nIt would be better to create a `net.Listener` first before starting the goroutine.\n\nI also think that defaulting to `:80` isn\u0027t great: better if `listenAddr` was a required field I think.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1cfd045b_de4c89f1",
+        "filename": "pkg/tool/http/serve.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-10T17:02:55Z",
+      "side": 1,
+      "message": "This is racy because it\u0027s not OK to do operations concurrently on `cue.Value`.\nI think you need a semi-global lock here.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

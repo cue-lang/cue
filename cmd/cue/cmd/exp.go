@@ -36,7 +36,17 @@ as the objective is to gain experience and then move the feature elsewhere.
 `[1:],
 	})
 
+	// Commands to some day promote out of `cue exp`.
 	cmd.AddCommand(newExpGenGoTypesCmd(c))
+
+	// Hidden commands which are only meant for integration tests.
+	cmd.AddCommand(&cobra.Command{
+		// Hang forever, disregarding context cancellation when SIGINT is received.
+		// Used to test that cmd/cue still exits in such a scenario.
+		Use:    "internal-hang",
+		Hidden: true,
+		Run:    func(cmd *cobra.Command, args []string) { select {} },
+	})
 	return cmd
 }
 

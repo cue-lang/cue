@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ca44e84_413fc24a",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-10T10:59:06Z",
+      "side": 1,
+      "message": "Oh, wasn\u0027t new after all. It is just that because of the refactoring, we need to pass some things around differently.\n\nBut did a full new refactor to be sure.",
+      "parentUuid": "869490de_c178b4d9",
+      "revId": "df1f47beaf99a20c40ce461d40856e9d45e43ce4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a965c34_13b0e220",
@@ -67,6 +85,24 @@
       "writtenOn": "2025-09-03T14:21:41Z",
       "side": 1,
       "message": "typically error values begin with Err, like ErrLegacy",
+      "revId": "df1f47beaf99a20c40ce461d40856e9d45e43ce4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccdb155c_cc116760",
+        "filename": "internal/task/task.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-10T10:59:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a965c34_13b0e220",
       "revId": "df1f47beaf99a20c40ce461d40856e9d45e43ce4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

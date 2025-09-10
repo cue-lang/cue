@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de76caab_1cfab277",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-10T13:51:54Z",
+      "side": 1,
+      "message": "This `stop` only happens once we have returned, i.e. once we are done doing everything we have to - including any graceful shutdown. So, the worst that can happen is that a second ^C runs right after this defer, but we were about to exit the entire program anyway, so no harm done.\n\nIt\u0027s also common practice to `defer stop()` or `defer cancel()` with cancellable contexts - and the example for NotifyContext does this too. So I\u0027m inclined to follow that unless we have a very good reason not to.",
+      "parentUuid": "bcd5b16c_1b3cc66e",
+      "revId": "6a075a4626c377b5c7c4b57c207b5b735e6275e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8db38c52_73a7ef28",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "76a1e672_c39a46d3",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-10T13:51:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8db38c52_73a7ef28",
+      "revId": "6a075a4626c377b5c7c4b57c207b5b735e6275e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e79c620_8956836f",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-09-10T12:59:53Z",
       "side": 1,
       "message": "I\u0027m very happy to be overruled on this - I am fairly allergic to use of context signalling (for someone who cut their teeth on actors, the context signalling design is ... challenging), and as such, I\u0027m very inexperienced on this.\n\nI don\u0027t like this. It seems to me that the design of context signalling is that you just don\u0027t get to know whether or not other go-routines are still running doing tidy-up work due to your context getting cancelled. The design doesn\u0027t support that use-case. It seems to me that if you need to know that, you should be passing around a sync.WaitGroup or something of that nature where you can coordinate across go-routines.",
+      "revId": "6a075a4626c377b5c7c4b57c207b5b735e6275e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8e4d97c_1c5fcf68",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-10T13:51:54Z",
+      "side": 1,
+      "message": "we discussed this on Discord and didn\u0027t reach an agreement; to discuss further in the future.",
+      "parentUuid": "2e79c620_8956836f",
       "revId": "6a075a4626c377b5c7c4b57c207b5b735e6275e1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

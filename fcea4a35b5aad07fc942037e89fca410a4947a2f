@@ -16,6 +16,24 @@
       "message": "Duplicate inline doc?",
       "revId": "fcea4a35b5aad07fc942037e89fca410a4947a2f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51792b1b_2c7797e8",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-10T08:09:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "65b4d31e_008d8422",
+      "revId": "fcea4a35b5aad07fc942037e89fca410a4947a2f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

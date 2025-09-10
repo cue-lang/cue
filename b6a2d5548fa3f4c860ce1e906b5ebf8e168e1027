@@ -16,6 +16,24 @@
       "message": "what about following append\u0027s own syntax, i.e. taking `...Selector` rather than `Selector`? I see little reason to restrict to just one value.",
       "revId": "b6a2d5548fa3f4c860ce1e906b5ebf8e168e1027",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed1c6f56_f3187a09",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-10T09:02:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "131b1dd9_e2d6f621",
+      "revId": "b6a2d5548fa3f4c860ce1e906b5ebf8e168e1027",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

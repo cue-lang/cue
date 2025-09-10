@@ -60,7 +60,7 @@ determine the modules registry.
 }
 
 func runModGet(cmd *Command, args []string) error {
-	reg, err := getCachedRegistry()
+	reg, err := getRegistry()
 	if err != nil {
 		return err
 	}

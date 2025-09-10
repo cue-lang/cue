@@ -7,7 +7,6 @@ import (
 
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/httplog"
-	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/mod/modconfig"
 )
 
@@ -17,8 +16,21 @@ func getRegistryResolver() (*modconfig.Resolver, error) {
 	return modconfig.NewResolver(newModConfig(""))
 }
 
-func getCachedRegistry() (modload.Registry, error) {
+// getRegistry sets up a registry eagerly, surfacing any configuration
+// errors immediately. Use it for commands which always need the registry.
+func getRegistry() (modconfig.CachedRegistry, error) {
 	return modconfig.NewRegistry(newModConfig(""))
+}
+
+// getLazyRegistry sets up a registry lazily, deferring any configuration
+// errors until the registry is actually used. Use it for commands which
+// may not need to interact with a registry at all, such as when loading
+// and evaluating local files or modules without external dependencies.
+func getLazyRegistry() *modconfig.LazyRegistry {
+	cfg := newModConfig("")
+	return &modconfig.LazyRegistry{New: func() (modconfig.CachedRegistry, error) {
+		return modconfig.NewRegistry(cfg)
+	}}
 }
 
 func newModConfig(registry string) *modconfig.Config {

@@ -657,7 +657,7 @@ func (x *FieldReference) resolve(c *OpContext, state Flags) *Vertex {
 type ValueReference struct {
 	Src     *ast.Ident
 	UpCount int32
-	Label   Feature // for informative purposes
+	Label   Feature // for informative purposes. 0 means self.
 }
 
 func (x *ValueReference) Source() ast.Node {

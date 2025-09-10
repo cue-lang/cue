@@ -14,38 +14,32 @@ env CUE_CACHE_DIR=
 env CUE_CONFIG_DIR=
 
 # Working on standalone files and directories should work without a cache or config.
-# TODO(mvdan): fix the ones that don't work currently.
 exec cue version
 exec cue help
 exec cue fmt standalone/foo.cue
 exec cue fmt ./standalone
-! exec cue export standalone/foo.cue
-cmp stderr ${WORK}/no-cache.${GOOS}.stderr
-! exec cue vet -c standalone/foo.cue
-cmp stderr ${WORK}/no-cache.${GOOS}.stderr
-! exec cue def standalone/foo.cue
-cmp stderr ${WORK}/no-cache.${GOOS}.stderr
+exec cue export standalone/foo.cue
+exec cue vet -c standalone/foo.cue
+exec cue def standalone/foo.cue
 
 # Working on modules without any dependencies should work without cache or config.
-# TODO(mvdan): fix the ones that don't work currently.
 cd localmod
 exec cue mod init mod.test/root
-! exec cue mod tidy
-cmp stderr ${WORK}/no-cache.${GOOS}.stderr
-! exec cue export .
-cmp stderr ${WORK}/no-cache.${GOOS}.stderr
-! exec cue vet -c=false ./...
-cmp stderr ${WORK}/no-cache.${GOOS}.stderr
+exec cue mod tidy
+exec cue export .
+exec cue vet -c=false ./...
 cd ..
 
 # Working on modules with external dependencies does not work without cache or config.
+# Note that we only `cmp stderr` once for the cache directory and then the config directory,
+# as each command adds their own context on top which is not interesting to this test.
 cd depmod
 ! exec cue export .
 cmp stderr ${WORK}/no-cache.${GOOS}.stderr
 ! exec cue mod tidy
-cmp stderr ${WORK}/no-cache.${GOOS}.stderr
+stderr 'cannot determine system cache directory'
 ! exec cue mod get remote.com/bar@v0.2.0
-cmp stderr ${WORK}/no-cache.${GOOS}.stderr
+stderr 'cannot determine system cache directory'
 cd ..
 
 # Trying to publish a module does not work without cache or config.
@@ -53,21 +47,23 @@ cd publishmod
 ! exec cue login
 cmp stderr ${WORK}/no-config.${GOOS}.stderr
 ! exec cue mod publish v0.0.1
-cmp stderr ${WORK}/no-cache.${GOOS}.stderr
+stderr 'cannot determine system cache directory'
 cd ..
 
-# TODO(mvdan): the cache error should give top-level context; why did we need to use the cache?
 # TODO(mvdan): both errors below should mention the cue env var that can be set as well.
 -- no-cache.linux.stderr --
-cannot determine system cache directory: neither $XDG_CACHE_HOME nor $HOME are defined
+mod.test/root@v0: import failed: cannot find package "remote.com/bar": cannot fetch remote.com/bar@v0.1.0: cannot determine system cache directory: neither $XDG_CACHE_HOME nor $HOME are defined:
+    ./foo.cue:3:8
 -- no-config.linux.stderr --
 cannot find the path to store CUE registry logins: cannot determine system config directory: neither $XDG_CONFIG_HOME nor $HOME are defined
 -- no-cache.darwin.stderr --
-cannot determine system cache directory: $HOME is not defined
+mod.test/root@v0: import failed: cannot find package "remote.com/bar": cannot fetch remote.com/bar@v0.1.0: cannot determine system cache directory: $HOME is not defined:
+    ./foo.cue:3:8
 -- no-config.darwin.stderr --
 cannot find the path to store CUE registry logins: cannot determine system config directory: $HOME is not defined
 -- no-cache.windows.stderr --
-cannot determine system cache directory: %LocalAppData% is not defined
+mod.test/root@v0: import failed: cannot find package "remote.com/bar": cannot fetch remote.com/bar@v0.1.0: cannot determine system cache directory: %LocalAppData% is not defined:
+    ./foo.cue:3:8
 -- no-config.windows.stderr --
 cannot find the path to store CUE registry logins: cannot determine system config directory: %AppData% is not defined
 -- standalone/foo.cue --

@@ -20,11 +20,9 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/signal"
 	"runtime"
 	"runtime/pprof"
 	"sync"
-	"syscall"
 	"testing"
 	"time"
 
@@ -299,9 +297,11 @@ func Main() int {
 		// Don't let anything else be printed to stdout; we're only benchmarking.
 		cmd.SetOutput(io.Discard)
 	}
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-	ctx = httplog.ContextWithAllowedURLQueryParams(ctx, allowURLQueryParam)
+	// TODO(mvdan): consider using [os/signal.NotifyContext]
+	ctx := httplog.ContextWithAllowedURLQueryParams(
+		context.Background(),
+		allowURLQueryParam,
+	)
 	if err := cmd.Run(ctx); err != nil {
 		if err != ErrPrintedError {
 			errors.Print(os.Stderr, err, &errors.Config{

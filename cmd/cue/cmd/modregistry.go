@@ -20,6 +20,9 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"cuelabs.dev/go/oci/ociregistry"
@@ -82,7 +85,9 @@ func runModRegistry(cmd *Command, args []string) error {
 		}
 	}()
 
-	<-cmd.Context().Done() // wait for an interrupt
+	sigint := make(chan os.Signal, 1)
+	signal.Notify(sigint, os.Interrupt, syscall.SIGTERM)
+	<-sigint
 
 	ctx, cancal := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancal()

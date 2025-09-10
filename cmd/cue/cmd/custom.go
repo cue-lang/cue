@@ -209,8 +209,16 @@ func doTasks(cmd *Command, command string, root *cue.Instance) error {
 	// capture the nuance of those situations, and ways in which this UX could
 	// be improved.
 
+	ctx := itask.Context{
+		TaskKey: taskKey,
+		Root:    root.Value(),
+		Stdin:   cmd.InOrStdin(),
+		Stdout:  cmd.OutOrStdout(),
+		Stderr:  cmd.OutOrStderr(),
+	}
+
 	var didWork atomic.Bool
-	c := flow.New(cfg, root, newTaskFunc(cmd, &didWork))
+	c := flow.New(cfg, root, ctx.TaskFunc(&didWork))
 
 	// Return early if anything was in error
 	if err := c.Run(cmd.Context()); err != nil {
@@ -292,68 +300,28 @@ var legacyKinds = map[string]string{
 	"testserver": "cmd/cue/cmd.Test",
 }
 
-func newTaskFunc(cmd *Command, didWork *atomic.Bool) flow.TaskFunc {
-	return func(v cue.Value) (flow.Runner, error) {
-		if !isTask(v) {
-			return nil, nil
-		}
-		didWork.Store(true)
-
-		kind, err := v.Lookup("$id").String()
-		if err != nil {
-			// Lookup kind for backwards compatibility.
-			// This should not be supported for cue run.
-			var err1 error
-			kind, err1 = v.Lookup("kind").String()
-			if err1 != nil || legacyKinds[kind] == "" {
-				return nil, errors.Promote(err1, "newTask")
-			}
-		}
-		var isLegacy bool
-		if k, ok := legacyKinds[kind]; ok {
-			kind = k
-			isLegacy = true
-		}
-		rf := itask.Lookup(kind)
-		if rf == nil {
-			return nil, errors.Newf(v.Pos(), "runner of kind %q not found", kind)
-		}
-
-		// Verify entry against template.
-		v = value.UnifyBuiltin(v, kind)
-		if err := v.Err(); err != nil {
-			err = v.Validate()
-			return nil, errors.Promote(err, "newTask")
-		}
-
-		runner, err := rf(v)
-		if err != nil {
-			return nil, errors.Promote(err, "errors running task")
-		}
-
-		return flow.RunnerFunc(func(t *flow.Task) error {
-			obj := t.Value()
-
-			if isLegacy {
-				obj = obj.Unify(v)
-			}
-			c := &itask.Context{
-				Context: t.Context(),
-				Stdin:   cmd.InOrStdin(),
-				Stdout:  cmd.OutOrStdout(),
-				Stderr:  cmd.OutOrStderr(),
-				Obj:     obj,
-			}
-			value, err := runner.Run(c)
-			if err != nil {
-				return err
-			}
-			if value != nil {
-				_ = t.Fill(value)
-			}
-			return nil
-		}), nil
+func taskKey(v cue.Value) (string, error) {
+	if !isTask(v) {
+		return "", nil
 	}
+
+	kind, err := v.Lookup("$id").String()
+	if err != nil {
+		// Lookup kind for backwards compatibility.
+		// This should not be supported for cue run.
+		var err1 error
+		kind, err1 = v.Lookup("kind").String()
+		if err1 != nil || legacyKinds[kind] == "" {
+			return "", errors.Promote(err1, "newTask")
+		}
+	}
+
+	if k, ok := legacyKinds[kind]; ok {
+		kind = k
+		err = itask.ErrLegacy
+	}
+
+	return kind, err
 }
 
 func init() {

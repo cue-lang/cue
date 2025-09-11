@@ -597,6 +597,8 @@ func newMockRegistryOauth(mode string) *httptest.Server {
 		switch mode {
 		case "device-code-expired":
 			writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodeExpired})
+		case "pending-forever":
+			writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodePending})
 		case "pending-success":
 			count := tokenRequestCounter.Add(1)
 			if count == 1 {

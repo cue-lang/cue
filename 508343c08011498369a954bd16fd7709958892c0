@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca024c19_1540df56",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-11T11:00:48Z",
+      "side": 1,
+      "message": "LGTM modulo a few minor suggestions, thanks!",
+      "revId": "508343c08011498369a954bd16fd7709958892c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b8d5889_f6e83723",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-11T11:00:48Z",
+      "side": 1,
+      "message": "```suggestion\n\t// Printer is used internally to detect printing cycles.\n```",
+      "revId": "508343c08011498369a954bd16fd7709958892c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4323739_f37f1e63",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-11T11:00:48Z",
+      "side": 1,
+      "message": "I don\u0027t think you need this: just declare `pos` locally within each branch, which would make it a little easier to understand I think.",
+      "revId": "508343c08011498369a954bd16fd7709958892c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2440f145_90e306b3",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1341,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-11T11:00:48Z",
+      "side": 1,
+      "message": "Despite the TODO, it might be nice to document what it actually is/does, given the opaque field name,",
+      "revId": "508343c08011498369a954bd16fd7709958892c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e167c89f_795ee3da",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-11T11:00:48Z",
+      "side": 1,
+      "message": "document that this is implementing the `format.Printer` interface and what it\u0027s actually doing?",
+      "revId": "508343c08011498369a954bd16fd7709958892c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f569e4b_3954b66b",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-11T11:00:48Z",
+      "side": 1,
+      "message": "```suggestion\n\t\tdst:     make([]byte, 0, 128),\n```\n?",
+      "revId": "508343c08011498369a954bd16fd7709958892c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

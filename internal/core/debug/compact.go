@@ -27,15 +27,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
-type compactPrinter struct {
-	printer
-}
-
-func (w *compactPrinter) string(s string) {
-	w.dst = append(w.dst, s...)
-}
-
-func (w *compactPrinter) node(n adt.Node) {
+func (w *printer) compactNode(n adt.Node) {
 	switch x := n.(type) {
 	case *adt.Vertex:
 		if x.BaseValue == nil || (w.cfg.Raw && !x.IsData()) {

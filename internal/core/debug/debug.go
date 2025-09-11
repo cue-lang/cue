@@ -50,12 +50,7 @@ func AppendNode(dst []byte, i adt.StringIndexer, n adt.Node, config *Config) []b
 	if config == nil {
 		config = &Config{}
 	}
-	p := printer{dst: dst, index: i, cfg: config}
-	if config.Compact {
-		p := compactPrinter{p}
-		p.node(n)
-		return p.dst
-	}
+	p := printer{dst: dst, index: i, cfg: config, compact: config.Compact}
 	p.node(n)
 	return p.dst
 }
@@ -70,10 +65,11 @@ func NodeString(i adt.StringIndexer, n adt.Node, config *Config) string {
 }
 
 type printer struct {
-	dst    []byte
-	index  adt.StringIndexer
-	indent string
-	cfg    *Config
+	dst     []byte
+	index   adt.StringIndexer
+	indent  string
+	cfg     *Config
+	compact bool // copied from config.Compact
 
 	// keep track of vertices to avoid cycles.
 	stack []*adt.Vertex
@@ -86,7 +82,7 @@ type printer struct {
 }
 
 func (w *printer) string(s string) {
-	if len(w.indent) > 0 {
+	if !w.compact && len(w.indent) > 0 {
 		s = strings.Replace(s, "\n", "\n"+w.indent, -1)
 	}
 	w.dst = append(w.dst, s...)
@@ -237,6 +233,10 @@ func (w *printer) arg(n adt.Node) {
 }
 
 func (w *printer) node(n adt.Node) {
+	if w.compact {
+		w.compactNode(n)
+		return
+	}
 	switch x := n.(type) {
 	case *adt.Vertex:
 		x, ok := w.printShared(x)

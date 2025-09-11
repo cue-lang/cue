@@ -1,0 +1,45 @@
+# TODO: none of these should fail
+! exec cue eval -e '#c' x.cue
+# cmp stdout out/stdout-c
+
+! exec cue eval -e 'd' x.cue
+# cmp stdout out/stdout-d
+
+exec cue eval x.cue
+cmp stdout out/stdout
+
+-- x.cue --
+import "struct"
+
+#c: matchN(1, [{
+	a!: _
+	c?: _
+}, {
+	b!: _
+	c?: _
+}]) & {
+	c!: _
+}
+
+d: struct.MinFields(3) & {
+	x!: 4
+	...
+}
+-- out/stdout-c --
+-- out/stdout-d --
+-- out/stdout --
+import "struct"
+
+#c: matchN(1, [{
+    a!: _
+    c?: _
+}, {
+    b!: _
+    c?: _
+}]) & {
+    c!: _
+}
+d: struct.MinFields(3) & {
+    x!: 4
+    ...
+}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "faf9266e_fa43b96f",
+        "filename": "cmd/cue/cmd/root_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-11T15:47:37Z",
+      "side": 1,
+      "message": "nit? It might be worth copying this line from the docs for Exited as it took me a moment to figure this one out:\n\n\u003e On Unix systems this reports true if the program exited due to calling exit, but false if the program terminated due to a signal.",
+      "revId": "940ea83e3c144399fff97b07d456842e10d344c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6031cc62_987bed3e",
+        "filename": "cmd/cue/cmd/root_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-11T15:47:37Z",
+      "side": 1,
+      "message": "This encodes that when leaving gracefully we do `os.Exit(0)` (or just let the main thread finish)? Would it be more obvious to ignore the err from cmd.Wait() and instead directly test the exit code in both the gracefulStderr branch and here?",
+      "revId": "940ea83e3c144399fff97b07d456842e10d344c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

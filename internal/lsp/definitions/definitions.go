@@ -963,6 +963,16 @@ func (n *astNode) eval() {
 		case *ast.EmbedDecl:
 			unprocessed = append(unprocessed, node.Expr)
 
+		case *ast.PostfixExpr:
+			if node.Op == token.ELLIPSIS {
+				unprocessed = append(unprocessed, node.X)
+			} else {
+				// Currently should never happen as Postfix is only used
+				// with ellipses. Just in case that changes, behave the
+				// same as Unary.
+				n.newAstNode(nil, node.X, nil)
+			}
+
 		case *ast.ParenExpr:
 			unprocessed = append(unprocessed, node.X)
 

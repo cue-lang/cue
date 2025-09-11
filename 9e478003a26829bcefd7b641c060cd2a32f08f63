@@ -16,6 +16,24 @@
       "message": "add a comment here? e.g. \"this is unexpected but fall back to something reasonable\". otherwise the if/else seems unnecessary as both branches are the same",
       "revId": "9e478003a26829bcefd7b641c060cd2a32f08f63",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bf256c1_772e2adb",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 970,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-11T10:41:21Z",
+      "side": 1,
+      "message": "I\u0027m an idiot and c+p\u0027d the wrong line. The branches are not meant to be the same. Fixed. And a comment added.",
+      "parentUuid": "4fe436bb_7f0b686a",
+      "revId": "9e478003a26829bcefd7b641c060cd2a32f08f63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

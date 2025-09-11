@@ -1,0 +1,63 @@
+# Issue #4029
+# Issue #4079
+
+
+# TODO: none of these should fail
+! exec cue eval -e '#c' issue4079.cue
+# cmp stdout out/stdout-c
+
+! exec cue eval -e 'd' issue4079.cue
+# cmp stdout out/stdout-d
+
+exec cue eval issue4079.cue
+cmp stdout out/stdout-4079
+
+! exec cue eval issue4029.cue
+cmp stdout out/stdout-4029
+
+-- issue4079.cue --
+import "struct"
+
+#c: matchN(1, [{
+	a!: _
+	c?: _
+}, {
+	b!: _
+	c?: _
+}]) & {
+	c!: _
+}
+
+d: struct.MinFields(3) & {
+	x!: 4
+	...
+}
+-- issue4029.cue --
+#Suffix:      string
+#MaybeSuffix: ""
+
+if len(#Suffix) > 0 {
+	#MaybeSuffix: "-\(#Suffix)"
+}
+
+ConfigMap: "\(#MaybeSuffix)"
+
+-- out/stdout-c --
+-- out/stdout-d --
+-- out/stdout-4079 --
+import "struct"
+
+#c: matchN(1, [{
+    a!: _
+    c?: _
+}, {
+    b!: _
+    c?: _
+}]) & {
+    c!: _
+}
+d: struct.MinFields(3) & {
+    x!: 4
+    ...
+}
+-- out/stdout-4029 --

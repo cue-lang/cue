@@ -15,6 +15,8 @@
 package cmd
 
 import (
+	"time"
+
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/encoding/gotypes"
 
@@ -36,7 +38,21 @@ as the objective is to gain experience and then move the feature elsewhere.
 `[1:],
 	})
 
+	// Commands to some day promote out of `cue exp`.
 	cmd.AddCommand(newExpGenGoTypesCmd(c))
+
+	// Hidden commands which are only meant for integration tests.
+	cmd.AddCommand(&cobra.Command{
+		// Hang forever, disregarding context cancellation when SIGINT is received.
+		// Used to test that cmd/cue still exits in such a scenario.
+		Use:    "internal-hang",
+		Hidden: true,
+		Run: func(cmd *cobra.Command, args []string) {
+			// We don't do e.g. an empty select, as that can cause the runtime
+			// to panic due to the detected deadlock.
+			time.Sleep(time.Hour)
+		},
+	})
 	return cmd
 }
 

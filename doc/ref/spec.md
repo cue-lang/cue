@@ -270,12 +270,12 @@ The following character sequences represent operators and punctuation:
 
 ```
 +     &&    ==    <     =     (     )
--     ||    !=    >     :     {     }
+-     ||    !=    >     :     {     }     ~
 *     &     =~    <=    ?     [     ]     ,
 /     |     !~    >=    !     _|_   ...   .
 ```
 <!--
-Free tokens:  ; ~ ^
+Free tokens:  ; % ^
 // To be used:
   @   at: associative lists.
 
@@ -1050,11 +1050,11 @@ the result of which is the unification of all those fields.
 StructLit       = "{" { Declaration "," } "}" .
 Declaration     = Field | Ellipsis | Embedding | LetClause | attribute .
 Ellipsis        = "..." [ Expression ] .
-Embedding       = Comprehension | AliasExpr .
-Field           = Label ":" { Label ":" } AliasExpr { attribute } .
-Label           = [ identifier "=" ] LabelExpr .
-LabelExpr       = LabelName [ "?" | "!" ] | "[" AliasExpr "]" .
-LabelName       = identifier | simple_string_lit | "(" AliasExpr ")" .
+Embedding       = Comprehension | Expr .
+Field           = Label ":" { Label ":" } Expr { attribute } .
+Label           = LabelExpr [ Alias ] .
+LabelExpr       = LabelName [ "?" | "!" ] | "[" Expr "]" .
+LabelName       = identifier | simple_string_lit | "(" Expr ")" .
 
 attribute       = "@" identifier "(" attr_tokens ")" .
 attr_tokens     = { attr_token |
@@ -1573,56 +1573,49 @@ Combined: myStruct1 & myStruct2
 
 #### Aliases
 
-Aliases name values that can be referred to
+Aliases bind identifiers to a field or its name that can be referred to
 within the [scope](#declarations-and-scopes) in which they are declared.
 The name of an alias must be unique within its scope.
 
 ```
-AliasExpr  = [ identifier "=" ] Expression .
+Alias  = "~" ( identifier | "(" ( identifier | "_" ) "," ( identifier | "_" ) ")" ) .
 ```
 
-Aliases can appear in several positions:
+The alias is specified using a postfix `~` operator after a label. A single
+identifier after `~` creates an alias referring to the field value, while the
+dual form `~(K,V)` creates two aliases: one for the label and one for the field
+value. Either position in the dual form can use `_` (blank identifier) to skip
+binding that alias.
 
-<!--- TODO: consider allowing this. It should be considered whether
-having field aliases isn't already sufficient.
+Aliases resolve as follows:
 
-As a declaration in a struct (`X=value`):
+After a label (`label~V: value` or `label~(K,V): value`):
 
-- binds identifier `X` to a value embedded within the struct.
---->
+- binds the identifier `V` to the field itself (not its value).
+- binds the identifier `K` to the label.
 
-In front of a Label (`X=label: value`):
+After a dynamic field (`(label)~V: value` or `(label)~(K,V): value`):
 
-- binds the identifier to the same value as `label` would be bound
-  to if it were a valid identifier.
+- binds the identifier `V` to the field itself.
+- binds the identifier `K` to the concrete label resulting from evaluating `label`.
+- the same semantics applies when binding to an interpolated string label.
 
-In front of a dynamic field (`X=(label): value`):
+After a pattern constraint (`[expr]~V: value` or `[expr]~(K,V): value`):
 
-- binds the identifier to the same value as `label` if it were a valid
-  static identifier.
-
-In front of a dynamic field expression (`(X=expr): value`):
-
-- binds the identifier to the concrete label resulting from evaluating `expr`.
-
-In front of a pattern constraint (`X=[expr]: value`):
-
-- binds the identifier to the same field as the matched by the pattern
-  within the instance of the field value (`value`).
-
-In front of a pattern constraint expression (`[X=expr]: value`):
-
-- binds the identifier to the concrete label that matches `expr`
+- binds the identifier `V` to the field matched by the pattern
+  within the scope of that field's value (`value`).
+- binds the identifier `K` to the concrete label that matches `expr`
   within the instances of the field value (`value`).
 
-Before a value (`foo: X=x`)
+Note that aliases are equivalent to referring to the field by name.
+Use `self` to refer to a field's value directly.
 
-- binds the identifier to the value it precedes within the scope of that value.
-
-Before a list element (`[ X=value, X+1 ]`) (Not yet implemented)
-
-- binds the identifier to the list element it precedes within the scope of the
-  list expression.
+```
+foo: {
+    let X = self
+    // X refers to the value of foo
+}
+```
 
 <!-- TODO: explain the difference between aliases and definitions.
      Now that you have definitions, are aliases really necessary?
@@ -1632,18 +1625,33 @@ Before a list element (`[ X=value, X+1 ]`) (Not yet implemented)
 ```
 // A field alias
 foo: X  // 4
-X="not an identifier": 4
+"not an identifier"~X: 4
 
-// A value alias
-foo: X={x: X.a}
+// A field alias example
+foo~F: {
+    x: F.a
+}
 bar: foo & {a: 1}  // {a: 1, x: 1}
 
-// A label alias
-[Y=string]: { name: Y }
-foo: { value: 1 } // outputs: foo: { name: "foo", value: 1 }
+// A label alias with dual form
+[string]~(K,V): { name: K, add1: V.value+1 }
+foo: { value: 1 } // outputs: foo: { name: "foo", value: 1, add1: 2 }
+
+// Using _ to bind only the label
+a~(K,_): { foo: 1 }
+b: K  // "a"
+
+// Using _ to bind only the field
+a~(_,V): { foo: 1 }
+b: V.foo + 2  // 3
+
+// Dynamic field with dual form
+("my" + "Field")~(K,V): { label: K, foo: 42 }
+value: V.foo,
+// outputs: {myField: { label: "myField", value: 42 }, value: 42}
 ```
 
-<!-- TODO: also allow aliases as lists -->
+<!-- TODO: also allow aliases in lists -->
 
 
 #### Let declarations
@@ -1658,6 +1666,17 @@ let x = expr
 
 a: x + 1
 b: x + 2
+```
+
+Let declarations are commonly used with the [`self`](#self-from-v0150) keyword
+to create value aliases:
+
+```
+foo: {
+    let V = self
+    x: V.a
+    y: V.b
+}
 ```
 
 #### Shorthand notation for nested structs
@@ -1830,7 +1849,7 @@ of the predefined identifier, prefixed with `__`.
 
 ```
 Functions
-len close and or
+len close and or, for more see builtins
 
 Types
 null      The null type and value
@@ -1839,6 +1858,8 @@ int       All integral numbers
 float     All decimal floating-point numbers
 string    Any valid UTF-8 sequence
 bytes     Any valid byte sequence
+
+self      Refers to the inner scope
 
 Derived   Value
 number    int | float
@@ -2013,7 +2034,34 @@ d: b.greeting  // "Hello, world!"
 e: c.greeting  // "Hello, you!"
 ```
 
+#### `self` (from v0.15.0)
 
+The [predeclared identifier](#predeclared-identifiers) `self` and `__self` refer
+to the innermost struct or list, or the top level if none exist.
+
+```
+a: {
+    b: {
+        c: self.d // refers to value of a.b.d (1)
+        d: 1
+    }
+    d: self // refers to value of a (cyclic)
+}
+e: self // refers to top level (cyclic)
+
+// lists
+f: [ 1, 2, self[0] ]  // refers to value of f[0]
+
+// implicit scope
+g: x: self // refers to value of g
+
+// naming using let
+let X = self
+h: a: b: c: X.f[0] // refers to the value of f[0] (1)
+
+// predeclared identifier redeclared
+i: self: x: y: z: self // refers to value of i.self (self redefined)
+```
 
 ### Primary expressions
 

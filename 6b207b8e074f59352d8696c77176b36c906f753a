@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3e69d2a_6bc5ebb1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-11T11:11:20Z",
+      "side": 1,
+      "message": "I\u0027m not convinced by the API-breaking change - is it really needed, or just a convenience? If the latter, I think it would be better to leave the signature as-is.",
+      "revId": "6b207b8e074f59352d8696c77176b36c906f753a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd091824_ae3a2430",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-11T11:11:20Z",
+      "side": 1,
+      "message": "This is a backwardly incompatible change. Are we sure we want to do it? I suspect it would be better not.",
+      "revId": "6b207b8e074f59352d8696c77176b36c906f753a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -178,6 +178,12 @@ func (n *nodeContext) disjunctError() (errs errors.Error) {
 	ctx := n.ctx
 
 	disjuncts := selectErrors(n.disjunctErrs)
+	var pos errors.Error
+
+	if len(n.userErrs) > 0 {
+		pos = disjuncts
+		disjuncts = selectErrors(n.userErrs)
+	}
 
 	if disjuncts == nil {
 		errs = ctx.Newf("empty disjunction") // XXX: add space to sort first
@@ -185,14 +191,26 @@ func (n *nodeContext) disjunctError() (errs errors.Error) {
 		disjuncts = errors.Sanitize(disjuncts)
 		k := len(errors.Errors(disjuncts))
 		if k == 1 {
+			if pos != nil {
+				addDisjunctPositions(disjuncts.(*ValueError), pos)
+			}
 			return disjuncts
 		}
 		// prefix '-' to sort to top
 		errs = ctx.Newf("%d errors in empty disjunction:", k)
+		if pos != nil {
+			addDisjunctPositions(errs.(*ValueError), pos)
+		}
 		errs = errors.Append(errs, disjuncts)
 	}
 
 	return errs
+}
+
+func addDisjunctPositions(dst *ValueError, src errors.Error) {
+	for _, p := range src.InputPositions() {
+		dst.AddPos(p)
+	}
 }
 
 func selectErrors(a []*Bottom) (errs errors.Error) {

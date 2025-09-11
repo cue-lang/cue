@@ -315,7 +315,11 @@ func (v *ValueError) AddPosition(n Node) {
 	if n == nil {
 		return
 	}
-	if p := pos(n); p != token.NoPos {
+	v.AddPos(pos(n))
+}
+
+func (v *ValueError) AddPos(p token.Pos) {
+	if p != token.NoPos {
 		for _, q := range v.auxpos {
 			if p == q {
 				return

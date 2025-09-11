@@ -326,6 +326,7 @@ type nodeContext struct {
 	// TODO: come up with a better name.
 	disjuncts    []*nodeContext
 	disjunctErrs []*Bottom
+	userErrs     []*Bottom
 
 	// hasDisjunction marks wither any disjunct was added. It is listed here
 	// instead of in nodeContextState as it should be cleared when a disjunction
@@ -504,6 +505,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			reqSets:         n.reqSets[:0],
 			disjunctions:    n.disjunctions[:0],
 			disjunctErrs:    n.disjunctErrs[:0],
+			userErrs:        n.userErrs[:0],
 			disjuncts:       n.disjuncts[:0],
 		}
 		n.scheduler.clear()

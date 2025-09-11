@@ -233,16 +233,16 @@ NumCloseIDs: 14
     }
   }
   #GlobalIngressController: (_|_){
-    // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(invalid interpolation: #GlobalIngressController.objects.namespaced.ingress.Service: non-concrete value string (type string)):
+    // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(#GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string)):
     //     ./issue2235.cue:43:12
     class: (string){ string }
     objects: (#struct){
       namespaced: (#struct){
         ingress: (_|_){
-          // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(invalid interpolation: #GlobalIngressController.objects.namespaced.ingress.Service: non-concrete value string (type string)):
+          // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(#GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string)):
           //     ./issue2235.cue:43:12
           Service: (_|_){
-            // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(invalid interpolation: #GlobalIngressController.objects.namespaced.ingress.Service: non-concrete value string (type string)):
+            // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(#GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string)):
             //     ./issue2235.cue:43:12
           }
         }
@@ -343,7 +343,7 @@ diff old new
    }
    #GlobalIngressController: (_|_){
 -    // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
-+    // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(invalid interpolation: #GlobalIngressController.objects.namespaced.ingress.Service: non-concrete value string (type string)):
++    // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(#GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string)):
      //     ./issue2235.cue:43:12
 -    //     ./issue2235.cue:40:9
      class: (string){ string }
@@ -351,12 +351,12 @@ diff old new
        namespaced: (#struct){
          ingress: (_|_){
 -          // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
-+          // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(invalid interpolation: #GlobalIngressController.objects.namespaced.ingress.Service: non-concrete value string (type string)):
++          // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(#GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string)):
            //     ./issue2235.cue:43:12
 -          //     ./issue2235.cue:40:9
            Service: (_|_){
 -            // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
-+            // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(invalid interpolation: #GlobalIngressController.objects.namespaced.ingress.Service: non-concrete value string (type string)):
++            // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(#GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string)):
              //     ./issue2235.cue:43:12
 -            //     ./issue2235.cue:40:9
            }

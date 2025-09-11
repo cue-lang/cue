@@ -187,7 +187,7 @@ Result:
           // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
           //     ./in.cue:59:8
           //     ./in.cue:59:11
-          // noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(invalid interpolation: noCycleError.foo.baz.#ID: non-concrete value string (type string)):
+          // noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string)):
           //     ./in.cue:61:22
         }
         #ID: (_|_){
@@ -261,7 +261,7 @@ diff old new
            // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
            //     ./in.cue:59:8
            //     ./in.cue:59:11
-+          // noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(invalid interpolation: noCycleError.foo.baz.#ID: non-concrete value string (type string)):
++          // noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string)):
 +          //     ./in.cue:61:22
          }
          #ID: (_|_){

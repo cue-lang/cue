@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fe436bb_7f0b686a",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 970,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-11T10:36:51Z",
+      "side": 1,
+      "message": "add a comment here? e.g. \"this is unexpected but fall back to something reasonable\". otherwise the if/else seems unnecessary as both branches are the same",
+      "revId": "9e478003a26829bcefd7b641c060cd2a32f08f63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

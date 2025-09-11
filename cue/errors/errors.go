@@ -487,7 +487,7 @@ func (p list) Err() error {
 type Config struct {
 	// Format formats the given string and arguments and writes it to w.
 	// It is used for all printing.
-	Format func(w io.Writer, format string, args ...interface{})
+	Format func(w io.Writer, format string, args ...interface{}) (n int, err error)
 
 	// Cwd is the current working directory. Filename positions are taken
 	// relative to this path.
@@ -532,6 +532,11 @@ func writeErr(w io.Writer, err Error, cfg *Config) {
 		_, _ = io.WriteString(w, ": ")
 	}
 
+	fprintf := defaultFprintf
+	if cfg.Format != nil {
+		fprintf = cfg.Format
+	}
+
 	for {
 		u := errors.Unwrap(err)
 
@@ -561,7 +566,7 @@ func writeErr(w io.Writer, err Error, cfg *Config) {
 			args[i] = pos
 		}
 
-		n, _ := fmt.Fprintf(w, msg, args...)
+		n, _ := fprintf(w, msg, args...)
 
 		if u == nil {
 			break
@@ -578,8 +583,8 @@ func writeErr(w io.Writer, err Error, cfg *Config) {
 	}
 }
 
-func defaultFprintf(w io.Writer, format string, args ...interface{}) {
-	fmt.Fprintf(w, format, args...)
+func defaultFprintf(w io.Writer, format string, args ...interface{}) (n int, err error) {
+	return fmt.Fprintf(w, format, args...)
 }
 
 func printError(w io.Writer, err error, cfg *Config) {

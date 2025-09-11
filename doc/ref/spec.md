@@ -1829,7 +1829,7 @@ of the predefined identifier, prefixed with `__`.
 
 ```
 Functions
-len close and or
+len close and or, for more see builtins
 
 Types
 null      The null type and value
@@ -1838,6 +1838,8 @@ int       All integral numbers
 float     All decimal floating-point numbers
 string    Any valid UTF-8 sequence
 bytes     Any valid byte sequence
+
+self      Refers to the inner scope
 
 Derived   Value
 number    int | float
@@ -2012,7 +2014,34 @@ d: b.greeting  // "Hello, world!"
 e: c.greeting  // "Hello, you!"
 ```
 
+#### `self` (from v0.15.0)
 
+The [predeclared identifier](#predeclared-identifiers) `self` and `__self` refer
+to the innermost struct or list, or the top level if none exist.
+
+```
+a: {
+    b: {
+        c: self.d // refers to value of a.b.d (1)
+        d: 1
+    }
+    d: self // refers to value of a (cyclic)
+}
+e: self // refers to top level (cyclic)
+
+// lists
+f: [ 1, 2, self[0] ]  // refers to value of f[0]
+
+// implicit scope
+g: x: self // refers to value of g
+
+// naming using let
+let X = self
+h: a: b: c: X.f[0] // refers to the value of f[0] (1)
+
+// predeclared identifier redeclared
+i: self: x: y: z: self // refers to value of i.self (self redefined)
+```
 
 ### Primary expressions
 

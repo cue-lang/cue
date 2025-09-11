@@ -25,10 +25,21 @@ indirect: {
 	x: error
 	y: x("msg")
 }
--- issue4001.cue --
+-- issues.cue --
 issue4001: {
 	a: "b"
 	a: int | error("error: "+"a='\(a)'")
+}
+issue3983: {
+	x: int | error("I wanted an integer")
+	x: >10 | error("I wanted more than 10")
+	x: <20 | error("I wanted less than 20")
+
+	x: 3
+}
+issue3984: {
+	v: "a" | error("must be a")
+	v: "b"
 }
 -- out/eval/stats --
 Leaks:  0
@@ -42,6 +53,7 @@ Conjuncts:    38
 Disjuncts:    30
 -- out/evalalpha --
 Errors:
+issue3983.x: 2 errors in empty disjunction:
 selection.twoUserErrors: 2 errors in empty disjunction:
 selection.useUserError: use me:
     ./in.cue:4:22
@@ -52,11 +64,18 @@ selection.twoUserErrors: error two:
 indirect.y: msg:
     ./in.cue:22:5
 issue4001.a: error: a='b':
-    ./issue4001.cue:3:11
+    ./issues.cue:3:11
+issue3983.x: invalid value 3 (out of bound >10):
+    ./issues.cue:7:5
+    ./issues.cue:10:5
+issue3983.x: I wanted less than 20:
+    ./issues.cue:8:11
+issue3984.v: must be a:
+    ./issues.cue:13:11
 
 Result:
 (_|_){
-  // [user]
+  // [eval]
   selection: (_|_){
     // [user]
     dropError: (int){ 1 }
@@ -105,7 +124,25 @@ Result:
     // [user]
     a: (_|_){
       // [user] issue4001.a: error: a='b':
-      //     ./issue4001.cue:3:11
+      //     ./issues.cue:3:11
+    }
+  }
+  issue3983: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval] issue3983.x: 2 errors in empty disjunction:
+      // issue3983.x: invalid value 3 (out of bound >10):
+      //     ./issues.cue:7:5
+      //     ./issues.cue:10:5
+      // issue3983.x: I wanted less than 20:
+      //     ./issues.cue:8:11
+    }
+  }
+  issue3984: (_|_){
+    // [user]
+    v: (_|_){
+      // [user] issue3984.v: must be a:
+      //     ./issues.cue:13:11
     }
   }
 }
@@ -113,7 +150,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,5 @@
+@@ -1,12 +1,6 @@
  Errors:
 -selection.twoUserErrors: 3 errors in empty disjunction:
 -selection.twoUserErrors: conflicting values 2 and 1:
@@ -123,20 +160,30 @@ diff old new
 -selection.useUserError: conflicting values 2 and 1:
 -    ./in.cue:4:16
 -    ./in.cue:4:18
++issue3983.x: 2 errors in empty disjunction:
 +selection.twoUserErrors: 2 errors in empty disjunction:
  selection.useUserError: use me:
      ./in.cue:4:22
  selection.twoUserErrors: error one:
-@@ -15,6 +8,8 @@
+@@ -15,26 +9,28 @@
      ./in.cue:6:44
  indirect.y: msg:
      ./in.cue:22:5
 +issue4001.a: error: a='b':
-+    ./issue4001.cue:3:11
++    ./issues.cue:3:11
++issue3983.x: invalid value 3 (out of bound >10):
++    ./issues.cue:7:5
++    ./issues.cue:10:5
++issue3983.x: I wanted less than 20:
++    ./issues.cue:8:11
++issue3984.v: must be a:
++    ./issues.cue:13:11
  
  Result:
  (_|_){
-@@ -23,18 +18,11 @@
+-  // [user]
++  // [eval]
+   selection: (_|_){
      // [user]
      dropError: (int){ 1 }
      useUserError: (_|_){
@@ -157,7 +204,7 @@ diff old new
        // selection.twoUserErrors: error one:
        //     ./in.cue:6:23
        // selection.twoUserErrors: error two:
-@@ -42,11 +30,7 @@
+@@ -42,11 +38,7 @@
      }
      x: (int){ int }
      dropIncomplete: (_|_){
@@ -170,7 +217,7 @@ diff old new
        //     ./in.cue:9:26
      }
    }
-@@ -56,20 +40,11 @@
+@@ -56,20 +48,11 @@
      }
      world: (string){ "world" }
      substituteAll: (_|_){
@@ -193,6 +240,33 @@ diff old new
        //     ./in.cue:18:41
        //     ./in.cue:13:9
        //     ./in.cue:18:77
+@@ -87,7 +70,25 @@
+     // [user]
+     a: (_|_){
+       // [user] issue4001.a: error: a='b':
+-      //     ./issue4001.cue:3:11
++      //     ./issues.cue:3:11
++    }
++  }
++  issue3983: (_|_){
++    // [eval]
++    x: (_|_){
++      // [eval] issue3983.x: 2 errors in empty disjunction:
++      // issue3983.x: invalid value 3 (out of bound >10):
++      //     ./issues.cue:7:5
++      //     ./issues.cue:10:5
++      // issue3983.x: I wanted less than 20:
++      //     ./issues.cue:8:11
++    }
++  }
++  issue3984: (_|_){
++    // [user]
++    v: (_|_){
++      // [user] issue3984.v: must be a:
++      //     ./issues.cue:13:11
+     }
+   }
+ }
 -- out/eval --
 Errors:
 selection.twoUserErrors: 3 errors in empty disjunction:
@@ -310,10 +384,20 @@ Result:
     y: 〈0;x〉("msg")
   }
 }
---- issue4001.cue
+--- issues.cue
 {
   issue4001: {
     a: "b"
     a: (int|error(("error: " + "a='\(〈0;a〉)'")))
+  }
+  issue3983: {
+    x: (int|error("I wanted an integer"))
+    x: (>10|error("I wanted more than 10"))
+    x: (<20|error("I wanted less than 20"))
+    x: 3
+  }
+  issue3984: {
+    v: ("a"|error("must be a"))
+    v: "b"
   }
 }

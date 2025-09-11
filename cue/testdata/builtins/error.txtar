@@ -25,6 +25,16 @@ indirect: {
 	x: error
 	y: x("msg")
 }
+-- incomplete.cue --
+import "struct"
+
+// The user error should not alter the type of error.
+minFields: struct.MinFields(2) | error("should remain incomplete")
+maxFields: a: 1
+
+multi: struct.MinFields(2) | error("should remain incomplete") | error("second")
+multi: a: 1
+
 -- issues.cue --
 issue4001: {
 	a: "b"
@@ -53,10 +63,16 @@ Conjuncts:    38
 Disjuncts:    30
 -- out/evalalpha --
 Errors:
-issue3983.x: 2 errors in empty disjunction:
-selection.twoUserErrors: 2 errors in empty disjunction:
+issue3983.x: 2 errors in empty disjunction::
+    ./issues.cue:7:5
+    ./issues.cue:10:5
+selection.twoUserErrors: 2 errors in empty disjunction::
+    ./in.cue:6:17
+    ./in.cue:6:19
 selection.useUserError: use me:
     ./in.cue:4:22
+    ./in.cue:4:16
+    ./in.cue:4:18
 selection.twoUserErrors: error one:
     ./in.cue:6:23
 selection.twoUserErrors: error two:
@@ -65,26 +81,33 @@ indirect.y: msg:
     ./in.cue:22:5
 issue4001.a: error: a='b':
     ./issues.cue:3:11
-issue3983.x: invalid value 3 (out of bound >10):
-    ./issues.cue:7:5
-    ./issues.cue:10:5
-issue3983.x: I wanted less than 20:
-    ./issues.cue:8:11
+    ./issues.cue:2:5
+    ./issues.cue:3:5
+issue3983.x: I wanted an integer:
+    ./issues.cue:6:11
+issue3983.x: I wanted more than 10:
+    ./issues.cue:7:11
 issue3984.v: must be a:
     ./issues.cue:13:11
+    ./issues.cue:13:5
+    ./issues.cue:14:5
 
 Result:
 (_|_){
   // [eval]
   selection: (_|_){
-    // [user]
+    // [eval]
     dropError: (int){ 1 }
     useUserError: (_|_){
-      // [user] selection.useUserError: use me:
+      // [eval] selection.useUserError: use me:
       //     ./in.cue:4:22
+      //     ./in.cue:4:16
+      //     ./in.cue:4:18
     }
     twoUserErrors: (_|_){
-      // [user] selection.twoUserErrors: 2 errors in empty disjunction:
+      // [eval] selection.twoUserErrors: 2 errors in empty disjunction::
+      //     ./in.cue:6:17
+      //     ./in.cue:6:19
       // selection.twoUserErrors: error one:
       //     ./in.cue:6:23
       // selection.twoUserErrors: error two:
@@ -94,6 +117,7 @@ Result:
     dropIncomplete: (_|_){
       // [incomplete] selection.dropIncomplete: user msg: x + 1 failed:
       //     ./in.cue:9:26
+      //     ./in.cue:8:5
     }
   }
   interpolation: (struct){
@@ -120,29 +144,49 @@ Result:
       //     ./in.cue:22:5
     }
   }
+  minFields: (struct){ struct.MinFields(2) }
+  maxFields: (struct){
+    a: (int){ 1 }
+  }
+  multi: (_|_){
+    // [incomplete] multi: 2 errors in empty disjunction::
+    //     ./incomplete.cue:7:8
+    //     ./incomplete.cue:7:25
+    //     ./incomplete.cue:8:8
+    // multi: should remain incomplete:
+    //     ./incomplete.cue:7:30
+    // multi: second:
+    //     ./incomplete.cue:7:66
+    a: (int){ 1 }
+  }
   issue4001: (_|_){
-    // [user]
+    // [eval]
     a: (_|_){
-      // [user] issue4001.a: error: a='b':
+      // [eval] issue4001.a: error: a='b':
       //     ./issues.cue:3:11
+      //     ./issues.cue:2:5
+      //     ./issues.cue:3:5
     }
   }
   issue3983: (_|_){
     // [eval]
     x: (_|_){
-      // [eval] issue3983.x: 2 errors in empty disjunction:
-      // issue3983.x: invalid value 3 (out of bound >10):
+      // [eval] issue3983.x: 2 errors in empty disjunction::
       //     ./issues.cue:7:5
       //     ./issues.cue:10:5
-      // issue3983.x: I wanted less than 20:
-      //     ./issues.cue:8:11
+      // issue3983.x: I wanted an integer:
+      //     ./issues.cue:6:11
+      // issue3983.x: I wanted more than 10:
+      //     ./issues.cue:7:11
     }
   }
   issue3984: (_|_){
-    // [user]
+    // [eval]
     v: (_|_){
-      // [user] issue3984.v: must be a:
+      // [eval] issue3984.v: must be a:
       //     ./issues.cue:13:11
+      //     ./issues.cue:13:5
+      //     ./issues.cue:14:5
     }
   }
 }
@@ -150,61 +194,70 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,6 @@
+@@ -1,14 +1,14 @@
  Errors:
 -selection.twoUserErrors: 3 errors in empty disjunction:
 -selection.twoUserErrors: conflicting values 2 and 1:
--    ./in.cue:6:17
--    ./in.cue:6:19
++issue3983.x: 2 errors in empty disjunction::
++    ./issues.cue:7:5
++    ./issues.cue:10:5
++selection.twoUserErrors: 2 errors in empty disjunction::
+     ./in.cue:6:17
+     ./in.cue:6:19
 -selection.useUserError: 2 errors in empty disjunction:
 -selection.useUserError: conflicting values 2 and 1:
 -    ./in.cue:4:16
 -    ./in.cue:4:18
-+issue3983.x: 2 errors in empty disjunction:
-+selection.twoUserErrors: 2 errors in empty disjunction:
  selection.useUserError: use me:
      ./in.cue:4:22
++    ./in.cue:4:16
++    ./in.cue:4:18
  selection.twoUserErrors: error one:
-@@ -15,26 +9,28 @@
+     ./in.cue:6:23
+ selection.twoUserErrors: error two:
+@@ -15,24 +15,33 @@
      ./in.cue:6:44
  indirect.y: msg:
      ./in.cue:22:5
 +issue4001.a: error: a='b':
 +    ./issues.cue:3:11
-+issue3983.x: invalid value 3 (out of bound >10):
-+    ./issues.cue:7:5
-+    ./issues.cue:10:5
-+issue3983.x: I wanted less than 20:
-+    ./issues.cue:8:11
++    ./issues.cue:2:5
++    ./issues.cue:3:5
++issue3983.x: I wanted an integer:
++    ./issues.cue:6:11
++issue3983.x: I wanted more than 10:
++    ./issues.cue:7:11
 +issue3984.v: must be a:
 +    ./issues.cue:13:11
++    ./issues.cue:13:5
++    ./issues.cue:14:5
  
  Result:
  (_|_){
 -  // [user]
 +  // [eval]
    selection: (_|_){
-     // [user]
+-    // [user]
++    // [eval]
      dropError: (int){ 1 }
      useUserError: (_|_){
 -      // [user] selection.useUserError: 2 errors in empty disjunction:
 -      // selection.useUserError: conflicting values 2 and 1:
--      //     ./in.cue:4:16
--      //     ./in.cue:4:18
++      // [eval] selection.useUserError: use me:
++      //     ./in.cue:4:22
+       //     ./in.cue:4:16
+       //     ./in.cue:4:18
 -      // selection.useUserError: use me:
-+      // [user] selection.useUserError: use me:
-       //     ./in.cue:4:22
+-      //     ./in.cue:4:22
      }
      twoUserErrors: (_|_){
 -      // [user] selection.twoUserErrors: 3 errors in empty disjunction:
 -      // selection.twoUserErrors: conflicting values 2 and 1:
--      //     ./in.cue:6:17
--      //     ./in.cue:6:19
-+      // [user] selection.twoUserErrors: 2 errors in empty disjunction:
++      // [eval] selection.twoUserErrors: 2 errors in empty disjunction::
+       //     ./in.cue:6:17
+       //     ./in.cue:6:19
        // selection.twoUserErrors: error one:
-       //     ./in.cue:6:23
-       // selection.twoUserErrors: error two:
-@@ -42,11 +38,7 @@
+@@ -42,12 +51,9 @@
      }
      x: (int){ int }
      dropIncomplete: (_|_){
@@ -215,9 +268,11 @@ diff old new
 -      // selection.dropIncomplete: user msg: x + 1 failed:
 +      // [incomplete] selection.dropIncomplete: user msg: x + 1 failed:
        //     ./in.cue:9:26
++      //     ./in.cue:8:5
      }
    }
-@@ -56,20 +48,11 @@
+   interpolation: (struct){
+@@ -56,20 +62,11 @@
      }
      world: (string){ "world" }
      substituteAll: (_|_){
@@ -240,30 +295,56 @@ diff old new
        //     ./in.cue:18:41
        //     ./in.cue:13:9
        //     ./in.cue:18:77
-@@ -87,7 +70,25 @@
-     // [user]
+@@ -83,11 +80,49 @@
+       //     ./in.cue:22:5
+     }
+   }
++  minFields: (struct){ struct.MinFields(2) }
++  maxFields: (struct){
++    a: (int){ 1 }
++  }
++  multi: (_|_){
++    // [incomplete] multi: 2 errors in empty disjunction::
++    //     ./incomplete.cue:7:8
++    //     ./incomplete.cue:7:25
++    //     ./incomplete.cue:8:8
++    // multi: should remain incomplete:
++    //     ./incomplete.cue:7:30
++    // multi: second:
++    //     ./incomplete.cue:7:66
++    a: (int){ 1 }
++  }
+   issue4001: (_|_){
+-    // [user]
++    // [eval]
      a: (_|_){
-       // [user] issue4001.a: error: a='b':
+-      // [user] issue4001.a: error: a='b':
 -      //     ./issue4001.cue:3:11
++      // [eval] issue4001.a: error: a='b':
 +      //     ./issues.cue:3:11
++      //     ./issues.cue:2:5
++      //     ./issues.cue:3:5
 +    }
 +  }
 +  issue3983: (_|_){
 +    // [eval]
 +    x: (_|_){
-+      // [eval] issue3983.x: 2 errors in empty disjunction:
-+      // issue3983.x: invalid value 3 (out of bound >10):
++      // [eval] issue3983.x: 2 errors in empty disjunction::
 +      //     ./issues.cue:7:5
 +      //     ./issues.cue:10:5
-+      // issue3983.x: I wanted less than 20:
-+      //     ./issues.cue:8:11
++      // issue3983.x: I wanted an integer:
++      //     ./issues.cue:6:11
++      // issue3983.x: I wanted more than 10:
++      //     ./issues.cue:7:11
 +    }
 +  }
 +  issue3984: (_|_){
-+    // [user]
++    // [eval]
 +    v: (_|_){
-+      // [user] issue3984.v: must be a:
++      // [eval] issue3984.v: must be a:
 +      //     ./issues.cue:13:11
++      //     ./issues.cue:13:5
++      //     ./issues.cue:14:5
      }
    }
  }
@@ -382,6 +463,17 @@ Result:
   indirect: {
     x: error
     y: 〈0;x〉("msg")
+  }
+}
+--- incomplete.cue
+{
+  minFields: (〈import;struct〉.MinFields(2)|error("should remain incomplete"))
+  maxFields: {
+    a: 1
+  }
+  multi: (〈import;struct〉.MinFields(2)|error("should remain incomplete")|error("second"))
+  multi: {
+    a: 1
   }
 }
 --- issues.cue

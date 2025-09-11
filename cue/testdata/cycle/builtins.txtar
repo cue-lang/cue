@@ -254,19 +254,34 @@ issue3634: reduced: {
 	}
 	out: len(#D & list.Repeat([#D & { a: b: 1 }], 1)[0])
 }
+-- issue3743.cue --
+import "encoding/yaml"
+
+issue3743: {
+	#transform: {
+	    in: _
+	    out: [
+	        if false {out}, // note that this is a cycle
+	        in,
+	    ]
+	}
+
+	docs: [ (#transform & {in: "x"}).out ]
+	out: yaml.MarshalStream(docs)
+}
 -- out/evalalpha/stats --
 Leaks:  47
-Freed:  440
-Reused: 412
-Allocs: 75
+Freed:  452
+Reused: 423
+Allocs: 76
 Retain: 0
 
-Unifications: 408
-Conjuncts:    727
+Unifications: 418
+Conjuncts:    743
 Disjuncts:    30
 Notifications: 2
 
-NumCloseIDs: 185
+NumCloseIDs: 188
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -282,17 +297,17 @@ diff old new
 -Conjuncts:    821
 -Disjuncts:    537
 +Leaks:  47
-+Freed:  440
-+Reused: 412
-+Allocs: 75
++Freed:  452
++Reused: 423
++Allocs: 76
 +Retain: 0
 +
-+Unifications: 408
-+Conjuncts:    727
++Unifications: 418
++Conjuncts:    743
 +Disjuncts:    30
 +Notifications: 2
 +
-+NumCloseIDs: 185
++NumCloseIDs: 188
 -- out/eval/stats --
 Leaks:  25
 Freed:  446
@@ -558,6 +573,20 @@ Result:
       }
       out: (int){ 1 }
     }
+  }
+  issue3743: (struct){
+    #transform: (#struct){
+      in: (_){ _ }
+      out: (#list){
+        0: (_){ _ }
+      }
+    }
+    docs: (#list){
+      0: (#list){
+        0: (string){ "x" }
+      }
+    }
+    out: (string){ "- x\n" }
   }
   jsonCycle: (_|_){
     // [structural cycle]
@@ -1051,7 +1080,26 @@ diff old new
          }
          #c: (#struct){
            b: (string){ string }
-@@ -244,8 +258,12 @@
+@@ -239,13 +253,31 @@
+       out: (int){ 1 }
+     }
+   }
++  issue3743: (struct){
++    #transform: (#struct){
++      in: (_){ _ }
++      out: (#list){
++        0: (_){ _ }
++      }
++    }
++    docs: (#list){
++      0: (#list){
++        0: (string){ "x" }
++      }
++    }
++    out: (string){ "- x\n" }
++  }
+   jsonCycle: (_|_){
+     // [structural cycle]
      t1: (_|_){
        // [structural cycle]
        x: (_|_){
@@ -1066,7 +1114,7 @@ diff old new
        }
      }
    }
-@@ -254,8 +272,15 @@
+@@ -254,8 +286,15 @@
      structCycle: (_|_){
        // [eval]
        x: (_|_){
@@ -1084,7 +1132,7 @@ diff old new
        }
      }
      ok: (struct){
-@@ -318,7 +343,7 @@
+@@ -318,7 +357,7 @@
            }
          }) }
        noHang: (struct){
@@ -1093,7 +1141,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -333,7 +358,8 @@
+@@ -333,7 +372,8 @@
            }
          }) }
      }
@@ -1103,7 +1151,7 @@ diff old new
        #S: (_){ matchN(1, (#list){
            0: (_|_){// {
              //   n: 〈2;#S〉
-@@ -348,8 +374,21 @@
+@@ -348,8 +388,21 @@
              }
            }) }
        }
@@ -1127,7 +1175,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -393,13 +432,13 @@
+@@ -393,13 +446,13 @@
          //     ./matchn.cue:63:6
          //     ./matchn.cue:62:8
          //     ./matchn.cue:63:13
@@ -1144,7 +1192,7 @@ diff old new
        }
        #s: (_){ matchN(1, (#list){
            0: (_|_){// matchN(1, [
-@@ -417,8 +456,8 @@
+@@ -417,8 +470,8 @@
        a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
      }
      data: (#struct){
@@ -1154,7 +1202,7 @@ diff old new
      }
    }
    selfCycle: (_|_){
-@@ -446,19 +485,8 @@
+@@ -446,19 +499,8 @@
          }
        }
      }
@@ -1176,7 +1224,7 @@ diff old new
        }
      }
      yamlVal: (_|_){
-@@ -466,25 +494,33 @@
+@@ -466,25 +508,33 @@
        t1: (_|_){
          // [structural cycle]
          x: (_|_){
@@ -1224,7 +1272,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -492,13 +528,16 @@
+@@ -492,13 +542,16 @@
          z: (_|_){
            // [structural cycle]
            y: (_|_){
@@ -1248,7 +1296,7 @@ diff old new
          }
        }
      }
-@@ -505,8 +544,12 @@
+@@ -505,8 +558,12 @@
      yamlValidatePartial: (_|_){
        // [structural cycle]
        x: (_|_){
@@ -1950,6 +1998,26 @@ Result:
         }),
       ], 1)[0]))
     }
+  }
+}
+--- issue3743.cue
+{
+  issue3743: {
+    #transform: {
+      in: _
+      out: [
+        if false {
+          〈2;out〉
+        },
+        〈1;in〉,
+      ]
+    }
+    docs: [
+      (〈1;#transform〉 & {
+        in: "x"
+      }).out,
+    ]
+    out: 〈import;"encoding/yaml"〉.MarshalStream(〈0;docs〉)
   }
 }
 --- jsoncycle.cue

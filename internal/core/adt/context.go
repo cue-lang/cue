@@ -1327,15 +1327,31 @@ func (c *OpContext) String(x Node) string {
 	return c.Format(c.Runtime, x)
 }
 
-type stringerFunc func() string
+// Formatter wraps an adt.Node with the necessary information to print it.
+//
+// TODO: we could eliminate the need for this by ensuring that errors are
+// _always_ formatted with a printer. We are not far off from this goal, but
+// we need to verify several things.
+// This is mainly possible because we intend to have a global string index
+// using weak references. It also assumes that errors are always printed
+// equally.
+type Formatter struct {
+	X Node
 
-func (f stringerFunc) String() string { return f() }
+	// F formats Node, resolving references as needed.using Runtime.
+	// TODO: only used for cases where the debug printer is somehow
+	// circumvented. Verify this no longer happens.
+	F func(Runtime, Node) string
+
+	// TODO: is runtime needed? Probably not if we have a global string index.
+	R Runtime
+}
+
+func (f Formatter) String() string { return f.F(f.R, f.X) }
 
 // Str reports a string of x via a [fmt.Stringer], for use in errors or debugging.
 func (c *OpContext) Str(x Node) fmt.Stringer {
-	return stringerFunc(func() string {
-		return c.String(x)
-	})
+	return Formatter{X: x, F: c.Format, R: c.Runtime}
 }
 
 // NewList returns a new list for the given values.

@@ -29,6 +29,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/format"
 )
 
 // New is a convenience wrapper for [errors.New] in the core library.
@@ -495,6 +496,12 @@ type Config struct {
 
 	// ToSlash sets whether to use Unix paths. Mostly used for testing.
 	ToSlash bool
+
+	// OmitPath removes the path prefix from error messages.
+	OmitPath bool
+
+	// Printer is used internally to detect printing cycles.
+	Printer format.Printer
 }
 
 var zeroConfig = &Config{}
@@ -526,10 +533,20 @@ func String(err Error) string {
 	return b.String()
 }
 
+// StringWithConfig generates a short message from a given Error, using the
+// provided configuration.
+func StringWithConfig(err Error, cfg *Config) string {
+	var b strings.Builder
+	writeErr(&b, err, cfg)
+	return b.String()
+}
+
 func writeErr(w io.Writer, err Error, cfg *Config) {
-	if path := strings.Join(err.Path(), "."); path != "" {
-		_, _ = io.WriteString(w, path)
-		_, _ = io.WriteString(w, ": ")
+	if !cfg.OmitPath {
+		if path := strings.Join(err.Path(), "."); path != "" {
+			_, _ = io.WriteString(w, path)
+			_, _ = io.WriteString(w, ": ")
+		}
 	}
 
 	for {
@@ -544,21 +561,33 @@ func writeErr(w io.Writer, err Error, cfg *Config) {
 		// so we make a copy if we need to replace any arguments.
 		didCopy := false
 		for i, arg := range args {
-			var pos token.Position
+			var alt any
 			switch arg := arg.(type) {
 			case token.Pos:
-				pos = arg.Position()
+				pos := arg.Position()
+				pos.Filename = relPath(pos.Filename, cfg)
+				alt = pos
 			case token.Position:
-				pos = arg
+				pos := arg
+				pos.Filename = relPath(pos.Filename, cfg)
+				alt = pos
 			default:
-				continue
+				if cfg.Printer == nil {
+					// We should always do something. Consider replacing
+					// vertices with a path if this is not set.
+					continue
+				}
+				var replaced bool
+				alt, replaced = cfg.Printer.ReplaceArg(arg)
+				if !replaced {
+					continue
+				}
 			}
 			if !didCopy {
 				args = slices.Clone(args)
 				didCopy = true
 			}
-			pos.Filename = relPath(pos.Filename, cfg)
-			args[i] = pos
+			args[i] = alt
 		}
 
 		n, _ := fmt.Fprintf(w, msg, args...)

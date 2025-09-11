@@ -81,6 +81,49 @@ type printer struct {
 	// - auto
 }
 
+// ReplaceArg implements the format.Printer interface. It wraps Vertex arguments
+// with a formatter value, that holds a pointer to w. This allows the stack
+// of processed vertices to be passed down, which in turn is used for cycle
+// detection.
+func (w *printer) ReplaceArg(arg any) (replacement any, replaced bool) {
+	var x adt.Node
+	var r adt.Runtime
+	switch v := arg.(type) {
+	case adt.Node:
+		x = v
+	case adt.Formatter:
+		x = v.X
+		r = v.R
+	}
+
+	switch x := x.(type) {
+	default:
+		return arg, false
+	case *adt.Vertex:
+		// We replace the formatter (or node) with our own formatter that is
+		// capable of detecting cycles.
+		return formatter{p: w, x: x, r: r}, true
+	}
+}
+
+type formatter struct {
+	p *printer
+	x adt.Node
+	r adt.Runtime ``
+}
+
+func (f formatter) String() string {
+	p := printer{
+		dst:     make([]byte, 0, 128),
+		index:   f.r,
+		cfg:     f.p.cfg,
+		compact: true, // Always compact for error arguments.
+		stack:   f.p.stack,
+	}
+	p.node(f.x)
+	return string(p.dst)
+}
+
 func (w *printer) string(s string) {
 	if !w.compact && len(w.indent) > 0 {
 		s = strings.Replace(s, "\n", "\n"+w.indent, -1)
@@ -163,7 +206,9 @@ func (w *printer) printShared(v0 *adt.Vertex) (x *adt.Vertex, ok bool) {
 func (w *printer) pushVertex(v *adt.Vertex) bool {
 	for _, x := range w.stack {
 		if x == v {
-			w.string("<TODO: unmarked structural cycle>")
+			w.string("value at path '")
+			w.path(v)
+			w.string("'")
 			return false
 		}
 	}
@@ -175,21 +220,15 @@ func (w *printer) popVertex() {
 	w.stack = w.stack[:len(w.stack)-1]
 }
 
-func (w *printer) shortError(errs errors.Error) {
-	for {
-		msg, args := errs.Msg()
-		w.dst = fmt.Appendf(w.dst, msg, args...)
-
-		err := errors.Unwrap(errs)
-		if err == nil {
-			break
-		}
-
-		if errs, _ = err.(errors.Error); errs != nil {
-			w.string(err.Error())
-			break
-		}
-	}
+// TODO: always print path? We allow a choice for keeping the error diff at a
+// minimum.
+func (w *printer) shortError(errs errors.Error, omitPath bool) {
+	w.string(errors.StringWithConfig(errs, &errors.Config{
+		Cwd:      w.cfg.Cwd,
+		ToSlash:  true,
+		OmitPath: omitPath,
+		Printer:  w,
+	}))
 }
 
 func (w *printer) interpolation(x *adt.Interpolation) {
@@ -277,6 +316,7 @@ func (w *printer) node(n adt.Node) {
 				msg := errors.Details(v.Err, &errors.Config{
 					Cwd:     w.cfg.Cwd,
 					ToSlash: true,
+					Printer: w,
 				})
 				msg = strings.TrimSpace(msg)
 				if msg != "" {
@@ -438,7 +478,7 @@ func (w *printer) node(n adt.Node) {
 		w.string(`_|_`)
 		if x.Err != nil {
 			w.string("(")
-			w.shortError(x.Err)
+			w.shortError(x.Err, true)
 			w.string(")")
 		}
 

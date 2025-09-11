@@ -3183,7 +3183,7 @@ func TestMarshalJSON(t *testing.T) {
 	}, {
 		// Issue #326
 		value: `x: "\(string)": "v"`,
-		err:   `x: key value of dynamic field must be concrete, found _|_(invalid interpolation: x: non-concrete value string (type string)) (and 1 more errors)`,
+		err:   `x: key value of dynamic field must be concrete, found _|_(x: invalid interpolation: non-concrete value string (type string)) (and 1 more errors)`,
 	}, {
 		// Issue #326
 		value: `x: "\(bool)": "v"`,

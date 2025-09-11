@@ -963,6 +963,13 @@ func (n *astNode) eval() {
 		case *ast.EmbedDecl:
 			unprocessed = append(unprocessed, node.Expr)
 
+		case *ast.PostfixExpr:
+			if node.Op == token.ELLIPSIS {
+				unprocessed = append(unprocessed, node.X)
+			} else {
+				unprocessed = append(unprocessed, node.X)
+			}
+
 		case *ast.ParenExpr:
 			unprocessed = append(unprocessed, node.X)
 

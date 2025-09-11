@@ -276,6 +276,41 @@ q: o.z
 		},
 
 		{
+			name: "Embedding...",
+			archive: `-- a.cue --
+@experiment(explicitopen)
+x: y: z: 3
+o: { p: 4, x.y... }
+q: o.z
+`,
+			expectDefinitions: map[position][]position{
+				ln(3, 1, "x"): {ln(2, 1, "x")},
+				ln(3, 1, "y"): {ln(2, 1, "y")},
+				ln(4, 1, "o"): {ln(3, 1, "o")},
+				ln(4, 1, "z"): {ln(2, 1, "z")},
+
+				ln(2, 1, "x"): {self},
+				ln(2, 1, "y"): {self},
+				ln(2, 1, "z"): {self},
+				ln(3, 1, "o"): {self},
+				ln(3, 1, "p"): {self},
+				ln(4, 1, "q"): {self},
+			},
+			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(2, 1, "x"):  {f: []string{"o", "q", "x"}},
+				ln(2, 1, "y"):  {f: []string{"y"}},
+				ln(2, 1, "z"):  {f: []string{"z"}},
+				ln(3, 1, "o"):  {f: []string{"o", "q", "x"}},
+				ln(3, 1, "p"):  {f: []string{"p", "z"}},
+				ln(3, 1, "x"):  {e: []string{"o", "p", "q", "x"}},
+				ln(3, 1, ".y"): {e: []string{"y"}},
+				ln(4, 1, "q"):  {f: []string{"o", "q", "x"}},
+				ln(4, 1, "o"):  {e: []string{"o", "q", "x"}},
+				ln(4, 1, ".z"): {e: []string{"p", "z"}},
+			},
+		},
+
+		{
 			name: "String_Literal",
 			archive: `-- a.cue --
 x: y: a.b

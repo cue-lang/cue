@@ -45,6 +45,11 @@ func (w *printer) compactNode(n adt.Node) {
 
 		switch v := x.BaseValue.(type) {
 		case *adt.StructMarker:
+			if !w.pushVertex(x) {
+				return
+			}
+			defer w.popVertex()
+
 			w.string("{")
 			for i, a := range x.Arcs {
 				if i > 0 {
@@ -72,6 +77,11 @@ func (w *printer) compactNode(n adt.Node) {
 			w.string("}")
 
 		case *adt.ListMarker:
+			if !w.pushVertex(x) {
+				return
+			}
+			defer w.popVertex()
+
 			w.string("[")
 			for i, a := range x.Arcs {
 				if i > 0 {
@@ -82,6 +92,8 @@ func (w *printer) compactNode(n adt.Node) {
 			w.string("]")
 
 		case *adt.Vertex:
+			// Disjunction, structure shared, etc.
+
 			if v, ok := w.printShared(x); !ok {
 				w.node(v)
 				w.popVertex()
@@ -154,7 +166,7 @@ func (w *printer) compactNode(n adt.Node) {
 		w.string(`_|_`)
 		if x.Err != nil {
 			w.string("(")
-			w.string(x.Err.Error())
+			w.shortError(x.Err, false)
 			w.string(")")
 		}
 

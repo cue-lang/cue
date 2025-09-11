@@ -10,6 +10,14 @@ valueCycle: b: X=3 + X
 
 // Issue #1003
 listValueAlias: X = [1, 2, X[0]]
+
+-- err.cue --
+@experiment(structcmp)
+
+cycleErr: X={
+	err3: == (X + 1)
+	err3: 4
+}
 -- out/eval/stats --
 Leaks:  0
 Freed:  13
@@ -21,7 +29,24 @@ Unifications: 13
 Conjuncts:    20
 Disjuncts:    13
 -- out/evalalpha --
-(struct){
+Errors:
+cycleErr.err3: invalid operands {err3:_|_(cycleErr.err3: invalid operands value at path 'cycleErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
+    ./err.cue:4:12
+    ./err.cue:3:13
+    ./err.cue:4:16
+
+Result:
+(_|_){
+  // [eval]
+  cycleErr: (_|_){
+    // [eval]
+    err3: (_|_){
+      // [eval] cycleErr.err3: invalid operands {err3:_|_(cycleErr.err3: invalid operands value at path 'cycleErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
+      //     ./err.cue:4:12
+      //     ./err.cue:3:13
+      //     ./err.cue:4:16
+    }
+  }
   structShorthand: (struct){
     b: (int){ 3 }
     c: (int){ 3 }
@@ -48,7 +73,30 @@ Disjuncts:    13
 diff old new
 --- old
 +++ new
-@@ -11,8 +11,8 @@
+@@ -1,4 +1,21 @@
+-(struct){
++Errors:
++cycleErr.err3: invalid operands {err3:_|_(cycleErr.err3: invalid operands value at path 'cycleErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
++    ./err.cue:4:12
++    ./err.cue:3:13
++    ./err.cue:4:16
++
++Result:
++(_|_){
++  // [eval]
++  cycleErr: (_|_){
++    // [eval]
++    err3: (_|_){
++      // [eval] cycleErr.err3: invalid operands {err3:_|_(cycleErr.err3: invalid operands value at path 'cycleErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
++      //     ./err.cue:4:12
++      //     ./err.cue:3:13
++      //     ./err.cue:4:16
++    }
++  }
+   structShorthand: (struct){
+     b: (int){ 3 }
+     c: (int){ 3 }
+@@ -11,8 +28,8 @@
    }
    valueCycle: (struct){
      b: (_|_){
@@ -84,6 +132,13 @@ diff old new
   }
 }
 -- out/compile --
+--- err.cue
+{
+  cycleErr: {
+    err3: ==(〈1〉 + 1)
+    err3: 4
+  }
+}
 --- in.cue
 {
   structShorthand: {

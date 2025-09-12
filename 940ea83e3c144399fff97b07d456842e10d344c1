@@ -69,6 +69,24 @@
       "parentUuid": "6031cc62_987bed3e",
       "revId": "940ea83e3c144399fff97b07d456842e10d344c1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54273827_d1d3e9a4",
+        "filename": "cmd/cue/cmd/root_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-12T15:38:09Z",
+      "side": 1,
+      "message": "Yes, I think so. Thank you.",
+      "parentUuid": "2b93352a_91b513f8",
+      "revId": "940ea83e3c144399fff97b07d456842e10d344c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

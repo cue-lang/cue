@@ -16,6 +16,24 @@
       "message": "I assume this needs a Hold vote, given that the proposal is not yet accepted.",
       "revId": "4cf2de2fbd7939521ca52507fda0a23cd907b2b0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6f48149_5c4b030a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:20:21Z",
+      "side": 1,
+      "message": "Depends. Aliases isn\u0027t but we could adopt self itself in one go.\n\nIf not, we should also hide it behind an experiment.",
+      "parentUuid": "e91cc031_817f18c2",
+      "revId": "4cf2de2fbd7939521ca52507fda0a23cd907b2b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

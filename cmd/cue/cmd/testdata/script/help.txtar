@@ -86,6 +86,7 @@ Additional help topics:
   cue help commands       user-defined commands
   cue help embed          file embedding
   cue help environment    environment variables
+  cue help experiments    experimental language features
   cue help filetypes      supported file types and qualifiers
   cue help flags          common flags for composing packages
   cue help injection      inject files or values into specific fields for a build

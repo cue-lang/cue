@@ -14,6 +14,8 @@
 
 package cmd
 
+//go:generate go run gen_experiments_help.go
+
 import (
 	"bufio"
 	"fmt"
@@ -125,6 +127,7 @@ var helpTopics = []*cobra.Command{
 	commandsHelp,
 	embedHelp,
 	environmentHelp,
+	experimentsHelp,
 	filetypeHelp,
 	flagsHelp,
 	injectHelp,

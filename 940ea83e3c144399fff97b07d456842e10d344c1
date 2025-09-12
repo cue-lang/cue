@@ -51,6 +51,24 @@
       "message": "This encodes that when leaving gracefully we do `os.Exit(0)` (or just let the main thread finish)? Would it be more obvious to ignore the err from cmd.Wait() and instead directly test the exit code in both the gracefulStderr branch and here?",
       "revId": "940ea83e3c144399fff97b07d456842e10d344c1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b93352a_91b513f8",
+        "filename": "cmd/cue/cmd/root_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-12T15:28:29Z",
+      "side": 1,
+      "message": "I\u0027ve actually refactored the test a bit to more clearly test the error and stderr in the various scenarios that we find useful. I also added comments. Is that clearer?",
+      "parentUuid": "6031cc62_987bed3e",
+      "revId": "940ea83e3c144399fff97b07d456842e10d344c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

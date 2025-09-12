@@ -61,7 +61,7 @@ type File struct {
 	// Spec change:   https://cuelang.org/cl/1217013
 	// Spec change:   https://cuelang.org/cl/1217014
 	// Needs cue fix: no
-	StructCmp bool `experiment:"preview:v0.14.0"`
+	StructCmp bool `experiment:"preview:v0.14.0,stable:v0.15.0"`
 
 	// ExplicitOpen enables the postfix ... operator to explicitly open
 	// closed structs, allowing additional fields to be added.

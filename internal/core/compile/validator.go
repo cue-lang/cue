@@ -122,7 +122,8 @@ var matchIfBuiltin = &adt.Builtin{
 	},
 }
 
-var finalCfg = &adt.ValidateConfig{Final: true}
+// Explicitly disabllow incomplete errors.
+var finalCfg = &adt.ValidateConfig{ReportIncomplete: true, Final: true}
 
 // finalizeSelf ensures a value is fully evaluated and then strips it of any
 // of its validators or default values.

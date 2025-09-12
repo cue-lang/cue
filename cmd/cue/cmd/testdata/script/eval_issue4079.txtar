@@ -1,9 +1,8 @@
-# TODO: none of these should fail
-! exec cue eval -e '#c' x.cue
-# cmp stdout out/stdout-c
+exec cue eval -e '#c' x.cue
+cmp stdout out/stdout-c
 
-! exec cue eval -e 'd' x.cue
-# cmp stdout out/stdout-d
+exec cue eval -e 'd' x.cue
+cmp stdout out/stdout-d
 
 exec cue eval x.cue
 cmp stdout out/stdout
@@ -25,8 +24,30 @@ d: struct.MinFields(3) & {
 	x!: 4
 	...
 }
+issue3633: {
+	// With nested matchNs as below, the schema will become an incomplete error
+	// as a value of the root vertex. Make sure this edge case is properly
+	// handled.
+	data: {} & #s
+	#s: matchN(1, [matchN(1, [{a!: _}])])
+}
 -- out/stdout-c --
+matchN(1, [{
+    a!: _
+    c?: _
+}, {
+    b!: _
+    c?: _
+}]) & {
+    c!: _
+}
 -- out/stdout-d --
+import "struct"
+
+struct.MinFields(3) & {
+    x!: 4
+    ...
+}
 -- out/stdout --
 import "struct"
 
@@ -42,4 +63,10 @@ import "struct"
 d: struct.MinFields(3) & {
     x!: 4
     ...
+}
+issue3633: {
+    data: #s & {}
+    #s: matchN(1, [matchN(1, [{
+        a!: _
+    }])])
 }

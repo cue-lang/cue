@@ -151,8 +151,11 @@ func runEval(cmd *Command, args []string) error {
 
 		if !flagIgnore.Bool(cmd) {
 			if err := v.Err(); err != nil {
-				errHeader()
-				return v.Validate(syn...)
+				err = v.Validate(syn...)
+				if err != nil {
+					errHeader()
+					return err
+				}
 			}
 
 			// TODO(#553): this can be removed once v.Syntax() below retains line

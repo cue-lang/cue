@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08831609_f254b297",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-12T11:04:28Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be tied to \"self\" directly? it seems to be tied to any ValueReference, which seems too broad. for example, could preexisting CUE create a ValueReference which ends up here without using \"self\"?\n\nIf we\u0027re 100% sure that\u0027s not the case, then we should document that in a comment here.\n\nIf we\u0027re not sure, then what I would suggest is that `predeclared.go` should keep track of which predeclared identifiers were added at what language version. I\u0027d personally prefer that anyway, because it feels like the version should be next to each declaration, much like what we do with experiments.",
+      "revId": "059144955e1237bd2e616aab04f7afcb6b986ea8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da152906_b38acf47",
+        "filename": "internal/core/compile/predeclared.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-12T11:04:28Z",
+      "side": 1,
+      "message": "this may be the simplest language addition yet!",
+      "revId": "059144955e1237bd2e616aab04f7afcb6b986ea8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

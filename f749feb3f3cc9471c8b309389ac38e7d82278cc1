@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0e7affcb_4c77daff",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:36:58Z",
+      "side": 1,
+      "message": "First suggestion is fine. The second out of scope for now. :)\nMaybe Claude can whip something up, but still a distraction.",
+      "parentUuid": "52883b12_4c3e6915",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0e686bc6_0f3d89cc",
         "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
         "patchSetId": 2
@@ -48,6 +66,24 @@
       "writtenOn": "2025-09-10T17:02:55Z",
       "side": 1,
       "message": "I\u0027d like to see some tests showing what happens when",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37cf2da1_96a3f3f9",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:36:58Z",
+      "side": 1,
+      "message": "When what?",
+      "parentUuid": "0e686bc6_0f3d89cc",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dfa95b8_e648dc62",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:36:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60ce4133_9b996630",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df283de9_dea0697b",
@@ -82,6 +136,24 @@
       "writtenOn": "2025-09-10T17:02:55Z",
       "side": 1,
       "message": "I think we should also include a test for a wildcard `...` last element, such as `/test/{foo...}`. AFAICS currently that doesn\u0027t appear in `pathValues`.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3fc53eae_fbd1307d",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:36:58Z",
+      "side": 1,
+      "message": "Done. Needed fixing in the regexp as well.",
+      "parentUuid": "df283de9_dea0697b",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -105,6 +177,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a7ff305d_520124cb",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:36:58Z",
+      "side": 1,
+      "message": "I would say there is no fixed convention, really. But sure. And changing #Machine did catch an error. Very nice this validation thing. :)\n\nMachineByRole is sort of an in-between case. I would say it is data, it just has incomplete values, which themselves are now typed (now #Machine is).",
+      "parentUuid": "c8ce7157_81dbeedc",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b7da2957_fbf13a9e",
         "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
         "patchSetId": 2
@@ -116,6 +206,24 @@
       "writtenOn": "2025-09-10T17:02:55Z",
       "side": 1,
       "message": "Presumably we\u0027re wanting to constrain the request so that it always has a `u` parameter here? How about being a bit more explicit about that?\n\n```suggestion\n\trequest: form: u!: [string]\n```\n?",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f20f2ce0_54a0492c",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:36:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7da2957_fbf13a9e",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -143,6 +251,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d318a70f_d4612d6b",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:36:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47f9252a_38792445",
+      "range": {
+        "startLine": 157,
+        "startChar": 0,
+        "endLine": 162,
+        "endChar": 1
+      },
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c4b9cf7_e3718b1d",
@@ -156,6 +288,24 @@
       "writtenOn": "2025-09-10T17:02:55Z",
       "side": 1,
       "message": "Do you really want the `\u003d~\"^/\"` constraint here? ISTM that it means that if someone inadvertently specifies some path that doesn\u0027t start with `/` (for example `GET /`) that we\u0027ll end up listening on `:80` which is probably not what\u0027s required.\nMaybe either close the struct or perhaps constrain `routing.path` instead.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ddfda09_e37b6936",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:36:58Z",
+      "side": 1,
+      "message": "Note that we don\u0027t allow \"GET /\". That is a Go thing. We translate it to the Go thing under the hood.\n\nBut I see your point. Constraints are changed. I left out the path constraint, as that should be part of the schema.",
+      "parentUuid": "8c4b9cf7_e3718b1d",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -177,6 +327,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9456d071_c4aede34",
+        "filename": "internal/task/task.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:36:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db33930d_37e17e1a",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "33f4c9d6_0c3c2af8",
@@ -190,6 +358,24 @@
       "writtenOn": "2025-09-10T17:02:55Z",
       "side": 1,
       "message": "We should probably add a `Path.Equal` method.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64d83c72_3c5a28bd",
+        "filename": "internal/task/task.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:36:58Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "33f4c9d6_0c3c2af8",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -211,6 +397,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61ea08ff_eeb7ee9f",
+        "filename": "internal/task/task.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:36:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd75279c_beecf28d",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "73b58cfa_94ed5cf6",
@@ -224,6 +428,24 @@
       "writtenOn": "2025-09-10T17:02:55Z",
       "side": 1,
       "message": "This does indeed feel dubious, and it\u0027s also racy AFAICS (potential for parallel writes) because BackgroundTask is called inside a goroutine. At the very least, I\u0027d suggest putting `Background` inside an `atomic.Bool` and adding a function rather than accessing the variable directly.\n\nOn second thoughts, why isn\u0027t it just as easy to do something like put a `sync.WaitGroup` (or `errgroup.Group`) inside `task.Context` and have a way to add to it (perhaps just expose a `Go` method) and wait for it to complete (in practice you\u0027d probably select on that finishing and os.Interrupt) ?",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4bc1b99_4b0fc999",
+        "filename": "internal/task/task.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:36:58Z",
+      "side": 1,
+      "message": "Made atomic and added as TODO.\n\nWe may redo all of this, so I don\u0027t think it is worth giving it too much thought at this point.",
+      "parentUuid": "73b58cfa_94ed5cf6",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

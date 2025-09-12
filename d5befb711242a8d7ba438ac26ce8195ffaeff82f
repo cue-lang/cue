@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8969902f_f0662784",
+        "filename": "encoding/openapi/build.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T08:56:13Z",
+      "side": 1,
+      "message": "Done. Found a better solution and implemented the TODO.",
+      "parentUuid": "108395d0_a11de9a5",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1865e28b_52a291ac",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-10T13:14:23Z",
       "side": 1,
       "message": "It feels a bit odd to have this as `Config` rather than `#Config`. Also, shouldn\u0027t we unify the argument with this, or is it just informational?",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a209382_f41e7123",
+        "filename": "pkg/encoding/openapi/openapi.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T08:56:13Z",
+      "side": 1,
+      "message": "The other configuration in tools (tls) is also Config. But happy to change.\n\nThe `cue cmd` tool generally doesn\u0027t unify values for technical reasons.\n\nEven for arguments it is possible, but very hard to do at the moment. As a result, this is consistently not done. I prefer to introduce a good mechanism for this, rather than jumping through hoops in this specific case.",
+      "parentUuid": "1865e28b_52a291ac",
       "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "89312527_499f6dd7",
+        "filename": "pkg/encoding/openapi/openapi.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T08:56:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c95612b_9096ea9c",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6275da5_4a7ef313",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-09-10T13:14:23Z",
       "side": 1,
       "message": "I wonder if this package and/or the Marshal function should be documented as being experimental. AFAIK this is the first time we\u0027ve exposed schema-marshaling functionality inside the CUE stdlib, and it definitely represents somewhat of a departure: for example, it brings things such as doc comments inside the CUE data model, and the results of the Marshal function will definitely change significantly over time as the encoding functionality improves.",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "559b03aa_fa31d6a0",
+        "filename": "pkg/encoding/openapi/openapi.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T08:56:13Z",
+      "side": 1,
+      "message": "Marked as experimental.",
+      "parentUuid": "d6275da5_4a7ef313",
       "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -88,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d18324f4_8c55e7e2",
+        "filename": "pkg/encoding/openapi/openapi.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T08:56:13Z",
+      "side": 1,
+      "message": "What would be the default version in that case?\n\nIn general I have required fields as arguments and optional fields in Config.\n\nMarked it as required to specify in the config with v3.0.0. In the future we could have a ConfigV3_1, etc. with some default set.\n\nEither way, I\u0027ve changed the version as part of the config, but TBH, I don\u0027t think I like it.\n\nBTW, I\u0027m unsure if configuration should come first or last. It can go either way. Maybe it should be last.",
+      "parentUuid": "5f93619d_f4a1ac5e",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a45fa2e7_106d8681",
         "filename": "pkg/encoding/openapi/openapi.go",
         "patchSetId": 2
@@ -105,6 +195,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2625f65a_0fda0665",
+        "filename": "pkg/encoding/openapi/openapi.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T08:56:13Z",
+      "side": 1,
+      "message": "What is \"it\" and what is a \"proper struct\"?",
+      "parentUuid": "a45fa2e7_106d8681",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3daa5543_ca57220f",
         "filename": "pkg/encoding/openapi/testdata/gen.txtar",
         "patchSetId": 2
@@ -116,6 +224,24 @@
       "writtenOn": "2025-09-10T13:14:23Z",
       "side": 1,
       "message": "Let\u0027s include a doc comment too, just to show that comments are indeed included in the OpenAPI output.",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afc477ad_359b1620",
+        "filename": "pkg/encoding/openapi/testdata/gen.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T08:56:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3daa5543_ca57220f",
       "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

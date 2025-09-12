@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "1037fbcf_756e8aa5",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:20:21Z",
+      "side": 1,
+      "message": "This is not for any ValueReference, but only when it is returned by a predeclared identifier, which is, and only will be, self (or __self).\n\nIn the end, we should track it in predeclared, indeed. But as this is only one case for now, and since we may still stuff it behind an experiment, this is good enough for now.\n\nAdded a note.",
+      "parentUuid": "08831609_f254b297",
+      "revId": "059144955e1237bd2e616aab04f7afcb6b986ea8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "da152906_b38acf47",
         "filename": "internal/core/compile/predeclared.go",
         "patchSetId": 3
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-12T11:04:28Z",
       "side": 1,
       "message": "this may be the simplest language addition yet!",
+      "revId": "059144955e1237bd2e616aab04f7afcb6b986ea8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3217de42_3e7f8820",
+        "filename": "internal/core/compile/predeclared.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T12:20:21Z",
+      "side": 1,
+      "message": "Yup. :)\n\nExcept for that really complicated cycle across printing errors that needed to be fixed. But that was an existing bug that was just more easily triggered with self. So I\u0027d say it still counts.",
+      "parentUuid": "da152906_b38acf47",
       "revId": "059144955e1237bd2e616aab04f7afcb6b986ea8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

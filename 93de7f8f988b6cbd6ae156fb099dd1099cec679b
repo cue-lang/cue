@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f0ad2f9_ef6a5dad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-12T18:35:53Z",
+      "side": 1,
+      "message": "gen_experiments_help.go is generated. I would mostly focus on the output it generates and not worry about whether the script could be improved.",
+      "revId": "93de7f8f988b6cbd6ae156fb099dd1099cec679b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

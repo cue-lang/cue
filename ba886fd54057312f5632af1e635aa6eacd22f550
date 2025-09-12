@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39364afd_679e9d31",
+        "filename": "cmd/cue/cmd/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-12T12:14:09Z",
+      "side": 1,
+      "message": "nit: `if err :\u003d v.Validate(syn...); err !\u003d nil {` for consistency",
+      "revId": "ba886fd54057312f5632af1e635aa6eacd22f550",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03f3fe79_3fc9fcc1",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_non_local.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-12T12:14:09Z",
+      "side": 1,
+      "message": "I\u0027m not the biggest fan of using `cue eval` for tests, given that we want to do away with it. how about `cue vet -c\u003dfalse`?",
+      "revId": "ba886fd54057312f5632af1e635aa6eacd22f550",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fdd2402_42b76480",
+        "filename": "cmd/cue/cmd/testdata/script/issue749.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-12T12:14:09Z",
+      "side": 1,
+      "message": "unnecesary change?",
+      "revId": "ba886fd54057312f5632af1e635aa6eacd22f550",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ba282e3_4ba68215",
+        "filename": "internal/core/adt/validate_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-12T12:14:09Z",
+      "side": 1,
+      "message": "surely this should be called \"disallow incomplete error with reportincomlpete\"?",
+      "revId": "ba886fd54057312f5632af1e635aa6eacd22f550",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02e56a93_ed23a238",
+        "filename": "internal/core/adt/validate_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-12T12:14:09Z",
+      "side": 1,
+      "message": "surely this should be called \"allow incomplete error with final\"?",
+      "revId": "ba886fd54057312f5632af1e635aa6eacd22f550",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "017ded88_b5c23584",
+        "filename": "internal/core/compile/validator.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-12T12:14:09Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 125,
+        "startChar": 14,
+        "endLine": 125,
+        "endChar": 23
+      },
+      "revId": "ba886fd54057312f5632af1e635aa6eacd22f550",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

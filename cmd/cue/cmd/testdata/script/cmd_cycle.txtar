@@ -11,6 +11,12 @@ cmp stderr stderr2416.golden
 exec cue cmd print issue2416b_tool.cue
 cmp stdout stdout2416.golden
 
+# Issue #40045
+# self-reference cycle, used to trigger dependency analysis stack overflow
+! exec cue cmd main issue4005_tool.cue
+cmp stderr stderr4005.golden
+
+
 -- issue2397.cue --
 package test
 
@@ -118,3 +124,34 @@ command.build.contents: invalid bytes argument: index out of range [0] with leng
 -- stdout2416.golden --
 key=default val=foo
 key=bar val=bar
+-- issue4005_tool.cue --
+package p
+
+import "tool/cli"
+
+#Size: {
+	input: int
+	size: [
+		if input > 10 {"large"},
+		"small"
+	][0]
+}
+
+command: main: {
+	input: 123
+	dump: cli.Print & {
+		text: (#Size & {
+			input: input
+			// The correct, non-cyclic form would be...
+			// "input": 123
+		}).size
+	}
+}
+-- stderr4005.golden --
+command.main.dump.text: invalid string argument: non-concrete value int in operand to >:
+    ./issue4005_tool.cue:15:2
+    ./issue4005_tool.cue:6:9
+    ./issue4005_tool.cue:8:6
+    ./issue4005_tool.cue:16:3
+    ./issue4005_tool.cue:17:11
+    tool/cli:5:3

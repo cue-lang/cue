@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3b017ce7_46e3dc99",
+        "filename": "encoding/openapi/build.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-12T09:43:49Z",
+      "side": 1,
+      "message": "I don\u0027t see any change. Perhaps you haven\u0027t uploaded the changes?",
+      "parentUuid": "8969902f_f0662784",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1865e28b_52a291ac",
         "filename": "pkg/encoding/openapi/openapi.cue",
         "patchSetId": 2

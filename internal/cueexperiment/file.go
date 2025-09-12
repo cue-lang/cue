@@ -54,13 +54,12 @@ type File struct {
 	Accepted_ bool `experiment:"preview:v0.13.0,stable:v0.15.0"`
 
 	// StructCmp enables comparison of structs. This also defines the ==
-	// operator to be defined on all values. For instance, comparing `1` and
+	// operator to be defined on all values. For instance, comparing 1 and
 	// "foo" will return false, whereas previously it would return an error.
 	//
 	// Proposal:      https://cuelang.org/issue/2583
 	// Spec change:   https://cuelang.org/cl/1217013
 	// Spec change:   https://cuelang.org/cl/1217014
-	// Needs cue fix: no
 	StructCmp bool `experiment:"preview:v0.14.0,stable:v0.15.0"`
 
 	// ExplicitOpen enables the postfix ... operator to explicitly open
@@ -68,12 +67,10 @@ type File struct {
 	//
 	// Proposal:      https://cuelang.org/issue/4032
 	// Spec change:   https://cuelang.org/cl/1221642
-	// Needs cue fix: yes
+	// Requires cue fix when upgrading
 	ExplicitOpen bool `experiment:"preview:v0.15.0"`
 
 	// Self enables the use of 'self' identifier to refer to the enclosing struct.
-	//
-	// Needs cue fix: no
 	//
 	// Proposal:      https://cuelang.org/issue/4014
 	// Spec change:   https://cuelang.org/cl/1222377

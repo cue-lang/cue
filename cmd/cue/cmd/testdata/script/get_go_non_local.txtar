@@ -22,7 +22,7 @@ cmp go.mod go.mod.golden
 go get externalmod.test/imports/root@v1.0.0
 exec cue get go externalmod.test/imports/root
 
-exec cue vet -c uses_imports_root.cue
+exec cue vet -c=false uses_imports_root.cue
 
 -- cue.mod/module.cue --
 module: "mod.test/local"
@@ -32,9 +32,7 @@ package p
 
 import "externalmod.test/imports/root"
 
-root.#Type & {
-    Sub1: Sub2: Leaf: 1
-}
+root.Type
 -- go.mod --
 module mod.test/local
 

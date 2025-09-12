@@ -267,7 +267,7 @@ func TestValidate(t *testing.T) {
 				    test:3:18`,
 	}, {
 		name: "disallow incomplete error with final",
-		cfg:  &adt.ValidateConfig{Final: true},
+		cfg:  &adt.ValidateConfig{ReportIncomplete: true},
 		in: `
 			x: y + 1
 			y: int
@@ -276,6 +276,14 @@ func TestValidate(t *testing.T) {
 				x: non-concrete value int in operand to +:
 				    test:2:7
 				    test:3:7`,
+	}, {
+		name: "disallow incomplete error with final",
+		cfg:  &adt.ValidateConfig{Final: true},
+		in: `
+			x: y + 1
+			y: int
+				`,
+		out: "",
 	}, {
 		name: "allow incomplete error with final while in definition",
 		cfg:  &adt.ValidateConfig{Final: true},

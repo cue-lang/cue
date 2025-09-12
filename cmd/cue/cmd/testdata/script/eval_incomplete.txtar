@@ -2,17 +2,16 @@
 # Issue #4079
 
 
-# TODO: none of these should fail
-! exec cue eval -e '#c' issue4079.cue
-# cmp stdout out/stdout-c
+exec cue eval -e '#c' issue4079.cue
+cmp stdout out/stdout-c
 
-! exec cue eval -e 'd' issue4079.cue
-# cmp stdout out/stdout-d
+exec cue eval -e 'd' issue4079.cue
+cmp stdout out/stdout-d
 
 exec cue eval issue4079.cue
 cmp stdout out/stdout-4079
 
-! exec cue eval issue4029.cue
+exec cue eval issue4029.cue
 cmp stdout out/stdout-4029
 
 -- issue4079.cue --
@@ -32,6 +31,13 @@ d: struct.MinFields(3) & {
 	x!: 4
 	...
 }
+issue3633: {
+	// With nested matchNs as below, the schema will become an incomplete error
+	// as a value of the root vertex. Make sure this edge case is properly
+	// handled.
+	data: {} & #s
+	#s: matchN(1, [matchN(1, [{a!: _}])])
+}
 -- issue4029.cue --
 #Suffix:      string
 #MaybeSuffix: ""
@@ -41,9 +47,23 @@ if len(#Suffix) > 0 {
 }
 
 ConfigMap: "\(#MaybeSuffix)"
-
 -- out/stdout-c --
+matchN(1, [{
+    a!: _
+    c?: _
+}, {
+    b!: _
+    c?: _
+}]) & {
+    c!: _
+}
 -- out/stdout-d --
+import "struct"
+
+struct.MinFields(3) & {
+    x!: 4
+    ...
+}
 -- out/stdout-4079 --
 import "struct"
 
@@ -60,4 +80,17 @@ d: struct.MinFields(3) & {
     x!: 4
     ...
 }
+issue3633: {
+    data: #s & {}
+    #s: matchN(1, [matchN(1, [{
+        a!: _
+    }])])
+}
 -- out/stdout-4029 --
+#Suffix:      string
+#MaybeSuffix: ""
+
+if len(#Suffix) > 0 {
+    #MaybeSuffix: "-\(#Suffix)"
+}
+ConfigMap: "\(#MaybeSuffix)"

@@ -24,6 +24,10 @@ type ValidateConfig struct {
 	// DisallowCycles indicates that there may not be cycles.
 	DisallowCycles bool
 
+	// ReportIncomplete reports an incomplete error even when concrete is not
+	// requested.
+	ReportIncomplete bool
+
 	// AllErrors continues descending into a Vertex, even if errors are found.
 	AllErrors bool
 
@@ -149,7 +153,7 @@ func (v *validator) validate(x *Vertex) {
 			}
 
 		case IncompleteError:
-			if v.checkFinal() {
+			if v.ReportIncomplete || v.checkConcrete() {
 				v.add(b)
 			}
 

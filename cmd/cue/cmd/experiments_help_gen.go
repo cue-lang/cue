@@ -82,7 +82,7 @@ Available global experiments:
 
   decodeint64 (preview: v0.11.0, default: v0.12.0, stable: v0.13.0)
     decodeint64 changes [cuelang.org/go/cue.Value.Decode] to choose
-    `+"`"+`int64`+"`"+` rather than `+"`"+`int`+"`"+` as the default type for CUE integer values
+    ` + "`" + `int64` + "`" + ` rather than ` + "`" + `int` + "`" + ` as the default type for CUE integer values
     to ensure consistency with 32-bit platforms.
 
   embed (preview: v0.10.0, default: v0.12.0, stable: v0.14.0)
@@ -95,7 +95,7 @@ Available global experiments:
 
   keepvalidators (preview: v0.14.0, default: v0.14.0)
     keepvalidators prevents validators from simplifying into concrete values,
-    even if their concrete value could be derived, such as `+"`"+`>=1 & <=1`+"`"+` to `+"`"+`1`+"`"+`.
+    even if their concrete value could be derived, such as ` + "`" + `>=1 & <=1` + "`" + ` to ` + "`" + `1` + "`" + `.
     See the proposal at https://cuelang.org/discussion/3775.
 
   modules (preview: v0.8.0, default: v0.9.0, stable: v0.11.0)

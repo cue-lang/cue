@@ -22,7 +22,7 @@ type Config struct {
 	// KeepValidators prevents validators from simplifying into concrete values,
 	// even if their concrete value could be derived, such as `>=1 & <=1` to `1`.
 	// See the proposal at https://cuelang.org/discussion/3775.
-	KeepValidators bool `experiment:"preview:v0.14.0,default:v0.14.0"`
+	KeepValidators bool `experiment:"preview:v0.14.0,default:v0.14.0,stable:v0.15.0"`
 
 	// The flags below describe completed experiments; they can still be set
 	// as long as the value aligns with the final behavior once the experiment finished.

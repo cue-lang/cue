@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5b5d8c7_e70813c8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-13T09:02:27Z",
+      "side": 1,
+      "message": "is it stable though? the proposal issue has had no updates since July. AFAICT we need to publicly mark the proposal as \"accepted\" before we make this change here.",
+      "revId": "f22e9f100a53f6aa825cf0c45e055a7cbbcda940",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4177a9b1_18f653a7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-13T09:02:27Z",
+      "side": 1,
+      "message": "please be careful with typing issue numbers by hand without double checking the link; it\u0027s easy to make mistakes. you actually want https://github.com/cue-lang/cue/issues/2583.",
+      "revId": "f22e9f100a53f6aa825cf0c45e055a7cbbcda940",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

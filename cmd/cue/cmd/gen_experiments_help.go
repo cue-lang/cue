@@ -39,9 +39,11 @@ type Experiment struct {
 	Name      string
 	FieldName string
 	Preview   string
+	Default   string
 	Stable    string
 	Withdrawn string
 	Comment   string
+	IsGlobal  bool // true for CUE_EXPERIMENT, false for @experiment
 }
 
 func main() {
@@ -50,26 +52,39 @@ func main() {
 		log.Fatalf("Failed to extract experiments: %v", err)
 	}
 
-	// Filter experiments from v0.14.0 onwards
-	var filtered []Experiment
+	// Separate per-file and global experiments
+	var fileExperiments []Experiment
+	var globalExperiments []Experiment
+
 	for _, exp := range experiments {
-		if exp.Preview != "" && semver.Compare(exp.Preview, "v0.14.0") >= 0 {
-			filtered = append(filtered, exp)
+		if exp.IsGlobal {
+			globalExperiments = append(globalExperiments, exp)
+		} else {
+			// Filter file experiments from v0.14.0 onwards to skip testing fields
+			if exp.Preview != "" && semver.Compare(exp.Preview, "v0.14.0") >= 0 {
+				fileExperiments = append(fileExperiments, exp)
+			}
 		}
 	}
 
-	// Sort experiments by preview version, then by name
-	sort.Slice(filtered, func(i, j int) bool {
-		if filtered[i].Preview != filtered[j].Preview {
-			return semver.Compare(filtered[i].Preview, filtered[j].Preview) < 0
+	// Sort file experiments by preview version, then by name
+	sort.Slice(fileExperiments, func(i, j int) bool {
+		if fileExperiments[i].Preview != fileExperiments[j].Preview {
+			return semver.Compare(fileExperiments[i].Preview, fileExperiments[j].Preview) < 0
 		}
-		return filtered[i].Name < filtered[j].Name
+		return fileExperiments[i].Name < fileExperiments[j].Name
 	})
 
-	// Validate URLs in comments
-	validateURLsInComments(filtered)
+	// Sort global experiments by name
+	sort.Slice(globalExperiments, func(i, j int) bool {
+		return globalExperiments[i].Name < globalExperiments[j].Name
+	})
 
-	output := generateHelpCommand(filtered)
+	// Validate URLs in comments for all experiments
+	allExperiments := append(fileExperiments, globalExperiments...)
+	validateURLsInComments(allExperiments)
+
+	output := generateHelpCommand(fileExperiments, globalExperiments)
 
 	if err := os.WriteFile("experiments_help_gen.go", []byte(output), 0644); err != nil {
 		log.Fatalf("Failed to write generated file: %v", err)
@@ -77,18 +92,96 @@ func main() {
 }
 
 func extractExperiments() ([]Experiment, error) {
-	// Parse the cueexperiment/file.go to extract comments
-	fset := token.NewFileSet()
-	src := "../../../internal/cueexperiment/file.go"
-	f, err := parser.ParseFile(fset, src, nil, parser.ParseComments)
+	// Extract file experiments from File struct
+	fileExperiments, err := extractExperimentsFromStruct(
+		reflect.TypeOf(cueexperiment.File{}),
+		"../../../internal/cueexperiment/file.go",
+		"File",
+		false, // IsGlobal = false for per-file experiments
+	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse file.go: %w", err)
+		return nil, fmt.Errorf("failed to extract file experiments: %w", err)
 	}
 
-	// Map field names to their comments and metadata
+	// Extract global experiments from Config struct
+	globalExperiments, err := extractExperimentsFromStruct(
+		reflect.TypeOf(cueexperiment.Config{}),
+		"../../../internal/cueexperiment/exp.go",
+		"Config",
+		true, // IsGlobal = true for global experiments
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to extract global experiments: %w", err)
+	}
+
+	// Combine both types of experiments
+	experiments := append(fileExperiments, globalExperiments...)
+	return experiments, nil
+}
+
+type fieldInfo struct {
+	comment string
+}
+
+type experimentInfo struct {
+	Preview   string
+	Default   string
+	Stable    string
+	Withdrawn string
+}
+
+func extractFieldComment(comments []*ast.Comment) string {
+	var lines []string
+	for _, comment := range comments {
+		text := strings.TrimPrefix(comment.Text, "//")
+		text = strings.TrimSpace(text)
+		if text != "" {
+			lines = append(lines, text)
+		}
+	}
+	return strings.Join(lines, "\n")
+}
+
+func parseExperimentTag(tagStr string) *experimentInfo {
+	info := &experimentInfo{}
+	for _, part := range strings.Split(tagStr, ",") {
+		part = strings.TrimSpace(part)
+		key, value, found := strings.Cut(part, ":")
+		if !found {
+			continue
+		}
+		switch key {
+		case "preview":
+			info.Preview = value
+		case "default":
+			info.Default = value
+		case "stable":
+			info.Stable = value
+		case "withdrawn":
+			info.Withdrawn = value
+		}
+	}
+	return info
+}
+
+func extractExperimentsFromStruct(structType reflect.Type, srcPath, structName string, isGlobal bool) ([]Experiment, error) {
+	// Parse the source file to extract comments
+	fset := token.NewFileSet()
+	f, err := parser.ParseFile(fset, srcPath, nil, parser.ParseComments)
+	if err != nil {
+		if isGlobal {
+			log.Printf("Warning: failed to parse %s for comments: %v", srcPath, err)
+			// For global experiments, continue without comments rather than failing
+			f = &ast.File{}
+		} else {
+			return nil, fmt.Errorf("failed to parse %s: %w", srcPath, err)
+		}
+	}
+
+	// Map field names to their comments
 	fieldComments := make(map[string]*fieldInfo)
 
-	// Find the File struct
+	// Find the target struct
 	for _, decl := range f.Decls {
 		genDecl, ok := decl.(*ast.GenDecl)
 		if !ok || genDecl.Tok != token.TYPE {
@@ -97,7 +190,7 @@ func extractExperiments() ([]Experiment, error) {
 
 		for _, spec := range genDecl.Specs {
 			typeSpec, ok := spec.(*ast.TypeSpec)
-			if !ok || typeSpec.Name.Name != "File" {
+			if !ok || typeSpec.Name.Name != structName {
 				continue
 			}
 
@@ -126,12 +219,11 @@ func extractExperiments() ([]Experiment, error) {
 		}
 	}
 
-	// Use reflection to get experiment info from the actual struct
+	// Use reflection to get experiment info from the struct
 	var experiments []Experiment
-	fileType := reflect.TypeOf(cueexperiment.File{})
 
-	for i := 0; i < fileType.NumField(); i++ {
-		field := fileType.Field(i)
+	for i := 0; i < structType.NumField(); i++ {
+		field := structType.Field(i)
 		tagStr, ok := field.Tag.Lookup("experiment")
 		if !ok {
 			continue
@@ -144,7 +236,6 @@ func extractExperiments() ([]Experiment, error) {
 
 		fieldInfo := fieldComments[field.Name]
 		comment := ""
-
 		if fieldInfo != nil {
 			comment = fieldInfo.comment
 		}
@@ -153,9 +244,11 @@ func extractExperiments() ([]Experiment, error) {
 			Name:      strings.ToLower(field.Name),
 			FieldName: field.Name,
 			Preview:   expInfo.Preview,
+			Default:   expInfo.Default,
 			Stable:    expInfo.Stable,
 			Withdrawn: expInfo.Withdrawn,
 			Comment:   comment,
+			IsGlobal:  isGlobal,
 		}
 
 		experiments = append(experiments, exp)
@@ -164,51 +257,7 @@ func extractExperiments() ([]Experiment, error) {
 	return experiments, nil
 }
 
-type fieldInfo struct {
-	comment string
-}
-
-type experimentInfo struct {
-	Preview   string
-	Stable    string
-	Withdrawn string
-}
-
-func extractFieldComment(comments []*ast.Comment) string {
-	var lines []string
-	for _, comment := range comments {
-		text := strings.TrimPrefix(comment.Text, "//")
-		text = strings.TrimSpace(text)
-		if text != "" {
-			lines = append(lines, text)
-		}
-	}
-	return strings.Join(lines, "\n")
-}
-
-func parseExperimentTag(tagStr string) *experimentInfo {
-	info := &experimentInfo{}
-	for _, part := range strings.Split(tagStr, ",") {
-		part = strings.TrimSpace(part)
-		key, value, found := strings.Cut(part, ":")
-		if !found {
-			continue
-		}
-		switch key {
-		case "preview":
-			info.Preview = value
-		case "stable":
-			info.Stable = value
-		case "withdrawn":
-			info.Withdrawn = value
-		}
-	}
-	return info
-}
-
-// TODO: also generate experiments listed for CUE_EXPERIMENTS and instead
-// redirect the documentation for CUE_EXPERIMENTS to this command.
-func generateHelpCommand(experiments []Experiment) string {
+func generateHelpCommand(fileExperiments []Experiment, globalExperiments []Experiment) string {
 	var sb strings.Builder
 
 	sb.WriteString(`// Copyright 2025 CUE Authors
@@ -237,11 +286,14 @@ var experimentsHelp = &cobra.Command{
 	Long: `)
 	sb.WriteString("`")
 	sb.WriteString(`
-Experimental language features that can be enabled on a per-file basis
-using the @experiment attribute.
+Experimental features that can be enabled in CUE.
 
-Note that there are also global experiments set through the CUE_EXPERIMENTS
-environment variable. See 'cue help environment' for details.
+There are two types of experiments:
+
+1. Per-file experiments: Enabled via @experiment attribute in CUE files
+2. Global experiments: Enabled via the CUE_EXPERIMENT environment variable
+
+## Per-file Experiments
 
 Experiments are enabled in CUE files using file-level attributes:
 
@@ -256,14 +308,21 @@ Multiple experiments can be enabled:
 	@experiment(structcmp,self)
 	@experiment(explicitopen)
 
-Available experiments:
+Available per-file experiments:
 
 `)
 
-	for _, exp := range experiments {
+	// Generate per-file experiments
+	for _, exp := range fileExperiments {
 		sb.WriteString(fmt.Sprintf("  %s (preview: %s", exp.Name, exp.Preview))
+		if exp.Default != "" {
+			sb.WriteString(fmt.Sprintf(", default: %s", exp.Default))
+		}
 		if exp.Stable != "" {
 			sb.WriteString(fmt.Sprintf(", stable: %s", exp.Stable))
+		}
+		if exp.Withdrawn != "" {
+			sb.WriteString(fmt.Sprintf(", withdrawn: %s", exp.Withdrawn))
 		}
 		sb.WriteString(")\n")
 
@@ -286,7 +345,66 @@ Available experiments:
 		sb.WriteString("\n")
 	}
 
-	sb.WriteString(`Language experiments may change behavior, syntax, or semantics.
+	// Add global experiments section
+	if len(globalExperiments) > 0 {
+		sb.WriteString(`
+## Global Experiments
+
+Global experiments are enabled via the CUE_EXPERIMENT environment variable:
+
+	export CUE_EXPERIMENT=cmdreferencepkg,keepvalidators
+	cue export myfile.cue
+
+Available global experiments:
+
+`)
+
+		for _, exp := range globalExperiments {
+			sb.WriteString(fmt.Sprintf("  %s", exp.Name))
+			if exp.Preview != "" {
+				sb.WriteString(fmt.Sprintf(" (preview: %s", exp.Preview))
+				if exp.Default != "" {
+					sb.WriteString(fmt.Sprintf(", default: %s", exp.Default))
+				}
+				if exp.Stable != "" {
+					sb.WriteString(fmt.Sprintf(", stable: %s", exp.Stable))
+				}
+				if exp.Withdrawn != "" {
+					sb.WriteString(fmt.Sprintf(", withdrawn: %s", exp.Withdrawn))
+				}
+				sb.WriteString(")")
+			} else if exp.Withdrawn != "" {
+				sb.WriteString(" (withdrawn)")
+			}
+			sb.WriteString("\n")
+
+			// Add full comment if available
+			if exp.Comment != "" {
+				// Split into lines and indent each line
+				lines := strings.Split(exp.Comment, "\n")
+				for _, line := range lines {
+					line = strings.TrimSpace(line)
+					if line != "" {
+						// Replace field name with lowercase version in the first occurrence
+						line = strings.Replace(line, exp.FieldName, exp.Name, 1)
+						// Escape backticks to avoid syntax errors in Go string literals
+						line = strings.ReplaceAll(line, "`", "`+\"`\"+`")
+						sb.WriteString(fmt.Sprintf("    %s\n", line))
+					}
+				}
+			}
+
+			sb.WriteString("\n")
+		}
+	}
+
+	sb.WriteString(`Experiment lifecycle:
+- preview:   experimental feature that can be enabled
+- default:   experiment enabled by default, can still be disabled
+- stable:    experiment permanently enabled, experiment flag has no effect
+- withdrawn: experiment removed and permanently disabled
+
+Language experiments may change behavior, syntax, or semantics.
 Use with caution in production code.
 `)
 	sb.WriteString("`")
@@ -297,7 +415,7 @@ Use with caution in production code.
 
 // validateURLsInComments checks that all URLs found in experiment comments are valid
 func validateURLsInComments(experiments []Experiment) {
-	validURLPattern := regexp.MustCompile(`^https://cuelang\.org/(issue|cl)/\d+$`)
+	validURLPattern := regexp.MustCompile(`^https://cuelang\.org/(issue|cl|discussion)/\d+$`)
 
 	for _, exp := range experiments {
 		if exp.Comment == "" {
@@ -309,7 +427,9 @@ func validateURLsInComments(experiments []Experiment) {
 		urls := urlPattern.FindAllString(exp.Comment, -1)
 
 		for _, url := range urls {
-			if !validURLPattern.MatchString(url) {
+			// Remove trailing punctuation for validation
+			cleanURL := strings.TrimRight(url, ".")
+			if !validURLPattern.MatchString(cleanURL) {
 				log.Printf("WARNING: Invalid URL format in %s experiment: %s", exp.Name, url)
 			}
 		}

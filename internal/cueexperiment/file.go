@@ -297,7 +297,6 @@ func getExperimentInfoT(experiment string, t any) *experimentInfo {
 func parseExperimentTag(tagStr string) *experimentInfo {
 	info := &experimentInfo{}
 	for f := range strings.SplitSeq(tagStr, ",") {
-		f = strings.TrimSpace(f)
 		key, rest, _ := strings.Cut(f, ":")
 		if !semver.IsValid(rest) {
 			panic(fmt.Sprintf("invalid semver in experiment tag %q: %q", key, rest))

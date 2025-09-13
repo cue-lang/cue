@@ -151,7 +151,7 @@ language: version: "v0.9.0"
     }
 }
 -- out/noembed --
-cannot parse CUE_EXPERIMENT: cannot change default value of deprecated flag "embed"
+error in CUE_EXPERIMENT: cannot change default value of stable experiment "embed"
 -- out/eval --
 a: {
     x: 34

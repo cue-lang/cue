@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fd5a2792_dc470b07",
+        "filename": "cmd/cue/cmd/gen_experiments_help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-13T10:59:31Z",
+      "side": 1,
+      "message": "I added a note in the documentation and a TODO to say we want to merge it.\n\nI prefer to do that in a follow-up CL, though.",
+      "parentUuid": "714db865_aa223bc8",
+      "revId": "36485c8c791f20446974821a5479771cdafeca12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0257bfdb_ef26e3cc",
         "filename": "cmd/cue/cmd/gen_experiments_help.go",
         "patchSetId": 2
@@ -48,6 +66,24 @@
       "writtenOn": "2025-09-13T09:08:10Z",
       "side": 1,
       "message": "remove the trailing whitespace",
+      "revId": "36485c8c791f20446974821a5479771cdafeca12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee438650_5bd81ed0",
+        "filename": "cmd/cue/cmd/gen_experiments_help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-13T10:59:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0257bfdb_ef26e3cc",
       "revId": "36485c8c791f20446974821a5479771cdafeca12",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -65,6 +101,24 @@
       "writtenOn": "2025-09-13T09:08:10Z",
       "side": 1,
       "message": "I think this is where the AI overcomplicates things. we could validate the links simply with a regular expression like `^https://cuelang\\.org/(issue|cl)/\\d+$`.",
+      "revId": "36485c8c791f20446974821a5479771cdafeca12",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44209ed4_b18db151",
+        "filename": "cmd/cue/cmd/gen_experiments_help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-13T10:59:31Z",
+      "side": 1,
+      "message": "Ha, I explicitly asked it to use url. My bad. :)",
+      "parentUuid": "2be3b041_6b46d8b6",
       "revId": "36485c8c791f20446974821a5479771cdafeca12",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

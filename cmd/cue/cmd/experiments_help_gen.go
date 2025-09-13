@@ -93,7 +93,7 @@ Available global experiments:
     evalv3 enables the new CUE evaluator, addressing performance issues
     and bringing better algorithms for disjunctions, closedness, and cycles.
 
-  keepvalidators (preview: v0.14.0, default: v0.14.0)
+  keepvalidators (preview: v0.14.0, default: v0.14.0, stable: v0.15.0)
     keepvalidators prevents validators from simplifying into concrete values,
     even if their concrete value could be derived, such as '>=1 & <=1' to '1'.
     See the proposal at https://cuelang.org/discussion/3775.

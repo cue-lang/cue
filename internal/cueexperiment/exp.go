@@ -20,7 +20,7 @@ type Config struct {
 	CmdReferencePkg bool `experiment:"preview:v0.13.0,default:v0.14.0"`
 
 	// KeepValidators prevents validators from simplifying into concrete values,
-	// even if their concrete value could be derived, such as `>=1 & <=1` to `1`.
+	// even if their concrete value could be derived, such as '>=1 & <=1' to '1'.
 	// See the proposal at https://cuelang.org/discussion/3775.
 	KeepValidators bool `experiment:"preview:v0.14.0,default:v0.14.0"`
 
@@ -38,7 +38,7 @@ type Config struct {
 	YAMLV3Decoder bool `experiment:"preview:v0.9.0,default:v0.9.0,stable:v0.11.0"`
 
 	// DecodeInt64 changes [cuelang.org/go/cue.Value.Decode] to choose
-	// `int64` rather than `int` as the default type for CUE integer values
+	// 'int64' rather than 'int' as the default type for CUE integer values
 	// to ensure consistency with 32-bit platforms.
 	DecodeInt64 bool `experiment:"preview:v0.11.0,default:v0.12.0,stable:v0.13.0"`
 

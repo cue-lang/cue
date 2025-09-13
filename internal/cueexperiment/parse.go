@@ -85,7 +85,7 @@ func parseConfig[T any](flags *T, version string, experiments map[string]bool) e
 		if tagStr, ok := field.Tag.Lookup("experiment"); ok {
 			name := strings.ToLower(field.Name)
 			explicitlyEnabled, hasExperiment := experiments[name]
-			disabled := hasExperiment && !explicitlyEnabled
+			explicitlyDisabled := hasExperiment && !explicitlyEnabled
 			for _, f := range strings.Split(tagStr, ",") {
 				key, rest, _ := strings.Cut(f, ":")
 				switch key {
@@ -103,7 +103,7 @@ func parseConfig[T any](flags *T, version string, experiments map[string]bool) e
 
 				case "default":
 					if version == "" || semver.Compare(version, rest) >= 0 {
-						if !disabled {
+						if !explicitlyDisabled {
 							fv.Field(i).Set(reflect.ValueOf(true))
 						}
 					}
@@ -112,7 +112,7 @@ func parseConfig[T any](flags *T, version string, experiments map[string]bool) e
 					if version == "" || semver.Compare(version, rest) >= 0 {
 						fv.Field(i).Set(reflect.ValueOf(true))
 					}
-					if disabled {
+					if explicitlyDisabled {
 						// We allow setting deprecated flags to their default
 						// value so that bold explorers will not be penalized
 						// for their experimentation.

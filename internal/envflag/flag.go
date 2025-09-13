@@ -95,18 +95,18 @@ func Parse[T any](flags *T, env string) error {
 			}
 		} else if field.Kind() == reflect.Bool {
 			// For bools, "somename" is short for "somename=true" or "somename=1".
-			// This mimicks how Go flags work, e.g. -knob is short for -knob=true.
+			// This mimics how Go flags work, e.g. -knob is short for -knob=true.
 			val = true
 		} else {
 			// For any other type, a value must be specified.
-			// This mimicks how Go flags work, e.g. -output=path does not allow -output.
+			// This mimics how Go flags work, e.g. -output=path does not allow -output.
 			errs = append(errs, fmt.Errorf("value needed for %s flag %q", field.Kind(), name))
 			continue
 		}
 
 		if deprecated[name] {
 			// We allow setting deprecated flags to their default value so that
-			// bold explorers will not be penalised for their experimentation.
+			// bold explorers will not be penalized for their experimentation.
 			if field.Interface() != val {
 				errs = append(errs, fmt.Errorf("cannot change default value of deprecated flag %q", name))
 			}

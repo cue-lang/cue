@@ -23,10 +23,12 @@ import (
 func TestParseConfig(t *testing.T) {
 	// Define a test struct with experiment tags
 	type testFlags struct {
-		Feature1 bool `experiment:"preview:v0.1.0"`
-		Feature2 bool `experiment:"preview:v0.2.0,stable:v1.0.0"`
-		Feature3 bool `experiment:"preview:v0.3.0,withdrawn:v0.5.0"`
-		Feature4 bool `experiment:"preview:v0.1.0,stable:v0.4.0"`
+		Feature1       bool `experiment:"preview:v0.1.0"`
+		Feature2       bool `experiment:"preview:v0.2.0,stable:v1.0.0"`
+		Feature3       bool `experiment:"preview:v0.3.0,withdrawn:v0.5.0"`
+		Feature4       bool `experiment:"preview:v0.1.0,stable:v0.4.0"`
+		FeatureDefault bool `experiment:"preview:v0.1.0,default:v0.2.0"`
+		FeatureStable  bool `experiment:"preview:v0.1.0,default:v0.2.0,stable:v0.3.0"`
 	}
 
 	tests := []struct {
@@ -40,7 +42,7 @@ func TestParseConfig(t *testing.T) {
 		name:        "empty_inputs",
 		version:     "",
 		experiments: "",
-		want:        testFlags{Feature2: true, Feature4: true},
+		want:        testFlags{Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     false,
 	}, {
 		name:        "enable_feature1",
@@ -51,72 +53,103 @@ func TestParseConfig(t *testing.T) {
 	}, {
 		name:        "enable_feature1_no_version",
 		experiments: "feature1",
-		want:        testFlags{Feature1: true, Feature2: true, Feature4: true},
+		want:        testFlags{Feature1: true, Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     false,
 	}, {
 		name:        "enable_accepted_feature2_no_version",
 		experiments: "feature2",
-		want:        testFlags{Feature2: true, Feature4: true},
+		want:        testFlags{Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     false,
 	}, {
 		name:        "enable_rejected_feature3_no_version",
 		experiments: "feature3",
-		want:        testFlags{Feature1: true, Feature2: true, Feature4: true},
+		want:        testFlags{Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     true,
 		errSubstr:   `cannot set rejected experiment "feature3"`,
 	}, {
 		name:        "feature_not_available_yet",
 		version:     "v0.0.9",
 		experiments: "feature1",
-		want:        testFlags{Feature2: true, Feature4: true},
+		want:        testFlags{},
 		wantErr:     true,
 		errSubstr:   "cannot set experiment \"feature1\" before version v0.1.0",
 	}, {
 		name:        "rejected_feature",
 		version:     "v0.5.0",
 		experiments: "feature3",
-		want:        testFlags{Feature2: true, Feature4: true},
+		want:        testFlags{Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     true,
 		errSubstr:   "cannot set rejected experiment \"feature3\"",
 	}, {
 		name:        "accepted_feature_automatically_enabled",
 		version:     "v1.0.0",
 		experiments: "",
-		want:        testFlags{Feature2: true, Feature4: true},
+		want:        testFlags{Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     false,
 	}, {
 		name:        "unknown_experiment",
 		version:     "v1.0.0",
 		experiments: "nonexistent",
-		want:        testFlags{Feature2: true, Feature4: true},
+		want:        testFlags{Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     true,
 		errSubstr:   "unknown experiment \"nonexistent\"",
 	}, {
 		name:        "multiple_experiments",
 		version:     "v0.3.0",
 		experiments: "feature1,feature2,feature3",
-		want:        testFlags{Feature1: true, Feature2: true, Feature3: true},
+		want:        testFlags{Feature1: true, Feature2: true, Feature3: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     false,
 	}, {
 		name:        "case_insensitive",
 		version:     "v0.3.0",
 		experiments: "FEATURE1",
-		want:        testFlags{Feature1: true, Feature2: true, Feature4: true},
+		want:        testFlags{Feature2: true, Feature4: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     true,
 		errSubstr:   `unknown experiment "FEATURE1"`,
 	}, {
 		name:        "experiments_with_spaces",
 		version:     "v0.3.0",
 		experiments: " feature1 , feature2 ",
-		want:        testFlags{Feature1: true, Feature2: true},
+		want:        testFlags{Feature1: true, Feature2: true, FeatureDefault: true, FeatureStable: true},
 		wantErr:     false,
 	}, {
 		name:        "multiple_errors",
 		version:     "v0.0.9",
 		experiments: "feature1,feature3,nonexistent",
-		want:        testFlags{Feature2: true, Feature4: true},
+		want:        testFlags{},
 		wantErr:     true,
 		errSubstr:   "cannot set experiment",
+	}, {
+		name:        "default_experiment_enabled_by_version",
+		version:     "v0.2.0",
+		experiments: "",
+		want:        testFlags{FeatureDefault: true, FeatureStable: true},
+		wantErr:     false,
+	}, {
+		name:        "default_experiment_not_enabled_before_version",
+		version:     "v0.1.5",
+		experiments: "",
+		want:        testFlags{},
+		wantErr:     false,
+	}, {
+		name:        "default_experiment_explicitly_disabled",
+		version:     "v0.2.0",
+		experiments: "featuredefault=false",
+		want:        testFlags{FeatureStable: true},
+		wantErr:     false,
+	}, {
+		name:        "stable_experiment_cannot_be_disabled",
+		version:     "v0.3.0",
+		experiments: "featurestable=false",
+		want:        testFlags{FeatureDefault: true, FeatureStable: true},
+		wantErr:     true,
+		errSubstr:   "cannot disable stable experiment \"featurestable\"",
+	}, {
+		name:        "stable_experiment_can_be_set_to_true",
+		version:     "v0.3.0",
+		experiments: "featurestable=true",
+		want:        testFlags{FeatureDefault: true, FeatureStable: true},
+		wantErr:     false,
 	}}
 
 	for _, tt := range tests {

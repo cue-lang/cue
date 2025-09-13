@@ -304,16 +304,8 @@ If an environment variable is unset or empty, sensible default setting is used.
 		See "cue help registryconfig" for details.
 
 	CUE_EXPERIMENT
-		Comma-separated list of experiment flags to enable or disable:
-
-		evalv3 (default true)
-			Enable the new CUE evaluator, addressing performance issues
-			and bringing a better disjunction algorithm.
-		cmdreferencepkg (default true)
-			Require referencing imported tool packages to declare "cue cmd" tasks.
-		keepvalidators (default true)
-			Prevent validators from simplifying into concrete values.
-			See: https://cuelang.org/discussion/3775
+		Comma-separated list of experiment flags to enable or disable.
+		See "cue help experiments" for details.
 
 	CUE_DEBUG
 		Comma-separated list of debug flags to enable or disable, such as:

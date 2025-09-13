@@ -23,6 +23,6 @@ foo: "bar"
     "foo": "bar"
 }
 -- unknown.stderr --
-cannot parse CUE_EXPERIMENT: unknown flag "unknown"
+error in CUE_EXPERIMENT: unknown experiment "unknown"
 -- deprecated.stderr --
-cannot parse CUE_EXPERIMENT: cannot change default value of deprecated flag "evalv3"
+error in CUE_EXPERIMENT: cannot disable stable experiment "evalv3"

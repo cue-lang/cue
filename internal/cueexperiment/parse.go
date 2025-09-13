@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/internal/mod/semver"
@@ -32,21 +33,41 @@ func parseExperiments(x ...string) (m map[string]bool) {
 			m = make(map[string]bool)
 		}
 		for _, elem := range strings.Split(a, ",") {
-			m[strings.TrimSpace(elem)] = true
+			elem = strings.TrimSpace(elem)
+			m[elem] = true
 		}
 	}
 	return m
 }
 
+func parseEnvExperiments(x ...string) (m map[string]bool, err error) {
+	for _, name := range x {
+		if name == "" {
+			continue
+		}
+		if m == nil {
+			m = make(map[string]bool)
+		}
+		name, valueStr, _ := strings.Cut(name, "=")
+		if valueStr == "" {
+			m[name] = true
+		} else if val, err := strconv.ParseBool(valueStr); err == nil {
+			m[name] = val
+		} else {
+			return nil, fmt.Errorf("cannot parse CUE_EXPERIMENT: invalid value %q for experiment %q", valueStr, name)
+		}
+	}
+	return m, nil
+}
+
 // parseConfig initializes the fields in flags from the attached struct field
-// tags as well as the contents of the given string, which is a comma-separated
-// list of experiment names.
+// tags as well as a set of experiment names.
 //
-// version is the language version associated with th module of a file. An empty
-// version string indicates the latest language version supported by the
+// version is the language version associated with the module of a file. An
+// empty version string indicates the latest language version supported by the
 // compiler.
 //
-// experiments is a comma-separated list of experiment names.
+// experiments is a map of experiment names.
 //
 // The struct field tag indicates the life cycle of the experiment, starting
 // with the version from when it was introduced, the version where it became
@@ -63,27 +84,45 @@ func parseConfig[T any](flags *T, version string, experiments map[string]bool) e
 		field := ft.Field(i)
 		if tagStr, ok := field.Tag.Lookup("experiment"); ok {
 			name := strings.ToLower(field.Name)
+			explicitlyEnabled, hasExperiment := experiments[name]
+			disabled := hasExperiment && !explicitlyEnabled
 			for _, f := range strings.Split(tagStr, ",") {
 				key, rest, _ := strings.Cut(f, ":")
 				switch key {
 				case "preview":
 					switch {
-					case !experiments[name]:
+					case !explicitlyEnabled:
+						// Experiment not explicitly enabled, skip
 					case version != "" && semver.Compare(version, rest) < 0:
 						const msg = "cannot set experiment %q before version %s"
 						errs = append(errs, fmt.Errorf(msg, name, rest))
 					default:
+						// Experiment is explicitly enabled and version allows it
 						fv.Field(i).Set(reflect.ValueOf(true))
+					}
+
+				case "default":
+					if version == "" || semver.Compare(version, rest) >= 0 {
+						if !disabled {
+							fv.Field(i).Set(reflect.ValueOf(true))
+						}
 					}
 
 				case "stable":
 					if version == "" || semver.Compare(version, rest) >= 0 {
 						fv.Field(i).Set(reflect.ValueOf(true))
 					}
+					if disabled {
+						// We allow setting deprecated flags to their default
+						// value so that bold explorers will not be penalized
+						// for their experimentation.
+						errs = append(errs, fmt.Errorf("cannot disable stable experiment %q", name))
+						continue
+					}
 
 				case "withdrawn":
 					expired := (version == "" || semver.Compare(version, rest) >= 0)
-					if expired && experiments[name] {
+					if expired && explicitlyEnabled {
 						const msg = "cannot set rejected experiment %q"
 						errs = append(errs, fmt.Errorf(msg, name))
 					}

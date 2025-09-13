@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1dad70a7_879a6813",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-13T09:30:33Z",
+      "side": 1,
+      "message": "Added comment.",
+      "parentUuid": "c5b5d8c7_e70813c8",
+      "revId": "f22e9f100a53f6aa825cf0c45e055a7cbbcda940",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4177a9b1_18f653a7",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1

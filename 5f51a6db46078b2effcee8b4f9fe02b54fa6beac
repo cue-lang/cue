@@ -1,0 +1,175 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56576791_8fc6aa7d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T21:18:13Z",
+      "side": 1,
+      "message": "A few more thoughts.",
+      "revId": "5f51a6db46078b2effcee8b4f9fe02b54fa6beac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd651672_d1d78c17",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T21:18:13Z",
+      "side": 1,
+      "message": "These explanatory comments are super helpful, thanks!",
+      "revId": "5f51a6db46078b2effcee8b4f9fe02b54fa6beac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4226833b_3142a576",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T21:18:13Z",
+      "side": 1,
+      "message": "I suspect this is better as a pure schema, demonstrating intent and good practice (AIUI):\n\n```suggestion\n\tos!:     \"Windows\" | \"Linux\" | \"MacOS\"\n\tarch!:   \"x86\" | \"arm64\"\n\tmem!:    int\n\tdisk!:   int\n\taccess!: {\n\t\tpublic!: bool\n\t}\n}\n```\n\nI\u0027ll make similar suggestions elsewhere: I\u0027m fairly sure that we should only\nuse regular fields  when we\u0027re actually providing information rather than trying to constrain values that will be provided later.\n\nUnfortunately https://github.com/cue-lang/cue/issues/4088 means that we don\u0027t get typo-checking if we do that, but I think that issue should be fixed sooner rather than later.",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 1
+      },
+      "revId": "5f51a6db46078b2effcee8b4f9fe02b54fa6beac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8402ae63_92628181",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T21:18:13Z",
+      "side": 1,
+      "message": "```suggestion\n\t\tmem?:  \u003c\u003d4Gi\n\t\tdisk?: \u003c\u003d100G\n\t}\n```",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 0
+      },
+      "revId": "5f51a6db46078b2effcee8b4f9fe02b54fa6beac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4cbeb24d_cf4e5849",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T21:18:13Z",
+      "side": 1,
+      "message": "```suggestion\n\t\taccess?: public?: false\n\t\tos?: \"Linux\" | \"Windows\"\n\t}\n```",
+      "range": {
+        "startLine": 111,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 0
+      },
+      "revId": "5f51a6db46078b2effcee8b4f9fe02b54fa6beac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cafadd4b_9a4a4e1f",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T21:18:13Z",
+      "side": 1,
+      "message": "Better as a required field so the intent (and presumably the error) is clearer ?\n```suggestion\n\trequest: form: u!: [string]\n```",
+      "revId": "5f51a6db46078b2effcee8b4f9fe02b54fa6beac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b796c03_bd060b23",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T21:18:13Z",
+      "side": 1,
+      "message": "It would be good to demonstrate a non-200 response code when the request is _not_ valid.",
+      "revId": "5f51a6db46078b2effcee8b4f9fe02b54fa6beac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4749c2e_6ded9d8d",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T21:18:13Z",
+      "side": 1,
+      "message": "Again, I think the intent is clearer if we require this rather than provide it.\n```suggestion\n\t\tvalue!: _\n```",
+      "revId": "5f51a6db46078b2effcee8b4f9fe02b54fa6beac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4926f829_56fc366d",
+        "filename": "pkg/tool/http/serve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T21:18:13Z",
+      "side": 1,
+      "message": "This is cute but I\u0027m not really sure that 409 is appropriate here - it seems to be about making a conflicting change to the resource rather than a an issue handling the request or creating the response (https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409).\n\nI suspect that in practice a well-behaved server should handle errors deliberately itself, choosing its own response codes and body as appropriate, and if this kind of evaluation error happens, 500 might be a better choice.",
+      "revId": "5f51a6db46078b2effcee8b4f9fe02b54fa6beac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

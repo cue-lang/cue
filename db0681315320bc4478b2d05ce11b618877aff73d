@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "249b2626_56b9314c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:15:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30a8baf1_af7bcb93",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "93a72f5f_dc2caf59",
@@ -316,6 +334,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2d729cb_3e2c08e3",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:15:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5628d77f_b78cead5",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1f0eba5e_b4bc67d2",
@@ -329,6 +365,24 @@
       "writtenOn": "2025-09-15T09:57:02Z",
       "side": 1,
       "message": "what\u0027s with these changes? was it gofmt? AFAICT there was nothing wrong with the old text.",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a82940ee_edd9f681",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:15:11Z",
+      "side": 1,
+      "message": "Ah. I changed that. The generated code was a mess, because of the back quotes and was rather \"unstable\". I think it is simpler to avoid \"`\" in multi-line strings in Go.",
+      "parentUuid": "1f0eba5e_b4bc67d2",
       "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

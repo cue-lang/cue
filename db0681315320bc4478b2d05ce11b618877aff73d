@@ -1,0 +1,192 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30a8baf1_af7bcb93",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:57:02Z",
+      "side": 1,
+      "message": "Add `Updates #3848`, as you are resolving the CUE_EXPERIMENT side of that issue here.",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93a72f5f_dc2caf59",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:57:02Z",
+      "side": 1,
+      "message": "nit: add \"the\"",
+      "range": {
+        "startLine": 30,
+        "startChar": 35,
+        "endLine": 30,
+        "endChar": 49
+      },
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4491a3d_e1257352",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:57:02Z",
+      "side": 1,
+      "message": "I would omit \"v0.14.0 onwards\" here - it\u0027s an internal detail, and the users shouldn\u0027t care",
+      "range": {
+        "startLine": 47,
+        "startChar": 30,
+        "endLine": 47,
+        "endChar": 48
+      },
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9176ab7c_f193f7a7",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:57:02Z",
+      "side": 1,
+      "message": "nit: can we use `export` as the example here? we don\u0027t want to encourage the use of `cue eval`",
+      "range": {
+        "startLine": 75,
+        "startChar": 5,
+        "endLine": 75,
+        "endChar": 9
+      },
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9a38df3_983daaba",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:57:02Z",
+      "side": 1,
+      "message": "nit: I might say \"experiment enabled\" rather than \"feature enabled\" in these two, for the sake of consistent terminology",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8a0977d_d7dffef6",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:57:02Z",
+      "side": 1,
+      "message": "clarify that it\u0027s disabled for good? like:\n\n\u003e experiment removed as permanently disabled, flag has no effect",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7327925d_1c62aebd",
+        "filename": "cmd/cue/cmd/gen_experiments_help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:57:02Z",
+      "side": 1,
+      "message": "what is the logic behind filtering from v0.14 onwards? can you expand on it, i.e. that on v0.13 we had some testing fields which we don\u0027t want to show the user?",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74aef157_db014a91",
+        "filename": "cmd/cue/cmd/gen_experiments_help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:57:02Z",
+      "side": 1,
+      "message": "I would personally do `f \u003d \u0026ast.File{}` here, then you can avoid the unfortunate indentation from `if f !\u003d nil` below",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5628d77f_b78cead5",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:57:02Z",
+      "side": 1,
+      "message": "```suggestion\n\t\tSee \"cue help experiments\" for details.\n```",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f0eba5e_b4bc67d2",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:57:02Z",
+      "side": 1,
+      "message": "what\u0027s with these changes? was it gofmt? AFAICT there was nothing wrong with the old text.",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

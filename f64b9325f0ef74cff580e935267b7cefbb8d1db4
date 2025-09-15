@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfc3a860_387d1019",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:58:20Z",
+      "side": 1,
+      "message": "expand on this? is this because the proposal is now accepted? I don\u0027t see any such announcement on the linked proposal discussion, https://github.com/cue-lang/cue/discussions/3775.",
+      "revId": "f64b9325f0ef74cff580e935267b7cefbb8d1db4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -90,6 +90,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1175462_d34d4bb8",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2343,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T16:49:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd3599c5_f418620f",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e78d45f4_6db5a74a",
@@ -197,6 +215,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd2263b7_f2f42ff1",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2345,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T16:49:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "387ae4c2_aaeb48e1",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e0a088f2_2157bcc5",
@@ -228,6 +264,24 @@
       "side": 1,
       "message": "I\u0027ve emphasized the term equality operators again. By definition, not all values are comparable. Equality is just defined to return false for non-comparable values.",
       "parentUuid": "e0a088f2_2157bcc5",
+      "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e8e8677_7e4a7580",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 2350,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T16:49:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0cb85f18_15e84f05",
       "revId": "58ec107dd7183018a68c525d7f91435eae1809e6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

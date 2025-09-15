@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f01725e4_de1fb60e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T16:13:39Z",
+      "side": 1,
+      "message": "This feels much nicer to me, thanks! I\u0027ve still got one nit about \"ordered type\", which isn\u0027t actually defined anywhere AFAICS.",
+      "revId": "8f07b2925145b60f021bd43de9d434ee51210c57",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2a4bd60_74236442",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 15
+      },
+      "lineNbr": 2347,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T16:13:39Z",
+      "side": 1,
+      "message": "What\u0027s an \"ordered type\"?",
+      "revId": "8f07b2925145b60f021bd43de9d434ee51210c57",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eae1b5ba_74b94178",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 15
+      },
+      "lineNbr": 2354,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-15T16:13:39Z",
+      "side": 1,
+      "message": "CUE doesn\u0027t really have a fundamental notion of a \"type\", so I think \"basic type\" (already mentioned elsewhere in the spec) would be more appropriate. Also, _all_ values may be compared, so perhaps we can just carve out an exception without saying that.\n\n```suggestion\n- Two values of different basic types are always unequal, except for integers and\n  floating-point numbers (see below).\n```",
+      "range": {
+        "startLine": 2353,
+        "startChar": 0,
+        "endLine": 2354,
+        "endChar": 53
+      },
+      "revId": "8f07b2925145b60f021bd43de9d434ee51210c57",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

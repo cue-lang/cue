@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2e56323_348a5c9f",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b09d7f74_48fd6a6e",
+      "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cd941ed5_0ec3d1b3",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-09-15T09:38:30Z",
       "side": 1,
       "message": "just use `strconv.ParseBool`, like envflag does",
+      "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b28cd931_7bd287f9",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "Hoisted the code and put it in parse.go to put it next to parseExperiments, which is quite similar (but different). Then used this code in the test instead.",
+      "parentUuid": "cd941ed5_0ec3d1b3",
       "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +94,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aac3adf9_5592189c",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9807d9b9_22fe314d",
+      "range": {
+        "startLine": 95,
+        "startChar": 0,
+        "endLine": 97,
+        "endChar": 2
+      },
+      "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bea72c4_5a08b7d2",
@@ -71,6 +131,24 @@
       "writtenOn": "2025-09-15T09:38:30Z",
       "side": 1,
       "message": "ditto - I would remove the whitespace trimming",
+      "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f7d01ad_e5f28024",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "I think it is reasonable to write \n@experiment(structcmp, explicitopen), \nthough.",
+      "parentUuid": "3bea72c4_5a08b7d2",
       "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -92,6 +170,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc2131c0_d3987a54",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "Removed the functionality. We can add it back later.\n\nUsing parseEnvExperiment, hoisted from exp.go in the test instead.",
+      "parentUuid": "d11d3c1e_5f244c9b",
+      "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d699d706_4fb1a6d6",
@@ -105,6 +201,24 @@
       "writtenOn": "2025-09-15T09:38:30Z",
       "side": 1,
       "message": "as discussed - rename these to explicitlyEnabled and explicitlyDisabled",
+      "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03582595_2ea934b1",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d699d706_4fb1a6d6",
       "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

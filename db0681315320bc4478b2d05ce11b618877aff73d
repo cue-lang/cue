@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0285c750_99556ab7",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "93a72f5f_dc2caf59",
+      "range": {
+        "startLine": 30,
+        "startChar": 35,
+        "endLine": 30,
+        "endChar": 49
+      },
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d4491a3d_e1257352",
@@ -54,6 +78,30 @@
       "writtenOn": "2025-09-15T09:57:02Z",
       "side": 1,
       "message": "I would omit \"v0.14.0 onwards\" here - it\u0027s an internal detail, and the users shouldn\u0027t care",
+      "range": {
+        "startLine": 47,
+        "startChar": 30,
+        "endLine": 47,
+        "endChar": 48
+      },
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62646be9_b8ef117a",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4491a3d_e1257352",
       "range": {
         "startLine": 47,
         "startChar": 30,
@@ -87,6 +135,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bebb6a6_5af352f9",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9176ab7c_f193f7a7",
+      "range": {
+        "startLine": 75,
+        "startChar": 5,
+        "endLine": 75,
+        "endChar": 9
+      },
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d9a38df3_983daaba",
@@ -100,6 +172,24 @@
       "writtenOn": "2025-09-15T09:57:02Z",
       "side": 1,
       "message": "nit: I might say \"experiment enabled\" rather than \"feature enabled\" in these two, for the sake of consistent terminology",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33461e27_6ef15c0c",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9a38df3_983daaba",
       "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -121,6 +211,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98680ec1_1b3a18f7",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8a0977d_d7dffef6",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7327925d_1c62aebd",
@@ -138,6 +246,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ab4ec32_4b178c16",
+        "filename": "cmd/cue/cmd/gen_experiments_help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "Indeed. Clarified in comment.",
+      "parentUuid": "7327925d_1c62aebd",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "74aef157_db014a91",
@@ -151,6 +277,24 @@
       "writtenOn": "2025-09-15T09:57:02Z",
       "side": 1,
       "message": "I would personally do `f \u003d \u0026ast.File{}` here, then you can avoid the unfortunate indentation from `if f !\u003d nil` below",
+      "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f841be32_9f993aca",
+        "filename": "cmd/cue/cmd/gen_experiments_help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-15T15:12:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74aef157_db014a91",
       "revId": "db0681315320bc4478b2d05ce11b618877aff73d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

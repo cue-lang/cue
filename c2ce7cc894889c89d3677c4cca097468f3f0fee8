@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b09d7f74_48fd6a6e",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:38:30Z",
+      "side": 1,
+      "message": "the `envflag` package does not trim any whitespace, so I wouldn\u0027t do it here either, unless there is a strong reason why",
+      "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd941ed5_0ec3d1b3",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:38:30Z",
+      "side": 1,
+      "message": "just use `strconv.ParseBool`, like envflag does",
+      "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9807d9b9_22fe314d",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:38:30Z",
+      "side": 1,
+      "message": "```suggestion\nvar initOnce \u003d sync.OnceValue(initExperimentFlags)\n```",
+      "range": {
+        "startLine": 95,
+        "startChar": 0,
+        "endLine": 97,
+        "endChar": 2
+      },
+      "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bea72c4_5a08b7d2",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:38:30Z",
+      "side": 1,
+      "message": "ditto - I would remove the whitespace trimming",
+      "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d11d3c1e_5f244c9b",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:38:30Z",
+      "side": 1,
+      "message": "ditto - just use `strconv.ParseBool`",
+      "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d699d706_4fb1a6d6",
+        "filename": "internal/cueexperiment/parse.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-15T09:38:30Z",
+      "side": 1,
+      "message": "as discussed - rename these to explicitlyEnabled and explicitlyDisabled",
+      "revId": "c2ce7cc894889c89d3677c4cca097468f3f0fee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

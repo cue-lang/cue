@@ -104,11 +104,7 @@ func NewFile(version string, experiments ...string) (*File, error) {
 // IsPreview returns true if the experiment exists and can be used
 // for the given version.
 func IsPreview(experiment, version string) bool {
-	return isPreview(experiment, version, File{})
-}
-
-func isPreview(experiment, version string, t any) bool {
-	expInfo := getExperimentInfoT(experiment, t)
+	expInfo := getExperimentInfoT[File](experiment)
 	if expInfo == nil {
 		return false
 	}
@@ -153,11 +149,11 @@ func (e *experimentInfo) isStableForVersion(version string) bool {
 // CanApplyFix validates whether an experiment fix can be applied
 // to a file with the given version and existing experiments.
 func CanApplyFix(experiment, version, target string) error {
-	return canApplyExperimentFix(experiment, version, target, File{})
+	return canApplyExperimentFix[File](experiment, version, target)
 }
 
-func canApplyExperimentFix(experiment, version, target string, t any) error {
-	expInfo := getExperimentInfoT(experiment, t)
+func canApplyExperimentFix[T any](experiment, version, target string) error {
+	expInfo := getExperimentInfoT[T](experiment)
 	if expInfo == nil {
 		return fmt.Errorf("unknown experiment %q", experiment)
 	}
@@ -190,13 +186,13 @@ func canApplyExperimentFix(experiment, version, target string, t any) error {
 // GetActive returns all experiments that are active (can be enabled)
 // for the given version, but not yet accepted.
 func GetActive(origVersion, targetVersion string) []string {
-	return getActiveExperiments(origVersion, targetVersion, File{})
+	return getActiveExperiments[File](origVersion, targetVersion)
 }
 
-func getActiveExperiments(origVersion, targetVersion string, t any) []string {
+func getActiveExperiments[T any](origVersion, targetVersion string) []string {
 	var active []string
 
-	ft := reflect.TypeOf(t)
+	ft := reflect.TypeFor[T]()
 	for i := 0; i < ft.NumField(); i++ {
 		field := ft.Field(i)
 		tagStr, ok := field.Tag.Lookup("experiment")
@@ -232,16 +228,16 @@ func getActiveExperiments(origVersion, targetVersion string, t any) []string {
 // (possibly in later versions), that can be upgraded from the current
 // version (must be lower than stable) to the desired version.
 func GetUpgradable(origVersion, targetVersion string) []string {
-	return getUpgradeExperiments(origVersion, targetVersion, File{})
+	return getUpgradeExperiments[File](origVersion, targetVersion)
 }
 
-func getUpgradeExperiments(origVersion, targetVersion string, t any) []string {
+func getUpgradeExperiments[T any](origVersion, targetVersion string) []string {
 	var accepted []string
 	if origVersion == "" {
 		panic("original version is empty")
 	}
 
-	ft := reflect.TypeOf(t)
+	ft := reflect.TypeFor[T]()
 	for i := 0; i < ft.NumField(); i++ {
 		field := ft.Field(i)
 		tagStr, ok := field.Tag.Lookup("experiment")
@@ -277,11 +273,11 @@ type experimentInfo struct {
 
 // getExperimentInfo returns experiment lifecycle info for the given experiment name
 func getExperimentInfo(experiment string) *experimentInfo {
-	return getExperimentInfoT(experiment, File{})
+	return getExperimentInfoT[File](experiment)
 }
 
-func getExperimentInfoT(experiment string, t any) *experimentInfo {
-	ft := reflect.TypeOf(t)
+func getExperimentInfoT[T any](experiment string) *experimentInfo {
+	ft := reflect.TypeFor[T]()
 	for i := 0; i < ft.NumField(); i++ {
 		field := ft.Field(i)
 		if strings.EqualFold(field.Name, experiment) {

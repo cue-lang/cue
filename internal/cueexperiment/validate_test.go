@@ -29,18 +29,17 @@ import (
 func TestExperimentVersionOrdering(t *testing.T) {
 	// Test both global experiments (Config) and file experiments (File)
 	testTypes := []struct {
-		name     string
-		typeSpec any
+		name string
+		ft   reflect.Type
 	}{
-		{"Config", Config{}},
-		{"File", File{}},
+		{"Config", reflect.TypeFor[Config]()},
+		{"File", reflect.TypeFor[File]()},
 	}
 
 	for _, tt := range testTypes {
 		t.Run(tt.name, func(t *testing.T) {
-			ft := reflect.TypeOf(tt.typeSpec)
-			for i := 0; i < ft.NumField(); i++ {
-				field := ft.Field(i)
+			for i := 0; i < tt.ft.NumField(); i++ {
+				field := tt.ft.Field(i)
 				tagStr, ok := field.Tag.Lookup("experiment")
 				if !ok {
 					continue

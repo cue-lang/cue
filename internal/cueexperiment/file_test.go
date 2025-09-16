@@ -190,7 +190,7 @@ func TestCanApplyFix(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := canApplyExperimentFix(tt.experiment, tt.version, tt.target, testFile{})
+			err := canApplyExperimentFix[testFile](tt.experiment, tt.version, tt.target)
 			if tt.wantErr == "" {
 				if err != nil {
 					t.Errorf("CanApplyFix() error = %v, want nil", err)
@@ -255,7 +255,7 @@ func TestGetActiveExperiments(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := getActiveExperiments(tt.version, tt.target, testFile{})
+			got := getActiveExperiments[testFile](tt.version, tt.target)
 			if !slices.Equal(got, tt.want) {
 				t.Errorf("GetActiveExperiments(%q, %q) = %v, want %v", tt.version, tt.target, got, tt.want)
 			}
@@ -304,7 +304,7 @@ func TestGetUpgradeExperiments(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := getUpgradeExperiments(tt.version, tt.target, testFile{})
+			got := getUpgradeExperiments[testFile](tt.version, tt.target)
 			if !slices.Equal(got, tt.want) {
 				t.Errorf("GetUpgradeExperiments(%q, %q) = %v, want %v", tt.version, tt.target, got, tt.want)
 			}

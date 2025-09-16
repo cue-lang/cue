@@ -93,8 +93,7 @@ func main() {
 
 func extractExperiments() ([]Experiment, error) {
 	// Extract file experiments from File struct
-	fileExperiments, err := extractExperimentsFromStruct(
-		reflect.TypeOf(cueexperiment.File{}),
+	fileExperiments, err := extractExperimentsFromStruct[cueexperiment.File](
 		"../../../internal/cueexperiment/file.go",
 		"File",
 		false, // IsGlobal = false for per-file experiments
@@ -104,8 +103,7 @@ func extractExperiments() ([]Experiment, error) {
 	}
 
 	// Extract global experiments from Config struct
-	globalExperiments, err := extractExperimentsFromStruct(
-		reflect.TypeOf(cueexperiment.Config{}),
+	globalExperiments, err := extractExperimentsFromStruct[cueexperiment.Config](
 		"../../../internal/cueexperiment/exp.go",
 		"Config",
 		true, // IsGlobal = true for global experiments
@@ -164,7 +162,7 @@ func parseExperimentTag(tagStr string) *experimentInfo {
 	return info
 }
 
-func extractExperimentsFromStruct(structType reflect.Type, srcPath, structName string, isGlobal bool) ([]Experiment, error) {
+func extractExperimentsFromStruct[T any](srcPath, structName string, isGlobal bool) ([]Experiment, error) {
 	// Parse the source file to extract comments
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, srcPath, nil, parser.ParseComments)
@@ -222,6 +220,7 @@ func extractExperimentsFromStruct(structType reflect.Type, srcPath, structName s
 	// Use reflection to get experiment info from the struct
 	var experiments []Experiment
 
+	structType := reflect.TypeFor[T]()
 	for i := 0; i < structType.NumField(); i++ {
 		field := structType.Field(i)
 		tagStr, ok := field.Tag.Lookup("experiment")

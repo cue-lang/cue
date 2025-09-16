@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3b2d6ea_85345514",
+        "filename": "encoding/openapi/build.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-16T09:47:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b017ce7_46e3dc99",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1865e28b_52a291ac",
@@ -225,6 +243,24 @@
       "side": 1,
       "message": "What is \"it\" and what is a \"proper struct\"?",
       "parentUuid": "a45fa2e7_106d8681",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39c22a23_2fbd7a6a",
+        "filename": "pkg/encoding/openapi/openapi.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-16T09:47:52Z",
+      "side": 1,
+      "message": "Sorry, I define the config as a Go struct so it appears in the Go package docs and (I think) makes the unmarshaling easier too:\n\n```\nfunc MarshalSchema(config Config, schema pkg.Schema) (string, error)\n\ntype Config struct {\n\t// Version holds the OpenAPI version to use when marshaling.\n\t// Currently only \"3.0.0\" is supported.\n\tVersion string `json:\"version\"`\n\n\t// Info specifies the info section of the OpenAPI document. To be a valid\n\t// OpenAPI document, it must include at least the title and version fields.\n\tInfo json.RawMessage\t`json:\"info\"`\n\n\t// selfContained causes all non-expanded external references to be included\n\t// in this document.\n\tSelfContained bool `json:\"selfContained\"`\n\n\t// ExpandReferences replaces references with actual objects when generating\n\t// OpenAPI Schema. It is an error for an CUE value to refer to itself\n\t// if this option is used.\n\tExpandReferences bool `json:\"expandReferences\"`\n}\n```",
+      "parentUuid": "2625f65a_0fda0665",
       "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

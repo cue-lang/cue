@@ -16,6 +16,24 @@
       "message": "I thought about this, but I don\u0027t see the benefit of it. I would think it just potentially generates more code (larger binary) without giving much typing benefits.\n\nCan you verify the binary size does not increase?",
       "revId": "c13199ed9b4056916054203a770b065294c1721d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dedb8510_9836c772",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-16T10:21:19Z",
+      "side": 1,
+      "message": "In general I\u0027m not a huge fan of using generics if there isn\u0027t a clear benefit. The rest of the code still uses reflection, so aside from a potential binary increase, it just increases complexity of the code.",
+      "parentUuid": "ed2705cf_6cf2da86",
+      "revId": "c13199ed9b4056916054203a770b065294c1721d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

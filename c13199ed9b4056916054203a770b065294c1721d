@@ -34,6 +34,24 @@
       "parentUuid": "ed2705cf_6cf2da86",
       "revId": "c13199ed9b4056916054203a770b065294c1721d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c41f5544_c957a970",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-16T10:35:24Z",
+      "side": 1,
+      "message": "The cue binary grows by 5KiB, or 0.018%, so that\u0027s negligible. Not really concerned about that given how we just have two types here.\n\nI guess complexity is subjective. I find the newer APIs much easier to reason about; you\u0027re passing types as type parameters rather than as odd zero values. Sure, it\u0027s still reflection underneath, but that\u0027s fine - it\u0027s just a matter of being clear about what is the type parameter.\n\nIf you don\u0027t like this I can abandon - I don\u0027t think it\u0027s a big deal either way - but I do lean towards using type parameters for this because you are literally passing types around.",
+      "parentUuid": "dedb8510_9836c772",
+      "revId": "c13199ed9b4056916054203a770b065294c1721d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

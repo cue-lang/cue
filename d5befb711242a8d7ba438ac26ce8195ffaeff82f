@@ -267,6 +267,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "27678131_398daf9b",
+        "filename": "pkg/encoding/openapi/openapi.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-16T13:02:19Z",
+      "side": 1,
+      "message": "As far as I can remember, that is not supported within the builtin packages.\n\nI think we should address this with the function signature proposal.",
+      "parentUuid": "39c22a23_2fbd7a6a",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3daa5543_ca57220f",
         "filename": "pkg/encoding/openapi/testdata/gen.txtar",
         "patchSetId": 2

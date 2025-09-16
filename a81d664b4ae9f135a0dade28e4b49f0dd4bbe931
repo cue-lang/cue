@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "200891c1_c4af6e64",
+        "filename": "encoding/openapi/errors.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-16T13:02:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f65439e0_4d182d94",
+      "revId": "a81d664b4ae9f135a0dade28e4b49f0dd4bbe931",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "438e2333_02d4b9ab",

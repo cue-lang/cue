@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec6f03b5_ff835d23",
+        "filename": "internal/cueexperiment/file.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-16T10:43:43Z",
+      "side": 0,
+      "message": "I guess this could still be simplified, also in the old code.",
+      "revId": "c3562904a6199ce1fffe3dab45d5fc9537e4b754",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

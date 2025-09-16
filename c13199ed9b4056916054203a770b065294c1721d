@@ -52,6 +52,24 @@
       "parentUuid": "dedb8510_9836c772",
       "revId": "c13199ed9b4056916054203a770b065294c1721d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e261e02_2494f529",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-09-16T10:43:43Z",
+      "side": 1,
+      "message": "To me the litmus test is whether you can catch errors at compilation time. You can\u0027t here. The only thing you do is doubling code. So to me this is not worth it. \n\nThe new code mixes two different mechanisms, which is more confusing to me.\n\nPersonally, I actually find the old code _easier_ to read. But I guess that is subjective.",
+      "parentUuid": "c41f5544_c957a970",
+      "revId": "c13199ed9b4056916054203a770b065294c1721d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

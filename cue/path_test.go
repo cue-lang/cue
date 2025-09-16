@@ -26,156 +26,281 @@ import (
 
 func TestPaths(t *testing.T) {
 	type testCase struct {
-		path cue.Path
-		out  string
-		str  string
-		err  bool
+		name      string
+		cue       string
+		path      cue.Path
+		transform func(cue.Value) cue.Value
+		wantErr   bool
+		wantVal   string
+		wantPath  string
+		wantInst  string
 	}
 	testCases := []testCase{{
-		path: cue.MakePath(cue.Str("list"), cue.AnyIndex),
-		out:  "int",
-		str:  "list.[_]",
+		name: "Definition",
+		cue: `
+			#Foo:   a: b: 1
+			"#Foo": c: d: 2
+		`,
+		path:     cue.MakePath(cue.Def("#Foo"), cue.Str("a"), cue.Str("b")),
+		wantVal:  "1",
+		wantPath: "#Foo.a.b",
 	}, {
-
-		path: cue.MakePath(cue.Def("#Foo"), cue.Str("a"), cue.Str("b")),
-		out:  "1",
-		str:  "#Foo.a.b",
+		name: "DefinitionWithParsePath",
+		cue: `
+			#Foo:   a: b: 1
+			"#Foo": c: d: 2
+		`,
+		path:     cue.ParsePath(`#Foo.a.b`),
+		wantVal:  "1",
+		wantPath: "#Foo.a.b",
 	}, {
-		path: cue.ParsePath(`#Foo.a.b`),
-		out:  "1",
-		str:  "#Foo.a.b",
+		name: "RegularFieldLookingLikeDefinition",
+		cue: `
+			#Foo:   a: b: 1
+			"#Foo": c: d: 2
+		`,
+		path:     cue.ParsePath(`"#Foo".c.d`),
+		wantVal:  "2",
+		wantPath: `"#Foo".c.d`,
 	}, {
-		path: cue.ParsePath(`"#Foo".c.d`),
-		out:  "2",
-		str:  `"#Foo".c.d`,
-	}, {
+		name: "DefWithoutLeadingHash",
+		cue: `
+			#Foo:   a: b: 1
+			"#Foo": c: d: 2
+		`,
 		// fallback Def(Foo) -> Def(#Foo)
-		path: cue.MakePath(cue.Def("Foo"), cue.Str("a"), cue.Str("b")),
-		out:  "1",
-		str:  "#Foo.a.b",
+		path:     cue.MakePath(cue.Def("Foo"), cue.Str("a"), cue.Str("b")),
+		wantVal:  "1",
+		wantPath: "#Foo.a.b",
 	}, {
-		path: cue.MakePath(cue.Str("b"), cue.Index(2)),
-		out:  "6",
-		str:  "b[2]", // #Foo.b.2
+		name: "FieldNotFound",
+		cue: `
+			#Foo:   a: b: 1
+			"#Foo": c: d: 2
+		`,
+		path:     cue.ParsePath("#Foo.a.c"),
+		wantPath: "#Foo.a.c",
+		wantVal:  `_|_ // field not found: c`,
 	}, {
-		path: cue.MakePath(cue.Str("c"), cue.Str("#Foo")),
-		out:  "7",
-		str:  `c."#Foo"`,
+		name: "ListIndexWithMakePath",
+		cue: `
+			b: [4, 5, 6]
+		`,
+		path:     cue.MakePath(cue.Str("b"), cue.Index(2)),
+		wantVal:  "6",
+		wantPath: "b[2]", // #Foo.b.2
 	}, {
-		path: cue.MakePath(cue.Hid("_foo", "_"), cue.Str("b")),
-		out:  "5",
-		str:  `_foo.b`,
+		name: "ListIndexWithParsePath",
+		cue: `
+			b: [4, 5, 6]
+		`,
+		path:     cue.ParsePath(`b[2]`),
+		wantPath: `b[2]`,
+		wantVal:  "6",
 	}, {
-		path: cue.ParsePath("#Foo.a.b"),
-		str:  "#Foo.a.b",
-		out:  "1",
+		name: "StrLookingLikeDefinition",
+		cue: `
+			c: "#Foo": 7
+		`,
+		path:     cue.MakePath(cue.Str("c"), cue.Str("#Foo")),
+		wantVal:  "7",
+		wantPath: `c."#Foo"`,
 	}, {
-		path: cue.ParsePath("#Foo.a.c"),
-		str:  "#Foo.a.c",
-		out:  `_|_ // field not found: c`,
+		name: "ParsePathWithQuotedStringLookingLikeDefinition",
+		cue: `
+			c: "#Foo": 7
+		`,
+		path:     cue.ParsePath(`c."#Foo"`),
+		wantPath: `c."#Foo"`,
+		wantVal:  "7",
 	}, {
-		path: cue.ParsePath(`b[2]`),
-		str:  `b[2]`,
-		out:  "6",
+		name: "AnonHiddenField",
+		cue: `
+			_foo: b: 5
+		`,
+		path:     cue.MakePath(cue.Hid("_foo", "_"), cue.Str("b")),
+		wantVal:  "5",
+		wantPath: `_foo.b`,
 	}, {
-		path: cue.ParsePath(`c."#Foo"`),
-		str:  `c."#Foo"`,
-		out:  "7",
+		name: "ParsePathWithHiddenLabel",
+		cue: `
+			_foo: b: 5
+		`,
+		path:     cue.ParsePath("foo._foo"),
+		wantPath: "_|_",
+		wantErr:  true,
+		wantVal:  `_|_ // invalid path: hidden label _foo not allowed`,
 	}, {
-		path: cue.ParsePath("foo._foo"),
-		str:  "_|_",
-		err:  true,
-		out:  `_|_ // invalid path: hidden label _foo not allowed`,
+		name: "ParsePathWithUnterminatedStringLiteral",
+		cue: `
+			c: "#Foo": 7
+		`,
+		path:     cue.ParsePath(`c."#Foo`),
+		wantPath: "_|_",
+		wantErr:  true,
+		wantVal:  `_|_ // string literal not terminated`,
 	}, {
-		path: cue.ParsePath(`c."#Foo`),
-		str:  "_|_",
-		err:  true,
-		out:  `_|_ // string literal not terminated`,
+		name: "ParsePathWithNonConstantIndex",
+		cue: `
+			a: 3
+			b: [4, 5, 6]
+		`,
+		path:     cue.ParsePath(`b[a]`),
+		wantPath: "_|_",
+		wantErr:  true,
+		wantVal:  `_|_ // non-constant expression a`,
 	}, {
-		path: cue.ParsePath(`b[a]`),
-		str:  "_|_",
-		err:  true,
-		out:  `_|_ // non-constant expression a`,
+		name: "ParsePathWithInvalidStringIndex",
+		cue: `
+			b: [4, 5, 6]
+		`,
+		path:     cue.ParsePath(`b['1']`),
+		wantPath: "_|_",
+		wantErr:  true,
+		wantVal:  `_|_ // invalid string index '1'`,
 	}, {
-		path: cue.ParsePath(`b['1']`),
-		str:  "_|_",
-		err:  true,
-		out:  `_|_ // invalid string index '1'`,
+		name: "ParsePathWithOutOfRangeIndex",
+		cue: `
+			b: [4, 5, 6]
+		`,
+		path:     cue.ParsePath(`b[3T]`),
+		wantPath: "_|_",
+		wantErr:  true,
+		wantVal:  `_|_ // int label out of range (3000000000000 not >=0 and <= 268435454)`,
 	}, {
-		path: cue.ParsePath(`b[3T]`),
-		str:  "_|_",
-		err:  true,
-		out:  `_|_ // int label out of range (3000000000000 not >=0 and <= 268435454)`,
+		name: "ParsePathWithFloatIndex",
+		cue: `
+			b: [4, 5, 6]
+		`,
+		path:     cue.ParsePath(`b[3.3]`),
+		wantPath: "_|_",
+		wantErr:  true,
+		wantVal:  `_|_ // invalid literal 3.3`,
 	}, {
-		path: cue.ParsePath(`b[3.3]`),
-		str:  "_|_",
-		err:  true,
-		out:  `_|_ // invalid literal 3.3`,
+		name: "MapWithAnyString",
+		cue: `
+			map: [string]: int
+		`,
+		path:     cue.MakePath(cue.Str("map"), cue.AnyString),
+		wantVal:  "int",
+		wantPath: "map.[_]",
 	}, {
-		path: cue.MakePath(cue.Str("map"), cue.AnyString),
-		out:  "int",
-		str:  "map.[_]",
+		name:     "ListWithAnyIndex",
+		cue:      `list: [...int]`,
+		path:     cue.MakePath(cue.Str("list"), cue.AnyIndex),
+		wantVal:  "int",
+		wantPath: "list.[_]",
 	}, {
-		path: cue.MakePath(cue.Str("list"), cue.AnyIndex),
-		out:  "int",
-		str:  "list.[_]",
+		name: "Issue2060_1",
+		cue: `
+			let X = {a: b: 0}
+			x: y: X.a
+		`,
+		path:     cue.ParsePath("x.y"),
+		wantVal:  "{\n\tb: 0\n}",
+		wantPath: "x.y",
 	}, {
-		path: cue.ParsePath("x.y"),
-		out:  "{\n\tb: 0\n}",
-		str:  "x.y",
+		name: "Issue2060_2",
+		cue: `
+			let X = {a: b: 0}
+			x: y: X.a
+		`,
+		path:     cue.ParsePath("x.y.b"),
+		wantVal:  "0",
+		wantPath: "x.y.b",
 	}, {
-		path: cue.ParsePath("x.y.b"),
-		out:  "0",
-		str:  "x.y.b",
+		name: "Issue3577",
+		cue: `
+			pkg: z
+			z: y: "hello"
+		`,
+		path:     cue.ParsePath("pkg.y"),
+		wantVal:  `"hello"`,
+		wantPath: "pkg.y", // show original path, not structure shared path.
 	}, {
-		// Issue 3577
-		path: cue.ParsePath("pkg.y"),
-		out:  `"hello"`,
-		str:  "pkg.y", // show original path, not structure shared path.
+		name: "Issue3922",
+		cue: `
+			out: #Output
+			#Output: name: _data.name
+			_data: name: "one"
+		`,
+		path:     cue.ParsePath("out.name"),
+		wantVal:  `"one"`,
+		wantPath: "out.name",
 	}, {
-		// Issue 3922
-		path: cue.ParsePath("out.name"),
-		out:  `"one"`,
-		str:  "out.name",
+		name: "UnrootedValue",
+		cue: `
+			{a: b: 1}.a
+		`,
+		path: cue.Path{},
+		transform: func(v cue.Value) cue.Value {
+			op, args := v.Expr()
+			if op != cue.SelectorOp {
+				panic(fmt.Errorf("unexpected operation %v", op))
+			}
+			return args[0].LookupPath(cue.ParsePath("a.b"))
+		},
+		wantVal:  "1",
+		wantInst: "nil",
+		wantPath: "a.b",
+	}, {
+		name: "ValueInPackage",
+		cue: `
+			import "strings"
+			strings.ToUpper("foo")
+		`,
+		path: cue.Path{},
+		transform: func(v cue.Value) cue.Value {
+			op, args := v.Expr()
+			if op != cue.CallOp {
+				panic(fmt.Errorf("unexpected operation %v", op))
+			}
+			return args[0]
+		},
+		wantVal:  `strings.ToUpper`,
+		wantPath: "ToUpper",
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
 		ctx := t.M.CueContext()
-		val := mustCompile(t, ctx, `
-			#Foo:   a: b: 1
-			"#Foo": c: d: 2
-			_foo: b: 5
-			a: 3
-			b: [4, 5, 6]
-			c: "#Foo": 7
-			map: [string]: int
-			list: [...int]
+		val := mustCompile(t, ctx, tc.cue)
 
-			// Issue 2060
-			let X = {a: b: 0}
-			x: y: X.a
-
-			// Issue 3577
-			pkg: z
-			z: y: "hello"
-
-			// Issue 3922
-			out: #Output
-			#Output: name: _data.name
-			_data: name: "one"
-		`)
-
-		t.Equal(tc.path.Err() != nil, tc.err)
+		t.Equal(tc.path.Err() != nil, tc.wantErr)
 
 		w := val.LookupPath(tc.path)
+		if tc.transform != nil {
+			w = tc.transform(w)
+		}
 
-		t.Equal(fmt.Sprint(w), tc.out)
+		t.Equal(fmt.Sprint(w), tc.wantVal)
 
 		if w.Err() != nil {
 			return
 		}
 
-		t.Equal(w.Path().String(), tc.str)
+		root, path := w.RootPath()
+		t.Logf("root %v", root)
+		t.Equal(path.String(), tc.wantPath)
+
+		// Sanity check that we can get to the
+		// value from the root.
+		if !root.LookupPath(path).Exists() {
+			t.Errorf("root path does not resolve")
+		}
+
+		inst := root.BuildInstance()
+		importPath := ""
+		switch {
+		case inst == nil:
+			importPath = "nil"
+		case inst.ImportPath == "":
+			if inst != val.BuildInstance() {
+				t.Errorf("unexpected instance with empty import path")
+			}
+		default:
+			importPath = inst.ImportPath
+		}
+		t.Equal(importPath, tc.wantInst)
 	})
 }
 

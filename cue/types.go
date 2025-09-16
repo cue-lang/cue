@@ -1434,33 +1434,44 @@ func (v hiddenValue) Lookup(path ...string) Value {
 	return v
 }
 
+// RootPath returns the value and path (r, p) from v such that r is a
+// package instance and [Value.LookupPath](r, p) resolves to v. If v is
+// not at a path within an instance, it returns zero values for r and p.
+func (v Value) RootPath() (Value, Path) {
+	if v.v == nil {
+		return Value{}, Path{}
+	}
+	root, path := appendPath(nil, v)
+	return root, Path{path: path}
+}
+
 // Path returns the path to this value from the root of an Instance.
 //
 // This is currently only defined for values that have a fixed path within
 // a configuration, and thus not those that are derived from Elem, Template,
 // or programmatically generated values such as those returned by Unify.
 func (v Value) Path() Path {
-	if v.v == nil {
-		return Path{}
-	}
-	return Path{path: appendPath(nil, v)}
+	_, path := v.RootPath()
+	return path
 }
 
 // Path computes the sequence of Features leading from the root to of the
 // instance to this Vertex.
-func appendPath(a []Selector, v Value) []Selector {
+func appendPath(a []Selector, v Value) (root Value, _ []Selector) {
 	if p := v.parent(); p.v != nil {
-		a = appendPath(a, p)
+		root, a = appendPath(a, p)
+	} else {
+		root = v
 	}
 
 	if v.v.Label == 0 {
 		// A Label may be 0 for programmatically inserted nodes.
-		return a
+		return root, a
 	}
 
 	f := v.v.Label
 	if index := f.Index(); index == adt.MaxIndex {
-		return append(a, Selector{anySelector(f)})
+		return root, append(a, Selector{anySelector(f)})
 	}
 
 	var sel selector
@@ -1482,7 +1493,7 @@ func appendPath(a []Selector, v Value) []Selector {
 	default:
 		panic(fmt.Sprintf("unsupported label type %v", t))
 	}
-	return append(a, Selector{sel})
+	return root, append(a, Selector{sel})
 }
 
 // LookupDef is equal to LookupPath(MakePath(Def(name))).

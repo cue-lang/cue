@@ -66,7 +66,7 @@ workflows: release: _repo.bashWorkflow & {
 
 			{
 				name: "Install GoReleaser"
-				uses: "goreleaser/goreleaser-action@v5"
+				uses: "goreleaser/goreleaser-action@v6"
 				with: {
 					"install-only": true
 					version:        _repo.goreleaserVersion

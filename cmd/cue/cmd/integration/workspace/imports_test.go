@@ -72,13 +72,12 @@ import "
 				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Reloaded", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 For file %v/a/a.cue found [Package dirs=[%v/a] importPath=example.com/bar/a@v0]", rootURI, rootURI, rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loading packages [example.com/bar/a@v0]", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/a] importPath=example.com/bar/a@v0", rootURI, rootURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
 				// A module is created for the imported module.
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=unknown Created", cacheURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Reloaded", cacheURI),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Loaded Package dirs=[%v/example.com/foo@v0.0.1/x] importPath=example.com/foo/x@v0", cacheURI, cacheURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/example.com/foo@v0.0.1/x] importPath=example.com/foo/x@v0 Reloaded", cacheURI),
 			)
 		})
 	})
@@ -95,7 +94,7 @@ import "
 			env.Await(
 				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/b] importPath=example.com/bar/b@v0", rootURI, rootURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/b] importPath=example.com/bar/b@v0 Reloaded", rootURI),
 				// Nothing is created for the unfindable imports
 				NoLogExactf(protocol.Debug, "example.net/bar/doesnotexist"),
 				NoLogExactf(protocol.Debug, "example.com/bar/doesnotexist"),
@@ -116,16 +115,16 @@ import "
 				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loading packages [example.com/bar/c@v0]", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Error when loading example.com/bar/c@v0: cannot get imports", rootURI),
-				// No conclusion of the load:
-				NoLogExactf(protocol.Debug, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/c] importPath=example.com/bar/c@v0", rootURI, rootURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/c] importPath=example.com/bar/c@v0 Created", rootURI),
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Error when reloading: cannot get imports", rootURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/c] importPath=example.com/bar/c@v0 Deleted", rootURI),
 			)
 			// Now edit it to correct the imports line:
 			env.EditBuffer("c/c.cue", fake.NewEdit(2, 7, 2, 7, `"`))
 			env.Await(
 				env.DoneWithChange(),
-				// We should now get the successful package load
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/c] importPath=example.com/bar/c@v0", rootURI, rootURI),
+				// We should get the package load
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/c] importPath=example.com/bar/c@v0 Reloaded", rootURI),
 			)
 		})
 	})

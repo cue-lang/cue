@@ -41,10 +41,9 @@ y: 5
 		env.Await(
 			env.DoneWithOpen(),
 			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Reloaded", rootURI),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 For file %v/a/a.cue found [Package dirs=[%v/a] importPath=example.com/bar/a@v0]", rootURI, rootURI, rootURI),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/a] importPath=example.com/bar/a@v0", rootURI, rootURI),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
 			// A package is created for the imported package.
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/cue.mod/gen/example.com/foo/x %v/cue.mod/pkg/example.com/foo/x %v/cue.mod/usr/example.com/foo/x] importPath=example.com/foo/x", rootURI, rootURI, rootURI, rootURI),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/cue.mod/gen/example.com/foo/x %v/cue.mod/pkg/example.com/foo/x %v/cue.mod/usr/example.com/foo/x] importPath=example.com/foo/x Reloaded", rootURI, rootURI, rootURI),
 		)
 		// Now perform a jump-to-dfn from the open a.cue file,
 		// from the "y" in "out: x.y", which should take us to the two

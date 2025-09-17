@@ -34,8 +34,7 @@ package a
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 For file %v/a.cue found [Package dirs=[%v] importPath=mod.example/x@v0:a]", rootURI, rootURI, rootURI),
-			NoLogExactf(protocol.Debug, "Module dir=%v module=mod.example/x@v0 For file %v/b.cue found [Package dirs=[%v] importPath=mod.example/x@v0:a]", rootURI, rootURI, rootURI),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		// The order of these events is very important. We need to
@@ -49,7 +48,7 @@ package a
 		env.CheckForFileChanges()
 
 		env.Await(
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 For file %v/b.cue found [Package dirs=[%v] importPath=mod.example/x@v0:a]", rootURI, rootURI, rootURI),
+			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		// Closing a.cue will now cause a re-read of the file from disk
@@ -59,6 +58,7 @@ package a
 		env.CloseBuffer("a.cue")
 		env.Await(
 			env.DoneWithClose(),
+			LogExactf(protocol.Debug, 3, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 	})
 }

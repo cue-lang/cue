@@ -59,7 +59,7 @@ out: "A" | // first letter
 			env.OpenFile("a/a.cue")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dirs=[%v/a] importPath=mod.example/x/a@v0", rootURI, rootURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
 			)
 			env.FormatBuffer("a/a.cue")
 			content, open := env.Editor.BufferText("a/a.cue")
@@ -77,7 +77,7 @@ out: "A" | // first letter
 			env.OpenFile("a/b.cue")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dirs=[%v/a] importPath=mod.example/x/a@v0", rootURI, rootURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
 			)
 			env.FormatBuffer("a/b.cue")
 			content, open := env.Editor.BufferText("a/b.cue")
@@ -95,7 +95,7 @@ out: "A" | // first letter
 			env.OpenFile("a/c.cue")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loaded Package dirs=[%v/a] importPath=mod.example/x/a@v0", rootURI, rootURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
 			)
 			env.FormatBuffer("a/c.cue")
 			content, open := env.Editor.BufferText("a/c.cue")

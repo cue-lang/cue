@@ -1030,7 +1030,7 @@ func (n *astNode) eval() {
 				// Non-base-case: we're processing the first clause in
 				// this node, and all that remain go into a copy of the
 				// comprehension, which we find later and pass to an
-				// appropriate child/descendent.
+				// appropriate child/descendant.
 				nodeCopy := *node
 				nodeCopy.Clauses = node.Clauses[1:]
 				comprehensionsStash[clause] = &nodeCopy

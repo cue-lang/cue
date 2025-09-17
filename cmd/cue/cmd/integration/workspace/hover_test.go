@@ -90,8 +90,8 @@ data: name: "bob"
 		env.OpenFile("a/a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/a] importPath=example.com/bar/a@v0", rootURI, rootURI),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Loaded Package dirs=[%v/example.com/foo@v0.0.1/x] importPath=example.com/foo/x@v0", cacheURI, cacheURI),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/example.com/foo@v0.0.1/x] importPath=example.com/foo/x@v0 Reloaded", cacheURI),
 		)
 
 		mappers := make(map[string]*protocol.Mapper)

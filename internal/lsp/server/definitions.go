@@ -25,7 +25,7 @@ import (
 func (s *server) Definition(ctx context.Context, params *protocol.DefinitionParams) ([]protocol.Location, error) {
 	uri := params.TextDocument.URI
 	pkg, err := s.packageForURI(uri)
-	if err != nil {
+	if err != nil || pkg == nil {
 		return nil, err
 	}
 	return pkg.Definition(uri, params.Position), nil
@@ -34,7 +34,7 @@ func (s *server) Definition(ctx context.Context, params *protocol.DefinitionPara
 func (s *server) Completion(ctx context.Context, params *protocol.CompletionParams) (*protocol.CompletionList, error) {
 	uri := params.TextDocument.URI
 	pkg, err := s.packageForURI(uri)
-	if err != nil {
+	if err != nil || pkg == nil {
 		return nil, err
 	}
 	return pkg.Completion(uri, params.Position), nil
@@ -43,7 +43,7 @@ func (s *server) Completion(ctx context.Context, params *protocol.CompletionPara
 func (s *server) Hover(ctx context.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
 	uri := params.TextDocument.URI
 	pkg, err := s.packageForURI(uri)
-	if err != nil {
+	if err != nil || pkg == nil {
 		return nil, err
 	}
 	return pkg.Hover(uri, params.Position), nil
@@ -56,24 +56,11 @@ func (s *server) packageForURI(uri protocol.DocumentURI) (*cache.Package, error)
 	} else if mod == nil {
 		return nil, fmt.Errorf("no module found for %v", uri)
 	}
-	pkgs, err := mod.FindPackagesOrModulesForFile(uri)
+	ip, _, err := mod.FindImportPathForFile(uri)
 	if err != nil {
 		return nil, err
-	} else if len(pkgs) == 0 {
+	} else if ip == nil {
 		return nil, fmt.Errorf("no pkgs found for %v", uri)
 	}
-	// The first package will be the "most specific". I.e. the package
-	// with root at the same directory as the file itself. There's
-	// maybe an argument that we should be calling e.g. Completion on
-	// all the packages, and merging the results. This would find
-	// definitions that exist due to ancestor imports, but these are
-	// descendant packages from the pov of the file on which Completion
-	// has just been called. For example, pkgs[0] could have import
-	// path foo.com/x:a and a package with import path foo.com/x/y/z:a
-	// could also exist in pkgs.
-	pkg, ok := pkgs[0].(*cache.Package)
-	if !ok {
-		return nil, fmt.Errorf("no pkgs found for %v", uri)
-	}
-	return pkg, nil
+	return mod.Package(*ip), nil
 }

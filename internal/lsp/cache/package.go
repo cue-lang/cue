@@ -53,16 +53,6 @@ type packageOrModule interface {
 	ActiveFilesAndDirs(files map[protocol.DocumentURI][]packageOrModule, dirs map[protocol.DocumentURI]struct{})
 }
 
-type status uint8
-
-const (
-	// lots of code relies on the zero value being dirty. Do not change
-	// this.
-	dirty status = iota
-	splendid
-	deleted
-)
-
 // Package models a single CUE package within a CUE module.
 type Package struct {
 	// immutable fields: all set at construction only
@@ -82,42 +72,36 @@ type Package struct {
 
 	// mutable fields:
 
-	// pkg is the [modpkgload.Package] for this package, as loaded by
+	// modpkg is the [modpkgload.Package] for this package, as loaded by
 	// [modpkgload.LoadPackages].
-	pkg *modpkgload.Package
+	modpkg *modpkgload.Package
 
 	// importedBy contains the packages that directly import this
 	// package.
 	importedBy []*Package
 
-	// status of this Package.
-	status status
+	// isDirty means that
+	isDirty bool
 
 	// definitions for the files in this package. This is updated
 	// whenever the package status transitions to splendid.
 	definitions *definitions.Definitions
-	// mappers is for converting between different file coordinate
-	// systems. This is updated alongsite definitions.
-	mappers map[*token.File]*protocol.Mapper
 }
 
 func NewPackage(module *Module, importPath ast.ImportPath, dirs []protocol.DocumentURI) *Package {
 	slices.Sort(dirs)
-	return &Package{
+	pkg := &Package{
 		module:     module,
 		importPath: importPath,
 		dirURIs:    dirs,
+		isDirty:    true,
 	}
+	module.packages[importPath] = pkg
+	return pkg
 }
 
 func (pkg *Package) String() string {
 	return fmt.Sprintf("Package dirs=%v importPath=%v", pkg.dirURIs, pkg.importPath)
-}
-
-// MarkFileDirty implements [packageOrModule]
-func (pkg *Package) MarkFileDirty(file protocol.DocumentURI) {
-	pkg.setStatus(dirty)
-	pkg.module.dirtyFiles[file] = struct{}{}
 }
 
 // Encloses implements [packageOrModule]
@@ -127,11 +111,11 @@ func (pkg *Package) Encloses(file protocol.DocumentURI) bool {
 
 // ActiveFilesAndDirs implements [packageOrModule]
 func (pkg *Package) ActiveFilesAndDirs(files map[protocol.DocumentURI][]packageOrModule, dirs map[protocol.DocumentURI]struct{}) {
-	if pkg.pkg == nil {
+	if pkg.modpkg == nil {
 		return
 	}
 	root := pkg.module.rootURI
-	for _, file := range pkg.pkg.Files() {
+	for _, file := range pkg.modpkg.Files() {
 		fileUri := protocol.DocumentURI(string(root) + "/" + file.FilePath)
 		files[fileUri] = append(files[fileUri], pkg)
 		// the root will already be in dirs - the module will have seen
@@ -143,6 +127,124 @@ func (pkg *Package) ActiveFilesAndDirs(files map[protocol.DocumentURI][]packageO
 			dirs[dir] = struct{}{}
 		}
 	}
+}
+
+// MarkFileDirty implements [packageOrModule]
+func (pkg *Package) MarkFileDirty(file protocol.DocumentURI) {
+	pkg.module.dirtyFiles[file] = struct{}{}
+	pkg.markDirty()
+}
+
+func (pkg *Package) markDirty() {
+	if pkg.isDirty {
+		return
+	}
+
+	pkg.isDirty = true
+	for _, importer := range pkg.importedBy {
+		importer.markDirty()
+	}
+}
+
+func (pkg *Package) delete() {
+	m := pkg.module
+	delete(m.packages, pkg.importPath)
+	modpkg := pkg.modpkg
+	w := m.workspace
+	if modpkg != nil {
+		for _, file := range modpkg.Files() {
+			tokFile := file.Syntax.Pos().File()
+			delete(w.mappers, tokFile)
+		}
+	}
+	w.invalidateActiveFilesAndDirs()
+}
+
+// setStatus sets the package's status. If the status is transitioning
+// to a splendid status, then definitions and mappers are created and
+// stored in the package.
+func (pkg *Package) update(modpkg *modpkgload.Package) error {
+	oldModpkg := pkg.modpkg
+	pkg.modpkg = modpkg
+
+	m := pkg.module
+	w := m.workspace
+	if err := modpkg.Error(); err != nil {
+		w.debugLog(fmt.Sprintf("%v Error when loading %v: %v", m, pkg.importPath, err))
+		// It could be that the last file within this package was
+		// deleted, so attempting to load it will create an error. So
+		// the correct thing to do now is just remove any record of
+		// the pkg.
+		pkg.delete()
+		return ErrModuleDeleted
+	}
+
+	pkg.isDirty = false
+
+	w.invalidateActiveFilesAndDirs()
+
+	if oldModpkg != nil {
+		for _, file := range oldModpkg.Files() {
+			delete(w.mappers, file.Syntax.Pos().File())
+		}
+		for _, importedModpkg := range oldModpkg.Imports() {
+			if isUnhandledPackage(importedModpkg) {
+				continue
+			}
+			ip := normalizeImportPath(importedModpkg)
+			modRootURI := moduleRootURI(importedModpkg)
+			if importedPkg, found := w.findPackage(modRootURI, ip); found {
+				importedPkg.RemoveImportedBy(pkg)
+			}
+		}
+	}
+
+	for _, importedModpkg := range modpkg.Imports() {
+		if isUnhandledPackage(importedModpkg) {
+			continue
+		}
+		ip := normalizeImportPath(importedModpkg)
+		modRootURI := moduleRootURI(importedModpkg)
+		if importedPkg, found := w.findPackage(modRootURI, ip); found {
+			importedPkg.EnsureImportedBy(pkg)
+		}
+	}
+
+	files := modpkg.Files()
+	astFiles := make([]*ast.File, len(files))
+	for i, f := range files {
+		astFiles[i] = f.Syntax
+		uri := m.rootURI + protocol.DocumentURI("/"+f.FilePath)
+		tokFile := f.Syntax.Pos().File()
+		w.mappers[tokFile] = protocol.NewMapper(uri, tokFile.Content())
+		delete(m.dirtyFiles, uri)
+	}
+
+	forPackage := func(importPath string) *definitions.Definitions {
+		importPath = ast.ParseImportPath(importPath).Canonical().String()
+		for _, imported := range modpkg.Imports() {
+			if imported.ImportPath() != importPath {
+				continue
+			} else if isUnhandledPackage(imported) {
+				// This includes stdlib packages, which we can't jump
+				// into yet!. TODO
+				return nil
+			}
+			ip := normalizeImportPath(imported)
+			importedPkg, found := w.findPackage(moduleRootURI(imported), ip)
+			if !found {
+				return nil
+			}
+			return importedPkg.definitions
+		}
+		return nil
+	}
+	// definitions.Analyse does almost no work - calculation of
+	// resolutions is done lazily. So no need to launch go-routines
+	// here.
+	pkg.definitions = definitions.Analyse(forPackage, astFiles...)
+
+	return nil
 }
 
 // EnsureImportedBy ensures that importer is recorded as a user of
@@ -160,66 +262,6 @@ func (pkg *Package) RemoveImportedBy(importer *Package) {
 	pkg.importedBy = slices.DeleteFunc(pkg.importedBy, func(p *Package) bool {
 		return p == importer
 	})
-}
-
-// setStatus sets the package's status. If the status is transitioning
-// to a splendid status, then definitions and mappers are created and
-// stored in the package.
-func (pkg *Package) setStatus(status status) {
-	if pkg.status == status {
-		return
-	}
-	pkg.status = status
-
-	switch status {
-	case dirty:
-		for _, importer := range pkg.importedBy {
-			importer.setStatus(dirty)
-		}
-
-	case splendid:
-		w := pkg.module.workspace
-		for file := range pkg.mappers {
-			delete(w.mappers, file)
-		}
-
-		modpkg := pkg.pkg
-		files := modpkg.Files()
-		mappers := make(map[*token.File]*protocol.Mapper, len(files))
-		astFiles := make([]*ast.File, len(files))
-		for i, f := range files {
-			astFiles[i] = f.Syntax
-			uri := pkg.module.rootURI + protocol.DocumentURI("/"+f.FilePath)
-			file := f.Syntax.Pos().File()
-			mapper := protocol.NewMapper(uri, file.Content())
-			mappers[file] = mapper
-			w.mappers[file] = mapper
-		}
-		forPackage := func(importPath string) *definitions.Definitions {
-			importPath = ast.ParseImportPath(importPath).Canonical().String()
-			for _, imported := range modpkg.Imports() {
-				if imported.ImportPath() != importPath {
-					continue
-				} else if isUnhandledPackage(imported) {
-					// This includes stdlib packages, which we can't jump
-					// into yet!. TODO
-					return nil
-				}
-				ip := normalizeImportPath(imported)
-				importedPkg, found := w.findPackage(moduleRootURI(imported), ip)
-				if !found {
-					return nil
-				}
-				return importedPkg.definitions
-			}
-			return nil
-		}
-		// definitions.Analyse does almost no work - calculation of
-		// resolutions is done lazily. So no need to launch go-routines
-		// here. Similarly, the creation of a mapper is lazy.
-		pkg.mappers = mappers
-		pkg.definitions = definitions.Analyse(forPackage, astFiles...)
-	}
 }
 
 // Definition attempts to treat the given uri and position as a file

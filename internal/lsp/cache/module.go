@@ -56,9 +56,6 @@ type Module struct {
 	// map are mirrored to the workspace's packages map.
 	packages map[ast.ImportPath]*Package
 
-	// status of this Module
-	status status
-
 	// dirtyFiles holds dirty files within the module's packages only:
 	// i.e. any file that was loaded by any of the module's
 	// packages. We gather these files in the Module rather than in
@@ -76,13 +73,18 @@ type Module struct {
 // cue.mod/module.cue file) is not loaded until [Module.ReloadModule]
 // is called.
 func NewModule(modFileUri protocol.DocumentURI, w *Workspace) *Module {
-	return &Module{
+	m := &Module{
 		workspace:  w,
 		rootURI:    modFileUri.Dir().Dir(),
 		modFileURI: modFileUri,
 		packages:   make(map[ast.ImportPath]*Package),
-		dirtyFiles: make(map[protocol.DocumentURI]struct{}),
+		dirtyFiles: map[protocol.DocumentURI]struct{}{
+			modFileUri: {},
+		},
 	}
+	w.modules[m.rootURI] = m
+	w.invalidateActiveFilesAndDirs()
+	return m
 }
 
 func (m *Module) String() string {
@@ -98,7 +100,7 @@ func (m *Module) MarkFileDirty(file protocol.DocumentURI) {
 	if file != m.modFileURI {
 		panic(fmt.Sprintf("%v being told about file %v", m, file))
 	}
-	m.status = dirty
+	m.dirtyFiles[m.modFileURI] = struct{}{}
 }
 
 // MarkFileDirty implements [packageOrModule]
@@ -111,42 +113,46 @@ func (m *Module) Encloses(file protocol.DocumentURI) bool {
 // reloading the module, or if the module has been marked as being
 // deleted.
 func (m *Module) ReloadModule() error {
-	switch m.status {
-	case dirty:
-		w := m.workspace
-		fh, err := w.overlayFS.ReadFile(m.modFileURI)
-		if err != nil {
-			m.status = deleted
-			w.debugLog(fmt.Sprintf("%v Error when reloading module: %v", m, err))
-			return ErrModuleDeleted
-		}
-		modFile, err := modfile.ParseNonStrict(fh.Content(), m.modFileURI.Path())
-		if err != nil {
-			m.status = deleted
-			w.debugLog(fmt.Sprintf("%v Error when reloading module: %v", m, err))
-			return ErrModuleDeleted
-		}
-		m.modFile = modFile
-		m.status = splendid
-		delete(m.dirtyFiles, m.modFileURI)
-		for _, pkg := range m.packages {
-			// TODO: might want to become smarter at this.
-			pkg.setStatus(dirty)
-		}
-		w.debugLog(fmt.Sprintf("%v Reloaded", m))
+	_, isDirty := m.dirtyFiles[m.modFileURI]
+	if !isDirty {
 		return nil
-	case splendid:
-		return nil
-	case deleted:
-		return ErrModuleDeleted
-	default:
-		panic(fmt.Sprintf("Unknown status %v", m.status))
 	}
+
+	w := m.workspace
+	fh, err := w.overlayFS.ReadFile(m.modFileURI)
+	if err != nil {
+		w.debugLog(fmt.Sprintf("%v Error when reloading module: %v", m, err))
+		m.delete()
+		return ErrModuleDeleted
+	}
+	modFile, err := modfile.ParseNonStrict(fh.Content(), m.modFileURI.Path())
+	if err != nil {
+		w.debugLog(fmt.Sprintf("%v Error when reloading module: %v", m, err))
+		m.delete()
+		return ErrModuleDeleted
+	}
+	m.modFile = modFile
+	delete(m.dirtyFiles, m.modFileURI)
+	for _, pkg := range m.packages {
+		// TODO: might want to become smarter at this.
+		pkg.markDirty()
+	}
+	w.debugLog(fmt.Sprintf("%v Reloaded", m))
+	return nil
 }
 
 // ErrModuleDeleted is returned by any method that cannot proceed
 // because module has been marked deleted.
 var ErrModuleDeleted = errors.New("Module deleted")
+
+func (m *Module) delete() {
+	for _, pkg := range m.packages {
+		pkg.delete()
+	}
+	w := m.workspace
+	delete(w.modules, m.rootURI)
+	w.invalidateActiveFilesAndDirs()
+}
 
 // ReadCUEFile attempts to read the file, using the language version
 // extracted from the module's Language.Version field. This will fail
@@ -243,7 +249,6 @@ func (m *Module) FindPackagesOrModulesForFile(file protocol.DocumentURI) ([]pack
 	pkg, found := m.packages[ip]
 	if !found {
 		pkg = NewPackage(m, ip, dirUris)
-		m.packages[ip] = pkg
 	}
 	pkgs := []packageOrModule{pkg}
 
@@ -278,7 +283,7 @@ func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
 	// 1. Gather all the dirty packages.
 	var pkgPaths []string
 	for _, pkg := range m.packages {
-		if pkg.status != dirty {
+		if !pkg.isDirty {
 			continue
 		}
 		pkgPaths = append(pkgPaths, pkg.importPath.String())

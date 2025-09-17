@@ -116,16 +116,15 @@ import "
 				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loading packages [example.com/bar/c@v0]", rootURI),
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/c] importPath=example.com/bar/c@v0", rootURI, rootURI),
 				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Error when loading example.com/bar/c@v0: cannot get imports", rootURI),
-				// No conclusion of the load:
-				NoLogExactf(protocol.Debug, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/c] importPath=example.com/bar/c@v0", rootURI, rootURI),
 			)
 			// Now edit it to correct the imports line:
 			env.EditBuffer("c/c.cue", fake.NewEdit(2, 7, 2, 7, `"`))
 			env.Await(
 				env.DoneWithChange(),
-				// We should now get the successful package load
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/c] importPath=example.com/bar/c@v0", rootURI, rootURI),
+				// We should get the package load
+				LogExactf(protocol.Debug, 2, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/c] importPath=example.com/bar/c@v0", rootURI, rootURI),
 			)
 		})
 	})

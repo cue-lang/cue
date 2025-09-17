@@ -293,7 +293,6 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 				pkg.MarkFileDirty(uri)
 				enclosingFound = enclosingFound || pkg.Encloses(uri)
 			}
-			w.invalidateActiveFilesAndDirs()
 			if fh == nil || enclosingFound {
 				delete(updatedFiles, uri)
 				continue
@@ -335,7 +334,6 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 							for _, pkg := range pkgs {
 								pkg.MarkFileDirty(activeUri)
 							}
-							w.invalidateActiveFilesAndDirs()
 						}
 					}
 				}
@@ -370,7 +368,7 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		}
 		delete(updatedFiles, uri)
 
-		_ = w.newModule(uri)
+		_ = w.ensureModule(uri)
 	}
 
 	// By now, all modules should be valid, and updatedFiles will only
@@ -389,7 +387,6 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		pkgs, err := m.FindPackagesOrModulesForFile(uri)
 		if err != nil {
 			if err == ErrModuleDeleted {
-				w.removeModule(m)
 				// TODO: something better
 				continue
 			}
@@ -404,7 +401,6 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 			for _, pkg := range pkgs {
 				pkg.MarkFileDirty(uri)
 			}
-			w.invalidateActiveFilesAndDirs()
 		}
 		// if len(pkgs) == 0 and no error, then it means the file had no
 		// package declaration. For the time being, we're ignoring
@@ -591,7 +587,7 @@ func (w *Workspace) FindModuleForFile(file protocol.DocumentURI) (*Module, error
 		} else if err != nil {
 			return nil, err
 		}
-		return w.newModule(fh.URI()), nil
+		return w.ensureModule(fh.URI()), nil
 	}
 
 	return nil, nil
@@ -599,26 +595,13 @@ func (w *Workspace) FindModuleForFile(file protocol.DocumentURI) (*Module, error
 
 // ensureModule returns the existing module for the given module root,
 // or if there is none, creates and returns a new module.
-func (w *Workspace) ensureModule(rootUri protocol.DocumentURI) *Module {
+func (w *Workspace) ensureModule(modFileUri protocol.DocumentURI) *Module {
+	rootUri := modFileUri.Dir().Dir()
 	m, found := w.modules[rootUri]
 	if !found {
-		m = w.newModule(rootUri + "/cue.mod/module.cue")
-		w.modules[rootUri] = m
+		m = NewModule(modFileUri, w)
+		w.debugLog(fmt.Sprintf("%v Created", m))
 	}
-	return m
-}
-
-func (w *Workspace) removeModule(m *Module) {
-	delete(w.modules, m.rootURI)
-}
-
-// newModule creates a new module, adding it to the set of modules
-// within this workspace.
-func (w *Workspace) newModule(modFileUri protocol.DocumentURI) *Module {
-	m := NewModule(modFileUri, w)
-	w.debugLog(fmt.Sprintf("%v Created", m))
-	w.modules[m.rootURI] = m
-	w.invalidateActiveFilesAndDirs()
 	return m
 }
 
@@ -626,16 +609,8 @@ func (w *Workspace) newModule(modFileUri protocol.DocumentURI) *Module {
 // cannot be reloaded, it is removed from the workspace.
 func (w *Workspace) reloadModules() {
 	modules := w.modules
-	changed := false
 	for _, m := range modules {
-		err := m.ReloadModule()
-		if err != nil {
-			changed = true
-			w.removeModule(m)
-		}
-	}
-	if changed {
-		w.invalidateActiveFilesAndDirs()
+		_ = m.ReloadModule()
 	}
 }
 
@@ -653,11 +628,8 @@ func (w *Workspace) reloadModules() {
 // new packages and even new modules, being added to the workspace.
 func (w *Workspace) reloadPackages() error {
 	modules := w.modules
-	modulesChanged := false
 
 	var loadedPkgs []*modpkgload.Package
-	allDirtyFiles := make(map[protocol.DocumentURI]*Module)
-
 	// A package in one module may import packages from different
 	// modules. We need to process and manage all such packages and
 	// modules. Therefore, whilst we ask the modules themselves to do
@@ -666,12 +638,7 @@ func (w *Workspace) reloadPackages() error {
 	for _, m := range modules {
 		pkgs, err := m.loadDirtyPackages()
 		if err != nil {
-			modulesChanged = true
-			w.removeModule(m)
 			continue
-		}
-		for fileUri := range m.dirtyFiles {
-			allDirtyFiles[fileUri] = m
 		}
 
 		if pkgs == nil {
@@ -692,9 +659,11 @@ func (w *Workspace) reloadPackages() error {
 		importPath ast.ImportPath
 		modRootURI protocol.DocumentURI
 	}
-	processedPkgs := make(map[importPathModRootPair]struct{})
-	pkgsImportsWorklist := make(map[*Package]*modpkgload.Package)
-	repeatReload := false
+	type pkgModPkgPair struct {
+		pkg    *Package
+		modpkg *modpkgload.Package
+	}
+	processedPkgs := make(map[importPathModRootPair]*pkgModPkgPair)
 
 	for _, loadedPkg := range loadedPkgs {
 		if isUnhandledPackage(loadedPkg) {
@@ -728,26 +697,13 @@ func (w *Workspace) reloadPackages() error {
 		if _, seen := processedPkgs[key]; seen {
 			continue
 		}
-		processedPkgs[key] = struct{}{}
-
-		m := w.ensureModule(modRootURI)
-		if err := m.ReloadModule(); err != nil {
-			modulesChanged = true
-			w.removeModule(m)
-			continue
+		pkgModPkg := &pkgModPkgPair{
+			modpkg: loadedPkg,
 		}
+		processedPkgs[key] = pkgModPkg
 
-		if err := loadedPkg.Error(); err != nil {
-			w.debugLog(fmt.Sprintf("%v Error when loading %v: %v", m, ip, err))
-			// It could be that the last file within this package was
-			// deleted, so attempting to load it will create an error. So
-			// the correct thing to do now is just remove any record of
-			// the pkg.
-			//
-			// TODO: if packages contains ip, then we should probably
-			// look at its importedBy field as that would tell us about
-			// packages that now have dangling imports.
-			delete(m.packages, ip)
+		m := w.ensureModule(modRootURI + "/cue.mod/module.cue")
+		if err := m.ReloadModule(); err != nil {
 			continue
 		}
 
@@ -788,68 +744,19 @@ func (w *Workspace) reloadPackages() error {
 				dirUris = []protocol.DocumentURI{dirUri}
 			}
 			pkg = NewPackage(m, ip, dirUris)
-			m.packages[ip] = pkg
 		}
-		// Capture the old loadedPkg (if it exists) so we can correct
-		// the import graph later.
-		pkgsImportsWorklist[pkg] = pkg.pkg
-		pkg.pkg = loadedPkg
-		pkg.setStatus(splendid)
-		w.debugLog(fmt.Sprintf("%v Loaded %v", m, pkg))
+		pkgModPkg.pkg = pkg
+	}
 
-		if len(allDirtyFiles) != 0 {
-			for _, file := range loadedPkg.Files() {
-				fileUri := protocol.DocumentURI(string(modRootURI) + "/" + file.FilePath)
-				m, found := allDirtyFiles[fileUri]
-				if found {
-					delete(allDirtyFiles, fileUri)
-					delete(m.dirtyFiles, fileUri)
-					if len(allDirtyFiles) == 0 {
-						break
-					}
-				}
-			}
+	// Now that all pkgs exist, perform the update
+	for _, pkgModPkg := range processedPkgs {
+		pkg, loadedPkg := pkgModPkg.pkg, pkgModPkg.modpkg
+		if pkg != nil {
+			w.debugLog(fmt.Sprintf("%v Loaded %v", pkg.module, pkg))
+			_ = pkg.update(loadedPkg)
 		}
 	}
 
-	if modulesChanged {
-		w.invalidateActiveFilesAndDirs()
-	}
-
-	// 2nd pass: create/correct inverted import graph now that all
-	// necessary Packages exist. pkgsImportsWorklist will only contain
-	// local packages (i.e. packages within this module)
-	imports := make(map[ast.ImportPath]*modpkgload.Package)
-	for pkg, oldPkg := range pkgsImportsWorklist {
-		clear(imports)
-		if oldPkg != nil {
-			for _, i := range oldPkg.Imports() {
-				if isUnhandledPackage(i) {
-					continue
-				}
-				imports[normalizeImportPath(i)] = i
-			}
-		}
-		for _, i := range pkg.pkg.Imports() {
-			if isUnhandledPackage(i) {
-				continue
-			}
-			ip := normalizeImportPath(i)
-			if _, found := imports[ip]; found {
-				// Both new and old pkgs import ip. Noop.
-				delete(imports, ip)
-			} else if importedPkg, found := w.findPackage(moduleRootURI(i), ip); found {
-				// Only new pkg imports ip. Add the back-pointer.
-				importedPkg.EnsureImportedBy(pkg)
-			}
-		}
-		for ip, i := range imports {
-			if importedPkg, found := w.findPackage(moduleRootURI(i), ip); found {
-				// Only old pkg imports ip. Remove the back-pointer.
-				importedPkg.RemoveImportedBy(pkg)
-			}
-		}
-	}
 	// Note that there's a potential memory leak here: we might load a
 	// package "foo" because it's imported by "bar". If "bar" is edited
 	// so that it no longer imports "foo" then we'll notice that, and
@@ -864,50 +771,50 @@ func (w *Workspace) reloadPackages() error {
 	// to an existing package which we've not reloaded, or to a package
 	// that we've never loaded. In both cases, the file will still be
 	// within this module.
-	for fileUri, m := range allDirtyFiles {
-		pkgs, err := m.FindPackagesOrModulesForFile(fileUri)
-		if err != nil {
-			if err == ErrModuleDeleted {
-				w.removeModule(m)
-				continue
+	repeatReload := false
+	for _, m := range modules {
+		for fileUri := range m.dirtyFiles {
+			delete(m.dirtyFiles, fileUri)
+			pkgs, err := m.FindPackagesOrModulesForFile(fileUri)
+			if err != nil {
+				if err == ErrModuleDeleted {
+					break
+				} else if errors.Is(err, fs.ErrNotExist) {
+					continue
+				} else if _, ok := err.(cueerrors.Error); ok {
+					// Most likely a syntax error; ignore it.
+					// TODO: this error might become a "diagnostics" message
+					continue
+				}
 			}
-			if _, ok := err.(cueerrors.Error); ok {
-				// Most likely a syntax error; ignore it.
-				// TODO: this error might become a "diagnostics" message
-				continue
+			for _, pkg := range pkgs {
+				pkg, ok := pkg.(*Package)
+				if !ok {
+					continue
+				}
+				key := importPathModRootPair{
+					importPath: pkg.importPath,
+					modRootURI: m.rootURI,
+				}
+				if _, loaded := processedPkgs[key]; loaded {
+					// We've just loaded this pkg. If
+					// FindPackagesOrModulesForFile thinks fileUri belongs in
+					// pkg, but the loading has not done that, then it most
+					// likely means modpkgload hit an error loading that
+					// package. We should *not* try again now otherwise we can
+					// hit an infinite loop.
+					continue
+				}
+				pkg.MarkFileDirty(fileUri)
+				repeatReload = true
 			}
-			return err
+			// if len(pkgs) == 0 and no error, then it means the file had no
+			// package declaration. For the time being, we're ignoring
+			// that. TODO something better
 		}
-		for _, pkg := range pkgs {
-			pkg, ok := pkg.(*Package)
-			if !ok {
-				continue
-			}
-			key := importPathModRootPair{
-				importPath: pkg.importPath,
-				modRootURI: m.rootURI,
-			}
-			if _, loaded := processedPkgs[key]; loaded {
-				// We've just loaded this pkg. If
-				// FindPackagesOrModulesForFile thinks fileUri belongs in
-				// pkg, but the loading has not done that, then it most
-				// likely means modpkgload hit an error loading that
-				// package. We should *not* try again now otherwise we can
-				// hit an infinite loop.
-				delete(allDirtyFiles, fileUri)
-				delete(m.dirtyFiles, fileUri)
-				continue
-			}
-			pkg.MarkFileDirty(fileUri)
-			repeatReload = true
-		}
-		// if len(pkgs) == 0 and no error, then it means the file had no
-		// package declaration. For the time being, we're ignoring
-		// that. TODO something better
 	}
 
 	if repeatReload {
-		w.invalidateActiveFilesAndDirs()
 		return w.reloadPackages()
 	}
 	return nil

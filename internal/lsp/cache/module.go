@@ -56,9 +56,6 @@ type Module struct {
 	// map are mirrored to the workspace's packages map.
 	packages map[ast.ImportPath]*Package
 
-	// status of this Module
-	status status
-
 	// dirtyFiles holds dirty files within the module's packages only:
 	// i.e. any file that was loaded by any of the module's
 	// packages. We gather these files in the Module rather than in
@@ -66,23 +63,34 @@ type Module struct {
 	// which package a file ends up in (it can change package). We only
 	// care that all the dirty files are loaded by _some_ package
 	// within the module.
-	//
-	// This field gets assigned a new map whenever the module reloads
-	// its packages.
 	dirtyFiles map[protocol.DocumentURI]struct{}
 }
 
-// NewModule creates a new Module. The CUE module itself (that is, the
-// cue.mod/module.cue file) is not loaded until [Module.ReloadModule]
-// is called.
+// NewModule creates a new [Module] and adds it to the workspace. The
+// CUE module itself (that is, the cue.mod/module.cue file) is not
+// loaded until [Module.ReloadModule] is called.
 func NewModule(modFileUri protocol.DocumentURI, w *Workspace) *Module {
-	return &Module{
+	m := &Module{
 		workspace:  w,
 		rootURI:    modFileUri.Dir().Dir(),
 		modFileURI: modFileUri,
 		packages:   make(map[ast.ImportPath]*Package),
-		dirtyFiles: make(map[protocol.DocumentURI]struct{}),
+		dirtyFiles: map[protocol.DocumentURI]struct{}{
+			modFileUri: {},
+		},
 	}
+	w.modules[m.rootURI] = m
+	w.debugLogf("%v Created", m)
+	// We only create a new module when we discover a
+	// cue.mod/module.cue file. Even without loading it, it's correct
+	// to invalidate the workspace's active files+dirs. The other way
+	// of looking at this is that a module only contains a single file
+	// - the cue.mod/module.cue file. If the content of that file
+	// changes, we do not need to invalidate active files+dirs. By
+	// contrast, a package can contain a variable number of files,
+	// which can change on every reload.
+	w.invalidateActiveFilesAndDirs()
+	return m
 }
 
 func (m *Module) String() string {
@@ -93,65 +101,70 @@ func (m *Module) String() string {
 	}
 }
 
-// MarkFileDirty implements [packageOrModule]
-func (m *Module) MarkFileDirty(file protocol.DocumentURI) {
+// markFileDirty implements [packageOrModule]
+func (m *Module) markFileDirty(file protocol.DocumentURI) {
 	if file != m.modFileURI {
 		panic(fmt.Sprintf("%v being told about file %v", m, file))
 	}
-	m.status = dirty
+	m.dirtyFiles[m.modFileURI] = struct{}{}
 }
 
 // MarkFileDirty implements [packageOrModule]
-func (m *Module) Encloses(file protocol.DocumentURI) bool {
+func (m *Module) encloses(file protocol.DocumentURI) bool {
 	return m.modFileURI == file
 }
 
 // ReloadModule reloads the module's modfile iff the module's status
-// is dirty. An error is returned if any problem is encountered when
-// reloading the module, or if the module has been marked as being
-// deleted.
+// is dirty. If an error is encountered when reloading the module, the
+// module and all its packages are deleted from the workspace.
 func (m *Module) ReloadModule() error {
-	switch m.status {
-	case dirty:
-		w := m.workspace
-		fh, err := w.overlayFS.ReadFile(m.modFileURI)
-		if err != nil {
-			m.status = deleted
-			w.debugLog(fmt.Sprintf("%v Error when reloading module: %v", m, err))
-			return ErrModuleDeleted
-		}
-		modFile, err := modfile.ParseNonStrict(fh.Content(), m.modFileURI.Path())
-		if err != nil {
-			m.status = deleted
-			w.debugLog(fmt.Sprintf("%v Error when reloading module: %v", m, err))
-			return ErrModuleDeleted
-		}
-		m.modFile = modFile
-		m.status = splendid
-		delete(m.dirtyFiles, m.modFileURI)
-		for _, pkg := range m.packages {
-			// TODO: might want to become smarter at this.
-			pkg.setStatus(dirty)
-		}
-		w.debugLog(fmt.Sprintf("%v Reloaded", m))
+	_, isDirty := m.dirtyFiles[m.modFileURI]
+	if !isDirty {
 		return nil
-	case splendid:
-		return nil
-	case deleted:
-		return ErrModuleDeleted
-	default:
-		panic(fmt.Sprintf("Unknown status %v", m.status))
 	}
+
+	w := m.workspace
+	fh, err := w.overlayFS.ReadFile(m.modFileURI)
+	if err != nil {
+		w.debugLogf("%v Error when reloading: %v", m, err)
+		m.delete()
+		return ErrBadModule
+	}
+	modFile, err := modfile.ParseNonStrict(fh.Content(), m.modFileURI.Path())
+	if err != nil {
+		w.debugLogf("%v Error when reloading: %v", m, err)
+		m.delete()
+		return ErrBadModule
+	}
+	m.modFile = modFile
+	delete(m.dirtyFiles, m.modFileURI)
+	for _, pkg := range m.packages {
+		// TODO: might want to become smarter at this.
+		pkg.markDirty()
+	}
+	w.debugLogf("%v Reloaded", m)
+	return nil
 }
 
-// ErrModuleDeleted is returned by any method that cannot proceed
-// because module has been marked deleted.
-var ErrModuleDeleted = errors.New("Module deleted")
+// ErrBadModule is returned by any method that cannot proceed because
+// the module is in a bad state (e.g. it's been deleted).
+var ErrBadModule = errors.New("bad module")
+
+// delete removes this module from the workspace, along with all the
+// packages within this module.
+func (m *Module) delete() {
+	for _, pkg := range m.packages {
+		pkg.delete()
+	}
+	w := m.workspace
+	delete(w.modules, m.rootURI)
+	w.debugLogf("%v Deleted", m)
+	w.invalidateActiveFilesAndDirs()
+}
 
 // ReadCUEFile attempts to read the file, using the language version
 // extracted from the module's Language.Version field. This will fail
-// if the module's module.cue file is invalid, and ErrModuleInvalid
-// will be returned.
+// if the module file can't be loaded.
 func (m *Module) ReadCUEFile(file protocol.DocumentURI) (*ast.File, parser.Config, fscache.FileHandle, error) {
 	if err := m.ReloadModule(); err != nil {
 		return nil, parser.Config{}, nil, err
@@ -165,49 +178,35 @@ func (m *Module) ReadCUEFile(file protocol.DocumentURI) (*ast.File, parser.Confi
 	return parsedFile, config, fh, err
 }
 
-// FindPackagesOrModulesForFile searches for the given file in both
-// the module itself, and packages within the module, returning a
-// (possibly empty) list of [packageOrModule]s to which the file
-// belongs. The file must be enclosed by the module's rootURI.
+// FindImportPathForFile calculates the import path and directories
+// for the package implied by the given file. The file must be
+// enclosed by the module's rootURI. The file will be read and parsed
+// as a CUE file, in order to find its package directive.
 //
-// The file will belong to the module if the file is the module's
-// modFileURI.
+// If exactly one directory uri is returned then the file's package
+// uses the new module system. If three directory uris are returned
+// then the package uses the old module system. No other number of
+// directory uris is possible.
 //
-// Otherwise, the file will be read and parsed as a CUE file, in order
-// to obtain its package. If the module doesn't already have a
-// suitable package one will be created.
-//
-// Already-loaded packages which include this file via
-// ancestor-imports are also returned in the list. However, if such
-// packages exist but are not loaded, they are not discovered
-// here. For example, if file is file:///a/b.cue, and it contains
-// "package x", and a package a/c:x within the same module is already
-// loaded, then the results will contain both package a:x and a/c:x,
-// but only if a/c:x is already loaded.
-func (m *Module) FindPackagesOrModulesForFile(file protocol.DocumentURI) ([]packageOrModule, error) {
+// This method does not inspect existing packages, nor create any new
+// package. Use [*Module.EnsurePackage] for that purpose.
+func (m *Module) FindImportPathForFile(file protocol.DocumentURI) (*ast.ImportPath, []protocol.DocumentURI, error) {
 	if !m.rootURI.Encloses(file) {
 		panic(fmt.Sprintf("Attempt to read file %v from module with root %v", file, m.rootURI))
-	}
-	if err := m.ReloadModule(); err != nil {
-		return nil, err
-	}
-
-	if file == m.modFileURI {
-		return []packageOrModule{m}, nil
 	}
 
 	w := m.workspace
 	parsedFile, _, _, err := m.ReadCUEFile(file)
 	if parsedFile == nil {
-		w.debugLog(fmt.Sprintf("%v Cannot read file %v, %v", m, file, err))
-		return nil, err
+		w.debugLogf("%v Cannot read file %v: %v", m, file, err)
+		return nil, nil, err
 	}
 	pkgName := parsedFile.PackageName()
 	if pkgName == "" {
 		// temporarily, we just completely ignore the file if it has no
 		// package decl. TODO something better
-		w.debugLog(fmt.Sprintf("%v No package found for %v", m, file))
-		return nil, nil
+		w.debugLogf("%v No package found for %v", m, file)
+		return nil, nil, nil
 	}
 
 	dirUri := file.Dir()
@@ -238,34 +237,52 @@ func (m *Module) FindPackagesOrModulesForFile(file protocol.DocumentURI) ([]pack
 	}
 
 	ip = ip.Canonical()
+	return &ip, dirUris, nil
+}
 
-	// the exact package is always needed:
+// Package returns the [*Package], if any, for the given import path
+// within this module.
+func (m *Module) Package(ip ast.ImportPath) *Package {
+	return m.packages[ip]
+}
+
+// EnsurePackage returns the [*Package] for the given import path
+// within this module, creating a new package if necessary.
+func (m *Module) EnsurePackage(ip ast.ImportPath, dirUris []protocol.DocumentURI) *Package {
 	pkg, found := m.packages[ip]
 	if !found {
-		pkg = NewPackage(m, ip, dirUris)
-		m.packages[ip] = pkg
+		pkg = m.newPackage(ip, dirUris)
 	}
-	pkgs := []packageOrModule{pkg}
+	return pkg
+}
 
-	if !isOldMod {
-		// Search also for descendent packages that might include the
-		// file by virtue of the ancestor-import-path pattern. The old
-		// module system never uses ancestor imports.
-		for _, pkg := range m.packages {
-			pkgIp := pkg.importPath
-			if pkgIp.Qualifier == ip.Qualifier && strings.HasPrefix(pkgIp.Path, ip.Path+"/") {
-				pkgs = append(pkgs, pkg)
-			}
+// DescendantPackages returns all the existing loaded packages within
+// this module that correspond to the given import path, or would
+// include the import path's files due to the ancestor-import
+// mechanism. The ancestor-import mechanism is not available for the
+// "old module" system, so only call this unless you know the import
+// path corresponds to the new module system.
+//
+// This method only returns existing packages; it does not create any
+// new packages.
+func (m *Module) DescendantPackages(ip ast.ImportPath) []*Package {
+	var pkgs []*Package
+	pkg, found := m.packages[ip]
+	if found {
+		pkgs = append(pkgs, pkg)
+	}
+	prefix := ip.Path + "/"
+	for _, pkg := range m.packages {
+		pkgIp := pkg.importPath
+		if pkgIp.Qualifier == ip.Qualifier && strings.HasPrefix(pkgIp.Path, prefix) {
+			pkgs = append(pkgs, pkg)
 		}
 	}
-
-	w.debugLog(fmt.Sprintf("%v For file %v found %v", m, file, pkgs))
-
-	return pkgs, nil
+	return pkgs
 }
 
 // loadDirtyPackages identifies all dirty packages within the module,
-// loads them and returs them. To do this, the modfile itself must be
+// loads them and returns them. To do this, the modfile itself must be
 // successfully loaded. The only non-nil error this method returns is
 // if the modfile cannot be loaded.
 func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
@@ -278,7 +295,7 @@ func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
 	// 1. Gather all the dirty packages.
 	var pkgPaths []string
 	for _, pkg := range m.packages {
-		if pkg.status != dirty {
+		if !pkg.isDirty {
 			continue
 		}
 		pkgPaths = append(pkgPaths, pkg.importPath.String())
@@ -299,19 +316,19 @@ func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
 	}
 	// Determinism in log messages:
 	slices.Sort(pkgPaths)
-	w.debugLog(fmt.Sprintf("%v Loading packages %v", m, pkgPaths))
+	w.debugLogf("%v Loading packages %v", m, pkgPaths)
 	loadedPkgs := modpkgload.LoadPackages(ctx, modPath, loc, reqs, w.registry, pkgPaths, nil)
 
 	return loadedPkgs, nil
 }
 
-// ActiveFilesAndDirs implements [packageOrModule]
-func (m *Module) ActiveFilesAndDirs(files map[protocol.DocumentURI][]packageOrModule, dirs map[protocol.DocumentURI]struct{}) {
+// activeFilesAndDirs implements [packageOrModule]
+func (m *Module) activeFilesAndDirs(files map[protocol.DocumentURI][]packageOrModule, dirs map[protocol.DocumentURI]struct{}) {
 	files[m.modFileURI] = []packageOrModule{m}
 	dirs[m.modFileURI.Dir()] = struct{}{}
 	dirs[m.rootURI] = struct{}{}
 	for _, pkg := range m.packages {
-		pkg.ActiveFilesAndDirs(files, dirs)
+		pkg.activeFilesAndDirs(files, dirs)
 	}
 }
 
@@ -329,6 +346,8 @@ func normalizeImportPath(pkg *modpkgload.Package) ast.ImportPath {
 
 	mod := pkg.Mod()
 	if !mod.IsValid() {
+		// This can happen if the package was created for an import
+		// declaration that could not be found.
 		return ip
 
 	} else if mod.IsLocal() {

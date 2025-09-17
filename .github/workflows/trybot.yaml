@@ -35,14 +35,14 @@ jobs:
       Dispatch-Trailer: {"type":"'))
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - name: Reset git directory modification times
         run: touch -t 202211302355 $(find * -type d)
       - name: Restore git file modification times
-        uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
+        uses: chetan/git-restore-mtime-action@cbf8161ddb4e9b162409104954fb540e8a38c1da
       - id: DispatchTrailer
         name: Try to extract Dispatch-Trailer
         run: |-
@@ -118,14 +118,14 @@ jobs:
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: gcloud auth for end-to-end tests
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.E2E_GCLOUD_KEY }}
       - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: gcloud setup for end-to-end tests
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@v3
       - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
@@ -141,8 +141,8 @@ jobs:
           go vet ./...
       - if: (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: Verify the end-to-end tests still build
-        run: go test -run=-
         working-directory: ./internal/_e2e
+        run: go test -run=-
       - if: (matrix.go-version == '1.25.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         env:
           STATICCHECK_CACHE: /cache/staticcheck

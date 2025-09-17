@@ -69,7 +69,7 @@ installGo: {
 checkoutCode: [...githubactions.#Step] & [
 	{
 		name: "Checkout code"
-		uses: "actions/checkout@v4" // TODO(mvdan): switch to namespacelabs/nscloud-checkout-action@v1 once Windows supports caching
+		uses: "actions/checkout@v5" // TODO(mvdan): switch to namespacelabs/nscloud-checkout-action@v1 once Windows supports caching
 
 		// "pull_request_target" builds will by default use a merge commit,
 		// testing the PR's HEAD merged on top of the master branch.
@@ -97,7 +97,7 @@ checkoutCode: [...githubactions.#Step] & [
 	},
 	{
 		name: "Restore git file modification times"
-		uses: "chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe"
+		uses: "chetan/git-restore-mtime-action@cbf8161ddb4e9b162409104954fb540e8a38c1da" // 2025-08-27
 	},
 
 	{
@@ -135,7 +135,7 @@ checkoutCode: [...githubactions.#Step] & [
 
 earlyChecks: githubactions.#Step & {
 	name: "Early git and code sanity checks"
-	run:  *"go run cuelang.org/go/internal/ci/checks@v0.13.2" | string
+	run:  *"go run cuelang.org/go/internal/ci/checks@v0.14.1" | string
 }
 
 curlGitHubAPI: {
@@ -171,9 +171,9 @@ setupCaches: {
 				let cacheModes = list.Concat([[
 					"go",
 				], #in.additionalCaches])
-				let cachePaths = list.Concat([[
-					// nothing here for now.
-				], #in.additionalCachePaths])
+
+				// nothing here by default for now.
+				let cachePaths = list.Concat([[], #in.additionalCachePaths])
 
 				if len(cacheModes) > 0 {
 					cache: strings.Join(cacheModes, "\n")

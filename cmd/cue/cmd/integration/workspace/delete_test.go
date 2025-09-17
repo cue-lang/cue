@@ -17,13 +17,15 @@ language: version: "v0.11.0"
 -- a.cue --
 package a
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	WithOptions(
+		RootURIAsDefaultFolder(), Modes(DefaultModes()&^Experimental),
+	).Run(t, files, func(t *testing.T, env *Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 For file %v/a.cue found [Package dirs=[%v] importPath=mod.example/x@v0:a]", rootURI, rootURI, rootURI),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		err := env.Sandbox.Workdir.RemoveFile(env.Ctx, "a.cue")
@@ -35,6 +37,7 @@ package a
 		env.CloseBuffer("a.cue")
 		env.Await(
 			env.DoneWithClose(),
+			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Cannot read file %v/a.cue: stat", rootURI, rootURI),
 		)
 	})
 }

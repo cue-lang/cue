@@ -36,10 +36,11 @@ y: 3
 		env.OpenFile("a/a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/a] importPath=example.com/bar/a@v0", rootURI, rootURI),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
 			// A package is created for the imported package.
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loaded Package dirs=[%v/x] importPath=example.com/bar/x", rootURI, rootURI),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/x] importPath=example.com/bar/x@v0 Reloaded", rootURI),
 		)
+
 		// Now perform a jump-to-dfn from the open a.cue file, from the
 		// "y" in "out: x.y", which should take us to the x/x.cue file.
 		from := protocol.Location{

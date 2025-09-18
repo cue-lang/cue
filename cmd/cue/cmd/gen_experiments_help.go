@@ -20,8 +20,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
 	"go/token"
 	"log"
@@ -86,7 +88,13 @@ func main() {
 
 	output := generateHelpCommand(fileExperiments, globalExperiments)
 
-	if err := os.WriteFile("experiments_help_gen.go", []byte(output), 0644); err != nil {
+	formattedOutput, err := format.Source(output)
+	if err != nil {
+		fmt.Printf("****\n%s\n****\n", output)
+		log.Fatalf("Invalid Go source in output (see above): %v", err)
+	}
+
+	if err := os.WriteFile("experiments_help_gen.go", []byte(formattedOutput), 0644); err != nil {
 		log.Fatalf("Failed to write generated file: %v", err)
 	}
 }
@@ -257,8 +265,8 @@ func extractExperimentsFromStruct(structType reflect.Type, srcPath, structName s
 	return experiments, nil
 }
 
-func generateHelpCommand(fileExperiments []Experiment, globalExperiments []Experiment) string {
-	var sb strings.Builder
+func generateHelpCommand(fileExperiments []Experiment, globalExperiments []Experiment) []byte {
+	var sb bytes.Buffer
 
 	sb.WriteString(`// Copyright 2025 CUE Authors
 //
@@ -282,6 +290,7 @@ import "github.com/spf13/cobra"
 
 var experimentsHelp = &cobra.Command{
 	Use:   "experiments",
+	Aliases: []string{"experiment"},
 	Short: "experimental language features",
 	Long: `)
 	sb.WriteString("`")
@@ -410,7 +419,7 @@ Use with caution in production code.
 	sb.WriteString("`")
 	sb.WriteString("[1:],\n}\n")
 
-	return sb.String()
+	return sb.Bytes()
 }
 
 // validateURLsInComments checks that all URLs found in experiment comments are valid

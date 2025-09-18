@@ -19,8 +19,9 @@ package cmd
 import "github.com/spf13/cobra"
 
 var experimentsHelp = &cobra.Command{
-	Use:   "experiments",
-	Short: "experimental language features",
+	Use:     "experiments",
+	Aliases: []string{"experiment"},
+	Short:   "experimental language features",
 	Long: `
 Experimental features that can be enabled in CUE.
 

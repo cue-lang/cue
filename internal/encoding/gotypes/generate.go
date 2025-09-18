@@ -121,12 +121,11 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 		if len(importedGo) > 0 {
 			printf("import (\n")
 			for _, path := range importedGo {
-				quotedPath := fmt.Sprintf("%q", path)
-				alias, ok := g.importAliases[path]
-				if ok {
-					quotedPath = fmt.Sprintf("%s %s", alias, quotedPath)
+				if alias, ok := g.importAliases[path]; ok {
+					printf("\t%s %q\n", alias, path)
+				} else {
+					printf("\t%q\n", path)
 				}
-				printf("\t%s\n", quotedPath)
 			}
 			printf(")\n")
 		}

@@ -795,29 +795,19 @@ func emitDocs(printf func(string, ...any), name string, groups []*ast.CommentGro
 }
 
 // gatherImportAliases collects the aliases from imports across the instance.
-// We explicitly ignore "_" aliases because CUE does not support.
 func gatherImportAliases(inst *build.Instance) (map[string]string, error) {
 	fileAliases := make(map[string]string)
 	for _, f := range inst.Files {
-		for _, d := range f.Decls {
-			impDecl, ok := d.(*ast.ImportDecl)
-			if !ok {
+		for _, s := range f.Imports {
+			if s.Path == nil || s.Name == nil {
 				continue
 			}
-			for _, s := range impDecl.Specs {
-				if s.Path == nil || s.Name == nil {
-					continue
-				}
-				alias := s.Name.Name
-				if alias == "_" {
-					continue
-				}
-				path, err := strconv.Unquote(s.Path.Value)
-				if err != nil {
-					return nil, err
-				}
-				fileAliases[path] = alias
+			alias := s.Name.Name
+			path, err := strconv.Unquote(s.Path.Value)
+			if err != nil {
+				return nil, err
 			}
+			fileAliases[path] = alias
 		}
 	}
 	return fileAliases, nil

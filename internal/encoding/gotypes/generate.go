@@ -697,12 +697,12 @@ func goValueAttr(val cue.Value) cue.Attribute {
 // By default this is the CUE package name, but it can be overriden by a @go() package attribute.
 // When supplying importAliases, and if no package attribute is found, the returned package name
 // reflects the alias name that the package is being imported as.
-func goPkgNameForInstance(inst *build.Instance, instVal cue.Value, aliasLookup map[string]string) string {
+func goPkgNameForInstance(inst *build.Instance, instVal cue.Value, importAliases map[string]string) string {
 	attr := goValueAttr(instVal)
 	if s, _ := attr.String(0); s != "" {
 		return s
 	}
-	if alias, ok := aliasLookup[inst.ImportPath]; ok {
+	if alias, ok := importAliases[inst.ImportPath]; ok {
 		return alias
 	}
 	return inst.PkgName

@@ -2688,9 +2688,9 @@ Builtin functions are predeclared. They are called like any other function.
 ### `error`
 The `error` builtin allows users to create custom error values with a specified
 message.
-User-generated errors can be included in disjunctions; if at least one disjunct
-is valid, any user errors are ignored.
-However, if all disjuncts fail, all user error messages are reported together.
+Custom errors can be included in disjunctions; if at least one disjunct
+is valid, any custom errors are ignored.
+However, if all disjuncts fail, all custom error messages are reported together.
 
 `error` takes a single string argument. If this argument is a literal
 interpolation, it will be extra resilient: if any of the arguments to the

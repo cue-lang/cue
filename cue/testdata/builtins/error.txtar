@@ -5,9 +5,9 @@ language: version: "v0.14.0"
 selection: {
 	dropError: 1 | error("drop me")
 
-	useUserError: 1&2 | error("use me")
+	useCustomError: 1&2 | error("use me")
 
-	twoUserErrors: 1&2 | error("error one") | error("error two")
+	twoCustomErrors: 1&2 | error("error one") | error("error two")
 
 	x: int
 	dropIncomplete: x + 1 | error("user msg: x + 1 failed")
@@ -28,7 +28,7 @@ indirect: {
 -- incomplete.cue --
 import "struct"
 
-// The user error should not alter the type of error.
+// The custom error should not alter the type of error.
 minFields: struct.MinFields(2) | error("should remain incomplete")
 maxFields: a: 1
 
@@ -66,17 +66,17 @@ Errors:
 issue3983.x: 2 errors in empty disjunction::
     ./issues.cue:7:5
     ./issues.cue:10:5
-selection.twoUserErrors: 2 errors in empty disjunction::
-    ./in.cue:6:17
+selection.twoCustomErrors: 2 errors in empty disjunction::
     ./in.cue:6:19
-selection.useUserError: use me:
-    ./in.cue:4:22
-    ./in.cue:4:16
+    ./in.cue:6:21
+selection.useCustomError: use me:
+    ./in.cue:4:24
     ./in.cue:4:18
-selection.twoUserErrors: error one:
-    ./in.cue:6:23
-selection.twoUserErrors: error two:
-    ./in.cue:6:44
+    ./in.cue:4:20
+selection.twoCustomErrors: error one:
+    ./in.cue:6:25
+selection.twoCustomErrors: error two:
+    ./in.cue:6:46
 indirect.y: msg:
     ./in.cue:22:5
 issue4001.a: error: a='b':
@@ -98,20 +98,20 @@ Result:
   selection: (_|_){
     // [eval]
     dropError: (int){ 1 }
-    useUserError: (_|_){
-      // [eval] selection.useUserError: use me:
-      //     ./in.cue:4:22
-      //     ./in.cue:4:16
+    useCustomError: (_|_){
+      // [eval] selection.useCustomError: use me:
+      //     ./in.cue:4:24
       //     ./in.cue:4:18
+      //     ./in.cue:4:20
     }
-    twoUserErrors: (_|_){
-      // [eval] selection.twoUserErrors: 2 errors in empty disjunction::
-      //     ./in.cue:6:17
+    twoCustomErrors: (_|_){
+      // [eval] selection.twoCustomErrors: 2 errors in empty disjunction::
       //     ./in.cue:6:19
-      // selection.twoUserErrors: error one:
-      //     ./in.cue:6:23
-      // selection.twoUserErrors: error two:
-      //     ./in.cue:6:44
+      //     ./in.cue:6:21
+      // selection.twoCustomErrors: error one:
+      //     ./in.cue:6:25
+      // selection.twoCustomErrors: error two:
+      //     ./in.cue:6:46
     }
     x: (int){ int }
     dropIncomplete: (_|_){
@@ -194,29 +194,32 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,14 +1,14 @@
+@@ -1,53 +1,59 @@
  Errors:
--selection.twoUserErrors: 3 errors in empty disjunction:
--selection.twoUserErrors: conflicting values 2 and 1:
+-selection.twoCustomErrors: 3 errors in empty disjunction:
+-selection.twoCustomErrors: conflicting values 2 and 1:
+-    ./in.cue:6:17
 +issue3983.x: 2 errors in empty disjunction::
 +    ./issues.cue:7:5
 +    ./issues.cue:10:5
-+selection.twoUserErrors: 2 errors in empty disjunction::
-     ./in.cue:6:17
++selection.twoCustomErrors: 2 errors in empty disjunction::
      ./in.cue:6:19
--selection.useUserError: 2 errors in empty disjunction:
--selection.useUserError: conflicting values 2 and 1:
+-selection.useCustomError: 2 errors in empty disjunction:
+-selection.useCustomError: conflicting values 2 and 1:
 -    ./in.cue:4:16
 -    ./in.cue:4:18
- selection.useUserError: use me:
-     ./in.cue:4:22
-+    ./in.cue:4:16
++    ./in.cue:6:21
+ selection.useCustomError: use me:
+-    ./in.cue:4:22
++    ./in.cue:4:24
 +    ./in.cue:4:18
- selection.twoUserErrors: error one:
-     ./in.cue:6:23
- selection.twoUserErrors: error two:
-@@ -15,24 +15,33 @@
-     ./in.cue:6:44
++    ./in.cue:4:20
+ selection.twoCustomErrors: error one:
+-    ./in.cue:6:23
++    ./in.cue:6:25
+ selection.twoCustomErrors: error two:
+-    ./in.cue:6:44
++    ./in.cue:6:46
  indirect.y: msg:
      ./in.cue:22:5
 +issue4001.a: error: a='b':
@@ -240,24 +243,30 @@ diff old new
 -    // [user]
 +    // [eval]
      dropError: (int){ 1 }
-     useUserError: (_|_){
--      // [user] selection.useUserError: 2 errors in empty disjunction:
--      // selection.useUserError: conflicting values 2 and 1:
-+      // [eval] selection.useUserError: use me:
-+      //     ./in.cue:4:22
-       //     ./in.cue:4:16
+     useCustomError: (_|_){
+-      // [user] selection.useCustomError: 2 errors in empty disjunction:
+-      // selection.useCustomError: conflicting values 2 and 1:
+-      //     ./in.cue:4:16
++      // [eval] selection.useCustomError: use me:
++      //     ./in.cue:4:24
        //     ./in.cue:4:18
--      // selection.useUserError: use me:
+-      // selection.useCustomError: use me:
 -      //     ./in.cue:4:22
++      //     ./in.cue:4:20
      }
-     twoUserErrors: (_|_){
--      // [user] selection.twoUserErrors: 3 errors in empty disjunction:
--      // selection.twoUserErrors: conflicting values 2 and 1:
-+      // [eval] selection.twoUserErrors: 2 errors in empty disjunction::
-       //     ./in.cue:6:17
+     twoCustomErrors: (_|_){
+-      // [user] selection.twoCustomErrors: 3 errors in empty disjunction:
+-      // selection.twoCustomErrors: conflicting values 2 and 1:
+-      //     ./in.cue:6:17
++      // [eval] selection.twoCustomErrors: 2 errors in empty disjunction::
        //     ./in.cue:6:19
-       // selection.twoUserErrors: error one:
-@@ -42,12 +51,9 @@
++      //     ./in.cue:6:21
+       // selection.twoCustomErrors: error one:
+-      //     ./in.cue:6:23
++      //     ./in.cue:6:25
+       // selection.twoCustomErrors: error two:
+-      //     ./in.cue:6:44
++      //     ./in.cue:6:46
      }
      x: (int){ int }
      dropIncomplete: (_|_){
@@ -350,19 +359,19 @@ diff old new
  }
 -- out/eval --
 Errors:
-selection.twoUserErrors: 3 errors in empty disjunction:
-selection.twoUserErrors: conflicting values 2 and 1:
+selection.twoCustomErrors: 3 errors in empty disjunction:
+selection.twoCustomErrors: conflicting values 2 and 1:
     ./in.cue:6:17
     ./in.cue:6:19
-selection.useUserError: 2 errors in empty disjunction:
-selection.useUserError: conflicting values 2 and 1:
+selection.useCustomError: 2 errors in empty disjunction:
+selection.useCustomError: conflicting values 2 and 1:
     ./in.cue:4:16
     ./in.cue:4:18
-selection.useUserError: use me:
+selection.useCustomError: use me:
     ./in.cue:4:22
-selection.twoUserErrors: error one:
+selection.twoCustomErrors: error one:
     ./in.cue:6:23
-selection.twoUserErrors: error two:
+selection.twoCustomErrors: error two:
     ./in.cue:6:44
 indirect.y: msg:
     ./in.cue:22:5
@@ -373,22 +382,22 @@ Result:
   selection: (_|_){
     // [user]
     dropError: (int){ 1 }
-    useUserError: (_|_){
-      // [user] selection.useUserError: 2 errors in empty disjunction:
-      // selection.useUserError: conflicting values 2 and 1:
+    useCustomError: (_|_){
+      // [user] selection.useCustomError: 2 errors in empty disjunction:
+      // selection.useCustomError: conflicting values 2 and 1:
       //     ./in.cue:4:16
       //     ./in.cue:4:18
-      // selection.useUserError: use me:
+      // selection.useCustomError: use me:
       //     ./in.cue:4:22
     }
-    twoUserErrors: (_|_){
-      // [user] selection.twoUserErrors: 3 errors in empty disjunction:
-      // selection.twoUserErrors: conflicting values 2 and 1:
+    twoCustomErrors: (_|_){
+      // [user] selection.twoCustomErrors: 3 errors in empty disjunction:
+      // selection.twoCustomErrors: conflicting values 2 and 1:
       //     ./in.cue:6:17
       //     ./in.cue:6:19
-      // selection.twoUserErrors: error one:
+      // selection.twoCustomErrors: error one:
       //     ./in.cue:6:23
-      // selection.twoUserErrors: error two:
+      // selection.twoCustomErrors: error two:
       //     ./in.cue:6:44
     }
     x: (int){ int }
@@ -447,8 +456,8 @@ Result:
 {
   selection: {
     dropError: (1|error("drop me"))
-    useUserError: ((1 & 2)|error("use me"))
-    twoUserErrors: ((1 & 2)|error("error one")|error("error two"))
+    useCustomError: ((1 & 2)|error("use me"))
+    twoCustomErrors: ((1 & 2)|error("error one")|error("error two"))
     x: int
     dropIncomplete: ((〈0;x〉 + 1)|error("user msg: x + 1 failed"))
   }

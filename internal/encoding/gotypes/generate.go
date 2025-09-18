@@ -231,7 +231,9 @@ type generator struct {
 	// def tracks the generation state for a single CUE definition.
 	def *generatedDef
 
-	// importAliases maps package names to the alias
+	// importAliases maps package names to a given alias. In the case that there are multiple aliases present for
+	// same package then we will use the first alias encountered. When the same alias is used for multiple packages
+	// across different files, then a number will be added to the end of the alias to avoid conflicts.
 	importAliases map[string]string
 }
 
@@ -797,6 +799,7 @@ func emitDocs(printf func(string, ...any), name string, groups []*ast.CommentGro
 // gatherImportAliases collects the aliases from imports across the instance.
 func gatherImportAliases(inst *build.Instance) (map[string]string, error) {
 	fileAliases := make(map[string]string)
+	trackedAliases := make(map[string]int32)
 	for _, f := range inst.Files {
 		for _, s := range f.Imports {
 			if s.Path == nil || s.Name == nil {
@@ -807,7 +810,11 @@ func gatherImportAliases(inst *build.Instance) (map[string]string, error) {
 			if err != nil {
 				return nil, err
 			}
+			if count, found := trackedAliases[alias]; found {
+				alias = fmt.Sprintf("%s%d", alias, count)
+			}
 			fileAliases[path] = alias
+			trackedAliases[alias]++
 		}
 	}
 	return fileAliases, nil

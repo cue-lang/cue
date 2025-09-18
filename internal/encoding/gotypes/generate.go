@@ -339,7 +339,6 @@ func (g *generator) emitType(val cue.Value, optionalStg optionalStrategy) (typeF
 		if err != nil {
 			return facts, fmt.Errorf("cannot parse @go type expression: %w", err)
 		}
-
 		for _, pkgPath := range importedByName {
 			g.importCuePkgAsGoPkg[pkgPath] = pkgPath
 		}

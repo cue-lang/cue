@@ -695,7 +695,8 @@ func goValueAttr(val cue.Value) cue.Attribute {
 
 // goPkgNameForInstance determines what to name a Go package generated from a CUE instance.
 // By default this is the CUE package name, but it can be overriden by a @go() package attribute.
-// Import aliases will also checked at this point and inserted if found.
+// When supplying importAliases, and if no package attribute is found, the returned package name
+// reflects the alias name that the package is being imported as.
 func goPkgNameForInstance(inst *build.Instance, instVal cue.Value, aliasLookup map[string]string) string {
 	attr := goValueAttr(instVal)
 	if s, _ := attr.String(0); s != "" {

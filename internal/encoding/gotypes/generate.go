@@ -799,23 +799,41 @@ func emitDocs(printf func(string, ...any), name string, groups []*ast.CommentGro
 // gatherImportAliases collects the aliases from imports across the instance.
 func gatherImportAliases(inst *build.Instance) (map[string]string, error) {
 	fileAliases := make(map[string]string)
-	trackedAliases := make(map[string]int32)
+	tracked := make(map[string]int)
+
+	type pair struct{ path, alias string }
+	var explicit []pair
+
 	for _, f := range inst.Files {
 		for _, s := range f.Imports {
-			if s.Path == nil || s.Name == nil {
+			if s.Path == nil {
 				continue
 			}
-			alias := s.Name.Name
-			path, err := strconv.Unquote(s.Path.Value)
+			pkgPath, err := strconv.Unquote(s.Path.Value)
 			if err != nil {
 				return nil, err
 			}
-			if count, found := trackedAliases[alias]; found {
-				alias = fmt.Sprintf("%s%d", alias, count)
+			// Unaliased import: reserve its base name
+			if s.Name == nil {
+				base := filepath.Base(pkgPath)
+				tracked[base]++
+				continue
 			}
-			fileAliases[path] = alias
-			trackedAliases[alias]++
+			// Explicit alias: queue for resolution
+			alias := s.Name.Name
+			explicit = append(explicit, pair{path: pkgPath, alias: alias})
 		}
 	}
+
+	// Resolve explicit aliases with conflict suffixing.
+	for _, e := range explicit {
+		alias := e.alias
+		if count, ok := tracked[alias]; ok {
+			alias = fmt.Sprintf("%s%d", alias, count)
+		}
+		fileAliases[e.path] = alias
+		tracked[e.alias]++ // track the alias name (unsuffixed) for future conflicts
+	}
+
 	return fileAliases, nil
 }

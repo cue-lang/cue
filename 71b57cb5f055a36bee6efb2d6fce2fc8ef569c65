@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "614f39ae_3f6571b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-09-19T05:03:47Z",
+      "side": 1,
+      "message": "BTW - this is of interest to Tom van Dinther in the context of Crossplane.",
+      "revId": "71b57cb5f055a36bee6efb2d6fce2fc8ef569c65",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -540,7 +540,8 @@ deps: {
 		v: "v0.2.3"
 	}
 }
-`}, {
+`,
+	}, {
 		name: "WithoutLanguage",
 		file: &File{
 			Module: "foo.com/bar@v0",
@@ -552,7 +553,8 @@ deps: {
 language: {
 	version: "v0.8.0"
 }
-`}, {
+`,
+	}, {
 		name: "WithVersionTooEarly",
 		file: &File{
 			Module: "foo.com/bar@v0",

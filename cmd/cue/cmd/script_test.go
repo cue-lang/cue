@@ -554,6 +554,11 @@ func testCmd() {
 				fmt.Println(msg)
 			}
 		}
+	case "expand":
+		// Expands env vars like $FOO and ${BAR} in arguments, and prints them out.
+		for _, arg := range args {
+			fmt.Println(os.ExpandEnv(arg))
+		}
 	default:
 		check(fmt.Errorf("unknown command: %q\n", cmd))
 	}

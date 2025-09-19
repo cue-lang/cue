@@ -23,7 +23,7 @@ message: *"MESSAGE=\(#messageText)" | string
 
 command: execEnv: {
     usesDefaultsStruct: exec.Run & {
-        cmd: ["sh", "-c", "echo $MESSAGE from $SENDER"]
+        cmd: ["testcmd", "expand", "$MESSAGE from $SENDER"]
         stdout: *"" | string
         env: {
             MESSAGE: #messageText
@@ -31,7 +31,7 @@ command: execEnv: {
         }
     }
     usesDefaultsList: exec.Run & {
-        cmd: ["sh", "-c", "echo $MESSAGE from $SENDER"]
+        cmd: ["testcmd", "expand", "$MESSAGE from $SENDER"]
         stdout: *"" | string
         env: [message, *"SENDER=John Doe" | string ]
     }

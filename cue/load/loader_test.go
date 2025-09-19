@@ -317,6 +317,20 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/toolonly
 display:./toolonly`,
 	}, {
+		name: "OnlyTestFilesWithTestsDisabledInConfig",
+		cfg: &Config{
+			Dir: testdataDir,
+		},
+		args: []string{"./testonly"},
+		want: `err:    build constraints exclude all CUE files in ./testonly:
+    $CWD/testdata/testmod/test.cue: package is test, want foo
+    $CWD/testdata/testmod/testonly/foo_test.cue: _test.cue files excluded in non-test mode
+path:   mod.test/test/testonly@v0:foo
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/testonly
+display:./testonly`,
+	}, {
 		name: "WithBoolTag",
 		cfg: &Config{
 			Dir:  testdataDir,

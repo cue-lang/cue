@@ -96,7 +96,8 @@ display:.
 files:
     $CWD/testdata/testmod/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+	}, {
 		name: "DefaultPackageWithExplicitDotArgument",
 		// Even though the directory is called testdata, the last path in
 		// the module is test. So "package test" is correctly the default
@@ -111,7 +112,8 @@ display:.
 files:
     $CWD/testdata/testmod/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+	}, {
 		name: "RelativeImportPathWildcard",
 		cfg:  dirCfg,
 		args: []string{"./other/..."},
@@ -121,7 +123,8 @@ path:   ""
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    ""
-display:""`}, {
+display:""`,
+	}, {
 		name: "NoMatchingPackageName",
 		cfg:  dirCfg,
 		args: []string{"./anon"},
@@ -131,7 +134,8 @@ path:   mod.test/test/anon@v0
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/anon
-display:./anon`}, {
+display:./anon`,
+	}, {
 		name: "RelativeImportPathSingle",
 		cfg:  dirCfg,
 		args: []string{"./other"},
@@ -143,7 +147,8 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/other
 display:./other
 files:
-    $CWD/testdata/testmod/other/main.cue`}, {
+    $CWD/testdata/testmod/other/main.cue`,
+	}, {
 		name: "RelativePathSuccess",
 		cfg:  dirCfg,
 		args: []string{"./hello"},
@@ -156,7 +161,8 @@ files:
     $CWD/testdata/testmod/test.cue
     $CWD/testdata/testmod/hello/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+	}, {
 		name: "ExplicitPackageIdentifier",
 		cfg:  dirCfg,
 		args: []string{"mod.test/test/hello:test"},
@@ -169,7 +175,8 @@ files:
     $CWD/testdata/testmod/test.cue
     $CWD/testdata/testmod/hello/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+	}, {
 		name: "NoPackageName",
 		cfg:  dirCfg,
 		args: []string{"mod.test/test/hello:nonexist"},
@@ -202,7 +209,8 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod
 display:command-line-arguments
 files:
-    $CWD/testdata/testmod/anon.cue`}, {
+    $CWD/testdata/testmod/anon.cue`,
+	}, {
 		name: "StandardInput",
 		cfg:  dirCfg,
 		args: []string{"-"},
@@ -212,7 +220,8 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod
 display:command-line-arguments
 files:
-    -`}, {
+    -`,
+	}, {
 		name: "BadIdentifier",
 		cfg:  dirCfg,
 		args: []string{"foo.com/bad-identifier"},
@@ -266,7 +275,8 @@ files:
     $CWD/testdata/testmod/imports/imports.cue
 imports:
     mod.test/catch: $CWD/testdata/testmod/cue.mod/pkg/mod.test/catch/catch.cue
-    mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue`}, {
+    mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue`,
+	}, {
 		name: "PackageWithImportsWithSkipImportsConfig",
 		cfg: &Config{
 			Dir:         testdataDir,
@@ -280,7 +290,8 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/imports
 display:./imports
 files:
-    $CWD/testdata/testmod/imports/imports.cue`}, {
+    $CWD/testdata/testmod/imports/imports.cue`,
+	}, {
 		name: "OnlyToolFiles",
 		cfg:  dirCfg,
 		args: []string{"./toolonly"},
@@ -290,7 +301,8 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/toolonly
 display:./toolonly
 files:
-    $CWD/testdata/testmod/toolonly/foo_tool.cue`}, {
+    $CWD/testdata/testmod/toolonly/foo_tool.cue`,
+	}, {
 		name: "OnlyToolFilesWithToolsDisabledInConfig",
 		cfg: &Config{
 			Dir: testdataDir,
@@ -303,7 +315,8 @@ path:   mod.test/test/toolonly@v0:foo
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/toolonly
-display:./toolonly`}, {
+display:./toolonly`,
+	}, {
 		name: "WithBoolTag",
 		cfg: &Config{
 			Dir:  testdataDir,
@@ -316,7 +329,8 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tags
 display:./tags
 files:
-    $CWD/testdata/testmod/tags/prod.cue`}, {
+    $CWD/testdata/testmod/tags/prod.cue`,
+	}, {
 		name: "WithAttrValTag",
 		cfg: &Config{
 			Dir:  testdataDir,
@@ -329,7 +343,8 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tags
 display:./tags
 files:
-    $CWD/testdata/testmod/tags/prod.cue`}, {
+    $CWD/testdata/testmod/tags/prod.cue`,
+	}, {
 		name: "UnusedTag",
 		cfg: &Config{
 			Dir:  testdataDir,
@@ -345,7 +360,8 @@ path:   mod.test/test/tagsbad@v0
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tagsbad
-display:./tagsbad`}, {
+display:./tagsbad`,
+	}, {
 		name: "ImportCycle",
 		cfg: &Config{
 			Dir: testdataDir,
@@ -361,7 +377,8 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/cycle
 display:./cycle
 files:
-    $CWD/testdata/testmod/cycle/cycle.cue`}, {
+    $CWD/testdata/testmod/cycle/cycle.cue`,
+	}, {
 		name: "AcceptLegacyModuleWithLegacyModule",
 		cfg: &Config{
 			Dir:                 testdata("testmod_legacy"),
@@ -373,7 +390,8 @@ root:   $CWD/testdata/testmod_legacy
 dir:    $CWD/testdata/testmod_legacy
 display:.
 files:
-    $CWD/testdata/testmod_legacy/foo.cue`}, {
+    $CWD/testdata/testmod_legacy/foo.cue`,
+	}, {
 		name: "AcceptLegacyModuleWithNonLegacyModule",
 		cfg: &Config{
 			Dir:                 testdataDir,
@@ -390,7 +408,8 @@ files:
     $CWD/testdata/testmod/imports/imports.cue
 imports:
     mod.test/catch: $CWD/testdata/testmod/cue.mod/pkg/mod.test/catch/catch.cue
-    mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue`}, {
+    mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue`,
+	}, {
 		name: "MismatchedModulePathInConfig",
 		cfg: &Config{
 			Dir:    testdataDir,
@@ -403,7 +422,8 @@ path:   ""
 module: wrong.test@v0
 root:   ""
 dir:    ""
-display:""`}, {
+display:""`,
+	}, {
 		name: "ModulePathInConfigWithoutMajorVersion",
 		cfg: &Config{
 			Dir:    testdataDir,
@@ -416,7 +436,8 @@ path:   ""
 module: mod.test/test
 root:   ""
 dir:    ""
-display:""`}, {
+display:""`,
+	}, {
 		name: "ModulePathInConfigWithoutMajorVersionAndMismatchedPath",
 		cfg: &Config{
 			Dir:    testdataDir,
@@ -429,7 +450,8 @@ path:   ""
 module: mod.test/wrong
 root:   ""
 dir:    ""
-display:""`}, {
+display:""`,
+	}, {
 		name: "ExplicitPackageWithUnqualifiedImportPath#1",
 		cfg: &Config{
 			Dir:     filepath.Join(testdataDir, "multi"),
@@ -442,7 +464,8 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/multi
 display:.
 files:
-    $CWD/testdata/testmod/multi/file.cue`}, {
+    $CWD/testdata/testmod/multi/file.cue`,
+	}, {
 		name: "ExplicitPackageWithUnqualifiedImportPath#2",
 		// This test replicates the failure reported in https://cuelang.org/issue/3213
 		cfg: &Config{
@@ -458,7 +481,8 @@ display:.
 files:
     $CWD/testdata/testmod/multi2/other.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+	}, {
 		name: "ExplicitPackageWithUnqualifiedImportPath#3",
 		cfg: &Config{
 			Dir:     filepath.Join(testdataDir, "multi3"),
@@ -473,7 +497,8 @@ display:.
 files:
     $CWD/testdata/testmod/multi3/other.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+	}, {
 		// Test that we can explicitly ask for non-package
 		// CUE files by setting Config.Package to "_".
 		name: "ExplicitPackageWithUnqualifiedImportPath#4",
@@ -489,7 +514,8 @@ dir:    $CWD/testdata/testmod/multi4
 display:.
 files:
     $CWD/testdata/testmod/multi4/nopackage1.cue
-    $CWD/testdata/testmod/multi4/nopackage2.cue`}, {
+    $CWD/testdata/testmod/multi4/nopackage2.cue`,
+	}, {
 		// Test what happens when there's a single CUE file
 		// with an explicit `package _` directive.
 		name: "ExplicitPackageWithUnqualifiedImportPath#5",
@@ -504,7 +530,8 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/multi5
 display:.
 files:
-    $CWD/testdata/testmod/multi5/nopackage.cue`}, {
+    $CWD/testdata/testmod/multi5/nopackage.cue`,
+	}, {
 		// Check that imports are only considered from files
 		// that match the build paths.
 		name: "BuildTagsWithImports#1",
@@ -522,7 +549,8 @@ files:
     $CWD/testdata/testmod/tagswithimports/prod.cue
 imports:
     mod.test/test/hello:test: $CWD/testdata/testmod/test.cue $CWD/testdata/testmod/hello/test.cue
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+	}, {
 		// Check that imports are only considered from files
 		// that match the build paths. When we don't have the prod
 		// tag, the bad import path mentioned in testdata/testmod/tagswithimports/nonprod.cue
@@ -540,7 +568,8 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tagswithimports
 display:.
 files:
-    $CWD/testdata/testmod/tagswithimports/nonprod.cue`}, {
+    $CWD/testdata/testmod/tagswithimports/nonprod.cue`,
+	}, {
 		name: "ModuleFileNonDirectory",
 		cfg: &Config{
 			Dir: testdata("testmod_legacymodfile"),
@@ -551,7 +580,8 @@ path:   ""
 module: ""
 root:   ""
 dir:    ""
-display:""`}, {
+display:""`,
+	}, {
 		// This test checks that files in parent directories
 		// do not result in irrelevant instances appearing
 		// in the result of Instances.
@@ -602,7 +632,8 @@ dir:    $CWD/testdata/testmod/issue3306/x
 display:./issue3306/x
 files:
     $CWD/testdata/testmod/issue3306/x.cue
-    $CWD/testdata/testmod/issue3306/x/x.cue`}, {
+    $CWD/testdata/testmod/issue3306/x/x.cue`,
+	}, {
 		// This test checks that when we use Package: "*",
 		// we can still use imported packages.
 		name: "AllPackagesWithImports",
@@ -627,7 +658,8 @@ display:.
 files:
     $CWD/testdata/testmod/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+	}, {
 		// This tests that we can load a CUE package by pointing Dir to it
 		// even when the package's directory name ends with ".cue".
 		name: "DirWithCUEFileExtension",

@@ -104,7 +104,8 @@ func TestNewStruct(t *testing.T) {
 	// foo
 
 	...
-}`}, {
+}`,
+	}, {
 		input: []any{
 			&ast.LetClause{Ident: ast.NewIdent("foo"), Expr: ast.NewIdent("bar")},
 			ast.Label(ast.NewString("bar")), ast.NewString("baz"),
@@ -117,7 +118,8 @@ func TestNewStruct(t *testing.T) {
 	let foo = bar
 	"bar": "baz"
 	"a":   "b"
-}`}, {
+}`,
+	}, {
 		input: []any{
 			ast.NewIdent("opt"), token.OPTION, ast.NewString("foo"),
 			ast.NewIdent("req"), token.NOT, ast.NewString("bar"),
@@ -125,7 +127,8 @@ func TestNewStruct(t *testing.T) {
 		want: `{
 	opt?: "foo"
 	req!: "bar"
-}`}, {
+}`,
+	}, {
 		input: []any{ast.Embed(ast.NewBool(true))},
 		want: `{
 	true

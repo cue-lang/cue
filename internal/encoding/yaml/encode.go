@@ -23,7 +23,7 @@ import (
 	"strings"
 	"sync"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"

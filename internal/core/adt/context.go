@@ -16,6 +16,7 @@ package adt
 
 import (
 	"fmt"
+	"iter"
 	"reflect"
 	"regexp"
 	"sync/atomic"
@@ -1042,14 +1043,14 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state Flags) *Vertex {
 }
 
 // Elems returns the evaluated elements of a list.
-func (c *OpContext) Elems(v Value) []*Vertex {
+func (c *OpContext) Elems(v Value) iter.Seq[*Vertex] {
 	list := c.list(v)
 	list.Finalize(c)
 	return list.Elems()
 }
 
 // RawElems returns the elements of the list without evaluating them.
-func (c *OpContext) RawElems(v Value) []*Vertex {
+func (c *OpContext) RawElems(v Value) iter.Seq[*Vertex] {
 	list := c.list(v)
 	return list.Elems()
 }

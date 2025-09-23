@@ -39,6 +39,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/subsume"
 	internaljson "cuelang.org/go/internal/encoding/json"
+	"cuelang.org/go/internal/iterutil"
 	"cuelang.org/go/internal/types"
 )
 
@@ -1125,7 +1126,7 @@ func (v Value) Len() Value {
 		case *adt.Vertex:
 			if x.IsList() {
 				n := &adt.Num{K: adt.IntKind}
-				n.X.SetInt64(int64(len(x.Elems())))
+				n.X.SetInt64(int64(iterutil.Count(x.Elems())))
 				if x.IsClosedList() {
 					return remakeFinal(v, n)
 				}
@@ -1177,7 +1178,7 @@ func (v Value) List() (Iterator, error) {
 // mustList is like [Value.List], but reusing ctx and leaving it to the caller
 // to apply defaults and check the kind.
 func (v Value) mustList(ctx *adt.OpContext) Iterator {
-	return Iterator{idx: v.idx, ctx: ctx, val: v, arcs: v.v.Elems()}
+	return Iterator{idx: v.idx, ctx: ctx, val: v, arcs: slices.Collect(v.v.Elems())}
 }
 
 // Null reports an error if v is not null.

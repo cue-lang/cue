@@ -15,6 +15,8 @@
 package pkg
 
 import (
+	"iter"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/core/adt"
 )
@@ -31,7 +33,7 @@ type List struct {
 }
 
 // Elems returns the elements of a list.
-func (l *List) Elems() []*adt.Vertex {
+func (l *List) Elems() iter.Seq[*adt.Vertex] {
 	return l.node.Elems()
 }
 

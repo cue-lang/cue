@@ -16,11 +16,13 @@ package adt
 
 import (
 	"fmt"
+	"iter"
 	"slices"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/iterutil"
 )
 
 // TODO: unanswered questions about structural cycles:
@@ -1162,7 +1164,7 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 		switch v.BaseValue.(type) {
 		case *ListMarker:
 			// TODO(perf): use precomputed length.
-			if f.Index() < len(v.Elems()) {
+			if f.Index() < iterutil.Count(v.Elems()) {
 				return true
 			}
 			return !v.IsClosedList()
@@ -1262,15 +1264,17 @@ func (v *Vertex) LookupRaw(f Feature) *Vertex {
 }
 
 // Elems returns the regular elements of a list.
-func (v *Vertex) Elems() []*Vertex {
-	// TODO: add bookkeeping for where list arcs start and end.
-	a := make([]*Vertex, 0, len(v.Arcs))
-	for _, x := range v.Arcs {
-		if x.Label.IsInt() {
-			a = append(a, x)
+func (v *Vertex) Elems() iter.Seq[*Vertex] {
+	return func(yield func(*Vertex) bool) {
+		// TODO: add bookkeeping for where list arcs start and end.
+		for _, x := range v.Arcs {
+			if x.Label.IsInt() {
+				if !yield(x) {
+					break
+				}
+			}
 		}
 	}
-	return a
 }
 
 func (v *Vertex) Init(c *OpContext) {

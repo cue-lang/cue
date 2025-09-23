@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	cueformat "cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/iterutil"
 )
 
 // ErrorCode indicates the type of error. The type of error may influence
@@ -287,7 +288,7 @@ func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg
 
 	var err errors.Error
 	if f.IsInt() {
-		err = c.NewPosf(pos, intMsg, f.Index(), len(v.Elems()))
+		err = c.NewPosf(pos, intMsg, f.Index(), iterutil.Count(v.Elems()))
 	} else {
 		err = c.NewPosf(pos, stringMsg, label)
 	}

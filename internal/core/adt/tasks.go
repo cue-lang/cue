@@ -16,6 +16,7 @@ package adt
 
 import (
 	"fmt"
+	"slices"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -330,7 +331,7 @@ func processListVertex(c *OpContext, t *task, mode runMode) {
 
 	l := t.x.(*Vertex)
 
-	elems := l.Elems()
+	elems := slices.Collect(l.Elems())
 	isClosed := l.IsClosedList()
 
 	// TODO: Share with code above.

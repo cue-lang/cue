@@ -311,7 +311,8 @@ func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 		return nil
 	}
 
-	for j, w := range v.Elems() {
+	j := 0
+	for w := range v.Elems() {
 		w.Finalize(c.ctx) // defensive
 		switch x := adt.Unwrap(adt.Default(w.Value())).(type) {
 		case *adt.Num:
@@ -339,6 +340,7 @@ func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 			c.Err = &callError{err}
 			return nil
 		}
+		j++
 	}
 	return a
 }
@@ -349,7 +351,8 @@ func (c *CallCtxt) StringList(i int) (a []string) {
 		return nil
 	}
 
-	for j, w := range v.Elems() {
+	j := 0
+	for w := range v.Elems() {
 		w.Finalize(c.ctx) // defensive
 		switch x := adt.Unwrap(adt.Default(w.Value())).(type) {
 		case *adt.String:
@@ -377,6 +380,7 @@ func (c *CallCtxt) StringList(i int) (a []string) {
 			c.Err = &callError{err}
 			return nil
 		}
+		j++
 	}
 	return a
 }

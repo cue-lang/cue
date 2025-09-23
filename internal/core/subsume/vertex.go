@@ -16,6 +16,7 @@ package subsume
 
 import (
 	"fmt"
+	"slices"
 
 	"cuelang.org/go/internal/core/adt"
 )
@@ -276,8 +277,8 @@ func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 		return false
 	}
 
-	xElems := x.Elems()
-	yElems := y.Elems()
+	xElems := slices.Collect(x.Elems())
+	yElems := slices.Collect(y.Elems())
 
 	switch {
 	case len(xElems) == len(yElems):

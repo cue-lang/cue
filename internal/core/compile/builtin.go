@@ -19,6 +19,7 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/iterutil"
 )
 
 // This file contains predeclared builtins.
@@ -96,7 +97,7 @@ var lenBuiltin = &adt.Builtin{
 				// This should not happen, but be defensive.
 				return c.NewErrf("unevaluated vertex")
 			case *adt.ListMarker:
-				return c.NewInt64(int64(len(x.Elems())), v)
+				return c.NewInt64(int64(iterutil.Count(x.Elems())), v)
 
 			case *adt.StructMarker:
 				n := 0
@@ -193,12 +194,12 @@ var andBuiltin = &adt.Builtin{
 		arg := call.Arg(0)
 
 		list := c.RawElems(arg)
-		if len(list) == 0 {
-			return &adt.Top{}
-		}
 		a := []adt.Value{}
-		for _, c := range list {
+		for c := range list {
 			a = append(a, c)
+		}
+		if len(a) == 0 {
+			return &adt.Top{}
 		}
 		return &adt.Conjunction{Values: a}
 	},
@@ -214,7 +215,7 @@ var orBuiltin = &adt.Builtin{
 		args := call.Args()
 
 		d := []adt.Disjunct{}
-		for _, c := range c.RawElems(args[0]) {
+		for c := range c.RawElems(args[0]) {
 			d = append(d, adt.Disjunct{Val: c, Default: false})
 		}
 		if len(d) == 0 {

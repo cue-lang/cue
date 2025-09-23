@@ -43,11 +43,8 @@ var matchNBuiltin = &adt.Builtin{
 		}
 
 		var errs []*adt.Bottom
-
-		constraints := c.Elems(args[2])
-
 		var count, possibleCount int64
-		for _, check := range constraints {
+		for check := range c.Elems(args[2]) {
 			v := adt.Unify(c, self, check)
 			if err := adt.Validate(c, v, finalCfg); err == nil {
 				// TODO: is it always true that the lack of an error signifies

@@ -636,7 +636,7 @@ func (e *extractor) strLabel(name string) cueast.Label {
 
 func (e *extractor) ident(name string, isDef bool) *cueast.Ident {
 	if isDef {
-		r := []rune(name)[0]
+		r, _ := utf8.DecodeRuneInString(name)
 		name = "#" + name
 		if !unicode.Is(unicode.Lu, r) {
 			name = "_" + name

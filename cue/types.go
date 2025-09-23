@@ -23,6 +23,7 @@ import (
 	"math/big"
 	"slices"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/cockroachdb/apd/v3"
 
@@ -1142,7 +1143,7 @@ func (v Value) Len() Value {
 		case *adt.Bytes:
 			return makeInt(v, int64(len(x.B)))
 		case *adt.String:
-			return makeInt(v, int64(len([]rune(x.Str))))
+			return makeInt(v, int64(utf8.RuneCountInString(x.Str)))
 		}
 	}
 	const msg = "len not supported for type %v"

@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/cockroachdb/apd/v3"
 
@@ -156,7 +157,7 @@ func NewComment(isDoc bool, s string) *ast.CommentGroup {
 		buf.WriteString("//")
 		for scanner.Scan() {
 			s := scanner.Text()
-			n := len([]rune(s)) + 1
+			n := utf8.RuneCountInString(s) + 1
 			if count+n > maxRunesPerLine && count > 3 {
 				cg.List = append(cg.List, &ast.Comment{Text: buf.String()})
 				count = 3

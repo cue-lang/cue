@@ -1177,13 +1177,7 @@ func (v Value) List() (Iterator, error) {
 // mustList is like [Value.List], but reusing ctx and leaving it to the caller
 // to apply defaults and check the kind.
 func (v Value) mustList(ctx *adt.OpContext) Iterator {
-	arcs := []*adt.Vertex{}
-	for _, a := range v.v.Elems() {
-		if a.Label.IsInt() {
-			arcs = append(arcs, a)
-		}
-	}
-	return Iterator{idx: v.idx, ctx: ctx, val: v, arcs: arcs}
+	return Iterator{idx: v.idx, ctx: ctx, val: v, arcs: v.v.Elems()}
 }
 
 // Null reports an error if v is not null.

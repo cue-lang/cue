@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e662d94_5ce6c972",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-29T08:24:19Z",
+      "side": 1,
+      "message": "I think I\u0027d request someone with more experience than me gives the casting vote of this - personally I think adding `Count` is a bit of a red flag.",
+      "revId": "489824ec03d563fd79c93e522bff31e5ef7f417b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "379e038b_fbc33a13",
+        "filename": "internal/core/compile/builtin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-29T08:24:19Z",
+      "side": 1,
+      "message": "As you\u0027re making general improvements here, using `make` with `len(list)` would likely be wise here too? Oh, also shouldn\u0027t `list` be renamed (`iter`?) given it\u0027s no longer a list. Took me a couple moments to figure out why ranges had changed from `_, c :\u003d`  to `c :\u003d` ... ah yes, it\u0027s not a list any more.",
+      "revId": "489824ec03d563fd79c93e522bff31e5ef7f417b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1175d99_d69172f4",
+        "filename": "internal/iterutil/iter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-29T08:24:19Z",
+      "side": 1,
+      "message": "I have to say I find this a bit alarming. `len` is O(1). Personally, I\u0027m not convinced the switch to iters is worth it given using `Count` is O(n), and especially seeing as we tend to be careful about memory allocations, so having to use `Count` in combination with `make` is a step backwards I think vs `len`.",
+      "revId": "489824ec03d563fd79c93e522bff31e5ef7f417b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

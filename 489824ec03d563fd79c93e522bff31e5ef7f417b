@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "869d2d31_109e26f6",
+        "filename": "internal/core/compile/builtin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-29T08:41:08Z",
+      "side": 1,
+      "message": "re naming - you\u0027re right, done.\n\nre make with len - we can\u0027t do that with an iterator, because the iterator doesn\u0027t work out how many elements there are upfront. the previous logic did have a length upfront, but only because it did the expensive construction of a list first, which defeats the purpose of trying to avoid work.",
+      "parentUuid": "379e038b_fbc33a13",
+      "revId": "489824ec03d563fd79c93e522bff31e5ef7f417b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f1175d99_d69172f4",
         "filename": "internal/iterutil/iter.go",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2025-09-29T08:24:19Z",
       "side": 1,
       "message": "I have to say I find this a bit alarming. `len` is O(1). Personally, I\u0027m not convinced the switch to iters is worth it given using `Count` is O(n), and especially seeing as we tend to be careful about memory allocations, so having to use `Count` in combination with `make` is a step backwards I think vs `len`.",
+      "revId": "489824ec03d563fd79c93e522bff31e5ef7f417b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "176e2045_8566d047",
+        "filename": "internal/iterutil/iter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-29T08:41:08Z",
+      "side": 1,
+      "message": "You have to bear in mind that the previous `len` was used on the newly created Elems slice. So \"iterate to create a new slice and then use `len` on it\" is strictly more expensive than \"iterate to count the length\".\n\nFor use cases where we need both the length and the elements themselves, yes, I stick to the slice via `slices.Collect`. But if we only need the length, then Count is best.",
+      "parentUuid": "f1175d99_d69172f4",
       "revId": "489824ec03d563fd79c93e522bff31e5ef7f417b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

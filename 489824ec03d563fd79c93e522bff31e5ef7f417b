@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "60b82bcf_0bb5bbd7",
+        "filename": "internal/core/compile/builtin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-29T09:02:19Z",
+      "side": 1,
+      "message": "Yeah, really interesting tradeoff - sure, you save the alloc and construction cost of the Elems list, but you now have potentially more allocs going on in the append (though I know it\u0027s a x1.4 len or something).",
+      "parentUuid": "869d2d31_109e26f6",
+      "revId": "489824ec03d563fd79c93e522bff31e5ef7f417b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1175d99_d69172f4",
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "You have to bear in mind that the previous `len` was used on the newly created Elems slice. So \"iterate to create a new slice and then use `len` on it\" is strictly more expensive than \"iterate to count the length\".\n\nFor use cases where we need both the length and the elements themselves, yes, I stick to the slice via `slices.Collect`. But if we only need the length, then Count is best.",
       "parentUuid": "f1175d99_d69172f4",
+      "revId": "489824ec03d563fd79c93e522bff31e5ef7f417b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c27f939_170971fd",
+        "filename": "internal/iterutil/iter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-09-29T09:02:19Z",
+      "side": 1,
+      "message": "Yep, that penny did drop for me.",
+      "parentUuid": "176e2045_8566d047",
       "revId": "489824ec03d563fd79c93e522bff31e5ef7f417b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

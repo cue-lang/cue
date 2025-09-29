@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7af5bb99_78bcb8fc",
+        "filename": "internal/core/compile/builtin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-29T09:48:03Z",
+      "side": 1,
+      "message": "ah yes. as we grow the list, we could alloc a bit more. but the runtime is pretty efficient with appends, so I wouldn\u0027t worry too much about it. we can always hope that the Elems iterator func gets inlined, at which point the compiler can realise when a slices.Collect could pre-allocate the right length for the new slice.",
+      "parentUuid": "60b82bcf_0bb5bbd7",
+      "revId": "489824ec03d563fd79c93e522bff31e5ef7f417b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1175d99_d69172f4",

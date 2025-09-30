@@ -16,6 +16,23 @@
       "message": "I\u0027m actually not entirely sure whether this is correct in general. If the created struct includes names like `matchN`, then not quoting them could break calls to the `matchN` built-in function.\n\nSo perhaps the answer here, to keep the API generic, is to let it always quote everything, and assume the caller will use cue/format.Simplify if they want to have nice CUE output.",
       "revId": "ef799d166b0ce985543b9ce2dc5ef6e0fd49e475",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3759787a_c7e64385",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-30T15:30:41Z",
+      "side": 1,
+      "message": "I\u0027m not convinced this is OK. We don\u0027t check whether there are any references to an identifier named x in the field value, and if there are then ISTM that this logic will be broken. Better to leave it up to `format.Simplify` to make it a label only when there are no such references, I think.",
+      "revId": "ef799d166b0ce985543b9ce2dc5ef6e0fd49e475",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

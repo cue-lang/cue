@@ -1038,7 +1038,7 @@ func (e *extractor) makeField(name string, kind fieldKind, expr types.Type, doc 
 
 	internal.SetConstraint(f, tok)
 
-	b, _ := format.Node(typ)
+	b, _ := format.Node(typ, format.Simplify())
 	return f, string(b)
 }
 

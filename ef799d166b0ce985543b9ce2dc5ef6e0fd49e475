@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b0c0105_c38aa8fa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-30T14:37:19Z",
+      "side": 1,
+      "message": "I\u0027m actually not entirely sure whether this is correct in general. If the created struct includes names like `matchN`, then not quoting them could break calls to the `matchN` built-in function.\n\nSo perhaps the answer here, to keep the API generic, is to let it always quote everything, and assume the caller will use cue/format.Simplify if they want to have nice CUE output.",
+      "revId": "ef799d166b0ce985543b9ce2dc5ef6e0fd49e475",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

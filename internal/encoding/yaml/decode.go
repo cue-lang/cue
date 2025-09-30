@@ -17,7 +17,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 )
 
 // TODO(mvdan): we should sanity check that the decoder always produces valid CUE,
@@ -469,23 +468,13 @@ func (d *decoder) label(yn *yaml.Node) (ast.Label, error) {
 
 	switch expr := expr.(type) {
 	case *ast.BasicLit:
-		if expr.Kind == token.STRING {
-			if ast.IsValidIdent(value) && !internal.IsDefOrHidden(value) {
-				return &ast.Ident{
-					NamePos: pos,
-					Name:    value,
-				}, nil
-			}
-			ast.SetPos(expr, pos)
-			return expr, nil
+		if expr.Kind != token.STRING {
+			// With incoming YAML like `Null: 1`, the key scalar is normalized to "null".
+			value = expr.Value
 		}
-
-		return &ast.BasicLit{
-			ValuePos: pos,
-			Kind:     token.STRING,
-			Value:    literal.Label.Quote(expr.Value),
-		}, nil
-
+		label := ast.NewLabel(value)
+		ast.SetPos(label, pos)
+		return label, nil
 	default:
 		return nil, d.posErrorf(yn, "invalid label "+value)
 	}

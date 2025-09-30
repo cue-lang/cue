@@ -421,9 +421,19 @@ type BasicLit struct {
 	label
 }
 
-// TODO: introduce and use NewLabel and NewBytes and perhaps NewText (in the
+// TODO: introduce and use NewBytes and perhaps NewText (in the
 // later case NewString would return a string or bytes type) to distinguish from
 // NewString. Consider how to pass indentation information.
+
+// NewLabel creates a new string label with the given value,
+// quoting it as a string literal only if necessary.
+// To create labels for definition or hidden fields, use [NewIdent].
+func NewLabel(name string) Label {
+	if strings.HasPrefix(name, "#") || strings.HasPrefix(name, "_") || !IsValidIdent(name) {
+		return NewString(name)
+	}
+	return NewIdent(name)
+}
 
 // NewString creates a new BasicLit with a string value without position.
 // It quotes the given string.

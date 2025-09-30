@@ -420,17 +420,9 @@ func quoteLabelIfNeeded(name string) string {
 // cue/format knows how to quote any other identifiers correctly.
 func (d *Decoder) label(tkey tomlKey, relPos token.RelPos) ast.Label {
 	pos := d.tokenFile.Pos(tkey.shape.Start.Offset, relPos)
-	if strings.HasPrefix(tkey.name, "_") {
-		return &ast.BasicLit{
-			ValuePos: pos,
-			Kind:     token.STRING,
-			Value:    literal.String.Quote(tkey.name),
-		}
-	}
-	return &ast.Ident{
-		NamePos: pos,
-		Name:    tkey.name,
-	}
+	label := ast.NewLabel(tkey.name)
+	ast.SetPos(label, pos)
+	return label
 }
 
 // decodeExpr decodes a single TOML value expression, found on the right side

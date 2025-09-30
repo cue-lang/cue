@@ -627,10 +627,6 @@ func (e *extractor) recordConsts(x *ast.GenDecl) {
 	}
 }
 
-func (e *extractor) strLabel(name string) cueast.Label {
-	return cueast.NewString(name)
-}
-
 func (e *extractor) ident(name string, isDef bool) *cueast.Ident {
 	if isDef {
 		r, _ := utf8.DecodeRuneInString(name)
@@ -1020,7 +1016,7 @@ func (e *extractor) makeField(name string, kind fieldKind, expr types.Type, doc 
 	if kind == definition {
 		label = e.ident(name, true)
 	} else {
-		label = e.strLabel(name)
+		label = cueast.NewLabel(name)
 	}
 	f = &cueast.Field{Label: label, Value: typ}
 	if doc := makeDoc(doc, newline); doc != nil {

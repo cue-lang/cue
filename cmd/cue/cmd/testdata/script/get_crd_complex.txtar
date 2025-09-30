@@ -99,32 +99,30 @@ import "time"
 
 #Database: {
 	_embeddedResource
-	"spec"?: {
-		"engine"!:   "postgres" | "mysql" | "mongodb"
-		"version"!:  =~"^[0-9]+\\.[0-9]+$"
-		"replicas"!: int & >=1 & <=10
-		"resources"!: {
-			"cpu"!:     string
-			"memory"!:  string
-			"storage"?: string
+	spec?: {
+		engine!:   "postgres" | "mysql" | "mongodb"
+		version!:  =~"^[0-9]+\\.[0-9]+$"
+		replicas!: int & >=1 & <=10
+		resources!: {
+			cpu!:     string
+			memory!:  string
+			storage?: string
 		}
-		"config"?: {
-			[string]: string
-		}
-		"backups"?: [...{
-			"schedule"!:  string
-			"retention"?: string
+		config?: [string]: string
+		backups?: [...{
+			schedule!:  string
+			retention?: string
 		}]
 	}
-	"status"?: {
-		"phase"?: "Pending" | "Running" | "Failed"
-		"conditions"?: [...{
-			"type"?:               string
-			"status"?:             string
-			"lastTransitionTime"?: time.Time
+	status?: {
+		phase?: "Pending" | "Running" | "Failed"
+		conditions?: [...{
+			type?:               string
+			status?:             string
+			lastTransitionTime?: time.Time
 		}]
-		"endpoint"?:      string
-		"readyReplicas"?: int
+		endpoint?:      string
+		readyReplicas?: int
 	}
 
 	_embeddedResource: {
@@ -139,12 +137,8 @@ import "time"
 	metadata!: {
 		name!:      string
 		namespace!: string
-		labels?: {
-			[string]: string
-		}
-		annotations?: {
-			[string]: string
-		}
+		labels?: [string]: string
+		annotations?: [string]: string
 		...
 	}
 }

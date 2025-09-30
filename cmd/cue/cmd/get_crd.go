@@ -133,7 +133,7 @@ func runCRD(cmd *Command, args []string) error {
 					if err := astutil.Sanitize(newf); err != nil {
 						return err
 					}
-					data, err := format.Node(newf)
+					data, err := format.Node(newf, format.Simplify())
 					if err != nil {
 						return err
 					}

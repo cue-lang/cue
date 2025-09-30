@@ -159,16 +159,16 @@ package v1
 
 #Foo: {
 	_embeddedResource
-	"spec"?: {
+	spec?: {
 		// Number of replicas
-		"replicas"!: int & >=1
+		replicas!: int & >=1
 
 		// Container image
-		"image"!: string
+		image!: string
 	}
-	"status"?: {
+	status?: {
 		// Whether the resource is ready
-		"ready"?: bool
+		ready?: bool
 	}
 
 	_embeddedResource: {
@@ -183,12 +183,8 @@ package v1
 	metadata!: {
 		name!:      string
 		namespace!: string
-		labels?: {
-			[string]: string
-		}
-		annotations?: {
-			[string]: string
-		}
+		labels?: [string]: string
+		annotations?: [string]: string
 		...
 	}
 }
@@ -197,9 +193,9 @@ package v1
 
 #Foo: {
 	_embeddedResource
-	"spec"?: {
-		"replicas"!: int & >=1
-		"image"!:    string
+	spec?: {
+		replicas!: int & >=1
+		image!:    string
 	}
 
 	_embeddedResource: {
@@ -214,12 +210,8 @@ package v1
 	metadata!: {
 		name!:      string
 		namespace!: string
-		labels?: {
-			[string]: string
-		}
-		annotations?: {
-			[string]: string
-		}
+		labels?: [string]: string
+		annotations?: [string]: string
 		...
 	}
 }
@@ -228,13 +220,13 @@ package v1beta1
 
 #Bar: {
 	_embeddedResource
-	"spec"?: {
-		"size"!:    "small" | "medium" | "large"
-		"enabled"?: bool
+	spec?: {
+		size!:    "small" | "medium" | "large"
+		enabled?: bool
 	}
-	"status"?: {
-		"phase"?: string
-		"ready"?: bool
+	status?: {
+		phase?: string
+		ready?: bool
 	}
 
 	_embeddedResource: {
@@ -249,12 +241,8 @@ package v1beta1
 	metadata!: {
 		name!:      string
 		namespace?: string
-		labels?: {
-			[string]: string
-		}
-		annotations?: {
-			[string]: string
-		}
+		labels?: [string]: string
+		annotations?: [string]: string
 		...
 	}
 }

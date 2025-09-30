@@ -145,11 +145,10 @@ func (dec *Decoder) decoderInnerText(xmlToken xml.CharData, contentOffset int64)
 		return fmt.Errorf("text content outside of an XML element is not supported")
 	}
 	pos := dec.tokenFile.Pos(int(contentOffset), token.NoRelPos)
-	txtContentPosition := pos
-	txtLabel := ast.NewString(contentAttribute)
-	txtLabel.ValuePos = txtContentPosition
+	txtLabel := ast.NewLabel(contentAttribute)
+	ast.SetPos(txtLabel, pos)
 	val := toBasicLit(textContent)
-	val.ValuePos = txtContentPosition
+	ast.SetPos(val, pos)
 	textContentNode := &ast.Field{
 		Label:    txtLabel,
 		Value:    val,
@@ -256,9 +255,9 @@ func isWhiteSpace(s string) bool {
 // for the beginning of the start tag of the given XML element.
 func (dec *Decoder) cueFieldFromXmlElement(elem xml.StartElement, xmlNode *xmlElement, startOffset int64) (*ast.Field, error) {
 	elementName := prefixedElementName(elem, xmlNode)
-	resLabel := ast.NewString(elementName)
+	resLabel := ast.NewLabel(elementName)
 	pos := dec.tokenFile.Pos(int(startOffset), token.NoRelPos)
-	resLabel.ValuePos = pos
+	ast.SetPos(resLabel, pos)
 	resultValue := &ast.StructLit{}
 	result := &ast.Field{
 		Label:    resLabel,
@@ -268,10 +267,10 @@ func (dec *Decoder) cueFieldFromXmlElement(elem xml.StartElement, xmlNode *xmlEl
 	// Extract attributes as children.
 	for _, a := range elem.Attr {
 		attrName := prefixedAttrName(a, elem, xmlNode)
-		label := ast.NewString(attributeSymbol + attrName)
+		label := ast.NewLabel(attributeSymbol + attrName)
 		value := toBasicLit(a.Value)
-		label.ValuePos = pos
-		value.ValuePos = pos
+		ast.SetPos(label, pos)
+		ast.SetPos(value, pos)
 		attrExpr := &ast.Field{
 			Label:    label,
 			Value:    value,

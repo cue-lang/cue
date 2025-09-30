@@ -382,9 +382,6 @@ func extract(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	for _, pkg := range pkgs {
-		fmt.Println(pkg.Errors)
-	}
 	if packages.PrintErrors(pkgs) > 0 {
 		return ErrPrintedError
 	}

@@ -2,6 +2,7 @@
 # in loading Go packages, such as a typechecking error.
 
 ! exec cue get go --local
+! stdout .
 cmpenv stderr stderr.golden
 
 -- go.mod --

@@ -203,7 +203,7 @@ var unmarshalTests = []struct {
 		`"_#foo": 1`,
 	}, {
 		"~: null key",
-		`"null": "null key"`,
+		`null: "null key"`,
 	}, {
 		`empty:
 apple: "newline"`,
@@ -304,8 +304,8 @@ True: 1
 Null: 1
 .Inf: 2
 `,
-		`"true": 1
-"null": 1
+		`true:   1
+null:   1
 "+Inf": 2`,
 	},
 

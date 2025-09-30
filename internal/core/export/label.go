@@ -19,10 +19,8 @@ import (
 	"fmt"
 	"io"
 	"strconv"
-	"strings"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 )
@@ -37,16 +35,8 @@ func (e *exporter) stringLabel(f adt.Feature) ast.Label {
 		s := e.identString(f)
 		return ast.NewIdent(s)
 
-	case adt.StringLabel:
-		s := e.ctx.IndexToString(int64(x))
-		if f == 0 || !ast.IsValidIdent(s) ||
-			strings.HasPrefix(s, "#") || strings.HasPrefix(s, "_") {
-			return ast.NewLit(token.STRING, literal.Label.Quote(s))
-		}
-		fallthrough
-
 	default:
-		return ast.NewIdent(e.ctx.IndexToString(int64(x)))
+		return ast.NewLabel(e.ctx.IndexToString(int64(x)))
 	}
 }
 

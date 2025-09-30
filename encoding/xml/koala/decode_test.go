@@ -478,7 +478,7 @@ func TestElementDecoding(t *testing.T) {
 			rootCueFile, err := astutil.ToFile(cueExpr)
 			qt.Assert(t, qt.IsNil(err))
 
-			actualCue, err := format.Node(rootCueFile, format.Simplify())
+			actualCue, err := format.Node(rootCueFile)
 
 			qt.Assert(t, qt.IsNil(err))
 			qt.Assert(t, qt.Equals(string(actualCue), test.wantCUE))

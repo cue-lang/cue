@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "5e412509_91a1bd7b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-30T17:16:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8d491c5_10628581",
+      "revId": "763403ad8a651ce77e7fbe0c220db2c8527ac5ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ceba6d0a_94cbab85",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2025-09-30T14:56:26Z",
       "side": 1,
       "message": "This is arguably slightly misleading, as \"regular\" is also used to distinguish a field from \"optional\" and \"required\". `cue.Str` talks about a \"string label\" which might be better.\n\n```suggestion\n// NewLabel creates a new string label with the given value, quoting it\n// as a string literal only if necessary.\n```\n\n?",
+      "revId": "763403ad8a651ce77e7fbe0c220db2c8527ac5ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6964b055_3b9a5e74",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-09-30T17:16:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a44a2cdb_668ee968",
       "revId": "763403ad8a651ce77e7fbe0c220db2c8527ac5ec",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

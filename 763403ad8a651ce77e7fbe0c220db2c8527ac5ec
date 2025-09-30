@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8d491c5_10628581",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-30T14:56:26Z",
+      "side": 1,
+      "message": "```suggestion\nas a label is a fairly common scenario, particularly when decoding\n```",
+      "revId": "763403ad8a651ce77e7fbe0c220db2c8527ac5ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ceba6d0a_94cbab85",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-30T14:56:26Z",
+      "side": 1,
+      "message": "LGTM modulo a couple of minor suggestions.",
+      "revId": "763403ad8a651ce77e7fbe0c220db2c8527ac5ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a44a2cdb_668ee968",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-09-30T14:56:26Z",
+      "side": 1,
+      "message": "This is arguably slightly misleading, as \"regular\" is also used to distinguish a field from \"optional\" and \"required\". `cue.Str` talks about a \"string label\" which might be better.\n\n```suggestion\n// NewLabel creates a new string label with the given value, quoting it\n// as a string literal only if necessary.\n```\n\n?",
+      "revId": "763403ad8a651ce77e7fbe0c220db2c8527ac5ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

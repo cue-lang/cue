@@ -128,21 +128,21 @@ import "time"
 	}
 
 	_embeddedResource: {
-		"apiVersion"!: string
-		"kind"!:       string
-		"metadata"?: {
+		apiVersion!: string
+		kind!:       string
+		metadata?: {
 			...
 		}
 	}
 	apiVersion: "myapp.com/v1"
 	kind:       "Database"
 	metadata!: {
-		"name"!:      string
-		"namespace"!: string
-		"labels"?: {
+		name!:      string
+		namespace!: string
+		labels?: {
 			[string]: string
 		}
-		"annotations"?: {
+		annotations?: {
 			[string]: string
 		}
 		...

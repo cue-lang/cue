@@ -545,7 +545,7 @@ func NewStruct(fields ...interface{}) *StructLit {
 		case Label:
 			label = x
 		case string:
-			label = NewString(x)
+			label = NewLabel(x)
 		default:
 			panic(fmt.Sprintf("unsupported label type %T", x))
 		}

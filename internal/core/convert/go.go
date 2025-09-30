@@ -493,10 +493,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 				reflect.Uint, reflect.Uint8, reflect.Uint16,
 				reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 
-				iter := value.MapRange()
-				for iter.Next() {
-					k := iter.Key()
-					val := iter.Value()
+				for k, val := range value.Seq2() {
 					// if isNil(val) {
 					// 	continue
 					// }
@@ -540,8 +537,8 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 
 			v := &adt.Vertex{}
 
-			for i := 0; i < value.Len(); i++ {
-				val := value.Index(i)
+			i := 0
+			for val := range value.Seq() {
 				x := c.convertRec(nilIsTop, val.Interface())
 				if x == nil {
 					return c.ctx.AddErrf("unsupported Go type (%T)",
@@ -553,6 +550,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 				list.Elems = append(list.Elems, x)
 				f := adt.MakeIntLabel(adt.IntLabel, int64(i))
 				v.Arcs = append(v.Arcs, c.ensureArcVertex(x, f))
+				i++
 			}
 
 			env := c.ctx.Env(0)

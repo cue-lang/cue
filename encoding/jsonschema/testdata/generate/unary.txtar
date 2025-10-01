@@ -1,0 +1,52 @@
+-- test.cue --
+
+@experiment(structcmp)
+
+package test
+
+t1?: =~ "^foo"
+t2?: !~ "bar"
+t3?: == 1
+t4?: >5
+t5?: >=5
+t6?: <10
+t7?: <=10
+t8?: >"foo"		// Not supported
+t9?: <"bar"		// Not supported
+
+-- out/generate-v3 --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	properties: {
+		t1: {
+			pattern: "^foo"
+			type:    "string"
+		}
+		t2: {
+			not: {
+				pattern: "bar"
+			}
+			type: "string"
+		}
+		t3: {
+			not: {
+				const: 1
+			}
+		}
+		t4: {
+			exclusiveMinimum: 5.0
+		}
+		t5: {
+			minimum: 5.0
+		}
+		t6: {
+			exclusiveMaximum: 1e+1
+		}
+		t7: {
+			maximum: 1e+1
+		}
+		t8: {}
+		t9: {}
+	}
+	type: "object"
+}

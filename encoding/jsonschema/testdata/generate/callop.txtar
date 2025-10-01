@@ -1,0 +1,74 @@
+-- test.cue --
+package test
+
+import (
+	"strings"
+	"math"
+	"time"
+)
+
+{
+	// String rune constraints
+	shortString?: strings.MaxRunes(10)
+	longString?: strings.MinRunes(5)
+
+	// Math constraints
+	multiple?: math.MultipleOf(5)
+
+	// Time format constraints
+	dateTime?: time.Format("2006-01-02T15:04:05Z07:00")
+	date?: time.Format("2006-01-02")
+	timeOnly?: time.Format("15:04:05")
+
+	// Combined constraints
+	userName?: string & strings.MinRunes(3) & strings.MaxRunes(20)
+	score?: int & math.MultipleOf(10)
+}
+-- out/generate-v3 --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	properties: {
+		date: {
+			format: "date"
+			type:   "string"
+		}
+		dateTime: {
+			format: "date-time"
+			type:   "string"
+		}
+		longString: {
+			minLength: 5
+			type:      "string"
+		}
+		multiple: {
+			multipleOf: 5.0
+			type:       "number"
+		}
+		score: {
+			allOf: [{
+				multipleOf: 1e+1
+				type:       "number"
+			}, {
+				type: "integer"
+			}]
+		}
+		shortString: {
+			maxLength: 10
+			type:      "string"
+		}
+		timeOnly: {
+			format: "time"
+			type:   "string"
+		}
+		userName: {
+			allOf: [{
+				maxLength: 20
+				type:      "string"
+			}, {
+				minLength: 3
+				type:      "string"
+			}]
+		}
+	}
+	type: "object"
+}

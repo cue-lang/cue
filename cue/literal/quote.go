@@ -133,10 +133,11 @@ func (f Form) Append(buf []byte, s string) []byte {
 		buf = append(buf, '#')
 	}
 	if f.multiline {
-		buf = append(buf, f.quote, f.quote, f.quote, '\n')
+		buf = append(buf, f.tripleQuote...)
+		buf = append(buf, '\n')
 		if s == "" {
 			buf = append(buf, f.indent...)
-			buf = append(buf, f.quote, f.quote, f.quote)
+			buf = append(buf, f.tripleQuote...)
 			return buf
 		}
 		if len(s) > 0 && s[0] != '\n' {
@@ -151,7 +152,7 @@ func (f Form) Append(buf []byte, s string) []byte {
 	if f.multiline {
 		buf = append(buf, '\n')
 		buf = append(buf, f.indent...)
-		buf = append(buf, f.quote, f.quote, f.quote)
+		buf = append(buf, f.tripleQuote...)
 	} else {
 		buf = append(buf, f.quote)
 	}

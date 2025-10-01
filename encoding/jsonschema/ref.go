@@ -28,7 +28,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
-	"cuelang.org/go/internal"
 )
 
 func parseRootRef(str string) (cue.Path, error) {
@@ -207,9 +206,7 @@ func defaultMap(p token.Pos, a []string) ([]ast.Label, error) {
 		return []ast.Label{ast.NewIdent("_#defs"), ast.NewString(string(p))}, nil
 	}
 	name := a[1]
-	if ast.IsValidIdent(name) &&
-		name != rootDefs[1:] &&
-		!internal.IsDefOrHidden(name) {
+	if name != rootDefs[1:] && !ast.MustQuoteStringLabel(name) {
 		return []ast.Label{ast.NewIdent("#" + name)}, nil
 	}
 	return []ast.Label{ast.NewIdent(rootDefs), ast.NewString(name)}, nil

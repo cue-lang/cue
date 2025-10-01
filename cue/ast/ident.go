@@ -70,6 +70,22 @@ func IsValidIdent(ident string) bool {
 	return true
 }
 
+// MustQuoteStringLabel reports whether the given string
+// must be quoted via [literal.Label].Quote to represent itself
+// as a string label, such as a regular field.
+//
+// Note that a negative result does not mean you can simply use
+// [NewIdent](name) to create a valid label without affecting any references.
+// In the general case, you should use [Ident.Node] to ensure each identifier references
+// exactly what they mean to, or quote any string label which doesn't need to be referenced.
+//
+// The main use case of this API is for simple scenarios, such as a JSON decoder
+// where the input is all data without any references.
+func MustQuoteStringLabel(name string) bool {
+	// TODO: return true for predeclared identifiers: "and", "matchN", etc.
+	return strings.HasPrefix(name, "#") || strings.HasPrefix(name, "_") || !IsValidIdent(name)
+}
+
 // LabelName reports the name of a label, whether it is an identifier
 // (it binds a value to a scope), and whether it is valid.
 // Keywords that are allowed in label positions are interpreted accordingly.

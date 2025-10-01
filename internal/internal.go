@@ -267,10 +267,6 @@ func IsHidden(s string) bool {
 	return strings.HasPrefix(s, "_")
 }
 
-func IsDefOrHidden(s string) bool {
-	return strings.HasPrefix(s, "#") || strings.HasPrefix(s, "_")
-}
-
 func IsDefinition(label ast.Label) bool {
 	switch x := label.(type) {
 	case *ast.Alias:

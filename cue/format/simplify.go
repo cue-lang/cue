@@ -19,7 +19,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
-	"cuelang.org/go/internal"
 )
 
 // labelSimplifier rewrites string labels to identifiers if
@@ -107,7 +106,7 @@ func (s *labelSimplifier) replace(c astutil.Cursor) bool {
 	switch x := c.Node().(type) {
 	case *ast.BasicLit:
 		str, err := strconv.Unquote(x.Value)
-		if err == nil && s.scope[str] && !internal.IsDefOrHidden(str) {
+		if err == nil && s.scope[str] {
 			c.Replace(ast.NewIdent(str))
 		}
 	}

@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 )
 
 // A Feature is an encoded form of a label which comprises a compact
@@ -76,14 +75,14 @@ func (f Feature) SelectorString(index StringIndexer) string {
 		}
 		return strconv.Itoa(int(x))
 	case StringLabel:
-		s := index.IndexToString(x)
-		if ast.IsValidIdent(s) && !internal.IsDefOrHidden(s) {
-			return s
-		}
 		if f == AnyString {
 			return "_"
 		}
-		return literal.Label.Quote(s)
+		s := index.IndexToString(x)
+		if ast.StringLabelNeedsQuoting(s) {
+			return literal.Label.Quote(s)
+		}
+		return s
 	default:
 		return f.IdentString(index)
 	}

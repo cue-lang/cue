@@ -2572,9 +2572,12 @@ func TestIssue4093(t *testing.T) {
 		op, args := v.Expr()
 		qt.Assert(t, qt.Equals(op, cue.SelectorOp))
 		qt.Assert(t, qt.HasLen(args, 2))
+		// Note: we see the entire value because the #X is represented
+		// internally as a selector operation topLevelValue.#X
+		// and we're looking at the first argument to that operation.
+		// It's not clear why we see `x: int` not `x: #X`.
 		s := fmt.Sprintf("%#v", args[0])
-		// TODO fix this
-		qt.Assert(t, qt.Equals(s, "%!v(PANIC=Format method: unsupported type *adt.NodeLink)"))
+		qt.Assert(t, qt.Equals(s, "x:  int\n#X: int"))
 	})
 }
 

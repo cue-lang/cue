@@ -148,9 +148,6 @@ func (c *comments) Comments() []*CommentGroup {
 	return *c.groups
 }
 
-// // AddComment adds the given comments to the fields.
-// // If line is true the comment is inserted at the preceding token.
-
 func (c *comments) AddComment(cg *CommentGroup) {
 	if cg == nil {
 		return
@@ -913,10 +910,6 @@ func (s *ImportSpec) pos() *token.Pos {
 	}
 	return s.Path.pos()
 }
-
-// func (s *AliasSpec) Pos() token.Pos { return s.Name.Pos() }
-// func (s *ValueSpec) Pos() token.Pos { return s.Names[0].Pos() }
-// func (s *TypeSpec) Pos() token.Pos  { return s.Name.Pos() }
 
 func (s *ImportSpec) End() token.Pos {
 	if s.EndPos != token.NoPos {

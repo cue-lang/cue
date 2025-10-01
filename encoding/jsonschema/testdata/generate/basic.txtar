@@ -1,0 +1,52 @@
+-- test.cue --
+package test
+t1?: int
+t2?: float
+t3?: number
+t4?: string
+t5?: bool
+t6?: string | int
+t7?: bytes
+-- datatest/tests.cue --
+package datatest
+
+ok: data: {
+	t1: 1
+	t2: 1.2
+	t3: 1.3
+	t4: "foo"
+	t5: true
+	t6: "bar"
+	t7: 'something'
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	properties: {
+		t1: {
+			type: "integer"
+		}
+		t2: {
+			type: "number"
+		}
+		t3: {
+			type: "number"
+		}
+		t4: {
+			type: "string"
+		}
+		t5: {
+			type: "boolean"
+		}
+		t6: {
+			anyOf: [{
+				type: "string"
+			}, {
+				type: "integer"
+			}]
+		}
+		t7: {}
+	}
+	type: "object"
+}
+-- out/generate-v3/ok --

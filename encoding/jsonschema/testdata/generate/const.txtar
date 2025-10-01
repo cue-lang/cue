@@ -1,0 +1,94 @@
+-- test.cue --
+package test
+
+int?: 2
+string?: "something"
+bool?: true
+float?: 1.5
+null?: null
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: {
+	bool: true
+	float: 1.5
+	int: 2
+	null: null
+	string: "something"
+}
+errorFloatForInt: {
+	data: {
+		int: 2.0
+		// TODO perhaps this shouldn't be an error?
+		// jsonschema doesn't distinguish between floats and ints like CUE does.
+		// See https://cuelang.org/issue/4121 and https://cuelang.org/issue/253.
+	}
+	error: true
+}
+errorNonBool: {
+	data: bool: "foo"
+	error: true
+}
+errorNonEqualFloat: {
+	data: float: 1.6
+	error: true
+}
+errorNonEqualInt: {
+	data: int: 9
+	error: true
+}
+errorNonNull: {
+	data: null: 1
+	error: true
+}
+errorNonString: {
+	data: string: "other"
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	properties: {
+		bool: {
+			const: true
+		}
+		float: {
+			const: 1.5
+		}
+		int: {
+			const: 2
+		}
+		null: {
+			const: null
+		}
+		string: {
+			const: "something"
+		}
+	}
+	type: "object"
+}
+-- out/generate-v3/errorFloatForInt --
+errorFloatForInt.data.int: conflicting values 2.0 and 2 (mismatched types float and int):
+    1:124
+    ./datatest/tests.cue:12:8
+-- out/generate-v3/errorNonBool --
+errorNonBool.data.bool: conflicting values "foo" and true (mismatched types string and bool):
+    1:81
+    ./datatest/tests.cue:20:14
+-- out/generate-v3/errorNonEqualFloat --
+errorNonEqualFloat.data.float: conflicting values 1.5 and 1.6:
+    1:104
+    ./datatest/tests.cue:24:15
+-- out/generate-v3/errorNonEqualInt --
+errorNonEqualInt.data.int: conflicting values 2 and 9:
+    1:124
+    ./datatest/tests.cue:28:13
+-- out/generate-v3/errorNonNull --
+errorNonNull.data.null: conflicting values 1 and null (mismatched types int and null):
+    1:143
+    ./datatest/tests.cue:32:14
+-- out/generate-v3/errorNonString --
+errorNonString.data.string: conflicting values "something" and "other":
+    1:167
+    ./datatest/tests.cue:36:16
+-- out/generate-v3/ok1 --

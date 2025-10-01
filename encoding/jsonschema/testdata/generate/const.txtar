@@ -1,0 +1,31 @@
+-- test.cue --
+package test
+
+int?: 2
+string?: "something"
+bool?: true
+float?: 1.5
+"null"?: null
+
+-- out/generate-v3 --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	properties: {
+		bool: {
+			const: true
+		}
+		float: {
+			const: 1.5
+		}
+		int: {
+			const: 2
+		}
+		null: {
+			const: null
+		}
+		string: {
+			const: "something"
+		}
+	}
+	type: "object"
+}

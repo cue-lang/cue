@@ -16,6 +16,24 @@
       "message": "perhaps note why this output is correct; I assume it\u0027s the entire root struct because the value at `x` is the reference `#X`, which selects `currentpackage.#X`.\n\nbut also, I wonder why it wouldn\u0027t be `x: #X\\n#X: int`",
       "revId": "4c04cdf35266a93a45bc31f97ebaa5a26478aa72",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8e62bc4_73dc3270",
+        "filename": "cue/types_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2576,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T14:25:28Z",
+      "side": 1,
+      "message": "I added a comment. I don\u0027t know why it wouldn\u0027t be that either, but I\u0027m not fixing that here!",
+      "parentUuid": "9bf4c88a_336bb77b",
+      "revId": "4c04cdf35266a93a45bc31f97ebaa5a26478aa72",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

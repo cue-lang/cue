@@ -72,8 +72,9 @@ type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 //    Value               Field          Field
 // Pkg                    nil            ImportSpec
 
-// Resolve resolves all identifiers in a file. Unresolved identifiers are
-// recorded in Unresolved. It will not overwrite already resolved values.
+// Resolve resolves all identifiers in a file, populating [ast.Ident.Node] fields.
+// Unresolved identifiers are recorded in [ast.File.Unresolved].
+// It will not overwrite already resolved identifiers.
 func Resolve(f *ast.File, errFn ErrFunc) {
 	visitor := &scope{errFn: errFn, identFn: resolveIdent}
 	ast.Walk(f, visitor.Before, nil)

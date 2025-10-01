@@ -403,7 +403,7 @@ type Ident struct {
 	Name string
 
 	Scope Node // scope in which node was found or nil if referring directly
-	Node  Node
+	Node  Node // node referenced by this identifier, if any; see [cuelang.org/go/cue/ast/astutil.Resolve]
 
 	comments
 	label
@@ -425,11 +425,13 @@ type BasicLit struct {
 // later case NewString would return a string or bytes type) to distinguish from
 // NewString. Consider how to pass indentation information.
 
-// NewLabel creates a new string label with the given value,
-// quoting it as a string literal only if necessary.
+// NewLabel creates a new string label with the given string,
+// quoting it as a string literal only if necessary,
+// as outlined in [StringLabelNeedsQuoting].
+//
 // To create labels for definition or hidden fields, use [NewIdent].
 func NewLabel(name string) Label {
-	if strings.HasPrefix(name, "#") || strings.HasPrefix(name, "_") || !IsValidIdent(name) {
+	if StringLabelNeedsQuoting(name) {
 		return NewString(name)
 	}
 	return NewIdent(name)

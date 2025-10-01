@@ -228,6 +228,9 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 		}
 		result = ast.NewBinExpr(token.OR, a...)
 
+	case *adt.NodeLink:
+		return e.value(x.Node, a...)
+
 	default:
 		panic(fmt.Sprintf("unsupported type %T", x))
 	}

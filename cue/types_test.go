@@ -2573,8 +2573,7 @@ func TestIssue4093(t *testing.T) {
 		qt.Assert(t, qt.Equals(op, cue.SelectorOp))
 		qt.Assert(t, qt.HasLen(args, 2))
 		s := fmt.Sprintf("%#v", args[0])
-		// TODO fix this
-		qt.Assert(t, qt.Equals(s, "%!v(PANIC=Format method: unsupported type *adt.NodeLink)"))
+		qt.Assert(t, qt.Equals(s, "x:  int\n#X: int"))
 	})
 }
 

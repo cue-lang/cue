@@ -16,6 +16,24 @@
       "message": "this has a merge conflict; I recently made this test table use more consistent formatting. did you pull master recently?",
       "revId": "9fb5c37abcaed0f82834bd8d53444f37aaa6aea9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0753bca9_137a268e",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T14:08:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78dfc3da_6dee382b",
+      "revId": "9fb5c37abcaed0f82834bd8d53444f37aaa6aea9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

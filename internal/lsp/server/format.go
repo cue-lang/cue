@@ -31,8 +31,6 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 	mod, err := s.workspace.FindModuleForFile(uri)
 	if err != nil {
 		return nil, err
-	} else if mod == nil {
-		return nil, fmt.Errorf("no module found for %v", uri)
 	}
 
 	parsedFile, config, fh, err := mod.ReadCUEFile(uri)

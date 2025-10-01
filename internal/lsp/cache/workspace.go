@@ -58,11 +58,13 @@ type Workspace struct {
 	// [Workspace.ActiveFilesAndDirs]
 	activeFiles map[protocol.DocumentURI][]packageOrModule
 	activeDirs  map[protocol.DocumentURI]struct{}
+
+	standalone *Standalone
 }
 
 func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
 	overlayFS := fscache.NewOverlayFS(cache.fs)
-	return &Workspace{
+	w := &Workspace{
 		registry: &registryWrapper{
 			Registry:  cache.registry,
 			overlayFS: overlayFS,
@@ -73,6 +75,8 @@ func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
 		modules:   make(map[protocol.DocumentURI]*Module),
 		mappers:   make(map[*token.File]*protocol.Mapper),
 	}
+	w.standalone = NewStandalone(w)
+	return w
 }
 
 // EnsureFolder ensures that the folder at dir is a [WorkspaceFolder]
@@ -380,8 +384,8 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 			return err
 		}
 		if m == nil {
-			w.debugLog(fmt.Sprintf("No module found for %v", uri))
-			// TODO: something better
+			w.debugLog(fmt.Sprintf("No module found for %v; treating as standalone", uri))
+			_ = w.standalone.refreshFile(uri)
 			continue
 		}
 		if m.modFileURI == uri {
@@ -391,7 +395,8 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		ip, dirUris, err := m.FindImportPathForFile(uri)
 		if err != nil {
 			if err == ErrBadModule {
-				// TODO: something better
+				w.debugLog(fmt.Sprintf("Module for %v is bad; treating as standalone", uri))
+				_ = w.standalone.refreshFile(uri)
 				continue
 			}
 			if _, ok := err.(cueerrors.Error); ok {
@@ -404,17 +409,20 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		}
 		if ip != nil && len(dirUris) != 0 {
 			pkg := m.EnsurePackage(*ip, dirUris)
+			w.standalone.deleteFile(uri)
 			if len(dirUris) == 1 {
 				for _, pkg := range m.DescendantPackages(pkg.importPath) {
 					pkg.markFileDirty(uri)
 				}
 			}
+		} else {
+			w.standalone.refreshFile(uri)
 		}
-		// if len(pkgs) == 0 and no error, then it means the file had no
-		// package declaration. For the time being, we're ignoring
-		// that. TODO something better
 	}
 
+	if err := w.standalone.subtractModulesAndPackages(); err != nil {
+		return err
+	}
 	return w.reloadPackages()
 }
 
@@ -815,8 +823,8 @@ func (w *Workspace) reloadPackages() error {
 				continue
 			}
 			if ip == nil || len(dirUris) == 0 {
-				// Probably the file had no package declaration. For the
-				// time being, we're ignoring that. TODO something better
+				// Probably the file had no package declaration.
+				w.standalone.refreshFile(fileUri)
 				continue
 			}
 			key := importPathModRootPair{

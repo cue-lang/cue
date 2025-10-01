@@ -110,7 +110,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 			// Pass all arguments that look like packages to loadPackages
 			// so that they'll be available when looking up the packages
 			// that are specified on the command line.
-			expandedPaths, err1 := expandPackageArgs(c, pkgArgs, c.Package, tg)
+			expandedPaths, err1 := expandPackageArgs(c, pkgArgs, c.Package, tg) // XXXX
 			if err1 != nil {
 				return []*build.Instance{c.newErrInstance(err1)}
 			}
@@ -134,7 +134,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 
 	a := []*build.Instance{}
 	if len(pkgArgs) > 0 {
-		for _, m := range l.importPaths(pkgArgs) {
+		for _, m := range l.importPaths(pkgArgs) { // XXXX
 			if m.Err != nil {
 				inst := c.newErrInstance(m.Err)
 				a = append(a, inst)

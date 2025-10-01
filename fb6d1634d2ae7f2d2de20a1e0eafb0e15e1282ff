@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ef9568d_ea4522cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T15:45:19Z",
+      "side": 1,
+      "message": "LGTM with a few minor comments/suggestions, thanks!",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14a29e63_e8505ca2",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T15:45:19Z",
+      "side": 1,
+      "message": "Maybe consider adding a helper, say `debugLogf` for convenience:\n\n\n\n```suggestion\n\t\tw.debugLogf(\"%v Error when reloading: %v\", m, err)\n```",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15f739e0_4291fcdf",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T15:45:19Z",
+      "side": 1,
+      "message": "```suggestion\n// because the module is in a bad state (e.g. it\u0027s been deleted).\n```",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f30fdd8b_df3e3bda",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T15:45:19Z",
+      "side": 1,
+      "message": "To my mind, \"the module itself\" suggests the entire module and all its contents, but I don\u0027t _think_ that\u0027s what you mean here.\n\n```suggestion\n// if module file for the module cannot be loaded.\n```",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfcaca3a_31054284",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T15:45:19Z",
+      "side": 1,
+      "message": "```suggestion\n// as a CUE file in order to read its package directive.\n```\n?",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e40ed1f6_be40be41",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T15:45:19Z",
+      "side": 1,
+      "message": "```suggestion\n// Package returns the [*Package], if any, for the given import path within this module.\n```\n?",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d4182c6_6add0ff5",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T15:45:19Z",
+      "side": 1,
+      "message": "trivial perf improvement: factor the string append out of the loop (probably saves might an allocation and string copy per iteration)",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28c14fd6_0043242c",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T15:45:19Z",
+      "side": 1,
+      "message": "Thanks for unexporting these!",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9a3c5d7_3383f588",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T15:45:19Z",
+      "side": 1,
+      "message": "```suggestion\n\t// isDirty means that the package needs reloading.\n```\n?",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "200e8596_0442c7b0",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T15:45:19Z",
+      "side": 1,
+      "message": "I _think_ that \"descendent\" might actually be the correct form here (adjective vs the noun-form \"descendant\"), although I\u0027m not totally sure.",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ccdeb2f2_feb6994f",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 839,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T15:45:19Z",
+      "side": 1,
+      "message": "Maybe add a comment explaining what this condition is about?",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

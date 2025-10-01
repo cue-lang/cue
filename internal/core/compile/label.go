@@ -119,7 +119,7 @@ func (l *fieldLabel) labelString() string {
 	case *ast.BasicLit:
 		if x.Kind == token.STRING {
 			s, err := literal.Unquote(x.Value)
-			if err == nil && ast.IsValidIdent(s) {
+			if err == nil && !ast.StringLabelNeedsQuoting(s) {
 				return s
 			}
 		}

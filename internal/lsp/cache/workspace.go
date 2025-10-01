@@ -58,11 +58,13 @@ type Workspace struct {
 	// [Workspace.ActiveFilesAndDirs]
 	activeFiles map[protocol.DocumentURI][]packageOrModule
 	activeDirs  map[protocol.DocumentURI]struct{}
+
+	standalone *Standalone
 }
 
 func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
 	overlayFS := fscache.NewOverlayFS(cache.fs)
-	return &Workspace{
+	w := &Workspace{
 		registry: &registryWrapper{
 			Registry:  cache.registry,
 			overlayFS: overlayFS,
@@ -73,6 +75,8 @@ func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
 		modules:   make(map[protocol.DocumentURI]*Module),
 		mappers:   make(map[*token.File]*protocol.Mapper),
 	}
+	w.standalone = NewStandalone(w)
+	return w
 }
 
 // EnsureFolder ensures that the folder at dir is a [WorkspaceFolder]
@@ -240,6 +244,7 @@ func (w *Workspace) activeFilesAndDirs() (files map[protocol.DocumentURI][]packa
 		for _, m := range w.modules {
 			m.activeFilesAndDirs(files, dirs)
 		}
+		w.standalone.activeFilesAndDirs(files, dirs)
 		w.activeFiles = files
 		w.activeDirs = dirs
 	}
@@ -380,8 +385,8 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 			return err
 		}
 		if m == nil {
-			w.debugLog(fmt.Sprintf("No module found for %v", uri))
-			// TODO: something better
+			w.debugLog(fmt.Sprintf("No module found for %v; treating as standalone", uri))
+			_ = w.standalone.reloadFile(uri)
 			continue
 		}
 		if m.modFileURI == uri {
@@ -391,7 +396,8 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		ip, dirUris, err := m.FindImportPathForFile(uri)
 		if err != nil {
 			if err == ErrBadModule {
-				// TODO: something better
+				w.debugLog(fmt.Sprintf("Module for %v is bad; treating as standalone", uri))
+				_ = w.standalone.reloadFile(uri)
 				continue
 			}
 			if _, ok := err.(cueerrors.Error); ok {
@@ -409,17 +415,22 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 					pkg.markFileDirty(uri)
 				}
 			}
+		} else {
+			w.standalone.reloadFile(uri)
 		}
-		// if len(pkgs) == 0 and no error, then it means the file had no
-		// package declaration. For the time being, we're ignoring
-		// that. TODO something better
 	}
 
+	w.standalone.reloadFiles()
+	if err := w.standalone.subtractModulesAndPackages(); err != nil {
+		return err
+	}
 	return w.reloadPackages()
 }
 
 func (w *Workspace) updateOverlays(modifications []file.Modification) (map[protocol.DocumentURI]fscache.FileHandle, error) {
 	now := time.Now()
+	w.debugLog(fmt.Sprint("updateOverlays", modifications))
+	defer w.debugLog("updateOverlays done")
 	updatedFiles := make(map[protocol.DocumentURI]fscache.FileHandle)
 
 	err := w.overlayFS.Update(func(txn *fscache.UpdateTxn) error {
@@ -815,8 +826,8 @@ func (w *Workspace) reloadPackages() error {
 				continue
 			}
 			if ip == nil || len(dirUris) == 0 {
-				// Probably the file had no package declaration. For the
-				// time being, we're ignoring that. TODO something better
+				// Probably the file had no package declaration.
+				w.standalone.reloadFile(fileUri)
 				continue
 			}
 			key := importPathModRootPair{

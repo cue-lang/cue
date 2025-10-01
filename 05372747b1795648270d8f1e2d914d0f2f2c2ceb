@@ -1,0 +1,220 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d17424e_c3b48989",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T14:13:35Z",
+      "side": 1,
+      "message": "first pass; a second review later.",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2118efa_c343a679",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T14:13:35Z",
+      "side": 1,
+      "message": "linkify?",
+      "range": {
+        "startLine": 31,
+        "startChar": 19,
+        "endLine": 31,
+        "endChar": 38
+      },
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbcafc3c_73a21b4c",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T14:13:35Z",
+      "side": 1,
+      "message": "linkify?",
+      "range": {
+        "startLine": 39,
+        "startChar": 20,
+        "endLine": 39,
+        "endChar": 35
+      },
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06cb692e_9fb1fdec",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T14:13:35Z",
+      "side": 1,
+      "message": "nit: I\u0027d use if/else rather than a type switch when you only have one type case. as a bonus point, you can early return in the \"else\" case, and unindent the main part of the body.",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9e849f7_1fbb9bec",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T14:13:35Z",
+      "side": 1,
+      "message": "the use of reflect.DeepEqual here makes me a little nervous...",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54737e56_dea233ef",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T14:13:35Z",
+      "side": 1,
+      "message": "ditto, I\u0027d use an if/else and early return",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b21d2dc_7574ecac",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T14:13:35Z",
+      "side": 1,
+      "message": "it seems to me like we should fail or panic on these TODO cases rather than have weird no-op behavior.\n\nalso, should this switch not have a default case?",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b8bf77b_fdd442fb",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T14:13:35Z",
+      "side": 1,
+      "message": "can we use constants here?",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8576f1d1_1d797592",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T14:13:35Z",
+      "side": 1,
+      "message": "surely this is just slices.ContainsFunc with a negated \"contains\" func? e.g.\n\n```\nif !allTrue(it.elems, func(it item) bool {\n\t_, ok :\u003d it.(*itemConst)\n\treturn ok\n}) {\n\treturn it\n}\n```\n\ncan be rewritten as\n\n```\nif slices.ContainsFunc(it.elems, func(it item) bool {\n\t_, ok :\u003d it.(*itemConst)\n\treturn !ok\n}) {\n\treturn it\n}\n```\n\nyou could always briefly document what you\u0027re doing if the negation is confusing.",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73622b1f_512b6946",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T14:13:35Z",
+      "side": 1,
+      "message": "document why we\u0027re using raw messages here?",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1aebcf60_6c6e2f83",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T14:13:35Z",
+      "side": 1,
+      "message": "document why we\u0027re using raw messages here?",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45f0df00_de9f74a6",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T14:13:35Z",
+      "side": 1,
+      "message": "surely this switch needs some sort of default case?",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

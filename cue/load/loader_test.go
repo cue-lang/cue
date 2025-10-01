@@ -628,6 +628,20 @@ files:
     $CWD/testdata/testmod/test.cue
 imports:
     mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+		// This test checks that we can use a :pkg selector
+		// to select named packages from multi-package directories.
+		name: "Issue4110",
+		cfg: &Config{
+			Dir: testdataDir,
+		},
+		args: []string{"./issue3306/...:a"},
+		want: `err:    found packages "a" (a.cue) and "b" (b.cue) in "issue3306/a"
+path:   ""
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    ""
+display:""`}, {
+
 		// This tests that we can load a CUE package by pointing Dir to it
 		// even when the package's directory name ends with ".cue".
 		name: "DirWithCUEFileExtension",
@@ -659,7 +673,6 @@ files:
 		got = strings.Replace(got, filepath.ToSlash(cwd), "$CWD", -1)
 		// Make test work with Windows.
 		got = strings.Replace(got, string(filepath.Separator), "/", -1)
-
 		t.Equal(got, tc.want)
 	})
 }

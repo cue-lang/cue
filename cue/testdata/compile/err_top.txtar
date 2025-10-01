@@ -32,11 +32,11 @@ disallowTopAsLet: cannot use _ as alias or let clause:
     ./in.cue:6:6
 disallowTopAsLabel: cannot use _ as label:
     ./in.cue:10:2
-nested._: cannot use _ as label:
+nested."_": cannot use _ as label:
     ./in.cue:23:14
-nested._foo: cannot use _ as label:
+nested."_foo": cannot use _ as label:
     ./in.cue:24:17
-nested.#foo: cannot use _ as label:
+nested."#foo": cannot use _ as label:
     ./in.cue:25:17
 --- in.cue
 {
@@ -73,11 +73,11 @@ disallowTopAsLet: cannot use _ as alias or let clause:
     ./in.cue:6:6
 disallowTopAsLabel: cannot use _ as label:
     ./in.cue:10:2
-nested._: cannot use _ as label:
+nested."_": cannot use _ as label:
     ./in.cue:23:14
-nested._foo: cannot use _ as label:
+nested."_foo": cannot use _ as label:
     ./in.cue:24:17
-nested.#foo: cannot use _ as label:
+nested."#foo": cannot use _ as label:
     ./in.cue:25:17
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -87,11 +87,11 @@ diff old new
      ./in.cue:6:6
  disallowTopAsLabel: cannot use _ as label:
      ./in.cue:10:2
-+nested._: cannot use _ as label:
++nested."_": cannot use _ as label:
 +    ./in.cue:23:14
-+nested._foo: cannot use _ as label:
++nested."_foo": cannot use _ as label:
 +    ./in.cue:24:17
-+nested.#foo: cannot use _ as label:
++nested."#foo": cannot use _ as label:
 +    ./in.cue:25:17
 -- out/eval --
 disallowTopAsAlias: cannot use _ as alias or let clause:

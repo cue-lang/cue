@@ -628,6 +628,21 @@ files:
     $CWD/testdata/testmod/test.cue
 imports:
     mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+		// This test checks that we can use a :pkg selector
+		// to select named packages from multi-package directories.
+		name: "Issue4110",
+		cfg: &Config{
+			Dir: testdataDir,
+		},
+		args: []string{"./issue3306/...:a"},
+		want: `path:   mod.test/test/issue3306/a@v0
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/issue3306/a
+display:./issue3306/a
+files:
+    $CWD/testdata/testmod/issue3306/a/a.cue`}, {
+
 		// This tests that we can load a CUE package by pointing Dir to it
 		// even when the package's directory name ends with ".cue".
 		name: "DirWithCUEFileExtension",

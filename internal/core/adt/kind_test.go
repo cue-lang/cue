@@ -14,48 +14,65 @@
 
 package adt
 
-import "testing"
+import (
+	"slices"
+	"testing"
+
+	"github.com/go-quicktest/qt"
+)
 
 func TestKindString(t *testing.T) {
 	testCases := []struct {
-		input Kind
-		want  string
+		input     Kind
+		want      string
+		wantKinds []Kind
 	}{{
 		input: BottomKind,
 		want:  "_|_",
 	}, {
-		input: IntKind | ListKind,
-		want:  `(int|[...])`,
+		input:     IntKind | ListKind,
+		want:      `(int|[...])`,
+		wantKinds: []Kind{IntKind, ListKind},
 	}, {
-		input: NullKind,
-		want:  "null",
+		input:     NullKind,
+		want:      "null",
+		wantKinds: []Kind{NullKind},
 	}, {
-		input: IntKind,
-		want:  "int",
+		input:     IntKind,
+		want:      "int",
+		wantKinds: []Kind{IntKind},
 	}, {
-		input: FloatKind,
-		want:  "float",
+		input:     FloatKind,
+		want:      "float",
+		wantKinds: []Kind{FloatKind},
 	}, {
-		input: StringKind,
-		want:  "string",
+		input:     StringKind,
+		want:      "string",
+		wantKinds: []Kind{StringKind},
 	}, {
-		input: BytesKind,
-		want:  "bytes",
+		input:     BytesKind,
+		want:      "bytes",
+		wantKinds: []Kind{BytesKind},
 	}, {
-		input: StructKind,
-		want:  "{...}",
+		input:     StructKind,
+		want:      "{...}",
+		wantKinds: []Kind{StructKind},
 	}, {
-		input: ListKind,
-		want:  "[...]",
+		input:     ListKind,
+		want:      "[...]",
+		wantKinds: []Kind{ListKind},
 	}, {
-		input: NumberKind,
-		want:  "number",
+		input:     NumberKind,
+		want:      "number",
+		wantKinds: []Kind{IntKind, FloatKind},
 	}, {
-		input: BoolKind | NumberKind | ListKind,
-		want:  "(bool|[...]|number)",
+		input:     BoolKind | NumberKind | ListKind,
+		want:      "(bool|[...]|number)",
+		wantKinds: []Kind{BoolKind, IntKind, FloatKind, ListKind},
 	}, {
-		input: 1 << 15,
-		want:  "bad(15)",
+		input:     1 << 15,
+		want:      "bad(15)",
+		wantKinds: []Kind{1 << 15},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.want, func(t *testing.T) {
@@ -63,6 +80,8 @@ func TestKindString(t *testing.T) {
 			if got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)
 			}
+			qt.Check(t, qt.Equals(tc.input.Count(), len(tc.wantKinds)))
+			qt.Check(t, qt.DeepEquals(slices.Collect(tc.input.Kinds()), tc.wantKinds))
 		})
 	}
 }

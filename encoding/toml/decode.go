@@ -405,13 +405,11 @@ func (d *Decoder) inlineFields(tkeys []tomlKey, relPos token.RelPos) (top, leaf 
 }
 
 // quoteLabelIfNeeded quotes a label name only if it needs quoting.
-//
-// TODO(mvdan): this exists in multiple packages; move to cue/literal or cue/ast?
 func quoteLabelIfNeeded(name string) string {
-	if ast.IsValidIdent(name) {
-		return name
+	if ast.MustQuoteStringLabel(name) {
+		return literal.Label.Quote(name)
 	}
-	return literal.Label.Quote(name)
+	return name
 }
 
 // label creates an ast.Label that represents a key with exactly the literal string name.

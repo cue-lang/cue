@@ -425,11 +425,20 @@ type BasicLit struct {
 // later case NewString would return a string or bytes type) to distinguish from
 // NewString. Consider how to pass indentation information.
 
-// NewLabel creates a new string label with the given value,
-// quoting it as a string literal only if necessary.
+// MustQuoteLabel reports whether the given string
+// must be quoted via [literal.Label].Quote to represent itself
+// as a string label, such as a regular field.
+func MustQuoteLabel(name string) bool {
+	return strings.HasPrefix(name, "#") || strings.HasPrefix(name, "_") || !IsValidIdent(name)
+}
+
+// NewLabel creates a new string label with the given string,
+// quoting it as a string literal only if necessary,
+// as outlined in [MustQuoteLabel].
+//
 // To create labels for definition or hidden fields, use [NewIdent].
 func NewLabel(name string) Label {
-	if strings.HasPrefix(name, "#") || strings.HasPrefix(name, "_") || !IsValidIdent(name) {
+	if MustQuoteLabel(name) {
 		return NewString(name)
 	}
 	return NewIdent(name)

@@ -89,7 +89,7 @@ func (s *labelSimplifier) markStrings(n ast.Node) bool {
 	switch x := n.(type) {
 	case *ast.BasicLit:
 		str, err := strconv.Unquote(x.Value)
-		if err != nil || !ast.IsValidIdent(str) || internal.IsDefOrHidden(str) {
+		if err != nil || ast.MustQuoteLabel(str) {
 			return false
 		}
 		s.scope[str] = true

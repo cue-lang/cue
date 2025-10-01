@@ -468,10 +468,6 @@ func (p Path) Err() error {
 	return errs
 }
 
-func isHiddenOrDefinition(s string) bool {
-	return strings.HasPrefix(s, "#") || strings.HasPrefix(s, "_")
-}
-
 // Hid returns a selector for a hidden field. It panics if pkg is empty.
 // Hidden fields are scoped by package, and pkg indicates for which package
 // the hidden field must apply. For anonymous packages, it must be set to "_".
@@ -551,7 +547,7 @@ type stringSelector string
 
 func (s stringSelector) String() string {
 	str := string(s)
-	if isHiddenOrDefinition(str) || !ast.IsValidIdent(str) {
+	if ast.MustQuoteLabel(str) {
 		return literal.Label.Quote(str)
 	}
 	return str

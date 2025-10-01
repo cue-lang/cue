@@ -1,0 +1,10 @@
+-- test.cue --
+package test
+
+1 | 2 | "three"
+
+-- out/generate-v3 --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	enum: [1, 2, "three"]
+}

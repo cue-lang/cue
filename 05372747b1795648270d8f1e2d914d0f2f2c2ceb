@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "923a7a31_a968262b",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T16:41:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d2118efa_c343a679",
+      "range": {
+        "startLine": 31,
+        "startChar": 19,
+        "endLine": 31,
+        "endChar": 38
+      },
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cbcafc3c_73a21b4c",
@@ -54,6 +78,30 @@
       "writtenOn": "2025-10-01T14:13:35Z",
       "side": 1,
       "message": "linkify?",
+      "range": {
+        "startLine": 39,
+        "startChar": 20,
+        "endLine": 39,
+        "endChar": 35
+      },
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37295113_92350e22",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T16:41:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbcafc3c_73a21b4c",
       "range": {
         "startLine": 39,
         "startChar": 20,
@@ -81,6 +129,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7aa2f526_96ba3ceb",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T16:41:29Z",
+      "side": 1,
+      "message": "I used an if/else originally but ended up preferring this, as it doesn\u0027t require me to use a new variable name so looks a bit cleaner to my mind, so I\u0027ll leave as is if that\u0027s OK.",
+      "parentUuid": "06cb692e_9fb1fdec",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9e849f7_1fbb9bec",
@@ -94,6 +160,24 @@
       "writtenOn": "2025-10-01T14:13:35Z",
       "side": 1,
       "message": "the use of reflect.DeepEqual here makes me a little nervous...",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac6a3161_d2646d39",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T16:41:29Z",
+      "side": 1,
+      "message": "Have you got an alternative suggestion? I could define `equal` methods on every item type but it would be very verbose and not gain much AFAICS.",
+      "parentUuid": "e9e849f7_1fbb9bec",
       "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -115,6 +199,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f987647_6933f812",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T16:41:29Z",
+      "side": 1,
+      "message": "ditto :)",
+      "parentUuid": "54737e56_dea233ef",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9b21d2dc_7574ecac",
@@ -128,6 +230,24 @@
       "writtenOn": "2025-10-01T14:13:35Z",
       "side": 1,
       "message": "it seems to me like we should fail or panic on these TODO cases rather than have weird no-op behavior.\n\nalso, should this switch not have a default case?",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d99836ec_3209e3fd",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T16:41:29Z",
+      "side": 1,
+      "message": "The behaviour isn\u0027t _that_ weird: we\u0027ll end up with just a `\"type\": \"foo\"` keyword appropriate for the CUE kind. We don\u0027t need to panic. I\u0027ve added a comment on the `it` variable to hopefully make it clearer.",
+      "parentUuid": "9b21d2dc_7574ecac",
       "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -149,6 +269,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcd16c2d_06fe64a6",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T16:41:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b8bf77b_fdd442fb",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8576f1d1_1d797592",
@@ -162,6 +300,24 @@
       "writtenOn": "2025-10-01T14:13:35Z",
       "side": 1,
       "message": "surely this is just slices.ContainsFunc with a negated \"contains\" func? e.g.\n\n```\nif !allTrue(it.elems, func(it item) bool {\n\t_, ok :\u003d it.(*itemConst)\n\treturn ok\n}) {\n\treturn it\n}\n```\n\ncan be rewritten as\n\n```\nif slices.ContainsFunc(it.elems, func(it item) bool {\n\t_, ok :\u003d it.(*itemConst)\n\treturn !ok\n}) {\n\treturn it\n}\n```\n\nyou could always briefly document what you\u0027re doing if the negation is confusing.",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2016a4d1_7d65db33",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T16:41:29Z",
+      "side": 1,
+      "message": "fair point. using ContainsFunc instead.",
+      "parentUuid": "8576f1d1_1d797592",
       "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -185,6 +341,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b35f6c31_5c18dd9f",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T16:41:29Z",
+      "side": 1,
+      "message": "using RawMessage seems fairly appropriate for a JSON value. I guess we could use `any` but that doesn\u0027t seem much better to me. What else would we use?",
+      "parentUuid": "73622b1f_512b6946",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1aebcf60_6c6e2f83",
         "filename": "encoding/jsonschema/generate_items.go",
         "patchSetId": 4
@@ -202,6 +376,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d958462d_a22a7ab5",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T16:41:29Z",
+      "side": 1,
+      "message": "ditto. I added a comment FWIW.",
+      "parentUuid": "1aebcf60_6c6e2f83",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "45f0df00_de9f74a6",
         "filename": "encoding/jsonschema/generate_items.go",
         "patchSetId": 4
@@ -213,6 +405,24 @@
       "writtenOn": "2025-10-01T14:13:35Z",
       "side": 1,
       "message": "surely this switch needs some sort of default case?",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "544130f1_506818f1",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-01T16:41:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45f0df00_de9f74a6",
       "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

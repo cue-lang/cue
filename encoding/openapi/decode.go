@@ -157,9 +157,7 @@ func openAPIMapping(pos token.Pos, a []string) ([]ast.Label, error) {
 			oapiSchemas, strings.Join(a, "/"))
 	}
 	name := a[2]
-	if ast.IsValidIdent(name) &&
-		name != rootDefs[1:] &&
-		!internal.IsDefOrHidden(name) {
+	if name != rootDefs[1:] && !ast.StringLabelNeedsQuoting(name) {
 		return []ast.Label{ast.NewIdent("#" + name)}, nil
 	}
 	return []ast.Label{ast.NewIdent(rootDefs), ast.NewString(name)}, nil

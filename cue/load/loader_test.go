@@ -635,13 +635,13 @@ imports:
 			Dir: testdataDir,
 		},
 		args: []string{"./issue3306/...:a"},
-		want: `err:    found packages "a" (a.cue) and "b" (b.cue) in "issue3306/a"
-path:   ""
+		want: `path:   mod.test/test/issue3306/a@v0
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
-dir:    ""
-display:""`}, {
-
+dir:    $CWD/testdata/testmod/issue3306/a
+display:./issue3306/a
+files:
+    $CWD/testdata/testmod/issue3306/a/a.cue`}, {
 		// This tests that we can load a CUE package by pointing Dir to it
 		// even when the package's directory name ends with ".cue".
 		name: "DirWithCUEFileExtension",

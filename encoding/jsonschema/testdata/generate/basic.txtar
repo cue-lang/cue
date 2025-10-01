@@ -1,0 +1,38 @@
+-- test.cue --
+package test
+{
+	foo!: int
+	bar?: string
+	baz!: #Baz
+}
+#Baz: {
+	x!: int
+}
+-- out/generate-v3 --
+{
+	$defs: {
+		"#Baz": {
+			properties: {
+				x: {
+					type: "integer"
+				}
+			}
+			required: ["x"]
+			type: "object"
+		}
+	}
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	properties: {
+		bar: {
+			type: "string"
+		}
+		baz: {
+			$ref: "#/$defs/#Baz"
+		}
+		foo: {
+			type: "integer"
+		}
+	}
+	required: ["foo", "baz"]
+	type: "object"
+}

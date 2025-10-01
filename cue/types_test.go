@@ -25,6 +25,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue"
@@ -2558,6 +2559,22 @@ func TestIssue3826(t *testing.T) {
 		if err := v.Validate(); err != nil {
 			t.Error(err)
 		}
+	})
+}
+
+// TestIssue4093 tests that a value that's a *adt.NodeLink
+// under the hood can be formatted OK.
+func TestIssue4093(t *testing.T) {
+	cuetdtest.FullMatrix.Run(t, "test", func(t *testing.T, m *cuetdtest.M) {
+		v := m.CueContext().CompileString(`x: #X, #X: int`)
+		qt.Assert(t, qt.IsNil(v.Err()))
+		v = v.LookupPath(cue.MakePath(cue.Str("x")))
+		op, args := v.Expr()
+		qt.Assert(t, qt.Equals(op, cue.SelectorOp))
+		qt.Assert(t, qt.HasLen(args, 2))
+		s := fmt.Sprintf("%#v", args[0])
+		// TODO fix this
+		qt.Assert(t, qt.Equals(s, "%!v(PANIC=Format method: unsupported type *adt.NodeLink)"))
 	})
 }
 

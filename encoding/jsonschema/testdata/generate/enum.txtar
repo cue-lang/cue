@@ -1,0 +1,33 @@
+-- test.cue --
+package test
+
+1 | 2 | "three"
+
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: 1
+ok2: data: "three"
+bad: {
+	data: 0
+	error: true
+}
+
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	enum: [1, 2, "three"]
+}
+-- out/generate-v3/bad --
+bad.data: 3 errors in empty disjunction:
+bad.data: conflicting values 0 and "three" (mismatched types int and string):
+    1:59
+    ./datatest/tests.cue:6:8
+bad.data: conflicting values 1 and 0:
+    1:59
+    ./datatest/tests.cue:6:8
+bad.data: conflicting values 2 and 0:
+    1:59
+    ./datatest/tests.cue:6:8
+-- out/generate-v3/ok1 --
+-- out/generate-v3/ok2 --

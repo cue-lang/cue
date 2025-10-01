@@ -1,0 +1,155 @@
+-- test.cue --
+package test
+
+t01?: =~"^foo"
+t02?: !~"bar"
+t03?: ==1
+t04?: !=1
+t05?: >5
+t06?: >=5
+t07?: <10
+t08?: <=10
+t09?: >"foo" // Not supported
+t10?: <"bar" // Not supported
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: {
+	t01: "foobar"
+	t02: "bam"
+	t03: 1
+	t04: 2
+	t05: 5.1
+	t06: 5
+	t07: 9.9
+	t08: 10
+	t09: "foob"
+	t10: "bap"
+}
+
+ok2: data: {}
+
+errorNonMatchingRegexp: {
+	data: t01: "nfoo"
+	error: true
+}
+errorMatchingRegexp: {
+	data: t02: "xbary"
+	error: true
+}
+errorUnequal: {
+	data: t03: 2
+	error: true
+}
+errorEqual1: {
+	data: t04: 1.0
+	// TODO this currently succeeds even though it should not
+	// because `{not: {const: 1}}` translates to `matchN(0, [1])`
+	// but 1 does not unify with 1.0 in CUE.
+	// See https://cuelang.org/issue/4121
+	//error: true
+}
+errorEqual2: {
+	data: t04: 1
+	error: true
+}
+errorNotGreater: {
+	data: t05: 5
+	error: true
+}
+errorNotGreaterEqual: {
+	data: t06: 4.99
+	error: true
+}
+errorNotLess: {
+	data: t07: 10
+	error: true
+}
+errorNotLessEqual: {
+	data: t08: 10.001
+	error: true
+}
+
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	properties: {
+		t01: {
+			pattern: "^foo"
+			type:    "string"
+		}
+		t02: {
+			not: {
+				pattern: "bar"
+			}
+			type: "string"
+		}
+		t03: {
+			const: 1
+		}
+		t04: {
+			not: {
+				const: 1
+			}
+		}
+		t05: {
+			exclusiveMinimum: 5.0
+			type:             "number"
+		}
+		t06: {
+			minimum: 5.0
+			type:    "number"
+		}
+		t07: {
+			exclusiveMaximum: 1e+1
+			type:             "number"
+		}
+		t08: {
+			maximum: 1e+1
+			type:    "number"
+		}
+		t09: {
+			type: "string"
+		}
+		t10: {
+			type: "string"
+		}
+	}
+	type: "object"
+}
+-- out/generate-v3/ok --
+-- out/generate-v3/errorEqual1 --
+-- out/generate-v3/errorEqual2 --
+errorEqual2.data.t04: invalid value 1 (does not satisfy matchN): 1 matched, expected 0:
+    1:187
+    ./datatest/tests.cue:39:13
+-- out/generate-v3/errorMatchingRegexp --
+errorMatchingRegexp.data.t02: invalid value "xbary" (does not satisfy matchN): 1 matched, expected 0:
+    1:121
+    ./datatest/tests.cue:23:13
+-- out/generate-v3/errorNonMatchingRegexp --
+errorNonMatchingRegexp.data.t01: invalid value "nfoo" (out of bound =~"^foo"):
+    1:80
+    ./datatest/tests.cue:19:13
+-- out/generate-v3/errorNotGreater --
+errorNotGreater.data.t05: invalid value 5 (out of bound >5):
+    1:213
+    ./datatest/tests.cue:43:13
+-- out/generate-v3/errorNotGreaterEqual --
+errorNotGreaterEqual.data.t06: invalid value 4.99 (out of bound >=5):
+    1:258
+    ./datatest/tests.cue:47:13
+-- out/generate-v3/errorNotLess --
+errorNotLess.data.t07: invalid value 10 (out of bound <1E+1):
+    1:294
+    ./datatest/tests.cue:51:13
+-- out/generate-v3/errorNotLessEqual --
+errorNotLessEqual.data.t08: invalid value 10.001 (out of bound <=1E+1):
+    1:342
+    ./datatest/tests.cue:55:13
+-- out/generate-v3/errorUnequal --
+errorUnequal.data.t03: conflicting values 1 and 2:
+    1:169
+    ./datatest/tests.cue:27:13
+-- out/generate-v3/ok1 --
+-- out/generate-v3/ok2 --

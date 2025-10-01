@@ -58,11 +58,13 @@ type Workspace struct {
 	// [Workspace.ActiveFilesAndDirs]
 	activeFiles map[protocol.DocumentURI][]packageOrModule
 	activeDirs  map[protocol.DocumentURI]struct{}
+
+	standalone *Standalone
 }
 
 func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
 	overlayFS := fscache.NewOverlayFS(cache.fs)
-	return &Workspace{
+	w := &Workspace{
 		registry: &registryWrapper{
 			Registry:  cache.registry,
 			overlayFS: overlayFS,
@@ -73,6 +75,8 @@ func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
 		modules:   make(map[protocol.DocumentURI]*Module),
 		mappers:   make(map[*token.File]*protocol.Mapper),
 	}
+	w.standalone = NewStandalone(w)
+	return w
 }
 
 func (w *Workspace) debugLogf(format string, args ...any) {
@@ -244,6 +248,7 @@ func (w *Workspace) activeFilesAndDirs() (files map[protocol.DocumentURI][]packa
 		for _, m := range w.modules {
 			m.activeFilesAndDirs(files, dirs)
 		}
+		w.standalone.activeFilesAndDirs(files, dirs)
 		w.activeFiles = files
 		w.activeDirs = dirs
 	}
@@ -380,13 +385,13 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 	for uri := range updatedFiles {
 		// We can only parse a cue file if we know what module it belongs to.
 		m, err := w.FindModuleForFile(uri)
+		if err == errModuleNotFound {
+			w.debugLogf("No module found for %v; treating as standalone", uri)
+			_ = w.standalone.reloadFile(uri)
+			continue
+		}
 		if err != nil {
 			return err
-		}
-		if m == nil {
-			w.debugLogf("No module found for %v", uri)
-			// TODO: something better
-			continue
 		}
 		if m.modFileURI == uri {
 			m.markFileDirty(uri)
@@ -395,7 +400,8 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		ip, dirUris, err := m.FindImportPathForFile(uri)
 		if err != nil {
 			if err == ErrBadModule {
-				// TODO: something better
+				w.debugLogf("Module for %v is bad; treating as standalone", uri)
+				_ = w.standalone.reloadFile(uri)
 				continue
 			}
 			if _, ok := err.(cueerrors.Error); ok {
@@ -413,12 +419,15 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 					pkg.markFileDirty(uri)
 				}
 			}
+		} else {
+			w.standalone.reloadFile(uri)
 		}
-		// if len(pkgs) == 0 and no error, then it means the file had no
-		// package declaration. For the time being, we're ignoring
-		// that. TODO something better
 	}
 
+	w.standalone.reloadFiles()
+	if err := w.standalone.subtractModulesAndPackages(); err != nil {
+		return err
+	}
 	return w.reloadPackages()
 }
 
@@ -570,8 +579,8 @@ func (w *Workspace) updateOverlays(modifications []file.Modification) (map[proto
 // (i.e. accommodating nested modules) module for the given file. This
 // may result in new modules being added to the workspace.
 //
-// If no module can be found, this method returns nil, nil; this
-// method does not create new modules.
+// If no module can be found, this method returns nil,
+// [errModuleNotFound]; this method does not create new modules.
 func (w *Workspace) FindModuleForFile(file protocol.DocumentURI) (*Module, error) {
 	w.reloadModules()
 	fileDir := file.Dir()
@@ -590,7 +599,7 @@ func (w *Workspace) FindModuleForFile(file protocol.DocumentURI) (*Module, error
 
 	// Even if candidate is non-nil, there may be a more specific
 	// module we haven't loaded yet.
-	for ; fileDir != "file:///"; fileDir = fileDir.Dir() {
+	for oldFileDir := file; fileDir != oldFileDir; oldFileDir, fileDir = fileDir, fileDir.Dir() {
 		if candidate != nil && fileDir.Encloses(candidate.rootURI) {
 			return candidate, nil
 		}
@@ -603,8 +612,10 @@ func (w *Workspace) FindModuleForFile(file protocol.DocumentURI) (*Module, error
 		return w.ensureModule(fh.URI()), nil
 	}
 
-	return nil, nil
+	return nil, errModuleNotFound
 }
+
+var errModuleNotFound = errors.New("module not found")
 
 // ensureModule returns the existing module for the given module root,
 // or if there is none, creates and returns a new module.
@@ -819,8 +830,8 @@ func (w *Workspace) reloadPackages() error {
 				continue
 			}
 			if ip == nil || len(dirUris) == 0 {
-				// Probably the file had no package declaration. For the
-				// time being, we're ignoring that. TODO something better
+				// Probably the file had no package declaration.
+				w.standalone.reloadFile(fileUri)
 				continue
 			}
 			key := importPathModRootPair{

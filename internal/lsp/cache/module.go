@@ -158,6 +158,7 @@ func (m *Module) delete() {
 	}
 	w := m.workspace
 	delete(w.modules, m.rootURI)
+	w.standalone.reloadFile(m.modFileURI)
 	w.debugLogf("%v Deleted", m)
 	w.invalidateActiveFilesAndDirs()
 }
@@ -203,8 +204,6 @@ func (m *Module) FindImportPathForFile(file protocol.DocumentURI) (*ast.ImportPa
 	}
 	pkgName := parsedFile.PackageName()
 	if pkgName == "" {
-		// temporarily, we just completely ignore the file if it has no
-		// package decl. TODO something better
 		w.debugLogf("%v No package found for %v", m, file)
 		return nil, nil, nil
 	}

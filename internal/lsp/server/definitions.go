@@ -16,51 +16,36 @@ package server
 
 import (
 	"context"
-	"fmt"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/lsp/cache"
 )
 
 func (s *server) Definition(ctx context.Context, params *protocol.DefinitionParams) ([]protocol.Location, error) {
 	uri := params.TextDocument.URI
-	pkg, err := s.packageForURI(uri)
-	if err != nil || pkg == nil {
+	w := s.workspace
+	tokFile, dfns, srcMapper, err := w.DefinitionsForURI(uri)
+	if tokFile == nil || err != nil {
 		return nil, err
 	}
-	return pkg.Definition(uri, params.Position), nil
+	return w.Definition(tokFile, dfns, srcMapper, params.Position), nil
 }
 
 func (s *server) Completion(ctx context.Context, params *protocol.CompletionParams) (*protocol.CompletionList, error) {
 	uri := params.TextDocument.URI
-	pkg, err := s.packageForURI(uri)
-	if err != nil || pkg == nil {
+	w := s.workspace
+	tokFile, dfns, srcMapper, err := w.DefinitionsForURI(uri)
+	if tokFile == nil || err != nil {
 		return nil, err
 	}
-	return pkg.Completion(uri, params.Position), nil
+	return w.Completion(tokFile, dfns, srcMapper, params.Position), nil
 }
 
 func (s *server) Hover(ctx context.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
 	uri := params.TextDocument.URI
-	pkg, err := s.packageForURI(uri)
-	if err != nil || pkg == nil {
+	w := s.workspace
+	tokFile, dfns, srcMapper, err := w.DefinitionsForURI(uri)
+	if tokFile == nil || err != nil {
 		return nil, err
 	}
-	return pkg.Hover(uri, params.Position), nil
-}
-
-func (s *server) packageForURI(uri protocol.DocumentURI) (*cache.Package, error) {
-	mod, err := s.workspace.FindModuleForFile(uri)
-	if err != nil {
-		return nil, err
-	} else if mod == nil {
-		return nil, fmt.Errorf("no module found for %v", uri)
-	}
-	ip, _, err := mod.FindImportPathForFile(uri)
-	if err != nil {
-		return nil, err
-	} else if ip == nil {
-		return nil, fmt.Errorf("no pkgs found for %v", uri)
-	}
-	return mod.Package(*ip), nil
+	return w.Hover(tokFile, dfns, srcMapper, params.Position), nil
 }

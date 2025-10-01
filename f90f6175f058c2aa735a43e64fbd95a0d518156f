@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b3a7a69_a0322b53",
+        "filename": "internal/core/adt/kind.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-01T13:59:23Z",
+      "side": 1,
+      "message": "nit: I might avoid using the word \"All\" here, because I first thought it would list all the kinds known globally, and not the ones contained in the receiver. How about KindBits, KindUnits, BaseKinds, IndividualKinds, or some other way of saying \"the separate kinds contained in this bitset\"?",
+      "revId": "f90f6175f058c2aa735a43e64fbd95a0d518156f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

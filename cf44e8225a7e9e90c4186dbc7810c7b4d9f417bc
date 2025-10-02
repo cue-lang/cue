@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95921f17_1c45fbfc",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 21
+      },
+      "lineNbr": 2221,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2025-10-02T15:28:57Z",
+      "side": 1,
+      "message": "Consider adding a comma after \"definition\" and before \"normal\".",
+      "revId": "cf44e8225a7e9e90c4186dbc7810c7b4d9f417bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17b610da_6b9fd26f",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 21
+      },
+      "lineNbr": 2782,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2025-10-02T15:28:57Z",
+      "side": 1,
+      "message": "Consider dropping several commas here:\n\"a partially defined or open struct to a fully defined or closed struct.\"\n\nAlternately, use em dashes:\n\"a partially defined—or open—struct to a fully defined—or closed—struct.\"",
+      "revId": "cf44e8225a7e9e90c4186dbc7810c7b4d9f417bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

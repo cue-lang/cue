@@ -1,0 +1,265 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4e4b40c_ff4d940a",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "invert and early break?",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d61a2aec_21f0391c",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "perhaps leave a TODO that this will need rethinking once declaring functions in CUE becomes a thing - because at that point one could presumably declare functions which could end up matching one of these cases",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e072a9b9_3c1b5430",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "surely the evaluator should be showing these helpful errors to users already? I wonder if we\u0027re just duplicating work unnecessarily here",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2eafb873_43b5ca51",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "hmm, should we be using `cuelang.org/go/pkg/time`\u0027s format constants here? they currently align with Go\u0027s constants, so it\u0027s not a big deal either way, but I wonder if using the Go package is blurring the line a bit or confusing things. Perhaps leave the code as is, but leave a note.",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4824af7_719a5fb7",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "I\u0027d personally summarize this with a brief comment, as it\u0027s a little subtle.",
+      "range": {
+        "startLine": 442,
+        "startChar": 1,
+        "endLine": 445,
+        "endChar": 2
+      },
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05b7e7f5_3eaa1880",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "the alternative to this would be slices.SortFunc followed by slices.CompactFunc - I assume you don\u0027t want to do that because you want to preserve the original order?",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c0ad453_994cb007",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "I\u0027d name this \"apply\", like in https://pkg.go.dev/cuelang.org/go/cue/ast/astutil#Apply, where the cursor also allows replacing nodes.\n\nBecause to me, a walk API is generally a read-only operation.",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7098e09b_df5330e3",
+        "filename": "encoding/jsonschema/testdata/generate/basic.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "I know you\u0027re generating the jsonschema values as maps, so perhaps it\u0027s not easy to do - but it would be nicest if we had some logical order to these fields, like `$schema` at the very top, and `type` before `properties`",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e23245c_73ea034f",
+        "filename": "encoding/jsonschema/testdata/generate/callop.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "any particular reason for this embedding? also in basic.txtar",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "113ef6d8_986a42bd",
+        "filename": "encoding/jsonschema/testdata/generate/callop.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "do we need a TODO to generate `5` here rather than `5.0`? even if it doesn\u0027t affect the semantics at all, the addition of `.0` is unnecessary and slightly distracting, given that the original source did not have it",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3667807_1f27c748",
+        "filename": "encoding/jsonschema/testdata/generate/callop.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "these `e+1` numeric formats are a worse version of the `.0` problem :)",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "021f77e0_b7a559ad",
+        "filename": "encoding/jsonschema/testdata/generate/const.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "you don\u0027t need to quote the null label :)",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "050f9a6c_6118ed5b",
+        "filename": "encoding/jsonschema/testdata/generate/unary.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "this experiment seems to not be used or needed here?",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2832475a_1176409d",
+        "filename": "encoding/jsonschema/testdata/generate/unary.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "nit: the comment indentation seems to be mixing tabs and spaces",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97dde54b_ed34d1a6",
+        "filename": "encoding/jsonschema/testdata/generate/unary.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "is an empty object a valid jsonschema property? should we be using anything here to signal \"the original field was an error\"?",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

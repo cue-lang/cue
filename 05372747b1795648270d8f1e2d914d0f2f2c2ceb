@@ -184,6 +184,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "96d1fe14_7f07455b",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "I just worry about non-test uses of DeepEqual in general - sometimes it leads to weird semantics, or can be surprisingly expensive if the data is large. I guess in this case, the types are simple and we don\u0027t expect the data to be large, so we know it\u0027s OK. Perhaps we could leave a short comment summarizing that.",
+      "parentUuid": "ac6a3161_d2646d39",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "54737e56_dea233ef",
         "filename": "encoding/jsonschema/generate.go",
         "patchSetId": 4
@@ -353,6 +371,24 @@
       "side": 1,
       "message": "using RawMessage seems fairly appropriate for a JSON value. I guess we could use `any` but that doesn\u0027t seem much better to me. What else would we use?",
       "parentUuid": "73622b1f_512b6946",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4342e261_fc67007a",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-02T22:34:47Z",
+      "side": 1,
+      "message": "indeed `any` is what I would naively use here. my instinct is that RawMessage is most helpful on the decoding side, to keep track of what the original JSON value looked like exactly byte-for-byte. On the encoding side I think it\u0027s generally not that useful, unless we need to deviate from the standard marshalling for some reason, or if we need the marshalling to happen in two stages of nesting. I don\u0027t think either of those applies here?\n\non a second review of the code, I see now that this often gets filled in from cue.Value.MarshalJSON - then I agree that a RawMessage is best. otherwise we\u0027d have to encode the CUE value to `any`, only for it to later be encoded a second time to JSON. so it\u0027s easiest to encode just once, and directly to JSON. perhaps note that we use MarshalJSON for this reason?",
+      "parentUuid": "b35f6c31_5c18dd9f",
       "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

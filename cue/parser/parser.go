@@ -1595,7 +1595,9 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 	last := &ast.BasicLit{ValuePos: pos, Kind: token.STRING, Value: lit}
 	exprs := []ast.Expr{last}
 
-	for p.tok == token.LPAREN {
+	// Note: we can only tell if the string returned by ResumeInterpolation
+	// starts a new interpolated expression by whether it ends in a parenthesis.
+	for strings.HasSuffix(last.Value, "(") {
 		c.pos = 1
 		p.expect(token.LPAREN)
 		cc.closeExpr(p, last)

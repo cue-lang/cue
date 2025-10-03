@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91be338a_a5bd8016",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T09:51:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14a29e63_e8505ca2",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "15f739e0_4291fcdf",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-10-01T15:45:19Z",
       "side": 1,
       "message": "```suggestion\n// because the module is in a bad state (e.g. it\u0027s been deleted).\n```",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75083aaf_80ab2bcb",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T09:51:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "15f739e0_4291fcdf",
       "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a3ffc40_027e7ffa",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T09:51:37Z",
+      "side": 1,
+      "message": "Indeed - increasingly I think of the module as really not much more than the module file.",
+      "parentUuid": "f30fdd8b_df3e3bda",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dfcaca3a_31054284",
@@ -82,6 +136,24 @@
       "writtenOn": "2025-10-01T15:45:19Z",
       "side": 1,
       "message": "```suggestion\n// as a CUE file in order to read its package directive.\n```\n?",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b4a0609_23ccb12c",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T09:51:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfcaca3a_31054284",
       "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f6ff14e_e33c14a7",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T09:51:37Z",
+      "side": 1,
+      "message": "Had to give you one...",
+      "parentUuid": "e40ed1f6_be40be41",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d4182c6_6add0ff5",
@@ -116,6 +206,24 @@
       "writtenOn": "2025-10-01T15:45:19Z",
       "side": 1,
       "message": "trivial perf improvement: factor the string append out of the loop (probably saves might an allocation and string copy per iteration)",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "383bfb57_6c3c20c3",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T09:51:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d4182c6_6add0ff5",
       "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "465c7bfa_cf251bd4",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T09:51:37Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "28c14fd6_0043242c",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9a3c5d7_3383f588",
@@ -150,6 +276,24 @@
       "writtenOn": "2025-10-01T15:45:19Z",
       "side": 1,
       "message": "```suggestion\n\t// isDirty means that the package needs reloading.\n```\n?",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af31d0ed_8e92ae22",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T09:51:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9a3c5d7_3383f588",
       "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -171,6 +315,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "720bee2a_1fc6974c",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T09:51:37Z",
+      "side": 1,
+      "message": "Discussed briefly elsewhere. There\u0027s mild agreement the change here is correct but it\u0027s also not super important.",
+      "parentUuid": "200e8596_0442c7b0",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ccdeb2f2_feb6994f",
@@ -184,6 +346,24 @@
       "writtenOn": "2025-10-01T15:45:19Z",
       "side": 1,
       "message": "Maybe add a comment explaining what this condition is about?",
+      "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ceb17ef_c40455c4",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 839,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T09:51:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ccdeb2f2_feb6994f",
       "revId": "fb6d1634d2ae7f2d2de20a1e0eafb0e15e1282ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -605,6 +605,11 @@ func (s *Scanner) popInterpolation() quoteInfo {
 }
 
 // ResumeInterpolation resumes scanning of a string interpolation.
+// It should be called when the final parenthesis (RPAREN) of an expression
+// inside a string interpolation has been consumed, and returns
+// the next literal segment of the interpolation string, including
+// the closing parenthesis, and possible the opening parenthesis
+// of the next interpolation expression if there is one.
 func (s *Scanner) ResumeInterpolation() string {
 	quote := s.popInterpolation()
 	_, str := s.scanString(s.offset-1, quote)
@@ -620,9 +625,10 @@ func (s *Scanner) Offset() int {
 // and its literal string if applicable. The source end is indicated by
 // EOF.
 //
-// If the returned token is a literal (IDENT, INT, FLOAT,
-// IMAG, CHAR, STRING) or COMMENT, the literal string
-// has the corresponding value.
+// If the returned token is a literal (IDENT, INT, FLOAT, IMAG, CHAR,
+// STRING, INTERPOLATION) or COMMENT or ATTRIBUTE, the literal
+// string has the corresponding value, but see below for more
+// information on INTERPOLATION.
 //
 // If the returned token is a keyword, the literal string is the keyword.
 //
@@ -646,6 +652,44 @@ func (s *Scanner) Offset() int {
 // Scan adds line information to the file added to the file
 // set with Init. Token positions are relative to that file
 // and thus relative to the file set.
+//
+// # String Interpolations
+//
+// The INTERPOLATION token is treated somewhat specially, as the scanner
+// does not itself determine the extent of the interpolation
+// expressions.
+//
+// The scanner relies on the caller to read tokens after the literal
+// string segments of the interpolation; when the caller has scanned the
+// final parenthesis, it must call [Scanner.ResumeInterpolation], which
+// returns the next segment of the interpolation, which may or may not
+// itself be an interpolation (it's an interpolation iff the final
+// character is an open-parenthesis).
+//
+// Note that the string literal associated with the INTERPOLATION token
+// and the string returned by ResumeInterpolation contain the bounding
+// parenthesis characters, even though they are also returned from the
+// scanner as separate tokens.
+//
+// For example, scanning the following CUE
+//
+//	#"a\#(foo("c \(d)"))"#
+//
+// would produce the following tokens and literal values:
+//
+//	INTERPOLATION `#"a\#(`
+//	LPAREN
+//	IDENT `b`
+//	LPAREN
+//	IDENT `foo`
+//	LPAREN
+//	INTERPOLATION `"c \(`
+//	IDENT `d`
+//	RPAREN
+//	ResumeInterpolation -> `)"`
+//	RPAREN
+//	RPAREN
+//	ResumeInterpolation -> `)"#`
 func (s *Scanner) Scan() (pos token.Pos, tok token.Token, lit string) {
 scanAgain:
 	s.skipWhitespace(1)

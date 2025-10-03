@@ -234,6 +234,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		tokFile := f.Syntax.Pos().File()
 		w.mappers[tokFile] = protocol.NewMapper(uri, tokFile.Content())
 		delete(m.dirtyFiles, uri)
+		w.standalone.deleteFile(uri)
 	}
 
 	forPackage := func(importPath string) *definitions.Definitions {

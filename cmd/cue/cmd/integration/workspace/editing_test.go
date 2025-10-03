@@ -171,6 +171,37 @@ v4: v2
 		})
 	})
 
+	t.Run("edit - change package - empty", func(t *testing.T) {
+		// we change the only file within a package, which causes the original package to be deleted
+		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+			rootURI := env.Sandbox.Workdir.RootURI()
+			env.CreateBuffer("z/z.cue", `
+package z
+z: 1
+`[1:])
+			env.Await(
+				env.DoneWithOpen(),
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/z@v0]", rootURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/z] importPath=mod.example/x/z@v0 Reloaded", rootURI),
+			)
+			// Change z/z.cue's package from "z" to "zz"
+			env.EditBuffer("z/z.cue", fake.NewEdit(0, 9, 0, 9, "z"))
+			env.Await(
+				env.DoneWithChange(),
+				// The original z package can't be reloaded because it doesn't exist any more
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/z] importPath=mod.example/x/z@v0 Deleted", rootURI),
+				// Deleting that package transitions its old files to standalone
+				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z/z.cue Created", rootURI),
+				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z/z.cue Reloaded", rootURI),
+				// We detected that the file changed package so the new package gets created
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/z] importPath=mod.example/x/z@v0:zz Created", rootURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/z] importPath=mod.example/x/z@v0:zz Reloaded", rootURI),
+				// Creating the new package removes the file from standalone
+				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z/z.cue Deleted", rootURI),
+			)
+		})
+	})
+
 	t.Run("edit - create ancestor imports", func(t *testing.T) {
 		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()

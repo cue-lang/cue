@@ -90,6 +90,7 @@ func NewModule(modFileUri protocol.DocumentURI, w *Workspace) *Module {
 	// contrast, a package can contain a variable number of files,
 	// which can change on every reload.
 	w.invalidateActiveFilesAndDirs()
+	w.standalone.deleteFile(modFileUri)
 	return m
 }
 

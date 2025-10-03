@@ -33,6 +33,24 @@
       "message": "I think both of these can now be just `string`, as the only input that produces an empty string is the empty string itself.",
       "revId": "dfbc8e0f6da782a2540ff312f15d4e7dd3f8e06b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4931165_126dc22a",
+        "filename": "cue/ast/importpath_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-03T13:33:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd25ac45_8f3e2cb7",
+      "revId": "dfbc8e0f6da782a2540ff312f15d4e7dd3f8e06b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

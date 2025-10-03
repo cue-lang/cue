@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9dc25c5_3b73871f",
+        "filename": "internal/lsp/cache/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T10:05:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b95a99a_9f0b0ac1",
+      "revId": "9b28609e1844925ece417f686d9cc352801ae107",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e111ddf9_5addde76",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-10-01T16:22:03Z",
       "side": 1,
       "message": "I had to think twice about what \"caret symbol\" and `|` implied here.\n\n```suggestion\n\t// try again. This can help when the editor\u0027s insertion point is just\n\t// after the end of a path element.\n```\n?",
+      "revId": "9b28609e1844925ece417f686d9cc352801ae107",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abb87b35_a3924f7c",
+        "filename": "internal/lsp/cache/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T10:05:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e111ddf9_5addde76",
       "revId": "9b28609e1844925ece417f686d9cc352801ae107",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a672b00_1b5c73d0",
+        "filename": "internal/lsp/cache/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T10:05:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7543088b_629cc372",
+      "revId": "9b28609e1844925ece417f686d9cc352801ae107",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2de3537d_ea4836f1",
@@ -82,6 +136,24 @@
       "writtenOn": "2025-10-01T16:22:03Z",
       "side": 1,
       "message": "\"modelled\" seems a bit odd to me here.\n\n```suggestion\n// It should be impossible for a file to be simultaneously held\n```\n?",
+      "revId": "9b28609e1844925ece417f686d9cc352801ae107",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1eb39263_560b8f74",
+        "filename": "internal/lsp/cache/standalone.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T10:05:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2de3537d_ea4836f1",
       "revId": "9b28609e1844925ece417f686d9cc352801ae107",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3d68fa2_1857e317",
+        "filename": "internal/lsp/cache/standalone.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T10:05:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86662cfb_34a74250",
+      "revId": "9b28609e1844925ece417f686d9cc352801ae107",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ebe5e338_baa13964",
@@ -116,6 +206,24 @@
       "writtenOn": "2025-10-01T16:22:03Z",
       "side": 1,
       "message": "nit: it would be nice to be consistent in the spelling of \"URI\" (ideally following the Go convention to capitalize acronyms)\n```suggestion\n\ttokFile, dfns, srcMapper, err :\u003d w.DefinitionsForURI(uri)\n```",
+      "revId": "9b28609e1844925ece417f686d9cc352801ae107",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8f0518f_3838e327",
+        "filename": "internal/lsp/server/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-03T10:05:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ebe5e338_baa13964",
       "revId": "9b28609e1844925ece417f686d9cc352801ae107",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

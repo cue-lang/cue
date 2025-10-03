@@ -83,6 +83,14 @@ func (s *Standalone) reloadFiles() {
 	}
 }
 
+// deleteFile ensures that a standalone file does not exist for uri.
+func (s *Standalone) deleteFile(uri protocol.DocumentURI) {
+	file, found := s.files[uri]
+	if found {
+		file.delete()
+	}
+}
+
 // subtractModulesAndPackages attempts to transition standalone files
 // to packages and modules. If a file has a package name, and if an
 // existing valid module can be found, and a suitable package within
@@ -213,7 +221,7 @@ func (f *standaloneFile) reload() error {
 	f.syntax = ast
 	f.definitions = definitions.Analyse(nil, ast)
 	w.mappers[ast.Pos().File()] = protocol.NewMapper(f.uri, ast.Pos().File().Content())
-	w.debugLogf("%v Reloaded %v", f, err)
+	w.debugLogf("%v Reloaded", f)
 	return nil
 }
 

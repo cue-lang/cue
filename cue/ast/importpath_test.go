@@ -24,7 +24,7 @@ var parseImportPathTests = []struct {
 	testName      string
 	path          string
 	want          ImportPath
-	wantCanonical string
+	wantCanonical any // untyped nil to be equal to the path field
 }{{
 	testName: "StdlibLikeWithSlash",
 	path:     "stdlib/path",
@@ -184,6 +184,40 @@ var parseImportPathTests = []struct {
 		Qualifier:         "strings",
 	},
 	wantCanonical: "strings",
+}, {
+	testName: "DotWithQualifier",
+	path:     ".:foo",
+	want: ImportPath{
+		Path:              ".",
+		ExplicitQualifier: true,
+		Qualifier:         "foo",
+	},
+}, {
+	// Historically, `:pkgname` has been a short-hand for `.:pkgname`.
+	testName: "JustQualifier",
+	path:     ":foo",
+	want: ImportPath{
+		Path:              "",
+		ExplicitQualifier: true,
+		Qualifier:         "foo",
+	},
+}, {
+	// Likely nonsensical, but keep track of what we return.
+	testName: "Empty",
+	path:     "",
+	want: ImportPath{
+		Path: "",
+	},
+}, {
+	// Likely nonsensical, but keep track of what we return.
+	testName: "Colon",
+	path:     ":",
+	want: ImportPath{
+		Path:              "",
+		ExplicitQualifier: true,
+		Qualifier:         "",
+	},
+	wantCanonical: "",
 }}
 
 func TestParseImportPath(t *testing.T) {
@@ -192,11 +226,11 @@ func TestParseImportPath(t *testing.T) {
 			parts := ParseImportPath(test.path)
 			qt.Assert(t, qt.DeepEquals(parts, test.want))
 			qt.Assert(t, qt.Equals(parts.String(), test.path))
-			if test.wantCanonical == "" {
+			if test.wantCanonical == nil {
 				test.wantCanonical = test.path
 			}
 			gotCanonical := parts.Canonical().String()
-			qt.Assert(t, qt.Equals(gotCanonical, test.wantCanonical))
+			qt.Assert(t, qt.Equals(gotCanonical, test.wantCanonical.(string)))
 			// Make sure that the canonical version round-trips OK.
 			qt.Assert(t, qt.Equals(ParseImportPath(gotCanonical).String(), gotCanonical))
 		})

@@ -18,6 +18,18 @@ cmp stdout output.golden
 exec cue eval ./x:x
 cmp stdout output.golden
 
+# Finally, check that the relative path `.` works with and without a qualifier.
+# Note that, historically, `:x` has worked as a short-hand for `.:x`.
+cd x
+exec cue eval .
+cmp stdout ../output.golden
+exec cue eval .:x
+cmp stdout ../output.golden
+# TODO: fix this recent regression
+! exec cue eval :x
+stderr 'standard library import path ":x" cannot be imported as a CUE package'
+# cmp stdout ../output.golden
+
 -- output.golden --
 x: 5
 -- cue.mod/module.cue --

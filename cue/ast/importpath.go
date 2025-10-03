@@ -1,6 +1,9 @@
 package ast
 
-import "strings"
+import (
+	"cmp"
+	"strings"
+)
 
 // ParseImportPath returns the various components of an import path.
 // It does not check the result for validity.
@@ -8,7 +11,12 @@ func ParseImportPath(p string) ImportPath {
 	var parts ImportPath
 	pathWithoutQualifier := p
 	if i := strings.LastIndexAny(p, "/:"); i >= 0 && p[i] == ':' {
-		pathWithoutQualifier = p[:i]
+		// Historically, `:pkgname` has been an alias for `.:pkgname`,
+		// and some users started relying on that behavior in the CLI
+		// even though it was never documented in `cue help inputs`.
+		// Keep support for it around for now, but perhaps reconsider in the future.
+		pathWithoutQualifier = cmp.Or(p[:i], ".")
+
 		parts.Qualifier = p[i+1:]
 		parts.ExplicitQualifier = true
 	}

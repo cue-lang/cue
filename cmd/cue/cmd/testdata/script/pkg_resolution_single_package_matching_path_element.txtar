@@ -25,10 +25,8 @@ exec cue eval .
 cmp stdout ../output.golden
 exec cue eval .:x
 cmp stdout ../output.golden
-# TODO: fix this recent regression
-! exec cue eval :x
-stderr 'standard library import path ":x" cannot be imported as a CUE package'
-# cmp stdout ../output.golden
+exec cue eval :x
+cmp stdout ../output.golden
 
 -- output.golden --
 x: 5

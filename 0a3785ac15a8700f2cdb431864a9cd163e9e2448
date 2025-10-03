@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "483d6f50_af597e44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-03T12:48:17Z",
+      "side": 1,
+      "message": "Not really keen on that `any` thing, but LGTM as long as it goes away in the next CL.",
+      "revId": "0a3785ac15a8700f2cdb431864a9cd163e9e2448",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f809e454_4e75c5d5",
+        "filename": "cue/ast/importpath_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-03T12:48:17Z",
+      "side": 1,
+      "message": "I\u0027m not keen on this. If we want something that\u0027s either string or nil, why not just use `*string` ? But, as I mention below, I don\u0027t think it\u0027s needed anyway.",
+      "revId": "0a3785ac15a8700f2cdb431864a9cd163e9e2448",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "791010d1_10919bb8",
+        "filename": "cue/ast/importpath_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-03T12:48:17Z",
+      "side": 1,
+      "message": "This seems inconsistent with `ExplicitEmptyQualifier`, which does include a colon at the end of the string. If we make it consistent, then we don\u0027t have any cases where a non-empty path maps to an empty canonical string, so we can remove the awkward `any` type for `wantCanonical`.\n\nAlthough... I see that\u0027s hard to do without changing existing behaviour, which is what this CL is trying to avoid.",
+      "revId": "0a3785ac15a8700f2cdb431864a9cd163e9e2448",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

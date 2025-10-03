@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f1ffa89_ce8c01e6",
+        "filename": "cue/ast/importpath_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-03T13:30:27Z",
+      "side": 1,
+      "message": "because I don\u0027t have `new(\"stringlit\")` yet :) I did briefly think about it, but as it will be a one-commit temporary thing, I\u0027ll leave as is.",
+      "parentUuid": "f809e454_4e75c5d5",
+      "revId": "0a3785ac15a8700f2cdb431864a9cd163e9e2448",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "791010d1_10919bb8",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-10-03T12:48:17Z",
       "side": 1,
       "message": "This seems inconsistent with `ExplicitEmptyQualifier`, which does include a colon at the end of the string. If we make it consistent, then we don\u0027t have any cases where a non-empty path maps to an empty canonical string, so we can remove the awkward `any` type for `wantCanonical`.\n\nAlthough... I see that\u0027s hard to do without changing existing behaviour, which is what this CL is trying to avoid.",
+      "revId": "0a3785ac15a8700f2cdb431864a9cd163e9e2448",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d525774_1ae76886",
+        "filename": "cue/ast/importpath_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-03T13:30:27Z",
+      "side": 1,
+      "message": "indeed, I\u0027ll clean this up in the next CL, I wanted to just reflect the current state of the world.",
+      "parentUuid": "791010d1_10919bb8",
       "revId": "0a3785ac15a8700f2cdb431864a9cd163e9e2448",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -572,9 +572,7 @@ cannot import package as definition identifier`,
 		{
 			desc: "paren after interpolation",
 			in:   `"\(1)"()`,
-			// Note: this actually masks an out-of-bounds slice index panic
-			// in scanner.Scanner.popInterpolation.
-			out: "\nexpected operand, found ')' (and 1 more errors)",
+			out:  `"\(1)"()`,
 		},
 		{
 			desc: "file comments",

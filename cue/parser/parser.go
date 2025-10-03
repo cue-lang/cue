@@ -16,6 +16,7 @@ package parser
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"unicode"
 
@@ -177,6 +178,8 @@ func (p *parser) closeList() {
 	switch c.isList--; {
 	case c.isList < 0:
 		if !p.panicking {
+			go panic("unmatched close list")
+			select {}
 			err := errors.Newf(p.pos, "unmatched close list")
 			p.errors = errors.Append(p.errors, err)
 			p.panicking = true
@@ -195,6 +198,8 @@ func (p *parser) closeList() {
 func (c *commentState) closeNode(p *parser, n ast.Node) ast.Node {
 	if p.comments != c {
 		if !p.panicking {
+			go panic("unmatched comments")
+			select {}
 			err := errors.Newf(p.pos, "unmatched comments")
 			p.errors = errors.Append(p.errors, err)
 			p.panicking = true
@@ -546,6 +551,7 @@ func syncExpr(p *parser) {
 func (p *parser) safePos(pos token.Pos) (res token.Pos) {
 	defer func() {
 		if recover() != nil {
+			log.Printf("recovering safePos")
 			res = p.file.Pos(p.file.Base()+p.file.Size(), pos.RelPos()) // EOF position
 		}
 	}()
@@ -1591,11 +1597,11 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 
 	lit := p.lit
 	pos := p.pos
-	p.next()
 	last := &ast.BasicLit{ValuePos: pos, Kind: token.STRING, Value: lit}
 	exprs := []ast.Expr{last}
 
-	for p.tok == token.LPAREN {
+	for strings.HasSuffix(last.Value, "(") {
+		p.next()
 		c.pos = 1
 		p.expect(token.LPAREN)
 		cc.closeExpr(p, last)
@@ -1608,7 +1614,6 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 		}
 		lit = p.scanner.ResumeInterpolation()
 		pos = p.pos
-		p.next()
 		last = &ast.BasicLit{
 			ValuePos: pos,
 			Kind:     token.STRING,
@@ -1616,6 +1621,7 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 		}
 		exprs = append(exprs, last)
 	}
+	p.next()
 	cc.closeExpr(p, last)
 	return &ast.Interpolation{Elts: exprs}
 }

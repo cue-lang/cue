@@ -16,6 +16,7 @@ package parser
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"unicode"
 
@@ -546,6 +547,7 @@ func syncExpr(p *parser) {
 func (p *parser) safePos(pos token.Pos) (res token.Pos) {
 	defer func() {
 		if recover() != nil {
+			log.Printf("recovering safePos")
 			res = p.file.Pos(p.file.Base()+p.file.Size(), pos.RelPos()) // EOF position
 		}
 	}()
@@ -1595,7 +1597,7 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 	last := &ast.BasicLit{ValuePos: pos, Kind: token.STRING, Value: lit}
 	exprs := []ast.Expr{last}
 
-	for p.tok == token.LPAREN {
+	for strings.HasSuffix(last.Value, "(") {
 		c.pos = 1
 		p.expect(token.LPAREN)
 		cc.closeExpr(p, last)

@@ -1214,10 +1214,18 @@ func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
 
 	case *ast.SelectorExpr:
 		resolved := n.resolve(e.X, false)
-		// use e.X.End() rather than sel.Pos() because starting at
-		// e.X.End() will include the "."
 		sel := e.Sel
-		n.addEmbedCompletions(e.X.End(), sel.End(), nil, resolved, sel.Pos())
+		// 1. Add a completion from the end of e.X to the start of the
+		// selector, which is "0 width". This basically covers just the
+		// . in the SelectorExpr. So when the user presses . and we
+		// present completions, they will be purely inserting text and
+		// not replacing any existing text.
+		n.addEmbedCompletions(e.X.End(), sel.Pos(), nil, resolved, sel.Pos())
+		// 2. Add a completion for the selector, which is the width of
+		// the selector. This means when the user is within the selector
+		// part, the completion will replace any existing part of the
+		// selector.
+		n.addEmbedCompletions(sel.Pos(), sel.End(), nil, resolved, sel.Pos())
 		name, _, err := ast.LabelName(sel)
 		if err != nil {
 			return nil

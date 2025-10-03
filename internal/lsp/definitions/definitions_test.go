@@ -2906,12 +2906,24 @@ func (tc *testCase) testCompletions(t *testing.T, files []*ast.File, dfnsByFilen
 			offset := posFrom.offset
 			ranges.Add(filename, offset, offset+len(posFrom.str))
 
+			startOffsetWant := offset
+			if posFrom.str[0] == '.' {
+				startOffsetWant += 1
+			}
 			for i := range len(posFrom.str) {
 				// Test every offset within the "from" token
 				offset := offset + i
-				fieldCompletionGot, embedCompletionGot, _, _, _ := fdfns.CompletionsForOffset(offset)
+				fieldCompletionGot, embedCompletionGot, startOffsetGot, _, embedEndOffsetGot := fdfns.CompletionsForOffset(offset)
 				qt.Check(t, qt.DeepEquals(fieldCompletionGot, fieldCompletionWant), qt.Commentf("from %#v(+%d)", posFrom, i))
 				qt.Check(t, qt.DeepEquals(embedCompletionGot, embedCompletionWant), qt.Commentf("from %#v(+%d)", posFrom, i))
+				qt.Check(t, qt.Equals(startOffsetGot, startOffsetWant), qt.Commentf("from %#v(+%d)", posFrom, i))
+				if len(embedCompletionWant) > 0 {
+					embedEndOffsetWant := posFrom.offset + len(posFrom.str)
+					if i == 0 && posFrom.str[i] == '.' {
+						embedEndOffsetWant = startOffsetWant
+					}
+					qt.Check(t, qt.Equals(embedEndOffsetGot, embedEndOffsetWant), qt.Commentf("from %#v(+%d)", posFrom, i))
+				}
 			}
 		}
 

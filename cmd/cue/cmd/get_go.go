@@ -37,6 +37,7 @@ import (
 
 	cueast "cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/load"
@@ -218,6 +219,8 @@ restrictive enum interpretation of #Switch remains.
 
 	cmd.Flags().StringP(string(flagPackage), "p", "", "package name for generated CUE files")
 
+	cmd.Flags().String(string(flagOutFile), "", "generate one CUE file for a single Go package")
+
 	return cmd
 }
 
@@ -357,6 +360,10 @@ var toString = []*types.Interface{
 // - consider not including types with any dropped fields.
 
 func extract(cmd *Command, args []string) error {
+	if flagLocal.IsSet(cmd) && flagOutFile.IsSet(cmd) {
+		return errors.New("--local and --outfile are mutually exclusive")
+	}
+
 	// TODO the CUE load using "." (below) assumes that a CUE module and a Go
 	// module will exist within the same directory (more precisely a Go module
 	// could be nested within a CUE module), such that the module path in any
@@ -384,6 +391,10 @@ func extract(cmd *Command, args []string) error {
 	}
 	if packages.PrintErrors(pkgs) > 0 {
 		return ErrPrintedError
+	}
+
+	if flagOutFile.IsSet(cmd) && len(pkgs) != 1 {
+		return errors.New("--outfile only allows for one package to be specified")
 	}
 
 	e := extractor{
@@ -462,8 +473,11 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		}
 	}
 
-	if err := os.MkdirAll(dir, 0777); err != nil {
-		return err
+	outFile := flagOutFile.String(e.cmd)
+	if outFile == "" {
+		if err := os.MkdirAll(dir, 0777); err != nil {
+			return err
+		}
 	}
 
 	e.usedPkgs = map[string]bool{}
@@ -473,7 +487,24 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		args += " --exclude=" + e.exclude
 	}
 
+	pName := flagPackage.String(e.cmd)
+	if pName == "" {
+		pName = p.Name
+	}
+
+	var (
+		decls  []cueast.Decl
+		cuePkg *cueast.Package
+	)
+	// By default, we output one CUE file for each Go file as long as there's anything to generate.
+	// When --outfile is used, we want to generate exactly one CUE file for an entire Go package,
+	// so we instead keep joining declarations until we reach the last Go file, where we then write.
 	for i, f := range p.Syntax {
+		if cuePkg == nil || outFile == "" {
+			cuePkg = &cueast.Package{Name: e.ident(pName, false)}
+			decls = nil
+		}
+
 		e.cmap = ast.NewCommentMap(p.Fset, f, f.Comments)
 
 		e.pkgNames = map[string]pkgInfo{}
@@ -494,25 +525,24 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 			e.pkgNames[pkgPath] = info
 		}
 
-		decls := []cueast.Decl{}
+		var fileDecls []cueast.Decl
 		for _, d := range f.Decls {
 			switch d := d.(type) {
 			case *ast.GenDecl:
-				decls = append(decls, e.reportDecl(d)...)
+				fileDecls = append(fileDecls, e.reportDecl(d)...)
 			}
 		}
 
-		if len(decls) == 0 && f.Doc == nil {
+		if len(fileDecls) == 0 && f.Doc == nil && outFile == "" {
 			continue
 		}
+		decls = append(decls, fileDecls...)
 
-		pName := flagPackage.String(e.cmd)
-		if pName == "" {
-			pName = p.Name
+		addDoc(f.Doc, cuePkg)
+
+		if outFile != "" && i != len(p.Syntax)-1 {
+			continue
 		}
-
-		pkg := &cueast.Package{Name: e.ident(pName, false)}
-		addDoc(f.Doc, pkg)
 
 		f := &cueast.File{Decls: []cueast.Decl{
 			&cueast.CommentGroup{List: []*cueast.Comment{
@@ -521,7 +551,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 			&cueast.CommentGroup{List: []*cueast.Comment{
 				{Text: "//cue:generate cue get go " + args},
 			}},
-			pkg,
+			cuePkg,
 		}}
 		f.Decls = append(f.Decls, decls...)
 
@@ -530,14 +560,24 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		}
 
 		file := filepath.Base(p.CompiledGoFiles[i])
-
 		file = strings.Replace(file, ".go", "_go", 1)
 		file += "_gen.cue"
+
 		b, err := format.Node(f, format.Simplify())
 		if err != nil {
 			return err
 		}
-		err = os.WriteFile(filepath.Join(dir, file), b, 0666)
+
+		dst := outFile
+		if dst == "" {
+			dst = filepath.Join(dir, file)
+		}
+
+		if dst == "-" {
+			_, err = os.Stdout.Write(b)
+		} else {
+			err = os.WriteFile(dst, b, 0666)
+		}
 		if err != nil {
 			return err
 		}
@@ -549,10 +589,10 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		}
 	}
 
-	for path := range e.usedPkgs {
-		if !e.done[path] {
-			e.done[path] = true
-			if err := e.extractPkg(root, e.allPkgs[path]); err != nil {
+	for pkgPath := range e.usedPkgs {
+		if !flagOutFile.IsSet(e.cmd) && !e.done[pkgPath] {
+			e.done[pkgPath] = true
+			if err := e.extractPkg(root, e.allPkgs[pkgPath]); err != nil {
 				return err
 			}
 		}
@@ -883,7 +923,7 @@ func makeDoc(g *ast.CommentGroup, isDoc bool) *cueast.CommentGroup {
 		// The parser has given us exactly the comment text.
 		switch c[1] {
 		case '/':
-			//-style comment (no newline at the end)
+			// //-style comment (no newline at the end)
 			a = append(a, &cueast.Comment{Text: c})
 
 		case '*':

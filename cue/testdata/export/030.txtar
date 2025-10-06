@@ -16,22 +16,6 @@ eval: true
 	}
 	#Bar: string
 }
--- out/def --
-#Foo: {
-	"#Foo": 2
-	sgl:    #Bar
-	ref:    (null | #Foo) & (null | #Foo)
-	ext:    #Bar | null
-	ref2:   null | #Foo.sgl
-	...
-}
-#Bar: string
--- out/export --
-
--- out/yaml --
-{}
--- out/json --
-{}
 -- out/compile --
 --- in.cue
 {
@@ -88,16 +72,6 @@ diff old new
 +Disjuncts:    10
 +
 +NumCloseIDs: 4
--- out/eval/stats --
-Leaks:  0
-Freed:  70
-Reused: 59
-Allocs: 11
-Retain: 1
-
-Unifications: 28
-Conjuncts:    131
-Disjuncts:    71
 -- out/evalalpha --
 (struct){
   #Foo: (#struct){
@@ -128,22 +102,3 @@ diff old new
      ext: ((null|string)){ |((string){ string }, (null){ null }) }
      ref2: ((null|string)){ |((null){ null }, (string){ string }) }
      "#Foo": (int){ 2 }
--- diff/todo/p2 --
-Structural cycle eliminated too soon?
--- out/eval --
-(struct){
-  #Foo: (#struct){
-    sgl: (string){ string }
-    ref: ((null|struct)){ |((null){ null }, (#struct){
-        sgl: (string){ string }
-        ref: (null){ null }
-        ext: ((null|string)){ |((string){ string }, (null){ null }) }
-        ref2: ((null|string)){ |((null){ null }, (string){ string }) }
-        "#Foo": (int){ 2 }
-      }) }
-    ext: ((null|string)){ |((string){ string }, (null){ null }) }
-    ref2: ((null|string)){ |((null){ null }, (string){ string }) }
-    "#Foo": (int){ 2 }
-  }
-  #Bar: (string){ string }
-}

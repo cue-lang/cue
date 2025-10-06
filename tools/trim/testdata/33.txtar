@@ -42,9 +42,3 @@ diff old new
 -h: #x & {}
 +h: #x & {b: 5}
  i: #x & {c: 5}
--- out/trim --
-== a.cue
-g: #x & {}
-#x: {a: 5, a: int} | {b: 5} | {c: >4}
-h: #x & {}
-i: #x & {c: 5}

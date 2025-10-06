@@ -46,16 +46,6 @@ graph TD
 	url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
 	stdout: "foo"
 }
--- out/run/t1/stats --
-Leaks:  0
-Freed:  50
-Reused: 43
-Allocs: 7
-Retain: 0
-
-Unifications: 27
-Conjuncts:    75
-Disjuncts:    50
 -- out/run/t2 --
 graph TD
   t0("root.get [Terminated]")
@@ -88,42 +78,4 @@ graph TD
 		stdout: "foo"
 		url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
 	}
-}
--- out/run/t2/stats --
-Leaks:  0
-Freed:  50
-Reused: 50
-Allocs: 0
-Retain: 0
-
-Unifications: 27
-Conjuncts:    80
-Disjuncts:    50
--- out/run/stats/totals --
-Leaks:  0
-Freed:  100
-Reused: 93
-Allocs: 7
-Retain: 0
-
-Unifications: 54
-Conjuncts:    155
-Disjuncts:    100
--- out/run/t3 --
-graph TD
-  t0("root.get [Terminated]")
-  t0-->t2
-  t1("root.convert [Terminated]")
-  t1-->t0
-  t2("foo [Terminated]")
-
--- out/run/t3/value --
-{
-	$id: "tool/exec.Run"
-	cmd: "cue-fake import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
-	env: {}
-	stdout:  "foo"
-	stderr:  null
-	stdin:   (*null | string | bytes) & get.response.body
-	success: bool
 }

@@ -7,19 +7,6 @@
 a: #S & {
 	v: {b: int}
 }
--- out/def --
-#S: {
-	[string]: {
-		a: int
-	}
-}
-a: #S & {
-	v: {
-		b: int
-	}
-}
--- out/legacy-debug --
-<0>{#S: <1>{[]: <2>(_: string)-><3>C{a: int}, }, a: <4>{[]: <5>(_: string)-><6>C{a: int}, v: _|_(int:field "b" not allowed in closed struct)}}
 -- out/compile --
 --- in.cue
 {
@@ -87,29 +74,3 @@ diff old new
          //     ./in.cue:5:6
        }
        a: (int){ int }
--- out/eval --
-Errors:
-a.v.b: field not allowed:
-    ./in.cue:2:12
-    ./in.cue:4:4
-    ./in.cue:5:6
-
-Result:
-(_|_){
-  // [eval]
-  #S: (#struct){
-  }
-  a: (_|_){
-    // [eval]
-    v: (_|_){
-      // [eval]
-      b: (_|_){
-        // [eval] a.v.b: field not allowed:
-        //     ./in.cue:2:12
-        //     ./in.cue:4:4
-        //     ./in.cue:5:6
-      }
-      a: (int){ int }
-    }
-  }
-}

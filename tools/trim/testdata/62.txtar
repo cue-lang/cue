@@ -39,8 +39,3 @@ diff old new
  #b: ({x: 5} | {x: 7}) & #a
 -out: #b & {}
 +out: #b & {x: 5}
--- out/trim --
-== a.cue
-#a: x: int
-#b: ({x: 5} | {x: 7}) & #a
-out: #b & {}

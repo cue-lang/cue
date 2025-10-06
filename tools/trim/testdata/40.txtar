@@ -28,7 +28,3 @@ diff old new
  #D: list: [...{value: number | *1}]
 -d: #D & {}
 +d: #D & {list: [{}]}
--- out/trim --
-== a.cue
-#D: list: [...{value: number | *1}]
-d: #D & {}

@@ -44,16 +44,6 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 48
--- out/eval/stats --
-Leaks:  24
-Freed:  74
-Reused: 69
-Allocs: 29
-Retain: 24
-
-Unifications: 98
-Conjuncts:    154
-Disjuncts:    98
 -- out/eval --
 Errors:
 regularFields.err1: invalid value {x:10,y:6} (does not satisfy matchIf): conflicting values 5 and 6:

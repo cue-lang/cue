@@ -50,21 +50,6 @@ diff old new
 +    min: (int){ |(*(int){ 1 }, (int){ int }) }
    }
  }
--- out/eval --
-(struct){
-  range1: (struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-    range: (int){ 8 }
-  }
-  range2: (struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-    max: (int){ &(>1, int) }
-  }
-  rg: (struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-    max: (int){ 8 }
-  }
-}
 -- out/compile --
 --- in.cue
 {

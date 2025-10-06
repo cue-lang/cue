@@ -58,16 +58,6 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 3
--- out/eval/stats --
-Leaks:  0
-Freed:  18
-Reused: 12
-Allocs: 6
-Retain: 269
-
-Unifications: 18
-Conjuncts:    354
-Disjuncts:    19
 -- out/eval --
 (struct){
   #TimeSpan: (#struct){

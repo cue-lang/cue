@@ -34,16 +34,6 @@ graph TD
 	$id:    "prepare"
 	stdout: "foo"
 }
--- out/run/t1/stats --
-Leaks:  0
-Freed:  11
-Reused: 6
-Allocs: 5
-Retain: 0
-
-Unifications: 11
-Conjuncts:    23
-Disjuncts:    11
 -- out/run/t2 --
 graph TD
   t0("root.prepare [Terminated]")
@@ -58,23 +48,3 @@ graph TD
 	}
 	stdout: "foo"
 }
--- out/run/t2/stats --
-Leaks:  0
-Freed:  12
-Reused: 12
-Allocs: 0
-Retain: 0
-
-Unifications: 12
-Conjuncts:    28
-Disjuncts:    12
--- out/run/stats/totals --
-Leaks:  0
-Freed:  23
-Reused: 18
-Allocs: 5
-Retain: 0
-
-Unifications: 23
-Conjuncts:    51
-Disjuncts:    23

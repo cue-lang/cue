@@ -9,17 +9,6 @@
 }
 x: (#a & {b: true}) & {c: 4}
 y: x
--- out/def --
-x: _|_ // field "c" not allowed in closed struct
-y: _|_ // field "c" not allowed in closed struct
-#a: {
-	b: bool
-	if b {
-		c: 4
-	}
-}
--- out/legacy-debug --
-<0>{x: _|_(4:field "c" not allowed in closed struct), y: _|_(4:field "c" not allowed in closed struct), #a: <1>C{b: bool if <2>.b yield <3>C{c: 4}}}
 -- out/compile --
 --- in.cue
 {
@@ -81,19 +70,3 @@ diff old new
 +  }
 +  y: ~(x)
  }
--- out/eval --
-(struct){
-  #a: (_|_){
-    // [incomplete] #a: incomplete bool: bool:
-    //     ./in.cue:5:5
-    b: (bool){ bool }
-  }
-  x: (#struct){
-    c: (int){ 4 }
-    b: (bool){ true }
-  }
-  y: (#struct){
-    c: (int){ 4 }
-    b: (bool){ true }
-  }
-}

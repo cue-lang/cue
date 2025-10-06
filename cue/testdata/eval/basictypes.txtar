@@ -21,16 +21,6 @@ comparison: {
 	structEquality: t: {name: "test"} == {name: "test"}
 	nestedComparison: t: {data: {value: 1}} == {data: {value: 1}}
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  9
-Reused: 6
-Allocs: 3
-Retain: 0
-
-Unifications: 9
-Conjuncts:    14
-Disjuncts:    9
 -- out/evalalpha --
 comparison.typeComparison.err: invalid operand string ('==' requires concrete value):
     ./in.cue:16:23
@@ -57,19 +47,6 @@ diff old new
 +    ./in.cue:16:23
 +comparison.typeComparison.err: invalid operand number ('==' requires concrete value):
 +    ./in.cue:16:33
--- out/eval --
-(struct){
-  top: (struct){
-    a: (_){ _ }
-    b: (_){ _ }
-  }
-  scalar: (struct){
-    a: (string){ string }
-    b: (string){ string }
-    c: (number){ number }
-    d: (number){ number }
-  }
-}
 -- out/compile --
 comparison.typeComparison.err: invalid operand string ('==' requires concrete value):
     ./in.cue:16:23

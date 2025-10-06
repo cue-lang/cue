@@ -4,22 +4,6 @@
 a: null
 b: a.x | "b"
 c: a["x"] | "c"
--- out/def --
-a: null
-b: "b"
-c: "c"
--- out/export --
-a: null
-b: "b"
-c: "c"
--- out/yaml --
-a: null
-b: b
-c: c
--- out/json --
-{"a":null,"b":"b","c":"c"}
--- out/legacy-debug --
-<0>{a: null, b: "b", c: "c"}
 -- out/compile --
 --- in.cue
 {

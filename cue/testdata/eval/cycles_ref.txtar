@@ -47,23 +47,6 @@ diff old new
    e: (struct){
      a: (int){ 1 }
      b: (int){ 2 }
--- out/eval --
-(struct){
-  a: (int){ 200 }
-  b: (int){ 100 }
-  c: (struct){
-    b: (int){ 2 }
-    a: (int){ 1 }
-  }
-  d: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  e: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-}
 -- out/compile --
 --- in.cue
 {

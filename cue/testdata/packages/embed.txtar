@@ -61,16 +61,6 @@ diff old new
 -  z: (int){ 3 }
 +  x: (int){ 1 }
  }
--- out/eval --
-(struct){
-  foo: (struct){
-    x: (int){ 1 }
-    y: (int){ 2 }
-  }
-  x: (int){ 1 }
-  y: (int){ 2 }
-  z: (int){ 3 }
-}
 -- out/compile --
 --- in.cue
 {

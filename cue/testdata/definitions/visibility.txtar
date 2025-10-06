@@ -48,18 +48,6 @@ diff old new
  }
 -- diff/explanation --
 New evaluator should ultimately disallow new definitions in closed structs.
--- out/eval --
-(struct){
-  #foo: (#struct){
-    name: (string){ string }
-  }
-  foo: (#struct){
-    name: (string){ string }
-    _name: (string){ "foo" }
-    _#name: (string){ "bar" }
-    #name: (string){ "baz" }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -25,7 +25,3 @@ diff old new
  == a.cue
 -x: <10
  x: 7
--- out/trim --
-== a.cue
-x: <10
-x: 7

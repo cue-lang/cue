@@ -38,8 +38,3 @@ diff old new
  y: {a: 5}
 -z: x & y & {a: 5}
 +z: x & y & _
--- out/trim --
-== a.cue
-x: {a: 5}
-y: {a: 5}
-z: x & y & {a: 5}

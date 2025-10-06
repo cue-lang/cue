@@ -28,7 +28,3 @@ diff old new
  [_]: x: "hello"
 -a: {}
 +a: _
--- out/trim --
-== in.cue
-[_]: x: "hello"
-a: {}

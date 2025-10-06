@@ -25,6 +25,3 @@ diff old new
  == a.cue
 -x: {a: bool, b: string, [>"b"]: int} & {a: true, b: "hi"}
 +x: {[>"b"]: int} & {a: true, b: "hi"}
--- out/trim --
-== a.cue
-x: {a: bool, b: string, [>"b"]: int} & {a: true, b: "hi"}

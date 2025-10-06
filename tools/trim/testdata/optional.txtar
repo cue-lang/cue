@@ -76,18 +76,3 @@ diff old new
 +b: #B
 +b: bb: _ // c can be removed, bb not.
  #B: bb?: c: 2
--- out/trim --
-== a.cue
-package pkg
-
-a: [...#A]
-
-a: [{
-	annotations: {}
-}]
-
-#A: annotations?: [string]: string
-
-b:        #B
-b: bb: {} // c can be removed, bb not.
-#B: bb?: c: 2

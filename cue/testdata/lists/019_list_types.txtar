@@ -27,27 +27,6 @@ e0: list.Repeat([{}], 2)
 e0: [{}]
 e1: [...int]
 e1: [...float]
--- out/def --
-l0: [1, 2, 3]
-l2: [{
-	a: 1
-}, {
-	a: 2
-	b: 3
-}]
-s1: [int]
-s2: [2]
-i1: [int, int, int, int, int, int][2]
-i2: 3
-t0: [{
-	a: 8
-}]
-t1: [...int]
-e0: _|_ // conflicting list lengths: conflicting values 2 and 1
-e1: [..._|_ // conflicting values int and float (mismatched types int and float),
-]
--- out/legacy-debug --
-<0>{l0: [1,2,3], l2: [<1>{a: 1},<2>{a: 2, b: 3}], s1: [int], s2: [2], i1: int, i2: 3, t0: [<3>{a: 8}], t1: [, ...int], e0: _|_(([<4>{},<4>{}] & [<5>{}]):conflicting list lengths: conflicting values 2 and 1), e1: [, ..._|_((int & float):conflicting values int and float (mismatched types int and float))]}
 -- out/compile --
 --- in.cue
 {
@@ -196,49 +175,3 @@ diff old new
      0: (struct){
      }
      1: (struct){
--- out/eval --
-Errors:
-e0: incompatible list lengths (1 and 2)
-
-Result:
-(_|_){
-  // [eval]
-  l0: (#list){
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 3 }
-  }
-  l2: (#list){
-    0: (struct){
-      a: (int){ 1 }
-    }
-    1: (struct){
-      a: (int){ 2 }
-      b: (int){ 3 }
-    }
-  }
-  s1: (#list){
-    0: (int){ int }
-  }
-  s2: (#list){
-    0: (int){ 2 }
-  }
-  i1: (int){ int }
-  i2: (int){ 3 }
-  t0: (#list){
-    0: (struct){
-      a: (int){ 8 }
-    }
-  }
-  t1: (list){
-  }
-  e0: (_|_){
-    // [eval] e0: incompatible list lengths (1 and 2)
-    0: (struct){
-    }
-    1: (struct){
-    }
-  }
-  e1: (list){
-  }
-}

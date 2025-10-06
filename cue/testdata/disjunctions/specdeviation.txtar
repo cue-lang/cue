@@ -142,45 +142,6 @@ for the transition to the new evaluator, though.
 UPDATE: we have made evalv3 a bit more in line with evalv2. Note how this
 affects staged.c, though.
 TODO(defaults): consider these cases with a potential default redesign.
--- out/eval --
-(struct){
-  Q: (int){ |(*(int){ 1 }, (int){ int }) }
-  q: (int){ |(*(int){ 1 }, (int){ int }) }
-  P: (int){ 2 }
-  p: (int){ |(*(int){ 2 }, (int){ int }) }
-  r: (int){ |((int){ 1 }, (int){ 2 }) }
-  s: (int){ |(*(int){ 1 }, (int){ 2 }) }
-  s1: (#struct){
-    max: (number){ |(*(int){ 5 }, (number){ >5 }) }
-    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-    min: (int){ 5 }
-  }
-  #Size: (#struct){
-    max: (number){ |(*(int){ 1 }, (number){ >0 }, (number){ >1 }) }
-    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-    min: (number){ |(*(int){ 1 }, (number){ >0 }) }
-  }
-  staged: (struct){
-    c: (string){ |(*(string){ "a" }, (string){ "b" }) }
-    d: (string){ |(*(string){ "a" }, (string){ "b" }) }
-  }
-  issue763a: (struct){
-    #A: (#struct){
-      v: (string){ |((string){ "a" }, (string){ "b" }, (string){ "c" }) }
-    }
-    h: (struct){
-      a: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-      baa: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-      boo: (#struct){
-        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

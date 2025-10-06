@@ -91,6 +91,22 @@ y: x
 		})
 	})
 
+	t.Run("open - really bad", func(t *testing.T) {
+		// A file with "@" as its only content upsets the parser to the
+		// extent that the ast that is returned is completely
+		// empty. Calling Pos() on such an AST returns NoPos, which has
+		// a nil source [token.File]. We test that this scenario does
+		// not cause crashes.
+		WithOptions(RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *Env) {
+			rootURI := env.Sandbox.Workdir.RootURI()
+			env.CreateBuffer("z.cue", "@")
+			env.Await(
+				env.DoneWithOpen(),
+				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Reloaded", rootURI),
+			)
+		})
+	})
+
 	t.Run("transition to module", func(t *testing.T) {
 		// starts with a package and without a module, then we add the module
 		WithOptions(RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *Env) {

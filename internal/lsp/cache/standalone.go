@@ -220,7 +220,9 @@ func (f *standaloneFile) reload() error {
 
 	f.syntax = ast
 	f.definitions = definitions.Analyse(nil, ast)
-	w.mappers[ast.Pos().File()] = protocol.NewMapper(f.uri, ast.Pos().File().Content())
+	if tokFile := ast.Pos().File(); tokFile != nil {
+		w.mappers[tokFile] = protocol.NewMapper(f.uri, tokFile.Content())
+	}
 	w.debugLogf("%v Reloaded", f)
 	return nil
 }

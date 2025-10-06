@@ -87,8 +87,6 @@ diff old new
          //     ./in.cue:5:6
        }
        a: (int){ int }
--- diff/todo/p2 --
-Missing positions.
 -- out/eval --
 Errors:
 a.v.b: field not allowed:

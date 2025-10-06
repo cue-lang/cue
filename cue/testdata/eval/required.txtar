@@ -356,8 +356,6 @@ diff old new
          #Foo: (#struct){
            a!: (int){ int }
          }
--- diff/todo/p2 --
-Missing position.
 -- out/eval --
 (_|_){
   // [eval]

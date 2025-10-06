@@ -256,8 +256,6 @@ diff old new
      //     ./in.cue:14:16
    }
    def: (struct){
--- diff/todo/p3 --
-Error messages slightly different.
 -- out/eval --
 Errors:
 c: invalid list index "3" (type string):

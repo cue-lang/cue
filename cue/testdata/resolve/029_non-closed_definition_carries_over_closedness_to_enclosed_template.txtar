@@ -224,8 +224,6 @@ diff old new
            //     ./in.cue:17:7
          }
          a: (int){ int }
--- diff/todo/p3 --
-Missing error positions.
 -- out/eval --
 Errors:
 a.v.b: field not allowed:

@@ -119,8 +119,6 @@ diff old new
 -    e?: (int){ int }
    }
  }
--- diff/todo/p3 --
-Missing error positions.
 -- diff/explanation --
 Dropping e? is correct.
 -- out/eval --

@@ -284,8 +284,6 @@ diff old new
 -    a: (int){ 1 }
 -  }
  }
--- diff/todo/p2 --
-Added near-duplicate message
 -- out/eval --
 Errors:
 invalid interpolation: conflicting values 2 and 1:

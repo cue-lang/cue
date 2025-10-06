@@ -60,8 +60,6 @@ diff old new
        //     ./in.cue:6:2
      }
    }
--- diff/todo/p2 --
-Positions.
 -- out/eval --
 Errors:
 x.b: field not allowed:

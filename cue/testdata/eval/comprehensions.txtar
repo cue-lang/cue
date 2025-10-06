@@ -350,8 +350,6 @@ diff old new
              }
            }
          }
--- diff/todo/p2 --
-Missing error positions.
 -- out/eval --
 Errors:
 issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):

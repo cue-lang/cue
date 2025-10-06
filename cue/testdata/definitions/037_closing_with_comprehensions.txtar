@@ -196,8 +196,6 @@ diff old new
        //     ./in.cue:29:3
      }
    }
--- diff/todo/p2 --
-error positions
 -- out/eval --
 Errors:
 #E.f3: field not allowed:

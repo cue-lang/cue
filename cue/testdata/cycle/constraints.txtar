@@ -1201,8 +1201,6 @@ diff old new
        }
        T: (_|_){
          // [structural cycle]
--- diff/todo/p2 --
-selfTriggerCycle.t1.a.b.b: cycle detected slightly too late
 -- out/eval --
 Errors:
 brokenRing.t1.p1.T.b: structural cycle

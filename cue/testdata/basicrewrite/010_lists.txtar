@@ -180,8 +180,6 @@ diff old new
      //     ./in.cue:5:12
    }
    e3: (_|_){
--- diff/todo/p2 --
-error: more precise message
 -- out/eval --
 Errors:
 e: conflicting values 4 and [] (mismatched types int and list):

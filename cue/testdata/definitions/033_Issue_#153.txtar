@@ -131,8 +131,6 @@ diff old new
          //     ./in.cue:16:4
        }
      }
--- diff/todo/p3 --
-missing error positions
 -- out/eval --
 Errors:
 listOfCloseds.0.b: field not allowed:

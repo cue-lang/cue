@@ -192,8 +192,6 @@ diff old new
      //     ./in.cue:19:30
    }
    negativeIndex: (_|_){
--- diff/todo/p4 --
-Error messages slightly different.
 -- out/eval --
 Errors:
 outOfBoundsDisjunction: invalid list index 1 (out of bounds):

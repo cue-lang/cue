@@ -119,6 +119,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 		}
 		for _, f := range t.Archive.Files {
 			if f.Name != "out/eval/stats" {
+				// TODO perhaps we should also look for out/evalalpha/stats too?
 				continue
 			}
 			c := cuecontext.New()
@@ -148,6 +149,12 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 				// solved.
 				w := t.Writer("stats")
 				fmt.Fprintln(w, counts)
+			default:
+				// This is technically a no-op but still worthwhile to
+				// inform the cuetxtar garbage collector we still care
+				// about the file.
+				w := t.Writer("stats")
+				w.Write(f.Data)
 			}
 			break
 		}

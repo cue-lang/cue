@@ -180,8 +180,6 @@ diff old new
      }
      b: (int){ 3 }
    }
--- diff/todo/p2 --
-Reordering / missing positions.
 -- out/eval --
 Errors:
 #e1.a.d: field not allowed:

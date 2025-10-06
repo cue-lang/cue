@@ -145,8 +145,6 @@ diff old new
        }
        1: (struct){
        }
--- diff/todo/p2 --
-error path moved
 -- out/eval --
 Errors:
 f.ben: incompatible list lengths (1 and 2)

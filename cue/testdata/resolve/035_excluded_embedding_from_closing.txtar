@@ -183,9 +183,6 @@ diff old new
      }
    }
  }
--- diff/todo/p2 --
-Positions.
-Reordering.
 -- out/eval --
 Errors:
 V.b.extra: field not allowed:

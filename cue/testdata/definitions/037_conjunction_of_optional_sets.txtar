@@ -141,8 +141,6 @@ diff old new
        //     ./in.cue:12:10
      }
    }
--- diff/todo/p2 --
-Missing positions.
 -- out/eval --
 Errors:
 c.aaa: field not allowed:

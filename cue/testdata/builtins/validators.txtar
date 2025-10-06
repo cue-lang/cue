@@ -664,8 +664,6 @@ diff old new
        }
      }
    }
--- diff/todo/p2 --
-issue3981: topo sort regression
 -- out/eval --
 Errors:
 issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):

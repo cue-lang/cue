@@ -81,8 +81,6 @@ diff old new
 +    }
    }
  }
--- diff/todo/p3 --
-Additional error message. Seems okay.
 -- out/eval --
 Errors:
 c2: conflicting values 1 and {bar:1} (mismatched types int and struct):

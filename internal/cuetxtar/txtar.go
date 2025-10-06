@@ -567,16 +567,6 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 							}
 							update = cuetest.UpdateGoldenFiles
 						}
-						// Remove all diff-related todo files.
-						for n := range index {
-							if strings.HasPrefix(n, "diff/todo/") {
-								delete(index, n)
-								if !cuetest.UpdateGoldenFiles {
-									t.Errorf("todo file %q exists without changes", n)
-								}
-								update = cuetest.UpdateGoldenFiles
-							}
-						}
 					}
 				}
 			}

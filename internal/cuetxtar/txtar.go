@@ -17,10 +17,12 @@ package cuetxtar
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/fs"
 	"maps"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -38,6 +40,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
+	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
 	"github.com/rogpeppe/go-internal/diff"
 	"golang.org/x/tools/txtar"
@@ -522,6 +525,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			// later.
 			ordering := maps.Clone(index)
 
+			usedFiles := make(map[string]bool)
 			// Add diff files between fallback and main file. These are added
 			// as regular output files so that they can be updated as well.
 			for _, sub := range tc.outFiles {
@@ -533,12 +537,14 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 						ordering[sub.name] = j
 					}
 					fallback := a.Files[j].Data
+					// The fallback file is "used" even though it's not actually
+					// an output file.
+					usedFiles[a.Files[j].Name] = true
 
 					result := sub.bytes()
 					if len(result) == 0 || len(fallback) == 0 {
 						continue
 					}
-
 					diffName := "diff/-" + sub.name + "<==>+" + sub.fallback
 					if _, ok := ordering[diffName]; !ok {
 						ordering[diffName] = j
@@ -572,7 +578,6 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			}
 
 			files := make([]txtar.File, 0, len(a.Files))
-
 			for _, sub := range tc.outFiles {
 				result := sub.bytes()
 
@@ -582,6 +587,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				if i, ok := index[sub.name]; ok {
 					gold.Data = a.Files[i].Data
 					delete(index, sub.name)
+					usedFiles[sub.name] = true
 
 					if bytes.Equal(gold.Data, result) {
 						continue
@@ -592,6 +598,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 					// Use the golden file of the fallback set if it matches.
 					if bytes.Equal(gold.Data, result) {
 						gold.Name = sub.fallback
+						usedFiles[gold.Name] = true
 						delete(index, sub.fallback)
 						continue
 					}
@@ -619,9 +626,34 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			// Add remaining unrelated files, ignoring files that were already
 			// added.
 			for _, f := range a.Files {
-				if _, ok := index[f.Name]; ok {
-					files = append(files, f)
+				if _, ok := index[f.Name]; !ok {
+					continue
 				}
+				files = append(files, f)
+			}
+			//			log.Printf("usedFiles %v", slices.Sorted(maps.Keys(usedFiles)))
+			//			for _, f := range a.Files {
+			//				log.Printf("- %q", f.Name)
+			//			}
+			if uri := os.Getenv("CUETXTAR_GC_URI"); uri != "" {
+				var retain []string
+				for _, f := range a.Files {
+					if isOutputFile(f.Name) && usedFiles[f.Name] {
+						retain = append(retain, f.Name)
+					}
+				}
+				absPath, err := filepath.Abs(fullpath)
+				qt.Assert(t, qt.IsNil(err))
+				body, err := json.Marshal(struct {
+					TxtarFile   string   `json:"txtarfile"`
+					RetainFiles []string `json:"retainFiles"`
+				}{absPath, retain})
+				qt.Assert(t, qt.IsNil(err))
+				req, err := http.NewRequest("PUT", uri, bytes.NewReader(body))
+				qt.Assert(t, qt.IsNil(err))
+				resp, err := http.DefaultClient.Do(req)
+				qt.Assert(t, qt.IsNil(err))
+				qt.Assert(t, qt.Equals(resp.StatusCode, http.StatusOK))
 			}
 			a.Files = files
 
@@ -651,4 +683,8 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func isOutputFile(name string) bool {
+	return strings.HasPrefix(name, "out/") || strings.HasPrefix(name, "diff/")
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ef20d00_83f3bdea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-06T14:54:23Z",
+      "side": 1,
+      "message": "Do we need a test case for the use of `self` without the experiment being turned on? or is that not very interesting, as it\u0027s just an unknown name?",
+      "revId": "160c1a8a8507fbe0ca54693d754b3b8fdcc9b7f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

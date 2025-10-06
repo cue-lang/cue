@@ -18,20 +18,6 @@ d: {
 		a: 3
 	}
 }
--- out/def --
-b: true
-a: "foo"
-c: {
-	a: 3
-}
-d: {
-	a: int
-	if a > 1 {
-		a: 3
-	}
-}
--- out/legacy-debug --
-<0>{b: true, a: "foo", c: <1>{a: 3}, d: <2>{a: int if (<3>.a > 1) yield <4>{a: 3}}}
 -- out/compile --
 --- in.cue
 {
@@ -52,18 +38,6 @@ d: {
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 4
-Allocs: 3
-Retain: 1
-
-Unifications: 7
-Conjuncts:    7
-Disjuncts:    7
-
-NumCloseIDs: 3
 -- out/evalalpha --
 (struct){
   a: (string){ "foo" }
@@ -105,15 +79,3 @@ diff old new
 +    }
    }
  }
--- out/eval --
-(struct){
-  a: (string){ "foo" }
-  b: (bool){ true }
-  c: (struct){
-    a: (int){ 3 }
-  }
-  d: (_|_){
-    // [cycle] cycle error:
-    //     ./in.cue:14:5
-  }
-}

@@ -54,12 +54,6 @@ close({
 	size?: list.MaxItems(9) & list.UniqueItems() & [_, _, _, ...]
 	additional?: [int, int, ...string]
 })
--- out/decode/testerr/err-foo-not-string --
-foo.0: conflicting values true and string (mismatched types bool and string):
-    generated.cue:5:1
-    generated.cue:6:9
-    generated.cue:6:12
-    test/err-foo-not-string.json:2:10
 -- test/empty.json --
 {}
 -- test/foo-items.json --

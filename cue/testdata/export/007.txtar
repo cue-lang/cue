@@ -6,15 +6,6 @@
 	d: #a["d"]
 	e: #a.t[2:3]
 }
--- out/def --
-#a: {
-	b: 2.0
-	s: "abc"
-}
-b: 2.0
-c: _|_ // undefined field "c"
-d: _|_ // undefined field "d"
-e: _|_ // undefined field "t"
 -- out/compile --
 --- in.cue
 {
@@ -29,16 +20,6 @@ e: _|_ // undefined field "t"
     e: 〈0;#a〉.t[2:3]
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  8
-Reused: 5
-Allocs: 3
-Retain: 0
-
-Unifications: 8
-Conjuncts:    10
-Disjuncts:    8
 -- out/eval --
 Errors:
 c: undefined field: c:

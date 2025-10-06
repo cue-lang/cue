@@ -8,16 +8,6 @@ d: {
 e: d & {
 	x: 5
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  9
-Reused: 6
-Allocs: 3
-Retain: 0
-
-Unifications: 9
-Conjuncts:    16
-Disjuncts:    9
 -- out/eval --
 (struct){
   a: (int){ 1 }

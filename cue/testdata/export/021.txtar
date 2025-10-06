@@ -9,19 +9,6 @@ eval: true
 	b: a: b: 4
 	a: b: 3
 }
--- out/def --
-
-A = a
-b: {
-	idx: A[str]
-	a: {
-		b: 4
-	}
-	str: string
-}
-a: {
-	b: 3
-}
 -- out/compile --
 --- in.cue
 {
@@ -40,16 +27,6 @@ a: {
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  8
-Reused: 3
-Allocs: 5
-Retain: 10
-
-Unifications: 8
-Conjuncts:    14
-Disjuncts:    18
 -- out/eval --
 (struct){
   b: (struct){

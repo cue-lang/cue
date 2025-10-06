@@ -12,20 +12,6 @@ comprehensionBinds: {
 	a: {for _ in [1] {a: _}}
 	b: {for _, _ in [1] {a: _}}
 }
--- out/eval/stats --
-Leaks:  2
-Freed:  16
-Reused: 12
-Allocs: 6
-Retain: 7
-
-Unifications: 18
-Conjuncts:    18
-Disjuncts:    21
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 5
 -- out/eval --
 Errors:
 k: cannot range over e (found int, want list or struct):

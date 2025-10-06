@@ -51,60 +51,6 @@ nodes: t3: {
 	s3: s1 & {c: 3}
 }
 
--- out/def --
-a: 100
-b: 200
-c: [100, 100]
-s1: s2 & {
-	a: 1
-}
-s2: s3 & {
-	b: 2
-}
-s3: s1 & {
-	c: 3
-}
--- out/export --
-a: 100
-b: 200
-c: [100, 100]
-s1: {
-	a: 1
-	b: 2
-	c: 3
-}
-s2: {
-	a: 1
-	b: 2
-	c: 3
-}
-s3: {
-	a: 1
-	b: 2
-	c: 3
-}
--- out/yaml --
-a: 100
-b: 200
-c:
-- 100
-- 100
-s1:
-  a: 1
-  b: 2
-  c: 3
-s2:
-  a: 1
-  b: 2
-  c: 3
-s3:
-  a: 1
-  b: 2
-  c: 3
--- out/json --
-{"a":100,"b":200,"c":[100,100],"s1":{"a":1,"b":2,"c":3},"s2":{"a":1,"b":2,"c":3},"s3":{"a":1,"b":2,"c":3}}
--- out/legacy-debug --
-<0>{a: 100, b: 200, c: [100,100], s1: <1>{a: 1, b: 2, c: 3}, s2: <2>{a: 1, b: 2, c: 3}, s3: <3>{a: 1, b: 2, c: 3}}
 -- out/compile --
 --- in.cue
 {
@@ -220,16 +166,6 @@ s3:
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  62
-Reused: 55
-Allocs: 7
-Retain: 10
-
-Unifications: 62
-Conjuncts:    105
-Disjuncts:    70
 -- out/eval --
 (struct){
   math: (struct){

@@ -10,16 +10,6 @@ x: {
 	#Schema
 	#Schema: close({ a: b: int})
 }
--- out/eval/stats --
-Leaks:  4
-Freed:  14
-Reused: 9
-Allocs: 9
-Retain: 6
-
-Unifications: 18
-Conjuncts:    32
-Disjuncts:    20
 -- out/eval --
 (#struct){
   c: (string){ "foo" }

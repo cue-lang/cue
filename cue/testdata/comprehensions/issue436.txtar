@@ -19,20 +19,6 @@ match: a & {
 not: a & {
 	val: "other"
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  25
-Reused: 20
-Allocs: 5
-Retain: 0
-
-Unifications: 13
-Conjuncts:    44
-Disjuncts:    25
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 3
 -- out/eval --
 (struct){
   #a: (#struct){

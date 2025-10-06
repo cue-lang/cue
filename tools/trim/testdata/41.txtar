@@ -106,25 +106,3 @@ diff old new
  	}
  }
  
--- out/trim --
-== a.cue
-base: helm: {}
-base: #HelmRelease
-
-#HelmRelease: {
-	helm: {
-		#WithHelmUtils
-	}
-}
-
-#HelmUtils: {
-	cacert?: string | *"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-}
-
-#WithHelmUtils: {
-	values: {
-		utils
-		...
-	}
-	utils: #HelmUtils
-}

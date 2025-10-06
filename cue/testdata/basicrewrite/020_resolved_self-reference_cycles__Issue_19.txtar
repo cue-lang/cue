@@ -12,30 +12,6 @@ z3: z1 - 3
 z3: 8
 
 // TODO: extensive tests with disjunctions.
--- out/def --
-// CUE knows how to resolve the following:
-x:  200
-y:  100
-z1: 11
-z2: 10
-z3: 8
--- out/export --
-// CUE knows how to resolve the following:
-x:  200
-y:  100
-z1: 11
-z2: 10
-z3: 8
--- out/yaml --
-x: 200
-y: 100
-z1: 11
-z2: 10
-z3: 8
--- out/json --
-{"x":200,"y":100,"z1":11,"z2":10,"z3":8}
--- out/legacy-debug --
-<0>{x: 200, y: 100, z1: 11, z2: 10, z3: 8}
 -- out/compile --
 --- in.cue
 {
@@ -47,16 +23,6 @@ z3: 8
   z3: (〈0;z1〉 - 3)
   z3: 8
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  6
-Reused: 2
-Allocs: 4
-Retain: 3
-
-Unifications: 6
-Conjuncts:    6
-Disjuncts:    8
 -- out/eval --
 (struct){
   x: (int){ 200 }

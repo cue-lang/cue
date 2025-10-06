@@ -21,25 +21,6 @@ def: {
 	#b: 3
 }
 e7: def["b"]
--- out/def --
-a: 2
-b: "bar"
-c: _|_ // invalid list index "3" (type string)
-l: []
-d:  _|_ // index 0 out of bounds
-e1: _|_ // invalid list index "" (type string)
-e2: _|_ // invalid operation: 2[2] (type int does not support indexing)
-e3: _|_ // invalid list index true (type bool)
-e4: _|_ // index 3 out of bounds
-e5: _|_ // invalid list index -1 (index must be non-negative)
-e6: _|_ // index 1 out of bounds
-def: {
-	a:  1
-	#b: 3
-}
-e7: def["b"]
--- out/legacy-debug --
-<0>{a: 2, b: "bar", c: _|_("3":invalid list index "3" (type string)), l: [], d: _|_([]:index 0 out of bounds), e1: _|_("":invalid list index "" (type string)), e2: _|_(2:invalid operation: 2[2] (type int does not support indexing)), e3: _|_(true:invalid list index true (type bool)), e4: _|_([1,2,3]:index 3 out of bounds), e5: _|_(-1:invalid list index -1 (index must be non-negative)), e6: _|_([]:index 1 out of bounds), def: <1>{a: 1, #b: 3}, e7: <2>.def["b"]}
 -- out/compile --
 --- in.cue
 {
@@ -89,16 +70,6 @@ e7: def["b"]
   }
   e7: 〈0;def〉["b"]
 }
--- out/eval/stats --
-Leaks:  10
-Freed:  32
-Reused: 26
-Allocs: 16
-Retain: 12
-
-Unifications: 34
-Conjuncts:    44
-Disjuncts:    42
 -- out/evalalpha --
 Errors:
 c: undefined field: "3":
@@ -256,92 +227,3 @@ diff old new
      //     ./in.cue:14:16
    }
    def: (struct){
--- diff/todo/p3 --
-Error messages slightly different.
--- out/eval --
-Errors:
-c: invalid list index "3" (type string):
-    ./in.cue:3:20
-d: index out of range [0] with length 0:
-    ./in.cue:4:16
-e1: invalid list index "" (type string):
-    ./in.cue:6:9
-e2: invalid operand 2 (found int, want list or struct):
-    ./in.cue:7:5
-e3: invalid index true (invalid type bool):
-    ./in.cue:8:5
-    ./in.cue:8:8
-e4: index out of range [3] with length 3:
-    ./in.cue:9:15
-e5: invalid index -1 (index must be non-negative):
-    ./in.cue:10:5
-    ./in.cue:10:15
-e6: invalid list index 1 (out of bounds):
-    ./in.cue:11:16
-e7: index out of range [3] with length 3:
-    ./in.cue:12:15
-e8: invalid index -1 (index must be non-negative):
-    ./in.cue:13:5
-    ./in.cue:13:15
-e9: invalid list index 1 (out of bounds):
-    ./in.cue:14:16
-
-Result:
-(_|_){
-  // [eval]
-  a: (int){ 2 }
-  b: (string){ "bar" }
-  c: (_|_){
-    // [eval] c: invalid list index "3" (type string):
-    //     ./in.cue:3:20
-  }
-  d: (_|_){
-    // [eval] d: index out of range [0] with length 0:
-    //     ./in.cue:4:16
-  }
-  l: (#list){
-  }
-  e1: (_|_){
-    // [eval] e1: invalid list index "" (type string):
-    //     ./in.cue:6:9
-  }
-  e2: (_|_){
-    // [eval] e2: invalid operand 2 (found int, want list or struct):
-    //     ./in.cue:7:5
-  }
-  e3: (_|_){
-    // [eval] e3: invalid index true (invalid type bool):
-    //     ./in.cue:8:5
-    //     ./in.cue:8:8
-  }
-  e4: (_|_){
-    // [eval] e4: index out of range [3] with length 3:
-    //     ./in.cue:9:15
-  }
-  e5: (_|_){
-    // [eval] e5: invalid index -1 (index must be non-negative):
-    //     ./in.cue:10:5
-    //     ./in.cue:10:15
-  }
-  e6: (_|_){
-    // [eval] e6: invalid list index 1 (out of bounds):
-    //     ./in.cue:11:16
-  }
-  e7: (_|_){
-    // [eval] e7: index out of range [3] with length 3:
-    //     ./in.cue:12:15
-  }
-  e8: (_|_){
-    // [eval] e8: invalid index -1 (index must be non-negative):
-    //     ./in.cue:13:5
-    //     ./in.cue:13:15
-  }
-  e9: (_|_){
-    // [eval] e9: invalid list index 1 (out of bounds):
-    //     ./in.cue:14:16
-  }
-  def: (struct){
-    a: (int){ 1 }
-    #b: (int){ 3 }
-  }
-}

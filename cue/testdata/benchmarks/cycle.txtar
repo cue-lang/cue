@@ -43,16 +43,6 @@ sameValues: CmustBeA: {
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  25
-Reused: 15
-Allocs: 10
-Retain: 1
-
-Unifications: 15
-Conjuncts:    30
-Disjuncts:    26
 -- out/evalalpha --
 (struct){
   sameValues: (struct){
@@ -101,29 +91,3 @@ diff old new
      }
    }
  }
--- out/eval --
-(struct){
-  sameValues: (struct){
-    SmustBeF: (struct){
-      T: (string){ string }
-      F: (struct){
-        x: (string){ string }
-      }
-      S: (struct){
-        x: (string){ string }
-      }
-    }
-    CmustBeA: (struct){
-      A: (struct){
-        x: (#list){
-          0: (string){ string }
-        }
-      }
-      C: (struct){
-        x: (#list){
-          0: (string){ string }
-        }
-      }
-    }
-  }
-}

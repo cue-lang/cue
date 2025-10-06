@@ -19,16 +19,6 @@ c2: #C2 & {
 	c1
 	age: 5
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 8
-Allocs: 3
-Retain: 0
-
-Unifications: 11
-Conjuncts:    27
-Disjuncts:    11
 -- out/evalalpha --
 (struct){
   #C1: (#struct){
@@ -67,25 +57,6 @@ diff old new
 +    name: (string){ "cueckoo" }
    }
  }
--- diff/explanation --
-Reordering
--- out/eval --
-(struct){
-  #C1: (#struct){
-    name: (string){ string }
-  }
-  #C2: (#struct){
-    name: (string){ string }
-    age: (int){ int }
-  }
-  c1: (#struct){
-    name: (string){ "cueckoo" }
-  }
-  c2: (#struct){
-    name: (string){ "cueckoo" }
-    age: (int){ 5 }
-  }
-}
 -- out/compile --
 --- x.cue
 {

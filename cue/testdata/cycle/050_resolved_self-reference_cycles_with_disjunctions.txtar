@@ -4,24 +4,6 @@
 a: b & {x: 1} | {y:     1} // {x:1,y:3,z:2} | {y:1}
 b: {x:     2} | c & {z: 2} // {x:2} | {x:1,y:3,z:2}
 c: a & {y: 3} | {z:     3} // {x:1,y:3,z:2} | {z:3}
--- out/def --
-a: b & {
-	x: 1
-} | {
-	y: 1
-}
-b: {
-	x: 2
-} | c & {
-	z: 2
-}
-c: a & {
-	y: 3
-} | {
-	z: 3
-}
--- out/legacy-debug --
-<0>{a: (<1>{x: 1, y: 3, z: 2} | <2>{y: 1}), b: (<3>{x: 2} | <4>{x: 1, y: 3, z: 2}), c: (<5>{x: 1, y: 3, z: 2} | <6>{z: 3})}
 -- out/compile --
 --- in.cue
 {
@@ -41,16 +23,6 @@ c: a & {
     z: 3
   })
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  43
-Reused: 32
-Allocs: 11
-Retain: 0
-
-Unifications: 25
-Conjuncts:    64
-Disjuncts:    43
 -- out/eval --
 (struct){
   a: (struct){ |((struct){

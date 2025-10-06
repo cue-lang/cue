@@ -8,24 +8,6 @@
 	vx:   arg.x
 	vy:   arg.y
 }
--- out/def --
-#T: {
-	arg: {
-		x: string
-	}
-	out1: _|_ // undefined field "y"
-	out2: _|_ // undefined field "y"
-	vx:   arg.x
-	vy:   _|_ // undefined field "y"
-}
--- out/export --
-
--- out/yaml --
-{}
--- out/json --
-{}
--- out/legacy-debug --
-<0>{#T: <1>C{arg: <2>C{x: string}, out1: _|_(<3>.arg.y:undefined field "y"), out2: _|_(<3>.arg.y:undefined field "y"), vx: string, vy: _|_(<3>.arg.y:undefined field "y")}}
 -- out/compile --
 --- in.cue
 {
@@ -39,16 +21,6 @@
     vy: 〈0;arg〉.y
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  8
-Reused: 4
-Allocs: 4
-Retain: 0
-
-Unifications: 8
-Conjuncts:    9
-Disjuncts:    8
 -- out/eval --
 Errors:
 #T.out1: invalid interpolation: undefined field: y:

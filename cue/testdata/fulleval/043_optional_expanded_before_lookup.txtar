@@ -11,45 +11,6 @@ test: A: {
 }
 
 B: test.A & {}
--- out/def --
-test: {
-	{[ID=string]: {
-		name: ID
-	}}
-	A: {
-		name:   "A"
-		field1: "1"
-		field2: "2"
-	}
-}
-B: test.A & {}
--- out/export --
-test: {
-	A: {
-		name:   "A"
-		field1: "1"
-		field2: "2"
-	}
-}
-B: {
-	name:   "A"
-	field1: "1"
-	field2: "2"
-}
--- out/yaml --
-test:
-  A:
-    name: A
-    field1: "1"
-    field2: "2"
-B:
-  name: A
-  field1: "1"
-  field2: "2"
--- out/json --
-{"test":{"A":{"name":"A","field1":"1","field2":"2"}},"B":{"name":"A","field1":"1","field2":"2"}}
--- out/legacy-debug --
-<0>{test: <1>{[]: <2>(ID: string)-><3>{name: <2>.ID}, A: <4>{name: "A", field1: "1", field2: "2"}}, B: <5>{name: "A", field1: "1", field2: "2"}}
 -- out/compile --
 --- in.cue
 {
@@ -66,16 +27,6 @@ B:
   }
   B: (〈0;test〉.A & {})
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  10
-Reused: 6
-Allocs: 4
-Retain: 0
-
-Unifications: 10
-Conjuncts:    15
-Disjuncts:    10
 -- out/eval --
 (struct){
   test: (struct){

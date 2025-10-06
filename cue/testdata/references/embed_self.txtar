@@ -3,16 +3,6 @@ Foo: {
 }
 
 Foo
--- out/eval/stats --
-Leaks:  0
-Freed:  2
-Reused: 0
-Allocs: 2
-Retain: 1
-
-Unifications: 2
-Conjuncts:    4
-Disjuncts:    3
 -- out/eval --
 (struct){
   Foo: (struct){

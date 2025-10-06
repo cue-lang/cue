@@ -2,16 +2,6 @@
 root2: 1
 #Root2: {}
 #Root2
--- out/eval/stats --
-Leaks:  0
-Freed:  3
-Reused: 0
-Allocs: 3
-Retain: 1
-
-Unifications: 3
-Conjuncts:    5
-Disjuncts:    4
 -- out/eval --
 (#struct){
   root2: (int){ 1 }

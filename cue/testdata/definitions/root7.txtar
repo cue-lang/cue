@@ -1,16 +1,6 @@
 -- in.cue --
 root: input: #deps: root: {}
 {root.input.#deps}
--- out/eval/stats --
-Leaks:  0
-Freed:  5
-Reused: 0
-Allocs: 5
-Retain: 3
-
-Unifications: 5
-Conjuncts:    9
-Disjuncts:    8
 -- out/eval --
 (#struct){
   root: (#struct){

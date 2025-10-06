@@ -2,16 +2,6 @@
 a: [{a: 1}, {b: 2 & 3}]
 
 b: [for x in a {x}]
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 3
-Allocs: 4
-Retain: 0
-
-Unifications: 7
-Conjuncts:    8
-Disjuncts:    7
 -- out/eval --
 Errors:
 a.1.b: conflicting values 3 and 2:

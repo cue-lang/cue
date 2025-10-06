@@ -28,51 +28,6 @@ x: {
 	s:   string
 	out: yaml.Marshal({"s": s})
 }
--- out/def --
-import (
-	"encoding/json"
-	"encoding/yaml"
-	"text/template"
-)
-
-x: {
-	s: "myname"
-	#T
-}
-#T: {
-	s: string
-	S = s
-	out: template.Execute("{{.s}}", {
-		s: S
-	})
-}
-#V: {
-	s: string
-	S658221 = s
-	out: json.Marshal({
-		s: S658221
-	})
-}
-#U: {
-	s: string
-	S629a0f = s
-	out: yaml.Marshal({
-		s: S629a0f
-	})
-}
--- out/export --
-x: {
-	s:   "myname"
-	out: "myname"
-}
--- out/yaml --
-x:
-  s: myname
-  out: myname
--- out/json --
-{"x":{"s":"myname","out":"myname"}}
--- out/legacy-debug --
-<0>{x: <1>C{s: "myname", out: "myname"}, #T: <2>C{s: string, out: <3>.Execute ("{{.s}}",<4>C{s: <5>.s})}, #V: <6>C{s: string, out: <7>.Marshal (<8>C{s: <9>.s})}, #U: <10>C{s: string, out: <11>.Marshal (<12>C{s: <13>.s})}}
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  21
@@ -109,16 +64,6 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 3
--- out/eval/stats --
-Leaks:  0
-Freed:  45
-Reused: 39
-Allocs: 6
-Retain: 17
-
-Unifications: 45
-Conjuncts:    77
-Disjuncts:    62
 -- out/evalalpha --
 (struct){
   x: (#struct){
@@ -171,36 +116,6 @@ diff old new
      }
    }
  }
--- out/eval --
-(struct){
-  x: (#struct){
-    s: (string){ "myname" }
-    out: (string){ "myname" }
-  }
-  #T: (#struct){
-    s: (string){ string }
-    out: (_|_){
-      // [incomplete] #T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
-      //     ./in.cue:14:7
-      //     ./in.cue:15:3
-    }
-  }
-  #V: (#struct){
-    s: (string){ string }
-    out: (_|_){
-      // [incomplete] cannot convert incomplete value "string" to JSON:
-      //     ./in.cue:20:7
-    }
-  }
-  #U: (#struct){
-    s: (string){ string }
-    out: (_|_){
-      // [incomplete] #U.out: error in call to encoding/yaml.Marshal: incomplete value string:
-      //     ./in.cue:26:7
-      //     ./in.cue:25:7
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

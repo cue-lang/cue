@@ -36,20 +36,6 @@ binOp: {
 unaryOp: {
 	a: -num
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  30
-Reused: 25
-Allocs: 5
-Retain: 0
-
-Unifications: 22
-Conjuncts:    33
-Disjuncts:    30
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 2
 -- out/eval --
 (struct){
   list: (list){ |(*(#list){

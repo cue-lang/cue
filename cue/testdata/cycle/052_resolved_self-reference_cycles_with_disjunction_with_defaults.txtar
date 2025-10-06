@@ -44,52 +44,6 @@ z1: *(z2 + 1) | z3+5
 z2: z3 + 2
 z3: z1 - 3
 z3: 8
--- out/def --
-// The disjunction in xa could be resolved, but as disjunctions
-// are not resolved for expression, it remains unresolved.
-xa1: 8
-xa2: 8
-xa4: 10
-xa3: 6
-
-// As xb3 is a disjunction, xb2 cannot be resolved and evaluating
-// the cycle completely is broken. However, it is not an error
-// as the user might still resolve the disjunction.
-xb1: 8
-xb2: 8
-xb4: 10
-xb3: 6
-
-// Another variant with more disjunctions. xc1 remains with two
-// possibilities. Technically, only the first value is valid.
-// However, to fully determine that, all options of the remaining
-// disjunction will have to be evaluated algebraically, which is
-// not done.
-xc1: *8 | 9 | _|_ // conflicting values 10 and 9
-xc2: 8
-xc4: 9
-xc5: 10
-xc3: 6
-
-// The above is resolved by setting xd1 explicitly.
-xd1: *8 | 9 | _|_ // conflicting values 10 and 9
-xd2: 8
-xd4: 9
-xd5: 10
-xd3: 6
-
-// The above is resolved by setting xd1 explicitly to the wrong
-// value, resulting in an error.
-xe1: _|_ // conflicting values 6 and 7
-xe2: _|_ // conflicting values 6 and 7
-xe4: _|_ // conflicting values 6 and 7
-xe5: _|_ // conflicting values 6 and 7
-xe3: _|_ // conflicting values 6 and 7
-z1:  *11 | 13
-z2:  10
-z3:  8
--- out/legacy-debug --
-<0>{xa1: 8, xa2: 8, xa4: 10, xa3: 6, xb1: 8, xb2: 8, xb4: 10, xb3: 6, xc1: (*8 | 9), xc2: 8, xc4: 9, xc5: 10, xc3: 6, xd1: (*8 | 9), xd2: 8, xd4: 9, xd5: 10, xd3: 6, xe1: _|_((6 & 7):conflicting values 6 and 7), xe2: _|_((6 & 7):conflicting values 6 and 7), xe4: _|_((6 & 7):conflicting values 6 and 7), xe5: _|_((6 & 7):conflicting values 6 and 7), xe3: _|_((6 & 7):conflicting values 6 and 7), z1: (*11 | 13), z2: 10, z3: 8}
 -- out/compile --
 --- in.cue
 {
@@ -122,16 +76,6 @@ z3:  8
   z3: (〈0;z1〉 - 3)
   z3: 8
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  44
-Reused: 36
-Allocs: 8
-Retain: 25
-
-Unifications: 27
-Conjuncts:    82
-Disjuncts:    58
 -- out/evalalpha --
 Errors:
 xe3: conflicting values 7 and 6:
@@ -249,45 +193,3 @@ diff old new
    xc1: (int){ |(*(int){ 8 }, (int){ 9 }) }
    xc2: (int){ 8 }
    xc3: (int){ 6 }
--- diff/todo/p2 --
-xb*: cycles are not broken if between disjuncts if they are within expressions.
--- out/eval --
-Errors:
-xe3: conflicting values 7 and 6:
-    ./in.cue:35:6
-    ./in.cue:35:10
-
-Result:
-(_|_){
-  // [eval]
-  xa1: (int){ 8 }
-  xa2: (int){ 8 }
-  xa3: (int){ 6 }
-  xa4: (int){ 10 }
-  xb1: (int){ 8 }
-  xb2: (int){ 8 }
-  xb3: (int){ |(*(int){ 6 }, (int){ 9 }) }
-  xb4: (int){ 10 }
-  xc1: (int){ |(*(int){ 8 }, (int){ 9 }) }
-  xc2: (int){ 8 }
-  xc3: (int){ 6 }
-  xc4: (int){ 9 }
-  xc5: (int){ 10 }
-  xd1: (int){ |(*(int){ 8 }, (int){ 9 }) }
-  xd2: (int){ 8 }
-  xd3: (int){ 6 }
-  xd4: (int){ 9 }
-  xd5: (int){ 10 }
-  xe1: (int){ 9 }
-  xe2: (int){ 8 }
-  xe3: (_|_){
-    // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:35:6
-    //     ./in.cue:35:10
-  }
-  xe4: (int){ 9 }
-  xe5: (int){ 10 }
-  z1: (int){ |(*(int){ 11 }, (int){ 13 }) }
-  z2: (int){ 10 }
-  z3: (int){ 8 }
-}

@@ -18,16 +18,6 @@ n1: "\(1) \(2.00)"
 
 // but normalize representation
 n2: "\(1e2)"
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 9
-Allocs: 2
-Retain: 0
-
-Unifications: 11
-Conjuncts:    12
-Disjuncts:    11
 -- out/eval --
 (struct){
   bool1: (string){ "1+1=2:  true" }

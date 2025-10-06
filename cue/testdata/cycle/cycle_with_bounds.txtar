@@ -19,16 +19,6 @@ foo: 1
   bar: 0
   foo: 1
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  4
-Reused: 1
-Allocs: 3
-Retain: 1
-
-Unifications: 4
-Conjuncts:    9
-Disjuncts:    4
 -- out/eval --
 (struct){
   #Value: (int){ int }

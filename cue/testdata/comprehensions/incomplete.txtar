@@ -5,18 +5,6 @@ top: _
 a: [ if cond {}]
 b: [for x in src.foo {}]
 c: {for x in top {}}
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 5
-Allocs: 2
-Retain: 0
-
-Unifications: 7
-Conjuncts:    7
-Disjuncts:    7
-
-NumCloseIDs: 1
 -- out/eval --
 (struct){
   cond: (bool){ bool }

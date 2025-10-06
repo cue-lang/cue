@@ -5,11 +5,6 @@
 	"_foo": int
 	_bar:   int
 }
--- out/def --
-$type:  3
-"_":    int
-"_foo": int
-_bar:   int
 -- out/compile --
 --- in.cue
 {
@@ -20,16 +15,6 @@ _bar:   int
     _bar: int
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  5
-Reused: 3
-Allocs: 2
-Retain: 0
-
-Unifications: 5
-Conjuncts:    6
-Disjuncts:    5
 -- out/eval --
 (struct){
   $type: (int){ 3 }

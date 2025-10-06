@@ -70,20 +70,6 @@ full: {
 		"username": "foo"
 	}
 }
--- out/eval/stats --
-Leaks:  3
-Freed:  23
-Reused: 17
-Allocs: 9
-Retain: 58
-
-Unifications: 26
-Conjuncts:    50
-Disjuncts:    56
-
-MisalignedConjunct: 5
-
-NumCloseIDs: 3
 -- out/eval --
 Errors:
 out: cannot combine regular field "val" with "b":

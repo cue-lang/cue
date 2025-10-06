@@ -24,16 +24,6 @@ foo: [{type: "string"}] & [...#Value]
 foo: [{type: "string"}] & [...#Value]
 foo: [{type: "float"}] & [...#Value]
 foo: [{type: "float"}] & [...#Value]
--- out/eval/stats --
-Leaks:  0
-Freed:  16
-Reused: 10
-Allocs: 6
-Retain: 0
-
-Unifications: 10
-Conjuncts:    94
-Disjuncts:    16
 -- out/evalalpha --
 Errors:
 foo.0.type: conflicting values "string" and "float":
@@ -94,50 +84,6 @@ diff old new
        type: (_|_){
          // [eval] foo.0.type: conflicting values "string" and "float":
          //     ./in.cue:5:14
--- diff/explanation --
-Improved and simplified error message which can be detected before disjunction.
--- out/eval --
-Errors:
-foo.0: 2 errors in empty disjunction:
-foo.0.type: conflicting values "int" and "float":
-    ./in.cue:3:16
-    ./in.cue:5:14
-    ./in.cue:5:27
-    ./in.cue:5:30
-foo.0.type: conflicting values "string" and "float":
-    ./in.cue:5:14
-    ./in.cue:10:14
-
-Result:
-(_|_){
-  // [eval]
-  #Value: (#struct){ |((#struct){
-      type: (string){ "int" }
-    }, (#struct){
-      type: (string){ "float" }
-    }, (#struct){
-      type: (string){ "string" }
-    }) }
-  foo: (_|_){
-    // [eval]
-    0: (_|_){
-      // [eval] foo.0: 2 errors in empty disjunction:
-      // foo.0.type: conflicting values "int" and "float":
-      //     ./in.cue:3:16
-      //     ./in.cue:5:14
-      //     ./in.cue:5:27
-      //     ./in.cue:5:30
-      // foo.0.type: conflicting values "string" and "float":
-      //     ./in.cue:5:14
-      //     ./in.cue:10:14
-      type: (_|_){
-        // [eval] foo.0.type: conflicting values "string" and "float":
-        //     ./in.cue:5:14
-        //     ./in.cue:10:14
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

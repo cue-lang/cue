@@ -24,32 +24,6 @@ jobs2: fooTest: name: "badName" // faulty
 jobs3: #Jobs
 jobs3: [string]: #Job
 jobs3: fooTest1: name: "badName" // faulty
--- out/def --
-#JobID: =~"^[a-zA-Z]*$"
-#Job: {
-	name: string
-	cmd:  string
-}
-#Jobs: {
-	{[#JobID]: #Job}
-	{[=~"Test$"]: {
-		name: =~"^test", ...
-	}}
-}
-jobs: {
-	foo: {
-		name: "allGood"
-	}
-}
-jobs1: _|_ // field "foo1" not allowed in closed struct
-jobs2: #Jobs & {
-	fooTest: {
-		name: "badName"
-	}
-}
-jobs3: _|_ // field "fooTest1" not allowed in closed struct
--- out/legacy-debug --
-<0>{#JobID: =~"^[a-zA-Z]*$", #Job: <1>C{name: string, cmd: string}, #Jobs: <2>C{[=~"^[a-zA-Z]*$"]: <3>(_: string)-><4>.#Job, [=~"Test$"]: <5>(_: string)-><6>C{name: =~"^test"}, }, jobs: <7>{foo: <8>{name: "allGood"}}, jobs1: _|_(<9>{}:field "foo1" not allowed in closed struct), jobs2: <10>C{[=~"^[a-zA-Z]*$"]: <11>(_: string)-><4>.#Job, [=~"Test$"]: <12>(_: string)-><13>C{name: =~"^test"}, fooTest: _|_(string:field "cmd" not allowed in closed struct)}, jobs3: _|_(<14>{name: "badName"}:field "fooTest1" not allowed in closed struct)}
 -- out/compile --
 --- in.cue
 {
@@ -98,16 +72,6 @@ jobs3: _|_ // field "fooTest1" not allowed in closed struct
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  19
-Reused: 15
-Allocs: 4
-Retain: 0
-
-Unifications: 19
-Conjuncts:    45
-Disjuncts:    19
 -- out/evalalpha --
 Errors:
 jobs1.foo1: field not allowed:
@@ -228,79 +192,3 @@ diff old new
      }
    }
  }
--- diff/todo/p2 --
-Missing error positions.
--- out/eval --
-Errors:
-jobs1.foo1: field not allowed:
-    ./in.cue:6:8
-    ./in.cue:7:2
-    ./in.cue:9:2
-    ./in.cue:15:17
-    ./in.cue:16:8
-jobs3.fooTest1: field not allowed:
-    ./in.cue:6:8
-    ./in.cue:7:2
-    ./in.cue:9:2
-    ./in.cue:21:8
-    ./in.cue:22:8
-    ./in.cue:23:8
-jobs2.fooTest.name: invalid value "badName" (out of bound =~"^test"):
-    ./in.cue:9:22
-    ./in.cue:3:8
-    ./in.cue:19:23
-
-Result:
-(_|_){
-  // [eval]
-  #JobID: (string){ =~"^[a-zA-Z]*$" }
-  #Job: (#struct){
-    name: (string){ string }
-    cmd: (string){ string }
-  }
-  #Jobs: (#struct){
-  }
-  jobs: (struct){
-    foo: (struct){
-      name: (string){ "allGood" }
-    }
-  }
-  jobs1: (_|_){
-    // [eval]
-    foo1: (_|_){
-      // [eval] jobs1.foo1: field not allowed:
-      //     ./in.cue:6:8
-      //     ./in.cue:7:2
-      //     ./in.cue:9:2
-      //     ./in.cue:15:17
-      //     ./in.cue:16:8
-    }
-  }
-  jobs2: (_|_){
-    // [eval]
-    fooTest: (_|_){
-      // [eval]
-      name: (_|_){
-        // [eval] jobs2.fooTest.name: invalid value "badName" (out of bound =~"^test"):
-        //     ./in.cue:9:22
-        //     ./in.cue:3:8
-        //     ./in.cue:19:23
-      }
-      cmd: (string){ string }
-    }
-  }
-  jobs3: (_|_){
-    // [eval]
-    fooTest1: (_|_){
-      // [eval] jobs3.fooTest1: field not allowed:
-      //     ./in.cue:6:8
-      //     ./in.cue:7:2
-      //     ./in.cue:9:2
-      //     ./in.cue:21:8
-      //     ./in.cue:22:8
-      //     ./in.cue:23:8
-      name: (string){ "badName" }
-      cmd: (string){ string }
-    }
-  }
-}

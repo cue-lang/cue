@@ -8,35 +8,6 @@ a: {
 		"\(k)": v
 	}
 }
--- out/def --
-a: {
-	b: {
-		c: 4
-		d: 5
-	}
-	c: 4
-	d: 5
-}
--- out/export --
-a: {
-	b: {
-		c: 4
-		d: 5
-	}
-	c: 4
-	d: 5
-}
--- out/yaml --
-a:
-  b:
-    c: 4
-    d: 5
-  c: 4
-  d: 5
--- out/json --
-{"a":{"b":{"c":4,"d":5},"c":4,"d":5}}
--- out/legacy-debug --
-<0>{a: <1>{b: <2>{c: 4, d: 5}, c: 4, d: 5}}
 -- out/compile --
 --- in.cue
 {
@@ -54,20 +25,6 @@ a:
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 3
-Allocs: 4
-Retain: 1
-
-Unifications: 7
-Conjuncts:    13
-Disjuncts:    8
-
-MisalignedConjunct: 2
-
-NumCloseIDs: 1
 -- out/eval --
 (struct){
   a: (struct){

@@ -7,20 +7,6 @@ if #E["y"] != _|_ {
 }
 #E: [_]: bool
 #E: x:   true
--- out/eval/stats --
-Leaks:  0
-Freed:  5
-Reused: 1
-Allocs: 4
-Retain: 2
-
-Unifications: 5
-Conjuncts:    7
-Disjuncts:    5
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 2
 -- out/eval --
 (struct){
   #E: (#struct){

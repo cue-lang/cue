@@ -1,40 +1,9 @@
 -- in.cue --
 "hello\nworld"
--- out/def --
-"""
-        hello
-        world
-        """
--- out/export --
-"""
-        hello
-        world
-        """
--- out/yaml --
-|-
-  hello
-  world
--- out/json --
-"hello\nworld"
--- out/legacy-debug --
-"""
-        hello
-        world
-        """
 -- out/compile --
 --- in.cue
 {
   "hello\nworld"
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  1
-Reused: 0
-Allocs: 1
-Retain: 0
-
-Unifications: 1
-Conjuncts:    2
-Disjuncts:    1
 -- out/eval --
 (string){ "hello\nworld" }

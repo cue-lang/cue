@@ -26,18 +26,6 @@ y: {{{for a in a {}}}}
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  4
-Reused: 2
-Allocs: 2
-Retain: 0
-
-Unifications: 4
-Conjuncts:    7
-Disjuncts:    4
-
-NumCloseIDs: 2
 -- out/eval --
 (struct){
   a: (#list){

@@ -34,16 +34,6 @@ z: #PrestepNewUser & {
 		}]
 	}
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  45
-Reused: 36
-Allocs: 9
-Retain: 1
-
-Unifications: 29
-Conjuncts:    71
-Disjuncts:    46
 -- out/eval --
 (struct){
   #Prestep: (#struct){

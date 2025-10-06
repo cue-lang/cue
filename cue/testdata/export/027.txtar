@@ -10,16 +10,6 @@ eval: true
 		#Bar: #Foo | string
 	}
 }
--- out/def --
-#Foo: {
-	#Bar: #Foo | string
-}
--- out/export --
-
--- out/yaml --
-{}
--- out/json --
-{}
 -- out/compile --
 --- in.cue
 {
@@ -29,16 +19,6 @@ eval: true
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  5
-Reused: 1
-Allocs: 4
-Retain: 0
-
-Unifications: 3
-Conjuncts:    6
-Disjuncts:    5
 -- out/eval --
 (struct){
   #Foo: (#struct){

@@ -17,16 +17,6 @@ t1: {
 
 	x: #d1 & #d2
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  15
-Reused: 10
-Allocs: 5
-Retain: 0
-
-Unifications: 15
-Conjuncts:    23
-Disjuncts:    15
 -- out/evalalpha --
 Errors:
 t0.v: conflicting values string and int (mismatched types string and int):
@@ -108,59 +98,6 @@ diff old new
        //     ./in.cue:5:9
      }
    }
--- out/eval --
-Errors:
-t0.v: conflicting values int and string (mismatched types int and string):
-    ./in.cue:1:4
-    ./in.cue:2:4
-    ./in.cue:5:9
-t1.x.a.b: conflicting values 4 and 3:
-    ./in.cue:10:9
-    ./in.cue:14:9
-    ./in.cue:17:5
-    ./in.cue:17:11
-
-Result:
-(_|_){
-  // [eval]
-  i: (int){ int }
-  s: (string){ string }
-  t0: (_|_){
-    // [eval]
-    v: (_|_){
-      // [eval] t0.v: conflicting values int and string (mismatched types int and string):
-      //     ./in.cue:1:4
-      //     ./in.cue:2:4
-      //     ./in.cue:5:9
-    }
-  }
-  t1: (_|_){
-    // [eval]
-    #d1: (#struct){
-      a: (#struct){
-        b: (int){ 3 }
-      }
-    }
-    #d2: (#struct){
-      a: (#struct){
-        b: (int){ 4 }
-      }
-    }
-    x: (_|_){
-      // [eval]
-      a: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] t1.x.a.b: conflicting values 4 and 3:
-          //     ./in.cue:10:9
-          //     ./in.cue:14:9
-          //     ./in.cue:17:5
-          //     ./in.cue:17:11
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

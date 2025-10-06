@@ -4,12 +4,6 @@
 a: *"a" | "b"
 b: *"b" | "a"
 c: a & b
--- out/def --
-a: *"a" | "b"
-b: *"b" | "a"
-c: a & b
--- out/legacy-debug --
-<0>{a: "a", b: "b", c: ("a" | "b")}
 -- out/compile --
 --- in.cue
 {
@@ -17,16 +11,6 @@ c: a & b
   b: (*"b"|"a")
   c: (〈0;a〉 & 〈0;b〉)
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  14
-Reused: 7
-Allocs: 7
-Retain: 0
-
-Unifications: 4
-Conjuncts:    17
-Disjuncts:    14
 -- out/eval --
 (struct){
   a: (string){ |(*(string){ "a" }, (string){ "b" }) }

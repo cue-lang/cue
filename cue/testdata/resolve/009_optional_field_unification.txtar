@@ -9,41 +9,6 @@ d: a & {"foo"?: "bar"}
 g1:       1
 "g\(1)"?: 1
 "g\(2)"?: 2
--- out/def --
-a: {
-	foo?: string
-}
-b: {
-	foo: "foo"
-}
-c: a & b
-d: a & {
-	foo?: "bar"
-}
-g1:  1
-g2?: 2
--- out/export --
-a: {}
-b: {
-	foo: "foo"
-}
-c: {
-	foo: "foo"
-}
-d: {}
-g1: 1
--- out/yaml --
-a: {}
-b:
-  foo: foo
-c:
-  foo: foo
-d: {}
-g1: 1
--- out/json --
-{"a":{},"b":{"foo":"foo"},"c":{"foo":"foo"},"d":{},"g1":1}
--- out/legacy-debug --
-<0>{a: <1>{foo?: string}, b: <2>{foo: "foo"}, c: <3>{foo: "foo"}, d: <4>{foo?: "bar"}, g1: 1, g2?: 2}
 -- out/compile --
 --- in.cue
 {
@@ -61,16 +26,6 @@ g1: 1
   "g\(1)"?: 1
   "g\(2)"?: 2
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 8
-Allocs: 3
-Retain: 0
-
-Unifications: 11
-Conjuncts:    19
-Disjuncts:    11
 -- out/eval --
 (struct){
   a: (struct){

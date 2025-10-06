@@ -24,16 +24,6 @@ andInPattern: {
 	}
 	#constraints: [=~"^.*$"]
 }
--- out/eval/stats --
-Leaks:  2
-Freed:  18
-Reused: 12
-Allocs: 8
-Retain: 3
-
-Unifications: 20
-Conjuncts:    27
-Disjuncts:    21
 -- out/eval --
 Errors:
 fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):

@@ -30,20 +30,6 @@ t: p: "foo"
 	x: close({ f1: int })
 	x: f2: 2
 }
--- out/eval/stats --
-Leaks:  3
-Freed:  16
-Reused: 12
-Allocs: 7
-Retain: 4
-
-Unifications: 19
-Conjuncts:    33
-Disjuncts:    20
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 4
 -- out/evalalpha --
 Errors:
 #V1.x.f2: field not allowed:
@@ -128,62 +114,6 @@ diff old new
      }
    }
  }
--- diff/todo/p2 --
-Missing positions
--- diff/todo/p3 --
-Reordering
--- out/eval --
-Errors:
-#V1.x.f2: field not allowed:
-    ./variant1.cue:2:11
-    ./variant1.cue:3:5
-z.x.f2: field not allowed:
-    ./in.cue:2:2
-    ./in.cue:5:12
-    ./in.cue:11:4
-    ./in.cue:14:3
-
-Result:
-(_|_){
-  // [eval]
-  #T: (#struct){
-    x: (#struct){
-      f1: (int){ int }
-    }
-  }
-  z: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval]
-      f1: (int){ 99 }
-      f2: (_|_){
-        // [eval] z.x.f2: field not allowed:
-        //     ./in.cue:2:2
-        //     ./in.cue:5:12
-        //     ./in.cue:11:4
-        //     ./in.cue:14:3
-      }
-    }
-  }
-  t: (#struct){
-    p: (string){ "foo" }
-  }
-  #C: (#struct){
-    p: (_){ _ }
-  }
-  #V1: (_|_){
-    // [eval]
-    x: (_|_){
-      // [eval]
-      f1: (int){ int }
-      f2: (_|_){
-        // [eval] #V1.x.f2: field not allowed:
-        //     ./variant1.cue:2:11
-        //     ./variant1.cue:3:5
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

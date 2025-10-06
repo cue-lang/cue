@@ -5,12 +5,6 @@ l: [ int, int] | [ string, string]
 
 l1: ["a", "b"]
 l2: l & ["c", "d"]
--- out/def --
-l: [int, int] | [string, string]
-l1: ["a", "b"]
-l2: ["c", "d"]
--- out/legacy-debug --
-<0>{l: ([int,int] | [string,string]), l1: ["a","b"], l2: ["c","d"]}
 -- out/compile --
 --- in.cue
 {
@@ -30,16 +24,6 @@ l2: ["c", "d"]
     "d",
   ])
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  18
-Reused: 13
-Allocs: 5
-Retain: 0
-
-Unifications: 14
-Conjuncts:    24
-Disjuncts:    18
 -- out/eval --
 (struct){
   l: (list){ |((#list){

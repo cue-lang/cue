@@ -73,20 +73,6 @@ issue2473: two: {
     }
   }
 }
--- out/eval/stats --
-Leaks:  2
-Freed:  19
-Reused: 13
-Allocs: 8
-Retain: 10
-
-Unifications: 13
-Conjuncts:    37
-Disjuncts:    21
-
-MisalignedConjunct: 5
-
-NumCloseIDs: 2
 -- out/evalalpha --
 Errors:
 simple.x: conflicting values "foo" and "x":
@@ -167,32 +153,3 @@ diff old new
        env: (string){ "prod" }
        env2: (string){ "prod" }
        example: (string){ "prod" }
--- out/eval --
-(struct){
-  simple: (_|_){
-    // [incomplete] simple: cannot add field x: was already used:
-    //     ./in.cue:5:2
-    x: (string){ "x" }
-  }
-  issue2473: (struct){
-    one: (struct){
-      c: (_|_){
-        // [incomplete] issue2473.one: cannot add field env2: was already used:
-        //     ./in.cue:19:7
-        env: (string){ "prod" }
-        env2: (string){ "prod" }
-      }
-      example: (_|_){
-        // [incomplete] issue2473.one: cannot add field env2: was already used:
-        //     ./in.cue:19:7
-      }
-    }
-    two: (_|_){
-      // [incomplete] issue2473.two: cannot add field env2: was already used:
-      //     ./in.cue:32:4
-      env: (string){ "prod" }
-      env2: (string){ "prod" }
-      example: (string){ "prod" }
-    }
-  }
-}

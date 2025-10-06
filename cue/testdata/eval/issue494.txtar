@@ -14,16 +14,6 @@ c: ben: [{}]
 #d: ben: [{}]
 
 d: #d
--- out/eval/stats --
-Leaks:  0
-Freed:  26
-Reused: 21
-Allocs: 5
-Retain: 0
-
-Unifications: 26
-Conjuncts:    56
-Disjuncts:    28
 -- out/evalalpha --
 (struct){
   _Q: (#list){
@@ -81,52 +71,6 @@ diff old new
 -  }
 +  d: ~(#d)
  }
--- out/eval --
-(struct){
-  _Q: (#list){
-    0: (struct){
-      pos: (int){ 0 }
-    }
-    1: (struct){
-      pos: (int){ 1 }
-    }
-  }
-  a: (struct){
-    ben: (#list){
-      0: (struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  b: (struct){
-    ben: (#list){
-      0: (struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  c: (struct){
-    ben: (#list){
-      0: (struct){
-        l: (int){ 1 }
-      }
-    }
-  }
-  #d: (#struct){
-    ben: (#list){
-      0: (#struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-  d: (#struct){
-    ben: (#list){
-      0: (#struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

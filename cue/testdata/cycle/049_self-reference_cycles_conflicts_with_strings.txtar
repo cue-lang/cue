@@ -6,13 +6,6 @@ a: {
 	y: x + "!"
 }
 a: x: "hey"
--- out/def --
-a: {
-	x: _|_ // conflicting values "hey!?" and "hey"
-	y: "hey!"
-}
--- out/legacy-debug --
-<0>{a: <1>{x: _|_(("hey!?" & "hey"):conflicting values "hey!?" and "hey"), y: "hey!"}}
 -- out/compile --
 --- in.cue
 {
@@ -24,16 +17,6 @@ a: {
     x: "hey"
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  4
-Reused: 0
-Allocs: 4
-Retain: 1
-
-Unifications: 4
-Conjuncts:    5
-Disjuncts:    5
 -- out/eval --
 Errors:
 a.x: conflicting values "hey!?" and "hey":

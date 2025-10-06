@@ -1,27 +1,6 @@
 raw: true
 -- in.cue --
 {a: "", b: len(a)}
--- out/def --
-a: ""
-b: 0
--- out/export --
-a: ""
-b: 0
--- out/yaml --
-a: ""
-b: 0
--- out/json --
-{"a":"","b":0}
--- out/eval/stats --
-Leaks:  0
-Freed:  3
-Reused: 1
-Allocs: 2
-Retain: 0
-
-Unifications: 3
-Conjuncts:    4
-Disjuncts:    3
 -- out/eval --
 (struct){
   a: (string){ "" }

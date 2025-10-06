@@ -20,18 +20,6 @@ package example
 // Issue #550
 blah: Settings.anyKey
 Settings: {}
--- out/ --
-
--- out/eval/stats --
-Leaks:  1
-Freed:  4
-Reused: 1
-Allocs: 4
-Retain: 2
-
-Unifications: 5
-Conjuncts:    6
-Disjuncts:    6
 -- out/eval --
 (struct){
   a: (int){ 1 }

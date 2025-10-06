@@ -16,20 +16,6 @@ eval: true
 	f64:  float64
 	fi:   float64 & int
 }
--- out/def --
-u16:  uint16
-u32:  uint32
-u64:  uint64
-u128: uint128
-u8:   uint8
-ua:   uint16 & >0
-us:   uint & <10000
-i16:  int16
-i32:  int32 & >0
-i64:  int64
-i128: int128
-f64:  float64
-fi:   int & float64
 -- out/compile --
 --- in.cue
 {
@@ -49,16 +35,6 @@ fi:   int & float64
     fi: (&(>=-1.797693134862315708145274237317043567981E+308, <=1.797693134862315708145274237317043567981E+308) & int)
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  14
-Reused: 12
-Allocs: 2
-Retain: 0
-
-Unifications: 14
-Conjuncts:    24
-Disjuncts:    14
 -- out/eval --
 (struct){
   u16: (int){ &(>=0, <=65535, int) }

@@ -22,16 +22,6 @@ package x
 	name:    string
 	address: string
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  20
-Reused: 14
-Allocs: 6
-Retain: 2
-
-Unifications: 18
-Conjuncts:    31
-Disjuncts:    22
 -- out/eval --
 (struct){
   #a: (#struct){ |((#struct){

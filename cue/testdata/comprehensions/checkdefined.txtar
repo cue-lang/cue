@@ -80,20 +80,6 @@ structs: {
 	select: t4: ({x: 1, y: 2} & {x: 3}).y == _|_
 }
 
--- out/eval/stats --
-Leaks:  11
-Freed:  89
-Reused: 85
-Allocs: 15
-Retain: 26
-
-Unifications: 100
-Conjuncts:    134
-Disjuncts:    105
-
-MisalignedConjunct: 2
-
-NumCloseIDs: 13
 -- out/eval --
 (struct){
   xc: (#struct){

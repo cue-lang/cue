@@ -4,16 +4,6 @@ TODO: l4 should be allowed
 #def1: l1: ["l2"]: {l3: int, l4: 26}
 #special1: #def1 & {l1: l2: l3:     <100}
 instance:  #special1 & {l1: l2: l3: 34}
--- out/eval/stats --
-Leaks:  0
-Freed:  17
-Reused: 12
-Allocs: 5
-Retain: 0
-
-Unifications: 17
-Conjuncts:    36
-Disjuncts:    17
 -- out/eval --
 (struct){
   #def1: (#struct){

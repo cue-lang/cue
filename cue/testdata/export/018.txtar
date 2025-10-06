@@ -1,21 +1,6 @@
 raw: true
 -- in.cue --
 {a: [1, 2], b: [for k, v in a {v}]}
--- out/def --
-a: [1, 2]
-b: [1, 2]
--- out/export --
-a: [1, 2]
-b: [1, 2]
--- out/yaml --
-a:
-- 1
-- 2
-b:
-- 1
-- 2
--- out/json --
-{"a":[1,2],"b":[1,2]}
 -- out/compile --
 --- in.cue
 {
@@ -31,16 +16,6 @@ b:
     ]
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 4
-Allocs: 3
-Retain: 0
-
-Unifications: 7
-Conjuncts:    12
-Disjuncts:    7
 -- out/eval --
 (struct){
   a: (#list){

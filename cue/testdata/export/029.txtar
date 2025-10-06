@@ -10,23 +10,6 @@ noOpt: true
 		#: "Fn::And": [_]
 	}
 }
--- out/def --
-#And: {
-	#: {
-		"Fn::And": [...3 | #And]
-	}
-}
-#Ands: #And & {
-	#: {
-		"Fn::And": [_]
-	}
-}
--- out/export --
-
--- out/yaml --
-{}
--- out/json --
-{}
 -- out/compile --
 --- in.cue
 {
@@ -78,16 +61,6 @@ diff old new
 +Disjuncts:    2
 +
 +NumCloseIDs: 3
--- out/eval/stats --
-Leaks:  0
-Freed:  12
-Reused: 3
-Allocs: 9
-Retain: 0
-
-Unifications: 10
-Conjuncts:    19
-Disjuncts:    12
 -- out/eval --
 (struct){
   #And: (#struct){

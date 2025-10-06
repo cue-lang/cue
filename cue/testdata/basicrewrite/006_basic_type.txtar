@@ -9,15 +9,6 @@ d: int & float // _|_
 e: "4" & string
 f: true
 f: bool
--- out/def --
-a: 1
-b: 1
-c: 1.0
-d: _|_ // conflicting values int and float (mismatched types int and float)
-e: "4"
-f: true
--- out/legacy-debug --
-<0>{a: 1, b: 1, c: 1.0, d: _|_((int & float):conflicting values int and float (mismatched types int and float)), e: "4", f: true}
 -- out/compile --
 --- in.cue
 {
@@ -30,16 +21,6 @@ f: true
   f: true
   f: bool
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 5
-Allocs: 2
-Retain: 0
-
-Unifications: 7
-Conjuncts:    13
-Disjuncts:    7
 -- out/eval --
 Errors:
 d: conflicting values int and float (mismatched types int and float):

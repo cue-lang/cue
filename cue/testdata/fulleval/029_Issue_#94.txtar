@@ -23,34 +23,6 @@ index: {
 	regular: foo["regular"]
 	_hidden: foo["_hidden"]
 }
--- out/def --
-foo: {
-	opt?:    1
-	txt:     2
-	#def:    3
-	regular: 4
-	_hidden: 5
-}
-comp: {
-	txt:     2
-	regular: 4
-}
-select: {
-	opt:     foo.opt
-	txt:     2
-	#def:    3
-	regular: 4
-	_hidden: 5
-}
-index: {
-	opt:     foo["opt"]
-	txt:     2
-	#def:    foo["#def"]
-	regular: 4
-	_hidden: foo["_hidden"]
-}
--- out/legacy-debug --
-<0>{foo: <1>{opt?: 1, txt: 2, #def: 3, regular: 4, _hidden: 5}, comp: <2>{txt: 2, regular: 4}, select: <3>{opt: <4>.foo.opt, txt: 2, #def: 3, regular: 4, _hidden: 5}, index: <5>{opt: <4>.foo["opt"], txt: 2, #def: <4>.foo["#def"], regular: 4, _hidden: <4>.foo["_hidden"]}}
 -- out/compile --
 --- in.cue
 {
@@ -81,20 +53,6 @@ index: {
     _hidden: 〈1;foo〉["_hidden"]
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  22
-Reused: 19
-Allocs: 3
-Retain: 0
-
-Unifications: 22
-Conjuncts:    32
-Disjuncts:    22
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 1
 -- out/eval --
 (struct){
   foo: (struct){

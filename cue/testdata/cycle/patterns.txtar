@@ -22,16 +22,6 @@ issue3326: {
 	_self
 	x: [1]
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 2
-Allocs: 5
-Retain: 2
-
-Unifications: 7
-Conjuncts:    59
-Disjuncts:    9
 -- out/evalalpha --
 (struct){
   a: (struct){
@@ -73,18 +63,6 @@ diff old new
 +    a: (int){ int }
 +  }
  }
--- out/eval --
-(struct){
-  a: (struct){
-    a: (int){ int }
-  }
-  b: (struct){
-    a: (int){ int }
-  }
-  c: (struct){
-    a: (int){ int }
-  }
-}
 -- out/compile --
 --- in.cue
 {

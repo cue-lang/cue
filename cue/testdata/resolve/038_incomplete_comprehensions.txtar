@@ -13,19 +13,6 @@ A: {
 B: A & {
 	src: ["foo", "bar"]
 }
--- out/def --
-A: {
-	src: _
-	baz: "baz"
-	for v in src {
-		"\(v)": v
-	}
-}
-B: A & {
-	src: ["foo", "bar"]
-}
--- out/legacy-debug --
-<0>{A: <1>{src: _, baz: "baz" <2>for _, v in <3>.src yield <4>{""+<2>.v+"": <2>.v}}, B: <5>{src: ["foo","bar"], baz: "baz", foo: "foo", bar: "bar"}}
 -- out/compile --
 --- in.cue
 {
@@ -45,20 +32,6 @@ B: A & {
     ]
   })
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 6
-Allocs: 5
-Retain: 9
-
-Unifications: 11
-Conjuncts:    16
-Disjuncts:    16
-
-MisalignedConjunct: 4
-
-NumCloseIDs: 4
 -- out/eval --
 (struct){
   A: (_|_){

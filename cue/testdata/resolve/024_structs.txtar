@@ -5,22 +5,6 @@ a: t & {c:  5} // {c:5,d:15}
 b: ti & {c: 7} // {c:7,d:21}
 t: {c: number, d: c * 3} // {c:number,d:number*3}
 ti: t & {c: int}
--- out/def --
-a: t & {
-	c: 5
-}
-t: {
-	c: number
-	d: c * 3
-}
-b: ti & {
-	c: 7
-}
-ti: t & {
-	c: int
-}
--- out/legacy-debug --
-<0>{a: <1>{c: 5, d: 15}, t: <2>{c: number, d: (<3>.c * 3)}, b: <4>{c: 7, d: 21}, ti: <5>{c: int, d: (<6>.c * 3)}}
 -- out/compile --
 --- in.cue
 {
@@ -38,16 +22,6 @@ ti: t & {
     c: int
   })
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  13
-Reused: 9
-Allocs: 4
-Retain: 2
-
-Unifications: 13
-Conjuncts:    33
-Disjuncts:    15
 -- out/eval --
 (struct){
   a: (struct){

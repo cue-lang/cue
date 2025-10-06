@@ -10,16 +10,6 @@
 #Both: #App | #Atom
 
 t1: #Both & {body: 3}
--- out/eval/stats --
-Leaks:  0
-Freed:  24
-Reused: 19
-Allocs: 5
-Retain: 0
-
-Unifications: 20
-Conjuncts:    38
-Disjuncts:    24
 -- out/evalalpha --
 (struct){
   #Artifact: (#struct){
@@ -63,34 +53,6 @@ diff old new
    #Both: (#struct){
      body: (_){ _ }
      other: (#struct){
--- out/eval --
-(struct){
-  #Artifact: (#struct){
-    body: (_){ _ }
-    other: (#struct){
-    }
-  }
-  #App: (#struct){
-    body: (_){ _ }
-    other: (#struct){
-    }
-  }
-  #Atom: (#struct){
-    body: (_){ _ }
-    other: (#struct){
-    }
-  }
-  #Both: (#struct){
-    body: (_){ _ }
-    other: (#struct){
-    }
-  }
-  t1: (#struct){
-    body: (int){ 3 }
-    other: (#struct){
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

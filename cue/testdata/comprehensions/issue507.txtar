@@ -23,16 +23,6 @@ bar: [
 		"hello bar: \(e)"
 	},
 ]
--- out/eval/stats --
-Leaks:  0
-Freed:  15
-Reused: 10
-Allocs: 5
-Retain: 0
-
-Unifications: 11
-Conjuncts:    17
-Disjuncts:    15
 -- out/eval --
 (struct){
   somelist: (list){ |(*(#list){

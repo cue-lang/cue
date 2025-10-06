@@ -2,8 +2,6 @@
 {
 	a: >=0 & <=10 & !=1
 }
--- out/def --
-a: >=0 & <=10 & !=1
 -- out/compile --
 --- in.cue
 {
@@ -11,16 +9,6 @@ a: >=0 & <=10 & !=1
     a: ((>=0 & <=10) & !=1)
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  2
-Reused: 0
-Allocs: 2
-Retain: 0
-
-Unifications: 2
-Conjuncts:    5
-Disjuncts:    2
 -- out/eval --
 (struct){
   a: (number){ &(>=0, <=10, !=1) }

@@ -32,15 +32,6 @@ diff old new
 -[#GraphFieldConfig lineColor]
  [#GraphFieldConfig drawStyle]
 +[#GraphFieldConfig lineColor]
--- diff/doc/explanation --
-reordering
--- out/doc --
-[]
-[#LineConfig]
-[#LineConfig lineColor]
-[#GraphFieldConfig]
-[#GraphFieldConfig lineColor]
-[#GraphFieldConfig drawStyle]
 -- out/value --
 == Simplified
 {}

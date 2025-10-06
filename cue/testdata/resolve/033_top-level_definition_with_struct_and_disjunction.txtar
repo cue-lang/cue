@@ -14,24 +14,6 @@
 	Type: "A"
 	Size: 1
 }
--- out/def --
-#def: {
-	Size: 0
-	Type: "B"
-	Text: string
-} | {
-	Size: 1
-	Type: "A"
-	Text: string
-}
--- out/export --
-
--- out/yaml --
-{}
--- out/json --
-{}
--- out/legacy-debug --
-<0>{#def: (<1>C{Size: (0 & int), Type: ("B" & string), Text: string} | <2>C{Size: (1 & int), Type: ("A" & string), Text: string})}
 -- out/compile --
 --- in.cue
 {
@@ -48,16 +30,6 @@
     Size: 1
   })
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  10
-Reused: 5
-Allocs: 5
-Retain: 0
-
-Unifications: 8
-Conjuncts:    15
-Disjuncts:    10
 -- out/eval --
 (struct){
   #def: (#struct){ |((#struct){

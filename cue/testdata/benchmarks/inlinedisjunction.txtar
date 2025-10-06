@@ -73,16 +73,6 @@ diff old new
 +ConjunctInfos:       99
 +MaxConjunctInfos:    12
 +MaxReqSets:          12
--- out/eval/stats --
-Leaks:  0
-Freed:  4674
-Reused: 3903
-Allocs: 771
-Retain: 0
-
-Unifications: 2590
-Conjuncts:    13409
-Disjuncts:    4674
 -- out/compile --
 --- in.cue
 {

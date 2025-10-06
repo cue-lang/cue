@@ -12,16 +12,6 @@ x: {
 a1: y: 5
 a1: a2: a3: a4: a5: a1.y
 b: a1.a2.a3.a4.a5
--- out/eval/stats --
-Leaks:  0
-Freed:  15
-Reused: 9
-Allocs: 6
-Retain: 0
-
-Unifications: 15
-Conjuncts:    22
-Disjuncts:    15
 -- out/eval --
 (struct){
   a: (struct){

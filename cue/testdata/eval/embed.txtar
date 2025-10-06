@@ -120,20 +120,6 @@ closednessInversion: {
 		a: b: c: "d"
 	}
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  116
-Reused: 106
-Allocs: 10
-Retain: 7
-
-Unifications: 110
-Conjuncts:    217
-Disjuncts:    122
-
-MisalignedConjunct: 15
-
-NumCloseIDs: 4
 -- out/eval --
 Errors:
 fieldNotAllowed.t1.addTwo.objs.extra: field not allowed:

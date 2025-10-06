@@ -29,18 +29,6 @@ incompleteIndex: {
 	top: _
 	a:   [1][top]
 }
--- out/eval/stats --
-Leaks:  1
-Freed:  17
-Reused: 14
-Allocs: 4
-Retain: 1
-
-Unifications: 18
-Conjuncts:    26
-Disjuncts:    18
-
-NumCloseIDs: 2
 -- out/eval --
 Errors:
 incompleteIndex.a: invalid index top (invalid type _):

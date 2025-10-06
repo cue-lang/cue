@@ -162,16 +162,6 @@ simplifyBinary: integer: {
   ok3: p3: <3 & >=2
   ok3: p4: <=3 & >2
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  148
-Reused: 143
-Allocs: 5
-Retain: 1
-
-Unifications: 148
-Conjuncts:    337
-Disjuncts:    149
 -- out/eval --
 Errors:
 simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:

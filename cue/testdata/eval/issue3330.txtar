@@ -35,16 +35,6 @@ simplified: {
 
 	out: #struct & {}
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  43
-Reused: 34
-Allocs: 9
-Retain: 3
-
-Unifications: 35
-Conjuncts:    69
-Disjuncts:    46
 -- out/evalalpha --
 Errors:
 eliminated.x: 2 errors in empty disjunction:
@@ -195,92 +185,6 @@ diff old new
        //     ./in.cue:23:16
      }
    }
--- diff/todo/p3 --
-Small differences in error output.
--- out/eval --
-Errors:
-eliminated.x: 2 errors in empty disjunction:
-eliminated.x: conflicting values null and {n:3} (mismatched types null and struct):
-    ./in.cue:22:5
-    ./in.cue:23:14
-eliminated.x.n: field not allowed:
-    ./in.cue:21:10
-    ./in.cue:22:14
-    ./in.cue:23:5
-    ./in.cue:23:16
-
-Result:
-(_|_){
-  // [eval]
-  issue3330: (struct){
-    #A: (#struct){
-      let empty#1 = (#struct){
-      }
-      field: (#struct){
-        n: (int){ 3 }
-      }
-    }
-    out: (#list){
-      0: (#struct){
-        let empty#1 = (#struct){
-        }
-        field: (#struct){
-          n: (int){ 3 }
-        }
-      }
-    }
-  }
-  eliminated: (_|_){
-    // [eval]
-    #empty: (#struct){
-    }
-    x: (_|_){
-      // [eval] eliminated.x: 2 errors in empty disjunction:
-      // eliminated.x: conflicting values null and {n:3} (mismatched types null and struct):
-      //     ./in.cue:22:5
-      //     ./in.cue:23:14
-      // eliminated.x.n: field not allowed:
-      //     ./in.cue:21:10
-      //     ./in.cue:22:14
-      //     ./in.cue:23:5
-      //     ./in.cue:23:16
-      n: (_|_){
-        // [eval] eliminated.x.n: field not allowed:
-        //     ./in.cue:21:10
-        //     ./in.cue:22:14
-        //     ./in.cue:23:5
-        //     ./in.cue:23:16
-      }
-    }
-    out: (_|_){
-      // [eval] eliminated.x: 2 errors in empty disjunction:
-      // eliminated.x: conflicting values null and {n:3} (mismatched types null and struct):
-      //     ./in.cue:22:5
-      //     ./in.cue:23:14
-      // eliminated.x.n: field not allowed:
-      //     ./in.cue:21:10
-      //     ./in.cue:22:14
-      //     ./in.cue:23:5
-      //     ./in.cue:23:16
-    }
-  }
-  simplified: (struct){
-    #struct: (#struct){
-      field: (#struct){
-        n: (int){ 3 }
-      }
-      g: (#struct){
-      }
-    }
-    out: (#struct){
-      field: (#struct){
-        n: (int){ 3 }
-      }
-      g: (#struct){
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

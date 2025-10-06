@@ -7,14 +7,6 @@ c: a & b
 d: b & a
 
 e: *1 | *1
--- out/def --
-a: *1 | int
-b: *3 | int
-c: a & b
-d: b & a
-e: 1
--- out/legacy-debug --
-<0>{a: 1, b: 3, c: int, d: int, e: 1}
 -- out/compile --
 --- in.cue
 {
@@ -24,16 +16,6 @@ e: 1
   d: (〈0;b〉 & 〈0;a〉)
   e: (*1|*1)
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  24
-Reused: 17
-Allocs: 7
-Retain: 0
-
-Unifications: 6
-Conjuncts:    30
-Disjuncts:    24
 -- out/eval --
 (struct){
   a: (int){ |(*(int){ 1 }, (int){ int }) }

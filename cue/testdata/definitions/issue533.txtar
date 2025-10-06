@@ -18,16 +18,6 @@ x2: _#x & {
 	Name: "hello"
 	Age:  50
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 8
-Allocs: 3
-Retain: 0
-
-Unifications: 11
-Conjuncts:    17
-Disjuncts:    11
 -- out/evalalpha --
 Errors:
 x1.Age: field not allowed:
@@ -95,49 +85,6 @@ diff old new
        //     ./in.cue:18:2
      }
    }
--- diff/todo/p2 --
-Positions.
--- out/eval --
-Errors:
-x1.Age: field not allowed:
-    ./in.cue:3:5
-    ./in.cue:11:5
-    ./in.cue:13:2
-x2.Age: field not allowed:
-    ./in.cue:7:6
-    ./in.cue:16:5
-    ./in.cue:18:2
-
-Result:
-(_|_){
-  // [eval]
-  #x: (#struct){
-    Name: (string){ string }
-  }
-  _#x(:x): (#struct){
-    Name: (string){ string }
-  }
-  x1: (_|_){
-    // [eval]
-    Name: (string){ "hello" }
-    Age: (_|_){
-      // [eval] x1.Age: field not allowed:
-      //     ./in.cue:3:5
-      //     ./in.cue:11:5
-      //     ./in.cue:13:2
-    }
-  }
-  x2: (_|_){
-    // [eval]
-    Name: (string){ "hello" }
-    Age: (_|_){
-      // [eval] x2.Age: field not allowed:
-      //     ./in.cue:7:6
-      //     ./in.cue:16:5
-      //     ./in.cue:18:2
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

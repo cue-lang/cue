@@ -71,17 +71,3 @@ diff old new
 +A: #X & _
 +
 +B: X & _
--- out/trim --
-== a.cue
-X: {
-	a: 1
-	b: true
-}
-#X: X
-
-A: #X & {}
-
-B: X & {
-	a: 1
-	b: true
-}

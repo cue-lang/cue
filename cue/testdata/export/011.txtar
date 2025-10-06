@@ -1,25 +1,6 @@
 raw: true
 -- in.cue --
 {a: {b: []}, c: a.b, d: a["b"]}
--- out/def --
-a: {
-	b: []
-}
-c: []
-d: []
--- out/export --
-a: {
-	b: []
-}
-c: []
-d: []
--- out/yaml --
-a:
-  b: []
-c: []
-d: []
--- out/json --
-{"a":{"b":[]},"c":[],"d":[]}
 -- out/compile --
 --- in.cue
 {
@@ -31,16 +12,6 @@ d: []
     d: 〈0;a〉["b"]
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  5
-Reused: 2
-Allocs: 3
-Retain: 0
-
-Unifications: 5
-Conjuncts:    8
-Disjuncts:    5
 -- out/eval --
 (struct){
   a: (struct){

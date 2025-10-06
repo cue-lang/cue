@@ -5,9 +5,6 @@ eval: true
 	a: (*1 | 2) & (1 | *2)
 	b: [(*1 | 2) & (1 | *2)]
 }
--- out/def --
-a: 1 | 2 | *_|_
-b: [1 | 2 | *_|_]
 -- out/compile --
 --- in.cue
 {
@@ -18,16 +15,6 @@ b: [1 | 2 | *_|_]
     ]
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  16
-Reused: 9
-Allocs: 7
-Retain: 0
-
-Unifications: 4
-Conjuncts:    19
-Disjuncts:    16
 -- out/eval --
 (struct){
   a: (int){ |((int){ 1 }, (int){ 2 }) }

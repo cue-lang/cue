@@ -38,16 +38,6 @@ modDivByZero: mod(2, 0)
 
 modTypeError1: mod(2.0, 1)
 modTypeError2: mod(2, 1.0)
--- out/eval/stats --
-Leaks:  0
-Freed:  29
-Reused: 27
-Allocs: 2
-Retain: 0
-
-Unifications: 29
-Conjuncts:    29
-Disjuncts:    29
 -- out/eval --
 Errors:
 quoDivByZero: division by zero:

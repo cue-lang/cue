@@ -13,30 +13,6 @@ V: #S & {
 	c: e:     int
 	b: extra: int
 }
--- out/def --
-#S: {
-	a: {
-		c: int
-	}
-	c: {
-		d: int
-		...
-	}
-	b: {
-		open: int
-		...
-	}
-}
-V: #S & {
-	c: {
-		e: int
-	}
-	b: {
-		extra: int
-	}
-}
--- out/legacy-debug --
-<0>{#S: <1>C{a: <2>C{c: int}, c: <3>{d: int}, b: <4>{open: int}}, V: <5>C{a: <6>C{c: int}, c: <7>{d: int, e: int}, b: <8>{open: int, extra: int}}}
 -- out/compile --
 --- in.cue
 {
@@ -63,16 +39,6 @@ V: #S & {
     }
   })
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  21
-Reused: 17
-Allocs: 4
-Retain: 0
-
-Unifications: 21
-Conjuncts:    29
-Disjuncts:    21
 -- out/evalalpha --
 Errors:
 V.b.extra: field not allowed:
@@ -183,68 +149,3 @@ diff old new
      }
    }
  }
--- diff/todo/p2 --
-Positions.
-Reordering.
--- out/eval --
-Errors:
-V.b.extra: field not allowed:
-    ./in.cue:6:10
-    ./in.cue:7:5
-    ./in.cue:9:4
-    ./in.cue:11:5
-V.c.e: field not allowed:
-    ./in.cue:3:2
-    ./in.cue:4:6
-    ./in.cue:9:4
-    ./in.cue:10:5
-
-Result:
-(_|_){
-  // [eval]
-  #S: (#struct){
-    a: (#struct){
-      c: (int){ int }
-    }
-    c: (#struct){
-      d: (int){ int }
-    }
-    let B#1 = (#struct){
-      open: (int){ int }
-    }
-    b: (#struct){
-      open: (int){ int }
-    }
-  }
-  V: (_|_){
-    // [eval]
-    a: (#struct){
-      c: (int){ int }
-    }
-    c: (_|_){
-      // [eval]
-      d: (int){ int }
-      e: (_|_){
-        // [eval] V.c.e: field not allowed:
-        //     ./in.cue:3:2
-        //     ./in.cue:4:6
-        //     ./in.cue:9:4
-        //     ./in.cue:10:5
-      }
-    }
-    let B#1 = (#struct){
-      open: (int){ int }
-    }
-    b: (_|_){
-      // [eval]
-      open: (int){ int }
-      extra: (_|_){
-        // [eval] V.b.extra: field not allowed:
-        //     ./in.cue:6:10
-        //     ./in.cue:7:5
-        //     ./in.cue:9:4
-        //     ./in.cue:11:5
-      }
-    }
-  }
-}

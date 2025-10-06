@@ -14,16 +14,6 @@ out: #Output & {
 		}
 	}
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  48
-Reused: 39
-Allocs: 9
-Retain: 0
-
-Unifications: 34
-Conjuncts:    65
-Disjuncts:    48
 -- out/evalalpha --
 (struct){
   #App: (#struct){
@@ -63,32 +53,6 @@ diff old new
          sub3: (struct){
            let _let#1 = (string){ "bar" }
            foo: (string){ "bar" }
--- out/eval --
-(struct){
-  #App: (#struct){
-    name?: (string){ string }
-    sub1?: (#struct){
-      sub2?: (_){ |((null){ null }, (_){ _ }) }
-    }
-  }
-  #Output: ((null|struct)){ |((null){ null }, (#struct){
-      name?: (string){ string }
-      sub1?: (#struct){
-        sub2?: (_){ |((null){ null }, (_){ _ }) }
-      }
-    }) }
-  out: (#struct){
-    name: (string){ "foo" }
-    sub1: (#struct){
-      sub2: (struct){
-        sub3: (struct){
-          let _let#1 = (string){ "bar" }
-          foo: (string){ "bar" }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

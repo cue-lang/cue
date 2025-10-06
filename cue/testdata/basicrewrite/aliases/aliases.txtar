@@ -23,16 +23,6 @@ t1: {
     d: 3
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  9
-Reused: 4
-Allocs: 5
-Retain: 3
-
-Unifications: 9
-Conjuncts:    14
-Disjuncts:    10
 -- out/eval --
 (struct){
   t0: (struct){

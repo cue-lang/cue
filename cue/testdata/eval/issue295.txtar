@@ -13,16 +13,6 @@ p: f: 9
     f: 9
   }
 }
--- out/eval/stats --
-Leaks:  1
-Freed:  3
-Reused: 0
-Allocs: 4
-Retain: 1
-
-Unifications: 4
-Conjuncts:    7
-Disjuncts:    4
 -- out/eval --
 (struct){
   p: (#struct){

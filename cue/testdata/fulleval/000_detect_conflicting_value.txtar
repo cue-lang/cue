@@ -3,26 +3,12 @@
 -- in.cue --
 a: 8000.9
 a: 7080 | int
--- out/def --
-a: _|_ // conflicting values 8000.9 and int (mismatched types float and int)
--- out/legacy-debug --
-<0>{a: _|_((8000.9 & (int | int)):conflicting values 8000.9 and int (mismatched types float and int))}
 -- out/compile --
 --- in.cue
 {
   a: 8000.9
   a: (7080|int)
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  4
-Reused: 1
-Allocs: 3
-Retain: 0
-
-Unifications: 2
-Conjuncts:    5
-Disjuncts:    4
 -- out/eval --
 Errors:
 a: 2 errors in empty disjunction:

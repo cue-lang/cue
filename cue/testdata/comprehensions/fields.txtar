@@ -58,20 +58,6 @@ issue560: {
 		tags_str: "b {c}"
 	}
 }
--- out/eval/stats --
-Leaks:  1
-Freed:  29
-Reused: 24
-Allocs: 6
-Retain: 1
-
-Unifications: 30
-Conjuncts:    38
-Disjuncts:    30
-
-MisalignedConjunct: 3
-
-NumCloseIDs: 5
 -- out/evalalpha --
 (struct){
   dynamic: (struct){
@@ -136,57 +122,6 @@ diff old new
      }
    }
    issue560: (struct){
--- diff/todo/p2 --
-Near-duplicate message
--- out/eval --
-(struct){
-  dynamic: (struct){
-    foo: (int){ 1 }
-    foobar: (int){ 2 }
-  }
-  ignoreOptional: (struct){
-    #x: (#struct){
-      a?: (string){ string }
-      b?: (string){ string }
-      c: (string){ string }
-    }
-    y: (struct){
-      c: (string){ "exists" }
-    }
-  }
-  missingRequiredError: (struct){
-    #x: (#struct){
-      a!: (string){ string }
-      b?: (string){ string }
-      c: (string){ string }
-    }
-    y: (_|_){
-      // [incomplete] missingRequiredError.y: missing required field in for comprehension: a:
-      //     ./in.cue:33:3
-      //     ./in.cue:27:3
-      //     ./in.cue:33:14
-    }
-  }
-  issue560: (struct){
-    #User: (#struct){
-      tags_str: (string){ string }
-      tags_map: (_|_){
-        // [incomplete] issue560.#User.tags_map: error in call to strings.Split: non-concrete value string:
-        //     ./in.cue:43:16
-        //     ./in.cue:41:13
-        "{a}": (string){ string }
-      }
-    }
-    user: (#struct){
-      tags_str: (string){ "b {c}" }
-      tags_map: (#struct){
-        "{a}": (string){ string }
-        b: (string){ string }
-        "{c}": (string){ string }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -19,16 +19,6 @@ subject: {
 #computeF1040: in:      #ReturnData
 #ReturnData: taxPayer?: #TaxPayer
 #TaxPayer: self?:       _
--- out/eval/stats --
-Leaks:  0
-Freed:  35
-Reused: 26
-Allocs: 9
-Retain: 4
-
-Unifications: 35
-Conjuncts:    82
-Disjuncts:    39
 -- out/evalalpha --
 (struct){
   _taxPayer(:p): (struct){
@@ -149,72 +139,6 @@ diff old new
    }
    #TaxPayer: (#struct){
      self?: (_){ _ }
--- out/eval --
-(struct){
-  _taxPayer(:p): (struct){
-    self: (struct){
-    }
-  }
-  let sam#1 = (struct){
-    taxPayer: (struct){
-      self: (struct){
-      }
-    }
-  }
-  assert: (struct){
-    invoke: (struct){
-      taxPayer: (struct){
-        self: (struct){
-        }
-      }
-    }
-    res: (struct){
-      in: (#struct){
-        taxPayer: (#struct){
-          self: (struct){
-          }
-        }
-      }
-      _computed(:p): (#struct){
-        in: (#struct){
-          taxPayer: (#struct){
-            self: (struct){
-            }
-          }
-        }
-      }
-    }
-  }
-  subject: (struct){
-    in: (#struct){
-      taxPayer?: (#struct){
-        self?: (_){ _ }
-      }
-    }
-    _computed(:p): (#struct){
-      in: (#struct){
-        taxPayer?: (#struct){
-          self?: (_){ _ }
-        }
-      }
-    }
-  }
-  #computeF1040: (#struct){
-    in: (#struct){
-      taxPayer?: (#struct){
-        self?: (_){ _ }
-      }
-    }
-  }
-  #ReturnData: (#struct){
-    taxPayer?: (#struct){
-      self?: (_){ _ }
-    }
-  }
-  #TaxPayer: (#struct){
-    self?: (_){ _ }
-  }
-}
 -- out/compile --
 --- in.cue
 {

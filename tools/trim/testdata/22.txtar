@@ -35,8 +35,3 @@ diff old new
  y: x({a: 5})
 -z: y & {a: int}
 +z: y & _
--- out/trim --
-== a.cue
-let x = close
-y: x({a: 5})
-z: y & {a: int}

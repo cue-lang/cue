@@ -3,16 +3,6 @@
 root1: 1
 #Root1: x: {}
 #Root1 & { }
--- out/eval/stats --
-Leaks:  0
-Freed:  5
-Reused: 2
-Allocs: 3
-Retain: 1
-
-Unifications: 5
-Conjuncts:    8
-Disjuncts:    6
 -- out/eval --
 (#struct){
   root1: (int){ 1 }

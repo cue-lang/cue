@@ -42,16 +42,6 @@ import "list"
 	do:   "f2"
 	from: #c1
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  73
-Reused: 58
-Allocs: 15
-Retain: 7
-
-Unifications: 57
-Conjuncts:    138
-Disjuncts:    80
 -- out/evalalpha --
 (struct){
   #d1: (#struct){
@@ -180,75 +170,6 @@ diff old new
 +    from: ~(#c1)
    }
  }
--- diff/todo/p3 --
-Reordering
--- out/eval --
-(struct){
-  #d1: (#struct){
-    as: (list){
-    }
-    #c: (#list){
-      0: (#struct){
-        do: (string){ "f1" }
-        as: (#list){
-          0: (string){ "go" }
-        }
-      }
-    }
-  }
-  #d2: (#struct){
-    p: (string){ |(*(string){ "." }, (string){ string }) }
-    #c: (#list){
-      0: (#struct){
-        do: (string){ "f2" }
-        from: (#struct){
-          #c: (#list){
-            0: (#struct){
-              do: (string){ "f1" }
-              as: (#list){
-                0: (string){ "go" }
-                1: (string){ |(*(string){ "." }, (string){ string }) }
-              }
-            }
-          }
-          as: (#list){
-            0: (string){ |(*(string){ "." }, (string){ string }) }
-          }
-        }
-      }
-    }
-  }
-  #c1: (_){
-    _
-    #c: (list){
-    }
-  }
-  #o: (#struct){ |((#struct){
-      do: (string){ "f1" }
-      as: (list){
-      }
-    }, (#struct){
-      do: (string){ "f2" }
-      from: (_){
-        _
-        #c: (list){
-        }
-      }
-    }) }
-  #f1: (#struct){
-    do: (string){ "f1" }
-    as: (list){
-    }
-  }
-  #f2: (#struct){
-    do: (string){ "f2" }
-    from: (_){
-      _
-      #c: (list){
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

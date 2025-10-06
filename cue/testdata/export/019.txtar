@@ -1,9 +1,6 @@
 raw: true
 -- in.cue --
 {a: >=0 & <=10, b: "Count: \(a) times"}
--- out/def --
-a: >=0 & <=10
-b: "Count: \(a) times"
 -- out/compile --
 --- in.cue
 {
@@ -12,16 +9,6 @@ b: "Count: \(a) times"
     b: "Count: \(〈0;a〉) times"
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  3
-Reused: 1
-Allocs: 2
-Retain: 0
-
-Unifications: 3
-Conjuncts:    9
-Disjuncts:    3
 -- out/eval --
 (struct){
   a: (number){ &(>=0, <=10) }

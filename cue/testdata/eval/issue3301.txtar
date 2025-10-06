@@ -40,18 +40,6 @@ object: #Leaf & {}
     more?: (int){ int }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 5
-Allocs: 6
-Retain: 7
-
-Unifications: 11
-Conjuncts:    25
-Disjuncts:    18
-
-NumCloseIDs: 2
 -- out/compile --
 --- in.cue
 {

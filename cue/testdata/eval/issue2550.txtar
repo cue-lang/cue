@@ -16,32 +16,6 @@ if bar.missing == "x" {
     foo: 〈0;let _bar#1〉
   }
 }
--- out/eval/stats --
-Leaks:  1
-Freed:  4
-Reused: 1
-Allocs: 4
-Retain: 2
-
-Unifications: 5
-Conjuncts:    5
-Disjuncts:    6
-
-NumCloseIDs: 1
--- out/eval --
-Errors:
-undefined field: missing:
-    ./in.cue:4:8
-
-Result:
-(_|_){
-  // [eval] undefined field: missing:
-  //     ./in.cue:4:8
-  foo: (string){ string }
-  bar: (#struct){
-  }
-  let _bar#1 = (_){ _ }
-}
 -- out/evalalpha --
 Errors:
 undefined field: missing:

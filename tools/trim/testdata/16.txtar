@@ -32,7 +32,3 @@ diff old new
  let s = {a: bool, b: "hi"}
 -x: s & {a: true, b: string}
 +x: s & {a: true}
--- out/trim --
-== a.cue
-let s = {a: bool, b: "hi"}
-x: s & {a: true, b: string}

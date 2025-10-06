@@ -587,7 +587,6 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			files := make([]txtar.File, 0, len(a.Files))
 			usedFiles := make(map[string]bool)
 			for _, sub := range tc.outFiles {
-				usedFiles[sub.name] = true
 				result := sub.bytes()
 
 				files = append(files, txtar.File{Name: sub.name})
@@ -596,6 +595,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				if i, ok := index[sub.name]; ok {
 					gold.Data = a.Files[i].Data
 					delete(index, sub.name)
+					usedFiles[sub.name] = true
 
 					if bytes.Equal(gold.Data, result) {
 						continue
@@ -606,6 +606,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 					// Use the golden file of the fallback set if it matches.
 					if bytes.Equal(gold.Data, result) {
 						gold.Name = sub.fallback
+						usedFiles[gold.Name] = true
 						delete(index, sub.fallback)
 						continue
 					}
@@ -638,6 +639,10 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				}
 				files = append(files, f)
 			}
+			//			log.Printf("usedFiles %v", slices.Sorted(maps.Keys(usedFiles)))
+			//			for _, f := range a.Files {
+			//				log.Printf("- %q", f.Name)
+			//			}
 			if uri := os.Getenv("CUETXTAR_GC_URI"); uri != "" {
 				var retain []string
 				for _, f := range a.Files {

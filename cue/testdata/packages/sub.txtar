@@ -15,16 +15,6 @@ import pkg2 "mod.test/foo/pkg1"
 package pkg1
 
 Object: "World"
--- out/eval/stats --
-Leaks:  2
-Freed:  2
-Reused: 0
-Allocs: 4
-Retain: 3
-
-Unifications: 4
-Conjuncts:    5
-Disjuncts:    4
 -- out/eval --
 (string){
   "Hello World!"

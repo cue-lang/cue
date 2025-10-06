@@ -2,16 +2,6 @@
 x: _
 #D: b: x
 #D & { b: _ }
--- out/eval/stats --
-Leaks:  0
-Freed:  5
-Reused: 2
-Allocs: 3
-Retain: 1
-
-Unifications: 5
-Conjuncts:    11
-Disjuncts:    6
 -- out/eval --
 (#struct){
   x: (_){ _ }

@@ -32,20 +32,6 @@ issue4011: reduced: {
 	}
 	envs: foo: {}
 }
--- out/eval/stats --
-Leaks:  5
-Freed:  22
-Reused: 12
-Allocs: 15
-Retain: 17
-
-Unifications: 27
-Conjuncts:    33
-Disjuncts:    37
-
-MisalignedConjunct: 4
-
-NumCloseIDs: 2
 -- out/eval --
 (struct){
   issue4011: (struct){

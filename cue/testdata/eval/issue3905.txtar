@@ -40,16 +40,6 @@ issue3905: full: {
 		}
 	}
 }
--- out/eval/stats --
-Leaks:  3
-Freed:  57
-Reused: 47
-Allocs: 13
-Retain: 26
-
-Unifications: 48
-Conjuncts:    93
-Disjuncts:    81
 -- out/evalalpha --
 (struct){
   issue3905: (struct){
@@ -161,68 +151,6 @@ diff old new
        }
      }
    }
--- out/eval --
-(struct){
-  issue3905: (struct){
-    reduced: (#struct){
-      #Schema: (#struct){
-        params: (#struct){
-          name: (string){ |(*(string){ "foo" }, (string){ string }) }
-        }
-        result: (#struct){
-          foo: (string){ "bar" }
-        }
-      }
-      foo: (string){ "bar" }
-    }
-    full: (struct){
-      #ReferenceGrantBuilder: (#struct){
-        parameters: (#struct){
-          namespace: (string){ string }
-          gatewayNamespace: (string){ |(*(string){ "foo" }, (string){ string }) }
-        }
-        referenceGrant: (#struct){
-          foo: (#struct){
-            apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-            kind: (string){ "ReferenceGrant" }
-            metadata: (#struct){
-              name: (string){ |(*(string){ "foo" }, (string){ string }) }
-              namespace: (string){ string }
-              labels?: (#struct){
-              }
-              annotations?: (#struct){
-              }
-            }
-          }
-        }
-      }
-      #ReferenceGrant: (#struct){
-        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-        kind: (string){ "ReferenceGrant" }
-        metadata!: (#struct){
-          name!: (string){ string }
-          namespace!: (string){ string }
-          labels?: (#struct){
-          }
-          annotations?: (#struct){
-          }
-        }
-      }
-      foo: (#struct){
-        apiVersion: (string){ "gateway.networking.k8s.io/v1beta1" }
-        kind: (string){ "ReferenceGrant" }
-        metadata: (#struct){
-          name: (string){ |(*(string){ "foo" }, (string){ string }) }
-          namespace: (string){ "foo" }
-          labels?: (#struct){
-          }
-          annotations?: (#struct){
-          }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

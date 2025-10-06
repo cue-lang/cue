@@ -5,31 +5,6 @@
 for x in [1] {
 	*close({}) | {[_]: null}
 }
--- out/def --
-
-for x in [1] *close({}) | {
-	[string]: null
-}
--- out/export --
-
--- out/yaml --
-{}
--- out/json --
-{}
--- out/legacy-debug --
-<0>{ <1>for _, x in [1] yield <2>{}, (*close (<3>{}) | <4>{[]: <5>(_: string)->null, })}
--- out/eval/stats --
-Leaks:  2
-Freed:  3
-Reused: 0
-Allocs: 5
-Retain: 2
-
-Unifications: 3
-Conjuncts:    8
-Disjuncts:    5
-
-NumCloseIDs: 1
 -- out/eval --
 (struct){ |(*(#struct){
   }, (struct){

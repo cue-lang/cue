@@ -26,16 +26,6 @@ package foo
 #Config & {
 	console: dark
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  25
-Reused: 19
-Allocs: 6
-Retain: 1
-
-Unifications: 21
-Conjuncts:    69
-Disjuncts:    26
 -- out/evalalpha --
 (#struct){
   console: (#struct){
@@ -86,36 +76,6 @@ diff old new
 -    ctermbg: (string){ "239" }
 -  }
  }
--- diff/todo/p3 --
-Reordering.
--- out/eval --
-(#struct){
-  #theme: (#struct){
-    color: (string){ string }
-    ctermbg: (string){ string }
-  }
-  dark: (#struct){
-    color: (string){ "dark" }
-    ctermbg: (string){ "239" }
-  }
-  light: (#struct){
-    color: (string){ "light" }
-    ctermbg: (string){ "254" }
-  }
-  #Config: (#struct){
-    console: (#struct){ |(*(#struct){
-        color: (string){ "light" }
-        ctermbg: (string){ "254" }
-      }, (#struct){
-        color: (string){ "dark" }
-        ctermbg: (string){ "239" }
-      }) }
-  }
-  console: (#struct){
-    color: (string){ "dark" }
-    ctermbg: (string){ "239" }
-  }
-}
 -- out/compile --
 --- box.cue
 {

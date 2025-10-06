@@ -18,16 +18,6 @@ cycleErr: X={
 	err3: == (X + 1)
 	err3: 4
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  13
-Reused: 9
-Allocs: 4
-Retain: 0
-
-Unifications: 13
-Conjuncts:    20
-Disjuncts:    13
 -- out/evalalpha --
 Errors:
 cycleErr.err3: invalid operands {err3:_|_(cycleErr.err3: invalid operands value at path 'cycleErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
@@ -107,30 +97,6 @@ diff old new
      }
    }
    listValueAlias: (#list){
--- out/eval --
-(struct){
-  structShorthand: (struct){
-    b: (int){ 3 }
-    c: (int){ 3 }
-  }
-  fieldAndValue: (struct){
-    foo: (int){
-      3
-      #sum: (int){ 6 }
-    }
-  }
-  valueCycle: (struct){
-    b: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:8:18
-    }
-  }
-  listValueAlias: (#list){
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 1 }
-  }
-}
 -- out/compile --
 --- err.cue
 {

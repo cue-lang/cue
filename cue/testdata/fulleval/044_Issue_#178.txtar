@@ -10,18 +10,6 @@ data: bytes
 
 len: int
 bar: hex.EncodedLen(len)
--- out/def --
-import (
-	"encoding/csv"
-	"encoding/hex"
-)
-
-foo:  csv.Decode(data)
-data: bytes
-len:  int
-bar:  hex.EncodedLen(len)
--- out/legacy-debug --
-<0>{foo: <1>.Decode (<2>.data), data: bytes, len: int, bar: <3>.EncodedLen (<2>.len)}
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  5
@@ -51,16 +39,6 @@ diff old new
 -Disjuncts:    10
 +Conjuncts:    5
 +Disjuncts:    0
--- out/eval/stats --
-Leaks:  0
-Freed:  5
-Reused: 2
-Allocs: 3
-Retain: 5
-
-Unifications: 5
-Conjuncts:    13
-Disjuncts:    10
 -- out/eval --
 (struct){
   foo: (_|_){

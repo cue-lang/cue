@@ -6,14 +6,6 @@ r: {
 	b:  a
 	c:  r["a"]
 }
--- out/def --
-r: {
-	a?: 3
-	b:  a
-	c:  r["a"]
-}
--- out/legacy-debug --
-<0>{r: <1>{a?: 3, b: <2>.a, c: <3>.r["a"]}}
 -- out/compile --
 --- in.cue
 {
@@ -23,16 +15,6 @@ r: {
     c: 〈1;r〉["a"]
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  5
-Reused: 2
-Allocs: 3
-Retain: 0
-
-Unifications: 5
-Conjuncts:    5
-Disjuncts:    5
 -- out/eval --
 (struct){
   r: (struct){

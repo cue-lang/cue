@@ -22,16 +22,6 @@ y: f: true
     f: true
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 3
-Allocs: 4
-Retain: 1
-
-Unifications: 7
-Conjuncts:    17
-Disjuncts:    8
 -- out/eval --
 (struct){
   x: (#struct){

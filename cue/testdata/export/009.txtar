@@ -8,13 +8,6 @@ import "list"
 	e: [1, 2, ...]
 	f: [1, 2, ...]
 }
--- out/def --
-a: [1, 2, int, int, int]
-b: <=5*[int] & [1, 2, ...]
-c: (>=3 & <=5)*[int] & [1, 2, ...]
-d: >=2*[int] & [1, 2, ...]
-e: [1, 2, ...int]
-f: [1, 2, ...]
 -- out/compile --
 --- in.cue
 {
@@ -42,16 +35,6 @@ f: [1, 2, ...]
     ]
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  15
-Reused: 11
-Allocs: 4
-Retain: 1
-
-Unifications: 15
-Conjuncts:    31
-Disjuncts:    16
 -- out/eval --
 (struct){
   a: (#list){

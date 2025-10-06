@@ -9,16 +9,6 @@ ex: {
 	"ZZZ":  "ZZZ"
 	"Html": "html"
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  10
-Reused: 7
-Allocs: 3
-Retain: 0
-
-Unifications: 10
-Conjuncts:    10
-Disjuncts:    10
 -- out/eval --
 (struct){
   ex: (struct){

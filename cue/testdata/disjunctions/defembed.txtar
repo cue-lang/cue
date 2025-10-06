@@ -64,52 +64,6 @@ diff old new
 +Disjuncts:    130
 +
 +NumCloseIDs: 16
--- out/eval/stats --
-Leaks:  0
-Freed:  163
-Reused: 155
-Allocs: 8
-Retain: 0
-
-Unifications: 29
-Conjuncts:    198
-Disjuncts:    163
--- out/eval --
-(struct){
-  x: (struct){
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-  }
-  y1: (struct){
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m4: (int){ 6 }
-  }
-  y2: (struct){
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m4: (int){ 6 }
-  }
-  y3: (struct){
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m4: (int){ 6 }
-  }
-  y4: (struct){
-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-    m4: (int){ 6 }
-  }
-  z: (struct){
-    b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-    a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-  }
-}
 -- out/evalalpha --
 (struct){
   x: (struct){
@@ -195,8 +149,6 @@ diff old new
    }
    z: (struct){
      b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
--- diff/todo/p3 --
-Reordering.
 -- out/compile --
 --- in.cue
 {

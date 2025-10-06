@@ -1,12 +1,5 @@
 -- in.cue --
 {a: 1, b: a + 2, c: null, d: true, e: _, f: string}
--- out/def --
-a: 1
-b: 3
-c: null
-d: true
-e: _
-f: string
 -- out/compile --
 --- in.cue
 {
@@ -19,16 +12,6 @@ f: string
     f: string
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 5
-Allocs: 2
-Retain: 0
-
-Unifications: 7
-Conjuncts:    8
-Disjuncts:    7
 -- out/eval --
 (struct){
   a: (int){ 1 }

@@ -20,18 +20,6 @@ for k, v in do {do: (k): v}
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  3
-Reused: 0
-Allocs: 3
-Retain: 0
-
-Unifications: 3
-Conjuncts:    5
-Disjuncts:    3
-
-NumCloseIDs: 1
 -- out/eval --
 (struct){
   do: (struct){

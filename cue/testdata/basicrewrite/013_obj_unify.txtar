@@ -9,26 +9,6 @@ o4: {a: 1, b:    2} & {b: 2}
 o4: {a: 1} & {a: 1, b:    2}
 e:  1   // 1 & {a:3}
 e: {a: 3}
--- out/def --
-o1: {
-	a: 1
-	b: 2
-}
-o2: {
-	a: 1
-	b: 2
-}
-o3: {
-	a: 1
-	b: 2
-}
-o4: {
-	a: 1
-	b: 2
-}
-e: _|_ // conflicting values 1 and {a: 3} (mismatched types int and struct)
--- out/legacy-debug --
-<0>{o1: <1>{a: 1, b: 2}, o2: <2>{a: 1, b: 2}, o3: <3>{a: 1, b: 2}, o4: <4>{a: 1, b: 2}, e: _|_((1 & <5>{a: 3}):conflicting values 1 and {a: 3} (mismatched types int and struct))}
 -- out/compile --
 --- in.cue
 {
@@ -71,16 +51,6 @@ e: _|_ // conflicting values 1 and {a: 3} (mismatched types int and struct)
     a: 3
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  15
-Reused: 12
-Allocs: 3
-Retain: 0
-
-Unifications: 15
-Conjuncts:    32
-Disjuncts:    15
 -- out/eval --
 Errors:
 e: conflicting values 1 and {a:3} (mismatched types int and struct):

@@ -65,17 +65,3 @@ diff old new
  }
  
  group: {
--- out/trim --
-== in.cue
-foo: multipath: {
-	t: [string]: {x: 5}
-
-	// Don't remove u!
-	t: u: {}
-}
-
-group: {
-	for k, v in foo {
-		comp: "\(k)": v
-	}
-}

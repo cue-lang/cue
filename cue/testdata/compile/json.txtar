@@ -34,16 +34,6 @@ a
     5,
   ]
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 8
-Allocs: 3
-Retain: 0
-
-Unifications: 11
-Conjuncts:    11
-Disjuncts:    11
 -- out/eval --
 (struct){
   a: (struct){

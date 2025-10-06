@@ -4,45 +4,6 @@ a: b.c.d
 b: c: {d: 3}
 c: {c: d.d}
 d: {d: 2}
--- out/def --
-a: 3
-b: {
-	c: {
-		d: 3
-	}
-}
-c: {
-	c: 2
-}
-d: {
-	d: 2
-}
--- out/export --
-a: 3
-b: {
-	c: {
-		d: 3
-	}
-}
-c: {
-	c: 2
-}
-d: {
-	d: 2
-}
--- out/yaml --
-a: 3
-b:
-  c:
-    d: 3
-c:
-  c: 2
-d:
-  d: 2
--- out/json --
-{"a":3,"b":{"c":{"d":3}},"c":{"c":2},"d":{"d":2}}
--- out/legacy-debug --
-<0>{a: 3, b: <1>{c: <2>{d: 3}}, c: <3>{c: 2}, d: <4>{d: 2}}
 -- out/compile --
 --- in.cue
 {
@@ -59,16 +20,6 @@ d:
     d: 2
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  9
-Reused: 4
-Allocs: 5
-Retain: 5
-
-Unifications: 9
-Conjuncts:    9
-Disjuncts:    12
 -- out/eval --
 (struct){
   a: (int){ 3 }

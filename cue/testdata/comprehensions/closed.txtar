@@ -110,20 +110,6 @@ issue3486: {
 		}
 	}
 }
--- out/eval/stats --
-Leaks:  2
-Freed:  80
-Reused: 74
-Allocs: 8
-Retain: 3
-
-Unifications: 68
-Conjuncts:    118
-Disjuncts:    81
-
-MisalignedConjunct: 15
-
-NumCloseIDs: 14
 -- out/eval --
 Errors:
 disallowed.vErr.d: field not allowed:

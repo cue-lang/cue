@@ -15,16 +15,6 @@ out: """
     c is \(commands.#c.help)
     d is \(commands.#d.help)
     """
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 3
-Allocs: 4
-Retain: 0
-
-Unifications: 7
-Conjuncts:    11
-Disjuncts:    7
 -- out/eval --
 (struct){
   a: (string){ "foo" }

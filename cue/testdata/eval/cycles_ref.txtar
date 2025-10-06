@@ -7,16 +7,6 @@ c: d & {b: 2}
 d: e
 e: {a: 1}
 e: c
--- out/eval/stats --
-Leaks:  0
-Freed:  12
-Reused: 7
-Allocs: 5
-Retain: 3
-
-Unifications: 12
-Conjuncts:    24
-Disjuncts:    15
 -- out/evalalpha --
 (struct){
   a: (int){ 200 }
@@ -47,23 +37,6 @@ diff old new
    e: (struct){
      a: (int){ 1 }
      b: (int){ 2 }
--- out/eval --
-(struct){
-  a: (int){ 200 }
-  b: (int){ 100 }
-  c: (struct){
-    b: (int){ 2 }
-    a: (int){ 1 }
-  }
-  d: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  e: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-}
 -- out/compile --
 --- in.cue
 {

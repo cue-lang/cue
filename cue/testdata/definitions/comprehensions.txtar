@@ -9,18 +9,6 @@ issue595: {
 		files: cfg.nam
 	}
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  6
-Reused: 1
-Allocs: 5
-Retain: 0
-
-Unifications: 6
-Conjuncts:    6
-Disjuncts:    6
-
-NumCloseIDs: 1
 -- out/eval --
 Errors:
 issue595.files: undefined field: nam:

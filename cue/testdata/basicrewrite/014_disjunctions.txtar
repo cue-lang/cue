@@ -33,27 +33,6 @@ m5: (*2 | 3) & (2 | 3)
 
 // All errors are treated the same as per the unification model.
 i1: [1, 2][3] | "c"
--- out/def --
-o1:  1 | 2 | 3
-o2:  1
-o3:  2
-o4:  1 | 2 | 3 | *_|_
-o5:  1 | *2 | 3
-o6:  1 | 2 | 3
-o7:  2 | 3
-o8:  2 | 3
-o9:  2 | 3
-o10: 3 | *2
-m1:  *2 | 3
-m2:  *2 | 3
-m3:  *2 | 3
-m4:  *2 | 3
-m5:  *2 | 3
-
-// All errors are treated the same as per the unification model.
-i1: "c"
--- out/legacy-debug --
-<0>{o1: (1 | 2 | 3), o2: 1, o3: 2, o4: (1 | 2 | 3 | *_|_), o5: (1 | *2 | 3), o6: (1 | 2 | 3), o7: (2 | 3), o8: (2 | 3), o9: (2 | 3), o10: (3 | *2), m1: (*2 | 3), m2: (*2 | 3), m3: (*2 | 3), m4: (*2 | 3), m5: (*2 | 3), i1: "c"}
 -- out/compile --
 --- in.cue
 {
@@ -77,16 +56,6 @@ i1: "c"
     2,
   ][3]|"c")
 }
--- out/eval/stats --
-Leaks:  1
-Freed:  134
-Reused: 126
-Allocs: 9
-Retain: 1
-
-Unifications: 18
-Conjuncts:    150
-Disjuncts:    135
 -- out/eval --
 (struct){
   o1: (int){ |((int){ 1 }, (int){ 2 }, (int){ 3 }) }

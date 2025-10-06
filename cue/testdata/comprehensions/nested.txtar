@@ -58,20 +58,6 @@ for k, v in deployment {
 		]
 	}
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  45
-Reused: 26
-Allocs: 19
-Retain: 33
-
-Unifications: 35
-Conjuncts:    95
-Disjuncts:    75
-
-MisalignedConjunct: 5
-
-NumCloseIDs: 1
 -- out/eval --
 (struct){
   service: (struct){

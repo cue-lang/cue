@@ -46,16 +46,6 @@ issue3977: inlineLet: {
 
 	err: p.out
 }
--- out/eval/stats --
-Leaks:  9
-Freed:  48
-Reused: 43
-Allocs: 14
-Retain: 27
-
-Unifications: 47
-Conjuncts:    87
-Disjuncts:    68
 -- out/eval --
 Errors:
 x: conflicting values 2 and 1:

@@ -24,16 +24,6 @@ foo
 package baz
 
 x: 1
--- out/eval/stats --
-Leaks:  2
-Freed:  9
-Reused: 6
-Allocs: 5
-Retain: 4
-
-Unifications: 11
-Conjuncts:    25
-Disjuncts:    13
 -- out/evalalpha --
 (struct){
   z: (int){ 3 }
@@ -61,18 +51,6 @@ diff old new
 -  z: (int){ 3 }
 +  x: (int){ 1 }
  }
--- diff/todo/p3 --
-Reordering
--- out/eval --
-(struct){
-  foo: (struct){
-    x: (int){ 1 }
-    y: (int){ 2 }
-  }
-  x: (int){ 1 }
-  y: (int){ 2 }
-  z: (int){ 3 }
-}
 -- out/compile --
 --- in.cue
 {

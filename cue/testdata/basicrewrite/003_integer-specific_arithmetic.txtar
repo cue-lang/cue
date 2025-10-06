@@ -28,33 +28,6 @@ m3:  -5 mod 2  // 1
 m4:  -5 mod -2 // 1
 me1: 2.0 mod 1
 me2: 2 mod 1.0
--- out/def --
-q1:  2
-q2:  -2
-q3:  -2
-q4:  2
-qe1: _|_ // invalid operation 2.0 quo 1 (mismatched types float and int)
-qe2: _|_ // invalid operation 2 quo 1.0 (mismatched types int and float)
-r1:  1
-r2:  1
-r3:  -1
-r4:  -1
-re1: _|_ // invalid operation 2.0 rem 1 (mismatched types float and int)
-re2: _|_ // invalid operation 2 rem 1.0 (mismatched types int and float)
-d1:  2
-d2:  -2
-d3:  -3
-d4:  3
-de1: _|_ // invalid operation 2.0 div 1 (mismatched types float and int)
-de2: _|_ // invalid operation 2 div 1.0 (mismatched types int and float)
-m1:  1
-m2:  1
-m3:  1
-m4:  1
-me1: _|_ // invalid operation 2.0 mod 1 (mismatched types float and int)
-me2: _|_ // invalid operation 2 mod 1.0 (mismatched types int and float)
--- out/legacy-debug --
-<0>{q1: 2, q2: -2, q3: -2, q4: 2, qe1: _|_((2.0 quo 1):invalid operation 2.0 quo 1 (mismatched types float and int)), qe2: _|_((2 quo 1.0):invalid operation 2 quo 1.0 (mismatched types int and float)), r1: 1, r2: 1, r3: -1, r4: -1, re1: _|_((2.0 rem 1):invalid operation 2.0 rem 1 (mismatched types float and int)), re2: _|_((2 rem 1.0):invalid operation 2 rem 1.0 (mismatched types int and float)), d1: 2, d2: -2, d3: -3, d4: 3, de1: _|_((2.0 div 1):invalid operation 2.0 div 1 (mismatched types float and int)), de2: _|_((2 div 1.0):invalid operation 2 div 1.0 (mismatched types int and float)), m1: 1, m2: 1, m3: 1, m4: 1, me1: _|_((2.0 mod 1):invalid operation 2.0 mod 1 (mismatched types float and int)), me2: _|_((2 mod 1.0):invalid operation 2 mod 1.0 (mismatched types int and float))}
 -- out/compile --
 --- in.cue
 {
@@ -83,16 +56,6 @@ me2: _|_ // invalid operation 2 mod 1.0 (mismatched types int and float)
   me1: (2.0 mod 1)
   me2: (2 mod 1.0)
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  25
-Reused: 23
-Allocs: 2
-Retain: 0
-
-Unifications: 25
-Conjuncts:    25
-Disjuncts:    25
 -- out/eval --
 Errors:
 qe1: invalid operands 2.0 and 1 to 'quo' (type float and int):

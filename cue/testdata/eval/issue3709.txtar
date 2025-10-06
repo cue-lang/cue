@@ -22,16 +22,6 @@ package imported
     [string]: 〈import;"foo.test/bar/imported"〉.#Foo
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  2
-Reused: 0
-Allocs: 2
-Retain: 0
-
-Unifications: 2
-Conjuncts:    2
-Disjuncts:    2
 -- out/eval --
 (struct){
   out: (struct){

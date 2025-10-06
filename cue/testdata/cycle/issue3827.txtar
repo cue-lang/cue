@@ -22,16 +22,6 @@ full: {
 		}
 	}
 }
--- out/eval/stats --
-Leaks:  6
-Freed:  29
-Reused: 22
-Allocs: 13
-Retain: 10
-
-Unifications: 31
-Conjuncts:    57
-Disjuncts:    38
 -- out/eval --
 (struct){
   reduced: (struct){

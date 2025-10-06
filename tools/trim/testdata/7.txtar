@@ -36,9 +36,3 @@ diff old new
 -	x: string
  	x: "hi"
  }
--- out/trim --
-== a.cue
-a: [string]: {
-	x: string
-	x: "hi"
-}

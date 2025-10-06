@@ -9,16 +9,6 @@
 }
 
 val: #Mid & {} & {myoutput: {content: "foo"}} // Should work.
--- out/eval/stats --
-Leaks:  0
-Freed:  10
-Reused: 6
-Allocs: 4
-Retain: 0
-
-Unifications: 10
-Conjuncts:    23
-Disjuncts:    10
 -- out/evalalpha --
 (struct){
   #TopLevel: (#struct){
@@ -50,25 +40,6 @@ diff old new
      }
    }
  }
--- diff/todo/p3 --
-Reordering
--- out/eval --
-(struct){
-  #TopLevel: (#struct){
-  }
-  #Mid: (#struct){
-    myoutput: (#struct){
-      path: (string){ "/output" }
-      content: (string){ string }
-    }
-  }
-  val: (#struct){
-    myoutput: (#struct){
-      path: (string){ "/output" }
-      content: (string){ "foo" }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -86,16 +86,6 @@ a: 0
 b: 1
 c: 2
 d: 3
--- out/eval/stats --
-Leaks:  0
-Freed:  78
-Reused: 68
-Allocs: 10
-Retain: 18
-
-Unifications: 26
-Conjuncts:    181
-Disjuncts:    82
 -- out/eval --
 (struct){
   #size: (int){ 2 }

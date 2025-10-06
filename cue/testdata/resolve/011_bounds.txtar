@@ -65,49 +65,6 @@ e6: >11 & <11
 e7: >=11 & <11
 e8: >11 & <=11
 e9: >"a" & <1
--- out/def --
-i1: 5
-i2: 5
-i3: []
-i4: !=2 & !=4
-s1: >=0 & <=10 & !=1
-s2: >=0 & <=10
-s3: >5
-s4: <10
-s5: !=2
-
-// TODO: could change inequality
-s6:   !=2
-s7:   !=2
-s8:   >5
-s10:  >1 & <=10
-s11:  >0 & <12
-s20:  10
-s22:  >5 & <=6
-s22a: 6
-s22b: 6
-s22c: 5
-s22d: 5
-s22e: 5
-s22f: 5
-s23:  >0 & <2
-s23a: 1
-s23b: 1
-s23c: 1
-s23d: 1
-s23e: >0.0 & <2.0
-s30:  >0
-e1:   _|_ // invalid value null (excluded by !=null)
-e2:   _|_ // invalid value null (excluded by !=null)
-e3:   _|_ // invalid value 1 (out of bound >1)
-e4:   _|_ // invalid value 0 (out of bound <0)
-e5:   _|_ // conflicting bounds >1 and <0
-e6:   _|_ // conflicting bounds >11 and <11
-e7:   _|_ // conflicting bounds >=11 and <11
-e8:   _|_ // conflicting bounds >11 and <=11
-e9:   _|_ // conflicting values >"a" and <1 (mismatched types string and number)
--- out/legacy-debug --
-<0>{i1: 5, i2: 5, i3: [], i4: (!=2 & !=4), s1: (>=0 & <=10 & !=1), s2: (>=0 & <=10), s3: >5, s4: <10, s5: !=2, s6: (!=2 & >=2), s7: (>=2 & !=2), s8: >5, s10: (<=10 & >1), s11: (>0 & <12), s20: 10, s22: (>5 & <=6), s22a: 6, s22b: 6, s22c: 5, s22d: 5, s22e: 5, s22f: 5, s23: (>0 & <2), s23a: 1, s23b: 1, s23c: 1, s23d: 1, s23e: (>0.0 & <2.0), s30: int & >0, e1: _|_((!=null & null):invalid value null (excluded by !=null)), e2: _|_((!=null & null):invalid value null (excluded by !=null)), e3: _|_((>1 & 1):invalid value 1 (out of bound >1)), e4: _|_((<0 & 0):invalid value 0 (out of bound <0)), e5: _|_(conflicting bounds >1 and <0), e6: _|_(conflicting bounds >11 and <11), e7: _|_(conflicting bounds >=11 and <11), e8: _|_(conflicting bounds >11 and <=11), e9: _|_((>"a" & <1):conflicting values >"a" and <1 (mismatched types string and number))}
 -- out/compile --
 --- in.cue
 {
@@ -163,16 +120,6 @@ e9:   _|_ // conflicting values >"a" and <1 (mismatched types string and number)
   e8: (>11 & <=11)
   e9: (>"a" & <1)
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  50
-Reused: 47
-Allocs: 3
-Retain: 0
-
-Unifications: 50
-Conjuncts:    126
-Disjuncts:    51
 -- out/eval --
 Errors:
 e1: conflicting values null and !=null (mismatched types null and (bool|string|bytes|func|list|struct|number)):

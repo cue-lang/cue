@@ -19,16 +19,6 @@ mixedComparison: {
     listVsStruct: f: [1, 2] == {a: 1}
     stringVsNumber: f: "hello" == 42
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  5
-Reused: 3
-Allocs: 2
-Retain: 0
-
-Unifications: 5
-Conjuncts:    5
-Disjuncts:    5
 -- out/evalalpha --
 (struct){
   a: (int){ 1 }
@@ -89,13 +79,6 @@ diff old new
 +    }
 +  }
  }
--- out/eval --
-(struct){
-  a: (int){ 1 }
-  b: (int){ 3 }
-  c: (int){ 2 }
-  d: (int){ 2 }
-}
 -- out/compile --
 --- in.cue
 {

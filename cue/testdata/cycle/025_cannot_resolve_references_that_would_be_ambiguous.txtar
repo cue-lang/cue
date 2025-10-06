@@ -12,24 +12,6 @@ b2: (0 | *1) & b1
 
 c1: (*{a: 1} | {b: 1}) & c2
 c2: (*{a: 2} | {b: 2}) & c1
--- out/def --
-a1: (*0 | 1) & a3-a2
-a3: 1
-a2: (*0 | 1) & a3-a1
-b1: (*0 | 1) & b2
-b2: (0 | *1) & b1
-c1: (*{
-	a: 1
-} | {
-	b: 1
-}) & c2
-c2: (*{
-	a: 2
-} | {
-	b: 2
-}) & c1
--- out/legacy-debug --
-<0>{a1: ((*0 | 1) & (<1>.a3 - <1>.a2)), a3: 1, a2: ((*0 | 1) & (<1>.a3 - <1>.a1)), b1: (0 | 1), b2: (0 | 1), c1: (<2>{a: 1, b: 2} | <3>{a: 2, b: 1}), c2: (<4>{a: 2, b: 1} | <5>{a: 1, b: 2})}
 -- out/compile --
 --- in.cue
 {
@@ -51,16 +33,6 @@ c2: (*{
     b: 2
   }) & 〈0;c1〉)
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  52
-Reused: 43
-Allocs: 9
-Retain: 19
-
-Unifications: 24
-Conjuncts:    80
-Disjuncts:    52
 -- out/eval --
 (struct){
   a1: (_|_){

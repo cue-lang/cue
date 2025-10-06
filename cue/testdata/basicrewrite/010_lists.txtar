@@ -9,19 +9,6 @@ e2:    [3]["d"]
 e3:    [3][-1]
 e4:    [1, 2, ...>=4 & <=5] & [1, 2, 4, 8]
 e5:    [1, 2, 4, 8] & [1, 2, ...>=4 & <=5]
--- out/def --
-list: [1, 2, 3]
-index: 2
-unify: [1, 2, 3]
-e:  _|_ // conflicting values [] and 4 (mismatched types list and int)
-e2: _|_ // invalid list index "d" (type string)
-e3: _|_ // invalid list index -1 (index must be non-negative)
-e4: [1, 2, 4, _|_, // invalid value 8 (out of bound <=5)
-]
-e5: [1, 2, 4, _|_, // invalid value 8 (out of bound <=5)
-]
--- out/legacy-debug --
-<0>{list: [1,2,3], index: 2, unify: [1,2,3], e: _|_(([] & 4):conflicting values [] and 4 (mismatched types list and int)), e2: _|_("d":invalid list index "d" (type string)), e3: _|_(-1:invalid list index -1 (index must be non-negative)), e4: [1,2,4,_|_((<=5 & 8):invalid value 8 (out of bound <=5))], e5: [1,2,4,_|_((<=5 & 8):invalid value 8 (out of bound <=5))]}
 -- out/compile --
 --- in.cue
 {
@@ -72,16 +59,6 @@ e5: [1, 2, 4, _|_, // invalid value 8 (out of bound <=5)
     ...(>=4 & <=5),
   ])
 }
--- out/eval/stats --
-Leaks:  4
-Freed:  23
-Reused: 20
-Allocs: 7
-Retain: 4
-
-Unifications: 27
-Conjuncts:    46
-Disjuncts:    26
 -- out/evalalpha --
 Errors:
 e: conflicting values [] and 4 (mismatched types list and int):
@@ -180,73 +157,3 @@ diff old new
      //     ./in.cue:5:12
    }
    e3: (_|_){
--- diff/todo/p2 --
-error: more precise message
--- out/eval --
-Errors:
-e: conflicting values 4 and [] (mismatched types int and list):
-    ./in.cue:4:8
-    ./in.cue:4:13
-e2: invalid list index d (type string):
-    ./in.cue:5:12
-e3: invalid index -1 (index must be non-negative):
-    ./in.cue:6:8
-    ./in.cue:6:12
-e4.3: invalid value 8 (out of bound <=5):
-    ./in.cue:7:24
-    ./in.cue:7:41
-e5.3: invalid value 8 (out of bound <=5):
-    ./in.cue:8:39
-    ./in.cue:8:18
-
-Result:
-(_|_){
-  // [eval]
-  list: (#list){
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 3 }
-  }
-  index: (int){ 2 }
-  unify: (#list){
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 3 }
-  }
-  e: (_|_){
-    // [eval] e: conflicting values 4 and [] (mismatched types int and list):
-    //     ./in.cue:4:8
-    //     ./in.cue:4:13
-  }
-  e2: (_|_){
-    // [eval] e2: invalid list index d (type string):
-    //     ./in.cue:5:12
-  }
-  e3: (_|_){
-    // [eval] e3: invalid index -1 (index must be non-negative):
-    //     ./in.cue:6:8
-    //     ./in.cue:6:12
-  }
-  e4: (_|_){
-    // [eval]
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 4 }
-    3: (_|_){
-      // [eval] e4.3: invalid value 8 (out of bound <=5):
-      //     ./in.cue:7:24
-      //     ./in.cue:7:41
-    }
-  }
-  e5: (_|_){
-    // [eval]
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 4 }
-    3: (_|_){
-      // [eval] e5.3: invalid value 8 (out of bound <=5):
-      //     ./in.cue:8:39
-      //     ./in.cue:8:18
-    }
-  }
-}

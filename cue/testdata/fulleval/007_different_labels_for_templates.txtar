@@ -4,29 +4,6 @@
 a: [X=string]: {name: X}
 a: [Name=string]: {name: Name}
 a: foo: {}
--- out/def --
-a: {
-	{[X=string]: {
-		name: X & X
-	}}
-	foo: {
-		name: "foo"
-	}
-}
--- out/export --
-a: {
-	foo: {
-		name: "foo"
-	}
-}
--- out/yaml --
-a:
-  foo:
-    name: foo
--- out/json --
-{"a":{"foo":{"name":"foo"}}}
--- out/legacy-debug --
-<0>{a: <1>{[]: <2>(X: string)->(<3>{name: <2>.X} & <4>{name: <2>.X}), foo: <5>{name: "foo"}}}
 -- out/compile --
 --- in.cue
 {
@@ -44,16 +21,6 @@ a:
     foo: {}
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  4
-Reused: 0
-Allocs: 4
-Retain: 0
-
-Unifications: 4
-Conjuncts:    9
-Disjuncts:    4
 -- out/eval --
 (struct){
   a: (struct){

@@ -9,26 +9,6 @@ for key, value in {x: v: 1} {
 		_p: 3
 	}
 }
--- out/def --
-x: {
-	v: {
-		"1": 2
-	}
-	_p: 3
-}
--- out/export --
-x: {
-	v: {
-		"1": 2
-	}
-}
--- out/yaml --
-x:
-  v:
-    "1": 2
--- out/json --
--- out/legacy-debug --
-<0>{x: <1>{v: <2>{"1": 2}, _p: 3}}
 -- out/compile --
 --- in.cue
 {
@@ -47,20 +27,6 @@ x:
     }
   }
 }
--- out/eval/stats --
-Leaks:  3
-Freed:  7
-Reused: 2
-Allocs: 8
-Retain: 7
-
-Unifications: 8
-Conjuncts:    11
-Disjuncts:    12
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 1
 -- out/eval --
 (struct){
   x: (struct){

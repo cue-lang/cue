@@ -4,27 +4,6 @@ a: _
 b: a
 a: {d: 1, d: _}
 b: _
--- out/def --
-a: {
-	d: 1
-}
-b: a
--- out/export --
-a: {
-	d: 1
-}
-b: {
-	d: 1
-}
--- out/yaml --
-a:
-  d: 1
-b:
-  d: 1
--- out/json --
-{"a":{"d":1},"b":{"d":1}}
--- out/legacy-debug --
-<0>{a: <1>{d: 1}, b: <2>{d: 1}}
 -- out/compile --
 --- in.cue
 {
@@ -36,16 +15,6 @@ b:
   }
   b: _
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  5
-Reused: 2
-Allocs: 3
-Retain: 0
-
-Unifications: 5
-Conjuncts:    11
-Disjuncts:    5
 -- out/evalalpha --
 (struct){
   a: (struct){
@@ -66,12 +35,3 @@ diff old new
 -  }
 +  b: ~(a)
  }
--- out/eval --
-(struct){
-  a: (struct){
-    d: (int){ 1 }
-  }
-  b: (struct){
-    d: (int){ 1 }
-  }
-}

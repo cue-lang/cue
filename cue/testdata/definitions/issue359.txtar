@@ -34,16 +34,6 @@ many: #complex & {
 notbad: many & {
 	things: hola: peso: 2
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  81
-Reused: 74
-Allocs: 7
-Retain: 0
-
-Unifications: 41
-Conjuncts:    134
-Disjuncts:    81
 -- out/eval --
 (struct){
   #simple: (#struct){

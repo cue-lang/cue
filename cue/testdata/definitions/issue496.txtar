@@ -8,16 +8,6 @@
 }
 
 l: #N
--- out/eval/stats --
-Leaks:  0
-Freed:  8
-Reused: 4
-Allocs: 4
-Retain: 0
-
-Unifications: 8
-Conjuncts:    13
-Disjuncts:    8
 -- out/evalalpha --
 (struct){
   #A: (_){ _ }
@@ -43,20 +33,6 @@ diff old new
 -  }
 +  l: ~(#N)
  }
--- out/eval --
-(struct){
-  #A: (_){ _ }
-  #N: (#struct){
-    _E: (#struct){
-      name: (string){ "hello" }
-    }
-  }
-  l: (#struct){
-    _E: (#struct){
-      name: (string){ "hello" }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

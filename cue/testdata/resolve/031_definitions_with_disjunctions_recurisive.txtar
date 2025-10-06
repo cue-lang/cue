@@ -10,26 +10,6 @@
 	}
 	x: c: 3
 }
--- out/def --
-#Foo: {
-	x: {
-		field: int
-		a:     1
-		c:     3
-	} | {
-		field: int
-		b:     2
-		c:     3
-	}
-}
--- out/export --
-
--- out/yaml --
-{}
--- out/json --
-{}
--- out/legacy-debug --
-<0>{#Foo: <1>C{x: (<2>C{field: int, a: 1, c: 3} | <3>C{field: int, b: 2, c: 3})}}
 -- out/compile --
 --- in.cue
 {
@@ -47,16 +27,6 @@
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 5
-Allocs: 6
-Retain: 0
-
-Unifications: 9
-Conjuncts:    13
-Disjuncts:    11
 -- out/eval --
 (struct){
   #Foo: (#struct){

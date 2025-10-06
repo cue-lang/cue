@@ -179,10 +179,3 @@ diff old new
 -cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let clause or alias:
 +cycles.issue1042.#Add16.let[].for[].c: cyclic references in let clause or alias:
      ./in.cue:34:45
--- out/eval --
-cycles.a.let[].c.c: cyclic references in let clause or alias:
-    ./in.cue:5:15
-cycles.b.let[].c.c: cyclic references in let clause or alias:
-    ./in.cue:11:15
-cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let clause or alias:
-    ./in.cue:34:45

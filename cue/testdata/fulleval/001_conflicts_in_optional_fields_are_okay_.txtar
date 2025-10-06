@@ -5,20 +5,6 @@ d: {a: 1, b?: 3} | {a: 2}
 
 // the following conjunction should not eliminate any disjuncts
 c: d & {b?: 4}
--- out/def --
-d: {
-	a:  1
-	b?: 3
-} | {
-	a: 2
-}
-
-// the following conjunction should not eliminate any disjuncts
-c: d & {
-	b?: 4
-}
--- out/legacy-debug --
-<0>{d: (<1>{a: 1, b?: 3} | <2>{a: 2}), c: (<3>{a: 1, b?: (3 & 4)} | <4>{a: 2, b?: 4})}
 -- out/compile --
 --- in.cue
 {
@@ -32,16 +18,6 @@ c: d & {
     b?: 4
   })
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  14
-Reused: 9
-Allocs: 5
-Retain: 0
-
-Unifications: 10
-Conjuncts:    17
-Disjuncts:    14
 -- out/eval --
 (struct){
   d: (struct){ |((struct){

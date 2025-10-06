@@ -702,28 +702,6 @@ diff old new
 +Notifications: 4
 +
 +NumCloseIDs: 319
--- out/eval/stats --
-Leaks:  9
-Freed:  2856
-Reused: 2841
-Allocs: 24
-Retain: 123
-
-Unifications: 1435
-Conjuncts:    4154
-Disjuncts:    2979
-
-MisalignedConjunct: 44
-
-NumCloseIDs: 10
--- diff/explanation --
-issue2209.simplified.t2.BAZ: now fixed
-issue2209.simplified.t3.BAZ: missing error.
-issue2209.simplified.t3: new evaluator fixes known bug.
-preserveClosedness.medium.p*: discarding of default is correct.
-issue1417: new evaluator fixes known bug
-issue3149: new evaluator fixes known bug
-issue770: new evaluator fixes a bug in "c" and "coo" where defaults did not apply correctly.
 -- out/eval --
 (struct){
   disambiguateClosed: (struct){

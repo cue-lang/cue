@@ -47,10 +47,3 @@ diff old new
  a: [string]: x: "hi"
  
  b: [string]: x: string
--- out/trim --
-== a.cue
-a: [string]: x: string
-a: [string]: x: "hi"
-
-b: [string]: x: string
-b: [=~".*"]: x: "hi"

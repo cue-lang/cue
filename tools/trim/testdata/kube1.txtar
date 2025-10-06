@@ -102,28 +102,3 @@ diff old new
  }
  
  service: a: {
--- out/trim --
-== in.cue
-service: [ID=string]: {
-	ports: [...{
-		protocol: *"TCP" | "UDP"
-		extra:    3
-	}]
-}
-
-service: a: {
-	ports: [{
-		name: "a"
-		key:  "bar"
-	}]
-}
-
-service: a: {
-	ports: [{
-		key: "bar"
-	}]
-}
-
-service: a: {
-	ports: [{}]
-}

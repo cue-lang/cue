@@ -2,18 +2,6 @@
 #evalPartial
 -- in.cue --
 a: {[_]: _}
--- out/def --
-a: {
-	...
-}
--- out/export --
-a: {}
--- out/yaml --
-a: {}
--- out/json --
-{"a":{}}
--- out/legacy-debug --
-<0>{a: <1>{...}}
 -- out/compile --
 --- in.cue
 {
@@ -21,16 +9,6 @@ a: {}
     [_]: _
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  2
-Reused: 0
-Allocs: 2
-Retain: 0
-
-Unifications: 2
-Conjuncts:    2
-Disjuncts:    2
 -- out/eval --
 (struct){
   a: (struct){

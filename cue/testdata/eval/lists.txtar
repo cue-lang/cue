@@ -7,16 +7,6 @@ b: a[3]
 d: 5
 
 c: [for x in [[1, 2]][0] {x + d}]
--- out/eval/stats --
-Leaks:  4
-Freed:  11
-Reused: 8
-Allocs: 7
-Retain: 6
-
-Unifications: 15
-Conjuncts:    29
-Disjuncts:    13
 -- out/eval --
 (struct){
   a: (#list){

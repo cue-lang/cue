@@ -97,16 +97,6 @@ invalidPattern: {
 	[=~"BAD)" & =~"x"]: string
 	y: 123
 }
--- out/eval/stats --
-Leaks:  1
-Freed:  61
-Reused: 56
-Allocs: 6
-Retain: 4
-
-Unifications: 60
-Conjuncts:    109
-Disjuncts:    65
 -- out/eval --
 Errors:
 invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:

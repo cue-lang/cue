@@ -7,12 +7,6 @@ b: 200
 
 x: 100
 x: x + 1
--- out/def --
-x: _|_ // conflicting values 100 and 101
-a: _|_ // conflicting values 210 and 200
-b: _|_ // conflicting values 210 and 200
--- out/legacy-debug --
-<0>{x: _|_((100 & 101):conflicting values 100 and 101), a: _|_((210 & 200):conflicting values 210 and 200), b: _|_((210 & 200):conflicting values 210 and 200)}
 -- out/compile --
 --- in.cue
 {
@@ -22,16 +16,6 @@ b: _|_ // conflicting values 210 and 200
   x: 100
   x: (〈0;x〉 + 1)
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  4
-Reused: 1
-Allocs: 3
-Retain: 1
-
-Unifications: 4
-Conjuncts:    5
-Disjuncts:    4
 -- out/eval --
 Errors:
 b: conflicting values 210 and 200:

@@ -15,51 +15,6 @@ e: {
 		v: e.v
 	}
 }
--- out/def --
-a: 2
-b: 2
-d: {
-	d: 3
-	e: 3
-}
-e: {
-	e: {
-		v: 1
-	}
-	f: {
-		v: 1
-	}
-}
--- out/export --
-a: 2
-b: 2
-d: {
-	d: 3
-	e: 3
-}
-e: {
-	e: {
-		v: 1
-	}
-	f: {
-		v: 1
-	}
-}
--- out/yaml --
-a: 2
-b: 2
-d:
-  d: 3
-  e: 3
-e:
-  e:
-    v: 1
-  f:
-    v: 1
--- out/json --
-{"a":2,"b":2,"d":{"d":3,"e":3},"e":{"e":{"v":1},"f":{"v":1}}}
--- out/legacy-debug --
-<0>{a: 2, b: 2, d: <1>{d: 3, e: 3}, e: <2>{e: <3>{v: 1}, f: <4>{v: 1}}}
 -- out/compile --
 --- in.cue
 {
@@ -78,16 +33,6 @@ e:
     }
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 7
-Allocs: 4
-Retain: 1
-
-Unifications: 11
-Conjuncts:    13
-Disjuncts:    11
 -- out/eval --
 (struct){
   a: (int){ 2 }

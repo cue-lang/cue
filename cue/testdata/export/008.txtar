@@ -1,8 +1,5 @@
 -- in.cue --
 {a: [ 3 & 4]}
--- out/def --
-a: [_|_, // conflicting values 3 and 4
-]
 -- out/compile --
 --- in.cue
 {
@@ -12,16 +9,6 @@ a: [_|_, // conflicting values 3 and 4
     ]
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  3
-Reused: 0
-Allocs: 3
-Retain: 0
-
-Unifications: 3
-Conjuncts:    5
-Disjuncts:    3
 -- out/eval --
 Errors:
 a.0: conflicting values 4 and 3:

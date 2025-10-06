@@ -6,36 +6,6 @@ fn: {
 	out: arg[1:]
 }
 fn1: fn & {arg: [1]}
--- out/def --
-fn: {
-	arg: [1]
-	out: []
-}
-fn1: fn & {
-	arg: [1]
-}
--- out/export --
-fn: {
-	arg: [1]
-	out: []
-}
-fn1: {
-	arg: [1]
-	out: []
-}
--- out/yaml --
-fn:
-  arg:
-  - 1
-  out: []
-fn1:
-  arg:
-  - 1
-  out: []
--- out/json --
-{"fn":{"arg":[1],"out":[]},"fn1":{"arg":[1],"out":[]}}
--- out/legacy-debug --
-<0>{fn: <1>{arg: [1], out: []}, fn1: <2>{arg: [1], out: []}}
 -- out/compile --
 --- in.cue
 {
@@ -53,16 +23,6 @@ fn1:
     ]
   })
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  9
-Reused: 5
-Allocs: 4
-Retain: 0
-
-Unifications: 9
-Conjuncts:    17
-Disjuncts:    9
 -- out/eval --
 (struct){
   fn: (struct){

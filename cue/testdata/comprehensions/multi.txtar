@@ -21,16 +21,6 @@ issue574: {
 		},
 	]
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  24
-Reused: 20
-Allocs: 4
-Retain: 0
-
-Unifications: 24
-Conjuncts:    37
-Disjuncts:    24
 -- out/eval --
 (struct){
   list: (#list){

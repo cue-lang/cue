@@ -13,20 +13,6 @@ h: _|_ == ({a: 1} & {a: 2})
 i: _|_ == ({a: 1} & {b: 2})
 
 err: 1 & 2
--- out/def --
-a:   true
-b:   _|_ // conflicting values 1 and 2
-err: _|_ // conflicting values 1 and 2
-c:   true
-d:   false
-e:   _|_ // conflicting values 1 and 2
-// z: err == err // TODO: should infer to be true?
-f: true
-g: false
-h: true
-i: false
--- out/legacy-debug --
-<0>{a: true, b: _|_((1 & 2):conflicting values 1 and 2), err: _|_((1 & 2):conflicting values 1 and 2), c: true, d: false, e: _|_((1 & 2):conflicting values 1 and 2), f: true, g: false, h: true, i: false}
 -- out/compile --
 --- in.cue
 {
@@ -57,16 +43,6 @@ i: false
   }))
   err: (1 & 2)
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  21
-Reused: 16
-Allocs: 5
-Retain: 4
-
-Unifications: 21
-Conjuncts:    28
-Disjuncts:    21
 -- out/eval --
 Errors:
 err: conflicting values 2 and 1:

@@ -10,18 +10,6 @@ e4: [0][1:2]
 e5: 4[1:2]
 e6: [2]["":]
 e7: [2][:"9"]
--- out/def --
-a: []
-b: []
-e1: _|_ // slice bounds out of range
-e2: _|_ // negative slice index
-e3: _|_ // invalid slice index: 1 > 0
-e4: _|_ // slice bounds out of range
-e5: _|_ // cannot slice 4 (type int)
-e6: _|_ // invalid slice index "" (type string)
-e7: _|_ // invalid slice index "9" (type string)
--- out/legacy-debug --
-<0>{a: [], b: [], e1: _|_(1:slice bounds out of range), e2: _|_([0]:negative slice index), e3: _|_([0]:invalid slice index: 1 > 0), e4: _|_(2:slice bounds out of range), e5: _|_(4:cannot slice 4 (type int)), e6: _|_("":invalid slice index "" (type string)), e7: _|_("9":invalid slice index "9" (type string))}
 -- out/compile --
 --- in.cue
 {
@@ -49,16 +37,6 @@ e7: _|_ // invalid slice index "9" (type string)
     2,
   ][:"9"]
 }
--- out/eval/stats --
-Leaks:  8
-Freed:  10
-Reused: 8
-Allocs: 10
-Retain: 8
-
-Unifications: 18
-Conjuncts:    18
-Disjuncts:    18
 -- out/eval --
 Errors:
 e1: index 1 out of range:

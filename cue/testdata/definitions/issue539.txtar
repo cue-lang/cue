@@ -12,16 +12,6 @@ Component: {
 }
 
 hello: #Schema & Component
--- out/eval/stats --
-Leaks:  0
-Freed:  14
-Reused: 9
-Allocs: 5
-Retain: 0
-
-Unifications: 10
-Conjuncts:    18
-Disjuncts:    14
 -- out/eval --
 (struct){
   #Schema: (#struct){

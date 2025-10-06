@@ -3,16 +3,6 @@ alongside other fields.
 -- in.cue --
 {[X=string]: baz: X}
 bar: {}
--- out/eval/stats --
-Leaks:  0
-Freed:  3
-Reused: 0
-Allocs: 3
-Retain: 0
-
-Unifications: 3
-Conjuncts:    5
-Disjuncts:    3
 -- out/eval --
 (struct){
   bar: (struct){

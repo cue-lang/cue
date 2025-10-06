@@ -20,16 +20,6 @@ chained: x: {
 	(x.hello): "true"
 	a: b: "hello"
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  23
-Reused: 16
-Allocs: 7
-Retain: 1
-
-Unifications: 19
-Conjuncts:    29
-Disjuncts:    23
 -- out/eval --
 (struct){
   chained: (struct){

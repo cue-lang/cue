@@ -7,15 +7,6 @@ c: false == true
 d: false != true
 e: true & true
 f: true & false
--- out/def --
-a: true
-b: true
-c: false
-d: true
-e: true
-f: _|_ // conflicting values true and false
--- out/legacy-debug --
-<0>{a: true, b: true, c: false, d: true, e: true, f: _|_(true:conflicting values true and false)}
 -- out/compile --
 --- in.cue
 {
@@ -26,16 +17,6 @@ f: _|_ // conflicting values true and false
   e: (true & true)
   f: (true & false)
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 5
-Allocs: 2
-Retain: 0
-
-Unifications: 7
-Conjuncts:    9
-Disjuncts:    7
 -- out/eval --
 Errors:
 f: conflicting values false and true:

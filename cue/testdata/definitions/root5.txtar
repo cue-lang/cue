@@ -13,16 +13,6 @@ x: {
 	a: b: "foo"
 	c: "foo"
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  20
-Reused: 14
-Allocs: 6
-Retain: 6
-
-Unifications: 20
-Conjuncts:    34
-Disjuncts:    26
 -- out/evalalpha --
 (#struct){
   _schema: ~(#Schema)
@@ -76,39 +66,6 @@ diff old new
      #Schema: (#struct){
        a?: (#struct){
          b?: (string){ string }
--- out/eval --
-(#struct){
-  _schema: (#struct){
-    a?: (#struct){
-      b?: (string){ string }
-    }
-  }
-  #Schema: (#struct){
-    a?: (#struct){
-      b?: (string){ string }
-    }
-  }
-  a: (#struct){
-    b: (string){ "foo" }
-  }
-  c: (string){ "foo" }
-  x: (#struct){
-    _schema: (#struct){
-      a?: (#struct){
-        b?: (string){ string }
-      }
-    }
-    #Schema: (#struct){
-      a?: (#struct){
-        b?: (string){ string }
-      }
-    }
-    a: (#struct){
-      b: (string){ "foo" }
-    }
-    c: (string){ "foo" }
-  }
-}
 -- out/compile --
 --- in.cue
 {

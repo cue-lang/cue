@@ -5,51 +5,12 @@ a: "foo\nbar"
 b: a
 
 // TODO: mimic http://exploringjs.com/es6/ch_template-literals.html#sec_introduction-template-literals
--- out/def --
-a: """
-        foo
-        bar
-        """
-b: """
-        foo
-        bar
-        """
--- out/export --
-a: """
-        foo
-        bar
-        """
-b: """
-        foo
-        bar
-        """
--- out/yaml --
-a: |-
-  foo
-  bar
-b: |-
-  foo
-  bar
--- out/json --
-{"a":"foo\nbar","b":"foo\nbar"}
--- out/legacy-debug --
-<0>{a: "foo\nbar", b: "foo\nbar"}
 -- out/compile --
 --- in.cue
 {
   a: "foo\nbar"
   b: 〈0;a〉
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  3
-Reused: 1
-Allocs: 2
-Retain: 0
-
-Unifications: 3
-Conjuncts:    4
-Disjuncts:    3
 -- out/eval --
 (struct){
   a: (string){ "foo\nbar" }

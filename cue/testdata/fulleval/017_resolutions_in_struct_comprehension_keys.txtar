@@ -2,21 +2,6 @@
 #evalFull
 -- in.cue --
 a: {for _, b in ["c"] {"\(b+".")": "a"}}
--- out/def --
-a: {
-	"c.": "a"
-}
--- out/export --
-a: {
-	"c.": "a"
-}
--- out/yaml --
-a:
-  c.: a
--- out/json --
-{"a":{"c.":"a"}}
--- out/legacy-debug --
-<0>{a: <1>{"c.": "a"}}
 -- out/compile --
 --- in.cue
 {
@@ -28,18 +13,6 @@ a:
     }
   }
 }
--- out/eval/stats --
-Leaks:  2
-Freed:  3
-Reused: 0
-Allocs: 5
-Retain: 3
-
-Unifications: 5
-Conjuncts:    5
-Disjuncts:    4
-
-NumCloseIDs: 1
 -- out/eval --
 (struct){
   a: (struct){

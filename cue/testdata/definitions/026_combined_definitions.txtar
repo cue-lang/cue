@@ -31,41 +31,6 @@ d1: #D1 & {env: c: "C"}
 }
 
 #DC: {a: int}
--- out/def --
-// Allow combining of structs within a definition
-#D1: {
-	env: {
-		a: "A"
-		b: "B"
-	}
-	#def: {
-		a: "A"
-		b: "B"
-	}
-}
-d1: #D1 & {
-	env: {
-		c: "C"
-	}
-}
-#D2: {
-	a: int
-	b: int
-}
-#D3: {
-	env: {
-		a: "A"
-		b: "B"
-	}
-}
-#D4: {
-	env: _|_ // field "b" not allowed in closed struct
-}
-#DC: {
-	a: int
-}
--- out/legacy-debug --
-<0>{#D1: <1>C{env: <2>C{a: "A", b: "B"}, #def: <3>C{a: "A", b: "B"}}, d1: <4>C{env: _|_("C":field "c" not allowed in closed struct), #def: <5>C{a: "A", b: "B"}}, #D2: <6>C{a: int, b: int}, #D3: <7>C{env: <8>C{a: "A", b: "B"}}, #D4: <9>C{env: _|_(int:field "b" not allowed in closed struct)}, #DC: <10>C{a: int}}
 -- out/compile --
 --- in.cue
 {
@@ -114,16 +79,6 @@ d1: #D1 & {
     a: int
   }
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  29
-Reused: 24
-Allocs: 5
-Retain: 1
-
-Unifications: 29
-Conjuncts:    41
-Disjuncts:    30
 -- out/evalalpha --
 Errors:
 #D4.env.b: field not allowed:
@@ -236,78 +191,3 @@ diff old new
      }
    }
    #DC: (#struct){
--- diff/todo/p2 --
-Missing positions
--- diff/todo/p3 --
-Reordering
--- out/eval --
-Errors:
-#D4.env.b: field not allowed:
-    ./in.cue:26:7
-    ./in.cue:27:7
-    ./in.cue:30:6
-d1.env.c: field not allowed:
-    ./in.cue:3:7
-    ./in.cue:4:7
-    ./in.cue:9:5
-    ./in.cue:9:17
-
-Result:
-(_|_){
-  // [eval]
-  #D1: (#struct){
-    env: (#struct){
-      a: (string){ "A" }
-      b: (string){ "B" }
-    }
-    #def: (#struct){
-      a: (string){ "A" }
-      b: (string){ "B" }
-    }
-  }
-  d1: (_|_){
-    // [eval]
-    env: (_|_){
-      // [eval]
-      a: (string){ "A" }
-      b: (string){ "B" }
-      c: (_|_){
-        // [eval] d1.env.c: field not allowed:
-        //     ./in.cue:3:7
-        //     ./in.cue:4:7
-        //     ./in.cue:9:5
-        //     ./in.cue:9:17
-      }
-    }
-    #def: (#struct){
-      a: (string){ "A" }
-      b: (string){ "B" }
-    }
-  }
-  #D2: (#struct){
-    a: (int){ int }
-    b: (int){ int }
-  }
-  #D3: (#struct){
-    env: (#struct){
-      a: (string){ "A" }
-      b: (string){ "B" }
-    }
-  }
-  #D4: (_|_){
-    // [eval]
-    env: (_|_){
-      // [eval]
-      a: (int){ int }
-      b: (_|_){
-        // [eval] #D4.env.b: field not allowed:
-        //     ./in.cue:26:7
-        //     ./in.cue:27:7
-        //     ./in.cue:30:6
-      }
-    }
-  }
-  #DC: (#struct){
-    a: (int){ int }
-  }
-}

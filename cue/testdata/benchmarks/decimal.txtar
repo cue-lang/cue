@@ -39,16 +39,6 @@ out: [
     (1 / 3),
   ]
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  11
-Reused: 8
-Allocs: 3
-Retain: 0
-
-Unifications: 11
-Conjuncts:    11
-Disjuncts:    11
 -- out/eval --
 (struct){
   out: (#list){

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77b29d65_c37c1065",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-06T23:27:54Z",
+      "side": 1,
+      "message": "+2 please, as I already reviewed over on github: https://github.com/cue-lang/cue/pull/3987",
+      "revId": "c62a22230a2931be8cbed4c8f0f57e3c88bf64e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

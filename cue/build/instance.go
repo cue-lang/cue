@@ -107,7 +107,10 @@ type Instance struct {
 
 	Deps       []string `api:"alpha"`
 	DepsErrors []error  `api:"alpha"`
-	Match      []string `api:"alpha"`
+	// TODO: Match was declared for years but never set by any of the cue/build logic.
+	// If any user was trying to use it, we should implement it,
+	// but that seems unlikely given that it was always empty.
+	// Match []string `api:"alpha"`
 }
 
 // RelPath reports the path of f relative to the root of the instance's module

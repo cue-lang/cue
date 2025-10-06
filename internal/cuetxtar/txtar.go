@@ -17,10 +17,12 @@ package cuetxtar
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/fs"
 	"maps"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -38,6 +40,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
+	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
 	"github.com/rogpeppe/go-internal/diff"
 	"golang.org/x/tools/txtar"
@@ -582,8 +585,9 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			}
 
 			files := make([]txtar.File, 0, len(a.Files))
-
+			usedFiles := make(map[string]bool)
 			for _, sub := range tc.outFiles {
+				usedFiles[sub.name] = true
 				result := sub.bytes()
 
 				files = append(files, txtar.File{Name: sub.name})
@@ -629,9 +633,30 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			// Add remaining unrelated files, ignoring files that were already
 			// added.
 			for _, f := range a.Files {
-				if _, ok := index[f.Name]; ok {
-					files = append(files, f)
+				if _, ok := index[f.Name]; !ok {
+					continue
 				}
+				files = append(files, f)
+			}
+			if uri := os.Getenv("CUETXTAR_GC_URI"); uri != "" {
+				var retain []string
+				for _, f := range a.Files {
+					if isOutputFile(f.Name) && usedFiles[f.Name] {
+						retain = append(retain, f.Name)
+					}
+				}
+				absPath, err := filepath.Abs(fullpath)
+				qt.Assert(t, qt.IsNil(err))
+				body, err := json.Marshal(struct {
+					TxtarFile   string   `json:"txtarfile"`
+					RetainFiles []string `json:"retainFiles"`
+				}{absPath, retain})
+				qt.Assert(t, qt.IsNil(err))
+				req, err := http.NewRequest("PUT", uri, bytes.NewReader(body))
+				qt.Assert(t, qt.IsNil(err))
+				resp, err := http.DefaultClient.Do(req)
+				qt.Assert(t, qt.IsNil(err))
+				qt.Assert(t, qt.Equals(resp.StatusCode, http.StatusOK))
 			}
 			a.Files = files
 
@@ -661,4 +686,8 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func isOutputFile(name string) bool {
+	return strings.HasPrefix(name, "out/") || strings.HasPrefix(name, "diff/")
 }

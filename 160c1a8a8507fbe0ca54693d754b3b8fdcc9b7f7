@@ -16,6 +16,24 @@
       "message": "Do we need a test case for the use of `self` without the experiment being turned on? or is that not very interesting, as it\u0027s just an unknown name?",
       "revId": "160c1a8a8507fbe0ca54693d754b3b8fdcc9b7f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "589264b5_c77031cf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-06T15:01:53Z",
+      "side": 1,
+      "message": "Indeed - it\u0027s just an unknown name, so there\u0027s nothing new there.",
+      "parentUuid": "3ef20d00_83f3bdea",
+      "revId": "160c1a8a8507fbe0ca54693d754b3b8fdcc9b7f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8853127_c8cea8b4",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 608,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-06T15:28:47Z",
+      "side": 1,
+      "message": "Unless we\u0027re going to do that for all token constants used in the doc comments throughout, I\u0027d prefer to be consistent and avoid it here.",
+      "parentUuid": "d8df7b5b_b4645053",
+      "range": {
+        "startLine": 608,
+        "startChar": 51,
+        "endLine": 608,
+        "endChar": 57
+      },
+      "revId": "9e213f8ccf5096b119c3cfd90defb3034cb182a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdd79a9c_c15bd2c7",
@@ -37,6 +61,30 @@
       "writtenOn": "2025-10-06T14:36:57Z",
       "side": 1,
       "message": "use commas?",
+      "range": {
+        "startLine": 629,
+        "startChar": 25,
+        "endLine": 629,
+        "endChar": 49
+      },
+      "revId": "9e213f8ccf5096b119c3cfd90defb3034cb182a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7158ed9_67c6135a",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 629,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-06T15:28:47Z",
+      "side": 1,
+      "message": "I don\u0027t _think_ any more commas are justified here.",
+      "parentUuid": "cdd79a9c_c15bd2c7",
       "range": {
         "startLine": 629,
         "startChar": 25,

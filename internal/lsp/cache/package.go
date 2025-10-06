@@ -231,8 +231,9 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	for i, f := range files {
 		astFiles[i] = f.Syntax
 		uri := m.rootURI + protocol.DocumentURI("/"+f.FilePath)
-		tokFile := f.Syntax.Pos().File()
-		w.mappers[tokFile] = protocol.NewMapper(uri, tokFile.Content())
+		if tokFile := f.Syntax.Pos().File(); tokFile != nil {
+			w.mappers[tokFile] = protocol.NewMapper(uri, tokFile.Content())
+		}
 		delete(m.dirtyFiles, uri)
 		w.standalone.deleteFile(uri)
 	}

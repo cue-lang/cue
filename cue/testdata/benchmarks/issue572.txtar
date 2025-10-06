@@ -44,20 +44,6 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 4499
--- out/eval/stats --
-Leaks:  0
-Freed:  3001
-Reused: 2998
-Allocs: 3
-Retain: 0
-
-Unifications: 3001
-Conjuncts:    7498
-Disjuncts:    3001
-
-MisalignedConjunct: 1498
-
-NumCloseIDs: 1
 -- out/eval --
 (struct){
   _entries(:p): (#list){

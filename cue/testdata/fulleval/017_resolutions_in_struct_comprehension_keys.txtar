@@ -2,21 +2,6 @@
 #evalFull
 -- in.cue --
 a: {for _, b in ["c"] {"\(b+".")": "a"}}
--- out/def --
-a: {
-	"c.": "a"
-}
--- out/export --
-a: {
-	"c.": "a"
-}
--- out/yaml --
-a:
-  c.: a
--- out/json --
-{"a":{"c.":"a"}}
--- out/legacy-debug --
-<0>{a: <1>{"c.": "a"}}
 -- out/compile --
 --- in.cue
 {

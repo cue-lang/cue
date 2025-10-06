@@ -67,25 +67,6 @@ diff old new
 +    name: (string){ "cueckoo" }
    }
  }
--- diff/explanation --
-Reordering
--- out/eval --
-(struct){
-  #C1: (#struct){
-    name: (string){ string }
-  }
-  #C2: (#struct){
-    name: (string){ string }
-    age: (int){ int }
-  }
-  c1: (#struct){
-    name: (string){ "cueckoo" }
-  }
-  c2: (#struct){
-    name: (string){ "cueckoo" }
-    age: (int){ 5 }
-  }
-}
 -- out/compile --
 --- x.cue
 {

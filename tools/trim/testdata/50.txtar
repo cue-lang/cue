@@ -41,11 +41,3 @@ diff old new
  
 -service: pastrychef: selector: {}
 +service: pastrychef: _
--- out/trim --
-== a.cue
-service: [_]: {
-	metadata: {x: 3}
-	selector: metadata
-}
-
-service: pastrychef: selector: {}

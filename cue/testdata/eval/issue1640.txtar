@@ -92,24 +92,3 @@ diff old new
    #MultiCaseString: (#struct){
      lc: (string){ string }
      uc: (string){ string }
--- out/eval --
-(struct){
-  y: (string){ "foo" }
-  x: (string){ "foo" }
-  fact1: (#struct){
-    lc: (string){ "foo" }
-    uc: (string){ "foo" }
-  }
-  fact2: (#struct){
-    lc: (string){ "foo" }
-    uc: (string){ "foo" }
-  }
-  #MCS: (#struct){
-    lc: (string){ string }
-    uc: (string){ string }
-  }
-  #MultiCaseString: (#struct){
-    lc: (string){ string }
-    uc: (string){ string }
-  }
-}

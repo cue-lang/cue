@@ -32,10 +32,6 @@ line  reference    path of resulting vertex
 -- out/dependencies/all --
 line  reference    path of resulting vertex
 4:    outer     => outer
--- diff/dependencies-v3/todo/p1 --
-bring in line with evalv2.
-Also, this drops some entries from the dynamic case that seem perhaps too
-aggressive.
 -- out/dependencies-v3/dynamic --
 line  reference    path of resulting vertex
 14:   X.enabled => a.instance.enabled
@@ -65,16 +61,6 @@ diff old new
 +13:   #base     => a.#base
 +19:   #combined => a.#combined
 +14:   X.enabled => a.instance.enabled
--- out/dependencies/dynamic --
-line  reference                                     path of resulting vertex
-14:   X.enabled                                  => a.instance.enabled
-4:    outer                                      => outer
-4:    (instance & outer & {enabled: true}).value => a.instance.value
-4:    outer                                      => outer
-5:    val                                        => a.command.alias.val
-13:   #base                                      => a.#base
-19:   #combined                                  => a.#combined
-14:   X.enabled                                  => a.instance.enabled
 -- out/dependencies-v3/stats/field --
 // COUNT: 0
 -- out/dependencies-v3/stats/all --

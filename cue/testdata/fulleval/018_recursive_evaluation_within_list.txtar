@@ -13,25 +13,6 @@ b1: {
 	d: "s" + c
 	c: string
 }
--- out/def --
-l: [a]
-a: b & {
-	c: "t"
-}
-b: {
-	c: string
-	d: c
-}
-l1: [a1]
-a1: b1 & {
-	c: "t"
-}
-b1: {
-	c: string
-	d: "s" + c
-}
--- out/legacy-debug --
-<0>{l: [<1>{c: "t", d: "t"}], a: <2>{c: "t", d: "t"}, b: <3>{c: string, d: string}, l1: [<4>{c: "t", d: "st"}], a1: <5>{c: "t", d: "st"}, b1: <6>{c: string, d: ("s" + <7>.c)}}
 -- out/compile --
 --- in.cue
 {
@@ -132,38 +113,3 @@ diff old new
    }
    b1: (struct){
      d: (_|_){
--- out/eval --
-(struct){
-  l: (#list){
-    0: (struct){
-      d: (string){ "t" }
-      c: (string){ "t" }
-    }
-  }
-  a: (struct){
-    d: (string){ "t" }
-    c: (string){ "t" }
-  }
-  b: (struct){
-    d: (string){ string }
-    c: (string){ string }
-  }
-  l1: (#list){
-    0: (struct){
-      d: (string){ "st" }
-      c: (string){ "t" }
-    }
-  }
-  a1: (struct){
-    d: (string){ "st" }
-    c: (string){ "t" }
-  }
-  b1: (struct){
-    d: (_|_){
-      // [incomplete] b1.d: non-concrete value string in operand to +:
-      //     ./in.cue:10:5
-      //     ./in.cue:11:5
-    }
-    c: (string){ string }
-  }
-}

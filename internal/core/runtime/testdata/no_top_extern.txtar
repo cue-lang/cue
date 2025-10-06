@@ -11,10 +11,6 @@ package foo
 Foo: _ @test(file.xx, abi=c, sig="func(int)int")
 
 -- extern/out --
--- out/extern/config --
-{
-	Foo: _
-}
 -- out/extern --
 {
 	Foo: _

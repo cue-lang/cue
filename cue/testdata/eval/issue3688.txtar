@@ -119,16 +119,6 @@ diff old new
 +Disjuncts:    22
 +
 +NumCloseIDs: 43
--- out/eval/stats --
-Leaks:  15
-Freed:  105
-Reused: 99
-Allocs: 21
-Retain: 37
-
-Unifications: 82
-Conjuncts:    246
-Disjuncts:    139
 -- out/eval --
 (struct){
   #TypeA: ((string|struct)){ |((string){ string }, (#struct){

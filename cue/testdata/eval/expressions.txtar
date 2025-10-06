@@ -89,13 +89,6 @@ diff old new
 +    }
 +  }
  }
--- out/eval --
-(struct){
-  a: (int){ 1 }
-  b: (int){ 3 }
-  c: (int){ 2 }
-  d: (int){ 2 }
-}
 -- out/compile --
 --- in.cue
 {

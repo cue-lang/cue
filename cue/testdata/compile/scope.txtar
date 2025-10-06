@@ -116,16 +116,6 @@ diff old new
 +Notifications: 2
 +
 +NumCloseIDs: 13
--- out/eval/stats --
-Leaks:  2
-Freed:  48
-Reused: 45
-Allocs: 5
-Retain: 8
-
-Unifications: 50
-Conjuncts:    102
-Disjuncts:    54
 -- out/evalalpha --
 Errors:
 schema.next: structural cycle
@@ -178,47 +168,3 @@ diff old new
 +    // [structural cycle]
    }
  }
--- diff/todo/p3 --
-Structural cycle reported in different location. Seems fine, as
-ultimately we need to print the paths of the cycle anyway.
-Now also reports a position.
--- out/eval --
-Errors:
-schema.next: structural cycle
-
-Result:
-(_|_){
-  // [structural cycle]
-  a: (struct){
-    d: (struct){
-    }
-    e: (struct){
-    }
-    c: (struct){
-    }
-  }
-  b: (struct){
-  }
-  s: (string){ "foo" }
-  c: (string){ "foo" }
-  d: (struct){
-  }
-  e: (struct){
-  }
-  let B#1 = (struct){
-    open: (int){ int }
-  }
-  f: (struct){
-    open: (int){ int }
-  }
-  schema: (_|_){
-    // [structural cycle]
-    next: (_|_){
-      // [structural cycle] schema.next: structural cycle
-    }
-  }
-  let _schema_1#2 = (_|_){
-    // [structural cycle] _schema_1: structural cycle:
-    //     ./in.cue:32:8
-  }
-}

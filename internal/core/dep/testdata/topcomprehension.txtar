@@ -29,8 +29,6 @@ line  reference    path of resulting vertex
 5:    value     => **non-rooted**
 2:    key       => **non-rooted**
 3:    value     => **non-rooted**
--- diff/dependencies/todo/p3 --
-Reordering.
 -- out/dependencies/dynamic --
 line  reference    path of resulting vertex
 4:    key       => **non-rooted**

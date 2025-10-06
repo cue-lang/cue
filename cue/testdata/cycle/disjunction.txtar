@@ -84,16 +84,6 @@ diff old new
 +Disjuncts:    73
 +
 +NumCloseIDs: 20
--- out/eval/stats --
-Leaks:  0
-Freed:  199
-Reused: 181
-Allocs: 18
-Retain: 0
-
-Unifications: 93
-Conjuncts:    280
-Disjuncts:    199
 -- out/eval --
 Errors:
 cycle.a: structural cycle

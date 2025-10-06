@@ -35,8 +35,6 @@ Retain: 0
 Unifications: 7
 Conjuncts:    9
 Disjuncts:    7
--- diff/explanation --
-Not including illegal field. Seems fine.
 -- out/eval --
 Errors:
 bulkToSelf.a.foo.bar: conflicting values "3" and int (mismatched types string and int):

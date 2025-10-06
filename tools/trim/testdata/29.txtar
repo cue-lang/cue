@@ -25,6 +25,3 @@ diff old new
  == a.cue
 -x: {a: 5} & {a: 5}
 +x: {a: 5} & _
--- out/trim --
-== a.cue
-x: {a: 5} & {a: 5}

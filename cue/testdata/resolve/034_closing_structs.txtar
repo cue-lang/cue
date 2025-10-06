@@ -19,36 +19,6 @@ ctot: ct & ot // {x: int, ...}
 cpct: cp & ct // closed({x: int})
 ctcp: ct & cp // closed({x: int})
 ctct: ct & ct // {x: int, ...}
--- out/def --
-op: {
-	x: int
-}
-ot: {
-	x: int
-	...
-}
-cp: close({
-	x: int
-})
-ct: {
-	x: int
-	...
-}
-opot: op & ot
-otop: ot & op
-opcp: op & cp
-cpop: cp & op
-opct: op & ct
-ctop: ct & op
-otcp: ot & cp
-cpot: cp & ot
-otct: ot & ct
-ctot: ct & ot
-cpct: cp & ct
-ctcp: ct & cp
-ctct: ct & ct
--- out/legacy-debug --
-<0>{op: <1>{x: int}, ot: <2>{x: int, ...}, cp: <3>C{x: int}, ct: <4>{x: int, ...}, opot: <5>{x: int, ...}, otop: <6>{x: int, ...}, opcp: <7>C{x: int}, cpop: <8>C{x: int}, opct: <9>{x: int, ...}, ctop: <10>{x: int, ...}, otcp: <11>C{x: int}, cpot: <12>C{x: int}, otct: <13>{x: int, ...}, ctot: <14>{x: int, ...}, cpct: <15>C{x: int}, ctcp: <16>C{x: int}, ctct: <17>{x: int, ...}}
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  90
@@ -86,16 +56,6 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 38
--- out/eval/stats --
-Leaks:  15
-Freed:  35
-Reused: 32
-Allocs: 18
-Retain: 15
-
-Unifications: 50
-Conjuncts:    115
-Disjuncts:    50
 -- out/evalalpha --
 (struct){
   op: (struct){
@@ -161,60 +121,6 @@ diff old new
 -  }
 +  ctct: ~(ct)
  }
--- out/eval --
-(struct){
-  op: (struct){
-    x: (int){ int }
-  }
-  ot: (struct){
-    x: (int){ int }
-  }
-  cp: (#struct){
-    x: (int){ int }
-  }
-  ct: (#struct){
-    x: (int){ int }
-  }
-  opot: (struct){
-    x: (int){ int }
-  }
-  otop: (struct){
-    x: (int){ int }
-  }
-  opcp: (#struct){
-    x: (int){ int }
-  }
-  cpop: (#struct){
-    x: (int){ int }
-  }
-  opct: (#struct){
-    x: (int){ int }
-  }
-  ctop: (#struct){
-    x: (int){ int }
-  }
-  otcp: (#struct){
-    x: (int){ int }
-  }
-  cpot: (#struct){
-    x: (int){ int }
-  }
-  otct: (#struct){
-    x: (int){ int }
-  }
-  ctot: (#struct){
-    x: (int){ int }
-  }
-  cpct: (#struct){
-    x: (int){ int }
-  }
-  ctcp: (#struct){
-    x: (int){ int }
-  }
-  ctct: (#struct){
-    x: (int){ int }
-  }
-}
 -- out/compile --
 --- in.cue
 {

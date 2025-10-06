@@ -4,9 +4,6 @@ a: b: {
 	c: 1
 	d: 2
 }
--- out/selfcontained --
-c: 1
-d: 2
 -- out/self/default --
 c: 1
 d: 2

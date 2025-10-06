@@ -67,26 +67,6 @@ diff old new
  [y]
  ["s-q"]
  ["s-r"]
--- diff/out/todo/p3 --
-One missing entry is the result of the new evaluator not generating a
-bogus field for a failed dynamic field.
--- out/doc --
-[]
-[x]
-[a]
-[a labelX]
-[a labelY]
-[a labelZ]
-[q]
-[q1]
-[r]
-[r1]
-[_]
-[y]
-["s-q"]
-["s-r"]
-["s-q1"]
-["s-q1" r1]
 -- out/value-v3 --
 == Simplified
 {
@@ -294,16 +274,3 @@ diff old new
 +		(r1)!: 3
 +	}
 +}
--- diff/value/todo/p0 --
-Ignored errors?
--- out/value --
-== Simplified
-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
-== Raw
-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
-== Final
-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
-== All
-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
-== Eval
-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)

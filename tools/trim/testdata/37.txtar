@@ -80,22 +80,3 @@ diff old new
 +		limits: close({})
  	}
  }
--- out/trim --
-== a.cue
-things: [_]: {
-	resources: *{
-		requests: {
-			memory: "100M"
-			cpu:    "100m"
-		}
-		limits: requests
-	} | {...}
-}
-
-things: vagrant: {
-	resources: {
-		requests: {
-			cpu: "1m"
-		}
-	}
-}

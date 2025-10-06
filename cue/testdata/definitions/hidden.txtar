@@ -165,8 +165,6 @@ diff old new
 +  }
 +  g: ~(f._val(:foo))
  }
--- diff/todo/p2 --
-Reordering / missing positions.
 -- out/eval --
 Errors:
 e._name.c: field not allowed:

@@ -142,8 +142,6 @@ for the transition to the new evaluator, though.
 UPDATE: we have made evalv3 a bit more in line with evalv2. Note how this
 affects staged.c, though.
 TODO(defaults): consider these cases with a potential default redesign.
--- diff/todo/p3 --
-Reordering.
 -- out/eval --
 (struct){
   Q: (int){ |(*(int){ 1 }, (int){ int }) }

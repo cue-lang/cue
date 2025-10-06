@@ -136,8 +136,6 @@ diff old new
      }
    }
    issue560: (struct){
--- diff/todo/p2 --
-Near-duplicate message
 -- out/eval --
 (struct){
   dynamic: (struct){

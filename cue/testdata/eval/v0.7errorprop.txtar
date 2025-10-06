@@ -55,8 +55,6 @@ diff old new
      }
    }
    #A: (#struct){
--- diff/todo/p2 --
-Missing error positions.
 -- out/eval --
 Errors:
 a.c: field not allowed:

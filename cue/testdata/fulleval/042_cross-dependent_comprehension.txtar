@@ -81,8 +81,6 @@ diff old new
 +  }
 +  y: ~(x)
  }
--- diff/todo/p3 --
-Reordering
 -- out/eval --
 (struct){
   #a: (_|_){

@@ -281,9 +281,6 @@ diff old new
      }
      x: (#struct){
        Name: (string){ "a" }
--- diff/todo/p3 --
-Reordering
-Missing error positions
 -- out/eval --
 Errors:
 reclose1.z.d: field not allowed:

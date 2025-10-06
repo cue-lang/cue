@@ -148,6 +148,12 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 				// solved.
 				w := t.Writer("stats")
 				fmt.Fprintln(w, counts)
+			default:
+				// This is technically a no-op but still worthwhile to
+				// inform the cuetxtar garbage collector we still care
+				// about the file.
+				w := t.Writer("stats")
+				w.Write(f.Data)
 			}
 			break
 		}

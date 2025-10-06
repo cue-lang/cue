@@ -228,8 +228,6 @@ diff old new
      }
    }
  }
--- diff/todo/p2 --
-Missing error positions.
 -- out/eval --
 Errors:
 jobs1.foo1: field not allowed:

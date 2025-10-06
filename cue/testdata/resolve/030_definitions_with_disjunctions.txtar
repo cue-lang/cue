@@ -144,8 +144,6 @@ diff old new
 +    field: (int){ int }
    }
  }
--- diff/todo/p2 --
-Missing error positions and reorderings.
 -- diff/explanation --
 bar.b: removed in new evaluator. This is correct. In the old
 evaluator this addition was spurious.

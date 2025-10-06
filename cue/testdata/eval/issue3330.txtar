@@ -195,8 +195,6 @@ diff old new
        //     ./in.cue:23:16
      }
    }
--- diff/todo/p3 --
-Small differences in error output.
 -- out/eval --
 Errors:
 eliminated.x: 2 errors in empty disjunction:

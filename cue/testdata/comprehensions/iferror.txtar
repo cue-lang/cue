@@ -298,10 +298,6 @@ diff old new
      }
    }
  }
--- diff/todo/p2 --
-issue1972: "field not allowed" are somewhat correct (it is also a list), but
-are already covered by the other error message and should be elided.
-This may lead to a large number of errors otherwise.
 -- out/eval --
 Errors:
 issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):

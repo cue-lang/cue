@@ -95,8 +95,6 @@ diff old new
        //     ./in.cue:18:2
      }
    }
--- diff/todo/p2 --
-Positions.
 -- out/eval --
 Errors:
 x1.Age: field not allowed:

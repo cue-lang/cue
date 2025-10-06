@@ -179,10 +179,6 @@ diff old new
    }
    o1: (struct){
      a?: (_|_){
--- diff/todo/p2 --
-v1.a: Incorrect path in error message.
--- diff/todo/p3 --
-Missing error position.
 -- out/eval --
 (struct){
   #k1: (#struct){

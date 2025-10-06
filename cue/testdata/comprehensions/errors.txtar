@@ -152,8 +152,6 @@ diff old new
          //     ./in.cue:40:3
          //     ./in.cue:41:9
        }
--- diff/todo/p2 --
-Missing error message.
 -- out/eval --
 Errors:
 conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):

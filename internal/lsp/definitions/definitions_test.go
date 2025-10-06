@@ -2754,6 +2754,118 @@ something: {
 				ln(12, 1, "b"):         {f: []string{"bar"}, e: []string{"#Foo", "#Schema", "foo", "something"}},
 			},
 		},
+
+		{
+			name: "Self_Simple",
+			archive: `-- a.cue --
+@experiment(self)
+x: y: 3
+x: z: self.y
+
+a: {
+    b: {
+        c: self.d
+        d: 1
+    }
+    d: self
+}
+e: self
+`,
+			expectDefinitions: map[position][]position{
+				ln(3, 1, "self"): {ln(2, 1, "x"), ln(3, 1, "x")},
+				ln(3, 1, "y"):    {ln(2, 1, "y")},
+
+				ln(7, 1, "self"): {ln(6, 1, "b")},
+				ln(7, 1, "d"):    {ln(8, 1, "d")},
+
+				ln(10, 1, "self"): {ln(5, 1, "a")},
+				ln(12, 1, "self"): {},
+
+				ln(2, 1, "x"):  {self, ln(3, 1, "x")},
+				ln(2, 1, "y"):  {self},
+				ln(3, 1, "x"):  {self, ln(2, 1, "x")},
+				ln(3, 1, "z"):  {self},
+				ln(5, 1, "a"):  {self},
+				ln(6, 1, "b"):  {self},
+				ln(7, 1, "c"):  {self},
+				ln(8, 1, "d"):  {self},
+				ln(10, 1, "d"): {self},
+				ln(12, 1, "e"): {self},
+			},
+			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(2, 1, "x"):     {f: []string{"a", "e", "x"}},
+				ln(2, 1, "y"):     {f: []string{"y", "z"}},
+				ln(3, 1, "x"):     {f: []string{"a", "e", "x"}},
+				ln(3, 1, "z"):     {f: []string{"y", "z"}},
+				ln(3, 1, "self"):  {e: []string{"a", "e", "x", "z"}},
+				ln(3, 1, ".y"):    {e: []string{"y", "z"}},
+				ln(5, 1, "a"):     {f: []string{"a", "e", "x"}},
+				ln(6, 1, "b"):     {f: []string{"b", "d"}},
+				ln(7, 1, "c"):     {f: []string{"c", "d"}},
+				ln(7, 1, "self"):  {e: []string{"a", "b", "c", "d", "e", "x"}},
+				ln(7, 1, ".d"):    {e: []string{"c", "d"}},
+				ln(8, 1, "d"):     {f: []string{"c", "d"}},
+				ln(10, 1, "d"):    {f: []string{"b", "d"}},
+				ln(10, 1, "self"): {f: []string{"b", "d"}, e: []string{"a", "b", "d", "e", "x"}},
+				ln(12, 1, "e"):    {f: []string{"a", "e", "x"}},
+				ln(12, 1, "self"): {f: []string{"a", "e", "x"}, e: []string{"a", "e", "x"}},
+			},
+		},
+
+		{
+			name: "Self_List",
+			archive: `-- a.cue --
+@experiment(self)
+f: [ 1, 2, self[0] ]
+let X = self
+g: h: X.f[0]
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "self"): {ln(2, 1, "f")},
+				ln(2, 1, "[0]"):  {ln(2, 1, "1")},
+				ln(4, 1, "X"):    {ln(3, 1, "X")},
+				ln(4, 1, "f"):    {ln(2, 1, "f")},
+				ln(4, 1, "[0]"):  {ln(2, 1, "1")},
+
+				ln(2, 1, "f"): {self},
+				ln(4, 1, "g"): {self},
+				ln(4, 1, "h"): {self},
+			},
+			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(2, 1, "f"):    {f: []string{"f", "g"}},
+				ln(2, 1, "self"): {e: []string{"X", "f", "g"}},
+				ln(3, 1, "self"): {f: []string{"f", "g"}, e: []string{"X", "f", "g"}},
+				ln(4, 1, "g"):    {f: []string{"f", "g"}},
+				ln(4, 1, "h"):    {f: []string{"h"}},
+				ln(4, 1, "X"):    {e: []string{"X", "f", "g", "h"}},
+				ln(4, 1, ".f"):   {e: []string{"f", "g"}},
+			},
+		},
+
+		{
+			name: "Self_Self",
+			archive: `-- a.cue --
+@experiment(self)
+i: self: x: y: z: self
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 2, "self"): {ln(2, 1, "self")},
+
+				ln(2, 1, "i"):    {self},
+				ln(2, 1, "self"): {self},
+				ln(2, 1, "x"):    {self},
+				ln(2, 1, "y"):    {self},
+				ln(2, 1, "z"):    {self},
+			},
+			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(2, 1, "i"):    {f: []string{"i"}},
+				ln(2, 1, "self"): {f: []string{"self"}},
+				ln(2, 1, "x"):    {f: []string{"x"}},
+				ln(2, 1, "y"):    {f: []string{"y"}},
+				ln(2, 1, "z"):    {f: []string{"z"}},
+				ln(2, 2, "self"): {f: []string{"x"}, e: []string{"i", "self", "x", "y", "z"}},
+			},
+		},
 	}.run(t)
 }
 

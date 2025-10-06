@@ -1359,6 +1359,7 @@ func navigateBindingsByName(navigables []*navigableBindings, name string) []*nav
 // subsequent path elements, we search the navigable bindings (see the
 // [astNode.resolve] method).
 func (n *astNode) resolvePathRoot(name string) *navigableBindings {
+	nOrig := n
 	for ; n != nil; n = n.parent {
 		if bindings, found := n.bindings[name]; found {
 			nav := bindings[0].navigable
@@ -1395,7 +1396,14 @@ func (n *astNode) resolvePathRoot(name string) *navigableBindings {
 			// If we've got this far, we're allowed to inspect the
 			// (shared) navigable bindings directly without having to go
 			// via our bindings.
-			return n.navigable.bindings[name]
+			if nav, found := n.navigable.bindings[name]; found {
+				return nav
+			}
+			// Support for the Self experiment:
+			if name == "self" && nOrig.key != nil && nOrig.key.Pos().Experiment().Self {
+				return nOrig.navigable.parent
+			}
+			return nil
 		}
 	}
 	return nil

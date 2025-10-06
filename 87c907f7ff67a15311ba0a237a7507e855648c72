@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f9671a1_5e16b82a",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-06T16:24:09Z",
+      "side": 1,
+      "message": "Did you intend to change the semantics here? Previously it would still walk into `x.Value` in this case but now it does not. I suspect that\u0027s the reason that the \"seemingly unnecessary\" switch case was present.",
+      "revId": "87c907f7ff67a15311ba0a237a7507e855648c72",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cdba282_a7b3a2f4",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-06T16:24:09Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "87c907f7ff67a15311ba0a237a7507e855648c72",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e57fef3a_2a682e89",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-06T16:24:09Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "87c907f7ff67a15311ba0a237a7507e855648c72",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

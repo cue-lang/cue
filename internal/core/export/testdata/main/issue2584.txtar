@@ -8,7 +8,6 @@ F2: {
 }
 D: {}
 let L = D
--- out/self/default --
 -- out/definition --
 
 let L = D

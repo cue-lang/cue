@@ -59,12 +59,6 @@ issue3737: reduced2: {
         end:      start + duration
     }
 }
--- out/def --
-a: b - 100
-b: a + 100
-c: [c[1], c[0]]
--- out/legacy-debug --
-<0>{a: (<1>.b - 100), b: (<1>.a + 100), c: [<1>.c[1],<1>.c[0]]}
 -- out/compile --
 --- disjunction.cue
 {

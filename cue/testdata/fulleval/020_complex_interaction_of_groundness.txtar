@@ -6,26 +6,6 @@ res: [ a.b.c & {d: "b"}]
 
 a: b: [C=string]: {d: string, s: "a" + d}
 a: b: c: d: string
--- out/def --
-res: [{
-	d: "b"
-	s: "ab"
-} & (a.b.c & {
-	d: "b"
-})]
-a: {
-	b: {
-		{[C=string]: {
-			d: string, s: "a" + d
-		}}
-		c: {
-			d: string
-			s: "a" + d
-		}
-	}
-}
--- out/legacy-debug --
-<0>{res: [<1>{d: "b", s: "ab"}], a: <2>{b: <3>{[]: <4>(C: string)-><5>{d: string, s: ("a" + <5>.d)}, c: <6>{d: string, s: ("a" + <7>.d)}}}}
 -- out/compile --
 --- in.cue
 {

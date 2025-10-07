@@ -15,24 +15,6 @@ noOpt: true
 	}
 	val2: #def2
 }
--- out/def --
-reg: {
-	foo: 1
-	bar: {
-		baz: 3
-	}
-}
-#def: {
-	a:   1
-	sub: reg
-}
-val: #def
-#def2: {
-	a: {
-		b: int
-	}
-}
-val2: #def2
 -- out/compile --
 --- in.cue
 {

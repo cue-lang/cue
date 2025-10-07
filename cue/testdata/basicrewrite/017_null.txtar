@@ -10,18 +10,6 @@ eq1:  null == 1
 eq2:  1 == null
 ne1:  "s" != null
 call: null()
--- out/def --
-eql: true
-neq: false
-unf: null
-
-// errors
-eq1:  false
-eq2:  false
-ne1:  true
-call: _|_ // cannot call non-function null (type null)
--- out/legacy-debug --
-<0>{eql: true, neq: false, unf: null, eq1: false, eq2: false, ne1: true, call: _|_(null:cannot call non-function null (type null))}
 -- out/compile --
 --- in.cue
 {

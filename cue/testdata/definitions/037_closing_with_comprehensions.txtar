@@ -32,29 +32,6 @@ for k, v in {f3: int} {
 		"\(k)": v
 	}
 }
--- out/def --
-#A: {
-	f1: int
-	f2: int
-}
-a: _|_ // field "f3" not allowed in closed struct
-#B: {
-	f1: v
-}
-#C: {
-	f1: {
-		_
-		v
-		...
-	}
-}
-#D: {
-	f1: v
-	...
-}
-#E: _|_ // field "f3" not allowed in closed struct
--- out/legacy-debug --
-<0>{#A: <1>C{f1: int, f2: int}, a: _|_(<2>.v:field "f3" not allowed in closed struct), #B: <3>C{f1: int}, #C: <4>C{f1: int}, #D: <5>{f1: int, ...}, #E: _|_(<6>.v:field "f3" not allowed in closed struct)}
 -- out/compile --
 --- in.cue
 {

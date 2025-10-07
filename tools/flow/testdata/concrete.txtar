@@ -44,6 +44,26 @@ graph TD
 	text:  "v"
 	value: "v"
 }
+-- out/run-v3/t1/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   1
+-- diff/-out/run-v3/t1/stats<==>+out/run/t1/stats --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   1
 -- out/run/t1/stats --
 Leaks:  0
 Freed:  0
@@ -54,6 +74,26 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
+-- out/run-v3/t2/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   1
+-- diff/-out/run-v3/t2/stats<==>+out/run/t2/stats --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   1
 -- out/run/t2/stats --
 Leaks:  0
 Freed:  0
@@ -64,6 +104,26 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
+-- out/run-v3/stats/totals --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   2
+-- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   2
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  0

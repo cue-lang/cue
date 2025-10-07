@@ -25,6 +25,44 @@ graph TD
 	stdout: "foo"
 	text:   "03"
 }
+-- out/run-v3/t1/stats --
+Leaks:  6
+Freed:  23
+Reused: 14
+Allocs: 15
+Retain: 0
+
+Unifications: 23
+Conjuncts:    34
+Disjuncts:    2
+ResolveDep:   8
+
+NumCloseIDs: 4
+-- diff/-out/run-v3/t1/stats<==>+out/run/t1/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+-Leaks:  8
++Leaks:  6
+ Freed:  23
+-Reused: 19
+-Allocs: 12
+-Retain: 24
+-
+-Unifications: 27
+-Conjuncts:    38
+-Disjuncts:    41
++Reused: 14
++Allocs: 15
++Retain: 0
++
++Unifications: 23
++Conjuncts:    34
++Disjuncts:    2
++ResolveDep:   8
++
++NumCloseIDs: 4
 -- out/run/t1/stats --
 Leaks:  8
 Freed:  23
@@ -35,6 +73,44 @@ Retain: 24
 Unifications: 27
 Conjuncts:    38
 Disjuncts:    41
+-- out/run-v3/stats/totals --
+Leaks:  6
+Freed:  23
+Reused: 14
+Allocs: 15
+Retain: 0
+
+Unifications: 23
+Conjuncts:    34
+Disjuncts:    2
+ResolveDep:   8
+
+NumCloseIDs: 4
+-- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+-Leaks:  8
++Leaks:  6
+ Freed:  23
+-Reused: 19
+-Allocs: 12
+-Retain: 24
+-
+-Unifications: 27
+-Conjuncts:    38
+-Disjuncts:    41
++Reused: 14
++Allocs: 15
++Retain: 0
++
++Unifications: 23
++Conjuncts:    34
++Disjuncts:    2
++ResolveDep:   8
++
++NumCloseIDs: 4
 -- out/run/stats/totals --
 Leaks:  8
 Freed:  23

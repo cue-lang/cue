@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "01a4f7ff_bdc0ff1b",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-07T16:18:34Z",
+      "side": 1,
+      "message": "oof, very well spotted. undone the switch removal.",
+      "parentUuid": "0f9671a1_5e16b82a",
+      "revId": "87c907f7ff67a15311ba0a237a7507e855648c72",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2cdba282_a7b3a2f4",

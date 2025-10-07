@@ -30,14 +30,18 @@ type M struct {
 	// Flags is public to allow tests to customise e.g. logging.
 	Flags cuedebug.Config
 
-	name     string
-	fallback string
-	version  internal.EvaluatorVersion
+	name      string
+	fallback  string
+	version   internal.EvaluatorVersion
+	isDefault bool
 }
 
 func (t *M) Name() string     { return t.name }
 func (t *M) Fallback() string { return t.fallback }
-func (t *M) IsDefault() bool  { return t.name == DefaultVersion }
+
+// IsDefault reports whether this matrix entry should
+// be considered "default" for this matrix.
+func (t *M) IsDefault() bool { return t.isDefault }
 
 func (t *M) CueContext() *cue.Context {
 	ctx := cuecontext.New()
@@ -52,11 +56,10 @@ func (t *M) Runtime() *runtime.Runtime {
 	return (*runtime.Runtime)(t.CueContext())
 }
 
-// TODO(mvdan): the default should now be evalv3.
-// We keep it to be v2 for now, as a lot of tests still assume the evalv2 output
-// is the "golden output". We will phase that out incrementally.
-const DefaultVersion = "v2"
-
+// Matrix represents a set of possible parameters to run tests over. The
+// first entry in the slice is considered the "default" and can be used
+// to choose a specific entry to record values for (for example test
+// statistics or error message output).
 type Matrix []M
 
 var (
@@ -93,7 +96,8 @@ func (m Matrix) Run(t *testing.T, name string, f func(t *testing.T, m *M)) {
 
 // Do runs f in a subtest for each configuration in the matrix.
 func (m Matrix) Do(t *testing.T, f func(t *testing.T, m *M)) {
-	for _, c := range m {
+	for i, c := range m {
+		c.isDefault = i == 0
 		t.Run(c.name, func(t *testing.T) {
 			f(t, &c)
 		})

@@ -32,6 +32,26 @@ graph TD
   t2("root.c [Waiting]")
   t2-->t1
 
+-- out/run-v3/stats/totals --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   3
+-- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   3
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  0

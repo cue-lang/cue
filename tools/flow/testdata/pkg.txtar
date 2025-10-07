@@ -84,6 +84,46 @@ graph TD
 	$id: "valToOut"
 	out: "foo subbar"
 }
+-- out/run-v3/t1/stats --
+Leaks:  0
+Freed:  14
+Reused: 5
+Allocs: 9
+Retain: 0
+
+Unifications: 14
+Conjuncts:    19
+Disjuncts:    0
+ResolveDep:   5
+
+GenerationMismatch: 2
+
+NumCloseIDs: 1
+-- diff/-out/run-v3/t1/stats<==>+out/run/t1/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,14 @@
+ Leaks:  0
+-Freed:  17
+-Reused: 12
+-Allocs: 5
++Freed:  14
++Reused: 5
++Allocs: 9
+ Retain: 0
+ 
+-Unifications: 17
+-Conjuncts:    30
+-Disjuncts:    17
++Unifications: 14
++Conjuncts:    19
++Disjuncts:    0
++ResolveDep:   5
++
++GenerationMismatch: 2
++
++NumCloseIDs: 1
 -- out/run/t1/stats --
 Leaks:  0
 Freed:  17
@@ -94,6 +134,45 @@ Retain: 0
 Unifications: 17
 Conjuncts:    30
 Disjuncts:    17
+-- out/run-v3/t2/stats --
+Leaks:  0
+Freed:  14
+Reused: 14
+Allocs: 0
+Retain: 0
+
+Unifications: 14
+Conjuncts:    24
+Disjuncts:    0
+ResolveDep:   6
+
+GenerationMismatch: 2
+
+NumCloseIDs: 2
+-- diff/-out/run-v3/t2/stats<==>+out/run/t2/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,14 @@
+ Leaks:  0
+-Freed:  17
+-Reused: 17
++Freed:  14
++Reused: 14
+ Allocs: 0
+ Retain: 0
+ 
+-Unifications: 17
+-Conjuncts:    31
+-Disjuncts:    17
++Unifications: 14
++Conjuncts:    24
++Disjuncts:    0
++ResolveDep:   6
++
++GenerationMismatch: 2
++
++NumCloseIDs: 2
 -- out/run/t2/stats --
 Leaks:  0
 Freed:  17
@@ -104,6 +183,26 @@ Retain: 0
 Unifications: 17
 Conjuncts:    31
 Disjuncts:    17
+-- out/run-v3/t3/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   2
+-- diff/-out/run-v3/t3/stats<==>+out/run/t3/stats --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   2
 -- out/run/t3/stats --
 Leaks:  0
 Freed:  0
@@ -114,6 +213,46 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
+-- out/run-v3/stats/totals --
+Leaks:  0
+Freed:  28
+Reused: 19
+Allocs: 9
+Retain: 0
+
+Unifications: 28
+Conjuncts:    43
+Disjuncts:    0
+ResolveDep:   13
+
+GenerationMismatch: 4
+
+NumCloseIDs: 3
+-- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,14 @@
+ Leaks:  0
+-Freed:  34
+-Reused: 29
+-Allocs: 5
++Freed:  28
++Reused: 19
++Allocs: 9
+ Retain: 0
+ 
+-Unifications: 34
+-Conjuncts:    61
+-Disjuncts:    34
++Unifications: 28
++Conjuncts:    43
++Disjuncts:    0
++ResolveDep:   13
++
++GenerationMismatch: 4
++
++NumCloseIDs: 3
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  34

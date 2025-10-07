@@ -1,4 +1,4 @@
-# reproduction for https://github.com/cue-lang/cue/issues/3974
+# An alias expressed in the CUE source is transferred to the generated Go code.
 exec cue exp gengotypes
 cmp cue_types_main_gen.go expect-gengo
 

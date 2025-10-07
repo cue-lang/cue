@@ -1,4 +1,4 @@
-# reproduction for https://github.com/cue-lang/cue/issues/3974
+# An package alias in one CUE file matches the name of a different package imported in a separate CUE file.
 exec cue exp gengotypes
 cmp cue_types_main_gen.go expect-gengo
 

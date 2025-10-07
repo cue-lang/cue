@@ -1,4 +1,4 @@
-# reproduction for https://github.com/cue-lang/cue/issues/3974
+# Two CUE files in a package import two different packages under the same explicit name.
 exec cue exp gengotypes
 cmp cue_types_main_gen.go expect-gengo
 

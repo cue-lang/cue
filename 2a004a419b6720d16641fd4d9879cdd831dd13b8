@@ -160,6 +160,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "612650aa_8897eeae",
+        "filename": "internal/core/export/testdata/selfcontained/nochange.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-07T15:48:40Z",
+      "side": 0,
+      "message": "Actually, on further investigation, AFAICS this removal is correct. This test is _not_ temporarily disabled in self_test.go. The full list is:\n\n```\n\"self-v3/selfcontained/import\"\n\"self/selfcontained/cyclic\"\n\"self-v3/selfcontained/cyclic\"\n\"self-v3-noshare/selfcontained/cyclic\"\n```\nbut this test file is `nochange.txtar`, not `import.txtar` or `cyclic.txtar`.\n\nAs it happens, tests marked as `ToDo` are not considered as part of the GC at all - their txtar files are ignored completely.",
+      "parentUuid": "76cea41d_682a665d",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e7816e2c_4186c991",
@@ -209,6 +227,24 @@
       "side": 0,
       "message": "I think it can be removed, I\u0027m just not sure. I just seemed a bit haphazard. There was no mention it in the CL description.",
       "parentUuid": "5e79bb4f_2e146dcc",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0df7b88f_91081fad",
+        "filename": "internal/core/runtime/testdata/no_top_extern.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-07T15:48:40Z",
+      "side": 0,
+      "message": "The GC removes any `out/*` file that\u0027s not actually an output file. This fits that bill, so I\u0027m not sure it\u0027s needed to point it out specifically.",
+      "parentUuid": "0f03e14e_9cb35f74",
       "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

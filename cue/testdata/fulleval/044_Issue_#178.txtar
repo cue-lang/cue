@@ -10,18 +10,6 @@ data: bytes
 
 len: int
 bar: hex.EncodedLen(len)
--- out/def --
-import (
-	"encoding/csv"
-	"encoding/hex"
-)
-
-foo:  csv.Decode(data)
-data: bytes
-len:  int
-bar:  hex.EncodedLen(len)
--- out/legacy-debug --
-<0>{foo: <1>.Decode (<2>.data), data: bytes, len: int, bar: <3>.EncodedLen (<2>.len)}
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  5

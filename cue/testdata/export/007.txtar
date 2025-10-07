@@ -6,15 +6,6 @@
 	d: #a["d"]
 	e: #a.t[2:3]
 }
--- out/def --
-#a: {
-	b: 2.0
-	s: "abc"
-}
-b: 2.0
-c: _|_ // undefined field "c"
-d: _|_ // undefined field "d"
-e: _|_ // undefined field "t"
 -- out/compile --
 --- in.cue
 {

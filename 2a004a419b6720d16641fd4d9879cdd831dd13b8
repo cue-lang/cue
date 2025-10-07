@@ -91,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "06831f6f_2b08ac89",
+        "filename": "cue/testdata/eval/basictypes.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T14:31:00Z",
+      "side": 0,
+      "message": "I\u0027m not sure how this is updated or not at this moment, but there should be at least a stats file.\n\nIt is probably not updated because it the numbers are low. So it is probably okay to remove it.",
+      "parentUuid": "d0aa2903_4cd1010f",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e0fbaf91_adc625cc",
         "filename": "internal/core/export/testdata/selfcontained/nochange.txtar",
         "patchSetId": 8
@@ -120,6 +138,24 @@
       "side": 0,
       "message": "That\u0027s a tricky one, because when a test is skipped, there\u0027s no way for cuetxtar to know what output files it might be producing were it to run. Given that this seems to be the only instance of this pattern in the entire repo, I wonder if it would be OK to just remove it for now, or just rename the entry to something like `old/out/selfcontained` so it doesn\u0027t look exactly like all the other out files?",
       "parentUuid": "e0fbaf91_adc625cc",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76cea41d_682a665d",
+        "filename": "internal/core/export/testdata/selfcontained/nochange.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T14:31:00Z",
+      "side": 0,
+      "message": "Maybe. OTOH, the ToDo files are part of the txtar tests. Can\u0027t you use that to mark them somehow?\n\nOtherwise maybe not -- old/ ,but rather -- skipped/ to make clear it should still be enabled.",
+      "parentUuid": "11b823b2_9794ec15",
       "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -161,6 +197,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0f03e14e_9cb35f74",
+        "filename": "internal/core/runtime/testdata/no_top_extern.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T14:31:00Z",
+      "side": 0,
+      "message": "I think it can be removed, I\u0027m just not sure. I just seemed a bit haphazard. There was no mention it in the CL description.",
+      "parentUuid": "5e79bb4f_2e146dcc",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "11282e54_59734bcc",
         "filename": "tools/flow/testdata/dynamic.txtar",
         "patchSetId": 8
@@ -190,6 +244,24 @@
       "side": 0,
       "message": "This seems similar to https://review.gerrithub.io/c/cue-lang/cue/+/1223892/8/cue/testdata/eval/basictypes.txtar#b36\n\nThat is, these files don\u0027t seem to be used at all: changing them doesn\u0027t cause a test failure and they\u0027re not created if they don\u0027t exist.\n\nThat is, I suspect this is pointing towards an error in the underlying tests rather than a false positive in the GC.",
       "parentUuid": "11282e54_59734bcc",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06050b09_afcf1375",
+        "filename": "tools/flow/testdata/dynamic.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T14:31:00Z",
+      "side": 0,
+      "message": "These are quite recent and I remember using this to check improvement in performance.\n\nSo regardless if this is an error in the tests or GC, it would still be great not to remove them. I DO see logic related to it in flow_tests.go",
+      "parentUuid": "3497d492_cd22147d",
       "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

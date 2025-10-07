@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de8ac8c5_632d9b15",
+        "filename": "cue/testdata/basicrewrite/018_self-reference_cycles.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T13:09:51Z",
+      "side": 0,
+      "message": "This should not be removed.",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8b75ab4_2293db4d",
+        "filename": "cue/testdata/eval/basictypes.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T13:09:51Z",
+      "side": 0,
+      "message": "It seems this should not be removed.",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0fbaf91_adc625cc",
+        "filename": "internal/core/export/testdata/selfcontained/nochange.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T13:09:51Z",
+      "side": 0,
+      "message": "This should not be removed.\n\nThis test is temporarily disabled in self_test.go because of bugs.\n\nIn general, anything marked with ToDo should not be removed.",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7816e2c_4186c991",
+        "filename": "internal/core/runtime/testdata/no_top_extern.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T13:09:51Z",
+      "side": 0,
+      "message": "Not sure what this is.",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11282e54_59734bcc",
+        "filename": "tools/flow/testdata/dynamic.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T13:09:51Z",
+      "side": 0,
+      "message": "It seems wrong that this is removed.\n\nDitto for other files in this directory.",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

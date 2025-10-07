@@ -107,6 +107,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30e3dff4_3deb7cf2",
+        "filename": "cue/testdata/eval/basictypes.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-07T16:25:15Z",
+      "side": 0,
+      "message": "Fixed with the IsDefault fix.",
+      "parentUuid": "06831f6f_2b08ac89",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e0fbaf91_adc625cc",
@@ -298,6 +316,24 @@
       "side": 0,
       "message": "These are quite recent and I remember using this to check improvement in performance.\n\nSo regardless if this is an error in the tests or GC, it would still be great not to remove them. I DO see logic related to it in flow_tests.go",
       "parentUuid": "3497d492_cd22147d",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe4a86ef_b7459343",
+        "filename": "tools/flow/testdata/dynamic.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-07T16:25:15Z",
+      "side": 0,
+      "message": "Fixed with the IsDefault fix.",
+      "parentUuid": "06050b09_afcf1375",
       "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

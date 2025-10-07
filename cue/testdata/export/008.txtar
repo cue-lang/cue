@@ -1,8 +1,5 @@
 -- in.cue --
 {a: [ 3 & 4]}
--- out/def --
-a: [_|_, // conflicting values 3 and 4
-]
 -- out/compile --
 --- in.cue
 {

@@ -7,19 +7,6 @@ eval: true
 	}
 	a: [...string]
 }
--- out/def --
-#FindInMap: {
-	#: {
-		"Fn::FindInMap": [string | #FindInMap]
-	}
-}
-a: [...string]
--- out/export --
-a: []
--- out/yaml --
-a: []
--- out/json --
-{"a":[]}
 -- out/compile --
 --- in.cue
 {

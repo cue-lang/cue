@@ -121,27 +121,3 @@ Retain: 24
 Unifications: 27
 Conjuncts:    38
 Disjuncts:    41
--- out/run/t2 --
-graph TD
-  t0("root.prepare [Terminated]")
-  t1("root.run [Terminated]")
-  t1-->t0
-
--- out/run/t2/value --
-{
-	$id:    "run"
-	stdout: "foo"
-	env: {
-		input: "foo"
-	}
-}
--- out/run/t2/stats --
-Leaks:  0
-Freed:  12
-Reused: 12
-Allocs: 0
-Retain: 0
-
-Unifications: 12
-Conjuncts:    20
-Disjuncts:    12

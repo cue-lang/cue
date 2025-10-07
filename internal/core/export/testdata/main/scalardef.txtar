@@ -15,8 +15,6 @@ import pkg2 "mod.test/foo/pkg1"
 package pkg1
 
 Object: "World"
--- out/eval --
-(string){ "Hello World!" }
 -- out/doc --
 []
 [#pkg1]

@@ -215,9 +215,6 @@ a: {
     c: 3
 }
 
--- out/compile/experiment_test --
-predeclared identifier "self" requires the Self experiment to be enabled:
-    ./experiment_test.cue:4:8
 -- out/compile --
 --- in.cue
 {

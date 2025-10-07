@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "de77a89f_8e63c03b",
+        "filename": "cue/ast/ident.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-07T16:18:34Z",
+      "side": 1,
+      "message": "as agreed, I\u0027m going with",
+      "parentUuid": "3312dded_c4d800c7",
+      "revId": "f8eee9e5ee472fab156329ca88dfcbd7044cb35b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "02aff59a_de7d57cc",
         "filename": "cue/ast/ident.go",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-06T15:23:16Z",
       "side": 1,
       "message": "Particularly with the \"Must\" name as is, I\u0027d say this TODO is dubious: there\u0027s no hard requirement to do that.",
+      "revId": "f8eee9e5ee472fab156329ca88dfcbd7044cb35b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ccede20_474f1401",
+        "filename": "cue/ast/ident.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-07T16:18:34Z",
+      "side": 1,
+      "message": "removed as discussed",
+      "parentUuid": "02aff59a_de7d57cc",
       "revId": "f8eee9e5ee472fab156329ca88dfcbd7044cb35b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -2,18 +2,6 @@
 #evalPartial
 -- in.cue --
 a: {[_]: _}
--- out/def --
-a: {
-	...
-}
--- out/export --
-a: {}
--- out/yaml --
-a: {}
--- out/json --
-{"a":{}}
--- out/legacy-debug --
-<0>{a: <1>{...}}
 -- out/compile --
 --- in.cue
 {

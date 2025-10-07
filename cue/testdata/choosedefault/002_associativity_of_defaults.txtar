@@ -66,14 +66,6 @@ issue3908: full: {
 	out: #Schema & { field: string | *"dataDefault" }
 	#Schema: field: string | *null
 }
--- out/def --
-x: a & b
-y: b & c
-a: *"a" | "b" | "c"
-b: *"a" | "b" | "c"
-c: *"a" | *"b" | "c"
--- out/legacy-debug --
-<0>{x: "a", y: (*"a" | *"b"), a: "a", b: "a", c: (*"a" | *"b")}
 -- out/compile --
 --- complex.cue
 {

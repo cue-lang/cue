@@ -32,8 +32,6 @@ validatePartial: #test & {
 }
 
 invalidDisjuntion: yaml.Validate("a: 3", {a: 1 | 2})
--- diff/todo --
-missing position
 -- out/yaml --
 Errors:
 #test.t1.ok1: cannot call non-function fn (type _):

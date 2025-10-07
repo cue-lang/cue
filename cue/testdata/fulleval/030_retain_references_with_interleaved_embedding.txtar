@@ -14,40 +14,6 @@ a: d: {
 a: [Name=string]: {#info: {
 	X: "foo"
 }}
--- out/def --
-a: {
-	{[Name=string]: {
-		#info: {
-			X: "foo"
-		}
-	}}
-	d: {
-		#info: {
-			...
-		}
-		Y: #info.X
-		#base
-	}
-}
-#base: {
-	#info: {
-		...
-	}
-}
--- out/export --
-a: {
-	d: {
-		Y: "foo"
-	}
-}
--- out/yaml --
-a:
-  d:
-    Y: foo
--- out/json --
-{"a":{"d":{"Y":"foo"}}}
--- out/legacy-debug --
-<0>{a: <1>{[]: <2>(Name: string)-><3>{#info: <4>C{X: "foo"}}, d: <5>C{#info: <6>C{X: "foo"}, Y: "foo"}}, #base: <7>C{#info: <8>{...}}}
 -- out/compile --
 --- in.cue
 {

@@ -45,21 +45,6 @@ typeEnum: baz: 3
 // symbolEnum: baz: "baz"
 
 singleEnum: 1
--- out/jsonpb --
-enum: asIs:        "foo"
-enum: asIsUnknown: "foobar"
-
-// Convert integers to strings
-defEnum: foo: "foo"
-defEnum: bar: "bar"
-defEnum: baz: 3
-
-// TODO: consider supporting @symbol(foo) or @json(,symbol=foo)
-// symbolEnum: foo: "foo"
-// symbolEnum: bar: "bar"
-// symbolEnum: baz: "baz"
-
-singleEnum: "single"
 -- out/encode --
 enum: {
   asIs: "foo"

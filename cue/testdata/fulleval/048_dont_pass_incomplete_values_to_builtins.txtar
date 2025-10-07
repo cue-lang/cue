@@ -5,13 +5,6 @@ import "encoding/json"
 
 input: string
 foo:   json.Marshal(input)
--- out/def --
-import "encoding/json"
-
-input: string
-foo:   json.Marshal(input)
--- out/legacy-debug --
-<0>{input: string, foo: <1>.Marshal (<2>.input)}
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  3

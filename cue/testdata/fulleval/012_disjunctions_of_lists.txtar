@@ -5,12 +5,6 @@ l: *[ int, int] | [ string, string]
 
 l1: ["a", "b"]
 l2: l & ["c", "d"]
--- out/def --
-l: *[int, int] | [string, string]
-l1: ["a", "b"]
-l2: ["c", "d"]
--- out/legacy-debug --
-<0>{l: [int,int], l1: ["a","b"], l2: ["c","d"]}
 -- out/compile --
 --- in.cue
 {

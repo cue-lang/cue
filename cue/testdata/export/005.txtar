@@ -1,12 +1,5 @@
 -- in.cue --
 {a: 1, b: a + 2, c: null, d: true, e: _, f: string}
--- out/def --
-a: 1
-b: 3
-c: null
-d: true
-e: _
-f: string
 -- out/compile --
 --- in.cue
 {

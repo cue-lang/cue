@@ -59,12 +59,6 @@ issue3737: reduced2: {
         end:      start + duration
     }
 }
--- out/def --
-a: b - 100
-b: a + 100
-c: [c[1], c[0]]
--- out/legacy-debug --
-<0>{a: (<1>.b - 100), b: (<1>.a + 100), c: [<1>.c[1],<1>.c[0]]}
 -- out/compile --
 --- disjunction.cue
 {
@@ -509,9 +503,6 @@ diff old new
          }
        }
      }
--- diff/explanations --
-issue3669: expressions are now allowed to refer to defaults within disjunctions,
-   even in a cycle, as long as the results are consistent.
 -- out/eval --
 (struct){
   oneway: (struct){

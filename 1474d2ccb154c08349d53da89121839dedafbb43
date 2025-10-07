@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80e79260_a72982e2",
+        "filename": "cue/testdata/basicrewrite/016_comparison.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1101,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T09:54:36Z",
+      "side": 0,
+      "message": "I don\u0027t understand how this can be removed, there is still a diff file.",
+      "revId": "1474d2ccb154c08349d53da89121839dedafbb43",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

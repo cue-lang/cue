@@ -9,12 +9,6 @@ k2: -8_000_000_000
 
 e1: int16
 e1: 100_000
--- out/def --
-k1: 44
-k2: -8000000000
-e1: _|_ // invalid value 100000 (out of bound int & <=32767)
--- out/legacy-debug --
-<0>{k1: 44, k2: -8000000000, e1: _|_((int & <=32767 & 100000):invalid value 100000 (out of bound int & <=32767))}
 -- out/compile --
 --- in.cue
 {

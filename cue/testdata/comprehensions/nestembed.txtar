@@ -74,35 +74,6 @@ diff old new
 +    aws: ~(useful_infra.aws)
    }
  }
--- out/eval --
-(struct){
-  DeleteThis: (#list){
-    0: (string){ "this" }
-    1: (string){ "that" }
-  }
-  useful_infra: (struct){
-    gcp: (struct){
-      cluters: (int){ 10 }
-    }
-    aws: (struct){
-      clusters: (int){ 20 }
-    }
-    this: (struct){
-      clusters: (int){ 1 }
-    }
-    that: (struct){
-      clusters: (int){ 2 }
-    }
-  }
-  New_infra: (struct){
-    gcp: (struct){
-      cluters: (int){ 10 }
-    }
-    aws: (struct){
-      clusters: (int){ 20 }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

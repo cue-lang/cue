@@ -182,23 +182,6 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 54
--- out/eval/stats --
-Leaks:  0
-Freed:  72
-Reused: 64
-Allocs: 8
-Retain: 15
-
-Unifications: 72
-Conjuncts:    127
-Disjuncts:    83
-
-MisalignedConjunct: 27
-
-NumCloseIDs: 20
-- comprehension.t1 should be at most an incomplete error, as it is fixable.
-  Arguably they should pass, though, as there is a predictable path to its
-  resolution.
 -- out/eval --
 Errors:
 comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:

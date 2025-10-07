@@ -20,13 +20,3 @@ graph TD
   t1("root.b [Waiting]")
   t1-->t0
 
--- out/run/stats/totals --
-Leaks:  0
-Freed:  0
-Reused: 0
-Allocs: 0
-Retain: 0
-
-Unifications: 0
-Conjuncts:    0
-Disjuncts:    0

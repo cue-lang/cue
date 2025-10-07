@@ -76,17 +76,3 @@ diff old new
  }
  
  clusters: [_]: #cluster
--- out/trim --
-== a.cue
-#IPPool: {
-	cidr: string
-}
-
-#cluster: {
-	podCIDR: string
-	IPPool: #IPPool & {}
-}
-
-clusters: [_]: #cluster
-
-clusters: vagrant: podCIDR: "abc"

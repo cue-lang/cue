@@ -194,20 +194,6 @@ diff old new
 +Notifications: 12
 +
 +NumCloseIDs: 124
--- out/eval/stats --
-Leaks:  10
-Freed:  130
-Reused: 123
-Allocs: 17
-Retain: 57
-
-Unifications: 136
-Conjuncts:    304
-Disjuncts:    173
-
-MisalignedConjunct: 1
-
-NumCloseIDs: 2
 -- out/eval --
 Errors:
 listEmbed.b6: index out of range [5] with length 2:

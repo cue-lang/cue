@@ -57,18 +57,6 @@ diff old new
 +Disjuncts:    0
  
  NumCloseIDs: 1
--- out/eval/stats --
-Leaks:  0
-Freed:  21
-Reused: 16
-Allocs: 5
-Retain: 72
-
-Unifications: 21
-Conjuncts:    3
-Disjuncts:    93
-
-NumCloseIDs: 1
 -- out/eval --
 (_|_){
   // [incomplete] incomplete bool: _

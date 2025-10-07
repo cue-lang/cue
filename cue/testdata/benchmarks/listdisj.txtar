@@ -98,13 +98,3 @@ diff old new
 }
 -- diff/explanation --
 Differences fully due to rendered structure sharing.
--- out/eval/stats --
-Leaks:  0
-Freed:  447
-Reused: 439
-Allocs: 8
-Retain: 0
-
-Unifications: 287
-Conjuncts:    894
-Disjuncts:    447

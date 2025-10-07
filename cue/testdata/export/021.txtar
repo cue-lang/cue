@@ -9,19 +9,6 @@ eval: true
 	b: a: b: 4
 	a: b: 3
 }
--- out/def --
-
-A = a
-b: {
-	idx: A[str]
-	a: {
-		b: 4
-	}
-	str: string
-}
-a: {
-	b: 3
-}
 -- out/compile --
 --- in.cue
 {

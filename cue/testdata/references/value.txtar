@@ -107,30 +107,6 @@ diff old new
      }
    }
    listValueAlias: (#list){
--- out/eval --
-(struct){
-  structShorthand: (struct){
-    b: (int){ 3 }
-    c: (int){ 3 }
-  }
-  fieldAndValue: (struct){
-    foo: (int){
-      3
-      #sum: (int){ 6 }
-    }
-  }
-  valueCycle: (struct){
-    b: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:8:18
-    }
-  }
-  listValueAlias: (#list){
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 1 }
-  }
-}
 -- out/compile --
 --- err.cue
 {

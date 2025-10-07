@@ -3,16 +3,6 @@
 -- in.cue --
 a: {l: ["foo", v], v: l[1]}
 b: a & {l: [_, "bar"]}
--- out/def --
-a: {
-	l: ["foo", v]
-	v: l[1]
-}
-b: a & {
-	l: [_, "bar"]
-}
--- out/legacy-debug --
-<0>{a: <1>{l: ["foo",<2>.v], v: <2>.l[1]}, b: <3>{l: ["foo","bar"], v: "bar"}}
 -- out/compile --
 --- in.cue
 {

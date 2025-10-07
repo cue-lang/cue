@@ -57,12 +57,3 @@ diff old new
 +First: _
  
  First: #DefA | #DefB
--- out/trim --
-== a.cue
-#DefA: A: "a"
-#DefB: B: "b"
-
-First: {}
-First: {}
-
-First: #DefA | #DefB

@@ -71,32 +71,6 @@ diff old new
 positions
 -- diff/todo/p3 --
 Reordering
--- out/eval --
-Errors:
-B.c: field not allowed:
-    ./test.cue:1:10
-    ./test.cue:6:4
-    ./test.cue:7:2
-
-Result:
-(_|_){
-  // [eval]
-  A: (#struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  B: (_|_){
-    // [eval]
-    a: (int){ 1 }
-    b: (int){ 2 }
-    c: (_|_){
-      // [eval] B.c: field not allowed:
-      //     ./test.cue:1:10
-      //     ./test.cue:6:4
-      //     ./test.cue:7:2
-    }
-  }
-}
 -- out/compile --
 --- test.cue
 {

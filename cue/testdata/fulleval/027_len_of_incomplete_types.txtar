@@ -12,24 +12,6 @@ v7:   len([2] | *[1, 2])
 v8:   len([2] | [1, 2])
 v9:   len("😂")
 v10:  len("")
--- out/def --
-args: *[] | [...string]
-v1:   0
-v2:   0
-v3:   0
-v4:   1
-v5:   len({
-	a: 3
-} | {
-	a: 4
-})
-v6:  len('sf' | 'dd')
-v7:  2
-v8:  len([2] | [1, 2])
-v9:  4
-v10: 0
--- out/legacy-debug --
-<0>{args: [], v1: 0, v2: 0, v3: 0, v4: 1, v5: len ((<1>{a: 3} | <2>{a: 4})), v6: len (('sf' | 'dd')), v7: 2, v8: len (([2] | [1,2])), v9: 4, v10: 0}
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  38
@@ -62,16 +44,6 @@ diff old new
 +Unifications: 27
 +Conjuncts:    37
 +Disjuncts:    10
--- out/eval/stats --
-Leaks:  3
-Freed:  90
-Reused: 84
-Allocs: 9
-Retain: 3
-
-Unifications: 59
-Conjuncts:    105
-Disjuncts:    93
 -- out/eval --
 (struct){
   args: (list){ |(*(#list){

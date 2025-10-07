@@ -61,20 +61,6 @@ diff old new
  [#B #f]
  [#B #bar]
 +[#B #a]
--- diff/doc/explanation --
-Reordering.
--- out/doc --
-[]
-[#A]
-[#A #a]
-[#E]
-[#F]
-[#G]
-[#B]
-[#B #a]
-[#B #def]
-[#B #f]
-[#B #bar]
 -- out/value --
 == Simplified
 {}

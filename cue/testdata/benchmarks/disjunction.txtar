@@ -172,16 +172,6 @@ diff old new
  Conjuncts:    143
 -Disjuncts:    82
 +Disjuncts:    78
--- out/eval/stats --
-Leaks:  0
-Freed:  82
-Reused: 74
-Allocs: 8
-Retain: 0
-
-Unifications: 4
-Conjuncts:    143
-Disjuncts:    82
 -- out/eval --
 (struct){
   x: (struct){

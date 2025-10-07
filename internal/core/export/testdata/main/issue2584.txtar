@@ -8,7 +8,6 @@ F2: {
 }
 D: {}
 let L = D
--- out/self/default --
 -- out/definition --
 
 let L = D
@@ -41,18 +40,6 @@ diff old new
 -[F2 _]
  [D]
  [L]
--- diff/doc/explanation --
-An incomplete dynamic field does not manifest itself as an invalid field
-in the new evaluator. This is probably for the better.
--- out/doc --
-[]
-[F1]
-[F1 sub1]
-[F1 sub1 sub2]
-[F2]
-[F2 _]
-[D]
-[L]
 -- out/value-v3 --
 == Simplified
 {
@@ -133,72 +120,3 @@ diff old new
  	D: {}
  }
  == All
--- diff/value/todo/p2 --
-Seemingly benign change in error message.
--- out/value --
-== Simplified
-{
-	let L = D
-	F1: {
-		sub1: {
-			sub2: {}
-		}
-	}
-	F2: {
-		(string): _
-		L
-	}
-	D: {}
-}
-== Raw
-{
-	let L = D
-	F1: {
-		sub1: {
-			sub2: {}
-		}
-	}
-	F2: {
-		(string): _
-		L
-	}
-	D: {}
-}
-== Final
-{
-	F1: {
-		sub1: {
-			sub2: {}
-		}
-	}
-	F2: _|_ // F2: invalid non-ground value string (must be concrete string)
-	D: {}
-}
-== All
-{
-	let L = D
-	F1: {
-		sub1: {
-			sub2: {}
-		}
-	}
-	F2: {
-		(string): _
-		L
-	}
-	D: {}
-}
-== Eval
-{
-	let L = D
-	F1: {
-		sub1: {
-			sub2: {}
-		}
-	}
-	F2: {
-		(string): _
-		L
-	}
-	D: {}
-}

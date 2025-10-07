@@ -64,20 +64,6 @@ diff old new
 +ConjunctInfos:       905
 +MaxConjunctInfos:    103
 +MaxReqSets:          104
--- out/eval/stats --
-Leaks:  0
-Freed:  700
-Reused: 594
-Allocs: 106
-Retain: 108
-
-Unifications: 700
-Conjuncts:    1302
-Disjuncts:    807
-
-MisalignedConjunct: 696
-
-NumCloseIDs: 4
 -- out/eval --
 (struct){
   out: (#struct){

@@ -20,8 +20,6 @@ package example
 // Issue #550
 blah: Settings.anyKey
 Settings: {}
--- out/ --
-
 -- out/eval/stats --
 Leaks:  1
 Freed:  4

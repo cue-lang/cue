@@ -70,15 +70,3 @@ diff old new
  }
  a: #def1 & {
  	in1: "test"
--- out/trim --
-== a.cue
-#def2: {
-	in2: string
-}
-#def1: {
-	in1: string
-	out: #def2 & {}
-}
-a: #def1 & {
-	in1: "test"
-}

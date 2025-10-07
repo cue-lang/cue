@@ -8,14 +8,6 @@ d: _|_ != b.a
 e: _|_ == _|_
 f: ({} & false) == _|_
 g: _|_ != ({} & false)
--- out/def --
-a: _|_ // explicit error (_|_ literal) in source
-b: _|_ // explicit error (_|_ literal) in source
-c: true
-d: false
-e: true
--- out/legacy-debug --
-<0>{a: _|_(explicit error (_|_ literal) in source), b: _|_(explicit error (_|_ literal) in source), c: true, d: false, e: true}
 -- out/compile --
 --- in.cue
 {

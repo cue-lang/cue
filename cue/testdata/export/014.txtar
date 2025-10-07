@@ -3,8 +3,6 @@ raw: true
 {
 	a: >=0 & <=10 & !=1
 }
--- out/def --
-a: >=0 & <=10 & !=1
 -- out/compile --
 --- in.cue
 {

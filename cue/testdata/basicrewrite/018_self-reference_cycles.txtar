@@ -509,7 +509,7 @@ diff old new
          }
        }
      }
--- diff/explanations --
+-- diff/explanation --
 issue3669: expressions are now allowed to refer to defaults within disjunctions,
    even in a cycle, as long as the results are consistent.
 -- out/eval --

@@ -7,15 +7,6 @@
 }
 -- out/decode/extract --
 [1]
--- out/decode/testerr/err-1 --
-conflicting values 1 and [1] (mismatched types int and list):
-    generated.cue:1:1
-    test/err-1.json:1:1
--- out/decode/testerr/err-2 --
-0: conflicting values 2 and 1:
-    generated.cue:1:1
-    generated.cue:1:2
-    test/err-2.json:1:2
 -- test/exact.json --
 [1]
 -- test/err-1.json --

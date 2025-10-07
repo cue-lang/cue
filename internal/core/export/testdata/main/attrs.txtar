@@ -488,8 +488,6 @@ diff old new
  		}
  		d: {
  			@decl2(), @decl1()
--- diff/value/todo/p3 --
-Reordering of attributes.
 -- out/value --
 == Simplified
 {

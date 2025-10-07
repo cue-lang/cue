@@ -33,23 +33,3 @@ graph TD
 	stdout: "foo"
 	text:   "10 10"
 }
--- out/run/t1/stats --
-Leaks:  0
-Freed:  14
-Reused: 7
-Allocs: 7
-Retain: 1
-
-Unifications: 10
-Conjuncts:    29
-Disjuncts:    15
--- out/run/stats/totals --
-Leaks:  0
-Freed:  14
-Reused: 7
-Allocs: 7
-Retain: 1
-
-Unifications: 10
-Conjuncts:    29
-Disjuncts:    15

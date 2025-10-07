@@ -1,26 +1,5 @@
 -- in.cue --
 "hello\nworld"
--- out/def --
-"""
-        hello
-        world
-        """
--- out/export --
-"""
-        hello
-        world
-        """
--- out/yaml --
-|-
-  hello
-  world
--- out/json --
-"hello\nworld"
--- out/legacy-debug --
-"""
-        hello
-        world
-        """
 -- out/compile --
 --- in.cue
 {

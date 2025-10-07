@@ -58,8 +58,6 @@ line  reference    path of resulting vertex
 14:   X3.w      => v.w
 7:    v         => v
 8:    v         => v
--- diff/dependencies-v3/todo/p2 --
-bring in line with evalv2
 -- out/dependencies/dynamic --
 line  reference    path of resulting vertex
 12:   X1        => v.w

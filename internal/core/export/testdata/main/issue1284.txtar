@@ -135,8 +135,6 @@ diff old new
  == Eval
 -_|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
 +_|_ // a2.l: conflicting values [...] and {} (mismatched types list and struct)
--- diff/value/todo/p2 --
-Slightly changed error messages.
 -- out/value --
 == Simplified
 _|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)

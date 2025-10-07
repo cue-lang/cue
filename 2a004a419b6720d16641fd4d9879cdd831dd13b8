@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9445a1c8_972dba57",
+        "filename": "cue/testdata/basicrewrite/018_self-reference_cycles.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-07T14:04:47Z",
+      "side": 0,
+      "message": "Done in https://review.gerrithub.io/c/cue-lang/cue/+/1223937",
+      "parentUuid": "193ff7ed_c740ba63",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8b75ab4_2293db4d",

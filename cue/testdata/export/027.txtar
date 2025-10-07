@@ -10,16 +10,6 @@ eval: true
 		#Bar: #Foo | string
 	}
 }
--- out/def --
-#Foo: {
-	#Bar: #Foo | string
-}
--- out/export --
-
--- out/yaml --
-{}
--- out/json --
-{}
 -- out/compile --
 --- in.cue
 {

@@ -22,32 +22,6 @@ raw: true
 		{[_]: <300}
 	}
 }
--- out/def --
-#emb: {
-	a: 1
-	sub: {
-		f: 3
-	}
-}
-#def: {
-	b: 2
-	#emb
-}
-#f: {
-	a: 10
-}
-#e: {
-	b: int
-	#f
-	[string]: <100
-	[string]: <300
-}
--- out/export --
-
--- out/yaml --
-{}
--- out/json --
-{}
 -- out/compile --
 --- in.cue
 {

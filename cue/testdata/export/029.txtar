@@ -10,23 +10,6 @@ noOpt: true
 		#: "Fn::And": [_]
 	}
 }
--- out/def --
-#And: {
-	#: {
-		"Fn::And": [...3 | #And]
-	}
-}
-#Ands: #And & {
-	#: {
-		"Fn::And": [_]
-	}
-}
--- out/export --
-
--- out/yaml --
-{}
--- out/json --
-{}
 -- out/compile --
 --- in.cue
 {

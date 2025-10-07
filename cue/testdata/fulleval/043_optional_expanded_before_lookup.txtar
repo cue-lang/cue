@@ -11,45 +11,6 @@ test: A: {
 }
 
 B: test.A & {}
--- out/def --
-test: {
-	{[ID=string]: {
-		name: ID
-	}}
-	A: {
-		name:   "A"
-		field1: "1"
-		field2: "2"
-	}
-}
-B: test.A & {}
--- out/export --
-test: {
-	A: {
-		name:   "A"
-		field1: "1"
-		field2: "2"
-	}
-}
-B: {
-	name:   "A"
-	field1: "1"
-	field2: "2"
-}
--- out/yaml --
-test:
-  A:
-    name: A
-    field1: "1"
-    field2: "2"
-B:
-  name: A
-  field1: "1"
-  field2: "2"
--- out/json --
-{"test":{"A":{"name":"A","field1":"1","field2":"2"}},"B":{"name":"A","field1":"1","field2":"2"}}
--- out/legacy-debug --
-<0>{test: <1>{[]: <2>(ID: string)-><3>{name: <2>.ID}, A: <4>{name: "A", field1: "1", field2: "2"}}, B: <5>{name: "A", field1: "1", field2: "2"}}
 -- out/compile --
 --- in.cue
 {

@@ -1,25 +1,6 @@
 raw: true
 -- in.cue --
 {a: {b: []}, c: a.b, d: a["b"]}
--- out/def --
-a: {
-	b: []
-}
-c: []
-d: []
--- out/export --
-a: {
-	b: []
-}
-c: []
-d: []
--- out/yaml --
-a:
-  b: []
-c: []
-d: []
--- out/json --
-{"a":{"b":[]},"c":[],"d":[]}
 -- out/compile --
 --- in.cue
 {

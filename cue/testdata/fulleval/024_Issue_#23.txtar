@@ -3,15 +3,6 @@
 -- in.cue --
 x: {a:     1} | {a: 2}
 y: x & {a: 3}
--- out/def --
-x: {
-	a: 1
-} | {
-	a: 2
-}
-y: _|_ // ; empty disjunction: conflicting values 2 and 3
--- out/legacy-debug --
-<0>{x: (<1>{a: 1} | <2>{a: 2}), y: _|_((1 & 3):empty disjunction: conflicting values 1 and 3;(2 & 3):empty disjunction: conflicting values 2 and 3)}
 -- out/compile --
 --- in.cue
 {
@@ -34,9 +25,6 @@ Retain: 0
 Unifications: 7
 Conjuncts:    15
 Disjuncts:    11
--- diff/explanation --
-It is okay to show field a as long as the error is clear and points to the
-violating disjunction.
 -- out/eval --
 Errors:
 y: 2 errors in empty disjunction:

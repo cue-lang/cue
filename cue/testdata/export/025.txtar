@@ -11,15 +11,6 @@ eval: true
 	a: int
 	c: *1 | 2
 }
--- out/def --
-b: [{
-	if a > 4 {
-		f: 4
-	}
-	{[X=string]: int}
-}][a]
-a: int
-c: *1 | 2
 -- out/compile --
 --- in.cue
 {

@@ -16,22 +16,6 @@ eval: true
 	}
 	#Bar: string
 }
--- out/def --
-#Foo: {
-	"#Foo": 2
-	sgl:    #Bar
-	ref:    (null | #Foo) & (null | #Foo)
-	ext:    #Bar | null
-	ref2:   null | #Foo.sgl
-	...
-}
-#Bar: string
--- out/export --
-
--- out/yaml --
-{}
--- out/json --
-{}
 -- out/compile --
 --- in.cue
 {

@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "193ff7ed_c740ba63",
+        "filename": "cue/testdata/basicrewrite/018_self-reference_cycles.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-07T13:58:05Z",
+      "side": 0,
+      "message": "This is inconsistent with the other `diff/explanation` entries. I\u0027ll rename it to be consistent and then it won\u0027t be removed.",
+      "parentUuid": "de8ac8c5_632d9b15",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b8b75ab4_2293db4d",
         "filename": "cue/testdata/eval/basictypes.txtar",
         "patchSetId": 8
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-07T13:09:51Z",
       "side": 0,
       "message": "It seems this should not be removed.",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0aa2903_4cd1010f",
+        "filename": "cue/testdata/eval/basictypes.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-07T13:58:05Z",
+      "side": 0,
+      "message": "I don\u0027t understand how this is used. I removed it, and it doesn\u0027t get created, even with `CUE_UPDATE\u003dforce`, and neither does it cause a test failure if I change the numbers arbitrarily.\n\nSo if you genuinely feel like this should reflect stats, it seems like there\u0027s some issue with the underlying tests which this GC is exposing.",
+      "parentUuid": "b8b75ab4_2293db4d",
       "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "11b823b2_9794ec15",
+        "filename": "internal/core/export/testdata/selfcontained/nochange.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-07T13:58:05Z",
+      "side": 0,
+      "message": "That\u0027s a tricky one, because when a test is skipped, there\u0027s no way for cuetxtar to know what output files it might be producing were it to run. Given that this seems to be the only instance of this pattern in the entire repo, I wonder if it would be OK to just remove it for now, or just rename the entry to something like `old/out/selfcontained` so it doesn\u0027t look exactly like all the other out files?",
+      "parentUuid": "e0fbaf91_adc625cc",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e7816e2c_4186c991",
         "filename": "internal/core/runtime/testdata/no_top_extern.txtar",
         "patchSetId": 8
@@ -71,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5e79bb4f_2e146dcc",
+        "filename": "internal/core/runtime/testdata/no_top_extern.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-07T13:58:05Z",
+      "side": 0,
+      "message": "Me neither. Any reason it shouldn\u0027t be removed, given that it looks like an output file but isn\u0027t used by anything?",
+      "parentUuid": "e7816e2c_4186c991",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "11282e54_59734bcc",
         "filename": "tools/flow/testdata/dynamic.txtar",
         "patchSetId": 8
@@ -82,6 +154,24 @@
       "writtenOn": "2025-10-07T13:09:51Z",
       "side": 0,
       "message": "It seems wrong that this is removed.\n\nDitto for other files in this directory.",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3497d492_cd22147d",
+        "filename": "tools/flow/testdata/dynamic.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-07T13:58:05Z",
+      "side": 0,
+      "message": "This seems similar to https://review.gerrithub.io/c/cue-lang/cue/+/1223892/8/cue/testdata/eval/basictypes.txtar#b36\n\nThat is, these files don\u0027t seem to be used at all: changing them doesn\u0027t cause a test failure and they\u0027re not created if they don\u0027t exist.\n\nThat is, I suspect this is pointing towards an error in the underlying tests rather than a false positive in the GC.",
+      "parentUuid": "11282e54_59734bcc",
       "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -143,6 +143,26 @@ graph TD
 	}
 	index: int
 }
+-- out/run-v3/t2/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   1
+-- diff/-out/run-v3/t2/stats<==>+out/run/t2/stats --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   1
 -- out/run/t2/stats --
 Leaks:  0
 Freed:  0
@@ -181,6 +201,36 @@ graph TD
 	//cue:path: root.concreteValueInGeneratedSubfield.index
 	let INDEX = int
 }
+-- out/run-v3/t3/stats --
+Leaks:  3
+Freed:  0
+Reused: 0
+Allocs: 3
+Retain: 0
+
+Unifications: 1
+Conjuncts:    1
+Disjuncts:    0
+ResolveDep:   2
+-- diff/-out/run-v3/t3/stats<==>+out/run/t3/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,10 @@
+-Leaks:  1
++Leaks:  3
+ Freed:  0
+ Reused: 0
+-Allocs: 1
+-Retain: 1
++Allocs: 3
++Retain: 0
+ 
+ Unifications: 1
+ Conjuncts:    1
+-Disjuncts:    1
++Disjuncts:    0
++ResolveDep:   2
 -- out/run/t3/stats --
 Leaks:  1
 Freed:  0
@@ -223,6 +273,26 @@ graph TD
 	//cue:path: root.concreteValueInGeneratedSubfield.index
 	let INDEX = int
 }
+-- out/run-v3/t4/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   1
+-- diff/-out/run-v3/t4/stats<==>+out/run/t4/stats --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   1
 -- out/run/t4/stats --
 Leaks:  0
 Freed:  0
@@ -258,6 +328,26 @@ graph TD
 	$id: "valToOut"
 	x:   3
 }
+-- out/run-v3/t5/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   2
+-- diff/-out/run-v3/t5/stats<==>+out/run/t5/stats --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   2
 -- out/run/t5/stats --
 Leaks:  0
 Freed:  0
@@ -297,6 +387,26 @@ graph TD
 	}
 	incomplete: _
 }
+-- out/run-v3/t6/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   2
+-- diff/-out/run-v3/t6/stats<==>+out/run/t6/stats --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   2
 -- out/run/t6/stats --
 Leaks:  0
 Freed:  0
@@ -337,6 +447,26 @@ graph TD
 	//cue:path: root.indirectTaskRootReference.incomplete
 	let INCOMPLETE = _
 }
+-- out/run-v3/t7/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   1
+-- diff/-out/run-v3/t7/stats<==>+out/run/t7/stats --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   1
 -- out/run/t7/stats --
 Leaks:  0
 Freed:  0
@@ -380,6 +510,26 @@ graph TD
 	//cue:path: root.indirectTaskRootReference.incomplete
 	let INCOMPLETE = _
 }
+-- out/run-v3/t8/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   2
+-- diff/-out/run-v3/t8/stats<==>+out/run/t8/stats --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   2
 -- out/run/t8/stats --
 Leaks:  0
 Freed:  0
@@ -425,6 +575,26 @@ graph TD
 	//cue:path: root.indirectTaskRootReference.incomplete
 	let INCOMPLETE = _
 }
+-- out/run-v3/t9/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   1
+-- diff/-out/run-v3/t9/stats<==>+out/run/t9/stats --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   1
 -- out/run/t9/stats --
 Leaks:  0
 Freed:  0
@@ -435,6 +605,36 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
+-- out/run-v3/stats/totals --
+Leaks:  3
+Freed:  0
+Reused: 0
+Allocs: 3
+Retain: 0
+
+Unifications: 1
+Conjuncts:    1
+Disjuncts:    0
+ResolveDep:   12
+-- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,10 @@
+-Leaks:  1
++Leaks:  3
+ Freed:  0
+ Reused: 0
+-Allocs: 1
+-Retain: 1
++Allocs: 3
++Retain: 0
+ 
+ Unifications: 1
+ Conjuncts:    1
+-Disjuncts:    1
++Disjuncts:    0
++ResolveDep:   12
 -- out/run/stats/totals --
 Leaks:  1
 Freed:  0

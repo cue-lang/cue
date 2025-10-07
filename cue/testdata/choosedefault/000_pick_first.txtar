@@ -8,29 +8,6 @@ b: c: *{
 } | {
 	a: 3
 }
--- out/def --
-a: *5 | "a" | true
-b: {
-	c: *{
-		a: 2
-	} | {
-		a: 3
-	}
-}
--- out/export --
-a: 5
-b: {
-	c: *{
-		a: 2
-	} | {
-		a: 3
-	}
-}
--- out/yaml --
--- out/json --
-{"a":5,"b":{"c":{"a":2}}}
--- out/legacy-debug --
-<0>{a: 5, b: <1>{c: <2>{a: 2}}}
 -- out/compile --
 --- in.cue
 {

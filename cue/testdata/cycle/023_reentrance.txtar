@@ -20,8 +20,6 @@ fib3:  (fib & {n: 3}).out  // SHOULD be an error
 fib7:  (fib & {n: 7}).out  // Error
 fib12: (fib & {n: 12}).out // Error
 
--- out/legacy-debug --
-<0>{fibRec: <1>{nn: int, out: (<2>.fib & <3>{n: <4>.nn}).out}, fib: <5>{n: int if (<6>.n >= 2) yield <7>{out: ((<2>.fibRec & <8>{nn: (<6>.n - 2)}).out + (<2>.fibRec & <9>{nn: (<6>.n - 1)}).out)},  if (<6>.n < 2) yield <10>{out: <6>.n}}, fib2: 1, fib7: 13, fib12: 144}
 -- out/compile --
 --- in.cue
 {

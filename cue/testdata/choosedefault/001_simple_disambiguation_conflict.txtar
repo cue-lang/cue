@@ -4,12 +4,6 @@
 a: *"a" | "b"
 b: *"b" | "a"
 c: a & b
--- out/def --
-a: *"a" | "b"
-b: *"b" | "a"
-c: a & b
--- out/legacy-debug --
-<0>{a: "a", b: "b", c: ("a" | "b")}
 -- out/compile --
 --- in.cue
 {

@@ -28,51 +28,6 @@ x: {
 	s:   string
 	out: yaml.Marshal({"s": s})
 }
--- out/def --
-import (
-	"encoding/json"
-	"encoding/yaml"
-	"text/template"
-)
-
-x: {
-	s: "myname"
-	#T
-}
-#T: {
-	s: string
-	S = s
-	out: template.Execute("{{.s}}", {
-		s: S
-	})
-}
-#V: {
-	s: string
-	S658221 = s
-	out: json.Marshal({
-		s: S658221
-	})
-}
-#U: {
-	s: string
-	S629a0f = s
-	out: yaml.Marshal({
-		s: S629a0f
-	})
-}
--- out/export --
-x: {
-	s:   "myname"
-	out: "myname"
-}
--- out/yaml --
-x:
-  s: myname
-  out: myname
--- out/json --
-{"x":{"s":"myname","out":"myname"}}
--- out/legacy-debug --
-<0>{x: <1>C{s: "myname", out: "myname"}, #T: <2>C{s: string, out: <3>.Execute ("{{.s}}",<4>C{s: <5>.s})}, #V: <6>C{s: string, out: <7>.Marshal (<8>C{s: <9>.s})}, #U: <10>C{s: string, out: <11>.Marshal (<12>C{s: <13>.s})}}
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  21

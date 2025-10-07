@@ -5,11 +5,6 @@
 	"_foo": int
 	_bar:   int
 }
--- out/def --
-$type:  3
-"_":    int
-"_foo": int
-_bar:   int
 -- out/compile --
 --- in.cue
 {

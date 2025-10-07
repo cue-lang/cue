@@ -1,15 +1,5 @@
 -- in.cue --
 'hello'
--- out/def --
-'hello'
--- out/export --
-'hello'
--- out/yaml --
-hello
--- out/json --
-"aGVsbG8="
--- out/legacy-debug --
-'hello'
 -- out/compile --
 --- in.cue
 {

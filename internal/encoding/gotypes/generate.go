@@ -226,15 +226,15 @@ type generator struct {
 	// belongs to the current package or not.
 	pkgRoot cue.Value
 
-	// Fields for each definition.
-
-	// def tracks the generation state for a single CUE definition.
-	def *generatedDef
-
 	// importAliases maps package names to a given alias. In the case that there are multiple aliases present for
 	// same package then we will use the first alias encountered. When the same alias is used for multiple packages
 	// across different files, then a number will be added to the end of the alias to avoid conflicts.
 	importAliases map[string]string
+
+	// Fields for each definition.
+
+	// def tracks the generation state for a single CUE definition.
+	def *generatedDef
 }
 
 type qualifiedPath = string // [build.Instance.ImportPath] + " " + [cue.Path.String]

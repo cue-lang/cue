@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de5bf45a_f2675586",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T09:58:37Z",
+      "side": 1,
+      "message": "This will get very noisy. It should not be a default. See code above. It is tuned to NOT always write it deliberately.",
+      "revId": "2e8e28d14482fbfe0bf740810e7f9898a10762fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb1492b3_08e87c97",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T09:58:37Z",
+      "side": 0,
+      "message": "Why remove this? This is quite handy.",
+      "revId": "afdde342d403a7cdb28f7ef35745b7591246341a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

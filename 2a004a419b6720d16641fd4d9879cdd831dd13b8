@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a11de7e_5a9cd034",
+        "filename": "internal/cuetxtar/gc.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-07T12:52:16Z",
+      "side": 1,
+      "message": "A file comment describing what this does and who and when it should run it would be nice.",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

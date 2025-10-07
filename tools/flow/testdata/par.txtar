@@ -100,6 +100,40 @@ graph TD
 	$id: "valToOut"
 	out: "foobarbaz"
 }
+-- out/run-v3/t1/stats --
+Leaks:  0
+Freed:  20
+Reused: 10
+Allocs: 10
+Retain: 0
+
+Unifications: 20
+Conjuncts:    25
+Disjuncts:    0
+ResolveDep:   3
+
+NumCloseIDs: 1
+-- diff/-out/run-v3/t1/stats<==>+out/run/t1/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+ Leaks:  0
+ Freed:  20
+-Reused: 16
+-Allocs: 4
++Reused: 10
++Allocs: 10
+ Retain: 0
+ 
+ Unifications: 20
+-Conjuncts:    29
+-Disjuncts:    20
++Conjuncts:    25
++Disjuncts:    0
++ResolveDep:   3
++
++NumCloseIDs: 1
 -- out/run/t1/stats --
 Leaks:  0
 Freed:  20
@@ -110,6 +144,34 @@ Retain: 0
 Unifications: 20
 Conjuncts:    29
 Disjuncts:    20
+-- out/run-v3/t2/stats --
+Leaks:  0
+Freed:  20
+Reused: 20
+Allocs: 0
+Retain: 0
+
+Unifications: 20
+Conjuncts:    30
+Disjuncts:    0
+ResolveDep:   3
+
+NumCloseIDs: 2
+-- diff/-out/run-v3/t2/stats<==>+out/run/t2/stats --
+diff old new
+--- old
++++ new
+@@ -5,5 +5,8 @@
+ Retain: 0
+ 
+ Unifications: 20
+-Conjuncts:    34
+-Disjuncts:    20
++Conjuncts:    30
++Disjuncts:    0
++ResolveDep:   3
++
++NumCloseIDs: 2
 -- out/run/t2/stats --
 Leaks:  0
 Freed:  20
@@ -120,6 +182,32 @@ Retain: 0
 Unifications: 20
 Conjuncts:    34
 Disjuncts:    20
+-- out/run-v3/t3/stats --
+Leaks:  0
+Freed:  20
+Reused: 20
+Allocs: 0
+Retain: 0
+
+Unifications: 20
+Conjuncts:    35
+Disjuncts:    0
+ResolveDep:   3
+
+NumCloseIDs: 3
+-- diff/-out/run-v3/t3/stats<==>+out/run/t3/stats --
+diff old new
+--- old
++++ new
+@@ -6,4 +6,7 @@
+ 
+ Unifications: 20
+ Conjuncts:    35
+-Disjuncts:    20
++Disjuncts:    0
++ResolveDep:   3
++
++NumCloseIDs: 3
 -- out/run/t3/stats --
 Leaks:  0
 Freed:  20
@@ -130,6 +218,26 @@ Retain: 0
 Unifications: 20
 Conjuncts:    35
 Disjuncts:    20
+-- out/run-v3/t4/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   3
+-- diff/-out/run-v3/t4/stats<==>+out/run/t4/stats --
+diff old new
+--- old
++++ new
+@@ -7,3 +7,4 @@
+ Unifications: 0
+ Conjuncts:    0
+ Disjuncts:    0
++ResolveDep:   3
 -- out/run/t4/stats --
 Leaks:  0
 Freed:  0
@@ -140,6 +248,40 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
+-- out/run-v3/stats/totals --
+Leaks:  0
+Freed:  60
+Reused: 50
+Allocs: 10
+Retain: 0
+
+Unifications: 60
+Conjuncts:    90
+Disjuncts:    0
+ResolveDep:   12
+
+NumCloseIDs: 6
+-- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+ Leaks:  0
+ Freed:  60
+-Reused: 56
+-Allocs: 4
++Reused: 50
++Allocs: 10
+ Retain: 0
+ 
+ Unifications: 60
+-Conjuncts:    98
+-Disjuncts:    60
++Conjuncts:    90
++Disjuncts:    0
++ResolveDep:   12
++
++NumCloseIDs: 6
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  60

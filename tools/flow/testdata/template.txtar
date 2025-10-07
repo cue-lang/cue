@@ -46,6 +46,43 @@ graph TD
 	url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
 	stdout: "foo"
 }
+-- out/run-v3/t1/stats --
+Leaks:  2
+Freed:  46
+Reused: 28
+Allocs: 20
+Retain: 0
+
+Unifications: 26
+Conjuncts:    59
+Disjuncts:    21
+ResolveDep:   6
+
+NumCloseIDs: 2
+-- diff/-out/run-v3/t1/stats<==>+out/run/t1/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+-Leaks:  0
+-Freed:  50
+-Reused: 43
+-Allocs: 7
++Leaks:  2
++Freed:  46
++Reused: 28
++Allocs: 20
+ Retain: 0
+ 
+-Unifications: 27
+-Conjuncts:    75
+-Disjuncts:    50
++Unifications: 26
++Conjuncts:    59
++Disjuncts:    21
++ResolveDep:   6
++
++NumCloseIDs: 2
 -- out/run/t1/stats --
 Leaks:  0
 Freed:  50
@@ -89,6 +126,43 @@ graph TD
 		url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
 	}
 }
+-- out/run-v3/t2/stats --
+Leaks:  3
+Freed:  45
+Reused: 45
+Allocs: 3
+Retain: 0
+
+Unifications: 26
+Conjuncts:    64
+Disjuncts:    21
+ResolveDep:   9
+
+NumCloseIDs: 3
+-- diff/-out/run-v3/t2/stats<==>+out/run/t2/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+-Leaks:  0
+-Freed:  50
+-Reused: 50
+-Allocs: 0
++Leaks:  3
++Freed:  45
++Reused: 45
++Allocs: 3
+ Retain: 0
+ 
+-Unifications: 27
+-Conjuncts:    80
+-Disjuncts:    50
++Unifications: 26
++Conjuncts:    64
++Disjuncts:    21
++ResolveDep:   9
++
++NumCloseIDs: 3
 -- out/run/t2/stats --
 Leaks:  0
 Freed:  50
@@ -99,6 +173,43 @@ Retain: 0
 Unifications: 27
 Conjuncts:    80
 Disjuncts:    50
+-- out/run-v3/stats/totals --
+Leaks:  5
+Freed:  91
+Reused: 73
+Allocs: 23
+Retain: 0
+
+Unifications: 52
+Conjuncts:    123
+Disjuncts:    42
+ResolveDep:   15
+
+NumCloseIDs: 5
+-- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,12 @@
+-Leaks:  0
+-Freed:  100
+-Reused: 93
+-Allocs: 7
++Leaks:  5
++Freed:  91
++Reused: 73
++Allocs: 23
+ Retain: 0
+ 
+-Unifications: 54
+-Conjuncts:    155
+-Disjuncts:    100
++Unifications: 52
++Conjuncts:    123
++Disjuncts:    42
++ResolveDep:   15
++
++NumCloseIDs: 5
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  100

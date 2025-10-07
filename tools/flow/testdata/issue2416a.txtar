@@ -77,20 +77,6 @@ graph TD
 	permissions:   511
 	stdout:        "foo"
 }
--- out/run/t1/stats --
-Leaks:  0
-Freed:  57
-Reused: 48
-Allocs: 9
-Retain: 5
-
-Unifications: 41
-Conjuncts:    101
-Disjuncts:    59
-
-MisalignedConjunct: 2
-
-NumCloseIDs: 3
 -- out/run/t2 --
 graph TD
   t0("root.build.task.mkdir.output [Terminated]")
@@ -115,31 +101,3 @@ graph TD
 		"""
 	stdout: "foo"
 }
--- out/run/t2/stats --
-Leaks:  0
-Freed:  58
-Reused: 58
-Allocs: 0
-Retain: 5
-
-Unifications: 42
-Conjuncts:    108
-Disjuncts:    60
-
-MisalignedConjunct: 2
-
-NumCloseIDs: 3
--- out/run/stats/totals --
-Leaks:  0
-Freed:  115
-Reused: 106
-Allocs: 9
-Retain: 10
-
-Unifications: 83
-Conjuncts:    209
-Disjuncts:    119
-
-MisalignedConjunct: 4
-
-NumCloseIDs: 6

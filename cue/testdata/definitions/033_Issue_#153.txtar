@@ -20,20 +20,6 @@ Foo & {
 		}
 	}]
 }
--- out/def --
-Foo: {
-	listOfCloseds: [...#Closed]
-}
-listOfCloseds: [_|_, // field "b" not allowed in closed struct
-]
-#Closed: {
-	a: int | *0
-}
-Junk: {
-	b: 2
-}
--- out/legacy-debug --
-<0>{<1>{listOfCloseds: [_|_(<2>.v:field "b" not allowed in closed struct)]}, Foo: <3>{listOfCloseds: []}, #Closed: <4>C{a: 0}, Junk: <5>{b: 2}}
 -- out/compile --
 --- in.cue
 {
@@ -133,45 +119,3 @@ diff old new
      }
 -- diff/todo/p3 --
 missing error positions
--- out/eval --
-Errors:
-listOfCloseds.0.b: field not allowed:
-    ./in.cue:2:18
-    ./in.cue:2:21
-    ./in.cue:5:10
-    ./in.cue:13:1
-    ./in.cue:14:18
-    ./in.cue:15:3
-    ./in.cue:16:4
-
-Result:
-(_|_){
-  // [eval]
-  Foo: (struct){
-    listOfCloseds: (list){
-    }
-  }
-  #Closed: (#struct){
-    a: (int){ |(*(int){ 0 }, (int){ int }) }
-  }
-  Junk: (struct){
-    b: (int){ 2 }
-  }
-  listOfCloseds: (_|_){
-    // [eval]
-    0: (_|_){
-      // [eval]
-      a: (int){ |(*(int){ 0 }, (int){ int }) }
-      b: (_|_){
-        // [eval] listOfCloseds.0.b: field not allowed:
-        //     ./in.cue:2:18
-        //     ./in.cue:2:21
-        //     ./in.cue:5:10
-        //     ./in.cue:13:1
-        //     ./in.cue:14:18
-        //     ./in.cue:15:3
-        //     ./in.cue:16:4
-      }
-    }
-  }
-}

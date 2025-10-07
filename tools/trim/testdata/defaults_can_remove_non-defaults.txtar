@@ -28,7 +28,3 @@ diff old new
  foo: [string]: a: *1 | int
 -foo: b: {}
 +foo: b: _
--- out/trim --
-== in.cue
-foo: [string]: a: *1 | int
-foo: b: {}

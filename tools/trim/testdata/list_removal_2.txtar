@@ -53,9 +53,3 @@ diff old new
 +service: a: {
 +	ports: [_, _]
 +}
--- out/trim --
-== in.cue
-service: [string]: {
-	ports: [{a: 1}, {a: 1}, ...{extra: 3}]
-}
-service: a: {}

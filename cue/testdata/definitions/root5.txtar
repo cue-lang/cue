@@ -76,39 +76,6 @@ diff old new
      #Schema: (#struct){
        a?: (#struct){
          b?: (string){ string }
--- out/eval --
-(#struct){
-  _schema: (#struct){
-    a?: (#struct){
-      b?: (string){ string }
-    }
-  }
-  #Schema: (#struct){
-    a?: (#struct){
-      b?: (string){ string }
-    }
-  }
-  a: (#struct){
-    b: (string){ "foo" }
-  }
-  c: (string){ "foo" }
-  x: (#struct){
-    _schema: (#struct){
-      a?: (#struct){
-        b?: (string){ string }
-      }
-    }
-    #Schema: (#struct){
-      a?: (#struct){
-        b?: (string){ string }
-      }
-    }
-    a: (#struct){
-      b: (string){ "foo" }
-    }
-    c: (string){ "foo" }
-  }
-}
 -- out/compile --
 --- in.cue
 {

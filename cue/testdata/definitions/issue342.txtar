@@ -76,32 +76,6 @@ diff old new
    }
    Z: (string){ "FOO" }
  }
--- out/eval --
-(struct){
-  X: (struct){
-    #Simple: (#struct){
-      ref: (string){ string }
-    }
-    #Complex: (#struct){ |((#struct){
-        ref: (string){ string }
-      }, (#struct){
-        local: (string){ string }
-      }) }
-    var: (string){ "XXX" }
-    test_1: (#struct){ |((#struct){
-        ref: (string){ string }
-      }, (#struct){
-        local: (string){ string }
-      }) }
-    test_3_XXX: (#struct){
-      ref: (string){ "FOO" }
-    }
-    test_2_XXX: (#struct){
-      ref: (string){ string }
-    }
-  }
-  Z: (string){ "FOO" }
-}
 -- out/compile --
 --- in.cue
 {

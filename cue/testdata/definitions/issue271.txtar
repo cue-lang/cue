@@ -62,32 +62,6 @@ diff old new
    }
 -- diff/todo/p2 --
 Positions.
--- out/eval --
-Errors:
-x.b: field not allowed:
-    ./in.cue:1:5
-    ./in.cue:2:11
-    ./in.cue:3:5
-    ./in.cue:6:2
-
-Result:
-(_|_){
-  // [eval]
-  #T: (#struct){
-    a: (string){ string }
-  }
-  x: (_|_){
-    // [eval]
-    a: (string){ "hello" }
-    b: (_|_){
-      // [eval] x.b: field not allowed:
-      //     ./in.cue:1:5
-      //     ./in.cue:2:11
-      //     ./in.cue:3:5
-      //     ./in.cue:6:2
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

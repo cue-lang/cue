@@ -251,8 +251,6 @@ errorListDef: {
 	errorList
 	#Def: 1
 }
--- diff/doc/explanation --
-Reordering.
 -- out/doc-v3 --
 []
 [p1]
@@ -354,90 +352,6 @@ diff old new
  [preserveKeyFieldInComprehension]
  [errorStructDef]
  [errorStructDef a]
--- out/doc --
-[]
-[p1]
-[d1]
-[d1 foobar]
-[bar]
-[d2]
-[d2 foobar]
-[d2 foobar name]
-[d2 foobar foo]
-[a]
-- Issue #1910
-
-[comp]
-[comp bar]
-[bytes]
-[c1]
-[s1]
-[l1]
-[l1 0]
-[l2]
-[l3]
-[l4]
-[l4 0]
-[l4 1]
-[l5]
-[l5 #foo]
-[l5 0]
-[l5 1]
-[#foo]
-[l6]
-[l6 #foo]
-[l6 0]
-[l6 1]
-[n1]
-[n10]
-[t]
-- t is true
-
-[e1]
-[e2]
-[e3]
-[e4]
-[e5]
-[e6]
-[e7]
-[e8]
-[m1]
-[m1 foo]
-- foo is an optional field
-
-[m1 bar]
-- bar is a field
-
-[m1 baz]
-- baz is a required field.
-
-[x]
-[y1]
-[y1 src]
-[y1 src 0]
-[y1 src 1]
-[y1 src 2]
-[y1 x]
-[y1 x 0]
-[y1 x 1]
-[y1 x 2]
-[y1 foo0]
-[y1 bar1]
-[y1 bar2]
-[y1 foo1]
-[y1 foo2]
-[preserveKeyFieldInComprehension]
-[errorStructDef]
-[errorStructDef a]
-[errorStructDef b]
-[errorStructDef #Def]
-[errorList]
-[errorList 0]
-[errorList 1]
-[errorListDef]
-[errorListDef #Def]
-[errorListDef 0]
-[errorListDef 1]
 -- out/value --
 == Simplified
 _|_ // e3: index out of range [2] with length 2

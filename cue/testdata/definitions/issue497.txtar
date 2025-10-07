@@ -47,24 +47,6 @@ diff old new
 -  }
 +  l: ~(#N)
  }
--- out/eval --
-(struct){
-  #A: (_){ _ }
-  #N: (#struct){
-    f: (#struct){
-      j: (#struct){
-        n: (string){ "hi" }
-      }
-    }
-  }
-  l: (#struct){
-    f: (#struct){
-      j: (#struct){
-        n: (string){ "hi" }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

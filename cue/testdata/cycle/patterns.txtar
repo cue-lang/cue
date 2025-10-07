@@ -73,18 +73,6 @@ diff old new
 +    a: (int){ int }
 +  }
  }
--- out/eval --
-(struct){
-  a: (struct){
-    a: (int){ int }
-  }
-  b: (struct){
-    a: (int){ int }
-  }
-  c: (struct){
-    a: (int){ int }
-  }
-}
 -- out/compile --
 --- in.cue
 {

@@ -702,20 +702,6 @@ diff old new
 +Notifications: 4
 +
 +NumCloseIDs: 319
--- out/eval/stats --
-Leaks:  9
-Freed:  2856
-Reused: 2841
-Allocs: 24
-Retain: 123
-
-Unifications: 1435
-Conjuncts:    4154
-Disjuncts:    2979
-
-MisalignedConjunct: 44
-
-NumCloseIDs: 10
 -- diff/explanation --
 issue2209.simplified.t2.BAZ: now fixed
 issue2209.simplified.t3.BAZ: missing error.

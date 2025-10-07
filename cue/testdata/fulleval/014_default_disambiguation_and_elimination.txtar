@@ -7,14 +7,6 @@ c: a & b
 d: b & a
 
 e: *1 | *1
--- out/def --
-a: *1 | int
-b: *3 | int
-c: a & b
-d: b & a
-e: 1
--- out/legacy-debug --
-<0>{a: 1, b: 3, c: int, d: int, e: 1}
 -- out/compile --
 --- in.cue
 {

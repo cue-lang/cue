@@ -39,8 +39,6 @@ additional: {
 [additional]
 [additional env]
 [additional confs]
--- diff/value/explanation --
-Benign change in error message.
 -- out/value-v3 --
 == Simplified
 {
@@ -118,67 +116,3 @@ diff old new
  	}
  }
  == All
--- out/value --
-== Simplified
-{
-	x: {
-		y: int64
-	}
-	s: strings.MinRunes(4) & strings.MaxRunes(7)
-	additional: {
-		env: _
-		confs: {
-			if env {}
-		}
-	}
-}
-== Raw
-{
-	x: {
-		y: int & >=-9223372036854775808 & <=9223372036854775807
-	}
-	s: strings.MinRunes(4) & strings.MaxRunes(7)
-	additional: {
-		env: _
-		confs: {
-			if env {}
-		}
-	}
-}
-== Final
-{
-	x: {
-		y: int64
-	}
-	s: strings.MinRunes(4) & strings.MaxRunes(7)
-	additional: {
-		env:   _
-		confs: _|_ // incomplete bool: _
-	}
-}
-== All
-{
-	x: {
-		y: int64
-	}
-	s: strings.MinRunes(4) & strings.MaxRunes(7)
-	additional: {
-		env: _
-		confs: {
-			if env {}
-		}
-	}
-}
-== Eval
-{
-	x: {
-		y: int & >=-9223372036854775808 & <=9223372036854775807
-	}
-	s: strings.MinRunes(4) & strings.MaxRunes(7)
-	additional: {
-		env: _
-		confs: {
-			if env {}
-		}
-	}
-}

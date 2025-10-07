@@ -63,13 +63,3 @@ diff old new
 +	hilbert: _
  }
  d: [string]: s
--- out/trim --
-== a.cue
-a: 5
-s: {age: a}
-d: {
-	jack: {}
-	gill: {}
-	hilbert: {}
-}
-d: [string]: s

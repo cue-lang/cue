@@ -49,10 +49,3 @@ diff old new
 -b: w: x: y: {}
 +b: w: _
  b: a
--- out/trim --
-== a.cue
-a: [string]: {
-	x: y: z: 5
-}
-b: w: x: y: {}
-b: a

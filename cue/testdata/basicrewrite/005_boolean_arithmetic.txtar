@@ -7,15 +7,6 @@ c: false == true
 d: false != true
 e: true & true
 f: true & false
--- out/def --
-a: true
-b: true
-c: false
-d: true
-e: true
-f: _|_ // conflicting values true and false
--- out/legacy-debug --
-<0>{a: true, b: true, c: false, d: true, e: true, f: _|_(true:conflicting values true and false)}
 -- out/compile --
 --- in.cue
 {

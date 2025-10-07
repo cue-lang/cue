@@ -66,14 +66,6 @@ issue3908: full: {
 	out: #Schema & { field: string | *"dataDefault" }
 	#Schema: field: string | *null
 }
--- out/def --
-x: a & b
-y: b & c
-a: *"a" | "b" | "c"
-b: *"a" | "b" | "c"
-c: *"a" | *"b" | "c"
--- out/legacy-debug --
-<0>{x: "a", y: (*"a" | *"b"), a: "a", b: "a", c: (*"a" | *"b")}
 -- out/compile --
 --- complex.cue
 {
@@ -192,16 +184,6 @@ diff old new
 +Disjuncts:    278
 +
 +NumCloseIDs: 101
--- out/eval/stats --
-Leaks:  0
-Freed:  382
-Reused: 370
-Allocs: 12
-Retain: 1
-
-Unifications: 104
-Conjuncts:    516
-Disjuncts:    383
 -- out/eval --
 (struct){
   t1: (struct){

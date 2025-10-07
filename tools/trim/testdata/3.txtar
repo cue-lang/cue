@@ -26,7 +26,3 @@ diff old new
  == a.cue
 -x: string
  x: "hi"
--- out/trim --
-== a.cue
-x: string
-x: "hi"

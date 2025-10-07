@@ -248,16 +248,6 @@ diff old new
 +Disjuncts:    0
 +
 +NumCloseIDs: 4
--- out/eval/stats --
-Leaks:  0
-Freed:  191
-Reused: 186
-Allocs: 5
-Retain: 7
-
-Unifications: 191
-Conjuncts:    511
-Disjuncts:    200
 -- diff/explanation --
 simplifyBinary.integer.ok2.*: v3 indicates correct type.
 -- out/eval --

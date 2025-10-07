@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8740afda_76ac1ab3",
+        "filename": "cue/ast/ident.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-07T21:30:33Z",
+      "side": 1,
+      "message": "... StringLabelNeedsQuoting",
+      "parentUuid": "de77a89f_8e63c03b",
+      "revId": "f8eee9e5ee472fab156329ca88dfcbd7044cb35b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02aff59a_de7d57cc",

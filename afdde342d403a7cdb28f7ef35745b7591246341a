@@ -16,6 +16,24 @@
       "message": "Why remove this? This is quite handy.",
       "revId": "afdde342d403a7cdb28f7ef35745b7591246341a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eee070e1_d4e4cab9",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-07T11:42:06Z",
+      "side": 0,
+      "message": "To reiterate online discussion:\n\nIn general, `diff/todo/pX` doesn\u0027t say which diff the TODO applies to, to take one example, in https://review.gerrithub.io/c/cue-lang/cue/+/1223893/2/cue/testdata/basicrewrite/010_lists.txtar we have `out/def` which has no diffs and `out/eval` which does, so when the `def` test executes, it sees that there are no diffs (for def itself) and decides to remove the `diff/todo/p3` file. That\u0027s why it seemed better to me to remove the `diff/todo` file only when there are no `diff/*` entries at all, and similarly for `diff/*/explanation`.",
+      "parentUuid": "fb1492b3_08e87c97",
+      "revId": "afdde342d403a7cdb28f7ef35745b7591246341a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

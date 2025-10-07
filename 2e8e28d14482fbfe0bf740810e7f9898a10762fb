@@ -16,6 +16,24 @@
       "message": "This will get very noisy. It should not be a default. See code above. It is tuned to NOT always write it deliberately.",
       "revId": "2e8e28d14482fbfe0bf740810e7f9898a10762fb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45ba6c4e_7b4cf849",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-07T11:42:06Z",
+      "side": 1,
+      "message": "As discussed online, this is _not_ changing the contents: it\u0027s just telling the cuetxtar logic that the entry is an output.",
+      "parentUuid": "de5bf45a_f2675586",
+      "revId": "2e8e28d14482fbfe0bf740810e7f9898a10762fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

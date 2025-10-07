@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "114e0560_c0e0c723",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-07T21:30:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2cdba282_a7b3a2f4",
+      "revId": "87c907f7ff67a15311ba0a237a7507e855648c72",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e57fef3a_2a682e89",
@@ -66,6 +84,24 @@
       "writtenOn": "2025-10-06T16:24:09Z",
       "side": 1,
       "message": "ditto",
+      "revId": "87c907f7ff67a15311ba0a237a7507e855648c72",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "203b8e85_283b4dc2",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-07T21:30:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e57fef3a_2a682e89",
       "revId": "87c907f7ff67a15311ba0a237a7507e855648c72",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

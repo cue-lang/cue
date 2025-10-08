@@ -104,6 +104,24 @@
       "parentUuid": "e6b05f25_3a0579dc",
       "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f233006_bff7a1cf",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T12:18:21Z",
+      "side": 1,
+      "message": "I guess the larger question here is: is it valid to consider anchors to be part of the \"public API\" of a YAML document? The unstated assumption of this CL is that it is: if a YAML document is updated and changes the anchor name, then it will change the CUE API surface area.\n\nI suspect that there\u0027s no single answer here and that it depends very much on the YAML in question. That\u0027s why I\u0027m suggesting the possibility of making it a decoding option.\n\nWe could just use `let` statements and avoid the question for now, I guess. But were you intending to use the anchor references directly in your use case?\n\n\u003e Can you clarify what do you mean by this? Do you mean adding some prefix to the resulting definition names such that \u0026myAnchor would become #yamlEncodermyAnchor?\n\nThat kind of thing, yeah. Or `_#yaml.myAnchor` or whatever.",
+      "parentUuid": "e6c3ea27_671321c9",
+      "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

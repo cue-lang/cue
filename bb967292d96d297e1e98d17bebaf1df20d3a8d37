@@ -158,6 +158,24 @@
       "parentUuid": "7b96c2de_39f963c0",
       "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a5ba9ed_bb5cbf9b",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1039031
+      },
+      "writtenOn": "2025-10-08T14:50:28Z",
+      "side": 1,
+      "message": "\u003e I agree with this. But an \"identifier\" in CUE can be several kinds of things: a string label, a definition label, a let definition, etc.\n\nYeah I meant definition.\n\n\u003e That\u0027s good to know, thanks! So it seems that there\u0027s no inherent reason you\u0027d need actual definitions vs lets, right?\n\nRethinking this, I probably don\u0027t.\n\nI\u0027ll have a look at re-writing this using let declarations. Which I suppose leaves us with with the invalid identifier problem - do you think it makes sense to ignore invalid identifiers and warn the user?",
+      "parentUuid": "c0edc8af_c1ec746b",
+      "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

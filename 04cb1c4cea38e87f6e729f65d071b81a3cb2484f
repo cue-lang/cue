@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a22c8649_32c95293",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T09:51:27Z",
+      "side": 1,
+      "message": "```suggestion\ncue/build: remove the Instance.Match field, which was never set\n```",
+      "revId": "04cb1c4cea38e87f6e729f65d071b81a3cb2484f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7166ca92_1c066f9b",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T09:51:27Z",
+      "side": 1,
+      "message": "```suggestion\n\t// TODO: Match was declared for years but never set by any of the cue/build logic.\n```",
+      "revId": "04cb1c4cea38e87f6e729f65d071b81a3cb2484f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

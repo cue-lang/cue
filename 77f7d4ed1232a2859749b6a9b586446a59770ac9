@@ -124,6 +124,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61466309_754e3910",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 812,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-08T12:35:44Z",
+      "side": 1,
+      "message": "yes. that is also part of my TODOs.",
+      "parentUuid": "cb85e1a2_150855f3",
+      "revId": "77f7d4ed1232a2859749b6a9b586446a59770ac9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5bf621cb_038c8826",

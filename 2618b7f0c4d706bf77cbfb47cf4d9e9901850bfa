@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f272dade_3ed11d82",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T11:52:41Z",
+      "side": 1,
+      "message": "LGTM with one more minor suggestion.",
+      "revId": "2618b7f0c4d706bf77cbfb47cf4d9e9901850bfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae1c42e3_60941652",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 816,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T11:52:41Z",
+      "side": 1,
+      "message": "Maybe sanity check that the qualifier is non-empty (perhaps panic if it is?).",
+      "revId": "2618b7f0c4d706bf77cbfb47cf4d9e9901850bfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

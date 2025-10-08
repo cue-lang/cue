@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5609aec_ec3874b5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T10:19:50Z",
+      "side": 1,
+      "message": "I think a bit more thought is required here: this runs significant risk of breaking things.",
+      "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6b05f25_3a0579dc",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T10:19:50Z",
+      "side": 1,
+      "message": "There is no guarantee that the anchor value is a valid CUE identifier, and indeed it often is not (my first Google hit for \"yaml anchors\" came up with this example https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/), so this can end up breaking existing valid YAML imports. For example, this test fails now:\n\n```\nexec cue export x.yaml\n-- x.yaml --\na: \u0026build-test\nb: *build-test\n```\n\nThere is also the risk that these definitions end up clashing with existing definitions. For example, this test passes on the old implementation but fails on the new:\n\n```\nexec cue mod init\nexec cue export .\n-- x.yaml --\na: \u0026anchor\nb: *anchor\n-- foo.cue --\n@extern(embed)\n\npackage foo\n\n_data: _ @embed(file\u003dx.yaml)\n_data\n#anchor: true\n```\n\nI wonder if this should be an opt-in feature.\nAlternatively, perhaps choose names that are more yaml-encoder-specific to avoid the risk of namespace clashes.",
+      "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

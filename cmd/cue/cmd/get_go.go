@@ -1016,7 +1016,7 @@ func (e *extractor) makeField(name string, kind fieldKind, expr types.Type, doc 
 	if kind == definition {
 		label = e.ident(name, true)
 	} else {
-		label = cueast.NewLabel(name)
+		label = cueast.NewStringLabel(name)
 	}
 	f = &cueast.Field{Label: label, Value: typ}
 	if doc := makeDoc(doc, newline); doc != nil {

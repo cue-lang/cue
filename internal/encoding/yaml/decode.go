@@ -472,7 +472,7 @@ func (d *decoder) label(yn *yaml.Node) (ast.Label, error) {
 			// With incoming YAML like `Null: 1`, the key scalar is normalized to "null".
 			value = expr.Value
 		}
-		label := ast.NewLabel(value)
+		label := ast.NewStringLabel(value)
 		ast.SetPos(label, pos)
 		return label, nil
 	default:

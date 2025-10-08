@@ -323,7 +323,7 @@ func (d *decoder) decodeMsg(m *mapping, n []*pbast.Node) ast.Expr {
 			// TODO: convert line number information. However, position
 			// information in textpbfmt packages is too wonky to be useful
 			f := &ast.Field{
-				Label: ast.NewLabel(f.CUEName),
+				Label: ast.NewStringLabel(f.CUEName),
 				Value: value,
 				// Attrs: []*ast.Attribute{{Text: f.attr.}},
 			}

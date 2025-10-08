@@ -36,7 +36,7 @@ func (e *exporter) stringLabel(f adt.Feature) ast.Label {
 		return ast.NewIdent(s)
 
 	default:
-		return ast.NewLabel(e.ctx.IndexToString(int64(x)))
+		return ast.NewStringLabel(e.ctx.IndexToString(int64(x)))
 	}
 }
 

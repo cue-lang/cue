@@ -50,6 +50,24 @@
       "message": "There is no guarantee that the anchor value is a valid CUE identifier, and indeed it often is not (my first Google hit for \"yaml anchors\" came up with this example https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/), so this can end up breaking existing valid YAML imports. For example, this test fails now:\n\n```\nexec cue export x.yaml\n-- x.yaml --\na: \u0026build-test\nb: *build-test\n```\n\nThere is also the risk that these definitions end up clashing with existing definitions. For example, this test passes on the old implementation but fails on the new:\n\n```\nexec cue mod init\nexec cue export .\n-- x.yaml --\na: \u0026anchor\nb: *anchor\n-- foo.cue --\n@extern(embed)\n\npackage foo\n\n_data: _ @embed(file\u003dx.yaml)\n_data\n#anchor: true\n```\n\nI wonder if this should be an opt-in feature.\nAlternatively, perhaps choose names that are more yaml-encoder-specific to avoid the risk of namespace clashes.",
       "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6c3ea27_671321c9",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1039031
+      },
+      "writtenOn": "2025-10-08T11:49:07Z",
+      "side": 1,
+      "message": "This is good feedback, thanks.\n\nRegarding your first point, I see two ways around it. Either sanitize the YAML anchors to valid CUE identifiers, or outright ignore anchors which are invalid CUE identifiers. I\u0027m leaning towards the second option - but there has to be a clear user warning so the user is aware why such anchors were ignored.\n\nRegarding definition names derived from YAML anchors conflicting with existing CUE definitions. I don\u0027t have a lot of experience with CUE, so I\u0027m unsure how ubiquitous this situation is.\nHowever, I think there are two separate use-cases here. In your example you embed a YAML file, and the definition collision is indeed unwanted behavior. I agree it\u0027s better to turn off this feature in this case, as it pollutes the namespace (as you said).\nThe other use-case would be running `cue import x.yaml`. In which case one can argue the collision is not necessarily undesired. Here\u0027s an example without anchors:\n\n```\n$ cat foo.cue \npackage foo\n\ng: 3\n$ cat x.yaml \ng: 4\n$ cue import -p foo x.yaml\n$ cue export .\ng: conflicting values 4 and 3:\n    ./foo.cue:3:4\n    ./x.cue:3:4\n```\n\nThe import itself doesn\u0027t fail but the export does.\n(and FWIW, embedding this `x.yaml` inside `foo.cue` would also cause an export error, as the YAML would pollute the namespace, it\u0027s just a bit more subtle when it comes to anchors \u003c-\u003e definitions. This also slightly contradicts my sentiment above of disabling this feature when embedding).\n\n\u003e Alternatively, perhaps choose names that are more yaml-encoder-specific to avoid the risk of namespace clashes.\n\nCan you clarify what do you mean by this? Do you mean adding some prefix to the resulting definition names such that \u0026myAnchor would become #yamlEncodermyAnchor?\n\nRegarding this being opt-in - I would rather avoid this if possible. It\u0027s better to introduce something which works well and the user doesn\u0027t have to think about, rather than introduce another flag.\nAdditionally - making this opt-in would introduce maintenance burden. We would have to test both code paths. And on top of this, I\u0027m unsure which changes to the code base does this two-mode encoder imply - I\u0027ll have to take a look.",
+      "parentUuid": "e6b05f25_3a0579dc",
+      "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

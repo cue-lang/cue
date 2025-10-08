@@ -317,6 +317,9 @@ Multiple experiments can be enabled:
 	@experiment(structcmp,self)
 	@experiment(explicitopen)
 
+The behavior of per-file experiments tracks the language version declared in their module,
+or if none exists, the language version reported by "cue version".
+
 Available per-file experiments:
 
 `)
@@ -364,6 +367,8 @@ Global experiments are enabled via the CUE_EXPERIMENT environment variable:
 	export CUE_EXPERIMENT=cmdreferencepkg,keepvalidators
 	cue export myfile.cue
 
+The behavior of global experiments tracks the language version reported by "cue version".
+
 Available global experiments:
 
 `)
@@ -407,7 +412,7 @@ Available global experiments:
 		}
 	}
 
-	sb.WriteString(`Experiment lifecycle:
+	sb.WriteString(`Each experiment's lifecycle tracks language versions as follows:
 - preview:   experimental feature that can be enabled
 - default:   experiment enabled by default, can still be disabled
 - stable:    experiment permanently enabled, experiment flag has no effect

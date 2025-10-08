@@ -77,7 +77,7 @@ Available Commands:
   login       log into a CUE registry
   mod         module maintenance
   trim        remove superfluous fields
-  version     print CUE version
+  version     print the CUE version and build information
   vet         validate data
 
 Use "cue help [command]" for more information about a command.

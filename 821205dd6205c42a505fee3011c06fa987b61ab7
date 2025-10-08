@@ -34,6 +34,24 @@
       "parentUuid": "f82de322_34703205",
       "revId": "821205dd6205c42a505fee3011c06fa987b61ab7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f30f2c2_b8c5073e",
+        "filename": "internal/cuetxtar/gc.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-08T11:05:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40c8003f_9269e33e",
+      "revId": "821205dd6205c42a505fee3011c06fa987b61ab7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

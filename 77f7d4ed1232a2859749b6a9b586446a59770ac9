@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bcd1f35_98f16c24",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T10:52:05Z",
+      "side": 1,
+      "message": "Seems like a good direction, but I\u0027d like to see some examples that use import qualifiers and/or major versions.",
+      "revId": "77f7d4ed1232a2859749b6a9b586446a59770ac9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2b5efe5_9b7ddb93",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 808,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T10:52:05Z",
+      "side": 1,
+      "message": "This field is deprecated in favour of f.ImportSpecs.",
+      "revId": "77f7d4ed1232a2859749b6a9b586446a59770ac9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94d91ae1_08deedb6",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 812,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T10:52:05Z",
+      "side": 1,
+      "message": "Probably better to use literal.Unquote ?",
+      "revId": "77f7d4ed1232a2859749b6a9b586446a59770ac9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bf621cb_038c8826",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 818,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T10:52:05Z",
+      "side": 1,
+      "message": "This isn\u0027t right (for example, if the import path is `foo.com/bar@v0:baz`, it would choose `bar@v0:baz` but that\u0027s not a valid base name).\n\nI think we should use `ast.ParseImportPath(pkgPath).Qualifier` instead, which _should_ always return something non-empty in valid code, since if it wasn\u0027t valid we\u0027d be required to specify an alias and a package qualifier.",
+      "revId": "77f7d4ed1232a2859749b6a9b586446a59770ac9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

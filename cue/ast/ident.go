@@ -40,16 +40,12 @@ func IsValidIdent(ident string) bool {
 		return false
 	}
 
-	consumed := false
-	if strings.HasPrefix(ident, "_") {
-		ident = ident[1:]
-		consumed = true
-		if len(ident) == 0 {
-			return true
-		}
+	ident, consumed := strings.CutPrefix(ident, "_")
+	if ident == "" {
+		return true // "_" is a valid identifier
 	}
-	if strings.HasPrefix(ident, "#") {
-		ident = ident[1:]
+	ident, consumedHash := strings.CutPrefix(ident, "#")
+	if consumedHash {
 		// Note: _#0 is not allowed by the spec, although _0 is.
 		// TODO: set consumed to true here to allow #0.
 		consumed = false

@@ -140,6 +140,24 @@
       "parentUuid": "7f233006_bff7a1cf",
       "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0edc8af_c1ec746b",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T14:10:51Z",
+      "side": 1,
+      "message": "\u003e The underlying assumption was that the equivalent CUE representation for a YAML file with anchors, is a CUE file where each anchor is converted to an identifier.\n\nI agree with this. But an \"identifier\" in CUE can be several kinds of things: a string label, a definition label, a let definition, etc.\n\n\u003e Can you elaborate why would this solve the issue? Daniel proposed this initially but I went for definitions since the scope for the let expressions does not behave like YAML anchor scopes (YAML anchors are valid from the line they are defined until the line they are overridden, or the end of the document).\n\nIt would solve the problem because `let` just defines identifiers locally so they\u0027re available in the local lexical scope and nowhere else.\n\nI agree the scope of let expressions does not behave like YAML anchor scopes, but neither do CUE definitions: I don\u0027t entirely see how one is more aligned than the other in this respect.\n\n\u003e My specific use case was importing YAML files with tens of thousands of lines, containing complex anchors.\nThat\u0027s good to know, thanks! So it seems that there\u0027s no inherent reason you\u0027d need actual definitions vs lets, right?",
+      "parentUuid": "7b96c2de_39f963c0",
+      "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -418,7 +418,7 @@ func quoteLabelIfNeeded(name string) string {
 // cue/format knows how to quote any other identifiers correctly.
 func (d *Decoder) label(tkey tomlKey, relPos token.RelPos) ast.Label {
 	pos := d.tokenFile.Pos(tkey.shape.Start.Offset, relPos)
-	label := ast.NewLabel(tkey.name)
+	label := ast.NewStringLabel(tkey.name)
 	ast.SetPos(label, pos)
 	return label
 }

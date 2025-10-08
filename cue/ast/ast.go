@@ -422,12 +422,12 @@ type BasicLit struct {
 // later case NewString would return a string or bytes type) to distinguish from
 // NewString. Consider how to pass indentation information.
 
-// NewLabel creates a new string label with the given string,
+// NewStringLabel creates a new string label with the given string,
 // quoting it as a string literal only if necessary,
 // as outlined in [StringLabelNeedsQuoting].
 //
 // To create labels for definition or hidden fields, use [NewIdent].
-func NewLabel(name string) Label {
+func NewStringLabel(name string) Label {
 	if StringLabelNeedsQuoting(name) {
 		return NewString(name)
 	}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d1e6393_aa0c5896",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-08T11:30:06Z",
+      "side": 1,
+      "message": "Done in terms of qualified imports. I joined the test files to deduplicate some of the logic.\n\nNot done in terms of imports with major versions; this only really makes sense with external dependencies, and `cue exp gengotypes` doesn\u0027t currently work for external dependencies as there\u0027s no good place to put the Go files (it currently tries to write under CUE_CACHE_DIR and fails). I\u0027ve left the disabled tests for now, with a TODO.",
+      "parentUuid": "2bcd1f35_98f16c24",
+      "revId": "77f7d4ed1232a2859749b6a9b586446a59770ac9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d2b5efe5_9b7ddb93",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-08T10:52:05Z",
       "side": 1,
       "message": "This field is deprecated in favour of f.ImportSpecs.",
+      "revId": "77f7d4ed1232a2859749b6a9b586446a59770ac9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97a5e04d_6a858556",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 808,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-08T11:30:06Z",
+      "side": 1,
+      "message": "done; FWIW the PR was written before the deprecation happened",
+      "parentUuid": "d2b5efe5_9b7ddb93",
       "revId": "77f7d4ed1232a2859749b6a9b586446a59770ac9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "753f3878_0679cbcb",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 812,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-08T11:30:06Z",
+      "side": 1,
+      "message": "not exactly. we mostly use strconv.Unquote for unquoting CUE imports because it mimics \"simple strings\" with just double quotes, rather than cue/literal.Unquote which supports triple quotes, escaped quotes, etc etc. The spec grammar says that imports should only allow simple string literals as paths.\n\nI agree it\u0027s odd. adding cue/literal.UnquoteSimple is on my TODO list.",
+      "parentUuid": "94d91ae1_08deedb6",
+      "revId": "77f7d4ed1232a2859749b6a9b586446a59770ac9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5bf621cb_038c8826",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-10-08T10:52:05Z",
       "side": 1,
       "message": "This isn\u0027t right (for example, if the import path is `foo.com/bar@v0:baz`, it would choose `bar@v0:baz` but that\u0027s not a valid base name).\n\nI think we should use `ast.ParseImportPath(pkgPath).Qualifier` instead, which _should_ always return something non-empty in valid code, since if it wasn\u0027t valid we\u0027d be required to specify an alias and a package qualifier.",
+      "revId": "77f7d4ed1232a2859749b6a9b586446a59770ac9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84abd79f_88b9cbe3",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 818,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-08T11:30:06Z",
+      "side": 1,
+      "message": "well spotted, done.",
+      "parentUuid": "5bf621cb_038c8826",
       "revId": "77f7d4ed1232a2859749b6a9b586446a59770ac9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"github.com/cockroachdb/apd/v3"
@@ -510,7 +511,7 @@ func (s scopedSelector) feature(r adt.Runtime) adt.Feature {
 // not prefixed with a #. It will panic if s cannot be written as a valid
 // identifier.
 func Def(s string) Selector {
-	if !strings.HasPrefix(s, "#") && !strings.HasPrefix(s, "_#") {
+	if !internal.IsDef(s) {
 		s = "#" + s
 	}
 	if !ast.IsValidIdent(s) {

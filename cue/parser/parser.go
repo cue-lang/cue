@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/scanner"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cueexperiment"
 )
 
@@ -1666,7 +1667,7 @@ func (p *parser) parseImportSpec(_ int) *ast.ImportSpec {
 	var ident *ast.Ident
 	if p.tok == token.IDENT {
 		ident = p.parseIdentDecl()
-		if isDefinition(ident) {
+		if internal.IsDef(ident.Name) {
 			p.errf(p.pos, "cannot import package as definition identifier")
 		}
 	}
@@ -1778,7 +1779,7 @@ func (p *parser) parseFile() *ast.File {
 		if name.Name == "_" && p.cfg.Mode&DeclarationErrors != 0 {
 			p.errf(p.pos, "invalid package name _")
 		}
-		if isDefinition(name) {
+		if internal.IsDef(name.Name) {
 			p.errf(p.pos, "invalid package name %s", name.Name)
 		}
 		pkg := &ast.Package{
@@ -1817,9 +1818,4 @@ func (p *parser) parseFile() *ast.File {
 	}
 	c.closeNode(p, f)
 	return f
-}
-
-func isDefinition(ident *ast.Ident) bool {
-	return strings.HasPrefix(ident.Name, "#") ||
-		strings.HasPrefix(ident.Name, "_#")
 }

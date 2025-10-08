@@ -122,6 +122,24 @@
       "parentUuid": "e6c3ea27_671321c9",
       "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b96c2de_39f963c0",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1039031
+      },
+      "writtenOn": "2025-10-08T12:49:57Z",
+      "side": 1,
+      "message": "\u003e I guess the larger question here is: is it valid to consider anchors to be part of the \"public API\" of a YAML document?\n\nMy first instinctive answer to this question is plainly \"no\". Even most YAML libraries across different programming languages usually do not expose the anchors when deserializing YAML files.\n\nHowever, I disagree about the assumption I had in mind when writing this CL. The underlying assumption was that the equivalent CUE representation for a YAML file with anchors, is a CUE file where each anchor is converted to an identifier.\nThis strengthens the notion that this feature should probably be disabled when embedding YAML files, since the anchors are not a part of their \"public API\".\n\nThough when doing a one-off `cue import`, I think this feature gives a more accurate representation of the current state of the YAML file.\n\n\u003e We could just use `let` statements and avoid the question for now, I guess.\n\nCan you elaborate why would this solve the issue? Daniel proposed this initially but I went for definitions since the scope for the let expressions does not behave like YAML anchor scopes (YAML anchors are valid from the line they are defined until the line they are overridden, or the end of the document).\n\nI just fail to understand how would this solve the issue. What am I missing here?\n\n\u003e But were you intending to use the anchor references directly in your use case?\n\nMy specific use case was importing YAML files with tens of thousands of lines, containing complex anchors. I was trying to simplify the definitions and improving the readability of the documents by adding constraints which you can do in CUE and not in YAML, obviously.",
+      "parentUuid": "7f233006_bff7a1cf",
+      "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

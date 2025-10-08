@@ -198,6 +198,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cfb9bdc1_8314d9f7",
+        "filename": "internal/core/export/testdata/selfcontained/nochange.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-08T07:51:55Z",
+      "side": 0,
+      "message": "Yes, I know they are ignored. But we should mark that the corresponding golden files should not be removed. Please DO NOT remove the tests for these.",
+      "parentUuid": "612650aa_8897eeae",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e7816e2c_4186c991",
         "filename": "internal/core/runtime/testdata/no_top_extern.txtar",
         "patchSetId": 8

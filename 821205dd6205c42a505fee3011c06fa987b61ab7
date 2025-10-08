@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1c0d465_d562d4c2",
+        "filename": "internal/core/export/testdata/selfcontained/nochange.txtar",
+        "patchSetId": 13
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-08T07:51:55Z",
+      "side": 0,
+      "message": "Another one that should not be removed.",
+      "revId": "821205dd6205c42a505fee3011c06fa987b61ab7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

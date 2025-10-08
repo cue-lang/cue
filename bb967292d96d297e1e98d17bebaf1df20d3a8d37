@@ -35,6 +35,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a88a0de8_6bdff227",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1039031
+      },
+      "writtenOn": "2025-10-08T11:57:47Z",
+      "side": 1,
+      "message": "I must disclose that I\u0027ve lost personal interest in this change since I\u0027ve moved on from the problem I was working on, and won\u0027t come back to it.\nHowever, I do have free time for the next week so I make the effort to get this merged.\n\nHowever, if this likely to break things all over, and you deem the risk-reward not worth it, we can abandon this altogether - no strings attached. I personally found this useful when importing huge YAMLs, so I thought others would as well.",
+      "parentUuid": "b5609aec_ec3874b5",
+      "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4291b5d6_08d48bd9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1039031
+      },
+      "writtenOn": "2025-10-08T11:57:47Z",
+      "side": 1,
+      "message": "I can have a look.",
+      "parentUuid": "0ed5a316_189ccade",
+      "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e6b05f25_3a0579dc",

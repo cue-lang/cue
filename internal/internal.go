@@ -290,10 +290,7 @@ func IsRegularField(f *ast.Field) bool {
 	if ident == nil {
 		return true
 	}
-	if strings.HasPrefix(ident.Name, "#") || strings.HasPrefix(ident.Name, "_") {
-		return false
-	}
-	return true
+	return !ast.StringLabelNeedsQuoting(ident.Name)
 }
 
 // SetConstraints sets both the main and deprecated fields of f according to the

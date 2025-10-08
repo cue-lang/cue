@@ -321,6 +321,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a807fd24_0adda569",
+        "filename": "internal/core/runtime/testdata/no_top_extern.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T11:15:12Z",
+      "side": 0,
+      "message": "Marking as resolved because it seems like this is fine to remove.",
+      "parentUuid": "0df7b88f_91081fad",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11282e54_59734bcc",

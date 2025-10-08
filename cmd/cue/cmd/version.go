@@ -42,12 +42,9 @@ func runVersion(cmd *Command, args []string) error {
 	if !ok {
 		return errors.New("unknown error reading build-info")
 	}
-	fmt.Fprintf(w, "cue version %s\n\n", cueversion.ModuleVersion())
-	fmt.Fprintf(w, "go version %s\n", runtime.Version())
-	bi.Settings = append(bi.Settings, debug.BuildSetting{
-		Key:   "cue.lang.version",
-		Value: cueversion.LanguageVersion(),
-	})
+	fmt.Fprintf(w, "CUE version %s\n\n", cueversion.ModuleVersion())
+	fmt.Fprintf(w, "CUE language version %s\n\n", cueversion.LanguageVersion())
+	fmt.Fprintf(w, "Go version %s\n", runtime.Version())
 	for _, s := range bi.Settings {
 		if s.Value == "" {
 			// skip empty build settings

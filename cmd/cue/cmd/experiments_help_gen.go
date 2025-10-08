@@ -45,6 +45,9 @@ Multiple experiments can be enabled:
 	@experiment(structcmp,self)
 	@experiment(explicitopen)
 
+Per-file experiments track the language version declared in their module,
+or if none exists, the language version reported by "cue version".
+
 Available per-file experiments:
 
   structcmp (preview: v0.14.0, stable: v0.15.0)
@@ -74,6 +77,8 @@ Global experiments are enabled via the CUE_EXPERIMENT environment variable:
 
 	export CUE_EXPERIMENT=cmdreferencepkg,keepvalidators
 	cue export myfile.cue
+
+Global experiments track the language version reported by "cue version".
 
 Available global experiments:
 
@@ -113,7 +118,7 @@ Available global experiments:
     yamlv3decoder swaps the old internal/third_party/yaml decoder with the new
     decoder implemented in internal/encoding/yaml on top of yaml.v3.
 
-Experiment lifecycle:
+Each experiment's lifecycle tracks language versions as follows:
 - preview:   experimental feature that can be enabled
 - default:   experiment enabled by default, can still be disabled
 - stable:    experiment permanently enabled, experiment flag has no effect

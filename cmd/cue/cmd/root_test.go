@@ -113,18 +113,18 @@ func TestVersion(t *testing.T) {
 
 	for _, expr := range []string{
 		`^cue version v0\.\d+\.\d+`,
-		`\s+go version go1\.\d+`,
+		`\s+CUE language version ` + regexp.QuoteMeta(cueversion.LanguageVersion()),
+		`\s+Go version go1\.\d+`,
 		`\s+-buildmode\s`,
 		`\s+GOARCH\s`,
 		`\s+GOARCH\s`,
 		`\s+vcs git`,
 		`\s+vcs.revision\s`,
 		`\s+vcs.time\s`,
-		`\s+cue\.lang\.version\s+` + regexp.QuoteMeta(cueversion.LanguageVersion()),
 	} {
 		// The output string is multi-line, and [qt.Matches] anchors the regular expression
 		// like `^(expr)$`, so use `(?s)` to match newlines.
-		qt.Assert(t, qt.Matches(got, `(?s).*`+expr+`.*`))
+		qt.Check(t, qt.Matches(got, `(?s).*`+expr+`.*`))
 	}
 }
 

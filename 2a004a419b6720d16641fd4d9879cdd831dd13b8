@@ -216,6 +216,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "136e9e08_be2ac484",
+        "filename": "internal/core/export/testdata/selfcontained/nochange.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-08T08:12:39Z",
+      "side": 0,
+      "message": "What I\u0027m saying is that this particular test is _not_ marked as ToDo (and if it was, we would not be making this change). I believe this is a genuinely spurious output file: the name of the test is \"self\" not \"selfcontained\" and the output file is \"out/self/default\" (as created [here](https://github.com/cue-lang/cue/blob/1bc296c49a40760215318c006c5fa91add54f241/internal/core/export/self_test.go#L75))",
+      "parentUuid": "cfb9bdc1_8314d9f7",
+      "revId": "2a004a419b6720d16641fd4d9879cdd831dd13b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e7816e2c_4186c991",
         "filename": "internal/core/runtime/testdata/no_top_extern.txtar",
         "patchSetId": 8

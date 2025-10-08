@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f82de322_34703205",
+        "filename": "internal/cuetxtar/gc.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-08T07:45:21Z",
+      "side": 1,
+      "message": "Maybe for completeness mention what you mean with \"all the tests\" or give an example on how to run the command.",
+      "revId": "821205dd6205c42a505fee3011c06fa987b61ab7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

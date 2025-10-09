@@ -1019,6 +1019,9 @@ func (v Value) Pos() token.Pos {
 // Allows does not take into account validators like list.MaxItems(4). This may
 // change in the future.
 func (v Value) Allows(sel Selector) bool {
+	if v.v == nil {
+		return false
+	}
 	if v.v.HasEllipsis {
 		return true
 	}

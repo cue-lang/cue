@@ -1458,15 +1458,15 @@ diff old new
 --- old
 +++ new
 @@ -1,13 +1,17 @@
--Leaks:  82
--Freed:  1376
+-Leaks:  74
+-Freed:  1384
 -Reused: 1358
 -Allocs: 100
--Retain: 492
+-Retain: 479
 -
 -Unifications: 970
--Conjuncts:    2971
--Disjuncts:    1707
+-Conjuncts:    2973
+-Disjuncts:    1704
 -
 -MisalignedConjunct: 268
 -
@@ -1489,15 +1489,15 @@ diff old new
 +MaxReqSets:          12
 +MaxRedirect:         1
 -- out/eval/stats --
-Leaks:  82
-Freed:  1376
+Leaks:  74
+Freed:  1384
 Reused: 1358
 Allocs: 100
-Retain: 492
+Retain: 479
 
 Unifications: 970
-Conjuncts:    2971
-Disjuncts:    1707
+Conjuncts:    2973
+Disjuncts:    1704
 
 MisalignedConjunct: 268
 

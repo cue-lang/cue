@@ -279,19 +279,19 @@ diff old new
 --- old
 +++ new
 @@ -1,13 +1,12 @@
--Leaks:  112
--Freed:  510
--Reused: 500
--Allocs: 122
--Retain: 258
+-Leaks:  44
+-Freed:  726
+-Reused: 713
+-Allocs: 57
+-Retain: 121
 -
--Unifications: 622
--Conjuncts:    1433
--Disjuncts:    751
+-Unifications: 770
+-Conjuncts:    1669
+-Disjuncts:    838
 -
 -MisalignedConjunct: 48
 -
--NumCloseIDs: 61
+-NumCloseIDs: 101
 +Leaks:  16
 +Freed:  414
 +Reused: 354
@@ -305,19 +305,19 @@ diff old new
 +
 +NumCloseIDs: 217
 -- out/eval/stats --
-Leaks:  112
-Freed:  510
-Reused: 500
-Allocs: 122
-Retain: 258
+Leaks:  44
+Freed:  726
+Reused: 713
+Allocs: 57
+Retain: 121
 
-Unifications: 622
-Conjuncts:    1433
-Disjuncts:    751
+Unifications: 770
+Conjuncts:    1669
+Disjuncts:    838
 
 MisalignedConjunct: 48
 
-NumCloseIDs: 61
+NumCloseIDs: 101
 -- out/evalalpha --
 (struct){
   given: (struct){

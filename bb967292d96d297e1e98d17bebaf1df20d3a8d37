@@ -194,6 +194,24 @@
       "parentUuid": "4a5ba9ed_bb5cbf9b",
       "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93598a44_418ed824",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-09T08:28:55Z",
+      "side": 1,
+      "message": "For the updated change - could you send it via Gerrit directly? That way it can be reviewed and merged here, without us having to do the dance of importing a GitHub PR. I\u0027d then abandon this one. See: https://github.com/cue-lang/cue/blob/master/CONTRIBUTING.md#preparing-for-gerrithub-cl-contributions",
+      "parentUuid": "984be7f1_59f43142",
+      "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

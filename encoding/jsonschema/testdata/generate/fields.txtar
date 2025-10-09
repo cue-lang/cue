@@ -1,0 +1,48 @@
+-- test.cue --
+package test
+t1?: int		// optional
+t2!: int		// required
+t3: int		// noncrete regular field -> required
+t4: true		// concrete regular field atom -> optional
+t5: {x!: int}	// struct not fully concrete (containing required field) -> required
+t6: {x?: 4, y: 1}	// fully concrete struct -> optional
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	properties: {
+		t1: {
+			type: "integer"
+		}
+		t2: {
+			type: "integer"
+		}
+		t3: {
+			type: "integer"
+		}
+		t4: {
+			const: true
+		}
+		t5: {
+			properties: {
+				x: {
+					type: "integer"
+				}
+			}
+			required: ["x"]
+			type: "object"
+		}
+		t6: {
+			properties: {
+				x: {
+					const: 4
+				}
+				y: {
+					const: 1
+				}
+			}
+			type: "object"
+		}
+	}
+	required: ["t2", "t3", "t5"]
+	type: "object"
+}

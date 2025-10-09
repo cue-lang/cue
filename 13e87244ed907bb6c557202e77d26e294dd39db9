@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49300430_8a55d7f6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-09T11:25:22Z",
+      "side": 1,
+      "message": "again this commit message must mention https://github.com/cue-lang/cue/issues/3175",
+      "revId": "13e87244ed907bb6c557202e77d26e294dd39db9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f082f9c_8fd3cf23",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-09T11:25:22Z",
+      "side": 1,
+      "message": "avoiding panics SGTM, but I think there should be agreement as to what a zero value should behave like before we start documenting and fixing towards that behavior. I\u0027ll leave this one to Marcel as he had fairly strong opinions on it.",
+      "revId": "13e87244ed907bb6c557202e77d26e294dd39db9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a0b0f0a_23d7a079",
+        "filename": "cue/types.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-09T11:25:22Z",
+      "side": 1,
+      "message": "I know this is roughly in line with what happens today, e.g. Kind returning Bottom, but I\u0027m worried that documenting and standardizing around that goes against what Marcel said in https://github.com/cue-lang/cue/issues/3175, i.e. he wants a zero Value to behave like \"top\".",
+      "revId": "13e87244ed907bb6c557202e77d26e294dd39db9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

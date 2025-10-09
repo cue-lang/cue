@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5023a145_f91df2e4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T12:05:34Z",
+      "side": 1,
+      "message": "I\u0027m not sure I agree with that. Keeping the logic simple based on the first char of the identifier seems like a better option here to me.",
+      "revId": "835785fa21b8347a88dcf02734d4c4115c6accf8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "328fd08a_dcd3c370",
+        "filename": "internal/internal.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T12:05:34Z",
+      "side": 1,
+      "message": "This is doing more work than it needs to: we should already know that ident.Name is a valid identifier: we just want to find out if it\u0027s a regular field vs a definition or hidden field.\n\nIf someone has by some chance actually made a Field with a bad name in (say a space), we probably don\u0027t want pretend that it\u0027s not a regular field because of that.\n\nSo I think I\u0027d just do:\n\n```\nreturn indent.Name[0] !\u003d \u0027#\u0027 \u0026\u0026 ident.Name[0] !\u003d \u0027_\u0027\n```\n\nIf there\u0027s an empty ident.Name, I think it\u0027s OK to panic.\nOr just leave the logic as is.",
+      "revId": "835785fa21b8347a88dcf02734d4c4115c6accf8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

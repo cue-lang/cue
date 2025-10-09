@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1428f613_fb9150a6",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4e4b40c_ff4d940a",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d61a2aec_21f0391c",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-02T22:34:47Z",
       "side": 1,
       "message": "perhaps leave a TODO that this will need rethinking once declaring functions in CUE becomes a thing - because at that point one could presumably declare functions which could end up matching one of these cases",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "644b435c_51bd96db",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "I actually think that won\u0027t be possible, because the first element is the package path and I doubt it will be allowed for users to define functions in the stdlib package namespace.\n\nBut I left a TODO anyway.",
+      "parentUuid": "d61a2aec_21f0391c",
       "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3487ed1d_1599fc7e",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "As discussed online, the evaluator does _not_ necessarily show these errors to users already, and the alternative is to panic, so I think this is fine.",
+      "parentUuid": "e072a9b9_3c1b5430",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2eafb873_43b5ca51",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-10-02T22:34:47Z",
       "side": 1,
       "message": "hmm, should we be using `cuelang.org/go/pkg/time`\u0027s format constants here? they currently align with Go\u0027s constants, so it\u0027s not a big deal either way, but I wonder if using the Go package is blurring the line a bit or confusing things. Perhaps leave the code as is, but leave a note.",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20edd387_b816745f",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "I\u0027d prefer not to rely on pkg/time as an API, as it\u0027s really not designed as a Go API. Also, the time parsing format is defined to be exactly the same as Go\u0027s (it would be a highly breaking change if it wasn\u0027t) and the package API doesn\u0027t define all the constants that we need here. So I think best left as-is.",
+      "parentUuid": "2eafb873_43b5ca51",
       "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -92,6 +164,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3b59392_610621ff",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "done (and the logic was wrong too!)",
+      "parentUuid": "f4824af7_719a5fb7",
+      "range": {
+        "startLine": 442,
+        "startChar": 1,
+        "endLine": 445,
+        "endChar": 2
+      },
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "05b7e7f5_3eaa1880",
@@ -105,6 +201,24 @@
       "writtenOn": "2025-10-02T22:34:47Z",
       "side": 1,
       "message": "the alternative to this would be slices.SortFunc followed by slices.CompactFunc - I assume you don\u0027t want to do that because you want to preserve the original order?",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d643f70_fe5f801d",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "Sorting is hard to do when there\u0027s no defined ordering between items.",
+      "parentUuid": "05b7e7f5_3eaa1880",
       "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -126,6 +240,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b536f9b3_bc72bfe6",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c0ad453_994cb007",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7098e09b_df5330e3",
@@ -139,6 +271,24 @@
       "writtenOn": "2025-10-02T22:34:47Z",
       "side": 1,
       "message": "I know you\u0027re generating the jsonschema values as maps, so perhaps it\u0027s not easy to do - but it would be nicest if we had some logical order to these fields, like `$schema` at the very top, and `type` before `properties`",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af4b7841_2eb7168b",
+        "filename": "encoding/jsonschema/testdata/generate/basic.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "Yeah, for a future CL. I added a TODO.",
+      "parentUuid": "7098e09b_df5330e3",
       "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -160,6 +310,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54d52668_cdddf801",
+        "filename": "encoding/jsonschema/testdata/generate/callop.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e23245c_73ea034f",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "113ef6d8_986a42bd",
@@ -173,6 +341,24 @@
       "writtenOn": "2025-10-02T22:34:47Z",
       "side": 1,
       "message": "do we need a TODO to generate `5` here rather than `5.0`? even if it doesn\u0027t affect the semantics at all, the addition of `.0` is unnecessary and slightly distracting, given that the original source did not have it",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4949a07a_bb35615b",
+        "filename": "encoding/jsonschema/testdata/generate/callop.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "The reason is that we\u0027re storing it as a `float64` internally and this is just how CUE represents that value. I\u0027ve added a TODO.",
+      "parentUuid": "113ef6d8_986a42bd",
       "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -194,6 +380,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0e0e500_3b85c433",
+        "filename": "encoding/jsonschema/testdata/generate/callop.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "Yeah, this is just CUE\u0027s default encoding for float64 values. In general CUE can\u0027t turn float literals into int literals because they\u0027re treated separately. I\u0027ve added a TODO.",
+      "parentUuid": "e3667807_1f27c748",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "021f77e0_b7a559ad",
@@ -207,6 +411,24 @@
       "writtenOn": "2025-10-02T22:34:47Z",
       "side": 1,
       "message": "you don\u0027t need to quote the null label :)",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3658785_2814526a",
+        "filename": "encoding/jsonschema/testdata/generate/const.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "021f77e0_b7a559ad",
       "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -228,6 +450,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "494ad1d2_4798ad3e",
+        "filename": "encoding/jsonschema/testdata/generate/unary.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "I thought it was needed for the unary \u003d\u003d operators, but it seems not.",
+      "parentUuid": "050f9a6c_6118ed5b",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2832475a_1176409d",
@@ -245,6 +485,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b6ed624_472cbaf7",
+        "filename": "encoding/jsonschema/testdata/generate/unary.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2832475a_1176409d",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97dde54b_ed34d1a6",
@@ -258,6 +516,24 @@
       "writtenOn": "2025-10-02T22:34:47Z",
       "side": 1,
       "message": "is an empty object a valid jsonschema property? should we be using anything here to signal \"the original field was an error\"?",
+      "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e090578c_10c6ca92",
+        "filename": "encoding/jsonschema/testdata/generate/unary.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "Yes it is: it just means \"accepts anything\" and is equivalent to `true` (or `_` in CUE). In general translation to JSON Schema from CUE is always going to be lossy because CUE is fundamentally more expressive, and the general strategy for doing that is to be more lenient rather than error on something we can\u0027t model in JSON Schema. That\u0027s what we\u0027re seeing there.\n\nThat said, we should be seeing type constraints here but we aren\u0027t so that needs fixing.",
+      "parentUuid": "97dde54b_ed34d1a6",
       "revId": "8d04bc0e0e95d5b5febb8968ba743932f2a38239",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -200,6 +200,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a98630cd_bd278b0f",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "96d1fe14_7f07455b",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "54737e56_dea233ef",
@@ -393,6 +411,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6547c69a_b7e04ce9",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4342e261_fc67007a",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1aebcf60_6c6e2f83",
@@ -424,6 +460,24 @@
       "side": 1,
       "message": "ditto. I added a comment FWIW.",
       "parentUuid": "1aebcf60_6c6e2f83",
+      "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a4739e4_0f4ed853",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-09T13:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d958462d_a22a7ab5",
       "revId": "05372747b1795648270d8f1e2d914d0f2f2c2ceb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

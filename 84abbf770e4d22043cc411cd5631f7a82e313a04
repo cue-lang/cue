@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4be3d56c_3c6e2420",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-09T15:45:36Z",
+      "side": 1,
+      "message": "I don\u0027t know if Marcel had any logic going into the existing behavior, but I agree with your reasoning and prefer what you do here.",
+      "revId": "84abbf770e4d22043cc411cd5631f7a82e313a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -106,8 +106,8 @@ func TestQuote(t *testing.T) {
 			a\xc5a
 			'''`},
 		{form: Bytes.WithTabIndent(3), in: "a\xc5'''a", out: `#'''
-			a\xc5'''a
-			'''#`, lossy: true},
+			a\#xc5'''a
+			'''#`},
 	}
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%q", tc.in), func(t *testing.T) {
@@ -127,7 +127,7 @@ func TestQuote(t *testing.T) {
 			}
 
 			if !tc.lossy && str != tc.in {
-				t.Errorf("Quote: %s", cmp.Diff(tc.in, str))
+				t.Errorf("Roundtrip: %s", cmp.Diff(tc.in, str))
 			}
 		})
 	}

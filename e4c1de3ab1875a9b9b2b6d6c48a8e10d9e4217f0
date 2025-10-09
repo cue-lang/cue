@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb6bf33d_63127e28",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-10-09T09:30:11Z",
+      "side": 1,
+      "message": "I\u0027ve done this, but I disagree about duplication being a problem if the aim of the help text is to assist newcomers. A lack of duplication (instead preferring  pointers to other docs) eases the documentation maintenance burden only by outsourcing that cost to each reader; who must take the additional step of following those links, mentally recombine the information, and synthesise it into the correct result for the individual command they\u0027re trying to understand.\n\nIMHO a lack of duplication is fine in reference material, where avoiding inconsistencies via single-sources-of-truth is paramount; but it\u0027s either neutral or negative when a text\u0027s readership includes any significant amount of less technical folks, or newcomers. I believe that the `cue help \u003ccommand\u003e` texts should primarily meet their need of understanding `\u003ccommand\u003e`, and shouldn\u0027t be written or considered as reference material ... but that\u0027s just my personal view 🙂",
+      "parentUuid": "43f85ac9_d45a7f54",
+      "revId": "e4c1de3ab1875a9b9b2b6d6c48a8e10d9e4217f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "88ec5521_300c0a36",
@@ -54,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6af1a7ff_989e4303",
+        "filename": "cmd/cue/cmd/export.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-10-09T09:30:11Z",
+      "side": 1,
+      "message": "I\u0027ve shortened this section and added a pointer to `cue help inputs`.",
+      "parentUuid": "88ec5521_300c0a36",
+      "revId": "e4c1de3ab1875a9b9b2b6d6c48a8e10d9e4217f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5f68831a_4b07847a",
         "filename": "cmd/cue/cmd/export.go",
         "patchSetId": 4
@@ -65,6 +101,24 @@
       "writtenOn": "2025-05-07T08:58:41Z",
       "side": 1,
       "message": "I don\u0027t think this section should be here; we have `cue help inputs` to explain how to give CUE files or packages as arguments to CLI commands. This repeats some of that text.",
+      "revId": "e4c1de3ab1875a9b9b2b6d6c48a8e10d9e4217f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "726f107c_b1400bf0",
+        "filename": "cmd/cue/cmd/export.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-10-09T09:30:11Z",
+      "side": 1,
+      "message": "I\u0027ve removed this section.",
+      "parentUuid": "5f68831a_4b07847a",
       "revId": "e4c1de3ab1875a9b9b2b6d6c48a8e10d9e4217f0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

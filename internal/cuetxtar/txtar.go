@@ -133,8 +133,6 @@ type Test struct {
 
 	// The absolute path of the current test directory.
 	Dir string
-
-	hasGold bool
 }
 
 // Ensure that Test always implements testing.TB.
@@ -305,10 +303,7 @@ func (t *Test) Instances(args ...string) []*build.Instance {
 	a := t.RawInstances(args...)
 	for _, i := range a {
 		if i.Err != nil {
-			if t.hasGold {
-				t.Fatal("Parse error: ", errors.Details(i.Err, nil))
-			}
-			t.Skip("Parse error: ", errors.Details(i.Err, nil))
+			t.Fatal("Parse error: ", errors.Details(i.Err, nil))
 		}
 	}
 	return a
@@ -488,13 +483,6 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			update := false
 
 			for i, f := range a.Files {
-				hasPrefix := func(s string) bool {
-					// It's either "\(tc.prefix)" or "\(tc.prefix)/..." but not some other name
-					// that happens to start with tc.prefix.
-					return strings.HasPrefix(f.Name, s) && (f.Name == s || f.Name[len(s)] == '/')
-				}
-
-				tc.hasGold = hasPrefix(tc.prefix) || hasPrefix(tc.fallback)
 
 				// Format CUE files as required
 				if tc.HasTag("noformat") || !strings.HasSuffix(f.Name, ".cue") {

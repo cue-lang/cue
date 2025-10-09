@@ -1,3 +1,4 @@
+-- in.cue --
 // unwrap into single value
 unwrap: or([1, 1, 1])
 
@@ -8,3 +9,56 @@ unique2: or([{a: 1}, {a: 1}, {a: 2}])
 
 // do not unique embedded scalars with differing values for child definitions.
 embed1: or([{2, #x: 1}, {2, #x: 2}])
+-- out/compile --
+--- in.cue
+{
+  unwrap: or([
+    1,
+    1,
+    1,
+  ])
+  unique1: or([
+    2,
+    1,
+    1,
+    2,
+  ])
+  unique2: or([
+    {
+      a: 1
+    },
+    {
+      a: 1
+    },
+    {
+      a: 2
+    },
+  ])
+  embed1: or([
+    {
+      2
+      #x: 1
+    },
+    {
+      2
+      #x: 2
+    },
+  ])
+}
+-- out/evalalpha --
+(struct){
+  unwrap: (int){ 1 }
+  unique1: (int){ |((int){ 2 }, (int){ 1 }) }
+  unique2: (struct){ |((struct){
+      a: (int){ 1 }
+    }, (struct){
+      a: (int){ 2 }
+    }) }
+  embed1: (int){ |((int){
+      2
+      #x: (int){ 1 }
+    }, (int){
+      2
+      #x: (int){ 2 }
+    }) }
+}

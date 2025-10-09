@@ -2397,6 +2397,243 @@ func TestUnify2(t *testing.T) {
 
 }
 
+func TestZeroValue(t *testing.T) {
+	// Methods invoked on the zero value should not panic
+	// and should show reasonable behavior.
+
+	var v cue.Value
+	top := cuecontext.New().CompileString("_")
+	one := cuecontext.New().CompileString("1")
+
+	// Allows
+	// TODO
+	//qt.Assert(t, qt.IsFalse(v.Allows(cue.Str("foo"))))
+	qt.Assert(t, qt.PanicMatches(func() {
+		v.Allows(cue.Str("foo"))
+	}, "runtime error: .*"))
+
+	// AppendFloat
+	_, err := v.AppendFloat(nil, 'g', 10)
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+
+	// AppendInt
+	_, err = v.AppendInt(nil, 10)
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+
+	// Attribute
+	attr := v.Attribute("foo")
+	qt.Assert(t, qt.ErrorMatches(attr.Err(), `attribute "foo" does not exist`))
+
+	// Attributes
+	qt.Assert(t, qt.HasLen(v.Attributes(^cue.AttrKind(0)), 0))
+
+	// Bool
+	_, err = v.Bool()
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+
+	// BuildInstance
+	qt.Assert(t, qt.IsNil(v.BuildInstance()))
+
+	// Bytes
+	// TODO
+	//_, err = v.Bytes()
+	// qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+	qt.Assert(t, qt.PanicMatches(func() {
+		v.Bytes()
+	}, "undefined value"))
+
+	// Context
+	// TODO arguably this _should_ panic?
+	qt.Assert(t, qt.IsNil(v.Context()))
+
+	// Decode
+	// TODO decoding a non-existent value should arguably always fail.
+	// qt.Assert(t, qt.ErrorMatches(v.Decode(new(any)), `undefined value`))
+	qt.Assert(t, qt.IsNil(v.Decode(new(any))))
+
+	// Default
+	v1, ok := v.Default()
+	qt.Assert(t, qt.IsFalse(ok))
+	qt.Assert(t, qt.IsFalse(v1.Exists()))
+
+	// Doc
+	qt.Assert(t, qt.HasLen(v.Doc(), 0))
+
+	// Equals
+	qt.Assert(t, qt.IsFalse(v.Equals(v)))
+
+	// Err
+	qt.Assert(t, qt.ErrorMatches(v.Err(), `undefined value`))
+
+	// Eval
+	qt.Assert(t, qt.IsFalse(v.Eval().Exists()))
+
+	// Expr
+	op, args := v.Expr()
+	qt.Assert(t, qt.Equals(op, cue.NoOp))
+	qt.Assert(t, qt.HasLen(args, 0))
+
+	// Fields
+	// TODO
+	//_, err = v.Fields()
+	//qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+	qt.Assert(t, qt.PanicMatches(func() {
+		v.Fields()
+	}, `.*runtime error.*`))
+
+	// FillPath
+	qt.Assert(t, qt.ErrorMatches(v.FillPath(cue.MakePath(cue.Str("x")), 1).Err(), `undefined value`))
+
+	// Float
+	_, err = v.Float(nil)
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+
+	// Float64
+	_, err = v.Float64()
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+
+	// Format
+	// Create our own fmt.State because fmt catches panics.
+	st := &fmtState{}
+	v.Format(st, 'v')
+	qt.Assert(t, qt.Equals(st.String(), `<nil>`))
+
+	// IncompleteKind
+	qt.Assert(t, qt.Equals(v.IncompleteKind(), cue.BottomKind))
+
+	// Int
+	_, err = v.Int(nil)
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+
+	// Int64
+	_, err = v.Int64()
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+
+	// IsConcrete
+	// TODO arguably this is wrong: if the zero value is considered
+	// to be an error, and IsConcrete returns true for terminal errors,
+	// then this should be true.
+	qt.Assert(t, qt.IsFalse(v.IsConcrete()))
+
+	// IsNull
+	qt.Assert(t, qt.IsFalse(v.IsNull()))
+
+	// Kind
+	qt.Assert(t, qt.Equals(v.Kind(), cue.BottomKind))
+
+	// Len
+	// TODO
+	// qt.Assert(t, qt.IsFalse(v.Len().Exists()))
+	qt.Assert(t, qt.PanicMatches(func() {
+		v.Len()
+	}, ".*"))
+
+	// List
+	_, err = v.List()
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+
+	// LookupPath
+	v = v.LookupPath(cue.MakePath(cue.Str("a")))
+	qt.Assert(t, qt.ErrorMatches(v.Err(), `undefined value`))
+
+	// MantExp
+	_, err = v.MantExp(nil)
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+
+	// MarshalJSON
+	// TODO arguably this should fail like any bottom value.
+	data, err := v.MarshalJSON()
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.Equals(string(data), `null`))
+
+	// Path
+	// TODO arguably this should return an error path
+	path := v.Path()
+	qt.Assert(t, qt.IsNil(path.Err()))
+	qt.Assert(t, qt.HasLen(path.Selectors(), 0))
+
+	// Pos
+	qt.Assert(t, qt.IsFalse(v.Pos().IsValid()))
+
+	// ReferencePath
+	root, path := v.ReferencePath()
+	qt.Assert(t, qt.ErrorMatches(root.Err(), `undefined value`))
+	qt.Assert(t, qt.HasLen(path.Selectors(), 0))
+
+	// Source
+	qt.Assert(t, qt.IsNil(v.Source()))
+
+	// String
+	_, err = v.String()
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+
+	// Subsume
+	// TODO arguably this should return an error
+	qt.Assert(t, qt.IsNil(v.Subsume(cue.Value{})))
+	// TODO
+	//qt.Assert(t, qt.IsNil(v.Subsume(top)))
+	qt.Assert(t, qt.PanicMatches(func() {
+		v.Subsume(top)
+	}, `runtime error: .*`))
+
+	// Syntax
+	qt.Assert(t, qt.IsNil(v.Syntax()))
+
+	// Uint64
+	_, err = v.Uint64()
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
+
+	// Unify
+	qt.Assert(t, qt.ErrorMatches(v.Unify(v).Err(), `undefined value`))
+	// TODO all the following should probably be errors.
+	qt.Assert(t, qt.IsNil(top.Unify(v).Err()))
+	qt.Assert(t, qt.IsNil(v.Unify(top).Err()))
+	qt.Assert(t, qt.IsNil(one.Unify(v).Err()))
+	qt.Assert(t, qt.IsNil(v.Unify(one).Err()))
+
+	// UnifyAccept
+	qt.Assert(t, qt.ErrorMatches(v.UnifyAccept(v, v).Err(), `undefined value`))
+	// TODO all the following should probably be errors.
+	qt.Assert(t, qt.IsNil(v.UnifyAccept(top, top).Err()))
+	qt.Assert(t, qt.IsNil(top.UnifyAccept(v, v).Err()))
+
+	// Validate
+	// TODO
+	// qt.Assert(t, qt.ErrorMatches(v.Validate(), "undefined value"))
+	qt.Assert(t, qt.PanicMatches(func() {
+		v.Validate()
+	}, ".*"))
+
+	// Walk
+	beforeCount, afterCount := 0, 0
+	v.Walk(func(v cue.Value) bool {
+		beforeCount++
+		qt.Check(t, qt.ErrorMatches(v.Err(), `undefined value`))
+		return true
+	}, func(v cue.Value) {
+		afterCount++
+		qt.Check(t, qt.ErrorMatches(v.Err(), `undefined value`))
+	})
+	qt.Assert(t, qt.Equals(beforeCount, 1))
+	qt.Assert(t, qt.Equals(afterCount, 1))
+}
+
+type fmtState struct {
+	strings.Builder
+}
+
+func (*fmtState) Width() (int, bool) {
+	return 0, false
+}
+
+func (*fmtState) Precision() (int, bool) {
+	return 0, false
+}
+
+func (*fmtState) Flag(c int) bool {
+	return c == '#'
+}
+
 func TestUnifyAccept(t *testing.T) {
 	type testCase struct {
 		value string

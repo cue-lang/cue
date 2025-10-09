@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "499d3888_f0c35940",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-09T11:21:11Z",
+      "side": 1,
+      "message": "this commit message must reference https://github.com/cue-lang/cue/issues/3175 - and probably give that a read to remind yourself of what we discussed last time this came up",
+      "revId": "0450116fb390c3671c5f0361606eaf4a0decf4d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8a7d1c1_c9af154a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-09T11:21:11Z",
+      "side": 1,
+      "message": "Marcel should +2 this, but LGTM",
+      "revId": "0450116fb390c3671c5f0361606eaf4a0decf4d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

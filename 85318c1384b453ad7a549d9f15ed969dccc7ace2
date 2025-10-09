@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "63ace253_58e9e21a",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-09T08:46:39Z",
+      "side": 1,
+      "message": "I see that you\u0027re trying to be more precise and helpful for the user, but I\u0027m afraid this is not correct. The advancing of versions is not just about activating or changing defaults. It\u0027s as follows:\n\ntoo old -\u003e unavailable\npreview -\u003e you can opt in\ndefault -\u003e you can opt out\nstable -\u003e always on, you cannot opt out\nwithdrawn -\u003e always off, you cannot opt in\n\nhence my use of \"track\" was trying to be generic enough to say that the lifecycle of an experiment moves along with the language version you\u0027re using.",
+      "parentUuid": "d2e76d4d_a8426776",
+      "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "edd22270_6cd870ba",
         "filename": "cmd/cue/cmd/experiments_help_gen.go",
         "patchSetId": 2

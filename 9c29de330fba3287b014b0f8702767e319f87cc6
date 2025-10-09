@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6344bad1_a030c5b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-10-09T16:04:10Z",
+      "side": 1,
+      "message": "Missing word?\n\n```suggestion\nwhich would be a nil pointer, to cause a nil pointer dereference panic.\n```\n\n```suggestion\nwhich could be a nil pointer, to cause a nil pointer dereference panic.\n```",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 65
+      },
+      "revId": "9c29de330fba3287b014b0f8702767e319f87cc6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

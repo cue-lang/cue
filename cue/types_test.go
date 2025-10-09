@@ -2406,11 +2406,7 @@ func TestZeroValue(t *testing.T) {
 	one := cuecontext.New().CompileString("1")
 
 	// Allows
-	// TODO
-	//qt.Assert(t, qt.IsFalse(v.Allows(cue.Str("foo"))))
-	qt.Assert(t, qt.PanicMatches(func() {
-		v.Allows(cue.Str("foo"))
-	}, "runtime error: .*"))
+	qt.Assert(t, qt.IsFalse(v.Allows(cue.Str("foo"))))
 
 	// AppendFloat
 	_, err := v.AppendFloat(nil, 'g', 10)
@@ -2435,21 +2431,15 @@ func TestZeroValue(t *testing.T) {
 	qt.Assert(t, qt.IsNil(v.BuildInstance()))
 
 	// Bytes
-	// TODO
-	//_, err = v.Bytes()
-	// qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
-	qt.Assert(t, qt.PanicMatches(func() {
-		v.Bytes()
-	}, "undefined value"))
+	_, err = v.Bytes()
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
 
 	// Context
 	// TODO arguably this _should_ panic?
 	qt.Assert(t, qt.IsNil(v.Context()))
 
 	// Decode
-	// TODO decoding a non-existent value should arguably always fail.
-	// qt.Assert(t, qt.ErrorMatches(v.Decode(new(any)), `undefined value`))
-	qt.Assert(t, qt.IsNil(v.Decode(new(any))))
+	qt.Assert(t, qt.ErrorMatches(v.Decode(new(any)), `undefined value`))
 
 	// Default
 	v1, ok := v.Default()
@@ -2474,12 +2464,8 @@ func TestZeroValue(t *testing.T) {
 	qt.Assert(t, qt.HasLen(args, 0))
 
 	// Fields
-	// TODO
-	//_, err = v.Fields()
-	//qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
-	qt.Assert(t, qt.PanicMatches(func() {
-		v.Fields()
-	}, `.*runtime error.*`))
+	_, err = v.Fields()
+	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
 
 	// FillPath
 	qt.Assert(t, qt.ErrorMatches(v.FillPath(cue.MakePath(cue.Str("x")), 1).Err(), `undefined value`))
@@ -2522,11 +2508,7 @@ func TestZeroValue(t *testing.T) {
 	qt.Assert(t, qt.Equals(v.Kind(), cue.BottomKind))
 
 	// Len
-	// TODO
-	// qt.Assert(t, qt.IsFalse(v.Len().Exists()))
-	qt.Assert(t, qt.PanicMatches(func() {
-		v.Len()
-	}, ".*"))
+	qt.Assert(t, qt.IsFalse(v.Len().Exists()))
 
 	// List
 	_, err = v.List()
@@ -2568,13 +2550,8 @@ func TestZeroValue(t *testing.T) {
 	qt.Assert(t, qt.ErrorMatches(err, `undefined value`))
 
 	// Subsume
-	// TODO arguably this should return an error
-	qt.Assert(t, qt.IsNil(v.Subsume(cue.Value{})))
-	// TODO
-	//qt.Assert(t, qt.IsNil(v.Subsume(top)))
-	qt.Assert(t, qt.PanicMatches(func() {
-		v.Subsume(top)
-	}, `runtime error: .*`))
+	qt.Assert(t, qt.ErrorMatches(v.Subsume(v), `undefined value`))
+	qt.Assert(t, qt.ErrorMatches(v.Subsume(top), `undefined value`))
 
 	// Syntax
 	qt.Assert(t, qt.IsNil(v.Syntax()))
@@ -2598,11 +2575,7 @@ func TestZeroValue(t *testing.T) {
 	qt.Assert(t, qt.IsNil(top.UnifyAccept(v, v).Err()))
 
 	// Validate
-	// TODO
-	// qt.Assert(t, qt.ErrorMatches(v.Validate(), "undefined value"))
-	qt.Assert(t, qt.PanicMatches(func() {
-		v.Validate()
-	}, ".*"))
+	qt.Assert(t, qt.ErrorMatches(v.Validate(), "undefined value"))
 
 	// Walk
 	beforeCount, afterCount := 0, 0
@@ -3731,13 +3704,6 @@ func TestReferencePath(t *testing.T) {
 				}
 			}
 		})
-	}
-}
-
-func TestZeroValueBuildInstance(t *testing.T) {
-	inst := cue.Value{}.BuildInstance()
-	if inst != nil {
-		t.Error("unexpected non-nil instance")
 	}
 }
 

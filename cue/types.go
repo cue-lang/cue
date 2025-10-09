@@ -544,7 +544,8 @@ func (v Value) Float64() (float64, error) {
 }
 
 // Value holds any value, which may be a Boolean, Error, List, Null, Number,
-// Struct, or String.
+// Struct, or String. The zero Value behaves in most cases as if it's
+// an error.
 type Value struct {
 	idx *runtime.Runtime
 	v   *adt.Vertex
@@ -778,6 +779,10 @@ func (v Value) IncompleteKind() Kind {
 }
 
 // MarshalJSON marshalls this value into valid JSON.
+//
+// It currently marshals the zero Value as JSON null
+// but that behavior might change to return an error
+// in the future.
 func (v Value) MarshalJSON() (b []byte, err error) {
 	b, err = v.appendJSON(v.ctx(), nil)
 	if err != nil {
@@ -1019,6 +1024,9 @@ func (v Value) Pos() token.Pos {
 // Allows does not take into account validators like list.MaxItems(4). This may
 // change in the future.
 func (v Value) Allows(sel Selector) bool {
+	if v.v == nil {
+		return false
+	}
 	if v.v.HasEllipsis {
 		return true
 	}
@@ -1031,8 +1039,11 @@ func (v Value) Allows(sel Selector) bool {
 // (not relying on default values), a terminal error, a list, or a struct.
 // It does not verify that values of lists or structs are concrete themselves.
 // To check whether there is a concrete default, use this method on [Value.Default].
+//
+// IsConcrete returns false for the zero Value.
 func (v Value) IsConcrete() bool {
 	if v.v == nil {
+		// TODO this is arguably inconsistent with the docs.
 		return false // any is neither concrete, not a list or struct.
 	}
 	w := v.v.DerefValue()
@@ -1121,35 +1132,35 @@ func makeInt(v Value, x int64) Value {
 // For lists it reports the capacity of the list. For structs it indicates the
 // number of fields, for bytes the number of bytes.
 func (v Value) Len() Value {
-	if v.v != nil {
-		switch x := v.eval(v.ctx()).(type) {
-		case *adt.Vertex:
-			if x.IsList() {
-				n := &adt.Num{K: adt.IntKind}
-				n.X.SetInt64(int64(iterutil.Count(x.Elems())))
-				if x.IsClosedList() {
-					return remakeFinal(v, n)
-				}
-				// Note: this HAS to be a Conjunction value and cannot be
-				// an adt.BinaryExpr, as the expressions would be considered
-				// to be self-contained and unresolvable when evaluated
-				// (can never become concrete).
-				c := &adt.Conjunction{Values: []adt.Value{
-					&adt.BasicType{K: adt.IntKind},
-					&adt.BoundValue{Op: adt.GreaterEqualOp, Value: n},
-				}}
-				return remakeFinal(v, c)
-
+	if v.v == nil {
+		return Value{}
+	}
+	switch x := v.eval(v.ctx()).(type) {
+	case *adt.Vertex:
+		if x.IsList() {
+			n := &adt.Num{K: adt.IntKind}
+			n.X.SetInt64(int64(iterutil.Count(x.Elems())))
+			if x.IsClosedList() {
+				return remakeFinal(v, n)
 			}
-		case *adt.Bytes:
-			return makeInt(v, int64(len(x.B)))
-		case *adt.String:
-			return makeInt(v, int64(utf8.RuneCountInString(x.Str)))
+			// Note: this HAS to be a Conjunction value and cannot be
+			// an adt.BinaryExpr, as the expressions would be considered
+			// to be self-contained and unresolvable when evaluated
+			// (can never become concrete).
+			c := &adt.Conjunction{Values: []adt.Value{
+				&adt.BasicType{K: adt.IntKind},
+				&adt.BoundValue{Op: adt.GreaterEqualOp, Value: n},
+			}}
+			return remakeFinal(v, c)
+
 		}
+	case *adt.Bytes:
+		return makeInt(v, int64(len(x.B)))
+	case *adt.String:
+		return makeInt(v, int64(utf8.RuneCountInString(x.Str)))
 	}
 	const msg = "len not supported for type %v"
 	return remakeValue(v, nil, mkErr(v.v, msg, v.Kind()))
-
 }
 
 // Elem returns the value of undefined element types of lists and structs.
@@ -1219,6 +1230,9 @@ func (v Value) String() (string, error) {
 // Bytes returns a byte slice if v represents a list of bytes or an error
 // otherwise.
 func (v Value) Bytes() ([]byte, error) {
+	if v.v == nil {
+		return nil, errNotExists.Err
+	}
 	v, _ = v.Default()
 	ctx := v.ctx()
 	switch x := v.eval(ctx).(type) {
@@ -1396,6 +1410,9 @@ func (s *hiddenStruct) Fields(opts ...Option) *Iterator {
 // Fields creates an iterator over v's fields if v is a struct or an error
 // otherwise.
 func (v Value) Fields(opts ...Option) (*Iterator, error) {
+	if v.v == nil {
+		return nil, errNotExists.Err
+	}
 	o := options{omitDefinitions: true, omitHidden: true, omitOptional: true}
 	o.updateOptions(opts)
 	ctx := v.ctx()
@@ -1435,6 +1452,8 @@ func (v hiddenValue) Lookup(path ...string) Value {
 // This is currently only defined for values that have a fixed path within
 // a configuration, and thus not those that are derived from Elem, Template,
 // or programmatically generated values such as those returned by Unify.
+//
+// It returns an empty path for the zero Value.
 func (v Value) Path() Path {
 	if v.v == nil {
 		return Path{}
@@ -1680,6 +1699,9 @@ func (v hiddenValue) Template() func(label string) Value {
 // Value v and w must be obtained from the same build. TODO: remove this
 // requirement.
 func (v Value) Subsume(w Value, opts ...Option) error {
+	if v.v == nil {
+		return errNotExists.Err
+	}
 	o := getOptions(opts)
 	p := subsume.CUE
 	switch {
@@ -2066,6 +2088,9 @@ func (o *options) updateOptions(opts []Option) {
 // [Concrete] are used. The [Final] option can be used to check for missing
 // required fields.
 func (v Value) Validate(opts ...Option) error {
+	if v.v == nil {
+		return errNotExists.Err
+	}
 	o := options{}
 	o.updateOptions(opts)
 

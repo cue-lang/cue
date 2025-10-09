@@ -1,0 +1,26 @@
+# Test JSON Schema generation from CUE
+
+# Generate JSON Schema in JSON format (default output format for JSON Schema)
+exec cue def --out jsonschema foo.cue
+cmp stdout golden_json.output
+
+# Generate JSON Schema in CUE format
+exec cue def --out jsonschema+cue foo.cue
+cmp stdout golden_cue.output
+
+-- foo.cue --
+t1?: int
+-- golden_cue.output --
+$schema: "https://json-schema.org/draft/2020-12/schema"
+properties: t1: type: "integer"
+type: "object"
+-- golden_json.output --
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+        "t1": {
+            "type": "integer"
+        }
+    },
+    "type": "object"
+}

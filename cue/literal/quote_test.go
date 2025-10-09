@@ -102,6 +102,12 @@ func TestQuote(t *testing.T) {
 			foo
 			'''\#r\#f\#\
 			'''#`},
+		{form: Bytes.WithTabIndent(3), in: "a\xc5a", out: `'''
+			a\xc5a
+			'''`},
+		{form: Bytes.WithTabIndent(3), in: "a\xc5'''a", out: `#'''
+			a\xc5'''a
+			'''#`, lossy: true},
 	}
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%q", tc.in), func(t *testing.T) {

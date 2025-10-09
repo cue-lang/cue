@@ -41,6 +41,9 @@ import (
 // at the corresponding part of v. This allows decoding values
 // that aren't entirely concrete into a Go type.
 func (v Value) Decode(x interface{}) error {
+	if v.v == nil {
+		return errNotExists.Err
+	}
 	var d decoder
 	w := reflect.ValueOf(x)
 	if w.Kind() != reflect.Pointer || w.IsNil() {

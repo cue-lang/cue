@@ -192,7 +192,8 @@ func (f Form) appendEscaped(buf []byte, s string) []byte {
 			r, width = utf8.DecodeRuneInString(s)
 		}
 		if f.exact && width == 1 && r == utf8.RuneError {
-			buf = append(buf, `\x`...)
+			buf = f.appendEscape(buf)
+			buf = append(buf, 'x')
 			buf = append(buf, lowerhex[s[0]>>4])
 			buf = append(buf, lowerhex[s[0]&0xF])
 			continue

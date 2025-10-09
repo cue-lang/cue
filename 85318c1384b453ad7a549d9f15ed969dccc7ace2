@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2e76d4d_a8426776",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-10-09T07:04:04Z",
+      "side": 1,
+      "message": "Whilst I understand \"track\", I would phrase this for the user as something like\n\n```suggestion\nThe default activation of per-file experiments is controlled by the language version declared in their module,\n```",
+      "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edd22270_6cd870ba",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-10-09T07:04:04Z",
+      "side": 1,
+      "message": "Ditto.\n\n```suggestion\nThe default activation of global experiments is controlled by the language version reported by \"cue version\".\n```",
+      "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

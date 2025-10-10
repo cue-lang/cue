@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "73ffcf0e_1d1e34dc",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-10-10T08:54:38Z",
+      "side": 1,
+      "message": "That\u0027s good. I prefer your first wording:\n\n```suggestion\nThe behavior of per-file experiments tracks the language version declared in their module,\n```\n\n---\n\n... because this form feels like it has a slightly confusing overlap with the `default` lifecycle marker: \n\n---\n\n```suggestion\nThe availability and default state of per-file experiments tracks the language version declared in their module,\n```",
+      "parentUuid": "42e3711f_cc810f5e",
+      "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "edd22270_6cd870ba",
         "filename": "cmd/cue/cmd/experiments_help_gen.go",
         "patchSetId": 2
@@ -103,6 +121,24 @@
       "side": 1,
       "message": "As above:\n\n```suggestion\nThe availability of global experiments tracks the language version reported by \"cue version\".\n```",
       "parentUuid": "edd22270_6cd870ba",
+      "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "214dab91_35c8d70f",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-10-10T08:54:38Z",
+      "side": 1,
+      "message": "As above:\n\n```suggestion\nThe behavior of global experiments tracks the language version reported by \"cue version\".\n```",
+      "parentUuid": "c84ee374_e1871700",
       "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

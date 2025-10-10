@@ -16,6 +16,24 @@
       "message": "note that you sent this patch on top of mine. instead, join both commits into one with the change-id you have here. because we want to merge your patch by itself, rather than my old and broken patch and then your fixes on top.",
       "revId": "ab00518298b0ea359a464b47b9f3c74d8bd2a337",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80ffaf46_69731909",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1039031
+      },
+      "writtenOn": "2025-10-10T13:26:27Z",
+      "side": 1,
+      "message": "Oh, that\u0027s what I did in the first place but it was hard to review that way. I\u0027ll restore that change over at https://cue.gerrithub.io/c/cue-lang/cue/+/1224165",
+      "parentUuid": "31bbfc6c_2449b0e8",
+      "revId": "ab00518298b0ea359a464b47b9f3c74d8bd2a337",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

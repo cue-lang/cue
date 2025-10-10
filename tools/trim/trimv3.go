@@ -476,7 +476,7 @@ func (t *trimmerV3) findPatterns(v *adt.Vertex) {
 				pair.Constraint.Finalize(t.ctx)
 				t.logf("pattern %d %p::%T", i, pair.Constraint, pair.Constraint)
 				t.inc()
-				pair.Constraint.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+				for c := range pair.Constraint.LeafConjuncts() {
 					field := c.Field()
 					elem := c.Elem()
 					expr := c.Expr()
@@ -489,9 +489,7 @@ func (t *trimmerV3) findPatterns(v *adt.Vertex) {
 						nm.ignoreConjunct = true
 						nm.markRequired()
 					}
-
-					return true
-				})
+				}
 				t.dec()
 			}
 		}
@@ -546,7 +544,7 @@ func (t *trimmerV3) findDisjunctions(v *adt.Vertex) {
 			}
 		}
 
-		v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+		for c := range v.LeafConjuncts() {
 			switch disj := c.Elem().(type) {
 			case *adt.Disjunction:
 				t.logf("found disjunction")
@@ -576,8 +574,7 @@ func (t *trimmerV3) findDisjunctions(v *adt.Vertex) {
 					branches = append(branches, branch)
 				}
 			}
-			return true
-		})
+		}
 
 		t.dec()
 
@@ -598,7 +595,7 @@ func (t *trimmerV3) findDisjunctions(v *adt.Vertex) {
 		}
 		seen[v] = struct{}{}
 
-		v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+		for c := range v.LeafConjuncts() {
 			if src := c.Field().Source(); src != nil {
 				nm := t.getNodeMeta(src)
 				t.logf(" ignoring %v", nm.src.Pos())
@@ -608,8 +605,7 @@ func (t *trimmerV3) findDisjunctions(v *adt.Vertex) {
 			t.resolveElemAll(c, func(resolver adt.Resolver, resolvedTo *adt.Vertex) {
 				worklist = append(worklist, resolvedTo.Arcs...)
 			})
-			return true
-		})
+		}
 		worklist = append(worklist, v.Arcs...)
 	}
 }
@@ -682,7 +678,7 @@ func (t *trimmerV3) findRedundancies(v *adt.Vertex, keepAll bool) {
 	}
 
 	var nodeMetas, winners, disjDefaultWinners []*nodeMeta
-	v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+	for c := range v.LeafConjuncts() {
 		field := c.Field()
 		elem := c.Elem()
 		expr := c.Expr()
@@ -690,7 +686,7 @@ func (t *trimmerV3) findRedundancies(v *adt.Vertex, keepAll bool) {
 		if src == nil {
 			t.logf("conjunct field: %p::%T, elem: %p::%T, expr: %p::%T, src nil",
 				field, field, elem, elem, expr, expr)
-			return true
+			continue
 		}
 
 		t.logf("conjunct field: %p::%T, elem: %p::%T, expr: %p::%T, src: %v",
@@ -765,8 +761,7 @@ func (t *trimmerV3) findRedundancies(v *adt.Vertex, keepAll bool) {
 		}
 
 		t.linkResolvers(c, false)
-		return true
-	})
+	}
 
 	if keepAll {
 		t.logf("keeping all %d nodes", len(nodeMetas))
@@ -846,10 +841,10 @@ func (t *trimmerV3) linkResolvers(c adt.Conjunct, addInverse bool) {
 	}
 
 	t.resolveElemAll(c, func(resolver adt.Resolver, resolvedTo *adt.Vertex) {
-		resolvedTo.VisitLeafConjuncts(func(resolvedToC adt.Conjunct) bool {
+		for resolvedToC := range resolvedTo.LeafConjuncts() {
 			src := resolvedToC.Source()
 			if src == nil {
-				return true
+				continue
 			}
 			resolvedToNm := t.getNodeMeta(src)
 			resolverNm := t.getNodeMeta(resolver.Source())
@@ -885,8 +880,7 @@ func (t *trimmerV3) linkResolvers(c adt.Conjunct, addInverse bool) {
 					resolvedToNm.src.Pos(), origNm.src.Pos())
 				resolvedToNm.addRequiredBy(origNm)
 			}
-			return true
-		})
+		}
 	})
 }
 
@@ -967,10 +961,9 @@ func (t *trimmerV3) equallySpecific(v *adt.Vertex, cs ...adt.Conjunct) bool {
 		if r, ok := c.Elem().(adt.Resolver); ok {
 			v1, bot := t.ctx.Resolve(c, r)
 			if bot == nil {
-				v1.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+				for c := range v1.LeafConjuncts() {
 					conjVertex.InsertConjunct(c)
-					return true
-				})
+				}
 				continue
 			}
 		}

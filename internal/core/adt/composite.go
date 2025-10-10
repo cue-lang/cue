@@ -562,8 +562,17 @@ func (v *Vertex) setParentDone() {
 }
 
 // VisitLeafConjuncts visits all conjuncts that are leafs of the ConjunctGroup tree.
+//
+// TODO(mvdan): switch all to [Vertex.LeafConjuncts].
 func (v *Vertex) VisitLeafConjuncts(f func(Conjunct) bool) {
 	iterConjuncts(v.Conjuncts, f)
+}
+
+// LeafConjuncts iterates over all conjuncts that are leafs of the ConjunctGroup tree.
+func (v *Vertex) LeafConjuncts() iter.Seq[Conjunct] {
+	return func(yield func(Conjunct) bool) {
+		_ = iterConjuncts(v.Conjuncts, yield)
+	}
 }
 
 func iterConjuncts(a []Conjunct, yield func(Conjunct) bool) bool {
@@ -620,14 +629,11 @@ func (v *Vertex) SingleConjunct() (c Conjunct, count int) {
 	if v == nil {
 		return c, 0
 	}
-	v.VisitLeafConjuncts(func(x Conjunct) bool {
-		c = x
+	for c = range v.LeafConjuncts() {
 		if count++; count > 1 {
-			return false
+			break
 		}
-		return true
-	})
-
+	}
 	return c, count
 }
 

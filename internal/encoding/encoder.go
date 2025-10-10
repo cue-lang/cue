@@ -250,8 +250,16 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 }
 
 func (e *Encoder) EncodeFile(f *ast.File) error {
-	e.autoSimplify = false
-	return e.encodeFile(f, e.interpret)
+	if e.interpret == nil && e.encFile != nil {
+		// TODO it's not clear that it's actually desirable to turn
+		// off simplification in this case. This case generally arises
+		// when we're producing CUE code with `cue eval` and
+		// simplified results seem generally preferable.
+		e.autoSimplify = false
+		return e.encFile(f)
+	}
+	e.autoSimplify = true
+	return e.Encode(e.ctx.BuildFile(f))
 }
 
 func (e *Encoder) Encode(v cue.Value) error {
@@ -259,31 +267,17 @@ func (e *Encoder) Encode(v cue.Value) error {
 	if err := v.Validate(cue.Concrete(e.concrete)); err != nil {
 		return err
 	}
-	if e.interpret != nil {
-		f, err := e.interpret(v)
-		if err != nil {
-			return err
-		}
-		return e.encodeFile(f, nil)
-	}
-	if e.encValue != nil {
+	if e.interpret == nil {
 		return e.encValue(v)
 	}
-	return e.encFile(internal.ToFile(v.Syntax()))
-}
-
-func (e *Encoder) encodeFile(f *ast.File, interpret func(cue.Value) (*ast.File, error)) error {
-	if interpret == nil && e.encFile != nil {
-		return e.encFile(f)
-	}
-	e.autoSimplify = true
-	v := e.ctx.BuildFile(f)
-	if err := v.Err(); err != nil {
+	f, err := e.interpret(v)
+	if err != nil {
 		return err
 	}
-	if interpret != nil {
-		return e.Encode(v)
+	if e.encFile != nil {
+		return e.encFile(f)
 	}
+	v = e.ctx.BuildFile(f)
 	if err := v.Validate(cue.Concrete(e.concrete)); err != nil {
 		return err
 	}

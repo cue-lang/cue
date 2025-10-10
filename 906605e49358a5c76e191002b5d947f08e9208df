@@ -106,6 +106,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a97cbef0_9be8f3fe",
+        "filename": "cmd/cue/cmd/export.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-10-10T09:35:10Z",
+      "side": 1,
+      "message": "Done in a follow up.",
+      "parentUuid": "af7800eb_4f707a7d",
+      "range": {
+        "startLine": 41,
+        "startChar": 46,
+        "endLine": 44,
+        "endChar": 5
+      },
+      "revId": "906605e49358a5c76e191002b5d947f08e9208df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3693b732_e3be8288",

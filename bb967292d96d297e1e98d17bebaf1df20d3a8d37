@@ -230,6 +230,24 @@
       "parentUuid": "93598a44_418ed824",
       "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1af6cd8b_6b61970e",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-10T11:45:09Z",
+      "side": 1,
+      "message": "You need a new Change-id trailer so that it sends a new patch; otherwise you cannot edit my patch here directly",
+      "parentUuid": "9f84378c_f7ad5d1a",
+      "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

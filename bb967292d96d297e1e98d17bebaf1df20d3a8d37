@@ -212,6 +212,24 @@
       "parentUuid": "984be7f1_59f43142",
       "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f84378c_f7ad5d1a",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1039031
+      },
+      "writtenOn": "2025-10-10T11:28:58Z",
+      "side": 1,
+      "message": "@mvdan@mvdan.cc\nI tried sending it via Gerrit, but that failed. Maybe you have to set me as the owner of this change? It\u0027s my first time using Gerrit so maybe I did something wrong?\n\nI ran `git push gerrit HEAD:refs/for/master` where `gerrit` is the SSH remote pointing to Gerrit, and I get the following error:\n\n```\n ! [remote rejected]     HEAD -\u003e refs/for/master (cannot add patch set to 1223900.)\n```",
+      "parentUuid": "93598a44_418ed824",
+      "revId": "bb967292d96d297e1e98d17bebaf1df20d3a8d37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

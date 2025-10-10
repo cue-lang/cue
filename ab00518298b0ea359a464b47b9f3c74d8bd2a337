@@ -34,6 +34,24 @@
       "parentUuid": "31bbfc6c_2449b0e8",
       "revId": "ab00518298b0ea359a464b47b9f3c74d8bd2a337",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc1f77d8_565b6c28",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-10T13:27:32Z",
+      "side": 1,
+      "message": "ah I see. yes, an entirely new and separate patch is best :) you can abandon this one now",
+      "parentUuid": "80ffaf46_69731909",
+      "revId": "ab00518298b0ea359a464b47b9f3c74d8bd2a337",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

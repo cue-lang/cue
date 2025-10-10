@@ -17,6 +17,7 @@ package export
 import (
 	"cmp"
 	"fmt"
+	"maps"
 	"slices"
 
 	"cuelang.org/go/cue/ast"
@@ -177,10 +178,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 
 	// Collect and order set of fields.
 
-	fields := []adt.Feature{}
-	for f := range e.fields {
-		fields = append(fields, f)
-	}
+	fields := slices.Collect(maps.Keys(e.fields))
 
 	// Sort fields in case features lists are missing to ensure
 	// predictability. Also sort in reverse order, so that bugs

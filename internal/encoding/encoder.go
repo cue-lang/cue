@@ -82,6 +82,9 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 		// TODO: get encoding options
 		cfg := &openapi.Config{}
 		e.interpret = func(v cue.Value) (*ast.File, error) {
+			if err := v.Validate(); err != nil {
+				return nil, err
+			}
 			return openapi.Generate(v, cfg)
 		}
 	case build.ProtobufJSON:
@@ -264,10 +267,10 @@ func (e *Encoder) EncodeFile(f *ast.File) error {
 
 func (e *Encoder) Encode(v cue.Value) error {
 	e.autoSimplify = true
-	if err := v.Validate(cue.Concrete(e.concrete)); err != nil {
-		return err
-	}
 	if e.interpret == nil {
+		if err := v.Validate(cue.Concrete(e.concrete)); err != nil {
+			return err
+		}
 		return e.encValue(v)
 	}
 	f, err := e.interpret(v)

@@ -141,8 +141,15 @@ func (pkg *Package) markDirty() {
 
 	pkg.isDirty = true
 	for _, importer := range pkg.importedBy {
-		importer.markDirty()
+		importer.resetDefinitions()
 	}
+}
+
+func (pkg *Package) resetDefinitions() {
+	if pkg.isDirty || pkg.definitions == nil {
+		return
+	}
+	pkg.definitions.Reset()
 }
 
 // delete removes this package from its module.

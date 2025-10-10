@@ -31,6 +31,114 @@ import (
 	"github.com/rogpeppe/go-internal/txtar"
 )
 
+func TestXXX(t *testing.T) {
+	str := `
+_x: y: {m: {z: zz: zzz: 3, g: z, h: g}.h, n: _}.n
+a: b: c: _x.y.zz
+`[1:]
+
+	pos := ln(1, 1, "zz")
+
+	str = `
+a: b: {
+	c: d: {
+		g: h: 3
+		i: g
+		j: i
+	}.j
+	e: c
+	e1: c + 1
+	f: e
+}.f & {d: h: int}
+k: l: a.b.d.h
+
+m: n: o: 33
+`[1:]
+
+	pos = ln(3, 1, "h")
+
+	// 	str = `
+	// a: {
+	// //	for x in {}
+	//    let b = 7 {
+	// 	c: b
+	// }
+	// }
+	// `[1:]
+	// 	pos = ln(3, 1, "b")
+
+	// 	str = `
+	// a: { x: 1, y: 2, z: 3}
+	// b: { x: 4, y: 5, z: 6}
+	// o: {
+	// 	for k, v in a {
+	// 		(k): v * b[k]
+	// 		p: v
+	// 	}
+	// }
+	// q: o.p
+	// r: o.k
+	// `[1:]
+	// 	pos = ln(4, 1, "v")
+
+	// 	str = `
+	// a: {b: c.d, d: 3} | {d: 4}
+	// c: a
+	// `[1:]
+	// 	pos = ln(1, 3, "d")
+
+	str = `
+	import "magic"
+
+	x: magic.Merlin(y)
+	y: "wand"
+	`[1:]
+	pos = ln(1, 1, "magic")
+
+	// str = `a: n=(2 * (div(n, 2))) | error("\(n) is not even")`
+	// pos = ln(1, 1, "n")
+
+	// str = `
+	// _a: {x: _a}
+	// _a
+	// `[1:]
+	// pos = ln(1, 1, "a")
+
+	// 	str = `
+	// a: ({b: c.d, d: 3} & {}) | {x: _} | {y: _} | {z: _} | {d: 4}
+	// c: a
+	// 	`[1:]
+	// 	pos = ln(1, 3, "d")
+
+	fileAst, _ := parser.ParseFile(t.Name(), str, parser.ParseComments)
+	fileAst.Pos().File().SetContent([]byte(str))
+	qt.Assert(t, qt.IsNotNil(fileAst))
+	dfns := definitions.Analyse(nil, fileAst)
+	fdfns := dfns.ForFile(t.Name())
+
+	filesByName := map[string]*ast.File{
+		t.Name(): fileAst,
+	}
+	pos.determineOffset(filesByName)
+
+	if false {
+		t.Log(pos.offset)
+		t.Log()
+		t.Log("-- 1 --")
+		t.Log(fdfns.UsagesForOffset(pos.offset))
+
+		t.Log()
+		t.Log("-- 2 --")
+		t.Log(fdfns.UsagesForOffset(pos.offset))
+
+		t.Log()
+		t.Log("-- 3 --")
+	}
+	for i, n := range fdfns.UsagesForOffset(pos.offset) {
+		t.Logf("%d %v %v", i, n, n.Pos().Position())
+	}
+}
+
 func TestDefinitions(t *testing.T) {
 	testCases{
 		{
@@ -933,6 +1041,7 @@ l=a: {b: 3, c: l.b}`,
 				ln(1, 2, "l"): {ln(1, 1, "a")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
+				ln(1, 1, "l"): {ln(1, 1, "a")},
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
@@ -955,6 +1064,7 @@ a: c: l.b`,
 				ln(2, 1, "l"): {ln(1, 1, "a"), ln(2, 1, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
 
+				ln(1, 1, "l"): {ln(1, 1, "a"), ln(2, 1, "a")},
 				ln(1, 1, "a"): {self, ln(2, 1, "a")},
 				ln(1, 1, "b"): {self},
 
@@ -983,6 +1093,7 @@ l=a: c: l.b`,
 				ln(1, 1, "a"): {self, ln(2, 1, "a")},
 				ln(1, 1, "b"): {self},
 
+				ln(2, 1, "l"): {ln(2, 1, "a"), ln(1, 1, "a")},
 				ln(2, 1, "a"): {self, ln(1, 1, "a")},
 				ln(2, 1, "c"): {self},
 			},
@@ -1005,6 +1116,7 @@ c: l.b`,
 				ln(2, 1, "l"): {ln(1, 1, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
 
+				ln(1, 1, "l"): {ln(1, 1, "a")},
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "b"): {self},
 
@@ -1040,6 +1152,7 @@ h: a.l
 				ln(6, 1, "l"): {},
 				ln(1, 1, "a"): {self, ln(5, 1, "a")},
 
+				ln(2, 1, "l"): {ln(2, 1, "b")},
 				ln(2, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 				ln(2, 2, "d"): {self},
@@ -1075,9 +1188,10 @@ h: a.l
 			archive: `-- a.cue --
 l=(a): {b: 3, c: l.b}`,
 			expectDefinitions: map[position][]position{
-				ln(1, 2, "l"): {ln(1, 1, "(")},
+				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
@@ -1099,9 +1213,10 @@ l=(a): b: 3
 			// expressions. Therefore we don't consider the two `(a)`
 			// keys to be the same.
 			expectDefinitions: map[position][]position{
-				ln(2, 1, "l"): {ln(1, 1, "(")},
+				ln(2, 1, "l"): {ln(1, 1, "l")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
 
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
@@ -1124,10 +1239,11 @@ l=(a): c: l.b`,
 			// not link the two `(a)` keys, and so we cannot resolve the
 			// b in l.b.
 			expectDefinitions: map[position][]position{
-				ln(2, 2, "l"): {ln(2, 1, "(")},
+				ln(2, 2, "l"): {ln(2, 1, "l")},
 				ln(2, 1, "b"): {},
 
 				ln(1, 1, "b"): {self},
+				ln(2, 1, "l"): {self},
 				ln(2, 1, "c"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
@@ -1146,9 +1262,10 @@ l=(a): c: l.b`,
 l=(a): b: 3
 c: l.b`,
 			expectDefinitions: map[position][]position{
-				ln(2, 1, "l"): {ln(1, 1, ("("))},
+				ln(2, 1, "l"): {ln(1, 1, ("l"))},
 				ln(2, 1, "b"): {ln(1, 1, ("b"))},
 
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
@@ -1166,9 +1283,10 @@ c: l.b`,
 			archive: `-- a.cue --
 l=[a]: {b: 3, c: l.b}`,
 			expectDefinitions: map[position][]position{
-				ln(1, 2, "l"): {ln(1, 1, "[")},
+				ln(1, 2, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
@@ -1194,6 +1312,7 @@ l=[a]: b: 3
 				ln(2, 1, "l"): {},
 				ln(2, 1, "b"): {},
 
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
@@ -1212,9 +1331,10 @@ l=[a]: c: l.b`,
 			// Again, the two [a] patterns are not merged. The l of l.b
 			// can be resolved, but not the b.
 			expectDefinitions: map[position][]position{
-				ln(2, 2, "l"): {ln(2, 1, "[")},
+				ln(2, 2, "l"): {ln(2, 1, "l")},
 				ln(2, 1, "b"): {},
 
+				ln(2, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
@@ -1237,6 +1357,7 @@ c: l.b`,
 				ln(2, 1, "l"): {},
 				ln(2, 1, "b"): {},
 
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
@@ -1259,6 +1380,7 @@ c: l.b`,
 				ln(1, 3, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {},
 
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 				ln(1, 1, "d"): {self},
@@ -1286,10 +1408,12 @@ c: l.b`,
 			expectDefinitions: map[position][]position{
 				ln(2, 1, "l"): {},
 
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(1, 1, "a"): {e: []string{"l"}},
 				ln(1, 1, "b"): {f: []string{"b"}},
 				ln(2, 1, "c"): {f: []string{"c"}},
 				ln(2, 1, "l"): {e: []string{"c"}},
@@ -1306,10 +1430,12 @@ c: l`,
 			expectDefinitions: map[position][]position{
 				ln(2, 1, "l"): {},
 
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(1, 1, "a"): {e: []string{"c", "l"}},
 				ln(1, 1, "b"): {f: []string{"b"}},
 				ln(2, 1, "c"): {f: []string{"c"}},
 				ln(2, 1, "l"): {e: []string{"c"}},
@@ -1325,6 +1451,7 @@ a: l={b: 3, c: l.b}`,
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
@@ -1346,6 +1473,7 @@ a: l={b: 3} & {c: l.b}`,
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
@@ -1369,6 +1497,7 @@ a: l=({b: 3} & {c: l.b})`,
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
@@ -1392,6 +1521,7 @@ c: l.b`,
 				ln(2, 1, "b"): {},
 
 				ln(1, 1, "a"): {self},
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 
 				ln(2, 1, "c"): {self},
@@ -1413,6 +1543,7 @@ a: n=(2 * (div(n, 2))) | error("\(n) is not even")
 				ln(1, 2, "n"): {ln(1, 1, "n")},
 				ln(1, 3, "n"): {ln(1, 1, "n")},
 
+				ln(1, 1, "n"): {self},
 				ln(1, 1, "a"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
@@ -1631,7 +1762,7 @@ d: c.b
 		{
 			name: "Disjunction_Looping",
 			archive: `-- a.cue --
-a: {b: c.d, d: 3} | {d: 4}
+a: ({b: c.d, d: 3} & {}) | {x: _} | {y: _} | {z: _} | {d: 4}
 c: a
 `,
 			expectDefinitions: map[position][]position{
@@ -1642,6 +1773,9 @@ c: a
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 2, "d"): {self},
+				ln(1, 1, "x"): {self},
+				ln(1, 1, "y"): {self},
+				ln(1, 1, "z"): {self},
 				ln(1, 3, "d"): {self},
 
 				ln(2, 1, "c"): {self},
@@ -1650,11 +1784,17 @@ c: a
 				ln(1, 1, "a"):  {f: []string{"a", "c"}},
 				ln(1, 1, "b"):  {f: []string{"b", "d"}},
 				ln(1, 1, "c"):  {e: []string{"a", "b", "c", "d"}},
-				ln(1, 1, ".d"): {e: []string{"b", "d"}},
+				ln(1, 1, ".d"): {e: []string{"b", "d", "x", "y", "z"}},
 				ln(1, 2, "d"):  {f: []string{"b", "d"}},
+				ln(1, 1, "x"):  {f: []string{"x"}},
+				ln(1, 1, "_"):  {e: []string{"a", "c", "x"}},
+				ln(1, 1, "y"):  {f: []string{"y"}},
+				ln(1, 2, "_"):  {e: []string{"a", "c", "y"}},
+				ln(1, 1, "z"):  {f: []string{"z"}},
+				ln(1, 3, "_"):  {e: []string{"a", "c", "z"}},
 				ln(1, 3, "d"):  {f: []string{"d"}},
 				ln(2, 1, "c"):  {f: []string{"a", "c"}},
-				ln(2, 1, "a"):  {f: []string{"b", "d"}, e: []string{"a", "c"}},
+				ln(2, 1, "a"):  {f: []string{"b", "d", "x", "y", "z"}, e: []string{"a", "c"}},
 			},
 		},
 
@@ -1833,8 +1973,9 @@ y: "wand"
 				ln(3, 1, "Merlin"): {},
 				ln(3, 1, "y"):      {ln(4, 1, "y")},
 
-				ln(3, 1, "x"): {self},
-				ln(4, 1, "y"): {self},
+				ln(1, 1, `"magic"`): {self},
+				ln(3, 1, "x"):       {self},
+				ln(4, 1, "y"):       {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
 				ln(3, 1, "x"):     {f: []string{"x", "y"}},
@@ -1854,6 +1995,8 @@ x: wand.foo
 			expectDefinitions: map[position][]position{
 				ln(3, 1, "wand"): {ln(1, 1, "wand")},
 				ln(3, 1, "foo"):  {},
+
+				ln(1, 1, `wand`): {self},
 				ln(3, 1, "x"):    {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
@@ -2027,6 +2170,7 @@ y: x.c`,
 
 				ln(1, 1, "a"): {self},
 				ln(2, 1, "b"): {self},
+				ln(3, 1, "l"): {ln(3, 1, "x")},
 				ln(3, 1, "x"): {self},
 				ln(5, 1, "c"): {self},
 				ln(7, 1, "z"): {self},
@@ -2065,6 +2209,7 @@ y: x.c
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 
+				ln(2, 1, "x"): {self},
 				ln(3, 1, "y"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
@@ -2096,6 +2241,7 @@ o: a.b
 				ln(6, 1, "b"): {},
 
 				ln(1, 1, "a"): {self, ln(5, 1, "a")},
+				ln(2, 1, "b"): {self},
 				ln(3, 1, "c"): {self},
 
 				ln(5, 1, "a"): {self, ln(1, 1, "a")},
@@ -2154,7 +2300,11 @@ r: o.k
 				ln(2, 1, "y"): {self},
 				ln(2, 1, "z"): {self},
 
-				ln(3, 1, "o"):  {self},
+				ln(3, 1, "o"): {self},
+
+				ln(4, 1, "k"): {self},
+				ln(4, 1, "v"): {self},
+
 				ln(6, 1, "p"):  {self},
 				ln(9, 1, "q"):  {self},
 				ln(10, 1, "r"): {self},
@@ -2194,6 +2344,9 @@ foo: bar: "baz"`,
 				ln(1, 1, "foo"): {ln(2, 1, "foo")},
 				ln(1, 1, "bar"): {ln(2, 1, "bar")},
 
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+
 				ln(2, 1, "foo"): {self},
 				ln(2, 1, "bar"): {self},
 			},
@@ -2218,7 +2371,11 @@ k: {}
 				ln(2, 3, "k"): {ln(2, 1, "k")},
 
 				ln(1, 1, "x"): {self},
+
+				ln(2, 1, "k"): {self},
+				ln(2, 1, "v"): {self},
 				ln(2, 2, "v"): {self},
+
 				ln(4, 1, "k"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
@@ -2245,8 +2402,13 @@ i: g[0].h`,
 				ln(4, 1, "x"): {ln(3, 1, "x")},
 				ln(6, 1, "g"): {ln(1, 1, "g")},
 
-				ln(1, 1, "g"):   {self},
-				ln(4, 1, "h"):   {self},
+				ln(1, 1, "g"): {self},
+				ln(1, 1, "x"): {self},
+
+				ln(2, 1, "x"): {self},
+				ln(3, 1, "x"): {self},
+				ln(4, 1, "h"): {self},
+
 				ln(6, 1, "i"):   {self},
 				ln(6, 1, "[0]"): {ln(1, 1, "for")},
 				ln(6, 1, "h"):   {ln(4, 1, "h")},
@@ -2306,6 +2468,9 @@ bar: foo
 			expectDefinitions: map[position][]position{
 				fln("b.cue", 3, 1, "foo"): {fln("a.cue", 3, 1, "foo")},
 
+				fln("a.cue", 1, 1, "x"): {self, fln("b.cue", 1, 1, "x")},
+				fln("b.cue", 1, 1, "x"): {self, fln("a.cue", 1, 1, "x")},
+
 				fln("a.cue", 3, 1, "foo"): {self},
 				fln("b.cue", 3, 1, "bar"): {self},
 			},
@@ -2336,6 +2501,10 @@ foo: _
 `,
 			expectDefinitions: map[position][]position{
 				fln("c.cue", 3, 1, "foo"): {fln("a.cue", 3, 1, "foo"), fln("b.cue", 3, 1, "foo"), fln("c.cue", 4, 1, "foo")},
+
+				fln("a.cue", 1, 1, "x"): {self, fln("b.cue", 1, 1, "x"), fln("c.cue", 1, 1, "x")},
+				fln("b.cue", 1, 1, "x"): {self, fln("a.cue", 1, 1, "x"), fln("c.cue", 1, 1, "x")},
+				fln("c.cue", 1, 1, "x"): {self, fln("a.cue", 1, 1, "x"), fln("b.cue", 1, 1, "x")},
 
 				fln("a.cue", 3, 1, "foo"): {self, fln("b.cue", 3, 1, "foo"), fln("c.cue", 4, 1, "foo")},
 				fln("b.cue", 3, 1, "foo"): {self, fln("a.cue", 3, 1, "foo"), fln("c.cue", 4, 1, "foo")},
@@ -2369,6 +2538,9 @@ foo: {qux: bar}
 			expectDefinitions: map[position][]position{
 				fln("a.cue", 3, 2, "bar"): {fln("a.cue", 3, 1, "bar")},
 				fln("b.cue", 3, 1, "bar"): {},
+
+				fln("a.cue", 1, 1, "x"): {self, fln("b.cue", 1, 1, "x")},
+				fln("b.cue", 1, 1, "x"): {self, fln("a.cue", 1, 1, "x")},
 
 				fln("a.cue", 3, 1, "foo"): {self, fln("b.cue", 3, 1, "foo")},
 				fln("a.cue", 3, 1, "bar"): {self},
@@ -2410,6 +2582,10 @@ foo: qux: foo.bar
 				fln("b.cue", 3, 1, "bar"): {},
 				fln("c.cue", 3, 2, "foo"): {fln("a.cue", 3, 1, "foo"), fln("a.cue", 4, 1, "foo"), fln("b.cue", 3, 1, "foo"), fln("c.cue", 3, 1, "foo")},
 				fln("c.cue", 3, 1, "bar"): {fln("a.cue", 3, 1, "bar")},
+
+				fln("a.cue", 1, 1, "x"): {self, fln("b.cue", 1, 1, "x"), fln("c.cue", 1, 1, "x")},
+				fln("b.cue", 1, 1, "x"): {self, fln("a.cue", 1, 1, "x"), fln("c.cue", 1, 1, "x")},
+				fln("c.cue", 1, 1, "x"): {self, fln("a.cue", 1, 1, "x"), fln("b.cue", 1, 1, "x")},
 
 				fln("a.cue", 3, 1, "foo"): {self, fln("a.cue", 4, 1, "foo"), fln("b.cue", 3, 1, "foo"), fln("c.cue", 3, 1, "foo")},
 				fln("a.cue", 3, 1, "bar"): {self},
@@ -2462,8 +2638,14 @@ s: a
 				fln("b.cue", 3, 1, "a"): {},
 				fln("c.cue", 4, 1, "a"): {fln("c.cue", 3, 1, "a")},
 
+				fln("a.cue", 1, 1, "x"): {self, fln("b.cue", 1, 1, "x"), fln("c.cue", 1, 1, "x")},
+				fln("b.cue", 1, 1, "x"): {self, fln("a.cue", 1, 1, "x"), fln("c.cue", 1, 1, "x")},
+				fln("c.cue", 1, 1, "x"): {self, fln("a.cue", 1, 1, "x"), fln("b.cue", 1, 1, "x")},
+
+				fln("a.cue", 3, 1, "a"): {self},
 				fln("a.cue", 4, 1, "q"): {self},
 				fln("b.cue", 3, 1, "r"): {self},
+				fln("c.cue", 3, 1, "a"): {self},
 				fln("c.cue", 4, 1, "s"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
@@ -2495,6 +2677,9 @@ w: a: b: 6
 			expectDefinitions: map[position][]position{
 				fln("a.cue", 4, 1, "a"): {fln("a.cue", 5, 1, "a"), fln("b.cue", 3, 1, "a")},
 				fln("a.cue", 4, 1, "b"): {fln("a.cue", 5, 1, "b"), fln("b.cue", 3, 1, "b")},
+
+				fln("a.cue", 1, 1, "x"): {self, fln("b.cue", 1, 1, "x")},
+				fln("b.cue", 1, 1, "x"): {self, fln("a.cue", 1, 1, "x")},
 
 				fln("a.cue", 3, 1, "w"): {self, fln("b.cue", 3, 1, "w")},
 				fln("a.cue", 4, 1, "x"): {self},
@@ -2557,7 +2742,13 @@ a: {
 				fln("c.cue", 4, 1, "c"): {},
 				fln("d.cue", 5, 1, "X"): {fln("d.cue", 4, 1, "f")},
 
+				fln("a.cue", 1, 1, "x"): {self, fln("b.cue", 1, 1, "x"), fln("c.cue", 1, 1, "x"), fln("d.cue", 1, 1, "x")},
+				fln("b.cue", 1, 1, "x"): {self, fln("a.cue", 1, 1, "x"), fln("c.cue", 1, 1, "x"), fln("d.cue", 1, 1, "x")},
+				fln("c.cue", 1, 1, "x"): {self, fln("a.cue", 1, 1, "x"), fln("b.cue", 1, 1, "x"), fln("d.cue", 1, 1, "x")},
+				fln("d.cue", 1, 1, "x"): {self, fln("a.cue", 1, 1, "x"), fln("b.cue", 1, 1, "x"), fln("c.cue", 1, 1, "x")},
+
 				fln("a.cue", 3, 1, "a"): {self, fln("b.cue", 3, 1, "a"), fln("c.cue", 3, 1, "a"), fln("d.cue", 3, 1, "a")},
+				fln("a.cue", 4, 1, "X"): {fln("a.cue", 4, 1, "b"), fln("b.cue", 4, 1, "b")},
 				fln("a.cue", 4, 1, "b"): {self, fln("b.cue", 4, 1, "b")},
 				fln("a.cue", 4, 1, "c"): {self, fln("b.cue", 4, 1, "c")},
 				fln("a.cue", 5, 1, "d"): {self},
@@ -2570,6 +2761,7 @@ a: {
 				fln("c.cue", 4, 1, "e"): {self},
 
 				fln("d.cue", 3, 1, "a"): {self, fln("a.cue", 3, 1, "a"), fln("b.cue", 3, 1, "a"), fln("c.cue", 3, 1, "a")},
+				fln("d.cue", 4, 1, "X"): {fln("d.cue", 4, 1, "f")},
 				fln("d.cue", 4, 1, "f"): {self},
 				fln("d.cue", 4, 1, "c"): {self},
 				fln("d.cue", 5, 1, "g"): {self},
@@ -2615,10 +2807,14 @@ z: y.x
 package a
 `,
 			expectDefinitions: map[position][]position{
-				fln("b.cue", 3, 1, `"a"`): {fln("a.cue", 1, 1, "package a"), fln("c.cue", 1, 1, "package a")},
+				fln("b.cue", 3, 1, `"a"`): {fln("a.cue", 1, 3, "a"), fln("c.cue", 1, 3, "a")},
 				fln("b.cue", 5, 1, "a"):   {fln("b.cue", 3, 1, `"a"`)},
 				fln("b.cue", 6, 1, "y"):   {fln("b.cue", 5, 1, "y")},
 				fln("b.cue", 6, 1, "x"):   {fln("a.cue", 3, 1, "x")},
+
+				fln("a.cue", 1, 3, "a"): {self, fln("c.cue", 1, 3, "a")},
+				fln("b.cue", 1, 1, "b"): {self},
+				fln("c.cue", 1, 3, "a"): {self, fln("a.cue", 1, 3, "a")},
 
 				fln("a.cue", 3, 1, "x"): {self},
 
@@ -2828,6 +3024,7 @@ g: h: X.f[0]
 				ln(4, 1, "[0]"):  {ln(2, 1, "1")},
 
 				ln(2, 1, "f"): {self},
+				ln(3, 1, "X"): {self},
 				ln(4, 1, "g"): {self},
 				ln(4, 1, "h"): {self},
 			},
@@ -2922,22 +3119,28 @@ func (tcs testCases) run(t *testing.T) {
 				expectCompletions[from] = completions
 			}
 
-			dfnsByFilename := make(map[string]*definitions.FileDefinitions)
-			dfnsByPkgName := make(map[string]*definitions.Definitions)
-			forPackage := func(importPath string) *definitions.Definitions {
-				return dfnsByPkgName[importPath]
-			}
-
-			for pkgName, files := range filesByPkg {
-				dfns := definitions.Analyse(forPackage, files...)
-				dfnsByPkgName[pkgName] = dfns
-				for _, fileAst := range files {
-					dfnsByFilename[fileAst.Filename] = dfns.ForFile(fileAst.Filename)
+			analyse := func() map[string]*definitions.FileDefinitions {
+				dfnsByFilename := make(map[string]*definitions.FileDefinitions)
+				dfnsByPkgName := make(map[string]*definitions.Definitions)
+				forPackage := func(importPath string) *definitions.Definitions {
+					return dfnsByPkgName[importPath]
 				}
+
+				for pkgName, files := range filesByPkg {
+					dfns := definitions.Analyse(forPackage, files...)
+					dfnsByPkgName[pkgName] = dfns
+					for _, fileAst := range files {
+						dfnsByFilename[fileAst.Filename] = dfns.ForFile(fileAst.Filename)
+					}
+				}
+				return dfnsByFilename
 			}
 
-			tc.testDefinitions(t, files, dfnsByFilename)
-			tc.testCompletions(t, files, dfnsByFilename)
+			// The subtests need fresh [*definitions.FileDefinitions]
+			// because each subtest causes mutations.
+			tc.testDefinitions(t, files, analyse())
+			tc.testCompletions(t, files, analyse())
+			tc.testUsages(t, files, analyse())
 		})
 	}
 }
@@ -2991,6 +3194,51 @@ func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, dfnsByFilen
 					fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
 				}
 				qt.Check(t, qt.DeepEquals(fileOffsetsGot, []fileOffset{}), qt.Commentf("file: %q, offset: %d", filename, i))
+			}
+		}
+	})
+}
+
+func (tc *testCase) testUsages(t *testing.T, files []*ast.File, dfnsByFilename map[string]*definitions.FileDefinitions) {
+	t.Run("usages", func(t *testing.T) {
+		expectUsages := make(map[position][]position)
+		for dfn, uses := range tc.expectDefinitions {
+			if slices.Contains(uses, self) || dfn.str[0] == '[' { // skip dynamic indexing for usages, and parens
+				continue
+			}
+			for _, use := range uses {
+				if use == self {
+					use = dfn
+				}
+				if use.str[0] == '(' || use.str[0] == '[' {
+					continue
+				}
+				expectUsages[use] = append(expectUsages[use], dfn)
+			}
+		}
+
+		for posUse, positionsWant := range expectUsages {
+			filename := posUse.filename
+			fdfns := dfnsByFilename[filename]
+			qt.Check(t, qt.IsNotNil(fdfns))
+
+			offset := posUse.offset
+
+			for i := range len(posUse.str) {
+				// Test every offset within the "use" token
+				offset := offset + i
+				nodesGot := fdfns.UsagesForOffset(offset)
+				fileOffsetsGot := make([]fileOffset, len(nodesGot))
+				for j, node := range nodesGot {
+					fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
+				}
+				fileOffsetsWant := make([]fileOffset, len(positionsWant))
+				for j, p := range positionsWant {
+					fileOffsetsWant[j] = p.fileOffset()
+				}
+				slices.SortFunc(fileOffsetsGot, cmpFileOffsets)
+				slices.SortFunc(fileOffsetsWant, cmpFileOffsets)
+				qt.Check(t, qt.DeepEquals(fileOffsetsGot, fileOffsetsWant), qt.Commentf("from %#v(+%d)", posUse, i))
 			}
 		}
 	})

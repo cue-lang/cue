@@ -18,8 +18,10 @@ missingX: {
 }
 -- out/generate-v3/schema --
 {
+	$schema: "https://json-schema.org/draft/2020-12/schema"
 	$defs: {
 		"#D1": {
+			type: "object"
 			properties: {
 				x: {
 					type: "integer"
@@ -29,22 +31,20 @@ missingX: {
 				}
 			}
 			required: ["x"]
-			type: "object"
 		}
 		"#D2": {
 			type: "string"
 		}
 	}
-	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type: "object"
 	properties: {
 		foo: {
 			$ref: "#/$defs/#D1"
 		}
 	}
 	required: ["foo"]
-	type: "object"
 }
 -- out/generate-v3/simple --
 -- out/generate-v3/missingX --
 missingX.data.foo.x: field is required but not present:
-    1:18
+    1:91

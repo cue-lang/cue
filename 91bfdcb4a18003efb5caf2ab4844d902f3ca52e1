@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c57f0a09_70f9ea46",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-10-10T08:36:47Z",
+      "side": 1,
+      "message": "PTAL, and submit if you\u0027re happy (I don\u0027t have privs to do so in this repo).",
+      "revId": "91bfdcb4a18003efb5caf2ab4844d902f3ca52e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "42e3711f_cc810f5e",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-10T08:05:23Z",
+      "side": 1,
+      "message": "\"availability\" is better but still not the whole story I think; how about...\n\n\u003e The behavior of per-file experiments tracks the language version ...\n\nwhere \"behavior\" can mean both \"availability\" and \"default state\". The alternative is to fully spell it out:\n\n\u003e The availability and default state of per-file experiments tracks the language version ...",
+      "parentUuid": "0a927ad7_94a872e4",
+      "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "edd22270_6cd870ba",
         "filename": "cmd/cue/cmd/experiments_help_gen.go",
         "patchSetId": 2

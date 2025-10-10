@@ -87,6 +87,62 @@ func (w *Workspace) Definition(tokFile *token.File, fdfns *definitions.FileDefin
 	return locations
 }
 
+func (w *Workspace) References(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, mod *Module, pos protocol.Position) []protocol.Location {
+	// TODO: force-load every package within mod
+	var targets []ast.Node
+	// If UsagesForOffset returns no results, and if it's safe to
+	// do so, we back off the Character offset (column number) by 1 and
+	// try again. This can help when the caret symbol is a | (as
+	// opposed to a block - i.e. it's *between* two characters rather
+	// than *over* a single character) and is placed straight after the
+	// end of a path element.
+	posAdj := []uint32{0, 1}[:1]
+	if pos.Character == 0 {
+		posAdj = posAdj[:1]
+	}
+	for _, adj := range posAdj {
+		pos := pos
+		pos.Character -= adj
+		offset, err := srcMapper.PositionOffset(pos)
+		if err != nil {
+			w.debugLog(err.Error())
+			continue
+		}
+
+		targets = fdfns.UsagesForOffset(offset)
+		if len(targets) > 0 {
+			break
+		}
+	}
+	if len(targets) == 0 {
+		return nil
+	}
+
+	locations := make([]protocol.Location, len(targets))
+	for i, target := range targets {
+		startPos := target.Pos().Position()
+		endPos := target.End().Position()
+
+		targetFile := target.Pos().File()
+		targetMapper := w.mappers[targetFile]
+		if targetMapper == nil {
+			w.debugLog("mapper not found: " + targetFile.Name())
+			return nil
+		}
+		r, err := targetMapper.OffsetRange(startPos.Offset, endPos.Offset)
+		if err != nil {
+			w.debugLog(err.Error())
+			return nil
+		}
+
+		locations[i] = protocol.Location{
+			URI:   protocol.URIFromPath(startPos.Filename),
+			Range: r,
+		}
+	}
+	return locations
+}
+
 // Hover is very similar to Definition. It attempts to resolve the
 // given position, within the file definitions, to one or more ast
 // nodes, and returns the doc comments attached to those ast nodes.
@@ -258,10 +314,10 @@ func (w *Workspace) Completion(tokFile *token.File, fdfns *definitions.FileDefin
 	}
 }
 
-func (w *Workspace) DefinitionsForURI(fileUri protocol.DocumentURI) (*token.File, *definitions.FileDefinitions, *protocol.Mapper, error) {
+func (w *Workspace) DefinitionsForURI(fileUri protocol.DocumentURI) (*token.File, *definitions.FileDefinitions, *protocol.Mapper, *Module, error) {
 	mod, err := w.FindModuleForFile(fileUri)
 	if err != nil && err != errModuleNotFound {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	var dfns *definitions.Definitions
@@ -280,21 +336,21 @@ func (w *Workspace) DefinitionsForURI(fileUri protocol.DocumentURI) (*token.File
 		if standalone, found := w.standalone.files[fileUri]; found {
 			dfns = standalone.definitions
 		} else {
-			return nil, nil, nil, nil
+			return nil, nil, nil, nil, nil
 		}
 	}
 
 	fdfns := dfns.ForFile(fileUri.Path())
 	if fdfns == nil {
-		return nil, nil, nil, nil
+		return nil, nil, nil, nil, nil
 	}
 
 	tokFile := fdfns.File.Pos().File()
 	srcMapper := w.mappers[tokFile]
 	if srcMapper == nil {
 		w.debugLog("mapper not found: " + string(fileUri))
-		return nil, nil, nil, nil
+		return nil, nil, nil, nil, nil
 	}
 
-	return tokFile, fdfns, srcMapper, nil
+	return tokFile, fdfns, srcMapper, mod, nil
 }

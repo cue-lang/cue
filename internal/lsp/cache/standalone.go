@@ -207,8 +207,9 @@ func (f *standaloneFile) reload() error {
 		f.delete()
 		return ErrBadFile
 	}
-	ast, _, err := fh.ReadCUE(standaloneParserConfig)
-	if ast == nil {
+
+	syntax, _, err := fh.ReadCUE(standaloneParserConfig)
+	if syntax == nil {
 		w.debugLogf("%v Error when reloading: %v", f, err)
 		f.delete()
 		return ErrBadFile
@@ -218,9 +219,9 @@ func (f *standaloneFile) reload() error {
 		delete(w.mappers, oldAst.Pos().File())
 	}
 
-	f.syntax = ast
-	f.definitions = definitions.Analyse(nil, ast)
-	if tokFile := ast.Pos().File(); tokFile != nil {
+	f.syntax = syntax
+	f.definitions = definitions.Analyse(ast.ImportPath{}, nil, nil, nil, syntax)
+	if tokFile := syntax.Pos().File(); tokFile != nil {
 		w.mappers[tokFile] = protocol.NewMapper(f.uri, tokFile.Content())
 	}
 	w.debugLogf("%v Reloaded", f)

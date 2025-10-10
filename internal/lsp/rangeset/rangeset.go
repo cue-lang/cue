@@ -27,6 +27,10 @@ type Range struct {
 	End   int
 }
 
+func (r Range) String() string {
+	return fmt.Sprintf("%d-%d", r.Start, r.End)
+}
+
 // RangeSet holds a collection of sorted, non-overlapping ranges.
 type RangeSet struct {
 	ranges []Range

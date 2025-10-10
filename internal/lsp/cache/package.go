@@ -141,8 +141,15 @@ func (pkg *Package) markDirty() {
 
 	pkg.isDirty = true
 	for _, importer := range pkg.importedBy {
-		importer.markDirty()
+		importer.resetDefinitions()
 	}
+}
+
+func (pkg *Package) resetDefinitions() {
+	if pkg.isDirty || pkg.definitions == nil {
+		return
+	}
+	pkg.definitions.Reset()
 }
 
 // delete removes this package from its module.
@@ -215,6 +222,8 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		}
 	}
 
+	importCanonicalisation := make(map[string]ast.ImportPath)
+
 	for _, importedModpkg := range modpkg.Imports() {
 		if isUnhandledPackage(importedModpkg) {
 			continue
@@ -223,6 +232,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		modRootURI := moduleRootURI(importedModpkg)
 		if importedPkg, found := w.findPackage(modRootURI, ip); found {
 			importedPkg.EnsureImportedBy(pkg)
+			importCanonicalisation[importedModpkg.ImportPath()] = importedPkg.importPath
 		}
 	}
 
@@ -257,10 +267,22 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		}
 		return nil
 	}
+
+	pkgImporters := func() []*definitions.Definitions {
+		if len(pkg.importedBy) == 0 {
+			return nil
+		}
+		dfns := make([]*definitions.Definitions, len(pkg.importedBy))
+		for i, pkg := range pkg.importedBy {
+			dfns[i] = pkg.definitions
+		}
+		return dfns
+	}
+
 	// definitions.Analyse does almost no work - calculation of
 	// resolutions is done lazily. So no need to launch go-routines
 	// here.
-	pkg.definitions = definitions.Analyse(forPackage, astFiles...)
+	pkg.definitions = definitions.Analyse(pkg.importPath, importCanonicalisation, forPackage, pkgImporters, astFiles...)
 
 	return nil
 }

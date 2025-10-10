@@ -141,8 +141,15 @@ func (pkg *Package) markDirty() {
 
 	pkg.isDirty = true
 	for _, importer := range pkg.importedBy {
-		importer.markDirty()
+		importer.resetDefinitions()
 	}
+}
+
+func (pkg *Package) resetDefinitions() {
+	if pkg.isDirty || pkg.definitions == nil {
+		return
+	}
+	pkg.definitions.Reset()
 }
 
 // delete removes this package from its module.
@@ -260,7 +267,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	// definitions.Analyse does almost no work - calculation of
 	// resolutions is done lazily. So no need to launch go-routines
 	// here.
-	pkg.definitions = definitions.Analyse(forPackage, astFiles...)
+	pkg.definitions = definitions.Analyse(pkg.importPath, forPackage, astFiles...)
 
 	return nil
 }

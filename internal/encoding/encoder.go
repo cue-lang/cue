@@ -264,11 +264,14 @@ func (e *Encoder) EncodeFile(f *ast.File) error {
 
 func (e *Encoder) Encode(v cue.Value) error {
 	e.autoSimplify = true
-	if err := v.Validate(cue.Concrete(e.concrete)); err != nil {
-		return err
-	}
 	if e.interpret == nil {
+		if err := v.Validate(cue.Concrete(e.concrete)); err != nil {
+			return err
+		}
 		return e.encValue(v)
+	}
+	if err := v.Validate(); err != nil {
+		return err
 	}
 	f, err := e.interpret(v)
 	if err != nil {

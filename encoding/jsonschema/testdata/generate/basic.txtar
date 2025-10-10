@@ -22,6 +22,7 @@ ok: data: {
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
 	properties: {
 		t1: {
 			type: "integer"
@@ -45,8 +46,7 @@ ok: data: {
 				type: "integer"
 			}]
 		}
-		t7: {}
+		t7: true
 	}
-	type: "object"
 }
 -- out/generate-v3/ok --

@@ -73,16 +73,17 @@ errorNotLessEqual: {
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
 	properties: {
 		t01: {
-			pattern: "^foo"
 			type:    "string"
+			pattern: "^foo"
 		}
 		t02: {
+			type: "string"
 			not: {
 				pattern: "bar"
 			}
-			type: "string"
 		}
 		t03: {
 			const: 1
@@ -93,20 +94,20 @@ errorNotLessEqual: {
 			}
 		}
 		t05: {
-			exclusiveMinimum: 5.0
 			type:             "number"
+			exclusiveMinimum: 5
 		}
 		t06: {
-			minimum: 5.0
 			type:    "number"
+			minimum: 5
 		}
 		t07: {
-			exclusiveMaximum: 1e+1
 			type:             "number"
+			exclusiveMaximum: 10
 		}
 		t08: {
-			maximum: 1e+1
 			type:    "number"
+			maximum: 10
 		}
 		t09: {
 			type: "string"
@@ -115,41 +116,40 @@ errorNotLessEqual: {
 			type: "string"
 		}
 	}
-	type: "object"
 }
 -- out/generate-v3/ok --
 -- out/generate-v3/errorEqual1 --
 -- out/generate-v3/errorEqual2 --
 errorEqual2.data.t04: invalid value 1 (does not satisfy matchN): 1 matched, expected 0:
-    1:187
+    1:203
     ./datatest/tests.cue:39:13
 -- out/generate-v3/errorMatchingRegexp --
 errorMatchingRegexp.data.t02: invalid value "xbary" (does not satisfy matchN): 1 matched, expected 0:
-    1:121
+    1:153
     ./datatest/tests.cue:23:13
 -- out/generate-v3/errorNonMatchingRegexp --
 errorNonMatchingRegexp.data.t01: invalid value "nfoo" (out of bound =~"^foo"):
-    1:80
+    1:112
     ./datatest/tests.cue:19:13
 -- out/generate-v3/errorNotGreater --
 errorNotGreater.data.t05: invalid value 5 (out of bound >5):
-    1:213
+    1:245
     ./datatest/tests.cue:43:13
 -- out/generate-v3/errorNotGreaterEqual --
 errorNotGreaterEqual.data.t06: invalid value 4.99 (out of bound >=5):
-    1:258
+    1:290
     ./datatest/tests.cue:47:13
 -- out/generate-v3/errorNotLess --
-errorNotLess.data.t07: invalid value 10 (out of bound <1E+1):
-    1:294
+errorNotLess.data.t07: invalid value 10 (out of bound <10):
+    1:326
     ./datatest/tests.cue:51:13
 -- out/generate-v3/errorNotLessEqual --
-errorNotLessEqual.data.t08: invalid value 10.001 (out of bound <=1E+1):
-    1:342
+errorNotLessEqual.data.t08: invalid value 10.001 (out of bound <=10):
+    1:372
     ./datatest/tests.cue:55:13
 -- out/generate-v3/errorUnequal --
 errorUnequal.data.t03: conflicting values 1 and 2:
-    1:169
+    1:185
     ./datatest/tests.cue:27:13
 -- out/generate-v3/ok1 --
 -- out/generate-v3/ok2 --

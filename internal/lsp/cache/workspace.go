@@ -428,7 +428,8 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 	if err := w.standalone.subtractModulesAndPackages(); err != nil {
 		return err
 	}
-	return w.reloadPackages()
+	w.reloadPackages()
+	return nil
 }
 
 func (w *Workspace) updateOverlays(modifications []file.Modification) (map[protocol.DocumentURI]fscache.FileHandle, error) {
@@ -649,7 +650,7 @@ func (w *Workspace) reloadModules() {
 // its module. If a dirty file has changed package, that new package
 // will be created and loaded. Imports are followed, and may result in
 // new packages and even new modules, being added to the workspace.
-func (w *Workspace) reloadPackages() error {
+func (w *Workspace) reloadPackages() {
 	modules := w.modules
 
 	var loadedPkgs []*modpkgload.Package
@@ -675,7 +676,7 @@ func (w *Workspace) reloadPackages() error {
 	}
 
 	if len(loadedPkgs) == 0 {
-		return nil
+		return
 	}
 
 	// Process the results of loading the all the dirty packages from
@@ -871,9 +872,8 @@ func (w *Workspace) reloadPackages() error {
 	}
 
 	if repeatReload {
-		return w.reloadPackages()
+		w.reloadPackages()
 	}
-	return nil
 }
 
 func (w *Workspace) findPackage(modRootURI protocol.DocumentURI, ip ast.ImportPath) (*Package, bool) {

@@ -150,10 +150,6 @@ func (s *server) RangesFormatting(context.Context, *protocol.DocumentRangesForma
 	return nil, notImplemented("RangesFormatting")
 }
 
-func (s *server) References(ctx context.Context, params *protocol.ReferenceParams) (_ []protocol.Location, rerr error) {
-	return nil, notImplemented("References")
-}
-
 func (s *server) Rename(ctx context.Context, params *protocol.RenameParams) (*protocol.WorkspaceEdit, error) {
 	return nil, notImplemented("Rename")
 }

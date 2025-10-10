@@ -49,3 +49,13 @@ func (s *server) Hover(ctx context.Context, params *protocol.HoverParams) (*prot
 	}
 	return w.Hover(tokFile, dfns, srcMapper, params.Position), nil
 }
+
+func (s *server) References(ctx context.Context, params *protocol.ReferenceParams) ([]protocol.Location, error) {
+	uri := params.TextDocument.URI
+	w := s.workspace
+	tokFile, dfns, srcMapper, err := w.DefinitionsForURI(uri)
+	if tokFile == nil || err != nil {
+		return nil, err
+	}
+	return w.References(tokFile, dfns, srcMapper, params.Position), nil
+}

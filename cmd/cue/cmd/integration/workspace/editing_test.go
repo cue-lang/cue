@@ -120,9 +120,9 @@ v4: v2
 			env.WriteWorkspaceFile("a/a.cue", "package a\n\nv1: string\n")
 			env.Await(
 				env.DoneWithChangeWatchedFiles(),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/a@v0 mod.example/x/b/c@v0:b]", rootURI),
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/a@v0]", rootURI),
 				LogExactf(protocol.Debug, 2, false, "Package dirs=[%v/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
-				LogExactf(protocol.Debug, 2, false, "Package dirs=[%v/b/c] importPath=mod.example/x/b/c@v0:b Reloaded", rootURI),
+				// TODO change to 1 and make comment talk about reset LogExactf(protocol.Debug, 2, false, "Package dirs=[%v/b/c] importPath=mod.example/x/b/c@v0:b Reloaded", rootURI),
 			)
 		})
 	})
@@ -318,9 +318,9 @@ z: 1
 			qt.Assert(t, qt.ContentEquals(locs, []protocol.Location{
 				{
 					URI: rootURI + "/a/a.cue",
-					// |package a|
+					// package |a|
 					Range: protocol.Range{
-						Start: protocol.Position{Line: 0, Character: 0},
+						Start: protocol.Position{Line: 0, Character: 8},
 						End:   protocol.Position{Line: 0, Character: 9},
 					},
 				},

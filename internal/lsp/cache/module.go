@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -324,11 +325,47 @@ func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
 
 // activeFilesAndDirs implements [packageOrModule]
 func (m *Module) activeFilesAndDirs(files map[protocol.DocumentURI][]packageOrModule, dirs map[protocol.DocumentURI]struct{}) {
-	files[m.modFileURI] = []packageOrModule{m}
-	dirs[m.modFileURI.Dir()] = struct{}{}
-	dirs[m.rootURI] = struct{}{}
+	if files != nil {
+		files[m.modFileURI] = []packageOrModule{m}
+	}
+	if dirs != nil {
+		dirs[m.modFileURI.Dir()] = struct{}{}
+		dirs[m.rootURI] = struct{}{}
+	}
 	for _, pkg := range m.packages {
 		pkg.activeFilesAndDirs(files, dirs)
+	}
+}
+
+func (m *Module) loadAllPackages() {
+	files := make(map[protocol.DocumentURI][]packageOrModule)
+	m.activeFilesAndDirs(files, nil)
+
+	var toLoad []protocol.DocumentURI
+	rootPath := m.rootURI.Path()
+	fsys := m.workspace.overlayFS.IoFS(rootPath)
+	fs.WalkDir(fsys, ".", func(p string, d fs.DirEntry, err error) error {
+		if d.Type().IsRegular() && strings.HasSuffix(p, ".cue") {
+			p = filepath.Join(rootPath, filepath.FromSlash(p))
+			pUri := protocol.URIFromPath(p)
+			if _, found := files[pUri]; !found {
+				toLoad = append(toLoad, pUri)
+			}
+		}
+		return nil
+	})
+
+	for _, pUri := range toLoad {
+		ip, dirUris, err := m.FindImportPathForFile(pUri)
+		if err != nil || ip == nil || len(dirUris) == 0 {
+			continue
+		}
+		pkg := m.EnsurePackage(*ip, dirUris)
+		if len(dirUris) == 1 { // i.e. the new module system is in use
+			for _, pkg := range m.DescendantPackages(pkg.importPath) {
+				pkg.markFileDirty(pUri)
+			}
+		}
 	}
 }
 

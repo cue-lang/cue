@@ -240,6 +240,10 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		pkg.imports = pkg.imports[:0]
 	}
 
+	importCanonicalisation := make(map[string]ast.ImportPath)
+	importCanonicalisation[modpkg.ImportPath()] = pkg.importPath
+	importCanonicalisation[ast.ParseImportPath(modpkg.ImportPath()).Canonical().String()] = pkg.importPath
+
 	for _, importedModpkg := range modpkg.Imports() {
 		if isUnhandledPackage(importedModpkg) {
 			continue
@@ -249,6 +253,8 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		if importedPkg, found := w.findPackage(modRootURI, ip); found {
 			importedPkg.EnsureImportedBy(pkg)
 			pkg.imports = append(pkg.imports, importedPkg)
+			importCanonicalisation[importedModpkg.ImportPath()] = importedPkg.importPath
+			importCanonicalisation[ast.ParseImportPath(importedModpkg.ImportPath()).Canonical().String()] = importedPkg.importPath
 		}
 	}
 
@@ -284,10 +290,21 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		return nil
 	}
 
+	pkgImporters := func() []*definitions.Definitions {
+		if len(pkg.importedBy) == 0 {
+			return nil
+		}
+		dfns := make([]*definitions.Definitions, len(pkg.importedBy))
+		for i, pkg := range pkg.importedBy {
+			dfns[i] = pkg.definitions
+		}
+		return dfns
+	}
+
 	// definitions.Analyse does almost no work - calculation of
 	// resolutions is done lazily. So no need to launch go-routines
 	// here.
-	pkg.definitions = definitions.Analyse(ast.ImportPath{}, nil, forPackage, nil, astFiles...)
+	pkg.definitions = definitions.Analyse(pkg.importPath, importCanonicalisation, forPackage, pkgImporters, astFiles...)
 
 	return nil
 }

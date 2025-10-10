@@ -15,8 +15,8 @@
 package jsonschema
 
 import (
-	"encoding/json"
 	"fmt"
+	"maps"
 	"reflect"
 	"slices"
 	"strings"
@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 )
 
 // GenerateConfig configures JSON Schema generation from CUE values.
@@ -60,6 +61,9 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	if cfg.Version == VersionUnknown {
 		cfg.Version = VersionDraft2020_12
 	}
+	if cfg.Version != VersionDraft2020_12 {
+		return nil, fmt.Errorf("only version %v is supported for generating JSON Schema for now", VersionDraft2020_12)
+	}
 
 	g := &generator{
 		cfg:  cfg,
@@ -68,29 +72,45 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	item := g.makeItem(v)
 	item = mergeAllOf(item)
 	item = enumFromConst(item)
-	m := item.generate(g)
+	expr := item.generate(g)
+
+	// Check if the result is a boolean literal
+	if lit, ok := expr.(*ast.BasicLit); ok && (lit.Kind == token.TRUE || lit.Kind == token.FALSE) {
+		if lit.Kind == token.FALSE {
+			// There should already be an error; if not, create one
+			if g.err == nil {
+				g.addError(v, fmt.Errorf("schema cannot be satisfied"))
+			}
+			return nil, g.err
+		}
+		// true means empty struct
+		expr = &ast.StructLit{}
+	}
+
+	// The result should be a struct literal
+	st, ok := expr.(*ast.StructLit)
+	if !ok {
+		return nil, fmt.Errorf("expected struct literal from generate, got %T", expr)
+	}
 
 	// Add schema version metadata and definitions.
-	m["$schema"] = VersionDraft2020_12.String()
+	fields := []ast.Decl{makeField("$schema", ast.NewString(cfg.Version.String()))}
 	if len(g.defs) != 0 {
-		defs := make(map[string]any)
-		for name, def := range g.defs {
-			defs[name] = def.generate(g)
+		defFields := make([]ast.Decl, 0, len(g.defs))
+		for _, name := range slices.Sorted(maps.Keys(g.defs)) {
+			defFields = append(defFields, &ast.Field{
+				Label: ast.NewStringLabel(name),
+				Value: g.defs[name].generate(g),
+			})
 		}
-		m["$defs"] = defs
+		fields = append(fields, makeField("$defs", &ast.StructLit{Elts: defFields}))
 	}
+	fields = append(fields, st.Elts...)
+
 	if g.err != nil {
 		return nil, g.err
 	}
-	// TODO it would be nice if we could encode the resulting map
-	// elements in some kind of logical order rather than purely
-	// lexical, such as $schema at the start, "type" before "properties"
-	// etc.
-	finalv := v.Context().Encode(m)
-	if err := finalv.Err(); err != nil {
-		return nil, err
-	}
-	return finalv.Syntax().(ast.Expr), nil
+	return makeSchemaStructLit(fields...), nil
 }
 
 // mergeAllOf returns the item with adjacent itemAllOf nodes
@@ -142,7 +162,7 @@ func enumFromConst(it item) item {
 		// TODO this doesn't cover cases where there are some
 		// const values and some noncrete values.
 		it1 := &itemEnum{
-			values: make([]json.RawMessage, 0, len(it.elems)),
+			values: make([]ast.Expr, 0, len(it.elems)),
 		}
 		for _, e := range it.elems {
 			it1.values = append(it1.values, e.(*itemConst).value)
@@ -230,14 +250,19 @@ func (g *generator) makeItem(v cue.Value) item {
 			// Binary operations can't be expressed in JSON Schema.
 			break
 		}
-		data, err := args[0].MarshalJSON()
-		if err != nil {
+		if !args[0].IsConcrete() {
 			// If it's not concrete, we can't represent it in JSON Schema
 			// so accept anything.
 			return &itemTrue{}
 		}
+		syntax := args[0].Syntax()
+		expr, ok := syntax.(ast.Expr)
+		if !ok {
+			g.addError(args[0], fmt.Errorf("expected expression from Syntax, got %T", syntax))
+			return &itemFalse{}
+		}
 		it := &itemConst{
-			value: data,
+			value: expr,
 		}
 		if op == cue.EqualOp {
 			return it
@@ -284,14 +309,14 @@ func (g *generator) makeItem(v cue.Value) item {
 		return g.makeCallItem(v, args)
 	}
 	if isConcreteScalar(v) {
-		data, err := v.MarshalJSON()
-		if err != nil {
-			// Shouldn't happen.
-			g.addError(v, err)
+		syntax := v.Syntax()
+		expr, ok := syntax.(ast.Expr)
+		if !ok {
+			g.addError(v, fmt.Errorf("expected expression from Syntax, got %T", syntax))
 			return &itemFalse{}
 		}
 		return &itemConst{
-			value: data,
+			value: expr,
 		}
 	}
 	kind := v.IncompleteKind()

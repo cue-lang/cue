@@ -262,15 +262,13 @@ func (e *exporter) bool(n *adt.Bool) (b *ast.BasicLit) {
 	return ast.NewBool(n.B)
 }
 
-func extractBasic(a []adt.Conjunct) (lit *ast.BasicLit) {
-	adt.VisitConjuncts(a, func(c adt.Conjunct) bool {
+func extractBasic(a []adt.Conjunct) *ast.BasicLit {
+	for c := range adt.ConjunctsSeq(a) {
 		if b, ok := c.Source().(*ast.BasicLit); ok {
-			lit = &ast.BasicLit{Kind: b.Kind, Value: b.Value}
-			return false
+			return &ast.BasicLit{Kind: b.Kind, Value: b.Value}
 		}
-		return true
-	})
-	return lit
+	}
+	return nil
 }
 
 func (e *exporter) num(n *adt.Num, orig []adt.Conjunct) *ast.BasicLit {

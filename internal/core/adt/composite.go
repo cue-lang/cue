@@ -563,23 +563,29 @@ func (v *Vertex) setParentDone() {
 
 // VisitLeafConjuncts visits all conjuncts that are leafs of the ConjunctGroup tree.
 func (v *Vertex) VisitLeafConjuncts(f func(Conjunct) bool) {
-	VisitConjuncts(v.Conjuncts, f)
+	iterConjuncts(v.Conjuncts, f)
 }
 
-func VisitConjuncts(a []Conjunct, f func(Conjunct) bool) bool {
+func iterConjuncts(a []Conjunct, yield func(Conjunct) bool) bool {
 	for _, c := range a {
 		switch x := c.x.(type) {
 		case *ConjunctGroup:
-			if !VisitConjuncts(*x, f) {
+			if !iterConjuncts(*x, yield) {
 				return false
 			}
 		default:
-			if !f(c) {
+			if !yield(c) {
 				return false
 			}
 		}
 	}
 	return true
+}
+
+func ConjunctsSeq(a []Conjunct) iter.Seq[Conjunct] {
+	return func(yield func(Conjunct) bool) {
+		_ = iterConjuncts(a, yield)
+	}
 }
 
 // VisitAllConjuncts visits all conjuncts of v, including ConjunctGroups.

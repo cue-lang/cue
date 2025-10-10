@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0a927ad7_94a872e4",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-10-10T07:58:25Z",
+      "side": 1,
+      "message": "Whilst I think there\u0027s a nuance present (can per-file experiments have a `default` state; and if so, how can they be disabled?) I agree the verb needs to be generic.\n\nHow about\n\n```suggestion\nThe availability of per-file experiments tracks the language version declared in their module,\n```",
+      "parentUuid": "63ace253_58e9e21a",
+      "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "edd22270_6cd870ba",
         "filename": "cmd/cue/cmd/experiments_help_gen.go",
         "patchSetId": 2
@@ -49,6 +67,24 @@
       "writtenOn": "2025-10-09T07:04:04Z",
       "side": 1,
       "message": "Ditto.\n\n```suggestion\nThe default activation of global experiments is controlled by the language version reported by \"cue version\".\n```",
+      "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c84ee374_e1871700",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-10-10T07:58:25Z",
+      "side": 1,
+      "message": "As above:\n\n```suggestion\nThe availability of global experiments tracks the language version reported by \"cue version\".\n```",
+      "parentUuid": "edd22270_6cd870ba",
       "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

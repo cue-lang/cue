@@ -474,33 +474,33 @@ null:   1
 	// Anchors and aliases.
 	{
 		"a: &x 1\nb: &y 2\nc: *x\nd: *y\n",
-		`#x: 1
-a:  #x
-#y: 2
-b:  #y
-c:  #x
-d:  #y`,
+		`let #x = 1
+a: #x
+let #y = 2
+b: #y
+c: #x
+d: #y`,
 	}, {
 		"a: &a {c: 1}\nb: *a",
-		`#a: {c: 1}
+		`let #a = {c: 1}
 a: #a
 b: #a`,
 	}, {
 		"a: &a [1, 2]\nb: *a",
-		"#a: [1, 2]\na: #a\nb: #a",
+		"let #a = [1, 2]\na: #a\nb: #a",
 	},
 	{
 		`a: &a "b"
 *a : "c"`,
-		`#a: "b"
-a:  #a
-b:  "c"`,
+		`let #a = "b"
+a: #a
+b: "c"`,
 	},
 	{
 		`- 3
 - &a 4
 - *a`,
-		`#a: 4, [
+		`let #a = 4, [
 	3,
 	#a,
 	#a,
@@ -514,10 +514,10 @@ b:  "c"`,
 a: *a
 b: *b
 `,
-		`#b: {
+		`let #b = {
 	baz: 1
 }
-#a: {
+let #a = {
 	bar: #b
 }
 foo: #a
@@ -527,11 +527,11 @@ b:   #b`,
 	{
 		`a:
   - &b c`,
-		`#b: "c"
+		`let #b = "c"
 a: [#b]`,
 	},
 	// Recursive anchor - make sure we don't infinitely recurse on such input.
-	{"a: &a\n  b: *a\n", `#a: {
+	{"a: &a\n  b: *a\n", `let #a = {
 	b: #a
 }
 a: #a`},
@@ -819,12 +819,12 @@ a:
 	// yaml-test-suite 3GZX: Spec Example 7.1. Alias Nodes
 	{
 		"First occurrence: &anchor Foo\nSecond occurrence: *anchor\nOverride anchor: &anchor Bar\nReuse anchor: *anchor\n",
-		`#anchor:             "Foo"
+		`let #anchor = "Foo"
 "First occurrence":  #anchor
 "Second occurrence": #anchor
-#anchor_2:           "Bar"
-"Override anchor":   #anchor_2
-"Reuse anchor":      #anchor_2`,
+let #anchor_2 = "Bar"
+"Override anchor": #anchor_2
+"Reuse anchor":    #anchor_2`,
 	},
 }
 

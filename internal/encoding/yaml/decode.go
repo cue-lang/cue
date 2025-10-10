@@ -64,9 +64,9 @@ type decoder struct {
 	// forceNewline ensures that the next position will be on a new line.
 	forceNewline bool
 
-	// anchorFields contains the anchors that are gathered as we walk the YAML nodes.
-	// these are only added to the AST when we're done processing the whole document.
-	anchorFields []ast.Field
+	// anchorLetClauses contains the anchors that are gathered as we walk the YAML nodes.
+	// these are only added to the AST at the top level of the document.
+	anchorLetClauses []ast.LetClause
 	// anchorNames map anchor nodes to their names.
 	anchorNames map[*yaml.Node]string
 	// anchorTakenNames keeps track of anchor names that have been taken.
@@ -358,8 +358,8 @@ func (d *decoder) document(yn *yaml.Node) (ast.Expr, error) {
 func (d *decoder) addAnchorNodes(expr ast.Expr) (ast.Expr, error) {
 	elements := []ast.Decl{}
 
-	for _, field := range d.anchorFields {
-		elements = append(elements, &field)
+	for _, clause := range d.anchorLetClauses {
+		elements = append(elements, &clause)
 	}
 
 	switch x := expr.(type) {
@@ -373,7 +373,7 @@ func (d *decoder) addAnchorNodes(expr ast.Expr) (ast.Expr, error) {
 		}
 	default:
 		// If the whole YAML document is not a map / seq, then it can't have anchors.
-		// maybe assert that `anchorFields` is empty?
+		// maybe assert that `anchorLetClauses` is empty?
 		break
 	}
 
@@ -474,10 +474,10 @@ outer:
 		field.Value = value
 
 		if isTopLevel {
-			for _, field := range d.anchorFields {
+			for _, field := range d.anchorLetClauses {
 				m.Elts = append(m.Elts, &field)
 			}
-			d.anchorFields = nil
+			d.anchorLetClauses = nil
 		}
 
 		m.Elts = append(m.Elts, field)
@@ -708,7 +708,14 @@ func (d *decoder) inlineAlias(yn *yaml.Node) (ast.Expr, error) {
 }
 
 // referenceAlias replaces an alias with a reference to the identifier of its anchor.
+// If the anchor name is not a valid identifier, it inlines it instead.
 func (d *decoder) referenceAlias(yn *yaml.Node) (ast.Expr, error) {
+	// If the anchor name is an invalid identifier, then we never processed it in the first place.
+	// Just inline it.
+	if !ast.IsValidIdent(yn.Alias.Anchor) {
+		return d.inlineAlias(yn)
+	}
+
 	anchor, ok := d.anchorNames[yn.Alias]
 	if !ok {
 		return nil, d.posErrorf(yn, "anchor %q not found", yn.Alias.Anchor)
@@ -722,6 +729,11 @@ func (d *decoder) referenceAlias(yn *yaml.Node) (ast.Expr, error) {
 
 func (d *decoder) anchor(yn *yaml.Node, isTopLevel bool) (ast.Expr, error) {
 	var anchorIdent string
+
+	if !ast.IsValidIdent(yn.Anchor) {
+		fmt.Println("warning: YAML anchor", yn.Anchor, "is not a valid CUE identifier; inlining")
+		return d.extractNoAnchor(yn, isTopLevel)
+	}
 
 	// Pick a non-conflicting anchor name.
 	for i := 1; ; i++ {
@@ -744,9 +756,10 @@ func (d *decoder) anchor(yn *yaml.Node, isTopLevel bool) (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	d.anchorFields = append(d.anchorFields, ast.Field{
-		Label: &ast.Ident{Name: anchorIdent},
-		Value: expr,
+
+	d.anchorLetClauses = append(d.anchorLetClauses, ast.LetClause{
+		Ident: &ast.Ident{Name: anchorIdent},
+		Expr:  expr,
 	})
 
 	return &ast.Ident{

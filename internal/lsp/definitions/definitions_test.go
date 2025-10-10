@@ -31,6 +31,84 @@ import (
 	"github.com/rogpeppe/go-internal/txtar"
 )
 
+func TestXXX(t *testing.T) {
+	str := `
+_x: y: {m: {z: zz: zzz: 3, g: z, h: g}.h, n: _}.n
+a: b: c: _x.y.zz
+`[1:]
+
+	pos := ln(1, 1, "zz")
+
+	str = `
+a: b: {
+	c: d: {
+		g: h: 3
+		i: g
+		j: i
+	}.j
+	e: c
+	f: e
+}.f & {}
+k: l: a.b.d.h
+
+m: n: o: 33
+`[1:]
+
+	pos = ln(3, 1, "h")
+
+	str = `
+a: {
+//	for x in {}
+   let b = 7 {
+	c: b
+}
+}
+`[1:]
+	pos = ln(3, 1, "b")
+
+	str = `
+a: { x: 1, y: 2, z: 3}
+b: { x: 4, y: 5, z: 6}
+o: {
+	for k, v in a {
+		(k): v * b[k]
+		p: v
+	}
+}
+q: o.p
+r: o.k
+`[1:]
+	pos = ln(4, 1, "v")
+
+	fileAst, _ := parser.ParseFile(t.Name(), str, parser.ParseComments)
+	fileAst.Pos().File().SetContent([]byte(str))
+	qt.Assert(t, qt.IsNotNil(fileAst))
+	dfns := definitions.Analyse(nil, fileAst)
+	fdfns := dfns.ForFile(t.Name())
+
+	filesByName := map[string]*ast.File{
+		t.Name(): fileAst,
+	}
+	pos.determineOffset(filesByName)
+
+	if false {
+		t.Log(pos.offset)
+		t.Log()
+		t.Log("-- 1 --")
+		t.Log(fdfns.UsagesForOffset(pos.offset))
+
+		t.Log()
+		t.Log("-- 2 --")
+		t.Log(fdfns.UsagesForOffset(pos.offset))
+
+		t.Log()
+		t.Log("-- 3 --")
+	}
+	for i, n := range fdfns.UsagesForOffset(pos.offset) {
+		t.Logf("%d %v %v", i, n, n.Pos().Position())
+	}
+}
+
 func TestDefinitions(t *testing.T) {
 	testCases{
 		{
@@ -921,18 +999,19 @@ x: c: x
 				ln(2, 1, "y"):      {f: []string{"c"}, e: []string{"x", "y"}},
 				ln(3, 1, "x"):      {f: []string{"x", "y"}},
 				ln(3, 1, "c"):      {f: []string{"c"}},
-				ln(3, 2, "x"):      {f: []string{"c"}, e: []string{"c", "x", "y"}},
+				ln(3, 2, "x"):      {e: []string{"c", "x", "y"}},
 			},
 		},
 
 		{
-			name: "Alias_Plain_Label_Internal",
+			name: "Alias_Plain_Label_Internal", // FIXME FOR USAGES
 			archive: `-- a.cue --
 l=a: {b: 3, c: l.b}`,
 			expectDefinitions: map[position][]position{
 				ln(1, 2, "l"): {ln(1, 1, "a")},
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
+				ln(1, 1, "l"): {ln(1, 1, "a")},
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
@@ -947,7 +1026,7 @@ l=a: {b: 3, c: l.b}`,
 		},
 
 		{
-			name: "Alias_Plain_Label_Internal_Implicit",
+			name: "Alias_Plain_Label_Internal_Implicit", // FIXME FOR USAGES
 			archive: `-- a.cue --
 l=a: b: 3
 a: c: l.b`,
@@ -955,6 +1034,7 @@ a: c: l.b`,
 				ln(2, 1, "l"): {ln(1, 1, "a"), ln(2, 1, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
 
+				ln(1, 1, "l"): {ln(1, 1, "a"), ln(2, 1, "a")},
 				ln(1, 1, "a"): {self, ln(2, 1, "a")},
 				ln(1, 1, "b"): {self},
 
@@ -972,7 +1052,7 @@ a: c: l.b`,
 		},
 
 		{
-			name: "Alias_Plain_Label_Internal_Implicit_Reversed",
+			name: "Alias_Plain_Label_Internal_Implicit_Reversed", // FIXME FOR USAGES
 			archive: `-- a.cue --
 a: b: 3
 l=a: c: l.b`,
@@ -983,6 +1063,7 @@ l=a: c: l.b`,
 				ln(1, 1, "a"): {self, ln(2, 1, "a")},
 				ln(1, 1, "b"): {self},
 
+				ln(2, 1, "l"): {ln(2, 1, "a"), ln(1, 1, "a")},
 				ln(2, 1, "a"): {self, ln(1, 1, "a")},
 				ln(2, 1, "c"): {self},
 			},
@@ -997,7 +1078,7 @@ l=a: c: l.b`,
 		},
 
 		{
-			name: "Alias_Plain_Label_External",
+			name: "Alias_Plain_Label_External", // FIXME FOR USAGES
 			archive: `-- a.cue --
 l=a: b: 3
 c: l.b`,
@@ -1005,6 +1086,7 @@ c: l.b`,
 				ln(2, 1, "l"): {ln(1, 1, "a")},
 				ln(2, 1, "b"): {ln(1, 1, "b")},
 
+				ln(1, 1, "l"): {ln(1, 1, "a")},
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "b"): {self},
 
@@ -1020,7 +1102,7 @@ c: l.b`,
 		},
 
 		{
-			name: "Alias_Plain_Label_Scoping",
+			name: "Alias_Plain_Label_Scoping", // FIXME FOR USAGES
 			archive: `-- a.cue --
 a: {
 	l=b: {c: l.d, d: 3}
@@ -1040,6 +1122,7 @@ h: a.l
 				ln(6, 1, "l"): {},
 				ln(1, 1, "a"): {self, ln(5, 1, "a")},
 
+				ln(2, 1, "l"): {ln(2, 1, "b")},
 				ln(2, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 				ln(2, 2, "d"): {self},
@@ -1091,7 +1174,7 @@ l=(a): {b: 3, c: l.b}`,
 		},
 
 		{
-			name: "Alias_Dynamic_Label_Internal_Implicit",
+			name: "Alias_Dynamic_Label_Internal_Implicit", // FIXME FOR USAGES HERE
 			archive: `-- a.cue --
 l=(a): b: 3
 (a): c: l.b`,
@@ -1259,6 +1342,7 @@ c: l.b`,
 				ln(1, 3, "l"): {ln(1, 1, "l")},
 				ln(1, 2, "b"): {},
 
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 				ln(1, 1, "d"): {self},
@@ -1286,10 +1370,12 @@ c: l.b`,
 			expectDefinitions: map[position][]position{
 				ln(2, 1, "l"): {},
 
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(1, 1, "a"): {e: []string{"l"}},
 				ln(1, 1, "b"): {f: []string{"b"}},
 				ln(2, 1, "c"): {f: []string{"c"}},
 				ln(2, 1, "l"): {e: []string{"c"}},
@@ -1306,10 +1392,12 @@ c: l`,
 			expectDefinitions: map[position][]position{
 				ln(2, 1, "l"): {},
 
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(1, 1, "a"): {e: []string{"c", "l"}},
 				ln(1, 1, "b"): {f: []string{"b"}},
 				ln(2, 1, "c"): {f: []string{"c"}},
 				ln(2, 1, "l"): {e: []string{"c"}},
@@ -1325,6 +1413,7 @@ a: l={b: 3, c: l.b}`,
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
@@ -1346,6 +1435,7 @@ a: l={b: 3} & {c: l.b}`,
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
@@ -1369,6 +1459,7 @@ a: l=({b: 3} & {c: l.b})`,
 				ln(1, 2, "b"): {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
@@ -1392,6 +1483,7 @@ c: l.b`,
 				ln(2, 1, "b"): {},
 
 				ln(1, 1, "a"): {self},
+				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 
 				ln(2, 1, "c"): {self},
@@ -1413,6 +1505,7 @@ a: n=(2 * (div(n, 2))) | error("\(n) is not even")
 				ln(1, 2, "n"): {ln(1, 1, "n")},
 				ln(1, 3, "n"): {ln(1, 1, "n")},
 
+				ln(1, 1, "n"): {self},
 				ln(1, 1, "a"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
@@ -1833,6 +1926,7 @@ y: "wand"
 				ln(3, 1, "Merlin"): {},
 				ln(3, 1, "y"):      {ln(4, 1, "y")},
 
+				//				ln(1, 1, `"magic"`): {self},
 				ln(3, 1, "x"): {self},
 				ln(4, 1, "y"): {self},
 			},
@@ -1854,7 +1948,9 @@ x: wand.foo
 			expectDefinitions: map[position][]position{
 				ln(3, 1, "wand"): {ln(1, 1, "wand")},
 				ln(3, 1, "foo"):  {},
-				ln(3, 1, "x"):    {self},
+
+				//				ln(1, 1, `wand "magic"`): {self},
+				ln(3, 1, "x"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
 				ln(3, 1, "x"):    {f: []string{"x"}},
@@ -2027,6 +2123,7 @@ y: x.c`,
 
 				ln(1, 1, "a"): {self},
 				ln(2, 1, "b"): {self},
+				ln(3, 1, "l"): {ln(3, 1, "x")},
 				ln(3, 1, "x"): {self},
 				ln(5, 1, "c"): {self},
 				ln(7, 1, "z"): {self},
@@ -2065,6 +2162,7 @@ y: x.c
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 
+				ln(2, 1, "x"): {self},
 				ln(3, 1, "y"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
@@ -2096,6 +2194,7 @@ o: a.b
 				ln(6, 1, "b"): {},
 
 				ln(1, 1, "a"): {self, ln(5, 1, "a")},
+				ln(2, 1, "b"): {self},
 				ln(3, 1, "c"): {self},
 
 				ln(5, 1, "a"): {self, ln(1, 1, "a")},
@@ -2154,7 +2253,11 @@ r: o.k
 				ln(2, 1, "y"): {self},
 				ln(2, 1, "z"): {self},
 
-				ln(3, 1, "o"):  {self},
+				ln(3, 1, "o"): {self},
+
+				ln(4, 1, "k"): {self},
+				ln(4, 1, "v"): {self},
+
 				ln(6, 1, "p"):  {self},
 				ln(9, 1, "q"):  {self},
 				ln(10, 1, "r"): {self},
@@ -2194,6 +2297,9 @@ foo: bar: "baz"`,
 				ln(1, 1, "foo"): {ln(2, 1, "foo")},
 				ln(1, 1, "bar"): {ln(2, 1, "bar")},
 
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+
 				ln(2, 1, "foo"): {self},
 				ln(2, 1, "bar"): {self},
 			},
@@ -2218,7 +2324,11 @@ k: {}
 				ln(2, 3, "k"): {ln(2, 1, "k")},
 
 				ln(1, 1, "x"): {self},
+
+				ln(2, 1, "k"): {self},
+				ln(2, 1, "v"): {self},
 				ln(2, 2, "v"): {self},
+
 				ln(4, 1, "k"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
@@ -2245,8 +2355,13 @@ i: g[0].h`,
 				ln(4, 1, "x"): {ln(3, 1, "x")},
 				ln(6, 1, "g"): {ln(1, 1, "g")},
 
-				ln(1, 1, "g"):   {self},
-				ln(4, 1, "h"):   {self},
+				ln(1, 1, "g"): {self},
+				ln(1, 1, "x"): {self},
+
+				ln(2, 1, "x"): {self},
+				ln(3, 1, "x"): {self},
+				ln(4, 1, "h"): {self},
+
 				ln(6, 1, "i"):   {self},
 				ln(6, 1, "[0]"): {ln(1, 1, "for")},
 				ln(6, 1, "h"):   {ln(4, 1, "h")},
@@ -2462,8 +2577,10 @@ s: a
 				fln("b.cue", 3, 1, "a"): {},
 				fln("c.cue", 4, 1, "a"): {fln("c.cue", 3, 1, "a")},
 
+				fln("a.cue", 3, 1, "a"): {self},
 				fln("a.cue", 4, 1, "q"): {self},
 				fln("b.cue", 3, 1, "r"): {self},
+				fln("c.cue", 3, 1, "a"): {self},
 				fln("c.cue", 4, 1, "s"): {self},
 			},
 			expectCompletions: map[position]fieldEmbedCompletions{
@@ -2558,6 +2675,7 @@ a: {
 				fln("d.cue", 5, 1, "X"): {fln("d.cue", 4, 1, "f")},
 
 				fln("a.cue", 3, 1, "a"): {self, fln("b.cue", 3, 1, "a"), fln("c.cue", 3, 1, "a"), fln("d.cue", 3, 1, "a")},
+				fln("a.cue", 4, 1, "X"): {fln("a.cue", 4, 1, "b"), fln("b.cue", 4, 1, "b")},
 				fln("a.cue", 4, 1, "b"): {self, fln("b.cue", 4, 1, "b")},
 				fln("a.cue", 4, 1, "c"): {self, fln("b.cue", 4, 1, "c")},
 				fln("a.cue", 5, 1, "d"): {self},
@@ -2570,6 +2688,7 @@ a: {
 				fln("c.cue", 4, 1, "e"): {self},
 
 				fln("d.cue", 3, 1, "a"): {self, fln("a.cue", 3, 1, "a"), fln("b.cue", 3, 1, "a"), fln("c.cue", 3, 1, "a")},
+				fln("d.cue", 4, 1, "X"): {fln("d.cue", 4, 1, "f")},
 				fln("d.cue", 4, 1, "f"): {self},
 				fln("d.cue", 4, 1, "c"): {self},
 				fln("d.cue", 5, 1, "g"): {self},
@@ -2806,9 +2925,9 @@ e: self
 				ln(7, 1, ".d"):    {e: []string{"c", "d"}},
 				ln(8, 1, "d"):     {f: []string{"c", "d"}},
 				ln(10, 1, "d"):    {f: []string{"b", "d"}},
-				ln(10, 1, "self"): {f: []string{"b", "d"}, e: []string{"a", "b", "d", "e", "x"}},
+				ln(10, 1, "self"): {f: []string{"b"}, e: []string{"a", "b", "d", "e", "x"}},
 				ln(12, 1, "e"):    {f: []string{"a", "e", "x"}},
-				ln(12, 1, "self"): {f: []string{"a", "e", "x"}, e: []string{"a", "e", "x"}},
+				ln(12, 1, "self"): {f: []string{"a", "x"}, e: []string{"a", "e", "x"}},
 			},
 		},
 
@@ -2828,6 +2947,7 @@ g: h: X.f[0]
 				ln(4, 1, "[0]"):  {ln(2, 1, "1")},
 
 				ln(2, 1, "f"): {self},
+				ln(3, 1, "X"): {self},
 				ln(4, 1, "g"): {self},
 				ln(4, 1, "h"): {self},
 			},
@@ -2922,22 +3042,28 @@ func (tcs testCases) run(t *testing.T) {
 				expectCompletions[from] = completions
 			}
 
-			dfnsByFilename := make(map[string]*definitions.FileDefinitions)
-			dfnsByPkgName := make(map[string]*definitions.Definitions)
-			forPackage := func(importPath string) *definitions.Definitions {
-				return dfnsByPkgName[importPath]
-			}
-
-			for pkgName, files := range filesByPkg {
-				dfns := definitions.Analyse(forPackage, files...)
-				dfnsByPkgName[pkgName] = dfns
-				for _, fileAst := range files {
-					dfnsByFilename[fileAst.Filename] = dfns.ForFile(fileAst.Filename)
+			analyse := func() map[string]*definitions.FileDefinitions {
+				dfnsByFilename := make(map[string]*definitions.FileDefinitions)
+				dfnsByPkgName := make(map[string]*definitions.Definitions)
+				forPackage := func(importPath string) *definitions.Definitions {
+					return dfnsByPkgName[importPath]
 				}
+
+				for pkgName, files := range filesByPkg {
+					dfns := definitions.Analyse(forPackage, files...)
+					dfnsByPkgName[pkgName] = dfns
+					for _, fileAst := range files {
+						dfnsByFilename[fileAst.Filename] = dfns.ForFile(fileAst.Filename)
+					}
+				}
+				return dfnsByFilename
 			}
 
-			tc.testDefinitions(t, files, dfnsByFilename)
-			tc.testCompletions(t, files, dfnsByFilename)
+			// The subtests need fresh [*definitions.FileDefinitions]
+			// because each subtest causes mutations.
+			tc.testDefinitions(t, files, analyse())
+			tc.testCompletions(t, files, analyse())
+			tc.testUsages(t, files, analyse())
 		})
 	}
 }
@@ -2991,6 +3117,48 @@ func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, dfnsByFilen
 					fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
 				}
 				qt.Check(t, qt.DeepEquals(fileOffsetsGot, []fileOffset{}), qt.Commentf("file: %q, offset: %d", filename, i))
+			}
+		}
+	})
+}
+
+func (tc *testCase) testUsages(t *testing.T, files []*ast.File, dfnsByFilename map[string]*definitions.FileDefinitions) {
+	t.Run("usages", func(t *testing.T) {
+		expectUsages := make(map[position][]position)
+		for dfn, uses := range tc.expectDefinitions {
+			if slices.Contains(uses, self) || dfn.str[0] == '[' { // skip dynamic indexing for usages
+				continue
+			}
+			for _, use := range uses {
+				if use == self {
+					use = dfn
+				}
+				expectUsages[use] = append(expectUsages[use], dfn)
+			}
+		}
+
+		for posUse, positionsWant := range expectUsages {
+			filename := posUse.filename
+			fdfns := dfnsByFilename[filename]
+			qt.Check(t, qt.IsNotNil(fdfns))
+
+			offset := posUse.offset
+
+			for i := range len(posUse.str) {
+				// Test every offset within the "use" token
+				offset := offset + i
+				nodesGot := fdfns.UsagesForOffset(offset)
+				fileOffsetsGot := make([]fileOffset, len(nodesGot))
+				for j, node := range nodesGot {
+					fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
+				}
+				fileOffsetsWant := make([]fileOffset, len(positionsWant))
+				for j, p := range positionsWant {
+					fileOffsetsWant[j] = p.fileOffset()
+				}
+				slices.SortFunc(fileOffsetsGot, cmpFileOffsets)
+				slices.SortFunc(fileOffsetsWant, cmpFileOffsets)
+				qt.Check(t, qt.DeepEquals(fileOffsetsGot, fileOffsetsWant), qt.Commentf("from %#v(+%d)", posUse, i))
 			}
 		}
 	})

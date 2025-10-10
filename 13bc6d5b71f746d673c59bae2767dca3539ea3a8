@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "769e1c32_1d03b650",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-10T13:56:49Z",
+      "side": 1,
+      "message": "SGTM in principle but below are some thoughts",
+      "revId": "13bc6d5b71f746d673c59bae2767dca3539ea3a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd6b66c7_c0898941",
+        "filename": "internal/encoding/encoder.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-10T13:56:49Z",
+      "side": 1,
+      "message": "if you always validate as I mention below, can you avoid this?",
+      "revId": "13bc6d5b71f746d673c59bae2767dca3539ea3a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0ba578a_977549eb",
+        "filename": "internal/encoding/encoder.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-10T13:56:49Z",
+      "side": 1,
+      "message": "this seems a bit unfortunate - we should always validate in some way, be it with `cue.Concrete(true)` or `cue.Concrete(false)`",
+      "revId": "13bc6d5b71f746d673c59bae2767dca3539ea3a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

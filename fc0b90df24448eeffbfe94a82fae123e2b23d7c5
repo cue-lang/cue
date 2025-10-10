@@ -16,6 +16,24 @@
       "message": "I don\u0027t know why this error becomes worse, but that seems like an orthogonal issue to investigate separately.",
       "revId": "fc0b90df24448eeffbfe94a82fae123e2b23d7c5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8eb20d0_4c4af0b4",
+        "filename": "cmd/cue/cmd/testdata/script/eval_notexistfatal.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-10T13:43:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98485d05_608da83a",
+      "revId": "fc0b90df24448eeffbfe94a82fae123e2b23d7c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

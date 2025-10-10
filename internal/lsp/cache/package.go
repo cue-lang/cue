@@ -75,6 +75,8 @@ type Package struct {
 	// package.
 	importedBy []*Package
 
+	imports []*Package
+
 	// isDirty means that the package needs reloading.
 	isDirty bool
 
@@ -140,9 +142,19 @@ func (pkg *Package) markDirty() {
 	}
 
 	pkg.isDirty = true
-	for _, importer := range pkg.importedBy {
-		importer.markDirty()
+	for _, pkg := range pkg.importedBy {
+		pkg.resetDefinitions()
 	}
+	for _, pkg := range pkg.imports {
+		pkg.resetDefinitions()
+	}
+}
+
+func (pkg *Package) resetDefinitions() {
+	if pkg.isDirty || pkg.definitions == nil {
+		return
+	}
+	pkg.definitions.Reset()
 }
 
 // delete removes this package from its module.
@@ -213,7 +225,12 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 				importedPkg.RemoveImportedBy(pkg)
 			}
 		}
+		clear(pkg.imports)
 	}
+
+	importCanonicalisation := make(map[string]ast.ImportPath)
+	importCanonicalisation[modpkg.ImportPath()] = pkg.importPath
+	importCanonicalisation[ast.ParseImportPath(modpkg.ImportPath()).Canonical().String()] = pkg.importPath
 
 	for _, importedModpkg := range modpkg.Imports() {
 		if isUnhandledPackage(importedModpkg) {
@@ -223,6 +240,9 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		modRootURI := moduleRootURI(importedModpkg)
 		if importedPkg, found := w.findPackage(modRootURI, ip); found {
 			importedPkg.EnsureImportedBy(pkg)
+			pkg.imports = append(pkg.imports, pkg)
+			importCanonicalisation[importedModpkg.ImportPath()] = importedPkg.importPath
+			importCanonicalisation[ast.ParseImportPath(importedModpkg.ImportPath()).Canonical().String()] = importedPkg.importPath
 		}
 	}
 
@@ -257,10 +277,22 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		}
 		return nil
 	}
+
+	pkgImporters := func() []*definitions.Definitions {
+		if len(pkg.importedBy) == 0 {
+			return nil
+		}
+		dfns := make([]*definitions.Definitions, len(pkg.importedBy))
+		for i, pkg := range pkg.importedBy {
+			dfns[i] = pkg.definitions
+		}
+		return dfns
+	}
+
 	// definitions.Analyse does almost no work - calculation of
 	// resolutions is done lazily. So no need to launch go-routines
 	// here.
-	pkg.definitions = definitions.Analyse(forPackage, astFiles...)
+	pkg.definitions = definitions.Analyse(pkg.importPath, importCanonicalisation, forPackage, pkgImporters, astFiles...)
 
 	return nil
 }

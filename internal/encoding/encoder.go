@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/encoding/protobuf/textproto"
@@ -87,18 +88,21 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 			}
 			return openapi.Generate(v, cfg)
 		}
+	case build.JSONSchema:
+		// TODO: get encoding options
+		cfg := &jsonschema.GenerateConfig{}
+		e.interpret = func(v cue.Value) (*ast.File, error) {
+			expr, err := jsonschema.Generate(v, cfg)
+			if err != nil {
+				return nil, err
+			}
+			return internal.ToFile(expr), nil
+		}
 	case build.ProtobufJSON:
 		e.interpret = func(v cue.Value) (*ast.File, error) {
 			f := internal.ToFile(v.Syntax())
 			return f, jsonpb.NewEncoder(v).RewriteFile(f)
 		}
-
-	// case build.JSONSchema:
-	// 	// TODO: get encoding options
-	// 	cfg := openapi.Config{}
-	// 	i.interpret = func(inst *cue.Instance) (*ast.File, error) {
-	// 		return jsonschmea.Generate(inst, cfg)
-	// 	}
 	default:
 		return nil, fmt.Errorf("unsupported interpretation %q", f.Interpretation)
 	}

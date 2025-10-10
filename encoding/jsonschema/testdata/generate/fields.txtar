@@ -9,6 +9,7 @@ t6: {x?: 4, y: 1}	// fully concrete struct -> optional
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
 	properties: {
 		t1: {
 			type: "integer"
@@ -23,15 +24,16 @@ t6: {x?: 4, y: 1}	// fully concrete struct -> optional
 			const: true
 		}
 		t5: {
+			type: "object"
 			properties: {
 				x: {
 					type: "integer"
 				}
 			}
 			required: ["x"]
-			type: "object"
 		}
 		t6: {
+			type: "object"
 			properties: {
 				x: {
 					const: 4
@@ -40,9 +42,7 @@ t6: {x?: 4, y: 1}	// fully concrete struct -> optional
 					const: 1
 				}
 			}
-			type: "object"
 		}
 	}
 	required: ["t2", "t3", "t5"]
-	type: "object"
 }

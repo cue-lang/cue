@@ -12,15 +12,15 @@ cmp stdout golden_cue.output
 t1?: int
 -- golden_cue.output --
 $schema: "https://json-schema.org/draft/2020-12/schema"
+type:    "object"
 properties: t1: type: "integer"
-type: "object"
 -- golden_json.output --
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
     "properties": {
         "t1": {
             "type": "integer"
         }
-    },
-    "type": "object"
+    }
 }

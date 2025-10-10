@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -329,6 +330,42 @@ func (m *Module) activeFilesAndDirs(files map[protocol.DocumentURI][]packageOrMo
 	dirs[m.rootURI] = struct{}{}
 	for _, pkg := range m.packages {
 		pkg.activeFilesAndDirs(files, dirs)
+	}
+}
+
+// loadAllPackages looks for all regular cue files within the module's
+// root directory and if they're not already loaded, it attempts to
+// load them. Note that it ignores files with no package declaration;
+// it does not (currently) treat load them as standalone files.
+func (m *Module) loadAllPackages() {
+	files, _ := m.workspace.activeFilesAndDirs()
+
+	var toLoad []protocol.DocumentURI
+	rootPath := m.rootURI.Path()
+	fsys := m.workspace.overlayFS.IoFS(rootPath)
+	fs.WalkDir(fsys, ".", func(p string, d fs.DirEntry, err error) error {
+		if err == nil && d.Type().IsRegular() && strings.HasSuffix(p, ".cue") {
+			p = filepath.Join(rootPath, filepath.FromSlash(p))
+			uri := protocol.URIFromPath(p)
+			if _, found := files[uri]; !found {
+				toLoad = append(toLoad, uri)
+			}
+		}
+		return nil
+	})
+
+	for _, uri := range toLoad {
+		ip, dirUris, err := m.FindImportPathForFile(uri)
+		if err != nil || ip == nil || len(dirUris) == 0 {
+			continue
+		}
+		pkg := m.EnsurePackage(*ip, dirUris)
+		pkg.markFileDirty(uri)
+		if len(dirUris) == 1 { // i.e. the new module system is in use
+			for _, pkg := range m.DescendantPackages(pkg.importPath) {
+				pkg.markFileDirty(uri)
+			}
+		}
 	}
 }
 

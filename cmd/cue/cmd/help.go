@@ -164,6 +164,10 @@ to a registry location by consulting cue.mod/module.cue and the
 registry configuration (see "cue help modules" and "cue help
 registryconfig" for more details).
 
+A package is loaded as a package instance: the unification of all CUE
+files with the same package name found in the package's directory and
+every ancestor directory leading up to the module root.
+
 An import may contain a ":name" suffix to indicate a specific
 package to load within a given path. It is necessary to specify this
 when there is more than one package at the path.

@@ -84,12 +84,12 @@ badScore2: {
 			type:      "string"
 		}
 		multiple: {
-			multipleOf: 5.0
+			multipleOf: 5
 			type:       "number"
 		}
 		score: {
 			allOf: [{
-				multipleOf: 1e+1
+				multipleOf: 10
 				type:       "number"
 			}, {
 				type: "integer"
@@ -127,7 +127,7 @@ badDateTime.data.dateTime: invalid value "2025-10-02T13" (does not satisfy time.
 badScore2.data.score: invalid value 5 (does not satisfy matchN): 1 matched, expected 2:
     1:262
     ./datatest/tests.cue:42:15
-badScore2.data.score: invalid value 5 (does not satisfy math.MultipleOf(1E+1)):
+badScore2.data.score: invalid value 5 (does not satisfy math.MultipleOf(10)):
     1:272
     1:262
     ./datatest/tests.cue:42:15
@@ -137,12 +137,12 @@ badTime.data.date: invalid value "25:00:10" (does not satisfy time.Format("2006-
     ./datatest/tests.cue:34:14
 -- out/generate-v3/badUserName --
 badUserName.data.userName: invalid value "x" (does not satisfy matchN): 1 matched, expected 2:
-    1:432
+    1:430
     ./datatest/tests.cue:38:18
 badUserName.data.userName: invalid value "x" (does not satisfy strings.MinRunes(3)):
-    1:475
-    1:432
-    1:475
+    1:473
+    1:430
+    1:473
     ./datatest/tests.cue:38:18
 -- out/generate-v3/notMultiple --
 notMultiple.data.multiple: invalid value 1 (does not satisfy math.MultipleOf(5)):
@@ -151,8 +151,8 @@ notMultiple.data.multiple: invalid value 1 (does not satisfy math.MultipleOf(5))
 -- out/generate-v3/ok --
 -- out/generate-v3/stringTooLong --
 stringTooLong.data.shortString: invalid value "01234567890" (does not satisfy strings.MaxRunes(10)):
-    1:343
-    1:343
+    1:341
+    1:341
     ./datatest/tests.cue:14:21
 -- out/generate-v3/stringTooShort --
 stringTooShort.data.longString: invalid value "x" (does not satisfy strings.MinRunes(5)):

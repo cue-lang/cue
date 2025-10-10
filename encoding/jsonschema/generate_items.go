@@ -15,22 +15,24 @@
 package jsonschema
 
 import (
-	"encoding/json"
 	"fmt"
-	"maps"
 	"slices"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
 )
 
 // TODO use a defined order when keywords are marshaled
 // so that we always put $schema at the start, for example.
 
 // item represents a JSON Schema constraint or structure that can be
-// converted to a map representation for serialization.
+// converted to an AST representation for serialization.
 type item interface {
-	// generate returns the JSON object representation of this item.
-	generate(g *generator) map[string]any
+	// generate returns the AST representation of this item.
+	// For JSON Schema keywords, this returns a struct literal with fields
+	// in lexical order.
+	generate(g *generator) ast.Expr
 
 	// apply invokes f on each sub-item, replacing each with the
 	// item returned, and returns the new item (or the same if nothing has changed).
@@ -41,8 +43,8 @@ type item interface {
 // itemTrue represents a schema that accepts any value (true schema)
 type itemTrue struct{}
 
-func (i *itemTrue) generate(g *generator) map[string]any {
-	return map[string]any{}
+func (i *itemTrue) generate(g *generator) ast.Expr {
+	return ast.NewBool(true)
 }
 
 func (i *itemTrue) apply(f func(item) item) item {
@@ -52,8 +54,8 @@ func (i *itemTrue) apply(f func(item) item) item {
 // itemFalse represents a schema that accepts no values (false schema)
 type itemFalse struct{}
 
-func (i *itemFalse) generate(g *generator) map[string]any {
-	return singleKeyword("not", map[string]any{})
+func (i *itemFalse) generate(g *generator) ast.Expr {
+	return ast.NewBool(false)
 }
 
 func (i *itemFalse) apply(f func(item) item) item {
@@ -69,41 +71,88 @@ func (i *itemAllOf) add(it item) {
 	i.elems = append(i.elems, it)
 }
 
-func (i *itemAllOf) generate(g *generator) map[string]any {
+func (i *itemAllOf) generate(g *generator) ast.Expr {
 	// Because a single json schema object is essentially an allOf itself,
 	// we can merge objects that don't share keywords
 	// but we also have to be careful not to merge keywords
 	// that interact with one another (for example `properties` and `patternProperties`).
-	var unmerged []map[string]any
-	final := make(map[string]any)
+	var unmerged []ast.Expr
+	var finalFields []ast.Decl
+	finalFieldNames := make(map[string]bool)
+
 	for _, e := range i.elems {
-		m := e.generate(g)
+		expr := e.generate(g)
+
+		// Handle true: it's the identity for allOf, so skip it
+		if isBoolLit(expr, true) {
+			continue
+		}
+
+		// Handle false: if any element is false, the whole allOf is false
+		if isBoolLit(expr, false) {
+			return ast.NewBool(false)
+		}
+
+		// Try to extract struct literal fields for merging
+		st, ok := expr.(*ast.StructLit)
+		if !ok {
+			// Not a struct literal, can't merge
+			unmerged = append(unmerged, expr)
+			continue
+		}
+
+		// Check if we can merge these fields with existing ones
 		avoidMerging := false
-		for k := range m {
-			// If the keyword interacts with any member already in final,
-			// avoid merging, or the keyword is already present in final.
-			if _, ok := final[k]; ok {
-				avoidMerging = true
-				break
-			}
-			for _, ik := range keywordInteractions[k] {
-				if _, ok := final[ik]; ok {
+		for _, decl := range st.Elts {
+			if _, ok := decl.(*ast.Field); ok {
+				name := fieldLabel(decl)
+				if name == "" {
+					// Can't determine field name, avoid merging
 					avoidMerging = true
+					break
+				}
+				// Check if field already exists
+				if finalFieldNames[name] {
+					avoidMerging = true
+					break
+				}
+				// Check if field interacts with any existing field
+				for _, ik := range keywordInteractions[name] {
+					if finalFieldNames[ik] {
+						avoidMerging = true
+						break
+					}
+				}
+				if avoidMerging {
 					break
 				}
 			}
 		}
+
 		if avoidMerging {
-			unmerged = append(unmerged, m)
+			unmerged = append(unmerged, expr)
 		} else {
-			maps.Copy(final, m)
+			// Merge the fields
+			for _, decl := range st.Elts {
+				if _, ok := decl.(*ast.Field); ok {
+					name := fieldLabel(decl)
+					finalFieldNames[name] = true
+				}
+				finalFields = append(finalFields, decl)
+			}
 		}
 	}
+
 	if len(unmerged) == 0 {
-		return final
+		return makeStructLit(finalFields...)
 	}
-	unmerged = append(unmerged, final)
-	return singleKeyword("allOf", unmerged)
+
+	// Add the merged fields as one element if non-empty
+	if len(finalFields) > 0 {
+		unmerged = append(unmerged, makeStructLit(finalFields...))
+	}
+
+	return singleKeyword("allOf", ast.NewList(unmerged...))
 }
 
 func (i *itemAllOf) apply(f func(item) item) item {
@@ -119,8 +168,8 @@ type itemOneOf struct {
 	elems []item
 }
 
-func (i *itemOneOf) generate(g *generator) map[string]any {
-	return singleKeyword("oneOf", generateSlice(g, i.elems))
+func (i *itemOneOf) generate(g *generator) ast.Expr {
+	return singleKeyword("oneOf", generateList(g, i.elems))
 }
 
 func (i *itemOneOf) apply(f func(item) item) item {
@@ -136,8 +185,8 @@ type itemAnyOf struct {
 	elems []item
 }
 
-func (i *itemAnyOf) generate(g *generator) map[string]any {
-	return singleKeyword("anyOf", generateSlice(g, i.elems))
+func (i *itemAnyOf) generate(g *generator) ast.Expr {
+	return singleKeyword("anyOf", generateList(g, i.elems))
 }
 
 func (i *itemAnyOf) apply(f func(item) item) item {
@@ -153,7 +202,7 @@ type itemNot struct {
 	elem item
 }
 
-func (i *itemNot) generate(g *generator) map[string]any {
+func (i *itemNot) generate(g *generator) ast.Expr {
 	return singleKeyword("not", i.elem.generate(g))
 }
 
@@ -166,14 +215,12 @@ func (i *itemNot) apply(f func(item) item) item {
 }
 
 // itemConst represents a constant value constraint.
-// The value represents the actual constant in question,
-// as a raw message so that we avoid unnecessary
-// round-tripping from CUE->value->JSON.
+// The value represents the actual constant in question as an AST expression.
 type itemConst struct {
-	value json.RawMessage
+	value ast.Expr
 }
 
-func (i *itemConst) generate(g *generator) map[string]any {
+func (i *itemConst) generate(g *generator) ast.Expr {
 	return singleKeyword("const", i.value)
 }
 
@@ -183,13 +230,12 @@ func (i *itemConst) apply(f func(item) item) item {
 
 // itemEnum represents an "enum" constraint.
 // Each value represents one possible value of the enum.
-// We use raw JSON for the same reason that [itemConst] uses it.
 type itemEnum struct {
-	values []json.RawMessage
+	values []ast.Expr
 }
 
-func (i *itemEnum) generate(g *generator) map[string]any {
-	return singleKeyword("enum", i.values)
+func (i *itemEnum) generate(g *generator) ast.Expr {
+	return singleKeyword("enum", ast.NewList(i.values...))
 }
 
 func (i *itemEnum) apply(f func(item) item) item {
@@ -200,8 +246,8 @@ type itemRef struct {
 	defName string
 }
 
-func (i *itemRef) generate(g *generator) map[string]any {
-	return singleKeyword("$ref", "#/$defs/"+i.defName)
+func (i *itemRef) generate(g *generator) ast.Expr {
+	return singleKeyword("$ref", ast.NewString("#/$defs/"+i.defName))
 }
 
 func (i *itemRef) apply(f func(item) item) item {
@@ -213,11 +259,15 @@ type itemType struct {
 	kinds []string
 }
 
-func (i *itemType) generate(g *generator) map[string]any {
+func (i *itemType) generate(g *generator) ast.Expr {
 	if len(i.kinds) == 1 {
-		return singleKeyword("type", i.kinds[0])
+		return singleKeyword("type", ast.NewString(i.kinds[0]))
 	}
-	return singleKeyword("type", i.kinds)
+	exprs := make([]ast.Expr, len(i.kinds))
+	for i, k := range i.kinds {
+		exprs[i] = ast.NewString(k)
+	}
+	return singleKeyword("type", ast.NewList(exprs...))
 }
 
 func (i *itemType) apply(f func(item) item) item {
@@ -229,8 +279,8 @@ type itemFormat struct {
 	format string
 }
 
-func (i *itemFormat) generate(g *generator) map[string]any {
-	return singleKeyword("format", i.format)
+func (i *itemFormat) generate(g *generator) ast.Expr {
+	return singleKeyword("format", ast.NewString(i.format))
 }
 
 func (i *itemFormat) apply(f func(item) item) item {
@@ -242,8 +292,8 @@ type itemPattern struct {
 	regexp string
 }
 
-func (i *itemPattern) generate(g *generator) map[string]any {
-	return singleKeyword("pattern", i.regexp)
+func (i *itemPattern) generate(g *generator) ast.Expr {
+	return singleKeyword("pattern", ast.NewString(i.regexp))
 }
 
 func (i *itemPattern) apply(f func(item) item) item {
@@ -258,7 +308,7 @@ type itemBounds struct {
 	n float64
 }
 
-func (i *itemBounds) generate(g *generator) map[string]any {
+func (i *itemBounds) generate(g *generator) ast.Expr {
 	var keyword string
 	switch i.constraint {
 	case cue.LessThanOp:
@@ -272,7 +322,7 @@ func (i *itemBounds) generate(g *generator) map[string]any {
 	default:
 		panic(fmt.Errorf("unexpected bound operand %v", i.constraint))
 	}
-	return singleKeyword(keyword, i.n)
+	return singleKeyword(keyword, ast.NewLit(token.FLOAT, fmt.Sprint(i.n)))
 }
 
 func (i *itemBounds) apply(f func(item) item) item {
@@ -284,8 +334,8 @@ type itemMultipleOf struct {
 	n float64
 }
 
-func (i *itemMultipleOf) generate(g *generator) map[string]any {
-	return singleKeyword("multipleOf", i.n)
+func (i *itemMultipleOf) generate(g *generator) ast.Expr {
+	return singleKeyword("multipleOf", ast.NewLit(token.FLOAT, fmt.Sprint(i.n)))
 }
 
 func (i *itemMultipleOf) apply(f func(item) item) item {
@@ -298,7 +348,7 @@ type itemLengthBounds struct {
 	n          int
 }
 
-func (i *itemLengthBounds) generate(g *generator) map[string]any {
+func (i *itemLengthBounds) generate(g *generator) ast.Expr {
 	var keyword string
 	switch i.constraint {
 	case cue.LessThanEqualOp:
@@ -309,7 +359,7 @@ func (i *itemLengthBounds) generate(g *generator) map[string]any {
 		panic("unexpected constraint in length bounds")
 	}
 
-	return singleKeyword(keyword, i.n)
+	return singleKeyword(keyword, ast.NewLit(token.INT, fmt.Sprint(i.n)))
 }
 
 func (i *itemLengthBounds) apply(f func(item) item) item {
@@ -322,7 +372,7 @@ type itemItemsBounds struct {
 	n          int
 }
 
-func (i *itemItemsBounds) generate(g *generator) map[string]any {
+func (i *itemItemsBounds) generate(g *generator) ast.Expr {
 	var keyword string
 	switch i.constraint {
 	case cue.LessThanEqualOp:
@@ -332,7 +382,7 @@ func (i *itemItemsBounds) generate(g *generator) map[string]any {
 	default:
 		panic("unexpected constraint in items bounds")
 	}
-	return singleKeyword(keyword, i.n)
+	return singleKeyword(keyword, ast.NewLit(token.INT, fmt.Sprint(i.n)))
 }
 
 func (i *itemItemsBounds) apply(f func(item) item) item {
@@ -345,7 +395,7 @@ type itemPropertyBounds struct {
 	n          int
 }
 
-func (i *itemPropertyBounds) generate(g *generator) map[string]any {
+func (i *itemPropertyBounds) generate(g *generator) ast.Expr {
 	var keyword string
 	switch i.constraint {
 	case cue.LessThanEqualOp:
@@ -355,7 +405,7 @@ func (i *itemPropertyBounds) generate(g *generator) map[string]any {
 	default:
 		panic("unexpected constraint in items bounds")
 	}
-	return singleKeyword(keyword, i.n)
+	return singleKeyword(keyword, ast.NewLit(token.INT, fmt.Sprint(i.n)))
 }
 
 func (i *itemPropertyBounds) apply(f func(item) item) item {
@@ -367,7 +417,7 @@ type itemItems struct {
 	elem item
 }
 
-func (i *itemItems) generate(g *generator) map[string]any {
+func (i *itemItems) generate(g *generator) ast.Expr {
 	return singleKeyword("items", i.elem.generate(g))
 }
 
@@ -384,8 +434,8 @@ type itemPrefixItems struct {
 	elems []item
 }
 
-func (i *itemPrefixItems) generate(g *generator) map[string]any {
-	return singleKeyword("items", generateSlice(g, i.elems))
+func (i *itemPrefixItems) generate(g *generator) ast.Expr {
+	return singleKeyword("items", generateList(g, i.elems))
 }
 
 func (i *itemPrefixItems) apply(f func(item) item) item {
@@ -403,15 +453,15 @@ type itemContains struct {
 	max  *int
 }
 
-func (i *itemContains) generate(g *generator) map[string]any {
-	m := singleKeyword("contains", i.elem.generate(g))
+func (i *itemContains) generate(g *generator) ast.Expr {
+	fields := []ast.Decl{makeField("contains", i.elem.generate(g))}
 	if i.min != nil {
-		m["minContains"] = *i.min
+		fields = append(fields, makeField("minContains", ast.NewLit(token.INT, fmt.Sprint(*i.min))))
 	}
 	if i.max != nil {
-		m["maxContains"] = *i.max
+		fields = append(fields, makeField("maxContains", ast.NewLit(token.INT, fmt.Sprint(*i.max))))
 	}
-	return m
+	return makeStructLit(fields...)
 }
 
 func (i *itemContains) apply(f func(item) item) item {
@@ -435,16 +485,21 @@ type itemProperties struct {
 	// TODO patternProperties, additionalProperties
 }
 
-func (i *itemProperties) generate(g *generator) map[string]any {
-	properties := make(map[string]any)
-	for _, prop := range i.elems {
-		properties[prop.name] = prop.item.generate(g)
+func (i *itemProperties) generate(g *generator) ast.Expr {
+	// Build properties struct with fields in lexical order
+	propFields := make([]ast.Decl, len(i.elems))
+	for j, prop := range i.elems {
+		propFields[j] = makeField(prop.name, prop.item.generate(g))
 	}
-	m := singleKeyword("properties", properties)
+	fields := []ast.Decl{makeField("properties", makeStructLit(propFields...))}
 	if len(i.required) > 0 {
-		m["required"] = i.required
+		reqExprs := make([]ast.Expr, len(i.required))
+		for j, r := range i.required {
+			reqExprs[j] = ast.NewString(r)
+		}
+		fields = append(fields, makeField("required", ast.NewList(reqExprs...)))
 	}
-	return m
+	return makeStructLit(fields...)
 }
 
 func (i *itemProperties) apply(f func(item) item) item {
@@ -494,17 +549,15 @@ type itemIfThenElse struct {
 	elseElem item
 }
 
-func (i *itemIfThenElse) generate(g *generator) map[string]any {
-	m := map[string]any{
-		"if": i.ifElem.generate(g),
-	}
+func (i *itemIfThenElse) generate(g *generator) ast.Expr {
+	fields := []ast.Decl{makeField("if", i.ifElem.generate(g))}
 	if i.thenElem != nil {
-		m["then"] = i.thenElem.generate(g)
+		fields = append(fields, makeField("then", i.thenElem.generate(g)))
 	}
 	if i.elseElem != nil {
-		m["else"] = i.elseElem.generate(g)
+		fields = append(fields, makeField("else", i.elseElem.generate(g)))
 	}
-	return m
+	return makeStructLit(fields...)
 }
 
 func (i *itemIfThenElse) apply(f func(item) item) item {
@@ -523,16 +576,16 @@ func (i *itemIfThenElse) apply(f func(item) item) item {
 	return &itemIfThenElse{ifElem: ifElem, thenElem: thenElem, elseElem: elseElem}
 }
 
-func generateSlice(g *generator, items []item) []any {
-	return mapSlice(items, func(it item) any {
-		return it.generate(g)
-	})
+func generateList(g *generator, items []item) ast.Expr {
+	exprs := make([]ast.Expr, len(items))
+	for i, it := range items {
+		exprs[i] = it.generate(g)
+	}
+	return ast.NewList(exprs...)
 }
 
-func singleKeyword(name string, val any) map[string]any {
-	return map[string]any{
-		name: val,
-	}
+func singleKeyword(name string, val ast.Expr) ast.Expr {
+	return makeStructLit(makeField(name, val))
 }
 
 // keywordGroups holds sets of JSON Schema keywords that
@@ -556,3 +609,50 @@ var keywordInteractions = func() map[string][]string {
 	}
 	return m
 }()
+
+// makeStructLit creates a struct literal with fields in lexical order.
+func makeStructLit(fields ...ast.Decl) *ast.StructLit {
+	// Sort fields lexically by label name
+	slices.SortFunc(fields, func(a, b ast.Decl) int {
+		aName := fieldLabel(a)
+		bName := fieldLabel(b)
+		if aName < bName {
+			return -1
+		}
+		if aName > bName {
+			return 1
+		}
+		return 0
+	})
+	return &ast.StructLit{Elts: fields}
+}
+
+// fieldLabel extracts the field label name from a declaration.
+func fieldLabel(d ast.Decl) string {
+	if f, ok := d.(*ast.Field); ok {
+		if name, _, _ := ast.LabelName(f.Label); name != "" {
+			return name
+		}
+	}
+	return ""
+}
+
+// makeField creates a field with a string label and given value.
+func makeField(name string, value ast.Expr) *ast.Field {
+	return &ast.Field{
+		Label: ast.NewStringLabel(name),
+		Value: value,
+	}
+}
+
+// isBoolLit checks if expr is a boolean literal with the given value.
+func isBoolLit(expr ast.Expr, val bool) bool {
+	lit, ok := expr.(*ast.BasicLit)
+	if !ok {
+		return false
+	}
+	if lit.Kind != token.TRUE && lit.Kind != token.FALSE {
+		return false
+	}
+	return (lit.Kind == token.TRUE) == val
+}

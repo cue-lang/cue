@@ -45,7 +45,7 @@ ok: data: {
 				type: "integer"
 			}]
 		}
-		t7: {}
+		t7: true
 	}
 	type: "object"
 }

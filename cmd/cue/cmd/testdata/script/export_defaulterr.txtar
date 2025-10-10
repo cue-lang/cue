@@ -20,7 +20,7 @@ toto: value: *_|_ | (*"toto" | string)
 toto.value: incomplete value "toto" | string
 -- expect_stdout_json --
 -- expect_stderr_json --
-toto.value: incomplete value "toto" | string
+toto.value: cannot convert incomplete value "|((string){ \"toto\" }, (string){ string })" to JSON
 -- expect_stdout_yaml --
 -- expect_stderr_yaml --
-toto.value: incomplete value "toto" | string
+yaml: unsupported node "toto"|string (*ast.BinaryExpr)

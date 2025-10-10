@@ -1,22 +1,22 @@
 ! exec cue eval ./exporterr --out json
-cmp stdout expect-stdout
-cmp stderr expect-stderr
+! stdout .
+cmp stderr expect-stderr-eval-json
 
 ! exec cue eval ./exporterr -c
-cmp stdout expect-stdout
-cmp stderr expect-stderr
+! stdout .
+cmp stderr expect-stderr-eval-concrete-cue
 
 ! exec cue export ./exporterr
-cmp stdout expect-stdout
-cmp stderr expect-stderr
+! stdout .
+cmp stderr expect-stderr-export-json
 
 ! exec cue export repeated.cue -o openapi:export.json
 ! stdout .
-cmp stderr expect-stderr-openapi
+cmp stderr expect-stderr-export-openapi
 
 ! exec cue eval repeated.cue --out openapi
 ! stdout .
-cmp stderr expect-stderr-openapi
+cmp stderr expect-stderr-eval-openapi
 
 -- repeated.cue --
 info: {
@@ -26,17 +26,6 @@ info: {
 info: {
     title: "test title 2"
 }
--- expect-stderr-openapi --
-info.title: conflicting values "test title 2" and "test title":
-    ./repeated.cue:2:12
-    ./repeated.cue:6:12
--- expect-stderr --
-a.b.2.c: incomplete value int:
-    ./exporterr/export_err.cue:3:18
-out: invalid interpolation: undefined field: d:
-    ./exporterr/export_err.cue:7:6
-    ./exporterr/export_err.cue:7:16
--- expect-stdout --
 -- exporterr/export_err.cue --
 package exporterr
 
@@ -45,4 +34,23 @@ a: b: [0, 1, {c: int}, 3]
 // Issue #553
 b: c: "hello"
 out: "d is \(b.d)"
--- exporterr/cue.mod/module.cue --
+-- expect-stderr-eval-json --
+a.b.2.c: cannot convert incomplete value "int" to JSON:
+    ./exporterr/export_err.cue:3:18
+-- expect-stderr-eval-concrete-cue --
+a.b.2.c: incomplete value int:
+    ./exporterr/export_err.cue:3:18
+out: invalid interpolation: undefined field: d:
+    ./exporterr/export_err.cue:7:6
+    ./exporterr/export_err.cue:7:16
+-- expect-stderr-export-json --
+a.b.2.c: cannot convert incomplete value "int" to JSON:
+    ./exporterr/export_err.cue:3:18
+-- expect-stderr-export-openapi --
+info.title: conflicting values "test title 2" and "test title":
+    ./repeated.cue:2:12
+    ./repeated.cue:6:12
+-- expect-stderr-eval-openapi --
+info.title: conflicting values "test title 2" and "test title":
+    ./repeated.cue:2:12
+    ./repeated.cue:6:12

@@ -167,7 +167,6 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 		e.encFile = func(f *ast.File) error { return format(f.Filename, f) }
 
 	case build.JSON, build.JSONL:
-		e.concrete = true
 		d := json.NewEncoder(w)
 		d.SetIndent("", "    ")
 		d.SetEscapeHTML(cfg.EscapeHTML)
@@ -180,7 +179,6 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 		}
 
 	case build.YAML:
-		e.concrete = true
 		streamed := false
 		// TODO(mvdan): use a NewEncoder API like in TOML below.
 		e.encValue = func(v cue.Value) error {
@@ -198,13 +196,11 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 		}
 
 	case build.TOML:
-		e.concrete = true
 		enc := toml.NewEncoder(w)
 		e.encValue = enc.Encode
 
 	case build.TextProto:
 		// TODO: verify that the schema is given. Otherwise err out.
-		e.concrete = true
 		e.encValue = func(v cue.Value) error {
 			v = v.Unify(cfg.Schema)
 			b, err := textproto.NewEncoder().Encode(v)
@@ -217,7 +213,6 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 		}
 
 	case build.Text:
-		e.concrete = true
 		e.encValue = func(v cue.Value) error {
 			s, err := v.String()
 			if err != nil {
@@ -232,7 +227,6 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 		}
 
 	case build.Binary:
-		e.concrete = true
 		e.encValue = func(v cue.Value) error {
 			b, err := v.Bytes()
 			if err != nil {

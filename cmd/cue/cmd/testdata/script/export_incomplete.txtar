@@ -5,23 +5,23 @@
 
 # Default export mode
 ! exec cue export x.cue
-cmp stderr out/stderr
+cmp stderr out/export-json-stderr
 
 # JSON
 ! exec cue export --out json x.cue
-cmp stderr out/stderr
+cmp stderr out/export-json-stderr
 
 # Yaml
 ! exec cue export --out yaml x.cue
-cmp stderr out/stderr
+cmp stderr out/export-yaml-stderr
 
 # CUE data
 ! exec cue export --out cue x.cue
-cmp stderr out/stderr
+cmp stderr out/export-cue-stderr
 
 # Concrete
 ! exec cue eval -c x.cue
-cmp stderr out/stderr
+cmp stderr out/eval-cue-stderr
 
 # CUE
 exec cue eval --out cue x.cue
@@ -48,5 +48,11 @@ V2: ("x" | "y") | *#SomeBaseType.#AUTO
 }
 V1: "z"
 V2: "x" | "y"
--- out/stderr --
+-- out/export-json-stderr --
+V2: cannot convert incomplete value "|((string){ \"x\" }, (string){ \"y\" })" to JSON
+-- out/export-yaml-stderr --
+yaml: unsupported node "x"|"y" (*ast.BinaryExpr)
+-- out/export-cue-stderr --
+V2: incomplete value "x" | "y"
+-- out/eval-cue-stderr --
 V2: incomplete value "x" | "y"

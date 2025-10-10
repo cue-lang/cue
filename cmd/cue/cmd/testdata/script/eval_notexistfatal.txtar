@@ -24,7 +24,7 @@ sortedx: list.Sort(x, {})
 
 -- expect-stdout1 --
 -- expect-stderr1 --
-sortedx: error in call to list.Sort: field not found: less:
+sortedx: error in call to list.Sort:
     ./x.cue:8:10
 -- expect-stdout2 --
 import "list"

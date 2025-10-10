@@ -16,6 +16,69 @@
       "message": "PTAL",
       "revId": "906605e49358a5c76e191002b5d947f08e9208df",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45372b43_15e8c227",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-10T07:53:17Z",
+      "side": 1,
+      "message": "Thanks! This definitely reads a lot better than what we have in master. And the length is a lot better than your earlier patchset, thank you! Just two last nits but LGTM.",
+      "revId": "906605e49358a5c76e191002b5d947f08e9208df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2a44a73_a9c775a7",
+        "filename": "cmd/cue/cmd/export.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-10T07:53:17Z",
+      "side": 1,
+      "message": "I\u0027d personally drop this and directly point to `cue help inputs` instead. Package instance loading is described in more detail there, and most users don\u0027t actually use it anyway, so I think it\u0027s best to not briefly mention it here.",
+      "range": {
+        "startLine": 41,
+        "startChar": 46,
+        "endLine": 44,
+        "endChar": 5
+      },
+      "revId": "906605e49358a5c76e191002b5d947f08e9208df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3693b732_e3be8288",
+        "filename": "cmd/cue/cmd/export.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-10T07:53:17Z",
+      "side": 1,
+      "message": "```suggestion\n    cue      output as CUE    (can encode any value)\n    json     output as JSON   (can encode any value)\n    toml     output as TOML   (can encode any value)\n    yaml     output as YAML   (can encode any value)\n    text     output as text   (can only encode values of type string)\n    binary   output as binary (can only encode values of type string or bytes)\n```\n\npersonally I\u0027d drop the quotes and colons, to make this more plaintext friendly",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 79
+      },
+      "revId": "906605e49358a5c76e191002b5d947f08e9208df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

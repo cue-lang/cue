@@ -88,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5ed93bb_134a1d1e",
+        "filename": "cmd/cue/cmd/export.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-10T07:53:17Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6af1a7ff_989e4303",
+      "revId": "e4c1de3ab1875a9b9b2b6d6c48a8e10d9e4217f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f68831a_4b07847a",
@@ -119,6 +137,24 @@
       "side": 1,
       "message": "I\u0027ve removed this section.",
       "parentUuid": "5f68831a_4b07847a",
+      "revId": "e4c1de3ab1875a9b9b2b6d6c48a8e10d9e4217f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7dedfb65_a1d5835a",
+        "filename": "cmd/cue/cmd/export.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-10T07:53:17Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "726f107c_b1400bf0",
       "revId": "e4c1de3ab1875a9b9b2b6d6c48a8e10d9e4217f0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

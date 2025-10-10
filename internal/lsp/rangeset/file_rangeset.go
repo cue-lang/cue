@@ -16,11 +16,16 @@ package rangeset
 
 import (
 	"cmp"
+	"fmt"
 	"slices"
 )
 
 type FilenameRangeSet struct {
 	pairs []filenameRangeSetPair
+}
+
+func (frs *FilenameRangeSet) String() string {
+	return fmt.Sprint(frs.pairs)
 }
 
 func NewFilenameRangeSet() *FilenameRangeSet {
@@ -30,6 +35,10 @@ func NewFilenameRangeSet() *FilenameRangeSet {
 type filenameRangeSetPair struct {
 	filename string
 	ranges   *RangeSet
+}
+
+func (frs filenameRangeSetPair) String() string {
+	return fmt.Sprintf("{%s: %v}", frs.filename, frs.ranges)
 }
 
 func (frs *FilenameRangeSet) Add(filename string, start, end int) {

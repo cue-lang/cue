@@ -84,6 +84,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "af7800eb_4f707a7d",
+        "filename": "cmd/cue/cmd/export.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-10T08:59:08Z",
+      "side": 1,
+      "message": "if we don\u0027t document instances properly anywhere in `cue help`, we definitely should - but that would be in `cue help inputs`. I think summarizing them in `cue help export` only is a bit odd, given that they also apply to `cue vet`, `cue eval`, `cue cmd`, `cue def`...\n\nI\u0027d say send a brief follow-up CL to this one and I can get it quickly reviewed - or if you don\u0027t have the time, yeah, file an issue.",
+      "parentUuid": "a287215e_1d4ea79b",
+      "range": {
+        "startLine": 41,
+        "startChar": 46,
+        "endLine": 44,
+        "endChar": 5
+      },
+      "revId": "906605e49358a5c76e191002b5d947f08e9208df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3693b732_e3be8288",
         "filename": "cmd/cue/cmd/export.go",
         "patchSetId": 6

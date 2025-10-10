@@ -954,11 +954,11 @@ func (v Value) Source() ast.Node {
 	}
 	count := 0
 	var src ast.Node
-	v.v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+	for c := range v.v.LeafConjuncts() {
 		src = c.Source()
 		count++
-		return true
-	})
+		// TODO(mvdan): break early on count > 1?
+	}
 	if count > 1 || src == nil {
 		src = v.v.Value().Source()
 	}
@@ -999,16 +999,15 @@ func (v Value) Pos() token.Pos {
 	}
 	// Pick the most-concrete field.
 	var p token.Pos
-	v.v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+	for c := range v.v.LeafConjuncts() {
 		x := c.Elem()
 		pp := pos(x)
 		if pp == token.NoPos {
-			return true
+			continue
 		}
 		p = pp
 		// TODO: Prefer struct conjuncts with actual fields.
-		return true
-	})
+	}
 	return p
 }
 
@@ -2175,7 +2174,7 @@ func (v Value) Expr() (Op, []Value) {
 	default:
 		a := []Value{}
 		ctx := v.ctx()
-		v.v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+		for c := range v.v.LeafConjuncts() {
 			// Keep parent here. TODO: do we need remove the requirement
 			// from other conjuncts?
 			n := &adt.Vertex{
@@ -2185,9 +2184,7 @@ func (v Value) Expr() (Op, []Value) {
 			n.AddConjunct(c)
 			n.Finalize(ctx)
 			a = append(a, makeValue(v.idx, n, v.parent_))
-			return true
-		})
-
+		}
 		return adt.AndOp, a
 	}
 

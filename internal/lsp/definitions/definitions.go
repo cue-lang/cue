@@ -315,15 +315,13 @@ func Analyse(forPackage DefinitionsForPackageFunc, files ...*ast.File) *Definiti
 		forPackage = func(importPath string) *Definitions { return nil }
 	}
 	dfns := &Definitions{
-		pkgDecls:   &navigableBindings{},
 		byFilename: make(map[string]*FileDefinitions, len(files)),
 		forPackage: forPackage,
 	}
+	dfns.Reset()
 
-	pkgNode := dfns.newAstNode(nil, nil, nil, nil)
-	pkgNode.fieldsAllowed = true
-	dfns.pkgNode = pkgNode
-	navigable := &navigableBindings{}
+	pkgNode := dfns.pkgNode
+	navigable := &navigableBindings{parent: pkgNode.navigable}
 
 	for _, file := range files {
 		fileNode := pkgNode.newAstNode(nil, file, navigable)
@@ -337,6 +335,23 @@ func Analyse(forPackage DefinitionsForPackageFunc, files ...*ast.File) *Definiti
 	}
 
 	return dfns
+}
+
+func (dfns *Definitions) Reset() {
+	dfns.pkgDecls = &navigableBindings{}
+
+	pkgNode := dfns.newAstNode(nil, nil, nil, nil)
+	pkgNode.fieldsAllowed = true
+	dfns.pkgNode = pkgNode
+	navigable := &navigableBindings{parent: pkgNode.navigable}
+
+	for _, fdfns := range dfns.byFilename {
+		fileNode := pkgNode.newAstNode(nil, fdfns.File, navigable)
+		fileNode.fieldsAllowed = true
+		fdfns.pkgNode = pkgNode
+		clear(fdfns.definitions)
+		clear(fdfns.completions)
+	}
 }
 
 // newAstNode creates a new [astNode]. All arguments may be nil; if
@@ -519,6 +534,107 @@ func (fdfns *FileDefinitions) CompletionsForOffset(offset int) (fields, embeds [
 	return fields, embeds, resolutions.startOffset, resolutions.fieldEndOffset, resolutions.embedEndOffset
 }
 
+func (fdfns *FileDefinitions) UsagesForOffset(offset int) []ast.Node {
+	if offset < 0 {
+		return nil
+	}
+
+	definitions := fdfns.definitions
+
+	definitionsForOffset, found := definitions[offset]
+	if !found {
+		definitions[offset] = []*navigableBindings{}
+		fdfns.evalForOffset(offset)
+		definitionsForOffset = definitions[offset]
+		fmt.Println("Eval finished", offset)
+	}
+	fmt.Printf("%d navs in definitionsForOffset\n", len(definitionsForOffset))
+
+	isExported := false
+
+	// every nav which uses the thing we care about, or any nav in the path to the thing we care about
+	targetsSeen := make(map[*navigableBindings]struct{})
+	evaluatedNavs := make(map[*navigableBindings]struct{})
+	evaluatedNodes := make(map[*astNode]struct{})
+	navsWorklist := slices.Clone(definitionsForOffset)
+
+	for len(navsWorklist) > 0 {
+		nav := navsWorklist[0]
+		navsWorklist = navsWorklist[1:]
+
+		if _, seen := evaluatedNavs[nav]; seen {
+			continue
+		}
+		evaluatedNavs[nav] = struct{}{}
+
+		var pathElements []*navigableBindings
+		var evalWorklist []*astNode
+		var child *navigableBindings
+		for nav := nav; nav != nil; child, nav = nav, nav.parent {
+			if nav == fdfns.pkgNode.navigable {
+				isExported = true
+			}
+			pathElements = append(pathElements, nav)
+			if child != nil && nav.name != "" && child.name == "" {
+				break
+			}
+			evaluatedNavs[nav] = struct{}{}
+			evalWorklist = nav.contributingNodes
+		}
+
+		evalWorklist = slices.Clone(evalWorklist)
+		for len(evalWorklist) > 0 {
+			node := evalWorklist[0]
+			evalWorklist = evalWorklist[1:]
+
+			if _, seen := evaluatedNodes[node]; seen {
+				continue
+			}
+			evaluatedNodes[node] = struct{}{}
+
+			node.eval()
+			for _, s := range node.allChildren {
+				evalWorklist = append(evalWorklist, s)
+			}
+		}
+
+		clear(targetsSeen)
+		targetsWorklist := pathElements
+		for len(targetsWorklist) > 0 {
+			target := targetsWorklist[0]
+			targetsWorklist = targetsWorklist[1:]
+
+			if _, seen := targetsSeen[target]; seen {
+				continue
+			}
+			targetsSeen[target] = struct{}{}
+
+			for _, use := range target.usedBy {
+				// Only if the usage is basically an embedding
+				// (i.e. appears in resolvesTo) do we need to go
+				// further. So for example, when inspecting the uses of y,
+				// if we found x: y + 1 we would not then need to inspect
+				// the uses of x.
+				if slices.Contains(use.resolvesTo, target) {
+					fmt.Println(target.name, "used by", use.navigable.name)
+					targetsWorklist = append(targetsWorklist, use.navigable)
+					navsWorklist = append(navsWorklist, use.navigable)
+				}
+			}
+		}
+	}
+
+	if isExported {
+		fmt.Println("** exported from package **")
+	}
+
+	exprs := make(map[ast.Node]*astNode)
+	for _, nav := range definitions[offset] {
+		maps.Copy(exprs, nav.usedBy)
+	}
+	return slices.Collect(maps.Keys(exprs))
+}
+
 // evalForOffset evaluates from the pkgNode, evaluating only child
 // astNodes that contain the given file-byte-offset.
 func (fdfns *FileDefinitions) evalForOffset(offset int) {
@@ -573,7 +689,8 @@ type astNode struct {
 	// ident. This can be nil, such as when a node is an
 	// expression. For example in the path {a: 3, b: a}.b, a node with
 	// no key will be created, containing the structlit {a: 3, b: a}.
-	key ast.Node
+	key      ast.Node
+	keyAlias ast.Node
 	// resolvesTo points to the navigable bindings this node resolves
 	// to, due to embedded paths. For example, in x: {y.z}, whatever
 	// node y.z resolves to, its navigable bindings will be stored in
@@ -707,7 +824,15 @@ type navigableBindings struct {
 	// non-first-elements of a path, and let expressions (amongst
 	// others) introduce bindings that are not visible to
 	// non-first-path-elements.
-	name string
+	name   string
+	usedBy map[ast.Node]*astNode
+}
+
+func (nav *navigableBindings) recordUsage(e ast.Node, node *astNode) {
+	if nav.usedBy == nil {
+		nav.usedBy = make(map[ast.Node]*astNode)
+	}
+	nav.usedBy[e] = node
 }
 
 // addDefinition records that the target navigableBindings are the
@@ -770,13 +895,12 @@ func (n *astNode) addEmbedCompletions(start, end token.Pos, node *astNode, targe
 }
 
 // addFieldCompletions records that the target navigableBindings are
-// considered to contain bindings which should be offered at
-// completions for any completion request between the start and end
-// positions. colonPos contains the position of the colon which
-// follows the existing field name (probably slightly beyond the end
-// position), and is used to ensure that when the LSP server suggests
-// completions to the client, those completions correctly edit the
-// existing field.
+// considered to contain bindings which should be offered for any
+// completion request between the start and end positions. colonPos
+// contains the position of the colon which follows the existing field
+// name (probably slightly beyond the end position), and is used to
+// ensure that when the LSP server suggests completions to the client,
+// those completions correctly edit the existing field.
 func (n *astNode) addFieldCompletions(start, end token.Pos, targets []*navigableBindings, colonPos token.Pos) {
 	if len(targets) == 0 || start == token.NoPos || end == token.NoPos {
 		return
@@ -840,6 +964,13 @@ func (n *astNode) eval() {
 	unprocessed := []ast.Node{n.unprocessed}
 	n.unprocessed = nil
 
+	fmt.Printf("Eval key:%v(%v) unprocessed:%T astnodes %p (%p) navs %p (%p)", n.key, n.keyAlias, unprocessed[0], n, n.parent, n.navigable, n.navigable.parent)
+	if n.key != nil {
+		fmt.Println("keyPos:", n.key.Pos().Position())
+	} else {
+		fmt.Println()
+	}
+
 	var embeddedResolvable, resolvable []ast.Expr
 	// This maps from clauses we process in this astNode, to the
 	// remains of the corresponding comprehension that should be passed
@@ -895,7 +1026,7 @@ func (n *astNode) eval() {
 				// ImportSpec, we create appropriate file-scope bindings,
 				// but also pass the spec as the unprocessed value to a
 				// fresh child node;
-				if node.Name == nil {
+				if alias := node.Name; alias == nil {
 					str, err := strconv.Unquote(node.Path.Value)
 					if err != nil {
 						continue
@@ -905,32 +1036,34 @@ func (n *astNode) eval() {
 						n.newBinding(ip.Qualifier, node, node)
 					}
 				} else {
-					n.newBinding(node.Name.Name, node, node)
+					n.newBinding(alias.Name, node, node)
 				}
 
 			} else {
 				// 2) In that child node, the second time we see the
-				// ImportSpec, we lookup the package imported, ensure the
-				// package declarations have been processed, and add a
+				// ImportSpec, we lookup the package imported and add a
 				// resolution to them.
-				path := node.Path
-				str, err := strconv.Unquote(path.Value)
-				if err != nil {
-					continue
-				}
-				dfns := n.dfns.forPackage(str)
-				if dfns == nil {
-					continue
+				navs := []*navigableBindings{n.navigable}
+				str, err := strconv.Unquote(node.Path.Value)
+				if err == nil {
+					dfns := n.dfns.forPackage(str)
+					if dfns != nil {
+						pkgNode := dfns.pkgNode
+						pkgNode.eval()
+						for _, child := range pkgNode.allChildren {
+							child.eval()
+						}
+						navs = []*navigableBindings{dfns.pkgDecls}
+					}
 				}
 				// Eval the pkgNode and its immediate children only (which
 				// will be filenodes). This is enough to ensure the
 				// package declarations have been found and added to the
 				// pkgDecls.
-				dfns.pkgNode.eval()
-				for _, child := range dfns.pkgNode.allChildren {
-					child.eval()
-				}
-				n.addDefinition(path.Pos(), path.End(), []*navigableBindings{dfns.pkgDecls})
+				// for _, child := range dfns.pkgNode.allChildren {
+				// 	child.eval()
+				// }
+				n.addDefinition(n.key.Pos(), n.key.End(), navs)
 			}
 
 		case *ast.StructLit:
@@ -1007,8 +1140,26 @@ func (n *astNode) eval() {
 				n.newAstNode(nil, arg, nil)
 			}
 
-		case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr, *fieldDeclExpr:
+		case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr:
 			embeddedResolvable = append(embeddedResolvable, node.(ast.Expr))
+
+		case *fieldDeclExpr:
+			parent := n.parent
+			key := parent.key
+			if node.colonPos != token.NoPos {
+				navs := expandNavigableViaAncestralPath(parent.navigable.parent)
+				n.addFieldCompletions(key.Pos(), key.End(), navs, node.colonPos.Add(1))
+			}
+
+			navs := expandNavigableViaAncestralPath(parent.navigable)
+			n.addDefinition(key.Pos(), key.End(), navs)
+
+			if keyAlias := parent.keyAlias; keyAlias != nil {
+				n.addDefinition(keyAlias.Pos(), keyAlias.End(), navs)
+				for _, nav := range navs {
+					nav.recordUsage(keyAlias, n)
+				}
+			}
 
 		case *ast.Comprehension:
 			clause := node.Clauses[0]
@@ -1037,66 +1188,42 @@ func (n *astNode) eval() {
 			}
 
 		case *ast.IfClause:
-			comprehensionTail := comprehensionsStash[node]
-			childExpr := n.newAstNode(nil, node.Condition, nil)
-			childExpr.addRange(comprehensionTail)
+			n.newAstNode(nil, node.Condition, nil)
 
-			childTail := childExpr.newAstNode(nil, comprehensionTail, nil)
-			n.resolvesTo = append(n.resolvesTo, childTail.navigable)
-			if _, ok := comprehensionTail.(*ast.Comprehension); !ok {
-				// If it's not a comprehension, then it must be the
-				// body. In which case the body resolves back to us.
-				childTail.resolvesTo = append(childTail.resolvesTo, n.navigable)
-			}
+			comprehensionTail := comprehensionsStash[node]
+			n.newAstNode(nil, comprehensionTail, n.navigable)
 
 		case *ast.ForClause:
+			n.newAstNode(nil, node.Source, nil)
+
+			stack := astNodeStack{n.newAstNode(nil, nil, nil)}
+
+			if key := node.Key; key != nil {
+				stack.push(key, stack.peek().newBinding(key.Name, key, nil))
+			}
+			if val := node.Value; val != nil {
+				stack.push(val, stack.peek().newBinding(val.Name, val, nil))
+			}
+
 			comprehensionTail := comprehensionsStash[node]
-			childExpr := n.newAstNode(nil, node.Source, nil)
-			childExpr.addRange(comprehensionTail)
-
-			childBinding := childExpr.newAstNode(nil, nil, nil)
-			if node.Key != nil {
-				childBinding.newBinding(node.Key.Name, node.Key, nil)
-			}
-			if node.Value != nil {
-				childBinding.newBinding(node.Value.Name, node.Value, nil)
-			}
-			childBinding.addRange(comprehensionTail)
-
-			childTail := childBinding.newAstNode(nil, comprehensionTail, nil)
-			n.resolvesTo = append(n.resolvesTo, childTail.navigable)
-			if _, ok := comprehensionTail.(*ast.Comprehension); !ok {
-				// If it's not a comprehension, then it must be the
-				// body. In which case the body resolves back to us.
-				childTail.resolvesTo = append(childTail.resolvesTo, n.navigable)
-			}
+			stack.push(comprehensionTail, stack.peek().newAstNode(nil, comprehensionTail, n.navigable))
 
 		case *ast.LetClause:
+			ident := node.Ident
 			// A let clause might or might not be within a comprehension.
 			if comprehensionTail, found := comprehensionsStash[node]; found {
-				// We're within a wider comprehension: take care to make
-				// sure the binding is added as a child of the expr, and
-				// thus the expr cannot see its own binding (unlike a
-				// field).
-				childExpr := n.newAstNode(nil, node.Expr, nil)
-				childExpr.addRange(comprehensionTail)
+				// We're within a wider comprehension.
+				n.newAstNode(nil, node.Expr, nil)
 
-				childBinding := childExpr.newAstNode(nil, nil, nil)
-				childBinding.newBinding(node.Ident.Name, node.Ident, nil)
-				childBinding.addRange(comprehensionTail)
+				stack := astNodeStack{n.newAstNode(nil, nil, nil)}
+				stack.push(ident, stack.peek().newBinding(ident.Name, ident, nil))
+				stack.push(comprehensionTail, stack.peek().newAstNode(nil, comprehensionTail, n.navigable))
 
-				childTail := childBinding.newAstNode(nil, comprehensionTail, nil)
-				n.resolvesTo = append(n.resolvesTo, childTail.navigable)
-				if _, ok := comprehensionTail.(*ast.Comprehension); !ok {
-					// If it's not a comprehension, then it must be the
-					// body. In which case the body resolves back to us.
-					childTail.resolvesTo = append(childTail.resolvesTo, n.navigable)
-				}
 			} else {
 				// We're not within a wider comprehension: the binding
 				// must be added to the current node n because we need to
 				// be able to find it from the first element of a path.
-				n.newBinding(node.Ident.Name, node.Ident, node.Expr)
+				n.newBinding(ident.Name, ident, node.Expr)
 			}
 
 		case *ast.Field:
@@ -1117,14 +1244,8 @@ func (n *astNode) eval() {
 				name, _, err := ast.LabelName(label)
 				if err == nil {
 					binding = n.ensureNavigableBinding(name, label, node.Value, node.TokenPos)
-				} else {
-					binding = n.newAstNode(label, node.Value, nil)
 				}
-			default:
-				binding = n.newAstNode(label, node.Value, nil)
 			}
-
-			binding.addDocComments(node)
 
 			if isAlias {
 				switch alias.Expr.(type) {
@@ -1132,17 +1253,28 @@ func (n *astNode) eval() {
 					// X=[e]: field
 					// X is only visible within field
 					wrapper := n.newAstNode(nil, nil, nil)
-					wrapper.appendBinding(alias.Ident.Name, binding)
-					binding.parent = wrapper
+					binding = wrapper.newBinding(alias.Ident.Name, alias.Ident, node.Value)
+					wrapper.addRange(node)
 				case ast.Label:
 					// X=ident: field
 					// X="basic": field
 					// X="\(e)": field
 					// X=(e): field
 					// X is visible within s
-					n.appendBinding(alias.Ident.Name, binding)
+					if binding == nil {
+						binding = n.newBinding(alias.Ident.Name, alias.Ident, node.Value)
+					} else {
+						n.appendBinding(alias.Ident.Name, binding)
+						binding.addRange(alias.Ident)
+						binding.keyAlias = alias.Ident
+					}
 				}
 			}
+			if binding == nil {
+				binding = n.newAstNode(label, node.Value, nil)
+			}
+
+			binding.addDocComments(node)
 
 			switch label := label.(type) {
 			case *ast.Interpolation:
@@ -1154,6 +1286,7 @@ func (n *astNode) eval() {
 					// Although the spec supports this, the parser doesn't seem to.
 					wrapper := n.newAstNode(nil, nil, nil)
 					wrapper.newBinding(alias.Ident.Name, alias.Ident, alias.Expr)
+					wrapper.addRange(node)
 					binding.parent = wrapper
 				} else {
 					resolvable = append(resolvable, label.X)
@@ -1165,6 +1298,7 @@ func (n *astNode) eval() {
 						// X is only visible within field.
 						wrapper := n.newAstNode(nil, nil, nil)
 						wrapper.newBinding(alias.Ident.Name, alias.Ident, alias.Expr)
+						wrapper.addRange(node)
 						binding.parent = wrapper
 					} else {
 						resolvable = append(resolvable, elt)
@@ -1190,14 +1324,7 @@ func (n *astNode) eval() {
 func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
 	switch e := e.(type) {
 	case *fieldDeclExpr:
-		parent := n.parent
-		key := parent.key
-		navs := expandNavigableViaAncestralPath(parent.navigable.parent)
-		n.addFieldCompletions(key.Pos(), key.End(), navs, e.colonPos.Add(1))
-
-		navs = expandNavigableViaAncestralPath(parent.navigable)
-		n.addDefinition(key.Pos(), key.End(), navs)
-		return navs
+		panic("here")
 
 	case *ast.Ident:
 		if maybeField && n.fieldsAllowed {
@@ -1210,6 +1337,7 @@ func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
 		}
 		navs := []*navigableBindings{root}
 		n.addDefinition(e.Pos(), e.End(), navs)
+		root.recordUsage(e, n)
 		return navs
 
 	case *ast.SelectorExpr:
@@ -1233,6 +1361,9 @@ func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
 
 		results := navigateBindingsByName(resolved, name)
 		n.addDefinition(sel.Pos(), sel.End(), results)
+		for _, nav := range results {
+			nav.recordUsage(sel, n)
+		}
 		return results
 
 	case *ast.IndexExpr:
@@ -1255,12 +1386,13 @@ func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
 
 		results := navigateBindingsByName(resolved, name)
 		n.addDefinition(e.Lbrack, e.Rbrack.Add(1), results)
+		for _, nav := range results {
+			nav.recordUsage(e.Index, n)
+		}
 		return results
 
 	default:
-		return slices.Collect(maps.Keys(
-			expandNavigables([]*navigableBindings{n.newAstNode(nil, e, nil).navigable}),
-		))
+		return []*navigableBindings{n.newAstNode(nil, e, nil).navigable}
 	}
 }
 
@@ -1282,10 +1414,10 @@ func expandNavigables(navigables []*navigableBindings) map[*navigableBindings]st
 		}
 		navigableSet[nav] = struct{}{}
 
-		// evaluating a node X can add new nodes into X's
+		// evaluating a node X can append new nodes onto X's
 		// navigable.contributingNodes. So we need to make sure we
 		// evaluate and expand into those too. I.e. calling node.eval()
-		// can modify nav.contributingNodes.
+		// can modify nav.contributingNodes, thus we don't use range.
 		for i := 0; i < len(nav.contributingNodes); i++ {
 			node := nav.contributingNodes[i]
 
@@ -1471,6 +1603,14 @@ func (n *astNode) ensureNavigableBinding(name string, key ast.Label, unprocessed
 func (n *astNode) newBinding(name string, key ast.Node, unprocessed ast.Node) *astNode {
 	binding := n.newAstNode(key, unprocessed, nil)
 	n.appendBinding(name, binding)
+	if _, isImport := unprocessed.(*ast.ImportSpec); !isImport && !strings.HasPrefix(name, "__") {
+		// Same logic as in [astNode.ensureNavigableBinding] above;
+		// except we also need to exclude imports here, as import specs
+		// are handled specially - see the ast.ImportSpec case in
+		// [astNode.eval].
+		expr := &fieldDeclExpr{position: key, colonPos: token.NoPos}
+		binding.newAstNode(key, expr, nil)
+	}
 	return binding
 }
 
@@ -1515,4 +1655,22 @@ func (w *fieldDeclExpr) Pos() token.Pos {
 
 func (w *fieldDeclExpr) End() token.Pos {
 	return w.position.End()
+}
+
+type astNodeStack []*astNode
+
+func (stack *astNodeStack) push(n ast.Node, node *astNode) {
+	nodes := *stack
+	for _, node := range nodes {
+		node.addRange(n)
+	}
+	*stack = append(nodes, node)
+}
+
+func (stack *astNodeStack) peek() *astNode {
+	nodes := *stack
+	if len(nodes) == 0 {
+		return nil
+	}
+	return nodes[len(nodes)-1]
 }

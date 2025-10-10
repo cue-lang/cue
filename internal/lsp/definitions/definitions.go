@@ -284,24 +284,52 @@ import (
 	"cuelang.org/go/internal/lsp/rangeset"
 )
 
-// DefinitionsForPackageFunc is a callback function used to resolve package definitions
-// by their import path. It returns the Definitions for the given import path, or nil
-// if the package cannot be resolved.
+// DefinitionsForPackageFunc is a callback function used to resolve
+// package definitions by their import path. It returns the
+// Definitions for the given import path, or nil if the package cannot
+// be resolved.
 type DefinitionsForPackageFunc func(importPath string) *Definitions
+
+// ImportersFunc is a callback function to fetch the package
+// definitions for packages that import the current package.
+type ImportersFunc func() []*Definitions
 
 // Definitions provides methods to resolve file offsets to their
 // definitions.
 type Definitions struct {
+	// ip is the canonical (with major-version suffix) import path for
+	// this package.
+	ip ast.ImportPath
 	// pkgNode is the top level (or root) lexical scope
 	pkgNode *astNode
-	// pkgDecls represents every package declaration with the files
+	// pkgDecls contains every package declaration with the files
 	// passed to [Analyse]. This is not the same as the
 	// [pkgNode.navigable] (which is the entire package scope).
 	pkgDecls *navigableBindings
 	// byFilename maps file names to [FileDefinitions]
 	byFilename map[string]*FileDefinitions
-	// forPackage is a callback function to resolve imported packages
+	// forPackage is a callback function to resolve imported packages.
 	forPackage DefinitionsForPackageFunc
+	// pkgImporters is a callback function to fetch the definitions for
+	// all packages that import this package.
+	pkgImporters ImportersFunc
+	// importCanonicalisation provides canonical (with major-version
+	// suffix) import paths for every import spec within the current
+	// package. The LSP always uses canonical import paths, but
+	// individual cue files can have import statements that (1) elide
+	// major version suffices; (2) have explicit but unnecessary
+	// qualifiers. Being able to map such paths from import statements
+	// to canonical ImportPaths is necessary when (1) grouping together
+	// common imports (perhaps different files within this package
+	// import the same package, but the path can differ); (2) searching
+	// for import specs that have paths which refer to a particular
+	// ImportPath.
+	importCanonicalisation map[string]ast.ImportPath
+	// importSpecNodes contains entries for every import within this
+	// package. Within this package, all import specs that are of the
+	// same (canonical) import path, share the same
+	// navigableBinding. This is made possible by this map.
+	importSpecNodes map[ast.ImportPath]*navigableBindings
 }
 
 // Analyse creates and performs initial configuration of a new
@@ -310,33 +338,93 @@ type Definitions struct {
 // package. The set of files cannot be modified after construction;
 // instead, construction is cheap, so the intention is you replace the
 // whole Definitions value.
-func Analyse(forPackage DefinitionsForPackageFunc, files ...*ast.File) *Definitions {
+//
+// For the ip, importCanonicalisation, forPackage, and pkgImporters
+// parameters, see the corresponding fields in [Definitions].
+func Analyse(ip ast.ImportPath, importCanonicalisation map[string]ast.ImportPath, forPackage DefinitionsForPackageFunc, pkgImporters ImportersFunc, files ...*ast.File) *Definitions {
 	if forPackage == nil {
 		forPackage = func(importPath string) *Definitions { return nil }
 	}
+	if pkgImporters == nil {
+		pkgImporters = func() []*Definitions { return nil }
+	}
 	dfns := &Definitions{
-		pkgDecls:   &navigableBindings{},
-		byFilename: make(map[string]*FileDefinitions, len(files)),
-		forPackage: forPackage,
+		ip:                     ip,
+		importCanonicalisation: importCanonicalisation,
+		byFilename:             make(map[string]*FileDefinitions, len(files)),
+		forPackage:             forPackage,
+		pkgImporters:           pkgImporters,
+		importSpecNodes:        make(map[ast.ImportPath]*navigableBindings),
+	}
+	dfns.Reset()
+
+	pkgNode := dfns.pkgNode
+	fileNodesNavigable := &navigableBindings{
+		dfns:   dfns,
+		parent: pkgNode.navigable,
 	}
 
-	pkgNode := dfns.newAstNode(nil, nil, nil, nil)
-	pkgNode.fieldsAllowed = true
-	dfns.pkgNode = pkgNode
-	navigable := &navigableBindings{}
-
 	for _, file := range files {
-		fileNode := pkgNode.newAstNode(nil, file, navigable)
-		fileNode.fieldsAllowed = true
-		dfns.byFilename[file.Filename] = &FileDefinitions{
-			pkgNode:     pkgNode,
+		fdfns := &FileDefinitions{
+			dfns:        dfns,
 			definitions: make(map[int][]*navigableBindings),
 			completions: make(map[int]*completionResolutions),
 			File:        file,
 		}
+		dfns.byFilename[file.Filename] = fdfns
+		fileNode := fdfns.newAstNode(pkgNode, nil, file, fileNodesNavigable)
+		fileNode.fieldsAllowed = true
+		pkgNode.allChildren = append(pkgNode.allChildren, fileNode)
 	}
 
 	return dfns
+}
+
+func (dfns *Definitions) Reset() {
+	clear(dfns.importSpecNodes)
+
+	// pkgNode, and its navigable, are the roots. They have no parents.
+	pkgNode := &astNode{}
+	pkgNode.navigable = &navigableBindings{
+		dfns:              dfns,
+		contributingNodes: []*astNode{pkgNode},
+	}
+	dfns.pkgNode = pkgNode
+
+	// pkgDecls is a child of pkgNode.navigable. It will have every
+	// package declaration contributed to it as they are encountered.
+	dfns.pkgDecls = &navigableBindings{
+		dfns:   dfns,
+		parent: pkgNode.navigable,
+	}
+
+	// fileNodesNavigable is also a child of pkgNode.navigable. It has
+	// every file node contributed to it.
+	fileNodesNavigable := &navigableBindings{
+		dfns:   dfns,
+		parent: pkgNode.navigable,
+	}
+
+	for _, fdfns := range dfns.byFilename {
+		clear(fdfns.definitions)
+		clear(fdfns.completions)
+		clear(fdfns.identUsageOffsets)
+		fileNode := fdfns.newAstNode(pkgNode, nil, fdfns.File, fileNodesNavigable)
+		fileNode.fieldsAllowed = true
+		pkgNode.allChildren = append(pkgNode.allChildren, fileNode)
+	}
+}
+
+func (dfns *Definitions) bootFiles() {
+	// Eval the pkgNode and its immediate children only
+	// (which will be filenodes). This is enough to
+	// ensure the package declarations have been found
+	// and added to the pkgDecls.
+	pkgNode := dfns.pkgNode
+	pkgNode.eval()
+	for _, child := range pkgNode.allChildren {
+		child.eval()
+	}
 }
 
 // newAstNode creates a new [astNode]. All arguments may be nil; if
@@ -349,15 +437,15 @@ func Analyse(forPackage DefinitionsForPackageFunc, files ...*ast.File) *Definiti
 // unprocessed would be the field's value. The navigableBindings are
 // the (potentially shared) bindings which are used in the resolution
 // of the non-first-elements of a path.
-func (dfns *Definitions) newAstNode(parent *astNode, key ast.Node, unprocessed ast.Node, navigable *navigableBindings) *astNode {
+func (fdfns *FileDefinitions) newAstNode(parent *astNode, key ast.Node, unprocessed ast.Node, navigable *navigableBindings) *astNode {
 	if navigable == nil {
-		navigable = &navigableBindings{}
+		navigable = &navigableBindings{dfns: fdfns.dfns}
 		if parent != nil {
 			navigable.parent = parent.navigable
 		}
 	}
 	s := &astNode{
-		dfns:        dfns,
+		fdfns:       fdfns,
 		parent:      parent,
 		unprocessed: unprocessed,
 		navigable:   navigable,
@@ -378,8 +466,7 @@ func (dfns *Definitions) ForFile(filename string) *FileDefinitions {
 // FileDefinitions provides methods to resolve file offsets within a
 // certain file to their definitions.
 type FileDefinitions struct {
-	// pkgNode is the package-level astNode containing this file
-	pkgNode *astNode
+	dfns *Definitions
 	// definitions caches the definitions that have been computed
 	// during evaluation. This ensures that subsequent calls to
 	// [evalForOffset] for a given offset are O(1). The map key is the
@@ -389,6 +476,8 @@ type FileDefinitions struct {
 	completions map[int]*completionResolutions
 	// File is the original [ast.File] that was passed to [Analyse].
 	File *ast.File
+
+	identUsageOffsets map[string][]int
 }
 
 // completionResolutions models the various different types of
@@ -407,6 +496,7 @@ type completionResolutions struct {
 // DefinitionsForOffset reports the definitions that the file offset (number of
 // bytes from the start of the file) resolves to.
 func (fdfns *FileDefinitions) DefinitionsForOffset(offset int) []ast.Node {
+	fdfns.dfns.bootFiles()
 	definitions := fdfns.definitions
 	navs, found := definitions[offset]
 	if !found {
@@ -432,6 +522,7 @@ func (fdfns *FileDefinitions) DefinitionsForOffset(offset int) []ast.Node {
 // file offset (number of bytes from the start of the file) resolves
 // to.
 func (fdfns *FileDefinitions) DocCommentsForOffset(offset int) map[ast.Node][]*ast.CommentGroup {
+	fdfns.dfns.bootFiles()
 	definitions := fdfns.definitions
 	navs, found := definitions[offset]
 	if !found {
@@ -456,6 +547,7 @@ func (fdfns *FileDefinitions) DocCommentsForOffset(offset int) map[ast.Node][]*a
 // path element following the path element indicated by the offset
 // (number of bytes from the start of the file).
 func (fdfns *FileDefinitions) CompletionsForOffset(offset int) (fields, embeds []string, startOffset, fieldEndOffset, embedEndOffset int) {
+	fdfns.dfns.bootFiles()
 	completions := fdfns.completions
 	resolutions, found := completions[offset]
 	if !found {
@@ -519,6 +611,218 @@ func (fdfns *FileDefinitions) CompletionsForOffset(offset int) (fields, embeds [
 	return fields, embeds, resolutions.startOffset, resolutions.fieldEndOffset, resolutions.embedEndOffset
 }
 
+func (fdfns *FileDefinitions) UsagesForOffset(offset int) []ast.Node {
+	fdfns.dfns.bootFiles()
+	definitions := fdfns.definitions
+	navs, found := definitions[offset]
+	if !found {
+		definitions[offset] = []*navigableBindings{}
+		fdfns.evalForOffset(offset)
+		navs = definitions[offset]
+	}
+
+	if len(navs) == 1 {
+		nav := navs[0]
+		if nav == nav.dfns.pkgDecls && nav.dfns != fdfns.dfns {
+			// The request is for usages of an import.
+			for n, node := range nav.usedBy {
+				if _, ok := n.(*ast.ImportSpec); ok && node.fdfns == fdfns {
+					navs = []*navigableBindings{node.navigable}
+					break
+				}
+			}
+		}
+	}
+
+	usages(navs)
+
+	exprs := make(map[ast.Node]*astNode)
+	for _, nav := range navs {
+		maps.Copy(exprs, nav.usedBy)
+	}
+	return slices.Collect(maps.Keys(exprs))
+}
+
+func usages(navsWorklist []*navigableBindings) {
+	// every nav which uses the thing we care about, or any nav in the path to the thing we care about
+	targetsSeen := make(map[*navigableBindings]struct{})
+	evaluatedNavs := make(map[*navigableBindings]struct{})
+	evaluatedNodes := make(map[*astNode]struct{})
+	navsWorklist = slices.Clip(navsWorklist)
+
+	for len(navsWorklist) > 0 {
+		nav := navsWorklist[0]
+		navsWorklist = navsWorklist[1:]
+
+		if _, seen := evaluatedNavs[nav]; seen {
+			continue
+		}
+		evaluatedNavs[nav] = struct{}{}
+
+		isExported := false
+		var pathElements []*navigableBindings
+		var evalWorklist []*astNode
+		{
+			var child *navigableBindings
+			for parent := nav; parent != nil; child, parent = parent, parent.parent {
+				if parent == parent.dfns.pkgNode.navigable {
+					isExported = true
+				}
+				pathElements = append(pathElements, parent)
+				if child != nil && parent.name != "" && child.name == "" {
+					break
+				}
+				evaluatedNavs[parent] = struct{}{}
+				evalWorklist = parent.contributingNodes
+			}
+		}
+
+		evalWorklist = slices.Clip(evalWorklist)
+		for len(evalWorklist) > 0 {
+			node := evalWorklist[0]
+			evalWorklist = evalWorklist[1:]
+
+			if _, seen := evaluatedNodes[node]; seen {
+				continue
+			}
+			evaluatedNodes[node] = struct{}{}
+
+			node.eval()
+			evalWorklist = append(evalWorklist, node.allChildren...)
+		}
+
+		targetsWorklist := pathElements
+		clear(targetsSeen)
+		for len(targetsWorklist) > 0 {
+			target := targetsWorklist[0]
+			targetsWorklist = targetsWorklist[1:]
+
+			if _, seen := targetsSeen[target]; seen {
+				continue
+			}
+			targetsSeen[target] = struct{}{}
+
+			for _, use := range target.usedBy {
+				// Only if the usage is basically an embedding
+				// (i.e. appears in resolvesTo) do we need to go
+				// further. So for example, when inspecting the uses of y,
+				// if we found x: y + 1 we would not then need to inspect
+				// the uses of x.
+				if slices.Contains(use.resolvesTo, target) {
+					targetsWorklist = append(targetsWorklist, use.navigable)
+					navsWorklist = append(navsWorklist, use.navigable)
+				}
+			}
+		}
+
+		if isExported {
+			// For all the packages that import us, find where usages of
+			// this package appears.
+			for _, dfns := range nav.dfns.pkgImporters() {
+				navsWorklist = append(navsWorklist, dfns.initialNavsForImport(nav.dfns.ip)...)
+			}
+		}
+	}
+}
+
+func (dfns *Definitions) initialNavsForImport(ip ast.ImportPath) []*navigableBindings {
+	dfns.bootFiles()
+	nav, found := dfns.importSpecNodes[ip]
+	if !found {
+		return nil
+	}
+	var result []*navigableBindings
+	for _, node := range nav.contributingNodes {
+		spec := node.keyAlias.(*ast.ImportSpec)
+		name := ""
+		if alias := spec.Name; alias != nil && alias.Name != "" {
+			name = alias.Name
+		} else {
+			ip := dfns.parseImportSpec(spec)
+			if ip == nil {
+				continue
+			}
+			name = ip.Qualifier
+		}
+		fdfns := node.fdfns
+		definitions := fdfns.definitions
+		offsets := fdfns.findIdentUsageOffsets(name)
+
+		for _, offset := range offsets {
+			navs, found := definitions[offset]
+			if !found {
+				definitions[offset] = []*navigableBindings{}
+				fdfns.evalForOffset(offset)
+				navs = definitions[offset]
+			}
+			result = append(result, navs...)
+		}
+	}
+	return result
+}
+
+func (fdfns *FileDefinitions) findIdentUsageOffsets(name string) []int {
+	identUsageOffsets := fdfns.identUsageOffsets
+	if identUsageOffsets == nil {
+		identUsageOffsets = make(map[string][]int)
+		fdfns.identUsageOffsets = identUsageOffsets
+	}
+
+	offsets, found := identUsageOffsets[name]
+	if !found {
+		ast.Walk(fdfns.File, func(n ast.Node) bool {
+			switch n := n.(type) {
+			case *ast.ImportDecl:
+				return false
+			case *ast.Field:
+				if label, ok := n.Label.(*ast.Ident); ok && label.Name == name {
+					return false
+				}
+				// NB we could get smarter and try and look inside an alias.
+			case *ast.LetClause:
+				if n.Ident.Name == name {
+					return false
+				}
+			case *ast.ForClause:
+				if n.Key != nil && n.Key.Name == name {
+					return false
+				}
+				if n.Value != nil && n.Value.Name == name {
+					return false
+				}
+			case *ast.Ident:
+				if n.Name == name {
+					offsets = append(offsets, n.Pos().Position().Offset)
+				}
+			}
+			return true
+		}, nil)
+		identUsageOffsets[name] = offsets
+	}
+
+	return offsets
+}
+
+func (dfns *Definitions) parseImportSpec(spec *ast.ImportSpec) *ast.ImportPath {
+	str, err := strconv.Unquote(spec.Path.Value)
+	if err != nil {
+		return nil
+	}
+	if ip, found := dfns.importCanonicalisation[str]; found {
+		return &ip
+	}
+	// If the import specs explicitly give a qualifier that isn't
+	// needed, we should test again in case we now get a match
+	// (modimports calls Canonical on import paths so if the
+	// importCanonicalisation is built from the result of modimports
+	// etc then this second test becomes necessary).
+	ip := ast.ParseImportPath(str).Canonical()
+	if ip, found := dfns.importCanonicalisation[ip.String()]; found {
+		return &ip
+	}
+	return &ip
+}
+
 // evalForOffset evaluates from the pkgNode, evaluating only child
 // astNodes that contain the given file-byte-offset.
 func (fdfns *FileDefinitions) evalForOffset(offset int) {
@@ -527,7 +831,7 @@ func (fdfns *FileDefinitions) evalForOffset(offset int) {
 	}
 
 	filename := fdfns.File.Filename
-	pkgNode := fdfns.pkgNode
+	pkgNode := fdfns.dfns.pkgNode
 	pkgNode.eval()
 	seen := make(map[*astNode]struct{})
 	worklist := []*astNode{pkgNode}
@@ -561,7 +865,7 @@ func (fdfns *FileDefinitions) evalForOffset(offset int) {
 // new namespace for lexical resolution, and may or may not create a
 // new namespace for non-lexical resolution.
 type astNode struct {
-	dfns *Definitions
+	fdfns *FileDefinitions
 	// parent is the parent astNode.
 	parent *astNode
 	// unprocessed is the initial node that this astNode is solely
@@ -573,7 +877,8 @@ type astNode struct {
 	// ident. This can be nil, such as when a node is an
 	// expression. For example in the path {a: 3, b: a}.b, a node with
 	// no key will be created, containing the structlit {a: 3, b: a}.
-	key ast.Node
+	key      ast.Node
+	keyAlias ast.Node
 	// resolvesTo points to the navigable bindings this node resolves
 	// to, due to embedded paths. For example, in x: {y.z}, whatever
 	// node y.z resolves to, its navigable bindings will be stored in
@@ -618,7 +923,7 @@ type astNode struct {
 // [Definitions.newAstNode]. See those docs for more details on the
 // arguments to this function.
 func (n *astNode) newAstNode(key ast.Node, unprocessed ast.Node, navigable *navigableBindings) *astNode {
-	s := n.dfns.newAstNode(n, key, unprocessed, navigable)
+	s := n.fdfns.newAstNode(n, key, unprocessed, navigable)
 	n.allChildren = append(n.allChildren, s)
 	return s
 }
@@ -664,6 +969,7 @@ func (n *astNode) dump(depth int) {
 // a graph (directed, acyclic) of navigableBindings. The zero value is
 // ready for use.
 type navigableBindings struct {
+	dfns *Definitions
 	// parent is the parent navigableBindings. The graph of
 	// navigableBindings can be different from the graph of astNodes,
 	// because two astNodes in a parent-child relationship can reuse
@@ -707,7 +1013,15 @@ type navigableBindings struct {
 	// non-first-elements of a path, and let expressions (amongst
 	// others) introduce bindings that are not visible to
 	// non-first-path-elements.
-	name string
+	name   string
+	usedBy map[ast.Node]*astNode
+}
+
+func (nav *navigableBindings) recordUsage(e ast.Node, node *astNode) {
+	if nav.usedBy == nil {
+		nav.usedBy = make(map[ast.Node]*astNode)
+	}
+	nav.usedBy[e] = node
 }
 
 // addDefinition records that the target navigableBindings are the
@@ -720,12 +1034,11 @@ func (n *astNode) addDefinition(start, end token.Pos, targets []*navigableBindin
 	}
 
 	startPosition := start.Position()
-	filename := startPosition.Filename
-	resolutions := n.dfns.byFilename[filename].definitions
+	definitions := n.fdfns.definitions
 
 	endOffset := end.Position().Offset
 	for offset := startPosition.Offset; offset < endOffset; offset++ {
-		resolutions[offset] = targets
+		definitions[offset] = targets
 	}
 }
 
@@ -752,15 +1065,14 @@ func (n *astNode) addEmbedCompletions(start, end token.Pos, node *astNode, targe
 	}
 
 	startPosition := start.Position()
-	filename := startPosition.Filename
-	resolutions := n.dfns.byFilename[filename].completions
+	completions := n.fdfns.completions
 
 	endOffset := end.Position().Offset
 	for offset := startPosition.Offset; offset < endOffset; offset++ {
-		r, found := resolutions[offset]
+		r, found := completions[offset]
 		if !found {
 			r = &completionResolutions{}
-			resolutions[offset] = r
+			completions[offset] = r
 		}
 		r.embedNavigables = targets
 		r.embedNode = node
@@ -770,28 +1082,26 @@ func (n *astNode) addEmbedCompletions(start, end token.Pos, node *astNode, targe
 }
 
 // addFieldCompletions records that the target navigableBindings are
-// considered to contain bindings which should be offered at
-// completions for any completion request between the start and end
-// positions. colonPos contains the position of the colon which
-// follows the existing field name (probably slightly beyond the end
-// position), and is used to ensure that when the LSP server suggests
-// completions to the client, those completions correctly edit the
-// existing field.
+// considered to contain bindings which should be offered for any
+// completion request between the start and end positions. colonPos
+// contains the position of the colon which follows the existing field
+// name (probably slightly beyond the end position), and is used to
+// ensure that when the LSP server suggests completions to the client,
+// those completions correctly edit the existing field.
 func (n *astNode) addFieldCompletions(start, end token.Pos, targets []*navigableBindings, colonPos token.Pos) {
 	if len(targets) == 0 || start == token.NoPos || end == token.NoPos {
 		return
 	}
 
 	startPosition := start.Position()
-	filename := startPosition.Filename
-	resolutions := n.dfns.byFilename[filename].completions
+	completions := n.fdfns.completions
 
 	endOffset := end.Position().Offset
 	for offset := startPosition.Offset; offset < endOffset; offset++ {
-		r, found := resolutions[offset]
+		r, found := completions[offset]
 		if !found {
 			r = &completionResolutions{}
-			resolutions[offset] = r
+			completions[offset] = r
 		}
 		r.fieldNavigables = targets
 		r.fieldEndOffset = colonPos.Position().Offset
@@ -877,8 +1187,9 @@ func (n *astNode) eval() {
 			// Package declarations must be added to the pkgDecls
 			// navigable, so that they can all be found when resolving
 			// imports of this package, in some other package.
-			child := n.newAstNode(node, nil, n.dfns.pkgDecls)
+			child := n.newAstNode(node.Name, nil, n.fdfns.dfns.pkgDecls)
 			child.addDocComments(node)
+			n.addDefinition(node.Name.Pos(), node.Name.End(), []*navigableBindings{child.navigable})
 
 		case *ast.ImportDecl:
 			for _, spec := range node.Specs {
@@ -890,47 +1201,73 @@ func (n *astNode) eval() {
 			// avoid the possibility that evaluating a filenode would
 			// lookup every imported package and evaluate its filenodes
 			// (which themselves might do the same...).
+			dfns := n.fdfns.dfns
 			if n.isFileNode() {
 				// 1) At the filenode level, the first time we see the
 				// ImportSpec, we create appropriate file-scope bindings,
 				// but also pass the spec as the unprocessed value to a
 				// fresh child node;
-				if node.Name == nil {
-					str, err := strconv.Unquote(node.Path.Value)
-					if err != nil {
-						continue
+				ip := dfns.parseImportSpec(node)
+				if ip == nil {
+					break
+				}
+				importSpecNodes := dfns.importSpecNodes
+				nav, found := importSpecNodes[*ip]
+
+				var child *astNode
+				if alias := node.Name; alias != nil && alias.Name != "" {
+					child = n.newAstNode(alias, node, nav)
+					n.appendBinding(alias.Name, child)
+				} else if ip.Qualifier != "" {
+					child = n.newAstNode(node.Path, node, nav)
+					n.appendBinding(ip.Qualifier, child)
+				}
+				if child != nil {
+					child.keyAlias = node
+					if !found {
+						importSpecNodes[*ip] = child.navigable
 					}
-					ip := ast.ParseImportPath(str)
-					if ip.Qualifier != "" {
-						n.newBinding(ip.Qualifier, node, node)
-					}
-				} else {
-					n.newBinding(node.Name.Name, node, node)
 				}
 
 			} else {
 				// 2) In that child node, the second time we see the
-				// ImportSpec, we lookup the package imported, ensure the
-				// package declarations have been processed, and add a
+				// ImportSpec, we lookup the package imported and add a
 				// resolution to them.
-				path := node.Path
-				str, err := strconv.Unquote(path.Value)
-				if err != nil {
-					continue
+				str, err := strconv.Unquote(node.Path.Value)
+				var remotePkgDfns *Definitions
+				if err == nil {
+					remotePkgDfns = dfns.forPackage(str)
+					if remotePkgDfns != nil {
+						remotePkgDfns.bootFiles()
+						// The pkg exists. We've booted it which means that
+						// its pkgDecls now have contributingNodes which are
+						// the package declarations from every file in that
+						// package.
+					}
 				}
-				dfns := n.dfns.forPackage(str)
-				if dfns == nil {
-					continue
+				if remotePkgDfns == nil {
+					// Something went wrong. We create a fake dfns to
+					// handle this, so that elsewhere we can treat all
+					// imports the same, regardless of whether they were
+					// successful or not. Essentially, unsuccessful imports
+					// just appear as empty packages.
+					//
+					// If we really need to, we can tell that the import
+					// was successful or not from its dfns:
+					//
+					// 1. a bad import will have an empty ip (importPath) field
+					// 2. a bad import will have pkgDecls with no contributingNodes
+					remotePkgDfns = Analyse(ast.ImportPath{}, nil, nil, nil)
 				}
-				// Eval the pkgNode and its immediate children only (which
-				// will be filenodes). This is enough to ensure the
-				// package declarations have been found and added to the
-				// pkgDecls.
-				dfns.pkgNode.eval()
-				for _, child := range dfns.pkgNode.allChildren {
-					child.eval()
-				}
-				n.addDefinition(path.Pos(), path.End(), []*navigableBindings{dfns.pkgDecls})
+
+				// We add a definition from this import to the package
+				// declarations in the remote package.
+				n.addDefinition(n.key.Pos(), n.key.End(), []*navigableBindings{remotePkgDfns.pkgDecls})
+				// We also record that we are using those package
+				// decls. This means that from the result of resolving the
+				// import spec, we can always get back to this astNode n,
+				// and thus find our ImportSpec in n.keyAlias.
+				remotePkgDfns.pkgDecls.recordUsage(node, n)
 			}
 
 		case *ast.StructLit:
@@ -1007,8 +1344,26 @@ func (n *astNode) eval() {
 				n.newAstNode(nil, arg, nil)
 			}
 
-		case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr, *fieldDeclExpr:
+		case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr:
 			embeddedResolvable = append(embeddedResolvable, node.(ast.Expr))
+
+		case *fieldDeclExpr:
+			parent := n.parent
+			key := parent.key
+			if node.colonPos != token.NoPos {
+				navs := expandNavigableViaAncestralPath(parent.navigable.parent)
+				n.addFieldCompletions(key.Pos(), key.End(), navs, node.colonPos.Add(1))
+			}
+
+			navs := expandNavigableViaAncestralPath(parent.navigable)
+			n.addDefinition(key.Pos(), key.End(), navs)
+
+			if keyAlias := parent.keyAlias; keyAlias != nil {
+				n.addDefinition(keyAlias.Pos(), keyAlias.End(), navs)
+				for _, nav := range navs {
+					nav.recordUsage(keyAlias, n)
+				}
+			}
 
 		case *ast.Comprehension:
 			clause := node.Clauses[0]
@@ -1037,66 +1392,42 @@ func (n *astNode) eval() {
 			}
 
 		case *ast.IfClause:
-			comprehensionTail := comprehensionsStash[node]
-			childExpr := n.newAstNode(nil, node.Condition, nil)
-			childExpr.addRange(comprehensionTail)
+			n.newAstNode(nil, node.Condition, nil)
 
-			childTail := childExpr.newAstNode(nil, comprehensionTail, nil)
-			n.resolvesTo = append(n.resolvesTo, childTail.navigable)
-			if _, ok := comprehensionTail.(*ast.Comprehension); !ok {
-				// If it's not a comprehension, then it must be the
-				// body. In which case the body resolves back to us.
-				childTail.resolvesTo = append(childTail.resolvesTo, n.navigable)
-			}
+			comprehensionTail := comprehensionsStash[node]
+			n.newAstNode(nil, comprehensionTail, n.navigable)
 
 		case *ast.ForClause:
+			n.newAstNode(nil, node.Source, nil)
+
+			stack := astNodeStack{n.newAstNode(nil, nil, nil)}
+
+			if key := node.Key; key != nil {
+				stack.push(key, stack.peek().newBinding(key.Name, key, nil))
+			}
+			if val := node.Value; val != nil {
+				stack.push(val, stack.peek().newBinding(val.Name, val, nil))
+			}
+
 			comprehensionTail := comprehensionsStash[node]
-			childExpr := n.newAstNode(nil, node.Source, nil)
-			childExpr.addRange(comprehensionTail)
-
-			childBinding := childExpr.newAstNode(nil, nil, nil)
-			if node.Key != nil {
-				childBinding.newBinding(node.Key.Name, node.Key, nil)
-			}
-			if node.Value != nil {
-				childBinding.newBinding(node.Value.Name, node.Value, nil)
-			}
-			childBinding.addRange(comprehensionTail)
-
-			childTail := childBinding.newAstNode(nil, comprehensionTail, nil)
-			n.resolvesTo = append(n.resolvesTo, childTail.navigable)
-			if _, ok := comprehensionTail.(*ast.Comprehension); !ok {
-				// If it's not a comprehension, then it must be the
-				// body. In which case the body resolves back to us.
-				childTail.resolvesTo = append(childTail.resolvesTo, n.navigable)
-			}
+			stack.push(comprehensionTail, stack.peek().newAstNode(nil, comprehensionTail, n.navigable))
 
 		case *ast.LetClause:
+			ident := node.Ident
 			// A let clause might or might not be within a comprehension.
 			if comprehensionTail, found := comprehensionsStash[node]; found {
-				// We're within a wider comprehension: take care to make
-				// sure the binding is added as a child of the expr, and
-				// thus the expr cannot see its own binding (unlike a
-				// field).
-				childExpr := n.newAstNode(nil, node.Expr, nil)
-				childExpr.addRange(comprehensionTail)
+				// We're within a wider comprehension.
+				n.newAstNode(nil, node.Expr, nil)
 
-				childBinding := childExpr.newAstNode(nil, nil, nil)
-				childBinding.newBinding(node.Ident.Name, node.Ident, nil)
-				childBinding.addRange(comprehensionTail)
+				stack := astNodeStack{n.newAstNode(nil, nil, nil)}
+				stack.push(ident, stack.peek().newBinding(ident.Name, ident, nil))
+				stack.push(comprehensionTail, stack.peek().newAstNode(nil, comprehensionTail, n.navigable))
 
-				childTail := childBinding.newAstNode(nil, comprehensionTail, nil)
-				n.resolvesTo = append(n.resolvesTo, childTail.navigable)
-				if _, ok := comprehensionTail.(*ast.Comprehension); !ok {
-					// If it's not a comprehension, then it must be the
-					// body. In which case the body resolves back to us.
-					childTail.resolvesTo = append(childTail.resolvesTo, n.navigable)
-				}
 			} else {
 				// We're not within a wider comprehension: the binding
 				// must be added to the current node n because we need to
 				// be able to find it from the first element of a path.
-				n.newBinding(node.Ident.Name, node.Ident, node.Expr)
+				n.newBinding(ident.Name, ident, node.Expr)
 			}
 
 		case *ast.Field:
@@ -1117,14 +1448,8 @@ func (n *astNode) eval() {
 				name, _, err := ast.LabelName(label)
 				if err == nil {
 					binding = n.ensureNavigableBinding(name, label, node.Value, node.TokenPos)
-				} else {
-					binding = n.newAstNode(label, node.Value, nil)
 				}
-			default:
-				binding = n.newAstNode(label, node.Value, nil)
 			}
-
-			binding.addDocComments(node)
 
 			if isAlias {
 				switch alias.Expr.(type) {
@@ -1132,17 +1457,28 @@ func (n *astNode) eval() {
 					// X=[e]: field
 					// X is only visible within field
 					wrapper := n.newAstNode(nil, nil, nil)
-					wrapper.appendBinding(alias.Ident.Name, binding)
-					binding.parent = wrapper
+					binding = wrapper.newBinding(alias.Ident.Name, alias.Ident, node.Value)
+					wrapper.addRange(node)
 				case ast.Label:
 					// X=ident: field
 					// X="basic": field
 					// X="\(e)": field
 					// X=(e): field
 					// X is visible within s
-					n.appendBinding(alias.Ident.Name, binding)
+					if binding == nil {
+						binding = n.newBinding(alias.Ident.Name, alias.Ident, node.Value)
+					} else {
+						n.appendBinding(alias.Ident.Name, binding)
+						binding.addRange(alias.Ident)
+						binding.keyAlias = alias.Ident
+					}
 				}
 			}
+			if binding == nil {
+				binding = n.newAstNode(label, node.Value, nil)
+			}
+
+			binding.addDocComments(node)
 
 			switch label := label.(type) {
 			case *ast.Interpolation:
@@ -1154,6 +1490,7 @@ func (n *astNode) eval() {
 					// Although the spec supports this, the parser doesn't seem to.
 					wrapper := n.newAstNode(nil, nil, nil)
 					wrapper.newBinding(alias.Ident.Name, alias.Ident, alias.Expr)
+					wrapper.addRange(node)
 					binding.parent = wrapper
 				} else {
 					resolvable = append(resolvable, label.X)
@@ -1165,6 +1502,7 @@ func (n *astNode) eval() {
 						// X is only visible within field.
 						wrapper := n.newAstNode(nil, nil, nil)
 						wrapper.newBinding(alias.Ident.Name, alias.Ident, alias.Expr)
+						wrapper.addRange(node)
 						binding.parent = wrapper
 					} else {
 						resolvable = append(resolvable, elt)
@@ -1189,16 +1527,6 @@ func (n *astNode) eval() {
 // & y`.
 func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
 	switch e := e.(type) {
-	case *fieldDeclExpr:
-		parent := n.parent
-		key := parent.key
-		navs := expandNavigableViaAncestralPath(parent.navigable.parent)
-		n.addFieldCompletions(key.Pos(), key.End(), navs, e.colonPos.Add(1))
-
-		navs = expandNavigableViaAncestralPath(parent.navigable)
-		n.addDefinition(key.Pos(), key.End(), navs)
-		return navs
-
 	case *ast.Ident:
 		if maybeField && n.fieldsAllowed {
 			n.addFieldCompletions(e.Pos(), e.End(), expandNavigableViaAncestralPath(n.navigable), e.End())
@@ -1210,6 +1538,7 @@ func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
 		}
 		navs := []*navigableBindings{root}
 		n.addDefinition(e.Pos(), e.End(), navs)
+		root.recordUsage(e, n)
 		return navs
 
 	case *ast.SelectorExpr:
@@ -1233,6 +1562,9 @@ func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
 
 		results := navigateBindingsByName(resolved, name)
 		n.addDefinition(sel.Pos(), sel.End(), results)
+		for _, nav := range results {
+			nav.recordUsage(sel, n)
+		}
 		return results
 
 	case *ast.IndexExpr:
@@ -1255,12 +1587,13 @@ func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
 
 		results := navigateBindingsByName(resolved, name)
 		n.addDefinition(e.Lbrack, e.Rbrack.Add(1), results)
+		for _, nav := range results {
+			nav.recordUsage(e.Index, n)
+		}
 		return results
 
 	default:
-		return slices.Collect(maps.Keys(
-			expandNavigables([]*navigableBindings{n.newAstNode(nil, e, nil).navigable}),
-		))
+		return []*navigableBindings{n.newAstNode(nil, e, nil).navigable}
 	}
 }
 
@@ -1282,22 +1615,22 @@ func expandNavigables(navigables []*navigableBindings) map[*navigableBindings]st
 		}
 		navigableSet[nav] = struct{}{}
 
-		// evaluating a node X can add new nodes into X's
+		// evaluating a node X can append new nodes onto X's
 		// navigable.contributingNodes. So we need to make sure we
 		// evaluate and expand into those too. I.e. calling node.eval()
-		// can modify nav.contributingNodes.
+		// can modify nav.contributingNodes, thus we don't use range.
 		for i := 0; i < len(nav.contributingNodes); i++ {
 			node := nav.contributingNodes[i]
 
 			node.eval()
 			navigables = append(navigables, node.resolvesTo...)
 
-			if spec, ok := node.key.(*ast.ImportSpec); ok {
+			if spec, ok := node.keyAlias.(*ast.ImportSpec); ok {
 				str, err := strconv.Unquote(spec.Path.Value)
 				if err != nil {
 					continue
 				}
-				dfns := node.dfns.forPackage(str)
+				dfns := node.fdfns.dfns.forPackage(str)
 				if dfns == nil {
 					continue
 				}
@@ -1412,7 +1745,7 @@ func (n *astNode) resolvePathRoot(name string) *navigableBindings {
 // isFileNode reports whether n is a direct child of the package
 // astNode.
 func (n *astNode) isFileNode() bool {
-	return n.parent == n.dfns.pkgNode
+	return n.parent == nil || n.parent == n.fdfns.dfns.pkgNode
 }
 
 // ensureNavigableBinding creates and returns a new [astNode],
@@ -1471,6 +1804,11 @@ func (n *astNode) ensureNavigableBinding(name string, key ast.Label, unprocessed
 func (n *astNode) newBinding(name string, key ast.Node, unprocessed ast.Node) *astNode {
 	binding := n.newAstNode(key, unprocessed, nil)
 	n.appendBinding(name, binding)
+	if !strings.HasPrefix(name, "__") {
+		// Same logic as in [astNode.ensureNavigableBinding] above;
+		expr := &fieldDeclExpr{position: key, colonPos: token.NoPos}
+		binding.newAstNode(key, expr, nil)
+	}
 	return binding
 }
 
@@ -1515,4 +1853,22 @@ func (w *fieldDeclExpr) Pos() token.Pos {
 
 func (w *fieldDeclExpr) End() token.Pos {
 	return w.position.End()
+}
+
+type astNodeStack []*astNode
+
+func (stack *astNodeStack) push(n ast.Node, node *astNode) {
+	nodes := *stack
+	for _, node := range nodes {
+		node.addRange(n)
+	}
+	*stack = append(nodes, node)
+}
+
+func (stack *astNodeStack) peek() *astNode {
+	nodes := *stack
+	if len(nodes) == 0 {
+		return nil
+	}
+	return nodes[len(nodes)-1]
 }

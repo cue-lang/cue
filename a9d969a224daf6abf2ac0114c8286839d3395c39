@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82e93602_49bd7455",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-11T21:41:51Z",
+      "side": 1,
+      "message": "This is already reviewed on the original PR; just need a quick sanity check and a +2 given that I can\u0027t approve a patch I\u0027m uploading myself :)",
+      "revId": "a9d969a224daf6abf2ac0114c8286839d3395c39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

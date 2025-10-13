@@ -1,0 +1,108 @@
+-- test.cue --
+package test
+
+// Open list with element type
+stringList?: [...string]
+
+// Open list with number elements
+numberList?: [...number]
+
+// Closed list (tuple)
+tuple?: [string, int]
+
+// Mixed tuple with concrete values
+mixedTuple?: [string, 2, bool]
+
+// Empty list
+emptyList?: []
+
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: {
+	stringList: ["a", "b", "c"]
+	numberList: [1, 2.5, 3]
+	tuple: ["foo", 42]
+	mixedTuple: ["bar", 2, true]
+	emptyList: []
+}
+
+ok2: data: {}
+
+badStringList: {
+	data: stringList: [1, 2, 3]
+	error: true
+}
+
+badTupleLength: {
+	data: tuple: ["foo"]
+	error: true
+}
+
+badTupleType: {
+	data: tuple: [1, "bar"]
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: {
+		emptyList: {
+			type:      "array"
+			maxLength: 0
+		}
+		mixedTuple: {
+			type: "array"
+			prefixItems: [{
+				type: "string"
+			}, {
+				const: 2
+			}, {
+				type: "boolean"
+			}]
+			maxLength: 3
+			minLength: 3
+		}
+		numberList: {
+			type: "array"
+			items: {
+				type: "number"
+			}
+		}
+		stringList: {
+			type: "array"
+			items: {
+				type: "string"
+			}
+		}
+		tuple: {
+			type: "array"
+			prefixItems: [{
+				type: "string"
+			}, {
+				type: "integer"
+			}]
+			maxLength: 2
+			minLength: 2
+		}
+	}
+}
+-- out/generate-v3/badStringList --
+badStringList.data.stringList.0: conflicting values 1 and string (mismatched types int and string):
+    ./datatest/tests.cue:14:21
+badStringList.data.stringList.1: conflicting values 2 and string (mismatched types int and string):
+    ./datatest/tests.cue:14:24
+badStringList.data.stringList.2: conflicting values 3 and string (mismatched types int and string):
+    ./datatest/tests.cue:14:27
+-- out/generate-v3/badTupleLength --
+badTupleLength.data.tuple: incompatible list lengths (1 and 3):
+    1:391
+-- out/generate-v3/badTupleType --
+badTupleType.data.tuple.0: conflicting values 1 and string (mismatched types int and string):
+    ./datatest/tests.cue:24:16
+badTupleType.data.tuple.1: conflicting values "bar" and int (mismatched types string and int):
+    1:425
+    ./datatest/tests.cue:24:19
+-- out/generate-v3/ok1 --
+-- out/generate-v3/ok2 --

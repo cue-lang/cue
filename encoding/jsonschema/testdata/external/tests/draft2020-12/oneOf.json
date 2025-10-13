@@ -26,18 +26,12 @@
 			{
 				"description": "both oneOf valid",
 				"data": 3,
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "neither oneOf valid",
 				"data": 1.5,
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -59,10 +53,7 @@
 			{
 				"description": "mismatch base schema",
 				"data": 3,
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "one oneOf valid",
@@ -72,10 +63,7 @@
 			{
 				"description": "both oneOf valid",
 				"data": "foo",
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -93,10 +81,7 @@
 			{
 				"description": "any value is invalid",
 				"data": "foo",
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -208,10 +193,7 @@
 					"foo": "baz",
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "neither oneOf valid (complex)",
@@ -219,10 +201,7 @@
 					"foo": 2,
 					"bar": "quux"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -246,10 +225,7 @@
 			{
 				"description": "both valid - invalid",
 				"data": 123,
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -279,10 +255,7 @@
 				"data": {
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "first valid - valid",
@@ -307,10 +280,7 @@
 					"bar": 2,
 					"baz": 3
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -359,20 +329,14 @@
 					"foo": "foo",
 					"bar": 8
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "neither oneOf valid",
 				"data": {
 					"baz": "quux"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

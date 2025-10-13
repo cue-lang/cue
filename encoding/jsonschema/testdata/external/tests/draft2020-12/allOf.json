@@ -40,20 +40,14 @@
 				"data": {
 					"foo": "baz"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "mismatch first",
 				"data": {
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "wrong type",
@@ -61,10 +55,7 @@
 					"foo": "baz",
 					"bar": "quux"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -127,10 +118,7 @@
 					"bar": 2,
 					"baz": null
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "mismatch second allOf",
@@ -138,20 +126,14 @@
 					"foo": "quux",
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "mismatch both",
 				"data": {
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -177,10 +159,7 @@
 			{
 				"description": "mismatch one",
 				"data": 35,
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

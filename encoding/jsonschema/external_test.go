@@ -252,6 +252,7 @@ func runExternalSchemaTest(t *testing.T, m *cuetdtest.M, variant string, s *exte
 // invokes Generate on it, then returns the result of invoking Extract on
 // the result of that.
 func roundTripViaGenerate(t *testing.T, schemaValue cue.Value) (cue.Value, error) {
+	t.Logf("round tripping from schema %#v", schemaValue)
 	ctx := schemaValue.Context()
 	// Generate JSON Schema from the extracted CUE.
 	// Note: 2020_12 is the only version that we currently support.

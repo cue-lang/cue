@@ -2,8 +2,9 @@
 package test
 
 import (
-	"strings"
+	"list"
 	"math"
+	"strings"
 	"time"
 )
 
@@ -18,6 +19,11 @@ multiple?: math.MultipleOf(5)
 dateTime?: time.Format("2006-01-02T15:04:05Z07:00")
 date?: time.Format("2006-01-02")
 timeOnly?: time.Format("15:04:05")
+
+// List constraints
+shortList?: list.MaxItems(3)
+longList?: list.MinItems(5)
+boundedList?: list.MaxItems(3) & list.MinItems(5)
 
 // Combined constraints
 userName?: string & strings.MinRunes(3) & strings.MaxRunes(20)
@@ -72,6 +78,11 @@ badScore2: {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	type:    "object"
 	properties: {
+		boundedList: {
+			type:     "array"
+			maxItems: 3
+			minItems: 5
+		}
 		date: {
 			type:   "string"
 			format: "date"
@@ -79,6 +90,10 @@ badScore2: {
 		dateTime: {
 			type:   "string"
 			format: "date-time"
+		}
+		longList: {
+			type:     "array"
+			minItems: 5
 		}
 		longString: {
 			type:      "string"
@@ -95,6 +110,10 @@ badScore2: {
 				type:       "integer"
 				multipleOf: 10
 			}]
+		}
+		shortList: {
+			type:     "array"
+			maxItems: 3
 		}
 		shortString: {
 			type:      "string"
@@ -113,39 +132,39 @@ badScore2: {
 }
 -- out/generate-v3/badDate --
 badDate.data.date: invalid value "2025-10-40" (does not satisfy time.Format("2006-01-02")): error in call to time.Format: invalid time "2025-10-40":
-    1:113
+    1:170
     ./datatest/tests.cue:30:14
 -- out/generate-v3/badDateTime --
 badDateTime.data.dateTime: invalid value "2025-10-02T13" (does not satisfy time.Time): error in call to time.Time: invalid time "2025-10-02T13":
-    1:158
+    1:215
     ./datatest/tests.cue:26:18
 -- out/generate-v3/badScore2 --
 badScore2.data.score: invalid value 5 (does not satisfy math.MultipleOf(10)):
-    1:323
-    1:278
+    1:421
+    1:376
     ./datatest/tests.cue:42:15
 -- out/generate-v3/badTime --
 badTime.data.date: invalid value "25:00:10" (does not satisfy time.Format("2006-01-02")): error in call to time.Format: invalid time "25:00:10":
-    1:113
+    1:170
     ./datatest/tests.cue:34:14
 -- out/generate-v3/badUserName --
 badUserName.data.userName: invalid value "x" (does not satisfy strings.MinRunes(3)):
-    1:477
-    1:462
-    1:477
+    1:617
+    1:602
+    1:617
     ./datatest/tests.cue:38:18
 -- out/generate-v3/notMultiple --
 notMultiple.data.multiple: invalid value 1 (does not satisfy math.MultipleOf(5)):
-    1:253
+    1:351
     ./datatest/tests.cue:22:18
 -- out/generate-v3/ok --
 -- out/generate-v3/stringTooLong --
 stringTooLong.data.shortString: invalid value "01234567890" (does not satisfy strings.MaxRunes(10)):
-    1:373
-    1:373
+    1:513
+    1:513
     ./datatest/tests.cue:14:21
 -- out/generate-v3/stringTooShort --
 stringTooShort.data.longString: invalid value "x" (does not satisfy strings.MinRunes(5)):
-    1:210
-    1:210
+    1:308
+    1:308
     ./datatest/tests.cue:18:20

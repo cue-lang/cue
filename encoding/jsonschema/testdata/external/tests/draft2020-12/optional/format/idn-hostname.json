@@ -46,7 +46,8 @@
 				"data": "〮실례.테스트",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -54,7 +55,8 @@
 				"data": "실〮례.테스트",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -62,7 +64,8 @@
 				"data": "실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실례례테스트례례례례례례례례례례례례례례례례례테스트례례례례례례례례례례례례례례례례례례례테스트례례례례례례례례례례례례테스트례례실례.테스트",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -71,7 +74,8 @@
 				"data": "-\u003e $1.00 \u003c--",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -86,7 +90,8 @@
 				"data": "xn--X",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -95,7 +100,8 @@
 				"data": "XN--aa---o47jg78q",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -104,7 +110,8 @@
 				"data": "-hello",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -113,7 +120,8 @@
 				"data": "hello-",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -122,7 +130,8 @@
 				"data": "-hello-",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -131,7 +140,8 @@
 				"data": "ःhello",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -140,7 +150,8 @@
 				"data": "̀hello",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -149,7 +160,8 @@
 				"data": "҈hello",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -170,7 +182,8 @@
 				"data": "ـߺ",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -179,7 +192,8 @@
 				"data": "〱〲〳〴〵〮〯〻",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -188,7 +202,8 @@
 				"data": "a·l",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -197,7 +212,8 @@
 				"data": "·l",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -206,7 +222,8 @@
 				"data": "l·a",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -215,7 +232,8 @@
 				"data": "l·",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -230,7 +248,8 @@
 				"data": "α͵S",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -239,7 +258,8 @@
 				"data": "α͵",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -254,7 +274,8 @@
 				"data": "A׳ב",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -263,7 +284,8 @@
 				"data": "׳ב",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -278,7 +300,8 @@
 				"data": "A״ב",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -287,7 +310,8 @@
 				"data": "״ב",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -302,7 +326,8 @@
 				"data": "def・abc",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -311,7 +336,8 @@
 				"data": "・",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -338,7 +364,8 @@
 				"data": "ب٠۰",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -359,7 +386,8 @@
 				"data": "क‍ष",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -368,7 +396,8 @@
 				"data": "‍ष",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{

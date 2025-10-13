@@ -5,6 +5,9 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"uniqueItems": true
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "unique array of integers is valid",
@@ -12,7 +15,10 @@
 					1,
 					2
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array of integers is invalid",
@@ -20,7 +26,10 @@
 					1,
 					1
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array of more than two integers is invalid",
@@ -29,7 +38,10 @@
 					2,
 					1
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "numbers are unique if mathematically unequal",
@@ -38,7 +50,10 @@
 					1.00,
 					1
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "false is not equal to zero",
@@ -46,7 +61,10 @@
 					0,
 					false
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "true is not equal to one",
@@ -54,7 +72,10 @@
 					1,
 					true
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique array of strings is valid",
@@ -63,7 +84,10 @@
 					"bar",
 					"baz"
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array of strings is invalid",
@@ -72,7 +96,10 @@
 					"bar",
 					"foo"
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique array of objects is valid",
@@ -84,7 +111,10 @@
 						"foo": "baz"
 					}
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array of objects is invalid",
@@ -96,7 +126,10 @@
 						"foo": "bar"
 					}
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "property order of array of objects is ignored",
@@ -110,7 +143,10 @@
 						"foo": "bar"
 					}
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique array of nested objects is valid",
@@ -130,7 +166,10 @@
 						}
 					}
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array of nested objects is invalid",
@@ -150,7 +189,10 @@
 						}
 					}
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique array of arrays is valid",
@@ -162,7 +204,10 @@
 						"bar"
 					]
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array of arrays is invalid",
@@ -174,7 +219,10 @@
 						"foo"
 					]
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array of more than two arrays is invalid",
@@ -189,7 +237,10 @@
 						"foo"
 					]
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "1 and true are unique",
@@ -197,7 +248,10 @@
 					1,
 					true
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "0 and false are unique",
@@ -205,7 +259,10 @@
 					0,
 					false
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[1] and [true] are unique",
@@ -217,7 +274,10 @@
 						true
 					]
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[0] and [false] are unique",
@@ -229,7 +289,10 @@
 						false
 					]
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "nested [1] and [true] are unique",
@@ -247,7 +310,10 @@
 						"foo"
 					]
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "nested [0] and [false] are unique",
@@ -265,7 +331,10 @@
 						"foo"
 					]
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique heterogeneous types are valid",
@@ -279,7 +348,10 @@
 					1,
 					"{}"
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique heterogeneous types are invalid",
@@ -293,7 +365,10 @@
 					{},
 					1
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "different objects are unique",
@@ -307,7 +382,10 @@
 						"b": 1
 					}
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "objects are non-unique despite key order",
@@ -321,7 +399,10 @@
 						"a": 1
 					}
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "{\"a\": false} and {\"a\": 0} are unique",
@@ -333,7 +414,10 @@
 						"a": 0
 					}
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "{\"a\": true} and {\"a\": 1} are unique",
@@ -345,7 +429,10 @@
 						"a": 1
 					}
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -363,6 +450,9 @@
 			],
 			"uniqueItems": true
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "[false, true] from items array is valid",
@@ -370,7 +460,10 @@
 					false,
 					true
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[true, false] from items array is valid",
@@ -378,7 +471,10 @@
 					true,
 					false
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[false, false] from items array is not valid",
@@ -386,7 +482,10 @@
 					false,
 					false
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[true, true] from items array is not valid",
@@ -394,7 +493,10 @@
 					true,
 					true
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique array extended from [false, true] is valid",
@@ -404,7 +506,10 @@
 					"foo",
 					"bar"
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique array extended from [true, false] is valid",
@@ -414,7 +519,10 @@
 					"foo",
 					"bar"
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array extended from [false, true] is not valid",
@@ -424,7 +532,10 @@
 					"foo",
 					"foo"
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array extended from [true, false] is not valid",
@@ -434,7 +545,10 @@
 					"foo",
 					"foo"
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -453,6 +567,9 @@
 			"uniqueItems": true,
 			"additionalItems": false
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "[false, true] from items array is valid",
@@ -460,7 +577,10 @@
 					false,
 					true
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[true, false] from items array is valid",
@@ -468,7 +588,10 @@
 					true,
 					false
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[false, false] from items array is not valid",
@@ -476,7 +599,10 @@
 					false,
 					false
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[true, true] from items array is not valid",
@@ -484,7 +610,10 @@
 					true,
 					true
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "extra items are invalid even if unique",
@@ -493,7 +622,10 @@
 					true,
 					null
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -503,6 +635,9 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"uniqueItems": false
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "unique array of integers is valid",
@@ -510,7 +645,10 @@
 					1,
 					2
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array of integers is valid",
@@ -518,7 +656,10 @@
 					1,
 					1
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "numbers are unique if mathematically unequal",
@@ -527,7 +668,10 @@
 					1.00,
 					1
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "false is not equal to zero",
@@ -535,7 +679,10 @@
 					0,
 					false
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "true is not equal to one",
@@ -543,7 +690,10 @@
 					1,
 					true
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique array of objects is valid",
@@ -555,7 +705,10 @@
 						"foo": "baz"
 					}
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array of objects is valid",
@@ -567,7 +720,10 @@
 						"foo": "bar"
 					}
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique array of nested objects is valid",
@@ -587,7 +743,10 @@
 						}
 					}
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array of nested objects is valid",
@@ -607,7 +766,10 @@
 						}
 					}
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique array of arrays is valid",
@@ -619,7 +781,10 @@
 						"bar"
 					]
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array of arrays is valid",
@@ -631,7 +796,10 @@
 						"foo"
 					]
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "1 and true are unique",
@@ -639,7 +807,10 @@
 					1,
 					true
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "0 and false are unique",
@@ -647,7 +818,10 @@
 					0,
 					false
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique heterogeneous types are valid",
@@ -660,7 +834,10 @@
 					null,
 					1
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique heterogeneous types are valid",
@@ -674,7 +851,10 @@
 					{},
 					1
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -692,6 +872,9 @@
 			],
 			"uniqueItems": false
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "[false, true] from items array is valid",
@@ -699,7 +882,10 @@
 					false,
 					true
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[true, false] from items array is valid",
@@ -707,7 +893,10 @@
 					true,
 					false
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[false, false] from items array is valid",
@@ -715,7 +904,10 @@
 					false,
 					false
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[true, true] from items array is valid",
@@ -723,7 +915,10 @@
 					true,
 					true
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique array extended from [false, true] is valid",
@@ -733,7 +928,10 @@
 					"foo",
 					"bar"
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "unique array extended from [true, false] is valid",
@@ -743,7 +941,10 @@
 					"foo",
 					"bar"
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array extended from [false, true] is valid",
@@ -753,7 +954,10 @@
 					"foo",
 					"foo"
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-unique array extended from [true, false] is valid",
@@ -763,7 +967,10 @@
 					"foo",
 					"foo"
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -782,6 +989,9 @@
 			"uniqueItems": false,
 			"additionalItems": false
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "[false, true] from items array is valid",
@@ -789,7 +999,10 @@
 					false,
 					true
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[true, false] from items array is valid",
@@ -797,7 +1010,10 @@
 					true,
 					false
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[false, false] from items array is valid",
@@ -805,7 +1021,10 @@
 					false,
 					false
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[true, true] from items array is valid",
@@ -813,7 +1032,10 @@
 					true,
 					true
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "extra items are invalid even if unique",
@@ -822,7 +1044,10 @@
 					true,
 					null
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	}

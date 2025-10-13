@@ -36,17 +36,16 @@ func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
 	fields := []*ast.Field{}
 
 	// Collect docs directly related to this Vertex.
-	v.VisitLeafConjuncts(func(x adt.Conjunct) bool {
+	for x := range v.LeafConjuncts() {
 		// TODO: Is this still being used?
 		if v, ok := x.Elem().(*adt.Vertex); ok {
 			docs = append(docs, extractDocs(v)...)
-			return true
 		}
 
 		switch f := x.Field().Source().(type) {
 		case *ast.Field:
 			if hasShorthandValue(f) {
-				return true
+				continue
 			}
 			fields = append(fields, f)
 			for _, cg := range f.Comments() {
@@ -59,19 +58,17 @@ func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
 			fdocs, _ := internal.FileComments(f)
 			docs = append(docs, fdocs...)
 		}
-
-		return true
-	})
+	}
 
 	// Collect docs from parent scopes in collapsed fields.
 	for p := v.Parent; p != nil; p = p.Parent {
 
 		newFields := []*ast.Field{}
 
-		p.VisitLeafConjuncts(func(x adt.Conjunct) bool {
+		for x := range p.LeafConjuncts() {
 			f, ok := x.Source().(*ast.Field)
 			if !ok || !hasShorthandValue(f) {
-				return true
+				continue
 			}
 
 			nested := nestedField(f)
@@ -85,8 +82,7 @@ func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
 					}
 				}
 			}
-			return true
-		})
+		}
 
 		fields = newFields
 	}
@@ -142,10 +138,9 @@ func containsDoc(a []*ast.CommentGroup, cg *ast.CommentGroup) bool {
 }
 
 func ExtractFieldAttrs(v *adt.Vertex) (attrs []*ast.Attribute) {
-	v.VisitLeafConjuncts(func(x adt.Conjunct) bool {
+	for x := range v.LeafConjuncts() {
 		attrs = extractFieldAttrs(attrs, x.Field())
-		return true
-	})
+	}
 	return attrs
 }
 

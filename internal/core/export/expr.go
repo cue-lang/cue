@@ -81,13 +81,12 @@ func (e *exporter) expr(env *adt.Environment, v adt.Elem) (result ast.Expr) {
 		} // Should this be the arcs label?
 
 		a := []conjunct{}
-		x.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+		for c := range x.LeafConjuncts() {
 			if c, ok := c.Elem().(*adt.Comprehension); ok && !c.DidResolve() {
-				return true
+				continue
 			}
 			a = append(a, conjunct{c, 0})
-			return true
-		})
+		}
 
 		return e.mergeValues(adt.InvalidLabel, x, a, x.Conjuncts...)
 
@@ -424,10 +423,9 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 
 			switch {
 			default:
-				v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+				for c := range v.LeafConjuncts() {
 					e.addExpr(c.Env, v, c.Elem(), false)
-					return true
-				})
+				}
 
 			case v.IsData():
 				e.structs = append(e.structs, v.Structs...)

@@ -166,11 +166,10 @@ func TestX(t *testing.T) {
 
 	ctxt := eval.NewContext(r, n)
 
-	n.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+	for c := range n.LeafConjuncts() {
 		str := debug.NodeString(ctxt, c.Elem(), nil)
 		t.Log(str)
-		return true
-	})
+	}
 
 	w := &strings.Builder{}
 	fmt.Fprintln(w)

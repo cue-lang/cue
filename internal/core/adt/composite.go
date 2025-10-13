@@ -231,7 +231,7 @@ type Vertex struct {
 	// the final value of this Vertex.
 	//
 	// TODO: all access to Conjuncts should go through functions like
-	// VisitLeafConjuncts and VisitAllConjuncts. We should probably make this
+	// LeafConjuncts and VisitAllConjuncts. We should probably make this
 	// an unexported field.
 	Conjuncts ConjunctGroup
 
@@ -559,13 +559,6 @@ func (v *Vertex) setParentDone() {
 			a.setParentDone()
 		}
 	}
-}
-
-// VisitLeafConjuncts visits all conjuncts that are leafs of the ConjunctGroup tree.
-//
-// TODO(mvdan): switch all to [Vertex.LeafConjuncts].
-func (v *Vertex) VisitLeafConjuncts(f func(Conjunct) bool) {
-	iterConjuncts(v.Conjuncts, f)
 }
 
 // LeafConjuncts iterates over all conjuncts that are leafs of the ConjunctGroup tree.

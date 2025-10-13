@@ -401,38 +401,41 @@ func (i *itemPropertyBounds) apply(f func(item) item) item {
 	return i
 }
 
-// itemItems represents an items constraint for arrays
+// itemItems represents the items and prefixItems constraint for arrays.
 type itemItems struct {
-	elem item
+	// known prefix.
+	prefix []item
+	// all elements beyond the prefix.
+	rest item
 }
 
 func (i *itemItems) generate(g *generator) ast.Expr {
-	return singleKeyword("items", i.elem.generate(g))
+	fields := make([]ast.Decl, 0, 2)
+	if len(i.prefix) > 0 {
+		items := make([]ast.Expr, len(i.prefix))
+		for i, e := range i.prefix {
+			items[i] = e.generate(g)
+		}
+		fields = append(fields, makeField("prefixItems", &ast.ListLit{
+			Elts: items,
+		}))
+	}
+	if i.rest != nil {
+		fields = append(fields, makeField("items", i.rest.generate(g)))
+	}
+	return makeSchemaStructLit(fields...)
 }
 
 func (i *itemItems) apply(f func(item) item) item {
-	elem := i.elem.apply(f)
-	if elem == i.elem {
+	rest := i.rest
+	if rest != nil {
+		rest = f(rest)
+	}
+	prefix, changed := applyElems(i.prefix, f)
+	if !changed && rest == i.rest {
 		return i
 	}
-	return &itemItems{elem: elem}
-}
-
-// itemPrefixItems represents prefixItems constraint for arrays
-type itemPrefixItems struct {
-	elems []item
-}
-
-func (i *itemPrefixItems) generate(g *generator) ast.Expr {
-	return singleKeyword("items", generateList(g, i.elems))
-}
-
-func (i *itemPrefixItems) apply(f func(item) item) item {
-	elems, changed := applyElems(i.elems, f)
-	if !changed {
-		return i
-	}
-	return &itemPrefixItems{elems: elems}
+	return &itemItems{prefix: prefix, rest: rest}
 }
 
 // itemContains represents a contains constraint for arrays

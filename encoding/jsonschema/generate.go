@@ -214,6 +214,10 @@ func (g *generator) addError(pos cue.Value, err error) {
 	g.err = errors.Append(g.err, errors.Promote(err, ""))
 }
 
+func (g *generator) addErrorf(pos cue.Value, f string, a ...any) {
+	g.addError(pos, fmt.Errorf(f, a...))
+}
+
 // makeItem returns an item representing the JSON Schema
 // for v in naive form.
 func (g *generator) makeItem(v cue.Value) item {
@@ -353,7 +357,7 @@ func (g *generator) makeItem(v cue.Value) item {
 	case cue.StructKind:
 		it = g.makeStructItem(v)
 	case cue.ListKind:
-		// TODO list type support
+		it = g.makeListItem(v)
 	}
 	var elems []item
 	if kinds := cueKindToJSONSchemaTypes(kind); len(kinds) > 0 {
@@ -471,6 +475,28 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 				&itemFormat{format: format},
 			},
 		}
+	case "list.MinItems", "list.MaxItems":
+		if len(args) != 2 {
+			g.addError(v, fmt.Errorf("%s expects 1 argument, got %d", funcName, len(args)-1))
+			return &itemFalse{}
+		}
+		n, err := args[1].Int64()
+		if err != nil {
+			g.addError(args[1], err)
+			return &itemFalse{}
+		}
+		var constraint cue.Op
+		if funcName == "list.MinItems" {
+			constraint = cue.GreaterThanEqualOp
+		} else {
+			constraint = cue.LessThanEqualOp
+		}
+		return &itemAllOf{
+			elems: []item{
+				&itemType{kinds: []string{"array"}},
+				&itemItemsBounds{constraint: constraint, n: int(n)},
+			},
+		}
 
 	default:
 		// For unknown functions, accept anything rather than fail.
@@ -514,6 +540,69 @@ func (g *generator) makeStructItem(v cue.Value) item {
 		return &itemTrue{}
 	}
 	return &props
+}
+
+func (g *generator) makeListItem(v cue.Value) item {
+	ellipsis := v.LookupPath(cue.MakePath(cue.AnyIndex))
+	lenv := v.Len()
+	var n int64
+	if ellipsis.Exists() {
+		// It's an open list. The length will be in the form int&>=5
+		op, args := lenv.Expr()
+		if op != cue.AndOp || len(args) != 2 {
+			g.addErrorf(v, "list length has unexpected form; got %v want int&>=N", lenv)
+			return &itemFalse{}
+		}
+		op, args = args[1].Expr()
+		if op != cue.GreaterThanEqualOp || len(args) != 1 {
+			g.addErrorf(v, "list length has unexpected form (2); got %v want >=N", lenv)
+			return &itemFalse{}
+		}
+		var err error
+		n, err = args[0].Int64()
+		if err != nil {
+			g.addErrorf(v, "cannot extract list length from %v: %v", v, err)
+			return &itemFalse{}
+		}
+	} else {
+		var err error
+		n, err = lenv.Int64()
+		if err != nil {
+			g.addErrorf(v, "cannot extract concrete list length from %v: %v", v, err)
+		}
+	}
+	prefix := make([]item, n)
+	for i := range n {
+		elem := v.LookupPath(cue.MakePath(cue.Index(i)))
+		if !elem.Exists() {
+			g.addErrorf(v, "cannot get value at index %d in %v", i, v)
+			return &itemFalse{}
+		}
+		prefix[i] = g.makeItem(elem)
+	}
+	a := &itemAllOf{
+		elems: []item{&itemType{kinds: []string{"array"}}},
+	}
+	items := &itemItems{}
+	if len(prefix) > 0 {
+		a.elems = append(a.elems, &itemLengthBounds{
+			constraint: cue.GreaterThanEqualOp,
+			n:          len(prefix),
+		})
+		items.prefix = prefix
+	}
+	if ellipsis.Exists() {
+		items.rest = g.makeItem(ellipsis)
+	} else {
+		a.elems = append(a.elems, &itemLengthBounds{
+			constraint: cue.LessThanEqualOp,
+			n:          len(prefix),
+		})
+	}
+	if items.rest != nil || len(items.prefix) > 0 {
+		a.elems = append(a.elems, items)
+	}
+	return a
 }
 
 // cueKindToJSONSchemaTypes converts a CUE kind to JSON Schema type strings

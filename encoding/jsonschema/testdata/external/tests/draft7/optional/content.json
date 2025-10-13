@@ -4,24 +4,34 @@
 		"schema": {
 			"contentMediaType": "application/json"
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "a valid JSON document",
 				"data": "{\"foo\": \"bar\"}",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "an invalid JSON document",
 				"data": "{:}",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
 				"description": "ignores non-strings",
 				"data": 100,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -30,24 +40,34 @@
 		"schema": {
 			"contentEncoding": "base64"
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "a valid base64 string",
 				"data": "eyJmb28iOiAiYmFyIn0K",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "an invalid base64 string (% is not a valid character)",
 				"data": "eyJmb28iOi%iYmFyIn0K",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
 				"description": "ignores non-strings",
 				"data": 100,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -57,18 +77,25 @@
 			"contentMediaType": "application/json",
 			"contentEncoding": "base64"
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "a valid base64-encoded JSON document",
 				"data": "eyJmb28iOiAiYmFyIn0K",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "a validly-encoded invalid JSON document",
 				"data": "ezp9Cg==",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -76,13 +103,17 @@
 				"data": "{}",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
 				"description": "ignores non-strings",
 				"data": 100,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	}

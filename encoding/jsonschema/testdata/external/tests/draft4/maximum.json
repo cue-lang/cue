@@ -4,26 +4,41 @@
 		"schema": {
 			"maximum": 3.0
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "below the maximum is valid",
 				"data": 2.6,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boundary point is valid",
 				"data": 3.0,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "above the maximum is invalid",
 				"data": 3.5,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "ignores non-numbers",
 				"data": "x",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -32,26 +47,41 @@
 		"schema": {
 			"maximum": 300
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "below the maximum is invalid",
 				"data": 299.97,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boundary point integer is valid",
 				"data": 300,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boundary point float is valid",
 				"data": 300.00,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "above the maximum is invalid",
 				"data": 300.5,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -61,29 +91,42 @@
 			"maximum": 3.0,
 			"exclusiveMaximum": false
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "below the maximum is valid",
 				"data": 2.6,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boundary point is valid",
 				"data": 3.0,
 				"valid": true,
 				"skip": {
-					"v3": "6 errors in empty disjunction:\nconflicting values 3.0 and [...] (mismatched types float and list):\n    generated.cue:2:1\n    generated.cue:2:31\n    instance.json:1:1\nconflicting values 3.0 and bool (mismatched types float and bool):\n    generated.cue:2:1\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values 3.0 and null (mismatched types float and null):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values 3.0 and string (mismatched types float and string):\n    generated.cue:2:1\n    generated.cue:2:22\n    instance.json:1:1\nconflicting values 3.0 and {...} (mismatched types float and struct):\n    generated.cue:2:1\n    generated.cue:2:39\n    instance.json:1:1\ninvalid value 3.0 (out of bound \u003c3.0):\n    generated.cue:2:15\n    instance.json:1:1\n"
+					"v3": "6 errors in empty disjunction:\nconflicting values 3.0 and [...] (mismatched types float and list):\n    generated.cue:2:1\n    generated.cue:2:31\n    instance.json:1:1\nconflicting values 3.0 and bool (mismatched types float and bool):\n    generated.cue:2:1\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values 3.0 and null (mismatched types float and null):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values 3.0 and string (mismatched types float and string):\n    generated.cue:2:1\n    generated.cue:2:22\n    instance.json:1:1\nconflicting values 3.0 and {...} (mismatched types float and struct):\n    generated.cue:2:1\n    generated.cue:2:39\n    instance.json:1:1\ninvalid value 3.0 (out of bound \u003c3.0):\n    generated.cue:2:15\n    instance.json:1:1\n",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
 				"description": "above the maximum is invalid",
 				"data": 3.5,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "ignores non-numbers",
 				"data": "x",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -93,16 +136,25 @@
 			"maximum": 3.0,
 			"exclusiveMaximum": true
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "below the maximum is still valid",
 				"data": 2.2,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boundary point is invalid",
 				"data": 3.0,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	}

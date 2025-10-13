@@ -5,21 +5,33 @@
 		"schema": {
 			"minLength": 2
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "a 3-character string is valid",
 				"data": "foo",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "a 1-character string is not valid",
 				"data": "a",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "a non-string is valid",
 				"data": 5,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	}

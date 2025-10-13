@@ -45,7 +45,10 @@
 			{
 				"description": "match $ref to $id",
 				"data": "a string to match #/$defs/id_in_enum",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "conflicting values \"a string to match #/$defs/id_in_enum\" and {...} (mismatched types string and struct):\n    instance.json:1:1\n"
+				}
 			},
 			{
 				"description": "no match on enum or $ref to $id",

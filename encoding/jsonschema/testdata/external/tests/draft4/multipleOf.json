@@ -4,21 +4,33 @@
 		"schema": {
 			"multipleOf": 2
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "int by int",
 				"data": 10,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "int by int fail",
 				"data": 7,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "ignores non-numbers",
 				"data": "foo",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -27,21 +39,33 @@
 		"schema": {
 			"multipleOf": 1.5
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "zero is multiple of anything",
 				"data": 0,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "4.5 is multiple of 1.5",
 				"data": 4.5,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "35 is not multiple of 1.5",
 				"data": 35,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -50,16 +74,25 @@
 		"schema": {
 			"multipleOf": 0.0001
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "0.0075 is multiple of 0.0001",
 				"data": 0.0075,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "0.00751 is not multiple of 0.0001",
 				"data": 0.00751,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -69,11 +102,17 @@
 			"type": "integer",
 			"multipleOf": 0.123456789
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "invalid, but naive implementations may raise an overflow error",
 				"data": 1E+308,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -83,11 +122,17 @@
 			"type": "integer",
 			"multipleOf": 1E-8
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "any integer is a multiple of 1e-8",
 				"data": 12391239123,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	}

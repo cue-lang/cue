@@ -7,16 +7,25 @@
 				"const": 0
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "valid when valid against lone if",
 				"data": 0,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "valid when invalid against lone if",
 				"data": "hello",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -28,16 +37,25 @@
 				"const": 0
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "valid when valid against lone then",
 				"data": 0,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "valid when invalid against lone then",
 				"data": "hello",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -49,16 +67,25 @@
 				"const": 0
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "valid when valid against lone else",
 				"data": 0,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "valid when invalid against lone else",
 				"data": "hello",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -73,21 +100,33 @@
 				"minimum": -10
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "valid through then",
 				"data": -1,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "invalid through then",
 				"data": -100,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "valid when if test fails",
 				"data": 3,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -102,21 +141,33 @@
 				"multipleOf": 2
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "valid when if test passes",
 				"data": -1,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "valid through else",
 				"data": 4,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "invalid through else",
 				"data": 3,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -134,26 +185,41 @@
 				"multipleOf": 2
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "valid through then",
 				"data": -1,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "invalid through then",
 				"data": -100,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "valid through else",
 				"data": 4,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "invalid through else",
 				"data": 3,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -179,16 +245,25 @@
 				}
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "valid, but would have been invalid through then",
 				"data": -100,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "valid, but would have been invalid through else",
 				"data": 3,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -204,16 +279,25 @@
 				"const": "else"
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "boolean schema true in if always chooses the then path (valid)",
 				"data": "then",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boolean schema true in if always chooses the then path (invalid)",
 				"data": "else",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -230,7 +314,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:3:9\n"
+			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:3:9\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -238,7 +323,8 @@
 				"data": "then",
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -246,7 +332,8 @@
 				"data": "else",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -265,26 +352,41 @@
 				"maxLength": 4
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "yes redirects to then and passes",
 				"data": "yes",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "other redirects to else and passes",
 				"data": "other",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "no redirects to then and fails",
 				"data": "no",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "invalid redirects to else and fails",
 				"data": "invalid",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	}

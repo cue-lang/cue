@@ -12,13 +12,19 @@
 			},
 			"additionalProperties": false
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "no additional properties is valid",
 				"data": {
 					"foo": 1
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "an additional property is invalid",
@@ -27,7 +33,10 @@
 					"bar": 2,
 					"quux": "boom"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "ignores arrays",
@@ -36,17 +45,26 @@
 					2,
 					3
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "ignores strings",
 				"data": "foobarbaz",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "ignores other non-objects",
 				"data": 12,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "patternProperties are not additional properties",
@@ -54,7 +72,10 @@
 					"foo": 1,
 					"vroom": 2
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -67,20 +88,29 @@
 			},
 			"additionalProperties": false
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "matching the pattern is valid",
 				"data": {
 					"ármányos": 2
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "not matching the pattern is invalid",
 				"data": {
 					"élmény": 2
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -96,13 +126,19 @@
 				"type": "boolean"
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "no additional properties is valid",
 				"data": {
 					"foo": 1
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "an additional valid property is valid",
@@ -111,7 +147,10 @@
 					"bar": 2,
 					"quux": true
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "an additional invalid property is invalid",
@@ -120,7 +159,10 @@
 					"bar": 2,
 					"quux": 12
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -132,20 +174,29 @@
 				"type": "boolean"
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "an additional valid property is valid",
 				"data": {
 					"foo": true
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "an additional invalid property is invalid",
 				"data": {
 					"foo": 1
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -158,6 +209,9 @@
 				"bar": {}
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "additional properties are allowed",
@@ -166,7 +220,10 @@
 					"bar": 2,
 					"quux": true
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -185,6 +242,9 @@
 				"type": "boolean"
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "properties defined in allOf are not examined",
@@ -192,7 +252,10 @@
 					"foo": 1,
 					"bar": true
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -204,13 +267,19 @@
 				"type": "null"
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "allows null values",
 				"data": {
 					"foo": null
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -226,7 +295,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:6:3\n"
+			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:6:3\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -236,7 +306,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -247,7 +318,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -269,6 +341,9 @@
 			},
 			"additionalProperties": false
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "additionalProperties doesn't consider dependentSchemas",
@@ -277,7 +352,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -285,7 +361,10 @@
 				"data": {
 					"bar": ""
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "additionalProperties can't see bar even when foo2 is present",
@@ -295,7 +374,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]

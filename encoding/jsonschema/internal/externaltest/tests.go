@@ -36,7 +36,9 @@ type Test struct {
 // the test will be expected to pass.
 //
 // Each key in the map represents the name of a point
-// in the cuetdtest matrix.
+// in the cuetdtest matrix, optionally followed
+// by a "-$variant" suffix to indicate a test variant
+// such as round-trip testing.
 type Skip map[string]string
 
 type location struct {

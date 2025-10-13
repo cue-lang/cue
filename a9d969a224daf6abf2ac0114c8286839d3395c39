@@ -98,6 +98,24 @@
       "parentUuid": "b20a3b0a_90b810fa",
       "revId": "a9d969a224daf6abf2ac0114c8286839d3395c39",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2a917c2_3881a161",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-13T11:24:02Z",
+      "side": 1,
+      "message": "your mechanism wasn\u0027t quite it - because we need to track what filename to write each output file to - but I ended up with a variation of your suggestion here, what do you think? https://review.gerrithub.io/c/cue-lang/cue/+/1224238",
+      "parentUuid": "904446db_4d423941",
+      "revId": "a9d969a224daf6abf2ac0114c8286839d3395c39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

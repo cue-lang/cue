@@ -231,8 +231,8 @@ type Vertex struct {
 	// the final value of this Vertex.
 	//
 	// TODO: all access to Conjuncts should go through functions like
-	// LeafConjuncts and VisitAllConjuncts. We should probably make this
-	// an unexported field.
+	// [Vertex.LeafConjuncts] and [Vertex.AllConjuncts].
+	// We should probably make this an unexported field.
 	Conjuncts ConjunctGroup
 
 	// Structs is a slice of struct literals that contributed to this value.
@@ -561,7 +561,7 @@ func (v *Vertex) setParentDone() {
 	}
 }
 
-// LeafConjuncts iterates over all conjuncts that are leafs of the ConjunctGroup tree.
+// LeafConjuncts iterates over all conjuncts that are leaves of the [ConjunctGroup] tree.
 func (v *Vertex) LeafConjuncts() iter.Seq[Conjunct] {
 	return func(yield func(Conjunct) bool) {
 		_ = iterConjuncts(v.Conjuncts, yield)
@@ -569,6 +569,8 @@ func (v *Vertex) LeafConjuncts() iter.Seq[Conjunct] {
 }
 
 func iterConjuncts(a []Conjunct, yield func(Conjunct) bool) bool {
+	// TODO: note that this is iterAllConjuncts but without yielding ConjunctGroups.
+	// Can we reuse the code in a simple enough way?
 	for _, c := range a {
 		switch x := c.x.(type) {
 		case *ConjunctGroup:
@@ -584,28 +586,39 @@ func iterConjuncts(a []Conjunct, yield func(Conjunct) bool) bool {
 	return true
 }
 
+// ConjunctsSeq iterates over all conjuncts that are leafs in the list of trees given.
 func ConjunctsSeq(a []Conjunct) iter.Seq[Conjunct] {
 	return func(yield func(Conjunct) bool) {
 		_ = iterConjuncts(a, yield)
 	}
 }
 
-// VisitAllConjuncts visits all conjuncts of v, including ConjunctGroups.
+// AllConjuncts iterates through all conjuncts of v, including [ConjunctGroup]s.
 // Note that ConjunctGroups do not have an Environment associated with them.
-func (v *Vertex) VisitAllConjuncts(f func(c Conjunct, isLeaf bool)) {
-	visitAllConjuncts(v.Conjuncts, f)
+// The boolean reports whether the conjunct is a leaf.
+func (v *Vertex) AllConjuncts() iter.Seq2[Conjunct, bool] {
+	return func(yield func(Conjunct, bool) bool) {
+		_ = iterAllConjuncts(v.Conjuncts, yield)
+	}
 }
 
-func visitAllConjuncts(a []Conjunct, f func(c Conjunct, isLeaf bool)) {
+func iterAllConjuncts(a []Conjunct, yield func(c Conjunct, isLeaf bool) bool) bool {
 	for _, c := range a {
 		switch x := c.x.(type) {
 		case *ConjunctGroup:
-			f(c, false)
-			visitAllConjuncts(*x, f)
+			if !yield(c, false) {
+				return false
+			}
+			if !iterAllConjuncts(*x, yield) {
+				return false
+			}
 		default:
-			f(c, true)
+			if !yield(c, true) {
+				return false
+			}
 		}
 	}
+	return true
 }
 
 // HasConjuncts reports whether v has any conjuncts.

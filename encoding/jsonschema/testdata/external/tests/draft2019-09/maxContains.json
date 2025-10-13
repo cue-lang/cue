@@ -5,13 +5,19 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"maxContains": 1
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "one item valid against lone maxContains",
 				"data": [
 					1
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "two items still valid against lone maxContains",
@@ -19,7 +25,10 @@
 					1,
 					2
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -32,18 +41,27 @@
 			},
 			"maxContains": 1
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "empty data",
 				"data": [],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "all elements match, valid maxContains",
 				"data": [
 					1
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "all elements match, invalid maxContains",
@@ -51,7 +69,10 @@
 					1,
 					1
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "some elements match, valid maxContains",
@@ -59,7 +80,10 @@
 					1,
 					2
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "some elements match, invalid maxContains",
@@ -68,7 +92,10 @@
 					2,
 					1
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -81,13 +108,19 @@
 			},
 			"maxContains": 1.0
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "one element matches, valid maxContains",
 				"data": [
 					1
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "too many elements match, invalid maxContains",
@@ -95,7 +128,10 @@
 					1,
 					1
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -109,11 +145,17 @@
 			"minContains": 1,
 			"maxContains": 3
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "actual \u003c minContains \u003c maxContains",
 				"data": [],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "minContains \u003c actual \u003c maxContains",
@@ -121,7 +163,10 @@
 					1,
 					1
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "minContains \u003c maxContains \u003c actual",
@@ -131,7 +176,10 @@
 					1,
 					1
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	}

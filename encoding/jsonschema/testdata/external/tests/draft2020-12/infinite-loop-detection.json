@@ -36,7 +36,10 @@
 				"data": {
 					"foo": "a string"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	}

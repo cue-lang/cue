@@ -21,6 +21,11 @@ allTests: [_]: [... #Schema]
 	// to indicate which tests are passing and which
 	// are failing. See #Skip for details.
 	skip?: #Skip
+
+	// skipRoundTrip is similar to skip but specifically for
+	// the round-trip Generate testing. It indicates which
+	// schemas fail when doing Extract -> Generate -> Extract.
+	skipRoundTrip?: #Skip
 }
 
 #Test: {
@@ -35,6 +40,10 @@ allTests: [_]: [... #Schema]
 	// are failing. The text indicates some reason as to
 	// why the test is skipped.
 	skip?: #Skip
+
+	// skipRoundTrip is similar to skip but specifically for
+	// the round-trip Generate testing.
+	skipRoundTrip?: #Skip
 }
 
 // #Skip indicates that a test or schema should be skipped
@@ -44,4 +53,5 @@ allTests: [_]: [... #Schema]
 // If all fields are empty, the skip field itself should be omitted.
 #Skip: {
 	v3?: string
+	"v3-roundtrip"?: string
 }

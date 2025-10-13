@@ -8,16 +8,25 @@
 				3
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "one of the enum is valid",
 				"data": 1,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "something else is invalid",
 				"data": 4,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -34,30 +43,45 @@
 				}
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "one of the enum is valid",
 				"data": [],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "something else is invalid",
 				"data": null,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "objects are deep compared",
 				"data": {
 					"foo": false
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "valid object matches",
 				"data": {
 					"foo": 12
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "extra properties in object is invalid",
@@ -65,7 +89,10 @@
 					"foo": 12,
 					"boo": 42
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -77,21 +104,33 @@
 				null
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "null is valid",
 				"data": null,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "number is valid",
 				"data": 6,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "something else is invalid",
 				"data": "test",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -115,6 +154,9 @@
 				"bar"
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "both properties are valid",
@@ -122,7 +164,10 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "wrong foo value",
@@ -130,7 +175,10 @@
 					"foo": "foot",
 					"bar": "bar"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "wrong bar value",
@@ -138,26 +186,38 @@
 					"foo": "foo",
 					"bar": "bart"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "missing optional property is valid",
 				"data": {
 					"bar": "bar"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "missing required property is invalid",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "missing all properties is invalid",
 				"data": {},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -169,21 +229,33 @@
 				"foo\rbar"
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "member 1 is valid",
 				"data": "foo\nbar",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "member 2 is valid",
 				"data": "foo\rbar",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "another string is invalid",
 				"data": "abc",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -194,21 +266,33 @@
 				false
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "false is valid",
 				"data": false,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "integer zero is invalid",
 				"data": 0,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "float zero is invalid",
 				"data": 0.0,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -221,27 +305,39 @@
 				]
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "[false] is valid",
 				"data": [
 					false
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[0] is invalid",
 				"data": [
 					0
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[0.0] is invalid",
 				"data": [
 					0.0
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -252,21 +348,33 @@
 				true
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "true is valid",
 				"data": true,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "integer one is invalid",
 				"data": 1,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "float one is invalid",
 				"data": 1.0,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -279,27 +387,39 @@
 				]
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "[true] is valid",
 				"data": [
 					true
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[1] is invalid",
 				"data": [
 					1
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[1.0] is invalid",
 				"data": [
 					1.0
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -310,23 +430,33 @@
 				0
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "false is invalid",
 				"data": false,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "integer zero is valid",
 				"data": 0,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "float zero is valid",
 				"data": 0.0,
 				"valid": true,
 				"skip": {
-					"v3": "conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:2:1\n    instance.json:1:1\n"
+					"v3": "conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:2:1\n    instance.json:1:1\n",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -340,20 +470,29 @@
 				]
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "[false] is invalid",
 				"data": [
 					false
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[0] is valid",
 				"data": [
 					0
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[0.0] is valid",
@@ -362,7 +501,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "0: conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:2:1\n    generated.cue:2:2\n    instance.json:1:2\n"
+					"v3": "0: conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:2:1\n    generated.cue:2:2\n    instance.json:1:2\n",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -374,23 +514,33 @@
 				1
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "true is invalid",
 				"data": true,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "integer one is valid",
 				"data": 1,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "float one is valid",
 				"data": 1.0,
 				"valid": true,
 				"skip": {
-					"v3": "conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:2:1\n    instance.json:1:1\n"
+					"v3": "conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:2:1\n    instance.json:1:1\n",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -404,20 +554,29 @@
 				]
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "[true] is invalid",
 				"data": [
 					true
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[1] is valid",
 				"data": [
 					1
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "[1.0] is valid",
@@ -426,7 +585,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "0: conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:2:1\n    generated.cue:2:2\n    instance.json:1:2\n"
+					"v3": "0: conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:2:1\n    generated.cue:2:2\n    instance.json:1:2\n",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -438,16 +598,25 @@
 				"hello\u0000there"
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "match string with nul",
 				"data": "hello\u0000there",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "do not match string lacking nul",
 				"data": "hellothere",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	}

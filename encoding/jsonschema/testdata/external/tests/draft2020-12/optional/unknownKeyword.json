@@ -46,7 +46,10 @@
 			{
 				"description": "type matches second anyOf, which has a real schema in it",
 				"data": "a string",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "conflicting values \"a string\" and {...} (mismatched types string and struct):\n    instance.json:1:1\n"
+				}
 			},
 			{
 				"description": "type matches non-schema in first anyOf",

@@ -56,7 +56,8 @@
 				"data": "\\\\WINDOWS\\fileshare",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -74,7 +75,8 @@
 				"data": "#frag\\ment",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]

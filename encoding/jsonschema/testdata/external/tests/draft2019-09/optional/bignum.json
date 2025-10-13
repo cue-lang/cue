@@ -5,16 +5,25 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"type": "integer"
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "a bignum is an integer",
 				"data": 12345678910111213141516171819202122232425262728293031,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "a negative bignum is an integer",
 				"data": -12345678910111213141516171819202122232425262728293031,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -24,16 +33,25 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"type": "number"
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "a bignum is a number",
 				"data": 98249283749234923498293171823948729348710298301928331,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "a negative bignum is a number",
 				"data": -98249283749234923498293171823948729348710298301928331,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -43,11 +61,17 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"type": "string"
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "a bignum is not a string",
 				"data": 98249283749234923498293171823948729348710298301928331,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -57,11 +81,17 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"maximum": 18446744073709551615
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "comparison works for high numbers",
 				"data": 18446744073709551600,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -71,11 +101,17 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"exclusiveMaximum": 972783798187987123879878123.18878137
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "comparison works for high numbers",
 				"data": 972783798187987123879878123.188781371,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -85,11 +121,17 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"minimum": -18446744073709551615
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "comparison works for very negative numbers",
 				"data": -18446744073709551600,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -99,11 +141,17 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"exclusiveMinimum": -972783798187987123879878123.18878137
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "comparison works for very negative numbers",
 				"data": -972783798187987123879878123.188781371,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	}

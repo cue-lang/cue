@@ -31,7 +31,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cueexperiment"
 	itask "cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
@@ -99,17 +98,13 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 	// TODO: remove this block to allow commands to be defined in any file.
 	_, w := value.ToInternal(cmds)
 	hasToolFile := false
-	w.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+	for c := range w.LeafConjuncts() {
 		src := c.Source()
-		if src == nil {
-			return true
-		}
-		if strings.HasSuffix(src.Pos().Filename(), "_tool.cue") {
+		if src != nil && strings.HasSuffix(src.Pos().Filename(), "_tool.cue") {
 			hasToolFile = true
-			return false
+			break
 		}
-		return true
-	})
+	}
 	if !hasToolFile {
 		// Note that earlier versions of this code checked cmds.Err in this scenario,
 		// but it isn't clear why that was done, and we had no tests covering it.

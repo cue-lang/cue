@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6892b54f_ba3f24b4",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-13T09:05:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e63ec496_e2d84fe0",
+      "revId": "b25d7893e2cfc36e7e1bec7d2ff8c1fb7d7c9beb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6769086_653b212d",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-13T08:46:08Z",
       "side": 1,
       "message": "invert to unindent the rest of the for loop body?\n\nalso, can you reuse your fieldLabel helper here?",
+      "revId": "b25d7893e2cfc36e7e1bec7d2ff8c1fb7d7c9beb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bce8e56d_a27a39e4",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-13T09:05:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a6769086_653b212d",
       "revId": "b25d7893e2cfc36e7e1bec7d2ff8c1fb7d7c9beb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

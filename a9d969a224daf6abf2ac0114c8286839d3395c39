@@ -16,6 +16,46 @@
       "message": "This is already reviewed on the original PR; just need a quick sanity check and a +2 given that I can\u0027t approve a patch I\u0027m uploading myself :)",
       "revId": "a9d969a224daf6abf2ac0114c8286839d3395c39",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f3c8177_60637b9d",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-13T07:50:44Z",
+      "side": 1,
+      "message": "nit: You do call this method several times in this function. I would be tempted to bring it out to a var, just to make reading a bit easier. `singleOutputFile :\u003d ...` perhaps.",
+      "range": {
+        "startLine": 476,
+        "startChar": 17,
+        "endLine": 476,
+        "endChar": 22
+      },
+      "revId": "a9d969a224daf6abf2ac0114c8286839d3395c39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b20a3b0a_90b810fa",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-13T07:50:44Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s particularly important but I would have written this loop a different way around, which at least in my head (which is probably missing some crucial details) might be simpler.\n\nI would have done roughly:\n```\ncurFile :\u003d \u0026cueast.File{} // and set up the comments here. Maybe abstract this to a func\nfiles :\u003d []*cueast.File{curFile}\nfor _, f :\u003d range p.Syntax {\n  // shove f into curfile\n  \n  if !singleOutputFile {\n    curFile \u003d \u0026cueast.File{} // same as above\n    files \u003d append(files, curFile)\n  }\n}\n\n// now we know that `files` contains everything we need\nfor _, file :\u003d range files {\n  // write them out\n}\n```\n\nI think this might helpfully simplify the control flow logic within the loop, but I wouldn\u0027t be surprised if I\u0027m missing something.",
+      "revId": "a9d969a224daf6abf2ac0114c8286839d3395c39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

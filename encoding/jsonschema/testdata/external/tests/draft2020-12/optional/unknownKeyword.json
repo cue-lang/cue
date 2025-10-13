@@ -48,7 +48,7 @@
 				"data": "a string",
 				"valid": true,
 				"skip": {
-					"v3-roundtrip": "conflicting values \"a string\" and {...} (mismatched types string and struct):\n    instance.json:1:1\n"
+					"v3-roundtrip": "conflicting values \"a string\" and {...} (mismatched types string and struct):\n    instance.json:1:1\ninvalid value \"a string\" (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\ncannot use \"a string\" (type _|_) as _ in argument 1 to matchN:\n    instance.json:1:1\n"
 				}
 			},
 			{

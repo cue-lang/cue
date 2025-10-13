@@ -90,6 +90,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ebe15da_877e30c1",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-13T10:50:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "73ffcf0e_1d1e34dc",
+      "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "edd22270_6cd870ba",
@@ -143,6 +161,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "57ea4599_7365f702",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-13T10:50:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "214dab91_35c8d70f",
+      "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3813ff47_04bd0042",
@@ -156,6 +192,24 @@
       "writtenOn": "2025-10-13T09:35:06Z",
       "side": 1,
       "message": "maybe \"cue command version\"",
+      "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6833762d_58dfa396",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-13T10:50:47Z",
+      "side": 1,
+      "message": "I reverted back to \"cue version\"; I think \"cue command\" can be confused with `cue cmd`.",
+      "parentUuid": "3813ff47_04bd0042",
       "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

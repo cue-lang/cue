@@ -81,7 +81,6 @@ func (i *itemAllOf) generate(g *generator) ast.Expr {
 
 	for _, e := range i.elems {
 		expr := e.generate(g)
-
 		if lit, ok := expr.(*ast.BasicLit); ok {
 			switch lit.Kind {
 			case token.TRUE:
@@ -197,7 +196,7 @@ func (i *itemNot) generate(g *generator) ast.Expr {
 }
 
 func (i *itemNot) apply(f func(item) item) item {
-	elem := i.elem.apply(f)
+	elem := f(i.elem)
 	if elem == i.elem {
 		return i
 	}
@@ -455,7 +454,7 @@ func (i *itemContains) generate(g *generator) ast.Expr {
 }
 
 func (i *itemContains) apply(f func(item) item) item {
-	elem := i.elem.apply(f)
+	elem := f(i.elem)
 	if elem == i.elem {
 		return i
 	}
@@ -495,7 +494,7 @@ func (i *itemProperties) apply(f func(item) item) item {
 	changed := false
 	elems := i.elems
 	for j, prop := range elems {
-		if it := prop.item.apply(f); it != prop.item {
+		if it := f(prop.item); it != prop.item {
 			if !changed {
 				elems = slices.Clone(elems)
 				changed = true
@@ -550,13 +549,13 @@ func (i *itemIfThenElse) generate(g *generator) ast.Expr {
 }
 
 func (i *itemIfThenElse) apply(f func(item) item) item {
-	ifElem := i.ifElem.apply(f)
+	ifElem := f(i.ifElem)
 	var thenElem, elseElem item
 	if i.thenElem != nil {
-		thenElem = i.thenElem.apply(f)
+		thenElem = f(i.thenElem)
 	}
 	if i.elseElem != nil {
-		elseElem = i.elseElem.apply(f)
+		elseElem = f(i.elseElem)
 	}
 
 	if ifElem == i.ifElem && thenElem == i.thenElem && elseElem == i.elseElem {

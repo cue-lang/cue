@@ -5,21 +5,33 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"contentMediaType": "application/json"
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "a valid JSON document",
 				"data": "{\"foo\": \"bar\"}",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "an invalid JSON document; validates true",
 				"data": "{:}",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "ignores non-strings",
 				"data": 100,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -29,21 +41,33 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"contentEncoding": "base64"
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "a valid base64 string",
 				"data": "eyJmb28iOiAiYmFyIn0K",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "an invalid base64 string (% is not a valid character); validates true",
 				"data": "eyJmb28iOi%iYmFyIn0K",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "ignores non-strings",
 				"data": 100,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -54,26 +78,41 @@
 			"contentMediaType": "application/json",
 			"contentEncoding": "base64"
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "a valid base64-encoded JSON document",
 				"data": "eyJmb28iOiAiYmFyIn0K",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "a validly-encoded invalid JSON document; validates true",
 				"data": "ezp9Cg==",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "an invalid base64 string that is valid JSON; validates true",
 				"data": "{}",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "ignores non-strings",
 				"data": 100,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -96,7 +135,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"contentSchema\" not yet implemented"
+			"v3": "extract error: keyword \"contentSchema\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -104,7 +144,8 @@
 				"data": "eyJmb28iOiAiYmFyIn0K",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -112,7 +153,8 @@
 				"data": "eyJib28iOiAyMCwgImZvbyI6ICJiYXoifQ==",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -120,7 +162,8 @@
 				"data": "eyJib28iOiAyMH0=",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -128,7 +171,8 @@
 				"data": "e30=",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -136,7 +180,8 @@
 				"data": "W10=",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -144,7 +189,8 @@
 				"data": "ezp9Cg==",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -152,7 +198,8 @@
 				"data": "{}",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -160,7 +207,8 @@
 				"data": 100,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]

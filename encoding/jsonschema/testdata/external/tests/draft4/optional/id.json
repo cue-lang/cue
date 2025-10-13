@@ -32,6 +32,9 @@
 				}
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "exact match to enum, and type matches",
@@ -39,17 +42,26 @@
 					"id": "https://localhost:1234/my_identifier.json",
 					"type": "null"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "match $ref to id",
 				"data": "a string to match #/definitions/id_in_enum",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "no match on enum or $ref to id",
 				"data": 1,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	}

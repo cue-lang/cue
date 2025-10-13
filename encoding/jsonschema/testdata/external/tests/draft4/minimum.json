@@ -4,26 +4,41 @@
 		"schema": {
 			"minimum": 1.1
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "above the minimum is valid",
 				"data": 2.6,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boundary point is valid",
 				"data": 1.1,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "below the minimum is invalid",
 				"data": 0.6,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "ignores non-numbers",
 				"data": "x",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -33,29 +48,42 @@
 			"minimum": 1.1,
 			"exclusiveMinimum": false
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "above the minimum is valid",
 				"data": 2.6,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boundary point is valid",
 				"data": 1.1,
 				"valid": true,
 				"skip": {
-					"v3": "6 errors in empty disjunction:\nconflicting values 1.1 and [...] (mismatched types float and list):\n    generated.cue:2:1\n    generated.cue:2:31\n    instance.json:1:1\nconflicting values 1.1 and bool (mismatched types float and bool):\n    generated.cue:2:1\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values 1.1 and null (mismatched types float and null):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values 1.1 and string (mismatched types float and string):\n    generated.cue:2:1\n    generated.cue:2:22\n    instance.json:1:1\nconflicting values 1.1 and {...} (mismatched types float and struct):\n    generated.cue:2:1\n    generated.cue:2:39\n    instance.json:1:1\ninvalid value 1.1 (out of bound \u003e1.1):\n    generated.cue:2:15\n    instance.json:1:1\n"
+					"v3": "6 errors in empty disjunction:\nconflicting values 1.1 and [...] (mismatched types float and list):\n    generated.cue:2:1\n    generated.cue:2:31\n    instance.json:1:1\nconflicting values 1.1 and bool (mismatched types float and bool):\n    generated.cue:2:1\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values 1.1 and null (mismatched types float and null):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values 1.1 and string (mismatched types float and string):\n    generated.cue:2:1\n    generated.cue:2:22\n    instance.json:1:1\nconflicting values 1.1 and {...} (mismatched types float and struct):\n    generated.cue:2:1\n    generated.cue:2:39\n    instance.json:1:1\ninvalid value 1.1 (out of bound \u003e1.1):\n    generated.cue:2:15\n    instance.json:1:1\n",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
 				"description": "below the minimum is invalid",
 				"data": 0.6,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "ignores non-numbers",
 				"data": "x",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -65,16 +93,25 @@
 			"minimum": 1.1,
 			"exclusiveMinimum": true
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "above the minimum is still valid",
 				"data": 1.2,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boundary point is invalid",
 				"data": 1.1,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -83,41 +120,65 @@
 		"schema": {
 			"minimum": -2
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "negative above the minimum is valid",
 				"data": -1,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "positive above the minimum is valid",
 				"data": 0,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boundary point is valid",
 				"data": -2,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boundary point with float is valid",
 				"data": -2.0,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "float below the minimum is invalid",
 				"data": -2.0001,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "int below the minimum is invalid",
 				"data": -3,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "ignores non-numbers",
 				"data": "x",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	}

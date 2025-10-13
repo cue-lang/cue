@@ -27,7 +27,10 @@
 					"bar": 2,
 					"quux": "boom"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "ignores arrays",
@@ -80,7 +83,10 @@
 				"data": {
 					"élmény": 2
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -120,7 +126,10 @@
 					"bar": 2,
 					"quux": 12
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -145,7 +154,10 @@
 				"data": {
 					"foo": 1
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -192,7 +204,10 @@
 					"foo": 1,
 					"bar": true
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -226,7 +241,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:6:3\n"
+			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:6:3\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -236,7 +252,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -247,7 +264,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -277,7 +295,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -285,7 +304,10 @@
 				"data": {
 					"bar": ""
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "additionalProperties can't see bar even when foo2 is present",
@@ -295,7 +317,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]

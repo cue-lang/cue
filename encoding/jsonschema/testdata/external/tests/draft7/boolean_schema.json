@@ -2,55 +2,85 @@
 	{
 		"description": "boolean schema 'true'",
 		"schema": true,
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "string is valid",
 				"data": "foo",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boolean true is valid",
 				"data": true,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "boolean false is valid",
 				"data": false,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "null is valid",
 				"data": null,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "object is valid",
 				"data": {
 					"foo": "bar"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "empty object is valid",
 				"data": {},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "array is valid",
 				"data": [
 					"foo"
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "empty array is valid",
 				"data": [],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -58,7 +88,8 @@
 		"description": "boolean schema 'false'",
 		"schema": false,
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:1\n"
+			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:1\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -66,7 +97,8 @@
 				"data": 1,
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -74,7 +106,8 @@
 				"data": "foo",
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -82,7 +115,8 @@
 				"data": true,
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -90,7 +124,8 @@
 				"data": false,
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -98,7 +133,8 @@
 				"data": null,
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -108,7 +144,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -116,7 +153,8 @@
 				"data": {},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -126,7 +164,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -134,7 +173,8 @@
 				"data": [],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]

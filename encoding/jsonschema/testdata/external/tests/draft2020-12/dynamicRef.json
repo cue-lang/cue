@@ -16,7 +16,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)"
+			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -27,7 +28,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -38,7 +40,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -60,7 +63,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)"
+			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -71,7 +75,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -82,7 +87,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -104,7 +110,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot determine CUE location for JSON Schema location id=https://test.json-schema.org/ref-dynamicAnchor-same-schema/root#items: anchors (items) not supported (and 3 more errors)"
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=https://test.json-schema.org/ref-dynamicAnchor-same-schema/root#items: anchors (items) not supported (and 3 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -115,7 +122,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -126,7 +134,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -158,7 +167,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)"
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -169,7 +179,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -180,7 +191,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -213,7 +225,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)"
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -224,7 +237,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -235,7 +249,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -271,7 +286,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)"
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -282,7 +298,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -293,7 +310,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -325,7 +343,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 5 more errors)"
+			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 5 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -336,7 +355,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -368,7 +388,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)"
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -379,7 +400,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -412,7 +434,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 7 more errors)"
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 7 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -423,7 +446,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -464,7 +488,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)"
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -479,7 +504,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -494,7 +520,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -535,7 +562,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)"
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 5 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -550,7 +578,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -616,7 +645,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 7 more errors)"
+			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 7 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -629,7 +659,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -642,7 +673,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -655,7 +687,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -668,7 +701,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -714,7 +748,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 7 more errors)"
+			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 7 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -722,7 +757,8 @@
 				"data": "a string",
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -730,7 +766,8 @@
 				"data": 42,
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -738,7 +775,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -753,7 +791,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)"
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -767,7 +806,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -781,7 +821,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -806,7 +847,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)"
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -816,7 +858,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -830,7 +873,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -844,7 +888,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -875,7 +920,8 @@
 			]
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)"
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -885,7 +931,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -899,7 +946,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -913,7 +961,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -944,7 +993,8 @@
 			]
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)"
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -954,7 +1004,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -968,7 +1019,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -982,7 +1034,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -993,7 +1046,8 @@
 			"$ref": "http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/foo"
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/detached-dynamicref.json:schema\":\n    generated.cue:1:8\n"
+			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/detached-dynamicref.json:schema\":\n    generated.cue:1:8\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -1001,7 +1055,8 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1009,7 +1064,8 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -1032,7 +1088,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)"
+			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -1042,7 +1099,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1052,7 +1110,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -1100,7 +1159,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 5 more errors)"
+			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 5 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -1112,7 +1172,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1124,7 +1185,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]

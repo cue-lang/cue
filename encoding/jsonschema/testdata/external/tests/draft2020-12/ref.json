@@ -32,7 +32,10 @@
 				"data": {
 					"bar": false
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "recursive mismatch",
@@ -41,7 +44,10 @@
 						"bar": false
 					}
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -58,20 +64,29 @@
 				}
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 3 more errors)"
+		},
 		"tests": [
 			{
 				"description": "match",
 				"data": {
 					"bar": 3
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "mismatch",
 				"data": {
 					"bar": true
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -88,6 +103,9 @@
 				}
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 3 more errors)"
+		},
 		"tests": [
 			{
 				"description": "match array",
@@ -95,7 +113,10 @@
 					1,
 					2
 				],
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "mismatch array",
@@ -103,7 +124,10 @@
 					1,
 					"foo"
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -134,48 +158,69 @@
 				}
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "cannot extract generated schema: invalid JSON reference: parse \"#/$defs/#.\\\"percent%field\\\"\": invalid URL escape \"%fi\" (and 3 more errors)"
+		},
 		"tests": [
 			{
 				"description": "slash invalid",
 				"data": {
 					"slash": "aoeu"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "tilde invalid",
 				"data": {
 					"tilde": "aoeu"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "percent invalid",
 				"data": {
 					"percent": "aoeu"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "slash valid",
 				"data": {
 					"slash": 123
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "tilde valid",
 				"data": {
 					"tilde": 123
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "percent valid",
 				"data": {
 					"percent": 123
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -260,7 +305,8 @@
 			"$ref": "https://json-schema.org/draft/2020-12/schema"
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: package \"json-schema.org/draft/2020-12/schema\" imported but not defined in :\n    generated.cue:1:8\n"
+			"v3": "extract error: cannot compile resulting schema: package \"json-schema.org/draft/2020-12/schema\" imported but not defined in :\n    generated.cue:1:8\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -270,7 +316,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -280,7 +327,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -357,7 +405,10 @@
 			{
 				"description": "any value is valid",
 				"data": "foo",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "conflicting values \"foo\" and {...} (mismatched types string and struct):\n    instance.json:1:1\n"
+				}
 			}
 		]
 	},
@@ -371,7 +422,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:5:8\n"
+			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:5:8\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -379,7 +431,8 @@
 				"data": "foo",
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -551,7 +604,8 @@
 			"$ref": "#/$defs/A"
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -561,7 +615,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -592,7 +647,10 @@
 				"data": {
 					"type": "string"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "match the enum exactly",
@@ -625,6 +683,9 @@
 			},
 			"$ref": "schema-relative-uri-defs2.json"
 		},
+		"skip": {
+			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 3 more errors)"
+		},
 		"tests": [
 			{
 				"description": "invalid on inner field",
@@ -634,7 +695,10 @@
 					},
 					"bar": "a"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "invalid on outer field",
@@ -644,7 +708,10 @@
 					},
 					"bar": 1
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "valid on both fields",
@@ -654,7 +721,10 @@
 					},
 					"bar": "a"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -680,6 +750,9 @@
 			},
 			"$ref": "schema-refs-absolute-uris-defs2.json"
 		},
+		"skip": {
+			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 3 more errors)"
+		},
 		"tests": [
 			{
 				"description": "invalid on inner field",
@@ -689,7 +762,10 @@
 					},
 					"bar": "a"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "invalid on outer field",
@@ -699,7 +775,10 @@
 					},
 					"bar": 1
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "valid on both fields",
@@ -709,7 +788,10 @@
 					},
 					"bar": "a"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -737,16 +819,25 @@
 				}
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-number is invalid",
 				"data": "a",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -774,7 +865,10 @@
 			{
 				"description": "data is valid against first definition",
 				"data": 5,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "conflicting values 5 and {...} (mismatched types int and struct):\n    instance.json:1:1\ncannot use 5 (type _|_) as _ in argument 1 to matchN:\n    instance.json:1:1\n"
+				}
 			},
 			{
 				"description": "data is invalid against first definition",
@@ -805,7 +899,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot determine CUE location for JSON Schema location id=https://example.com/draft2020-12/ref-and-id2/base.json#bigint: anchors (bigint) not supported (and 5 more errors)"
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=https://example.com/draft2020-12/ref-and-id2/base.json#bigint: anchors (bigint) not supported (and 5 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -813,7 +908,8 @@
 				"data": 5,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -821,7 +917,8 @@
 				"data": 50,
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -1043,7 +1140,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot determine CUE location for JSON Schema location id=urn:uuid:deadbeef-1234-ff00-00ff-4321feebdaed#something: anchors (something) not supported (and 3 more errors)"
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=urn:uuid:deadbeef-1234-ff00-00ff-4321feebdaed#something: anchors (something) not supported (and 3 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -1053,7 +1151,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1063,7 +1162,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -1109,7 +1209,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: package \"example.com/ref/if\" imported but not defined in :\n    generated.cue:1:8\n"
+			"v3": "extract error: cannot compile resulting schema: package \"example.com/ref/if\" imported but not defined in :\n    generated.cue:1:8\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -1117,7 +1218,8 @@
 				"data": "foo",
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1125,7 +1227,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -1141,7 +1244,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: package \"example.com/ref/then\" imported but not defined in :\n    generated.cue:1:8\n"
+			"v3": "extract error: cannot compile resulting schema: package \"example.com/ref/then\" imported but not defined in :\n    generated.cue:1:8\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -1149,7 +1253,8 @@
 				"data": "foo",
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1157,7 +1262,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -1173,7 +1279,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: package \"example.com/ref/else\" imported but not defined in :\n    generated.cue:1:8\n"
+			"v3": "extract error: cannot compile resulting schema: package \"example.com/ref/else\" imported but not defined in :\n    generated.cue:1:8\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -1181,7 +1288,8 @@
 				"data": "foo",
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1189,7 +1297,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -1293,16 +1402,25 @@
 				}
 			]
 		},
+		"skip": {
+			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-number is invalid",
 				"data": "a",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	}

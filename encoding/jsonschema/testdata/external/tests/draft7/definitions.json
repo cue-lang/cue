@@ -5,7 +5,8 @@
 			"$ref": "http://json-schema.org/draft-07/schema#"
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: package \"json-schema.org/draft-07/schema\" imported but not defined in :\n    generated.cue:1:8\n"
+			"v3": "extract error: cannot compile resulting schema: package \"json-schema.org/draft-07/schema\" imported but not defined in :\n    generated.cue:1:8\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -19,7 +20,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -33,7 +35,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]

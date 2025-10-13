@@ -66,23 +66,33 @@
 				"data": "http://2001:0db8:85a3:0000:0000:8a2e:0370:7334",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
 				"description": "an invalid relative IRI Reference",
 				"data": "/abc",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "an invalid IRI",
 				"data": "\\\\WINDOWS\\filëßåré",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "an invalid IRI though valid IRI reference",
 				"data": "âππ",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	}

@@ -90,10 +90,10 @@ badScore2: {
 		}
 		score: {
 			allOf: [{
-				type:       "number"
-				multipleOf: 10
+				type: "number"
 			}, {
-				type: "integer"
+				type:       "integer"
+				multipleOf: 10
 			}]
 		}
 		shortString: {
@@ -105,13 +105,9 @@ badScore2: {
 			format: "time"
 		}
 		userName: {
-			allOf: [{
-				type:      "string"
-				maxLength: 20
-			}, {
-				type:      "string"
-				minLength: 3
-			}]
+			type:      "string"
+			maxLength: 20
+			minLength: 3
 		}
 	}
 }
@@ -124,11 +120,8 @@ badDateTime.data.dateTime: invalid value "2025-10-02T13" (does not satisfy time.
     1:158
     ./datatest/tests.cue:26:18
 -- out/generate-v3/badScore2 --
-badScore2.data.score: invalid value 5 (does not satisfy matchN): 1 matched, expected 2:
-    1:278
-    ./datatest/tests.cue:42:15
 badScore2.data.score: invalid value 5 (does not satisfy math.MultipleOf(10)):
-    1:304
+    1:323
     1:278
     ./datatest/tests.cue:42:15
 -- out/generate-v3/badTime --
@@ -136,13 +129,10 @@ badTime.data.date: invalid value "25:00:10" (does not satisfy time.Format("2006-
     1:113
     ./datatest/tests.cue:34:14
 -- out/generate-v3/badUserName --
-badUserName.data.userName: invalid value "x" (does not satisfy matchN): 1 matched, expected 2:
-    1:446
-    ./datatest/tests.cue:38:18
 badUserName.data.userName: invalid value "x" (does not satisfy strings.MinRunes(3)):
-    1:505
-    1:446
-    1:505
+    1:477
+    1:462
+    1:477
     ./datatest/tests.cue:38:18
 -- out/generate-v3/notMultiple --
 notMultiple.data.multiple: invalid value 1 (does not satisfy math.MultipleOf(5)):

@@ -5,13 +5,17 @@
 			"type": "integer",
 			"multipleOf": 0.5
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "valid if optional overflow handling is implemented",
 				"data": 1E+308,
 				"valid": true,
 				"skip": {
-					"v3": "conflicting values 1E+308 and int (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n"
+					"v3": "conflicting values 1E+308 and int (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]

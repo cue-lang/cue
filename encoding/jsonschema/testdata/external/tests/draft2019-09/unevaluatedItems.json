@@ -6,7 +6,8 @@
 			"unevaluatedItems": true
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -14,7 +15,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -24,7 +26,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -36,7 +39,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -44,7 +48,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -54,7 +59,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -68,7 +74,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -76,7 +83,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -86,7 +94,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -96,7 +105,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -111,7 +121,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -122,7 +133,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -139,7 +151,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -149,7 +162,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -160,7 +174,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -178,7 +193,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -189,7 +205,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -206,7 +223,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -218,7 +236,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -230,7 +249,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -251,7 +271,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -263,7 +284,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -275,7 +297,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -302,7 +325,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -313,7 +337,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -325,7 +350,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -347,7 +373,8 @@
 			]
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -358,7 +385,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -369,7 +397,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -380,7 +409,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -402,7 +432,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -412,7 +443,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -424,7 +456,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -448,7 +481,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -458,7 +492,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -470,7 +505,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -506,7 +542,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -517,7 +554,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -529,7 +567,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -541,7 +580,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -554,7 +594,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -589,7 +630,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -600,7 +642,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -612,7 +655,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -639,7 +683,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -650,7 +695,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -694,7 +740,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -706,7 +753,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -719,7 +767,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -732,7 +781,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -746,7 +796,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -761,7 +812,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -769,7 +821,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -779,7 +832,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -807,7 +861,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -818,7 +873,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -830,7 +886,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -858,7 +915,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -869,7 +927,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -881,7 +940,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -919,7 +979,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 7 more errors)"
+			"v3": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 7 more errors)",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -935,7 +996,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -952,7 +1014,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -973,7 +1036,8 @@
 			]
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -983,7 +1047,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -1018,7 +1083,8 @@
 			]
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -1030,7 +1096,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1043,7 +1110,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -1055,7 +1123,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -1063,7 +1132,8 @@
 				"data": true,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1071,7 +1141,8 @@
 				"data": 123,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1079,7 +1150,8 @@
 				"data": 1.0,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1087,7 +1159,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1095,7 +1168,8 @@
 				"data": "foo",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1103,7 +1177,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -1117,7 +1192,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -1127,7 +1203,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -1146,7 +1223,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -1156,7 +1234,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -1166,7 +1245,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]

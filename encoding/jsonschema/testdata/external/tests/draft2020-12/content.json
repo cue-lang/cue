@@ -96,7 +96,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"contentSchema\" not yet implemented"
+			"v3": "extract error: keyword \"contentSchema\" not yet implemented",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -104,7 +105,8 @@
 				"data": "eyJmb28iOiAiYmFyIn0K",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -112,7 +114,8 @@
 				"data": "eyJib28iOiAyMCwgImZvbyI6ICJiYXoifQ==",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -120,7 +123,8 @@
 				"data": "eyJib28iOiAyMH0=",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -128,7 +132,8 @@
 				"data": "e30=",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -136,7 +141,8 @@
 				"data": "W10=",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -144,7 +150,8 @@
 				"data": "ezp9Cg==",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -152,7 +159,8 @@
 				"data": "{}",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -160,7 +168,8 @@
 				"data": 100,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]

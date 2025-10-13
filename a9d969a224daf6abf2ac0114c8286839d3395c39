@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2eeb4308_4a040bf1",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-13T10:57:06Z",
+      "side": 1,
+      "message": "done; used the string value directly, because we don\u0027t actually want to distinguish \"set and empty\" from \"unset\".",
+      "parentUuid": "8f3c8177_60637b9d",
+      "range": {
+        "startLine": 476,
+        "startChar": 17,
+        "endLine": 476,
+        "endChar": 22
+      },
+      "revId": "a9d969a224daf6abf2ac0114c8286839d3395c39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b20a3b0a_90b810fa",
@@ -54,6 +78,24 @@
       "writtenOn": "2025-10-13T07:50:44Z",
       "side": 1,
       "message": "I don\u0027t think it\u0027s particularly important but I would have written this loop a different way around, which at least in my head (which is probably missing some crucial details) might be simpler.\n\nI would have done roughly:\n```\ncurFile :\u003d \u0026cueast.File{} // and set up the comments here. Maybe abstract this to a func\nfiles :\u003d []*cueast.File{curFile}\nfor _, f :\u003d range p.Syntax {\n  // shove f into curfile\n  \n  if !singleOutputFile {\n    curFile \u003d \u0026cueast.File{} // same as above\n    files \u003d append(files, curFile)\n  }\n}\n\n// now we know that `files` contains everything we need\nfor _, file :\u003d range files {\n  // write them out\n}\n```\n\nI think this might helpfully simplify the control flow logic within the loop, but I wouldn\u0027t be surprised if I\u0027m missing something.",
+      "revId": "a9d969a224daf6abf2ac0114c8286839d3395c39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "904446db_4d423941",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-13T10:57:06Z",
+      "side": 1,
+      "message": "you\u0027re spot on that the existing logic is not easy to follow, I said as much in the PR review. I\u0027ll attempt a refactor like what you suggest in a follow-up commit, because this commit is not mine, and this is non-trivial enough where it might break something - so best to keep it separate.",
+      "parentUuid": "b20a3b0a_90b810fa",
       "revId": "a9d969a224daf6abf2ac0114c8286839d3395c39",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

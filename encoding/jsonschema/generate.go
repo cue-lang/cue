@@ -17,6 +17,7 @@ package jsonschema
 import (
 	"cmp"
 	"fmt"
+	"iter"
 	"maps"
 	"reflect"
 	"slices"
@@ -120,23 +121,49 @@ func mergeAllOf(it item) item {
 		it1 := &itemAllOf{
 			elems: make([]item, 0, len(it.elems)),
 		}
-		for _, e := range it.elems {
-			e := mergeAllOf(e)
-			if e1, ok := e.(*itemAllOf); ok {
-				it1.elems = append(it1.elems, e1.elems...)
-			} else {
-				it1.elems = append(it1.elems, e)
+	loop:
+		for e := range conjuncts(it) {
+			// Remove elements that are entirely redundant.
+			// Note: DeepEqual seems reasonable here because values are generally
+			// small and the data structures are well-defined. We could
+			// reconsider if these assumptions change.
+			// TODO we could unify itemType elements here, for example:
+			// allOf(itemType(number), itemType(integer)) -> itemType(integer)
+			for _, e1 := range it1.elems {
+				if reflect.DeepEqual(e1, e) {
+					continue loop
+				}
 			}
+			it1.elems = append(it1.elems, e.apply(mergeAllOf))
 		}
-		// Remove elements that are entirely redundant.
-		// Note: DeepEqual seems reasonable here because values are generally
-		// small and the data structures are well-defined. We could
-		// reconsider if these assumptions change.
-		it1.elems = dedupe(it1.elems, func(x, y item) bool { return reflect.DeepEqual(x, y) })
+		if len(it1.elems) == 1 {
+			return it1.elems[0]
+		}
 		return it1
 	default:
 		return it.apply(mergeAllOf)
 	}
+}
+
+func conjuncts(it *itemAllOf) iter.Seq[item] {
+	return func(yield func(item) bool) {
+		yieldConjuncts(it, yield)
+	}
+}
+
+func yieldConjuncts(it *itemAllOf, yield func(item) bool) bool {
+	for _, e := range it.elems {
+		if ae, ok := e.(*itemAllOf); ok {
+			if !yieldConjuncts(ae, yield) {
+				return false
+			}
+		} else {
+			if !yield(e) {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 // enumFromConst returns the item with disjunctive

@@ -15,10 +15,12 @@
 package jsonschema_test
 
 import (
+	"bytes"
 	stdjson "encoding/json"
 	"fmt"
 	"io"
 	"maps"
+	"net/url"
 	"os"
 	"path"
 	"regexp"
@@ -90,6 +92,13 @@ var supportsCharacterClassCategoryAlias = func() bool {
 	return err == nil
 }()
 
+var fixesParsingIPv6HostWithoutBrackets = func() bool {
+	// We use Sprintf so that staticcheck on Go 1.26 and later does not
+	// helpfully report that this URL will always fail to parse.
+	_, err := url.Parse(fmt.Sprintf("%s://2001:0db8:85a3:0000:0000:8a2e:0370:7334", "http"))
+	return err != nil
+}()
+
 func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *externaltest.Schema) {
 	t.Logf("file %v", path.Join("testdata/external", filename))
 	ctx := m.CueContext()
@@ -106,8 +115,9 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 		t.Skipf("skipping test for unknown schema version %v", versStr)
 	}
 
-	// Go 1.25.0 implements Unicode category aliases in regular expressions,
+	// Go 1.25 implements Unicode category aliases in regular expressions,
 	// and so e.g. \p{Letter} did not work on Go 1.24.x releases.
+	// See: https://github.com/golang/go/issues/70780
 	// Our tests must run on the latest two stable Go versions, currently 1.24 and 1.25,
 	// where such character classes lead to schema compilation errors on 1.24.
 	//
@@ -115,6 +125,19 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 	// TODO: get rid of this whole thing once we require Go 1.25 or later in the future.
 	if rxCharacterClassCategoryAlias.Match(s.Schema) && !supportsCharacterClassCategoryAlias {
 		t.Skip("regexp character classes for Unicode category aliases work only on Go 1.25 and later")
+	}
+
+	// Go 1.26 fixes [url.Parse] so that it correctly rejects IPv6 hosts
+	// without the required surrounding square brackets.
+	// See: https://github.com/golang/go/issues/31024
+	// Our tests must run on the latest two stable Go versions, currently 1.24 and 1.25,
+	// where such behavior is still buggy.
+	//
+	// As a temporary compromise, skip the test on 1.26 or later;
+	// we care about testing the behavior that most CUE users will see today.
+	// TODO: get rid of this whole thing once we require Go 1.26 or later in the future.
+	if bytes.Contains(s.Schema, []byte(`"iri"`)) && fixesParsingIPv6HostWithoutBrackets {
+		t.Skip("net/url.Parse tightens behavior on IPv6 hosts on Go 1.26 and later")
 	}
 
 	schemaAST, extractErr := jsonschema.Extract(jsonValue, &jsonschema.Config{

@@ -43,12 +43,18 @@
 					3,
 					4
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "empty array is invalid",
 				"data": [],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "not array is valid",
@@ -93,7 +99,10 @@
 					3,
 					4
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -114,7 +123,10 @@
 			{
 				"description": "empty array is invalid",
 				"data": [],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -130,12 +142,18 @@
 				"data": [
 					"foo"
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "empty array is invalid",
 				"data": [],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "non-arrays are valid",
@@ -163,7 +181,10 @@
 					4,
 					8
 				],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "does not match items, matches contains",
@@ -215,7 +236,10 @@
 			{
 				"description": "empty array is invalid",
 				"data": [],
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},

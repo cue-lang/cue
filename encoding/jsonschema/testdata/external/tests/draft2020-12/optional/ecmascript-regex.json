@@ -47,7 +47,8 @@
 			"pattern": "^\\cC$"
 		},
 		"skip": {
-			"v3": "extract error: invalid regexp \"^\\\\cC$\": error parsing regexp: invalid escape sequence: `\\c`"
+			"v3": "extract error: invalid regexp \"^\\\\cC$\": error parsing regexp: invalid escape sequence: `\\c`",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -55,7 +56,8 @@
 				"data": "\\cC",
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -63,7 +65,8 @@
 				"data": "\u0003",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -76,7 +79,8 @@
 			"pattern": "^\\cc$"
 		},
 		"skip": {
-			"v3": "extract error: invalid regexp \"^\\\\cc$\": error parsing regexp: invalid escape sequence: `\\c`"
+			"v3": "extract error: invalid regexp \"^\\\\cc$\": error parsing regexp: invalid escape sequence: `\\c`",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -84,7 +88,8 @@
 				"data": "\\cc",
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -92,7 +97,8 @@
 				"data": "\u0003",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -210,7 +216,8 @@
 				"data": "\u000b",
 				"valid": true,
 				"skip": {
-					"v3": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+					"v3": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3-roundtrip": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -223,7 +230,8 @@
 				"data": " ",
 				"valid": true,
 				"skip": {
-					"v3": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+					"v3": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3-roundtrip": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -231,7 +239,8 @@
 				"data": "\ufeff",
 				"valid": true,
 				"skip": {
-					"v3": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+					"v3": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3-roundtrip": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -244,7 +253,8 @@
 				"data": "\u2029",
 				"valid": true,
 				"skip": {
-					"v3": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+					"v3": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3-roundtrip": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -252,7 +262,8 @@
 				"data": " ",
 				"valid": true,
 				"skip": {
-					"v3": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+					"v3": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3-roundtrip": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -290,7 +301,8 @@
 				"data": "\u000b",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -303,7 +315,8 @@
 				"data": " ",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -311,7 +324,8 @@
 				"data": "\ufeff",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -324,7 +338,8 @@
 				"data": "\u2029",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -332,7 +347,8 @@
 				"data": " ",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -465,7 +481,8 @@
 				"data": "\\a",
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]
@@ -531,7 +548,10 @@
 				"data": {
 					"L'ÉCOLE": "PAS DE VRAIE VIE"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -558,21 +578,30 @@
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "unicode character in hex format in string",
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "unicode matching is case-sensitive",
 				"data": {
 					"L'ÉCOLE": "PAS DE VRAIE VIE"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -592,14 +621,20 @@
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "unicode character in hex format in string",
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "ascii characters match",
@@ -633,14 +668,20 @@
 				"data": {
 					"-%#": "spending the year dead for tax reasons"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)",
 				"data": {
 					"৪২": "khajit has wares if you have coin"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -667,7 +708,10 @@
 				"data": {
 					"-%#": "spending the year dead for tax reasons"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)",

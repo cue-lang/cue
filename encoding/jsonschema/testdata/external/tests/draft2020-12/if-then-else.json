@@ -82,7 +82,10 @@
 			{
 				"description": "invalid through then",
 				"data": -100,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "valid when if test fails",
@@ -116,7 +119,10 @@
 			{
 				"description": "invalid through else",
 				"data": 3,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -143,7 +149,10 @@
 			{
 				"description": "invalid through then",
 				"data": -100,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "valid through else",
@@ -153,7 +162,10 @@
 			{
 				"description": "invalid through else",
 				"data": 3,
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -213,7 +225,10 @@
 			{
 				"description": "boolean schema true in if always chooses the then path (invalid)",
 				"data": "else",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	},
@@ -230,7 +245,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:3:9\n"
+			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:3:9\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -238,7 +254,8 @@
 				"data": "then",
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -246,7 +263,8 @@
 				"data": "else",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -279,12 +297,18 @@
 			{
 				"description": "no redirects to then and fails",
 				"data": "no",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "invalid redirects to else and fails",
 				"data": "invalid",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			}
 		]
 	}

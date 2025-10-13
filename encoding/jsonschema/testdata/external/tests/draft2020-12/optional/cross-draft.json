@@ -7,7 +7,8 @@
 			"$ref": "http://localhost:1234/draft2019-09/ignore-prefixItems.json"
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/ignore-prefixItems.json:schema\":\n    generated.cue:1:8\n"
+			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/ignore-prefixItems.json:schema\":\n    generated.cue:1:8\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -20,7 +21,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]

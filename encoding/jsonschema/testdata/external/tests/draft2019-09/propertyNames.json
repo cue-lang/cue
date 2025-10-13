@@ -8,7 +8,8 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:6:3\n"
+			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:6:3\n",
+			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
 			{
@@ -19,7 +20,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -30,7 +32,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -38,7 +41,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -51,7 +55,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -59,7 +64,8 @@
 				"data": "foobar",
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -67,7 +73,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v3": "could not compile schema"
+					"v3": "could not extract schema",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]
@@ -80,6 +87,9 @@
 				"pattern": "^a+$"
 			}
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "matching property names valid",
@@ -88,7 +98,10 @@
 					"aa": {},
 					"aaa": {}
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "non-matching property name is invalid",
@@ -97,13 +110,17 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
 				"description": "object without properties is valid",
 				"data": {},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -113,18 +130,27 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"propertyNames": true
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "object with any properties is valid",
 				"data": {
 					"foo": 1
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			},
 			{
 				"description": "empty object is valid",
 				"data": {},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "could not extract schema"
+				}
 			}
 		]
 	},
@@ -134,6 +160,9 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"propertyNames": false
 		},
+		"skip": {
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
+		},
 		"tests": [
 			{
 				"description": "object with any properties is invalid",
@@ -142,7 +171,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success"
+					"v3": "unexpected success",
+					"v3-roundtrip": "could not extract schema"
 				}
 			},
 			{
@@ -150,7 +180,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v3": "6 errors in empty disjunction:\nconflicting values [...] and {} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:33\n    instance.json:1:1\nconflicting values bool and {} (mismatched types bool and struct):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values null and {} (mismatched types null and struct):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values number and {} (mismatched types number and struct):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values string and {} (mismatched types string and struct):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:4:3\n"
+					"v3": "6 errors in empty disjunction:\nconflicting values [...] and {} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:33\n    instance.json:1:1\nconflicting values bool and {} (mismatched types bool and struct):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values null and {} (mismatched types null and struct):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values number and {} (mismatched types number and struct):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values string and {} (mismatched types string and struct):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:4:3\n",
+					"v3-roundtrip": "could not extract schema"
 				}
 			}
 		]

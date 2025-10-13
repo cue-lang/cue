@@ -47,6 +47,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -54,6 +57,9 @@
 				"data": "P",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -63,6 +69,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -70,6 +79,9 @@
 				"data": "PT",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -79,6 +91,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -87,6 +102,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -94,6 +112,9 @@
 				"data": "P2S",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -143,6 +164,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -151,6 +175,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -158,6 +185,9 @@
 				"data": "P1",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			}

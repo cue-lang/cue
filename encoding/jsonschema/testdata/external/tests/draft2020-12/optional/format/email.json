@@ -47,6 +47,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -95,6 +98,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -102,6 +108,9 @@
 				"data": "test.@example.com",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -116,6 +125,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -124,6 +136,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -131,6 +146,9 @@
 				"data": "joe.bloggs@[127.0.0.300]",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			}

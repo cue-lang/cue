@@ -38,7 +38,10 @@
 					"foo": "quux",
 					"bar": 2
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "wrong type other",
@@ -46,7 +49,10 @@
 					"foo": 2,
 					"bar": "quux"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "wrong type both",
@@ -54,7 +60,10 @@
 					"foo": "quux",
 					"bar": "quux"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "ignores arrays",
@@ -97,7 +106,10 @@
 				"data": {
 					"bar": 2
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "object with both properties is invalid",
@@ -105,7 +117,10 @@
 					"foo": 1,
 					"bar": 2
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "empty object is valid",
@@ -147,7 +162,10 @@
 						"foo\"bar": 1
 					}
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "quoted tab invalid under dependent schema",
@@ -155,14 +173,20 @@
 					"foo\tbar": 1,
 					"a": 2
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "quoted quote invalid under dependent schema",
 				"data": {
 					"foo'bar": 1
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -191,6 +215,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -208,6 +235,9 @@
 				},
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},

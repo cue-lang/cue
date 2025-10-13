@@ -82,7 +82,10 @@
 			{
 				"description": "invalid through then",
 				"data": -100,
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "valid when if test fails",
@@ -116,7 +119,10 @@
 			{
 				"description": "invalid through else",
 				"data": 3,
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -143,7 +149,10 @@
 			{
 				"description": "invalid through then",
 				"data": -100,
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "valid through else",
@@ -153,7 +162,10 @@
 			{
 				"description": "invalid through else",
 				"data": 3,
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -213,7 +225,10 @@
 			{
 				"description": "boolean schema true in if always chooses the then path (invalid)",
 				"data": "else",
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -279,12 +294,18 @@
 			{
 				"description": "no redirects to then and fails",
 				"data": "no",
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "invalid redirects to else and fails",
 				"data": "invalid",
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	}

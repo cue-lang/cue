@@ -47,6 +47,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -55,6 +58,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -62,6 +68,9 @@
 				"data": "8:0030:6Z",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -76,6 +85,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -83,6 +95,9 @@
 				"data": "23:58:60Z",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -97,6 +112,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -104,6 +122,9 @@
 				"data": "23:58:60+00:00",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -123,6 +144,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -130,6 +154,9 @@
 				"data": "23:59:60+00:30",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -149,6 +176,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -156,6 +186,9 @@
 				"data": "23:59:60-00:30",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -185,6 +218,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -198,6 +234,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -205,6 +244,9 @@
 				"data": "00:60:00Z",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -214,6 +256,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -221,6 +266,9 @@
 				"data": "22:59:60Z",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -230,6 +278,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -237,6 +288,9 @@
 				"data": "01:02:03+24:00",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -246,6 +300,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -253,6 +310,9 @@
 				"data": "01:02:03Z+00:30",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -262,6 +322,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -269,6 +332,9 @@
 				"data": "01:01:01,1111",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -278,6 +344,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -285,6 +354,9 @@
 				"data": "12:00:00.52",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -294,6 +366,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -302,6 +377,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -309,6 +387,9 @@
 				"data": "ab:cd:ef",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			}

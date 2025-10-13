@@ -13,6 +13,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "conflicting values 1E+308 and int (mismatched types float and int):\n    generated.cue:5:1\n    instance.json:1:1\n"
+				},
+				"skipRoundTrip": {
+					"v3": "conflicting values 1E+308 and int (mismatched types float and int):\n    instance.json:1:1\n"
 				}
 			}
 		]

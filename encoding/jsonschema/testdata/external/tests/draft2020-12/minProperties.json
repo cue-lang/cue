@@ -24,7 +24,10 @@
 			{
 				"description": "too short is invalid",
 				"data": {},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "ignores arrays",
@@ -61,7 +64,10 @@
 			{
 				"description": "too short is invalid",
 				"data": {},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	}

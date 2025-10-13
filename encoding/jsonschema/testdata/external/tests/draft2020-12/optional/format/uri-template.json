@@ -47,6 +47,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{

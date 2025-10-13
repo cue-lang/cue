@@ -17,6 +17,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "conflicting values 1.0 and int (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n"
+				},
+				"skipRoundTrip": {
+					"v3": "conflicting values 1.0 and int (mismatched types float and int):\n    instance.json:1:1\n"
 				}
 			},
 			{

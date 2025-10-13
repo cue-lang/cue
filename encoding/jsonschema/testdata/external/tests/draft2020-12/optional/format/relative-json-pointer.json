@@ -62,6 +62,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -69,6 +72,9 @@
 				"data": "-1/foo/bar",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -78,6 +84,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -85,6 +94,9 @@
 				"data": "0##",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -94,6 +106,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -102,6 +117,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -109,6 +127,9 @@
 				"data": "",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},

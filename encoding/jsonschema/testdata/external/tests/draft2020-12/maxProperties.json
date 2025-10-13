@@ -28,7 +28,10 @@
 					"bar": 2,
 					"baz": 3
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "ignores arrays",
@@ -72,7 +75,10 @@
 					"bar": 2,
 					"baz": 3
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -93,7 +99,10 @@
 				"data": {
 					"foo": 1
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	}

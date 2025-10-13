@@ -71,6 +71,9 @@
 			"$schema": "https://json-schema.org/draft/2020-12/schema",
 			"items": false
 		},
+		"skipRoundTrip": {
+			"v3": "cannot build value from JSON: explicit error (_|_ literal) in source"
+		},
 		"tests": [
 			{
 				"description": "any non-empty array is invalid",
@@ -79,12 +82,18 @@
 					"foo",
 					true
 				],
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "cannot build value from JSON: explicit error (_|_ literal) in source"
+				}
 			},
 			{
 				"description": "empty array is valid",
 				"data": [],
-				"valid": true
+				"valid": true,
+				"skipRoundTrip": {
+					"v3": "cannot build value from JSON: explicit error (_|_ literal) in source"
+				}
 			}
 		]
 	},
@@ -448,6 +457,9 @@
 			],
 			"items": false
 		},
+		"skipRoundTrip": {
+			"v3": "cannot build value from JSON: explicit error (_|_ literal) in source"
+		},
 		"tests": [
 			{
 				"description": "empty array",
@@ -455,6 +467,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "7 errors in empty disjunction:\nconflicting values [] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nincompatible list lengths (0 and 4):\n    generated.cue:3:33\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n"
+				},
+				"skipRoundTrip": {
+					"v3": "cannot build value from JSON: explicit error (_|_ literal) in source"
 				}
 			},
 			{
@@ -465,6 +480,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "7 errors in empty disjunction:\nconflicting values [1] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nincompatible list lengths (1 and 4):\n    generated.cue:3:33\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n"
+				},
+				"skipRoundTrip": {
+					"v3": "cannot build value from JSON: explicit error (_|_ literal) in source"
 				}
 			},
 			{
@@ -476,6 +494,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "7 errors in empty disjunction:\nconflicting values [1,2] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1,2] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1,2] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1,2] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1,2] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nincompatible list lengths (2 and 4):\n    generated.cue:3:33\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n"
+				},
+				"skipRoundTrip": {
+					"v3": "cannot build value from JSON: explicit error (_|_ literal) in source"
 				}
 			},
 			{
@@ -488,6 +509,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "6 errors in empty disjunction:\nconflicting values [1,2,3] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1,2,3] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1,2,3] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1,2,3] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1,2,3] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n"
+				},
+				"skipRoundTrip": {
+					"v3": "cannot build value from JSON: explicit error (_|_ literal) in source"
 				}
 			},
 			{
@@ -498,7 +522,10 @@
 					3,
 					4
 				],
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "cannot build value from JSON: explicit error (_|_ literal) in source"
+				}
 			}
 		]
 	},
@@ -562,6 +589,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "6 errors in empty disjunction:\nconflicting values \"x\" and int (mismatched types string and int):\n    generated.cue:3:1\n    generated.cue:3:53\n    instance.json:1:2\nconflicting values [\"x\",2,3] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [\"x\",2,3] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [\"x\",2,3] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [\"x\",2,3] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [\"x\",2,3] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:60\n    instance.json:1:1\n"
+				},
+				"skipRoundTrip": {
+					"v3": "5 errors in empty disjunction:\nconflicting values \"x\" and int (mismatched types string and int):\n    instance.json:1:2\nconflicting values [\"x\",2,3] and bool (mismatched types list and bool):\n    instance.json:1:1\nconflicting values [\"x\",2,3] and null (mismatched types list and null):\n    instance.json:1:1\nconflicting values [\"x\",2,3] and number (mismatched types list and number):\n    instance.json:1:1\nconflicting values [\"x\",2,3] and {...} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and [\"x\",2,3] (mismatched types bool and list):\n    instance.json:1:1\nconflicting values null and [\"x\",2,3] (mismatched types null and list):\n    instance.json:1:1\nconflicting values number and [\"x\",2,3] (mismatched types number and list):\n    instance.json:1:1\nconflicting values string and [\"x\",2,3] (mismatched types string and list):\n    instance.json:1:1\ninvalid value [\"x\",2,3] (does not satisfy matchN): 1 matched, expected 2:\n    instance.json:1:1\ninvalid value [\"x\",2,3] (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -583,6 +613,9 @@
 			],
 			"items": false
 		},
+		"skipRoundTrip": {
+			"v3": "cannot build value from JSON: explicit error (_|_ literal) in source"
+		},
 		"tests": [
 			{
 				"description": "heterogeneous invalid instance",
@@ -591,7 +624,10 @@
 					"bar",
 					37
 				],
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "cannot build value from JSON: explicit error (_|_ literal) in source"
+				}
 			},
 			{
 				"description": "valid instance",
@@ -601,6 +637,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "6 errors in empty disjunction:\nconflicting values [null] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [null] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [null] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [null] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [null] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:55\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:3:48\n"
+				},
+				"skipRoundTrip": {
+					"v3": "cannot build value from JSON: explicit error (_|_ literal) in source"
 				}
 			}
 		]

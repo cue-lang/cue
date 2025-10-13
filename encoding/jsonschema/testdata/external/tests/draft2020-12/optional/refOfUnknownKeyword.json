@@ -12,20 +12,29 @@
 				}
 			}
 		},
+		"skipRoundTrip": {
+			"v3": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "match",
 				"data": {
 					"bar": 3
 				},
-				"valid": true
+				"valid": true,
+				"skipRoundTrip": {
+					"v3": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
+				}
 			},
 			{
 				"description": "mismatch",
 				"data": {
 					"bar": true
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
+				}
 			}
 		]
 	},
@@ -44,20 +53,29 @@
 				}
 			}
 		},
+		"skipRoundTrip": {
+			"v3": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "match",
 				"data": {
 					"bar": 3
 				},
-				"valid": true
+				"valid": true,
+				"skipRoundTrip": {
+					"v3": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
+				}
 			},
 			{
 				"description": "mismatch",
 				"data": {
 					"bar": true
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
+				}
 			}
 		]
 	},
@@ -73,16 +91,25 @@
 			],
 			"$ref": "#/examples/0"
 		},
+		"skipRoundTrip": {
+			"v3": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "match",
 				"data": "a string",
-				"valid": true
+				"valid": true,
+				"skipRoundTrip": {
+					"v3": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
+				}
 			},
 			{
 				"description": "mismatch",
 				"data": 42,
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
+				}
 			}
 		]
 	}

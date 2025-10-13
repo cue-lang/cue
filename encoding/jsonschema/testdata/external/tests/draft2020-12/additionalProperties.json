@@ -27,7 +27,10 @@
 					"bar": 2,
 					"quux": "boom"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "ignores arrays",
@@ -80,7 +83,10 @@
 				"data": {
 					"élmény": 2
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -120,7 +126,10 @@
 					"bar": 2,
 					"quux": 12
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -145,7 +154,10 @@
 				"data": {
 					"foo": 1
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -192,7 +204,10 @@
 					"foo": 1,
 					"bar": true
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -278,6 +293,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -285,7 +303,10 @@
 				"data": {
 					"bar": ""
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "additionalProperties can't see bar even when foo2 is present",
@@ -295,6 +316,9 @@
 				},
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			}

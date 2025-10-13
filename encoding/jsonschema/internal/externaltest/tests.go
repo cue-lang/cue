@@ -15,20 +15,22 @@ import (
 
 type Schema struct {
 	location
-	Description string             `json:"description"`
-	Comment     string             `json:"comment,omitempty"`
-	Schema      stdjson.RawMessage `json:"schema"`
-	Skip        Skip               `json:"skip,omitempty"`
-	Tests       []*Test            `json:"tests"`
+	Description   string             `json:"description"`
+	Comment       string             `json:"comment,omitempty"`
+	Schema        stdjson.RawMessage `json:"schema"`
+	Skip          Skip               `json:"skip,omitempty"`
+	SkipRoundTrip Skip               `json:"skipRoundTrip,omitempty"`
+	Tests         []*Test            `json:"tests"`
 }
 
 type Test struct {
 	location
-	Description string             `json:"description"`
-	Comment     string             `json:"comment,omitempty"`
-	Data        stdjson.RawMessage `json:"data"`
-	Valid       bool               `json:"valid"`
-	Skip        Skip               `json:"skip,omitempty"`
+	Description   string             `json:"description"`
+	Comment       string             `json:"comment,omitempty"`
+	Data          stdjson.RawMessage `json:"data"`
+	Valid         bool               `json:"valid"`
+	Skip          Skip               `json:"skip,omitempty"`
+	SkipRoundTrip Skip               `json:"skipRoundTrip,omitempty"`
 }
 
 // Skip records information about whether a given schema

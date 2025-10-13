@@ -211,6 +211,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				},
+				"skipRoundTrip": {
+					"v3": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -224,6 +227,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				},
+				"skipRoundTrip": {
+					"v3": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -232,6 +238,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				},
+				"skipRoundTrip": {
+					"v3": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -245,6 +254,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				},
+				"skipRoundTrip": {
+					"v3": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -253,6 +265,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				},
+				"skipRoundTrip": {
+					"v3": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -291,6 +306,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -304,6 +322,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -311,6 +332,9 @@
 				"data": "\ufeff",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -325,6 +349,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -332,6 +359,9 @@
 				"data": " ",
 				"valid": false,
 				"skip": {
+					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
 					"v3": "unexpected success"
 				}
 			},
@@ -466,6 +496,9 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success"
+				},
+				"skipRoundTrip": {
+					"v3": "unexpected success"
 				}
 			}
 		]
@@ -531,7 +564,10 @@
 				"data": {
 					"L'ÉCOLE": "PAS DE VRAIE VIE"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -558,21 +594,30 @@
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "unicode character in hex format in string",
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "unicode matching is case-sensitive",
 				"data": {
 					"L'ÉCOLE": "PAS DE VRAIE VIE"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -592,14 +637,20 @@
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "unicode character in hex format in string",
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "ascii characters match",
@@ -633,14 +684,20 @@
 				"data": {
 					"-%#": "spending the year dead for tax reasons"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)",
 				"data": {
 					"৪২": "khajit has wares if you have coin"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -667,7 +724,10 @@
 				"data": {
 					"-%#": "spending the year dead for tax reasons"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)",

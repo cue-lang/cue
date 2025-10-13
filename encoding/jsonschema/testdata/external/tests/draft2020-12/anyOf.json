@@ -31,7 +31,10 @@
 			{
 				"description": "neither anyOf valid",
 				"data": 1.5,
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -53,7 +56,10 @@
 			{
 				"description": "mismatch base schema",
 				"data": 3,
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "one anyOf valid",
@@ -63,7 +69,10 @@
 			{
 				"description": "both anyOf invalid",
 				"data": "foo",
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -114,7 +123,10 @@
 			{
 				"description": "any value is invalid",
 				"data": "foo",
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -174,7 +186,10 @@
 					"foo": 2,
 					"bar": "quux"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},

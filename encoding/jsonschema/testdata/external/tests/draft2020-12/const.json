@@ -54,7 +54,10 @@
 				"data": {
 					"foo": "bar"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "another type is invalid",
@@ -62,7 +65,10 @@
 					1,
 					2
 				],
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -91,7 +97,10 @@
 				"data": [
 					2
 				],
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "array with additional items is invalid",
@@ -100,7 +109,10 @@
 					2,
 					3
 				],
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -256,14 +268,20 @@
 				"data": {
 					"a": 0
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "{\"a\": 0.0} is invalid",
 				"data": {
 					"a": 0.0
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -288,14 +306,20 @@
 				"data": {
 					"a": 1
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "{\"a\": 1.0} is invalid",
 				"data": {
 					"a": 1.0
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -322,6 +346,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n"
+				},
+				"skipRoundTrip": {
+					"v3": "conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -364,6 +391,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n"
+				},
+				"skipRoundTrip": {
+					"v3": "conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			}
 		]
@@ -381,6 +411,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "conflicting values -2 and -2.0 (mismatched types int and float):\n    generated.cue:3:1\n    instance.json:1:1\n"
+				},
+				"skipRoundTrip": {
+					"v3": "conflicting values -2 and -2.0 (mismatched types int and float):\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -428,6 +461,9 @@
 				"valid": true,
 				"skip": {
 					"v3": "conflicting values 9007199254740992.0 and 9007199254740992 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n"
+				},
+				"skipRoundTrip": {
+					"v3": "conflicting values 9007199254740992.0 and 9007199254740992 (mismatched types float and int):\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
 			{

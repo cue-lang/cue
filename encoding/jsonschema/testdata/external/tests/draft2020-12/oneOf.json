@@ -26,12 +26,18 @@
 			{
 				"description": "both oneOf valid",
 				"data": 3,
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "neither oneOf valid",
 				"data": 1.5,
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -53,7 +59,10 @@
 			{
 				"description": "mismatch base schema",
 				"data": 3,
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "one oneOf valid",
@@ -63,7 +72,10 @@
 			{
 				"description": "both oneOf valid",
 				"data": "foo",
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -81,7 +93,10 @@
 			{
 				"description": "any value is invalid",
 				"data": "foo",
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -117,7 +132,10 @@
 			{
 				"description": "any value is invalid",
 				"data": "foo",
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -135,7 +153,10 @@
 			{
 				"description": "any value is invalid",
 				"data": "foo",
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -187,7 +208,10 @@
 					"foo": "baz",
 					"bar": 2
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "neither oneOf valid (complex)",
@@ -195,7 +219,10 @@
 					"foo": 2,
 					"bar": "quux"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -219,7 +246,10 @@
 			{
 				"description": "both valid - invalid",
 				"data": 123,
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -249,7 +279,10 @@
 				"data": {
 					"bar": 2
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "first valid - valid",
@@ -274,7 +307,10 @@
 					"bar": 2,
 					"baz": 3
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},
@@ -323,14 +359,20 @@
 					"foo": "foo",
 					"bar": 8
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "neither oneOf valid",
 				"data": {
 					"baz": "quux"
 				},
-				"valid": false
+				"valid": false,
+				"skipRoundTrip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},

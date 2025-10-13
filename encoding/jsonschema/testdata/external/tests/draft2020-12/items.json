@@ -72,7 +72,7 @@
 			"items": false
 		},
 		"skip": {
-			"v3-roundtrip": "cannot build value from JSON: explicit error (_|_ literal) in source"
+			"v3-roundtrip": "generate error: error found in schema: [_]: explicit error (_|_ literal) in source"
 		},
 		"tests": [
 			{
@@ -465,7 +465,7 @@
 			"items": false
 		},
 		"skip": {
-			"v3-roundtrip": "cannot build value from JSON: explicit error (_|_ literal) in source"
+			"v3-roundtrip": "generate error: error found in schema: [_]: explicit error (_|_ literal) in source"
 		},
 		"tests": [
 			{
@@ -611,7 +611,7 @@
 			"items": false
 		},
 		"skip": {
-			"v3-roundtrip": "cannot build value from JSON: explicit error (_|_ literal) in source"
+			"v3-roundtrip": "generate error: error found in schema: [_]: explicit error (_|_ literal) in source"
 		},
 		"tests": [
 			{

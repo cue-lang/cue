@@ -107,7 +107,7 @@
 			"propertyNames": false
 		},
 		"skip": {
-			"v3-roundtrip": "cannot build value from JSON: explicit error (_|_ literal) in source"
+			"v3-roundtrip": "generate error: error found in schema: explicit error (_|_ literal) in source"
 		},
 		"tests": [
 			{

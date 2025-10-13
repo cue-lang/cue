@@ -55,7 +55,7 @@ func TestGenerate(t *testing.T) {
 		// Round-trip test: convert generated JSON Schema back to CUE to validate
 		// First compile the AST to a CUE value, then marshal to JSON
 		schemaValue := ctx.BuildExpr(r)
-		qt.Assert(t, qt.IsNil(schemaValue.Err()))
+		qt.Assert(t, qt.IsNil(schemaValue.Err()), qt.Commentf("schema data: %q", data))
 
 		schemaBytes, err := schemaValue.MarshalJSON()
 		qt.Assert(t, qt.IsNil(err))

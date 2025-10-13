@@ -141,6 +141,23 @@
       "parentUuid": "c84ee374_e1871700",
       "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3813ff47_04bd0042",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-13T09:35:06Z",
+      "side": 1,
+      "message": "maybe \"cue command version\"",
+      "revId": "85318c1384b453ad7a549d9f15ed969dccc7ace2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -197,10 +197,10 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 			// prevent the file comment from attaching to pkg when there is no pkg comment
 			PackagePos: token.NoPos.WithRel(token.NewSection),
 		}
-		v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+		for c := range v.LeafConjuncts() {
 			f, _ := c.Source().(*ast.File)
 			if f == nil {
-				return true
+				continue
 			}
 
 			if name := f.PackageName(); name != "" {
@@ -219,8 +219,7 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 					ast.AddComment(fout, c)
 				}
 			}
-			return true
-		})
+		}
 
 		if pkgName != "" {
 			pkg.Name = ast.NewIdent(pkgName)
@@ -450,10 +449,9 @@ func (e *exporter) markUsedFeatures(x adt.Expr) {
 		switch x := n.(type) {
 		case *adt.Vertex:
 			if !x.IsData() {
-				x.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+				for c := range x.LeafConjuncts() {
 					w.Elem(c.Elem())
-					return true
-				})
+				}
 			}
 
 		case *adt.DynamicReference:

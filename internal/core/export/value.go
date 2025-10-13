@@ -56,10 +56,9 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 		e.popFrame(saved)
 	}()
 
-	n.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+	for c := range n.LeafConjuncts() {
 		e.markLets(c.Expr().Source(), s)
-		return true
-	})
+	}
 
 	switch x := n.BaseValue.(type) {
 	case nil:
@@ -103,14 +102,9 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 	}
 	if result == nil {
 		// fall back to expression mode
-		a := []adt.Conjunct{}
-		n.VisitLeafConjuncts(func(c adt.Conjunct) bool {
-			a = append(a, c)
-			return true
-		})
 		// Use stable sort to ensure that tie breaks (for instance if elements
 		// are not associated with a position) are deterministic.
-		slices.SortStableFunc(a, cmpConjuncts)
+		a := slices.SortedStableFunc(n.LeafConjuncts(), cmpConjuncts)
 
 		exprs := make([]ast.Expr, 0, len(a))
 		for _, c := range a {

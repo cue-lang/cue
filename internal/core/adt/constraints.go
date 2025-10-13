@@ -98,10 +98,8 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 			Constraint: constraint,
 		})
 	} else {
-		found := false
-		constraint.VisitLeafConjuncts(func(x Conjunct) bool {
+		for x := range constraint.LeafConjuncts() {
 			if x.x == c.x && x.Env.Up == c.Env.Up && x.Env.Vertex == c.Env.Vertex {
-				found = true
 				if c.CloseInfo.opID == n.ctx.opID {
 					// TODO: do we need this replacement?
 					src := x.CloseInfo.defID
@@ -110,13 +108,9 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 				} else {
 					n.ctx.stats.MisalignedConstraint++
 				}
+				// The constraint already existed and the conjunct was already added.
 				return false
 			}
-			return true
-		})
-		// The constraint already existed and the conjunct was already added.
-		if found {
-			return false
 		}
 	}
 
@@ -177,10 +171,9 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (r
 		// TODO: hoist and reuse with the identical code in optional.go.
 		if x == cycle {
 			err := ctx.NewPosf(pos(pattern), "cyclic pattern constraint")
-			ctx.vertex.VisitLeafConjuncts(func(c Conjunct) bool {
+			for c := range ctx.vertex.LeafConjuncts() {
 				addPositions(ctx, err, c)
-				return true
-			})
+			}
 			ctx.AddBottom(&Bottom{
 				Err:  err,
 				Node: ctx.vertex,

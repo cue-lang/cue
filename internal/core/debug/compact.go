@@ -32,14 +32,13 @@ func (w *printer) compactNode(n adt.Node) {
 	case *adt.Vertex:
 		if x.BaseValue == nil || (w.cfg.Raw && !x.IsData()) {
 			i := 0
-			x.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+			for c := range x.LeafConjuncts() {
 				if i > 0 {
 					w.string(" & ")
 				}
 				i++
 				w.node(c.Elem())
-				return true
-			})
+			}
 			return
 		}
 

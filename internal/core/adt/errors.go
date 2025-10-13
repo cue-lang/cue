@@ -234,15 +234,14 @@ func NewRequiredNotPresentError(ctx *OpContext, v *Vertex, morePositions ...Node
 	for _, p := range morePositions {
 		err.AddPosition(p)
 	}
-	v.VisitLeafConjuncts(func(c Conjunct) bool {
+	for c := range v.LeafConjuncts() {
 		if f, ok := c.x.(*Field); ok && f.ArcType == ArcRequired {
 			err.AddPosition(c.x)
 		}
 		if p := c.CloseInfo.Location(ctx); p != nil {
 			err.AddPosition(p)
 		}
-		return true
-	})
+	}
 
 	b := &Bottom{
 		Code: IncompleteError,
@@ -256,10 +255,9 @@ func NewRequiredNotPresentError(ctx *OpContext, v *Vertex, morePositions ...Node
 func newRequiredFieldInComprehensionError(ctx *OpContext, x *ForClause, v *Vertex) *Bottom {
 	err := ctx.Newf("missing required field in for comprehension: %v", v.Label)
 	err.AddPosition(x.Src)
-	v.VisitLeafConjuncts(func(c Conjunct) bool {
+	for c := range v.LeafConjuncts() {
 		addPositions(ctx, err, c)
-		return true
-	})
+	}
 	return &Bottom{
 		Code: IncompleteError,
 		Err:  err,
@@ -365,10 +363,9 @@ func appendNodePositions(a []token.Pos, n Node) []token.Pos {
 		a = append(a, p)
 	}
 	if v, ok := n.(*Vertex); ok {
-		v.VisitLeafConjuncts(func(c Conjunct) bool {
+		for c := range v.LeafConjuncts() {
 			a = appendNodePositions(a, c.Elem())
-			return true
-		})
+		}
 	}
 	return a
 }

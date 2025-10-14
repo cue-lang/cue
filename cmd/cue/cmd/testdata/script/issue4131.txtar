@@ -1,0 +1,31 @@
+# This used to cause a panic in typocheck.go.
+
+exec cue export -e out.keys --out yaml in.cue
+cmp stdout stdout.golden
+
+-- in.cue --
+_inputs: foo: _
+_inputs: [_]: "foo value"
+
+_cfg: ({
+	x: (_CopyKeys & {_in: _inputs})._out
+}).x
+
+out: (_Files & {cfg: _cfg}).files
+
+_Files: {
+	cfg: keys: {}
+	cfg: copied: {}
+	files: {
+		keys: [for k, _ in cfg.keys {k}]
+		for k, v in cfg.copied {(k): v}
+	}
+}
+
+_CopyKeys: {
+	_in: {}
+	_out: keys: _in
+	_out: copied: {for k, v in _in {(k): v}}
+}
+-- stdout.golden --
+- foo

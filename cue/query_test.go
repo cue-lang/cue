@@ -16,6 +16,7 @@ package cue_test
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -157,6 +158,23 @@ func TestLookupPath(t *testing.T) {
 				t.Error(b)
 			}
 		})
+	}
+}
+
+func TestLookupPathOnExprListElement(t *testing.T) {
+	// Regression test for issue where LookupPath on list elements returned
+	// from Expr() would panic due to unfinalized vertices.
+	ctx := cuecontext.New()
+	v := ctx.CompileString(`a: matchN(1, [_])`)
+	op, args := v.LookupPath(cue.ParsePath("a")).Eval().Expr()
+	if op != cue.CallOp || len(args) != 3 {
+		t.Fatalf("unexpected expr results: %v %v", op, args)
+	}
+
+	// This should not panic - we're looking up an element in the list argument
+	top := args[2].LookupPath(cue.MakePath(cue.Index(0)))
+	if got := fmt.Sprint(top); got != "_" {
+		t.Errorf("unexpected value for list element: got %q, want %q", got, "_")
 	}
 }
 

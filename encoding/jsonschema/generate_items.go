@@ -462,8 +462,8 @@ func (i *itemItems) apply(f func(item) item) item {
 // itemContains represents a contains constraint for arrays
 type itemContains struct {
 	elem item
-	min  *int
-	max  *int
+	min  *int64
+	max  *int64
 }
 
 func (i *itemContains) generate(g *generator) ast.Expr {

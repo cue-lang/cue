@@ -16,6 +16,24 @@
       "message": "should these unknown forms be some sort of error?",
       "revId": "ae57ac858529cfc9fee7878021ac31d247d1ef3a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57973304_05071425",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-14T17:13:53Z",
+      "side": 1,
+      "message": "I don\u0027t _think_ so. There\u0027s only a limited subset of forms that we can encode to JSON Schema (in general CUE is more expressive than JSON Schema), and in general the policy is to be able to translate such CUE even if we lose something in the process.\n\nThere might be room in the future for a mode that strives for exactly accurate CUE-\u003eJSON Schema, but that would be very limiting in the CUE that we could generate schemas for, so I\u0027m not sure how useful it would be.",
+      "parentUuid": "c454ca16_847b7a2a",
+      "revId": "ae57ac858529cfc9fee7878021ac31d247d1ef3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

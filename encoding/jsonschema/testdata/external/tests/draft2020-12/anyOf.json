@@ -114,10 +114,7 @@
 			{
 				"description": "any value is invalid",
 				"data": "foo",
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

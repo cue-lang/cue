@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3acef710_627733b8",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-14T08:27:49Z",
+      "side": 1,
+      "message": "100% nit: this spelling of this condition confuses me, and to my little head it reads better via DeMorgan\u0027s. But I can well believe this is just me.\n\nI think what we want is:\n\n1. if this is the last item then keep going\n2. else if outfile is not in use then keep going\n3. else next item (`continue`)\n\nSo I think that\u0027s `if !(i \u003d\u003d len(p.Syntax)-1 || outFile \u003d\u003d \"\") { continue }`, which is the same as yours, just with a DeMorgan\u0027s switcheroo.",
+      "revId": "5e61119f932c9e746db68041f3db9a9e0b726c88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c9cfc3f_dd3cc3ed",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-14T08:27:49Z",
+      "side": 1,
+      "message": "I know you mentioned (somewhere?) that you needed to keep the filename around so you couldn\u0027t quite do the loop as I suggested it. But the [ast.File] does have a `Filename` field which you could use to stash this file name in. And then perhaps do the sanitize+format+write as part of the 2nd loop.\n\nEntirely up to you though - as you have it, it\u0027s clearer than it was. I think with the two loops you can drop having to care about the `i \u003d\u003d len(p.Syntax)-1` check, and I always like dropping the loop counter, but that\u0027s just me. It\u0027s all tradeoffs :)",
+      "revId": "5e61119f932c9e746db68041f3db9a9e0b726c88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "928e7fec_017b47f9",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 575,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-14T08:27:49Z",
+      "side": 1,
+      "message": "You could lift the `outFile` check to be outside this whole loop?",
+      "revId": "5e61119f932c9e746db68041f3db9a9e0b726c88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

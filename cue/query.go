@@ -56,6 +56,7 @@ outer:
 				if a.IsConstraint() && !sel.sel.isConstraint() {
 					break
 				}
+				a.Finalize(ctx)
 				parent = linkParent(parent, n, a)
 				n = a
 				continue outer

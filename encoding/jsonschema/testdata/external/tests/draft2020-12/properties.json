@@ -185,10 +185,7 @@
 				"data": {
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "both properties present is invalid",
@@ -196,10 +193,7 @@
 					"foo": 1,
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

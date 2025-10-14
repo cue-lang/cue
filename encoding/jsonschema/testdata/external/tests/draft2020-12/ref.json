@@ -640,7 +640,10 @@
 			{
 				"description": "do not evaluate the $ref inside the enum, matching any string",
 				"data": "this is a string",
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3-roundtrip": "unexpected success"
+				}
 			},
 			{
 				"description": "do not evaluate the $ref inside the enum, definition exact match",

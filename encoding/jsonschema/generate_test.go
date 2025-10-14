@@ -51,6 +51,7 @@ func TestGenerate(t *testing.T) {
 		data, err := format.Node(r)
 		qt.Assert(t, qt.IsNil(err))
 		t.Writer("schema").Write(data)
+		t.Logf("generated schema: %q", data)
 
 		// Round-trip test: convert generated JSON Schema back to CUE to validate
 		// First compile the AST to a CUE value, then marshal to JSON
@@ -71,6 +72,7 @@ func TestGenerate(t *testing.T) {
 		})
 		qt.Assert(t, qt.IsNil(err), qt.Commentf("generated JSON Schema should round-trip cleanly via Extract"))
 		extractedSchemaValue := ctx.BuildFile(extractedSchemaFile)
+		t.Logf("extracted schema: %#v", extractedSchemaValue)
 		qt.Assert(t, qt.IsNil(extractedSchemaValue.Err()))
 
 		txfs, err := txtar.FS(t.Archive)

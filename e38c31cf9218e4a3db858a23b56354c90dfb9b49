@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a065a57_4e741d15",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-14T16:52:28Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "3c18d508_aa8e6825",
+      "revId": "e38c31cf9218e4a3db858a23b56354c90dfb9b49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3da289b9_33d3968c",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-14T10:48:38Z",
       "side": 1,
       "message": "briefly document the choice of version here and above?",
+      "revId": "e38c31cf9218e4a3db858a23b56354c90dfb9b49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70d05587_bf8d93b6",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-14T16:52:28Z",
+      "side": 1,
+      "message": "Done, although I removed the DefaultVersion field here as it\u0027s unnecessary because `Generate` always includes a `$schema` explicitly.",
+      "parentUuid": "3da289b9_33d3968c",
       "revId": "e38c31cf9218e4a3db858a23b56354c90dfb9b49",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

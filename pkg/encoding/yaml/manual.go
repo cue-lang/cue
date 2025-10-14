@@ -31,7 +31,7 @@ func Marshal(v cue.Value) (string, error) {
 	if err := v.Validate(cue.Concrete(true)); err != nil {
 		return "", err
 	}
-	n := v.Syntax(cue.Final(), cue.Concrete(true))
+	n := v.Syntax(cue.Concrete(true))
 	b, err := cueyaml.Encode(n)
 	return string(b), err
 }
@@ -52,7 +52,7 @@ func MarshalStream(v cue.Value) (string, error) {
 		if err := v.Validate(cue.Concrete(true)); err != nil {
 			return "", err
 		}
-		n := v.Syntax(cue.Final(), cue.Concrete(true))
+		n := v.Syntax(cue.Concrete(true))
 		b, err := cueyaml.Encode(n)
 		if err != nil {
 			return "", err

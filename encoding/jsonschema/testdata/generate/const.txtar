@@ -60,7 +60,7 @@ errorNonString: {
 			const: 2
 		}
 		null: {
-			const: null
+			type: "null"
 		}
 		string: {
 			const: "something"
@@ -85,10 +85,9 @@ errorNonEqualInt.data.int: conflicting values 2 and 9:
     ./datatest/tests.cue:28:13
 -- out/generate-v3/errorNonNull --
 errorNonNull.data.null: conflicting values 1 and null (mismatched types int and null):
-    1:159
     ./datatest/tests.cue:32:14
 -- out/generate-v3/errorNonString --
 errorNonString.data.string: conflicting values "something" and "other":
-    1:183
+    1:184
     ./datatest/tests.cue:36:16
 -- out/generate-v3/ok1 --

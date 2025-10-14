@@ -49,7 +49,7 @@ ok: data: {
 		}
 		t7: true
 		t8: {
-			const: null
+			type: "null"
 		}
 	}
 }

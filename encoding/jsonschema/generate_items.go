@@ -70,6 +70,11 @@ func (i *itemAllOf) add(it item) {
 	i.elems = append(i.elems, it)
 }
 
+// elements implements [itemElements].
+func (i *itemAllOf) elements() []item {
+	return i.elems
+}
+
 func (i *itemAllOf) generate(g *generator) ast.Expr {
 	// Because a single json schema object is essentially an allOf itself,
 	// we can merge objects that don't share keywords
@@ -169,6 +174,11 @@ func (i *itemOneOf) apply(f func(item) item) item {
 	return &itemOneOf{elems: elems}
 }
 
+// elements implements [itemElements].
+func (i *itemOneOf) elements() []item {
+	return i.elems
+}
+
 // itemAnyOf represents an anyOf combinator
 type itemAnyOf struct {
 	elems []item
@@ -184,6 +194,11 @@ func (i *itemAnyOf) apply(f func(item) item) item {
 		return i
 	}
 	return &itemAnyOf{elems: elems}
+}
+
+// elements implements [itemElements].
+func (i *itemAnyOf) elements() []item {
+	return i.elems
 }
 
 // itemNot represents a not combinator

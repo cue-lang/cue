@@ -337,7 +337,7 @@ func (g *generator) makeItem(v cue.Value) item {
 	case cue.CallOp:
 		return g.makeCallItem(v, args)
 	}
-	if isConcreteScalar(v) {
+	if isConcreteScalar(v) && !v.IsNull() {
 		if err := v.Err(); err != nil {
 			g.addError(v, fmt.Errorf("error found in schema: %v", err))
 			return &itemFalse{}
@@ -681,6 +681,11 @@ func (g *generator) makeListItem(v cue.Value) item {
 	}
 	if ellipsis.Exists() {
 		items.rest = g.makeItem(ellipsis)
+		if _, ok := items.rest.(*itemTrue); ok {
+			// Additional items are allowed by default anyway,
+			// so no need to include them explicitly.
+			items.rest = nil
+		}
 	} else {
 		a.elems = append(a.elems, &itemLengthBounds{
 			constraint: cue.LessThanEqualOp,

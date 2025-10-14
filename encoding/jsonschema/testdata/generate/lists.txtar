@@ -56,8 +56,7 @@ badTupleType: {
 			maxLength: 0
 		}
 		emptyOpenList: {
-			type:  "array"
-			items: true
+			type: "array"
 		}
 		mixedTuple: {
 			type: "array"
@@ -104,12 +103,12 @@ badStringList.data.stringList.2: conflicting values 3 and string (mismatched typ
     ./datatest/tests.cue:14:27
 -- out/generate-v3/badTupleLength --
 badTupleLength.data.tuple: incompatible list lengths (1 and 3):
-    1:437
+    1:424
 -- out/generate-v3/badTupleType --
 badTupleType.data.tuple.0: conflicting values 1 and string (mismatched types int and string):
     ./datatest/tests.cue:24:16
 badTupleType.data.tuple.1: conflicting values "bar" and int (mismatched types string and int):
-    1:471
+    1:458
     ./datatest/tests.cue:24:19
 -- out/generate-v3/ok1 --
 -- out/generate-v3/ok2 --

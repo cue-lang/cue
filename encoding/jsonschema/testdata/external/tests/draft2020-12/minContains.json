@@ -33,20 +33,14 @@
 			{
 				"description": "empty data",
 				"data": [],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "no elements match",
 				"data": [
 					2
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "single element matches, valid minContains",
@@ -86,20 +80,14 @@
 			{
 				"description": "empty data",
 				"data": [],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "all elements match, invalid minContains",
 				"data": [
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "some elements match, invalid minContains",
@@ -107,10 +95,7 @@
 					1,
 					2
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "all elements match, valid minContains (exactly as needed)",
@@ -155,10 +140,7 @@
 				"data": [
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "both elements match, valid minContains",
@@ -184,20 +166,14 @@
 			{
 				"description": "empty data",
 				"data": [],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "all elements match, invalid minContains",
 				"data": [
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "all elements match, invalid maxContains",
@@ -206,10 +182,7 @@
 					1,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "all elements match, valid maxContains and minContains",
@@ -235,20 +208,14 @@
 			{
 				"description": "empty data",
 				"data": [],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid minContains",
 				"data": [
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid maxContains",
@@ -257,10 +224,7 @@
 					1,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid maxContains and minContains",
@@ -268,10 +232,7 @@
 					1,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -328,10 +289,7 @@
 					1,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	}

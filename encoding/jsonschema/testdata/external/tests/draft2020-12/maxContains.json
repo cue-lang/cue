@@ -36,10 +36,7 @@
 			{
 				"description": "empty data",
 				"data": [],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "all elements match, valid maxContains",
@@ -54,10 +51,7 @@
 					1,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "some elements match, valid maxContains",
@@ -74,10 +68,7 @@
 					2,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -104,10 +95,7 @@
 					1,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -125,10 +113,7 @@
 			{
 				"description": "actual \u003c minContains \u003c maxContains",
 				"data": [],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "minContains \u003c actual \u003c maxContains",
@@ -146,10 +131,7 @@
 					1,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3760d2ce_bef8345f",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-14T10:52:44Z",
+      "side": 1,
+      "message": "swap this comment for an assertion? like\n\n```\nvar _ itemElements \u003d (*itemAllOf)(nil)\n```\nand same below",
+      "revId": "bb0bb1b377f10966f8466a660e0d7c861c7a70cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

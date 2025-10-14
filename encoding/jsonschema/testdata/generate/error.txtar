@@ -1,0 +1,33 @@
+-- test.cue --
+package test
+
+errorField?: matchN(1, [int, error("disallowed")])
+-- datatest/tests.cue --
+package datatest
+
+ok: data: errorField: 10
+fail: {
+	data: errorField: "foo"
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: {
+		errorField: {
+			oneOf: [{
+				type: "integer"
+			}, false]
+		}
+	}
+}
+-- out/generate-v3/fail --
+fail.data.errorField: conflicting values "foo" and int (mismatched types string and int):
+    1:113
+    ./datatest/tests.cue:5:20
+fail.data.errorField: disallowed
+fail.data.errorField: invalid value "foo" (does not satisfy matchN): 0 matched, expected 1:
+    1:103
+    ./datatest/tests.cue:5:20
+-- out/generate-v3/ok --

@@ -400,6 +400,11 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 	funcName := fmt.Sprint(args[0])
 
 	switch funcName {
+	case "error()", "error":
+		// Explicit error: don't add an error to g but map it to a `false` schema.
+		// See https://github.com/cue-lang/cue/issues/4133 for why
+		// we include "error()" as well as "error"
+		return &itemFalse{}
 	case "strings.MinRunes":
 		if len(args) != 2 {
 			g.addError(v, fmt.Errorf("strings.MinRunes expects 1 argument, got %d", len(args)-1))
@@ -517,31 +522,26 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 			return &itemTrue{}
 		}
 
-		// Extract the constraint from the first argument.
-		// It can be a literal int (0, 1, N) or a unary expression (>=1).
-		constraintVal := args[1]
-		op, opArgs := constraintVal.Expr()
+		constraintVal, listVal := args[1], args[2]
 
-		// Extract the list of items from the second argument.
-		listVal := args[2]
-		listIter, err := listVal.List()
-		if err != nil {
-			// Not a list, accept anything
-			return &itemTrue{}
-		}
-
-		// Collect all items in the list
 		var items []item
-		for listIter.Next() {
-			items = append(items, g.makeItem(listIter.Value()))
+		for i := 0; ; i++ {
+			// Unfortunately https://github.com/cue-lang/cue/issues/4132 means
+			// that we cannot iterate over elements of the list with listVal.List
+			// when there are error elements (which there could be, as [Extract]
+			// can generate explicit errors, but we _can_ use [Value.LookupPath]
+			// to look up explicit indexes.
+			v := listVal.LookupPath(cue.MakePath(cue.Index(i)))
+			if !v.Exists() {
+				break
+			}
+			items = append(items, g.makeItem(v))
 		}
-
-		if len(items) == 0 {
-			// Empty list, accept anything
-			return &itemTrue{}
-		}
+		// Extract the list of items from the second argument.
 
 		// Determine which combinator to use based on the constraint
+		// It can be a literal int (0, 1, N) or a unary expression (>=1).
+		op, opArgs := constraintVal.Expr()
 		switch op {
 		case cue.NoOp:
 			// It's a simple integer literal
@@ -559,6 +559,9 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 				}
 				return &itemNot{elem: items[0]}
 			case 1:
+				if len(items) == 0 {
+					return &itemFalse{}
+				}
 				// matchN(1, [a, b, c, ...]) represents oneOf
 				return &itemOneOf{elems: items}
 			default:
@@ -576,14 +579,14 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 				return &itemTrue{}
 			}
 			n, err := opArgs[0].Int64()
-			if err != nil {
+			if err != nil || n != 1 {
+				// Unknown matchN pattern, accept anything
 				return &itemTrue{}
 			}
-			if n == 1 {
-				return &itemAnyOf{elems: items}
+			if len(items) == 0 {
+				return &itemFalse{}
 			}
-			// Unknown matchN pattern, accept anything
-			return &itemTrue{}
+			return &itemAnyOf{elems: items}
 
 		default:
 			// Unknown operator, accept anything

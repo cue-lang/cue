@@ -79,10 +79,7 @@
 					"foo",
 					true
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "empty array is valid",
@@ -465,7 +462,7 @@
 				"valid": true,
 				"skip": {
 					"v3": "7 errors in empty disjunction:\nconflicting values [] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:77\n    instance.json:1:1\nincompatible list lengths (0 and 4):\n    generated.cue:3:33\n0: disallowed:\n    generated.cue:3:54\n",
-					"v3-roundtrip": "conflicting values [] and {...} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and [] (mismatched types bool and list):\n    instance.json:1:1\nconflicting values null and [] (mismatched types null and list):\n    instance.json:1:1\nconflicting values number and [] (mismatched types number and list):\n    instance.json:1:1\nconflicting values string and [] (mismatched types string and list):\n    instance.json:1:1\nincompatible list lengths (0 and 4)\ninvalid value [] (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
+					"v3-roundtrip": "conflicting values [] and {...} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and [] (mismatched types bool and list):\n    instance.json:1:1\nconflicting values null and [] (mismatched types null and list):\n    instance.json:1:1\nconflicting values number and [] (mismatched types number and list):\n    instance.json:1:1\nconflicting values string and [] (mismatched types string and list):\n    instance.json:1:1\nincompatible list lengths (0 and 4)\ninvalid value [] (does not satisfy matchN): 1 matched, expected 2:\n    instance.json:1:1\ninvalid value [] (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -476,7 +473,7 @@
 				"valid": true,
 				"skip": {
 					"v3": "7 errors in empty disjunction:\nconflicting values [1] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:77\n    instance.json:1:1\nincompatible list lengths (1 and 4):\n    generated.cue:3:33\n0: disallowed:\n    generated.cue:3:54\n",
-					"v3-roundtrip": "conflicting values [1] and {...} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and [1] (mismatched types bool and list):\n    instance.json:1:1\nconflicting values null and [1] (mismatched types null and list):\n    instance.json:1:1\nconflicting values number and [1] (mismatched types number and list):\n    instance.json:1:1\nconflicting values string and [1] (mismatched types string and list):\n    instance.json:1:1\nincompatible list lengths (1 and 4)\ninvalid value [1] (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
+					"v3-roundtrip": "conflicting values [1] and {...} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and [1] (mismatched types bool and list):\n    instance.json:1:1\nconflicting values null and [1] (mismatched types null and list):\n    instance.json:1:1\nconflicting values number and [1] (mismatched types number and list):\n    instance.json:1:1\nconflicting values string and [1] (mismatched types string and list):\n    instance.json:1:1\nincompatible list lengths (1 and 4)\ninvalid value [1] (does not satisfy matchN): 0 matched, expected 2:\n    instance.json:1:1\n0: disallowed:\n    instance.json:1:1\ninvalid value [1] (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -488,7 +485,7 @@
 				"valid": true,
 				"skip": {
 					"v3": "7 errors in empty disjunction:\nconflicting values [1,2] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1,2] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1,2] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1,2] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1,2] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:77\n    instance.json:1:1\nincompatible list lengths (2 and 4):\n    generated.cue:3:33\n0: disallowed:\n    generated.cue:3:54\n",
-					"v3-roundtrip": "conflicting values [1,2] and {...} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and [1,2] (mismatched types bool and list):\n    instance.json:1:1\nconflicting values null and [1,2] (mismatched types null and list):\n    instance.json:1:1\nconflicting values number and [1,2] (mismatched types number and list):\n    instance.json:1:1\nconflicting values string and [1,2] (mismatched types string and list):\n    instance.json:1:1\nincompatible list lengths (2 and 4)\ninvalid value [1,2] (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
+					"v3-roundtrip": "conflicting values [1,2] and {...} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and [1,2] (mismatched types bool and list):\n    instance.json:1:1\nconflicting values null and [1,2] (mismatched types null and list):\n    instance.json:1:1\nconflicting values number and [1,2] (mismatched types number and list):\n    instance.json:1:1\nconflicting values string and [1,2] (mismatched types string and list):\n    instance.json:1:1\nincompatible list lengths (2 and 4)\ninvalid value [1,2] (does not satisfy matchN): 0 matched, expected 2:\n    instance.json:1:1\n0: disallowed:\n    instance.json:1:1\ninvalid value [1,2] (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -500,7 +497,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "0: disallowed:\n    generated.cue:3:54\n    generated.cue:3:1\n    instance.json:1:1\n"
+					"v3": "0: disallowed:\n    generated.cue:3:54\n    generated.cue:3:1\n    instance.json:1:1\n",
+					"v3-roundtrip": "conflicting values [1,2,3] and {...} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and [1,2,3] (mismatched types bool and list):\n    instance.json:1:1\nconflicting values null and [1,2,3] (mismatched types null and list):\n    instance.json:1:1\nconflicting values number and [1,2,3] (mismatched types number and list):\n    instance.json:1:1\nconflicting values string and [1,2,3] (mismatched types string and list):\n    instance.json:1:1\ninvalid value [1,2,3] (does not satisfy matchN): 1 matched, expected 2:\n    instance.json:1:1\n0: disallowed:\n    instance.json:1:1\ninvalid value [1,2,3] (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -511,10 +509,7 @@
 					3,
 					4
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -608,10 +603,7 @@
 					"bar",
 					37
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "valid instance",
@@ -620,7 +612,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "0: disallowed:\n    generated.cue:3:48\n    generated.cue:3:1\n    instance.json:1:1\n"
+					"v3": "0: disallowed:\n    generated.cue:3:48\n    generated.cue:3:1\n    instance.json:1:1\n",
+					"v3-roundtrip": "conflicting values [null] and {...} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and [null] (mismatched types bool and list):\n    instance.json:1:1\nconflicting values null and [null] (mismatched types null and list):\n    instance.json:1:1\nconflicting values number and [null] (mismatched types number and list):\n    instance.json:1:1\nconflicting values string and [null] (mismatched types string and list):\n    instance.json:1:1\ninvalid value [null] (does not satisfy matchN): 1 matched, expected 2:\n    instance.json:1:1\n0: disallowed:\n    instance.json:1:1\ninvalid value [null] (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
 				}
 			}
 		]

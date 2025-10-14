@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "891f39a6_58bb95a0",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 587,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-14T11:36:53Z",
+      "side": 1,
+      "message": "I actually think I prefer specifying it in terms of `prefix`, because that\u0027s the actual artifact we\u0027re creating here. In a sense, `n` is just an intermediate step.",
+      "parentUuid": "e798727e_2d5107e3",
+      "revId": "a61e1f951ded075db773de2c789e34c313a4bb0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d8586bd_1b56f0c4",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-14T10:45:22Z",
       "side": 1,
       "message": "ditto, use `n \u003e 0`",
+      "revId": "a61e1f951ded075db773de2c789e34c313a4bb0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b82d398_69419c3d",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-14T11:36:53Z",
+      "side": 1,
+      "message": "ditto: the real reason we\u0027re choosing to append `items` is not `n`, but `prefix`, however it gets produced.",
+      "parentUuid": "7d8586bd_1b56f0c4",
       "revId": "a61e1f951ded075db773de2c789e34c313a4bb0a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

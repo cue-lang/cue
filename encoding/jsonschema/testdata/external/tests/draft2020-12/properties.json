@@ -167,27 +167,18 @@
 				"bar": false
 			}
 		},
-		"skip": {
-			"v3-roundtrip": "generate error: error found in schema: bar: explicit error (_|_ literal) in source"
-		},
 		"tests": [
 			{
 				"description": "no property present is valid",
 				"data": {},
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "only 'true' property present is valid",
 				"data": {
 					"foo": 1
 				},
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "only 'false' property present is invalid",
@@ -196,7 +187,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -207,7 +198,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]

@@ -7,5 +7,23 @@
 	]
 }
 
+-- out/decode-v3/extract --
+matchN(>=1, [_, error("disallowed")])
+-- diff/-out/decode-v3/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -1,1 +1,1 @@
+-matchN(>=1, [_, _|_])
++matchN(>=1, [_, error("disallowed")])
+-- out/decode-v3-noshare/extract --
+matchN(>=1, [_, error("disallowed")])
+-- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
+diff old new
+--- old
++++ new
+@@ -1,1 +1,1 @@
+-matchN(>=1, [_, _|_])
++matchN(>=1, [_, error("disallowed")])
 -- out/decode/extract --
 matchN(>=1, [_, _|_])

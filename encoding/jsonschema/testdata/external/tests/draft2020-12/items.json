@@ -71,9 +71,6 @@
 			"$schema": "https://json-schema.org/draft/2020-12/schema",
 			"items": false
 		},
-		"skip": {
-			"v3-roundtrip": "generate error: error found in schema: [_]: explicit error (_|_ literal) in source"
-		},
 		"tests": [
 			{
 				"description": "any non-empty array is invalid",
@@ -84,16 +81,13 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
 				"description": "empty array is valid",
 				"data": [],
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -136,7 +130,7 @@
 			]
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:10:12\n",
+			"v3": "extract error: cannot compile resulting schema: #item.0: disallowed:\n    generated.cue:10:12\n",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -464,17 +458,14 @@
 			],
 			"items": false
 		},
-		"skip": {
-			"v3-roundtrip": "generate error: error found in schema: [_]: explicit error (_|_ literal) in source"
-		},
 		"tests": [
 			{
 				"description": "empty array",
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v3": "7 errors in empty disjunction:\nconflicting values [] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nincompatible list lengths (0 and 4):\n    generated.cue:3:33\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n",
-					"v3-roundtrip": "could not extract schema"
+					"v3": "7 errors in empty disjunction:\nconflicting values [] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:77\n    instance.json:1:1\nincompatible list lengths (0 and 4):\n    generated.cue:3:33\n0: disallowed:\n    generated.cue:3:54\n",
+					"v3-roundtrip": "conflicting values [] and {...} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and [] (mismatched types bool and list):\n    instance.json:1:1\nconflicting values null and [] (mismatched types null and list):\n    instance.json:1:1\nconflicting values number and [] (mismatched types number and list):\n    instance.json:1:1\nconflicting values string and [] (mismatched types string and list):\n    instance.json:1:1\nincompatible list lengths (0 and 4)\ninvalid value [] (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -484,8 +475,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "7 errors in empty disjunction:\nconflicting values [1] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nincompatible list lengths (1 and 4):\n    generated.cue:3:33\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n",
-					"v3-roundtrip": "could not extract schema"
+					"v3": "7 errors in empty disjunction:\nconflicting values [1] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:77\n    instance.json:1:1\nincompatible list lengths (1 and 4):\n    generated.cue:3:33\n0: disallowed:\n    generated.cue:3:54\n",
+					"v3-roundtrip": "conflicting values [1] and {...} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and [1] (mismatched types bool and list):\n    instance.json:1:1\nconflicting values null and [1] (mismatched types null and list):\n    instance.json:1:1\nconflicting values number and [1] (mismatched types number and list):\n    instance.json:1:1\nconflicting values string and [1] (mismatched types string and list):\n    instance.json:1:1\nincompatible list lengths (1 and 4)\ninvalid value [1] (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -496,8 +487,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "7 errors in empty disjunction:\nconflicting values [1,2] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1,2] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1,2] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1,2] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1,2] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nincompatible list lengths (2 and 4):\n    generated.cue:3:33\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n",
-					"v3-roundtrip": "could not extract schema"
+					"v3": "7 errors in empty disjunction:\nconflicting values [1,2] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1,2] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1,2] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1,2] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1,2] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:77\n    instance.json:1:1\nincompatible list lengths (2 and 4):\n    generated.cue:3:33\n0: disallowed:\n    generated.cue:3:54\n",
+					"v3-roundtrip": "conflicting values [1,2] and {...} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and [1,2] (mismatched types bool and list):\n    instance.json:1:1\nconflicting values null and [1,2] (mismatched types null and list):\n    instance.json:1:1\nconflicting values number and [1,2] (mismatched types number and list):\n    instance.json:1:1\nconflicting values string and [1,2] (mismatched types string and list):\n    instance.json:1:1\nincompatible list lengths (2 and 4)\ninvalid value [1,2] (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -509,8 +500,7 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "6 errors in empty disjunction:\nconflicting values [1,2,3] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [1,2,3] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [1,2,3] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [1,2,3] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [1,2,3] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:61\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:3:54\n",
-					"v3-roundtrip": "could not extract schema"
+					"v3": "0: disallowed:\n    generated.cue:3:54\n    generated.cue:3:1\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -523,7 +513,7 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]
@@ -610,9 +600,6 @@
 			],
 			"items": false
 		},
-		"skip": {
-			"v3-roundtrip": "generate error: error found in schema: [_]: explicit error (_|_ literal) in source"
-		},
 		"tests": [
 			{
 				"description": "heterogeneous invalid instance",
@@ -623,7 +610,7 @@
 				],
 				"valid": false,
 				"skip": {
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -633,8 +620,7 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "6 errors in empty disjunction:\nconflicting values [null] and bool (mismatched types list and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values [null] and null (mismatched types list and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values [null] and number (mismatched types list and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values [null] and string (mismatched types list and string):\n    generated.cue:3:1\n    generated.cue:3:24\n    instance.json:1:1\nconflicting values [null] and {...} (mismatched types list and struct):\n    generated.cue:3:1\n    generated.cue:3:55\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:3:48\n",
-					"v3-roundtrip": "could not extract schema"
+					"v3": "0: disallowed:\n    generated.cue:3:48\n    generated.cue:3:1\n    instance.json:1:1\n"
 				}
 			}
 		]

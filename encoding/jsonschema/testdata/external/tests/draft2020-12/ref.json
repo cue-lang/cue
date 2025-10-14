@@ -422,7 +422,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:5:8\n",
+			"v3": "extract error: cannot compile resulting schema: disallowed:\n    generated.cue:5:8\n#bool: disallowed:\n    generated.cue:5:8\n",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [

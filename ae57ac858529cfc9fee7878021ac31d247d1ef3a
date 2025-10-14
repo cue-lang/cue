@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c454ca16_847b7a2a",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-14T10:50:31Z",
+      "side": 1,
+      "message": "should these unknown forms be some sort of error?",
+      "revId": "ae57ac858529cfc9fee7878021ac31d247d1ef3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

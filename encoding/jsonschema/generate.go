@@ -122,7 +122,7 @@ func mergeAllOf(it item) item {
 			elems: make([]item, 0, len(it.elems)),
 		}
 	loop:
-		for e := range conjuncts(it) {
+		for e := range siblings(it) {
 			// Remove elements that are entirely redundant.
 			// Note: DeepEqual seems reasonable here because values are generally
 			// small and the data structures are well-defined. We could
@@ -145,16 +145,20 @@ func mergeAllOf(it item) item {
 	}
 }
 
-func conjuncts(it *itemAllOf) iter.Seq[item] {
+type elementsItem interface {
+	elements() []item
+}
+
+func siblings[T elementsItem](it T) iter.Seq[item] {
 	return func(yield func(item) bool) {
-		yieldConjuncts(it, yield)
+		yieldSiblings(it, yield)
 	}
 }
 
-func yieldConjuncts(it *itemAllOf, yield func(item) bool) bool {
-	for _, e := range it.elems {
-		if ae, ok := e.(*itemAllOf); ok {
-			if !yieldConjuncts(ae, yield) {
+func yieldSiblings[T elementsItem](it T, yield func(item) bool) bool {
+	for _, e := range it.elements() {
+		if ae, ok := e.(T); ok {
+			if !yieldSiblings(ae, yield) {
 				return false
 			}
 		} else {

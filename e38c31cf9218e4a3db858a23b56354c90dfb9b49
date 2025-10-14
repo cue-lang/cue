@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c18d508_aa8e6825",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-14T10:48:38Z",
+      "side": 1,
+      "message": "the refactor of the existing code here is mixed with new code, so I\u0027ll have to trust you that it\u0027s correct. if you want me to review the no-op refactor, then it would need to be split into its own commit.",
+      "revId": "e38c31cf9218e4a3db858a23b56354c90dfb9b49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3da289b9_33d3968c",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-14T10:48:38Z",
+      "side": 1,
+      "message": "briefly document the choice of version here and above?",
+      "revId": "e38c31cf9218e4a3db858a23b56354c90dfb9b49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

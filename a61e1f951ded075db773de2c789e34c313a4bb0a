@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e798727e_2d5107e3",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 587,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-14T10:45:22Z",
+      "side": 1,
+      "message": "simplify to `if n \u003e 0`? this threw me off for a second until I realized it\u0027s always equal to `n`",
+      "revId": "a61e1f951ded075db773de2c789e34c313a4bb0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d8586bd_1b56f0c4",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-14T10:45:22Z",
+      "side": 1,
+      "message": "ditto, use `n \u003e 0`",
+      "revId": "a61e1f951ded075db773de2c789e34c313a4bb0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

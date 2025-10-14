@@ -1,0 +1,92 @@
+-- test.cue --
+package test
+
+import "list"
+
+// Contains with default minimum (1)
+p1?: list.MatchN(>=1, _)
+
+// Contains with minimum 0
+p2?: list.MatchN(>=0, _)
+
+// Contains with minimum and maximum
+p3?: list.MatchN(>=1 & <=6, _)
+
+// Contains with minimum 3 and maximum 6
+p4?: list.MatchN(>=3 & <=6, _)
+
+// Contains with a specific schema
+stringContains?: list.MatchN(>=1, string)
+
+// Contains with complex schema
+complexContains?: list.MatchN(>=2 & <=5, {type: "user", name: string})
+
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: {
+	p1: [1, 2, 3]
+	p2: []
+	p3: [1, 2, 3, 4, 5, 6]
+	p4: [1, 2, 3, 4, 5, 6]
+	stringContains: ["a", "b", "c"]
+	complexContains: [{type: "user", name: "alice"}, {type: "user", name: "bob"}]
+}
+
+ok2: data: {}
+
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: {
+		complexContains: {
+			type: "array"
+			contains: {
+				type: "object"
+				properties: {
+					name: {
+						type: "string"
+					}
+					type: {
+						const: "user"
+					}
+				}
+				required: ["name"]
+			}
+			maxContains: 5
+			minContains: 2
+		}
+		p1: {
+			type:        "array"
+			contains:    true
+			minContains: 1
+		}
+		p2: {
+			type:        "array"
+			contains:    true
+			minContains: 0
+		}
+		p3: {
+			type:        "array"
+			contains:    true
+			maxContains: 6
+			minContains: 1
+		}
+		p4: {
+			type:        "array"
+			contains:    true
+			maxContains: 6
+			minContains: 3
+		}
+		stringContains: {
+			type: "array"
+			contains: {
+				type: "string"
+			}
+			minContains: 1
+		}
+	}
+}
+-- out/generate-v3/ok1 --
+-- out/generate-v3/ok2 --

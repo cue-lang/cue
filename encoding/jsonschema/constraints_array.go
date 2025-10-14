@@ -45,7 +45,7 @@ func constraintAdditionalItems(key string, n cue.Value, s *state) {
 		panic("no elements in list")
 	}
 	last := s.list.Elts[len(s.list.Elts)-1].(*ast.Ellipsis)
-	if isBottom(elem) {
+	if isErrorCall(elem) {
 		// No additional elements allowed. Remove the ellipsis.
 		s.list.Elts = s.list.Elts[:len(s.list.Elts)-1]
 		return

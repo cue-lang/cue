@@ -646,7 +646,7 @@ func (s *state) finalize() (e ast.Expr) {
 	if s.allowedTypes == 0 {
 		// Nothing is possible. This isn't a necessarily a problem, as
 		// we might be inside an allOf or oneOf with other valid constraints.
-		return bottom()
+		return errorDisallowed()
 	}
 
 	s.finalizeObject()
@@ -1156,8 +1156,20 @@ func excludeFields(decls []ast.Decl) []ast.Expr {
 	}
 }
 
-func bottom() ast.Expr {
-	return &ast.BottomLit{}
+func errorDisallowed() ast.Expr {
+	return ast.NewCall(ast.NewIdent("error"), ast.NewString("disallowed"))
+}
+
+func isErrorCall(e ast.Expr) bool {
+	call, ok := e.(*ast.CallExpr)
+	if !ok {
+		return false
+	}
+	target, ok := call.Fun.(*ast.Ident)
+	if !ok {
+		return false
+	}
+	return target.Name == "error"
 }
 
 func top() ast.Expr {
@@ -1168,17 +1180,12 @@ func boolSchema(ok bool) ast.Expr {
 	if ok {
 		return top()
 	}
-	return bottom()
+	return errorDisallowed()
 }
 
 func isTop(s ast.Expr) bool {
 	i, ok := s.(*ast.Ident)
 	return ok && i.Name == "_"
-}
-
-func isBottom(e ast.Expr) bool {
-	_, ok := e.(*ast.BottomLit)
-	return ok
 }
 
 func addTag(field ast.Label, tag, value string) *ast.Field {

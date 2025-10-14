@@ -88,7 +88,7 @@
 		"description": "boolean schema 'false'",
 		"schema": false,
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:1\n",
+			"v3": "extract error: cannot compile resulting schema: disallowed:\n    generated.cue:2:1\n",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [

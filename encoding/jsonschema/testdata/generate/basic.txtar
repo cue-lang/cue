@@ -7,6 +7,7 @@ t4?: string
 t5?: bool
 t6?: string | int
 t7?: bytes
+t8?: null
 -- datatest/tests.cue --
 package datatest
 
@@ -47,6 +48,9 @@ ok: data: {
 			}]
 		}
 		t7: true
+		t8: {
+			const: null
+		}
 	}
 }
 -- out/generate-v3/ok --

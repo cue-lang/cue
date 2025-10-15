@@ -349,19 +349,14 @@ func (g *generator) makeItem(v cue.Value) item {
 	case cue.CallOp:
 		return g.makeCallItem(v, args)
 	}
-	if isConcreteScalar(v) && !v.IsNull() {
-		if err := v.Err(); err != nil {
-			g.addError(v, fmt.Errorf("error found in schema: %v", err))
-			return &itemFalse{}
-		}
-		syntax := v.Syntax()
-		expr, ok := syntax.(ast.Expr)
-		if !ok {
-			g.addError(v, fmt.Errorf("expected expression from Syntax, got %T", syntax))
-			return &itemFalse{}
-		}
-		return &itemConst{
-			value: expr,
+	if !v.IsNull() {
+		// We want to encode null as {type: "null"} not {const: null}
+		// so then there's a possibility of collapsing it together in
+		// the same type keyword.
+		if e, ok := g.constValueOf(v); ok {
+			return &itemConst{
+				value: e,
+			}
 		}
 	}
 	kind := v.IncompleteKind()
@@ -395,6 +390,88 @@ func (g *generator) makeItem(v cue.Value) item {
 	}
 }
 
+// constValueOf returns the "constant" value of a given
+// cue value. There are a few possible ways to represent
+// a JSON Schema const in CUE; some examples:
+//
+//	true
+//	==true
+//	close({a!: true})	// Note: this is the representation Extract uses
+//	[==true]
+//	[true]
+//
+// There's some overlap here with the unary == treatment
+// in [generator.makeItem] but in that case we know that
+// the argument must be constant, and this case we don't.
+func (g *generator) constValueOf(v cue.Value) (ast.Expr, bool) {
+	// Check for unary == operator (e.g., ==1, ==true)
+	op, args := v.Expr()
+	if op == cue.EqualOp && len(args) == 1 {
+		// It's a unary equals, recurse on the argument
+		return g.constValueOf(args[0])
+	}
+
+	switch kind := v.Kind(); kind {
+	case cue.BottomKind:
+		return nil, false
+	case cue.StructKind:
+		if !v.IsClosed() {
+			// Open struct is not const.
+			return nil, false
+		}
+		// Closed struct: all fields must be required (no optional fields)
+		// and we need to recursively check all field values are const
+		iter, err := v.Fields(cue.Optional(true), cue.Patterns(true))
+		if err != nil {
+			return nil, false
+		}
+		var fields []ast.Decl
+		for iter.Next() {
+			sel := iter.Selector()
+			// All fields must be required for the struct to be const
+			if sel.ConstraintType() != cue.RequiredConstraint {
+				return nil, false
+			}
+			// Recursively check if the field value is const
+			fieldExpr, ok := g.constValueOf(iter.Value())
+			if !ok {
+				return nil, false
+			}
+			// Create a regular field (not required marker)
+			fields = append(fields, makeField(sel.Unquoted(), fieldExpr))
+		}
+		return &ast.StructLit{Elts: fields}, true
+	case cue.ListKind:
+		if v.LookupPath(cue.MakePath(cue.AnyIndex)).Exists() {
+			// Open list is not const.
+			return nil, false
+		}
+		// Closed list: recursively check all elements are const
+		iter, err := v.List()
+		if err != nil {
+			return nil, false
+		}
+		var elems []ast.Expr
+		for iter.Next() {
+			elemExpr, ok := g.constValueOf(iter.Value())
+			if !ok {
+				return nil, false
+			}
+			elems = append(elems, elemExpr)
+		}
+		return &ast.ListLit{Elts: elems}, true
+	}
+	// For other kinds (atoms), if it's concrete, return its syntax
+	if !v.IsConcrete() {
+		return nil, false
+	}
+	expr, ok := v.Syntax().(ast.Expr)
+	if !ok {
+		return nil, false
+	}
+	return expr, true
+}
+
 func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 	if len(args) < 1 {
 		// Invalid call - not enough arguments
@@ -414,13 +491,8 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 		// we include "error()" as well as "error"
 		return &itemFalse{}
 	case "close":
-		// TODO incorporate closedness into the model
-		// For now, just treat close(x) the same as x.
-		if len(args) != 2 {
-			g.addError(v, fmt.Errorf("close expects 1 argument, got %d", len(args)-1))
-			return &itemFalse{}
-		}
-		return g.makeItem(args[1])
+		// We'll detect closedness with IsClosed further down.
+		return g.makeItem(v.Eval())
 	case "strings.MinRunes":
 		if len(args) != 2 {
 			g.addError(v, fmt.Errorf("strings.MinRunes expects 1 argument, got %d", len(args)-1))

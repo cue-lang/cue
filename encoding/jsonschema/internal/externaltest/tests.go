@@ -4,8 +4,10 @@ import (
 	"bytes"
 	stdjson "encoding/json"
 	"fmt"
+	"iter"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
@@ -47,7 +49,33 @@ type location struct {
 }
 
 func (loc location) Pos() token.Pos {
-	return loc.root.LookupPath(loc.path).Pos()
+	var v cue.Value
+	for v = range conjuncts(loc.root.LookupPath(loc.path)) {
+		p := v.Pos()
+		if strings.HasSuffix(p.Filename(), ".json") {
+			return p
+		}
+	}
+	return v.Pos()
+}
+
+func conjuncts(v cue.Value) iter.Seq[cue.Value] {
+	return func(yield func(cue.Value) bool) {
+		yieldConjuncts(v, yield)
+	}
+}
+
+func yieldConjuncts(v cue.Value, yield func(cue.Value) bool) bool {
+	op, args := v.Expr()
+	if op != cue.AndOp {
+		return yield(v)
+	}
+	for _, v := range args {
+		if !yieldConjuncts(v, yield) {
+			return false
+		}
+	}
+	return true
 }
 
 // WriteTestDir writes test data files as read by ReadTestDir

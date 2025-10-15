@@ -54,10 +54,7 @@
 				"data": {
 					"foo": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "another type is invalid",
@@ -65,10 +62,7 @@
 					1,
 					2
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -97,10 +91,7 @@
 				"data": [
 					2
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "array with additional items is invalid",
@@ -109,10 +100,7 @@
 					2,
 					3
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -268,20 +256,14 @@
 				"data": {
 					"a": 0
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "{\"a\": 0.0} is invalid",
 				"data": {
 					"a": 0.0
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -306,20 +288,14 @@
 				"data": {
 					"a": 1
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "{\"a\": 1.0} is invalid",
 				"data": {
 					"a": 1.0
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

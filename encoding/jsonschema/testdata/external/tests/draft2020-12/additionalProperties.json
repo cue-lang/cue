@@ -27,10 +27,7 @@
 					"bar": 2,
 					"quux": "boom"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "ignores arrays",
@@ -57,7 +54,10 @@
 					"foo": 1,
 					"vroom": 2
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3-roundtrip": "conflicting values [...] and {foo:1,vroom:2} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and {foo:1,vroom:2} (mismatched types bool and struct):\n    instance.json:1:1\nconflicting values null and {foo:1,vroom:2} (mismatched types null and struct):\n    instance.json:1:1\nconflicting values number and {foo:1,vroom:2} (mismatched types number and struct):\n    instance.json:1:1\nconflicting values string and {foo:1,vroom:2} (mismatched types string and struct):\n    instance.json:1:1\ninvalid value {foo:1,vroom:2} (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\nvroom: field not allowed:\n    instance.json:1:18\n"
+				}
 			}
 		]
 	},
@@ -304,10 +304,7 @@
 				"data": {
 					"bar": ""
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "additionalProperties can't see bar even when foo2 is present",
@@ -317,8 +314,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success",
-					"v3-roundtrip": "unexpected success"
+					"v3": "unexpected success"
 				}
 			}
 		]

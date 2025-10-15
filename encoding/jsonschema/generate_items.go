@@ -493,9 +493,10 @@ type property struct {
 
 // itemProperties represents object properties and associated keywords.
 type itemProperties struct {
-	elems    []property
-	required []string
-	// TODO patternProperties, additionalProperties
+	elems                []property
+	required             []string
+	additionalProperties item
+	// TODO patternProperties
 }
 
 func (i *itemProperties) generate(g *generator) ast.Expr {
@@ -510,6 +511,9 @@ func (i *itemProperties) generate(g *generator) ast.Expr {
 			reqExprs[j] = ast.NewString(r)
 		}
 		fields = append(fields, makeField("required", ast.NewList(reqExprs...)))
+	}
+	if i.additionalProperties != nil {
+		fields = append(fields, makeField("additionalProperties", i.additionalProperties.generate(g)))
 	}
 	return makeSchemaStructLit(fields...)
 }
@@ -529,12 +533,20 @@ func (i *itemProperties) apply(f func(item) item) item {
 			}
 		}
 	}
+	additionalProperties := i.additionalProperties
+	if additionalProperties != nil {
+		if ap := f(additionalProperties); ap != additionalProperties {
+			additionalProperties = ap
+			changed = true
+		}
+	}
 	if !changed {
 		return i
 	}
 	return &itemProperties{
-		elems:    elems,
-		required: i.required,
+		elems:                elems,
+		required:             i.required,
+		additionalProperties: additionalProperties,
 	}
 }
 

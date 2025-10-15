@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9ed65a6_b12db4c1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-15T13:57:52Z",
+      "side": 1,
+      "message": "I made the review changes myself because I wanted to rely on the CL.",
+      "revId": "7718722f4a934fa31c347b8978ef73e95cab0bfe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

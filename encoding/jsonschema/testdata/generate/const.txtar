@@ -6,6 +6,13 @@ string?: "something"
 bool?: true
 float?: 1.5
 null?: null
+
+// Test different forms of const as mentioned in constValueOf doc comment:
+unaryEquals?: ==42
+closedStruct?: close({a!: "foo", b!: 123})
+closedStructWithNull?: close({a!: null})
+listWithUnaryEquals?: [==1, ==2, ==3]
+listConcrete?: ["a", "b", "c"]
 -- datatest/tests.cue --
 package datatest
 
@@ -15,6 +22,10 @@ ok1: data: {
 	int: 2
 	null: null
 	string: "something"
+	unaryEquals: 42
+	closedStruct: {a: "foo", b: 123}
+	listWithUnaryEquals: [1, 2, 3]
+	listConcrete: ["a", "b", "c"]
 }
 errorFloatForInt: {
 	data: {
@@ -45,6 +56,30 @@ errorNonString: {
 	data: string: "other"
 	error: true
 }
+errorNonUnaryEquals: {
+	data: unaryEquals: 99
+	error: true
+}
+errorNonClosedStructFieldA: {
+	data: closedStruct: {a: "bar", b: 123}
+	error: true
+}
+errorNonClosedStructFieldB: {
+	data: closedStruct: {a: "foo", b: 456}
+	error: true
+}
+errorClosedStructExtraField: {
+	data: closedStruct: {a: "foo", b: 123, c: "extra"}
+	error: true
+}
+errorListWrongElement: {
+	data: listWithUnaryEquals: [1, 99, 3]
+	error: true
+}
+errorListWrongLength: {
+	data: listConcrete: ["a", "b"]
+	error: true
+}
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
@@ -53,11 +88,28 @@ errorNonString: {
 		bool: {
 			const: true
 		}
+		closedStruct: {
+			const: {
+				a: "foo"
+				b: 123
+			}
+		}
+		closedStructWithNull: {
+			const: {
+				a: null
+			}
+		}
 		float: {
 			const: 1.5
 		}
 		int: {
 			const: 2
+		}
+		listConcrete: {
+			const: ["a", "b", "c"]
+		}
+		listWithUnaryEquals: {
+			const: [1, 2, 3]
 		}
 		null: {
 			type: "null"
@@ -65,29 +117,51 @@ errorNonString: {
 		string: {
 			const: "something"
 		}
+		unaryEquals: {
+			const: 42
+		}
 	}
 }
 -- out/generate-v3/errorFloatForInt --
 errorFloatForInt.data.int: conflicting values 2.0 and 2 (mismatched types float and int):
-    1:140
-    ./datatest/tests.cue:12:8
+    1:229
+    ./datatest/tests.cue:16:8
 -- out/generate-v3/errorNonBool --
 errorNonBool.data.bool: conflicting values "foo" and true (mismatched types string and bool):
     1:97
-    ./datatest/tests.cue:20:14
+    ./datatest/tests.cue:24:14
 -- out/generate-v3/errorNonEqualFloat --
 errorNonEqualFloat.data.float: conflicting values 1.5 and 1.6:
-    1:120
-    ./datatest/tests.cue:24:15
+    1:209
+    ./datatest/tests.cue:28:15
 -- out/generate-v3/errorNonEqualInt --
 errorNonEqualInt.data.int: conflicting values 2 and 9:
-    1:140
-    ./datatest/tests.cue:28:13
+    1:229
+    ./datatest/tests.cue:32:13
 -- out/generate-v3/errorNonNull --
 errorNonNull.data.null: conflicting values 1 and null (mismatched types int and null):
-    ./datatest/tests.cue:32:14
+    ./datatest/tests.cue:36:14
 -- out/generate-v3/errorNonString --
 errorNonString.data.string: conflicting values "something" and "other":
-    1:184
-    ./datatest/tests.cue:36:16
+    1:352
+    ./datatest/tests.cue:40:16
 -- out/generate-v3/ok1 --
+-- out/generate-v3/errorClosedStructExtraField --
+errorClosedStructExtraField.data.closedStruct.c: field not allowed:
+    ./datatest/tests.cue:56:41
+-- out/generate-v3/errorListWrongElement --
+errorListWrongElement.data.listWithUnaryEquals.1: conflicting values 2 and 99:
+    ./datatest/tests.cue:60:33
+-- out/generate-v3/errorListWrongLength --
+errorListWrongLength.data.listConcrete: incompatible list lengths (2 and 3):
+    1:256
+-- out/generate-v3/errorNonClosedStructFieldA --
+errorNonClosedStructFieldA.data.closedStruct.a: conflicting values "foo" and "bar":
+    ./datatest/tests.cue:48:26
+-- out/generate-v3/errorNonClosedStructFieldB --
+errorNonClosedStructFieldB.data.closedStruct.b: conflicting values 123 and 456:
+    ./datatest/tests.cue:52:36
+-- out/generate-v3/errorNonUnaryEquals --
+errorNonUnaryEquals.data.unaryEquals: conflicting values 42 and 99:
+    1:388
+    ./datatest/tests.cue:44:21

@@ -46,7 +46,9 @@ func TestGenerate(t *testing.T) {
 		if p, ok := t.Value("path"); ok {
 			v = v.LookupPath(cue.ParsePath(p))
 		}
-		r, err := jsonschema.Generate(v, nil)
+		r, err := jsonschema.Generate(v, &jsonschema.GenerateConfig{
+			ExplicitOpen: t.HasTag("explicitOpen"),
+		})
 		qt.Assert(t, qt.IsNil(err))
 		data, err := format.Node(r)
 		qt.Assert(t, qt.IsNil(err))

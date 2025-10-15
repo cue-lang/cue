@@ -1,0 +1,80 @@
+-- test.cue --
+package test
+t1?: #S1
+t2?: #S2
+t3?: close(_foo)
+t4?: {a?: int, ...}
+t5?: {[_]: int}
+t6?: {a?: int}
+
+#S1: {
+	a?: int
+}
+#S2: {
+	a?: int
+	...
+}
+_foo: a?: int
+
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: {
+		"#S1": {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				a: {
+					type: "integer"
+				}
+			}
+		}
+		"#S2": {
+			type: "object"
+			properties: {
+				a: {
+					type: "integer"
+				}
+			}
+		}
+		"_foo": {
+			type: "object"
+			properties: {
+				a: {
+					type: "integer"
+				}
+			}
+		}
+	}
+	type: "object"
+	properties: {
+		t1: {
+			$ref: "#/$defs/#S1"
+		}
+		t2: {
+			$ref: "#/$defs/#S2"
+		}
+		t3: {
+			$ref: "#/$defs/_foo"
+		}
+		t4: {
+			type: "object"
+			properties: {
+				a: {
+					type: "integer"
+				}
+			}
+		}
+		t5: {
+			type: "object"
+		}
+		t6: {
+			type: "object"
+			properties: {
+				a: {
+					type: "integer"
+				}
+			}
+		}
+	}
+}

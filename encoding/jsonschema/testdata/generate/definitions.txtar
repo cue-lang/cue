@@ -21,7 +21,8 @@ missingX: {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	$defs: {
 		"#D1": {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: {
 				x: {
 					type: "integer"
@@ -46,5 +47,4 @@ missingX: {
 }
 -- out/generate-v3/simple --
 -- out/generate-v3/missingX --
-missingX.data.foo.x: field is required but not present:
-    1:91
+missingX.data.foo.x: field is required but not present

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05744307_18bae022",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1159,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-15T14:45:18Z",
+      "side": 1,
+      "message": "I\u0027d call this `errorDisallowed` for clarity",
+      "revId": "1cf9912771f7e60bdab77ac1291e70784cce7fd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7bc78de_4a187c3d",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1163,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-15T14:45:18Z",
+      "side": 1,
+      "message": "ditto, I\u0027d call this `isError` or `isErrorCall`",
+      "revId": "1cf9912771f7e60bdab77ac1291e70784cce7fd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

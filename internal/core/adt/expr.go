@@ -938,6 +938,13 @@ func (x *SelectorExpr) resolve(c *OpContext, state Flags) *Vertex {
 	// TODO(eval): dynamic nodes should be fully evaluated here as the result
 	// will otherwise be discarded and there will be no other chance to check
 	// the struct is valid.
+	if (c.inDetached == 0 && n.IsDynamic) || c.inValidator > 0 {
+		n.Finalize(c)
+		if b := n.Bottom(); b != nil {
+			c.AddBottom(b)
+			return emptyNode
+		}
+	}
 
 	pos := x.Src.Sel.Pos()
 	return c.lookup(n, pos, x.Sel, state)
@@ -977,6 +984,13 @@ func (x *IndexExpr) resolve(ctx *OpContext, state Flags) *Vertex {
 	// TODO(eval): dynamic nodes should be fully evaluated here as the result
 	// will otherwise be discarded and there will be no other chance to check
 	// the struct is valid.
+	if (ctx.inDetached == 0 && n.IsDynamic) || ctx.inValidator > 0 {
+		n.Finalize(ctx)
+		if b := n.Bottom(); b != nil {
+			ctx.AddBottom(b)
+			return emptyNode
+		}
+	}
 
 	f := ctx.Label(x.Index, i)
 

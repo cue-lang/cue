@@ -4096,3 +4096,315 @@ func compactRawStr(v cue.Value) string {
 	cfg := &debug.Config{Compact: true, Raw: true}
 	return debug.NodeString(ctx, cue.ValueVertex(v), cfg)
 }
+
+func TestIsClosed(t *testing.T) {
+	testCases := []struct {
+		desc                string
+		input               string
+		path                string
+		wantClosed          bool
+		wantClosedRecursive bool
+	}{
+		{
+			desc:                "open struct",
+			input:               `x: {a: 1}`,
+			path:                "x",
+			wantClosed:          false,
+			wantClosedRecursive: false,
+		},
+		{
+			desc:                "struct with close builtin",
+			input:               `x: close({a: 1})`,
+			path:                "x",
+			wantClosed:          true,
+			wantClosedRecursive: false,
+		},
+		{
+			desc:                "definition",
+			input:               `#X: {a: 1}`,
+			path:                "#X",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "field in definition",
+			input:               `#X: {a: {b: 1}}`,
+			path:                "#X.a",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "structure sharing: definition reference",
+			input:               `#X: {a: 1}, y: #X`,
+			path:                "y",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "structure sharing: definition nested field",
+			input:               `#X: {a: {b: 1}}, y: #X`,
+			path:                "y.a",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "structure sharing: mixed open and closed",
+			input:               `#X: {a: 1}, y: {b: 2, c: #X}`,
+			path:                "y.c",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "structure sharing: open struct in closed",
+			input:               `#X: {a: open}, open: {b: 1}, y: #X.a`,
+			path:                "y",
+			wantClosed:          true, // Inherits closed status from definition
+			wantClosedRecursive: true, // Inherits closed status from definition
+		},
+		{
+			desc:                "disjunction with close",
+			input:               `x: close({a: 1}) | close({b: 2})`,
+			path:                "x",
+			wantClosed:          false, // Disjunction itself is not closed
+			wantClosedRecursive: false,
+		},
+		{
+			desc:                "disjunction with close and elimination",
+			input:               `x: close({a: 1}) | close({b: 2}), x: a: 1`,
+			path:                "x",
+			wantClosed:          true,
+			wantClosedRecursive: false,
+		},
+		{
+			desc:                "disjunction with definition",
+			input:               `#A: {a: 1}, #B: {b: 2}, x: #A | #B`,
+			path:                "x",
+			wantClosed:          false, // Disjunction itself is not closed
+			wantClosedRecursive: false, // Disjunction itself is not closed
+		},
+		{
+			desc:                "disjunction with mixed closedness",
+			input:               `#A: {a: 1}, x: #A | {b: 2}`,
+			path:                "x",
+			wantClosed:          false,
+			wantClosedRecursive: false,
+		},
+		{
+			desc:                "disjunction resolved to closed",
+			input:               `#A: {a: 1}, #B: {b: 2}, x: (#A | #B) & {a: 1}`,
+			path:                "x",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "nested definition in open struct",
+			input:               `x: {#D: {a: 1}}`,
+			path:                "x.#D",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "empty struct with close",
+			input:               `x: close({})`,
+			path:                "x",
+			wantClosed:          true,
+			wantClosedRecursive: false,
+		},
+		{
+			desc:                "empty definition",
+			input:               `#X: {}`,
+			path:                "#X",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "close with pattern constraint",
+			input:               `x: close({[string]: int})`,
+			path:                "x",
+			wantClosed:          true,
+			wantClosedRecursive: false,
+		},
+		{
+			desc:                "definition with pattern constraint",
+			input:               `#X: {[string]: int}`,
+			path:                "#X",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "multiple levels of structure sharing 1",
+			input:               `#A: {a: 1}, #B: {b: #A}, y: #B.b`,
+			path:                "y",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "multiple levels of structure sharing 2",
+			input:               `#A: {a: 1}, x: {b: #A}, y: x.b`,
+			path:                "y",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "multiple levels of structure sharing 3",
+			input:               `#A: {a: {c: 1}}, x: {b: #A}, y: x.b.a`,
+			path:                "y",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "multiple levels of structure sharing 4",
+			input:               `a: {a: c: 1}, x: {#b: a}, y: x.#b.a`,
+			path:                "y",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "scalar value (non-struct)",
+			input:               `x: 42`,
+			path:                "x",
+			wantClosed:          false,
+			wantClosedRecursive: false,
+		},
+		{
+			desc:                "list value",
+			input:               `x: [1, 2, 3]`,
+			path:                "x",
+			wantClosed:          false,
+			wantClosedRecursive: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			cuetdtest.FullMatrix.Run(t, tc.input, func(t *testing.T, m *cuetdtest.M) {
+				v := getValue(m, tc.input)
+
+				// Navigate to the specified path
+				pathParts := strings.Split(tc.path, ".")
+				for _, part := range pathParts {
+					if strings.HasPrefix(part, "#") {
+						v = v.LookupDef(part)
+					} else {
+						v = v.Lookup(part)
+					}
+				}
+
+				if err := v.Err(); err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+
+				gotClosed := v.IsClosed()
+				if gotClosed != tc.wantClosed {
+					t.Errorf("IsClosed(): got %v, want %v", gotClosed, tc.wantClosed)
+				}
+
+				gotClosedRecursive := v.IsClosedRecursively()
+				if gotClosedRecursive != tc.wantClosedRecursive {
+					t.Errorf("IsClosedRecursively(): got %v, want %v", gotClosedRecursive, tc.wantClosedRecursive)
+				}
+			})
+		})
+	}
+}
+
+func TestIsClosedWithDisjunctions(t *testing.T) {
+	testCases := []struct {
+		desc                string
+		input               string
+		wantClosed          bool
+		wantClosedRecursive bool
+	}{
+		{
+			desc: "unresolved disjunction with all closed options",
+			input: `
+				#A: {a: 1}
+				#B: {b: 2}
+				x: #A | #B
+			`,
+			wantClosed:          false, // Disjunction itself is not closed
+			wantClosedRecursive: false,
+		},
+		{
+			desc: "unresolved disjunction with mixed closedness",
+			input: `
+				#A: {a: 1}
+				x: #A | {b: 2}
+			`,
+			wantClosed:          false,
+			wantClosedRecursive: false,
+		},
+		{
+			desc: "disjunction with close() builtin",
+			input: `
+				x: close({a: 1}) | close({b: 2})
+			`,
+			wantClosed:          false, // Disjunction itself is not closed
+			wantClosedRecursive: false,
+		},
+		{
+			desc: "default disjunction with closed values",
+			input: `
+				#A: {a: 1}
+				#B: {b: 2}
+				x: *#A | #B
+			`,
+			wantClosed:          false, // Disjunction itself is not closed
+			wantClosedRecursive: false,
+		},
+		{
+			desc: "nested disjunction in definition",
+			input: `
+				x: #X
+				#X: {
+					field: close({a: 1}) | close({b: 2})
+				}
+			`,
+			wantClosed:          true, // Definition is closed
+			wantClosedRecursive: true, // Definition is recursively closed
+		},
+		{
+			desc: "triple disjunction all closed",
+			input: `
+				#A: {a: 1}
+				#B: {b: 2}
+				#C: {c: 3}
+				x: #A | #B | #C
+			`,
+			wantClosed:          false, // Disjunction itself is not closed
+			wantClosedRecursive: false,
+		},
+		{
+			desc: "triple disjunction with one open",
+			input: `
+				#A: {a: 1}
+				#B: {b: 2}
+				x: #A | #B | {c: 3}
+			`,
+			wantClosed:          false,
+			wantClosedRecursive: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			cuetdtest.FullMatrix.Run(t, tc.input, func(t *testing.T, m *cuetdtest.M) {
+				v := getValue(m, tc.input).Lookup("x")
+
+				if err := v.Err(); err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+
+				gotClosed := v.IsClosed()
+				if gotClosed != tc.wantClosed {
+					t.Errorf("IsClosed(): got %v, want %v", gotClosed, tc.wantClosed)
+				}
+
+				gotClosedRecursive := v.IsClosedRecursively()
+				if gotClosedRecursive != tc.wantClosedRecursive {
+					t.Errorf("IsClosedRecursively(): got %v, want %v", gotClosedRecursive, tc.wantClosedRecursive)
+				}
+			})
+		})
+	}
+}

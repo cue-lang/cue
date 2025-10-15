@@ -1026,6 +1026,48 @@ func (v Value) Allows(sel Selector) bool {
 	return v.v.Accept(c, f)
 }
 
+// IsClosed reports whether the value has been closed at the top level, either
+// with the close function or by being referenced as a definition.
+func (v Value) IsClosed() bool {
+	if v.v == nil {
+		return false
+	}
+	// Use the non-forwarded node to get the actual closed state
+	x := v.v
+	isClosed := x.ClosedNonRecursive || x.ClosedRecursive
+	for {
+		if v, ok := x.BaseValue.(*adt.Vertex); ok {
+			isClosed = isClosed || v.ClosedNonRecursive || v.ClosedRecursive
+			x = v
+			continue
+		}
+		break
+	}
+	return isClosed
+}
+
+// IsClosedRecursively reports whether the value has been closed by virtue of
+// being referenced as a definition.
+func (v Value) IsClosedRecursively() bool {
+	if v.v == nil {
+		return false
+	}
+	// Use the non-forwarded node to get the actual closed state
+	x := v.v
+	isClosed := x.ClosedRecursive
+	// This loop doesn't seem necessary for ClosedRecursive, but we will keep
+	// it as a safety net.
+	for {
+		if v, ok := x.BaseValue.(*adt.Vertex); ok {
+			isClosed = isClosed || v.ClosedRecursive
+			x = v
+			continue
+		}
+		break
+	}
+	return isClosed
+}
+
 // IsConcrete reports whether the current value is a concrete scalar value
 // (not relying on default values), a terminal error, a list, or a struct.
 // It does not verify that values of lists or structs are concrete themselves.

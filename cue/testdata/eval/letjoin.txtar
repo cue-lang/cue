@@ -134,8 +134,8 @@ issue3591: missing: {
 -- out/evalalpha/stats --
 Leaks:  54
 Freed:  139
-Reused: 125
-Allocs: 68
+Reused: 124
+Allocs: 69
 Retain: 0
 
 Unifications: 124
@@ -163,8 +163,8 @@ diff old new
 -NumCloseIDs: 3
 +Leaks:  54
 +Freed:  139
-+Reused: 125
-+Allocs: 68
++Reused: 124
++Allocs: 69
 +Retain: 0
 +
 +Unifications: 124

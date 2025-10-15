@@ -26,6 +26,7 @@ import (
 	"os"
 	"path"
 	"slices"
+	"strings"
 
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/jsonschema/internal/externaltest"
@@ -36,7 +37,12 @@ const testDir = "testdata/external"
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: teststats version\n")
-		fmt.Fprintf(os.Stderr, "\nList all failed tests for the given evaluator version (e.g. v3)\n")
+		fmt.Fprintf(os.Stderr, `
+List all failed tests for the given evaluator version (e.g. v3).
+If multiple versions are given, it prints tests that fail for all
+those versions. If a version starts with a ! character,
+it excludes tests that do not fail for that version.
+`)
 		os.Exit(2)
 	}
 	flag.Parse()
@@ -44,31 +50,43 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if flag.NArg() != 1 {
+	if flag.NArg() < 1 {
 		flag.Usage()
 	}
-	listFailures(os.Stdout, flag.Arg(0), tests)
+	listFailures(os.Stdout, flag.Args(), tests)
 }
 
-func listFailures(outw io.Writer, version string, tests map[string][]*externaltest.Schema) {
+func listFailures(outw io.Writer, versions []string, tests map[string][]*externaltest.Schema) {
 	for _, filename := range slices.Sorted(maps.Keys(tests)) {
 		schemas := tests[filename]
 		for _, schema := range schemas {
-			if schema.Skip[version] != "" {
+			if match(schema.Skip, versions) {
 				fmt.Fprintf(outw, "%s: schema fail (%s)\n", testdataPos(schema), schema.Description)
 				continue
 			}
 			for _, test := range schema.Tests {
-				if test.Skip[version] != "" {
-					reason := "fail"
-					if !test.Valid {
-						reason = "unexpected success"
-					}
-					fmt.Fprintf(outw, "%s: %s (%s; %s)\n", testdataPos(test), reason, schema.Description, test.Description)
+				if !match(test.Skip, versions) {
+					continue
 				}
+				reason := "fail"
+				if !test.Valid {
+					reason = "unexpected success"
+				}
+				fmt.Fprintf(outw, "%s: %s (%s; %s)\n", testdataPos(test), reason, schema.Description, test.Description)
 			}
 		}
 	}
+}
+
+func match(skip map[string]string, versions []string) bool {
+	for _, v := range versions {
+		v, wantSuccess := strings.CutPrefix(v, "!")
+		_, failed := skip[v]
+		if failed != !wantSuccess {
+			return false
+		}
+	}
+	return true
 }
 
 type positioner interface {

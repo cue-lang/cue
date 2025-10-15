@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dc0b52e_c1e409c2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-15T12:03:54Z",
+      "side": 1,
+      "message": "Thanks for this. LGTM modulo a few minor suggestions, thanks!",
+      "revId": "e231583f57cd6bf120a05efd89fa0cc8d8382ed9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "857d5f0f_dabad774",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1060,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-15T12:03:54Z",
+      "side": 1,
+      "message": "Given that we can never go from true to false, how about stopping whenever isClosed is true, thus avoiding the loop entirely in the \"unnecessary\" case?\n\n```suggestion\n\tfor !isClosed {\n```",
+      "revId": "e231583f57cd6bf120a05efd89fa0cc8d8382ed9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f26ed87b_2d261a79",
+        "filename": "cue/types_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 4292,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-15T12:03:54Z",
+      "side": 1,
+      "message": "```suggestion\n\tv \u003d v.LookupPath(cue.ParsePath(tc.path))\n```\n?",
+      "range": {
+        "startLine": 4283,
+        "startChar": 0,
+        "endLine": 4292,
+        "endChar": 0
+      },
+      "revId": "e231583f57cd6bf120a05efd89fa0cc8d8382ed9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae579abe_888c9e59",
+        "filename": "cue/types_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 4305,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-15T12:03:54Z",
+      "side": 1,
+      "message": "a bit more concise with qt:\n\n```suggestion\nqt.Check(t, qt.Equals(v.IsClosed(), tc.wantClosed))\nqt.Check(t, qt.Equals(v.IsClosedRecursively(), tc.wantClosedRecursive))\n```\n\nI might also suggest a checking more universal property:\n\n```\nif v.IsClosedRecursively() {\n    qt.Check(t, qt.IsTrue(v.IsClosed()))\n}\n```",
+      "range": {
+        "startLine": 4297,
+        "startChar": 0,
+        "endLine": 4305,
+        "endChar": 5
+      },
+      "revId": "e231583f57cd6bf120a05efd89fa0cc8d8382ed9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31cda43d_e206bcbd",
+        "filename": "cue/types_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 4311,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-15T12:03:54Z",
+      "side": 1,
+      "message": "This doesn\u0027t seem worth having a separate test for: just fold the test cases into TestIsClosed",
+      "revId": "e231583f57cd6bf120a05efd89fa0cc8d8382ed9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf8c7343_ebd5b1b6",
+        "filename": "cue/types_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 4385,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-15T12:03:54Z",
+      "side": 1,
+      "message": "Some other test cases to check:\n\n```\ninput: `#A: 1 | {a!: int}`\npath: \"#A\"\n```\n\n\n```\ninput: `close(1 | {a!: int})`\n```\n\n```\ninput: `close(true)`\n```\n\nsome cases involving lists, just to be sure and lock the behaviour in.",
+      "revId": "e231583f57cd6bf120a05efd89fa0cc8d8382ed9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

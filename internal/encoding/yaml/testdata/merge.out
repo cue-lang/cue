@@ -1,15 +1,17 @@
+#CENTER: {x: 1, y: 2}
+#LEFT: {x: 0, y: 2}
+#BIG: {r: 10}
+#SMALL: {r: 1}
+
 // From http://yaml.org/type/merge.html
 // Test
 anchors: {
-	list: [{
-		x: 1, y: 2
-	}, {
-		x: 0, y: 2
-	}, {
-		r: 10
-	}, {
-		r: 1
-	}]
+	list: [
+		#CENTER,
+		#LEFT,
+		#BIG,
+		#SMALL,
+	]
 }
 
 // All the following maps are equal:

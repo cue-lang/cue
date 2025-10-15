@@ -106,9 +106,6 @@
 			"$schema": "https://json-schema.org/draft/2020-12/schema",
 			"propertyNames": false
 		},
-		"skip": {
-			"v3-roundtrip": "generate error: error found in schema: disallowed"
-		},
 		"tests": [
 			{
 				"description": "object with any properties is invalid",
@@ -118,7 +115,7 @@
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -126,8 +123,7 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v3": "disallowed:\n    generated.cue:4:3\n    generated.cue:3:1\n    instance.json:1:1\n",
-					"v3-roundtrip": "could not extract schema"
+					"v3": "disallowed:\n    generated.cue:4:3\n    generated.cue:3:1\n    instance.json:1:1\n"
 				}
 			}
 		]

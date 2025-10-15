@@ -45,20 +45,14 @@
 			{
 				"description": "something else is invalid",
 				"data": null,
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "objects are deep compared",
 				"data": {
 					"foo": false
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "valid object matches",

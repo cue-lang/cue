@@ -405,6 +405,14 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 		// See https://github.com/cue-lang/cue/issues/4133 for why
 		// we include "error()" as well as "error"
 		return &itemFalse{}
+	case "close":
+		// TODO incorporate closedness into the model
+		// For now, just treat close(x) the same as x.
+		if len(args) != 2 {
+			g.addError(v, fmt.Errorf("close expects 1 argument, got %d", len(args)-1))
+			return &itemFalse{}
+		}
+		return g.makeItem(args[1])
 	case "strings.MinRunes":
 		if len(args) != 2 {
 			g.addError(v, fmt.Errorf("strings.MinRunes expects 1 argument, got %d", len(args)-1))

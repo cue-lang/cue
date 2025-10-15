@@ -21,6 +21,8 @@
 package strconv
 
 import (
+	"cuelang.org/go/cue/literal"
+	"cuelang.org/go/internal"
 	"math/big"
 	"strconv"
 )
@@ -63,6 +65,36 @@ func FormatBool(b bool) string {
 // as their respective special floating point values. It ignores case when matching.
 func ParseFloat(s string, bitSize int) (float64, error) {
 	return strconv.ParseFloat(s, bitSize)
+}
+
+// ParseNumber interprets s using the full CUE number literal syntax and returns
+// the resulting value as an arbitrary-precision decimal. It accepts decimal
+// and non-decimal bases, underscores as separators, fractional syntax, and
+// the decimal or binary multiplier suffixes defined by CUE (for example "1Ki"
+// and "10M").
+//
+// If s is not syntactically well-formed, ParseNumber returns a *strconv.NumError
+// with Err containing detailed syntax information. Semantic errors, such as a
+// multiplier that cannot be represented, are reported in the same way.
+func ParseNumber(s string) (*internal.Decimal, error) {
+	var info literal.NumInfo
+	if err := literal.ParseNum(s, &info); err != nil {
+		return nil, &strconv.NumError{
+			Func: "ParseNumber",
+			Num:  s,
+			Err:  err,
+		}
+	}
+
+	var dec internal.Decimal
+	if err := info.Decimal(&dec); err != nil {
+		return nil, &strconv.NumError{
+			Func: "ParseNumber",
+			Num:  s,
+			Err:  err,
+		}
+	}
+	return &dec, nil
 }
 
 // IntSize is the size in bits of an int or uint value.

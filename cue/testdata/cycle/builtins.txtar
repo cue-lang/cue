@@ -134,6 +134,8 @@ issue3633: final: {
 	#s: matchN(1, [matchN(1, [{a!: _}])])
 }
 -- cycle.cue --
+import "strconv"
+
 noCycle: t1: {
 	_s
 	_s: {
@@ -166,6 +168,12 @@ issue3649: cycle: t1: {
 		b: string
 		a: matchN(1, [#c])
 	}
+}
+
+// This used to cause a stack overflow.
+issue4037: cycle: {
+	_intlike: x=matchN(1, [strconv.Atoi(x)])
+	f: "1233" & _intlike
 }
 -- yamlcycle.cue --
 import "encoding/yaml"
@@ -270,18 +278,18 @@ issue3743: {
 	out: yaml.MarshalStream(docs)
 }
 -- out/evalalpha/stats --
-Leaks:  47
-Freed:  450
-Reused: 421
-Allocs: 76
+Leaks:  48
+Freed:  461
+Reused: 431
+Allocs: 78
 Retain: 0
 
-Unifications: 417
-Conjuncts:    741
+Unifications: 427
+Conjuncts:    756
 Disjuncts:    30
 Notifications: 2
 
-NumCloseIDs: 187
+NumCloseIDs: 191
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -296,18 +304,18 @@ diff old new
 -Unifications: 441
 -Conjuncts:    821
 -Disjuncts:    537
-+Leaks:  47
-+Freed:  450
-+Reused: 421
-+Allocs: 76
++Leaks:  48
++Freed:  461
++Reused: 431
++Allocs: 78
 +Retain: 0
 +
-+Unifications: 417
-+Conjuncts:    741
++Unifications: 427
++Conjuncts:    756
 +Disjuncts:    30
 +Notifications: 2
 +
-+NumCloseIDs: 187
++NumCloseIDs: 191
 -- out/eval/stats --
 Leaks:  25
 Freed:  446
@@ -320,22 +328,28 @@ Conjuncts:    821
 Disjuncts:    537
 -- out/evalalpha --
 Errors:
+0: cannot use [_|_(0: cannot use value at path '_' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
+    ./cycle.cue:39:24
 noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-    ./cycle.cue:4:7
-    ./cycle.cue:4:14
-    ./cycle.cue:5:13
+    ./cycle.cue:6:7
+    ./cycle.cue:6:14
+    ./cycle.cue:7:13
 noCycle.t1.#x.#x: structural cycle:
-    ./cycle.cue:4:7
+    ./cycle.cue:6:7
 noCycle.t1._s.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-    ./cycle.cue:4:7
-    ./cycle.cue:4:14
-    ./cycle.cue:5:13
+    ./cycle.cue:6:7
+    ./cycle.cue:6:14
+    ./cycle.cue:7:13
 issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-    ./cycle.cue:31:6
-    ./cycle.cue:28:11
-    ./cycle.cue:31:13
+    ./cycle.cue:33:6
+    ./cycle.cue:30:11
+    ./cycle.cue:33:13
 issue3649.cycle.t1.data.a.a: structural cycle:
-    ./cycle.cue:31:6
+    ./cycle.cue:33:6
+issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, expected 1:
+    ./cycle.cue:39:14
+    ./cycle.cue:39:21
+    ./cycle.cue:40:5
 jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
     ./jsoncycle.cue:4:8
     ./jsoncycle.cue:5:8
@@ -416,18 +430,18 @@ Result:
         // [eval]
         #x: (_|_){
           // [eval] noCycle.t1._s.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-          //     ./cycle.cue:4:7
-          //     ./cycle.cue:4:14
-          //     ./cycle.cue:5:13
+          //     ./cycle.cue:6:7
+          //     ./cycle.cue:6:14
+          //     ./cycle.cue:7:13
         }
       }
       #x: (_|_){
         // [eval] noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-        //     ./cycle.cue:4:7
-        //     ./cycle.cue:4:14
-        //     ./cycle.cue:5:13
+        //     ./cycle.cue:6:7
+        //     ./cycle.cue:6:14
+        //     ./cycle.cue:7:13
         // noCycle.t1.#x.#x: structural cycle:
-        //     ./cycle.cue:4:7
+        //     ./cycle.cue:6:7
       }
     }
   }
@@ -481,11 +495,11 @@ Result:
           // [eval]
           a: (_|_){
             // [eval] issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-            //     ./cycle.cue:31:6
-            //     ./cycle.cue:28:11
-            //     ./cycle.cue:31:13
+            //     ./cycle.cue:33:6
+            //     ./cycle.cue:30:11
+            //     ./cycle.cue:33:13
             // issue3649.cycle.t1.data.a.a: structural cycle:
-            //     ./cycle.cue:31:6
+            //     ./cycle.cue:33:6
             b: (string){ "foo" }
           }
           b: (string){ string }
@@ -497,6 +511,24 @@ Result:
               }
             }) }
         }
+      }
+    }
+  }
+  issue4037: (_|_){
+    // [eval]
+    cycle: (_|_){
+      // [eval]
+      _intlike: (_){ matchN(1, (#list){
+          0: (_|_){// 〈import;strconv〉.Atoi(〈1〉)
+          }
+        }) }
+      f: (_|_){
+        // [eval] 0: cannot use [_|_(0: cannot use value at path '_' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
+        //     ./cycle.cue:39:24
+        // issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, expected 1:
+        //     ./cycle.cue:39:14
+        //     ./cycle.cue:39:21
+        //     ./cycle.cue:40:5
       }
     }
   }
@@ -893,20 +925,27 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -3,24 +3,39 @@
-     ./cycle.cue:4:7
-     ./cycle.cue:4:14
-     ./cycle.cue:5:13
+@@ -1,26 +1,47 @@
+ Errors:
++0: cannot use [_|_(0: cannot use value at path '_' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
++    ./cycle.cue:39:24
+ noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+-    ./cycle.cue:4:7
+-    ./cycle.cue:4:14
+-    ./cycle.cue:5:13
 -noCycle.t1.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
 -    ./cycle.cue:4:7
 -    ./cycle.cue:4:14
 -    ./cycle.cue:5:13
++    ./cycle.cue:6:7
++    ./cycle.cue:6:14
++    ./cycle.cue:7:13
 +noCycle.t1.#x.#x: structural cycle:
-+    ./cycle.cue:4:7
++    ./cycle.cue:6:7
  noCycle.t1._s.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-     ./cycle.cue:4:7
-     ./cycle.cue:4:14
-     ./cycle.cue:5:13
+-    ./cycle.cue:4:7
+-    ./cycle.cue:4:14
+-    ./cycle.cue:5:13
 -noCycle.t1._s.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
 -    ./cycle.cue:4:7
 -    ./cycle.cue:4:14
@@ -915,12 +954,19 @@ diff old new
 -    ./jsoncycle.cue:4:22
 -listMatchN.structCycle.x.y.y: structural cycle:
 -    ./listmatchncycle.cue:4:23
++    ./cycle.cue:6:7
++    ./cycle.cue:6:14
++    ./cycle.cue:7:13
 +issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-+    ./cycle.cue:31:6
-+    ./cycle.cue:28:11
-+    ./cycle.cue:31:13
++    ./cycle.cue:33:6
++    ./cycle.cue:30:11
++    ./cycle.cue:33:13
 +issue3649.cycle.t1.data.a.a: structural cycle:
-+    ./cycle.cue:31:6
++    ./cycle.cue:33:6
++issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, expected 1:
++    ./cycle.cue:39:14
++    ./cycle.cue:39:21
++    ./cycle.cue:40:5
 +jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
 +    ./jsoncycle.cue:4:8
 +    ./jsoncycle.cue:5:8
@@ -945,7 +991,7 @@ diff old new
  issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
      ./matchn.cue:55:13
      ./matchn.cue:55:20
-@@ -53,26 +68,21 @@
+@@ -53,26 +74,21 @@
      ./yamlcycle.cue:15:8
  selfCycle.t1.c.d.d.d: structural cycle:
      ./yamlcycle.cue:14:5
@@ -987,21 +1033,27 @@ diff old new
  
  Result:
  (_|_){
-@@ -88,10 +98,6 @@
-           //     ./cycle.cue:4:7
-           //     ./cycle.cue:4:14
-           //     ./cycle.cue:5:13
+@@ -85,35 +101,30 @@
+         // [eval]
+         #x: (_|_){
+           // [eval] noCycle.t1._s.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+-          //     ./cycle.cue:4:7
+-          //     ./cycle.cue:4:14
+-          //     ./cycle.cue:5:13
 -          // noCycle.t1._s.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
 -          //     ./cycle.cue:4:7
 -          //     ./cycle.cue:4:14
 -          //     ./cycle.cue:5:13
++          //     ./cycle.cue:6:7
++          //     ./cycle.cue:6:14
++          //     ./cycle.cue:7:13
          }
        }
        #x: (_|_){
-@@ -99,21 +105,20 @@
-         //     ./cycle.cue:4:7
-         //     ./cycle.cue:4:14
-         //     ./cycle.cue:5:13
+         // [eval] noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+-        //     ./cycle.cue:4:7
+-        //     ./cycle.cue:4:14
+-        //     ./cycle.cue:5:13
 -        // noCycle.t1.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
 -        //     ./cycle.cue:4:7
 -        //     ./cycle.cue:4:14
@@ -1017,8 +1069,11 @@ diff old new
 -          a: (struct){
 -            b: (string){ "foo" }
 -          }
++        //     ./cycle.cue:6:7
++        //     ./cycle.cue:6:14
++        //     ./cycle.cue:7:13
 +        // noCycle.t1.#x.#x: structural cycle:
-+        //     ./cycle.cue:4:7
++        //     ./cycle.cue:6:7
 +      }
 +    }
 +  }
@@ -1034,7 +1089,7 @@ diff old new
          }
          #c: (#struct){
            b?: (string){ string }
-@@ -125,7 +130,6 @@
+@@ -125,7 +136,6 @@
        }
        t2: (struct){
          x: (struct){
@@ -1042,7 +1097,7 @@ diff old new
            y: (struct){
              a: (struct){
                d: (struct){
-@@ -133,6 +137,7 @@
+@@ -133,6 +143,7 @@
                }
              }
            }
@@ -1050,7 +1105,7 @@ diff old new
          }
          c: (struct){
            b?: (string){ string }
-@@ -147,13 +152,22 @@
+@@ -147,13 +158,22 @@
          }
        }
      }
@@ -1069,18 +1124,43 @@ diff old new
 +          // [eval]
 +          a: (_|_){
 +            // [eval] issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-+            //     ./cycle.cue:31:6
-+            //     ./cycle.cue:28:11
-+            //     ./cycle.cue:31:13
++            //     ./cycle.cue:33:6
++            //     ./cycle.cue:30:11
++            //     ./cycle.cue:33:13
 +            // issue3649.cycle.t1.data.a.a: structural cycle:
-+            //     ./cycle.cue:31:6
++            //     ./cycle.cue:33:6
 +            b: (string){ "foo" }
 +          }
 +          b: (string){ string }
          }
          #c: (#struct){
            b: (string){ string }
-@@ -239,13 +253,31 @@
+@@ -165,6 +185,24 @@
+       }
+     }
+   }
++  issue4037: (_|_){
++    // [eval]
++    cycle: (_|_){
++      // [eval]
++      _intlike: (_){ matchN(1, (#list){
++          0: (_|_){// 〈import;strconv〉.Atoi(〈1〉)
++          }
++        }) }
++      f: (_|_){
++        // [eval] 0: cannot use [_|_(0: cannot use value at path '_' (type list) as string in argument 1 to strconv.Atoi)] (type list) as string in argument 1 to strconv.Atoi:
++        //     ./cycle.cue:39:24
++        // issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, expected 1:
++        //     ./cycle.cue:39:14
++        //     ./cycle.cue:39:21
++        //     ./cycle.cue:40:5
++      }
++    }
++  }
+   builtinCyclePerm0: (struct){
+     X: (string){ "mod.test" }
+     Y: (struct){
+@@ -239,13 +277,31 @@
        out: (int){ 1 }
      }
    }
@@ -1114,7 +1194,7 @@ diff old new
        }
      }
    }
-@@ -254,8 +286,15 @@
+@@ -254,8 +310,15 @@
      structCycle: (_|_){
        // [eval]
        x: (_|_){
@@ -1132,7 +1212,7 @@ diff old new
        }
      }
      ok: (struct){
-@@ -318,7 +357,7 @@
+@@ -318,7 +381,7 @@
            }
          }) }
        noHang: (struct){
@@ -1141,7 +1221,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -333,7 +372,8 @@
+@@ -333,7 +396,8 @@
            }
          }) }
      }
@@ -1151,7 +1231,7 @@ diff old new
        #S: (_){ matchN(1, (#list){
            0: (_|_){// {
              //   n: 〈2;#S〉
-@@ -348,8 +388,21 @@
+@@ -348,8 +412,21 @@
              }
            }) }
        }
@@ -1175,7 +1255,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -393,13 +446,13 @@
+@@ -393,13 +470,13 @@
          //     ./matchn.cue:63:6
          //     ./matchn.cue:62:8
          //     ./matchn.cue:63:13
@@ -1192,7 +1272,7 @@ diff old new
        }
        #s: (_){ matchN(1, (#list){
            0: (_|_){// matchN(1, [
-@@ -417,8 +470,8 @@
+@@ -417,8 +494,8 @@
        a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
      }
      data: (#struct){
@@ -1202,7 +1282,7 @@ diff old new
      }
    }
    selfCycle: (_|_){
-@@ -446,19 +499,8 @@
+@@ -446,19 +523,8 @@
          }
        }
      }
@@ -1224,7 +1304,7 @@ diff old new
        }
      }
      yamlVal: (_|_){
-@@ -466,25 +508,33 @@
+@@ -466,25 +532,33 @@
        t1: (_|_){
          // [structural cycle]
          x: (_|_){
@@ -1272,7 +1352,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -492,13 +542,16 @@
+@@ -492,13 +566,16 @@
          z: (_|_){
            // [structural cycle]
            y: (_|_){
@@ -1296,7 +1376,7 @@ diff old new
          }
        }
      }
-@@ -505,8 +558,12 @@
+@@ -505,8 +582,12 @@
      yamlValidatePartial: (_|_){
        // [structural cycle]
        x: (_|_){
@@ -1901,6 +1981,14 @@ Result:
           ])
         }
       }
+    }
+  }
+  issue4037: {
+    cycle: {
+      _intlike: matchN(1, [
+        〈import;strconv〉.Atoi(〈1〉),
+      ])
+      f: ("1233" & 〈0;_intlike〉)
     }
   }
 }

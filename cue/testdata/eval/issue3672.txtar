@@ -300,19 +300,19 @@ value0: Only: [{UseSectionName: true}]
   }
 }
 -- out/evalalpha/stats --
-Leaks:  163
-Freed:  1155
-Reused: 1098
-Allocs: 220
+Leaks:  344
+Freed:  1781
+Reused: 1723
+Allocs: 402
 Retain: 0
 
-Unifications: 296
-Conjuncts:    1511
-Disjuncts:    344
+Unifications: 403
+Conjuncts:    2391
+Disjuncts:    578
 
-NumCloseIDs: 522
+NumCloseIDs: 836
 
-ConjunctInfos:       622
+ConjunctInfos:       920
 MaxConjunctInfos:    7
 MaxReqSets:          15
 MaxRedirect:         6
@@ -330,19 +330,19 @@ diff old new
 -Unifications: 140273
 -Conjuncts:    468967
 -Disjuncts:    330375
-+Leaks:  163
-+Freed:  1155
-+Reused: 1098
-+Allocs: 220
++Leaks:  344
++Freed:  1781
++Reused: 1723
++Allocs: 402
 +Retain: 0
 +
-+Unifications: 296
-+Conjuncts:    1511
-+Disjuncts:    344
++Unifications: 403
++Conjuncts:    2391
++Disjuncts:    578
 +
-+NumCloseIDs: 522
++NumCloseIDs: 836
 +
-+ConjunctInfos:       622
++ConjunctInfos:       920
 +MaxConjunctInfos:    7
 +MaxReqSets:          15
 +MaxRedirect:         6
@@ -697,7 +697,10 @@ Disjuncts:    330375
       0: (string){
         "UseSectionName"
         let INL#9 = (_|_){
-          // [eval] value0.xs.0.INL: conflicting values [...] and string (mismatched types list and string):
+          // [eval] value0.xs.0.INL: 2 errors in empty disjunction:
+          // value0.xs.0.INL: 5 errors in empty disjunction:
+          // value0.xs.0.INL: 6 errors in empty disjunction:
+          // value0.xs.0.INL: conflicting values [...] and string (mismatched types list and string):
           //     ./x.cue:22:51
           //     ./x.cue:22:52
           //     ./x.cue:28:12
@@ -755,14 +758,13 @@ Disjuncts:    330375
           //     ./x.cue:111:13
           //     ./x.cue:111:18
           //     ./x.cue:123:9
-          // value0.xs.0.INL: 2 errors in empty disjunction::
-          //     ./x.cue:113:7
           UseSectionName: (_|_){
             // [cycle] cycle error
           }
         }
         let INA#7 = (_|_){
-          // [eval] value0.xs.0.INA: conflicting values {Prepend:#ConfigText} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
+          // [eval] value0.xs.0.INA: 3 errors in empty disjunction:
+          // value0.xs.0.INA: conflicting values {Prepend:#ConfigText} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
           //     ./x.cue:22:51
           //     ./x.cue:22:52
           //     ./x.cue:44:29
@@ -777,19 +779,16 @@ Disjuncts:    330375
           //     ./x.cue:118:4
           //     ./x.cue:118:38
           //     ./x.cue:123:9
-          // value0.xs.0.INA: 3 errors in empty disjunction::
-          //     ./x.cue:97:7
           // value0.xs.0.INA.Append: field not allowed:
-          //     ./x.cue:97:7
           //     ./x.cue:94:19
           // value0.xs.0.INA.UseSectionName: field not allowed:
-          //     ./x.cue:97:7
           //     ./x.cue:124:17
           Append: (_){ _ }
           UseSectionName: (bool){ true }
         }
         let INP#8 = (_|_){
-          // [eval] value0.xs.0.INP: conflicting values {Prepend:#ConfigText} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
+          // [eval] value0.xs.0.INP: 2 errors in empty disjunction:
+          // value0.xs.0.INP: conflicting values {Prepend:#ConfigText} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
           //     ./x.cue:22:51
           //     ./x.cue:22:52
           //     ./x.cue:44:29
@@ -804,10 +803,7 @@ Disjuncts:    330375
           //     ./x.cue:118:4
           //     ./x.cue:118:38
           //     ./x.cue:123:9
-          // value0.xs.0.INP: 2 errors in empty disjunction::
-          //     ./x.cue:100:7
           // value0.xs.0.INP.UseSectionName: field not allowed:
-          //     ./x.cue:100:7
           //     ./x.cue:124:17
           Prepend: (_){ _ }
           UseSectionName: (bool){ true }
@@ -985,7 +981,7 @@ diff old new
      }
    }
    value0: (#struct){
-@@ -304,1171 +338,131 @@
+@@ -304,1171 +338,127 @@
        0: (string){
          "UseSectionName"
          let INL#9 = (_|_){
@@ -1000,7 +996,10 @@ diff old new
 -          //     ./x.cue:111:13
 -          //     ./x.cue:123:9
 -          //     ./x.cue:124:16
-+          // [eval] value0.xs.0.INL: conflicting values [...] and string (mismatched types list and string):
++          // [eval] value0.xs.0.INL: 2 errors in empty disjunction:
++          // value0.xs.0.INL: 5 errors in empty disjunction:
++          // value0.xs.0.INL: 6 errors in empty disjunction:
++          // value0.xs.0.INL: conflicting values [...] and string (mismatched types list and string):
 +          //     ./x.cue:22:51
 +          //     ./x.cue:22:52
 +          //     ./x.cue:28:12
@@ -1076,23 +1075,8 @@ diff old new
 -          //     ./x.cue:111:18
 -          //     ./x.cue:123:9
 -          // value0.xs.0.INL: 5 errors in empty disjunction::
-+          //     ./x.cue:22:51
-+          //     ./x.cue:22:52
-+          //     ./x.cue:28:12
-+          //     ./x.cue:44:29
-+          //     ./x.cue:51:23
-+          //     ./x.cue:53:18
-+          //     ./x.cue:55:19
-+          //     ./x.cue:62:25
-+          //     ./x.cue:70:12
-+          //     ./x.cue:70:47
-+          //     ./x.cue:109:13
-+          //     ./x.cue:111:13
-+          //     ./x.cue:111:18
-+          //     ./x.cue:123:9
-+          // value0.xs.0.INL: 2 errors in empty disjunction::
-           //     ./x.cue:113:7
-           UseSectionName: (_|_){
+-          //     ./x.cue:113:7
+-          UseSectionName: (_|_){
 -            // [eval] value0.xs.0.INL.UseSectionName: conflicting values true and string (mismatched types bool and string):
 -            //     ./x.cue:22:52
 -            //     ./x.cue:44:29
@@ -1171,6 +1155,21 @@ diff old new
 -                  UseSectionName: (bool){ true }
 -                }) }
 -            }) }
++          //     ./x.cue:22:51
++          //     ./x.cue:22:52
++          //     ./x.cue:28:12
++          //     ./x.cue:44:29
++          //     ./x.cue:51:23
++          //     ./x.cue:53:18
++          //     ./x.cue:55:19
++          //     ./x.cue:62:25
++          //     ./x.cue:70:12
++          //     ./x.cue:70:47
++          //     ./x.cue:109:13
++          //     ./x.cue:111:13
++          //     ./x.cue:111:18
++          //     ./x.cue:123:9
++          UseSectionName: (_|_){
 +            // [cycle] cycle error
 +          }
          }
@@ -1272,7 +1271,9 @@ diff old new
 -          //     ./x.cue:118:4
 -          //     ./x.cue:123:9
 -          // value0.xs.0.INA: 9 errors in empty disjunction::
-+          // [eval] value0.xs.0.INA: conflicting values {Prepend:#ConfigText} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
+-          //     ./x.cue:97:7
++          // [eval] value0.xs.0.INA: 3 errors in empty disjunction:
++          // value0.xs.0.INA: conflicting values {Prepend:#ConfigText} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
 +          //     ./x.cue:22:51
 +          //     ./x.cue:22:52
 +          //     ./x.cue:44:29
@@ -1287,10 +1288,8 @@ diff old new
 +          //     ./x.cue:118:4
 +          //     ./x.cue:118:38
 +          //     ./x.cue:123:9
-+          // value0.xs.0.INA: 3 errors in empty disjunction::
-           //     ./x.cue:97:7
            // value0.xs.0.INA.Append: field not allowed:
-           //     ./x.cue:97:7
+-          //     ./x.cue:97:7
 -          //     ./x.cue:15:14
 -          //     ./x.cue:22:52
 -          //     ./x.cue:28:12
@@ -1314,7 +1313,7 @@ diff old new
 -          //     ./x.cue:123:9
 -          //     ./x.cue:124:16
            // value0.xs.0.INA.UseSectionName: field not allowed:
-           //     ./x.cue:97:7
+-          //     ./x.cue:97:7
 -          //     ./x.cue:15:14
 -          //     ./x.cue:22:52
 -          //     ./x.cue:28:12
@@ -1826,7 +1825,8 @@ diff old new
 -          //     ./x.cue:118:38
 -          //     ./x.cue:123:9
 -          //     ./x.cue:124:16
-+          // [eval] value0.xs.0.INP: conflicting values {Prepend:#ConfigText} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
++          // [eval] value0.xs.0.INP: 2 errors in empty disjunction:
++          // value0.xs.0.INP: conflicting values {Prepend:#ConfigText} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
 +          //     ./x.cue:22:51
 +          //     ./x.cue:22:52
 +          //     ./x.cue:44:29
@@ -1841,10 +1841,8 @@ diff old new
 +          //     ./x.cue:118:4
 +          //     ./x.cue:118:38
 +          //     ./x.cue:123:9
-+          // value0.xs.0.INP: 2 errors in empty disjunction::
-+          //     ./x.cue:100:7
            // value0.xs.0.INP.UseSectionName: field not allowed:
-           //     ./x.cue:100:7
+-          //     ./x.cue:100:7
 -          //     ./x.cue:15:14
 -          //     ./x.cue:22:52
 -          //     ./x.cue:28:12
@@ -2254,7 +2252,7 @@ diff old new
            //     ./x.cue:77:13
            //     ./x.cue:77:18
            //     ./x.cue:96:3
-@@ -1479,7 +473,9 @@
+@@ -1479,7 +469,9 @@
            //     ./x.cue:118:38
            //     ./x.cue:123:9
            //     ./x.cue:124:16

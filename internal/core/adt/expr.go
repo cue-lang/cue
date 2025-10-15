@@ -842,7 +842,12 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	// finalize any references made by the let.
 
 	b := arc.Bottom()
-	if !arc.MultiLet && (b == nil || isCyclePlaceholder(b)) {
+	// Check if the arc is currently being evaluated to prevent infinite
+	// recursion when a let references itself through a field selector.
+	// If the arc has a running state, we must use the cache mechanism
+	// to properly detect and handle cycles.
+	arcState := arc.getState(ctx)
+	if !arc.MultiLet && (b == nil || isCyclePlaceholder(b)) && arcState == nil {
 		return arc
 	}
 

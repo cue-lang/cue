@@ -583,24 +583,24 @@ diff old new
    _parent_configs: (struct){
      PARENT: (bool){ true }
 -- out/evalalpha/stats --
-Leaks:  46
+Leaks:  52
 Freed:  163
 Reused: 142
-Allocs: 67
+Allocs: 73
 Retain: 0
 
-Unifications: 174
-Conjuncts:    326
+Unifications: 175
+Conjuncts:    328
 Disjuncts:    12
 Notifications: 3
 
-NumCloseIDs: 109
+NumCloseIDs: 110
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,13 +1,12 @@
--Leaks:  52
+ Leaks:  52
 -Freed:  158
 -Reused: 149
 -Allocs: 61
@@ -613,18 +613,17 @@ diff old new
 -MisalignedConjunct: 74
 -
 -NumCloseIDs: 11
-+Leaks:  46
 +Freed:  163
 +Reused: 142
-+Allocs: 67
++Allocs: 73
 +Retain: 0
 +
-+Unifications: 174
-+Conjuncts:    326
++Unifications: 175
++Conjuncts:    328
 +Disjuncts:    12
 +Notifications: 3
 +
-+NumCloseIDs: 109
++NumCloseIDs: 110
 -- out/eval/stats --
 Leaks:  52
 Freed:  158

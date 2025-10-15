@@ -58,19 +58,19 @@ output: {
 	"2": (datastream & {marker: length: 14}).marker.position
 }
 -- out/evalalpha/stats --
-Leaks:  32
-Freed:  415
-Reused: 257
-Allocs: 190
+Leaks:  327
+Freed:  477
+Reused: 429
+Allocs: 375
 Retain: 0
 
-Unifications: 375
-Conjuncts:    1332
+Unifications: 476
+Conjuncts:    1573
 Disjuncts:    8
 
-NumCloseIDs: 535
+NumCloseIDs: 648
 
-ConjunctInfos:       856
+ConjunctInfos:       1022
 MaxConjunctInfos:    28
 MaxReqSets:          26
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -91,19 +91,19 @@ diff old new
 -MisalignedConjunct: 1216
 -
 -NumCloseIDs: 12
-+Leaks:  32
-+Freed:  415
-+Reused: 257
-+Allocs: 190
++Leaks:  327
++Freed:  477
++Reused: 429
++Allocs: 375
 +Retain: 0
 +
-+Unifications: 375
-+Conjuncts:    1332
++Unifications: 476
++Conjuncts:    1573
 +Disjuncts:    8
 +
-+NumCloseIDs: 535
++NumCloseIDs: 648
 +
-+ConjunctInfos:       856
++ConjunctInfos:       1022
 +MaxConjunctInfos:    28
 +MaxReqSets:          26
 -- out/eval/stats --

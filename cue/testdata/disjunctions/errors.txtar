@@ -151,10 +151,10 @@ issue4022: full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  29
+Leaks:  31
 Freed:  209
-Reused: 189
-Allocs: 49
+Reused: 190
+Allocs: 50
 Retain: 0
 
 Unifications: 116
@@ -181,10 +181,10 @@ diff old new
 -MisalignedConjunct: 1
 -
 -NumCloseIDs: 11
-+Leaks:  29
++Leaks:  31
 +Freed:  209
-+Reused: 189
-+Allocs: 49
++Reused: 190
++Allocs: 50
 +Retain: 0
 +
 +Unifications: 116

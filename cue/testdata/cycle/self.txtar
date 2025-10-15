@@ -1,4 +1,6 @@
 -- in.cue --
+@experiment(self)
+
 import "list"
 
 expr: error1: {
@@ -264,18 +266,28 @@ issue1729: t2: {
 	#x: { #x | {} }
 }
 
+issue4125: t1_self: {
+	let Root = self
+	a: Root.a
+}
+
+issue4125: t2_alias: X={
+	let Y = X
+	b: Y.b
+}
+
 -- out/evalalpha/stats --
-Leaks:  34
-Freed:  290
-Reused: 267
-Allocs: 57
+Leaks:  42
+Freed:  297
+Reused: 275
+Allocs: 64
 Retain: 0
 
-Unifications: 206
-Conjuncts:    412
+Unifications: 219
+Conjuncts:    432
 Disjuncts:    100
 
-NumCloseIDs: 80
+NumCloseIDs: 86
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -290,17 +302,17 @@ diff old new
 -Unifications: 240
 -Conjuncts:    663
 -Disjuncts:    447
-+Leaks:  34
-+Freed:  290
-+Reused: 267
-+Allocs: 57
++Leaks:  42
++Freed:  297
++Reused: 275
++Allocs: 64
 +Retain: 0
 +
-+Unifications: 206
-+Conjuncts:    412
++Unifications: 219
++Conjuncts:    432
 +Disjuncts:    100
 +
-+NumCloseIDs: 80
++NumCloseIDs: 86
 -- out/eval/stats --
 Leaks:  0
 Freed:  432
@@ -314,15 +326,15 @@ Disjuncts:    447
 -- out/evalalpha --
 Errors:
 expr.error1.a: conflicting values 4 and 3:
-    ./in.cue:4:5
-    ./in.cue:5:5
+    ./in.cue:6:5
+    ./in.cue:7:5
 expr.error2.a: conflicting values 4 and 3:
-    ./in.cue:8:5
-    ./in.cue:9:5
+    ./in.cue:10:5
+    ./in.cue:11:5
 0: structural cycle:
-    ./in.cue:13:5
+    ./in.cue:15:5
 1: structural cycle:
-    ./in.cue:17:5
+    ./in.cue:19:5
 
 Result:
 (_|_){
@@ -333,16 +345,16 @@ Result:
       // [eval]
       a: (_|_){
         // [eval] expr.error1.a: conflicting values 4 and 3:
-        //     ./in.cue:4:5
-        //     ./in.cue:5:5
+        //     ./in.cue:6:5
+        //     ./in.cue:7:5
       }
     }
     error2: (_|_){
       // [eval]
       a: (_|_){
         // [eval] expr.error2.a: conflicting values 4 and 3:
-        //     ./in.cue:8:5
-        //     ./in.cue:9:5
+        //     ./in.cue:10:5
+        //     ./in.cue:11:5
       }
     }
   }
@@ -352,14 +364,14 @@ Result:
       // [structural cycle]
       a: (_|_){
         // [structural cycle] 0: structural cycle:
-        //     ./in.cue:13:5
+        //     ./in.cue:15:5
       }
     }
     error2: (_|_){
       // [structural cycle]
       a: (_|_){
         // [structural cycle] 1: structural cycle:
-        //     ./in.cue:17:5
+        //     ./in.cue:19:5
       }
     }
   }
@@ -660,22 +672,66 @@ Result:
       }
     }
   }
+  issue4125: (struct){
+    t1_self: (struct){
+      let Root#1 = (_|_){
+        // [structural cycle] issue4125.t1_self.Root: structural cycle
+      }
+      a: (_){ _ }
+    }
+    t2_alias: (struct){
+      let Y#2 = (_|_){
+        // [structural cycle] issue4125.t2_alias.Y: structural cycle
+      }
+      b: (_){ _ }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -5,6 +5,10 @@
+@@ -1,10 +1,14 @@
+ Errors:
+ expr.error1.a: conflicting values 4 and 3:
+-    ./in.cue:4:5
+-    ./in.cue:5:5
++    ./in.cue:6:5
++    ./in.cue:7:5
  expr.error2.a: conflicting values 4 and 3:
-     ./in.cue:8:5
-     ./in.cue:9:5
+-    ./in.cue:8:5
+-    ./in.cue:9:5
++    ./in.cue:10:5
++    ./in.cue:11:5
 +0: structural cycle:
-+    ./in.cue:13:5
++    ./in.cue:15:5
 +1: structural cycle:
-+    ./in.cue:17:5
++    ./in.cue:19:5
  
  Result:
  (_|_){
+@@ -15,8 +19,8 @@
+       // [eval]
+       a: (_|_){
+         // [eval] expr.error1.a: conflicting values 4 and 3:
+-        //     ./in.cue:4:5
+-        //     ./in.cue:5:5
++        //     ./in.cue:6:5
++        //     ./in.cue:7:5
+       }
+     }
+     error2: (_|_){
+@@ -23,8 +27,8 @@
+       // [eval]
+       a: (_|_){
+         // [eval] expr.error2.a: conflicting values 4 and 3:
+-        //     ./in.cue:8:5
+-        //     ./in.cue:9:5
++        //     ./in.cue:10:5
++        //     ./in.cue:11:5
+       }
+     }
+   }
 @@ -33,17 +37,15 @@
      error1: (_|_){
        // [structural cycle]
@@ -692,14 +748,14 @@ diff old new
 -        0: (string){ "1" }
 -        1: (string){ "2" }
 +        // [structural cycle] 0: structural cycle:
-+        //     ./in.cue:13:5
++        //     ./in.cue:15:5
 +      }
 +    }
 +    error2: (_|_){
 +      // [structural cycle]
 +      a: (_|_){
 +        // [structural cycle] 1: structural cycle:
-+        //     ./in.cue:17:5
++        //     ./in.cue:19:5
        }
      }
    }
@@ -727,6 +783,25 @@ diff old new
      }
    }
    disjSelf: (struct){
+@@ -350,4 +346,18 @@
+       }
+     }
+   }
++  issue4125: (struct){
++    t1_self: (struct){
++      let Root#1 = (_|_){
++        // [structural cycle] issue4125.t1_self.Root: structural cycle
++      }
++      a: (_){ _ }
++    }
++    t2_alias: (struct){
++      let Y#2 = (_|_){
++        // [structural cycle] issue4125.t2_alias.Y: structural cycle
++      }
++      b: (_){ _ }
++    }
++  }
+ }
 -- diff/todo/p3 --
 list.error*: different error messages.
 -- out/eval --

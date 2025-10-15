@@ -123,14 +123,14 @@ issue3978: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  9
-Freed:  115
-Reused: 92
-Allocs: 32
+Leaks:  10
+Freed:  116
+Reused: 93
+Allocs: 33
 Retain: 0
 
-Unifications: 104
-Conjuncts:    151
+Unifications: 105
+Conjuncts:    152
 Disjuncts:    5
 
 NumCloseIDs: 47
@@ -152,14 +152,14 @@ diff old new
 -MisalignedConjunct: 1
 -
 -NumCloseIDs: 6
-+Leaks:  9
-+Freed:  115
-+Reused: 92
-+Allocs: 32
++Leaks:  10
++Freed:  116
++Reused: 93
++Allocs: 33
 +Retain: 0
 +
-+Unifications: 104
-+Conjuncts:    151
++Unifications: 105
++Conjuncts:    152
 +Disjuncts:    5
 +
 +NumCloseIDs: 47
@@ -233,8 +233,7 @@ Result:
     t2: (struct){
       a: (struct){
         let X#4 = (_|_){
-          // [structural cycle] letCycleFail.t2.a.X: structural cycle:
-          //     ./in.cue:43:6
+          // [structural cycle] letCycleFail.t2.a.X: structural cycle
         }
         x: (struct){
           y: (string){ "" }
@@ -426,7 +425,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -65,14 +52,9 @@
+@@ -65,14 +52,8 @@
      }
      t2: (struct){
        a: (struct){
@@ -439,12 +438,11 @@ diff old new
 -            y: (string){ "" }
 -          }
 +        let X#4 = (_|_){
-+          // [structural cycle] letCycleFail.t2.a.X: structural cycle:
-+          //     ./in.cue:43:6
++          // [structural cycle] letCycleFail.t2.a.X: structural cycle
          }
          x: (struct){
            y: (string){ "" }
-@@ -88,17 +70,17 @@
+@@ -88,17 +69,17 @@
    disjunctionCycle: (_|_){
      // [eval]
      a: (_|_){
@@ -473,7 +471,7 @@ diff old new
        //     ./in.cue:56:5
        //     ./in.cue:56:9
      }
-@@ -145,12 +127,11 @@
+@@ -145,12 +126,11 @@
      b: (_|_){
        // [structural cycle]
        d: (_|_){

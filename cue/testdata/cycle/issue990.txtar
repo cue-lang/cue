@@ -86,8 +86,8 @@ Reused: 626
 Allocs: 238
 Retain: 0
 
-Unifications: 331
-Conjuncts:    1357
+Unifications: 332
+Conjuncts:    1358
 Disjuncts:    106
 
 NumCloseIDs: 422
@@ -342,8 +342,8 @@ diff old new
 +Allocs: 238
 +Retain: 0
 +
-+Unifications: 331
-+Conjuncts:    1357
++Unifications: 332
++Conjuncts:    1358
 +Disjuncts:    106
 +
 +NumCloseIDs: 422

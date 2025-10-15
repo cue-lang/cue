@@ -626,20 +626,20 @@ issue4006: {
 	out: #C & #B
 }
 -- out/evalalpha/stats --
-Leaks:  46
-Freed:  875
+Leaks:  70
+Freed:  866
 Reused: 818
-Allocs: 103
+Allocs: 118
 Retain: 0
 
-Unifications: 755
-Conjuncts:    1513
+Unifications: 765
+Conjuncts:    1528
 Disjuncts:    84
 Notifications: 7
 
-NumCloseIDs: 440
+NumCloseIDs: 439
 
-ConjunctInfos:       1105
+ConjunctInfos:       1117
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2
@@ -659,20 +659,20 @@ diff old new
 -Disjuncts:    1209
 -
 -NumCloseIDs: 3
-+Leaks:  46
-+Freed:  875
++Leaks:  70
++Freed:  866
 +Reused: 818
-+Allocs: 103
++Allocs: 118
 +Retain: 0
 +
-+Unifications: 755
-+Conjuncts:    1513
++Unifications: 765
++Conjuncts:    1528
 +Disjuncts:    84
 +Notifications: 7
 +
-+NumCloseIDs: 440
++NumCloseIDs: 439
 +
-+ConjunctInfos:       1105
++ConjunctInfos:       1117
 +MaxConjunctInfos:    5
 +MaxReqSets:          9
 +MaxRedirect:         2

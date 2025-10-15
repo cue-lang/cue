@@ -47,7 +47,7 @@
 				"data": "a string to match #/$defs/id_in_enum",
 				"valid": true,
 				"skip": {
-					"v3-roundtrip": "conflicting values \"a string to match #/$defs/id_in_enum\" and {$id!:\"https://localhost:1234/draft2020-12/id/my_identifier.json\",type!:\"null\",...} (mismatched types string and struct):\n    instance.json:1:1\nconflicting values \"a string to match #/$defs/id_in_enum\" and {...} (mismatched types string and struct):\n    instance.json:1:1\ninvalid value \"a string to match #/$defs/id_in_enum\" (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
+					"v3-roundtrip": "conflicting values \"a string to match #/$defs/id_in_enum\" and {$id!:\"https://localhost:1234/draft2020-12/id/my_identifier.json\",type!:\"null\"} (mismatched types string and struct):\n    instance.json:1:1\nconflicting values \"a string to match #/$defs/id_in_enum\" and {...} (mismatched types string and struct):\n    instance.json:1:1\ninvalid value \"a string to match #/$defs/id_in_enum\" (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\n"
 				}
 			},
 			{

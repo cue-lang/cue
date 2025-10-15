@@ -32,10 +32,7 @@
 				"data": {
 					"bar": false
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "recursive mismatch",
@@ -44,10 +41,7 @@
 						"bar": false
 					}
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

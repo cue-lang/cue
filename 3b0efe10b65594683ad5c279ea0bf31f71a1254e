@@ -16,6 +16,24 @@
       "message": "Ultimately, we should allow references in YAML, so in that case this won\u0027t work. But for now it seems sensible.\n\nPlease add a remark with the cue.Contrete(true) regarding this.",
       "revId": "3b0efe10b65594683ad5c279ea0bf31f71a1254e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f33bc022_e7976b0b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-15T10:49:15Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "7ef037cd_684fb0d4",
+      "revId": "3b0efe10b65594683ad5c279ea0bf31f71a1254e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

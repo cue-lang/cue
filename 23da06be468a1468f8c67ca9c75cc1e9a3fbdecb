@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74ca2e7c_85d9f66e",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-15T16:56:28Z",
+      "side": 1,
+      "message": "nit: I\u0027d quote all mentions of `additionalProperties: true` (or false) in double quotes or backquotes, for the sake of the reader",
+      "revId": "23da06be468a1468f8c67ca9c75cc1e9a3fbdecb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

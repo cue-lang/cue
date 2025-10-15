@@ -43,6 +43,14 @@ type GenerateConfig struct {
 	//
 	// If this is nil, [DefaultNameFunc] will be used.
 	NameFunc func(root cue.Value, path cue.Path) string
+
+	// ExplicitOpen, when true, will never close a schema with additionalProperties: false
+	// but _will_ explicitly open a schema with additionalProperties: true
+	// when there is an explicit ... or universal pattern in a struct.
+	//
+	// By default (when ExplicitOpen is false), all structs that are closed will
+	// have an additionalProperties: false added.
+	ExplicitOpen bool
 }
 
 // Generate generates a JSON Schema for the given CUE value,
@@ -713,6 +721,19 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 
 func (g *generator) makeStructItem(v cue.Value) item {
 	var props itemProperties
+
+	ellipsis := v.LookupPath(cue.MakePath(cue.AnyString))
+	if ellipsis.Exists() {
+		// All fields are explicitly allowed (either with `...` or `[_]: T`)
+		props.additionalProperties = g.makeItem(ellipsis)
+		if _, ok := props.additionalProperties.(*itemTrue); ok && !g.cfg.ExplicitOpen {
+			// additionalProperties: true is a no-op in JSON Schema in general
+			// so omit it unless we're explicitly opening up schemas.
+			props.additionalProperties = nil
+		}
+	} else if v.IsClosed() && !g.cfg.ExplicitOpen {
+		props.additionalProperties = &itemFalse{}
+	}
 
 	// TODO include pattern constraints in the results when that's implemented
 	iter, err := v.Fields(cue.Optional(true))

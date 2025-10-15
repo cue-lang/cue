@@ -67,10 +67,7 @@
 					"foo": 12,
 					"boo": 42
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

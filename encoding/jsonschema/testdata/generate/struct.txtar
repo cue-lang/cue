@@ -6,7 +6,7 @@ t3?: close(_foo)
 t4?: {a?: int, ...}
 t5?: {[_]: int}
 t6?: {a?: int}
-
+t7?: close({a!: string, b!: int})
 #S1: {
 	a?: int
 }
@@ -37,14 +37,6 @@ _foo: a?: int
 				}
 			}
 		}
-		"_foo": {
-			type: "object"
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
-		}
 	}
 	type: "object"
 	properties: {
@@ -55,7 +47,13 @@ _foo: a?: int
 			$ref: "#/$defs/#S2"
 		}
 		t3: {
-			$ref: "#/$defs/_foo"
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				a: {
+					type: "integer"
+				}
+			}
 		}
 		t4: {
 			type: "object"
@@ -75,6 +73,19 @@ _foo: a?: int
 					type: "integer"
 				}
 			}
+		}
+		t7: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				a: {
+					type: "string"
+				}
+				b: {
+					type: "integer"
+				}
+			}
+			required: ["a", "b"]
 		}
 	}
 }

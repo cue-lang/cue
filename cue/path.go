@@ -139,6 +139,23 @@ func (sel Selector) String() string {
 	return sel.sel.String()
 }
 
+// Pattern returns the label pattern for a pattern constraint selector
+// returned by an iterator with the [Patterns] option enabled.
+// For all other selector types, it returns the zero [Value];
+// you can use [Value.Exists] to determine whether the returned
+// value is valid or not.
+//
+// Note that [AnyString].Pattern also returns the zero value.
+// This is unfortunate but necessary because it has no
+// way to return a value within the correct [Context].
+func (sel Selector) Pattern() Value {
+	switch sel := sel.sel.(type) {
+	case patternSelector:
+		return sel.pattern
+	}
+	return Value{}
+}
+
 // Unquoted returns the unquoted value of a string label.
 // It panics unless [Selector.LabelType] is [StringLabel] and has a concrete name.
 func (sel Selector) Unquoted() string {
@@ -605,6 +622,19 @@ func (s anySelector) feature(r adt.Runtime) adt.Feature {
 	return adt.Feature(s)
 }
 
+type patternSelector struct {
+	pattern Value
+}
+
+func (s patternSelector) String() string               { return fmt.Sprintf("[%#v]", s.pattern) }
+func (s patternSelector) isConstraint() bool           { return true }
+func (s patternSelector) labelType() SelectorType      { return StringLabel }
+func (s patternSelector) constraintType() SelectorType { return PatternConstraint }
+func (s patternSelector) feature(r adt.Runtime) adt.Feature {
+	// Only called for non-pattern selectors.
+	panic("unreachable")
+}
+
 // TODO: allow import paths to be represented?
 //
 // // ImportPath defines a lookup at the root of an instance. It must be the first
@@ -613,6 +643,7 @@ func (s anySelector) feature(r adt.Runtime) adt.Feature {
 //	func ImportPath(s string) Selector {
 //		return importSelector(s)
 //	}
+
 type constraintSelector struct {
 	selector
 	constraint SelectorType

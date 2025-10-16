@@ -16,6 +16,24 @@
       "message": "Might be worth doing a push to `ci/test` to smoke test the release workflow.",
       "revId": "e72de2135b8308bbe9440ee56ce9b000feff2ee5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36bc67c1_ab273830",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-16T16:38:40Z",
+      "side": 1,
+      "message": "done, and green: https://github.com/cue-lang/cue/commit/e72de2135b8308bbe9440ee56ce9b000feff2ee5",
+      "parentUuid": "a8a3630c_0a31527d",
+      "revId": "e72de2135b8308bbe9440ee56ce9b000feff2ee5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

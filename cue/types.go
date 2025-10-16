@@ -965,8 +965,8 @@ func (v Value) Source() ast.Node {
 	return src
 }
 
-// If v exactly represents a package, BuildInstance returns
-// the build instance corresponding to the value; otherwise it returns nil.
+// BuildInstance returns the build instance corresponding to the value
+// if v exactly represents a package; otherwise it returns nil.
 //
 // The value returned by [Value.ReferencePath] will commonly represent a package.
 func (v Value) BuildInstance() *build.Instance {

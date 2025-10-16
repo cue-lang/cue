@@ -105,7 +105,7 @@ func fileNameOK(r rune) bool {
 	return unicode.IsLetter(r)
 }
 
-// CheckPathWithoutVersion is like CheckPath except that
+// CheckPathWithoutVersion is like [CheckPath] except that
 // it expects a module path without a major version.
 func CheckPathWithoutVersion(basePath string) (err error) {
 	if _, _, ok := SplitPathVersion(basePath); ok {

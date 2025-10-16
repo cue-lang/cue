@@ -384,7 +384,7 @@ func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
 	return c.make(n)
 }
 
-// Encode converts a Go type to a CUE [Value].
+// EncodeType converts a Go type to a CUE [Value].
 //
 // The returned value will represent an error, accessible through [Value.Err],
 // if any error occurred.

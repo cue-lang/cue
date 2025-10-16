@@ -28,7 +28,7 @@ import (
 // DefaultContext is the shared context used with top-level functions.
 var DefaultContext = &Context{}
 
-// MustConstrain is like Constrain, but panics if there is an error.
+// MustConstrain is like [Constrain], but panics if there is an error.
 func MustConstrain(x interface{}, constraints string) {
 	if err := Constrain(x, constraints); err != nil {
 		panic(err)

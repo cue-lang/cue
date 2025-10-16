@@ -507,7 +507,7 @@ func (s scopedSelector) feature(r adt.Runtime) adt.Feature {
 	return adt.MakeIdentLabel(r, s.name, s.pkg)
 }
 
-// A Def marks a string as a definition label. An # will be added if a string is
+// Def marks a string as a definition label. An # will be added if a string is
 // not prefixed with a #. It will panic if s cannot be written as a valid
 // identifier.
 func Def(s string) Selector {
@@ -539,7 +539,7 @@ func (d definitionSelector) feature(r adt.Runtime) adt.Feature {
 	return adt.MakeIdentLabel(r, string(d), "")
 }
 
-// A Str is a CUE string label. Definition selectors are defined with Def.
+// Str creates a CUE string label. Definition selectors are defined with [Def].
 func Str(s string) Selector {
 	return Selector{stringSelector(s)}
 }
@@ -562,7 +562,7 @@ func (s stringSelector) feature(r adt.Runtime) adt.Feature {
 	return adt.MakeStringLabel(r, string(s))
 }
 
-// An Index selects a list element by index.
+// Index selects a list element by index.
 // It returns an invalid selector if the index is out of range.
 func Index[T interface{ int | int64 }](x T) Selector {
 	f, err := adt.MakeLabel(nil, int64(x), adt.IntLabel)

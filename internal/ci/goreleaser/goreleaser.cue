@@ -69,7 +69,6 @@ config: {
 		// For those reasons, let goreleaser create the release, but leaving it as a draft.
 		draft: true
 	}
-	checksum: name_template:    "checksums.txt"
 	snapshot: version_template: "{{ .Tag }}-next"
 	// As explained above, we write our own release notes.
 	changelog: disable: true

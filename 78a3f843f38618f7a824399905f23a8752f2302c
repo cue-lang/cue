@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "820041a5_e751600a",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-16T10:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8f2668a_a859564f",
+      "revId": "78a3f843f38618f7a824399905f23a8752f2302c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ad032a4_c9092bfc",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-15T15:44:16Z",
       "side": 1,
       "message": "this pattern is quite common, so I wonder if something like\n\n```\nreturn unknownAcceptAnything\n```\n\nwould be a nicer way to say what\u0027s happening, and then document it in a single place, with the global variable declaration.",
+      "revId": "78a3f843f38618f7a824399905f23a8752f2302c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93ae191b_97f11f3a",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 581,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-16T10:00:42Z",
+      "side": 1,
+      "message": "Agreed, but not now to save on conflicts.",
+      "parentUuid": "6ad032a4_c9092bfc",
       "revId": "78a3f843f38618f7a824399905f23a8752f2302c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

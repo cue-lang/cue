@@ -130,7 +130,7 @@ func New(fsys fs.FS, prefix string) (*Registry, error) {
 	return NewServer(ocifilter.ReadOnly(r), authConfig)
 }
 
-// NewServer is like New except that instead of uploading
+// NewServer is like [New] except that instead of uploading
 // the contents of a filesystem, it just serves the contents
 // of the given registry guarded by the given auth configuration.
 // If auth is nil, no authentication will be required.

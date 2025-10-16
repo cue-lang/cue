@@ -36,14 +36,14 @@
 //
 // # Validating Go Values
 //
-// To check whether a struct's values satisfy its constraints, call Validate:
+// To check whether a struct's values satisfy its constraints, call [Validate]:
 //
 //	if err := cuego.Validate(p); err != nil {
 //	   return err
 //	}
 //
 // Validation assumes that all values are filled in correctly and will not
-// infer values. To automatically infer values, use Complete.
+// infer values. To automatically infer values, use [Complete].
 //
 // # Completing Go Values
 //

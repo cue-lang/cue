@@ -199,9 +199,7 @@ func (inst *hiddenInstance) Eval(expr ast.Expr) Value {
 	return v.Context().BuildExpr(expr, Scope(v), InferBuiltins(true))
 }
 
-// DO NOT USE.
-//
-// Deprecated: do not use.
+// Deprecated: do not use; use unification instead.
 func Merge(inst ...*Instance) *Instance {
 	v := &adt.Vertex{}
 

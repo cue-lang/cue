@@ -68,7 +68,7 @@ func ParseFloat(s string, bitSize int) (float64, error) {
 // IntSize is the size in bits of an int or uint value.
 const IntSize = 64
 
-// ParseUint is like ParseInt but for unsigned numbers.
+// ParseUint is like [ParseInt] but for unsigned numbers.
 func ParseUint(s string, base int, bitSize int) (*big.Int, error) {
 	if bitSize < 0 {
 		return nil, &strconv.NumError{

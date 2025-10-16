@@ -180,7 +180,7 @@ func InterfaceLocalMulticastIP(ip cue.Value) bool {
 	return netGetIP(ip).IsInterfaceLocalMulticast()
 }
 
-// LinkLocalMulticast reports whether ip is a link-local multicast address.
+// LinkLocalMulticastIP reports whether ip is a link-local multicast address.
 func LinkLocalMulticastIP(ip cue.Value) bool {
 	return netGetIP(ip).IsLinkLocalMulticast()
 }

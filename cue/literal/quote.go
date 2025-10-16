@@ -53,7 +53,7 @@ func (f Form) WithTabIndent(n int) Form {
 	return f
 }
 
-// WithOptionalIndent is like WithTabIndent, but only returns a multiline
+// WithOptionalTabIndent is like [Form.WithTabIndent], but only returns a multiline
 // strings if it doesn't contain any newline characters.
 func (f Form) WithOptionalTabIndent(tabs int) Form {
 	f.indent = strings.Repeat("\t", tabs)
@@ -82,7 +82,7 @@ var (
 	// TODO: ExactString: quotes to bytes type if the string cannot be
 	// represented without loss of accuracy.
 
-	// Label is like String, but optimized for labels.
+	// Label is like [String], but optimized for labels.
 	Label Form = stringForm
 
 	// Bytes defines the format of bytes literal.

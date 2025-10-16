@@ -7,17 +7,14 @@ import (
 // Versions implements mvs.Versions[Version].
 type Versions struct{}
 
-// New implements mvs.Versions[Version].Version.
 func (Versions) Version(v Version) string {
 	return v.Version()
 }
 
-// New implements mvs.Versions[Version].Path.
 func (Versions) Path(v Version) string {
 	return v.Path()
 }
 
-// New implements mvs.Versions[Version].New.
 func (Versions) New(p, v string) (Version, error) {
 	return NewVersion(p, v)
 }

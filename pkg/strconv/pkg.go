@@ -64,6 +64,18 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
+		Name: "ParseNum",
+		Params: []pkg.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.NumberKind,
+		Func: func(c *pkg.CallCtxt) {
+			s := c.String(0)
+			if c.Do() {
+				c.Ret, c.Err = ParseNum(s)
+			}
+		},
+	}, {
 		Name:  "IntSize",
 		Const: "64",
 	}, {

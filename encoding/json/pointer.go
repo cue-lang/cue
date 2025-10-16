@@ -55,13 +55,11 @@ func (p Pointer) Tokens() iter.Seq[string] {
 		for len(s) > 0 {
 			s = strings.TrimPrefix(s, "/")
 			i := min(uint(strings.IndexByte(s, '/')), uint(len(s)))
-			var ok bool
+			tok := s[:i]
 			if needUnesc {
-				ok = yield(jsonPtrUnesc.Replace(s[:i]))
-			} else {
-				ok = yield(s[:i])
+				tok = jsonPtrUnesc.Replace(tok)
 			}
-			if !ok {
+			if !yield(tok) {
 				return
 			}
 			s = s[i:]

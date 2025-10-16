@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9729a296_6f57939d",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-16T16:22:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "241109c9_0c2b076f",
+      "revId": "1f088997f7b7eee86b728855024fda5be56e2eda",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "82e85432_d25094b8",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-10-16T16:07:37Z",
       "side": 1,
       "message": "I guess this could be:\n```\n    for c, isLeaf :\u003d v.AllConjuncts {\n       if isLeaf \u0026\u0026 !yield(c) {\n          return\n       }\n    }\n```\nand then we wouldn\u0027t need `iterConjuncts` but maybe just leave as a TODO for now?",
+      "revId": "1f088997f7b7eee86b728855024fda5be56e2eda",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dff570b3_5da5edff",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-16T16:22:12Z",
+      "side": 1,
+      "message": "you\u0027re totally right about this one, but then iterConjuncts is still needed for ConjunctsSeq, so it\u0027s not that easy. I left a TODO given it\u0027s not straightforward.",
+      "parentUuid": "82e85432_d25094b8",
       "revId": "1f088997f7b7eee86b728855024fda5be56e2eda",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -60,9 +60,6 @@ func WriteTestDir(dir string, tests map[string][]*Schema) error {
 		if err != nil {
 			return err
 		}
-		if err != nil {
-			return err
-		}
 		data = append(data, '\n')
 		oldData, err := os.ReadFile(filename)
 		if err != nil {

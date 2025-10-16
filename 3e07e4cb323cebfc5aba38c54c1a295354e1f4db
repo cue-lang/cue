@@ -16,6 +16,24 @@
       "message": "surely you meant to add this file as part of a different CL?",
       "revId": "3e07e4cb323cebfc5aba38c54c1a295354e1f4db",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b170dc71_188722ff",
+        "filename": "encoding/jsonschema/valuematch.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-16T10:00:42Z",
+      "side": 1,
+      "message": "No, it was just an experiment that didn\u0027t work and I probably won\u0027t use. Removed.",
+      "parentUuid": "9c203758_93cc934c",
+      "revId": "3e07e4cb323cebfc5aba38c54c1a295354e1f4db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

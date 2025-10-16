@@ -15,7 +15,6 @@
 package cue_test
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"math"
@@ -862,7 +861,7 @@ func TestFields(t *testing.T) {
 		res:   "{reg:4,}",
 	}, {
 		value: `{a:1,b:2,c:int}`,
-		err:   "cannot convert incomplete value",
+		res:   "{a:1,b:2,c:int,}",
 	}, {
 		value: `
 			step1: {}
@@ -871,7 +870,7 @@ func TestFields(t *testing.T) {
 			   step3: {prefix: step2.value}
 			}
 			_hidden: 3`,
-		res: `{step1:{},step2:{"prefix":3},}`,
+		res: `{step1:,step2:prefix: 3,}`,
 	}, {
 		opts: []cue.Option{cue.Final()},
 		value: `
@@ -905,9 +904,37 @@ func TestFields(t *testing.T) {
 		value: `a: x, x: y, y: b: 1`,
 		path:  "a",
 		res:   `{b:1,}`,
+	}, {
+		opts:  []cue.Option{cue.Patterns(true)},
+		value: `[=~"^a"]: 1`,
+		res:   `{[=~"^a"]:1,}`,
+	}, {
+		opts:  []cue.Option{cue.Patterns(true)},
+		value: `[=~"^a"]: 1, [string]: 2`,
+		res:   `{[=~"^a"]:1,[string]:2,}`,
+	}, {
+		opts:  []cue.Option{cue.Patterns(true)},
+		value: `[=~"^a"]: >1, a: 2`,
+		res:   `{[=~"^a"]:>1,a:2,}`,
+	}, {
+		opts:  []cue.Option{cue.Patterns(true)},
+		value: `{[_]: 1}`,
+		res:   `{[_]:1,}`,
+	}, {
+		opts:  []cue.Option{cue.Patterns(true)},
+		value: `{...}`,
+		res:   `{}`,
+	}, {
+		opts:  []cue.Option{cue.Patterns(true)},
+		value: `{...}`,
+		res:   `{}`,
+	}, {
+		opts:  []cue.Option{cue.Patterns(true)},
+		value: `{[1, 2, ...int], [string]: int}`,
+		res:   `{[>=2]:int,[string]:int,0:1,1:2,}`,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.SmallMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+		cuetdtest.SmallMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			f := getValue(m, tc.value)
 
 			obj := f.LookupPath(cue.ParsePath(tc.path))
@@ -917,11 +944,23 @@ func TestFields(t *testing.T) {
 
 			buf := []byte{'{'}
 			for iter.Next() {
-				buf = append(buf, iter.Selector().String()...)
+				sel := iter.Selector()
+				if sel.ConstraintType() == cue.PatternConstraint {
+					qt.Check(t, qt.Equals(
+						sel.String(),
+						fmt.Sprintf("[%#v]", sel.Pattern()),
+					))
+					wantType := cue.StringLabel | cue.PatternConstraint
+					if obj.Kind() == cue.ListKind {
+						wantType = cue.IndexLabel | cue.PatternConstraint
+					}
+					qt.Check(t, qt.Equals(sel.Type(), wantType))
+				}
+				buf = append(buf, sel.String()...)
 				buf = append(buf, ':')
-				b, err := iter.Value().MarshalJSON()
-				checkFatal(t, err, tc.err, "Obj.At")
-				buf = append(buf, b...)
+				v := iter.Value()
+				checkFatal(t, v.Err(), tc.err, "Obj.At")
+				buf = fmt.Appendf(buf, "%#v", v)
 				buf = append(buf, ',')
 			}
 			buf = append(buf, '}')
@@ -931,14 +970,20 @@ func TestFields(t *testing.T) {
 
 			iter, _ = obj.Fields(tc.opts...)
 			for iter.Next() {
-				want, err := iter.Value().MarshalJSON()
-				checkFatal(t, err, tc.err, "Obj.At2")
+				v := iter.Value()
+				checkFatal(t, v.Err(), tc.err, "Obj.At2")
+				want := fmt.Sprintf("%#v", v)
 
-				got, err := obj.LookupPath(cue.MakePath(iter.Selector())).MarshalJSON()
-				checkFatal(t, err, tc.err, "Obj.At2")
-
-				if !bytes.Equal(got, want) {
-					t.Errorf("Lookup: got %q; want %q", got, want)
+				got := obj.LookupPath(cue.MakePath(iter.Selector()))
+				if iter.FieldType().ConstraintType() == cue.PatternConstraint {
+					// Can't look up iterated pattern constraints.
+					qt.Assert(t, qt.ErrorMatches(
+						got.Err(),
+						`.*cannot look up pattern constraints.*`,
+					))
+				} else {
+					checkFatal(t, err, tc.err, "Obj.At2")
+					qt.Assert(t, qt.Equals(fmt.Sprintf("%#v", got), want))
 				}
 			}
 			v := obj.LookupPath(cue.MakePath(cue.Str("non-existing")))

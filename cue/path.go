@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/runtime"
 	"github.com/cockroachdb/apd/v3"
 )
 
@@ -137,6 +138,28 @@ type Selector struct {
 // String reports the CUE representation of a selector.
 func (sel Selector) String() string {
 	return sel.sel.String()
+}
+
+// ErrNotAPattern is a sentinel error value indicating that a value is not a
+// pattern, which may be returned by [Selector.Pattern].
+var ErrNotAPattern = newErrValue(
+	Value{idx: runtime.New()},
+	&adt.Bottom{
+		Err:  errors.Newf(token.NoPos, "selector is not a pattern"),
+		Code: adt.EvalError,
+	},
+)
+
+// Pattern returns the label pattern for a pattern constraint selector
+// returned by an iterator with the [Patterns] option enabled.
+//
+// For other selectors, it returns [ErrNotAPattern].
+func (sel Selector) Pattern() Value {
+	switch sel := sel.sel.(type) {
+	case patternSelector:
+		return sel.pattern
+	}
+	return ErrNotAPattern
 }
 
 // Unquoted returns the unquoted value of a string label.
@@ -605,6 +628,20 @@ func (s anySelector) feature(r adt.Runtime) adt.Feature {
 	return adt.Feature(s)
 }
 
+type patternSelector struct {
+	pattern    Value
+	_labelType SelectorType
+}
+
+func (s patternSelector) String() string               { return fmt.Sprintf("[%#v]", s.pattern) }
+func (s patternSelector) isConstraint() bool           { return true }
+func (s patternSelector) labelType() SelectorType      { return s._labelType }
+func (s patternSelector) constraintType() SelectorType { return PatternConstraint }
+func (s patternSelector) feature(r adt.Runtime) adt.Feature {
+	// Only called for non-pattern selectors.
+	panic("unreachable")
+}
+
 // TODO: allow import paths to be represented?
 //
 // // ImportPath defines a lookup at the root of an instance. It must be the first
@@ -613,6 +650,7 @@ func (s anySelector) feature(r adt.Runtime) adt.Feature {
 //	func ImportPath(s string) Selector {
 //		return importSelector(s)
 //	}
+
 type constraintSelector struct {
 	selector
 	constraint SelectorType

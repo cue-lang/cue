@@ -373,13 +373,7 @@ func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
 	ctx := c.ctx()
 	// TODO: is true the right default?
 	expr := convert.GoValueToValue(ctx, x, options.nilIsTop)
-	var n *adt.Vertex
-	if v, ok := expr.(*adt.Vertex); ok {
-		n = v
-	} else {
-		n = &adt.Vertex{}
-		n.AddConjunct(adt.MakeRootConjunct(nil, expr))
-	}
+	n := exprToVertex(expr)
 	n.Finalize(ctx)
 	return c.make(n)
 }
@@ -399,13 +393,7 @@ func (c *Context) EncodeType(x interface{}, option ...EncodeOption) Value {
 	if err != nil {
 		return c.makeError(err)
 	}
-	var n *adt.Vertex
-	if v, ok := expr.(*adt.Vertex); ok {
-		n = v
-	} else {
-		n = &adt.Vertex{}
-		n.AddConjunct(adt.MakeRootConjunct(nil, expr))
-	}
+	n := exprToVertex(expr)
 	n.Finalize(ctx)
 	return c.make(n)
 }

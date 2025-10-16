@@ -16,6 +16,24 @@
       "message": "nit: I\u0027d quote all mentions of `additionalProperties: true` (or false) in double quotes or backquotes, for the sake of the reader",
       "revId": "23da06be468a1468f8c67ca9c75cc1e9a3fbdecb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52ca9c21_d5f976f0",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-16T10:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74ca2e7c_85d9f66e",
+      "revId": "23da06be468a1468f8c67ca9c75cc1e9a3fbdecb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

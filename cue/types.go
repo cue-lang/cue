@@ -90,10 +90,11 @@ const (
 //
 // TODO: remove
 type structValue struct {
-	ctx  *adt.OpContext
-	v    Value
-	obj  *adt.Vertex
-	arcs []*adt.Vertex
+	ctx      *adt.OpContext
+	v        Value
+	obj      *adt.Vertex
+	arcs     []*adt.Vertex
+	patterns []adt.PatternConstraint
 }
 
 type hiddenStructValue = structValue
@@ -212,33 +213,52 @@ func unwrapJSONError(err error) errors.Error {
 
 // An Iterator iterates over values.
 type Iterator struct {
-	val     Value
-	idx     *runtime.Runtime
-	ctx     *adt.OpContext
-	arcs    []*adt.Vertex
-	p       int
-	cur     Value
-	f       adt.Feature
-	arcType adt.ArcType
+	val       Value
+	idx       *runtime.Runtime
+	ctx       *adt.OpContext
+	arcs      []*adt.Vertex
+	patterns  []adt.PatternConstraint
+	p         int
+	cur       Value
+	f         adt.Feature
+	arcType   adt.ArcType
+	isPattern bool
+	isList    bool
 }
 
 type hiddenIterator = Iterator
 
 // Next advances the iterator to the next value and reports whether there was any.
 // It must be called before the first call to [Iterator.Value] or [Iterator.Selector].
+//
+// Note that pattern constraints will be produced by the iterator before
+// any other field.
 func (i *Iterator) Next() bool {
-	if i.p >= len(i.arcs) {
+	switch {
+	case i.p >= len(i.arcs)+len(i.patterns):
 		i.cur = Value{}
 		return false
+	case i.p < len(i.patterns):
+		i.isPattern = true
+		i.arcType = adt.ArcNotPresent
+		pattern := i.patterns[i.p]
+		pattern.Constraint.Finalize(i.ctx)
+		i.cur = makeValue(i.val.idx, pattern.Constraint,
+			linkParent(i.val.parent_, i.val.v, pattern.Constraint),
+		)
+		i.p++
+		return true
+
+	default:
+		arc := i.arcs[i.p-len(i.patterns)]
+		arc.Finalize(i.ctx)
+		i.isPattern = false
+		i.f = arc.Label
+		i.arcType = arc.ArcType
+		i.cur = makeValue(i.val.idx, arc, linkParent(i.val.parent_, i.val.v, arc))
+		i.p++
+		return true
 	}
-	arc := i.arcs[i.p]
-	arc.Finalize(i.ctx)
-	p := linkParent(i.val.parent_, i.val.v, arc)
-	i.f = arc.Label
-	i.arcType = arc.ArcType
-	i.cur = makeValue(i.val.idx, arc, p)
-	i.p++
-	return true
 }
 
 // Value returns the current value in the list.
@@ -249,12 +269,33 @@ func (i *Iterator) Value() Value {
 
 // Selector reports the field label of this iteration.
 func (i *Iterator) Selector() Selector {
-	sel := featureToSel(i.f, i.idx)
-	// Only call wrapConstraint if there is any constraint type to wrap with.
-	if ctype := fromArcType(i.arcType); ctype != 0 {
-		sel = wrapConstraint(sel, ctype)
+	if !i.isPattern {
+		sel := featureToSel(i.f, i.idx)
+		// Only call wrapConstraint if there is any constraint type to wrap with.
+		if ctype := fromArcType(i.arcType); ctype != 0 {
+			sel = wrapConstraint(sel, ctype)
+		}
+		return sel
 	}
-	return sel
+	pattern := exprToVertex(i.patterns[i.p-1].Pattern)
+	pattern.Finalize(i.ctx)
+
+	return Selector{
+		patternSelector{
+			pattern: makeValue(i.val.idx, pattern,
+				linkParent(i.val.parent_, i.val.v, pattern),
+			),
+			_labelType: i.patternSelectorType().LabelType(),
+		},
+	}
+}
+
+func (i *Iterator) patternSelectorType() SelectorType {
+	if i.isList {
+		// Pattern constraints in lists are always indexes.
+		return IndexLabel | PatternConstraint
+	}
+	return StringLabel | PatternConstraint
 }
 
 // Label reports the label of the value if i iterates over struct fields and ""
@@ -278,6 +319,9 @@ func (i *Iterator) IsOptional() bool {
 
 // FieldType reports the type of the field.
 func (i *Iterator) FieldType() SelectorType {
+	if i.isPattern {
+		return i.patternSelectorType()
+	}
 	return featureToSelType(i.f, i.arcType)
 }
 
@@ -614,12 +658,16 @@ func newVertexRoot(idx *runtime.Runtime, ctx *adt.OpContext, x *adt.Vertex) Valu
 }
 
 func newValueRoot(idx *runtime.Runtime, ctx *adt.OpContext, x adt.Expr) Value {
+	return newVertexRoot(idx, ctx, exprToVertex(x))
+}
+
+func exprToVertex(x adt.Expr) *adt.Vertex {
 	if n, ok := x.(*adt.Vertex); ok {
-		return newVertexRoot(idx, ctx, n)
+		return n
 	}
-	node := &adt.Vertex{}
-	node.AddConjunct(adt.MakeRootConjunct(nil, x))
-	return newVertexRoot(idx, ctx, node)
+	n := &adt.Vertex{}
+	n.AddConjunct(adt.MakeRootConjunct(nil, x))
+	return n
 }
 
 func newChildValue(o *structValue, i int) Value {
@@ -1021,6 +1069,10 @@ func (v Value) Allows(sel Selector) bool {
 	if v.v.HasEllipsis {
 		return true
 	}
+	if _, ok := sel.sel.(patternSelector); ok {
+		// We can always add a pattern constraint.
+		return true
+	}
 	c := v.ctx()
 	f := sel.sel.feature(c)
 	return v.v.Accept(c, f)
@@ -1308,8 +1360,8 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 	switch b := v.v.Bottom(); {
 	case b != nil && b.IsIncomplete() && !o.concrete && !o.final:
 
-	// Allow scalar values if hidden or definition fields are requested.
-	case !o.omitHidden, !o.omitDefinitions:
+	// Allow scalar values if hidden or definition fields or patterns are requested.
+	case !o.omitHidden, !o.omitDefinitions, o.includePatterns:
 	default:
 		if err := v.checkKind(ctx, adt.StructKind); err != nil && !err.ChildError {
 			return structValue{}, err
@@ -1357,7 +1409,11 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 		}
 		arcs = append(arcs, arc)
 	}
-	return structValue{ctx, orig, obj, arcs}, nil
+	var patterns []adt.PatternConstraint
+	if o.includePatterns && obj.PatternConstraints != nil {
+		patterns = obj.PatternConstraints.Pairs
+	}
+	return structValue{ctx, orig, obj, arcs, patterns}, nil
 }
 
 // Struct returns the underlying struct of a value or an error if the value
@@ -1437,7 +1493,11 @@ func (s *hiddenStruct) Fields(opts ...Option) *Iterator {
 // Fields creates an iterator over v's fields if v is a struct or an error
 // otherwise.
 func (v Value) Fields(opts ...Option) (*Iterator, error) {
-	o := options{omitDefinitions: true, omitHidden: true, omitOptional: true}
+	o := options{
+		omitDefinitions: true,
+		omitHidden:      true,
+		omitOptional:    true,
+	}
 	o.updateOptions(opts)
 	ctx := v.ctx()
 	obj, err := v.structValOpts(ctx, o)
@@ -1445,7 +1505,14 @@ func (v Value) Fields(opts ...Option) (*Iterator, error) {
 		return &Iterator{idx: v.idx, ctx: ctx}, v.toErr(err)
 	}
 
-	return &Iterator{idx: v.idx, ctx: ctx, val: v, arcs: obj.arcs}, nil
+	return &Iterator{
+		idx:      v.idx,
+		ctx:      ctx,
+		val:      v,
+		arcs:     obj.arcs,
+		patterns: obj.patterns,
+		isList:   v.Kind() == ListKind,
+	}, nil
 }
 
 // Lookup reports the value at a path starting from v. The empty path returns v
@@ -1637,6 +1704,13 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 	for _, sel := range slices.Backward(p.path) {
 		switch sel.Type() {
 		case StringLabel | PatternConstraint:
+			if _, ok := sel.sel.(patternSelector); ok {
+				// TODO consider relaxing this restriction, in which case we'd really
+				// want a constructor for pattern selectors too.
+				return newErrValue(v,
+					mkErr(nil, 0, "cannot use pattern selector in FillPath"),
+				)
+			}
 			expr = &adt.StructLit{Decls: []adt.Decl{
 				&adt.BulkOptionalField{
 					Filter: &adt.BasicType{K: adt.StringKind},
@@ -1963,6 +2037,7 @@ type options struct {
 	omitDefinitions  bool
 	omitOptional     bool
 	omitAttrs        bool
+	includePatterns  bool
 	inlineImports    bool
 	showErrors       bool
 	final            bool
@@ -2066,6 +2141,21 @@ func Definitions(include bool) Option {
 	return func(p *options) {
 		p.hasHidden = true
 		p.omitDefinitions = !include
+	}
+}
+
+// Patterns indicates whether pattern constraints should be included
+// when iterating over struct fields. This includes universal pattern
+// constraints such as `[_]: int` or `[=~"^a"]: string` but
+// not the ellipsis pattern as selected by [AnyString]: that
+// can be found with [Value.LookupPath].LookupPath(cue.MakePath(cue.AnyString)).
+func Patterns(include bool) Option {
+	// TODO we can include patterns, but there's no way
+	// of iterating over patterns _only_ which might be
+	// useful in some cases. Perhaps we could add:
+	//	func Regular(include bool) Option
+	return func(p *options) {
+		p.includePatterns = include
 	}
 }
 

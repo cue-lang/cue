@@ -33,6 +33,24 @@
       "message": "The isClosed could be checked here as well.",
       "revId": "7718722f4a934fa31c347b8978ef73e95cab0bfe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "441407ec_dbb7f943",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1038,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-16T10:00:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3be064ec_0e78df42",
+      "revId": "7718722f4a934fa31c347b8978ef73e95cab0bfe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,23 @@
       "message": "I made the review changes myself because I wanted to rely on the CL.",
       "revId": "7718722f4a934fa31c347b8978ef73e95cab0bfe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3be064ec_0e78df42",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1038,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-16T08:55:45Z",
+      "side": 1,
+      "message": "The isClosed could be checked here as well.",
+      "revId": "7718722f4a934fa31c347b8978ef73e95cab0bfe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

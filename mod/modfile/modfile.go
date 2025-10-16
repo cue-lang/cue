@@ -211,7 +211,7 @@ func ParseLegacy(modfile []byte, filename string) (*File, error) {
 	}, nil
 }
 
-// ParseNonStrict is like Parse but allows some laxity in the parsing:
+// ParseNonStrict is like [Parse] but allows some laxity in the parsing:
 //   - if a module path lacks a version, it's taken from the version.
 //   - if a non-canonical version is used, it will be canonicalized.
 //

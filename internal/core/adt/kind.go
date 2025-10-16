@@ -134,8 +134,8 @@ func (k Kind) String() string {
 	return toString(k, kindStrs)
 }
 
-// TypeString is like String, but returns a string representation of a valid
-// CUE type.
+// TypeString is like [Kind.String],
+// but returns a string representation of a valid CUE type.
 func (k Kind) TypeString() string {
 	return toString(k, typeStrs)
 }

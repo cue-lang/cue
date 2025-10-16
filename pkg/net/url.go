@@ -57,7 +57,7 @@ func URL(s string) (bool, error) {
 	return err == nil, err
 }
 
-// URL validates that s is an absolute URL.
+// AbsURL validates that s is an absolute URL.
 // Note: this does also allow non-ASCII characters.
 func AbsURL(s string) (bool, error) {
 	u, err := url.Parse(s)

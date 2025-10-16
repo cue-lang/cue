@@ -16,7 +16,7 @@ type SourceLoc struct {
 	Dir string
 }
 
-// ReadCUE can be implemented by an [fs.FS]
+// ReadCUEFS can be implemented by an [fs.FS]
 // to provide an optimized (cached) way of
 // reading and parsing CUE syntax.
 type ReadCUEFS interface {

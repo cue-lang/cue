@@ -92,8 +92,8 @@ func FindAll(pattern, s string, n int) ([]string, error) {
 	return m, nil
 }
 
-// FindAllNamedSubmatch is like FindAllSubmatch, but returns a list of maps
-// with the named used in capturing groups. See FindNamedSubmatch for an
+// FindAllNamedSubmatch is like [FindAllSubmatch], but returns a list of maps
+// with the named used in capturing groups. See [FindNamedSubmatch] for an
 // example on how to use named groups.
 func FindAllNamedSubmatch(pattern, s string, n int) ([]map[string]string, error) {
 	re, err := regexp.Compile(pattern)
@@ -123,7 +123,7 @@ func FindAllNamedSubmatch(pattern, s string, n int) ([]map[string]string, error)
 
 var errNoNamedGroup = errors.New("no named groups")
 
-// FindAllSubmatch is the 'All' version of FindSubmatch; it returns a list
+// FindAllSubmatch is the 'All' version of [FindSubmatch]; it returns a list
 // of all successive matches of the expression, as defined by the 'All'
 // description in the package comment.
 // A return value of bottom indicates no match.
@@ -139,7 +139,7 @@ func FindAllSubmatch(pattern, s string, n int) ([][]string, error) {
 	return m, nil
 }
 
-// FindNamedSubmatch is like FindSubmatch, but returns a map with the names used
+// FindNamedSubmatch is like [FindSubmatch], but returns a map with the names used
 // in capturing groups.
 //
 // Example:

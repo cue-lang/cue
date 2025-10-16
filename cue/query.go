@@ -15,6 +15,8 @@
 package cue
 
 import (
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -49,6 +51,11 @@ func (v Value) LookupPath(p Path) Value {
 
 outer:
 	for _, sel := range p.path {
+		if _, ok := sel.sel.(patternSelector); ok {
+			// It's not possible to look up pattern constraints.
+			// TODO could potentially relax that restriction.
+			return newErrValue(makeValue(v.idx, n, parent), &adt.Bottom{Err: errors.Newf(token.NoPos, "cannot look up pattern constraints other than AnyString or AnyIndex")})
+		}
 		f := sel.sel.feature(v.idx)
 		deref := n.DerefValue()
 		for _, a := range deref.Arcs {

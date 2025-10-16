@@ -29,6 +29,7 @@ cmp stderr stderr4-golden
 }
 -- stderr4-golden --
 conflicting values "foo.com_v3.0.2-pre/bar" and "wrong":
+    --schema:1:1
     .tmp/cache/mod/extract/foo.com@v3.0.2-pre/bar/x.cue:2:7
     ./data.json:1:1
 -- data.json --

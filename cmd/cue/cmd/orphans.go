@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"cmp"
 	"fmt"
 	"path/filepath"
 	"strconv"
@@ -235,21 +236,29 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 					if p, ok := x.(*ast.ParenExpr); ok {
 						x = p.X // unwrap for better error messages
 					}
-					l := ctx.BuildExpr(x,
-						cue.InferBuiltins(true),
-						cue.Scope(inst))
+					l := ctx.BuildExpr(x, cue.InferBuiltins(true), cue.Scope(inst))
+					var errArg any
 					switch l.Kind() {
-					case cue.StringKind, cue.IntKind:
-						label = l.Syntax().(ast.Label)
-
-					default:
-						var arg interface{} = l
-						if err := l.Err(); err != nil {
-							arg = err
+					case cue.StringKind:
+						s, err := l.String()
+						if err != nil {
+							errArg = err
+							break
 						}
-						return nil, fmt.Errorf(
-							`error evaluating label %v: %v`,
-							astinternal.DebugStr(x), arg)
+						label = ast.NewString(s)
+					case cue.IntKind:
+						i, err := l.Int64()
+						if err != nil {
+							errArg = err
+							break
+						}
+						label = ast.NewLit(token.INT, strconv.FormatInt(i, 10))
+					default:
+						errArg = cmp.Or[any](l.Err(), l)
+					}
+					if errArg != nil {
+						return nil, fmt.Errorf(`error evaluating label %v: %v`,
+							astinternal.DebugStr(x), errArg)
 					}
 				}
 				ast.SetPos(label, token.NoPos)

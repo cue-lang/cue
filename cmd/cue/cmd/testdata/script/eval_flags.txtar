@@ -47,8 +47,10 @@ reference "#D1" not found:
     --schema:1:1
 -- expect-stderr5 --
 X: conflicting values 1 and float (mismatched types int and float):
+    --schema:1:1
     ./test.json:2:8
     ./vector.cue:4:8
 Y: conflicting values 2 and float (mismatched types int and float):
+    --schema:1:1
     ./test.json:3:8
     ./vector.cue:5:8

@@ -24,6 +24,4 @@ x: #Def & {
 -- self_contained.golden --
 package blah
 
-int & {
-	5
-}
+5

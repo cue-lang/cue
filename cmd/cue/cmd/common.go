@@ -316,11 +316,13 @@ func (i *expressionIter) value() cue.Value {
 		return i.iter.value()
 	}
 	v := i.iter.value()
-	return v.Context().BuildExpr(i.expr[i.i],
+	result := v.Context().BuildExpr(i.expr[i.i],
 		cue.Scope(v),
 		cue.InferBuiltins(true),
 		cue.ImportPath(i.iter.id()),
 	)
+	// Evaluate the result to resolve any references in the scope.
+	return result.Eval()
 }
 
 type config struct {

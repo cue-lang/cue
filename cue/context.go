@@ -181,8 +181,6 @@ func (c *Context) BuildExpr(x ast.Expr, options ...BuildOption) Value {
 	r := c.runtime()
 	cfg := c.parseOptions(options)
 
-	ctx := c.ctx()
-
 	// TODO: move to runtime?: it probably does not make sense to treat BuildExpr
 	// and the expression resulting from CompileString differently.
 	astutil.ResolveExpr(x, errFn)
@@ -193,7 +191,12 @@ func (c *Context) BuildExpr(x ast.Expr, options ...BuildOption) Value {
 	if err != nil {
 		return c.makeError(err)
 	}
-	v := adt.Resolve(ctx, conjunct)
+
+	// Create a vertex with the conjunct to it, rather than using [adt.Resolve].
+	// This preserves the original expression structure, which is important
+	// for builtins like close() that need to track state through conjuncts.
+	v := &adt.Vertex{}
+	v.AddConjunct(conjunct)
 
 	return c.make(v)
 }

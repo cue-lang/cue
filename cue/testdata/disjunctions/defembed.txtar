@@ -30,10 +30,10 @@ z: {
 	{a: b} | {b: int}
 }
 -- out/evalalpha/stats --
-Leaks:  22
-Freed:  138
-Reused: 126
-Allocs: 34
+Leaks:  40
+Freed:  120
+Reused: 108
+Allocs: 52
 Retain: 0
 
 Unifications: 28
@@ -50,10 +50,10 @@ diff old new
 -Freed:  163
 -Reused: 155
 -Allocs: 8
-+Leaks:  22
-+Freed:  138
-+Reused: 126
-+Allocs: 34
++Leaks:  40
++Freed:  120
++Reused: 108
++Allocs: 52
  Retain: 0
  
 -Unifications: 29

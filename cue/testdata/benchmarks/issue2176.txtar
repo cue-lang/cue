@@ -60,8 +60,8 @@ output: {
 -- out/evalalpha/stats --
 Leaks:  327
 Freed:  477
-Reused: 429
-Allocs: 375
+Reused: 427
+Allocs: 377
 Retain: 0
 
 Unifications: 476
@@ -93,8 +93,8 @@ diff old new
 -NumCloseIDs: 12
 +Leaks:  327
 +Freed:  477
-+Reused: 429
-+Allocs: 375
++Reused: 427
++Allocs: 377
 +Retain: 0
 +
 +Unifications: 476

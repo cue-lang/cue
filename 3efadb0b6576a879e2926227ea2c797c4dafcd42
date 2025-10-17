@@ -1,0 +1,265 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72d0be6f_1d349985",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "It is too subtle to rely on Exists here (see also next comment). I see two options: \n1) return an error Value using newErrorValue. This would be consistent with other code. We could consider returning a sentinel error value for easy comparison.\n\n2) return (pattern Value, ok bool)\n\nI think the second is clearer. The first, though, could work if combined with \"IsPattern\".",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40c99470_417ed66d",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "This is incorrect: Exists does not return whether a value is valid, but rather whether it exists in the configuration. See documentation. A zero value is valid.\n\nI know Exists is odd, and we should change it, but it does not mean IsValid.",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68fb667b_1aa4855c",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "I don\u0027t understand this comment. What would the correct Context be for AnyString according to you?",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "276c7f04_3f4dbcdf",
+        "filename": "cue/query.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "Idiomatically, use colon after TODO (`TODO: msg`) possibly adding a qualifier (`TODO(qual): msg`).",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e445575c_b22563ab",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "My guess is that you do patterns first because that allows users only interested in patterns to skip the regular arcs without needing to have another option? \n\nPerhaps document that here.",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "253113f6_06757bbf",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "try to stay \u003c 80 chars on a line.",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aeda7b43_3f1fe699",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "ditto.",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47f21d95_300f491e",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "Pattern constraints can also be associated with lists (specifically for the ...T). So in that case it would be an IntLabel.",
+      "range": {
+        "startLine": 304,
+        "startChar": 9,
+        "endLine": 304,
+        "endChar": 20
+      },
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "109bc426_45e951a9",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "I double checked and the \"pattern constraint\" option is only used for structs.\n\nBut ...T entries in lists are also considered pattern constraints. (`[_, ...T]` is encoded as `[\u003e\u003d1]: T`)\n\nSo to be more future proof, I would write\n\nst :\u003d featureToSelType(i.f, i.arcType)\nif i.isPattern {\n   st \u003d st.LabelType() | PatternConstraint\n}\nreturn st",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e152bca5_e324c7ab",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1054,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "This is not correct if the type is not a struct. So we should check whether v can be a structure.",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b3191a1_f007fe13",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1054,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "This is not entirely correct: if this is a list, for instance, AnyString will currently fail. Similarly, PatternConstraints, are currently only allowed for structs.",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "153679cb_dff8a52e",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1331,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "I prefer the meaning of the zero value not to change to avoid creating bugs now or in the future.\n\nIt is nice to have consistency, but includePatters would be a bit safer as it more accurately reflect the \"default\" behavior.",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d575646b_c48b3e5d",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1691,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "TODO style. Did you consider just setting the pattern constraint conjunction in Filter (old terminology) below?",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d59f9ade_a4ad5fe6",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1692,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "80 chars limit",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "672614b8_80408bd4",
+        "filename": "cue/types_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-17T09:35:49Z",
+      "side": 1,
+      "message": "80 chars here and below.",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

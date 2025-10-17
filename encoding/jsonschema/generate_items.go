@@ -17,6 +17,7 @@ package jsonschema
 import (
 	"cmp"
 	"fmt"
+	"maps"
 	"slices"
 
 	"cuelang.org/go/cue"
@@ -493,17 +494,21 @@ type property struct {
 
 // itemProperties represents object properties and associated keywords.
 type itemProperties struct {
-	elems                []property
+	properties           map[string]item
 	required             []string
 	additionalProperties item
-	// TODO patternProperties
+	patternProperties    map[string]item
 }
 
 func (i *itemProperties) generate(g *generator) ast.Expr {
-	propFields := make([]ast.Decl, len(i.elems))
-	for j, prop := range i.elems {
-		propFields[j] = makeField(prop.name, prop.item.generate(g))
+	propFields := make([]ast.Decl, 0, len(i.properties))
+	for name, it := range i.properties {
+		propFields = append(propFields, makeField(name, it.generate(g)))
 	}
+	slices.SortFunc(propFields, func(a, b ast.Decl) int {
+		return cmp.Compare(fieldLabel(a), fieldLabel(b))
+	})
+
 	fields := []ast.Decl{makeField("properties", &ast.StructLit{Elts: propFields})}
 	if len(i.required) > 0 {
 		reqExprs := make([]ast.Expr, len(i.required))
@@ -515,24 +520,20 @@ func (i *itemProperties) generate(g *generator) ast.Expr {
 	if i.additionalProperties != nil {
 		fields = append(fields, makeField("additionalProperties", i.additionalProperties.generate(g)))
 	}
+	if len(i.patternProperties) > 0 {
+		pp := &ast.StructLit{}
+		for _, p := range slices.Sorted(maps.Keys(i.patternProperties)) {
+			pp.Elts = append(pp.Elts, makeField(p, i.patternProperties[p].generate(g)))
+		}
+		fields = append(fields, makeField("patternProperties", pp))
+	}
 	return makeSchemaStructLit(fields...)
 }
 
 func (i *itemProperties) apply(f func(item) item) item {
-	changed := false
-	elems := i.elems
-	for j, prop := range elems {
-		if it := f(prop.item); it != prop.item {
-			if !changed {
-				elems = slices.Clone(elems)
-				changed = true
-			}
-			elems[j] = property{
-				name: prop.name,
-				item: it,
-			}
-		}
-	}
+	properties, changed0 := applyMap(i.properties, f)
+	patternProperties, changed1 := applyMap(i.patternProperties, f)
+	changed := changed0 || changed1
 	additionalProperties := i.additionalProperties
 	if additionalProperties != nil {
 		if ap := f(additionalProperties); ap != additionalProperties {
@@ -544,10 +545,37 @@ func (i *itemProperties) apply(f func(item) item) item {
 		return i
 	}
 	return &itemProperties{
-		elems:                elems,
+		properties:           properties,
 		required:             i.required,
 		additionalProperties: additionalProperties,
+		patternProperties:    patternProperties,
 	}
+}
+
+func applyMap(m map[string]item, f func(item) item) (map[string]item, bool) {
+	var m1 map[string]item
+	for key, e := range m {
+		e1 := f(e)
+		if e1 == e {
+			continue
+		}
+		if m1 == nil {
+			m1 = make(map[string]item)
+		}
+		m1[key] = e1
+	}
+	if m1 == nil {
+		return m, false
+	}
+	if len(m1) == len(m) {
+		return m1, true
+	}
+	for key, e := range m {
+		if _, ok := m1[key]; !ok {
+			m1[key] = e
+		}
+	}
+	return m1, true
 }
 
 func applyElems(elems []item, f func(item) item) ([]item, bool) {

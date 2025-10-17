@@ -28,6 +28,6 @@ Result:
     }
   }
   y: (_|_){
-    // [structural cycle]
+    // [structural cycle] x.y: structural cycle
   }
 }

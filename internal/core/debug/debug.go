@@ -312,7 +312,7 @@ func (w *printer) node(n adt.Node) {
 			w.indent += "// "
 			w.string("\n")
 			w.dst = fmt.Appendf(w.dst, "[%v]", v.Code)
-			if !v.ChildError {
+			if !v.ChildError || len(x.Arcs) == 0 {
 				msg := errors.Details(v.Err, &errors.Config{
 					Cwd:     w.cfg.Cwd,
 					ToSlash: true,

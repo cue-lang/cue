@@ -866,7 +866,7 @@ Result:
                 b: (_|_){
                   // [structural cycle]
                   link: (_|_){
-                    // [structural cycle]
+                    // [structural cycle] selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
                   }
                 }
               }
@@ -875,7 +875,7 @@ Result:
           b: (_|_){
             // [structural cycle]
             link: (_|_){
-              // [structural cycle]
+              // [structural cycle] selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
             }
           }
         }
@@ -1135,7 +1135,7 @@ diff old new
 +                b: (_|_){
 +                  // [structural cycle]
 +                  link: (_|_){
-+                    // [structural cycle]
++                    // [structural cycle] selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
 +                  }
 +                }
 +              }
@@ -1144,7 +1144,7 @@ diff old new
 +          b: (_|_){
 +            // [structural cycle]
 +            link: (_|_){
-+              // [structural cycle]
++              // [structural cycle] selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
              }
            }
          }

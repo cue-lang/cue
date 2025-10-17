@@ -162,7 +162,7 @@ Result:
     }
   }
   let _schema_1#2 = (_|_){
-    // [structural cycle]
+    // [structural cycle] schema.next: structural cycle
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
@@ -175,7 +175,7 @@ diff old new
    let _schema_1#2 = (_|_){
 -    // [structural cycle] _schema_1: structural cycle:
 -    //     ./in.cue:32:8
-+    // [structural cycle]
++    // [structural cycle] schema.next: structural cycle
    }
  }
 -- diff/todo/p3 --

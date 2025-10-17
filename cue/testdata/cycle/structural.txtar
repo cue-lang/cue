@@ -1400,7 +1400,7 @@ Result:
       }
     }
     let _schema_1#1 = (_|_){
-      // [structural cycle]
+      // [structural cycle] withLetFail.schema.next: structural cycle
     }
   }
   fieldsSumInfinite: (_|_){
@@ -2034,7 +2034,7 @@ diff old new
      let _schema_1#1 = (_|_){
 -      // [structural cycle] withLetFail._schema_1: structural cycle:
 -      //     ./in.cue:362:17
-+      // [structural cycle]
++      // [structural cycle] withLetFail.schema.next: structural cycle
      }
    }
    fieldsSumInfinite: (_|_){

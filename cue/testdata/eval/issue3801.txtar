@@ -97,10 +97,10 @@ issue3801: nonRooted: full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  33
-Freed:  203
-Reused: 174
-Allocs: 62
+Leaks:  36
+Freed:  200
+Reused: 171
+Allocs: 65
 Retain: 0
 
 Unifications: 167
@@ -122,10 +122,10 @@ diff old new
 -Unifications: 332
 -Conjuncts:    783
 -Disjuncts:    373
-+Leaks:  33
-+Freed:  203
-+Reused: 174
-+Allocs: 62
++Leaks:  36
++Freed:  200
++Reused: 171
++Allocs: 65
 +Retain: 0
 +
 +Unifications: 167

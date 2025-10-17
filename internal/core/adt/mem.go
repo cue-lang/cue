@@ -153,9 +153,13 @@ func (r reclaimer) reclaim(v *Vertex) bool {
 			// of a disjunct it is reclaimed later as part of [freeDisjunct].
 			return false
 		} else {
+			if n.refCount > 0 {
+				goto skipRoot
+			}
+
 			r.reclaimBaseValueBuffers(v)
 
-			if n.refCount > 0 || (v.Parent != nil && !v.Label.IsLet()) {
+			if v.Parent != nil && !v.Label.IsLet() {
 				goto skipRoot
 			}
 		}

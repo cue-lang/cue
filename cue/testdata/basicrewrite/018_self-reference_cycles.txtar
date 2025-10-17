@@ -131,10 +131,10 @@ issue3737: reduced2: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  3
-Freed:  56
-Reused: 36
-Allocs: 23
+Leaks:  5
+Freed:  54
+Reused: 34
+Allocs: 25
 Retain: 0
 
 Unifications: 47
@@ -156,10 +156,10 @@ diff old new
 -Unifications: 48
 -Conjuncts:    285
 -Disjuncts:    88
-+Leaks:  3
-+Freed:  56
-+Reused: 36
-+Allocs: 23
++Leaks:  5
++Freed:  54
++Reused: 34
++Allocs: 25
 +Retain: 0
 +
 +Unifications: 47

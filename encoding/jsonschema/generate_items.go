@@ -17,6 +17,7 @@ package jsonschema
 import (
 	"cmp"
 	"fmt"
+	"maps"
 	"slices"
 
 	"cuelang.org/go/cue"
@@ -496,7 +497,7 @@ type itemProperties struct {
 	elems                []property
 	required             []string
 	additionalProperties item
-	// TODO patternProperties
+	patternProperties    map[string]item
 }
 
 func (i *itemProperties) generate(g *generator) ast.Expr {
@@ -514,6 +515,13 @@ func (i *itemProperties) generate(g *generator) ast.Expr {
 	}
 	if i.additionalProperties != nil {
 		fields = append(fields, makeField("additionalProperties", i.additionalProperties.generate(g)))
+	}
+	if len(i.patternProperties) > 0 {
+		pp := &ast.StructLit{}
+		for _, p := range slices.Sorted(maps.Keys(i.patternProperties)) {
+			pp.Elts = append(pp.Elts, makeField(p, i.patternProperties[p].generate(g)))
+		}
+		fields = append(fields, makeField("patternProperties", pp))
 	}
 	return makeSchemaStructLit(fields...)
 }

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bef7efca_23810669",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-17T15:47:18Z",
+      "side": 1,
+      "message": "surely this should be a \"fixes\"? and if not, the commit message should explain why.",
+      "revId": "f6e797d2f12c131bd1d2c07c217cefc183a4418c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f54a9e0_7cf73d4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-17T15:47:18Z",
+      "side": 1,
+      "message": "SGTM but I\u0027m confused by the status of 4119 after this change; see the comments below.",
+      "revId": "f6e797d2f12c131bd1d2c07c217cefc183a4418c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcac503d_5dd5fb7c",
+        "filename": "cue/testdata/eval/disjselfcycle.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-17T15:47:18Z",
+      "side": 1,
+      "message": "is this meant to fail? both `full` and `reduced` should not cause an error, and it appears they don\u0027t. if `reducedNested` fails, that sounds like it\u0027s a bug or TODO, or that the test case shows a different scenario that shouldn\u0027t work at all.",
+      "revId": "f6e797d2f12c131bd1d2c07c217cefc183a4418c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -308,7 +308,6 @@ func constraintPatternProperties(key string, n cue.Value, s *state) {
 		s.errf(n, `value of "patternProperties" must be an object, found %v`, n.Kind())
 	}
 	obj := s.object(n)
-	existing := excludeFields(s.obj.Elts)
 	s.processMap(n, func(key string, n cue.Value) {
 		if !s.checkRegexp(n, key) {
 			return
@@ -321,12 +320,9 @@ func constraintPatternProperties(key string, n cue.Value, s *state) {
 			&ast.UnaryExpr{Op: token.NMAT, X: ast.NewString(key)})
 
 		// We'll make a pattern constraint of the form:
-		// 	[pattern & !~(properties)]: schema
+		// 	[pattern]: schema
 		f := embedStruct(ast.NewStruct(&ast.Field{
-			Label: ast.NewList(ast.NewBinExpr(
-				token.AND,
-				append([]ast.Expr{&ast.UnaryExpr{Op: token.MAT, X: ast.NewString(key)}}, existing...)...,
-			)),
+			Label: ast.NewList(&ast.UnaryExpr{Op: token.MAT, X: ast.NewString(key)}),
 			Value: s.schema(n),
 		}))
 		ast.SetRelPos(f, token.NewSection)

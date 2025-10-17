@@ -305,10 +305,11 @@ type nodeContext struct {
 	cyclicConjuncts []cyclicConjunct
 
 	// These fields are used to track type checking.
-	reqDefIDs    []refInfo
-	replaceIDs   []replaceID
-	conjunctInfo []conjunctInfo
-	reqSets      reqSets
+	reqDefIDs          []refInfo
+	replaceIDs         []replaceID
+	conjunctInfo       []conjunctInfo
+	reqSets            reqSets
+	containsDefIDCache map[[2]defID]bool // cache for containsDefID results
 
 	// Checks is a list of conjuncts, as we need to preserve the context in
 	// which it was evaluated. The conjunct is always a validator (and thus
@@ -492,22 +493,24 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			nodeContextState: nodeContextState{
 				kind: TopKind,
 			},
-			toFree:          n.toFree[:0],
-			arcMap:          n.arcMap[:0],
-			cyclicConjuncts: n.cyclicConjuncts[:0],
-			notify:          n.notify[:0],
-			sharedIDs:       n.sharedIDs[:0],
-			checks:          n.checks[:0],
-			postChecks:      n.postChecks[:0],
-			reqDefIDs:       n.reqDefIDs[:0],
-			replaceIDs:      n.replaceIDs[:0],
-			conjunctInfo:    n.conjunctInfo[:0],
-			reqSets:         n.reqSets[:0],
-			disjunctions:    n.disjunctions[:0],
-			disjunctErrs:    n.disjunctErrs[:0],
-			userErrs:        n.userErrs[:0],
-			disjuncts:       n.disjuncts[:0],
+			toFree:             n.toFree[:0],
+			arcMap:             n.arcMap[:0],
+			cyclicConjuncts:    n.cyclicConjuncts[:0],
+			notify:             n.notify[:0],
+			sharedIDs:          n.sharedIDs[:0],
+			checks:             n.checks[:0],
+			postChecks:         n.postChecks[:0],
+			reqDefIDs:          n.reqDefIDs[:0],
+			replaceIDs:         n.replaceIDs[:0],
+			conjunctInfo:       n.conjunctInfo[:0],
+			reqSets:            n.reqSets[:0],
+			disjunctions:       n.disjunctions[:0],
+			disjunctErrs:       n.disjunctErrs[:0],
+			userErrs:           n.userErrs[:0],
+			disjuncts:          n.disjuncts[:0],
+			containsDefIDCache: n.containsDefIDCache, // cleared below
 		}
+		clear(n.containsDefIDCache)
 		n.scheduler.clear()
 	} else {
 		c.stats.Allocs++

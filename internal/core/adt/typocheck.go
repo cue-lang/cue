@@ -708,10 +708,15 @@ outer:
 }
 
 func (n *nodeContext) containsDefID(node, child defID) bool {
-	// TODO(perf): cache result
 	// TODO(perf): we could keep track of the minimum defID that could map so
 	// that we can use this to bail out early.
 	c := n.ctx
+
+	key := [2]defID{node, child}
+	if result, ok := n.containsDefIDCache[key]; ok {
+		return result
+	}
+
 	c.redirectsBuf = c.redirectsBuf[:0]
 	for p := n; p != nil; p = p.node.Parent.state {
 		if p.opID != n.opID {
@@ -727,7 +732,14 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 		c.stats.MaxRedirect = int64(len(c.redirectsBuf))
 	}
 
-	return n.containsDefIDRec(node, child, child)
+	result := n.containsDefIDRec(node, child, child)
+
+	if n.containsDefIDCache == nil {
+		n.containsDefIDCache = make(map[[2]defID]bool)
+	}
+	n.containsDefIDCache[key] = result
+
+	return result
 }
 
 func (n *nodeContext) containsDefIDRec(node, child, start defID) bool {

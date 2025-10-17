@@ -1,0 +1,224 @@
+-- in.cue --
+-- comprehensions.cue --
+issue4119: reduced: {
+	x: [...]
+	x: _ | *[{f: 123}]
+	x: [
+		for i in x {
+			f: i.f
+		}
+	]
+}
+// This test is added to test the memory management bug isn't triggered
+// one level deeper. This test is expected to fail, as it now triggers
+// a structural cycle in the right disjunct, leaving an incomplete error
+// on the left disjunct.
+issue4119: reducedNested: {
+	x: {y: [...]}
+	x: {y: _} | *{y: [{f: 123}]}
+	x: {y: [
+		for i in x {
+			f: i.f
+		}
+	]}
+}
+issue4119: full: {
+	_img: img={
+		val: string
+		accounts: {
+			groups: img.accounts.groups | *[{gid: 65532}]
+
+			// Recursive comprehension - this triggers the bug
+			groups: [
+				for g in groups
+				let _gid = g.gid {
+					gid: [
+						if _gid != _|_ {_gid},
+						65532,
+					][0]
+				},
+			]
+		}
+	}
+
+	art: {
+		images: [string]: #Image
+		for k, v in images {
+			images: (k): _img & v
+		}
+	}
+	#Image: {
+		val: string
+		accounts?: {
+			groups?: [...]
+		}
+	}
+	art: images: ko: {
+		val: "test"
+	}
+}
+-- out/evalalpha --
+Errors:
+issue4119.reducedNested.x.y.0.f: undefined field: f:
+    ./comprehensions.cue:19:9
+
+Result:
+(_|_){
+  // [eval]
+  issue4119: (_|_){
+    // [eval]
+    reduced: (struct){
+      x: (list){ |(*(#list){
+          0: (struct){
+            f: (int){ 123 }
+          }
+        }, (#list){
+        }) }
+    }
+    reducedNested: (_|_){
+      // [eval]
+      x: (_|_){
+        // [eval] issue4119.reducedNested.x.y.0.f: undefined field: f:
+        //     ./comprehensions.cue:19:9
+        y: (list){ list }
+      }
+    }
+    full: (struct){
+      _img: (struct){
+        val: (string){ string }
+        accounts: (struct){
+          groups: (#list){
+            0: (_|_){// {
+              //   gid: [
+              //     if (〈2;_gid〉 != _|_(explicit error (_|_ literal) in source)) {
+              //       〈3;_gid〉
+              //     },
+              //     65532,
+              //   ][0]
+              // }
+            }
+          }
+        }
+      }
+      art: (struct){
+        images: (struct){
+          ko: (#struct){
+            val: (string){ "test" }
+            accounts: (#struct){
+              groups: (#list){ |(*(#list){
+                  0: (#struct){
+                    gid: (int){ 65532 }
+                  }
+                }, (#list){
+                }) }
+            }
+          }
+        }
+      }
+      #Image: (#struct){
+        val: (string){ string }
+        accounts?: (#struct){
+          groups?: (list){
+          }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- comprehensions.cue
+{
+  issue4119: {
+    reduced: {
+      x: [
+        ...,
+      ]
+      x: (_|*[
+        {
+          f: 123
+        },
+      ])
+      x: [
+        for _, i in 〈1;x〉 {
+          f: 〈1;i〉.f
+        },
+      ]
+    }
+  }
+  issue4119: {
+    reducedNested: {
+      x: {
+        y: [
+          ...,
+        ]
+      }
+      x: ({
+        y: _
+      }|*{
+        y: [
+          {
+            f: 123
+          },
+        ]
+      })
+      x: {
+        y: [
+          for _, i in 〈2;x〉 {
+            f: 〈1;i〉.f
+          },
+        ]
+      }
+    }
+  }
+  issue4119: {
+    full: {
+      _img: {
+        val: string
+        accounts: {
+          groups: (〈2〉.accounts.groups|*[
+            {
+              gid: 65532
+            },
+          ])
+          groups: [
+            for _, g in 〈1;groups〉 let _gid = 〈0;g〉.gid {
+              gid: [
+                if (〈2;_gid〉 != _|_(explicit error (_|_ literal) in source)) {
+                  〈3;_gid〉
+                },
+                65532,
+              ][0]
+            },
+          ]
+        }
+      }
+      art: {
+        images: {
+          [string]: 〈2;#Image〉
+        }
+        for k, v in 〈0;images〉 {
+          images: {
+            〈2;k〉: (〈4;_img〉 & 〈2;v〉)
+          }
+        }
+      }
+      #Image: {
+        val: string
+        accounts?: {
+          groups?: [
+            ...,
+          ]
+        }
+      }
+      art: {
+        images: {
+          ko: {
+            val: "test"
+          }
+        }
+      }
+    }
+  }
+}
+--- in.cue
+{}

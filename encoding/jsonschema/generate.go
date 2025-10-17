@@ -15,11 +15,11 @@
 package jsonschema
 
 import (
-	"cmp"
 	"fmt"
 	"iter"
 	"maps"
 	"reflect"
+	"regexp"
 	"slices"
 	"strings"
 	"time"
@@ -150,6 +150,17 @@ func mergeAllOf(it item) item {
 		return it1
 	default:
 		return it.apply(mergeAllOf)
+	}
+}
+
+func conjuncts(it item) iter.Seq[item] {
+	return func(yield func(item) bool) {
+		it1, ok := it.(*itemAllOf)
+		if !ok {
+			yield(it)
+			return
+		}
+		yieldSiblings(it1, yield)
 	}
 }
 
@@ -788,30 +799,58 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 }
 
 func (g *generator) makeStructItem(v cue.Value) item {
-	var props itemProperties
+	props := itemProperties{
+		properties: make(map[string]item),
+	}
 
-	ellipsis := v.LookupPath(cue.MakePath(cue.AnyString))
-	if ellipsis.Exists() {
-		// All fields are explicitly allowed (either with `...` or `[_]: T`)
-		props.additionalProperties = g.makeItem(ellipsis)
-		if _, ok := props.additionalProperties.(*itemTrue); ok && !g.cfg.ExplicitOpen {
+	explicitlyOpen := func(constraint item) {
+		props.additionalProperties = constraint
+		if _, ok := constraint.(*itemTrue); ok && !g.cfg.ExplicitOpen {
 			// additionalProperties: true is a no-op in JSON Schema in general
 			// so omit it unless we're explicitly opening up schemas.
 			props.additionalProperties = nil
 		}
+	}
+
+	ellipsis := v.LookupPath(cue.MakePath(cue.AnyString))
+	if ellipsis.Exists() {
+		// All fields are explicitly allowed (either with `...` or `[_]: T`)
+		explicitlyOpen(g.makeItem(ellipsis))
 	} else if v.IsClosed() && !g.cfg.ExplicitOpen {
 		props.additionalProperties = &itemFalse{}
 	}
 
-	// TODO include pattern constraints in the results when that's implemented
-	iter, err := v.Fields(cue.Optional(true))
+	iter, err := v.Fields(cue.Optional(true), cue.Patterns(true))
 	if err != nil {
 		g.addError(v, err)
 		return &itemFalse{}
 	}
+	type pat struct {
+		pattern    *regexp.Regexp
+		constraint item
+	}
+	var patternConstraints []pat
+outer:
 	for iter.Next() {
 		sel := iter.Selector()
 		switch sel.ConstraintType() {
+		case cue.PatternConstraint:
+			re, ok := regexpForValue(sel.Pattern())
+			if ok {
+				if props.patternProperties == nil {
+					props.patternProperties = make(map[string]item)
+				}
+				constraint := g.makeItem(iter.Value())
+				props.patternProperties[re.String()] = constraint
+				patternConstraints = append(patternConstraints, pat{re, constraint})
+			} else {
+				// We can't express the constraint in JSON Schema, and it
+				// might cover any number of possible labels, so the
+				// only thing we can do is treat the whole thing as explicitly
+				// open.
+				explicitlyOpen(&itemTrue{})
+			}
+			continue outer
 		case cue.OptionalConstraint:
 		case cue.RequiredConstraint:
 			props.required = append(props.required, sel.Unquoted())
@@ -823,15 +862,54 @@ func (g *generator) makeStructItem(v cue.Value) item {
 				props.required = append(props.required, sel.Unquoted())
 			}
 		}
-		props.elems = append(props.elems, property{
-			name: sel.Unquoted(),
-			item: g.makeItem(iter.Value()),
-		})
+		propItem := g.makeItem(iter.Value())
+		fieldName := sel.Unquoted()
+		if len(patternConstraints) == 0 {
+			props.properties[fieldName] = propItem
+			continue
+		}
+		// There are pattern constraints which will have been unified in with
+		// the constraints of any matching field. They're redundant with
+		// respect to patternProperties, so remove them.
+		// This has the potential to remove explicit constraints on the fields
+		// themselves, but this will not change behavior, just result in a slightly
+		// smaller resulting schema.
+		allof, ok := propItem.(*itemAllOf)
+		if !ok || len(allof.elems) <= 1 {
+			// No possibility of removing any conjuncts.
+			props.properties[fieldName] = propItem
+			continue
+		}
+		var elems []item
+		for _, c := range patternConstraints {
+			if !c.pattern.MatchString(fieldName) {
+				continue
+			}
+			if elems == nil {
+				elems = slices.Collect(siblings(allof))
+			}
+			// We've found a pattern constraint that unifies with the field name.
+			// Its constraint will have been added to this property's constraints
+			// but are redundant, so remove them.
+			elems = slices.DeleteFunc(elems, func(it item) bool {
+				// TODO this is unacceptably inefficient. We should fix that
+				// by making comparisons more efficient somehow.
+				for itc := range conjuncts(c.constraint) {
+					if reflect.DeepEqual(it, itc) {
+						return true
+					}
+				}
+				return false
+			})
+		}
+		if len(elems) == 0 {
+			propItem = &itemTrue{}
+		} else {
+			propItem = &itemAllOf{elems: elems}
+		}
+		props.properties[fieldName] = propItem
 	}
-	slices.SortFunc(props.elems, func(e1, e2 property) int {
-		return cmp.Compare(e1.name, e2.name)
-	})
-	if len(props.elems) == 0 && len(props.required) == 0 {
+	if len(props.properties) == 0 && len(props.required) == 0 {
 		return &itemTrue{}
 	}
 	return &props
@@ -932,6 +1010,50 @@ func cueKindToJSONSchemaTypes(kind cue.Kind) []string {
 		types = append(types, t)
 	}
 	return types
+}
+
+// regexpForValue tries to interpret v as a regular expression constraint,
+// It returns  the regular expression and reports whether it succeeded.
+func regexpForValue(v cue.Value) (*regexp.Regexp, bool) {
+	s, ok := regexpForValue1(v)
+	if !ok {
+		return nil, false
+	}
+	pat, err := regexp.Compile(s)
+	return pat, err == nil
+}
+
+func regexpForValue1(v cue.Value) (string, bool) {
+	op, args := v.Expr()
+	if op == cue.RegexMatchOp {
+		if len(args) != 1 {
+			return "", false
+		}
+		s, err := args[0].String()
+		if err != nil {
+			return "", false
+		}
+		return s, true
+	}
+	s, err := v.String()
+	if err == nil {
+		// Exact match.
+		return "^" + regexp.QuoteMeta(s) + "$", true
+	}
+	if acceptsAllString(v) {
+		// It matches all possible string labels: return
+		// a regular expression that matches all possible
+		// labels too.
+		return "", true
+	}
+	return "", false
+}
+
+func acceptsAllString(v cue.Value) bool {
+	// TODO return v.AcceptsAll(cue.StringKind) if/when that
+	// method is implemented.
+	sv := v.Context().CompileString("string")
+	return v.Unify(sv).Subsume(sv, cue.Final()) == nil
 }
 
 // trueAsNil returns the nil item if the item

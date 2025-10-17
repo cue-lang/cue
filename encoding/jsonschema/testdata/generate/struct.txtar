@@ -7,6 +7,14 @@ t4?: {a?: int, ...}
 t5?: {[_]: int}
 t6?: {a?: int}
 t7?: close({a!: string, b!: int})
+t8?: {
+	[=~"^a"]: =~"b"
+	[=~"b$"]: =~"x"
+	a?: string
+	b?: string
+	ab?: string
+	x?: string
+}
 #S1: {
 	a?: int
 }
@@ -86,6 +94,40 @@ _foo: a?: int
 				}
 			}
 			required: ["a", "b"]
+		}
+		t8: {
+			type: "object"
+			patternProperties: {
+				"^a": {
+					type:    "string"
+					pattern: "b"
+				}
+				b$: {
+					type:    "string"
+					pattern: "x"
+				}
+			}
+			properties: {
+				a: {
+					type:    "string"
+					pattern: "b"
+				}
+				ab: {
+					allOf: [{
+						pattern: "x"
+					}, {
+						type:    "string"
+						pattern: "b"
+					}]
+				}
+				b: {
+					type:    "string"
+					pattern: "x"
+				}
+				x: {
+					type: "string"
+				}
+			}
 		}
 	}
 }

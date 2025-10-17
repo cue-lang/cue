@@ -54,10 +54,7 @@
 					"foo": 1,
 					"vroom": 2
 				},
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "conflicting values [...] and {foo:1,vroom:2} (mismatched types list and struct):\n    instance.json:1:1\nconflicting values bool and {foo:1,vroom:2} (mismatched types bool and struct):\n    instance.json:1:1\nconflicting values null and {foo:1,vroom:2} (mismatched types null and struct):\n    instance.json:1:1\nconflicting values number and {foo:1,vroom:2} (mismatched types number and struct):\n    instance.json:1:1\nconflicting values string and {foo:1,vroom:2} (mismatched types string and struct):\n    instance.json:1:1\ninvalid value {foo:1,vroom:2} (does not satisfy matchN): 0 matched, expected \u003e=1:\n    instance.json:1:1\nvroom: field not allowed:\n    instance.json:1:18\n"
-				}
+				"valid": true
 			}
 		]
 	},

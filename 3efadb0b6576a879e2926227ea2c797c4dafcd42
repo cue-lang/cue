@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39e41a7d_f8e40aec",
+        "filename": "encoding/jsonschema/testdata/generate/struct_explicitopen.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T07:26:20Z",
+      "side": 0,
+      "message": "This change is unfortunate: there\u0027s no way to strip off just the `close` in `close(_foo)` using the CUE API while leaving the reference `_foo` intact but also preserving the fact that it\u0027s closed. This is similar to the fact that it\u0027s not possible to preserve double-references (a refers to b refers to c).",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

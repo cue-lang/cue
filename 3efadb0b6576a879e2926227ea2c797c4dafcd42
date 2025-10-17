@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c04154c_035197ba",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "Given that the user can easily determine whether a selector is a pattern constraint (`sel.ConstraintType() \u003d\u003d cue.PatternConstraint`) and we never return `AnyString` or `AnyIndex` from a field iterator, maybe we don\u0027t even need to document this.\n\nI\u0027m not keen on the other options:\n- newErrValue requires a Value to make the error with, but we haven\u0027t always got one\n- returning (Value, bool) is very unidiomatic in the CUE API and makes this method harder to use for no particularly good reason, given that the user can, and almost certainly will, be checking the constraint type first, as mentioned above.\n\nI\u0027ve made some changes that might hopefully be considered an improvement.",
+      "parentUuid": "72d0be6f_1d349985",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40c99470_417ed66d",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-17T09:35:49Z",
       "side": 1,
       "message": "This is incorrect: Exists does not return whether a value is valid, but rather whether it exists in the configuration. See documentation. A zero value is valid.\n\nI know Exists is odd, and we should change it, but it does not mean IsValid.",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8af06df0_594e51e5",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "Discussed at length online. Fixed by returning an error value in this case.",
+      "parentUuid": "40c99470_417ed66d",
       "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9e9995c_995a9c22",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "Fixed by returning an error value in this case.",
+      "parentUuid": "68fb667b_1aa4855c",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "276c7f04_3f4dbcdf",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-10-17T09:35:49Z",
       "side": 1,
       "message": "Idiomatically, use colon after TODO (`TODO: msg`) possibly adding a qualifier (`TODO(qual): msg`).",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64633878_23319acd",
+        "filename": "cue/query.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "276c7f04_3f4dbcdf",
       "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "351ce2c2_c01f122c",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "There\u0027s also the useful property that patterns apply to all fields, so when we get to a string field, we already know all the patterns that apply to it.\n\nI tried to document the \"why\" but just ended up omitting it because nothing sounded decent.",
+      "parentUuid": "e445575c_b22563ab",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "253113f6_06757bbf",
@@ -103,6 +193,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e93453d_2f8fe4ef",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "253113f6_06757bbf",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aeda7b43_3f1fe699",
@@ -116,6 +224,24 @@
       "writtenOn": "2025-10-17T09:35:49Z",
       "side": 1,
       "message": "ditto.",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9766f41c_b2d57f61",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aeda7b43_3f1fe699",
       "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -160,6 +286,48 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ccb0556_475aafe8",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47f21d95_300f491e",
+      "range": {
+        "startLine": 304,
+        "startChar": 9,
+        "endLine": 304,
+        "endChar": 20
+      },
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ef28f2f_aa5ff451",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "Interesting point!\nDone (slightly differently, as we pattern constraints don\u0027t have arcs, so there\u0027s no natural adt.Feature to use).",
+      "parentUuid": "109bc426_45e951a9",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e152bca5_e324c7ab",
@@ -194,6 +362,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3119900_3a9d6e7b",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1054,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "This doesn\u0027t change the behaviour for AnyString (it\u0027s not of type `patternSelector`), and it _is_ possible to add pattern constraints to lists: \nhttps://cuelang.org/play/?id\u003dDRK1Do3p-nN#w\u003dfunction\u0026i\u003dcue\u0026f\u003dexport\u0026o\u003dcue",
+      "parentUuid": "6b3191a1_f007fe13",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a42bf92_94cf0ba8",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1054,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "Given that we allow adding hidden fields and definitions to non-structs (and Allow says that we can); for example:\n```\nctx.CompileString(`1`).Allows(cue.Def(\"#T\"))\n```\nreturns true.\n\nAnd that empirically we _can_ add pattern constraints (both string, int. and non-specific) to lists, it seems correct to return true here.",
+      "parentUuid": "e152bca5_e324c7ab",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "153679cb_dff8a52e",
@@ -207,6 +411,24 @@
       "writtenOn": "2025-10-17T09:35:49Z",
       "side": 1,
       "message": "I prefer the meaning of the zero value not to change to avoid creating bugs now or in the future.\n\nIt is nice to have consistency, but includePatters would be a bit safer as it more accurately reflect the \"default\" behavior.",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29201362_0d443189",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1331,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "153679cb_dff8a52e",
       "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -228,6 +450,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67453e9d_4484c827",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1691,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "I did consider it, but I think that it\u0027s not very useful being able to use `FillPath` with a pattern constraint if you can\u0027t create a selector with an arbitrary pattern constraint, which we can\u0027t do as yet. I think it\u0027s OK to leave both of them for a future CL.",
+      "parentUuid": "d575646b_c48b3e5d",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d59f9ade_a4ad5fe6",
@@ -245,6 +485,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d773c4e0_6355ef8e",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1692,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "Done (assuming 4-space tabs)",
+      "parentUuid": "d59f9ade_a4ad5fe6",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "672614b8_80408bd4",
@@ -258,6 +516,24 @@
       "writtenOn": "2025-10-17T09:35:49Z",
       "side": 1,
       "message": "80 chars here and below.",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f100488_1a59c3ef",
+        "filename": "cue/types_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-17T13:16:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "672614b8_80408bd4",
       "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

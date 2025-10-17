@@ -108,7 +108,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "unexpected success",
 					"v3-roundtrip": "unexpected success"
 				}
 			},

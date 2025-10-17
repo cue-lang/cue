@@ -66,7 +66,6 @@
   },
   "additionalProperties": false
 }
-
 -- out/decode/extract --
 // Main schema
 
@@ -86,9 +85,9 @@ close({
 		foo?: number
 		bar?: number
 
-		{[=~"^\\P{Lu}" & !~"^(foo|bar)$"]: string}
+		{[=~"^\\P{Lu}"]: string}
 
-		{[=~"^\\P{Lo}" & !~"^(foo|bar)$"]: int}
+		{[=~"^\\P{Lo}"]: int}
 		...
 	}
 	patternsNoProps?: {
@@ -101,9 +100,9 @@ close({
 		foo?: number
 		bar?: number
 
-		{[=~"^\\P{Lu}" & !~"^(foo|bar)$"]: string}
+		{[=~"^\\P{Lu}"]: string}
 
-		{[=~"^\\P{Lo}" & !~"^(foo|bar)$"]: int}
+		{[=~"^\\P{Lo}"]: int}
 		{[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string}
 	}
 	multi?: >=7 | struct.MaxFields(5) & {

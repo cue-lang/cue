@@ -121,6 +121,47 @@ func TestParse(t *testing.T) {
 			out: `if=foo: 0, for=bar: 2, let=bar: 3, func=baz: 4`,
 		},
 		{
+			desc: "postfix alias simple form",
+			in: `@experiment(aliasandself)
+		a~X: 1
+		b~Y: 2`,
+			out: `@experiment(aliasandself), a~X: 1, b~Y: 2`,
+		},
+		{
+			desc: "postfix alias dual form",
+			in: `@experiment(aliasandself)
+		a~(K,V): 1
+		b~(L,W): 2`,
+			out: `@experiment(aliasandself), a~(K,V): 1, b~(L,W): 2`,
+		},
+		{
+			desc: "postfix alias with constraints",
+			in: `@experiment(aliasandself)
+		a~X?: 1
+		b~(K,V)!: 2`,
+			out: `@experiment(aliasandself), a~X?: 1, b~(K,V)!: 2`,
+		},
+		{
+			desc: "postfix alias in nested fields",
+			in: `@experiment(aliasandself)
+		a~A: b~B: c~C: 1`,
+			out: `@experiment(aliasandself), a~A: {b~B: {c~C: 1}}`,
+		},
+		{
+			desc: "postfix alias with dynamic field",
+			in: `@experiment(aliasandself)
+		(x)~F: 1
+		("y")~G: 2`,
+			out: `@experiment(aliasandself), (x)~F: 1, ("y")~G: 2`,
+		},
+		{
+			desc: "postfix alias with pattern constraint",
+			in: `@experiment(aliasandself)
+		[string]~X: int
+		[=~"^a"]~(K,V): string`,
+			out: `@experiment(aliasandself), [string]~X: int, [=~"^a"]~(K,V): string`,
+		},
+		{
 			desc: "keywords as selector",
 			in: `a : {
 			if: 0
@@ -886,7 +927,31 @@ bar: 2
 		`,
 			out: "\nparsing experiments for version \"v0.14.0\": cannot set experiment \"explicitopen\" before version v0.15.0",
 		},
-	}
+		{
+			desc: "postfix alias with experiment",
+			in: `@experiment(aliasandself)
+	a~X: {foo: 1}
+	b: X.foo`,
+			out: "@experiment(aliasandself), a~X: {foo: 1}, b: X.foo",
+		},
+		{
+			desc: "postfix alias disallows old syntax",
+			in: `@experiment(aliasandself)
+	X=a: {foo: 1}`,
+			out: "@experiment(aliasandself), X: {foo: 1}\nold-style alias syntax (=) is not allowed with AliasAndSelf experiment; use postfix syntax (~X or ~(K,V))",
+		},
+		{
+			desc: "old alias syntax without experiment",
+			in: `X=a: {foo: 1}
+	b: X`,
+			out: "X=a: {foo: 1}, b: X",
+		},
+		{
+			desc: "postfix alias without experiment",
+			in: `a~X: {foo: 1}
+	b: X.foo`,
+			out: "a~X: {foo: 1}, b: X.foo\npostfix alias syntax requires @experiment(aliasandself)",
+		}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			mode := []Option{AllErrors}
@@ -1119,4 +1184,104 @@ func TestX(t *testing.T) {
 		t.Errorf("unexpected error: %v", err)
 	}
 	t.Error(astinternal.DebugStr(f))
+}
+
+func TestPostfixAlias(t *testing.T) {
+	tests := []struct {
+		name      string
+		input     string
+		wantAlias bool
+		wantDual  bool
+		wantLabel string
+		wantField string
+	}{
+		{
+			name:      "simple form",
+			input:     "@experiment(aliasandself)\na~X: 1",
+			wantAlias: true,
+			wantDual:  false,
+			wantField: "X",
+		},
+		{
+			name:      "dual form",
+			input:     "@experiment(aliasandself)\na~(K,V): 1",
+			wantAlias: true,
+			wantDual:  true,
+			wantLabel: "K",
+			wantField: "V",
+		},
+		{
+			name:      "no alias",
+			input:     "a: 1",
+			wantAlias: false,
+		},
+		{
+			name:      "with optional",
+			input:     "@experiment(aliasandself)\na~X?: 1",
+			wantAlias: true,
+			wantField: "X",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			f, err := ParseFile("test.cue", []byte(tt.input), ParseComments)
+			if err != nil {
+				t.Fatalf("ParseFile failed: %v", err)
+			}
+
+			if len(f.Decls) == 0 {
+				t.Fatal("Expected at least one declaration")
+			}
+
+			// Find the first field declaration (skip over attributes)
+			var field *ast.Field
+			for _, decl := range f.Decls {
+				if f, ok := decl.(*ast.Field); ok {
+					field = f
+					break
+				}
+			}
+			if field == nil {
+				t.Fatal("Expected at least one *ast.Field")
+			}
+
+			if tt.wantAlias {
+				if field.Alias == nil {
+					t.Fatal("Expected alias to be non-nil")
+				}
+
+				if field.Alias.Field == nil {
+					t.Fatal("Expected Field identifier to be non-nil")
+				}
+
+				if got := field.Alias.Field.Name; got != tt.wantField {
+					t.Errorf("Field.Name = %q, want %q", got, tt.wantField)
+				}
+
+				if tt.wantDual {
+					if field.Alias.Label == nil {
+						t.Fatal("Expected Label identifier to be non-nil for dual form")
+					}
+					if got := field.Alias.Label.Name; got != tt.wantLabel {
+						t.Errorf("Label.Name = %q, want %q", got, tt.wantLabel)
+					}
+					if !field.Alias.Lparen.IsValid() {
+						t.Error("Expected Lparen to be valid for dual form")
+					}
+				} else {
+					if field.Alias.Label != nil {
+						t.Error("Expected Label to be nil for simple form")
+					}
+					if field.Alias.Lparen.IsValid() {
+						t.Error("Expected Lparen to be invalid for simple form")
+					}
+				}
+			} else {
+				if field.Alias != nil {
+					t.Errorf("Expected alias to be nil, got %+v", field.Alias)
+				}
+			}
+		})
+	}
 }

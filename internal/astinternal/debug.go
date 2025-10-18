@@ -419,6 +419,20 @@ func DebugStr(x interface{}) (out string) {
 
 	case *ast.Field:
 		out := DebugStr(v.Label)
+		if v.Alias != nil {
+			out += "~"
+			if v.Alias.Label != nil {
+				// Dual form
+				out += "("
+				out += DebugStr(v.Alias.Label)
+				out += ","
+				out += DebugStr(v.Alias.Field)
+				out += ")"
+			} else {
+				// Simple form
+				out += DebugStr(v.Alias.Field)
+			}
+		}
 		if t := v.Constraint; t != token.ILLEGAL {
 			out += t.String()
 		}

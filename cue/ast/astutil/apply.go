@@ -350,6 +350,9 @@ func applyCursor(v applyVisitor, c Cursor) {
 
 	case *ast.Field:
 		apply(v, c, &n.Label)
+		if n.Alias != nil {
+			apply(v, c, &n.Alias)
+		}
 		if n.Value != nil {
 			apply(v, c, &n.Value)
 		}
@@ -430,6 +433,14 @@ func applyCursor(v applyVisitor, c Cursor) {
 	case *ast.Alias:
 		apply(v, c, &n.Ident)
 		apply(v, c, &n.Expr)
+
+	case *ast.PostfixAlias:
+		if n.Label != nil {
+			apply(v, c, &n.Label)
+		}
+		if n.Field != nil {
+			apply(v, c, &n.Field)
+		}
 
 	case *ast.Comprehension:
 		applyList(v, c, n.Clauses)

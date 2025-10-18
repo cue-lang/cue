@@ -64,6 +64,11 @@ type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 //   X in [X=x]: y        Field          Expr (x)
 //   X in X=[x]: y        Field          Field
 //
+//   V in foo~(K,V): v    Field          Field
+//   K in foo~(K,V): v    Field          Field
+//   V in [x]~(K,V): y    Field          Field
+//   K in [x]~(K,V): y    Field          Expr (x)
+//
 // for k, v in            ForClause      Ident
 // let x = y              LetClause      Ident
 //
@@ -128,9 +133,29 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 				if _, ok := a.Expr.(*ast.ListLit); !ok {
 					s.insert(name, x, a)
 				}
+				if x.Alias != nil {
+					// Error: cannot have both old-style label alias and postfix
+					// alias
+					s.errFn(x.Pos(),
+						"field has both label alias and postfix alias")
+				}
 			}
 
-			// default:
+			if a := x.Alias; a != nil {
+				// Aliases on pattern constraints may only be referenced within
+				// the pattern constraint itself. These are handled below.
+				if _, isPattern := label.(*ast.ListLit); !isPattern {
+					if aliasHasField(s, a) {
+						s.insert(a.Field.Name, x, a)
+					}
+					if aliasHasLabel(s, a) {
+						s.insert(a.Label.Name, a.Label, a)
+					}
+				}
+			}
+
+			// TODO(perf): replace labelName with quick tests: this generates an
+			// error in many cases.
 			name, isIdent, _ := ast.LabelName(label)
 			if isIdent {
 				v := x.Value
@@ -251,6 +276,34 @@ func (s *scope) lookup(name string) (p *scope, obj ast.Node, node entry) {
 	return nil, nil, entry{}
 }
 
+// aliasHasField reports whether the given postfix alias has a Field alias.
+func aliasHasField(s *scope, a *ast.PostfixAlias) bool {
+	if a.Label == nil {
+		// Single case
+		switch {
+		case a.Field == nil:
+			s.errFn(a.Pos(),
+				"single postfix alias with no field")
+			return false
+		case a.Field.Name == "_":
+			s.errFn(a.Pos(),
+				"single postfix alias %q field cannot be the blank identifier", a.Label.Name)
+			return false
+		}
+	} else if a.Field == nil || a.Field.Name == "_" {
+		if a.Label.Name == "_" {
+			s.errFn(a.Pos(),
+				"both label and field in postfix alias cannot be the blank identifier")
+		}
+		return false
+	}
+	return true
+}
+
+func aliasHasLabel(s *scope, a *ast.PostfixAlias) bool {
+	return a.Label != nil && a.Label.Name != "_"
+}
+
 func (s *scope) Before(n ast.Node) bool {
 	switch x := n.(type) {
 	case *ast.File:
@@ -301,6 +354,12 @@ func (s *scope) Before(n ast.Node) bool {
 			expr := label.Elts[0]
 
 			if a, ok := expr.(*ast.Alias); ok {
+				if x.Alias != nil {
+					// Error: cannot have both old-style pattern alias and
+					// postfix alias
+					s.errFn(x.Pos(),
+						"pattern constraint has both label alias and postfix alias")
+				}
 				expr = a.Expr
 
 				// Add to current scope, instead of the value's, and allow
@@ -310,6 +369,15 @@ func (s *scope) Before(n ast.Node) bool {
 				// messages. This puts the burden on clients of this library
 				// to detect illegal usage, though.
 				s.insert(a.Ident.Name, a.Expr, a)
+			} else if a := x.Alias; a != nil {
+				// Handle postfix aliases in pattern constraints: [string]~X or
+				// [string]~(K,V)
+				if aliasHasField(s, a) {
+					s.insert(a.Field.Name, x, a)
+				}
+				if aliasHasLabel(s, a) {
+					s.insert(a.Label.Name, expr, a)
+				}
 			}
 
 			ast.Walk(expr, nil, func(n ast.Node) {
@@ -326,6 +394,7 @@ func (s *scope) Before(n ast.Node) bool {
 		}
 
 		if n := x.Value; n != nil {
+			// Handle value aliases.
 			if alias, ok := x.Value.(*ast.Alias); ok {
 				// TODO: this should move into Before once decl attributes
 				// have been fully deprecated and embed attributes are introduced.

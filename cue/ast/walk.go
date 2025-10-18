@@ -53,6 +53,9 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 
 	case *Field:
 		Walk(n.Label, before, after)
+		if n.Alias != nil {
+			Walk(n.Alias, before, after)
+		}
 		if n.Value != nil {
 			Walk(n.Value, before, after)
 		}
@@ -137,6 +140,14 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 	case *Alias:
 		Walk(n.Ident, before, after)
 		Walk(n.Expr, before, after)
+
+	case *PostfixAlias:
+		if n.Label != nil {
+			Walk(n.Label, before, after)
+		}
+		if n.Field != nil {
+			Walk(n.Field, before, after)
+		}
 
 	case *Comprehension:
 		walkList(n.Clauses, before, after)

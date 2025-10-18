@@ -1,0 +1,48 @@
+-- simple.cue --
+a~X: 1
+b:   X
+c:   a
+-- out/resolve/simple --
+3[a]:  Scope: 0[<nil>]     Node: 0[]
+4[X]:  Scope: 0[<nil>]     Node: 0[]
+6[b]:  Scope: 0[<nil>]     Node: 0[]
+7[X]:  Scope: 1[*ast.File] Node: 2[a~X: 1]
+9[c]:  Scope: 0[<nil>]     Node: 0[]
+10[a]: Scope: 1[*ast.File] Node: 0[1]
+-- dual.cue --
+a~(K, V): 1
+b:        K
+c:        V
+d:        a
+-- out/resolve/dual --
+3[a]:  Scope: 0[<nil>]     Node: 0[]
+4[K]:  Scope: 0[<nil>]     Node: 0[]
+5[V]:  Scope: 0[<nil>]     Node: 0[]
+7[b]:  Scope: 0[<nil>]     Node: 0[]
+8[K]:  Scope: 1[*ast.File] Node: 4[K]
+10[c]: Scope: 0[<nil>]     Node: 0[]
+11[V]: Scope: 1[*ast.File] Node: 2[a~(K, V): 1]
+13[d]: Scope: 0[<nil>]     Node: 0[]
+14[a]: Scope: 1[*ast.File] Node: 0[1]
+-- pattern.cue --
+[string]~X: int
+y:          X
+-- out/resolve/pattern --
+3[string]: Scope: 0[<nil>] Node: 0[]
+4[X]:      Scope: 0[<nil>] Node: 0[]
+5[int]:    Scope: 0[<nil>] Node: 0[]
+7[y]:      Scope: 0[<nil>] Node: 0[]
+8[X]:      Scope: 0[<nil>] Node: 0[]
+-- pattern_dual.cue --
+[string]~(K, V): int
+y:               K
+z:               V
+-- out/resolve/pattern_dual --
+3[string]: Scope: 0[<nil>] Node: 0[]
+4[K]:      Scope: 0[<nil>] Node: 0[]
+5[V]:      Scope: 0[<nil>] Node: 0[]
+6[int]:    Scope: 0[<nil>] Node: 0[]
+8[y]:      Scope: 0[<nil>] Node: 0[]
+9[K]:      Scope: 0[<nil>] Node: 0[]
+11[z]:     Scope: 0[<nil>] Node: 0[]
+12[V]:     Scope: 0[<nil>] Node: 0[]

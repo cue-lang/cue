@@ -1,0 +1,485 @@
+-- in.cue --
+@experiment(aliasandself)
+
+// Basic postfix alias - simple form
+a1~X1: {
+	foo: 1
+}
+b1: X1.foo + 2
+
+// Basic postfix alias - dual form
+a2~(K2,V2): {
+	name: K2
+	val: V2.foo
+}
+a2: {foo: 42}
+
+// Postfix alias with _ for field
+a3~(K3,_): {
+	foo: 1
+}
+b3: K3
+
+// Postfix alias with _ for label
+a4~(_,V4): {
+	foo: 1
+}
+b4: V4.foo + 2
+
+// Dynamic field with postfix alias
+("dyn")~X5: {
+	foo: 1
+}
+b5: X5.foo + 10
+
+// Dynamic field with dual form
+("dyn2")~(K6,V6): {
+	name: K6
+	val: V6.foo
+}
+dyn2: {foo: 100}
+
+// Pattern constraint with postfix alias - scoped to value only
+// The field alias should create a recursive reference
+pattern: {
+	[string]~(LabelAlias,_): {
+		labelRef: LabelAlias
+	}
+	foo: {}
+}
+
+// Pattern constraint with dual form
+pattern2: {
+	[string]~(LabelName,FieldRef): {
+		labelVal: LabelName
+		fieldVal: FieldRef.data
+	}
+	foo: {data: 1}
+	bar: {data: 2}
+}
+
+// Pattern constraint - field alias creates recursive reference
+// TODO: fix this. Note that this is also broken with old aliases.
+// pattern3recursive: {
+// 	[string]~(_, FieldAlias): {
+// 		// FieldAlias refers to this field, creating recursion
+// 		recursive: FieldAlias
+// 	}
+// 	foo: {}
+// }
+
+// Nested structs with postfix aliases
+nested~X7: {
+	inner~Y7: {
+		a: 1
+	}
+	b: Y7.a + X7.inner.a
+}
+result1: nested.b
+
+// Multiple fields with aliases referencing each other
+multi: {
+	a~A8: 1
+	b~B8: A8 + 2
+	c: B8 + 3
+}
+
+// Postfix alias in comprehension
+comp: {
+	items: [1, 2, 3]
+	for i, v in items {
+		"\(i)"~X9: {
+			index: i
+			value: v
+			double: X9.value * 2
+		}
+	}
+}
+
+// Postfix alias with constraints
+constrained~X10?: {
+	required: true
+}
+test1: X10.required
+
+// Interpolation with postfix alias
+"\("inter")"~X11: {
+	foo: 1
+}
+b6: X11.foo + 5
+
+// Postfix alias with optional and default
+opt~X12?: {
+	a: 1
+	b: X12
+}
+
+// TODO: seemingly wrong semantics, but matches old behavior.
+def~Y13: {
+	b: 2
+	c: Y13.b
+} | {b: 3}
+
+// Pattern with blank identifier - label only visible in value
+pattern3: {
+	[string]~(LN14,_): {
+		labelName: LN14
+	}
+	test: {}
+}
+
+// Pattern with blank identifier - field only visible in value
+pattern4: {
+	[string]~(_,FR15): {
+		fieldRef: FR15.x
+	}
+	test: {x: 99}
+}
+
+// Multiple aliases in same scope
+same: {
+	a~A16: 1
+	b~B16: 2
+	c: A16 + B16
+}
+
+// Alias referencing earlier alias
+chain~X17: {
+	a: 1
+}
+chain2~Y18: {
+	ref: X17.a
+}
+result2: Y18.ref
+
+// Postfix alias with list value
+list~X19: [1, 2, 3]
+b7: X19[0] + X19[1]
+
+// Postfix alias with disjunction
+disj~X20: 1 | 2 | 3
+b8: X20
+
+// Nested pattern constraints with aliases
+deep: {
+	[string]~(OuterLabel,_): {
+		[string]~(InnerLabel, InnerField): {
+			outer: OuterLabel
+			inner: InnerLabel
+			value: InnerField.x
+		}
+		foo: {x: 1}
+	}
+	bar: {}
+}
+
+// Alias with definition
+#Def~X21: {
+	field: 42
+}
+usedef: X21.field
+-- out/evalalpha --
+(struct){
+  a1: (struct){
+    foo: (int){ 1 }
+  }
+  b1: (int){ 3 }
+  a2: (struct){
+    name: (_|_){
+      // [incomplete] a2.name: undefined field: K2:
+      //     ./in.cue:11:8
+    }
+    val: (int){ 42 }
+    foo: (int){ 42 }
+  }
+  a3: (struct){
+    foo: (int){ 1 }
+  }
+  b3: (_|_){
+    // [incomplete] b3: undefined field: K3:
+    //     ./in.cue:20:5
+  }
+  a4: (struct){
+    foo: (int){ 1 }
+  }
+  b4: (int){ 3 }
+  b5: (int){ 11 }
+  dyn2: (struct){
+    foo: (int){ 100 }
+    name: (_|_){
+      // [incomplete] dyn2.name: undefined field: K6:
+      //     ./in.cue:36:8
+    }
+    val: (int){ 100 }
+  }
+  pattern: (struct){
+    foo: (struct){
+      labelRef: (string){ "foo" }
+    }
+  }
+  pattern2: (struct){
+    foo: (struct){
+      data: (int){ 1 }
+      labelVal: (string){ "foo" }
+      fieldVal: (int){ 1 }
+    }
+    bar: (struct){
+      data: (int){ 2 }
+      labelVal: (string){ "bar" }
+      fieldVal: (int){ 2 }
+    }
+  }
+  nested: (struct){
+    inner: (struct){
+      a: (int){ 1 }
+    }
+    b: (int){ 2 }
+  }
+  result1: (int){ 2 }
+  multi: (struct){
+    a: (int){ 1 }
+    b: (int){ 3 }
+    c: (int){ 6 }
+  }
+  comp: (struct){
+    items: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+    "0": (struct){
+      index: (int){ 0 }
+      value: (int){ 1 }
+      double: (int){ 2 }
+    }
+    "1": (struct){
+      index: (int){ 1 }
+      value: (int){ 2 }
+      double: (int){ 4 }
+    }
+    "2": (struct){
+      index: (int){ 2 }
+      value: (int){ 3 }
+      double: (int){ 6 }
+    }
+  }
+  constrained?: (struct){
+    required: (bool){ true }
+  }
+  test1: (_|_){
+    // [incomplete] test1: cannot reference optional field: constrained:
+    //     ./in.cue:102:8
+  }
+  b6: (int){ 6 }
+  opt?: (struct){
+    a: (int){ 1 }
+    b: (_|_){
+      // [incomplete] opt.b: cannot reference optional field: opt:
+      //     ./in.cue:113:5
+    }
+  }
+  def: (struct){ |((struct){
+      b: (int){ 2 }
+      c: (int){ 2 }
+    }, (struct){
+      b: (int){ 3 }
+    }) }
+  pattern3: (struct){
+    test: (struct){
+      labelName: (string){ "test" }
+    }
+  }
+  pattern4: (struct){
+    test: (struct){
+      x: (int){ 99 }
+      fieldRef: (int){ 99 }
+    }
+  }
+  same: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+    c: (int){ 3 }
+  }
+  chain: (struct){
+    a: (int){ 1 }
+  }
+  chain2: (struct){
+    ref: (int){ 1 }
+  }
+  result2: (int){ 1 }
+  list: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+  }
+  b7: (int){ 3 }
+  disj: (int){ |((int){ 1 }, (int){ 2 }, (int){ 3 }) }
+  b8: (int){ |((int){ 1 }, (int){ 2 }, (int){ 3 }) }
+  deep: (struct){
+    bar: (struct){
+      foo: (struct){
+        x: (int){ 1 }
+        outer: (string){ "bar" }
+        inner: (string){ "foo" }
+        value: (int){ 1 }
+      }
+    }
+  }
+  #Def: (#struct){
+    field: (int){ 42 }
+  }
+  usedef: (int){ 42 }
+  dyn: (struct){
+    foo: (int){ 1 }
+  }
+  inter: (struct){
+    foo: (int){ 1 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a1: {
+    foo: 1
+  }
+  b1: (〈0;a1〉.foo + 2)
+  a2: {
+    name: 〈1;K2〉
+    val: 〈1;a2〉.foo
+  }
+  a2: {
+    foo: 42
+  }
+  a3: {
+    foo: 1
+  }
+  b3: 〈0;K3〉
+  a4: {
+    foo: 1
+  }
+  b4: (〈0;a4〉.foo + 2)
+  "dyn": {
+    foo: 1
+  }
+  b5: (〈0;("dyn")〉.foo + 10)
+  "dyn2": {
+    name: 〈1;K6〉
+    val: 〈1;("dyn2")〉.foo
+  }
+  dyn2: {
+    foo: 100
+  }
+  pattern: {
+    [string]: {
+      labelRef: 〈1;-〉
+    }
+    foo: {}
+  }
+  pattern2: {
+    [string]: {
+      labelVal: 〈1;-〉
+      fieldVal: 〈1;(〈0;-〉)〉.data
+    }
+    foo: {
+      data: 1
+    }
+    bar: {
+      data: 2
+    }
+  }
+  nested: {
+    inner: {
+      a: 1
+    }
+    b: (〈0;inner〉.a + 〈1;nested〉.inner.a)
+  }
+  result1: 〈0;nested〉.b
+  multi: {
+    a: 1
+    b: (〈0;a〉 + 2)
+    c: (〈0;b〉 + 3)
+  }
+  comp: {
+    items: [
+      1,
+      2,
+      3,
+    ]
+    for i, v in 〈0;items〉 {
+      "\(〈1;i〉)": {
+        index: 〈2;i〉
+        value: 〈2;v〉
+        double: (〈1;("\(〈1;i〉)")〉.value * 2)
+      }
+    }
+  }
+  constrained?: {
+    required: true
+  }
+  test1: 〈0;constrained〉.required
+  "\("inter")": {
+    foo: 1
+  }
+  b6: (〈0;("\("inter")")〉.foo + 5)
+  opt?: {
+    a: 1
+    b: 〈1;opt〉
+  }
+  def: ({
+    b: 2
+    c: 〈1;def〉.b
+  }|{
+    b: 3
+  })
+  pattern3: {
+    [string]: {
+      labelName: 〈1;-〉
+    }
+    test: {}
+  }
+  pattern4: {
+    [string]: {
+      fieldRef: 〈1;(〈0;-〉)〉.x
+    }
+    test: {
+      x: 99
+    }
+  }
+  same: {
+    a: 1
+    b: 2
+    c: (〈0;a〉 + 〈0;b〉)
+  }
+  chain: {
+    a: 1
+  }
+  chain2: {
+    ref: 〈1;chain〉.a
+  }
+  result2: 〈0;chain2〉.ref
+  list: [
+    1,
+    2,
+    3,
+  ]
+  b7: (〈0;list〉[0] + 〈0;list〉[1])
+  disj: (1|2|3)
+  b8: 〈0;disj〉
+  deep: {
+    [string]: {
+      [string]: {
+        outer: 〈2;-〉
+        inner: 〈1;-〉
+        value: 〈1;(〈0;-〉)〉.x
+      }
+      foo: {
+        x: 1
+      }
+    }
+    bar: {}
+  }
+  #Def: {
+    field: 42
+  }
+  usedef: 〈0;#Def〉.field
+}

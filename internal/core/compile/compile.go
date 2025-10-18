@@ -218,7 +218,8 @@ func (c *compiler) lookupAlias(k int, id *ast.Ident) aliasEntry {
 	entry, ok := m[name]
 
 	if !ok {
-		err := c.errf(id, "could not find LetClause associated with identifier %q", name)
+		err := c.errf(id,
+			"could not find let or alias associated with identifier %q", name)
 		return aliasEntry{expr: err}
 	}
 
@@ -470,7 +471,20 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 
 		switch f := n.Node.(type) {
 		case *ast.Field:
-			_ = c.lookupAlias(k, f.Label.(*ast.Alias).Ident) // mark as used
+			var ident *ast.Ident
+			if alias, _ := f.Label.(*ast.Alias); alias != nil {
+				if f.Alias != nil {
+					return c.errf(f,
+						"field has both label alias and postfix alias")
+				}
+				ident = alias.Ident
+			} else if f.Alias != nil {
+				ident = f.Alias.Field
+			} else {
+				return c.errf(f, "label reference has no alias")
+			}
+
+			_ = c.lookupAlias(k, ident) // mark as used
 			// The expression of field Label is always done in the same
 			// Environment as pointed to by the UpCount of the DynamicReference
 			// and the evaluation of a DynamicReference assumes this.
@@ -537,21 +551,36 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 			X:       entry.expr, // TODO: remove usage
 		}
 
-	// TODO: handle new-style aliases
-
+	// Handle new-style postfix aliases: a~X or a~(K,V)
 	case *ast.Field:
-		// X=x: y
-		// X=(x): y
-		// X="\(x)": y
-		a, ok := f.Label.(*ast.Alias)
-		if !ok {
+		var ident *ast.Ident
+		lab := f.Label
+		// Old-style label aliases: X=x: y, X=(x): y, X="\(x)":
+
+		if a, ok := f.Label.(*ast.Alias); ok {
+			ident = a.Ident
+			if f.Alias != nil {
+				return c.errf(f, "field has both label alias and postfix alias")
+			}
+			label, ok := a.Expr.(ast.Label)
+			if !ok {
+				return c.errf(a.Expr, "invalid label expression")
+			}
+			lab = label
+		} else if f.Alias != nil {
+			// Check if this identifier refers to the Field alias or Label alias
+			// The Field alias (X or V) is the value reference
+			// The Label alias (K) in dual form is a string reference
+			if f.Alias.Field == nil {
+				return c.errf(f, "postfix alias must have field component")
+			}
+			ident = f.Alias.Field
+		} else {
 			return c.errf(n, "illegal reference %s", n.Name)
 		}
-		aliasInfo := c.lookupAlias(k, a.Ident) // marks alias as used.
-		lab, ok := a.Expr.(ast.Label)
-		if !ok {
-			return c.errf(a.Expr, "invalid label expression")
-		}
+
+		aliasInfo := c.lookupAlias(k, ident) // marks alias as used.
+
 		name, _, err := ast.LabelName(lab)
 		switch {
 		case errors.Is(err, ast.ErrIsExpression):
@@ -596,6 +625,10 @@ func (c *compiler) addDecls(st *adt.StructLit, a []ast.Decl) {
 	}
 }
 
+func isNonBlank(a *ast.Ident) bool {
+	return a != nil && a.Name != "_"
+}
+
 func (c *compiler) markAlias(d ast.Decl) {
 	switch x := d.(type) {
 	case *ast.Field:
@@ -608,6 +641,15 @@ func (c *compiler) markAlias(d ast.Decl) {
 			e := aliasEntry{source: a}
 
 			c.insertAlias(a.Ident, e)
+		}
+
+		// Register postfix aliases for regular fields (not pattern constraints)
+		// Pattern constraints register aliases in value scope only
+		// Regular field: register in parent scope
+		// Store the Field in the label so we can find it later
+		// Skip _ (blank identifier)
+		if a := x.Alias; a != nil && isNonBlank(a.Field) {
+			c.insertAlias(a.Field, aliasEntry{source: a})
 		}
 
 	case *ast.LetClause:
@@ -639,6 +681,8 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 
 		v := x.Value
 		var value adt.Expr
+
+		// Handle value aliases. Deprecated in new aliases.
 		if a, ok := v.(*ast.Alias); ok {
 			c.pushScope(nil, 0, a)
 			c.insertAlias(a.Ident, aliasEntry{source: a})
@@ -675,6 +719,12 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 			if a, ok := elem.(*ast.Alias); ok {
 				label = c.label(a.Ident)
 				elem = a.Expr
+			}
+
+			// For postfix aliases, use the Field identifier (X or V)
+			// For dual form ~(K,V), we use V as the primary label
+			if a := x.Alias; a != nil && isNonBlank(a.Label) {
+				label = c.label(a.Label)
 			}
 
 			return &adt.BulkOptionalField{
@@ -726,8 +776,6 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 			Value:   value,
 		}
 
-	// case: *ast.Alias: // TODO(value alias)
-
 	case *ast.CommentGroup:
 		// Nothing to do for a free-floating comment group.
 
@@ -760,19 +808,31 @@ func (c *compiler) addLetDecl(d ast.Decl) {
 	switch x := d.(type) {
 	case *ast.Field:
 		lab := x.Label
+		var ident *ast.Ident
 		if a, ok := lab.(*ast.Alias); ok {
+			if x.Alias != nil {
+				c.errf(x, "field has both label alias and postfix alias")
+				return
+			}
+
 			if lab, ok = a.Expr.(ast.Label); !ok {
 				// error reported elsewhere
 				return
 			}
+			ident = a.Ident
 
-			switch lab.(type) {
-			case *ast.Ident, *ast.BasicLit, *ast.ListLit:
-				// Even though we won't need the alias, we still register it
-				// for duplicate and failed reference detection.
-			default:
-				c.updateAlias(a.Ident, c.expr(a.Expr))
-			}
+		} else if a := x.Alias; a != nil && isNonBlank(a.Field) {
+			ident = x.Alias.Field
+		} else {
+			break
+		}
+
+		switch lab.(type) {
+		case *ast.Ident, *ast.BasicLit, *ast.ListLit:
+			// Even though we won't need the alias, we still register it
+			// for duplicate and failed reference detection.
+		default:
+			c.updateAlias(ident, c.expr(lab.(ast.Expr)))
 		}
 
 	case *ast.Alias:

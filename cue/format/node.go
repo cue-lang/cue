@@ -328,7 +328,30 @@ func (f *formatter) decl(decl ast.Decl) {
 
 	switch n := decl.(type) {
 	case *ast.Field:
-		f.label(n.Label, n.Constraint)
+		// Format label without constraint (we'll add constraint after alias)
+		f.label(n.Label, token.ILLEGAL)
+
+		// Format postfix alias if present
+		if a := n.Alias; a != nil {
+			f.print(a.Tilde, token.TILDE, noblank)
+			if a.Label != nil {
+				// Dual form: ~(K,V)
+				// Assumes that ILLEGAL tokens are no-ops.
+				f.print(a.Lparen, token.LPAREN, noblank)
+				f.expr(a.Label)
+				f.print(a.Comma, token.COMMA, noblank)
+				f.expr(a.Field)
+				f.print(a.Rparen, token.RPAREN, noblank)
+			} else {
+				// Simple form: ~X
+				f.expr(a.Field)
+			}
+		}
+
+		// Format constraint marker (?, !) if present
+		if n.Constraint != token.ILLEGAL {
+			f.print(n.Constraint)
+		}
 
 		f.print(noblank, nooverride, n.TokenPos, token.COLON)
 		f.visitComments(f.current.pos)

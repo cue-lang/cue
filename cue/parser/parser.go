@@ -887,6 +887,9 @@ func (p *parser) parseField() (decl ast.Decl) {
 		return e
 	}
 
+	// Parse postfix alias if present
+	m.Alias = p.parsePostfixAlias()
+
 	switch p.tok {
 	case token.OPTION, token.NOT:
 		m.Optional = p.pos
@@ -942,7 +945,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 		}
 
 		label, expr, _, ok := p.parseLabel(true)
-		if !ok || (p.tok != token.COLON && p.tok != token.OPTION && p.tok != token.NOT) {
+		if !ok || (p.tok != token.COLON && p.tok != token.OPTION && p.tok != token.NOT && p.tok != token.TILDE) {
 			if expr == nil {
 				expr = p.parseRHS()
 			}
@@ -952,6 +955,9 @@ func (p *parser) parseField() (decl ast.Decl) {
 		field := &ast.Field{Label: label}
 		m.Value = &ast.StructLit{Elts: []ast.Decl{field}}
 		m = field
+
+		// Parse postfix alias if present
+		m.Alias = p.parsePostfixAlias()
 
 		switch p.tok {
 		case token.OPTION, token.NOT:
@@ -1369,6 +1375,15 @@ func (p *parser) parseAlias(lhs ast.Expr) (expr ast.Expr) {
 		return lhs
 	}
 	pos := p.pos
+
+	// Check if old-style aliases are disallowed
+	if p.experiments != nil && p.experiments.AliasAndSelf {
+		p.errf(pos, "old-style alias syntax (=) is not allowed with @experiment(aliasandself); use postfix syntax (~X or ~(K,V))")
+		p.next()
+		expr = p.parseRHS()
+		return expr
+	}
+
 	p.next()
 	expr = p.parseRHS()
 	if expr == nil {
@@ -1381,6 +1396,88 @@ func (p *parser) parseAlias(lhs ast.Expr) (expr ast.Expr) {
 	}
 	p.errf(p.pos, "expected identifier for alias")
 	return expr
+}
+
+// parsePostfixAlias parses the postfix alias syntax: ~X or ~(K,V)
+// Returns nil if no alias is present.
+func (p *parser) parsePostfixAlias() *ast.PostfixAlias {
+	if p.tok != token.TILDE {
+		return nil
+	}
+
+	pos := p.pos
+
+	// Check if postfix alias syntax requires experiment
+	if p.experiments == nil || !p.experiments.AliasAndSelf {
+		p.errf(pos, "postfix alias syntax requires @experiment(aliasandself)")
+	}
+
+	p.next()
+
+	switch p.tok {
+	case token.LPAREN:
+		// Dual form: ~(K,V)
+		lparen := p.pos
+		p.next()
+
+		if p.tok != token.IDENT {
+			p.errorExpected(p.pos, "identifier for label alias")
+			return nil
+		}
+		k := p.parseIdent()
+
+		comma := p.pos
+		if p.tok != token.COMMA {
+			p.errorExpected(p.pos, "','")
+			// Recovery: treat as simple form with just K
+			return &ast.PostfixAlias{
+				Tilde: pos,
+				Field: k,
+			}
+		}
+		p.next()
+
+		if p.tok != token.IDENT {
+			p.errorExpected(p.pos, "identifier for field alias")
+			// Recovery: return what we have
+			return &ast.PostfixAlias{
+				Tilde:  pos,
+				Lparen: lparen,
+				Label:  k,
+				Comma:  comma,
+				Field:  k, // Use K as field too for recovery
+			}
+		}
+		v := p.parseIdent()
+
+		rparen := p.pos
+		if p.tok != token.RPAREN {
+			p.errorExpected(p.pos, "')'")
+		} else {
+			p.next()
+		}
+
+		return &ast.PostfixAlias{
+			Tilde:  pos,
+			Lparen: lparen,
+			Label:  k,
+			Comma:  comma,
+			Field:  v,
+			Rparen: rparen,
+		}
+
+	case token.IDENT:
+		// Simple form: ~X
+		ident := p.parseIdent()
+		return &ast.PostfixAlias{
+			Tilde: pos,
+			Field: ident,
+		}
+
+	default:
+		p.errorExpected(p.pos, "identifier or '('")
+		return nil
+	}
 }
 
 // checkExpr checks that x is an expression (and not a type).

@@ -123,6 +123,7 @@ disjList: ok4: {
 	#A: [#A] | string
 }
 
+-- old.cue --
 name: "foo"
 dynamicSelf: ok1: {
 	X=(name): string | X
@@ -266,11 +267,14 @@ issue1729: t2: {
 	#x: { #x | {} }
 }
 
+-- selfnew.cue --
+@experiment(aliasandself)
+
 issue4125: t1_self: {
 	let Root = self
 	a: Root.a
 }
-
+-- selfold.cue --
 issue4125: t2_alias: X={
 	let Y = X
 	b: Y.b
@@ -284,7 +288,7 @@ Allocs: 64
 Retain: 0
 
 Unifications: 219
-Conjuncts:    432
+Conjuncts:    435
 Disjuncts:    100
 
 NumCloseIDs: 86
@@ -309,7 +313,7 @@ diff old new
 +Retain: 0
 +
 +Unifications: 219
-+Conjuncts:    432
++Conjuncts:    435
 +Disjuncts:    100
 +
 +NumCloseIDs: 86
@@ -1358,6 +1362,9 @@ Result:
       ]|string)
     }
   }
+}
+--- old.cue
+{
   name: "foo"
   dynamicSelf: {
     ok1: {
@@ -1624,12 +1631,18 @@ Result:
       }
     }
   }
+}
+--- selfnew.cue
+{
   issue4125: {
     t1_self: {
       let Root#1 = 〈1〉
       a: 〈0;let Root#1〉.a
     }
   }
+}
+--- selfold.cue
+{
   issue4125: {
     t2_alias: {
       let Y#2 = 〈1〉

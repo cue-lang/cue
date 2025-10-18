@@ -301,7 +301,8 @@ func (a *Attribute) Split() (key, body string) {
 type Field struct {
 	// TODO(mvdan): remove the deprecated fields below in early 2026.
 
-	Label Label // must have at least one element.
+	Label Label         // must have at least one element.
+	Alias *PostfixAlias // optional postfix alias (nil if no alias)
 	// Deprecated: use [Field.Constraint]
 	Optional   token.Pos
 	Constraint token.Token // token.ILLEGAL, token.OPTION, or token.NOT
@@ -347,6 +348,35 @@ type Alias struct {
 func (a *Alias) Pos() token.Pos  { return a.Ident.Pos() }
 func (a *Alias) pos() *token.Pos { return a.Ident.pos() }
 func (a *Alias) End() token.Pos  { return a.Expr.End() }
+
+// A PostfixAlias represents the new postfix alias syntax using ~.
+// It appears in field declarations after the label.
+//
+// Simple form: label~X where X captures the field reference
+// Dual form: label~(K,V) where K captures the label name string and V captures the field reference
+type PostfixAlias struct {
+	Tilde token.Pos // position of "~"
+
+	// Dual form: ~(K,V)
+	Lparen token.Pos // position of "(" (invalid if simple form)
+	Label  *Ident    // K: label name capture (nil if simple form)
+	Comma  token.Pos // position of "," (invalid if simple form)
+	Rparen token.Pos // position of ")" (invalid if simple form)
+
+	// Both forms: the field reference (always non-nil)
+	Field *Ident // X or V: captures the field reference
+
+	comments
+}
+
+func (a *PostfixAlias) Pos() token.Pos  { return a.Tilde }
+func (a *PostfixAlias) pos() *token.Pos { return &a.Tilde }
+func (a *PostfixAlias) End() token.Pos {
+	if a.Rparen.IsValid() {
+		return a.Rparen.Add(1)
+	}
+	return a.Field.End()
+}
 
 // A Comprehension node represents a comprehension declaration.
 type Comprehension struct {

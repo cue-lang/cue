@@ -57,22 +57,23 @@ func _() {
 	_ = x[SEMICOLON-46]
 	_ = x[COLON-47]
 	_ = x[OPTION-48]
-	_ = x[operatorEnd-49]
-	_ = x[keywordBeg-50]
-	_ = x[IF-51]
-	_ = x[FOR-52]
-	_ = x[IN-53]
-	_ = x[LET-54]
-	_ = x[FUNC-55]
-	_ = x[TRUE-56]
-	_ = x[FALSE-57]
-	_ = x[NULL-58]
-	_ = x[keywordEnd-59]
+	_ = x[TILDE-49]
+	_ = x[operatorEnd-50]
+	_ = x[keywordBeg-51]
+	_ = x[IF-52]
+	_ = x[FOR-53]
+	_ = x[IN-54]
+	_ = x[LET-55]
+	_ = x[FUNC-56]
+	_ = x[TRUE-57]
+	_ = x[FALSE-58]
+	_ = x[NULL-59]
+	_ = x[keywordEnd-60]
 }
 
-const _Token_name = "ILLEGALEOFCOMMENTATTRIBUTEliteralBegIDENTINTFLOATSTRINGINTERPOLATION_|_literalEndoperatorBeg+-*^/quoremdivmod&|&&||===<>!<-!=<=>==~!~([{,....)]};:?operatorEndkeywordBegifforinletfunctruefalsenullkeywordEnd"
+const _Token_name = "ILLEGALEOFCOMMENTATTRIBUTEliteralBegIDENTINTFLOATSTRINGINTERPOLATION_|_literalEndoperatorBeg+-*^/quoremdivmod&|&&||===<>!<-!=<=>==~!~([{,....)]};:?~operatorEndkeywordBegifforinletfunctruefalsenullkeywordEnd"
 
-var _Token_index = [...]uint8{0, 7, 10, 17, 26, 36, 41, 44, 49, 55, 68, 71, 81, 92, 93, 94, 95, 96, 97, 100, 103, 106, 109, 110, 111, 113, 115, 116, 118, 119, 120, 121, 123, 125, 127, 129, 131, 133, 134, 135, 136, 137, 138, 141, 142, 143, 144, 145, 146, 147, 158, 168, 170, 173, 175, 178, 182, 186, 191, 195, 205}
+var _Token_index = [...]uint8{0, 7, 10, 17, 26, 36, 41, 44, 49, 55, 68, 71, 81, 92, 93, 94, 95, 96, 97, 100, 103, 106, 109, 110, 111, 113, 115, 116, 118, 119, 120, 121, 123, 125, 127, 129, 131, 133, 134, 135, 136, 137, 138, 141, 142, 143, 144, 145, 146, 147, 148, 159, 169, 171, 174, 176, 179, 183, 187, 192, 196, 206}
 
 func (i Token) String() string {
 	if i < 0 || i >= Token(len(_Token_index)-1) {

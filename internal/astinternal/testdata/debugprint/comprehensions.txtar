@@ -27,6 +27,7 @@ for k, v in input if v > 2 {
 							NamePos: token.Pos("comprehensions.cue:2:2", newline)
 							Name: "a"
 						}
+						Alias: nil
 						Optional: token.Pos("-")
 						Constraint: token.Token("ILLEGAL")
 						TokenPos: token.Pos("comprehensions.cue:2:3", nospace)
@@ -92,6 +93,7 @@ for k, v in input if v > 2 {
 							}
 							Rparen: token.Pos("comprehensions.cue:5:4", nospace)
 						}
+						Alias: nil
 						Optional: token.Pos("-")
 						Constraint: token.Token("ILLEGAL")
 						TokenPos: token.Pos("comprehensions.cue:5:5", nospace)

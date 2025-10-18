@@ -10,6 +10,7 @@ disjunctoin: b | c | *d
 				NamePos: token.Pos("unify.txtar:1:1", nospace)
 				Name: "unification"
 			}
+			Alias: nil
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("unify.txtar:1:12", nospace)
@@ -41,6 +42,7 @@ disjunctoin: b | c | *d
 				NamePos: token.Pos("unify.txtar:2:1", newline)
 				Name: "disjunctoin"
 			}
+			Alias: nil
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("unify.txtar:2:12", nospace)

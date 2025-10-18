@@ -840,6 +840,8 @@ scanAgain:
 		case '?':
 			tok = token.OPTION
 			insertEOL = true
+		case '~':
+			tok = token.TILDE
 		case '.':
 			if '0' <= s.ch && s.ch <= '9' {
 				insertEOL = true

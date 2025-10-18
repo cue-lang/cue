@@ -19,6 +19,7 @@ embed: {
 				NamePos: token.Pos("fields.cue:1:1", nospace)
 				Name: "a"
 			}
+			Alias: nil
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:1:2", nospace)
@@ -40,6 +41,7 @@ embed: {
 				NamePos: token.Pos("fields.cue:2:1", newline)
 				Name: "b"
 			}
+			Alias: nil
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:2:2", nospace)
@@ -65,6 +67,7 @@ embed: {
 				NamePos: token.Pos("fields.cue:3:1", newline)
 				Name: "c"
 			}
+			Alias: nil
 			Optional: token.Pos("fields.cue:3:2", nospace)
 			Constraint: token.Token("!")
 			TokenPos: token.Pos("fields.cue:3:3", nospace)
@@ -77,6 +80,7 @@ embed: {
 							NamePos: token.Pos("fields.cue:3:5", blank)
 							Name: "d"
 						}
+						Alias: nil
 						Optional: token.Pos("fields.cue:3:6", nospace)
 						Constraint: token.Token("?")
 						TokenPos: token.Pos("fields.cue:3:7", nospace)
@@ -104,6 +108,7 @@ embed: {
 					Name: "e"
 				}
 			}
+			Alias: nil
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:4:4", nospace)
@@ -129,6 +134,7 @@ embed: {
 							}
 							Rbrack: token.Pos("fields.cue:4:15", nospace)
 						}
+						Alias: nil
 						Optional: token.Pos("-")
 						Constraint: token.Token("ILLEGAL")
 						TokenPos: token.Pos("fields.cue:4:16", nospace)
@@ -149,6 +155,7 @@ embed: {
 				NamePos: token.Pos("fields.cue:5:1", newline)
 				Name: "#Schema"
 			}
+			Alias: nil
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:5:8", nospace)
@@ -161,6 +168,7 @@ embed: {
 							NamePos: token.Pos("fields.cue:6:2", newline)
 							Name: "name"
 						}
+						Alias: nil
 						Optional: token.Pos("-")
 						Constraint: token.Token("ILLEGAL")
 						TokenPos: token.Pos("fields.cue:6:6", nospace)
@@ -185,6 +193,7 @@ embed: {
 				NamePos: token.Pos("fields.cue:9:1", newline)
 				Name: "embed"
 			}
+			Alias: nil
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:9:6", nospace)

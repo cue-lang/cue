@@ -20,6 +20,7 @@ b: 3
 				NamePos: token.Pos("file.cue:3:1", section)
 				Name: "a"
 			}
+			Alias: nil
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("file.cue:3:2", nospace)
@@ -36,6 +37,7 @@ b: 3
 				NamePos: token.Pos("file.cue:4:1", newline)
 				Name: "b"
 			}
+			Alias: nil
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("file.cue:4:2", nospace)

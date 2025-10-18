@@ -95,6 +95,7 @@ const (
 	SEMICOLON // ;
 	COLON     // :
 	OPTION    // ?
+	TILDE     // ~
 	operatorEnd
 
 	keywordBeg

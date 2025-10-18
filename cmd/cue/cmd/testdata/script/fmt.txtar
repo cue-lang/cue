@@ -18,7 +18,7 @@ a: 2
 bb: 3
 -- fmt/cue.mod/module.cue --
 -- issue1744/invalid.cue --
-~
+%
 -- issue1744/stderr-golden --
-illegal character U+007E '~':
+illegal character U+0025 '%':
     ./issue1744/invalid.cue:1:1

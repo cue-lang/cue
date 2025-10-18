@@ -333,7 +333,7 @@ func checkComma(t *testing.T, line string, mode Mode) {
 			// the illegal token literal indicates what
 			// kind of semicolon literal to expect
 			commaLit := "\n"
-			if lit[0] == '~' {
+			if lit[0] == '%' {
 				commaLit = ","
 			}
 			// next token must be a comma
@@ -357,11 +357,11 @@ func checkComma(t *testing.T, line string, mode Mode) {
 }
 
 var lines = []string{
-	// ~ indicates a comma present in the source
+	// % indicates a comma present in the source
 	// ^ indicates an automatically inserted comma
 	"",
-	"\ufeff~,", // first BOM is ignored
-	"~,",
+	"\ufeff%,", // first BOM is ignored
+	"%,",
 	"foo^\n",
 	"_foo^\n",
 	"123^\n",
@@ -412,7 +412,7 @@ var lines = []string{
 	"[[\n",
 	"{\n",
 	"{{\n",
-	"~,\n",
+	"%,\n",
 	".\n",
 
 	")^\n",
@@ -590,14 +590,14 @@ func TestScanInterpolation(t *testing.T) {
 }
 
 func TestStdErrorHander(t *testing.T) {
-	const src = "~\n" + // illegal character, cause an error
-		"~ ~\n" + // two errors on the same line
+	const src = "%\n" + // illegal character, cause an error
+		"% %\n" + // two errors on the same line
 		"//line File2:20\n" +
-		"~\n" + // different file, but same line
+		"%\n" + // different file, but same line
 		"//line File2:1\n" +
-		"~ ~\n" + // same file, decreasing line number
+		"% %\n" + // same file, decreasing line number
 		"//line File1:1\n" +
-		"~ ~ ~" // original file, line 1 again
+		"% % %" // original file, line 1 again
 
 	var list errors.Error
 	eh := func(pos token.Pos, msg string, args []interface{}) {

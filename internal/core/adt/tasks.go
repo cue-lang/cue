@@ -186,7 +186,20 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 	// unevaluated.
 	ci := t.id
 
-	c := MakeConjunct(t.env, field, ci)
+	// TODO: consider using a different mechanism where we do not have to
+	// copy the environment every time. If we do not have an alternative,
+	// we could use the same technique in pattern constraints to at least
+	// not have to copy it in most cases.
+	env := t.env
+	if x := field.Src; x != nil && x.Alias != nil && x.Alias.Label != nil {
+		e := *(t.env)
+		if f.Index() < MaxIndex {
+			e.DynamicLabel = f
+		}
+		env = &e
+	}
+
+	c := MakeConjunct(env, field, ci)
 	n.insertArc(f, field.ArcType, c, ci, true)
 }
 

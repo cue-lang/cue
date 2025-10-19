@@ -64,10 +64,12 @@ type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 //   X in [X=x]: y        Field          Expr (x)
 //   X in X=[x]: y        Field          Field
 //
-//   V in foo~(K,V): v    Field          Field
-//   K in foo~(K,V): v    Field          Field
+//   V in foo~(K,V): v    File/Struct    Field
+//   K in foo~(K,V): v    Field          Expr "foo"
 //   V in [x]~(K,V): y    Field          Field
 //   K in [x]~(K,V): y    Field          Expr (x)
+//   V in (x)~(K,V): y    File/Struct    Field
+//   K in (x)~(K,V): y    Field          Expr (x)
 //
 // for k, v in            ForClause      Ident
 // let x = y              LetClause      Ident
@@ -109,8 +111,9 @@ type scope struct {
 }
 
 type entry struct {
-	node ast.Node
-	link ast.Node // Alias, LetClause, or Field
+	node  ast.Node
+	link  ast.Node   // Alias, LetClause, or Field
+	field *ast.Field // Used for LabelAliases
 }
 
 func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope {
@@ -132,7 +135,7 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 			if a, ok := x.Label.(*ast.Alias); ok {
 				name := a.Ident.Name
 				if _, ok := a.Expr.(*ast.ListLit); !ok {
-					s.insert(name, x, a)
+					s.insert(name, x, a, nil)
 				}
 				if x.Alias != nil {
 					// Error: cannot have both old-style label alias and postfix
@@ -154,22 +157,22 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 				if a, ok := v.(*ast.Alias); ok {
 					v = a.Expr
 				}
-				s.insert(name, v, x)
+				s.insert(name, v, x, nil)
 			}
 		case *ast.LetClause:
 			name, isIdent, _ := ast.LabelName(x.Ident)
 			if isIdent {
-				s.insert(name, x, x)
+				s.insert(name, x, x, nil)
 			}
 		case *ast.Alias:
 			name, isIdent, _ := ast.LabelName(x.Ident)
 			if isIdent {
-				s.insert(name, x, x)
+				s.insert(name, x, x, nil)
 			}
 		case *ast.ImportDecl:
 			for _, spec := range x.Specs {
 				info, _ := ParseImportSpec(spec)
-				s.insert(info.Ident, spec, spec)
+				s.insert(info.Ident, spec, spec, nil)
 			}
 		}
 	}
@@ -200,7 +203,7 @@ func (s *scope) mustBeUnique(n ast.Node) bool {
 	return false
 }
 
-func (s *scope) insert(name string, n, link ast.Node) {
+func (s *scope) insert(name string, n, link ast.Node, f *ast.Field) {
 	if name == "" {
 		return
 	}
@@ -231,7 +234,7 @@ func (s *scope) insert(name string, n, link ast.Node) {
 			// s.errFn(n.Pos(), "alias %q already declared in enclosing scope", name)
 		}
 	}
-	s.index[name] = entry{node: n, link: link}
+	s.index[name] = entry{node: n, link: link, field: f}
 }
 
 func (s *scope) resolveScope(name string, node ast.Node) (scope ast.Node, e entry, ok bool) {
@@ -259,44 +262,18 @@ func (s *scope) lookup(name string) (p *scope, obj ast.Node, node entry) {
 			if _, ok := n.node.(*ast.ImportSpec); ok {
 				return s, nil, n
 			}
-			return s, s.node, n
+			obj := s.node
+			if n.field != nil {
+				// Label alias case.
+				obj = n.field
+			}
+			return s, obj, n
 		}
 		// s, last = s.outer, s
 		s = s.outer
 	}
 	return nil, nil, entry{}
 }
-
-// func insertPostfixAliases(s *scope, x *ast.Field) {
-// 	a := x.Alias
-// 	if a == nil {
-// 		return
-// 	}
-// 	hasField := a.Field != nil && a.Field.Name != "_"
-// 	hasLabel := a.Label != nil && a.Label.Name != "_"
-
-// 	if a.Label == nil {
-// 		// Single form: ~X
-// 		switch {
-// 		case !hasField:
-// 			s.errFn(a.Pos(),
-// 				"single postfix alias %q must have valid identifier", a.Label.Name)
-// 		default:
-// 			s.insert(a.Field.Name, x, a)
-// 		}
-// 	} else {
-// 		// Double form: ~(X,Y)
-// 		switch {
-// 		case !hasField && !hasLabel:
-// 			s.errFn(a.Pos(),
-// 				"both label and field in postfix alias cannot be the blank identifier")
-// 		case hasField:
-// 			s.insert(a.Field.Name, x, a)
-// 		case hasLabel:
-// 			s.insert(a.Label.Name, a.Label, a)
-// 		}
-// 	}
-// }
 
 func insertPostfixAliases(s *scope, x *ast.Field) {
 	a := x.Alias
@@ -311,7 +288,7 @@ func insertPostfixAliases(s *scope, x *ast.Field) {
 			s.errFn(a.Pos(),
 				"single postfix alias %q field cannot be the blank identifier", a.Label.Name)
 		} else {
-			s.insert(a.Field.Name, x, a)
+			s.insert(a.Field.Name, x, a, nil)
 		}
 		return
 	}
@@ -324,10 +301,10 @@ func insertPostfixAliases(s *scope, x *ast.Field) {
 		return
 	}
 	if hasLabel {
-		s.insert(a.Label.Name, a.Label, a)
+		s.insert(a.Label.Name, a.Label, a, x)
 	}
 	if hasField {
-		s.insert(a.Field.Name, x, a)
+		s.insert(a.Field.Name, x, a, nil)
 	}
 }
 
@@ -374,7 +351,7 @@ func (s *scope) Before(n ast.Node) bool {
 			s = newScope(s.file, s, x, nil)
 			if alias != nil {
 				if name, _, _ := ast.LabelName(alias.Ident); name != "" {
-					s.insert(name, x, alias)
+					s.insert(name, x, alias, nil)
 				}
 			}
 
@@ -395,7 +372,7 @@ func (s *scope) Before(n ast.Node) bool {
 				// illegal name clashes, and it allows giving better error
 				// messages. This puts the burden on clients of this library
 				// to detect illegal usage, though.
-				s.insert(a.Ident.Name, a.Expr, a)
+				s.insert(a.Ident.Name, a.Expr, a, x)
 			} else if a := x.Alias; a != nil {
 				insertPostfixAliases(s, x)
 			}
@@ -419,7 +396,7 @@ func (s *scope) Before(n ast.Node) bool {
 				// TODO: this should move into Before once decl attributes
 				// have been fully deprecated and embed attributes are introduced.
 				s = newScope(s.file, s, x, nil)
-				s.insert(alias.Ident.Name, alias, x)
+				s.insert(alias.Ident.Name, alias, x, nil)
 				n = alias.Expr
 			}
 			s.inField = true
@@ -507,14 +484,14 @@ func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 			ast.Walk(x.Source, s.Before, nil)
 			s = newScope(s.file, s, x, nil)
 			if x.Key != nil {
-				s.insert(x.Key.Name, x.Key, x)
+				s.insert(x.Key.Name, x.Key, x, nil)
 			}
-			s.insert(x.Value.Name, x.Value, x)
+			s.insert(x.Value.Name, x.Value, x, nil)
 
 		case *ast.LetClause:
 			ast.Walk(x.Expr, s.Before, nil)
 			s = newScope(s.file, s, x, nil)
-			s.insert(x.Ident.Name, x.Ident, x)
+			s.insert(x.Ident.Name, x.Ident, x, nil)
 
 		default:
 			ast.Walk(c, s.Before, nil)

@@ -209,7 +209,7 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 
 		_ = z.addImport(spec)
 		info, _ := ParseImportSpec(spec)
-		z.fileScope.insert(info.Ident, spec, spec)
+		z.fileScope.insert(info.Ident, spec, spec, nil)
 		return true
 	}
 
@@ -239,7 +239,7 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 				Path: x.Path,
 			})
 			z.importMap[xi.ID] = spec
-			z.fileScope.insert(name, spec, spec)
+			z.fileScope.insert(name, spec, spec, nil)
 		}
 
 		info, _ := ParseImportSpec(spec)

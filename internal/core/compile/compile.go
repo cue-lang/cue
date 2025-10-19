@@ -21,6 +21,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cueexperiment"
@@ -469,19 +470,32 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 			UpCount: upCount,
 		}
 
-		switch f := n.Node.(type) {
+		switch x := n.Node.(type) {
+		case *ast.Ident:
+			// If the identifier refers to a label alias, we link to that.
+			if f.Alias != nil && f.Alias.Label == x {
+				switch lab := f.Label.(type) {
+				case *ast.Ident:
+					if internal.IsDefOrHidden(lab.Name) {
+						return c.errf(x, "label alias cannot reference definition or hidden field")
+					}
+					return c.expr(ast.NewString(lab.Name))
+				case *ast.BasicLit:
+					return c.expr(lab)
+				}
+			}
 		case *ast.Field:
 			var ident *ast.Ident
-			if alias, _ := f.Label.(*ast.Alias); alias != nil {
-				if f.Alias != nil {
-					return c.errf(f,
+			if alias, _ := x.Label.(*ast.Alias); alias != nil {
+				if x.Alias != nil {
+					return c.errf(x,
 						"field has both label alias and postfix alias")
 				}
 				ident = alias.Ident
-			} else if f.Alias != nil {
-				ident = f.Alias.Field
+			} else if x.Alias != nil {
+				ident = x.Alias.Field
 			} else {
-				return c.errf(f, "label reference has no alias")
+				return c.errf(x, "label reference has no alias")
 			}
 
 			_ = c.lookupAlias(k, ident) // mark as used
@@ -497,11 +511,11 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 			}
 
 		case *ast.Alias:
-			_ = c.lookupAlias(k, f.Ident) // mark as used
+			_ = c.lookupAlias(k, x.Ident) // mark as used
 			return &adt.ValueReference{
 				Src:     n,
 				UpCount: upCount,
-				Label:   c.label(f.Ident),
+				Label:   c.label(x.Ident),
 			}
 		}
 		return label

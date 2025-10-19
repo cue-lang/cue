@@ -185,20 +185,14 @@ usedef: X21.field
   }
   b1: (int){ 3 }
   a2: (struct){
-    name: (_|_){
-      // [incomplete] a2.name: undefined field: K2:
-      //     ./in.cue:11:8
-    }
+    name: (string){ "a2" }
     val: (int){ 42 }
     foo: (int){ 42 }
   }
   a3: (struct){
     foo: (int){ 1 }
   }
-  b3: (_|_){
-    // [incomplete] b3: undefined field: K3:
-    //     ./in.cue:20:5
-  }
+  b3: (string){ "a3" }
   a4: (struct){
     foo: (int){ 1 }
   }
@@ -206,10 +200,7 @@ usedef: X21.field
   b5: (int){ 11 }
   dyn2: (struct){
     foo: (int){ 100 }
-    name: (_|_){
-      // [incomplete] dyn2.name: undefined field: K6:
-      //     ./in.cue:36:8
-    }
+    name: (string){ "dyn2" }
     val: (int){ 100 }
   }
   pattern: (struct){
@@ -344,7 +335,7 @@ usedef: X21.field
   }
   b1: (〈0;a1〉.foo + 2)
   a2: {
-    name: 〈1;K2〉
+    name: "a2"
     val: 〈1;a2〉.foo
   }
   a2: {
@@ -353,7 +344,7 @@ usedef: X21.field
   a3: {
     foo: 1
   }
-  b3: 〈0;K3〉
+  b3: "a3"
   a4: {
     foo: 1
   }
@@ -363,7 +354,7 @@ usedef: X21.field
   }
   b5: (〈0;("dyn")〉.foo + 10)
   "dyn2": {
-    name: 〈1;K6〉
+    name: 〈1;-〉
     val: 〈1;("dyn2")〉.foo
   }
   dyn2: {

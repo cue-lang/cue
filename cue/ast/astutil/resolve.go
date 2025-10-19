@@ -145,7 +145,9 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 				}
 			}
 			if _, isPattern := label.(*ast.ListLit); !isPattern {
-				insertPostfixAliases(s, x)
+				if a := x.Alias; a != nil {
+					insertPostfixAliases(s, x, a.Label)
+				}
 			}
 
 			// TODO(perf): replace labelName with quick tests: this generates an
@@ -275,7 +277,7 @@ func (s *scope) lookup(name string) (p *scope, obj ast.Node, node entry) {
 	return nil, nil, entry{}
 }
 
-func insertPostfixAliases(s *scope, x *ast.Field) {
+func insertPostfixAliases(s *scope, x *ast.Field, expr ast.Node) {
 	a := x.Alias
 	if a == nil {
 		return
@@ -301,7 +303,7 @@ func insertPostfixAliases(s *scope, x *ast.Field) {
 		return
 	}
 	if hasLabel {
-		s.insert(a.Label.Name, a.Label, a, x)
+		s.insert(a.Label.Name, expr, a, x)
 	}
 	if hasField {
 		s.insert(a.Field.Name, x, a, nil)
@@ -373,8 +375,8 @@ func (s *scope) Before(n ast.Node) bool {
 				// messages. This puts the burden on clients of this library
 				// to detect illegal usage, though.
 				s.insert(a.Ident.Name, a.Expr, a, x)
-			} else if a := x.Alias; a != nil {
-				insertPostfixAliases(s, x)
+			} else {
+				insertPostfixAliases(s, x, expr)
 			}
 
 			ast.Walk(expr, nil, func(n ast.Node) {

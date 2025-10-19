@@ -1,0 +1,280 @@
+
+#exp:aliasandself
+
+-- cue.mod/module.cue --
+module: "test.example"
+
+language: version: "v0.15.0"
+
+-- a.cue --
+package foo
+
+// Simple field alias
+X=a: {
+	foo: 1
+	bar: X.foo + 2
+}
+
+// Multiple aliases
+Y=b: {
+	data: 42
+}
+Z=c: {
+	val: Y.data
+}
+-- b.cue --
+package foo
+
+// Nested aliases
+outer: {
+	Inner=middle: {
+		Leaf=deep: {
+			value: 1
+		}
+		ref: Leaf.value
+	}
+	ref2: Inner.Leaf.value
+}
+-- c.cue --
+package foo
+
+// With constraints
+OptField=a?: {
+	value: 1
+}
+
+ReqField=b!: {
+	value: 2
+}
+-- d.cue --
+// Already has postfix alias experiment, so do not do any changes.
+@experiment(aliasandself)
+
+package foo
+
+a~X: {
+	foo: 1
+}
+-- e.cue --
+package foo
+
+// Pattern constraints with old alias syntax
+// Note: Old syntax does not support pattern constraint aliases
+// This is just testing that regular fields work correctly
+schema: {
+	[Name=string]: {
+		name: Name
+	}
+	Y=[Name=string]: {
+		name: Name
+		value: Y.name
+	}
+}
+-- f.cue --
+package foo
+
+// Dynamic fields with old alias syntax
+DynAlias=(x): {
+	field: 1
+	ref: DynAlias.field
+}
+
+// Dynamic field with string literal
+StrAlias=("foo"): {
+	data: 2
+	ref: StrAlias.data
+}
+
+// Dynamic field with interpolation
+DynInterpAlias=("\(name)"): {
+	val: 3
+	ref: InterpAlias.val
+}
+// Just the interpolation
+InterpAlias="\(name)": {
+	val: 3
+	ref: InterpAlias.val
+}
+-- g.cue --
+package foo
+
+// Value aliases - old syntax X={...}
+// Should convert to let with self
+foo: X={
+	x: X.a
+	y: X.b
+	a: 1
+	b: 2
+}
+
+bar: Y={
+	data: Y.x + 10
+	x: 5
+}
+
+// Nested value alias
+outer: {
+	inner: Z={
+		value: Z.n * 2
+		n: 3
+	}
+}
+
+// Multiple fields with value aliases
+multi: {
+	first: A={
+		val: A.base * 2
+		base: 10
+	}
+	second: B={
+		val: B.base * 3
+		base: 20
+	}
+}
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "test.example"
+language: {
+	version: "v0.15.0"
+}
+--- a.cue
+@experiment(aliasandself)
+
+package foo
+
+// Simple field alias
+a~X: {
+	foo: 1
+	bar: X.foo + 2
+}
+
+// Multiple aliases
+b~Y: {
+	data: 42
+}
+c~Z: {
+	val: Y.data
+}
+--- b.cue
+@experiment(aliasandself)
+
+package foo
+
+// Nested aliases
+outer: {
+	middle~Inner: {
+		deep~Leaf: {
+			value: 1
+		}
+		ref: Leaf.value
+	}
+	ref2: Inner.Leaf.value
+}
+--- c.cue
+@experiment(aliasandself)
+
+package foo
+
+// With constraints
+a~OptField?: {
+	value: 1
+}
+b~ReqField!: {
+	value: 2
+}
+--- d.cue
+// Already has postfix alias experiment, so do not do any changes.
+@experiment(aliasandself)
+
+package foo
+
+a~X: {
+	foo: 1
+}
+--- e.cue
+@experiment(aliasandself)
+
+package foo
+
+// Pattern constraints with old alias syntax
+// Note: Old syntax does not support pattern constraint aliases
+// This is just testing that regular fields work correctly
+schema: {
+	[string]~(Name,_): {
+		name: Name
+	}
+	[string]~(Name,Y): {
+		name:  Name
+		value: Y.name
+	}
+}
+--- f.cue
+@experiment(aliasandself)
+
+package foo
+
+// Dynamic fields with old alias syntax
+(x)~DynAlias: {
+	field: 1
+	ref:   DynAlias.field
+}
+
+// Dynamic field with string literal
+("foo")~StrAlias: {
+	data: 2
+	ref:  StrAlias.data
+}
+
+// Dynamic field with interpolation
+("\(name)")~DynInterpAlias: {
+	val: 3
+	ref: InterpAlias.val
+}
+// Just the interpolation
+"\(name)"~InterpAlias: {
+	val: 3
+	ref: InterpAlias.val
+}
+--- g.cue
+@experiment(aliasandself)
+
+package foo
+
+// Value aliases - old syntax X={...}
+// Should convert to let with self
+foo: {
+	let X = self
+	x: X.a
+	y: X.b
+	a: 1
+	b: 2
+}
+
+bar: {
+	let Y = self
+	data: Y.x + 10
+	x:    5
+}
+
+// Nested value alias
+outer: {
+	inner: {
+		let Z = self
+		value: Z.n * 2
+		n:     3
+	}
+}
+
+// Multiple fields with value aliases
+multi: {
+	first: {
+		let A = self
+		val:  A.base * 2
+		base: 10
+	}
+	second: {
+		let B = self
+		val:  B.base * 3
+		base: 20
+	}
+}

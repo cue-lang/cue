@@ -130,6 +130,10 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 		f = fixExperiment(fixExplicitOpen, f, "explicitopen", targetVersion)
 	}
 
+	if wantExps.AliasAndSelf && !existingExps.AliasAndSelf {
+		f = fixExperiment(fixAliasAndSelf, f, "aliasandself", targetVersion)
+	}
+
 	// Make sure we use the "after" function, and not the "before",
 	// because "before" will stop recursion early which creates
 	// problems with nested expressions.
@@ -294,6 +298,103 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 		}
 		return true
 	}).(*ast.File)
+
+	return result, hasChanges
+}
+
+func fixAliasAndSelf(f *ast.File) (result *ast.File, hasChanges bool) {
+	// Run multiple passes until no more changes are made, to handle nested aliases
+	for {
+		var changed bool
+		result, changed = fixAliasAndSelfPass(f)
+		if changed {
+			hasChanges = true
+			f = result
+		} else {
+			break
+		}
+	}
+	return result, hasChanges
+}
+
+func fixAliasAndSelfPass(f *ast.File) (result *ast.File, hasChanges bool) {
+	result = astutil.Apply(f, func(c astutil.Cursor) bool {
+		n, ok := c.Node().(*ast.Field)
+		if !ok {
+			return true
+		}
+
+		// Check if this field has an old-style alias in the label
+		if alias, ok := n.Label.(*ast.Alias); ok {
+			hasChanges = true
+
+			// Convert old-style alias (X=label) to new postfix alias (label~X)
+			// The alias.Expr should be a Label (e.g., Ident)
+			n.Alias = &ast.PostfixAlias{
+				Field: alias.Ident,
+			}
+			ast.SetRelPos(alias.Ident, token.NoSpace)
+
+			if label, ok := alias.Expr.(ast.Label); ok {
+				// Skip if the label is not a valid Label type
+				n.Label = label
+				ast.SetRelPos(label, token.NoRelPos)
+			}
+		}
+
+		if list, ok := n.Label.(*ast.ListLit); ok && len(list.Elts) == 1 {
+			if alias, ok := list.Elts[0].(*ast.Alias); ok {
+				hasChanges = true
+				if n.Alias == nil {
+					n.Alias = &ast.PostfixAlias{
+						Field: ast.NewIdent("_"),
+					}
+				}
+				n.Alias.Label = alias.Ident
+				list.Elts[0] = alias.Expr
+				ast.SetRelPos(alias.Ident, token.NoSpace)
+				ast.SetRelPos(alias.Expr, token.NoRelPos)
+			}
+		}
+
+		// Check if this field has an old-style value alias in the value
+		// e.g., foo: X={x: X.a} should become foo: {let X = self; x: X.a}
+		if alias, ok := n.Value.(*ast.Alias); ok {
+			hasChanges = true
+
+			// The value alias binds the alias identifier to self
+			// Convert: foo: X={x: X.a, y: 1}
+			// To: foo: {let X = self; x: X.a; y: 1}
+
+			// The alias.Expr should be a StructLit
+			s, ok := alias.Expr.(*ast.StructLit)
+			if !ok {
+				// This is possible V=[{a?: V}]. Replace with
+				// {let V = self, [{a?: V}]} in that case.
+				s = &ast.StructLit{Elts: []ast.Decl{alias.Expr}}
+			}
+
+			// Create a let clause: let X = self
+			letClause := &ast.LetClause{
+				Ident: alias.Ident,
+				Expr:  ast.NewIdent("self"),
+			}
+
+			// Insert the let clause at the beginning of the struct
+			s.Elts = slices.Insert(s.Elts, 0, ast.Decl(letClause))
+
+			n.Value = s
+
+			// Relink referring nodes to prevent rewriting by Sanitize.
+			astutil.Apply(s, func(c astutil.Cursor) bool {
+				if id, ok := c.Node().(*ast.Ident); ok && id.Node == alias {
+					id.Node = letClause
+				}
+				return true
+			}, nil)
+		}
+		return true
+	}, nil).(*ast.File)
 
 	return result, hasChanges
 }

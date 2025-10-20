@@ -70,11 +70,15 @@ type File struct {
 	// Requires cue fix when upgrading
 	ExplicitOpen bool `experiment:"preview:v0.15.0"`
 
-	// Self enables the use of 'self' identifier to refer to the enclosing struct.
+	// AliasAndSelf enables the use of 'self' identifier to refer to the
+	// enclosing struct and enables the postfix alias syntax (~X and ~(K,V)).
+	// The file where this experiment is enabled disallows the use of old prefix
+	// alias syntax (X=).
 	//
 	// Proposal:      https://cuelang.org/issue/4014
 	// Spec change:   https://cuelang.org/cl/1222377
-	Self bool `experiment:"preview:v0.15.0"`
+	// Requires cue fix when upgrading
+	AliasAndSelf bool `experiment:"preview:v0.15.0"`
 }
 
 // LanguageVersion returns the language version of the file or "" if no language

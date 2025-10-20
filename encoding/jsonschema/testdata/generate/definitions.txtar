@@ -42,13 +42,7 @@ missingX: {
 			type: "string"
 		}
 		"#D3": {
-			anyOf: [{
-				const: "a"
-			}, {
-				const: "b"
-			}, {
-				const: "c"
-			}]
+			enum: ["a", "b", "c"]
 		}
 	}
 	type: "object"

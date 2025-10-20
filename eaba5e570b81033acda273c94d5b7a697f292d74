@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0663c966_d5e21cf7",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-20T09:42:08Z",
+      "side": 1,
+      "message": "I\u0027ll suggest to only do this when len(c.redirectBuf) \u003e some constant. As per our discussion, we settled on 15.",
+      "revId": "eaba5e570b81033acda273c94d5b7a697f292d74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

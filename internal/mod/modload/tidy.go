@@ -159,14 +159,20 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 		Source:   old.Source,
 		Custom:   old.Custom,
 	}
-	defaults := rs.DefaultMajorVersions()
 	for _, v := range rs.RootModules() {
 		if v.IsLocal() {
 			continue
 		}
+		// Check if this module version matches the default major version.
+		// We want to mark it as default if either:
+		// 1. It was explicitly marked as default in the original module file
+		// 2. It's the only major version for this module path in the roots
+		defaultMajor, status := rs.DefaultMajorVersion(v.BasePath())
+		isDefault := (status == modrequirements.ExplicitDefault || status == modrequirements.NonExplicitDefault) &&
+			defaultMajor == semver.Major(v.Version())
 		mf.Deps[v.Path()] = &modfile.Dep{
 			Version: v.Version(),
-			Default: defaults[v.BasePath()] == semver.Major(v.Version()),
+			Default: isDefault,
 		}
 	}
 	return mf

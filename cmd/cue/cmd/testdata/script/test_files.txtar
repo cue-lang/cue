@@ -26,7 +26,8 @@ language: {
 }
 deps: {
 	"test.example/d1@v0": {
-		v: "v0.0.1"
+		v:       "v0.0.1"
+		default: true
 	}
 	"test.example/d2@v0": {
 		v:       "v0.0.1"

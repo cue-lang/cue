@@ -9,7 +9,8 @@ language: {
 }
 deps: {
 	"bar.com@v0": {
-		v: "v0.0.2"
+		v:       "v0.0.2"
+		default: true
 	}
 }
 -- cue.mod/module.cue --

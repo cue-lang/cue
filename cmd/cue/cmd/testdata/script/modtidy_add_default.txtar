@@ -1,0 +1,58 @@
+# Test that cue mod tidy adds default: true to an existing dependency
+# when it's the only major version for that module path.
+# Regression test for https://cuelang.org/issue/2938
+
+# First verify that the dependency doesn't have default: true
+! exec grep 'default: true' cue.mod/module.cue
+
+# Run cue mod tidy
+exec cue mod tidy
+
+# Verify that default: true has been added
+cmp cue.mod/module.cue want-module
+
+# Check that the module still evaluates correctly
+exec cue export .
+cmp stdout want-stdout
+
+-- want-stdout --
+{
+    "value": "from example.com"
+}
+-- want-module --
+module: "main.org@v0"
+language: {
+	version: "v0.11.0"
+}
+deps: {
+	"example.com@v1": {
+		v:       "v1.0.0"
+		default: true
+	}
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: {
+	version: "v0.11.0"
+}
+deps: {
+	"example.com@v1": {
+		v: "v1.0.0"
+	}
+}
+-- main.cue --
+package main
+
+import "example.com/foo"
+
+value: foo.value
+
+-- _registry/example.com_v1.0.0/cue.mod/module.cue --
+module: "example.com@v1"
+language: {
+	version: "v0.11.0"
+}
+-- _registry/example.com_v1.0.0/foo/data.cue --
+package foo
+
+value: "from example.com"

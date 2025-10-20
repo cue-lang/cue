@@ -923,7 +923,17 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 	}
 
 	switch arc.ArcType {
-	case ArcMember, ArcRequired:
+	case ArcRequired:
+		label := f.SelectorString(c.Runtime)
+		b := &Bottom{
+			Code: IncompleteError,
+			Err:  c.NewPosf(pos, "required field missing: %s", label),
+			Node: v,
+		}
+		// TODO: yield failure
+		c.AddBottom(b) // TODO: unify error mechanism.
+		return arcReturn
+	case ArcMember:
 		return arcReturn
 
 	case ArcOptional:

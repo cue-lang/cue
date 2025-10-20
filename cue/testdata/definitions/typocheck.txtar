@@ -633,13 +633,13 @@ Allocs: 121
 Retain: 0
 
 Unifications: 765
-Conjuncts:    1528
+Conjuncts:    1529
 Disjuncts:    84
 Notifications: 7
 
-NumCloseIDs: 439
+NumCloseIDs: 440
 
-ConjunctInfos:       1117
+ConjunctInfos:       1118
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2
@@ -666,13 +666,13 @@ diff old new
 +Retain: 0
 +
 +Unifications: 765
-+Conjuncts:    1528
++Conjuncts:    1529
 +Disjuncts:    84
 +Notifications: 7
 +
-+NumCloseIDs: 439
++NumCloseIDs: 440
 +
-+ConjunctInfos:       1117
++ConjunctInfos:       1118
 +MaxConjunctInfos:    5
 +MaxReqSets:          9
 +MaxRedirect:         2
@@ -1389,7 +1389,7 @@ Result:
         }, (#struct){
           pass: (#struct){
             let self#2 = (_|_){
-              // [incomplete] issue3832.#T._assert.pass.self: undefined field: self:
+              // [eval] issue3832.#T._assert.pass.self: undefined field: self:
               //     ./issue3832.cue:8:19
             }
             outFirstName: (_|_){
@@ -2447,7 +2447,7 @@ diff old new
              let self#2 = (_|_){
 -              // [incomplete] issue3832.#T._assert.pass.self: in.self undefined (in is incomplete):
 -              //     ./issue3832.cue:8:16
-+              // [incomplete] issue3832.#T._assert.pass.self: undefined field: self:
++              // [eval] issue3832.#T._assert.pass.self: undefined field: self:
 +              //     ./issue3832.cue:8:19
              }
              outFirstName: (_|_){

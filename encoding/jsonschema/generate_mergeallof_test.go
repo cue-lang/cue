@@ -18,18 +18,18 @@ import (
 	"testing"
 
 	"github.com/go-quicktest/qt"
-	"github.com/google/go-cmp/cmp"
 )
 
 func TestMergeAllOf(t *testing.T) {
-	itemString := &itemType{kinds: []string{"string"}}
-	itemNumber := &itemType{kinds: []string{"number"}}
-	itemBool := &itemType{kinds: []string{"boolean"}}
+	u := newUniqueItems()
+	itemString := u.intern(&itemType{kinds: []string{"string"}})
+	itemNumber := u.intern(&itemType{kinds: []string{"number"}})
+	itemBool := u.intern(&itemType{kinds: []string{"boolean"}})
 
 	tests := []struct {
 		name string
-		item item
-		want item
+		item internItem
+		want internItem
 	}{
 		{
 			name: "NonAllOfItemReturnsAsIs",
@@ -38,223 +38,213 @@ func TestMergeAllOf(t *testing.T) {
 		},
 		{
 			name: "AllOfWithSingleElementReturnsThatElement",
-			item: &itemAllOf{
-				elems: []item{itemString},
-			},
+			item: u.intern(&itemAllOf{
+				elems: []internItem{itemString},
+			}),
 			want: itemString,
 		},
 		{
 			name: "AllOfWithMultipleElementsStaysAsAllOf",
-			item: &itemAllOf{
-				elems: []item{itemString, itemNumber},
-			},
-			want: &itemAllOf{
-				elems: []item{itemString, itemNumber},
-			},
+			item: u.intern(&itemAllOf{
+				elems: []internItem{itemString, itemNumber},
+			}),
+			want: u.intern(&itemAllOf{
+				elems: []internItem{itemString, itemNumber},
+			}),
 		},
 		{
 			name: "NestedAllOfIsFlattened",
-			item: &itemAllOf{
-				elems: []item{
+			item: u.intern(&itemAllOf{
+				elems: []internItem{
 					itemString,
-					&itemAllOf{
-						elems: []item{itemNumber, itemBool},
-					},
+					u.intern(&itemAllOf{
+						elems: []internItem{itemNumber, itemBool},
+					}),
 				},
-			},
-			want: &itemAllOf{
-				elems: []item{itemString, itemNumber, itemBool},
-			},
+			}),
+			want: u.intern(&itemAllOf{
+				elems: []internItem{itemString, itemNumber, itemBool},
+			}),
 		},
 		{
 			name: "MultipleNestedAllOfAreAllFlattened",
-			item: &itemAllOf{
-				elems: []item{
-					&itemAllOf{
-						elems: []item{itemString},
-					},
-					&itemAllOf{
-						elems: []item{itemNumber},
-					},
-					&itemAllOf{
-						elems: []item{itemBool},
-					},
+			item: u.intern(&itemAllOf{
+				elems: []internItem{
+					u.intern(&itemAllOf{
+						elems: []internItem{itemString},
+					}),
+					u.intern(&itemAllOf{
+						elems: []internItem{itemNumber},
+					}),
+					u.intern(&itemAllOf{
+						elems: []internItem{itemBool},
+					}),
 				},
-			},
-			want: &itemAllOf{
-				elems: []item{itemString, itemNumber, itemBool},
-			},
+			}),
+			want: u.intern(&itemAllOf{
+				elems: []internItem{itemString, itemNumber, itemBool},
+			}),
 		},
 		{
 			name: "DeeplyNestedAllOfIsFullyFlattened",
-			item: &itemAllOf{
-				elems: []item{
+			item: u.intern(&itemAllOf{
+				elems: []internItem{
 					itemString,
-					&itemAllOf{
-						elems: []item{
+					u.intern(&itemAllOf{
+						elems: []internItem{
 							itemNumber,
-							&itemAllOf{
-								elems: []item{itemBool},
-							},
+							u.intern(&itemAllOf{
+								elems: []internItem{itemBool},
+							}),
 						},
-					},
+					}),
 				},
-			},
-			want: &itemAllOf{
-				elems: []item{itemString, itemNumber, itemBool},
-			},
+			}),
+			want: u.intern(&itemAllOf{
+				elems: []internItem{itemString, itemNumber, itemBool},
+			}),
 		},
 		{
 			name: "DuplicateItemsAreRemoved",
-			item: &itemAllOf{
-				elems: []item{itemString, itemString, itemNumber, itemString},
-			},
-			want: &itemAllOf{
-				elems: []item{itemString, itemNumber},
-			},
+			item: u.intern(&itemAllOf{
+				elems: []internItem{itemString, itemString, itemNumber, itemString},
+			}),
+			want: u.intern(&itemAllOf{
+				elems: []internItem{itemString, itemNumber},
+			}),
 		},
 		{
 			name: "DuplicateItemsAfterFlatteningAreRemoved",
-			item: &itemAllOf{
-				elems: []item{
+			item: u.intern(&itemAllOf{
+				elems: []internItem{
 					itemString,
-					&itemAllOf{
-						elems: []item{itemString, itemNumber},
-					},
+					u.intern(&itemAllOf{
+						elems: []internItem{itemString, itemNumber},
+					}),
 					itemString,
 				},
-			},
-			want: &itemAllOf{
-				elems: []item{itemString, itemNumber},
-			},
+			}),
+			want: u.intern(&itemAllOf{
+				elems: []internItem{itemString, itemNumber},
+			}),
 		},
 		{
 			name: "AllOfNestedInOtherItemTypesHasChildrenMerged",
-			item: &itemNot{
-				elem: &itemAllOf{
-					elems: []item{
-						&itemAllOf{
-							elems: []item{
-								&itemAllOf{
-									elems: []item{itemString},
-								},
+			item: u.intern(&itemNot{
+				elem: u.intern(&itemAllOf{
+					elems: []internItem{
+						u.intern(&itemAllOf{
+							elems: []internItem{
+								u.intern(&itemAllOf{
+									elems: []internItem{itemString},
+								}),
 								itemNumber,
 							},
-						},
+						}),
 					},
-				},
-			},
-			want: &itemNot{
-				elem: &itemAllOf{
-					elems: []item{itemString, itemNumber},
-				},
-			},
+				}),
+			}),
+			want: u.intern(&itemNot{
+				elem: u.intern(&itemAllOf{
+					elems: []internItem{itemString, itemNumber},
+				}),
+			}),
 		},
 		{
 			name: "AllOfNestedInAnyOfIsRecursivelyMerged",
-			item: &itemAnyOf{
-				elems: []item{
-					&itemAllOf{
-						elems: []item{
-							&itemAllOf{
-								elems: []item{itemString},
-							},
+			item: u.intern(&itemAnyOf{
+				elems: []internItem{
+					u.intern(&itemAllOf{
+						elems: []internItem{
+							u.intern(&itemAllOf{
+								elems: []internItem{itemString},
+							}),
 							itemNumber,
 						},
-					},
+					}),
 					itemBool,
 				},
-			},
-			want: &itemAnyOf{
-				elems: []item{
-					&itemAllOf{
-						elems: []item{itemString, itemNumber},
-					},
+			}),
+			want: u.intern(&itemAnyOf{
+				elems: []internItem{
+					u.intern(&itemAllOf{
+						elems: []internItem{itemString, itemNumber},
+					}),
 					itemBool,
 				},
-			},
+			}),
 		},
 		{
 			name: "SingleElementAfterFlatteningAndDeduplication",
-			item: &itemAllOf{
-				elems: []item{
-					&itemAllOf{
-						elems: []item{itemString},
-					},
-					&itemAllOf{
-						elems: []item{itemString},
-					},
+			item: u.intern(&itemAllOf{
+				elems: []internItem{
+					u.intern(&itemAllOf{
+						elems: []internItem{itemString},
+					}),
+					u.intern(&itemAllOf{
+						elems: []internItem{itemString},
+					}),
 				},
-			},
+			}),
 			want: itemString,
 		},
 		{
 			name: "EmptyAllOfBecomesSingleElementAndIsUnwrapped",
-			item: &itemAllOf{
-				elems: []item{
-					&itemAllOf{
-						elems: []item{itemString},
-					},
+			item: u.intern(&itemAllOf{
+				elems: []internItem{
+					u.intern(&itemAllOf{
+						elems: []internItem{itemString},
+					}),
 				},
-			},
+			}),
 			want: itemString,
 		},
 		{
 			name: "ComplexNestedStructureWithMixedTypes",
-			item: &itemAllOf{
-				elems: []item{
-					&itemAllOf{
-						elems: []item{
+			item: u.intern(&itemAllOf{
+				elems: []internItem{
+					u.intern(&itemAllOf{
+						elems: []internItem{
 							itemString,
-							&itemAllOf{
-								elems: []item{itemNumber},
-							},
+							u.intern(&itemAllOf{
+								elems: []internItem{itemNumber},
+							}),
 						},
-					},
-					&itemNot{
-						elem: &itemAllOf{
-							elems: []item{
+					}),
+					u.intern(&itemNot{
+						elem: u.intern(&itemAllOf{
+							elems: []internItem{
 								itemBool,
-								&itemAllOf{
-									elems: []item{&itemFormat{format: "date"}},
-								},
+								u.intern(&itemAllOf{
+									elems: []internItem{u.intern(&itemFormat{format: "date"})},
+								}),
 							},
-						},
-					},
+						}),
+					}),
 					itemString, // Duplicate, should be removed
 				},
-			},
-			want: &itemAllOf{
-				elems: []item{
+			}),
+			want: u.intern(&itemAllOf{
+				elems: []internItem{
 					itemString,
 					itemNumber,
-					&itemNot{
-						elem: &itemAllOf{
-							elems: []item{
+					u.intern(&itemNot{
+						elem: u.intern(&itemAllOf{
+							elems: []internItem{
 								itemBool,
-								&itemFormat{format: "date"},
+								u.intern(&itemFormat{format: "date"}),
 							},
-						},
-					},
+						}),
+					}),
 				},
-			},
+			}),
 		},
 	}
 
-	// Define comparison options for unexported fields
-	cmpOpt := cmp.AllowUnexported(
-		itemAllOf{},
-		itemAnyOf{},
-		itemFormat{},
-		itemNot{},
-		itemType{},
-		property{},
-	)
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := mergeAllOf(tt.item)
-			qt.Assert(t, qt.CmpEquals(got, tt.want, cmpOpt))
+			got := mergeAllOf(tt.item, u)
+			qt.Assert(t, qt.Equals(got, tt.want))
 		})
 	}
 }

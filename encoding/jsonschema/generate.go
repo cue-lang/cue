@@ -19,7 +19,6 @@ import (
 	"iter"
 	"log"
 	"maps"
-	"reflect"
 	"regexp"
 	"slices"
 	"strings"
@@ -77,13 +76,14 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	}
 
 	g := &generator{
-		cfg:  cfg,
-		defs: make(map[string]item),
+		cfg:    cfg,
+		defs:   make(map[string]internItem),
+		unique: newUniqueItems(),
 	}
 	item := g.makeItem(v)
-	item = mergeAllOf(item)
-	item = enumFromConst(item)
-	expr := item.generate(g)
+	item = mergeAllOf(item, g.unique)
+	item = enumFromConst(item, g.unique)
+	expr := item.Get().generate(g)
 
 	// Check if the result is a boolean literal
 	if lit, ok := expr.(*ast.BasicLit); ok && (lit.Kind == token.TRUE || lit.Kind == token.FALSE) {
@@ -109,7 +109,7 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	if len(g.defs) != 0 {
 		defFields := make([]ast.Decl, 0, len(g.defs))
 		for _, name := range slices.Sorted(maps.Keys(g.defs)) {
-			defFields = append(defFields, makeField(name, g.defs[name].generate(g)))
+			defFields = append(defFields, makeField(name, g.defs[name].Get().generate(g)))
 		}
 		fields = append(fields, makeField("$defs", &ast.StructLit{Elts: defFields}))
 	}
@@ -124,39 +124,32 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 // mergeAllOf returns the item with adjacent itemAllOf nodes
 // all merged into a single itemAllOf node with all
 // the conjuncts in.
-func mergeAllOf(it item) item {
-	switch it := it.(type) {
+func mergeAllOf(it internItem, u *uniqueItems) internItem {
+	switch it1 := it.Get().(type) {
 	case *itemAllOf:
-		it1 := &itemAllOf{
-			elems: make([]item, 0, len(it.elems)),
+		it2 := &itemAllOf{
+			elems: make([]internItem, 0, len(it1.elems)),
 		}
-	loop:
-		for e := range siblings(it) {
+		for e := range siblings(it1) {
 			// Remove elements that are entirely redundant.
-			// Note: DeepEqual seems reasonable here because values are generally
-			// small and the data structures are well-defined. We could
-			// reconsider if these assumptions change.
 			// TODO we could unify itemType elements here, for example:
 			// allOf(itemType(number), itemType(integer)) -> itemType(integer)
-			for _, e1 := range it1.elems {
-				if reflect.DeepEqual(e1, e) {
-					continue loop
-				}
+			if !slices.Contains(it2.elems, e) {
+				it2.elems = append(it2.elems, mergeAllOf(e, u))
 			}
-			it1.elems = append(it1.elems, e.apply(mergeAllOf))
 		}
-		if len(it1.elems) == 1 {
-			return it1.elems[0]
+		if len(it2.elems) == 1 {
+			return it2.elems[0]
 		}
-		return it1
+		return u.intern(it2)
 	default:
-		return it.apply(mergeAllOf)
+		return u.apply(it, mergeAllOf)
 	}
 }
 
-func conjuncts(it item) iter.Seq[item] {
-	return func(yield func(item) bool) {
-		it1, ok := it.(*itemAllOf)
+func itemConjuncts(it internItem) iter.Seq[internItem] {
+	return func(yield func(internItem) bool) {
+		it1, ok := it.Get().(*itemAllOf)
 		if !ok {
 			yield(it)
 			return
@@ -166,18 +159,18 @@ func conjuncts(it item) iter.Seq[item] {
 }
 
 type elementsItem interface {
-	elements() []item
+	elements() []internItem
 }
 
-func siblings[T elementsItem](it T) iter.Seq[item] {
-	return func(yield func(item) bool) {
+func siblings[T elementsItem](it T) iter.Seq[internItem] {
+	return func(yield func(internItem) bool) {
 		yieldSiblings(it, yield)
 	}
 }
 
-func yieldSiblings[T elementsItem](it T, yield func(item) bool) bool {
+func yieldSiblings[T elementsItem](it T, yield func(internItem) bool) bool {
 	for _, e := range it.elements() {
-		if ae, ok := e.(T); ok {
+		if ae, ok := e.Get().(T); ok {
 			if !yieldSiblings(ae, yield) {
 				return false
 			}
@@ -197,15 +190,15 @@ func yieldSiblings[T elementsItem](it T, yield func(item) bool) bool {
 //	anyOf(const("a"), const("b"), const("c"))
 //	->
 //	enum("a", "b", "c")
-func enumFromConst(it item) item {
-	switch it := it.(type) {
+func enumFromConst(it0 internItem, u *uniqueItems) internItem {
+	switch it := it0.Get().(type) {
 	case *itemAnyOf:
-		if slices.ContainsFunc(it.elems, func(it item) bool {
-			_, ok := it.(*itemConst)
+		if slices.ContainsFunc(it.elems, func(it internItem) bool {
+			_, ok := it.Get().(*itemConst)
 			return !ok
 		}) {
 			// They're not all consts, so return as-is.
-			return it
+			return it0
 		}
 		// All items are const. We can make an enum from this.
 		// TODO this doesn't cover cases where there are some
@@ -214,11 +207,11 @@ func enumFromConst(it item) item {
 			values: make([]ast.Expr, 0, len(it.elems)),
 		}
 		for _, e := range it.elems {
-			it1.values = append(it1.values, e.(*itemConst).value)
+			it1.values = append(it1.values, e.Get().(*itemConst).value)
 		}
-		return it1
+		return u.intern(it1)
 	default:
-		return it.apply(enumFromConst)
+		return u.apply(it0, enumFromConst)
 	}
 }
 
@@ -230,7 +223,11 @@ type generator struct {
 
 	// defs holds any definitions made during the course of generation,
 	// indexed by the entry name within the `$defs` field.
-	defs map[string]item
+	defs map[string]internItem
+
+	// unique ensures that all items are comparable with
+	// simple equality.
+	unique *uniqueItems
 }
 
 func (g *generator) addError(pos cue.Value, err error) {
@@ -244,7 +241,11 @@ func (g *generator) addErrorf(pos cue.Value, f string, a ...any) {
 
 // makeItem returns an item representing the JSON Schema
 // for v in naive form.
-func (g *generator) makeItem(v cue.Value) item {
+func (g *generator) makeItem(v cue.Value) internItem {
+	return g.unique.intern(g.makeItem0(v))
+}
+
+func (g *generator) makeItem0(v cue.Value) item {
 	op, args := v.Expr()
 	switch op {
 	case cue.NoOp, cue.SelectorOp:
@@ -262,7 +263,7 @@ func (g *generator) makeItem(v cue.Value) item {
 				// Already defined.
 				return ref
 			}
-			g.defs[name] = nil // Prevent infinite loops on cycles.
+			g.defs[name] = internItem{} // Prevent infinite loops on cycles.
 			g.defs[name] = g.makeItem(v.Eval())
 			return ref
 		}
@@ -281,19 +282,19 @@ func (g *generator) makeItem(v cue.Value) item {
 			g.addError(args[0], err)
 			return &itemFalse{}
 		}
-		var m item = &itemPattern{
+		m := g.unique.intern(&itemPattern{
 			regexp: re,
-		}
+		})
 		if op == cue.NotRegexMatchOp {
-			m = &itemNot{
+			m = g.unique.intern(&itemNot{
 				elem: m,
-			}
+			})
 		}
 		return &itemAllOf{
-			elems: []item{
-				&itemType{
+			elems: []internItem{
+				g.unique.intern(&itemType{
 					kinds: []string{"string"},
-				},
+				}),
 				m,
 			},
 		}
@@ -314,11 +315,11 @@ func (g *generator) makeItem(v cue.Value) item {
 			g.addError(args[0], fmt.Errorf("expected expression from Syntax, got %T", syntax))
 			return &itemFalse{}
 		}
-		it := &itemConst{
+		it := g.unique.intern(&itemConst{
 			value: expr,
-		}
+		})
 		if op == cue.EqualOp {
-			return it
+			return it.Get()
 		}
 		return &itemNot{
 			elem: it,
@@ -339,14 +340,14 @@ func (g *generator) makeItem(v cue.Value) item {
 				return &itemTrue{}
 			}
 			return &itemAllOf{
-				elems: []item{
-					&itemBounds{
+				elems: []internItem{
+					g.unique.intern(&itemBounds{
 						constraint: op,
 						n:          n,
-					},
-					&itemType{
+					}),
+					g.unique.intern(&itemType{
 						kinds: []string{"number"},
-					},
+					}),
 				},
 			}
 		case cue.StringKind:
@@ -382,20 +383,20 @@ func (g *generator) makeItem(v cue.Value) item {
 	case cue.ListKind:
 		it = g.makeListItem(v)
 	}
-	var elems []item
+	var elems []internItem
 	if kinds := cueKindToJSONSchemaTypes(kind); len(kinds) > 0 {
-		elems = append(elems, &itemType{
+		elems = append(elems, g.unique.intern(&itemType{
 			kinds: kinds,
-		})
+		}))
 	}
 	if it != nil {
-		elems = append(elems, it)
+		elems = append(elems, g.unique.intern(it))
 	}
 	switch len(elems) {
 	case 0:
 		return &itemTrue{}
 	case 1:
-		return elems[0]
+		return elems[0].Get()
 	}
 	return &itemAllOf{
 		elems: elems,
@@ -504,7 +505,7 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 		return &itemFalse{}
 	case "close":
 		// We'll detect closedness with IsClosed further down.
-		return g.makeItem(v.Eval())
+		return g.makeItem(v.Eval()).Get()
 	case "strings.MinRunes":
 		if len(args) != 2 {
 			g.addError(v, fmt.Errorf("strings.MinRunes expects 1 argument, got %d", len(args)-1))
@@ -516,9 +517,9 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 			return &itemFalse{}
 		}
 		return &itemAllOf{
-			elems: []item{
-				&itemType{kinds: []string{"string"}},
-				&itemLengthBounds{constraint: cue.GreaterThanEqualOp, n: int(n)},
+			elems: []internItem{
+				g.unique.intern(&itemType{kinds: []string{"string"}}),
+				g.unique.intern(&itemLengthBounds{constraint: cue.GreaterThanEqualOp, n: int(n)}),
 			},
 		}
 
@@ -533,9 +534,9 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 			return &itemFalse{}
 		}
 		return &itemAllOf{
-			elems: []item{
-				&itemType{kinds: []string{"string"}},
-				&itemLengthBounds{constraint: cue.LessThanEqualOp, n: int(n)},
+			elems: []internItem{
+				g.unique.intern(&itemType{kinds: []string{"string"}}),
+				g.unique.intern(&itemLengthBounds{constraint: cue.LessThanEqualOp, n: int(n)}),
 			},
 		}
 
@@ -550,9 +551,9 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 			return &itemFalse{}
 		}
 		return &itemAllOf{
-			elems: []item{
-				&itemType{kinds: []string{"number"}},
-				&itemMultipleOf{n: n},
+			elems: []internItem{
+				g.unique.intern(&itemType{kinds: []string{"number"}}),
+				g.unique.intern(&itemMultipleOf{n: n}),
 			},
 		}
 
@@ -583,9 +584,9 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 			return &itemType{kinds: []string{"string"}}
 		}
 		return &itemAllOf{
-			elems: []item{
-				&itemType{kinds: []string{"string"}},
-				&itemFormat{format: format},
+			elems: []internItem{
+				g.unique.intern(&itemType{kinds: []string{"string"}}),
+				g.unique.intern(&itemFormat{format: format}),
 			},
 		}
 	case "list.MinItems", "list.MaxItems":
@@ -605,9 +606,9 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 			constraint = cue.LessThanEqualOp
 		}
 		return &itemAllOf{
-			elems: []item{
-				&itemType{kinds: []string{"array"}},
-				&itemItemsBounds{constraint: constraint, n: int(n)},
+			elems: []internItem{
+				g.unique.intern(&itemType{kinds: []string{"array"}}),
+				g.unique.intern(&itemItemsBounds{constraint: constraint, n: int(n)}),
 			},
 		}
 
@@ -680,19 +681,19 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 		// Get the schema element from the second argument
 		// Check if it's bottom first (which represents "contains: false")
 		// to avoid adding errors to the generator.
-		var elem item
+		var elem internItem
 		elemVal := args[2]
 		if err := elemVal.Err(); err != nil {
 			// Bottom value - represents "contains: false"
-			elem = &itemFalse{}
+			elem = g.unique.intern(&itemFalse{})
 		} else {
 			elem = g.makeItem(elemVal)
 		}
 
 		return &itemAllOf{
-			elems: []item{
-				&itemType{kinds: []string{"array"}},
-				&itemContains{elem: elem, min: minVal, max: maxVal},
+			elems: []internItem{
+				g.unique.intern(&itemType{kinds: []string{"array"}}),
+				g.unique.intern(&itemContains{elem: elem, min: minVal, max: maxVal}),
 			},
 		}
 
@@ -709,7 +710,7 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 
 		constraintVal, listVal := args[1], args[2]
 
-		var items []item
+		var items []internItem
 		for i := 0; ; i++ {
 			// Unfortunately https://github.com/cue-lang/cue/issues/4132 means
 			// that we cannot iterate over elements of the list with listVal.List
@@ -801,15 +802,15 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 
 func (g *generator) makeStructItem(v cue.Value) item {
 	props := itemProperties{
-		properties: make(map[string]item),
+		properties: make(map[string]internItem),
 	}
 
-	explicitlyOpen := func(constraint item) {
+	explicitlyOpen := func(constraint internItem) {
 		props.additionalProperties = constraint
-		if _, ok := constraint.(*itemTrue); ok && !g.cfg.ExplicitOpen {
+		if _, ok := constraint.Get().(*itemTrue); ok && !g.cfg.ExplicitOpen {
 			// additionalProperties: true is a no-op in JSON Schema in general
 			// so omit it unless we're explicitly opening up schemas.
-			props.additionalProperties = nil
+			props.additionalProperties = internItem{}
 		}
 	}
 
@@ -818,7 +819,7 @@ func (g *generator) makeStructItem(v cue.Value) item {
 		// All fields are explicitly allowed (either with `...` or `[_]: T`)
 		explicitlyOpen(g.makeItem(ellipsis))
 	} else if v.IsClosed() && !g.cfg.ExplicitOpen {
-		props.additionalProperties = &itemFalse{}
+		props.additionalProperties = g.unique.intern(&itemFalse{})
 	}
 
 	iter, err := v.Fields(cue.Optional(true), cue.Patterns(true))
@@ -827,8 +828,8 @@ func (g *generator) makeStructItem(v cue.Value) item {
 		return &itemFalse{}
 	}
 	type pat struct {
-		pattern    *regexp.Regexp
-		constraint item
+		pattern     *regexp.Regexp
+		constraints map[internItem]bool
 	}
 	var patternConstraints []pat
 outer:
@@ -839,17 +840,24 @@ outer:
 			re, ok := regexpForValue(sel.Pattern())
 			if ok {
 				if props.patternProperties == nil {
-					props.patternProperties = make(map[string]item)
+					props.patternProperties = make(map[string]internItem)
 				}
 				constraint := g.makeItem(iter.Value())
 				props.patternProperties[re.String()] = constraint
-				patternConstraints = append(patternConstraints, pat{re, constraint})
+				p := pat{
+					pattern:     re,
+					constraints: make(map[internItem]bool),
+				}
+				for c := range itemConjuncts(constraint) {
+					p.constraints[c] = true
+				}
+				patternConstraints = append(patternConstraints, p)
 			} else {
 				// We can't express the constraint in JSON Schema, and it
 				// might cover any number of possible labels, so the
 				// only thing we can do is treat the whole thing as explicitly
 				// open.
-				explicitlyOpen(&itemTrue{})
+				explicitlyOpen(g.unique.intern(&itemTrue{}))
 			}
 			continue outer
 		case cue.OptionalConstraint:
@@ -875,14 +883,14 @@ outer:
 		// This has the potential to remove explicit constraints on the fields
 		// themselves, but this will not change behavior, just result in a slightly
 		// smaller resulting schema.
-		allof, ok := propItem.(*itemAllOf)
+		allof, ok := propItem.Get().(*itemAllOf)
 		if !ok || len(allof.elems) <= 1 {
 			// No possibility of removing any conjuncts.
 			props.properties[fieldName] = propItem
 			continue
 		}
 		log.Printf("removing constraints from %v elements", len(slices.Collect(siblings(allof))))
-		var elems []item
+		var elems []internItem
 		for _, c := range patternConstraints {
 			if !c.pattern.MatchString(fieldName) {
 				continue
@@ -890,19 +898,19 @@ outer:
 			log.Printf("found match for %v", fieldName)
 			if elems == nil {
 				elems = slices.Collect(siblings(allof))
+				log.Printf("%d siblings in allof", len(elems))
 			}
 			// We've found a pattern constraint that unifies with the field name.
 			// Its constraint will have been added to this property's constraints
 			// but are redundant, so remove them.
-			elems = slices.DeleteFunc(elems, func(it item) bool {
-				// TODO remove all conjuncts!
-				return reflect.DeepEqual(it, c.constraint)
+			elems = slices.DeleteFunc(elems, func(it internItem) bool {
+				return c.constraints[it]
 			})
 		}
 		if len(elems) == 0 {
-			propItem = &itemTrue{}
+			propItem = g.unique.intern(&itemTrue{})
 		} else {
-			propItem = &itemAllOf{elems: elems}
+			propItem = g.unique.intern(&itemAllOf{elems: elems})
 		}
 		props.properties[fieldName] = propItem
 	}
@@ -961,7 +969,7 @@ func (g *generator) makeListItem(v cue.Value) item {
 			g.addErrorf(v, "cannot extract concrete list length from %v: %v", v, err)
 		}
 	}
-	prefix := make([]item, n)
+	prefix := make([]internItem, n)
 	for i := range n {
 		elem := v.LookupPath(cue.MakePath(cue.Index(i)))
 		if !elem.Exists() {
@@ -971,26 +979,26 @@ func (g *generator) makeListItem(v cue.Value) item {
 		prefix[i] = g.makeItem(elem)
 	}
 	a := &itemAllOf{
-		elems: []item{&itemType{kinds: []string{"array"}}},
+		elems: []internItem{g.unique.intern(&itemType{kinds: []string{"array"}})},
 	}
 	items := &itemItems{}
 	if len(prefix) > 0 {
-		a.elems = append(a.elems, &itemLengthBounds{
+		a.elems = append(a.elems, g.unique.intern(&itemLengthBounds{
 			constraint: cue.GreaterThanEqualOp,
 			n:          len(prefix),
-		})
+		}))
 		items.prefix = prefix
 	}
 	if ellipsis.Exists() {
 		items.rest = trueAsNil(g.makeItem(ellipsis))
 	} else {
-		a.elems = append(a.elems, &itemLengthBounds{
+		a.elems = append(a.elems, g.unique.intern(&itemLengthBounds{
 			constraint: cue.LessThanEqualOp,
 			n:          len(prefix),
-		})
+		}))
 	}
-	if items.rest != nil || len(items.prefix) > 0 {
-		a.elems = append(a.elems, items)
+	if items.rest.Get() != nil || len(items.prefix) > 0 {
+		a.elems = append(a.elems, g.unique.intern(items))
 	}
 	return a
 }
@@ -1074,9 +1082,9 @@ func acceptsAllString(v cue.Value) bool {
 
 // trueAsNil returns the nil item if the item
 // is *itemTrue (top).
-func trueAsNil(it item) item {
-	if _, ok := it.(*itemTrue); ok {
-		return nil
+func trueAsNil(it internItem) internItem {
+	if _, ok := it.Get().(*itemTrue); ok {
+		return internItem{}
 	}
 	return it
 }

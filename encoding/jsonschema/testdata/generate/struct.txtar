@@ -108,16 +108,9 @@ _foo: a?: int
 				}
 			}
 			properties: {
-				a: {
-					type: "string"
-				}
-				ab: {
-					type:    "string"
-					pattern: "x"
-				}
-				b: {
-					type: "string"
-				}
+				a:  true
+				ab: true
+				b:  true
 				x: {
 					type: "string"
 				}

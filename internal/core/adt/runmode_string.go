@@ -19,9 +19,9 @@ const _runMode_name = "ignoreattemptOnlyyieldfinalize"
 var _runMode_index = [...]uint8{0, 6, 17, 22, 30}
 
 func (i runMode) String() string {
-	i -= 1
-	if i >= runMode(len(_runMode_index)-1) {
-		return "runMode(" + strconv.FormatInt(int64(i+1), 10) + ")"
+	idx := int(i) - 1
+	if i < 1 || idx >= len(_runMode_index)-1 {
+		return "runMode(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _runMode_name[_runMode_index[i]:_runMode_index[i+1]]
+	return _runMode_name[_runMode_index[idx]:_runMode_index[idx+1]]
 }

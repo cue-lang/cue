@@ -76,8 +76,9 @@ const _Token_name = "ILLEGALEOFCOMMENTATTRIBUTEliteralBegIDENTINTFLOATSTRINGINTE
 var _Token_index = [...]uint8{0, 7, 10, 17, 26, 36, 41, 44, 49, 55, 68, 71, 81, 92, 93, 94, 95, 96, 97, 100, 103, 106, 109, 110, 111, 113, 115, 116, 118, 119, 120, 121, 123, 125, 127, 129, 131, 133, 134, 135, 136, 137, 138, 141, 142, 143, 144, 145, 146, 147, 148, 159, 169, 171, 174, 176, 179, 183, 187, 192, 196, 206}
 
 func (i Token) String() string {
-	if i < 0 || i >= Token(len(_Token_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_Token_index)-1 {
 		return "Token(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _Token_name[_Token_index[i]:_Token_index[i+1]]
+	return _Token_name[_Token_index[idx]:_Token_index[idx+1]]
 }

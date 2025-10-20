@@ -20,8 +20,9 @@ const _vertexStatus_name = "unprocessedevaluatingpartialconjunctsfinalized"
 var _vertexStatus_index = [...]uint8{0, 11, 21, 28, 37, 46}
 
 func (i vertexStatus) String() string {
-	if i < 0 || i >= vertexStatus(len(_vertexStatus_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_vertexStatus_index)-1 {
 		return "vertexStatus(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _vertexStatus_name[_vertexStatus_index[i]:_vertexStatus_index[i+1]]
+	return _vertexStatus_name[_vertexStatus_index[idx]:_vertexStatus_index[idx+1]]
 }

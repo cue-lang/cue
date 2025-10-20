@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79c42e00_9559263e",
+        "filename": "cue/testdata/eval/required.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-20T16:35:13Z",
+      "side": 1,
+      "message": "bad formatting? this needs one more tab",
+      "revId": "b8f81496d1faa2613b2c4250294dd96571578bd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

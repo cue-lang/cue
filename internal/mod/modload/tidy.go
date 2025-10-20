@@ -271,6 +271,11 @@ func (ld *loader) tidyOnce(ctx context.Context, rootPkgPaths []string, origRs *m
 // path appearing in either requirement set (keyed by full module path,
 // including the major version), and the union of their default major
 // versions (the local view winning on conflict).
+//
+// A module's major version is treated as a default not only when it is an
+// explicit default but also when it is the only major version for that
+// module path (a non-explicit default); `cue mod tidy` makes such defaults
+// explicit (see issue #2938).
 func mergeRequirements(pub, local *modrequirements.Requirements) (maxVers, defaults map[string]string) {
 	maxVers = make(map[string]string)
 	defaults = make(map[string]string)
@@ -286,9 +291,28 @@ func mergeRequirements(pub, local *modrequirements.Requirements) (maxVers, defau
 				maxVers[v.Path()] = v.Version()
 			}
 		}
-		maps.Copy(defaults, rs.DefaultMajorVersions())
+		maps.Copy(defaults, rootDefaultMajorVersions(rs))
 	}
 	return maxVers, defaults
+}
+
+// rootDefaultMajorVersions returns the default major version for every module
+// path among the root modules of rs, keyed by base path. A major version is
+// treated as a default not only when it is an explicit default but also when
+// it is the only major version for that module path (a non-explicit default),
+// so that `cue mod tidy` and `cue mod get` make such defaults explicit (see
+// issue #2938).
+func rootDefaultMajorVersions(rs *modrequirements.Requirements) map[string]string {
+	defaults := make(map[string]string)
+	for _, v := range rs.RootModules() {
+		if v.IsLocal() {
+			continue
+		}
+		if major, status := rs.DefaultMajorVersion(v.BasePath()); status == modrequirements.ExplicitDefault || status == modrequirements.NonExplicitDefault {
+			defaults[v.BasePath()] = major
+		}
+	}
+	return defaults
 }
 
 func hasReplace(mf *modfile.File) bool {

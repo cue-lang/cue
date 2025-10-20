@@ -52,9 +52,18 @@ stderr '^cannot determine new module graph: not.exist/x@v0.1.2: module not.exist
 module: "main.org@v0"
 language: version: "v0.8.0"
 deps: {
-	"bar.com@v0": v:     "v0.5.0"
-	"baz.org@v0": v:     "v0.10.2"
-	"example.com@v0": v: "v0.0.1"
+	"bar.com@v0": {
+		v:       "v0.5.0"
+		default: true
+	}
+	"baz.org@v0": {
+		v:       "v0.10.2"
+		default: true
+	}
+	"example.com@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
 	"foo.com/bar/hello@v0": {
 		v:       "v0.2.3"
 		default: true
@@ -72,9 +81,18 @@ deps: {
 module: "main.org@v0"
 language: version: "v0.8.0"
 deps: {
-	"bar.com@v0": v:     "v0.5.0"
-	"baz.org@v0": v:     "v0.11.0-alpha"
-	"example.com@v0": v: "v0.0.1"
+	"bar.com@v0": {
+		v:       "v0.5.0"
+		default: true
+	}
+	"baz.org@v0": {
+		v:       "v0.11.0-alpha"
+		default: true
+	}
+	"example.com@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
 	"foo.com/bar/hello@v0": {
 		v:       "v0.2.3"
 		default: true

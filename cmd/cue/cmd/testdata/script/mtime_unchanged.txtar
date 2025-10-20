@@ -78,7 +78,10 @@ bar
 -- cue.mod/module.cue --
 module: "test.example@v0"
 language: version: "v0.9.0"
-deps: "foo.org/bar@v1": v: "v1.0.0"
+deps: "foo.org/bar@v1": {
+	v:       "v1.0.0"
+	default: true
+}
 -- _registry/foo.org_bar_v1.0.0/cue.mod/module.cue --
 module: "foo.org/bar@v1"
 language: version: "v0.9.0"

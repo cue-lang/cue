@@ -104,7 +104,7 @@ func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registr
 		}
 	}
 	rs = modrequirements.NewRequirements(mf.QualifiedModule(), reg, finalVersions, mf.DefaultMajorVersions())
-	return modfileFromRequirements(mf, rs, nil, rs.DefaultMajorVersions(), nil), nil
+	return modfileFromRequirements(mf, rs, nil, rootDefaultMajorVersions(rs), nil), nil
 }
 
 // ResolveAbsolutePackage resolves a package in a standalone fashion, irrespective

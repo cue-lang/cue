@@ -28,7 +28,10 @@ source: kind: "self"
 module: "main.org@v1"
 language: version: "v0.9.0"
 source: kind:      "self"
-deps: "example.com@v0": v: "v0.0.1"
+deps: "example.com@v0": {
+	v:       "v0.0.1"
+	default: true
+}
 -- main.cue --
 package main
 import "example.com@v0:main"

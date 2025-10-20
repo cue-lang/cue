@@ -44,7 +44,10 @@ language: {
 -- importer-noqualifier/cue.mod/module.cue.want --
 module: "main.org/importer-noqualifier@v1"
 language: version: "v0.9.0"
-deps: "main.org/foo-bar@v1": v: "v1.0.0"
+deps: "main.org/foo-bar@v1": {
+	v:       "v1.0.0"
+	default: true
+}
 -- importer-noqualifier/main.cue --
 package importer
 
@@ -62,7 +65,10 @@ language: {
 -- getter-noqualifier/cue.mod/module.cue.want --
 module: "main.org/getter-noqualifier@v1"
 language: version: "v0.9.0"
-deps: "main.org/foo-bar@v1": v: "v1.0.0"
+deps: "main.org/foo-bar@v1": {
+	v:       "v1.0.0"
+	default: true
+}
 -- importer-withqualifier/cue.mod/module.cue --
 module: "main.org/importer-withqualifier@v1"
 language: {
@@ -71,7 +77,10 @@ language: {
 -- importer-withqualifier/cue.mod/module.cue.want --
 module: "main.org/importer-withqualifier@v1"
 language: version: "v0.9.0"
-deps: "main.org/foo-bar@v1": v: "v1.0.0"
+deps: "main.org/foo-bar@v1": {
+	v:       "v1.0.0"
+	default: true
+}
 -- importer-withqualifier/main.cue --
 package importer
 

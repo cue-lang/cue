@@ -6,8 +6,14 @@ bar.com
 module: "main.org@v0"
 language: version: "v0.8.0"
 deps: {
-	"bar.com@v0": v: "v0.0.1"
-	"foo.com@v0": v: "v0.0.1"
+	"bar.com@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
+	"foo.com@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
 }
 -- cue.mod/module.cue --
 module: "main.org@v0"

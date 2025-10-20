@@ -21,7 +21,10 @@ module: "main.org@v0"
 language: version: "v0.17.0"
 source: kind: "self"
 deps: {
-	"example.com/dep@v0": v: "v0.1.0"
+	"example.com/dep@v0": {
+		v:       "v0.1.0"
+		default: true
+	}
 }
 -- m/cue.mod/local-module.cue --
 deps: {

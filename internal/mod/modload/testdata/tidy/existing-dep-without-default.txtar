@@ -1,13 +1,10 @@
 # Test that tidy adds default: true to an existing dep when it's the only major version
 -- want --
 module: "main.org@v0"
-language: {
-	version: "v0.11.0"
-}
-deps: {
-	"example.com@v1": {
-		v: "v1.0.0"
-	}
+language: version: "v0.11.0"
+deps: "example.com@v1": {
+	v:       "v1.0.0"
+	default: true
 }
 -- cue.mod/module.cue --
 module: "main.org@v0"

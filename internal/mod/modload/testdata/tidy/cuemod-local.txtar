@@ -7,7 +7,10 @@ module is not tidy: missing dependency providing package example.com@v0:main
 -- want --
 module: "main.org@v0"
 language: version: "v0.8.0"
-deps: "example.com@v0": v: "v0.0.1"
+deps: "example.com@v0": {
+	v:       "v0.0.1"
+	default: true
+}
 -- cue.mod/module.cue --
 module: "main.org@v0"
 language: version: "v0.8.0"

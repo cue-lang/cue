@@ -74,7 +74,7 @@ const (
 	MaxLICENSE = 16 << 20
 )
 
-// File provides an abstraction for a file in a directory, zip, or anything
+// FileIO provides an abstraction for a file in a directory, zip, or anything
 // else that looks like a file - it knows how to open files represented
 // as a particular type without being a file itself.
 //

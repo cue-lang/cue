@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c311d610_06c92377",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-20T11:38:25Z",
+      "side": 1,
+      "message": "surely this meant to be `[1]:`? https://www.markdownguide.org/basic-syntax/#formatting-the-second-part-of-the-link",
+      "revId": "e79396a82da2a556c065d4181a854d0670347d03",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

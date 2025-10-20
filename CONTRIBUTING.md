@@ -289,14 +289,14 @@ process:
 
 If you want to use SSH for authentication *to GerritHub*, SSH keys can be
 [configured in your user
-profile](https://review.gerrithub.io/settings/#SSHKeys).  If you choose to use
+profile](https://cue.gerrithub.io/settings/#SSHKeys).  If you choose to use
 SSH for authentication, you will not be able to use the `git-codereview`
 command that's suggested later in this document, as the command [doesn't
 support SSH-based git
 origins](https://github.com/golang/go/issues/9599#issuecomment-70538097).
 
 For HTTP Credentials, [generate a password via your user
-profile](https://review.gerrithub.io/settings/#HTTPCredentials). Then use an
+profile](https://cue.gerrithub.io/settings/#HTTPCredentials). Then use an
 existing HTTP authentication mechanism like `.netrc`, macOS KeyChain, or some
 other [credential helper](https://git-scm.com/docs/gitcredentials). If you have
 any troubles with this step, please [raise an
@@ -332,7 +332,7 @@ directory.
 
 ### Step 4: Clone the CUE repository locally
 
-Visit https://review.gerrithub.io/admin/repos/cue-lang/cue, then click "SSH" or
+Visit https://cue.gerrithub.io/admin/repos/cue-lang/cue, then click "SSH" or
 "HTTP" depending on which authentication mechanism you configured in step 2.
 Then copy and run the corresponding "Clone" command. Make sure not to use
 "ANONYMOUS HTTP", as that will not work with `git-codereview` command. 
@@ -428,7 +428,7 @@ print, something like:
 
 ```
 remote: New Changes:
-remote:   https://review.gerrithub.io/99999 math: improved Sin, Cos and Tan precision for very large arguments
+remote:   https://cue.gerrithub.io/99999 math: improved Sin, Cos and Tan precision for very large arguments
 ```
 
 If you get an error instead, see the ["Troubleshooting mail
@@ -671,7 +671,7 @@ issue/edit/code review/submit process itself.
 
 Files in the CUE repository don't list author names, both to avoid clutter and
 to avoid having to keep the lists up to date.  Instead, your name will appear in
-the [git change log](https://review.gerrithub.io/plugins/gitiles/cue-lang/cue/+log)
+the [git change log](https://cue.gerrithub.io/plugins/gitiles/cue-lang/cue/+log)
 and in [GitHub's contributor stats](https://github.com/cue-lang/cue/graphs/contributors)
 when using an email address linked to a GitHub account.
 
@@ -807,7 +807,7 @@ It will look something like this:
 
 
 ```console
-$ git fetch https://review.gerrithub.io/a/cue-lang/cue refs/changes/67/519567/1 && git checkout FETCH_HEAD
+$ git fetch https://cue.gerrithub.io/a/cue-lang/cue refs/changes/67/519567/1 && git checkout FETCH_HEAD
 ```
 
 To revert, change back to the branch you were working in.

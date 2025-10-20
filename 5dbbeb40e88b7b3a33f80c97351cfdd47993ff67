@@ -16,6 +16,24 @@
       "message": "I\u0027m not sure we want to necessarily _guarantee_ that. So maybe slip in a \"currently\"?",
       "revId": "5dbbeb40e88b7b3a33f80c97351cfdd47993ff67",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59c51312_b336cfa1",
+        "filename": "cue/types.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-20T14:30:59Z",
+      "side": 1,
+      "message": "My gut feeling is that it\u0027s worth documenting because people might well end up relying on it anyway (it\u0027s useful), and it keeps us honest: if it becomes awkward to maintain that invariant in the future, we could provide an option to disable it in favour of a more efficient implementation.\n\nDiscussed online, and we\u0027ll leave as is for now.",
+      "parentUuid": "13f73db3_34adbf0a",
+      "revId": "5dbbeb40e88b7b3a33f80c97351cfdd47993ff67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

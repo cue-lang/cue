@@ -18,8 +18,9 @@ const _EventKind_name = "NoEventhttp client->http client<-"
 var _EventKind_index = [...]uint8{0, 7, 20, 33}
 
 func (i EventKind) String() string {
-	if i < 0 || i >= EventKind(len(_EventKind_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_EventKind_index)-1 {
 		return "EventKind(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _EventKind_name[_EventKind_index[i]:_EventKind_index[i+1]]
+	return _EventKind_name[_EventKind_index[idx]:_EventKind_index[idx+1]]
 }

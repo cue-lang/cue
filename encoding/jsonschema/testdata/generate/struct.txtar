@@ -108,22 +108,9 @@ _foo: a?: int
 				}
 			}
 			properties: {
-				a: {
-					type:    "string"
-					pattern: "b"
-				}
-				ab: {
-					allOf: [{
-						pattern: "x"
-					}, {
-						type:    "string"
-						pattern: "b"
-					}]
-				}
-				b: {
-					type:    "string"
-					pattern: "x"
-				}
+				a:  true
+				ab: true
+				b:  true
 				x: {
 					type: "string"
 				}

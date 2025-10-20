@@ -1,0 +1,34 @@
+# Test that tidy adds default: true to an existing dep when it's the only major version
+-- want --
+module: "main.org@v0"
+language: {
+	version: "v0.11.0"
+}
+deps: {
+	"example.com@v1": {
+		v: "v1.0.0"
+	}
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: {
+	version: "v0.11.0"
+}
+deps: {
+	"example.com@v1": {
+		v: "v1.0.0"
+		// Note: no default: true here, but should be added by tidy
+	}
+}
+-- main.cue --
+package main
+
+// Import without major version - should work because there's only one major version
+import "example.com/foo"
+
+-- _registry/example.com_v1.0.0/cue.mod/module.cue --
+module: "example.com@v1"
+language: version: "v0.11.0"
+
+-- _registry/example.com_v1.0.0/foo/top.cue --
+package foo

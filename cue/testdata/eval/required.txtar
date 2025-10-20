@@ -74,7 +74,27 @@ reference: {
 		a!: 1
 	}
 }
+-- issue3918.cue --
+import "strings"
 
+issue3918: reduced: {
+	#disjuncts: {
+		in!: [...string]
+		out: strings.Join(in, "|")
+	}
+
+	x: (#disjuncts & {
+		in: ["foo", "bar"]
+	}).out
+}
+issue3918: noFunction: {
+	#disjuncts: {
+		in!: [...string]
+		out: in
+	}
+	_foo: #disjuncts & {}
+	x: _foo.out
+}
 -- out/compile --
 --- in.cue
 {
@@ -202,6 +222,37 @@ reference: {
     }
   }
 }
+--- issue3918.cue
+{
+  issue3918: {
+    reduced: {
+      #disjuncts: {
+        in!: [
+          ...string,
+        ]
+        out: 〈import;strings〉.Join(〈0;in〉, "|")
+      }
+      x: (〈0;#disjuncts〉 & {
+        in: [
+          "foo",
+          "bar",
+        ]
+      }).out
+    }
+  }
+  issue3918: {
+    noFunction: {
+      #disjuncts: {
+        in!: [
+          ...string,
+        ]
+        out: 〈0;in〉
+      }
+      _foo: (〈0;#disjuncts〉 & {})
+      x: 〈0;_foo〉.out
+    }
+  }
+}
 -- out/eval/stats --
 Leaks:  0
 Freed:  66
@@ -319,6 +370,32 @@ Disjuncts:    76
       }
     }
   }
+  issue3918: (struct){
+    reduced: (struct){
+      #disjuncts: (#struct){
+        in!: (list){
+        }
+        out: (string){ "" }
+      }
+      x: (string){ "foo|bar" }
+    }
+    noFunction: (struct){
+      #disjuncts: (#struct){
+        in!: (list){
+        }
+        out: (list){
+        }
+      }
+      _foo: (#struct){
+        in!: (list){
+        }
+        out: (list){
+        }
+      }
+      x: (list){
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -356,6 +433,37 @@ diff old new
          #Foo: (#struct){
            a!: (int){ int }
          }
+@@ -110,4 +104,30 @@
+       }
+     }
+   }
++  issue3918: (struct){
++    reduced: (struct){
++      #disjuncts: (#struct){
++        in!: (list){
++        }
++        out: (string){ "" }
++      }
++      x: (string){ "foo|bar" }
++    }
++    noFunction: (struct){
++      #disjuncts: (#struct){
++        in!: (list){
++        }
++        out: (list){
++        }
++      }
++      _foo: (#struct){
++        in!: (list){
++        }
++        out: (list){
++        }
++      }
++      x: (list){
++      }
++    }
++  }
+ }
 -- diff/todo/p2 --
 Missing position.
 -- out/eval --

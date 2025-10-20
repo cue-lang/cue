@@ -1849,7 +1849,10 @@ Result:
         }
       }
       #B: (#struct){
-        x: (_){ _ }
+        x: (_|_){
+          // [incomplete] issue3935.reduced.#B.x: required field missing: y:
+          //     ./issue3935.cue:9:7
+        }
         y!: (#struct){
           x!: (_){ _ }
         }
@@ -1879,10 +1882,13 @@ Result:
           config!: (_){ _ }
         }
         namespace: (_|_){
-          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined as _specConfig is incomplete (type _):
-          //     ./issue3935.cue:36:15
+          // [incomplete] issue3935.full.#SchemaSelected.namespace: undefined field: namespace:
+          //     ./issue3935.cue:36:27
         }
-        _specConfig: (_){ _ }
+        _specConfig: (_|_){
+          // [incomplete] issue3935.full.#SchemaSelected._specConfig: required field missing: spec:
+          //     ./issue3935.cue:39:16
+        }
       }
     }
   }
@@ -2068,6 +2074,36 @@ diff old new
        }
        #A: (#struct){
          y: (#struct){
+@@ -882,7 +854,10 @@
+         }
+       }
+       #B: (#struct){
+-        x: (_){ _ }
++        x: (_|_){
++          // [incomplete] issue3935.reduced.#B.x: required field missing: y:
++          //     ./issue3935.cue:9:7
++        }
+         y!: (#struct){
+           x!: (_){ _ }
+         }
+@@ -912,10 +887,13 @@
+           config!: (_){ _ }
+         }
+         namespace: (_|_){
+-          // [incomplete] issue3935.full.#SchemaSelected.namespace: _specConfig.namespace undefined as _specConfig is incomplete (type _):
+-          //     ./issue3935.cue:36:15
+-        }
+-        _specConfig: (_){ _ }
++          // [incomplete] issue3935.full.#SchemaSelected.namespace: undefined field: namespace:
++          //     ./issue3935.cue:36:27
++        }
++        _specConfig: (_|_){
++          // [incomplete] issue3935.full.#SchemaSelected._specConfig: required field missing: spec:
++          //     ./issue3935.cue:39:16
++        }
+       }
+     }
+   }
 -- out/evalalpha/stats --
 Leaks:  76
 Freed:  611

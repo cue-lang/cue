@@ -278,7 +278,10 @@ func (v *Vertex) reportFieldCycleError(c *OpContext, pos token.Pos, f Feature) *
 
 func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg, stringMsg string) *Bottom {
 	code := IncompleteError
-	if !v.Accept(c, f) {
+	// If v is an error, we need to adopt the worst error.
+	if b := v.Bottom(); b != nil && !isCyclePlaceholder(b) {
+		code = b.Code
+	} else if !v.Accept(c, f) {
 		code = EvalError
 	}
 

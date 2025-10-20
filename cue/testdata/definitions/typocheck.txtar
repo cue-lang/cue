@@ -259,6 +259,8 @@ issue3832: {
 			pass:   "never"
 		} | {
 			invoke!: _
+			// TODO: here, the let from _subject.out gets converted to a
+			// permanent error,instead of incomplete.
 			pass:    (_subject & {in: invoke}).out
 		}
 		results: _assert.pass
@@ -633,13 +635,13 @@ Allocs: 121
 Retain: 0
 
 Unifications: 765
-Conjuncts:    1528
+Conjuncts:    1529
 Disjuncts:    84
 Notifications: 7
 
-NumCloseIDs: 439
+NumCloseIDs: 440
 
-ConjunctInfos:       1117
+ConjunctInfos:       1118
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2
@@ -666,13 +668,13 @@ diff old new
 +Retain: 0
 +
 +Unifications: 765
-+Conjuncts:    1528
++Conjuncts:    1529
 +Disjuncts:    84
 +Notifications: 7
 +
-+NumCloseIDs: 439
++NumCloseIDs: 440
 +
-+ConjunctInfos:       1117
++ConjunctInfos:       1118
 +MaxConjunctInfos:    5
 +MaxReqSets:          9
 +MaxRedirect:         2
@@ -1401,7 +1403,7 @@ Result:
         }) }
       results: (_|_){
         // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
-        //     ./issue3832.cue:20:12
+        //     ./issue3832.cue:22:12
       }
     }
     _assert: (#struct){
@@ -2441,7 +2443,7 @@ diff old new
            }
          }
        }
-@@ -818,21 +698,32 @@
+@@ -818,19 +698,30 @@
          }, (#struct){
            pass: (#struct){
              let self#2 = (_|_){
@@ -2461,10 +2463,11 @@ diff old new
          }) }
        results: (_|_){
 -        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete)),outFirstName:_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete))},invoke!:_} (type struct):
+-        //     ./issue3832.cue:20:12
 +        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
-         //     ./issue3832.cue:20:12
-       }
-     }
++        //     ./issue3832.cue:22:12
++      }
++    }
 +    _assert: (#struct){
 +      invoke: (#struct){
 +        self: (#struct){
@@ -2474,11 +2477,9 @@ diff old new
 +      pass: (#struct){
 +        let self#2 = ~(issue3832._assert.invoke.self)
 +        outFirstName: (string){ "Sam" }
-+      }
-+    }
+       }
+     }
      _subject: (#struct){
-       in: (_){ _ }
-       out: (#struct){
 @@ -841,32 +732,15 @@
            //     ./issue3832.cue:8:16
          }

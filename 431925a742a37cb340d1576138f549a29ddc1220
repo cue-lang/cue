@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1aa7e1b8_ac898119",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-20T11:50:08Z",
+      "side": 1,
+      "message": "again I think this link syntax is not right. if what you wanted was a footnote, it seems like you must use `[^1]` above too, then. https://www.markdownguide.org/extended-syntax/#footnotes",
+      "revId": "431925a742a37cb340d1576138f549a29ddc1220",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9ae5537_7e483e44",
+        "filename": "internal/anyunique/unique.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-20T11:50:08Z",
+      "side": 1,
+      "message": "is this an identical copy of the future maphash.Hasher?\n\nif so, I\u0027d make that clear, and add a TODO to replace this with the upstream API once it lands.",
+      "revId": "431925a742a37cb340d1576138f549a29ddc1220",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbb71218_ef175d7d",
+        "filename": "internal/anyunique/unique.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-20T11:50:08Z",
+      "side": 1,
+      "message": "empty comment?",
+      "revId": "431925a742a37cb340d1576138f549a29ddc1220",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fe93664_e060814f",
+        "filename": "internal/anyunique/unique.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-20T11:50:08Z",
+      "side": 1,
+      "message": "should we not give this a slightly longer name?",
+      "revId": "431925a742a37cb340d1576138f549a29ddc1220",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

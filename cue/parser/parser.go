@@ -1762,10 +1762,9 @@ func (p *parser) parseFile() *ast.File {
 		p.errors = errors.Append(p.errors, e)
 		// Do not proceed without setting p.experiments.
 		return nil
-	} else {
-		p.experiments = exp
-		p.file.SetExperiments(exp)
 	}
+	p.experiments = exp
+	p.file.SetExperiments(exp)
 
 	// The package clause is not a declaration: it does not appear in any
 	// scope.

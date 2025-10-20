@@ -23,10 +23,6 @@ import (
 // testFile is like File, but with a fixed set of experiments for testing
 // purposes
 type testFile struct {
-	// version is the module version of the file that was compiled.
-	version     string
-	experiments string
-
 	Exp10_R14 bool `experiment:"preview:v0.10.0,withdrawn:v0.14.0"`
 	Exp11_R13 bool `experiment:"preview:v0.11.0,withdrawn:v0.13.0"`
 

@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "5d34db43_d2d242b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-20T09:49:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bef7efca_23810669",
+      "revId": "f6e797d2f12c131bd1d2c07c217cefc183a4418c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2f54a9e0_7cf73d4c",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2025-10-17T15:47:18Z",
       "side": 1,
       "message": "is this meant to fail? both `full` and `reduced` should not cause an error, and it appears they don\u0027t. if `reducedNested` fails, that sounds like it\u0027s a bug or TODO, or that the test case shows a different scenario that shouldn\u0027t work at all.",
+      "revId": "f6e797d2f12c131bd1d2c07c217cefc183a4418c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2a5d865_1fe46c6c",
+        "filename": "cue/testdata/eval/disjselfcycle.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-20T09:49:21Z",
+      "side": 1,
+      "message": "added comment.\n\nThe original reproducers pass.",
+      "parentUuid": "dcac503d_5dd5fb7c",
       "revId": "f6e797d2f12c131bd1d2c07c217cefc183a4418c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

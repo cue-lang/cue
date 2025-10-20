@@ -4,8 +4,10 @@ foo!: #D1
 #D1: {
 	x!: int
 	y?: #D2
+	z?: #D3
 }
 #D2: string
+#D3: "a" | "b" | "c"
 
 -- datatest/testdata.cue --
 package datatest
@@ -30,11 +32,23 @@ missingX: {
 				y: {
 					$ref: "#/$defs/#D2"
 				}
+				z: {
+					$ref: "#/$defs/#D3"
+				}
 			}
 			required: ["x"]
 		}
 		"#D2": {
 			type: "string"
+		}
+		"#D3": {
+			anyOf: [{
+				const: "a"
+			}, {
+				const: "b"
+			}, {
+				const: "c"
+			}]
 		}
 	}
 	type: "object"

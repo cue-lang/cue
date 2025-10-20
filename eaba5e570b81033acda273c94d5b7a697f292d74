@@ -16,6 +16,24 @@
       "message": "I\u0027ll suggest to only do this when len(c.redirectBuf) \u003e some constant. As per our discussion, we settled on 15.",
       "revId": "eaba5e570b81033acda273c94d5b7a697f292d74",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca9923f2_6407578b",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-20T10:09:32Z",
+      "side": 1,
+      "message": "done, and added a comment explaining the choice of 15.",
+      "parentUuid": "0663c966_d5e21cf7",
+      "revId": "eaba5e570b81033acda273c94d5b7a697f292d74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

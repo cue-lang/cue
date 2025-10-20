@@ -19,8 +19,9 @@ const _State_name = "WaitingReadyRunningTerminated"
 var _State_index = [...]uint8{0, 7, 12, 19, 29}
 
 func (i State) String() string {
-	if i < 0 || i >= State(len(_State_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_State_index)-1 {
 		return "State(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _State_name[_State_index[i]:_State_index[i+1]]
+	return _State_name[_State_index[idx]:_State_index[idx+1]]
 }

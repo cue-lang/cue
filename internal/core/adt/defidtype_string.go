@@ -19,8 +19,9 @@ const _defIDType_name = "*EDS"
 var _defIDType_index = [...]uint8{0, 1, 2, 3, 4}
 
 func (i defIDType) String() string {
-	if i < 0 || i >= defIDType(len(_defIDType_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_defIDType_index)-1 {
 		return "defIDType(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _defIDType_name[_defIDType_index[i]:_defIDType_index[i+1]]
+	return _defIDType_name[_defIDType_index[idx]:_defIDType_index[idx+1]]
 }

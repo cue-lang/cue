@@ -21,8 +21,9 @@ const _RelPos_name = "invalidelidednospaceblanknewlinesection"
 var _RelPos_index = [...]uint8{0, 7, 13, 20, 25, 32, 39}
 
 func (i RelPos) String() string {
-	if i < 0 || i >= RelPos(len(_RelPos_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_RelPos_index)-1 {
 		return "RelPos(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _RelPos_name[_RelPos_index[i]:_RelPos_index[i+1]]
+	return _RelPos_name[_RelPos_index[idx]:_RelPos_index[idx+1]]
 }

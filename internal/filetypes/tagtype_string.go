@@ -19,8 +19,9 @@ const _TagType_name = "TagUnknownTagTopLevelTagSubsidiaryBoolTagSubsidiaryString
 var _TagType_index = [...]uint8{0, 10, 21, 38, 57}
 
 func (i TagType) String() string {
-	if i < 0 || i >= TagType(len(_TagType_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_TagType_index)-1 {
 		return "TagType(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _TagType_name[_TagType_index[i]:_TagType_index[i+1]]
+	return _TagType_name[_TagType_index[idx]:_TagType_index[idx+1]]
 }

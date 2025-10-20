@@ -42,8 +42,9 @@ const _Op_name = "NoOp&|.[][:]()&&||==!!=<<=>>==~!~+-*/quoremdivmod\\()"
 var _Op_index = [...]uint8{0, 4, 5, 6, 7, 9, 12, 14, 16, 18, 20, 21, 23, 24, 26, 27, 29, 31, 33, 34, 35, 36, 37, 40, 43, 46, 49, 52}
 
 func (i Op) String() string {
-	if i < 0 || i >= Op(len(_Op_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_Op_index)-1 {
 		return "Op(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _Op_name[_Op_index[i]:_Op_index[i+1]]
+	return _Op_name[_Op_index[idx]:_Op_index[idx+1]]
 }

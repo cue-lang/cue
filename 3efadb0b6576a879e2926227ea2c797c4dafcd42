@@ -176,6 +176,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6cd828f_ffee6322",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-20T12:38:24Z",
+      "side": 1,
+      "message": "Just FYI, conjuncts from patterns are already unified into individual fields. Either way.",
+      "parentUuid": "351ce2c2_c01f122c",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "253113f6_06757bbf",
@@ -394,6 +412,42 @@
       "side": 1,
       "message": "Given that we allow adding hidden fields and definitions to non-structs (and Allow says that we can); for example:\n```\nctx.CompileString(`1`).Allows(cue.Def(\"#T\"))\n```\nreturns true.\n\nAnd that empirically we _can_ add pattern constraints (both string, int. and non-specific) to lists, it seems correct to return true here.",
       "parentUuid": "e152bca5_e324c7ab",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fcb27b8_a97330e4",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1054,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-20T12:38:24Z",
+      "side": 1,
+      "message": "Interesting.",
+      "parentUuid": "d3119900_3a9d6e7b",
+      "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ec3e813_0cc17477",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1054,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-20T12:38:24Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8a42bf92_94cf0ba8",
       "revId": "3efadb0b6576a879e2926227ea2c797c4dafcd42",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

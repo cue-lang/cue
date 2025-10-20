@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13f73db3_34adbf0a",
+        "filename": "cue/types.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-20T12:38:24Z",
+      "side": 1,
+      "message": "I\u0027m not sure we want to necessarily _guarantee_ that. So maybe slip in a \"currently\"?",
+      "revId": "5dbbeb40e88b7b3a33f80c97351cfdd47993ff67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

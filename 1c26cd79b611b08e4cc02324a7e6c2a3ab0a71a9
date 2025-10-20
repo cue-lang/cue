@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae08b5c0_11776cfd",
+        "filename": "encoding/jsonschema/generate_items.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 865,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-20T11:55:19Z",
+      "side": 1,
+      "message": "should we briefly note here why this use of DeepEqual is acceptable? e.g. is it because we think it will be called very few times in practice?",
+      "revId": "1c26cd79b611b08e4cc02324a7e6c2a3ab0a71a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

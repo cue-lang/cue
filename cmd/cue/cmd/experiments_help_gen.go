@@ -58,17 +58,21 @@ Available per-file experiments:
     Spec change:   https://cuelang.org/cl/1217013
     Spec change:   https://cuelang.org/cl/1217014
 
+  aliasandself (preview: v0.15.0)
+    aliasandself enables the use of 'self' identifier to refer to the
+    enclosing struct and enables the postfix alias syntax (~X and ~(K,V)).
+    The file where this experiment is enabled disallows the use of old prefix
+    alias syntax (X=).
+    Proposal:      https://cuelang.org/issue/4014
+    Spec change:   https://cuelang.org/cl/1222377
+    Requires cue fix when upgrading
+
   explicitopen (preview: v0.15.0)
     explicitopen enables the postfix ... operator to explicitly open
     closed structs, allowing additional fields to be added.
     Proposal:      https://cuelang.org/issue/4032
     Spec change:   https://cuelang.org/cl/1221642
     Requires cue fix when upgrading
-
-  self (preview: v0.15.0)
-    self enables the use of 'self' identifier to refer to the enclosing struct.
-    Proposal:      https://cuelang.org/issue/4014
-    Spec change:   https://cuelang.org/cl/1222377
 
 
 ## Global Experiments

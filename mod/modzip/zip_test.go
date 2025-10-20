@@ -210,7 +210,7 @@ func TestCheckFilesWithDirWithTrailingSlash(t *testing.T) {
 		name: "cue.mod/module.cue",
 		data: []byte(`module: "example.com/m"`),
 	}}
-	_, err := modzip.CheckFiles[fakeFile](files, fakeFileIO{})
+	_, err := modzip.CheckFiles(files, fakeFileIO{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -247,7 +247,7 @@ func TestCheckFiles(t *testing.T) {
 			}
 
 			// Check the files.
-			cf, _ := modzip.CheckFiles[fakeFile](files, fakeFileIO{})
+			cf, _ := modzip.CheckFiles(files, fakeFileIO{})
 			got := formatCheckedFiles(cf)
 			if diff := cmp.Diff(test.want, got); diff != "" {
 				t.Errorf("unexpected result; (-want +got):\n%s", diff)
@@ -406,7 +406,7 @@ func TestCreate(t *testing.T) {
 					data: tf.Data,
 				}
 			}
-			if err := modzip.Create[fakeFile](tmpZipFile, m, files, fakeFileIO{}); err != nil {
+			if err := modzip.Create(tmpZipFile, m, files, fakeFileIO{}); err != nil {
 				if test.wantErr == "" {
 					t.Fatalf("unexpected error: %v", err)
 				} else if !strings.Contains(err.Error(), test.wantErr) {
@@ -751,7 +751,7 @@ func TestCreateSizeLimits(t *testing.T) {
 			if wantCheckFilesErr == "" {
 				wantCheckFilesErr = test.wantErr
 			}
-			if _, err := modzip.CheckFiles[fakeFile](test.files, fakeFileIO{}); err == nil && wantCheckFilesErr != "" {
+			if _, err := modzip.CheckFiles(test.files, fakeFileIO{}); err == nil && wantCheckFilesErr != "" {
 				t.Fatalf("CheckFiles: unexpected success; want error containing %q", wantCheckFilesErr)
 			} else if err != nil && wantCheckFilesErr == "" {
 				t.Fatalf("CheckFiles: got error %q; want success", err)
@@ -763,7 +763,7 @@ func TestCreateSizeLimits(t *testing.T) {
 			if wantCreateErr == "" {
 				wantCreateErr = test.wantErr
 			}
-			if err := modzip.Create[fakeFile](io.Discard, sizeLimitVersion, test.files, fakeFileIO{}); err == nil && wantCreateErr != "" {
+			if err := modzip.Create(io.Discard, sizeLimitVersion, test.files, fakeFileIO{}); err == nil && wantCreateErr != "" {
 				t.Fatalf("Create: unexpected success; want error containing %q", wantCreateErr)
 			} else if err != nil && wantCreateErr == "" {
 				t.Fatalf("Create: got error %q; want success", err)

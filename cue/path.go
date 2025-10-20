@@ -556,7 +556,7 @@ func (d definitionSelector) labelType() SelectorType {
 	return DefinitionLabel
 }
 
-func (s definitionSelector) constraintType() SelectorType { return 0 }
+func (d definitionSelector) constraintType() SelectorType { return 0 }
 
 func (d definitionSelector) feature(r adt.Runtime) adt.Feature {
 	return adt.MakeIdentLabel(r, string(d), "")

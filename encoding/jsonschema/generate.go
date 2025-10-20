@@ -79,9 +79,7 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 		defs:   make(map[string]internItem),
 		unique: newUniqueItems(),
 	}
-	item := g.makeItem(v)
-	item = mergeAllOf(item, g.unique)
-	item = enumFromConst(item, g.unique)
+	item := optimize(g.makeItem(v), g.unique)
 	expr := item.Get().generate(g)
 
 	// Check if the result is a boolean literal
@@ -108,7 +106,8 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	if len(g.defs) != 0 {
 		defFields := make([]ast.Decl, 0, len(g.defs))
 		for _, name := range slices.Sorted(maps.Keys(g.defs)) {
-			defFields = append(defFields, makeField(name, g.defs[name].Get().generate(g)))
+			def := optimize(g.defs[name], g.unique)
+			defFields = append(defFields, makeField(name, def.Get().generate(g)))
 		}
 		fields = append(fields, makeField("$defs", &ast.StructLit{Elts: defFields}))
 	}
@@ -118,6 +117,11 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 		return nil, g.err
 	}
 	return makeSchemaStructLit(fields...), nil
+}
+
+func optimize(it internItem, u *uniqueItems) internItem {
+	it = mergeAllOf(it, u)
+	return enumFromConst(it, u)
 }
 
 // mergeAllOf returns the item with adjacent itemAllOf nodes

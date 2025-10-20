@@ -167,14 +167,14 @@ workflows: trybot: _repo.bashWorkflow & {
 		// Note that it sorts tag names as strings, which is not the best, but works OK.
 		if:   "(\(_repo.isProtectedBranch) || \(_repo.isTestDefaultBranch)) && \(_repo.isLatestGoLinux)"
 		name: "Check all git tags are available"
-		run: """
+		run:  """
 			cd $(mktemp -d)
 
-			git ls-remote --tags https://github.com/cue-lang/cue >github.txt
+			git ls-remote --tags \(_repo.githubRepositoryURL) >github.txt
 			echo "GitHub tags:"
 			sed 's/^/    /' github.txt
 
-			git ls-remote --tags https://review.gerrithub.io/cue-lang/cue >gerrit.txt
+			git ls-remote --tags \(_repo.gerritHubRepositoryURL) >gerrit.txt
 
 			if ! diff -u github.txt gerrit.txt; then
 				echo "GitHub and Gerrit do not agree on the list of tags!"

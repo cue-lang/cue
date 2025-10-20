@@ -11,7 +11,8 @@ language: {
 }
 deps: {
 	"example.com@v0": {
-		v: "v0.0.1"
+		v:       "v0.0.1"
+		default: true
 	}
 }
 -- cue.mod/module.cue --

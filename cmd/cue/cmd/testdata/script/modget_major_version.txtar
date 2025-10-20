@@ -13,7 +13,8 @@ language: {
 }
 deps: {
 	"foo.org/bar@v2": {
-		v: "v2.0.0"
+		v:       "v2.0.0"
+		default: true
 	}
 }
 -- want-stdout --

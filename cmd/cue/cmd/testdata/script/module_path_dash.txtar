@@ -48,7 +48,8 @@ language: {
 }
 deps: {
 	"main.org/foo-bar@v1": {
-		v: "v1.0.0"
+		v:       "v1.0.0"
+		default: true
 	}
 }
 -- importer-noqualifier/main.cue --
@@ -72,7 +73,8 @@ language: {
 }
 deps: {
 	"main.org/foo-bar@v1": {
-		v: "v1.0.0"
+		v:       "v1.0.0"
+		default: true
 	}
 }
 -- importer-withqualifier/cue.mod/module.cue --
@@ -87,7 +89,8 @@ language: {
 }
 deps: {
 	"main.org/foo-bar@v1": {
-		v: "v1.0.0"
+		v:       "v1.0.0"
+		default: true
 	}
 }
 -- importer-withqualifier/main.cue --

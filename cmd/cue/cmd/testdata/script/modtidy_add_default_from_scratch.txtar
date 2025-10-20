@@ -1,0 +1,53 @@
+# Test that cue mod tidy adds default: true when adding a new dependency
+# from scratch (when there's no existing dependency entry).
+# This complements modtidy_add_default.txtar to show both paths work.
+
+# Verify no dependencies exist initially
+! exec grep 'deps:' cue.mod/module.cue
+
+# Run cue mod tidy
+exec cue mod tidy
+
+# Verify that the dependency was added with default: true
+cmp cue.mod/module.cue want-module
+
+# Check that the module evaluates correctly
+exec cue export .
+cmp stdout want-stdout
+
+-- want-stdout --
+{
+    "value": "from example.com"
+}
+-- want-module --
+module: "main.org@v0"
+language: {
+	version: "v0.11.0"
+}
+deps: {
+	"example.com@v1": {
+		v:       "v1.0.0"
+		default: true
+	}
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: {
+	version: "v0.11.0"
+}
+-- main.cue --
+package main
+
+import "example.com/foo"
+
+value: foo.value
+
+-- _registry/example.com_v1.0.0/cue.mod/module.cue --
+module: "example.com@v1"
+language: {
+	version: "v0.11.0"
+}
+-- _registry/example.com_v1.0.0/foo/data.cue --
+package foo
+
+value: "from example.com"

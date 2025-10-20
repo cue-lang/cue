@@ -16,6 +16,24 @@
       "message": "this TODO needs a bit more context; are you imagining a new API here, or is there a bug with some existing API?\n\nalso, can you not use `v.Allows(cue.AnyString)` or something like that? in which case we could just inline the simple check.",
       "revId": "fab3c51789c7596106a41a59fa03e19640760953",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5562362_13a3c660",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1053,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-20T15:21:49Z",
+      "side": 1,
+      "message": "Yeah, I\u0027m imagining a new API (the name was the result of a long discussion thrashing out the details with Marcel). `v.Allows(cue.AnyString)` doesn\u0027t mean the same thing. For example if `v` is `string`, `v.Allows(cue.AnyString)` will return false.\n\nWhat I need to know is whether a given value can be unified with all values of a particular kind (for example, `[_]: x` and `[string]: x` but not `[\u003d~\"x\"]: x`)\n\nFor the record, the new API (and implementation) we were considering is this:\n\n```\n// AcceptsAll reports whether all instances of the given kind are guaranteed\n// to unify with v.\n// Note: if it returns false, v may or may not accept all values of that kind.\nfunc (v Value) AcceptsAll(k Kind) bool {\n    return v.v.Concreteness() \u003e\u003d Type \u0026\u0026 (v.IncompleteKind() \u0026 k) \u003d\u003d k\n}\n```\n\nI\u0027ll qualify the TODO to make it clear the API doesn\u0027t exist yet.",
+      "parentUuid": "b8fa9f9f_1c023018",
+      "revId": "fab3c51789c7596106a41a59fa03e19640760953",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

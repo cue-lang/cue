@@ -1,18 +1,24 @@
 -- test.cue --
 package test
-close({a!: string, b!: int})
+
+[=~"^a"]: =~"b"
+[=~"b$"]: =~"x"
+ab?: string
 -- out/generate-v3/schema --
 {
-	$schema:              "https://json-schema.org/draft/2020-12/schema"
-	type:                 "object"
-	additionalProperties: false
-	properties: {
-		a: {
-			type: "string"
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	patternProperties: {
+		"^a": {
+			type:    "string"
+			pattern: "b"
 		}
-		b: {
-			type: "integer"
+		b$: {
+			type:    "string"
+			pattern: "x"
 		}
 	}
-	required: ["a", "b"]
+	properties: {
+		ab: true
+	}
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8fa9f9f_1c023018",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1053,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-20T11:45:04Z",
+      "side": 1,
+      "message": "this TODO needs a bit more context; are you imagining a new API here, or is there a bug with some existing API?\n\nalso, can you not use `v.Allows(cue.AnyString)` or something like that? in which case we could just inline the simple check.",
+      "revId": "fab3c51789c7596106a41a59fa03e19640760953",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

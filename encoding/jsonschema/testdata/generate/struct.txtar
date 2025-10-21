@@ -1,13 +1,17 @@
 -- test.cue --
 package test
-t1?: #S1
-t2?: #S2
-t3?: close(_foo)
-t4?: {a?: int, ...}
-t5?: {[_]: int}
-t6?: {a?: int}
-t7?: close({a!: string, b!: int})
-t8?: {
+import (
+	"strings"
+	"struct"
+)
+t01?: #S1
+t02?: #S2
+t03?: close(_foo)
+t04?: {a?: int, ...}
+t05?: {[_]: int}
+t06?: {a?: int}
+t07?: close({a!: string, b!: int})
+t08?: {
 	[=~"^a"]: =~"b"
 	[=~"b$"]: =~"x"
 	a?: string
@@ -15,6 +19,27 @@ t8?: {
 	ab?: string
 	x?: string
 }
+t09?: close({
+	{a?: int}
+	b?: int
+})
+t10?: {
+	[_]: int
+}
+t10?: {
+	{[_]: int}
+	a?: int
+}
+t11?: {
+	x?: string
+	[_]: =~"foo"
+} & {
+	x?: =~"bar"
+	y?: string
+	[_]: =~"bar"
+	[=~"x"]: strings.MinRunes(1)
+} & struct.MaxFields(100)
+
 #S1: {
 	a?: int
 }
@@ -48,13 +73,13 @@ _foo: a?: int
 	}
 	type: "object"
 	properties: {
-		t1: {
+		t01: {
 			$ref: "#/$defs/#S1"
 		}
-		t2: {
+		t02: {
 			$ref: "#/$defs/#S2"
 		}
-		t3: {
+		t03: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
@@ -63,7 +88,7 @@ _foo: a?: int
 				}
 			}
 		}
-		t4: {
+		t04: {
 			type: "object"
 			properties: {
 				a: {
@@ -71,10 +96,10 @@ _foo: a?: int
 				}
 			}
 		}
-		t5: {
+		t05: {
 			type: "object"
 		}
-		t6: {
+		t06: {
 			type: "object"
 			properties: {
 				a: {
@@ -82,7 +107,7 @@ _foo: a?: int
 				}
 			}
 		}
-		t7: {
+		t07: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
@@ -95,7 +120,7 @@ _foo: a?: int
 			}
 			required: ["a", "b"]
 		}
-		t8: {
+		t08: {
 			type: "object"
 			patternProperties: {
 				"^a": {
@@ -115,6 +140,63 @@ _foo: a?: int
 					type: "string"
 				}
 			}
+		}
+		t09: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				a: {
+					type: "integer"
+				}
+				b: {
+					type: "integer"
+				}
+			}
+		}
+		t10: {
+			type: "object"
+			properties: {
+				a: {
+					type: "integer"
+				}
+			}
+		}
+		t11: {
+			allOf: [{
+				additionalProperties: {
+					type:    "string"
+					pattern: "bar"
+				}
+				patternProperties: {
+					"": {
+						type:    "string"
+						pattern: "bar"
+					}
+					x: {
+						type:      "string"
+						minLength: 1
+					}
+				}
+				properties: {
+					x: true
+					y: true
+				}
+			}, {
+				type: "object"
+				additionalProperties: {
+					type:    "string"
+					pattern: "foo"
+				}
+				patternProperties: {
+					"": {
+						type:    "string"
+						pattern: "foo"
+					}
+				}
+				properties: {
+					x: true
+				}
+			}]
 		}
 	}
 }

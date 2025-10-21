@@ -22,6 +22,30 @@
       },
       "revId": "06bcabe2eb466051a560ab6189d12054bd86e63c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bcf947c_5cf238f3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T10:13:04Z",
+      "side": 1,
+      "message": "Actually, I went to reduce it a bit further, and it is actually a problematic issue. So I have added a problematic example and fixed the original issue.",
+      "parentUuid": "c83a8dbf_00e220cb",
+      "range": {
+        "startLine": 15,
+        "startChar": 30,
+        "endLine": 19,
+        "endChar": 1
+      },
+      "revId": "06bcabe2eb466051a560ab6189d12054bd86e63c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

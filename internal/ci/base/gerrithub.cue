@@ -137,7 +137,10 @@ trybotDispatchWorkflow: bashWorkflow & {
 						${{ toJSON(\(v.expr)) }}
 						EOD
 						)"
-						git log -1 --format=%B | git interpret-trailers --trailer "\(dispatchTrailer): $trailer" | git commit --amend -F -
+						# --no-divider prevents a "---" line from marking the end of the commit message.
+						# Here, we know that the input is exactly one commit message,
+						# so don't do weird things if the commit message has a "---" line.
+						git log -1 --format=%B | git interpret-trailers --no-divider --trailer "\(dispatchTrailer): $trailer" | git commit --amend -F -
 						git log -1
 
 						success=false
@@ -165,7 +168,7 @@ pushTipToTrybotWorkflow: bashWorkflow & {
 	on: {
 		push: branches: protectedBranchPatterns
 	}
-	name: "Push tip to \(trybot.key)"
+	name:        "Push tip to \(trybot.key)"
 	concurrency: "push_tip_to_trybot"
 
 	jobs: push: {

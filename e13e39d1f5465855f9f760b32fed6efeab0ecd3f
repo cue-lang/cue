@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6de0e71b_55651c4e",
+        "filename": "cue/op.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T14:00:04Z",
+      "side": 1,
+      "message": "Hmmm, it is called explicitly the spread operator in the spec. Also, as the Expr API does not distinguish between postfix and prefix operators, I think calling it Ellipsis makes it too easy to confuse with ...T. This will be even more so the case if we have the function proposal, which might introduce a prefix ... as well.",
+      "parentUuid": "f44ef61b_bed45742",
+      "revId": "e13e39d1f5465855f9f760b32fed6efeab0ecd3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8ce88c3b_27468066",
         "filename": "cue/types_test.go",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2025-10-21T13:47:07Z",
       "side": 1,
       "message": "Could we try:\n\n```\ninput: \"v: {#Y, a: 1}, #Y: {b: 2}\"\n```\ni.e. embedding _without_ an explicit spread op.\ngiven that in context, the embedded `#Y` means the same thing as `#Y` AIUI, we might expect to see a SpreadOp there too. And that would mean that it\u0027s possible to distinguish embedding from unification in legacy code too.\n\nAt the least it would be good to have the test case there to see what the behaviour actually is.",
+      "revId": "e13e39d1f5465855f9f760b32fed6efeab0ecd3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1efadf8_ad0749ec",
+        "filename": "cue/types_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 4043,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T14:00:04Z",
+      "side": 1,
+      "message": "I don\u0027t think we should introduce the spread operator there. The semantics between old embedding and the spread operator is close, but not the same. (E.g. this is why cue fix must introduce __closeAll, which is still not entirely the same.)\n\nAdded a test case, though.",
+      "parentUuid": "8ce88c3b_27468066",
       "revId": "e13e39d1f5465855f9f760b32fed6efeab0ecd3f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

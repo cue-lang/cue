@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16f51690_1d487297",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-21T13:47:07Z",
+      "side": 1,
+      "message": "LGTM with a couple of thoughts, thanks!",
+      "revId": "e13e39d1f5465855f9f760b32fed6efeab0ecd3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f44ef61b_bed45742",
+        "filename": "cue/op.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-21T13:47:07Z",
+      "side": 1,
+      "message": "All the other Op values are fairly obvious what the correspond to, but arguably \"spread\" isn\u0027t obviously related to the postfix `...` operator, so perhaps either comment here saying what it means, or maybe name it more obviously after the operator in question, say EllipsisOp?\n\nActually, it would be nice if the comments in the adt package were duplicated here anyway, as then they\u0027ll be more clearly visible in the public API.",
+      "revId": "e13e39d1f5465855f9f760b32fed6efeab0ecd3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ce88c3b_27468066",
+        "filename": "cue/types_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 4043,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-21T13:47:07Z",
+      "side": 1,
+      "message": "Could we try:\n\n```\ninput: \"v: {#Y, a: 1}, #Y: {b: 2}\"\n```\ni.e. embedding _without_ an explicit spread op.\ngiven that in context, the embedded `#Y` means the same thing as `#Y` AIUI, we might expect to see a SpreadOp there too. And that would mean that it\u0027s possible to distinguish embedding from unification in legacy code too.\n\nAt the least it would be good to have the test case there to see what the behaviour actually is.",
+      "revId": "e13e39d1f5465855f9f760b32fed6efeab0ecd3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

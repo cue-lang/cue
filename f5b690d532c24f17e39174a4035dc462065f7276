@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d55a5b99_d11465ae",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T10:47:59Z",
+      "side": 1,
+      "message": "nit: I\u0027d add `a \u003d\u003d nil` checks to these funcs, then there\u0027s less work for the callers to do upfront",
+      "revId": "f5b690d532c24f17e39174a4035dc462065f7276",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "182efea7_6d433c2e",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 648,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T10:47:59Z",
+      "side": 1,
+      "message": "join with the \"if\" condition above? see the next comment too",
+      "revId": "f5b690d532c24f17e39174a4035dc462065f7276",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72fb25b5_f215ee52",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 726,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T10:47:59Z",
+      "side": 1,
+      "message": "if we move `aliasHasLabel` to e.g. `internal.AliasHasLabel`, then here you could do `if a :\u003d x.Alias; internal.AliasHasLabel(a)`",
+      "revId": "f5b690d532c24f17e39174a4035dc462065f7276",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebc70af5_d9be0f78",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 824,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T10:47:59Z",
+      "side": 1,
+      "message": "ditto AliasHasLabel",
+      "revId": "f5b690d532c24f17e39174a4035dc462065f7276",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6873ab7_8c99587d",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T14:30:33Z",
+      "side": 1,
+      "message": "I thought it was for a moment, but we don\u0027t support embedded aliases yet. So it is not.\n\nDone",
+      "parentUuid": "6479a196_dca29bfc",
+      "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c27a0e17_f136cae1",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-10-21T13:44:04Z",
       "side": 1,
       "message": "use a type switch on `n.Label`, given that you have two cases?",
+      "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1ca04cd_898c9625",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T14:30:33Z",
+      "side": 1,
+      "message": "That is not possible: n.Label is rewritten, so it may end up running both cases, instead of just one.",
+      "parentUuid": "c27a0e17_f136cae1",
       "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab3910ff_deb532cd",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T14:30:33Z",
+      "side": 1,
+      "message": "In theory this should even not be possible, as it means invalid CUE. But made the code more permissive.",
+      "parentUuid": "4f975fb8_93cdb68f",
+      "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9d7a0cc_16b1dd72",
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb5ab41f_e1daa0c8",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T14:30:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9d7a0cc_16b1dd72",
+      "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e0460e3_726221df",
@@ -99,6 +171,24 @@
       "writtenOn": "2025-10-21T13:44:04Z",
       "side": 1,
       "message": "don\u0027t you always have to assign the result of Apply? i.e. `s \u003d astutil.Apply(s, ...).\n\nand then do `n.Value \u003d s` afterwards.",
+      "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae4d516c_10cfcfbb",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T14:30:33Z",
+      "side": 1,
+      "message": "Not always, only if there is a possibility that the value gets changed. In this case that is not possible, as we only are updating fields of values, and we are not replacing a visited node.",
+      "parentUuid": "8e0460e3_726221df",
       "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

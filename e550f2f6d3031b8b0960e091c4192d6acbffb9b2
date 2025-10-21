@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab44babf_79c922a4",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1380,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T10:40:20Z",
+      "side": 1,
+      "message": "the error message should use the way the experiment is spelled in the syntax, e.g. `with @experiment(aliasandself); use ...`",
+      "range": {
+        "startLine": 1380,
+        "startChar": 62,
+        "endLine": 1380,
+        "endChar": 74
+      },
+      "revId": "e550f2f6d3031b8b0960e091c4192d6acbffb9b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

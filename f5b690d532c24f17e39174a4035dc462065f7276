@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "abf8ac74_cbad05ad",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T13:01:01Z",
+      "side": 1,
+      "message": "Moved the whole logic into a single function.",
+      "parentUuid": "d55a5b99_d11465ae",
+      "revId": "f5b690d532c24f17e39174a4035dc462065f7276",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "182efea7_6d433c2e",
         "filename": "internal/core/compile/compile.go",
         "patchSetId": 5
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-21T10:47:59Z",
       "side": 1,
       "message": "join with the \"if\" condition above? see the next comment too",
+      "revId": "f5b690d532c24f17e39174a4035dc462065f7276",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ddcc509_9091e77d",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 648,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T13:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "182efea7_6d433c2e",
       "revId": "f5b690d532c24f17e39174a4035dc462065f7276",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3cdeb73b_95827b17",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 726,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T13:01:01Z",
+      "side": 1,
+      "message": "Kept is a bit more local, and also only one function.",
+      "parentUuid": "72fb25b5_f215ee52",
+      "revId": "f5b690d532c24f17e39174a4035dc462065f7276",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ebc70af5_d9be0f78",
         "filename": "internal/core/compile/compile.go",
         "patchSetId": 5
@@ -65,6 +119,24 @@
       "writtenOn": "2025-10-21T10:47:59Z",
       "side": 1,
       "message": "ditto AliasHasLabel",
+      "revId": "f5b690d532c24f17e39174a4035dc462065f7276",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "274cb29e_345117e4",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 824,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T13:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ebc70af5_d9be0f78",
       "revId": "f5b690d532c24f17e39174a4035dc462065f7276",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

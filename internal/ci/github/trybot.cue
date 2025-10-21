@@ -174,7 +174,7 @@ workflows: trybot: _repo.bashWorkflow & {
 			echo "GitHub tags:"
 			sed 's/^/    /' github.txt
 
-			git ls-remote --tags \(_repo.gerritHubRepositoryURL) >gerrit.txt
+			git ls-remote --tags \(_repo.gerritHubRepositoryNoAuthURL) >gerrit.txt
 
 			if ! diff -u github.txt gerrit.txt; then
 				echo "GitHub and Gerrit do not agree on the list of tags!"

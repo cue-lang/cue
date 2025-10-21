@@ -158,7 +158,7 @@ jobs:
           echo "GitHub tags:"
           sed 's/^/    /' github.txt
 
-          git ls-remote --tags https://cue.gerrithub.io/a/cue-lang/cue >gerrit.txt
+          git ls-remote --tags https://cue.gerrithub.io/cue-lang/cue >gerrit.txt
 
           if ! diff -u github.txt gerrit.txt; then
           	echo "GitHub and Gerrit do not agree on the list of tags!"

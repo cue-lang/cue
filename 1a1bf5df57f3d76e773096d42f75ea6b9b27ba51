@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30460c56_d2a4de35",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T15:35:24Z",
+      "side": 1,
+      "message": "so the spec would no longer describe the old syntax? I guess that\u0027s fine, but then we need to be careful about timing this merge. because for a little while, both old and new aliases will have a decent amount of users in CUE.",
+      "range": {
+        "startLine": 14,
+        "startChar": 47,
+        "endLine": 14,
+        "endChar": 56
+      },
+      "revId": "1a1bf5df57f3d76e773096d42f75ea6b9b27ba51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f535979_47b07f8a",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 1595,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T15:35:24Z",
+      "side": 1,
+      "message": "above you say \"label\" and here you say \"field name\". can we use consistent terminology? or if both are valid ways to say the same, I\u0027d say that explicitly.",
+      "range": {
+        "startLine": 1595,
+        "startChar": 34,
+        "endLine": 1595,
+        "endChar": 44
+      },
+      "revId": "1a1bf5df57f3d76e773096d42f75ea6b9b27ba51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f5e2467_c0451d33",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 1631,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T15:35:24Z",
+      "side": 1,
+      "message": "`~F` here is unused? if it\u0027s somehow on purpose, that seems confusing, so I\u0027d document it. but I\u0027d assume taht this would be a compile error.\n\n\nI guess you were trying to show how to use `~F` here, because there\u0027s no other example; in which case, the use of \"self\" is what is wrong here.",
+      "revId": "1a1bf5df57f3d76e773096d42f75ea6b9b27ba51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "beb71709_47c23983",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 1639,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T15:35:24Z",
+      "side": 1,
+      "message": "surely the output here is missing `add1: 2`?",
+      "revId": "1a1bf5df57f3d76e773096d42f75ea6b9b27ba51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2330731f_0954117b",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 1651,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T15:35:24Z",
+      "side": 1,
+      "message": "would this not result in a structural cycle? we end up with a struct whose \"field\" field points to itself. assuming that \"outputs\" is a form of export, I can\u0027t see how this could ever export to sensible data.",
+      "revId": "1a1bf5df57f3d76e773096d42f75ea6b9b27ba51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

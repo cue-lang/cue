@@ -40,7 +40,7 @@ func Check(path, version string) error {
 			Err:  &InvalidVersionError{Version: version, Err: errors.New("not a semantic version")},
 		}
 	}
-	_, pathMajor, _ := SplitPathVersion(path)
+	_, pathMajor, _ := ast.SplitPackageVersion(path)
 	if err := CheckPathMajor(version, pathMajor); err != nil {
 		return &ModuleError{Path: path, Err: err}
 	}
@@ -108,7 +108,7 @@ func fileNameOK(r rune) bool {
 // CheckPathWithoutVersion is like [CheckPath] except that
 // it expects a module path without a major version.
 func CheckPathWithoutVersion(basePath string) (err error) {
-	if _, _, ok := SplitPathVersion(basePath); ok {
+	if _, _, ok := ast.SplitPackageVersion(basePath); ok {
 		return fmt.Errorf("module path inappropriately contains version")
 	}
 	if err := checkPath(basePath, modulePath); err != nil {
@@ -162,7 +162,7 @@ func CheckPath(mpath string) (err error) {
 		}
 	}()
 
-	basePath, vers, ok := SplitPathVersion(mpath)
+	basePath, vers, ok := ast.SplitPackageVersion(mpath)
 	if ok {
 		if semver.Major(vers) != vers {
 			return fmt.Errorf("path can contain major version only")
@@ -194,7 +194,7 @@ func CheckPath(mpath string) (err error) {
 // The element prefix up to the first dot must not be a reserved file name
 // on Windows, regardless of case (CON, com1, NuL, and so on).
 func CheckImportPath(path string) error {
-	parts := ParseImportPath(path)
+	parts := ast.ParseImportPath(path)
 	if semver.Major(parts.Version) != parts.Version {
 		return &InvalidPathError{
 			Kind: "import",
@@ -389,6 +389,8 @@ var badWindowsNames = []string{
 // SplitPathVersion("foo.com/bar@") returns ("foo.com/bar@", "", false).
 //
 // Deprecated: use [ast.SplitPackageVersion] instead.
+//
+//go:fix inline
 func SplitPathVersion(path string) (prefix, version string, ok bool) {
 	return ast.SplitPackageVersion(path)
 }
@@ -396,13 +398,17 @@ func SplitPathVersion(path string) (prefix, version string, ok bool) {
 // ImportPath holds the various components of an import path.
 //
 // Deprecated: use [ast.ImportPath] instead.
+//
+//go:fix inline
 type ImportPath = ast.ImportPath
 
 // ParseImportPath returns the various components of an import path.
 // It does not check the result for validity.
 //
 // Deprecated: use [ast.ParseImportPath] instead.
-func ParseImportPath(p string) ImportPath {
+//
+//go:fix inline
+func ParseImportPath(p string) ast.ImportPath {
 	return ast.ParseImportPath(p)
 }
 

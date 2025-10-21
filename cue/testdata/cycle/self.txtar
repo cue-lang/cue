@@ -1,5 +1,5 @@
 -- in.cue --
-@experiment(self)
+@experiment(aliasandself)
 
 import "list"
 

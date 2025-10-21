@@ -1400,7 +1400,7 @@ func (n *astNode) resolvePathRoot(name string) *navigableBindings {
 				return nav
 			}
 			// Support for the Self experiment:
-			if name == "self" && nOrig.key != nil && nOrig.key.Pos().Experiment().Self {
+			if name == "self" && nOrig.key != nil && nOrig.key.Pos().Experiment().AliasAndSelf {
 				return nOrig.navigable.parent
 			}
 			return nil

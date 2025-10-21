@@ -38,6 +38,14 @@ _foo: a?: int
 				}
 			}
 		}
+		"_foo": {
+			type: "object"
+			properties: {
+				a: {
+					type: "integer"
+				}
+			}
+		}
 	}
 	type: "object"
 	properties: {
@@ -48,12 +56,7 @@ _foo: a?: int
 			$ref: "#/$defs/#S2"
 		}
 		t3: {
-			type: "object"
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			$ref: "#/$defs/_foo"
 		}
 		t4: {
 			type:                 "object"
@@ -66,6 +69,14 @@ _foo: a?: int
 		}
 		t5: {
 			type: "object"
+			additionalProperties: {
+				type: "integer"
+			}
+			patternProperties: {
+				"": {
+					type: "integer"
+				}
+			}
 		}
 		t6: {
 			type: "object"

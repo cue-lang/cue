@@ -52,6 +52,23 @@ type GenerateConfig struct {
 	ExplicitOpen bool
 }
 
+type closedMode byte
+
+const (
+	open = closedMode(iota)
+	closed
+	closedRecursively
+)
+
+// descend returns the closed mode that applies to m when
+// descending one level of struct field.
+func (m closedMode) descend() closedMode {
+	if m == closedRecursively {
+		return m
+	}
+	return open
+}
+
 // Generate generates a JSON Schema for the given CUE value,
 // with the returned AST representing the generated JSON result.
 func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
@@ -79,7 +96,14 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 		defs:   make(map[string]internItem),
 		unique: newUniqueItems(),
 	}
-	item := optimize(g.makeItem(v), g.unique)
+	mode := open
+	switch {
+	case v.IsClosed():
+		mode = closed
+	case v.IsClosedRecursively():
+		mode = closedRecursively
+	}
+	item := optimize(g.makeItem(v, mode), g.unique)
 	expr := item.Value().generate(g)
 
 	// Check if the result is a boolean literal
@@ -238,17 +262,28 @@ func (g *generator) addError(pos cue.Value, err error) {
 	g.err = errors.Append(g.err, errors.Promote(err, ""))
 }
 
+// isDefinition reports whether the given path represents a definition.
+// A definition is indicated by a selector with DefinitionLabel type.
+func isDefinition(path cue.Path) bool {
+	for _, sel := range path.Selectors() {
+		if sel.LabelType() == cue.DefinitionLabel {
+			return true
+		}
+	}
+	return false
+}
+
 func (g *generator) addErrorf(pos cue.Value, f string, a ...any) {
 	g.addError(pos, fmt.Errorf(f, a...))
 }
 
 // makeItem returns an item representing the JSON Schema
 // for v in naive form.
-func (g *generator) makeItem(v cue.Value) internItem {
-	return g.unique.intern(g.makeItem0(v))
+func (g *generator) makeItem(v cue.Value, mode closedMode) internItem {
+	return g.unique.intern(g.makeItem0(v, mode))
 }
 
-func (g *generator) makeItem0(v cue.Value) item {
+func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 	op, args := v.Expr()
 	switch op {
 	case cue.NoOp, cue.SelectorOp:
@@ -259,6 +294,14 @@ func (g *generator) makeItem0(v cue.Value) item {
 		// It's a reference: generate a definition for it.
 		// TODO Not all references need or should have a definition.
 		if name := g.cfg.NameFunc(pkg, path); name != "" {
+			// Lookup path directly rather than following v
+			// so that we get to see the reference in isolation
+			// and can follow its value even if it's a reference itself.
+			v1 := pkg.LookupPath(path)
+			if !v1.Exists() {
+				g.addErrorf(v, "reference %v not found", path)
+			}
+			v = v1
 			ref := &itemRef{
 				defName: name,
 			}
@@ -267,16 +310,32 @@ func (g *generator) makeItem0(v cue.Value) item {
 				return ref
 			}
 			g.defs[name] = internItem{} // Prevent infinite loops on cycles.
-			g.defs[name] = g.makeItem(v.Eval())
+			defMode := open
+			if isDefinition(path) {
+				defMode = closedRecursively
+			}
+			g.defs[name] = g.makeItem(v, defMode)
 			return ref
 		}
 	case cue.AndOp:
+		if v.Kind() == cue.StructKind {
+			// It's a conjunction of structs: we want to see all the
+			// top level fields in one coherent view because JSON
+			// Schema requires `additionalProperties` to be at the
+			// same level as `properties`.
+			return &itemAllOf{
+				elems: []internItem{
+					g.unique.intern(g.makeStructItem(v, mode)),
+					g.unique.intern(&itemType{kinds: []string{"object"}}),
+				},
+			}
+		}
 		return &itemAllOf{
-			elems: mapSlice(args, g.makeItem),
+			elems: mapSlice(args, func(v cue.Value) internItem { return g.makeItem(v, open) }),
 		}
 	case cue.OrOp:
 		return &itemAnyOf{
-			elems: mapSlice(args, g.makeItem),
+			elems: mapSlice(args, func(v cue.Value) internItem { return g.makeItem(v, open) }),
 		}
 	case cue.RegexMatchOp,
 		cue.NotRegexMatchOp:
@@ -363,13 +422,13 @@ func (g *generator) makeItem0(v cue.Value) item {
 			return &itemFalse{}
 		}
 	case cue.CallOp:
-		return g.makeCallItem(v, args)
+		return g.makeCallItem(v, args, mode)
 	}
 	if !v.IsNull() {
 		// We want to encode null as {type: "null"} not {const: null}
 		// so then there's a possibility of collapsing it together in
 		// the same type keyword.
-		if e, ok := g.constValueOf(v); ok {
+		if e, ok := g.constExpr(v, mode); ok {
 			return &itemConst{
 				value: e,
 			}
@@ -382,9 +441,9 @@ func (g *generator) makeItem0(v cue.Value) item {
 	var it item // additional constraints for some known types.
 	switch kind {
 	case cue.StructKind:
-		it = g.makeStructItem(v)
+		it = g.makeStructItem(v, mode)
 	case cue.ListKind:
-		it = g.makeListItem(v)
+		it = g.makeListItem(v, mode)
 	}
 	var elems []internItem
 	if kinds := cueKindToJSONSchemaTypes(kind); len(kinds) > 0 {
@@ -406,7 +465,7 @@ func (g *generator) makeItem0(v cue.Value) item {
 	}
 }
 
-// constValueOf returns the "constant" value of a given
+// constExpr returns the "constant" value of a given
 // cue value. There are a few possible ways to represent
 // a JSON Schema const in CUE; some examples:
 //
@@ -419,19 +478,22 @@ func (g *generator) makeItem0(v cue.Value) item {
 // There's some overlap here with the unary == treatment
 // in [generator.makeItem] but in that case we know that
 // the argument must be constant, and this case we don't.
-func (g *generator) constValueOf(v cue.Value) (ast.Expr, bool) {
+func (g *generator) constExpr(v cue.Value, mode closedMode) (ast.Expr, bool) {
 	// Check for unary == operator (e.g., ==1, ==true)
 	op, args := v.Expr()
 	if op == cue.EqualOp && len(args) == 1 {
-		// It's a unary equals, recurse on the argument
-		return g.constValueOf(args[0])
+		// It's a unary equals: the argument must be concrete and
+		// there's no need to use [constExpr] any more.
+		syntax := args[0].Syntax()
+		expr, ok := syntax.(ast.Expr)
+		return expr, ok
 	}
 
 	switch kind := v.Kind(); kind {
 	case cue.BottomKind:
 		return nil, false
 	case cue.StructKind:
-		if !v.IsClosed() {
+		if mode == open {
 			// Open struct is not const.
 			return nil, false
 		}
@@ -449,7 +511,7 @@ func (g *generator) constValueOf(v cue.Value) (ast.Expr, bool) {
 				return nil, false
 			}
 			// Recursively check if the field value is const
-			fieldExpr, ok := g.constValueOf(iter.Value())
+			fieldExpr, ok := g.constExpr(iter.Value(), mode)
 			if !ok {
 				return nil, false
 			}
@@ -469,7 +531,7 @@ func (g *generator) constValueOf(v cue.Value) (ast.Expr, bool) {
 		}
 		var elems []ast.Expr
 		for iter.Next() {
-			elemExpr, ok := g.constValueOf(iter.Value())
+			elemExpr, ok := g.constExpr(iter.Value(), mode)
 			if !ok {
 				return nil, false
 			}
@@ -482,13 +544,10 @@ func (g *generator) constValueOf(v cue.Value) (ast.Expr, bool) {
 		return nil, false
 	}
 	expr, ok := v.Syntax().(ast.Expr)
-	if !ok {
-		return nil, false
-	}
-	return expr, true
+	return expr, ok
 }
 
-func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
+func (g *generator) makeCallItem(v cue.Value, args []cue.Value, mode closedMode) item {
 	if len(args) < 1 {
 		// Invalid call - not enough arguments
 		g.addError(v, fmt.Errorf("call operation with no function"))
@@ -499,7 +558,6 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 	// TODO this might need rethinking if/when functions become more of
 	// a first class thing within CUE.
 	funcName := fmt.Sprint(args[0])
-
 	switch funcName {
 	case "error()", "error":
 		// Explicit error: don't add an error to g but map it to a `false` schema.
@@ -507,8 +565,10 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 		// we include "error()" as well as "error"
 		return &itemFalse{}
 	case "close":
-		// We'll detect closedness with IsClosed further down.
-		return g.makeItem(v.Eval()).Value()
+		if mode == open {
+			mode = closed
+		}
+		return g.makeItem(args[1], mode).Value()
 	case "strings.MinRunes":
 		if len(args) != 2 {
 			g.addError(v, fmt.Errorf("strings.MinRunes expects 1 argument, got %d", len(args)-1))
@@ -690,7 +750,7 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 			// Bottom value - represents "contains: false"
 			elem = g.unique.intern(&itemFalse{})
 		} else {
-			elem = g.makeItem(elemVal)
+			elem = g.makeItem(elemVal, open)
 		}
 
 		return &itemAllOf{
@@ -724,7 +784,7 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 			if !v.Exists() {
 				break
 			}
-			items = append(items, g.makeItem(v))
+			items = append(items, g.makeItem(v, open))
 		}
 		// Extract the list of items from the second argument.
 
@@ -791,9 +851,9 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 		}
 
 		return &itemIfThenElse{
-			ifElem:   g.makeItem(args[1]),
-			thenElem: trueAsNil(g.makeItem(args[2])),
-			elseElem: trueAsNil(g.makeItem(args[3])),
+			ifElem:   g.makeItem(args[1], open),
+			thenElem: trueAsNil(g.makeItem(args[2], open)),
+			elseElem: trueAsNil(g.makeItem(args[3], open)),
 		}
 
 	default:
@@ -803,10 +863,12 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value) item {
 	}
 }
 
-func (g *generator) makeStructItem(v cue.Value) item {
+func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 	props := itemProperties{
-		properties: make(map[string]internItem),
+		properties:        make(map[string]internItem),
+		patternProperties: make(map[string]internItem),
 	}
+	required := make(map[string]bool)
 
 	explicitlyOpen := func(constraint internItem) {
 		props.additionalProperties = constraint
@@ -820,107 +882,134 @@ func (g *generator) makeStructItem(v cue.Value) item {
 	ellipsis := v.LookupPath(cue.MakePath(cue.AnyString))
 	if ellipsis.Exists() {
 		// All fields are explicitly allowed (either with `...` or `[_]: T`)
-		explicitlyOpen(g.makeItem(ellipsis))
-	} else if v.IsClosed() && !g.cfg.ExplicitOpen {
+		explicitlyOpen(g.makeItem(ellipsis, mode.descend()))
+	} else if mode != open && !g.cfg.ExplicitOpen {
 		props.additionalProperties = g.unique.intern(&itemFalse{})
 	}
 
-	iter, err := v.Fields(cue.Optional(true), cue.Patterns(true))
-	if err != nil {
-		g.addError(v, err)
-		return &itemFalse{}
+	allOf := &itemAllOf{}
+	addProperty := func(fieldName string, it internItem) {
+		props.properties[fieldName] = join(props.properties[fieldName], it, g.unique)
 	}
-	type pat struct {
-		pattern     *regexp.Regexp
-		constraints map[internItem]bool
+	addPatternProperty := func(pattern string, it internItem) {
+		props.patternProperties[pattern] = join(props.patternProperties[pattern], it, g.unique)
 	}
-	var patternConstraints []pat
-outer:
-	for iter.Next() {
-		sel := iter.Selector()
-		switch sel.ConstraintType() {
-		case cue.PatternConstraint:
-			re, ok := regexpForValue(sel.Pattern())
-			if ok {
-				if props.patternProperties == nil {
-					props.patternProperties = make(map[string]internItem)
-				}
-				constraint := g.makeItem(iter.Value())
-				props.patternProperties[re.String()] = constraint
-				p := pat{
-					pattern:     re,
-					constraints: make(map[internItem]bool),
-				}
-				for c := range itemConjuncts(constraint) {
-					p.constraints[c] = true
-				}
-				patternConstraints = append(patternConstraints, p)
-			} else {
-				// We can't express the constraint in JSON Schema, and it
-				// might cover any number of possible labels, so the
-				// only thing we can do is treat the whole thing as explicitly
-				// open.
-				explicitlyOpen(g.unique.intern(&itemTrue{}))
-			}
-			continue outer
-		case cue.OptionalConstraint:
-		case cue.RequiredConstraint:
-			props.required = append(props.required, sel.Unquoted())
-		default:
-			// It's a regular field. If it's concrete, then we can
-			// consider the field to be optional because it's OK
-			// to omit it. Otherwise it'll be required.
-			if err := iter.Value().Validate(cue.Concrete(true)); err != nil {
-				props.required = append(props.required, sel.Unquoted())
-			}
-		}
-		propItem := g.makeItem(iter.Value())
-		fieldName := sel.Unquoted()
-		if len(patternConstraints) == 0 {
-			props.properties[fieldName] = propItem
+	for v := range valueConjuncts(v) {
+		pkg, _ := v.ReferencePath()
+		if pkg.Exists() || v.Kind() != cue.StructKind {
+			// This conjunct is a reference or some other non-struct literal.
+			// Let's keep it as such.
+			allOf.elems = append(allOf.elems, g.makeItem(v, open))
 			continue
 		}
-		// There are pattern constraints which will have been unified in with
-		// the constraints of any matching field. They're redundant with
-		// respect to patternProperties, so remove them.
-		// This has the potential to remove explicit constraints on the fields
-		// themselves, but this will not change behavior, just result in a slightly
-		// smaller resulting schema.
-		allof, ok := propItem.Value().(*itemAllOf)
-		if !ok || len(allof.elems) <= 1 {
-			// No possibility of removing any conjuncts.
-			props.properties[fieldName] = propItem
-			continue
+		iter, err := v.Fields(cue.Optional(true), cue.Patterns(true))
+		if err != nil {
+			g.addError(v, err)
+			return &itemFalse{}
 		}
-		var elems []internItem
-		for _, c := range patternConstraints {
-			if !c.pattern.MatchString(fieldName) {
+		type pat struct {
+			pattern     *regexp.Regexp
+			constraints map[internItem]bool
+		}
+		// patternConstraints keeps track of the pattern constraints in this
+		// particular conjunct so we can remove them from the individual fields.
+		var patternConstraints []pat
+	outer:
+		for iter.Next() {
+			sel := iter.Selector()
+			switch sel.ConstraintType() {
+			case cue.PatternConstraint:
+				re, ok := regexpForValue(sel.Pattern())
+				if ok {
+					constraint := g.makeItem(iter.Value(), mode.descend())
+					addPatternProperty(re.String(), constraint)
+					p := pat{
+						pattern:     re,
+						constraints: make(map[internItem]bool),
+					}
+					for c := range itemConjuncts(constraint) {
+						p.constraints[c] = true
+					}
+					patternConstraints = append(patternConstraints, p)
+				} else {
+					// We can't express the constraint in JSON Schema, and it
+					// might cover any number of possible labels, so the
+					// only thing we can do is treat the whole thing as explicitly
+					// open.
+					explicitlyOpen(g.unique.intern(&itemTrue{}))
+				}
+				continue outer
+			case cue.OptionalConstraint:
+			case cue.RequiredConstraint:
+				required[sel.Unquoted()] = true
+			default:
+				// It's a regular field. If it's concrete, then we can
+				// consider the field to be optional because it's OK
+				// to omit it. Otherwise it'll be required.
+				if err := iter.Value().Validate(cue.Concrete(true)); err != nil {
+					required[sel.Unquoted()] = true
+				}
+			}
+			propItem := g.makeItem(iter.Value(), mode.descend())
+			fieldName := sel.Unquoted()
+			if len(patternConstraints) == 0 {
+				addProperty(fieldName, propItem)
 				continue
 			}
-			if elems == nil {
-				elems = slices.Collect(siblings(allof))
+			// There are pattern constraints which will have been unified in with
+			// the constraints of any matching field. They're redundant with
+			// respect to patternProperties, so remove them.
+			// This has the potential to remove explicit constraints on the fields
+			// themselves, but this will not change behavior, just result in a slightly
+			// smaller resulting schema.
+			allof, ok := propItem.Value().(*itemAllOf)
+			if !ok || len(allof.elems) <= 1 {
+				// No possibility of removing any conjuncts.
+				addProperty(fieldName, propItem)
+				continue
 			}
-			// We've found a pattern constraint that unifies with the field name.
-			// Its constraint will have been added to this property's constraints
-			// but are redundant, so remove them.
-			elems = slices.DeleteFunc(elems, func(it internItem) bool {
-				return c.constraints[it]
-			})
+			var elems []internItem
+			for _, c := range patternConstraints {
+				if !c.pattern.MatchString(fieldName) {
+					continue
+				}
+				if elems == nil {
+					elems = slices.Collect(siblings(allof))
+				}
+				// We've found a pattern constraint that unifies with the field name.
+				// Its constraint will have been added to this property's constraints
+				// but are redundant, so remove them.
+				elems = slices.DeleteFunc(elems, func(it internItem) bool {
+					return c.constraints[it]
+				})
+			}
+			if len(elems) == 0 {
+				propItem = g.unique.intern(&itemTrue{})
+			} else {
+				propItem = g.unique.intern(&itemAllOf{elems: elems})
+			}
+			addProperty(fieldName, propItem)
 		}
-		if len(elems) == 0 {
-			propItem = g.unique.intern(&itemTrue{})
-		} else {
-			propItem = g.unique.intern(&itemAllOf{elems: elems})
+	}
+	props.required = slices.Sorted(maps.Keys(required))
+	hasObjectConstraints :=
+		len(props.properties) == 0 ||
+			len(props.required) == 0 ||
+			len(props.patternProperties) == 0
+	if len(allOf.elems) > 0 {
+		if !hasObjectConstraints {
+			return allOf
 		}
-		props.properties[fieldName] = propItem
+		allOf.elems = append(allOf.elems, g.unique.intern(&props))
+		return allOf
 	}
-	if len(props.properties) == 0 && len(props.required) == 0 {
-		return &itemTrue{}
+	if hasObjectConstraints {
+		return &props
 	}
-	return &props
+	return &itemTrue{}
 }
 
-func (g *generator) makeListItem(v cue.Value) item {
+func (g *generator) makeListItem(v cue.Value, mode closedMode) item {
 	ellipsis := v.LookupPath(cue.MakePath(cue.AnyIndex))
 	lenv := v.Len()
 	var n int64
@@ -956,7 +1045,7 @@ func (g *generator) makeListItem(v cue.Value) item {
 			g.addErrorf(v, "cannot get value at index %d in %v", i, v)
 			return &itemFalse{}
 		}
-		prefix[i] = g.makeItem(elem)
+		prefix[i] = g.makeItem(elem, mode)
 	}
 	a := &itemAllOf{
 		elems: []internItem{g.unique.intern(&itemType{kinds: []string{"array"}})},
@@ -970,7 +1059,7 @@ func (g *generator) makeListItem(v cue.Value) item {
 		items.prefix = prefix
 	}
 	if ellipsis.Exists() {
-		items.rest = trueAsNil(g.makeItem(ellipsis))
+		items.rest = trueAsNil(g.makeItem(ellipsis, mode))
 	} else {
 		a.elems = append(a.elems, g.unique.intern(&itemLengthBounds{
 			constraint: cue.LessThanEqualOp,
@@ -981,6 +1070,18 @@ func (g *generator) makeListItem(v cue.Value) item {
 		a.elems = append(a.elems, g.unique.intern(items))
 	}
 	return a
+}
+
+func join(it1, it2 internItem, u *uniqueItems) internItem {
+	if it1.Value() == nil {
+		return it2
+	}
+	if it2.Value() == nil {
+		return it1
+	}
+	return u.intern(&itemAllOf{
+		elems: []internItem{it1, it2},
+	})
 }
 
 // cueKindToJSONSchemaTypes converts a CUE kind to JSON Schema type strings
@@ -1106,4 +1207,22 @@ func mapSlice[T1, T2 any](xs []T1, f func(T1) T2) []T2 {
 		xs1[i] = f(x)
 	}
 	return xs1
+}
+func valueConjuncts(v cue.Value) iter.Seq[cue.Value] {
+	return func(yield func(cue.Value) bool) {
+		yieldValueConjuncts(v, yield)
+	}
+}
+
+func yieldValueConjuncts(v cue.Value, yield func(cue.Value) bool) bool {
+	op, args := v.Expr()
+	if op != cue.AndOp {
+		return yield(v)
+	}
+	for _, v := range args {
+		if !yieldValueConjuncts(v, yield) {
+			return false
+		}
+	}
+	return true
 }

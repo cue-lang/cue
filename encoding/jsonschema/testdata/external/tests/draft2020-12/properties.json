@@ -106,10 +106,7 @@
 				"data": {
 					"foo": []
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "patternProperty validates nonproperty",
@@ -126,10 +123,7 @@
 				"data": {
 					"fxo": []
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "additionalProperty ignores property",

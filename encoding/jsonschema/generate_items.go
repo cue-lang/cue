@@ -618,15 +618,17 @@ func (it *itemProperties) hash(h *maphash.Hash, u *uniqueItems) {
 }
 
 func (i *itemProperties) generate(g *generator) ast.Expr {
-	propFields := make([]ast.Decl, 0, len(i.properties))
-	for name, it := range i.properties {
-		propFields = append(propFields, makeField(name, it.Value().generate(g)))
+	fields := []ast.Decl{}
+	if len(i.properties) > 0 {
+		propFields := make([]ast.Decl, 0, len(i.properties))
+		for name, it := range i.properties {
+			propFields = append(propFields, makeField(name, it.Value().generate(g)))
+		}
+		slices.SortFunc(propFields, func(a, b ast.Decl) int {
+			return cmp.Compare(fieldLabel(a), fieldLabel(b))
+		})
+		fields = append(fields, makeField("properties", &ast.StructLit{Elts: propFields}))
 	}
-	slices.SortFunc(propFields, func(a, b ast.Decl) int {
-		return cmp.Compare(fieldLabel(a), fieldLabel(b))
-	})
-
-	fields := []ast.Decl{makeField("properties", &ast.StructLit{Elts: propFields})}
 	if len(i.required) > 0 {
 		reqExprs := make([]ast.Expr, len(i.required))
 		for j, r := range i.required {

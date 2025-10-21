@@ -58,6 +58,8 @@ const (
 	IntModuloOp     // mod
 
 	InterpolationOp // \()
+
+	SpreadOp // ...
 )
 
 // OpFromToken converts a token.Token to an Op.

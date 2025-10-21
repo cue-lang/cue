@@ -68,6 +68,24 @@
       "message": "LGTM when tests pass.",
       "revId": "c59fbb6c7d5a4d34cac2e05a53db3ae4d8bc4b4b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f260d9d_1914404a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T21:05:21Z",
+      "side": 1,
+      "message": "these bugs were fixed, so the rewrite is now correct.",
+      "parentUuid": "eccf3aa3_f4d668af",
+      "revId": "c59fbb6c7d5a4d34cac2e05a53db3ae4d8bc4b4b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

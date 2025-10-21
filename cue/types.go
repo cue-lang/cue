@@ -2333,6 +2333,9 @@ process:
 	case *adt.UnaryExpr:
 		a = append(a, remakeValue(v, env, x.X))
 		op = x.Op
+	case *adt.OpenExpr:
+		a = append(a, remakeValue(v, env, x.X))
+		op = adt.SpreadOp
 	case *adt.BoundExpr:
 		a = append(a, remakeValue(v, env, x.Expr))
 		op = x.Op

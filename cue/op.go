@@ -58,4 +58,6 @@ const (
 	IntModuloOp     Op = adt.IntModuloOp
 
 	InterpolationOp Op = adt.InterpolationOp
+
+	SpreadOp Op = adt.SpreadOp
 )

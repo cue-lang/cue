@@ -157,6 +157,7 @@ func Version(v string) Option {
 
 // FromVersion specifies until which legacy version the parser should provide
 // backwards compatibility.
+//
 // Deprecated: use [Version] instead.
 func FromVersion(version int) Option {
 	return optionFunc(func(cfg *Config) {})

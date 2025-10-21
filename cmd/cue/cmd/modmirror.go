@@ -24,6 +24,7 @@ import (
 	"github.com/opencontainers/go-digest"
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/mod/modconfig"
@@ -146,7 +147,7 @@ func runModMirror(cmd *Command, args []string) error {
 	// TODO concurrency
 	var expanded []module.Version
 	for _, m := range modules {
-		mpath, mvers, ok := module.SplitPathVersion(m)
+		mpath, mvers, ok := ast.SplitPackageVersion(m)
 		if !ok || semver.Canonical(mvers) != mvers {
 			if useMod {
 				// Resolve the version from the module file.

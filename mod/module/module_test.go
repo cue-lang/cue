@@ -7,6 +7,7 @@ package module
 import (
 	"testing"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/cuetest"
 	"github.com/go-quicktest/qt"
 )
@@ -656,8 +657,8 @@ func TestParseImportPath(t *testing.T) {
 	// Just a smoke test to make sure that the (deprecated)
 	// ParseImportPath function is still wired up and the
 	// ImportPath type is still defined.
-	ip := ParseImportPath("foo.com/bar@v0:baz")
-	qt.Assert(t, qt.DeepEquals(ip, ImportPath{
+	ip := ast.ParseImportPath("foo.com/bar@v0:baz")
+	qt.Assert(t, qt.DeepEquals(ip, ast.ImportPath{
 		Path:              "foo.com/bar",
 		Version:           "v0",
 		Qualifier:         "baz",

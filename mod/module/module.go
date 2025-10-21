@@ -85,6 +85,7 @@ import (
 	"slices"
 	"strings"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/semver"
 )
 
@@ -133,7 +134,7 @@ func (m Version) BasePath() string {
 	if m.IsLocal() {
 		return m.path
 	}
-	basePath, _, ok := SplitPathVersion(m.path)
+	basePath, _, ok := ast.SplitPackageVersion(m.path)
 	if !ok {
 		panic(fmt.Errorf("broken invariant: failed to split version in %q", m.path))
 	}
@@ -183,7 +184,7 @@ func MustParseVersion(s string) Version {
 // The version must be canonical (i.e. it can't be
 // just a major version).
 func ParseVersion(s string) (Version, error) {
-	basePath, vers, ok := SplitPathVersion(s)
+	basePath, vers, ok := ast.SplitPackageVersion(s)
 	if !ok {
 		return Version{}, fmt.Errorf("invalid module path@version %q", s)
 	}
@@ -222,19 +223,19 @@ func NewVersion(path string, version string) (Version, error) {
 			return Version{}, fmt.Errorf("version %q (of module %q) is not canonical", version, path)
 		}
 		maj := semver.Major(version)
-		_, vmaj, ok := SplitPathVersion(path)
+		_, vmaj, ok := ast.SplitPackageVersion(path)
 		if ok && maj != vmaj {
 			return Version{}, fmt.Errorf("mismatched major version suffix in %q (version %v)", path, version)
 		}
 		if !ok {
 			fullPath := path + "@" + maj
-			if _, _, ok := SplitPathVersion(fullPath); !ok {
+			if _, _, ok := ast.SplitPackageVersion(fullPath); !ok {
 				return Version{}, fmt.Errorf("cannot form version path from %q, version %v", path, version)
 			}
 			path = fullPath
 		}
 	default:
-		base, _, ok := SplitPathVersion(path)
+		base, _, ok := ast.SplitPackageVersion(path)
 		if !ok {
 			return Version{}, fmt.Errorf("path %q has no major version", path)
 		}

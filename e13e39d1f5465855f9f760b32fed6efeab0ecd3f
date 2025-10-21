@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d31f2b19_3f112e6b",
+        "filename": "cue/op.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-21T16:20:56Z",
+      "side": 1,
+      "message": "I suspect most users won\u0027t have read the spec! Still, we can always add comments later.",
+      "parentUuid": "6de0e71b_55651c4e",
+      "revId": "e13e39d1f5465855f9f760b32fed6efeab0ecd3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ce88c3b_27468066",
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "I don\u0027t think we should introduce the spread operator there. The semantics between old embedding and the spread operator is close, but not the same. (E.g. this is why cue fix must introduce __closeAll, which is still not entirely the same.)\n\nAdded a test case, though.",
       "parentUuid": "8ce88c3b_27468066",
+      "revId": "e13e39d1f5465855f9f760b32fed6efeab0ecd3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad88f711_c3f3644e",
+        "filename": "cue/types_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 4043,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-21T16:20:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1efadf8_ad0749ec",
       "revId": "e13e39d1f5465855f9f760b32fed6efeab0ecd3f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

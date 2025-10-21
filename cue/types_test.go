@@ -4037,6 +4037,12 @@ func TestExpr(t *testing.T) {
 		input: "v: 2 mod 5",
 		want:  "mod(2 5)",
 	}, {
+		input: "@experiment(explicitopen)\n v: #Y..., #Y: {b: 2}",
+		want:  `...(.(〈〉 "#Y"))`,
+	}, {
+		input: "@experiment(explicitopen)\n v: {#Y..., a: 1}, #Y: {b: 2}",
+		want:  `&(...(.(〈〉 "#Y")) {a:1})`,
+	}, {
 		input: "v: a.b, a: b: 4",
 		want:  `.(.(〈〉 "a") "b")`,
 	}, {

@@ -212,6 +212,25 @@ nonConcrete: {
 	eErr6: ==_int
 	eErr6: "foo"
 }
+-- issue4142.cue --
+@experiment(structcmp)
+
+inDefinitions: ok1: {
+	#X: =={ name: "X" }
+	x: #X & { name: "X" }
+}
+inDefinitions: ok2: {
+	x: #X & { name: "Y" }
+	#X: !={ name: "X" }
+}
+inDefinitions: err1: {
+	#X: =={ name: "X" }
+	x: #X & { name: "Y" }
+}
+inDefinitions: err2: {
+	#X: !={ name: "X" }
+	x: #X & { name: "X" }
+}
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  205
@@ -346,6 +365,26 @@ equalStruct.err2: invalid value {a:1,b:2} (out of bound !={a:1,b:2}):
     ./equals.cue:26:8
 simplifyExpr.e2: cannot use null for bound >:
     ./in.cue:62:8
+inDefinitions.ok1.x: invalid left-hand value to '==' (type _|_): inDefinitions.ok1.x.name: field not allowed:
+    ./issue4142.cue:4:6
+inDefinitions.ok1.x.name: field not allowed:
+    ./issue4142.cue:4:6
+    ./issue4142.cue:5:12
+inDefinitions.ok2.x: invalid left-hand value to '!=' (type _|_): inDefinitions.ok2.x.name: field not allowed:
+    ./issue4142.cue:9:6
+inDefinitions.ok2.x.name: field not allowed:
+    ./issue4142.cue:9:6
+    ./issue4142.cue:8:12
+inDefinitions.err1.x: invalid left-hand value to '==' (type _|_): inDefinitions.err1.x.name: field not allowed:
+    ./issue4142.cue:12:6
+inDefinitions.err1.x.name: field not allowed:
+    ./issue4142.cue:12:6
+    ./issue4142.cue:13:12
+inDefinitions.err2.x: invalid left-hand value to '!=' (type _|_): inDefinitions.err2.x.name: field not allowed:
+    ./issue4142.cue:16:6
+inDefinitions.err2.x.name: field not allowed:
+    ./issue4142.cue:16:6
+    ./issue4142.cue:17:12
 
 Result:
 (_|_){
@@ -866,6 +905,85 @@ Result:
       //     ./in.cue:62:8
     }
   }
+  inDefinitions: (_|_){
+    // [eval]
+    ok1: (_|_){
+      // [eval]
+      #X: (struct){ ==(struct){
+          name: (_|_){// "X"
+          }
+        } }
+      x: (_|_){
+        // [eval] inDefinitions.ok1.x: invalid left-hand value to '==' (type _|_): inDefinitions.ok1.x.name: field not allowed:
+        //     ./issue4142.cue:4:6
+        // inDefinitions.ok1.x.name: field not allowed:
+        //     ./issue4142.cue:4:6
+        //     ./issue4142.cue:5:12
+        name: (_|_){
+          // [eval] inDefinitions.ok1.x.name: field not allowed:
+          //     ./issue4142.cue:4:6
+          //     ./issue4142.cue:5:12
+        }
+      }
+    }
+    ok2: (_|_){
+      // [eval]
+      x: (_|_){
+        // [eval] inDefinitions.ok2.x: invalid left-hand value to '!=' (type _|_): inDefinitions.ok2.x.name: field not allowed:
+        //     ./issue4142.cue:9:6
+        // inDefinitions.ok2.x.name: field not allowed:
+        //     ./issue4142.cue:9:6
+        //     ./issue4142.cue:8:12
+        name: (_|_){
+          // [eval] inDefinitions.ok2.x.name: field not allowed:
+          //     ./issue4142.cue:9:6
+          //     ./issue4142.cue:8:12
+        }
+      }
+      #X: (struct){ !=(struct){
+          name: (_|_){// "X"
+          }
+        } }
+    }
+    err1: (_|_){
+      // [eval]
+      #X: (struct){ ==(struct){
+          name: (_|_){// "X"
+          }
+        } }
+      x: (_|_){
+        // [eval] inDefinitions.err1.x: invalid left-hand value to '==' (type _|_): inDefinitions.err1.x.name: field not allowed:
+        //     ./issue4142.cue:12:6
+        // inDefinitions.err1.x.name: field not allowed:
+        //     ./issue4142.cue:12:6
+        //     ./issue4142.cue:13:12
+        name: (_|_){
+          // [eval] inDefinitions.err1.x.name: field not allowed:
+          //     ./issue4142.cue:12:6
+          //     ./issue4142.cue:13:12
+        }
+      }
+    }
+    err2: (_|_){
+      // [eval]
+      #X: (struct){ !=(struct){
+          name: (_|_){// "X"
+          }
+        } }
+      x: (_|_){
+        // [eval] inDefinitions.err2.x: invalid left-hand value to '!=' (type _|_): inDefinitions.err2.x.name: field not allowed:
+        //     ./issue4142.cue:16:6
+        // inDefinitions.err2.x.name: field not allowed:
+        //     ./issue4142.cue:16:6
+        //     ./issue4142.cue:17:12
+        name: (_|_){
+          // [eval] inDefinitions.err2.x.name: field not allowed:
+          //     ./issue4142.cue:16:6
+          //     ./issue4142.cue:17:12
+        }
+      }
+    }
+  }
 }
 -- out/compile --
 --- binary.cue
@@ -1203,5 +1321,48 @@ Result:
     bne5: !=〈0;b〉
     e1: <=~"foo"
     e2: >null
+  }
+}
+--- issue4142.cue
+{
+  inDefinitions: {
+    ok1: {
+      #X: =={
+        name: "X"
+      }
+      x: (〈0;#X〉 & {
+        name: "X"
+      })
+    }
+  }
+  inDefinitions: {
+    ok2: {
+      x: (〈0;#X〉 & {
+        name: "Y"
+      })
+      #X: !={
+        name: "X"
+      }
+    }
+  }
+  inDefinitions: {
+    err1: {
+      #X: =={
+        name: "X"
+      }
+      x: (〈0;#X〉 & {
+        name: "Y"
+      })
+    }
+  }
+  inDefinitions: {
+    err2: {
+      #X: !={
+        name: "X"
+      }
+      x: (〈0;#X〉 & {
+        name: "X"
+      })
+    }
   }
 }

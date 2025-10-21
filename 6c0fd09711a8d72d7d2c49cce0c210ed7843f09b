@@ -16,6 +16,24 @@
       "message": "From my reading of `modernize`, this doesn\u0027t look quite right.\nI suspect this is more like it?\n\n\n```suggestion\nall: modernize -fix -category\u003dstringsseq ./...\n```\n\nPerhaps mention the full command (including full path to `modernize`) in the description?",
       "revId": "6c0fd09711a8d72d7d2c49cce0c210ed7843f09b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6de64f1_e3e2413a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T20:58:40Z",
+      "side": 1,
+      "message": "the help text was out of date, they renamed the flags to be standalone. changing now to `go fix`, now that it\u0027s the new home for these refactors.",
+      "parentUuid": "8c2bc736_c64074d0",
+      "revId": "6c0fd09711a8d72d7d2c49cce0c210ed7843f09b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

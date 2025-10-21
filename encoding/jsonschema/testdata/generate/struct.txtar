@@ -70,6 +70,14 @@ _foo: a?: int
 				}
 			}
 		}
+		"_foo": {
+			type: "object"
+			properties: {
+				a: {
+					type: "integer"
+				}
+			}
+		}
 	}
 	type: "object"
 	properties: {
@@ -80,13 +88,7 @@ _foo: a?: int
 			$ref: "#/$defs/#S2"
 		}
 		t03: {
-			type:                 "object"
-			additionalProperties: false
-			properties: {
-				a: {
-					type: "integer"
-				}
-			}
+			$ref: "#/$defs/_foo"
 		}
 		t04: {
 			type: "object"
@@ -98,6 +100,14 @@ _foo: a?: int
 		}
 		t05: {
 			type: "object"
+			additionalProperties: {
+				type: "integer"
+			}
+			patternProperties: {
+				"": {
+					type: "integer"
+				}
+			}
 		}
 		t06: {
 			type: "object"
@@ -155,6 +165,14 @@ _foo: a?: int
 		}
 		t10: {
 			type: "object"
+			additionalProperties: {
+				type: "integer"
+			}
+			patternProperties: {
+				"": {
+					type: "integer"
+				}
+			}
 			properties: {
 				a: {
 					type: "integer"
@@ -162,41 +180,33 @@ _foo: a?: int
 			}
 		}
 		t11: {
-			allOf: [{
-				additionalProperties: {
-					type:    "string"
+			type: "object"
+			additionalProperties: {
+				allOf: [{
 					pattern: "bar"
-				}
-				patternProperties: {
-					"": {
-						type:    "string"
-						pattern: "bar"
-					}
-					x: {
-						type:      "string"
-						minLength: 1
-					}
-				}
-				properties: {
-					x: true
-					y: true
-				}
-			}, {
-				type: "object"
-				additionalProperties: {
+				}, {
 					type:    "string"
 					pattern: "foo"
-				}
-				patternProperties: {
-					"": {
+				}]
+			}
+			patternProperties: {
+				"": {
+					allOf: [{
+						pattern: "bar"
+					}, {
 						type:    "string"
 						pattern: "foo"
-					}
+					}]
 				}
-				properties: {
-					x: true
+				x: {
+					type:      "string"
+					minLength: 1
 				}
-			}]
+			}
+			properties: {
+				x: true
+				y: true
+			}
 		}
 	}
 }

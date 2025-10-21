@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7db56b45_36e3cfb1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T13:44:04Z",
+      "side": 1,
+      "message": "was this meant to be part of the title?",
+      "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6479a196_dca29bfc",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T13:44:04Z",
+      "side": 1,
+      "message": "is this Alias case necessary? if not, I\u0027d just do a single `n, ok :\u003d c.Node.(*ast.Field); if !ok { return true }`, so you can unindent the rest.",
+      "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c27a0e17_f136cae1",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T13:44:04Z",
+      "side": 1,
+      "message": "use a type switch on `n.Label`, given that you have two cases?",
+      "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f975fb8_93cdb68f",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T13:44:04Z",
+      "side": 1,
+      "message": "this skips the rewrite for the entire field though, not just an alias label. it sounds to me like you should use a type switch, and `break` to exit just this \"label is an alias\" branch.",
+      "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9d7a0cc_16b1dd72",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T13:44:04Z",
+      "side": 1,
+      "message": "ditto, I think you want this to be a `break`",
+      "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e0460e3_726221df",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-21T13:44:04Z",
+      "side": 1,
+      "message": "don\u0027t you always have to assign the result of Apply? i.e. `s \u003d astutil.Apply(s, ...).\n\nand then do `n.Value \u003d s` afterwards.",
+      "revId": "9c7e7b248828f9ace54f24beaf88091bd35cf390",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -31,10 +31,7 @@
 					"foo": "bar",
 					"fooooo": 2
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "multiple invalid matches is invalid",
@@ -42,10 +39,7 @@
 					"foo": "bar",
 					"foooooo": "baz"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "ignores arrays",
@@ -107,20 +101,14 @@
 				"data": {
 					"a": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid due to the other is invalid",
 				"data": {
 					"aaaa": 31
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid due to both is invalid",
@@ -128,10 +116,7 @@
 					"aaa": "foo",
 					"aaaa": 31
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -161,10 +146,7 @@
 				"data": {
 					"a31b": null
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "regexes are case sensitive",
@@ -178,10 +160,7 @@
 				"data": {
 					"a_X_3": 3
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -207,10 +186,7 @@
 				"data": {
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "object with both properties is invalid",
@@ -218,20 +194,14 @@
 					"foo": 1,
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "object with a property matching both true and false is invalid",
 				"data": {
 					"foobar": 1
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "empty object is valid",

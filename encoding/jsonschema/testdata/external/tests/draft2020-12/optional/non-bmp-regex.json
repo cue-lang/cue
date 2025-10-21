@@ -82,20 +82,14 @@
 				"data": {
 					"🐲": "hello"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "doesn't match two",
 				"data": {
 					"🐲🐲": "hello"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	}

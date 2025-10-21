@@ -75,6 +75,9 @@ type Package struct {
 	// package.
 	importedBy []*Package
 
+	// imports contains the packages that are imported by this package.
+	imports []*Package
+
 	// isDirty means that the package needs reloading.
 	isDirty bool
 
@@ -132,16 +135,37 @@ func (pkg *Package) markFileDirty(file protocol.DocumentURI) {
 	pkg.markDirty()
 }
 
-// markDirty marks the current package as being dirty, along with any
-// package that imports this package (recursively).
+// markDirty marks the current package as being dirty, and resets both
+// its own definitions and the definitions of every upstream and
+// downstream package, recursively in both directions.
 func (pkg *Package) markDirty() {
 	if pkg.isDirty {
 		return
 	}
 
 	pkg.isDirty = true
-	for _, importer := range pkg.importedBy {
-		importer.markDirty()
+	pkg.resetDefinitions()
+
+	// upstream - packges we import
+	worklist := pkg.imports
+	for len(worklist) > 0 {
+		pkg := worklist[0]
+		pkg.resetDefinitions()
+		worklist = append(worklist[1:], pkg.imports...)
+	}
+
+	// downstream - packages that import us
+	worklist = pkg.importedBy
+	for len(worklist) > 0 {
+		pkg := worklist[0]
+		pkg.resetDefinitions()
+		worklist = append(worklist[1:], pkg.importedBy...)
+	}
+}
+
+func (pkg *Package) resetDefinitions() {
+	if pkg.definitions != nil {
+		pkg.definitions.Reset()
 	}
 }
 
@@ -213,6 +237,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 				importedPkg.RemoveImportedBy(pkg)
 			}
 		}
+		pkg.imports = pkg.imports[:0]
 	}
 
 	for _, importedModpkg := range modpkg.Imports() {
@@ -223,6 +248,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		modRootURI := moduleRootURI(importedModpkg)
 		if importedPkg, found := w.findPackage(modRootURI, ip); found {
 			importedPkg.EnsureImportedBy(pkg)
+			pkg.imports = append(pkg.imports, importedPkg)
 		}
 	}
 
@@ -257,6 +283,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		}
 		return nil
 	}
+
 	// definitions.Analyse does almost no work - calculation of
 	// resolutions is done lazily. So no need to launch go-routines
 	// here.

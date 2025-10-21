@@ -365,26 +365,12 @@ equalStruct.err2: invalid value {a:1,b:2} (out of bound !={a:1,b:2}):
     ./equals.cue:26:8
 simplifyExpr.e2: cannot use null for bound >:
     ./in.cue:62:8
-inDefinitions.ok1.x: invalid left-hand value to '==' (type _|_): inDefinitions.ok1.x.name: field not allowed:
-    ./issue4142.cue:4:6
-inDefinitions.ok1.x.name: field not allowed:
-    ./issue4142.cue:4:6
-    ./issue4142.cue:5:12
-inDefinitions.ok2.x: invalid left-hand value to '!=' (type _|_): inDefinitions.ok2.x.name: field not allowed:
-    ./issue4142.cue:9:6
-inDefinitions.ok2.x.name: field not allowed:
-    ./issue4142.cue:9:6
-    ./issue4142.cue:8:12
-inDefinitions.err1.x: invalid left-hand value to '==' (type _|_): inDefinitions.err1.x.name: field not allowed:
+inDefinitions.err1.x: invalid value {name:"Y"} (out of bound =={name:"X"}):
     ./issue4142.cue:12:6
-inDefinitions.err1.x.name: field not allowed:
-    ./issue4142.cue:12:6
-    ./issue4142.cue:13:12
-inDefinitions.err2.x: invalid left-hand value to '!=' (type _|_): inDefinitions.err2.x.name: field not allowed:
+    ./issue4142.cue:13:5
+inDefinitions.err2.x: invalid value {name:"X"} (out of bound !={name:"X"}):
     ./issue4142.cue:16:6
-inDefinitions.err2.x.name: field not allowed:
-    ./issue4142.cue:16:6
-    ./issue4142.cue:17:12
+    ./issue4142.cue:17:5
 
 Result:
 (_|_){
@@ -907,38 +893,18 @@ Result:
   }
   inDefinitions: (_|_){
     // [eval]
-    ok1: (_|_){
-      // [eval]
+    ok1: (struct){
       #X: (struct){ ==(struct){
           name: (_|_){// "X"
           }
         } }
-      x: (_|_){
-        // [eval] inDefinitions.ok1.x: invalid left-hand value to '==' (type _|_): inDefinitions.ok1.x.name: field not allowed:
-        //     ./issue4142.cue:4:6
-        // inDefinitions.ok1.x.name: field not allowed:
-        //     ./issue4142.cue:4:6
-        //     ./issue4142.cue:5:12
-        name: (_|_){
-          // [eval] inDefinitions.ok1.x.name: field not allowed:
-          //     ./issue4142.cue:4:6
-          //     ./issue4142.cue:5:12
-        }
+      x: (#struct){
+        name: (string){ "X" }
       }
     }
-    ok2: (_|_){
-      // [eval]
-      x: (_|_){
-        // [eval] inDefinitions.ok2.x: invalid left-hand value to '!=' (type _|_): inDefinitions.ok2.x.name: field not allowed:
-        //     ./issue4142.cue:9:6
-        // inDefinitions.ok2.x.name: field not allowed:
-        //     ./issue4142.cue:9:6
-        //     ./issue4142.cue:8:12
-        name: (_|_){
-          // [eval] inDefinitions.ok2.x.name: field not allowed:
-          //     ./issue4142.cue:9:6
-          //     ./issue4142.cue:8:12
-        }
+    ok2: (struct){
+      x: (#struct){
+        name: (string){ "Y" }
       }
       #X: (struct){ !=(struct){
           name: (_|_){// "X"
@@ -952,16 +918,10 @@ Result:
           }
         } }
       x: (_|_){
-        // [eval] inDefinitions.err1.x: invalid left-hand value to '==' (type _|_): inDefinitions.err1.x.name: field not allowed:
+        // [eval] inDefinitions.err1.x: invalid value {name:"Y"} (out of bound =={name:"X"}):
         //     ./issue4142.cue:12:6
-        // inDefinitions.err1.x.name: field not allowed:
-        //     ./issue4142.cue:12:6
-        //     ./issue4142.cue:13:12
-        name: (_|_){
-          // [eval] inDefinitions.err1.x.name: field not allowed:
-          //     ./issue4142.cue:12:6
-          //     ./issue4142.cue:13:12
-        }
+        //     ./issue4142.cue:13:5
+        name: (string){ "Y" }
       }
     }
     err2: (_|_){
@@ -971,16 +931,10 @@ Result:
           }
         } }
       x: (_|_){
-        // [eval] inDefinitions.err2.x: invalid left-hand value to '!=' (type _|_): inDefinitions.err2.x.name: field not allowed:
+        // [eval] inDefinitions.err2.x: invalid value {name:"X"} (out of bound !={name:"X"}):
         //     ./issue4142.cue:16:6
-        // inDefinitions.err2.x.name: field not allowed:
-        //     ./issue4142.cue:16:6
-        //     ./issue4142.cue:17:12
-        name: (_|_){
-          // [eval] inDefinitions.err2.x.name: field not allowed:
-          //     ./issue4142.cue:16:6
-          //     ./issue4142.cue:17:12
-        }
+        //     ./issue4142.cue:17:5
+        name: (string){ "X" }
       }
     }
   }

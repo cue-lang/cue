@@ -590,7 +590,12 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			}
 			*bound = x
 
-		case EqualOp, NotEqualOp, MatchOp, NotMatchOp:
+		case EqualOp, NotEqualOp:
+			// We treat equality as an open validator.
+			n.updateConjunctInfo(TopKind, id, cHasOpenValidator|cHasTop)
+			fallthrough
+
+		case MatchOp, NotMatchOp:
 			// This check serves as simplifier, but also to remove duplicates.
 			k := 0
 			match := false
@@ -612,6 +617,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			if !match {
 				n.checks = append(n.checks, MakeConjunct(env, x, id))
 			}
+
 			return
 		}
 

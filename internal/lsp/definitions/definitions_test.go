@@ -2758,7 +2758,7 @@ something: {
 		{
 			name: "Self_Simple",
 			archive: `-- a.cue --
-@experiment(self)
+@experiment(aliasandself)
 x: y: 3
 x: z: self.y
 
@@ -2815,7 +2815,7 @@ e: self
 		{
 			name: "Self_List",
 			archive: `-- a.cue --
-@experiment(self)
+@experiment(aliasandself)
 f: [ 1, 2, self[0] ]
 let X = self
 g: h: X.f[0]
@@ -2845,7 +2845,7 @@ g: h: X.f[0]
 		{
 			name: "Self_Self",
 			archive: `-- a.cue --
-@experiment(self)
+@experiment(aliasandself)
 i: self: x: y: z: self
 `,
 			expectDefinitions: map[position][]position{

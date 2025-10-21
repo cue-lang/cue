@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8876048b_13b623a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T09:24:27Z",
+      "side": 1,
+      "message": "Submit spec changes only when an experiment has been accepted.",
+      "revId": "596be91c5063d94d6b3f3fd5a27bdbf8d09ac58d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

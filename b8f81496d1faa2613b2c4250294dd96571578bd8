@@ -16,6 +16,24 @@
       "message": "bad formatting? this needs one more tab",
       "revId": "b8f81496d1faa2613b2c4250294dd96571578bd8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf9edd59_76d9ca3a",
+        "filename": "cue/testdata/eval/required.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-21T10:13:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "79c42e00_9559263e",
+      "revId": "b8f81496d1faa2613b2c4250294dd96571578bd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

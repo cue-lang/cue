@@ -151,7 +151,7 @@ func getName(f *reflect.StructField) string {
 func isOptional(f *reflect.StructField) bool {
 	isOptional := false
 	switch f.Type.Kind() {
-	case reflect.Ptr, reflect.Map, reflect.Chan, reflect.Interface, reflect.Slice:
+	case reflect.Pointer, reflect.Map, reflect.Chan, reflect.Interface, reflect.Slice:
 		// Note: it may be confusing to distinguish between an empty slice and
 		// a nil slice. However, it is also surprising to not be able to specify
 		// a default value for a slice. So for now we will allow it.
@@ -182,7 +182,7 @@ func isOptional(f *reflect.StructField) bool {
 func isOmitEmpty(f *reflect.StructField) bool {
 	isOmitEmpty := false
 	switch f.Type.Kind() {
-	case reflect.Ptr, reflect.Map, reflect.Chan, reflect.Interface, reflect.Slice:
+	case reflect.Pointer, reflect.Map, reflect.Chan, reflect.Interface, reflect.Slice:
 		// Note: it may be confusing to distinguish between an empty slice and
 		// a nil slice. However, it is also surprising to not be able to specify
 		// a default value for a slice. So for now we will allow it.
@@ -213,7 +213,7 @@ func GoValueToExpr(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Expr {
 func isNil(x reflect.Value) bool {
 	switch x.Kind() {
 	// Only check for supported types; ignore func and chan.
-	case reflect.Ptr, reflect.Map, reflect.Slice, reflect.Interface:
+	case reflect.Pointer, reflect.Map, reflect.Slice, reflect.Interface:
 		return x.IsNil()
 	}
 	return false
@@ -400,7 +400,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 		case reflect.Float32, reflect.Float64:
 			return c.convertRec(nilIsTop, value.Float())
 
-		case reflect.Ptr:
+		case reflect.Pointer:
 			if value.IsNil() {
 				if nilIsTop {
 					ident, _ := src.(*ast.Ident)
@@ -666,9 +666,9 @@ func (c *goConverter) goTypeToValueRec(allowNullDefault bool, t reflect.Type) (e
 	}
 
 	switch k := t.Kind(); k {
-	case reflect.Ptr:
+	case reflect.Pointer:
 		elem := t.Elem()
-		for elem.Kind() == reflect.Ptr {
+		for elem.Kind() == reflect.Pointer {
 			elem = elem.Elem()
 		}
 		e, _ = c.goTypeToValueRec(false, elem)

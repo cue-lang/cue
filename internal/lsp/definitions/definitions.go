@@ -319,24 +319,60 @@ func Analyse(forPackage DefinitionsForPackageFunc, files ...*ast.File) *Definiti
 		byFilename: make(map[string]*FileDefinitions, len(files)),
 		forPackage: forPackage,
 	}
+	dfns.Reset()
 
-	pkgNode := dfns.newAstNode(nil, nil, nil, nil)
-	pkgNode.fieldsAllowed = true
-	dfns.pkgNode = pkgNode
-	navigable := &navigableBindings{}
+	pkgNode := dfns.pkgNode
+	fileNodesNavigable := &navigableBindings{
+		parent: pkgNode.navigable,
+	}
 
 	for _, file := range files {
-		fileNode := pkgNode.newAstNode(nil, file, navigable)
-		fileNode.fieldsAllowed = true
-		dfns.byFilename[file.Filename] = &FileDefinitions{
+		fdfns := &FileDefinitions{
 			pkgNode:     pkgNode,
 			definitions: make(map[int][]*navigableBindings),
 			completions: make(map[int]*completionResolutions),
 			File:        file,
 		}
+		dfns.byFilename[file.Filename] = fdfns
+		fileNode := pkgNode.newAstNode(nil, file, fileNodesNavigable)
+		fileNode.fieldsAllowed = true
 	}
 
 	return dfns
+}
+
+// Reset clears all cached analysis from Definitions. The Definitions
+// are returned to the same state as after initial construction and
+// before any analysis (evaluation) has taken place. This is useful
+// for when foreign packages (which are (transitively) imported by
+// this package, or import this package) have been modified but this
+// package itself has not been.
+func (dfns *Definitions) Reset() {
+	// pkgNode, and its navigable, are the roots. They have no parents.
+	pkgNode := &astNode{dfns: dfns}
+	pkgNode.navigable = &navigableBindings{
+		contributingNodes: []*astNode{pkgNode},
+	}
+	dfns.pkgNode = pkgNode
+
+	// pkgDecls is a child of pkgNode.navigable. It will have every
+	// package declaration contributed to it as they are encountered.
+	dfns.pkgDecls = &navigableBindings{
+		parent: pkgNode.navigable,
+	}
+
+	// fileNodesNavigable is also a child of pkgNode.navigable. It has
+	// every file node contributed to it.
+	fileNodesNavigable := &navigableBindings{
+		parent: pkgNode.navigable,
+	}
+
+	for _, fdfns := range dfns.byFilename {
+		clear(fdfns.definitions)
+		clear(fdfns.completions)
+		fileNode := pkgNode.newAstNode(nil, fdfns.File, fileNodesNavigable)
+		fileNode.fieldsAllowed = true
+	}
 }
 
 // newAstNode creates a new [astNode]. All arguments may be nil; if

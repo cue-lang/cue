@@ -285,7 +285,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	// definitions.Analyse does almost no work - calculation of
 	// resolutions is done lazily. So no need to launch go-routines
 	// here.
-	pkg.definitions = definitions.Analyse(forPackage, astFiles...)
+	pkg.definitions = definitions.Analyse(ast.ImportPath{}, nil, forPackage, nil, astFiles...)
 
 	return nil
 }

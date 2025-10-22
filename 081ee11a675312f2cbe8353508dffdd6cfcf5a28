@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5fa943bf_576271dc",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-22T11:50:47Z",
+      "side": 1,
+      "message": "ugh, goodness, yes it does matter. That\u0027s a consequence of refactoring and not rereading the whole thing. Thank you for spotting that - will fix!",
+      "parentUuid": "0f5e6a42_230e257e",
+      "revId": "081ee11a675312f2cbe8353508dffdd6cfcf5a28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d77f2f1d_5b5ee95d",
         "filename": "internal/lsp/cache/package.go",
         "patchSetId": 2

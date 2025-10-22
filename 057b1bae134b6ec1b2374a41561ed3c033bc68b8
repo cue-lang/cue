@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "64dc897a_57d8e780",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1501,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-22T12:25:04Z",
+      "side": 1,
+      "message": "Oh yes, this has really just changed location a bit - it was previously in resolve but now it\u0027s in eval. I think it could happily live in either, but I decided it made more sense for it to exist in eval.",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2d4005ac_a44d7867",
         "filename": "internal/lsp/definitions/definitions_test.go",
         "patchSetId": 2

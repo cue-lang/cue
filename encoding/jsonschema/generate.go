@@ -44,8 +44,8 @@ type GenerateConfig struct {
 	NameFunc func(root cue.Value, path cue.Path) string
 
 	// ExplicitOpen, when true, will never close a schema with `additionalProperties: false`
-	// but _will_ explicitly open a schema with `additionalProperties: true`
-	// when there is an explicit `...` or universal pattern in a struct.
+	// (but _will_ explicitly open a schema with `additionalProperties: true`
+	// when there is an explicit `...` or universal pattern in a struct).
 	//
 	// By default (when ExplicitOpen is false), all structs that are closed will
 	// have an `additionalProperties: false` added.
@@ -870,23 +870,6 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 	}
 	required := make(map[string]bool)
 
-	explicitlyOpen := func(constraint internItem) {
-		props.additionalProperties = constraint
-		if _, ok := constraint.Value().(*itemTrue); ok && !g.cfg.ExplicitOpen {
-			// additionalProperties: true is a no-op in JSON Schema in general
-			// so omit it unless we're explicitly opening up schemas.
-			props.additionalProperties = internItem{}
-		}
-	}
-
-	ellipsis := v.LookupPath(cue.MakePath(cue.AnyString))
-	if ellipsis.Exists() {
-		// All fields are explicitly allowed (either with `...` or `[_]: T`)
-		explicitlyOpen(g.makeItem(ellipsis, mode.descend()))
-	} else if mode != open && !g.cfg.ExplicitOpen {
-		props.additionalProperties = g.unique.intern(&itemFalse{})
-	}
-
 	allOf := &itemAllOf{}
 	addProperty := func(fieldName string, it internItem) {
 		props.properties[fieldName] = join(props.properties[fieldName], it, g.unique)
@@ -894,6 +877,7 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 	addPatternProperty := func(pattern string, it internItem) {
 		props.patternProperties[pattern] = join(props.patternProperties[pattern], it, g.unique)
 	}
+	hasUniversalConstraint := false
 	for v := range valueConjuncts(v) {
 		pkg, _ := v.ReferencePath()
 		if pkg.Exists() || v.Kind() != cue.StructKind {
@@ -921,6 +905,12 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 			case cue.PatternConstraint:
 				re, ok := regexpForValue(sel.Pattern())
 				if ok {
+					if re.String() == "" && acceptsAllString(sel.Pattern()) {
+						// Record the fact that we've seen a universal constraint
+						// because then we know that LookupPath(AnyString)
+						// will return it.
+						hasUniversalConstraint = true
+					}
 					constraint := g.makeItem(iter.Value(), mode.descend())
 					addPatternProperty(re.String(), constraint)
 					p := pat{
@@ -936,7 +926,7 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 					// might cover any number of possible labels, so the
 					// only thing we can do is treat the whole thing as explicitly
 					// open.
-					explicitlyOpen(g.unique.intern(&itemTrue{}))
+					addPatternProperty("", g.unique.intern(&itemTrue{}))
 				}
 				continue outer
 			case cue.OptionalConstraint:
@@ -990,6 +980,36 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 			}
 			addProperty(fieldName, propItem)
 		}
+	}
+
+	ellipsis := v.LookupPath(cue.MakePath(cue.AnyString))
+	if ellipsis.Exists() && !hasUniversalConstraint {
+		constraint := g.makeItem(ellipsis, mode.descend())
+		if isTrue(constraint) {
+			// `... _` is indistingishable from `[_]: _` so set it as a
+			// pattern property so we can treat it uniformly.
+			addPatternProperty("", constraint)
+		} else {
+			// Note: currently this will never happen as the CUE evaluator
+			// does not support `... T` in structs.
+			props.additionalProperties = constraint
+		}
+	}
+
+	if constraint, ok := props.patternProperties[""]; ok && isTrue(constraint) || len(props.properties) == 0 {
+		// There's a universal pattern constraint and either no
+		// properties or we accept anything. In both these cases it's
+		// not possible to tell the difference between
+		// `additionalProperties` (only applies to properties not
+		// explicitly mentioned) and `patternProperties` (applies to all
+		// properties regardless), so use `additionalProperties` in
+		// preference as it's a little shorter and arguably more
+		// obvious.
+		props.additionalProperties = join(props.additionalProperties, constraint, g.unique)
+		delete(props.patternProperties, "")
+	}
+	if mode != open && !g.cfg.ExplicitOpen && props.additionalProperties.Value() == nil {
+		props.additionalProperties = g.unique.intern(&itemFalse{})
 	}
 	props.required = slices.Sorted(maps.Keys(required))
 	hasObjectConstraints :=
@@ -1073,10 +1093,10 @@ func (g *generator) makeListItem(v cue.Value, mode closedMode) item {
 }
 
 func join(it1, it2 internItem, u *uniqueItems) internItem {
-	if it1.Value() == nil {
+	if it1.Value() == nil || isTrue(it1) {
 		return it2
 	}
-	if it2.Value() == nil {
+	if it2.Value() == nil || isTrue(it2) {
 		return it1
 	}
 	return u.intern(&itemAllOf{
@@ -1165,10 +1185,15 @@ func acceptsAllString(v cue.Value) bool {
 // trueAsNil returns the nil item if the item
 // is *itemTrue (top).
 func trueAsNil(it internItem) internItem {
-	if _, ok := it.Value().(*itemTrue); ok {
+	if isTrue(it) {
 		return internItem{}
 	}
 	return it
+}
+
+func isTrue(it internItem) bool {
+	_, ok := it.Value().(*itemTrue)
+	return ok
 }
 
 // isConcreteScalar reports whether v should be considered concrete

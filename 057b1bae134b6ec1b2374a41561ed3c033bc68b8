@@ -69,6 +69,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8689cf0c_8ccfa3fb",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-22T17:29:32Z",
+      "side": 1,
+      "message": "That made me panic! In the constructor. Line 411 I think.",
+      "parentUuid": "6048eb4d_0fed381c",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3b48f4e2_fc820193",

@@ -15,6 +15,7 @@
 package yaml_test
 
 import (
+	"io"
 	"strings"
 	"testing"
 
@@ -141,6 +142,192 @@ null
 				if got := string(b); got != yamlOut {
 					t.Errorf("EncodeStream:\ngot  %q\nwant %q", got, yamlOut)
 				}
+			}
+		})
+	}
+}
+
+func TestDecoder(t *testing.T) {
+	testCases := []struct {
+		name    string
+		yaml    string
+		want    []string
+		wantErr bool
+	}{{
+		name: "empty document",
+		yaml: ``,
+		want: []string{`*null | _`},
+	}, {
+		name: "single struct",
+		yaml: `a: foo
+b: bar`,
+		want: []string{`{
+	a: "foo"
+	b: "bar"
+}`},
+	}, {
+		name: "single struct - inline",
+		yaml: `a: foo`,
+		want: []string{`{
+	a: "foo"
+}`},
+	}, {
+		name: "single list",
+		yaml: `[1, 2, 3]`,
+		want: []string{`[1, 2, 3]`},
+	}, {
+		name: "single object",
+		yaml: `{"key": "value"}`,
+		want: []string{`{
+	key: "value"
+}`},
+	}, {
+		name: "single string",
+		yaml: `simple string`,
+		want: []string{`"simple string"`},
+	}, {
+		name: "single number",
+		yaml: `42`,
+		want: []string{`42`},
+	}, {
+		name: "single boolean",
+		yaml: `true`,
+		want: []string{`true`},
+	}, {
+		name: "single null",
+		yaml: `null`,
+		want: []string{`null`},
+	}, {
+		name: "multiple documents with separator",
+		yaml: `a: foo
+---
+b: bar
+c: baz`,
+		want: []string{
+			`{
+	a: "foo"
+}`,
+			`{
+	b: "bar"
+	c: "baz"
+}`,
+		},
+	}, {
+		name: "three documents",
+		yaml: `name: first
+---
+name: second
+---
+name: third`,
+		want: []string{
+			`{
+	name: "first"
+}`,
+			`{
+
+	name: "second"
+}`,
+			`{
+
+	name: "third"
+}`,
+		},
+	}, {
+		name: "documents with lists",
+		yaml: `- one
+- two
+---
+- three
+- four`,
+		want: []string{
+			`[
+	"one",
+	"two",
+]`,
+			`[
+	"three",
+	"four",
+]`,
+		},
+	}, {
+		name: "document with null",
+		yaml: `---
+null
+---
+a: value`,
+		want: []string{
+			`null`,
+			`{
+
+	a: "value"
+}`,
+		},
+	}, {
+		name: "mixed types",
+		yaml: `string: text
+number: 42
+bool: true
+---
+list:
+  - item1
+  - item2`,
+		want: []string{
+			`{
+	string: "text"
+	number: 42
+	bool:   true
+}`,
+			`{
+	list: [
+		"item1",
+		"item2",
+	]
+}`,
+		},
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			d := yaml.NewDecoder(tc.name, strings.NewReader(tc.yaml))
+
+			var results []string
+			for {
+				expr, err := d.Extract()
+				if err == io.EOF {
+					break
+				}
+				if tc.wantErr {
+					if err == nil {
+						t.Fatal("expected error but got none")
+					}
+					return
+				}
+				if err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+
+				b, err := format.Node(expr)
+				if err != nil {
+					t.Fatalf("format error: %v", err)
+				}
+				results = append(results, strings.TrimSpace(string(b)))
+			}
+
+			if len(results) != len(tc.want) {
+				t.Fatalf("got %d documents, want %d\nresults: %v\nwant: %v",
+					len(results), len(tc.want), results, tc.want)
+			}
+
+			for i, got := range results {
+				if got != tc.want[i] {
+					t.Errorf("document %d:\ngot  %q\nwant %q", i, got, tc.want[i])
+				}
+			}
+
+			// Verify that calling Extract again returns EOF
+			_, err := d.Extract()
+			if err != io.EOF {
+				t.Errorf("expected io.EOF on subsequent Extract, got %v", err)
 			}
 		})
 	}

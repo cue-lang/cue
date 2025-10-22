@@ -670,16 +670,35 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 	case Value: // *NullLit, *BoolLit, *NumLit, *StringLit, *BytesLit, *Builtin
 		n.unshare()
+		if p, isData := pos(v).Priority(); isData {
+			id.Priority = p
+		}
+
 		n.updateCyclicStatusV3(id)
 
 		if y := n.scalar; y != nil {
+			p1 := n.scalarID.Priority
+			p2 := id.Priority
+			if p1 != 0 && p2 != 0 {
+				if p1 > p2 {
+					// all good
+					break
+				} else if p1 < p2 {
+					// should not happen: signal is incorrect
+					goto patchConjunct
+				}
+			}
 			if b, ok := BinOp(ctx, errOnDiffType, EqualOp, x, y).(*Bool); !ok || !b.B {
 				n.reportConflict(x, y, x.Kind(), y.Kind(), n.scalarID, id)
 			}
 			break
 		}
+	patchConjunct:
 		n.scalar = x
 		n.scalarID = id
+		// TODO: only set "scalarKnown" if there are no other high priority
+		// conjuncts. Alternatively, we should process high priority conjuncts
+		// in the scheduler first.
 		n.signal(scalarKnown)
 
 	default:

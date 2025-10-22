@@ -1,0 +1,13 @@
+-- low.cue --
+@layer(3)
+
+a: int | *1
+
+-- high.cue --
+@layer(5)
+
+a: int | *2
+-- out/layer --
+{
+	a: *2 | 1 | int
+}

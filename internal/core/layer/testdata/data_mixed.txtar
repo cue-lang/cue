@@ -1,0 +1,16 @@
+-- a.cue --
+@layer(2,defaultData)
+mixed: {
+	fromData: 1
+	fromBoth: 2
+}
+-- b.cue --
+@layer(3)
+mixed: {
+	fromNormal: 10
+	fromBoth: 20
+}
+-- out/layer --
+mixed.fromBoth: conflicting values 20 and 2:
+    ./a.cue:4:12
+    ./b.cue:4:12

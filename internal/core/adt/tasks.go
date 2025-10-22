@@ -258,7 +258,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 
 	var ellipsis Node
 
-	id := t.id
+	id := c.subField(t.id)
 
 	index := int64(0)
 	hasComprehension := false

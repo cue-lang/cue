@@ -1,0 +1,16 @@
+-- low.cue --
+@layer(3)
+
+a: int | *1
+b: _
+c: a & b
+-- high.cue --
+@layer(5)
+
+b: int | *2
+-- out/layer --
+{
+	a: *1 | int
+	b: *2 | int
+	c: *2 | int | 1
+}

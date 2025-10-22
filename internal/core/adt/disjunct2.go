@@ -556,6 +556,9 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 	// a special mode, or evaluating more aggressively if finalize is not given.
 	v.status = unprocessed
 
+	if m == isDefault {
+		c.CloseInfo.Priority, _ = pos(c.x).Priority()
+	}
 	d.scheduleConjunct(c, c.CloseInfo)
 
 	oc.unlinkOverlay()

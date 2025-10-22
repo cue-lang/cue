@@ -121,6 +121,24 @@
       "message": "what does an empty pattern mean? I tried searching the existing jsonschema code, as well as a bit on google, but could not find an easy answer. if it means something special like \"all properties\", I\u0027d like to see a note about it somewhere in the code with an example like `patternProperties: \"\": type: \"integer\"`, as I could not find any.\n\n\nIf my guess above is correct - is this patternProperties not redundant with additionalProperties too? both enforce `type: \"integer\"` the same way. It sounds like we\u0027re being mildly wasteful here.",
       "revId": "da67af8411fd13aa55f251e0f6c208fd9da6e69a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c772b40a_540d1fa1",
+        "filename": "encoding/jsonschema/testdata/generate/struct_explicitopen.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T10:31:59Z",
+      "side": 1,
+      "message": "An empty pattern (the empty regexp) means \"anything\". So this is technically correct, but you\u0027re right, this is redundant and I think I know why, but it\u0027s a little tricky to make a very quick fix for, and given that the schemas are still technically correct, I think it\u0027s OK to leave for a subsequent CL.",
+      "parentUuid": "11d456df_2eee08ad",
+      "revId": "da67af8411fd13aa55f251e0f6c208fd9da6e69a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

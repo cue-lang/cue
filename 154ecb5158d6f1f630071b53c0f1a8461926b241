@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b449bb89_0205ecb6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T13:40:40Z",
+      "side": 1,
+      "message": "LGTM except... shouldn\u0027t there be at least a smoke test for this new logic?",
+      "revId": "154ecb5158d6f1f630071b53c0f1a8461926b241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3014ab85_2b72c471",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T13:40:40Z",
+      "side": 1,
+      "message": "this could panic if a read of the root dir fails, I think.\n\n\n```suggestion\n\t\tif err \u003d\u003d nil \u0026\u0026 d.Type().IsRegular() \u0026\u0026 strings.HasSuffix(p, \".cue\") {\n```",
+      "revId": "154ecb5158d6f1f630071b53c0f1a8461926b241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

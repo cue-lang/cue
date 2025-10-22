@@ -1,5 +1,5 @@
 -- in.cue --
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 import "list"
 
@@ -268,7 +268,7 @@ issue1729: t2: {
 }
 
 -- selfnew.cue --
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 issue4125: t1_self: {
 	let Root = self

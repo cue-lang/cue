@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfb9c6cf_caaa6750",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T11:31:52Z",
+      "side": 1,
+      "message": "LGTM with one thought.",
+      "revId": "081ee11a675312f2cbe8353508dffdd6cfcf5a28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f5e6a42_230e257e",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T11:31:52Z",
+      "side": 1,
+      "message": "Does is matter that we might be overwriting the original `pkg.imports` slice here?\n\nIf not, then perhaps add a doc comment to that effect.\nOr be defensive and initialize `worklist` with:\n\n```\n\tworklist :\u003d slices.Clone(pkg.imports)\n```\n\nOr I guess you could write a helper function to avoid the queue entirely and make the business logic arguably a little clearer:\n\n```\n\tfor pkg :\u003d range allDeps(pkg, func(pkg *Package) []*Package { return pkg.imports }) {\n\t\tpkg.resetDefinitions()\n\t}\n\n// allDeps returns an iterator over all dependencies of p as determined\n// by the deps function.\nfunc allDeps(p *Package, deps func(p *Package) []*Package) iter.Seq[*Package] {\n\tyieldAllDeps :\u003d func(p *Package, yield func(*Package) bool) bool {\n\t\tif !yield(p) {\n\t\t\treturn\n\t\t}\n\t\tfor _, p :\u003d range deps(p) {\n\t\t\tif !yieldAllDeps(p) {\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}\n\treturn func(yield func(*Package) bool) {\n\t\tyieldAllDeps(deps(p))\n\t}\n}\n```",
+      "revId": "081ee11a675312f2cbe8353508dffdd6cfcf5a28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d77f2f1d_5b5ee95d",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T11:31:52Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "081ee11a675312f2cbe8353508dffdd6cfcf5a28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c24bdcd4_32b82f09",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T11:31:52Z",
+      "side": 1,
+      "message": "```suggestion\n// this package, or import this package) have been modified but this\n```",
+      "revId": "081ee11a675312f2cbe8353508dffdd6cfcf5a28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -71,7 +71,7 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 	}
 	if cfg != nil && cfg.ImportPath != "" {
 		b.ImportPath = cfg.ImportPath
-		b.PkgName = astutil.ImportPathName(b.ImportPath)
+		b.PkgName = ast.ParseImportPath(b.ImportPath).Qualifier
 	}
 	v, err = compile.Files(cc, x, b.ID(), b.Files...)
 	errs = errors.Append(errs, err)

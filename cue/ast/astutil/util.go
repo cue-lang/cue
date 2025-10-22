@@ -15,9 +15,7 @@
 package astutil
 
 import (
-	"path"
 	"strconv"
-	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -33,14 +31,10 @@ import (
 //
 // Deprecated: use [ast.ParseImportPath] instead to obtain the
 // qualifier.
+//
+//go:fix inline
 func ImportPathName(id string) string {
-	// TODO use ast.ParseImportPath(id).Qualifier and change
-	// callers to understand that they might receive an empty string.
-	name := path.Base(id)
-	if p := strings.LastIndexByte(name, ':'); p > 0 {
-		name = name[p+1:]
-	}
-	return name
+	return ast.ParseImportPath(id).Qualifier
 }
 
 // ImportInfo describes the information contained in an ImportSpec.

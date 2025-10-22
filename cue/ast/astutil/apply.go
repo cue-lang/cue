@@ -136,7 +136,7 @@ func (c *cursor) Import(importPath string) *ast.Ident {
 		return nil
 	}
 
-	name := ImportPathName(importPath)
+	name := ast.ParseImportPath(importPath).Qualifier
 
 	// TODO: come up with something much better.
 	// For instance, hoist the uniquer form cue/export.go to

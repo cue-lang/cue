@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "739058a4_2e2f9d53",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-22T11:52:12Z",
+      "side": 1,
+      "message": "wait, no, it\u0027s fine isn\u0027t it? The original pkg.imports is unaltered - we append to the list but the content of pkg.imports isn\u0027t changed. Am I missing something?",
+      "parentUuid": "5fa943bf_576271dc",
+      "revId": "081ee11a675312f2cbe8353508dffdd6cfcf5a28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d77f2f1d_5b5ee95d",
         "filename": "internal/lsp/cache/package.go",
         "patchSetId": 2

@@ -1376,8 +1376,8 @@ func (p *parser) parseAlias(lhs ast.Expr) (expr ast.Expr) {
 	pos := p.pos
 
 	// Check if old-style aliases are disallowed
-	if p.experiments != nil && p.experiments.AliasAndSelf {
-		p.errf(pos, "old-style alias syntax (=) is not allowed with @experiment(aliasandself); use postfix syntax (~X or ~(K,V))")
+	if p.experiments != nil && p.experiments.AliasV2 {
+		p.errf(pos, "old-style alias syntax (=) is not allowed with @experiment(aliasv2); use postfix syntax (~X or ~(K,V))")
 		p.next()
 		expr = p.parseRHS()
 		return expr
@@ -1407,8 +1407,8 @@ func (p *parser) parsePostfixAlias() *ast.PostfixAlias {
 	pos := p.pos
 
 	// Check if postfix alias syntax requires experiment
-	if p.experiments == nil || !p.experiments.AliasAndSelf {
-		p.errf(pos, "postfix alias syntax requires @experiment(aliasandself)")
+	if p.experiments == nil || !p.experiments.AliasV2 {
+		p.errf(pos, "postfix alias syntax requires @experiment(aliasv2)")
 	}
 
 	p.next()

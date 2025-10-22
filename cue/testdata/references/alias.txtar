@@ -1,5 +1,5 @@
 -- in.cue --
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 // Basic postfix alias - simple form
 a1~X1: {

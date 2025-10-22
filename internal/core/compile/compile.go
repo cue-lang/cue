@@ -358,8 +358,8 @@ func (c *compiler) verifyVersion(src ast.Node, n adt.Expr) adt.Expr {
 		kind = "predeclared identifier"
 		name = x.Src.Name
 		// Check if Self experiment is enabled
-		if !c.experiments.AliasAndSelf {
-			return c.errf(src, "%s %q requires @experiment(aliasandself)", kind, name)
+		if !c.experiments.AliasV2 {
+			return c.errf(src, "%s %q requires @experiment(aliasv2)", kind, name)
 		}
 		x.Label = adt.MakeStringLabel(c.index, name)
 		return n

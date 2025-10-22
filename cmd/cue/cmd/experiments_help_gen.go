@@ -58,8 +58,8 @@ Available per-file experiments:
     Spec change:   https://cuelang.org/cl/1217013
     Spec change:   https://cuelang.org/cl/1217014
 
-  aliasandself (preview: v0.15.0)
-    aliasandself enables the use of 'self' identifier to refer to the
+  aliasv2 (preview: v0.15.0)
+    aliasv2 enables the use of 'self' identifier to refer to the
     enclosing struct and enables the postfix alias syntax (~X and ~(K,V)).
     The file where this experiment is enabled disallows the use of old prefix
     alias syntax (X=).

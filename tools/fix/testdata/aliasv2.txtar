@@ -1,5 +1,5 @@
 
-#exp:aliasandself
+#exp:aliasv2
 
 -- cue.mod/module.cue --
 module: "test.example"
@@ -48,7 +48,7 @@ ReqField=b!: {
 }
 -- d.cue --
 // Already has postfix alias experiment, so do not do any changes.
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 package foo
 
@@ -138,7 +138,7 @@ language: {
 	version: "v0.15.0"
 }
 --- a.cue
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 package foo
 
@@ -156,7 +156,7 @@ c~Z: {
 	val: Y.data
 }
 --- b.cue
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 package foo
 
@@ -171,7 +171,7 @@ outer: {
 	ref2: Inner.Leaf.value
 }
 --- c.cue
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 package foo
 
@@ -184,7 +184,7 @@ b~ReqField!: {
 }
 --- d.cue
 // Already has postfix alias experiment, so do not do any changes.
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 package foo
 
@@ -192,7 +192,7 @@ a~X: {
 	foo: 1
 }
 --- e.cue
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 package foo
 
@@ -209,7 +209,7 @@ schema: {
 	}
 }
 --- f.cue
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 package foo
 
@@ -236,7 +236,7 @@ package foo
 	ref: InterpAlias.val
 }
 --- g.cue
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 package foo
 

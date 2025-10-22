@@ -1,7 +1,7 @@
 Test various self reference cases.
 
 -- in.cue --
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 // Basic self usage - top level
 a: self.b
@@ -42,7 +42,7 @@ computed: {
 cycle: self.cycle
 
 -- list.cue --
-@experiment(aliasandself)
+@experiment(aliasv2)
 import "list"
 
 #IntStrings: {list.Repeat([int, string], div(len(self), 2))}
@@ -53,7 +53,7 @@ listCheck: err: #IntStrings
 listCheck: err: [1, "foo", "bar", 2]
 
 -- withlet.cue --
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 withLet: {
 	let X = self
@@ -65,7 +65,7 @@ withLet: {
 }
 -- validator.cue --
 @experiment(structcmp)
-@experiment(aliasandself)
+@experiment(aliasv2)
 
 validator: {
 	err1: {{{{== (self + 1)}}}}

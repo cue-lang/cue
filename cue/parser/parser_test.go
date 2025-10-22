@@ -122,44 +122,44 @@ func TestParse(t *testing.T) {
 		},
 		{
 			desc: "postfix alias simple form",
-			in: `@experiment(aliasandself)
+			in: `@experiment(aliasv2)
 		a~X: 1
 		b~Y: 2`,
-			out: `@experiment(aliasandself), a~X: 1, b~Y: 2`,
+			out: `@experiment(aliasv2), a~X: 1, b~Y: 2`,
 		},
 		{
 			desc: "postfix alias dual form",
-			in: `@experiment(aliasandself)
+			in: `@experiment(aliasv2)
 		a~(K,V): 1
 		b~(L,W): 2`,
-			out: `@experiment(aliasandself), a~(K,V): 1, b~(L,W): 2`,
+			out: `@experiment(aliasv2), a~(K,V): 1, b~(L,W): 2`,
 		},
 		{
 			desc: "postfix alias with constraints",
-			in: `@experiment(aliasandself)
+			in: `@experiment(aliasv2)
 		a~X?: 1
 		b~(K,V)!: 2`,
-			out: `@experiment(aliasandself), a~X?: 1, b~(K,V)!: 2`,
+			out: `@experiment(aliasv2), a~X?: 1, b~(K,V)!: 2`,
 		},
 		{
 			desc: "postfix alias in nested fields",
-			in: `@experiment(aliasandself)
+			in: `@experiment(aliasv2)
 		a~A: b~B: c~C: 1`,
-			out: `@experiment(aliasandself), a~A: {b~B: {c~C: 1}}`,
+			out: `@experiment(aliasv2), a~A: {b~B: {c~C: 1}}`,
 		},
 		{
 			desc: "postfix alias with dynamic field",
-			in: `@experiment(aliasandself)
+			in: `@experiment(aliasv2)
 		(x)~F: 1
 		("y")~G: 2`,
-			out: `@experiment(aliasandself), (x)~F: 1, ("y")~G: 2`,
+			out: `@experiment(aliasv2), (x)~F: 1, ("y")~G: 2`,
 		},
 		{
 			desc: "postfix alias with pattern constraint",
-			in: `@experiment(aliasandself)
+			in: `@experiment(aliasv2)
 		[string]~X: int
 		[=~"^a"]~(K,V): string`,
-			out: `@experiment(aliasandself), [string]~X: int, [=~"^a"]~(K,V): string`,
+			out: `@experiment(aliasv2), [string]~X: int, [=~"^a"]~(K,V): string`,
 		},
 		{
 			desc: "keywords as selector",
@@ -929,16 +929,16 @@ bar: 2
 		},
 		{
 			desc: "postfix alias with experiment",
-			in: `@experiment(aliasandself)
+			in: `@experiment(aliasv2)
 	a~X: {foo: 1}
 	b: X.foo`,
-			out: "@experiment(aliasandself), a~X: {foo: 1}, b: X.foo",
+			out: "@experiment(aliasv2), a~X: {foo: 1}, b: X.foo",
 		},
 		{
 			desc: "postfix alias disallows old syntax",
-			in: `@experiment(aliasandself)
+			in: `@experiment(aliasv2)
 	X=a: {foo: 1}`,
-			out: "@experiment(aliasandself), X: {foo: 1}\nold-style alias syntax (=) is not allowed with @experiment(aliasandself); use postfix syntax (~X or ~(K,V))",
+			out: "@experiment(aliasv2), X: {foo: 1}\nold-style alias syntax (=) is not allowed with @experiment(aliasv2); use postfix syntax (~X or ~(K,V))",
 		},
 		{
 			desc: "old alias syntax without experiment",
@@ -950,7 +950,7 @@ bar: 2
 			desc: "postfix alias without experiment",
 			in: `a~X: {foo: 1}
 	b: X.foo`,
-			out: "a~X: {foo: 1}, b: X.foo\npostfix alias syntax requires @experiment(aliasandself)",
+			out: "a~X: {foo: 1}, b: X.foo\npostfix alias syntax requires @experiment(aliasv2)",
 		}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
@@ -1197,14 +1197,14 @@ func TestPostfixAlias(t *testing.T) {
 	}{
 		{
 			name:      "simple form",
-			input:     "@experiment(aliasandself)\na~X: 1",
+			input:     "@experiment(aliasv2)\na~X: 1",
 			wantAlias: true,
 			wantDual:  false,
 			wantField: "X",
 		},
 		{
 			name:      "dual form",
-			input:     "@experiment(aliasandself)\na~(K,V): 1",
+			input:     "@experiment(aliasv2)\na~(K,V): 1",
 			wantAlias: true,
 			wantDual:  true,
 			wantLabel: "K",
@@ -1217,7 +1217,7 @@ func TestPostfixAlias(t *testing.T) {
 		},
 		{
 			name:      "with optional",
-			input:     "@experiment(aliasandself)\na~X?: 1",
+			input:     "@experiment(aliasv2)\na~X?: 1",
 			wantAlias: true,
 			wantField: "X",
 		},

@@ -130,8 +130,8 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 		f = fixExperiment(fixExplicitOpen, f, "explicitopen", targetVersion)
 	}
 
-	if wantExps.AliasAndSelf && !existingExps.AliasAndSelf {
-		f = fixExperiment(fixAliasAndSelf, f, "aliasandself", targetVersion)
+	if wantExps.AliasV2 && !existingExps.AliasV2 {
+		f = fixExperiment(fixAliasV2, f, "aliasv2", targetVersion)
 	}
 
 	// Make sure we use the "after" function, and not the "before",
@@ -302,11 +302,11 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 	return result, hasChanges
 }
 
-func fixAliasAndSelf(f *ast.File) (result *ast.File, hasChanges bool) {
+func fixAliasV2(f *ast.File) (result *ast.File, hasChanges bool) {
 	// Run multiple passes until no more changes are made, to handle nested aliases
 	for {
 		var changed bool
-		result, changed = fixAliasAndSelfPass(f)
+		result, changed = fixAliasV2Pass(f)
 		if changed {
 			hasChanges = true
 			f = result
@@ -317,7 +317,7 @@ func fixAliasAndSelf(f *ast.File) (result *ast.File, hasChanges bool) {
 	return result, hasChanges
 }
 
-func fixAliasAndSelfPass(f *ast.File) (result *ast.File, hasChanges bool) {
+func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 	result = astutil.Apply(f, func(c astutil.Cursor) bool {
 		n, ok := c.Node().(*ast.Field)
 		if !ok {

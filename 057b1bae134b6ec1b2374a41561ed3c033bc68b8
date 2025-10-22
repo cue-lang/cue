@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abaa9839_107172cc",
+        "filename": "cmd/cue/cmd/integration/workspace/editing_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-22T11:01:26Z",
+      "side": 1,
+      "message": "This change is because of a tweak to how package declarations get evaluated. Now, the definition is added from the package name only, not the entire package decl.",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d4005ac_a44d7867",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 936,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-22T11:01:26Z",
+      "side": 1,
+      "message": "This change, and all those like it, are due to improvements in how aliases are handled, and the fact the new keyAlias field in astNode now exists and is being used.",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -416,6 +416,10 @@ func (c *OpContext) subField(ci CloseInfo) CloseInfo {
 	// as, at this point, it seems to be only used for debugging. We may
 	// want to consider having a separate field for this, though.
 	ci.FromEmbed = false
+
+	// The priority should be cleared for sub fields: we take default struct
+	// in its entirety, but not piecemeal.
+	ci.Priority = 0
 	return ci
 }
 

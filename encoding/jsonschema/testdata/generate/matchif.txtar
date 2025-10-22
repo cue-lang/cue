@@ -66,7 +66,8 @@ ok3: data: {}
 	properties: {
 		basicIfThenElse: {
 			else: {
-				type: "object"
+				type:                 "object"
+				additionalProperties: true
 				properties: {
 					c: {
 						type: "string"
@@ -75,7 +76,8 @@ ok3: data: {}
 				required: ["c"]
 			}
 			if: {
-				type: "object"
+				type:                 "object"
+				additionalProperties: true
 				properties: {
 					a: {
 						type: "number"
@@ -84,7 +86,8 @@ ok3: data: {}
 				required: ["a"]
 			}
 			then: {
-				type: "object"
+				type:                 "object"
+				additionalProperties: true
 				properties: {
 					b: {
 						type: "number"
@@ -95,7 +98,8 @@ ok3: data: {}
 		}
 		ifOnly: {
 			if: {
-				type: "object"
+				type:                 "object"
+				additionalProperties: true
 				properties: {
 					foo: {
 						type: "string"
@@ -106,7 +110,8 @@ ok3: data: {}
 		}
 		ifThenOnly: {
 			if: {
-				type: "object"
+				type:                 "object"
+				additionalProperties: true
 				properties: {
 					x: {
 						type: "integer"
@@ -115,7 +120,8 @@ ok3: data: {}
 				required: ["x"]
 			}
 			then: {
-				type: "object"
+				type:                 "object"
+				additionalProperties: true
 				properties: {
 					y: {
 						type: "integer"

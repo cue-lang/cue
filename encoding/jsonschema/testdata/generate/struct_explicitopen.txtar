@@ -72,11 +72,6 @@ _foo: a?: int
 			additionalProperties: {
 				type: "integer"
 			}
-			patternProperties: {
-				"": {
-					type: "integer"
-				}
-			}
 		}
 		t6: {
 			type: "object"

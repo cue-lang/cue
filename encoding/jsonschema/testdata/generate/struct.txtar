@@ -26,11 +26,11 @@ t09?: close({
 t10?: {
 	[_]: int
 }
-t10?: {
+t11?: {
 	{[_]: int}
 	a?: int
 }
-t11?: {
+t12?: {
 	x?: string
 	[_]: =~"foo"
 } & {
@@ -63,7 +63,8 @@ _foo: a?: int
 			}
 		}
 		"#S2": {
-			type: "object"
+			type:                 "object"
+			additionalProperties: true
 			properties: {
 				a: {
 					type: "integer"
@@ -91,7 +92,8 @@ _foo: a?: int
 			$ref: "#/$defs/_foo"
 		}
 		t04: {
-			type: "object"
+			type:                 "object"
+			additionalProperties: true
 			properties: {
 				a: {
 					type: "integer"
@@ -102,11 +104,6 @@ _foo: a?: int
 			type: "object"
 			additionalProperties: {
 				type: "integer"
-			}
-			patternProperties: {
-				"": {
-					type: "integer"
-				}
 			}
 		}
 		t06: {
@@ -168,6 +165,9 @@ _foo: a?: int
 			additionalProperties: {
 				type: "integer"
 			}
+		}
+		t11: {
+			type: "object"
 			patternProperties: {
 				"": {
 					type: "integer"
@@ -179,16 +179,8 @@ _foo: a?: int
 				}
 			}
 		}
-		t11: {
+		t12: {
 			type: "object"
-			additionalProperties: {
-				allOf: [{
-					pattern: "bar"
-				}, {
-					type:    "string"
-					pattern: "foo"
-				}]
-			}
 			patternProperties: {
 				"": {
 					allOf: [{

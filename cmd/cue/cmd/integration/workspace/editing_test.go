@@ -319,9 +319,9 @@ z: 1
 			qt.Assert(t, qt.ContentEquals(locs, []protocol.Location{
 				{
 					URI: rootURI + "/a/a.cue",
-					// |package a|
+					// package |a|
 					Range: protocol.Range{
-						Start: protocol.Position{Line: 0, Character: 0},
+						Start: protocol.Position{Line: 0, Character: 8},
 						End:   protocol.Position{Line: 0, Character: 9},
 					},
 				},

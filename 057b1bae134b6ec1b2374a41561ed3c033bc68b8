@@ -20,6 +20,108 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "aeaa62c2_7e6ce1d3",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T12:52:04Z",
+      "side": 1,
+      "message": "That backwards reads to me.\n\n```suggestion\n//  2. we record the field usage node in that navigable binding\n```",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "471085c2_a998e705",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T12:52:04Z",
+      "side": 1,
+      "message": "FWIW these days unless I\u0027m writing a method on a function type, I tend to write function types as aliases. 🤷\n\n\n```suggestion\ntype ImportersFunc \u003d func() []*Definitions\n```",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6048eb4d_0fed381c",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T12:52:04Z",
+      "side": 1,
+      "message": "I can\u0027t see anywhere this is actually populated.",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b48f4e2_fc820193",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T12:52:04Z",
+      "side": 1,
+      "message": "bit of a weird name: is \"boot\" short for \"bootstrap\" or something?",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "554aeb4d_c3089ea1",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T12:52:04Z",
+      "side": 1,
+      "message": "This reads like the identifiers themselves are unknown, but I don\u0027t _think_ that\u0027s the meaning you\u0027re trying to convey. Although maybe it is...?\nI wonder about `likelyReferenceOffsets` or something?",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f6cf5a8_4968b162",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 723,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T12:52:04Z",
+      "side": 1,
+      "message": "Given that this doesn\u0027t return anything, maybe make it clear what the intended side-effects are?",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "64dc897a_57d8e780",
         "filename": "internal/lsp/definitions/definitions.go",
         "patchSetId": 2
@@ -48,6 +150,24 @@
       "writtenOn": "2025-10-22T11:01:26Z",
       "side": 1,
       "message": "This change, and all those like it, are due to improvements in how aliases are handled, and the fact the new keyAlias field in astNode now exists and is being used.",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "182b3483_d10dbf04",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 936,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T12:52:04Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2d4005ac_a44d7867",
       "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

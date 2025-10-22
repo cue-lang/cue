@@ -1,0 +1,20 @@
+# TODO: treat lists as "scalars" in defaultsData mode
+-- a.cue --
+@layer(2,defaultData)
+nested: {
+	items: [1, 2]
+	config: {
+		values: ["a"]
+	}
+}
+-- b.cue --
+@layer(3,defaultData)
+nested: {
+	items: [3, 4, 5]
+	config: {
+		values: ["b", "c"]
+	}
+}
+-- out/layer --
+nested.items: incompatible list lengths (2 and 3):
+    ./b.cue:3:9

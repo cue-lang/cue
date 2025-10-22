@@ -20,6 +20,7 @@ import (
 	"sort"
 	"sync"
 
+	"cuelang.org/go/internal/core/layer"
 	"cuelang.org/go/internal/cueexperiment"
 )
 
@@ -92,6 +93,14 @@ func (p hiddenPos) Experiment() (x cueexperiment.File) {
 
 	x = *p.file.experiments
 	return x
+}
+
+// NOTE: this is an internal API and may change at any time without notice.
+func (p hiddenPos) Priority() (pr layer.Priority, ok bool) {
+	if f := p.file; f != nil {
+		return f.p, f.isData
+	}
+	return 0, false
 }
 
 // TODO(mvdan): The methods below don't need to build an entire Position
@@ -263,6 +272,8 @@ type File struct {
 	content []byte
 
 	experiments *cueexperiment.File
+	p           layer.Priority
+	isData      bool
 }
 
 // NewFile returns a new file with the given OS file name. The size provides the
@@ -300,6 +311,18 @@ type hiddenFile = File
 
 func (f *hiddenFile) SetExperiments(experiments *cueexperiment.File) {
 	f.experiments = experiments
+}
+
+// NOTE: this is an internal API and may change at any time without notice.
+//
+// SetLayer sets the layer priority for this file. The priority parameter
+// determines the precedence of defaults defined in this file, with higher
+// values taking precedence over lower values. The isData parameter indicates
+// whether this file should be treated as containing data defaults, which
+// have different merging semantics from regular defaults.
+func (f *hiddenFile) SetLayer(priority int8, isData bool) {
+	f.p = layer.Priority(priority)
+	f.isData = isData
 }
 
 // Name returns the file name of file f as registered with AddFile.

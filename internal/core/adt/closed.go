@@ -14,6 +14,8 @@
 
 package adt
 
+import "cuelang.org/go/internal/core/layer"
+
 // This file implements the closedness algorithm.
 
 // Outline of algorithm
@@ -101,6 +103,11 @@ type CloseInfo struct {
 
 	// This conjunct was opened by the ... postfix operator.
 	Opened bool
+
+	// Priority is used for default resolution. Higher values win. 0 means no
+	// priority is assigned. Default handling may be more restrictive than
+	// specified in the spec when a priority is assigned.
+	Priority layer.Priority
 
 	CycleInfo
 }

@@ -258,6 +258,8 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 
 	var ellipsis Node
 
+	id := t.id
+
 	index := int64(0)
 	hasComprehension := false
 	for j, elem := range l.Elems {
@@ -269,7 +271,6 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 				label, err := MakeLabel(x.Source(), index, IntLabel)
 				n.addErr(err)
 				index++
-				id := t.id
 				// id.setOptional(t.node)
 				c := MakeConjunct(e, x.Value, id)
 				n.insertArc(label, ArcMember, c, id, true)
@@ -294,7 +295,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 				elem = &Top{}
 			}
 
-			id := t.id
+			id := id
 			id.setOptionalV3(t.node)
 
 			c := MakeConjunct(t.env, elem, id)
@@ -309,8 +310,8 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 			label, err := MakeLabel(x.Source(), index, IntLabel)
 			n.addErr(err)
 			index++
-			c := MakeConjunct(t.env, x, t.id)
-			n.insertArc(label, ArcMember, c, t.id, true)
+			c := MakeConjunct(t.env, x, id)
+			n.insertArc(label, ArcMember, c, id, true)
 		}
 
 		if max := n.maxListLen; n.listIsClosed && int(index) > max {
@@ -336,7 +337,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 		n.listIsClosed = isClosed
 	}
 
-	n.updateListType(l, t.id, isClosed, ellipsis)
+	n.updateListType(l, id, isClosed, ellipsis)
 }
 
 func processListVertex(c *OpContext, t *task, mode runMode) {

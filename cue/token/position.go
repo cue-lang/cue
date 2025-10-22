@@ -20,6 +20,7 @@ import (
 	"sort"
 	"sync"
 
+	"cuelang.org/go/internal/core/layer"
 	"cuelang.org/go/internal/cueexperiment"
 )
 
@@ -92,6 +93,20 @@ func (p hiddenPos) Experiment() (x cueexperiment.File) {
 
 	x = *p.file.experiments
 	return x
+}
+
+func (p hiddenPos) Layer() *layer.Layer {
+	if p.file != nil && p.file.layer != nil {
+		return p.file.layer
+	}
+	return nil
+}
+
+func (p hiddenPos) Priority() layer.Priority {
+	if p.file != nil && p.file.layer != nil {
+		return p.file.layer.Priority
+	}
+	return 0
 }
 
 // TODO(mvdan): The methods below don't need to build an entire Position
@@ -263,6 +278,7 @@ type File struct {
 	content []byte
 
 	experiments *cueexperiment.File
+	layer       *layer.Layer
 }
 
 // NewFile returns a new file with the given OS file name. The size provides the
@@ -300,6 +316,10 @@ type hiddenFile = File
 
 func (f *hiddenFile) SetExperiments(experiments *cueexperiment.File) {
 	f.experiments = experiments
+}
+
+func (f *hiddenFile) SetLayer(layer *layer.Layer) {
+	f.layer = layer
 }
 
 // Name returns the file name of file f as registered with AddFile.

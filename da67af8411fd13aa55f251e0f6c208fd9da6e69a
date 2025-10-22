@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "118c8175_13c53a84",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T09:45:44Z",
+      "side": 1,
+      "message": "Yeah, I\u0027ve mentioned it, and it doesn\u0027t seem like the semantics are going to change. I don\u0027t really know what the \"right\" thing to do is tbh.",
+      "parentUuid": "d48b9e77_63895009",
+      "revId": "da67af8411fd13aa55f251e0f6c208fd9da6e69a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab92022e_b81372d2",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc1e4522_19601a94",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T09:45:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab92022e_b81372d2",
+      "revId": "da67af8411fd13aa55f251e0f6c208fd9da6e69a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f924ae4a_7774307a",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-10-22T09:35:45Z",
       "side": 1,
       "message": "ditto with the above, I think this can be just `return expr, ok`",
+      "revId": "da67af8411fd13aa55f251e0f6c208fd9da6e69a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e68efc69_7c4d87af",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-22T09:45:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f924ae4a_7774307a",
       "revId": "da67af8411fd13aa55f251e0f6c208fd9da6e69a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

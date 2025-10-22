@@ -1,0 +1,22 @@
+-- a.cue --
+@layer(3)
+
+config: {
+	port: int | *8080
+	host: string | *"localhost"
+}
+-- b.cue --
+@layer(5)
+
+config: {
+	port: int | *9000
+	timeout: int | *30
+}
+-- out/layer --
+{
+	config: {
+		port:    *9000 | int | 8080
+		host:    *"localhost" | string
+		timeout: *30 | int
+	}
+}

@@ -1,0 +1,21 @@
+-- a.cue --
+@layer(2,defaultData)
+x: {
+	b: { x: 1 }
+	c: { x: 2 }
+}
+-- b.cue --
+@layer(3,defaultData)
+x: c: { x: 3 }
+
+-- out/layer --
+{
+	x: {
+		b: {
+			x: 1
+		}
+		c: {
+			x: 3
+		}
+	}
+}

@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/layer"
 )
 
 // TODO TODO TODO TODO TODO TODO  TODO TODO TODO  TODO TODO TODO  TODO TODO TODO
@@ -386,8 +387,10 @@ type nodeContextState struct {
 	shareDecremented bool       // counters of sharedIDs have been decremented
 
 	depth           int32
-	defaultMode     defaultMode // cumulative default mode
-	origDefaultMode defaultMode // default mode of the original disjunct
+	defaultMode     defaultMode    // cumulative default mode
+	origDefaultMode defaultMode    // default mode of the original disjunct
+	priority        layer.Priority // Priority corresponding to defaultMode
+	origPriority    layer.Priority // Priority of the original disjunct
 
 	// has a value filled out before the node splits into a disjunction. Aside
 	// from detecting a self-reference cycle when there is otherwise just an
@@ -442,9 +445,11 @@ type nodeContextState struct {
 
 	// Value info
 
-	kind     Kind
-	kindExpr Expr      // expr that adjust last value (for error reporting)
-	kindID   CloseInfo // for error tracing
+	kind           Kind
+	constraintKind Kind
+	defaultKind    Kind
+	kindExpr       Expr      // expr that adjust last value (for error reporting)
+	kindID         CloseInfo // for error tracing
 
 	// Current value (may be under construction)
 	scalar   Value // TODO: use Value in node.
@@ -491,7 +496,9 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			scheduler: n.scheduler,
 			node:      node,
 			nodeContextState: nodeContextState{
-				kind: TopKind,
+				kind:           TopKind,
+				constraintKind: TopKind,
+				defaultKind:    TopKind,
 			},
 			toFree:             n.toFree[:0],
 			arcMap:             n.arcMap[:0],
@@ -521,7 +528,11 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			},
 			node: node,
 
-			nodeContextState: nodeContextState{kind: TopKind},
+			nodeContextState: nodeContextState{
+				kind:           TopKind,
+				constraintKind: TopKind,
+				defaultKind:    TopKind,
+			},
 		}
 	}
 

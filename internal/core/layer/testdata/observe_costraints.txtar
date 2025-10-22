@@ -1,0 +1,16 @@
+-- low.cue --
+@layer(3)
+
+a: int | *1
+b: _
+c: a & b
+-- high.cue --
+@layer(5)
+
+b: int | *"foo" // foo does not unify with int, so is eliminated
+-- out/layer --
+{
+	a: *1 | int
+	b: *"foo" | int
+	c: *1 | int
+}

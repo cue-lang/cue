@@ -1,0 +1,22 @@
+-- a.cue --
+@layer(2)
+
+x: string | *"low"
+y: int | *10
+-- b.cue --
+@layer(4)
+
+x: string | *"medium"
+z: bool | *true
+-- c.cue --
+@layer(6)
+
+x: string | *"high"
+y: int | *20
+z: bool
+-- out/layer --
+{
+	x: *"high" | string | "medium" | "low"
+	y: *20 | int | 10
+	z: *true | bool
+}

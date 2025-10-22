@@ -14,7 +14,12 @@
 
 package adt
 
-import "slices"
+import (
+	"math"
+	"slices"
+
+	"cuelang.org/go/internal/core/layer"
+)
 
 // # Overview
 //
@@ -392,6 +397,7 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 
 	leftDropsDefault := true
 	rightDropsDefault := true
+	priority, _ := pos(dn.src).Priority()
 
 	for i, p := range cross {
 		ID := n.nextCrossProduct(i, len(cross), p)
@@ -415,6 +421,13 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 				continue
 			}
 
+			// Promote the priority of defaults.
+			r.origPriority = priority
+			r.priority = p.origPriority
+			if p.defaultMode == isDefault && p.origPriority > priority {
+				r.origPriority = priority
+			}
+
 			tmp = append(tmp, r)
 			if p.defaultMode == isDefault || p.origDefaultMode == isDefault {
 				leftDropsDefault = false
@@ -430,6 +443,17 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 		// Unroll nested disjunctions.
 		switch len(r.disjuncts) {
 		case 0:
+			// If a default is not dropped in a higher priority, allow still to
+			// become a default, even if other other side has dropped defaults.
+			if !rightDropsDefault && r.origDefaultMode == notDefault &&
+				priority < r.priority {
+				r.origDefaultMode = maybeDefault
+			}
+			if !leftDropsDefault && r.defaultMode == notDefault &&
+				priority > r.priority {
+				r.defaultMode = maybeDefault
+			}
+
 			r.defaultMode = combineDefault2(r.defaultMode, r.origDefaultMode, leftDropsDefault, rightDropsDefault)
 			// r did not have a nested disjunction.
 			dst = appendDisjunct(n.ctx, dst, r)
@@ -556,6 +580,9 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 	// a special mode, or evaluating more aggressively if finalize is not given.
 	v.status = unprocessed
 
+	if m == isDefault {
+		c.CloseInfo.Priority, _ = pos(c.x).Priority()
+	}
 	d.scheduleConjunct(c, c.CloseInfo)
 
 	oc.unlinkOverlay()
@@ -605,17 +632,32 @@ func (n *nodeContext) finalizeDisjunctions() {
 		return
 	}
 
+	// Determine highest priority and if the default exists.
+	hasDefaults := false
+	defaultPriority := layer.Priority(math.MinInt8)
+	for _, x := range n.disjuncts {
+		if x.defaultMode == isDefault {
+			hasDefaults = true
+			if x.origPriority > defaultPriority {
+				defaultPriority = x.origPriority
+			}
+		}
+	}
+
 	a := make([]Value, len(n.disjuncts))
 	p := 0
-	hasDefaults := false
 	for i, x := range n.disjuncts {
+		if x.origPriority < defaultPriority && x.defaultMode != isDefault {
+			x.defaultMode = notDefault
+		}
+
 		switch x.defaultMode {
 		case isDefault:
-			a[i] = a[p]
-			a[p] = x.node
-			p++
-			hasDefaults = true
-
+			if x.origPriority == defaultPriority {
+				a[i] = a[p]
+				a[p] = x.node
+				p++
+			}
 		case notDefault:
 			hasDefaults = true
 			fallthrough

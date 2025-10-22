@@ -1,0 +1,10 @@
+-- a.cue --
+@layer(2,defaultData)
+list: [2]
+-- b.cue --
+@layer(3,defaultData)
+list: [3]
+-- out/layer --
+{
+	list: [2]
+}

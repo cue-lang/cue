@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f64769b_b1224670",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-23T20:00:52Z",
+      "side": 1,
+      "message": "It is definitely not finished yet. It works enough for some demoing though, and helps doing integration work in parallel. It is not intended to be finished.",
+      "parentUuid": "4d7f470b_8582c5a2",
+      "revId": "eb0016da53db43e58a92527881ef6a4097159a2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fb9ef68_1cfebd3f",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad4fd728_c62a1a44",
+        "filename": "cue/token/position.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-23T20:00:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fb9ef68_1cfebd3f",
+      "revId": "eb0016da53db43e58a92527881ef6a4097159a2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "298483d4_422eccab",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-10-23T16:44:51Z",
       "side": 1,
       "message": "if this really shouldn\u0027t happen, maybe panic is better so that we can find implementation problems early?",
+      "revId": "eb0016da53db43e58a92527881ef6a4097159a2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4375652_73da7624",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-23T20:00:52Z",
+      "side": 1,
+      "message": "Turns out it can happen and it is okay. Removed comment.",
+      "parentUuid": "298483d4_422eccab",
       "revId": "eb0016da53db43e58a92527881ef6a4097159a2d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -77,6 +131,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef8592ea_78956037",
+        "filename": "internal/core/layer/testdata/data.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-23T20:00:52Z",
+      "side": 1,
+      "message": "Lists are not handled properly yet.",
+      "parentUuid": "25da1a14_e2004302",
+      "range": {
+        "startLine": 1,
+        "startChar": 1,
+        "endLine": 1,
+        "endChar": 2
+      },
+      "revId": "eb0016da53db43e58a92527881ef6a4097159a2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eecca97a_c5de3d92",
         "filename": "internal/core/layer/testdata/scalar.txtar",
         "patchSetId": 5
@@ -88,6 +166,24 @@
       "writtenOn": "2025-10-23T16:44:51Z",
       "side": 1,
       "message": "I\u0027d definitely like to see more test cases here.\n\nFor example, I just tried this and it does not behave as I\u0027d expect (I\u0027d expect `c` to end up with `\"foo\"` as a default but it does not):\n\n```\n-- low.cue --\n@layer(3)\n\na: int | *1\nb: _\nc: a \u0026 b\n-- high.cue --\n@layer(5)\n\nb: int | *\"foo\"\n```",
+      "revId": "eb0016da53db43e58a92527881ef6a4097159a2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eff581dd_f386e27d",
+        "filename": "internal/core/layer/testdata/scalar.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-23T20:00:52Z",
+      "side": 1,
+      "message": "This is correct behavior. It may be clearer when written in \"new\" syntax.\n\na: int \u003d 1 // p\u003d3\nb: int \u003d \"foo\" // p\u003d5\nc: a \u0026 b\n\n\"foo\" is an invalid default and does not unify with either a or b and thus is eliminated.",
+      "parentUuid": "eecca97a_c5de3d92",
       "revId": "eb0016da53db43e58a92527881ef6a4097159a2d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

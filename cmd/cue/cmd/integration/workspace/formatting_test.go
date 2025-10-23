@@ -6,7 +6,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"github.com/go-quicktest/qt"
-	"github.com/rogpeppe/go-internal/txtar"
+	"golang.org/x/tools/txtar"
 )
 
 func TestFormatting(t *testing.T) {

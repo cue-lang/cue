@@ -130,10 +130,6 @@ func (s *server) PrepareCallHierarchy(ctx context.Context, params *protocol.Call
 	return nil, notImplemented("PrepareCallHierarchy")
 }
 
-func (s *server) PrepareRename(ctx context.Context, params *protocol.PrepareRenameParams) (*protocol.PrepareRenamePlaceholder, error) {
-	return nil, notImplemented("PrepareRename")
-}
-
 func (s *server) PrepareTypeHierarchy(context.Context, *protocol.TypeHierarchyPrepareParams) ([]protocol.TypeHierarchyItem, error) {
 	return nil, notImplemented("PrepareTypeHierarchy")
 }
@@ -148,10 +144,6 @@ func (s *server) RangeFormatting(context.Context, *protocol.DocumentRangeFormatt
 
 func (s *server) RangesFormatting(context.Context, *protocol.DocumentRangesFormattingParams) ([]protocol.TextEdit, error) {
 	return nil, notImplemented("RangesFormatting")
-}
-
-func (s *server) Rename(ctx context.Context, params *protocol.RenameParams) (*protocol.WorkspaceEdit, error) {
-	return nil, notImplemented("Rename")
 }
 
 func (s *server) Resolve(context.Context, *protocol.InlayHint) (*protocol.InlayHint, error) {

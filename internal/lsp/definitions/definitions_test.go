@@ -28,7 +28,7 @@ import (
 	"cuelang.org/go/internal/lsp/definitions"
 	"cuelang.org/go/internal/lsp/rangeset"
 	"github.com/go-quicktest/qt"
-	"github.com/rogpeppe/go-internal/txtar"
+	"golang.org/x/tools/txtar"
 )
 
 func TestDefinitions(t *testing.T) {

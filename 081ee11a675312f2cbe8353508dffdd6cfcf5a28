@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0d74998_e028e5e7",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-23T11:18:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "739058a4_2e2f9d53",
+      "revId": "081ee11a675312f2cbe8353508dffdd6cfcf5a28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d77f2f1d_5b5ee95d",
@@ -84,6 +102,24 @@
       "writtenOn": "2025-10-22T11:31:52Z",
       "side": 1,
       "message": "ditto",
+      "revId": "081ee11a675312f2cbe8353508dffdd6cfcf5a28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c732603e_b4dc27f7",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-23T11:18:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d77f2f1d_5b5ee95d",
       "revId": "081ee11a675312f2cbe8353508dffdd6cfcf5a28",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

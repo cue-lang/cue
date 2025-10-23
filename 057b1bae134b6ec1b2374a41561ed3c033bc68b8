@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bf4e4c4_2860d518",
+        "filename": "cmd/cue/cmd/integration/workspace/editing_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-23T10:47:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "abaa9839_107172cc",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aeaa62c2_7e6ce1d3",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cef433ac_b70aadae",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-23T10:47:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aeaa62c2_7e6ce1d3",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "471085c2_a998e705",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-10-22T12:52:04Z",
       "side": 1,
       "message": "FWIW these days unless I\u0027m writing a method on a function type, I tend to write function types as aliases. 🤷\n\n\n```suggestion\ntype ImportersFunc \u003d func() []*Definitions\n```",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b504b8d_e8b35270",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-23T10:47:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "471085c2_a998e705",
       "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -106,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "09d67e0e_9ccc43b1",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-23T10:47:03Z",
+      "side": 1,
+      "message": "You boot a computer don\u0027t you? I think this is just a personal taste thing - I\u0027ve frequently called things `boot` if it\u0027s to do with startup/initialisation etc. I could well believe it\u0027s short for bootstrap, but that\u0027s honestly not how I think about it.",
+      "parentUuid": "3b48f4e2_fc820193",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "554aeb4d_c3089ea1",
         "filename": "internal/lsp/definitions/definitions.go",
         "patchSetId": 2
@@ -117,6 +189,24 @@
       "writtenOn": "2025-10-22T12:52:04Z",
       "side": 1,
       "message": "This reads like the identifiers themselves are unknown, but I don\u0027t _think_ that\u0027s the meaning you\u0027re trying to convey. Although maybe it is...?\nI wonder about `likelyReferenceOffsets` or something?",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a54d93a_9ad98286",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-23T10:47:03Z",
+      "side": 1,
+      "message": "Well, I\u0027m not inventing idents, so yes, the idents are \"known\" but it\u0027s (maybe) unknown to what they\u0027re referring (it\u0027s the _usage_ that\u0027s unknown I guess). I think `likelyReferenceOffsets` is probably better.",
+      "parentUuid": "554aeb4d_c3089ea1",
       "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -138,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "366f911d_2537d7b9",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 723,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-23T10:47:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f6cf5a8_4968b162",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64dc897a_57d8e780",
@@ -151,6 +259,24 @@
       "writtenOn": "2025-10-22T12:25:04Z",
       "side": 1,
       "message": "Oh yes, this has really just changed location a bit - it was previously in resolve but now it\u0027s in eval. I think it could happily live in either, but I decided it made more sense for it to exist in eval.",
+      "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5be3a9d7_07e51c49",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1501,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-23T10:47:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "64dc897a_57d8e780",
       "revId": "057b1bae134b6ec1b2374a41561ed3c033bc68b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

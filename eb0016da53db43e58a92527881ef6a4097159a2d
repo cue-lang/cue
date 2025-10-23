@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d7f470b_8582c5a2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-23T16:44:51Z",
+      "side": 1,
+      "message": "This feels a little _too_ rudimentary for now: we should at least nail down some behaviour that feels \"right\" within the constraints of a static layering system.",
+      "revId": "eb0016da53db43e58a92527881ef6a4097159a2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fb9ef68_1cfebd3f",
+        "filename": "cue/token/position.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-23T16:44:51Z",
+      "side": 1,
+      "message": "I\u0027m afraid this is still not usable by an external module as `layer` is an internal package, so there\u0027s no way for a caller to make a Priority value (other than by calling with a const number which isn\u0027t super useful :) )\n\nAlso, what does the second parameter mean?",
+      "revId": "eb0016da53db43e58a92527881ef6a4097159a2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "298483d4_422eccab",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-23T16:44:51Z",
+      "side": 1,
+      "message": "if this really shouldn\u0027t happen, maybe panic is better so that we can find implementation problems early?",
+      "revId": "eb0016da53db43e58a92527881ef6a4097159a2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25da1a14_e2004302",
+        "filename": "internal/core/layer/testdata/data.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-23T16:44:51Z",
+      "side": 1,
+      "message": "I\u0027d like to see more test cases here. For example, what happens when non-scalar values are involved.\n\nFor I tried this test case and it failed:\n\n```\n-- a.cue --\n@layer(2,defaultData)\nx: [2]\n-- b.cue --\n@layer(3,defaultData)\nx: [3]\n-- out/layer --\n{\n\tx: [3]\n}\n```\n\nIs that intended behaviour or not?\n\nLikewise I\u0027d like to see examples where data defaults mingle with non-data defaults in the same configuration.",
+      "range": {
+        "startLine": 1,
+        "startChar": 1,
+        "endLine": 1,
+        "endChar": 2
+      },
+      "revId": "eb0016da53db43e58a92527881ef6a4097159a2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eecca97a_c5de3d92",
+        "filename": "internal/core/layer/testdata/scalar.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-23T16:44:51Z",
+      "side": 1,
+      "message": "I\u0027d definitely like to see more test cases here.\n\nFor example, I just tried this and it does not behave as I\u0027d expect (I\u0027d expect `c` to end up with `\"foo\"` as a default but it does not):\n\n```\n-- low.cue --\n@layer(3)\n\na: int | *1\nb: _\nc: a \u0026 b\n-- high.cue --\n@layer(5)\n\nb: int | *\"foo\"\n```",
+      "revId": "eb0016da53db43e58a92527881ef6a4097159a2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

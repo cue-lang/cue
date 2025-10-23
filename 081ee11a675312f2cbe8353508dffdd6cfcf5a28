@@ -103,6 +103,24 @@
       "message": "```suggestion\n// this package, or import this package) have been modified but this\n```",
       "revId": "081ee11a675312f2cbe8353508dffdd6cfcf5a28",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9aa9d02e_6dcb5f3a",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-23T10:32:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c24bdcd4_32b82f09",
+      "revId": "081ee11a675312f2cbe8353508dffdd6cfcf5a28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

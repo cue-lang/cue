@@ -57,5 +57,25 @@ func (s *server) References(ctx context.Context, params *protocol.ReferenceParam
 	if tokFile == nil || err != nil {
 		return nil, err
 	}
-	return w.References(tokFile, dfns, srcMapper, params.Position), nil
+	return w.References(tokFile, dfns, srcMapper, params.Position, params.Context.IncludeDeclaration), nil
+}
+
+func (s *server) Rename(ctx context.Context, params *protocol.RenameParams) (*protocol.WorkspaceEdit, error) {
+	uri := params.TextDocument.URI
+	w := s.workspace
+	tokFile, dfns, srcMapper, err := w.DefinitionsForURI(uri, true)
+	if tokFile == nil || err != nil {
+		return nil, err
+	}
+	return w.Rename(tokFile, dfns, srcMapper, params), nil
+}
+
+func (s *server) PrepareRename(ctx context.Context, params *protocol.PrepareRenameParams) (*protocol.PrepareRenamePlaceholder, error) {
+	uri := params.TextDocument.URI
+	w := s.workspace
+	tokFile, dfns, srcMapper, err := w.DefinitionsForURI(uri, true)
+	if tokFile == nil || err != nil {
+		return nil, err
+	}
+	return w.PrepareRename(tokFile, dfns, srcMapper, params.Position), nil
 }

@@ -684,7 +684,7 @@ func (fdfns *FileDefinitions) CompletionsForOffset(offset int) (fields, embeds [
 // UsagesForOffset reports the nodes that make use of whatever the
 // file offset (number of bytes from the start of the file) resolves
 // to.
-func (fdfns *FileDefinitions) UsagesForOffset(offset int) []ast.Node {
+func (fdfns *FileDefinitions) UsagesForOffset(offset int, includeDefinitions bool) []ast.Node {
 	definitions := fdfns.definitions
 	navs, found := definitions[offset]
 	if !found {
@@ -716,7 +716,19 @@ func (fdfns *FileDefinitions) UsagesForOffset(offset int) []ast.Node {
 	for _, nav := range navs {
 		maps.Copy(exprs, nav.usedBy)
 	}
-	return slices.Collect(maps.Keys(exprs))
+	nodes := slices.Collect(maps.Keys(exprs))
+
+	if includeDefinitions {
+		for _, nav := range navs {
+			for _, n := range nav.contributingNodes {
+				if n.key != nil {
+					nodes = append(nodes, n.key)
+				}
+			}
+		}
+	}
+
+	return nodes
 }
 
 // usages attempts to discover all uses of the given navs whilst doing

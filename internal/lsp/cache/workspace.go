@@ -582,7 +582,7 @@ func (w *Workspace) updateOverlays(modifications []file.Modification) (map[proto
 // may result in new modules being added to the workspace.
 //
 // If no module can be found, this method returns nil,
-// [errModuleNotFound]; this method does not create new modules.
+// [errModuleNotFound].
 func (w *Workspace) FindModuleForFile(file protocol.DocumentURI) (*Module, error) {
 	w.reloadModules()
 	fileDir := file.Dir()

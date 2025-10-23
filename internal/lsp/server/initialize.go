@@ -87,6 +87,13 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 	}
 	s.eventuallyUseWorkspaceFolders(validFolders)
 
+	var renameOpts any = true
+	if r := params.Capabilities.TextDocument.Rename; r != nil && r.PrepareSupport {
+		renameOpts = protocol.RenameOptions{
+			PrepareProvider: r.PrepareSupport,
+		}
+	}
+
 	return &protocol.InitializeResult{
 		ServerInfo: &protocol.ServerInfo{
 			Name:    "cuelsp",
@@ -101,6 +108,7 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 			DocumentFormattingProvider: &protocol.Or_ServerCapabilities_documentFormattingProvider{Value: true},
 			HoverProvider:              &protocol.Or_ServerCapabilities_hoverProvider{Value: true},
 			ReferencesProvider:         &protocol.Or_ServerCapabilities_referencesProvider{Value: true},
+			RenameProvider:             renameOpts,
 			TextDocumentSync: &protocol.TextDocumentSyncOptions{
 				Change:    protocol.Incremental,
 				OpenClose: true,

@@ -87,7 +87,7 @@ func (w *Workspace) Definition(tokFile *token.File, fdfns *definitions.FileDefin
 	return locations
 }
 
-func (w *Workspace) References(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) []protocol.Location {
+func (w *Workspace) References(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position, includeDefinitions bool) []protocol.Location {
 	var targets []ast.Node
 	// If UsagesForOffset returns no results, and if it's safe to
 	// do so, we back off the Character offset (column number) by 1 and
@@ -108,7 +108,7 @@ func (w *Workspace) References(tokFile *token.File, fdfns *definitions.FileDefin
 			continue
 		}
 
-		targets = fdfns.UsagesForOffset(offset)
+		targets = fdfns.UsagesForOffset(offset, includeDefinitions)
 		if len(targets) > 0 {
 			break
 		}

@@ -69,6 +69,13 @@ c3: p3.out
 			{
 				URI: rootURI + "/a/a.cue",
 				Range: protocol.Range{
+					Start: protocol.Position{Line: 2, Character: 0},
+					End:   protocol.Position{Line: 2, Character: 3},
+				},
+			},
+			{
+				URI: rootURI + "/a/a.cue",
+				Range: protocol.Range{
 					Start: protocol.Position{Line: 3, Character: 8},
 					End:   protocol.Position{Line: 3, Character: 11},
 				},

@@ -57,5 +57,5 @@ func (s *server) References(ctx context.Context, params *protocol.ReferenceParam
 	if tokFile == nil || err != nil {
 		return nil, err
 	}
-	return w.References(tokFile, dfns, srcMapper, params.Position), nil
+	return w.References(tokFile, dfns, srcMapper, params), nil
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd71d566_36094665",
+        "filename": "cmd/cue/cmd/integration/workspace/references_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-24T11:35:05Z",
+      "side": 1,
+      "message": "The LSP test framework always sets the IncludeDeclarations param to true in the call to FindReferences. So we get an extra result here now.",
+      "revId": "127e146b2b8f8a5c7effe86373c4496a3ec98053",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

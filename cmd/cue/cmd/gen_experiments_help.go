@@ -314,7 +314,7 @@ Experiments are enabled in CUE files using file-level attributes:
 
 Multiple experiments can be enabled:
 
-	@experiment(structcmp,self)
+	@experiment(structcmp,aliasv2)
 	@experiment(explicitopen)
 
 The behavior of per-file experiments tracks the language version declared in their module,

@@ -134,8 +134,12 @@ name docs4
 
 		for p, expectation := range testCases {
 			p.determinePos(mappers)
-			ranges.Add(p.filename, p.offset, p.offset+len(p.str))
-			for i := range p.str {
+			// it's len(p.str)+1 because we want to go from the cursor
+			// before the start of the str up to cursor after the end of
+			// str. So |str to str|
+			strLen := len(p.str) + 1
+			ranges.Add(p.filename, p.offset, p.offset+strLen)
+			for i := range strLen {
 				pos := p.pos
 				pos.Character += uint32(i)
 				got, _ := env.Hover(protocol.Location{

@@ -3311,7 +3311,7 @@ func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCas
 			for i := range len(posUse.str) {
 				// Test every offset within the "use" token
 				offset := offset + i
-				nodesGot := fdfns.UsagesForOffset(offset)
+				nodesGot := fdfns.UsagesForOffset(offset, false)
 				fileOffsetsGot := make([]fileOffset, len(nodesGot))
 				for j, node := range nodesGot {
 					fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())

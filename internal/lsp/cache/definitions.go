@@ -17,6 +17,7 @@ package cache
 import (
 	"cmp"
 	"fmt"
+	"iter"
 	"maps"
 	"path/filepath"
 	"slices"
@@ -34,20 +35,7 @@ import (
 // the definitions of those nodes.
 func (w *Workspace) Definition(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) []protocol.Location {
 	var targets []ast.Node
-	// If DefinitionsForOffset returns no results, and if it's safe to
-	// do so, we back off the Character offset (column number) by 1 and
-	// try again. This can help when the caret symbol is a | (as
-	// opposed to a block - i.e. it's *between* two characters rather
-	// than *over* a single character) and is placed straight after the
-	// end of a path element.
-	posAdj := []uint32{0, 1}
-	if pos.Character == 0 {
-		posAdj = posAdj[:1]
-	}
-	for _, adj := range posAdj {
-		pos := pos
-		pos.Character -= adj
-		offset, err := srcMapper.PositionOffset(pos)
+	for offset, err := range adjustedPositionsIter(pos, srcMapper) {
 		if err != nil {
 			w.debugLog(err.Error())
 			continue
@@ -87,7 +75,7 @@ func (w *Workspace) Definition(tokFile *token.File, fdfns *definitions.FileDefin
 	return locations
 }
 
-func (w *Workspace) References(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) []protocol.Location {
+func (w *Workspace) References(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, params *protocol.ReferenceParams) []protocol.Location {
 	var targets []ast.Node
 	// If UsagesForOffset returns no results, and if it's safe to
 	// do so, we back off the Character offset (column number) by 1 and
@@ -95,20 +83,14 @@ func (w *Workspace) References(tokFile *token.File, fdfns *definitions.FileDefin
 	// opposed to a block - i.e. it's *between* two characters rather
 	// than *over* a single character) and is placed straight after the
 	// end of a path element.
-	posAdj := []uint32{0, 1}[:1]
-	if pos.Character == 0 {
-		posAdj = posAdj[:1]
-	}
-	for _, adj := range posAdj {
-		pos := pos
-		pos.Character -= adj
-		offset, err := srcMapper.PositionOffset(pos)
+	pos := params.Position
+	for offset, err := range adjustedPositionsIter(pos, srcMapper) {
 		if err != nil {
 			w.debugLog(err.Error())
 			continue
 		}
 
-		targets = fdfns.UsagesForOffset(offset)
+		targets = fdfns.UsagesForOffset(offset, params.Context.IncludeDeclaration)
 		if len(targets) > 0 {
 			break
 		}
@@ -147,13 +129,17 @@ func (w *Workspace) References(tokFile *token.File, fdfns *definitions.FileDefin
 // nodes, and returns the doc comments attached to those ast nodes.
 func (w *Workspace) Hover(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.Hover {
 	var comments map[ast.Node][]*ast.CommentGroup
-	offset, err := srcMapper.PositionOffset(pos)
-	if err != nil {
-		w.debugLog(err.Error())
-		return nil
-	}
+	for offset, err := range adjustedPositionsIter(pos, srcMapper) {
+		if err != nil {
+			w.debugLog(err.Error())
+			continue
+		}
 
-	comments = fdfns.DocCommentsForOffset(offset)
+		comments = fdfns.DocCommentsForOffset(offset)
+		if len(comments) > 0 {
+			break
+		}
+	}
 	if len(comments) == 0 {
 		return nil
 	}
@@ -356,4 +342,29 @@ func (w *Workspace) DefinitionsForURI(fileUri protocol.DocumentURI, loadAllPkgsI
 	}
 
 	return tokFile, fdfns, srcMapper, nil
+}
+
+// adjustedPositionsIter returns an iterator that produces offsets
+// determined by the position and mapper. In a number of cases it
+// makes sense to try both the actual cursor position and the position
+// one character to the left. This can help when the caret symbol is a
+// | (as opposed to a block - i.e. it's *between* two characters
+// rather than *over* a single character) and is placed straight after
+// the end of a token.
+func adjustedPositionsIter(pos protocol.Position, mapper *protocol.Mapper) iter.Seq2[int, error] {
+	posAdj := []uint32{0, 1}
+	if pos.Character == 0 {
+		posAdj = posAdj[:1]
+	}
+	return func(yield func(int, error) bool) {
+		for _, adj := range posAdj {
+			pos := pos
+			pos.Character -= adj
+			offset, err := mapper.PositionOffset(pos)
+
+			if !yield(offset, err) {
+				return
+			}
+		}
+	}
 }

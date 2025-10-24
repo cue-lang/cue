@@ -33,6 +33,29 @@
       "message": "Marcel to review",
       "revId": "09367f9964bf7d241cac525822f7fe3e39afe28f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fabfa6e0_23b13ac1",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-10-24T10:23:14Z",
+      "side": 1,
+      "message": "I don\u0027t think this is correct; you don\u0027t need more than one attribute as the example shows. So I would suggest removing this text.",
+      "range": {
+        "startLine": 43,
+        "startChar": 36,
+        "endLine": 43,
+        "endChar": 65
+      },
+      "revId": "09367f9964bf7d241cac525822f7fe3e39afe28f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -263,11 +263,11 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	for i, f := range files {
 		astFiles[i] = f.Syntax
 		uri := m.rootURI + protocol.DocumentURI("/"+f.FilePath)
+		w.standalone.deleteFile(uri)
+		delete(m.dirtyFiles, uri)
 		if tokFile := f.Syntax.Pos().File(); tokFile != nil {
 			w.mappers[tokFile] = protocol.NewMapper(uri, tokFile.Content())
 		}
-		delete(m.dirtyFiles, uri)
-		w.standalone.deleteFile(uri)
 	}
 
 	forPackage := func(importPath string) *definitions.Definitions {

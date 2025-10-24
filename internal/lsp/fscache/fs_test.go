@@ -103,7 +103,11 @@ func TestOverlayFSURI(t *testing.T) {
 			ast, cfg, err := fh.ReadCUE(parser.NewConfig())
 			qt.Assert(t, qt.IsNotNil(err))
 			qt.Assert(t, qt.Equals(cfg.Mode, parser.ParseComments))
-			qt.Assert(t, qt.Equals(len(ast.Decls), 2))
+			// The three decls are:
+			// 1. The fake injected package declaration
+			// 2. A bad decl ("hello")
+			// 3. An embed decl ("world")
+			qt.Assert(t, qt.Equals(len(ast.Decls), 3))
 
 		} else if strings.HasSuffix(f, "bad.cue") {
 			qt.Assert(t, qt.DeepEquals(fh.Content(), []byte(fileContentBad)))

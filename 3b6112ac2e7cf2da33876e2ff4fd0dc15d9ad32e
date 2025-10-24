@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4efc383_4551b988",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 585,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-24T11:36:38Z",
+      "side": 1,
+      "message": "sorry, this is a drive-by - I spotted this doc was self-contradictory.",
+      "revId": "3b6112ac2e7cf2da33876e2ff4fd0dc15d9ad32e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,7 +1,9 @@
 package fscache
 
 import (
+	"crypto/sha256"
 	"errors"
+	"fmt"
 	iofs "io/fs"
 	"os"
 	"path/filepath"
@@ -76,7 +78,15 @@ type cueFileParser struct {
 // attempt that succeeds (nil error) is returned. It is useful to fall
 // back to ImportsOnly if there are syntax errors further on in the
 // CUE.
-func (p *cueFileParser) ReadCUE(config parser.Config) (ast *ast.File, cfg parser.Config, err error) {
+//
+// Any non-nil AST returned will have an [ast.Package] decl in the
+// root of the AST. If no package decl is present in the parsed AST,
+// one is created and added, using a hash of the filename as the
+// package name. Always ensuring a package name is present means that
+// an import path can be made for every cue file within a module,
+// which means that [modpkgload.LoadPackages] can always be used to
+// load a package and resolve its imports.
+func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg parser.Config, err error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
@@ -97,24 +107,45 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (ast *ast.File, cfg parser
 	importsOnly.Mode = parser.ImportsOnly
 
 	for _, cfg = range []parser.Config{parseComments, importsOnly} {
-		ast, err = parser.ParseFile(bf.Filename, content, cfg)
-		if ast != nil {
+		syntax, err = parser.ParseFile(bf.Filename, content, cfg)
+		if syntax != nil {
 			break
 		}
 	}
 
-	if ast != nil {
-		file := ast.Pos().File()
+	if syntax != nil {
+		file := syntax.Pos().File()
 		if file != nil {
 			file.SetContent(content)
+		}
+		var pkg *ast.Package
+		decls := syntax.Decls
+		for _, decl := range decls {
+			if p, ok := decl.(*ast.Package); ok {
+				pkg = p
+				break
+			}
+		}
+		if pkg == nil {
+			pkg = &ast.Package{PackagePos: syntax.Pos()}
+			if len(decls) == 0 {
+				decls = append(decls, pkg)
+			} else {
+				decls = append(decls[:1], decls...)
+				decls[0] = pkg
+			}
+			syntax.Decls = decls
+		}
+		if pkg.Name == nil || pkg.Name.Name == "" || pkg.Name.Name == "_" {
+			pkg.Name = ast.NewIdent(fmt.Sprintf("_%x", sha256.Sum256([]byte(bf.Filename))))
 		}
 	}
 
 	p.config = cfg
-	p.ast = ast
+	p.ast = syntax
 	p.err = err
 
-	return ast, cfg, err
+	return syntax, cfg, err
 }
 
 // Version implements [FileHandle]

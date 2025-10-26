@@ -546,9 +546,9 @@ func (f *File) unpack(offset index, adjusted bool) (filename string, line, colum
 }
 
 func (f *File) position(p Pos, adjusted bool) (pos Position) {
-	offset := f.fixOffset(p.index() - 1)
-	pos.Offset = int(offset)
-	pos.Filename, pos.Line, pos.Column = f.unpack(offset, adjusted)
+	offset := f.Offset(p)
+	pos.Offset = offset
+	pos.Filename, pos.Line, pos.Column = f.unpack(index(offset), adjusted)
 	return
 }
 

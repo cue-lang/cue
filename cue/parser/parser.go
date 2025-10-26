@@ -517,7 +517,7 @@ func syncExpr(p *parser) {
 				p.syncCnt++
 				return
 			}
-			if p.syncPos.Before(p.pos) {
+			if p.syncPos.Compare(p.pos) < 0 {
 				p.syncPos = p.pos
 				p.syncCnt = 0
 				return

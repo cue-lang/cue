@@ -204,8 +204,9 @@ func (p Pos) HasRelPos() bool {
 
 // TODO: deprecate in favor of [Pos.Compare]?
 
+// Before reports whether p < q, as documented in [Pos.Compare].
 func (p Pos) Before(q Pos) bool {
-	return p.file == q.file && p.Offset() < q.Offset()
+	return p.Compare(q) < 0
 }
 
 // Offset reports the byte offset relative to the file.

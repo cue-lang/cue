@@ -103,10 +103,6 @@ func (p hiddenPos) Priority() (pr layer.Priority, ok bool) {
 	return 0, false
 }
 
-// TODO(mvdan): The methods below don't need to build an entire Position
-// just to access some of the information. This could matter particularly for
-// Compare, as it is called many times when sorting by position.
-
 func (p Pos) Line() int {
 	if p.file == nil {
 		return 0
@@ -212,7 +208,11 @@ func (p Pos) Before(q Pos) bool {
 
 // Offset reports the byte offset relative to the file.
 func (p Pos) Offset() int {
-	return p.Position().Offset
+	// Avoid calling [Pos.Position] as it also unpacks line and column info.
+	if p.file == nil {
+		return 0
+	}
+	return p.file.Offset(p)
 }
 
 // Add creates a new position relative to the p offset by n.
@@ -286,7 +286,6 @@ func NewFile(filename string, deprecatedBase, size int) *File {
 		deprecatedBase = 1
 	}
 	return &File{
-		mutex: sync.RWMutex{},
 		name:  filename,
 		base:  index(deprecatedBase),
 		size:  index(size),

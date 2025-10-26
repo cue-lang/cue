@@ -103,20 +103,18 @@ func (p hiddenPos) Priority() (pr layer.Priority, ok bool) {
 	return 0, false
 }
 
+// Line returns the position's line number, starting at 1.
 func (p Pos) Line() int {
-	if p.file == nil {
-		return 0
-	}
 	return p.Position().Line
 }
 
+// Column returns the position's column number counting in bytes,
+// starting at 1.
 func (p Pos) Column() int {
-	if p.file == nil {
-		return 0
-	}
 	return p.Position().Column
 }
 
+// Filename returns the name of the file that this position belongs to.
 func (p Pos) Filename() string {
 	// Avoid calling [Pos.Position] as it also unpacks line and column info.
 	if p.file == nil {
@@ -125,6 +123,7 @@ func (p Pos) Filename() string {
 	return p.file.name
 }
 
+// Position unpacks the position information into a flat struct.
 func (p Pos) Position() Position {
 	if p.file == nil {
 		return Position{}
@@ -201,6 +200,8 @@ func (p RelPos) Pos() Pos {
 func (p Pos) HasRelPos() bool {
 	return p.offset&relMask != 0
 }
+
+// TODO: deprecate in favor of [Pos.Compare]?
 
 func (p Pos) Before(q Pos) bool {
 	return p.file == q.file && p.Offset() < q.Offset()

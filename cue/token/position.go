@@ -146,13 +146,14 @@ func (p Pos) Compare(p2 Pos) int {
 	} else if p2 == NoPos {
 		return -1
 	}
-	pos, pos2 := p.Position(), p2.Position()
-	if c := cmp.Compare(pos.Filename, pos2.Filename); c != 0 {
+	// Avoid calling [Pos.Position] as it also unpacks line and column info;
+	// comparing positions only needs filenames and offsets.
+	if c := cmp.Compare(p.Filename(), p2.Filename()); c != 0 {
 		return c
 	}
 	// Note that CUE doesn't currently use any directives which alter
 	// position information, like Go's //line, so comparing by offset is enough.
-	return cmp.Compare(pos.Offset, pos2.Offset)
+	return cmp.Compare(p.Offset(), p2.Offset())
 }
 
 // NoPos is the zero value for [Pos]; there is no file and line information

@@ -1979,7 +1979,7 @@ func (n *astNode) appendBinding(name string, binding *astNode) {
 func (n *astNode) addDocComments(node ast.Node) {
 	var comments []*ast.CommentGroup
 	for _, group := range ast.Comments(node) {
-		if group.Doc && len(group.List) > 0 && group.List[0].Pos().Before(node.Pos()) {
+		if group.Doc && len(group.List) > 0 && group.List[0].Pos().Compare(node.Pos()) < 0 {
 			comments = append(comments, group)
 		}
 	}

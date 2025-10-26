@@ -229,7 +229,7 @@ func (f *formatter) walkListElems(list []ast.Expr) {
 		splitComments := x.Pos().IsValid()
 		if splitComments {
 			for _, cg := range ast.Comments(x) {
-				if x.Pos().Before(cg.Pos()) {
+				if x.Pos().Compare(cg.Pos()) < 0 {
 					commentsAfter = append(commentsAfter, cg)
 				}
 			}

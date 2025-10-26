@@ -122,10 +122,11 @@ func (p Pos) Column() int {
 }
 
 func (p Pos) Filename() string {
+	// Avoid calling [Pos.Position] as it also unpacks line and column info.
 	if p.file == nil {
 		return ""
 	}
-	return p.Position().Filename
+	return p.file.name
 }
 
 func (p Pos) Position() Position {

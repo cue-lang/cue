@@ -16,6 +16,24 @@
       "message": "marvellous hack! :)",
       "revId": "8511656827a5439a60597bc20e3ea3a604a3367c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91e79f7c_161c1e05",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-27T13:32:50Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "595d6fbc_bb78884f",
+      "revId": "8511656827a5439a60597bc20e3ea3a604a3367c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

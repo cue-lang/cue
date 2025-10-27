@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "820ed69a_d9c74ee8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-27T09:20:30Z",
+      "side": 1,
+      "message": "I imagine something got missed here?",
+      "revId": "ecf3ac6d346378ba1bfbc669137d1c88e3b3936a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0429d515_6f7a24bc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-27T09:20:30Z",
+      "side": 1,
+      "message": "TBH, I\u0027m a little surprised by this. Although I completely agree that the previous semantics of Before are unsafe, and that Compare is the only safe thing to use, the fix here is nevertheless a breaking change IMO. I honestly don\u0027t see much difference between correcting the behaviour of Before, as you have done here, and just removing it altogether (in fact, I would argue that removing it is the safer thing to do).",
+      "revId": "ecf3ac6d346378ba1bfbc669137d1c88e3b3936a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

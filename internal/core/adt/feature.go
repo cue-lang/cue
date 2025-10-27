@@ -388,6 +388,3 @@ func (f Feature) safeIndex() int64 {
 	}
 	return int64(x)
 }
-
-// TODO: should let declarations be implemented as fields?
-// func (f Feature) isLet() bool  { return f.typ() == letLabel }

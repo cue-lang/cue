@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42fe0b8c_53b2090e",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-27T11:42:27Z",
+      "side": 1,
+      "message": "gopls suggests using DeMorgan to simplify your expression, and I think that\u0027s a good idea in general - your expression is slightly convoluted.\n\n\nI played with an alternative like\n\n\n```\n\t\tif outFile \u003d\u003d \"\" || i \u003d\u003d len(p.Syntax)-1 {\n\t\t\t// By default, we generate one CUE file per Go file.\n\t\t\t// With --outfile, we keep adding to one output file, and write it at the end.\n\t\t} else {\n\t\t\tcontinue\n\t\t}\n```\n\n\nwhich keeps the logic the way you meant it, but I don\u0027t think that\u0027s particularly clearer either.\n\n\nI\u0027ll keep the existing conditional, but expand the doc a bit.",
+      "parentUuid": "3acef710_627733b8",
+      "revId": "5e61119f932c9e746db68041f3db9a9e0b726c88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4c9cfc3f_dd3cc3ed",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "40ef9e46_bf0e9669",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-27T11:42:27Z",
+      "side": 1,
+      "message": "I think with the two loops I\u0027d still need logic to determine if I\u0027m accumulating into one file, or generating a new file each time, so I\u0027m not sure if it would be simpler. I\u0027ve left it as a TODO, happy to iterate on this further in the future.",
+      "parentUuid": "4c9cfc3f_dd3cc3ed",
+      "revId": "5e61119f932c9e746db68041f3db9a9e0b726c88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "928e7fec_017b47f9",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-10-14T08:27:49Z",
       "side": 1,
       "message": "You could lift the `outFile` check to be outside this whole loop?",
+      "revId": "5e61119f932c9e746db68041f3db9a9e0b726c88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b208a28c_122efd08",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 575,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-27T11:42:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "928e7fec_017b47f9",
       "revId": "5e61119f932c9e746db68041f3db9a9e0b726c88",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

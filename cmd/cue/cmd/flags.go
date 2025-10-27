@@ -27,6 +27,7 @@ const (
 	flagAllMajor        flagName = "all-major"
 	flagAllVersions     flagName = "all-versions"
 	flagCheck           flagName = "check"
+	flagDeps            flagName = "deps"
 	flagDiff            flagName = "diff"
 	flagDryRun          flagName = "dry-run"
 	flagEscape          flagName = "escape"

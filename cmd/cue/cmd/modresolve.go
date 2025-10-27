@@ -16,11 +16,13 @@ package cmd
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"cuelabs.dev/go/oci/ociregistry/ociref"
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 )
@@ -45,10 +47,15 @@ If no arguments are provided, the current module path is used.
 This is equivalent to specifying "." as an argument, which
 also refers to the current module.
 
+If the --deps flag is provided, all dependencies from the current
+module are resolved and displayed. The --deps flag cannot be used
+with module path arguments.
+
 Note that this command is not yet stable and may be changed.
 `,
 		RunE: mkRunE(c, runModResolve),
 	}
+	cmd.Flags().Bool(string(flagDeps), false, "resolve all dependencies in the current module")
 	return cmd
 }
 
@@ -57,6 +64,55 @@ func runModResolve(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
+	depsFlag := flagDeps.Bool(cmd)
+
+	if depsFlag && len(args) > 0 {
+		return fmt.Errorf("cannot specify module arguments with --deps flag")
+	}
+
+	if depsFlag {
+		_, mf, _, err := readModuleFile()
+		if err != nil {
+			return err
+		}
+
+		if len(mf.Deps) == 0 {
+			return nil
+		}
+
+		// Collect all module paths and sort them for consistent output
+		var modulePaths []string
+		for modPath := range mf.Deps {
+			modulePaths = append(modulePaths, modPath)
+		}
+		slices.Sort(modulePaths)
+
+		var hadErrors bool
+		for _, modPath := range modulePaths {
+			dep := mf.Deps[modPath]
+			mpath, _, ok := strings.Cut(modPath, "@")
+			if !ok {
+				mpath = modPath
+			}
+
+			vers := dep.Version
+
+			ref, err := resolveModuleToRegistry(resolver, mpath, vers, modPath)
+			if err != nil {
+				fmt.Fprintf(cmd.ErrOrStderr(), "%s: %v\n", modPath, err)
+				hadErrors = true
+				continue
+			}
+
+			fmt.Fprintf(cmd.OutOrStdout(), "%s: %s\n", modPath, ref)
+		}
+		if hadErrors {
+			return ErrPrintedError
+		}
+		return nil
+	}
+
 	var mf *modfile.File
 	if len(args) == 0 {
 		// Use the current module if no arguments are provided.
@@ -86,29 +142,41 @@ func runModResolve(cmd *Command, args []string) error {
 				return fmt.Errorf("invalid module path: %v", err)
 			}
 		}
-		loc, ok := resolver.ResolveToLocation(mpath, vers)
-		if !ok {
+
+		ref, err := resolveModuleToRegistry(resolver, mpath, vers, arg)
+		if err != nil {
 			// TODO should we print this and carry on anyway?
 			// And perhaps return a silent error when we do that?
-			return fmt.Errorf("no registry found for module %q", arg)
-		}
-
-		ref := ociref.Reference{
-			Host:       loc.Host,
-			Repository: loc.Repository,
-		}
-		// TODO when vers is empty, loc.Tag does actually contain the
-		// tag prefix (if any) so we could potentially provide more info,
-		// but it might be misleading so leave it out for now.
-		// Also, there's no way in the standard OCI reference syntax to
-		// indicate that a connection is insecure, so leave out that
-		// info too. We could use our own syntax (+insecure) but
-		// that arguably makes the output less useful as it won't be
-		// acceptable to standard tooling.
-		if vers != "" {
-			ref.Tag = loc.Tag
+			return err
 		}
 		fmt.Println(ref)
 	}
 	return nil
+}
+
+// resolveModuleToRegistry resolves a module path and version to its
+// registry location and returns the OCI reference as a string.
+// The originalArg parameter is used only for error messages.
+func resolveModuleToRegistry(resolver *modconfig.Resolver, mpath, vers, originalArg string) (string, error) {
+	loc, ok := resolver.ResolveToLocation(mpath, vers)
+	if !ok {
+		return "", fmt.Errorf("no registry found for module %q", originalArg)
+	}
+
+	ref := ociref.Reference{
+		Host:       loc.Host,
+		Repository: loc.Repository,
+	}
+	// TODO when vers is empty, loc.Tag does actually contain the
+	// tag prefix (if any) so we could potentially provide more info,
+	// but it might be misleading so leave it out for now.
+	// Also, there's no way in the standard OCI reference syntax to
+	// indicate that a connection is insecure, so leave out that
+	// info too. We could use our own syntax (+insecure) but
+	// that arguably makes the output less useful as it won't be
+	// acceptable to standard tooling.
+	if vers != "" {
+		ref.Tag = loc.Tag
+	}
+	return ref.String(), nil
 }

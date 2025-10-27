@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6bfd239_0452c2f7",
+        "filename": "cmd/cue/cmd/integration/workspace/formatting_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-27T12:28:57Z",
+      "side": 1,
+      "message": "Oh yes, I spotted I\u0027d been importing the wrong version apparently so I corrected all these.",
+      "revId": "962b427f6b65dac72676ac168b1e9db29e038f8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

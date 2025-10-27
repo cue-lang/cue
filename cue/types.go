@@ -1138,14 +1138,6 @@ func (v Value) IsConcrete() bool {
 	return true
 }
 
-// // Deprecated: IsIncomplete
-// //
-// // It indicates that the value cannot be fully evaluated due to
-// // insufficient information.
-// func (v Value) IsIncomplete() bool {
-// 	panic("deprecated")
-// }
-
 // Exists reports whether this value existed in the configuration.
 func (v Value) Exists() bool {
 	if v.v == nil {

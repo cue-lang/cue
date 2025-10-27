@@ -16,6 +16,24 @@
       "message": "separate to this change, but having `start.Offset()` and `startOffset` be different values is a bit confusing :)",
       "revId": "80932f4d9ba6f2112aa570e7dfe61dcaa18c12c6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4be68809_9a33e01b",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1233,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-27T10:51:44Z",
+      "side": 1,
+      "message": "Totally agree - have renamed to startPos.",
+      "parentUuid": "4c23f11e_fb0d9d06",
+      "revId": "80932f4d9ba6f2112aa570e7dfe61dcaa18c12c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

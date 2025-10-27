@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "692ac9c7_c676e7eb",
+        "filename": "internal/lsp/cache/definitions.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-27T12:35:58Z",
+      "side": 1,
+      "message": "nice to see this factored out!",
+      "revId": "a1da0f87d7e560fa7d14f704f594a0e74cef0c70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

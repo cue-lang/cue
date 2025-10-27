@@ -19,10 +19,10 @@ import (
 	"compress/gzip"
 	"encoding/gob"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
@@ -144,8 +144,8 @@ func (r *Runtime) Marshal(values ...InstanceOrValue) (b []byte, err error) {
 		file, _ := export.Def(r.runtime(), inst.ID(), i.instance().root)
 		imports := []string{}
 		for spec := range file.ImportSpecs() {
-			info, _ := astutil.ParseImportSpec(spec)
-			imports = append(imports, info.ID)
+			path, _ := strconv.Unquote(spec.Path.Value)
+			imports = append(imports, path)
 		}
 
 		if inst.PkgName != "" {

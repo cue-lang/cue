@@ -15,10 +15,10 @@
 package runtime
 
 import (
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
@@ -119,20 +119,20 @@ func (r *Runtime) CompileFile(cfg *Config, file *ast.File) (*adt.Vertex, *build.
 }
 
 func (x *Runtime) buildSpec(cfg *Config, b *build.Instance, spec *ast.ImportSpec) (errs errors.Error) {
-	info, err := astutil.ParseImportSpec(spec)
+	path, err := strconv.Unquote(spec.Path.Value)
 	if err != nil {
 		return errors.Promote(err, "invalid import path")
 	}
 
-	pkg := b.LookupImport(info.ID)
+	pkg := b.LookupImport(path)
 	if pkg == nil {
-		if strings.Contains(info.ID, ".") {
+		if strings.Contains(path, ".") {
 			return errors.Newf(spec.Pos(),
 				"package %q imported but not defined in %s",
-				info.ID, b.ImportPath)
-		} else if x.index.builtinPaths[info.ID] == nil {
+				path, b.ImportPath)
+		} else if x.index.builtinPaths[path] == nil {
 			return errors.Newf(spec.Pos(),
-				"builtin package %q undefined", info.ID)
+				"builtin package %q undefined", path)
 		}
 		return nil
 	}

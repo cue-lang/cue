@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1b34181_261eb3b6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-27T09:13:49Z",
+      "side": 1,
+      "message": "There are half a dozen sites in the lsp where I\u0027m calling .Position().Offset. I\u0027ll make a note to switch those to calling .Offset() directly.",
+      "revId": "83feeb6ab26ea97f148023c22e26310bc522287f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

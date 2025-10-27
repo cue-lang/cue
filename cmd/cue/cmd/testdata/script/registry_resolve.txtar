@@ -31,9 +31,55 @@ cmp stdout want-resolve7
 
 exec cue mod resolve .
 cmp stdout want-resolve7
+
+# Test --all flag with no dependencies (should produce no output)
+exec cue mod resolve --all
+! stdout .
+
+# Now test with a module that has dependencies
+cd has-deps
+env CUE_REGISTRY=file:registry-config.cue
+
+exec cue mod resolve -a
+cmp stdout want-resolve-all
+
+# Test that --all with arguments produces an error
+! exec cue mod resolve --all a.com/b
+stderr 'cannot specify module arguments with --all flag'
+
+# Test that regular resolve still works
+exec cue mod resolve
+cmp stdout want-resolve-current
+
 -- cue.mod/module.cue --
 module: "a.com/foo/bar"
 language: version: "v0.9.2"
+-- has-deps/cue.mod/module.cue --
+module: "example.com/mymodule"
+language: version: "v0.9.2"
+deps: {
+	"a.com/foo/bar@v1": v: "v1.2.3"
+	"stripped.org/bar/baz@v0": v: "v0.1.2"
+	"somethingelse.bar.com/abc@v1": v: "v1.2.3"
+}
+-- has-deps/registry-config.cue --
+moduleRegistries: {
+	"a.com": {
+		registry: "r1.example/a/b+insecure"
+	}
+	"a.com/foo/bar": {
+		registry: "r2.example/xxx"
+		pathEncoding: "hashAsRepo"
+		prefixForTags: "cue-"
+	}
+	"stripped.org/bar": {
+		registry: "r3.example/repo"
+		stripPrefix: true
+	}
+	"badmodules.org": {
+		registry: "none"
+	}
+}
 -- registry-config.cue --
 moduleRegistries: {
 	"a.com": {
@@ -68,3 +114,9 @@ r2.example/xxx/0764601cd4e1d9d84efc2f4ddc23191e599fa9826f46b16b84269b6fe3679184:
 r3.example/repo/baz/p:v0.1.2
 -- want-resolve7 --
 r2.example/xxx/7c9813cd44d6d9348eb223e71d608e491805730547b8ff6f4b1ccb964b913148
+-- has-deps/want-resolve-all --
+a.com/foo/bar@v1: r2.example/xxx/7c9813cd44d6d9348eb223e71d608e491805730547b8ff6f4b1ccb964b913148:cue-v1.2.3
+somethingelse.bar.com/abc@v1: registry.cue.works/somethingelse.bar.com/abc:v1.2.3
+stripped.org/bar/baz@v0: r3.example/repo/baz:v0.1.2
+-- has-deps/want-resolve-current --
+registry.cue.works/example.com/mymodule

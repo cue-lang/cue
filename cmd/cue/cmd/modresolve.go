@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"cuelabs.dev/go/oci/ociregistry/ociref"
@@ -45,10 +46,15 @@ If no arguments are provided, the current module path is used.
 This is equivalent to specifying "." as an argument, which
 also refers to the current module.
 
+If the --all flag is provided, all dependencies from the current
+module are resolved and displayed. The --all flag cannot be used
+with module path arguments.
+
 Note that this command is not yet stable and may be changed.
 `,
 		RunE: mkRunE(c, runModResolve),
 	}
+	cmd.Flags().BoolP("all", "a", false, "resolve all dependencies in the current module")
 	return cmd
 }
 
@@ -57,6 +63,67 @@ func runModResolve(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
+	allFlag, err := cmd.Flags().GetBool("all")
+	if err != nil {
+		return err
+	}
+
+	// Validate that --all and args are mutually exclusive
+	if allFlag && len(args) > 0 {
+		return fmt.Errorf("cannot specify module arguments with --all flag")
+	}
+
+	// Handle --all flag: list all dependencies
+	if allFlag {
+		_, mf, _, err := readModuleFile()
+		if err != nil {
+			return err
+		}
+
+		if len(mf.Deps) == 0 {
+			// No dependencies to resolve
+			return nil
+		}
+
+		// Collect all module paths and sort them for consistent output
+		var modulePaths []string
+		for modPath := range mf.Deps {
+			modulePaths = append(modulePaths, modPath)
+		}
+		slices.Sort(modulePaths)
+
+		// Resolve and print each dependency
+		for _, modPath := range modulePaths {
+			dep := mf.Deps[modPath]
+			mpath, _, ok := strings.Cut(modPath, "@")
+			if !ok {
+				mpath = modPath
+			}
+
+			// Always use the version from the dependency
+			vers := dep.Version
+
+			loc, ok := resolver.ResolveToLocation(mpath, vers)
+			if !ok {
+				return fmt.Errorf("no registry found for module %q", modPath)
+			}
+
+			ref := ociref.Reference{
+				Host:       loc.Host,
+				Repository: loc.Repository,
+			}
+			if vers != "" {
+				ref.Tag = loc.Tag
+			}
+
+			// Print in format: module@version: registry-reference
+			fmt.Printf("%s: %s\n", modPath, ref)
+		}
+		return nil
+	}
+
+	// Original behavior when --all is not specified
 	var mf *modfile.File
 	if len(args) == 0 {
 		// Use the current module if no arguments are provided.

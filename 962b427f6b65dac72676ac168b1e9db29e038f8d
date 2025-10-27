@@ -51,6 +51,24 @@
       "message": "Maybe mention if this implements an interface or otherwise add a doc comment? (ditto for the other method)",
       "revId": "962b427f6b65dac72676ac168b1e9db29e038f8d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78ab0e0c_55a5cc1b",
+        "filename": "internal/lsp/cache/rename.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-27T13:32:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbdddcef_5a2a5930",
+      "revId": "962b427f6b65dac72676ac168b1e9db29e038f8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

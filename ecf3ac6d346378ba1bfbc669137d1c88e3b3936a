@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1d3dfa9_19521692",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-27T11:25:56Z",
+      "side": 1,
+      "message": "oops. done.",
+      "parentUuid": "820ed69a_d9c74ee8",
+      "revId": "ecf3ac6d346378ba1bfbc669137d1c88e3b3936a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0429d515_6f7a24bc",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-27T09:20:30Z",
       "side": 1,
       "message": "TBH, I\u0027m a little surprised by this. Although I completely agree that the previous semantics of Before are unsafe, and that Compare is the only safe thing to use, the fix here is nevertheless a breaking change IMO. I honestly don\u0027t see much difference between correcting the behaviour of Before, as you have done here, and just removing it altogether (in fact, I would argue that removing it is the safer thing to do).",
+      "revId": "ecf3ac6d346378ba1bfbc669137d1c88e3b3936a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fb75e5e_b020280d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-27T11:25:56Z",
+      "side": 1,
+      "message": "You\u0027re right that it\u0027s a form of breaking change, in that its behavior is now different. I think that\u0027s something we have to do sooner than later, though, as the two methods being inconsistent seems like a bug to me.\n\n\nI did think about removing it, but removing it right away feels too harsh. Existing code would stop compiling immediately - including ours. We tend to deprecate for at least a few months first, so that\u0027s what I\u0027ll do here.",
+      "parentUuid": "0429d515_6f7a24bc",
       "revId": "ecf3ac6d346378ba1bfbc669137d1c88e3b3936a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

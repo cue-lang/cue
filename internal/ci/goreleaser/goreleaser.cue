@@ -69,6 +69,12 @@ config: {
 		// For those reasons, let goreleaser create the release, but leaving it as a draft.
 		draft: true
 	}
+
+	// We rely on GitHub providing digests for assets natively
+	// via their web UI and APIs, which is more user friendly. See:
+	// https://github.blog/changelog/2025-06-03-releases-now-expose-digests-for-release-assets/
+	checksum: disable: true
+
 	snapshot: version_template: "{{ .Tag }}-next"
 	// As explained above, we write our own release notes.
 	changelog: disable: true

@@ -933,7 +933,7 @@ func (fdfns *FileDefinitions) findIdentUsageOffsets(name string) []int {
 				}
 			case *ast.Ident:
 				if n.Name == name {
-					offsets = append(offsets, n.Pos().Position().Offset)
+					offsets = append(offsets, n.Pos().Offset())
 				}
 			}
 			return true
@@ -1197,11 +1197,10 @@ func (n *astNode) addDefinition(start, end token.Pos, targets []*navigableBindin
 		return
 	}
 
-	startPosition := start.Position()
 	definitions := n.fdfns.definitions
 
-	endOffset := end.Position().Offset
-	for offset := startPosition.Offset; offset < endOffset; offset++ {
+	endOffset := end.Offset()
+	for offset := start.Offset(); offset < endOffset; offset++ {
 		definitions[offset] = targets
 	}
 }
@@ -1220,19 +1219,18 @@ func (n *astNode) addDefinition(start, end token.Pos, targets []*navigableBindin
 //
 // For a non-first path element, the start position will include the
 // . so that completions are presented as soon as the user types
-// ".". The startOffset parameter contains the position of the start
-// of the existing path element so that the LSP server can send
+// ".". The startPos parameter contains the position of the start of
+// the existing path element so that the LSP server can send
 // completions to the client that correctly edit the existing path.
-func (n *astNode) addEmbedCompletions(start, end token.Pos, node *astNode, targets []*navigableBindings, startOffset token.Pos) {
+func (n *astNode) addEmbedCompletions(start, end token.Pos, node *astNode, targets []*navigableBindings, startPos token.Pos) {
 	if (len(targets) == 0 && node == nil) || start == token.NoPos || end == token.NoPos {
 		return
 	}
 
-	startPosition := start.Position()
 	completions := n.fdfns.completions
 
-	endOffset := end.Position().Offset
-	for offset := startPosition.Offset; offset < endOffset; offset++ {
+	endOffset := end.Offset()
+	for offset := start.Offset(); offset < endOffset; offset++ {
 		r, found := completions[offset]
 		if !found {
 			r = &completionResolutions{}
@@ -1241,7 +1239,7 @@ func (n *astNode) addEmbedCompletions(start, end token.Pos, node *astNode, targe
 		r.embedNavigables = targets
 		r.embedNode = node
 		r.embedEndOffset = endOffset
-		r.startOffset = startOffset.Position().Offset
+		r.startOffset = startPos.Offset()
 	}
 }
 
@@ -1257,19 +1255,19 @@ func (n *astNode) addFieldCompletions(start, end token.Pos, targets []*navigable
 		return
 	}
 
-	startPosition := start.Position()
+	startOffset := start.Offset()
 	completions := n.fdfns.completions
 
-	endOffset := end.Position().Offset
-	for offset := startPosition.Offset; offset < endOffset; offset++ {
+	endOffset := end.Offset()
+	for offset := startOffset; offset < endOffset; offset++ {
 		r, found := completions[offset]
 		if !found {
 			r = &completionResolutions{}
 			completions[offset] = r
 		}
 		r.fieldNavigables = targets
-		r.fieldEndOffset = colonPos.Position().Offset
-		r.startOffset = startPosition.Offset
+		r.fieldEndOffset = colonPos.Offset()
+		r.startOffset = startOffset
 	}
 }
 

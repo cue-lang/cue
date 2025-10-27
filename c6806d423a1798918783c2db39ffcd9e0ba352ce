@@ -16,6 +16,24 @@
       "message": "this was a bug - it\u0027s essential to delete the old standalone file (if it exists) before storing our new mapper in w.mappers. The old code would store the new mapper, and then the standalone.deleteFile code would delete that mapper!",
       "revId": "c6806d423a1798918783c2db39ffcd9e0ba352ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24154624_95842ee0",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-27T12:44:24Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "bd97f4bd_9519fbf0",
+      "revId": "c6806d423a1798918783c2db39ffcd9e0ba352ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

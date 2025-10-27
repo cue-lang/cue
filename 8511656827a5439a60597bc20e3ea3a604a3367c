@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "595d6fbc_bb78884f",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-27T12:44:24Z",
+      "side": 1,
+      "message": "marvellous hack! :)",
+      "revId": "8511656827a5439a60597bc20e3ea3a604a3367c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1000,14 +1000,12 @@ func (v Value) Source() ast.Node {
 	if v.v == nil {
 		return nil
 	}
-	count := 0
+	c, count := v.v.SingleConjunct()
 	var src ast.Node
-	for c := range v.v.LeafConjuncts() {
+	if count == 1 {
 		src = c.Source()
-		count++
-		// TODO(mvdan): break early on count > 1?
 	}
-	if count > 1 || src == nil {
+	if src == nil {
 		src = v.v.Value().Source()
 	}
 	return src
@@ -2140,7 +2138,7 @@ func Definitions(include bool) Option {
 // when iterating over struct fields. This includes universal pattern
 // constraints such as `[_]: int` or `[=~"^a"]: string` but
 // not the ellipsis pattern as selected by [AnyString]: that
-// can be found with [Value.LookupPath].LookupPath(cue.MakePath(cue.AnyString)).
+// can be found with [Value.LookupPath](cue.MakePath(cue.AnyString)).
 func Patterns(include bool) Option {
 	// TODO we can include patterns, but there's no way
 	// of iterating over patterns _only_ which might be

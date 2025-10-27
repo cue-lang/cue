@@ -16,6 +16,41 @@
       "message": "Oh yes, I spotted I\u0027d been importing the wrong version apparently so I corrected all these.",
       "revId": "962b427f6b65dac72676ac168b1e9db29e038f8d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "714a4fcc_d3c442ad",
+        "filename": "cmd/cue/cmd/integration/workspace/formatting_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-27T12:41:20Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d6bfd239_0452c2f7",
+      "revId": "962b427f6b65dac72676ac168b1e9db29e038f8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbdddcef_5a2a5930",
+        "filename": "internal/lsp/cache/rename.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-27T12:41:20Z",
+      "side": 1,
+      "message": "Maybe mention if this implements an interface or otherwise add a doc comment? (ditto for the other method)",
+      "revId": "962b427f6b65dac72676ac168b1e9db29e038f8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

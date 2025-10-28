@@ -346,7 +346,7 @@ import (
 // package definitions by their import path. It returns the
 // Definitions for the given import path, or nil if the package cannot
 // be resolved.
-type DefinitionsForPackageFunc = func(importPath string) *Definitions
+type DefinitionsForPackageFunc = func(importPath ast.ImportPath) *Definitions
 
 // ImportersFunc is a callback function to fetch the package
 // definitions for packages that directly import the current package.
@@ -401,7 +401,7 @@ type Definitions struct {
 // parameters, see the corresponding fields in [Definitions].
 func Analyse(ip ast.ImportPath, importCanonicalisation map[string]ast.ImportPath, forPackage DefinitionsForPackageFunc, pkgImporters ImportersFunc, files ...*ast.File) *Definitions {
 	if forPackage == nil {
-		forPackage = func(importPath string) *Definitions { return nil }
+		forPackage = func(importPath ast.ImportPath) *Definitions { return nil }
 	}
 	if pkgImporters == nil {
 		pkgImporters = func() []*Definitions { return nil }
@@ -1395,10 +1395,10 @@ func (n *astNode) eval() {
 				// 2) In that child node, the second time we see the
 				// ImportSpec, we lookup the package imported and add a
 				// resolution to them.
-				str, err := strconv.Unquote(node.Path.Value)
+				ip := dfns.parseImportSpec(node)
 				var remotePkgDfns *Definitions
-				if err == nil {
-					remotePkgDfns = dfns.forPackage(str)
+				if ip != nil {
+					remotePkgDfns = dfns.forPackage(*ip)
 					if remotePkgDfns != nil {
 						// The pkg exists. Booting it means that its
 						// pkgDecls have contributingNodes which are the
@@ -1790,11 +1790,12 @@ func expandNavigables(navigables []*navigableBindings) map[*navigableBindings]st
 			navigables = append(navigables, node.resolvesTo...)
 
 			if spec, ok := node.keyAlias.(*ast.ImportSpec); ok {
-				str, err := strconv.Unquote(spec.Path.Value)
-				if err != nil {
+				dfns := node.fdfns.dfns
+				ip := dfns.parseImportSpec(spec)
+				if ip == nil {
 					continue
 				}
-				dfns := node.fdfns.dfns.forPackage(str)
+				dfns = node.fdfns.dfns.forPackage(*ip)
 				if dfns == nil {
 					continue
 				}

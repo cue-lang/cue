@@ -394,6 +394,12 @@ func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath
 	}
 
 	pkg := filepath.ToSlash(dir[len(c.ModuleRoot):])
+	// Ensure pkg starts with "/" unless it's empty.
+	// When ModuleRoot is "/", dir[len(c.ModuleRoot):] produces a string
+	// without a leading "/", but we need it for proper path concatenation.
+	if pkg != "" && !strings.HasPrefix(pkg, "/") {
+		pkg = "/" + pkg
+	}
 	switch {
 	case strings.HasPrefix(pkg, "/cue.mod/"):
 		pkg = pkg[len("/cue.mod/"):]

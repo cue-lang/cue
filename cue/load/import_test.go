@@ -139,8 +139,7 @@ language: version: "v0.11.0"
 
 	insts = Instances([]string{"./pkgdir"}, conf)
 	qt.Assert(t, qt.HasLen(insts, 1))
-	// qt.Assert(t, qt.IsNil(insts[0].Err))
-	qt.Assert(t, qt.ErrorMatches(insts[0].Err, "internal error: local import path .* resulted in non-internal package .*"))
-	// qt.Assert(t, qt.Equals(insts[0].Module, "mod.test@v0"))
-	// qt.Assert(t, qt.Equals(insts[0].ImportPath, "mod.test/pkgdir@v0:pkgname"))
+	qt.Assert(t, qt.IsNil(insts[0].Err))
+	qt.Assert(t, qt.Equals(insts[0].Module, "mod.test@v0"))
+	qt.Assert(t, qt.Equals(insts[0].ImportPath, "mod.test/pkgdir@v0:pkgname"))
 }

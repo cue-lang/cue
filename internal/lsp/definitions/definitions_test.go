@@ -3183,8 +3183,8 @@ func (tcs testCases) run(t *testing.T) {
 			analyse := func() testCaseAnalysis {
 				dfnsByFilename := make(map[string]*definitions.FileDefinitions)
 				dfnsByPkgName := make(map[string]*definitions.Definitions)
-				forPackage := func(importPath string) *definitions.Definitions {
-					return dfnsByPkgName[importPath]
+				forPackage := func(importPath ast.ImportPath) *definitions.Definitions {
+					return dfnsByPkgName[importPath.String()]
 				}
 				importCanonicalisation := make(map[string]ast.ImportPath)
 				analysis := testCaseAnalysis{

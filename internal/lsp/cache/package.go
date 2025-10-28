@@ -181,17 +181,11 @@ func (pkg *Package) delete() {
 			fileUri := m.rootURI + protocol.DocumentURI("/"+file.FilePath)
 			w.standalone.reloadFile(fileUri)
 		}
-		for _, importedModpkg := range modpkg.Imports() {
-			if isUnhandledPackage(importedModpkg) {
-				continue
-			}
-			ip := normalizeImportPath(importedModpkg)
-			modRootURI := moduleRootURI(importedModpkg)
-			if importedPkg, found := w.findPackage(modRootURI, ip); found {
-				importedPkg.RemoveImportedBy(pkg)
-			}
-		}
 	}
+	for _, importedPkg := range pkg.imports {
+		importedPkg.RemoveImportedBy(pkg)
+	}
+	pkg.imports = nil
 	w.debugLogf("%v Deleted", pkg)
 	w.invalidateActiveFilesAndDirs()
 }
@@ -227,18 +221,12 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		for _, file := range oldModpkg.Files() {
 			delete(w.mappers, file.Syntax.Pos().File())
 		}
-		for _, importedModpkg := range oldModpkg.Imports() {
-			if isUnhandledPackage(importedModpkg) {
-				continue
-			}
-			ip := normalizeImportPath(importedModpkg)
-			modRootURI := moduleRootURI(importedModpkg)
-			if importedPkg, found := w.findPackage(modRootURI, ip); found {
-				importedPkg.RemoveImportedBy(pkg)
-			}
-		}
-		pkg.imports = pkg.imports[:0]
 	}
+
+	for _, importedPkg := range pkg.imports {
+		importedPkg.RemoveImportedBy(pkg)
+	}
+	pkg.imports = pkg.imports[:0]
 
 	importCanonicalisation := make(map[string]ast.ImportPath)
 	importCanonicalisation[modpkg.ImportPath()] = pkg.importPath
@@ -257,6 +245,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 			importCanonicalisation[ast.ParseImportPath(importedModpkg.ImportPath()).Canonical().String()] = importedPkg.importPath
 		}
 	}
+	pkg.imports = slices.Clip(pkg.imports)
 
 	files := modpkg.Files()
 	astFiles := make([]*ast.File, len(files))
@@ -270,20 +259,10 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		}
 	}
 
-	forPackage := func(importPath string) *definitions.Definitions {
-		importPath = ast.ParseImportPath(importPath).Canonical().String()
-		for _, imported := range modpkg.Imports() {
-			if imported.ImportPath() != importPath {
+	forPackage := func(importPath ast.ImportPath) *definitions.Definitions {
+		for _, importedPkg := range pkg.imports {
+			if importedPkg.importPath != importPath {
 				continue
-			} else if isUnhandledPackage(imported) {
-				// This includes stdlib packages, which we can't jump
-				// into yet!. TODO
-				return nil
-			}
-			ip := normalizeImportPath(imported)
-			importedPkg, found := w.findPackage(moduleRootURI(imported), ip)
-			if !found {
-				return nil
 			}
 			return importedPkg.definitions
 		}

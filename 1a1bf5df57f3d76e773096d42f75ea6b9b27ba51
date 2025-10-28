@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "70bcda4e_90f28318",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-28T16:14:54Z",
+      "side": 1,
+      "message": "Yeah, that is the idea. We have a link to the _uncommitted_ CL in the experiment. If people want the spec for older language versions we should serve all versions.",
+      "parentUuid": "30460c56_d2a4de35",
+      "range": {
+        "startLine": 14,
+        "startChar": 47,
+        "endLine": 14,
+        "endChar": 56
+      },
+      "revId": "1a1bf5df57f3d76e773096d42f75ea6b9b27ba51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4f535979_47b07f8a",
         "filename": "doc/ref/spec.md",
         "patchSetId": 9
@@ -37,6 +61,30 @@
       "writtenOn": "2025-10-21T15:35:24Z",
       "side": 1,
       "message": "above you say \"label\" and here you say \"field name\". can we use consistent terminology? or if both are valid ways to say the same, I\u0027d say that explicitly.",
+      "range": {
+        "startLine": 1595,
+        "startChar": 34,
+        "endLine": 1595,
+        "endChar": 44
+      },
+      "revId": "1a1bf5df57f3d76e773096d42f75ea6b9b27ba51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff6c7603_1c95366e",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 1595,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-28T16:14:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f535979_47b07f8a",
       "range": {
         "startLine": 1595,
         "startChar": 34,
@@ -64,6 +112,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a20e426_9d87fb71",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 1631,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-28T16:14:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f5e2467_c0451d33",
+      "revId": "1a1bf5df57f3d76e773096d42f75ea6b9b27ba51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "beb71709_47c23983",
@@ -81,6 +147,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6aaf6e2c_fc11e43b",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 1639,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-28T16:14:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "beb71709_47c23983",
+      "revId": "1a1bf5df57f3d76e773096d42f75ea6b9b27ba51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2330731f_0954117b",
@@ -94,6 +178,24 @@
       "writtenOn": "2025-10-21T15:35:24Z",
       "side": 1,
       "message": "would this not result in a structural cycle? we end up with a struct whose \"field\" field points to itself. assuming that \"outputs\" is a form of export, I can\u0027t see how this could ever export to sensible data.",
+      "revId": "1a1bf5df57f3d76e773096d42f75ea6b9b27ba51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c26621c_97d1b7f8",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 9
+      },
+      "lineNbr": 1651,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-10-28T16:14:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2330731f_0954117b",
       "revId": "1a1bf5df57f3d76e773096d42f75ea6b9b27ba51",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

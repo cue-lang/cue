@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8282f1c2_08ece088",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-28T08:12:29Z",
+      "side": 1,
+      "message": "The way we currently declare and get flags is via the `flagName` type, I\u0027d stick to the same for consistency",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5bcf516_4b6bbadb",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-28T08:12:29Z",
+      "side": 1,
+      "message": "I\u0027d remove this comment; I think LLMs can be unnecessarily verbose sometimes",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c681c42_84138f41",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-28T08:12:29Z",
+      "side": 1,
+      "message": "ditto, I\u0027d remove",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5260556b_efc590ba",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-28T08:12:29Z",
+      "side": 1,
+      "message": "ditto, I\u0027d remove",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07d747e7_e6517600",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-28T08:12:29Z",
+      "side": 1,
+      "message": "surely errors should go to stderr?",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2af9e8d_2f4d038f",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-28T08:12:29Z",
+      "side": 1,
+      "message": "remember that you shouldn\u0027t just rely on os.Stdout; use `cmd.OutOrStdout()`",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3318342_c0267521",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-28T08:12:29Z",
+      "side": 1,
+      "message": "we have ErrPrintedError for this purpose, if you want to avoid showing this message to stderr",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -388,12 +388,17 @@ func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath
 		return "", fmt.Errorf("cannot determine import path for %q (root undefined)", origPath)
 	}
 
-	dir := filepath.Clean(absDir)
-	if !strings.HasPrefix(dir, c.ModuleRoot) {
+	subdir, ok := strings.CutPrefix(filepath.Clean(absDir), c.ModuleRoot)
+	if !ok {
 		return "", fmt.Errorf("cannot determine import path for %q (dir outside of root)", origPath)
 	}
 
-	pkg := filepath.ToSlash(dir[len(c.ModuleRoot):])
+	pkg := filepath.ToSlash(subdir)
+	// If [Config.ModuleRoot] was the root of the filesystem,
+	// it had a trailing slash which got removed as a prefix; add it back.
+	if pkg != "" && !strings.HasPrefix(pkg, "/") {
+		pkg = "/" + pkg
+	}
 	switch {
 	case strings.HasPrefix(pkg, "/cue.mod/"):
 		pkg = pkg[len("/cue.mod/"):]

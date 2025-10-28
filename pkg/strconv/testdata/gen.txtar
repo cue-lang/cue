@@ -53,6 +53,13 @@ t44: strconv.ParseUint("100", 16, 8)      // hex overflow uint8
 t45: strconv.ParseUint("invalid", 10, 8)  // syntax error
 t46: strconv.ParseUint("123", 10, -1)     // negative bitSize error
 t47: strconv.ParseUint("-1", 10, 8)       // negative value error
+// Test ParseNum
+t48: strconv.ParseNum("123.456")
+t49: strconv.ParseNum("0xFF")
+t50: strconv.ParseNum("1Ki")
+t51: strconv.ParseNum("-.5")
+t52: strconv.ParseNum("1_")
+t53: strconv.ParseNum("0xG")
 -- out/strconv-v3 --
 Errors:
 t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat:
@@ -98,6 +105,10 @@ t46: error in call to strconv.ParseUint: strconv.ParseUint: parsing "123": value
     ./in.cue:51:6
 t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range:
     ./in.cue:52:6
+t52: error in call to strconv.ParseNum: strconv.ParseNum: parsing "1_": illegal '_' in number:
+    ./in.cue:58:6
+t53: error in call to strconv.ParseNum: strconv.ParseNum: parsing "0xG": illegal hexadecimal number "0xG":
+    ./in.cue:59:6
 
 Result:
 t1:  "40"
@@ -150,6 +161,13 @@ t44: _|_ // t44: error in call to strconv.ParseUint: strconv.ParseUint: parsing 
 t45: _|_ // t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax
 t46: _|_ // t46: error in call to strconv.ParseUint: strconv.ParseUint: parsing "123": value out of range
 t47: _|_ // t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range
+// Test ParseNum
+t48: 123.456
+t49: 255
+t50: 1024
+t51: -0.5
+t52: _|_ // t52: error in call to strconv.ParseNum: strconv.ParseNum: parsing "1_": illegal '_' in number
+t53: _|_ // t53: error in call to strconv.ParseNum: strconv.ParseNum: parsing "0xG": illegal hexadecimal number "0xG"
 -- diff/-out/strconv-v3<==>+out/strconv --
 diff old new
 --- old

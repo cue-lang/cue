@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/build"
+	"github.com/go-quicktest/qt"
 )
 
 func testdata(elems ...string) string {
@@ -98,4 +99,48 @@ func TestLocalDirectory(t *testing.T) {
 	if p.DisplayPath != "." {
 		t.Fatalf("DisplayPath=%q, want %q", p.DisplayPath, ".")
 	}
+}
+
+// Test that ModuleRoot can be at the root of the filesystem when
+// using an overlay, and the loading should work just fine.
+func TestOverlayModuleRoot(t *testing.T) {
+	// Find the root directory; "/" on Unix-like systems,
+	// something like "C:\\" on Windows.
+	root, _ := os.Getwd()
+	for {
+		parent := filepath.Dir(root)
+		if parent == root {
+			break // reached the top
+		}
+		root = parent
+	}
+	t.Logf("root directory: %s", root)
+
+	rooted := func(path string) string {
+		return filepath.Join(root, path)
+	}
+	conf := &Config{
+		Dir:        rooted(""),
+		ModuleRoot: rooted(""),
+		Overlay: map[string]Source{
+			rooted("cue.mod/module.cue"): FromString(`
+module: "mod.test@v0"
+language: version: "v0.11.0"
+`),
+			rooted("root.cue"):       FromString(`package root`),
+			rooted("pkgdir/pkg.cue"): FromString(`package pkgname`),
+		},
+	}
+	insts := Instances([]string{"."}, conf)
+	qt.Assert(t, qt.HasLen(insts, 1))
+	qt.Assert(t, qt.IsNil(insts[0].Err))
+	qt.Assert(t, qt.Equals(insts[0].Module, "mod.test@v0"))
+	qt.Assert(t, qt.Equals(insts[0].ImportPath, "mod.test@v0:root"))
+
+	insts = Instances([]string{"./pkgdir"}, conf)
+	qt.Assert(t, qt.HasLen(insts, 1))
+	// qt.Assert(t, qt.IsNil(insts[0].Err))
+	qt.Assert(t, qt.ErrorMatches(insts[0].Err, "internal error: local import path .* resulted in non-internal package .*"))
+	// qt.Assert(t, qt.Equals(insts[0].Module, "mod.test@v0"))
+	// qt.Assert(t, qt.Equals(insts[0].ImportPath, "mod.test/pkgdir@v0:pkgname"))
 }

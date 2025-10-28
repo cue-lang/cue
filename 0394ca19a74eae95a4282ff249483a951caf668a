@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c24dfcfb_832aab73",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-28T08:26:18Z",
+      "side": 1,
+      "message": "I think the name here is confusing; \"all\" tells me \"all modules in view\", as in \"the current module plus all transitive deps\". this only does transitive deps, so I think the flag needs to be called \"deps\".\n\n\nor if you want to keep it as \"all\", it should also print how the current module resolves.",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8282f1c2_08ece088",
         "filename": "cmd/cue/cmd/modresolve.go",
         "patchSetId": 3

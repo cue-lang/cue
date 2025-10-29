@@ -45,8 +45,9 @@ type parser struct {
 	indent    int  // indentation used for tracing output
 
 	// Comments
-	leadComment *ast.CommentGroup
-	comments    *commentState
+	leadComment  *ast.CommentGroup
+	comments     *commentState
+	commentStack []*commentState // to reuse [commentState] allocations
 
 	// Next token, filled by [parser.next0].
 	pos token.Pos   // token position
@@ -108,11 +109,24 @@ type commentState struct {
 	lastPos   int8
 }
 
+func (p *parser) allocCommentState() *commentState {
+	if n := len(p.commentStack); n > 0 {
+		c := p.commentStack[n-1]
+		p.commentStack = p.commentStack[:n-1]
+		*c = commentState{groups: c.groups[:0]}
+		return c
+	}
+	return &commentState{}
+}
+
+func (p *parser) freeCommentState(c *commentState) {
+	p.commentStack = append(p.commentStack, c)
+}
+
 // openComments reserves the next doc comment for the caller and flushes
 func (p *parser) openComments() *commentState {
-	child := &commentState{
-		parent: p.comments,
-	}
+	child := p.allocCommentState()
+	child.parent = p.comments
 	if c := p.comments; c != nil && c.isList > 0 {
 		if c.lastChild != nil {
 			var groups []*ast.CommentGroup
@@ -129,7 +143,6 @@ func (p *parser) openComments() *commentState {
 				}
 			}
 			ast.SetComments(c.lastChild, groups)
-			c.groups = nil
 		} else {
 			c.lastChild = nil
 			// attach before next
@@ -137,8 +150,8 @@ func (p *parser) openComments() *commentState {
 				cg.Position = 0
 			}
 			child.groups = c.groups
-			c.groups = nil
 		}
+		c.groups = c.groups[:0]
 	}
 	if p.leadComment != nil {
 		child.groups = append(child.groups, p.leadComment)
@@ -155,10 +168,9 @@ func (p *parser) openList() {
 		p.comments.isList++
 		return
 	}
-	c := &commentState{
-		parent: p.comments,
-		isList: 1,
-	}
+	c := p.allocCommentState()
+	c.parent = p.comments
+	c.isList = 1
 	p.comments = c
 }
 
@@ -174,7 +186,7 @@ func (p *parser) closeList() {
 			cg.Position = c.lastPos
 			ast.AddComment(c.lastChild, cg)
 		}
-		c.groups = nil
+		c.groups = c.groups[:0]
 	}
 	switch c.isList--; {
 	case c.isList < 0:
@@ -191,6 +203,7 @@ func (p *parser) closeList() {
 		}
 		parent.pos++
 		p.comments = parent
+		p.freeCommentState(c)
 	}
 }
 
@@ -217,7 +230,7 @@ func (c *commentState) closeNode(p *parser, n ast.Node) ast.Node {
 			}
 		}
 	}
-	c.groups = nil
+	p.freeCommentState(c)
 	return n
 }
 

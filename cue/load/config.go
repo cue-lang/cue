@@ -351,6 +351,8 @@ func addImportQualifier(pkg importPath, name string) (importPath, error) {
 // It does not initialize c.Context, because that requires the
 // loader in order to use for build.Loader.
 func (c Config) complete() (cfg *Config, err error) {
+	// Ensure [Config.Dir] is a clean and absolute path,
+	// necessary for matching directory prefixes later.
 	if c.Dir == "" {
 		c.Dir, err = os.Getwd()
 		if err != nil {
@@ -368,6 +370,9 @@ func (c Config) complete() (cfg *Config, err error) {
 	}
 	c.fileSystem = fsys
 
+	// Ensure [Config.ModuleRoot] is a clean and absolute path,
+	// necessary for matching directory prefixes later.
+	//
 	// TODO: determine root on a package basis. Maybe we even need a
 	// pkgname.cue.mod
 	// Look to see if there is a cue.mod.
@@ -383,6 +388,8 @@ func (c Config) complete() (cfg *Config, err error) {
 		}
 	} else if !filepath.IsAbs(c.ModuleRoot) {
 		c.ModuleRoot = filepath.Join(c.Dir, c.ModuleRoot)
+	} else {
+		c.ModuleRoot = filepath.Clean(c.ModuleRoot)
 	}
 	if c.SkipImports {
 		// We should never use the registry in SkipImports mode

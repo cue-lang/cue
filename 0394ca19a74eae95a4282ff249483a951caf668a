@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "46f10828_4042299a",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-29T12:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c24dfcfb_832aab73",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8282f1c2_08ece088",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-28T08:12:29Z",
       "side": 1,
       "message": "The way we currently declare and get flags is via the `flagName` type, I\u0027d stick to the same for consistency",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dcabe13_080e1c80",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-29T12:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8282f1c2_08ece088",
       "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "011a7aa3_87858b2c",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-29T12:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5bcf516_4b6bbadb",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3c681c42_84138f41",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-10-28T08:12:29Z",
       "side": 1,
       "message": "ditto, I\u0027d remove",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23d428a8_bbed131a",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-29T12:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c681c42_84138f41",
       "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5261eb3_7d3ae7ce",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-29T12:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5260556b_efc590ba",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07d747e7_e6517600",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-10-28T08:12:29Z",
       "side": 1,
       "message": "surely errors should go to stderr?",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54e11fa2_bef918c4",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-29T12:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07d747e7_e6517600",
       "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c27b302_e5f8117d",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-29T12:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d2af9e8d_2f4d038f",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e3318342_c0267521",
@@ -133,6 +259,24 @@
       "writtenOn": "2025-10-28T08:12:29Z",
       "side": 1,
       "message": "we have ErrPrintedError for this purpose, if you want to avoid showing this message to stderr",
+      "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25ec0c54_6e5e8b50",
+        "filename": "cmd/cue/cmd/modresolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-29T12:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3318342_c0267521",
       "revId": "0394ca19a74eae95a4282ff249483a951caf668a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

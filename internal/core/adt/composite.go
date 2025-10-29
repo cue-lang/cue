@@ -84,7 +84,13 @@ import (
 // node. Each conjunct that make up node in the tree can be associated with
 // a different environment (although some conjuncts may share an Environment).
 type Environment struct {
-	Up     *Environment
+	Up *Environment
+
+	// Vertex should not be accessed directly in most cases.
+	// Use DerefVertex(ctx) instead to handle overlay mappings correctly.
+	//
+	// TODO(mvdan): unexport this field, or give it a longer name
+	// to clarify it should not be read directly in most cases?
 	Vertex *Vertex
 
 	// DynamicLabel is only set when instantiating a field from a pattern
@@ -99,15 +105,30 @@ type Environment struct {
 	cache map[cacheKey]Value
 }
 
+// Equal reports whether e and f refer to the same node.
+func (e *Environment) Equal(ctx *OpContext, f *Environment) bool {
+	return e.Up == f.Up && e.DerefVertex(ctx) == f.DerefVertex(ctx)
+}
+
 type cacheKey struct {
 	Expr Expr
 	Arc  *Vertex
 }
 
+// DerefVertex returns the dereferenced vertex for this environment.
+// It must be used instead of directly accessing the Vertex field
+// to handle overlay mappings correctly during disjunction evaluation.
+func (e *Environment) DerefVertex(ctx *OpContext) *Vertex {
+	if ctx == nil {
+		return e.Vertex
+	}
+	return ctx.deref(e.Vertex)
+}
+
 func (e *Environment) up(ctx *OpContext, count int32) *Environment {
 	for i := int32(0); i < count; i++ {
 		e = e.Up
-		ctx.Assertf(ctx.Pos(), e.Vertex != nil, "Environment.up encountered a nil vertex")
+		ctx.Assertf(ctx.Pos(), e.DerefVertex(ctx) != nil, "Environment.up encountered a nil vertex")
 	}
 	return e
 }
@@ -1362,7 +1383,11 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 	default:
 		v.ArcType = ArcMember
 	}
-	p, _ := findConjunct(v.Conjuncts, c)
+	var ctx *OpContext
+	if v.state != nil {
+		ctx = v.state.ctx
+	}
+	p, _ := findConjunct(ctx, v.Conjuncts, c)
 	return p >= 0
 }
 
@@ -1370,11 +1395,10 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 //
 // NOTE: we are not comparing closeContexts. The intended use of this function
 // is only to add to list of conjuncts within a closeContext.
-func findConjunct(cs []Conjunct, c Conjunct) (int, Conjunct) {
+func findConjunct(ctx *OpContext, cs []Conjunct, c Conjunct) (int, Conjunct) {
 	for i, x := range cs {
 		// TODO: disregard certain fields from comparison (e.g. Refs)?
-		if x.x == c.x &&
-			x.Env.Up == c.Env.Up && x.Env.Vertex == c.Env.Vertex {
+		if x.x == c.x && x.Env.Equal(ctx, c.Env) {
 			return i, x
 		}
 	}

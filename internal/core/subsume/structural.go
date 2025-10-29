@@ -54,7 +54,7 @@ func (s *subsumer) node(env *adt.Environment, up int32) *adt.Vertex {
 	for ; up != 0; up-- {
 		env = env.Up
 	}
-	return env.Vertex
+	return env.DerefVertex(s.ctx)
 }
 
 func (s *subsumer) structural(a, b adt.Conjunct) bool {

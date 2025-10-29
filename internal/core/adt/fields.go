@@ -203,7 +203,7 @@ func (v *Vertex) insertConjunct(ctx *OpContext, c Conjunct, id CloseInfo, mode A
 	var c2 Conjunct
 	pos = -1
 	if check {
-		pos, c2 = findConjunct(v.Conjuncts, c)
+		pos, c2 = findConjunct(ctx, v.Conjuncts, c)
 
 	}
 	if pos == -1 {

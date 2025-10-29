@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a23b45f_bfa08772",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 999,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-29T13:30:21Z",
+      "side": 1,
+      "message": "this is perhaps just me, but I always struggle with combinations of `\u0026\u0026` and `||` without parenthesis. I can never remember which one has priority, or if it goes left to right. add parenthesis to be explicit and readable?",
+      "range": {
+        "startLine": 999,
+        "startChar": 51,
+        "endLine": 999,
+        "endChar": 105
+      },
+      "revId": "02d5b51eba682fdc8a3d75e87fdb70ac865e42f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

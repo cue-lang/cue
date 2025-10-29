@@ -99,7 +99,7 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 		})
 	} else {
 		for x := range constraint.LeafConjuncts() {
-			if x.x == c.x && x.Env.Up == c.Env.Up && x.Env.Vertex == c.Env.Vertex {
+			if x.x == c.x && x.Env.Equal(ctx, c.Env) {
 				if c.CloseInfo.opID == n.ctx.opID {
 					// TODO: do we need this replacement?
 					src := x.CloseInfo.defID

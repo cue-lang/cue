@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e2a51c7a_2093a0f3",
+        "filename": "cue/load/import.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-29T13:07:32Z",
+      "side": 1,
+      "message": "Ha, I see you did that in the subsequent CL. But if you do my suggested change below, then it wouldn\u0027t be necessary.",
+      "parentUuid": "0f7e1ca8_70bd5c23",
+      "revId": "d28bfe608c4321374e96ec3269d28aa9b2c263af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b5cf3d4b_348bcf0e",
         "filename": "cue/load/import.go",
         "patchSetId": 3

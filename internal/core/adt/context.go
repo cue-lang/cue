@@ -264,12 +264,13 @@ func (c *OpContext) Env(upCount int32) *Environment {
 
 func (c *OpContext) relNode(upCount int32) *Vertex {
 	e := c.e.up(c, upCount)
-	c.unify(e.Vertex, Flags{
+	v := e.DerefVertex(c)
+	c.unify(v, Flags{
 		status:    partial,
 		condition: allKnown,
 		mode:      ignore,
 	})
-	return e.Vertex
+	return v
 }
 
 func (c *OpContext) relLabel(upCount int32) Feature {
@@ -613,7 +614,7 @@ func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete b
 		val = &Bottom{
 			Code: IncompleteError,
 			Err:  c.Newf("UNANTICIPATED ERROR"),
-			Node: env.Vertex,
+			Node: env.DerefVertex(c),
 		}
 
 	}

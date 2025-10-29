@@ -157,18 +157,6 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 			continue
 		}
 
-		// The group of the root closeContext should point to the Conjuncts field
-		// of the Vertex. As we already allocated the group, we use that allocation,
-		// but "move" it to v.Conjuncts.
-		// TODO: Is this ever necessary? It is certainly necessary to rewrite
-		// environments from inserted disjunction values, but expressions that
-		// were already added will typically need to be recomputed and recreated
-		// anyway. We add this in to be a bit defensive and reinvestigate once we
-		// have more aggressive structure sharing implemented
-		for i, c := range v.Conjuncts {
-			v.Conjuncts[i].Env = ctx.derefDisjunctsEnv(c.Env)
-		}
-
 		for _, t := range n.tasks {
 			ctx.rewriteComprehension(t)
 
@@ -267,29 +255,6 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 	return v
 }
 
-// derefDisjunctsEnv creates a new env for each Environment in the Up chain with
-// each Environment where Vertex is "from" to one where Vertex is "to".
-//
-// TODO(perf): we could, instead, just look up the mapped vertex in
-// OpContext.Up. This would avoid us having to copy the Environments for each
-// disjunct. This requires quite a bit of plumbing, though, so we leave it as
-// is until this proves to be a performance issue.
-func (ctx *overlayContext) derefDisjunctsEnv(env *Environment) *Environment {
-	if env == nil {
-		return nil
-	}
-	up := ctx.derefDisjunctsEnv(env.Up)
-	to := ctx.vertexMap.deref(env.Vertex)
-	if up != env.Up || env.Vertex != to {
-		env = &Environment{
-			Up:           up,
-			Vertex:       to,
-			DynamicLabel: env.DynamicLabel,
-		}
-	}
-	return env
-}
-
 func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 	n.node.getState(ctx.ctx) // ensure state is initialized.
 
@@ -323,14 +288,9 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 	// to correct results.
 	// d.cyclicConjuncts = append(d.cyclicConjuncts, n.cyclicConjuncts...)
 
-	if len(n.disjunctions) > 0 {
-		// Do not clone cc in disjunctions, as it is identified by underlying.
-		// We only need to clone the cc in disjunctCCs.
-		for _, x := range n.disjunctions {
-			x.env = ctx.derefDisjunctsEnv(x.env)
-			d.disjunctions = append(d.disjunctions, x)
-		}
-	}
+	// Do not clone cc in disjunctions, as it is identified by underlying.
+	// We only need to clone the cc in disjunctCCs.
+	d.disjunctions = append(d.disjunctions, n.disjunctions...)
 
 	return d
 }
@@ -381,8 +341,6 @@ func (ctx *overlayContext) cloneTask(t *task, dst, src *scheduler) *task {
 
 	id := t.id
 
-	env := ctx.derefDisjunctsEnv(t.env)
-
 	// TODO(perf): alloc from buffer.
 	d := &task{
 		run:            t.run,
@@ -392,7 +350,7 @@ func (ctx *overlayContext) cloneTask(t *task, dst, src *scheduler) *task {
 		blockCondition: t.blockCondition,
 		blockedOn:      t.blockedOn, // will be rewritten later
 		err:            t.err,
-		env:            env,
+		env:            t.env,
 		x:              t.x,
 		id:             id,
 

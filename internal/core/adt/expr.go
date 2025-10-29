@@ -62,7 +62,7 @@ func (x *StructLit) Source() ast.Node { return x.Src }
 
 func (x *StructLit) evaluate(c *OpContext, state Flags) Value {
 	e := c.Env(0)
-	v := c.newInlineVertex(e.Vertex, nil, Conjunct{e, x, c.ci})
+	v := c.newInlineVertex(e.DerefVertex(c), nil, Conjunct{e, x, c.ci})
 	// evaluate may not finalize a field, as the resulting value may be
 	// used in a context where more conjuncts are added. It may also lead
 	// to disjuncts being in a partially expanded state, leading to
@@ -217,7 +217,7 @@ func (x *ListLit) Source() ast.Node {
 func (x *ListLit) evaluate(c *OpContext, state Flags) Value {
 	e := c.Env(0)
 	// Pass conditions but at least set fieldSetKnown.
-	v := c.newInlineVertex(e.Vertex, nil, Conjunct{e, x, c.ci})
+	v := c.newInlineVertex(e.DerefVertex(c), nil, Conjunct{e, x, c.ci})
 	v.CompleteArcsOnly(c)
 
 	// TODO(evalv3): evaluating more aggressively yields some improvements, but
@@ -757,7 +757,7 @@ func (x *DynamicReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	})
 	ctx.PopState(frame)
 	f := ctx.Label(x.Label, v)
-	return ctx.lookup(e.Vertex, pos(x), f, state)
+	return ctx.lookup(e.DerefVertex(ctx), pos(x), f, state)
 }
 
 // An ImportReference refers to an imported package.
@@ -810,13 +810,12 @@ func (x *LetReference) Source() ast.Node {
 
 func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	e := ctx.Env(x.UpCount)
-	n := e.Vertex
 
 	// No need to Unify n, as Let references can only result from evaluating
 	// an expression within n, in which case evaluation must already have
 	// started.
 
-	arc := ctx.lookup(n, pos(x), x.Label, state)
+	arc := ctx.lookup(e.DerefVertex(ctx), pos(x), x.Label, state)
 	if arc == nil {
 		return nil
 	}
@@ -1254,7 +1253,7 @@ func (x *BinaryExpr) evaluate(c *OpContext, state Flags) Value {
 		// to the required state. If the struct is already dynamic, we will
 		// evaluate the struct regardless to ensure that cycle reporting
 		// keeps working.
-		if (c.inDetached == 0 && env.Vertex.IsDynamic) || c.inValidator > 0 {
+		if (c.inDetached == 0 && env.DerefVertex(c).IsDynamic) || c.inValidator > 0 {
 			v.Finalize(c)
 		} else {
 			v.CompleteArcsOnly(c)
@@ -1443,7 +1442,7 @@ func isFinalError(n *Vertex) bool {
 // change after the fact.
 // expectError indicates whether the value should evaluate to an error or not.
 func (c *OpContext) verifyNonMonotonicResult(env *Environment, x Expr, expectError bool) {
-	if n := env.Vertex.state; n != nil {
+	if n := env.DerefVertex(c).state; n != nil {
 		n.postChecks = append(n.postChecks, envCheck{
 			env:         env,
 			expr:        x,
@@ -2128,7 +2127,7 @@ func (x *ForClause) yield(s *compState) {
 		}
 
 		n := &Vertex{
-			Parent: c.Env(0).Vertex,
+			Parent: c.Env(0).DerefVertex(c),
 
 			// Using Finalized here ensures that no nodeContext is allocated,
 			// preventing a leak, as this "helper" struct bypasses normal

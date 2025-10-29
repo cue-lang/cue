@@ -84,7 +84,13 @@ import (
 // node. Each conjunct that make up node in the tree can be associated with
 // a different environment (although some conjuncts may share an Environment).
 type Environment struct {
-	Up     *Environment
+	Up *Environment
+
+	// Vertex should not be accessed directly in most cases.
+	// Use DerefVertex(ctx) instead to handle overlay mappings correctly.
+	//
+	// TODO(mvdan): unexport this field, or give it a longer name
+	// to clarify it should not be read directly in most cases?
 	Vertex *Vertex
 
 	// DynamicLabel is only set when instantiating a field from a pattern
@@ -104,10 +110,17 @@ type cacheKey struct {
 	Arc  *Vertex
 }
 
+// DerefVertex returns the dereferenced vertex for this environment.
+// It must be used instead of directly accessing the Vertex field
+// to handle overlay mappings correctly during disjunction evaluation.
+func (e *Environment) DerefVertex(ctx *OpContext) *Vertex {
+	return ctx.deref(e.Vertex)
+}
+
 func (e *Environment) up(ctx *OpContext, count int32) *Environment {
 	for i := int32(0); i < count; i++ {
 		e = e.Up
-		ctx.Assertf(ctx.Pos(), e.Vertex != nil, "Environment.up encountered a nil vertex")
+		ctx.Assertf(ctx.Pos(), e.DerefVertex(ctx) != nil, "Environment.up encountered a nil vertex")
 	}
 	return e
 }

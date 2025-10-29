@@ -22,6 +22,30 @@
       },
       "revId": "02d5b51eba682fdc8a3d75e87fdb70ac865e42f0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25d4f559_bf140e4e",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 999,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-29T13:39:03Z",
+      "side": 1,
+      "message": "I\u0027ll land it for now (FTW, `\u0026\u0026` is higher pri than `||`) and maybe come back to it later.",
+      "parentUuid": "8a23b45f_bfa08772",
+      "range": {
+        "startLine": 999,
+        "startChar": 51,
+        "endLine": 999,
+        "endChar": 105
+      },
+      "revId": "02d5b51eba682fdc8a3d75e87fdb70ac865e42f0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

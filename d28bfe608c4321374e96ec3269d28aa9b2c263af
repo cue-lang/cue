@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f7e1ca8_70bd5c23",
+        "filename": "cue/load/import.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-29T13:06:14Z",
+      "side": 1,
+      "message": "I\u0027m thinking we should make sure that ModuleRoot is clean too, otherwise this is still not necessarily valid.",
+      "revId": "d28bfe608c4321374e96ec3269d28aa9b2c263af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5cf3d4b_348bcf0e",
+        "filename": "cue/load/import.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-29T13:06:14Z",
+      "side": 1,
+      "message": "I tend to to avoid conditions in comments if it works nicely,\nby including the comment inside the comment where the condition\nis true by definition.\n\n```suggestion\n\tif pkg !\u003d \"\" \u0026\u0026 !strings.HasPrefix(pkg, \"/\") {\n\t\t// [Config.ModuleRoot] was the root of the filesystem\n\t\t// and it had a trailing slash which got removed as a\n\t\t// prefix; add it back.\n\t\tpkg \u003d \"/\" + pkg\n\t}\n\tswitch {\n```\n\nAlthough I struggle to understand the comment. Presumably by definition the root _always_ has a trailing slash; in fact it\u0027s \"just\" a slash.\n\nAll this seems a bit ad hoc. Might it not be better to use filepath.Rel which is designed for this kind of thing?\n\n```\nfunc importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath, error) {\n\trelPath, err :\u003d filepath.Rel(c.ModuleRoot, absDir)\n\tif err !\u003d nil || strings.HasPrefix(relPath, \"..\" + filepath.Separator) {\n\t\treturn \"\", fmt.Errorf(\"cannot determine import path for %q (dir outside of root)\", origPath)\n\t}\n\tpkg :\u003d filepath.ToSlash(relPath)\n\t... etc\n}\n```",
+      "range": {
+        "startLine": 397,
+        "startChar": 0,
+        "endLine": 402,
+        "endChar": 0
+      },
+      "revId": "d28bfe608c4321374e96ec3269d28aa9b2c263af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

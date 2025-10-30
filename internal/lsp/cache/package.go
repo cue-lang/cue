@@ -251,7 +251,11 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		currentFiles[fileUri] = struct{}{}
 		f := w.ensureFile(fileUri)
 		f.setSyntax(file.Syntax)
-		f.ensureUser(pkg)
+		if file.SyntaxError == nil {
+			f.ensureUser(pkg)
+		} else {
+			f.ensureUser(pkg, file.SyntaxError)
+		}
 		w.standalone.deleteFile(fileUri)
 	}
 	if oldModpkg != nil {

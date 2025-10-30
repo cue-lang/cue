@@ -79,7 +79,15 @@ func (s *server) DocumentLink(ctx context.Context, params *protocol.DocumentLink
 }
 
 func (s *server) DocumentSymbol(ctx context.Context, params *protocol.DocumentSymbolParams) ([]interface{}, error) {
-	return nil, notImplemented("DocumentSymbol")
+	root := s.workspace.DocumentSymbols(params.TextDocument.URI)
+	if len(root) == 0 {
+		return nil, nil
+	}
+	roots := make([]interface{}, len(root))
+	for i, child := range root {
+		roots[i] = child
+	}
+	return roots, nil
 }
 
 func (s *server) ExecuteCommand(ctx context.Context, params *protocol.ExecuteCommandParams) (interface{}, error) {

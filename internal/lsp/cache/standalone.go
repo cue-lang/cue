@@ -56,7 +56,9 @@ func (s *Standalone) reloadFile(uri protocol.DocumentURI) error {
 		file = &standaloneFile{
 			standalone: s,
 			uri:        uri,
+			file:       s.workspace.ensureFile(uri),
 		}
+		file.file.ensureUser(file)
 		s.files[uri] = file
 		s.workspace.invalidateActiveFilesAndDirs()
 		s.workspace.debugLogf("%v Created", file)
@@ -100,7 +102,7 @@ func (s *Standalone) deleteFile(uri protocol.DocumentURI) {
 // file.
 func (s *Standalone) subtractModulesAndPackages() error {
 	for uri, file := range s.files {
-		if pkgName := file.syntax.PackageName(); pkgName == "" {
+		if pkgName := file.file.syntax.PackageName(); pkgName == "" {
 			continue
 		}
 
@@ -137,13 +139,11 @@ type standaloneFile struct {
 	// isDirty means the standalone file should be reloaded.
 	isDirty bool
 
-	// syntax is the result of parsing the file as CUE. This is updated
-	// whenever the file is reloaded.
-	syntax *ast.File
-
 	// definitions for this standalone file only. This is updated
 	// whenever the file is reloaded.
 	definitions *definitions.Definitions
+
+	file *File
 }
 
 func (f *standaloneFile) String() string {
@@ -176,10 +176,8 @@ var standaloneParserConfig = parser.NewConfig(parser.ParseComments)
 // delete removes the standalone file from the workspace.
 func (f *standaloneFile) delete() {
 	delete(f.standalone.files, f.uri)
+	f.file.removeUser(f)
 	w := f.standalone.workspace
-	if oldAst := f.syntax; oldAst != nil {
-		delete(w.mappers, oldAst.Pos().File())
-	}
 	w.invalidateActiveFilesAndDirs()
 	w.debugLogf("%v Deleted", f)
 }
@@ -215,15 +213,9 @@ func (f *standaloneFile) reload() error {
 		return ErrBadFile
 	}
 
-	if oldAst := f.syntax; oldAst != nil {
-		delete(w.mappers, oldAst.Pos().File())
-	}
-
-	f.syntax = syntax
 	f.definitions = definitions.Analyse(ast.ImportPath{}, nil, nil, nil, syntax)
-	if tokFile := syntax.Pos().File(); tokFile != nil {
-		w.mappers[tokFile] = protocol.NewMapper(f.uri, tokFile.Content())
-	}
+	f.file.setSyntax(syntax)
+	f.file.ensureUser(f, err)
 	w.debugLogf("%v Reloaded", f)
 	return nil
 }

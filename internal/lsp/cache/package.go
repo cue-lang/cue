@@ -250,7 +250,11 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		delete(m.dirtyFiles, fileUri)
 		currentFiles[fileUri] = struct{}{}
 		f := w.ensureFile(fileUri)
-		f.ensureUser(pkg)
+		if file.SyntaxError == nil {
+			f.ensureUser(pkg)
+		} else {
+			f.ensureUser(pkg, file.SyntaxError)
+		}
 		f.setSyntax(file.Syntax)
 		w.standalone.deleteFile(fileUri)
 	}

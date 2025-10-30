@@ -34,6 +34,7 @@ import (
 // folders [WorkspaceFolder].
 type Workspace struct {
 	registry  Registry // shared with other Workspaces
+	client    protocol.Client
 	fs        *fscache.CUECacheFS
 	overlayFS *fscache.OverlayFS
 
@@ -68,13 +69,14 @@ type Workspace struct {
 	standalone *Standalone
 }
 
-func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
+func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string)) *Workspace {
 	overlayFS := fscache.NewOverlayFS(cache.fs)
 	w := &Workspace{
 		registry: &registryWrapper{
 			Registry:  cache.registry,
 			overlayFS: overlayFS,
 		},
+		client:    client,
 		fs:        cache.fs,
 		overlayFS: overlayFS,
 		debugLog:  debugLog,
@@ -443,6 +445,7 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		return err
 	}
 	w.reloadPackages()
+	w.publishDiagnostics()
 	return nil
 }
 

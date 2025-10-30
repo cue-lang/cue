@@ -87,7 +87,7 @@ func Resolve(f *ast.File, errFn ErrFunc) {
 	ast.Walk(f, visitor.Before, nil)
 }
 
-// Resolve resolves all identifiers in an expression.
+// ResolveExpr resolves all identifiers in an expression.
 // It will not overwrite already resolved values.
 func ResolveExpr(e ast.Expr, errFn ErrFunc) {
 	f := &ast.File{}
@@ -95,7 +95,7 @@ func ResolveExpr(e ast.Expr, errFn ErrFunc) {
 	ast.Walk(e, visitor.Before, nil)
 }
 
-// A Scope maintains the set of named language entities declared
+// A scope maintains the set of named language entities declared
 // in the scope and a link to the immediately surrounding (outer)
 // scope.
 type scope struct {
@@ -108,6 +108,9 @@ type scope struct {
 	identFn func(s *scope, n *ast.Ident) bool
 	nameFn  func(name string)
 	errFn   func(p token.Pos, msg string, args ...interface{})
+
+	// scopeStack is used to reuse scope allocations. Only set on the root scope.
+	scopeStack []*scope
 }
 
 type entry struct {
@@ -116,17 +119,63 @@ type entry struct {
 	field *ast.Field // Used for LabelAliases
 }
 
-func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope {
-	const n = 4 // initial scope capacity
-	s := &scope{
-		file:    f,
-		outer:   outer,
-		node:    node,
-		index:   make(map[string]entry, n),
-		identFn: outer.identFn,
-		nameFn:  outer.nameFn,
-		errFn:   outer.errFn,
+func (s *scope) rootScope() *scope {
+	// If this ever shows up in a CPU profile because we have very deeply nested scopes,
+	// we can consider a shortcut, such as a pointer to a shared slice or struct.
+	for s.outer != nil {
+		s = s.outer
 	}
+	return s
+}
+
+func (s *scope) allocScope() *scope {
+	root := s.rootScope()
+	if n := len(root.scopeStack); n > 0 {
+		scope := root.scopeStack[n-1]
+		root.scopeStack = root.scopeStack[:n-1]
+		return scope
+	}
+	return &scope{index: make(map[string]entry, 4)}
+}
+
+// putScope is not a method on scope on purpose, as we don't want to repeat
+// calls to [scope.rootScope] in [scope.freeScopesUntil].
+func putScope(root, s *scope) {
+	// Ensure no pointers remain, which can hold onto memory.
+	// We only reuse the index map capacity.
+	*s = scope{index: s.index}
+	clear(s.index)
+	root.scopeStack = append(root.scopeStack, s)
+}
+
+func (s *scope) freeScope() {
+	root := s.rootScope()
+	putScope(root, s)
+}
+
+// freeScopesUntil frees all scopes from s up to (but not including) 'ancestor'.
+func (s *scope) freeScopesUntil(ancestor *scope) {
+	root := s.rootScope()
+	for s != ancestor {
+		if s == nil {
+			panic("ancestor scope not found")
+		}
+		next := s.outer
+		putScope(root, s)
+		s = next
+	}
+}
+
+func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope {
+	s := outer.allocScope()
+	s.file = f
+	s.outer = outer
+	s.node = node
+	s.inField = false
+	s.identFn = outer.identFn
+	s.nameFn = outer.nameFn
+	s.errFn = outer.errFn
+
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
@@ -313,7 +362,8 @@ func insertPostfixAliases(s *scope, x *ast.Field, expr ast.Node) {
 func (s *scope) Before(n ast.Node) bool {
 	switch x := n.(type) {
 	case *ast.File:
-		s := newScope(x, s, x, x.Decls)
+		s = newScope(x, s, x, x.Decls)
+		defer s.freeScope()
 		// Support imports.
 		for _, d := range x.Decls {
 			ast.Walk(d, s.Before, nil)
@@ -322,13 +372,16 @@ func (s *scope) Before(n ast.Node) bool {
 
 	case *ast.StructLit:
 		s = newScope(s.file, s, x, x.Elts)
+		defer s.freeScope()
 		for _, elt := range x.Elts {
 			ast.Walk(elt, s.Before, nil)
 		}
 		return false
 
 	case *ast.Comprehension:
+		outer := s
 		s = scopeClauses(s, x.Clauses)
+		defer s.freeScopesUntil(outer)
 		ast.Walk(x.Value, s.Before, nil)
 		return false
 
@@ -351,6 +404,7 @@ func (s *scope) Before(n ast.Node) bool {
 				break
 			}
 			s = newScope(s.file, s, x, nil)
+			defer s.freeScope()
 			if alias != nil {
 				if name, _, _ := ast.LabelName(alias.Ident); name != "" {
 					s.insert(name, x, alias, nil)
@@ -398,6 +452,7 @@ func (s *scope) Before(n ast.Node) bool {
 				// TODO: this should move into Before once decl attributes
 				// have been fully deprecated and embed attributes are introduced.
 				s = newScope(s.file, s, x, nil)
+				defer s.freeScope()
 				s.insert(alias.Ident.Name, alias, x, nil)
 				n = alias.Expr
 			}

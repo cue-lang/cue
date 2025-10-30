@@ -15,9 +15,11 @@
 package cache
 
 import (
+	"context"
 	"slices"
 
 	"cuelang.org/go/cue/ast"
+	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 )
@@ -55,6 +57,14 @@ func (w *Workspace) DocumentSymbols(fileUri protocol.DocumentURI) []protocol.Doc
 	return nil
 }
 
+// publishDiagnostics sends to the client / editor all new diagnostic
+// messages.
+func (w *Workspace) publishDiagnostics() {
+	for _, f := range w.files {
+		f.publishErrors()
+	}
+}
+
 // File models a single CUE file. This file might be loaded by one or
 // more packages, or might be loaded within [Standalone]. A File can
 // only be deleted if it is not in use by the client / editor
@@ -73,22 +83,52 @@ type File struct {
 	mapper  *protocol.Mapper
 	symbols []protocol.DocumentSymbol
 
-	// the current users of this File.
-	users []packageOrModule
+	// errors records both the current users of this File and any
+	// errors they have reported. Because most of the time there will
+	// be only a single user of a File, it is modelled using a slice
+	// rather than a map.
+	errors []userErrors
+	// dirtyErrors records if the errors for this file have changed
+	// since we last published them to the client.
+	dirtyErrors bool
 }
 
-// ensureUser records that this File is in use by user.
-func (f *File) ensureUser(user packageOrModule) {
-	if slices.Contains(f.users, user) {
+type userErrors struct {
+	user   packageOrModule
+	errors []error
+}
+
+// ensureUser records that this File is in use by user. The errs,
+// which may be nil, contains any errors which this user has
+// encountered with this file and which should be reported to the
+// client via diagonstic notifications.
+func (f *File) ensureUser(user packageOrModule, errs ...error) {
+	for i := range f.errors {
+		existing := &f.errors[i]
+		if existing.user != user {
+			continue
+		}
+
+		f.dirtyErrors = f.dirtyErrors || len(errs) > 0 || len(existing.errors) > 0
+		existing.errors = errs
 		return
 	}
-	f.users = append(f.users, user)
+
+	f.errors = append(f.errors, userErrors{
+		user:   user,
+		errors: errs,
+	})
+	f.dirtyErrors = f.dirtyErrors || len(errs) > 0
 }
 
 // removeUser records that user is no longer using this File.
 func (f *File) removeUser(user packageOrModule) {
-	f.users = slices.DeleteFunc(f.users, func(u packageOrModule) bool {
-		return u == user
+	f.errors = slices.DeleteFunc(f.errors, func(existing userErrors) bool {
+		if existing.user != user {
+			return false
+		}
+		f.dirtyErrors = f.dirtyErrors || len(existing.errors) > 0
+		return true
 	})
 	f.maybeDelete()
 }
@@ -108,7 +148,7 @@ func (f *File) close() {
 // maybeDelete removes this File from all the relevant collections if
 // it is both not open in the client / editor, and it has no users.
 func (f *File) maybeDelete() {
-	if f.isOpen || len(f.users) > 0 {
+	if f.isOpen || len(f.errors) > 0 {
 		return
 	}
 	w := f.workspace
@@ -201,4 +241,107 @@ func (f *File) documentSymbols() []protocol.DocumentSymbol {
 
 	f.symbols = peek().Children
 	return f.symbols
+}
+
+// tokenRangeOffsets searches through the file's AST for the range of
+// the smallest token which contains the offset. In some cases there
+// is no such token, for example some of the errors from the parser
+// contain an offset which does not correspond to any token in the
+// AST. In this case, the range of the first token beyond offset is
+// returned. Failing that, the range of the entire file is returned.
+func (f *File) tokenRangeOffsets(offset int) (start, end int) {
+	start = f.syntax.Pos().Offset()
+	end = f.syntax.End().Offset()
+	if !(start <= offset && offset < end) {
+		return
+	}
+
+	closestStart, closestEnd := end, end
+	shrunkStartEnd := false
+	ast.Walk(f.syntax, func(n ast.Node) bool {
+		startOffset := n.Pos().Offset()
+		endOffset := n.End().Offset()
+
+		if startOffset > offset && (startOffset-offset < closestStart-offset) {
+			closestStart, closestEnd = startOffset, endOffset
+		}
+
+		if startOffset <= offset && offset < endOffset {
+			shrunkStartEnd = shrunkStartEnd || (endOffset-startOffset) < (end-start)
+			start, end = startOffset, endOffset
+			return true
+		}
+
+		return false
+	}, nil)
+
+	if !shrunkStartEnd && closestStart < closestEnd {
+		return closestStart, closestEnd
+	}
+
+	return start, end
+}
+
+// publishErrors sends PublishDiagnostics notifications to the client
+// if this File is open and has changed its errors since last
+// publication.
+func (f *File) publishErrors() {
+	if !f.isOpen || !f.dirtyErrors || f.tokFile == nil || f.mapper == nil {
+		return
+	}
+	f.dirtyErrors = false
+	// must not be nil!
+	diags := []protocol.Diagnostic{}
+	for _, errs := range f.errors {
+		for _, err := range errs.errors {
+			diags = f.errorToDiagnostics(err, diags)
+		}
+	}
+
+	params := &protocol.PublishDiagnosticsParams{
+		URI:         f.uri,
+		Version:     f.tokFile.Revision(),
+		Diagnostics: diags,
+	}
+	f.workspace.client.PublishDiagnostics(context.Background(), params)
+}
+
+// errorToDiagnostics converts cue errors to [protocol.Diagnostic]
+// messages. It will extract positions from the errors, check they
+// belong to this File, find corresponding ranges within this File,
+// and append new Diagnostics to the provided accumulator.
+func (f *File) errorToDiagnostics(err error, acc []protocol.Diagnostic) []protocol.Diagnostic {
+	err, ok := err.(cueerrors.Error)
+	if !ok {
+		return acc
+	}
+
+	for _, e := range cueerrors.Errors(err) {
+		errPos := e.Position()
+		if !errPos.IsValid() {
+			continue
+		}
+
+		if protocol.DocumentURI(protocol.URIFromPath(errPos.Filename())) != f.uri {
+			// This error is for a different file, skip it
+			continue
+		}
+
+		startOffset, endOffset := f.tokenRangeOffsets(errPos.Offset())
+		r, err := f.mapper.OffsetRange(startOffset, endOffset)
+		if err != nil {
+			continue
+		}
+
+		diag := protocol.Diagnostic{
+			Range:    r,
+			Severity: protocol.SeverityError,
+			Source:   "cue",
+			Message:  e.Error(),
+		}
+
+		acc = append(acc, diag)
+	}
+
+	return acc
 }

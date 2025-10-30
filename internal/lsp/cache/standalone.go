@@ -215,7 +215,7 @@ func (f *standaloneFile) reload() error {
 
 	f.definitions = definitions.Analyse(ast.ImportPath{}, nil, nil, nil, syntax)
 	f.file.setSyntax(syntax)
-	f.file.ensureUser(f)
+	f.file.ensureUser(f, err)
 	w.debugLogf("%v Reloaded", f)
 	return nil
 }

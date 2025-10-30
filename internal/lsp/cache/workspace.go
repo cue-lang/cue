@@ -33,6 +33,7 @@ import (
 // folders [WorkspaceFolder].
 type Workspace struct {
 	registry  Registry // shared with other Workspaces
+	client    protocol.Client
 	fs        *fscache.CUECacheFS
 	overlayFS *fscache.OverlayFS
 
@@ -59,21 +60,26 @@ type Workspace struct {
 	activeFiles map[protocol.DocumentURI][]packageOrModule
 	activeDirs  map[protocol.DocumentURI]struct{}
 
+	files map[protocol.DocumentURI]*File
+
 	standalone *Standalone
 }
 
-func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
+func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string)) *Workspace {
 	overlayFS := fscache.NewOverlayFS(cache.fs)
 	w := &Workspace{
 		registry: &registryWrapper{
 			Registry:  cache.registry,
 			overlayFS: overlayFS,
 		},
+		client:    client,
 		fs:        cache.fs,
 		overlayFS: overlayFS,
 		debugLog:  debugLog,
 		modules:   make(map[protocol.DocumentURI]*Module),
 		mappers:   make(map[*token.File]*protocol.Mapper),
+
+		files: make(map[protocol.DocumentURI]*File),
 	}
 	w.standalone = NewStandalone(w)
 	return w
@@ -274,6 +280,12 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 
 	activeFiles, activeDirs := w.activeFilesAndDirs()
 	for uri, fh := range updatedFiles {
+		if fh == nil {
+			w.closeFile(uri)
+		} else {
+			w.ensureFile(uri).open()
+		}
+
 		// If it is in activeFiles then we know it's a file we have
 		// loaded in the past.
 		//
@@ -430,6 +442,7 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		return err
 	}
 	w.reloadPackages()
+	w.publishDiagnostics()
 	return nil
 }
 

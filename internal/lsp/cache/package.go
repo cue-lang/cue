@@ -177,9 +177,9 @@ func (pkg *Package) delete() {
 	w := m.workspace
 	if modpkg := pkg.modpkg; modpkg != nil {
 		for _, file := range modpkg.Files() {
-			delete(w.mappers, file.Syntax.Pos().File())
 			fileUri := m.rootURI + protocol.DocumentURI("/"+file.FilePath)
 			w.standalone.reloadFile(fileUri)
+			w.files[fileUri].removeUser(pkg)
 		}
 	}
 	for _, importedPkg := range pkg.imports {
@@ -217,12 +217,6 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 
 	w.invalidateActiveFilesAndDirs()
 
-	if oldModpkg != nil {
-		for _, file := range oldModpkg.Files() {
-			delete(w.mappers, file.Syntax.Pos().File())
-		}
-	}
-
 	for _, importedPkg := range pkg.imports {
 		importedPkg.RemoveImportedBy(pkg)
 	}
@@ -247,15 +241,29 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	}
 	pkg.imports = slices.Clip(pkg.imports)
 
+	currentFiles := make(map[protocol.DocumentURI]struct{})
 	files := modpkg.Files()
 	astFiles := make([]*ast.File, len(files))
-	for i, f := range files {
-		astFiles[i] = f.Syntax
-		uri := m.rootURI + protocol.DocumentURI("/"+f.FilePath)
-		w.standalone.deleteFile(uri)
-		delete(m.dirtyFiles, uri)
-		if tokFile := f.Syntax.Pos().File(); tokFile != nil {
-			w.mappers[tokFile] = protocol.NewMapper(uri, tokFile.Content())
+	for i, file := range files {
+		astFiles[i] = file.Syntax
+		fileUri := m.rootURI + protocol.DocumentURI("/"+file.FilePath)
+		delete(m.dirtyFiles, fileUri)
+		currentFiles[fileUri] = struct{}{}
+		f := w.ensureFile(fileUri)
+		f.setSyntax(file.Syntax)
+		if file.SyntaxError == nil {
+			f.ensureUser(pkg)
+		} else {
+			f.ensureUser(pkg, file.SyntaxError)
+		}
+		w.standalone.deleteFile(fileUri)
+	}
+	if oldModpkg != nil {
+		for _, file := range oldModpkg.Files() {
+			fileUri := m.rootURI + protocol.DocumentURI("/"+file.FilePath)
+			if _, found := currentFiles[fileUri]; !found {
+				w.files[fileUri].removeUser(pkg)
+			}
 		}
 	}
 

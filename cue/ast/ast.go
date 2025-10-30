@@ -167,6 +167,13 @@ func (c *comments) AddComment(cg *CommentGroup) {
 
 func (c *comments) SetComments(cgs []*CommentGroup) {
 	if c.groups == nil {
+		if cgs == nil {
+			// Replacing no comments with a nil slice is a no-op.
+			// Avoid allocating below.
+			// Note that we continue for other zero-length slices,
+			// as the caller may want to reuse memory.
+			return
+		}
 		a := cgs
 		c.groups = &a
 		return

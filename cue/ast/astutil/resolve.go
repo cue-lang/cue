@@ -462,9 +462,7 @@ func (s *scope) Before(n ast.Node) bool {
 		saved := s.index[name]
 		delete(s.index, name) // The same name may still appear in another scope
 
-		if x.Expr != nil {
-			ast.Walk(x.Expr, s.Before, nil)
-		}
+		ast.Walk(x.Expr, s.Before, nil)
 		s.index[name] = saved
 		return false
 
@@ -474,9 +472,7 @@ func (s *scope) Before(n ast.Node) bool {
 		saved := s.index[name]
 		delete(s.index, name) // The same name may still appear in another scope
 
-		if x.Expr != nil {
-			ast.Walk(x.Expr, s.Before, nil)
-		}
+		ast.Walk(x.Expr, s.Before, nil)
 		s.index[name] = saved
 		return false
 

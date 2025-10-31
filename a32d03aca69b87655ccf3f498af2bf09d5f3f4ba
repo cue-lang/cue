@@ -3,6 +3,46 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7045ec07_7d936232",
+        "filename": "cue/token/position.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T14:00:10Z",
+      "side": 1,
+      "message": "I notice now that this should probably be `[File.mutex]`",
+      "range": {
+        "startLine": 275,
+        "startChar": 56,
+        "endLine": 275,
+        "endChar": 65
+      },
+      "revId": "a32d03aca69b87655ccf3f498af2bf09d5f3f4ba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb18f942_b48f93a8",
+        "filename": "cue/token/position.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T14:00:10Z",
+      "side": 1,
+      "message": "note this rename in the commit message?",
+      "revId": "a32d03aca69b87655ccf3f498af2bf09d5f3f4ba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7aa562a8_950196b4",
         "filename": "cue/token/position.go",
         "patchSetId": 2

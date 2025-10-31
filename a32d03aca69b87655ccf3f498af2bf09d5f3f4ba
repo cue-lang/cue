@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7aa562a8_950196b4",
+        "filename": "cue/token/position.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-10-31T13:59:23Z",
+      "side": 1,
+      "message": "We already have versions (e.g. language version) flying around in places, but I think this isn\u0027t that kind of version. How about \"revision\" or something a bit obviously different from that?",
+      "revId": "a32d03aca69b87655ccf3f498af2bf09d5f3f4ba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

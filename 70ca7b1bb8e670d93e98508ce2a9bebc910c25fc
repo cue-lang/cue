@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a70d924_c58ff3e1",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-31T09:24:39Z",
+      "side": 1,
+      "message": "ok, so my query about the order of peeling from the pool on your later CL also applies here. Also, there you called it a pool, and here you call it a stack (which 100% matches how it\u0027s being accessed) - keeping with one name might be ideal.",
+      "revId": "70ca7b1bb8e670d93e98508ce2a9bebc910c25fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6e6a37d_a2214b79",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-31T09:24:39Z",
+      "side": 1,
+      "message": "I think on the other CL, you clean the state before you put it into the pool, whereas here you\u0027re cleaning it on the way out. I can see arguments either way but I think I would err on the side of cleaning on the way into the pool as that would make life easier for GC, and is slightly more defensive.",
+      "revId": "70ca7b1bb8e670d93e98508ce2a9bebc910c25fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5e39566_db229f9c",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-31T09:24:39Z",
+      "side": 1,
+      "message": "on the basis you\u0027re generally tidying, this line should surely be flung into the sun?",
+      "revId": "70ca7b1bb8e670d93e98508ce2a9bebc910c25fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5b7b024_6da5e45f",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-31T09:24:39Z",
+      "side": 1,
+      "message": "Yeah this baffles me, and I need convincing this is right! On the `if` before, from what I can see, the first branch doesn\u0027t touch `c.groups` at all, so I think this line could be moved into the `else` block.\n\nI am very much not sure that the `[:0]` is right given that that means a subsequent append would mutate the content of the array that is also now in `child.groups`. If this line was `\u003d c.groups[:0:0]` then I could believe it (or `slices.Clip`), but as it is, this seems dangerous to me.\n\nAre the performance gains really lost if this line moves up one (into the `else`) and reverts to its `\u003d nil` version?",
+      "revId": "70ca7b1bb8e670d93e98508ce2a9bebc910c25fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

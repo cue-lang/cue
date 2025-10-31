@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c48648b_f6ffab13",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-31T09:10:15Z",
+      "side": 1,
+      "message": "This is just an idea, and you may have already tried it and decided against it.\nI suspect changing the pool to *[]*scope, and copying that pointer to every scope would be faster than walking up to the root every time you need it. It could well be a rounding error in terms of perf change - after all, scopes tend not to be very deep.",
+      "revId": "9b362302cb3321cb403e6931fec331b71d791054",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f3da50c_9da7f64b",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-31T09:10:15Z",
+      "side": 1,
+      "message": "I find this very interesting; I\u0027ve always done this differently but I wonder if I\u0027m missing something. I tend to peel off the front of the list, not the end. So I do:\n```\nscope :\u003d root.scopePool[0]\nroot.scopePool \u003d root.scopePool[1:]\nreturn scope\n```\nThe reason I\u0027ve done that in the past is because it means the pool no longer contains the memory of scope, which means it can be collected if necessary. The way you do it, because you\u0027re not reducing the capacity of the pool at the same time, the scope actually remains in the list and so can\u0027t be GC\u0027d.\nBut, having said all that, I could well believe I\u0027m missing something and that it turns out I\u0027m wrong.",
+      "revId": "9b362302cb3321cb403e6931fec331b71d791054",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "581016a7_24211460",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-31T09:10:15Z",
+      "side": 1,
+      "message": "I think this might be a better API if it\u0027s a method on scope. You can still amortize the cost of finding the root.\n```suggestion\nfunc (s *scope) putScope(freed *scope) {\n root :\u003d s.rootScope()\n *freed \u003d // etc\n}\n```",
+      "revId": "9b362302cb3321cb403e6931fec331b71d791054",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f4534a3_25e7c0f2",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-31T09:10:15Z",
+      "side": 1,
+      "message": "fwiw, and I realise this is probably not idiomatic, I\u0027d rename this as \n```suggestion\nfunc (ancestor *scope) freeScopesUntil(descendent *scope) {\n```\nbut I seem to spend all my time these days dealing with trees; I find making it as easy as possible to keep track of what the relationship is between two nodes very useful. This is not horribly complex code, so 100% just a nit.",
+      "revId": "9b362302cb3321cb403e6931fec331b71d791054",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -714,7 +714,7 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 	c := n.ctx
 
 	key := [2]defID{node, child}
-	if result, ok := n.containsDefIDCache[key]; ok {
+	if result, ok := c.containsDefIDCache[key]; ok {
 		return result
 	}
 
@@ -735,14 +735,14 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 
 	result := n.containsDefIDRec(node, child, child)
 
-	// Caching in [nodeContext.containsDefIDCache] adds overhead;
+	// Caching in [OpContext.containsDefIDCache] adds overhead;
 	// only do it if we estimate that [nodeContext.containsDefIDRec]
 	// is doing significant work by looking at the number of replaceIDs.
 	if len(c.redirectsBuf) > 15 {
-		if n.containsDefIDCache == nil {
-			n.containsDefIDCache = make(map[[2]defID]bool)
+		if c.containsDefIDCache == nil {
+			c.containsDefIDCache = make(map[[2]defID]bool)
 		}
-		n.containsDefIDCache[key] = result
+		c.containsDefIDCache[key] = result
 	}
 
 	return result

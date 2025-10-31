@@ -50,10 +50,12 @@ func Sanitize(f *ast.File) error {
 	}
 
 	// Gather all names.
+	stack := make([]*scope, 0, 8)
 	s := &scope{
-		errFn:   z.errf,
-		nameFn:  z.addName,
-		identFn: z.markUsed,
+		errFn:      z.errf,
+		nameFn:     z.addName,
+		identFn:    z.markUsed,
+		scopeStack: &stack,
 	}
 	ast.Walk(f, s.Before, nil)
 	if z.errs != nil {
@@ -61,11 +63,13 @@ func Sanitize(f *ast.File) error {
 	}
 
 	// Add imports and unshadow.
+	stack = stack[:0]
 	s = &scope{
-		file:    f,
-		errFn:   z.errf,
-		identFn: z.handleIdent,
-		index:   make(map[string]entry),
+		file:       f,
+		errFn:      z.errf,
+		identFn:    z.handleIdent,
+		index:      make(map[string]entry),
+		scopeStack: &stack,
 	}
 	z.fileScope = s
 	ast.Walk(f, s.Before, nil)

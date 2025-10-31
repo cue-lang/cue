@@ -83,7 +83,12 @@ type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 // Unresolved identifiers are recorded in [ast.File.Unresolved].
 // It will not overwrite already resolved identifiers.
 func Resolve(f *ast.File, errFn ErrFunc) {
-	visitor := &scope{errFn: errFn, identFn: resolveIdent}
+	stack := make([]*scope, 0, 8)
+	visitor := &scope{
+		errFn:      errFn,
+		identFn:    resolveIdent,
+		scopeStack: &stack,
+	}
 	ast.Walk(f, visitor.Before, nil)
 }
 
@@ -91,7 +96,13 @@ func Resolve(f *ast.File, errFn ErrFunc) {
 // It will not overwrite already resolved values.
 func ResolveExpr(e ast.Expr, errFn ErrFunc) {
 	f := &ast.File{}
-	visitor := &scope{file: f, errFn: errFn, identFn: resolveIdent}
+	stack := make([]*scope, 0, 8)
+	visitor := &scope{
+		file:       f,
+		errFn:      errFn,
+		identFn:    resolveIdent,
+		scopeStack: &stack,
+	}
 	ast.Walk(e, visitor.Before, nil)
 }
 
@@ -109,8 +120,9 @@ type scope struct {
 	nameFn  func(name string)
 	errFn   func(p token.Pos, msg string, args ...interface{})
 
-	// scopeStack is used to reuse scope allocations. Only set on the root scope.
-	scopeStack []*scope
+	// scopeStack is used to reuse scope allocations.
+	// The pointer is shared between the root scope and all its children.
+	scopeStack *[]*scope
 }
 
 type entry struct {
@@ -119,49 +131,34 @@ type entry struct {
 	field *ast.Field // Used for LabelAliases
 }
 
-func (s *scope) rootScope() *scope {
-	// If this ever shows up in a CPU profile because we have very deeply nested scopes,
-	// we can consider a shortcut, such as a pointer to a shared slice or struct.
-	for s.outer != nil {
-		s = s.outer
-	}
-	return s
-}
-
-func (s *scope) allocScope() *scope {
-	root := s.rootScope()
-	if n := len(root.scopeStack); n > 0 {
-		scope := root.scopeStack[n-1]
-		root.scopeStack = root.scopeStack[:n-1]
+func (s *scope) allocScope() (s2 *scope) {
+	if n := len(*s.scopeStack); n > 0 {
+		scope := (*s.scopeStack)[n-1]
+		*s.scopeStack = (*s.scopeStack)[:n-1]
 		return scope
 	}
-	return &scope{index: make(map[string]entry, 4)}
-}
-
-// putScope is not a method on scope on purpose, as we don't want to repeat
-// calls to [scope.rootScope] in [scope.freeScopesUntil].
-func putScope(root, s *scope) {
-	// Ensure no pointers remain, which can hold onto memory.
-	// We only reuse the index map capacity.
-	*s = scope{index: s.index}
-	clear(s.index)
-	root.scopeStack = append(root.scopeStack, s)
+	return &scope{
+		index:      make(map[string]entry, 4),
+		scopeStack: s.scopeStack,
+	}
 }
 
 func (s *scope) freeScope() {
-	root := s.rootScope()
-	putScope(root, s)
+	// Ensure no pointers remain, which can hold onto memory.
+	// We only reuse the index map capacity, and keep the scopeStack pointer.
+	*s = scope{index: s.index, scopeStack: s.scopeStack}
+	clear(s.index)
+	*s.scopeStack = append(*s.scopeStack, s)
 }
 
 // freeScopesUntil frees all scopes from s up to (but not including) 'ancestor'.
 func (s *scope) freeScopesUntil(ancestor *scope) {
-	root := s.rootScope()
 	for s != ancestor {
 		if s == nil {
 			panic("ancestor scope not found")
 		}
 		next := s.outer
-		putScope(root, s)
+		s.freeScope()
 		s = next
 	}
 }

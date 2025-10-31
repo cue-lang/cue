@@ -98,7 +98,7 @@ func (p hiddenPos) Experiment() (x cueexperiment.File) {
 // NOTE: this is an internal API and may change at any time without notice.
 func (p hiddenPos) Priority() (pr layer.Priority, ok bool) {
 	if f := p.file; f != nil {
-		return f.p, f.isData
+		return f.priority, f.isData
 	}
 	return 0, false
 }
@@ -278,8 +278,9 @@ type File struct {
 	content []byte
 
 	experiments *cueexperiment.File
-	p           layer.Priority
+	priority    layer.Priority
 	isData      bool
+	version     int32
 }
 
 // NewFile returns a new file with the given OS file name. The size provides the
@@ -326,7 +327,7 @@ func (f *hiddenFile) SetExperiments(experiments *cueexperiment.File) {
 // whether this file should be treated as containing data defaults, which
 // have different merging semantics from regular defaults.
 func (f *hiddenFile) SetLayer(priority int8, isData bool) {
-	f.p = layer.Priority(priority)
+	f.priority = layer.Priority(priority)
 	f.isData = isData
 }
 
@@ -464,6 +465,20 @@ func (f *hiddenFile) Content() []byte {
 	f.mutex.RLock()
 	defer f.mutex.RUnlock()
 	return f.content
+}
+
+// NOTE: this is an internal API and may change at any time without notice.
+//
+// SetVersion sets the file's version.
+func (f *hiddenFile) SetVersion(version int32) {
+	f.version = version
+}
+
+// NOTE: this is an internal API and may change at any time without notice.
+//
+// Version retrieves the file's version.
+func (f *hiddenFile) Version() int32 {
+	return f.version
 }
 
 // A lineInfo object describes alternative file and line number

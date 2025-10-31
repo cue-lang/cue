@@ -15,15 +15,11 @@
 package cache
 
 import (
-	"errors"
-	"io/fs"
-
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/definitions"
-	"cuelang.org/go/internal/lsp/fscache"
 )
 
 // Rename implements the LSP Rename functionality.
@@ -41,7 +37,12 @@ func (w *Workspace) Rename(tokFile *token.File, fdfns *definitions.FileDefinitio
 		}
 	}
 
-	changes := make(map[protocol.DocumentURI][]protocol.TextEdit)
+	type versionedEdits struct {
+		edits   []protocol.TextEdit
+		version int32
+	}
+
+	changes := make(map[protocol.DocumentURI]*versionedEdits)
 	for _, target := range targets {
 		startPos := target.Pos().Position()
 		endPos := target.End().Position()
@@ -62,7 +63,14 @@ func (w *Workspace) Rename(tokFile *token.File, fdfns *definitions.FileDefinitio
 		if lit, ok := target.(*ast.BasicLit); (ok && lit.Kind == token.STRING) || !ast.IsValidIdent(name) {
 			name = literal.Label.Quote(name)
 		}
-		changes[uri] = append(changes[uri], protocol.TextEdit{
+		ve, found := changes[uri]
+		if !found {
+			ve = &versionedEdits{
+				version: targetFile.Revision(),
+			}
+			changes[uri] = ve
+		}
+		ve.edits = append(ve.edits, protocol.TextEdit{
 			Range:   r,
 			NewText: name,
 		})
@@ -73,25 +81,9 @@ func (w *Workspace) Rename(tokFile *token.File, fdfns *definitions.FileDefinitio
 	}
 
 	var docChanges []protocol.DocumentChanges
-	err := w.overlayFS.View(func(txn *fscache.ViewTxn) error {
-		for uri, edits := range changes {
-			handle, err := txn.Get(uri)
-			version := int32(0)
-			if errors.Is(err, fs.ErrNotExist) {
-				// noop
-			} else if err != nil {
-				return err
-			} else {
-				version = handle.Version()
-			}
-			docChanges = append(docChanges, protocol.TextEditsToDocumentChanges(uri, version, edits)...)
-		}
-		return nil
-	})
-	if err != nil {
-		w.debugLog(err.Error())
+	for uri, edits := range changes {
+		docChanges = append(docChanges, protocol.TextEditsToDocumentChanges(uri, edits.version, edits.edits)...)
 	}
-
 	return &protocol.WorkspaceEdit{DocumentChanges: docChanges}
 }
 

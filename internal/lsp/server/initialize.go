@@ -106,6 +106,7 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 			},
 			DefinitionProvider:         &protocol.Or_ServerCapabilities_definitionProvider{Value: true},
 			DocumentFormattingProvider: &protocol.Or_ServerCapabilities_documentFormattingProvider{Value: true},
+			DocumentSymbolProvider:     &protocol.Or_ServerCapabilities_documentSymbolProvider{Value: true},
 			HoverProvider:              &protocol.Or_ServerCapabilities_hoverProvider{Value: true},
 			ReferencesProvider:         &protocol.Or_ServerCapabilities_referencesProvider{Value: true},
 			RenameProvider:             renameOpts,

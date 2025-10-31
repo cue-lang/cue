@@ -51,18 +51,20 @@ func NewStandalone(workspace *Workspace) *Standalone {
 //
 // If the file cannot be loaded then it is deleted.
 func (s *Standalone) reloadFile(uri protocol.DocumentURI) error {
-	file, found := s.files[uri]
+	sfile, found := s.files[uri]
 	if !found {
-		file = &standaloneFile{
+		sfile = &standaloneFile{
 			standalone: s,
 			uri:        uri,
+			file:       s.workspace.ensureFile(uri),
 		}
-		s.files[uri] = file
+		sfile.file.ensureUser(sfile)
+		s.files[uri] = sfile
 		s.workspace.invalidateActiveFilesAndDirs()
-		s.workspace.debugLogf("%v Created", file)
+		s.workspace.debugLogf("%v Created", sfile)
 	}
-	file.isDirty = true
-	return file.reload()
+	sfile.isDirty = true
+	return sfile.reload()
 }
 
 func (s *Standalone) activeFilesAndDirs(files map[protocol.DocumentURI][]packageOrModule, dirs map[protocol.DocumentURI]struct{}) {
@@ -99,8 +101,8 @@ func (s *Standalone) deleteFile(uri protocol.DocumentURI) {
 // requirements are not met, then the file remains as a standalone
 // file.
 func (s *Standalone) subtractModulesAndPackages() error {
-	for uri, file := range s.files {
-		if pkgName := file.syntax.PackageName(); pkgName == "" {
+	for uri, sfile := range s.files {
+		if pkgName := sfile.file.syntax.PackageName(); pkgName == "" {
 			continue
 		}
 
@@ -112,7 +114,7 @@ func (s *Standalone) subtractModulesAndPackages() error {
 			if err != nil || ip == nil || len(dirUris) == 0 {
 				continue
 			}
-			file.delete()
+			sfile.delete()
 			pkg := m.EnsurePackage(*ip, dirUris)
 			pkg.markFileDirty(uri)
 			if len(dirUris) == 1 {
@@ -137,13 +139,11 @@ type standaloneFile struct {
 	// isDirty means the standalone file should be reloaded.
 	isDirty bool
 
-	// syntax is the result of parsing the file as CUE. This is updated
-	// whenever the file is reloaded.
-	syntax *ast.File
-
 	// definitions for this standalone file only. This is updated
 	// whenever the file is reloaded.
 	definitions *definitions.Definitions
+
+	file *File
 }
 
 func (f *standaloneFile) String() string {
@@ -176,10 +176,8 @@ var standaloneParserConfig = parser.NewConfig(parser.ParseComments)
 // delete removes the standalone file from the workspace.
 func (f *standaloneFile) delete() {
 	delete(f.standalone.files, f.uri)
+	f.file.removeUser(f)
 	w := f.standalone.workspace
-	if oldAst := f.syntax; oldAst != nil {
-		delete(w.mappers, oldAst.Pos().File())
-	}
 	w.invalidateActiveFilesAndDirs()
 	w.debugLogf("%v Deleted", f)
 }
@@ -215,15 +213,9 @@ func (f *standaloneFile) reload() error {
 		return ErrBadFile
 	}
 
-	if oldAst := f.syntax; oldAst != nil {
-		delete(w.mappers, oldAst.Pos().File())
-	}
-
-	f.syntax = syntax
 	f.definitions = definitions.Analyse(ast.ImportPath{}, nil, nil, nil, syntax)
-	if tokFile := syntax.Pos().File(); tokFile != nil {
-		w.mappers[tokFile] = protocol.NewMapper(f.uri, tokFile.Content())
-	}
+	f.file.setSyntax(syntax)
+	f.file.ensureUser(f)
 	w.debugLogf("%v Reloaded", f)
 	return nil
 }

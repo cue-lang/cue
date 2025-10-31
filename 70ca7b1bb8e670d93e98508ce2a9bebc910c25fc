@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0accc05f_51f74210",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T11:30:08Z",
+      "side": 1,
+      "message": "yeah, I don\u0027t think it affects anything in this case.",
+      "parentUuid": "e5b404d0_12da31eb",
+      "revId": "70ca7b1bb8e670d93e98508ce2a9bebc910c25fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6e6a37d_a2214b79",

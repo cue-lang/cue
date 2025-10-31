@@ -141,6 +141,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee01c035_99abc724",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-10-31T11:24:26Z",
+      "side": 1,
+      "message": "Bah, apologies, I read it the wrong way round. FWIW, I find it much easier to read with the renamed \"ancestor\"; in my head I had the ancestor on the left, not the right.",
+      "parentUuid": "ec4b12bb_fd989c39",
+      "revId": "9b362302cb3321cb403e6931fec331b71d791054",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f4534a3_25e7c0f2",

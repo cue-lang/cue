@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "07297d18_27b27d79",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T10:29:38Z",
+      "side": 1,
+      "message": "yeah, I can consistently name them \"stack\" - I\u0027ll fix up the other patch.\n\n\nIn the other patch you said:\n\n\n\u003e The reason I\u0027ve done that in the past is because it means the pool no longer contains the memory of scope, which means it can be collected if necessary. The way you do it, because you\u0027re not reducing the capacity  of the pool at the same time, the scope actually remains in the list and so can\u0027t be GC\u0027d.\n\n\nI do think that peeling from the end is the only way to do this when appends go to the end as well. If we append to the end but peel from the front, then the memory reuse doesn\u0027t work:\n1) we create object A (allocation)\n2) we \"free\" A by appending it to the slice (allocation)\n3) we create object B by popping the front of the slice\n4) we \"free\" B by appending it to the slice (possible allocation! we reduced slice capacity by 1)\n\n\nIt\u0027s that possible allocation in step 4 which is a problem. If you always pop and put from the end of the slice, then a pop+put pair of operations will never allocate if the slice has at least one element.\n\n\n\nAnother way to think about it is that we want to reuse the backing array of commentStack as much as possible. Each time we shift the start of the slice back by one, we\u0027re reducing capacity by one, so we\u0027re wasting memory. The resulting slice length is the same with either method, it\u0027s just a matter of how wasteful we are with the slice capacity we have.\n\n\nSomething else to keep in mind is that we\u0027re mainly trying to reuse the `commentState` allocations, but the `[]*commentState` stack is also allocated, so it\u0027s not free if we keep growing it as we put and pop elements from it.",
+      "parentUuid": "8a70d924_c58ff3e1",
+      "revId": "70ca7b1bb8e670d93e98508ce2a9bebc910c25fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d6e6a37d_a2214b79",
         "filename": "cue/parser/parser.go",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-31T09:24:39Z",
       "side": 1,
       "message": "I think on the other CL, you clean the state before you put it into the pool, whereas here you\u0027re cleaning it on the way out. I can see arguments either way but I think I would err on the side of cleaning on the way into the pool as that would make life easier for GC, and is slightly more defensive.",
+      "revId": "70ca7b1bb8e670d93e98508ce2a9bebc910c25fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67d7d8db_911a2a93",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T10:29:38Z",
+      "side": 1,
+      "message": "indeed, cleaning on the \"put\" is better. done.",
+      "parentUuid": "d6e6a37d_a2214b79",
       "revId": "70ca7b1bb8e670d93e98508ce2a9bebc910c25fc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e94aee2_82477c1a",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T10:29:38Z",
+      "side": 1,
+      "message": "ha, I guess so.",
+      "parentUuid": "f5e39566_db229f9c",
+      "revId": "70ca7b1bb8e670d93e98508ce2a9bebc910c25fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f5b7b024_6da5e45f",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-10-31T09:24:39Z",
       "side": 1,
       "message": "Yeah this baffles me, and I need convincing this is right! On the `if` before, from what I can see, the first branch doesn\u0027t touch `c.groups` at all, so I think this line could be moved into the `else` block.\n\nI am very much not sure that the `[:0]` is right given that that means a subsequent append would mutate the content of the array that is also now in `child.groups`. If this line was `\u003d c.groups[:0:0]` then I could believe it (or `slices.Clip`), but as it is, this seems dangerous to me.\n\nAre the performance gains really lost if this line moves up one (into the `else`) and reverts to its `\u003d nil` version?",
+      "revId": "70ca7b1bb8e670d93e98508ce2a9bebc910c25fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab3a8cfc_5d62faa7",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T10:29:38Z",
+      "side": 1,
+      "message": "well spotted; I had seen that the \"if\" branch just used c.groups and then discarded it, so I thought it was wasteful to throw the entire slice away by assigning to nil. I had not spotted that the \"else\" branch keeps the slice around via child.groups.\n\n\nfor consistency, I\u0027ve swapped the \"else\" branch to do an append. child.groups may be reusing memory as a slice, so the append will often not cause allocations. I prefer this way over assigning to nil, because any assignment to nil is definitely likely to throw away memory which could be reused.\n\n\nI did not measure a noticeable change in performance, which is expected, as most nodes have no comments.",
+      "parentUuid": "f5b7b024_6da5e45f",
       "revId": "70ca7b1bb8e670d93e98508ce2a9bebc910c25fc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -149,7 +149,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 }
 
 // Version implements [FileHandle]
-func (entry *diskFileEntry) Version() int32 { return -1 }
+func (entry *diskFileEntry) Version() int32 { panic("Should never be called") }
 
 // Content implements [FileHandle]
 func (entry *diskFileEntry) Content() []byte { return slices.Clone(entry.content) }

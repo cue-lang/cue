@@ -134,9 +134,10 @@ type OpContext struct {
 	nest int
 
 	// used in typocheck.go
-	nextDefID    defID         // next available defID
-	containments []containment // parent relations
-	redirectsBuf []replaceID   // reusable buffer used in containsDefID
+	nextDefID          defID             // next available defID
+	containments       []containment     // parent relations
+	redirectsBuf       []replaceID       // reusable buffer used in containsDefID
+	containsDefIDCache map[[2]defID]bool // cache for containsDefID results
 
 	stats        stats.Counts
 	freeListNode *nodeContext

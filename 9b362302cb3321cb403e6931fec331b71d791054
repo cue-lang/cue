@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe667add_d0468e30",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T10:29:38Z",
+      "side": 1,
+      "message": "I thought about a similar mechanism - always keeping a pointer straight to the root. I decided against it because we increase the size of each scope, and I assume that scopes aren\u0027t very deeply nested, like you. I\u0027ll leave a note about it for future readers, in case this ever pops up in a CPU profile.",
+      "parentUuid": "1c48648b_f6ffab13",
+      "revId": "9b362302cb3321cb403e6931fec331b71d791054",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f3da50c_9da7f64b",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-10-31T09:10:15Z",
       "side": 1,
       "message": "I find this very interesting; I\u0027ve always done this differently but I wonder if I\u0027m missing something. I tend to peel off the front of the list, not the end. So I do:\n```\nscope :\u003d root.scopePool[0]\nroot.scopePool \u003d root.scopePool[1:]\nreturn scope\n```\nThe reason I\u0027ve done that in the past is because it means the pool no longer contains the memory of scope, which means it can be collected if necessary. The way you do it, because you\u0027re not reducing the capacity of the pool at the same time, the scope actually remains in the list and so can\u0027t be GC\u0027d.\nBut, having said all that, I could well believe I\u0027m missing something and that it turns out I\u0027m wrong.",
+      "revId": "9b362302cb3321cb403e6931fec331b71d791054",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "302f8e3b_cb16edc9",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T10:29:38Z",
+      "side": 1,
+      "message": "replied in the other patch",
+      "parentUuid": "2f3da50c_9da7f64b",
       "revId": "9b362302cb3321cb403e6931fec331b71d791054",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00bb6b18_2492178a",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T10:29:38Z",
+      "side": 1,
+      "message": "this is what the code like initially, but I didn\u0027t like that `freeScopesUntil` kept calling `rootScope` as it walked the chain of parents, which is quadratic. hence this function very specifically requires the root scope on purpose. I\u0027ve clarified the docs.\n\n\nAnd with those semantics, it\u0027s weird to have the func as a method - it\u0027s far too easy to forget that it requires a root, and call it on a non-root scope.",
+      "parentUuid": "581016a7_24211460",
+      "revId": "9b362302cb3321cb403e6931fec331b71d791054",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2652369_e68a9b4f",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-10-31T09:30:20Z",
       "side": 1,
       "message": "Wait, if you don\u0027t free `until` then `until.outer` will point to a node that\u0027s now been freed. I don\u0027t understand how this is the intended behaviour?",
+      "revId": "9b362302cb3321cb403e6931fec331b71d791054",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec4b12bb_fd989c39",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T10:29:38Z",
+      "side": 1,
+      "message": "We\u0027re walking up as we free, and each \"outer\" pointer also points up. So if we are not freeing `until`, we\u0027re not freeing its parent in `until.outer` either.",
+      "parentUuid": "a2652369_e68a9b4f",
       "revId": "9b362302cb3321cb403e6931fec331b71d791054",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21873438_72efec9b",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T10:29:38Z",
+      "side": 1,
+      "message": "agreed, but this is backwards :) \"until\" is an ancestor, which is probably why we\u0027re on different pages in the last comment. I\u0027ve kept the receiver name the same for consistency, but renamed \"until\" to \"ancestor\".",
+      "parentUuid": "6f4534a3_25e7c0f2",
+      "revId": "9b362302cb3321cb403e6931fec331b71d791054",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8496ae6_3a28f571",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-10-31T09:30:20Z",
       "side": 1,
       "message": "oh, being defensive, I would add\n```\nif s \u003d\u003d root {\n panic(\"ancestor was not an ancestor of descendent\")\n}\n```",
+      "revId": "9b362302cb3321cb403e6931fec331b71d791054",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d7b0e05_82e663d2",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-10-31T10:29:38Z",
+      "side": 1,
+      "message": "added, but in a simpler form with `s \u003d\u003d nil`, which also covers us against nil pointer dereferences.",
+      "parentUuid": "b8496ae6_3a28f571",
       "revId": "9b362302cb3321cb403e6931fec331b71d791054",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

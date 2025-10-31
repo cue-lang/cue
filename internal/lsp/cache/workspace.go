@@ -59,6 +59,11 @@ type Workspace struct {
 	activeFiles map[protocol.DocumentURI][]packageOrModule
 	activeDirs  map[protocol.DocumentURI]struct{}
 
+	// files holds the general state for each loaded file. This state
+	// is used whether the file is part of one or more packages, or is
+	// with standalone.
+	files map[protocol.DocumentURI]*File
+
 	standalone *Standalone
 }
 
@@ -74,6 +79,7 @@ func NewWorkspace(cache *Cache, debugLog func(string)) *Workspace {
 		debugLog:  debugLog,
 		modules:   make(map[protocol.DocumentURI]*Module),
 		mappers:   make(map[*token.File]*protocol.Mapper),
+		files:     make(map[protocol.DocumentURI]*File),
 	}
 	w.standalone = NewStandalone(w)
 	return w
@@ -274,6 +280,12 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 
 	activeFiles, activeDirs := w.activeFilesAndDirs()
 	for uri, fh := range updatedFiles {
+		if fh == nil {
+			w.closeFile(uri)
+		} else {
+			w.ensureFile(uri).open()
+		}
+
 		// If it is in activeFiles then we know it's a file we have
 		// loaded in the past.
 		//

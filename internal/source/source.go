@@ -63,6 +63,8 @@ func Open(filename string, src any) (io.ReadCloser, error) {
 			return io.NopCloser(strings.NewReader(src)), nil
 		case []byte:
 			return io.NopCloser(bytes.NewReader(src)), nil
+		case io.ReadCloser:
+			return src, nil
 		case io.Reader:
 			return io.NopCloser(src), nil
 		}

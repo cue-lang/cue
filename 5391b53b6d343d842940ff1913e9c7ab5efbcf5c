@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b74bd1dc_3dbcf99c",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-02T22:38:01Z",
+      "side": 1,
+      "message": "This doc comment is out of date now.",
+      "revId": "5391b53b6d343d842940ff1913e9c7ab5efbcf5c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

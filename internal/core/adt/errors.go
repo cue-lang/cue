@@ -332,9 +332,9 @@ func (v *ValueError) AddPos(p token.Pos) {
 }
 
 func (v *ValueError) AddClosedPositions(ctx *OpContext, c CloseInfo) {
-	c.AncestorPositions(ctx, func(n Node) {
+	for n := range c.AncestorPositions(ctx) {
 		v.AddPosition(n)
-	})
+	}
 }
 
 func (c *OpContext) errNode() *Vertex {

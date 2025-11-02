@@ -306,10 +306,11 @@ type nodeContext struct {
 	cyclicConjuncts []cyclicConjunct
 
 	// These fields are used to track type checking.
-	reqDefIDs    []refInfo
-	replaceIDs   []replaceID
-	conjunctInfo []conjunctInfo
-	reqSets      reqSets
+	reqDefIDs      []refInfo
+	replaceIDs     []replaceID
+	flatReplaceIDs []replaceID // including all parents, and sorted by 'to' in descending order
+	conjunctInfo   []conjunctInfo
+	reqSets        reqSets
 
 	// Checks is a list of conjuncts, as we need to preserve the context in
 	// which it was evaluated. The conjunct is always a validator (and thus
@@ -384,6 +385,7 @@ type nodeContextState struct {
 
 	dropParentRequirements bool // used for typo checking
 	computedCloseInfo      bool // used for typo checking
+	computedFlatReplaceIDs bool // whether [nodeContext.flatReplaceIDs] has been computed
 
 	isShared         bool       // set if we are currently structure sharing
 	noSharing        bool       // set if structure sharing is not allowed
@@ -515,6 +517,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			postChecks:      n.postChecks[:0],
 			reqDefIDs:       n.reqDefIDs[:0],
 			replaceIDs:      n.replaceIDs[:0],
+			flatReplaceIDs:  n.flatReplaceIDs[:0],
 			conjunctInfo:    n.conjunctInfo[:0],
 			reqSets:         n.reqSets[:0],
 			disjunctions:    n.disjunctions[:0],

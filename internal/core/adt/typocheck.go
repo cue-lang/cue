@@ -718,19 +718,25 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 		return result
 	}
 
-	c.redirectsBuf = c.redirectsBuf[:0]
-	for p := n; p != nil; p = p.node.Parent.state {
-		if p.opID != n.opID {
-			break
+	// Build sortedReplaceIDs once per nodeContext by traversing the parent chain.
+	if !n.computedFlatReplaceIDs {
+		for p := n; p != nil; p = p.node.Parent.state {
+			if p.opID != n.opID {
+				break
+			}
+			n.flatReplaceIDs = append(n.flatReplaceIDs, p.replaceIDs...)
+			if p.node.Parent == nil {
+				break
+			}
 		}
-		c.redirectsBuf = append(c.redirectsBuf, p.replaceIDs...)
-		if p.node.Parent == nil {
-			break
-		}
-	}
+		slices.SortFunc(n.flatReplaceIDs, func(a, b replaceID) int {
+			return int(b.to) - int(a.to)
+		})
+		n.computedFlatReplaceIDs = true
 
-	if int64(len(c.redirectsBuf)) > c.stats.MaxRedirect {
-		c.stats.MaxRedirect = int64(len(c.redirectsBuf))
+		if int64(len(n.flatReplaceIDs)) > c.stats.MaxRedirect {
+			c.stats.MaxRedirect = int64(len(n.flatReplaceIDs))
+		}
 	}
 
 	result := n.containsDefIDRec(node, child, child)
@@ -738,7 +744,7 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 	// Caching in [OpContext.containsDefIDCache] adds overhead;
 	// only do it if we estimate that [nodeContext.containsDefIDRec]
 	// is doing significant work by looking at the number of replaceIDs.
-	if len(c.redirectsBuf) > 15 {
+	if len(n.flatReplaceIDs) > 15 {
 		if c.containsDefIDCache == nil {
 			c.containsDefIDCache = make(map[[2]defID]bool)
 		}
@@ -751,23 +757,31 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 func (n *nodeContext) containsDefIDRec(node, child, start defID) bool {
 	c := n.ctx
 
-	// NOTE: this loop is O(H)
+	// Walk up the containment hierarchy.
+	// Since p only decreases and flatReplaceIDs is sorted by 'to' (descending),
+	// we maintain a cursor and scan linearly forwards through matches.
+	// This is O(H + R) total, where R is the number of redirects.
+	cursor := 0
 	for p := child; p != 0; {
 		if p == node {
 			return true
 		}
 
-		// TODO(perf): can be binary search if we keep redirects sorted. Also, p
-		// should be monotonically decreasing, so we could use this to direct
-		// the binary search or-- at the very least--to only have to pass the
-		// array once.
-		for _, r := range c.redirectsBuf {
-			if r.to == p && r.from != child {
-				if n.containsDefIDRec(node, r.from, start) {
-					return true
-				}
-			}
+		// Skip entries where 'to' > p.
+		for cursor < len(n.flatReplaceIDs) && n.flatReplaceIDs[cursor].to > p {
+			cursor++
 		}
+
+		// Process all entries with 'to' == p.
+		for cursor < len(n.flatReplaceIDs) && n.flatReplaceIDs[cursor].to == p {
+			from := n.flatReplaceIDs[cursor].from
+			if from != child && n.containsDefIDRec(node, from, start) {
+				return true
+			}
+			cursor++
+		}
+		// cursor now points to the first entry with 'to' < p (or past the end)
+		// which is perfect for the next iteration with an even smaller p.
 
 		p = c.containments[p].id
 		if p == start {

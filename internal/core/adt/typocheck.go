@@ -713,11 +713,6 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 	// that we can use this to bail out early.
 	c := n.ctx
 
-	key := [2]defID{node, child}
-	if result, ok := c.containsDefIDCache[key]; ok {
-		return result
-	}
-
 	// Build sortedReplaceIDs once per nodeContext by traversing the parent chain.
 	if !n.computedFlatReplaceIDs {
 		for p := n; p != nil; p = p.node.Parent.state {
@@ -739,12 +734,22 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 		}
 	}
 
-	result := n.containsDefIDRec(node, child, child)
-
 	// Caching in [OpContext.containsDefIDCache] adds overhead;
 	// only do it if we estimate that [nodeContext.containsDefIDRec]
-	// is doing significant work by looking at the number of replaceIDs.
-	if len(n.flatReplaceIDs) > 15 {
+	// will do significant work by looking at the number of replaceIDs.
+	caching := len(n.flatReplaceIDs) > 15
+
+	key := [2]defID{node, child}
+	// Note that even a map lookup has some overhead, which adds up.
+	if caching {
+		if result, ok := c.containsDefIDCache[key]; ok {
+			return result
+		}
+	}
+
+	result := n.containsDefIDRec(node, child, child)
+
+	if caching {
 		if c.containsDefIDCache == nil {
 			c.containsDefIDCache = make(map[[2]defID]bool)
 		}

@@ -27,6 +27,7 @@ import (
 // ensureFile returns an existing [File] associated with uri if it
 // exists, or creates a new association if not.
 func (w *Workspace) ensureFile(uri protocol.DocumentURI) *File {
+	w.filesMutex.Lock()
 	f, found := w.files[uri]
 	if !found {
 		f = &File{
@@ -35,13 +36,16 @@ func (w *Workspace) ensureFile(uri protocol.DocumentURI) *File {
 		}
 		w.files[uri] = f
 	}
+	w.filesMutex.Unlock()
 	return f
 }
 
 // closeFile calls [File.close] on a [File] associated with uri. If no
 // such [File] exists, it is a noop.
 func (w *Workspace) closeFile(uri protocol.DocumentURI) {
+	w.filesMutex.Lock()
 	f, found := w.files[uri]
+	w.filesMutex.Unlock()
 	if !found {
 		return
 	}
@@ -50,7 +54,10 @@ func (w *Workspace) closeFile(uri protocol.DocumentURI) {
 
 // DocumentSymbol implements the LSP DocumentSymbols functionality.
 func (w *Workspace) DocumentSymbols(fileUri protocol.DocumentURI) []protocol.DocumentSymbol {
-	if f, found := w.files[fileUri]; found {
+	w.filesMutex.Lock()
+	f, found := w.files[fileUri]
+	w.filesMutex.Unlock()
+	if found {
 		return f.documentSymbols()
 	}
 	w.debugLogf("Document symbols requested for closed file: %v", fileUri)
@@ -60,9 +67,11 @@ func (w *Workspace) DocumentSymbols(fileUri protocol.DocumentURI) []protocol.Doc
 // publishDiagnostics sends to the client / editor all new diagnostic
 // messages.
 func (w *Workspace) publishDiagnostics() {
+	w.filesMutex.Lock()
 	for _, f := range w.files {
 		f.publishErrors()
 	}
+	w.filesMutex.Unlock()
 }
 
 // File models a single CUE file. This file might be loaded by one or
@@ -155,7 +164,9 @@ func (f *File) maybeDelete() {
 	if tokFile := f.tokFile; tokFile != nil {
 		delete(w.mappers, tokFile)
 	}
+	w.filesMutex.Lock()
 	delete(w.files, f.uri)
+	w.filesMutex.Unlock()
 }
 
 // setSyntax updates this state with the provided syntax. All derived

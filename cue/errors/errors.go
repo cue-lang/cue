@@ -126,6 +126,22 @@ type Error interface {
 	Msg() (format string, args []interface{})
 }
 
+func ErrorToPortable(err Error) *token.PortableError {
+	poss := err.InputPositions()
+	possJson := make([]token.PortablePosition, len(poss))
+	for i, pos := range poss {
+		possJson[i] = pos.ToPortable()
+	}
+	f, args := err.Msg()
+	return &token.PortableError{
+		PositionJSON:       err.Position().ToPortable(),
+		InputPositionsJSON: possJson,
+		ErrorJSON:          err.Error(),
+		PathJSON:           err.Path(),
+		MsgJSON:            fmt.Sprintf(f, args...),
+	}
+}
+
 // Positions returns the printable positions returned by an error,
 // sorted by relevance when possible and with duplicates removed.
 func Positions(err error) []token.Pos {

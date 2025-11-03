@@ -54,7 +54,7 @@ Examples:
 
 	addOutFlags(cmd.Flags(), true)
 	addOrphanFlags(cmd.Flags())
-	addInjectionFlags(cmd.Flags(), false, false)
+	addInjectionFlags(cmd.Flags(), false)
 
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "evaluate this expression only")
 

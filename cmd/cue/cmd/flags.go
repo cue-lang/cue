@@ -117,15 +117,11 @@ func addOrphanFlags(f *pflag.FlagSet) {
 	f.Bool(string(flagMerge), true, "merge non-CUE files")
 }
 
-func addInjectionFlags(f *pflag.FlagSet, auto, hidden bool) {
+func addInjectionFlags(f *pflag.FlagSet, auto bool) {
 	f.StringArrayP(string(flagInject), "t", nil,
 		"set the value of a tagged field")
 	f.BoolP(string(flagInjectVars), "T", auto,
 		"inject system variables in tags")
-	if hidden {
-		f.Lookup(string(flagInject)).Hidden = true
-		f.Lookup(string(flagInjectVars)).Hidden = true
-	}
 }
 
 type flagName string

@@ -898,13 +898,11 @@ func (e *extractor) altType(typ types.Type) cueast.Expr {
 	return nil
 }
 
-func addDoc(g *ast.CommentGroup, x cueast.Node) bool {
+func addDoc(g *ast.CommentGroup, x cueast.Node) {
 	doc := makeDoc(g, true)
 	if doc != nil {
 		cueast.AddComment(x, doc)
-		return true
 	}
-	return false
 }
 
 func makeDoc(g *ast.CommentGroup, isDoc bool) *cueast.CommentGroup {

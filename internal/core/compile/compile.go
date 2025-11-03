@@ -1201,12 +1201,11 @@ func listEllipsis(n *ast.ListLit) (elts []ast.Expr, e *ast.Ellipsis) {
 	return elts, e
 }
 
-func (c *compiler) assertConcreteIsPossible(src ast.Node, op adt.Op, x adt.Expr) bool {
+func (c *compiler) assertConcreteIsPossible(src ast.Node, op adt.Op, x adt.Expr) {
 	if !adt.AssertConcreteIsPossible(op, x) {
 		str := astinternal.DebugStr(src)
 		c.errf(src, "invalid operand %s ('%s' requires concrete value)", str, op)
 	}
-	return false
 }
 
 func (c *compiler) addDisjunctionElem(d *adt.DisjunctionExpr, n ast.Expr, mark bool) {

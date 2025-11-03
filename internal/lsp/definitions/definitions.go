@@ -1500,6 +1500,18 @@ func (n *astNode) eval() {
 
 		case *ast.Ellipsis:
 			child := n.newAstNode(node, node.Type, nil)
+			// The navigable needs a name so that [UsagesForOffset] will
+			// traverse up out of it and thus we'll evaluate nodes
+			// outside of the scope (n), which may lead to the recording
+			// of uses of the ellipsis (or nodes within it).
+			//
+			// However, ellipses are not unified together, e.g. in
+			//
+			//	[a, ...b] & [...c]
+			//
+			// b and c are not unified. So we do not use
+			// ensureNavigableBinding, as that would merge the ellipses.
+			child.navigable.name = "__..."
 			n.ellipses = append(n.ellipses, child.navigable)
 
 		case *ast.CallExpr:
@@ -1521,6 +1533,9 @@ func (n *astNode) eval() {
 
 			navs := expandNavigableViaAncestralPath(parent.navigable)
 			n.addDefinition(key.Pos(), key.End(), navs)
+			for _, nav := range navs {
+				nav.recordUsage(key, n)
+			}
 
 			if keyAlias := parent.keyAlias; keyAlias != nil {
 				n.addDefinition(keyAlias.Pos(), keyAlias.End(), navs)

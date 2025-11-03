@@ -65,6 +65,9 @@ type Module struct {
 	// care that all the dirty files are loaded by _some_ package
 	// within the module.
 	dirtyFiles map[protocol.DocumentURI]struct{}
+
+	pingHubAfterReload bool
+	hubManager         *HubManager
 }
 
 // NewModule creates a new [Module] and adds it to the workspace. The
@@ -80,6 +83,7 @@ func NewModule(modFileUri protocol.DocumentURI, w *Workspace) *Module {
 			modFileUri: {},
 		},
 	}
+	m.hubManager = NewHubManager(m)
 	w.modules[m.rootURI] = m
 	w.debugLogf("%v Created", m)
 	// We only create a new module when we discover a
@@ -145,6 +149,7 @@ func (m *Module) ReloadModule() error {
 		pkg.markDirty()
 	}
 	w.debugLogf("%v Reloaded", m)
+	m.hubManager.Reload()
 	return nil
 }
 
@@ -158,6 +163,7 @@ func (m *Module) delete() {
 	for _, pkg := range m.packages {
 		pkg.delete()
 	}
+	m.hubManager.Shutdown()
 	w := m.workspace
 	delete(w.modules, m.rootURI)
 	w.standalone.reloadFile(m.modFileURI)
@@ -366,6 +372,13 @@ func (m *Module) loadAllPackages() {
 				pkg.markFileDirty(uri)
 			}
 		}
+	}
+}
+
+func (m *Module) pingHub() {
+	if m.pingHubAfterReload {
+		m.pingHubAfterReload = false
+		m.hubManager.SourceHasChanged()
 	}
 }
 

@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	"cuelang.org/go/cue/ast"
@@ -63,7 +64,8 @@ type Workspace struct {
 	// files holds the general state for each loaded file. This state
 	// is used whether the file is part of one or more packages, or is
 	// with standalone.
-	files map[protocol.DocumentURI]*File
+	files      map[protocol.DocumentURI]*File
+	filesMutex sync.Mutex
 
 	standalone *Standalone
 }
@@ -809,6 +811,7 @@ func (w *Workspace) reloadPackages() {
 				pkg.delete()
 			}
 		}
+		m.pingHub()
 	}
 
 	// Note that there's a potential memory leak here: we might load a

@@ -50,9 +50,10 @@ func (s serverState) String() string {
 // straight to the workspace. The server also takes care of shutdown,
 // handling the [server.Shutdown] and [server.Exit] messages.
 type server struct {
-	client    protocol.ClientCloser
-	cache     *cache.Cache
-	workspace *cache.Workspace
+	client      protocol.ClientCloser
+	cache       *cache.Cache
+	actorClient *serverActorClient
+	workspace   *cache.Workspace
 
 	state   serverState
 	options *settings.Options
@@ -199,4 +200,8 @@ func (s *server) maybeUseWorkspaceFolders(ctx context.Context) error {
 	s.pendingFolders = nil
 
 	return s.AddFolders(ctx, folders)
+}
+
+func (s *server) inActor(fun func()) {
+	s.actorClient.sendAndWait(func(*server) { fun() })
 }

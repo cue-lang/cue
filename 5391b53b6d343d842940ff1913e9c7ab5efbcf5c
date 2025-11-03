@@ -16,6 +16,24 @@
       "message": "This doc comment is out of date now.",
       "revId": "5391b53b6d343d842940ff1913e9c7ab5efbcf5c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39f5c72f_b542e6b3",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-03T23:34:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b74bd1dc_3dbcf99c",
+      "revId": "5391b53b6d343d842940ff1913e9c7ab5efbcf5c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

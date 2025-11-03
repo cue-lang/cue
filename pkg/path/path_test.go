@@ -379,8 +379,8 @@ var winbasetests = []PathTest{
 }
 
 func TestBase(t *testing.T) {
-	tests := basetests
 	testEachOS(t, []OS{Unix, Windows}, func(t *testing.T, os OS) {
+		tests := slices.Clone(basetests)
 		if os == Windows {
 			// make unix tests work on windows
 			for i := range tests {
@@ -426,7 +426,7 @@ var windirtests = []PathTest{
 
 func TestDir(t *testing.T) {
 	testEachOS(t, []OS{Unix, Windows}, func(t *testing.T, os OS) {
-		tests := dirtests
+		tests := slices.Clone(dirtests)
 		if os == Windows {
 			// make unix tests work on windows
 			for i := range tests {

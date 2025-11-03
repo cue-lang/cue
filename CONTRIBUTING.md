@@ -40,22 +40,19 @@ to queries in the issue tracker):
 cause.
 - [**NeedsDecision**](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsDecision):
   the issue is relatively well understood, but the CUE team hasn't yet decided
-the best way to address it.  It would be better to wait for a decision before
-writing code.  If you are interested on working on an issue in this state, feel
-free to "ping" maintainers in the issue's comments if some time has passed
-without a decision.
+  the best way to address it.  It would be better to wait for a decision before
+  writing code.  If you are interested on working on an issue in this state, feel
+  free to "ping" maintainers in the issue's comments if some time has passed
+  without a decision.
 - [**NeedsFix**](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix):
   the issue is fully understood and code can be written to fix it.
-- [**help
-  wanted**](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3A"help+wanted"):
-project maintainers need input from someone who has experience or expertise to
-answer or progress this issue.
-- [**good first
-  issue**](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3A"good+first+issue"):
-often combined with `NeedsFix`, `good first issue` indicates an issue is very
-likely a good candidate for someone
-looking to make their first code contribution.
-
+- [**help wanted**](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3A"help+wanted"):
+  project maintainers need input from someone who has experience or expertise to
+  answer or progress this issue.
+- [**good first issue**](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3A"good+first+issue"):
+  often combined with `NeedsFix`, `good first issue` indicates an issue is very
+  likely a good candidate for someone
+  looking to make their first code contribution.
 
 ### Open an issue for any new problem
 
@@ -106,7 +103,6 @@ the `-s` flag.
 The explanations of the GitHub and GerritHub contribution workflows that follow
 assume all commits you create are signed-off in this way.
 
-
 ## Preparing for GitHub Pull Request (PR) Contributions
 
 First-time contributors that are already familiar with the <a
@@ -118,19 +114,14 @@ supported.
 Here is a checklist of the steps to follow when contributing via GitHub PR
 workflow:
 
-- **Step 0**: Review the guidelines on [Good Commit
-  Messages](#good-commit-messages), [The Review Process](#the-review-process)
-and [Miscellaneous Topics](#miscellaneous-topics)
+- **Step 0**: Review the guidelines on [Good Commit Messages](#good-commit-messages),
+  [The Review Process](#the-review-process) and [Miscellaneous Topics](#miscellaneous-topics)
 - **Step 1**: Create a GitHub account if you do not have one.
-- **Step 2**:
-  [Fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) the CUE
-project, and clone your fork locally
-
+- **Step 2**: [Fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
+  the CUE project, and clone your fork locally
 
 That's it! You are now ready to send a change via GitHub, the subject of the
 next section.
-
-
 
 ## Sending a change via GitHub
 
@@ -155,8 +146,7 @@ $ git commit -s
 
 Notice as we explained above, the `-s` flag asserts the Developer Certificate of
 Origin by adding a `Signed-off-by` line to a commit. When writing a commit
-message, remember the guidelines on [good commit
-messages](#good-commit-messages).
+message, remember the guidelines on [good commit messages](#good-commit-messages).
 
 You’ve written and tested your code, but before sending code out for review, run
 all the tests from the root of the repository to ensure the changes don’t break
@@ -166,8 +156,8 @@ other packages or programs:
 $ go test ./...
 ```
 
-Your change is now ready! [Submit a
-PR](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)
+Your change is now ready!
+[Submit a PR](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)
 in the usual way.
 
 Once your PR is submitted, a maintainer will trigger continuous integration (CI)
@@ -206,8 +196,7 @@ between the original commit in your PR and the amended commit.
 What happens if you accidentally create an additional commit and now have two
 commits on your branch? No worries, you can "squash" commits on a branch to
 create a single commit. See the GitHub documentation on [how to squash commits
-with GitHub
-Desktop](https://docs.github.com/en/desktop/managing-commits/squashing-commits-in-github-desktop),
+with GitHub Desktop](https://docs.github.com/en/desktop/managing-commits/squashing-commits-in-github-desktop),
 or using the [`git` command
 interactively](https://medium.com/@slamflipstrom/a-beginners-guide-to-squashing-commits-with-git-rebase-8185cf6e62ec).
 
@@ -217,7 +206,6 @@ With the review cycle complete, the CI checks green and your PR approved, it
 will be imported into GerritHub and then submitted. Your PR will close
 automatically as it is "merged" in GerritHub. Congratulations! You will have
 made your first contribution to the CUE project.
-
 
 ## Preparing for GerritHub [CL](https://google.github.io/eng-practices/#terminology) Contributions
 
@@ -243,7 +231,6 @@ follow:
 - **Step 2**: Set up a [GerritHub](http://gerrithub.io/) account.
 - **Step 3**: [Install `git-codereview`](#step-3-install-the-git-codereview-command)
 - **Step 4**: Clone the CUE repository locally.
-
 
 We cover steps 1-4 in more detail below.
 
@@ -280,28 +267,22 @@ process:
 
 - Visit [GerritHub](http://gerrithub.io/).
 - Click "First Time Sign In".
-- Click the green "Sign In" button, to sign in using your GitHub
-  credentials.
-- When prompted "Which level of GitHub access do you need?", choose
-  "Default" and then click "Login."
+- Click the green "Sign In" button, to sign in using your GitHub credentials.
+- When prompted "Which level of GitHub access do you need?",
+  choose "Default" and then click "Login".
 - Click "Authorize gerritforge-ltd" on the GitHub auth page.
-- Confirm account profile details and click "Next."
+- Confirm account profile details and click "Next".
 
-If you want to use SSH for authentication *to GerritHub*, SSH keys can be
-[configured in your user
-profile](https://cue.gerrithub.io/settings/#SSHKeys).  If you choose to use
-SSH for authentication, you will not be able to use the `git-codereview`
-command that's suggested later in this document, as the command [doesn't
-support SSH-based git
-origins](https://github.com/golang/go/issues/9599#issuecomment-70538097).
+For HTTP Credentials, [generate a password via your user profile](https://cue.gerrithub.io/settings/#HTTPCredentials).
+Then use an existing HTTP authentication mechanism like GNOME Keyring, macOS KeyChain,
+`.netrc`, or some other [credential helper](https://git-scm.com/docs/gitcredentials).
+If you have any troubles with this step, please [raise an issue](https://cuelang.org/issues/new).
 
-For HTTP Credentials, [generate a password via your user
-profile](https://cue.gerrithub.io/settings/#HTTPCredentials). Then use an
-existing HTTP authentication mechanism like `.netrc`, macOS KeyChain, or some
-other [credential helper](https://git-scm.com/docs/gitcredentials). If you have
-any troubles with this step, please [raise an
-issue](https://cuelang.org/issues/new).
-
+If you prefer SSH for authentication *to GerritHub*, SSH keys can be
+[configured in your user profile](https://cue.gerrithub.io/settings/#SSHKeys).
+Note that the `git-codereview` command that's suggested later in this document
+[does not support SSH-based git origins](https://github.com/golang/go/issues/9599#issuecomment-70538097),
+hence we recommend using HTTP authentication.
 
 ### Step 3: Install the `git-codereview` command
 
@@ -332,10 +313,9 @@ directory.
 
 ### Step 4: Clone the CUE repository locally
 
-Visit https://cue.gerrithub.io/admin/repos/cue-lang/cue, then click "SSH" or
-"HTTP" depending on which authentication mechanism you configured in step 2.
-Then copy and run the corresponding "Clone" command. Make sure not to use
-"ANONYMOUS HTTP", as that will not work with `git-codereview` command. 
+Visit https://cue.gerrithub.io/admin/repos/cue-lang/cue, click on "HTTP",
+then copy and run the corresponding "Clone" command. Using "SSH" or
+"ANONYMOUS HTTP", will not work with the `git-codereview` command.
 
 ## Sending a change via GerritHub
 
@@ -357,7 +337,6 @@ $ go test ./...
 Each CUE change must be made in a branch, created from the `master` branch.  You
 can use the normal `git` commands to create a branch and stage changes:
 
-
 ```console
 $ git checkout -b mybranch
 $ [edit files...]
@@ -365,7 +344,6 @@ $ git add [files...]
 ```
 
 To commit changes, instead of `git commit -s`, use `git codereview change -s`.
-
 
 ```console
 $ git codereview change -s
@@ -377,14 +355,12 @@ You can edit the commit description in your favorite editor as usual.  The
 line near the bottom.  That line is used by Gerrit to match successive uploads
 of the same change.  Do not edit or delete it.  A Change-Id looks like this:
 
-
 ```
 Change-Id: I2fbdbffb3aab626c4b6f56348861b7909e3e8990
 ```
 
 The `git-codereview` command also checks that you've run `go fmt` over the
 source code, and that the commit message follows the suggested format.
-
 
 If you need to edit the files again, you can stage the new changes and re-run
 `git codereview change -s`: each subsequent run will amend the existing commit
@@ -395,28 +371,21 @@ commits by mistake, you can use `git rebase` to [squash them
 together](https://medium.com/@slamflipstrom/a-beginners-guide-to-squashing-commits-with-git-rebase-8185cf6e62ec)
 into a single one.
 
-
-
-
-
 ### Step 3: Test your changes
 
 You've written and tested your code, but before sending code out for review, run
 all the tests for the whole tree to ensure the changes don't break other
 packages or programs:
 
-
 ```console
 $ go test ./...
 ```
-
 
 ### Step 4: Send changes for review
 
 Once the change is ready and tested over the whole tree, send it for review.
 This is done with the `mail` sub-command which, despite its name, doesn't
 directly mail anything; it just sends the change to Gerrit:
-
 
 ```console
 $ git codereview mail
@@ -425,29 +394,23 @@ $ git codereview mail
 Gerrit assigns your change a number and URL, which `git codereview mail` will
 print, something like:
 
-
 ```
 remote: New Changes:
 remote:   https://cue.gerrithub.io/99999 math: improved Sin, Cos and Tan precision for very large arguments
 ```
 
-If you get an error instead, see the ["Troubleshooting mail
-errors"](#troubleshooting-gerrithub-mail-errors).
-
+If you get an error instead, see the ["Troubleshooting mail errors"](#troubleshooting-gerrithub-mail-errors).
 
 ### Step 5: Revise changes after a review
 
 CUE maintainers will review your code on Gerrit, and you will get notifications
 via e-mail.  You can see the review on Gerrit and comment on them there.  You
-can also reply [using
-e-mail](https://gerrit-review.googlesource.com/Documentation/intro-user.html#reply-by-email)
+can also reply [using e-mail](https://gerrit-review.googlesource.com/Documentation/intro-user.html#reply-by-email)
 if you prefer.
-
 
 If you need to revise your change after the review, edit the files in the same
 branch you previously created, add them to the Git staging area, and then amend
 the commit with `git codereview change`:
-
 
 ```console
 $ git codereview change  # amend current commit (without -s because we already signed-off, above)
@@ -458,12 +421,10 @@ $ git codereview mail    # send new changes to Gerrit
 If you don't need to change the commit description, just save and exit from the
 editor.  Remember not to touch the special `Change-Id` line.
 
-
 Again, make sure that you always keep a single commit in each branch.  If you
 add more commits by mistake, you can use `git rebase` to [squash them
 together](https://medium.com/@slamflipstrom/a-beginners-guide-to-squashing-commits-with-git-rebase-8185cf6e62ec)
 into a single one.
-
 
 ### CL approved!
 
@@ -471,15 +432,12 @@ With the review cycle complete, the CI checks green and your CL approved with
 `+2`, it will be submitted. Congratulations! You will have made your first
 contribution to the CUE project.
 
-
 ## Good commit messages
 
 Commit messages in CUE follow a specific set of conventions, which we discuss in
 this section.
 
-
 Here is an example of a good one:
-
 
 ```
 cue/ast/astutil: fix resolution bugs
@@ -488,20 +446,18 @@ This fixes several bugs and documentation bugs in
 identifier resolution.
 
 1. Resolution in comprehensions would resolve identifiers
-to themselves.
+   to themselves.
 
-2. Label aliases now no longer bind to references outside
-the scope of the field. The compiler would catch this invalid
-bind and report an error, but it is better not to bind in the
-first place.
+2. Label aliases now no longer bind to references outside the scope
+   of the field. The compiler would catch this invalid bind and
+   report an error, but it is better not to bind in the first place.
 
 3. Remove some more mentions of Template labels.
 
 4. Documentation for comprehensions was incorrect
-(Scope and Node were reversed).
+   (Scope and Node were reversed).
 
-5. Aliases X in `X=[string]: foo` should only be visible
-in foo.
+5. Aliases X in `X=[string]: foo` should only be visible in foo.
 
 Fixes #946
 ```
@@ -512,15 +468,12 @@ The first line of the change description is conventionally a short one-line
 summary of the change, prefixed by the primary affected package
 (`cue/ast/astutil` in the example above).
 
-
 A rule of thumb is that it should be written so to complete the sentence "This
 change modifies CUE to \_\_\_\_." That means it does not start with a capital
 letter, is not a complete sentence, and actually summarizes the result of the
 change.
 
-
 Follow the first line by a blank line.
-
 
 ### Main content
 
@@ -529,8 +482,6 @@ and explain what it does.  Write in complete sentences with correct punctuation,
 just like for your comments in CUE.  Don't use HTML, Markdown, or any other
 markup language.
 
-
-
 ### Referencing issues
 
 The special notation `Fixes #12345` associates the change with issue 12345 in
@@ -538,26 +489,20 @@ the [CUE issue tracker](https://cuelang.org/issue/12345) When this change is
 eventually applied, the issue tracker will automatically mark the issue as
 fixed.
 
-
 If the change is a partial step towards the resolution of the issue, uses the
 notation `Updates #12345`.  This will leave a comment in the issue linking back
 to the change in Gerrit, but it will not close the issue when the change is
 applied.
-
 
 All issues are tracked in the main repository's issue tracker.
 If you are sending a change against a subrepository, you must use the
 fully-qualified syntax supported by GitHub to make sure the change is linked to
 the issue in the main repository, not the subrepository (eg. `Fixes cue-lang/cue#999`).
 
-
-
 ## The review process
 
 This section explains the review process in detail and how to approach reviews
 after a change has been sent to either GerritHub or GitHub.
-
-
 
 ### Common mistakes
 
@@ -566,14 +511,13 @@ maintainer will have a look and provide some initial review that for first-time
 contributors usually focuses on basic cosmetics and common mistakes.  These
 include things like:
 
-
 - Commit message not following the suggested format.
 - The lack of a linked GitHub issue.  The vast majority of changes require a
   linked issue that describes the bug or the feature that the change fixes or
-implements, and consensus should have been reached on the tracker before
-proceeding with it.  Gerrit reviews do not discuss the merit of the change, just
-its implementation.  Only trivial or cosmetic changes will be accepted without
-an associated issue.
+  implements, and consensus should have been reached on the tracker before
+  proceeding with it.  Gerrit reviews do not discuss the merit of the change, just
+  its implementation.  Only trivial or cosmetic changes will be accepted without
+  an associated issue.
 
 ### Continuous Integration (CI) checks
 
@@ -583,11 +527,9 @@ checks.  Most CI tests complete in a few minutes, at which point a link will be
 posted in Gerrit where you can see the results, or if you are submitting a PR
 results are presented as checks towards the bottom of the PR.
 
-
 If any of the CI checks fail, follow the link and check the full logs.  Try to
 understand what broke, update your change to fix it, and upload again.
 Maintainers will trigger a new CI run to see if the problem was fixed.
-
 
 ### Reviews
 
@@ -595,25 +537,21 @@ The CUE community values very thorough reviews.  Think of each review comment
 like a ticket: you are expected to somehow "close" it by acting on it, either by
 implementing the suggestion or convincing the reviewer otherwise.
 
-
 After you update the change, go through the review comments and make sure to
 reply to every one.  In GerritHub you can click the "Done" button to reply
 indicating that you've implemented the reviewer's suggestion and in GitHub you
 can mark a comment as resolved; otherwise, click on "Reply" and explain why you
 have not, or what you have done instead.
 
-
 It is perfectly normal for changes to go through several round of reviews, with
 one or more reviewers making new comments every time and then waiting for an
 updated change before reviewing again.  This cycle happens even for experienced
 contributors, so don't be discouraged by it.
 
-
 ### Voting conventions in GerritHub
 
 As they near a decision, reviewers will make a "vote" on your change.
 The Gerrit voting system involves an integer in the range -2 to +2:
-
 
 - **+2** The change is approved for being merged.  Only CUE maintainers can cast
   a +2 vote.
@@ -630,12 +568,8 @@ it, but would like to encourage an approval.
 When reviewing a PR, a reviewer will indicate the nature of their response:
 
 * **Comments** - general feedback without explicit approval.
-* **Approve** - feedback and approval for this PR to accepted and submitted in
-  GerritHub.
-* **Request changes** - feedback that must be addressed before this PR can
-  proceed.
-
-
+* **Approve** - feedback and approval for this PR to accepted and submitted in GerritHub.
+* **Request changes** - feedback that must be addressed before this PR can proceed.
 
 ### Submitting an approved change
 
@@ -643,11 +577,9 @@ After the code has been `+2`'ed in GerritHub or "Approved" in GitHub, an
 approver will apply it to the `master` branch using the Gerrit user interface.
 This is called "submitting the change".
 
-
 The two steps (approving and submitting) are separate because in some cases
 maintainers may want to approve it but not to submit it right away (for
 instance, the tree could be temporarily frozen).
-
 
 Submitting a change checks it into the repository.  The change description will
 include a link to the code review, which will be updated with a link to the
@@ -655,17 +587,13 @@ change in the repository.  Since the method used to integrate the changes is
 Git's "Cherry Pick", the commit hashes in the repository will be changed by the
 submit operation.
 
-
 If your change has been approved for a few days without being submitted, feel
 free to write a comment in GerritHub or GitHub requesting submission.
-
 
 ## Miscellaneous topics
 
 This section collects a number of other comments that are outside the
 issue/edit/code review/submit process itself.
-
-
 
 ### Copyright headers
 
@@ -678,7 +606,6 @@ when using an email address linked to a GitHub account.
 New files that you contribute should use the standard copyright header
 with the current year reflecting when they were added.
 Do not update the copyright year for existing files that you change.
-
 
 ```
 // Copyright 2018 The CUE Authors
@@ -704,7 +631,6 @@ registration process.
 
 If you see something like...
 
-
 ```
 remote: Processing changes: refs: 1, done
 remote:
@@ -717,13 +643,11 @@ you need to configure Git for this repository to use the e-mail address that you
 registered with.  To change the e-mail address to ensure this doesn't happen
 again, run:
 
-
 ```console
 $ git config user.email email@address.com
 ```
 
 Then change the commit to use this alternative e-mail address with this command:
-
 
 ```console
 $ git commit --amend --author="Author Name &lt;email@address.com&gt;"
@@ -731,11 +655,9 @@ $ git commit --amend --author="Author Name &lt;email@address.com&gt;"
 
 Then retry by running:
 
-
 ```console
 $ git codereview mail
 ```
-
 
 ### Quickly testing your changes
 
@@ -743,7 +665,6 @@ Running `go test ./...` for every single change to the code tree is burdensome.
 Even though it is strongly suggested to run it before sending a change, during
 the normal development cycle you may want to compile and test only the package
 you are developing.
-
 
 In this section, we'll call the directory into which you cloned the CUE
 repository `$CUEDIR`.  As CUE uses Go modules, The `cue` tool built by `go
@@ -768,32 +689,25 @@ $ go test ./...
 
 To use the new tool you would still need to build and install it.
 
-
 ### Specifying a reviewer / CCing others in GerritHub
 
 You can specify a reviewer or CC interested parties using the `-r` or `-cc`
 options.  Both accept a comma-separated list of e-mail addresses:
 
-
 ```console
 $ git codereview mail -r joe@cuelang.org -cc mabel@example.com,math-nuts@swtch.com
 ```
-
 
 ### Synchronize your client with GerritHub
 
 While you were working, others might have submitted changes to the repository.
 To update your local branch, run
 
-
 ```console
 $ git codereview sync
 ```
 
-(Under the covers this runs
-`git pull -r`.)
-
-
+(Under the covers this runs `git pull -r`.)
 
 ### Reviewing code by others
 
@@ -805,19 +719,16 @@ repository.  On the Gerrit review page, click the "Download ▼" link in the upp
 right corner, copy the "Checkout" command and run it from your local Git repo.
 It will look something like this:
 
-
 ```console
 $ git fetch https://cue.gerrithub.io/a/cue-lang/cue refs/changes/67/519567/1 && git checkout FETCH_HEAD
 ```
 
 To revert, change back to the branch you were working in.
 
-
 ### Set up git aliases
 
 The `git-codereview` command can be run directly from the shell
 by typing, for instance,
-
 
 ```console
 $ git codereview sync
@@ -826,7 +737,6 @@ $ git codereview sync
 but it is more convenient to set up aliases for `git-codereview`'s own
 subcommands, so that the above becomes,
 
-
 ```console
 $ git sync
 ```
@@ -834,7 +744,6 @@ $ git sync
 The `git-codereview` subcommands have been chosen to be distinct from Git's own,
 so it's safe to define these aliases.  To install them, copy this text into your
 Git configuration file (usually `.gitconfig` in your home directory):
-
 
 ```
 [alias]
@@ -846,7 +755,6 @@ Git configuration file (usually `.gitconfig` in your home directory):
 	sync = codereview sync
 ```
 
-
 ### Sending multiple dependent changes
 
 Advanced users may want to stack up related commits in a single branch.  Gerrit
@@ -854,10 +762,8 @@ allows for changes to be dependent on each other, forming such a dependency
 chain.  Each change will need to be approved and submitted separately but the
 dependency will be visible to reviewers.
 
-
 To send out a group of dependent changes, keep each change as a different commit
 under the same branch, and then run:
-
 
 ```console
 $ git codereview mail HEAD
@@ -877,8 +783,7 @@ project. we also explained how `git commit -s` can be used to sign-off each
 commit. But:
 
 * it's easy to forget the `-s` flag;
-* it's not always possible/easy to fix up other tools that wrap the `git commit`
-  step.
+* it's not always possible/easy to fix up other tools that wrap the `git commit` step.
 
 You can automate the sign-off step using a [`git`
 hook](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks). Run the
@@ -911,7 +816,6 @@ chmod +x .git/hooks/prepare-commit-msg
 
 If you already have a `prepare-commit-msg` hook, adapt it accordingly. The `-s`
 flag will now be implied every time a commit is created.
-
 
 ## Code of Conduct
 

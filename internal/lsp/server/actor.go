@@ -120,6 +120,11 @@ func New(cache *cache.Cache, client protocol.ClientCloser, options *settings.Opt
 	}
 
 	w, r := NewMailbox[serverFunc]()
+	actorClient := &serverActorClient{
+		w:  w,
+		id: strconv.FormatInt(counter, 10),
+	}
+	server.actorClient = actorClient
 	go func() {
 		defer r.Terminate()
 		for {
@@ -128,10 +133,7 @@ func New(cache *cache.Cache, client protocol.ClientCloser, options *settings.Opt
 			msg.MarkProcessed()
 		}
 	}()
-	return &serverActorClient{
-		w:  w,
-		id: strconv.FormatInt(counter, 10),
-	}
+	return actorClient
 }
 
 type serverActorClient struct {

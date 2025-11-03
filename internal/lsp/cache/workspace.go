@@ -35,6 +35,7 @@ import (
 type Workspace struct {
 	registry  Registry // shared with other Workspaces
 	client    protocol.Client
+	inActor   func(func())
 	fs        *fscache.CUECacheFS
 	overlayFS *fscache.OverlayFS
 
@@ -69,7 +70,7 @@ type Workspace struct {
 	standalone *Standalone
 }
 
-func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string)) *Workspace {
+func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string), inActor func(func())) *Workspace {
 	overlayFS := fscache.NewOverlayFS(cache.fs)
 	w := &Workspace{
 		registry: &registryWrapper{
@@ -77,6 +78,7 @@ func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string)) *
 			overlayFS: overlayFS,
 		},
 		client:    client,
+		inActor:   inActor,
 		fs:        cache.fs,
 		overlayFS: overlayFS,
 		debugLog:  debugLog,
@@ -827,6 +829,7 @@ func (w *Workspace) reloadPackages() {
 				}
 			}
 		}
+		m.pingHub()
 	}
 
 	// Note that there's a potential memory leak here: we might load a

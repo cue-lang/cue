@@ -83,7 +83,7 @@ func newVetCmd(c *Command) *cobra.Command {
 	}
 
 	addOrphanFlags(cmd.Flags())
-	addInjectionFlags(cmd.Flags(), false, false)
+	addInjectionFlags(cmd.Flags(), false)
 
 	cmd.Flags().BoolP(string(flagConcrete), "c", false,
 		"require the evaluation to be concrete, or set -c=false to allow incomplete values")

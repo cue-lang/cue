@@ -100,7 +100,7 @@ See "cue help filetypes" for more information on values accepted by --out.
 
 	addOutFlags(cmd.Flags(), true)
 	addOrphanFlags(cmd.Flags())
-	addInjectionFlags(cmd.Flags(), false, false)
+	addInjectionFlags(cmd.Flags(), false)
 
 	cmd.Flags().Bool(string(flagEscape), false, "use HTML escaping")
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "export this expression only")

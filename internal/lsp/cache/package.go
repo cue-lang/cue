@@ -132,6 +132,7 @@ func (pkg *Package) activeFilesAndDirs(files map[protocol.DocumentURI][]packageO
 // markFileDirty implements [packageOrModule]
 func (pkg *Package) markFileDirty(file protocol.DocumentURI) {
 	pkg.module.dirtyFiles[file] = struct{}{}
+	pkg.module.pingHubAfterReload = true
 	pkg.markDirty()
 }
 
@@ -179,7 +180,10 @@ func (pkg *Package) delete() {
 		for _, file := range modpkg.Files() {
 			fileUri := m.rootURI + protocol.DocumentURI("/"+file.FilePath)
 			w.standalone.reloadFile(fileUri)
-			w.files[fileUri].removeUser(pkg)
+			w.filesMutex.Lock()
+			f := w.files[fileUri]
+			w.filesMutex.Unlock()
+			f.removeUser(pkg)
 		}
 	}
 	for _, importedPkg := range pkg.imports {
@@ -262,7 +266,10 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		for _, file := range oldModpkg.Files() {
 			fileUri := m.rootURI + protocol.DocumentURI("/"+file.FilePath)
 			if _, found := currentFiles[fileUri]; !found {
-				w.files[fileUri].removeUser(pkg)
+				w.filesMutex.Lock()
+				f := w.files[fileUri]
+				w.filesMutex.Unlock()
+				f.removeUser(pkg)
 			}
 		}
 	}

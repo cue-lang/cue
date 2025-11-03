@@ -187,10 +187,7 @@ func (dec *Decoder) decodeStartElement(xmlToken xml.StartElement, startOffset in
 	// Covers the root node.
 	if dec.currField.field == nil {
 		dec.currXmlElement = &xmlElement{xmlName: xmlToken.Name, attr: xmlToken.Attr}
-		cueElement, err := dec.cueFieldFromXmlElement(xmlToken, dec.currXmlElement, startOffset)
-		if err != nil {
-			return err
-		}
+		cueElement := dec.cueFieldFromXmlElement(xmlToken, dec.currXmlElement, startOffset)
 		dec.currField.assignNewCurrField(cueElement)
 		dec.astRoot = ast.NewStruct(dec.currField.field)
 		ast.SetPos(dec.astRoot, dec.tokenFile.Pos(0, token.NoRelPos))
@@ -208,10 +205,7 @@ func (dec *Decoder) decodeStartElement(xmlToken xml.StartElement, startOffset in
 	parentXmlNode.children = append(parentXmlNode.children, dec.currXmlElement)
 	// For the CUE ast: step down the CUE hierarchy.
 	dec.ancestors = append(dec.ancestors, dec.currField)
-	newElement, err := dec.cueFieldFromXmlElement(xmlToken, dec.currXmlElement, startOffset)
-	if err != nil {
-		return err
-	}
+	newElement := dec.cueFieldFromXmlElement(xmlToken, dec.currXmlElement, startOffset)
 	// Check if this new XML element has a name that's been seen before at the current level.
 	prefixedXmlElementName := prefixedElementName(xmlToken, dec.currXmlElement)
 	sameNameElements := dec.currField.currFieldChildren[prefixedXmlElementName]
@@ -253,7 +247,7 @@ func isWhiteSpace(s string) bool {
 // cueFieldFromXmlElement creates a new [ast.Field] to model the given xml element information
 // in [xml.StartElement] and [xmlElement]. The startOffset represents the offset
 // for the beginning of the start tag of the given XML element.
-func (dec *Decoder) cueFieldFromXmlElement(elem xml.StartElement, xmlNode *xmlElement, startOffset int64) (*ast.Field, error) {
+func (dec *Decoder) cueFieldFromXmlElement(elem xml.StartElement, xmlNode *xmlElement, startOffset int64) *ast.Field {
 	elementName := prefixedElementName(elem, xmlNode)
 	resLabel := ast.NewStringLabel(elementName)
 	pos := dec.tokenFile.Pos(int(startOffset), token.NoRelPos)
@@ -278,7 +272,7 @@ func (dec *Decoder) cueFieldFromXmlElement(elem xml.StartElement, xmlNode *xmlEl
 		}
 		resultValue.Elts = append(resultValue.Elts, attrExpr)
 	}
-	return result, nil
+	return result
 }
 
 // prefixedElementName returns the full name of an element,

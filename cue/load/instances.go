@@ -218,10 +218,7 @@ func loadAbsPackage(
 	ip := ast.ParseImportPath(pkg)
 	ip.Version = semver.Major(mv.Version())
 
-	pkgs, err := loadPackages(ctx, cfg, mf, loc, []string{ip.String()}, tg)
-	if err != nil {
-		return "", nil, err
-	}
+	pkgs := loadPackages(ctx, cfg, mf, loc, []string{ip.String()}, tg)
 	return ip.String(), pkgs, nil
 }
 
@@ -271,7 +268,7 @@ func loadPackagesFromArgs(
 		},
 		slices.Sorted(maps.Keys(pkgPaths)),
 		tg,
-	)
+	), nil
 }
 
 func loadPackages(
@@ -281,7 +278,7 @@ func loadPackages(
 	mainModLoc module.SourceLoc,
 	pkgPaths []string,
 	tg *tagger,
-) (*modpkgload.Packages, error) {
+) *modpkgload.Packages {
 	mainModPath := mainMod.QualifiedModule()
 	reqs := modrequirements.NewRequirements(
 		mainModPath,
@@ -325,7 +322,7 @@ func loadPackages(
 			}
 			return true
 		},
-	), nil
+	)
 }
 
 func isAbsVersionPackage(p string) bool {

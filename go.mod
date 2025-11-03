@@ -1,15 +1,17 @@
 module cuelang.org/go
 
-go 1.24.0
+go 1.25.2
 
 require (
 	cuelabs.dev/go/oci/ociregistry v0.0.0-20250722084951-074d06050084
 	github.com/cockroachdb/apd/v3 v3.2.1
+	github.com/coder/websocket v1.8.14
 	github.com/emicklei/proto v1.14.2
 	github.com/go-quicktest/qt v1.101.0
 	github.com/google/go-cmp v0.7.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.6.0
+	github.com/msackman/riskybiscuits v0.0.0-20251103161416-61b503ecada3
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/pelletier/go-toml/v2 v2.2.4

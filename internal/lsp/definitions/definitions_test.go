@@ -17,6 +17,7 @@ package definitions_test
 import (
 	"cmp"
 	"fmt"
+	"maps"
 	"math"
 	"slices"
 	"strings"
@@ -1957,6 +1958,9 @@ y: "wand"
 				ln(3, 1, "y"):     {e: []string{"magic", "x", "y"}},
 				ln(4, 1, "y"):     {f: []string{"x", "y"}},
 			},
+			expectUsagesExtra: map[position]map[bool][]position{
+				ln(1, 1, `"magic"`): {true: []position{self}},
+			},
 		},
 
 		{
@@ -1975,6 +1979,9 @@ x: wand.foo
 			expectCompletions: map[position]fieldEmbedCompletions{
 				ln(3, 1, "x"):    {f: []string{"x"}},
 				ln(3, 1, "wand"): {e: []string{"wand", "x"}},
+			},
+			expectUsagesExtra: map[position]map[bool][]position{
+				ln(1, 1, "wand"): {true: []position{self}},
 			},
 		},
 
@@ -2803,6 +2810,9 @@ package a
 				fln("b.cue", 6, 1, "y"):  {e: []string{"a", "y", "z"}},
 				fln("b.cue", 6, 1, ".x"): {e: []string{"x"}},
 			},
+			expectUsagesExtra: map[position]map[bool][]position{
+				fln("b.cue", 3, 1, `"a"`): {true: []position{self}},
+			},
 			importedBy: map[string][]string{
 				"a": {"b"},
 			},
@@ -2884,6 +2894,11 @@ o: c.o.z
 				fln("d.cue", 5, 1, "c"):  {e: []string{"c", "o"}},
 				fln("d.cue", 5, 1, ".o"): {e: []string{"o"}},
 				fln("d.cue", 5, 1, ".z"): {e: []string{"z"}},
+			},
+			expectUsagesExtra: map[position]map[bool][]position{
+				fln("b.cue", 3, 1, `"a"`): {true: []position{self}},
+				fln("c.cue", 3, 1, `"b"`): {true: []position{self}},
+				fln("d.cue", 3, 1, `"c"`): {true: []position{self}},
 			},
 			importedBy: map[string][]string{
 				"a": {"b"},
@@ -3131,6 +3146,7 @@ type testCase struct {
 	archive           string
 	expectDefinitions map[position][]position
 	expectCompletions map[position]fieldEmbedCompletions
+	expectUsagesExtra map[position]map[bool][]position
 	importedBy        map[string][]string
 }
 
@@ -3163,6 +3179,10 @@ func (tcs testCases) run(t *testing.T) {
 				filesByPkg[pkgName] = append(filesByPkg[pkgName], fileAst)
 			}
 
+			// Determining offsets. For all of these, we mutate the map
+			// keys, and they are not pointers. This means we need to
+			// delete the entry from the map, then do the mutation, then
+			// re-add to the map.
 			expectDefinitions := tc.expectDefinitions
 			for from, tos := range expectDefinitions {
 				delete(expectDefinitions, from)
@@ -3178,6 +3198,19 @@ func (tcs testCases) run(t *testing.T) {
 				delete(expectCompletions, from)
 				from.determineOffset(filesByName)
 				expectCompletions[from] = completions
+			}
+
+			expectUsagesExtra := tc.expectUsagesExtra
+			for from, usagesM := range expectUsagesExtra {
+				delete(expectUsagesExtra, from)
+				from.determineOffset(filesByName)
+				for _, usages := range usagesM {
+					for i := range usages {
+						use := &usages[i]
+						use.determineOffset(filesByName)
+					}
+				}
+				expectUsagesExtra[from] = usagesM
 			}
 
 			analyse := func() testCaseAnalysis {
@@ -3248,11 +3281,11 @@ func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, analysis te
 					fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
 				}
 				fileOffsetsWant := make([]fileOffset, len(positionsWant))
-				for j, p := range positionsWant {
-					if p == self {
+				for j, posWant := range positionsWant {
+					if posWant == self {
 						fileOffsetsWant[j] = posFrom.fileOffset()
 					} else {
-						fileOffsetsWant[j] = p.fileOffset()
+						fileOffsetsWant[j] = posWant.fileOffset()
 					}
 				}
 				slices.SortFunc(fileOffsetsGot, cmpFileOffsets)
@@ -3281,48 +3314,241 @@ func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, analysis te
 	})
 }
 
+func connectedComponents(edges map[position][]position) [][]position {
+	// Build undirected adjacency
+	adj := maps.Clone(edges)
+	for posUse, posDfns := range edges {
+		for _, posDfn := range posDfns {
+			adj[posDfn] = append(adj[posDfn], posUse)
+		}
+	}
+
+	visited := make(map[position]struct{})
+	var components [][]position
+
+	var dfs func(position, *[]position)
+	dfs = func(p position, component *[]position) {
+		visited[p] = struct{}{}
+		*component = append(*component, p)
+		for _, neighbour := range adj[p] {
+			if _, found := visited[neighbour]; !found {
+				dfs(neighbour, component)
+			}
+		}
+	}
+
+	for pos := range adj {
+		if _, found := visited[pos]; !found {
+			component := []position{}
+			dfs(pos, &component)
+			components = append(components, component)
+		}
+	}
+
+	return components
+}
+
 func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCaseAnalysis) {
 	t.Run("usages", func(t *testing.T) {
-		expectUsages := make(map[position][]position)
-		for dfn, uses := range tc.expectDefinitions {
-			// If we expect dfn to resolve to either self then we skip
-			// it. Self is used for field declarations to resolve to
-			// themselves, but usages of a field is very different.
-			//
-			// Similarly, if the dfn starts with a '[' then we assume
-			// it's a dynamic index, and inverting this def-use will not
-			// currently work with usages. E.g. {x: _}["x"] currently
-			// works for definitions but not usages.
-			if slices.Contains(uses, self) || dfn.str[0] == '[' {
+
+		// UsagesForOffset has two modes: whether or not to include
+		// definitions in the results. We wish to test both nodes.
+		//
+		// When *excluding* definitions, we can form the expected usages
+		// by simply inverting the expected definitions. There are two
+		// wrinkles:
+		//
+		// 1. When examining the expected definitions, we must exclude
+		// those where the key is a field declation itself. These can be
+		// detected by the fact the value will contain self - i.e. the
+		// field declaration resolves to itself:
+		//
+		// 2. We need to detect dynamic indexing specially. See comments
+		// below.
+		expectUsagesExcluding := make(map[position][]position)
+		for posUse, posDfns := range tc.expectDefinitions {
+			if slices.Contains(posDfns, self) {
+				continue
+			} else if strings.HasPrefix(posUse.str, `["`) {
+				// If posUse starts with [" then we assume it's a dynamic
+				// index into a struct. These can be inverted. E.g.
+				//
+				//	{"g": 13}["g"]
+				//
+				// works correctly in both directions. However, some
+				// gentle massaging of the offset is currently needed.
+				posUse.offset += 1
+			} else if strings.HasPrefix(posUse.str, `[`) {
+				// Otherwise, it's either a const number dynamic index, or
+				// some reference. These can't be inverted so we have to
+				// skip. The const number can't be inverted because in the
+				// list, there's no key element to query for usages
+				// (i.e. we don't support [0: a, 1: b, 2: c][1]); and
+				// references in dynamic indexes are not evaluated by our
+				// evaluator.
 				continue
 			}
-			for _, use := range uses {
-				expectUsages[use] = append(expectUsages[use], dfn)
+			for _, use := range posDfns {
+				expectUsagesExcluding[use] = append(expectUsagesExcluding[use], posUse)
 			}
 		}
 
-		for posUse, positionsWant := range expectUsages {
-			filename := posUse.filename
-			fdfns := analysis.dfnsByFilename[filename]
-			qt.Check(t, qt.IsNotNil(fdfns))
+		// When *including* definitions, things get a bit more
+		// complex. Consider:
+		//
+		//	d: x: 17         // let's call this x1
+		//	r: d & {x: int}  // let's call this x2
+		//
+		// Here, the x on line 1 resolves only to itself, whilst the x
+		// on line 2 resolves to both. I.e. we would have in
+		// expectDefinitions:
+		//
+		//	use       -> definitions
+		//	ln(1,1,x) -> {self}              (i.e. x1 -> {x1})
+		//	ln(2,1,x) -> {self, ln(1,1,"x"}} (i.e. x2 -> {x1, x2})
+		//
+		// If we simply invert this we get
+		//
+		//	def -> uses
+		//	x1  -> {x1, x2} // this is fine
+		//	x2  -> {x2}     // this is wrong
+		//
+		// This entry for x2 is wrong. UsagesForOffset starts by
+		// resolving the token at the offset and then establishing uses
+		// of what ever it has resolved to. So x2 would be resolved to
+		// {x1,x2} and then we'd search for uses of both.
+		//
+		// This problem only occurs for keys of expectDefinitions which
+		// are themselves field declaration. In the above example, d.x
+		// is distinct from r.x and so it is correct that x1 does *not*
+		// resolve to x2. Again, We detect these scenarios because an
+		// entry in expectDefinitions for a field declaration will
+		// always resolve to itself (and potentially other declarations
+		// too).
+		//
+		// So we filter out the declarations. We treat this as an
+		// *undirected* graph and establish the connected components. In
+		// the above example, that'll group x1 and x2 together into a
+		// component. Then we invert the expectDefinitions, but, we add
+		// in the full content of the component for the definition. So,
+		// in the above example, rather than simply inverting
+		//
+		//	use -> def
+		//	x1 -> {x1}
+		//
+		// we would find the rhs element belongs to the component
+		// {x1,x2}, and so we would actually be inverting
+		//
+		//	use -> def
+		//	x1 -> {x1, x2}
+		//
+		// This then ensures the expectUsages contains
+		//
+		//	def -> uses
+		//	x1  -> {x1, x2}
+		//	x2  -> {x1, x2}
+		//
+		// Package-declarations are slightly special and so we have to
+		// make sure they are not treated as declarations for our
+		// purposes here.
 
-			offset := posUse.offset
-
-			for i := range len(posUse.str) {
-				// Test every offset within the "use" token
-				offset := offset + i
-				nodesGot := fdfns.UsagesForOffset(offset, false)
-				fileOffsetsGot := make([]fileOffset, len(nodesGot))
-				for j, node := range nodesGot {
-					fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
+		declarations := make(map[position][]position)
+		for posUse, posDfns := range tc.expectDefinitions {
+			if posUse.offset == 8 && strings.HasPrefix(posUse.content, "package ") {
+				continue
+			}
+			posDfns := slices.Clone(posDfns)
+			for i, posDfn := range posDfns {
+				if posDfn == self { // this must be a field declaration
+					posDfns[i] = posUse
+					declarations[posUse] = posDfns
 				}
+			}
+		}
+
+		// componentsByMembers maps from any component member to its
+		// full component.
+		componentsByMembers := make(map[position][]position)
+		for _, component := range connectedComponents(declarations) {
+			for _, pos := range component {
+				componentsByMembers[pos] = component
+			}
+		}
+
+		expectUsagesIncluding := make(map[position][]position)
+		for posUse, posDfns := range tc.expectDefinitions {
+			if strings.HasPrefix(posUse.str, `["`) {
+				// Same logic as when calculating expectUsagesExcluding.
+				posUse.offset += 1
+			} else if strings.HasPrefix(posUse.str, `[`) {
+				// Same logic as when calculating expectUsagesExcluding.
+				continue
+			}
+
+			// Expand each definition via its component.
+			expandedDfns := make(map[position]struct{})
+			worklist := posDfns
+			for len(worklist) > 0 {
+				posDfn := worklist[0]
+				worklist = worklist[1:]
+				if posDfn == self {
+					// Unlike expectUsagesExcluding, we allow self here.
+					posDfn = posUse
+				}
+				if _, seen := expandedDfns[posDfn]; seen {
+					continue
+				}
+				expandedDfns[posDfn] = struct{}{}
+				worklist = append(worklist, componentsByMembers[posDfn]...)
+			}
+
+			for posDfn := range expandedDfns {
+				expectUsagesIncluding[posDfn] = append(expectUsagesIncluding[posDfn], posUse)
+			}
+		}
+
+		for _, includeDefinitions := range []bool{false, true} {
+			var expectUsages map[position][]position
+			if includeDefinitions {
+				expectUsages = expectUsagesIncluding
+			} else {
+				expectUsages = expectUsagesExcluding
+			}
+
+			for posUse, posDfnsM := range tc.expectUsagesExtra {
+				posDfns := expectUsages[posUse]
+				for _, posDfn := range posDfnsM[includeDefinitions] {
+					if posDfn == self {
+						posDfn = posUse
+					}
+					posDfns = append(posDfns, posDfn)
+				}
+				expectUsages[posUse] = posDfns
+			}
+
+			for posUse, positionsWant := range expectUsages {
+				filename := posUse.filename
+				fdfns := analysis.dfnsByFilename[filename]
+				qt.Check(t, qt.IsNotNil(fdfns))
+
 				fileOffsetsWant := make([]fileOffset, len(positionsWant))
 				for j, p := range positionsWant {
 					fileOffsetsWant[j] = p.fileOffset()
 				}
-				slices.SortFunc(fileOffsetsGot, cmpFileOffsets)
-				slices.SortFunc(fileOffsetsWant, cmpFileOffsets)
-				qt.Check(t, qt.DeepEquals(fileOffsetsGot, fileOffsetsWant), qt.Commentf("from %#v(+%d)", posUse, i))
+
+				offset := posUse.offset
+				for i := range len(posUse.str) {
+					// Test every offset within the "use" token
+					offset := offset + i
+					nodesGot := fdfns.UsagesForOffset(offset, includeDefinitions)
+					fileOffsetsGot := make([]fileOffset, len(nodesGot))
+					for j, node := range nodesGot {
+						fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
+					}
+					slices.SortFunc(fileOffsetsGot, cmpFileOffsets)
+					slices.SortFunc(fileOffsetsWant, cmpFileOffsets)
+					qt.Check(t, qt.DeepEquals(fileOffsetsGot, fileOffsetsWant), qt.Commentf("from %#v(+%d) includeDefinitions? %v", posUse, i, includeDefinitions))
+				}
 			}
 		}
 	})
@@ -3519,6 +3745,7 @@ type position struct {
 	n        int
 	str      string
 	offset   int
+	content  string
 }
 
 func (p *position) String() string {
@@ -3575,6 +3802,7 @@ func (p *position) determineOffset(filesByName map[string]*ast.File) {
 		endOffset = lines[p.line]
 	}
 	content := string(file.Content())
+	p.content = content
 	line := content[startOffset:endOffset]
 	n := p.n
 	for i := range line {

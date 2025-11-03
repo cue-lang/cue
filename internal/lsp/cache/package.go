@@ -132,6 +132,7 @@ func (pkg *Package) activeFilesAndDirs(files map[protocol.DocumentURI][]packageO
 // markFileDirty implements [packageOrModule]
 func (pkg *Package) markFileDirty(file protocol.DocumentURI) {
 	pkg.module.dirtyFiles[file] = struct{}{}
+	pkg.module.pingHubAfterReload = true
 	pkg.markDirty()
 }
 

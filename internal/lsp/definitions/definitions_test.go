@@ -3284,6 +3284,17 @@ func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, analysis te
 func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCaseAnalysis) {
 	t.Run("usages", func(t *testing.T) {
 		expectUsages := make(map[position][]position)
+		// for posFrom, posDfns := range tc.expectDefinitions {
+		// 	for _, posDfn := range posDfns {
+		// 		if posDfn == self {
+		// 			posDfn = posFrom
+		// 		}
+		// 		expectUsages[posDfn] = nil
+		// 	}
+		// }
+		// for posFrom, posDfns := range tc.expectDefinitions {
+		// }
+
 		for dfn, uses := range tc.expectDefinitions {
 			// If we expect dfn to resolve to either self then we skip
 			// it. Self is used for field declarations to resolve to
@@ -3293,11 +3304,15 @@ func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCas
 			// it's a dynamic index, and inverting this def-use will not
 			// currently work with usages. E.g. {x: _}["x"] currently
 			// works for definitions but not usages.
-			if slices.Contains(uses, self) || dfn.str[0] == '[' {
+			if dfn.str[0] == '[' {
 				continue
 			}
 			for _, use := range uses {
-				expectUsages[use] = append(expectUsages[use], dfn)
+				if use == self {
+					expectUsages[dfn] = append(expectUsages[dfn], dfn)
+				} else {
+					expectUsages[use] = append(expectUsages[use], dfn)
+				}
 			}
 		}
 

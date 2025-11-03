@@ -1521,6 +1521,9 @@ func (n *astNode) eval() {
 
 			navs := expandNavigableViaAncestralPath(parent.navigable)
 			n.addDefinition(key.Pos(), key.End(), navs)
+			for _, nav := range navs {
+				nav.recordUsage(key, n)
+			}
 
 			if keyAlias := parent.keyAlias; keyAlias != nil {
 				n.addDefinition(keyAlias.Pos(), keyAlias.End(), navs)

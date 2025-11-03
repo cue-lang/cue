@@ -17,6 +17,7 @@ package cache
 import (
 	"context"
 	"slices"
+	"sync"
 
 	"cuelang.org/go/cue/ast"
 	cueerrors "cuelang.org/go/cue/errors"
@@ -27,6 +28,7 @@ import (
 // ensureFile returns an existing [File] associated with uri if it
 // exists, or creates a new association if not.
 func (w *Workspace) ensureFile(uri protocol.DocumentURI) *File {
+	w.filesMutex.Lock()
 	f, found := w.files[uri]
 	if !found {
 		f = &File{
@@ -35,13 +37,16 @@ func (w *Workspace) ensureFile(uri protocol.DocumentURI) *File {
 		}
 		w.files[uri] = f
 	}
+	w.filesMutex.Unlock()
 	return f
 }
 
 // closeFile calls [File.close] on a [File] associated with uri. If no
 // such [File] exists, it is a noop.
 func (w *Workspace) closeFile(uri protocol.DocumentURI) {
+	w.filesMutex.Lock()
 	f, found := w.files[uri]
+	w.filesMutex.Unlock()
 	if !found {
 		return
 	}
@@ -50,7 +55,10 @@ func (w *Workspace) closeFile(uri protocol.DocumentURI) {
 
 // DocumentSymbol implements the LSP DocumentSymbols functionality.
 func (w *Workspace) DocumentSymbols(fileUri protocol.DocumentURI) []protocol.DocumentSymbol {
-	if f, found := w.files[fileUri]; found {
+	w.filesMutex.Lock()
+	f, found := w.files[fileUri]
+	w.filesMutex.Unlock()
+	if found {
 		return f.documentSymbols()
 	}
 	w.debugLogf("Document symbols requested for closed file: %v", fileUri)
@@ -60,9 +68,11 @@ func (w *Workspace) DocumentSymbols(fileUri protocol.DocumentURI) []protocol.Doc
 // publishDiagnostics sends to the client / editor all new diagnostic
 // messages.
 func (w *Workspace) publishDiagnostics() {
+	w.filesMutex.Lock()
 	for _, f := range w.files {
 		f.publishErrors()
 	}
+	w.filesMutex.Unlock()
 }
 
 // File models a single CUE file. This file might be loaded by one or
@@ -78,10 +88,11 @@ type File struct {
 	// syntax is the current AST for this file. Setting syntax via the
 	// [File.setSyntax] method updates syntax, tokFile, mapper, and
 	// symbols fields.
-	syntax  *ast.File
-	tokFile *token.File
-	mapper  *protocol.Mapper
-	symbols []protocol.DocumentSymbol
+	syntax      *ast.File
+	tokFile     *token.File
+	mapper      *protocol.Mapper
+	symbols     []protocol.DocumentSymbol
+	tokFileLock sync.Mutex
 
 	// errors records both the current users of this File and any
 	// errors they have reported. Because most of the time there will
@@ -155,7 +166,9 @@ func (f *File) maybeDelete() {
 	if tokFile := f.tokFile; tokFile != nil {
 		delete(w.mappers, tokFile)
 	}
+	w.filesMutex.Lock()
 	delete(w.files, f.uri)
+	w.filesMutex.Unlock()
 }
 
 // setSyntax updates this state with the provided syntax. All derived
@@ -168,7 +181,9 @@ func (f *File) setSyntax(syntax *ast.File) {
 	}
 	f.syntax = syntax
 	tokFile := syntax.Pos().File()
+	f.tokFileLock.Lock()
 	f.tokFile = tokFile
+	f.tokFileLock.Unlock()
 	if tokFile == nil {
 		f.mapper = nil
 	} else {
@@ -176,6 +191,12 @@ func (f *File) setSyntax(syntax *ast.File) {
 		w.mappers[tokFile] = f.mapper
 	}
 	f.symbols = nil
+}
+
+func (f *File) GetTokFileSafe() *token.File {
+	f.tokFileLock.Lock()
+	defer f.tokFileLock.Unlock()
+	return f.tokFile
 }
 
 // documentSymbols returns the hierarchical document symbols for this

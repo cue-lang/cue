@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eddd956d_b4aaeaf5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-05T12:57:52Z",
+      "side": 1,
+      "message": "this should be #4162",
+      "revId": "6625d0c2d85c839f8cd016a4d61da08300013cd2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74973eed_56582d8b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-05T12:57:52Z",
+      "side": 1,
+      "message": "SGTM for lists but I think the test and fix are too narrow.",
+      "revId": "6625d0c2d85c839f8cd016a4d61da08300013cd2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "718d13cc_bba5442e",
+        "filename": "tools/fix/testdata/explicitopen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-05T12:57:52Z",
+      "side": 1,
+      "message": "some test cases are missing here. In the issue I also had an embedded inline struct, which is currently broken too:\n\n\n```\nfoo: {\n    {bar: \"baz\"}\n}\n\n```\n\n\nAnd the same happens for basic literals - embedded strings, integers, etc.\n\n\nSo I suspect the fix itself is also incomplete.",
+      "revId": "6625d0c2d85c839f8cd016a4d61da08300013cd2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

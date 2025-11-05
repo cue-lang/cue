@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b86621d0_a2543bf3",
+        "filename": "cue/testdata/definitions/explicitopen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-05T13:04:55Z",
+      "side": 1,
+      "message": "what about `x: foo... \u0026 bar...`? I\u0027m not sure if that is meant to work, so I think adding a test would be useful.",
+      "revId": "67fbb834bb424cd9334ab97a1fb3c3a12637abc9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

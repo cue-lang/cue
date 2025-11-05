@@ -4137,16 +4137,17 @@ func exprStr(v cue.Value) string {
 	if op == cue.NoOp {
 		return compactRawStr(operands[0])
 	}
-	s := op.String()
-	s += "("
+	var s strings.Builder
+	s.WriteString(op.String())
+	s.WriteString("(")
 	for i, v := range operands {
 		if i > 0 {
-			s += " "
+			s.WriteString(" ")
 		}
-		s += exprStr(v)
+		s.WriteString(exprStr(v))
 	}
-	s += ")"
-	return s
+	s.WriteString(")")
+	return s.String()
 }
 
 func compactRawStr(v cue.Value) string {

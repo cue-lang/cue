@@ -190,6 +190,31 @@ combinenew: {
 	f17: err: NewOpen1 & NewClosed1
 	f18: ok: NewClosed1 & NewClosed1
 }
+-- issues.cue --
+@experiment(explicitopen)
+issue4150: {
+	#Def: a: int
+
+	x: #Def... & {
+			a: 42
+			b: 42
+	}
+	foo: {a: int}
+	bar: {b: int}
+	y: foo... & bar...
+
+	// NOTE: we allow this, even though it doesn't mean anything. The benefit
+	// of this is that code doesn't become brittle using the spread operator
+	// for references. Consider this example:
+	//
+	//  #Def: a: int
+	//	foo: 1 | #Def
+	//	bar: foo...
+	//
+	// Not allowing ... on any expression would mean #foo... may or may not be
+	// erroneous, depending on the value foo is set to.
+	z: 1...
+}
 -- out/evalalpha --
 Errors:
 combinenew.e0.err.b: field not allowed:
@@ -262,6 +287,26 @@ useOld2.t2.err.c: field not allowed:
 Result:
 (_|_){
   // [eval]
+  issue4150: (struct){
+    #Def: (#struct){
+      a: (int){ int }
+    }
+    x: (#struct){
+      a: (int){ 42 }
+      b: (int){ 42 }
+    }
+    foo: (struct){
+      a: (int){ int }
+    }
+    bar: (struct){
+      b: (int){ int }
+    }
+    y: (struct){
+      a: (int){ int }
+      b: (int){ int }
+    }
+    z: (int){ 1 }
+  }
   NewClosed1: (#struct){
     a: (int){ 1 }
   }
@@ -1052,6 +1097,26 @@ Result:
   }
 }
 -- out/compile --
+--- issues.cue
+{
+  issue4150: {
+    #Def: {
+      a: int
+    }
+    x: (〈0;#Def〉... & {
+      a: 42
+      b: 42
+    })
+    foo: {
+      a: int
+    }
+    bar: {
+      b: int
+    }
+    y: (〈0;foo〉... & 〈0;bar〉...)
+    z: 1...
+  }
+}
 --- new.cue
 {
   NewClosed1: {

@@ -21,6 +21,9 @@ c: (x & y)...
 // Test with function call
 d: fn()...
 
+// As an expression
+e: #Base... & {y: int}
+
 foo: {}
 
 x:  _
@@ -37,6 +40,9 @@ fn: _
   b: 〈0;foo〉.bar...
   c: (〈0;x〉 & 〈0;y〉)...
   d: 〈0;fn〉()...
+  e: (〈0;#Base〉... & {
+    y: int
+  })
   foo: {}
   x: _
   y: _
@@ -62,6 +68,10 @@ Result:
   d: (_|_){
     // [eval] d: cannot call non-function fn (type _):
     //     ./with_experiment.cue:17:4
+  }
+  e: (#struct){
+    y: (int){ int }
+    x: (int){ int }
   }
   foo: (struct){
   }

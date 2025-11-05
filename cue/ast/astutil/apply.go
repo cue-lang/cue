@@ -196,7 +196,20 @@ func (c *cursor) Delete()                 { panic("unsupported") }
 // Children are traversed in the order in which they appear in the
 // respective node's struct definition.
 func Apply(node ast.Node, before, after func(Cursor) bool) ast.Node {
-	apply(&applier{before: before, after: after}, nil, &node)
+	a := &applier{before: before, after: after}
+	apply(a, nil, &node)
+
+	// Fix certain references.
+	if a.fieldValueMap != nil {
+		ast.Walk(node, func(n ast.Node) bool {
+			if x, ok := n.(*ast.Ident); ok {
+				if v, ok := a.fieldValueMap[x.Node]; ok {
+					x.Node = v
+				}
+			}
+			return true
+		}, nil)
+	}
 	return node
 }
 
@@ -206,6 +219,7 @@ func Apply(node ast.Node, before, after func(Cursor) bool) ast.Node {
 type applyVisitor interface {
 	Before(Cursor) applyVisitor
 	After(Cursor) bool
+	Maping(before, after ast.Node)
 }
 
 // Helper functions for common node lists. They may be empty.
@@ -334,6 +348,8 @@ func applyCursor(v applyVisitor, c Cursor) {
 	// parsing and printing?
 	applyList(v, c, ast.Comments(node))
 
+	var beforeValue ast.Node // Used for Field
+
 	// apply children
 	// (the order of the cases matches the order
 	// of the corresponding node types in go)
@@ -349,6 +365,7 @@ func applyCursor(v applyVisitor, c Cursor) {
 		// nothing to do
 
 	case *ast.Field:
+		beforeValue = n.Value
 		apply(v, c, &n.Label)
 		if n.Alias != nil {
 			apply(v, c, &n.Alias)
@@ -468,6 +485,9 @@ func applyCursor(v applyVisitor, c Cursor) {
 	}
 
 	v.After(c)
+	if f, ok := node.(*ast.Field); ok && beforeValue != f.Value {
+		v.Maping(beforeValue, f.Value)
+	}
 }
 
 type applier struct {
@@ -476,6 +496,15 @@ type applier struct {
 
 	commentStack []commentFrame
 	current      commentFrame
+
+	fieldValueMap map[ast.Node]ast.Node
+}
+
+func (f *applier) Maping(before, after ast.Node) {
+	if f.fieldValueMap == nil {
+		f.fieldValueMap = make(map[ast.Node]ast.Node)
+	}
+	f.fieldValueMap[before] = after
 }
 
 type commentFrame struct {

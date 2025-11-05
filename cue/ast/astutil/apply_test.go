@@ -325,9 +325,7 @@ b: a
 `,
 		out: `
 a: "bar"
-b: a_9
-
-let a_9 = a
+b: a
 `,
 		after: func(c astutil.Cursor) bool {
 			switch x := c.Node().(type) {

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e112e47d_87d896c2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-05T14:31:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eddd956d_b4aaeaf5",
+      "revId": "6625d0c2d85c839f8cd016a4d61da08300013cd2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "74973eed_56582d8b",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac95094c_dc5062aa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-05T14:31:50Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "74973eed_56582d8b",
+      "revId": "6625d0c2d85c839f8cd016a4d61da08300013cd2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "718d13cc_bba5442e",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-11-05T12:57:52Z",
       "side": 1,
       "message": "some test cases are missing here. In the issue I also had an embedded inline struct, which is currently broken too:\n\n\n```\nfoo: {\n    {bar: \"baz\"}\n}\n\n```\n\n\nAnd the same happens for basic literals - embedded strings, integers, etc.\n\n\nSo I suspect the fix itself is also incomplete.",
+      "revId": "6625d0c2d85c839f8cd016a4d61da08300013cd2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6de4bdd_75f21e41",
+        "filename": "tools/fix/testdata/explicitopen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-05T14:31:50Z",
+      "side": 1,
+      "message": "As per commit message, this is a separate issue that I\u0027m handling in 4150.\n\nThat said, it is probably safe to omit ... on a literal struct, so I excluded adding it.",
+      "parentUuid": "718d13cc_bba5442e",
       "revId": "6625d0c2d85c839f8cd016a4d61da08300013cd2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

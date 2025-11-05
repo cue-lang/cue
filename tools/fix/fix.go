@@ -280,6 +280,39 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 				if x.Op != token.AND {
 					return true
 				}
+			case *ast.Ident:
+				if x.Name == "_" {
+					return true
+				}
+			case *ast.CallExpr:
+				if fun, ok := x.Fun.(*ast.SelectorExpr); ok {
+					id, ok := fun.X.(*ast.Ident)
+					if !ok {
+						break
+					}
+					sel, ok := fun.Sel.(*ast.Ident)
+					if !ok {
+						break
+					}
+					i, ok := id.Node.(*ast.ImportSpec)
+					if !ok {
+						break
+					}
+					switch i.Path.Value {
+					case `"list"`:
+						switch sel.Name {
+						case "Avg", "Sum", "Max", "Min", "Product",
+							"MaxItems", "MinItems",
+							"Contains", "UniqueItems",
+							"Range",
+							"SortStrings",
+							"IsSorted", "IsSortedStrings":
+							return true
+						}
+					default:
+						return true
+					}
+				}
 			case *ast.ListLit, // Lists cannot be opened anyway (atm).
 				*ast.StructLit, // Structs are open by default
 				*ast.BasicLit,

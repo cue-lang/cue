@@ -161,22 +161,23 @@ var closeAllBuiltin = &adt.Builtin{
 		c := call.OpContext()
 
 		x := call.Expr(0)
-		switch x.(type) {
-		case *adt.StructLit, *adt.ListLit:
-			if src := x.Source(); src == nil || !src.Pos().Experiment().ExplicitOpen {
-				// Allow usage if explicit open is set
-				return c.NewErrf("__closeAll may only be used when explicitopen is enabled")
-			}
-		default:
-			return c.NewErrf("argument must be a struct or list literal")
+		if src := x.Source(); src == nil || !src.Pos().Experiment().ExplicitOpen {
+			// Allow usage if explicit open is set
+			return c.NewErrf("__closeAll may only be used when explicitopen is enabled")
 		}
+		// switch x.(type) {
+		// case *adt.StructLit, *adt.ListLit:
+
+		// }
 
 		// must be literal struct
 		args := call.Args()
 
 		s, ok := args[0].(*adt.Vertex)
 		if !ok {
-			return c.NewErrf("struct argument must be concrete")
+			// No-op if not a struct.
+			// TODO: do disjunctions and conjunctions need special handling?
+			return args[0]
 		}
 
 		s.ClosedRecursive = true

@@ -1024,8 +1024,7 @@ func supportedType(stack []types.Type, t types.Type) (ok bool) {
 		if t.NumFields() == 0 {
 			return true
 		}
-		for i := 0; i < t.NumFields(); i++ {
-			f := t.Field(i)
+		for f := range t.Fields() {
 			if f.Exported() && supportedType(stack, f.Type()) {
 				return true
 			}
@@ -1305,8 +1304,8 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 		// 	int | string
 		//
 		var exprs []cueast.Expr
-		for i := 0; i < typ.NumEmbeddeds(); i++ {
-			exprs = append(exprs, e.makeType(typ.EmbeddedType(i)))
+		for etyp := range typ.EmbeddedTypes() {
+			exprs = append(exprs, e.makeType(etyp))
 		}
 		return cueast.NewBinExpr(cuetoken.OR, exprs...)
 

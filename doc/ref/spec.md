@@ -2803,6 +2803,77 @@ with `quo(x, y)` truncated towards zero.
 A zero divisor in either case results in bottom (an error).
 
 
+## Builtin Validators
+
+A validator validates the value at the position where it is defined.
+A successful validation yields the original value;
+a failed validation yields an error.
+
+Bounds (`<10`) are a type of validator.
+
+Functions that return a boolean value can be used as validators by omitting
+their first argument.
+
+The remainder of this section defines builtin validators. These can only be
+used as validators, so we will not refer to their function equivalents.
+
+### `matchN`
+
+The `matchN` builtin is a validator that checks if a specified number of schemas
+from a given list unify successfully with the value being validated.
+
+`matchN` takes two arguments:
+- a numeric constraint specifying how many schemas must match,
+- a list of schemas to test against the value.
+
+The validator evaluates each schema in the list by unifying it with the value.
+It counts how many schemas unify successfully (without producing an error).
+The validator succeeds if the count satisfies the numeric constraint provided
+as the first argument.
+
+```
+// Exactly 2 schemas must match
+value: "foo" & matchN(2, [string, !="bar", <4])  // true: string and !="bar" match
+
+// At least 1 schema must match
+value: 5 & matchN(>=1, [int, >10])  // true: int matches
+
+// Exactly 0 schemas must match (none should match)
+value: "test" & matchN(0, [int, >100])  // true: neither matches
+```
+
+If the numeric constraint cannot be satisfied even with incomplete information,
+the error is marked as incomplete and will be reevaluated as more information
+becomes available.
+
+
+### `matchIf`
+
+The `matchIf` builtin is a conditional validator that applies different schema
+constraints based on whether an initial condition is satisfied.
+
+`matchIf` takes three arguments:
+- a condition schema (the "if" clause),
+- the schema to apply if the condition matches (the "then" clause),
+- the schema to apply if the condition does not match (the "else" clause).
+
+The validator first attempts to unify the value with the condition schema.
+If the condition unifies successfully, the "then" schema is applied;
+otherwise, the "else" schema is applied.
+The validator succeeds if the chosen schema unifies successfully with the value.
+
+```
+// If value is a string, it must have length > 3; otherwise it must be > 10
+value: "hello" & matchIf(string, len(value) > 3, value > 10)  // true
+
+// If value matches {a: int}, it must have b field; otherwise a must be a string
+x: {a: 1} & matchIf(x, {a: int}, {a: int, b: int}, {a: string})  // false: missing b
+
+// If value is >5, it must be <10; otherwise it must be <3
+y: 2 & matchIf(y, >5, <10, <3)  // true: 2 is <=5, so <3 is checked
+```
+
+
 ## Cycles
 
 Implementations are required to interpret or reject cycles encountered

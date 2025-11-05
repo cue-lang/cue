@@ -57,10 +57,6 @@ func (c *Controller) runLoop() {
 
 		// Mark tasks as Ready.
 		for _, t := range c.tasks {
-			// Avoid clobbering t: since we are running a goroutine below that
-			// refers to this t, we need to ensure t is captured before the next
-			// loop starts.
-			t := t
 			switch t.state {
 			case Waiting:
 				waiting = true

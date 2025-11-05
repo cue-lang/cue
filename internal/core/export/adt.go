@@ -51,16 +51,20 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 		return ast.NewList(a...)
 
 	case *adt.StructLit:
-		// TODO: should we use pushFrame here?
-		// _, saved := e.pushFrame([]adt.Conjunct{adt.MakeConjunct(nil, x)})
-		// defer e.popFrame(saved)
-		// s := e.frame(0).scope
+		outerEnv := env
+		vertex := e.node()
+		if outerEnv != nil && outerEnv.Vertex != nil {
+			vertex = outerEnv.Vertex
+		}
 
-		s := &ast.StructLit{}
+		s, saved := e.pushFrame(vertex, []adt.Conjunct{adt.MakeRootConjunct(outerEnv, x)})
+		defer e.popFrame(saved)
+		defer filterUnusedLets(s)
+
 		// TODO: ensure e.node() is set in more cases. Right now it is not
 		// always set in mergeValues, even in cases where it could be. Better
 		// to be conservative for now, though.
-		env := &adt.Environment{Up: env, Vertex: e.node()}
+		env := &adt.Environment{Up: outerEnv, Vertex: vertex}
 
 		for _, d := range x.Decls {
 			var a *ast.Alias
@@ -229,6 +233,12 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 		return &ast.UnaryExpr{
 			Op: x.Op.Token(),
 			X:  e.innerExpr(env, x.X),
+		}
+
+	case *adt.OpenExpr:
+		return &ast.PostfixExpr{
+			X:  e.innerExpr(env, x.X),
+			Op: token.ELLIPSIS,
 		}
 
 	case *adt.BinaryExpr:

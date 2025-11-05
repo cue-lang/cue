@@ -1,0 +1,79 @@
+-- in.cue --
+@experiment(explicitopen)
+spread: {
+	a: 1
+	b: a...
+	c: {a...}
+	d: close({})...
+}
+-- out/doc-v3 --
+[]
+[spread]
+[spread a]
+[spread b]
+[spread c]
+[spread d]
+-- out/value-v3 --
+== Simplified
+{
+	spread: {
+		a: 1
+		b: 1
+		c: 1
+		d: {}
+	}
+}
+== Raw
+{
+	spread: {
+		a: 1
+		b: 1
+		c: 1
+		d: {}
+	}
+}
+== Final
+{
+	spread: {
+		a: 1
+		b: 1
+		c: 1
+		d: {}
+	}
+}
+== All
+{
+	@experiment(explicitopen)
+	spread: {
+		a: 1
+		b: 1
+		c: 1
+		d: {}
+	}
+}
+== Eval
+{
+	@experiment(explicitopen)
+	spread: {
+		a: 1
+		b: 1
+		c: 1
+		d: {}
+	}
+}
+-- out/definition-v3 --
+@experiment(explicitopen)
+spread: {
+	a: 1
+	b: a...
+	c: a...
+	d: close({})...
+}
+-- out/definition-v3-noshare --
+@experiment(explicitopen)
+spread: {
+	a: 1
+	b: a...
+	c: a...
+	d: close({})...
+}

@@ -301,6 +301,9 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 	case *adt.UnaryExpr:
 		c.markExpr(env, x.X)
 
+	case *adt.OpenExpr:
+		c.markExpr(env, x.X)
+
 	case *adt.Interpolation:
 		for i := 1; i < len(x.Parts); i += 2 {
 			c.markExpr(env, x.Parts[i])

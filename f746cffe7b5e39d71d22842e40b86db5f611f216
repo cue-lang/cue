@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "104a1fbe_ce379c11",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-05T15:05:37Z",
+      "side": 1,
+      "message": "How does Go do alignment nowadays? putting this near hasDisjunctions, or moving it to nodeContextState (see comment later as well, may prevent 7 bytes from being added).",
+      "revId": "f746cffe7b5e39d71d22842e40b86db5f611f216",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea86f7bb_00e530dc",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-05T15:05:37Z",
+      "side": 1,
+      "message": "Do we similarly need to update cloneNodeContext in overlay.go? Not sure, but seems like we might, or that that that may prevent recomputation.\n\nYou would have to set computedFlatReplaceIDs then as well, or include that value in nodeContextState.",
+      "revId": "f746cffe7b5e39d71d22842e40b86db5f611f216",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

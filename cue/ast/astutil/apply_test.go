@@ -268,6 +268,8 @@ a: list6c6973
 			return true
 		},
 	}, {
+		// TODO: replacement reference to Package list could use list directly,
+		// without creating an alias.
 		name: "imports add to",
 		in: `package foo
 
@@ -277,10 +279,7 @@ a: 3
 				`,
 		out: `package foo
 
-import (
-	"math"
-	list6c6973 "list"
-)
+import list6c6973 "list"
 
 a: list6c6973
 			`,
@@ -294,6 +293,8 @@ a: list6c6973
 			return true
 		},
 	}, {
+		// TODO: replacement reference to Package list could use list directly,
+		// without creating an alias.
 		name: "imports duplicate",
 		in: `package foo
 
@@ -303,10 +304,7 @@ a: 3
 				`,
 		out: `package foo
 
-import (
-	"list"
-	list6c6973 "list"
-)
+import list6c6973 "list"
 
 a: list6c6973
 					`,
@@ -315,6 +313,27 @@ a: list6c6973
 			case *ast.BasicLit:
 				if x.Kind == token.INT {
 					c.Replace(c.Import("list"))
+				}
+			}
+			return true
+		},
+	}, {
+		name: "patch identifiers",
+		in: `
+a: "foo"
+b: a
+`,
+		out: `
+a: "bar"
+b: a_9
+
+let a_9 = a
+`,
+		after: func(c astutil.Cursor) bool {
+			switch x := c.Node().(type) {
+			case *ast.Field:
+				if _, ok := x.Value.(*ast.BasicLit); ok {
+					x.Value = ast.NewString("bar")
 				}
 			}
 			return true
@@ -328,6 +347,10 @@ a: list6c6973
 			}
 
 			n := astutil.Apply(f, tc.before, tc.after)
+			// We call Sanitize to ensure that references are patched correctly.
+			// The references are otherwise not visualized in the test output.
+			err = astutil.Sanitize(n.(*ast.File))
+			qt.Assert(t, qt.IsNil(err))
 
 			b, err := format.Node(n)
 			qt.Assert(t, qt.IsNil(err))

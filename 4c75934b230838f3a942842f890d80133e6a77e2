@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8027ea5b_480aaa36",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-05T14:46:09Z",
+      "side": 1,
+      "message": "No. This only handles cases where the type of alias stays the same. The fixAliasV2Pass changes the type of alias, which requires a different kind of rewriting.",
+      "parentUuid": "3278664c_9c64122a",
+      "revId": "4c75934b230838f3a942842f890d80133e6a77e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3127f376_0c2dd975",
         "filename": "cue/ast/astutil/apply.go",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2025-11-05T13:03:18Z",
       "side": 1,
       "message": "document this new method? note how the godoc on the interface already documents Before and After.\n\n\nalso, did you mean to name it \"Mapping\"?",
+      "revId": "4c75934b230838f3a942842f890d80133e6a77e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ecdcab3_cef6ae82",
+        "filename": "cue/ast/astutil/apply.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-05T14:46:09Z",
+      "side": 1,
+      "message": "Yes. Mapping indeed.",
+      "parentUuid": "3127f376_0c2dd975",
       "revId": "4c75934b230838f3a942842f890d80133e6a77e2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

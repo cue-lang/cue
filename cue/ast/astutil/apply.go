@@ -196,16 +196,34 @@ func (c *cursor) Delete()                 { panic("unsupported") }
 // Children are traversed in the order in which they appear in the
 // respective node's struct definition.
 func Apply(node ast.Node, before, after func(Cursor) bool) ast.Node {
-	apply(&applier{before: before, after: after}, nil, &node)
+	a := &applier{before: before, after: after}
+	apply(a, nil, &node)
+
+	// Fix certain references.
+	if a.fieldValueMap != nil {
+		ast.Walk(node, func(n ast.Node) bool {
+			if x, ok := n.(*ast.Ident); ok {
+				if v, ok := a.fieldValueMap[x.Node]; ok {
+					x.Node = v
+				}
+			}
+			return true
+		}, nil)
+	}
 	return node
 }
 
-// A applyVisitor's before method is invoked for each node encountered by Walk.
+// A applyVisitor's Before method is invoked for each node encountered by Walk.
 // If the result applyVisitor w is true, Walk visits each of the children
 // of node with the applyVisitor w, followed by a call of w.After.
+// The Mapping method is used to record changes to values that affect
+// Ident.Node and Ident.Scope fields.
+// TODO: currently, Mapping is only used to record Field.Value changes. Track
+// more changes in the future.
 type applyVisitor interface {
 	Before(Cursor) applyVisitor
 	After(Cursor) bool
+	Mapping(before, after ast.Node)
 }
 
 // Helper functions for common node lists. They may be empty.
@@ -334,6 +352,8 @@ func applyCursor(v applyVisitor, c Cursor) {
 	// parsing and printing?
 	applyList(v, c, ast.Comments(node))
 
+	var beforeValue ast.Node // Used for Field
+
 	// apply children
 	// (the order of the cases matches the order
 	// of the corresponding node types in go)
@@ -349,6 +369,7 @@ func applyCursor(v applyVisitor, c Cursor) {
 		// nothing to do
 
 	case *ast.Field:
+		beforeValue = n.Value
 		apply(v, c, &n.Label)
 		if n.Alias != nil {
 			apply(v, c, &n.Alias)
@@ -468,6 +489,9 @@ func applyCursor(v applyVisitor, c Cursor) {
 	}
 
 	v.After(c)
+	if f, ok := node.(*ast.Field); ok && beforeValue != f.Value {
+		v.Mapping(beforeValue, f.Value)
+	}
 }
 
 type applier struct {
@@ -476,6 +500,15 @@ type applier struct {
 
 	commentStack []commentFrame
 	current      commentFrame
+
+	fieldValueMap map[ast.Node]ast.Node
+}
+
+func (f *applier) Mapping(before, after ast.Node) {
+	if f.fieldValueMap == nil {
+		f.fieldValueMap = make(map[ast.Node]ast.Node)
+	}
+	f.fieldValueMap[before] = after
 }
 
 type commentFrame struct {

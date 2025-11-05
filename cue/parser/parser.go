@@ -1512,6 +1512,7 @@ func (p *parser) checkExpr(x ast.Expr) ast.Expr {
 	case *ast.CallExpr:
 	case *ast.UnaryExpr:
 	case *ast.BinaryExpr:
+	case *ast.PostfixExpr:
 	default:
 		// all other nodes are not proper expressions
 		p.errorExpected(x.Pos(), "expression")

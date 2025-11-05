@@ -190,6 +190,16 @@ combinenew: {
 	f17: err: NewOpen1 & NewClosed1
 	f18: ok: NewClosed1 & NewClosed1
 }
+-- issues.cue --
+@experiment(explicitopen)
+issue4150: {
+	#Def: a: int
+
+	x: #Def... & {
+			a: 42
+			b: 42
+	}
+}
 -- out/evalalpha --
 Errors:
 combinenew.e0.err.b: field not allowed:
@@ -262,6 +272,15 @@ useOld2.t2.err.c: field not allowed:
 Result:
 (_|_){
   // [eval]
+  issue4150: (struct){
+    #Def: (#struct){
+      a: (int){ int }
+    }
+    x: (#struct){
+      a: (int){ 42 }
+      b: (int){ 42 }
+    }
+  }
   NewClosed1: (#struct){
     a: (int){ 1 }
   }
@@ -1052,6 +1071,18 @@ Result:
   }
 }
 -- out/compile --
+--- issues.cue
+{
+  issue4150: {
+    #Def: {
+      a: int
+    }
+    x: (〈0;#Def〉... & {
+      a: 42
+      b: 42
+    })
+  }
+}
 --- new.cue
 {
   NewClosed1: {

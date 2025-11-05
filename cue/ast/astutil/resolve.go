@@ -57,7 +57,7 @@ type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 // Value
 //   X in a: X=y          Field          Alias
 // Fields
-//   X in X: y            File/Struct    Expr (y)
+//   y in X: y            File/Struct    Expr (y)
 //   X in X=x: y          File/Struct    Field
 //   X in X=(x): y        File/Struct    Field
 //   X in X="\(x)": y     File/Struct    Field

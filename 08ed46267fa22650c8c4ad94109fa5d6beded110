@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af1c1279_8951bbc4",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2808,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-05T14:55:27Z",
+      "side": 1,
+      "message": "This sentence is breaking my brain a bit. For e.g. matchN, I\u0027d imagine:\n\n\n\u003e A validator is a function that validates the value\n\n\nBut assuming you want to keep saying \"value\", I\u0027d suggest rewording so that one can read it aloud without it sounding silly.",
+      "range": {
+        "startLine": 2808,
+        "startChar": 0,
+        "endLine": 2808,
+        "endChar": 47
+      },
+      "revId": "08ed46267fa22650c8c4ad94109fa5d6beded110",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a641f444_7767005e",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2818,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-05T14:55:27Z",
+      "side": 1,
+      "message": "unfinished sentence?",
+      "revId": "08ed46267fa22650c8c4ad94109fa5d6beded110",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "944a15a5_de22e7f6",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2827,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-05T14:55:27Z",
+      "side": 1,
+      "message": "I\u0027d drop \"the first argument is\" and \"the second argument is\", I think that\u0027s implicitly understood",
+      "revId": "08ed46267fa22650c8c4ad94109fa5d6beded110",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a54bd92e_3ef733e0",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2858,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-05T14:55:27Z",
+      "side": 1,
+      "message": "ditto, I\u0027d drop the numbering of the arguments",
+      "revId": "08ed46267fa22650c8c4ad94109fa5d6beded110",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

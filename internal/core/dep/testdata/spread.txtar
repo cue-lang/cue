@@ -1,0 +1,24 @@
+
+-- in.cue --
+@experiment(explicitopen)
+remove: {
+	a: b: c
+	c: d: 3
+}
+a: {
+	dep: [for v in remove {v...}]
+}
+-- out/dependencies-v3/field --
+line  reference    path of resulting vertex
+-- out/dependencies-v3/stats/field --
+// COUNT: 0
+-- out/dependencies-v3/all --
+line  reference    path of resulting vertex
+7:    remove    => remove
+-- out/dependencies-v3/stats/all --
+// COUNT: 1
+-- out/dependencies-v3/dynamic --
+line  reference    path of resulting vertex
+7:    remove    => remove
+-- out/dependencies-v3/stats/dynamic --
+// COUNT: 2

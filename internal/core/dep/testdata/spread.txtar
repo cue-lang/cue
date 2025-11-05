@@ -16,9 +16,11 @@ line  reference    path of resulting vertex
 line  reference    path of resulting vertex
 7:    remove    => remove
 -- out/dependencies-v3/stats/all --
-// COUNT: 1
+// COUNT: 2
 -- out/dependencies-v3/dynamic --
 line  reference    path of resulting vertex
 7:    remove    => remove
+7:    v         => remove.a
+7:    v         => remove.c
 -- out/dependencies-v3/stats/dynamic --
-// COUNT: 2
+// COUNT: 6

@@ -121,7 +121,6 @@ func TextEditsToDocumentChanges(uri DocumentURI, version int32, edits []TextEdit
 func TextDocumentEditsToDocumentChanges(edits []TextDocumentEdit) []DocumentChanges {
 	changes := []DocumentChanges{} // non-nil
 	for _, edit := range edits {
-		edit := edit
 		changes = append(changes, DocumentChanges{TextDocumentEdit: &edit})
 	}
 	return changes

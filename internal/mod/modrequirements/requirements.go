@@ -315,7 +315,6 @@ func (rs *Requirements) readModGraph(ctx context.Context) (*ModuleGraph, error) 
 	}
 
 	for _, m := range rs.rootModules {
-		m := m
 		if !m.IsValid() {
 			panic("root module version is invalid")
 		}

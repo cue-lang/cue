@@ -55,7 +55,6 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 		// _, saved := e.pushFrame([]adt.Conjunct{adt.MakeConjunct(nil, x)})
 		// defer e.popFrame(saved)
 		// s := e.frame(0).scope
-
 		s := &ast.StructLit{}
 		// TODO: ensure e.node() is set in more cases. Right now it is not
 		// always set in mergeValues, even in cases where it could be. Better
@@ -229,6 +228,12 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 		return &ast.UnaryExpr{
 			Op: x.Op.Token(),
 			X:  e.innerExpr(env, x.X),
+		}
+
+	case *adt.OpenExpr:
+		return &ast.PostfixExpr{
+			X:  e.innerExpr(env, x.X),
+			Op: token.ELLIPSIS,
 		}
 
 	case *adt.BinaryExpr:

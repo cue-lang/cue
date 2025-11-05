@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "51f80650_0a120a8d",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2808,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-05T17:43:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af1c1279_8951bbc4",
+      "range": {
+        "startLine": 2808,
+        "startChar": 0,
+        "endLine": 2808,
+        "endChar": 47
+      },
+      "revId": "08ed46267fa22650c8c4ad94109fa5d6beded110",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a641f444_7767005e",
@@ -37,6 +61,24 @@
       "writtenOn": "2025-11-05T14:55:27Z",
       "side": 1,
       "message": "unfinished sentence?",
+      "revId": "08ed46267fa22650c8c4ad94109fa5d6beded110",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bfe3ff0_05dcc535",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2818,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-05T17:43:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a641f444_7767005e",
       "revId": "08ed46267fa22650c8c4ad94109fa5d6beded110",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "098d5121_4810120f",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2827,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-05T17:43:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "944a15a5_de22e7f6",
+      "revId": "08ed46267fa22650c8c4ad94109fa5d6beded110",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a54bd92e_3ef733e0",
@@ -71,6 +131,24 @@
       "writtenOn": "2025-11-05T14:55:27Z",
       "side": 1,
       "message": "ditto, I\u0027d drop the numbering of the arguments",
+      "revId": "08ed46267fa22650c8c4ad94109fa5d6beded110",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e34f1c4_c5e2431a",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2858,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-05T17:43:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a54bd92e_3ef733e0",
       "revId": "08ed46267fa22650c8c4ad94109fa5d6beded110",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

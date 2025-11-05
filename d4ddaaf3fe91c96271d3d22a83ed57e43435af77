@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8990bba4_917e6c30",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-05T15:07:19Z",
+      "side": 1,
+      "message": "How does this impact the rest of Unity?",
+      "revId": "d4ddaaf3fe91c96271d3d22a83ed57e43435af77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

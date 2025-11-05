@@ -16,6 +16,24 @@
       "message": "How does this impact the rest of Unity?",
       "revId": "d4ddaaf3fe91c96271d3d22a83ed57e43435af77",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ecf84cf_a6e5166d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-05T17:05:03Z",
+      "side": 1,
+      "message": "Similarly minimal, all between 0% (noise) and 0.2%. If this memory usage ever becomes an issue, we could always use a different metric to decide whether we cache or not, but for now, a 0-1% memory increase for a CPU savings of up to 14% seems well worth it.",
+      "parentUuid": "8990bba4_917e6c30",
+      "revId": "d4ddaaf3fe91c96271d3d22a83ed57e43435af77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

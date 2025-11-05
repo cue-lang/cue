@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
@@ -40,11 +41,12 @@ func (s *server) AddFolders(ctx context.Context, folders map[protocol.WorkspaceF
 	}
 
 	if len(folderErrs) > 0 {
-		errMsg := "Error loading workspace folders:\n"
+		var errMsg strings.Builder
+		errMsg.WriteString("Error loading workspace folders:\n")
 		for uri, err := range folderErrs {
-			errMsg += fmt.Sprintf("failed to load view for %s: %v\n", uri, err)
+			errMsg.WriteString(fmt.Sprintf("failed to load view for %s: %v\n", uri, err))
 		}
-		return errors.New(errMsg)
+		return errors.New(errMsg.String())
 	}
 
 	// Register for file watching notifications, if they are supported.

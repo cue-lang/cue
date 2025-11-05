@@ -14,6 +14,9 @@ package foo
 X: {
 	#A
 }
+Y: {
+	[1, 2] // Do not add ellipsis to lists, as it is unnecessary.
+}
 -- b.cue --
 // Already tagged, so do not do any changes.
 @experiment(explicitopen)
@@ -41,6 +44,9 @@ package foo
 X: __closeAll({
 	#A...
 })
+Y: {
+	[1, 2] // Do not add ellipsis to lists, as it is unnecessary.
+}
 --- b.cue
 // Already tagged, so do not do any changes.
 @experiment(explicitopen)

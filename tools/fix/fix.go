@@ -272,8 +272,23 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 		switch n := n.(type) {
 		case *ast.EmbedDecl:
 			// Check if the embedded expression needs to be "opened" with ellipsis
-			if _, ok := n.Expr.(*ast.PostfixExpr); ok {
-				break
+			switch x := n.Expr.(type) {
+			case *ast.PostfixExpr:
+				// Already has ellipsis
+				return true
+			case *ast.BinaryExpr:
+				if x.Op != token.AND {
+					return true
+				}
+			case *ast.ListLit, // Lists cannot be opened anyway (atm).
+				*ast.StructLit, // Structs are open by default
+				*ast.BasicLit,
+				*ast.Interpolation,
+				*ast.UnaryExpr:
+
+				return true
+			default:
+				// Needs ellipsis
 			}
 
 			// Transform the embedding to use postfix ellipsis

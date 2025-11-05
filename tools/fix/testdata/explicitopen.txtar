@@ -14,6 +14,16 @@ package foo
 X: {
 	#A
 }
+str: "bar"
+Y: {
+	// Do not add ellipsis where unnecessary.
+	[1, 2]
+	1,
+	"foo",
+	"foo\(str)"
+	<=10,
+	{b: int}
+}
 -- b.cue --
 // Already tagged, so do not do any changes.
 @experiment(explicitopen)
@@ -41,6 +51,16 @@ package foo
 X: __closeAll({
 	#A...
 })
+str: "bar"
+Y: {
+	// Do not add ellipsis where unnecessary.
+	[1, 2]
+	1
+	"foo"
+	"foo\(str)"
+	<=10
+	{b: int}
+}
 --- b.cue
 // Already tagged, so do not do any changes.
 @experiment(explicitopen)

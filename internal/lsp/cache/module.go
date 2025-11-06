@@ -344,7 +344,17 @@ func (m *Module) loadAllPackages() {
 	rootPath := m.rootURI.Path()
 	fsys := m.workspace.overlayFS.IoFS(rootPath)
 	fs.WalkDir(fsys, ".", func(p string, d fs.DirEntry, err error) error {
-		if err == nil && d.Type().IsRegular() && strings.HasSuffix(p, ".cue") {
+		if err != nil {
+			return err
+		}
+		// Do not enter nested modules.
+		if d.Type().IsDir() {
+			info, err := fs.Stat(fsys, p+"/cue.mod/module.cue")
+			if err == nil && !info.IsDir() {
+				return fs.SkipDir
+			}
+		}
+		if d.Type().IsRegular() && strings.HasSuffix(p, ".cue") {
 			p = filepath.Join(rootPath, filepath.FromSlash(p))
 			uri := protocol.URIFromPath(p)
 			if _, found := files[uri]; !found {

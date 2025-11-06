@@ -266,19 +266,97 @@ func fixExperiment(fn func(*ast.File) (*ast.File, bool), f *ast.File, exp, versi
 	return result
 }
 
+type closeInfo struct {
+	// Do not close enclosing structs if non-zero. This may be the case
+	// for comprehensions, nested structs, etc.
+	suspendReclose int
+
+	isListElement bool
+
+	// If the current scope embedded a definition, we know for sure the
+	// enclosing struct needs to be closed.
+	embedsDefinition bool
+}
+
+func (c closeInfo) shouldReclose() bool {
+	return c.suspendReclose == 0 && !c.isListElement
+}
+
 func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
+
+	var info closeInfo
+	recloseStack := []closeInfo{}
 	result = astutil.Apply(f, func(c astutil.Cursor) bool {
 		n := c.Node()
 		switch n := n.(type) {
+		case *ast.Field:
+			recloseStack = append(recloseStack, info)
+			info = closeInfo{}
+			if internal.IsDefinition(n.Label) {
+				info.suspendReclose++
+			}
+
+		case *ast.BinaryExpr:
+			if n.Op == token.AND || n.Op == token.OR {
+				recloseStack = append(recloseStack, info)
+				info = closeInfo{}
+			}
+
+		case *ast.ListLit:
+			info.isListElement = true
+
+		case *ast.Comprehension:
+			info.suspendReclose++
+
 		case *ast.EmbedDecl:
+			// Disable closing embedded structs.
+			info.suspendReclose++
+
 			// Check if the embedded expression needs to be "opened" with ellipsis
 			switch x := n.Expr.(type) {
 			case *ast.PostfixExpr:
 				// Already has ellipsis
 				return true
 			case *ast.BinaryExpr:
-				if x.Op != token.AND {
+				// Needs to be handled per term.
+				if x.Op != token.AND && x.Op != token.OR {
 					return true
+				}
+			case *ast.Ident:
+				if x.Name == "_" {
+					return true
+				}
+				if internal.IsDefinition(x) {
+					info.embedsDefinition = true
+				}
+			case *ast.CallExpr:
+				if fun, ok := x.Fun.(*ast.SelectorExpr); ok {
+					id, ok := fun.X.(*ast.Ident)
+					if !ok {
+						break
+					}
+					sel, ok := fun.Sel.(*ast.Ident)
+					if !ok {
+						break
+					}
+					i, ok := id.Node.(*ast.ImportSpec)
+					if !ok {
+						break
+					}
+					switch i.Path.Value {
+					case `"list"`:
+						switch sel.Name {
+						case "Avg", "Sum", "Max", "Min", "Product",
+							"MaxItems", "MinItems",
+							"Contains", "UniqueItems",
+							"Range",
+							"SortStrings",
+							"IsSorted", "IsSortedStrings":
+							return true
+						}
+					default:
+						return true
+					}
 				}
 			case *ast.ListLit, // Lists cannot be opened anyway (atm).
 				*ast.StructLit, // Structs are open by default
@@ -298,6 +376,8 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 				OpPos: n.Expr.End(),
 			}
 
+			// After is not called after a Replace: match nesting count.
+			info.suspendReclose--
 			c.Replace(&ast.EmbedDecl{
 				Expr: postfixExpr,
 			})
@@ -305,10 +385,31 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 		}
 		return true
 	}, func(c astutil.Cursor) bool {
-		if c.Modified() {
-			if n, ok := c.Node().(*ast.Field); ok && !internal.IsDefinition(n.Label) {
-				ast.SetRelPos(n.Value, token.NoSpace)
-				n.Value = ast.NewCall(ast.NewIdent("__reclose"), n.Value)
+		switch n := c.Node().(type) {
+		case *ast.Field:
+			info = recloseStack[len(recloseStack)-1]
+			recloseStack = recloseStack[:len(recloseStack)-1]
+			c.Modified(false)
+
+		case *ast.BinaryExpr:
+			if n.Op == token.AND || n.Op == token.OR {
+				info = recloseStack[len(recloseStack)-1]
+				recloseStack = recloseStack[:len(recloseStack)-1]
+				c.Modified(false)
+			}
+
+		case *ast.Comprehension, *ast.EmbedDecl:
+			info.suspendReclose--
+
+		case *ast.StructLit:
+			if c.Modified(true) && info.shouldReclose() {
+				ast.SetRelPos(n, token.NoSpace)
+				// TODO: we could use embedsDefinition to select whether to
+				// use __reclose or __closeAll. For now, always use __reclose,
+				// as we need to verify some of the edge cases around this.
+				hasChanges = true
+				c.Replace(ast.NewCall(ast.NewIdent("__reclose"), n))
+				c.Modified(false)
 			}
 		}
 		return true

@@ -94,15 +94,15 @@ inList: {
 	]
 }
 inClose: {
-	workflows: close({
+	workflows: close(__reclose({
 		_repo...
-	})
+	}))
 }
-nestedStruct: __reclose({
+nestedStruct: {
 	containsTrybotTrailer: __reclose({
 		{#foo...}
 	})
-})
+}
 --- b.cue
 // Already tagged, so do not do any changes.
 @experiment(explicitopen)

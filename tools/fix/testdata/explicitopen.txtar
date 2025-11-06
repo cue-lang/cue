@@ -24,6 +24,27 @@ Y: {
 	<=10,
 	{b: int}
 }
+
+_repo: {}
+inList: {
+	steps: [
+		for v in _repo.checkoutCode {v},
+		for v in installGo {v},
+		{
+			name: "foo"
+		},
+	]
+}
+inClose: {
+	workflows: close({
+		_repo
+	})
+}
+nestedStruct: {
+	containsTrybotTrailer: {
+		{#foo}
+	}
+}
 -- b.cue --
 // Already tagged, so do not do any changes.
 @experiment(explicitopen)
@@ -61,6 +82,27 @@ Y: {
 	<=10
 	{b: int}
 }
+
+_repo: {}
+inList: {
+	steps: [
+		for v in _repo.checkoutCode {v...},
+		for v in installGo {v...},
+		{
+			name: "foo"
+		},
+	]
+}
+inClose: {
+	workflows: close({
+		_repo...
+	})
+}
+nestedStruct: __reclose({
+	containsTrybotTrailer: __reclose({
+		{#foo...}
+	})
+})
 --- b.cue
 // Already tagged, so do not do any changes.
 @experiment(explicitopen)

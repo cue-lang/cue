@@ -52,7 +52,7 @@ writeWorkflows: {
 		workflows: uniqueWorkflowNames
 	}
 	_dir: path.FromSlash("../../.github/workflows", path.Unix)
-	
+
 	remove: {
 		glob: file.Glob & {
 			glob: path.Join([_dir, "*" + workflowFileExtension], _goos)

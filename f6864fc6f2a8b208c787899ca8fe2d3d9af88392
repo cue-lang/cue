@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67a71638_22f26ed6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-06T11:14:02Z",
+      "side": 1,
+      "message": "I would briefly note that Modified was added in v0.15.0-alpha.1, so we are still allowed to make a breaking change to this public API method given that it hasn\u0027t shipped in a final release yet.",
+      "revId": "f6864fc6f2a8b208c787899ca8fe2d3d9af88392",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d99cf7ba_db38ed74",
+        "filename": "cue/ast/astutil/apply.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-06T11:14:02Z",
+      "side": 1,
+      "message": "I\u0027m not the biggest fan of a boolean parameter here; `Modified(true)` reads like you\u0027re setting \"modified \u003d true\", when it\u0027s more like a read-only getter. I don\u0027t have an alternative suggestion coming to mind, though. Perhaps split this method into two \"sticky\" and \"non-sticky\" variants? Or keep Modified as is, and pair it with a \"clear enclosing modified\" method?",
+      "revId": "f6864fc6f2a8b208c787899ca8fe2d3d9af88392",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c980bd00_92f34640",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-06T11:14:02Z",
+      "side": 1,
+      "message": "document?",
+      "revId": "f6864fc6f2a8b208c787899ca8fe2d3d9af88392",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9982bc7c_f81689de",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-06T11:14:02Z",
+      "side": 1,
+      "message": "can we use a printer/formatter here that takes `x.Fun` and gives us the stringified form, like `\"list.Avg\"` or `\"list.Range\"`? Then we could switch on that directly, saving quite a bit of code. I don\u0027t think performance here is hugely important.",
+      "range": {
+        "startLine": 333,
+        "startChar": 1,
+        "endLine": 359,
+        "endChar": 6
+      },
+      "revId": "f6864fc6f2a8b208c787899ca8fe2d3d9af88392",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05ab829c_eca192b9",
+        "filename": "tools/fix/testdata/explicitopen.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-06T11:14:02Z",
+      "side": 1,
+      "message": "can we avoid adding `__reclose` when already wrapped in `close`? or are these not redundant, given that `close` is not recursive?",
+      "revId": "f6864fc6f2a8b208c787899ca8fe2d3d9af88392",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

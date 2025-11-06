@@ -88,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "873d1a6a_f2f961f0",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-06T12:13:22Z",
+      "side": 1,
+      "message": "removed, as I fixed the bug in Apply that caused this to be necessary.",
+      "parentUuid": "c980bd00_92f34640",
+      "revId": "f6864fc6f2a8b208c787899ca8fe2d3d9af88392",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9982bc7c_f81689de",

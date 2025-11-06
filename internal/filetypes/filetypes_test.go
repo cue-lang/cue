@@ -375,6 +375,12 @@ func TestParseFile(t *testing.T) {
 		in:  "file.bar",
 		out: `unknown file extension .bar`,
 	}, {
+		in:  `D:\foo.json`,
+		out: `unknown filetype D`,
+	}, {
+		in:  `json:D:\foo.json`,
+		out: `unknown filetype json:D`,
+	}, {
 		in:   "-",
 		mode: Input,
 		out: &build.File{
@@ -486,6 +492,14 @@ func TestParseArgs(t *testing.T) {
 			{Filename: `c:\path\to\file.dat`, Encoding: build.JSON},
 		},
 	}, {
+		in: `D:\foo.json`,
+		out: []*build.File{
+			{Filename: `D:\foo.json`, Encoding: build.JSON, Interpretation: build.Auto},
+		},
+	}, {
+		in:  `json:D:\foo.json`,
+		out: `unsupported file name "json:D:\\foo.json": may not have ':'`,
+	}, {
 		in:  "json: json+schema: bar.schema",
 		out: `scoped qualifier "json:" without file`,
 	}, {
@@ -494,6 +508,9 @@ func TestParseArgs(t *testing.T) {
 	}, {
 		in:  "json:foo:bar.yaml",
 		out: `unsupported file name "json:foo:bar.yaml": may not have ':'`,
+	}, {
+		in:  "data:foo.cue",
+		out: `cannot combine scope with file`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.in, func(t *testing.T) {

@@ -608,6 +608,8 @@ func (w *Workspace) FindModuleForFile(file protocol.DocumentURI) (*Module, error
 		fh, err := w.overlayFS.ReadFile(fileDir + "/cue.mod/module.cue")
 		if errors.Is(err, fs.ErrNotExist) {
 			continue
+		} else if _, ok := err.(*fs.PathError); ok {
+			continue
 		} else if err != nil {
 			return nil, err
 		}
@@ -792,6 +794,21 @@ func (w *Workspace) reloadPackages() {
 		for _, pkg := range m.packages {
 			if pkg.isDirty {
 				pkg.delete()
+				key := importPathModRootPair{
+					importPath: pkg.importPath,
+					modRootURI: m.rootURI,
+				}
+				if _, found := processedPkgs[key]; !found {
+					// We have a pkg that is dirty, but when we tried to
+					// load it, we got nothing back at all. This possibly
+					// means this pkg doesn't exist within this module. It
+					// could be a race with the file system, or it could be
+					// a bug in the LSP.
+					w.debugLogf("Warning: attempt to load package %v within module %v produced no result.", pkg.importPath, m.rootURI)
+					// Add to processedPkgs so that we don't risk calling
+					// reloadPackages again and looping infinitely.
+					processedPkgs[key] = nil
+				}
 			}
 		}
 	}
@@ -822,6 +839,10 @@ func (w *Workspace) reloadPackages() {
 					break
 				} else if errors.Is(err, fs.ErrNotExist) {
 					// The file has been deleted. nothing to do.
+					continue
+				} else if _, ok := err.(*fs.PathError); ok {
+					// A parent directory of the file has been
+					// deleted. Probably.
 					continue
 				} else if _, ok := err.(cueerrors.Error); ok {
 					// Most likely a syntax error; ignore it.

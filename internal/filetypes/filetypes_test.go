@@ -381,6 +381,12 @@ func TestParseFile(t *testing.T) {
 		in:  `json:D:\foo.json`,
 		out: `unknown filetype json:D`,
 	}, {
+		in:  "json:",
+		out: `empty file name in "json:"`,
+	}, {
+		in:  ":file.json",
+		out: `unsupported file name ":file.json": may not have ':`,
+	}, {
 		in:   "-",
 		mode: Input,
 		out: &build.File{
@@ -505,6 +511,9 @@ func TestParseArgs(t *testing.T) {
 	}, {
 		in:  "json:",
 		out: `scoped qualifier "json:" without file`,
+	}, {
+		in:  ":file.json",
+		out: `unsupported file name ":file.json": may not have ':'`,
 	}, {
 		in:  "json:foo:bar.yaml",
 		out: `unsupported file name "json:foo:bar.yaml": may not have ':'`,

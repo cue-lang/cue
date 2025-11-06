@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3feba9fe_6de8c500",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-06T11:59:40Z",
+      "side": 1,
+      "message": "No longer applicable, as I\u0027ve changed it back.",
+      "parentUuid": "67a71638_22f26ed6",
+      "revId": "f6864fc6f2a8b208c787899ca8fe2d3d9af88392",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d99cf7ba_db38ed74",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-11-06T11:14:02Z",
       "side": 1,
       "message": "I\u0027m not the biggest fan of a boolean parameter here; `Modified(true)` reads like you\u0027re setting \"modified \u003d true\", when it\u0027s more like a read-only getter. I don\u0027t have an alternative suggestion coming to mind, though. Perhaps split this method into two \"sticky\" and \"non-sticky\" variants? Or keep Modified as is, and pair it with a \"clear enclosing modified\" method?",
+      "revId": "f6864fc6f2a8b208c787899ca8fe2d3d9af88392",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24423444_9bcabac6",
+        "filename": "cue/ast/astutil/apply.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-06T11:59:40Z",
+      "side": 1,
+      "message": "I had the latter originally, but found this API, although more \"alternative\", forced one more to think about how to handle the Modified flag.\n\nAdded ClearEnclosingModified and referenced it in the docs for Modified.",
+      "parentUuid": "d99cf7ba_db38ed74",
       "revId": "f6864fc6f2a8b208c787899ca8fe2d3d9af88392",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -112,6 +148,24 @@
       "writtenOn": "2025-11-06T11:14:02Z",
       "side": 1,
       "message": "can we avoid adding `__reclose` when already wrapped in `close`? or are these not redundant, given that `close` is not recursive?",
+      "revId": "f6864fc6f2a8b208c787899ca8fe2d3d9af88392",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35764802_bffcd72a",
+        "filename": "tools/fix/testdata/explicitopen.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-06T11:59:40Z",
+      "side": 1,
+      "message": "Yes, I thought about that, and initially implemented it, but that is actually not correct. If _repos is recursively closed, we should still call __reclose.",
+      "parentUuid": "05ab829c_eca192b9",
       "revId": "f6864fc6f2a8b208c787899ca8fe2d3d9af88392",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

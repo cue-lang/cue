@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes/internal"
+	cuepath "cuelang.org/go/pkg/path"
 )
 
 // Mode indicate the base mode of operation and indicates a different set of
@@ -144,9 +145,13 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 	scope := ""
 	file := s
 
-	if p := strings.LastIndexByte(s, ':'); p >= 0 {
-		scope = s[:p]
-		file = s[p+1:]
+	if cuepath.IsAbs(s, cuepath.Windows) {
+		// Absolute paths on Windows can begin with a volume name, like `C:\foo\bar`;
+		// do not confuse that for a scope prefix.
+		// Note that we use [cuepath.IsAbs] for consistent behavior across platforms.
+	} else if before, after, ok := strings.Cut(s, ":"); ok {
+		scope = before
+		file = after
 		if scope == "" {
 			return nil, errors.Newf(token.NoPos, "unsupported file name %q: may not have ':", s)
 		}

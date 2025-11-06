@@ -375,11 +375,18 @@ func TestParseFile(t *testing.T) {
 		in:  "file.bar",
 		out: `unknown file extension .bar`,
 	}, {
-		in:  `D:\foo.json`,
-		out: `unknown filetype D`,
+		in: `D:\foo.json`,
+		out: &build.File{
+			Filename:       `D:\foo.json`,
+			Encoding:       build.JSON,
+			Interpretation: build.Auto,
+		},
 	}, {
-		in:  `json:D:\foo.json`,
-		out: `unknown filetype json:D`,
+		in: `json:D:\foo.json`,
+		out: &build.File{
+			Filename: `D:\foo.json`,
+			Encoding: build.JSON,
+		},
 	}, {
 		in:  "json:",
 		out: `empty file name in "json:"`,

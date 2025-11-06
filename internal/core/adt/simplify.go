@@ -42,7 +42,7 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		// NOTE: EqualOp should not happen, but include it defensively.
 		// Maybe an API would use it, for instance.
 		case EqualOp, NotEqualOp, MatchOp, NotMatchOp:
-			if test(ctx, EqualOp, xv, yv) {
+			if BinOpBool(ctx, nil, EqualOp, xv, yv) {
 				return x
 			}
 			return nil // keep both bounds
@@ -64,7 +64,7 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		// inverse is true as well.
 
 		// Tighten bound.
-		if test(ctx, cmp, xv, yv) {
+		if BinOpBool(ctx, nil, cmp, xv, yv) {
 			return x
 		}
 		return y
@@ -232,12 +232,12 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		}
 
 	case x.Op == NotEqualOp:
-		if !test(ctx, y.Op, xv, yv) {
+		if !BinOpBool(ctx, nil, y.Op, xv, yv) {
 			return y
 		}
 
 	case y.Op == NotEqualOp:
-		if !test(ctx, x.Op, yv, xv) {
+		if !BinOpBool(ctx, nil, x.Op, yv, xv) {
 			return x
 		}
 	}
@@ -276,13 +276,6 @@ func opInfo(op Op) (cmp Op, norm int) {
 		return NotMatchOp, 3
 	}
 	panic("cue: unreachable")
-}
-
-func test(ctx *OpContext, op Op, a, b Value) bool {
-	if b, ok := BinOp(ctx, nil, op, a, b).(*Bool); ok {
-		return b.B
-	}
-	return false
 }
 
 // SimplifyValidator simplifies non-bound validators.

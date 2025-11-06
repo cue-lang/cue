@@ -154,10 +154,7 @@ func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {
 		return ok
 
 	case *Num, *String, *Bool, *Bytes, *Null:
-		if b, ok := BinOp(ctx, errOnDiffType, EqualOp, v, w).(*Bool); ok {
-			return b.B
-		}
-		return false
+		return BinOpBool(ctx, errOnDiffType, EqualOp, v, w)
 
 	// TODO: for the remainder we are dealing with non-concrete values, so we
 	// could also just not bother.

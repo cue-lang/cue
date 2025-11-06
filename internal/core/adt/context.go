@@ -141,9 +141,12 @@ type OpContext struct {
 	stats        stats.Counts
 	freeListNode *nodeContext
 
-	e         *Environment
-	ci        CloseInfo
-	src       ast.Node
+	e  *Environment
+	ci CloseInfo
+
+	// When nil, created nodes like [Bool] may use sentinels to avoid allocations.
+	src ast.Node
+
 	errs      *Bottom
 	positions []Node // keep track of error positions
 

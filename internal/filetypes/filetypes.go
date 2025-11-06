@@ -153,7 +153,7 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 		scope = before
 		file = after
 		if scope == "" {
-			return nil, errors.Newf(token.NoPos, "unsupported file name %q: may not have ':", s)
+			return nil, errors.Newf(token.NoPos, "empty filetype prefix in %q", s)
 		}
 	}
 

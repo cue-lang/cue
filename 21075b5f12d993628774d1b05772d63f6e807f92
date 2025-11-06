@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cb1535d_1ba0d3a2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-06T11:30:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "06256eb8_6cc62e82",
+      "revId": "21075b5f12d993628774d1b05772d63f6e807f92",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1f02106_f11918bb",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-11-06T11:04:40Z",
       "side": 1,
       "message": "any particular reason that one says \"embed\" and the other \"embeds\"?\n\nor also, embedClosed is unused, so might as well just keep the latter.\n\nplease document the field as well.",
+      "revId": "21075b5f12d993628774d1b05772d63f6e807f92",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fdb8247_e82894d6",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-06T11:30:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1f02106_f11918bb",
       "revId": "21075b5f12d993628774d1b05772d63f6e807f92",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -36,12 +36,12 @@ import (
 
 // Package parameters
 githubRepositoryPath: *(URLPath & {#url: githubRepositoryURL, _}) | string
-githubRepositoryURL:    *("https://github.com/" + githubRepositoryPath) | string
-gerritHubHostname:      *"cue.gerrithub.io" | string
-gerritHubRepositoryURL: *("https://\(gerritHubHostname)/a/" + githubRepositoryPath) | string
+githubRepositoryURL:          *("https://github.com/" + githubRepositoryPath) | string
+gerritHubHostname:            *"cue.gerrithub.io" | string
+gerritHubRepositoryURL:       *("https://\(gerritHubHostname)/a/" + githubRepositoryPath) | string
 gerritHubRepositoryNoAuthURL: *("https://\(gerritHubHostname)/" + githubRepositoryPath) | string
-trybotRepositoryPath:   *(githubRepositoryPath + "-" + trybot.key) | string
-trybotRepositoryURL:    *("https://github.com/" + trybotRepositoryPath) | string
+trybotRepositoryPath:         *(githubRepositoryPath + "-" + trybot.key) | string
+trybotRepositoryURL:          *("https://github.com/" + trybotRepositoryPath) | string
 
 defaultBranch:     *"master" | string
 testDefaultBranch: *"ci/test" | _

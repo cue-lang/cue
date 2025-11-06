@@ -77,6 +77,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "282f8b45_82dbe77e",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-06T11:25:10Z",
+      "side": 1,
+      "message": "Not really, for\n\n```\nimport foo \"list\"\n\na: foo.Contains(foo, bar)\n```\n\nthe printed version, using default methods, would be \"foo.Contains\", not \"list.Contains\". We could hoist the code somewhere else, but I don\u0027t see that benefit, and just makes it harder to read.",
+      "parentUuid": "9982bc7c_f81689de",
+      "range": {
+        "startLine": 333,
+        "startChar": 1,
+        "endLine": 359,
+        "endChar": 6
+      },
+      "revId": "f6864fc6f2a8b208c787899ca8fe2d3d9af88392",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "05ab829c_eca192b9",
         "filename": "tools/fix/testdata/explicitopen.txtar",
         "patchSetId": 2

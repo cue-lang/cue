@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bba9a164_8a9220dd",
+        "filename": "cmd/cue/cmd/integration/workspace/references_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-06T16:04:52Z",
+      "side": 1,
+      "message": "add the comment to nested/cue.mod/module.cue, so that it\u0027s closer to where it matters?",
+      "revId": "bc8f987376f872790973aae2aa8d0c9ad6654b86",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3a3f731_1442ba53",
+        "filename": "cmd/cue/cmd/integration/workspace/references_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-06T16:04:52Z",
+      "side": 1,
+      "message": "nit: I\u0027d use a longer package name than \"x\" for clarity, like `donotload` or `neverload` or `nestedmodpkg`",
+      "revId": "bc8f987376f872790973aae2aa8d0c9ad6654b86",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84ad4d25_36e22e6b",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-06T16:04:52Z",
+      "side": 1,
+      "message": "FWIW elsewhere in the cue repo we use the presence of a cue.mod file (any file, not just a directory) to tell if a directory starts a nested module, so I\u0027d do the same here for consistency",
+      "revId": "bc8f987376f872790973aae2aa8d0c9ad6654b86",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

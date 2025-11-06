@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "30ead806_270c6eb3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-06T10:56:44Z",
+      "side": 1,
+      "message": "```suggestion\ndesirable. I.e. on line 1 it would claim the only use is that of line\n```",
+      "revId": "ee678bcfbb0d8109225e95e6bbc186a9573bcc09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9dc65333_ba5c0063",
         "filename": "internal/lsp/definitions/definitions_test.go",
         "patchSetId": 5
@@ -14,6 +31,41 @@
       "writtenOn": "2025-11-06T10:49:11Z",
       "side": 1,
       "message": "Took me 5 mins to decode the code that follows this comment. Hence adding the comment.",
+      "revId": "ee678bcfbb0d8109225e95e6bbc186a9573bcc09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6460b4d7_560fd55c",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 3185,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-06T10:56:44Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9dc65333_ba5c0063",
+      "revId": "ee678bcfbb0d8109225e95e6bbc186a9573bcc09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b85aab27_51128a2e",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 3396,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-06T10:56:44Z",
+      "side": 1,
+      "message": "super useful comment thanks!",
       "revId": "ee678bcfbb0d8109225e95e6bbc186a9573bcc09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

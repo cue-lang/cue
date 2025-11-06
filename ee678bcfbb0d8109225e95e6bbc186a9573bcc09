@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dc65333_ba5c0063",
+        "filename": "internal/lsp/definitions/definitions_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 3185,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-06T10:49:11Z",
+      "side": 1,
+      "message": "Took me 5 mins to decode the code that follows this comment. Hence adding the comment.",
+      "revId": "ee678bcfbb0d8109225e95e6bbc186a9573bcc09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

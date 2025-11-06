@@ -220,13 +220,13 @@ func isNil(x reflect.Value) bool {
 }
 
 func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value) {
-	if t := (&types.Value{}); types.CastValue(t, x) {
+	src := c.ctx.Source()
+	switch v := x.(type) {
+	case types.Interface:
+		t := &types.Value{}
+		v.Core(t)
 		// TODO: panic if not the same runtime.
 		return t.V
-	}
-	src := c.ctx.Source()
-
-	switch v := x.(type) {
 	case nil:
 		if nilIsTop {
 			ident, _ := src.(*ast.Ident)

@@ -71,8 +71,10 @@ type Cursor interface {
 	// Unless n is wrapped by ApplyRecursively, Apply does not walk n.
 	InsertBefore(n ast.Node)
 
-	// Modified reports whether the cursor has been modified.
-	Modified() bool
+	// Modified reports whether the cursor has been modified. This flag is
+	// for informational purposes only. If sticky is set to false, the flag
+	// is cleared for enclosing values.
+	Modified(sticky bool) bool
 
 	self() *cursor
 }
@@ -126,7 +128,13 @@ func (c *cursor) self() *cursor  { return c }
 func (c *cursor) Parent() Cursor { return c.parent }
 func (c *cursor) Index() int     { return c.index }
 func (c *cursor) Node() ast.Node { return c.node }
-func (c *cursor) Modified() bool { return c.modified }
+func (c *cursor) Modified(sticky bool) bool {
+	m := c.modified
+	if !sticky {
+		c.modified = false
+	}
+	return m
+}
 
 // Deprecated: use [ast.NewImport] as an [ast.Ident.Node], and then
 // [Sanitize].

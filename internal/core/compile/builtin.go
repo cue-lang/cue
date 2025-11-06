@@ -185,6 +185,41 @@ var closeAllBuiltin = &adt.Builtin{
 	},
 }
 
+var recloseBuiltin = &adt.Builtin{
+	Name:   "__reclose",
+	Params: []adt.Param{topParam},
+	Result: adt.TopKind,
+	Func: func(call *adt.CallContext) adt.Expr {
+		c := call.OpContext()
+
+		x := call.Expr(0)
+		switch x.(type) {
+		case *adt.StructLit, *adt.ListLit:
+			if src := x.Source(); src == nil || !src.Pos().Experiment().ExplicitOpen {
+				// Allow usage if explicit open is set
+				return c.NewErrf("__reclose may only be used when explicitopen is enabled")
+			}
+		default:
+			return c.NewErrf("argument must be a struct or list literal")
+		}
+
+		// must be literal struct
+		args := call.Args()
+
+		// Note that we could have an embedded scalar here, so having a struct
+		// or list does not guarantee that the result is that as well.
+		//
+		//	#Def: 1
+		//	a: __reclose({ #Def })
+		//
+		if s, ok := args[0].(*adt.Vertex); ok && s.ShouldRecursivelyClose() {
+			s.ClosedRecursive = true
+		}
+
+		return args[0]
+	},
+}
+
 var andBuiltin = &adt.Builtin{
 	Name:   "and",
 	Params: []adt.Param{listParam},

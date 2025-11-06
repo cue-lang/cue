@@ -351,6 +351,7 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	// once.
 	switch isDef, _ := IsDef(c.Expr()); {
 	case isDef || arc.Label.IsDef() || closeInfo.TopDef:
+		n.embedsRecursivelyClosed = true
 		n.isDef = true
 		// n.node.ClosedRecursive = true // TODO: should we set this here?
 		closeInfo.FromDef = true
@@ -365,6 +366,10 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		c.CloseInfo.defID = closeInfo.defID
 		c.CloseInfo.outerID = closeInfo.outerID
 		c.CloseInfo.enclosingEmbed = closeInfo.enclosingEmbed
+	}
+
+	if arc.ClosedRecursive {
+		n.embedsRecursivelyClosed = true
 	}
 
 	key := arcKey{arc, ciKey}

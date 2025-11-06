@@ -346,6 +346,9 @@ type nodeContextState struct {
 	// node after a corresponding task has been completed.
 	toComplete bool
 
+	embedClosed             bool
+	embedsRecursivelyClosed bool
+
 	// isCompleting > 0 indicates whether a call to completeNodeTasks is in
 	// progress.
 	isCompleting int

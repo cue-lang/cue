@@ -138,7 +138,7 @@ package foo
 #A: a: int
 #B: b: int
 
-X: __closeAll({
+X: __reclose({
 	#A... // foo
 
 	// bar

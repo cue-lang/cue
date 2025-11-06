@@ -48,7 +48,7 @@ package foo
 
 #A: a: int
 
-X: __closeAll({
+X: __reclose({
 	#A...
 })
 str: "bar"

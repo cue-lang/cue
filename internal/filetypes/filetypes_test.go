@@ -392,7 +392,7 @@ func TestParseFile(t *testing.T) {
 		out: `empty file name in "json:"`,
 	}, {
 		in:  ":file.json",
-		out: `unsupported file name ":file.json": may not have ':`,
+		out: `empty filetype prefix in ":file.json"`,
 	}, {
 		in:   "-",
 		mode: Input,

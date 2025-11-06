@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fb3a8c5_46715e89",
+        "filename": "cmd/cue/cmd/integration/workspace/references_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-06T17:09:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bba9a164_8a9220dd",
+      "revId": "bc8f987376f872790973aae2aa8d0c9ad6654b86",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3a3f731_1442ba53",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3eb50746_3f44dde6",
+        "filename": "cmd/cue/cmd/integration/workspace/references_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-06T17:09:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3a3f731_1442ba53",
+      "revId": "bc8f987376f872790973aae2aa8d0c9ad6654b86",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "84ad4d25_36e22e6b",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-11-06T16:04:52Z",
       "side": 1,
       "message": "FWIW elsewhere in the cue repo we use the presence of a cue.mod file (any file, not just a directory) to tell if a directory starts a nested module, so I\u0027d do the same here for consistency",
+      "revId": "bc8f987376f872790973aae2aa8d0c9ad6654b86",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "832beee6_8a868fe3",
+        "filename": "internal/lsp/cache/module.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-06T17:09:58Z",
+      "side": 1,
+      "message": "hmm. Throughout the lsp it\u0027s very consistently cue.mod/module.cue, and this needs to really line up with the behaviour of modpkgload: I don\u0027t want to invent semantics for dealing with cue.mod *files*, or cue.mod directories that *don\u0027t* have a module.cue file inside.",
+      "parentUuid": "84ad4d25_36e22e6b",
       "revId": "bc8f987376f872790973aae2aa8d0c9ad6654b86",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e67b9ae2_b254bd33",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-06T15:03:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "daea93ee_9861a3d5",
+      "revId": "f746cffe7b5e39d71d22842e40b86db5f611f216",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ea86f7bb_00e530dc",

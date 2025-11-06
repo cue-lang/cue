@@ -312,7 +312,5 @@ func (s *subsumer) bound(x *adt.BoundValue, v adt.Value) bool {
 }
 
 func test(ctx *adt.OpContext, src adt.Node, op adt.Op, gt, lt adt.Value) bool {
-	x := adt.BinOp(ctx, src, op, gt, lt)
-	b, ok := x.(*adt.Bool)
-	return ok && b.B
+	return adt.BinOpBool(ctx, src, op, gt, lt)
 }

@@ -278,11 +278,8 @@ func opInfo(op Op) (cmp Op, norm int) {
 	panic("cue: unreachable")
 }
 
-func test(ctx *OpContext, op Op, a, b Value) bool {
-	if b, ok := BinOp(ctx, nil, op, a, b).(*Bool); ok {
-		return b.B
-	}
-	return false
+func test(ctx *OpContext, op Op, left, right Value) bool {
+	return BinOpBool(ctx, nil, op, left, right)
 }
 
 // SimplifyValidator simplifies non-bound validators.

@@ -49,125 +49,19 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 	leftKind := left.Kind()
 	rightKind := right.Kind()
 
-	if err := validateValue(c, left, checkConcrete); err != nil {
-		const msg = "invalid left-hand value to '%s' (type %s): %v"
-		// TODO: Wrap bottom instead of using NewErrf?
-		b := c.NewErrf(msg, op, left.Kind(), err.Err)
-		b.Code = err.Code
+	if b := binOpValidate(c, op, left, right); b != nil {
 		return b
-	}
-	if err := validateValue(c, right, checkConcrete); err != nil {
-		const msg = "invalid right-hand value to '%s' (type %s): %v"
-		b := c.NewErrf(msg, op, left.Kind(), err.Err)
-		b.Code = err.Code
-		return b
-	}
-
-	if err := CombineErrors(c.src, left, right); err != nil {
-		return err
 	}
 
 	switch op {
-	case EqualOp:
-		switch {
-		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
-			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
-
-		case leftKind != rightKind:
-			if p.Experiment().StructCmp ||
-				// compatibility with !structCmp:
-				leftKind == NullKind || rightKind == NullKind {
-				return c.newBool(false)
-			}
-
-		case leftKind == NullKind:
-			return c.newBool(true)
-
-		case leftKind == BoolKind:
-			return c.newBool(c.BoolValue(left) == c.BoolValue(right))
-
-		case leftKind == StringKind:
-			// normalize?
-			return cmpTonode(c, op, strings.Compare(c.StringValue(left), c.StringValue(right)))
-
-		case leftKind == BytesKind:
-			return cmpTonode(c, op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op)))
-
-		case leftKind == ListKind:
-			return c.newBool(Equal(c, left, right, RegularOnly|IgnoreOptional))
-
-		case !p.Experiment().StructCmp:
-		case leftKind == StructKind:
-			return c.newBool(Equal(c, left, right, RegularOnly|IgnoreOptional))
+	case EqualOp, NotEqualOp,
+		LessThanOp, LessEqualOp, GreaterEqualOp, GreaterThanOp,
+		BoolAndOp, BoolOrOp,
+		MatchOp, NotMatchOp:
+		b, ok := binOpBool(c, p, op, left, right)
+		if ok {
+			return c.newBool(b)
 		}
-
-	case NotEqualOp:
-		switch {
-		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
-			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
-
-		case leftKind != rightKind:
-			if p.Experiment().StructCmp ||
-				// compatibility with !structCmp:
-				leftKind == NullKind ||
-				rightKind == NullKind {
-				return c.newBool(true)
-			}
-
-		case leftKind == NullKind:
-			return c.newBool(false)
-
-		case leftKind == BoolKind:
-			return c.newBool(c.boolValue(left, op) != c.boolValue(right, op))
-
-		case leftKind == StringKind:
-			// normalize?
-			return cmpTonode(c, op, strings.Compare(c.StringValue(left), c.StringValue(right)))
-
-		case leftKind == BytesKind:
-			return cmpTonode(c, op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op)))
-
-		case leftKind == ListKind:
-			return c.newBool(!Equal(c, left, right, RegularOnly|IgnoreOptional))
-
-		case !p.Experiment().StructCmp:
-		case leftKind == StructKind:
-			return c.newBool(!Equal(c, left, right, RegularOnly|IgnoreOptional))
-		}
-
-	case LessThanOp, LessEqualOp, GreaterEqualOp, GreaterThanOp:
-		switch {
-		case leftKind == StringKind && rightKind == StringKind:
-			// normalize?
-			return cmpTonode(c, op, strings.Compare(c.stringValue(left, op), c.stringValue(right, op)))
-
-		case leftKind == BytesKind && rightKind == BytesKind:
-			return cmpTonode(c, op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op)))
-
-		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
-			// n := c.newNum(left, right)
-			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
-		}
-
-	case BoolAndOp:
-		return c.newBool(c.boolValue(left, op) && c.boolValue(right, op))
-
-	case BoolOrOp:
-		return c.newBool(c.boolValue(left, op) || c.boolValue(right, op))
-
-	case MatchOp:
-		// if y.re == nil {
-		// 	// This really should not happen, but leave in for safety.
-		// 	b, err := Regexp.MatchString(str, x.str)
-		// 	if err != nil {
-		// 		return c.Errf(Src, "error parsing Regexp: %v", err)
-		// 	}
-		// 	return boolTonode(Src, b)
-		// }
-		return c.newBool(c.regexp(right).MatchString(c.stringValue(left, op)))
-
-	case NotMatchOp:
-		return c.newBool(!c.regexp(right).MatchString(c.stringValue(left, op)))
 
 	case AddOp:
 		switch {
@@ -250,21 +144,163 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 		left, right, op, left.Kind(), right.Kind())
 }
 
-func cmpTonode(c *OpContext, op Op, r int) Value {
-	result := false
+func binOpValidate(c *OpContext, op Op, left, right Value) *Bottom {
+	if err := validateValue(c, left, checkConcrete); err != nil {
+		const msg = "invalid left-hand value to '%s' (type %s): %v"
+		// TODO: Wrap bottom instead of using NewErrf?
+		b := c.NewErrf(msg, op, left.Kind(), err.Err)
+		b.Code = err.Code
+		return b
+	}
+	if err := validateValue(c, right, checkConcrete); err != nil {
+		const msg = "invalid right-hand value to '%s' (type %s): %v"
+		b := c.NewErrf(msg, op, left.Kind(), err.Err)
+		b.Code = err.Code
+		return b
+	}
+	if err := CombineErrors(c.src, left, right); err != nil {
+		return err
+	}
+	return nil
+}
+
+func BinOpBool(c *OpContext, node Node, op Op, left, right Value) bool {
+	var p token.Pos
+	if node != nil {
+		if src := node.Source(); src != nil {
+			p = src.Pos()
+		}
+	}
+	if b := binOpValidate(c, op, left, right); b != nil {
+		return false
+	}
+	b, _ := binOpBool(c, p, op, left, right)
+	return b
+}
+
+func binOpBool(c *OpContext, p token.Pos, op Op, left, right Value) (result, ok bool) {
+	leftKind := left.Kind()
+	rightKind := right.Kind()
+	switch op {
+	case EqualOp:
+		switch {
+		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
+			return cmpTonode(op, c.Num(left, op).X.Cmp(&c.Num(right, op).X)), true
+
+		case leftKind != rightKind:
+			if p.Experiment().StructCmp ||
+				// compatibility with !structCmp:
+				leftKind == NullKind || rightKind == NullKind {
+				return false, true
+			}
+
+		case leftKind == NullKind:
+			return true, true
+
+		case leftKind == BoolKind:
+			return c.BoolValue(left) == c.BoolValue(right), true
+
+		case leftKind == StringKind:
+			// normalize?
+			return cmpTonode(op, strings.Compare(c.StringValue(left), c.StringValue(right))), true
+
+		case leftKind == BytesKind:
+			return cmpTonode(op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op))), true
+
+		case leftKind == ListKind:
+			return Equal(c, left, right, RegularOnly|IgnoreOptional), true
+
+		case !p.Experiment().StructCmp:
+		case leftKind == StructKind:
+			return Equal(c, left, right, RegularOnly|IgnoreOptional), true
+		}
+
+	case NotEqualOp:
+		switch {
+		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
+			return cmpTonode(op, c.Num(left, op).X.Cmp(&c.Num(right, op).X)), true
+
+		case leftKind != rightKind:
+			if p.Experiment().StructCmp ||
+				// compatibility with !structCmp:
+				leftKind == NullKind ||
+				rightKind == NullKind {
+				return true, true
+			}
+
+		case leftKind == NullKind:
+			return false, true
+
+		case leftKind == BoolKind:
+			return c.boolValue(left, op) != c.boolValue(right, op), true
+
+		case leftKind == StringKind:
+			// normalize?
+			return cmpTonode(op, strings.Compare(c.StringValue(left), c.StringValue(right))), true
+
+		case leftKind == BytesKind:
+			return cmpTonode(op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op))), true
+
+		case leftKind == ListKind:
+			return !Equal(c, left, right, RegularOnly|IgnoreOptional), true
+
+		case !p.Experiment().StructCmp:
+		case leftKind == StructKind:
+			return !Equal(c, left, right, RegularOnly|IgnoreOptional), true
+		}
+
+	case LessThanOp, LessEqualOp, GreaterEqualOp, GreaterThanOp:
+		switch {
+		case leftKind == StringKind && rightKind == StringKind:
+			// normalize?
+			return cmpTonode(op, strings.Compare(c.stringValue(left, op), c.stringValue(right, op))), true
+
+		case leftKind == BytesKind && rightKind == BytesKind:
+			return cmpTonode(op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op))), true
+
+		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
+			// n := c.newNum(left, right)
+			return cmpTonode(op, c.Num(left, op).X.Cmp(&c.Num(right, op).X)), true
+		}
+
+	case BoolAndOp:
+		return c.boolValue(left, op) && c.boolValue(right, op), true
+
+	case BoolOrOp:
+		return c.boolValue(left, op) || c.boolValue(right, op), true
+
+	case MatchOp:
+		// if y.re == nil {
+		// 	// This really should not happen, but leave in for safety.
+		// 	b, err := Regexp.MatchString(str, x.str)
+		// 	if err != nil {
+		// 		return c.Errf(Src, "error parsing Regexp: %v", err)
+		// 	}
+		// 	return boolTonode(Src, b)
+		// }
+		return c.regexp(right).MatchString(c.stringValue(left, op)), true
+
+	case NotMatchOp:
+		return !c.regexp(right).MatchString(c.stringValue(left, op)), true
+
+	}
+	return false, false
+}
+
+func cmpTonode(op Op, r int) bool {
 	switch op {
 	case LessThanOp:
-		result = r == -1
+		return r == -1
 	case LessEqualOp:
-		result = r != 1
+		return r != 1
 	case EqualOp, AndOp:
-		result = r == 0
+		return r == 0
 	case NotEqualOp:
-		result = r != 0
+		return r != 0
 	case GreaterEqualOp:
-		result = r != -1
+		return r != -1
 	case GreaterThanOp:
-		result = r == 1
+		return r == 1
 	}
-	return c.newBool(result)
+	return false
 }

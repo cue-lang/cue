@@ -31,6 +31,21 @@ var checkConcrete = &ValidateConfig{
 // kinds.
 var errOnDiffType = &UnaryExpr{}
 
+// BinOpBool is like [BinOp] but it avoids allocating a [Bool] for boolean operators
+// such as [EqualOp].
+func BinOpBool(c *OpContext, node Node, op Op, left, right Value) bool {
+	// The caller doesn't need a full [Value], so to save allocations,
+	// use a nil source to ensure that [OpContext.newBool] won't allocate.
+	// This swap seems fine given that OpContext is not meant for concurrent use.
+	src := c.src
+	c.src = nil
+	defer func() { c.src = src }()
+
+	v := BinOp(c, node, op, left, right)
+	b, ok := v.(*Bool)
+	return ok && b.B
+}
+
 // BinOp handles all operations except AndOp and OrOp. This includes processing
 // unary comparators such as '<4' and '=~"foo"'.
 //

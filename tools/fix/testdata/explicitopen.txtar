@@ -23,6 +23,28 @@ Y: {
 	"foo\(str)"
 	<=10,
 	{b: int}
+	_
+}
+
+_repo: {}
+inList: {
+	steps: [
+		for v in _repo.checkoutCode {v},
+		for v in installGo {v},
+		{
+			name: "foo"
+		},
+	]
+}
+inClose: {
+	workflows: close({
+		_repo
+	})
+}
+nestedStruct: {
+	containsTrybotTrailer: {
+		{#foo}
+	}
 }
 -- b.cue --
 // Already tagged, so do not do any changes.
@@ -52,7 +74,7 @@ X: __reclose({
 	#A...
 })
 str: "bar"
-Y: {
+Y: __reclose({
 	// Do not add ellipsis where unnecessary.
 	[1, 2]
 	1
@@ -60,7 +82,29 @@ Y: {
 	"foo\(str)"
 	<=10
 	{b: int}
+	_...
+})
+
+_repo: {}
+inList: {
+	steps: [
+		for v in _repo.checkoutCode {v...},
+		for v in installGo {v...},
+		{
+			name: "foo"
+		},
+	]
 }
+inClose: {
+	workflows: close({
+		_repo...
+	})
+}
+nestedStruct: __reclose({
+	containsTrybotTrailer: __reclose({
+		{#foo...}
+	})
+})
 --- b.cue
 // Already tagged, so do not do any changes.
 @experiment(explicitopen)

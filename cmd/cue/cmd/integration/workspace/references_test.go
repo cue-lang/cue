@@ -11,6 +11,12 @@ import (
 	"golang.org/x/tools/txtar"
 )
 
+// NB the nested files in the archive below appear to do nothing. They
+// have been added to test that when FindReferences triggers loading
+// of all packages within the current module, we do not accidentally
+// walk down into nested modules, which could previously provoke
+// infinite loops when packages are loaded.
+
 const referencesFiles = `
 -- cue.mod/module.cue --
 module: "example.com/bar"
@@ -48,6 +54,13 @@ import p3 "example.com/bar/a"
 c1: p1.out
 c2: p2.out
 c3: p3.out
+-- nested/cue.mod/module.cue --
+module: "example.org/nested"
+language: version: "v0.14.0"
+-- nested/x.cue --
+package x
+
+greeting: "hello"
 -- want/a/a.cue --
 package a
 
@@ -162,6 +175,12 @@ func TestReferences(t *testing.T) {
 
 		gotTo := env.References(from)
 		qt.Assert(t, qt.ContentEquals(gotTo, wantTo), qt.Commentf("from: %#v", from))
+
+		env.Await(
+			// Make sure we did not create a package x: that pkg only
+			// belongs to the nested module.
+			NoLogExactf(protocol.Debug, "Package dirs=[%v/nested] importPath=example.com/bar/nested@v0:x", rootURI),
+		)
 	})
 }
 

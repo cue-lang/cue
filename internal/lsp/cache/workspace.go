@@ -792,6 +792,21 @@ func (w *Workspace) reloadPackages() {
 		for _, pkg := range m.packages {
 			if pkg.isDirty {
 				pkg.delete()
+				key := importPathModRootPair{
+					importPath: pkg.importPath,
+					modRootURI: m.rootURI,
+				}
+				if _, found := processedPkgs[key]; !found {
+					// We have a pkg that is dirty, but when we tried to
+					// load it, we got nothing back at all. This possibly
+					// means this pkg doesn't exist within this module. It
+					// could be a race with the file system, or it could be
+					// a bug in the LSP.
+					w.debugLogf("Warning: attempt to load package %v within module %v produced no result.", pkg.importPath, m.rootURI)
+					// Add to processedPkgs so that we don't risk calling
+					// reloadPackages again and looping infinitely.
+					processedPkgs[key] = nil
+				}
 			}
 		}
 	}

@@ -72,7 +72,12 @@ type Cursor interface {
 	InsertBefore(n ast.Node)
 
 	// Modified reports whether the cursor has been modified.
+	// Use ClearEnclosingModified to reset the flag.
 	Modified() bool
+
+	// ClearEnclosingModified resets the Modified flag of the cursor so that
+	// the processing of enclosing nodes do not observe the modification.
+	ClearEnclosingModified()
 
 	self() *cursor
 }
@@ -122,11 +127,12 @@ func fileInfo(c Cursor) (info *info) {
 	return nil
 }
 
-func (c *cursor) self() *cursor  { return c }
-func (c *cursor) Parent() Cursor { return c.parent }
-func (c *cursor) Index() int     { return c.index }
-func (c *cursor) Node() ast.Node { return c.node }
-func (c *cursor) Modified() bool { return c.modified }
+func (c *cursor) self() *cursor           { return c }
+func (c *cursor) Parent() Cursor          { return c.parent }
+func (c *cursor) Index() int              { return c.index }
+func (c *cursor) Node() ast.Node          { return c.node }
+func (c *cursor) Modified() bool          { return c.modified }
+func (c *cursor) ClearEnclosingModified() { c.modified = false }
 
 // Deprecated: use [ast.NewImport] as an [ast.Ident.Node], and then
 // [Sanitize].

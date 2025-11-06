@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06256eb8_6cc62e82",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-06T11:04:40Z",
+      "side": 1,
+      "message": "I\u0027d mention that this is particularly important for tools/fix, which is syntax-only, so it cannot know what a reference points to or evaluates to.",
+      "revId": "21075b5f12d993628774d1b05772d63f6e807f92",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1f02106_f11918bb",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-06T11:04:40Z",
+      "side": 1,
+      "message": "any particular reason that one says \"embed\" and the other \"embeds\"?\n\nor also, embedClosed is unused, so might as well just keep the latter.\n\nplease document the field as well.",
+      "revId": "21075b5f12d993628774d1b05772d63f6e807f92",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -308,7 +308,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 		if c.Modified() {
 			if n, ok := c.Node().(*ast.Field); ok && !internal.IsDefinition(n.Label) {
 				ast.SetRelPos(n.Value, token.NoSpace)
-				n.Value = ast.NewCall(ast.NewIdent("__closeAll"), n.Value)
+				n.Value = ast.NewCall(ast.NewIdent("__reclose"), n.Value)
 			}
 		}
 		return true

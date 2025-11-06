@@ -82,6 +82,19 @@ func (v *Vertex) IsRecursivelyClosed() bool {
 	return v.ClosedRecursive
 }
 
+// ShouldRecursivelyClose reports whether this vertex should be closed
+// recursively using __reclose. This is to simulate compatibility mode
+// with the semantics from before explicitOpen was introduced.
+//
+// This is the case if any of the embeddings marked with ... were recursively
+// closed before opening them up with ....
+func (v *Vertex) ShouldRecursivelyClose() bool {
+	if v.state == nil {
+		return false
+	}
+	return v.state.embedsRecursivelyClosed
+}
+
 type CloseInfo struct {
 	// defID is a unique ID to track anything that gets inserted from this
 	// Conjunct.

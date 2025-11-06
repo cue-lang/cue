@@ -1,0 +1,385 @@
+-- in.cue --
+@experiment(explicitopen)
+
+noClose: {
+	foo: a: int
+	a: __reclose({
+		foo...
+	})
+
+	t1: ok: a & {b: 1}
+}
+
+recursive: {
+	#x: { foo: int}
+	// Basic usage of __reclose - makes structs recursively closed
+	a: __reclose({
+		#x...
+		nested: field2: int
+	})
+
+	// Test that extra fields are not allowed (should error)
+	t1: err: a & {extra: "not allowed"}
+
+	t2: ok: a & {nested: field2: 5}
+	t3: ok: a & {foo: 5}
+
+
+	// Test that nested extra fields are not allowed (should error)
+	t4: err: a & {
+		field1: 1
+		nested: {
+			field2: "hello"
+			extra: "not allowed"
+		}
+	}
+
+	// Test with empty struct
+	e: __reclose({})
+	t5: err: e & {extra: "not allowed"}  // should error
+}
+
+
+nonRecursive: {
+	x: __reclose({
+		close({b: int})...
+		c: int
+		d: e: int
+	})
+	y: err: x & {f: int}
+	z: ok: x & {d: f: int}
+}
+
+nonStructLiterals: {
+	// Test with non-struct should error
+	t1: err: __reclose("not a struct")
+
+
+	#A: a: int
+	t4: err: __reclose(#A)
+}
+
+nonStructDefinitions: {
+	#Def: 1
+
+	a: __reclose({
+		#Def...
+	})
+
+	t1: ok: a & 1
+
+	t2: err: a & {b: 1} // errors because of regular field + embedded scalar
+}
+
+-- old.cue --
+retro: {
+	// May not be used if explicitopen is not set.
+	t1: err: __reclose({})
+}
+
+-- out/compile --
+--- in.cue
+{
+  noClose: {
+    foo: {
+      a: int
+    }
+    a: __reclose({
+      〈1;foo〉...
+    })
+    t1: {
+      ok: (〈1;a〉 & {
+        b: 1
+      })
+    }
+  }
+  recursive: {
+    #x: {
+      foo: int
+    }
+    a: __reclose({
+      〈1;#x〉...
+      nested: {
+        field2: int
+      }
+    })
+    t1: {
+      err: (〈1;a〉 & {
+        extra: "not allowed"
+      })
+    }
+    t2: {
+      ok: (〈1;a〉 & {
+        nested: {
+          field2: 5
+        }
+      })
+    }
+    t3: {
+      ok: (〈1;a〉 & {
+        foo: 5
+      })
+    }
+    t4: {
+      err: (〈1;a〉 & {
+        field1: 1
+        nested: {
+          field2: "hello"
+          extra: "not allowed"
+        }
+      })
+    }
+    e: __reclose({})
+    t5: {
+      err: (〈1;e〉 & {
+        extra: "not allowed"
+      })
+    }
+  }
+  nonRecursive: {
+    x: __reclose({
+      close({
+        b: int
+      })...
+      c: int
+      d: {
+        e: int
+      }
+    })
+    y: {
+      err: (〈1;x〉 & {
+        f: int
+      })
+    }
+    z: {
+      ok: (〈1;x〉 & {
+        d: {
+          f: int
+        }
+      })
+    }
+  }
+  nonStructLiterals: {
+    t1: {
+      err: __reclose("not a struct")
+    }
+    #A: {
+      a: int
+    }
+    t4: {
+      err: __reclose(〈1;#A〉)
+    }
+  }
+  nonStructDefinitions: {
+    #Def: 1
+    a: __reclose({
+      〈1;#Def〉...
+    })
+    t1: {
+      ok: (〈1;a〉 & 1)
+    }
+    t2: {
+      err: (〈1;a〉 & {
+        b: 1
+      })
+    }
+  }
+}
+--- old.cue
+{
+  retro: {
+    t1: {
+      err: __reclose({})
+    }
+  }
+}
+-- out/evalalpha --
+Errors:
+nonRecursive.y.err.f: field not allowed:
+    ./in.cue:48:15
+nonStructDefinitions.t2.err: conflicting values 1 and {b:1} (mismatched types int and struct):
+    ./in.cue:62:8
+    ./in.cue:70:11
+    ./in.cue:70:15
+recursive.t1.err.extra: field not allowed:
+    ./in.cue:21:16
+recursive.t4.err.nested.field2: conflicting values "hello" and int (mismatched types string and int):
+    ./in.cue:17:19
+    ./in.cue:28:11
+    ./in.cue:31:12
+nonStructLiterals.t1.err: argument must be a struct or list literal:
+    ./in.cue:54:11
+nonStructLiterals.t4.err: argument must be a struct or list literal:
+    ./in.cue:58:11
+retro.t1.err: __reclose may only be used when explicitopen is enabled:
+    ./old.cue:3:11
+
+Result:
+(_|_){
+  // [eval]
+  noClose: (struct){
+    foo: (struct){
+      a: (int){ int }
+    }
+    a: (struct){
+      a: (int){ int }
+    }
+    t1: (struct){
+      ok: (struct){
+        b: (int){ 1 }
+        a: (int){ int }
+      }
+    }
+  }
+  recursive: (_|_){
+    // [eval]
+    #x: (#struct){
+      foo: (int){ int }
+    }
+    a: (#struct){
+      nested: (#struct){
+        field2: (int){ int }
+      }
+      foo: (int){ int }
+    }
+    t1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        extra: (_|_){
+          // [eval] recursive.t1.err.extra: field not allowed:
+          //     ./in.cue:21:16
+        }
+        nested: (#struct){
+          field2: (int){ int }
+        }
+        foo: (int){ int }
+      }
+    }
+    t2: (struct){
+      ok: (#struct){
+        nested: (struct){
+          field2: (int){ 5 }
+        }
+        foo: (int){ int }
+      }
+    }
+    t3: (struct){
+      ok: (#struct){
+        foo: (int){ 5 }
+        nested: (#struct){
+          field2: (int){ int }
+        }
+      }
+    }
+    t4: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        field1: (int){ 1 }
+        nested: (_|_){
+          // [eval]
+          field2: (_|_){
+            // [eval] recursive.t4.err.nested.field2: conflicting values "hello" and int (mismatched types string and int):
+            //     ./in.cue:17:19
+            //     ./in.cue:28:11
+            //     ./in.cue:31:12
+          }
+          extra: (string){ "not allowed" }
+        }
+        foo: (int){ int }
+      }
+    }
+    e: (struct){
+    }
+    t5: (struct){
+      err: (struct){
+        extra: (string){ "not allowed" }
+      }
+    }
+  }
+  nonRecursive: (_|_){
+    // [eval]
+    x: (#struct){
+      c: (int){ int }
+      d: (struct){
+        e: (int){ int }
+      }
+      b: (int){ int }
+    }
+    y: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        f: (_|_){
+          // [eval] nonRecursive.y.err.f: field not allowed:
+          //     ./in.cue:48:15
+        }
+        c: (int){ int }
+        d: (struct){
+          e: (int){ int }
+        }
+        b: (int){ int }
+      }
+    }
+    z: (struct){
+      ok: (#struct){
+        d: (struct){
+          f: (int){ int }
+          e: (int){ int }
+        }
+        c: (int){ int }
+        b: (int){ int }
+      }
+    }
+  }
+  nonStructLiterals: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval] nonStructLiterals.t1.err: argument must be a struct or list literal:
+        //     ./in.cue:54:11
+      }
+    }
+    #A: (#struct){
+      a: (int){ int }
+    }
+    t4: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval] nonStructLiterals.t4.err: argument must be a struct or list literal:
+        //     ./in.cue:58:11
+      }
+    }
+  }
+  nonStructDefinitions: (_|_){
+    // [eval]
+    #Def: (int){ 1 }
+    a: (int){ 1 }
+    t1: (struct){
+      ok: (int){ 1 }
+    }
+    t2: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval] nonStructDefinitions.t2.err: conflicting values 1 and {b:1} (mismatched types int and struct):
+        //     ./in.cue:62:8
+        //     ./in.cue:70:11
+        //     ./in.cue:70:15
+        b: (_|_){// 1
+        }
+      }
+    }
+  }
+  retro: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval] retro.t1.err: __reclose may only be used when explicitopen is enabled:
+        //     ./old.cue:3:11
+      }
+    }
+  }
+}

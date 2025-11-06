@@ -346,6 +346,13 @@ type nodeContextState struct {
 	// node after a corresponding task has been completed.
 	toComplete bool
 
+	// embedsRecursivelyClosed is used to implement __reclose. It must be set
+	// when a vertex that is recursively closed is embedded through a spread
+	// operator. It is okay to set it if it is just unified with a vertex that
+	// is recursively closed, but not added through a spread operator. The
+	// result will just be an unnecessary call to __reclose.
+	embedsRecursivelyClosed bool
+
 	// isCompleting > 0 indicates whether a call to completeNodeTasks is in
 	// progress.
 	isCompleting int

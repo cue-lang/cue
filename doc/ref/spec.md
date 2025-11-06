@@ -2817,10 +2817,14 @@ their first argument.
 The remainder of this section defines builtin validators. These can only be
 used as validators, so we will not refer to their function equivalents.
 
+These builtins referes to finalized values, which means that it the value
+being validated is fully resolved, and defaults taken, before it is unified
+with the schema.
+
 ### `matchN`
 
 The `matchN` builtin is a validator that checks if a specified number of schemas
-from a given list unify successfully with the value being validated.
+from a given list unify successfully with the finalized value being validated.
 
 `matchN` takes two arguments:
 - a numeric constraint specifying how many schemas must match,
@@ -2857,7 +2861,8 @@ constraints based on whether an initial condition is satisfied.
 - the schema to apply if the condition matches (the "then" clause),
 - the schema to apply if the condition does not match (the "else" clause).
 
-The validator first attempts to unify the value with the condition schema.
+The validator first attempts to unify the finalized value with the condition
+schema.
 If the condition unifies successfully, the "then" schema is applied;
 otherwise, the "else" schema is applied.
 The validator succeeds if the chosen schema unifies successfully with the value.

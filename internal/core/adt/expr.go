@@ -1211,7 +1211,7 @@ func (x *UnaryExpr) evaluate(c *OpContext, state Flags) Value {
 
 	case NotOp:
 		if v, ok := v.(*Bool); ok {
-			return &Bool{x.Src, !v.B}
+			return c.NewBool(!v.B)
 		}
 		expectedKind = BoolKind
 	}
@@ -1425,7 +1425,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 	}
 
 	c.PopState(s)
-	return &Bool{src, match}
+	return c.NewBool(match)
 }
 
 func isFinalError(n *Vertex) bool {

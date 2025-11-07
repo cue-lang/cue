@@ -92,14 +92,14 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 			if p.Experiment().StructCmp ||
 				// compatibility with !structCmp:
 				leftKind == NullKind || rightKind == NullKind {
-				return c.newBool(false)
+				return c.NewBool(false)
 			}
 
 		case leftKind == NullKind:
-			return c.newBool(true)
+			return c.NewBool(true)
 
 		case leftKind == BoolKind:
-			return c.newBool(c.BoolValue(left) == c.BoolValue(right))
+			return c.NewBool(c.BoolValue(left) == c.BoolValue(right))
 
 		case leftKind == StringKind:
 			// normalize?
@@ -109,11 +109,11 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 			return cmpTonode(c, op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op)))
 
 		case leftKind == ListKind:
-			return c.newBool(Equal(c, left, right, RegularOnly|IgnoreOptional))
+			return c.NewBool(Equal(c, left, right, RegularOnly|IgnoreOptional))
 
 		case !p.Experiment().StructCmp:
 		case leftKind == StructKind:
-			return c.newBool(Equal(c, left, right, RegularOnly|IgnoreOptional))
+			return c.NewBool(Equal(c, left, right, RegularOnly|IgnoreOptional))
 		}
 
 	case NotEqualOp:
@@ -126,14 +126,14 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 				// compatibility with !structCmp:
 				leftKind == NullKind ||
 				rightKind == NullKind {
-				return c.newBool(true)
+				return c.NewBool(true)
 			}
 
 		case leftKind == NullKind:
-			return c.newBool(false)
+			return c.NewBool(false)
 
 		case leftKind == BoolKind:
-			return c.newBool(c.boolValue(left, op) != c.boolValue(right, op))
+			return c.NewBool(c.boolValue(left, op) != c.boolValue(right, op))
 
 		case leftKind == StringKind:
 			// normalize?
@@ -143,11 +143,11 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 			return cmpTonode(c, op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op)))
 
 		case leftKind == ListKind:
-			return c.newBool(!Equal(c, left, right, RegularOnly|IgnoreOptional))
+			return c.NewBool(!Equal(c, left, right, RegularOnly|IgnoreOptional))
 
 		case !p.Experiment().StructCmp:
 		case leftKind == StructKind:
-			return c.newBool(!Equal(c, left, right, RegularOnly|IgnoreOptional))
+			return c.NewBool(!Equal(c, left, right, RegularOnly|IgnoreOptional))
 		}
 
 	case LessThanOp, LessEqualOp, GreaterEqualOp, GreaterThanOp:
@@ -165,10 +165,10 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 		}
 
 	case BoolAndOp:
-		return c.newBool(c.boolValue(left, op) && c.boolValue(right, op))
+		return c.NewBool(c.boolValue(left, op) && c.boolValue(right, op))
 
 	case BoolOrOp:
-		return c.newBool(c.boolValue(left, op) || c.boolValue(right, op))
+		return c.NewBool(c.boolValue(left, op) || c.boolValue(right, op))
 
 	case MatchOp:
 		// if y.re == nil {
@@ -179,10 +179,10 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 		// 	}
 		// 	return boolTonode(Src, b)
 		// }
-		return c.newBool(c.regexp(right).MatchString(c.stringValue(left, op)))
+		return c.NewBool(c.regexp(right).MatchString(c.stringValue(left, op)))
 
 	case NotMatchOp:
-		return c.newBool(!c.regexp(right).MatchString(c.stringValue(left, op)))
+		return c.NewBool(!c.regexp(right).MatchString(c.stringValue(left, op)))
 
 	case AddOp:
 		switch {
@@ -281,5 +281,5 @@ func cmpTonode(c *OpContext, op Op, r int) Value {
 	case GreaterThanOp:
 		result = r == 1
 	}
-	return c.newBool(result)
+	return c.NewBool(result)
 }

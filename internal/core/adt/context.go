@@ -1297,11 +1297,11 @@ func (c *OpContext) newBytes(b []byte) Value {
 }
 
 var (
-	boolFalseNoSrc = &Bool{B: false}
-	boolTrueNoSrc  = &Bool{B: true}
+	StaticBoolFalse = &Bool{B: false}
+	StaticBoolTrue  = &Bool{B: true}
 )
 
-func (c *OpContext) newBool(b bool) Value {
+func (c *OpContext) NewBool(b bool) Value {
 	if c.HasErr() {
 		return c.Err()
 	}
@@ -1311,9 +1311,9 @@ func (c *OpContext) newBool(b bool) Value {
 	// to the operation, so we can reuse Bool allocations.
 	if c.src == nil {
 		if b {
-			return boolTrueNoSrc
+			return StaticBoolTrue
 		} else {
-			return boolFalseNoSrc
+			return StaticBoolFalse
 		}
 	}
 	return &Bool{Src: c.src, B: b}

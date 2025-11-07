@@ -39,7 +39,7 @@ var matchNBuiltin = &adt.Builtin{
 
 		self := finalizeSelf(c, args[0])
 		if err := bottom(c, self); err != nil {
-			return &adt.Bool{B: false}
+			return adt.StaticBoolFalse
 		}
 
 		var errs []*adt.Bottom
@@ -74,7 +74,7 @@ var matchNBuiltin = &adt.Builtin{
 			}
 			return b
 		}
-		return &adt.Bool{B: true}
+		return adt.StaticBoolTrue
 	},
 }
 
@@ -98,7 +98,7 @@ var matchIfBuiltin = &adt.Builtin{
 
 		self := finalizeSelf(c, args[0])
 		if err := bottom(c, self); err != nil {
-			return &adt.Bool{B: false}
+			return adt.StaticBoolFalse
 		}
 		ifSchema, thenSchema, elseSchema := args[1], args[2], args[3]
 		v := adt.Unify(c, self, ifSchema)
@@ -111,7 +111,7 @@ var matchIfBuiltin = &adt.Builtin{
 		v = adt.Unify(c, self, chosenSchema)
 		err := adt.Validate(c, v, finalCfg)
 		if err == nil {
-			return &adt.Bool{B: true}
+			return adt.StaticBoolTrue
 		}
 		// TODO should we also include in the error something about the fact that
 		// the if condition passed or failed?

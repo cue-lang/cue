@@ -289,9 +289,6 @@ type nodeContext struct {
 
 	arcMap []arcKey // not copied for cloning
 
-	// vertexMap is used to map vertices in disjunctions.
-	vertexMap vertexMap
-
 	// notify is used to communicate errors in cyclic dependencies.
 	// TODO: also use this to communicate increasingly more concrete values.
 	notify []receiver

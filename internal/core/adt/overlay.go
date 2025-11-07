@@ -15,7 +15,6 @@
 package adt
 
 import (
-	"maps"
 	"slices"
 )
 
@@ -141,12 +140,9 @@ func (m vertexMap) deref(v *Vertex) *Vertex {
 // cloneRoot clones the Vertex in which disjunctions are defined to allow
 // inserting selected disjuncts into a new Vertex.
 func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
-	maps.Copy(ctx.vertexMap, root.vertexMap)
-
 	// Clone all vertices that need to be cloned to support the overlay.
 	v := ctx.cloneVertex(root.node)
 	v.IsDisjunct = true
-	v.state.vertexMap = ctx.vertexMap
 	ctx.root = v
 
 	for _, v := range ctx.vertices {

@@ -13,8 +13,10 @@ import (
 	"time"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/robustio"
@@ -137,6 +139,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 			syntax.Decls = decls
 		}
 		if pkg.Name == nil || pkg.Name.Name == "" || pkg.Name.Name == "_" {
+			// Important that this ident has no position.
 			pkg.Name = ast.NewIdent(fmt.Sprintf("_%x", sha256.Sum256([]byte(bf.Filename))))
 		}
 	}
@@ -146,6 +149,34 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 	p.err = err
 
 	return syntax, cfg, err
+}
+
+// phantomPackageNameLength contains the total length of the package
+// name injected into files which do not have a package declaration.
+var phantomPackageNameLength = len(fmt.Sprintf("_%x", [sha256.Size]byte{}))
+
+// IsPhantomPackage reports whether the package declaration was
+// created to be injected into a file's AST for files which have no
+// package declaration themselves.
+func IsPhantomPackage(pkgDecl *ast.Package) bool {
+	name := pkgDecl.Name
+	return name != nil && name.Pos() == token.NoPos && len(name.Name) == phantomPackageNameLength && name.Name[0] == '_'
+}
+
+// RemovePhantomPackageDecl removes any phantom package declaration
+// from the provided AST.
+func RemovePhantomPackageDecl(file *ast.File) ast.Node {
+	pkgDeclSeen := false
+	return astutil.Apply(file, func(c astutil.Cursor) bool {
+		pkgDecl, ok := c.Node().(*ast.Package)
+		if ok {
+			pkgDeclSeen = true
+			if IsPhantomPackage(pkgDecl) {
+				c.Delete()
+			}
+		}
+		return !pkgDeclSeen
+	}, nil)
 }
 
 // Version implements [FileHandle]

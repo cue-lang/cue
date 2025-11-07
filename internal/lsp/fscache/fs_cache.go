@@ -13,8 +13,10 @@ import (
 	"time"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/robustio"
@@ -137,7 +139,8 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 			syntax.Decls = decls
 		}
 		if pkg.Name == nil || pkg.Name.Name == "" || pkg.Name.Name == "_" {
-			pkg.Name = ast.NewIdent(fmt.Sprintf("_%x", sha256.Sum256([]byte(bf.Filename))))
+			// Important that this ident has no position.
+			pkg.Name = ast.NewIdent(phantomPackageName(bf.Filename))
 		}
 	}
 
@@ -146,6 +149,55 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 	p.err = err
 
 	return syntax, cfg, err
+}
+
+func phantomPackageName(filename string) string {
+	return fmt.Sprintf("_%x", sha256.Sum256([]byte(filename)))
+}
+
+// phantomPackageNameLength contains the total length of the package
+// name injected into files which do not have a package declaration.
+var phantomPackageNameLength = len(phantomPackageName(""))
+
+// IsPhantomPackage reports whether the package declaration was
+// created to be injected into a file's AST for files which have no
+// package declaration themselves.
+func IsPhantomPackage(pkgDecl *ast.Package) bool {
+	name := pkgDecl.Name
+	return name != nil && name.Pos() == token.NoPos && len(name.Name) == phantomPackageNameLength && name.Name[0] == '_'
+}
+
+// RemovePhantomPackageDecl removes any phantom package declaration
+// from the provided AST.
+func RemovePhantomPackageDecl(file *ast.File) ast.Node {
+	topLevelDecls := make(map[ast.Node]struct{})
+	for _, decl := range file.Preamble() {
+		topLevelDecls[decl] = struct{}{}
+	}
+
+	// TODO: this is still wasteful: although we ensure we do not go
+	// "deep" down the tree, we nevertheless always look at every top
+	// level decl in the File.
+
+	pkgDeclSeen := false
+	return astutil.Apply(file, func(c astutil.Cursor) bool {
+		if pkgDeclSeen {
+			return false
+		}
+		node := c.Node()
+		pkgDecl, ok := node.(*ast.Package)
+		if ok {
+			pkgDeclSeen = true
+			if IsPhantomPackage(pkgDecl) {
+				c.Delete()
+			}
+			return false
+		}
+		// package decls must appear at the top level, so do not go any
+		// deeper.
+		_, isTopLevel := topLevelDecls[node]
+		return !isTopLevel
+	}, nil)
 }
 
 // Version implements [FileHandle]

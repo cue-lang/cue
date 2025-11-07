@@ -253,7 +253,7 @@ z: x & {
 `,
 			expectDefinitions: map[position][]position{
 				ln(2, 1, "x"): {ln(1, 1, "x")},
-				ln(4, 1, "y"): {ln(3, 1, "y")}, // Wrong - should also go to line 1's y
+				ln(4, 1, "y"): {ln(3, 1, "y"), ln(1, 1, "y")},
 
 				ln(1, 1, "x"): {self},
 				ln(1, 1, "y"): {self},
@@ -272,7 +272,6 @@ z: x & {
 				ln(4, 1, "w"):   {f: []string{"w", "y"}},
 				ln(4, 1, "y"):   {e: []string{"w", "x", "y", "z"}},
 			},
-			skipUsages: true,
 		},
 
 		{
@@ -287,7 +286,7 @@ z: {
 `,
 			expectDefinitions: map[position][]position{
 				ln(2, 1, "x"): {ln(1, 1, "x")},
-				ln(5, 1, "y"): {ln(4, 1, "y")}, // Wrong - should also go to line 1's y
+				ln(5, 1, "y"): {ln(4, 1, "y"), ln(1, 1, "y")},
 
 				ln(1, 1, "x"): {self},
 				ln(1, 1, "y"): {self},
@@ -308,7 +307,6 @@ z: {
 				ln(5, 1, "w"):   {f: []string{"w", "y"}},
 				ln(5, 1, "y"):   {e: []string{"w", "x", "y", "z"}},
 			},
-			skipUsages: true,
 		},
 
 		{
@@ -3216,7 +3214,6 @@ type testCase struct {
 	expectDefinitions map[position][]position
 	expectCompletions map[position]fieldEmbedCompletions
 	expectUsagesExtra map[position]map[bool][]position
-	skipUsages        bool
 	importedBy        map[string][]string
 }
 
@@ -3420,10 +3417,6 @@ func connectedComponents(edges map[position][]position) [][]position {
 
 func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCaseAnalysis) {
 	t.Run("usages", func(t *testing.T) {
-		if tc.skipUsages {
-			t.SkipNow()
-		}
-
 		// UsagesForOffset has two modes: whether or not to include
 		// field declarations in the results. We wish to test both
 		// modes.

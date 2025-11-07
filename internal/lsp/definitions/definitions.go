@@ -1719,9 +1719,11 @@ func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
 		if root == nil {
 			return nil
 		}
-		navs := []*navigableBindings{root}
+		navs := expandNavigableViaAncestralPath(root)
 		n.addDefinition(e.Pos(), e.End(), navs)
-		root.recordUsage(e, n)
+		for _, nav := range navs {
+			nav.recordUsage(e, n)
+		}
 		return navs
 
 	case *ast.SelectorExpr:

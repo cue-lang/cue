@@ -17,6 +17,7 @@ package pkg
 import (
 	"io"
 	"math/big"
+	"math/bits"
 
 	"github.com/cockroachdb/apd/v3"
 
@@ -31,8 +32,8 @@ type CallCtxt struct {
 	*adt.CallContext
 	ctx     *adt.OpContext
 	builtin *Builtin
-	Err     interface{}
-	Ret     interface{}
+	Err     any
+	Ret     any
 
 	args []adt.Value
 }
@@ -111,15 +112,21 @@ func (c *CallCtxt) Int32(i int) int32 { return int32(c.intValue(i, 32, "int32"))
 func (c *CallCtxt) Rune(i int) rune   { return rune(c.intValue(i, 32, "rune")) }
 func (c *CallCtxt) Int64(i int) int64 { return c.intValue(i, 64, "int64") }
 
-func (c *CallCtxt) intValue(i, bits int, typ string) int64 {
+func (c *CallCtxt) intValue(i, bitLen int, typ string) int64 {
 	arg := c.args[i]
+	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
+		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
+		if n, err := num.X.Int64(); err == nil && bits.Len64(uint64(n)) <= bitLen {
+			return n
+		}
+	}
 	x := value.Make(c.ctx, arg)
 	n, err := x.Int(nil)
 	if err != nil {
 		c.invalidArgType(arg, i, typ, err)
 		return 0
 	}
-	if n.BitLen() > bits {
+	if n.BitLen() > bitLen {
 		c.errf(err, "int %s overflows %s in argument %d in call to %s",
 			n, typ, i, c.Name())
 	}
@@ -134,14 +141,23 @@ func (c *CallCtxt) Uint16(i int) uint16 { return uint16(c.uintValue(i, 16, "uint
 func (c *CallCtxt) Uint32(i int) uint32 { return uint32(c.uintValue(i, 32, "uint32")) }
 func (c *CallCtxt) Uint64(i int) uint64 { return c.uintValue(i, 64, "uint64") }
 
-func (c *CallCtxt) uintValue(i, bits int, typ string) uint64 {
+func (c *CallCtxt) uintValue(i, bitLen int, typ string) uint64 {
+	arg := c.args[i]
+	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
+		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
+		// Note that [apd.Decimal] has an Int64 method, but no Uint64 method,
+		// so any uint64 value that doesn't fit in an int64 skips the shortcut.
+		if n, err := num.X.Int64(); err == nil && n >= 0 && bits.Len64(uint64(n)) <= bitLen {
+			return uint64(n)
+		}
+	}
 	x := value.Make(c.ctx, c.args[i])
 	n, err := x.Int(nil)
 	if err != nil || n.Sign() < 0 {
 		c.invalidArgType(c.args[i], i, typ, err)
 		return 0
 	}
-	if n.BitLen() > bits {
+	if n.BitLen() > bitLen {
 		c.errf(err, "int %s overflows %s in argument %d in call to %s",
 			n, typ, i, c.Name())
 	}
@@ -150,20 +166,32 @@ func (c *CallCtxt) uintValue(i, bits int, typ string) uint64 {
 }
 
 func (c *CallCtxt) Decimal(i int) *apd.Decimal {
-	x := value.Make(c.ctx, c.args[i])
+	arg := c.args[i]
+	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
+		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
+		return &num.X
+	}
+	x := value.Make(c.ctx, arg)
 	res, err := x.Decimal()
 	if err != nil {
-		c.invalidArgType(c.args[i], i, "Decimal", err)
+		c.invalidArgType(arg, i, "Decimal", err)
 		return nil
 	}
 	return res
 }
 
 func (c *CallCtxt) Float64(i int) float64 {
-	x := value.Make(c.ctx, c.args[i])
+	arg := c.args[i]
+	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
+		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
+		if f, err := num.X.Float64(); err == nil {
+			return f
+		}
+	}
+	x := value.Make(c.ctx, arg)
 	res, err := x.Float64()
 	if err != nil {
-		c.invalidArgType(c.args[i], i, "float64", err)
+		c.invalidArgType(arg, i, "float64", err)
 		return 0
 	}
 	return res
@@ -200,21 +228,30 @@ func (c *CallCtxt) BigFloat(i int) *big.Float {
 }
 
 func (c *CallCtxt) String(i int) string {
-	// TODO: use Evaluate instead.
-	x := value.Make(c.ctx, c.args[i])
+	arg := c.args[i]
+	if str, _ := c.ctx.EvaluateKeepState(arg).(*adt.String); str != nil {
+		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
+		return str.Str
+	}
+	x := value.Make(c.ctx, arg)
 	v, err := x.String()
 	if err != nil {
-		c.invalidArgType(c.args[i], i, "string", err)
+		c.invalidArgType(arg, i, "string", err)
 		return ""
 	}
 	return v
 }
 
 func (c *CallCtxt) Bytes(i int) []byte {
-	x := value.Make(c.ctx, c.args[i])
+	arg := c.args[i]
+	if bs, _ := c.ctx.EvaluateKeepState(arg).(*adt.Bytes); bs != nil {
+		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
+		return bs.B
+	}
+	x := value.Make(c.ctx, arg)
 	v, err := x.Bytes()
 	if err != nil {
-		c.invalidArgType(c.args[i], i, "bytes", err)
+		c.invalidArgType(arg, i, "bytes", err)
 		return nil
 	}
 	return v
@@ -232,10 +269,15 @@ func (c *CallCtxt) Reader(i int) io.Reader {
 }
 
 func (c *CallCtxt) Bool(i int) bool {
-	x := value.Make(c.ctx, c.args[i])
+	arg := c.args[i]
+	if b, _ := c.ctx.EvaluateKeepState(arg).(*adt.Bool); b != nil {
+		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
+		return b.B
+	}
+	x := value.Make(c.ctx, arg)
 	b, err := x.Bool()
 	if err != nil {
-		c.invalidArgType(c.args[i], i, "bool", err)
+		c.invalidArgType(arg, i, "bool", err)
 		return false
 	}
 	return b
@@ -268,7 +310,7 @@ func (c *CallCtxt) Iter(i int) (a cue.Iterator) {
 	x := value.Make(c.ctx, arg)
 	v, err := x.List()
 	if err != nil {
-		c.invalidArgType(c.args[i], i, "list", err)
+		c.invalidArgType(arg, i, "list", err)
 	}
 	return v
 }

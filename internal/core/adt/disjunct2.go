@@ -529,6 +529,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 	_ = ID // Do not remove, used for debugging.
 
 	oc := newOverlayContext(n.ctx)
+	defer n.ctx.freeOverlayContext(oc)
 
 	// Complete as much of the pending work of this node and its parent before
 	// copying. Note that once a copy is made, the disjunct is no longer able

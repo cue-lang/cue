@@ -138,8 +138,9 @@ type OpContext struct {
 	containments       []containment     // parent relations
 	containsDefIDCache map[[2]defID]bool // cache for containsDefID results
 
-	stats        stats.Counts
-	freeListNode *nodeContext
+	stats           stats.Counts
+	freeListNode    *nodeContext
+	freeListOverlay *overlayContext
 
 	e         *Environment
 	ci        CloseInfo

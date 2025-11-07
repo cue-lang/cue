@@ -42,12 +42,28 @@ import (
 // could get by with only copying arcs to that are modified in the copy.
 
 func newOverlayContext(ctx *OpContext) *overlayContext {
-	return &overlayContext{
-		ctx: ctx,
-
-		// TODO(perf): take a map from a pool of maps and reuse.
-		vertexMap: make(map[*Vertex]*Vertex),
+	oc := ctx.freeListOverlay
+	if oc != nil {
+		ctx.freeListOverlay = oc.nextFree
+		oc.ctx = ctx
+	} else {
+		oc = &overlayContext{
+			ctx:       ctx,
+			vertexMap: make(map[*Vertex]*Vertex),
+		}
 	}
+	return oc
+}
+
+func (ctx *OpContext) freeOverlayContext(oc *overlayContext) {
+	oc.root = nil
+	oc.vertices = oc.vertices[:0]
+	oc.nextFree = nil
+	clear(oc.vertexMap)
+	clear(oc.compMap)
+
+	oc.nextFree = ctx.freeListOverlay
+	ctx.freeListOverlay = oc
 }
 
 // An overlayContext keeps track of copied vertices, closeContexts, and tasks.
@@ -71,6 +87,9 @@ type overlayContext struct {
 	// confMap maps envComprehension values to the ones copied for this
 	// overlayContext.
 	compMap map[*envComprehension]*envComprehension
+
+	// nextFree is used for maintaining a free list of overlayContext instances.
+	nextFree *overlayContext
 }
 
 type vertexMap map[*Vertex]*Vertex

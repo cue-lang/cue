@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4f04931_ab5cf619",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1722,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-07T09:22:18Z",
+      "side": 0,
+      "message": "I was always suspicious of this. Always seemed odd to me that this was the only place we ever promoted a single navigable to a slice.",
+      "revId": "1276233df628b898916acaa1e02281618d0cea2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

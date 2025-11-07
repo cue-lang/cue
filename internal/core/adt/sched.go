@@ -304,6 +304,26 @@ func (s *scheduler) clear() {
 	}
 }
 
+// allTasksStarted reports whether all tasks have started processing.
+func allTasksStarted(x *nodeContext) bool {
+	for _, t := range x.tasks {
+		if t.state == taskREADY {
+			return false
+		}
+	}
+	return true
+}
+
+// allTasksFinished reports whether all tasks have completed processing.
+func allTasksFinished(x *nodeContext) bool {
+	for _, t := range x.tasks {
+		if t.state < taskSUCCESS {
+			return false
+		}
+	}
+	return true
+}
+
 // cloneInto initializes the state of dst to be the same as s.
 //
 // NOTE: this is deliberately not a pointer receiver: this approach allows

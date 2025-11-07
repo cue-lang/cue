@@ -243,6 +243,75 @@ y: a.b
 		},
 
 		{
+			name: "Inner_Reference_Explicit",
+			archive: `-- a.cue --
+x: y: int
+z: x & {
+  y: 3
+  w: y
+}
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "x"): {ln(1, 1, "x")},
+				ln(4, 1, "y"): {ln(3, 1, "y")}, // Wrong - should also go to line 1's y
+
+				ln(1, 1, "x"): {self},
+				ln(1, 1, "y"): {self},
+
+				ln(2, 1, "z"): {self},
+				ln(3, 1, "y"): {self, ln(1, 1, "y")},
+				ln(4, 1, "w"): {self},
+			},
+			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(1, 1, "x"):   {f: []string{"x", "z"}},
+				ln(1, 1, "y"):   {f: []string{"y"}},
+				ln(1, 1, "int"): {e: []string{"x", "y", "z"}},
+				ln(2, 1, "z"):   {f: []string{"x", "z"}},
+				ln(2, 1, "x"):   {e: []string{"x", "z"}},
+				ln(3, 1, "y"):   {f: []string{"w", "y"}},
+				ln(4, 1, "w"):   {f: []string{"w", "y"}},
+				ln(4, 1, "y"):   {e: []string{"w", "x", "y", "z"}},
+			},
+			skipUsages: true,
+		},
+
+		{
+			name: "Inner_Reference_Implicit",
+			archive: `-- a.cue --
+x: y: int
+z: x
+z: {
+  y: 3
+  w: y
+}
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "x"): {ln(1, 1, "x")},
+				ln(5, 1, "y"): {ln(4, 1, "y")}, // Wrong - should also go to line 1's y
+
+				ln(1, 1, "x"): {self},
+				ln(1, 1, "y"): {self},
+
+				ln(2, 1, "z"): {self, ln(3, 1, "z")},
+				ln(3, 1, "z"): {self, ln(2, 1, "z")},
+				ln(4, 1, "y"): {self, ln(1, 1, "y")},
+				ln(5, 1, "w"): {self},
+			},
+			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(1, 1, "x"):   {f: []string{"x", "z"}},
+				ln(1, 1, "y"):   {f: []string{"y"}},
+				ln(1, 1, "int"): {e: []string{"x", "y", "z"}},
+				ln(2, 1, "z"):   {f: []string{"x", "z"}},
+				ln(2, 1, "x"):   {f: []string{"w", "y"}, e: []string{"x", "z"}},
+				ln(3, 1, "z"):   {f: []string{"x", "z"}},
+				ln(4, 1, "y"):   {f: []string{"w", "y"}},
+				ln(5, 1, "w"):   {f: []string{"w", "y"}},
+				ln(5, 1, "y"):   {e: []string{"w", "x", "y", "z"}},
+			},
+			skipUsages: true,
+		},
+
+		{
 			name: "Embedding",
 			archive: `-- a.cue --
 x: y: z: 3
@@ -3147,6 +3216,7 @@ type testCase struct {
 	expectDefinitions map[position][]position
 	expectCompletions map[position]fieldEmbedCompletions
 	expectUsagesExtra map[position]map[bool][]position
+	skipUsages        bool
 	importedBy        map[string][]string
 }
 
@@ -3350,6 +3420,9 @@ func connectedComponents(edges map[position][]position) [][]position {
 
 func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCaseAnalysis) {
 	t.Run("usages", func(t *testing.T) {
+		if tc.skipUsages {
+			t.SkipNow()
+		}
 
 		// UsagesForOffset has two modes: whether or not to include
 		// field declarations in the results. We wish to test both

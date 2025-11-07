@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65a3190b_ce190f47",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-07T14:16:56Z",
+      "side": 1,
+      "message": "Unity reports Go.AllocObjects savings between 0 and 3%",
+      "revId": "fc4088a1098c0b28a5d48056a63945d2171472b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

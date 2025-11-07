@@ -325,7 +325,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 		}
 		return &adt.Bottom{Err: errs}
 	case bool:
-		return &adt.Bool{Src: src, B: v}
+		return c.ctx.NewBool(v)
 	case string:
 		s, _ := unicode.UTF8.NewEncoder().String(v)
 		return &adt.String{Src: src, Str: s}
@@ -378,7 +378,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 		value := reflect.ValueOf(v)
 		switch value.Kind() {
 		case reflect.Bool:
-			return &adt.Bool{Src: src, B: value.Bool()}
+			return c.ctx.NewBool(value.Bool())
 
 		case reflect.String:
 			str := value.String()

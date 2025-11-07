@@ -157,8 +157,7 @@ type schedState uint8
 const (
 	schedREADY schedState = iota
 
-	schedRUNNING    // processing conjunct(s)
-	schedFINALIZING // all tasks completed, run new tasks immediately
+	schedRUNNING // processing conjunct(s)
 	schedSUCCESS
 	schedFAILED
 )
@@ -188,8 +187,6 @@ func (s schedState) String() string {
 		return "READY"
 	case schedRUNNING:
 		return "RUNNING"
-	case schedFINALIZING:
-		return "FINALIZING"
 	case schedSUCCESS:
 		return "SUCCESS"
 	case schedFAILED:
@@ -653,11 +650,6 @@ func (s *scheduler) insertTask(t *task) {
 		panic("task depends on its own completion")
 	}
 	t.completes = completes
-
-	if s.state == schedFINALIZING {
-		runTask(t, finalize)
-		return
-	}
 
 	s.incrementCounts(completes)
 	s.tasks = append(s.tasks, t)

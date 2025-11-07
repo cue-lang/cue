@@ -20,6 +20,8 @@ package adt
 //
 
 import (
+	"slices"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
@@ -705,7 +707,8 @@ func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
 
 	ctx := n.ctx
 
-	a := []Value{}
+	// Preallocate some space in the stack.
+	a := make([]Value, 0, 4)
 	// if n.node.Value != nil {
 	// 	a = append(a, n.node.Value)
 	// }
@@ -754,7 +757,9 @@ func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
 		v = a[0]
 
 	default:
-		v = &Conjunction{Values: a}
+		// With multiple elements, the slice escapes so it must allocate.
+		// Make a copy here, so that the len(a)==1 case stays in the stack.
+		v = &Conjunction{Values: slices.Clone(a)}
 	}
 
 	return v

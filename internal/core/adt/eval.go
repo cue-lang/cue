@@ -455,11 +455,9 @@ type nodeContextState struct {
 
 	// Value info
 
-	kind           Kind
-	constraintKind Kind
-	defaultKind    Kind
-	kindExpr       Expr      // expr that adjust last value (for error reporting)
-	kindID         CloseInfo // for error tracing
+	kind     Kind
+	kindExpr Expr      // expr that adjust last value (for error reporting)
+	kindID   CloseInfo // for error tracing
 
 	// Current value (may be under construction)
 	scalar   Value // TODO: use Value in node.
@@ -506,9 +504,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			scheduler: n.scheduler,
 			node:      node,
 			nodeContextState: nodeContextState{
-				kind:           TopKind,
-				constraintKind: TopKind,
-				defaultKind:    TopKind,
+				kind: TopKind,
 			},
 			toFree:          n.toFree[:0],
 			arcMap:          n.arcMap[:0],
@@ -538,9 +534,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			node: node,
 
 			nodeContextState: nodeContextState{
-				kind:           TopKind,
-				constraintKind: TopKind,
-				defaultKind:    TopKind,
+				kind: TopKind,
 			},
 		}
 	}

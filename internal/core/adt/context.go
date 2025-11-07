@@ -141,6 +141,7 @@ type OpContext struct {
 	stats           stats.Counts
 	freeListNode    *nodeContext
 	freeListOverlay *overlayContext
+	validatorBuf    []Value // reused by [nodeContext.getValidators]
 
 	e         *Environment
 	ci        CloseInfo

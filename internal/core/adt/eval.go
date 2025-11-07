@@ -20,6 +20,8 @@ package adt
 //
 
 import (
+	"slices"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
@@ -702,7 +704,7 @@ func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
 
 	ctx := n.ctx
 
-	a := []Value{}
+	a := ctx.validatorBuf[:0]
 	// if n.node.Value != nil {
 	// 	a = append(a, n.node.Value)
 	// }
@@ -751,8 +753,12 @@ func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
 		v = a[0]
 
 	default:
-		v = &Conjunction{Values: a}
+		// Make a copy since the Conjunction will hold a reference to the slice.
+		v = &Conjunction{Values: slices.Clone(a)}
 	}
+
+	// Update the buffer for reuse on the next call.
+	ctx.validatorBuf = a
 
 	return v
 }

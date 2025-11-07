@@ -1837,18 +1837,6 @@ func (v Value) Unify(w Value) Value {
 
 	n := adt.Unify(ctx, v.v, w.v)
 
-	if ctx.Version == internal.EvalV2 {
-		if err := n.Err(ctx); err != nil {
-			return makeValue(v.idx, n, v.parent_)
-		}
-		if err := allowed(ctx, v.v, n); err != nil {
-			return newErrValue(w, err)
-		}
-		if err := allowed(ctx, w.v, n); err != nil {
-			return newErrValue(v, err)
-		}
-	}
-
 	return makeValue(v.idx, n, v.parent_)
 }
 
@@ -1871,18 +1859,8 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 	n := &adt.Vertex{}
 	ctx := v.ctx()
 
-	switch ctx.Version {
-	case internal.EvalV2:
-		cv := adt.MakeRootConjunct(nil, v.v)
-		cw := adt.MakeRootConjunct(nil, w.v)
-
-		n.AddConjunct(cv)
-		n.AddConjunct(cw)
-
-	case internal.EvalV3:
-		n.AddOpenConjunct(ctx, v.v)
-		n.AddOpenConjunct(ctx, w.v)
-	}
+	n.AddOpenConjunct(ctx, v.v)
+	n.AddOpenConjunct(ctx, w.v)
 	n.Finalize(ctx)
 
 	n.Parent = v.v.Parent

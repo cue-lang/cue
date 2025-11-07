@@ -248,12 +248,9 @@ type nodeContext struct {
 	// This allows checking that we are not using stale nodeContexts.
 	opID uint64
 
-	// refCount:
-	// evalv2: keeps track of all current usages of the node, such that the
-	//    node can be freed when the counter reaches zero.
-	// evalv3: keeps track of the number points in the code where this
-	//.   nodeContext is used for processing. A nodeContext that is being
-	//.   processed may not be freed yet.
+	// refCount keeps track of the number points in the code where this
+	// nodeContext is used for processing. A nodeContext that is being
+	// processed may not be freed yet.
 	refCount int
 
 	// isDisjunct indicates whether this nodeContext is used in a disjunction.

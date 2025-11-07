@@ -744,7 +744,6 @@ func appendDisjunct(ctx *OpContext, a []*nodeContext, x *nodeContext) []*nodeCon
 	// check uniqueness
 	// TODO: if a node is not finalized, we could check that the parent
 	// (overlayed) closeContexts are identical.
-outer:
 	for _, xn := range a {
 		// TODO: for some reason, r may already have been added to dst in some
 		// cases, so we need to check for this.
@@ -756,19 +755,9 @@ outer:
 			// Partial node
 
 			if !equalPartialNode(xn.ctx, x.node, xn.node) {
-				continue outer
+				continue
 			}
-			if len(xn.tasks) != xn.taskPos || len(x.tasks) != x.taskPos {
-				if len(xn.tasks) != len(x.tasks) {
-					continue
-				}
-			}
-			for i, t := range xn.tasks[xn.taskPos:] {
-				s := x.tasks[i]
-				if s.x != t.x {
-					continue outer
-				}
-			}
+
 			vx, okx := nx.(Value)
 			ny := xv.BaseValue
 			if ny == nil || isCyclePlaceholder(ny) {
@@ -776,13 +765,13 @@ outer:
 			}
 			vy, oky := ny.(Value)
 			if okx && oky && !Equal(ctx, vx, vy, CheckStructural) {
-				continue outer
+				continue
 
 			}
 		} else {
 			// Complete nodes.
 			if !Equal(ctx, xn.node.DerefValue(), x.node.DerefValue(), CheckStructural) {
-				continue outer
+				continue
 			}
 		}
 
@@ -796,6 +785,43 @@ outer:
 	}
 
 	return append(a, x)
+}
+
+// equalTasks reports whether the unfinished tasks in x and y are equal based on
+// their expression value. Clearly, this is O(n^2). In our testing repo the
+// maximum number of tasks is 101, although usually the number is much smaller.
+// If this becomes a bottleneck, could make the task list stack based and keep
+// separate queues ready and processed tasks. An unequal number of ready tasks
+// would automatically mean inequality, and by sorting the lists we could
+// achieve O(n log n) complexity.
+func equalTasks(x, y *nodeContext) bool {
+inner1:
+	for _, t := range x.tasks {
+		if t.state != taskREADY {
+			continue
+		}
+		for _, tt := range y.tasks {
+			if t.x == tt.x {
+				continue inner1
+			}
+		}
+		return false
+	}
+
+inner2:
+	for _, t := range y.tasks {
+		if t.state != taskREADY {
+			continue
+		}
+		for _, tt := range x.tasks {
+			if t.x == tt.x {
+				continue inner2
+			}
+		}
+		return false
+	}
+
+	return true
 }
 
 func equalPartialNode(ctx *OpContext, x, y *Vertex) bool {
@@ -875,10 +901,9 @@ func isEqualNodeValue(x, y *nodeContext) bool {
 	if len(x.checks) != len(y.checks) {
 		return false
 	}
-	if len(x.tasks) != x.taskPos || len(y.tasks) != y.taskPos {
-		if len(x.tasks) != len(y.tasks) {
-			return false
-		}
+
+	if !equalTasks(x, y) {
+		return false
 	}
 
 	if !isEqualValue(x.ctx, x.lowerBound, y.lowerBound) {
@@ -892,13 +917,6 @@ func isEqualNodeValue(x, y *nodeContext) bool {
 	for i, c := range x.checks {
 		d := y.checks[i]
 		if !Equal(x.ctx, c.x.(Value), d.x.(Value), CheckStructural) {
-			return false
-		}
-	}
-
-	for i, t := range x.tasks[x.taskPos:] {
-		s := y.tasks[i]
-		if s.x != t.x {
 			return false
 		}
 	}

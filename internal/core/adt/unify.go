@@ -253,7 +253,7 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 
 	if n.node.ArcType != ArcPending &&
 		n.meets(allAncestorsProcessed) &&
-		len(n.tasks) == n.taskPos {
+		allTasksFinished(n) {
 		n.signal(arcTypeKnown)
 	}
 
@@ -546,8 +546,7 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 		n.signal(allAncestorsProcessed)
 	}
 
-	if len(n.scheduler.tasks) != n.scheduler.taskPos {
-		// TODO: do we need any more requirements here?
+	if !allTasksStarted(n) {
 		const needs = valueKnown | fieldConjunctsKnown
 
 		n.process(needs, mode)

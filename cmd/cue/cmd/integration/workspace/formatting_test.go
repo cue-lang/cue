@@ -11,24 +11,24 @@ import (
 
 func TestFormatting(t *testing.T) {
 	const files = `
--- cue.mod/module.cue --
+-- m/cue.mod/module.cue --
 module: "mod.example/x"
 language: version: "v0.11.0"
 
--- a/a.cue --
+-- m/a/a.cue --
 package a
 
   import "strings"
 
   v1: int
 
--- formatted/a/a.cue --
+-- formatted/m/a/a.cue --
 package a
 
 import "strings"
 
 v1: int
--- a/b.cue --
+-- m/a/b.cue --
 package a
 
   import "strings"
@@ -36,13 +36,25 @@ package a
  complete
   and utter
    rubbish
--- a/c.cue --
+-- m/a/c.cue --
 package a
 
 out: "A" | // first letter
 	"B" | // second letter
 	"C" | // third letter
 										"D" // fourth letter
+-- m/a/nopkg.cue --
+x: 3
+    y: x
+-- formatted/m/a/nopkg.cue --
+x: 3
+y: x
+-- standalone/a.cue --
+ y: x
+   x: 4
+-- formatted/standalone/a.cue --
+y: x
+x: 4
 `
 
 	archiveFiles := make(map[string]string)
@@ -56,15 +68,15 @@ out: "A" | // first letter
 			env.Await(
 				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			)
-			env.OpenFile("a/a.cue")
+			env.OpenFile("m/a/a.cue")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/m/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
 			)
-			env.FormatBuffer("a/a.cue")
-			content, open := env.Editor.BufferText("a/a.cue")
+			env.FormatBuffer("m/a/a.cue")
+			content, open := env.Editor.BufferText("m/a/a.cue")
 			qt.Assert(t, qt.Equals(open, true))
-			qt.Assert(t, qt.Equals(content, archiveFiles["formatted/a/a.cue"]))
+			qt.Assert(t, qt.Equals(content, archiveFiles["formatted/m/a/a.cue"]))
 		})
 	})
 
@@ -74,15 +86,15 @@ out: "A" | // first letter
 			env.Await(
 				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			)
-			env.OpenFile("a/b.cue")
+			env.OpenFile("m/a/b.cue")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/m/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
 			)
-			env.FormatBuffer("a/b.cue")
-			content, open := env.Editor.BufferText("a/b.cue")
+			env.FormatBuffer("m/a/b.cue")
+			content, open := env.Editor.BufferText("m/a/b.cue")
 			qt.Assert(t, qt.Equals(open, true))
-			qt.Assert(t, qt.Equals(content, archiveFiles["a/b.cue"]))
+			qt.Assert(t, qt.Equals(content, archiveFiles["m/a/b.cue"]))
 		})
 	})
 
@@ -92,15 +104,37 @@ out: "A" | // first letter
 			env.Await(
 				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			)
-			env.OpenFile("a/c.cue")
+			env.OpenFile("m/a/c.cue")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
+				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/m/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
 			)
-			env.FormatBuffer("a/c.cue")
-			content, open := env.Editor.BufferText("a/c.cue")
+			env.FormatBuffer("m/a/c.cue")
+			content, open := env.Editor.BufferText("m/a/c.cue")
 			qt.Assert(t, qt.Equals(open, true))
-			qt.Assert(t, qt.Equals(content, archiveFiles["a/c.cue"]))
+			qt.Assert(t, qt.Equals(content, archiveFiles["m/a/c.cue"]))
+		})
+	})
+
+	t.Run("format no-package file", func(t *testing.T) {
+		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+			env.OpenFile("m/a/nopkg.cue")
+			env.Await(env.DoneWithOpen())
+			env.FormatBuffer("m/a/nopkg.cue")
+			content, open := env.Editor.BufferText("m/a/nopkg.cue")
+			qt.Assert(t, qt.Equals(open, true))
+			qt.Assert(t, qt.Equals(content, archiveFiles["formatted/m/a/nopkg.cue"]))
+		})
+	})
+
+	t.Run("format standalone file", func(t *testing.T) {
+		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+			env.OpenFile("standalone/a.cue")
+			env.Await(env.DoneWithOpen())
+			env.FormatBuffer("standalone/a.cue")
+			content, open := env.Editor.BufferText("standalone/a.cue")
+			qt.Assert(t, qt.Equals(open, true))
+			qt.Assert(t, qt.Equals(content, archiveFiles["formatted/standalone/a.cue"]))
 		})
 	})
 }

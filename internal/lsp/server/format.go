@@ -16,6 +16,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/diff"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
+	"cuelang.org/go/internal/lsp/fscache"
 )
 
 // Formatting formats the params.TextDocument.URI as canonical cue.
@@ -28,12 +29,7 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 	defer done()
 
 	uri := params.TextDocument.URI
-	mod, err := s.workspace.FindModuleForFile(uri)
-	if err != nil {
-		return nil, err
-	}
-
-	parsedFile, config, fh, err := mod.ReadCUEFile(uri)
+	parsedFile, config, fh, err := s.workspace.ReadCUEFile(uri)
 	if err != nil {
 		s.client.ShowMessage(ctx, &protocol.ShowMessageParams{
 			Type:    protocol.Info,
@@ -48,7 +44,8 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 		return nil, nil
 	}
 
-	formatted, err := cueformat.Node(parsedFile)
+	node := fscache.RemovePhantomPackageDecl(parsedFile)
+	formatted, err := cueformat.Node(node)
 	if err != nil {
 		// TODO fix up the AST like gopls so we can do more with
 		// partial/incomplete code.

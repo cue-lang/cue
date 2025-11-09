@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"cmp"
-	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -635,9 +634,6 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 func (b *buildPlan) parseFlags() (err error) {
 	b.mergeData = !b.cfg.noMerge && flagMerge.Bool(b.cmd)
 
-	if flagStrict.IsSet(b.cmd) {
-		return fmt.Errorf(`--strict is deprecated; use "jsonschema+strict:" as shown in "cue help filetypes"`)
-	}
 	b.encConfig = &encoding.Config{
 		Mode:      b.cfg.mode,
 		Stdin:     b.cmd.InOrStdin(),

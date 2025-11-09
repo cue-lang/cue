@@ -306,18 +306,12 @@ func (a *Attribute) Split() (key, body string) {
 
 // A Field represents a field declaration in a struct.
 type Field struct {
-	// TODO(mvdan): remove the deprecated fields below in early 2026.
-
-	Label Label         // must have at least one element.
-	Alias *PostfixAlias // optional postfix alias (nil if no alias)
-	// Deprecated: use [Field.Constraint]
-	Optional   token.Pos
-	Constraint token.Token // token.ILLEGAL, token.OPTION, or token.NOT
+	Label      Label         // must have at least one element.
+	Alias      *PostfixAlias // optional postfix alias (nil if no alias)
+	Constraint token.Token   // token.ILLEGAL, token.OPTION, or token.NOT
 
 	// No TokenPos: Value must be an StructLit with one field.
 	TokenPos token.Pos
-	// Deprecated: the value is always [token.COLON]
-	Token token.Token
 
 	Value Expr // the value associated with this field.
 
@@ -557,7 +551,6 @@ func NewStruct(fields ...interface{}) *StructLit {
 	for i := 0; i < len(fields); i++ {
 		var (
 			label      Label
-			optional   = token.NoPos
 			constraint = token.ILLEGAL
 			expr       Expr
 		)
@@ -594,10 +587,7 @@ func NewStruct(fields ...interface{}) *StructLit {
 				break inner
 			case token.Token:
 				switch x {
-				case token.OPTION:
-					constraint = x
-					optional = token.Blank.Pos()
-				case token.NOT:
+				case token.OPTION, token.NOT:
 					constraint = x
 				case token.COLON, token.ILLEGAL:
 				default:
@@ -612,7 +602,6 @@ func NewStruct(fields ...interface{}) *StructLit {
 		}
 		s.Elts = append(s.Elts, &Field{
 			Label:      label,
-			Optional:   optional,
 			Constraint: constraint,
 			Value:      expr,
 		})

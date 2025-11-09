@@ -21,10 +21,8 @@ b: 3
 				Name: "a"
 			}
 			Alias: nil
-			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("file.cue:3:2", nospace)
-			Token: token.Token(":")
 			Value: *ast.Ident@XXXX{
 				NamePos: token.Pos("file.cue:3:4", blank)
 				Name: "b"
@@ -38,10 +36,8 @@ b: 3
 				Name: "b"
 			}
 			Alias: nil
-			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("file.cue:4:2", nospace)
-			Token: token.Token(":")
 			Value: *ast.BasicLit@XXXX{
 				ValuePos: token.Pos("file.cue:4:4", blank)
 				Kind: token.Token("INT")

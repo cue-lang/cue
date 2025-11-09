@@ -1057,7 +1057,6 @@ func (e *extractor) makeField(name string, kind fieldKind, expr types.Type, doc 
 		cueast.SetRelPos(doc, cuetoken.NewSection)
 	}
 
-	var tok cuetoken.Token
 	switch kind {
 	case definition:
 		// neither optional nor required.
@@ -1066,10 +1065,8 @@ func (e *extractor) makeField(name string, kind fieldKind, expr types.Type, doc 
 		// higher than a certain number? We may not be able to determine this
 		// accurately enough.
 	case optional:
-		tok = cuetoken.OPTION
+		f.Constraint = cuetoken.OPTION
 	}
-
-	internal.SetConstraint(f, tok)
 
 	b, _ := format.Node(typ, format.Simplify())
 	return f, string(b)

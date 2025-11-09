@@ -20,10 +20,8 @@ embed: {
 				Name: "a"
 			}
 			Alias: nil
-			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:1:2", nospace)
-			Token: token.Token(":")
 			Value: *ast.BasicLit{
 				ValuePos: token.Pos("fields.cue:1:4", blank)
 				Kind: token.Token("INT")
@@ -42,10 +40,8 @@ embed: {
 				Name: "b"
 			}
 			Alias: nil
-			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:2:2", nospace)
-			Token: token.Token(":")
 			Value: *ast.BasicLit{
 				ValuePos: token.Pos("fields.cue:2:4", blank)
 				Kind: token.Token("INT")
@@ -68,10 +64,8 @@ embed: {
 				Name: "c"
 			}
 			Alias: nil
-			Optional: token.Pos("fields.cue:3:2", nospace)
 			Constraint: token.Token("!")
 			TokenPos: token.Pos("fields.cue:3:3", nospace)
-			Token: token.Token(":")
 			Value: *ast.StructLit{
 				Lbrace: token.Pos("-")
 				Elts: []ast.Decl{
@@ -81,10 +75,8 @@ embed: {
 							Name: "d"
 						}
 						Alias: nil
-						Optional: token.Pos("fields.cue:3:6", nospace)
 						Constraint: token.Token("?")
 						TokenPos: token.Pos("fields.cue:3:7", nospace)
-						Token: token.Token(":")
 						Value: *ast.Ident{
 							NamePos: token.Pos("fields.cue:3:9", blank)
 							Name: "string"
@@ -109,10 +101,8 @@ embed: {
 				}
 			}
 			Alias: nil
-			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:4:4", nospace)
-			Token: token.Token(":")
 			Value: *ast.StructLit{
 				Lbrace: token.Pos("-")
 				Elts: []ast.Decl{
@@ -135,10 +125,8 @@ embed: {
 							Rbrack: token.Pos("fields.cue:4:15", nospace)
 						}
 						Alias: nil
-						Optional: token.Pos("-")
 						Constraint: token.Token("ILLEGAL")
 						TokenPos: token.Pos("fields.cue:4:16", nospace)
-						Token: token.Token(":")
 						Value: *ast.Ident{
 							NamePos: token.Pos("fields.cue:4:18", blank)
 							Name: "int"
@@ -156,10 +144,8 @@ embed: {
 				Name: "#Schema"
 			}
 			Alias: nil
-			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:5:8", nospace)
-			Token: token.Token(":")
 			Value: *ast.StructLit@ref001{
 				Lbrace: token.Pos("fields.cue:5:10", blank)
 				Elts: []ast.Decl{
@@ -169,10 +155,8 @@ embed: {
 							Name: "name"
 						}
 						Alias: nil
-						Optional: token.Pos("-")
 						Constraint: token.Token("ILLEGAL")
 						TokenPos: token.Pos("fields.cue:6:6", nospace)
-						Token: token.Token(":")
 						Value: *ast.Ident{
 							NamePos: token.Pos("fields.cue:6:8", blank)
 							Name: "string"
@@ -194,10 +178,8 @@ embed: {
 				Name: "embed"
 			}
 			Alias: nil
-			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:9:6", nospace)
-			Token: token.Token(":")
 			Value: *ast.StructLit{
 				Lbrace: token.Pos("fields.cue:9:8", blank)
 				Elts: []ast.Decl{

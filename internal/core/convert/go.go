@@ -745,7 +745,7 @@ func (c *goConverter) goTypeToValueRec(allowNullDefault bool, t reflect.Type) (e
 			d := &ast.Field{Label: ast.NewIdent(name), Value: elem}
 			c.setNextPos(d)
 			if isOptional(&f) {
-				internal.SetConstraint(d, token.OPTION)
+				d.Constraint = token.OPTION
 			}
 			obj.Elts = append(obj.Elts, d)
 		}

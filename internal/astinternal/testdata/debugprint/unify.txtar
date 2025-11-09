@@ -11,10 +11,8 @@ disjunctoin: b | c | *d
 				Name: "unification"
 			}
 			Alias: nil
-			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("unify.txtar:1:12", nospace)
-			Token: token.Token(":")
 			Value: *ast.BinaryExpr{
 				X: *ast.BinaryExpr{
 					X: *ast.Ident{
@@ -43,10 +41,8 @@ disjunctoin: b | c | *d
 				Name: "disjunctoin"
 			}
 			Alias: nil
-			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("unify.txtar:2:12", nospace)
-			Token: token.Token(":")
 			Value: *ast.BinaryExpr{
 				X: *ast.BinaryExpr{
 					X: *ast.Ident{

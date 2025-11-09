@@ -905,7 +905,6 @@ func (p *parser) parseField() (decl ast.Decl) {
 
 	switch p.tok {
 	case token.OPTION, token.NOT:
-		m.Optional = p.pos
 		m.Constraint = p.tok
 		p.next()
 	}
@@ -946,7 +945,6 @@ func (p *parser) parseField() (decl ast.Decl) {
 	}
 
 	m.TokenPos = p.pos
-	m.Token = p.tok
 	if p.tok != token.COLON {
 		p.errorExpected(pos, "':'")
 	}
@@ -974,13 +972,11 @@ func (p *parser) parseField() (decl ast.Decl) {
 
 		switch p.tok {
 		case token.OPTION, token.NOT:
-			m.Optional = p.pos
 			m.Constraint = p.tok
 			p.next()
 		}
 
 		m.TokenPos = p.pos
-		m.Token = p.tok
 		if p.tok != token.COLON {
 			if p.tok.IsLiteral() {
 				p.errf(p.pos, "expected ':'; found %s", p.lit)

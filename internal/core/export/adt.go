@@ -25,7 +25,6 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -561,8 +560,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 	case *adt.Field:
 		e.setDocs(x)
 		f := e.getFixedField(x)
-
-		internal.SetConstraint(f, x.ArcType.Token())
+		f.Constraint = x.ArcType.Token()
 		e.setField(x.Label, f)
 
 		f.Attrs = extractFieldAttrs(nil, x)
@@ -630,8 +628,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		e.setDocs(x)
 		srcKey := x.Key
 
-		f := &ast.Field{}
-		internal.SetConstraint(f, x.ArcType.Token())
+		f := &ast.Field{Constraint: x.ArcType.Token()}
 
 		v, _ := e.ctx.Evaluate(env, x.Key)
 

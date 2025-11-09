@@ -139,7 +139,6 @@ type Config struct {
 	PkgName string // package name for files to generate
 
 	Force     bool // overwrite existing files
-	Strict    bool // strict mode for jsonschema (deprecated)
 	Stream    bool // potentially write more than one document per file
 	AllErrors bool
 
@@ -318,8 +317,8 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 			// The strictKeywords and strictFeatures tags are
 			// set by internal/filetypes from the strict tag when appropriate.
 
-			StrictKeywords: cfg.Strict || tags["strictKeywords"],
-			StrictFeatures: cfg.Strict || tags["strictFeatures"],
+			StrictKeywords: tags["strictKeywords"],
+			StrictFeatures: tags["strictFeatures"],
 		}
 		file, err = jsonschema.Extract(v, cfg)
 		// TODO: simplify currently erases file line info. Reintroduce after fix.
@@ -337,8 +336,8 @@ func openAPIFunc(c *Config, f *build.File) interpretFunc {
 			// Note: don't populate Strict (see more detailed
 			// comment in jsonSchemaFunc)
 
-			StrictKeywords: c.Strict || tags["strictKeywords"],
-			StrictFeatures: c.Strict || tags["strictFeatures"],
+			StrictKeywords: tags["strictKeywords"],
+			StrictFeatures: tags["strictFeatures"],
 		})
 		// TODO: simplify currently erases file line info. Reintroduce after fix.
 		// file, err = simplify(file, err)

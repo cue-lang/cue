@@ -595,8 +595,7 @@ defined to be a YAML file which contents encode OpenAPI
 definitions.
 
 A qualifier applies to all files following it on the command line
-until the next qualifier. The cue tool does not allow a ':' in
-filenames.
+until the next qualifier.
 
 The following tags can be used in qualifiers to further
 influence input or output. For input these act as

@@ -60,7 +60,6 @@ const (
 	flagSchema          flagName = "schema"
 	flagSimplify        flagName = "simplify"
 	flagSource          flagName = "source"
-	flagStrict          flagName = "strict"
 	flagTo              flagName = "to"
 	flagTrace           flagName = "trace"
 	flagUpdateIdent     flagName = "update-ident"
@@ -92,11 +91,6 @@ func addGlobalFlags(f *pflag.FlagSet) {
 	f.BoolP(string(flagVerbose), "v", false,
 		"print information about progress")
 	f.BoolP(string(flagAllErrors), "E", false, "print all available errors")
-
-	// As of v0.14, this deprecated flag now fails when used.
-	// TODO(mvdan): remove entirely in v0.16; no users should remain by then.
-	f.Bool(string(flagStrict), false, "")
-	f.MarkHidden(string(flagStrict))
 
 	f.String(string(flagCpuProfile), "", "write a CPU profile to the specified file before exiting")
 	f.MarkHidden(string(flagCpuProfile))

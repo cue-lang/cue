@@ -511,7 +511,7 @@ func TestParseArgs(t *testing.T) {
 		},
 	}, {
 		in:  `json:D:\foo.json`,
-		out: `unsupported file name "json:D:\\foo.json": may not have ':'`,
+		out: `cannot combine scope with file`,
 	}, {
 		in:  "json: json+schema: bar.schema",
 		out: `scoped qualifier "json:" without file`,
@@ -520,10 +520,10 @@ func TestParseArgs(t *testing.T) {
 		out: `scoped qualifier "json:" without file`,
 	}, {
 		in:  ":file.json",
-		out: `unsupported file name ":file.json": may not have ':'`,
+		out: `empty filetype prefix in ":file.json"`,
 	}, {
 		in:  "json:foo:bar.yaml",
-		out: `unsupported file name "json:foo:bar.yaml": may not have ':'`,
+		out: `cannot combine scope with file`,
 	}, {
 		in:  "data:foo.cue",
 		out: `cannot combine scope with file`,

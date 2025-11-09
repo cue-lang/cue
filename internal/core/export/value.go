@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -455,7 +454,7 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 		// This package typically does not create errors that did not result
 		// from evaluation already.
 
-		internal.SetConstraint(f, arc.ArcType.Token())
+		f.Constraint = arc.ArcType.Token()
 
 		f.Value = e.vertex(arc.DerefValue())
 

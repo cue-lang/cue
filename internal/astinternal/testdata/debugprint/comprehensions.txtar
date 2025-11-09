@@ -28,10 +28,8 @@ for k, v in input if v > 2 {
 							Name: "a"
 						}
 						Alias: nil
-						Optional: token.Pos("-")
 						Constraint: token.Token("ILLEGAL")
 						TokenPos: token.Pos("comprehensions.cue:2:3", nospace)
-						Token: token.Token(":")
 						Value: *ast.BasicLit{
 							ValuePos: token.Pos("comprehensions.cue:2:5", blank)
 							Kind: token.Token("true")
@@ -94,10 +92,8 @@ for k, v in input if v > 2 {
 							Rparen: token.Pos("comprehensions.cue:5:4", nospace)
 						}
 						Alias: nil
-						Optional: token.Pos("-")
 						Constraint: token.Token("ILLEGAL")
 						TokenPos: token.Pos("comprehensions.cue:5:5", nospace)
-						Token: token.Token(":")
 						Value: *ast.Ident{
 							NamePos: token.Pos("comprehensions.cue:5:7", blank)
 							Name: "v"

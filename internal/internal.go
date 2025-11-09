@@ -300,17 +300,6 @@ func IsRegularField(f *ast.Field) bool {
 	return true
 }
 
-// SetConstraints sets both the main and deprecated fields of f according to the
-// given constraint token.
-func SetConstraint(f *ast.Field, t token.Token) {
-	f.Constraint = t
-	if t == token.ILLEGAL {
-		f.Optional = token.NoPos
-	} else {
-		f.Optional = token.Blank.Pos()
-	}
-}
-
 // GenPath reports the directory in which to store generated files.
 func GenPath(root string) string {
 	return filepath.Join(root, "cue.mod", "gen")

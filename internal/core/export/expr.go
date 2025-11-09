@@ -22,7 +22,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -264,7 +263,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			x.inDefinition--
 		}
 
-		internal.SetConstraint(d, field.arcType.Token())
+		d.Constraint = field.arcType.Token()
 		if x.cfg.ShowDocs {
 			v := &adt.Vertex{Conjuncts: a}
 			docs := extractDocs(v)

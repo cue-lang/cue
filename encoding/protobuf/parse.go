@@ -529,7 +529,6 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 		p.addTag(f, o.tags)
 
 		if !o.required {
-			f.Optional = token.NoSpace.Pos()
 			f.Constraint = token.OPTION
 		}
 
@@ -723,7 +722,6 @@ func (p *protoConverter) oneOf(x *proto.Oneof) {
 		case *proto.OneOfField:
 			newStruct()
 			oneOf := p.parseField(s, 0, x.Field)
-			oneOf.Optional = token.NoPos
 			oneOf.Constraint = token.ILLEGAL
 
 		case *proto.Comment:
@@ -763,7 +761,6 @@ func (p *protoConverter) parseField(s *ast.StructLit, i int, x *proto.Field) *as
 	p.addTag(f, o.tags)
 
 	if !o.required {
-		f.Optional = token.NoSpace.Pos()
 		f.Constraint = token.OPTION
 	}
 	return f
@@ -798,7 +795,6 @@ func (p *optionParser) parse(options []*proto.Option) {
 			addComments(constraint, 1, o.Comment, o.InlineComment)
 			p.message.Elts = append(p.message.Elts, constraint)
 			if !p.required {
-				constraint.Optional = token.NoSpace.Pos()
 				constraint.Constraint = token.OPTION
 			}
 		case "(google.api.field_behavior)":

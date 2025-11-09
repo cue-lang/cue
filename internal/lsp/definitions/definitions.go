@@ -1456,7 +1456,6 @@ func (n *astNode) eval() {
 				unprocessed = append(unprocessed, &ast.Field{
 					Label:    &ast.Ident{NamePos: elt.Pos(), Name: "__" + fmt.Sprint(i)},
 					TokenPos: elt.Pos(),
-					Token:    token.COLON,
 					Value:    elt,
 				})
 			}

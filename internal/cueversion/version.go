@@ -14,7 +14,7 @@ import (
 // This determines the latest version of CUE that
 // is accepted by the module.
 func LanguageVersion() string {
-	return "v0.15.0"
+	return "v0.16.0"
 }
 
 // ModuleVersion returns the version of the cuelang.org/go module as best as can

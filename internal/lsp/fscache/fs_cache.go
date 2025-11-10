@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/robustio"
@@ -170,34 +170,16 @@ func IsPhantomPackage(pkgDecl *ast.Package) bool {
 // RemovePhantomPackageDecl removes any phantom package declaration
 // from the provided AST.
 func RemovePhantomPackageDecl(file *ast.File) ast.Node {
-	topLevelDecls := make(map[ast.Node]struct{})
-	for _, decl := range file.Preamble() {
-		topLevelDecls[decl] = struct{}{}
+	pkgDecl, i := internal.Package(file)
+	if pkgDecl == nil || !IsPhantomPackage(pkgDecl) {
+		return file
 	}
 
-	// TODO: this is still wasteful: although we ensure we do not go
-	// "deep" down the tree, we nevertheless always look at every top
-	// level decl in the File.
-
-	pkgDeclSeen := false
-	return astutil.Apply(file, func(c astutil.Cursor) bool {
-		if pkgDeclSeen {
-			return false
-		}
-		node := c.Node()
-		pkgDecl, ok := node.(*ast.Package)
-		if ok {
-			pkgDeclSeen = true
-			if IsPhantomPackage(pkgDecl) {
-				c.Delete()
-			}
-			return false
-		}
-		// package decls must appear at the top level, so do not go any
-		// deeper.
-		_, isTopLevel := topLevelDecls[node]
-		return !isTopLevel
-	}, nil)
+	decls := slices.Clone(file.Decls)
+	decls = slices.Delete(decls, i, i+1)
+	fileCopy := *file
+	fileCopy.Decls = decls
+	return &fileCopy
 }
 
 // Version implements [FileHandle]

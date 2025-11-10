@@ -117,22 +117,23 @@ const (
 	DevVersion    = EvalV3 // TODO(mvdan): rename to EvalExperiment for consistency with cuecontext
 )
 
-// Package finds the package declaration from the preamble of a file.
-func Package(f *ast.File) *ast.Package {
-	for _, d := range f.Decls {
+// Package finds the package declaration from the preamble of a file,
+// returning it, and its index within the file's Decls.
+func Package(f *ast.File) (*ast.Package, int) {
+	for i, d := range f.Decls {
 		switch d := d.(type) {
 		case *ast.CommentGroup:
 		case *ast.Attribute:
 		case *ast.Package:
 			if d.Name == nil { // malformed package declaration
-				return nil
+				return nil, -1
 			}
-			return d
+			return d, i
 		default:
-			return nil
+			return nil, -1
 		}
 	}
-	return nil
+	return nil, -1
 }
 
 // NewComment creates a new CommentGroup from the given text.
@@ -178,7 +179,7 @@ func NewComment(isDoc bool, s string) *ast.CommentGroup {
 
 func FileComments(f *ast.File) (docs, rest []*ast.CommentGroup) {
 	hasPkg := false
-	if pkg := Package(f); pkg != nil {
+	if pkg, _ := Package(f); pkg != nil {
 		hasPkg = true
 		docs = pkg.Comments()
 	}

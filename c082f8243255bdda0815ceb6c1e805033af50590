@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "68d8f919_6eac93be",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-10T13:00:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "37b6c6f6_74ac3065",
+      "revId": "c082f8243255bdda0815ceb6c1e805033af50590",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec552ba7_3432eaf2",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-11-10T12:45:08Z",
       "side": 1,
       "message": "this is slightly inefficient for huge CUE files with no package clause. once you reach any non-preamble declaration (where preamble is a package, an import, or an attribute) you can stop immediately, because you cannot have any more package or import declarations after that point.\n\n\nthis is not easy to do with astutil.Apply, but I\u0027d leave a TODO here for the future.",
+      "revId": "c082f8243255bdda0815ceb6c1e805033af50590",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "951836ce_3db47b0b",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-10T13:00:17Z",
+      "side": 1,
+      "message": "Thank you for pointing this out. I\u0027ve had a think and I think I\u0027ve implemented a fix for this. LMK what you think.",
+      "parentUuid": "ec552ba7_3432eaf2",
       "revId": "c082f8243255bdda0815ceb6c1e805033af50590",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

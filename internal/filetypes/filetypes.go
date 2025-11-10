@@ -134,10 +134,13 @@ func DefaultTagsForInterpretation(interp build.Interpretation, mode Mode) map[st
 }
 
 func cutScope(s string) (scope, file string, found bool) {
-	if cuepath.IsAbs(s, cuepath.Windows) {
+	if cuepath.IsAbs(s, cuepath.Windows) || cuepath.IsAbs(s, cuepath.Unix) {
 		// Absolute paths on Windows can begin with a volume name, like `C:\foo\bar`;
 		// do not confuse that for a scope prefix.
 		// Note that we use [cuepath.IsAbs] for consistent behavior across platforms.
+		//
+		// We also check for Unix, so that `/foo:colons.json` is treated
+		// as an absolute filename rather than a `/foo` scope prefix on `colons.json`.
 	} else if before, after, ok := strings.Cut(s, ":"); ok {
 		return before, after, true
 	}

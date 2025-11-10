@@ -80,11 +80,20 @@ type Stats struct {
 	// CUE groups stats obtained from the CUE evaluator.
 	CUE stats.Counts
 
-	// Go groups stats obtained from the Go runtime.
+	// Go groups stats obtained from the Go runtime via [runtime.ReadMemStats].
 	Go struct {
 		AllocBytes   uint64
 		AllocObjects uint64
 	}
+
+	// Proc groups stats obtained from the current OS process via calls like [syscall.Getrusage].
+	Proc procStats
+}
+
+type procStats struct {
+	UserNano    uint64
+	SysNano     uint64
+	MaxRssBytes uint64
 }
 
 func fetchStats() Stats {
@@ -106,8 +115,20 @@ func fetchStats() Stats {
 				panic(err) // used only in the tests; OK to panic
 			}
 		}
+		if name := os.Getenv("CUE_TEST_SYSUSAGE"); name != "" && testing.Testing() {
+			bs, err := os.ReadFile(name)
+			if err != nil {
+				panic(err) // used only in the tests; OK to panic
+			}
+			if err := json.Unmarshal(bs, &stats.Proc); err != nil {
+				panic(err) // used only in the tests; OK to panic
+			}
+		}
 	} else {
 		runtime.ReadMemStats(&mem)
+
+		// If this fails, let the values be zero.
+		getProcStatsSelf(&stats.Proc)
 	}
 
 	stats.Go.AllocBytes = mem.TotalAlloc

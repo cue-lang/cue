@@ -87,6 +87,24 @@
       "parentUuid": "951836ce_3db47b0b",
       "revId": "c082f8243255bdda0815ceb6c1e805033af50590",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1b7685e_f9b32b2d",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-10T13:05:26Z",
+      "side": 1,
+      "message": "ah, clever approach. just one nit to improve it: rather than looping over `file.Decls`, loop over `file.Preamble()`, which is only the preamble declarations. this way you won\u0027t add map entries for e.g. a million top-level fields.\n\n\nFWIW there\u0027s also `internal.Package(*ast.File) *ast.Package`, but that doesn\u0027t use a cursor, so it\u0027s not great for removal. You could consider having it return `(*ast.Package, int)` with an index, and then do something like `file.Decls \u003d slices.Delete(file.Decls, i, i+1)`. I think either approach is fine, I only briefly thought about this one because it avoids needing to build a map.",
+      "parentUuid": "951836ce_3db47b0b",
+      "revId": "c082f8243255bdda0815ceb6c1e805033af50590",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

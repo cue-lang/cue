@@ -388,6 +388,16 @@ func TestParseFile(t *testing.T) {
 			Encoding: build.JSON,
 		},
 	}, {
+		in: `D:\foo:colons.json`,
+		out: &build.File{
+			Filename:       `D:\foo:colons.json`,
+			Encoding:       build.JSON,
+			Interpretation: build.Auto,
+		},
+	}, {
+		in:  `/foo:colons.json`,
+		out: `unknown filetype /foo`,
+	}, {
 		in:  "json:",
 		out: `empty file name in "json:"`,
 	}, {
@@ -509,6 +519,14 @@ func TestParseArgs(t *testing.T) {
 		out: []*build.File{
 			{Filename: `D:\foo.json`, Encoding: build.JSON, Interpretation: build.Auto},
 		},
+	}, {
+		in: `D:\foo:colons.json`,
+		out: []*build.File{
+			{Filename: `D:\foo:colons.json`, Encoding: build.JSON, Interpretation: build.Auto},
+		},
+	}, {
+		in:  `/foo:colons.json`,
+		out: `cannot combine scope with file`,
 	}, {
 		in:  `json:D:\foo.json`,
 		out: `cannot combine scope with file`,

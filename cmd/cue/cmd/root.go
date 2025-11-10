@@ -95,6 +95,52 @@ type Stats struct {
 	}
 }
 
+func fetchStats() Stats {
+	var stats Stats
+	stats.CUE = adt.TotalStats()
+
+	var mem runtime.MemStats
+	var sys syscall.Rusage
+	if testing.Testing() {
+		// Fill in the runtime and system stats, which are cumulative counters.
+		// Since in practice the numbers aren't deterministic,
+		// due to the inherent behavior of the Go runtime and modern OSes,
+		// we support replacing these structs via JSON files in the tests.
+		if name := os.Getenv("CUE_TEST_MEMSTATS"); name != "" {
+			bs, err := os.ReadFile(name)
+			if err != nil {
+				panic(err) // used only in the tests; OK to panic
+			}
+			if err := json.Unmarshal(bs, &mem); err != nil {
+				panic(err) // used only in the tests; OK to panic
+			}
+		}
+		if name := os.Getenv("CUE_TEST_SYSUSAGE"); name != "" && testing.Testing() {
+			bs, err := os.ReadFile(name)
+			if err != nil {
+				panic(err) // used only in the tests; OK to panic
+			}
+			if err := json.Unmarshal(bs, &sys); err != nil {
+				panic(err) // used only in the tests; OK to panic
+			}
+		}
+	} else {
+		runtime.ReadMemStats(&mem)
+
+		// If this fails, let the values be zero.
+		syscall.Getrusage(syscall.RUSAGE_SELF, &sys)
+	}
+
+	stats.Go.AllocBytes = mem.TotalAlloc
+	stats.Go.AllocObjects = mem.Mallocs
+
+	stats.Proc.UserNano = uint64(sys.Utime.Nano())
+	stats.Proc.SysNano = uint64(sys.Stime.Nano())
+	stats.Proc.MaxRssBytes = uint64(sys.Maxrss * 1024) // [syscall.Rusage.Maxrss] is in KiB.
+
+	return stats
+}
+
 // commandGroup makes cmd runnable in a way that implements commands grouping more subcommands,
 // such as `cue mod` or `cue refactor`. Note that the user can't actually run these commands to
 // do anything useful, but we need RunE for good error messages, as Cobra itself is lacking:
@@ -175,45 +221,7 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		}
 
 		if statsEnc != nil {
-			var stats Stats
-			stats.CUE = adt.TotalStats()
-
-			// Fill in the runtime stats, which are cumulative counters.
-			// Since in practice the number of allocations isn't fully deterministic,
-			// due to the inherent behavior of memory pools like sync.Pool,
-			// we support supplying MemStats as a JSON file in the tests.
-			var m runtime.MemStats
-			if name := os.Getenv("CUE_TEST_MEMSTATS"); name != "" && testing.Testing() {
-				bs, err := os.ReadFile(name)
-				if err != nil {
-					return err
-				}
-				if err := json.Unmarshal(bs, &m); err != nil {
-					return err
-				}
-			} else {
-				runtime.ReadMemStats(&m)
-			}
-			stats.Go.AllocBytes = m.TotalAlloc
-			stats.Go.AllocObjects = m.Mallocs
-
-			var sys syscall.Rusage
-			if name := os.Getenv("CUE_TEST_SYSUSAGE"); name != "" && testing.Testing() {
-				bs, err := os.ReadFile(name)
-				if err != nil {
-					return err
-				}
-				if err := json.Unmarshal(bs, &sys); err != nil {
-					return err
-				}
-			} else {
-				// If this fails, let the values be zero.
-				syscall.Getrusage(syscall.RUSAGE_SELF, &sys)
-			}
-			stats.Proc.UserNano = uint64(sys.Utime.Nano())
-			stats.Proc.SysNano = uint64(sys.Stime.Nano())
-			stats.Proc.MaxRssBytes = uint64(sys.Maxrss * 1024) // [syscall.Rusage.Maxrss] is in KiB.
-
+			stats := fetchStats()
 			statsEnc.Encode(c.ctx.Encode(stats))
 			statsEnc.Close()
 		}

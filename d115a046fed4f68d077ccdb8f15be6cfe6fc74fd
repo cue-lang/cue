@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9a8b394_ea9f518d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-10T10:20:05Z",
+      "side": 1,
+      "message": "LGTM except for removing the mention of the `strict` filetype.",
+      "revId": "d115a046fed4f68d077ccdb8f15be6cfe6fc74fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

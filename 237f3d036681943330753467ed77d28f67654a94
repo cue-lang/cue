@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c823b465_2dec8e26",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-10T10:20:05Z",
+      "side": 0,
+      "message": "Hmm, the CL description talks about removing the `--strict` flag, not the filetype, and I\u0027m not totally convinced that\u0027s a good idea, especially given that we haven\u0027t deprecated it, and it\u0027s significantly easier to use/remember than `jsonschema+strictFeatures+strictKeyords`.\n\nAlso, this CL doesn\u0027t actually remove this filetype. If we _do_ want to remove it, we should deprecate it first.",
+      "revId": "237f3d036681943330753467ed77d28f67654a94",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

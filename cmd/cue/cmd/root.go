@@ -23,6 +23,7 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"sync"
+	"syscall"
 	"testing"
 	"time"
 
@@ -80,10 +81,17 @@ type Stats struct {
 	// CUE groups stats obtained from the CUE evaluator.
 	CUE stats.Counts
 
-	// Go groups stats obtained from the Go runtime.
+	// Go groups stats obtained from the Go runtime via [runtime.ReadMemStats].
 	Go struct {
 		AllocBytes   uint64
 		AllocObjects uint64
+	}
+
+	// Proc groups stats obtained from the current OS process via [syscall.Getrusage].
+	Proc struct {
+		UserNano    uint64
+		SysNano     uint64
+		MaxRssBytes uint64
 	}
 }
 
@@ -188,6 +196,23 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 			}
 			stats.Go.AllocBytes = m.TotalAlloc
 			stats.Go.AllocObjects = m.Mallocs
+
+			var sys syscall.Rusage
+			if name := os.Getenv("CUE_TEST_SYSUSAGE"); name != "" && testing.Testing() {
+				bs, err := os.ReadFile(name)
+				if err != nil {
+					return err
+				}
+				if err := json.Unmarshal(bs, &sys); err != nil {
+					return err
+				}
+			} else {
+				// If this fails, let the values be zero.
+				syscall.Getrusage(syscall.RUSAGE_SELF, &sys)
+			}
+			stats.Proc.UserNano = uint64(sys.Utime.Nano())
+			stats.Proc.SysNano = uint64(sys.Stime.Nano())
+			stats.Proc.MaxRssBytes = uint64(sys.Maxrss * 1024) // [syscall.Rusage.Maxrss] is in KiB.
 
 			statsEnc.Encode(c.ctx.Encode(stats))
 			statsEnc.Close()

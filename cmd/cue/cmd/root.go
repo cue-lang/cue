@@ -341,11 +341,19 @@ func Main() int {
 	}
 	if benchName != "" {
 		fmt.Printf("Benchmark%s\t", benchName)
+
+		// The standard Go benchmark numbers from `go test -bench -benchmem`.
 		fmt.Printf("%d\t%d ns/op", 1, time.Since(start))
-		var memStats runtime.MemStats
-		runtime.ReadMemStats(&memStats)
-		fmt.Printf("\t%d B/op", memStats.TotalAlloc)
-		fmt.Printf("\t%d allocs/op", memStats.Mallocs)
+		stats := fetchStats()
+		fmt.Printf("\t%d B/op", stats.Go.AllocBytes)
+
+		// Extra numbers which may be useful in some cases.
+		// Starting with allocs/op, which tends to be pretty stable,
+		// and max RSS, which tends to be very useful when reducing memory usage.
+		fmt.Printf("\t%d allocs/op", stats.Go.AllocObjects)
+		fmt.Printf("\t%d max-RSS-B/op", stats.Proc.MaxRssBytes)
+		fmt.Printf("\t%d user-ns/op", stats.Proc.UserNano)
+		fmt.Printf("\t%d sys-ns/op", stats.Proc.SysNano)
 		fmt.Printf("\n")
 	}
 	return 0

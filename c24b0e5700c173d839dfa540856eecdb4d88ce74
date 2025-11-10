@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce451664_c6b1ac5e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-10T22:10:05Z",
+      "side": 1,
+      "message": "```suggestion\nmight be garbage collected quickly; a process may allocate 4GiB in total\n```",
+      "revId": "c24b0e5700c173d839dfa540856eecdb4d88ce74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

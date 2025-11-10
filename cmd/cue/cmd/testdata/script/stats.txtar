@@ -4,8 +4,8 @@ env CUE_STATS_FILE=-
 exec cue export x.cue
 stderr -count=1 '"EvalVersion": 3,'
 stderr -count=1 '"AllocBytes": [1-9]\d*,'
-[unix] stderr -count=1 '"SysNano": [1-9]\d*,'
-[windows] stderr -count=1 '"SysNano": 0,'
+[unix] stderr -count=1 '"MaxRssBytes": [1-9]\d*$'
+[windows] stderr -count=1 '"MaxRssBytes": 0$'
 
 # Smoke test that CUE_BENCH also works.
 env CUE_STATS_FILE=
@@ -14,7 +14,7 @@ exec cue export x.cue
 ! stderr .
 [unix] stdout -count=1 '^BenchmarkFooBar\s+1\s+[1-9]\d* ns/op'
 stdout -count=1 '\d+\s+B/op'
-stdout -count=1 '\d+\s+sys-ns/op'
+stdout -count=1 '\d+\s+max-RSS-B/op'
 env CUE_BENCH=
 
 # Mock the Go runtime and OS stats, to verify the rest of the logic.

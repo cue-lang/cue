@@ -33,6 +33,24 @@
       "message": "Maybe add a comment to the src field in OpContext to document this behavior.",
       "revId": "a373cd3f17bf68aee6b12ce1b0aab370bebf6691",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1d99b67_c102302e",
+        "filename": "internal/core/adt/binop.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-10T11:13:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9191ec4_afa394f5",
+      "revId": "a373cd3f17bf68aee6b12ce1b0aab370bebf6691",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

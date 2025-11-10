@@ -16,6 +16,23 @@
       "message": "Unity reports Go.AllocObjects savings between 0 and 0.5%",
       "revId": "eceb12277e085c45156c6c198c3a6d3902d63289",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9530f098_4507cf46",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-10T10:13:25Z",
+      "side": 1,
+      "message": "maybe add comment here about what it does.",
+      "revId": "eceb12277e085c45156c6c198c3a6d3902d63289",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

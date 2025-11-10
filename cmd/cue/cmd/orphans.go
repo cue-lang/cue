@@ -160,7 +160,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 }
 
 func setPackage(f *ast.File, name string, overwrite bool) {
-	if pkg := internal.Package(f); pkg != nil {
+	if pkg, _ := internal.Package(f); pkg != nil {
 		if !overwrite || pkg.Name.Name == name {
 			return
 		}
@@ -299,7 +299,7 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 		} else {
 			field := &ast.Field{Label: labels[0]}
 			f.Decls = append(f.Decls, field)
-			if pkg := internal.Package(file); pkg != nil {
+			if pkg, _ := internal.Package(file); pkg != nil {
 				astutil.CopyComments(field, pkg)
 			}
 			for _, e := range labels[1:] {

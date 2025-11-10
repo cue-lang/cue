@@ -348,6 +348,10 @@ func listAppendJSON(b []byte, l *Iterator) ([]byte, error) {
 
 func (v Value) getNum(k adt.Kind) (*adt.Num, errors.Error) {
 	v, _ = v.Default()
+	if num, _ := v.v.BaseValue.(*adt.Num); num != nil && k&v.Kind() != adt.BottomKind {
+		// In the happy path, avoid creating a new [OpContext], which is wasteful.
+		return num, nil
+	}
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, k); err != nil {
 		return nil, v.toErr(err)
@@ -1282,6 +1286,10 @@ func (v Value) Bool() (bool, error) {
 // String returns the string value if v is a string or an error otherwise.
 func (v Value) String() (string, error) {
 	v, _ = v.Default()
+	if str, _ := v.v.BaseValue.(*adt.String); str != nil {
+		// In the happy path, avoid creating a new [OpContext], which is wasteful.
+		return str.Str, nil
+	}
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, adt.StringKind); err != nil {
 		return "", v.toErr(err)

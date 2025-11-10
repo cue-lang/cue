@@ -149,7 +149,7 @@ func (r *Runtime) Marshal(values ...InstanceOrValue) (b []byte, err error) {
 		}
 
 		if inst.PkgName != "" {
-			if pkg := internal.Package(file); pkg == nil {
+			if pkg, _ := internal.Package(file); pkg == nil {
 				pkg := &ast.Package{Name: ast.NewIdent(inst.PkgName)}
 				file.Decls = append([]ast.Decl{pkg}, file.Decls...)
 			} else if pkg.Name.Name != inst.PkgName {

@@ -1,37 +1,52 @@
+# Smoke test that we can obtain real stats from the OS.
+# Go stats should work on all platforms; Proc stats are OS-specific.
+env CUE_STATS_FILE=-
+exec cue export x.cue
+stderr -count=1 '"EvalVersion": 3,'
+stderr -count=1 '"AllocBytes": [1-9]\d*,'
+[unix] stderr -count=1 '"SysNano": [1-9]\d*,'
+[windows] stderr -count=1 '"SysNano": 0,'
+
+# Smoke test that CUE_BENCH also works.
+env CUE_STATS_FILE=
+env CUE_BENCH=FooBar
+exec cue export x.cue
+! stderr .
+[unix] stdout -count=1 '^BenchmarkFooBar\s+1\s+[1-9]\d* ns/op'
+stdout -count=1 '\d+\s+B/op'
+stdout -count=1 '\d+\s+sys-ns/op'
+env CUE_BENCH=
+
+# Mock the Go runtime and OS stats, to verify the rest of the logic.
 env CUE_TEST_MEMSTATS=memstats.json
 env CUE_TEST_SYSUSAGE=sysusage.json
 
 env CUE_STATS_FILE=stats.json
-exec cue eval x.cue
+exec cue export x.cue
 cmp stats.json out/stats.json
 
 # overwrite existing files.
 env CUE_STATS_FILE=overwrite_stats.json
-exec cue eval x.cue
+exec cue export x.cue
 cmp overwrite_stats.json out/stats.json
 
 env CUE_STATS_FILE=stats.cue
-exec cue eval x.cue
+exec cue export x.cue
 cmp stats.cue out/stats.cue
 
 env CUE_STATS_FILE=stats.yaml
-exec cue eval x.cue
+exec cue export x.cue
 cmp stats.yaml out/stats.yaml
 
 # default output is JSON.
 env CUE_STATS_FILE=-
-exec cue eval x.cue
+exec cue export x.cue
 cmp stderr out/stderr
-
-# Check that CUE_EXPERIMENT=evalv3 works, and EvalVersion reports the correct value.
-env CUE_STATS_FILE=-
-exec cue eval x.cue
-stderr -count=1 '"EvalVersion": 3,'
 
 -- x.cue --
 a: 1
 b: 2
-c: a | b
+c: a | *b
 -- memstats.json --
 {
     "TotalAlloc": 300456,

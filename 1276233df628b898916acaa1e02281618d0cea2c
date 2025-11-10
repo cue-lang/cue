@@ -16,6 +16,24 @@
       "message": "I was always suspicious of this. Always seemed odd to me that this was the only place we ever promoted a single navigable to a slice.",
       "revId": "1276233df628b898916acaa1e02281618d0cea2c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1d98010_da0495ae",
+        "filename": "internal/lsp/definitions/definitions.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1722,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-10T11:18:43Z",
+      "side": 0,
+      "message": "Acknowledged",
+      "parentUuid": "b4f04931_ab5cf619",
+      "revId": "1276233df628b898916acaa1e02281618d0cea2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

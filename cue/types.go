@@ -348,6 +348,10 @@ func listAppendJSON(b []byte, l *Iterator) ([]byte, error) {
 
 func (v Value) getNum(k adt.Kind) (*adt.Num, errors.Error) {
 	v, _ = v.Default()
+	if num, _ := v.v.BaseValue.(*adt.Num); num != nil && k&v.Kind() != adt.BottomKind {
+		// In the happy path, avoid creating a new [OpContext], which is wasteful.
+		return num, nil
+	}
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, k); err != nil {
 		return nil, v.toErr(err)
@@ -1257,6 +1261,10 @@ func (v Value) mustList(ctx *adt.OpContext) Iterator {
 // Null reports an error if v is not null.
 func (v Value) Null() error {
 	v, _ = v.Default()
+	if b, _ := v.v.BaseValue.(*adt.Null); b != nil {
+		// In the happy path, avoid creating a new [OpContext], which is wasteful.
+		return nil
+	}
 	if err := v.checkKind(v.ctx(), adt.NullKind); err != nil {
 		return v.toErr(err)
 	}
@@ -1266,12 +1274,20 @@ func (v Value) Null() error {
 // IsNull reports whether v is null.
 func (v Value) IsNull() bool {
 	v, _ = v.Default()
+	if b, _ := v.v.BaseValue.(*adt.Null); b != nil {
+		// In the happy path, avoid creating a new [OpContext], which is wasteful.
+		return true
+	}
 	return v.isKind(v.ctx(), adt.NullKind)
 }
 
 // Bool returns the bool value of v or false and an error if v is not a boolean.
 func (v Value) Bool() (bool, error) {
 	v, _ = v.Default()
+	if b, _ := v.v.BaseValue.(*adt.Bool); b != nil {
+		// In the happy path, avoid creating a new [OpContext], which is wasteful.
+		return b.B, nil
+	}
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, adt.BoolKind); err != nil {
 		return false, v.toErr(err)
@@ -1282,6 +1298,10 @@ func (v Value) Bool() (bool, error) {
 // String returns the string value if v is a string or an error otherwise.
 func (v Value) String() (string, error) {
 	v, _ = v.Default()
+	if str, _ := v.v.BaseValue.(*adt.String); str != nil {
+		// In the happy path, avoid creating a new [OpContext], which is wasteful.
+		return str.Str, nil
+	}
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, adt.StringKind); err != nil {
 		return "", v.toErr(err)
@@ -1293,6 +1313,13 @@ func (v Value) String() (string, error) {
 // otherwise.
 func (v Value) Bytes() ([]byte, error) {
 	v, _ = v.Default()
+	switch val := v.v.BaseValue.(type) {
+	// In the happy path, avoid creating a new [OpContext], which is wasteful.
+	case *adt.Bytes:
+		return bytes.Clone(val.B), nil
+	case *adt.String:
+		return []byte(val.Str), nil
+	}
 	ctx := v.ctx()
 	switch x := v.eval(ctx).(type) {
 	case *adt.Bytes:

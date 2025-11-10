@@ -33,6 +33,24 @@
       "message": "maybe add comment here about what it does.",
       "revId": "eceb12277e085c45156c6c198c3a6d3902d63289",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3520947c_c275ea48",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-10T11:13:02Z",
+      "side": 1,
+      "message": "this line was already here, it\u0027s just moved slightly.",
+      "parentUuid": "9530f098_4507cf46",
+      "revId": "eceb12277e085c45156c6c198c3a6d3902d63289",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

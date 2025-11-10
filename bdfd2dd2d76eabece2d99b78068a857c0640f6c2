@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bd8c3e1_8f8942fe",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 598,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-10T10:36:50Z",
+      "side": 0,
+      "message": "Hmm, technically we still have some restrictions. For example, say I\u0027ve got a file named `json:foo.txt`; that will still cause a failure. I\u0027m not quite sure what the right answer is here, but I think there\u0027s still something we should say here.",
+      "revId": "bdfd2dd2d76eabece2d99b78068a857c0640f6c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

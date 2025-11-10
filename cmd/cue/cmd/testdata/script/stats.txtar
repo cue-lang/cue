@@ -1,4 +1,5 @@
 env CUE_TEST_MEMSTATS=memstats.json
+env CUE_TEST_SYSUSAGE=sysusage.json
 
 env CUE_STATS_FILE=stats.json
 exec cue eval x.cue
@@ -36,6 +37,12 @@ c: a | b
     "TotalAlloc": 300456,
     "Mallocs": 100123
 }
+-- sysusage.json --
+{
+    "UserNano": 123000,
+    "SysNano": 456000,
+    "MaxRssBytes": 789000
+}
 -- overwrite_stats.json --
 contents overwritten
 -- out/stats.json --
@@ -64,6 +71,11 @@ contents overwritten
     "Go": {
         "AllocBytes": 300456,
         "AllocObjects": 100123
+    },
+    "Proc": {
+        "UserNano": 123000,
+        "SysNano": 456000,
+        "MaxRssBytes": 789000
     }
 }
 -- out/stats.cue --
@@ -92,6 +104,11 @@ Go: {
 	AllocBytes:   300456
 	AllocObjects: 100123
 }
+Proc: {
+	UserNano:    123000
+	SysNano:     456000
+	MaxRssBytes: 789000
+}
 -- out/stats.yaml --
 CUE:
   EvalVersion: 3
@@ -116,6 +133,10 @@ CUE:
 Go:
   AllocBytes: 300456
   AllocObjects: 100123
+Proc:
+  UserNano: 123000
+  SysNano: 456000
+  MaxRssBytes: 789000
 -- out/stderr --
 {
     "CUE": {
@@ -142,5 +163,10 @@ Go:
     "Go": {
         "AllocBytes": 300456,
         "AllocObjects": 100123
+    },
+    "Proc": {
+        "UserNano": 123000,
+        "SysNano": 456000,
+        "MaxRssBytes": 789000
     }
 }

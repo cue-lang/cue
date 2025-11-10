@@ -17,6 +17,7 @@ package adt
 import (
 	"bytes"
 	"fmt"
+	"math/big"
 	"regexp"
 
 	"github.com/cockroachdb/apd/v3"
@@ -274,6 +275,20 @@ type Num struct {
 
 func (x *Num) Source() ast.Node { return x.Src }
 func (x *Num) Kind() Kind       { return x.K }
+
+func (x *Num) BigInt(z *big.Int) *big.Int {
+	if x.X.Exponent != 0 {
+		panic("cue: exponent should always be nil for integer types")
+	}
+	if z == nil {
+		z = &big.Int{}
+	}
+	z.Set(x.X.Coeff.MathBigInt())
+	if x.X.Negative {
+		z.Neg(z)
+	}
+	return z
+}
 
 // String is a string value. It can be used as a Value and Expr.
 type String struct {

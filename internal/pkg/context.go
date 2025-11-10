@@ -198,10 +198,15 @@ func (c *CallCtxt) Float64(i int) float64 {
 }
 
 func (c *CallCtxt) BigInt(i int) *big.Int {
-	x := value.Make(c.ctx, c.args[i])
+	arg := c.args[i]
+	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
+		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
+		return num.BigInt(nil)
+	}
+	x := value.Make(c.ctx, arg)
 	n, err := x.Int(nil)
 	if err != nil {
-		c.invalidArgType(c.args[i], i, "int", err)
+		c.invalidArgType(arg, i, "int", err)
 		return nil
 	}
 	return n

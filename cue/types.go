@@ -447,17 +447,7 @@ func (v Value) Int(z *big.Int) (*big.Int, error) {
 	if err != nil {
 		return nil, err
 	}
-	if z == nil {
-		z = &big.Int{}
-	}
-	if n.X.Exponent != 0 {
-		panic("cue: exponent should always be nil for integer types")
-	}
-	z.Set(n.X.Coeff.MathBigInt())
-	if n.X.Negative {
-		z.Neg(z)
-	}
-	return z, nil
+	return n.BigInt(z), nil
 }
 
 // Int64 converts the underlying integral number to int64. It reports an

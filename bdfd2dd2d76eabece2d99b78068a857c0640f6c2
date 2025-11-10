@@ -16,6 +16,24 @@
       "message": "Hmm, technically we still have some restrictions. For example, say I\u0027ve got a file named `json:foo.txt`; that will still cause a failure. I\u0027m not quite sure what the right answer is here, but I think there\u0027s still something we should say here.",
       "revId": "bdfd2dd2d76eabece2d99b78068a857c0640f6c2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5eee5c30_68327e62",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 598,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-10T11:05:43Z",
+      "side": 0,
+      "message": "very good point! I think we can clarify that this is only a restriction on relative filenames. because for absolute filenames, we can make it work everywhere. I\u0027ve sent another small chain to test and fix that for Unix.",
+      "parentUuid": "3bd8c3e1_8f8942fe",
+      "revId": "bdfd2dd2d76eabece2d99b78068a857c0640f6c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

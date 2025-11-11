@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3d330c0_f1c9b75f",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 599,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-11T18:13:01Z",
+      "side": 1,
+      "message": "Hmm, it doesn\u0027t allow a `:` in absolute filenames either, in general:\n\n```\n% cue export  /tmp/foo:bar.json\ncannot combine scope with file\n```\n\nBut maybe that points to a reasonable way ahead: we skip the scope checking for any absolute filename. That also means that users _can_ name any file at all regardless of name if they just use an absolute filename, which seems like a nice win.",
+      "revId": "14118da752c1958485de504cab8aeeeeb31dfc03",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

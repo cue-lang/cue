@@ -16,6 +16,7 @@ package adt
 
 import (
 	"fmt"
+	"math/bits"
 	"strings"
 	"testing"
 
@@ -55,6 +56,9 @@ func TestStateNames(t *testing.T) {
 	}
 	if autoFieldConjunctsKnown != fieldConjunctsKnown {
 		t.Error("inconsistent state name for fieldConjunctsKnown")
+	}
+	if idx := bits.TrailingZeros16(uint16(fieldConjunctsKnown)); idx != fieldConjunctsKnownIdx {
+		t.Errorf("fieldConjunctsKnownIdx = %d, want %d", fieldConjunctsKnownIdx, idx)
 	}
 }
 

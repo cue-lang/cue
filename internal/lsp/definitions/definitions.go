@@ -569,13 +569,7 @@ type completionResolutions struct {
 // DefinitionsForOffset reports the definitions that the file offset (number of
 // bytes from the start of the file) resolves to.
 func (fdfns *FileDefinitions) DefinitionsForOffset(offset int) []ast.Node {
-	definitions := fdfns.definitions
-	navs, found := definitions[offset]
-	if !found {
-		definitions[offset] = []*navigableBindings{}
-		fdfns.evalForOffset(offset)
-		navs = definitions[offset]
-	}
+	navs := fdfns.findDefinitionsForOffsets(offset)
 
 	var nodes []ast.Node
 	for _, nav := range navs {
@@ -594,13 +588,7 @@ func (fdfns *FileDefinitions) DefinitionsForOffset(offset int) []ast.Node {
 // file offset (number of bytes from the start of the file) resolves
 // to.
 func (fdfns *FileDefinitions) DocCommentsForOffset(offset int) map[ast.Node][]*ast.CommentGroup {
-	definitions := fdfns.definitions
-	navs, found := definitions[offset]
-	if !found {
-		definitions[offset] = []*navigableBindings{}
-		fdfns.evalForOffset(offset)
-		navs = definitions[offset]
-	}
+	navs := fdfns.findDefinitionsForOffsets(offset)
 
 	commentsMap := make(map[ast.Node][]*ast.CommentGroup)
 	for _, nav := range navs {
@@ -685,26 +673,33 @@ func (fdfns *FileDefinitions) CompletionsForOffset(offset int) (fields, embeds [
 // file offset (number of bytes from the start of the file) resolves
 // to.
 func (fdfns *FileDefinitions) UsagesForOffset(offset int, includeDefinitions bool) []ast.Node {
-	definitions := fdfns.definitions
-	navs, found := definitions[offset]
-	if !found {
-		definitions[offset] = []*navigableBindings{}
-		fdfns.evalForOffset(offset)
-		navs = definitions[offset]
-	}
+	navs := fdfns.findDefinitionsForOffsets(offset)
 
 	if len(navs) == 1 {
 		nav := navs[0]
-		if nav == nav.dfns.pkgDecls && nav.dfns != fdfns.dfns {
+		dfns := fdfns.dfns
+		if nav == nav.dfns.pkgDecls && nav.dfns != dfns {
 			// We have resolved the offset to package declarations of
 			// some foreign package. From this we can infer that the user
 			// is actually asking for usages of an import, so we hunt
 			// through the usedBy looking for a import spec that's from
 			// this file.
 			for n, node := range nav.usedBy {
-				if _, ok := n.(*ast.ImportSpec); ok && node.fdfns == fdfns {
-					navs = []*navigableBindings{node.navigable}
-					break
+				if spec, ok := n.(*ast.ImportSpec); ok && node.fdfns == fdfns {
+					// If we set navs to node.navigable then we would eval
+					// the whole package. To avoid that, we extract the
+					// name of the import and hunt through the AST of this
+					// file, searching for uses of that name.
+					name := dfns.importSpecName(spec)
+					if name == "" {
+						continue
+					}
+					offsets := fdfns.findIdentUsageOffsets(name)
+					result := fdfns.findDefinitionsForOffsets(offsets...)
+					if len(result) > 0 {
+						navs = result
+						break
+					}
 				}
 			}
 		}
@@ -840,8 +835,9 @@ func usages(navsWorklist []*navigableBindings) {
 		if isExported {
 			// For all the packages that import us, find where usages of
 			// this package appears.
-			for _, dfns := range nav.dfns.pkgImporters() {
-				navsWorklist = append(navsWorklist, dfns.initialNavsForImport(nav.dfns.ip)...)
+			ip := nav.dfns.ip
+			for _, remotePkgDfns := range nav.dfns.pkgImporters() {
+				navsWorklist = append(navsWorklist, remotePkgDfns.initialNavsForImport(ip)...)
 			}
 		}
 	}
@@ -867,31 +863,33 @@ func (dfns *Definitions) initialNavsForImport(ip ast.ImportPath) []*navigableBin
 	var result []*navigableBindings
 	for _, node := range nav.contributingNodes {
 		spec := node.keyAlias.(*ast.ImportSpec)
-		name := ""
-		if alias := spec.Name; alias != nil && alias.Name != "" {
-			name = alias.Name
-		} else {
-			ip := dfns.parseImportSpec(spec)
-			if ip == nil {
-				continue
-			}
-			name = ip.Qualifier
+		name := dfns.importSpecName(spec)
+		if name == "" {
+			continue
 		}
-		fdfns := node.fdfns
-		definitions := fdfns.definitions
-		offsets := fdfns.findIdentUsageOffsets(name)
 
-		for _, offset := range offsets {
-			navs, found := definitions[offset]
-			if !found {
-				definitions[offset] = []*navigableBindings{}
-				fdfns.evalForOffset(offset)
-				navs = definitions[offset]
-			}
-			result = append(result, navs...)
-		}
+		fdfns := node.fdfns
+		offsets := fdfns.findIdentUsageOffsets(name)
+		result = append(result, fdfns.findDefinitionsForOffsets(offsets...)...)
 	}
 	return result
+}
+
+// importSpecName extracts the name of the import spec: the alias name
+// if that's in use, or otherwise the package qualifier, whether
+// implied or explicit.
+func (dfns *Definitions) importSpecName(spec *ast.ImportSpec) string {
+	name := ""
+	if alias := spec.Name; alias != nil && alias.Name != "" {
+		name = alias.Name
+	} else {
+		ip := dfns.parseImportSpec(spec)
+		if ip == nil {
+			return ""
+		}
+		name = ip.Qualifier
+	}
+	return name
 }
 
 // findIdentUsageOffsets does a rough-and-ready walk through the ast,
@@ -1002,6 +1000,24 @@ func (fdfns *FileDefinitions) evalForOffset(offset int) {
 	}
 
 	//pkgNode.dump(1)
+}
+
+// findDefinitionsForOffsets gathers together the navigableBindings
+// which are the definitions reachable from each offset, evaluating
+// the offset as necessary.
+func (fdfns *FileDefinitions) findDefinitionsForOffsets(offsets ...int) []*navigableBindings {
+	definitions := fdfns.definitions
+	var result []*navigableBindings
+	for _, offset := range offsets {
+		navs, found := definitions[offset]
+		if !found {
+			definitions[offset] = []*navigableBindings{}
+			fdfns.evalForOffset(offset)
+			navs = definitions[offset]
+		}
+		result = append(result, navs...)
+	}
+	return result
 }
 
 // astNode corresponds to a node from the AST. An astNode can be

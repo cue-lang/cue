@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/cueexperiment"
 	itask "cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
@@ -253,23 +252,10 @@ func isTask(v cue.Value) bool {
 		return false
 	}
 
-	id := v.LookupPath(cue.MakePath(cue.Str("$id")))
-
-	cueexperiment.Init()
-	if !cueexperiment.Flags.CmdReferencePkg {
-		// In the old mode, $id or kind being present is enough.
-		if id.Exists() {
-			return true
-		}
-		// Is it an existing legacy kind.
-		str, err := v.Lookup("kind").String()
-		_, ok := legacyKinds[str]
-		return err == nil && ok
-	}
-
-	// In the new mode, $id must exist and be a reference to the hidden _id field from a tool package.
+	// $id must exist and be a reference to the hidden _id field from a tool package.
 	// TODO: surely we can check this via id.BuildInstance().ImportPath, but it's not obvious how to do so.
 	// Or perhaps add a method on cue.Value to get the package info directly, like the import path.
+	id := v.LookupPath(cue.MakePath(cue.Str("$id")))
 	if !id.Exists() {
 		return false
 	}

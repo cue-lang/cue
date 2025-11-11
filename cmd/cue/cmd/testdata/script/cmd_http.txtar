@@ -1,37 +1,28 @@
-# TODO(mvdan): rewrite this test to not need to disable this experiment.
-# Note how /cmd/cue/cmd/custom.go registers a task with the legacy kind "testserver".
-env CUE_EXPERIMENT=cmdreferencepkg=0
-
 exec cue cmd http
 cmp stdout cmd_http.out
 -- cmd_http.out --
-{"data":"I'll be back!","when":"now"}
+{"Version":"v1.0.0","Time":"2018-10-22T18:45:39Z"}
+
 
 -- task_tool.cue --
 package home
 
 import (
-	h "tool/http"
 	"tool/cli"
+	h "tool/http"
+	"tool/os"
 )
 
 command: http: {
-	task: testserver: {
-		kind: "testserver"
-		url:  string
+	env: os.Getenv & {
+        GOPROXY: string
 	}
-	task: http: h.Post & {
-		url:    task.testserver.url
+	task: http: h.Get & {
+		url: env.GOPROXY + "/externalmod.test/imports/@v/v1.0.0.info"
 
-		request: body:  "I'll be back!"
 		response: body: string // TODO: allow this to be a struct, parsing the body.
 	}
 	task: print: cli.Print & {
 		text: task.http.response.body
 	}
 }
-
--- task.cue --
-package home
-
-message: "Hello world!"

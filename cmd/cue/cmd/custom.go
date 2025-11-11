@@ -17,13 +17,8 @@ package cmd
 // This file contains code or initializing and running custom commands.
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"net/http/httptest"
 	"strings"
-	"sync"
 	"sync/atomic"
 
 	"github.com/spf13/cobra"
@@ -289,10 +284,9 @@ func isTask(v cue.Value) bool {
 }
 
 var legacyKinds = map[string]string{
-	"exec":       "tool/exec.Run",
-	"http":       "tool/http.Do",
-	"print":      "tool/cli.Print",
-	"testserver": "cmd/cue/cmd.Test",
+	"exec":  "tool/exec.Run",
+	"http":  "tool/http.Do",
+	"print": "tool/cli.Print",
 }
 
 func taskKey(v cue.Value) (string, error) {
@@ -317,32 +311,4 @@ func taskKey(v cue.Value) (string, error) {
 	}
 
 	return kind, err
-}
-
-func init() {
-	itask.Register("cmd/cue/cmd.Test", newTestServerCmd)
-}
-
-var testServerOnce = sync.OnceValue(func() string {
-	s := httptest.NewServer(http.HandlerFunc(
-		func(w http.ResponseWriter, req *http.Request) {
-			data, _ := io.ReadAll(req.Body)
-			d := map[string]string{
-				"data": string(data),
-				"when": "now",
-			}
-			enc := json.NewEncoder(w)
-			_ = enc.Encode(d)
-		}))
-	return s.URL
-})
-
-func newTestServerCmd(v cue.Value) (itask.Runner, error) {
-	return testServerCmd(testServerOnce()), nil
-}
-
-type testServerCmd string
-
-func (s testServerCmd) Run(ctx *itask.Context) (x interface{}, err error) {
-	return map[string]interface{}{"url": string(s)}, nil
 }

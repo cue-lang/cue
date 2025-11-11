@@ -236,10 +236,7 @@ func (f *File) documentSymbols() []protocol.DocumentSymbol {
 				return false
 			}
 			child.SelectionRange, err = mapper.OffsetRange(labelStartOffset, labelEndOffset)
-			if err != nil {
-				return false
-			}
-			return true
+			return err == nil
 		},
 		func(n ast.Node) {
 			if _, ok := n.(*ast.Field); ok {

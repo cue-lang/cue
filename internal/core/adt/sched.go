@@ -404,6 +404,8 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 		s.signal(f(s))
 	}
 
+	s.handleParents(needs, mode)
+
 	if s.ctx.LogEval > 0 && len(s.tasks) > 0 {
 
 		if v := s.tasks[0].node.node; v != nil {
@@ -701,6 +703,7 @@ func runTask(t *task, mode runMode) {
 	defer func() {
 		ctx.freeScope = ctx.freeScope[:len(ctx.freeScope)-1]
 
+		// TODO(pushdown): try to remove once transitioned.
 		if n := t.node; n.toComplete {
 			n.toComplete = false
 			n.completeNodeTasks(attemptOnly)

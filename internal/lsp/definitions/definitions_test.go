@@ -2886,6 +2886,66 @@ package a
 		},
 
 		{
+			name: "Resolve_Import_Repeated",
+			archive: `-- a.cue --
+package a
+
+x: 12
+-- b.cue --
+package b
+
+import "a"
+
+y: a
+-- c.cue --
+package b
+
+import "a"
+
+z: a.x & y.x
+`,
+			expectDefinitions: map[position][]position{
+				fln("b.cue", 3, 1, `"a"`): {fln("a.cue", 1, 3, "a")},
+				fln("b.cue", 5, 1, "a"):   {fln("b.cue", 3, 1, `"a"`), fln("c.cue", 3, 1, `"a"`)}, // Wrong! Use of import should not resolve into c.cue
+
+				fln("c.cue", 3, 1, `"a"`): {fln("a.cue", 1, 3, "a")},
+
+				fln("c.cue", 5, 1, "a"): {fln("c.cue", 3, 1, `"a"`), fln("b.cue", 3, 1, `"a"`)}, // Wrong! Use of import should not resolve into b.cue
+				fln("c.cue", 5, 1, "x"): {fln("a.cue", 3, 1, "x")},
+				fln("c.cue", 5, 1, "y"): {fln("b.cue", 5, 1, "y")},
+				fln("c.cue", 5, 2, "x"): {fln("a.cue", 3, 1, "x")},
+
+				fln("a.cue", 1, 3, "a"): {self},
+				fln("b.cue", 1, 1, "b"): {self, fln("c.cue", 1, 1, "b")},
+				fln("c.cue", 1, 1, "b"): {self, fln("b.cue", 1, 1, "b")},
+
+				fln("a.cue", 3, 1, "x"): {self},
+
+				fln("b.cue", 5, 1, "y"): {self},
+				fln("c.cue", 5, 1, "z"): {self},
+			},
+			expectCompletions: map[position]fieldEmbedCompletions{
+				fln("a.cue", 3, 1, "x"): {f: []string{"x"}},
+
+				fln("b.cue", 5, 1, "y"): {f: []string{"y", "z"}},
+				fln("b.cue", 5, 1, "a"): {f: []string{"x"}, e: []string{"a", "y", "z"}},
+
+				fln("c.cue", 5, 1, "z"):  {f: []string{"y", "z"}},
+				fln("c.cue", 5, 1, "a"):  {e: []string{"a", "y", "z"}},
+				fln("c.cue", 5, 1, ".x"): {e: []string{"x"}},
+				fln("c.cue", 5, 1, "y"):  {e: []string{"a", "y", "z"}},
+				fln("c.cue", 5, 2, ".x"): {e: []string{"x"}},
+			},
+			expectUsagesExtra: map[position]map[bool][]position{
+				fln("b.cue", 3, 1, `"a"`): {true: []position{self, fln("c.cue", 3, 1, `"a"`)}}, // Wrong! an import statement in b.cue should not be merged with the same import in c.cue
+				fln("c.cue", 3, 1, `"a"`): {true: []position{self, fln("b.cue", 3, 1, `"a"`)}}, // Wrong! an import statement in c.cue should not be merged with the same import in b.cue
+			},
+			importedBy: map[string][]string{
+				"a": {"b"},
+			},
+		},
+
+		{
 			name: "Resolve_Import_Chain",
 			archive: `-- a.cue --
 package a

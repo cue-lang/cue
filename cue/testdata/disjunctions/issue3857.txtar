@@ -49,7 +49,7 @@ issue3851: t1: {
 		}
 		out: {
 			two: {shared: "foo", disj: *"default" | _}
-			one: {shared: "foo", disj: _}
+			one: {shared: "foo", disj: *"default" | _}
 		}
 	})
 }
@@ -82,7 +82,7 @@ issue3851: t2: {
 		env1: {
 			conf: {
 				two: {shared: "foo", disj: *{} | _}
-				one: {shared: "foo", disj: *{} | _ | {} | _}
+				one: {shared: "foo", disj: *{} | _}
 			}
 		}
 	})

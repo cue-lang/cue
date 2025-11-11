@@ -353,6 +353,7 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 			}
 		}
 
+	// TODO(pushdown): remove
 	case needs&fieldSetKnown != 0:
 		n.evalArcTypes(mode)
 	}
@@ -515,6 +516,7 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 		defer n.ctx.Un(n.ctx.Indentf(n.node, "(%v)", mode))
 	}
 
+	// TODO(pushdown): can be removed remove
 	// In attemptOnly mode, don't assert initialization to allow processing
 	// of partially initialized vertices
 	if mode != attemptOnly {
@@ -524,6 +526,8 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 		return
 	}
 
+	// TODO(pushdown): okay to remove, but results in different default
+	// behavior. Verify.
 	if n.isCompleting > 0 {
 		return
 	}
@@ -532,16 +536,8 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 		n.isCompleting--
 	}()
 
+	// Needed to not have nil pointer exceptions in some builtin calls.
 	v := n.node
-
-	if !v.Label.IsLet() {
-		if p := v.Parent; p != nil && p.state != nil {
-			if !v.IsDynamic && n.completed&allAncestorsProcessed == 0 {
-				p.state.completeNodeTasks(mode)
-			}
-		}
-	}
-
 	if v.IsDynamic || v.Label.IsLet() || v.Parent.allChildConjunctsKnown(n.ctx) {
 		n.signal(allAncestorsProcessed)
 	}
@@ -551,15 +547,6 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 
 		n.process(needs, mode)
 		n.updateScalar()
-	}
-
-	// As long as ancestors are not processed, it is still possible for
-	// conjuncts to be inserted. Until that time, it is not okay to decrement
-	// theroot. It is not necessary to wait on tasks to complete, though,
-	// as pending tasks will have their own dependencies on root, meaning it
-	// is safe to decrement here.
-	if !n.meets(allAncestorsProcessed) && !n.node.Label.IsLet() && mode != finalize {
-		return
 	}
 }
 
@@ -592,7 +579,8 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 
 	// TODO: this should only be done if n is not currently running tasks.
 	// Investigate how to work around this.
-	n.completeNodeTasks(finalize)
+	// TODO(pushdown): probably okay to remove.
+	// n.completeNodeTasks(finalize)
 
 	n.incDepth()
 	defer n.decDepth()
@@ -815,6 +803,8 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 		// which circumstances this is still necessary, and at least ensure
 		// this will not be run if node v currently has a running task.
 		state.completeNodeTasks(attemptOnly)
+		// TODO(pushdown): consider this once transitioned.
+		// state.process(needFieldSetKnown, flags.runMode)
 	}
 
 	// TODO: verify lookup types.

@@ -32,8 +32,7 @@ type Runtime struct {
 	// the kind in a file-level @extern(kind) attribute.
 	interpreters map[string]Interpreter
 
-	version            internal.EvaluatorVersion
-	simplifyValidators bool
+	version internal.EvaluatorVersion
 
 	flags cuedebug.Config
 }
@@ -44,7 +43,6 @@ func (r *Runtime) Settings() (internal.EvaluatorVersion, cuedebug.Config) {
 
 func (r *Runtime) ConfigureOpCtx(ctx *adt.OpContext) {
 	ctx.Version = r.version
-	ctx.SimplifyValidators = r.simplifyValidators
 	ctx.Config = r.flags
 }
 
@@ -100,7 +98,6 @@ func (r *Runtime) SetDebugOptions(flags *cuedebug.Config) {
 // SetGlobalExperiments that apply to language evaluation.
 // It does not set the version.
 func (r *Runtime) SetGlobalExperiments(flags *cueexperiment.Config) {
-	r.simplifyValidators = !flags.KeepValidators
 	// Do not set version as this is already set by NewWithSettings or
 	// SetVersion.
 }

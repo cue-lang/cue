@@ -93,8 +93,6 @@ func TestEvalV3(t *testing.T) {
 }
 
 func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedebug.Config, exp cueexperiment.Config) (errorCount int64) {
-	exp.KeepValidators = !t.HasTag("simplifyValidators")
-
 	a := t.Instance()
 	r := runtime.NewWithSettings(version, dbg)
 	r.SetGlobalExperiments(&exp)

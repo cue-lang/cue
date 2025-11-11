@@ -178,6 +178,8 @@ const (
 	// used to trigger finalization of disjunctions.
 	disjunctionTask
 
+	childConjunctsDone
+
 	leftOfMaxCoreCondition
 
 	finalStateKnown condition = leftOfMaxCoreCondition - 1
@@ -256,6 +258,64 @@ var schedConfig = taskContext{
 	complete:    stateCompletions,
 }
 
+func (s *scheduler) handleParents(needs condition, mode runMode) {
+	if s.meets(needs) {
+		return
+	}
+
+	// const needParents = fieldConjunctsKnown |
+	// 	fieldSetKnown |
+	// 	arcTypeKnown |
+	// 	valueKnown |
+	// 	scalarKnown
+
+	// if needs&needParents == 0 {
+	// 	return
+	// }
+
+	s.node.processAncestors(mode)
+}
+
+func (n *nodeContext) processAncestors(mode runMode) (done bool) {
+
+	if n == nil {
+		return // Some tests do not set node.
+	}
+	v := n.node
+
+	if n.meets(allAncestorsProcessed) {
+		return true
+	}
+
+	parentsDone := true
+	p := n.node.Parent
+	if p != nil {
+		n := p.state
+
+		if n.meets(childConjunctsDone) {
+			return true
+		}
+
+		parentsDone = n.processAncestors(mode)
+
+		const fieldConjunctsKnownIndex = 4
+		if n.counters[fieldConjunctsKnownIndex] > 0 {
+			n.process(fieldConjunctsKnown, mode)
+		}
+
+		if parentsDone && n.counters[fieldConjunctsKnownIndex] == 0 {
+			n.completed |= childConjunctsDone
+		}
+	}
+
+	if done || v.IsDynamic || v.Label.IsLet() ||
+		v.Parent.allChildConjunctsKnown(n.ctx) {
+		n.signal(allAncestorsProcessed)
+	}
+
+	return parentsDone
+}
+
 // stateCompletions indicates the completion of conditions based on the
 // completions of other conditions.
 func stateCompletions(s *scheduler) condition {
@@ -318,19 +378,12 @@ func (v *Vertex) allChildConjunctsKnown(ctx *OpContext) bool {
 		return true
 	}
 
-	// TODO(refcount): allow partial processed?
-	if v.Status() == finalized || (v.state == nil && v.status != unprocessed) {
-		// This can happen, for instance, if this is called on a parent of a
-		// rooted node that is marked as a parent for a dynamic node.
-		// In practice this should be handled by the caller, but we add this
-		// as an extra safeguard.
-		// TODO: remove this check at some point.
+	n := v.getState(ctx)
+	if n == nil {
 		return true
 	}
-
-	n := v.getState(ctx)
-
 	return n.meets(fieldConjunctsKnown | allAncestorsProcessed)
+
 }
 
 func (n *nodeContext) scheduleTask(r *runner, env *Environment, x Node, ci CloseInfo) *task {

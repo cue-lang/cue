@@ -383,11 +383,6 @@ type Definitions struct {
 	// for import specs that have paths which refer to a particular
 	// ImportPath.
 	importCanonicalisation map[string]ast.ImportPath
-	// importSpecNodes contains entries for every import within this
-	// package. Within this package, all import specs that are of the
-	// same (canonical) import path, share the same
-	// navigableBinding. This is made possible by this map.
-	importSpecNodes map[ast.ImportPath]*navigableBindings
 }
 
 // Analyse creates and performs initial configuration of a new
@@ -412,7 +407,6 @@ func Analyse(ip ast.ImportPath, importCanonicalisation map[string]ast.ImportPath
 		byFilename:             make(map[string]*FileDefinitions, len(files)),
 		forPackage:             forPackage,
 		pkgImporters:           pkgImporters,
-		importSpecNodes:        make(map[ast.ImportPath]*navigableBindings),
 	}
 	dfns.Reset()
 
@@ -445,7 +439,6 @@ func Analyse(ip ast.ImportPath, importCanonicalisation map[string]ast.ImportPath
 // this package, or import this package) have been modified but this
 // package itself has not been.
 func (dfns *Definitions) Reset() {
-	clear(dfns.importSpecNodes)
 
 	// pkgNode, and its navigable, are the roots. They have no parents.
 	pkgNode := &astNode{}
@@ -473,6 +466,7 @@ func (dfns *Definitions) Reset() {
 		clear(fdfns.definitions)
 		clear(fdfns.completions)
 		clear(fdfns.likelyReferenceOffsets)
+		clear(fdfns.importSpecNodes)
 		fileNode := fdfns.newAstNode(pkgNode, nil, fdfns.File, fileNodesNavigable)
 		fileNode.fieldsAllowed = true
 		pkgNode.allChildren = append(pkgNode.allChildren, fileNode)
@@ -551,6 +545,11 @@ type FileDefinitions struct {
 	// to reference imported packages. It is lazily populated by
 	// [FileDefinitions.findIdentUsageOffsets].
 	likelyReferenceOffsets map[string][]int
+	// importSpecNodes contains entries for every import within this
+	// file. Within this file, all import specs that are of the
+	// same (canonical) import path, share the same
+	// navigableBinding. This is made possible by this map.
+	importSpecNodes map[ast.ImportPath]*navigableBindings
 }
 
 // completionResolutions models the various different types of
@@ -856,21 +855,22 @@ func (dfns *Definitions) initialNavsForImport(ip ast.ImportPath) []*navigableBin
 	// evaluate up to those offsets only, and return the
 	// navigableBindings now associated with those offsets.
 	dfns.bootFiles()
-	nav, found := dfns.importSpecNodes[ip]
-	if !found {
-		return nil
-	}
 	var result []*navigableBindings
-	for _, node := range nav.contributingNodes {
-		spec := node.keyAlias.(*ast.ImportSpec)
-		name := dfns.importSpecName(spec)
-		if name == "" {
+	for _, fdfns := range dfns.byFilename {
+		nav, found := fdfns.importSpecNodes[ip]
+		if !found {
 			continue
 		}
+		for _, node := range nav.contributingNodes {
+			spec := node.keyAlias.(*ast.ImportSpec)
+			name := dfns.importSpecName(spec)
+			if name == "" {
+				continue
+			}
 
-		fdfns := node.fdfns
-		offsets := fdfns.findIdentUsageOffsets(name)
-		result = append(result, fdfns.findDefinitionsForOffsets(offsets...)...)
+			offsets := fdfns.findIdentUsageOffsets(name)
+			result = append(result, fdfns.findDefinitionsForOffsets(offsets...)...)
+		}
 	}
 	return result
 }
@@ -1393,7 +1393,11 @@ func (n *astNode) eval() {
 				if ip == nil {
 					break
 				}
-				importSpecNodes := dfns.importSpecNodes
+				importSpecNodes := n.fdfns.importSpecNodes
+				if importSpecNodes == nil {
+					importSpecNodes = make(map[ast.ImportPath]*navigableBindings)
+					n.fdfns.importSpecNodes = importSpecNodes
+				}
 				nav, found := importSpecNodes[*ip]
 
 				var child *astNode

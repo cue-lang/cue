@@ -86,7 +86,7 @@ The behavior of global experiments tracks the language version reported by "cue 
 
 Available global experiments:
 
-  cmdreferencepkg (preview: v0.13.0, default: v0.14.0)
+  cmdreferencepkg (preview: v0.13.0, default: v0.14.0, stable: v0.16.0)
     cmdreferencepkg requires referencing an imported tool package to declare tasks.
     Otherwise, declaring tasks via "$id" or "kind" string fields is allowed.
 

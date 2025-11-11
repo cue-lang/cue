@@ -34,19 +34,10 @@ stdout -count=1 '^hello$'
 ! exec cue cmd useCliPrintCopy
 stderr 'no tasks found'
 
-# Disabling the cmdreferencepkg experiment, tasks work without referencing imported tool packages.
+# Disabling the cmdreferencepkg experiment is no longer allowed.
 env CUE_EXPERIMENT=cmdreferencepkg=0
-
-exec cue cmd inputKindOutside
-stdout -count=1 '^hello$'
-stdout -count=1 '^command from input$'
-
-exec cue cmd inputDollarIdOutside
-stdout -count=1 '^hello$'
-stdout -count=1 '^command from input$'
-
-exec cue cmd useCliPrintCopy
-stdout -count=1 '^hello$'
+! exec cue cmd inputKindOutside
+stderr 'cannot disable stable experiment "cmdreferencepkg"'
 
 -- input_kind.json --
 {"cmd": {"kind": "print",          "text": "command from input"}, "data": "hello"}

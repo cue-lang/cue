@@ -17,7 +17,7 @@ var Flags Config
 type Config struct {
 	// CmdReferencePkg requires referencing an imported tool package to declare tasks.
 	// Otherwise, declaring tasks via "$id" or "kind" string fields is allowed.
-	CmdReferencePkg bool `experiment:"preview:v0.13.0,default:v0.14.0"`
+	CmdReferencePkg bool `experiment:"preview:v0.13.0,default:v0.14.0,stable:v0.16.0"`
 
 	// KeepValidators prevents validators from simplifying into concrete values,
 	// even if their concrete value could be derived, such as '>=1 & <=1' to '1'.

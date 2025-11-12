@@ -19,7 +19,6 @@ import (
 	"encoding"
 	"encoding/json"
 	"fmt"
-	"math"
 	"math/big"
 	"reflect"
 	"slices"
@@ -78,25 +77,11 @@ func FromGoType(ctx *adt.OpContext, x any) (adt.Expr, errors.Error) {
 }
 
 type goConverter struct {
-	ctx    *adt.OpContext
-	tfile  *token.File
-	offset int
+	ctx *adt.OpContext
 }
 
 func newGoConverter(ctx *adt.OpContext) *goConverter {
-	return &goConverter{
-		ctx: ctx,
-		// Code in *[token.File] uses size+1 in a few places. So do
-		// MaxInt-2 to be sure to avoid wrap-around issues.
-		tfile:  token.NewFile(pkgID(), -1, math.MaxInt-2),
-		offset: 1,
-	}
-}
-
-func (c *goConverter) setNextPos(n ast.Node) ast.Node {
-	ast.SetPos(n, c.tfile.Pos(c.offset, 0))
-	c.offset++
-	return n
+	return &goConverter{ctx: ctx}
 }
 
 func compileExpr(ctx *adt.OpContext, expr ast.Expr) adt.Value {
@@ -407,7 +392,7 @@ func (c *goConverter) fromGoValue(nilIsTop bool, x interface{}) (result adt.Valu
 			return c.fromGoValue(nilIsTop, value.Elem().Interface())
 
 		case reflect.Struct:
-			sl := &adt.StructLit{Src: c.setNextPos(ast.NewStruct())}
+			sl := &adt.StructLit{Src: ast.NewStruct()}
 			sl.Init(c.ctx)
 			v := &adt.Vertex{}
 
@@ -468,7 +453,7 @@ func (c *goConverter) fromGoValue(nilIsTop bool, x interface{}) (result adt.Valu
 			return v
 
 		case reflect.Map:
-			obj := &adt.StructLit{Src: c.setNextPos(ast.NewStruct())}
+			obj := &adt.StructLit{Src: ast.NewStruct()}
 			obj.Init(c.ctx)
 			v := &adt.Vertex{}
 
@@ -525,8 +510,6 @@ func (c *goConverter) fromGoValue(nilIsTop bool, x interface{}) (result adt.Valu
 
 		case reflect.Slice, reflect.Array:
 			list := &adt.ListLit{Src: ast.NewList()}
-			c.setNextPos(list.Src)
-
 			v := &adt.Vertex{}
 
 			i := 0
@@ -587,7 +570,6 @@ func (c *goConverter) createField(l adt.Feature, sub adt.Value, sl *adt.StructLi
 	if expr, ok := sub.Source().(ast.Expr); ok {
 		astField.Value = expr
 	}
-	c.setNextPos(astField.Label)
 	src.Elts = append(src.Elts, astField)
 	field := &adt.Field{Label: l, Value: sub, Src: astField}
 	sl.Decls = append(sl.Decls, field)
@@ -717,7 +699,6 @@ func (c *goConverter) fromGoType(allowNullDefault bool, t reflect.Type) (e ast.E
 
 			// The GO JSON decoder always allows a value to be undefined.
 			d := &ast.Field{Label: ast.NewIdent(name), Value: elem}
-			c.setNextPos(d)
 			if isOptional(&f) {
 				d.Constraint = token.OPTION
 			}
@@ -785,7 +766,6 @@ func (c *goConverter) fromGoType(allowNullDefault bool, t reflect.Type) (e ast.E
 store:
 	// TODO: store error if not nil?
 	if e != nil {
-		c.setNextPos(e)
 		f := &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: e}}}
 		astutil.Resolve(f, func(_ token.Pos, msg string, args ...interface{}) {
 			c.ctx.AddErrf(msg, args...)

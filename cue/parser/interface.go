@@ -155,32 +155,14 @@ func Version(v string) Option {
 	})
 }
 
-// FromVersion specifies until which legacy version the parser should provide
-// backwards compatibility.
-//
-// Deprecated: use [Version] instead.
-func FromVersion(version int) Option {
-	return optionFunc(func(cfg *Config) {})
-}
-
 // DeprecationError is a sentinel error to indicate that an error is
 // related to an unsupported old CUE syntax.
 type DeprecationError struct {
-	// Deprecated: version integers have been replaced by language versions as semver strings.
-	Version int
 }
 
 func (e *DeprecationError) Error() string {
 	return "try running `cue fix` (possibly with an earlier version, like v0.2.2) to upgrade"
 }
-
-const (
-	// Deprecated: see [Version].
-	Latest = 0
-
-	// Deprecated: see [Version].
-	FullBackwardCompatibility = 0
-)
 
 // FileOffset specifies the File position info to use.
 //

@@ -112,6 +112,12 @@ func TestGenerated(t *testing.T) {
 			out: `*null|[...*null|{Name: string, Description: string}]`,
 		}, {
 			in: func(ctx *adt.OpContext) (adt.Expr, error) {
+				in := &KeepGoFieldOrdering{}
+				return convert.FromGoValue(ctx, in, false), nil
+			},
+			out: `One: 0, Two: 0, Three: 0, Four: 0, Five: 0, Six: 0, Seven: 0, Eight: 0, Nine: 0, Ten: 0`,
+		}, {
+			in: func(ctx *adt.OpContext) (adt.Expr, error) {
 				expr, err := parser.ParseExpr("test", `{
 				x: Guide.#Terminal
 				Guide: {}
@@ -262,6 +268,11 @@ type B struct {
 
 type C struct {
 	Terminals []*A
+}
+
+type KeepGoFieldOrdering struct {
+	One, Two, Three, Four, Five  int64
+	Six, Seven, Eight, Nine, Ten int32
 }
 
 // For debugging purposes. Do not delete.

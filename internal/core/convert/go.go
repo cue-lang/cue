@@ -45,17 +45,22 @@ import (
 // The code in this file is a prototype implementation and is far from
 // optimized.
 
-// GoValueToValue converts a Go value to an internal CUE value.
+// FromGoValue converts a Go value to an internal CUE value.
 // The returned CUE value is finalized and concrete.
-func GoValueToValue(ctx *adt.OpContext, x any, nilIsTop bool) adt.Value {
-	v := GoValueToExpr(ctx, nilIsTop, x)
+func FromGoValue(ctx *adt.OpContext, x any, nilIsTop bool) adt.Value {
+	v := newGoConverter(ctx).fromGoValue(nilIsTop, x)
+	if v == nil {
+		return ctx.AddErrf("unsupported Go type (%T)", x)
+	}
 	// TODO: return Value
-	return toValue(v)
+	return v
 }
 
-func GoTypeToExpr(ctx *adt.OpContext, x any) (adt.Expr, errors.Error) {
-	v := newGoConverter(ctx).convertGoType(reflect.TypeOf(x))
+// FromGoType converts a Go type to an internal CUE expression.
+func FromGoType(ctx *adt.OpContext, x any) (adt.Expr, errors.Error) {
+	v := newGoConverter(ctx).fromGoType(reflect.TypeOf(x))
 	if err := ctx.Err(); err != nil {
+		// TODO: return an error as the expr itself, like [FromGoValue]?
 		return v, err.Err
 	}
 	return v, nil
@@ -81,15 +86,6 @@ func (c *goConverter) setNextPos(n ast.Node) ast.Node {
 	ast.SetPos(n, c.tfile.Pos(c.offset, 0))
 	c.offset++
 	return n
-}
-
-func toValue(e adt.Expr) adt.Value {
-	if v, ok := e.(adt.Value); ok {
-		return v
-	}
-	obj := &adt.Vertex{}
-	obj.AddConjunct(adt.MakeRootConjunct(nil, e))
-	return obj
 }
 
 func compileExpr(ctx *adt.OpContext, expr ast.Expr) adt.Value {
@@ -204,14 +200,6 @@ func isOmitEmpty(f *reflect.StructField) bool {
 	return isOmitEmpty
 }
 
-func GoValueToExpr(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Expr {
-	e := newGoConverter(ctx).convertRec(nilIsTop, x)
-	if e == nil {
-		return ctx.AddErrf("unsupported Go type (%T)", x)
-	}
-	return e
-}
-
 func isNil(x reflect.Value) bool {
 	switch x.Kind() {
 	// Only check for supported types; ignore func and chan.
@@ -221,7 +209,7 @@ func isNil(x reflect.Value) bool {
 	return false
 }
 
-func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value) {
+func (c *goConverter) fromGoValue(nilIsTop bool, x interface{}) (result adt.Value) {
 	src := c.ctx.Source()
 	switch v := x.(type) {
 	case types.Interface:
@@ -395,7 +383,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 			return c.toUint(value.Uint())
 
 		case reflect.Float32, reflect.Float64:
-			return c.convertRec(nilIsTop, value.Float())
+			return c.fromGoValue(nilIsTop, value.Float())
 
 		case reflect.Pointer:
 			if value.IsNil() {
@@ -405,7 +393,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 				}
 				return &adt.Null{Src: src}
 			}
-			return c.convertRec(nilIsTop, value.Elem().Interface())
+			return c.fromGoValue(nilIsTop, value.Elem().Interface())
 
 		case reflect.Struct:
 			sl := &adt.StructLit{Src: c.setNextPos(ast.NewStruct())}
@@ -428,7 +416,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 				if isOmitEmpty(&sf) && val.IsZero() {
 					continue
 				}
-				sub := c.convertRec(nilIsTop, val.Interface())
+				sub := c.fromGoValue(nilIsTop, val.Interface())
 				if sub == nil {
 					// mimic behavior of encoding/json: skip fields of unsupported types
 					continue
@@ -491,7 +479,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 					// 	continue
 					// }
 
-					sub := c.convertRec(nilIsTop, val.Interface())
+					sub := c.fromGoValue(nilIsTop, val.Interface())
 					// mimic behavior of encoding/json: report error of
 					// unsupported type.
 					if sub == nil {
@@ -532,7 +520,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 
 			i := 0
 			for _, val := range value.Seq2() {
-				x := c.convertRec(nilIsTop, val.Interface())
+				x := c.fromGoValue(nilIsTop, val.Interface())
 				if x == nil {
 					return c.ctx.AddErrf("unsupported Go type (%T)",
 						val.Interface())
@@ -606,7 +594,7 @@ func (c *goConverter) toUint(x uint64) adt.Value {
 	return n
 }
 
-func (c *goConverter) convertGoType(t reflect.Type) adt.Expr {
+func (c *goConverter) fromGoType(t reflect.Type) adt.Expr {
 	// TODO: this can be much more efficient.
 	// TODO: synchronize
 	return c.goTypeToValue(true, t)
@@ -627,14 +615,14 @@ func (c *goConverter) goTypeToValue(allowNullDefault bool, t reflect.Type) adt.E
 		return t
 	}
 
-	_, v := c.goTypeToValueRec(allowNullDefault, t)
-	if v == nil {
+	_, expr := c.goTypeToExprRec(allowNullDefault, t)
+	if expr == nil {
 		return c.ctx.AddErrf("unsupported Go type (%v)", t)
 	}
-	return v
+	return expr
 }
 
-func (c *goConverter) goTypeToValueRec(allowNullDefault bool, t reflect.Type) (e ast.Expr, expr adt.Expr) {
+func (c *goConverter) goTypeToExprRec(allowNullDefault bool, t reflect.Type) (e ast.Expr, expr adt.Expr) {
 	if src, t, ok := c.ctx.LoadType(t); ok {
 		return src, t
 	}
@@ -668,7 +656,7 @@ func (c *goConverter) goTypeToValueRec(allowNullDefault bool, t reflect.Type) (e
 		for elem.Kind() == reflect.Pointer {
 			elem = elem.Elem()
 		}
-		e, _ = c.goTypeToValueRec(false, elem)
+		e, _ = c.goTypeToExprRec(false, elem)
 		if allowNullDefault {
 			e = wrapOrNull(e)
 		}
@@ -715,7 +703,7 @@ func (c *goConverter) goTypeToValueRec(allowNullDefault bool, t reflect.Type) (e
 				continue
 			}
 			_, ok := f.Tag.Lookup("cue")
-			elem, _ := c.goTypeToValueRec(!ok, f.Type)
+			elem, _ := c.goTypeToExprRec(!ok, f.Type)
 			if isBad(elem) {
 				continue // Ignore fields for unsupported types
 			}
@@ -756,7 +744,7 @@ func (c *goConverter) goTypeToValueRec(allowNullDefault bool, t reflect.Type) (e
 		if t.Elem().Kind() == reflect.Uint8 {
 			e = ast.NewIdent("__bytes")
 		} else {
-			elem, _ := c.goTypeToValueRec(allowNullDefault, t.Elem())
+			elem, _ := c.goTypeToExprRec(allowNullDefault, t.Elem())
 			if elem == nil {
 				b := c.ctx.AddErrf("unsupported Go type (%v)", t.Elem())
 				return &ast.BadExpr{}, b
@@ -788,7 +776,7 @@ func (c *goConverter) goTypeToValueRec(allowNullDefault bool, t reflect.Type) (e
 			return &ast.BadExpr{}, b
 		}
 
-		v, x := c.goTypeToValueRec(allowNullDefault, t.Elem())
+		v, x := c.goTypeToExprRec(allowNullDefault, t.Elem())
 		if v == nil {
 			b := c.ctx.AddErrf("unsupported Go type (%v)", t.Elem())
 			return &ast.BadExpr{}, b

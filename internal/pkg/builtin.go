@@ -173,7 +173,7 @@ func ToBuiltin(b *Builtin) *adt.Builtin {
 				return nil
 			}
 		}
-		return convert.GoValueToValue(ctx, c.Ret, true)
+		return convert.FromGoValue(ctx, c.Ret, true)
 	}
 	return x
 }

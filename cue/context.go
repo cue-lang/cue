@@ -372,7 +372,7 @@ func (c *Context) Encode(x any, option ...EncodeOption) Value {
 
 	ctx := c.ctx()
 	// TODO: is true the right default?
-	val := convert.GoValueToValue(ctx, x, options.nilIsTop)
+	val := convert.FromGoValue(ctx, x, options.nilIsTop)
 	n := adt.ToVertex(val) // we know val is finalized
 	n.Finalize(ctx)
 	return c.make(n)
@@ -389,7 +389,7 @@ func (c *Context) EncodeType(x any, option ...EncodeOption) Value {
 	}
 
 	ctx := c.ctx()
-	expr, err := convert.GoTypeToExpr(ctx, x)
+	expr, err := convert.FromGoType(ctx, x)
 	if err != nil {
 		return c.makeError(err)
 	}

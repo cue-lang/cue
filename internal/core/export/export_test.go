@@ -87,7 +87,7 @@ func TestGenerated(t *testing.T) {
 				in := &C{
 					Terminals: []*A{{Name: "Name", Description: "Desc"}},
 				}
-				return convert.GoValueToValue(ctx, in, false), nil
+				return convert.FromGoValue(ctx, in, false), nil
 			},
 			out: `Terminals: [{Name: "Name", Description: "Desc"}]`,
 		}, {
@@ -95,19 +95,19 @@ func TestGenerated(t *testing.T) {
 				in := &C{
 					Terminals: []*A{{Name: "Name", Description: "Desc"}},
 				}
-				return convert.GoTypeToExpr(ctx, in)
+				return convert.FromGoType(ctx, in)
 			},
 			out: `*null|{Terminals?: *null|[...*null|{Name: string, Description: string}]}`,
 		}, {
 			in: func(ctx *adt.OpContext) (adt.Expr, error) {
 				in := []*A{{Name: "Name", Description: "Desc"}}
-				return convert.GoValueToValue(ctx, in, false), nil
+				return convert.FromGoValue(ctx, in, false), nil
 			},
 			out: `[{Name: "Name", Description: "Desc"}]`,
 		}, {
 			in: func(ctx *adt.OpContext) (adt.Expr, error) {
 				in := []*A{{Name: "Name", Description: "Desc"}}
-				return convert.GoTypeToExpr(ctx, in)
+				return convert.FromGoType(ctx, in)
 			},
 			out: `*null|[...*null|{Name: string, Description: string}]`,
 		}, {

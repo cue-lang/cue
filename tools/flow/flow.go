@@ -437,7 +437,7 @@ func (t *Task) addDep(path string, dep *Task) {
 //
 // This method may currently only be called by the runner.
 func (t *Task) Fill(x interface{}) error {
-	expr := convert.GoValueToExpr(t.ctxt, true, x)
+	expr := convert.FromGoValue(t.ctxt, x, true)
 	if t.update == nil {
 		t.update = expr
 		return nil

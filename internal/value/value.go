@@ -101,7 +101,7 @@ func FromGoValue(r *cue.Context, x interface{}, nilIsTop bool) cue.Value {
 	rt := (*runtime.Runtime)(r)
 	rt.Init()
 	ctx := eval.NewContext(rt, nil)
-	v := convert.GoValueToValue(ctx, x, nilIsTop)
+	v := convert.FromGoValue(ctx, x, nilIsTop)
 	n := adt.ToVertex(v)
 	return r.Encode(n)
 }
@@ -110,7 +110,7 @@ func FromGoType(r *cue.Context, x interface{}) cue.Value {
 	rt := (*runtime.Runtime)(r)
 	rt.Init()
 	ctx := eval.NewContext(rt, nil)
-	expr, err := convert.GoTypeToExpr(ctx, x)
+	expr, err := convert.FromGoType(ctx, x)
 	if err != nil {
 		expr = &adt.Bottom{Err: err}
 	}

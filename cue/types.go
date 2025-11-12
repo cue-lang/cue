@@ -1706,7 +1706,7 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 		// TODO: inject import path of current package?
 		expr = resolveExpr(ctx, n, x)
 	default:
-		expr = convert.GoValueToValue(ctx, x, true)
+		expr = convert.FromGoValue(ctx, x, true)
 	}
 	for _, sel := range slices.Backward(p.path) {
 		switch sel.Type() {

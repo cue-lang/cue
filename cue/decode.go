@@ -51,6 +51,8 @@ func (v Value) Decode(x interface{}) error {
 	return d.errs
 }
 
+// TODO(mvdan): move decoder to internal/core/convert as ToGoValue
+
 type decoder struct {
 	errs errors.Error
 }

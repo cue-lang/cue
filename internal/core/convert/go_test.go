@@ -239,7 +239,7 @@ func TestConvert(t *testing.T) {
 	for _, tc := range testCases {
 		ctx := adt.NewContext(r, &adt.Vertex{})
 		t.Run("", func(t *testing.T) {
-			v := convert.GoValueToValue(ctx, tc.goVal, true)
+			v := convert.FromGoValue(ctx, tc.goVal, true)
 			n, ok := v.(*adt.Vertex)
 			if !ok {
 				n = &adt.Vertex{BaseValue: v}
@@ -260,7 +260,7 @@ func TestX(t *testing.T) {
 	r := runtime.New()
 	ctx := adt.NewContext(r, &adt.Vertex{})
 
-	v := convert.GoValueToValue(ctx, x, false)
+	v := convert.FromGoValue(ctx, x, false)
 	// if err != nil {
 	// 	t.Fatal(err)
 	// }
@@ -402,7 +402,7 @@ func TestConvertType(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			ctx := adt.NewContext(r, &adt.Vertex{})
-			v, err := convert.GoTypeToExpr(ctx, tc.goTyp)
+			v, err := convert.FromGoType(ctx, tc.goTyp)
 			got := debug.NodeString(ctx, v, nil)
 			if got != tc.want {
 				t.Errorf("\n got %q;\nwant %q", got, tc.want)

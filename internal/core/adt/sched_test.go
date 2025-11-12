@@ -140,7 +140,6 @@ func TestScheduler(t *testing.T) {
 					process(name, t, deps...)
 				},
 				completes: completes,
-				needs:     needs,
 			},
 			node: n,
 			x:    &String{Str: name}, // Set name for debugging purposes.
@@ -197,7 +196,6 @@ func TestScheduler(t *testing.T) {
 					fmt.Fprint(w, " FAIL")
 				},
 				completes: completes,
-				needs:     needs,
 			},
 			node: n,
 			x:    &String{Str: name}, // Set name for debugging purposes.
@@ -263,31 +261,6 @@ func TestScheduler(t *testing.T) {
 			v0 (SUCCESS):
 			    task:    t1: FAILED`,
 	}, {
-		// Tasks will have to be run in order according to their dependencies.
-		// Note that the tasks will be run in order, as they all depend on the
-		// same node, in which case the order must be and will be strictly
-		// enforced.
-		name: "dependency chain on nodes within scheduler",
-		init: func() {
-			v0 := node(nil)
-			success("third", v0, c3ValueKnown, c2ArcTypeKnown)
-			success("fourth", v0, c4ScalarKnown, c3ValueKnown)
-			success("second", v0, c2ArcTypeKnown, c1AllAncestorsProcessed)
-			success("first", v0, c1AllAncestorsProcessed, 0)
-		},
-		log: `
-		    running task first
-		    running task second
-		    running task third
-		    running task fourth`,
-
-		state: `
-			v0 (SUCCESS):
-			    task:    third: SUCCESS
-			    task:    fourth: SUCCESS
-			    task:    second: SUCCESS
-			    task:    first: SUCCESS`,
-	}, {
 		// If a task depends on a state completion for which there is no task,
 		// it should be considered as completed, because essentially all
 		// information is known about that state.
@@ -317,27 +290,6 @@ func TestScheduler(t *testing.T) {
 			v1 (SUCCESS):
 			    task:    t1: SUCCESS
 			v2 (SUCCESS):`,
-	}, {
-		name: "tasks depend on multiple other tasks within same scheduler",
-		init: func() {
-			v0 := node(nil)
-			success("before1", v0, c2ArcTypeKnown, 0)
-			success("last", v0, c4ScalarKnown, c1AllAncestorsProcessed|c2ArcTypeKnown|c3ValueKnown)
-			success("block", v0, c3ValueKnown, c1AllAncestorsProcessed|c2ArcTypeKnown)
-			success("before2", v0, c1AllAncestorsProcessed, 0)
-		},
-		log: `
-		    running task before1
-		    running task before2
-		    running task block
-		    running task last`,
-
-		state: `
-			v0 (SUCCESS):
-			    task:    before1: SUCCESS
-			    task:    last: SUCCESS
-			    task:    block: SUCCESS
-			    task:    before2: SUCCESS`,
 	}, {
 		// In this test we simulate dynamic reference that are dependent
 		// on each other in a chain to form the fields. Task t0 would not be

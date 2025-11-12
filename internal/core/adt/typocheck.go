@@ -676,16 +676,11 @@ func (n *nodeContext) hasEvidenceForOne(all reqSets, i uint32, conjuncts []conju
 	}
 
 	embedScope, ok := all.lookupSet(a.embed)
-
 	if !ok {
 		return false
 	}
 
 	outerScope, ok := all.lookupSet(a.parent)
-
-	if ok && outerScope.removed {
-		return true
-	}
 
 outer:
 	for _, c := range conjuncts {
@@ -695,6 +690,9 @@ outer:
 		}
 
 		if !ok || a.parent == 0 {
+			return true
+		}
+		if outerScope.removed {
 			return true
 		}
 

@@ -276,6 +276,20 @@ func (n *nodeContext) processAncestors(mode runMode) (done bool) {
 	if p != nil {
 		n := p.state
 
+		// p.state is nil when the parent vertex exists but has not yet
+		// entered evaluation (its nodeContext has not been created).
+		// This arises when processAncestors is reached via the
+		// completePending → lookup → process → handleParents chain: a
+		// SelectorExpr inside an IfClause fires inside a comprehension
+		// that is running while its parent struct is still lazy.  Without
+		// this guard the nil receiver panics below at n.meets(...).
+		// A related trigger (fieldSetKnown added to unifyNode) is guarded
+		// by the same check; see the note in the later commit that adds
+		// that change.
+		if n == nil {
+			return false
+		}
+
 		if n.meets(childConjunctsDone) {
 			return true
 		}

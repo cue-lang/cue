@@ -817,6 +817,12 @@ func (c *OpContext) evalStateCI(v Expr, state Flags) (result Value, ci CloseInfo
 
 				v := c.evaluate(arc, x, state)
 
+				if arc.nonRooted && !allTasksFinished(s) {
+					if t := c.current(); t != nil {
+						t.node.deferred = append(t.node.deferred, s)
+					}
+				}
+
 				return v, c.ci
 			}
 		}

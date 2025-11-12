@@ -286,6 +286,13 @@ type scheduler struct {
 	// the indicate conditions. This can hold tasks from other nodes or tasks
 	// originating from this node itself.
 	blocking []*task
+
+	// deferred tracks nodes that were not completed during computation and that
+	// still need to be finalized. This is especially important for inline
+	// structs, which may not be included in the output and thus the errors
+	// would never be discovered. But it is also important for models where we
+	// only do partial evaluation.
+	deferred []*nodeContext
 }
 
 func (s *scheduler) clear() {
@@ -745,6 +752,13 @@ func runTask(t *task, mode runMode) {
 	t.err = nil
 
 	t.run.f(ctx, t, mode)
+
+	for _, d := range t.node.deferred {
+		d.node.CompleteArcsOnly(ctx)
+		if b, ok := d.node.BaseValue.(*Bottom); ok {
+			t.node.addBottom(b)
+		}
+	}
 
 	if t.state != taskWAITING {
 		t.blockedOn = nil

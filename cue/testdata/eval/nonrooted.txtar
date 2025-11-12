@@ -11,7 +11,7 @@ issue3977: inlineExpr: {
 		out: x + 1
 	}
 
-	err: (#fn & {x: 2}).out @test(eq, 3, incorrect) @test(err:todo, p=1, code=eval,
+	err: (#fn & {x: 2}).out @test(err, code=eval,
 		contains="conflicting values", args=[1, 2])
 }
 issue3977: inlineDisj1: {
@@ -21,7 +21,11 @@ issue3977: inlineDisj1: {
 		out: "value=\(x)"
 	}
 
-	err: (#fn & {x: "invalid"}).out @test(eq, "value=invalid", incorrect) @test(err:todo, p=1, code=eval, contains="conflicting values")
+	err: (#fn & {x: "invalid"}).out @test(err, code=eval,
+		suberr=(code=eval, path=x, contains="conflicting values %s and %s", args=["2", "invalid"], pos=[-6:14, -4:8, 0:8, 0:18]),
+		suberr=(code=eval, path=x, contains="conflicting values %s and %s", args=["3", "invalid"], pos=[-6:20, -4:8, 0:8, 0:18]),
+		suberr=(code=eval, path=x, contains="conflicting values %s and %s", args=["4", "invalid"], pos=[-6:26, -4:8, 0:8, 0:18]),
+	)
 }
 issue3977: inlineDisj2: {
 	#NetworkID: 1
@@ -66,7 +70,29 @@ Unifications: 47
 Conjuncts:    87
 Disjuncts:    68
 -- out/errors.txt --
+[eval] x: conflicting values 1 and 2:
+    ./in.cue:2:14
+    ./in.cue:4:8
+    ./in.cue:8:8
+    ./in.cue:8:18
 [incomplete] issue3977.inlineDisj1.#fn.out: invalid interpolation: unresolved disjunction "2" | "3" | "4" (type string):
+    ./in.cue:15:8
+[eval] x: conflicting values "2" and "invalid":
+    ./in.cue:12:14
+    ./in.cue:14:8
+    ./in.cue:18:8
+    ./in.cue:18:18
+x: conflicting values "3" and "invalid":
+    ./in.cue:12:20
+    ./in.cue:14:8
+    ./in.cue:18:8
+    ./in.cue:18:18
+x: conflicting values "4" and "invalid":
+    ./in.cue:12:26
+    ./in.cue:14:8
+    ./in.cue:18:8
+    ./in.cue:18:18
+x: 3 errors in empty disjunction::
     ./in.cue:15:8
 [eval] x: conflicting values 2 and 1:
     ./in.cue:21:14

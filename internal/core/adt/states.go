@@ -131,19 +131,6 @@ const (
 	// TODO: rename to something better?
 	scalarKnown
 
-	// listTypeKnown indicates that it is known that lists unified with this
-	// Vertex should be interpreted as integer indexed lists, as associative
-	// lists, or an error.
-	//
-	// This is a signal condition that is reached when:
-	//    - allFieldsKnown is reached (all expressions have )
-	//    - it is unified with an associative list type
-	//
-	// TODO(assoclist): this is set to 0 below: This mode is only needed for
-	// associative lists and is not yet used. We should use this again and fix
-	// any performance issues when we implement associative lists.
-	// listTypeKnown
-
 	// fieldConjunctsKnown means that all the conjuncts of all fields are
 	// known.
 	fieldConjunctsKnown
@@ -245,9 +232,6 @@ const (
 	// At the moment this is equal to 'scalarKnown'.
 	concreteKnown = scalarKnown
 
-	// TODO(assoclist): see comment above.
-	listTypeKnown condition = 0
-
 	// fieldConjunctsKnownIdx is the bit-position index of
 	// fieldConjunctsKnown, for use as a scheduler.counters index.
 	// It must equal bits.TrailingZeros16(uint16(fieldConjunctsKnown)).
@@ -259,7 +243,7 @@ const (
 // new taskContexts.
 var schedConfig = taskContext{
 	counterMask: conditionsUsingCounters,
-	autoUnblock: listTypeKnown | scalarKnown | arcTypeKnown,
+	autoUnblock: scalarKnown | arcTypeKnown,
 	complete:    stateCompletions,
 }
 
@@ -365,7 +349,6 @@ func stateCompletions(s *scheduler) condition {
 		if v.ArcType == ArcMember || v.ArcType == ArcNotPresent {
 			x |= scalarKnown
 		}
-		x |= listTypeKnown
 	}
 
 	if x.meets(needFieldConjunctsKnown | needTasksDone) {

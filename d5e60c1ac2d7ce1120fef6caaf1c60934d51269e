@@ -16,6 +16,24 @@
       "message": "Not great that we rely on external servers for local testing, though.",
       "revId": "d5e60c1ac2d7ce1120fef6caaf1c60934d51269e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3a34d7b_fc166efe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-12T09:33:04Z",
+      "side": 1,
+      "message": "as the commit message explains, this is a local test goproxy",
+      "parentUuid": "31f1f933_00e759d9",
+      "revId": "d5e60c1ac2d7ce1120fef6caaf1c60934d51269e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

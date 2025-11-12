@@ -369,11 +369,6 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 		}
 		return n
 
-	case reflect.Value:
-		if v.CanInterface() {
-			return c.convertRec(nilIsTop, v.Interface())
-		}
-
 	default:
 		value := reflect.ValueOf(v)
 		switch value.Kind() {

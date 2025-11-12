@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d94d2bef_eba02f18",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-12T09:45:25Z",
+      "side": 1,
+      "message": "Please wrap comment at 80 chars.",
+      "revId": "b77723a43b4bc6a2a4580e04af9b32e876d557bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

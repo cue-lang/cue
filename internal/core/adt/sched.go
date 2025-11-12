@@ -280,8 +280,7 @@ type scheduler struct {
 	// tasks lists all tasks that were scheduled for this scheduler.
 	// The list only contains tasks that are associated with this node.
 	// TODO: rename to queue and taskPos to nextQueueIndex.
-	tasks   []*task
-	taskPos int
+	tasks []*task
 
 	// blocking is a list of tasks that are blocked on the completion of
 	// the indicate conditions. This can hold tasks from other nodes or tasks
@@ -428,10 +427,12 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 	s.state = schedRUNNING
 	// Use variable instead of range, because s.tasks may grow during processes.
 
+	taskPos := 0
+
 processNextTask:
-	for s.taskPos < len(s.tasks) {
-		t := s.tasks[s.taskPos]
-		s.taskPos++
+	for taskPos < len(s.tasks) {
+		t := s.tasks[taskPos]
+		taskPos++
 
 		if t.state != taskREADY {
 			// TODO(perf): Figure out how it is possible to reach this and if we
@@ -512,7 +513,7 @@ unblockTasks:
 
 	// The running of tasks above may result in more tasks being added to the
 	// queue. Process these first before continuing.
-	if s.taskPos < len(s.tasks) {
+	if taskPos < len(s.tasks) {
 		goto processNextTask
 	}
 
@@ -679,7 +680,7 @@ func (s *scheduler) insertTask(t *task) {
 	// Sort by priority. This code is optimized for the case that there are
 	// very few tasks with higher priority. This loop will almost always
 	// terminate within 0 or 1 iterations.
-	for i := len(s.tasks) - 1; i > s.taskPos; i-- {
+	for i := len(s.tasks) - 1; i > 0; i-- {
 		if s.tasks[i-1].run.priority <= s.tasks[i].run.priority {
 			break
 		}

@@ -47,15 +47,12 @@ func TestPackages(t *testing.T) {
 	}, {
 		name:  "failing field with validator",
 		value: &pkg1.OtherStruct{A: "car"},
-		want: `
-2 errors in empty disjunction:
+		want: `2 errors in empty disjunction:
 conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encoding/gocode/testdata/pkg2".PickMe} (mismatched types null and struct):
     pkg1/instance.cue:x:x
 A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
     pkg1/instance.cue:x:x
-    _:1:4
-    pkg1/instance.cue:x:x
-`,
+    pkg1/instance.cue:x:x`,
 	}, {
 		name:  "failing field of type int",
 		value: &pkg1.MyStruct{A: 11, B: "dog"},
@@ -68,8 +65,7 @@ A: invalid value 11 (out of bound <=10):
 	}, {
 		name:  "failing nested struct ",
 		value: &pkg1.MyStruct{A: 5, B: "dog", O: &pkg1.OtherStruct{A: "car", P: 6}},
-		want: `
-4 errors in empty disjunction:
+		want: `4 errors in empty disjunction:
 conflicting values null and {A:<=10,B:(=~"cat"|*"dog"),O?:OtherStruct,I:"cuelang.org/go/encoding/gocode/testdata/pkg2".ImportMe} (mismatched types null and struct):
     pkg1/instance.cue:x:x
 O: 2 errors in empty disjunction:
@@ -78,9 +74,7 @@ O: conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/enc
     pkg1/instance.cue:x:x
 O.A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
     pkg1/instance.cue:x:x
-    _:1:4
-    pkg1/instance.cue:x:x
-`,
+    pkg1/instance.cue:x:x`,
 	}, {
 		name:  "fail nested struct of different package",
 		value: &pkg1.MyStruct{A: 5, B: "dog", O: &pkg1.OtherStruct{A: "X", P: 4}},

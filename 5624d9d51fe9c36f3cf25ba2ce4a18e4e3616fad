@@ -16,6 +16,24 @@
       "message": "This external contribution LGTM, and the way the tests show its behavior looks good too.\n\n\nMy only thought is that perhaps we should name it ParseNumber. The other APIs in this package mirror the predeclared names in the spec (int, uint, float, bool), so it seems weird to shorten `number` to `num`.\n\n\ncue/literal does have ParseNum rather than ParseNumber, but I\u0027d say that was a small mistake that we could always fix up later.",
       "revId": "5624d9d51fe9c36f3cf25ba2ce4a18e4e3616fad",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae798e34_bae04317",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-12T13:10:29Z",
+      "side": 1,
+      "message": "I\u0027m find with either, with a slight preference for ParseNumber.",
+      "parentUuid": "800ebba3_6b398bdc",
+      "revId": "5624d9d51fe9c36f3cf25ba2ce4a18e4e3616fad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

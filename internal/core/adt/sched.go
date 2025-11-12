@@ -613,10 +613,6 @@ type runner struct {
 	// completes indicates which states this tasks contributes to.
 	completes condition
 
-	// needes indicates which states of the corresponding node need to be
-	// completed before this task can be run.
-	needs condition
-
 	// a lower priority indicates a preference to run a task before tasks
 	// of a higher priority.
 	priority int8
@@ -663,15 +659,13 @@ type task struct {
 }
 
 func (s *scheduler) insertTask(t *task) {
+	if t.run.completes == 0 {
+		panic("task with no completes")
+	}
 	completes := t.run.completes
-	needs := t.run.needs
 
-	s.needs |= needs
 	s.provided |= completes
 
-	if needs&completes != 0 {
-		panic("task depends on its own completion")
-	}
 	t.completes = completes
 
 	s.incrementCounts(completes)
@@ -685,10 +679,6 @@ func (s *scheduler) insertTask(t *task) {
 			break
 		}
 		s.tasks[i], s.tasks[i-1] = s.tasks[i-1], s.tasks[i]
-	}
-
-	if s.completed&needs != needs {
-		t.waitFor(s, needs)
 	}
 }
 

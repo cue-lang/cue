@@ -75,7 +75,7 @@ func (n *nodeContext) initBare() {
 		n.blockOn(allAncestorsProcessed)
 	}
 
-	n.blockOn(scalarKnown | listTypeKnown | arcTypeKnown)
+	n.blockOn(scalarKnown | arcTypeKnown)
 
 	if v.Label.IsDef() {
 		v.ClosedRecursive = true

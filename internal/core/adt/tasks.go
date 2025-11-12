@@ -64,13 +64,11 @@ func init() {
 		name:      "ListLit",
 		f:         processListLit,
 		completes: fieldConjunct,
-		needs:     listTypeKnown,
 	}
 	handleListVertex = &runner{
 		name:      "ListVertex",
 		f:         processListVertex,
 		completes: fieldConjunct,
-		needs:     listTypeKnown,
 	}
 	handleDisjunctions = &runner{
 		name:      "Disjunctions",

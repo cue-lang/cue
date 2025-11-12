@@ -45,13 +45,15 @@ import (
 // The code in this file is a prototype implementation and is far from
 // optimized.
 
-func GoValueToValue(ctx *adt.OpContext, x interface{}, nilIsTop bool) adt.Value {
+// GoValueToValue converts a Go value to an internal CUE value.
+// The returned CUE value is finalized and concrete.
+func GoValueToValue(ctx *adt.OpContext, x any, nilIsTop bool) adt.Value {
 	v := GoValueToExpr(ctx, nilIsTop, x)
 	// TODO: return Value
 	return toValue(v)
 }
 
-func GoTypeToExpr(ctx *adt.OpContext, x interface{}) (adt.Expr, errors.Error) {
+func GoTypeToExpr(ctx *adt.OpContext, x any) (adt.Expr, errors.Error) {
 	v := newGoConverter(ctx).convertGoType(reflect.TypeOf(x))
 	if err := ctx.Err(); err != nil {
 		return v, err.Err

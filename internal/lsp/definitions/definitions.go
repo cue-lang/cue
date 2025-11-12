@@ -704,7 +704,19 @@ func (fdfns *FileDefinitions) UsagesForOffset(offset int, includeDefinitions boo
 		}
 	}
 
-	usages(navs)
+	allComplete := true
+	for _, nav := range navs {
+		if !nav.usedByComplete {
+			allComplete = false
+			break
+		}
+	}
+	if !allComplete {
+		usages(navs)
+		for _, nav := range navs {
+			nav.usedByComplete = true
+		}
+	}
 
 	exprs := make(map[ast.Node]*astNode)
 	for _, nav := range navs {
@@ -1195,7 +1207,8 @@ type navigableBindings struct {
 	// the navigableBindings with name x and contributingNodes `x: 3`
 	// (i.e. line 1) will have its usedBy map contain the ast.Node for
 	// x (from the 2nd line) with the `y: x` astNode.
-	usedBy map[ast.Node]*astNode
+	usedBy         map[ast.Node]*astNode
+	usedByComplete bool
 }
 
 // recordUsage records that the [ast.Node] e (which will occur

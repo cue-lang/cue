@@ -19,7 +19,6 @@ package convert_test
 import (
 	"encoding"
 	"math/big"
-	"reflect"
 	"testing"
 	"time"
 
@@ -199,8 +198,6 @@ func TestConvert(t *testing.T) {
 	}, {
 		(*struct{ A int })(nil), "(_){ _ }",
 	}, {
-		reflect.ValueOf(3), "(int){ 3 }",
-	}, {
 		time.Date(2019, 4, 1, 0, 0, 0, 0, time.UTC), `(string){ "2019-04-01T00:00:00Z" }`,
 	}, {
 		func() interface{} {
@@ -226,10 +223,16 @@ func TestConvert(t *testing.T) {
 			"(struct){\n  \"1\": (string){ \"foo\" }\n}"},
 		{map[string]encoding.TextMarshaler{"foo": nil},
 			"(struct){\n  foo: (_){ _ }\n}"},
+		{map[string]encoding.TextMarshaler{"foo": &textMarshaller{b: "bar"}},
+			"(struct){\n  foo: (string){ \"bar\" }\n}"},
 		{make(chan int),
 			"(_|_){\n  // [eval] unsupported Go type (chan int)\n}"},
 		{[]interface{}{func() {}},
 			"(_|_){\n  // [eval] unsupported Go type (func())\n}"},
+		{[]encoding.TextMarshaler{nil},
+			"(#list){\n  0: (_){ _ }\n}"},
+		{[]encoding.TextMarshaler{&textMarshaller{b: "bar"}},
+			"(#list){\n  0: (string){ \"bar\" }\n}"},
 		{stringType("\x80"), `(string){ "�" }`},
 	}
 	r := runtime.New()

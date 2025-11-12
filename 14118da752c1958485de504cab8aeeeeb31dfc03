@@ -52,6 +52,24 @@
       "parentUuid": "0c4046f5_21838a0d",
       "revId": "14118da752c1958485de504cab8aeeeeb31dfc03",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "618318c7_205e8cfb",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 599,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-12T08:50:49Z",
+      "side": 1,
+      "message": "I thought about making the \"is absolute\" logic OS dependent, but the filetypes package is nicely OS independent right now, so breaking that felt really unfortunate. The old logic already tried to detect Windows volume names via plain string logic on all platforms.",
+      "parentUuid": "6c9445ca_e0913e25",
+      "revId": "14118da752c1958485de504cab8aeeeeb31dfc03",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

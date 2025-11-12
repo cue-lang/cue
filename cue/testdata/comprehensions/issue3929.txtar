@@ -211,14 +211,14 @@ Allocs: 36
 Retain: 0
 
 Unifications: 96
-Conjuncts:    262
-Disjuncts:    53
+Conjuncts:    278
+Disjuncts:    62
 
-NumCloseIDs: 99
+NumCloseIDs: 102
 
-ConjunctInfos:       157
-MaxConjunctInfos:    6
-MaxReqSets:          13
+ConjunctInfos:       161
+MaxConjunctInfos:    7
+MaxReqSets:          14
 MaxRedirect:         3
 -- out/compile --
 --- in.cue

@@ -708,6 +708,28 @@ func runTask(t *task, mode runMode) {
 		ctx.freeScope = ctx.freeScope[:len(ctx.freeScope)-1]
 
 		// TODO(pushdown): try to remove once transitioned.
+		//
+		// Disabling this block causes three categories of regressions:
+		//   1. Cycle detection: self-referential list indexing (e.g.
+		//      x: [x[0]][0]) loses its cycle sentinel and returns the
+		//      let-bound reference instead of _.
+		//      Test: TestEvalV3/eval/disjunctions/indexElimination
+		//   2. Unexpanded references: existence-check comprehensions
+		//      (if Y.host != _|_) leave references like Y_2.host unresolved
+		//      instead of substituting the concrete value "mod.test".
+		//      Test: TestEvalV3/cycle/compbottomnofinal/large
+		//   3. Disjunction default handling: nested definition chains that
+		//      contain if-guarded disjunctions (e.g. imagePullPolicy) gain
+		//      spurious defaults, and disjunction values that should remain
+		//      as "a"|"b" collapse to a concrete value prematurely.
+		//      Tests: TestEvalV3/comprehensions/issue3929/{reduced,full}
+		//
+		// Root cause: toComplete is set in scheduleVertexConjuncts when the
+		// arc being scheduled is still in progress (getBareState != nil).
+		// Without the post-task completeNodeTasks(attemptOnly) call, those
+		// nodes never signal allAncestorsProcessed or process remaining
+		// valueKnown|fieldConjunctsKnown tasks, leaving evaluation
+		// half-finished.
 		if n := t.node; n.toComplete {
 			n.toComplete = false
 			n.completeNodeTasks(attemptOnly)

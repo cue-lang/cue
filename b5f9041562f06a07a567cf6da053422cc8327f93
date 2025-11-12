@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84f58723_34328c61",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1262,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-12T09:50:31Z",
+      "side": 1,
+      "message": "Null, IsNull, Bool, and Bytes would also benefit from this. I would include those now as well to avoid having to address this down the road, the likelihood of which is probably high.",
+      "revId": "b5f9041562f06a07a567cf6da053422cc8327f93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

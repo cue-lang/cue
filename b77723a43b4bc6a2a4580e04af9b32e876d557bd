@@ -16,6 +16,24 @@
       "message": "Please wrap comment at 80 chars.",
       "revId": "b77723a43b4bc6a2a4580e04af9b32e876d557bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00fe5b3e_4e3c382a",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-12T10:55:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d94d2bef_eba02f18",
+      "revId": "b77723a43b4bc6a2a4580e04af9b32e876d557bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

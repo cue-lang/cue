@@ -518,6 +518,8 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		}
 
 		addDoc(f.Doc, cuePkg)
+		lenPreamble := len(cueFile.Decls)
+
 		for _, d := range f.Decls {
 			switch d := d.(type) {
 			case *ast.GenDecl:
@@ -525,8 +527,9 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 			}
 		}
 
-		if outFile == "" && len(cueFile.Decls) == 0 && f.Doc == nil {
+		if outFile == "" && len(cueFile.Decls) == lenPreamble && f.Doc == nil {
 			// By default, empty files are not generated.
+			// Note that cueFile.Decls is never empty, as we add top-level docs and a package clause.
 			continue
 		}
 

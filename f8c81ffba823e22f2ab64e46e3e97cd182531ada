@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "783539e3_11c2d6d0",
+        "filename": "cmd/cue/cmd/integration/workspace/symbols_test.go",
+        "patchSetId": 20
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-13T16:35:58Z",
+      "side": 1,
+      "message": "I\u0027d be interested to see what happens when there are multiple definitions for `x`.",
+      "revId": "f8c81ffba823e22f2ab64e46e3e97cd182531ada",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03d0ee73_7458e587",
+        "filename": "internal/lsp/cache/file.go",
+        "patchSetId": 20
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-13T16:35:58Z",
+      "side": 1,
+      "message": "save a level of indentation by returning early?\n\n```suggestion\n\t\t\tfield, ok :\u003d n.(*ast.Field)\n\t\t\tif !ok {\n\t\t\t    return true\n\t\t\t}\n```",
+      "revId": "f8c81ffba823e22f2ab64e46e3e97cd182531ada",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

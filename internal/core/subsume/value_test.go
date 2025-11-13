@@ -863,9 +863,8 @@ func TestValues(t *testing.T) {
 		},
 		{
 			// Pattern constraint subsumes closed struct without pattern constraints.
-			// TODO: this should not result in an error.
 			in:  `a: {[string]: int}, b: close({foo: 1})`,
-			err: "value not an instance",
+			err: "",
 		},
 		{
 			// Pattern constraint subsumes itself.

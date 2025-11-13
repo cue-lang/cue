@@ -41,9 +41,6 @@ type streamServer struct {
 
 	// optionsOverrides is passed to newly created workspaces.
 	optionsOverrides func(*settings.Options)
-
-	// serverForTest may be set to a test fake for testing.
-	serverForTest server.ServerWithID
 }
 
 // NewStreamServer creates a StreamServer using the shared cache.
@@ -55,11 +52,8 @@ func NewStreamServer(cache *cache.Cache, daemon bool, optionsFunc func(*settings
 // incoming streams using a new lsp server.
 func (s *streamServer) ServeStream(ctx context.Context, conn jsonrpc2.Conn) error {
 	client := protocol.ClientDispatcher(conn)
-	svr := s.serverForTest
-	if svr == nil {
-		options := settings.DefaultOptions(s.optionsOverrides)
-		svr = server.New(s.cache, client, options)
-	}
+	options := settings.DefaultOptions(s.optionsOverrides)
+	svr := server.New(s.cache, client, options)
 	svrID := svr.ID()
 	// Clients may or may not send a shutdown message. Make sure the server is
 	// shut down.

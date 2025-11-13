@@ -861,6 +861,17 @@ func TestValues(t *testing.T) {
 			in:  `a: {}, b: {[_]: 6}`,
 			err: "",
 		},
+		{
+			// Pattern constraint subsumes closed struct without pattern constraints.
+			// TODO: this should not result in an error.
+			in:  `a: {[string]: int}, b: close({foo: 1})`,
+			err: "value not an instance",
+		},
+		{
+			// Pattern constraint subsumes itself.
+			in:  `a: {[string]: int}, b: {[string]: int}`,
+			err: "",
+		},
 
 		// TODO: the subNoOptional mode used to be used by the equality check.
 		// Now this has its own implementation it is no longer necessary. Keep

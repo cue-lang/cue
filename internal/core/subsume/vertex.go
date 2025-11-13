@@ -229,7 +229,7 @@ outer:
 		if apc == nil {
 			return true
 		}
-		if y.IsClosedList() || y.IsClosedList() || final {
+		if y.IsClosedStruct() || y.IsClosedList() || final {
 			// This is a special case where know that any allowed optional field
 			// in a must be bottom in y, which is strictly more specific.
 			return true

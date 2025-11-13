@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c91d82f_10e1faa1",
+        "filename": "internal/lsp/cache/file.go",
+        "patchSetId": 24
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-13T16:40:40Z",
+      "side": 1,
+      "message": "tbh I usually just name this `errors`. It\u0027s a superset of the stdlib errors package after all.",
+      "revId": "0cbfa4250c4ba180eba68c60d1b8f06815b42664",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

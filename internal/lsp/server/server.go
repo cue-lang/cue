@@ -10,8 +10,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strconv"
-	"sync/atomic"
 
 	"cuelang.org/go/internal/golangorgx/gopls/progress"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -19,31 +17,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/lsp/cache"
 )
-
-var serverIDCounter int64
-
-type ServerWithID interface {
-	protocol.Server
-
-	// ID returns a unique, human-readable string for this server, for
-	// the purpose of log messages and debugging.
-	ID() string
-}
-
-// New creates an LSP server and binds it to handle incoming client
-// messages on the supplied stream.
-func New(cache *cache.Cache, client protocol.ClientCloser, options *settings.Options) ServerWithID {
-	counter := atomic.AddInt64(&serverIDCounter, 1)
-
-	return &server{
-		id:     strconv.FormatInt(counter, 10),
-		client: client,
-		cache:  cache,
-
-		state:   serverCreated,
-		options: options,
-	}
-}
 
 type serverState int
 
@@ -77,11 +50,10 @@ func (s serverState) String() string {
 // straight to the workspace. The server also takes care of shutdown,
 // handling the [server.Shutdown] and [server.Exit] messages.
 type server struct {
-	id string
-
-	client    protocol.ClientCloser
-	cache     *cache.Cache
-	workspace *cache.Workspace
+	client      protocol.ClientCloser
+	cache       *cache.Cache
+	actorClient *serverActorClient
+	workspace   *cache.Workspace
 
 	state   serverState
 	options *settings.Options
@@ -99,9 +71,7 @@ type server struct {
 	watchingIDCounter   int
 }
 
-var _ ServerWithID = (*server)(nil)
-
-func (s *server) ID() string { return s.id }
+var _ protocol.Server = (*server)(nil)
 
 // Shutdown implements the 'shutdown' LSP handler. It releases resources
 // associated with the server and waits for all ongoing work to complete.
@@ -230,4 +200,8 @@ func (s *server) maybeUseWorkspaceFolders(ctx context.Context) error {
 	s.pendingFolders = nil
 
 	return s.AddFolders(ctx, folders)
+}
+
+func (s *server) inActor(fun func()) {
+	s.actorClient.sendAndWait(func(*server) { fun() })
 }

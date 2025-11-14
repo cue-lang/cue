@@ -241,7 +241,7 @@ func (c condition) meets(x condition) bool {
 	return c&x == x
 }
 
-const numCompletionStates = 10 // TODO: make this configurable
+const numCompletionStates = 10
 
 // A scheduler represents the set of outstanding tasks for a node.
 type scheduler struct {
@@ -441,12 +441,6 @@ processNextTask:
 		t := s.tasks[taskPos]
 		taskPos++
 
-		if t.state != taskREADY {
-			// TODO(perf): Figure out how it is possible to reach this and if we
-			// should optimize.
-			// panic("task not READY")
-		}
-
 		switch {
 		case t.state == taskRUNNING:
 			// TODO: we could store the current referring node that caused
@@ -455,9 +449,10 @@ processNextTask:
 			// mark the cycle as a generation counter, instead of a boolean
 			// value, so that it will be trivial reconstruct a detailed cycle
 			// report when generating an error message.
-
 		case t.state != taskREADY:
-
+			// TODO(perf): Figure out how it is possible to reach this and if we
+			// should optimize.
+			// panic("task not READY")
 		default:
 			runTask(t, mode)
 		}

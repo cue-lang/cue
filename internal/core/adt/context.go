@@ -763,12 +763,9 @@ func (c *OpContext) evalStateCI(v Expr, state Flags) (result Value, ci CloseInfo
 		// implement markCycle, or whether we need it at all.
 		// TODO: is this indirect necessary?
 		// arc = arc.Indirect()
-
-		if n := arc.getState(c); n != nil {
-			c.ci, _ = n.detectCycle(arc, nil, x, c.ci)
-		}
-
 		if s := arc.getState(c); s != nil {
+			c.ci, _ = s.detectCycle(arc, nil, x, c.ci)
+
 			defer s.retainProcess().releaseProcess()
 
 			origNeeds := state.condition

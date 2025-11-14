@@ -927,13 +927,13 @@ func (c *OpContext) unifyNode(expr Expr, state Flags) (result Value) {
 		}
 
 		// Always yield to not get spurious errors.
-		n.process(arcTypeKnown, yield)
+		n.process(arcTypeKnown|fieldSetKnown, yield)
 		// It is possible that the node is only midway through
 		// evaluating a disjunction. In this case, we want to ensure
 		// that disjunctions are finalized, so that disjunction shows
 		// up in BaseValue.
 		if len(n.disjuncts) > 0 {
-			n.node.unify(c, Flags{condition: arcTypeKnown, mode: yield, checkTypos: false})
+			n.node.unify(c, Flags{condition: arcTypeKnown | fieldSetKnown, mode: yield, checkTypos: false})
 		}
 	}
 

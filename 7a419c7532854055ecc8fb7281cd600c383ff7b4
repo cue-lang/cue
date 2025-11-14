@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e920c62_3620791a",
+        "filename": "cue/testdata/builtins/and.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-14T11:47:51Z",
+      "side": 1,
+      "message": "Maybe name these indicating whether they SHOULD work nor not (like incompleteError), not whether they work or not. I assume one of these is incorrect.",
+      "revId": "7a419c7532854055ecc8fb7281cd600c383ff7b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

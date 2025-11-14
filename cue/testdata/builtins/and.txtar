@@ -3,6 +3,23 @@ merge: and([1, 1])
 
 // ensure definitions along embedded scalars are preserved.
 embed: and([{2, #x: 1}, {2, #x: 2}])
+
+issue3719: {
+    #openStruct: {...}
+	_filledLater: #openStruct.foo
+
+	works: {
+		for k, v in _filledLater.bar {
+			(k): v
+		}
+	}
+
+	doesNotWork: and([
+		for k, v in _filledLater.bar {
+			(k): v
+		}
+	])
+}
 -- out/eval/stats --
 Leaks:  2
 Freed:  4
@@ -20,6 +37,10 @@ embed.#x: conflicting values 2 and 1:
     ./in.cue:4:21
     ./in.cue:4:25
     ./in.cue:4:33
+issue3719.doesNotWork: cannot use _|_(issue3719._filledLater: undefined field: foo) (type _|_) as type list:
+    ./in.cue:16:15
+    ./in.cue:16:19
+    ./in.cue:17:3
 
 Result:
 (_|_){
@@ -35,21 +56,45 @@ Result:
       //     ./in.cue:4:33
     }
   }
+  issue3719: (_|_){
+    // [eval]
+    #openStruct: (#struct){
+    }
+    _filledLater: (_|_){
+      // [incomplete] issue3719._filledLater: undefined field: foo:
+      //     ./in.cue:8:28
+    }
+    works: (_|_){
+      // [incomplete] issue3719._filledLater: undefined field: foo:
+      //     ./in.cue:8:28
+    }
+    doesNotWork: (_|_){
+      // [eval] issue3719.doesNotWork: cannot use _|_(issue3719._filledLater: undefined field: foo) (type _|_) as type list:
+      //     ./in.cue:16:15
+      //     ./in.cue:16:19
+      //     ./in.cue:17:3
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,6 +1,8 @@
+@@ -1,7 +1,13 @@
  Errors:
  embed.#x: conflicting values 2 and 1:
 +    ./in.cue:4:13
      ./in.cue:4:21
 +    ./in.cue:4:25
      ./in.cue:4:33
++issue3719.doesNotWork: cannot use _|_(issue3719._filledLater: undefined field: foo) (type _|_) as type list:
++    ./in.cue:16:15
++    ./in.cue:16:19
++    ./in.cue:17:3
  
  Result:
-@@ -11,7 +13,9 @@
+ (_|_){
+@@ -11,8 +17,29 @@
      // [eval]
      #x: (_|_){
        // [eval] embed.#x: conflicting values 2 and 1:
@@ -59,6 +104,26 @@ diff old new
        //     ./in.cue:4:33
      }
    }
++  issue3719: (_|_){
++    // [eval]
++    #openStruct: (#struct){
++    }
++    _filledLater: (_|_){
++      // [incomplete] issue3719._filledLater: undefined field: foo:
++      //     ./in.cue:8:28
++    }
++    works: (_|_){
++      // [incomplete] issue3719._filledLater: undefined field: foo:
++      //     ./in.cue:8:28
++    }
++    doesNotWork: (_|_){
++      // [eval] issue3719.doesNotWork: cannot use _|_(issue3719._filledLater: undefined field: foo) (type _|_) as type list:
++      //     ./in.cue:16:15
++      //     ./in.cue:16:19
++      //     ./in.cue:17:3
++    }
++  }
+ }
 -- out/eval --
 Errors:
 embed.#x: conflicting values 2 and 1:
@@ -95,4 +160,20 @@ Result:
       #x: 2
     },
   ])
+  issue3719: {
+    #openStruct: {
+      ...
+    }
+    _filledLater: 〈0;#openStruct〉.foo
+    works: {
+      for k, v in 〈1;_filledLater〉.bar {
+        〈1;k〉: 〈1;v〉
+      }
+    }
+    doesNotWork: and([
+      for k, v in 〈1;_filledLater〉.bar {
+        〈1;k〉: 〈1;v〉
+      },
+    ])
+  }
 }

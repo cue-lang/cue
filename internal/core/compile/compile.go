@@ -599,7 +599,9 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 		switch {
 		case errors.Is(err, ast.ErrIsExpression):
 			if aliasInfo.expr == nil {
-				panic("unreachable")
+				// This can happen when we have a cyclic reference like (x)~x: 3
+				// where the label expression references the alias being defined.
+				return c.errf(n, "cyclic reference in field alias")
 			}
 			return &adt.DynamicReference{
 				Src:     n,

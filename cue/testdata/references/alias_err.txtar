@@ -1,0 +1,64 @@
+-- old.cue --
+issue2527: {
+	x=(x): 3
+}
+issue2094: {
+	Y=(X): string
+	X=("foo"): "bar"
+}
+-- new.cue --
+@experiment(aliasv2)
+
+issue2527: {
+	(x)~x: 3
+}
+issue2094: {
+	(X)~Y: string
+	("foo")~X: "bar"
+}
+-- out/evalalpha --
+issue2527: cyclic reference in field alias:
+    ./new.cue:4:3
+issue2094: cyclic reference in field alias:
+    ./new.cue:7:3
+issue2094: unreferenced alias or let clause Y:
+    ./new.cue:7:5
+issue2527: cyclic reference in field alias:
+    ./old.cue:2:5
+issue2094: unreferenced alias or let clause Y:
+    ./old.cue:5:2
+issue2094: cyclic reference in field alias:
+    ./old.cue:5:5
+-- out/compile --
+issue2527: cyclic reference in field alias:
+    ./new.cue:4:3
+issue2094: cyclic reference in field alias:
+    ./new.cue:7:3
+issue2094: unreferenced alias or let clause Y:
+    ./new.cue:7:5
+issue2527: cyclic reference in field alias:
+    ./old.cue:2:5
+issue2094: unreferenced alias or let clause Y:
+    ./old.cue:5:2
+issue2094: cyclic reference in field alias:
+    ./old.cue:5:5
+--- new.cue
+{
+  issue2527: {
+    〈0;(_|_(cyclic reference in field alias))〉: 3
+  }
+  issue2094: {
+    〈0;("foo")〉: string
+    "foo": "bar"
+  }
+}
+--- old.cue
+{
+  issue2527: {
+    〈0;(_|_(cyclic reference in field alias))〉: 3
+  }
+  issue2094: {
+    〈0;("foo")〉: string
+    "foo": "bar"
+  }
+}

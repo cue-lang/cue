@@ -224,11 +224,11 @@ var andBuiltin = &adt.Builtin{
 	Name:   "and",
 	Params: []adt.Param{listParam},
 	Result: adt.IntKind,
-	RawFunc: func(call *adt.CallContext) adt.Value {
+	Func: func(call *adt.CallContext) adt.Expr {
 		c := call.OpContext()
-		arg := call.Arg(0)
+		args := call.Args()
 
-		seq := c.RawElems(arg)
+		seq := c.RawElems(args[0])
 		a := []adt.Value{}
 		for c := range seq {
 			a = append(a, c)

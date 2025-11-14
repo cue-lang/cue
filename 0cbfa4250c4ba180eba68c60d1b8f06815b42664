@@ -16,6 +16,24 @@
       "message": "tbh I usually just name this `errors`. It\u0027s a superset of the stdlib errors package after all.",
       "revId": "0cbfa4250c4ba180eba68c60d1b8f06815b42664",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da922778_eac0cf6f",
+        "filename": "internal/lsp/cache/file.go",
+        "patchSetId": 24
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-14T09:10:11Z",
+      "side": 1,
+      "message": "Hmm, I don\u0027t follow how it is a superset - it doesn\u0027t reexport everything from the stdlib.\n\nMy brain would be quite confused seeing:\n```\nfunc (f *File) errorToDiagnostics(err error, acc []protocol.Diagnostic) []protocol.Diagnostic {\n\terr, ok :\u003d err.(errors.Error)\n```",
+      "parentUuid": "4c91d82f_10e1faa1",
+      "revId": "0cbfa4250c4ba180eba68c60d1b8f06815b42664",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

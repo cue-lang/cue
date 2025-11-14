@@ -18,7 +18,7 @@ import (
 	"cuelang.org/go/cue/build"
 )
 
-//go:generate go run -tags bootstrap ./generate.go
+//go:generate go run -tags cuebootstrap ./generate.go
 
 func toFile(mode Mode, sc *scope, filename string) (*build.File, error) {
 	return toFileGenerated(mode, sc, filename)

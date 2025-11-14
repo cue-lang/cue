@@ -38,10 +38,6 @@ embed.#x: conflicting values 2 and 1:
     ./in.cue:4:21
     ./in.cue:4:25
     ./in.cue:4:33
-issue3719.withAnd: cannot use _|_(issue3719._filledLater: undefined field: foo) (type _|_) as type list:
-    ./in.cue:17:11
-    ./in.cue:17:15
-    ./in.cue:18:3
 
 Result:
 (_|_){
@@ -57,8 +53,7 @@ Result:
       //     ./in.cue:4:33
     }
   }
-  issue3719: (_|_){
-    // [eval]
+  issue3719: (struct){
     #openStruct: (#struct){
     }
     _filledLater: (_|_){
@@ -70,10 +65,8 @@ Result:
       //     ./in.cue:8:28
     }
     withAnd: (_|_){
-      // [eval] issue3719.withAnd: cannot use _|_(issue3719._filledLater: undefined field: foo) (type _|_) as type list:
-      //     ./in.cue:17:11
-      //     ./in.cue:17:15
-      //     ./in.cue:18:3
+      // [incomplete] issue3719._filledLater: undefined field: foo:
+      //     ./in.cue:8:28
     }
   }
 }
@@ -81,21 +74,16 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,13 @@
+@@ -1,6 +1,8 @@
  Errors:
  embed.#x: conflicting values 2 and 1:
 +    ./in.cue:4:13
      ./in.cue:4:21
 +    ./in.cue:4:25
      ./in.cue:4:33
-+issue3719.withAnd: cannot use _|_(issue3719._filledLater: undefined field: foo) (type _|_) as type list:
-+    ./in.cue:17:11
-+    ./in.cue:17:15
-+    ./in.cue:18:3
  
  Result:
- (_|_){
-@@ -11,8 +17,29 @@
+@@ -11,8 +13,26 @@
      // [eval]
      #x: (_|_){
        // [eval] embed.#x: conflicting values 2 and 1:
@@ -105,8 +93,7 @@ diff old new
        //     ./in.cue:4:33
      }
    }
-+  issue3719: (_|_){
-+    // [eval]
++  issue3719: (struct){
 +    #openStruct: (#struct){
 +    }
 +    _filledLater: (_|_){
@@ -118,10 +105,8 @@ diff old new
 +      //     ./in.cue:8:28
 +    }
 +    withAnd: (_|_){
-+      // [eval] issue3719.withAnd: cannot use _|_(issue3719._filledLater: undefined field: foo) (type _|_) as type list:
-+      //     ./in.cue:17:11
-+      //     ./in.cue:17:15
-+      //     ./in.cue:18:3
++      // [incomplete] issue3719._filledLater: undefined field: foo:
++      //     ./in.cue:8:28
 +    }
 +  }
  }

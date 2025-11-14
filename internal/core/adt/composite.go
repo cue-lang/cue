@@ -1022,10 +1022,13 @@ func (v *Vertex) CompleteArcs(c *OpContext) {
 func (v *Vertex) CompleteArcsOnly(c *OpContext) {
 	c.unify(v, Flags{
 		status:     conjuncts,
-		condition:  fieldSetKnown,
+		condition:  allKnown &^ subFieldsProcessed,
 		mode:       finalize,
 		checkTypos: false,
 	})
+	if v.ArcType == ArcPending {
+		c.undefinedFieldError(v, IncompleteError)
+	}
 }
 
 func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {

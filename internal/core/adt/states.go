@@ -292,15 +292,16 @@ func (n *nodeContext) processAncestors(mode runMode) (done bool) {
 		}
 
 		// p.state is nil when the parent vertex exists but has not yet
-		// entered evaluation (its nodeContext has not been created).
-		// This arises when processAncestors is reached via the
-		// completePending → lookup → process → handleParents chain: a
-		// SelectorExpr inside an IfClause fires inside a comprehension
-		// that is running while its parent struct is still lazy.  Without
-		// this guard the nil receiver panics below at n.meets(...).
-		// A related trigger (fieldSetKnown added to unifyNode) is guarded
-		// by the same check; see the note in the later commit that adds
-		// that change.
+		// entered evaluation (no nodeContext has been created for it).
+		// Two known trigger paths:
+		//   1. completePending → lookup → process → handleParents: a
+		//      SelectorExpr inside an IfClause fires in a comprehension
+		//      while its parent struct is still lazy.
+		//   2. unifyNode passes arcTypeKnown|fieldSetKnown to process,
+		//      so handleParents no longer returns early once arcTypeKnown
+		//      is met, reaching processAncestors for nodes whose parents
+		//      were never unified. (Reproducer: TestScript/cmd_typocheck)
+		// Without this guard the nil receiver panics at n.meets(...).
 		if n == nil {
 			return false
 		}

@@ -186,8 +186,7 @@ closeFail.x.b: field not allowed:
 letCycleFail.t1.a.c: structural cycle
 printCycle.a.X: structural cycle
 structCycle.c: structural cycle
-disjunctionCycle.b: cannot use 1 (type int) as type list:
-    ./in.cue:56:5
+disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:56:9
 b: structural cycle:
     ./in.cue:62:6
@@ -249,18 +248,15 @@ Result:
   disjunctionCycle: (_|_){
     // [eval]
     a: (_|_){
-      // [eval] disjunctionCycle.b: cannot use 1 (type int) as type list:
-      //     ./in.cue:56:5
+      // [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
       //     ./in.cue:56:9
     }
     b: (_|_){
-      // [eval] disjunctionCycle.b: cannot use 1 (type int) as type list:
-      //     ./in.cue:56:5
+      // [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
       //     ./in.cue:56:9
     }
     c: (_|_){
-      // [eval] disjunctionCycle.b: cannot use 1 (type int) as type list:
-      //     ./in.cue:56:5
+      // [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
       //     ./in.cue:56:9
     }
   }
@@ -384,7 +380,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,33 +1,20 @@
+@@ -1,33 +1,19 @@
  Errors:
 -closeCycle.a: structural cycle
 -closeCycle.b.d: structural cycle
@@ -400,14 +396,15 @@ diff old new
 -disjunctionCycle.a: cannot use 1 (type int) as type list:
 -    ./in.cue:56:5
 -    ./in.cue:56:9
-+printCycle.a.X: structural cycle
-+structCycle.c: structural cycle
- disjunctionCycle.b: cannot use 1 (type int) as type list:
-     ./in.cue:56:5
-     ./in.cue:56:9
--disjunctionCycle.c: cannot use 1 (type int) as type list:
+-disjunctionCycle.b: cannot use 1 (type int) as type list:
 -    ./in.cue:56:5
 -    ./in.cue:56:9
+-disjunctionCycle.c: cannot use 1 (type int) as type list:
+-    ./in.cue:56:5
++printCycle.a.X: structural cycle
++structCycle.c: structural cycle
++disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
+     ./in.cue:56:9
  b: structural cycle:
      ./in.cue:62:6
 -closeCycle.c: structural cycle:
@@ -425,7 +422,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -65,14 +52,8 @@
+@@ -65,14 +51,8 @@
      }
      t2: (struct){
        a: (struct){
@@ -442,7 +439,7 @@ diff old new
          }
          x: (struct){
            y: (string){ "" }
-@@ -88,17 +69,17 @@
+@@ -88,18 +68,15 @@
    disjunctionCycle: (_|_){
      // [eval]
      a: (_|_){
@@ -457,21 +454,20 @@ diff old new
 -    }
 -    c: (_|_){
 -      // [eval] disjunctionCycle.c: cannot use 1 (type int) as type list:
-+      // [eval] disjunctionCycle.b: cannot use 1 (type int) as type list:
-+      //     ./in.cue:56:5
+-      //     ./in.cue:56:5
++      // [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
 +      //     ./in.cue:56:9
 +    }
 +    b: (_|_){
-+      // [eval] disjunctionCycle.b: cannot use 1 (type int) as type list:
-+      //     ./in.cue:56:5
++      // [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
 +      //     ./in.cue:56:9
 +    }
 +    c: (_|_){
-+      // [eval] disjunctionCycle.b: cannot use 1 (type int) as type list:
-       //     ./in.cue:56:5
++      // [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
        //     ./in.cue:56:9
      }
-@@ -145,12 +126,11 @@
+   }
+@@ -145,12 +122,11 @@
      b: (_|_){
        // [structural cycle]
        d: (_|_){

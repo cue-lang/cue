@@ -19,6 +19,7 @@ package x
 		if _in.foo != _|_ {
 			"foo"
 		},
+		// TODO: broken.
 		"impossible", // in & #TypeA != _|_ !!
 	][0]
 }
@@ -108,3 +109,5 @@ NumCloseIDs: 43
     }
   }
 }
+-- diff/todo/p1 --
+The impossible is apparently possible.

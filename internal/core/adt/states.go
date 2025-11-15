@@ -242,9 +242,9 @@ var schedConfig = taskContext{
 	complete:    stateCompletions,
 }
 
-func (s *scheduler) handleParents(needs condition, mode runMode) {
+func (s *scheduler) handleParents(needs condition, mode runMode) (done bool) {
 	if s.meets(needs) {
-		return
+		return false
 	}
 
 	// const needParents = fieldConjunctsKnown |
@@ -257,7 +257,7 @@ func (s *scheduler) handleParents(needs condition, mode runMode) {
 	// 	return
 	// }
 
-	s.node.processAncestors(mode)
+	return s.node.processAncestors(mode)
 }
 
 func (n *nodeContext) processAncestors(mode runMode) (done bool) {
@@ -273,9 +273,9 @@ func (n *nodeContext) processAncestors(mode runMode) (done bool) {
 
 	parentsDone := true
 	p := n.node.Parent
-	if p != nil {
-		n := p.state
-
+	switch {
+	case p != nil:
+		n := p.getState(n.ctx)
 		// p.state is nil when the parent vertex exists but has not yet
 		// entered evaluation (no nodeContext has been created for it).
 		// Two known trigger paths:
@@ -288,11 +288,11 @@ func (n *nodeContext) processAncestors(mode runMode) (done bool) {
 		//      were never unified. (Reproducer: TestScript/cmd_typocheck)
 		// Without this guard the nil receiver panics at n.meets(...).
 		if n == nil {
-			return false
+			break
 		}
 
 		if n.meets(childConjunctsDone) {
-			return true
+			break
 		}
 
 		parentsDone = n.processAncestors(mode)

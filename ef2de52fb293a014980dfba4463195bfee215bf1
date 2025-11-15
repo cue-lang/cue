@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "214fcc94_97212b6a",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-11-15T14:45:34Z",
+      "side": 1,
+      "message": "Hmmm, this seems to delete the output the other tests. Perhaps move this to a different file?",
+      "revId": "ef2de52fb293a014980dfba4463195bfee215bf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

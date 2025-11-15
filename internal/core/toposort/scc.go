@@ -39,20 +39,11 @@ type StronglyConnectedComponent struct {
 // The components returned are topologically sorted (forwards), and
 // form a DAG (this is the "condensation graph").
 func (graph *Graph) StronglyConnectedComponents() []*StronglyConnectedComponent {
-	nodeStates := make([]sccNodeState, len(graph.nodes))
-	for i, node := range graph.nodes {
-		node.sccNodeState = &nodeStates[i]
-	}
-
 	scc := &sccFinderState{}
 	for _, node := range graph.nodes {
 		if !node.sccNodeState.visited {
 			scc.findSCC(node)
 		}
-	}
-
-	for _, node := range graph.nodes {
-		node.sccNodeState = nil
 	}
 
 	components := scc.components
@@ -81,7 +72,7 @@ func (scc *sccFinderState) findSCC(cur *Node) {
 	num := scc.counter
 	scc.counter++
 
-	curScc := cur.sccNodeState
+	curScc := &cur.sccNodeState
 	curScc.lowLink = num
 	curScc.index = num
 	curScc.visited = true
@@ -90,7 +81,7 @@ func (scc *sccFinderState) findSCC(cur *Node) {
 	scc.stack = append(scc.stack, cur)
 
 	for _, next := range cur.Outgoing {
-		nextScc := next.sccNodeState
+		nextScc := &next.sccNodeState
 		if !nextScc.visited {
 			scc.findSCC(next)
 			curScc.lowLink = min(curScc.lowLink, nextScc.lowLink)
@@ -112,7 +103,7 @@ func (scc *sccFinderState) findSCC(cur *Node) {
 
 		for i := len(scc.stack) - 1; i >= 0; i-- {
 			nodeN := scc.stack[i]
-			nodeNScc := nodeN.sccNodeState
+			nodeNScc := &nodeN.sccNodeState
 			nodeNScc.onStack = false
 			nodeNScc.component = component
 			componentNodes = append(componentNodes, nodeN)

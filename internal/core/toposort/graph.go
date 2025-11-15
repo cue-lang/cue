@@ -32,7 +32,6 @@ type Graph struct {
 type Node struct {
 	Feature    adt.Feature
 	Outgoing   Nodes
-	Incoming   Nodes
 	structMeta *structMeta
 	// temporary state for calculating the Strongly Connected
 	// Components of a graph.
@@ -108,7 +107,6 @@ func (builder *GraphBuilder) AddEdge(from, to adt.Feature) {
 	fromNode := builder.EnsureNode(from)
 	toNode := builder.EnsureNode(to)
 	fromNode.Outgoing = append(fromNode.Outgoing, toNode)
-	toNode.Incoming = append(toNode.Incoming, fromNode)
 }
 
 // Ensure that a node for this feature exists. This is necessary for

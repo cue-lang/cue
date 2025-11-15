@@ -126,20 +126,21 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		id := id
 		id.setOptionalV3(n)
 
-		// TODO(perf): reuse envDisjunct values so that we can also reuse the
-		// disjunct slice.
 		n.ctx.holeID++
-		d := envDisjunct{
-			env:     env,
-			cloneID: id,
-			holeID:  n.ctx.holeID,
-			src:     x,
-		}
+		// Reuse disjunctBuffer to avoid allocating a new slice for each disjunction.
+		n.ctx.disjunctBuffer = n.ctx.disjunctBuffer[:0]
 		for _, dv := range x.Values {
-			d.disjuncts = append(d.disjuncts, disjunct{
+			n.ctx.disjunctBuffer = append(n.ctx.disjunctBuffer, disjunct{
 				expr: dv.Val,
 				mode: mode(x.HasDefaults, dv.Default),
 			})
+		}
+		d := envDisjunct{
+			env:       env,
+			cloneID:   id,
+			holeID:    n.ctx.holeID,
+			src:       x,
+			disjuncts: slices.Clone(n.ctx.disjunctBuffer),
 		}
 		n.scheduleDisjunction(d)
 		n.updateConjunctInfo(TopKind, id, 0)
@@ -531,23 +532,24 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		n.updateCyclicStatusV3(id)
 		n.unshare()
 
-		// TODO(perf): reuse envDisjunct values so that we can also reuse the
-		// disjunct slice.
 		id := id
 		id.setOptionalV3(n)
 
 		n.ctx.holeID++
-		d := envDisjunct{
-			env:     env,
-			cloneID: id,
-			holeID:  n.ctx.holeID,
-			src:     x,
-		}
+		// Reuse disjunctBuffer to avoid allocating a new slice for each disjunction.
+		n.ctx.disjunctBuffer = n.ctx.disjunctBuffer[:0]
 		for i, dv := range x.Values {
-			d.disjuncts = append(d.disjuncts, disjunct{
+			n.ctx.disjunctBuffer = append(n.ctx.disjunctBuffer, disjunct{
 				expr: dv,
 				mode: mode(x.HasDefaults, i < x.NumDefaults),
 			})
+		}
+		d := envDisjunct{
+			env:       env,
+			cloneID:   id,
+			holeID:    n.ctx.holeID,
+			src:       x,
+			disjuncts: slices.Clone(n.ctx.disjunctBuffer),
 		}
 		n.scheduleDisjunction(d)
 

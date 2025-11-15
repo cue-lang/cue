@@ -137,6 +137,9 @@ type OpContext struct {
 	containments       []containment   // parent relations
 	containsDefIDCache map[uint64]bool // cache for containsDefID results
 
+	// disjunctBuffer is reused when constructing [envDisjunct.disjuncts].
+	disjunctBuffer []disjunct
+
 	stats        stats.Counts
 	freeListNode *nodeContext
 

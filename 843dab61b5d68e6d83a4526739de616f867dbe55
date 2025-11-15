@@ -16,6 +16,24 @@
       "message": "Do we need to set this value in copied (like disjunctions)?\nAutomatically done in nodeContextState. Also, we tend to not mix lists and non-lists in this particular code.",
       "revId": "843dab61b5d68e6d83a4526739de616f867dbe55",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cacb6af7_00305228",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-15T14:58:59Z",
+      "side": 1,
+      "message": "well spotted, done. it seems to help cpu perf by a furter 1%.\n\n\nI did notice that you have just slices here, but this field is very closely related to flatReplaceIDs, so I\u0027m inclined to keep them together. I worry that separating them could lead to inconsistencies in the future.",
+      "parentUuid": "af423b46_fa24421b",
+      "revId": "843dab61b5d68e6d83a4526739de616f867dbe55",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

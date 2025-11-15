@@ -3348,6 +3348,45 @@ i: self: x: y: z: self
 				ln(2, 2, "self"): {f: []string{"x"}, e: []string{"i", "self", "x", "y", "z"}},
 			},
 		},
+
+		{
+			name: "mega usages breaks stuff",
+			archive: `-- a.cue --
+x: out: g: 6
+y: x
+z: y.out
+a: z.g
+`,
+
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "x"):   {ln(1, 1, "x")},
+				ln(3, 1, "y"):   {ln(2, 1, "y")},
+				ln(3, 1, "out"): {ln(1, 1, "out")},
+				ln(4, 1, "z"):   {ln(3, 1, "z")},
+				ln(4, 1, "g"):   {ln(1, 1, "g")},
+
+				ln(1, 1, "x"):   {self},
+				ln(1, 1, "out"): {self},
+				ln(1, 1, "g"):   {self},
+
+				ln(2, 1, "y"): {self},
+				ln(3, 1, "z"): {self},
+				ln(4, 1, "a"): {self},
+			},
+			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(1, 1, "x"):    {f: []string{"a", "x", "y", "z"}},
+				ln(1, 1, "out"):  {f: []string{"out"}},
+				ln(1, 1, "g"):    {f: []string{"g"}},
+				ln(2, 1, "y"):    {f: []string{"a", "x", "y", "z"}},
+				ln(2, 1, "x"):    {f: []string{"out"}, e: []string{"a", "x", "y", "z"}},
+				ln(3, 1, "z"):    {f: []string{"a", "x", "y", "z"}},
+				ln(3, 1, "y"):    {e: []string{"a", "x", "y", "z"}},
+				ln(3, 1, ".out"): {e: []string{"out"}},
+				ln(4, 1, "a"):    {f: []string{"a", "x", "y", "z"}},
+				ln(4, 1, "z"):    {e: []string{"a", "x", "y", "z"}},
+				ln(4, 1, ".g"):   {e: []string{"g"}},
+			},
+		},
 	}.run(t)
 }
 

@@ -217,7 +217,7 @@ func (sm *structMeta) hasDynamic(dynFieldsMap map[*adt.DynamicField][]adt.Featur
 // we look at the vertex's conjuncts. If a conjunct is a binary
 // expression &, then we look up the structMeta for the arguments to
 // the binary expression, and mark them as explicit unification.
-func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []*structMeta {
+func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 	structInfos := v.Structs
 	// Note that it's important that nodeToStructMetas avoids duplicate entries,
 	// which cause significant slowness for some large configs.
@@ -231,18 +231,16 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []*structMeta {
 		nodeToStructMetas[node] = m
 		return m
 	}
-	structMetas := make([]*structMeta, 0, len(structInfos))
+	structMetas := make([]structMeta, len(structInfos))
 
 	// Create all the structMetas and map to them from a StructInfo's
 	// StructLit, and all its internal Decls. Initial attempt at
 	// recording a position, which will be correct only for direct use
 	// of literal structs in the calculation of vertex v.
-	for _, s := range structInfos {
+	for i, s := range structInfos {
 		sl := s.StructLit
-		sMeta := &structMeta{
-			structInfo: s,
-		}
-		structMetas = append(structMetas, sMeta)
+		sMeta := &structMetas[i]
+		sMeta.structInfo = s
 
 		if src := sl.Source(); src != nil {
 			sMeta.pos = src.Pos()
@@ -373,7 +371,7 @@ type vertexFeatures struct {
 	dynFieldsMap map[*adt.DynamicField][]adt.Feature
 }
 
-func (vf *vertexFeatures) compareStructMeta(a, b *structMeta) int {
+func (vf *vertexFeatures) compareStructMeta(a, b structMeta) int {
 	if c := a.pos.Compare(b.pos); c != 0 {
 		return c
 	}
@@ -406,7 +404,8 @@ func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
 
 	var batches structMetaBatches
 	var batch structMetaBatch
-	for _, root := range roots {
+	for i := range roots {
+		root := &roots[i]
 		if len(batch) == 0 ||
 			(batch[0].pos == root.pos && !root.hasDynamic(dynFieldsMap)) {
 			batch = append(batch, root)

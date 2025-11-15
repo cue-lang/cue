@@ -604,7 +604,7 @@ func (n *nodeContext) checkTypos() {
 			required = slices.Clone(required)
 		}
 
-		n.filterSets(&required, func(n *nodeContext, a *reqSet) bool {
+		n.filterSets(&required, func(a *reqSet) bool {
 			if id := hasParentEllipsis(n, a, n.conjunctInfo); id != 0 {
 				a.removed = true
 			}
@@ -966,7 +966,7 @@ outer:
 	// If 'v' is a hidden field, then all reqSets in 'a' for which there is no
 	// corresponding entry in conjunctInfo should be removed from 'a'.
 	if allowedInClosed(v.Label) {
-		n.filterSets(&a, func(n *nodeContext, a *reqSet) bool {
+		n.filterSets(&a, func(a *reqSet) bool {
 			for _, c := range n.conjunctInfo {
 				if n.containsDefID(a.id, c.id) {
 					return true // keep the set
@@ -981,7 +981,7 @@ outer:
 		parentConjuncts = p.state.conjunctInfo
 	}
 
-	n.filterTop(&a, n.conjunctInfo, parentConjuncts)
+	n.filterTop(&a, parentConjuncts)
 
 	n.computedCloseInfo = true
 	if int64(len(a)) > n.ctx.stats.MaxReqSets {
@@ -993,12 +993,12 @@ outer:
 
 // If there is a top or ellipsis for all supported conjuncts, we have
 // evidence that this node can be dropped.
-func (n *nodeContext) filterTop(a *reqSets, conjuncts, parentConjuncts []conjunctInfo) (openLevel bool) {
-	n.filterSets(a, func(n *nodeContext, a *reqSet) bool {
+func (n *nodeContext) filterTop(a *reqSets, parentConjuncts []conjunctInfo) {
+	n.filterSets(a, func(a *reqSet) bool {
 		var f conjunctFlags
 		hasAny := false
 
-		for _, c := range conjuncts {
+		for _, c := range n.conjunctInfo {
 			if n.containsDefID(a.id, c.id) {
 				hasAny = true
 				flags := c.flags
@@ -1025,7 +1025,7 @@ func (n *nodeContext) filterTop(a *reqSets, conjuncts, parentConjuncts []conjunc
 			// The following logic should only apply to non-structs.
 		default:
 			hasAny = false
-			for _, c := range conjuncts {
+			for _, c := range n.conjunctInfo {
 				if n.containsDefID(id, c.id) {
 					hasAny = true
 				}
@@ -1037,7 +1037,6 @@ func (n *nodeContext) filterTop(a *reqSets, conjuncts, parentConjuncts []conjunc
 
 		return true
 	})
-	return openLevel
 }
 
 // hasParentEllipsis reports if the parent has any conjuncts from an ellipsis
@@ -1059,7 +1058,7 @@ func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) defI
 }
 
 func (n *nodeContext) filterNonRecursive(a *reqSets) {
-	n.filterSets(a, func(n *nodeContext, e *reqSet) bool {
+	n.filterSets(a, func(e *reqSet) bool {
 		x := e
 		if x.once { //  || x.id == 0
 			e.ignored = true
@@ -1069,12 +1068,11 @@ func (n *nodeContext) filterNonRecursive(a *reqSets) {
 }
 
 // filter keeps all reqSets e in a for which f(e) and removes the rest.
-func (n *nodeContext) filterSets(a *reqSets, f func(n *nodeContext, e *reqSet) bool) {
+func (n *nodeContext) filterSets(a *reqSets, f func(e *reqSet) bool) {
 	temp := (*a)[:0]
 	for i := range *a {
 		set := (*a)[i]
-
-		if f(n, &set) {
+		if f(&set) {
 			temp = append(temp, set)
 		}
 	}

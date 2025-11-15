@@ -16,6 +16,24 @@
       "message": "s/the same receiver/the same as the receiver/ ?",
       "revId": "079f248b69c50cf348f81340a73431881c44ae84",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "810fe8bf_86c6a071",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-15T14:58:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "03efebb9_3a6ac626",
+      "revId": "079f248b69c50cf348f81340a73431881c44ae84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

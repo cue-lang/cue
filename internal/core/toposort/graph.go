@@ -35,7 +35,7 @@ type Node struct {
 	structMeta *structMeta
 	// temporary state for calculating the Strongly Connected
 	// Components of a graph.
-	sccNodeState *sccNodeState
+	sccNodeState sccNodeState
 	position     int
 }
 

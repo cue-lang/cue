@@ -1896,6 +1896,46 @@ func expandNavigableViaAncestralPath(nav *navigableBindings) []*navigableBinding
 	return navs
 }
 
+func expandNavigableViaAncestralPathMega(nav *navigableBindings) []*navigableBindings {
+	//fmt.Printf("mega entry for nav %p %v\n", nav, nav.name)
+	var names []string
+	for ; nav != nil && nav.name != ""; nav = nav.parent {
+		names = append(names, nav.name)
+	}
+	navsSet := make(map[*navigableBindings]struct{})
+	navs := []*navigableBindings{nav}
+	for _, name := range slices.Backward(names) {
+		navs = navigateBindingsByName(navs, name)
+
+		clear(navsSet)
+		for len(navs) > 0 {
+			usages(navs)
+			var nextNavs []*navigableBindings
+			for _, nav := range navs {
+				navsSet[nav] = struct{}{}
+				for _, use := range nav.usedBy {
+					// Only if the usage is basically an embedding
+					// (i.e. appears in resolvesTo) do we need to go
+					// further.
+					if !slices.Contains(use.resolvesTo, nav) {
+						continue
+					}
+					if _, seen := navsSet[use.navigable]; seen {
+						continue
+					}
+					navsSet[use.navigable] = struct{}{}
+					nextNavs = append(nextNavs, use.navigable)
+				}
+			}
+			navs = nextNavs
+		}
+
+		navs = slices.Collect(maps.Keys(navsSet))
+	}
+	//fmt.Printf("mega exit for nav %p %v\n", nav, nav.name)
+	return navs
+}
+
 // navigateBindingsByName maximally expands the set of bindings, and
 // indexes every member of the expanded set by the name, and the
 // accumulated results returned.

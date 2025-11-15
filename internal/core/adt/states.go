@@ -231,6 +231,11 @@ const (
 	// concreteKnown means that we know whether a value is concrete or not.
 	// At the moment this is equal to 'scalarKnown'.
 	concreteKnown = scalarKnown
+
+	// fieldConjunctsKnownIdx is the bit-position index of
+	// fieldConjunctsKnown, for use as a scheduler.counters index.
+	// It must equal bits.TrailingZeros16(uint16(fieldConjunctsKnown)).
+	fieldConjunctsKnownIdx = 4
 )
 
 // schedConfig configures a taskContext with the states needed for the
@@ -242,26 +247,21 @@ var schedConfig = taskContext{
 	complete:    stateCompletions,
 }
 
-func (s *scheduler) handleParents(needs condition, mode runMode) {
+// handleParents checks whether needs is already met and, if not, triggers
+// ancestor processing to propagate conjuncts downward. It reports whether
+// all ancestors have completed processing.
+func (s *scheduler) handleParents(needs condition, mode runMode) (done bool) {
 	if s.meets(needs) {
-		return
+		return true
 	}
 
-	// const needParents = fieldConjunctsKnown |
-	// 	fieldSetKnown |
-	// 	arcTypeKnown |
-	// 	valueKnown |
-	// 	scalarKnown
-
-	// if needs&needParents == 0 {
-	// 	return
-	// }
-
-	s.node.processAncestors(mode)
+	return s.node.processAncestors(mode)
 }
 
+// processAncestors walks up the parent chain, recursively processing each
+// ancestor's pending conjuncts until fieldConjunctsKnown is reached. It
+// returns true when all ancestors have finished processing.
 func (n *nodeContext) processAncestors(mode runMode) (done bool) {
-
 	if n == nil {
 		return // Some tests do not set node.
 	}
@@ -273,9 +273,9 @@ func (n *nodeContext) processAncestors(mode runMode) (done bool) {
 
 	parentsDone := true
 	p := n.node.Parent
-	if p != nil {
+	switch {
+	case p != nil:
 		n := p.state
-
 		// p.state is nil when the parent vertex exists but has not yet
 		// entered evaluation (no nodeContext has been created for it).
 		// Two known trigger paths:
@@ -288,21 +288,20 @@ func (n *nodeContext) processAncestors(mode runMode) (done bool) {
 		//      were never unified. (Reproducer: TestScript/cmd_typocheck)
 		// Without this guard the nil receiver panics at n.meets(...).
 		if n == nil {
-			return false
+			break
 		}
 
 		if n.meets(childConjunctsDone) {
-			return true
+			break
 		}
 
 		parentsDone = n.processAncestors(mode)
 
-		const fieldConjunctsKnownIndex = 4
-		if n.counters[fieldConjunctsKnownIndex] > 0 {
+		if n.counters[fieldConjunctsKnownIdx] > 0 {
 			n.process(fieldConjunctsKnown, mode)
 		}
 
-		if parentsDone && n.counters[fieldConjunctsKnownIndex] == 0 {
+		if parentsDone && n.counters[fieldConjunctsKnownIdx] == 0 {
 			n.completed |= childConjunctsDone
 		}
 	}
@@ -381,7 +380,6 @@ func (v *Vertex) allChildConjunctsKnown(ctx *OpContext) bool {
 		return true
 	}
 	return n.meets(fieldConjunctsKnown | allAncestorsProcessed)
-
 }
 
 func (n *nodeContext) scheduleTask(r *runner, env *Environment, x Node, ci CloseInfo) *task {

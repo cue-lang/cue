@@ -530,11 +530,6 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 
 	oc := newOverlayContext(n.ctx)
 
-	// Complete as much of the pending work of this node and its parent before
-	// copying. Note that once a copy is made, the disjunct is no longer able
-	// to receive conjuncts from the original.
-	n.completeNodeTasks(mode)
-
 	// TODO: we may need to process incoming notifications for all arcs in
 	// the copied disjunct, but only those notifications not coming from
 	// within the arc itself.

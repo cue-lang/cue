@@ -707,8 +707,6 @@ outer:
 }
 
 func (n *nodeContext) containsDefID(node, child defID) bool {
-	// TODO(perf): we could keep track of the minimum defID that could map so
-	// that we can use this to bail out early.
 	c := n.ctx
 
 	// Build sortedReplaceIDs once per nodeContext by traversing the parent chain.
@@ -726,6 +724,13 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 			return int(b.to) - int(a.to)
 		})
 		n.computedFlatReplaceIDs = true
+
+		// Compute minimum 'to' value for early bailout optimization.
+		// Since flatReplaceIDs is sorted by 'to' in descending order,
+		// the last entry has the minimum value.
+		if len(n.flatReplaceIDs) > 0 {
+			n.minFlatReplaceIDTo = n.flatReplaceIDs[len(n.flatReplaceIDs)-1].to
+		}
 
 		if int64(len(n.flatReplaceIDs)) > c.stats.MaxRedirect {
 			c.stats.MaxRedirect = int64(len(n.flatReplaceIDs))
@@ -770,21 +775,25 @@ func (n *nodeContext) containsDefIDRec(node, child, start defID) bool {
 			return true
 		}
 
-		// Skip entries where 'to' > p.
-		for cursor < len(n.flatReplaceIDs) && n.flatReplaceIDs[cursor].to > p {
-			cursor++
-		}
-
-		// Process all entries with 'to' == p.
-		for cursor < len(n.flatReplaceIDs) && n.flatReplaceIDs[cursor].to == p {
-			from := n.flatReplaceIDs[cursor].from
-			if from != child && n.containsDefIDRec(node, from, start) {
-				return true
+		// Early bailout: if p < minFlatReplaceIDTo, no replaceID entries
+		// can match p, so we can skip replacement scanning entirely.
+		if p >= n.minFlatReplaceIDTo {
+			// Skip entries where 'to' > p.
+			for cursor < len(n.flatReplaceIDs) && n.flatReplaceIDs[cursor].to > p {
+				cursor++
 			}
-			cursor++
+
+			// Process all entries with 'to' == p.
+			for cursor < len(n.flatReplaceIDs) && n.flatReplaceIDs[cursor].to == p {
+				from := n.flatReplaceIDs[cursor].from
+				if from != child && n.containsDefIDRec(node, from, start) {
+					return true
+				}
+				cursor++
+			}
+			// cursor now points to the first entry with 'to' < p (or past the end)
+			// which is perfect for the next iteration with an even smaller p.
 		}
-		// cursor now points to the first entry with 'to' < p (or past the end)
-		// which is perfect for the next iteration with an even smaller p.
 
 		p = c.containments[p].id
 		if p == start {

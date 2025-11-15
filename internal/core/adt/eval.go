@@ -305,11 +305,12 @@ type nodeContext struct {
 	cyclicConjuncts []cyclicConjunct
 
 	// These fields are used to track type checking.
-	reqDefIDs      []refInfo
-	replaceIDs     []replaceID
-	flatReplaceIDs []replaceID // including all parents, and sorted by 'to' in descending order
-	conjunctInfo   []conjunctInfo
-	reqSets        reqSets
+	reqDefIDs          []refInfo
+	replaceIDs         []replaceID
+	flatReplaceIDs     []replaceID // including all parents, and sorted by 'to' in descending order
+	minFlatReplaceIDTo defID       // minimum 'to' value in flatReplaceIDs, 0 if empty
+	conjunctInfo       []conjunctInfo
+	reqSets            reqSets
 
 	// Checks is a list of conjuncts, as we need to preserve the context in
 	// which it was evaluated. The conjunct is always a validator (and thus

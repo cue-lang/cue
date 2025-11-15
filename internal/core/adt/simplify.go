@@ -131,24 +131,25 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 			break
 		}
 
-		var d, lo, hi apd.Decimal
-		lo.Set(&a.X)
-		hi.Set(&b.X)
+		var d apd.Decimal
+		lo, hi := a.X, b.X
 		if k&FloatKind == 0 {
-			// Readjust bounds for integers.
+			// Readjust bounds for integers, making copies to leave the originals untouched.
+			lo.Set(&a.X)
 			if x.Op == GreaterEqualOp {
 				// >=3.4  ==>  >=4
-				_, _ = internal.BaseContext.Ceil(&lo, &a.X)
+				internal.BaseContext.Ceil(&lo, &a.X)
 			} else {
 				// >3.4  ==>  >3
-				_, _ = internal.BaseContext.Floor(&lo, &a.X)
+				internal.BaseContext.Floor(&lo, &a.X)
 			}
+			hi.Set(&a.X)
 			if y.Op == LessEqualOp {
 				// <=2.3  ==>  <= 2
-				_, _ = internal.BaseContext.Floor(&hi, &b.X)
+				internal.BaseContext.Floor(&hi, &b.X)
 			} else {
 				// <2.3   ==>  < 3
-				_, _ = internal.BaseContext.Ceil(&hi, &b.X)
+				internal.BaseContext.Ceil(&hi, &b.X)
 			}
 		}
 

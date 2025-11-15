@@ -16,6 +16,24 @@
       "message": "Hmmm, this seems to delete the output the other tests. Perhaps move this to a different file?",
       "revId": "ef2de52fb293a014980dfba4463195bfee215bf1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d1b4dce_c8e6a17c",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-15T15:11:30Z",
+      "side": 1,
+      "message": "hrm, I thought that by putting the test cases in a separate file entry in the same txtar file, then they wouldn\u0027t conflict, but you\u0027re right that they still do. done.",
+      "parentUuid": "214fcc94_97212b6a",
+      "revId": "ef2de52fb293a014980dfba4463195bfee215bf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

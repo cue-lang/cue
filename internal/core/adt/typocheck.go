@@ -742,7 +742,8 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 	// will do significant work by looking at the number of replaceIDs.
 	caching := len(n.flatReplaceIDs) > 15
 
-	key := [2]defID{node, child}
+	// Pack node and child into a single uint64 key for faster map lookups.
+	key := uint64(node)<<32 | uint64(child)
 	// Note that even a map lookup has some overhead, which adds up.
 	if caching {
 		if result, ok := c.containsDefIDCache[key]; ok {
@@ -754,7 +755,7 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 
 	if caching {
 		if c.containsDefIDCache == nil {
-			c.containsDefIDCache = make(map[[2]defID]bool)
+			c.containsDefIDCache = make(map[uint64]bool)
 		}
 		c.containsDefIDCache[key] = result
 	}

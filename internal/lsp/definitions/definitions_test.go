@@ -379,6 +379,89 @@ q: o.z
 		},
 
 		{
+			name: "Embedded_Dependency_Simple",
+			archive: `-- a.cue --
+a: b: c: {
+	c.d
+	e
+}
+
+e: d: {x: 1}
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "c"): {ln(1, 1, "c")},
+				ln(2, 1, "d"): {ln(6, 1, "d")},
+				ln(3, 1, "e"): {ln(6, 1, "e")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
+
+				ln(6, 1, "e"): {self},
+				ln(6, 1, "d"): {self},
+				ln(6, 1, "x"): {self},
+			},
+			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(1, 1, "a"):  {f: []string{"a", "e"}},
+				ln(1, 1, "b"):  {f: []string{"b"}},
+				ln(1, 1, "c"):  {f: []string{"c"}},
+				ln(2, 1, "c"):  {e: []string{"a", "b", "c", "e"}},
+				ln(2, 1, ".d"): {e: []string{"d", "x"}},
+				ln(3, 1, "e"):  {f: []string{"d", "x"}, e: []string{"a", "b", "c", "e"}},
+				ln(6, 1, "e"):  {f: []string{"a", "e"}},
+				ln(6, 1, "d"):  {f: []string{"d"}},
+				ln(6, 1, "x"):  {f: []string{"x"}},
+			},
+		},
+
+		{
+			name: "Embedded_Dependency_Complex",
+			archive: `-- a.cue --
+a: b: c: {
+	e
+	c.d
+	f
+}
+
+e: d: {x: 1}
+f: d: {y: 1}
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "e"): {ln(7, 1, "e")},
+				ln(3, 1, "c"): {ln(1, 1, "c")},
+				ln(3, 1, "d"): {ln(7, 1, "d"), ln(8, 1, "d")},
+				ln(4, 1, "f"): {ln(8, 1, "f")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
+
+				ln(7, 1, "e"): {self},
+				ln(7, 1, "d"): {self},
+				ln(7, 1, "x"): {self},
+
+				ln(8, 1, "f"): {self},
+				ln(8, 1, "d"): {self},
+				ln(8, 1, "y"): {self},
+			},
+			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(1, 1, "a"):  {f: []string{"a", "e", "f"}},
+				ln(1, 1, "b"):  {f: []string{"b"}},
+				ln(1, 1, "c"):  {f: []string{"c"}},
+				ln(2, 1, "e"):  {f: []string{"d", "x", "y"}, e: []string{"a", "b", "c", "e", "f"}},
+				ln(3, 1, "c"):  {e: []string{"a", "b", "c", "e", "f"}},
+				ln(3, 1, ".d"): {e: []string{"d", "x", "y"}},
+				ln(4, 1, "f"):  {f: []string{"d", "x", "y"}, e: []string{"a", "b", "c", "e", "f"}},
+				ln(7, 1, "e"):  {f: []string{"a", "e", "f"}},
+				ln(7, 1, "d"):  {f: []string{"d"}},
+				ln(7, 1, "x"):  {f: []string{"x"}},
+				ln(8, 1, "f"):  {f: []string{"a", "e", "f"}},
+				ln(8, 1, "d"):  {f: []string{"d"}},
+				ln(8, 1, "y"):  {f: []string{"y"}},
+			},
+		},
+
+		{
 			name: "String_Literal",
 			archive: `-- a.cue --
 x: y: a.b

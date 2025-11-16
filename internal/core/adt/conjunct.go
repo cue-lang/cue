@@ -585,15 +585,16 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 				bound = &n.lowerBound
 			}
 			if y := *bound; y != nil {
-				v := SimplifyBounds(ctx, n.kind, x, y)
-				if err := valueError(v); err != nil {
-					err.AddPosition(v)
-					err.AddPosition(*bound)
-					err.AddClosedPositions(n.ctx, id)
+				if v := SimplifyBounds(ctx, n.kind, x, y); v != nil {
+					if err := valueError(v); err != nil {
+						err.AddPosition(v)
+						err.AddPosition(*bound)
+						err.AddClosedPositions(n.ctx, id)
+					}
+					*bound = nil
+					n.insertValueConjunct(env, v, id)
+					return
 				}
-				*bound = nil
-				n.insertValueConjunct(env, v, id)
-				return
 			}
 			*bound = x
 

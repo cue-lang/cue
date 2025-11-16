@@ -1727,10 +1727,29 @@ func (n *astNode) eval() {
 		}
 	}
 
-	for _, expr := range embeddedResolvable {
-		nodes := n.resolve(expr, true)
-		n.resolvesTo = append(n.resolvesTo, nodes...)
+	resolvesToSet := make(map[*navigableBindings]struct{})
+	previousCount := make([]int, len(embeddedResolvable))
+	for {
+		repeatNeeded := false
+		for i, expr := range embeddedResolvable {
+			navs := n.resolve(expr, true)
+			if len(navs) > previousCount[i] {
+				previousCount[i] = len(navs)
+				for _, nav := range navs {
+					if _, seen := resolvesToSet[nav]; !seen {
+						resolvesToSet[nav] = struct{}{}
+						n.resolvesTo = append(n.resolvesTo, nav)
+						repeatNeeded = true
+					}
+				}
+			}
+		}
+		if !repeatNeeded {
+			// No progress made
+			break
+		}
 	}
+
 	for _, expr := range resolvable {
 		n.resolve(expr, false)
 	}
@@ -1747,11 +1766,10 @@ func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
 			n.addFieldCompletions(e.Pos(), e.End(), expandNavigableViaAncestralPath(n.navigable), e.End())
 		}
 		n.addEmbedCompletions(e.Pos(), e.End(), n, nil, e.Pos())
-		root := n.resolvePathRoot(e.Name)
-		if root == nil {
+		navs := n.resolvePathRoot(e.Name)
+		if len(navs) == 0 {
 			return nil
 		}
-		navs := expandNavigableViaAncestralPath(root)
 		n.addDefinition(e.Pos(), e.End(), navs)
 		for _, nav := range navs {
 			nav.recordUsage(e, n)
@@ -1909,22 +1927,22 @@ func navigateBindingsByName(navigables []*navigableBindings, name string) []*nav
 // the astNode's own bindings (and its ancestry), whereas for
 // subsequent path elements, we search the navigable bindings (see the
 // [astNode.resolve] method).
-func (n *astNode) resolvePathRoot(name string) *navigableBindings {
+func (n *astNode) resolvePathRoot(name string) []*navigableBindings {
 	nOrig := n
 	for ; n != nil; n = n.parent {
-		if bindings, found := n.bindings[name]; found {
-			nav := bindings[0].navigable
-			if len(bindings) == 1 {
+		if childNodes, found := n.bindings[name]; found {
+			if len(childNodes) == 1 {
+				nav := childNodes[0].navigable
 				if nav.name == "" {
 					// name has been resolved to an alias (or comprehension
 					// binding, dynamic field, pattern etc). Crucially, it
 					// doesn't have a "navigable" name.
-					return nav
+					return []*navigableBindings{nav}
 				} else if nav.name != name {
 					// name has been resolved to an alias which had a
 					// normal ident or basiclit field name. Switch to that
 					// name.
-					return n.navigable.bindings[nav.name]
+					return navigateBindingsByName([]*navigableBindings{n.navigable}, nav.name)
 				}
 			}
 
@@ -1932,7 +1950,7 @@ func (n *astNode) resolvePathRoot(name string) *navigableBindings {
 			// an ident and not a basiclit. But that ident can come from
 			// any of the (potentially many) matching bindings!
 			identFound := false
-			for _, binding := range bindings {
+			for _, binding := range childNodes {
 				if _, ok := binding.key.(*ast.Ident); ok {
 					identFound = true
 					break
@@ -1941,18 +1959,18 @@ func (n *astNode) resolvePathRoot(name string) *navigableBindings {
 			if !identFound {
 				continue
 			}
-			return nav
+			return navigateBindingsByName([]*navigableBindings{n.navigable}, name)
 		}
 		if n.isFileNode() {
 			// If we've got this far, we're allowed to inspect the
 			// (shared) navigable bindings directly without having to go
 			// via our bindings.
-			if nav, found := n.navigable.bindings[name]; found {
-				return nav
+			if _, found := n.navigable.bindings[name]; found {
+				return navigateBindingsByName([]*navigableBindings{n.navigable}, name)
 			}
 			// Support for the Self experiment:
 			if name == "self" && nOrig.key != nil && nOrig.key.Pos().Experiment().AliasV2 {
-				return nOrig.navigable.parent
+				return []*navigableBindings{nOrig.navigable.parent}
 			}
 			return nil
 		}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "affbca57_feb98889",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-17T13:39:56Z",
+      "side": 1,
+      "message": "As with the others, this is not urgent.\n\nAlso, best to review this while ignoring whitespace; you can do this locally with `git show -w` or `git diff -w`, or by changing the settings on Gerrit\u0027s diff view.",
+      "revId": "4e8cafa12c598f4bea01820bc6a3a5fbb8a1ba99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

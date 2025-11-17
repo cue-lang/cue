@@ -134,7 +134,7 @@ func (c CloseInfo) Location(ctx *OpContext) token.Pos {
 	if c.opID != ctx.opID || c.defID == 0 {
 		return token.NoPos
 	}
-	return ctx.containments[c.defID].pos
+	return ctx.positionTable[ctx.containments[c.defID].posIndex]
 }
 
 // AncestorPositions returns an iterator over each parent of c,
@@ -146,7 +146,8 @@ func (c *CloseInfo) AncestorPositions(ctx *OpContext) iter.Seq[token.Pos] {
 			return
 		}
 		for p := c.defID; p != 0; p = ctx.containments[p].id {
-			if !yield(ctx.containments[p].pos) {
+			pos := ctx.positionTable[ctx.containments[p].posIndex]
+			if !yield(pos) {
 				return
 			}
 		}

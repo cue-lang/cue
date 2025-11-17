@@ -327,30 +327,6 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		return
 	}
 
-	// We need to ensure that each arc is only unified once (or at least) a
-	// bounded time, witch each conjunct. Comprehensions, for instance, may
-	// distribute a value across many values that get unified back into the
-	// same value. If such a value is a disjunction, than a disjunction of N
-	// disjuncts will result in a factor N more unifications for each
-	// occurrence of such value, resulting in exponential running time. This
-	// is especially common values that are used as a type.
-	//
-	// However, unification is idempotent, so each such conjunct only needs
-	// to be unified once. This cache checks for this and prevents an
-	// exponential blowup in such case.
-	//
-	// TODO(perf): this cache ensures the conjuncts of an arc at most once
-	// per ID. However, we really need to add the conjuncts of an arc only
-	// once total, and then add the close information once per close ID
-	// (pointer can probably be shared). Aside from being more performant,
-	// this is probably the best way to guarantee that conjunctions are
-	// linear in this case.
-
-	ciKey := closeInfo
-	ciKey.Refs = nil
-	// No need to key on CloseInfo with evalv3.
-	ciKey = CloseInfo{}
-
 	// Also check arc.Label: definitions themselves do not have the FromDef to
 	// reflect their closedness. This means that if we are structure sharing, we
 	// may end up with a Vertex that is a definition without the reference
@@ -378,11 +354,28 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		c.CloseInfo.enclosingEmbed = closeInfo.enclosingEmbed
 	}
 
-	key := arcKey{arc, ciKey}
-	if slices.Contains(n.arcMap, key) {
+	// We need to ensure that each arc is only unified once (or at least) a
+	// bounded time, witch each conjunct. Comprehensions, for instance, may
+	// distribute a value across many values that get unified back into the
+	// same value. If such a value is a disjunction, than a disjunction of N
+	// disjuncts will result in a factor N more unifications for each
+	// occurrence of such value, resulting in exponential running time. This
+	// is especially common values that are used as a type.
+	//
+	// However, unification is idempotent, so each such conjunct only needs
+	// to be unified once. This cache checks for this and prevents an
+	// exponential blowup in such case.
+	//
+	// TODO(perf): this cache ensures the conjuncts of an arc at most once
+	// per ID. However, we really need to add the conjuncts of an arc only
+	// once total, and then add the close information once per close ID
+	// (pointer can probably be shared). Aside from being more performant,
+	// this is probably the best way to guarantee that conjunctions are
+	// linear in this case.
+	if slices.Contains(n.arcMap, arc) {
 		return
 	}
-	n.arcMap = append(n.arcMap, key)
+	n.arcMap = append(n.arcMap, arc)
 
 	if arc.Parent != nil && (!n.node.nonRooted || n.node.IsDynamic) {
 		// If the arc has a parent that for which the field conjuncts are not

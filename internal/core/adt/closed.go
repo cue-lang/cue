@@ -17,6 +17,7 @@ package adt
 import (
 	"iter"
 
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/layer"
 )
 
@@ -129,23 +130,23 @@ type CloseInfo struct {
 	CycleInfo
 }
 
-func (c CloseInfo) Location(ctx *OpContext) Node {
+func (c CloseInfo) Location(ctx *OpContext) token.Pos {
 	if c.opID != ctx.opID || c.defID == 0 {
-		return nil
+		return token.NoPos
 	}
-	return ctx.containments[c.defID].n
+	return ctx.containments[c.defID].pos
 }
 
 // AncestorPositions returns an iterator over each parent of c,
 // starting with the most immediate parent. This is used
 // to add positions to errors that are associated with a CloseInfo.
-func (c *CloseInfo) AncestorPositions(ctx *OpContext) iter.Seq[Node] {
-	return func(yield func(Node) bool) {
+func (c *CloseInfo) AncestorPositions(ctx *OpContext) iter.Seq[token.Pos] {
+	return func(yield func(token.Pos) bool) {
 		if c.opID != ctx.opID {
 			return
 		}
 		for p := c.defID; p != 0; p = ctx.containments[p].id {
-			if !yield(ctx.containments[p].n) {
+			if !yield(ctx.containments[p].pos) {
 				return
 			}
 		}

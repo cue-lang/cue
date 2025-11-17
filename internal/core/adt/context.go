@@ -965,11 +965,17 @@ func (c *OpContext) typeErrorAs(v Value, k Kind, as interface{}) {
 
 var emptyNode = &Vertex{status: finalized}
 
+// TODO(mvdan) use this pos helper throughout the adt package
+
 func pos(x Node) token.Pos {
-	if x.Source() == nil {
+	if x == nil {
 		return token.NoPos
 	}
-	return x.Source().Pos()
+	src := x.Source()
+	if src == nil {
+		return token.NoPos
+	}
+	return src.Pos()
 }
 
 // node is called by SelectorExpr.resolve and IndexExpr.resolve.

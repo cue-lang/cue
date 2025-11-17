@@ -229,6 +229,7 @@ func (p Pos) Add(n int) Pos {
 // meaning either a printable file position to obtain via [Pos.Position],
 // and/or a relative position to obtain via [Pos.RelPos].
 func (p Pos) IsValid() bool {
+	// TODO(mvdan): replace manual NoPos checks with IsValid
 	return p != NoPos
 }
 

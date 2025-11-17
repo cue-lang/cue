@@ -225,9 +225,7 @@ func addPositions(ctx *OpContext, err *ValueError, c Conjunct) {
 			addPositions(ctx, err, c)
 		}
 	}
-	if p := c.CloseInfo.Location(ctx); p != nil {
-		err.AddPosition(p)
-	}
+	err.AddPos(c.CloseInfo.Location(ctx))
 }
 
 func NewRequiredNotPresentError(ctx *OpContext, v *Vertex, morePositions ...Node) *Bottom {
@@ -240,9 +238,7 @@ func NewRequiredNotPresentError(ctx *OpContext, v *Vertex, morePositions ...Node
 		if f, ok := c.x.(*Field); ok && f.ArcType == ArcRequired {
 			err.AddPosition(c.x)
 		}
-		if p := c.CloseInfo.Location(ctx); p != nil {
-			err.AddPosition(p)
-		}
+		err.AddPos(c.CloseInfo.Location(ctx))
 	}
 
 	b := &Bottom{
@@ -316,24 +312,22 @@ type ValueError struct {
 }
 
 func (v *ValueError) AddPosition(n Node) {
-	if n == nil {
-		return
-	}
 	v.AddPos(pos(n))
 }
 
 func (v *ValueError) AddPos(p token.Pos) {
-	if p != token.NoPos {
-		if slices.Contains(v.auxpos, p) {
-			return
-		}
-		v.auxpos = append(v.auxpos, p)
+	if !p.IsValid() {
+		return
 	}
+	if slices.Contains(v.auxpos, p) {
+		return
+	}
+	v.auxpos = append(v.auxpos, p)
 }
 
 func (v *ValueError) AddClosedPositions(ctx *OpContext, c CloseInfo) {
 	for n := range c.AncestorPositions(ctx) {
-		v.AddPosition(n)
+		v.AddPos(n)
 	}
 }
 

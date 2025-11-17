@@ -188,8 +188,8 @@ const (
 )
 
 type containment struct {
-	id  defID
-	pos token.Pos
+	id       defID  // parent defID
+	posIndex uint32 // index into [OpContext.positionTable]
 }
 
 func (c *OpContext) getNextDefID(n Node) defID {
@@ -199,10 +199,32 @@ func (c *OpContext) getNextDefID(n Node) defID {
 	if len(c.containments) == 0 {
 		// Our ID starts at 1. Create an extra element for the zero value.
 		c.containments = make([]containment, 1, 16)
+		// Position index 0 is reserved for [token.NoPos].
+		c.positionTable = []token.Pos{token.NoPos}
+		c.positionIndex = make(map[token.Pos]uint32)
+		c.positionIndex[token.NoPos] = 0
 	}
-	c.containments = append(c.containments, containment{id: 0, pos: pos(n)})
+
+	posIdx := c.internPosition(pos(n))
+	c.containments = append(c.containments, containment{id: 0, posIndex: posIdx})
 
 	return c.nextDefID
+}
+
+// internPosition returns an index into [OpContext.positionTable],
+// which deduplicates positions to save memory.
+func (c *OpContext) internPosition(p token.Pos) uint32 {
+	if idx, ok := c.positionIndex[p]; ok {
+		return idx
+	}
+	idx := uint32(len(c.positionTable))
+	if int(idx) != len(c.positionTable) {
+		// If we manage to overflow, fall back index zero for [token.NoPos].
+		return 0
+	}
+	c.positionTable = append(c.positionTable, p)
+	c.positionIndex[p] = idx
+	return idx
 }
 
 type refInfo struct {

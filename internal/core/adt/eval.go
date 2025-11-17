@@ -232,11 +232,6 @@ func isCyclePlaceholder(v BaseValue) bool {
 	return v == cycle
 }
 
-type arcKey struct {
-	arc *Vertex
-	id  CloseInfo
-}
-
 // A nodeContext is used to collate all conjuncts of a value to facilitate
 // unification. Conceptually order of unification does not matter. However,
 // order has relevance when performing checks of non-monotic properties. Such
@@ -286,7 +281,7 @@ type nodeContext struct {
 	// slices to nil, we truncate the existing buffers so that they do not
 	// need to be reallocated upon reuse of the nodeContext.
 
-	arcMap []arcKey // not copied for cloning
+	arcMap []*Vertex // not copied for cloning
 
 	// vertexMap is used to map vertices in disjunctions.
 	vertexMap vertexMap

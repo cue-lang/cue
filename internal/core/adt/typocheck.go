@@ -169,6 +169,7 @@ import (
 	"slices"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
 )
 
 type defID uint32
@@ -187,8 +188,8 @@ const (
 )
 
 type containment struct {
-	id defID
-	n  Node
+	id  defID
+	pos token.Pos
 }
 
 func (c *OpContext) getNextDefID(n Node) defID {
@@ -199,7 +200,7 @@ func (c *OpContext) getNextDefID(n Node) defID {
 		// Our ID starts at 1. Create an extra element for the zero value.
 		c.containments = make([]containment, 1, 16)
 	}
-	c.containments = append(c.containments, containment{id: 0, n: n})
+	c.containments = append(c.containments, containment{id: 0, pos: pos(n)})
 
 	return c.nextDefID
 }

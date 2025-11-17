@@ -630,7 +630,7 @@ func (n *nodeContext) reportFieldMismatch(
 
 	err := ctx.NewPosf(p, "cannot combine regular field %q with %v", f, scalar)
 
-	if s != nil {
+	if s != nil { // important to avoid a typed nil
 		err.AddPosition(s)
 	}
 

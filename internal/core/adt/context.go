@@ -137,6 +137,13 @@ type OpContext struct {
 	containments       []containment   // parent relations
 	containsDefIDCache map[uint64]bool // cache for containsDefID results
 
+	// [token.Pos] interning for containments to reduce memory usage,
+	// given that millions of elements in [OpContext.containments]
+	// can share the same position. [uint32] is 4 bytes,
+	// whereas [token.Pos] is 16 bytes with alignment.
+	positionTable []token.Pos          // unique positions
+	positionIndex map[token.Pos]uint32 // reverse lookup for interning
+
 	// disjunctBuffer is reused when constructing [envDisjunct.disjuncts].
 	disjunctBuffer []disjunct
 

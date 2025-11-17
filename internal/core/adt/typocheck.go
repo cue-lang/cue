@@ -263,7 +263,7 @@ type replaceID struct {
 }
 
 func (n *nodeContext) addReplacement(x replaceID) {
-	if x.from == x.to {
+	if x.from == 0 || x.from == x.to {
 		return
 	}
 

@@ -334,14 +334,12 @@ func (v *Vertex) allChildConjunctsKnown(ctx *OpContext) bool {
 }
 
 func (n *nodeContext) scheduleTask(r *runner, env *Environment, x Node, ci CloseInfo) *task {
-	t := &task{
-		run:  r,
-		node: n,
-
-		env: env,
-		id:  ci,
-		x:   x,
-	}
+	t := n.ctx.newTask()
+	t.run = r
+	t.node = n
+	t.env = env
+	t.id = ci
+	t.x = x
 	n.insertTask(t)
 	return t
 }

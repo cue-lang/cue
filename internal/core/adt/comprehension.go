@@ -270,11 +270,12 @@ func (n *nodeContext) insertComprehension(
 }
 
 type compState struct {
-	ctx   *OpContext
-	comp  *Comprehension
-	i     int
-	f     YieldFunc
-	state vertexStatus
+	ctx       *OpContext
+	comp      *Comprehension
+	clauseIdx int
+	f         YieldFunc
+	index     int64
+	state     vertexStatus
 }
 
 // yield evaluates a Comprehension within the given Environment and calls
@@ -284,12 +285,14 @@ func (c *OpContext) yield(
 	env *Environment, // env for field for which this yield is called
 	comp *Comprehension,
 	state Flags,
+	startIndex int64,
 	f YieldFunc, // called for every result
-) *Bottom {
+) (finalIndex int64, err *Bottom) {
 	s := &compState{
 		ctx:   c,
 		comp:  comp,
 		f:     f,
+		index: startIndex,
 		state: state.status,
 	}
 	y := comp.Clauses[0]
@@ -299,25 +302,26 @@ func (c *OpContext) yield(
 		defer c.PopArc(c.PushArc(node))
 	}
 
-	s.i++
+	s.clauseIdx++
 	y.yield(s)
-	s.i--
+	s.clauseIdx--
 
-	return c.PopState(saved)
+	return s.index, c.PopState(saved)
 }
 
 func (s *compState) yield(env *Environment) (ok bool) {
 	c := s.ctx
-	if s.i >= len(s.comp.Clauses) {
-		s.f(env)
+	if s.clauseIdx >= len(s.comp.Clauses) {
+		s.f(env, s.index)
+		s.index++
 		return true
 	}
-	dst := s.comp.Clauses[s.i]
+	dst := s.comp.Clauses[s.clauseIdx]
 	saved := c.PushState(env, dst.Source())
 
-	s.i++
+	s.clauseIdx++
 	dst.yield(s)
-	s.i--
+	s.clauseIdx--
 
 	if b := c.PopState(saved); b != nil {
 		c.AddBottom(b)
@@ -335,15 +339,15 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	// Compute environments, if needed.
 	if !d.done {
 		var envs []*Environment
-		f := func(env *Environment) {
+		f := func(env *Environment, _ int64) {
 			envs = append(envs, env)
 		}
 
-		if err := ctx.yield(d.vertex, d.env, d.comp, Flags{
+		if _, err := ctx.yield(d.vertex, d.env, d.comp, Flags{
 			status:    state,
 			condition: allKnown,
 			mode:      ignore,
-		}, f); err != nil {
+		}, 0, f); err != nil {
 			if err.IsIncomplete() {
 				return err
 			}

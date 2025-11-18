@@ -577,14 +577,15 @@ type CycleInfo struct {
 	// a cycle is detected and of which type.
 	CycleType CyclicType
 
-	// IsCyclic indicates whether this conjunct, or any of its ancestors,
-	// had a violating cycle.
-	// TODO: make this a method and use CycleType == IsCyclic after V2 is removed.
-	IsCyclic bool
-
 	// TODO(perf): pack this in with CloseInfo. Make an uint32 pointing into
 	// a buffer maintained in OpContext, using a mark-release mechanism.
 	Refs *RefNode
+}
+
+// IsCyclic indicates whether this conjunct, or any of its ancestors,
+// had a violating cycle.
+func (ci CycleInfo) IsCyclic() bool {
+	return ci.CycleType == IsCyclic
 }
 
 // A RefNode is a linked list of associated references.
@@ -721,7 +722,6 @@ func (n *nodeContext) markNonCyclic(id CloseInfo) {
 // the conjunct in the absence of evidence of a non-cyclic conjunct.
 func (n *nodeContext) markCyclic(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (CloseInfo, bool) {
 	ci.CycleType = IsCyclic
-	ci.IsCyclic = true
 
 	n.hasAnyCyclicConjunct = true
 	n.hasAncestorCycle = true
@@ -738,7 +738,6 @@ func (n *nodeContext) markCyclic(arc *Vertex, env *Environment, x Resolver, ci C
 
 func (n *nodeContext) markCyclicPath(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (CloseInfo, bool) {
 	ci.CycleType = IsCyclic
-	ci.IsCyclic = true
 
 	n.hasAnyCyclicConjunct = true
 
@@ -757,7 +756,7 @@ func (n *nodeContext) markCyclicPath(arc *Vertex, env *Environment, x Resolver, 
 // entirety, if present, to avoid getting unrelated data.
 func (c *OpContext) combineCycleInfo(ci CloseInfo) CloseInfo {
 	cc := c.ci.CycleInfo
-	if cc.IsCyclic {
+	if cc.IsCyclic() {
 		ci.CycleInfo = cc
 	}
 	return ci
@@ -819,7 +818,7 @@ func (c *CloseInfo) setOptional(n *nodeContext) {
 // a structural cycle.
 func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
 	n.hasFieldValue = true
-	if !c.IsCyclic {
+	if !c.IsCyclic() {
 		n.hasNonCycle = true
 		for _, c := range n.cyclicConjuncts {
 			ci := c.c.CloseInfo

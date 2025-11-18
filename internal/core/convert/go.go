@@ -535,21 +535,24 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, x interface{}) (result adt.V
 }
 
 func ensureArcVertex(ctx *adt.OpContext, x adt.Value, l adt.Feature) *adt.Vertex {
+	if arc, ok := x.(*adt.Vertex); ok {
+		if arc.Label == l {
+			// TODO(mvdan): avoid these calls entirely.
+			// Do this for later to avoid merge conflicts with other changes.
+			return arc
+		}
+		a := *arc
+		a.Label = l
+		return &a
+	}
 	env := ctx.Env(0)
 	if env == nil {
 		env = &adt.Environment{}
 	}
-	arc, ok := x.(*adt.Vertex)
-	if ok {
-		a := *arc
-		arc = &a
-		arc.Label = l
-	} else {
-		arc = &adt.Vertex{Label: l}
-		arc.AddConjunct(adt.MakeRootConjunct(env, x))
-		arc.SetValue(ctx, x)
-		arc.ForceDone()
-	}
+	arc := &adt.Vertex{Label: l}
+	arc.AddConjunct(adt.MakeRootConjunct(env, x))
+	arc.SetValue(ctx, x)
+	arc.ForceDone()
 	return arc
 }
 

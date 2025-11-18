@@ -222,6 +222,10 @@ loop1:
 		ci = n.splitStruct(s, ci)
 	}
 
+	// Struct literals with static elements are common;
+	// grow the capacity ahead of time to make space for their arcs.
+	n.node.Arcs = slices.Grow(n.node.Arcs, len(s.Decls))
+
 	// First add fixed fields and schedule expressions.
 	for _, d := range s.Decls {
 		switch x := d.(type) {

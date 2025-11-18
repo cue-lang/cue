@@ -491,21 +491,24 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 }
 
 func ensureArcVertex(ctx *adt.OpContext, x adt.Value, l adt.Feature) *adt.Vertex {
+	if arc, ok := x.(*adt.Vertex); ok {
+		if arc.Label == l {
+			// We already have a vertex with the correct label; do not make a copy.
+			return arc
+		}
+		// We already have a vertex; copy it and adjust its label.
+		a := *arc
+		a.Label = l
+		return &a
+	}
 	env := ctx.Env(0)
 	if env == nil {
 		env = &adt.Environment{}
 	}
-	arc, ok := x.(*adt.Vertex)
-	if ok {
-		a := *arc
-		arc = &a
-		arc.Label = l
-	} else {
-		arc = &adt.Vertex{Label: l}
-		arc.AddConjunct(adt.MakeRootConjunct(env, x))
-		arc.SetValue(ctx, x)
-		arc.ForceDone()
-	}
+	arc := &adt.Vertex{Label: l}
+	arc.AddConjunct(adt.MakeRootConjunct(env, x))
+	arc.SetValue(ctx, x)
+	arc.ForceDone()
 	return arc
 }
 

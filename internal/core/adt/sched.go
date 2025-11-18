@@ -76,6 +76,9 @@ type taskContext struct {
 	// can be frozen and the tasks unblocked.
 	blocking []*task
 
+	// taskPool is a pool of tasks that can be reused to avoid allocations.
+	taskPool []*task
+
 	// counterMask marks which conditions use counters. Other conditions are
 	// handled by signals only.
 	counterMask condition
@@ -110,8 +113,21 @@ func (p *taskContext) popTask() {
 }
 
 func (p *taskContext) newTask() *task {
-	// TODO: allocate from pool.
+	if n := len(p.taskPool); n > 0 {
+		t := p.taskPool[n-1]
+		p.taskPool = p.taskPool[:n-1]
+		// Clear task fields to avoid retaining references from previous use.
+		// We clear here (not in freeTask) because tasks can be in multiple queues
+		// simultaneously and may still be accessed after being "freed" from one queue.
+		*t = task{}
+		return t
+	}
 	return &task{}
+}
+
+func (p *taskContext) freeTask(t *task) {
+	// Add task to pool without clearing. Task will be cleared when reused.
+	p.taskPool = append(p.taskPool, t)
 }
 
 type taskState uint8
@@ -267,8 +283,6 @@ type scheduler struct {
 }
 
 func (s *scheduler) clear() {
-	// TODO(perf): free tasks into task pool
-
 	// Any tasks blocked on this scheduler are unblocked once the scheduler is cleared.
 	// Otherwise they might signal a cleared scheduler, which can panic.
 	//
@@ -278,6 +292,13 @@ func (s *scheduler) clear() {
 	for _, t := range s.blocking {
 		t.blockedOn = nil
 		t.blockCondition = neverKnown
+	}
+
+	// Free tasks back to the pool for reuse. Tasks are not cleared here because
+	// they may still be referenced in other schedulers' blocking queues.
+	// They will be cleared when obtained from the pool for reuse.
+	for _, t := range s.tasks {
+		s.ctx.freeTask(t)
 	}
 
 	*s = scheduler{

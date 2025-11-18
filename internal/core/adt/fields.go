@@ -163,12 +163,21 @@ func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) 
 		}
 	}
 
-	arc = &Vertex{
+	// getArc is immediately followed by inserting one conjunct,
+	// and vertices with one conjunct are rather common.
+	// When allocating the vertex, also allocate a bootstrap conjuncts array.
+	alloc := struct {
+		arc       Vertex
+		conjuncts [1]Conjunct
+	}{}
+	arc = &alloc.arc
+	*arc = Vertex{
 		Parent:    v,
 		Label:     f,
 		ArcType:   mode,
 		nonRooted: v.IsDynamic || v.nonRooted,
 		anonymous: v.anonymous || v.Label.IsLet(),
+		Conjuncts: alloc.conjuncts[:0],
 	}
 	if n.scheduler.frozen&fieldSetKnown != 0 {
 		b := n.ctx.NewErrf("adding field %v not allowed as field set was already referenced", f)

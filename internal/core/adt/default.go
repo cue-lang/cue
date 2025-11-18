@@ -84,6 +84,10 @@ func (v *Vertex) Default() *Vertex {
 		return w
 
 	case *ListMarker:
+		if !d.IsOpen {
+			// If the list is already closed, avoid the copies below.
+			return v
+		}
 		m := *d
 		m.IsOpen = false
 

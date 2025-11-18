@@ -228,6 +228,9 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 			v.Arcs[i] = arc
 			arc.Parent = v
 		}
+	} else if cap(x.Arcs) > 0 {
+		// If the original slice has any capacity, don't share it.
+		v.Arcs = nil
 	}
 
 	v.Structs = slices.Clone(v.Structs)

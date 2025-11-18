@@ -262,6 +262,11 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 
 	index := int64(0)
 	hasComprehension := false
+
+	// List literals with static elements are common;
+	// grow the capacity ahead of time to make space for their arcs.
+	n.node.Arcs = slices.Grow(n.node.Arcs, len(l.Elems))
+
 	for j, elem := range l.Elems {
 		// TODO: Terminate early in case of runaway comprehension.
 

@@ -346,26 +346,22 @@ func (ctx *overlayContext) cloneTask(t *task, dst, src *scheduler) *task {
 
 	id := t.id
 
-	// TODO(perf): alloc from buffer.
-	d := &task{
-		run:            t.run,
-		state:          t.state,
-		completes:      t.completes,
-		unblocked:      t.unblocked,
-		blockCondition: t.blockCondition,
-		blockedOn:      t.blockedOn, // will be rewritten later
-		err:            t.err,
-		env:            t.env,
-		x:              t.x,
-		id:             id,
-
-		node: dst.node,
-
-		// These are rewritten after everything is cloned when all vertices are
-		// known.
-		comp: t.comp,
-		leaf: t.leaf,
-	}
+	d := ctx.ctx.newTask()
+	d.run = t.run
+	d.state = t.state
+	d.completes = t.completes
+	d.unblocked = t.unblocked
+	d.blockCondition = t.blockCondition
+	d.blockedOn = t.blockedOn // will be rewritten later
+	d.err = t.err
+	d.env = t.env
+	d.x = t.x
+	d.id = id
+	d.node = dst.node
+	// These are rewritten after everything is cloned when all vertices are
+	// known.
+	d.comp = t.comp
+	d.leaf = t.leaf
 
 	return d
 }

@@ -59,13 +59,9 @@ type overlayContext struct {
 	// root is the root of the disjunct.
 	root *Vertex
 
-	// vertices holds the original, non-overlay vertices. The overlay for a
-	// vertex v can be obtained by looking up v.cc.overlay.src.
-	vertices []*Vertex
-
-	// vertexMap maps Vertex values of an originating node to the ones copied
-	// for this overlayContext. This is used to update the Vertex values in
-	// Environment values.
+	// vertexMap maps original Vertex values to their cloned counterparts.
+	// This is used to update the Vertex values in Environment values.
+	// The overlay for a vertex v can be obtained by looking up v.overlay.
 	vertexMap vertexMap
 
 	// confMap maps envComprehension values to the ones copied for this
@@ -149,8 +145,12 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 	v.state.vertexMap = ctx.vertexMap
 	ctx.root = v
 
-	for _, v := range ctx.vertices {
+	for v := range ctx.vertexMap {
 		v = v.overlay
+		if v == nil {
+			// Skip vertices copied from root.vertexMap that weren't cloned.
+			continue
+		}
 
 		n := v.state
 		if n == nil {
@@ -190,8 +190,10 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 //
 // TODO(perf): consider using generation counters.
 func (ctx *overlayContext) unlinkOverlay() {
-	for _, v := range ctx.vertices {
-		v.overlay = nil
+	for orig := range ctx.vertexMap {
+		if orig.overlay != nil {
+			orig.overlay = nil
+		}
 	}
 }
 
@@ -214,8 +216,6 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 	*v = *x
 	ctx.vertexMap[x] = v
 	x.overlay = v
-
-	ctx.vertices = append(ctx.vertices, x)
 
 	v.Conjuncts = slices.Clone(v.Conjuncts)
 

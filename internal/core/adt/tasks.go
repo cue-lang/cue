@@ -267,10 +267,10 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 
 		switch x := elem.(type) {
 		case *Comprehension:
-			err := c.yield(nil, t.env, x, Flags{status: partial, mode: mode}, func(e *Environment) {
-				label, err := MakeLabel(x.Source(), index, IntLabel)
+			var err *Bottom
+			index, err = c.yield(nil, t.env, x, Flags{status: partial, mode: mode}, index, func(e *Environment, idx int64) {
+				label, err := MakeLabel(x.Source(), idx, IntLabel)
 				n.addErr(err)
-				index++
 				// id.setOptional(t.node)
 				c := MakeConjunct(e, x.Value, id)
 				n.insertArc(label, ArcMember, c, id, true)

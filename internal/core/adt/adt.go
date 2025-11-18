@@ -122,7 +122,8 @@ type Resolver interface {
 	resolve(ctx *OpContext, state Flags) *Vertex
 }
 
-type YieldFunc func(env *Environment)
+// YieldFunc is called for each result of a comprehension.
+type YieldFunc func(env *Environment, index int64)
 
 // A Yielder represents 0 or more labeled values of structs or lists.
 type Yielder interface {

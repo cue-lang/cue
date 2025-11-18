@@ -1907,7 +1907,7 @@ func TestDefaults(t *testing.T) {
 		value:      `{x?: []}`,
 		def:        `[]`,
 		val:        `[]`,
-		ok:         true,
+		ok:         false,
 		firstField: true,
 	}}
 	for _, tc := range testCases {

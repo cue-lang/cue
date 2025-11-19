@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c38cee0_cff9fa92",
+        "filename": "internal/core/adt/simplify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-19T08:54:10Z",
+      "side": 1,
+      "message": "I\u0027m surprised by the NumDigits() \u003e 1. I would have though \u003e\u003d 1 would do. Or put it another way: why do we care that the subtraction would be larger than 2? Is it to do with \u003elo \u0026 \u003chi and so you want a gap between them?",
+      "revId": "0bc9a4e2b156114abc12c39283f19b97e197f444",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

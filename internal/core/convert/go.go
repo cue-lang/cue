@@ -352,9 +352,19 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return fromGoValue(ctx, nilIsTop, val.Elem())
 
 	case reflect.Struct:
-		sl := &adt.StructLit{Src: ast.NewStruct()}
+		// Grow the slices to match the number of fields in the Go struct,
+		// avoiding repeated slice growth in append calls below.
+		numFields := typ.NumField()
+		sl := &adt.StructLit{
+			Src: &ast.StructLit{
+				Elts: make([]ast.Decl, 0, numFields),
+			},
+			Decls: make([]adt.Decl, 0, numFields),
+		}
 		sl.Init(ctx)
-		v := &adt.Vertex{}
+		v := &adt.Vertex{
+			Arcs: make([]*adt.Vertex, 0, numFields),
+		}
 
 		for i := range typ.NumField() {
 			sf := typ.Field(i)
@@ -460,8 +470,16 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		}
 		fallthrough
 	case reflect.Array:
-		list := &adt.ListLit{Src: ast.NewList()}
-		v := &adt.Vertex{}
+		// Grow the slices to match the number of fields in the Go struct,
+		// avoiding repeated slice growth in append calls below.
+		numElems := val.Len()
+		list := &adt.ListLit{
+			Src:   &ast.ListLit{},
+			Elems: make([]adt.Elem, 0, numElems),
+		}
+		v := &adt.Vertex{
+			Arcs: make([]*adt.Vertex, 0, numElems),
+		}
 
 		i := 0
 		for _, val := range val.Seq2() {

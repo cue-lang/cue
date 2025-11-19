@@ -16,6 +16,23 @@
       "message": "As with the others, this is not urgent.\n\nAlso, best to review this while ignoring whitespace; you can do this locally with `git show -w` or `git diff -w`, or by changing the settings on Gerrit\u0027s diff view.",
       "revId": "4e8cafa12c598f4bea01820bc6a3a5fbb8a1ba99",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b2cf27d_c478c348",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-19T09:01:18Z",
+      "side": 1,
+      "message": "Well I generally avoid Go\u0027s reflect stuff like the plague so I have very little understanding of what\u0027s going on here. But the tests seem to still pass.",
+      "revId": "4e8cafa12c598f4bea01820bc6a3a5fbb8a1ba99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -146,6 +146,7 @@ type OpContext struct {
 	e  *Environment
 	ci CloseInfo
 
+	// Source node associated with the CUE operation, if any.
 	// When nil, created nodes like [Bool] may use sentinels to avoid allocations.
 	src ast.Node
 

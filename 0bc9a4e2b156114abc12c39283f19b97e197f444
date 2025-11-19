@@ -16,6 +16,24 @@
       "message": "I\u0027m surprised by the NumDigits() \u003e 1. I would have though \u003e\u003d 1 would do. Or put it another way: why do we care that the subtraction would be larger than 2? Is it to do with \u003elo \u0026 \u003chi and so you want a gap between them?",
       "revId": "0bc9a4e2b156114abc12c39283f19b97e197f444",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "545c4838_557dc74f",
+        "filename": "internal/core/adt/simplify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-19T10:12:00Z",
+      "side": 1,
+      "message": "The code below cares about `diff \u003d hi - lo` values between 0 and 2. If we simply check `NumDigits() \u003e\u003d 1`, and given that `lo \u003c\u003d 0`, it could be that `hi, lo \u003d 1, 0`, and so the logic below cannot be skipped. My use of `NumDigits() \u003e 1` is so that `hi \u003e\u003d 10`, and then we know diff must be at least 10 too.\n\nAs to why exactly the code below cares about diff values between 0 and 2, I don\u0027t care too much about - here I want to quickly discard the built-in bounds, which are all start from 128, so it\u0027s not like the difference between cutting at 2 or 10 really matters :)",
+      "parentUuid": "3c38cee0_cff9fa92",
+      "revId": "0bc9a4e2b156114abc12c39283f19b97e197f444",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

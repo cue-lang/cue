@@ -184,13 +184,13 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		// TODO: should we allow this?
 		r = cfg.Stdin
 	} else {
-		rc, err := source.Open(f.Filename, f.Source)
-		i.closer = rc
-		i.err = err
+		r, i.err = source.Open(f.Filename, f.Source)
+		if c, ok := r.(io.Closer); ok {
+			i.closer = c
+		}
 		if i.err != nil {
 			return i
 		}
-		r = rc
 	}
 
 	switch f.Interpretation {

@@ -46,21 +46,20 @@ func ReadAll(filename string, src any) ([]byte, error) {
 	return os.ReadFile(filename)
 }
 
-// Open creates a source reader for the given arguments. If src != nil,
-// Open converts src to an io.Open if possible; otherwise it returns an
-// error. If src == nil, Open returns the result of opening the file
-// specified by filename.
-func Open(filename string, src any) (io.ReadCloser, error) {
+// Open creates a source reader for the given arguments.
+// If src != nil, Open converts src to an [io.Reader] if possible; otherwise it returns an error.
+// If src == nil, Open returns the result of opening the file specified by filename.
+//
+// The caller must check if the result is an [io.Closer], and if so, close it when done.
+func Open(filename string, src any) (io.Reader, error) {
 	if src != nil {
 		switch src := src.(type) {
 		case string:
-			return io.NopCloser(strings.NewReader(src)), nil
+			return strings.NewReader(src), nil
 		case []byte:
-			return io.NopCloser(bytes.NewReader(src)), nil
-		case io.ReadCloser:
-			return src, nil
+			return bytes.NewReader(src), nil
 		case io.Reader:
-			return io.NopCloser(src), nil
+			return src, nil
 		}
 		return nil, fmt.Errorf("invalid source type %T", src)
 	}

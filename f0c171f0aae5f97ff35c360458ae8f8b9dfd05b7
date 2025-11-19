@@ -16,6 +16,24 @@
       "message": "I don\u0027t like this because it breaks the algorithm for calculating strongly connected components.\n\nAs the comment says, the sccNodeState is temporary - it is valid only during the calculation of the SCCs. My reading of this change is that these nodes now become permanent. This means that if you calculate the SCCs, then change the graph, and then recalculate the SCCs, then you\u0027ll be mixing up nodes and most likely get the wrong results. I.e. the scc nodes capture the current state of graph, and they can\u0027t be reused.\n\nIf you really want to do this, I\u0027d want to see the API for the graph in general modified so that attempting to modify the graph after the SCCs have been calculated leads to probably a panic, but at minimum an error.",
       "revId": "f0c171f0aae5f97ff35c360458ae8f8b9dfd05b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a61f755_2f75de02",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-19T10:19:05Z",
+      "side": 1,
+      "message": "I see, that makes sense.\n\nI\u0027ve changed the code to keep the clearing of each sccNodeState before and after the findSCC work. I\u0027m pretty sure this is semantically equivalent to what happened before, just removing the pointer indirection. What do you think?\n\nI also think the initial clear is redundant now and could be removed - since the zero value is already cleared, and StronglyConnectedComponents leaves the state clear when it finishes too, then the initial clear is unnecessary. But I\u0027ve left it in for now to keep the same structure we have at master.",
+      "parentUuid": "2fba85fa_380e9a77",
+      "revId": "f0c171f0aae5f97ff35c360458ae8f8b9dfd05b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

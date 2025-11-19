@@ -624,9 +624,8 @@ func (v valueScope) Parent() compile.Scope {
 type hiddenValue = Value
 
 // Core is for internal use only.
-func (v hiddenValue) Core(x *types.Value) {
-	x.V = v.v
-	x.R = v.idx
+func (v hiddenValue) Core() types.Value {
+	return types.Value{V: v.v, R: v.idx}
 }
 
 func newErrValue(v Value, b *adt.Bottom) Value {

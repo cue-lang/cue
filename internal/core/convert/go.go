@@ -271,8 +271,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 
 	if _, ok := implements(typ, typesInterface); ok {
 		v, _ := val.Interface().(types.Interface) // TODO(go1.25): use reflect.TypeAssert
-		t := &types.Value{}
-		v.Core(t)
+		t := v.Core()
 		// TODO: panic if not the same runtime.
 		return t.V
 	}

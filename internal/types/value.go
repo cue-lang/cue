@@ -25,5 +25,5 @@ type Value struct {
 }
 
 type Interface interface {
-	Core(v *Value)
+	Core() Value
 }

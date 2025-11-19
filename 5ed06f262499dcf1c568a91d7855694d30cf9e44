@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "516b79a5_64c262e9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-19T11:43:32Z",
+      "side": 1,
+      "message": "This performance regression surprised me enough that I raised a proposal upstream: https://github.com/golang/go/issues/76357\n\nAlthough the best case scenario is that this is released in Go in 3-9 months, and we can use it a year from now, so I\u0027d still merge this now in the meantime.",
+      "revId": "5ed06f262499dcf1c568a91d7855694d30cf9e44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -323,12 +323,12 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return &adt.String{Src: src, Str: str}
 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		n := &adt.Num{Src: ctx.Source(), K: adt.IntKind}
+		n := &adt.Num{Src: src, K: adt.IntKind}
 		n.X = *apd.New(val.Int(), 0)
 		return n
 
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		n := &adt.Num{Src: ctx.Source(), K: adt.IntKind}
+		n := &adt.Num{Src: src, K: adt.IntKind}
 		n.X.Coeff.SetUint64(val.Uint())
 		return n
 
@@ -355,9 +355,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		// avoiding repeated slice growth in append calls below.
 		numFields := typ.NumField()
 		sl := &adt.StructLit{
-			Src: &ast.StructLit{
-				Elts: make([]ast.Decl, 0, numFields),
-			},
+			Src:   src,
 			Decls: make([]adt.Decl, 0, numFields),
 		}
 		sl.Init(ctx)
@@ -403,7 +401,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			}
 
 			f := ctx.StringLabel(name)
-			createField(ctx, f, sub, sl)
+			sl.Decls = append(sl.Decls, &adt.Field{Label: f, Value: sub})
 			v.Arcs = append(v.Arcs, ensureArcVertex(ctx, sub, f))
 		}
 
@@ -418,7 +416,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return v
 
 	case reflect.Map:
-		obj := &adt.StructLit{Src: ast.NewStruct()}
+		obj := &adt.StructLit{Src: src}
 		obj.Init(ctx)
 		v := &adt.Vertex{}
 
@@ -450,7 +448,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			})
 			// Create all the adt/ast fields after sorting the arcs
 			for _, arc := range v.Arcs {
-				createField(ctx, arc.Label, arc, obj)
+				obj.Decls = append(obj.Decls, &adt.Field{Label: arc.Label, Value: arc})
 			}
 		}
 
@@ -472,8 +470,9 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		// Grow the slices to match the number of fields in the Go struct,
 		// avoiding repeated slice growth in append calls below.
 		numElems := val.Len()
+		src, _ := src.(*ast.ListLit)
 		list := &adt.ListLit{
-			Src:   &ast.ListLit{},
+			Src:   src,
 			Elems: make([]adt.Elem, 0, numElems),
 		}
 		v := &adt.Vertex{
@@ -531,20 +530,6 @@ func ensureArcVertex(ctx *adt.OpContext, x adt.Value, l adt.Feature) *adt.Vertex
 	arc.SetValue(ctx, x)
 	arc.ForceDone()
 	return arc
-}
-
-func createField(ctx *adt.OpContext, l adt.Feature, sub adt.Value, sl *adt.StructLit) {
-	src := sl.Src.(*ast.StructLit)
-	astField := &ast.Field{
-		Label:      ast.NewIdent(l.IdentString(ctx)),
-		Constraint: token.ILLEGAL,
-	}
-	if expr, ok := sub.Source().(ast.Expr); ok {
-		astField.Value = expr
-	}
-	src.Elts = append(src.Elts, astField)
-	field := &adt.Field{Label: l, Value: sub, Src: astField}
-	sl.Decls = append(sl.Decls, field)
 }
 
 var (

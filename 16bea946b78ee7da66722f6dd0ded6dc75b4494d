@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "334db403_679c5b03",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-19T15:39:08Z",
+      "side": 1,
+      "message": "I agree - there is no useful information in the astFields that were being created.",
+      "revId": "16bea946b78ee7da66722f6dd0ded6dc75b4494d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -34,6 +34,24 @@
       "parentUuid": "2fba85fa_380e9a77",
       "revId": "f0c171f0aae5f97ff35c360458ae8f8b9dfd05b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bd7f5d7_33efefee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-19T10:38:33Z",
+      "side": 1,
+      "message": "Yes, I think this works given that none of the `sccNodeState` escape from the method. I also completely agree that the clearing at the start is unneeded - very happy for that to be deleted; clearing at the end is all that\u0027s needed.",
+      "parentUuid": "7a61f755_2f75de02",
+      "revId": "f0c171f0aae5f97ff35c360458ae8f8b9dfd05b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

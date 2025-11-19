@@ -58,6 +58,7 @@ type Decoder struct {
 	file           *ast.File
 	filename       string // may change on iteration for some formats
 	index          int
+	size           int // length of the source file if known; -1 otherwise
 	err            error
 }
 
@@ -183,8 +184,9 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 	if f.Source == nil && f.Filename == "-" {
 		// TODO: should we allow this?
 		r = cfg.Stdin
+		i.size = -1
 	} else {
-		r, i.err = source.Open(f.Filename, f.Source)
+		r, i.size, i.err = source.Open(f.Filename, f.Source)
 		if c, ok := r.(io.Closer); ok {
 			i.closer = c
 		}
@@ -237,17 +239,22 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 	path := f.Filename
 	switch f.Encoding {
 	case build.CUE:
+		b, err := source.ReadAllSize(r, i.size)
+		if err != nil {
+			i.err = err
+			break
+		}
 		if cfg.ParseFile == nil {
-			i.file, i.err = parser.ParseFile(path, r, cfg.ParserConfig)
+			i.file, i.err = parser.ParseFile(path, b, cfg.ParserConfig)
 		} else {
-			i.file, i.err = cfg.ParseFile(path, r, cfg.ParserConfig)
+			i.file, i.err = cfg.ParseFile(path, b, cfg.ParserConfig)
 		}
 		i.validate(i.file, f)
 		if i.err == nil {
 			i.doInterpret()
 		}
 	case build.JSON:
-		b, err := io.ReadAll(r)
+		b, err := source.ReadAllSize(r, i.size)
 		if err != nil {
 			i.err = err
 			break
@@ -260,7 +267,7 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		i.next = json.NewDecoder(nil, path, r).Extract
 		i.Next()
 	case build.YAML:
-		b, err := io.ReadAll(r)
+		b, err := source.ReadAllSize(r, i.size)
 		i.err = err
 		i.next = yaml.NewDecoder(path, b).Decode
 		i.Next()
@@ -276,11 +283,11 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 			i.err = fmt.Errorf("xml requires a variant, such as: xml+koala")
 		}
 	case build.Text:
-		b, err := io.ReadAll(r)
+		b, err := source.ReadAllSize(r, i.size)
 		i.err = err
 		i.expr = ast.NewString(string(b))
 	case build.Binary:
-		b, err := io.ReadAll(r)
+		b, err := source.ReadAllSize(r, i.size)
 		i.err = err
 		s := literal.Bytes.WithTabIndent(1).Quote(string(b))
 		i.expr = ast.NewLit(token.STRING, s)
@@ -291,7 +298,7 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		}
 		i.file, i.err = protobuf.Extract(path, r, paths)
 	case build.TextProto:
-		b, err := io.ReadAll(r)
+		b, err := source.ReadAllSize(r, i.size)
 		i.err = err
 		if err == nil {
 			d := textproto.NewDecoder()

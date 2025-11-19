@@ -96,6 +96,9 @@ func (dec *Decoder) Decode() (ast.Expr, error) {
 		return nil, io.EOF
 	}
 	dec.decoderRan = true
+	// TODO(mvdan): note that we read the whole input just for the sake of [token.NewFile];
+	// either revamp that API so that it doesn't need the length upfront,
+	// or lean into it and have internal/encoding pass the input size here.
 	xmlText, err := io.ReadAll(dec.reader)
 	if err != nil {
 		return nil, err

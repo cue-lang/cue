@@ -32,7 +32,6 @@ import (
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/diff"
-	"cuelang.org/go/internal/types"
 	"golang.org/x/tools/txtar"
 )
 
@@ -66,8 +65,7 @@ func TestSelfContained(t *testing.T) {
 			v = v.LookupPath(cue.ParsePath(p))
 		}
 
-		var tValue types.Value
-		v.Core(&tValue)
+		tValue := v.Core()
 
 		self := *export.All
 		self.SelfContained = true
@@ -182,8 +180,7 @@ language: version: "v0.9.0"
 
 	v = v.LookupPath(cue.ParsePath("a.b"))
 
-	var tValue types.Value
-	v.Core(&tValue)
+	tValue := v.Core()
 	self := export.All
 	self.SelfContained = true
 	self.InlineImports = true

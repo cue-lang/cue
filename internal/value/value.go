@@ -24,7 +24,6 @@ import (
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
-	"cuelang.org/go/internal/types"
 )
 
 // Context returns the cue.Context of the given argument.
@@ -64,14 +63,12 @@ func OpContext[Ctx *cue.Runtime | *cue.Context | cue.Value](c Ctx) *adt.OpContex
 }
 
 func ToInternal(v cue.Value) (*runtime.Runtime, *adt.Vertex) {
-	var t types.Value
-	v.Core(&t)
+	t := v.Core()
 	return t.R, t.V
 }
 
 func Vertex(v cue.Value) *adt.Vertex {
-	var t types.Value
-	v.Core(&t)
+	t := v.Core()
 	return t.V
 }
 

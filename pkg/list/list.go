@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/iterutil"
 	"cuelang.org/go/internal/pkg"
-	"cuelang.org/go/internal/types"
 	"cuelang.org/go/internal/value"
 )
 
@@ -271,8 +270,7 @@ func UniqueItems(a []cue.Value) (bool, error) {
 	// - Sort the elements based on the hash value.
 	// - Compare subsequent elements to see if they are equal.
 
-	var tv types.Value
-	a[0].Core(&tv)
+	tv := a[0].Core()
 	ctx := eval.NewContext(tv.R, tv.V)
 
 	posX, posY := 0, 0

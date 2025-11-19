@@ -482,7 +482,11 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		}
 
 		i := 0
-		for _, val := range val.Seq2() {
+		// Note that we don't use [reflect.Value.Seq2],
+		// as it allocates more per iteration, and we don't need the index value.
+		// We can't use [reflect.Value.Seq] either, as that's just the indices.
+		for i < numElems {
+			val := val.Index(i)
 			x := fromGoValue(ctx, nilIsTop, val)
 			if x == nil {
 				return ctx.AddErrf("unsupported Go type (%T)", val.Interface())

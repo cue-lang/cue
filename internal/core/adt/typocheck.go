@@ -166,6 +166,7 @@ package adt
 // type.
 //
 import (
+	"iter"
 	"slices"
 
 	"cuelang.org/go/cue/ast"
@@ -604,12 +605,11 @@ func (n *nodeContext) checkTypos() {
 			required = slices.Clone(required)
 		}
 
-		required = filterSets(required, func(a *reqSet) bool {
+		for a := range required.elemPtrs() {
 			if id := hasParentEllipsis(n, a, n.conjunctInfo); id != 0 {
 				a.removed = true
 			}
-			return true
-		})
+		}
 		// TODO(perf): somehow prevent error generation of recursive structures,
 		// or at least make it cheap. Right now if this field is a typo, likely
 		// all descendents will be regarded as typos.
@@ -915,7 +915,7 @@ func getReqSets(n *nodeContext) reqSets {
 	// Grow the capacity of the slice ahead of time to avoid incremental growth below.
 	a = slices.Grow(a, len(parentReqs)+len(n.reqDefIDs))
 	a = append(a, parentReqs...)
-	a = filterNonRecursive(a)
+	filterNonRecursive(a)
 
 	last := len(a) - 1
 
@@ -1062,26 +1062,34 @@ func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) defI
 	return 0
 }
 
-func filterNonRecursive(a reqSets) reqSets {
-	return filterSets(a, func(e *reqSet) bool {
-		x := e
-		if x.once { //  || x.id == 0
+func filterNonRecursive(a reqSets) {
+	for e := range a.elemPtrs() {
+		if e.once { //  || e.id == 0
 			e.ignored = true
 		}
-		return true // keep the entry
-	})
+	}
 }
 
 // filter keeps all reqSets e in a for which f(e) and removes the rest.
 func filterSets(a reqSets, f func(e *reqSet) bool) reqSets {
 	temp := a[:0]
 	for i := range a {
-		set := a[i]
-		if f(&set) {
-			temp = append(temp, set)
+		set := &a[i]
+		if f(set) {
+			temp = append(temp, *set)
 		}
 	}
 	return temp
+}
+
+func (a reqSets) elemPtrs() iter.Seq[*reqSet] {
+	return func(yield func(e *reqSet) bool) {
+		for i := range a {
+			if !yield(&a[i]) {
+				return
+			}
+		}
+	}
 }
 
 // lookupSet returns the set in a with the given id or nil if no such set.

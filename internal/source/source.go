@@ -72,13 +72,15 @@ func ReadAllSize(r io.Reader, size int) ([]byte, error) {
 //
 // The caller must check if the result is an [io.Closer], and if so, close it when done.
 // The size of the opened reader is returned if possible, or -1 otherwise.
-func Open(filename string, src any) (io.Reader, int, error) {
+func Open(filename string, src any) (_ io.Reader, size int, _ error) {
 	if src != nil {
 		switch src := src.(type) {
 		case string:
 			return strings.NewReader(src), len(src), nil
 		case []byte:
 			return bytes.NewReader(src), len(src), nil
+		case *os.File:
+			return fileWithSize(src)
 		case io.Reader:
 			return src, -1, nil
 		}
@@ -88,6 +90,10 @@ func Open(filename string, src any) (io.Reader, int, error) {
 	if err != nil {
 		return nil, -1, err
 	}
+	return fileWithSize(f)
+}
+
+func fileWithSize(f *os.File) (io.Reader, int, error) {
 	// If we just opened a regular file, return its size too.
 	// If we can't get its size, such as non-regular files, don't give one.
 	stat, err := f.Stat()

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2448477_a24a41f4",
+        "filename": "internal/source/source.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-20T11:07:12Z",
+      "side": 1,
+      "message": "tiny nit, personally, I\u0027d s/actually //",
+      "revId": "3f58bba2542388f0f827f98db620f57ea70329c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d140822a_a003820a",
+        "filename": "internal/source/source.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-20T11:07:12Z",
+      "side": 1,
+      "message": "just a thought: would `max(size, bytes.MinRead)` be preferable?",
+      "revId": "3f58bba2542388f0f827f98db620f57ea70329c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bbbac65_19710cc6",
+        "filename": "internal/source/source.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-20T11:07:12Z",
+      "side": 1,
+      "message": "Hmm. This is changing the api isn\u0027t it? Previously, you could call Open on a fifo (`mkfifo`) and it would work. Now it won\u0027t. I agree that if stat returns an error then bail, but if err is nil, but it\u0027s non-regular, I\u0027d return f, -1, nil.\n\nOh and in the early returns, I would have expected to see calls to `f.Close()`",
+      "revId": "3f58bba2542388f0f827f98db620f57ea70329c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

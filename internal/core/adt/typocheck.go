@@ -604,7 +604,7 @@ func (n *nodeContext) checkTypos() {
 			required = slices.Clone(required)
 		}
 
-		n.filterSets(&required, func(a *reqSet) bool {
+		required = filterSets(required, func(a *reqSet) bool {
 			if id := hasParentEllipsis(n, a, n.conjunctInfo); id != 0 {
 				a.removed = true
 			}
@@ -915,7 +915,7 @@ func getReqSets(n *nodeContext) reqSets {
 	// Grow the capacity of the slice ahead of time to avoid incremental growth below.
 	a = slices.Grow(a, len(parentReqs)+len(n.reqDefIDs))
 	a = append(a, parentReqs...)
-	n.filterNonRecursive(&a)
+	a = filterNonRecursive(a)
 
 	last := len(a) - 1
 
@@ -971,7 +971,7 @@ outer:
 	// If 'v' is a hidden field, then all reqSets in 'a' for which there is no
 	// corresponding entry in conjunctInfo should be removed from 'a'.
 	if allowedInClosed(v.Label) {
-		n.filterSets(&a, func(a *reqSet) bool {
+		a = filterSets(a, func(a *reqSet) bool {
 			for _, c := range n.conjunctInfo {
 				if n.containsDefID(a.id, c.id) {
 					return true // keep the set
@@ -986,7 +986,7 @@ outer:
 		parentConjuncts = p.state.conjunctInfo
 	}
 
-	n.filterTop(&a, parentConjuncts)
+	a = n.filterTop(a, parentConjuncts)
 
 	n.computedCloseInfo = true
 	if int64(len(a)) > n.ctx.stats.MaxReqSets {
@@ -998,8 +998,8 @@ outer:
 
 // If there is a top or ellipsis for all supported conjuncts, we have
 // evidence that this node can be dropped.
-func (n *nodeContext) filterTop(a *reqSets, parentConjuncts []conjunctInfo) {
-	n.filterSets(a, func(a *reqSet) bool {
+func (n *nodeContext) filterTop(a reqSets, parentConjuncts []conjunctInfo) reqSets {
+	return filterSets(a, func(a *reqSet) bool {
 		var f conjunctFlags
 		hasAny := false
 
@@ -1062,8 +1062,8 @@ func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) defI
 	return 0
 }
 
-func (n *nodeContext) filterNonRecursive(a *reqSets) {
-	n.filterSets(a, func(e *reqSet) bool {
+func filterNonRecursive(a reqSets) reqSets {
+	return filterSets(a, func(e *reqSet) bool {
 		x := e
 		if x.once { //  || x.id == 0
 			e.ignored = true
@@ -1073,15 +1073,15 @@ func (n *nodeContext) filterNonRecursive(a *reqSets) {
 }
 
 // filter keeps all reqSets e in a for which f(e) and removes the rest.
-func (n *nodeContext) filterSets(a *reqSets, f func(e *reqSet) bool) {
-	temp := (*a)[:0]
-	for i := range *a {
-		set := (*a)[i]
+func filterSets(a reqSets, f func(e *reqSet) bool) reqSets {
+	temp := a[:0]
+	for i := range a {
+		set := a[i]
 		if f(&set) {
 			temp = append(temp, set)
 		}
 	}
-	*a = temp
+	return temp
 }
 
 // lookupSet returns the set in a with the given id or nil if no such set.

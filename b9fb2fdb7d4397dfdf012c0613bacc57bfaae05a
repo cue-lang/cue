@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10131cad_b4411a4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-20T11:26:03Z",
+      "side": 1,
+      "message": "Unity projects report lower Go.AllocBytes by as much as 10% - big success :)",
+      "revId": "b9fb2fdb7d4397dfdf012c0613bacc57bfaae05a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -907,10 +907,15 @@ func getReqSets(n *nodeContext) reqSets {
 	a := n.reqSets[:0]
 	v := n.node
 
+	var parentReqs reqSets
 	if p := v.Parent; p != nil && !n.dropParentRequirements {
-		a = append(a, getReqSets(p.state)...)
-		n.filterNonRecursive(&a)
+		parentReqs = getReqSets(p.state)
 	}
+
+	// Grow the capacity of the slice ahead of time to avoid incremental growth below.
+	a = slices.Grow(a, len(parentReqs)+len(n.reqDefIDs))
+	a = append(a, parentReqs...)
+	n.filterNonRecursive(&a)
 
 	last := len(a) - 1
 

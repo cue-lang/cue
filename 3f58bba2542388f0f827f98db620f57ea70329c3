@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "343d0eae_e997f6af",
+        "filename": "internal/source/source.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-20T11:19:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2448477_a24a41f4",
+      "revId": "3f58bba2542388f0f827f98db620f57ea70329c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d140822a_a003820a",
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f1091b22_53e98741",
+        "filename": "internal/source/source.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-20T11:19:16Z",
+      "side": 1,
+      "message": "no, because of the docs above - if a file is 2000 bytes and we allocate a buffer for 2000 bytes, what would happen is:\n\n\nread with available capacity 2000\nwe get 2000 bytes and a nil error, ending up with capacity 0\nwe need to read again, but have capacity 0 smaller than MinRead (512)\ngrow (2x) to satisfy MinRead\nread with available capacity 2000 (total buffer size 4000)\nwe get 0 bytes and EOF, so we finish\n\nso in total we allocate a 2000 byte buffer plus a 4000 byte buffer.\n\n\nif we allocate size+MinRead instead, i.e. 2512 bytes, then the above happens without the \"grow\" step, and we allocate 2512 in total rather than 6000. And the final buffer is also smaller - 2512 rather than 4000.",
+      "parentUuid": "d140822a_a003820a",
+      "revId": "3f58bba2542388f0f827f98db620f57ea70329c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5bbbac65_19710cc6",
         "filename": "internal/source/source.go",
         "patchSetId": 3
@@ -48,6 +84,24 @@
       "writtenOn": "2025-11-20T11:07:12Z",
       "side": 1,
       "message": "Hmm. This is changing the api isn\u0027t it? Previously, you could call Open on a fifo (`mkfifo`) and it would work. Now it won\u0027t. I agree that if stat returns an error then bail, but if err is nil, but it\u0027s non-regular, I\u0027d return f, -1, nil.\n\nOh and in the early returns, I would have expected to see calls to `f.Close()`",
+      "revId": "3f58bba2542388f0f827f98db620f57ea70329c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f13f9c0d_6a552de0",
+        "filename": "internal/source/source.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-20T11:19:16Z",
+      "side": 1,
+      "message": "Yikes, nice catch. I actually intended to return `f, -1, nil` in these cases.",
+      "parentUuid": "5bbbac65_19710cc6",
       "revId": "3f58bba2542388f0f827f98db620f57ea70329c3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

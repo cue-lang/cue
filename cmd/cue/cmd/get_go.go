@@ -258,6 +258,7 @@ type extractor struct {
 	orig     map[types.Type]*ast.StructType
 	usedPkgs map[string]bool
 	consts   map[string][]string
+	semantic importSematic
 
 	// per file
 	cmap     ast.CommentMap
@@ -444,9 +445,39 @@ func (e *extractor) recordTypeInfo(p *packages.Package) {
 	}
 }
 
+type importSematic int
+
+const (
+	semanticDefault importSematic = iota
+	semanticKubernetes
+)
+
+func (s importSematic) String() string {
+	switch s {
+	case semanticKubernetes:
+		return "kubernetes"
+	case semanticDefault:
+		return "default"
+	default:
+		panic("invalid semantic")
+	}
+}
+
 func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	e.pkg = p
-	e.logf("--- Package %s", p.PkgPath)
+	e.semantic = semanticDefault
+
+	for _, f := range p.Syntax {
+		for _, c := range f.Comments {
+			for _, c := range c.List {
+				switch c.Text {
+				case "// +k8s:openapi-gen=true":
+					e.semantic = semanticKubernetes
+				}
+			}
+		}
+	}
+	e.logf("--- Package %s - Semantic: %s", p.PkgPath, e.semantic)
 
 	e.recordTypeInfo(p)
 
@@ -857,7 +888,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 					if basic, ok := typ.(*types.Basic); ok && basic.Info()&types.IsUntyped != 0 {
 						break // untyped basic types do not make valid identifiers
 					}
-					cv = cueast.NewBinExpr(cuetoken.AND, e.makeType(typ), cv)
+					cv = cueast.NewBinExpr(cuetoken.AND, e.makeType(typ, regular), cv)
 				}
 
 				f.Value = cv
@@ -1047,7 +1078,7 @@ const (
 )
 
 func (e *extractor) makeField(name string, kind fieldKind, expr types.Type, doc *ast.CommentGroup, newline bool) (f *cueast.Field, typename string) {
-	typ := e.makeType(expr)
+	typ := e.makeType(expr, kind)
 	var label cueast.Label
 	if kind == definition {
 		label = e.ident(name, true)
@@ -1075,7 +1106,7 @@ func (e *extractor) makeField(name string, kind fieldKind, expr types.Type, doc 
 	return f, string(b)
 }
 
-func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
+func (e *extractor) makeType(typ types.Type, kind fieldKind) (result cueast.Expr) {
 	switch typ := types.Unalias(typ).(type) {
 	case *types.Named:
 		obj := typ.Obj()
@@ -1209,10 +1240,13 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 
 		return result
 	case *types.Pointer:
+		if e.semantic == semanticKubernetes && kind == optional {
+			return e.makeType(typ.Elem(), kind)
+		}
 		return &cueast.BinaryExpr{
 			X:  cueast.NewNull(),
 			Op: cuetoken.OR,
-			Y:  e.makeType(typ.Elem()),
+			Y:  e.makeType(typ.Elem(), kind),
 		}
 
 	case *types.Struct:
@@ -1231,7 +1265,7 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 		if typ.Elem() == typeByte {
 			return e.ident("bytes", false)
 		}
-		return cueast.NewList(&cueast.Ellipsis{Type: e.makeType(typ.Elem())})
+		return cueast.NewList(&cueast.Ellipsis{Type: e.makeType(typ.Elem(), kind)})
 
 	case *types.Array:
 		if typ.Elem() == typeByte {
@@ -1248,7 +1282,7 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 					Value: strconv.Itoa(int(typ.Len())),
 				},
 				Op: cuetoken.MUL,
-				Y:  cueast.NewList(e.makeType(typ.Elem())),
+				Y:  cueast.NewList(e.makeType(typ.Elem(), kind)),
 			}
 		}
 
@@ -1259,7 +1293,7 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 
 		f := &cueast.Field{
 			Label: cueast.NewList(e.ident("string", false)),
-			Value: e.makeType(typ.Elem()),
+			Value: e.makeType(typ.Elem(), kind),
 		}
 		cueast.SetRelPos(f, cuetoken.Blank)
 		return &cueast.StructLit{
@@ -1282,7 +1316,7 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 	case *types.Union:
 		var exprs []cueast.Expr
 		for term := range typ.Terms() {
-			exprs = append(exprs, e.makeType(term.Type()))
+			exprs = append(exprs, e.makeType(term.Type(), kind))
 		}
 		return cueast.NewBinExpr(cuetoken.OR, exprs...)
 
@@ -1305,12 +1339,12 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 		//
 		var exprs []cueast.Expr
 		for etyp := range typ.EmbeddedTypes() {
-			exprs = append(exprs, e.makeType(etyp))
+			exprs = append(exprs, e.makeType(etyp, kind))
 		}
 		return cueast.NewBinExpr(cuetoken.OR, exprs...)
 
 	case *types.TypeParam:
-		return e.makeType(typ.Constraint())
+		return e.makeType(typ.Constraint(), kind)
 
 	default:
 		// record error
@@ -1360,7 +1394,7 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 			}
 			switch typ := types.Unalias(typ).(type) {
 			case *types.Named:
-				embed := &cueast.EmbedDecl{Expr: e.makeType(typ)}
+				embed := &cueast.EmbedDecl{Expr: e.makeType(typ, regular)}
 				if i > 0 {
 					cueast.SetRelPos(embed, cuetoken.NewSection)
 				}

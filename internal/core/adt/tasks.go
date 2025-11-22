@@ -129,7 +129,7 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 
 	// A reference that points to itself indicates equality. In that case
 	// we are done computing and we can return the arc as is.
-	ci, skip := t.node.detectCycleV3(d, t.env, r, ci)
+	ci, skip := t.node.detectCycle(d, t.env, r, ci)
 	if skip {
 		// Either we have a structure cycle or we are unifying with another
 		// conjunct. In either case, we are no longer structure sharing here.
@@ -254,7 +254,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 
 	l := t.x.(*ListLit)
 
-	n.updateCyclicStatusV3(t.id)
+	n.updateCyclicStatus(t.id)
 
 	var ellipsis Node
 
@@ -301,7 +301,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 			}
 
 			id := id
-			id.setOptionalV3(t.node)
+			id.setOptional(t.node)
 
 			c := MakeConjunct(t.env, elem, id)
 			pat := &BoundValue{

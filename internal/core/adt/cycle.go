@@ -642,7 +642,7 @@ const (
 	IsCyclic
 )
 
-func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (_ CloseInfo, skip bool) {
+func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (_ CloseInfo, skip bool) {
 	n.assertInitialized()
 
 	// If we are pointing to a direct ancestor, and we are in an optional arc,
@@ -650,8 +650,8 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 	// is okay. If we are pointing to a direct ancestor in a non-optional arc,
 	// we also can terminate, as this is a structural cycle.
 	// TODO: use depth or check direct ancestry.
-	if n.hasAncestorV3(arc) {
-		return n.markCyclicV3(arc, env, x, ci)
+	if n.hasAncestor(arc) {
+		return n.markCyclic(arc, env, x, ci)
 	}
 
 	// As long as a node-wide cycle has not yet been detected, we allow cycles
@@ -691,10 +691,10 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 				return ci, false
 			}
 
-			return n.markCyclicPathV3(arc, env, x, ci)
+			return n.markCyclicPath(arc, env, x, ci)
 		}
 		if equalDeref(r.Node, n.node) && r.Ref == x && arc.nonRooted {
-			return n.markCyclicPathV3(arc, env, x, ci)
+			return n.markCyclicPath(arc, env, x, ci)
 		}
 	}
 
@@ -717,9 +717,9 @@ func (n *nodeContext) markNonCyclic(id CloseInfo) {
 	}
 }
 
-// markCyclicV3 marks a conjunct as being cyclic. Also, it postpones processing
+// markCyclic marks a conjunct as being cyclic. Also, it postpones processing
 // the conjunct in the absence of evidence of a non-cyclic conjunct.
-func (n *nodeContext) markCyclicV3(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (CloseInfo, bool) {
+func (n *nodeContext) markCyclic(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (CloseInfo, bool) {
 	ci.CycleType = IsCyclic
 	ci.IsCyclic = true
 
@@ -736,7 +736,7 @@ func (n *nodeContext) markCyclicV3(arc *Vertex, env *Environment, x Resolver, ci
 	return ci, false
 }
 
-func (n *nodeContext) markCyclicPathV3(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (CloseInfo, bool) {
+func (n *nodeContext) markCyclicPath(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (CloseInfo, bool) {
 	ci.CycleType = IsCyclic
 	ci.IsCyclic = true
 
@@ -777,9 +777,9 @@ func (c *OpContext) hasDepthCycle(v *Vertex) bool {
 	return false
 }
 
-// hasAncestorV3 checks whether a node is currently being processed. The code
+// hasAncestor checks whether a node is currently being processed. The code
 // still assumes that is includes any node that is currently being processed.
-func (n *nodeContext) hasAncestorV3(arc *Vertex) bool {
+func (n *nodeContext) hasAncestor(arc *Vertex) bool {
 	if n.ctx.hasDepthCycle(arc) {
 		return true
 	}
@@ -805,19 +805,19 @@ func (n *nodeContext) hasOnlyCyclicConjuncts() bool {
 		(n.hasAnyCyclicConjunct && !n.hasNonCyclic)
 }
 
-// setOptionalV3 marks a conjunct as being optional. The nodeContext is
+// setOptional marks a conjunct as being optional. The nodeContext is
 // currently unused, but allows for checks to be added and to add logging during
 // debugging.
-func (c *CloseInfo) setOptionalV3(n *nodeContext) {
+func (c *CloseInfo) setOptional(n *nodeContext) {
 	_ = n // See comment.
 	if c.CycleType == NoCycle {
 		c.CycleType = IsOptional
 	}
 }
 
-// updateCyclicStatusV3 looks for proof of non-cyclic conjuncts to override
+// updateCyclicStatus looks for proof of non-cyclic conjuncts to override
 // a structural cycle.
-func (n *nodeContext) updateCyclicStatusV3(c CloseInfo) {
+func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
 	n.hasFieldValue = true
 	if !c.IsCyclic {
 		n.hasNonCycle = true
@@ -833,7 +833,7 @@ func (n *nodeContext) updateCyclicStatusV3(c CloseInfo) {
 	}
 }
 
-func assertStructuralCycleV3(n *nodeContext) bool {
+func assertStructuralCycle(n *nodeContext) bool {
 	n.cyclicConjuncts = n.cyclicConjuncts[:0]
 
 	if n.hasOnlyCyclicConjuncts() {

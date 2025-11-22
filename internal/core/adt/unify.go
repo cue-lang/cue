@@ -321,7 +321,7 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 
 	case needs&subFieldsProcessed != 0:
 		switch {
-		case assertStructuralCycleV3(n):
+		case assertStructuralCycle(n):
 
 		case n.node.status == finalized:
 			// There is no need to recursively process if the node is already
@@ -417,7 +417,7 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 
 		// TODO: find a more principled way to catch this cycle and avoid this
 		// check.
-		if n.hasAncestorV3(w) {
+		if n.hasAncestor(w) {
 			n.reportCycleError()
 			return true
 		}

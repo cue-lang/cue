@@ -112,7 +112,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		n.unshare()
 
 		// At this point we known we have at least an empty list.
-		n.updateCyclicStatusV3(id)
+		n.updateCyclicStatus(id)
 
 		env := &Environment{
 			Up:     env,
@@ -124,7 +124,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 	case *DisjunctionExpr:
 		n.unshare()
 		id := id
-		id.setOptionalV3(n)
+		id.setOptional(n)
 
 		n.ctx.holeID++
 		// Reuse disjunctBuffer to avoid allocating a new slice for each disjunction.
@@ -181,7 +181,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 func (n *nodeContext) scheduleStruct(env *Environment,
 	s *StructLit,
 	ci CloseInfo) {
-	n.updateCyclicStatusV3(ci)
+	n.updateCyclicStatus(ci)
 	n.updateConjunctInfo(StructKind, ci, cHasStruct)
 
 	// NOTE: This is a crucial point in the code:
@@ -236,7 +236,7 @@ loop1:
 			}
 			ci := n.ctx.subField(ci)
 			if x.ArcType == ArcOptional {
-				ci.setOptionalV3(n)
+				ci.setOptional(n)
 			}
 
 			fc := MakeConjunct(childEnv, x, ci)
@@ -266,7 +266,7 @@ loop1:
 
 		case *BulkOptionalField:
 			ci := n.ctx.subField(ci)
-			ci.setOptionalV3(n)
+			ci.setOptional(n)
 
 			// All do not depend on each other, so can be added at once.
 			n.scheduleTask(handlePatternConstraint, childEnv, x, ci)
@@ -474,7 +474,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		}
 
 		if !x.IsData() {
-			n.updateCyclicStatusV3(id)
+			n.updateCyclicStatus(id)
 
 			c := MakeConjunct(env, x, id)
 			n.scheduleVertexConjuncts(c, x, id)
@@ -487,7 +487,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			panic(fmt.Sprintf("invalid type %T", x.BaseValue))
 
 		case *ListMarker:
-			n.updateCyclicStatusV3(id)
+			n.updateCyclicStatus(id)
 
 			// TODO: arguably we know now that the type _must_ be a list.
 			n.scheduleTask(handleListVertex, env, x, id)
@@ -533,11 +533,11 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 	switch x := v.(type) {
 	case *Disjunction:
-		n.updateCyclicStatusV3(id)
+		n.updateCyclicStatus(id)
 		n.unshare()
 
 		id := id
-		id.setOptionalV3(n)
+		id.setOptional(n)
 
 		n.ctx.holeID++
 		// Reuse disjunctBuffer to avoid allocating a new slice for each disjunction.
@@ -566,21 +566,21 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		}
 
 	case *Top:
-		n.updateCyclicStatusV3(id)
+		n.updateCyclicStatus(id)
 
 		n.hasTop = true
 		n.updateConjunctInfo(TopKind, id, cHasTop)
 
 	case *BasicType:
 		n.unshare()
-		n.updateCyclicStatusV3(id)
+		n.updateCyclicStatus(id)
 		if x.K != TopKind {
 			n.updateConjunctInfo(TopKind, id, cHasTop)
 		}
 
 	case *BoundValue:
 		n.unshare()
-		n.updateCyclicStatusV3(id)
+		n.updateCyclicStatus(id)
 
 		switch x.Op {
 		case LessThanOp, LessEqualOp, GreaterThanOp, GreaterEqualOp:
@@ -687,7 +687,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			id.Priority = p
 		}
 
-		n.updateCyclicStatusV3(id)
+		n.updateCyclicStatus(id)
 
 		if y := n.scalar; y != nil {
 			p1 := n.scalarID.Priority

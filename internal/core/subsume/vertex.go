@@ -28,11 +28,6 @@ import (
 //
 // TODO(perf): use merge sort where possible.
 func (s *subsumer) vertices(x, y *adt.Vertex) bool {
-	return s.verticesDev(x, y)
-}
-
-// verticesDev replaces vertices with the implementation of the new evaluator.
-func (s *subsumer) verticesDev(x, y *adt.Vertex) bool {
 	if x == y {
 		return true
 	}

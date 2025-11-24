@@ -37,16 +37,16 @@ type Foo struct {
 package pkg1
 
 #Foo: {
-	required:          string        @go(Required)
-	pointer?:          null | string @go(Pointer,*string)
-	omitEmptyPointer?: null | string @go(OmitEmptyPointer,*string)
+	required:          string @go(Required)
+	pointer?:          string @go(Pointer,*string)
+	omitEmptyPointer?: string @go(OmitEmptyPointer,*string)
 
 	// +optional
 	optionalComment?: string @go(OptionalComment)
 
 	// +optional
-	optionalCommentPointer?: null | string @go(OptionalCommentPointer,*string)
+	optionalCommentPointer?: string @go(OptionalCommentPointer,*string)
 
 	// +nullable
-	nullableCommentPointer?: null | string @go(NullableCommentPointer,*string)
+	nullableCommentPointer: null | string @go(NullableCommentPointer,*string)
 }

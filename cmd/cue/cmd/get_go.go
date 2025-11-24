@@ -254,10 +254,11 @@ type extractor struct {
 	done    map[string]bool
 
 	// per package
-	pkg      *packages.Package
-	orig     map[types.Type]*ast.StructType
-	usedPkgs map[string]bool
-	consts   map[string][]string
+	pkg         *packages.Package
+	orig        map[types.Type]*ast.StructType
+	usedPkgs    map[string]bool
+	consts      map[string][]string
+	k8sSemantic bool
 
 	// per file
 	cmap     ast.CommentMap
@@ -446,7 +447,18 @@ func (e *extractor) recordTypeInfo(p *packages.Package) {
 
 func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	e.pkg = p
-	e.logf("--- Package %s", p.PkgPath)
+	e.k8sSemantic = false
+
+outer:
+	for _, f := range p.Syntax {
+		for _, c := range f.Comments {
+			if strings.Contains(c.Text(), "+k8s:openapi-gen=true") {
+				e.k8sSemantic = true
+				break outer
+			}
+		}
+	}
+	e.logf("--- Package %s - Kubernetes semantics: %t", p.PkgPath, e.k8sSemantic)
 
 	e.recordTypeInfo(p)
 
@@ -857,7 +869,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 					if basic, ok := typ.(*types.Basic); ok && basic.Info()&types.IsUntyped != 0 {
 						break // untyped basic types do not make valid identifiers
 					}
-					cv = cueast.NewBinExpr(cuetoken.AND, e.makeType(typ), cv)
+					cv = cueast.NewBinExpr(cuetoken.AND, e.makeType(typ, regular), cv)
 				}
 
 				f.Value = cv
@@ -1047,7 +1059,7 @@ const (
 )
 
 func (e *extractor) makeField(name string, kind fieldKind, expr types.Type, doc *ast.CommentGroup, newline bool) (f *cueast.Field, typename string) {
-	typ := e.makeType(expr)
+	typ := e.makeType(expr, kind)
 	var label cueast.Label
 	if kind == definition {
 		label = e.ident(name, true)
@@ -1075,7 +1087,7 @@ func (e *extractor) makeField(name string, kind fieldKind, expr types.Type, doc 
 	return f, string(b)
 }
 
-func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
+func (e *extractor) makeType(typ types.Type, kind fieldKind) (result cueast.Expr) {
 	switch typ := types.Unalias(typ).(type) {
 	case *types.Named:
 		obj := typ.Obj()
@@ -1209,10 +1221,14 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 
 		return result
 	case *types.Pointer:
+		// In K8s, a field is only nullable if explicitly marked as such.
+		if e.k8sSemantic && kind == optional {
+			return e.makeType(typ.Elem(), kind)
+		}
 		return &cueast.BinaryExpr{
 			X:  cueast.NewNull(),
 			Op: cuetoken.OR,
-			Y:  e.makeType(typ.Elem()),
+			Y:  e.makeType(typ.Elem(), kind),
 		}
 
 	case *types.Struct:
@@ -1231,7 +1247,7 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 		if typ.Elem() == typeByte {
 			return e.ident("bytes", false)
 		}
-		return cueast.NewList(&cueast.Ellipsis{Type: e.makeType(typ.Elem())})
+		return cueast.NewList(&cueast.Ellipsis{Type: e.makeType(typ.Elem(), kind)})
 
 	case *types.Array:
 		if typ.Elem() == typeByte {
@@ -1248,7 +1264,7 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 					Value: strconv.Itoa(int(typ.Len())),
 				},
 				Op: cuetoken.MUL,
-				Y:  cueast.NewList(e.makeType(typ.Elem())),
+				Y:  cueast.NewList(e.makeType(typ.Elem(), kind)),
 			}
 		}
 
@@ -1259,7 +1275,7 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 
 		f := &cueast.Field{
 			Label: cueast.NewList(e.ident("string", false)),
-			Value: e.makeType(typ.Elem()),
+			Value: e.makeType(typ.Elem(), kind),
 		}
 		cueast.SetRelPos(f, cuetoken.Blank)
 		return &cueast.StructLit{
@@ -1282,7 +1298,7 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 	case *types.Union:
 		var exprs []cueast.Expr
 		for term := range typ.Terms() {
-			exprs = append(exprs, e.makeType(term.Type()))
+			exprs = append(exprs, e.makeType(term.Type(), kind))
 		}
 		return cueast.NewBinExpr(cuetoken.OR, exprs...)
 
@@ -1305,12 +1321,12 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 		//
 		var exprs []cueast.Expr
 		for etyp := range typ.EmbeddedTypes() {
-			exprs = append(exprs, e.makeType(etyp))
+			exprs = append(exprs, e.makeType(etyp, kind))
 		}
 		return cueast.NewBinExpr(cuetoken.OR, exprs...)
 
 	case *types.TypeParam:
-		return e.makeType(typ.Constraint())
+		return e.makeType(typ.Constraint(), kind)
 
 	default:
 		// record error
@@ -1360,7 +1376,7 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 			}
 			switch typ := types.Unalias(typ).(type) {
 			case *types.Named:
-				embed := &cueast.EmbedDecl{Expr: e.makeType(typ)}
+				embed := &cueast.EmbedDecl{Expr: e.makeType(typ, regular)}
 				if i > 0 {
 					cueast.SetRelPos(embed, cuetoken.NewSection)
 				}
@@ -1381,10 +1397,7 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		doc := docs[i]
 
 		// TODO: check referrers
-		kind := regular
-		if e.isOptional(f, doc, tag) {
-			kind = optional
-		}
+		kind := e.detectFieldKind(f, doc, tag)
 		field, cueType := e.makeField(name, kind, f.Type(), doc, count > 0)
 		add(field)
 
@@ -1480,24 +1493,36 @@ func (e *extractor) isInline(tag string) bool {
 		hasFlag(tag, "yaml", "inline", 1)
 }
 
-func (e *extractor) isOptional(f *types.Var, doc *ast.CommentGroup, tag string) bool {
-	if _, ok := f.Type().(*types.Pointer); ok {
-		return true
-	}
-
+func (e *extractor) detectFieldKind(f *types.Var, doc *ast.CommentGroup, tag string) fieldKind {
+	// From k8s docs (https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md):
+	// - a map field marked with `+nullable` would accept either `foo: null` or `foo: {}`.
+	// - Using the `+optional` or the `omitempty` tag means that the field is optional.
+	//   Note that for backward compatibility, any field that has the `omitempty` struct
+	//   tag, and is not explicitly marked as `+required`, will be considered to be optional.
 	for line := range strings.SplitSeq(doc.Text(), "\n") {
 		before, _, _ := strings.Cut(strings.TrimSpace(line), "=")
-		if before == "+optional" {
-			return true
+		switch before {
+		case "+nullable":
+			return regular
+		case "+optional":
+			return optional
 		}
+	}
+
+	if _, ok := f.Type().(*types.Pointer); ok {
+		return optional
 	}
 
 	// Go 1.24 added the "omitzero" option to encoding/json, an improvement over "omitempty".
 	// Note that, as of mid 2025, YAML libraries don't seem to have picked up "omitzero" yet.
 	// TODO: also when the type is a list or other kind of pointer.
-	return hasFlag(tag, "json", "omitempty", 1) ||
+	if hasFlag(tag, "json", "omitempty", 1) ||
 		hasFlag(tag, "json", "omitzero", 1) ||
-		hasFlag(tag, "yaml", "omitempty", 1)
+		hasFlag(tag, "yaml", "omitempty", 1) {
+		return optional
+	}
+
+	return regular
 }
 
 func hasFlag(tag, key, flag string, offset int) bool {

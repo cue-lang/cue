@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f9e7a70_5b158e01",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1065,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-11-24T09:07:36Z",
+      "side": 1,
+      "message": "I feel like `filter` is the wrong word now - filter is absolutely a word that to my head implies most like a pure/referentially-transparent list-in, (shorter) list-out function. I feel like `markIgnored` or something might be more appropriate here.",
+      "revId": "4626f36635f6fa46bb28e21a920d9b90be0749d9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

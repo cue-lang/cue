@@ -81,9 +81,9 @@ type Package struct {
 	// isDirty means that the package needs reloading.
 	isDirty bool
 
-	// definitions for the files in this package. This is updated
+	// eval for the files in this package. This is updated
 	// whenever the package status transitions to splendid.
-	definitions *eval.Definitions
+	eval *eval.Evaluator
 }
 
 // newPackage creates a new [Package] and adds it to the module.
@@ -164,8 +164,8 @@ func (pkg *Package) markDirty() {
 }
 
 func (pkg *Package) resetDefinitions() {
-	if pkg.definitions != nil {
-		pkg.definitions.Reset()
+	if pkg.eval != nil {
+		pkg.eval.Reset()
 	}
 }
 
@@ -267,31 +267,30 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		}
 	}
 
-	forPackage := func(importPath ast.ImportPath) *eval.Definitions {
+	forPackage := func(importPath ast.ImportPath) *eval.Evaluator {
 		for _, importedPkg := range pkg.imports {
 			if importedPkg.importPath != importPath {
 				continue
 			}
-			return importedPkg.definitions
+			return importedPkg.eval
 		}
 		return nil
 	}
 
-	pkgImporters := func() []*eval.Definitions {
+	pkgImporters := func() []*eval.Evaluator {
 		if len(pkg.importedBy) == 0 {
 			return nil
 		}
-		dfns := make([]*eval.Definitions, len(pkg.importedBy))
+		evals := make([]*eval.Evaluator, len(pkg.importedBy))
 		for i, pkg := range pkg.importedBy {
-			dfns[i] = pkg.definitions
+			evals[i] = pkg.eval
 		}
-		return dfns
+		return evals
 	}
 
-	// eval.Analyse does almost no work - calculation of
-	// resolutions is done lazily. So no need to launch go-routines
-	// here.
-	pkg.definitions = eval.Analyse(pkg.importPath, importCanonicalisation, forPackage, pkgImporters, astFiles...)
+	// eval.New does almost no work - calculation of resolutions is
+	// done lazily. So no need to launch go-routines here.
+	pkg.eval = eval.New(pkg.importPath, importCanonicalisation, forPackage, pkgImporters, astFiles...)
 
 	return nil
 }

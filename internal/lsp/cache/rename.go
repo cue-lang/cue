@@ -19,23 +19,18 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/lsp/definitions"
+	"cuelang.org/go/internal/lsp/eval"
 )
 
 // Rename implements the LSP Rename functionality.
-func (w *Workspace) Rename(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, params *protocol.RenameParams) *protocol.WorkspaceEdit {
-	var targets []ast.Node
-	for offset, err := range adjustedPositionsIter(params.Position, srcMapper) {
-		if err != nil {
-			w.debugLog(err.Error())
-			continue
-		}
-
-		targets = fdfns.UsagesForOffset(offset, true)
-		if len(targets) > 0 {
-			break
-		}
+func (w *Workspace) Rename(tokFile *token.File, fdfns *eval.FileEvaluator, srcMapper *protocol.Mapper, params *protocol.RenameParams) *protocol.WorkspaceEdit {
+	offset, err := srcMapper.PositionOffset(params.Position)
+	if err != nil {
+		w.debugLog(err.Error())
+		return nil
 	}
+
+	targets := fdfns.UsagesForOffset(offset, true)
 
 	type versionedEdits struct {
 		edits   []protocol.TextEdit
@@ -88,19 +83,14 @@ func (w *Workspace) Rename(tokFile *token.File, fdfns *definitions.FileDefinitio
 }
 
 // Rename implements the LSP PrepareRename functionality.
-func (w *Workspace) PrepareRename(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.PrepareRenamePlaceholder {
-	var targets []ast.Node
-	for offset, err := range adjustedPositionsIter(pos, srcMapper) {
-		if err != nil {
-			w.debugLog(err.Error())
-			continue
-		}
-
-		targets = fdfns.UsagesForOffset(offset, true)
-		if len(targets) > 0 {
-			break
-		}
+func (w *Workspace) PrepareRename(tokFile *token.File, fdfns *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.PrepareRenamePlaceholder {
+	offset, err := srcMapper.PositionOffset(pos)
+	if err != nil {
+		w.debugLog(err.Error())
+		return nil
 	}
+
+	targets := fdfns.UsagesForOffset(offset, true)
 
 	// The client (editor) has provided us with a single position
 	// within a file, but it wants back a range so that it can fully

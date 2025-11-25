@@ -3265,6 +3265,52 @@ i: self: x: y: z: self
 				ln(2, 2, "self"): {f: []string{"x"}, e: []string{"i", "self", "x", "y", "z"}},
 			},
 		},
+
+		{
+			name: "Deep",
+			archive: `-- a.cue --
+a: b: c: d: e: f: f
+a: b: c: d: e: f: f
+`,
+			expectDefinitions: map[position][]position{
+				ln(1, 2, "f"): {ln(1, 1, "f"), ln(2, 1, "f")},
+				ln(2, 2, "f"): {ln(2, 1, "f"), ln(1, 1, "f")},
+
+				ln(1, 1, "a"): {self, ln(2, 1, "a")},
+				ln(2, 1, "a"): {self, ln(1, 1, "a")},
+
+				ln(1, 1, "b"): {self, ln(2, 1, "b")},
+				ln(2, 1, "b"): {self, ln(1, 1, "b")},
+
+				ln(1, 1, "c"): {self, ln(2, 1, "c")},
+				ln(2, 1, "c"): {self, ln(1, 1, "c")},
+
+				ln(1, 1, "d"): {self, ln(2, 1, "d")},
+				ln(2, 1, "d"): {self, ln(1, 1, "d")},
+
+				ln(1, 1, "e"): {self, ln(2, 1, "e")},
+				ln(2, 1, "e"): {self, ln(1, 1, "e")},
+
+				ln(1, 1, "f"): {self, ln(2, 1, "f")},
+				ln(2, 1, "f"): {self, ln(1, 1, "f")},
+			},
+			expectCompletions: map[position]fieldEmbedCompletions{
+				ln(1, 1, "a"): {f: []string{"a"}},
+				ln(1, 1, "b"): {f: []string{"b"}},
+				ln(1, 1, "c"): {f: []string{"c"}},
+				ln(1, 1, "d"): {f: []string{"d"}},
+				ln(1, 1, "e"): {f: []string{"e"}},
+				ln(1, 1, "f"): {f: []string{"f"}},
+				ln(1, 2, "f"): {e: []string{"a", "b", "c", "d", "e", "f"}},
+				ln(2, 1, "a"): {f: []string{"a"}},
+				ln(2, 1, "b"): {f: []string{"b"}},
+				ln(2, 1, "c"): {f: []string{"c"}},
+				ln(2, 1, "d"): {f: []string{"d"}},
+				ln(2, 1, "e"): {f: []string{"e"}},
+				ln(2, 1, "f"): {f: []string{"f"}},
+				ln(2, 2, "f"): {e: []string{"a", "b", "c", "d", "e", "f"}},
+			},
+		},
 	}.run(t)
 }
 

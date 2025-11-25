@@ -42,6 +42,12 @@ import (
 
 // A Node represents any node in the abstract syntax tree.
 type Node interface {
+	// We should have invariants:
+	// 1. Pos() <= End()
+	// 2. If a node has children nodes, then all of those children
+	//   nodes should fall within their parent's Pos() -> End() range.
+	// TODO: add tests to enforce these.
+
 	Pos() token.Pos // position of first character belonging to the node
 	End() token.Pos // position of first character immediately after the node
 
@@ -849,7 +855,7 @@ func (x *Ident) End() token.Pos {
 }
 func (x *BasicLit) End() token.Pos { return x.ValuePos.Add(len(x.Value)) }
 
-func (x *Interpolation) End() token.Pos { return x.Elts[len(x.Elts)-1].Pos() }
+func (x *Interpolation) End() token.Pos { return x.Elts[len(x.Elts)-1].End() }
 func (x *Func) End() token.Pos          { return x.Ret.End() }
 func (x *StructLit) End() token.Pos {
 	if x.Rbrace == token.NoPos && len(x.Elts) > 0 {

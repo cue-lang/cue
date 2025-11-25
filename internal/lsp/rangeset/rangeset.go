@@ -95,6 +95,9 @@ func (rs *RangeSet) Add(start, end int) {
 // Contains reports if an offset is within any of the ranges in the
 // set.
 func (rs *RangeSet) Contains(offset int) bool {
+	if rs == nil {
+		return false
+	}
 	// Use sort.Search to find the index of the first range that
 	// *could* contain the offset. This would be the first range whose
 	// end is > offset.

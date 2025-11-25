@@ -26,13 +26,14 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/eval"
 	"cuelang.org/go/internal/lsp/rangeset"
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 )
 
-func TestDefinitions(t *testing.T) {
+func TestEval(t *testing.T) {
 	testCases{
 		{
 			name: "Selector_Implicit_ViaRoot",
@@ -52,17 +53,25 @@ a: b: 6
 				ln(3, 1, "a"): {self, ln(2, 1, "a")},
 				ln(3, 1, "b"): {self, ln(2, 1, "b")},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):  {f: []string{"a", "x"}},
-				ln(1, 1, "y"):  {f: []string{"y"}},
-				ln(1, 1, "a"):  {e: []string{"a", "x", "y"}},
-				ln(1, 1, ".b"): {e: []string{"b"}},
-				ln(2, 1, "a"):  {f: []string{"a", "x"}},
-				ln(2, 1, "b"):  {f: []string{"b"}},
-				ln(3, 1, "a"):  {f: []string{"a", "x"}},
-				ln(3, 1, "b"):  {f: []string{"b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "x"}},
+				or1(2):     {f: []string{"y"}, e: []string{"a", "x"}},
+				or(3, 5):   {f: []string{"y"}},
+				or(5, 8):   {e: []string{"a", "x", "y"}},
+				or(8, 10):  {e: []string{"b"}},
+				or(10, 12): {f: []string{"a", "x"}},
+				or1(12):    {f: []string{"b"}, e: []string{"a", "x"}},
+				or(13, 15): {f: []string{"b"}},
+				or1(15):    {e: []string{"a", "b", "x"}},
+				or1(17):    {e: []string{"a", "b", "x"}},
+				or(18, 20): {f: []string{"a", "x"}},
+				or1(20):    {f: []string{"b"}, e: []string{"a", "x"}},
+				or(21, 23): {f: []string{"b"}},
+				or1(23):    {e: []string{"a", "b", "x"}},
+				or1(25):    {e: []string{"a", "b", "x"}},
 			},
 		},
+
 		{
 			name: "Selector_Implicit_ViaNonRoot",
 			archive: `-- a.cue --
@@ -86,19 +95,31 @@ w: a: b: 6
 				ln(5, 1, "b"): {self, ln(3, 1, "b")},
 				ln(5, 1, "w"): {self, ln(1, 1, "w")},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "w"):  {f: []string{"w"}},
-				ln(2, 1, "x"):  {f: []string{"a", "x"}},
-				ln(2, 1, "y"):  {f: []string{"y"}},
-				ln(2, 1, "a"):  {e: []string{"a", "w", "x", "y"}},
-				ln(2, 1, ".b"): {e: []string{"b"}},
-				ln(3, 1, "a"):  {f: []string{"a", "x"}},
-				ln(3, 1, "b"):  {f: []string{"b"}},
-				ln(5, 1, "w"):  {f: []string{"w"}},
-				ln(5, 1, "a"):  {f: []string{"a", "x"}},
-				ln(5, 1, "b"):  {f: []string{"b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"w"}},
+				or(2, 6):   {f: []string{"a", "x"}, e: []string{"w"}},
+				or(6, 8):   {f: []string{"a", "x"}},
+				or1(8):     {f: []string{"y"}, e: []string{"a", "w", "x"}},
+				or(9, 11):  {f: []string{"y"}},
+				or(11, 14): {e: []string{"a", "w", "x", "y"}},
+				or(14, 16): {e: []string{"b"}},
+				or1(16):    {f: []string{"a", "x"}, e: []string{"w"}},
+				or(17, 19): {f: []string{"a", "x"}},
+				or1(19):    {f: []string{"b"}, e: []string{"a", "w", "x"}},
+				or(20, 22): {f: []string{"b"}},
+				or1(22):    {e: []string{"a", "b", "w", "x"}},
+				or1(24):    {e: []string{"a", "b", "w", "x"}},
+				or1(25):    {f: []string{"a", "x"}, e: []string{"w"}},
+				or(27, 29): {f: []string{"w"}},
+				or1(29):    {f: []string{"a", "x"}, e: []string{"w"}},
+				or(30, 32): {f: []string{"a", "x"}},
+				or1(32):    {f: []string{"b"}, e: []string{"a", "w"}},
+				or(33, 35): {f: []string{"b"}},
+				or1(35):    {e: []string{"a", "b", "w"}},
+				or1(37):    {e: []string{"a", "b", "w"}},
 			},
 		},
+
 		{
 			name: "Pointer_Chasing_Implicit",
 			archive: `-- a.cue --
@@ -128,22 +149,28 @@ out2: z.f
 				ln(6, 1, "out1"): {self},
 				ln(7, 1, "out2"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x1"):   {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(1, 1, "f"):    {f: []string{"f"}},
-				ln(2, 1, "x2"):   {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(2, 1, "f"):    {f: []string{"f"}},
-				ln(3, 1, "y"):    {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(3, 1, "x1"):   {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(4, 1, "y"):    {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(4, 1, "x2"):   {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(5, 1, "z"):    {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(5, 1, "y"):    {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(6, 1, "out1"): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(6, 1, "z"):    {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(7, 1, "out2"): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(7, 1, "z"):    {e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(7, 1, ".f"):   {e: []string{"f"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 3):   {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or1(3):     {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(4, 6):   {f: []string{"f"}},
+				or1(6):     {e: []string{"f", "out1", "out2", "x1", "x2", "y", "z"}},
+				or1(8):     {e: []string{"f", "out1", "out2", "x1", "x2", "y", "z"}},
+				or(9, 12):  {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or1(12):    {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(13, 15): {f: []string{"f"}},
+				or1(15):    {e: []string{"f", "out1", "out2", "x1", "x2", "y", "z"}},
+				or1(17):    {e: []string{"f", "out1", "out2", "x1", "x2", "y", "z"}},
+				or(18, 20): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(20, 24): {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(24, 26): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(26, 30): {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(30, 32): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(32, 35): {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(35, 40): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(40, 43): {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(43, 48): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(48, 51): {e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(51, 53): {e: []string{"f"}},
 			},
 		},
 
@@ -174,21 +201,28 @@ out2: z.f
 				ln(5, 1, "out1"): {self},
 				ln(6, 1, "out2"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x1"):   {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(1, 1, "f"):    {f: []string{"f"}},
-				ln(2, 1, "x2"):   {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(2, 1, "f"):    {f: []string{"f"}},
-				ln(3, 1, "y"):    {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(3, 1, "x1"):   {e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(3, 1, "x2"):   {e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(4, 1, "z"):    {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(4, 1, "y"):    {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(5, 1, "out1"): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(5, 1, "z"):    {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(6, 1, "out2"): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(6, 1, "z"):    {e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
-				ln(6, 1, ".f"):   {e: []string{"f"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 3):   {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or1(3):     {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(4, 6):   {f: []string{"f"}},
+				or1(6):     {e: []string{"f", "out1", "out2", "x1", "x2", "y", "z"}},
+				or1(8):     {e: []string{"f", "out1", "out2", "x1", "x2", "y", "z"}},
+				or(9, 12):  {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or1(12):    {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(13, 15): {f: []string{"f"}},
+				or1(15):    {e: []string{"f", "out1", "out2", "x1", "x2", "y", "z"}},
+				or1(17):    {e: []string{"f", "out1", "out2", "x1", "x2", "y", "z"}},
+				or(18, 20): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(20, 24): {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(24, 26): {e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(26, 29): {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(29, 31): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(31, 34): {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(34, 39): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(39, 42): {f: []string{"f"}, e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(42, 47): {f: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(47, 50): {e: []string{"out1", "out2", "x1", "x2", "y", "z"}},
+				or(50, 52): {e: []string{"f"}},
 			},
 		},
 
@@ -224,21 +258,26 @@ y: a.b
 				ln(5, 1, "a"): {self},
 				ln(7, 1, "y"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):   {f: []string{"a", "c", "d", "x", "y"}},
-				ln(1, 1, "a"):   {e: []string{"a", "c", "d", "x", "y"}},
-				ln(1, 1, ".b"):  {e: []string{"b"}},
-				ln(3, 1, "c"):   {f: []string{"a", "c", "d", "x", "y"}},
-				ln(3, 1, "b"):   {f: []string{"b"}},
-				ln(4, 1, "d"):   {f: []string{"a", "c", "d", "x", "y"}},
-				ln(4, 1, "b"):   {f: []string{"b"}},
-				ln(4, 1, "int"): {e: []string{"a", "b", "c", "d", "x", "y"}},
-				ln(5, 1, "a"):   {f: []string{"a", "c", "d", "x", "y"}},
-				ln(5, 1, "c"):   {e: []string{"a", "c", "d", "x", "y"}},
-				ln(5, 1, "d"):   {e: []string{"a", "c", "d", "x", "y"}},
-				ln(7, 1, "y"):   {f: []string{"a", "c", "d", "x", "y"}},
-				ln(7, 1, "a"):   {e: []string{"a", "c", "d", "x", "y"}},
-				ln(7, 1, ".b"):  {e: []string{"b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "c", "d", "x", "y"}},
+				or(2, 5):   {e: []string{"a", "c", "d", "x", "y"}},
+				or(5, 7):   {e: []string{"b"}},
+				or(7, 10):  {f: []string{"a", "c", "d", "x", "y"}},
+				or1(10):    {f: []string{"b"}, e: []string{"a", "c", "d", "x", "y"}},
+				or(11, 13): {f: []string{"b"}},
+				or1(13):    {e: []string{"a", "b", "c", "d", "x", "y"}},
+				or1(15):    {e: []string{"a", "b", "c", "d", "x", "y"}},
+				or(16, 18): {f: []string{"a", "c", "d", "x", "y"}},
+				or1(18):    {f: []string{"b"}, e: []string{"a", "c", "d", "x", "y"}},
+				or(19, 21): {f: []string{"b"}},
+				or(21, 26): {e: []string{"a", "b", "c", "d", "x", "y"}},
+				or(26, 28): {f: []string{"a", "c", "d", "x", "y"}},
+				or(28, 31): {f: []string{"b"}, e: []string{"a", "c", "d", "x", "y"}},
+				or(31, 33): {e: []string{"a", "c", "d", "x", "y"}},
+				or(33, 35): {f: []string{"b"}, e: []string{"a", "c", "d", "x", "y"}},
+				or(35, 38): {f: []string{"a", "c", "d", "x", "y"}},
+				or(38, 41): {e: []string{"a", "c", "d", "x", "y"}},
+				or(41, 43): {e: []string{"b"}},
 			},
 		},
 
@@ -262,15 +301,21 @@ z: x & {
 				ln(3, 1, "y"): {self, ln(1, 1, "y")},
 				ln(4, 1, "w"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):   {f: []string{"x", "z"}},
-				ln(1, 1, "y"):   {f: []string{"y"}},
-				ln(1, 1, "int"): {e: []string{"x", "y", "z"}},
-				ln(2, 1, "z"):   {f: []string{"x", "z"}},
-				ln(2, 1, "x"):   {e: []string{"x", "z"}},
-				ln(3, 1, "y"):   {f: []string{"w", "y"}},
-				ln(4, 1, "w"):   {f: []string{"w", "y"}},
-				ln(4, 1, "y"):   {e: []string{"w", "x", "y", "z"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x", "z"}},
+				or1(2):     {f: []string{"y"}, e: []string{"x", "z"}},
+				or(3, 5):   {f: []string{"y"}},
+				or(5, 10):  {e: []string{"x", "y", "z"}},
+				or(10, 12): {f: []string{"x", "z"}},
+				or(12, 15): {f: []string{"w", "y"}, e: []string{"x", "z"}},
+				or(15, 17): {e: []string{"x", "z"}},
+				or(17, 23): {f: []string{"w", "y"}, e: []string{"x", "z"}},
+				or1(23):    {e: []string{"w", "x", "y", "z"}},
+				or1(25):    {e: []string{"w", "x", "y", "z"}},
+				or(26, 30): {f: []string{"w", "y"}, e: []string{"x", "z"}},
+				or(30, 33): {e: []string{"w", "x", "y", "z"}},
+				or1(33):    {f: []string{"w", "y"}, e: []string{"x", "z"}},
+				or1(34):    {e: []string{"x", "z"}},
 			},
 		},
 
@@ -296,16 +341,67 @@ z: {
 				ln(4, 1, "y"): {self, ln(1, 1, "y")},
 				ln(5, 1, "w"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):   {f: []string{"x", "z"}},
-				ln(1, 1, "y"):   {f: []string{"y"}},
-				ln(1, 1, "int"): {e: []string{"x", "y", "z"}},
-				ln(2, 1, "z"):   {f: []string{"x", "z"}},
-				ln(2, 1, "x"):   {f: []string{"w", "y"}, e: []string{"x", "z"}},
-				ln(3, 1, "z"):   {f: []string{"x", "z"}},
-				ln(4, 1, "y"):   {f: []string{"w", "y"}},
-				ln(5, 1, "w"):   {f: []string{"w", "y"}},
-				ln(5, 1, "y"):   {e: []string{"w", "x", "y", "z"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x", "z"}},
+				or1(2):     {f: []string{"y"}, e: []string{"x", "z"}},
+				or(3, 5):   {f: []string{"y"}},
+				or(5, 10):  {e: []string{"x", "y", "z"}},
+				or(10, 12): {f: []string{"x", "z"}},
+				or(12, 15): {f: []string{"w", "y"}, e: []string{"x", "z"}},
+				or(15, 17): {f: []string{"x", "z"}},
+				or(17, 22): {f: []string{"w", "y"}, e: []string{"x", "z"}},
+				or(22, 24): {f: []string{"w", "y"}},
+				or1(24):    {e: []string{"w", "x", "y", "z"}},
+				or1(26):    {e: []string{"w", "x", "y", "z"}},
+				or(27, 29): {f: []string{"w", "y"}, e: []string{"x", "z"}},
+				or(29, 31): {f: []string{"w", "y"}},
+				or(31, 34): {e: []string{"w", "x", "y", "z"}},
+				or1(34):    {f: []string{"w", "y"}, e: []string{"x", "z"}},
+			},
+		},
+
+		{
+			name: "Inner_Reference_Implicit_Parent",
+			archive: `-- a.cue --
+a: b: c: int
+x: a
+x: b: {c: 3, d: c}
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "a"): {ln(1, 1, "a")},
+
+				ln(3, 2, "c"): {ln(3, 1, "c"), ln(1, 1, "c")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
+
+				ln(2, 1, "x"): {self, ln(3, 1, "x")},
+				ln(3, 1, "x"): {self, ln(2, 1, "x")},
+
+				ln(3, 1, "b"): {self, ln(1, 1, "b")},
+				ln(3, 1, "c"): {self, ln(1, 1, "c")},
+				ln(3, 1, "d"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "x"}},
+				or1(2):     {f: []string{"b"}, e: []string{"a", "x"}},
+				or(3, 5):   {f: []string{"b"}},
+				or1(5):     {f: []string{"c"}, e: []string{"a", "b", "x"}},
+				or(6, 8):   {f: []string{"c"}},
+				or(8, 13):  {e: []string{"a", "b", "c", "x"}},
+				or(13, 15): {f: []string{"a", "x"}},
+				or(15, 18): {f: []string{"b"}, e: []string{"a", "x"}},
+				or(18, 20): {f: []string{"a", "x"}},
+				or1(20):    {f: []string{"b"}, e: []string{"a", "x"}},
+				or(21, 23): {f: []string{"b"}},
+				or(23, 25): {f: []string{"c", "d"}, e: []string{"a", "b", "x"}},
+				or(25, 27): {f: []string{"c", "d"}},
+				or1(27):    {e: []string{"a", "b", "c", "d", "x"}},
+				or1(29):    {e: []string{"a", "b", "c", "d", "x"}},
+				or1(30):    {f: []string{"c", "d"}, e: []string{"a", "b", "x"}},
+				or(31, 33): {f: []string{"c", "d"}},
+				or(33, 36): {e: []string{"a", "b", "c", "d", "x"}},
 			},
 		},
 
@@ -329,17 +425,26 @@ q: o.z
 				ln(2, 1, "p"): {self},
 				ln(3, 1, "q"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):  {f: []string{"o", "q", "x"}},
-				ln(1, 1, "y"):  {f: []string{"y"}},
-				ln(1, 1, "z"):  {f: []string{"z"}},
-				ln(2, 1, "o"):  {f: []string{"o", "q", "x"}},
-				ln(2, 1, "p"):  {f: []string{"p", "z"}},
-				ln(2, 1, "x"):  {e: []string{"o", "p", "q", "x"}},
-				ln(2, 1, ".y"): {e: []string{"y"}},
-				ln(3, 1, "q"):  {f: []string{"o", "q", "x"}},
-				ln(3, 1, "o"):  {e: []string{"o", "q", "x"}},
-				ln(3, 1, ".z"): {e: []string{"p", "z"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"o", "q", "x"}},
+				or1(2):     {f: []string{"y"}, e: []string{"o", "q", "x"}},
+				or(3, 5):   {f: []string{"y"}},
+				or1(5):     {f: []string{"z"}, e: []string{"o", "q", "x", "y"}},
+				or(6, 8):   {f: []string{"z"}},
+				or1(8):     {e: []string{"o", "q", "x", "y", "z"}},
+				or1(10):    {e: []string{"o", "q", "x", "y", "z"}},
+				or(11, 13): {f: []string{"o", "q", "x"}},
+				or(13, 16): {f: []string{"p", "z"}, e: []string{"o", "q", "x"}},
+				or(16, 18): {f: []string{"p", "z"}},
+				or1(18):    {e: []string{"o", "p", "q", "x"}},
+				or1(20):    {e: []string{"o", "p", "q", "x"}},
+				or1(21):    {f: []string{"p", "z"}, e: []string{"o", "q", "x"}},
+				or(22, 24): {e: []string{"o", "q", "x"}},
+				or(24, 26): {e: []string{"y"}},
+				or1(26):    {f: []string{"p", "z"}, e: []string{"o", "q", "x"}},
+				or(28, 30): {f: []string{"o", "q", "x"}},
+				or(30, 33): {e: []string{"o", "q", "x"}},
+				or(33, 35): {e: []string{"p", "z"}},
 			},
 		},
 
@@ -364,17 +469,182 @@ q: o.z
 				ln(3, 1, "p"): {self},
 				ln(4, 1, "q"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(2, 1, "x"):  {f: []string{"o", "q", "x"}},
-				ln(2, 1, "y"):  {f: []string{"y"}},
-				ln(2, 1, "z"):  {f: []string{"z"}},
-				ln(3, 1, "o"):  {f: []string{"o", "q", "x"}},
-				ln(3, 1, "p"):  {f: []string{"p", "z"}},
-				ln(3, 1, "x"):  {e: []string{"o", "p", "q", "x"}},
-				ln(3, 1, ".y"): {e: []string{"y"}},
-				ln(4, 1, "q"):  {f: []string{"o", "q", "x"}},
-				ln(4, 1, "o"):  {e: []string{"o", "q", "x"}},
-				ln(4, 1, ".z"): {e: []string{"p", "z"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(25, 28): {f: []string{"o", "q", "x"}},
+				or1(28):    {f: []string{"y"}, e: []string{"o", "q", "x"}},
+				or(29, 31): {f: []string{"y"}},
+				or1(31):    {f: []string{"z"}, e: []string{"o", "q", "x", "y"}},
+				or(32, 34): {f: []string{"z"}},
+				or1(34):    {e: []string{"o", "q", "x", "y", "z"}},
+				or1(36):    {e: []string{"o", "q", "x", "y", "z"}},
+				or(37, 39): {f: []string{"o", "q", "x"}},
+				or(39, 42): {f: []string{"p", "z"}, e: []string{"o", "q", "x"}},
+				or(42, 44): {f: []string{"p", "z"}},
+				or1(44):    {e: []string{"o", "p", "q", "x"}},
+				or1(46):    {e: []string{"o", "p", "q", "x"}},
+				or1(47):    {f: []string{"p", "z"}, e: []string{"o", "q", "x"}},
+				or(48, 50): {e: []string{"o", "q", "x"}},
+				or(50, 52): {e: []string{"y"}},
+				or(52, 56): {f: []string{"p", "z"}, e: []string{"o", "q", "x"}},
+				or(57, 59): {f: []string{"o", "q", "x"}},
+				or(59, 62): {e: []string{"o", "q", "x"}},
+				or(62, 64): {e: []string{"p", "z"}},
+			},
+		},
+
+		{
+			name: "Embedded_Dependency_Simple",
+			archive: `-- a.cue --
+a: b: c: {
+	c.d
+	e
+}
+
+e: d: {x: 1}
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "c"): {ln(1, 1, "c")},
+				ln(2, 1, "d"): {ln(6, 1, "d")},
+				ln(3, 1, "e"): {ln(6, 1, "e")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
+
+				ln(6, 1, "e"): {self},
+				ln(6, 1, "d"): {self},
+				ln(6, 1, "x"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "e"}},
+				or1(2):     {f: []string{"b"}, e: []string{"a", "e"}},
+				or(3, 5):   {f: []string{"b"}},
+				or1(5):     {f: []string{"c"}, e: []string{"a", "b", "e"}},
+				or(6, 8):   {f: []string{"c"}},
+				or(8, 12):  {f: []string{"d", "x"}, e: []string{"a", "b", "c", "e"}},
+				or(12, 14): {e: []string{"a", "b", "c", "e"}},
+				or(14, 16): {e: []string{"d", "x"}},
+				or(16, 20): {f: []string{"d", "x"}, e: []string{"a", "b", "c", "e"}},
+				or(21, 24): {f: []string{"a", "e"}},
+				or1(24):    {f: []string{"d"}, e: []string{"a", "e"}},
+				or(25, 27): {f: []string{"d"}},
+				or(27, 29): {f: []string{"x"}, e: []string{"a", "d", "e"}},
+				or(29, 31): {f: []string{"x"}},
+				or1(31):    {e: []string{"a", "d", "e", "x"}},
+				or1(33):    {e: []string{"a", "d", "e", "x"}},
+			},
+		},
+
+		{
+			name: "Embedded_Dependency_Complex",
+			archive: `-- a.cue --
+a: b: c: {
+	e
+	c.d
+	f
+}
+
+e: d: {x: 1}
+f: d: {y: 1}
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "e"): {ln(7, 1, "e")},
+				ln(3, 1, "c"): {ln(1, 1, "c")},
+				ln(3, 1, "d"): {ln(7, 1, "d"), ln(8, 1, "d")},
+				ln(4, 1, "f"): {ln(8, 1, "f")},
+
+				ln(1, 1, "a"): {self},
+				ln(1, 1, "b"): {self},
+				ln(1, 1, "c"): {self},
+
+				ln(7, 1, "e"): {self},
+				ln(7, 1, "d"): {self},
+				ln(7, 1, "x"): {self},
+
+				ln(8, 1, "f"): {self},
+				ln(8, 1, "d"): {self},
+				ln(8, 1, "y"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "e", "f"}},
+				or1(2):     {f: []string{"b"}, e: []string{"a", "e", "f"}},
+				or(3, 5):   {f: []string{"b"}},
+				or1(5):     {f: []string{"c"}, e: []string{"a", "b", "e", "f"}},
+				or(6, 8):   {f: []string{"c"}},
+				or(8, 15):  {f: []string{"d", "x", "y"}, e: []string{"a", "b", "c", "e", "f"}},
+				or(15, 17): {e: []string{"a", "b", "c", "e", "f"}},
+				or(17, 19): {e: []string{"d", "x", "y"}},
+				or(19, 23): {f: []string{"d", "x", "y"}, e: []string{"a", "b", "c", "e", "f"}},
+				or(24, 27): {f: []string{"a", "e", "f"}},
+				or1(27):    {f: []string{"d"}, e: []string{"a", "e", "f"}},
+				or(28, 30): {f: []string{"d"}},
+				or(30, 32): {f: []string{"x"}, e: []string{"a", "d", "e", "f"}},
+				or(32, 34): {f: []string{"x"}},
+				or1(34):    {e: []string{"a", "d", "e", "f", "x"}},
+				or1(36):    {e: []string{"a", "d", "e", "f", "x"}},
+				or(38, 40): {f: []string{"a", "e", "f"}},
+				or1(40):    {f: []string{"d"}, e: []string{"a", "e", "f"}},
+				or(41, 43): {f: []string{"d"}},
+				or(43, 45): {f: []string{"y"}, e: []string{"a", "d", "e", "f"}},
+				or(45, 47): {f: []string{"y"}},
+				or1(47):    {e: []string{"a", "d", "e", "f", "y"}},
+				or1(49):    {e: []string{"a", "d", "e", "f", "y"}},
+			},
+		},
+
+		{
+			name: "Embedded_Dependency_Mutual",
+			archive: `-- a.cue --
+c: {x.y, e}
+x: {c.d, f}
+e: d: a: 1
+f: y: b: 2
+`,
+			expectDefinitions: map[position][]position{
+				ln(1, 1, "x"): {ln(2, 1, "x")},
+				ln(1, 1, "y"): {ln(4, 1, "y")},
+				ln(1, 1, "e"): {ln(3, 1, "e")},
+
+				ln(2, 1, "c"): {ln(1, 1, "c")},
+				ln(2, 1, "d"): {ln(3, 1, "d")},
+				ln(2, 1, "f"): {ln(4, 1, "f")},
+
+				ln(1, 1, "c"): {self},
+				ln(2, 1, "x"): {self},
+
+				ln(3, 1, "e"): {self},
+				ln(3, 1, "d"): {self},
+				ln(3, 1, "a"): {self},
+
+				ln(4, 1, "f"): {self},
+				ln(4, 1, "y"): {self},
+				ln(4, 1, "b"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"c", "e", "f", "x"}},
+				or(2, 4):   {f: []string{"b", "d"}, e: []string{"c", "e", "f", "x"}},
+				or(4, 6):   {e: []string{"c", "e", "f", "x"}},
+				or(6, 8):   {e: []string{"a", "y"}},
+				or(8, 11):  {f: []string{"b", "d"}, e: []string{"c", "e", "f", "x"}},
+				or(12, 14): {f: []string{"c", "e", "f", "x"}},
+				or(14, 16): {f: []string{"a", "y"}, e: []string{"c", "e", "f", "x"}},
+				or(16, 18): {e: []string{"c", "e", "f", "x"}},
+				or(18, 20): {e: []string{"b", "d"}},
+				or(20, 23): {f: []string{"a", "y"}, e: []string{"c", "e", "f", "x"}},
+				or(24, 26): {f: []string{"c", "e", "f", "x"}},
+				or1(26):    {f: []string{"d"}, e: []string{"c", "e", "f", "x"}},
+				or(27, 29): {f: []string{"d"}},
+				or1(29):    {f: []string{"a"}, e: []string{"c", "d", "e", "f", "x"}},
+				or(30, 32): {f: []string{"a"}},
+				or1(32):    {e: []string{"a", "c", "d", "e", "f", "x"}},
+				or1(34):    {e: []string{"a", "c", "d", "e", "f", "x"}},
+				or(35, 37): {f: []string{"c", "e", "f", "x"}},
+				or1(37):    {f: []string{"y"}, e: []string{"c", "e", "f", "x"}},
+				or(38, 40): {f: []string{"y"}},
+				or1(40):    {f: []string{"b"}, e: []string{"c", "e", "f", "x", "y"}},
+				or(41, 43): {f: []string{"b"}},
+				or1(43):    {e: []string{"b", "c", "e", "f", "x", "y"}},
+				or1(45):    {e: []string{"b", "c", "e", "f", "x", "y"}},
 			},
 		},
 
@@ -396,15 +666,23 @@ a: b: 5
 				ln(3, 1, `"a"`): {self, ln(2, 1, "a")},
 				ln(3, 1, "b"):   {self, ln(2, 1, "b")},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):   {f: []string{"a", "x"}},
-				ln(1, 1, "y"):   {f: []string{"y"}},
-				ln(1, 1, "a"):   {e: []string{"a", "x", "y"}},
-				ln(1, 1, ".b"):  {e: []string{"b"}},
-				ln(2, 1, "a"):   {f: []string{"a", "x"}},
-				ln(2, 1, "b"):   {f: []string{"b"}},
-				ln(3, 1, `"a"`): {f: []string{"a", "x"}},
-				ln(3, 1, "b"):   {f: []string{"b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "x"}},
+				or1(2):     {f: []string{"y"}, e: []string{"a", "x"}},
+				or(3, 5):   {f: []string{"y"}},
+				or(5, 8):   {e: []string{"a", "x", "y"}},
+				or(8, 10):  {e: []string{"b"}},
+				or(10, 12): {f: []string{"a", "x"}},
+				or1(12):    {f: []string{"b"}, e: []string{"a", "x"}},
+				or(13, 15): {f: []string{"b"}},
+				or1(15):    {e: []string{"a", "b", "x"}},
+				or1(17):    {e: []string{"a", "b", "x"}},
+				or1(18):    {f: []string{"a", "x"}},
+				or(19, 22): {e: []string{"a", "x"}},
+				or1(22):    {f: []string{"b"}, e: []string{"a", "x"}},
+				or(23, 25): {f: []string{"b"}},
+				or1(25):    {e: []string{"a", "b", "x"}},
+				or1(27):    {e: []string{"a", "b", "x"}},
 			},
 		},
 
@@ -414,9 +692,9 @@ a: b: 5
 x: [{a: 5}, {b: 6}]
 y: x[1].b`,
 			expectDefinitions: map[position][]position{
-				ln(2, 1, "x"):   {ln(1, 1, "x")},
-				ln(2, 1, "[1]"): {ln(1, 2, "{")},
-				ln(2, 1, "b"):   {ln(1, 1, "b")},
+				ln(2, 1, "x"):  {ln(1, 1, "x")},
+				ln(2, 1, "1]"): {ln(1, 2, "{")},
+				ln(2, 1, "b"):  {ln(1, 1, "b")},
 
 				ln(1, 1, "x"): {self},
 				ln(1, 1, "a"): {self},
@@ -424,13 +702,22 @@ y: x[1].b`,
 
 				ln(2, 1, "y"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):  {f: []string{"x", "y"}},
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(2, 1, "y"):  {f: []string{"x", "y"}},
-				ln(2, 1, "x"):  {e: []string{"x", "y"}},
-				ln(2, 1, ".b"): {e: []string{"b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x", "y"}},
+				or(2, 4):   {e: []string{"x", "y"}},
+				or1(4):     {f: []string{"a"}, e: []string{"x", "y"}},
+				or(5, 7):   {f: []string{"a"}},
+				or1(7):     {e: []string{"a", "x", "y"}},
+				or1(9):     {e: []string{"a", "x", "y"}},
+				or1(11):    {e: []string{"x", "y"}},
+				or1(12):    {f: []string{"b"}, e: []string{"x", "y"}},
+				or(13, 15): {f: []string{"b"}},
+				or1(15):    {e: []string{"b", "x", "y"}},
+				or1(17):    {e: []string{"b", "x", "y"}},
+				or1(19):    {e: []string{"x", "y"}},
+				or(20, 22): {f: []string{"x", "y"}},
+				or(22, 25): {e: []string{"x", "y"}},
+				or(28, 30): {e: []string{"b"}},
 			},
 		},
 
@@ -440,9 +727,9 @@ y: x[1].b`,
 x: [{a: 5}, {b: 6}, ...{a: 4}]
 y: x[17].a`,
 			expectDefinitions: map[position][]position{
-				ln(2, 1, "x"):    {ln(1, 1, "x")},
-				ln(2, 1, "[17]"): {ln(1, 1, "...")},
-				ln(2, 1, "a"):    {ln(1, 2, "a")},
+				ln(2, 1, "x"):   {ln(1, 1, "x")},
+				ln(2, 1, "17]"): {ln(1, 1, "...")},
+				ln(2, 1, "a"):   {ln(1, 2, "a")},
 
 				ln(1, 1, "x"): {self},
 				ln(1, 1, "a"): {self},
@@ -451,14 +738,27 @@ y: x[17].a`,
 
 				ln(2, 1, "y"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):  {f: []string{"x", "y"}},
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(1, 2, "a"):  {f: []string{"a"}},
-				ln(2, 1, "y"):  {f: []string{"x", "y"}},
-				ln(2, 1, "x"):  {e: []string{"x", "y"}},
-				ln(2, 1, ".a"): {e: []string{"a"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x", "y"}},
+				or(2, 4):   {e: []string{"x", "y"}},
+				or1(4):     {f: []string{"a"}, e: []string{"x", "y"}},
+				or(5, 7):   {f: []string{"a"}},
+				or1(7):     {e: []string{"a", "x", "y"}},
+				or1(9):     {e: []string{"a", "x", "y"}},
+				or1(11):    {e: []string{"x", "y"}},
+				or1(12):    {f: []string{"b"}, e: []string{"x", "y"}},
+				or(13, 15): {f: []string{"b"}},
+				or1(15):    {e: []string{"b", "x", "y"}},
+				or1(17):    {e: []string{"b", "x", "y"}},
+				or1(19):    {e: []string{"x", "y"}},
+				or(20, 24): {f: []string{"a"}, e: []string{"x", "y"}},
+				or(24, 26): {f: []string{"a"}},
+				or1(26):    {e: []string{"a", "x", "y"}},
+				or1(28):    {e: []string{"a", "x", "y"}},
+				or1(30):    {e: []string{"x", "y"}},
+				or(31, 33): {f: []string{"x", "y"}},
+				or(33, 36): {e: []string{"x", "y"}},
+				or(40, 42): {e: []string{"a"}},
 			},
 		},
 
@@ -469,10 +769,10 @@ x: [{a: 5}, {b: 6}, ...z]
 y: x[17].a
 z: a: 4`,
 			expectDefinitions: map[position][]position{
-				ln(1, 1, "z"):    {ln(3, 1, "z")},
-				ln(2, 1, "x"):    {ln(1, 1, "x")},
-				ln(2, 1, "[17]"): {ln(1, 1, "...")},
-				ln(2, 1, "a"):    {ln(3, 1, "a")},
+				ln(1, 1, "z"):   {ln(3, 1, "z")},
+				ln(2, 1, "x"):   {ln(1, 1, "x")},
+				ln(2, 1, "17]"): {ln(1, 1, "...")},
+				ln(2, 1, "a"):   {ln(3, 1, "a")},
 
 				ln(1, 1, "x"): {self},
 				ln(1, 1, "a"): {self},
@@ -483,16 +783,29 @@ z: a: 4`,
 				ln(3, 1, "z"): {self},
 				ln(3, 1, "a"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):  {f: []string{"x", "y", "z"}},
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(1, 1, "z"):  {e: []string{"x", "y", "z"}},
-				ln(2, 1, "y"):  {f: []string{"x", "y", "z"}},
-				ln(2, 1, "x"):  {e: []string{"x", "y", "z"}},
-				ln(2, 1, ".a"): {e: []string{"a"}},
-				ln(3, 1, "z"):  {f: []string{"x", "y", "z"}},
-				ln(3, 1, "a"):  {f: []string{"a"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x", "y", "z"}},
+				or(2, 4):   {e: []string{"x", "y", "z"}},
+				or1(4):     {f: []string{"a"}, e: []string{"x", "y", "z"}},
+				or(5, 7):   {f: []string{"a"}},
+				or1(7):     {e: []string{"a", "x", "y", "z"}},
+				or1(9):     {e: []string{"a", "x", "y", "z"}},
+				or1(11):    {e: []string{"x", "y", "z"}},
+				or1(12):    {f: []string{"b"}, e: []string{"x", "y", "z"}},
+				or(13, 15): {f: []string{"b"}},
+				or1(15):    {e: []string{"b", "x", "y", "z"}},
+				or1(17):    {e: []string{"b", "x", "y", "z"}},
+				or1(19):    {e: []string{"x", "y", "z"}},
+				or(20, 25): {f: []string{"a"}, e: []string{"x", "y", "z"}},
+				or1(25):    {e: []string{"x", "y", "z"}},
+				or(26, 28): {f: []string{"x", "y", "z"}},
+				or(28, 31): {e: []string{"x", "y", "z"}},
+				or(35, 37): {e: []string{"a"}},
+				or(37, 39): {f: []string{"x", "y", "z"}},
+				or1(39):    {f: []string{"a"}, e: []string{"x", "y", "z"}},
+				or(40, 42): {f: []string{"a"}},
+				or1(42):    {e: []string{"a", "x", "y", "z"}},
+				or1(44):    {e: []string{"a", "x", "y", "z"}},
 			},
 		},
 
@@ -512,14 +825,23 @@ d: l & [{x: 3}, {x: 4}]
 				ln(2, 1, "x"): {self, ln(1, 1, "x")},
 				ln(2, 2, "x"): {self, ln(1, 1, "x")},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "l"):   {f: []string{"d", "l"}},
-				ln(1, 1, "x"):   {f: []string{"x"}},
-				ln(1, 1, "int"): {e: []string{"d", "l", "x"}},
-				ln(2, 1, "d"):   {f: []string{"d", "l"}},
-				ln(2, 1, "l"):   {e: []string{"d", "l"}},
-				ln(2, 1, "x"):   {f: []string{"x"}},
-				ln(2, 2, "x"):   {f: []string{"x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"d", "l"}},
+				or(2, 4):   {e: []string{"d", "l"}},
+				or(4, 8):   {f: []string{"x"}, e: []string{"d", "l"}},
+				or(8, 10):  {f: []string{"x"}},
+				or(10, 15): {e: []string{"d", "l", "x"}},
+				or1(16):    {e: []string{"d", "l"}},
+				or(17, 19): {f: []string{"d", "l"}},
+				or(19, 25): {e: []string{"d", "l"}},
+				or(25, 28): {f: []string{"x"}, e: []string{"d", "l"}},
+				or1(28):    {e: []string{"d", "l", "x"}},
+				or1(30):    {e: []string{"d", "l", "x"}},
+				or(31, 33): {e: []string{"d", "l"}},
+				or(33, 36): {f: []string{"x"}, e: []string{"d", "l"}},
+				or1(36):    {e: []string{"d", "l", "x"}},
+				or1(38):    {e: []string{"d", "l", "x"}},
+				or(39, 41): {e: []string{"d", "l"}},
 			},
 		},
 
@@ -537,13 +859,25 @@ d: [{x: 3}, {x: 4}]
 				ln(2, 1, "x"): {self, ln(1, 1, "x")},
 				ln(2, 2, "x"): {self, ln(1, 1, "x")},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "d"):   {f: []string{"d"}},
-				ln(1, 1, "x"):   {f: []string{"x"}},
-				ln(1, 1, "int"): {e: []string{"d", "x"}},
-				ln(2, 1, "d"):   {f: []string{"d"}},
-				ln(2, 1, "x"):   {f: []string{"x"}},
-				ln(2, 2, "x"):   {f: []string{"x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"d"}},
+				or(2, 4):   {e: []string{"d"}},
+				or(4, 8):   {f: []string{"x"}, e: []string{"d"}},
+				or(8, 10):  {f: []string{"x"}},
+				or(10, 15): {e: []string{"d", "x"}},
+				or1(16):    {e: []string{"d"}},
+				or(17, 19): {f: []string{"d"}},
+				or(19, 21): {e: []string{"d"}},
+				or1(21):    {f: []string{"x"}, e: []string{"d"}},
+				or(22, 24): {f: []string{"x"}},
+				or1(24):    {e: []string{"d", "x"}},
+				or1(26):    {e: []string{"d", "x"}},
+				or1(28):    {e: []string{"d"}},
+				or1(29):    {f: []string{"x"}, e: []string{"d"}},
+				or(30, 32): {f: []string{"x"}},
+				or1(32):    {e: []string{"d", "x"}},
+				or1(34):    {e: []string{"d", "x"}},
+				or1(36):    {e: []string{"d"}},
 			},
 		},
 
@@ -557,15 +891,15 @@ o: x & y
 p: o[0].a
 q: o[3].a`,
 			expectDefinitions: map[position][]position{
-				ln(2, 1, "z"):   {ln(3, 1, "z")},
-				ln(4, 1, "x"):   {ln(1, 1, "x")},
-				ln(4, 1, "y"):   {ln(2, 1, "y")},
-				ln(5, 1, "o"):   {ln(4, 1, "o")},
-				ln(5, 1, "[0]"): {ln(1, 1, "{"), ln(2, 1, "...")},
-				ln(5, 1, "a"):   {ln(1, 1, "a"), ln(3, 1, "a")},
-				ln(6, 1, "o"):   {ln(4, 1, "o")},
-				ln(6, 1, "[3]"): {ln(1, 1, "..."), ln(2, 1, "...")},
-				ln(6, 1, "a"):   {ln(1, 2, "a"), ln(3, 1, "a")},
+				ln(2, 1, "z"):  {ln(3, 1, "z")},
+				ln(4, 1, "x"):  {ln(1, 1, "x")},
+				ln(4, 1, "y"):  {ln(2, 1, "y")},
+				ln(5, 1, "o"):  {ln(4, 1, "o")},
+				ln(5, 1, "0]"): {ln(1, 1, "{"), ln(2, 1, "...")},
+				ln(5, 1, "a"):  {ln(1, 1, "a"), ln(3, 1, "a")},
+				ln(6, 1, "o"):  {ln(4, 1, "o")},
+				ln(6, 1, "3]"): {ln(1, 1, "..."), ln(2, 1, "...")},
+				ln(6, 1, "a"):  {ln(1, 2, "a"), ln(3, 1, "a")},
 
 				ln(1, 1, "x"): {self},
 				ln(1, 1, "a"): {self},
@@ -581,25 +915,40 @@ q: o[3].a`,
 				ln(5, 1, "p"): {self},
 				ln(6, 1, "q"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):   {f: []string{"o", "p", "q", "x", "y", "z"}},
-				ln(1, 1, "a"):   {f: []string{"a"}},
-				ln(1, 1, "b"):   {f: []string{"b"}},
-				ln(1, 2, "a"):   {f: []string{"a"}},
-				ln(2, 1, "y"):   {f: []string{"o", "p", "q", "x", "y", "z"}},
-				ln(2, 1, "z"):   {e: []string{"o", "p", "q", "x", "y", "z"}},
-				ln(3, 1, "z"):   {f: []string{"o", "p", "q", "x", "y", "z"}},
-				ln(3, 1, "a"):   {f: []string{"a"}},
-				ln(3, 1, "int"): {e: []string{"a", "o", "p", "q", "x", "y", "z"}},
-				ln(4, 1, "o"):   {f: []string{"o", "p", "q", "x", "y", "z"}},
-				ln(4, 1, "x"):   {e: []string{"o", "p", "q", "x", "y", "z"}},
-				ln(4, 1, "y"):   {e: []string{"o", "p", "q", "x", "y", "z"}},
-				ln(5, 1, "p"):   {f: []string{"o", "p", "q", "x", "y", "z"}},
-				ln(5, 1, "o"):   {e: []string{"o", "p", "q", "x", "y", "z"}},
-				ln(5, 1, ".a"):  {e: []string{"a"}},
-				ln(6, 1, "q"):   {f: []string{"o", "p", "q", "x", "y", "z"}},
-				ln(6, 1, "o"):   {e: []string{"o", "p", "q", "x", "y", "z"}},
-				ln(6, 1, ".a"):  {e: []string{"a"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"o", "p", "q", "x", "y", "z"}},
+				or(2, 4):   {e: []string{"o", "p", "q", "x", "y", "z"}},
+				or1(4):     {f: []string{"a"}, e: []string{"o", "p", "q", "x", "y", "z"}},
+				or(5, 7):   {f: []string{"a"}},
+				or1(7):     {e: []string{"a", "o", "p", "q", "x", "y", "z"}},
+				or1(9):     {e: []string{"a", "o", "p", "q", "x", "y", "z"}},
+				or1(11):    {e: []string{"o", "p", "q", "x", "y", "z"}},
+				or1(12):    {f: []string{"b"}, e: []string{"o", "p", "q", "x", "y", "z"}},
+				or(13, 15): {f: []string{"b"}},
+				or1(15):    {e: []string{"b", "o", "p", "q", "x", "y", "z"}},
+				or1(17):    {e: []string{"b", "o", "p", "q", "x", "y", "z"}},
+				or1(19):    {e: []string{"o", "p", "q", "x", "y", "z"}},
+				or(20, 24): {f: []string{"a"}, e: []string{"o", "p", "q", "x", "y", "z"}},
+				or(24, 26): {f: []string{"a"}},
+				or1(26):    {e: []string{"a", "o", "p", "q", "x", "y", "z"}},
+				or1(28):    {e: []string{"a", "o", "p", "q", "x", "y", "z"}},
+				or1(30):    {e: []string{"o", "p", "q", "x", "y", "z"}},
+				or(31, 33): {f: []string{"o", "p", "q", "x", "y", "z"}},
+				or(33, 35): {e: []string{"o", "p", "q", "x", "y", "z"}},
+				or(35, 40): {f: []string{"a"}, e: []string{"o", "p", "q", "x", "y", "z"}},
+				or1(40):    {e: []string{"o", "p", "q", "x", "y", "z"}},
+				or(41, 43): {f: []string{"o", "p", "q", "x", "y", "z"}},
+				or1(43):    {f: []string{"a"}, e: []string{"o", "p", "q", "x", "y", "z"}},
+				or(44, 46): {f: []string{"a"}},
+				or(46, 51): {e: []string{"a", "o", "p", "q", "x", "y", "z"}},
+				or(51, 53): {f: []string{"o", "p", "q", "x", "y", "z"}},
+				or(53, 60): {e: []string{"o", "p", "q", "x", "y", "z"}},
+				or(60, 62): {f: []string{"o", "p", "q", "x", "y", "z"}},
+				or(62, 65): {e: []string{"o", "p", "q", "x", "y", "z"}},
+				or(68, 70): {e: []string{"a"}},
+				or(70, 72): {f: []string{"o", "p", "q", "x", "y", "z"}},
+				or(72, 75): {e: []string{"o", "p", "q", "x", "y", "z"}},
+				or(78, 80): {e: []string{"a"}},
 			},
 		},
 
@@ -630,23 +979,37 @@ d: c.b.x
 				ln(2, 1, "e"): {self},
 				ln(3, 1, "d"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "c"):   {f: []string{"b", "c", "d"}},
-				ln(1, 1, "a"):   {f: []string{"a", "b", "z"}},
-				ln(1, 1, "b"):   {f: []string{"e"}, e: []string{"a", "b", "c", "d"}},
-				ln(1, 1, `"b"`): {f: []string{"a", "b", "z"}},
-				ln(1, 1, "x"):   {f: []string{"x"}},
-				ln(1, 3, "b"):   {f: []string{"a", "b", "z"}},
-				ln(1, 2, "x"):   {f: []string{"x"}},
-				ln(1, 1, "z"):   {f: []string{"a", "b", "z"}},
-				ln(1, 4, "b"):   {e: []string{"b", "c", "d", "z"}},
-				ln(1, 1, ".x"):  {e: []string{"x"}},
-				ln(2, 1, "b"):   {f: []string{"b", "c", "d"}},
-				ln(2, 1, "e"):   {f: []string{"e"}},
-				ln(3, 1, "d"):   {f: []string{"b", "c", "d"}},
-				ln(3, 1, "c"):   {e: []string{"b", "c", "d"}},
-				ln(3, 1, ".b"):  {e: []string{"a", "b", "z"}},
-				ln(3, 1, ".x"):  {e: []string{"x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"b", "c", "d"}},
+				or(2, 4):   {f: []string{"a", "b", "z"}, e: []string{"b", "c", "d"}},
+				or(4, 6):   {f: []string{"a", "b", "z"}},
+				or(6, 9):   {f: []string{"e"}, e: []string{"a", "b", "c", "d"}},
+				or1(9):     {f: []string{"a", "b", "z"}, e: []string{"b", "c", "d"}},
+				or1(10):    {f: []string{"a", "b", "z"}},
+				or(11, 14): {e: []string{"a", "b", "z"}},
+				or1(14):    {f: []string{"x"}, e: []string{"a", "b", "c", "d"}},
+				or(15, 17): {f: []string{"x"}},
+				or1(17):    {e: []string{"a", "b", "c", "d", "x"}},
+				or1(19):    {e: []string{"a", "b", "c", "d", "x"}},
+				or1(23):    {f: []string{"a", "b", "z"}, e: []string{"b", "c", "d"}},
+				or(24, 26): {f: []string{"a", "b", "z"}},
+				or1(26):    {f: []string{"x"}, e: []string{"b", "c", "d", "z"}},
+				or(27, 29): {f: []string{"x"}},
+				or1(29):    {e: []string{"b", "c", "d", "x", "z"}},
+				or1(31):    {e: []string{"b", "c", "d", "x", "z"}},
+				or1(32):    {f: []string{"a", "b", "z"}, e: []string{"b", "c", "d"}},
+				or(33, 35): {f: []string{"a", "b", "z"}},
+				or(35, 38): {e: []string{"b", "c", "d", "z"}},
+				or(38, 40): {e: []string{"x"}},
+				or(41, 43): {f: []string{"b", "c", "d"}},
+				or1(43):    {f: []string{"e"}, e: []string{"b", "c", "d"}},
+				or(44, 46): {f: []string{"e"}},
+				or1(46):    {e: []string{"b", "c", "d", "e"}},
+				or1(48):    {e: []string{"b", "c", "d", "e"}},
+				or(49, 51): {f: []string{"b", "c", "d"}},
+				or(51, 54): {e: []string{"b", "c", "d"}},
+				or(54, 56): {e: []string{"a", "b", "z"}},
+				or(56, 58): {e: []string{"x"}},
 			},
 		},
 
@@ -670,14 +1033,25 @@ b: {
 				ln(4, 1, "c"):   {self},
 				ln(5, 1, "a"):   {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "b"):   {f: []string{"b"}},
-				ln(2, 1, "a"):   {f: []string{"a", "b"}},
-				ln(3, 1, `"b"`): {f: []string{"a", "b"}},
-				ln(4, 1, "c"):   {f: []string{"a", "c"}},
-				ln(4, 1, "b"):   {e: []string{"a", "b", "c"}},
-				ln(4, 1, ".a"):  {e: []string{"a", "b"}},
-				ln(5, 1, "a"):   {f: []string{"a", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"b"}},
+				or(2, 7):   {f: []string{"a", "b"}, e: []string{"b"}},
+				or(7, 9):   {f: []string{"a", "b"}},
+				or1(9):     {e: []string{"a", "b"}},
+				or1(11):    {e: []string{"a", "b"}},
+				or(12, 14): {f: []string{"a", "b"}, e: []string{"b"}},
+				or1(14):    {f: []string{"a", "b"}},
+				or(15, 18): {e: []string{"a", "b"}},
+				or(18, 25): {f: []string{"a", "c"}, e: []string{"a", "b"}},
+				or(25, 27): {f: []string{"a", "c"}},
+				or(27, 30): {e: []string{"a", "b", "c"}},
+				or(30, 32): {e: []string{"a", "b"}},
+				or(32, 36): {f: []string{"a", "c"}, e: []string{"a", "b"}},
+				or(36, 38): {f: []string{"a", "c"}},
+				or1(38):    {e: []string{"a", "b", "c"}},
+				or1(41):    {e: []string{"a", "b", "c"}},
+				or(42, 45): {f: []string{"a", "c"}, e: []string{"a", "b"}},
+				or1(46):    {f: []string{"a", "b"}, e: []string{"b"}},
 			},
 		},
 
@@ -703,16 +1077,28 @@ b: {
 				ln(5, 1, "a"):   {self},
 				ln(7, 1, "b"):   {self, ln(3, 1, `"b"`)},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "b"):   {f: []string{"b"}},
-				ln(2, 1, "a"):   {f: []string{"a", "b"}},
-				ln(3, 1, `"b"`): {f: []string{"a", "b"}},
-				ln(4, 1, "c"):   {f: []string{"a", "c"}},
-				ln(4, 1, "b"):   {e: []string{"a", "b", "c"}},
-				ln(4, 1, ".a"):  {e: []string{"a", "c"}},
-				ln(5, 1, "a"):   {f: []string{"a", "c"}},
-				ln(7, 1, "b"):   {f: []string{"a", "b"}},
-				ln(7, 1, "_"):   {f: []string{"a", "c"}, e: []string{"a", "b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"b"}},
+				or(2, 7):   {f: []string{"a", "b"}, e: []string{"b"}},
+				or(7, 9):   {f: []string{"a", "b"}},
+				or1(9):     {e: []string{"a", "b"}},
+				or1(11):    {e: []string{"a", "b"}},
+				or(12, 14): {f: []string{"a", "b"}, e: []string{"b"}},
+				or1(14):    {f: []string{"a", "b"}},
+				or(15, 18): {e: []string{"a", "b"}},
+				or(18, 25): {f: []string{"a", "c"}, e: []string{"a", "b"}},
+				or(25, 27): {f: []string{"a", "c"}},
+				or(27, 30): {e: []string{"a", "b", "c"}},
+				or(30, 32): {e: []string{"a", "c"}},
+				or(32, 36): {f: []string{"a", "c"}, e: []string{"a", "b"}},
+				or(36, 38): {f: []string{"a", "c"}},
+				or1(38):    {e: []string{"a", "b", "c"}},
+				or1(41):    {e: []string{"a", "b", "c"}},
+				or(42, 45): {f: []string{"a", "c"}, e: []string{"a", "b"}},
+				or(46, 48): {f: []string{"a", "b"}, e: []string{"b"}},
+				or(48, 50): {f: []string{"a", "b"}},
+				or(50, 53): {f: []string{"a", "c"}, e: []string{"a", "b"}},
+				or1(53):    {f: []string{"a", "b"}, e: []string{"b"}},
 			},
 		},
 
@@ -740,17 +1126,29 @@ b: b: _`,
 				ln(8, 1, "b"): {self, ln(1, 1, "b")},
 				ln(8, 2, "b"): {self, ln(3, 1, `"b"`)},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "b"):   {f: []string{"b"}},
-				ln(2, 1, "a"):   {f: []string{"a", "b"}},
-				ln(3, 1, `"b"`): {f: []string{"a", "b"}},
-				ln(4, 1, "c"):   {f: []string{"a", "c"}},
-				ln(4, 1, "b"):   {e: []string{"a", "b", "c"}},
-				ln(4, 1, ".a"):  {e: []string{"a", "b"}},
-				ln(5, 1, "a"):   {f: []string{"a", "c"}},
-				ln(8, 1, "b"):   {f: []string{"b"}},
-				ln(8, 2, "b"):   {f: []string{"a", "b"}},
-				ln(8, 1, "_"):   {f: []string{"a", "c"}, e: []string{"b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"b"}},
+				or(2, 7):   {f: []string{"a", "b"}, e: []string{"b"}},
+				or(7, 9):   {f: []string{"a", "b"}},
+				or1(9):     {e: []string{"a", "b"}},
+				or1(11):    {e: []string{"a", "b"}},
+				or(12, 14): {f: []string{"a", "b"}, e: []string{"b"}},
+				or1(14):    {f: []string{"a", "b"}},
+				or(15, 18): {e: []string{"a", "b"}},
+				or(18, 25): {f: []string{"a", "c"}, e: []string{"a", "b"}},
+				or(25, 27): {f: []string{"a", "c"}},
+				or(27, 30): {e: []string{"a", "b", "c"}},
+				or(30, 32): {e: []string{"a", "b"}},
+				or(32, 36): {f: []string{"a", "c"}, e: []string{"a", "b"}},
+				or(36, 38): {f: []string{"a", "c"}},
+				or1(38):    {e: []string{"a", "b", "c"}},
+				or1(41):    {e: []string{"a", "b", "c"}},
+				or(42, 45): {f: []string{"a", "c"}, e: []string{"a", "b"}},
+				or1(46):    {f: []string{"a", "b"}, e: []string{"b"}},
+				or(48, 50): {f: []string{"b"}},
+				or1(50):    {f: []string{"a", "b"}, e: []string{"b"}},
+				or(51, 53): {f: []string{"a", "b"}},
+				or(53, 56): {f: []string{"a", "c"}, e: []string{"b"}},
 			},
 		},
 
@@ -768,14 +1166,20 @@ a: {in: {x: 5}, out: in}.out.x`,
 				ln(1, 1, "x"):   {self},
 				ln(1, 1, "out"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):    {f: []string{"a"}},
-				ln(1, 1, "in"):   {f: []string{"in", "out"}},
-				ln(1, 1, "x"):    {f: []string{"x"}},
-				ln(1, 1, "out"):  {f: []string{"in", "out"}},
-				ln(1, 2, "in"):   {f: []string{"x"}, e: []string{"a", "in", "out"}},
-				ln(1, 1, ".out"): {e: []string{"in", "out"}},
-				ln(1, 1, ".x"):   {e: []string{"x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a"}},
+				or1(2):     {e: []string{"a"}},
+				or1(3):     {f: []string{"in", "out"}, e: []string{"a"}},
+				or(4, 7):   {f: []string{"in", "out"}},
+				or(7, 9):   {f: []string{"x"}, e: []string{"a", "in", "out"}},
+				or(9, 11):  {f: []string{"x"}},
+				or1(11):    {e: []string{"a", "in", "out", "x"}},
+				or1(13):    {e: []string{"a", "in", "out", "x"}},
+				or1(15):    {f: []string{"in", "out"}, e: []string{"a"}},
+				or(16, 20): {f: []string{"in", "out"}},
+				or(20, 24): {f: []string{"x"}, e: []string{"a", "in", "out"}},
+				or(25, 29): {e: []string{"in", "out"}},
+				or(29, 31): {e: []string{"x"}},
 			},
 		},
 
@@ -831,34 +1235,54 @@ m: n: o: 33`,
 				ln(11, 1, "n"): {self},
 				ln(11, 1, "o"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):   {f: []string{"a", "k", "m"}},
-				ln(1, 1, "b"):   {f: []string{"b"}},
-				ln(2, 1, "c"):   {f: []string{"c", "e", "f"}},
-				ln(2, 1, "d"):   {f: []string{"d"}},
-				ln(3, 1, "g"):   {f: []string{"g", "i", "j"}},
-				ln(3, 1, "h"):   {f: []string{"h"}},
-				ln(3, 1, "m"):   {e: []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m"}},
-				ln(3, 1, ".n"):  {e: []string{"n"}},
-				ln(4, 1, "i"):   {f: []string{"g", "i", "j"}},
-				ln(4, 1, "g"):   {f: []string{"h"}, e: []string{"a", "b", "c", "d", "e", "f", "g", "i", "j", "k", "m"}},
-				ln(5, 1, "j"):   {f: []string{"g", "i", "j"}},
-				ln(5, 1, "i"):   {f: []string{"h"}, e: []string{"a", "b", "c", "d", "e", "f", "g", "i", "j", "k", "m"}},
-				ln(6, 1, ".j"):  {e: []string{"g", "i", "j"}},
-				ln(7, 1, "e"):   {f: []string{"c", "e", "f"}},
-				ln(7, 1, "c"):   {f: []string{"d"}, e: []string{"a", "b", "c", "e", "f", "k", "m"}},
-				ln(8, 1, "f"):   {f: []string{"c", "e", "f"}},
-				ln(8, 1, "e"):   {f: []string{"d"}, e: []string{"a", "b", "c", "e", "f", "k", "m"}},
-				ln(9, 1, ".f"):  {e: []string{"c", "e", "f"}},
-				ln(10, 1, "k"):  {f: []string{"a", "k", "m"}},
-				ln(10, 1, "l"):  {f: []string{"l"}},
-				ln(10, 1, "a"):  {e: []string{"a", "k", "l", "m"}},
-				ln(10, 1, ".b"): {e: []string{"b"}},
-				ln(10, 1, ".d"): {e: []string{"d"}},
-				ln(10, 1, ".h"): {e: []string{"h"}},
-				ln(11, 1, "m"):  {f: []string{"a", "k", "m"}},
-				ln(11, 1, "n"):  {f: []string{"n"}},
-				ln(11, 1, "o"):  {f: []string{"o"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):     {f: []string{"a", "k", "m"}},
+				or1(2):       {f: []string{"b"}, e: []string{"a", "k", "m"}},
+				or(3, 5):     {f: []string{"b"}},
+				or1(5):       {f: []string{"d"}, e: []string{"a", "b", "k", "m"}},
+				or(6, 12):    {f: []string{"c", "e", "f"}, e: []string{"a", "b", "k", "m"}},
+				or(12, 14):   {f: []string{"c", "e", "f"}},
+				or1(14):      {f: []string{"d"}, e: []string{"a", "b", "c", "e", "f", "k", "m"}},
+				or(15, 17):   {f: []string{"d"}},
+				or1(17):      {f: []string{"h"}, e: []string{"a", "b", "c", "d", "e", "f", "k", "m"}},
+				or(18, 28):   {f: []string{"g", "i", "j"}, e: []string{"a", "b", "c", "d", "e", "f", "k", "m"}},
+				or(28, 30):   {f: []string{"g", "i", "j"}},
+				or1(30):      {f: []string{"h"}, e: []string{"a", "b", "c", "d", "e", "f", "g", "i", "j", "k", "m"}},
+				or(31, 33):   {f: []string{"h"}},
+				or1(33):      {f: []string{"o"}, e: []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m"}},
+				or(34, 36):   {e: []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m"}},
+				or(36, 38):   {e: []string{"n"}},
+				or(38, 46):   {f: []string{"g", "i", "j"}, e: []string{"a", "b", "c", "d", "e", "f", "k", "m"}},
+				or(46, 48):   {f: []string{"g", "i", "j"}},
+				or(48, 51):   {f: []string{"h"}, e: []string{"a", "b", "c", "d", "e", "f", "g", "i", "j", "k", "m"}},
+				or(51, 59):   {f: []string{"g", "i", "j"}, e: []string{"a", "b", "c", "d", "e", "f", "k", "m"}},
+				or(59, 61):   {f: []string{"g", "i", "j"}},
+				or(61, 64):   {f: []string{"h"}, e: []string{"a", "b", "c", "d", "e", "f", "g", "i", "j", "k", "m"}},
+				or(64, 69):   {f: []string{"g", "i", "j"}, e: []string{"a", "b", "c", "d", "e", "f", "k", "m"}},
+				or(70, 72):   {e: []string{"g", "i", "j"}},
+				or(72, 76):   {f: []string{"c", "e", "f"}, e: []string{"a", "b", "k", "m"}},
+				or(76, 78):   {f: []string{"c", "e", "f"}},
+				or(78, 81):   {f: []string{"d"}, e: []string{"a", "b", "c", "e", "f", "k", "m"}},
+				or(81, 85):   {f: []string{"c", "e", "f"}, e: []string{"a", "b", "k", "m"}},
+				or(85, 87):   {f: []string{"c", "e", "f"}},
+				or(87, 90):   {f: []string{"d"}, e: []string{"a", "b", "c", "e", "f", "k", "m"}},
+				or1(90):      {f: []string{"c", "e", "f"}, e: []string{"a", "b", "k", "m"}},
+				or(92, 94):   {e: []string{"c", "e", "f"}},
+				or(94, 96):   {f: []string{"a", "k", "m"}},
+				or1(96):      {f: []string{"l"}, e: []string{"a", "k", "m"}},
+				or(97, 99):   {f: []string{"l"}},
+				or1(99):      {f: []string{"o"}, e: []string{"a", "k", "l", "m"}},
+				or(100, 102): {e: []string{"a", "k", "l", "m"}},
+				or(102, 104): {e: []string{"b"}},
+				or(104, 106): {e: []string{"d"}},
+				or(106, 108): {e: []string{"h"}},
+				or(108, 110): {f: []string{"a", "k", "m"}},
+				or1(110):     {f: []string{"n"}, e: []string{"a", "k", "m"}},
+				or(111, 113): {f: []string{"n"}},
+				or1(113):     {f: []string{"o"}, e: []string{"a", "k", "m", "n"}},
+				or(114, 116): {f: []string{"o"}},
+				or1(116):     {e: []string{"a", "k", "m", "n", "o"}},
+				or1(119):     {e: []string{"a", "k", "m", "n", "o"}},
 			},
 		},
 
@@ -868,16 +1292,23 @@ m: n: o: 33`,
 a: [7, {b: 3}, true][1].b`,
 			// If the index is a literal const we do resolve it.
 			expectDefinitions: map[position][]position{
-				ln(1, 1, "[1]"): {ln(1, 1, "{")},
-				ln(1, 2, "b"):   {ln(1, 1, "b")},
+				ln(1, 1, "1]"): {ln(1, 1, "{")},
+				ln(1, 2, "b"):  {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "b"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(1, 1, ".b"): {e: []string{"b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a"}},
+				or(2, 4):   {e: []string{"a"}},
+				or(5, 7):   {e: []string{"a"}},
+				or1(7):     {f: []string{"b"}, e: []string{"a"}},
+				or(8, 10):  {f: []string{"b"}},
+				or1(10):    {e: []string{"a", "b"}},
+				or1(12):    {e: []string{"a", "b"}},
+				or1(14):    {e: []string{"a"}},
+				or(19, 21): {e: []string{"a"}},
+				or(24, 26): {e: []string{"b"}},
 			},
 		},
 
@@ -899,11 +1330,19 @@ n: 1
 
 				ln(2, 1, "n"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"): {f: []string{"a", "n"}},
-				ln(1, 1, "b"): {f: []string{"b"}},
-				ln(1, 1, "n"): {e: []string{"a", "n"}},
-				ln(2, 1, "n"): {f: []string{"a", "n"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "n"}},
+				or(2, 4):   {e: []string{"a", "n"}},
+				or(5, 7):   {e: []string{"a", "n"}},
+				or1(7):     {f: []string{"b"}, e: []string{"a", "n"}},
+				or(8, 10):  {f: []string{"b"}},
+				or1(10):    {e: []string{"a", "b", "n"}},
+				or1(12):    {e: []string{"a", "b", "n"}},
+				or1(14):    {e: []string{"a", "n"}},
+				or(19, 26): {e: []string{"a", "n"}},
+				or(26, 28): {f: []string{"a", "n"}},
+				or1(28):    {e: []string{"a", "n"}},
+				or1(30):    {e: []string{"a", "n"}},
 			},
 		},
 
@@ -913,9 +1352,9 @@ n: 1
 x: "a b": z: 5
 y: x["a b"].z`,
 			expectDefinitions: map[position][]position{
-				ln(2, 1, "x"):       {ln(1, 1, "x")},
-				ln(2, 1, `["a b"]`): {ln(1, 1, `"a b"`)},
-				ln(2, 1, "z"):       {ln(1, 1, "z")},
+				ln(2, 1, "x"):      {ln(1, 1, "x")},
+				ln(2, 1, `"a b"]`): {ln(1, 1, `"a b"`)},
+				ln(2, 1, "z"):      {ln(1, 1, "z")},
 
 				ln(1, 1, "x"):     {self},
 				ln(1, 1, `"a b"`): {self},
@@ -923,13 +1362,19 @@ y: x["a b"].z`,
 
 				ln(2, 1, "y"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):     {f: []string{"x", "y"}},
-				ln(1, 1, `"a b"`): {f: []string{"a b"}},
-				ln(1, 1, "z"):     {f: []string{"z"}},
-				ln(2, 1, "y"):     {f: []string{"x", "y"}},
-				ln(2, 1, "x"):     {e: []string{"x", "y"}},
-				ln(2, 1, ".z"):    {e: []string{"z"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x", "y"}},
+				or1(2):     {f: []string{"a b"}, e: []string{"x", "y"}},
+				or1(3):     {f: []string{"a b"}},
+				or(4, 9):   {e: []string{"a b"}},
+				or1(9):     {f: []string{"z"}, e: []string{"a b", "x", "y"}},
+				or(10, 12): {f: []string{"z"}},
+				or1(12):    {e: []string{"a b", "x", "y", "z"}},
+				or1(14):    {e: []string{"a b", "x", "y", "z"}},
+				or(15, 17): {f: []string{"x", "y"}},
+				or(17, 20): {e: []string{"x", "y"}},
+				or(20, 27): {e: []string{"a b"}},
+				or(27, 29): {e: []string{"z"}},
 			},
 		},
 
@@ -946,13 +1391,23 @@ a: ({b: c, c: 3} | {c: 4}).c`,
 				ln(1, 2, "c"): {self},
 				ln(1, 3, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b", "c"}},
-				ln(1, 1, "c"):  {e: []string{"a", "b", "c"}},
-				ln(1, 2, "c"):  {f: []string{"b", "c"}},
-				ln(1, 3, "c"):  {f: []string{"c"}},
-				ln(1, 1, ".c"): {e: []string{"b", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a"}},
+				or1(2):     {e: []string{"a"}},
+				or(3, 5):   {f: []string{"b", "c"}, e: []string{"a"}},
+				or(5, 7):   {f: []string{"b", "c"}},
+				or(7, 10):  {e: []string{"a", "b", "c"}},
+				or1(10):    {f: []string{"b", "c"}, e: []string{"a"}},
+				or(11, 13): {f: []string{"b", "c"}},
+				or1(13):    {e: []string{"a", "b", "c"}},
+				or1(15):    {e: []string{"a", "b", "c"}},
+				or(17, 19): {e: []string{"a"}},
+				or1(19):    {f: []string{"c"}, e: []string{"a"}},
+				or(20, 22): {f: []string{"c"}},
+				or1(22):    {e: []string{"a", "c"}},
+				or1(24):    {e: []string{"a", "c"}},
+				or1(26):    {e: []string{"a"}},
+				or(27, 29): {e: []string{"b", "c"}},
 			},
 		},
 
@@ -968,11 +1423,11 @@ b: a`,
 				ln(1, 1, "a"): {self},
 				ln(2, 1, "b"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"): {f: []string{"a", "b"}},
-				ln(1, 1, "b"): {e: []string{"a", "b"}},
-				ln(2, 1, "b"): {f: []string{"a", "b"}},
-				ln(2, 1, "a"): {e: []string{"a", "b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):  {f: []string{"a", "b"}},
+				or(2, 5):  {e: []string{"a", "b"}},
+				or(5, 7):  {f: []string{"a", "b"}},
+				or(7, 10): {e: []string{"a", "b"}},
 			},
 		},
 
@@ -991,13 +1446,13 @@ c: a`,
 				ln(2, 1, "b"): {self},
 				ln(3, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"): {f: []string{"a", "b", "c"}},
-				ln(1, 1, "b"): {e: []string{"a", "b", "c"}},
-				ln(2, 1, "b"): {f: []string{"a", "b", "c"}},
-				ln(2, 1, "c"): {e: []string{"a", "b", "c"}},
-				ln(3, 1, "c"): {f: []string{"a", "b", "c"}},
-				ln(3, 1, "a"): {e: []string{"a", "b", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "b", "c"}},
+				or(2, 5):   {e: []string{"a", "b", "c"}},
+				or(5, 7):   {f: []string{"a", "b", "c"}},
+				or(7, 10):  {e: []string{"a", "b", "c"}},
+				or(10, 12): {f: []string{"a", "b", "c"}},
+				or(12, 15): {e: []string{"a", "b", "c"}},
 			},
 		},
 
@@ -1014,11 +1469,13 @@ a: b: c: a`,
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"): {f: []string{"a"}},
-				ln(1, 1, "b"): {f: []string{"b"}},
-				ln(1, 1, "c"): {f: []string{"c"}},
-				ln(1, 2, "a"): {f: []string{"b"}, e: []string{"a", "b", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):  {f: []string{"a"}},
+				or1(2):    {f: []string{"b"}, e: []string{"a"}},
+				or(3, 5):  {f: []string{"b"}},
+				or1(5):    {f: []string{"c"}, e: []string{"a", "b"}},
+				or(6, 8):  {f: []string{"c"}},
+				or(8, 11): {f: []string{"b"}, e: []string{"a", "b", "c"}},
 			},
 		},
 
@@ -1034,12 +1491,15 @@ a: b: c: a.b`,
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(1, 1, "c"):  {f: []string{"c"}},
-				ln(1, 2, "a"):  {e: []string{"a", "b", "c"}},
-				ln(1, 1, ".b"): {e: []string{"b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a"}},
+				or1(2):     {f: []string{"b"}, e: []string{"a"}},
+				or(3, 5):   {f: []string{"b"}},
+				or1(5):     {f: []string{"c"}, e: []string{"a", "b"}},
+				or(6, 8):   {f: []string{"c"}},
+				or1(8):     {f: []string{"c"}, e: []string{"a", "b", "c"}},
+				or(9, 11):  {e: []string{"a", "b", "c"}},
+				or(11, 13): {e: []string{"b"}},
 			},
 		},
 
@@ -1063,16 +1523,19 @@ x: c: x
 				ln(3, 1, "x"): {self, ln(2, 1, "x")},
 				ln(3, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "y"):      {f: []string{"x", "y"}},
-				ln(1, 1, "string"): {e: []string{"x", "y"}},
-				ln(1, 1, "b"):      {f: []string{"b"}},
-				ln(1, 2, "y"):      {e: []string{"b", "x", "y"}},
-				ln(2, 1, "x"):      {f: []string{"x", "y"}},
-				ln(2, 1, "y"):      {f: []string{"c"}, e: []string{"x", "y"}},
-				ln(3, 1, "x"):      {f: []string{"x", "y"}},
-				ln(3, 1, "c"):      {f: []string{"c"}},
-				ln(3, 2, "x"):      {f: []string{"c"}, e: []string{"c", "x", "y"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x", "y"}},
+				or1(2):     {e: []string{"x", "y"}},
+				or(4, 11):  {e: []string{"x", "y"}},
+				or1(12):    {f: []string{"b"}, e: []string{"x", "y"}},
+				or(13, 15): {f: []string{"b"}},
+				or(15, 18): {e: []string{"b", "x", "y"}},
+				or(18, 20): {f: []string{"x", "y"}},
+				or(20, 23): {f: []string{"c"}, e: []string{"x", "y"}},
+				or(23, 25): {f: []string{"x", "y"}},
+				or1(25):    {f: []string{"c"}, e: []string{"x", "y"}},
+				or(26, 28): {f: []string{"c"}},
+				or(28, 31): {f: []string{"c"}, e: []string{"c", "x", "y"}},
 			},
 		},
 
@@ -1089,12 +1552,18 @@ l=a: {b: 3, c: l.b}`,
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b", "c"}},
-				ln(1, 1, "c"):  {f: []string{"b", "c"}},
-				ln(1, 2, "l"):  {e: []string{"a", "b", "c", "l"}},
-				ln(1, 1, ".b"): {e: []string{"b", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or1(0):     {f: []string{"a"}},
+				or1(1):     {e: []string{"a", "l"}},
+				or(2, 4):   {f: []string{"a"}},
+				or(4, 6):   {f: []string{"b", "c"}, e: []string{"a", "l"}},
+				or(6, 8):   {f: []string{"b", "c"}},
+				or1(8):     {e: []string{"a", "b", "c", "l"}},
+				or1(10):    {e: []string{"a", "b", "c", "l"}},
+				or1(11):    {f: []string{"b", "c"}, e: []string{"a", "l"}},
+				or(12, 14): {f: []string{"b", "c"}},
+				or(14, 17): {e: []string{"a", "b", "c", "l"}},
+				or(17, 19): {e: []string{"b", "c"}},
 			},
 		},
 
@@ -1114,13 +1583,19 @@ a: c: l.b`,
 				ln(2, 1, "a"): {self, ln(1, 1, "a")},
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b", "c"}},
-				ln(2, 1, "a"):  {f: []string{"a"}},
-				ln(2, 1, "c"):  {f: []string{"b", "c"}},
-				ln(2, 1, "l"):  {e: []string{"a", "c", "l"}},
-				ln(2, 1, ".b"): {e: []string{"b", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or1(0):     {f: []string{"a"}},
+				or1(1):     {e: []string{"a", "l"}},
+				or(2, 4):   {f: []string{"a"}},
+				or1(4):     {f: []string{"b", "c"}, e: []string{"a", "l"}},
+				or(5, 7):   {f: []string{"b", "c"}},
+				or1(7):     {e: []string{"a", "b", "l"}},
+				or1(9):     {e: []string{"a", "b", "l"}},
+				or(10, 12): {f: []string{"a"}},
+				or1(12):    {f: []string{"b", "c"}, e: []string{"a", "l"}},
+				or(13, 15): {f: []string{"b", "c"}},
+				or(15, 18): {e: []string{"a", "c", "l"}},
+				or(18, 20): {e: []string{"b", "c"}},
 			},
 		},
 
@@ -1140,13 +1615,19 @@ l=a: c: l.b`,
 				ln(2, 1, "a"): {self, ln(1, 1, "a")},
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b", "c"}},
-				ln(2, 1, "a"):  {f: []string{"a"}},
-				ln(2, 1, "c"):  {f: []string{"b", "c"}},
-				ln(2, 2, "l"):  {e: []string{"a", "c", "l"}},
-				ln(2, 1, ".b"): {e: []string{"b", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a"}},
+				or1(2):     {f: []string{"b", "c"}, e: []string{"a", "l"}},
+				or(3, 5):   {f: []string{"b", "c"}},
+				or1(5):     {e: []string{"a", "b", "l"}},
+				or1(7):     {e: []string{"a", "b", "l"}},
+				or1(8):     {f: []string{"a"}},
+				or1(9):     {e: []string{"a", "l"}},
+				or(10, 12): {f: []string{"a"}},
+				or1(12):    {f: []string{"b", "c"}, e: []string{"a", "l"}},
+				or(13, 15): {f: []string{"b", "c"}},
+				or(15, 18): {e: []string{"a", "c", "l"}},
+				or(18, 20): {e: []string{"b", "c"}},
 			},
 		},
 
@@ -1165,12 +1646,17 @@ c: l.b`,
 
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a", "c"}},
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(2, 1, "c"):  {f: []string{"a", "c"}},
-				ln(2, 1, "l"):  {e: []string{"a", "c", "l"}},
-				ln(2, 1, ".b"): {e: []string{"b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or1(0):     {f: []string{"a", "c"}},
+				or1(1):     {e: []string{"a", "c", "l"}},
+				or(2, 4):   {f: []string{"a", "c"}},
+				or1(4):     {f: []string{"b"}, e: []string{"a", "c", "l"}},
+				or(5, 7):   {f: []string{"b"}},
+				or1(7):     {e: []string{"a", "b", "c", "l"}},
+				or1(9):     {e: []string{"a", "b", "c", "l"}},
+				or(10, 12): {f: []string{"a", "c"}},
+				or(12, 15): {e: []string{"a", "c", "l"}},
+				or(15, 17): {e: []string{"b"}},
 			},
 		},
 
@@ -1207,22 +1693,32 @@ h: a.l
 
 				ln(6, 1, "h"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a", "h"}},
-				ln(2, 1, "b"):  {f: []string{"b", "e", "f"}},
-				ln(2, 1, "c"):  {f: []string{"c", "d"}},
-				ln(2, 2, "l"):  {e: []string{"a", "b", "c", "d", "e", "h", "l"}},
-				ln(2, 1, ".d"): {e: []string{"c", "d"}},
-				ln(2, 2, "d"):  {f: []string{"c", "d"}},
-				ln(3, 1, "e"):  {f: []string{"b", "e", "f"}},
-				ln(3, 1, "l"):  {e: []string{"a", "b", "e", "h", "l"}},
-				ln(3, 1, ".d"): {e: []string{"c", "d"}},
-				ln(5, 1, "a"):  {f: []string{"a", "h"}},
-				ln(5, 1, "f"):  {f: []string{"b", "e", "f"}},
-				ln(5, 1, "l"):  {e: []string{"a", "f", "h"}},
-				ln(6, 1, "h"):  {f: []string{"a", "h"}},
-				ln(6, 1, "a"):  {e: []string{"a", "h"}},
-				ln(6, 1, ".l"): {e: []string{"b", "e", "f"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "h"}},
+				or(2, 6):   {f: []string{"b", "e", "f"}, e: []string{"a", "h"}},
+				or1(6):     {f: []string{"b", "e", "f"}},
+				or1(7):     {e: []string{"b", "e", "f"}},
+				or(8, 10):  {f: []string{"b", "e", "f"}},
+				or(10, 12): {f: []string{"c", "d"}, e: []string{"a", "b", "e", "h", "l"}},
+				or(12, 14): {f: []string{"c", "d"}},
+				or(14, 17): {e: []string{"a", "b", "c", "d", "e", "h", "l"}},
+				or(17, 19): {e: []string{"c", "d"}},
+				or1(19):    {f: []string{"c", "d"}, e: []string{"a", "b", "e", "h", "l"}},
+				or(20, 22): {f: []string{"c", "d"}},
+				or1(22):    {e: []string{"a", "b", "c", "d", "e", "h", "l"}},
+				or1(24):    {e: []string{"a", "b", "c", "d", "e", "h", "l"}},
+				or1(26):    {f: []string{"b", "e", "f"}, e: []string{"a", "h"}},
+				or(27, 29): {f: []string{"b", "e", "f"}},
+				or(29, 32): {e: []string{"a", "b", "e", "h", "l"}},
+				or(32, 34): {e: []string{"c", "d"}},
+				or1(34):    {f: []string{"b", "e", "f"}, e: []string{"a", "h"}},
+				or(36, 38): {f: []string{"a", "h"}},
+				or1(38):    {f: []string{"b", "e", "f"}, e: []string{"a", "h"}},
+				or(39, 41): {f: []string{"b", "e", "f"}},
+				or(41, 44): {e: []string{"a", "f", "h"}},
+				or(46, 48): {f: []string{"a", "h"}},
+				or(48, 51): {e: []string{"a", "h"}},
+				or(51, 53): {e: []string{"b", "e", "f"}},
 			},
 		},
 
@@ -1238,12 +1734,17 @@ l=(a): {b: 3, c: l.b}`,
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {e: []string{"l"}},
-				ln(1, 1, "b"):  {f: []string{"b", "c"}},
-				ln(1, 1, "c"):  {f: []string{"b", "c"}},
-				ln(1, 2, "l"):  {e: []string{"b", "c", "l"}},
-				ln(1, 1, ".b"): {e: []string{"b", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or1(1):     {e: []string{"l"}},
+				or(3, 5):   {e: []string{"l"}},
+				or(6, 8):   {f: []string{"b", "c"}, e: []string{"l"}},
+				or(8, 10):  {f: []string{"b", "c"}},
+				or1(10):    {e: []string{"b", "c", "l"}},
+				or1(12):    {e: []string{"b", "c", "l"}},
+				or1(13):    {f: []string{"b", "c"}, e: []string{"l"}},
+				or(14, 16): {f: []string{"b", "c"}},
+				or(16, 19): {e: []string{"b", "c", "l"}},
+				or(19, 21): {e: []string{"b", "c"}},
 			},
 		},
 
@@ -1263,13 +1764,18 @@ l=(a): b: 3
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {e: []string{"l"}},
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(2, 1, "a"):  {e: []string{"l"}},
-				ln(2, 1, "c"):  {f: []string{"c"}},
-				ln(2, 1, "l"):  {e: []string{"c", "l"}},
-				ln(2, 1, ".b"): {e: []string{"b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or1(1):     {e: []string{"l"}},
+				or(3, 5):   {e: []string{"l"}},
+				or1(6):     {f: []string{"b"}, e: []string{"l"}},
+				or(7, 9):   {f: []string{"b"}},
+				or1(9):     {e: []string{"b", "l"}},
+				or1(11):    {e: []string{"b", "l"}},
+				or(13, 15): {e: []string{"l"}},
+				or1(16):    {f: []string{"c"}, e: []string{"l"}},
+				or(17, 19): {f: []string{"c"}},
+				or(19, 22): {e: []string{"c", "l"}},
+				or(22, 24): {e: []string{"b"}},
 			},
 		},
 
@@ -1289,13 +1795,18 @@ l=(a): c: l.b`,
 				ln(2, 1, "l"): {self},
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {e: []string{"l"}},
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(2, 1, "a"):  {e: []string{"l"}},
-				ln(2, 1, "c"):  {f: []string{"c"}},
-				ln(2, 2, "l"):  {e: []string{"c", "l"}},
-				ln(2, 1, ".b"): {e: []string{"c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(1, 3):   {e: []string{"l"}},
+				or1(4):     {f: []string{"b"}, e: []string{"l"}},
+				or(5, 7):   {f: []string{"b"}},
+				or1(7):     {e: []string{"b", "l"}},
+				or1(9):     {e: []string{"b", "l"}},
+				or1(11):    {e: []string{"l"}},
+				or(13, 15): {e: []string{"l"}},
+				or1(16):    {f: []string{"c"}, e: []string{"l"}},
+				or(17, 19): {f: []string{"c"}},
+				or(19, 22): {e: []string{"c", "l"}},
+				or(22, 24): {e: []string{"c"}},
 			},
 		},
 
@@ -1312,12 +1823,17 @@ c: l.b`,
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {e: []string{"c", "l"}},
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(2, 1, "c"):  {f: []string{"c"}},
-				ln(2, 1, "l"):  {e: []string{"c", "l"}},
-				ln(2, 1, ".b"): {e: []string{"b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or1(0):     {f: []string{"c"}},
+				or1(1):     {e: []string{"c", "l"}},
+				or(3, 5):   {e: []string{"c", "l"}},
+				or1(6):     {f: []string{"b"}, e: []string{"c", "l"}},
+				or(7, 9):   {f: []string{"b"}},
+				or1(9):     {e: []string{"b", "c", "l"}},
+				or1(11):    {e: []string{"b", "c", "l"}},
+				or(12, 14): {f: []string{"c"}},
+				or(14, 17): {e: []string{"c", "l"}},
+				or(17, 19): {e: []string{"b"}},
 			},
 		},
 
@@ -1333,11 +1849,17 @@ l=[a]: {b: 3, c: l.b}`,
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "b"):  {f: []string{"b", "c"}},
-				ln(1, 1, "c"):  {f: []string{"b", "c"}},
-				ln(1, 2, "l"):  {e: []string{"b", "c", "l"}},
-				ln(1, 1, ".b"): {e: []string{"b", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or1(1):     {e: []string{"l"}},
+				or(3, 5):   {e: []string{"l"}},
+				or(6, 8):   {f: []string{"b", "c"}, e: []string{"l"}},
+				or(8, 10):  {f: []string{"b", "c"}},
+				or1(10):    {e: []string{"b", "c", "l"}},
+				or1(12):    {e: []string{"b", "c", "l"}},
+				or1(13):    {f: []string{"b", "c"}, e: []string{"l"}},
+				or(14, 16): {f: []string{"b", "c"}},
+				or(16, 19): {e: []string{"b", "c", "l"}},
+				or(19, 21): {e: []string{"b", "c"}},
 			},
 		},
 
@@ -1359,10 +1881,15 @@ l=[a]: b: 3
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "b"): {f: []string{"b"}},
-				ln(2, 1, "c"): {f: []string{"c"}},
-				ln(2, 1, "l"): {e: []string{"c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or1(1):     {e: []string{"l"}},
+				or(3, 5):   {e: []string{"l"}},
+				or1(6):     {f: []string{"b"}, e: []string{"l"}},
+				or(7, 9):   {f: []string{"b"}},
+				or1(9):     {e: []string{"b", "l"}},
+				or1(11):    {e: []string{"b", "l"}},
+				or(16, 19): {f: []string{"c"}},
+				or(19, 22): {e: []string{"c"}},
 			},
 		},
 
@@ -1381,11 +1908,16 @@ l=[a]: c: l.b`,
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(2, 1, "c"):  {f: []string{"c"}},
-				ln(2, 2, "l"):  {e: []string{"c", "l"}},
-				ln(2, 1, ".b"): {e: []string{"c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(4, 7):   {f: []string{"b"}},
+				or1(7):     {e: []string{"b"}},
+				or1(9):     {e: []string{"b"}},
+				or1(11):    {e: []string{"l"}},
+				or(13, 15): {e: []string{"l"}},
+				or1(16):    {f: []string{"c"}, e: []string{"l"}},
+				or(17, 19): {f: []string{"c"}},
+				or(19, 22): {e: []string{"c", "l"}},
+				or(22, 24): {e: []string{"c"}},
 			},
 		},
 
@@ -1404,11 +1936,16 @@ c: l.b`,
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"): {e: []string{"c"}},
-				ln(1, 1, "b"): {f: []string{"b"}},
-				ln(2, 1, "c"): {f: []string{"c"}},
-				ln(2, 1, "l"): {e: []string{"c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or1(0):     {f: []string{"c"}},
+				or1(1):     {e: []string{"c", "l"}},
+				or(3, 5):   {e: []string{"c", "l"}},
+				or1(6):     {f: []string{"b"}, e: []string{"c", "l"}},
+				or(7, 9):   {f: []string{"b"}},
+				or1(9):     {e: []string{"b", "c", "l"}},
+				or1(11):    {e: []string{"b", "c", "l"}},
+				or(12, 14): {f: []string{"c"}},
+				or(14, 17): {e: []string{"c"}},
 			},
 		},
 
@@ -1428,13 +1965,18 @@ c: l.b`,
 				ln(1, 1, "c"): {self},
 				ln(1, 1, "d"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"): {e: []string{"l"}},
-				ln(1, 1, "b"): {f: []string{"b", "c", "d"}},
-				ln(1, 1, "c"): {f: []string{"b", "c", "d"}},
-				ln(1, 2, "l"): {e: []string{"b", "c", "d", "l"}},
-				ln(1, 1, "d"): {f: []string{"b", "c", "d"}},
-				ln(1, 3, "l"): {e: []string{"b", "c", "d", "l"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(3, 5):   {e: []string{"l"}},
+				or(6, 8):   {f: []string{"b", "c", "d"}, e: []string{"l"}},
+				or(8, 10):  {f: []string{"b", "c", "d"}},
+				or1(10):    {e: []string{"b", "c", "d", "l"}},
+				or1(12):    {e: []string{"b", "c", "d", "l"}},
+				or1(13):    {f: []string{"b", "c", "d"}, e: []string{"l"}},
+				or(14, 16): {f: []string{"b", "c", "d"}},
+				or(16, 19): {e: []string{"b", "c", "d", "l"}},
+				or1(19):    {f: []string{"b", "c", "d"}, e: []string{"l"}},
+				or(20, 22): {f: []string{"b", "c", "d"}},
+				or(22, 25): {e: []string{"b", "c", "d", "l"}},
 			},
 		},
 
@@ -1455,11 +1997,14 @@ c: l.b`,
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"): {e: []string{"l"}},
-				ln(1, 1, "b"): {f: []string{"b"}},
-				ln(2, 1, "c"): {f: []string{"c"}},
-				ln(2, 1, "l"): {e: []string{"c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(3, 5):   {e: []string{"l"}},
+				or1(6):     {f: []string{"b"}, e: []string{"l"}},
+				or(7, 9):   {f: []string{"b"}},
+				or1(9):     {e: []string{"b", "l"}},
+				or1(11):    {e: []string{"b", "l"}},
+				or(16, 19): {f: []string{"c"}},
+				or(19, 22): {e: []string{"c"}},
 			},
 		},
 
@@ -1477,11 +2022,15 @@ c: l`,
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"): {e: []string{"c", "l"}},
-				ln(1, 1, "b"): {f: []string{"b"}},
-				ln(2, 1, "c"): {f: []string{"c"}},
-				ln(2, 1, "l"): {e: []string{"c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 3):   {f: []string{"c"}},
+				or(3, 5):   {e: []string{"c", "l"}},
+				or1(6):     {f: []string{"b"}, e: []string{"c", "l"}},
+				or(7, 9):   {f: []string{"b"}},
+				or1(9):     {e: []string{"b", "c", "l"}},
+				or1(11):    {e: []string{"b", "c", "l"}},
+				or(12, 14): {f: []string{"c"}},
+				or(14, 17): {e: []string{"c"}},
 			},
 		},
 
@@ -1498,12 +2047,17 @@ a: l={b: 3, c: l.b}`,
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b", "c"}},
-				ln(1, 1, "c"):  {f: []string{"b", "c"}},
-				ln(1, 2, "l"):  {e: []string{"a", "b", "c", "l"}},
-				ln(1, 1, ".b"): {e: []string{"b", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a"}},
+				or1(2):     {e: []string{"a"}},
+				or1(5):     {f: []string{"b", "c"}, e: []string{"a", "l"}},
+				or(6, 8):   {f: []string{"b", "c"}},
+				or1(8):     {e: []string{"a", "b", "c", "l"}},
+				or1(10):    {e: []string{"a", "b", "c", "l"}},
+				or1(11):    {f: []string{"b", "c"}, e: []string{"a", "l"}},
+				or(12, 14): {f: []string{"b", "c"}},
+				or(14, 17): {e: []string{"a", "b", "c", "l"}},
+				or(17, 19): {e: []string{"b", "c"}},
 			},
 		},
 
@@ -1520,12 +2074,17 @@ a: l={b: 3} & {c: l.b}`,
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b", "c"}},
-				ln(1, 1, "c"):  {f: []string{"b", "c"}},
-				ln(1, 2, "l"):  {e: []string{"a", "c", "l"}},
-				ln(1, 1, ".b"): {e: []string{"b", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a"}},
+				or1(2):     {e: []string{"a"}},
+				or1(5):     {f: []string{"b", "c"}, e: []string{"a", "l"}},
+				or(6, 8):   {f: []string{"b", "c"}},
+				or1(8):     {e: []string{"a", "b", "l"}},
+				or1(10):    {e: []string{"a", "b", "l"}},
+				or1(14):    {f: []string{"b", "c"}, e: []string{"a", "l"}},
+				or(15, 17): {f: []string{"b", "c"}},
+				or(17, 20): {e: []string{"a", "c", "l"}},
+				or(20, 22): {e: []string{"b", "c"}},
 			},
 		},
 
@@ -1544,12 +2103,18 @@ a: l=({b: 3} & {c: l.b})`,
 				ln(1, 1, "b"): {self},
 				ln(1, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b", "c"}},
-				ln(1, 1, "c"):  {f: []string{"b", "c"}},
-				ln(1, 2, "l"):  {e: []string{"a", "c", "l"}},
-				ln(1, 1, ".b"): {e: []string{"b", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a"}},
+				or1(2):     {e: []string{"a"}},
+				or(5, 7):   {f: []string{"b", "c"}, e: []string{"a", "l"}},
+				or(7, 9):   {f: []string{"b", "c"}},
+				or1(9):     {e: []string{"a", "b", "l"}},
+				or1(11):    {e: []string{"a", "b", "l"}},
+				or1(15):    {f: []string{"b", "c"}, e: []string{"a", "l"}},
+				or(16, 18): {f: []string{"b", "c"}},
+				or(18, 21): {e: []string{"a", "c", "l"}},
+				or(21, 23): {e: []string{"b", "c"}},
+				or1(24):    {e: []string{"a", "l"}},
 			},
 		},
 
@@ -1569,11 +2134,15 @@ c: l.b`,
 
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"): {f: []string{"a", "c"}},
-				ln(1, 1, "b"): {f: []string{"b"}},
-				ln(2, 1, "c"): {f: []string{"a", "c"}},
-				ln(2, 1, "l"): {e: []string{"a", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "c"}},
+				or1(2):     {e: []string{"a", "c"}},
+				or1(5):     {f: []string{"b"}, e: []string{"a", "c", "l"}},
+				or(6, 8):   {f: []string{"b"}},
+				or1(8):     {e: []string{"a", "b", "c", "l"}},
+				or1(10):    {e: []string{"a", "b", "c", "l"}},
+				or(12, 14): {f: []string{"a", "c"}},
+				or(14, 17): {e: []string{"a", "c"}},
 			},
 		},
 
@@ -1589,12 +2158,14 @@ a: n=(2 * (div(n, 2))) | error("\(n) is not even")
 				ln(1, 1, "n"): {self},
 				ln(1, 1, "a"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):     {f: []string{"a"}},
-				ln(1, 1, "div"):   {e: []string{"a", "n"}},
-				ln(1, 2, "n"):     {e: []string{"a", "n"}},
-				ln(1, 1, "error"): {e: []string{"a", "n"}},
-				ln(1, 3, "n"):     {e: []string{"a", "n"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a"}},
+				or1(2):     {e: []string{"a"}},
+				or1(5):     {e: []string{"a", "n"}},
+				or(7, 18):  {e: []string{"a", "n"}},
+				or(19, 31): {e: []string{"a", "n"}},
+				or(34, 36): {e: []string{"a", "n"}},
+				or(49, 51): {e: []string{"a", "n"}},
 			},
 		},
 
@@ -1610,12 +2181,17 @@ c: (f({a: b, b: 3})).g
 				ln(1, 1, "a"): {self},
 				ln(1, 2, "b"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "c"): {f: []string{"c"}},
-				ln(1, 1, "f"): {e: []string{"c"}},
-				ln(1, 1, "a"): {f: []string{"a", "b"}},
-				ln(1, 1, "b"): {e: []string{"a", "b", "c"}},
-				ln(1, 2, "b"): {f: []string{"a", "b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"c"}},
+				or(2, 6):   {e: []string{"c"}},
+				or1(6):     {f: []string{"a", "b"}, e: []string{"c"}},
+				or(7, 9):   {f: []string{"a", "b"}},
+				or(9, 12):  {e: []string{"a", "b", "c"}},
+				or1(12):    {f: []string{"a", "b"}, e: []string{"c"}},
+				or(13, 15): {f: []string{"a", "b"}},
+				or1(15):    {e: []string{"a", "b", "c"}},
+				or1(17):    {e: []string{"a", "b", "c"}},
+				or(19, 21): {e: []string{"c"}},
 			},
 		},
 
@@ -1643,20 +2219,33 @@ p: d.c
 				ln(2, 1, "o"): {self},
 				ln(3, 1, "p"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "d"):  {f: []string{"d", "o", "p"}},
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(1, 2, "a"):  {f: []string{"a", "c"}},
-				ln(1, 2, "b"):  {f: []string{"b"}},
-				ln(1, 1, "c"):  {f: []string{"a", "c"}},
-				ln(2, 1, "o"):  {f: []string{"d", "o", "p"}},
-				ln(2, 1, "d"):  {e: []string{"d", "o", "p"}},
-				ln(2, 1, ".a"): {e: []string{"a", "c"}},
-				ln(2, 1, ".b"): {e: []string{"b"}},
-				ln(3, 1, "p"):  {f: []string{"d", "o", "p"}},
-				ln(3, 1, "d"):  {e: []string{"d", "o", "p"}},
-				ln(3, 1, ".c"): {e: []string{"a", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"d", "o", "p"}},
+				or1(2):     {f: []string{"a", "c"}, e: []string{"d", "o", "p"}},
+				or1(3):     {f: []string{"a"}, e: []string{"d", "o", "p"}},
+				or(4, 6):   {f: []string{"a"}},
+				or1(6):     {f: []string{"b"}, e: []string{"a", "d", "o", "p"}},
+				or(7, 9):   {f: []string{"b"}},
+				or1(9):     {e: []string{"a", "b", "d", "o", "p"}},
+				or1(11):    {e: []string{"a", "b", "d", "o", "p"}},
+				or(13, 15): {e: []string{"d", "o", "p"}},
+				or1(15):    {f: []string{"a", "c"}, e: []string{"d", "o", "p"}},
+				or(16, 18): {f: []string{"a", "c"}},
+				or1(18):    {f: []string{"b"}, e: []string{"a", "c", "d", "o", "p"}},
+				or(19, 21): {f: []string{"b"}},
+				or1(21):    {e: []string{"a", "b", "c", "d", "o", "p"}},
+				or1(23):    {e: []string{"a", "b", "c", "d", "o", "p"}},
+				or1(24):    {f: []string{"a", "c"}, e: []string{"d", "o", "p"}},
+				or(25, 27): {f: []string{"a", "c"}},
+				or1(27):    {e: []string{"a", "c", "d", "o", "p"}},
+				or1(29):    {e: []string{"a", "c", "d", "o", "p"}},
+				or(31, 33): {f: []string{"d", "o", "p"}},
+				or(33, 36): {e: []string{"d", "o", "p"}},
+				or(36, 38): {e: []string{"a", "c"}},
+				or(38, 40): {e: []string{"b"}},
+				or(40, 42): {f: []string{"d", "o", "p"}},
+				or(42, 45): {e: []string{"d", "o", "p"}},
+				or(45, 47): {e: []string{"a", "c"}},
 			},
 		},
 
@@ -1684,20 +2273,34 @@ p: d.c
 				ln(2, 1, "o"): {self},
 				ln(3, 1, "p"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "d"):  {f: []string{"d", "o", "p"}},
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(1, 2, "a"):  {f: []string{"a"}},
-				ln(1, 2, "b"):  {f: []string{"b"}},
-				ln(1, 1, "c"):  {f: []string{"a", "c"}},
-				ln(2, 1, "o"):  {f: []string{"d", "o", "p"}},
-				ln(2, 1, "d"):  {e: []string{"d", "o", "p"}},
-				ln(2, 1, ".a"): {e: []string{"a", "c"}},
-				ln(2, 1, ".b"): {e: []string{"b"}},
-				ln(3, 1, "p"):  {f: []string{"d", "o", "p"}},
-				ln(3, 1, "d"):  {e: []string{"d", "o", "p"}},
-				ln(3, 1, ".c"): {e: []string{"a", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"d", "o", "p"}},
+				or(2, 4):   {f: []string{"a", "c"}, e: []string{"d", "o", "p"}},
+				or1(4):     {f: []string{"a"}, e: []string{"d", "o", "p"}},
+				or(5, 7):   {f: []string{"a"}},
+				or1(7):     {f: []string{"b"}, e: []string{"a", "d", "o", "p"}},
+				or(8, 10):  {f: []string{"b"}},
+				or1(10):    {e: []string{"a", "b", "d", "o", "p"}},
+				or1(12):    {e: []string{"a", "b", "d", "o", "p"}},
+				or(14, 16): {e: []string{"d", "o", "p"}},
+				or1(16):    {f: []string{"a"}, e: []string{"d", "o", "p"}},
+				or(17, 19): {f: []string{"a"}},
+				or1(19):    {f: []string{"b"}, e: []string{"a", "d", "o", "p"}},
+				or(20, 22): {f: []string{"b"}},
+				or1(22):    {e: []string{"a", "b", "d", "o", "p"}},
+				or1(24):    {e: []string{"a", "b", "d", "o", "p"}},
+				or(26, 29): {e: []string{"d", "o", "p"}},
+				or(29, 32): {f: []string{"a", "c"}, e: []string{"d", "o", "p"}},
+				or1(32):    {e: []string{"c", "d", "o", "p"}},
+				or1(34):    {e: []string{"c", "d", "o", "p"}},
+				or1(35):    {e: []string{"d", "o", "p"}},
+				or(36, 38): {f: []string{"d", "o", "p"}},
+				or(38, 41): {e: []string{"d", "o", "p"}},
+				or(41, 43): {e: []string{"a", "c"}},
+				or(43, 45): {e: []string{"b"}},
+				or(45, 47): {f: []string{"d", "o", "p"}},
+				or(47, 50): {e: []string{"d", "o", "p"}},
+				or(50, 52): {e: []string{"a", "c"}},
 			},
 		},
 
@@ -1723,17 +2326,34 @@ o: (d1 & d2).a
 
 				ln(3, 1, "o"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "d1"): {f: []string{"d1", "d2", "o"}},
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 2, "a"):  {f: []string{"a"}},
-				ln(2, 1, "d2"): {f: []string{"d1", "d2", "o"}},
-				ln(2, 1, "a"):  {f: []string{"a"}},
-				ln(2, 2, "a"):  {f: []string{"a"}},
-				ln(3, 1, "o"):  {f: []string{"d1", "d2", "o"}},
-				ln(3, 1, "d1"): {e: []string{"d1", "d2", "o"}},
-				ln(3, 1, "d2"): {e: []string{"d1", "d2", "o"}},
-				ln(3, 1, ".a"): {e: []string{"a"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 3):   {f: []string{"d1", "d2", "o"}},
+				or(3, 5):   {f: []string{"a"}, e: []string{"d1", "d2", "o"}},
+				or(5, 7):   {f: []string{"a"}},
+				or1(7):     {e: []string{"a", "d1", "d2", "o"}},
+				or1(9):     {e: []string{"a", "d1", "d2", "o"}},
+				or(11, 13): {e: []string{"d1", "d2", "o"}},
+				or1(13):    {f: []string{"a"}, e: []string{"d1", "d2", "o"}},
+				or(14, 16): {f: []string{"a"}},
+				or1(16):    {e: []string{"a", "d1", "d2", "o"}},
+				or1(18):    {e: []string{"a", "d1", "d2", "o"}},
+				or(20, 23): {f: []string{"d1", "d2", "o"}},
+				or(23, 25): {f: []string{"a"}, e: []string{"d1", "d2", "o"}},
+				or(25, 27): {f: []string{"a"}},
+				or1(27):    {e: []string{"a", "d1", "d2", "o"}},
+				or1(29):    {e: []string{"a", "d1", "d2", "o"}},
+				or(31, 33): {e: []string{"d1", "d2", "o"}},
+				or1(33):    {f: []string{"a"}, e: []string{"d1", "d2", "o"}},
+				or(34, 36): {f: []string{"a"}},
+				or1(36):    {e: []string{"a", "d1", "d2", "o"}},
+				or1(38):    {e: []string{"a", "d1", "d2", "o"}},
+				or(40, 42): {f: []string{"d1", "d2", "o"}},
+				or1(42):    {e: []string{"d1", "d2", "o"}},
+				or(43, 47): {f: []string{"a"}, e: []string{"d1", "d2", "o"}},
+				or(47, 49): {e: []string{"d1", "d2", "o"}},
+				or(49, 52): {f: []string{"a"}, e: []string{"d1", "d2", "o"}},
+				or1(52):    {e: []string{"d1", "d2", "o"}},
+				or(53, 55): {e: []string{"a"}},
 			},
 		},
 
@@ -1757,17 +2377,22 @@ out: r.x
 
 				ln(3, 1, "out"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "d"):      {f: []string{"d", "out", "r"}},
-				ln(1, 1, "x"):      {f: []string{"x"}},
-				ln(1, 1, "string"): {e: []string{"d", "out", "r"}},
-				ln(2, 1, "r"):      {f: []string{"d", "out", "r"}},
-				ln(2, 1, "d"):      {e: []string{"d", "out", "r"}},
-				ln(2, 1, "x"):      {f: []string{"x"}},
-				ln(2, 1, "int"):    {e: []string{"d", "out", "r", "x"}},
-				ln(3, 1, "out"):    {f: []string{"d", "out", "r"}},
-				ln(3, 1, "r"):      {e: []string{"d", "out", "r"}},
-				ln(3, 1, ".x"):     {e: []string{"x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"d", "out", "r"}},
+				or(2, 4):   {f: []string{"x"}, e: []string{"d", "out", "r"}},
+				or(4, 6):   {f: []string{"x"}},
+				or1(6):     {e: []string{"d", "out", "r", "x"}},
+				or1(9):     {e: []string{"d", "out", "r", "x"}},
+				or(11, 20): {e: []string{"d", "out", "r"}},
+				or(20, 22): {f: []string{"d", "out", "r"}},
+				or(22, 25): {f: []string{"x"}, e: []string{"d", "out", "r"}},
+				or(25, 27): {e: []string{"d", "out", "r"}},
+				or(27, 30): {f: []string{"x"}, e: []string{"d", "out", "r"}},
+				or(30, 35): {e: []string{"d", "out", "r", "x"}},
+				or1(35):    {e: []string{"d", "out", "r"}},
+				or(36, 40): {f: []string{"d", "out", "r"}},
+				or(40, 43): {e: []string{"d", "out", "r"}},
+				or(43, 45): {e: []string{"x"}},
 			},
 		},
 
@@ -1790,15 +2415,23 @@ d: c.b
 				ln(2, 1, "b"): {self},
 				ln(3, 1, "d"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "c"):  {f: []string{"b", "c", "d"}},
-				ln(1, 1, "a"):  {f: []string{"a"}},
-				ln(1, 1, "b"):  {e: []string{"a", "b", "c", "d"}},
-				ln(1, 2, "b"):  {f: []string{"b"}},
-				ln(2, 1, "b"):  {f: []string{"b", "c", "d"}},
-				ln(3, 1, "d"):  {f: []string{"b", "c", "d"}},
-				ln(3, 1, "c"):  {e: []string{"b", "c", "d"}},
-				ln(3, 1, ".b"): {e: []string{"a", "b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"b", "c", "d"}},
+				or1(2):     {f: []string{"a", "b"}, e: []string{"b", "c", "d"}},
+				or1(3):     {f: []string{"a"}, e: []string{"b", "c", "d"}},
+				or(4, 6):   {f: []string{"a"}},
+				or(6, 9):   {e: []string{"a", "b", "c", "d"}},
+				or(10, 12): {e: []string{"b", "c", "d"}},
+				or1(12):    {f: []string{"b"}, e: []string{"b", "c", "d"}},
+				or(13, 15): {f: []string{"b"}},
+				or1(15):    {e: []string{"b", "c", "d"}},
+				or1(17):    {e: []string{"b", "c", "d"}},
+				or(19, 21): {f: []string{"b", "c", "d"}},
+				or1(21):    {e: []string{"b", "c", "d"}},
+				or1(23):    {e: []string{"b", "c", "d"}},
+				or(24, 26): {f: []string{"b", "c", "d"}},
+				or(26, 29): {e: []string{"b", "c", "d"}},
+				or(29, 31): {e: []string{"a", "b"}},
 			},
 		},
 
@@ -1823,21 +2456,37 @@ c: a
 
 				ln(2, 1, "c"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a", "c"}},
-				ln(1, 1, "b"):  {f: []string{"b", "d"}},
-				ln(1, 1, "c"):  {e: []string{"a", "b", "c", "d"}},
-				ln(1, 1, ".d"): {e: []string{"b", "d", "x", "y", "z"}},
-				ln(1, 2, "d"):  {f: []string{"b", "d"}},
-				ln(1, 1, "x"):  {f: []string{"x"}},
-				ln(1, 1, "_"):  {e: []string{"a", "c", "x"}},
-				ln(1, 1, "y"):  {f: []string{"y"}},
-				ln(1, 2, "_"):  {e: []string{"a", "c", "y"}},
-				ln(1, 1, "z"):  {f: []string{"z"}},
-				ln(1, 3, "_"):  {e: []string{"a", "c", "z"}},
-				ln(1, 3, "d"):  {f: []string{"d"}},
-				ln(2, 1, "c"):  {f: []string{"a", "c"}},
-				ln(2, 1, "a"):  {f: []string{"b", "d", "x", "y", "z"}, e: []string{"a", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "c"}},
+				or1(2):     {f: []string{"b", "d", "x", "y", "z"}, e: []string{"a", "c"}},
+				or(3, 5):   {f: []string{"b", "d"}, e: []string{"a", "c"}},
+				or(5, 7):   {f: []string{"b", "d"}},
+				or(7, 10):  {e: []string{"a", "b", "c", "d"}},
+				or(10, 12): {e: []string{"b", "d", "x", "y", "z"}},
+				or1(12):    {f: []string{"b", "d"}, e: []string{"a", "c"}},
+				or(13, 15): {f: []string{"b", "d"}},
+				or1(15):    {e: []string{"a", "b", "c", "d"}},
+				or1(17):    {e: []string{"a", "b", "c", "d"}},
+				or(21, 23): {f: []string{"b", "d"}, e: []string{"a", "c"}},
+				or(24, 27): {e: []string{"a", "c"}},
+				or1(27):    {f: []string{"x"}, e: []string{"a", "c"}},
+				or(28, 30): {f: []string{"x"}},
+				or(30, 33): {e: []string{"a", "c", "x"}},
+				or(34, 36): {e: []string{"a", "c"}},
+				or1(36):    {f: []string{"y"}, e: []string{"a", "c"}},
+				or(37, 39): {f: []string{"y"}},
+				or(39, 42): {e: []string{"a", "c", "y"}},
+				or(43, 45): {e: []string{"a", "c"}},
+				or1(45):    {f: []string{"z"}, e: []string{"a", "c"}},
+				or(46, 48): {f: []string{"z"}},
+				or(48, 51): {e: []string{"a", "c", "z"}},
+				or(52, 54): {e: []string{"a", "c"}},
+				or1(54):    {f: []string{"d"}, e: []string{"a", "c"}},
+				or(55, 57): {f: []string{"d"}},
+				or1(57):    {e: []string{"a", "c", "d"}},
+				or1(59):    {e: []string{"a", "c", "d"}},
+				or(61, 63): {f: []string{"a", "c"}},
+				or(63, 66): {f: []string{"b", "d", "x", "y", "z"}, e: []string{"a", "c"}},
 			},
 		},
 
@@ -1860,15 +2509,21 @@ d: c.b
 				ln(2, 1, "b"): {self},
 				ln(3, 1, "d"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "c"):  {f: []string{"b", "c", "d"}},
-				ln(1, 1, "a"):  {f: []string{"a", "b"}},
-				ln(1, 1, "b"):  {e: []string{"a", "b", "c", "d"}},
-				ln(1, 2, "b"):  {f: []string{"a", "b"}},
-				ln(2, 1, "b"):  {f: []string{"b", "c", "d"}},
-				ln(3, 1, "d"):  {f: []string{"b", "c", "d"}},
-				ln(3, 1, "c"):  {e: []string{"b", "c", "d"}},
-				ln(3, 1, ".b"): {e: []string{"a", "b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"b", "c", "d"}},
+				or(2, 4):   {f: []string{"a", "b"}, e: []string{"b", "c", "d"}},
+				or(4, 6):   {f: []string{"a", "b"}},
+				or(6, 9):   {e: []string{"a", "b", "c", "d"}},
+				or1(12):    {f: []string{"a", "b"}, e: []string{"b", "c", "d"}},
+				or(13, 15): {f: []string{"a", "b"}},
+				or1(15):    {e: []string{"b", "c", "d"}},
+				or1(17):    {e: []string{"b", "c", "d"}},
+				or(19, 21): {f: []string{"b", "c", "d"}},
+				or1(21):    {e: []string{"b", "c", "d"}},
+				or1(23):    {e: []string{"b", "c", "d"}},
+				or(24, 26): {f: []string{"b", "c", "d"}},
+				or(26, 29): {e: []string{"b", "c", "d"}},
+				or(29, 31): {e: []string{"a", "b"}},
 			},
 		},
 
@@ -1896,17 +2551,27 @@ y: x.a`,
 				ln(5, 1, "a"): {self, ln(2, 1, "a"), ln(3, 1, "a")},
 				ln(7, 1, "y"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):   {f: []string{"x", "y"}},
-				ln(2, 1, "a"):   {f: []string{"a", "b"}},
-				ln(2, 1, "int"): {e: []string{"a", "b", "x", "y"}},
-				ln(2, 1, "b"):   {f: []string{"a", "b"}},
-				ln(2, 2, "a"):   {e: []string{"a", "b", "x", "y"}},
-				ln(3, 1, "a"):   {f: []string{"a", "b"}},
-				ln(5, 1, "a"):   {f: []string{"a", "b"}},
-				ln(7, 1, "y"):   {f: []string{"x", "y"}},
-				ln(7, 1, "x"):   {e: []string{"x", "y"}},
-				ln(7, 1, ".a"):  {e: []string{"a", "b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x", "y"}},
+				or(2, 7):   {f: []string{"a", "b"}, e: []string{"x", "y"}},
+				or(7, 9):   {f: []string{"a", "b"}},
+				or(9, 14):  {e: []string{"a", "b", "x", "y"}},
+				or1(14):    {f: []string{"a", "b"}, e: []string{"x", "y"}},
+				or(15, 17): {f: []string{"a", "b"}},
+				or(17, 20): {e: []string{"a", "b", "x", "y"}},
+				or(20, 22): {f: []string{"a", "b"}, e: []string{"x", "y"}},
+				or(22, 24): {f: []string{"a", "b"}},
+				or1(24):    {e: []string{"a", "b", "x", "y"}},
+				or1(26):    {e: []string{"a", "b", "x", "y"}},
+				or1(27):    {f: []string{"a", "b"}, e: []string{"x", "y"}},
+				or(31, 34): {f: []string{"a", "b"}, e: []string{"x", "y"}},
+				or(34, 36): {f: []string{"a", "b"}},
+				or(36, 38): {e: []string{"a", "x", "y"}},
+				or1(39):    {e: []string{"a", "x", "y"}},
+				or1(40):    {f: []string{"a", "b"}, e: []string{"x", "y"}},
+				or(42, 44): {f: []string{"x", "y"}},
+				or(44, 47): {e: []string{"x", "y"}},
+				or(47, 49): {e: []string{"a", "b"}},
 			},
 		},
 
@@ -1935,22 +2600,34 @@ d: c.b.x`,
 				ln(2, 1, "b"): {self},
 				ln(3, 1, "d"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "c"):  {f: []string{"b", "c", "d"}},
-				ln(1, 1, "a"):  {f: []string{"a", "b", "z"}},
-				ln(1, 1, "b"):  {f: []string{"x"}, e: []string{"a", "b", "c", "d"}},
-				ln(1, 2, "b"):  {f: []string{"a", "b", "z"}},
-				ln(1, 1, "x"):  {f: []string{"x"}},
-				ln(1, 3, "b"):  {f: []string{"a", "b", "z"}},
-				ln(1, 2, "x"):  {f: []string{"x"}},
-				ln(1, 1, "z"):  {f: []string{"a", "b", "z"}},
-				ln(1, 4, "b"):  {e: []string{"b", "c", "d", "z"}},
-				ln(1, 1, ".x"): {e: []string{"x"}},
-				ln(2, 1, "b"):  {f: []string{"b", "c", "d"}},
-				ln(3, 1, "d"):  {f: []string{"b", "c", "d"}},
-				ln(3, 1, "c"):  {e: []string{"b", "c", "d"}},
-				ln(3, 1, ".b"): {e: []string{"a", "b", "z"}},
-				ln(3, 1, ".x"): {e: []string{"x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"b", "c", "d"}},
+				or(2, 4):   {f: []string{"a", "b", "z"}, e: []string{"b", "c", "d"}},
+				or(4, 6):   {f: []string{"a", "b", "z"}},
+				or(6, 9):   {f: []string{"x"}, e: []string{"a", "b", "c", "d"}},
+				or1(9):     {f: []string{"a", "b", "z"}, e: []string{"b", "c", "d"}},
+				or(10, 12): {f: []string{"a", "b", "z"}},
+				or1(12):    {f: []string{"x"}, e: []string{"a", "b", "c", "d"}},
+				or(13, 15): {f: []string{"x"}},
+				or1(15):    {e: []string{"a", "b", "c", "d", "x"}},
+				or1(17):    {e: []string{"a", "b", "c", "d", "x"}},
+				or1(21):    {f: []string{"a", "b", "z"}, e: []string{"b", "c", "d"}},
+				or(22, 24): {f: []string{"a", "b", "z"}},
+				or1(24):    {f: []string{"x"}, e: []string{"b", "c", "d", "z"}},
+				or(25, 27): {f: []string{"x"}},
+				or1(27):    {e: []string{"b", "c", "d", "x", "z"}},
+				or1(29):    {e: []string{"b", "c", "d", "x", "z"}},
+				or1(30):    {f: []string{"a", "b", "z"}, e: []string{"b", "c", "d"}},
+				or(31, 33): {f: []string{"a", "b", "z"}},
+				or(33, 36): {e: []string{"b", "c", "d", "z"}},
+				or(36, 38): {e: []string{"x"}},
+				or(39, 41): {f: []string{"b", "c", "d"}},
+				or1(41):    {e: []string{"b", "c", "d"}},
+				or1(43):    {e: []string{"b", "c", "d"}},
+				or(44, 46): {f: []string{"b", "c", "d"}},
+				or(46, 49): {e: []string{"b", "c", "d"}},
+				or(49, 51): {e: []string{"a", "b", "z"}},
+				or(51, 53): {e: []string{"x"}},
 			},
 		},
 
@@ -1966,12 +2643,18 @@ b: ({a: 6} & {a: int}).a
 				ln(1, 1, "a"): {self, ln(1, 2, "a")},
 				ln(1, 2, "a"): {self, ln(1, 1, "a")},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "b"):   {f: []string{"b"}},
-				ln(1, 1, "a"):   {f: []string{"a"}},
-				ln(1, 2, "a"):   {f: []string{"a"}},
-				ln(1, 1, "int"): {e: []string{"a", "b"}},
-				ln(1, 1, ".a"):  {e: []string{"a"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"b"}},
+				or1(2):     {e: []string{"b"}},
+				or(3, 5):   {f: []string{"a"}, e: []string{"b"}},
+				or(5, 7):   {f: []string{"a"}},
+				or1(7):     {e: []string{"a", "b"}},
+				or1(9):     {e: []string{"a", "b"}},
+				or1(13):    {f: []string{"a"}, e: []string{"b"}},
+				or(14, 16): {f: []string{"a"}},
+				or(16, 21): {e: []string{"a", "b"}},
+				or1(22):    {e: []string{"b"}},
+				or(23, 25): {e: []string{"a"}},
 			},
 		},
 
@@ -1992,14 +2675,24 @@ a: 12
 
 				ln(2, 1, "a"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "c"): {f: []string{"a", "c"}},
-				ln(1, 1, "a"): {f: []string{"a", "d"}},
-				ln(1, 1, "d"): {f: []string{"a", "d"}},
-				ln(1, 2, "a"): {e: []string{"a", "c", "d"}},
-				ln(1, 1, "b"): {f: []string{"b"}},
-				ln(1, 3, "a"): {e: []string{"a", "b", "c"}},
-				ln(2, 1, "a"): {f: []string{"a", "c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "c"}},
+				or(2, 4):   {e: []string{"a", "c"}},
+				or1(4):     {f: []string{"a", "d"}, e: []string{"a", "c"}},
+				or(5, 7):   {f: []string{"a", "d"}},
+				or1(7):     {e: []string{"a", "c", "d"}},
+				or1(9):     {e: []string{"a", "c", "d"}},
+				or1(10):    {f: []string{"a", "d"}, e: []string{"a", "c"}},
+				or(11, 13): {f: []string{"a", "d"}},
+				or(13, 16): {e: []string{"a", "c", "d"}},
+				or(17, 19): {e: []string{"a", "c"}},
+				or1(19):    {f: []string{"b"}, e: []string{"a", "c"}},
+				or(20, 22): {f: []string{"b"}},
+				or(22, 25): {e: []string{"a", "b", "c"}},
+				or1(26):    {e: []string{"a", "c"}},
+				or(29, 31): {f: []string{"a", "c"}},
+				or1(31):    {e: []string{"a", "c"}},
+				or1(34):    {e: []string{"a", "c"}},
 			},
 		},
 
@@ -2019,11 +2712,15 @@ y: "wand"
 				ln(3, 1, "x"): {self},
 				ln(4, 1, "y"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(3, 1, "x"):     {f: []string{"x", "y"}},
-				ln(3, 1, "magic"): {e: []string{"magic", "x", "y"}},
-				ln(3, 1, "y"):     {e: []string{"magic", "x", "y"}},
-				ln(4, 1, "y"):     {f: []string{"x", "y"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 7):   {f: []string{"x", "y"}},
+				or(7, 15):  {e: []string{"magic", "x", "y"}},
+				or(15, 18): {f: []string{"x", "y"}},
+				or(18, 25): {e: []string{"magic", "x", "y"}},
+				or(32, 35): {e: []string{"magic", "x", "y"}},
+				or(35, 37): {f: []string{"x", "y"}},
+				or1(37):    {e: []string{"magic", "x", "y"}},
+				or1(44):    {e: []string{"magic", "x", "y"}},
 			},
 			expectUsagesExtra: map[position]map[bool][]position{
 				ln(1, 1, `"magic"`): {true: []position{self}},
@@ -2043,9 +2740,11 @@ x: wand.foo
 
 				ln(3, 1, "x"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(3, 1, "x"):    {f: []string{"x"}},
-				ln(3, 1, "wand"): {e: []string{"wand", "x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 7):   {f: []string{"x"}},
+				or(7, 20):  {e: []string{"wand", "x"}},
+				or(20, 23): {f: []string{"x"}},
+				or(23, 29): {e: []string{"wand", "x"}},
 			},
 			expectUsagesExtra: map[position]map[bool][]position{
 				ln(1, 1, "wand"): {true: []position{self}},
@@ -2072,16 +2771,23 @@ d: "4+\(a) > 0?\(b.x)"
 				ln(3, 1, "x"): {self},
 				ln(4, 1, "d"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a", "b", "c", "d"}},
-				ln(2, 1, "b"):  {f: []string{"a", "b", "c", "d"}},
-				ln(2, 1, "c"):  {f: []string{"x"}, e: []string{"a", "b", "c", "d"}},
-				ln(3, 1, "c"):  {f: []string{"a", "b", "c", "d"}},
-				ln(3, 1, "x"):  {f: []string{"x"}},
-				ln(4, 1, "d"):  {f: []string{"a", "b", "c", "d"}},
-				ln(4, 1, "a"):  {e: []string{"a", "b", "c", "d"}},
-				ln(4, 1, "b"):  {e: []string{"a", "b", "c", "d"}},
-				ln(4, 1, ".x"): {e: []string{"x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "b", "c", "d"}},
+				or1(2):     {e: []string{"a", "b", "c", "d"}},
+				or1(4):     {e: []string{"a", "b", "c", "d"}},
+				or(5, 7):   {f: []string{"a", "b", "c", "d"}},
+				or(7, 10):  {f: []string{"x"}, e: []string{"a", "b", "c", "d"}},
+				or(10, 12): {f: []string{"a", "b", "c", "d"}},
+				or1(12):    {f: []string{"x"}, e: []string{"a", "b", "c", "d"}},
+				or(13, 15): {f: []string{"x"}},
+				or1(15):    {e: []string{"a", "b", "c", "d", "x"}},
+				or1(20):    {e: []string{"a", "b", "c", "d", "x"}},
+				or(21, 23): {f: []string{"a", "b", "c", "d"}},
+				or1(23):    {e: []string{"a", "b", "c", "d"}},
+				or(29, 31): {e: []string{"a", "b", "c", "d"}},
+				or(38, 40): {e: []string{"a", "b", "c", "d"}},
+				or(40, 42): {e: []string{"x"}},
+				or1(43):    {e: []string{"a", "b", "c", "d"}},
 			},
 		},
 
@@ -2096,10 +2802,13 @@ a: 5
 
 				ln(1, 1, "a"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):     {f: []string{"a"}},
-				ln(2, 1, "a"):     {e: []string{"a"}},
-				ln(2, 1, "hello"): {e: []string{"a"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a"}},
+				or1(2):     {e: []string{"a"}},
+				or1(4):     {e: []string{"a"}},
+				or1(5):     {f: []string{"a"}},
+				or(12, 14): {e: []string{"a"}},
+				or(16, 23): {e: []string{"a"}},
 			},
 		},
 
@@ -2119,14 +2828,22 @@ a: 12
 				ln(1, 1, "b"): {self},
 				ln(2, 1, "a"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "y"):  {f: []string{"a", "y"}},
-				ln(1, 1, "a"):  {f: []string{"a", "b"}},
-				ln(1, 1, "b"):  {f: []string{"a", "b"}},
-				ln(1, 2, "a"):  {e: []string{"a", "b", "y"}},
-				ln(1, 1, ".b"): {e: []string{"a", "b"}},
-				ln(1, 3, "a"):  {e: []string{"a", "y"}},
-				ln(2, 1, "a"):  {f: []string{"a", "y"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "y"}},
+				or1(2):     {e: []string{"a", "y"}},
+				or1(6):     {f: []string{"a", "b"}, e: []string{"a", "y"}},
+				or(7, 9):   {f: []string{"a", "b"}},
+				or1(9):     {e: []string{"a", "b", "y"}},
+				or1(11):    {e: []string{"a", "b", "y"}},
+				or1(12):    {f: []string{"a", "b"}, e: []string{"a", "y"}},
+				or(13, 15): {f: []string{"a", "b"}},
+				or(15, 18): {e: []string{"a", "b", "y"}},
+				or(19, 21): {e: []string{"a", "b"}},
+				or(24, 26): {e: []string{"a", "y"}},
+				or1(27):    {e: []string{"a", "y"}},
+				or(28, 30): {f: []string{"a", "y"}},
+				or1(30):    {e: []string{"a", "y"}},
+				or1(33):    {e: []string{"a", "y"}},
 			},
 		},
 
@@ -2142,10 +2859,13 @@ y: "sticks"
 				ln(1, 1, "x"): {self},
 				ln(2, 1, "y"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"): {f: []string{"x", "y"}},
-				ln(1, 1, "y"): {e: []string{"x", "y"}},
-				ln(2, 1, "y"): {f: []string{"x", "y"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x", "y"}},
+				or1(2):     {e: []string{"x", "y"}},
+				or(9, 14):  {e: []string{"x", "y"}},
+				or(14, 16): {f: []string{"x", "y"}},
+				or1(16):    {e: []string{"x", "y"}},
+				or1(25):    {e: []string{"x", "y"}},
 			},
 		},
 
@@ -2156,19 +2876,24 @@ x: {"💩": "sticks"}
 y: x["💩"]
 `,
 			expectDefinitions: map[position][]position{
-				ln(2, 1, "x"):     {ln(1, 1, "x")},
-				ln(2, 1, `["💩"]`): {ln(1, 1, `"💩"`)},
+				ln(2, 1, "x"):    {ln(1, 1, "x")},
+				ln(2, 1, `"💩"]`): {ln(1, 1, `"💩"`)},
 
 				ln(1, 1, "x"):   {self},
 				ln(1, 1, `"💩"`): {self},
 
 				ln(2, 1, "y"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):   {f: []string{"x", "y"}},
-				ln(1, 1, `"💩"`): {f: []string{"💩"}},
-				ln(2, 1, "y"):   {f: []string{"x", "y"}},
-				ln(2, 1, "x"):   {e: []string{"x", "y"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x", "y"}},
+				or(2, 4):   {f: []string{"💩"}, e: []string{"x", "y"}},
+				or1(4):     {f: []string{"💩"}},
+				or(5, 11):  {e: []string{"💩"}},
+				or1(11):    {e: []string{"x", "y", "💩"}},
+				or1(20):    {e: []string{"x", "y", "💩"}},
+				or(22, 24): {f: []string{"x", "y"}},
+				or(24, 27): {e: []string{"x", "y"}},
+				or(27, 35): {e: []string{"💩"}},
 			},
 		},
 
@@ -2187,11 +2912,16 @@ y: x."💩"
 
 				ln(2, 1, "y"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"):   {f: []string{"x", "y"}},
-				ln(1, 1, `"💩"`): {f: []string{"💩"}},
-				ln(2, 1, "y"):   {f: []string{"x", "y"}},
-				ln(2, 1, "x"):   {e: []string{"x", "y"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x", "y"}},
+				or(2, 4):   {f: []string{"💩"}, e: []string{"x", "y"}},
+				or1(4):     {f: []string{"💩"}},
+				or(5, 11):  {e: []string{"💩"}},
+				or1(11):    {e: []string{"x", "y", "💩"}},
+				or1(20):    {e: []string{"x", "y", "💩"}},
+				or(22, 24): {f: []string{"x", "y"}},
+				or(24, 27): {e: []string{"x", "y"}},
+				or(27, 34): {e: []string{"💩"}},
 			},
 		},
 
@@ -2223,19 +2953,31 @@ y: x.c`,
 				ln(7, 1, "z"): {self},
 				ln(9, 1, "y"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a", "b", "x", "y"}},
-				ln(2, 1, "b"):  {f: []string{"a", "b", "x", "y"}},
-				ln(3, 1, "x"):  {f: []string{"a", "b", "x", "y"}},
-				ln(4, 1, "a"):  {e: []string{"a", "b", "l", "x", "y", "z"}},
-				ln(5, 1, "c"):  {f: []string{"c", "z"}},
-				ln(5, 1, "b"):  {e: []string{"a", "b", "c", "l", "x", "y", "z"}},
-				ln(7, 1, "z"):  {f: []string{"c", "z"}},
-				ln(7, 1, "l"):  {e: []string{"a", "b", "l", "x", "y", "z"}},
-				ln(7, 1, ".c"): {e: []string{"c", "z"}},
-				ln(9, 1, "y"):  {f: []string{"a", "b", "x", "y"}},
-				ln(9, 1, "x"):  {e: []string{"a", "b", "l", "x", "y"}},
-				ln(9, 1, ".c"): {e: []string{"c", "z"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "b", "x", "y"}},
+				or1(2):     {e: []string{"a", "b", "l", "x", "y"}},
+				or1(5):     {e: []string{"a", "b", "l", "x", "y"}},
+				or(6, 8):   {f: []string{"a", "b", "x", "y"}},
+				or1(8):     {e: []string{"a", "b", "l", "x", "y"}},
+				or1(10):    {e: []string{"a", "b", "l", "x", "y"}},
+				or1(11):    {f: []string{"a", "b", "x", "y"}},
+				or1(12):    {e: []string{"a", "b", "l", "x", "y"}},
+				or(13, 15): {f: []string{"a", "b", "x", "y"}},
+				or(15, 22): {f: []string{"c", "z"}, e: []string{"a", "b", "l", "x", "y"}},
+				or(22, 26): {e: []string{"a", "b", "l", "x", "y", "z"}},
+				or1(28):    {e: []string{"a", "b", "l", "x", "y", "z"}},
+				or(29, 33): {f: []string{"c", "z"}, e: []string{"a", "b", "l", "x", "y", "z"}},
+				or(33, 35): {f: []string{"c", "z"}},
+				or(35, 38): {e: []string{"a", "b", "c", "l", "x", "y", "z"}},
+				or(38, 40): {f: []string{"c", "z"}, e: []string{"a", "b", "l", "x", "y", "z"}},
+				or1(41):    {f: []string{"c", "z"}, e: []string{"a", "b", "l", "x", "y"}},
+				or(42, 44): {f: []string{"c", "z"}},
+				or(44, 47): {e: []string{"a", "b", "l", "x", "y", "z"}},
+				or(47, 49): {e: []string{"c", "z"}},
+				or1(49):    {f: []string{"c", "z"}, e: []string{"a", "b", "l", "x", "y"}},
+				or(51, 53): {f: []string{"a", "b", "x", "y"}},
+				or(53, 56): {e: []string{"a", "b", "l", "x", "y"}},
+				or(56, 58): {e: []string{"c", "z"}},
 			},
 		},
 
@@ -2259,15 +3001,20 @@ y: x.c
 				ln(2, 1, "x"): {self},
 				ln(3, 1, "y"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a", "y"}},
-				ln(1, 1, "b"):  {f: []string{"b"}},
-				ln(1, 1, "c"):  {f: []string{"c"}},
-				ln(2, 1, "a"):  {e: []string{"a", "x", "y"}},
-				ln(2, 1, ".b"): {e: []string{"b"}},
-				ln(3, 1, "y"):  {f: []string{"a", "y"}},
-				ln(3, 1, "x"):  {e: []string{"a", "x", "y"}},
-				ln(3, 1, ".c"): {e: []string{"c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "y"}},
+				or1(2):     {f: []string{"b"}, e: []string{"a", "x", "y"}},
+				or(3, 5):   {f: []string{"b"}},
+				or1(5):     {f: []string{"c"}, e: []string{"a", "b", "x", "y"}},
+				or(6, 8):   {f: []string{"c"}},
+				or1(8):     {e: []string{"a", "b", "c", "x", "y"}},
+				or1(11):    {e: []string{"a", "b", "c", "x", "y"}},
+				or(12, 18): {f: []string{"a", "y"}},
+				or(18, 20): {e: []string{"a", "x", "y"}},
+				or(20, 22): {e: []string{"b"}},
+				or(22, 24): {f: []string{"a", "y"}},
+				or(24, 27): {e: []string{"a", "x", "y"}},
+				or(27, 29): {e: []string{"c"}},
 			},
 		},
 
@@ -2296,16 +3043,22 @@ o: a.b
 
 				ln(6, 1, "o"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):  {f: []string{"a", "o"}},
-				ln(3, 1, "c"):  {f: []string{"c", "d"}},
-				ln(3, 1, "b"):  {e: []string{"a", "b", "c", "o"}},
-				ln(5, 1, "a"):  {f: []string{"a", "o"}},
-				ln(5, 1, "d"):  {f: []string{"c", "d"}},
-				ln(5, 1, "b"):  {e: []string{"a", "d", "o"}},
-				ln(6, 1, "o"):  {f: []string{"a", "o"}},
-				ln(6, 1, "a"):  {e: []string{"a", "o"}},
-				ln(6, 1, ".b"): {e: []string{"c", "d"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a", "o"}},
+				or(2, 10):  {f: []string{"c", "d"}, e: []string{"a", "o"}},
+				or(10, 12): {f: []string{"c", "d"}},
+				or1(14):    {e: []string{"a", "b", "c", "o"}},
+				or1(15):    {f: []string{"c", "d"}, e: []string{"a", "o"}},
+				or(16, 18): {f: []string{"c", "d"}},
+				or(18, 21): {e: []string{"a", "b", "c", "o"}},
+				or1(21):    {f: []string{"c", "d"}, e: []string{"a", "o"}},
+				or(23, 25): {f: []string{"a", "o"}},
+				or1(25):    {f: []string{"c", "d"}, e: []string{"a", "o"}},
+				or(26, 28): {f: []string{"c", "d"}},
+				or(28, 31): {e: []string{"a", "d", "o"}},
+				or(31, 33): {f: []string{"a", "o"}},
+				or(33, 36): {e: []string{"a", "o"}},
+				or(36, 38): {e: []string{"c", "d"}},
 			},
 		},
 
@@ -2356,29 +3109,53 @@ r: o.k
 				ln(9, 1, "q"):  {self},
 				ln(10, 1, "r"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "a"):   {f: []string{"a", "b", "o", "q", "r"}},
-				ln(1, 1, "x"):   {f: []string{"x", "y", "z"}},
-				ln(1, 1, "y"):   {f: []string{"x", "y", "z"}},
-				ln(1, 1, "z"):   {f: []string{"x", "y", "z"}},
-				ln(2, 1, "b"):   {f: []string{"a", "b", "o", "q", "r"}},
-				ln(2, 1, "x"):   {f: []string{"x", "y", "z"}},
-				ln(2, 1, "y"):   {f: []string{"x", "y", "z"}},
-				ln(2, 1, "z"):   {f: []string{"x", "y", "z"}},
-				ln(3, 1, "o"):   {f: []string{"a", "b", "o", "q", "r"}},
-				ln(4, 1, "a"):   {e: []string{"a", "b", "o", "q", "r"}},
-				ln(5, 1, "k"):   {e: []string{"a", "b", "k", "o", "p", "q", "r", "v"}},
-				ln(5, 1, "v"):   {e: []string{"a", "b", "k", "o", "p", "q", "r", "v"}},
-				ln(5, 1, "b"):   {e: []string{"a", "b", "k", "o", "p", "q", "r", "v"}},
-				ln(5, 2, "k"):   {e: []string{"a", "b", "k", "o", "p", "q", "r", "v"}},
-				ln(6, 1, "p"):   {f: []string{"p"}},
-				ln(6, 1, "v"):   {e: []string{"a", "b", "k", "o", "p", "q", "r", "v"}},
-				ln(9, 1, "q"):   {f: []string{"a", "b", "o", "q", "r"}},
-				ln(9, 1, "o"):   {e: []string{"a", "b", "o", "q", "r"}},
-				ln(9, 1, ".p"):  {e: []string{"p"}},
-				ln(10, 1, "r"):  {f: []string{"a", "b", "o", "q", "r"}},
-				ln(10, 1, "o"):  {e: []string{"a", "b", "o", "q", "r"}},
-				ln(10, 1, ".k"): {e: []string{"p"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):     {f: []string{"a", "b", "o", "q", "r"}},
+				or(2, 5):     {f: []string{"x", "y", "z"}, e: []string{"a", "b", "o", "q", "r"}},
+				or(5, 7):     {f: []string{"x", "y", "z"}},
+				or1(7):       {e: []string{"a", "b", "o", "q", "r", "x", "y", "z"}},
+				or1(9):       {e: []string{"a", "b", "o", "q", "r", "x", "y", "z"}},
+				or1(10):      {f: []string{"x", "y", "z"}, e: []string{"a", "b", "o", "q", "r"}},
+				or(11, 13):   {f: []string{"x", "y", "z"}},
+				or1(13):      {e: []string{"a", "b", "o", "q", "r", "x", "y", "z"}},
+				or1(15):      {e: []string{"a", "b", "o", "q", "r", "x", "y", "z"}},
+				or1(16):      {f: []string{"x", "y", "z"}, e: []string{"a", "b", "o", "q", "r"}},
+				or(17, 19):   {f: []string{"x", "y", "z"}},
+				or1(19):      {e: []string{"a", "b", "o", "q", "r", "x", "y", "z"}},
+				or1(21):      {e: []string{"a", "b", "o", "q", "r", "x", "y", "z"}},
+				or(23, 25):   {f: []string{"a", "b", "o", "q", "r"}},
+				or(25, 28):   {f: []string{"x", "y", "z"}, e: []string{"a", "b", "o", "q", "r"}},
+				or(28, 30):   {f: []string{"x", "y", "z"}},
+				or1(30):      {e: []string{"a", "b", "o", "q", "r", "x", "y", "z"}},
+				or1(32):      {e: []string{"a", "b", "o", "q", "r", "x", "y", "z"}},
+				or1(33):      {f: []string{"x", "y", "z"}, e: []string{"a", "b", "o", "q", "r"}},
+				or(34, 36):   {f: []string{"x", "y", "z"}},
+				or1(36):      {e: []string{"a", "b", "o", "q", "r", "x", "y", "z"}},
+				or1(38):      {e: []string{"a", "b", "o", "q", "r", "x", "y", "z"}},
+				or1(39):      {f: []string{"x", "y", "z"}, e: []string{"a", "b", "o", "q", "r"}},
+				or(40, 42):   {f: []string{"x", "y", "z"}},
+				or1(42):      {e: []string{"a", "b", "o", "q", "r", "x", "y", "z"}},
+				or1(44):      {e: []string{"a", "b", "o", "q", "r", "x", "y", "z"}},
+				or(46, 48):   {f: []string{"a", "b", "o", "q", "r"}},
+				or(48, 56):   {f: []string{"p"}, e: []string{"a", "b", "o", "q", "r"}},
+				or1(58):      {e: []string{"a", "b", "o", "q", "r"}},
+				or(61, 64):   {e: []string{"a", "b", "k", "o", "q", "r"}},
+				or(64, 66):   {f: []string{"x", "y", "z"}, e: []string{"a", "b", "k", "o", "q", "r"}},
+				or(66, 70):   {f: []string{"p"}, e: []string{"a", "b", "k", "o", "q", "r", "v"}},
+				or1(70):      {f: []string{"p"}},
+				or(71, 73):   {e: []string{"a", "b", "k", "o", "p", "q", "r", "v"}},
+				or(74, 84):   {e: []string{"a", "b", "k", "o", "p", "q", "r", "v"}},
+				or(84, 86):   {f: []string{"p"}, e: []string{"a", "b", "k", "o", "q", "r", "v"}},
+				or(86, 88):   {f: []string{"p"}},
+				or(88, 91):   {e: []string{"a", "b", "k", "o", "p", "q", "r", "v"}},
+				or(91, 93):   {f: []string{"p"}, e: []string{"a", "b", "k", "o", "q", "r", "v"}},
+				or1(94):      {f: []string{"p"}, e: []string{"a", "b", "o", "q", "r"}},
+				or(96, 98):   {f: []string{"a", "b", "o", "q", "r"}},
+				or(98, 101):  {e: []string{"a", "b", "o", "q", "r"}},
+				or(101, 103): {e: []string{"p"}},
+				or(103, 105): {f: []string{"a", "b", "o", "q", "r"}},
+				or(105, 108): {e: []string{"a", "b", "o", "q", "r"}},
+				or(108, 110): {e: []string{"p"}},
 			},
 		},
 
@@ -2397,11 +3174,17 @@ foo: bar: "baz"`,
 				ln(2, 1, "foo"): {self},
 				ln(2, 1, "bar"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "foo"):  {e: []string{"foo"}},
-				ln(1, 1, ".bar"): {e: []string{"bar"}},
-				ln(2, 1, "foo"):  {f: []string{"foo"}},
-				ln(2, 1, "bar"):  {f: []string{"bar"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 4):   {f: []string{"foo"}},
+				or1(6):     {e: []string{"foo"}},
+				or(9, 16):  {e: []string{"a", "foo"}},
+				or(16, 20): {e: []string{"a", "bar", "foo"}},
+				or(20, 22): {f: []string{"foo"}, e: []string{"a", "b", "foo"}},
+				or(23, 27): {f: []string{"foo"}},
+				or1(27):    {f: []string{"bar"}, e: []string{"foo"}},
+				or(28, 32): {f: []string{"bar"}},
+				or1(32):    {e: []string{"bar", "foo"}},
+				or1(38):    {e: []string{"bar", "foo"}},
 			},
 		},
 
@@ -2425,12 +3208,17 @@ k: {}
 
 				ln(4, 1, "k"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"): {f: []string{"k", "x"}},
-				ln(2, 2, "k"): {e: []string{"k", "x"}},
-				ln(2, 2, "v"): {f: []string{"v"}},
-				ln(2, 3, "k"): {e: []string{"k", "v", "x"}},
-				ln(4, 1, "k"): {f: []string{"k", "x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"k", "x"}},
+				or(2, 10):  {f: []string{"v"}, e: []string{"k", "x"}},
+				or1(12):    {e: []string{"k", "x"}},
+				or(15, 20): {e: []string{"k", "x"}},
+				or1(20):    {f: []string{"v"}, e: []string{"k", "v", "x"}},
+				or(21, 23): {f: []string{"v"}},
+				or(23, 26): {e: []string{"k", "v", "x"}},
+				or1(27):    {f: []string{"v"}, e: []string{"k", "x"}},
+				or(29, 31): {f: []string{"k", "x"}},
+				or(31, 34): {e: []string{"k", "x"}},
 			},
 		},
 
@@ -2456,19 +3244,31 @@ i: g[0].h`,
 				ln(3, 1, "x"): {self},
 				ln(4, 1, "h"): {self},
 
-				ln(6, 1, "i"):   {self},
-				ln(6, 1, "[0]"): {ln(1, 1, "for")},
-				ln(6, 1, "h"):   {ln(4, 1, "h")},
+				ln(6, 1, "i"):  {self},
+				ln(6, 1, "0]"): {ln(1, 1, "for")},
+				ln(6, 1, "h"):  {ln(4, 1, "h")},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "g"):  {f: []string{"g", "i"}},
-				ln(2, 2, "x"):  {e: []string{"g", "i", "x"}},
-				ln(3, 2, "x"):  {e: []string{"g", "i", "x"}},
-				ln(4, 1, "h"):  {f: []string{"h"}},
-				ln(4, 1, "x"):  {e: []string{"g", "h", "i", "x"}},
-				ln(6, 1, "i"):  {f: []string{"g", "i"}},
-				ln(6, 1, "g"):  {e: []string{"g", "i"}},
-				ln(6, 1, ".h"): {e: []string{"h"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"g", "i"}},
+				or(2, 4):   {e: []string{"g", "i"}},
+				or1(4):     {f: []string{"h"}, e: []string{"g", "i"}},
+				or(5, 8):   {e: []string{"g", "i"}},
+				or(10, 14): {e: []string{"g", "i"}},
+				or(15, 17): {e: []string{"g", "i"}},
+				or(18, 20): {e: []string{"g", "i"}},
+				or(20, 24): {e: []string{"g", "i", "x"}},
+				or(26, 30): {e: []string{"g", "i", "x"}},
+				or(31, 36): {e: []string{"g", "i", "x"}},
+				or(38, 42): {e: []string{"g", "i", "x"}},
+				or1(43):    {e: []string{"g", "i", "x"}},
+				or(44, 51): {f: []string{"h"}, e: []string{"g", "i", "x"}},
+				or(51, 53): {f: []string{"h"}},
+				or(53, 56): {e: []string{"g", "h", "i", "x"}},
+				or(56, 58): {f: []string{"h"}, e: []string{"g", "i", "x"}},
+				or1(59):    {e: []string{"g", "i"}},
+				or(60, 62): {f: []string{"g", "i"}},
+				or(62, 65): {e: []string{"g", "i"}},
+				or(68, 70): {e: []string{"h"}},
 			},
 		},
 
@@ -2489,15 +3289,19 @@ o: #x & #x.y.z
 
 				ln(2, 1, "o"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "#x"): {f: []string{"#x", "o"}},
-				ln(1, 1, "y"):  {f: []string{"y"}},
-				ln(1, 1, "#z"): {f: []string{"#z"}},
-				ln(2, 1, "o"):  {f: []string{"#x", "o"}},
-				ln(2, 1, "#x"): {e: []string{"#x", "o"}},
-				ln(2, 2, "#x"): {e: []string{"#x", "o"}},
-				ln(2, 1, ".y"): {e: []string{"y"}},
-				ln(2, 1, ".z"): {e: []string{"#z"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 3):   {f: []string{"#x", "o"}},
+				or1(3):     {f: []string{"y"}, e: []string{"#x", "o"}},
+				or(4, 6):   {f: []string{"y"}},
+				or1(6):     {f: []string{"#z"}, e: []string{"#x", "o", "y"}},
+				or(7, 10):  {f: []string{"#z"}},
+				or1(10):    {e: []string{"#x", "#z", "o", "y"}},
+				or1(12):    {e: []string{"#x", "#z", "o", "y"}},
+				or(13, 15): {f: []string{"#x", "o"}},
+				or(15, 19): {f: []string{"y"}, e: []string{"#x", "o"}},
+				or(19, 24): {e: []string{"#x", "o"}},
+				or(24, 26): {e: []string{"#x", "o", "y"}},
+				or(26, 28): {e: []string{"#x", "#z", "o"}},
 			},
 		},
 
@@ -2521,12 +3325,13 @@ bar: foo
 				fln("a.cue", 3, 1, "foo"): {self},
 				fln("b.cue", 3, 1, "bar"): {self},
 			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				orf("a.cue", 10, 15): {f: []string{"bar", "foo"}},
+				orf("a.cue", 15, 16): {e: []string{"foo"}},
+				orf("a.cue", 20, 21): {e: []string{"foo"}},
 
-			expectCompletions: map[position]fieldEmbedCompletions{
-				fln("a.cue", 3, 1, "foo"): {f: []string{"bar", "foo"}},
-
-				fln("b.cue", 3, 1, "bar"): {f: []string{"bar", "foo"}},
-				fln("b.cue", 3, 1, "foo"): {e: []string{"bar", "foo"}},
+				orf("b.cue", 10, 15): {f: []string{"bar", "foo"}},
+				orf("b.cue", 15, 20): {e: []string{"bar"}},
 			},
 		},
 
@@ -2559,15 +3364,19 @@ foo: _
 				fln("c.cue", 3, 1, "bar"): {self},
 				fln("c.cue", 4, 1, "foo"): {self, fln("a.cue", 3, 1, "foo"), fln("b.cue", 3, 1, "foo")},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				fln("a.cue", 3, 1, "foo"): {f: []string{"bar", "foo"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				orf("a.cue", 10, 15): {f: []string{"bar", "foo"}},
+				orf("a.cue", 15, 16): {e: []string{"foo"}},
+				orf("a.cue", 20, 21): {e: []string{"foo"}},
 
-				fln("b.cue", 3, 1, "foo"): {f: []string{"bar", "foo"}},
+				orf("b.cue", 10, 15): {f: []string{"bar", "foo"}},
+				orf("b.cue", 15, 16): {e: []string{"foo"}},
+				orf("b.cue", 21, 22): {e: []string{"foo"}},
 
-				fln("c.cue", 3, 1, "bar"): {f: []string{"bar", "foo"}},
-				fln("c.cue", 3, 1, "foo"): {e: []string{"bar", "foo"}},
-				fln("c.cue", 4, 1, "foo"): {f: []string{"bar", "foo"}},
-				fln("c.cue", 4, 1, "_"):   {e: []string{"bar", "foo"}},
+				orf("c.cue", 10, 15): {f: []string{"bar", "foo"}},
+				orf("c.cue", 15, 20): {e: []string{"bar", "foo"}},
+				orf("c.cue", 20, 24): {f: []string{"bar", "foo"}},
+				orf("c.cue", 24, 27): {e: []string{"bar", "foo"}},
 			},
 		},
 
@@ -2596,15 +3405,20 @@ foo: {qux: bar}
 				fln("b.cue", 3, 1, "foo"): {self, fln("a.cue", 3, 1, "foo")},
 				fln("b.cue", 3, 1, "qux"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				fln("a.cue", 3, 1, "foo"): {f: []string{"foo"}},
-				fln("a.cue", 3, 1, "bar"): {f: []string{"bar", "baz", "qux"}},
-				fln("a.cue", 3, 1, "baz"): {f: []string{"bar", "baz", "qux"}},
-				fln("a.cue", 3, 2, "bar"): {e: []string{"bar", "baz", "foo"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				orf("a.cue", 10, 15): {f: []string{"foo"}},
+				orf("a.cue", 15, 17): {f: []string{"bar", "baz", "qux"}, e: []string{"foo"}},
+				orf("a.cue", 17, 21): {f: []string{"bar", "baz", "qux"}},
+				orf("a.cue", 21, 22): {e: []string{"bar", "baz", "foo"}},
+				orf("a.cue", 26, 27): {e: []string{"bar", "baz", "foo"}},
+				orf("a.cue", 27, 28): {f: []string{"bar", "baz", "qux"}, e: []string{"foo"}},
+				orf("a.cue", 28, 32): {f: []string{"bar", "baz", "qux"}},
+				orf("a.cue", 32, 37): {e: []string{"bar", "baz", "foo"}},
 
-				fln("b.cue", 3, 1, "foo"): {f: []string{"foo"}},
-				fln("b.cue", 3, 1, "qux"): {f: []string{"bar", "baz", "qux"}},
-				fln("b.cue", 3, 1, "bar"): {e: []string{"foo", "qux"}},
+				orf("b.cue", 10, 15): {f: []string{"foo"}},
+				orf("b.cue", 15, 17): {f: []string{"bar", "baz", "qux"}, e: []string{"foo"}},
+				orf("b.cue", 17, 21): {f: []string{"bar", "baz", "qux"}},
+				orf("b.cue", 21, 26): {e: []string{"foo", "qux"}},
 			},
 		},
 
@@ -2645,21 +3459,27 @@ foo: qux: foo.bar
 				fln("c.cue", 3, 1, "foo"): {self, fln("a.cue", 3, 1, "foo"), fln("a.cue", 4, 1, "foo"), fln("b.cue", 3, 1, "foo")},
 				fln("c.cue", 3, 1, "qux"): {self, fln("b.cue", 3, 1, "qux")},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				fln("a.cue", 3, 1, "foo"): {f: []string{"foo"}},
-				fln("a.cue", 3, 1, "bar"): {f: []string{"bar", "baz", "qux"}},
-				fln("a.cue", 4, 1, "foo"): {f: []string{"foo"}},
-				fln("a.cue", 4, 1, "baz"): {f: []string{"bar", "baz", "qux"}},
-				fln("a.cue", 4, 1, "bar"): {e: []string{"baz", "foo"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				orf("a.cue", 10, 15): {f: []string{"foo"}},
+				orf("a.cue", 15, 16): {f: []string{"bar", "baz", "qux"}, e: []string{"foo"}},
+				orf("a.cue", 16, 20): {f: []string{"bar", "baz", "qux"}},
+				orf("a.cue", 20, 21): {e: []string{"bar", "foo"}},
+				orf("a.cue", 25, 26): {e: []string{"bar", "foo"}},
+				orf("a.cue", 26, 30): {f: []string{"foo"}},
+				orf("a.cue", 30, 31): {f: []string{"bar", "baz", "qux"}, e: []string{"foo"}},
+				orf("a.cue", 31, 35): {f: []string{"bar", "baz", "qux"}},
+				orf("a.cue", 35, 40): {e: []string{"baz", "foo"}},
 
-				fln("b.cue", 3, 1, "foo"): {f: []string{"foo"}},
-				fln("b.cue", 3, 1, "qux"): {f: []string{"bar", "baz", "qux"}},
-				fln("b.cue", 3, 1, "bar"): {e: []string{"foo", "qux"}},
+				orf("b.cue", 10, 15): {f: []string{"foo"}},
+				orf("b.cue", 15, 16): {f: []string{"bar", "baz", "qux"}, e: []string{"foo"}},
+				orf("b.cue", 16, 20): {f: []string{"bar", "baz", "qux"}},
+				orf("b.cue", 20, 25): {e: []string{"foo", "qux"}},
 
-				fln("c.cue", 3, 1, "foo"):  {f: []string{"foo"}},
-				fln("c.cue", 3, 1, "qux"):  {f: []string{"bar", "baz", "qux"}},
-				fln("c.cue", 3, 2, "foo"):  {e: []string{"foo", "qux"}},
-				fln("c.cue", 3, 1, ".bar"): {e: []string{"bar", "baz", "qux"}},
+				orf("c.cue", 10, 15): {f: []string{"foo"}},
+				orf("c.cue", 15, 16): {f: []string{"bar", "baz", "qux"}, e: []string{"foo"}},
+				orf("c.cue", 16, 20): {f: []string{"bar", "baz", "qux"}},
+				orf("c.cue", 20, 25): {e: []string{"foo", "qux"}},
+				orf("c.cue", 25, 29): {e: []string{"bar", "baz", "qux"}},
 			},
 		},
 
@@ -2695,15 +3515,19 @@ s: a
 				fln("c.cue", 3, 1, "a"): {self},
 				fln("c.cue", 4, 1, "s"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				fln("a.cue", 4, 1, "q"): {f: []string{"q", "r", "s"}},
-				fln("a.cue", 4, 1, "a"): {e: []string{"a", "q", "r", "s"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				orf("a.cue", 10, 19): {f: []string{"q", "r", "s"}},
+				orf("a.cue", 20, 21): {e: []string{"a", "q"}},
+				orf("a.cue", 21, 23): {f: []string{"q", "r", "s"}},
+				orf("a.cue", 23, 26): {e: []string{"a", "q"}},
 
-				fln("b.cue", 3, 1, "r"): {f: []string{"q", "r", "s"}},
-				fln("b.cue", 3, 1, "a"): {e: []string{"q", "r", "s"}},
+				orf("b.cue", 10, 13): {f: []string{"q", "r", "s"}},
+				orf("b.cue", 13, 16): {e: []string{"r"}},
 
-				fln("c.cue", 4, 1, "s"): {f: []string{"q", "r", "s"}},
-				fln("c.cue", 4, 1, "a"): {e: []string{"a", "q", "r", "s"}},
+				orf("c.cue", 10, 19): {f: []string{"q", "r", "s"}},
+				orf("c.cue", 23, 24): {e: []string{"a", "s"}},
+				orf("c.cue", 24, 26): {f: []string{"q", "r", "s"}},
+				orf("c.cue", 26, 29): {e: []string{"a", "s"}},
 			},
 		},
 
@@ -2738,18 +3562,29 @@ w: a: b: 6
 				fln("b.cue", 3, 1, "a"): {self, fln("a.cue", 5, 1, "a")},
 				fln("b.cue", 3, 1, "b"): {self, fln("a.cue", 5, 1, "b")},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				fln("a.cue", 3, 1, "w"):  {f: []string{"w"}},
-				fln("a.cue", 4, 1, "x"):  {f: []string{"a", "x"}},
-				fln("a.cue", 4, 1, "y"):  {f: []string{"y"}},
-				fln("a.cue", 4, 1, "a"):  {e: []string{"a", "w", "x", "y"}},
-				fln("a.cue", 4, 1, ".b"): {e: []string{"b"}},
-				fln("a.cue", 5, 1, "a"):  {f: []string{"a", "x"}},
-				fln("a.cue", 5, 1, "b"):  {f: []string{"b"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				orf("a.cue", 10, 13): {f: []string{"w"}},
+				orf("a.cue", 13, 17): {f: []string{"a", "x"}, e: []string{"w"}},
+				orf("a.cue", 17, 19): {f: []string{"a", "x"}},
+				orf("a.cue", 19, 20): {f: []string{"y"}, e: []string{"a", "w", "x"}},
+				orf("a.cue", 20, 22): {f: []string{"y"}},
+				orf("a.cue", 22, 25): {e: []string{"a", "w", "x", "y"}},
+				orf("a.cue", 25, 27): {e: []string{"b"}},
+				orf("a.cue", 27, 28): {f: []string{"a", "x"}, e: []string{"w"}},
+				orf("a.cue", 28, 30): {f: []string{"a", "x"}},
+				orf("a.cue", 30, 31): {f: []string{"b"}, e: []string{"a", "w", "x"}},
+				orf("a.cue", 31, 33): {f: []string{"b"}},
+				orf("a.cue", 33, 34): {e: []string{"a", "b", "w", "x"}},
+				orf("a.cue", 35, 36): {e: []string{"a", "b", "w", "x"}},
+				orf("a.cue", 36, 37): {f: []string{"a", "x"}, e: []string{"w"}},
 
-				fln("b.cue", 3, 1, "w"): {f: []string{"w"}},
-				fln("b.cue", 3, 1, "a"): {f: []string{"a", "x"}},
-				fln("b.cue", 3, 1, "b"): {f: []string{"b"}},
+				orf("b.cue", 10, 13): {f: []string{"w"}},
+				orf("b.cue", 13, 14): {f: []string{"a", "x"}, e: []string{"w"}},
+				orf("b.cue", 14, 16): {f: []string{"a", "x"}},
+				orf("b.cue", 16, 17): {f: []string{"b"}, e: []string{"a", "w"}},
+				orf("b.cue", 17, 19): {f: []string{"b"}},
+				orf("b.cue", 19, 20): {e: []string{"a", "b", "w"}},
+				orf("b.cue", 21, 22): {e: []string{"a", "b", "w"}},
 			},
 		},
 
@@ -2813,27 +3648,50 @@ a: {
 				fln("d.cue", 4, 1, "c"): {self},
 				fln("d.cue", 5, 1, "g"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				fln("a.cue", 3, 1, "a"):  {f: []string{"a"}},
-				fln("a.cue", 4, 1, "b"):  {f: []string{"b", "d", "e", "f", "g"}},
-				fln("a.cue", 4, 1, "c"):  {f: []string{"c"}},
-				fln("a.cue", 5, 1, "d"):  {f: []string{"b", "d", "e", "f", "g"}},
-				fln("a.cue", 5, 1, "X"):  {e: []string{"X", "a", "b", "d"}},
-				fln("a.cue", 5, 1, ".c"): {e: []string{"c"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				orf("a.cue", 10, 13): {f: []string{"a"}},
+				orf("a.cue", 13, 17): {f: []string{"b", "d", "e", "f", "g"}, e: []string{"a"}},
+				orf("a.cue", 17, 18): {f: []string{"b", "d", "e", "f", "g"}},
+				orf("a.cue", 18, 19): {e: []string{"b", "d", "e", "f", "g"}},
+				orf("a.cue", 19, 21): {f: []string{"b", "d", "e", "f", "g"}},
+				orf("a.cue", 21, 23): {f: []string{"c"}, e: []string{"X", "a", "b", "d"}},
+				orf("a.cue", 23, 25): {f: []string{"c"}},
+				orf("a.cue", 25, 26): {e: []string{"X", "a", "b", "c", "d"}},
+				orf("a.cue", 30, 31): {e: []string{"X", "a", "b", "c", "d"}},
+				orf("a.cue", 32, 33): {f: []string{"b", "d", "e", "f", "g"}, e: []string{"a"}},
+				orf("a.cue", 33, 35): {f: []string{"b", "d", "e", "f", "g"}},
+				orf("a.cue", 35, 38): {e: []string{"X", "a", "b", "d"}},
+				orf("a.cue", 38, 40): {e: []string{"c"}},
+				orf("a.cue", 40, 41): {f: []string{"b", "d", "e", "f", "g"}, e: []string{"a"}},
 
-				fln("b.cue", 3, 1, "a"): {f: []string{"a"}},
-				fln("b.cue", 4, 1, "b"): {f: []string{"b", "d", "e", "f", "g"}},
-				fln("b.cue", 4, 1, "c"): {f: []string{"c"}},
+				orf("b.cue", 10, 13): {f: []string{"a"}},
+				orf("b.cue", 13, 17): {f: []string{"b", "d", "e", "f", "g"}, e: []string{"a"}},
+				orf("b.cue", 17, 19): {f: []string{"b", "d", "e", "f", "g"}},
+				orf("b.cue", 19, 21): {f: []string{"c"}, e: []string{"a", "b"}},
+				orf("b.cue", 21, 23): {f: []string{"c"}},
+				orf("b.cue", 23, 24): {e: []string{"a", "b", "c"}},
+				orf("b.cue", 29, 30): {e: []string{"a", "b", "c"}},
+				orf("b.cue", 31, 32): {f: []string{"b", "d", "e", "f", "g"}, e: []string{"a"}},
 
-				fln("c.cue", 3, 1, "a"): {f: []string{"a"}},
-				fln("c.cue", 4, 1, "e"): {f: []string{"b", "d", "e", "f", "g"}},
-				fln("c.cue", 4, 1, "X"): {e: []string{"a", "e"}},
+				orf("c.cue", 10, 13): {f: []string{"a"}},
+				orf("c.cue", 13, 17): {f: []string{"b", "d", "e", "f", "g"}, e: []string{"a"}},
+				orf("c.cue", 17, 19): {f: []string{"b", "d", "e", "f", "g"}},
+				orf("c.cue", 19, 22): {e: []string{"a", "e"}},
+				orf("c.cue", 24, 25): {f: []string{"b", "d", "e", "f", "g"}, e: []string{"a"}},
 
-				fln("d.cue", 3, 1, "a"): {f: []string{"a"}},
-				fln("d.cue", 4, 1, "f"): {f: []string{"b", "d", "e", "f", "g"}},
-				fln("d.cue", 4, 1, "c"): {f: []string{"c"}},
-				fln("d.cue", 5, 1, "g"): {f: []string{"b", "d", "e", "f", "g"}},
-				fln("d.cue", 5, 1, "X"): {f: []string{"c"}, e: []string{"X", "a", "f", "g"}},
+				orf("d.cue", 10, 13): {f: []string{"a"}},
+				orf("d.cue", 13, 17): {f: []string{"b", "d", "e", "f", "g"}, e: []string{"a"}},
+				orf("d.cue", 17, 18): {f: []string{"b", "d", "e", "f", "g"}},
+				orf("d.cue", 18, 19): {e: []string{"b", "d", "e", "f", "g"}},
+				orf("d.cue", 19, 21): {f: []string{"b", "d", "e", "f", "g"}},
+				orf("d.cue", 21, 23): {f: []string{"c"}, e: []string{"X", "a", "f", "g"}},
+				orf("d.cue", 23, 25): {f: []string{"c"}},
+				orf("d.cue", 25, 26): {e: []string{"X", "a", "c", "f", "g"}},
+				orf("d.cue", 27, 28): {e: []string{"X", "a", "c", "f", "g"}},
+				orf("d.cue", 29, 30): {f: []string{"b", "d", "e", "f", "g"}, e: []string{"a"}},
+				orf("d.cue", 30, 32): {f: []string{"b", "d", "e", "f", "g"}},
+				orf("d.cue", 32, 35): {f: []string{"c"}, e: []string{"X", "a", "f", "g"}},
+				orf("d.cue", 35, 36): {f: []string{"b", "d", "e", "f", "g"}, e: []string{"a"}},
 			},
 		},
 
@@ -2868,14 +3726,18 @@ package a
 				fln("b.cue", 5, 1, "y"): {self},
 				fln("b.cue", 6, 1, "z"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				fln("a.cue", 3, 1, "x"): {f: []string{"x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				orf("a.cue", 10, 13): {f: []string{"x"}},
+				orf("a.cue", 13, 14): {e: []string{"x"}},
+				orf("a.cue", 16, 17): {e: []string{"x"}},
 
-				fln("b.cue", 5, 1, "y"):  {f: []string{"y", "z"}},
-				fln("b.cue", 5, 1, "a"):  {f: []string{"x"}, e: []string{"a", "y", "z"}},
-				fln("b.cue", 6, 1, "z"):  {f: []string{"y", "z"}},
-				fln("b.cue", 6, 1, "y"):  {e: []string{"a", "y", "z"}},
-				fln("b.cue", 6, 1, ".x"): {e: []string{"x"}},
+				orf("b.cue", 10, 18): {f: []string{"y", "z"}},
+				orf("b.cue", 18, 22): {e: []string{"a", "y", "z"}},
+				orf("b.cue", 22, 25): {f: []string{"y", "z"}},
+				orf("b.cue", 25, 28): {f: []string{"x"}, e: []string{"a", "y", "z"}},
+				orf("b.cue", 28, 30): {f: []string{"y", "z"}},
+				orf("b.cue", 30, 33): {e: []string{"a", "y", "z"}},
+				orf("b.cue", 33, 35): {e: []string{"x"}},
 			},
 			expectUsagesExtra: map[position]map[bool][]position{
 				fln("b.cue", 3, 1, `"a"`): {true: []position{self}},
@@ -2924,17 +3786,23 @@ z: a.x & y.x
 				fln("b.cue", 5, 1, "y"): {self},
 				fln("c.cue", 5, 1, "z"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				fln("a.cue", 3, 1, "x"): {f: []string{"x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				orf("a.cue", 10, 13): {f: []string{"x"}},
+				orf("a.cue", 13, 14): {e: []string{"x"}},
+				orf("a.cue", 16, 17): {e: []string{"x"}},
 
-				fln("b.cue", 5, 1, "y"): {f: []string{"y", "z"}},
-				fln("b.cue", 5, 1, "a"): {f: []string{"x"}, e: []string{"a", "y", "z"}},
+				orf("b.cue", 10, 18): {f: []string{"y", "z"}},
+				orf("b.cue", 18, 22): {e: []string{"a", "y"}},
+				orf("b.cue", 22, 25): {f: []string{"y", "z"}},
+				orf("b.cue", 25, 28): {f: []string{"x"}, e: []string{"a", "y"}},
 
-				fln("c.cue", 5, 1, "z"):  {f: []string{"y", "z"}},
-				fln("c.cue", 5, 1, "a"):  {e: []string{"a", "y", "z"}},
-				fln("c.cue", 5, 1, ".x"): {e: []string{"x"}},
-				fln("c.cue", 5, 1, "y"):  {e: []string{"a", "y", "z"}},
-				fln("c.cue", 5, 2, ".x"): {e: []string{"x"}},
+				orf("c.cue", 10, 18): {f: []string{"y", "z"}},
+				orf("c.cue", 18, 22): {e: []string{"a", "z"}},
+				orf("c.cue", 22, 25): {f: []string{"y", "z"}},
+				orf("c.cue", 25, 28): {e: []string{"a", "z"}},
+				orf("c.cue", 28, 30): {e: []string{"a", "x", "z"}},
+				orf("c.cue", 30, 34): {e: []string{"a", "z"}},
+				orf("c.cue", 34, 36): {e: []string{"a", "x", "z"}},
 			},
 			expectUsagesExtra: map[position]map[bool][]position{
 				fln("b.cue", 3, 1, `"a"`): {true: []position{self}},
@@ -3001,26 +3869,39 @@ o: c.o.z
 				fln("d.cue", 1, 1, "d"): {self},
 				fln("d.cue", 5, 1, "o"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				fln("a.cue", 3, 1, "o"): {f: []string{"o"}},
-				fln("a.cue", 3, 1, "x"): {f: []string{"x"}},
-				fln("a.cue", 3, 1, "y"): {f: []string{"y"}},
-				fln("a.cue", 3, 1, "z"): {f: []string{"z"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				orf("a.cue", 10, 13): {f: []string{"o"}},
+				orf("a.cue", 13, 14): {f: []string{"x"}, e: []string{"o"}},
+				orf("a.cue", 14, 16): {f: []string{"x"}},
+				orf("a.cue", 16, 17): {f: []string{"y"}, e: []string{"o", "x"}},
+				orf("a.cue", 17, 19): {f: []string{"y"}},
+				orf("a.cue", 19, 20): {f: []string{"z"}, e: []string{"o", "x", "y"}},
+				orf("a.cue", 20, 22): {f: []string{"z"}},
+				orf("a.cue", 22, 23): {e: []string{"o", "x", "y", "z"}},
+				orf("a.cue", 25, 26): {e: []string{"o", "x", "y", "z"}},
 
-				fln("b.cue", 5, 1, "o"):  {f: []string{"o"}},
-				fln("b.cue", 5, 1, "a"):  {e: []string{"a", "o"}},
-				fln("b.cue", 5, 1, ".o"): {e: []string{"o"}},
-				fln("b.cue", 5, 1, ".x"): {e: []string{"x"}},
+				orf("b.cue", 10, 18): {f: []string{"o"}},
+				orf("b.cue", 18, 22): {e: []string{"a", "o"}},
+				orf("b.cue", 22, 25): {f: []string{"o"}},
+				orf("b.cue", 25, 26): {f: []string{"y"}, e: []string{"a", "o"}},
+				orf("b.cue", 26, 28): {e: []string{"a", "o"}},
+				orf("b.cue", 28, 30): {e: []string{"o"}},
+				orf("b.cue", 30, 32): {e: []string{"x"}},
 
-				fln("c.cue", 5, 1, "o"):  {f: []string{"o"}},
-				fln("c.cue", 5, 1, "b"):  {e: []string{"b", "o"}},
-				fln("c.cue", 5, 1, ".o"): {e: []string{"o"}},
-				fln("c.cue", 5, 1, ".y"): {e: []string{"y"}},
+				orf("c.cue", 10, 18): {f: []string{"o"}},
+				orf("c.cue", 18, 22): {e: []string{"b", "o"}},
+				orf("c.cue", 22, 25): {f: []string{"o"}},
+				orf("c.cue", 25, 26): {f: []string{"z"}, e: []string{"b", "o"}},
+				orf("c.cue", 26, 28): {e: []string{"b", "o"}},
+				orf("c.cue", 28, 30): {e: []string{"o"}},
+				orf("c.cue", 30, 32): {e: []string{"y"}},
 
-				fln("d.cue", 5, 1, "o"):  {f: []string{"o"}},
-				fln("d.cue", 5, 1, "c"):  {e: []string{"c", "o"}},
-				fln("d.cue", 5, 1, ".o"): {e: []string{"o"}},
-				fln("d.cue", 5, 1, ".z"): {e: []string{"z"}},
+				orf("d.cue", 10, 18): {f: []string{"o"}},
+				orf("d.cue", 18, 22): {e: []string{"c", "o"}},
+				orf("d.cue", 22, 25): {f: []string{"o"}},
+				orf("d.cue", 25, 28): {e: []string{"c", "o"}},
+				orf("d.cue", 28, 30): {e: []string{"o"}},
+				orf("d.cue", 30, 32): {e: []string{"z"}},
 			},
 			expectUsagesExtra: map[position]map[bool][]position{
 				fln("b.cue", 3, 1, `"a"`): {true: []position{self}},
@@ -3062,20 +3943,32 @@ z: x: 5
 				ln(4, 1, "y"): {self},
 				ln(5, 1, "z"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "x"): {f: []string{"x", "y", "z"}},
-				ln(1, 2, "x"): {f: []string{"x"}},
-				ln(1, 3, "x"): {f: []string{"x"}},
-				ln(2, 1, "x"): {f: []string{"x", "y", "z"}},
-				ln(2, 2, "x"): {f: []string{"x"}},
-				ln(2, 3, "x"): {f: []string{"x"}},
-				ln(3, 1, "x"): {f: []string{"x", "y", "z"}},
-				ln(3, 1, "y"): {f: []string{"x"}, e: []string{"x", "y", "z"}},
-				ln(4, 1, "y"): {f: []string{"x", "y", "z"}},
-				ln(4, 1, "x"): {f: []string{"x"}},
-				ln(4, 1, "z"): {f: []string{"x"}, e: []string{"x", "y", "z"}},
-				ln(5, 1, "z"): {f: []string{"x", "y", "z"}},
-				ln(5, 1, "x"): {f: []string{"x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x", "y", "z"}},
+				or1(2):     {f: []string{"x"}, e: []string{"x", "y", "z"}},
+				or(3, 5):   {f: []string{"x"}},
+				or1(5):     {f: []string{"x"}, e: []string{"x", "y", "z"}},
+				or(6, 8):   {f: []string{"x"}},
+				or1(8):     {e: []string{"x", "y", "z"}},
+				or1(10):    {e: []string{"x", "y", "z"}},
+				or(11, 13): {f: []string{"x", "y", "z"}},
+				or1(13):    {f: []string{"x"}, e: []string{"x", "y", "z"}},
+				or(14, 16): {f: []string{"x"}},
+				or1(16):    {f: []string{"x"}, e: []string{"x", "y", "z"}},
+				or(17, 19): {f: []string{"x"}},
+				or1(19):    {e: []string{"x", "y", "z"}},
+				or1(21):    {e: []string{"x", "y", "z"}},
+				or(22, 24): {f: []string{"x", "y", "z"}},
+				or(24, 27): {f: []string{"x"}, e: []string{"x", "y", "z"}},
+				or(27, 29): {f: []string{"x", "y", "z"}},
+				or1(29):    {f: []string{"x"}, e: []string{"x", "y", "z"}},
+				or(30, 32): {f: []string{"x"}},
+				or(32, 35): {f: []string{"x"}, e: []string{"x", "y", "z"}},
+				or(35, 37): {f: []string{"x", "y", "z"}},
+				or1(37):    {f: []string{"x"}, e: []string{"x", "y", "z"}},
+				or(38, 40): {f: []string{"x"}},
+				or1(40):    {e: []string{"x", "y", "z"}},
+				or1(42):    {e: []string{"x", "y", "z"}},
 			},
 		},
 
@@ -3098,14 +3991,20 @@ furble: 4
 				ln(4, 1, "x"):       {self},
 				ln(7, 1, "furble"):  {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "#Schema"): {f: []string{"#Schema", "furble", "x"}},
-				ln(2, 1, "foo"):     {f: []string{"foo"}},
-				ln(2, 1, "int"):     {e: []string{"#Schema", "foo", "furble", "x"}},
-				ln(4, 1, "x"):       {f: []string{"#Schema", "furble", "x"}},
-				ln(4, 1, "#Schema"): {e: []string{"#Schema", "furble", "x"}},
-				ln(5, 1, "f"):       {f: []string{"foo"}, e: []string{"#Schema", "furble", "x"}},
-				ln(7, 1, "furble"):  {f: []string{"#Schema", "furble", "x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 8):   {f: []string{"#Schema", "furble", "x"}},
+				or(8, 12):  {f: []string{"foo"}, e: []string{"#Schema", "furble", "x"}},
+				or(12, 16): {f: []string{"foo"}},
+				or(17, 22): {e: []string{"#Schema", "foo", "furble", "x"}},
+				or1(22):    {f: []string{"foo"}, e: []string{"#Schema", "furble", "x"}},
+				or(24, 26): {f: []string{"#Schema", "furble", "x"}},
+				or(26, 35): {f: []string{"foo"}, e: []string{"#Schema", "furble", "x"}},
+				or(35, 37): {e: []string{"#Schema", "furble", "x"}},
+				or(37, 43): {f: []string{"foo"}, e: []string{"#Schema", "furble", "x"}},
+				or1(43):    {e: []string{"#Schema", "furble", "x"}},
+				or(44, 51): {f: []string{"#Schema", "furble", "x"}},
+				or1(51):    {e: []string{"#Schema", "furble", "x"}},
+				or1(53):    {e: []string{"#Schema", "furble", "x"}},
 			},
 		},
 
@@ -3138,18 +4037,24 @@ something: {
 				ln(10, 1, "something"): {self, ln(9, 1, "something")},
 				ln(11, 1, "foo"):       {self, ln(2, 1, "foo")},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(1, 1, "#Schema"):    {f: []string{"#Foo", "#Schema", "something"}},
-				ln(2, 1, "foo"):        {f: []string{"foo"}},
-				ln(2, 1, "#Foo"):       {f: []string{"bar"}, e: []string{"#Foo", "#Schema", "foo", "something"}},
-				ln(5, 1, "#Foo"):       {f: []string{"#Foo", "#Schema", "something"}},
-				ln(6, 1, "bar"):        {f: []string{"bar"}},
-				ln(6, 1, "int"):        {e: []string{"#Foo", "#Schema", "bar", "something"}},
-				ln(9, 1, "something"):  {f: []string{"#Foo", "#Schema", "something"}},
-				ln(9, 1, "#Schema"):    {f: []string{"foo"}, e: []string{"#Foo", "#Schema", "something"}},
-				ln(10, 1, "something"): {f: []string{"#Foo", "#Schema", "something"}},
-				ln(11, 1, "foo"):       {f: []string{"foo"}},
-				ln(12, 1, "b"):         {f: []string{"bar"}, e: []string{"#Foo", "#Schema", "foo", "something"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 8):   {f: []string{"#Foo", "#Schema", "something"}},
+				or(8, 12):  {f: []string{"foo"}, e: []string{"#Foo", "#Schema", "something"}},
+				or(12, 16): {f: []string{"foo"}},
+				or(17, 23): {f: []string{"bar"}, e: []string{"#Foo", "#Schema", "foo", "something"}},
+				or1(23):    {f: []string{"foo"}, e: []string{"#Foo", "#Schema", "something"}},
+				or(25, 31): {f: []string{"#Foo", "#Schema", "something"}},
+				or(31, 35): {f: []string{"bar"}, e: []string{"#Foo", "#Schema", "something"}},
+				or(35, 39): {f: []string{"bar"}},
+				or(40, 45): {e: []string{"#Foo", "#Schema", "bar", "something"}},
+				or1(45):    {f: []string{"bar"}, e: []string{"#Foo", "#Schema", "something"}},
+				or(47, 58): {f: []string{"#Foo", "#Schema", "something"}},
+				or(58, 67): {f: []string{"foo"}, e: []string{"#Foo", "#Schema", "something"}},
+				or(67, 77): {f: []string{"#Foo", "#Schema", "something"}},
+				or(77, 81): {f: []string{"foo"}, e: []string{"#Foo", "#Schema", "something"}},
+				or(81, 85): {f: []string{"foo"}},
+				or(85, 94): {f: []string{"bar"}, e: []string{"#Foo", "#Schema", "foo", "something"}},
+				or1(95):    {f: []string{"foo"}, e: []string{"#Foo", "#Schema", "something"}},
 			},
 		},
 
@@ -3190,23 +4095,35 @@ e: self
 				ln(10, 1, "d"): {self},
 				ln(12, 1, "e"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(2, 1, "x"):     {f: []string{"a", "e", "x"}},
-				ln(2, 1, "y"):     {f: []string{"y", "z"}},
-				ln(3, 1, "x"):     {f: []string{"a", "e", "x"}},
-				ln(3, 1, "z"):     {f: []string{"y", "z"}},
-				ln(3, 1, "self"):  {e: []string{"a", "e", "x", "z"}},
-				ln(3, 1, ".y"):    {e: []string{"y", "z"}},
-				ln(5, 1, "a"):     {f: []string{"a", "e", "x"}},
-				ln(6, 1, "b"):     {f: []string{"b", "d"}},
-				ln(7, 1, "c"):     {f: []string{"c", "d"}},
-				ln(7, 1, "self"):  {e: []string{"a", "b", "c", "d", "e", "x"}},
-				ln(7, 1, ".d"):    {e: []string{"c", "d"}},
-				ln(8, 1, "d"):     {f: []string{"c", "d"}},
-				ln(10, 1, "d"):    {f: []string{"b", "d"}},
-				ln(10, 1, "self"): {f: []string{"b", "d"}, e: []string{"a", "b", "d", "e", "x"}},
-				ln(12, 1, "e"):    {f: []string{"a", "e", "x"}},
-				ln(12, 1, "self"): {f: []string{"a", "e", "x"}, e: []string{"a", "e", "x"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(20, 23):   {f: []string{"a", "e", "x"}},
+				or1(23):      {f: []string{"y", "z"}, e: []string{"a", "e", "x"}},
+				or(24, 26):   {f: []string{"y", "z"}},
+				or1(26):      {e: []string{"a", "e", "x", "y"}},
+				or1(28):      {e: []string{"a", "e", "x", "y"}},
+				or(29, 31):   {f: []string{"a", "e", "x"}},
+				or1(31):      {f: []string{"y", "z"}, e: []string{"a", "e", "x"}},
+				or(32, 34):   {f: []string{"y", "z"}},
+				or(34, 40):   {e: []string{"a", "e", "x", "z"}},
+				or(40, 42):   {e: []string{"y", "z"}},
+				or(42, 45):   {f: []string{"a", "e", "x"}},
+				or(45, 52):   {f: []string{"b", "d"}, e: []string{"a", "e", "x"}},
+				or(52, 54):   {f: []string{"b", "d"}},
+				or(54, 65):   {f: []string{"c", "d"}, e: []string{"a", "b", "d", "e", "x"}},
+				or(65, 67):   {f: []string{"c", "d"}},
+				or(67, 73):   {e: []string{"a", "b", "c", "d", "e", "x"}},
+				or(73, 75):   {e: []string{"c", "d"}},
+				or(75, 83):   {f: []string{"c", "d"}, e: []string{"a", "b", "d", "e", "x"}},
+				or(83, 85):   {f: []string{"c", "d"}},
+				or1(85):      {e: []string{"a", "b", "c", "d", "e", "x"}},
+				or1(87):      {e: []string{"a", "b", "c", "d", "e", "x"}},
+				or(88, 93):   {f: []string{"c", "d"}, e: []string{"a", "b", "d", "e", "x"}},
+				or(94, 98):   {f: []string{"b", "d"}, e: []string{"a", "e", "x"}},
+				or(98, 100):  {f: []string{"b", "d"}},
+				or(100, 106): {f: []string{"b", "d"}, e: []string{"a", "b", "d", "e", "x"}},
+				or1(106):     {f: []string{"b", "d"}, e: []string{"a", "e", "x"}},
+				or(108, 110): {f: []string{"a", "e", "x"}},
+				or(110, 116): {f: []string{"a", "e", "x"}, e: []string{"a", "e", "x"}},
 			},
 		},
 
@@ -3220,24 +4137,29 @@ g: h: X.f[0]
 `,
 			expectDefinitions: map[position][]position{
 				ln(2, 1, "self"): {ln(2, 1, "f")},
-				ln(2, 1, "[0]"):  {ln(2, 1, "1")},
+				ln(2, 1, "0]"):   {ln(2, 1, "1")},
 				ln(4, 1, "X"):    {ln(3, 1, "X")},
 				ln(4, 1, "f"):    {ln(2, 1, "f")},
-				ln(4, 1, "[0]"):  {ln(2, 1, "1")},
+				ln(4, 1, "0]"):   {ln(2, 1, "1")},
 
 				ln(2, 1, "f"): {self},
 				ln(3, 1, "X"): {self},
 				ln(4, 1, "g"): {self},
 				ln(4, 1, "h"): {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(2, 1, "f"):    {f: []string{"f", "g"}},
-				ln(2, 1, "self"): {e: []string{"X", "f", "g"}},
-				ln(3, 1, "self"): {f: []string{"f", "g"}, e: []string{"X", "f", "g"}},
-				ln(4, 1, "g"):    {f: []string{"f", "g"}},
-				ln(4, 1, "h"):    {f: []string{"h"}},
-				ln(4, 1, "X"):    {e: []string{"X", "f", "g", "h"}},
-				ln(4, 1, ".f"):   {e: []string{"f", "g"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(20, 23): {f: []string{"f", "g"}},
+				or(23, 26): {e: []string{"X", "f", "g"}},
+				or(27, 29): {e: []string{"X", "f", "g"}},
+				or(30, 37): {e: []string{"X", "f", "g"}},
+				or(40, 42): {e: []string{"X", "f", "g"}},
+				or(42, 50): {f: []string{"f", "g"}},
+				or(50, 55): {f: []string{"f", "g"}, e: []string{"X", "f", "g"}},
+				or(55, 57): {f: []string{"f", "g"}},
+				or1(57):    {f: []string{"h"}, e: []string{"X", "f", "g"}},
+				or(58, 60): {f: []string{"h"}},
+				or(60, 63): {e: []string{"X", "f", "g", "h"}},
+				or(63, 65): {e: []string{"f", "g"}},
 			},
 		},
 
@@ -3256,13 +4178,73 @@ i: self: x: y: z: self
 				ln(2, 1, "y"):    {self},
 				ln(2, 1, "z"):    {self},
 			},
-			expectCompletions: map[position]fieldEmbedCompletions{
-				ln(2, 1, "i"):    {f: []string{"i"}},
-				ln(2, 1, "self"): {f: []string{"self"}},
-				ln(2, 1, "x"):    {f: []string{"x"}},
-				ln(2, 1, "y"):    {f: []string{"y"}},
-				ln(2, 1, "z"):    {f: []string{"z"}},
-				ln(2, 2, "self"): {f: []string{"x"}, e: []string{"i", "self", "x", "y", "z"}},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(20, 23): {f: []string{"i"}},
+				or1(23):    {f: []string{"self"}, e: []string{"i"}},
+				or(24, 29): {f: []string{"self"}},
+				or1(29):    {f: []string{"x"}, e: []string{"i", "self"}},
+				or(30, 32): {f: []string{"x"}},
+				or1(32):    {f: []string{"y"}, e: []string{"i", "self", "x"}},
+				or(33, 35): {f: []string{"y"}},
+				or1(35):    {f: []string{"z"}, e: []string{"i", "self", "x", "y"}},
+				or(36, 38): {f: []string{"z"}},
+				or(38, 44): {f: []string{"x"}, e: []string{"i", "self", "x", "y", "z"}},
+			},
+		},
+
+		{
+			name: "Deep",
+			archive: `-- a.cue --
+a: b: c: d: e: f: f
+a: b: c: d: e: f: f
+`,
+			expectDefinitions: map[position][]position{
+				ln(1, 2, "f"): {ln(1, 1, "f"), ln(2, 1, "f")},
+				ln(2, 2, "f"): {ln(2, 1, "f"), ln(1, 1, "f")},
+
+				ln(1, 1, "a"): {self, ln(2, 1, "a")},
+				ln(2, 1, "a"): {self, ln(1, 1, "a")},
+
+				ln(1, 1, "b"): {self, ln(2, 1, "b")},
+				ln(2, 1, "b"): {self, ln(1, 1, "b")},
+
+				ln(1, 1, "c"): {self, ln(2, 1, "c")},
+				ln(2, 1, "c"): {self, ln(1, 1, "c")},
+
+				ln(1, 1, "d"): {self, ln(2, 1, "d")},
+				ln(2, 1, "d"): {self, ln(1, 1, "d")},
+
+				ln(1, 1, "e"): {self, ln(2, 1, "e")},
+				ln(2, 1, "e"): {self, ln(1, 1, "e")},
+
+				ln(1, 1, "f"): {self, ln(2, 1, "f")},
+				ln(2, 1, "f"): {self, ln(1, 1, "f")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"a"}},
+				or1(2):     {f: []string{"b"}, e: []string{"a"}},
+				or(3, 5):   {f: []string{"b"}},
+				or1(5):     {f: []string{"c"}, e: []string{"a", "b"}},
+				or(6, 8):   {f: []string{"c"}},
+				or1(8):     {f: []string{"d"}, e: []string{"a", "b", "c"}},
+				or(9, 11):  {f: []string{"d"}},
+				or1(11):    {f: []string{"e"}, e: []string{"a", "b", "c", "d"}},
+				or(12, 14): {f: []string{"e"}},
+				or1(14):    {f: []string{"f"}, e: []string{"a", "b", "c", "d", "e"}},
+				or(15, 17): {f: []string{"f"}},
+				or(17, 20): {e: []string{"a", "b", "c", "d", "e", "f"}},
+				or(20, 22): {f: []string{"a"}},
+				or1(22):    {f: []string{"b"}, e: []string{"a"}},
+				or(23, 25): {f: []string{"b"}},
+				or1(25):    {f: []string{"c"}, e: []string{"a", "b"}},
+				or(26, 28): {f: []string{"c"}},
+				or1(28):    {f: []string{"d"}, e: []string{"a", "b", "c"}},
+				or(29, 31): {f: []string{"d"}},
+				or1(31):    {f: []string{"e"}, e: []string{"a", "b", "c", "d"}},
+				or(32, 34): {f: []string{"e"}},
+				or1(34):    {f: []string{"f"}, e: []string{"a", "b", "c", "d", "e"}},
+				or(35, 37): {f: []string{"f"}},
+				or(37, 40): {e: []string{"a", "b", "c", "d", "e", "f"}},
 			},
 		},
 	}.run(t)
@@ -3272,7 +4254,7 @@ type testCase struct {
 	name              string
 	archive           string
 	expectDefinitions map[position][]position
-	expectCompletions map[position]fieldEmbedCompletions
+	expectCompletions map[offsetRange]fieldEmbedCompletions
 	expectUsagesExtra map[position]map[bool][]position
 	importedBy        map[string][]string
 }
@@ -3323,7 +4305,7 @@ func (tcs testCases) run(t *testing.T) {
 			expectCompletions := tc.expectCompletions
 			for from, completions := range expectCompletions {
 				delete(expectCompletions, from)
-				from.determineOffset(filesByName)
+				from.setFilename(filesByName)
 				expectCompletions[from] = completions
 			}
 
@@ -3341,38 +4323,38 @@ func (tcs testCases) run(t *testing.T) {
 			}
 
 			analyse := func() testCaseAnalysis {
-				dfnsByFilename := make(map[string]*eval.FileDefinitions)
-				dfnsByPkgName := make(map[string]*eval.Definitions)
-				forPackage := func(importPath ast.ImportPath) *eval.Definitions {
-					return dfnsByPkgName[importPath.String()]
+				evalByFilename := make(map[string]*eval.FileEvaluator)
+				evalByPkgName := make(map[string]*eval.Evaluator)
+				forPackage := func(importPath ast.ImportPath) *eval.Evaluator {
+					return evalByPkgName[importPath.String()]
 				}
 				importCanonicalisation := make(map[string]ast.ImportPath)
 				analysis := testCaseAnalysis{
-					dfnsByPkgName:  dfnsByPkgName,
-					dfnsByFilename: dfnsByFilename,
+					evalByPkgName:  evalByPkgName,
+					evalByFilename: evalByFilename,
 				}
 
 				for pkgName, files := range filesByPkg {
 					ip := ast.ImportPath{Path: pkgName}.Canonical()
 					importCanonicalisation[pkgName] = ip
-					pkgImporters := func() []*eval.Definitions {
+					pkgImporters := func() []*eval.Evaluator {
 						pkgNames := tc.importedBy[pkgName]
-						dfns := make([]*eval.Definitions, len(pkgNames))
+						eval := make([]*eval.Evaluator, len(pkgNames))
 						for i, pkgName := range pkgNames {
-							dfns[i] = dfnsByPkgName[pkgName]
+							eval[i] = evalByPkgName[pkgName]
 						}
-						return dfns
+						return eval
 					}
-					dfns := eval.Analyse(ip, importCanonicalisation, forPackage, pkgImporters, files...)
-					dfnsByPkgName[pkgName] = dfns
+					eval := eval.New(ip, importCanonicalisation, forPackage, pkgImporters, files...)
+					evalByPkgName[pkgName] = eval
 					for _, fileAst := range files {
-						dfnsByFilename[fileAst.Filename] = dfns.ForFile(fileAst.Filename)
+						evalByFilename[fileAst.Filename] = eval.ForFile(fileAst.Filename)
 					}
 				}
 				return analysis
 			}
 
-			// The subtests need fresh [*eval.FileDefinitions]
+			// The subtests need fresh [*eval.FileEvaluator]
 			// because each subtest causes mutations.
 			tc.testDefinitions(t, files, analyse())
 			tc.testCompletions(t, files, analyse())
@@ -3382,27 +4364,27 @@ func (tcs testCases) run(t *testing.T) {
 }
 
 type testCaseAnalysis struct {
-	dfnsByPkgName  map[string]*eval.Definitions
-	dfnsByFilename map[string]*eval.FileDefinitions
+	evalByPkgName  map[string]*eval.Evaluator
+	evalByFilename map[string]*eval.FileEvaluator
 }
 
 func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, analysis testCaseAnalysis) {
-	dfnsByFilename := analysis.dfnsByFilename
+	evalByFilename := analysis.evalByFilename
 	t.Run("definitions", func(t *testing.T) {
 		ranges := rangeset.NewFilenameRangeSet()
 
 		for posFrom, positionsWant := range tc.expectDefinitions {
 			filename := posFrom.filename
-			fdfns := dfnsByFilename[filename]
-			qt.Check(t, qt.IsNotNil(fdfns))
+			fileEval := evalByFilename[filename]
+			qt.Check(t, qt.IsNotNil(fileEval))
 
 			offset := posFrom.offset
-			ranges.Add(filename, offset, offset+len(posFrom.str))
+			ranges.Add(filename, offset, offset+len(posFrom.str)+1)
 
-			for i := range len(posFrom.str) {
+			for i := range len(posFrom.str) + 1 {
 				// Test every offset within the "from" token
 				offset := offset + i
-				nodesGot := fdfns.DefinitionsForOffset(offset)
+				nodesGot := fileEval.DefinitionsForOffset(offset)
 				fileOffsetsGot := make([]fileOffset, len(nodesGot))
 				for j, node := range nodesGot {
 					fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
@@ -3425,12 +4407,12 @@ func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, analysis te
 		// expectations, resolve to nothing.
 		for _, fileAst := range files {
 			filename := fileAst.Filename
-			fdfns := dfnsByFilename[filename]
+			fileEval := evalByFilename[filename]
 			for i := range fileAst.Pos().File().Content() {
 				if ranges.Contains(filename, i) {
 					continue
 				}
-				nodesGot := fdfns.DefinitionsForOffset(i)
+				nodesGot := fileEval.DefinitionsForOffset(i)
 				fileOffsetsGot := make([]fileOffset, len(nodesGot))
 				for j, node := range nodesGot {
 					fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
@@ -3496,16 +4478,14 @@ func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCas
 		for posUse, posDfns := range tc.expectDefinitions {
 			if slices.Contains(posDfns, self) {
 				continue
-			} else if strings.HasPrefix(posUse.str, `["`) {
-				// If posUse starts with [" then we assume it's a dynamic
+			} else if strings.HasSuffix(posUse.str, `"]`) {
+				// If posUse ends with "] then we assume it's a dynamic
 				// index into a struct. These can be inverted. E.g.
 				//
 				//	{"g": 13}["g"]
 				//
-				// works correctly in both directions. However, some
-				// gentle massaging of the offset is currently needed.
-				posUse.offset += 1
-			} else if strings.HasPrefix(posUse.str, `[`) {
+				// works correctly in both directions.
+			} else if strings.HasSuffix(posUse.str, `]`) {
 				// Otherwise, it's either a const number dynamic index, or
 				// some reference. These can't be inverted so we have to
 				// skip. The const number can't be inverted because in the
@@ -3604,10 +4584,9 @@ func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCas
 
 		expectUsagesIncluding := make(map[position][]position)
 		for posUse, posDfns := range tc.expectDefinitions {
-			if strings.HasPrefix(posUse.str, `["`) {
+			if strings.HasSuffix(posUse.str, `"]`) {
 				// Same logic as when calculating expectUsagesExcluding.
-				posUse.offset += 1
-			} else if strings.HasPrefix(posUse.str, `[`) {
+			} else if strings.HasSuffix(posUse.str, `]`) {
 				// Same logic as when calculating expectUsagesExcluding.
 				continue
 			}
@@ -3655,8 +4634,8 @@ func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCas
 
 			for posUse, positionsWant := range expectUsages {
 				filename := posUse.filename
-				fdfns := analysis.dfnsByFilename[filename]
-				qt.Check(t, qt.IsNotNil(fdfns))
+				fe := analysis.evalByFilename[filename]
+				qt.Assert(t, qt.IsNotNil(fe))
 
 				fileOffsetsWant := make([]fileOffset, len(positionsWant))
 				for j, p := range positionsWant {
@@ -3667,7 +4646,7 @@ func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCas
 				for i := range len(posUse.str) {
 					// Test every offset within the "use" token
 					offset := offset + i
-					nodesGot := fdfns.UsagesForOffset(offset, includeDefinitions)
+					nodesGot := fe.UsagesForOffset(offset, includeDefinitions)
 					fileOffsetsGot := make([]fileOffset, len(nodesGot))
 					for j, node := range nodesGot {
 						fileOffsetsGot[j] = fileOffsetForTokenPos(node.Pos().Position())
@@ -3682,46 +4661,44 @@ func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCas
 }
 
 func (tc *testCase) testCompletions(t *testing.T, files []*ast.File, analysis testCaseAnalysis) {
-	dfnsByFilename := analysis.dfnsByFilename
+	evalByFilename := analysis.evalByFilename
 	t.Run("completions", func(t *testing.T) {
 		defer func() {
 			if t.Failed() {
-				tc.dumpCompletions(t, files, dfnsByFilename)
+				tc.dumpCompletions(t, files, evalByFilename)
 			}
 		}()
 
 		ranges := rangeset.NewFilenameRangeSet()
 
-		for posFrom, completionWant := range tc.expectCompletions {
+		for curRange, completionWant := range tc.expectCompletions {
 			fieldCompletionWant := completionWant.f
 			embedCompletionWant := completionWant.e
 			slices.Sort(fieldCompletionWant)
 			slices.Sort(embedCompletionWant)
-			filename := posFrom.filename
-			fdfns := dfnsByFilename[filename]
-			qt.Check(t, qt.IsNotNil(fdfns))
+			filename := curRange.filename
+			fe := evalByFilename[filename]
+			qt.Check(t, qt.IsNotNil(fe))
 
-			offset := posFrom.offset
-			ranges.Add(filename, offset, offset+len(posFrom.str))
+			ranges.Add(filename, curRange.from, curRange.to)
 
-			startOffsetWant := offset
-			if posFrom.str[0] == '.' {
-				startOffsetWant += 1
-			}
-			for i := range len(posFrom.str) {
-				// Test every offset within the "from" token
-				offset := offset + i
-				fieldCompletionGot, embedCompletionGot, startOffsetGot, _, embedEndOffsetGot := fdfns.CompletionsForOffset(offset)
-				qt.Check(t, qt.DeepEquals(fieldCompletionGot, fieldCompletionWant), qt.Commentf("from %#v(+%d)", posFrom, i))
-				qt.Check(t, qt.DeepEquals(embedCompletionGot, embedCompletionWant), qt.Commentf("from %#v(+%d)", posFrom, i))
-				qt.Check(t, qt.Equals(startOffsetGot, startOffsetWant), qt.Commentf("from %#v(+%d)", posFrom, i))
-				if len(embedCompletionWant) > 0 {
-					embedEndOffsetWant := posFrom.offset + len(posFrom.str)
-					if i == 0 && posFrom.str[i] == '.' {
-						embedEndOffsetWant = startOffsetWant
+			for i := curRange.from; i < curRange.to; i++ {
+				fieldCompletionGot := make(map[string]struct{})
+				embedCompletionGot := make(map[string]struct{})
+				for completions, names := range fe.CompletionsForOffset(i) {
+					if completions.Kind == protocol.FieldCompletion {
+						maps.Copy(fieldCompletionGot, names)
 					}
-					qt.Check(t, qt.Equals(embedEndOffsetGot, embedEndOffsetWant), qt.Commentf("from %#v(+%d)", posFrom, i))
+					if completions.Kind == protocol.VariableCompletion {
+						maps.Copy(embedCompletionGot, names)
+					}
 				}
+				fieldCompletionGotSlice := slices.Collect(maps.Keys(fieldCompletionGot))
+				slices.Sort(fieldCompletionGotSlice)
+				embedCompletionGotSlice := slices.Collect(maps.Keys(embedCompletionGot))
+				slices.Sort(embedCompletionGotSlice)
+				qt.Check(t, qt.DeepEquals(fieldCompletionGotSlice, fieldCompletionWant), qt.Commentf("from %#v[%d]", curRange, i))
+				qt.Check(t, qt.DeepEquals(embedCompletionGotSlice, embedCompletionWant), qt.Commentf("from %#v[%d]", curRange, i))
 			}
 		}
 
@@ -3729,109 +4706,79 @@ func (tc *testCase) testCompletions(t *testing.T, files []*ast.File, analysis te
 		// expectations, complete to nothing.
 		for _, fileAst := range files {
 			filename := fileAst.Filename
-			fdfns := dfnsByFilename[filename]
+			fe := evalByFilename[filename]
 
 			for i := range fileAst.Pos().File().Content() {
 				if ranges.Contains(filename, i) {
 					continue
 				}
-				fieldCompletionGot, embedCompletionGot, _, _, _ := fdfns.CompletionsForOffset(i)
-				qt.Check(t, qt.DeepEquals(fieldCompletionGot, nil), qt.Commentf("file: %q, offset: %d, got %d field completions", filename, i, len(fieldCompletionGot)))
-				qt.Check(t, qt.DeepEquals(embedCompletionGot, nil), qt.Commentf("file: %q, offset: %d, got %d embed completions", filename, i, len(embedCompletionGot)))
+				completions := fe.CompletionsForOffset(i)
+				qt.Check(t, qt.DeepEquals(completions, nil), qt.Commentf("file: %q, offset: %d, got %d completions", filename, i, len(completions)))
 			}
 		}
 	})
 }
 
-func (tc *testCase) dumpCompletions(t *testing.T, files []*ast.File, dfnsByFilename map[string]*eval.FileDefinitions) {
+func (tc *testCase) dumpCompletions(t *testing.T, files []*ast.File, evalByFilename map[string]*eval.FileEvaluator) {
 	for _, fileAst := range files {
 		filename := fileAst.Filename
-		fdfns := dfnsByFilename[filename]
+		fe := evalByFilename[filename]
 		content := fileAst.Pos().File().Content()
 
-		fields := strings.FieldsFunc(string(content), func(r rune) bool {
-			switch r {
-			case ' ', '\t', '\n', ':', '.', '{', '}', '[', ']', '(', ')', ',', '=', '+', '-', '!', '?':
-				return true
-			default:
-				return false
-			}
-		})
-
-		offsetMap := make(map[int]position, len(fields))
-		fieldPerLine := make(map[string]int)
-		lineNum := 1
-		lineStartOffset := 0
-
-		for line := range strings.Lines(string(content)) {
-			lineLen := len(line)
-			clear(fieldPerLine)
-			column := 0
-			for len(fields) > 0 {
-				field := fields[0]
-				columnRel := strings.Index(line, field)
-				if columnRel == -1 {
-					break
-				}
-
-				fields = fields[1:]
-				line = line[columnRel+len(field):]
-
-				column += columnRel
-				offset := lineStartOffset + column
-				column += len(field)
-				// If it's a path element (not the root) then include
-				// the dot. E.g. .y in x.y. But if it's an ellipsis
-				// (e.g. ...z) then leave the z alone.
-				if offset > 0 && content[offset-1] == '.' && (offset == 1 || content[offset-2] != '.') {
-					field = "." + field
-					offset--
-				}
-
-				// Increase the counts for field and every substring of
-				// field for this line.
-				for start := range field {
-					for end := start + 1; end <= len(field); end++ {
-						field := field[start:end]
-						fieldPerLine[field]++
-					}
-				}
-				n := fieldPerLine[field]
-
-				pos := fln(filename, lineNum, n, field)
-				pos.offset = offset
-				offsetMap[offset] = pos
-			}
-
-			lineNum++
-			lineStartOffset += lineLen
-		}
-
 		var strs []string
+		var curRange *offsetRange
+		var prevFields, prevEmbeds []string
 		for i := range content {
-			fieldCompletionGot, embedCompletionGot, _, _, _ := fdfns.CompletionsForOffset(i)
-			if len(fieldCompletionGot) > 0 || len(embedCompletionGot) > 0 {
-				if pos, found := offsetMap[i]; found {
-					strs = append(strs, completionString(files, pos, fieldCompletionGot, embedCompletionGot))
+			fieldCompletionGot := make(map[string]struct{})
+			embedCompletionGot := make(map[string]struct{})
+			for completions, names := range fe.CompletionsForOffset(i) {
+				if completions.Kind == protocol.FieldCompletion {
+					maps.Copy(fieldCompletionGot, names)
+				}
+				if completions.Kind == protocol.VariableCompletion {
+					maps.Copy(embedCompletionGot, names)
 				}
 			}
+			fieldCompletionGotSlice := slices.Collect(maps.Keys(fieldCompletionGot))
+			slices.Sort(fieldCompletionGotSlice)
+			embedCompletionGotSlice := slices.Collect(maps.Keys(embedCompletionGot))
+			slices.Sort(embedCompletionGotSlice)
+			if curRange != nil {
+				if slices.Equal(prevFields, fieldCompletionGotSlice) && slices.Equal(prevEmbeds, embedCompletionGotSlice) {
+					curRange.to = i + 1
+					continue
+				}
+				strs = completionString(files, curRange, prevFields, prevEmbeds, strs)
+			}
+			curRange = &offsetRange{
+				filename: filename,
+				from:     i,
+				to:       i + 1,
+			}
+			prevFields = fieldCompletionGotSlice
+			prevEmbeds = embedCompletionGotSlice
 		}
+		strs = completionString(files, curRange, prevFields, prevEmbeds, strs)
 
 		if len(strs) > 0 {
-			t.Log("Suggested expectCompletions: map[position]fieldEmbedCompletions{\n" + strings.Join(strs, "\n") + "\n},\n")
+			t.Log("Suggested expectCompletions: map[offsetRange]fieldEmbedCompletions{\n" + strings.Join(strs, "\n") + "\n},\n")
 		}
 	}
 }
 
-func completionString(files []*ast.File, posFrom position, fieldCompletionsGot, embedCompletionsGot []string) string {
-	if len(fieldCompletionsGot) == 0 && len(embedCompletionsGot) == 0 {
-		return ""
+func completionString(files []*ast.File, curRange *offsetRange, fieldCompletionsGot, embedCompletionsGot, acc []string) []string {
+	if curRange == nil || len(fieldCompletionsGot) == 0 && len(embedCompletionsGot) == 0 {
+		return acc
 	}
 	msg := ""
 	if len(files) == 1 {
-		msg = fmt.Sprintf("\tln(%d, %d, %q): ", posFrom.line, posFrom.n, posFrom.str)
+		if curRange.from+1 == curRange.to {
+			msg = fmt.Sprintf("\tor1(%d): ", curRange.from)
+		} else {
+			msg = fmt.Sprintf("\tor(%d, %d): ", curRange.from, curRange.to)
+		}
 	} else {
-		msg = fmt.Sprintf("\tfln(%q, %d, %d, %q): ", posFrom.filename, posFrom.line, posFrom.n, posFrom.str)
+		msg = fmt.Sprintf("\torf(%q, %d, %d): ", curRange.filename, curRange.from, curRange.to)
 	}
 
 	var strs []string
@@ -3847,7 +4794,7 @@ func completionString(files []*ast.File, posFrom position, fieldCompletionsGot, 
 	}
 
 	msg += "{" + strings.Join(strs, `, `) + "},"
-	return msg
+	return append(acc, msg)
 }
 
 type fileOffset struct {
@@ -3942,6 +4889,54 @@ func (p *position) determineOffset(filesByName map[string]*ast.File) {
 		}
 	}
 	panic("Failed to determine offset")
+}
+
+type offsetRange struct {
+	filename string
+	// from is the start of the range; it is inclusive.
+	from int
+	// to is the end of the range; it is exclusive.
+	to int
+}
+
+// Convenience constructor to make a new [offsetRange] with the
+// 0-based byte offset range.
+func or(from, to int) offsetRange {
+	return offsetRange{
+		from: from,
+		to:   to,
+	}
+}
+
+// Convenience constructor to make a new [offsetRange] starting at
+// from, and finishing 1 byte later.
+func or1(from int) offsetRange {
+	return offsetRange{
+		from: from,
+		to:   from + 1,
+	}
+}
+
+// Convenience constructor to make a new [offsetRange] with the
+// 0-based byte offset range within the given file.
+func orf(filename string, from, to int) offsetRange {
+	return offsetRange{
+		filename: filename,
+		from:     from,
+		to:       to,
+	}
+}
+
+func (or *offsetRange) setFilename(filesByName map[string]*ast.File) {
+	if or.filename == "" {
+		if len(filesByName) == 1 {
+			for name := range filesByName {
+				or.filename = name
+			}
+		} else {
+			panic("no filename set and more than one file available")
+		}
+	}
 }
 
 // self is a convenience singleton which can be freely used in

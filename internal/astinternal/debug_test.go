@@ -39,6 +39,7 @@ func TestDebugPrint(t *testing.T) {
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		includePointers := t.HasTag("includePointers")
+		allPositions := t.HasTag("allPositions")
 		for _, file := range t.Archive.Files {
 			if strings.HasPrefix(file.Name, "out/") {
 				continue
@@ -55,6 +56,7 @@ func TestDebugPrint(t *testing.T) {
 			full := astinternal.AppendDebug(nil, f, astinternal.DebugConfig{
 				IncludeNodeRefs: true,
 				IncludePointers: includePointers,
+				AllPositions:    allPositions,
 			})
 			if includePointers {
 				// Pointer values change between runs. Replace with a constant

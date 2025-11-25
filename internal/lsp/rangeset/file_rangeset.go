@@ -66,6 +66,9 @@ func (frs *FilenameRangeSet) Add(filename string, start, end int) {
 }
 
 func (frs *FilenameRangeSet) Contains(filename string, offset int) bool {
+	if frs == nil {
+		return false
+	}
 	pairs := frs.pairs
 	i, found := slices.BinarySearchFunc(pairs, filename, filenameRangeSetPairCmp)
 	return found && pairs[i].ranges.Contains(offset)

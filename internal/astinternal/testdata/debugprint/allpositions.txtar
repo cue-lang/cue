@@ -1,0 +1,79 @@
+#allPositions
+-- file.cue --
+package p
+
+a: b
+b: 3
+-- out/debugprint/file.cue --
+*ast.File[file.cue:1:1,4:5]{
+	Filename: "file.cue"
+	Decls: []ast.Decl{
+		*ast.Package[file.cue:1:1,1:10]{
+			PackagePos: token.Pos("file.cue:1:1", nospace)
+			Name: *ast.Ident[file.cue:1:9,1:10]{
+				NamePos: token.Pos("file.cue:1:9", blank)
+				Name: "p"
+			}
+		}
+		*ast.Field[file.cue:3:1,3:5]{
+			Label: *ast.Ident[file.cue:3:1,3:2]{
+				NamePos: token.Pos("file.cue:3:1", section)
+				Name: "a"
+			}
+			Alias: nil
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("file.cue:3:2", nospace)
+			Value: *ast.Ident[file.cue:3:4,3:5]{
+				NamePos: token.Pos("file.cue:3:4", blank)
+				Name: "b"
+				Node: @ref001 (*ast.BasicLit)
+			}
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field[file.cue:4:1,4:5]{
+			Label: *ast.Ident[file.cue:4:1,4:2]{
+				NamePos: token.Pos("file.cue:4:1", newline)
+				Name: "b"
+			}
+			Alias: nil
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("file.cue:4:2", nospace)
+			Value: *ast.BasicLit@ref001[file.cue:4:4,4:5]{
+				ValuePos: token.Pos("file.cue:4:4", blank)
+				Kind: token.Token("INT")
+				Value: "3"
+			}
+			Attrs: []*ast.Attribute{}
+		}
+	}
+	Imports: []*ast.ImportSpec{}
+	LanguageVersion: "v0.13.0"
+}
+-- out/debugprint/file.cue/omitempty-strings --
+*ast.File{
+	Filename: "file.cue"
+	Decls: []ast.Decl{
+		*ast.Package{
+			Name: *ast.Ident{
+				Name: "p"
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				Name: "a"
+			}
+			Value: *ast.Ident{
+				Name: "b"
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				Name: "b"
+			}
+			Value: *ast.BasicLit{
+				Value: "3"
+			}
+		}
+	}
+	LanguageVersion: "v0.13.0"
+}

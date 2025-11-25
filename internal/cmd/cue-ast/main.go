@@ -43,8 +43,6 @@ usage of cue-ast:
 
     Write multi-line Go-like representations of CUE syntax trees.
 
-      -omitempty    omit empty and invalid values
-
   cue-ast join [flags] [inputs]
 
     Join the input package instance as a single file.
@@ -66,11 +64,21 @@ See 'cue help inputs' as well.
 	name, args := os.Args[1], os.Args[2:]
 	switch name {
 	case "print":
+		flag.Usage = func() {
+			fmt.Fprintf(os.Stderr, `
+cue-ast print [flags] [inputs]
+
+Write multi-line Go-like representations of CUE syntax trees.
+`)
+			flag.PrintDefaults()
+		}
 		var cfg astinternal.DebugConfig
-		flag.BoolVar(&cfg.OmitEmpty, "omitempty", false, "")
-		flag.BoolVar(&cfg.IncludeNodeRefs, "refs", false, "")
+		flag.BoolVar(&cfg.OmitEmpty, "omitempty", false,
+			"omit empty strings, empty structs, empty list, nil pointers, invalid positions, and missing tokens")
+		flag.BoolVar(&cfg.IncludeNodeRefs, "refs", false, "print node references for Node fields")
 		fileFlag := false
-		flag.BoolVar(&fileFlag, "files", false, "")
+		flag.BoolVar(&fileFlag, "files", false, "treat arguments as literal files; do not try to load as package")
+		flag.BoolVar(&cfg.AllPositions, "pos", false, "print position info for all nodes")
 		// Note that DebugConfig also has a Filter func, but that doesn't lend itself well
 		// to a command line flag. Perhaps we could provide some commonly used filters,
 		// such as "positions only" or "skip positions".

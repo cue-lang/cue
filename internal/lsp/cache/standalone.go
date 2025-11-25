@@ -21,7 +21,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/lsp/definitions"
+	"cuelang.org/go/internal/lsp/eval"
 )
 
 // Standalone models cue files which cannot be placed within a
@@ -141,7 +141,7 @@ type standaloneFile struct {
 
 	// definitions for this standalone file only. This is updated
 	// whenever the file is reloaded.
-	definitions *definitions.Definitions
+	definitions *eval.Evaluator
 
 	file *File
 }
@@ -213,9 +213,9 @@ func (f *standaloneFile) reload() error {
 		return ErrBadFile
 	}
 
-	f.definitions = definitions.Analyse(ast.ImportPath{}, nil, nil, nil, syntax)
 	f.file.setSyntax(syntax)
 	f.file.ensureUser(f, err)
+	f.definitions = eval.New(ast.ImportPath{}, nil, nil, nil, syntax)
 	w.debugLogf("%v Reloaded", f)
 	return nil
 }

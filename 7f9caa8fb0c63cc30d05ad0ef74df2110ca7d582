@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "55f9259c_e03212f2",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-25T12:49:23Z",
+      "side": 1,
+      "message": "I tried this and didn\u0027t much like the way it looked - the code seems more cluttered less clear to me that way. I added a doc comment to make the contract clearer.",
+      "parentUuid": "1bf4741b_d873ff81",
+      "revId": "7f9caa8fb0c63cc30d05ad0ef74df2110ca7d582",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3338bc7f_f8ff43e3",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-11-25T12:43:46Z",
       "side": 1,
       "message": "similarly, I\u0027d call these something like startPos and endPos",
+      "revId": "7f9caa8fb0c63cc30d05ad0ef74df2110ca7d582",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00dbc080_4e43cf41",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-11-25T12:49:23Z",
+      "side": 1,
+      "message": "as above.",
+      "parentUuid": "3338bc7f_f8ff43e3",
       "revId": "7f9caa8fb0c63cc30d05ad0ef74df2110ca7d582",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

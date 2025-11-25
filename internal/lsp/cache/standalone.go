@@ -141,7 +141,7 @@ type standaloneFile struct {
 
 	// definitions for this standalone file only. This is updated
 	// whenever the file is reloaded.
-	definitions *eval.Definitions
+	definitions *eval.Evaluator
 
 	file *File
 }
@@ -213,9 +213,9 @@ func (f *standaloneFile) reload() error {
 		return ErrBadFile
 	}
 
-	f.definitions = eval.Analyse(ast.ImportPath{}, nil, nil, nil, syntax)
 	f.file.setSyntax(syntax)
 	f.file.ensureUser(f, err)
+	f.definitions = eval.New(ast.ImportPath{}, nil, nil, nil, syntax)
 	w.debugLogf("%v Reloaded", f)
 	return nil
 }

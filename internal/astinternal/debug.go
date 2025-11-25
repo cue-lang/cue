@@ -60,6 +60,10 @@ type DebugConfig struct {
 	// values; setting this also implies [DebugConfig.IncludeNodeRefs]
 	// and references will be printed as pointers.
 	IncludePointers bool
+
+	// AllPositions causes all [ast.Node] implementions to emit their start
+	// and end positions.
+	AllPositions bool
 }
 
 type debugPrinter struct {
@@ -86,6 +90,7 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 	// Skip over interfaces and pointers, stopping early if nil.
 	concreteType := v.Type()
 	refName := ""
+	var startPos, endPos token.Pos
 	ptrVal := uintptr(0)
 	for {
 		k := v.Kind()
@@ -104,6 +109,7 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 				if id, ok := d.nodeRefs[n]; ok {
 					refName = refIDToName(id)
 				}
+				startPos, endPos = n.Pos(), n.End()
 			}
 		}
 		v = v.Elem()
@@ -156,6 +162,9 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 		} else if refName != "" {
 			d.printf("@%s", refName)
 		}
+		if d.cfg.AllPositions && startPos.IsValid() {
+			d.printf("[%v]", positionRange(startPos, endPos))
+		}
 		d.printf("{")
 		d.level++
 		var anyElems bool
@@ -174,6 +183,26 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 			d.printf("}")
 		}
 	}
+}
+
+// positionRange returns a string representing the range
+// of positions between p0 and p1, as returned
+// by [ast.Node.Pos] and [ast.Node.End] respectively.
+func positionRange(p0, p1 token.Pos) string {
+	if !p1.IsValid() {
+		return p0.String()
+	}
+	pos0, pos1 := p0.Position(), p1.Position()
+	if pos1.Filename != pos0.Filename {
+		return fmt.Sprintf("%v,%v", pos0, pos1)
+	}
+	var buf strings.Builder
+	if len(pos0.Filename) != 0 {
+		buf.WriteString(pos0.Filename)
+		buf.WriteString(":")
+	}
+	fmt.Fprintf(&buf, "%d:%d,%d:%d", pos0.Line, pos0.Column, pos1.Line, pos1.Column)
+	return buf.String()
 }
 
 func (d *debugPrinter) sliceElems(v reflect.Value, elemType reflect.Type) (anyElems bool) {

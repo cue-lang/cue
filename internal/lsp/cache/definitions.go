@@ -17,7 +17,6 @@ package cache
 import (
 	"cmp"
 	"fmt"
-	"iter"
 	"maps"
 	"path/filepath"
 	"slices"
@@ -33,19 +32,14 @@ import (
 // Definition attempts to resolve the given position, within the file
 // definitions, to one or more ast nodes, and returns the positions of
 // the definitions of those nodes.
-func (w *Workspace) Definition(tokFile *token.File, fdfns *eval.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) []protocol.Location {
-	var targets []ast.Node
-	for offset, err := range adjustedPositionsIter(pos, srcMapper) {
-		if err != nil {
-			w.debugLog(err.Error())
-			continue
-		}
-
-		targets = fdfns.DefinitionsForOffset(offset)
-		if len(targets) > 0 {
-			break
-		}
+func (w *Workspace) Definition(tokFile *token.File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) []protocol.Location {
+	offset, err := srcMapper.PositionOffset(pos)
+	if err != nil {
+		w.debugLog(err.Error())
+		return nil
 	}
+
+	targets := fe.DefinitionsForOffset(offset)
 	if len(targets) == 0 {
 		return nil
 	}
@@ -75,25 +69,20 @@ func (w *Workspace) Definition(tokFile *token.File, fdfns *eval.FileDefinitions,
 	return locations
 }
 
-func (w *Workspace) References(tokFile *token.File, fdfns *eval.FileDefinitions, srcMapper *protocol.Mapper, params *protocol.ReferenceParams) []protocol.Location {
-	var targets []ast.Node
+func (w *Workspace) References(tokFile *token.File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, params *protocol.ReferenceParams) []protocol.Location {
 	// If UsagesForOffset returns no results, and if it's safe to
 	// do so, we back off the Character offset (column number) by 1 and
 	// try again. This can help when the caret symbol is a | (as
 	// opposed to a block - i.e. it's *between* two characters rather
 	// than *over* a single character) and is placed straight after the
 	// end of a path element.
-	for offset, err := range adjustedPositionsIter(params.Position, srcMapper) {
-		if err != nil {
-			w.debugLog(err.Error())
-			continue
-		}
-
-		targets = fdfns.UsagesForOffset(offset, params.Context.IncludeDeclaration)
-		if len(targets) > 0 {
-			break
-		}
+	offset, err := srcMapper.PositionOffset(params.Position)
+	if err != nil {
+		w.debugLog(err.Error())
+		return nil
 	}
+
+	targets := fe.UsagesForOffset(offset, params.Context.IncludeDeclaration)
 	if len(targets) == 0 {
 		return nil
 	}
@@ -126,19 +115,14 @@ func (w *Workspace) References(tokFile *token.File, fdfns *eval.FileDefinitions,
 // Hover is very similar to Definition. It attempts to resolve the
 // given position, within the file definitions, to one or more ast
 // nodes, and returns the doc comments attached to those ast nodes.
-func (w *Workspace) Hover(tokFile *token.File, fdfns *eval.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.Hover {
-	var comments map[ast.Node][]*ast.CommentGroup
-	for offset, err := range adjustedPositionsIter(pos, srcMapper) {
-		if err != nil {
-			w.debugLog(err.Error())
-			continue
-		}
-
-		comments = fdfns.DocCommentsForOffset(offset)
-		if len(comments) > 0 {
-			break
-		}
+func (w *Workspace) Hover(tokFile *token.File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.Hover {
+	offset, err := srcMapper.PositionOffset(pos)
+	if err != nil {
+		w.debugLog(err.Error())
+		return nil
 	}
+
+	comments := fe.DocCommentsForOffset(offset)
 	if len(comments) == 0 {
 		return nil
 	}
@@ -199,7 +183,7 @@ func (w *Workspace) Hover(tokFile *token.File, fdfns *eval.FileDefinitions, srcM
 
 // Completion attempts to resolve the given position, within the file
 // definitions, from which subsequent path elements can be suggested.
-func (w *Workspace) Completion(tokFile *token.File, fdfns *eval.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.CompletionList {
+func (w *Workspace) Completion(tokFile *token.File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.CompletionList {
 	offset, err := srcMapper.PositionOffset(pos)
 	if err != nil {
 		w.debugLog(err.Error())
@@ -210,101 +194,83 @@ func (w *Workspace) Completion(tokFile *token.File, fdfns *eval.FileDefinitions,
 	// len(content), and not len(content)-1.
 	offset = min(offset, len(content))
 
-	// Use offset-1 because the cursor is always one beyond what we want.
-	fields, embeds, startOffset, fieldEndOffset, embedEndOffset := fdfns.CompletionsForOffset(offset - 1)
+	completions := fe.CompletionsForOffset(offset)
 
-	startOffset = min(startOffset, len(content))
-	fieldEndOffset = min(fieldEndOffset, len(content))
-	embedEndOffset = min(embedEndOffset, len(content))
+	var completionItems []protocol.CompletionItem
 
-	// According to the LSP spec, TextEdits must be on the same line as
-	// offset (the cursor position), and must include offset. If we're
-	// in the middle of a selector that's spread over several lines
-	// (possibly accidentally), we can't perform an edit.  E.g. (with
-	// the cursor position as | ):
-	//
-	//	x: a.|
-	//	y: _
-	//
-	// Here, the parser will treat this as "x: a.y, _" (and raise an
-	// error because it got a : where it expected a newline or ,
-	// ). Completions that we offer here will want to try to replace y,
-	// but the cursor is on the previous line. It's also very unlikely
-	// this is what the user wants. So in this case, we just treat it
-	// as a simple insert at the cursor position.
-	if startOffset > offset {
-		startOffset = offset
-		fieldEndOffset = offset
-		embedEndOffset = offset
-	}
-
-	totalLen := len(fields) + len(embeds)
-	if totalLen == 0 {
-		return nil
-	}
-	sortTextLen := len(fmt.Sprint(totalLen))
-
-	completions := make([]protocol.CompletionItem, 0, totalLen)
-
-	for _, cs := range []struct {
-		completions   []string
-		endOffset     int
-		kind          protocol.CompletionItemKind
-		newTextSuffix string
-	}{
-		{
-			completions:   fields,
-			endOffset:     fieldEndOffset,
-			kind:          protocol.FieldCompletion,
-			newTextSuffix: ":",
-		},
-		{
-			completions: embeds,
-			endOffset:   embedEndOffset,
-			kind:        protocol.VariableCompletion,
-		},
-	} {
-		if len(cs.completions) == 0 {
+	for completion, names := range completions {
+		if len(names) == 0 {
 			continue
 		}
 
-		completionRange, rangeErr := srcMapper.OffsetRange(startOffset, cs.endOffset)
+		completionRange, rangeErr := srcMapper.OffsetRange(completion.Start, completion.End)
 		if rangeErr != nil {
 			w.debugLog(rangeErr.Error())
 		}
-		for _, name := range cs.completions {
+
+		// According to the LSP spec, TextEdits must be entirely on the
+		// same line as offset (the cursor position), and must include
+		// offset. If we're in the middle of a selector that's spread
+		// over several lines (possibly accidentally), we can't perform
+		// an edit.  E.g. (with the cursor position as | ):
+		//
+		//	x: a.|
+		//	y: _
+		//
+		// Here, the parser will treat this as "x: a.y, _" (and raise an
+		// error because it got a : where it expected a newline or ,
+		// ). Completions that we offer here will want to try to replace
+		// y, but the cursor is on the previous line. It's also very
+		// unlikely this is what the user wants. So in this case, we
+		// just treat it as a simple insert at the cursor position.
+
+		// Testing shows, and general advice seems to be, that the
+		// completions should have their range finish at the current
+		// cursor position. This is not ideal as it makes replacing
+		// existing tokens won't quite work correctly, but not trimming
+		// this End causes problematic behaviour in popular editors.
+		//
+		// TODO: it's possible other fields with protocol.CompletionItem
+		// can be used to get the behaviour we really want here.
+		completionRange.End = pos
+
+		for name := range names {
 			if !ast.IsValidIdent(name) {
 				name = strconv.Quote(name)
 			}
 			item := protocol.CompletionItem{
-				Label:    name,
-				Kind:     cs.kind,
-				SortText: fmt.Sprintf("%0*d", sortTextLen, len(completions)),
-				// TODO: we can add in documentation for each item if we can
-				// find it.
+				Label: name,
+				Kind:  completion.Kind,
 			}
 			if rangeErr == nil {
 				item.TextEdit = &protocol.TextEdit{
 					Range:   completionRange,
-					NewText: name + cs.newTextSuffix,
+					NewText: name + completion.Suffix,
 				}
 			}
-			completions = append(completions, item)
+			completionItems = append(completionItems, item)
 		}
 	}
 
+	slices.SortFunc(completionItems, func(a, b protocol.CompletionItem) int {
+		if c := cmp.Compare(a.Label, b.Label); c != 0 {
+			return c
+		}
+		return cmp.Compare(a.Kind, b.Kind)
+	})
+
 	return &protocol.CompletionList{
-		Items: completions,
+		Items: completionItems,
 	}
 }
 
-func (w *Workspace) DefinitionsForURI(fileUri protocol.DocumentURI, loadAllPkgsInMod bool) (*token.File, *eval.FileDefinitions, *protocol.Mapper, error) {
+func (w *Workspace) FileEvaluatorForURI(fileUri protocol.DocumentURI, loadAllPkgsInMod bool) (*token.File, *eval.FileEvaluator, *protocol.Mapper, error) {
 	mod, err := w.FindModuleForFile(fileUri)
 	if err != nil && err != errModuleNotFound {
 		return nil, nil, nil, err
 	}
 
-	var dfns *eval.Definitions
+	var e *eval.Evaluator
 
 	if mod != nil {
 		if loadAllPkgsInMod {
@@ -315,55 +281,30 @@ func (w *Workspace) DefinitionsForURI(fileUri protocol.DocumentURI, loadAllPkgsI
 		if ip != nil {
 			pkg := mod.Package(*ip)
 			if pkg != nil {
-				dfns = pkg.definitions
+				e = pkg.eval
 			}
 		}
 	}
 
-	if dfns == nil {
+	if e == nil {
 		if standalone, found := w.standalone.files[fileUri]; found {
-			dfns = standalone.definitions
+			e = standalone.definitions
 		} else {
 			return nil, nil, nil, nil
 		}
 	}
 
-	fdfns := dfns.ForFile(fileUri.Path())
-	if fdfns == nil {
+	fe := e.ForFile(fileUri.Path())
+	if fe == nil {
 		return nil, nil, nil, nil
 	}
 
-	tokFile := fdfns.File.Pos().File()
+	tokFile := fe.File.Pos().File()
 	srcMapper := w.mappers[tokFile]
 	if srcMapper == nil {
 		w.debugLog("mapper not found: " + string(fileUri))
 		return nil, nil, nil, nil
 	}
 
-	return tokFile, fdfns, srcMapper, nil
-}
-
-// adjustedPositionsIter returns an iterator that produces offsets
-// determined by the position and mapper. In a number of cases it
-// makes sense to try both the actual cursor position and the position
-// one character to the left. This can help when the caret symbol is a
-// | (as opposed to a block - i.e. it's *between* two characters
-// rather than *over* a single character) and is placed straight after
-// the end of a token.
-func adjustedPositionsIter(pos protocol.Position, mapper *protocol.Mapper) iter.Seq2[int, error] {
-	posAdj := []uint32{0, 1}
-	if pos.Character == 0 {
-		posAdj = posAdj[:1]
-	}
-	return func(yield func(int, error) bool) {
-		for _, adj := range posAdj {
-			pos := pos
-			pos.Character -= adj
-			offset, err := mapper.PositionOffset(pos)
-
-			if !yield(offset, err) {
-				return
-			}
-		}
-	}
+	return tokFile, fe, srcMapper, nil
 }

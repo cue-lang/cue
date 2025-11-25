@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Definitions resolves paths to sets of [ast.Node]. It is used in the
-// LSP for "jump-to-definition" functionality, amongst others. A path
-// is either an [ast.Ident], or a CUE expression followed by zero or
-// more idents, all chained together by dots.
+// Evaluator performs light-weight evaluation of CUE ASTs. It is used
+// in the LSP for "jump-to-definition" functionality, amongst
+// others. A path is either an [ast.Ident], or a CUE expression
+// followed by zero or more idents, all chained together by dots.
 //
 // # Introduction
 //
@@ -42,12 +42,13 @@
 // which they can jump.
 //
 // The implementation is a lazy, memoized, call-by-need evaluator. The
-// only purpose of this evaluator is to calculate what each element of
-// each path resolves to; there is no calculation of fixed-points, no
-// subsumption, no unification. And the little that this evaluator
-// does do is imprecise. For example, it does not test field names
-// (even when known) against patterns. It does not compute the names
-// of dynamic fields, even when it is trivial to do so statically. It
+// purpose of this evaluator is to calculate what each element of each
+// path resolves to; to track uses of fields; documentation comments;
+// and other properties useful for the LSP. There is no subsumption,
+// no unification of values other than structs. And the little that
+// this evaluator does do is imprecise. For example, it does not test
+// field names (even when known) against patterns. It does not compute
+// the names of dynamic fields, even when it is trivial to do so. It
 // is a MAY-analysis and not a MUST-analysis. This means that it may
 // offer jump-to-definition targets that do not occur during full
 // evaluation, but which we are unable to dismiss with only the simple
@@ -60,9 +61,9 @@
 //	n₂: 5
 //	z₁: y₃.a₄
 //
-// Here, a₄ will resolve to both a₁ and a₂, even though the constraint
-// via a₃ may (or may not) eliminate one (or both!) branches of the
-// disjunction.
+// Here, a₄ will always resolve to both a₁ and a₂, even though the
+// constraint via a₃ may (or may not) eliminate one (or both!)
+// branches of the disjunction.
 //
 // # Algorithm 1: simplified CUE
 //
@@ -90,38 +91,38 @@
 // that does *not* exist in the same lexical scope (or ancestor of) as
 // that path.
 //
-// In this evaluator, an "astNode" is a collection of bindings,
-// i.e. key-value pairs. The values are themselves astNodes.  An
-// astNode is created with one or more unprocessed [ast.Node] values,
-// for example, an [ast.File], or an [ast.StructLit].
+// In this evaluator, a "frame" is a collection of bindings,
+// i.e. key-value pairs. The values are themselves frames.  A frame is
+// created with one or more unprocessed [ast.Node] values, for
+// example, a [ast.File], or a [ast.StructLit].
 //
-// When an astNode is evaluated, its unprocessed values are
-// unpacked. An [ast.StructLit] for example contains a number of
-// [ast.Decl] nodes, which are themselves then processed. When a
-// astNode encounters an [ast.Field], the astNode ensures a binding
-// exists for the field's name, and adds the field's value to the
-// binding's astNode's unprocessed values. Thus if the same field
-// definition is encountered multiple times, its values are
-// accumulated into a single astNode. Note that evaluation of an
-// astNode is not recursive: its bindings are not automatically
-// evaluated. Thus an astNode is the unit of evaluation; by adding new
-// astNodes you can create new points where evaluation can pause (and
-// potentially resume later on).
+// When a frame is evaluated, its unprocessed values are unpacked. A
+// [ast.StructLit] for example contains a number of [ast.Decl] nodes,
+// which are themselves then processed. When a frame encounters a
+// [ast.Field], the frame ensures a binding exists for the field's
+// name, and adds the field's value to the binding's frame's
+// unprocessed values. Thus if the same field definition is
+// encountered multiple times, its values are accumulated into a
+// single child frame. Note that evaluation of a frame is not
+// recursive: its bindings are not automatically evaluated. Thus a
+// frame is the unit of evaluation; by adding new frames you can
+// create new points where evaluation can pause (and optionally resume
+// later on).
 //
-// If, during evaluation, an astNode encounters a path, the path will
-// correspond either to the value of a field (i.e. the astNode is for
-// something like x: y), or an embedding into a struct. The astNode
-// keeps track of these embedded paths and once processing of the
-// astNode's values is complete, it then resolves the embedded paths
-// to further astNodes, and records that this astNode itself resolves
-// to these other astNodes (the resolvesTo field).
+// If, during evaluation, a frame encounters a path, the path might
+// correspond to the value of a field (i.e. the frame is for something
+// like x: y), or an embedding into a struct. The frame keeps track of
+// these embedded paths and once processing of the frame's values is
+// complete, it then resolves the embedded paths to further frames,
+// and records that this frame itself resolves to these other frames
+// (the resolvesTo field).
 //
-// The consequence is that the evaluation of an astNode creates and
-// fully populates (with their unprocessed values) all of its bindings
+// The consequence is that the evaluation of a frame creates and fully
+// populates (with their unprocessed values) all of its own bindings
 // before any resolution of paths occurs. Thus evaluation can be
 // driven by demand: if a path is encountered that accesses one of the
-// astNode's bindings (or any binding of an ancestor astNode), then it
-// is guaranteed that the binding (if it exists) contains its complete
+// frame's bindings (or any binding of an ancestor frame), then it is
+// guaranteed that the binding (if it exists) contains its complete
 // set of values before it is accessed, and so it is safe to evaluate.
 //
 // Consider this example:
@@ -132,57 +133,57 @@
 //		b: y.a
 //	}
 //
-// Evaluating the outermost astNode will create two bindings, one for
-// x (with the path y as its value), and one for y (containing the
-// [ast.StructLit] as its value). If the astNode for y is evaluated,
-// it will create its own bindings for a (containing the
-// [ast.BasicLit] 3), and for b (containing the path y.a).
+// Evaluating the outermost frame will create two bindings, one for x
+// (with the path y as its value), and one for y (containing the
+// [ast.StructLit] as its value). If the frame for y is evaluated, it
+// will create its own bindings for a (a frame containing the
+// [ast.BasicLit] 3), and for b (a frame containing the path y.a).
 //
-// Imagine we want to resolve, in the outermost astNode, the path
-// x.a. We first evaluate the outermost astNode, then inspect its
-// bindings. We find an x in there, so we grab that astNode. This
+// Imagine we want to resolve, in the outermost frame, the path
+// x.a. We first evaluate the outermost frame, then inspect its
+// bindings. We find an x in there, so we grab that frame. This
 // completes resolving the x of x.a. We now wish to find an a within
-// that astNode, so we evaluate it. This astNode contains only the
+// that frame, so we evaluate it. This frame contains only the
 // path y and so we have to resolve y and record that result within
-// our astNode.
+// our frame.
 //
-// Every astNode knows its own parent astNode. This astNode containing
-// the path y will inspect its own bindings for y, and find
-// nothing. It asks its ancestors whether they know of a binding for
-// y. Its parent does have a binding for y, so we grab that
-// astNode. This completes the resolution of y, and thus the
-// evaluation of the astNode that contains the path y. We now ask this
-// same astNode whether it contains a binding for a. It doesn't, but
-// we also inspect all the astNodes that this node resolves to. There
-// is one resolved-to astNode, and it does contain a binding for a, so
-// we grab that. This completes the resolution of x.a.
+// Every frame knows its own parent frame. This frame containing the
+// path y will inspect its own bindings for y, and find nothing. It
+// asks its ancestors whether they know of a binding for y. Its parent
+// does have a binding for y, so we grab that frame. This completes
+// the resolution of y, and thus the evaluation of the frame that
+// contains the path y. We now ask this same frame whether it contains
+// a binding for a. It doesn't, but we also inspect all the frames
+// that this frame resolves to. There is one resolved-to frame, and it
+// does contain a binding for a, so we grab that. This completes the
+// resolution of x.a.
 //
 // In summary: this algorithm traverses the AST breadth first and
 // incrementally, to lazily merge together bindings that share the
-// same path into astNodes.
+// same path into frames.
 //
 // Unmentioned is that there are various [ast.Expr] types that can use
 // paths but not declare their own bindings, for example an
 // interpolated string. When these are encountered during evaluation,
-// the astNode accumulates and processes them in the same way as
+// the frame accumulates and processes them in the same way as
 // embedded paths. The only difference is they don't need to be
-// recorded within the node's resolves-to set.
+// recorded within the frame's resolves-to set.
 //
 // # Querying
 //
 // In the previous section, we walked through the example of
-// attempting to resolve the path x.a in the outermost astNode. But
-// this isn't what an LSP client will ask. An LSP client doesn't know
-// what path the cursor is on, nor anything about the current scope or
-// how these may correspond to astNodes. The LSP client knows only the
+// attempting to resolve the path x.a in the outermost frame. But this
+// isn't what an LSP client will ask. An LSP client doesn't know what
+// path the cursor is on, nor anything about the current scope or how
+// these may correspond to frames. The LSP client knows only the
 // cursor's line and column number.
 //
 // To facilitate an API that allows querying by file-coordinates,
-// astNodes are extended with a rangeset. For each [ast.Node] that an
-// astNode processes, it adds to its rangeset the range from the
-// node's start file-offset to its end file-offset. Then, when asked
-// to resolve whatever exists at some file-coordinate, we only need to
-// evaluate the astNodes that contain the file-coordinate in question.
+// frames are extended with a start and end [token.Pos] range. For
+// each [ast.Node] that a frame processes, it extends its range to the
+// node's start file-offset and end file-offset. Then, when asked to
+// resolve whatever exists at some file-coordinate, we only need to
+// evaluate the frames that contain the file-coordinate in question.
 //
 // # Algorithm 2: real CUE
 //
@@ -211,22 +212,22 @@
 //
 // Whereas before (in Algorithm 1) the evaluator would create one
 // binding for x, now the evaluator creates two bindings for x, each
-// having a distinct astNode value. Both of those astNodes share a
-// "navigable bindings" struct and so any children that either of
-// these astNodes have, can be grouped together appropriately via
-// their shared "navigable bindings". Thus in this example, the
-// evaluation of the outermost astNode creates two bindings for x;
-// their distinct astNodes share a "navigable bindings", and also have
-// one binding each for their respective y fields. These y fields are
-// grouped together within the shared "navigable bindings".
+// having a distinct frame. Both of those frames share a "navigable
+// bindings" struct and so any children that either of these frames
+// have, can be grouped together appropriately via their shared
+// "navigable bindings". Thus in this example, the evaluation of the
+// outermost frame creates two bindings for x; these distinct child
+// frames share a "navigable bindings", and also have one binding each
+// for their respective y fields. These y fields are grouped together
+// within their own shared "navigable bindings".
 //
 // This means that when resolving the first element of a path, we can
 // walk up the lexical bindings only, and then once that's resolved,
 // switch to the navigable bindings for the rest of the path.
 //
 // For aliases, comprehensions and one or two other things, a binding
-// can be created in the current astNode which is not added to the
-// astNode's navigable bindings. This means it can only ever be found
+// can be created in the current frame which is not added to the
+// frame's navigable bindings. This means it can only ever be found
 // and used as the first element of a path. A navigable binding is
 // always also a lexical binding, but a lexical binding need not be a
 // navigable binding.
@@ -235,18 +236,18 @@
 //
 // CUE states that fields declared at the top level of a file are not
 // in the file's scope, but are in fact in the package's scope. At
-// construction, the file astNodes all share a "navigable
+// construction, the file frames all share a "navigable
 // bindings". Thus if two different files in the same package both
 // declare the same field, they will be correctly grouped together
 // within that navigable bindings.
 //
-// When a file astNode processes an [ast.File], lexical and navigable
+// When a file frame processes an [ast.File], lexical and navigable
 // bindings will be created as normal. When resolving the first
-// element of a path in some deeper astNode, it can be the case that
-// after walking up the chain of ancestor astNodes, no matching
-// lexical binding is found even within the relevant file's astNode's
+// element of a path in some deeper frame, it can be the case that
+// after walking up the chain of ancestor frames, no matching lexical
+// binding is found even within the relevant file's frame's
 // bindings. In this case, it is safe to directly inspect the file's
-// navigable bindings, which amount to the package's lexical
+// navigable bindings, which amounts to the package's lexical
 // bindings. In this way, a path's first element can be an ident that
 // is only declared in some separate file within the same package, and
 // yet it can still be resolved.
@@ -261,49 +262,45 @@
 //
 // x₁ and x₂ should resolve to each other. Similarly y₁ and y₂. To
 // achieve this, when a field is encountered and a new binding added,
-// the new binding's astNode itself adds a new child astNode that
-// contains a [fieldDeclExpr] as its unprocessed value. This value,
-// when evaluated, walks up the navigable bindings ancestors,
-// gathering their names, and stopping when either the package root is
-// reached, or the navigable binding has no name. From this oldest
-// ancestor, the calculated path is then resolved using the normal
-// mechanics for path resolution. This path will resolve to all the
-// declarations of the field in question. Imagine that in the above
-// example, both int and 7 are replaced with the path x.y.
+// we create a 2nd child frame, which contains a [fieldDeclExpr] as
+// its unprocessed value. This value, when evaluated, walks up the
+// navigable bindings ancestors, gathering their names, and stopping
+// when either the package root is reached, or the navigable binding
+// has no name. From this oldest ancestor, the calculated path is then
+// resolved using the normal mechanics for path resolution. This path
+// will resolve to all the declarations of the field in
+// question. Imagine that in the above example, both int and 7 are
+// replaced with the path x.y.
 //
 // # Find Usages / References
 //
-// When a field usage is resolved to its definition navigable binding:
-//
-//  1. we record that the file offsets of the field use resolve to this
-//     navigable binding;
-//  2. we record the field usage node in that navigable binding.
+// When a field usage is resolved, we record in the definition
+// navigable the frame and [ast.Node] that uses the definition.
 //
 // For example:
 //
 //	x: y
 //	y: 3
 //
-// The y on line 1 will resolve to the navigable bindings that
-// represent the y field of line 2. We record that the file offsets
-// for the y of line 1 resolve to that navigable binding. Inside that
-// navigable binding we record it is "used by" the y node of line 1.
+// The y on line 1 will resolve to the navigable that represents the y
+// field of line 2. Inside that navigable we record it is "used by"
+// the y node of line 1.
 //
 // So, when the user asks for Find Usages for a given file offset, we
-// first find the definition of that offset as described above. Field
-// usages resolve to their declarations, and field declarations
-// resolve to themselves. Having found the correct navigable binding,
-// we now need to force the evaluation of every astNode that could
-// possibly make use of this navigable binding; evaluating an astNode
-// is enough to add entries to the relevant navigable bindings.
+// first find the definition of that offset as described
+// previously. Field usages resolve to their declarations, and field
+// declarations resolve to themselves. Having found the correct
+// navigable, we now need to force the evaluation of every frame that
+// could possibly make use of this navigable; evaluating a frame is
+// enough to add entries to the relevant navigable's usedBy field.
 //
 // In general, a field can be accessed from anywhere, and so having
 // found the definition of a field, the simple approach is to evaluate
-// every astNode that that contributes to the definition's navigable
-// bindings, all of the descendants of those astNodes, all of the
-// ancestors of those astNodes, and also those ancestors'
-// descendants. In other words, everything. This could get expensive,
-// so there are a couple of ways we can curtail evaluation.
+// every frame that contributes to the definition's navigable, all of
+// the descendants of those frames, all of the ancestors of those
+// frames, and also those ancestors' descendants. In other words,
+// everything. This could get expensive, so there are a couple of ways
+// we can trim evaluation.
 //
 //	x: {h: 3, y: 4}.y
 //
@@ -317,8 +314,8 @@
 // Here though, we don't care just about h, we have to also care about
 // the path to h from within this in-line struct, i.e. [i,h]. We can
 // detect that i is used by x, and so h has escaped from the in-line
-// struct and so we need to fully evaluated further up the tree where
-// there might be an x.h.
+// struct and so we need to evaluate further up the tree where there
+// might be an x.h.
 //
 // Even if a field does escape an in-line struct, other expressions
 // can block it from being accessed.
@@ -331,6 +328,7 @@
 package eval
 
 import (
+	"cmp"
 	"fmt"
 	"maps"
 	"slices"
@@ -339,36 +337,35 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/rangeset"
 )
 
-// DefinitionsForPackageFunc is a callback function used to resolve
-// package definitions by their import path. It returns the
-// Definitions for the given import path, or nil if the package cannot
+// EvalsForPackageFunc is a callback function used to resolve
+// package evals by their import path. It returns the
+// Evals for the given import path, or nil if the package cannot
 // be resolved.
-type DefinitionsForPackageFunc = func(importPath ast.ImportPath) *Definitions
+type EvaluatorForPackageFunc = func(importPath ast.ImportPath) *Evaluator
 
 // ImportersFunc is a callback function to fetch the package
-// definitions for packages that directly import the current package.
-type ImportersFunc = func() []*Definitions
+// evaluator for packages that directly import the current package.
+type ImportersFunc = func() []*Evaluator
 
-// Definitions provides methods to resolve file offsets to their
-// definitions.
-type Definitions struct {
+type Evaluator struct {
 	// ip is the canonical (with major-version suffix) import path for
 	// this package.
 	ip ast.ImportPath
-	// pkgNode is the top level (or root) lexical scope
-	pkgNode *astNode
+	// pkgFrame is the top level (or root) lexical scope
+	pkgFrame *frame
 	// pkgDecls contains every package declaration with the files
 	// passed to [Analyse]. This is not the same as the
-	// [pkgNode.navigable] (which is the entire package scope).
-	pkgDecls *navigableBindings
-	// byFilename maps file names to [FileDefinitions]
-	byFilename map[string]*FileDefinitions
+	// [pkgFrame.navigable] (which is the entire package scope).
+	pkgDecls *navigable
+	// byFilename maps file names to [FileEvaluator]
+	byFilename map[string]*FileEvaluator
 	// forPackage is a callback function to resolve imported packages.
-	forPackage DefinitionsForPackageFunc
-	// pkgImporters is a callback function to fetch the definitions for
+	forPackage EvaluatorForPackageFunc
+	// pkgImporters is a callback function to fetch the evaluator for
 	// all packages that directly import this package.
 	pkgImporters ImportersFunc
 	// importCanonicalisation provides canonical (with major-version
@@ -385,196 +382,224 @@ type Definitions struct {
 	importCanonicalisation map[string]ast.ImportPath
 }
 
-// Analyse creates and performs initial configuration of a new
-// [Definitions] value. It does not perform any analysis eagerly. All
-// files provided will be treated as if they are part of the same
-// package. The set of files cannot be modified after construction;
-// instead, construction is cheap, so the intention is you replace the
-// whole Definitions value.
+// New creates and performs initial configuration of a new [Evaluator]
+// value. It does not perform any evaluation eagerly. All files
+// provided will be treated as if they are part of the same package
+// (without checking). The set of files cannot be modified after
+// construction; instead, construction is cheap, so the intention is
+// you replace the whole Evaluator value.
 //
 // For the ip, importCanonicalisation, forPackage, and pkgImporters
 // parameters, see the corresponding fields in [Definitions].
-func Analyse(ip ast.ImportPath, importCanonicalisation map[string]ast.ImportPath, forPackage DefinitionsForPackageFunc, pkgImporters ImportersFunc, files ...*ast.File) *Definitions {
+func New(ip ast.ImportPath, importCanonicalisation map[string]ast.ImportPath, forPackage EvaluatorForPackageFunc, pkgImporters ImportersFunc, files ...*ast.File) *Evaluator {
 	if forPackage == nil {
-		forPackage = func(importPath ast.ImportPath) *Definitions { return nil }
+		forPackage = func(importPath ast.ImportPath) *Evaluator { return nil }
 	}
 	if pkgImporters == nil {
-		pkgImporters = func() []*Definitions { return nil }
+		pkgImporters = func() []*Evaluator { return nil }
 	}
-	dfns := &Definitions{
+	evaluator := &Evaluator{
 		ip:                     ip,
 		importCanonicalisation: importCanonicalisation,
-		byFilename:             make(map[string]*FileDefinitions, len(files)),
+		byFilename:             make(map[string]*FileEvaluator, len(files)),
 		forPackage:             forPackage,
 		pkgImporters:           pkgImporters,
 	}
-	dfns.Reset()
+	evaluator.Reset()
 
-	pkgNode := dfns.pkgNode
-	fileNodesNavigable := &navigableBindings{
-		dfns:   dfns,
-		parent: pkgNode.navigable,
+	pkgFrame := evaluator.pkgFrame
+	fileFramesNavigable := &navigable{
+		evaluator: evaluator,
+		parent:    pkgFrame.navigable,
 	}
 
 	for _, file := range files {
-		fdfns := &FileDefinitions{
-			dfns:        dfns,
-			definitions: make(map[int][]*navigableBindings),
-			completions: make(map[int]*completionResolutions),
-			File:        file,
+		fe := &FileEvaluator{
+			evaluator: evaluator,
+			File:      file,
 		}
-		dfns.byFilename[file.Filename] = fdfns
-		fileNode := fdfns.newAstNode(pkgNode, nil, file, fileNodesNavigable)
-		fileNode.fieldsAllowed = true
-		pkgNode.allChildren = append(pkgNode.allChildren, fileNode)
+		evaluator.byFilename[file.Filename] = fe
+		fileFr := fe.newFrame(pkgFrame, file, fileFramesNavigable)
+		pkgFrame.childFrames = append(pkgFrame.childFrames, fileFr)
+		// The AST doesn't include blank space after the last token. But
+		// the user's cursor can be in that space and we need to be able
+		// to resolve such offsets to a frame. Also, the cursor can be
+		// after the very last char, so we need a +1
+		tokFile := file.Pos().File()
+		if tokFile == nil || tokFile.Size() == 0 {
+			continue
+		}
+		fileFr.end = tokFile.Pos(tokFile.Size()+1, token.NoRelPos)
 	}
 
-	return dfns
+	return evaluator
 }
 
-// Reset clears all cached analysis from Definitions. The Definitions
-// are returned to the same state as after initial construction and
-// before any analysis (evaluation) has taken place. This is useful
-// for when foreign packages (which are (transitively) imported by
-// this package, or import this package) have been modified but this
-// package itself has not been.
-func (dfns *Definitions) Reset() {
-
-	// pkgNode, and its navigable, are the roots. They have no parents.
-	pkgNode := &astNode{}
-	pkgNode.navigable = &navigableBindings{
-		dfns:              dfns,
-		contributingNodes: []*astNode{pkgNode},
+// Reset clears all cached evaluation from Evaluator. The Evaluation
+// is returned to the same state as after initial construction, before
+// any evaluation has taken place. This is useful for when foreign
+// packages (which are (transitively) imported by this package, or
+// import this package) have been modified but this package itself has
+// not been.
+func (e *Evaluator) Reset() {
+	// pkgFrame, and its navigable, are the roots. They have no parents.
+	pkgFrame := &frame{}
+	pkgFrame.navigable = &navigable{
+		evaluator: e,
+		frames:    []*frame{pkgFrame},
 	}
-	dfns.pkgNode = pkgNode
+	e.pkgFrame = pkgFrame
 
-	// pkgDecls is a child of pkgNode.navigable. It will have every
+	// pkgDecls is a child of pkgFrame.navigable. It will have every
 	// package declaration contributed to it as they are encountered.
-	dfns.pkgDecls = &navigableBindings{
-		dfns:   dfns,
-		parent: pkgNode.navigable,
+	e.pkgDecls = &navigable{
+		evaluator: e,
+		parent:    pkgFrame.navigable,
 	}
 
-	// fileNodesNavigable is also a child of pkgNode.navigable. It has
-	// every file node contributed to it.
-	fileNodesNavigable := &navigableBindings{
-		dfns:   dfns,
-		parent: pkgNode.navigable,
+	// fileFramesNavigable is also a child of pkgFrame.navigable. It has
+	// every file frame contributed to it.
+	fileFramesNavigable := &navigable{
+		evaluator: e,
+		parent:    pkgFrame.navigable,
 	}
 
-	for _, fdfns := range dfns.byFilename {
-		clear(fdfns.definitions)
-		clear(fdfns.completions)
-		clear(fdfns.likelyReferenceOffsets)
-		clear(fdfns.importSpecNodes)
-		fileNode := fdfns.newAstNode(pkgNode, nil, fdfns.File, fileNodesNavigable)
-		fileNode.fieldsAllowed = true
-		pkgNode.allChildren = append(pkgNode.allChildren, fileNode)
+	for _, fe := range e.byFilename {
+		clear(fe.likelyReferenceOffsets)
+		clear(fe.importSpecNavigables)
+		fileFr := fe.newFrame(pkgFrame, fe.File, fileFramesNavigable)
+		pkgFrame.childFrames = append(pkgFrame.childFrames, fileFr)
+		tokFile := fe.File.Pos().File()
+		if tokFile == nil {
+			continue
+		}
+		fileFr.end = tokFile.Pos(tokFile.Size()+1, token.NoRelPos)
 	}
 }
 
-// bootFiles evaluates the top level (root) pkgNode and its direct
+// ForFile looks up the [FileEvaluator] for the given filename.
+func (e *Evaluator) ForFile(filename string) *FileEvaluator {
+	e.bootFiles()
+	return e.byFilename[filename]
+}
+
+// bootFiles evaluates the top level (root) pkgFrame and its direct
 // children only. This is useful to ensure package declarations and
 // import specs have been processed.
-func (dfns *Definitions) bootFiles() {
-	// Eval the pkgNode and its immediate children only
-	// (which will be filenodes). This is enough to
+func (e *Evaluator) bootFiles() {
+	// Eval the pkgFrame and its immediate children only
+	// (which will be fileFrames). This is enough to
 	// ensure the package declarations have been found
 	// and added to the pkgDecls.
-	pkgNode := dfns.pkgNode
-	pkgNode.eval()
-	for _, child := range pkgNode.allChildren {
-		child.eval()
+	pkgFrame := e.pkgFrame
+	pkgFrame.eval()
+	for _, fileFr := range pkgFrame.childFrames {
+		fileFr.eval()
 	}
 }
 
-// newAstNode creates a new [astNode]. All arguments other than parent
-// may be nil. The key is the node which is the definition this node
-// represents, and may be nil if this astNode does represent any sort
-// of binding. The unprocessed value is the [ast.Node] which is to be
-// processed by the new astNode. In the case of an [ast.Field], for
-// example, the key would be the field's label, and unprocessed would
-// be the field's value. The navigableBindings are the (potentially
-// shared) bindings which are used in the resolution of the
-// non-first-elements of a path; if navigable is nil, then a new
-// navigable will be created and used within the new astNode.
-func (fdfns *FileDefinitions) newAstNode(parent *astNode, key ast.Node, unprocessed ast.Node, navigable *navigableBindings) *astNode {
-	if parent == nil {
-		panic("parent must not be nil")
+// parseImportSpec attempts to extract the path from the given import
+// spec, and return its canonical form with major-version suffix if at
+// all possible. It makes use of the
+// [Evaluator.importCanonicalisation] field.
+func (e *Evaluator) parseImportSpec(spec *ast.ImportSpec) *ast.ImportPath {
+	str, err := strconv.Unquote(spec.Path.Value)
+	if err != nil {
+		return nil
 	}
-	if navigable == nil {
-		navigable = &navigableBindings{
-			dfns:   fdfns.dfns,
-			parent: parent.navigable,
+	if ip, found := e.importCanonicalisation[str]; found {
+		return &ip
+	}
+	// modimports/modpkgload calls Canonical on import paths, so if
+	// importCanonicalisation is built from the result of modimports
+	// etc then unnecessary explicit qualifiers in import specs will
+	// have been removed. So, parse the path, find the canonical form,
+	// and then check again to see if we find anything:
+	ip := ast.ParseImportPath(str).Canonical()
+	if ip, found := e.importCanonicalisation[ip.String()]; found {
+		return &ip
+	}
+	return &ip
+}
+
+// initialNavsForImport locates navigable that are likely to
+// contain uses of the import path.
+func (e *Evaluator) initialNavsForImport(ip ast.ImportPath) []*navigable {
+	// When calculating usages of a field, we can discover that the
+	// field is exported by the package. We then look for all the
+	// packages that import us. To try to avoid brute force evaluation
+	// of the whole of these "downstream" packages, we use
+	// [FileEvaluator.findIdentUsageOffsets] to quickly search for
+	// file offsets that appear to be of idents that match the imported
+	// package's name (i.e. our original now-"upstream" package). We
+	// evaluate up to those offsets only, and return the
+	// navigable now associated with those offsets.
+	e.bootFiles()
+	var result []*navigable
+	for _, fe := range e.byFilename {
+		nav, found := fe.importSpecNavigables[ip]
+		if !found {
+			continue
+		}
+		for _, fr := range nav.frames {
+			spec := fr.node.(*ast.ImportSpec)
+			name := e.importSpecName(spec)
+			if name == "" {
+				continue
+			}
+
+			for _, offsets := range fe.findIdentUsageOffsets(name) {
+				for _, fr := range fe.evalForOffset(offsets) {
+					result = append(result, fr.navigable)
+				}
+			}
 		}
 	}
-	s := &astNode{
-		fdfns:       fdfns,
-		parent:      parent,
-		unprocessed: unprocessed,
-		navigable:   navigable,
-	}
-	navigable.contributingNodes = append(navigable.contributingNodes, s)
-	if key != nil {
-		s.key = key
-		s.addRange(key)
-	}
-	return s
+	return result
 }
 
-// ForFile looks up the [FileDefinitions] for the given filename.
-func (dfns *Definitions) ForFile(filename string) *FileDefinitions {
-	return dfns.byFilename[filename]
+// importSpecName extracts the name of the import spec: the alias name
+// if that's in use, or otherwise the package qualifier, whether
+// implied or explicit.
+func (e *Evaluator) importSpecName(spec *ast.ImportSpec) string {
+	name := ""
+	if alias := spec.Name; alias != nil && alias.Name != "" {
+		name = alias.Name
+	} else {
+		ip := e.parseImportSpec(spec)
+		if ip == nil {
+			return ""
+		}
+		name = ip.Qualifier
+	}
+	return name
 }
 
-// FileDefinitions provides methods to resolve file offsets within a
-// certain file to their definitions.
-type FileDefinitions struct {
-	dfns *Definitions
-	// definitions caches the definitions that have been computed
-	// during evaluation. This ensures that subsequent calls to
-	// [evalForOffset] for a given offset are O(1). The map key is the
-	// byte offset within the file.
-	definitions map[int][]*navigableBindings
-	// completions is the same as definitions, but for completions.
-	completions map[int]*completionResolutions
+type FileEvaluator struct {
+	evaluator *Evaluator
 	// File is the original [ast.File] that was passed to [Analyse].
 	File *ast.File
 	// likelyReferenceOffsets contains file offsets for idents that are
 	// likely to be references (as opposed to declarations) and likely
 	// to reference imported packages. It is lazily populated by
-	// [FileDefinitions.findIdentUsageOffsets].
+	// [FileEvaluator.findIdentUsageOffsets].
 	likelyReferenceOffsets map[string][]int
-	// importSpecNodes contains entries for every import within this
+	// importSpecNavigables contains entries for every import within this
 	// file. Within this file, all import specs that are of the
 	// same (canonical) import path, share the same
-	// navigableBinding. This is made possible by this map.
-	importSpecNodes map[ast.ImportPath]*navigableBindings
+	// navigable. This is made possible by this map.
+	importSpecNavigables map[ast.ImportPath]*navigable
 }
 
-// completionResolutions models the various different types of
-// completions that are available for a given location, alongside
-// various file coordinates which are essential for the LSP to
-// instruct the client correctly for editing the source.
-type completionResolutions struct {
-	embedNavigables []*navigableBindings
-	embedNode       *astNode
-	fieldNavigables []*navigableBindings
-	startOffset     int
-	fieldEndOffset  int
-	embedEndOffset  int
-}
-
-// DefinitionsForOffset reports the definitions that the file offset (number of
-// bytes from the start of the file) resolves to.
-func (fdfns *FileDefinitions) DefinitionsForOffset(offset int) []ast.Node {
-	navs := fdfns.findDefinitionsForOffsets(offset)
-
+// DefinitionsForOffset reports the definitions that the file offset
+// (number of bytes from the start of the file) resolves to.
+func (fe *FileEvaluator) DefinitionsForOffset(offset int) []ast.Node {
 	var nodes []ast.Node
-	for _, nav := range navs {
-		for _, n := range nav.contributingNodes {
-			if n.key != nil {
-				nodes = append(nodes, n.key)
+
+	for nav := range fe.definitionsForOffset(offset) {
+		for _, fr := range nav.frames {
+			if fr.key != nil {
+				nodes = append(nodes, fr.key)
 			}
 		}
 	}
@@ -583,17 +608,18 @@ func (fdfns *FileDefinitions) DefinitionsForOffset(offset int) []ast.Node {
 }
 
 // DocCommentsForOffset is very similar to DefinitionsForOffset. It
-// reports the doc comments associated with then definitions that the
+// reports the doc comments associated with the definitions that the
 // file offset (number of bytes from the start of the file) resolves
 // to.
-func (fdfns *FileDefinitions) DocCommentsForOffset(offset int) map[ast.Node][]*ast.CommentGroup {
-	navs := fdfns.findDefinitionsForOffsets(offset)
-
+func (fe *FileEvaluator) DocCommentsForOffset(offset int) map[ast.Node][]*ast.CommentGroup {
 	commentsMap := make(map[ast.Node][]*ast.CommentGroup)
-	for _, nav := range navs {
-		for _, n := range nav.contributingNodes {
-			if n.key != nil && len(n.docComments) > 0 {
-				commentsMap[n.key] = n.docComments
+
+	for nav := range fe.definitionsForOffset(offset) {
+		for _, fr := range nav.frames {
+			if fr.key != nil {
+				if comments := fr.docComments(); len(comments) > 0 {
+					commentsMap[fr.key] = comments
+				}
 			}
 		}
 	}
@@ -601,102 +627,261 @@ func (fdfns *FileDefinitions) DocCommentsForOffset(offset int) map[ast.Node][]*a
 	return commentsMap
 }
 
+type Completion struct {
+	// Start and End contain the range of the file that should be
+	// replaced by this Completion. They are byte offsets.
+	Start int
+	End   int
+	// Suffix should be appended to all string suggestions. It's
+	// typically ": " for suggested fields.
+	Suffix string
+	Kind   protocol.CompletionItemKind
+}
+
 // CompletionsForOffset reports the set of strings that can form a new
 // path element following the path element indicated by the offset
 // (number of bytes from the start of the file).
-func (fdfns *FileDefinitions) CompletionsForOffset(offset int) (fields, embeds []string, startOffset, fieldEndOffset, embedEndOffset int) {
-	completions := fdfns.completions
-	resolutions, found := completions[offset]
-	if !found {
-		completions[offset] = &completionResolutions{}
-		fdfns.evalForOffset(offset)
-		resolutions = completions[offset]
+func (fe *FileEvaluator) CompletionsForOffset(offset int) map[Completion]map[string]struct{} {
+	var completions map[Completion]map[string]struct{}
+	addCompletions := func(completion Completion, nameSet map[string]struct{}) {
+		if len(nameSet) == 0 {
+			return
+		}
+		if completions == nil {
+			completions = make(map[Completion]map[string]struct{})
+		}
+		names, found := completions[completion]
+		if !found {
+			completions[completion] = nameSet
+			return
+		}
+		maps.Copy(names, nameSet)
 	}
 
-	namesSet := make(map[string]struct{})
-	if navs := resolutions.fieldNavigables; len(navs) > 0 {
-		navigableSet := expandNavigables(navs)
-		for nav := range navigableSet {
+	suggestEmbedsFrom := make(map[*frame]Completion)
+	suggestFieldsFrom := make(map[*navigable]Completion)
+
+	leafFrames := fe.evalForOffset(offset)
+nextFrame:
+	for _, fr := range leafFrames {
+		if fr.navigable == fe.evaluator.pkgDecls {
+			// do not make any suggestions if we're inside a package decl
+			continue
+		}
+
+		// 1. Are we in a fieldDecl?
+		//
+		// We want to handle being in a path *within* a fieldDecl
+		// carefully: that path could be from an expression
+		// (e.g. dynamic field: (a.|b): foo), or it could just be the
+		// fake ancestral path of a simple field key ident. So we test
+		// paths *after* explicitly testing the key ident of a
+		// fieldDecl.
+		fieldDecl, ok := fr.node.(*fieldDeclExpr)
+		inFieldDecl := ok && fieldDecl.start.Offset() <= offset && offset <= fieldDecl.end.Offset()
+		if inFieldDecl {
+			// Only make suggestions if we're really within the field key ident.
+			if keyIdent := fieldDecl.keyIdent; keyIdent != nil {
+				start := keyIdent.Pos().Offset()
+				end := keyIdent.End().Offset()
+				if start <= offset && offset <= end {
+					// It's an existing field key ident, we don't care
+					// where the colon is; our suggestions replace the
+					// whole ident.
+					suggestFieldsFrom[fieldDecl.valueFrame.navigable.parent] = Completion{
+						Start: start,
+						End:   end,
+					}
+					continue nextFrame
+				}
+			}
+			if fieldDecl.start.Offset() == offset {
+				// The cursor is right at the start of the field decl, but
+				// the field decl must either have no key ident, or
+				// there's some alias or something else. E.g. |(a): f.
+				// We're going to suggest new fields to insert, and they
+				// need to have a trailing colon and space.
+				suggestFieldsFrom[fr.navigable.parent] = Completion{
+					Start:  offset,
+					End:    offset,
+					Suffix: ": ",
+				}
+				continue nextFrame
+			}
+		}
+
+		// 2. Are we in a path?
+		//
+		// We could still be in a field decl here, but not within the
+		// key ident, nor at the very start of the field. E.g. a string
+		// interpolation: "a-\(b|.c)-d": e
+		for _, p := range fr.childPaths {
+			compIdx, _ := p.definitionsForOffset(offset)
+			if compIdx < 0 {
+				continue
+			}
+			pc := p.components[compIdx]
+			// We're going to make suggestions that replace the whole of
+			// the existing path element.
+			embedCompletions := Completion{Start: pc.start.Offset(), End: pc.end.Offset()}
+			if compIdx < len(p.components)-1 {
+				// We're before the last component in the path, so
+				// back off the end so it doesn't include the .
+				embedCompletions.End--
+			}
+			if compIdx == 0 && !p.startsInline {
+				// We're in the first component of a path which starts
+				// with an ident. The first component must be resolvable
+				// lexically, the same as embeds.
+				suggestEmbedsFrom[fr] = embedCompletions
+				if len(p.components) == 2 {
+					// This path only has 1 component, so we offer to
+					// switch it to a field.
+					fieldCompletions := embedCompletions
+					fieldCompletions.Suffix = ": "
+					suggestFieldsFrom[fr.navigable] = fieldCompletions
+				}
+			} else {
+				// We're in some component of a path, but not at the start.
+				nameSet := make(map[string]struct{})
+				for nav := range expandNavigables(pc.unexpanded) {
+					for name := range nav.bindings {
+						if !strings.HasPrefix(name, "__") {
+							nameSet[name] = struct{}{}
+						}
+					}
+				}
+				if len(nameSet) > 0 {
+					embedCompletions.Kind = protocol.VariableCompletion
+					addCompletions(embedCompletions, nameSet)
+				}
+			}
+			continue nextFrame
+		}
+
+		if inFieldDecl {
+			continue nextFrame
+		}
+
+		if fr.unknownRanges.Contains(offset) {
+			// We're within some AST node that this evaluator does not
+			// process (eg a BasicLit). Do not offer any completions *at
+			// all*.
+			return nil
+		}
+
+		// 3. Are we at the very start of some value? E.g. x: |true
+		for ancestor := fr; ancestor != nil; ancestor = ancestor.parent {
+			node := ancestor.node
+			if ancestor.key == nil || node == nil {
+				continue
+			}
+			if node.Pos().Offset() < offset {
+				break
+			}
+			// We're injecting embed *and* field suggestions (not
+			// replacing). Field suggestions require a trailing colon and
+			// space.
+			//
+			// The key thing here is the detection that we have a field
+			// decl to our left, and so injecting additional fields is
+			// sensible.
+			suggestFieldsFrom[fr.navigable] = Completion{
+				Start:  offset,
+				End:    offset,
+				Suffix: ": ",
+			}
+			suggestEmbedsFrom[fr] = Completion{
+				Start: offset,
+				End:   offset,
+			}
+			continue nextFrame
+		}
+
+		node := fr.node
+		s, isStruct := node.(*ast.StructLit)
+		if isStruct && s.Lbrace.IsValid() && s.Rbrace.IsValid() && (offset < s.Lbrace.Offset() || s.Rbrace.Offset() < offset) {
+			continue
+		}
+
+		suggestEmbedsFrom[fr] = Completion{Start: offset, End: offset}
+
+		_, isFile := node.(*ast.File)
+		if isFile || isStruct {
+			// We must be between fields.
+			suggestFieldsFrom[fr.navigable] = Completion{Start: offset, End: offset}
+		}
+	}
+
+	processedEmbedFrames := make(map[*frame]struct{})
+	for fr, embedCompletions := range suggestEmbedsFrom {
+		nameSet := make(map[string]struct{})
+		for childFr, parentFr := fr, fr.parent; parentFr != nil; childFr, parentFr = parentFr, parentFr.parent {
+			if _, seen := processedEmbedFrames[childFr]; seen {
+				break
+			}
+			processedEmbedFrames[childFr] = struct{}{}
+			for name := range parentFr.bindings {
+				if !strings.HasPrefix(name, "__") {
+					nameSet[name] = struct{}{}
+				}
+			}
+		}
+		if len(nameSet) == 0 {
+			continue
+		}
+		embedCompletions.Kind = protocol.VariableCompletion
+		addCompletions(embedCompletions, nameSet)
+	}
+
+	for nav, fieldCompletions := range suggestFieldsFrom {
+		nameSet := make(map[string]struct{})
+		for nav := range expandNavigables([]*navigable{nav}) {
 			for name := range nav.bindings {
 				if !strings.HasPrefix(name, "__") {
-					namesSet[name] = struct{}{}
+					nameSet[name] = struct{}{}
 				}
 			}
 		}
-	}
-	fields = slices.Collect(maps.Keys(namesSet))
-	slices.Sort(fields)
-
-	clear(namesSet)
-	if navs := resolutions.embedNavigables; len(navs) > 0 {
-		navigableSet := expandNavigables(navs)
-
-		for nav := range navigableSet {
-			for name := range nav.bindings {
-				if !strings.HasPrefix(name, "__") && ast.IsValidIdent(name) {
-					namesSet[name] = struct{}{}
-				}
-			}
+		if len(nameSet) == 0 {
+			continue
 		}
+		fieldCompletions.Kind = protocol.FieldCompletion
+		addCompletions(fieldCompletions, nameSet)
 	}
 
-	for node := resolutions.embedNode; node != nil; node = node.parent {
-		for name := range node.bindings {
-			if !strings.HasPrefix(name, "__") && ast.IsValidIdent(name) {
-				namesSet[name] = struct{}{}
-			}
-		}
-		if node.isFileNode() {
-			// Include the package bindings
-			for name := range node.navigable.bindings {
-				if !strings.HasPrefix(name, "__") && ast.IsValidIdent(name) {
-					namesSet[name] = struct{}{}
-				}
-			}
-		}
-	}
-	embeds = slices.Collect(maps.Keys(namesSet))
-	// For now, we are simply sorting completions lexicographically. It
-	// might be worth trying to sort by "distance" - the number of
-	// parents/resolvedTo "hops" it takes to get from the cursor
-	// position to the suggestion. That might be quite complex to do
-	// though, and many editors completely ignore any suggested
-	// ordering of completions, so it's not clear if this will be worth
-	// it. TODO.
-	slices.Sort(embeds)
-
-	return fields, embeds, resolutions.startOffset, resolutions.fieldEndOffset, resolutions.embedEndOffset
+	return completions
 }
 
 // UsagesForOffset reports the nodes that make use of whatever the
 // file offset (number of bytes from the start of the file) resolves
 // to.
-func (fdfns *FileDefinitions) UsagesForOffset(offset int, includeDefinitions bool) []ast.Node {
-	navs := fdfns.findDefinitionsForOffsets(offset)
+func (fe *FileEvaluator) UsagesForOffset(offset int, includeDefinitions bool) []ast.Node {
+	navs := slices.Collect(maps.Keys(fe.definitionsForOffset(offset)))
 
 	if len(navs) == 1 {
 		nav := navs[0]
-		dfns := fdfns.dfns
-		if nav == nav.dfns.pkgDecls && nav.dfns != dfns {
+		pkgEval := fe.evaluator
+		if nav == nav.evaluator.pkgDecls && nav.evaluator != pkgEval {
 			// We have resolved the offset to package declarations of
-			// some foreign package. From this we can infer that the user
+			// some remote package. From this we can infer that the user
 			// is actually asking for usages of an import, so we hunt
 			// through the usedBy looking for a import spec that's from
 			// this file.
-			for n, node := range nav.usedBy {
-				if spec, ok := n.(*ast.ImportSpec); ok && node.fdfns == fdfns {
-					// If we set navs to node.navigable then we would eval
+			for n, fr := range nav.usedBy {
+				if spec, ok := n.(*ast.ImportSpec); ok && fr.fileEvaluator == fe {
+					// If we set navs to fr.navigable then we would eval
 					// the whole package. To avoid that, we extract the
 					// name of the import and hunt through the AST of this
 					// file, searching for uses of that name.
-					name := dfns.importSpecName(spec)
+					name := pkgEval.importSpecName(spec)
 					if name == "" {
 						continue
 					}
-					offsets := fdfns.findIdentUsageOffsets(name)
-					result := fdfns.findDefinitionsForOffsets(offsets...)
+					offsets := fe.findIdentUsageOffsets(name)
+					result := fe.definitionsForOffset(offsets...)
 					if len(result) > 0 {
-						navs = result
+						navs = slices.Collect(maps.Keys(result))
 						break
 					}
 				}
@@ -706,27 +891,26 @@ func (fdfns *FileDefinitions) UsagesForOffset(offset int, includeDefinitions boo
 
 	usages(navs)
 
-	exprs := make(map[ast.Node]*astNode)
+	exprs := make(map[ast.Node]*frame)
 	for _, nav := range navs {
-		for n, node := range nav.usedBy {
-			if includeDefinitions || n != node.key {
-				exprs[n] = node
+		for node, fr := range nav.usedBy {
+			if includeDefinitions || node != fr.key {
+				exprs[node] = fr
 			}
 		}
 	}
 
 	if includeDefinitions {
 		for _, nav := range navs {
-			for _, n := range nav.contributingNodes {
-				if n.key != nil {
-					exprs[n.key] = nil
+			for _, fr := range nav.frames {
+				if fr.key != nil {
+					exprs[fr.key] = nil
 				}
 			}
 		}
 	}
 
-	nodes := slices.Collect(maps.Keys(exprs))
-	return nodes
+	return slices.Collect(maps.Keys(exprs))
 }
 
 // usages attempts to discover all uses of the given navs whilst doing
@@ -734,98 +918,95 @@ func (fdfns *FileDefinitions) UsagesForOffset(offset int, includeDefinitions boo
 // (particularly their usedBy field) so that by the time this function
 // returns, their usedBy fields contain the same entries as if every
 // available [*Definitions] had been fully evaluated.
-func usages(navsWorklist []*navigableBindings) {
+func usages(navsWorklist []*navigable) {
 	navsWorklist = slices.Clip(navsWorklist)
 
-	targetsSeen := make(map[*navigableBindings]struct{})
-	evaluatedNavs := make(map[*navigableBindings]struct{})
-	evaluatedNodes := make(map[*astNode]struct{})
+	traversedNavs := make(map[*navigable]struct{})
+	evaluatedNavs := make(map[*navigable]struct{})
 
 	for len(navsWorklist) > 0 {
 		nav := navsWorklist[0]
 		navsWorklist = navsWorklist[1:]
 
-		if _, seen := evaluatedNavs[nav]; seen {
+		if _, seen := traversedNavs[nav]; seen {
 			continue
 		}
-		evaluatedNavs[nav] = struct{}{}
+		traversedNavs[nav] = struct{}{}
 
-		// We're going to have to evaluate everything in
-		// nav.contributingNodes. But we might need to evaluate
-		// contributingNodes from the ancestors of nav too.
+		// We're going to have to evaluate everything in nav.frames. But
+		// we might need to evaluate frames from the ancestors of nav
+		// too.
 		isExported := false
-		var pathElements []*navigableBindings
-		var evalWorklist []*astNode
+		var targetNavs []*navigable
+		var evalWorklist []*navigable
 		{
-			var child *navigableBindings
+			pkgNav := nav.evaluator.pkgFrame.navigable
+			var child *navigable
 			for parent := nav; parent != nil; child, parent = parent, parent.parent {
-				if parent == parent.dfns.pkgNode.navigable {
+				if parent == pkgNav {
 					isExported = true
 				}
-				pathElements = append(pathElements, parent)
-				if child != nil && parent.name != "" && child.name == "" {
-					// The transition from an unnamed child nav to a named
-					// parent nav is the place to stop.
-					//
-					//	x: (({y: 6} & {y: int}).y + 1)
-					//
-					// If the user is asking for usages of the first y, we
-					// must walk up until we find the x navigable binding
-					// and evaluate all its contributingNodes.
-					break
+				evalWorklist = []*navigable{parent}
+				if child != nil {
+					// Because each nav has a role to play as a parent and
+					// then a child, we only add navs to the traversedNavs
+					// set once they've played both roles.
+					traversedNavs[child] = struct{}{}
+					targetNavs = append(targetNavs, child)
+					if parent.name != "" && child.name == "" {
+						// The transition from an unnamed child nav to a named
+						// parent nav is the place to stop.
+						//
+						//	x: (({y: 6} & {y: int}).y + 1)
+						//
+						// If the user is asking for usages of the first y, we
+						// must walk up until we find the x navigable binding
+						// and evaluate all its frames.
+						break
+					}
 				}
-				evaluatedNavs[parent] = struct{}{}
-				evalWorklist = parent.contributingNodes
 			}
 		}
 
-		evalWorklist = slices.Clip(evalWorklist)
 		for len(evalWorklist) > 0 {
-			node := evalWorklist[0]
+			nav := evalWorklist[0]
 			evalWorklist = evalWorklist[1:]
 
-			if _, seen := evaluatedNodes[node]; seen {
+			if _, seen := evaluatedNavs[nav]; seen {
 				continue
 			}
-			evaluatedNodes[node] = struct{}{}
+			evaluatedNavs[nav] = struct{}{}
 
-			node.eval()
-			evalWorklist = append(evalWorklist, node.allChildren...)
+			nav.eval()
+			for _, fr := range nav.frames {
+				for _, childFr := range fr.childFrames {
+					evalWorklist = append(evalWorklist, childFr.navigable)
+				}
+			}
 		}
 
-		// We must evaluate every node (and consider their ancestors for
-		// evaluation) that uses any navigable binding in pathElements.
+		// We must evaluate every frame (and consider their ancestors
+		// for evaluation) that uses any navigable in targetNavs.
 		//
 		//	x: {i: h: j: 3, k: i}.k.h
 		//
-		// The user asked for usages of j, we established pathElements
-		// is [x,i,h,j]. We have evaluated everything within i, h and j,
-		// and now we look at any discovered uses of x,i,h,j. We will
-		// find i is used by k, and so we schedule k for evaluation. We
-		// then find k is used by x but x doesn't resolve to k. However,
-		// we do find h is used by x, and x does resolve to h and so we
-		// schedule x for evaluation. I.e. we have established that one
-		// of i,h,j has escaped from the in-line struct and so x itself
-		// (and its ancestors) must be evaluated.
-		targetsWorklist := pathElements
-		clear(targetsSeen)
-		for len(targetsWorklist) > 0 {
-			target := targetsWorklist[0]
-			targetsWorklist = targetsWorklist[1:]
-
-			if _, seen := targetsSeen[target]; seen {
-				continue
-			}
-			targetsSeen[target] = struct{}{}
-
+		// The user asked for usages of j, we established targetNavs is
+		// [j,h,i]. We have evaluated everything within x, and now we
+		// look at any discovered uses of j,h,i. We will find i is used
+		// by k, and so we schedule k for evaluation. We find k is used
+		// by x but x doesn't resolve to k. However, we also find h is
+		// used by x, and x does resolve to h and so we add x to the
+		// navsWorklist. I.e. we have established that one of j,h,i has
+		// escaped from the in-line struct and so at least some of x's
+		// ancestors must now be evaluated.
+		for _, target := range targetNavs {
 			for _, use := range target.usedBy {
-				// Only if the usage is basically an embedding
+				// Only if the use of target is basically an embedding
 				// (i.e. appears in resolvesTo) do we need to go
 				// further. So for example, when inspecting the uses of y,
 				// if we found x: y + 1 we would not then need to inspect
 				// the uses of x.
-				if slices.Contains(use.resolvesTo, target) {
-					targetsWorklist = append(targetsWorklist, use.navigable)
+				if _, found := use.navigable.resolvesTo[target]; found {
 					navsWorklist = append(navsWorklist, use.navigable)
 				}
 			}
@@ -834,62 +1015,32 @@ func usages(navsWorklist []*navigableBindings) {
 		if isExported {
 			// For all the packages that import us, find where usages of
 			// this package appears.
-			ip := nav.dfns.ip
-			for _, remotePkgDfns := range nav.dfns.pkgImporters() {
+			ip := nav.evaluator.ip
+			for _, remotePkgDfns := range nav.evaluator.pkgImporters() {
 				navsWorklist = append(navsWorklist, remotePkgDfns.initialNavsForImport(ip)...)
 			}
 		}
 	}
 }
 
-// initialNavsForImport locates navigableBindings that are likely to
-// contain uses of the import path.
-func (dfns *Definitions) initialNavsForImport(ip ast.ImportPath) []*navigableBindings {
-	// When calculating usages of a field, we can discover that the
-	// field is exported by the package. We then look for all the
-	// packages that import us. To try to avoid brute force evaluation
-	// of the whole of these "downstream" packages, we use
-	// [FileDefinitions.findIdentUsageOffsets] to quickly search for
-	// file offsets that appear to be of idents that match the imported
-	// package's name (i.e. our original now-"upstream" package). We
-	// evaluate up to those offsets only, and return the
-	// navigableBindings now associated with those offsets.
-	dfns.bootFiles()
-	var result []*navigableBindings
-	for _, fdfns := range dfns.byFilename {
-		nav, found := fdfns.importSpecNodes[ip]
-		if !found {
-			continue
-		}
-		for _, node := range nav.contributingNodes {
-			spec := node.keyAlias.(*ast.ImportSpec)
-			name := dfns.importSpecName(spec)
-			if name == "" {
-				continue
+// definitionsForOffset gathers together the navigables which are the
+// definitions reachable from each offset.
+func (fe *FileEvaluator) definitionsForOffset(offsets ...int) map[*navigable]struct{} {
+	results := make(map[*navigable]struct{})
+
+	for _, offset := range offsets {
+		leafFrames := fe.evalForOffset(offset)
+		for _, fr := range leafFrames {
+			for _, p := range fr.childPaths {
+				_, navs := p.definitionsForOffset(offset)
+				for _, nav := range navs {
+					results[nav] = struct{}{}
+				}
 			}
-
-			offsets := fdfns.findIdentUsageOffsets(name)
-			result = append(result, fdfns.findDefinitionsForOffsets(offsets...)...)
 		}
 	}
-	return result
-}
 
-// importSpecName extracts the name of the import spec: the alias name
-// if that's in use, or otherwise the package qualifier, whether
-// implied or explicit.
-func (dfns *Definitions) importSpecName(spec *ast.ImportSpec) string {
-	name := ""
-	if alias := spec.Name; alias != nil && alias.Name != "" {
-		name = alias.Name
-	} else {
-		ip := dfns.parseImportSpec(spec)
-		if ip == nil {
-			return ""
-		}
-		name = ip.Qualifier
-	}
-	return name
+	return results
 }
 
 // findIdentUsageOffsets does a rough-and-ready walk through the ast,
@@ -901,16 +1052,16 @@ func (dfns *Definitions) importSpecName(spec *ast.ImportSpec) string {
 // for idents which match the given name, and are unlikely to resolve
 // to other fields. This is approximate and false positives will
 // definitely be returned, but it's a single fast pass over the AST.
-func (fdfns *FileDefinitions) findIdentUsageOffsets(name string) []int {
-	unknownIdents := fdfns.likelyReferenceOffsets
-	if unknownIdents == nil {
-		unknownIdents = make(map[string][]int)
-		fdfns.likelyReferenceOffsets = unknownIdents
+func (fe *FileEvaluator) findIdentUsageOffsets(name string) []int {
+	likelyReferenceOffsets := fe.likelyReferenceOffsets
+	if likelyReferenceOffsets == nil {
+		likelyReferenceOffsets = make(map[string][]int)
+		fe.likelyReferenceOffsets = likelyReferenceOffsets
 	}
 
-	offsets, found := unknownIdents[name]
+	offsets, found := likelyReferenceOffsets[name]
 	if !found {
-		ast.Walk(fdfns.File, func(n ast.Node) bool {
+		ast.Walk(fe.File, func(n ast.Node) bool {
 			switch n := n.(type) {
 			case *ast.ImportDecl:
 				return false
@@ -940,128 +1091,372 @@ func (fdfns *FileDefinitions) findIdentUsageOffsets(name string) []int {
 			}
 			return true
 		}, nil)
-		unknownIdents[name] = offsets
+		likelyReferenceOffsets[name] = offsets
 	}
 
 	return offsets
 }
 
-// parseImportSpec attempts to extract the path from the given import
-// spec, and return its canonical form with major-version suffix if at
-// all possible. It makes use of the
-// [Definitions.importCanonicalisation] field.
-func (dfns *Definitions) parseImportSpec(spec *ast.ImportSpec) *ast.ImportPath {
-	str, err := strconv.Unquote(spec.Path.Value)
-	if err != nil {
-		return nil
+// newFrame creates a new [frame]. All arguments other than parent may
+// be nil. Node is the [ast.Node] which is to be processed by the new
+// frame. The navigable is the (potentially shared) bindings which are
+// used in the resolution of the non-first-components of a path; if
+// navigable is nil, then a new navigable will be created and used.
+func (fe *FileEvaluator) newFrame(parent *frame, node ast.Node, nav *navigable) *frame {
+	if parent == nil {
+		panic("parent must not be nil")
 	}
-	if ip, found := dfns.importCanonicalisation[str]; found {
-		return &ip
+	if nav == nil {
+		nav = &navigable{
+			evaluator: fe.evaluator,
+			parent:    parent.navigable,
+		}
 	}
-	// modimports/modpkgload calls Canonical on import paths, so if
-	// importCanonicalisation is built from the result of modimports
-	// etc then unnecessary explicit qualifiers in import specs will
-	// have been removed. So, parse the path, find the canonical form,
-	// and then check again to see if we find anything:
-	ip := ast.ParseImportPath(str).Canonical()
-	if ip, found := dfns.importCanonicalisation[ip.String()]; found {
-		return &ip
+	child := &frame{
+		fileEvaluator: fe,
+		parent:        parent,
+		node:          node,
+		navigable:     nav,
+		start:         token.NoPos,
+		end:           token.NoPos,
 	}
-	return &ip
+	nav.frames = append(nav.frames, child)
+	if node != nil {
+		child.start = node.Pos()
+		child.end = node.End()
+	}
+	return child
 }
 
-// evalForOffset evaluates from the pkgNode, evaluating only child
-// astNodes that contain the given file-byte-offset.
-func (fdfns *FileDefinitions) evalForOffset(offset int) {
+// evalForOffset evaluates from the pkgFrame, evaluating only frames
+// within navigables for which at least one frame contains the given
+// file-byte-offset.
+func (fe *FileEvaluator) evalForOffset(offset int) []*frame {
 	if offset < 0 {
-		return
+		return nil
 	}
 
-	filename := fdfns.File.Filename
-	pkgNode := fdfns.dfns.pkgNode
-	pkgNode.eval()
-	seen := make(map[*astNode]struct{})
-	worklist := []*astNode{pkgNode}
+	var leafFrames []*frame
+	seen := make(map[*navigable]struct{})
+	worklist := []*navigable{fe.evaluator.pkgFrame.navigable}
 	for len(worklist) > 0 {
-		s := worklist[0]
+		nav := worklist[0]
 		worklist = worklist[1:]
 
-		if _, found := seen[s]; found {
+		if _, found := seen[nav]; found {
 			continue
 		}
-		seen[s] = struct{}{}
+		seen[nav] = struct{}{}
 
-		for _, s := range s.allChildren {
-			s.eval()
-			if s.contains(filename, offset) {
-				worklist = append(worklist, s)
+		nav.eval()
+
+		for _, fr := range nav.frames {
+			// The very top level pkgFrame.navigable will not "contain"
+			// the file+offset, but it will have a child that does. This
+			// is the only case where a child frame would contain a
+			// file+offset and its parent frame does not.
+
+			isLeaf := fr.contains(fe, offset)
+			for _, child := range fr.childFrames {
+				if child.contains(fe, offset) {
+					worklist = append(worklist, child.navigable)
+					isLeaf = false
+				}
+			}
+			if isLeaf {
+				leafFrames = append(leafFrames, fr)
 			}
 		}
 	}
 
-	//pkgNode.dump(1)
+	return leafFrames
 }
 
-// findDefinitionsForOffsets gathers together the navigableBindings
-// which are the definitions reachable from each offset, evaluating
-// the offset as necessary.
-func (fdfns *FileDefinitions) findDefinitionsForOffsets(offsets ...int) []*navigableBindings {
-	definitions := fdfns.definitions
-	var result []*navigableBindings
-	for _, offset := range offsets {
-		navs, found := definitions[offset]
-		if !found {
-			definitions[offset] = []*navigableBindings{}
-			fdfns.evalForOffset(offset)
-			navs = definitions[offset]
-		}
-		result = append(result, navs...)
+// navigable groups together frames, and itself is a node in a graph
+// (directed, acyclic) of navigables.
+type navigable struct {
+	evaluator *Evaluator
+	// evaluated tracks whether this navigable has been evaluated,
+	// ensuring it is only evaluated once. Note that it is possible for
+	// a navigable's frames to be evaluated without the navigable
+	// itself being evaluated. Therefore it is not sufficient to rely
+	// on finding unevaluated frames within a navigable.
+	evaluated bool
+	// parent is the parent navigable. The graph of navigables can be
+	// different from the graph of frames, because two frames in a
+	// parent-child relationship can reuse the same navigable. A good
+	// example of this is:
+	//
+	//	x: y & z
+	//
+	// Here, the frame for the x field-value will create two child
+	// frames, one for each of y and z, but all three will use the same
+	// navigable.
+	parent *navigable
+	// frames are the frames that contribute to this navigable. It is
+	// an invariant that every member of frames has its navigable field
+	// set to this navigable. It is also an invariant that every frame
+	// that has a particular navigable value in its navigable field
+	// will appear in that navigable's frames field.
+	frames []*frame
+	// bindings contains all bindings for this navigable node. These
+	// bindings are "merged"; for example:
+	//
+	//	x: a
+	//	x: b
+	//
+	// There would only be one navigable that covers both x
+	// field-values. This is in contrast to [frame], where bindings are
+	// not merged: there would be two bindings (frame)s for x.
+	bindings map[string]*navigable
+	// name is the identifier name for this binding. This may be the
+	// empty string if this navigable itself does not appear in
+	// its parent's bindings. A good example of this is a let
+	// expression:
+	//
+	//	let x = 3
+	//
+	// The frame containing this expression will have its own binding
+	// for x to a child frame. That child frame will have a fresh
+	// navigable, but that navigable will not appear in the parent
+	// frame's own navigable's bindings. This is because navigables are
+	// used for resolving non-first-elements of a path, and let
+	// expressions (amongst others) introduce bindings that are not
+	// visible to non-first-path-elements.
+	name string
+	// resolvesTo points to the navigables this navigable resolves to,
+	// due to embedded paths. For example, in x: y.z, whatever frame
+	// y.z resolves to, its navigable bindings will be stored in the
+	// resolvesTo field of x's navigable.
+	resolvesTo map[*navigable]struct{}
+	// resolvesToObservers contains paths, each with an index, that
+	// should be informed whenever the [resolvesTo] set for this
+	// navigable changes.
+	resolvesToObservers map[*path]int
+	// usedBy maps [ast.Node]s to [frame]s when the ast.Node resolves
+	// to this nav. The ast.Node will be some part of the frame's own
+	// node. For example:
+	//
+	// x: 3
+	// y: x
+	//
+	// the navigable with name x and frames `x: 3` (i.e. line 1) will
+	// have its usedBy map contain the ast.Node for x (from the 2nd
+	// line) with the `y: x` frame.
+	usedBy map[ast.Node]*frame
+}
+
+// eval evaluates the navigable's frames lazily. Evaluation is not
+// recursive: it does not evaluate children. Except in special cases
+// (e.g. pkgFrames), [frame.eval] should not be directly
+// called. Instead call this [navigable.eval].
+func (n *navigable) eval() {
+	if n.evaluated {
+		return
 	}
-	return result
+	n.evaluated = true
+	// Calling fr.eval() can append new frames to
+	// fr.navigable.frames (for example, the evaluation of
+	// BinaryExpr or comprehension clauses, can append new frames to
+	// the current navigable). Thus we don't use range.
+	for i := 0; i < len(n.frames); i++ {
+		fr := n.frames[i]
+		fr.eval()
+	}
+
+	if len(n.bindings) == 0 {
+		return
+	}
+	//	a: b: c: _
+	//	x: a
+	//	x: b: c: _
+	//
+	// We want to make sure that x.b resolves to a.b (and then later if
+	// we evaluate x.b, we'll make x.b.c resolve to a.b.c).
+	navs := expandNavigables(slices.Collect(maps.Keys(n.resolvesTo)))
+	for name, nav := range n.bindings {
+		nav.ensureResolvesTo(navigateByName(navs, name))
+	}
 }
 
-// astNode corresponds to a node from the AST. An astNode can be
-// created at any time, and creates the opportunity for evaluation to
-// be paused (and later resumed). Any binding reachable via
-// node.parent*.bindings is a candidate for resolving the first
+// ensureResolvesTo makes sure that this navigable's resolvesTo set
+// contains every navigable within navs. If the resolvesTo set grows
+// then the navigable's resolvesTo observers will be invoked.
+func (n *navigable) ensureResolvesTo(navs []*navigable) {
+	changed := false
+	resolvesTo := n.resolvesTo
+	for _, nav := range navs {
+		if nav == n {
+			continue
+		} else if _, found := resolvesTo[nav]; found {
+			continue
+		}
+		if resolvesTo == nil {
+			resolvesTo = make(map[*navigable]struct{})
+			n.resolvesTo = resolvesTo
+		}
+		resolvesTo[nav] = struct{}{}
+		changed = true
+	}
+	if !changed {
+		return
+	}
+	for path, i := range n.resolvesToObservers {
+		path.resolvesToChanged(i)
+	}
+}
+
+// ensureResolvesToObserver ensures that the path p with index i are
+// registered in this navigable as a resolvesTo observer. Once
+// registered, any subsequent change to the navigable's resolvesTo set
+// will result in the path's [resolvesToChanged] method being invoked,
+// with the index i.
+func (n *navigable) ensureResolvesToObserver(p *path, i int) {
+	resolvesToObservers := n.resolvesToObservers
+	if resolvesToObservers == nil {
+		resolvesToObservers = make(map[*path]int)
+		n.resolvesToObservers = resolvesToObservers
+	}
+	resolvesToObservers[p] = i
+}
+
+// recordUsage records that the [ast.Node] node (which will occur
+// somewhere within the [frame] fr.node) is considered to resolve to
+// nav (i.e. be a use of nav).
+func (n *navigable) recordUsage(node ast.Node, fr *frame) {
+	if n.usedBy == nil {
+		n.usedBy = make(map[ast.Node]*frame)
+	}
+	n.usedBy[node] = fr
+}
+
+// ensureNavigable returns a navigable to be used for bindings of the
+// given name. It will create a fresh navigable if there is no
+// existing navigable available for the given name via the frame's own
+// navigables.
+func (n *navigable) ensureNavigable(name string) *navigable {
+	bindings := n.bindings
+	if bindings == nil {
+		bindings = make(map[string]*navigable)
+		n.bindings = bindings
+	}
+	childNav, found := bindings[name]
+	if !found {
+		childNav = &navigable{
+			evaluator: n.evaluator,
+			parent:    n,
+			name:      name,
+		}
+		bindings[name] = childNav
+	}
+	return childNav
+}
+
+// navigateByName searches the bindings of every member of the navs
+// set by the given name, and the accumulated results returned.
+func navigateByName(navs map[*navigable]struct{}, name string) []*navigable {
+	var results []*navigable
+	for nav := range navs {
+		childNav, found := nav.bindings[name]
+		if found {
+			results = append(results, childNav)
+		}
+
+		for _, fr := range nav.frames {
+			childFrs, found := fr.bindings[name]
+			// If there is also a matching binding in the frame, but it
+			// leads to a different navigable, then it must be for an
+			// alias or similar. Thus the frame didn't match, so if the
+			// frame has ellipses then we include those.
+			addEllipses := !found || (len(childFrs) == 1 && childFrs[0].navigable != childNav)
+			if addEllipses {
+				results = append(results, fr.ellipses...)
+			}
+		}
+	}
+	return results
+}
+
+// expandNavigables maximally expands the given navigables:
+// transitively inspecting all the frames that contribute to each
+// navigable, evaluating them and including the resolvesTo
+// navigables. This expands each given navigable to every navigable
+// that can be reached (transitively) via embedding.
+func expandNavigables(navs []*navigable) map[*navigable]struct{} {
+	if len(navs) == 0 {
+		return nil
+	}
+	worklist := navs
+	navsSet := make(map[*navigable]struct{})
+	for len(worklist) > 0 {
+		nav := worklist[0]
+		worklist = worklist[1:]
+		if _, seen := navsSet[nav]; seen {
+			continue
+		}
+		navsSet[nav] = struct{}{}
+
+		nav.eval()
+
+		for _, fr := range nav.frames {
+			if spec, ok := fr.node.(*ast.ImportSpec); ok {
+				pkgEval := fr.fileEvaluator.evaluator
+				ip := pkgEval.parseImportSpec(spec)
+				if ip == nil {
+					continue
+				}
+				pkgEval = pkgEval.forPackage(*ip)
+				if pkgEval == nil {
+					continue
+				}
+				pkgFrame := pkgEval.pkgFrame
+				pkgFrame.eval()
+				for _, fileFr := range pkgFrame.childFrames {
+					worklist = append(worklist, fileFr.navigable)
+				}
+			}
+		}
+
+		worklist = slices.AppendSeq(worklist, maps.Keys(nav.resolvesTo))
+	}
+	return navsSet
+}
+
+// frame corresponds to a node from the AST. A frame can be created at
+// any time, and creates the opportunity for evaluation to be paused
+// (and later resumed). Any binding reachable via
+// frame.parent*.bindings is a candidate for resolving the first
 // (ident) element of a path, and the navigable field's value (which
-// can be shared between astNodes) offers candidates for resolving
-// subsequent elements of a path. So creating a new astNode creates a
+// can be shared between frames) offers candidates for resolving
+// subsequent elements of a path. So creating a new frame creates a
 // new namespace for lexical resolution, and may or may not create a
 // new namespace for non-lexical resolution.
-type astNode struct {
-	fdfns *FileDefinitions
-	// parent is the parent astNode.
-	parent *astNode
-	// unprocessed is the initial node that this astNode is solely
-	// responsible for evaluating. Once a call to [node.eval] has
-	// returned, unprocessed must never be modified.
-	unprocessed ast.Node
-	// key is the position that is considered to define this node. For
-	// example, if a node represents `a: {}` then key is set to the `a`
-	// ident. This can be nil, such as when a node is an
-	// expression. For example in the path {a: 3, b: a}.b, a node with
+type frame struct {
+	fileEvaluator *FileEvaluator
+	// parent is the parent frame.
+	parent *frame
+	// childFrames contains every frame that is a child of this
+	// frame. When searching for a given file-offset, these frames are
+	// tested for whether they contain the desired file-offset.
+	childFrames []*frame
+	// childPaths contains every path that is considered part of this
+	// frame.
+	childPaths []*path
+	// key is the position that is considered to define this frame. For
+	// example, if a frame represents `x: {}` then key is set to the
+	// `x` ident. This can be nil, such as when a frame is an
+	// expression. For example in the path {a: 3, b: a}.b, a frame with
 	// no key will be created, containing the structlit {a: 3, b: a}.
 	key ast.Node
-	// keyAlias is like key but used for aliases. For example if a node
-	// represents `l=a: {}` then key is set to the `a` ident, and
-	// keyAlias is set to the `l` ident. This is used for field
-	// declarations where we want both the simple ident and the alias
-	// to be the same definition; and it is also (ab)used for import
-	// specs so that the import spec itself can be kept within the node
-	// for later use.
-	keyAlias ast.Node
-	// resolvesTo points to the navigable bindings this node resolves
-	// to, due to embedded paths. For example, in x: {y.z}, whatever
-	// node y.z resolves to, its navigable bindings will be stored in
-	// the resolvesTo field of x.
-	resolvesTo []*navigableBindings
-	// allChildren contains every astNode that is a child of this
-	// node. When searching for a given file-offset, these nodes are
-	// tested for whether they contain the desired file-offset.
-	allChildren []*astNode
-	// bindings contains all bindings for this astNode. Note the map's
-	// values are slices because a single node can have multiple
+	// node is the initial node that this frame is solely responsible
+	// for evaluating.
+	node ast.Node
+	// docsNode is set to node if this frame is considered to be a
+	// source of documentation comments. These are used for the "hover"
+	// LSP functionality.
+	docsNode ast.Node
+	// bindings contains all bindings for this frame. Note the map's
+	// values are slices because a single frame can have multiple
 	// bindings for the same key. For example:
 	//
 	//	x: bool
@@ -1069,309 +1464,150 @@ type astNode struct {
 	//
 	// Bindings are used for the resolution of the first element of a
 	// path, if that element is an ident. Thus to some extent they (and
-	// an astNode itself) correspond to a lexical scope. Bindings are
+	// an frame itself) correspond to a lexical scope. Bindings are
 	// more general than fields: they include aliases and
 	// comprehensions as well as normal fields.
-	bindings map[string][]*astNode
+	bindings map[string][]*frame
+	// ellipses contains navigables for ellipsis values.
+	ellipses []*navigable
 	// navigable provides access to the "navigable bindings" that is
-	// shared between multiple astNodes that should be considered
+	// shared between multiple frames that should be considered
 	// "merged together".
-	navigable *navigableBindings
-	// ranges tracks the file ranges covered by this astNode
-	ranges *rangeset.FilenameRangeSet
-	// ellipses contains navigableBindings for ellipsis patterns.
-	ellipses []*navigableBindings
-	// fieldsAllowed indicates whether this astNode models a lexical
-	// scope in the AST in which fields could exist. This is used for
-	// completions: fields will only be suggested if
-	// fieldsAllowed. Within a ListLit, for example, fields are not
-	// allowed..
-	fieldsAllowed bool
-	docComments   []*ast.CommentGroup
+	navigable *navigable
+	// evaluated tracks whether this frame has been evaluated, ensuring
+	// it is only evaluated once.
+	evaluated bool
+	// start and end contain the bounds (inclusive) of this frame. They
+	// can differ from the bounds of the frame's node; this can be
+	// essential for evaluation to proceed correctly: for example with
+	// x & y, we ensure that the frames for both sides have the same
+	// bounds so that they will both claim to contain the same offsets,
+	// and so both will always be evaluated together, which ensures
+	// they are evaluated as if merged together.
+	start token.Pos
+	end   token.Pos
+	// unknownRanges tracks ranges for which no completions should be
+	// offered. This includes the ranges for all nodes which do not
+	// have explicit cases within [frame.eval]. A good example is
+	// BasicLit: within a BasicLit, no completions should be offered.
+	unknownRanges *rangeset.RangeSet
 }
 
-// newAstNode creates a new [astNodes] which is a child of the current
-// astNode. This is a light wrapper around
-// [Definitions.newAstNode]. See those docs for more details on the
-// arguments to this function.
-func (n *astNode) newAstNode(key ast.Node, unprocessed ast.Node, navigable *navigableBindings) *astNode {
-	s := n.fdfns.newAstNode(n, key, unprocessed, navigable)
-	n.allChildren = append(n.allChildren, s)
-	return s
+// isFileFrame reports whether f is the top level package frame or a
+// direct child of it.
+func (f *frame) isFileFrame() bool {
+	return f.fileEvaluator == nil || f.parent == f.fileEvaluator.evaluator.pkgFrame
 }
 
-// dump sends to stdout the current astNode, its bindings, and
-// allChildren, in a "pretty" indented fashion. This is for aiding
-// debugging.
-func (n *astNode) dump(depth int) {
-	printf := func(f string, a ...any) {
-		fmt.Printf("%*s%s\n", depth*3, "", fmt.Sprintf(f, a...))
-	}
-
-	printf("Node %p", n)
-	printf(" Ranges %v", n.ranges)
-
-	nav := n.navigable
-	if len(nav.bindings) > 0 {
-		printf(" Navigable: %p %q", nav, nav.name)
-		for name, bindings := range nav.bindings {
-			printf("  %s: %p", name, bindings)
-		}
-	}
-
-	if len(n.bindings) > 0 {
-		printf(" Lexical:")
-		for name, bindings := range n.bindings {
-			printf("  %s:", name)
-			for _, binding := range bindings {
-				binding.dump(depth + 1)
-			}
-		}
-	}
-
-	if len(n.allChildren) > 0 {
-		printf(" All children:")
-		for _, s := range n.allChildren {
-			s.dump(depth + 1)
-		}
-	}
-}
-
-// navigableBindings groups together astNodes, and itself is a node in
-// a graph (directed, acyclic) of navigableBindings. The zero value is
-// ready for use.
-type navigableBindings struct {
-	dfns *Definitions
-	// parent is the parent navigableBindings. The graph of
-	// navigableBindings can be different from the graph of astNodes,
-	// because two astNodes in a parent-child relationship can reuse
-	// the same navigableBindings. A good example of this is:
-	//
-	//	x: y & z
-	//
-	// Here, the astNode for the x field-value will create two child
-	// astNodes, one for each of y and z, but all three will use the
-	// same navigableBindings.
-	parent *navigableBindings
-	// bindings contains all bindings for this navigableBindings
-	// node. These bindings are "merged"; for example:
-	//
-	//	x: a
-	//	x: b
-	//
-	// There would only be one navigableBinding that covers both x
-	// field-values. This is in contrast to [astNode], where bindings
-	// are not merged: there would be two bindings (astNodes) for x.
-	bindings map[string]*navigableBindings
-	// contributingNodes are the astNodes that contribute to this
-	// navigableBindings. It is an invariant that every member of
-	// contributingNodes has its navigable field set to this
-	// navigableBindings. It is also an invariant that every astNode
-	// that has a particular navigableBindings value in its navigable
-	// field will appear in that navigableBinding's contributingNodes.
-	contributingNodes []*astNode
-	// name is the identifier name for this binding. This may be the
-	// empty string if this navigableBinding itself does not appear in
-	// its parent's bindings. A good example of this is a let
-	// expression:
-	//
-	//	let x = 3
-	//
-	// The astNode containing this expression will have its own binding
-	// for x to a child astNode. That child astNode will have a fresh
-	// navigableBinding, but that navigableBinding will not appear in
-	// the parent astNode's own navigableBinding's bindings. This is
-	// because navigableBindings are used for resolving
-	// non-first-elements of a path, and let expressions (amongst
-	// others) introduce bindings that are not visible to
-	// non-first-path-elements.
-	name string
-	// usedBy maps [ast.Node]s to [astNode] when the ast.Node resolves
-	// to this nav. For example:
-	//
-	// x: 3
-	// y: x
-	//
-	// the navigableBindings with name x and contributingNodes `x: 3`
-	// (i.e. line 1) will have its usedBy map contain the ast.Node for
-	// x (from the 2nd line) with the `y: x` astNode.
-	usedBy map[ast.Node]*astNode
-}
-
-// recordUsage records that the [ast.Node] e (which will occur
-// somewhere within the [astNode] node) is considered to resolve to
-// nav (i.e. be a use of nav).
-func (nav *navigableBindings) recordUsage(e ast.Node, node *astNode) {
-	if nav.usedBy == nil {
-		nav.usedBy = make(map[ast.Node]*astNode)
-	}
-	nav.usedBy[e] = node
-}
-
-// addDefinition records that the target navigableBindings are the
-// definitions for the file and all offsets between the start and end
-// positions. Existing definitions for those offsets are overwritten
-// without warning.
-func (n *astNode) addDefinition(start, end token.Pos, targets []*navigableBindings) {
-	if len(targets) == 0 || !start.IsValid() || !end.IsValid() {
-		return
-	}
-
-	definitions := n.fdfns.definitions
-
-	endOffset := end.Offset()
-	for offset := start.Offset(); offset < endOffset; offset++ {
-		definitions[offset] = targets
-	}
-}
-
-// addEmbedCompletions records that both node (and all its parents)
-// and targets are considered to contain bindings which should be
-// offered as completions for any completion request between the start
-// and end positions.
-//
-// The first element of a path must resolve lexically (if it's an
-// ident). For this, the node parameter is provided, and all its
-// ancestors are also considered. For subsequent elements of a path,
-// the targets parameter is provided, which contains all the
-// navigables resulting from resolving the prior elements of the
-// selector.
-//
-// For a non-first path element, the start position will include the
-// . so that completions are presented as soon as the user types
-// ".". The startPos parameter contains the position of the start of
-// the existing path element so that the LSP server can send
-// completions to the client that correctly edit the existing path.
-func (n *astNode) addEmbedCompletions(start, end token.Pos, node *astNode, targets []*navigableBindings, startPos token.Pos) {
-	if (len(targets) == 0 && node == nil) || !start.IsValid() || !end.IsValid() {
-		return
-	}
-
-	completions := n.fdfns.completions
-
-	endOffset := end.Offset()
-	for offset := start.Offset(); offset < endOffset; offset++ {
-		r, found := completions[offset]
-		if !found {
-			r = &completionResolutions{}
-			completions[offset] = r
-		}
-		r.embedNavigables = targets
-		r.embedNode = node
-		r.embedEndOffset = endOffset
-		r.startOffset = startPos.Offset()
-	}
-}
-
-// addFieldCompletions records that the target navigableBindings are
-// considered to contain bindings which should be offered for any
-// completion request between the start and end positions. colonPos
-// contains the position of the colon which follows the existing field
-// name (probably slightly beyond the end position), and is used to
-// ensure that when the LSP server suggests completions to the client,
-// those completions correctly edit the existing field.
-func (n *astNode) addFieldCompletions(start, end token.Pos, targets []*navigableBindings, colonPos token.Pos) {
-	if len(targets) == 0 || !start.IsValid() || !end.IsValid() {
-		return
-	}
-
-	startOffset := start.Offset()
-	completions := n.fdfns.completions
-
-	endOffset := end.Offset()
-	for offset := startOffset; offset < endOffset; offset++ {
-		r, found := completions[offset]
-		if !found {
-			r = &completionResolutions{}
-			completions[offset] = r
-		}
-		r.fieldNavigables = targets
-		r.fieldEndOffset = colonPos.Offset()
-		r.startOffset = startOffset
-	}
-}
-
-// addRange records that the astNode covers the range from the node's
+// addRange records that the frame covers the range from the node's
 // start file-offset to its end file-offset. Because the AST is
 // non-recursive in a few areas (e.g. comprehensions), it's sometimes
-// necessary to explicitly extend the range of an astNode so that
-// navigation-by-offset evaluates the correct astNodes.
-func (n *astNode) addRange(node ast.Node) {
-	start := node.Pos().Position()
-	end := node.End().Position()
-
-	rs := n.ranges
-	if rs == nil {
-		rs = rangeset.NewFilenameRangeSet()
-		n.ranges = rs
-	}
-
-	rs.Add(start.Filename, start.Offset, end.Offset)
-}
-
-// contains reports whether the astNode contains the given
-// file-offset.
-//
-// As a special case, file nodes (i.e. astNodes for which the parent
-// is the pkgNode) always contain every file-offset.
-func (n *astNode) contains(filename string, offset int) bool {
-	ranges := n.ranges
-	return n.isFileNode() || (ranges != nil && ranges.Contains(filename, offset))
-}
-
-// eval evaluates the astNode lazily. Evaluation is not recursive: it
-// does not evaluate child bindings. eval must be called before a
-// node's bindings, allChildren, or resolvesTo fields are inspected,
-// or before [astNode.contains] is invoked. See also the package level
-// documentation.
-func (n *astNode) eval() {
-	if n.unprocessed == nil {
+// necessary to explicitly extend the range of an frame so that
+// navigation-by-offset evaluates the correct frames.
+func (f *frame) addRange(node ast.Node) {
+	start := node.Pos()
+	end := node.End()
+	if !start.IsValid() || !end.IsValid() {
 		return
 	}
 
-	unprocessed := []ast.Node{n.unprocessed}
-	n.unprocessed = nil
+	if !f.start.IsValid() {
+		f.start = start
+	} else if f.start.File() != start.File() {
+		panic("Attempt to combine different files in node range start")
+	} else if start.Offset() < f.start.Offset() {
+		f.start = start
+	}
+
+	if !f.end.IsValid() {
+		f.end = end
+	} else if f.end.File() != end.File() {
+		panic("Attempt to combine different files in node range end")
+	} else if end.Offset() > f.end.Offset() {
+		f.end = end
+	}
+}
+
+// contains reports whether the frame contains the given file-offset.
+func (f *frame) contains(fe *FileEvaluator, offset int) (r bool) {
+	start, end := f.start, f.end
+	if !start.IsValid() || !end.IsValid() {
+		return false
+	} else if f.fileEvaluator != fe {
+		return false
+	} else {
+		return start.Offset() <= offset && offset <= end.Offset()
+	}
+}
+
+// addUnknownRange ensures that no completions will be offered for
+// cursor positions between start and end.
+func (f *frame) addUnknownRange(start, end int) {
+	unknownRanges := f.unknownRanges
+	if unknownRanges == nil {
+		unknownRanges = rangeset.NewRangeSet()
+		f.unknownRanges = unknownRanges
+	}
+	unknownRanges.Add(start, end)
+}
+
+// newFrame creates a new [frame] which is a child of the current
+// frame f. This is a light wrapper around
+// [fileEvaluator.newFrame]. See those docs for more details on the
+// arguments to this function.
+func (f *frame) newFrame(node ast.Node, nav *navigable) *frame {
+	child := f.fileEvaluator.newFrame(f, node, nav)
+	f.childFrames = append(f.childFrames, child)
+	return child
+}
+
+// eval evaluates the frame lazily. Evaluation is not recursive: it
+// does not evaluate child bindings. eval must be called before a
+// frame's bindings, childFrames, or childPaths are accessed. See also
+// the package level documentation.
+func (f *frame) eval() {
+	if f.evaluated {
+		return
+	}
+	f.evaluated = true
+	if f.node == nil {
+		return
+	}
+
+	//fmt.Printf("%p eval with key %v node %T; nav: %p\n", f, f.key, f.node, f.navigable)
 
 	var embeddedResolvable, resolvable []ast.Expr
-	// This maps from clauses we process in this astNode, to the
-	// remains of the corresponding comprehension that should be passed
-	// to some child astNode. See the ast.Comprehension case below.
-	//
-	// Say we have Comprehension{Clauses: [A,B,C], Value: D} in our
-	// list of unprocessed nodes. When we encounter it, clause A will
-	// go into our unprocessed list, and comprehensionsStash[A] =
-	// Comprehension{Clauses: [B,C], Value: D}. Then, when we then
-	// process A, we can find this tail of the comprehension and pass
-	// that to some child astNode.
-	//
-	// The base-case is when we have Comprehension{Clauses: [C], Value:
-	// D} in our list of unprocessed nodes. When we process it, C will
-	// go into our list of unprocessed nodes as normal, and
-	// comprehensionsStash[C] = D. So then when we process C, again
-	// we'll be able to find the tail - D - and pass that to the
-	// appropriate astNode.
 	var comprehensionsStash map[ast.Node]ast.Node
 
+	unprocessed := []ast.Node{f.node}
 	for len(unprocessed) > 0 {
 		node := unprocessed[0]
 		unprocessed = unprocessed[1:]
-
-		n.addRange(node)
+		//fmt.Printf("%p eval processing %T %v\n", f, node, node)
 
 		switch node := node.(type) {
 		case *ast.File:
 			for _, decl := range node.Decls {
 				unprocessed = append(unprocessed, decl)
 			}
-			n.fieldsAllowed = true
 
 		case *ast.Package:
 			// Package declarations must be added to the pkgDecls
 			// navigable, so that they can all be found when resolving
 			// imports of this package, in some other package.
-			child := n.newAstNode(node.Name, nil, n.fdfns.dfns.pkgDecls)
-			child.addDocComments(node)
-			n.addDefinition(node.Name.Pos(), node.Name.End(), []*navigableBindings{child.navigable})
+
+			childFr := f.newFrame(nil, f.fileEvaluator.evaluator.pkgDecls)
+			childFr.key = node.Name
+			childFr.addRange(node)
+			childFr.docsNode = node
+			p := &path{
+				frame: childFr,
+				components: []pathComponent{{
+					unexpanded: []*navigable{f.fileEvaluator.evaluator.pkgDecls},
+					node:       node.Name,
+				}},
+			}
+			childFr.childPaths = append(childFr.childPaths, p)
 
 		case *ast.ImportDecl:
 			for _, spec := range node.Specs {
@@ -1383,86 +1619,90 @@ func (n *astNode) eval() {
 			// avoid the possibility that evaluating a filenode would
 			// lookup every imported package and evaluate its filenodes
 			// (which themselves might do the same...).
-			dfns := n.fdfns.dfns
-			if n.isFileNode() {
-				// 1) At the filenode level, the first time we see the
+			pkgEval := f.fileEvaluator.evaluator
+			if f.isFileFrame() {
+				// 1) At the file level, the first time we see the
 				// ImportSpec, we create appropriate file-scope bindings,
 				// but also pass the spec as the unprocessed value to a
-				// fresh child node;
-				ip := dfns.parseImportSpec(node)
+				// fresh child frame;
+				ip := pkgEval.parseImportSpec(node)
 				if ip == nil {
 					break
 				}
-				importSpecNodes := n.fdfns.importSpecNodes
-				if importSpecNodes == nil {
-					importSpecNodes = make(map[ast.ImportPath]*navigableBindings)
-					n.fdfns.importSpecNodes = importSpecNodes
-				}
-				nav, found := importSpecNodes[*ip]
-
-				var child *astNode
+				name := ""
+				var key ast.Node
 				if alias := node.Name; alias != nil && alias.Name != "" {
-					child = n.newAstNode(alias, node, nav)
-					n.appendBinding(alias.Name, child)
+					name = alias.Name
+					key = alias
 				} else if ip.Qualifier != "" {
-					child = n.newAstNode(node.Path, node, nav)
-					n.appendBinding(ip.Qualifier, child)
+					name = ip.Qualifier
+					key = node.Path
+				} else {
+					break
 				}
-				if child != nil {
-					child.keyAlias = node
-					if !found {
-						importSpecNodes[*ip] = child.navigable
-					}
+
+				importSpecNavigables := f.fileEvaluator.importSpecNavigables
+				if importSpecNavigables == nil {
+					importSpecNavigables = make(map[ast.ImportPath]*navigable)
+					f.fileEvaluator.importSpecNavigables = importSpecNavigables
 				}
+				nav, found := importSpecNavigables[*ip]
+				childFr := f.newFrame(node, nav)
+				if !found {
+					importSpecNavigables[*ip] = childFr.navigable
+				}
+				childFr.key = key
+				f.appendBinding(name, childFr)
 
 			} else {
-				// 2) In that child node, the second time we see the
+				// 2) In that child frame, the second time we see the
 				// ImportSpec, we lookup the package imported and add a
 				// resolution to them.
-				ip := dfns.parseImportSpec(node)
-				var remotePkgDfns *Definitions
-				if ip != nil {
-					remotePkgDfns = dfns.forPackage(*ip)
-					if remotePkgDfns != nil {
-						// The pkg exists. Booting it means that its
-						// pkgDecls have contributingNodes which are the
-						// package declarations from every file in that
-						// package. So we can add a definition from this
-						// import spec to all the package decls in the
-						// remote pkg.
-						remotePkgDfns.bootFiles()
-					}
+				ip := pkgEval.parseImportSpec(node)
+				remotePkgEvaluator := pkgEval.forPackage(*ip)
+				if remotePkgEvaluator != nil {
+					// The pkg exists. Booting it means that its
+					// pkgDecls have frames which are the
+					// package declarations from every file in that
+					// package.
+					remotePkgEvaluator.bootFiles()
 				}
-				if remotePkgDfns == nil {
-					// Something went wrong. We create a fake dfns to
+				if remotePkgEvaluator == nil {
+					// Something went wrong. We create a fake evaluator to
 					// handle this so that elsewhere we can treat all
 					// imports the same, regardless of whether they were
 					// successful or not. Essentially, unsuccessful imports
 					// just appear as empty phantom packages.
 					//
 					// If we really need to, we can tell that the import
-					// was successful or not from its dfns:
+					// was successful or not from its evaluator:
 					//
 					// 1. a bad import will have an empty ip (importPath) field
-					// 2. a bad import will have pkgDecls with no contributingNodes
-					remotePkgDfns = Analyse(ast.ImportPath{}, nil, nil, nil)
+					// 2. a bad import will have pkgDecls with no frames
+					remotePkgEvaluator = New(ast.ImportPath{}, nil, nil, nil)
 				}
 
-				// We add a definition from this import to the package
-				// declarations in the remote package.
-				n.addDefinition(n.key.Pos(), n.key.End(), []*navigableBindings{remotePkgDfns.pkgDecls})
+				// We add a path that records that the name of this import
+				// spec resolves to the remote package.
+				p := &path{
+					frame: f,
+					components: []pathComponent{{
+						unexpanded: []*navigable{remotePkgEvaluator.pkgDecls},
+						node:       f.key,
+					}},
+				}
+				f.childPaths = append(f.childPaths, p)
+
 				// We also record that we are using those package
 				// decls. This means that from the result of resolving the
-				// import spec, we can always get back to this astNode n,
-				// and thus find our ImportSpec in n.keyAlias.
-				remotePkgDfns.pkgDecls.recordUsage(node, n)
+				// import spec, we can always get back to this frame f.
+				remotePkgEvaluator.pkgDecls.recordUsage(node, f)
 			}
 
 		case *ast.StructLit:
 			for _, elt := range node.Elts {
 				unprocessed = append(unprocessed, elt)
 			}
-			n.fieldsAllowed = true
 
 		case *ast.ListLit:
 			for i, elt := range node.Elts {
@@ -1475,14 +1715,15 @@ func (n *astNode) eval() {
 				// *ast.Field case below.
 				unprocessed = append(unprocessed, &ast.Field{
 					Label:    &ast.Ident{NamePos: elt.Pos(), Name: "__" + fmt.Sprint(i)},
-					TokenPos: elt.Pos(),
+					TokenPos: token.NoPos,
 					Value:    elt,
 				})
 			}
-			n.fieldsAllowed = false
 
 		case *ast.Interpolation:
-			resolvable = append(resolvable, node.Elts...)
+			for _, elt := range node.Elts {
+				unprocessed = append(unprocessed, elt)
+			}
 
 		case *ast.EmbedDecl:
 			unprocessed = append(unprocessed, node.Expr)
@@ -1494,39 +1735,43 @@ func (n *astNode) eval() {
 				// Currently should never happen as Postfix is only used
 				// with ellipses. Just in case that changes, behave the
 				// same as Unary.
-				n.newAstNode(nil, node.X, nil)
+				f.newFrame(node.X, nil)
 			}
 
 		case *ast.ParenExpr:
 			unprocessed = append(unprocessed, node.X)
 
 		case *ast.UnaryExpr:
-			n.newAstNode(nil, node.X, nil)
+			f.newFrame(node.X, nil)
 
 		case *ast.BinaryExpr:
 			switch node.Op {
 			case token.AND:
-				n.newAstNode(nil, node.X, n.navigable)
-				n.newAstNode(nil, node.Y, n.navigable)
+				f.newFrame(node.X, f.navigable).addRange(node)
+				f.newFrame(node.Y, f.navigable).addRange(node)
 			case token.OR:
-				lhs := n.newAstNode(nil, node.X, nil)
-				rhs := n.newAstNode(nil, node.Y, nil)
-				n.resolvesTo = append(n.resolvesTo, lhs.navigable, rhs.navigable)
+				lhsNav := f.newFrame(node.X, nil).navigable
+				rhsNav := f.newFrame(node.Y, nil).navigable
+				f.navigable.ensureResolvesTo([]*navigable{lhsNav, rhsNav})
+				lhsNav.recordUsage(node, f)
+				rhsNav.recordUsage(node, f)
 			default:
-				n.newAstNode(nil, node.X, nil)
-				n.newAstNode(nil, node.Y, nil)
+				f.newFrame(node.X, nil)
+				f.newFrame(node.Y, nil)
 			}
 
 		case *ast.Alias:
 			// X=e (the old deprecated alias syntax)
-			n.newBinding(node.Ident.Name, node.Ident, node.Expr)
+			f.newBinding(node.Ident, node.Expr)
 
 		case *ast.Ellipsis:
-			child := n.newAstNode(node, node.Type, nil)
+			childFr := f.newFrame(node.Type, nil)
+			childFr.key = node
+			childFr.addRange(node)
 			// The navigable needs a name so that [UsagesForOffset] will
-			// traverse up out of it and thus we'll evaluate nodes
-			// outside of the scope (n), which may lead to the recording
-			// of uses of the ellipsis (or nodes within it).
+			// traverse up out of it and thus we'll evaluate frames
+			// outside of the scope (f), which may lead to the recording
+			// of uses of the ellipsis (or frames within it).
 			//
 			// However, ellipses are not unified together, e.g. in
 			//
@@ -1534,43 +1779,33 @@ func (n *astNode) eval() {
 			//
 			// b and c are not unified. So we do not use
 			// ensureNavigableBinding, as that would merge the ellipses.
-			child.navigable.name = "__..."
-			n.ellipses = append(n.ellipses, child.navigable)
+			childFr.navigable.name = "__..."
+			f.ellipses = append(f.ellipses, childFr.navigable)
 
 		case *ast.CallExpr:
 			resolvable = append(resolvable, node.Fun)
 			for _, arg := range node.Args {
-				n.newAstNode(nil, arg, nil)
+				f.newFrame(arg, nil)
 			}
 
 		case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr:
 			embeddedResolvable = append(embeddedResolvable, node.(ast.Expr))
 
 		case *fieldDeclExpr:
-			parent := n.parent
-			key := parent.key
-			if node.colonPos.IsValid() {
-				navs := expandNavigableViaAncestralPath(parent.navigable.parent)
-				n.addFieldCompletions(key.Pos(), key.End(), navs, node.colonPos.Add(1))
+			aliasIdent := node.aliasIdent
+			key := node.key
+			if key != nil && !strings.HasPrefix(node.keyName, "__") && aliasIdent != key {
+				f.newPathFromAncestralNames(key, node.keyName)
 			}
-
-			navs := expandNavigableViaAncestralPath(parent.navigable)
-			n.addDefinition(key.Pos(), key.End(), navs)
-			for _, nav := range navs {
-				nav.recordUsage(key, n)
+			if aliasIdent != nil {
+				f.newPathFromAncestralNames(aliasIdent, aliasIdent.Name)
 			}
-
-			if keyAlias := parent.keyAlias; keyAlias != nil {
-				n.addDefinition(keyAlias.Pos(), keyAlias.End(), navs)
-				for _, nav := range navs {
-					nav.recordUsage(keyAlias, n)
-				}
-			}
+			unprocessed = append(unprocessed, node.exprs...)
 
 		case *ast.Comprehension:
 			clause := node.Clauses[0]
 			unprocessed = append(unprocessed, clause)
-			// We don't know how many child astNodes we'll need to
+			// We don't know how many child frames we'll need to
 			// process clause. So we stash whatever remains of this
 			// comprehension and can later find it once we've finished
 			// processing our clause.
@@ -1579,13 +1814,13 @@ func (n *astNode) eval() {
 			}
 			if len(node.Clauses) == 1 {
 				// Base-case: we're dealing with the last clause. So that
-				// clause gets processed in this node, and we make sure we
+				// clause gets processed in this frame, and we make sure we
 				// can later use that last clause to find the body (value)
 				// of this comprehension.
 				comprehensionsStash[clause] = node.Value
 			} else {
 				// Non-base-case: we're processing the first clause in
-				// this node, and all that remain go into a copy of the
+				// this frame, and all that remain go into a copy of the
 				// comprehension, which we find later and pass to an
 				// appropriate child/descendant.
 				nodeCopy := *node
@@ -1594,333 +1829,504 @@ func (n *astNode) eval() {
 			}
 
 		case *ast.IfClause:
-			n.newAstNode(nil, node.Condition, nil)
+			f.newFrame(node.Condition, nil)
 
 			comprehensionTail := comprehensionsStash[node]
-			n.newAstNode(nil, comprehensionTail, n.navigable)
+			f.newFrame(comprehensionTail, f.navigable)
 
 		case *ast.ForClause:
-			n.newAstNode(nil, node.Source, nil)
+			f.newFrame(node.Source, nil)
 
-			stack := astNodeStack{n.newAstNode(nil, nil, nil)}
+			stack := frameStack{f.newFrame(nil, nil)}
 
 			if key := node.Key; key != nil {
-				stack.push(key, stack.peek().newBinding(key.Name, key, nil))
+				stack.push(key, stack.peek().newBinding(key, nil))
 			}
 			if val := node.Value; val != nil {
-				stack.push(val, stack.peek().newBinding(val.Name, val, nil))
+				stack.push(val, stack.peek().newBinding(val, nil))
 			}
 
 			comprehensionTail := comprehensionsStash[node]
-			stack.push(comprehensionTail, stack.peek().newAstNode(nil, comprehensionTail, n.navigable))
+			stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
 
 		case *ast.LetClause:
 			ident := node.Ident
 			// A let clause might or might not be within a comprehension.
 			if comprehensionTail, found := comprehensionsStash[node]; found {
 				// We're within a wider comprehension.
-				n.newAstNode(nil, node.Expr, nil)
+				f.newFrame(node.Expr, nil)
 
-				stack := astNodeStack{n.newAstNode(nil, nil, nil)}
-				stack.push(ident, stack.peek().newBinding(ident.Name, ident, nil))
-				stack.push(comprehensionTail, stack.peek().newAstNode(nil, comprehensionTail, n.navigable))
+				stack := frameStack{f.newFrame(nil, nil)}
+				stack.push(ident, stack.peek().newBinding(ident, nil))
+				stack.push(comprehensionTail, stack.peek().newFrame(comprehensionTail, f.navigable))
 
 			} else {
 				// We're not within a wider comprehension: the binding
-				// must be added to the current node n because we need to
+				// must be added to the current frame f because we need to
 				// be able to find it from the first element of a path.
-				n.newBinding(ident.Name, ident, node.Expr)
+				f.newBinding(ident, node.Expr)
 			}
 
 		case *ast.Field:
-			label := node.Label
+			fieldDecl := fieldNames(node)
+			keyName := fieldDecl.keyName
 
-			alias, isAlias := label.(*ast.Alias)
-			if isAlias {
-				if expr, ok := alias.Expr.(ast.Label); ok {
-					label = expr
-				}
+			var childNav *navigable
+			if keyName != "" {
+				childNav = f.navigable.ensureNavigable(keyName)
 			}
 
-			var binding *astNode
-			switch label := label.(type) {
-			case *ast.Ident:
-				binding = n.ensureNavigableBinding(label.Name, label, node.Value, node.TokenPos)
-			case *ast.BasicLit:
-				name, _, err := ast.LabelName(label)
-				if err == nil {
-					binding = n.ensureNavigableBinding(name, label, node.Value, node.TokenPos)
-				}
-			}
+			var childFr *frame
 
-			if isAlias {
-				switch alias.Expr.(type) {
-				case *ast.ListLit:
-					// X=[e]: field
-					// X is only visible within field
-					wrapper := n.newAstNode(nil, nil, nil)
-					binding = wrapper.newBinding(alias.Ident.Name, alias.Ident, node.Value)
-					wrapper.addRange(node)
-				case ast.Label:
-					// X=ident: field
-					// X="basic": field
-					// X="\(e)": field
-					// X=(e): field
-					// X is visible within s
-					if binding == nil {
-						binding = n.newBinding(alias.Ident.Name, alias.Ident, node.Value)
-					} else {
-						n.appendBinding(alias.Ident.Name, binding)
-						binding.addRange(alias.Ident)
-						binding.keyAlias = alias.Ident
-					}
-				}
-			}
-			if binding == nil {
-				binding = n.newAstNode(label, node.Value, nil)
-			}
+			aliasIdent := fieldDecl.aliasIdent
+			if aliasIdent == nil {
+				childFr = f.newFrame(node.Value, childNav)
 
-			binding.addDocComments(node)
+			} else if fieldDecl.aliasInParentScope {
+				childFr = f.newFrame(node.Value, childNav)
+				f.appendBinding(aliasIdent.Name, childFr)
 
-			switch label := label.(type) {
-			case *ast.Interpolation:
-				resolvable = append(resolvable, label.Elts...)
-			case *ast.ParenExpr:
-				if alias, ok := label.X.(*ast.Alias); ok {
-					// (X=e): field
-					// X is only visible within field.
-					// Although the spec supports this, the parser doesn't seem to.
-					wrapper := n.newAstNode(nil, nil, nil)
-					wrapper.newBinding(alias.Ident.Name, alias.Ident, alias.Expr)
-					wrapper.addRange(node)
-					binding.parent = wrapper
+			} else {
+				wrapper := f.newFrame(nil, nil)
+				wrapper.addRange(node)
+				wrapper.navigable.ensureResolvesTo([]*navigable{f.navigable})
+				childFr = wrapper.newFrame(node.Value, childNav)
+
+				if expr := fieldDecl.aliasValue; expr != nil {
+					wrapper.newBinding(aliasIdent, expr)
+					// newBinding will have made a frame with a fresh
+					// fieldDeclExpr in it for aliasIdent, so we should
+					// nil it out in fieldDecl so that our frame for
+					// fieldDecl (below) doesn't also find the alias.
+					fieldDecl.aliasIdent = nil
 				} else {
-					resolvable = append(resolvable, label.X)
-				}
-			case *ast.ListLit:
-				for _, elt := range label.Elts {
-					if alias, ok := elt.(*ast.Alias); ok {
-						// [X=e]: field
-						// X is only visible within field.
-						wrapper := n.newAstNode(nil, nil, nil)
-						wrapper.newBinding(alias.Ident.Name, alias.Ident, alias.Expr)
-						wrapper.addRange(node)
-						binding.parent = wrapper
-					} else {
-						resolvable = append(resolvable, elt)
-					}
+					wrapper.appendBinding(aliasIdent.Name, childFr)
 				}
 			}
+
+			childFr.key = fieldDecl.key
+			childFr.docsNode = node
+			fieldDecl.valueFrame = childFr
+
+			if keyName != "" {
+				f.appendBinding(keyName, childFr)
+			}
+
+			if node.TokenPos.IsValid() {
+				childFr.start = node.TokenPos.Add(1)
+			}
+
+			if (fieldDecl.key != nil && !strings.HasPrefix(keyName, "__")) || len(fieldDecl.exprs) > 0 {
+				// The reason for guarding against __ here (which is
+				// possibly surprising given we also detect it in the
+				// fieldDeclExpr case above) is because the new frame will
+				// become authoritative for the offsets in fieldDecl,
+				// which would clobber the real value given that __ tends
+				// to mean no real key exists.
+				//
+				// We rely on the invariant that if the key *does* start
+				// with __ then we've created it and in these cases the
+				// field label is a simple ident with no aliases and no
+				// expressions in the field label. Therefore,
+				// len(fieldDecl.exprs) > 0 implies !strings.HasPrefix(keyName, "__")
+				childFr.parent.newFrame(fieldDecl, nil)
+			}
+
+		default:
+			f.addUnknownRange(node.Pos().Offset(), node.End().Offset())
 		}
 	}
 
 	for _, expr := range embeddedResolvable {
-		nodes := n.resolve(expr, true)
-		n.resolvesTo = append(n.resolvesTo, nodes...)
+		f.createPath(expr, f.navigable)
 	}
 	for _, expr := range resolvable {
-		n.resolve(expr, false)
+		f.createPath(expr, nil)
+	}
+	for _, p := range f.childPaths {
+		p.resolvesToChanged(0)
 	}
 }
 
-// resolve resolves the given expression into a slice of navigable
-// bindings. It is a slice because a single expression may resolve to
-// several unrelated navigable bindings. For example the expression `x
-// & y`.
-func (n *astNode) resolve(e ast.Expr, maybeField bool) []*navigableBindings {
-	switch e := e.(type) {
+// fieldNames analysis the field's label, returning a populated
+// [fieldDeclExpr].
+func fieldNames(field *ast.Field) *fieldDeclExpr {
+	// NB it is known that this doesn't cope well yet with fields which
+	// contain multiple aliases. Apparently this is legal:
+	//
+	//	s: x=[y=string]: {name: y, nextage: x.age+1}
+	//	out: s
+	//	out: john: {age: 13}
+	//
+	// TODO
+
+	label := field.Label
+
+	var unprocessed []ast.Node
+	var aliasIdent *ast.Ident
+	aliasInParentScope := false
+	alias, isAlias := label.(*ast.Alias)
+	if isAlias {
+		if expr, ok := alias.Expr.(ast.Label); ok {
+			label = expr
+		}
+		aliasIdent = alias.Ident
+		aliasInParentScope = true
+		unprocessed = append(unprocessed, alias.Expr)
+
+		switch expr := alias.Expr.(type) {
+		case *ast.ListLit:
+			// X=[e]: field
+			// X is only visible within field
+			aliasInParentScope = false
+
+		case ast.Label:
+			// X=ident: field
+			// X="basic": field
+			// X="\(e)": field
+			// X=(e): field
+			// X is visible within s
+			label = expr
+			unprocessed = nil
+		}
+	}
+
+	var key ast.Node
+	var keyIdent *ast.Ident
+	keyName := ""
+	var aliasValue ast.Expr
+	switch label := label.(type) {
 	case *ast.Ident:
-		if maybeField && n.fieldsAllowed {
-			n.addFieldCompletions(e.Pos(), e.End(), expandNavigableViaAncestralPath(n.navigable), e.End())
-		}
-		n.addEmbedCompletions(e.Pos(), e.End(), n, nil, e.Pos())
-		root := n.resolvePathRoot(e.Name)
-		if root == nil {
-			return nil
-		}
-		navs := expandNavigableViaAncestralPath(root)
-		n.addDefinition(e.Pos(), e.End(), navs)
-		for _, nav := range navs {
-			nav.recordUsage(e, n)
-		}
-		return navs
+		key = label
+		keyName = label.Name
+		keyIdent = label
 
-	case *ast.SelectorExpr:
-		resolved := n.resolve(e.X, false)
-		sel := e.Sel
-		// 1. Add a completion from the end of e.X to the start of the
-		// selector, which is "0 width". This basically covers just the
-		// . in the SelectorExpr. So when the user presses . and we
-		// present completions, they will be purely inserting text and
-		// not replacing any existing text.
-		n.addEmbedCompletions(e.X.End(), sel.Pos(), nil, resolved, sel.Pos())
-		// 2. Add a completion for the selector, which is the width of
-		// the selector. This means when the user is within the selector
-		// part, the completion will replace any existing part of the
-		// selector.
-		n.addEmbedCompletions(sel.Pos(), sel.End(), nil, resolved, sel.Pos())
-		name, _, err := ast.LabelName(sel)
-		if err != nil {
-			return nil
+	case *ast.BasicLit:
+		name, _, err := ast.LabelName(label)
+		if err == nil {
+			key = label
+			keyName = name
 		}
 
-		results := navigateBindingsByName(resolved, name)
-		n.addDefinition(sel.Pos(), sel.End(), results)
-		for _, nav := range results {
-			nav.recordUsage(sel, n)
-		}
-		return results
+	case *ast.Interpolation:
+		unprocessed = append(unprocessed, label)
 
-	case *ast.IndexExpr:
-		resolved := n.resolve(e.X, false)
-		lit, ok := e.Index.(*ast.BasicLit)
-		if !ok {
-			// If it's a path/ident etc, we don't attempt to calculate
-			// the dynamic index.
-			n.resolve(e.Index, false)
-			return nil
+	case *ast.ParenExpr:
+		if alias, ok := label.X.(*ast.Alias); ok {
+			// (X=e): field
+			// X is only visible within field.
+			// Although the spec supports this, the parser doesn't seem to.
+			aliasIdent = alias.Ident
+			aliasValue = alias.Expr
+		} else {
+			unprocessed = append(unprocessed, label.X)
 		}
-		name := "__" + lit.Value
-		if lit.Kind != token.INT {
-			var err error
-			name, _, err = ast.LabelName(lit)
+
+	case *ast.ListLit:
+		for _, elt := range label.Elts {
+			if alias, ok := elt.(*ast.Alias); ok {
+				// [X=e]: field
+				// X is only visible within field.
+				aliasIdent = alias.Ident
+				aliasValue = alias.Expr
+			} else {
+				unprocessed = append(unprocessed, elt)
+			}
+		}
+	}
+
+	if key == nil && aliasIdent != nil {
+		key = aliasIdent
+	}
+
+	start, end := field.Label.Pos(), field.Label.End()
+	if strings.HasPrefix(keyName, "__") {
+		end = start
+	} else if field.TokenPos.IsValid() {
+		end = field.TokenPos
+	}
+
+	return &fieldDeclExpr{
+		keyName:            keyName,
+		key:                key,
+		keyIdent:           keyIdent,
+		aliasIdent:         aliasIdent,
+		aliasInParentScope: aliasInParentScope,
+		aliasValue:         aliasValue,
+		exprs:              unprocessed,
+		start:              start,
+		end:                end,
+	}
+}
+
+// newBinding creates and returns a new [frame], and stores it under
+// the given name in the current frame only.
+func (f *frame) newBinding(key *ast.Ident, unprocessed ast.Node) *frame {
+	childFr := f.newFrame(unprocessed, nil)
+	name := key.Name
+	f.appendBinding(name, childFr)
+	if !strings.HasPrefix(name, "__") {
+		// Same logic as in [frame.ensureNavigableBinding] above;
+		expr := &fieldDeclExpr{
+			key:        key,
+			keyIdent:   key,
+			keyName:    name,
+			start:      key.Pos(),
+			end:        key.End(),
+			valueFrame: childFr,
+		}
+		f.newFrame(expr, nil)
+		childFr.key = key
+	}
+	return childFr
+
+}
+
+// appendBinding stores the binding under the given name in the
+// current frame only.
+func (f *frame) appendBinding(name string, binding *frame) {
+	if f.bindings == nil {
+		f.bindings = make(map[string][]*frame)
+	}
+	f.bindings[name] = append(f.bindings[name], binding)
+}
+
+// newPathFromAncestralNames creates a fake path and adds it to the
+// frame's childPaths. This is used by field declarations: the fake
+// paths created will resolve to other field declarations which are
+// unified with the current frame.
+//
+// Note that this method can only be called if the current frame's
+// node is a [fieldDeclExpr].
+//
+// Consider:
+//
+//	a: b: x: int
+//	c: a & {b: x: 4}
+//
+// We're at the final x on line 2. We need to make sure this resolves
+// to the x on line 1. Imagine instead of a field decl of x, it was a
+// use of x:
+//
+//	a: b: x: int
+//	c: a & {b: _anything: x}
+//
+// That wouldn't work - that's not a valid path to x. Instead, we want:
+//
+//	a: b: x: int
+//	c: a & {b: _anything: c.b.x}
+//
+// With that in mind, we want to construct as long a path as
+// possible and then treat it like a normal path (selector)
+// expression.
+func (f *frame) newPathFromAncestralNames(key ast.Node, keyName string) {
+	fieldDecl := f.node.(*fieldDeclExpr)
+
+	nav, name := fieldDecl.valueFrame.parent.resolvePathRoot(keyName, false)
+	if nav == nil {
+		return
+	}
+	components := []pathComponent{{
+		name:  name,
+		node:  key,
+		start: key.Pos(),
+		end:   key.End(),
+	}}
+	if name != "" {
+		for ; nav != nil && nav.name != ""; nav = nav.parent {
+			components = append(components, pathComponent{
+				name: nav.name,
+			})
+		}
+	}
+	if nav == nil {
+		return
+	}
+
+	slices.Reverse(components)
+	components[0].unexpanded = []*navigable{nav}
+
+	components = append(components, pathComponent{node: key})
+
+	p := &path{
+		frame:      fieldDecl.valueFrame,
+		components: components,
+	}
+
+	f.childPaths = append(f.childPaths, p)
+}
+
+// createPath creates a path from the expression expr. If the
+// expression is considered to be embeddded, then receiver should be
+// the navigable of the frame into which the expression is embedded.
+// The new path is added to the frame's childPaths.
+func (f *frame) createPath(expr ast.Expr, receiver *navigable) {
+	var components []pathComponent
+	var rootNav *navigable
+	nextEnd := token.NoPos
+	startsInline := false
+	for component := expr; component != nil; {
+		switch curExpr := component.(type) {
+		case *ast.Ident:
+			component = nil
+			end := nextEnd
+			if !end.IsValid() {
+				end = curExpr.End()
+			}
+			name := curExpr.Name
+			rootNav, name = f.resolvePathRoot(name, true)
+			components = append(components, pathComponent{
+				name:  name,
+				node:  curExpr,
+				start: curExpr.Pos(),
+				end:   end,
+			})
+
+		case *ast.SelectorExpr:
+			component = curExpr.X
+			end := nextEnd
+			if !end.IsValid() {
+				end = curExpr.End()
+			}
+			nextEnd = token.NoPos
+			sel := curExpr.Sel
+			start := sel.Pos()
+			if curExpr.Period.IsValid() {
+				nextEnd = curExpr.Period
+				start = curExpr.Period.Add(1)
+			}
+			name, _, err := ast.LabelName(sel)
 			if err != nil {
-				return nil
+				// wipe out anything we've built before. We can still work
+				// with whatever's to the left of this SelectorExpr, but
+				// nothing from sel onwards.
+				components = components[:0]
+				receiver = nil
+				continue
 			}
-		}
+			components = append(components, pathComponent{
+				name:  name,
+				node:  sel,
+				start: start,
+				end:   end,
+			})
 
-		results := navigateBindingsByName(resolved, name)
-		n.addDefinition(e.Lbrack, e.Rbrack.Add(1), results)
-		for _, nav := range results {
-			nav.recordUsage(e.Index, n)
-		}
-		return results
+		case *ast.IndexExpr:
+			component = curExpr.X
+			end := nextEnd
+			if !end.IsValid() {
+				end = curExpr.End()
+			}
+			nextEnd = token.NoPos
+			idx := curExpr.Index
+			start := idx.Pos()
+			if curExpr.Lbrack.IsValid() {
+				nextEnd = curExpr.Lbrack
+				start = curExpr.Lbrack
+			}
+			lit, ok := idx.(*ast.BasicLit)
+			if !ok {
+				// If it's a not a basic lit (i.e. it's path/ident etc),
+				// we don't attempt to calculate the dynamic index.
+				components = components[:0]
+				receiver = nil
+				// But we do need to attempt to resolve the (nested) path:
+				f.createPath(idx, nil)
+				continue
+			}
 
-	default:
-		return []*navigableBindings{n.newAstNode(nil, e, nil).navigable}
-	}
-}
-
-// expandNavigables maximally expands the provided set of navigables:
-// transitively inspecting all the astNodes that contribute to each
-// navigable, evaluating them and their resolvesTo navigables. This
-// expands a set of navigables to every navigable that can be reached
-// (transitively) via embedding.
-func expandNavigables(navigables []*navigableBindings) map[*navigableBindings]struct{} {
-	if len(navigables) == 0 {
-		return nil
-	}
-	navigableSet := make(map[*navigableBindings]struct{})
-	for len(navigables) > 0 {
-		nav := navigables[0]
-		navigables = navigables[1:]
-		if _, seen := navigableSet[nav]; seen {
-			continue
-		}
-		navigableSet[nav] = struct{}{}
-
-		// evaluating a node X can append new nodes onto X's
-		// navigable.contributingNodes. So we need to make sure we
-		// evaluate and expand into those too. I.e. calling node.eval()
-		// can modify nav.contributingNodes, thus we don't use range.
-		for i := 0; i < len(nav.contributingNodes); i++ {
-			node := nav.contributingNodes[i]
-
-			node.eval()
-			navigables = append(navigables, node.resolvesTo...)
-
-			if spec, ok := node.keyAlias.(*ast.ImportSpec); ok {
-				dfns := node.fdfns.dfns
-				ip := dfns.parseImportSpec(spec)
-				if ip == nil {
+			name := "__" + lit.Value
+			if lit.Kind != token.INT { // maybe string index
+				var err error
+				name, _, err = ast.LabelName(lit)
+				if err != nil {
+					components = components[:0]
+					receiver = nil
 					continue
 				}
-				dfns = node.fdfns.dfns.forPackage(*ip)
-				if dfns == nil {
-					continue
-				}
-				pkgNode := dfns.pkgNode
-				pkgNode.eval()
-				for _, node := range pkgNode.allChildren {
-					navigables = append(navigables, node.navigable)
-				}
 			}
-		}
-	}
-	return navigableSet
-}
 
-// expandNavigableViaAncestralPath calculates the set of
-// navigableBindings with which the argument is unified. Note this is
-// imperfect: for example it will not attempt to explore patterns.
-func expandNavigableViaAncestralPath(nav *navigableBindings) []*navigableBindings {
-	var names []string
-	for ; nav != nil && nav.name != ""; nav = nav.parent {
-		names = append(names, nav.name)
-	}
-	navs := []*navigableBindings{nav}
-	for _, name := range slices.Backward(names) {
-		navs = navigateBindingsByName(navs, name)
-	}
-	return navs
-}
+			components = append(components, pathComponent{
+				name:  name,
+				node:  idx,
+				start: start,
+				end:   end,
+			})
 
-// navigateBindingsByName maximally expands the set of bindings, and
-// indexes every member of the expanded set by the name, and the
-// accumulated results returned.
-func navigateBindingsByName(navigables []*navigableBindings, name string) []*navigableBindings {
-	navigableSet := expandNavigables(navigables)
-
-	var results []*navigableBindings
-	for navigable := range navigableSet {
-		childNav, found := navigable.bindings[name]
-		if found {
-			results = append(results, childNav)
-		}
-		for _, node := range navigable.contributingNodes {
-			childNodes, found := node.bindings[name]
-			// if there is a binding, we still add the ellipses if the
-			// binding is for a pattern, alias, comprehension etc.
-			addEllipses := !found || (len(childNodes) == 1 && childNodes[0].navigable != childNav)
-			if addEllipses {
-				results = append(results, node.ellipses...)
+		default:
+			component = nil
+			childFr := f.newFrame(curExpr, nil)
+			if nextEnd.IsValid() {
+				childFr.end = nextEnd
 			}
+			rootNav = childFr.navigable
+			startsInline = true
 		}
 	}
-	return results
+
+	if len(components) == 0 {
+		return
+	}
+	slices.Reverse(components)
+	if rootNav != nil {
+		// Even if there's no rootNav, it's important we keep going
+		// otherwise completions won't work - i.e. we need to be able to
+		// detect when an offset is within a path, even if the path is
+		// broken. So we don't return early when rootNav is nil, but we
+		// need to make sure we don't start putting nils into lists of
+		// unexpanded navigables.
+		components[0].unexpanded = []*navigable{rootNav}
+	}
+	// components always needs to be one longer to hold the results of
+	// the final path element.
+	components = append(components, pathComponent{node: expr})
+
+	p := &path{
+		frame:        f,
+		receiver:     receiver,
+		components:   components,
+		startsInline: startsInline,
+	}
+
+	f.childPaths = append(f.childPaths, p)
 }
 
 // resolvePathRoot resolves only the [ast.Ident] first element of a
 // path. CUE restricts the first element of any path (if it's an
 // ident) to be lexically defined. So here, we search for a match via
-// the astNode's own bindings (and its ancestry), whereas for
-// subsequent path elements, we search the navigable bindings (see the
-// [astNode.resolve] method).
-func (n *astNode) resolvePathRoot(name string) *navigableBindings {
-	nOrig := n
-	for ; n != nil; n = n.parent {
-		if bindings, found := n.bindings[name]; found {
-			nav := bindings[0].navigable
-			if len(bindings) == 1 {
+// the frame's own bindings (and its ancestry), whereas for subsequent
+// path elements, we search the navigable bindings.
+func (f *frame) resolvePathRoot(name string, requireIdent bool) (*navigable, string) {
+	frameOrig := f
+	for ; f != nil; f = f.parent {
+		if childFrs, found := f.bindings[name]; found {
+			if len(childFrs) == 1 {
+				nav := childFrs[0].navigable
 				if nav.name == "" {
 					// name has been resolved to an alias (or comprehension
-					// binding, dynamic field, pattern etc). Crucially, it
-					// doesn't have a "navigable" name.
-					return nav
+					// binding, dynamic field, pattern etc). Because it
+					// doesn't have a name, we can't subsequently use
+					// navigateByName, so we return the nav and "", and
+					// [path.resolvesToChanged] will know to not attempt to
+					// reresolve this.
+					return nav, ""
 				} else if nav.name != name {
 					// name has been resolved to an alias which had a
 					// normal ident or basiclit field name. Switch to that
 					// name.
-					return n.navigable.bindings[nav.name]
+					return f.navigable, nav.name
 				}
 			}
 
+			if !requireIdent {
+				return f.navigable, name
+			}
 			// If name lexically matches a non-alias, it must be matching
 			// an ident and not a basiclit. But that ident can come from
 			// any of the (potentially many) matching bindings!
 			identFound := false
-			for _, binding := range bindings {
-				if _, ok := binding.key.(*ast.Ident); ok {
+			for _, childFr := range childFrs {
+				if _, ok := childFr.key.(*ast.Ident); ok {
 					identFound = true
 					break
 				}
@@ -1928,145 +2334,263 @@ func (n *astNode) resolvePathRoot(name string) *navigableBindings {
 			if !identFound {
 				continue
 			}
-			return nav
+			return f.navigable, name
 		}
-		if n.isFileNode() {
+
+		if f.isFileFrame() {
 			// If we've got this far, we're allowed to inspect the
 			// (shared) navigable bindings directly without having to go
 			// via our bindings.
-			if nav, found := n.navigable.bindings[name]; found {
-				return nav
+			if _, found := f.navigable.bindings[name]; found {
+				return f.navigable, name
 			}
 			// Support for the Self experiment:
-			if name == "self" && nOrig.key != nil && nOrig.key.Pos().Experiment().AliasV2 {
-				return nOrig.navigable.parent
+			parentNav := frameOrig.navigable.parent
+			if name == "self" && frameOrig.fileEvaluator.File.Pos().Experiment().AliasV2 {
+				return parentNav, ""
 			}
-			return nil
+			return nil, ""
 		}
 	}
-	return nil
+	return nil, ""
 }
 
-// isFileNode reports whether n is the top level package astNode or a
-// direct child of it.
-func (n *astNode) isFileNode() bool {
-	return n.fdfns == nil || n.parent == n.fdfns.dfns.pkgNode
-}
-
-// ensureNavigableBinding creates and returns a new [astNode],
-// locating and using the appropriate shared [navigableBindings] for
-// the given name. The new node is stored in the node's bindings.
-func (n *astNode) ensureNavigableBinding(name string, key ast.Label, unprocessed ast.Node, colonPos token.Pos) *astNode {
-	// Search via our own shared navigable bindings. This is a
-	// criticial step that ensures that we continue to correctly share
-	// navigableBindings even as astNodes diverge. For example:
-	//
-	//	a: x.y.z
-	//	x: y: z: 3
-	//	x: y: z: 4
-	//
-	// By searching the *shared* bindings, we ensure not only that the
-	// two x: astNodes share a navigableBinding, but so too do the two
-	// y: nodes, and the two z: nodes. This ensures that the z in the
-	// x.y.z path resolves to both the z: 3 and z: 4 definitions.
-
-	// Lazily create our own navigable's bindings if needed:
-	bindings := n.navigable.bindings
-	if bindings == nil {
-		bindings = make(map[string]*navigableBindings)
-		n.navigable.bindings = bindings
+// docComments extracts the comments from the current frame.
+func (n *frame) docComments() []*ast.CommentGroup {
+	if n.docsNode == nil {
+		return nil
 	}
-
-	// Search for the nav for the new binding.
-	nav, found := bindings[name]
-	binding := n.newAstNode(key, unprocessed, nav)
-
-	if !strings.HasPrefix(name, "__") {
-		// If binding name starts with __ then we assume we artificially
-		// created it when converting a list's elements to struct
-		// fields. A list element doesn't have a key in the source, so
-		// there's no need to add a fieldDeclExpr for resolving that
-		// key.
-		expr := &fieldDeclExpr{position: key, colonPos: colonPos}
-		binding.newAstNode(key, expr, nil)
-	}
-
-	if !found {
-		// If the new binding has a new navigable, store it in our
-		// bindings, under name.
-		binding.navigable.name = name
-		bindings[name] = binding.navigable
-	} else if name != binding.navigable.name {
-		panic(fmt.Sprintf("Navigable name is %q but it should be %q", binding.navigable.name, name))
-	}
-	n.appendBinding(name, binding)
-
-	return binding
-}
-
-// newBinding creates and returns a new [astNode], and stores it under
-// the given name in the current astNode only.
-func (n *astNode) newBinding(name string, key ast.Node, unprocessed ast.Node) *astNode {
-	binding := n.newAstNode(key, unprocessed, nil)
-	n.appendBinding(name, binding)
-	if !strings.HasPrefix(name, "__") {
-		// Same logic as in [astNode.ensureNavigableBinding] above;
-		expr := &fieldDeclExpr{position: key, colonPos: token.NoPos}
-		binding.newAstNode(key, expr, nil)
-	}
-	return binding
-}
-
-// appendBinding stores the binding under the given name in the
-// current astNode only.
-func (n *astNode) appendBinding(name string, binding *astNode) {
-	binding.fieldsAllowed = true
-	if n.bindings == nil {
-		n.bindings = make(map[string][]*astNode)
-	}
-	n.bindings[name] = append(n.bindings[name], binding)
-}
-
-func (n *astNode) addDocComments(node ast.Node) {
 	var comments []*ast.CommentGroup
-	for _, group := range ast.Comments(node) {
-		if group.Doc && len(group.List) > 0 && group.List[0].Pos().Compare(node.Pos()) < 0 {
+	for _, group := range ast.Comments(n.docsNode) {
+		if group.Doc && len(group.List) > 0 && group.List[0].Pos().Compare(n.docsNode.Pos()) < 0 {
 			comments = append(comments, group)
 		}
 	}
-	n.docComments = comments
+	return comments
 }
 
-// fieldDeclExpr is a temporary representation of a field
-// declaration's key, used inside [astNode.ensureNavigableBinding] and
-// [astNode.resolve]. The position is holds the position of the key,
-// and the expression is always nil.
+// fieldDeclExpr models all the different possible parts of a field
+// declaration label in a more readily accessible form than the AST
+// itself.
 type fieldDeclExpr struct {
-	// Always nil: make the struct implement [ast.Expr]
-	ast.Expr
-	position ast.Node
-	// colonPos is the position of the colon that follows the field's
-	// label.
-	colonPos token.Pos
+	// Always nil: make the struct implement [ast.Node]
+	ast.Node
+	// keyName is the main name of the field, whether that's from an
+	// Ident or a BasicLit. It is not the name of any alias: if there
+	// is an alias but no main name, then keyName will be blank
+	// (e.g. X="\(y)")
+	keyName string
+	// keyIdent is the main Ident of the field if it exists.
+	keyIdent *ast.Ident
+	// key is either the main key of the field (whether it's an Ident
+	// or a BasicLit), or if neither of those exists, then it's the
+	// alias Ident.
+	key ast.Node
+	// aliasIdent is the alias Ident of the field if it exists.
+	aliasIdent *ast.Ident
+	// aliasInParentScope tracks whether the alias is visible to the
+	// rest of the parent scope or just the field value's scope. Most
+	// aliases are visible in the parent scope, but some are not,
+	// e.g. [x=e]: y
+	aliasInParentScope bool
+	// aliasValue contains the expression associated with the
+	// alias. For (x=e]: y and [x=e]: y aliases, the alias x should
+	// resolve to the expression e, and not the field value y.
+	aliasValue ast.Expr
+	// start and end track the bounds of the fieldDeclExpr.
+	start token.Pos
+	end   token.Pos
+	// exprs contains expressions from within the field declaration
+	// that need to be evaluated. E.g. "\(w)-\(x.y)": _
+	// Note this is always disjoint from aliasValue.
+	exprs []ast.Node
+	// valueFrame links the fieldDeclExpr to the frame in which the
+	// value of this field is evaluated.
+	valueFrame *frame
 }
 
 var _ ast.Node = (*fieldDeclExpr)(nil)
 
-func (w *fieldDeclExpr) Pos() token.Pos {
-	return w.position.Pos()
+// Pos implements [ast.Node]
+func (e *fieldDeclExpr) Pos() token.Pos {
+	return e.start
 }
 
-func (w *fieldDeclExpr) End() token.Pos {
-	return w.position.End()
+// End implements [ast.Node]
+func (e *fieldDeclExpr) End() token.Pos {
+	return e.end
 }
 
-// astNodeStack is used when evaluating comprehensions. It allows a
-// stack of astNodes to be built and ensures that the range of a node
-// is always a superset of the range of any node above it in the
-// stack.
-type astNodeStack []*astNode
+// path models CUE path expressions, and their resolution. Each
+// component of a path captures to what it resolves.
+type path struct {
+	// frame is the frame that contains this path in some way. Once
+	// each component of the path is resolved to a set of navigables,
+	// this frame and the component's node are added to the usedBy
+	// field of each of those navs.
+	frame *frame
+	// receiver is only used when a path is embedded. When the final
+	// component of a path is resolved, if receiver is non-nil, then
+	// its ensureResolvesTo method is called with the final set of
+	// navigables.
+	receiver *navigable
+	// components is the list of components of this path.
+	//
+	// For simple paths which start with an ident, components is always
+	// one longer than the number of parts of the path so that that the
+	// last pathComponent captures the results of the final path part.
+	//
+	// For paths that start with an inline struct (or list), the
+	// components will start immediately after the inline component,
+	// and will be one longer than the number of subsequent parts.
+	//
+	// components of length 1 are possible though: these are used to
+	// model resolutions which are computed via other
+	// means. E.g. package declarations and import specs.
+	components []pathComponent
+	// startsInline records whether this path started with an inline
+	// struct or list (which will not be part of the components).
+	startsInline bool
+}
 
-func (stack *astNodeStack) push(n ast.Node, node *astNode) {
+// pathComponent models part of a path.
+type pathComponent struct {
+	// node is the part of the path modelled by this pathComponent. For
+	// example in the path x.y, we have two components, the first with
+	// node which is the ident x, and the second with node which is the
+	// ident y.
+	node ast.Node
+	// unexpanded is the set of navigables that the previous path
+	// component resolves to.
+	unexpanded []*navigable
+	// expanded is the set of navs that can be reached from the
+	// expanding the unexpanded navs by following their resolvesTo
+	// fields transitively. This set should never decrease in
+	// size. Whenever it increases in size, we re-resolve the current
+	// component and all subsequent components in this path.
+	//
+	// Both unexpanded and expanded can be thought of as the "inputs"
+	// for the resolution of name. The results of that resolution are
+	// stored in the next component.
+	expanded map[*navigable]struct{}
+	// name is the name of the binding which we search for in all of
+	// the expanded navs.
+	name string
+	// start and end are the bounds of this pathComponent. Note that
+	// for the path `x . y` the end of the x component is the position
+	// of the dot, and the start of the y component is one character to
+	// the right of the dot.
+	start token.Pos
+	end   token.Pos
+}
+
+// resolvesToChanged indicates that the i-th component of this path
+// might need re-resolving, because the set of navigables that
+// constitute the inputs to the i-th component has expanded.
+//
+// If this i-th component really does need re-resolving, then the
+// i-th+1 component is then tested to see if its input set has grown,
+// and so on.
+func (p *path) resolvesToChanged(i int) {
+	components := p.components
+	compLen := len(components)
+
+	for ; i < compLen-1; i++ {
+		pc := &components[i]
+		unexpanded := pc.unexpanded
+
+		if pc.name != "" {
+			expanded := expandNavigables(unexpanded)
+			switch cmp.Compare(len(pc.expanded), len(expanded)) {
+			case 0: // no change
+				return
+			case 1: // new expanded set is smaller than old. "impossible"
+				panic(fmt.Sprintf("For path component %d, the expanded navs set shrank! Before: %d, after: %d",
+					i, len(pc.expanded), len(expanded)))
+			case -1:
+				pc.expanded = expanded
+				for nav := range expanded {
+					nav.ensureResolvesToObserver(p, i)
+				}
+			}
+
+			unexpanded = navigateByName(expanded, pc.name)
+		}
+
+		if len(unexpanded) == 0 {
+			for i++; i < compLen; i++ {
+				c := &components[i]
+				c.unexpanded = nil
+				c.expanded = nil
+			}
+			return
+		}
+
+		components[i+1].unexpanded = unexpanded
+		if pc.node != nil {
+			for _, nav := range unexpanded {
+				nav.recordUsage(pc.node, p.frame)
+			}
+		}
+	}
+
+	// If we get here, we have successfully resolved every component of
+	// this path and have new results for the final path
+	// component.
+
+	if p.receiver == nil {
+		return
+	}
+	p.receiver.ensureResolvesTo(components[i].unexpanded)
+}
+
+// definitionsForOffset searches the components of this path for a
+// component that contains the given offset. If found, the component's
+// index, and the results of its resolution (not its inputs) are
+// returned. If not found, -1, nil are returned.
+func (p *path) definitionsForOffset(offset int) (int, []*navigable) {
+	components := p.components
+	compLen := len(components)
+
+	if compLen == 1 {
+		pc := components[0]
+		start := pc.node.Pos()
+		end := pc.node.End()
+		if start.Offset() <= offset && offset <= end.Offset() {
+			return 0, pc.unexpanded
+		}
+		return -1, nil
+	}
+
+	i, found := slices.BinarySearchFunc(components[:compLen-1], nil, func(pc pathComponent, t any) int {
+		if pc.node == nil {
+			// this slice element (pc) precedes the target. I.e. hunt further right.
+			return -1
+		}
+		// cmp must return a negative number if the slice element
+		// precedes the target, or a positive number if the slice
+		// element follows the target.
+		if offset < pc.start.Offset() {
+			return 1
+		}
+		if pc.end.Offset() < offset {
+			return -1
+		}
+		return 0
+	})
+	if !found {
+		return -1, nil
+	}
+	return i, components[i+1].unexpanded
+}
+
+// frameStack is used when evaluating comprehensions. It allows a
+// stack of frames to be built and ensures that the range of a frame
+// is always a superset of the range of any frame above it in the
+// stack (stacks grow upwards).
+type frameStack []*frame
+
+func (stack *frameStack) push(n ast.Node, node *frame) {
 	nodes := *stack
 	for _, node := range nodes {
 		node.addRange(n)
@@ -2074,7 +2598,7 @@ func (stack *astNodeStack) push(n ast.Node, node *astNode) {
 	*stack = append(nodes, node)
 }
 
-func (stack *astNodeStack) peek() *astNode {
+func (stack *frameStack) peek() *frame {
 	nodes := *stack
 	if len(nodes) == 0 {
 		return nil

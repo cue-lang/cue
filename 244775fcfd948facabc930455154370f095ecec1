@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ef82987_f0696f4b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-27T12:32:06Z",
+      "side": 1,
+      "message": "With Marcel we talked about avoiding the map entirely, because the vertices slice with each Vertex pointing to the original vertex might be enough.",
+      "revId": "244775fcfd948facabc930455154370f095ecec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

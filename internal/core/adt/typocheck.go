@@ -878,7 +878,8 @@ func getReqSets(n *nodeContext) reqSets {
 	a := n.reqSets[:0]
 	v := n.node
 
-	if p := v.Parent; p != nil && !n.dropParentRequirements {
+	// Only inherit parent reqSets from the same OpContext to avoid stale defIDs.
+	if p := v.Parent; p != nil && !n.dropParentRequirements && p.state != nil && p.state.opID == n.opID {
 		a = append(a, getReqSets(p.state)...)
 		n.filterNonRecursive(&a)
 	}

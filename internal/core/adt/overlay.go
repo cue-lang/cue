@@ -15,7 +15,6 @@
 package adt
 
 import (
-	"maps"
 	"slices"
 )
 
@@ -44,9 +43,6 @@ import (
 func newOverlayContext(ctx *OpContext) *overlayContext {
 	return &overlayContext{
 		ctx: ctx,
-
-		// TODO(perf): take a map from a pool of maps and reuse.
-		vertexMap: make(map[*Vertex]*Vertex),
 	}
 }
 
@@ -60,20 +56,13 @@ type overlayContext struct {
 	root *Vertex
 
 	// vertices holds the original, non-overlay vertices. The overlay for a
-	// vertex v can be obtained by looking up v.cc.overlay.src.
+	// vertex v can be obtained by accessing v.overlay.
 	vertices []*Vertex
-
-	// vertexMap maps Vertex values of an originating node to the ones copied
-	// for this overlayContext. This is used to update the Vertex values in
-	// Environment values.
-	vertexMap vertexMap
 
 	// confMap maps envComprehension values to the ones copied for this
 	// overlayContext.
 	compMap map[*envComprehension]*envComprehension
 }
-
-type vertexMap map[*Vertex]*Vertex
 
 // overlayFrom is used to store overlay information in the OpContext. This
 // is used for dynamic resolution of vertices, which prevents data structures
@@ -81,41 +70,63 @@ type vertexMap map[*Vertex]*Vertex
 //
 // TODO(perf): right now this is only used for resolving vertices in
 // comprehensions. We could also use this for resolving environments, though.
-// Furthermore, we could used the "cleared" vertexMaps on this stack to avoid
-// allocating memory.
 //
 // NOTE: using a stack globally in OpContext is not very principled, as we
 // may be evaluating nested evaluations of different disjunctions. However,
 // in practice this just results in more work: as the vertices should not
 // overlap, there will be no cycles.
 type overlayFrame struct {
-	vertexMap vertexMap
-	root      *Vertex
+	root *Vertex
 }
 
-func (c *OpContext) pushOverlay(v *Vertex, m vertexMap) {
-	c.overlays = append(c.overlays, overlayFrame{m, v})
+type overlayEntry struct {
+	overlay    *Vertex
+	frameDepth int // depth at which this entry was added
+}
+
+func (c *OpContext) pushOverlay(v *Vertex, vertices []*Vertex) {
+	depth := len(c.overlays)
+
+	// Add new vertices to the shared map with current depth
+	for _, orig := range vertices {
+		if orig.overlay != nil {
+			c.overlayVertexMap[orig] = overlayEntry{orig.overlay, depth}
+		}
+	}
+
+	c.overlays = append(c.overlays, overlayFrame{v})
 }
 
 func (c *OpContext) popOverlay() {
-	c.overlays = c.overlays[:len(c.overlays)-1]
+	depth := len(c.overlays) - 1
+
+	// Remove all entries added at this depth
+	for key, entry := range c.overlayVertexMap {
+		if entry.frameDepth == depth {
+			delete(c.overlayVertexMap, key)
+		}
+	}
+
+	c.overlays = c.overlays[:depth]
 }
 
 func (c *OpContext) deref(v *Vertex) *Vertex {
-	for i := len(c.overlays) - 1; i >= 0; i-- {
-		f := c.overlays[i]
-		if f.root == v {
-			continue
+	// Check if v is the root of any active overlay frame
+	for i := range c.overlays {
+		if c.overlays[i].root == v {
+			return v
 		}
-		if x, ok := f.vertexMap[v]; ok {
-			return x
-		}
+	}
+	// Look up in the shared vertex map
+	if entry, ok := c.overlayVertexMap[v]; ok {
+		return entry.overlay
 	}
 	return v
 }
 
-// deref reports a replacement of v or v itself if such a replacement does not
-// exists. It computes the transitive closure of the replacement graph.
+// derefOverlay reports a replacement of v or v itself if such a replacement does not
+// exist. It computes the transitive closure of the replacement graph by following
+// the overlay chain.
 // TODO(perf): it is probably sufficient to only replace one level. But we need
 // to prove this to be sure. Until then, we keep the code as is.
 //
@@ -123,30 +134,26 @@ func (c *OpContext) deref(v *Vertex) *Vertex {
 // new Vertex nodes and only entries from old to new nodes are created, this
 // should never happen. But just in case we will panic instead of hang in such
 // situations.
-func (m vertexMap) deref(v *Vertex) *Vertex {
-	for i := 0; ; i++ {
-		x, ok := m[v]
-		if !ok {
-			break
-		}
-		v = x
-
-		if i > len(m) {
-			panic("cycle detected in vertexMap")
-		}
+func derefOverlay(v *Vertex) *Vertex {
+	if v == nil {
+		return nil
 	}
-	return v
+	const maxDepth = 1000 // Reasonable upper bound for overlay chain depth
+	for i := 0; i < maxDepth; i++ {
+		if v.overlay == nil {
+			return v
+		}
+		v = v.overlay
+	}
+	panic("cycle detected in overlay chain")
 }
 
 // cloneRoot clones the Vertex in which disjunctions are defined to allow
 // inserting selected disjuncts into a new Vertex.
 func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
-	maps.Copy(ctx.vertexMap, root.vertexMap)
-
 	// Clone all vertices that need to be cloned to support the overlay.
 	v := ctx.cloneVertex(root.node)
 	v.IsDisjunct = true
-	v.state.vertexMap = ctx.vertexMap
 	ctx.root = v
 
 	for _, v := range ctx.vertices {
@@ -160,11 +167,11 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 		for _, t := range n.tasks {
 			ctx.rewriteComprehension(t)
 
-			t.node = ctx.vertexMap.deref(t.node.node).state
+			t.node = derefOverlay(t.node.node).state
 
 			if t.blockedOn != nil {
 				before := t.blockedOn.node.node
-				after := ctx.vertexMap.deref(before)
+				after := derefOverlay(before)
 				// Tasks that are blocked on nodes outside the current scope
 				// of the disjunction should should be added to blocking queues.
 				if before == after {
@@ -212,7 +219,6 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 	// TODO(mem-mgmt): use free list for Vertex allocation.
 	v := &Vertex{}
 	*v = *x
-	ctx.vertexMap[x] = v
 	x.overlay = v
 
 	ctx.vertices = append(ctx.vertices, x)
@@ -395,7 +401,7 @@ func (ctx *overlayContext) mapComprehensionContext(ec *envComprehension) *envCom
 	}
 
 	if ctx.compMap[ec] == nil {
-		vertex := ctx.vertexMap.deref(ec.vertex)
+		vertex := derefOverlay(ec.vertex)
 		// Report the error at the root of the disjunction if otherwise the
 		// error would be reported outside of the disjunction.
 		if vertex == ec.vertex {

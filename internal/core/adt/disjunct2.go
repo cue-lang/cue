@@ -564,7 +564,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 		orig.BaseValue = d.node
 	}
 
-	n.ctx.pushOverlay(n.node, oc.vertexMap)
+	n.ctx.pushOverlay(n.node, oc.vertices)
 	defer n.ctx.popOverlay()
 
 	d.runMode = mode

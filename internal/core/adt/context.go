@@ -69,11 +69,12 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	}
 
 	ctx := &OpContext{
-		opID:        contextGeneration.Add(1),
-		Runtime:     cfg.Runtime,
-		Format:      cfg.Format,
-		vertex:      v,
-		taskContext: schedConfig,
+		opID:             contextGeneration.Add(1),
+		Runtime:          cfg.Runtime,
+		Format:           cfg.Format,
+		vertex:           v,
+		taskContext:      schedConfig,
+		overlayVertexMap: make(map[*Vertex]overlayEntry),
 	}
 	cfg.Runtime.ConfigureOpCtx(ctx)
 	ctx.stats.EvalVersion = ctx.Version
@@ -216,6 +217,17 @@ type OpContext struct {
 	IsValidator bool
 
 	overlays []overlayFrame
+
+	// overlayVertexMap is a shared map used by all overlay frames to track
+	// vertex overlay relationships during disjunction evaluation.
+	// It maps original vertices to their overlay copies, with each entry
+	// tagged by the frame depth at which it was added.
+	//
+	// When pushOverlay is called, new entries are added with the current depth.
+	// When popOverlay is called, all entries matching that depth are removed.
+	// This allows a single map to be shared across all nested overlay frames
+	// while maintaining proper scoping.
+	overlayVertexMap map[*Vertex]overlayEntry
 
 	// ==== Debugging ====
 	logID int // sequence number for log messages

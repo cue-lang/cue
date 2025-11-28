@@ -3957,6 +3957,7 @@ func checkFailed(t *testing.T, err error, str, name string) bool {
 func TestExpr(t *testing.T) {
 	testCases := []struct {
 		input string
+		path  string // path to lookup, defaults to "v"
 		want  string
 	}{{
 		input: "v: 3",
@@ -4120,10 +4121,30 @@ func TestExpr(t *testing.T) {
 	}, {
 		input: `a: string, if true { v: a }`,
 		want:  `.(〈〉 "a")`,
+	}, {
+		// Issue #4198: panic with opID mismatch when calling Expr() on LookupPath result.
+		input: `
+			x: #B & {
+				y: [ 1 ]
+			}
+
+			#B: #A | []
+
+			#A: {
+				y?: [...int]
+				...
+			}
+		`,
+		path: "x.y",
+		want: `&([1] [...int])`,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.input, func(t *testing.T, m *cuetdtest.M) {
-			v := getValue(m, tc.input).Lookup("v")
+			path := tc.path
+			if path == "" {
+				path = "v"
+			}
+			v := getValue(m, tc.input).LookupPath(cue.ParsePath(path))
 			got := exprStr(v)
 			if got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)

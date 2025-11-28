@@ -16,6 +16,24 @@
       "message": "With Marcel we talked about avoiding the map entirely, because the vertices slice with each Vertex pointing to the original vertex might be enough.",
       "revId": "244775fcfd948facabc930455154370f095ecec1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "634c1acf_2ec4c769",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-28T18:25:03Z",
+      "side": 1,
+      "message": "The alternative is at https://cue.gerrithub.io/c/cue-lang/cue/+/1226956.\n\n\nThe good news is that we get rid of two maps, not one. and the allocated bytes goes down by more than this change, because we reuse memory via OpContext instead.\n\nThis is a more complex change than just removing the map and using the slice, as Claude figured out we cannot simply use the vertices slice and the overlay field to track this; a few tests break. it had something to do with the overlays being cleaned up. so some sort of map or table is still necessary. I figured a map is fine, as long as we reuse space a bit better.",
+      "parentUuid": "5ef82987_f0696f4b",
+      "revId": "244775fcfd948facabc930455154370f095ecec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

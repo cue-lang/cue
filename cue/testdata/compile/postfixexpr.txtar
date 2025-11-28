@@ -49,13 +49,7 @@ fn: _
   fn: _
 }
 -- out/evalalpha --
-Errors:
-d: cannot call non-function fn (type _):
-    ./with_experiment.cue:17:4
-
-Result:
-(_|_){
-  // [eval]
+(struct){
   #Base: (#struct){
     x: (int){ int }
   }
@@ -66,7 +60,7 @@ Result:
   }
   c: (_){ _ }
   d: (_|_){
-    // [eval] d: cannot call non-function fn (type _):
+    // [incomplete] d: cannot call non-concrete value fn (type _):
     //     ./with_experiment.cue:17:4
   }
   e: (#struct){

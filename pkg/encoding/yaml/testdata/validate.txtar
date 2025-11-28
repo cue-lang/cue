@@ -32,6 +32,156 @@ validatePartial: #test & {
 }
 
 invalidDisjuntion: yaml.Validate("a: 3", {a: 1 | 2})
+-- out/yaml-v3 --
+Errors:
+validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b!:int}:
+    ./in.cue:8:11
+    ./in.cue:6:9
+    ./in.cue:7:16
+invalidDisjuntion: error in call to encoding/yaml.Validate: 2 errors in empty disjunction::
+    ./in.cue:33:20
+
+Result:
+import "encoding/yaml"
+
+#test: {
+	fn:    _
+	data1: "a: 2"
+	t1: {
+		ok1: data1 & fn({
+			a!: int
+		} | {
+			b!: int
+		})
+		ok2: data1 & fn(close({
+			a: int
+		}) | close({
+			b: int
+		}))
+		ok3: data1 & fn(#A | #B)
+	}
+	#A: {
+		a: int
+	}
+	#B: {
+		b: int
+	}
+	data2: "'foo'"
+	t2: {
+		ok1: data2 & fn(*int | string)
+		ok2: data2 & fn(string)
+	}
+}
+validate: {
+	fn:    yaml.Validate
+	data1: "a: 2"
+
+	// TODO: fix this test: the second disjunct should be eliminated, so there
+	// should not be a concreteness error.
+	t1: {
+		ok1: _|_ // validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): validate.t1.ok1: error in call to encoding/yaml.Validate: validate.t1.ok1: incomplete value {a:2} | {a:2,b!:int}
+		ok2: "a: 2"
+		ok3: "a: 2"
+	}
+	#A: {
+		a: int
+	}
+	#B: {
+		b: int
+	}
+	data2: "'foo'"
+	t2: {
+		ok1: "'foo'"
+		ok2: "'foo'"
+	}
+}
+validatePartial: {
+	fn:    yaml.ValidatePartial
+	data1: "a: 2"
+	t1: {
+		ok1: "a: 2"
+		ok2: "a: 2"
+		ok3: "a: 2"
+	}
+	#A: {
+		a: int
+	}
+	#B: {
+		b: int
+	}
+	data2: "'foo'"
+	t2: {
+		ok1: "'foo'"
+		ok2: "'foo'"
+	}
+}
+invalidDisjuntion: _|_ // invalidDisjuntion: error in call to encoding/yaml.Validate: invalidDisjuntion.a: 2 errors in empty disjunction: (and 2 more errors)
+-- diff/-out/yaml-v3<==>+out/yaml --
+diff old new
+--- old
++++ new
+@@ -1,18 +1,8 @@
+ Errors:
+-#test.t1.ok1: cannot call non-function fn (type _):
+-    ./in.cue:8:11
+ validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b!:int}:
+     ./in.cue:8:11
+     ./in.cue:6:9
+     ./in.cue:7:16
+-#test.t1.ok2: cannot call non-function fn (type _):
+-    ./in.cue:9:11
+-#test.t1.ok3: cannot call non-function fn (type _):
+-    ./in.cue:13:11
+-#test.t2.ok1: cannot call non-function fn (type _):
+-    ./in.cue:17:11
+-#test.t2.ok2: cannot call non-function fn (type _):
+-    ./in.cue:18:11
+ invalidDisjuntion: error in call to encoding/yaml.Validate: 2 errors in empty disjunction::
+     ./in.cue:33:20
+ 
+@@ -23,20 +13,28 @@
+ 	fn:    _
+ 	data1: "a: 2"
+ 	t1: {
+-		ok1: _|_ // #test.t1.ok1: cannot call non-function fn (type _)
+-		ok2: _|_ // #test.t1.ok2: cannot call non-function fn (type _)
+-		ok3: _|_ // #test.t1.ok3: cannot call non-function fn (type _)
+-	}
+-	#A: {
+-		a: int
+-	}
+-	#B: {
+-		b: int
+-	}
+-	data2: "'foo'"
+-	t2: {
+-		ok1: _|_ // #test.t2.ok1: cannot call non-function fn (type _)
+-		ok2: _|_ // #test.t2.ok2: cannot call non-function fn (type _)
++		ok1: data1 & fn({
++			a!: int
++		} | {
++			b!: int
++		})
++		ok2: data1 & fn(close({
++			a: int
++		}) | close({
++			b: int
++		}))
++		ok3: data1 & fn(#A | #B)
++	}
++	#A: {
++		a: int
++	}
++	#B: {
++		b: int
++	}
++	data2: "'foo'"
++	t2: {
++		ok1: data2 & fn(*int | string)
++		ok2: data2 & fn(string)
+ 	}
+ }
+ validate: {
 -- out/yaml --
 Errors:
 #test.t1.ok1: cannot call non-function fn (type _):

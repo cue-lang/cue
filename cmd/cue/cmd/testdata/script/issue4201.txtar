@@ -1,0 +1,30 @@
+# Issue #4201: function calls on non-concrete values should not cause permanent errors.
+#
+# When a function value is initially non-concrete but becomes concrete through
+# constraint unification, the function call should succeed rather than failing
+# with a permanent "cannot call non-function" error.
+
+exec cue export in.cue
+cmp stdout expect-stdout
+
+-- in.cue --
+import "strings"
+
+#X: {
+	_function: _
+	a:         string
+	b:         _function(a)
+}
+
+x: #X & {
+	_function: strings.ToUpper
+	a:         "foo"
+}
+
+-- expect-stdout --
+{
+    "x": {
+        "a": "foo",
+        "b": "FOO"
+    }
+}

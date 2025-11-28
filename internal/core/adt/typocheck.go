@@ -931,7 +931,8 @@ func getReqSets(n *nodeContext) reqSets {
 	v := n.node
 
 	var parentReqs reqSets
-	if p := v.Parent; p != nil && !n.dropParentRequirements {
+	// Only inherit parent reqSets from the same OpContext to avoid stale defIDs.
+	if p := v.Parent; p != nil && !n.dropParentRequirements && p.state != nil && p.state.opID == n.opID {
 		parentReqs = getReqSets(p.state)
 	}
 

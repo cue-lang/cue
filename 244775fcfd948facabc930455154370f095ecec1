@@ -34,6 +34,24 @@
       "parentUuid": "5ef82987_f0696f4b",
       "revId": "244775fcfd948facabc930455154370f095ecec1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88cc2e96_7c3bb6e6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-29T11:25:54Z",
+      "side": 1,
+      "message": "Actually, I\u0027m abandoning the other change because it\u0027s more complex and it breaks Unity on one project by running for a long time. So I think Claude is correct that removing the map here is too hard, at least right now.\n\n\nInstead, I\u0027ll explore incremental improvements on top of this one.",
+      "parentUuid": "634c1acf_2ec4c769",
+      "revId": "244775fcfd948facabc930455154370f095ecec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -42,11 +42,17 @@ import (
 // could get by with only copying arcs to that are modified in the copy.
 
 func newOverlayContext(ctx *OpContext) *overlayContext {
+	// Reuse the map from the overlays stack if one exists at this depth.
+	var m vertexMap
+	if i := len(ctx.overlays); i < cap(ctx.overlays) {
+		m = ctx.overlays[:cap(ctx.overlays)][i].vertexMap
+	}
+	if m == nil {
+		m = make(map[*Vertex]*Vertex)
+	}
 	return &overlayContext{
-		ctx: ctx,
-
-		// TODO(perf): take a map from a pool of maps and reuse.
-		vertexMap: make(map[*Vertex]*Vertex),
+		ctx:       ctx,
+		vertexMap: m,
 	}
 }
 
@@ -98,7 +104,9 @@ func (c *OpContext) pushOverlay(v *Vertex, m vertexMap) {
 }
 
 func (c *OpContext) popOverlay() {
-	c.overlays = c.overlays[:len(c.overlays)-1]
+	i := len(c.overlays) - 1
+	clear(c.overlays[i].vertexMap)
+	c.overlays = c.overlays[:i]
 }
 
 func (c *OpContext) deref(v *Vertex) *Vertex {

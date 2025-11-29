@@ -119,25 +119,16 @@ func (c *OpContext) deref(v *Vertex) *Vertex {
 }
 
 // deref reports a replacement of v or v itself if such a replacement does not
-// exists. It computes the transitive closure of the replacement graph.
-// TODO(perf): it is probably sufficient to only replace one level. But we need
-// to prove this to be sure. Until then, we keep the code as is.
+// exist. It performs a single-level lookup in the map.
 //
-// This function does a simple cycle check. As every overlayContext adds only
-// new Vertex nodes and only entries from old to new nodes are created, this
-// should never happen. But just in case we will panic instead of hang in such
-// situations.
+// Only one level of dereferencing is needed because vertex references in tasks
+// are rewritten after each overlay. When overlay N creates mapping old→new,
+// any subsequent overlay N+1 operates on vertices that were already rewritten
+// to overlay N's vertices. Thus we never need to traverse chains like A→A1→A2;
+// we only ever look up the most recent mapping (e.g., A1→A2).
 func (m vertexMap) deref(v *Vertex) *Vertex {
-	for i := 0; ; i++ {
-		x, ok := m[v]
-		if !ok {
-			break
-		}
-		v = x
-
-		if i > len(m) {
-			panic("cycle detected in vertexMap")
-		}
+	if x, ok := m[v]; ok {
+		return x
 	}
 	return v
 }

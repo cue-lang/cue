@@ -326,9 +326,6 @@ func (n *nodeContext) addConstraint(arc *Vertex, mode ArcType, c Conjunct, check
 	bulkEnv.DynamicLabel = f
 	c.Env = &bulkEnv
 
-	// TODO: can go, but do in separate CL.
-	arc, _ = n.getArc(f, mode)
-
 	arc.insertConjunct(n.ctx, c, c.CloseInfo, mode, check, false)
 }
 

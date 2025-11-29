@@ -301,34 +301,60 @@ func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg
 	return b
 }
 
-// A ValueError is returned as a result of evaluating a value.
-type ValueError struct {
+// baseError contains common fields and methods for error types.
+type baseError struct {
 	r       Runtime
 	v       *Vertex
 	pos     token.Pos
 	auxpos  []token.Pos
 	altPath []string
+}
+
+func (e *baseError) AddPos(p token.Pos) {
+	if !p.IsValid() {
+		return
+	}
+	if slices.Contains(e.auxpos, p) {
+		return
+	}
+	e.auxpos = append(e.auxpos, p)
+}
+
+func (e *baseError) AddClosedPositions(ctx *OpContext, c CloseInfo) {
+	for n := range c.AncestorPositions(ctx) {
+		e.AddPos(n)
+	}
+}
+
+func (e *baseError) Position() token.Pos {
+	return e.pos
+}
+
+func (e *baseError) InputPositions() []token.Pos {
+	return e.auxpos
+}
+
+func (e *baseError) Path() (a []string) {
+	if len(e.altPath) > 0 {
+		return e.altPath
+	}
+	if e.v == nil {
+		return nil
+	}
+	for _, f := range appendPath(nil, e.v) {
+		a = append(a, f.SelectorString(e.r))
+	}
+	return a
+}
+
+// A ValueError is returned as a result of evaluating a value.
+type ValueError struct {
+	baseError
 	errors.Message
 }
 
 func (v *ValueError) AddPosition(n Node) {
 	v.AddPos(pos(n))
-}
-
-func (v *ValueError) AddPos(p token.Pos) {
-	if !p.IsValid() {
-		return
-	}
-	if slices.Contains(v.auxpos, p) {
-		return
-	}
-	v.auxpos = append(v.auxpos, p)
-}
-
-func (v *ValueError) AddClosedPositions(ctx *OpContext, c CloseInfo) {
-	for n := range c.AncestorPositions(ctx) {
-		v.AddPos(n)
-	}
 }
 
 func (c *OpContext) errNode() *Vertex {
@@ -410,11 +436,13 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 	}
 
 	return &ValueError{
-		r:       c.Runtime,
-		v:       c.errNode(),
-		pos:     p,
-		auxpos:  a,
-		altPath: c.makeAltPath(),
+		baseError: baseError{
+			r:       c.Runtime,
+			v:       c.errNode(),
+			pos:     p,
+			auxpos:  a,
+			altPath: c.makeAltPath(),
+		},
 		Message: errors.NewMessagef(format, args...),
 	}
 }
@@ -439,23 +467,25 @@ func (e *ValueError) Error() string {
 	return errors.String(e)
 }
 
-func (e *ValueError) Position() token.Pos {
-	return e.pos
+// ConflictError defers formatting of conflict messages until the error is
+// actually needed, avoiding expensive string conversions and allocations.
+type ConflictError struct {
+	baseError
+	format func(Runtime, Node) string
+	v1, v2 Node
+	k1, k2 Kind
 }
 
-func (e *ValueError) InputPositions() (a []token.Pos) {
-	return e.auxpos
+func (e *ConflictError) Error() string {
+	return errors.String(e)
 }
 
-func (e *ValueError) Path() (a []string) {
-	if len(e.altPath) > 0 {
-		return e.altPath
+func (e *ConflictError) Msg() (format string, args []interface{}) {
+	v1Str := Formatter{X: e.v1, F: e.format, R: e.r}
+	v2Str := Formatter{X: e.v2, F: e.format, R: e.r}
+	if e.k1 == e.k2 {
+		return "conflicting values %s and %s", []interface{}{v1Str, v2Str}
 	}
-	if e.v == nil {
-		return nil
-	}
-	for _, f := range appendPath(nil, e.v) {
-		a = append(a, f.SelectorString(e.r))
-	}
-	return a
+	return "conflicting values %s and %s (mismatched types %s and %s)",
+		[]interface{}{v1Str, v2Str, e.k1, e.k2}
 }

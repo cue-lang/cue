@@ -447,7 +447,7 @@ type Ident struct {
 // A BasicLit node represents a literal of basic type.
 type BasicLit struct {
 	ValuePos token.Pos   // literal position
-	Kind     token.Token // INT, FLOAT, DURATION, or STRING
+	Kind     token.Token // INT, FLOAT, STRING, NULL, TRUE, FALSE
 	Value    string      // literal string; e.g. 42, 0x7f, 3.14, 1_234_567, 1e-9, 2.4i, 'a', '\x7f', "foo", or '\m\n\o'
 
 	comments

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80029b3a_0c4a75e9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1039102
+      },
+      "writtenOn": "2025-11-29T07:04:20Z",
+      "side": 1,
+      "message": "I don\u0027t really get why gerrit thinks there is a merge conflict 😅 I rebased against master and still no difference",
+      "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

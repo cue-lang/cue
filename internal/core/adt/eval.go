@@ -571,26 +571,41 @@ func (c *OpContext) freeNodeContext(n *nodeContext) {
 	n.scheduler.clear()
 }
 
-// TODO(perf): return a dedicated ConflictError that can track original
-// positions on demand.
-func (n *nodeContext) reportConflict(
-	v1, v2 Node,
-	k1, k2 Kind,
-	ids ...CloseInfo) {
-
+func (n *nodeContext) reportConflict(v1, v2 Node, k1, k2 Kind, ids ...CloseInfo) {
 	ctx := n.ctx
 
-	var err *ValueError
-	if k1 == k2 {
-		err = ctx.NewPosf(token.NoPos, "conflicting values %s and %s", v1, v2)
-	} else {
-		err = ctx.NewPosf(token.NoPos,
-			"conflicting values %s and %s (mismatched types %s and %s)",
-			v1, v2, k1, k2)
+	// Collect all positions from the nodes, including their leaf conjuncts
+	var auxpos []token.Pos
+	auxpos = appendNodePositions(auxpos, v1)
+	auxpos = appendNodePositions(auxpos, v2)
+
+	// Make shallow copies of Vertex nodes to avoid endless recursion when
+	// the error is set as the BaseValue. This matches the behavior in [OpContext.NewPosf].
+	if v, ok := v1.(*Vertex); ok {
+		vcopy := *v
+		v1 = &vcopy
+	}
+	if v, ok := v2.(*Vertex); ok {
+		vcopy := *v
+		v2 = &vcopy
 	}
 
-	err.AddPosition(v1)
-	err.AddPosition(v2)
+	// Create a ConflictError that defers formatting until needed
+	err := &ConflictError{
+		baseError: baseError{
+			r:       ctx.Runtime,
+			v:       ctx.errNode(),
+			pos:     token.NoPos,
+			auxpos:  auxpos,
+			altPath: ctx.makeAltPath(),
+		},
+		format: ctx.Format,
+		v1:     v1,
+		v2:     v2,
+		k1:     k1,
+		k2:     k2,
+	}
+
 	for _, id := range ids {
 		err.AddClosedPositions(ctx, id)
 	}

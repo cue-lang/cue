@@ -197,6 +197,8 @@ func isNil(x reflect.Value) bool {
 	return false
 }
 
+var utf8Enc = unicode.UTF8.NewEncoder()
+
 func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result adt.Value) {
 	src := ctx.Source()
 	if !val.IsValid() { // untyped nil, or dereferencing a nil pointer/interface
@@ -297,7 +299,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "encoding.TextMarshaler"))
 		}
-		s, _ := unicode.UTF8.NewEncoder().String(string(b))
+		s, _ := utf8Enc.String(string(b))
 		return &adt.String{Src: src, Str: s}
 	}
 	if _, ok := implements(typ, goError); ok {
@@ -315,7 +317,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 
 	case reflect.String:
 		str := val.String()
-		str, _ = unicode.UTF8.NewEncoder().String(str)
+		str, _ = utf8Enc.String(str)
 		// TODO: here and above: allow to fail on invalid strings.
 		// if !utf8.ValidString(str) {
 		// 	return ctx.AddErrf("cannot convert result to string: invalid UTF-8")

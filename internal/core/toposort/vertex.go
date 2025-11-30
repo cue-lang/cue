@@ -145,7 +145,7 @@ import (
 )
 
 type structMeta struct {
-	structInfo *adt.StructInfo
+	structInfo adt.StructInfo
 	pos        token.Pos
 
 	// Should this struct be considered to be part of an explicit
@@ -154,10 +154,7 @@ type structMeta struct {
 }
 
 func (sMeta *structMeta) String() string {
-	var sl *adt.StructLit
-	if sMeta.structInfo != nil {
-		sl = sMeta.structInfo.StructLit
-	}
+	sl := sMeta.structInfo.StructLit
 	return fmt.Sprintf("{%p sl:%p %v (explicit? %v)}",
 		sMeta, sl, sMeta.pos, sMeta.isExplicit)
 }

@@ -616,6 +616,21 @@ func (t *trimmerV3) keepAllChildren(n ast.Node) {
 	}, nil)
 }
 
+// findConjunctForStruct finds the conjunct in v that contains the given StructLit
+// and returns a new conjunct with the proper child environment and close info.
+func (t *trimmerV3) findConjunctForStruct(v *adt.Vertex, s *adt.StructLit) (adt.Conjunct, bool) {
+	for c := range v.LeafConjuncts() {
+		if expr := c.Expr(); expr == s {
+			childEnv := &adt.Environment{
+				Up:     c.Env,
+				Vertex: v,
+			}
+			return adt.MakeConjunct(childEnv, s, c.CloseInfo), true
+		}
+	}
+	return adt.Conjunct{}, false
+}
+
 // Once we have identified, and masked out, call expressions,
 // embeddings, patterns, and disjunctions, we can finally work
 // recursively through the vertices, testing their conjuncts to find
@@ -650,12 +665,16 @@ func (t *trimmerV3) findRedundancies(v *adt.Vertex, keepAll bool) {
 				Parent: v.Parent,
 				Label:  v.Label,
 			}
-			c := adt.MakeConjunct(si.Env, si.StructLit, si.CloseInfo)
+			c, found := t.findConjunctForStruct(v, si.StructLit)
+			if !found {
+				t.logf("could not find conjunct for struct lit, skipping: %#v", si)
+				continue
+			}
 			v1.InsertConjunct(c)
 			v1.Finalize(t.ctx)
-			t.logf("exploring disj struct lit %p (src %v): start", si, src.Pos())
+			t.logf("exploring disj struct lit %#v (src %v): start", si, src.Pos())
 			t.findRedundancies(v1, keepAll)
-			t.logf("exploring disj struct lit %p (src %v): end", si, src.Pos())
+			t.logf("exploring disj struct lit %#v (src %v): end", si, src.Pos())
 		}
 	}
 

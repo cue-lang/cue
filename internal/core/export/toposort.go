@@ -29,7 +29,7 @@ func VertexFeatures(c *adt.OpContext, v *adt.Vertex) []adt.Feature {
 	return toposort.VertexFeatures(c, v)
 }
 
-func extractFeatures(in []*adt.StructInfo) (a [][]adt.Feature) {
+func extractFeatures(in []adt.StructInfo) (a [][]adt.Feature) {
 	// Calculate total entries accounting for repeats.
 	// Total occurrences = 1 + Repeats for each StructInfo.
 	totalEntries := 0

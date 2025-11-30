@@ -306,7 +306,7 @@ type conjuncts struct {
 	values      *adt.Vertex
 	embed       []ast.Expr
 	conjuncts   []ast.Expr
-	structs     []*adt.StructInfo
+	structs     []adt.StructInfo
 	fields      map[adt.Feature]field
 	attrs       []*ast.Attribute
 	hasEllipsis bool
@@ -377,7 +377,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 			return
 		}
 		// Used for sorting.
-		e.structs = append(e.structs, &adt.StructInfo{StructLit: x, Env: env})
+		e.structs = append(e.structs, adt.StructInfo{StructLit: x})
 
 		env = &adt.Environment{Up: env, Vertex: e.node()}
 

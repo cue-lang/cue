@@ -258,7 +258,7 @@ type Vertex struct {
 
 	// Structs is a slice of struct literals that contributed to this value.
 	// This information is used to compute the topological sort of arcs.
-	Structs []*StructInfo
+	Structs []StructInfo
 }
 
 func deref(v *Vertex) *Vertex {
@@ -478,10 +478,6 @@ func (v *Vertex) Clone() *Vertex {
 
 type StructInfo struct {
 	*StructLit
-
-	Env *Environment
-
-	CloseInfo
 
 	// Repeats tracks how many additional times this struct appeared via [Vertex.AddStruct].
 	// This is used by toposort to give proper weight to repeated structs.
@@ -1414,19 +1410,16 @@ func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 }
 
 func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) {
-	for _, t := range v.Structs {
+	for i, t := range v.Structs {
 		if t.StructLit == s {
-			t.Repeats++
+			v.Structs[i].Repeats++
 			return
 		}
 	}
 	info := StructInfo{
 		StructLit: s,
-		Env:       env,
-		CloseInfo: ci,
 	}
-	t := &info
-	v.Structs = append(v.Structs, t)
+	v.Structs = append(v.Structs, info)
 }
 
 // Path computes the sequence of Features leading from the root to of the

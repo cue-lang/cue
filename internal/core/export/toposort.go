@@ -30,7 +30,15 @@ func VertexFeatures(c *adt.OpContext, v *adt.Vertex) []adt.Feature {
 }
 
 func extractFeatures(in []*adt.StructInfo) (a [][]adt.Feature) {
-	a = make([][]adt.Feature, 0, len(in))
+	// Calculate total entries accounting for repeats.
+	// Total occurrences = 1 + Repeats for each StructInfo.
+	totalEntries := 0
+	for _, s := range in {
+		if len(s.Decls) > 0 {
+			totalEntries += 1 + s.Repeats
+		}
+	}
+	a = make([][]adt.Feature, 0, totalEntries)
 	for _, s := range in {
 		sorted := make([]adt.Feature, 0, len(s.Decls))
 		for _, e := range s.Decls {
@@ -43,7 +51,11 @@ func extractFeatures(in []*adt.StructInfo) (a [][]adt.Feature) {
 		// Lists with a single element may still be useful to distinguish
 		// between known and unknown fields: unknown fields are sorted last.
 		if len(sorted) > 0 {
-			a = append(a, sorted)
+			occurrences := 1 + s.Repeats
+			// Add this front (1 + Repeats) times to give it proper weight
+			for i := 0; i < occurrences; i++ {
+				a = append(a, sorted)
+			}
 		}
 	}
 	return a

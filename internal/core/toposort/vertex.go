@@ -231,23 +231,33 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 		nodeToStructMetas[node] = m
 		return m
 	}
-	structMetas := make([]structMeta, len(structInfos))
+
+	totalMetas := 0
+	for _, s := range structInfos {
+		totalMetas += 1 + s.Repeats
+	}
+	structMetas := make([]structMeta, totalMetas)
 
 	// Create all the structMetas and map to them from a StructInfo's
 	// StructLit, and all its internal Decls. Initial attempt at
 	// recording a position, which will be correct only for direct use
 	// of literal structs in the calculation of vertex v.
-	for i, s := range structInfos {
+	// For each StructInfo, create (1 + Repeats) copies of its structMeta.
+	metaIdx := 0
+	for _, s := range structInfos {
 		sl := s.StructLit
-		sMeta := &structMetas[i]
-		sMeta.structInfo = s
+		for range 1 + s.Repeats {
+			sMeta := &structMetas[metaIdx]
+			metaIdx++
+			sMeta.structInfo = s
 
-		if src := sl.Source(); src != nil {
-			sMeta.pos = src.Pos()
-		}
-		structMetaMap(sl)[sMeta] = true
-		for _, decl := range sl.Decls {
-			structMetaMap(decl)[sMeta] = true
+			if src := sl.Source(); src != nil {
+				sMeta.pos = src.Pos()
+			}
+			structMetaMap(sl)[sMeta] = true
+			for _, decl := range sl.Decls {
+				structMetaMap(decl)[sMeta] = true
+			}
 		}
 	}
 

@@ -483,6 +483,10 @@ type StructInfo struct {
 
 	CloseInfo
 
+	// Repeats tracks how many additional times this struct appeared via [Vertex.AddStruct].
+	// This is used by toposort to give proper weight to repeated structs.
+	Repeats int
+
 	// Embed indicates the struct in which this struct is embedded (originally),
 	// or nil if this is a root structure.
 	// Embed   *StructInfo
@@ -1409,20 +1413,20 @@ func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 	v.Conjuncts = append(v.Conjuncts, c)
 }
 
-func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *StructInfo {
+func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) {
+	for _, t := range v.Structs {
+		if t.StructLit == s {
+			t.Repeats++
+			return
+		}
+	}
 	info := StructInfo{
 		StructLit: s,
 		Env:       env,
 		CloseInfo: ci,
 	}
-	for _, t := range v.Structs {
-		if *t == info { // TODO: check for different identity.
-			return t
-		}
-	}
 	t := &info
 	v.Structs = append(v.Structs, t)
-	return t
 }
 
 // Path computes the sequence of Features leading from the root to of the

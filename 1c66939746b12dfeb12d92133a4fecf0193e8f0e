@@ -16,6 +16,92 @@
       "message": "I don\u0027t really get why gerrit thinks there is a merge conflict 😅 I rebased against master and still no difference",
       "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a243ac2_a93d4cbc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-30T20:39:27Z",
+      "side": 1,
+      "message": "LGTM, just one last nit as I think your optional detection logic doesn\u0027t quite match what the k8s docs say.",
+      "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32073e27_50a735ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-30T20:39:27Z",
+      "side": 1,
+      "message": "ignore that, it\u0027s just gerrit being gerrit. we use the \"cherry pick\" merge strategy, so each commit is tested for mergeability (and conflicts) straight into master, without considering the chain of parent commits.",
+      "parentUuid": "80029b3a_0c4a75e9",
+      "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9cc41006_830a8f7a",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1511,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-30T20:39:27Z",
+      "side": 1,
+      "message": "Unless we want to summarize all the rules here - and I don\u0027t think we want to - I would link to the docs but avoid the bullet points.\n\n\nFor example, I don\u0027t think your \"optional\" semantics correctly follow this rule:\n\n\n\u003e Using the +optional or the omitempty tag causes OpenAPI documentation to reflect that the field is optional.\n\n\ni.e. with k8s semantics, a pointer field with neither `+optional` nor `omitempty` should NOT be generated as optional. See the comments below in the test file.",
+      "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90d1153f_c50ae125",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types_kubernetes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-30T20:39:27Z",
+      "side": 1,
+      "message": "why is this still an optional field? per the k8s docs, only fields marked as `+optional` or `omitempty` should be treated as optional; this is neither.",
+      "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "203832fb_1a2f8d98",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types_kubernetes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-11-30T20:39:27Z",
+      "side": 1,
+      "message": "why is this still an optional field? per the k8s docs, only fields marked as `+optional` or `omitempty` should be treated as optional; this is neither.",
+      "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

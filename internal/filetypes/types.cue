@@ -316,7 +316,8 @@ interpretations: jsonschema: {
 		strict:         *false | bool
 		strictKeywords: *strict | bool
 		// TODO: enable strictFeatures by default? (see https://cuelang.org/issue/3923).
-		strictFeatures: *strict | bool
+		strictFeatures:       *strict | bool
+		openOnlyWhenExplicit: *false | bool
 	}
 }
 

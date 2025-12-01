@@ -125,9 +125,10 @@ func TestDecode(t *testing.T) {
 			cfg.Root = root
 		}
 		cfg.Strict = t.HasTag("strict")
+		cfg.StrictFeatures = t.HasTag("strictFeatures")
 		cfg.StrictKeywords = cfg.StrictKeywords || t.HasTag("strictKeywords")
 		cfg.AllowNonExistentRoot = t.HasTag("allowNonExistentRoot")
-		cfg.StrictFeatures = t.HasTag("strictFeatures")
+		cfg.OpenOnlyWhenExplicit = t.HasTag("openOnlyWhenExplicit")
 		if t.HasTag("singleRoot") {
 			cfg.SingleRoot = true
 		}

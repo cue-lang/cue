@@ -617,6 +617,9 @@ valid with is mentioned in parentheses at the end.
     strictFeatures	report errors for lossy mappings. (jsonschema)
     strictKeywords	report errors for unknown keywords (jsonschema)
     strict			report errors for either of the above (jsonschema)
+    openOnlyWhenExplicit
+    				require a schema to be explicitly opened before a
+				... will be added to a struct (jsonschema)
 
 Many commands also support the --out and --outfile/-o flags.
 The --out flag specifies the output type using a qualifier

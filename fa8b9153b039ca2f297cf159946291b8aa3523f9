@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "377d247f_e0841f79",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-12-01T14:06:20Z",
+      "side": 1,
+      "message": "Is that okay? In the general case it should apply until a fixed point is reached.",
+      "revId": "fa8b9153b039ca2f297cf159946291b8aa3523f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -31,31 +31,32 @@ var fromFileDataBytes []byte
 
 func init() {
 	tagTypes = map[string]TagType{
-		"auto":           TagTopLevel,
-		"binary":         TagTopLevel,
-		"code":           TagTopLevel,
-		"cue":            TagTopLevel,
-		"dag":            TagTopLevel,
-		"data":           TagTopLevel,
-		"go":             TagTopLevel,
-		"graph":          TagTopLevel,
-		"json":           TagTopLevel,
-		"jsonl":          TagTopLevel,
-		"jsonschema":     TagTopLevel,
-		"koala":          TagSubsidiaryBool,
-		"lang":           TagSubsidiaryString,
-		"openapi":        TagTopLevel,
-		"pb":             TagTopLevel,
-		"proto":          TagTopLevel,
-		"schema":         TagTopLevel,
-		"strict":         TagSubsidiaryBool,
-		"strictFeatures": TagSubsidiaryBool,
-		"strictKeywords": TagSubsidiaryBool,
-		"text":           TagTopLevel,
-		"textproto":      TagTopLevel,
-		"toml":           TagTopLevel,
-		"xml":            TagTopLevel,
-		"yaml":           TagTopLevel,
+		"auto":                 TagTopLevel,
+		"binary":               TagTopLevel,
+		"code":                 TagTopLevel,
+		"cue":                  TagTopLevel,
+		"dag":                  TagTopLevel,
+		"data":                 TagTopLevel,
+		"go":                   TagTopLevel,
+		"graph":                TagTopLevel,
+		"json":                 TagTopLevel,
+		"jsonl":                TagTopLevel,
+		"jsonschema":           TagTopLevel,
+		"koala":                TagSubsidiaryBool,
+		"lang":                 TagSubsidiaryString,
+		"openOnlyWhenExplicit": TagSubsidiaryBool,
+		"openapi":              TagTopLevel,
+		"pb":                   TagTopLevel,
+		"proto":                TagTopLevel,
+		"schema":               TagTopLevel,
+		"strict":               TagSubsidiaryBool,
+		"strictFeatures":       TagSubsidiaryBool,
+		"strictKeywords":       TagSubsidiaryBool,
+		"text":                 TagTopLevel,
+		"textproto":            TagTopLevel,
+		"toml":                 TagTopLevel,
+		"xml":                  TagTopLevel,
+		"yaml":                 TagTopLevel,
 	}
 }
 
@@ -239,6 +240,8 @@ var subsidiaryBoolTagFuncs = []func(subsidiaryBoolTags) (subsidiaryBoolTags, err
 	unifySubsidiaryBoolTags_0,
 	unifySubsidiaryBoolTags_1,
 	unifySubsidiaryBoolTags_2,
+	unifySubsidiaryBoolTags_3,
+	unifySubsidiaryBoolTags_4,
 }
 
 var subsidiaryTagFuncs = []func(subsidiaryTags) (subsidiaryTags, error){
@@ -266,15 +269,19 @@ func (t subsidiaryTags) marshalToMap() map[string]string {
 }
 
 type subsidiaryBoolTags struct {
-	koala          opt.Opt[bool]
-	strict         opt.Opt[bool]
-	strictFeatures opt.Opt[bool]
-	strictKeywords opt.Opt[bool]
+	koala                opt.Opt[bool]
+	openOnlyWhenExplicit opt.Opt[bool]
+	strict               opt.Opt[bool]
+	strictFeatures       opt.Opt[bool]
+	strictKeywords       opt.Opt[bool]
 }
 
 func (t *subsidiaryBoolTags) unmarshalFromMap(m map[string]bool) error {
 	if x, ok := m["koala"]; ok {
 		t.koala = opt.Some(x)
+	}
+	if x, ok := m["openOnlyWhenExplicit"]; ok {
+		t.openOnlyWhenExplicit = opt.Some(x)
 	}
 	if x, ok := m["strict"]; ok {
 		t.strict = opt.Some(x)
@@ -291,6 +298,9 @@ func (t subsidiaryBoolTags) marshalToMap() map[string]bool {
 	m := make(map[string]bool)
 	if t.koala.IsPresent() {
 		m["koala"] = t.koala.Value()
+	}
+	if t.openOnlyWhenExplicit.IsPresent() {
+		m["openOnlyWhenExplicit"] = t.openOnlyWhenExplicit.Value()
 	}
 	if t.strict.IsPresent() {
 		m["strict"] = t.strict.Value()
@@ -357,7 +367,44 @@ func unifySubsidiaryTags_1(t subsidiaryTags) (subsidiaryTags, error) {
 	return r, nil
 }
 
-// unifySubsidiaryBoolTags_2 unifies subsidiaryBoolTags values according to the following CUE logic:
+// unifySubsidiaryBoolTags_3 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{
+//			[string]: bool
+//		}
+//		koala:                *false | bool
+//		strict:               *false | bool
+//		strictKeywords:       *strict | bool
+//		strictFeatures:       *strict | bool
+//		openOnlyWhenExplicit: *false | bool
+//	}
+func unifySubsidiaryBoolTags_3(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	r.koala = opt.Some(false)
+	if t.koala.IsPresent() {
+		r.koala = t.koala
+	}
+	r.openOnlyWhenExplicit = opt.Some(false)
+	if t.openOnlyWhenExplicit.IsPresent() {
+		r.openOnlyWhenExplicit = t.openOnlyWhenExplicit
+	}
+	r.strict = opt.Some(false)
+	if t.strict.IsPresent() {
+		r.strict = t.strict
+	}
+	r.strictFeatures = r.strict
+	if t.strictFeatures.IsPresent() {
+		r.strictFeatures = t.strictFeatures
+	}
+	r.strictKeywords = r.strict
+	if t.strictKeywords.IsPresent() {
+		r.strictKeywords = t.strictKeywords
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_4 unifies subsidiaryBoolTags values according to the following CUE logic:
 //
 //	{
 //		{
@@ -368,11 +415,14 @@ func unifySubsidiaryTags_1(t subsidiaryTags) (subsidiaryTags, error) {
 //		strictKeywords: *strict | bool
 //		strictFeatures: *strict | bool
 //	}
-func unifySubsidiaryBoolTags_2(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+func unifySubsidiaryBoolTags_4(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
 	r.koala = opt.Some(false)
 	if t.koala.IsPresent() {
 		r.koala = t.koala
+	}
+	if t.openOnlyWhenExplicit.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
 	}
 	r.strict = opt.Some(false)
 	if t.strict.IsPresent() {
@@ -403,6 +453,9 @@ func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 	if t.koala.IsPresent() {
 		r.koala = t.koala
 	}
+	if t.openOnlyWhenExplicit.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
+	}
 	if t.strict.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "strict")
 	}
@@ -421,14 +474,52 @@ func unifySubsidiaryBoolTags_0(t subsidiaryBoolTags) (subsidiaryBoolTags, error)
 //		{
 //			[string]: bool
 //		}
-//		strict:         *false | bool
-//		strictKeywords: *strict | bool
-//		strictFeatures: *strict | bool
+//		strict:               *false | bool
+//		strictKeywords:       *strict | bool
+//		strictFeatures:       *strict | bool
+//		openOnlyWhenExplicit: *false | bool
 //	}
 func unifySubsidiaryBoolTags_1(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
 	var r subsidiaryBoolTags
 	if t.koala.IsPresent() {
 		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	}
+	r.openOnlyWhenExplicit = opt.Some(false)
+	if t.openOnlyWhenExplicit.IsPresent() {
+		r.openOnlyWhenExplicit = t.openOnlyWhenExplicit
+	}
+	r.strict = opt.Some(false)
+	if t.strict.IsPresent() {
+		r.strict = t.strict
+	}
+	r.strictFeatures = r.strict
+	if t.strictFeatures.IsPresent() {
+		r.strictFeatures = t.strictFeatures
+	}
+	r.strictKeywords = r.strict
+	if t.strictKeywords.IsPresent() {
+		r.strictKeywords = t.strictKeywords
+	}
+	return r, nil
+}
+
+// unifySubsidiaryBoolTags_2 unifies subsidiaryBoolTags values according to the following CUE logic:
+//
+//	{
+//		{
+//			[string]: bool
+//		}
+//		strict:         *false | bool
+//		strictKeywords: *strict | bool
+//		strictFeatures: *strict | bool
+//	}
+func unifySubsidiaryBoolTags_2(t subsidiaryBoolTags) (subsidiaryBoolTags, error) {
+	var r subsidiaryBoolTags
+	if t.koala.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "koala")
+	}
+	if t.openOnlyWhenExplicit.IsPresent() {
+		return subsidiaryBoolTags{}, fmt.Errorf("field %q not allowed", "openOnlyWhenExplicit")
 	}
 	r.strict = opt.Some(false)
 	if t.strict.IsPresent() {

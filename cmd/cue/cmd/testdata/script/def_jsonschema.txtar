@@ -1,6 +1,10 @@
 exec cue def jsonschema: schema.json -p schema -l '#Person:'
 cmp stdout expect-stdout
 
+# With openOnlyWhenExplicit tag
+exec cue def jsonschema+openOnlyWhenExplicit: schema.json -p schema -l '#Person:'
+cmp stdout expect-openonlywhenexplicit-stdout
+
 # auto mode
 exec cue def schema.json -p schema -l '#Person:'
 cmp stdout expect-stdout
@@ -48,6 +52,26 @@ import "strings"
 	// Age in years which must be equal to or greater than zero.
 	age?: int & >=0
 	...
+}
+-- expect-openonlywhenexplicit-stdout --
+// Person
+
+package schema
+
+import "strings"
+
+#Person: {
+	@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+	@jsonschema(id="https://example.com/person.schema.json")
+
+	// The person's first name.
+	firstName?: string
+
+	// The person's last name.
+	lastName?: strings.MinRunes(1)
+
+	// Age in years which must be equal to or greater than zero.
+	age?: int & >=0
 }
 -- schema.json --
 ﻿{

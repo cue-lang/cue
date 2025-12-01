@@ -464,9 +464,10 @@ func TestParseArgs(t *testing.T) {
 				Form:           build.Schema,
 				Interpretation: "jsonschema",
 				BoolTags: map[string]bool{
-					"strict":         false,
-					"strictFeatures": false,
-					"strictKeywords": false,
+					"strict":               false,
+					"strictFeatures":       false,
+					"strictKeywords":       false,
+					"openOnlyWhenExplicit": false,
 				},
 			},
 		},
@@ -491,9 +492,10 @@ func TestParseArgs(t *testing.T) {
 				Interpretation: "jsonschema",
 				Form:           build.Schema,
 				BoolTags: map[string]bool{
-					"strict":         true,
-					"strictFeatures": true,
-					"strictKeywords": true,
+					"strict":               true,
+					"strictFeatures":       true,
+					"strictKeywords":       true,
+					"openOnlyWhenExplicit": false,
 				},
 			},
 		},
@@ -506,9 +508,26 @@ func TestParseArgs(t *testing.T) {
 				Interpretation: "jsonschema",
 				Form:           build.Schema,
 				BoolTags: map[string]bool{
-					"strict":         false,
-					"strictFeatures": true,
-					"strictKeywords": false,
+					"openOnlyWhenExplicit": false,
+					"strict":               false,
+					"strictFeatures":       true,
+					"strictKeywords":       false,
+				},
+			},
+		},
+	}, {
+		in: "jsonschema+openOnlyWhenExplicit: bar.schema",
+		out: []*build.File{
+			{
+				Filename:       "bar.schema",
+				Encoding:       "json",
+				Interpretation: "jsonschema",
+				Form:           build.Schema,
+				BoolTags: map[string]bool{
+					"strict":               false,
+					"strictFeatures":       false,
+					"strictKeywords":       false,
+					"openOnlyWhenExplicit": true,
 				},
 			},
 		},
@@ -563,8 +582,9 @@ func TestParseArgs(t *testing.T) {
 func TestDefaultTagsForInterpretation(t *testing.T) {
 	tags := DefaultTagsForInterpretation(build.JSONSchema, Input)
 	qt.Assert(t, qt.DeepEquals(tags, map[string]bool{
-		"strict":         false,
-		"strictFeatures": false,
-		"strictKeywords": false,
+		"strict":               false,
+		"strictFeatures":       false,
+		"strictKeywords":       false,
+		"openOnlyWhenExplicit": false,
 	}))
 }

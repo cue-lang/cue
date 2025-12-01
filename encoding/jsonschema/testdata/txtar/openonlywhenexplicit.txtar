@@ -1,0 +1,33 @@
+#openOnlyWhenExplicit
+-- schema.json --
+{
+  "type": "object",
+  "title": "Main schema",
+  "properties": {
+    "object1": {
+      "type": "object",
+      "properties": {
+        "a": {
+          "type": "string"
+        }
+      }
+    },
+    "object2": {
+      "type": "object",
+      "properties": {
+        "a": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
+
+-- out/decode/extract --
+// Main schema
+object1?: a?: string
+object2?: {
+	a?: string
+	...
+}

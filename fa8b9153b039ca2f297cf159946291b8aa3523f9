@@ -16,6 +16,24 @@
       "message": "Is that okay? In the general case it should apply until a fixed point is reached.",
       "revId": "fa8b9153b039ca2f297cf159946291b8aa3523f9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2d317da_ebc69dc1",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-01T17:40:51Z",
+      "side": 1,
+      "message": "I let Claude investigate this for twenty minutes and it failed to come up with a counter-example, so I\u0027m satisfied with that; but if you\u0027re not, I\u0027m happy to abandon this. It doesn\u0027t noticeably affect performance, because in practice, more than one map lookup is not needed, as you can see by the tests all passing the same way.",
+      "parentUuid": "377d247f_e0841f79",
+      "revId": "fa8b9153b039ca2f297cf159946291b8aa3523f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

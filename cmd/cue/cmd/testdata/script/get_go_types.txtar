@@ -136,6 +136,30 @@ type Foozer struct {
 
 	// +optional-some-suffix
 	RequiredCommentSuffix string `json:"requiredCommentSuffix"`
+
+	// +required
+	Required string `json:"required"`
+	// +required
+	RequiredPointer *string `json:"requiredPointer"`
+
+	// +nullable
+	Nullable string `json:"nullable"`
+	// +nullable
+	NullablePointer *string `json:"nullablePointer"`
+
+	// +required
+	// +nullable
+	RequiredNullable string `json:"requiredNullable"`
+	// +required
+	// +nullable
+	RequiredNullablePointer *string `json:"requiredNullablePointer"`
+
+	// +optional
+	// +nullable
+	OptionalNullable string `json:"optionalNullable"`
+	// +optional
+	// +nullable
+	OptionalNullablePointer *string `json:"optionalNullablePointer"`
 }
 
 type Identifier string
@@ -358,6 +382,34 @@ import (
 
 	// +optional-some-suffix
 	requiredCommentSuffix: string @go(RequiredCommentSuffix)
+
+	// +required
+	required: string @go(Required)
+
+	// +required
+	requiredPointer: string @go(RequiredPointer,*string)
+
+	// +nullable
+	nullable: null | string @go(Nullable,string)
+
+	// +nullable
+	nullablePointer?: null | string @go(NullablePointer,*string)
+
+	// +required
+	// +nullable
+	requiredNullable: null | string @go(RequiredNullable,string)
+
+	// +required
+	// +nullable
+	requiredNullablePointer: null | string @go(RequiredNullablePointer,*string)
+
+	// +optional
+	// +nullable
+	optionalNullable?: null | string @go(OptionalNullable,string)
+
+	// +optional
+	// +nullable
+	optionalNullablePointer?: null | string @go(OptionalNullablePointer,*string)
 }
 
 #Identifier: string // #enumIdentifier

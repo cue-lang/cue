@@ -88,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b8e7e52_5e0a2c92",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1511,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-01T16:49:23Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b87cff14_8c1200ff",
+      "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90d1153f_c50ae125",

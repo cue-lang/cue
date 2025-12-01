@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b87cff14_8c1200ff",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1511,
+      "author": {
+        "id": 1039102
+      },
+      "writtenOn": "2025-12-01T01:10:32Z",
+      "side": 1,
+      "message": "based on the docs pointers are also a marking that its optional:\n\n\u003e Optional fields have the following properties:\n\u003e They have the +optional comment tag in Go.\n\u003e They are a pointer type in the Go definition (e.g. AwesomeFlag *SomeFlag) or have a built-in nil value (e.g. maps and slices).\n\u003e They are marked with the omitempty json struct tag in the Go definition.",
+      "parentUuid": "9cc41006_830a8f7a",
+      "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "90d1153f_c50ae125",
         "filename": "cmd/cue/cmd/testdata/script/get_go_types_kubernetes.txtar",
         "patchSetId": 2
@@ -83,6 +101,24 @@
       "writtenOn": "2025-11-30T20:39:27Z",
       "side": 1,
       "message": "why is this still an optional field? per the k8s docs, only fields marked as `+optional` or `omitempty` should be treated as optional; this is neither.",
+      "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6aaf0c05_29112dfe",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types_kubernetes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1039102
+      },
+      "writtenOn": "2025-12-01T01:10:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "90d1153f_c50ae125",
       "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -100,6 +136,24 @@
       "writtenOn": "2025-11-30T20:39:27Z",
       "side": 1,
       "message": "why is this still an optional field? per the k8s docs, only fields marked as `+optional` or `omitempty` should be treated as optional; this is neither.",
+      "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2097736d_852b039a",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types_kubernetes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1039102
+      },
+      "writtenOn": "2025-12-01T01:10:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "203832fb_1a2f8d98",
       "revId": "1c66939746b12dfeb12d92133a4fecf0193e8f0e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

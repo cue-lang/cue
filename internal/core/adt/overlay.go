@@ -105,7 +105,15 @@ func (c *OpContext) pushOverlay(v *Vertex, m vertexMap) {
 
 func (c *OpContext) popOverlay() {
 	i := len(c.overlays) - 1
-	clear(c.overlays[i].vertexMap)
+	// TODO(mvdan): unfortunately, clearing maps with large capacities
+	// is fairly slow as of Go 1.25, and most uses only need few entries.
+	// Do not reuse large maps to avoid this pitfall for now.
+	// See: https://github.com/golang/go/issues/70617
+	if l := len(c.overlays[i].vertexMap); l > 512 {
+		c.overlays[i].vertexMap = nil
+	} else {
+		clear(c.overlays[i].vertexMap)
+	}
 	c.overlays = c.overlays[:i]
 }
 

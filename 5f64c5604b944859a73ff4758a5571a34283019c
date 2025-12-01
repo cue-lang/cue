@@ -16,6 +16,24 @@
       "message": "add RequiredPointer too, for completeness? the k8s docs do mention this is a possible scenario that is supported.",
       "revId": "5f64c5604b944859a73ff4758a5571a34283019c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85bec78b_2f10b6c3",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types_kubernetes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1039102
+      },
+      "writtenOn": "2025-12-01T01:10:15Z",
+      "side": 1,
+      "message": "Done by adding all possible combinations",
+      "parentUuid": "9c07b0f5_62788a13",
+      "revId": "5f64c5604b944859a73ff4758a5571a34283019c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

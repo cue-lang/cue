@@ -1284,7 +1284,7 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 
 		f := &cueast.Field{
 			Label: cueast.NewList(e.ident("string", false)),
-			Value: e.makeType(typ.Elem(), kind, nullable),
+			Value: e.makeType(typ.Elem(), kind, e.fieldAttributesFromType(typ.Elem())),
 		}
 		cueast.SetRelPos(f, cuetoken.Blank)
 		return &cueast.StructLit{
@@ -1506,6 +1506,19 @@ func (e *extractor) isInline(tag string) bool {
 		hasFlag(tag, "yaml", "inline", 1)
 }
 
+func (e *extractor) fieldAttributesFromType(f types.Type) (attrs fieldAttributes) {
+	switch f.(type) {
+	case *types.Pointer:
+		attrs |= optional
+
+		// In k8s semantics a pointer doesn't count as nullable.
+		if !e.k8sSemantic {
+			attrs |= nullable
+		}
+	}
+	return attrs
+}
+
 func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, tag string) (fieldAttributes, error) {
 	var attrs fieldAttributes
 	// See k8s docs https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md
@@ -1528,14 +1541,7 @@ func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, t
 		return attrs, nil
 	}
 
-	if _, ok := f.Type().(*types.Pointer); ok {
-		attrs |= optional
-
-		// In k8s semantics a pointer doesn't count as nullable.
-		if !e.k8sSemantic {
-			attrs |= nullable
-		}
-	}
+	attrs |= e.fieldAttributesFromType(f.Type())
 
 	// Go 1.24 added the "omitzero" option to encoding/json, an improvement over "omitempty".
 	// Note that, as of mid 2025, YAML libraries don't seem to have picked up "omitzero" yet.

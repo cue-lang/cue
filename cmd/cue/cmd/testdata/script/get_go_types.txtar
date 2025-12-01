@@ -86,10 +86,13 @@ type Foozer struct {
 
 	// Note: Go encodings of protobuf tags are lossy. So this is a best-effort
 	// thing.
-	Map    map[string]*CustomJSON `protobuf:"bytes,1,name=intf" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Map          map[string]*CustomJSON `protobuf:"bytes,1,name=intf" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	MapString    map[string]string
+
 	Slice1 []int
 	Slice2 []interface{}
 	Slice3 *[]json.Unmarshaler
+	Slice4 []*int
 	Array1 [5]int
 	Array2 [5]interface{}
 	Array3 *[5]json.Marshaler
@@ -335,9 +338,11 @@ import (
 	// Note: Go encodings of protobuf tags are lossy. So this is a best-effort
 	// thing.
 	Map: {[string]: null | #CustomJSON} @go(,map[string]*CustomJSON) @protobuf(1,map[bytes]bytes,name=intf)
+	MapString: {[string]: string} @go(,map[string]string)
 	Slice1: [...int] @go(,[]int)
 	Slice2: [...] @go(,[]interface{})
 	Slice3?: null | [...] @go(,*[]json.Unmarshaler)
+	Slice4: [...int] @go(,[]*int)
 	Array1: 5 * [int] @go(,[5]int)
 	Array2: 5 * [_] @go(,[5]interface{})
 	Array3?: null | 5*[_] @go(,*[5]json.Marshaler)

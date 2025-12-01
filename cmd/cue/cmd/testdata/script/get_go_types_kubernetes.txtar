@@ -61,40 +61,40 @@ type Foo struct {
 package pkg1
 
 #Foo: {
-	regular:           string        @go(Regular)
-	pointer?:          null | string @go(Pointer,*string)
-	omitEmpty?:        string        @go(OmitEmpty)
-	omitEmptyPointer?: null | string @go(OmitEmptyPointer,*string)
+	regular:           string @go(Regular)
+	pointer?:          string @go(Pointer,*string)
+	omitEmpty?:        string @go(OmitEmpty)
+	omitEmptyPointer?: string @go(OmitEmptyPointer,*string)
 
 	// +required
 	required: string @go(Required)
 
 	// +required
-	requiredPointer?: null | string @go(RequiredPointer,*string)
+	requiredPointer: string @go(RequiredPointer,*string)
 
 	// +optional
 	optional?: string @go(Optional)
 
 	// +optional
-	optionalPointer?: null | string @go(OptionalPointer,*string)
+	optionalPointer?: string @go(OptionalPointer,*string)
 
 	// +nullable
-	nullable: string @go(Nullable)
+	nullable: null | string @go(Nullable,string)
 
 	// +nullable
 	nullablePointer?: null | string @go(NullablePointer,*string)
 
 	// +required
 	// +nullable
-	requiredNullable: string @go(RequiredNullable)
+	requiredNullable: null | string @go(RequiredNullable,string)
 
 	// +required
 	// +nullable
-	requiredNullablePointer?: null | string @go(RequiredNullablePointer,*string)
+	requiredNullablePointer: null | string @go(RequiredNullablePointer,*string)
 
 	// +optional
 	// +nullable
-	optionalNullable?: string @go(OptionalNullable)
+	optionalNullable?: null | string @go(OptionalNullable,string)
 
 	// +optional
 	// +nullable

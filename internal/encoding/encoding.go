@@ -324,8 +324,9 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 			// The strictKeywords and strictFeatures tags are
 			// set by internal/filetypes from the strict tag when appropriate.
 
-			StrictKeywords: tags["strictKeywords"],
-			StrictFeatures: tags["strictFeatures"],
+			StrictKeywords:       tags["strictKeywords"],
+			StrictFeatures:       tags["strictFeatures"],
+			OpenOnlyWhenExplicit: tags["openOnlyWhenExplicit"],
 		}
 		file, err = jsonschema.Extract(v, cfg)
 		// TODO: simplify currently erases file line info. Reintroduce after fix.

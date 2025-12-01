@@ -16,6 +16,24 @@
       "message": "nit: the indenting here seems off. use spaces consistently, and make sure `...` is aligned with `require`?",
       "revId": "c45888789d39ec55f054aeb4c5054ca474ce7849",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4edd88b_c5855140",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-12-01T17:44:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0122bfa1_02251419",
+      "revId": "c45888789d39ec55f054aeb4c5054ca474ce7849",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

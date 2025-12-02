@@ -138,6 +138,9 @@ type Validator interface {
 
 // Pos returns the file position of n, or token.NoPos if it is unknown.
 func Pos(n Node) token.Pos {
+	if n == nil {
+		return token.NoPos
+	}
 	src := n.Source()
 	if src == nil {
 		return token.NoPos

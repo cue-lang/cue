@@ -948,7 +948,7 @@ func (c *OpContext) typeError(v Value, k Kind) {
 		return
 	}
 	if !IsConcrete(v) && v.Kind()&k != 0 {
-		c.addErrf(IncompleteError, pos(v), "incomplete %s: %s", k, v)
+		c.addErrf(IncompleteError, Pos(v), "incomplete %s: %s", k, v)
 	} else {
 		c.AddErrf("cannot use %s (type %s) as type %s", v, v.Kind(), k)
 	}
@@ -963,7 +963,7 @@ func (c *OpContext) typeErrorAs(v Value, k Kind, as interface{}) {
 		return
 	}
 	if !IsConcrete(v) && v.Kind()&k != 0 {
-		c.addErrf(IncompleteError, pos(v),
+		c.addErrf(IncompleteError, Pos(v),
 			"incomplete %s in %v: %s", k, as, v)
 	} else {
 		c.AddErrf("cannot use %s (type %s) as type %s in %v", v, v.Kind(), k, as)
@@ -971,19 +971,6 @@ func (c *OpContext) typeErrorAs(v Value, k Kind, as interface{}) {
 }
 
 var emptyNode = &Vertex{status: finalized}
-
-// TODO(mvdan) use this pos helper throughout the adt package
-
-func pos(x Node) token.Pos {
-	if x == nil {
-		return token.NoPos
-	}
-	src := x.Source()
-	if src == nil {
-		return token.NoPos
-	}
-	return src.Pos()
-}
 
 // node is called by SelectorExpr.resolve and IndexExpr.resolve.
 func (c *OpContext) node(orig Node, x Expr, scalar bool, state Flags) *Vertex {
@@ -1023,7 +1010,7 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state Flags) *Vertex {
 
 	switch nv := v.(type) {
 	case nil:
-		c.addErrf(IncompleteError, pos(x),
+		c.addErrf(IncompleteError, Pos(x),
 			"%s undefined (%s is incomplete)", orig, x)
 		return emptyNode
 
@@ -1047,12 +1034,12 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state Flags) *Vertex {
 		}
 	default:
 		if kind := v.Kind(); kind&StructKind != 0 {
-			c.addErrf(IncompleteError, pos(x),
+			c.addErrf(IncompleteError, Pos(x),
 				"%s undefined as %s is incomplete (type %s)", orig, x, kind)
 			return emptyNode
 
 		} else if !ok {
-			c.addErrf(0, pos(x), // TODO(error): better message.
+			c.addErrf(0, Pos(x), // TODO(error): better message.
 				"invalid operand %s (found %s, want list or struct)",
 				x.Source(), v.Kind())
 			return emptyNode

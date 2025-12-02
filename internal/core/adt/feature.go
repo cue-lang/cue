@@ -239,7 +239,7 @@ func LabelFromValue(c *OpContext, src Expr, v Value) Feature {
 	case IntKind, NumberKind:
 		x, _ := Unwrap(v).(*Num)
 		if x == nil {
-			c.addErrf(IncompleteError, pos(v), msgGround, v, "int")
+			c.addErrf(IncompleteError, Pos(v), msgGround, v, "int")
 			return InvalidLabel
 		}
 		t = IntLabel
@@ -268,7 +268,7 @@ func LabelFromValue(c *OpContext, src Expr, v Value) Feature {
 	case StringKind:
 		x, _ := Unwrap(v).(*String)
 		if x == nil {
-			c.addErrf(IncompleteError, pos(v), msgGround, v, "string")
+			c.addErrf(IncompleteError, Pos(v), msgGround, v, "string")
 			return InvalidLabel
 		}
 		t = StringLabel

@@ -17,8 +17,6 @@ package adt
 import (
 	"bytes"
 	"strings"
-
-	"cuelang.org/go/cue/token"
 )
 
 var checkConcrete = &ValidateConfig{
@@ -55,12 +53,7 @@ func BinOpBool(c *OpContext, node Node, op Op, left, right Value) bool {
 //
 // BinOp returns nil if not both left and right are concrete.
 func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
-	var p token.Pos
-	if node != nil {
-		if src := node.Source(); src != nil {
-			p = src.Pos()
-		}
-	}
+	p := Pos(node)
 	leftKind := left.Kind()
 	rightKind := right.Kind()
 

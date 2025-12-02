@@ -58,11 +58,7 @@ func (e *valueError) Position() token.Pos {
 	if e.err.Err != nil {
 		return e.err.Err.Position()
 	}
-	src := e.err.Source()
-	if src == nil {
-		return token.NoPos
-	}
-	return src.Pos()
+	return adt.Pos(e.err)
 }
 
 func (e *valueError) InputPositions() []token.Pos {
@@ -115,7 +111,7 @@ outer:
 		case string:
 			args := args[i+1:]
 			// Do not expand message so that errors can be localized.
-			pos := pos(src)
+			pos := adt.Pos(src)
 			if code < 0 {
 				code = 0
 			}

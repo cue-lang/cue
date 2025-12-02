@@ -206,7 +206,7 @@ func (c *OpContext) getNextDefID(n Node) defID {
 		c.positionIndex[token.NoPos] = 0
 	}
 
-	posIdx := c.internPosition(pos(n))
+	posIdx := c.internPosition(Pos(n))
 	c.containments = append(c.containments, containment{id: 0, posIndex: posIdx})
 
 	return c.nextDefID
@@ -522,7 +522,7 @@ func (v *Vertex) AddOpenConjunct(ctx *OpContext, w *Vertex) {
 // We can then say that requirement 3 (node A) holds if all fields contain
 // either label 3, or any field within 1 that is not 2.
 func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
-	if pos(x).Experiment().ExplicitOpen {
+	if Pos(x).Experiment().ExplicitOpen {
 		return id
 	}
 
@@ -550,7 +550,7 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 // definition is embedded within a struct. It can be removed if we implement
 // the #A vs #A... semantics.
 func (n *nodeContext) splitStruct(s *StructLit, id CloseInfo) CloseInfo {
-	if pos(s).Experiment().ExplicitOpen || n.ctx.OpenDef {
+	if Pos(s).Experiment().ExplicitOpen || n.ctx.OpenDef {
 		return id
 	}
 

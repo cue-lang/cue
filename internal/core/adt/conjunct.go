@@ -676,7 +676,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 	case Value: // *NullLit, *BoolLit, *NumLit, *StringLit, *BytesLit, *Builtin
 		n.unshare()
-		if p, isData := pos(v).Priority(); isData {
+		if p, isData := Pos(v).Priority(); isData {
 			id.Priority = p
 		}
 

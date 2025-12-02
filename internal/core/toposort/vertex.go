@@ -247,10 +247,8 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 			sMeta := &structMetas[metaIdx]
 			metaIdx++
 			sMeta.structInfo = s
+			sMeta.pos = adt.Pos(sl)
 
-			if src := sl.Source(); src != nil {
-				sMeta.pos = src.Pos()
-			}
 			structMetaMap(sl)[sMeta] = true
 			for _, decl := range sl.Decls {
 				structMetaMap(decl)[sMeta] = true

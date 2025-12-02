@@ -354,7 +354,7 @@ type ValueError struct {
 }
 
 func (v *ValueError) AddPosition(n Node) {
-	v.AddPos(pos(n))
+	v.AddPos(Pos(n))
 }
 
 func (c *OpContext) errNode() *Vertex {
@@ -382,7 +382,7 @@ func (c *OpContext) Newf(format string, args ...interface{}) *ValueError {
 }
 
 func appendNodePositions(a []token.Pos, n Node) []token.Pos {
-	if p := pos(n); p != token.NoPos {
+	if p := Pos(n); p != token.NoPos {
 		a = append(a, p)
 	}
 	if v, ok := n.(*Vertex); ok {

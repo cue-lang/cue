@@ -398,7 +398,7 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state Flags) Value {
 	case IntKind, FloatKind, NumberKind, StringKind, BytesKind:
 	case NullKind, StructKind, ListKind:
 		if x.Op != NotEqualOp && x.Op != EqualOp {
-			err := ctx.NewPosf(pos(x.Expr),
+			err := ctx.NewPosf(Pos(x.Expr),
 				"cannot use %s for bound %s", k, x.Op)
 			return &Bottom{
 				Err:  err,
@@ -415,7 +415,7 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state Flags) Value {
 				"non-concrete value %s for bound %s", x.Expr, x.Op)
 			return nil
 		}
-		err := ctx.NewPosf(pos(x.Expr),
+		err := ctx.NewPosf(Pos(x.Expr),
 			"invalid value %s (type %s) for bound %s", v, k, x.Op)
 		return &Bottom{
 			Err:  err,
@@ -581,7 +581,7 @@ func (x *FieldReference) Source() ast.Node {
 
 func (x *FieldReference) resolve(c *OpContext, state Flags) *Vertex {
 	n := c.relNode(x.UpCount)
-	pos := pos(x)
+	pos := Pos(x)
 	return c.lookup(n, pos, x.Label, state)
 }
 
@@ -693,7 +693,7 @@ func (x *DynamicReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	})
 	ctx.PopState(frame)
 	f := ctx.Label(x.Label, v)
-	return ctx.lookup(e.DerefVertex(ctx), pos(x), f, state)
+	return ctx.lookup(e.DerefVertex(ctx), Pos(x), f, state)
 }
 
 // An ImportReference refers to an imported package.
@@ -751,7 +751,7 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	// an expression within n, in which case evaluation must already have
 	// started.
 
-	arc := ctx.lookup(e.DerefVertex(ctx), pos(x), x.Label, state)
+	arc := ctx.lookup(e.DerefVertex(ctx), Pos(x), x.Label, state)
 	if arc == nil {
 		return nil
 	}
@@ -797,7 +797,7 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	// ensure that Comprehensions, which may be wrapped in ConjunctGroups,
 	// are eliminated.
 	_, isGroup := expr.(*ConjunctGroup)
-	ctx.Assertf(pos(expr), !isGroup, "unexpected number of expressions")
+	ctx.Assertf(Pos(expr), !isGroup, "unexpected number of expressions")
 
 	// TODO(mem): add counter for let cache usage.
 	key := cacheKey{expr, arc}
@@ -1083,7 +1083,7 @@ func (x *Interpolation) evaluate(c *OpContext, state Flags) Value {
 		err = &Bottom{
 			Code: err.Code,
 			Node: c.vertex,
-			Err:  errors.Wrapf(err.Err, pos(x), "invalid interpolation"),
+			Err:  errors.Wrapf(err.Err, Pos(x), "invalid interpolation"),
 		}
 		// c.AddBottom(err)
 		// return nil
@@ -1152,7 +1152,7 @@ func (x *UnaryExpr) evaluate(c *OpContext, state Flags) Value {
 		expectedKind = BoolKind
 	}
 	if k&expectedKind != BottomKind {
-		c.addErrf(IncompleteError, pos(x.X),
+		c.addErrf(IncompleteError, Pos(x.X),
 			"operand %s of '%s' not concrete (was %s)", x.X, op, k)
 		return nil
 	}
@@ -1419,7 +1419,7 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 	case *Builtin:
 		call.builtin = f
 		if f.RawFunc != nil {
-			if !call.builtin.checkArgs(c, pos(x), len(x.Args)) {
+			if !call.builtin.checkArgs(c, Pos(x), len(x.Args)) {
 				return nil
 			}
 			return f.RawFunc(call)
@@ -1495,7 +1495,7 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 			if c.errs == nil {
 				// There SHOULD be an error in the context. If not, we generate
 				// one.
-				c.Assertf(pos(x.Fun), c.HasErr(),
+				c.Assertf(Pos(x.Fun), c.HasErr(),
 					"argument %d to function %s is incomplete", i, x.Fun)
 			}
 
@@ -1652,7 +1652,7 @@ func (x *Builtin) call(call *CallContext) Expr {
 			if b != nil {
 				code = b.Code
 			}
-			c.addErrf(code, pos(a),
+			c.addErrf(code, Pos(a),
 				"cannot use %s (type %s) as %s in argument %d to %v",
 				a, k, x.Params[i].Kind(), i+1, fun)
 			return nil
@@ -1664,7 +1664,7 @@ func (x *Builtin) call(call *CallContext) Expr {
 			n := c.newInlineVertex(nil, nil, Conjunct{env, x, c.ci})
 			n.Finalize(c)
 			if n.IsErr() {
-				c.addErrf(0, pos(a),
+				c.addErrf(0, Pos(a),
 					"cannot use %s as %s in argument %d to %v",
 					a, v, i+1, fun)
 				return nil
@@ -1712,10 +1712,7 @@ func (x *BuiltinValidator) Source() ast.Node {
 }
 
 func (x *BuiltinValidator) Pos() token.Pos {
-	if src := x.Source(); src != nil {
-		return src.Pos()
-	}
-	return token.NoPos
+	return Pos(x)
 }
 
 func (x *BuiltinValidator) Kind() Kind {
@@ -1993,7 +1990,7 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 
 	switch nv := v.(type) {
 	case nil:
-		c.addErrf(IncompleteError, pos(x),
+		c.addErrf(IncompleteError, Pos(x),
 			"cannot range over %s (incomplete)", x)
 		return emptyNode
 
@@ -2011,12 +2008,12 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 
 	default:
 		if kind := v.Kind(); kind&(StructKind|ListKind) != 0 {
-			c.addErrf(IncompleteError, pos(x),
+			c.addErrf(IncompleteError, Pos(x),
 				"cannot range over %s (incomplete type %s)", x, kind)
 			return emptyNode
 
 		} else if !ok {
-			c.addErrf(0, pos(x), // TODO(error): better message.
+			c.addErrf(0, Pos(x), // TODO(error): better message.
 				"cannot range over %s (found %s, want list or struct)",
 				x.Source(), v.Kind())
 			return emptyNode
@@ -2027,7 +2024,7 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 	// struct or list, which is the case if it may be struct or list, but
 	// is also at least some other type, such as is the case with top.
 	if kind&(StructKind|ListKind) != 0 && kind != StructKind && kind != ListKind {
-		c.addErrf(IncompleteError, pos(x),
+		c.addErrf(IncompleteError, Pos(x),
 			"cannot range over %s (incomplete type %s)", x, kind)
 		return emptyNode
 	}

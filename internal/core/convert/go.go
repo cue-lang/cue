@@ -481,11 +481,10 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			Arcs: make([]*adt.Vertex, 0, numElems),
 		}
 
-		i := 0
 		// Note that we don't use [reflect.Value.Seq2],
 		// as it allocates more per iteration, and we don't need the index value.
 		// We can't use [reflect.Value.Seq] either, as that's just the indices.
-		for i < numElems {
+		for i := range numElems {
 			val := val.Index(i)
 			x := fromGoValue(ctx, nilIsTop, val)
 			if x == nil {
@@ -497,7 +496,6 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			list.Elems = append(list.Elems, x)
 			f := adt.MakeIntLabel(adt.IntLabel, int64(i))
 			v.Arcs = append(v.Arcs, ensureArcVertex(ctx, x, f))
-			i++
 		}
 
 		env := ctx.Env(0)

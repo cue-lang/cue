@@ -698,7 +698,8 @@ type ParenExpr struct {
 
 // A SelectorExpr node represents an expression followed by a selector.
 type SelectorExpr struct {
-	X   Expr  // expression
+	X   Expr // expression
+	Dot token.Pos
 	Sel Label // field selector
 
 	comments

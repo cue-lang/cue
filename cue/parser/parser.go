@@ -1542,6 +1542,7 @@ L:
 	for {
 		switch p.tok {
 		case token.PERIOD:
+			dot := p.pos
 			c := p.openComments()
 			c.pos = 1
 			p.next()
@@ -1549,6 +1550,7 @@ L:
 			case token.IDENT:
 				x = &ast.SelectorExpr{
 					X:   p.checkExpr(x),
+					Dot: dot,
 					Sel: p.parseIdent(),
 				}
 			case token.STRING:
@@ -1561,6 +1563,7 @@ L:
 					p.next()
 					x = &ast.SelectorExpr{
 						X:   p.checkExpr(x),
+						Dot: dot,
 						Sel: str,
 					}
 					break
@@ -1570,6 +1573,7 @@ L:
 				if p.tok.IsKeyword() {
 					x = &ast.SelectorExpr{
 						X:   p.checkExpr(x),
+						Dot: dot,
 						Sel: p.parseKeyIdent(),
 					}
 					break
@@ -1578,7 +1582,11 @@ L:
 				pos := p.pos
 				p.errorExpected(pos, "selector")
 				p.next() // make progress
-				x = &ast.SelectorExpr{X: x, Sel: &ast.Ident{NamePos: pos, Name: "_"}}
+				x = &ast.SelectorExpr{
+					X:   x,
+					Dot: dot,
+					Sel: &ast.Ident{NamePos: pos, Name: "_"},
+				}
 			}
 			c.closeNode(p, x)
 		case token.LBRACK:

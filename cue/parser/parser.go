@@ -1511,14 +1511,16 @@ L:
 	for {
 		switch p.tok {
 		case token.PERIOD:
+			period := p.pos
 			c := p.openComments()
 			c.pos = 1
 			p.next()
 			switch p.tok {
 			case token.IDENT:
 				x = &ast.SelectorExpr{
-					X:   p.checkExpr(x),
-					Sel: p.parseIdent(),
+					X:      p.checkExpr(x),
+					Period: period,
+					Sel:    p.parseIdent(),
 				}
 			case token.STRING:
 				if strings.HasPrefix(p.lit, `"`) && !strings.HasPrefix(p.lit, `""`) {
@@ -1529,8 +1531,9 @@ L:
 					}
 					p.next()
 					x = &ast.SelectorExpr{
-						X:   p.checkExpr(x),
-						Sel: str,
+						X:      p.checkExpr(x),
+						Period: period,
+						Sel:    str,
 					}
 					break
 				}
@@ -1538,8 +1541,9 @@ L:
 			default:
 				if p.tok.IsKeyword() {
 					x = &ast.SelectorExpr{
-						X:   p.checkExpr(x),
-						Sel: p.parseKeyIdent(),
+						X:      p.checkExpr(x),
+						Period: period,
+						Sel:    p.parseKeyIdent(),
 					}
 					break
 				}
@@ -1547,7 +1551,11 @@ L:
 				pos := p.pos
 				p.errorExpected(pos, "selector")
 				p.next() // make progress
-				x = &ast.SelectorExpr{X: x, Sel: &ast.Ident{NamePos: pos, Name: "_"}}
+				x = &ast.SelectorExpr{
+					X:      x,
+					Period: period,
+					Sel:    &ast.Ident{NamePos: pos, Name: "_"},
+				}
 			}
 			c.closeNode(p, x)
 		case token.LBRACK:

@@ -228,7 +228,7 @@ if true {
 		}
 		`,
 		path:    "#person.children",
-		options: o(cue.Schema(), cue.Raw()),
+		options: o(cue.Raw()),
 		out:     `[...#person]`,
 	}}
 	for _, tc := range testCases {
@@ -265,13 +265,13 @@ func TestFragment(t *testing.T) {
 	v := ctx.CompileString(in)
 	v = v.LookupPath(cue.ParsePath("#person.children"))
 
-	syntax := v.Syntax(cue.Schema(), cue.Raw()).(ast.Expr)
+	syntax := v.Syntax(cue.Raw()).(ast.Expr)
 
 	// Compile the fragment from within the scope it was derived.
 	v = ctx.BuildExpr(syntax, cue.Scope(v))
 
 	// Generate the syntax, this time as self-contained.
-	syntax = v.Syntax(cue.Schema()).(ast.Expr)
+	syntax = v.Syntax().(ast.Expr)
 	b, err := format.Node(syntax)
 	if err != nil {
 		t.Fatal(err)

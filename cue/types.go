@@ -2046,7 +2046,7 @@ func Final() Option {
 	}
 }
 
-// Schema specifies the input is a Schema. Used by Subsume.
+// Schema specifies the input is a Schema. Used only by [Value.Subsume].
 func Schema() Option {
 	return func(o *options) {
 		o.ignoreClosedness = true
@@ -2085,7 +2085,7 @@ func DisallowCycles(disallow bool) Option {
 // ErrorsAsValues treats errors as a regular value, including them at the
 // location in the tree where they occur, instead of interpreting them as a
 // configuration-wide failure that is returned instead of root value.
-// Used by Syntax.
+// Used by [Value.Syntax].
 func ErrorsAsValues(show bool) Option {
 	return func(p *options) { p.showErrors = show }
 }

@@ -169,7 +169,7 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 		n.addBottom(&Bottom{
 			Code: IncompleteError,
 			Node: n.node,
-			Err: ctx.NewPosf(pos(field.Key),
+			Err: ctx.NewPosf(Pos(field.Key),
 				"key value of dynamic field must be concrete, found %v", v),
 		})
 		return
@@ -178,7 +178,7 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 	f := ctx.Label(field.Key, v)
 	// TODO: remove this restriction.
 	if f.IsInt() {
-		n.addErr(ctx.NewPosf(pos(field.Key), "integer fields not supported"))
+		n.addErr(ctx.NewPosf(Pos(field.Key), "integer fields not supported"))
 		return
 	}
 

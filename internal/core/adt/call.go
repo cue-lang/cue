@@ -15,7 +15,6 @@
 package adt
 
 import (
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
 )
 
@@ -34,17 +33,10 @@ func (c *CallContext) OpContext() *OpContext {
 }
 
 func (c *CallContext) Pos() token.Pos {
-	var src ast.Node
-	switch {
-	case c.call != nil:
-		src = c.call.Source()
-	case c.builtin != nil:
-		src = c.builtin.Source()
+	if c.call != nil {
+		return Pos(c.call)
 	}
-	if src != nil {
-		return src.Pos()
-	}
-	return token.NoPos
+	return Pos(c.builtin)
 }
 
 func (c *CallContext) Value(i int) Value {

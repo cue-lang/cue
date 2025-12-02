@@ -397,7 +397,7 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 
 	leftDropsDefault := true
 	rightDropsDefault := true
-	priority, _ := pos(dn.src).Priority()
+	priority, _ := Pos(dn.src).Priority()
 
 	for i, p := range cross {
 		ID := n.nextCrossProduct(i, len(cross), p)
@@ -580,7 +580,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 	v.status = unprocessed
 
 	if m == isDefault {
-		c.CloseInfo.Priority, _ = pos(c.x).Priority()
+		c.CloseInfo.Priority, _ = Pos(c.x).Priority()
 	}
 	d.scheduleConjunct(c, c.CloseInfo)
 

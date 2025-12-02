@@ -628,7 +628,7 @@ func (n *nodeContext) reportFieldMismatch(
 		for _, a := range s.Decls {
 			if x, ok := a.(*Field); ok && x.Label.IsRegular() {
 				f = x.Label
-				p = pos(x)
+				p = Pos(x)
 				break
 			}
 		}

@@ -639,7 +639,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 		case a.ArcType > ArcRequired, !a.Label.IsString():
 		case n.kind&StructKind == 0:
 			if !n.node.IsErr() && !a.IsErr() {
-				n.reportFieldMismatch(pos(a.Value()), nil, a.Label, n.node.Value())
+				n.reportFieldMismatch(Pos(a.Value()), nil, a.Label, n.node.Value())
 			}
 			// case !wasVoid:
 			// case n.kind == TopKind:
@@ -702,7 +702,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 				Src:  c.expr.Source(),
 				Code: CycleError,
 				Node: n.node,
-				Err: ctx.NewPosf(pos(c.expr),
+				Err: ctx.NewPosf(Pos(c.expr),
 					"circular dependency in evaluation of conditionals: %v changed after evaluation",
 					ctx.Str(c.expr)),
 			})

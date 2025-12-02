@@ -1040,7 +1040,7 @@ func (v Value) Pos() token.Pos {
 	var p token.Pos
 	for c := range v.v.LeafConjuncts() {
 		x := c.Elem()
-		pp := pos(x)
+		pp := adt.Pos(x)
 		if pp == token.NoPos {
 			continue
 		}

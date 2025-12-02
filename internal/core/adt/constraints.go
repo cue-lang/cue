@@ -170,7 +170,7 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (r
 	case *Bottom:
 		// TODO: hoist and reuse with the identical code in optional.go.
 		if x == cycle {
-			err := ctx.NewPosf(pos(pattern), "cyclic pattern constraint")
+			err := ctx.NewPosf(Pos(pattern), "cyclic pattern constraint")
 			for c := range ctx.vertex.LeafConjuncts() {
 				addPositions(ctx, err, c)
 			}

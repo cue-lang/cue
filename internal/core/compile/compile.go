@@ -106,8 +106,7 @@ type compiler struct {
 
 	experiments cueexperiment.File
 
-	stack      []frame
-	inSelector int
+	stack []frame
 
 	// refersToForVariable tracks whether an expression refers to a key or
 	// value produced by a for comprehension embedded within a struct.
@@ -1027,7 +1026,6 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		return v
 
 	case *ast.SelectorExpr:
-		c.inSelector++
 		x := c.expr(n.X)
 		// TODO: check if x is an ImportReference, and if so, check if it a
 		// standard library, look up the builtin, and check its version. The
@@ -1037,7 +1035,6 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 			Src: n,
 			X:   x,
 			Sel: c.label(n.Sel)}
-		c.inSelector--
 		return ret
 
 	case *ast.IndexExpr:

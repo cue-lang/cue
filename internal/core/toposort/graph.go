@@ -16,6 +16,7 @@ package toposort
 
 import (
 	"cmp"
+	"maps"
 	"slices"
 
 	"cuelang.org/go/internal/core/adt"
@@ -121,11 +122,8 @@ func (builder *GraphBuilder) EnsureNode(feature adt.Feature) *Node {
 }
 
 func (builder *GraphBuilder) Build() *Graph {
-	nodesByFeature := builder.nodesByFeature
-	nodes := make(Nodes, 0, len(nodesByFeature))
-	for _, node := range nodesByFeature {
-		nodes = append(nodes, node)
-	}
+	nodes := make(Nodes, 0, len(builder.nodesByFeature))
+	nodes = slices.AppendSeq(nodes, maps.Values(builder.nodesByFeature))
 	return &Graph{nodes: nodes}
 }
 

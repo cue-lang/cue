@@ -1146,7 +1146,7 @@ func TestIncompleteSelection(t *testing.T) {
 			if sel == nil {
 				t.Fatalf("found no *SelectorExpr: %#v %s", f.Decls[0], astinternal.DebugStr(f))
 			}
-			const wantSel = "&{fmt _ {<nil>} {{}}}"
+			const wantSel = "&{fmt 1:9 _ {<nil>} {{}}}"
 			if fmt.Sprint(sel) != wantSel {
 				t.Fatalf("found selector %v, want %s", sel, wantSel)
 			}

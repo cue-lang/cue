@@ -162,9 +162,9 @@ func Positions(err error) []token.Pos {
 func comparePosWithNoPosFirst(a, b token.Pos) int {
 	if a == b {
 		return 0
-	} else if a == token.NoPos {
+	} else if !a.IsValid() {
 		return -1
-	} else if b == token.NoPos {
+	} else if !b.IsValid() {
 		return +1
 	}
 	return token.Pos.Compare(a, b)
@@ -255,7 +255,7 @@ func (e *wrapped) InputPositions() []token.Pos {
 }
 
 func (e *wrapped) Position() token.Pos {
-	if p := e.main.Position(); p != token.NoPos {
+	if p := e.main.Position(); p.IsValid() {
 		return p
 	}
 	if wrap, ok := e.wrap.(Error); ok {
@@ -422,7 +422,7 @@ func (p *list) removeMultiples() {
 func approximateEqual(a, b Error) bool {
 	aPos := a.Position()
 	bPos := b.Position()
-	if aPos == token.NoPos || bPos == token.NoPos {
+	if !aPos.IsValid() || !bPos.IsValid() {
 		return a.Error() == b.Error()
 	}
 	return aPos.Compare(bPos) == 0 && slices.Compare(a.Path(), b.Path()) == 0

@@ -382,7 +382,7 @@ func (c *OpContext) Newf(format string, args ...interface{}) *ValueError {
 }
 
 func appendNodePositions(a []token.Pos, n Node) []token.Pos {
-	if p := Pos(n); p != token.NoPos {
+	if p := Pos(n); p.IsValid() {
 		a = append(a, p)
 	}
 	if v, ok := n.(*Vertex); ok {
@@ -426,7 +426,7 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 			// level packages. This will allow the debug packages to be used
 			// more widely.
 			b, _ := cueformat.Node(x)
-			if p := x.Pos(); p != token.NoPos {
+			if p := x.Pos(); p.IsValid() {
 				a = append(a, p)
 			}
 			args[i] = string(b)

@@ -937,7 +937,7 @@ func (s *ImportSpec) pos() *token.Pos {
 }
 
 func (s *ImportSpec) End() token.Pos {
-	if s.EndPos != token.NoPos {
+	if s.EndPos.IsValid() {
 		return s.EndPos
 	}
 	return s.Path.End()
@@ -1145,7 +1145,7 @@ type Package struct {
 
 func (p *Package) Pos() token.Pos { return getPos(p) }
 func (p *Package) pos() *token.Pos {
-	if p.PackagePos != token.NoPos {
+	if p.PackagePos.IsValid() {
 		return &p.PackagePos
 	}
 	if p.Name != nil {

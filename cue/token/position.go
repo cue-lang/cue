@@ -141,9 +141,9 @@ func (p Pos) String() string {
 func (p Pos) Compare(p2 Pos) int {
 	if p == p2 {
 		return 0
-	} else if p == NoPos {
+	} else if !p.IsValid() {
 		return +1
-	} else if p2 == NoPos {
+	} else if !p2.IsValid() {
 		return -1
 	}
 	// Avoid calling [Pos.Position] as it also unpacks line and column info;
@@ -229,7 +229,6 @@ func (p Pos) Add(n int) Pos {
 // meaning either a printable file position to obtain via [Pos.Position],
 // and/or a relative position to obtain via [Pos.RelPos].
 func (p Pos) IsValid() bool {
-	// TODO(mvdan): replace manual NoPos checks with IsValid
 	return p != NoPos
 }
 
@@ -583,7 +582,7 @@ func (f *File) position(p Pos, adjusted bool) (pos Position) {
 // //line comments; otherwise those comments are ignored.
 // p must be a Pos value in f or NoPos.
 func (f *File) PositionFor(p Pos, adjusted bool) (pos Position) {
-	if p != NoPos {
+	if p.IsValid() {
 		pos = f.position(p, adjusted)
 	}
 	return

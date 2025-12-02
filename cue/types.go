@@ -1032,7 +1032,7 @@ func (v Value) Pos() token.Pos {
 	}
 
 	if src := v.Source(); src != nil {
-		if pos := src.Pos(); pos != token.NoPos {
+		if pos := src.Pos(); pos.IsValid() {
 			return pos
 		}
 	}
@@ -1041,7 +1041,7 @@ func (v Value) Pos() token.Pos {
 	for c := range v.v.LeafConjuncts() {
 		x := c.Elem()
 		pp := adt.Pos(x)
-		if pp == token.NoPos {
+		if !pp.IsValid() {
 			continue
 		}
 		p = pp

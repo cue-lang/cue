@@ -15,7 +15,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -164,7 +163,7 @@ var phantomPackageNameLength = len(phantomPackageName(""))
 // package declaration themselves.
 func IsPhantomPackage(pkgDecl *ast.Package) bool {
 	name := pkgDecl.Name
-	return name != nil && name.Pos() == token.NoPos && len(name.Name) == phantomPackageNameLength && name.Name[0] == '_'
+	return name != nil && !name.Pos().IsValid() && len(name.Name) == phantomPackageNameLength && name.Name[0] == '_'
 }
 
 // RemovePhantomPackageDecl removes any phantom package declaration

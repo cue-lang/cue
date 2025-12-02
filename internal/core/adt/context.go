@@ -859,7 +859,7 @@ func (c *OpContext) unifyNode(expr Expr, state Flags) (result Value) {
 		if b, ok := result.(*Bottom); ok {
 			if c.src != nil &&
 				b.Code == CycleError &&
-				b.Err.Position() == token.NoPos &&
+				!b.Err.Position().IsValid() &&
 				len(b.Err.InputPositions()) == 0 {
 				bb := *b
 				bb.Err = errors.Wrapf(b.Err, c.src.Pos(), "")

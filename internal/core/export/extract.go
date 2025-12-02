@@ -18,7 +18,6 @@ import (
 	"slices"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
@@ -112,10 +111,9 @@ func hasShorthandValue(f *ast.Field) bool {
 // nestedField returns the child field of a field shorthand.
 func nestedField(f *ast.Field) *ast.Field {
 	s, _ := f.Value.(*ast.StructLit)
-	if s == nil ||
-		len(s.Elts) != 1 ||
-		s.Lbrace != token.NoPos ||
-		s.Rbrace != token.NoPos {
+	if s == nil || len(s.Elts) != 1 ||
+		s.Lbrace.IsValid() ||
+		s.Rbrace.IsValid() {
 		return nil
 	}
 

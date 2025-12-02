@@ -1213,7 +1213,7 @@ func (nav *navigableBindings) recordUsage(e ast.Node, node *astNode) {
 // positions. Existing definitions for those offsets are overwritten
 // without warning.
 func (n *astNode) addDefinition(start, end token.Pos, targets []*navigableBindings) {
-	if len(targets) == 0 || start == token.NoPos || end == token.NoPos {
+	if len(targets) == 0 || !start.IsValid() || !end.IsValid() {
 		return
 	}
 
@@ -1243,7 +1243,7 @@ func (n *astNode) addDefinition(start, end token.Pos, targets []*navigableBindin
 // the existing path element so that the LSP server can send
 // completions to the client that correctly edit the existing path.
 func (n *astNode) addEmbedCompletions(start, end token.Pos, node *astNode, targets []*navigableBindings, startPos token.Pos) {
-	if (len(targets) == 0 && node == nil) || start == token.NoPos || end == token.NoPos {
+	if (len(targets) == 0 && node == nil) || !start.IsValid() || !end.IsValid() {
 		return
 	}
 
@@ -1271,7 +1271,7 @@ func (n *astNode) addEmbedCompletions(start, end token.Pos, node *astNode, targe
 // ensure that when the LSP server suggests completions to the client,
 // those completions correctly edit the existing field.
 func (n *astNode) addFieldCompletions(start, end token.Pos, targets []*navigableBindings, colonPos token.Pos) {
-	if len(targets) == 0 || start == token.NoPos || end == token.NoPos {
+	if len(targets) == 0 || !start.IsValid() || !end.IsValid() {
 		return
 	}
 
@@ -1549,7 +1549,7 @@ func (n *astNode) eval() {
 		case *fieldDeclExpr:
 			parent := n.parent
 			key := parent.key
-			if node.colonPos != token.NoPos {
+			if node.colonPos.IsValid() {
 				navs := expandNavigableViaAncestralPath(parent.navigable.parent)
 				n.addFieldCompletions(key.Pos(), key.End(), navs, node.colonPos.Add(1))
 			}

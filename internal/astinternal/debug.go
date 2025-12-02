@@ -397,7 +397,7 @@ func DebugStr(x interface{}) (out string) {
 
 	case *ast.ImportDecl:
 		out := "import "
-		if v.Lparen != token.NoPos {
+		if v.Lparen.IsValid() {
 			out += "( "
 			out += DebugStr(v.Specs)
 			out += " )"

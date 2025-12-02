@@ -286,7 +286,7 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 					refs.Ref, refs.Ref, refs.Ref.Source().Pos())
 			}
 			maps.Insert(structMetaMap(refs.Ref), maps.All(sMetas))
-			if pos := refs.Ref.Source().Pos(); pos != token.NoPos {
+			if pos := refs.Ref.Source().Pos(); pos.IsValid() {
 				for sMeta := range nodeToStructMetas[refs.Ref] {
 					sMeta.pos = pos
 				}
@@ -485,7 +485,7 @@ func (vf *vertexFeatures) addEdges(previous []adt.Feature, sMeta *structMeta) []
 				// same field within the same structLit
 				debug("    skipping 1\n")
 
-			} else if exists && !sMeta.isExplicit && sMeta.pos != token.NoPos &&
+			} else if exists && !sMeta.isExplicit && sMeta.pos.IsValid() &&
 				node.structMeta != nil &&
 				node.structMeta.pos.Filename() == filename {
 				// same field within the same file during implicit unification

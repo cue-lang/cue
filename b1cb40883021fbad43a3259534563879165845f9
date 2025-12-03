@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf89a6fe_c9d547df",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-03T11:40:26Z",
+      "side": 1,
+      "message": "yeah, I can see your point. this name was borrowed from Go, much like the rest of the API. I don\u0027t think it\u0027s a perfect name, but it\u0027s OK for now.\n\n\nin the years since, Go has sort of standardized around an IsZero method for encodings. we could possibly use that here, but \"is not zero\" is not significantly clear than \"is valid\" or \"is not no pos\" IMHO.",
+      "parentUuid": "be3e479a_cdc793ca",
+      "revId": "b1cb40883021fbad43a3259534563879165845f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06fbb8a0_a8c046f8",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-12-03T08:45:44Z",
       "side": 1,
       "message": "I know you\u0027ve just done a simple mechanical conversion here, but I would invert these two cases - it\u0027s clearer to read without the negation I think.",
+      "revId": "b1cb40883021fbad43a3259534563879165845f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb935f32_2dc2cfac",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-03T11:40:26Z",
+      "side": 1,
+      "message": "I\u0027ll do a separate patch for the sake of keeping this refactor as simple as possible - it\u0027s far too easy to mess it up and cause odd regressions which are a pain to bisect if I don\u0027t split these things up",
+      "parentUuid": "06fbb8a0_a8c046f8",
       "revId": "b1cb40883021fbad43a3259534563879165845f9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -218,18 +218,71 @@ if true {
 }
 	`,
 	}, {
-		name: "fragments",
+		name: "fragment with defaults",
 		in: `
-		// #person is a real person
 		#person: {
 			children: [...#person]
-			name: =~"^[A-Za-z0-9]+$"
-			address: string
+			age: int32
 		}
 		`,
-		path:    "#person.children",
-		options: o(cue.Raw()),
-		out:     `[...#person]`,
+		path:    "#person",
+		options: o(),
+		// TODO(mvdan): the default behavior is self-contained;
+		// why are we seeing a dangling reference to #person?
+		out: `{
+	_#def
+	_#def: {
+		children: [...#person]
+		age: int32
+	}
+}`,
+	}, {
+		name: "fragment but not self-contained",
+		in: `
+		#person: {
+			children: [...#person]
+			age: int32
+		}
+		`,
+		path:    "#person",
+		options: o(cue.SelfContained(false)),
+		out: `{
+	children: [...#person]
+	age: int32
+}`,
+	}, {
+		name: "fragment but expanded",
+		in: `
+		#person: {
+			children: [...#person]
+			age: int32
+		}
+		`,
+		path:    "#person",
+		options: o(cue.Expand(true)),
+		// TODO(mvdan): the default behavior is self-contained;
+		// why are we seeing a dangling reference to #person?
+		out: `{
+	_#def
+	_#def: {
+		children: [...#person]
+		age: int & >=-2147483648 & <=2147483647
+	}
+}`,
+	}, {
+		name: "fragment but expanded and not self-contained",
+		in: `
+		#person: {
+			children: [...#person]
+			age: int32
+		}
+		`,
+		path:    "#person",
+		options: o(cue.Expand(true), cue.SelfContained(false)), // like [cue.Raw]
+		out: `{
+	children: [...#person]
+	age: int & >=-2147483648 & <=2147483647
+}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

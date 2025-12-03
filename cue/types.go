@@ -883,16 +883,13 @@ func (v Value) appendJSON(ctx *adt.OpContext, b []byte) ([]byte, error) {
 // Syntax converts the possibly partially evaluated value into syntax. This
 // can use used to print the value with package format.
 func (v Value) Syntax(opts ...Option) ast.Node {
-	// TODO: the default should ideally be simplified representation that
-	// exactly represents the value. The latter can currently only be
-	// ensured with Raw().
 	if v.v == nil {
 		return nil
 	}
 	o := getOptions(opts)
 
 	p := export.Profile{
-		Simplify:         !o.raw,
+		Simplify:         !o.expand,
 		TakeDefaults:     o.final,
 		ShowOptional:     !o.omitOptional && !o.concrete,
 		ShowDefinitions:  !o.omitDefinitions && !o.concrete,
@@ -901,7 +898,7 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 		ShowDocs:         o.docs,
 		ShowErrors:       o.showErrors,
 		InlineImports:    o.inlineImports,
-		Fragment:         o.raw,
+		Fragment:         !o.selfContained,
 		ExpandReferences: o.concrete,
 	}
 
@@ -1811,7 +1808,7 @@ func (v Value) Subsume(w Value, opts ...Option) error {
 	case o.ignoreClosedness:
 		p = subsume.API
 	}
-	if !o.raw {
+	if !o.expand {
 		p.Defaults = true
 	}
 	ctx := v.ctx()
@@ -2015,7 +2012,8 @@ func mkPath(r *runtime.Runtime, a []Selector, v *adt.Vertex) (root *adt.Vertex, 
 
 type options struct {
 	concrete         bool // enforce that values are concrete
-	raw              bool // show original values
+	expand           bool // fully expanded syntax, e.g. int32's bounds rather than its name
+	selfContained    bool // self contained syntax, e.g. _#def embedding for closedness
 	hasHidden        bool
 	omitHidden       bool
 	omitDefinitions  bool
@@ -2090,15 +2088,41 @@ func ErrorsAsValues(show bool) Option {
 	return func(p *options) { p.showErrors = show }
 }
 
+// Expand controls whether [Value.Syntax] fully expands the value's syntax,
+// such as int32 being replaced by its bounds >=-2147483648 & <=2147483647.
+//
+// The default behavior is best for human consumption and brevity;
+// enable this option when a machine is interpreting the result.
+func Expand(expand bool) Option {
+	return func(p *options) { p.expand = expand }
+}
+
+// TODO: In the future, change the SelfContained default to false,
+// which is more intuitive for most users.
+
+// SelfContained controls whether [Value.Syntax] produces syntax which
+// accurately describes the semantics of the value in isolation,
+// such as wrapping a recursively closed value in an embedded definition,
+// and ensuring that no references are left dangling.
+//
+// When disabled, the produced syntax tree can be compiled by passing
+// the [cue.Value] from which it was generated as a [Scope].
+//
+// This option is enabled by default; use SelfContained(false) to disable it.
+func SelfContained(selfContained bool) Option {
+	return func(p *options) { p.selfContained = selfContained }
+}
+
 // Raw tells Syntax to generate the value as is without any simplifications and
 // without ensuring a value is self contained. Any references are left dangling.
-// The generated syntax tree can be compiled by passing the Value from which it
-// was generated to scope.
+// This is equivalent to Expand(true) and SelfContained(false).
 //
-// The option InlineImports overrides this option with respect to ensuring the
-// output is self contained.
+// Deprecated: use [Expand] and [SelfContained] for finer control instead.
 func Raw() Option {
-	return func(p *options) { p.raw = true }
+	return func(p *options) {
+		p.expand = true
+		p.selfContained = false
+	}
 }
 
 // All indicates that all fields and values should be included in processing
@@ -2163,6 +2187,7 @@ func Attributes(include bool) Option {
 }
 
 func getOptions(opts []Option) (o options) {
+	o.selfContained = true // on by default currently
 	o.updateOptions(opts)
 	return
 }

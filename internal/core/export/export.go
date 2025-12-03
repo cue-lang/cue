@@ -32,6 +32,7 @@ import (
 const debug = false
 
 type Profile struct {
+	// TODO(mvdan): rename to Expand to match the public API
 	Simplify bool
 
 	// Final reports incomplete errors as errors.
@@ -65,6 +66,9 @@ type Profile struct {
 	// Fragment disables printing a value as self contained. To successfully
 	// parse a fragment, the compiler needs to be given a scope with the value
 	// from which the fragment was extracted.
+	//
+	// TODO(mvdan): rename to SelfContaiend to match the public API.
+	// But how? Note that we already have a SelfContained bool above.
 	Fragment bool
 
 	// AddPackage causes a package clause to be added.

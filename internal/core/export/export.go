@@ -65,6 +65,13 @@ type Profile struct {
 	// Fragment disables printing a value as self contained. To successfully
 	// parse a fragment, the compiler needs to be given a scope with the value
 	// from which the fragment was extracted.
+	//
+	// TODO(mvdan): the public SelfContained option maps to !Fragment, which is
+	// confusing given the separate SelfContained field above. Marcel suspects
+	// Fragment and SelfContained should be joined into one option (he doesn't
+	// recall why both exist; likely a bug workaround or a slightly different
+	// use case), or that Fragment should be joined with InlineImports given
+	// the way it is implemented. Investigate and collapse these another time.
 	Fragment bool
 
 	// AddPackage causes a package clause to be added.

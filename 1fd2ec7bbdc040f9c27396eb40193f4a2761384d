@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47f08ccf_f99e1f67",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 499,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-12-03T08:33:07Z",
+      "side": 1,
+      "message": "This can surely go.",
+      "revId": "1fd2ec7bbdc040f9c27396eb40193f4a2761384d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

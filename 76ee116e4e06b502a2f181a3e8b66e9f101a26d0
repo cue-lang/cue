@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aff055cd_3309219d",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1714,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-12-03T08:36:07Z",
+      "side": 1,
+      "message": "It\u0027s a slight shame this has to exist at all.",
+      "revId": "76ee116e4e06b502a2f181a3e8b66e9f101a26d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1107,7 +1107,7 @@ func (t *trimmerV3) trim(files []*ast.File, dir string) error {
 		}
 		t.logf("%s", f.Filename)
 		t.inc()
-		astutil.Apply(f, func(c astutil.Cursor) bool {
+		astutil.ApplyN(f, func(c astutil.Cursor) bool {
 			n := c.Node()
 			d := t.nodes[n]
 

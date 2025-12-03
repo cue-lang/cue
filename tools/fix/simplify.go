@@ -22,14 +22,14 @@ import (
 
 func simplify(f *ast.File) *ast.File {
 	// Rewrite disjunctions with _ to _.
-	f = astutil.Apply(f, nil, func(c astutil.Cursor) bool {
+	f = astutil.ApplyN(f, nil, func(c astutil.Cursor) bool {
 		if x, ok := c.Node().(ast.Expr); ok {
 			if y := elideTop(x); x != y {
 				c.Replace(y)
 			}
 		}
 		return true
-	}).(*ast.File)
+	})
 
 	return f
 }

@@ -317,7 +317,7 @@ func refactorImports(f *ast.File, processImport func(importPath, ident string) (
 	identChanges := make(map[*ast.ImportSpec]string)
 	stopped := false
 	changed := false
-	astutil.Apply(f, func(c astutil.Cursor) bool {
+	astutil.ApplyN(f, func(c astutil.Cursor) bool {
 		if stopped {
 			return false
 		}

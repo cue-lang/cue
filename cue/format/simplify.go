@@ -52,7 +52,7 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl) {
 		switch x := d.(type) {
 		case *ast.Field:
 			if _, ok := x.Label.(*ast.BasicLit); ok {
-				x.Label = astutil.Apply(x.Label, nil, sc.replace).(ast.Label)
+				x.Label = astutil.ApplyN(x.Label, nil, sc.replace)
 			}
 		}
 	}

@@ -344,10 +344,10 @@ b: a
 				t.Fatal(err)
 			}
 
-			n := astutil.Apply(f, tc.before, tc.after)
+			n := astutil.ApplyN(f, tc.before, tc.after)
 			// We call Sanitize to ensure that references are patched correctly.
 			// The references are otherwise not visualized in the test output.
-			err = astutil.Sanitize(n.(*ast.File))
+			err = astutil.Sanitize(n)
 			qt.Assert(t, qt.IsNil(err))
 
 			b, err := format.Node(n)

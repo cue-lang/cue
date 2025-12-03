@@ -182,9 +182,20 @@ func (c *cursor) InsertAfter(n ast.Node)  { panic("unsupported") }
 func (c *cursor) InsertBefore(n ast.Node) { panic("unsupported") }
 func (c *cursor) Delete()                 { panic("unsupported") }
 
-// Apply traverses a syntax tree recursively, starting with root,
+// TODO(mvdan): delete Apply in late 2026,
+// at which point we could rename ApplyN to Apply once again via //go:inline.
+
+// Apply is the old and non-generic form of [ApplyN].
+//
+// Deprecated: use [ApplyN] instead, which is generic
+// and returns the same node type that was given.
+func Apply(node ast.Node, before, after func(Cursor) bool) ast.Node {
+	return ApplyN(node, before, after)
+}
+
+// ApplyN traverses a syntax tree recursively, starting with root,
 // and calling pre and post for each node as described below.
-// Apply returns the syntax tree, possibly modified.
+// ApplyN returns the syntax tree, possibly modified.
 //
 // If pre is not nil, it is called for each node before the node's
 // children are traversed (pre-order). If pre returns false, no
@@ -193,7 +204,7 @@ func (c *cursor) Delete()                 { panic("unsupported") }
 // If post is not nil, and a prior call of pre didn't return false,
 // post is called for each node after its children are traversed
 // (post-order). If post returns false, traversal is terminated and
-// Apply returns immediately.
+// ApplyN returns immediately.
 //
 // Only fields that refer to AST nodes are considered children;
 // i.e., token.Pos, Scopes, Objects, and fields of basic types
@@ -201,7 +212,7 @@ func (c *cursor) Delete()                 { panic("unsupported") }
 //
 // Children are traversed in the order in which they appear in the
 // respective node's struct definition.
-func Apply(node ast.Node, before, after func(Cursor) bool) ast.Node {
+func ApplyN[N ast.Node](node N, before, after func(Cursor) bool) N {
 	a := &applier{before: before, after: after}
 	apply(a, nil, &node)
 

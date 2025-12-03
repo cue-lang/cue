@@ -137,7 +137,7 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 	// Make sure we use the "after" function, and not the "before",
 	// because "before" will stop recursion early which creates
 	// problems with nested expressions.
-	f = astutil.Apply(f, nil, func(c astutil.Cursor) bool {
+	f = astutil.ApplyN(f, nil, func(c astutil.Cursor) bool {
 		n := c.Node()
 		switch n := n.(type) {
 		case *ast.BinaryExpr:
@@ -195,7 +195,7 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 			}
 		}
 		return true
-	}).(*ast.File)
+	})
 
 	if options.simplify {
 		f = simplify(f)
@@ -284,7 +284,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 
 	var info closeInfo
 	recloseStack := []closeInfo{}
-	result = astutil.Apply(f, func(c astutil.Cursor) bool {
+	result = astutil.ApplyN(f, func(c astutil.Cursor) bool {
 		n := c.Node()
 		switch n := n.(type) {
 		case *ast.Field:
@@ -408,7 +408,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			}
 		}
 		return true
-	}).(*ast.File)
+	})
 
 	return result, hasChanges
 }
@@ -429,7 +429,7 @@ func fixAliasV2(f *ast.File) (result *ast.File, hasChanges bool) {
 }
 
 func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
-	result = astutil.Apply(f, func(c astutil.Cursor) bool {
+	result = astutil.ApplyN(f, func(c astutil.Cursor) bool {
 		n, ok := c.Node().(*ast.Field)
 		if !ok {
 			return true
@@ -497,7 +497,7 @@ func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 			n.Value = s
 
 			// Relink referring nodes to prevent rewriting by Sanitize.
-			astutil.Apply(s, func(c astutil.Cursor) bool {
+			astutil.ApplyN(s, func(c astutil.Cursor) bool {
 				if id, ok := c.Node().(*ast.Ident); ok && id.Node == alias {
 					id.Node = letClause
 				}
@@ -505,7 +505,7 @@ func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 			}, nil)
 		}
 		return true
-	}, nil).(*ast.File)
+	}, nil)
 
 	return result, hasChanges
 }

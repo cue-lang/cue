@@ -520,7 +520,7 @@ func (h *hoister) hoist(f *ast.File) {
 		}
 	})
 
-	_ = astutil.Apply(f, func(c astutil.Cursor) bool {
+	_ = astutil.ApplyN(f, func(c astutil.Cursor) bool {
 		n := c.Node()
 		switch n.(type) {
 		case *ast.Comprehension:

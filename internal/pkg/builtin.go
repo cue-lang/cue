@@ -241,12 +241,12 @@ func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 	case string, fmt.Stringer:
 		// A string or a stringer likely used as a panic value.
 		ret = wrapCallErr(call, &adt.Bottom{
-			Err: errors.Newf(call.Pos(), "%s", err),
+			Err: errors.Newf(call.ctx.Pos(), "%s", err),
 		})
 	default:
 		// Some other value used when panicking; likely a bug.
 		ret = wrapCallErr(call, &adt.Bottom{
-			Err: errors.Newf(call.Pos(), "BUG: non-stringifiable %T", err),
+			Err: errors.Newf(call.ctx.Pos(), "BUG: non-stringifiable %T", err),
 		})
 	}
 	return ret

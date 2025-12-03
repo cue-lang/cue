@@ -48,7 +48,7 @@ func (c *CallCtxt) errf(underlying error, format string, args ...interface{}) {
 	case error:
 		errs = errors.Promote(x, "")
 	}
-	vErr := c.ctx.NewPosf(c.Pos(), format, args...)
+	vErr := c.ctx.NewPosf(c.ctx.Pos(), format, args...)
 	c.Err = &callError{&adt.Bottom{Code: code, Err: errors.Wrap(vErr, errs)}}
 }
 

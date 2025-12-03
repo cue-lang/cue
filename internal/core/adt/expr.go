@@ -1711,10 +1711,6 @@ func (x *BuiltinValidator) Source() ast.Node {
 	return x.Src.Source()
 }
 
-func (x *BuiltinValidator) Pos() token.Pos {
-	return Pos(x)
-}
-
 func (x *BuiltinValidator) Kind() Kind {
 	return x.Builtin.Params[0].Kind()
 }

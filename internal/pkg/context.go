@@ -22,7 +22,6 @@ import (
 	"github.com/cockroachdb/apd/v3"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/value"
 )
@@ -36,10 +35,6 @@ type CallCtxt struct {
 	Ret     any
 
 	args []adt.Value
-}
-
-func (c *CallCtxt) Pos() token.Pos {
-	return c.ctx.Pos()
 }
 
 func (c *CallCtxt) Name() string {

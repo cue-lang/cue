@@ -489,7 +489,7 @@ func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 
 	for _, v := range a {
 		switch {
-		case v.Null() == nil:
+		case v.IsNull():
 			// TODO: for JSON schema, we need to fall through.
 			nullable = true
 

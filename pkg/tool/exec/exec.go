@@ -46,7 +46,7 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	// TODO: set environment variables, if defined.
 	stream := func(name string) (stream cue.Value, ok bool) {
 		c := ctx.Obj.LookupPath(cue.ParsePath(name))
-		if err := c.Null(); c.Err() != nil || err == nil {
+		if c.Err() != nil || c.IsNull() {
 			return
 		}
 		return c, true

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be3e479a_cdc793ca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-12-03T08:45:44Z",
+      "side": 1,
+      "message": "My only slight quibble is that I don\u0027t really like the method name `IsValid`. `NoPos` is not _invalid_, it\u0027s just it doesn\u0027t exist in any known source. Still, I don\u0027t think I can come up with a better name right now.",
+      "revId": "b1cb40883021fbad43a3259534563879165845f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06fbb8a0_a8c046f8",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-12-03T08:45:44Z",
+      "side": 1,
+      "message": "I know you\u0027ve just done a simple mechanical conversion here, but I would invert these two cases - it\u0027s clearer to read without the negation I think.",
+      "revId": "b1cb40883021fbad43a3259534563879165845f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

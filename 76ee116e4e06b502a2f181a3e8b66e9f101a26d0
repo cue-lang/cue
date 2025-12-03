@@ -16,6 +16,24 @@
       "message": "It\u0027s a slight shame this has to exist at all.",
       "revId": "76ee116e4e06b502a2f181a3e8b66e9f101a26d0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c365c94c_b4e5477a",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1714,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-03T11:40:26Z",
+      "side": 1,
+      "message": "I was thinking the same. I\u0027ll see if they can be removed in a separate patch.",
+      "parentUuid": "aff055cd_3309219d",
+      "revId": "76ee116e4e06b502a2f181a3e8b66e9f101a26d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

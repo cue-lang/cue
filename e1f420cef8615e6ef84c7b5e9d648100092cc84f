@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2235fb19_020ce093",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2112,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-04T14:31:20Z",
+      "side": 1,
+      "message": "better names we came up with with Marcel: PreserveSemantics, ContextFree",
+      "revId": "e1f420cef8615e6ef84c7b5e9d648100092cc84f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0ff9e33_032881ac",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-04T14:31:20Z",
+      "side": 1,
+      "message": "Marcel says: we probably do want to join SelfContained and Fragment. he doesn\u0027t remember why he added both. probably working around a bug or trying to get a slightly different behavior for a use case.\n\n\n(or join SelfContained with InlineImports, given the way it is implemented)",
+      "revId": "e1f420cef8615e6ef84c7b5e9d648100092cc84f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

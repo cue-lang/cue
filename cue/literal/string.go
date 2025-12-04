@@ -84,7 +84,7 @@ func ParseQuotes(start, end string) (q QuoteInfo, nStart, nEnd int, err error) {
 	switch s[0] {
 	case '"', '\'':
 		q.char = s[0]
-		if len(s) > 3 && s[1] == s[0] && s[2] == s[0] {
+		if len(s) > 3 && s[1] == q.char && s[2] == q.char && s[3] != '#' {
 			switch s[3] {
 			case '\n':
 				q.quote = start[:3+q.numHash]

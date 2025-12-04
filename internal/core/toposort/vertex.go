@@ -229,30 +229,23 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 		return m
 	}
 
-	totalMetas := 0
-	for _, s := range structInfos {
-		totalMetas += 1 + s.Repeats
-	}
-	structMetas := make([]structMeta, totalMetas)
+	structMetas := make([]structMeta, len(structInfos))
 
 	// Create all the structMetas and map to them from a StructInfo's
 	// StructLit, and all its internal Decls. Initial attempt at
 	// recording a position, which will be correct only for direct use
 	// of literal structs in the calculation of vertex v.
-	// For each StructInfo, create (1 + Repeats) copies of its structMeta.
 	metaIdx := 0
 	for _, s := range structInfos {
 		sl := s.StructLit
-		for range 1 + s.Repeats {
-			sMeta := &structMetas[metaIdx]
-			metaIdx++
-			sMeta.structInfo = s
-			sMeta.pos = adt.Pos(sl)
+		sMeta := &structMetas[metaIdx]
+		metaIdx++
+		sMeta.structInfo = s
+		sMeta.pos = adt.Pos(sl)
 
-			structMetaMap(sl)[sMeta] = true
-			for _, decl := range sl.Decls {
-				structMetaMap(decl)[sMeta] = true
-			}
+		structMetaMap(sl)[sMeta] = true
+		for _, decl := range sl.Decls {
+			structMetaMap(decl)[sMeta] = true
 		}
 	}
 
@@ -412,12 +405,14 @@ func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
 	var batch structMetaBatch
 	for i := range roots {
 		root := &roots[i]
-		if len(batch) == 0 ||
-			(batch[0].pos == root.pos && !root.hasDynamic(dynFieldsMap)) {
-			batch = append(batch, root)
-		} else {
-			batches.appendBatch(batch)
-			batch = structMetaBatch{root}
+		for range 1 + root.structInfo.Repeats {
+			if len(batch) == 0 ||
+				(batch[0].pos == root.pos && !root.hasDynamic(dynFieldsMap)) {
+				batch = append(batch, root)
+			} else {
+				batches.appendBatch(batch)
+				batch = structMetaBatch{root}
+			}
 		}
 	}
 	batches.appendBatch(batch)

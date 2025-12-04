@@ -151,7 +151,7 @@ func (n *nodeContext) validateValue(state vertexStatus) {
 	// TODO: verify and simplify the below code to determine whether
 	// something is a struct.
 	markStruct := false
-	if n.aStruct != nil {
+	if n.aStruct {
 		markStruct = true
 	} else if len(n.node.Structs) > 0 {
 		// TODO: do something more principled here.
@@ -458,8 +458,7 @@ type nodeContextState struct {
 	scalar   Value // TODO: use Value in node.
 	scalarID CloseInfo
 
-	aStruct   Expr
-	aStructID CloseInfo
+	aStruct bool // TODO: eventually replace with kind & StructKind
 
 	// List fields
 	listIsClosed bool

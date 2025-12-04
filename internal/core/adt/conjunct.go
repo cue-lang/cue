@@ -231,8 +231,7 @@ loop1:
 		switch x := d.(type) {
 		case *Field:
 			if x.Label.IsString() && x.ArcType == ArcMember {
-				n.aStruct = s
-				n.aStructID = ci
+				n.aStruct = true
 				n.updateNodeType(StructKind, s, ci)
 			}
 			ci := n.ctx.subField(ci)
@@ -260,8 +259,7 @@ loop1:
 		case *DynamicField:
 			ci := n.ctx.subField(ci)
 			if x.ArcType == ArcMember {
-				n.aStruct = s
-				n.aStructID = ci
+				n.aStruct = true
 				n.updateNodeType(StructKind, s, ci)
 			}
 			n.scheduleTask(handleDynamic, childEnv, x, ci)
@@ -285,8 +283,7 @@ loop1:
 		n.updateConjunctInfo(TopKind, ci, cHasEllipsis)
 	}
 	if !hasEmbed {
-		n.aStruct = s
-		n.aStructID = ci
+		n.aStruct = true
 		n.updateNodeType(StructKind, s, ci)
 	}
 }
@@ -465,8 +462,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			}
 		}
 		if _, ok := x.BaseValue.(*StructMarker); ok {
-			n.aStruct = x
-			n.aStructID = id
+			n.aStruct = true
 			n.updateNodeType(StructKind, x, id)
 		}
 

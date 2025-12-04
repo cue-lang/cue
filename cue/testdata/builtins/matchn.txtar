@@ -1390,7 +1390,7 @@ Result:
 }
 -- out/evalalpha --
 Errors:
-closedByDefinition.err5.out.exports: conflicting values null and {exp1:"./main-module.js"} (mismatched types null and struct):
+closedByDefinition.err5.out.exports: conflicting values {exp1:"./main-module.js"} and null (mismatched types struct and null):
     ./closedness.cue:80:13
     ./closedness.cue:80:24
     ./closedness.cue:85:7
@@ -1408,7 +1408,7 @@ closedByDefinition.err5.out.exports.exp1: conflicting values "./main-module.js" 
     ./closedness.cue:82:26
     ./closedness.cue:85:7
     ./closedness.cue:86:18
-explicitClose.err1.out.a: conflicting values "all" and {baz:"notAllowed"} (mismatched types string and struct):
+explicitClose.err1.out.a: conflicting values {baz:"notAllowed"} and "all" (mismatched types struct and string):
     ./closedness.cue:32:11
     ./closedness.cue:32:12
     ./closedness.cue:33:6
@@ -1435,7 +1435,7 @@ match.singleErr.a: conflicting values "foo" and int (mismatched types string and
     ./in.cue:4:5
     ./in.cue:8:28
     ./in.cue:10:16
-openArguments.err2.out.a: conflicting values null and {allowed:"once"} (mismatched types null and struct):
+openArguments.err2.out.a: conflicting values {allowed:"once"} and null (mismatched types struct and null):
     ./closedness.cue:20:11
     ./closedness.cue:20:12
     ./closedness.cue:21:13
@@ -1646,7 +1646,7 @@ Result:
       out: (_|_){
         // [eval]
         a: (_|_){
-          // [eval] openArguments.err2.out.a: conflicting values null and {allowed:"once"} (mismatched types null and struct):
+          // [eval] openArguments.err2.out.a: conflicting values {allowed:"once"} and null (mismatched types struct and null):
           //     ./closedness.cue:20:11
           //     ./closedness.cue:20:12
           //     ./closedness.cue:21:13
@@ -1679,7 +1679,7 @@ Result:
       out: (_|_){
         // [eval]
         a: (_|_){
-          // [eval] explicitClose.err1.out.a: conflicting values "all" and {baz:"notAllowed"} (mismatched types string and struct):
+          // [eval] explicitClose.err1.out.a: conflicting values {baz:"notAllowed"} and "all" (mismatched types struct and string):
           //     ./closedness.cue:32:11
           //     ./closedness.cue:32:12
           //     ./closedness.cue:33:6
@@ -1840,7 +1840,7 @@ Result:
       out: (_|_){
         // [eval]
         exports: (_|_){
-          // [eval] closedByDefinition.err5.out.exports: conflicting values null and {exp1:"./main-module.js"} (mismatched types null and struct):
+          // [eval] closedByDefinition.err5.out.exports: conflicting values {exp1:"./main-module.js"} and null (mismatched types struct and null):
           //     ./closedness.cue:80:13
           //     ./closedness.cue:80:24
           //     ./closedness.cue:85:7
@@ -2384,6 +2384,31 @@ Result:
 diff old new
 --- old
 +++ new
+@@ -1,5 +1,5 @@
+ Errors:
+-closedByDefinition.err5.out.exports: conflicting values null and {exp1:"./main-module.js"} (mismatched types null and struct):
++closedByDefinition.err5.out.exports: conflicting values {exp1:"./main-module.js"} and null (mismatched types struct and null):
+     ./closedness.cue:80:13
+     ./closedness.cue:80:24
+     ./closedness.cue:85:7
+@@ -17,7 +17,7 @@
+     ./closedness.cue:82:26
+     ./closedness.cue:85:7
+     ./closedness.cue:86:18
+-explicitClose.err1.out.a: conflicting values "all" and {baz:"notAllowed"} (mismatched types string and struct):
++explicitClose.err1.out.a: conflicting values {baz:"notAllowed"} and "all" (mismatched types struct and string):
+     ./closedness.cue:32:11
+     ./closedness.cue:32:12
+     ./closedness.cue:33:6
+@@ -44,7 +44,7 @@
+     ./in.cue:4:5
+     ./in.cue:8:28
+     ./in.cue:10:16
+-openArguments.err2.out.a: conflicting values null and {allowed:"once"} (mismatched types null and struct):
++openArguments.err2.out.a: conflicting values {allowed:"once"} and null (mismatched types struct and null):
+     ./closedness.cue:20:11
+     ./closedness.cue:20:12
+     ./closedness.cue:21:13
 @@ -61,10 +61,6 @@
      ./closedness.cue:36:6
  explicitClose.err1.out.a.baz: field not allowed:
@@ -2395,6 +2420,33 @@ diff old new
      ./closedness.cue:36:11
  closedByDefinition.err5.out.exports: invalid value {exp1:"./main-module.js"} (does not satisfy matchN): 0 matched, expected 1:
      ./closedness.cue:80:13
+@@ -259,7 +255,7 @@
+       out: (_|_){
+         // [eval]
+         a: (_|_){
+-          // [eval] openArguments.err2.out.a: conflicting values null and {allowed:"once"} (mismatched types null and struct):
++          // [eval] openArguments.err2.out.a: conflicting values {allowed:"once"} and null (mismatched types struct and null):
+           //     ./closedness.cue:20:11
+           //     ./closedness.cue:20:12
+           //     ./closedness.cue:21:13
+@@ -292,7 +288,7 @@
+       out: (_|_){
+         // [eval]
+         a: (_|_){
+-          // [eval] explicitClose.err1.out.a: conflicting values "all" and {baz:"notAllowed"} (mismatched types string and struct):
++          // [eval] explicitClose.err1.out.a: conflicting values {baz:"notAllowed"} and "all" (mismatched types struct and string):
+           //     ./closedness.cue:32:11
+           //     ./closedness.cue:32:12
+           //     ./closedness.cue:33:6
+@@ -453,7 +449,7 @@
+       out: (_|_){
+         // [eval]
+         exports: (_|_){
+-          // [eval] closedByDefinition.err5.out.exports: conflicting values null and {exp1:"./main-module.js"} (mismatched types null and struct):
++          // [eval] closedByDefinition.err5.out.exports: conflicting values {exp1:"./main-module.js"} and null (mismatched types struct and null):
+           //     ./closedness.cue:80:13
+           //     ./closedness.cue:80:24
+           //     ./closedness.cue:85:7
 @@ -975,8 +971,8 @@
          run?: (string){ string }
        }

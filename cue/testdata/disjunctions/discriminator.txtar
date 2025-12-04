@@ -117,12 +117,12 @@ byKind.nullableList.out.0.0.0: conflicting values "not an int" and null (mismatc
     ./in.cue:69:8
     ./in.cue:69:19
 byKind.nullableStructOptional.out.f1: 6 errors in empty disjunction:
-byKind.nullableStructOptional.out.f1: conflicting values null and {f2:{f3:"not an int"}} (mismatched types null and struct):
+byKind.nullableStructOptional.out.f1: conflicting values {f2:{f3:"not an int"}} and null (mismatched types struct and null):
     ./in.cue:55:16
     ./in.cue:60:8
     ./in.cue:60:21
 byKind.nullableStructOptional.out.f1.f2: 4 errors in empty disjunction:
-byKind.nullableStructOptional.out.f1.f2: conflicting values null and {f3:"not an int"} (mismatched types null and struct):
+byKind.nullableStructOptional.out.f1.f2: conflicting values {f3:"not an int"} and null (mismatched types struct and null):
     ./in.cue:55:23
     ./in.cue:56:16
     ./in.cue:60:8
@@ -141,12 +141,12 @@ byKind.nullableStructOptional.out.f1.f2.f3: conflicting values "not an int" and 
     ./in.cue:60:8
     ./in.cue:60:29
 byKind.nullableStructRegular.out.f1: 6 errors in empty disjunction:
-byKind.nullableStructRegular.out.f1: conflicting values null and {f2:{f3:"not an int"}} (mismatched types null and struct):
+byKind.nullableStructRegular.out.f1: conflicting values {f2:{f3:"not an int"}} and null (mismatched types struct and null):
     ./in.cue:37:15
     ./in.cue:42:8
     ./in.cue:42:21
 byKind.nullableStructRegular.out.f1.f2: 4 errors in empty disjunction:
-byKind.nullableStructRegular.out.f1.f2: conflicting values null and {f3:"not an int"} (mismatched types null and struct):
+byKind.nullableStructRegular.out.f1.f2: conflicting values {f3:"not an int"} and null (mismatched types struct and null):
     ./in.cue:37:22
     ./in.cue:38:15
     ./in.cue:42:8
@@ -165,12 +165,12 @@ byKind.nullableStructRegular.out.f1.f2.f3: conflicting values "not an int" and n
     ./in.cue:42:8
     ./in.cue:42:29
 byKind.nullableStructRequired.out.f1: 6 errors in empty disjunction:
-byKind.nullableStructRequired.out.f1: conflicting values null and {f2:{f3:"not an int"}} (mismatched types null and struct):
+byKind.nullableStructRequired.out.f1: conflicting values {f2:{f3:"not an int"}} and null (mismatched types struct and null):
     ./in.cue:46:16
     ./in.cue:51:8
     ./in.cue:51:21
 byKind.nullableStructRequired.out.f1.f2: 4 errors in empty disjunction:
-byKind.nullableStructRequired.out.f1.f2: conflicting values null and {f3:"not an int"} (mismatched types null and struct):
+byKind.nullableStructRequired.out.f1.f2: conflicting values {f3:"not an int"} and null (mismatched types struct and null):
     ./in.cue:46:23
     ./in.cue:47:16
     ./in.cue:51:8
@@ -341,12 +341,12 @@ Result:
         // [eval]
         f1: (_|_){
           // [eval] byKind.nullableStructRegular.out.f1: 6 errors in empty disjunction:
-          // byKind.nullableStructRegular.out.f1: conflicting values null and {f2:{f3:"not an int"}} (mismatched types null and struct):
+          // byKind.nullableStructRegular.out.f1: conflicting values {f2:{f3:"not an int"}} and null (mismatched types struct and null):
           //     ./in.cue:37:15
           //     ./in.cue:42:8
           //     ./in.cue:42:21
           // byKind.nullableStructRegular.out.f1.f2: 4 errors in empty disjunction:
-          // byKind.nullableStructRegular.out.f1.f2: conflicting values null and {f3:"not an int"} (mismatched types null and struct):
+          // byKind.nullableStructRegular.out.f1.f2: conflicting values {f3:"not an int"} and null (mismatched types struct and null):
           //     ./in.cue:37:22
           //     ./in.cue:38:15
           //     ./in.cue:42:8
@@ -391,12 +391,12 @@ Result:
         // [eval]
         f1: (_|_){
           // [eval] byKind.nullableStructRequired.out.f1: 6 errors in empty disjunction:
-          // byKind.nullableStructRequired.out.f1: conflicting values null and {f2:{f3:"not an int"}} (mismatched types null and struct):
+          // byKind.nullableStructRequired.out.f1: conflicting values {f2:{f3:"not an int"}} and null (mismatched types struct and null):
           //     ./in.cue:46:16
           //     ./in.cue:51:8
           //     ./in.cue:51:21
           // byKind.nullableStructRequired.out.f1.f2: 4 errors in empty disjunction:
-          // byKind.nullableStructRequired.out.f1.f2: conflicting values null and {f3:"not an int"} (mismatched types null and struct):
+          // byKind.nullableStructRequired.out.f1.f2: conflicting values {f3:"not an int"} and null (mismatched types struct and null):
           //     ./in.cue:46:23
           //     ./in.cue:47:16
           //     ./in.cue:51:8
@@ -441,12 +441,12 @@ Result:
         // [eval]
         f1: (_|_){
           // [eval] byKind.nullableStructOptional.out.f1: 6 errors in empty disjunction:
-          // byKind.nullableStructOptional.out.f1: conflicting values null and {f2:{f3:"not an int"}} (mismatched types null and struct):
+          // byKind.nullableStructOptional.out.f1: conflicting values {f2:{f3:"not an int"}} and null (mismatched types struct and null):
           //     ./in.cue:55:16
           //     ./in.cue:60:8
           //     ./in.cue:60:21
           // byKind.nullableStructOptional.out.f1.f2: 4 errors in empty disjunction:
-          // byKind.nullableStructOptional.out.f1.f2: conflicting values null and {f3:"not an int"} (mismatched types null and struct):
+          // byKind.nullableStructOptional.out.f1.f2: conflicting values {f3:"not an int"} and null (mismatched types struct and null):
           //     ./in.cue:55:23
           //     ./in.cue:56:16
           //     ./in.cue:60:8

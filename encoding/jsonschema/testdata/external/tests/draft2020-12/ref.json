@@ -858,7 +858,7 @@
 				"data": 5,
 				"valid": true,
 				"skip": {
-					"v3-roundtrip": "conflicting values 5 and {...} (mismatched types int and struct):\n    instance.json:1:1\ncannot use 5 (type _|_) as _ in argument 1 to matchN:\n    instance.json:1:1\n"
+					"v3-roundtrip": "conflicting values 5 and {...} (mismatched types int and struct):\n    instance.json:1:1\n"
 				}
 			},
 			{

@@ -15,24 +15,24 @@ foo: foo
 -- out/evalalpha --
 Errors:
 2 errors in empty disjunction:
-conflicting values 25 and {foo:(25|44)} (mismatched types int and struct):
-    ./in.cue:1:6
+conflicting values {foo:{foo:(25|44)},foo,foo:foo} and 25 (mismatched types struct and int):
+    ./in.cue:1:1
     ./in.cue:1:11
     ./in.cue:2:1
-conflicting values 44 and {foo:(25|44)} (mismatched types int and struct):
-    ./in.cue:1:6
+conflicting values {foo:{foo:(25|44)},foo,foo:foo} and 44 (mismatched types struct and int):
+    ./in.cue:1:1
     ./in.cue:1:16
     ./in.cue:2:1
 
 Result:
 (_|_){
   // [eval] 2 errors in empty disjunction:
-  // conflicting values 25 and {foo:(25|44)} (mismatched types int and struct):
-  //     ./in.cue:1:6
+  // conflicting values {foo:{foo:(25|44)},foo,foo:foo} and 25 (mismatched types struct and int):
+  //     ./in.cue:1:1
   //     ./in.cue:1:11
   //     ./in.cue:2:1
-  // conflicting values 44 and {foo:(25|44)} (mismatched types int and struct):
-  //     ./in.cue:1:6
+  // conflicting values {foo:{foo:(25|44)},foo,foo:foo} and 44 (mismatched types struct and int):
+  //     ./in.cue:1:1
   //     ./in.cue:1:16
   //     ./in.cue:2:1
   foo: (struct){

@@ -861,24 +861,7 @@ outer:
 // TODO: this could be done much more cleanly if we are more deligent in early
 // evaluation.
 func isEqualNodeValue(x, y *nodeContext) bool {
-	xk := x.kind
-	yk := y.kind
-
-	// If a node is mid evaluation, the kind might not be actual if the type is
-	// a struct, as whether a struct is a struct kind or an embedded type is
-	// determined later. This is just a limitation of the current
-	// implementation, we should update the kind more directly so that this code
-	// is not necessary.
-	// TODO: verify that this is still necessary and if so fix it so that this
-	// can be removed.
-	if x.aStruct != nil {
-		xk &= StructKind
-	}
-	if y.aStruct != nil {
-		yk &= StructKind
-	}
-
-	if xk != yk {
+	if x.kind != y.kind {
 		return false
 	}
 	if x.hasTop != y.hasTop {

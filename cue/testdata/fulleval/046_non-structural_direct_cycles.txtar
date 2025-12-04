@@ -27,7 +27,7 @@ Conjuncts:    10
 Disjuncts:    8
 -- out/evalalpha --
 Errors:
-c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
+c2: conflicting values {bar:1} and 1 (mismatched types struct and int):
     ./in.cue:2:5
     ./in.cue:2:16
     ./in.cue:2:21
@@ -42,7 +42,7 @@ Result:
     baz: (int){ 2 }
   }
   c2: (_|_){
-    // [eval] c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
+    // [eval] c2: conflicting values {bar:1} and 1 (mismatched types struct and int):
     //     ./in.cue:2:5
     //     ./in.cue:2:16
     //     ./in.cue:2:21
@@ -54,16 +54,22 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,6 +2,7 @@
- c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
+@@ -1,7 +1,8 @@
+ Errors:
+-c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
++c2: conflicting values {bar:1} and 1 (mismatched types struct and int):
      ./in.cue:2:5
      ./in.cue:2:16
 +    ./in.cue:2:21
  
  Result:
  (_|_){
-@@ -16,6 +17,8 @@
-     // [eval] c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
+@@ -13,9 +14,11 @@
+     baz: (int){ 2 }
+   }
+   c2: (_|_){
+-    // [eval] c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
++    // [eval] c2: conflicting values {bar:1} and 1 (mismatched types struct and int):
      //     ./in.cue:2:5
      //     ./in.cue:2:16
 -    bar: (int){ 1 }

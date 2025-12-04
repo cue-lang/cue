@@ -397,7 +397,7 @@ f.val: conflicting values 3 and string (mismatched types int and string):
     ./in.cue:15:4
     ./in.cue:15:27
 issue3606.data: 2 errors in empty disjunction:
-issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+issue3606.data: conflicting values {notAllowed:true} and string (mismatched types struct and string):
     ./dependencies.cue:2:8
     ./dependencies.cue:4:6
     ./dependencies.cue:6:6
@@ -411,7 +411,7 @@ Result:
     // [eval]
     data: (_|_){
       // [eval] issue3606.data: 2 errors in empty disjunction:
-      // issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+      // issue3606.data: conflicting values {notAllowed:true} and string (mismatched types struct and string):
       //     ./dependencies.cue:2:8
       //     ./dependencies.cue:4:6
       //     ./dependencies.cue:6:6
@@ -877,9 +877,12 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -11,11 +11,10 @@
+@@ -9,13 +9,12 @@
+     ./in.cue:15:4
+     ./in.cue:15:27
  issue3606.data: 2 errors in empty disjunction:
- issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+-issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
++issue3606.data: conflicting values {notAllowed:true} and string (mismatched types struct and string):
      ./dependencies.cue:2:8
 +    ./dependencies.cue:4:6
      ./dependencies.cue:6:6
@@ -890,9 +893,12 @@ diff old new
  
  Result:
  (_|_){
-@@ -26,17 +25,11 @@
+@@ -24,19 +23,13 @@
+     // [eval]
+     data: (_|_){
        // [eval] issue3606.data: 2 errors in empty disjunction:
-       // issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+-      // issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
++      // issue3606.data: conflicting values {notAllowed:true} and string (mismatched types struct and string):
        //     ./dependencies.cue:2:8
 +      //     ./dependencies.cue:4:6
        //     ./dependencies.cue:6:6

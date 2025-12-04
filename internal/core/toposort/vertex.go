@@ -270,8 +270,9 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 				continue
 			}
 			if src := field.Source(); src != nil {
+				pos := src.Pos()
 				for sMeta := range sMetas {
-					sMeta.pos = src.Pos()
+					sMeta.pos = pos
 				}
 			}
 			refs := c.CloseInfo.CycleInfo.Refs

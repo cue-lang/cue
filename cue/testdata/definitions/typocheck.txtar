@@ -641,7 +641,7 @@ Notifications: 7
 
 NumCloseIDs: 440
 
-ConjunctInfos:       1118
+ConjunctInfos:       1132
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2
@@ -674,7 +674,7 @@ diff old new
 +
 +NumCloseIDs: 440
 +
-+ConjunctInfos:       1118
++ConjunctInfos:       1132
 +MaxConjunctInfos:    5
 +MaxReqSets:          9
 +MaxRedirect:         2
@@ -1958,12 +1958,12 @@ Result:
         out: (#struct){
           b1: (_|_){
             // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
-            // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
+            // disjunction.withErr.t1.out.b1: conflicting values {b2:{b3:params.mayExistLater}} and null (mismatched types struct and null):
             //     ./validators.cue:32:7
             //     ./validators.cue:33:7
             //     ./validators.cue:35:17
             // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
-            // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
+            // disjunction.withErr.t1.out.b1.b2: conflicting values {b3:params.mayExistLater} and null (mismatched types struct and null):
             //     ./validators.cue:32:7
             //     ./validators.cue:33:11
             //     ./validators.cue:35:24
@@ -2792,15 +2792,18 @@ diff old new
        }
      }
      out: (#struct){
-@@ -1415,25 +1266,19 @@
+@@ -1414,26 +1265,20 @@
+         out: (#struct){
            b1: (_|_){
              // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
-             // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
+-            // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
++            // disjunction.withErr.t1.out.b1: conflicting values {b2:{b3:params.mayExistLater}} and null (mismatched types struct and null):
 +            //     ./validators.cue:32:7
              //     ./validators.cue:33:7
              //     ./validators.cue:35:17
              // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
-             // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
+-            // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
++            // disjunction.withErr.t1.out.b1.b2: conflicting values {b3:params.mayExistLater} and null (mismatched types struct and null):
 +            //     ./validators.cue:32:7
              //     ./validators.cue:33:11
 +            //     ./validators.cue:35:24

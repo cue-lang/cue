@@ -272,10 +272,6 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 	}
 	n.updateScalar()
 
-	if n.aStruct != nil {
-		n.updateNodeType(StructKind, n.aStruct, n.aStructID)
-	}
-
 	// First process all but the subfields.
 	switch {
 	case n.meets(nodeOnlyNeeds):

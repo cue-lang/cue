@@ -82,6 +82,7 @@ func TestUnquote(t *testing.T) {
 		{"##'''\n\t\tHello\\#v\n\t\t'''##", "Hello\\#v", nil},
 		{`#"""` + "\n\t\t\\#r\n\t\t" + `"""#`, "\r", nil},
 		{`#""#`, "", nil},
+		{`#"""#`, `"`, nil},
 		{`#" ""#`, ` "`, nil},
 		{`#" """#`, ` ""`, nil},
 		{`##" """# "##`, ` """# `, nil},
@@ -111,9 +112,6 @@ func TestUnquote(t *testing.T) {
 		{`#"Hello'#`, "", errUnmatchedQuote},
 		{`#""" """#`, "", errMissingNewline},
 		{`"""` + "\r\n\tHello \\\r", "", errUnmatchedQuote},
-
-		// TODO: should this be legal?
-		{`#"""#`, "", errMissingNewline},
 	}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%s", i, tc.in), func(t *testing.T) {

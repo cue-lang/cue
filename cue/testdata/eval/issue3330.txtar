@@ -48,10 +48,10 @@ Disjuncts:    46
 -- out/evalalpha --
 Errors:
 eliminated.x: 2 errors in empty disjunction:
-eliminated.x: conflicting values null and {} (mismatched types null and struct):
-    ./in.cue:21:10
+eliminated.x: conflicting values {n:3} and null (mismatched types struct and null):
     ./in.cue:22:5
     ./in.cue:23:5
+    ./in.cue:23:14
 eliminated.x.n: field not allowed:
     ./in.cue:22:14
     ./in.cue:23:16
@@ -77,10 +77,10 @@ Result:
     }
     x: (_|_){
       // [eval] eliminated.x: 2 errors in empty disjunction:
-      // eliminated.x: conflicting values null and {} (mismatched types null and struct):
-      //     ./in.cue:21:10
+      // eliminated.x: conflicting values {n:3} and null (mismatched types struct and null):
       //     ./in.cue:22:5
       //     ./in.cue:23:5
+      //     ./in.cue:23:14
       // eliminated.x.n: field not allowed:
       //     ./in.cue:22:14
       //     ./in.cue:23:16
@@ -88,10 +88,10 @@ Result:
     }
     out: (_|_){
       // [eval] eliminated.x: 2 errors in empty disjunction:
-      // eliminated.x: conflicting values null and {} (mismatched types null and struct):
-      //     ./in.cue:21:10
+      // eliminated.x: conflicting values {n:3} and null (mismatched types struct and null):
       //     ./in.cue:22:5
       //     ./in.cue:23:5
+      //     ./in.cue:23:14
       // eliminated.x.n: field not allowed:
       //     ./in.cue:22:14
       //     ./in.cue:23:16
@@ -122,11 +122,10 @@ diff old new
  Errors:
  eliminated.x: 2 errors in empty disjunction:
 -eliminated.x: conflicting values null and {n:3} (mismatched types null and struct):
-+eliminated.x: conflicting values null and {} (mismatched types null and struct):
-+    ./in.cue:21:10
++eliminated.x: conflicting values {n:3} and null (mismatched types struct and null):
      ./in.cue:22:5
--    ./in.cue:23:14
 +    ./in.cue:23:5
+     ./in.cue:23:14
  eliminated.x.n: field not allowed:
 -    ./in.cue:21:10
      ./in.cue:22:14
@@ -168,10 +167,10 @@ diff old new
 -        //     ./in.cue:23:5
 -        //     ./in.cue:23:16
 -      }
-+      // eliminated.x: conflicting values null and {} (mismatched types null and struct):
-+      //     ./in.cue:21:10
++      // eliminated.x: conflicting values {n:3} and null (mismatched types struct and null):
 +      //     ./in.cue:22:5
 +      //     ./in.cue:23:5
++      //     ./in.cue:23:14
 +      // eliminated.x.n: field not allowed:
 +      //     ./in.cue:22:14
 +      //     ./in.cue:23:16
@@ -186,10 +185,10 @@ diff old new
 -      //     ./in.cue:21:10
 -      //     ./in.cue:22:14
 -      //     ./in.cue:23:5
-+      // eliminated.x: conflicting values null and {} (mismatched types null and struct):
-+      //     ./in.cue:21:10
++      // eliminated.x: conflicting values {n:3} and null (mismatched types struct and null):
 +      //     ./in.cue:22:5
 +      //     ./in.cue:23:5
++      //     ./in.cue:23:14
 +      // eliminated.x.n: field not allowed:
 +      //     ./in.cue:22:14
        //     ./in.cue:23:16

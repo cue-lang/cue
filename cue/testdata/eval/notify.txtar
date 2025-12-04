@@ -35,44 +35,40 @@ issue3437: {
 -- out/evalalpha --
 Errors:
 t1.p1: 2 errors in empty disjunction:
-t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+t1.p1: conflicting values {a,a:{a:(2|1)}} and 1 (mismatched types struct and int):
     ./in.cue:1:9
     ./in.cue:2:2
-    ./in.cue:3:5
     ./in.cue:3:10
-t1.p1: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+t1.p1: conflicting values {a,a:{a:(2|1)}} and 2 (mismatched types struct and int):
     ./in.cue:1:9
     ./in.cue:2:2
-    ./in.cue:3:5
     ./in.cue:3:8
 t1.p2: 2 errors in empty disjunction:
-t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+t1.p2: conflicting values {a:{a:(2|1)},a} and 1 (mismatched types struct and int):
     ./in.cue:5:9
-    ./in.cue:6:5
     ./in.cue:6:10
     ./in.cue:7:2
-t1.p2: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+t1.p2: conflicting values {a:{a:(2|1)},a} and 2 (mismatched types struct and int):
     ./in.cue:5:9
-    ./in.cue:6:5
     ./in.cue:6:8
     ./in.cue:7:2
 t2.p1.d: 2 errors in empty disjunction:
-t2.p1.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+t2.p1.d: conflicting values {a:{a:(2|1)}} and 1 (mismatched types struct and int):
     ./in.cue:10:5
-    ./in.cue:11:8
+    ./in.cue:11:5
     ./in.cue:11:13
-t2.p1.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+t2.p1.d: conflicting values {a:{a:(2|1)}} and 2 (mismatched types struct and int):
     ./in.cue:10:5
-    ./in.cue:11:8
+    ./in.cue:11:5
     ./in.cue:11:11
 t2.p2.d: 2 errors in empty disjunction:
-t2.p2.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+t2.p2.d: conflicting values {a:{a:(2|1)}} and 1 (mismatched types struct and int):
     ./in.cue:14:5
-    ./in.cue:15:8
+    ./in.cue:15:5
     ./in.cue:15:13
-t2.p2.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+t2.p2.d: conflicting values {a:{a:(2|1)}} and 2 (mismatched types struct and int):
     ./in.cue:14:5
-    ./in.cue:15:8
+    ./in.cue:15:5
     ./in.cue:15:11
 
 Result:
@@ -82,15 +78,13 @@ Result:
     // [eval]
     p1: (_|_){
       // [eval] t1.p1: 2 errors in empty disjunction:
-      // t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+      // t1.p1: conflicting values {a,a:{a:(2|1)}} and 1 (mismatched types struct and int):
       //     ./in.cue:1:9
       //     ./in.cue:2:2
-      //     ./in.cue:3:5
       //     ./in.cue:3:10
-      // t1.p1: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+      // t1.p1: conflicting values {a,a:{a:(2|1)}} and 2 (mismatched types struct and int):
       //     ./in.cue:1:9
       //     ./in.cue:2:2
-      //     ./in.cue:3:5
       //     ./in.cue:3:8
       a: (struct){
         a: (_){ _ }
@@ -98,14 +92,12 @@ Result:
     }
     p2: (_|_){
       // [eval] t1.p2: 2 errors in empty disjunction:
-      // t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+      // t1.p2: conflicting values {a:{a:(2|1)},a} and 1 (mismatched types struct and int):
       //     ./in.cue:5:9
-      //     ./in.cue:6:5
       //     ./in.cue:6:10
       //     ./in.cue:7:2
-      // t1.p2: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+      // t1.p2: conflicting values {a:{a:(2|1)},a} and 2 (mismatched types struct and int):
       //     ./in.cue:5:9
-      //     ./in.cue:6:5
       //     ./in.cue:6:8
       //     ./in.cue:7:2
       a: (struct){
@@ -119,13 +111,13 @@ Result:
       // [eval]
       d: (_|_){
         // [eval] t2.p1.d: 2 errors in empty disjunction:
-        // t2.p1.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+        // t2.p1.d: conflicting values {a:{a:(2|1)}} and 1 (mismatched types struct and int):
         //     ./in.cue:10:5
-        //     ./in.cue:11:8
+        //     ./in.cue:11:5
         //     ./in.cue:11:13
-        // t2.p1.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+        // t2.p1.d: conflicting values {a:{a:(2|1)}} and 2 (mismatched types struct and int):
         //     ./in.cue:10:5
-        //     ./in.cue:11:8
+        //     ./in.cue:11:5
         //     ./in.cue:11:11
         a: (struct){
           a: (_){ _ }
@@ -136,13 +128,13 @@ Result:
       // [eval]
       d: (_|_){
         // [eval] t2.p2.d: 2 errors in empty disjunction:
-        // t2.p2.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+        // t2.p2.d: conflicting values {a:{a:(2|1)}} and 1 (mismatched types struct and int):
         //     ./in.cue:14:5
-        //     ./in.cue:15:8
+        //     ./in.cue:15:5
         //     ./in.cue:15:13
-        // t2.p2.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+        // t2.p2.d: conflicting values {a:{a:(2|1)}} and 2 (mismatched types struct and int):
         //     ./in.cue:14:5
-        //     ./in.cue:15:8
+        //     ./in.cue:15:5
         //     ./in.cue:15:11
         a: (struct){
           a: (_){ _ }
@@ -1147,42 +1139,85 @@ Disjuncts:    111
 diff old new
 --- old
 +++ new
-@@ -1,19 +1,23 @@
+@@ -1,39 +1,39 @@
  Errors:
  t1.p1: 2 errors in empty disjunction:
- t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-    ./in.cue:2:2
+-    ./in.cue:3:5
++t1.p1: conflicting values {a,a:{a:(2|1)}} and 1 (mismatched types struct and int):
 +    ./in.cue:1:9
-     ./in.cue:2:2
-     ./in.cue:3:5
++    ./in.cue:2:2
      ./in.cue:3:10
- t1.p1: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+-t1.p1: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+-    ./in.cue:2:2
+-    ./in.cue:3:5
++t1.p1: conflicting values {a,a:{a:(2|1)}} and 2 (mismatched types struct and int):
 +    ./in.cue:1:9
-     ./in.cue:2:2
-     ./in.cue:3:5
++    ./in.cue:2:2
      ./in.cue:3:8
  t1.p2: 2 errors in empty disjunction:
- t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-    ./in.cue:6:5
++t1.p2: conflicting values {a:{a:(2|1)},a} and 1 (mismatched types struct and int):
 +    ./in.cue:5:9
-     ./in.cue:6:5
      ./in.cue:6:10
      ./in.cue:7:2
- t1.p2: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+-t1.p2: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+-    ./in.cue:6:5
++t1.p2: conflicting values {a:{a:(2|1)},a} and 2 (mismatched types struct and int):
 +    ./in.cue:5:9
-     ./in.cue:6:5
      ./in.cue:6:8
      ./in.cue:7:2
-@@ -44,29 +48,33 @@
+ t2.p1.d: 2 errors in empty disjunction:
+-t2.p1.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-    ./in.cue:10:5
+-    ./in.cue:11:8
++t2.p1.d: conflicting values {a:{a:(2|1)}} and 1 (mismatched types struct and int):
++    ./in.cue:10:5
++    ./in.cue:11:5
+     ./in.cue:11:13
+-t2.p1.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+-    ./in.cue:10:5
+-    ./in.cue:11:8
++t2.p1.d: conflicting values {a:{a:(2|1)}} and 2 (mismatched types struct and int):
++    ./in.cue:10:5
++    ./in.cue:11:5
+     ./in.cue:11:11
+ t2.p2.d: 2 errors in empty disjunction:
+-t2.p2.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-    ./in.cue:14:5
+-    ./in.cue:15:8
++t2.p2.d: conflicting values {a:{a:(2|1)}} and 1 (mismatched types struct and int):
++    ./in.cue:14:5
++    ./in.cue:15:5
+     ./in.cue:15:13
+-t2.p2.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+-    ./in.cue:14:5
+-    ./in.cue:15:8
++t2.p2.d: conflicting values {a:{a:(2|1)}} and 2 (mismatched types struct and int):
++    ./in.cue:14:5
++    ./in.cue:15:5
+     ./in.cue:15:11
+ 
+ Result:
+@@ -43,30 +43,30 @@
+     // [eval]
      p1: (_|_){
        // [eval] t1.p1: 2 errors in empty disjunction:
-       // t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-      // t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-      //     ./in.cue:2:2
+-      //     ./in.cue:3:5
++      // t1.p1: conflicting values {a,a:{a:(2|1)}} and 1 (mismatched types struct and int):
 +      //     ./in.cue:1:9
-       //     ./in.cue:2:2
-       //     ./in.cue:3:5
++      //     ./in.cue:2:2
        //     ./in.cue:3:10
-       // t1.p1: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+-      // t1.p1: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+-      //     ./in.cue:2:2
+-      //     ./in.cue:3:5
++      // t1.p1: conflicting values {a,a:{a:(2|1)}} and 2 (mismatched types struct and int):
 +      //     ./in.cue:1:9
-       //     ./in.cue:2:2
-       //     ./in.cue:3:5
++      //     ./in.cue:2:2
        //     ./in.cue:3:8
        a: (struct){
 -        a: (int){ |((int){ 2 }, (int){ 1 }) }
@@ -1191,14 +1226,16 @@ diff old new
      }
      p2: (_|_){
        // [eval] t1.p2: 2 errors in empty disjunction:
-       // t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-      // t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-      //     ./in.cue:6:5
++      // t1.p2: conflicting values {a:{a:(2|1)},a} and 1 (mismatched types struct and int):
 +      //     ./in.cue:5:9
-       //     ./in.cue:6:5
        //     ./in.cue:6:10
        //     ./in.cue:7:2
-       // t1.p2: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+-      // t1.p2: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+-      //     ./in.cue:6:5
++      // t1.p2: conflicting values {a:{a:(2|1)},a} and 2 (mismatched types struct and int):
 +      //     ./in.cue:5:9
-       //     ./in.cue:6:5
        //     ./in.cue:6:8
        //     ./in.cue:7:2
        a: (struct){
@@ -1207,8 +1244,23 @@ diff old new
        }
      }
    }
-@@ -85,7 +93,7 @@
-         //     ./in.cue:11:8
+@@ -76,16 +76,16 @@
+       // [eval]
+       d: (_|_){
+         // [eval] t2.p1.d: 2 errors in empty disjunction:
+-        // t2.p1.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-        //     ./in.cue:10:5
+-        //     ./in.cue:11:8
++        // t2.p1.d: conflicting values {a:{a:(2|1)}} and 1 (mismatched types struct and int):
++        //     ./in.cue:10:5
++        //     ./in.cue:11:5
+         //     ./in.cue:11:13
+-        // t2.p1.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+-        //     ./in.cue:10:5
+-        //     ./in.cue:11:8
++        // t2.p1.d: conflicting values {a:{a:(2|1)}} and 2 (mismatched types struct and int):
++        //     ./in.cue:10:5
++        //     ./in.cue:11:5
          //     ./in.cue:11:11
          a: (struct){
 -          a: (int){ |((int){ 2 }, (int){ 1 }) }
@@ -1216,8 +1268,23 @@ diff old new
          }
        }
      }
-@@ -102,7 +110,7 @@
-         //     ./in.cue:15:8
+@@ -93,16 +93,16 @@
+       // [eval]
+       d: (_|_){
+         // [eval] t2.p2.d: 2 errors in empty disjunction:
+-        // t2.p2.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-        //     ./in.cue:14:5
+-        //     ./in.cue:15:8
++        // t2.p2.d: conflicting values {a:{a:(2|1)}} and 1 (mismatched types struct and int):
++        //     ./in.cue:14:5
++        //     ./in.cue:15:5
+         //     ./in.cue:15:13
+-        // t2.p2.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
+-        //     ./in.cue:14:5
+-        //     ./in.cue:15:8
++        // t2.p2.d: conflicting values {a:{a:(2|1)}} and 2 (mismatched types struct and int):
++        //     ./in.cue:14:5
++        //     ./in.cue:15:5
          //     ./in.cue:15:11
          a: (struct){
 -          a: (int){ |((int){ 2 }, (int){ 1 }) }
@@ -1225,7 +1292,7 @@ diff old new
          }
        }
      }
-@@ -119,7 +127,7 @@
+@@ -119,7 +119,7 @@
    }
    issue3437: (struct){
      r: (_|_){
@@ -1234,7 +1301,7 @@ diff old new
        //     ./issue3437.cue:2:9
      }
      d: (struct){
-@@ -131,33 +139,853 @@
+@@ -131,33 +131,853 @@
          }
        }
      }

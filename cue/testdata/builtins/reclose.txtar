@@ -197,7 +197,7 @@ retro: {
 Errors:
 nonRecursive.y.err.f: field not allowed:
     ./in.cue:48:15
-nonStructDefinitions.t2.err: conflicting values 1 and {b:1} (mismatched types int and struct):
+nonStructDefinitions.t2.err: conflicting values {b:1} and 1 (mismatched types struct and int):
     ./in.cue:62:8
     ./in.cue:70:11
     ./in.cue:70:15
@@ -363,7 +363,7 @@ Result:
     t2: (_|_){
       // [eval]
       err: (_|_){
-        // [eval] nonStructDefinitions.t2.err: conflicting values 1 and {b:1} (mismatched types int and struct):
+        // [eval] nonStructDefinitions.t2.err: conflicting values {b:1} and 1 (mismatched types struct and int):
         //     ./in.cue:62:8
         //     ./in.cue:70:11
         //     ./in.cue:70:15

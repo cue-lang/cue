@@ -629,14 +629,14 @@ issue4006: {
 }
 -- out/evalalpha/stats --
 Leaks:  73
-Freed:  863
-Reused: 815
+Freed:  858
+Reused: 810
 Allocs: 121
 Retain: 0
 
 Unifications: 765
-Conjuncts:    1529
-Disjuncts:    84
+Conjuncts:    1527
+Disjuncts:    82
 Notifications: 7
 
 NumCloseIDs: 440
@@ -662,14 +662,14 @@ diff old new
 -
 -NumCloseIDs: 3
 +Leaks:  73
-+Freed:  863
-+Reused: 815
++Freed:  858
++Reused: 810
 +Allocs: 121
 +Retain: 0
 +
 +Unifications: 765
-+Conjuncts:    1529
-+Disjuncts:    84
++Conjuncts:    1527
++Disjuncts:    82
 +Notifications: 7
 +
 +NumCloseIDs: 440
@@ -1957,18 +1957,7 @@ Result:
         }
         out: (#struct){
           b1: (_|_){
-            // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
-            // disjunction.withErr.t1.out.b1: conflicting values {b2:{b3:params.mayExistLater}} and null (mismatched types struct and null):
-            //     ./validators.cue:32:7
-            //     ./validators.cue:33:7
-            //     ./validators.cue:35:17
-            // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
-            // disjunction.withErr.t1.out.b1.b2: conflicting values {b3:params.mayExistLater} and null (mismatched types struct and null):
-            //     ./validators.cue:32:7
-            //     ./validators.cue:33:11
-            //     ./validators.cue:35:24
-            //     ./validators.cue:36:17
-            // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+            // [incomplete] disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
             //     ./validators.cue:33:22
             b2: (struct){
               b3: (_){ _ }
@@ -2792,23 +2781,20 @@ diff old new
        }
      }
      out: (#struct){
-@@ -1414,26 +1265,20 @@
+@@ -1413,27 +1264,10 @@
+         }
          out: (#struct){
            b1: (_|_){
-             // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
+-            // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
 -            // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
-+            // disjunction.withErr.t1.out.b1: conflicting values {b2:{b3:params.mayExistLater}} and null (mismatched types struct and null):
-+            //     ./validators.cue:32:7
-             //     ./validators.cue:33:7
-             //     ./validators.cue:35:17
-             // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
+-            //     ./validators.cue:33:7
+-            //     ./validators.cue:35:17
+-            // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
 -            // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
-+            // disjunction.withErr.t1.out.b1.b2: conflicting values {b3:params.mayExistLater} and null (mismatched types struct and null):
-+            //     ./validators.cue:32:7
-             //     ./validators.cue:33:11
-+            //     ./validators.cue:35:24
-             //     ./validators.cue:36:17
-             // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+-            //     ./validators.cue:33:11
+-            //     ./validators.cue:36:17
+-            // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
++            // [incomplete] disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
              //     ./validators.cue:33:22
 -            b2: (_|_){
 -              // [incomplete] disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:

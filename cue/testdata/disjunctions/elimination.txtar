@@ -661,14 +661,14 @@ issue3958: t2: {
 }
 -- out/evalalpha/stats --
 Leaks:  215
-Freed:  2551
-Reused: 2513
+Freed:  2347
+Reused: 2309
 Allocs: 253
 Retain: 0
 
 Unifications: 658
-Conjuncts:    2752
-Disjuncts:    1298
+Conjuncts:    2650
+Disjuncts:    1196
 Notifications: 4
 
 NumCloseIDs: 319
@@ -691,14 +691,14 @@ diff old new
 -
 -NumCloseIDs: 10
 +Leaks:  215
-+Freed:  2551
-+Reused: 2513
++Freed:  2347
++Reused: 2309
 +Allocs: 253
 +Retain: 0
 +
 +Unifications: 658
-+Conjuncts:    2752
-+Disjuncts:    1298
++Conjuncts:    2650
++Disjuncts:    1196
 +Notifications: 4
 +
 +NumCloseIDs: 319

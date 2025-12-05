@@ -149,14 +149,14 @@ issue3908: full: {
 }
 -- out/evalalpha/stats --
 Leaks:  30
-Freed:  352
-Reused: 326
-Allocs: 56
+Freed:  348
+Reused: 323
+Allocs: 55
 Retain: 0
 
 Unifications: 62
-Conjuncts:    466
-Disjuncts:    278
+Conjuncts:    462
+Disjuncts:    274
 
 NumCloseIDs: 101
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -174,14 +174,14 @@ diff old new
 -Conjuncts:    516
 -Disjuncts:    383
 +Leaks:  30
-+Freed:  352
-+Reused: 326
-+Allocs: 56
++Freed:  348
++Reused: 323
++Allocs: 55
 +Retain: 0
 +
 +Unifications: 62
-+Conjuncts:    466
-+Disjuncts:    278
++Conjuncts:    462
++Disjuncts:    274
 +
 +NumCloseIDs: 101
 -- out/eval/stats --

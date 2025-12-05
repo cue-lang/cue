@@ -47,38 +47,24 @@ func TestPackages(t *testing.T) {
 	}, {
 		name:  "failing field with validator",
 		value: &pkg1.OtherStruct{A: "car"},
-		want: `2 errors in empty disjunction:
-conflicting values {A:"car",P:0} and null (mismatched types struct and null)
-A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
+		want: `A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
     pkg1/instance.cue:x:x
     pkg1/instance.cue:x:x`,
 	}, {
 		name:  "failing field of type int",
 		value: &pkg1.MyStruct{A: 11, B: "dog"},
-		want: `2 errors in empty disjunction:
-conflicting values {A:11,B:"dog",T:"0001-01-01T00:00:00Z"} and null (mismatched types struct and null)
-A: invalid value 11 (out of bound <=10):
+		want: `A: invalid value 11 (out of bound <=10):
     pkg1/instance.cue:x:x`,
 	}, {
 		name:  "failing nested struct ",
 		value: &pkg1.MyStruct{A: 5, B: "dog", O: &pkg1.OtherStruct{A: "car", P: 6}},
-		want: `4 errors in empty disjunction:
-conflicting values {A:5,B:"dog",T:"0001-01-01T00:00:00Z",O:{A:"car",P:6}} and null (mismatched types struct and null)
-O: 2 errors in empty disjunction:
-O: conflicting values {A:"car",P:6} and null (mismatched types struct and null):
-    pkg1/instance.cue:x:x
-O.A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
+		want: `O.A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
     pkg1/instance.cue:x:x
     pkg1/instance.cue:x:x`,
 	}, {
 		name:  "fail nested struct of different package",
 		value: &pkg1.MyStruct{A: 5, B: "dog", O: &pkg1.OtherStruct{A: "X", P: 4}},
-		want: `4 errors in empty disjunction:
-conflicting values {A:5,B:"dog",T:"0001-01-01T00:00:00Z",O:{A:"X",P:4}} and null (mismatched types struct and null)
-O: 2 errors in empty disjunction:
-O: conflicting values {A:"X",P:4} and null (mismatched types struct and null):
-    pkg1/instance.cue:x:x
-O.P: invalid value 4 (out of bound >5):
+		want: `O.P: invalid value 4 (out of bound >5):
     pkg2/instance.cue:x:x`,
 	}, {
 		name: "all good",

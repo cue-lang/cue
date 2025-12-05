@@ -1443,7 +1443,7 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 
 	default:
 		if !IsConcrete(fun) && fun.Kind()&FuncKind != 0 {
-			c.addErrf(IncompleteError, pos(x.Fun), "cannot call non-concrete value %s (type %s)", x.Fun, kind(fun))
+			c.addErrf(IncompleteError, Pos(x.Fun), "cannot call non-concrete value %s (type %s)", x.Fun, kind(fun))
 		} else {
 			c.AddErrf("cannot call non-function %s (type %s)", x.Fun, kind(fun))
 		}

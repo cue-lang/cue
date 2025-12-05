@@ -250,15 +250,15 @@ issue3824: panic: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  73
-Freed:  150
-Reused: 133
-Allocs: 90
+Leaks:  71
+Freed:  145
+Reused: 128
+Allocs: 88
 Retain: 0
 
-Unifications: 165
-Conjuncts:    268
-Disjuncts:    36
+Unifications: 163
+Conjuncts:    263
+Disjuncts:    35
 
 NumCloseIDs: 60
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -279,15 +279,15 @@ diff old new
 -MisalignedConjunct: 10
 -
 -NumCloseIDs: 16
-+Leaks:  73
-+Freed:  150
-+Reused: 133
-+Allocs: 90
++Leaks:  71
++Freed:  145
++Reused: 128
++Allocs: 88
 +Retain: 0
 +
-+Unifications: 165
-+Conjuncts:    268
-+Disjuncts:    36
++Unifications: 163
++Conjuncts:    263
++Disjuncts:    35
 +
 +NumCloseIDs: 60
 -- out/eval/stats --

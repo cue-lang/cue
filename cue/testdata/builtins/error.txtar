@@ -81,8 +81,6 @@ indirect.y: msg:
     ./in.cue:22:5
 issue4001.a: error: a='b':
     ./issues.cue:3:11
-    ./issues.cue:2:5
-    ./issues.cue:3:5
 issue3983.x: I wanted an integer:
     ./issues.cue:6:11
 issue3983.x: I wanted more than 10:
@@ -164,8 +162,6 @@ Result:
     a: (_|_){
       // [eval] issue4001.a: error: a='b':
       //     ./issues.cue:3:11
-      //     ./issues.cue:2:5
-      //     ./issues.cue:3:5
     }
   }
   issue3983: (_|_){
@@ -215,14 +211,12 @@ diff old new
  selection.twoUserErrors: error one:
      ./in.cue:6:23
  selection.twoUserErrors: error two:
-@@ -15,24 +15,33 @@
+@@ -15,24 +15,31 @@
      ./in.cue:6:44
  indirect.y: msg:
      ./in.cue:22:5
 +issue4001.a: error: a='b':
 +    ./issues.cue:3:11
-+    ./issues.cue:2:5
-+    ./issues.cue:3:5
 +issue3983.x: I wanted an integer:
 +    ./issues.cue:6:11
 +issue3983.x: I wanted more than 10:
@@ -257,7 +251,7 @@ diff old new
        //     ./in.cue:6:17
        //     ./in.cue:6:19
        // selection.twoUserErrors: error one:
-@@ -42,12 +51,9 @@
+@@ -42,12 +49,9 @@
      }
      x: (int){ int }
      dropIncomplete: (_|_){
@@ -272,7 +266,7 @@ diff old new
      }
    }
    interpolation: (struct){
-@@ -56,20 +62,11 @@
+@@ -56,20 +60,11 @@
      }
      world: (string){ "world" }
      substituteAll: (_|_){
@@ -295,7 +289,7 @@ diff old new
        //     ./in.cue:18:41
        //     ./in.cue:13:9
        //     ./in.cue:18:77
-@@ -83,11 +80,49 @@
+@@ -83,11 +78,47 @@
        //     ./in.cue:22:5
      }
    }
@@ -322,8 +316,6 @@ diff old new
 -      //     ./issue4001.cue:3:11
 +      // [eval] issue4001.a: error: a='b':
 +      //     ./issues.cue:3:11
-+      //     ./issues.cue:2:5
-+      //     ./issues.cue:3:5
 +    }
 +  }
 +  issue3983: (_|_){

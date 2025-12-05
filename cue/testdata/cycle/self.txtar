@@ -282,14 +282,14 @@ issue4125: t2_alias: X={
 
 -- out/evalalpha/stats --
 Leaks:  42
-Freed:  297
-Reused: 275
+Freed:  281
+Reused: 259
 Allocs: 64
 Retain: 0
 
 Unifications: 219
-Conjuncts:    435
-Disjuncts:    100
+Conjuncts:    427
+Disjuncts:    92
 
 NumCloseIDs: 86
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -307,14 +307,14 @@ diff old new
 -Conjuncts:    663
 -Disjuncts:    447
 +Leaks:  42
-+Freed:  297
-+Reused: 275
++Freed:  281
++Reused: 259
 +Allocs: 64
 +Retain: 0
 +
 +Unifications: 219
-+Conjuncts:    435
-+Disjuncts:    100
++Conjuncts:    427
++Disjuncts:    92
 +
 +NumCloseIDs: 86
 -- out/eval/stats --

@@ -147,14 +147,14 @@ _items: [#VMRuleList]
 }
 -- out/evalalpha/stats --
 Leaks:  18
-Freed:  36
-Reused: 20
+Freed:  32
+Reused: 16
 Allocs: 34
 Retain: 0
 
 Unifications: 38
-Conjuncts:    77
-Disjuncts:    12
+Conjuncts:    75
+Disjuncts:    10
 
 NumCloseIDs: 17
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -172,14 +172,14 @@ diff old new
 -Conjuncts:    257
 -Disjuncts:    161
 +Leaks:  18
-+Freed:  36
-+Reused: 20
++Freed:  32
++Reused: 16
 +Allocs: 34
 +Retain: 0
 +
 +Unifications: 38
-+Conjuncts:    77
-+Disjuncts:    12
++Conjuncts:    75
++Disjuncts:    10
 +
 +NumCloseIDs: 17
 -- out/eval/stats --

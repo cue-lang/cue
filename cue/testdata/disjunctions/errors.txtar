@@ -152,14 +152,14 @@ issue4022: full: {
 }
 -- out/evalalpha/stats --
 Leaks:  33
-Freed:  207
-Reused: 188
+Freed:  197
+Reused: 178
 Allocs: 52
 Retain: 0
 
 Unifications: 116
-Conjuncts:    281
-Disjuncts:    74
+Conjuncts:    277
+Disjuncts:    70
 Notifications: 2
 
 NumCloseIDs: 51
@@ -182,14 +182,14 @@ diff old new
 -
 -NumCloseIDs: 11
 +Leaks:  33
-+Freed:  207
-+Reused: 188
++Freed:  197
++Reused: 178
 +Allocs: 52
 +Retain: 0
 +
 +Unifications: 116
-+Conjuncts:    281
-+Disjuncts:    74
++Conjuncts:    277
++Disjuncts:    70
 +Notifications: 2
 +
 +NumCloseIDs: 51

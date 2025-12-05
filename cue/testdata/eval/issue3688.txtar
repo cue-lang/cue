@@ -84,14 +84,14 @@ examples: eg3: in: {
 }
 -- out/evalalpha/stats --
 Leaks:  8
-Freed:  82
-Reused: 63
+Freed:  72
+Reused: 53
 Allocs: 27
 Retain: 0
 
 Unifications: 41
-Conjuncts:    139
-Disjuncts:    22
+Conjuncts:    135
+Disjuncts:    18
 
 NumCloseIDs: 43
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -109,14 +109,14 @@ diff old new
 -Conjuncts:    246
 -Disjuncts:    139
 +Leaks:  8
-+Freed:  82
-+Reused: 63
++Freed:  72
++Reused: 53
 +Allocs: 27
 +Retain: 0
 +
 +Unifications: 41
-+Conjuncts:    139
-+Disjuncts:    22
++Conjuncts:    135
++Disjuncts:    18
 +
 +NumCloseIDs: 43
 -- out/eval/stats --

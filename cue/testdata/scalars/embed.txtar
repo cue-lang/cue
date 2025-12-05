@@ -153,14 +153,14 @@ selfRefInEmbed: t1: {
 
 -- out/evalalpha/stats --
 Leaks:  4
-Freed:  132
-Reused: 111
+Freed:  129
+Reused: 108
 Allocs: 25
 Retain: 0
 
 Unifications: 126
-Conjuncts:    284
-Disjuncts:    4
+Conjuncts:    283
+Disjuncts:    3
 Notifications: 12
 
 NumCloseIDs: 124
@@ -183,14 +183,14 @@ diff old new
 -
 -NumCloseIDs: 2
 +Leaks:  4
-+Freed:  132
-+Reused: 111
++Freed:  129
++Reused: 108
 +Allocs: 25
 +Retain: 0
 +
 +Unifications: 126
-+Conjuncts:    284
-+Disjuncts:    4
++Conjuncts:    283
++Disjuncts:    3
 +Notifications: 12
 +
 +NumCloseIDs: 124

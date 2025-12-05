@@ -301,14 +301,14 @@ value0: Only: [{UseSectionName: true}]
 }
 -- out/evalalpha/stats --
 Leaks:  344
-Freed:  1758
-Reused: 1700
+Freed:  1604
+Reused: 1546
 Allocs: 402
 Retain: 0
 
 Unifications: 386
-Conjuncts:    2349
-Disjuncts:    574
+Conjuncts:    2278
+Disjuncts:    503
 
 NumCloseIDs: 819
 
@@ -331,14 +331,14 @@ diff old new
 -Conjuncts:    468967
 -Disjuncts:    330375
 +Leaks:  344
-+Freed:  1758
-+Reused: 1700
++Freed:  1604
++Reused: 1546
 +Allocs: 402
 +Retain: 0
 +
 +Unifications: 386
-+Conjuncts:    2349
-+Disjuncts:    574
++Conjuncts:    2278
++Disjuncts:    503
 +
 +NumCloseIDs: 819
 +

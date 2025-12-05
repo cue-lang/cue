@@ -320,14 +320,14 @@ issue3891: full: {
 }
 -- out/evalalpha/stats --
 Leaks:  101
-Freed:  574
-Reused: 531
+Freed:  519
+Reused: 476
 Allocs: 144
 Retain: 0
 
 Unifications: 294
-Conjuncts:    810
-Disjuncts:    241
+Conjuncts:    780
+Disjuncts:    211
 Notifications: 1
 
 NumCloseIDs: 132
@@ -355,14 +355,14 @@ diff old new
 -
 -NumCloseIDs: 2
 +Leaks:  101
-+Freed:  574
-+Reused: 531
++Freed:  519
++Reused: 476
 +Allocs: 144
 +Retain: 0
 +
 +Unifications: 294
-+Conjuncts:    810
-+Disjuncts:    241
++Conjuncts:    780
++Disjuncts:    211
 +Notifications: 1
 +
 +NumCloseIDs: 132
@@ -396,11 +396,6 @@ f.val: conflicting values 3 and string (mismatched types int and string):
     ./in.cue:9:8
     ./in.cue:15:4
     ./in.cue:15:27
-issue3606.data: 2 errors in empty disjunction:
-issue3606.data: conflicting values {notAllowed:true} and string (mismatched types struct and string):
-    ./dependencies.cue:2:8
-    ./dependencies.cue:4:6
-    ./dependencies.cue:6:6
 issue3606.data.notAllowed: field not allowed:
     ./dependencies.cue:3:3
 
@@ -410,12 +405,7 @@ Result:
   issue3606: (_|_){
     // [eval]
     data: (_|_){
-      // [eval] issue3606.data: 2 errors in empty disjunction:
-      // issue3606.data: conflicting values {notAllowed:true} and string (mismatched types struct and string):
-      //     ./dependencies.cue:2:8
-      //     ./dependencies.cue:4:6
-      //     ./dependencies.cue:6:6
-      // issue3606.data.notAllowed: field not allowed:
+      // [eval] issue3606.data.notAllowed: field not allowed:
       //     ./dependencies.cue:3:3
       notAllowed: (bool){ true }
     }
@@ -877,15 +867,14 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -9,13 +9,12 @@
+@@ -8,14 +8,8 @@
+     ./in.cue:9:8
      ./in.cue:15:4
      ./in.cue:15:27
- issue3606.data: 2 errors in empty disjunction:
+-issue3606.data: 2 errors in empty disjunction:
 -issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
-+issue3606.data: conflicting values {notAllowed:true} and string (mismatched types struct and string):
-     ./dependencies.cue:2:8
-+    ./dependencies.cue:4:6
-     ./dependencies.cue:6:6
+-    ./dependencies.cue:2:8
+-    ./dependencies.cue:6:6
  issue3606.data.notAllowed: field not allowed:
      ./dependencies.cue:3:3
 -    ./dependencies.cue:4:6
@@ -893,16 +882,16 @@ diff old new
  
  Result:
  (_|_){
-@@ -24,19 +23,13 @@
+@@ -23,20 +17,9 @@
+   issue3606: (_|_){
      // [eval]
      data: (_|_){
-       // [eval] issue3606.data: 2 errors in empty disjunction:
+-      // [eval] issue3606.data: 2 errors in empty disjunction:
 -      // issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
-+      // issue3606.data: conflicting values {notAllowed:true} and string (mismatched types struct and string):
-       //     ./dependencies.cue:2:8
-+      //     ./dependencies.cue:4:6
-       //     ./dependencies.cue:6:6
-       // issue3606.data.notAllowed: field not allowed:
+-      //     ./dependencies.cue:2:8
+-      //     ./dependencies.cue:6:6
+-      // issue3606.data.notAllowed: field not allowed:
++      // [eval] issue3606.data.notAllowed: field not allowed:
        //     ./dependencies.cue:3:3
 -      //     ./dependencies.cue:4:6
 -      //     ./dependencies.cue:6:15
@@ -916,7 +905,7 @@ diff old new
      }
      #S: ((string|struct)){ |((string){ string }, (#struct){
        }) }
-@@ -151,12 +144,7 @@
+@@ -151,12 +134,7 @@
      //     ./in.cue:15:4
      //     ./in.cue:15:27
      name: (string){ "str" }
@@ -930,7 +919,7 @@ diff old new
    }
    e1: (struct){
      a: ((null|struct)){ |((null){ null }, (struct){
-@@ -268,8 +256,8 @@
+@@ -268,8 +246,8 @@
      e: (struct){
        foobar: (#struct){
          b: (#struct){
@@ -940,7 +929,7 @@ diff old new
          }
        }
      }
-@@ -279,10 +267,7 @@
+@@ -279,10 +257,7 @@
        x: (int){ 0 }
      }
      inList1: (struct){
@@ -952,7 +941,7 @@ diff old new
      }
      inList2: (struct){
        x: (int){ 0 }
-@@ -402,7 +387,7 @@
+@@ -402,7 +377,7 @@
            let Ok#2 = (bool){ true }
          }, (#struct){
            _ok: (bool){ true }
@@ -961,7 +950,7 @@ diff old new
            x: (bool){ true }
          }) }
        bar: (#struct){ |((#struct){
-@@ -437,9 +422,7 @@
+@@ -437,9 +412,7 @@
    issue3891: (struct){
      reduced: (struct){
        x: (_){ |(*(int){ 1 }, (_){ _ }) }
@@ -972,7 +961,7 @@ diff old new
        b: (struct){
          y: (int){ 1 }
        }
-@@ -475,14 +458,14 @@
+@@ -475,14 +448,14 @@
      }
      full: (struct){
        out: (#struct){

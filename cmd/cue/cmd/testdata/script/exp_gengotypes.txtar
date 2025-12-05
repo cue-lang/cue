@@ -254,16 +254,6 @@ fail.cue."11_Int8".types.Int8: invalid value 99999 (out of bound <=127):
     ./cuetest/all.cue:61:30
 fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
     ./cuetest/all.cue:62:30
-fail.cue."29_NullOrStruct".types.NullOrStruct: 2 errors in empty disjunction:
-fail.cue."29_NullOrStruct".types.NullOrStruct: conflicting values "foo" and null (mismatched types string and null):
-    ./cuetest/all.cue:20:1
-    ./cuetest/all.cue:24:2
-    ./cuetest/all.cue:25:55
-    ./cuetest/all.cue:81:43
-    ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:9:8
-    ./root/root.cue:13:10
-    ./root/types.cue:35:23
 fail.cue."29_NullOrStruct".types.NullOrStruct: conflicting values "foo" and {foo?:int} (mismatched types string and struct):
     ./cuetest/all.cue:20:1
     ./cuetest/all.cue:24:2

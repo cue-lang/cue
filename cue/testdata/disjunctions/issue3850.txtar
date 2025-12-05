@@ -57,14 +57,14 @@ issue3875: reduced: {
 }
 -- out/evalalpha/stats --
 Leaks:  22
-Freed:  120
-Reused: 97
+Freed:  112
+Reused: 89
 Allocs: 45
 Retain: 0
 
 Unifications: 66
-Conjuncts:    125
-Disjuncts:    22
+Conjuncts:    123
+Disjuncts:    20
 
 NumCloseIDs: 18
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -82,14 +82,14 @@ diff old new
 -Conjuncts:    182
 -Disjuncts:    123
 +Leaks:  22
-+Freed:  120
-+Reused: 97
++Freed:  112
++Reused: 89
 +Allocs: 45
 +Retain: 0
 +
 +Unifications: 66
-+Conjuncts:    125
-+Disjuncts:    22
++Conjuncts:    123
++Disjuncts:    20
 +
 +NumCloseIDs: 18
 -- out/eval/stats --

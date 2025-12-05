@@ -406,8 +406,22 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 		// p.completeNodeConjuncts()
 		initArcs(n.ctx, p.node)
 
+		incompatibleMask := make([]bool, len(dn.disjuncts))
+		numCompatible := 0
+		for j, d := range dn.disjuncts {
+			if v, ok := d.expr.(Value); ok && p.kind&v.Kind() == 0 {
+				incompatibleMask[j] = true
+			} else {
+				numCompatible++
+			}
+		}
+
 		for j, d := range dn.disjuncts {
 			ID.node.nextDisjunct(j, len(dn.disjuncts), d.expr)
+
+			if numCompatible == 1 && incompatibleMask[j] {
+				continue
+			}
 
 			c := MakeConjunct(dn.env, d.expr, dn.cloneID)
 			r, err := p.doDisjunct(c, d.mode, mode, n.node)

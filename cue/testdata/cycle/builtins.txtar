@@ -279,14 +279,14 @@ issue3743: {
 }
 -- out/evalalpha/stats --
 Leaks:  48
-Freed:  461
-Reused: 431
+Freed:  457
+Reused: 427
 Allocs: 78
 Retain: 0
 
 Unifications: 427
-Conjuncts:    756
-Disjuncts:    30
+Conjuncts:    754
+Disjuncts:    28
 Notifications: 2
 
 NumCloseIDs: 191
@@ -305,14 +305,14 @@ diff old new
 -Conjuncts:    821
 -Disjuncts:    537
 +Leaks:  48
-+Freed:  461
-+Reused: 431
++Freed:  457
++Reused: 427
 +Allocs: 78
 +Retain: 0
 +
 +Unifications: 427
-+Conjuncts:    756
-+Disjuncts:    30
++Conjuncts:    754
++Disjuncts:    28
 +Notifications: 2
 +
 +NumCloseIDs: 191

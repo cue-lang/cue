@@ -68,11 +68,7 @@ func TestLoad(t *testing.T) {
 		name: "BadModuleFile",
 		cfg:  badModCfg,
 		args: []string{"."},
-		want: `err:    module: 2 errors in empty disjunction:
-module: conflicting values 123 and "" (mismatched types int and string):
-    $CWD/testdata/badmod/cue.mod/module.cue:2:9
-    cuelang.org/go/mod/modfile/schema.cue:56:22
-module: conflicting values 123 and string (mismatched types int and string):
+		want: `err:    module: conflicting values 123 and string (mismatched types int and string):
     $CWD/testdata/badmod/cue.mod/module.cue:2:9
     cuelang.org/go/mod/modfile/schema.cue:56:12
     cuelang.org/go/mod/modfile/schema.cue:98:12

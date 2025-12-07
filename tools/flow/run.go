@@ -215,7 +215,7 @@ func (c *Controller) updateTaskResults(t *Task) bool {
 	expr := t.update
 	for _, label := range slices.Backward(t.labels) {
 		switch label.Typ() {
-		case adt.StringLabel, adt.HiddenLabel:
+		case adt.StringLabel, adt.HiddenLabel, adt.DefinitionLabel, adt.HiddenDefinitionLabel, adt.LetLabel:
 			expr = &adt.StructLit{
 				Decls: []adt.Decl{
 					&adt.Field{

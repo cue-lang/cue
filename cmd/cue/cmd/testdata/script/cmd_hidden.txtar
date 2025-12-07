@@ -1,0 +1,35 @@
+! exec cue cmd test
+stderr 'panic: unexpected label type'
+
+-- read.txt --
+hello world
+-- task_tool.cue --
+package foo
+
+import (
+	"tool/cli"
+	"tool/file"
+)
+
+command: test: {
+	hiddenRefs: {
+		letRef: letName
+		hid:    _hid
+		def:    #def
+		hidDef: _#hidDef
+	}
+	afterHidden: cli.Print & {
+		$after: [for t in hiddenRefs {t}]
+		text: """
+			\(hiddenRefs.letRef.contents)
+			\(hiddenRefs.hid.contents)
+			\(hiddenRefs.def.contents)
+			\(hiddenRefs.hidDef.contents)
+			"""
+	}
+}
+
+let letName = file.Read & {filename: "read.txt"}
+_hid: file.Read & {filename: "read.txt"}
+#def: file.Read & {filename: "read.txt"}
+_#hidDef: file.Read & {filename: "read.txt"}

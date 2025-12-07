@@ -1,5 +1,14 @@
-! exec cue cmd test
-stderr 'panic: unexpected label type'
+exec cue cmd test
+cmp stdout stdout.want
+
+-- stdout.want --
+hello world
+
+hello world
+
+hello world
+
+hello world
 
 -- read.txt --
 hello world

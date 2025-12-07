@@ -55,11 +55,6 @@ type Node interface {
 	// the node or nil if there is no such position.
 	pos() *token.Pos
 
-	// Deprecated: use [Comments]
-	Comments() []*CommentGroup
-
-	// Deprecated: use [AddComment]
-	AddComment(*CommentGroup)
 	commentInfo() *comments
 }
 
@@ -147,6 +142,12 @@ type comments struct {
 
 func (c *comments) commentInfo() *comments { return c }
 
+// TODO: remove these deprecated comment methods in late 2026.
+// Note that we unfortunately cannot use `//go:fix inline`;
+// for example, from the comments.Comments promoted method below,
+// we cannot call the Comments API as it works on Node, the embedding type.
+
+// Deprecated: use [Comments].
 func (c *comments) Comments() []*CommentGroup {
 	if c.groups == nil {
 		return []*CommentGroup{}
@@ -154,6 +155,7 @@ func (c *comments) Comments() []*CommentGroup {
 	return *c.groups
 }
 
+// Deprecated: use [AddComment].
 func (c *comments) AddComment(cg *CommentGroup) {
 	if cg == nil {
 		return
@@ -171,6 +173,7 @@ func (c *comments) AddComment(cg *CommentGroup) {
 	}
 }
 
+// Deprecated: use [SetComments].
 func (c *comments) SetComments(cgs []*CommentGroup) {
 	if c.groups == nil {
 		if cgs == nil {

@@ -718,13 +718,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 			mapNamed := false
 			underlying := e.pkg.TypesInfo.TypeOf(v.Type)
 			if b, ok := underlying.Underlying().(*types.Basic); ok && b.Kind() != types.String {
-				switch b.Kind() {
-				case types.Invalid:
-					continue
-				case types.String:
-				default:
-					mapNamed = true
-				}
+				mapNamed = true
 			}
 
 			switch tn, ok := e.pkg.TypesInfo.Defs[v.Name].(*types.TypeName); {
@@ -1020,7 +1014,7 @@ func supportedType(stack []types.Type, t types.Type) (ok bool) {
 	t = t.Underlying()
 	switch t := t.(type) {
 	case *types.Basic:
-		return t.Kind() != types.Invalid
+		return true
 	case *types.Named:
 		return true
 	case *types.Pointer:

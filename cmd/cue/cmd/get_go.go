@@ -273,7 +273,7 @@ type pkgInfo struct {
 	name string
 }
 
-func (e *extractor) logf(format string, args ...interface{}) {
+func (e *extractor) logf(format string, args ...any) {
 	if flagVerbose.Bool(e.cmd) {
 		fmt.Fprintf(e.cmd.Stderr(), format+"\n", args...)
 	}
@@ -284,7 +284,7 @@ func (e *extractor) usedPkg(pkg string) {
 }
 
 var (
-	typeAny    = types.Universe.Lookup("any").Type()    // any or interface{}
+	typeAny    = types.Universe.Lookup("any").Type()    // any
 	typeByte   = types.Universe.Lookup("byte").Type()   // byte
 	typeBytes  = types.NewSlice(typeByte)               // []byte
 	typeString = types.Universe.Lookup("string").Type() // string
@@ -332,12 +332,12 @@ var toTop = []*types.Interface{
 		typeMethod("UnmarshalJSON", []types.Type{typeBytes}, []types.Type{typeError}),
 	}, nil).Complete(),
 
-	// yaml.Marshaler: interface { MarshalYAML() (interface{}, error) }
+	// yaml.Marshaler: interface { MarshalYAML() (any, error) }
 	types.NewInterfaceType([]*types.Func{
 		typeMethod("MarshalYAML", nil, []types.Type{typeAny, typeError}),
 	}, nil).Complete(),
 
-	// yaml.Unmarshaler: interface { UnmarshalYAML(func(interface{}) error) error }
+	// yaml.Unmarshaler: interface { UnmarshalYAML(func(any) error) error }
 	types.NewInterfaceType([]*types.Func{
 		typeMethod("UnmarshalYAML", []types.Type{
 			typeSignature([]types.Type{typeAny}, []types.Type{typeError}),
@@ -761,7 +761,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 					label := cueast.NewString(v)
 					cueast.SetRelPos(label, cuetoken.Blank)
 
-					var x cueast.Expr = e.ident(v, true)
+					x := e.ident(v, true)
 					cueast.SetRelPos(x, cuetoken.Newline)
 					exprs = append(exprs, x)
 
@@ -985,21 +985,21 @@ func supportedType(stack []types.Type, t types.Type) (ok bool) {
 
 	if named, ok := t.(*types.Named); ok {
 		obj := named.Obj()
+		pkg := obj.Pkg()
 
 		// Redirect or drop Go standard library types.
-		if obj.Pkg() == nil {
-			// error interface
-			return true
+		if pkg == nil {
+			return true // error interface
 		}
-		switch obj.Pkg().Path() {
+		switch pkg.Path() {
 		case "time":
-			switch named.Obj().Name() {
+			switch obj.Name() {
 			case "Time", "Duration", "Location", "Month", "Weekday":
 				return true
 			}
 			return false
 		case "math/big":
-			switch named.Obj().Name() {
+			switch obj.Name() {
 			case "Int", "Float":
 				return true
 			}
@@ -1070,7 +1070,7 @@ func (e *extractor) makeField(name string, kind fieldKind, attrs fieldAttributes
 	}
 	f = &cueast.Field{Label: label, Value: typ}
 	if doc := makeDoc(doc, newline); doc != nil {
-		f.AddComment(doc)
+		cueast.AddComment(f, doc)
 		cueast.SetRelPos(doc, cuetoken.NewSection)
 	}
 

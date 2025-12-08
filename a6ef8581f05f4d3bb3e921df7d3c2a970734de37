@@ -16,6 +16,24 @@
       "message": "cue/token has `PERIOD`, so `Period` would be my initial choice of a name for the sake of consistency; I suspect the existing position fields do the same",
       "revId": "a6ef8581f05f4d3bb3e921df7d3c2a970734de37",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "455aa342_c68085f6",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-08T17:57:23Z",
+      "side": 1,
+      "message": "that said, in `foo.bar` we often say \"foo dot bar\", not \"foo period bar\", so I can see why you went with dot. `token.PERIOD` is probably not the biggest concern given that most users don\u0027t directly interact with that API.\n\nI\u0027m 50-50 on this currently, so I\u0027ll let Roger have a say :)",
+      "parentUuid": "821478d9_699fcab6",
+      "revId": "a6ef8581f05f4d3bb3e921df7d3c2a970734de37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

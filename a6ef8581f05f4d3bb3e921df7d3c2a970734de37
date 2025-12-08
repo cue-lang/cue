@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "821478d9_699fcab6",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-08T15:14:30Z",
+      "side": 1,
+      "message": "cue/token has `PERIOD`, so `Period` would be my initial choice of a name for the sake of consistency; I suspect the existing position fields do the same",
+      "revId": "a6ef8581f05f4d3bb3e921df7d3c2a970734de37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

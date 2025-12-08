@@ -1,5 +1,23 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40ed8658_cfc8dd29",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_std.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-12-08T12:37:59Z",
+      "side": 1,
+      "message": "FWIW neither of these types seem helpful to include in the generated CUE.\nMaybe include a TODO that they shouldn\u0027t generate fields, or that\nwe should be able to disable generation for types like this (non-empty interface types, structs with no exported types or all non-JSON-compatible types).\n\nSuch types are often the reason that `cue get go` generates many spurious unintended packages AFAIR.",
+      "revId": "21f5c8746f99a9a8ba81d3b06cd49a961d21d50d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ],
   "submitRequirementResults": [
     {
       "submitRequirement": {

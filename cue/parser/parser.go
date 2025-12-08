@@ -874,17 +874,12 @@ func (p *parser) parseField() (decl ast.Decl) {
 	defer func() { c.closeNode(p, decl) }()
 
 	pos := p.pos
-
-	this := &ast.Field{Label: nil}
-	m := this
-
 	tok := p.tok
 
 	label, expr, decl, ok := p.parseLabel(false)
 	if decl != nil {
 		return decl
 	}
-	m.Label = label
 
 	if !ok {
 		if expr == nil {
@@ -899,6 +894,10 @@ func (p *parser) parseField() (decl ast.Decl) {
 		p.consumeDeclComma()
 		return e
 	}
+
+	this := &ast.Field{}
+	m := this
+	m.Label = label
 
 	// Parse postfix alias if present
 	m.Alias = p.parsePostfixAlias()

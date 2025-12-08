@@ -36,11 +36,10 @@ func newModRenameCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rename <newModulePath>",
 		Short: "rename the current module",
-		Long: `Rename changes the name of the current module,
+		Long: `
+Rename changes the name of the current module,
 updating import statements in source files as required.
-
-Note that this command is not yet stable and may be changed.
-`,
+`[1:],
 		RunE: mkRunE(c, runModRename),
 		Args: cobra.ExactArgs(1),
 	}

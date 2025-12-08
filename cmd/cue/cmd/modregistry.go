@@ -33,11 +33,6 @@ import (
 
 func newModRegistryCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		// This command is hidden, for now at least,
-		// because it's not clear whether it should be
-		// officially supported.
-		Hidden: true,
-
 		Use:   "registry [listen-address]",
 		Short: "start a local in-memory module registry",
 		Long: `

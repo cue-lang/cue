@@ -8,14 +8,14 @@ There are many ways to contribute to CUE without writing code!
   being used in many varied different ways. Sharing experience reports helps
 to shape proposals and designs.
 * Create content: share blog posts, tutorials, videos, meetup talks, etc
-* Add your project to [Unity](https://cuelabs.dev/unity/) to help us test changes to CUE
+* Add your project to [Unity](https://cue.dev/products/unity/) to help us test changes to CUE
 
 ## Before contributing code
 
 As with many open source projects, CUE uses the GitHub [issue
 tracker](https://github.com/cue-lang/cue/issues) to not only track bugs, but
 also coordinate work on new features, bugs, designs and proposals.  Given the
-inherently distributed nature of open-source this coordination is important
+inherently distributed nature of open source this coordination is important
 because it very often serves as the main form of communication between
 contributors.
 
@@ -148,8 +148,8 @@ Notice as we explained above, the `-s` flag asserts the Developer Certificate of
 Origin by adding a `Signed-off-by` line to a commit. When writing a commit
 message, remember the guidelines on [good commit messages](#good-commit-messages).
 
-You’ve written and tested your code, but before sending code out for review, run
-all the tests from the root of the repository to ensure the changes don’t break
+You've written and tested your code, but before sending code out for review, run
+all the tests from the root of the repository to ensure the changes don't break
 other packages or programs:
 
 ```console
@@ -522,7 +522,7 @@ include things like:
 ### Continuous Integration (CI) checks
 
 After an initial reading of your change, maintainers will trigger CI checks,
-that run a full test suite and [Unity](https://cuelabs.dev/unity/)
+that run a full test suite and [Unity](https://cue.dev/products/unity/)
 checks.  Most CI tests complete in a few minutes, at which point a link will be
 posted in Gerrit where you can see the results, or if you are submitting a PR
 results are presented as checks towards the bottom of the PR.

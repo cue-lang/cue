@@ -49,8 +49,6 @@ needed to satisfy constraints imposed by other modules.
 The --module flag changes the module's path (the module.cue file's module field).
 The --source flag changes the module's declared source.
 The --drop-source flag removes the source field.
-
-Note that this command is not yet stable and may be changed.
 `,
 		RunE: mkRunE(c, editCmd.run),
 		Args: cobra.ExactArgs(0),

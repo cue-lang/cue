@@ -64,8 +64,6 @@ The --json flag can be used to find out more information about the upload.
 The --out flag can be used to write the module's contents to a directory
 in OCI Image Layout format. See this link for more details on the format:
 https://github.com/opencontainers/image-spec/blob/8f3820ccf8f65db8744e626df17fe8a64462aece/image-layout.md
-
-Note that this command is not yet stable and may be changed.
 `,
 		RunE: mkRunE(c, runModUpload),
 		Args: cobra.ExactArgs(1),

@@ -39,8 +39,6 @@ If there is no module path, it chooses an arbitrary path (test.example@v0).
 
 If the module.cue file is already compatible with the new syntax,
 it is just formatted without making any other changes.
-
-Note that this command is not yet stable and may be changed.
 `,
 		RunE: mkRunE(c, runModFix),
 		Args: cobra.ExactArgs(0),

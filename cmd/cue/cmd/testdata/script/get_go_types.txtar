@@ -215,6 +215,7 @@ func (c *CustomJSON) MarshalJSON() ([]byte, error) {
 }
 
 type CustomYAML struct {
+	unexported int
 }
 
 func (c CustomYAML) MarshalYAML() ([]byte, error) {

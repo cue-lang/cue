@@ -215,9 +215,10 @@ func (c *CustomJSON) MarshalJSON() ([]byte, error) {
 }
 
 type CustomYAML struct {
+	unexported int
 }
 
-func (c CustomYAML) MarshalYAML() ([]byte, error) {
+func (c CustomYAML) MarshalYAML() (any, error) {
 	return nil, nil
 }
 
@@ -479,7 +480,7 @@ _#internalIdentifier: #Identifier & "internal"
 
 #CustomJSON: _
 
-#CustomYAML: {}
+#CustomYAML: _
 
 _#localType: int
 

@@ -732,7 +732,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 				fallthrough
 
 			default:
-				if !supportedType(nil, typ) {
+				if !e.supportedType(nil, typ) {
 					e.logf("    Dropped declaration %v of unsupported type %v", name, typ)
 					continue
 				}
@@ -976,7 +976,12 @@ func makeDoc(g *ast.CommentGroup, isDoc bool) *cueast.CommentGroup {
 	return &cueast.CommentGroup{Doc: isDoc, List: a}
 }
 
-func supportedType(stack []types.Type, t types.Type) (ok bool) {
+func (e *extractor) supportedType(stack []types.Type, t types.Type) (ok bool) {
+	// If this is a type which implements a supported interface,
+	// we do support it.
+	if s := e.altType(t); s != nil {
+		return true
+	}
 	// handle recursive types
 	if slices.Contains(stack, t) {
 		return true
@@ -1015,27 +1020,27 @@ func supportedType(stack []types.Type, t types.Type) (ok bool) {
 	case *types.Basic:
 		return true
 	case *types.Named:
-		return supportedType(stack, t.Underlying())
+		return e.supportedType(stack, t.Underlying())
 	case *types.TypeParam:
-		return supportedType(stack, t.Underlying())
+		return e.supportedType(stack, t.Underlying())
 	case *types.Pointer:
-		return supportedType(stack, t.Elem())
+		return e.supportedType(stack, t.Elem())
 	case *types.Slice:
-		return supportedType(stack, t.Elem())
+		return e.supportedType(stack, t.Elem())
 	case *types.Array:
-		return supportedType(stack, t.Elem())
+		return e.supportedType(stack, t.Elem())
 	case *types.Map:
 		if b, ok := t.Key().Underlying().(*types.Basic); !ok || b.Kind() != types.String {
 			return false
 		}
-		return supportedType(stack, t.Elem())
+		return e.supportedType(stack, t.Elem())
 	case *types.Struct:
 		// Eliminate structs with fields for which all fields are filtered.
 		if t.NumFields() == 0 {
 			return true
 		}
 		for f := range t.Fields() {
-			if f.Exported() && supportedType(stack, f.Type()) {
+			if f.Exported() && e.supportedType(stack, f.Type()) {
 				return true
 			}
 		}
@@ -1365,7 +1370,7 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		if !ast.IsExported(f.Name()) {
 			continue
 		}
-		if !supportedType(nil, f.Type()) {
+		if !e.supportedType(nil, f.Type()) {
 			e.logf("    Dropped field %v for unsupported type %v", f.Name(), f.Type())
 			continue
 		}

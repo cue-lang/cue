@@ -107,7 +107,10 @@ type Foozer struct {
 	// that it is really only implemented by the embedded field.
 	Embed struct{ CustomJSON }
 
-	Unsupported map[int]string
+	MapKeyNamedUnsupported map[MyInt]MyString
+	MapKeyUnsupported      map[int]string
+	NamedMapKeyUnsupported MyIntMap
+	MapKeyNamedString      map[MyString]MyString
 
 	OptionalOmitEmptyJSON string `json:"optionalOmitEmptyJSON,omitempty"`
 
@@ -164,6 +167,10 @@ type Foozer struct {
 	// +nullable
 	OptionalNullablePointer *string `json:"optionalNullablePointer"`
 }
+
+type MyInt int
+type MyString string
+type MyIntMap map[MyInt]MyString
 
 type Identifier string
 
@@ -359,6 +366,7 @@ import (
 	Embed: {
 		CustomJSON: #CustomJSON
 	} @go(,struct{CustomJSON})
+	MapKeyNamedString: {[string]: #MyString} @go(,map[MyString]MyString)
 	optionalOmitEmptyJSON?: string    @go(OptionalOmitEmptyJSON)
 	optionalOmitZeroJSON?:  time.Time @go(OptionalOmitZeroJSON)
 	optionalOmitEmptyYAML?: string    @go(OptionalOmitEmptyYAML)
@@ -416,6 +424,10 @@ import (
 	// +nullable
 	optionalNullablePointer?: null | string @go(OptionalNullablePointer,*string)
 }
+
+#MyInt: int
+
+#MyString: string
 
 #Identifier: string // #enumIdentifier
 

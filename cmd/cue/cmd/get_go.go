@@ -1015,9 +1015,9 @@ func supportedType(stack []types.Type, t types.Type) (ok bool) {
 	case *types.Basic:
 		return true
 	case *types.Named:
-		return true
+		return supportedType(stack, t.Underlying())
 	case *types.TypeParam:
-		return true
+		return supportedType(stack, t.Underlying())
 	case *types.Pointer:
 		return supportedType(stack, t.Elem())
 	case *types.Slice:
@@ -1274,7 +1274,7 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 
 	case *types.Map:
 		if b, ok := typ.Key().Underlying().(*types.Basic); !ok || b.Kind() != types.String {
-			panic(fmt.Sprintf("unsupported map key type %T", typ.Key()))
+			panic(fmt.Sprintf("unsupported map key type %v", typ.Key()))
 		}
 
 		f := &cueast.Field{

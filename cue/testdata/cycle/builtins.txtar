@@ -133,6 +133,13 @@ issue3633: final: {
 	data: {} & #s
 	#s: matchN(1, [matchN(1, [{a!: _}])])
 }
+issue3842: reduced: {
+	#recursive: [...matchIf({
+		source?: "multi"
+	}, #recursive, _) & {
+		source?: string
+	}]
+}
 -- cycle.cue --
 import "strconv"
 
@@ -246,7 +253,7 @@ import "list"
 
 issue3634: full: {
 	#Schema: {
-		required?: [...string] 
+		required?: [...string]
 		properties?: [string]: null | #Schema
 	}
 	
@@ -279,13 +286,13 @@ issue3743: {
 }
 -- out/evalalpha/stats --
 Leaks:  48
-Freed:  461
-Reused: 431
-Allocs: 78
+Freed:  464
+Reused: 433
+Allocs: 79
 Retain: 0
 
-Unifications: 427
-Conjuncts:    756
+Unifications: 430
+Conjuncts:    759
 Disjuncts:    30
 Notifications: 2
 
@@ -305,13 +312,13 @@ diff old new
 -Conjuncts:    821
 -Disjuncts:    537
 +Leaks:  48
-+Freed:  461
-+Reused: 431
-+Allocs: 78
++Freed:  464
++Reused: 433
++Allocs: 79
 +Retain: 0
 +
-+Unifications: 427
-+Conjuncts:    756
++Unifications: 430
++Conjuncts:    759
 +Disjuncts:    30
 +Notifications: 2
 +
@@ -817,6 +824,12 @@ Result:
         }) }
     }
   }
+  issue3842: (struct){
+    reduced: (struct){
+      #recursive: (list){
+      }
+    }
+  }
   yamlNoCycle: (struct){
     #c: (#struct){
       b?: (string){ string }
@@ -1272,7 +1285,20 @@ diff old new
        }
        #s: (_){ matchN(1, (#list){
            0: (_|_){// matchN(1, [
-@@ -417,8 +494,8 @@
+@@ -411,6 +488,12 @@
+         }) }
+     }
+   }
++  issue3842: (struct){
++    reduced: (struct){
++      #recursive: (list){
++      }
++    }
++  }
+   yamlNoCycle: (struct){
+     #c: (#struct){
+       b?: (string){ string }
+@@ -417,8 +500,8 @@
        a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
      }
      data: (#struct){
@@ -1282,7 +1308,7 @@ diff old new
      }
    }
    selfCycle: (_|_){
-@@ -446,19 +523,8 @@
+@@ -446,19 +529,8 @@
          }
        }
      }
@@ -1304,7 +1330,7 @@ diff old new
        }
      }
      yamlVal: (_|_){
-@@ -466,25 +532,33 @@
+@@ -466,25 +538,33 @@
        t1: (_|_){
          // [structural cycle]
          x: (_|_){
@@ -1352,7 +1378,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -492,13 +566,16 @@
+@@ -492,13 +572,16 @@
          z: (_|_){
            // [structural cycle]
            y: (_|_){
@@ -1376,7 +1402,7 @@ diff old new
          }
        }
      }
-@@ -505,8 +582,12 @@
+@@ -505,8 +588,12 @@
      yamlValidatePartial: (_|_){
        // [structural cycle]
        x: (_|_){
@@ -2246,6 +2272,17 @@ Result:
           },
         ]),
       ])
+    }
+  }
+  issue3842: {
+    reduced: {
+      #recursive: [
+        ...(matchIf({
+          source?: "multi"
+        }, 〈1;#recursive〉, _) & {
+          source?: string
+        }),
+      ]
     }
   }
 }

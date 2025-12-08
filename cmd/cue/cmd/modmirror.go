@@ -37,8 +37,7 @@ func newModMirrorCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "mirror [module...]",
 		Short: "mirror module content between registries",
-		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
-
+		Long: `
 This commmand ensures that a set of modules and their dependencies
 are available ("mirrored") in a registry.
 
@@ -67,9 +66,7 @@ unless the --mod flag is specified, in which case the current module's
 dependencies will be used. When --mod is given and no modules
 are specified on the command line, all the current module's dependencies will
 be mirrored.
-
-Note that this command is not yet stable and may be changed.
-`,
+`[1:],
 		RunE: mkRunE(c, runModMirror),
 	}
 	cmd.Flags().BoolP(string(flagDryRun), "n", false, "only run simulation")

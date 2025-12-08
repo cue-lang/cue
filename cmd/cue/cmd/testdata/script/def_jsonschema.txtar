@@ -74,7 +74,7 @@ import "strings"
 	age?: int & >=0
 }
 -- schema.json --
-﻿{
+{
   "$id": "https://example.com/person.schema.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Person",

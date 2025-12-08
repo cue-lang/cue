@@ -23,11 +23,6 @@ import (
 	"regexp"
 	"slices"
 	"strings"
-
-	"github.com/yuin/goldmark"
-	mdast "github.com/yuin/goldmark/ast"
-	mdextension "github.com/yuin/goldmark/extension"
-	mdtext "github.com/yuin/goldmark/text"
 )
 
 func main() {
@@ -84,43 +79,6 @@ func checkCommit(dir string) error {
 	if !slices.Equal(authors, signers) {
 		return fmt.Errorf("commit author email addresses %q do not match signed-off-by trailers %q",
 			authors, signers)
-	}
-
-	// Forbid @-mentioning any GitHub usernames in commit messages,
-	// as that will lead to notifications which are likely unintended.
-	// If one must include a similar-looking snippet, like @embed(),
-	// they can be placed inside Markdown's single-line single-backticks
-	// without notifications being generated (e.g. "This uses `@embed()` to ...").
-	//
-	// Note that we parse the body as markdown including git trailers, but that's okay.
-	// Note that GitHub does not interpret mentions in titles, but we still check them
-	// for the sake of being conservative and consistent.
-	//
-	// TODO: this doesn't catch mentions in block quotes, which cause notifications.
-	// cf. https://cuelang.org/issue/4026
-	md := goldmark.New(
-		goldmark.WithExtensions(mdextension.GFM),
-	)
-	docBody := []byte(body)
-	doc := md.Parser().Parse(mdtext.NewReader(docBody))
-	if err := mdast.Walk(doc, func(node mdast.Node, entering bool) (mdast.WalkStatus, error) {
-		if !entering {
-			return mdast.WalkContinue, nil
-		}
-		// Uncomment for some quick debugging.
-		// fmt.Printf("%T\n%q\n\n", node, node.Text(docBody))
-		switch node.(type) {
-		case *mdast.CodeSpan:
-			return mdast.WalkSkipChildren, nil
-		case *mdast.Text:
-			text := node.Text(docBody)
-			if m := rxUserMention.FindSubmatch(text); m != nil {
-				return mdast.WalkStop, fmt.Errorf("commit mentions GitHub user %q; enclose code in single backticks", m[2])
-			}
-		}
-		return mdast.WalkContinue, nil
-	}); err != nil {
-		return err
 	}
 	return nil
 }

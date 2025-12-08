@@ -81,6 +81,8 @@ func (f *File) QualifiedModule() string {
 
 // Deprecated: this method is misnamed; use [File.ModuleRootPath]
 // instead.
+//
+//go:fix inline
 func (f *File) ModulePath() string {
 	return f.ModuleRootPath()
 }

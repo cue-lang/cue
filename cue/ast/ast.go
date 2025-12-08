@@ -1053,6 +1053,8 @@ outer:
 // VisitImports iterates through the import declarations in the file.
 //
 // Deprecated: use [File.ImportDecls].
+//
+//go:fix inline
 func (f *File) VisitImports(fn func(d *ImportDecl)) {
 	for d := range f.ImportDecls() {
 		fn(d)

@@ -51,8 +51,6 @@ this command will fail.
 
 See "cue help environment" for details on how $CUE_REGISTRY is used to
 determine the modules registry.
-
-Note that this command is not yet stable and may be changed.
 `,
 		RunE: mkRunE(c, runModGet),
 		Args: cobra.MinimumNArgs(1),

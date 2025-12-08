@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdff3a31_debdb233",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 985,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-12-08T14:52:19Z",
+      "side": 1,
+      "message": "tiny nit: I think it\u0027s generally nicer to avoid having the conditional in the comment when it\u0027s easier to avoid:\n\n\n\n```suggestion\n\tif s :\u003d e.altType(t); s !\u003d nil {\n\t\t// t implements a supported interface.\n\t\treturn true\n\t}\n\t// handle recursive types\n```",
+      "range": {
+        "startLine": 980,
+        "startChar": 0,
+        "endLine": 985,
+        "endChar": 0
+      },
+      "revId": "c679c163570f5481162e88a53b2e48515a915eda",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

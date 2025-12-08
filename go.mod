@@ -18,7 +18,6 @@ require (
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.10
 	github.com/tetratelabs/wazero v1.10.1
-	github.com/yuin/goldmark v1.7.13
 	go.yaml.in/yaml/v3 v3.0.4
 	golang.org/x/mod v0.30.0
 	golang.org/x/net v0.47.0

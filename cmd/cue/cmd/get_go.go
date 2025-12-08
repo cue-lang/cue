@@ -1010,12 +1010,13 @@ func supportedType(stack []types.Type, t types.Type) (ok bool) {
 		}
 	}
 
-	// Note that underlying types are never aliases.
-	t = t.Underlying()
+	t = types.Unalias(t)
 	switch t := t.(type) {
 	case *types.Basic:
 		return true
 	case *types.Named:
+		return true
+	case *types.TypeParam:
 		return true
 	case *types.Pointer:
 		return supportedType(stack, t.Elem())

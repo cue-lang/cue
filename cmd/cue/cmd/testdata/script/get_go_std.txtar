@@ -59,7 +59,8 @@ package x
 
 #Root: {
 	// reflect types and values in Go are opaque and do not encode as useful JSON.
-	ReflectType: _ @go(,reflect.Type)
+	ReflectType:  _ @go(,reflect.Type)
+	ReflectValue: _ @go(,reflect.Value)
 
 	// reflect.ValueError is an example of a struct made up of simple types,
 	// in this case a Method string and a Kind uint.

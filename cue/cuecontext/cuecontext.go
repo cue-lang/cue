@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package cuecontext creates [cue.Context] values,
+// which are needed for creating [cue.Value] values
+// and using the core API in the [cue] package.
 package cuecontext
 
 import (

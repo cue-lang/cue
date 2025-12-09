@@ -241,8 +241,7 @@ func TestDecode(t *testing.T) {
 	}, {
 		value: `{intPtr: int}`,
 		dst:   &Types{},
-		// TODO: issue #3928: we should fail due to the incomplete value
-		want: Types{IntPtr: nil},
+		err:   "intPtr: cannot convert non-concrete value int",
 	}, {
 		value: `[]`,
 		dst:   new(interface{}),
@@ -313,9 +312,7 @@ func TestDecode(t *testing.T) {
 	}, {
 		value: `{RawMessage: null}`,
 		dst:   &Unmarshalers{},
-		want:  Unmarshalers{RawMessage: nil},
-		// TODO: issue #3397:
-		// want:  Unmarshalers{RawMessage: json.RawMessage("null")},
+		want:  Unmarshalers{RawMessage: json.RawMessage("null")},
 	}, {
 		value: `{NetIP: "127.0.0.1"}`,
 		dst:   &Unmarshalers{},

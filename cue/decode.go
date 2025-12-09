@@ -68,8 +68,8 @@ func incompleteError(v Value) errors.Error {
 		v: v,
 		err: &adt.Bottom{
 			Code: adt.IncompleteError,
-			Err: errors.Newf(v.Pos(),
-				"cannot convert non-concrete value %v", v)},
+			Err:  errors.Newf(v.Pos(), "cannot convert non-concrete value %v", v),
+		},
 	}
 }
 
@@ -102,31 +102,13 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 		return
 	}
 
-	switch x.Kind() {
-	case reflect.Pointer, reflect.Map, reflect.Slice, reflect.Interface:
-		// nullable types
-		if v.IsNull() || !v.IsConcrete() {
-			d.clear(x)
-			return
-		}
-
-	default:
-		// TODO: allow incomplete values.
-		if !v.IsConcrete() {
-			d.addErr(incompleteError(v))
-			return
-		}
-	}
-
 	ij, it, x := indirect(x, v.IsNull())
-
 	if ij != nil {
 		b, err := v.MarshalJSON()
 		d.addErr(err)
 		d.addErr(ij.UnmarshalJSON(b))
 		return
 	}
-
 	if it != nil {
 		if _, ok := it.(*big.Float); ok {
 			f, err := v.Float(nil)
@@ -150,6 +132,21 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 	}
 
 	kind := x.Kind()
+	switch kind {
+	case reflect.Pointer, reflect.Map, reflect.Slice, reflect.Interface:
+		// nullable types
+		if v.IsNull() || !v.IsConcrete() {
+			d.clear(x)
+			return
+		}
+
+	default:
+		// TODO: allow incomplete values.
+		if !v.IsConcrete() {
+			d.addErr(incompleteError(v))
+			return
+		}
+	}
 
 	if kind == reflect.Interface {
 		value := d.interfaceValue(v)
@@ -336,7 +333,7 @@ func (d *decoder) convertMap(x reflect.Value, v Value) {
 	t := x.Type()
 
 	// Map key must either have string kind, have an integer kind,
-	// or be an encoding.TextUnmarshaler.
+	// or be an [encoding.TextUnmarshaler].
 	switch t.Key().Kind() {
 	case reflect.String,
 		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,

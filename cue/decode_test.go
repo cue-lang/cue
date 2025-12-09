@@ -15,8 +15,10 @@
 package cue_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/big"
+	"net"
 	"reflect"
 	"testing"
 	"time"
@@ -50,12 +52,6 @@ func TestDecode(t *testing.T) {
 		want  interface{}
 		err   string
 	}{{
-		// clear pointer
-		value: `null`,
-		dst:   &[]int{1},
-		want:  []int(nil),
-	}, {
-
 		value: `1`,
 		err:   "cannot decode into unsettable value",
 	}, {
@@ -221,22 +217,32 @@ func TestDecode(t *testing.T) {
 		},
 	}, {
 		// Issue #1466
-		value: `{"x": "1s"}
-		`,
-		dst:  &S{},
-		want: S{X: Duration{D: 1000000000}},
+		value: `{myDuration: "1s"}`,
+		dst:   &Types{},
+		want:  Types{DurationStruct: MyDuration{D: 1000000000}},
 	}, {
 		// Issue #1466
-		value: `{"x": '1s'}
-			`,
-		dst:  &S{},
-		want: S{X: Duration{D: 1000000000}},
+		value: `{myDuration: '1s'}`,
+		dst:   &Types{},
+		want:  Types{DurationStruct: MyDuration{D: 1000000000}},
 	}, {
 		// Issue #1466
-		value: `{"x": 1}
-				`,
-		dst: &S{},
-		err: "Decode: x: cannot use value 1 (type int) as (string|bytes)",
+		value: `{myDuration: 1}`,
+		dst:   &Types{},
+		err:   "Decode: myDuration: cannot use value 1 (type int) as (string|bytes)",
+	}, {
+		value: `{intPtr: null}`,
+		dst:   &Types{IntPtr: addr(999)}, // the original value is wiped
+		want:  Types{},
+	}, {
+		value: `{intPtr: 123}`,
+		dst:   &Types{},
+		want:  Types{IntPtr: addr(123)},
+	}, {
+		value: `{intPtr: int}`,
+		dst:   &Types{},
+		// TODO: issue #3928: we should fail due to the incomplete value
+		want: Types{IntPtr: nil},
 	}, {
 		value: `[]`,
 		dst:   new(interface{}),
@@ -300,6 +306,24 @@ func TestDecode(t *testing.T) {
 		value: `-1.99769313499e+508`,
 		dst:   new(*big.Float),
 		want:  bigFloat(`-1.99769313499e+508`),
+	}, {
+		value: `{RawMessage: 123.0}`,
+		dst:   &Unmarshalers{},
+		want:  Unmarshalers{RawMessage: json.RawMessage("123.0")},
+	}, {
+		value: `{RawMessage: null}`,
+		dst:   &Unmarshalers{},
+		want:  Unmarshalers{RawMessage: nil},
+		// TODO: issue #3397:
+		// want:  Unmarshalers{RawMessage: json.RawMessage("null")},
+	}, {
+		value: `{NetIP: "127.0.0.1"}`,
+		dst:   &Unmarshalers{},
+		want:  Unmarshalers{NetIP: net.IP{127, 0, 0, 1}},
+	}, {
+		value: `{NetIP: null}`,
+		dst:   &Unmarshalers{},
+		want:  Unmarshalers{NetIP: nil},
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
@@ -351,14 +375,20 @@ func TestDecodeIntoCUEValue(t *testing.T) {
 	})
 }
 
-type Duration struct {
+type MyDuration struct {
 	D time.Duration
 }
-type S struct {
-	X Duration `json:"x"`
+type Types struct {
+	DurationStruct MyDuration `json:"myDuration"`
+	IntPtr         *int       `json:"intPtr"`
 }
 
-func (d *Duration) UnmarshalText(data []byte) error {
+type Unmarshalers struct {
+	RawMessage json.RawMessage // [json.Unmarshaler]
+	NetIP      net.IP          // [encoding.TextUnmarshaler]
+}
+
+func (d *MyDuration) UnmarshalText(data []byte) error {
 	v, err := time.ParseDuration(string(data))
 	if err != nil {
 		return err
@@ -367,6 +397,8 @@ func (d *Duration) UnmarshalText(data []byte) error {
 	return nil
 }
 
-func (d *Duration) MarshalText() ([]byte, error) {
+func (d *MyDuration) MarshalText() ([]byte, error) {
 	return []byte(d.D.String()), nil
 }
+
+func addr[T any](t T) *T { return &t }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f6e9f08_fe3e1935",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-10T16:44:16Z",
+      "side": 1,
+      "message": "I keep forgetting that we need a new staticcheck release first, with the latest fixes.",
+      "revId": "06fbec7727e96fc0eb3ac3f6ee00ef203818db90",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

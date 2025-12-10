@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90e1f308_4189cb14",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1353,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-12-10T14:04:10Z",
+      "side": 1,
+      "message": "ISTM this might not _quite_ be sufficient in certain pathalogical cases - for example I suspect that the following Go field would pass this test but not be quoted:\n\n```\n\tFoo int\t`xml:\"), x: 4\"`\n```\nIt would be possible to work around this by checking the form of the resulting syntax, I think.",
+      "revId": "68d7cf088c2be0382a30ca7ceffbf2169d22afe6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

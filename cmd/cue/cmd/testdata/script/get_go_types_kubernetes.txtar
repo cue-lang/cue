@@ -5,12 +5,16 @@
 exec cue get go --local .
 cmp ./file2_go_gen.cue ./file2_go_gen.cue.golden
 
+# Check that the resulting CUE is valid
+exec cue vet -c=false
+
 -- go.mod --
 module mod.test
 
 go 1.21
 -- cue.mod/module.cue --
 module: "mod.test"
+language: version: "v0.15.0"
 -- file1.go --
 package pkg1
 

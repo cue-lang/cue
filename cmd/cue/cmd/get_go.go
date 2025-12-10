@@ -1183,6 +1183,9 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 				// This may happen if an alias is defined in a different file
 				// within this package referring to yet another package.
 				info.id = pkg.Path()
+				if path.Base(info.id) != pkg.Name() {
+					info.id += ":" + pkg.Name()
+				}
 			}
 			p.Node = cueast.NewImport(name, info.id)
 			// makeType is always called to describe a type, so whatever

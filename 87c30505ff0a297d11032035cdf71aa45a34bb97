@@ -16,6 +16,24 @@
       "message": "presumably you mean noncrete values here, as an incomplete value (a value which is an incomplete error) is almost certainly a mistake AFAICS?\n\nAlso, we _do_ already allow noncrete values when decoding into `cue.Value`. I\u0027m not entirely sure what this TODO would actually do tbh. Perhaps explain a bit more here about what allowing noncrete or incomplete values might imply?",
       "revId": "87c30505ff0a297d11032035cdf71aa45a34bb97",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14f3666a_5d21611e",
+        "filename": "cue/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-10T14:15:43Z",
+      "side": 1,
+      "message": "I agree that this TODO is not particularly clear - and I think it did mean noncrete - but I\u0027m simply moving these lines. It\u0027s been there since the very early days of decode.go, so I\u0027d rather leave it as-is and we can discuss with Marcel in the future when we want to tackle this.",
+      "parentUuid": "5a94e7de_1a61cc2d",
+      "revId": "87c30505ff0a297d11032035cdf71aa45a34bb97",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

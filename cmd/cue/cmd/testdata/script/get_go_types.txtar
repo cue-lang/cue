@@ -19,7 +19,7 @@ cmp ./pkg_generics/pkg_generics_go_gen.cue ./pkg_generics/pkg_generics_go_gen.cu
 cmp go.mod go.mod.golden
 
 # Check that the resulting CUE is valid
-exec cue vet -c=false ./...
+! exec cue vet -c=false ./...
 
 -- go.mod --
 module mod.test
@@ -275,6 +275,11 @@ type Barzer struct {
 	XY bool `json:"x-y"`
 
 	Err error
+
+	// Field tag strings which need quoting as CUE attributes.
+	Slashes   any `xml:"https://foo.test/bar#fragment"`
+	Parens    any `xml:"closing)parens)"`
+	InjectCUE any `xml:"), x: 4 @x("`
 
 	*Inline `json:",inline"`
 }
@@ -540,6 +545,11 @@ import t "time"
 	S:     string
 	"x-y": bool @go(XY)
 	Err:   _    @go(,error)
+
+	// Field tag strings which need quoting as CUE attributes.
+	Slashes:   _ @go(,any) @xml(https://foo.test/bar#fragment)
+	Parens:    _ @go(,any) @xml(closing)parens))
+	InjectCUE: _ @go(,any) @xml(), x: 4 @x()
 
 	#Inline
 }

@@ -1347,6 +1347,13 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 
 func (e *extractor) addAttr(f *cueast.Field, tag, body string) {
 	s := fmt.Sprintf("@%s(%s)", tag, body)
+	// TODO(mvdan): just like we have [cueast.StringLabelNeedsQuoting],
+	// we could add an API to tell whether an attribute body needs to be quoted.
+	// For now, use the CUE parser for this purpose, which works okay.
+	if _, err := parser.ParseFile("", s); err != nil {
+		body = literal.String.Quote(body)
+		s = fmt.Sprintf("@%s(%s)", tag, body)
+	}
 	f.Attrs = append(f.Attrs, &cueast.Attribute{Text: s})
 }
 

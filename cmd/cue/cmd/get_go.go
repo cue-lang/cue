@@ -1346,8 +1346,31 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 }
 
 func (e *extractor) addAttr(f *cueast.Field, tag, body string) {
+	if attrBodyNeedsQuoting(body) {
+		body = literal.String.Quote(body)
+	}
 	s := fmt.Sprintf("@%s(%s)", tag, body)
 	f.Attrs = append(f.Attrs, &cueast.Attribute{Text: s})
+}
+
+func attrBodyNeedsQuoting(s string) bool {
+	// TODO(mvdan): just like we have [cueast.StringLabelNeedsQuoting],
+	// we could add an API to tell whether an attribute body needs to be quoted.
+	// For now, use the CUE parser for this purpose, which works okay.
+	src := "@x(" + s + ")"
+	f, err := parser.ParseFile("", src)
+	if err != nil {
+		return true
+	}
+	// Make sure we parsed exactly one attribute with the content we expect.
+	if len(f.Decls) != 1 {
+		return true
+	}
+	attr, ok := f.Decls[0].(*cueast.Attribute)
+	if !ok || attr.Text != src {
+		return true
+	}
+	return false
 }
 
 func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {

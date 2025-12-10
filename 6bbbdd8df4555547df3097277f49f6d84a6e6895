@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "493987df_ca927c2c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-12-10T14:39:45Z",
+      "side": 1,
+      "message": "LGTM with a couple of thoughts/suggestions.",
+      "revId": "6bbbdd8df4555547df3097277f49f6d84a6e6895",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99869c6d_e40226a5",
+        "filename": "cue/ast/astutil/apply.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-12-10T14:39:45Z",
+      "side": 1,
+      "message": "I wonder whether this might be a slightly clearer name.\n\n```suggestion\nfunc applyIfNotNil[N nilableNode](v applyVisitor, parent Cursor, nodePtr *N) {\n```",
+      "revId": "6bbbdd8df4555547df3097277f49f6d84a6e6895",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afd3a1f0_156dcb7b",
+        "filename": "cue/ast/astutil/apply.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-12-10T14:39:45Z",
+      "side": 1,
+      "message": "Given that, AFAIK we never want to pass a nil pointer to the `before` or `after` functions, particularly as in many cases it will instantly cause a panic in the recipient, how about doing a sanity check here and panic with a more useful message if *nodePtr _is_ nil?\n\nThe alternative might be to treat `apply` as the same as your `applyNilable` and just return if the value is nil, but I think there\u0027s a reason the current code doesn\u0027t check for nil in many cases: it\u0027s actually an error if certain fields do happen to be nil.",
+      "revId": "6bbbdd8df4555547df3097277f49f6d84a6e6895",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

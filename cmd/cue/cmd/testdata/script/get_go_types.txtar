@@ -18,6 +18,9 @@ cmp ./pkg_generics/pkg_generics_go_gen.cue ./pkg_generics/pkg_generics_go_gen.cu
 # Verify dependencies did not change
 cmp go.mod go.mod.golden
 
+# Check that the resulting CUE is valid
+exec cue vet -c=false ./...
+
 -- go.mod --
 module mod.test
 
@@ -28,6 +31,7 @@ module mod.test
 go 1.21
 -- cue.mod/module.cue --
 module: "mod.test"
+language: version: "v0.15.0"
 -- pkg1/alias.go --
 package pkg1
 
@@ -300,7 +304,7 @@ type Barzer = pkgtwo.Barzer
 
 package pkg1
 
-import "mod.test/pkg2"
+import "mod.test/pkg2:pkgtwo"
 
 #MyBarzer: pkgtwo.#Barzer
 -- pkg1/file1_go_gen.cue.golden --

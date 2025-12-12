@@ -115,6 +115,29 @@ func TestCreate(t *testing.T) {
 	}
 }
 
+func TestSymlink(t *testing.T) {
+	name := filepath.Join(t.TempDir(), "file")
+	name = filepath.ToSlash(name)
+
+	v := parse(t, "tool/file.Symlink", fmt.Sprintf(`{
+		filename: "%s"
+		target: "testdata/input.foo"
+	}`, name))
+	_, err := (*cmdSymlink).Run(nil, &task.Context{Obj: v})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	target, err := os.Readlink(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got, want := filepath.ToSlash(target), "testdata/input.foo"; got != want {
+		t.Errorf("got %v; want %v", got, want)
+	}
+}
+
 func TestGlob(t *testing.T) {
 	// Simple globbing against testdata.
 	v := parse(t, "tool/file.Glob", `{

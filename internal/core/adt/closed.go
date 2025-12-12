@@ -96,11 +96,46 @@ func (v *Vertex) ShouldRecursivelyClose() bool {
 	return v.state.embedsRecursivelyClosed
 }
 
-type CloseInfo struct {
+// posInfo is a compact representation of position information for error reporting.
+// It stores only the essential fields needed for tracking positions and priority,
+// saving significant memory compared to the full CloseInfo struct.
+// This is used for scalarID and kindID fields in nodeContext.
+type posInfo struct {
+	// opID is the generation of this conjunct, used for sanity check.
+	opID uint64
+
 	// defID is a unique ID to track anything that gets inserted from this
 	// Conjunct.
-	opID           uint64 // generation of this conjunct, used for sanity check.
-	defID          defID
+	defID defID
+
+	// Priority is used for default resolution. Higher values win. 0 means no
+	// priority is assigned. Default handling may be more restrictive than
+	// specified in the spec when a priority is assigned.
+	Priority layer.Priority
+}
+
+// AncestorPositions returns an iterator over each parent of p,
+// starting with the most immediate parent. This is used
+// to add positions to errors that are associated with position info.
+func (p posInfo) AncestorPositions(ctx *OpContext) iter.Seq[token.Pos] {
+	return func(yield func(token.Pos) bool) {
+		if p.opID != ctx.opID {
+			return
+		}
+		for id := p.defID; id != 0; id = ctx.containments[id].id {
+			pos := ctx.positionTable[ctx.containments[id].posIndex]
+			if !yield(pos) {
+				return
+			}
+		}
+	}
+}
+
+type CloseInfo struct {
+	// Embedded posInfo provides opID, defID, and priority fields.
+	// These are the core fields needed for position tracking and priority comparison.
+	posInfo
+
 	enclosingEmbed defID // Tracks an embedding within a struct.
 	outerID        defID // Tracks the {} that should be closed after unifying.
 
@@ -122,11 +157,6 @@ type CloseInfo struct {
 	// This conjunct was opened by the ... postfix operator.
 	Opened bool
 
-	// Priority is used for default resolution. Higher values win. 0 means no
-	// priority is assigned. Default handling may be more restrictive than
-	// specified in the spec when a priority is assigned.
-	Priority layer.Priority
-
 	CycleInfo
 }
 
@@ -135,23 +165,6 @@ func (c CloseInfo) Location(ctx *OpContext) token.Pos {
 		return token.NoPos
 	}
 	return ctx.positionTable[ctx.containments[c.defID].posIndex]
-}
-
-// AncestorPositions returns an iterator over each parent of c,
-// starting with the most immediate parent. This is used
-// to add positions to errors that are associated with a CloseInfo.
-func (c *CloseInfo) AncestorPositions(ctx *OpContext) iter.Seq[token.Pos] {
-	return func(yield func(token.Pos) bool) {
-		if c.opID != ctx.opID {
-			return
-		}
-		for p := c.defID; p != 0; p = ctx.containments[p].id {
-			pos := ctx.positionTable[ctx.containments[p].posIndex]
-			if !yield(pos) {
-				return
-			}
-		}
-	}
 }
 
 // IsDef reports whether an expressions is a reference that references a

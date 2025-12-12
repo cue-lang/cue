@@ -451,12 +451,12 @@ type nodeContextState struct {
 	kind           Kind
 	constraintKind Kind
 	defaultKind    Kind
-	kindExpr       Expr      // expr that adjust last value (for error reporting)
-	kindID         CloseInfo // for error tracing
+	kindExpr       Expr    // expr that adjust last value (for error reporting)
+	kindID         posInfo // for error tracing
 
 	// Current value (may be under construction)
 	scalar   Value // TODO: use Value in node.
-	scalarID CloseInfo
+	scalarID posInfo
 
 	aStruct bool // TODO: eventually replace with kind & StructKind
 
@@ -570,7 +570,7 @@ func (c *OpContext) freeNodeContext(n *nodeContext) {
 	n.scheduler.clear()
 }
 
-func (n *nodeContext) reportConflict(v1, v2 Node, k1, k2 Kind, ids ...CloseInfo) {
+func (n *nodeContext) reportConflict(v1, v2 Node, k1, k2 Kind, ids ...posInfo) {
 	ctx := n.ctx
 
 	// Collect all positions from the nodes, including their leaf conjuncts
@@ -619,7 +619,7 @@ func (n *nodeContext) reportFieldMismatch(
 	s *StructLit,
 	f Feature,
 	scalar Expr,
-	id ...CloseInfo) {
+	id ...posInfo) {
 
 	ctx := n.ctx
 
@@ -671,7 +671,7 @@ func (n *nodeContext) updateNodeType(k Kind, v Expr, id CloseInfo) bool {
 	// 	n.reportFieldMismatch(token.NoPos, s, 0, n.kindExpr, id, n.kindID)
 
 	case n.kindExpr != nil:
-		n.reportConflict(n.kindExpr, v, n.kind, k, n.kindID, id)
+		n.reportConflict(n.kindExpr, v, n.kind, k, n.kindID, id.posInfo)
 
 	default:
 		n.addErr(ctx.Newf(
@@ -683,7 +683,7 @@ func (n *nodeContext) updateNodeType(k Kind, v Expr, id CloseInfo) bool {
 		n.kindExpr = v
 	}
 	n.kind = kind
-	n.kindID = id
+	n.kindID = id.posInfo
 	return kind != BottomKind
 }
 

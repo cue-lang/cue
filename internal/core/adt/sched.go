@@ -268,7 +268,7 @@ type scheduler struct {
 	// counters keeps track of the number of uncompleted tasks that are
 	// outstanding for each of the possible conditions. A state is
 	// considered completed if the corresponding counter reaches zero.
-	counters [numCompletionStates]int
+	counters [numCompletionStates]int32
 
 	// tasks lists all tasks that were scheduled for this scheduler.
 	// The list only contains tasks that are associated with this node.

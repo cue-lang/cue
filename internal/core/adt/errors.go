@@ -320,8 +320,8 @@ func (e *baseError) AddPos(p token.Pos) {
 	e.auxpos = append(e.auxpos, p)
 }
 
-func (e *baseError) AddClosedPositions(ctx *OpContext, c CloseInfo) {
-	for n := range c.AncestorPositions(ctx) {
+func (e *baseError) AddClosedPositions(ctx *OpContext, p posInfo) {
+	for n := range p.AncestorPositions(ctx) {
 		e.AddPos(n)
 	}
 }

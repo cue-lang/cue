@@ -586,7 +586,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 					if err := valueError(v); err != nil {
 						err.AddPosition(v)
 						err.AddPosition(*bound)
-						err.AddClosedPositions(n.ctx, id)
+						err.AddClosedPositions(n.ctx, id.posInfo)
 					}
 					*bound = nil
 					n.insertValueConjunct(env, v, id)
@@ -694,13 +694,13 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 				}
 			}
 			if !BinOpBool(ctx, errOnDiffType, EqualOp, x, y) {
-				n.reportConflict(x, y, x.Kind(), y.Kind(), n.scalarID, id)
+				n.reportConflict(x, y, x.Kind(), y.Kind(), n.scalarID, id.posInfo)
 			}
 			break
 		}
 	patchConjunct:
 		n.scalar = x
-		n.scalarID = id
+		n.scalarID = id.posInfo
 		// TODO: only set "scalarKnown" if there are no other high priority
 		// conjuncts. Alternatively, we should process high priority conjuncts
 		// in the scheduler first.
@@ -715,7 +715,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			if err := valueError(u); err != nil {
 				err.AddPosition(n.lowerBound)
 				err.AddPosition(n.upperBound)
-				err.AddClosedPositions(n.ctx, id)
+				err.AddClosedPositions(n.ctx, id.posInfo)
 			}
 			n.lowerBound = nil
 			n.upperBound = nil

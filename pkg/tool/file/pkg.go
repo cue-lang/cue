@@ -57,6 +57,24 @@
 //		contents: bytes | string
 //	}
 //
+//	// Symlink creates a symbolic link.
+//	Symlink: {
+//		$id: _id
+//		_id: "tool/file.Symlink"
+//
+//		// filename defines the name of the symlink.
+//		//
+//		// Relative names are taken relative to the current working directory.
+//		// Slashes are converted to the native OS path separator.
+//		filename: !=""
+//
+//		// target names the target file or directory of the symlink.
+//		//
+//		// Relative names are taken relative to the current working directory.
+//		// Slashes are converted to the native OS path separator.
+//		target: !=""
+//	}
+//
 //	// Glob returns a list of files.
 //	Glob: {
 //		$id: _id
@@ -166,6 +184,12 @@ var p = &pkg.Package{
 		filename:    !=""
 		permissions: int | *0o666
 		contents:    bytes | string
+	}
+	Symlink: {
+		$id:      _id
+		_id:      "tool/file.Symlink"
+		filename: !=""
+		target:   !=""
 	}
 	Glob: {
 		$id:  _id

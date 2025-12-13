@@ -1,0 +1,129 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d44ade0_45dff908",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-13T16:21:45Z",
+      "side": 1,
+      "message": "I\u0027d make the commit message title a bit clearer about what this is for:\n\n\u003e cmd/cue: add support for DOCKER_AUTH_CONFIG OCI registry credentials",
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cebdf45d_5bd9ba95",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-13T16:21:45Z",
+      "side": 1,
+      "message": "link to the Gerrit change instead, i.e: https://cuelang.org/cl/1227730",
+      "range": {
+        "startLine": 10,
+        "startChar": 51,
+        "endLine": 10,
+        "endChar": 91
+      },
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e004082_b0098275",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-13T16:21:45Z",
+      "side": 1,
+      "message": "unindent these list items for the sake of readability",
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e3dbacd_46488f54",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-13T16:21:45Z",
+      "side": 1,
+      "message": "remember to add `Fixes #4204` as a last paragraph.",
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01ffa4ea_95d73170",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-13T16:21:45Z",
+      "side": 1,
+      "message": "we already have and use env-fill to fill in the env vars in the docker config files - so I would suggest having something like `env-read` that sets an env var to a file without expanding its contents.",
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac7a2eaa_26e8b2ea",
+        "filename": "cmd/cue/cmd/testdata/script/registry_auth.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-13T16:21:45Z",
+      "side": 1,
+      "message": "this is unnecessary if you do the change suggested below",
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85a9b158_7e3567f6",
+        "filename": "cmd/cue/cmd/testdata/script/registry_auth.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-13T16:21:45Z",
+      "side": 1,
+      "message": "this just duplicates dockerconfig/config.json; is there a reason for that?\n\nif you want to keep the \"good password\" test case for the various test case scenarios, that\u0027s fine, but then you can just rename the file above to dockerconfig/goodpassword.json rather than duplicating it.",
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

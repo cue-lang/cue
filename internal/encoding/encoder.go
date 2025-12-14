@@ -312,10 +312,18 @@ func writer(f *build.File, cfg *Config) (_ io.Writer, close func() error) {
 			mode = os.O_WRONLY | os.O_CREATE | os.O_TRUNC
 		}
 		f, err := os.OpenFile(path, mode, 0o666)
-		if err != nil {
-			if errors.Is(err, fs.ErrExist) {
+		if errors.Is(err, fs.ErrExist) {
+			// If we failed because the file already existed,
+			// but the file in question is not regular, allow writing to it.
+			// This is done as a retry to avoid a Stat call before every OpenFile.
+			stat, err2 := os.Stat(path)
+			if err2 == nil && !stat.Mode().IsRegular() {
+				f, err = os.OpenFile(path, os.O_WRONLY, 0o666)
+			} else {
 				return errors.Wrapf(fs.ErrExist, token.NoPos, "error writing %q", path)
 			}
+		}
+		if err != nil {
 			return err
 		}
 		_, err = f.Write(b.Bytes())

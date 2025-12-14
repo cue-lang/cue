@@ -409,16 +409,6 @@ func (p *parser) next() {
 	}
 }
 
-// errDeprecated causes an error due to the use of a deprecated language feature.
-// Note that this is how language features used to get phased out;
-// we now use CUE experiments driven by a module's language version,
-// the CUE_EXPERIMENT environment variable, and the @experiment file attribute.
-// TODO(mvdan): transition out of this entirely.
-func (p *parser) errDeprecated(pos token.Pos, version, name string) {
-	p.errors = errors.Append(p.errors, errors.Wrapf(&DeprecationError{}, pos,
-		"use of deprecated %s (deprecated as of %s)", name, version))
-}
-
 func (p *parser) errf(pos token.Pos, msg string, args ...interface{}) {
 	// ePos := p.file.Position(pos)
 	ePos := pos
@@ -881,7 +871,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 			expr = p.parseRHS()
 		}
 		if a, ok := expr.(*ast.Alias); ok {
-			p.errDeprecated(a.Pos(), "v0.1.4", `old-style alias; use "let X = expr" instead`)
+			p.errf(a.Pos(), `pre-v0.2 alias; use "let X = expr" instead`)
 			p.consumeDeclComma()
 			return a
 		}
@@ -921,7 +911,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 
 	case token.RBRACE, token.EOF:
 		if a, ok := expr.(*ast.Alias); ok {
-			p.errDeprecated(a.Pos(), "v0.1.4", `old-style alias; use "let X = expr" instead`)
+			p.errf(a.Pos(), `pre-v0.2 alias; use "let X = expr" instead`)
 			return a
 		}
 		switch tok {

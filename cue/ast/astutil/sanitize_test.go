@@ -34,7 +34,7 @@ func TestSanitize(t *testing.T) {
 		desc: "Take existing import and rename it",
 		file: func() *ast.File {
 			spec := ast.NewImport(nil, "list")
-			spec.AddComment(internal.NewComment(true, "will be renamed"))
+			ast.AddComment(spec, internal.NewComment(true, "will be renamed"))
 			return &ast.File{Decls: []ast.Decl{
 				&ast.ImportDecl{Specs: []*ast.ImportSpec{spec}},
 				&ast.EmbedDecl{

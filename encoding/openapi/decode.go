@@ -73,7 +73,7 @@ func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 
 	if c.PkgName != "" {
 		p := &ast.Package{Name: ast.NewIdent(c.PkgName)}
-		p.AddComment(cg)
+		ast.AddComment(p, cg)
 		add(p)
 	} else if cg != nil {
 		add(cg)

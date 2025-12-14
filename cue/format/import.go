@@ -61,7 +61,7 @@ func setRelativePos(s *ast.ImportSpec, r token.RelPos) {
 }
 
 func hasDoc(s *ast.ImportSpec) bool {
-	for _, doc := range s.Comments() {
+	for _, doc := range ast.Comments(s) {
 		if doc.Doc {
 			return true
 		}
@@ -86,7 +86,7 @@ func importName(s *ast.ImportSpec) string {
 }
 
 func importComment(s *ast.ImportSpec) string {
-	for _, c := range s.Comments() {
+	for _, c := range ast.Comments(s) {
 		if c.Line {
 			return c.Text()
 		}
@@ -99,7 +99,7 @@ func collapse(prev, next *ast.ImportSpec) bool {
 	if importPath(next) != importPath(prev) || importName(next) != importName(prev) {
 		return false
 	}
-	for _, c := range prev.Comments() {
+	for _, c := range ast.Comments(prev) {
 		if !c.Doc {
 			return false
 		}

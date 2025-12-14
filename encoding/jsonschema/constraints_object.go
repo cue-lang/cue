@@ -392,10 +392,10 @@ func constraintProperties(key string, n cue.Value, s *state) {
 			f.Value = ast.NewString(s.k8sAPIVersion)
 			hasAPIVersion = true
 		}
-		if len(obj.Elts) > 0 && len(f.Comments()) > 0 {
+		if len(obj.Elts) > 0 && len(ast.Comments(f)) > 0 {
 			// TODO: change formatter such that either a NewSection on the
 			// field or doc comment will cause a new section.
-			ast.SetRelPos(f.Comments()[0], token.NewSection)
+			ast.SetRelPos(ast.Comments(f)[0], token.NewSection)
 		}
 		if state.deprecated {
 			switch expr.(type) {

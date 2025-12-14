@@ -238,7 +238,7 @@ func (e *exporter) bottom(n *adt.Bottom) *ast.BottomLit {
 	if x := n.Err; x != nil {
 		msg := x.Error()
 		comment := &ast.Comment{Text: "// " + msg}
-		err.AddComment(&ast.CommentGroup{
+		ast.AddComment(err, &ast.CommentGroup{
 			Line:     true,
 			Position: 2,
 			List:     []*ast.Comment{comment},

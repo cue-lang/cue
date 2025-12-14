@@ -706,7 +706,7 @@ func (p *protoConverter) oneOf(x *proto.Oneof) {
 	s := ast.NewStruct()
 	ast.SetRelPos(s, token.Newline)
 	embed := &ast.EmbedDecl{Expr: s}
-	embed.AddComment(comment(x.Comment, true))
+	ast.AddComment(embed, comment(x.Comment, true))
 
 	p.addDecl(embed)
 

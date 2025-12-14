@@ -224,12 +224,12 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 		if pkgName != "" {
 			pkg.Name = ast.NewIdent(pkgName)
 			fout.Decls = append(fout.Decls, pkg)
-			ast.SetComments(pkg, mergeDocs(pkg.Comments()))
+			ast.SetComments(pkg, mergeDocs(ast.Comments(pkg)))
 		} else {
-			for _, c := range fout.Comments() {
+			for _, c := range ast.Comments(fout) {
 				ast.AddComment(pkg, c)
 			}
-			ast.SetComments(fout, mergeDocs(pkg.Comments()))
+			ast.SetComments(fout, mergeDocs(ast.Comments(pkg)))
 		}
 	}
 

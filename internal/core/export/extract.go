@@ -49,7 +49,7 @@ func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
 				continue
 			}
 			fields = append(fields, f)
-			for _, cg := range f.Comments() {
+			for _, cg := range ast.Comments(f) {
 				if !containsDoc(docs, cg) && cg.Doc {
 					docs = append(docs, cg)
 				}
@@ -76,7 +76,7 @@ func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
 			for _, child := range fields {
 				if nested == child {
 					newFields = append(newFields, f)
-					for _, cg := range f.Comments() {
+					for _, cg := range ast.Comments(f) {
 						if !containsDoc(docs, cg) && cg.Doc {
 							docs = append(docs, cg)
 						}

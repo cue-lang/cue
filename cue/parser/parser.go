@@ -943,10 +943,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 	}
 
 	m.TokenPos = p.pos
-	if p.tok != token.COLON {
-		p.errorExpected(pos, "':'")
-	}
-	p.next() // :
+	p.expect(token.COLON)
 
 	for {
 		if l, ok := m.Label.(*ast.ListLit); ok && len(l.Elts) != 1 {
@@ -975,15 +972,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 		}
 
 		m.TokenPos = p.pos
-		if p.tok != token.COLON {
-			if p.tok.IsLiteral() {
-				p.errf(p.pos, "expected ':'; found %s", p.lit)
-			} else {
-				p.errf(p.pos, "expected ':'; found %s", p.tok)
-			}
-			break
-		}
-		p.next()
+		p.expect(token.COLON)
 	}
 
 	if attrs := p.parseAttributes(); attrs != nil {
@@ -1455,12 +1444,7 @@ func (p *parser) parsePostfixAlias() *ast.PostfixAlias {
 		}
 		v := p.parseIdent()
 
-		rparen := p.pos
-		if p.tok != token.RPAREN {
-			p.errorExpected(p.pos, "')'")
-		} else {
-			p.next()
-		}
+		rparen := p.expect(token.RPAREN)
 
 		return &ast.PostfixAlias{
 			Tilde:  pos,

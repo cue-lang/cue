@@ -842,7 +842,7 @@ func (p *parser) parseComprehension() (decl ast.Decl, ident *ast.Ident) {
 
 	tok := p.tok
 	pos := p.pos
-	clauses, fc := p.parseComprehensionClauses(true)
+	clauses, fc := p.parseComprehensionClauses()
 	if fc != nil {
 		ident = &ast.Ident{
 			NamePos: pos,
@@ -1116,14 +1116,13 @@ func (p *parser) parseStructBody() []ast.Decl {
 	return elts
 }
 
-// parseComprehensionClauses parses either new-style (first==true)
-// or old-style (first==false).
+// parseComprehensionClauses parses comprehension clauses.
 // Should we now disallow keywords as identifiers? If not, we need to
 // return a list of discovered labels as the alternative.
-func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c *commentState) {
+func (p *parser) parseComprehensionClauses() (clauses []ast.Clause, c *commentState) {
 	// TODO: reuse Template spec, which is possible if it doesn't check the
 	// first is an identifier.
-
+	first := true
 	for {
 		switch p.tok {
 		case token.FOR:
@@ -1198,7 +1197,6 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 		if p.tok == token.COMMA {
 			p.next()
 		}
-
 		first = false
 	}
 }
@@ -1318,7 +1316,7 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 	case token.FOR, token.IF:
 		tok := p.tok
 		pos := p.pos
-		clauses, fc := p.parseComprehensionClauses(true)
+		clauses, fc := p.parseComprehensionClauses()
 		if clauses != nil {
 			sc := p.openComments()
 			expr := p.parseStruct()

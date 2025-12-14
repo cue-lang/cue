@@ -172,7 +172,7 @@ func (r *rewriter) rewrite(schema cue.Value, expr ast.Expr) (x ast.Expr) {
 		return x
 
 	case *ast.ListLit:
-		elem, _ := schema.Elem()
+		elem := schema.LookupPath(cue.MakePath(cue.AnyIndex))
 		iter, _ := schema.List()
 		for i, e := range x.Elts {
 			v := elem

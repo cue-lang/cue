@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4a09e67_e2c6a1fe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1039131
+      },
+      "writtenOn": "2025-12-14T08:50:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d44ade0_45dff908",
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cebdf45d_5bd9ba95",
@@ -31,6 +49,30 @@
       "writtenOn": "2025-12-13T16:21:45Z",
       "side": 1,
       "message": "link to the Gerrit change instead, i.e: https://cuelang.org/cl/1227730",
+      "range": {
+        "startLine": 10,
+        "startChar": 51,
+        "endLine": 10,
+        "endChar": 91
+      },
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16591a85_5d763511",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1039131
+      },
+      "writtenOn": "2025-12-14T08:50:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cebdf45d_5bd9ba95",
       "range": {
         "startLine": 10,
         "startChar": 51,
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "053aad54_c5b74c13",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1039131
+      },
+      "writtenOn": "2025-12-14T08:50:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e004082_b0098275",
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e3dbacd_46488f54",
@@ -71,6 +131,24 @@
       "writtenOn": "2025-12-13T16:21:45Z",
       "side": 1,
       "message": "remember to add `Fixes #4204` as a last paragraph.",
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84bb6fb6_2879c3cd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1039131
+      },
+      "writtenOn": "2025-12-14T08:50:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e3dbacd_46488f54",
       "revId": "25a299bda7937977a30f43f3cff36121d695612d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -92,6 +170,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e5714ad_0e8b8e3d",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1039131
+      },
+      "writtenOn": "2025-12-14T08:50:12Z",
+      "side": 1,
+      "message": "Done. Thanks for spotting this one - it\u0027s cleaner.",
+      "parentUuid": "01ffa4ea_95d73170",
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ac7a2eaa_26e8b2ea",
@@ -109,6 +205,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35fafaff_9a1ef730",
+        "filename": "cmd/cue/cmd/testdata/script/registry_auth.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1039131
+      },
+      "writtenOn": "2025-12-14T08:50:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac7a2eaa_26e8b2ea",
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "85a9b158_7e3567f6",
@@ -122,6 +236,24 @@
       "writtenOn": "2025-12-13T16:21:45Z",
       "side": 1,
       "message": "this just duplicates dockerconfig/config.json; is there a reason for that?\n\nif you want to keep the \"good password\" test case for the various test case scenarios, that\u0027s fine, but then you can just rename the file above to dockerconfig/goodpassword.json rather than duplicating it.",
+      "revId": "25a299bda7937977a30f43f3cff36121d695612d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94e74521_69ce3215",
+        "filename": "cmd/cue/cmd/testdata/script/registry_auth.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1039131
+      },
+      "writtenOn": "2025-12-14T08:50:12Z",
+      "side": 1,
+      "message": "Done.\n\nThis bugged me when I first submitted the PR. Thanks for the suggestion!",
+      "parentUuid": "85a9b158_7e3567f6",
       "revId": "25a299bda7937977a30f43f3cff36121d695612d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

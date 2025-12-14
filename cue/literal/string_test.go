@@ -71,7 +71,7 @@ func TestUnquote(t *testing.T) {
 		{`"\q"`, "", errSyntax},
 		{"'\n'", "", errSyntax},
 		{"'---\n---'", "", errSyntax},
-		{"'''\r'''", "", errMissingNewline},
+		{"'''\r'''", "", errMissingOpeningNewline},
 
 		{`#"Hello"#`, "Hello", nil},
 		{`#"Hello\v"#`, "Hello\\v", nil},
@@ -104,17 +104,17 @@ func TestUnquote(t *testing.T) {
 		{"```", "", errSyntax},
 		{"Hello", "", errSyntax},
 		{`"Hello`, "", errUnmatchedQuote},
-		{`"""Hello"""`, "", errMissingNewline},
-		{`"""` + "Hello\n" + `"""`, "", errMissingNewline},
-		{`"""` + "\nHello" + `"""`, "Hello", nil}, // TODO: require the trailing newline
+		{`"""Hello"""`, "", errMissingOpeningNewline},
+		{`"""` + "Hello\n" + `"""`, "", errMissingOpeningNewline},
+		{`"""` + "\nHello" + `"""`, "", errMissingClosingNewline},
 		{"'''\n  Hello\n   '''", "", errInvalidWhitespace},
 		{"'''\n   a\n  b\n   '''", "", errInvalidWhitespace},
-		{"'''Hello\n'''", "", errMissingNewline},
-		{"'''\nHello'''", "Hello", nil}, // TODO: require the trailing newline
+		{"'''Hello\n'''", "", errMissingOpeningNewline},
+		{"'''\nHello'''", "", errMissingClosingNewline},
 		{`"Hello""`, "", errSyntax},
 		{`#"Hello"`, "", errUnmatchedQuote},
 		{`#"Hello'#`, "", errUnmatchedQuote},
-		{`#""" """#`, "", errMissingNewline},
+		{`#""" """#`, "", errMissingOpeningNewline},
 		{`"""` + "\r\n\tHello \\\r", "", errUnmatchedQuote},
 	}
 	for i, tc := range testCases {

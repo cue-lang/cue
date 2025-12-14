@@ -22,10 +22,12 @@ import (
 )
 
 var (
-	errSyntax            = errors.New("invalid syntax")
-	errInvalidWhitespace = errors.New("invalid string: invalid whitespace")
-	errMissingNewline    = errors.New(
+	errSyntax                = errors.New("invalid syntax")
+	errInvalidWhitespace     = errors.New("invalid string: invalid whitespace")
+	errMissingOpeningNewline = errors.New(
 		"invalid string: opening quote of multiline string must be followed by newline")
+	errMissingClosingNewline = errors.New(
+		"invalid string: closing quote of multiline string must follow a newline")
 	errUnmatchedQuote = errors.New("invalid string: unmatched quote")
 	// TODO: making this an error is optional according to RFC 4627. But we
 	// could make it not an error if this ever results in an issue.
@@ -95,7 +97,7 @@ func ParseQuotes(start, end string) (q QuoteInfo, nStart, nEnd int, err error) {
 				}
 				fallthrough
 			default:
-				return q, 0, 0, errMissingNewline
+				return q, 0, 0, errMissingOpeningNewline
 			}
 			q.multiline = true
 			q.numChar = 3
@@ -116,12 +118,17 @@ func ParseQuotes(start, end string) (q QuoteInfo, nStart, nEnd int, err error) {
 	}
 	if q.multiline {
 		i := len(end) - len(quote)
+		hasNewline := false
 		for i > 0 {
 			r, size := utf8.DecodeLastRuneInString(end[:i])
 			if r == '\n' || !unicode.IsSpace(r) {
+				hasNewline = r == '\n'
 				break
 			}
 			i -= size
+		}
+		if !hasNewline {
+			return q, 0, 0, errMissingClosingNewline
 		}
 		q.whitespace = end[i : len(end)-len(quote)]
 

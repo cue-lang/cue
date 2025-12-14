@@ -666,7 +666,8 @@ func (p *parser) parseOperand() (expr ast.Expr) {
 		return &ast.ParenExpr{
 			Lparen: lparen,
 			X:      x,
-			Rparen: rparen}
+			Rparen: rparen,
+		}
 
 	default:
 		if p.tok.IsKeyword() {
@@ -718,14 +719,16 @@ func (p *parser) parseIndexOrSlice(x ast.Expr) (expr ast.Expr) {
 			Lbrack: lbrack,
 			Low:    index[0],
 			High:   index[1],
-			Rbrack: rbrack}
+			Rbrack: rbrack,
+		}
 	}
 
 	return &ast.IndexExpr{
 		X:      x,
 		Lbrack: lbrack,
 		Index:  index[0],
-		Rbrack: rbrack}
+		Rbrack: rbrack,
+	}
 }
 
 func (p *parser) parseCallOrConversion(fun ast.Expr) (expr *ast.CallExpr) {
@@ -756,7 +759,8 @@ func (p *parser) parseCallOrConversion(fun ast.Expr) (expr *ast.CallExpr) {
 		Fun:    fun,
 		Lparen: lparen,
 		Args:   list,
-		Rparen: rparen}
+		Rparen: rparen,
+	}
 }
 
 // TODO: inline this function in parseFieldList once we no longer user comment
@@ -1283,7 +1287,8 @@ func (p *parser) parseList() (expr ast.Expr) {
 	return &ast.ListLit{
 		Lbrack: lbrack,
 		Elts:   elts,
-		Rbrack: rbrack}
+		Rbrack: rbrack,
+	}
 }
 
 func (p *parser) parseListElements() (list []ast.Expr) {
@@ -1664,7 +1669,8 @@ func (p *parser) parseBinaryExprTail(prec1 int, x ast.Expr) ast.Expr {
 			OpPos: pos,
 			Op:    op,
 			// Treat nested expressions as RHS.
-			Y: p.checkExpr(p.parseBinaryExpr(prec + 1))})
+			Y: p.checkExpr(p.parseBinaryExpr(prec + 1)),
+		})
 	}
 }
 

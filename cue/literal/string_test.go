@@ -105,8 +105,12 @@ func TestUnquote(t *testing.T) {
 		{"Hello", "", errSyntax},
 		{`"Hello`, "", errUnmatchedQuote},
 		{`"""Hello"""`, "", errMissingNewline},
+		{`"""` + "Hello\n" + `"""`, "", errMissingNewline},
+		{`"""` + "\nHello" + `"""`, "Hello", nil}, // TODO: require the trailing newline
 		{"'''\n  Hello\n   '''", "", errInvalidWhitespace},
 		{"'''\n   a\n  b\n   '''", "", errInvalidWhitespace},
+		{"'''Hello\n'''", "", errMissingNewline},
+		{"'''\nHello'''", "Hello", nil}, // TODO: require the trailing newline
 		{`"Hello""`, "", errSyntax},
 		{`#"Hello"`, "", errUnmatchedQuote},
 		{`#"Hello'#`, "", errUnmatchedQuote},

@@ -155,15 +155,6 @@ func Version(v string) Option {
 	})
 }
 
-// DeprecationError is a sentinel error to indicate that an error is
-// related to an unsupported old CUE syntax.
-type DeprecationError struct {
-}
-
-func (e *DeprecationError) Error() string {
-	return "try running `cue fix` (possibly with an earlier version, like v0.2.2) to upgrade"
-}
-
 // FileOffset specifies the File position info to use.
 //
 // Deprecated: this has no effect.

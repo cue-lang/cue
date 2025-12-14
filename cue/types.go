@@ -965,14 +965,14 @@ outer:
 			for _, c := range ast.Comments(e.Expr) {
 				ast.AddComment(f, c)
 			}
-			ast.SetComments(e.Expr, f.Comments())
+			ast.SetComments(e.Expr, ast.Comments(f))
 			return e.Expr
 		}
 	}
 	st := &ast.StructLit{
 		Elts: f.Decls,
 	}
-	ast.SetComments(st, f.Comments())
+	ast.SetComments(st, ast.Comments(f))
 	return st
 }
 

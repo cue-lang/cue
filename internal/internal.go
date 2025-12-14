@@ -181,10 +181,10 @@ func FileComments(f *ast.File) (docs, rest []*ast.CommentGroup) {
 	hasPkg := false
 	if pkg, _ := Package(f); pkg != nil {
 		hasPkg = true
-		docs = pkg.Comments()
+		docs = ast.Comments(pkg)
 	}
 
-	for _, c := range f.Comments() {
+	for _, c := range ast.Comments(f) {
 		if c.Doc {
 			docs = append(docs, c)
 		} else {

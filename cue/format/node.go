@@ -423,7 +423,7 @@ func (f *formatter) decl(decl ast.Decl) {
 			break
 		}
 		switch {
-		case len(n.Specs) == 1 && len(n.Specs[0].Comments()) == 0:
+		case len(n.Specs) == 1 && len(ast.Comments(n.Specs[0])) == 0:
 			if !n.Lparen.IsValid() {
 				f.print(blank)
 				f.walkSpecList(n.Specs)
@@ -715,7 +715,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		case len(x.Elts) == 0:
 			// collapse curly braces if the body is empty.
 			ffAlt := blank | nooverride
-			for _, c := range x.Comments() {
+			for _, c := range ast.Comments(x) {
 				if c.Position == 1 {
 					ffAlt = ff
 					break
@@ -745,7 +745,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		if len(x.Elts) == 0 {
 			// collapse square brackets if the body is empty.
 			collapseWs := blank | nooverride
-			for _, c := range x.Comments() {
+			for _, c := range ast.Comments(x) {
 				if c.Position == 1 {
 					collapseWs = ws
 					break

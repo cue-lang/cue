@@ -264,7 +264,7 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 		case build.ProtobufJSON:
 			v := b.instance.Value().LookupPath(path)
 			if b.useList {
-				v, _ = v.Elem()
+				v = v.LookupPath(cue.MakePath(cue.AnyIndex))
 			}
 			if !v.Exists() {
 				break

@@ -165,8 +165,13 @@ func (d *decoder) parseSchema(schema cue.Value) *mapping {
 				msg = d.parseSchema(i.Value())
 			}
 
-		case pbinternal.List, pbinternal.Map:
-			e, _ := i.Value().Elem()
+		case pbinternal.List:
+			e := i.Value().LookupPath(cue.MakePath(cue.AnyIndex))
+			if e.IncompleteKind() == cue.StructKind {
+				msg = d.parseSchema(e)
+			}
+		case pbinternal.Map:
+			e := i.Value().LookupPath(cue.MakePath(cue.AnyString))
 			if e.IncompleteKind() == cue.StructKind {
 				msg = d.parseSchema(e)
 			}

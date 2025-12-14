@@ -35,12 +35,11 @@ wait
 exists conflict_force.yml
 
 # Exporting to a named pipe (FIFO) should work without --force.
-# TODO: see https://cuelang.org/issue/3631
 # For now, these tests use mkfifo from the Unix coreutils package.
 # Note that we set up a pipe reader for each writer so it doesn't block forever.
 [exec:mkfifo] exec mkfifo named-pipe
 [exec:mkfifo] exec cat named-pipe &
-[exec:mkfifo] ! exec cue export --out json -o named-pipe file.cue
+[exec:mkfifo] exec cue export --out json -o named-pipe file.cue
 
 # Exporting to a named pipe (FIFO) should fail with --force,
 # because the flag should only allow overwriting regular files.
@@ -49,8 +48,7 @@ exists conflict_force.yml
 [exec:mkfifo] exec cue export --out json -f -o named-pipe file.cue
 
 # The same with /dev/null on Linux.
-# TODO: fix these too.
-[linux] ! exec cue export --out json -o /dev/null file.cue
+[linux] exec cue export --out json -o /dev/null file.cue
 [linux] exec cue export --out json -f -o /dev/null file.cue
 
 -- file.cue --

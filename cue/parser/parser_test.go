@@ -616,6 +616,74 @@ cannot import package as definition identifier`,
 			out:  `"\(1)"()`,
 		},
 		{
+			desc: "interpolation with leading newline and whitespace",
+			in: `"\(
+				1)"`,
+			out: `"\(1)"`,
+		},
+		{
+			desc: "interpolation with inner newline and whitespace",
+			in: `"\(1 +
+				2)"`,
+			out: `"\(1+2)"`,
+		},
+		{
+			desc: "interpolation with trailing whitespace and newline",
+			in: `"\(1
+				)"`,
+			// TODO: this should be consistent with the two test cases above.
+			out: `"\(1	)"
+expected ')' for string interpolation, found newline`,
+		},
+		{
+			desc: "interpolation with trailing comma",
+			in:   `"\(1,)"`,
+			out: `"\(1,)"
+expected ')' for string interpolation, found ','`,
+		},
+		{
+			desc: "multi-line interpolation with leading newline and whitespace",
+			in: `"""
+				\(
+				1)
+				"""`,
+			out: `"""
+				\(1)
+				"""`,
+		},
+		{
+			desc: "multi-line interpolation with inner newline and whitespace",
+			in: `"""
+				\(1 +
+				2)
+				"""`,
+			out: `"""
+				\(1+2)
+				"""`,
+		},
+		{
+			desc: "multi-line interpolation with trailing whitespace and newline",
+			in: `"""
+				\(1
+				)
+				"""`,
+			// TODO: this should be consistent with the two test cases above.
+			out: `"""
+				\(1	)
+				"""
+expected ')' for string interpolation, found newline`,
+		},
+		{
+			desc: "multi-line interpolation with trailing comma",
+			in: `"""
+				\(1,)
+				"""`,
+			out: `"""
+				\(1,)
+				"""
+expected ')' for string interpolation, found ','`,
+		},
+		{
 			desc: "file comments",
 			in: `// foo
 

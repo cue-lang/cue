@@ -208,7 +208,13 @@ func (p *parser) closeList() {
 	}
 }
 
-func (c *commentState) closeNode(p *parser, n ast.Node) ast.Node {
+type nilableNode interface {
+	ast.Node
+	comparable
+}
+
+func closeNode[N nilableNode](p *parser, c *commentState, n N) N {
+	var zero N
 	if p.comments != c {
 		if !p.panicking {
 			err := errors.Newf(p.pos, "unmatched comments")
@@ -225,23 +231,11 @@ func (c *commentState) closeNode(p *parser, n ast.Node) ast.Node {
 		c.parent.pos++
 	}
 	for _, cg := range c.groups {
-		if n != nil {
-			if cg != nil {
-				ast.AddComment(n, cg)
-			}
+		if n != zero && cg != nil {
+			ast.AddComment(n, cg)
 		}
 	}
 	p.freeCommentState(c)
-	return n
-}
-
-func (c *commentState) closeExpr(p *parser, n ast.Expr) ast.Expr {
-	c.closeNode(p, n)
-	return n
-}
-
-func (c *commentState) closeClause(p *parser, n ast.Clause) ast.Clause {
-	c.closeNode(p, n)
 	return n
 }
 
@@ -578,7 +572,7 @@ func (p *parser) parseIdent() *ast.Ident {
 		name = "_"
 	}
 	ident := &ast.Ident{NamePos: pos, Name: name}
-	c.closeNode(p, ident)
+	closeNode(p, c, ident)
 	return ident
 }
 
@@ -604,7 +598,7 @@ func (p *parser) parseKeyIdent() *ast.Ident {
 	name := p.lit
 	p.next()
 	ident := &ast.Ident{NamePos: pos, Name: name}
-	c.closeNode(p, ident)
+	closeNode(p, c, ident)
 	return ident
 }
 
@@ -639,20 +633,20 @@ func (p *parser) parseOperand() (expr ast.Expr) {
 		c := p.openComments()
 		x := &ast.BottomLit{Bottom: p.pos}
 		p.next()
-		return c.closeExpr(p, x)
+		return closeNode(p, c, x)
 
 	case token.NULL, token.TRUE, token.FALSE, token.INT, token.FLOAT, token.STRING:
 		c := p.openComments()
 		x := &ast.BasicLit{ValuePos: p.pos, Kind: p.tok, Value: p.lit}
 		p.next()
-		return c.closeExpr(p, x)
+		return closeNode(p, c, x)
 
 	case token.INTERPOLATION:
 		return p.parseInterpolation()
 
 	case token.LPAREN:
 		c := p.openComments()
-		defer func() { c.closeNode(p, expr) }()
+		defer func() { closeNode(p, c, expr) }()
 		lparen := p.pos
 		p.next()
 		p.exprLev++
@@ -678,7 +672,7 @@ func (p *parser) parseOperand() (expr ast.Expr) {
 	pos := p.pos
 	p.errorExpected(pos, "operand")
 	syncExpr(p)
-	return c.closeExpr(p, &ast.BadExpr{From: pos, To: p.pos})
+	return closeNode(p, c, &ast.BadExpr{From: pos, To: p.pos})
 }
 
 func (p *parser) parseIndexOrSlice(x ast.Expr) (expr ast.Expr) {
@@ -687,7 +681,7 @@ func (p *parser) parseIndexOrSlice(x ast.Expr) (expr ast.Expr) {
 	}
 
 	c := p.openComments()
-	defer func() { c.closeNode(p, expr) }()
+	defer func() { closeNode(p, c, expr) }()
 	c.pos = 1
 
 	const N = 2
@@ -734,7 +728,7 @@ func (p *parser) parseCallOrConversion(fun ast.Expr) (expr *ast.CallExpr) {
 		defer un(trace(p, "CallOrConversion"))
 	}
 	c := p.openComments()
-	defer func() { c.closeNode(p, expr) }()
+	defer func() { closeNode(p, c, expr) }()
 
 	p.openList()
 	defer p.closeList()
@@ -786,7 +780,7 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 			c := p.openComments()
 			ellipsis := &ast.Ellipsis{Ellipsis: p.pos}
 			p.next()
-			c.closeNode(p, ellipsis)
+			closeNode(p, c, ellipsis)
 			list = append(list, ellipsis)
 			p.consumeDeclComma()
 
@@ -810,13 +804,13 @@ func (p *parser) parseLetDecl() (decl ast.Decl, ident *ast.Ident) {
 
 	letPos := p.expect(token.LET)
 	if p.tok != token.IDENT {
-		c.closeNode(p, ident)
+		closeNode(p, c, ident)
 		return nil, &ast.Ident{
 			NamePos: letPos,
 			Name:    "let",
 		}
 	}
-	defer func() { c.closeNode(p, decl) }()
+	defer func() { closeNode(p, c, decl) }()
 
 	ident = p.parseIdentDecl()
 	assign := p.expect(token.BIND)
@@ -838,7 +832,7 @@ func (p *parser) parseComprehension() (decl ast.Decl, ident *ast.Ident) {
 	}
 
 	c := p.openComments()
-	defer func() { c.closeNode(p, decl) }()
+	defer func() { closeNode(p, c, decl) }()
 
 	tok := p.tok
 	pos := p.pos
@@ -848,13 +842,13 @@ func (p *parser) parseComprehension() (decl ast.Decl, ident *ast.Ident) {
 			NamePos: pos,
 			Name:    tok.String(),
 		}
-		fc.closeNode(p, ident)
+		closeNode(p, fc, ident)
 		return nil, ident
 	}
 
 	sc := p.openComments()
 	expr := p.parseStruct()
-	sc.closeExpr(p, expr)
+	closeNode(p, sc, expr)
 
 	if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
 		p.next()
@@ -872,7 +866,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 	}
 
 	c := p.openComments()
-	defer func() { c.closeNode(p, decl) }()
+	defer func() { closeNode(p, c, decl) }()
 
 	pos := p.pos
 	tok := p.tok
@@ -1006,7 +1000,7 @@ func (p *parser) parseAttribute(inPreamble bool) *ast.Attribute {
 		}
 	}
 	p.next()
-	c.closeNode(p, a)
+	closeNode(p, c, a)
 	return a
 }
 
@@ -1146,7 +1140,7 @@ func (p *parser) parseComprehensionClauses() (clauses []ast.Clause, c *commentSt
 			}
 			c.pos = 4
 			// params := p.parseParams(nil, ARROW)
-			clauses = append(clauses, c.closeClause(p, &ast.ForClause{
+			clauses = append(clauses, closeNode(p, c, &ast.ForClause{
 				For:    forPos,
 				Key:    key,
 				Colon:  colon,
@@ -1171,7 +1165,7 @@ func (p *parser) parseComprehensionClauses() (clauses []ast.Clause, c *commentSt
 				}
 			}
 
-			clauses = append(clauses, c.closeClause(p, &ast.IfClause{
+			clauses = append(clauses, closeNode(p, c, &ast.IfClause{
 				If:        ifPos,
 				Condition: p.parseRHS(),
 			}))
@@ -1184,7 +1178,7 @@ func (p *parser) parseComprehensionClauses() (clauses []ast.Clause, c *commentSt
 			assign := p.expect(token.BIND)
 			expr := p.parseRHS()
 
-			clauses = append(clauses, c.closeClause(p, &ast.LetClause{
+			clauses = append(clauses, closeNode(p, c, &ast.LetClause{
 				Let:   letPos,
 				Ident: ident,
 				Equal: assign,
@@ -1310,7 +1304,7 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 		defer un(trace(p, "ListElement"))
 	}
 	c := p.openComments()
-	defer func() { c.closeNode(p, expr) }()
+	defer func() { closeNode(p, c, expr) }()
 
 	switch p.tok {
 	case token.FOR, token.IF:
@@ -1320,7 +1314,7 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 		if clauses != nil {
 			sc := p.openComments()
 			expr := p.parseStruct()
-			sc.closeExpr(p, expr)
+			closeNode(p, sc, expr)
 
 			if p.atComma("list literal", token.RBRACK) { // TODO: may be EOF
 				p.next()
@@ -1336,7 +1330,7 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 			NamePos: pos,
 			Name:    tok.String(),
 		}
-		fc.closeNode(p, expr)
+		closeNode(p, fc, expr)
 
 	default:
 		expr = p.parseUnaryExpr()
@@ -1559,7 +1553,7 @@ L:
 				p.next() // make progress
 				x = &ast.SelectorExpr{X: x, Sel: &ast.Ident{NamePos: pos, Name: "_"}}
 			}
-			c.closeNode(p, x)
+			closeNode(p, c, x)
 		case token.LBRACK:
 			x = p.parseIndexOrSlice(p.checkExpr(x))
 		case token.LPAREN:
@@ -1569,7 +1563,7 @@ L:
 				pos := p.pos
 				c := p.openComments()
 				p.next()
-				x = c.closeExpr(p, &ast.PostfixExpr{
+				x = closeNode(p, c, &ast.PostfixExpr{
 					X:     p.checkExpr(x),
 					Op:    token.ELLIPSIS,
 					OpPos: pos,
@@ -1609,7 +1603,7 @@ func (p *parser) parseUnaryExpr() ast.Expr {
 		pos, op := p.pos, p.tok
 		c := p.openComments()
 		p.next()
-		return c.closeExpr(p, &ast.UnaryExpr{
+		return closeNode(p, c, &ast.UnaryExpr{
 			OpPos: pos,
 			Op:    op,
 			X:     p.checkExpr(p.parseUnaryExpr()),
@@ -1658,7 +1652,7 @@ func (p *parser) parseBinaryExprTail(prec1 int, x ast.Expr) ast.Expr {
 		c := p.openComments()
 		c.pos = 1
 		pos := p.expect(p.tok)
-		x = c.closeExpr(p, &ast.BinaryExpr{
+		x = closeNode(p, c, &ast.BinaryExpr{
 			X:     p.checkExpr(x),
 			OpPos: pos,
 			Op:    op,
@@ -1670,7 +1664,7 @@ func (p *parser) parseBinaryExprTail(prec1 int, x ast.Expr) ast.Expr {
 
 func (p *parser) parseInterpolation() (expr ast.Expr) {
 	c := p.openComments()
-	defer func() { c.closeNode(p, expr) }()
+	defer func() { closeNode(p, c, expr) }()
 
 	p.openList()
 	defer p.closeList()
@@ -1688,7 +1682,7 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 	for strings.HasSuffix(last.Value, "(") {
 		c.pos = 1
 		p.expect(token.LPAREN)
-		cc.closeExpr(p, last)
+		closeNode(p, cc, last)
 
 		exprs = append(exprs, p.parseRHS())
 
@@ -1706,7 +1700,7 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 		}
 		exprs = append(exprs, last)
 	}
-	cc.closeExpr(p, last)
+	closeNode(p, cc, last)
 	return &ast.Interpolation{Elts: exprs}
 }
 
@@ -1717,7 +1711,7 @@ func (p *parser) parseExpr() (expr ast.Expr) {
 	}
 
 	c := p.openComments()
-	defer func() { c.closeExpr(p, expr) }()
+	defer func() { closeNode(p, c, expr) }()
 
 	return p.parseBinaryExpr(token.LowestPrec + 1)
 }
@@ -1770,7 +1764,7 @@ func (p *parser) parseImportSpec(_ int) *ast.ImportSpec {
 		Name: ident,
 		Path: &ast.BasicLit{ValuePos: pos, Kind: token.STRING, Value: path},
 	}
-	c.closeNode(p, spec)
+	closeNode(p, c, spec)
 	p.imports = append(p.imports, spec)
 
 	return spec
@@ -1805,7 +1799,7 @@ func (p *parser) parseImports() *ast.ImportDecl {
 		Specs:  list,
 		Rparen: rparen,
 	}
-	c.closeNode(p, d)
+	closeNode(p, c, d)
 	return d
 }
 
@@ -1865,7 +1859,7 @@ func (p *parser) parseFile() *ast.File {
 		}
 		decls = append(decls, pkg)
 		p.expectComma() // skip over a comma or newline
-		c.closeNode(p, pkg)
+		closeNode(p, c, pkg)
 	}
 
 	for p.tok == token.ATTRIBUTE {
@@ -1893,6 +1887,6 @@ func (p *parser) parseFile() *ast.File {
 		Decls:           decls,
 		LanguageVersion: p.cfg.Version,
 	}
-	c.closeNode(p, f)
+	closeNode(p, c, f)
 	return f
 }

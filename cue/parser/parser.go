@@ -470,6 +470,7 @@ func (p *parser) expect(tok token.Token) token.Pos {
 	pos := p.pos
 	if p.tok != tok {
 		p.errorExpected(pos, "'"+tok.String()+"'")
+		pos = token.NoPos
 	}
 	p.next() // make progress
 	return pos
@@ -571,13 +572,10 @@ func (p *parser) safePos(pos token.Pos) (res token.Pos) {
 
 func (p *parser) parseIdent() *ast.Ident {
 	c := p.openComments()
-	pos := p.pos
-	name := "_"
-	if p.tok == token.IDENT {
-		name = p.lit
-		p.next()
-	} else {
-		p.expect(token.IDENT) // use expect() error handling
+	name := p.lit
+	pos := p.expect(token.IDENT)
+	if !pos.IsValid() {
+		name = "_"
 	}
 	ident := &ast.Ident{NamePos: pos, Name: name}
 	c.closeNode(p, ident)
@@ -1425,16 +1423,14 @@ func (p *parser) parsePostfixAlias() *ast.PostfixAlias {
 		}
 		k := p.parseIdent()
 
-		comma := p.pos
-		if p.tok != token.COMMA {
-			p.errorExpected(p.pos, "','")
+		comma := p.expect(token.COMMA)
+		if !comma.IsValid() {
 			// Recovery: treat as simple form with just K
 			return &ast.PostfixAlias{
 				Tilde: pos,
 				Field: k,
 			}
 		}
-		p.next()
 
 		if p.tok != token.IDENT {
 			p.errorExpected(p.pos, "identifier for field alias")
@@ -1765,16 +1761,10 @@ func (p *parser) parseImportSpec(_ int) *ast.ImportSpec {
 		}
 	}
 
-	pos := p.pos
-	var path string
-	if p.tok == token.STRING {
-		path = p.lit
-		if !isValidImport(path) {
-			p.errf(pos, "invalid import path: %s", path)
-		}
-		p.next()
-	} else {
-		p.expect(token.STRING) // use expect() error handling
+	path := p.lit
+	pos := p.expect(token.STRING)
+	if pos.IsValid() && !isValidImport(path) {
+		p.errf(pos, "invalid import path: %s", path)
 	}
 	p.expectComma() // skip over a comma or newline
 	// collect imports

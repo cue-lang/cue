@@ -1393,7 +1393,7 @@ func (p *parser) parseAlias(lhs ast.Expr) (expr ast.Expr) {
 		p.checkDeclIdent(x)
 		return &ast.Alias{Ident: x, Equal: pos, Expr: expr}
 	}
-	p.errf(p.pos, "expected identifier for alias")
+	p.errorExpected(p.pos, "identifier for alias")
 	return expr
 }
 
@@ -1700,7 +1700,7 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 
 		cc = p.openComments()
 		if p.tok != token.RPAREN {
-			p.errf(p.pos, "expected ')' for string interpolation")
+			p.errorExpected(p.pos, "')' for string interpolation")
 		}
 		lit = p.scanner.ResumeInterpolation()
 		pos = p.pos

@@ -486,15 +486,14 @@ func (p *parser) expectClosing(tok token.Token, context string) token.Pos {
 }
 
 func (p *parser) expectComma() {
-	// semicolon is optional before a closing ')', ']', '}', or newline
-	if p.tok != token.RPAREN && p.tok != token.RBRACE && p.tok != token.EOF {
-		switch p.tok {
-		case token.COMMA:
-			p.next()
-		default:
-			p.errorExpected(p.pos, "','")
-			syncExpr(p)
-		}
+	switch p.tok {
+	case token.COMMA:
+		p.next()
+	// the comma is optional before a closing ')', ']', '}', or newline
+	case token.RPAREN, token.RBRACE, token.EOF:
+	default:
+		p.errorExpected(p.pos, "','")
+		syncExpr(p)
 	}
 }
 
@@ -1255,9 +1254,7 @@ func (p *parser) parseFuncArgs() (list []ast.Expr) {
 
 	for p.tok != token.RPAREN && p.tok != token.EOF {
 		list = append(list, p.parseFuncArg())
-		if p.tok != token.RPAREN {
-			p.expectComma()
-		}
+		p.expectComma() // skip over a trailing comma or newline
 	}
 
 	return list
@@ -1786,13 +1783,10 @@ func (p *parser) parseImportSpec(_ int) *ast.ImportSpec {
 			p.errf(pos, "invalid import path: %s", path)
 		}
 		p.next()
-		p.expectComma() // call before accessing p.linecomment
 	} else {
 		p.expect(token.STRING) // use expect() error handling
-		if p.tok == token.COMMA {
-			p.expectComma() // call before accessing p.linecomment
-		}
 	}
+	p.expectComma() // skip over a comma or newline
 	// collect imports
 	spec := &ast.ImportSpec{
 		Name: ident,
@@ -1822,7 +1816,7 @@ func (p *parser) parseImports() *ast.ImportDecl {
 		}
 		p.closeList()
 		rparen = p.expect(token.RPAREN)
-		p.expectComma()
+		p.expectComma() // skip over a comma or newline
 	} else {
 		list = append(list, p.parseImportSpec(0))
 	}
@@ -1892,7 +1886,7 @@ func (p *parser) parseFile() *ast.File {
 			Name:       name,
 		}
 		decls = append(decls, pkg)
-		p.expectComma()
+		p.expectComma() // skip over a comma or newline
 		c.closeNode(p, pkg)
 	}
 

@@ -805,7 +805,7 @@ bar: 2
 			in: `
 		import . "foo"
 		`,
-			out: "import , \"foo\"\nexpected 'STRING', found '.'",
+			out: "import \nexpected 'STRING', found '.' (and 1 more errors)",
 		},
 		{
 			desc: "attributes (2)",

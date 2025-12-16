@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "917e7040_7fa1ebdb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-16T14:09:29Z",
+      "side": 1,
+      "message": "Sigh, again these are duplicates from when Gerrit was down. My bad.",
+      "revId": "0d8a9c3926174fdcf0368583d2c8e9e07a3b8ca0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

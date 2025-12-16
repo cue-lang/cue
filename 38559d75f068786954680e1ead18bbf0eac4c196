@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90e14ca8_4d99e9ba",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-12-16T11:25:01Z",
+      "side": 1,
+      "message": "tbh I\u0027m not entirely convinced this is that worthwhile.\nI\u0027d be inclined to leave this as a method, remove its return value (it\u0027s never used) and keep the `closeClause` and `closeExpr` methods - I think that ends up more readable than the generic function.\n\nThat said, I don\u0027t feel that strongly about it, so LGTM and I\u0027ll leave it up to you.",
+      "revId": "38559d75f068786954680e1ead18bbf0eac4c196",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

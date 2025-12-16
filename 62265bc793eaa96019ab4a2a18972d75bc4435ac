@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b53f1d65_f2b42d78",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-12-16T13:47:19Z",
+      "side": 1,
+      "message": "To me this wording seems to imply that a non-regular file can\u0027t be overwritten, but that\u0027s not the case - for non-regular files this is a no-op. I think a better solution might be to keep the wording the same and clarify that `-o` will allow overwrite of existing non-regular files.",
+      "revId": "62265bc793eaa96019ab4a2a18972d75bc4435ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

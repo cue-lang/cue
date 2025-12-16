@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df000142_739b6b4d",
+        "filename": "internal/encoding/encoder.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-12-16T13:43:31Z",
+      "side": 1,
+      "message": "As discussed online, I think this should use Stat not Lstat, and I think the right check is to special-case regular files, not just named pipes and device files, because that\u0027s the way the `--force` documentation is worded (and if we allow named pipes, why not sockets too, for example). It\u0027s also less OS-specific.\n\nAlso, I don\u0027t really like the goto - it means we have to reason very carefully about whether there might be an infinite loop, whereas if we just re-invoked os.OpenFile directly, it would be very clear it\u0027s only a single retry (I\u0027m assuming here that you are only intending it to be possible for there to be a single retry!).",
+      "revId": "010aab31d968e185c31945680aad88f10d664d4e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

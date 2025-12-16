@@ -34,6 +34,23 @@
       "parentUuid": "9585bd5b_f152a392",
       "revId": "30ec92cc672b364bad8579b43a439c81d2ce5fc5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c27ed555_ca63dbcc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-16T13:13:12Z",
+      "side": 1,
+      "message": "Holding until Marcel\u0027s changes for nxcc have landed.",
+      "revId": "30ec92cc672b364bad8579b43a439c81d2ce5fc5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

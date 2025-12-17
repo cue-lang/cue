@@ -27,6 +27,7 @@ import (
 	"path"
 	"slices"
 	"strings"
+	"unicode"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/semver"
@@ -247,12 +248,17 @@ func parseReplacement(oldPath, replace string, strict bool) (Replacement, error)
 	isLocal := strings.HasPrefix(replace, "./") || strings.HasPrefix(replace, "../")
 
 	// Reject absolute paths - they must use relative paths starting with ./ or ../
-	// Check for Unix-style absolute paths (/foo) and Windows-style (C:\foo or C:/foo)
-	if len(replace) > 0 && replace[0] == '/' {
+	// Check for Unix-style absolute paths (/foo) but not UNC-style (//server)
+	if len(replace) > 0 && replace[0] == '/' && (len(replace) < 2 || replace[1] != '/') {
 		return Replacement{}, fmt.Errorf("absolute path replacement %q not allowed; use relative path starting with ./ or ../", replace)
 	}
-	if len(replace) >= 3 && replace[1] == ':' && (replace[2] == '/' || replace[2] == '\\') {
+	// Check for Windows-style absolute paths (C:\foo or C:/foo) - first char must be a letter
+	if len(replace) >= 3 && unicode.IsLetter(rune(replace[0])) && replace[1] == ':' && (replace[2] == '/' || replace[2] == '\\') {
 		return Replacement{}, fmt.Errorf("absolute path replacement %q not allowed; use relative path starting with ./ or ../", replace)
+	}
+	// Reject UNC paths (\\server\share or //server/share)
+	if len(replace) >= 2 && ((replace[0] == '\\' && replace[1] == '\\') || (replace[0] == '/' && replace[1] == '/')) {
+		return Replacement{}, fmt.Errorf("UNC path replacement %q not allowed; use relative path starting with ./ or ../", replace)
 	}
 
 	if strict && isLocal {

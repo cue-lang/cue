@@ -246,6 +246,15 @@ func (mf *File) init(strict bool) error {
 func parseReplacement(oldPath, replace string, strict bool) (Replacement, error) {
 	isLocal := strings.HasPrefix(replace, "./") || strings.HasPrefix(replace, "../")
 
+	// Reject absolute paths - they must use relative paths starting with ./ or ../
+	// Check for Unix-style absolute paths (/foo) and Windows-style (C:\foo or C:/foo)
+	if len(replace) > 0 && replace[0] == '/' {
+		return Replacement{}, fmt.Errorf("absolute path replacement %q not allowed; use relative path starting with ./ or ../", replace)
+	}
+	if len(replace) >= 3 && replace[1] == ':' && (replace[2] == '/' || replace[2] == '\\') {
+		return Replacement{}, fmt.Errorf("absolute path replacement %q not allowed; use relative path starting with ./ or ../", replace)
+	}
+
 	if strict && isLocal {
 		return Replacement{}, fmt.Errorf("local path replacement %q not allowed in strict mode", replace)
 	}

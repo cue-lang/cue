@@ -316,6 +316,61 @@ deps: {
 	}
 }
 
+// TestLocalReplacementWithSelfReference tests behavior when a local replacement
+// has a dependency that references the module being replaced. This verifies
+// that the system handles such edge cases gracefully without infinite recursion.
+// Note: Local replacements are only processed at the main module level, so
+// true circular replacement chains are not possible by design.
+func TestLocalReplacementWithSelfReference(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Create local-a which has a dependency on example.com/foo (the module being replaced)
+	localADir := filepath.Join(tmpDir, "local-a", "cue.mod")
+	if err := os.MkdirAll(localADir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	// This local module depends on example.com/foo - the module it's replacing!
+	// This tests that we don't get into infinite recursion when resolving deps.
+	moduleCue := `module: "example.com/local-a@v0"
+language: version: "v0.9.0"
+deps: {
+	"example.com/foo@v0": v: "v0.1.0"
+}
+`
+	if err := os.WriteFile(filepath.Join(localADir, "module.cue"), []byte(moduleCue), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	replacements := map[string]modfiledata.Replacement{
+		"example.com/foo@v0": {
+			Old:       module.MustNewVersion("example.com/foo@v0", "v0.1.0"),
+			LocalPath: "./local-a",
+		},
+	}
+
+	lr, err := NewLocalReplacements(module.SourceLoc{
+		FS:  module.OSDirFS(tmpDir),
+		Dir: ".",
+	}, replacements)
+	if err != nil {
+		t.Fatalf("NewLocalReplacements() error = %v", err)
+	}
+
+	// FetchRequirements should succeed and return the deps from local-a,
+	// even though those deps include the module being replaced.
+	// The actual resolution of circular deps happens at a higher level.
+	deps, err := lr.FetchRequirements("./local-a")
+	if err != nil {
+		t.Fatalf("FetchRequirements() error = %v", err)
+	}
+	if len(deps) != 1 {
+		t.Errorf("FetchRequirements() returned %d deps, want 1", len(deps))
+	}
+	if len(deps) > 0 && deps[0].Path() != "example.com/foo@v0" {
+		t.Errorf("deps[0].Path() = %q, want example.com/foo@v0", deps[0].Path())
+	}
+}
+
 func TestNewLocalReplacementsPathResolutionError(t *testing.T) {
 	replacements := map[string]modfiledata.Replacement{
 		"example.com/foo@v0": {

@@ -151,7 +151,7 @@ func equalReplacements(r0, r1 map[string]modfiledata.Replacement) bool {
 		if !ok {
 			return false
 		}
-		if v0.LocalPath != v1.LocalPath || v0.New != v1.New || v0.Old != v1.Old {
+		if v0.LocalPath != v1.LocalPath || !v0.New.Equal(v1.New) || !v0.Old.Equal(v1.Old) {
 			return false
 		}
 	}
@@ -189,7 +189,10 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 	}
 
 	// First, preserve all replace directives from the original file.
-	// Replace directives are preserved during tidy operations (like Go).
+	// Replace directives are preserved during tidy operations, matching Go's behavior.
+	// This means replace directives may remain even if their target dependency is
+	// no longer needed - this is intentional to allow users to maintain replacements
+	// for dependencies that may be re-added later.
 	for path, dep := range old.Deps {
 		if dep.Replace != "" {
 			mf.Deps[path] = &modfile.Dep{

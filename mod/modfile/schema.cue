@@ -80,8 +80,8 @@ versions: "v0.9.0-alpha.0": {
 
 		#Dep: {
 			// v indicates the minimum required version of the module. This can
-			// be null or empty if the version is unknown and the module entry
-			// is only present to be replaced.
+			// be null or empty when the module entry is only present to specify
+			// a local path replacement (version-independent replacement).
 			v!: #Semver | null | ""
 
 			// default indicates this module is used as a default in case more

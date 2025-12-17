@@ -282,11 +282,12 @@ type ModuleGraph struct {
 // The caller must not modify the returned summary.
 func (rs *Requirements) cueModSummary(ctx context.Context, m module.Version) (*modFileSummary, error) {
 	// Apply replacement if there is one for this module.
-	// For remote module replacements, fetch requirements from the replacement module.
-	// For local path replacements, the registry will handle fetching from the local path.
+	// Remote module replacements are handled here by substituting the fetch target.
+	// Local path replacements are handled transparently by the localReplacementRegistry
+	// wrapper (in localreg.go) which intercepts registry.Requirements() calls.
 	fetchModule := m
 	if repl, ok := rs.replacements[m.Path()]; ok && repl.New.IsValid() {
-		// Remote module replacement - fetch requirements from the replacement
+		// Remote module replacement - fetch requirements from the replacement module
 		fetchModule = repl.New
 	}
 

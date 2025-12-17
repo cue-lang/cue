@@ -308,7 +308,7 @@ func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
 
 	// 2. Load all the packages found
 	modPath := m.modFile.QualifiedModule()
-	reqs := modrequirements.NewRequirements(modPath, w.registry, m.modFile.DepVersions(), m.modFile.DefaultMajorVersions())
+	reqs := modrequirements.NewRequirements(modPath, w.registry, m.modFile.DepVersions(), m.modFile.DefaultMajorVersions(), m.modFile.Replacements())
 	rootUri := m.rootURI
 	ctx := context.Background()
 	loc := module.SourceLoc{

@@ -61,6 +61,9 @@ type File struct {
 	// defaultMajorVersions maps from module base path (the path
 	// without its major version) to the major version default for that path.
 	defaultMajorVersions map[string]string
+
+	// replacements maps from module path (with major version) to its replacement.
+	replacements map[string]Replacement
 }
 
 // QualifiedModule returns the fully qualified module path
@@ -116,6 +119,18 @@ type Language struct {
 type Dep struct {
 	Version string `json:"v"`
 	Default bool   `json:"default,omitempty"`
+	Replace string `json:"replace,omitempty"`
+}
+
+// Replacement represents a processed replace directive.
+// Either New or LocalPath will be set, but not both.
+type Replacement struct {
+	// Old is the module being replaced.
+	Old module.Version
+	// New is the replacement module version (for remote replacements).
+	New module.Version
+	// LocalPath is set for local path replacements (starts with ./ or ../).
+	LocalPath string
 }
 
 // Init initializes the private dependency-related fields of f from
@@ -158,12 +173,32 @@ func (mf *File) init(strict bool) error {
 	versionByModule := make(map[string]module.Version)
 	var versions []module.Version
 	defaultMajorVersions := make(map[string]string)
+	replacements := make(map[string]Replacement)
 	if mainPath != "" {
 		// The main module is always the default for its own major version.
 		defaultMajorVersions[mainPath] = mainMajor
 	}
 	// Check that major versions match dependency versions.
 	for m, dep := range mf.Deps {
+		// Handle replace directives
+		if dep.Replace != "" {
+			repl, err := parseReplacement(m, dep.Replace, strict)
+			if err != nil {
+				return err
+			}
+			replacements[m] = repl
+		}
+
+		// If version is empty and there's a replace, this is a version-independent
+		// replacement - we don't add it to the versions list but still track the replacement.
+		if dep.Version == "" {
+			if dep.Replace == "" {
+				return fmt.Errorf("module %q has no version and no replacement", m)
+			}
+			// Version-independent replacement - don't add to versions list
+			continue
+		}
+
 		vers, err := module.NewVersion(m, dep.Version)
 		if err != nil {
 			return fmt.Errorf("cannot make version from module %q, version %q: %v", m, dep.Version, err)
@@ -193,11 +228,52 @@ func (mf *File) init(strict bool) error {
 	if len(defaultMajorVersions) == 0 {
 		defaultMajorVersions = nil
 	}
+	if len(replacements) == 0 {
+		replacements = nil
+	}
 	mf.versions = versions[:len(versions):len(versions)]
 	slices.SortFunc(mf.versions, module.Version.Compare)
 	mf.versionByModule = versionByModule
 	mf.defaultMajorVersions = defaultMajorVersions
+	mf.replacements = replacements
 	return nil
+}
+
+// parseReplacement parses a replace directive value and returns a Replacement.
+// The replace value can be either:
+// - A local file path starting with "./" or "../"
+// - A remote module path with version (e.g., "other.com/bar@v1.0.0")
+func parseReplacement(oldPath, replace string, strict bool) (Replacement, error) {
+	isLocal := strings.HasPrefix(replace, "./") || strings.HasPrefix(replace, "../")
+
+	if strict && isLocal {
+		return Replacement{}, fmt.Errorf("local path replacement %q not allowed in strict mode", replace)
+	}
+
+	// Parse the old module path to create a module.Version. We use an empty
+	// version string because the replacement applies to all versions of the
+	// module (unlike Go, CUE replacements don't support version-specific replacements).
+	oldVers, err := module.NewVersion(oldPath, "")
+	if err != nil {
+		return Replacement{}, fmt.Errorf("invalid module path %q in replace directive: %v", oldPath, err)
+	}
+
+	repl := Replacement{
+		Old: oldVers,
+	}
+
+	if isLocal {
+		repl.LocalPath = replace
+	} else {
+		// Parse as module@version
+		newVers, err := module.ParseVersion(replace)
+		if err != nil {
+			return Replacement{}, fmt.Errorf("invalid replacement %q: must be local path (./... or ../...) or module@version: %v", replace, err)
+		}
+		repl.New = newVers
+	}
+
+	return repl, nil
 }
 
 // MajorVersion returns the major version of the module,
@@ -224,6 +300,13 @@ func (f *File) DepVersions() []module.Version {
 // The caller should not modify the returned map.
 func (f *File) DefaultMajorVersions() map[string]string {
 	return f.defaultMajorVersions
+}
+
+// Replacements returns the map of module replacements.
+// The map is keyed by module path (with major version, e.g., "foo.com/bar@v0").
+// The caller should not modify the returned map.
+func (f *File) Replacements() map[string]Replacement {
+	return f.replacements
 }
 
 // ModuleForImportPath returns the module that should contain the given

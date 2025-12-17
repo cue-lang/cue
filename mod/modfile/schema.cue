@@ -80,9 +80,9 @@ versions: "v0.9.0-alpha.0": {
 
 		#Dep: {
 			// v indicates the minimum required version of the module. This can
-			// be null if the version is unknown and the module entry is only
-			// present to be replaced.
-			v!: #Semver | null
+			// be null or empty if the version is unknown and the module entry
+			// is only present to be replaced.
+			v!: #Semver | null | ""
 
 			// default indicates this module is used as a default in case more
 			// than one major version is specified for the same module path.
@@ -90,6 +90,12 @@ versions: "v0.9.0-alpha.0": {
 			// there is more than one major version for that path and default is
 			// not set for exactly one of them.
 			default?: bool
+
+			// replace specifies a replacement for this module.
+			// It can be either:
+			// - A local file path starting with "./" or "../"
+			// - A remote module path with version (e.g., "other.com/bar@v1.0.0")
+			replace?: string
 		}
 
 		// #Module constrains a module path. The major version indicator is
@@ -112,8 +118,14 @@ versions: "v0.9.0-alpha.0": {
 		// The module declaration is required.
 		module!: #Module
 
-		// No null versions, because no replacements yet.
-		#Dep: v!: #Semver
+		// In strict mode, versions must be present and local path replacements
+		// are not allowed in published modules.
+		#Dep: {
+			v!: #Semver
+			// Local path replacements (starting with ./ or ../) are not allowed
+			// in published modules. Remote module replacements are allowed.
+			replace?: !~"^\\.\\.?/"
+		}
 	}
 
 	// #Source describes a source of truth for a module's content.

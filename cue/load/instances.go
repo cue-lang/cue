@@ -218,7 +218,10 @@ func loadAbsPackage(
 	ip := ast.ParseImportPath(pkg)
 	ip.Version = semver.Major(mv.Version())
 
-	pkgs := loadPackages(ctx, cfg, mf, loc, []string{ip.String()}, tg)
+	pkgs, err := loadPackages(ctx, cfg, mf, loc, []string{ip.String()}, tg)
+	if err != nil {
+		return "", nil, err
+	}
 	return ip.String(), pkgs, nil
 }
 
@@ -268,7 +271,7 @@ func loadPackagesFromArgs(
 		},
 		slices.Sorted(maps.Keys(pkgPaths)),
 		tg,
-	), nil
+	)
 }
 
 func loadPackages(
@@ -278,20 +281,27 @@ func loadPackages(
 	mainModLoc module.SourceLoc,
 	pkgPaths []string,
 	tg *tagger,
-) *modpkgload.Packages {
+) (*modpkgload.Packages, error) {
 	mainModPath := mainMod.QualifiedModule()
+	// Wrap the registry to handle local path replacements.
+	// This allows cue eval/export to read requirements from local modules.
+	reg, err := modload.NewLocalReplacementRegistry(cfg.Registry, mainModLoc, mainMod.Replacements())
+	if err != nil {
+		return nil, err
+	}
 	reqs := modrequirements.NewRequirements(
 		mainModPath,
-		cfg.Registry,
+		reg,
 		mainMod.DepVersions(),
 		mainMod.DefaultMajorVersions(),
+		mainMod.Replacements(),
 	)
 	return modpkgload.LoadPackages(
 		ctx,
 		mainModPath,
 		mainModLoc,
 		reqs,
-		cfg.Registry,
+		reg,
 		pkgPaths,
 		func(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool {
 			if !cfg.Tools && strings.HasSuffix(mf.FilePath, "_tool.cue") {
@@ -322,7 +332,7 @@ func loadPackages(
 			}
 			return true
 		},
-	)
+	), nil
 }
 
 func isAbsVersionPackage(p string) bool {

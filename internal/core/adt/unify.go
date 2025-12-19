@@ -16,6 +16,7 @@ package adt
 
 import (
 	"fmt"
+	"slices"
 
 	"cuelang.org/go/cue/token"
 )
@@ -651,14 +652,9 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 		}
 	}
 
-	k := 0
-	for _, a := range n.node.Arcs {
-		if a.ArcType != ArcNotPresent {
-			n.node.Arcs[k] = a
-			k++
-		}
-	}
-	n.node.Arcs = n.node.Arcs[:k]
+	n.node.Arcs = slices.DeleteFunc(n.node.Arcs, func(a *Vertex) bool {
+		return a.ArcType == ArcNotPresent
+	})
 
 	for _, a := range n.node.Arcs {
 		// Errors are allowed in let fields. Handle errors and failure to
@@ -712,14 +708,9 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 	//
 	// TODO(perf): we could keep track if any such structs exist and only
 	// do this removal if there is a change of shrinking the list.
-	k = 0
-	for _, s := range n.node.Structs {
-		if s.initialized {
-			n.node.Structs[k] = s
-			k++
-		}
-	}
-	n.node.Structs = n.node.Structs[:k]
+	n.node.Structs = slices.DeleteFunc(n.node.Structs, func(s StructInfo) bool {
+		return !s.initialized
+	})
 
 	// TODO: This seems to be necessary, but enables structural cycles.
 	// Evaluator whether we still need this.

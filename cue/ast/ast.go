@@ -19,6 +19,7 @@ package ast
 import (
 	"fmt"
 	"iter"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue/literal"
@@ -274,17 +275,15 @@ func (g *CommentGroup) Text() string {
 
 	// Remove leading blank lines; convert runs of
 	// interior blank lines to a single blank line.
-	n := 0
-	for _, line := range lines {
-		if line != "" || n > 0 && lines[n-1] != "" {
-			lines[n] = line
-			n++
-		}
-	}
-	lines = lines[0:n]
+	lastBlank := true
+	lines = slices.DeleteFunc(lines, func(line string) bool {
+		remove := lastBlank && line == ""
+		lastBlank = line == ""
+		return remove
+	})
 
 	// Add final "" entry to get trailing newline from Join.
-	if n > 0 && lines[n-1] != "" {
+	if !lastBlank {
 		lines = append(lines, "")
 	}
 

@@ -600,15 +600,10 @@ func (e *exporter) markLetAlias(x *ast.LetClause) {
 
 // In value mode, lets are only used if there wasn't an error.
 func filterUnusedLets(s *ast.StructLit) {
-	k := 0
-	for i, d := range s.Elts {
-		if let, ok := d.(*ast.LetClause); ok && let.Expr == nil {
-			continue
-		}
-		s.Elts[k] = s.Elts[i]
-		k++
-	}
-	s.Elts = s.Elts[:k]
+	s.Elts = slices.DeleteFunc(s.Elts, func(d ast.Decl) bool {
+		let, ok := d.(*ast.LetClause)
+		return ok && let.Expr == nil
+	})
 }
 
 // resolveLet actually parses the let expression.

@@ -420,11 +420,6 @@ func (ctx *OpContext) notAllowedError(arc *Vertex) *Bottom {
 		arc.state.kind = 0
 	}
 
-	// TODO: remove? We are now setting it on both fields, which seems to be
-	// necessary for now. But we should remove this as it often results in
-	// a duplicate error.
-	// v.SetValue(ctx, ctx.NewErrf("field not allowed"))
-
 	// TODO: create a special kind of error that gets the positions
 	// of the relevant locations upon request from the arc.
 	return err

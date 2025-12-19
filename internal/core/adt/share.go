@@ -79,10 +79,6 @@ func (n *nodeContext) finalizeSharing() {
 		// its assigned location.
 		if v.state != nil && v.state.parent != nil {
 			v.Parent = v.state.parent
-
-			// TODO: see if this can be removed and why some errors are not
-			// propagated when removed.
-			n.isShared = false
 		}
 	case *Bottom:
 		// An error trumps sharing. We can leave it as is.

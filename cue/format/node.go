@@ -694,7 +694,16 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		f.before(nil)
 		// Reindent multiline interpolation string fragments directly.
 		search, replace := f.interpolationReindent(x)
+		// For multi-line string literals, enforce that the newlines
+		// surrounding each interpolation expression are either both
+		// present or both absent; if only one is present, force the
+		// other. For single-line string literals, collapse all newlines
+		// inside interpolation expressions so the result stays on one line.
+		forceNewline := interpolationNormalize(x)
 		for i, el := range x.Elts {
+			if forceNewline[i] {
+				f.print(newline, nooverride)
+			}
 			// Only reindent even-indexed elements, which are the string
 			// fragments; odd-indexed elements are expressions like "bar"
 			// in \("bar") which may also be BasicLits.
@@ -835,6 +844,86 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 	default:
 		panic(fmt.Sprintf("unimplemented type %T", x))
 	}
+}
+
+// interpolationNormalize normalizes the whitespace surrounding each
+// \(...) interpolation expression in x.
+//
+// For multi-line string literals, it returns the set of element indices
+// in x.Elts that should be preceded by an inserted newline so that the
+// leading and trailing newlines around each interpolation expression
+// are either both present or both absent.
+//
+// For single-line string literals, it mutates positions within each
+// interpolation expression and its closing fragment so that no
+// position-driven newlines are emitted, collapsing the interpolation
+// to a single line.
+func interpolationNormalize(x *ast.Interpolation) map[int]bool {
+	if len(x.Elts) < 3 {
+		return nil
+	}
+	first, ok := x.Elts[0].(*ast.BasicLit)
+	if !ok {
+		return nil
+	}
+	if !isMultilineStringLit(first.Value) {
+		clearNewline := func(n ast.Node) bool {
+			if n != nil && n.Pos().RelPos() >= token.Newline {
+				ast.SetRelPos(n, token.NoRelPos)
+			}
+			return true
+		}
+		for i := 1; i < len(x.Elts); i++ {
+			el := x.Elts[i]
+			if i%2 == 1 {
+				ast.Walk(el, clearNewline, nil)
+			} else {
+				clearNewline(el)
+			}
+		}
+		return nil
+	}
+	var force map[int]bool
+	for i := 1; i+1 < len(x.Elts); i += 2 {
+		prev, expr, next := x.Elts[i-1], x.Elts[i], x.Elts[i+1]
+		// Skip if any relevant position is missing, as can happen for
+		// AST nodes synthesized without positions.
+		if !prev.End().IsValid() || !expr.Pos().IsValid() ||
+			!expr.End().IsValid() || !next.Pos().IsValid() {
+			continue
+		}
+		hasLeading := expr.Pos().Line() > prev.End().Line()
+		hasTrailing := next.Pos().Line() > expr.End().Line()
+		if hasLeading == hasTrailing {
+			continue
+		}
+		if force == nil {
+			force = make(map[int]bool)
+		}
+		if hasLeading {
+			force[i+1] = true
+		} else {
+			force[i] = true
+		}
+	}
+	return force
+}
+
+// isMultilineStringLit reports whether s is the opening fragment of a
+// multi-line string literal such as """ or ”', optionally prefixed by
+// one or more '#' characters.
+func isMultilineStringLit(s string) bool {
+	for len(s) > 0 && s[0] == '#' {
+		s = s[1:]
+	}
+	if len(s) < 3 {
+		return false
+	}
+	switch s[0] {
+	case '"', '\'':
+		return s[1] == s[0] && s[2] == s[0]
+	}
+	return false
 }
 
 // interpolationReindent returns a search/replace pair to reindent multiline

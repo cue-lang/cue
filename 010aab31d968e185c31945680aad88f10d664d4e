@@ -16,6 +16,24 @@
       "message": "As discussed online, I think this should use Stat not Lstat, and I think the right check is to special-case regular files, not just named pipes and device files, because that\u0027s the way the `--force` documentation is worded (and if we allow named pipes, why not sockets too, for example). It\u0027s also less OS-specific.\n\nAlso, I don\u0027t really like the goto - it means we have to reason very carefully about whether there might be an infinite loop, whereas if we just re-invoked os.OpenFile directly, it would be very clear it\u0027s only a single retry (I\u0027m assuming here that you are only intending it to be possible for there to be a single retry!).",
       "revId": "010aab31d968e185c31945680aad88f10d664d4e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25c9d9b2_41b9bf94",
+        "filename": "internal/encoding/encoder.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-19T08:34:03Z",
+      "side": 1,
+      "message": "Agreed on Lstat vs Stat, given that OpenFile follows links. Done.\n\nAlso switched the logic to only check for non-regular files, which is indeed better.\n\nAnd you\u0027re very right about the goto - it\u0027s hard to be 100% sure that we couldn\u0027t loop forever. A single retry takes just as many lines, so I\u0027ve done that. The only caveat is that it requires being careful to not shadow variables that we care about; see `err2`.",
+      "parentUuid": "df000142_739b6b4d",
+      "revId": "010aab31d968e185c31945680aad88f10d664d4e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

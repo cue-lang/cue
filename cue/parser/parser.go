@@ -1669,6 +1669,7 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 
 	lit := p.lit
 	pos := p.pos
+	multiline := quoteInfo(lit)
 	p.next()
 	last := &ast.BasicLit{ValuePos: pos, Kind: token.STRING, Value: lit}
 	exprs := []ast.Expr{last}
@@ -1677,12 +1678,23 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 	// starts a new interpolated expression by whether it ends in a parenthesis.
 	for strings.HasSuffix(last.Value, "(") {
 		c.pos = 1
+		openPos := p.pos
 		p.expect(token.LPAREN)
 		cc.closeExpr(p, last)
 
 		exprs = append(exprs, p.parseRHS())
 
 		cc = p.openComments()
+		// If a comma was inserted, consume it to find the closing parenthesis.
+		// An inserted comma in a simple string literals will cause an error,
+		// but it is allowed in multi-line string literals.
+		if p.tok == token.COMMA && p.lit == "\n" {
+			p.next()
+		}
+		closePos := p.pos
+		if !multiline && openPos.Line() < closePos.Line() {
+			p.errf(openPos, "newlines in string interpolations are only allowed in multi-line literals")
+		}
 		if p.tok != token.RPAREN {
 			p.errorExpected(p.pos, "')' for string interpolation")
 		}
@@ -1698,6 +1710,22 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 	}
 	cc.closeExpr(p, last)
 	return &ast.Interpolation{Elts: exprs}
+}
+
+// quoteInfo is a tiny version of [literal.ParseQuotes] without needing the end literal.
+// It does not do any validation, as the scanner does that for us,
+// and only returns the information that we need right now.
+func quoteInfo(s string) (multiline bool) {
+	for s[0] == '#' {
+		s = s[1:]
+	}
+	switch s[0] {
+	case '"', '\'':
+		if len(s) >= 3 && s[1] == s[0] && s[2] == s[0] {
+			multiline = true
+		}
+	}
+	return
 }
 
 // Callers must check the result (using checkExpr), depending on context.

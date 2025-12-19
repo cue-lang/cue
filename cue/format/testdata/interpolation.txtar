@@ -1,0 +1,75 @@
+
+-- interpolation.input --
+package p
+
+// Single-line strings: any newlines inside interpolations collapse to one line.
+singleInline: "\(1)"
+singleLeading: "\(
+	1)"
+singleTrailing: "\(1
+)"
+singleInner: "\(1 +
+	2)"
+singleBoth: "\(
+	1
+)"
+singleTwo: "\(1) is \(
+	2)"
+
+// Multi-line strings: surrounding newlines around each interpolation are
+// balanced so they are either both present or both absent.
+multiBoth: """
+	\(
+	1
+	)
+	"""
+multiLeading: """
+	\(
+	1)
+	"""
+multiTrailing: """
+	\(1
+	)
+	"""
+multiNeither: """
+	\(1)
+	"""
+multiInner: """
+	\(1 +
+	2)
+	"""
+-- out/format/interpolation.golden --
+package p
+
+// Single-line strings: any newlines inside interpolations collapse to one line.
+singleInline:   "\(1)"
+singleLeading:  "\(1)"
+singleTrailing: "\(1)"
+singleInner:    "\(1+2)"
+singleBoth:     "\(1)"
+singleTwo:      "\(1) is \(2)"
+
+// Multi-line strings: surrounding newlines around each interpolation are
+// balanced so they are either both present or both absent.
+multiBoth:     """
+	\(
+				1
+				)
+	"""
+multiLeading:  """
+	\(
+				1
+				)
+	"""
+multiTrailing: """
+	\(
+				1
+				)
+	"""
+multiNeither:  """
+	\(1)
+	"""
+multiInner:    """
+	\(1+
+	2)
+	"""

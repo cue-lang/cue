@@ -619,21 +619,22 @@ cannot import package as definition identifier`,
 			desc: "interpolation with leading newline and whitespace",
 			in: `"\(
 				1)"`,
-			out: `"\(1)"`,
+			out: `"\(1)"
+newlines in string interpolations are only allowed in multi-line literals`,
 		},
 		{
 			desc: "interpolation with inner newline and whitespace",
 			in: `"\(1 +
 				2)"`,
-			out: `"\(1+2)"`,
+			out: `"\(1+2)"
+newlines in string interpolations are only allowed in multi-line literals`,
 		},
 		{
 			desc: "interpolation with trailing whitespace and newline",
 			in: `"\(1
 				)"`,
-			// TODO: this should be consistent with the two test cases above.
-			out: `"\(1	)"
-expected ')' for string interpolation, found newline`,
+			out: `"\(1)"
+newlines in string interpolations are only allowed in multi-line literals`,
 		},
 		{
 			desc: "interpolation with trailing comma",
@@ -667,11 +668,9 @@ expected ')' for string interpolation, found ','`,
 				\(1
 				)
 				"""`,
-			// TODO: this should be consistent with the two test cases above.
 			out: `"""
-				\(1	)
-				"""
-expected ')' for string interpolation, found newline`,
+				\(1)
+				"""`,
 		},
 		{
 			desc: "multi-line interpolation with trailing comma",

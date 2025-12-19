@@ -16,6 +16,24 @@
       "message": "To me this wording seems to imply that a non-regular file can\u0027t be overwritten, but that\u0027s not the case - for non-regular files this is a no-op. I think a better solution might be to keep the wording the same and clarify that `-o` will allow overwrite of existing non-regular files.",
       "revId": "62265bc793eaa96019ab4a2a18972d75bc4435ac",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c850373b_061890fd",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-19T08:41:28Z",
+      "side": 1,
+      "message": "I think the wording that this patch ends up with is indeed correct.\n\n1) For new (missing) files, `-o name` creates a new regular file, and `-f` is a no-op\n2) For existing regular files, `-o name` fails, and `-o name -f` does overwrite\n3) For existing non-regular files like named pipes, `-o name` writes in-place, and `-f` is a no-op - note that there is no overwriting here, as we do not attempt to truncate or replace\n\nHence I think it\u0027s valid to document `-o` as the output file, and document that `-f` allows replacing an existing regular file, which is the only case (2) where it does anything.",
+      "parentUuid": "b53f1d65_f2b42d78",
+      "revId": "62265bc793eaa96019ab4a2a18972d75bc4435ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

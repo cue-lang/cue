@@ -16,6 +16,7 @@ package runtime
 
 import (
 	"path"
+	"slices"
 	"strconv"
 
 	"cuelang.org/go/cue/ast"
@@ -138,20 +139,17 @@ func resolveFile(
 		}
 	}
 
-	k := 0
-	for _, u := range f.Unresolved {
+	f.Unresolved = slices.DeleteFunc(f.Unresolved, func(u *ast.Ident) bool {
 		if u.Node != nil {
-			continue
+			return true
 		}
 		if n, ok := allFields[u.Name]; ok {
 			u.Node = n
 			u.Scope = f
-			continue
+			return true
 		}
-		f.Unresolved[k] = u
-		k++
-	}
-	f.Unresolved = f.Unresolved[:k]
+		return false
+	})
 	// TODO: also need to resolve types.
 	// if len(f.Unresolved) > 0 {
 	// 	n := f.Unresolved[0]

@@ -115,9 +115,7 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 		result = ast.NewBinExpr(token.AND, exprs...)
 	}
 
-	if len(s.Elts) > 0 {
-		filterUnusedLets(s)
-	}
+	filterUnusedLets(s)
 	if result != s && len(s.Elts) > 0 {
 		// There are used let expressions within a non-struct.
 		// For now we just fall back to the original expressions.

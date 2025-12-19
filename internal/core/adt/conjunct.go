@@ -602,21 +602,18 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 		case MatchOp, NotMatchOp:
 			// This check serves as simplifier, but also to remove duplicates.
-			k := 0
 			match := false
-			for _, c := range n.checks {
+			n.checks = slices.DeleteFunc(n.checks, func(c Conjunct) bool {
 				if y, ok := c.x.(*BoundValue); ok {
-					switch z := SimplifyBounds(ctx, n.kind, x, y); {
-					case z == y:
+					switch SimplifyBounds(ctx, n.kind, x, y) {
+					case y:
 						match = true
-					case z == x:
-						continue
+					case x:
+						return true
 					}
 				}
-				n.checks[k] = c
-				k++
-			}
-			n.checks = n.checks[:k]
+				return false
+			})
 			// TODO(perf): do an early check to be able to prune further
 			// processing.
 			if !match {

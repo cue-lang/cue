@@ -1480,15 +1480,9 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		tags := reflect.StructTag(tag)
 		if t := tags.Get("protobuf"); t != "" {
 			split := strings.Split(t, ",")
-			k := 0
-			for _, s := range split {
-				if strings.HasPrefix(s, "name=") && s[len("name="):] == name {
-					continue
-				}
-				split[k] = s
-				k++
-			}
-			split = split[:k]
+			split = slices.DeleteFunc(split, func(s string) bool {
+				return strings.HasPrefix(s, "name=") && s[len("name="):] == name
+			})
 
 			// Put tag first, as type could potentially be elided and is
 			// "more optional".

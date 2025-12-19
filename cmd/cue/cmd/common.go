@@ -19,6 +19,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -776,19 +777,16 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 	ti.Root = binst[0].Root
 
 	for _, inst := range binst {
-		k := 0
-		for _, f := range inst.Files {
+		inst.Files = slices.DeleteFunc(inst.Files, func(f *ast.File) bool {
 			if strings.HasSuffix(f.Filename, "_tool.cue") {
 				if !included[f.Filename] {
 					_ = ti.AddSyntax(f)
 					included[f.Filename] = true
 				}
-				continue
+				return true
 			}
-			inst.Files[k] = f
-			k++
-		}
-		inst.Files = inst.Files[:k]
+			return false
+		})
 	}
 
 	insts, err := buildToolInstances(cmd.ctx, binst)

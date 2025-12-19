@@ -1780,6 +1780,12 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 		exprs = append(exprs, p.parseRHS())
 
 		cc = p.openComments()
+		// If a comma was inserted, consume it to find the closing parenthesis.
+		// Newlines inside string interpolations are allowed; the formatter
+		// normalizes leading/trailing newlines to be both present or both absent.
+		if p.tok == token.COMMA && p.lit == "\n" {
+			p.next()
+		}
 		if p.tok != token.RPAREN {
 			p.errorExpected(p.pos, "')' for string interpolation")
 		}

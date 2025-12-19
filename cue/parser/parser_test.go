@@ -909,9 +909,7 @@ use 'else' with single 'if' or 'try' clause`,
 			desc: "interpolation with trailing whitespace and newline",
 			in: `"\(1
 				)"`,
-			// TODO: this should be consistent with the two test cases above.
-			out: `"\(1	)"
-expected ')' for string interpolation, found newline`,
+			out: `"\(1)"`,
 		},
 		{
 			desc: "interpolation with trailing comma",
@@ -945,11 +943,9 @@ expected ')' for string interpolation, found ','`,
 				\(1
 				)
 				"""`,
-			// TODO: this should be consistent with the two test cases above.
 			out: `"""
-				\(1	)
-				"""
-expected ')' for string interpolation, found newline`,
+				\(1)
+				"""`,
 		},
 		{
 			desc: "multi-line interpolation with trailing comma",

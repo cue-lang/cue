@@ -1313,7 +1313,6 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 		//
 
 		if c.hasDepthCycle(v) {
-			// Eval V3 logic
 			c.verifyNonMonotonicResult(env, x, true)
 			match = op == EqualOp
 			break

@@ -169,7 +169,6 @@ language: version: "v0.9.0"
 	}
 
 	version := cuecontext.EvalDefault
-	version = cuecontext.EvalExperiment // Uncomment for eval V3
 	r := cuecontext.New(cuecontext.EvaluatorVersion(version))
 	(*runtime.Runtime)(r).SetDebugOptions(&cuedebug.Config{
 		Sharing: true,

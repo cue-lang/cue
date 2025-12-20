@@ -60,13 +60,13 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 	if err := validateValue(c, left, checkConcrete); err != nil {
 		const msg = "invalid left-hand value to '%s' (type %s): %v"
 		// TODO: Wrap bottom instead of using NewErrf?
-		b := c.NewErrf(msg, op, left.Kind(), err.Err)
+		b := c.NewErrf(msg, op, leftKind, err.Err)
 		b.Code = err.Code
 		return b
 	}
 	if err := validateValue(c, right, checkConcrete); err != nil {
 		const msg = "invalid right-hand value to '%s' (type %s): %v"
-		b := c.NewErrf(msg, op, left.Kind(), err.Err)
+		b := c.NewErrf(msg, op, leftKind, err.Err)
 		b.Code = err.Code
 		return b
 	}

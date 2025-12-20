@@ -794,11 +794,11 @@ Conjuncts:    857
 Disjuncts:    946
 -- out/evalalpha --
 Errors:
-lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
+lists.eErrPassthrough: invalid left-hand value to '==' (type list): 0: failed arithmetic: division by zero:
     ./lists.cue:24:19
 lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
     ./lists.cue:28:19
-incomplete.eErr4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
+incomplete.eErr4: invalid left-hand value to '==' (type struct): a: failed arithmetic: division by zero:
     ./structs.cue:77:9
 incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values string and int (mismatched types string and int):
     ./structs.cue:79:9
@@ -833,7 +833,7 @@ Result:
     f5: (bool){ false }
     f6: (bool){ false }
     eErrPassthrough: (_|_){
-      // [eval] lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
+      // [eval] lists.eErrPassthrough: invalid left-hand value to '==' (type list): 0: failed arithmetic: division by zero:
       //     ./lists.cue:24:19
       // lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
       //     ./lists.cue:28:19
@@ -919,7 +919,7 @@ Result:
       //     ./structs.cue:76:9
     }
     eErr4: (_|_){
-      // [eval] incomplete.eErr4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
+      // [eval] incomplete.eErr4: invalid left-hand value to '==' (type struct): a: failed arithmetic: division by zero:
       //     ./structs.cue:77:9
     }
     eErr5: (_|_){
@@ -991,13 +991,13 @@ diff old new
 @@ -1,11 +1,11 @@
  Errors:
 -lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
-+lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
++lists.eErrPassthrough: invalid left-hand value to '==' (type list): 0: failed arithmetic: division by zero:
      ./lists.cue:24:19
 -lists.eErrPassthrough: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
 +lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
      ./lists.cue:28:19
 -incomplete.eErr4: invalid left-hand value to '==' (type _|_): incomplete.a: failed arithmetic: division by zero:
-+incomplete.eErr4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
++incomplete.eErr4: invalid left-hand value to '==' (type struct): a: failed arithmetic: division by zero:
      ./structs.cue:77:9
 -incomplete.eErr5: invalid right-hand value to '==' (type struct): incomplete.a: conflicting values int and string (mismatched types int and string):
 +incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values string and int (mismatched types string and int):
@@ -1009,7 +1009,7 @@ diff old new
      f6: (bool){ false }
      eErrPassthrough: (_|_){
 -      // [eval] lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): lists.0: failed arithmetic: division by zero:
-+      // [eval] lists.eErrPassthrough: invalid left-hand value to '==' (type _|_): 0: failed arithmetic: division by zero:
++      // [eval] lists.eErrPassthrough: invalid left-hand value to '==' (type list): 0: failed arithmetic: division by zero:
        //     ./lists.cue:24:19
 -      // lists.eErrPassthrough: invalid right-hand value to '==' (type list): lists.1: conflicting values int and string (mismatched types int and string):
 +      // lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflicting values int and string (mismatched types int and string):
@@ -1041,7 +1041,7 @@ diff old new
      }
      eErr4: (_|_){
 -      // [eval] incomplete.eErr4: invalid left-hand value to '==' (type _|_): incomplete.a: failed arithmetic: division by zero:
-+      // [eval] incomplete.eErr4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
++      // [eval] incomplete.eErr4: invalid left-hand value to '==' (type struct): a: failed arithmetic: division by zero:
        //     ./structs.cue:77:9
      }
      eErr5: (_|_){

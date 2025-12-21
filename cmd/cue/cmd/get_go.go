@@ -82,7 +82,8 @@ Rules of Converting Go types to CUE
 Go structs are converted to cue structs adhering to the following conventions:
 
 	- field names are translated based on the definition of a "json" or "yaml"
-	  tag, in that order.
+	  tag, in that order. A --codec flag can be used to change the priority of
+	  the tag search.
 
 	- embedded structs marked with a json inline tag unify with struct
 	  definition. For instance, the Go struct
@@ -221,12 +222,18 @@ restrictive enum interpretation of #Switch remains.
 
 	cmd.Flags().String(string(flagOutFile), "", "generate one CUE file for a single Go package")
 
+	cmd.Flags().String(string(flagCodec), defaultCodec,
+		"comma-separated priority list of struct tags to use for field names")
+
 	return cmd
 }
 
 const (
 	flagExclude flagName = "exclude"
 	flagLocal   flagName = "local"
+	flagCodec   flagName = "codec"
+
+	defaultCodec = "json,yaml"
 )
 
 func (e *extractor) initExclusions(str string) {
@@ -266,6 +273,8 @@ type extractor struct {
 
 	exclusions []*regexp.Regexp
 	exclude    string
+
+	codecs []string
 }
 
 type pkgInfo struct {
@@ -406,6 +415,8 @@ func extract(cmd *Command, args []string) error {
 
 	e.initExclusions(flagExclude.String(cmd))
 
+	e.codecs = strings.Split(flagCodec.String(cmd), ",")
+
 	e.done = map[string]bool{}
 
 	for _, p := range pkgs {
@@ -495,6 +506,9 @@ outer:
 	e.usedPkgs = map[string]bool{}
 
 	args := pkg
+	if val := flagCodec.String(e.cmd); val != defaultCodec {
+		args += " --" + string(flagCodec) + "=" + val
+	}
 	if e.exclude != "" {
 		args += " --exclude=" + e.exclude
 	}
@@ -1423,7 +1437,7 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 			continue
 		}
 		tag := x.Tag(i)
-		name := getName(f.Name(), tag)
+		name := e.getName(f.Name(), tag)
 		if name == "-" {
 			continue
 		}
@@ -1593,9 +1607,9 @@ func hasFlag(tag, key, flag string, offset int) bool {
 	return false
 }
 
-func getName(name string, tag string) string {
+func (e *extractor) getName(name string, tag string) string {
 	tags := reflect.StructTag(tag)
-	for _, s := range []string{"json", "yaml"} {
+	for _, s := range e.codecs {
 		if tag, ok := tags.Lookup(s); ok {
 			tag, _, _ = strings.Cut(tag, ",")
 			if tag != "" {

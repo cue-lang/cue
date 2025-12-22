@@ -21,6 +21,7 @@ package toml
 import (
 	"fmt"
 	"io"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -336,6 +337,11 @@ func (d *Decoder) findArrayPrefix(rkey rootedKey) *openTableArray {
 
 	// Prefer an exact match over a relative prefix match.
 	if arr := d.findArray(rkey); arr != nil {
+		// When we find an exact match, we must forget about its subkeys
+		// because we're starting an entirely new array element.
+		d.openTableArrays = slices.DeleteFunc(d.openTableArrays, func(arr openTableArray) bool {
+			return strings.HasPrefix(arr.rkey, rkey+".")
+		})
 		return arr
 	}
 	// The longest relative key match wins.

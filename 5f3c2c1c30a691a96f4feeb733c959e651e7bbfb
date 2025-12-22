@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e4e164c_d3b768eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-12-22T09:41:13Z",
+      "side": 1,
+      "message": "Okay, but please ensure this does not impact performance. Except for one case, most of it looks quite a bit better indeed,",
+      "revId": "5f3c2c1c30a691a96f4feeb733c959e651e7bbfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9b68dd1_6d0f0a9b",
+        "filename": "internal/core/runtime/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-12-22T09:41:13Z",
+      "side": 1,
+      "message": "Is this really better? I don\u0027t see much difference in size, just more uncertainty if this won\u0027t create a memory allocation.",
+      "revId": "5f3c2c1c30a691a96f4feeb733c959e651e7bbfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

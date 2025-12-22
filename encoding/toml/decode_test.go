@@ -731,6 +731,52 @@ line two.\
 			]
 			`,
 	}, {
+		name: "ArrayTablesNestedSiblings",
+		input: `
+			[[foo]]
+			foo1 = "foo1 value"
+			[[foo.nested1]]
+			foo1_n1 = "foo1_n1 value"
+			[[foo.nested2.deeper]]
+			foo1_n2 = "foo1_n2 value"
+			[[foo]]
+			foo2 = "foo2 value"
+			[[foo.nested1]]
+			foo2_n1 = "foo2_n1 value"
+			[[foo.nested2.deeper]]
+			foo2_n2 = "foo2_n2 value"
+			`,
+		wantCUE: `
+            foo: [
+            	{
+            		foo1: "foo1 value"
+            		nested1: [
+            			{
+            				foo1_n1: "foo1_n1 value"
+            			},
+            		]
+            		nested2: deeper: [
+            			{
+            				foo1_n2: "foo1_n2 value"
+            			},
+            		]
+            	},
+            	{
+            		foo2: "foo2 value"
+            		nested1: [
+            			{
+            				foo2_n1: "foo2_n1 value"
+            			},
+            		]
+            		nested2: deeper: [
+            			{
+            				foo2_n2: "foo2_n2 value"
+            			},
+            		]
+            	},
+            ]
+			`,
+	}, {
 		name: "RedeclareKeyAsTableArray",
 		input: `
 			foo = "foo value"

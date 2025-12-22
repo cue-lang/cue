@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e608f5c9_6e031b51",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-22T10:38:25Z",
+      "side": 1,
+      "message": "The algorithm used by DeleteFunc is the same as ours - modulo an initial IndexFunc scan to avoid the copy work - so I don\u0027t expect it will cause any noticeable change. I also didn\u0027t notice any significant changes in e.g. the Unity benchmarks.",
+      "parentUuid": "4e4e164c_d3b768eb",
+      "revId": "5f3c2c1c30a691a96f4feeb733c959e651e7bbfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9b68dd1_6d0f0a9b",

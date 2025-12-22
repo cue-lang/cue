@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "072db614_e54d5856",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-22T06:00:20Z",
+      "side": 1,
+      "message": "make this `Fixes #2264` at the end of your commit message; see other commits in master for example.",
+      "revId": "1695998016c46f5efd3078dd1ff0c17db8709f70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf279d0e_e3b1388c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-22T06:00:20Z",
+      "side": 1,
+      "message": "Thanks, LGTM!",
+      "revId": "1695998016c46f5efd3078dd1ff0c17db8709f70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "012e33d2_a0464e8a",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1612,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-22T06:00:20Z",
+      "side": 1,
+      "message": "To address Roger\u0027s concern in the github issue, I\u0027d add a TODO like:\n\n```\n// TODO: We should probably never use a combination of names from different codecs\n// in a single struct. For example, with `--codec json,yaml`, if a struct has any field\n// with a JSON tag, we should ignore any YAML tags in that struct at that point.\n// Do this in a separate change in the future, to aid in bisecting.\n```\n\nAnd I\u0027d also expand the test case to have the various cases that we care about:\n1) a struct with only some JSON tags\n2) a struct with only some YAML tags\n3) a struct with overlapping JSON and YAML tags\n4) a struct with disjoint JSON and YAML tags",
+      "revId": "1695998016c46f5efd3078dd1ff0c17db8709f70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

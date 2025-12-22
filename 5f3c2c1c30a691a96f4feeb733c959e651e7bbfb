@@ -33,6 +33,24 @@
       "message": "Is this really better? I don\u0027t see much difference in size, just more uncertainty if this won\u0027t create a memory allocation.",
       "revId": "5f3c2c1c30a691a96f4feeb733c959e651e7bbfb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e943501d_4a010522",
+        "filename": "internal/core/runtime/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-22T10:36:32Z",
+      "side": 1,
+      "message": "I guess this is one of the cases where the improvement is smallest, but I still think it\u0027s nicer, if anything for the sake of consistency.\n\nI am certain that there\u0027s no downside in terms of allocations. DeleteFunc works in-place, exactly like our existing code. I wouldn\u0027t have suggested these changes if DeleteFunc made a copy of the input slice.",
+      "parentUuid": "f9b68dd1_6d0f0a9b",
+      "revId": "5f3c2c1c30a691a96f4feeb733c959e651e7bbfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

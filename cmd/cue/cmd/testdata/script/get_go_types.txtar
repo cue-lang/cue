@@ -144,6 +144,12 @@ const (
 	internalIdentifier Identifier = "internal"
 )
 
+type NoValues uint
+
+const (
+	_ = NoValues(0) // e.g. from a generated assert
+)
+
 const _ = true
 
 // appease linter
@@ -366,6 +372,8 @@ import (
 	_#internalIdentifier
 
 _#internalIdentifier: #Identifier & "internal"
+
+#NoValues: uint
 
 // Level gives an indication of the extent of stuff.
 #Level: int // #enumLevel

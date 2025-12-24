@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "4e5dc8ca_f1007b57",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-24T01:03:50Z",
+      "side": 1,
+      "message": "I assume you\u0027ve done this; note that replies on Gerrit are saved as drafts, so you have to \"reply\" at the top to send them.",
+      "parentUuid": "072db614_e54d5856",
+      "revId": "1695998016c46f5efd3078dd1ff0c17db8709f70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "cf279d0e_e3b1388c",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
@@ -48,6 +66,24 @@
       "writtenOn": "2025-12-22T06:00:20Z",
       "side": 1,
       "message": "To address Roger\u0027s concern in the github issue, I\u0027d add a TODO like:\n\n```\n// TODO: We should probably never use a combination of names from different codecs\n// in a single struct. For example, with `--codec json,yaml`, if a struct has any field\n// with a JSON tag, we should ignore any YAML tags in that struct at that point.\n// Do this in a separate change in the future, to aid in bisecting.\n```\n\nAnd I\u0027d also expand the test case to have the various cases that we care about:\n1) a struct with only some JSON tags\n2) a struct with only some YAML tags\n3) a struct with overlapping JSON and YAML tags\n4) a struct with disjoint JSON and YAML tags",
+      "revId": "1695998016c46f5efd3078dd1ff0c17db8709f70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d3b8872_588978c8",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1612,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-12-24T01:03:50Z",
+      "side": 1,
+      "message": "ditto :)",
+      "parentUuid": "012e33d2_a0464e8a",
       "revId": "1695998016c46f5efd3078dd1ff0c17db8709f70",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

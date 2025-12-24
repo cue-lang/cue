@@ -662,6 +662,9 @@ func (e *extractor) recordConsts(x *ast.GenDecl) {
 			continue
 		}
 		for _, n := range v.Names {
+			if n.Name == "_" {
+				continue
+			}
 			typ := e.pkg.TypesInfo.TypeOf(n).String()
 			e.consts[typ] = append(e.consts[typ], n.Name)
 		}
@@ -749,9 +752,6 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 				var exprs []cueast.Expr
 				var named []cueast.Decl
 				for _, v := range enums {
-					if v == "_" {
-						continue
-					}
 					label := cueast.NewString(v)
 					cueast.SetRelPos(label, cuetoken.Blank)
 

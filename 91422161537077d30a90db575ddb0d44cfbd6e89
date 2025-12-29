@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac68e4cf_4f0c7932",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-12-29T14:41:36Z",
+      "side": 1,
+      "message": "For the \"slow\" reader like me, it might be best to spell out the before and after:\n\n```\n// before\na: [\n\t{\n\t\tx: \"x1\"\n\t\tb: [{y: \"y1\"}, {y: \"y2\"}]\n\t},\n\t{\n\t\tx: \"x2\"\n\t},\n]\n\n// after\na: [\n\t{\n\t\tx: \"x1\"\n\t\tb: [{y: \"y1\"}]\n\t},\n\t{\n\t\tx: \"x2\"\n\t\tb: [{y: \"y2\"}]\n\t},\n]\n```",
+      "revId": "91422161537077d30a90db575ddb0d44cfbd6e89",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

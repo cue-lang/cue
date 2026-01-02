@@ -31,9 +31,8 @@ stderr 'invalid boolean value "notabool" for injection tag "enable"'
 # TODO: this error message seems wrong, it should say "invalid integer value"
 ! exec cue cmd -t count=notanint tag
 stderr '^data\.count: reference "notanint" not found'
-# TODO: fix this panic; see https://cuelang.org/issue/4087
 ! exec cue cmd -t toolenable=notabool tag
-stderr '^panic: runtime error: invalid memory address or nil pointer dereference$'
+stderr 'invalid boolean value "notabool" for injection tag "toolenable"'
 
 -- expect-stdout --
 data.json: {"env":"prod","name":"bar","enable":true,"count":5}

@@ -212,8 +212,11 @@ func parseTag(pos token.Pos, body string) (t *tag, err errors.Error) {
 
 func (t *tag) inject(value string, tg *tagger) errors.Error {
 	e, err := cli.ParseValue(token.NoPos, t.key, value, t.kind)
+	if err != nil {
+		return err
+	}
 	t.injectValue(e, tg)
-	return err
+	return nil
 }
 
 func (t *tag) injectValue(x ast.Expr, tg *tagger) {

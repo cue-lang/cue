@@ -16,8 +16,9 @@ package base
 
 import (
 	"path"
-	"encoding/yaml"
+	"encoding/json"
 	"tool/file"
+	"tool/exec"
 
 	"cue.dev/x/githubactions"
 )
@@ -53,25 +54,18 @@ writeWorkflows: {
 	}
 	_dir: path.FromSlash("../../.github/workflows", path.Unix)
 
-	remove: {
-		glob: file.Glob & {
-			glob: path.Join([_dir, "*" + workflowFileExtension], _goos)
-			files: [...string]
-		}
-		for _, _filename in glob.files {
-			"delete \(_filename)": file.RemoveAll & {
-				path: _filename
+	gen: exec.Run & {
+		cmd: ["go", "tool", "cue", "exp", "writefs"]
+		stdin: json.Marshal({
+			tool: "internal/ci/base/write.cue"
+			remove: [path.Join([_dir, "*" + workflowFileExtension], _goos)]
+			create: {
+				for _workflowName, _workflow in #in.workflows {
+					let filepath = path.Join([_dir, _workflowName + workflowFileExtension], _goos)
+					(filepath): {type: "file", contents: _workflow}
+				}
 			}
-		}
-	}
-	for _workflowName, _workflow in #in.workflows {
-		let _filename = _workflowName + workflowFileExtension
-		"generate \(_filename)": file.Create & {
-			$after: [for v in remove {v}]
-			filename: path.Join([_dir, _filename], _goos)
-			let donotedit = doNotEditMessage & {#generatedBy: "internal/ci/base/write.cue", _}
-			contents: "# \(donotedit)\n\n\(yaml.Marshal(_workflow))"
-		}
+		})
 	}
 }
 

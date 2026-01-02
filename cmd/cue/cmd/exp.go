@@ -155,7 +155,7 @@ writefs takes JSON via stdin in the form of
 		type!:     "symlink"
 		contents!: string
 	} | *{
-		type!: "file"
+		type: "file"
 
 		// If filepath has a supported file extension, such as .yaml or .json,
 		// this is an arbitrary concrete value written in that encoding.
@@ -171,8 +171,8 @@ For example, this tool can be used via "cue cmd" as follows:
 			tool: "cue cmd gen"
 			remove: ["out/*.yaml"]
 			create: {
-				"out/foo.yaml": {type: "file", contents: {body: "some struct"}}
-				"out/bar.yaml": {type: "file", contents: [some list]}
+				"out/foo.yaml": {contents: {body: "some struct"}}
+				"out/bar.yaml": {contents: [some list]}
 			}
 		})
 	}
@@ -238,7 +238,7 @@ func runExpWritefs(cmd *Command, args []string) error {
 			if err := os.Symlink(target, fp); err != nil {
 				return fmt.Errorf("failed to symlink %s -> %s: %v", fp, target, err)
 			}
-		case "file":
+		case "file", "": // empty if omitted, as it's the default
 			v := ctx.CompileBytes(f.Contents)
 			var buf bytes.Buffer
 			ext := filepath.Ext(fp)
@@ -278,6 +278,8 @@ func runExpWritefs(cmd *Command, args []string) error {
 			if err := os.WriteFile(fp, buf.Bytes(), 0o666); err != nil {
 				return fmt.Errorf("failed to write file %s: %v", fp, err)
 			}
+		default:
+			return fmt.Errorf("invalid type: %q", f.Type)
 		}
 	}
 	return nil

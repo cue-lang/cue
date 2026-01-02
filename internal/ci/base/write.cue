@@ -59,7 +59,10 @@ uniqueWorkflowNames: self={
 		type!:     "symlink"
 		contents!: string
 	} | *{
-		type!: "file"
+		// Note that this is a regular field so that it can be omitted as the default.
+		// Ideally we wouldn't mix defaults into a schema, but this is nice UX,
+		// and this carries forward the semantics we've had in a few repos for a while.
+		type: "file"
 
 		// If filepath has a supported file extension, such as .yaml or .json,
 		// this is an arbitrary concrete value written in that encoding.
@@ -84,7 +87,7 @@ writeWorkflows: {
 			create: {
 				for _workflowName, _workflow in #in.workflows {
 					let filepath = path.Join([_dir, _workflowName + workflowFileExtension], _goos)
-					(filepath): {type: "file", contents: _workflow}
+					(filepath): contents: _workflow
 				}
 			}
 		})

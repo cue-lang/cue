@@ -62,8 +62,10 @@ type Decoder struct {
 	err            error
 }
 
-type interpretFunc func(cue.Value) (file *ast.File, err error)
-type rewriteFunc func(*ast.File) (file *ast.File, err error)
+type (
+	interpretFunc func(cue.Value) (file *ast.File, err error)
+	rewriteFunc   func(*ast.File) (file *ast.File, err error)
+)
 
 func (i *Decoder) Filename() string { return i.filename }
 
@@ -159,6 +161,17 @@ type Config struct {
 //
 // This may change the contents of f.
 func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
+	return NewDecoderWithOpenFn(ctx, f, cfg, source.OsOpen)
+}
+
+// NewDecoderWithOpenFn returns a stream of non-rooted data expressions. The encoding
+// type of f must be a data type, but does not have to be an encoding that
+// can stream. stdin is used in case the file is "-".
+//
+// openFn is used should the underlying source-layer need to open a f.Filename (IFF f.Source == nil).
+//
+// This may change the contents of f.
+func NewDecoderWithOpenFn(ctx *cue.Context, f *build.File, cfg *Config, openFn source.OpenFn) *Decoder {
 	if cfg == nil {
 		cfg = &Config{}
 	}
@@ -186,7 +199,7 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		r = cfg.Stdin
 		i.size = -1
 	} else {
-		r, i.size, i.err = source.Open(f.Filename, f.Source)
+		r, i.size, i.err = source.OpenFunc(f.Filename, f.Source, openFn)
 		if c, ok := r.(io.Closer); ok {
 			i.closer = c
 		}
@@ -201,7 +214,6 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		openAPI := openAPIFunc(cfg, f)
 		jsonSchema := jsonSchemaFunc(cfg, f)
 		i.interpretFunc = func(v cue.Value) (file *ast.File, err error) {
-
 			switch i.interpretation = Detect(v); i.interpretation {
 			case build.JSONSchema:
 				return jsonSchema(v)

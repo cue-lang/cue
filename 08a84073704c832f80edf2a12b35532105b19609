@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "910495e1_b6e2fa3a",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-01-02T15:34:46Z",
+      "side": 1,
+      "message": "Nit: perhaps tweak this comment to say that we could do this \"properly\" by unifying the input to `writefs` with the schema (which would then give us the defaults for free)?",
+      "revId": "08a84073704c832f80edf2a12b35532105b19609",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

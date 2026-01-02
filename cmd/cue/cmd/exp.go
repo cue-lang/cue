@@ -136,6 +136,7 @@ func newExpWritefsCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "writefs",
 		Short: "remove and create files in bulk",
+		// NOTE: any changes to the schema below must be made to internal/ci/base/write.cue too.
 		Long: `
 WARNING: THIS COMMAND IS EXPERIMENTAL.
 In the future, it will be entirely replaced by native @export(...)

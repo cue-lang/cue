@@ -46,6 +46,28 @@ uniqueWorkflowNames: self={
 	}
 }
 
+// writefs describes the input expected by `cue exp writefs`.
+#writefs: {
+	// tool is the name of the tool that initiated the writefs call.
+	tool!: string
+
+	// remove is a list of glob patterns of files to remove before creating new ones.
+	remove?: [...string]
+
+	// create is the set of files to create, keyed by Unix file paths.
+	create?: [filepath=string]: {
+		type!:     "symlink"
+		contents!: string
+	} | *{
+		type!: "file"
+
+		// If filepath has a supported file extension, such as .yaml or .json,
+		// this is an arbitrary concrete value written in that encoding.
+		// Otherwise, this is a string written as-is.
+		contents!: _
+	}
+}
+
 // writeWorkflows regenerates the GitHub workflow YAML definitions.
 writeWorkflows: {
 	#in: {
@@ -56,7 +78,7 @@ writeWorkflows: {
 
 	gen: exec.Run & {
 		cmd: ["go", "tool", "cue", "exp", "writefs"]
-		stdin: json.Marshal({
+		stdin: json.Marshal(#writefs & {
 			tool: "internal/ci/base/write.cue"
 			remove: [path.Join([_dir, "*" + workflowFileExtension], _goos)]
 			create: {

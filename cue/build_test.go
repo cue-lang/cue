@@ -40,6 +40,14 @@ func TestFromExpr(t *testing.T) {
 			ast.NewString("World"),
 		),
 		out: `["Hello", "World"]`,
+	}, {
+		// Issue #2628; this would cause a panic in the evaluator.
+		expr: ast.NewBinExpr(
+			token.AND,
+			ast.NewIdent("bool"),
+			ast.NewBool(true),
+		),
+		out: `true`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

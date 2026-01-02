@@ -1189,7 +1189,8 @@ func (x *BinaryExpr) evaluate(c *OpContext, state Flags) Value {
 		// to the required state. If the struct is already dynamic, we will
 		// evaluate the struct regardless to ensure that cycle reporting
 		// keeps working.
-		if (c.inDetached == 0 && env.DerefVertex(c).IsDynamic) || c.inValidator > 0 {
+		envVertex := env.DerefVertex(c)
+		if (c.inDetached == 0 && envVertex != nil && envVertex.IsDynamic) || c.inValidator > 0 {
 			v.Finalize(c)
 		} else {
 			v.CompleteArcsOnly(c)

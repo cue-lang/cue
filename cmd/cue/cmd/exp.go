@@ -166,13 +166,13 @@ writefs takes JSON via stdin in the form of
 For example, this tool can be used via "cue cmd" as follows:
 
 	command: gen: exec.Run & {
-		cmd: ["go", "tool", "cue", "exp", "writefs"]
+		cmd: ["cue", "exp", "writefs"]
 		stdin: json.Marshal({
 			tool: "cue cmd gen"
 			remove: ["out/*.yaml"]
 			create: {
-				"out/foo.yaml": {"type": "file", contents: {body: "some struct"}}
-				"out/bar.yaml": {"type": "file", contents: [some list]}
+				"out/foo.yaml": {type: "file", contents: {body: "some struct"}}
+				"out/bar.yaml": {type: "file", contents: [some list]}
 			}
 		})
 	}

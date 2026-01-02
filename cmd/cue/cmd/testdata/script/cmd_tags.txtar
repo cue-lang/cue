@@ -1,14 +1,14 @@
-exec cue cmd -t prod -t name=bar tag tags.cue tags_tool.cue
+exec cue cmd -t prod -t name=bar -t enable=true -t count=5 tag tags.cue tags_tool.cue
 cmp stdout expect-stdout
 
 # Check that the flags can be used after any arguments;
 # such "interspersed" flags are supported by cobra by default.
-exec cue cmd tag tags.cue tags_tool.cue -t prod -t name=bar
+exec cue cmd tag tags.cue tags_tool.cue -t prod -t name=bar -t enable=true -t count=5
 cmp stdout expect-stdout
 
 # Verify that the global -t flag works with commands like "cmd"
 # or "eval", but not "fmt".
-exec cue -t prod -t name=bar cmd tag tags.cue tags_tool.cue
+exec cue -t prod -t name=bar -t enable=true -t count=5 cmd tag tags.cue tags_tool.cue
 cmp stdout expect-stdout
 exec cue eval -t name=bar tags.cue
 stdout 'name: *"bar"'
@@ -19,19 +19,50 @@ stderr 'unknown shorthand flag'
 ! exec cue -t name=bar fmt tags.cue
 stderr 'unknown shorthand flag'
 
+# Invalid tag injections.
+! exec cue cmd -t nosuchshort tag
+stderr 'tag "nosuchshort" not used in any file'
+! exec cue cmd -t nosuchname=bar tag
+stderr 'no tag for "nosuchname"'
+! exec cue cmd -t env=notadisjunct tag
+stderr '^data\.env: 2 errors in empty disjunction'
+! exec cue cmd -t enable=notabool tag
+stderr 'invalid boolean value "notabool" for injection tag "enable"'
+# TODO: this error message seems wrong, it should say "invalid integer value"
+! exec cue cmd -t count=notanint tag
+stderr '^data\.count: reference "notanint" not found'
+# TODO: fix this panic; see https://cuelang.org/issue/4087
+! exec cue cmd -t toolenable=notabool tag
+stderr '^panic: runtime error: invalid memory address or nil pointer dereference$'
+
 -- expect-stdout --
-prod: bar
+data.json: {"env":"prod","name":"bar","enable":true,"count":5}
+tooldata.json: {"enable":true}
 -- tags.cue --
 package tags
 
-var: env: "prod" | "staging" @tag(env,short=prod|staging)
-var: name: string  @tag(name)
+data: {
+    env: "prod" | "staging" @tag(env,short=prod|staging)
+    name: string @tag(name)
+    enable: _ @tag(enable,type=bool)
+    count: _ @tag(count,type=int)
+}
 
 -- tags_tool.cue --
 package tags
 
-import "tool/cli"
+import (
+    "encoding/json"
+    "tool/cli"
+)
+
+tooldata: {
+    enable: _ | *true @tag(toolenable,type=bool)
+}
 
 command: tag: cli.Print & {
-    text: "\(var.env): \(var.name)"
+    text: """
+        data.json: \(json.Marshal(data))
+        tooldata.json: \(json.Marshal(tooldata))
+        """
 }

@@ -20,7 +20,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 )
 
@@ -28,11 +28,18 @@ func ParseValue(pos token.Pos, name, str string, k cue.Kind) (x ast.Expr, errs e
 	var expr ast.Expr
 
 	if k&cue.NumberKind != 0 {
-		var err error
-		expr, err = parser.ParseExpr(name, str)
-		if err != nil {
+		var info literal.NumInfo
+		if err := literal.ParseNum(str, &info); err != nil {
+			// Note that the wrapped err already mentions str.
 			errs = errors.Wrapf(err, pos,
 				"invalid number for injection tag %q", name)
+		} else if info.IsInt() {
+			expr = ast.NewLit(token.INT, str)
+		} else if k&cue.FloatKind == 0 {
+			errs = errors.Newf(pos,
+				"invalid int %q for injection tag %q", str, name)
+		} else {
+			expr = ast.NewLit(token.FLOAT, str)
 		}
 	}
 
@@ -41,7 +48,7 @@ func ParseValue(pos token.Pos, name, str string, k cue.Kind) (x ast.Expr, errs e
 		b, ok := boolValues[str]
 		if !ok {
 			errs = errors.Append(errs, errors.Newf(pos,
-				"invalid boolean value %q for injection tag %q", str, name))
+				"invalid boolean %q for injection tag %q", str, name))
 		} else if expr != nil || k&cue.StringKind != 0 {
 			// Convert into an expression
 			bl := ast.NewBool(b)

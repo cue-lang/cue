@@ -27,15 +27,13 @@ stderr 'no tag for "nosuchname"'
 ! exec cue cmd -t env=notadisjunct tag
 stderr '^data\.env: 2 errors in empty disjunction'
 ! exec cue cmd -t enable=notabool tag
-stderr 'invalid boolean value "notabool" for injection tag "enable"'
-# TODO: this error message seems wrong, it should say "invalid integer value"
+stderr 'invalid boolean "notabool" for injection tag "enable"'
 ! exec cue cmd -t count=notanint tag
-stderr '^data\.count: reference "notanint" not found'
-# TODO: we should reject a float when type=int with a clear error
+stderr 'invalid number for injection tag "count": illegal number start "notanint"'
 ! exec cue cmd -t count=12.34 tag
-stderr 'cannot convert incomplete value'
+stderr 'invalid int "12.34" for injection tag "count"'
 ! exec cue cmd -t toolenable=notabool tag
-stderr 'invalid boolean value "notabool" for injection tag "toolenable"'
+stderr 'invalid boolean "notabool" for injection tag "toolenable"'
 
 -- expect-stdout --
 data.json: {"env":"prod","name":"bar","enable":true,"count":5,"mult":1.5}

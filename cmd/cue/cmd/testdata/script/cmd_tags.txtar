@@ -1,14 +1,14 @@
-exec cue cmd -t prod -t name=bar -t enable=true -t count=5 tag tags.cue tags_tool.cue
+exec cue cmd -t prod -t name=bar -t enable=true -t count=5 -t mult=1.5 tag tags.cue tags_tool.cue
 cmp stdout expect-stdout
 
 # Check that the flags can be used after any arguments;
 # such "interspersed" flags are supported by cobra by default.
-exec cue cmd tag tags.cue tags_tool.cue -t prod -t name=bar -t enable=true -t count=5
+exec cue cmd tag tags.cue tags_tool.cue -t prod -t name=bar -t enable=true -t count=5 -t mult=1.5
 cmp stdout expect-stdout
 
 # Verify that the global -t flag works with commands like "cmd"
 # or "eval", but not "fmt".
-exec cue -t prod -t name=bar -t enable=true -t count=5 cmd tag tags.cue tags_tool.cue
+exec cue -t prod -t name=bar -t enable=true -t count=5 -t mult=1.5 cmd tag tags.cue tags_tool.cue
 cmp stdout expect-stdout
 exec cue eval -t name=bar tags.cue
 stdout 'name: *"bar"'
@@ -31,11 +31,14 @@ stderr 'invalid boolean value "notabool" for injection tag "enable"'
 # TODO: this error message seems wrong, it should say "invalid integer value"
 ! exec cue cmd -t count=notanint tag
 stderr '^data\.count: reference "notanint" not found'
+# TODO: we should reject a float when type=int with a clear error
+! exec cue cmd -t count=12.34 tag
+stderr 'cannot convert incomplete value'
 ! exec cue cmd -t toolenable=notabool tag
 stderr 'invalid boolean value "notabool" for injection tag "toolenable"'
 
 -- expect-stdout --
-data.json: {"env":"prod","name":"bar","enable":true,"count":5}
+data.json: {"env":"prod","name":"bar","enable":true,"count":5,"mult":1.5}
 tooldata.json: {"enable":true}
 -- tags.cue --
 package tags
@@ -45,6 +48,7 @@ data: {
     name: string @tag(name)
     enable: _ @tag(enable,type=bool)
     count: _ @tag(count,type=int)
+    mult: _ @tag(mult,type=number)
 }
 
 -- tags_tool.cue --

@@ -19,11 +19,11 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/lsp/definitions"
+	"cuelang.org/go/internal/lsp/eval"
 )
 
 // Rename implements the LSP Rename functionality.
-func (w *Workspace) Rename(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, params *protocol.RenameParams) *protocol.WorkspaceEdit {
+func (w *Workspace) Rename(tokFile *token.File, fdfns *eval.FileDefinitions, srcMapper *protocol.Mapper, params *protocol.RenameParams) *protocol.WorkspaceEdit {
 	var targets []ast.Node
 	for offset, err := range adjustedPositionsIter(params.Position, srcMapper) {
 		if err != nil {
@@ -88,7 +88,7 @@ func (w *Workspace) Rename(tokFile *token.File, fdfns *definitions.FileDefinitio
 }
 
 // Rename implements the LSP PrepareRename functionality.
-func (w *Workspace) PrepareRename(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.PrepareRenamePlaceholder {
+func (w *Workspace) PrepareRename(tokFile *token.File, fdfns *eval.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.PrepareRenamePlaceholder {
 	var targets []ast.Node
 	for offset, err := range adjustedPositionsIter(pos, srcMapper) {
 		if err != nil {

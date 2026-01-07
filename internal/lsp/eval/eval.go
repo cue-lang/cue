@@ -328,7 +328,7 @@
 // Although h escapes from the in-line struct, it does not escape the
 // function call, so again we do not need to evaluate anything further
 // up the tree.
-package definitions
+package eval
 
 import (
 	"fmt"

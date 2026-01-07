@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package definitions_test
+package eval_test
 
 import (
 	"cmp"
@@ -26,7 +26,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/lsp/definitions"
+	"cuelang.org/go/internal/lsp/eval"
 	"cuelang.org/go/internal/lsp/rangeset"
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
@@ -3341,9 +3341,9 @@ func (tcs testCases) run(t *testing.T) {
 			}
 
 			analyse := func() testCaseAnalysis {
-				dfnsByFilename := make(map[string]*definitions.FileDefinitions)
-				dfnsByPkgName := make(map[string]*definitions.Definitions)
-				forPackage := func(importPath ast.ImportPath) *definitions.Definitions {
+				dfnsByFilename := make(map[string]*eval.FileDefinitions)
+				dfnsByPkgName := make(map[string]*eval.Definitions)
+				forPackage := func(importPath ast.ImportPath) *eval.Definitions {
 					return dfnsByPkgName[importPath.String()]
 				}
 				importCanonicalisation := make(map[string]ast.ImportPath)
@@ -3355,15 +3355,15 @@ func (tcs testCases) run(t *testing.T) {
 				for pkgName, files := range filesByPkg {
 					ip := ast.ImportPath{Path: pkgName}.Canonical()
 					importCanonicalisation[pkgName] = ip
-					pkgImporters := func() []*definitions.Definitions {
+					pkgImporters := func() []*eval.Definitions {
 						pkgNames := tc.importedBy[pkgName]
-						dfns := make([]*definitions.Definitions, len(pkgNames))
+						dfns := make([]*eval.Definitions, len(pkgNames))
 						for i, pkgName := range pkgNames {
 							dfns[i] = dfnsByPkgName[pkgName]
 						}
 						return dfns
 					}
-					dfns := definitions.Analyse(ip, importCanonicalisation, forPackage, pkgImporters, files...)
+					dfns := eval.Analyse(ip, importCanonicalisation, forPackage, pkgImporters, files...)
 					dfnsByPkgName[pkgName] = dfns
 					for _, fileAst := range files {
 						dfnsByFilename[fileAst.Filename] = dfns.ForFile(fileAst.Filename)
@@ -3372,7 +3372,7 @@ func (tcs testCases) run(t *testing.T) {
 				return analysis
 			}
 
-			// The subtests need fresh [*definitions.FileDefinitions]
+			// The subtests need fresh [*eval.FileDefinitions]
 			// because each subtest causes mutations.
 			tc.testDefinitions(t, files, analyse())
 			tc.testCompletions(t, files, analyse())
@@ -3382,8 +3382,8 @@ func (tcs testCases) run(t *testing.T) {
 }
 
 type testCaseAnalysis struct {
-	dfnsByPkgName  map[string]*definitions.Definitions
-	dfnsByFilename map[string]*definitions.FileDefinitions
+	dfnsByPkgName  map[string]*eval.Definitions
+	dfnsByFilename map[string]*eval.FileDefinitions
 }
 
 func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, analysis testCaseAnalysis) {
@@ -3743,7 +3743,7 @@ func (tc *testCase) testCompletions(t *testing.T, files []*ast.File, analysis te
 	})
 }
 
-func (tc *testCase) dumpCompletions(t *testing.T, files []*ast.File, dfnsByFilename map[string]*definitions.FileDefinitions) {
+func (tc *testCase) dumpCompletions(t *testing.T, files []*ast.File, dfnsByFilename map[string]*eval.FileDefinitions) {
 	for _, fileAst := range files {
 		filename := fileAst.Filename
 		fdfns := dfnsByFilename[filename]

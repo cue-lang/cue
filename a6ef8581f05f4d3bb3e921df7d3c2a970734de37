@@ -34,6 +34,24 @@
       "parentUuid": "821478d9_699fcab6",
       "revId": "a6ef8581f05f4d3bb3e921df7d3c2a970734de37",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64647487_f6fcbbff",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-07T11:47:43Z",
+      "side": 1,
+      "message": "Period is more consistent within the code base. I\u0027ll change.",
+      "parentUuid": "455aa342_c68085f6",
+      "revId": "a6ef8581f05f4d3bb3e921df7d3c2a970734de37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

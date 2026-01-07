@@ -21,7 +21,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/lsp/definitions"
+	"cuelang.org/go/internal/lsp/eval"
 	"cuelang.org/go/internal/mod/modpkgload"
 )
 
@@ -83,7 +83,7 @@ type Package struct {
 
 	// definitions for the files in this package. This is updated
 	// whenever the package status transitions to splendid.
-	definitions *definitions.Definitions
+	definitions *eval.Definitions
 }
 
 // newPackage creates a new [Package] and adds it to the module.
@@ -267,7 +267,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		}
 	}
 
-	forPackage := func(importPath ast.ImportPath) *definitions.Definitions {
+	forPackage := func(importPath ast.ImportPath) *eval.Definitions {
 		for _, importedPkg := range pkg.imports {
 			if importedPkg.importPath != importPath {
 				continue
@@ -277,21 +277,21 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		return nil
 	}
 
-	pkgImporters := func() []*definitions.Definitions {
+	pkgImporters := func() []*eval.Definitions {
 		if len(pkg.importedBy) == 0 {
 			return nil
 		}
-		dfns := make([]*definitions.Definitions, len(pkg.importedBy))
+		dfns := make([]*eval.Definitions, len(pkg.importedBy))
 		for i, pkg := range pkg.importedBy {
 			dfns[i] = pkg.definitions
 		}
 		return dfns
 	}
 
-	// definitions.Analyse does almost no work - calculation of
+	// eval.Analyse does almost no work - calculation of
 	// resolutions is done lazily. So no need to launch go-routines
 	// here.
-	pkg.definitions = definitions.Analyse(pkg.importPath, importCanonicalisation, forPackage, pkgImporters, astFiles...)
+	pkg.definitions = eval.Analyse(pkg.importPath, importCanonicalisation, forPackage, pkgImporters, astFiles...)
 
 	return nil
 }

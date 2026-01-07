@@ -27,13 +27,13 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/lsp/definitions"
+	"cuelang.org/go/internal/lsp/eval"
 )
 
 // Definition attempts to resolve the given position, within the file
 // definitions, to one or more ast nodes, and returns the positions of
 // the definitions of those nodes.
-func (w *Workspace) Definition(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) []protocol.Location {
+func (w *Workspace) Definition(tokFile *token.File, fdfns *eval.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) []protocol.Location {
 	var targets []ast.Node
 	for offset, err := range adjustedPositionsIter(pos, srcMapper) {
 		if err != nil {
@@ -75,7 +75,7 @@ func (w *Workspace) Definition(tokFile *token.File, fdfns *definitions.FileDefin
 	return locations
 }
 
-func (w *Workspace) References(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, params *protocol.ReferenceParams) []protocol.Location {
+func (w *Workspace) References(tokFile *token.File, fdfns *eval.FileDefinitions, srcMapper *protocol.Mapper, params *protocol.ReferenceParams) []protocol.Location {
 	var targets []ast.Node
 	// If UsagesForOffset returns no results, and if it's safe to
 	// do so, we back off the Character offset (column number) by 1 and
@@ -126,7 +126,7 @@ func (w *Workspace) References(tokFile *token.File, fdfns *definitions.FileDefin
 // Hover is very similar to Definition. It attempts to resolve the
 // given position, within the file definitions, to one or more ast
 // nodes, and returns the doc comments attached to those ast nodes.
-func (w *Workspace) Hover(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.Hover {
+func (w *Workspace) Hover(tokFile *token.File, fdfns *eval.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.Hover {
 	var comments map[ast.Node][]*ast.CommentGroup
 	for offset, err := range adjustedPositionsIter(pos, srcMapper) {
 		if err != nil {
@@ -199,7 +199,7 @@ func (w *Workspace) Hover(tokFile *token.File, fdfns *definitions.FileDefinition
 
 // Completion attempts to resolve the given position, within the file
 // definitions, from which subsequent path elements can be suggested.
-func (w *Workspace) Completion(tokFile *token.File, fdfns *definitions.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.CompletionList {
+func (w *Workspace) Completion(tokFile *token.File, fdfns *eval.FileDefinitions, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.CompletionList {
 	offset, err := srcMapper.PositionOffset(pos)
 	if err != nil {
 		w.debugLog(err.Error())
@@ -298,13 +298,13 @@ func (w *Workspace) Completion(tokFile *token.File, fdfns *definitions.FileDefin
 	}
 }
 
-func (w *Workspace) DefinitionsForURI(fileUri protocol.DocumentURI, loadAllPkgsInMod bool) (*token.File, *definitions.FileDefinitions, *protocol.Mapper, error) {
+func (w *Workspace) DefinitionsForURI(fileUri protocol.DocumentURI, loadAllPkgsInMod bool) (*token.File, *eval.FileDefinitions, *protocol.Mapper, error) {
 	mod, err := w.FindModuleForFile(fileUri)
 	if err != nil && err != errModuleNotFound {
 		return nil, nil, nil, err
 	}
 
-	var dfns *definitions.Definitions
+	var dfns *eval.Definitions
 
 	if mod != nil {
 		if loadAllPkgsInMod {

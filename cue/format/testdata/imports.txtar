@@ -67,3 +67,17 @@ import (
 a: time.time
 b: foo.foo
 c: bar.Bar
+-- issue1447.input --
+import "strings"
+
+// comment
+
+s: string
+u: strings.ToUpper(s)
+-- out/format/issue1447.golden --
+import "strings"
+
+// comment
+
+s: string
+u: strings.ToUpper(s)

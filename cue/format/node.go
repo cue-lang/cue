@@ -98,6 +98,18 @@ func hasDocComments(d ast.Decl) bool {
 	return false
 }
 
+// hasNoSignificantComments checks if an import spec has no comments that
+// would require formatting with parentheses. Trailing comments (Position > 1)
+// that appear after the import statement don't require parentheses.
+func hasNoSignificantComments(spec *ast.ImportSpec) bool {
+	for _, cg := range ast.Comments(spec) {
+		if cg.Position <= 1 {
+			return false
+		}
+	}
+	return true
+}
+
 func (f *formatter) walkDeclList(list []ast.Decl) {
 	f.before(nil)
 	d := 0
@@ -423,7 +435,7 @@ func (f *formatter) decl(decl ast.Decl) {
 			break
 		}
 		switch {
-		case len(n.Specs) == 1 && len(ast.Comments(n.Specs[0])) == 0:
+		case len(n.Specs) == 1 && hasNoSignificantComments(n.Specs[0]):
 			if !n.Lparen.IsValid() {
 				f.print(blank)
 				f.walkSpecList(n.Specs)
@@ -603,7 +615,6 @@ func (f *formatter) expr1(expr ast.Expr, prec1, depth int) {
 }
 
 func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
-
 	switch x := expr.(type) {
 	case *ast.BadExpr:
 		f.print(x.From, "_|_")

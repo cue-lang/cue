@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6e69d12_451fd5c6",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-08T17:53:42Z",
+      "side": 1,
+      "message": "did you mean for this to be 4 such that the `a: 4` disjunction is discarded, or are you happy that in this example, nothing is discarded by a real evaluation?",
+      "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72135005_bb7f5fcf",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-08T17:53:42Z",
+      "side": 1,
+      "message": "nit: \"an\" given that it reads like \"a ast file\" and \"a ast structlit\"?\n\n(same elsewhere in these docs)",
+      "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef3b56d6_8bbd28b6",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-08T17:53:42Z",
+      "side": 1,
+      "message": "nit: for readability, I might consistently backquote all CUE snippets, like in this case `x: y` or in others `a.b.c` or `x`.",
+      "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfb989bb_ecca49c8",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-08T17:53:42Z",
+      "side": 1,
+      "message": "another good example where consistent backquotes would help readability :)",
+      "range": {
+        "startLine": 139,
+        "startChar": 36,
+        "endLine": 139,
+        "endChar": 40
+      },
+      "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "062d1a17_3778ef55",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-08T17:53:42Z",
+      "side": 1,
+      "message": "is the plural here correct?",
+      "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

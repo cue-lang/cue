@@ -50,10 +50,10 @@ _foo: a?: int
 	type: "object"
 	properties: {
 		t1: {
-			$ref: "#/$defs/#S1"
+			$ref: "#/$defs/%23S1"
 		}
 		t2: {
-			$ref: "#/$defs/#S2"
+			$ref: "#/$defs/%23S2"
 		}
 		t3: {
 			$ref: "#/$defs/_foo"

@@ -29,6 +29,7 @@ func init() {
 	task.Register("tool/file.Read", newReadCmd)
 	task.Register("tool/file.Append", newAppendCmd)
 	task.Register("tool/file.Create", newCreateCmd)
+	task.Register("tool/file.Symlink", newSymlinkCmd)
 	task.Register("tool/file.Glob", newGlobCmd)
 	task.Register("tool/file.Mkdir", newMkdirCmd)
 	task.Register("tool/file.MkdirTemp", newMkdirTempCmd)
@@ -38,6 +39,7 @@ func init() {
 func newReadCmd(v cue.Value) (task.Runner, error)      { return &cmdRead{}, nil }
 func newAppendCmd(v cue.Value) (task.Runner, error)    { return &cmdAppend{}, nil }
 func newCreateCmd(v cue.Value) (task.Runner, error)    { return &cmdCreate{}, nil }
+func newSymlinkCmd(v cue.Value) (task.Runner, error)   { return &cmdSymlink{}, nil }
 func newGlobCmd(v cue.Value) (task.Runner, error)      { return &cmdGlob{}, nil }
 func newMkdirCmd(v cue.Value) (task.Runner, error)     { return &cmdMkdir{}, nil }
 func newMkdirTempCmd(v cue.Value) (task.Runner, error) { return &cmdMkdirTemp{}, nil }
@@ -46,6 +48,7 @@ func newRemoveAllCmd(v cue.Value) (task.Runner, error) { return &cmdRemoveAll{},
 type cmdRead struct{}
 type cmdAppend struct{}
 type cmdCreate struct{}
+type cmdSymlink struct{}
 type cmdGlob struct{}
 type cmdMkdir struct{}
 type cmdMkdirTemp struct{}
@@ -105,6 +108,18 @@ func (c *cmdCreate) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 
 	return nil, os.WriteFile(filename, b, os.FileMode(mode))
+}
+
+func (c *cmdSymlink) Run(ctx *task.Context) (res interface{}, err error) {
+	var (
+		filename = filepath.FromSlash(ctx.String("filename"))
+		target   = filepath.FromSlash(ctx.String("target"))
+	)
+	if ctx.Err != nil {
+		return nil, ctx.Err
+	}
+
+	return nil, os.Symlink(target, filename)
 }
 
 func (c *cmdGlob) Run(ctx *task.Context) (res interface{}, err error) {

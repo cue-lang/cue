@@ -21,6 +21,7 @@ package toml
 import (
 	"fmt"
 	"io"
+	"maps"
 	"slices"
 	"strconv"
 	"strings"
@@ -204,27 +205,11 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 		// Tables always begin a new line.
 		key, keyElems := d.decodeKey("", tnode.Key())
 
-		// Check if this table is a subtable of an existing array element
-		array := d.findArrayPrefix(key)
-		var actualKey string
-		if array != nil { // [last_array.new_table]
-			if array.rkey == key {
-				return d.nodeErrf(tnode.Child(), "cannot redeclare table array %q as a table", key)
-			}
-			// For subtables within array elements, we need to use the current array element's key
-			// to avoid false duplicate key errors between different array elements
-			subKey := key[len(array.rkey)+1:] // Remove the array prefix and dot
-			actualKey = fmt.Sprintf("%s.%d.%s", array.rkey, len(array.list.Elts)-1, subKey)
-
-		} else {
-			actualKey = key
-		}
-
 		// All table keys must be unique, including for the top-level table.
-		if d.seenTableKeys[actualKey] {
+		if d.seenTableKeys[key] {
 			return d.nodeErrf(tnode.Child(), "duplicate key: %s", key)
 		}
-		d.seenTableKeys[actualKey] = true
+		d.seenTableKeys[key] = true
 
 		// We want a multi-line struct with curly braces,
 		// just like TOML's tables are on multiple lines.
@@ -233,7 +218,11 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 			Lbrace: token.NoPos.WithRel(token.Blank),
 			Rbrace: token.NoPos.WithRel(token.Newline),
 		}
+		array := d.findArrayPrefix(key)
 		if array != nil { // [last_array.new_table]
+			if array.rkey == key {
+				return d.nodeErrf(tnode.Child(), "cannot redeclare table array %q as a table", key)
+			}
 			subKeyElems := keyElems[array.level:]
 			topField, leafField := d.inlineFields(subKeyElems, token.Newline)
 			array.lastTable.Elts = append(array.lastTable.Elts, topField)
@@ -243,7 +232,7 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 			d.topFile.Elts = append(d.topFile.Elts, topField)
 			leafField.Value = d.currentTable
 		}
-		d.currentTableKey = actualKey
+		d.currentTableKey = key
 
 	case toml.ArrayTable:
 		// Table array elements always begin a new line.
@@ -337,10 +326,18 @@ func (d *Decoder) findArrayPrefix(rkey rootedKey) *openTableArray {
 
 	// Prefer an exact match over a relative prefix match.
 	if arr := d.findArray(rkey); arr != nil {
+		// TODO: the fact that we need to delete from both structures below
+		// strongly hints towards merging the two structures in some way.
+		// We already have a TODO about making openTableArrays a more efficient structure.
+
 		// When we find an exact match, we must forget about its subkeys
 		// because we're starting an entirely new array element.
 		d.openTableArrays = slices.DeleteFunc(d.openTableArrays, func(arr openTableArray) bool {
 			return strings.HasPrefix(arr.rkey, rkey+".")
+		})
+		// We also need to forget about seen table keys.
+		maps.DeleteFunc(d.seenTableKeys, func(seenRkey rootedKey, _ bool) bool {
+			return strings.HasPrefix(seenRkey, rkey+".")
 		})
 		return arr
 	}

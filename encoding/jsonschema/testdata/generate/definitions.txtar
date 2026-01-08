@@ -30,10 +30,10 @@ missingX: {
 					type: "integer"
 				}
 				y: {
-					$ref: "#/$defs/#D2"
+					$ref: "#/$defs/%23D2"
 				}
 				z: {
-					$ref: "#/$defs/#D3"
+					$ref: "#/$defs/%23D3"
 				}
 			}
 			required: ["x"]
@@ -48,7 +48,7 @@ missingX: {
 	type: "object"
 	properties: {
 		foo: {
-			$ref: "#/$defs/#D1"
+			$ref: "#/$defs/%23D1"
 		}
 	}
 	required: ["foo"]

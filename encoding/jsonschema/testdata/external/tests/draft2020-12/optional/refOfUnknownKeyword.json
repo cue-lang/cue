@@ -12,29 +12,20 @@
 				}
 			}
 		},
-		"skip": {
-			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
-		},
 		"tests": [
 			{
 				"description": "match",
 				"data": {
 					"bar": 3
 				},
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "mismatch",
 				"data": {
 					"bar": true
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -53,29 +44,20 @@
 				}
 			}
 		},
-		"skip": {
-			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
-		},
 		"tests": [
 			{
 				"description": "match",
 				"data": {
 					"bar": 3
 				},
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "mismatch",
 				"data": {
 					"bar": true
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -91,25 +73,16 @@
 			],
 			"$ref": "#/examples/0"
 		},
-		"skip": {
-			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
-		},
 		"tests": [
 			{
 				"description": "match",
 				"data": "a string",
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "mismatch",
 				"data": 42,
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	}

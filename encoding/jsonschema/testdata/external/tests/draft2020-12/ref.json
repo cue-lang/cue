@@ -58,29 +58,20 @@
 				}
 			}
 		},
-		"skip": {
-			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 3 more errors)"
-		},
 		"tests": [
 			{
 				"description": "match",
 				"data": {
 					"bar": 3
 				},
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "mismatch",
 				"data": {
 					"bar": true
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -97,9 +88,6 @@
 				}
 			]
 		},
-		"skip": {
-			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 3 more errors)"
-		},
 		"tests": [
 			{
 				"description": "match array",
@@ -109,7 +97,7 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "conflicting values [1,2] and {...} (mismatched types list and struct):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -118,10 +106,7 @@
 					1,
 					"foo"
 				],
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -152,69 +137,48 @@
 				}
 			}
 		},
-		"skip": {
-			"v3-roundtrip": "cannot extract generated schema: invalid JSON reference: parse \"#/$defs/#.\\\"percent%field\\\"\": invalid URL escape \"%fi\" (and 3 more errors)"
-		},
 		"tests": [
 			{
 				"description": "slash invalid",
 				"data": {
 					"slash": "aoeu"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "tilde invalid",
 				"data": {
 					"tilde": "aoeu"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "percent invalid",
 				"data": {
 					"percent": "aoeu"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "slash valid",
 				"data": {
 					"slash": 123
 				},
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "tilde valid",
 				"data": {
 					"tilde": 123
 				},
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "percent valid",
 				"data": {
 					"percent": 123
 				},
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -674,9 +638,6 @@
 			},
 			"$ref": "schema-relative-uri-defs2.json"
 		},
-		"skip": {
-			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 3 more errors)"
-		},
 		"tests": [
 			{
 				"description": "invalid on inner field",
@@ -688,7 +649,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -701,7 +662,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -712,10 +673,7 @@
 					},
 					"bar": "a"
 				},
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -741,9 +699,6 @@
 			},
 			"$ref": "schema-refs-absolute-uris-defs2.json"
 		},
-		"skip": {
-			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 3 more errors)"
-		},
 		"tests": [
 			{
 				"description": "invalid on inner field",
@@ -755,7 +710,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -768,7 +723,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -779,10 +734,7 @@
 					},
 					"bar": "a"
 				},
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -810,25 +762,16 @@
 				}
 			]
 		},
-		"skip": {
-			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
-		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "non-number is invalid",
 				"data": "a",
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1393,25 +1336,16 @@
 				}
 			]
 		},
-		"skip": {
-			"v3-roundtrip": "cannot extract generated schema: reference to non-existent schema (and 1 more errors)"
-		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
-				"valid": true,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "non-number is invalid",
 				"data": "a",
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	}

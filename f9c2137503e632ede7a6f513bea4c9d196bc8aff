@@ -22,6 +22,30 @@
       },
       "revId": "f9c2137503e632ede7a6f513bea4c9d196bc8aff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab0b4e34_6e989e2a",
+        "filename": "cue/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 936,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-08T14:30:25Z",
+      "side": 1,
+      "message": "done as part of the following commit.",
+      "parentUuid": "36ddc62c_2d3ea555",
+      "range": {
+        "startLine": 925,
+        "startChar": 0,
+        "endLine": 936,
+        "endChar": 0
+      },
+      "revId": "f9c2137503e632ede7a6f513bea4c9d196bc8aff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -83,10 +83,10 @@ _foo: a?: int
 	type: "object"
 	properties: {
 		t01: {
-			$ref: "#/$defs/#S1"
+			$ref: "#/$defs/%23S1"
 		}
 		t02: {
-			$ref: "#/$defs/#S2"
+			$ref: "#/$defs/%23S2"
 		}
 		t03: {
 			$ref: "#/$defs/_foo"

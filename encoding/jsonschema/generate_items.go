@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"hash/maphash"
 	"maps"
+	"net/url"
 	"reflect"
 	"slices"
 
@@ -26,6 +27,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/internal/anyunique"
 )
 
@@ -309,7 +311,15 @@ func (it *itemRef) hash(h *maphash.Hash, u *uniqueItems) {
 }
 
 func (i *itemRef) generate(g *generator) ast.Expr {
-	return singleKeyword("$ref", ast.NewString("#/$defs/"+i.defName))
+	// Note: we might need to escape the fragment to produce
+	// a valid URI. Also, if the definition name itself contains
+	// a slash, it should be treated as a literal slash not as a JSON Pointer
+	// separator.
+	jptr := json.PointerFromTokens(slices.Values([]string{"$defs", i.defName}))
+	u := &url.URL{
+		Fragment: string(jptr),
+	}
+	return singleKeyword("$ref", ast.NewString(u.String()))
 }
 
 func (i *itemRef) apply(f func(internItem, *uniqueItems) internItem, u *uniqueItems) item {

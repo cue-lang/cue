@@ -2026,6 +2026,7 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 
 func (x *ForClause) yield(s *compState) {
 	c := s.ctx
+	env := c.Env(0)
 	n := c.forSource(x.Src)
 
 	if s := n.getState(c); s != nil {
@@ -2051,8 +2052,18 @@ func (x *ForClause) yield(s *compState) {
 			continue
 		}
 
-		n := &Vertex{
-			Parent: c.Env(0).DerefVertex(c),
+		// "for" clauses tend to yield many values;
+		// group allocations with the same lifetime here
+		// for the sake of reducing the runtime overhead.
+		alloc := struct {
+			v0, v1, v2 Vertex
+			arcs       [2]*Vertex
+			env        Environment
+		}{}
+
+		n := &alloc.v0
+		*n = Vertex{
+			Parent: env.DerefVertex(c),
 
 			// Using Finalized here ensures that no nodeContext is allocated,
 			// preventing a leak, as this "helper" struct bypasses normal
@@ -2061,10 +2072,13 @@ func (x *ForClause) yield(s *compState) {
 			IsDynamic: true,
 			anonymous: true,
 			ArcType:   ArcMember,
+
+			Arcs: alloc.arcs[:0],
 		}
 
 		if x.Value != InvalidLabel {
-			b := &Vertex{
+			b := &alloc.v1
+			*b = Vertex{
 				Label:     x.Value,
 				BaseValue: a,
 				IsDynamic: true,
@@ -2075,18 +2089,23 @@ func (x *ForClause) yield(s *compState) {
 		}
 
 		if x.Key != InvalidLabel {
-			v := &Vertex{
+			v := &alloc.v2
+			*v = Vertex{
 				Label:     x.Key,
 				IsDynamic: true,
 				anonymous: true,
 			}
 			key := a.Label.ToValue(c)
-			v.AddConjunct(MakeRootConjunct(c.Env(0), key))
+			v.AddConjunct(MakeRootConjunct(env, key))
 			v.SetValue(c, key)
 			n.Arcs = append(n.Arcs, v)
 		}
 
-		sub := c.spawn(n)
+		sub := &alloc.env
+		*sub = Environment{
+			Up:     env,
+			Vertex: n,
+		}
 		if !s.yield(sub) {
 			break
 		}

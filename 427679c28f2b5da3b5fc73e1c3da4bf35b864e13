@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2dc75445_7b3c5242",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-09T08:42:39Z",
+      "side": 1,
+      "message": "Well... it needs to be read in conjunction with the text that follows really. Maybe it would be less jarring if I switched it to 4. I think I\u0027ll do that.",
+      "parentUuid": "e6e69d12_451fd5c6",
+      "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "72135005_bb7f5fcf",
         "filename": "internal/lsp/eval/eval.go",
         "patchSetId": 8

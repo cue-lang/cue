@@ -788,21 +788,6 @@ func (n *nodeContext) addErr(err errors.Error) {
 	}
 }
 
-func valueError(v Value) *ValueError {
-	if v == nil {
-		return nil
-	}
-	b, _ := v.(*Bottom)
-	if b == nil {
-		return nil
-	}
-	err, _ := b.Err.(*ValueError)
-	if err == nil {
-		return nil
-	}
-	return err
-}
-
 func (n *nodeContext) insertFieldUnchecked(f Feature, mode ArcType, x Conjunct) *Vertex {
 	return n.insertArc(f, mode, x, x.CloseInfo, false)
 }

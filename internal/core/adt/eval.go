@@ -614,13 +614,7 @@ func (n *nodeContext) reportConflict(v1, v2 Node, k1, k2 Kind, ids ...posInfo) {
 
 // reportFieldMismatch reports the mixture of regular fields with non-struct
 // values. Either s or f needs to be given.
-func (n *nodeContext) reportFieldMismatch(
-	p token.Pos,
-	s *StructLit,
-	f Feature,
-	scalar Expr,
-	id ...posInfo) {
-
+func (n *nodeContext) reportFieldMismatch(p token.Pos, s *StructLit, f Feature, scalar Expr) {
 	ctx := n.ctx
 
 	if f == InvalidLabel {
@@ -632,7 +626,7 @@ func (n *nodeContext) reportFieldMismatch(
 			}
 		}
 		if f == InvalidLabel {
-			n.reportConflict(scalar, s, n.kind, StructKind, id...)
+			n.reportConflict(scalar, s, n.kind, StructKind)
 			return
 		}
 	}
@@ -641,10 +635,6 @@ func (n *nodeContext) reportFieldMismatch(
 
 	if s != nil { // important to avoid a typed nil
 		err.AddPosition(s)
-	}
-
-	for _, ci := range id {
-		err.AddClosedPositions(ctx, ci)
 	}
 
 	n.addErr(err)

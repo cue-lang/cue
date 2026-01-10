@@ -174,7 +174,7 @@ func combineDefault(a, b defaultMode) defaultMode {
 //
 // TODO(perf): the set of errors is now computed during evaluation. Eventually,
 // this could be done lazily.
-func (n *nodeContext) disjunctError() (errs errors.Error) {
+func (n *nodeContext) disjunctError() errors.Error {
 	ctx := n.ctx
 
 	disjuncts := selectErrors(n.disjunctErrs)
@@ -186,25 +186,22 @@ func (n *nodeContext) disjunctError() (errs errors.Error) {
 	}
 
 	if disjuncts == nil {
-		errs = ctx.Newf("empty disjunction") // XXX: add space to sort first
-	} else {
-		disjuncts = errors.Sanitize(disjuncts)
-		k := len(errors.Errors(disjuncts))
-		if k == 1 {
-			if pos != nil {
-				addDisjunctPositions(disjuncts.(*ValueError), pos)
-			}
-			return disjuncts
-		}
-		// prefix '-' to sort to top
-		errs = ctx.Newf("%d errors in empty disjunction:", k)
-		if pos != nil {
-			addDisjunctPositions(errs.(*ValueError), pos)
-		}
-		errs = errors.Append(errs, disjuncts)
+		return ctx.Newf("empty disjunction") // XXX: add space to sort first
 	}
-
-	return errs
+	disjuncts = errors.Sanitize(disjuncts)
+	k := len(errors.Errors(disjuncts))
+	if k == 1 {
+		if pos != nil {
+			addDisjunctPositions(disjuncts.(*ValueError), pos)
+		}
+		return disjuncts
+	}
+	// prefix '-' to sort to top
+	err := ctx.Newf("%d errors in empty disjunction:", k)
+	if pos != nil {
+		addDisjunctPositions(err, pos)
+	}
+	return errors.Append(err, disjuncts)
 }
 
 func addDisjunctPositions(dst *ValueError, src errors.Error) {

@@ -1746,7 +1746,7 @@ func (f *frame) eval() {
 			}
 
 		case *ast.EmbedDecl:
-			unprocessed = append(unprocessed, node.Expr)
+			f.newFrame(node.Expr, f.navigable)
 
 		case *ast.PostfixExpr:
 			if node.Op == token.ELLIPSIS {

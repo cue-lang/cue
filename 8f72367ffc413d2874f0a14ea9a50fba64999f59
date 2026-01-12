@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3f12ba1_5c8fd140",
+        "filename": "internal/lsp/cache/definitions.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T09:12:50Z",
+      "side": 1,
+      "message": "this `definitions.go` file should perhaps be renamed as well, to reflect the fact that it also does references, hover, etc etc.",
+      "revId": "8f72367ffc413d2874f0a14ea9a50fba64999f59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31790006_c42b6e7c",
+        "filename": "internal/lsp/rangeset/file_rangeset.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T09:12:50Z",
+      "side": 1,
+      "message": "typically it\u0027s up to the caller to ensure that the receiver is non-nil, is there a good reason why you\u0027re doing it in the callee with these rangeset types?",
+      "revId": "8f72367ffc413d2874f0a14ea9a50fba64999f59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

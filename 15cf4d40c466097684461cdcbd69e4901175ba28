@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee2e3326_fca7d5ec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-12T09:12:36Z",
+      "side": 1,
+      "message": "sticky shift key ;)",
+      "revId": "15cf4d40c466097684461cdcbd69e4901175ba28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -234,14 +234,15 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 		// the default parser options used by cue/load for better
 		// cache behavior.
 		syntax, syntaxErr = cueFS.ReadCUEFile(fpath, parser.NewConfig(parser.ImportsOnly))
-		if syntax == nil && syntaxErr == nil {
-			// This file couldn't be read-and-converted to a CUE
-			// AST. Make no further attempts on this file.
-			return "", true
-		} else if syntaxErr != nil && !errors.Is(syntaxErr, errors.ErrUnsupported) {
-			return "", yield(pf, syntaxErr)
+		if syntax == nil {
+			if syntaxErr == nil {
+				// This file couldn't be read-and-converted to a CUE
+				// AST. Make no further attempts on this file.
+				return "", true
+			} else if !errors.Is(syntaxErr, errors.ErrUnsupported) {
+				return "", yield(pf, syntaxErr)
+			}
 		}
-
 	}
 	if syntax == nil {
 		// Either the FS doesn't implement [module.ReadCUEFS]

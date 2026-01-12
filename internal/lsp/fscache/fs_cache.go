@@ -120,12 +120,11 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 		}
 
 	case build.JSON:
-		expr, err := json.Extract(filename, content)
-		if err != nil {
-			return nil, parser.Config{}, err
-		}
 		syntax = &ast.File{Filename: filename}
+		var expr ast.Expr
+		expr, err = json.Extract(filename, content)
 		switch expr := expr.(type) {
+		case nil: // unparsable
 		case *ast.StructLit:
 			syntax.Decls = expr.Elts
 		default:
@@ -134,9 +133,6 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 
 	case build.YAML:
 		syntax, err = yaml.Extract(filename, content)
-		if err != nil {
-			return nil, parser.Config{}, err
-		}
 
 	default:
 		return nil, parser.Config{}, nil
@@ -411,6 +407,7 @@ type CUEDirFS interface {
 	DirFS
 	module.OSRootFS
 	module.ReadCUEFS
+	iofs.SubFS
 }
 
 // rootedCUECacheFS is a wrapper over [CUECacheFS] that implements
@@ -428,6 +425,12 @@ var _ CUEDirFS = (*rootedCUECacheFS)(nil)
 // OSRoot implements [module.OSRootFS]
 func (fs *rootedCUECacheFS) OSRoot() string {
 	return fs.root
+}
+
+// Sub implements [iofs.Sub]
+func (fs *rootedCUECacheFS) Sub(dir string) (iofs.FS, error) {
+	root := filepath.Join(fs.root, filepath.FromSlash(dir))
+	return fs.cuecachefs.IoFS(root), nil
 }
 
 // Open implements [iofs.FS]

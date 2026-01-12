@@ -16,6 +16,24 @@
       "message": "sticky shift key ;)",
       "revId": "15cf4d40c466097684461cdcbd69e4901175ba28",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d83f02e_04601a18",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T09:16:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee2e3326_fca7d5ec",
+      "revId": "15cf4d40c466097684461cdcbd69e4901175ba28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -549,6 +549,7 @@ func (e *Evaluator) initialNavsForImport(ip ast.ImportPath) []*navigable {
 			}
 
 			for _, offsets := range fe.findIdentUsageOffsets(name) {
+				fmt.Println("initial offests for", name, offsets)
 				for _, fr := range fe.evalForOffset(offsets) {
 					result = append(result, fr.navigable)
 				}
@@ -615,10 +616,13 @@ func (fe *FileEvaluator) DocCommentsForOffset(offset int) map[ast.Node][]*ast.Co
 	commentsMap := make(map[ast.Node][]*ast.CommentGroup)
 
 	for nav := range fe.definitionsForOffset(offset) {
-		for _, fr := range nav.frames {
-			if fr.key != nil {
-				if comments := fr.docComments(); len(comments) > 0 {
-					commentsMap[fr.key] = comments
+		navs := expandNavigablesWithUsages([]*navigable{nav})
+		for nav := range navs {
+			for _, fr := range nav.frames {
+				if fr.key != nil {
+					if comments := fr.docComments(); len(comments) > 0 {
+						commentsMap[fr.key] = comments
+					}
 				}
 			}
 		}
@@ -836,7 +840,7 @@ nextFrame:
 
 	for nav, fieldCompletions := range suggestFieldsFrom {
 		nameSet := make(map[string]struct{})
-		for nav := range expandNavigables([]*navigable{nav}) {
+		for nav := range expandNavigablesWithUsages([]*navigable{nav}) {
 			for name := range nav.bindings {
 				if !strings.HasPrefix(name, "__") {
 					nameSet[name] = struct{}{}
@@ -984,6 +988,7 @@ func usages(navsWorklist []*navigable) {
 			}
 		}
 
+		fmt.Println("evalWorklist", evalWorklist, "isExported", isExported)
 		for len(evalWorklist) > 0 {
 			nav := evalWorklist[0]
 			evalWorklist = evalWorklist[1:]
@@ -1433,6 +1438,60 @@ func expandNavigables(navs []*navigable) map[*navigable]struct{} {
 		worklist = slices.AppendSeq(worklist, maps.Keys(nav.resolvesTo))
 	}
 	return navsSet
+}
+
+func expandNavigablesWithUsages(navs []*navigable) map[*navigable]struct{} {
+	fmt.Printf("expandNavigablesWithUsages %v\n", navs)
+
+	result := make(map[*navigable]struct{})
+	for _, nav := range navs {
+		var names []string
+		for ; nav != nil && nav.name != ""; nav = nav.parent {
+			names = append(names, nav.name)
+		}
+		fmt.Printf("  %v n:%p np:%p pk:%p\n", names, nav, nav.parent, nav.evaluator.pkgFrame.navigable)
+		if nav.parent == nav.evaluator.pkgFrame.navigable {
+			nav = nav.evaluator.pkgDecls
+		}
+		usages([]*navigable{nav})
+		navs := []*navigable{nav}
+		var importSpecNavs []*navigable
+		for _, useFr := range nav.usedBy {
+			if _, isSpec := useFr.node.(*ast.ImportSpec); isSpec {
+				importSpecNavs = append(importSpecNavs, useFr.navigable)
+			}
+		}
+		if len(importSpecNavs) > 0 {
+			usages(importSpecNavs)
+			navs = navs[:0]
+			for _, nav := range importSpecNavs {
+				navs = append(navs, nav)
+			}
+		}
+
+		walkFromMap := make(map[*navigable]struct{})
+		for _, nav := range navs {
+			fmt.Println("->", nav, nav.usedBy)
+			for _, fr := range nav.usedBy {
+				if _, found := fr.navigable.resolvesTo[nav]; !found {
+					continue
+				}
+				walkFromMap[fr.navigable] = struct{}{}
+			}
+		}
+
+		navs = slices.Collect(maps.Keys(walkFromMap))
+		fmt.Println("walk start", navs[0])
+		for _, name := range slices.Backward(names) {
+			navs = navigateByName(expandNavigables(navs), name)
+			fmt.Println(" after", name, navs[0])
+		}
+		maps.Copy(result, expandNavigables(navs))
+	}
+	for nav := range result {
+		fmt.Println("result", nav)
+	}
+	return result
 }
 
 // frame corresponds to a node from the AST. A frame can be created at

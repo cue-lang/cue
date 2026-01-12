@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8322f59a_fc0d0756",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "With our discussion and review on Friday, and my second pass today, I\u0027m happy enough to give a +2. I can\u0027t say I carefully read every line, but the design seems sound and nothing stands out as wrong or puzzling.\n\nI\u0027m happy to do another pass tomorrow with a fresh mind if you want me to, but as far as I\u0027m concerned that\u0027s not necessary :)",
+      "revId": "3c4a58c41c102ae7a4116004cf1a9b36b4b440dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4b183aa_c92dedea",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 909,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "is it worth joining the two `range navs` loops here?",
+      "revId": "3c4a58c41c102ae7a4116004cf1a9b36b4b440dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2d0f5cc_90b96b29",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 952,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "personally I\u0027d negate and unindent here",
+      "revId": "3c4a58c41c102ae7a4116004cf1a9b36b4b440dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a17ef46_cacbfa56",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 1499,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "as mentioned on Friday - I\u0027d move this near the top of the struct for clarity",
+      "revId": "3c4a58c41c102ae7a4116004cf1a9b36b4b440dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9e01772_b7aec953",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 2051,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "you\u0027re overriding aliasIdent and aliasValue for each list element, no?",
+      "revId": "3c4a58c41c102ae7a4116004cf1a9b36b4b440dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97167c24_8f14050e",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 2397,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "interesting choice. I can\u0027t say I disagree with it though :)",
+      "revId": "3c4a58c41c102ae7a4116004cf1a9b36b4b440dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c54d618_f55be9e6",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 2495,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "curious that one is a list and the other a map. I\u0027d imagine that both could be lists? if there\u0027s a good reason to have the difference, I\u0027d briefly point it out.",
+      "revId": "3c4a58c41c102ae7a4116004cf1a9b36b4b440dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d2f85f1_411b717d",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "I remember you mentioned in person that these tests are exhaustive, such that they must reflect the full set of definitions/completions/etc that the LSP shows for the source. does this also extend to the offset ranges? e.g. if you test that offset range `1-3` has a particular completion, but it\u0027s actually shown for all of `1-5`.",
+      "revId": "3c4a58c41c102ae7a4116004cf1a9b36b4b440dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

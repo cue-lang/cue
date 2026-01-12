@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a066bb8c_2b09ff2d",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 1559,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "I\u0027d still like to see a \"within\" helper for all of these offset-in-between checks :)",
+      "revId": "454b08aeefa07f042a36c29a346bd55fbb5b6de0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "891dfd8e_e477e424",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 1981,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "expand this a little? is the TODO to figure out a solution?",
+      "revId": "454b08aeefa07f042a36c29a346bd55fbb5b6de0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8e1c47b_00e172b3",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 1990,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "I\u0027d expect this type assert as part of the type switch below",
+      "revId": "454b08aeefa07f042a36c29a346bd55fbb5b6de0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df833529_c1c1e005",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 2003,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "no default case here? mainly thinking in terms of being defensive, against e.g. the language and AST packages adding more options in the future, which would silently do nothing rather than fail.",
+      "revId": "454b08aeefa07f042a36c29a346bd55fbb5b6de0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e52079fb_8d6c253d",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 2018,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-12T15:23:17Z",
+      "side": 1,
+      "message": "no default case?",
+      "revId": "454b08aeefa07f042a36c29a346bd55fbb5b6de0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -58,10 +58,7 @@ func (wf *WorkspaceFolder) UpdateOptions(opts *settings.Options) {
 func (wf *WorkspaceFolder) FileWatchingGlobPatterns(patterns map[protocol.RelativePattern]struct{}) bool {
 	const watchCueFiles = "**/*.{cue,json,jsonl,ldjson,ndjson,yaml,yml}"
 
-	patterns[protocol.RelativePattern{
-		BaseURI: wf.dir,
-		Pattern: watchCueFiles,
-	}] = struct{}{}
+	patterns[protocol.RelativePattern{Pattern: watchCueFiles}] = struct{}{}
 
 	return wf.watchSubdirs()
 }

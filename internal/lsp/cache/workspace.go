@@ -224,7 +224,7 @@ func (w *Workspace) FileWatchingGlobPatterns(ctx context.Context) map[protocol.R
 		for _, wfDir := range wfDirs {
 			// NB: a.Encloses(b) returns true if a == b
 			if wfDir.Encloses(activeDir) {
-				patterns[protocol.RelativePattern{Pattern: protocol.Pattern(activeDir)}] = struct{}{}
+				patterns[protocol.RelativePattern{Pattern: filepath.ToSlash(activeDir.Path())}] = struct{}{}
 				break
 			}
 		}
@@ -429,12 +429,7 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		}
 		if ip != nil && len(dirUris) != 0 {
 			pkg := m.EnsurePackage(*ip, dirUris)
-			pkg.markFileDirty(uri)
-			if len(dirUris) == 1 { // i.e. the new module system is in use
-				for _, pkg := range m.DescendantPackages(pkg.importPath) {
-					pkg.markFileDirty(uri)
-				}
-			}
+			m.markPackagesDirty(pkg, uri)
 		} else {
 			w.standalone.reloadFile(uri)
 		}
@@ -891,11 +886,7 @@ func (w *Workspace) reloadPackages() {
 				repeatReload = true
 			}
 			if len(dirUris) == 1 { // i.e. the new module system is in use
-				for _, pkg := range m.DescendantPackages(*ip) {
-					if pkg.importPath == *ip {
-						// handled specially, above
-						continue
-					}
+				for pkg := range m.descendantPackages(*ip) {
 					key.importPath = pkg.importPath
 					if _, loaded := processedPkgs[key]; loaded {
 						// Same as before: avoid infinite loops

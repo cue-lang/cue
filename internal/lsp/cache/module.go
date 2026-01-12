@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"iter"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -114,6 +115,27 @@ func (m *Module) markFileDirty(file protocol.DocumentURI) {
 // MarkFileDirty implements [packageOrModule]
 func (m *Module) encloses(file protocol.DocumentURI) bool {
 	return m.modFileURI == file
+}
+
+func (m *Module) markPackagesDirty(pkg *Package, fileUri protocol.DocumentURI) {
+	pkg.markFileDirty(fileUri)
+	if len(pkg.dirURIs) != 1 {
+		// the old module system is in use. No ancestor imports, and no embeddings.
+		return
+	}
+
+	if strings.HasSuffix(string(fileUri), ".cue") {
+		for p := range m.descendantPackages(pkg.importPath) {
+			p.markFileDirty(fileUri)
+		}
+
+	} else {
+		for p := range m.ascendantPackages(pkg) {
+			if p.embeddingsMatch(fileUri) {
+				p.markFileDirty(fileUri)
+			}
+		}
+	}
 }
 
 // ReloadModule reloads the module's modfile iff the module's status
@@ -257,29 +279,47 @@ func (m *Module) EnsurePackage(ip ast.ImportPath, dirUris []protocol.DocumentURI
 	return pkg
 }
 
-// DescendantPackages returns all the existing loaded packages within
-// this module that correspond to the given import path, or would
-// include the import path's files due to the ancestor-import
-// mechanism. The ancestor-import mechanism is not available for the
-// "old module" system, so only call this unless you know the import
-// path corresponds to the new module system.
+// descendantPackages returns all the existing loaded packages within
+// this module that would include the import path's package's files
+// due to the ancestor-import mechanism. The ancestor-import mechanism
+// is not available for the "old module" system, so only call this
+// unless you know the import path corresponds to the new module
+// system.
 //
 // This method only returns existing packages; it does not create any
 // new packages.
-func (m *Module) DescendantPackages(ip ast.ImportPath) []*Package {
-	var pkgs []*Package
-	pkg, found := m.packages[ip]
-	if found {
-		pkgs = append(pkgs, pkg)
-	}
-	prefix := ip.Path + "/"
-	for _, pkg := range m.packages {
-		pkgIp := pkg.importPath
-		if pkgIp.Qualifier == ip.Qualifier && strings.HasPrefix(pkgIp.Path, prefix) {
-			pkgs = append(pkgs, pkg)
+func (m *Module) descendantPackages(ip ast.ImportPath) iter.Seq[*Package] {
+	return func(yield func(*Package) bool) {
+		prefix := ip.Path + "/"
+		for _, pkg := range m.packages {
+			pkgIp := pkg.importPath
+			if pkgIp.Qualifier == ip.Qualifier && strings.HasPrefix(pkgIp.Path, prefix) {
+				if !yield(pkg) {
+					return
+				}
+			}
 		}
 	}
-	return pkgs
+}
+
+func (m *Module) ascendantPackages(pkg *Package) iter.Seq[*Package] {
+	return func(yield func(*Package) bool) {
+	pkgs:
+		for _, p := range m.packages {
+		pkgDirs:
+			for _, pkgDir := range pkg.dirURIs {
+				for _, pDir := range p.dirURIs {
+					if pDir.Encloses(pkgDir) {
+						continue pkgDirs
+					}
+				}
+				continue pkgs
+			}
+			if !yield(p) {
+				return
+			}
+		}
+	}
 }
 
 // loadDirtyPackages identifies all dirty packages within the module,
@@ -370,12 +410,7 @@ func (m *Module) loadAllPackages() {
 			continue
 		}
 		pkg := m.EnsurePackage(*ip, dirUris)
-		pkg.markFileDirty(uri)
-		if len(dirUris) == 1 { // i.e. the new module system is in use
-			for _, pkg := range m.DescendantPackages(pkg.importPath) {
-				pkg.markFileDirty(uri)
-			}
-		}
+		m.markPackagesDirty(pkg, uri)
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 	"io"
 	iofs "io/fs"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"sync"
@@ -549,6 +550,12 @@ func (fs *rootedOverlayFS) OSRoot() string {
 	return fs.delegatefs.OSRoot()
 }
 
+// Sub implements [iofs.Sub]
+func (fs *rootedOverlayFS) Sub(dir string) (iofs.FS, error) {
+	root := filepath.Join(fs.delegatefs.root, filepath.FromSlash(dir))
+	return fs.overlayfs.IoFS(root), nil
+}
+
 // pathComponents splits the name path into a slice of directory names
 // (which may be empty), and the final basename. The name must be
 // valid according to [iofs.ValidPath]
@@ -660,11 +667,7 @@ func (fs *rootedOverlayFS) IsDirWithCUEFiles(path string) (bool, error) {
 			continue
 		}
 
-		bf, err := filetypes.ParseFileAndType(file.basename, "", filetypes.Input)
-		if err != nil {
-			continue
-		}
-		switch bf.Encoding {
+		switch file.buildFile.Encoding {
 		case build.CUE, build.JSON, build.YAML:
 			return true, nil
 		default:

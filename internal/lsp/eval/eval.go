@@ -337,8 +337,10 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/interpreter/embed"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/lsp/fscache"
 	"cuelang.org/go/internal/lsp/rangeset"
 )
 
@@ -346,15 +348,15 @@ import (
 // package evals by their import path. It returns the Evals for the
 // given import path, or nil if the package cannot be resolved.
 type EvaluatorForPackageFunc = func(importPath ast.ImportPath) *Evaluator
+type EvaluatorsForEmbedAttrFunc = func(attrPos token.Pos) []*Evaluator
 
 // ImportersFunc is a callback function to fetch the package
 // evaluator for packages that directly import the current package.
 type ImportersFunc = func() []*Evaluator
+type EmbeddersFunc = func() map[*Evaluator][]*embed.Embed
 
 type Evaluator struct {
-	// ip is the canonical (with major-version suffix) import path for
-	// this package.
-	ip ast.ImportPath
+	config Config
 	// pkgFrame is the top level (or root) lexical scope
 	pkgFrame *frame
 	// pkgDecls contains every package declaration with the files
@@ -363,12 +365,13 @@ type Evaluator struct {
 	pkgDecls *navigable
 	// byFilename maps file names to [FileEvaluator]
 	byFilename map[string]*FileEvaluator
-	// forPackage is a callback function to resolve imported packages.
-	forPackage EvaluatorForPackageFunc
-	// pkgImporters is a callback function to fetch the evaluator for
-	// all packages that directly import this package.
-	pkgImporters ImportersFunc
-	// importCanonicalisation provides canonical (with major-version
+}
+
+type Config struct {
+	// IP is the canonical (with major-version suffix) import path for
+	// this package.
+	IP ast.ImportPath
+	// ImportCanonicalisation provides canonical (with major-version
 	// suffix) import paths for every import spec within the current
 	// package. The LSP always uses canonical import paths, but
 	// individual cue files can have import statements that (1) elide
@@ -379,7 +382,33 @@ type Evaluator struct {
 	// import the same package, but the path can differ); (2) searching
 	// for import specs that have paths which refer to a particular
 	// ImportPath.
-	importCanonicalisation map[string]ast.ImportPath
+	ImportCanonicalisation map[string]ast.ImportPath
+	// ForPackage is a callback function to resolve imported packages.
+	ForPackage EvaluatorForPackageFunc
+	// PkgImporters is a callback function to fetch the evaluator for
+	// all packages that directly import this package.
+	PkgImporters       ImportersFunc
+	ForEmbedAttribute  EvaluatorsForEmbedAttrFunc
+	PkgEmbedders       EmbeddersFunc
+	SupportsReferences bool
+}
+
+func (c *Config) init() {
+	if c.ForPackage == nil {
+		c.ForPackage = func(importPath ast.ImportPath) *Evaluator { return nil }
+	}
+	if c.PkgImporters == nil {
+		c.PkgImporters = func() []*Evaluator { return nil }
+	}
+
+	if c.ForEmbedAttribute == nil {
+		c.ForEmbedAttribute = func(attrPos token.Pos) []*Evaluator { return nil }
+	}
+	if c.PkgEmbedders == nil {
+		c.PkgEmbedders = func() map[*Evaluator][]*embed.Embed { return nil }
+	}
+
+	c.SupportsReferences = true
 }
 
 // New creates and performs initial configuration of a new [Evaluator]
@@ -391,19 +420,11 @@ type Evaluator struct {
 //
 // For the ip, importCanonicalisation, forPackage, and pkgImporters
 // parameters, see the corresponding fields in [Definitions].
-func New(ip ast.ImportPath, importCanonicalisation map[string]ast.ImportPath, forPackage EvaluatorForPackageFunc, pkgImporters ImportersFunc, files ...*ast.File) *Evaluator {
-	if forPackage == nil {
-		forPackage = func(importPath ast.ImportPath) *Evaluator { return nil }
-	}
-	if pkgImporters == nil {
-		pkgImporters = func() []*Evaluator { return nil }
-	}
+func New(config Config, files ...*ast.File) *Evaluator {
+	config.init()
 	evaluator := &Evaluator{
-		ip:                     ip,
-		importCanonicalisation: importCanonicalisation,
-		byFilename:             make(map[string]*FileEvaluator, len(files)),
-		forPackage:             forPackage,
-		pkgImporters:           pkgImporters,
+		config:     config,
+		byFilename: make(map[string]*FileEvaluator, len(files)),
 	}
 	evaluator.Reset()
 
@@ -507,7 +528,7 @@ func (e *Evaluator) parseImportSpec(spec *ast.ImportSpec) *ast.ImportPath {
 	if err != nil {
 		return nil
 	}
-	if ip, found := e.importCanonicalisation[str]; found {
+	if ip, found := e.config.ImportCanonicalisation[str]; found {
 		return &ip
 	}
 	// modimports/modpkgload calls Canonical on import paths, so if
@@ -516,7 +537,7 @@ func (e *Evaluator) parseImportSpec(spec *ast.ImportSpec) *ast.ImportPath {
 	// have been removed. So, parse the path, find the canonical form,
 	// and then check again to see if we find anything:
 	ip := ast.ParseImportPath(str).Canonical()
-	if ip, found := e.importCanonicalisation[ip.String()]; found {
+	if ip, found := e.config.ImportCanonicalisation[ip.String()]; found {
 		return &ip
 	}
 	return &ip
@@ -594,6 +615,9 @@ type FileEvaluator struct {
 // DefinitionsForOffset reports the definitions that the file offset
 // (number of bytes from the start of the file) resolves to.
 func (fe *FileEvaluator) DefinitionsForOffset(offset int) []ast.Node {
+	if !fe.evaluator.config.SupportsReferences {
+		return nil
+	}
 	var nodes []ast.Node
 
 	for nav := range fe.definitionsForOffset(offset) {
@@ -993,6 +1017,12 @@ func usages(navsWorklist []*navigable) {
 			}
 			evaluatedNavs[nav] = struct{}{}
 
+			// If this nav's evaluator does not support references
+			// (e.g. json) then there's no point evaluating it, because
+			// doing so cannot possibly find any uses of the targetNavs.
+			if !nav.evaluator.config.SupportsReferences {
+				continue
+			}
 			nav.eval()
 			for _, fr := range nav.frames {
 				for _, childFr := range fr.childFrames {
@@ -1031,9 +1061,34 @@ func usages(navsWorklist []*navigable) {
 		if isExported {
 			// For all the packages that import us, find where usages of
 			// this package appears.
-			ip := nav.evaluator.ip
-			for _, remotePkg := range nav.evaluator.pkgImporters() {
+			//
+			// Yes, after booting the remotePkg, our pkg decls, will be
+			// "usedBy" the relevant import spec in remotePkg. And yes,
+			// those import specs themselves would be usedBy paths that
+			// make use of the import. But only after those paths have
+			// been evaluated. So the whole point is to figure out which
+			// parts of the remotePkg should be evaluated, in order to
+			// populate the usedBy field of the navs we care about (which
+			// is not necessarily the import spec anyway).
+			ip := nav.evaluator.config.IP
+			for _, remotePkg := range nav.evaluator.config.PkgImporters() {
 				navsWorklist = append(navsWorklist, remotePkg.initialNavsForImport(ip)...)
+			}
+			// Embeds however are different: they are embedded into a
+			// specific part of a CUE AST, and it absolutely makes sense
+			// to start by evaluating that section of the AST.
+			for remotePkg, embeds := range nav.evaluator.config.PkgEmbedders() {
+				remotePkg.bootFiles()
+				for _, embed := range embeds {
+					pos := embed.Field.Value.Pos()
+					fe := remotePkg.byFilename[pos.Filename()]
+					if fe == nil {
+						continue
+					}
+					for _, fr := range fe.evalForOffset(pos.Offset()) {
+						navsWorklist = append(navsWorklist, fr.navigable)
+					}
+				}
 			}
 		}
 	}
@@ -1435,6 +1490,58 @@ func expandNavigables(navs []*navigable) map[*navigable]struct{} {
 	return navsSet
 }
 
+func expandNavigablesWithUsages(navs []*navigable) map[*navigable]struct{} {
+	fmt.Printf("expandNavigablesWithUsages %v\n", navs)
+
+	result := make(map[*navigable]struct{})
+	for _, nav := range navs {
+		var names []string
+		for ; nav != nil && nav.name != ""; nav = nav.parent {
+			names = append(names, nav.name)
+		}
+		fmt.Printf("  %v n:%p np:%p pk:%p\n", names, nav, nav.parent, nav.evaluator.pkgFrame.navigable)
+		if nav.parent == nav.evaluator.pkgFrame.navigable {
+			nav = nav.evaluator.pkgDecls
+		}
+		usages([]*navigable{nav})
+		navs := []*navigable{nav}
+		var importSpecNavs []*navigable
+		for _, useFr := range nav.usedBy {
+			if _, isSpec := useFr.node.(*ast.ImportSpec); isSpec {
+				importSpecNavs = append(importSpecNavs, useFr.navigable)
+			}
+		}
+		if len(importSpecNavs) > 0 {
+			usages(importSpecNavs)
+			navs = navs[:0]
+			for _, nav := range importSpecNavs {
+				navs = append(navs, nav)
+			}
+		}
+
+		walkFromMap := make(map[*navigable]struct{})
+		for _, nav := range navs {
+			fmt.Println("->", nav, nav.usedBy)
+			for _, fr := range nav.usedBy {
+				if _, found := fr.navigable.resolvesTo[nav]; !found {
+					continue
+				}
+				walkFromMap[fr.navigable] = struct{}{}
+			}
+		}
+
+		navs = slices.Collect(maps.Keys(walkFromMap))
+		for _, name := range slices.Backward(names) {
+			navs = navigateByName(expandNavigables(navs), name)
+		}
+		maps.Copy(result, expandNavigables(navs))
+	}
+	for nav := range result {
+		fmt.Println("result", nav)
+	}
+	return result
+}
+
 // frame corresponds to a node from the AST. A frame can be created at
 // any time, and creates the opportunity for evaluation to be paused
 // (and later resumed). Any binding reachable via
@@ -1610,7 +1717,14 @@ func (f *frame) eval() {
 			// imports of this package, in some other package.
 
 			childFr := f.newFrame(nil, f.fileEvaluator.evaluator.pkgDecls)
-			childFr.key = node.Name
+			if fscache.IsPhantomPackage(node) {
+				childFr.key = &ast.Ident{
+					Name:    "",
+					NamePos: f.fileEvaluator.File.Pos().File().Pos(0, token.NoRelPos),
+				}
+			} else {
+				childFr.key = node.Name
+			}
 			childFr.addRange(node)
 			childFr.docsNode = node
 			p := &path{
@@ -1672,7 +1786,7 @@ func (f *frame) eval() {
 				// ImportSpec, we lookup the package imported and add a
 				// resolution to them.
 				ip := pkgEval.parseImportSpec(node)
-				remotePkgEvaluator := pkgEval.forPackage(*ip)
+				remotePkgEvaluator := pkgEval.config.ForPackage(*ip)
 				if remotePkgEvaluator != nil {
 					// The pkg exists. Booting it means that its
 					// pkgDecls have frames which are the
@@ -1690,9 +1804,9 @@ func (f *frame) eval() {
 					// If we really need to, we can tell that the import
 					// was successful or not from its evaluator:
 					//
-					// 1. a bad import will have an empty ip (importPath) field
+					// 1. a bad import will have an empty IP (importPath) field
 					// 2. a bad import will have pkgDecls with no frames
-					remotePkgEvaluator = New(ast.ImportPath{}, nil, nil, nil)
+					remotePkgEvaluator = New(Config{})
 				}
 
 				// DefinitionsForOffset always traverses a path, so here
@@ -1958,6 +2072,45 @@ func (f *frame) eval() {
 				// len(fieldDecl.exprs) > 0 implies !strings.HasPrefix(keyName, "__")
 				childFr.parent.newFrame(fieldDecl, nil)
 			}
+
+			var remotePkgNavs []*navigable
+			for _, attr := range node.Attrs {
+				childFr.addRange(attr)
+				for _, remotePkgEvaluator := range f.fileEvaluator.evaluator.config.ForEmbedAttribute(attr.Pos()) {
+					// The attribute is an embed of 1 or more files, which
+					// we have converted to pkgs with evaluators. Booting
+					// them means their pkgDecls have frames.
+					//
+					// The behaviour here is very similar to processing an
+					// ImportSpec.
+					remotePkgEvaluator.bootFiles()
+					// We add a path that records that this field resolves
+					// to the remote package. DefinitionsForOffset always
+					// passes through a path, so this path ensures
+					// DefinitionsForOffset on the attr itself will take
+					// you to the embedded files.
+					p := &path{
+						frame: childFr,
+						components: []pathComponent{{
+							unexpanded: []*navigable{remotePkgEvaluator.pkgDecls},
+							node:       attr,
+						}},
+					}
+					childFr.childPaths = append(childFr.childPaths, p)
+
+					// Ensure that the child frame resolves to the file
+					// navs from the remote package. This allows paths that
+					// travels through the embed and into the remote pkg to
+					// resolve correctly.
+					for _, remoteFileFr := range remotePkgEvaluator.pkgFrame.childFrames {
+						remotePkgNavs = append(remotePkgNavs, remoteFileFr.navigable)
+					}
+
+					// We also record that the attr uses the remote package.
+					remotePkgEvaluator.pkgDecls.recordUsage(attr, childFr)
+				}
+			}
+			childFr.navigable.ensureResolvesTo(remotePkgNavs)
 
 		default:
 			f.addUnknownRange(node.Pos().Offset(), node.End().Offset())

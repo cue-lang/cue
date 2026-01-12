@@ -18,7 +18,6 @@ import (
 	"errors"
 	"fmt"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/eval"
@@ -116,15 +115,7 @@ func (s *Standalone) subtractModulesAndPackages() error {
 			}
 			sfile.delete()
 			pkg := m.EnsurePackage(*ip, dirUris)
-			pkg.markFileDirty(uri)
-			if len(dirUris) == 1 {
-				for _, pkg := range m.DescendantPackages(*ip) {
-					if pkg.importPath == *ip {
-						continue
-					}
-					pkg.markFileDirty(uri)
-				}
-			}
+			m.markPackagesDirty(pkg, uri)
 		}
 	}
 	return nil
@@ -207,15 +198,21 @@ func (f *standaloneFile) reload() error {
 	}
 
 	syntax, _, err := fh.ReadCUE(standaloneParserConfig)
+	file := f.file
+	file.setSyntax(syntax)
+	if err == nil {
+		file.ensureUser(f)
+	} else {
+		file.ensureUser(f, err)
+	}
+
 	if syntax == nil {
 		w.debugLogf("%v Error when reloading: %v", f, err)
 		f.delete()
 		return ErrBadFile
 	}
 
-	f.file.setSyntax(syntax)
-	f.file.ensureUser(f, err)
-	f.definitions = eval.New(ast.ImportPath{}, nil, nil, nil, syntax)
+	f.definitions = eval.New(eval.Config{}, syntax)
 	w.debugLogf("%v Reloaded", f)
 	return nil
 }

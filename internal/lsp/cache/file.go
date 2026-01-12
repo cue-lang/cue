@@ -173,7 +173,10 @@ func (f *File) setSyntax(syntax *ast.File) {
 		delete(w.mappers, oldTokFile)
 	}
 	f.syntax = syntax
-	tokFile := syntax.Pos().File()
+	var tokFile *token.File
+	if syntax != nil {
+		tokFile = syntax.Pos().File()
+	}
 	f.tokFile = tokFile
 	if tokFile == nil {
 		f.mapper = nil

@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08bbf2c1_271a3506",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-12T11:17:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2dc75445_7b3c5242",
+      "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72135005_bb7f5fcf",
@@ -55,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "340e73d8_037f7bbb",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-12T11:17:11Z",
+      "side": 1,
+      "message": "We discussed this on Friday. I don\u0027t really mind changing this, but when I read this, I miss out in my head saying the package name.",
+      "parentUuid": "72135005_bb7f5fcf",
+      "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ef3b56d6_8bbd28b6",
         "filename": "internal/lsp/eval/eval.go",
         "patchSetId": 8
@@ -66,6 +102,24 @@
       "writtenOn": "2026-01-08T17:53:42Z",
       "side": 1,
       "message": "nit: for readability, I might consistently backquote all CUE snippets, like in this case `x: y` or in others `a.b.c` or `x`.",
+      "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcd4b08c_ac872ef4",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-12T11:17:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef3b56d6_8bbd28b6",
       "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -93,6 +147,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b797a48_3f2f861e",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-12T11:17:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfb989bb_ecca49c8",
+      "range": {
+        "startLine": 139,
+        "startChar": 36,
+        "endLine": 139,
+        "endChar": 40
+      },
+      "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "062d1a17_3778ef55",
@@ -106,6 +184,24 @@
       "writtenOn": "2026-01-08T17:53:42Z",
       "side": 1,
       "message": "is the plural here correct?",
+      "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bc01560_3979c11c",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-12T11:17:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "062d1a17_3778ef55",
       "revId": "427679c28f2b5da3b5fc73e1c3da4bf35b864e13",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -33,6 +33,24 @@
       "message": "typically it\u0027s up to the caller to ensure that the receiver is non-nil, is there a good reason why you\u0027re doing it in the callee with these rangeset types?",
       "revId": "8f72367ffc413d2874f0a14ea9a50fba64999f59",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fe73ccd_16c618b5",
+        "filename": "internal/lsp/rangeset/file_rangeset.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-12T11:17:11Z",
+      "side": 1,
+      "message": "It was to simplify the `if fr.unknownRanges.Contains(offset) {` line in eval.go (around line 765). I don\u0027t mind switching around though and bringing out the nil chcek. I think at the time I made this change there was a more compelling reason, but that\u0027s gone now.",
+      "parentUuid": "31790006_c42b6e7c",
+      "revId": "8f72367ffc413d2874f0a14ea9a50fba64999f59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

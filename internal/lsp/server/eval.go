@@ -33,7 +33,7 @@ func (s *server) Definition(ctx context.Context, params *protocol.DefinitionPara
 func (s *server) Completion(ctx context.Context, params *protocol.CompletionParams) (*protocol.CompletionList, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	tokFile, fe, srcMapper, err := w.FileEvaluatorForURI(uri, false)
+	tokFile, fe, srcMapper, err := w.FileEvaluatorForURI(uri, true) // true only for mega
 	if tokFile == nil || err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (s *server) Completion(ctx context.Context, params *protocol.CompletionPara
 func (s *server) Hover(ctx context.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	tokFile, fe, srcMapper, err := w.FileEvaluatorForURI(uri, false)
+	tokFile, fe, srcMapper, err := w.FileEvaluatorForURI(uri, true) // true only for mega
 	if tokFile == nil || err != nil {
 		return nil, err
 	}

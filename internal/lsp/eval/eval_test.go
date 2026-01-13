@@ -493,6 +493,53 @@ q: o.z
 		},
 
 		{
+			name: "Embedded_Scopes",
+			archive: `-- a.cue --
+x: {
+	{a: b, y: z}
+	{b: _, a: b, z: _}
+	z: 3
+}`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "b"): {ln(3, 1, "b")}, // This is WRONG. That `b` should go no-where.
+				ln(2, 1, "z"): {ln(3, 1, "z"), ln(4, 1, "z")},
+
+				ln(3, 2, "b"): {ln(3, 1, "b")},
+
+				ln(1, 1, "x"): {self},
+				ln(2, 1, "a"): {self, ln(3, 1, "a")}, // WRONG - should be self only
+				ln(2, 1, "y"): {self},
+				ln(3, 1, "b"): {self},
+				ln(3, 1, "a"): {self, ln(2, 1, "a")}, // WRONG - should be self only
+				ln(3, 1, "z"): {self, ln(4, 1, "z")},
+				ln(4, 1, "z"): {self, ln(3, 1, "z")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2):   {f: []string{"x"}},
+				or(2, 7):   {f: []string{"a", "b", "y", "z"}, e: []string{"x"}},
+				or(7, 9):   {f: []string{"a", "b", "y", "z"}},
+				or(9, 12):  {e: []string{"a", "b", "x", "y", "z"}},
+				or1(12):    {f: []string{"a", "b", "y", "z"}, e: []string{"x"}},
+				or(13, 15): {f: []string{"a", "b", "y", "z"}},
+				or(15, 18): {e: []string{"a", "b", "x", "y", "z"}},
+				or(18, 21): {f: []string{"a", "b", "y", "z"}, e: []string{"x"}},
+				or(21, 23): {f: []string{"a", "b", "y", "z"}},
+				or(23, 26): {e: []string{"a", "b", "x", "y", "z"}},
+				or1(26):    {f: []string{"a", "b", "y", "z"}, e: []string{"x"}},
+				or(27, 29): {f: []string{"a", "b", "y", "z"}},
+				or(29, 32): {e: []string{"a", "b", "x", "y", "z"}},
+				or1(32):    {f: []string{"a", "b", "y", "z"}, e: []string{"x"}},
+				or(33, 35): {f: []string{"a", "b", "y", "z"}},
+				or(35, 38): {e: []string{"a", "b", "x", "y", "z"}},
+				or(38, 40): {f: []string{"a", "b", "y", "z"}, e: []string{"x"}},
+				or(40, 42): {f: []string{"a", "b", "y", "z"}},
+				or1(42):    {e: []string{"a", "b", "x", "y", "z"}},
+				or1(44):    {e: []string{"a", "b", "x", "y", "z"}},
+				or1(45):    {f: []string{"a", "b", "y", "z"}, e: []string{"x"}},
+			},
+		},
+
+		{
 			name: "Embedded_Dependency_Simple",
 			archive: `-- a.cue --
 a: b: c: {

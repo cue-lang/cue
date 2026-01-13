@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08ed4923_43436320",
+        "filename": "internal/encoding/encoder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-01-13T22:08:09Z",
+      "side": 1,
+      "message": "Just because `err` \"is\" fs.ErrExist doesn\u0027t mean that\u0027s all there is to it.\nMaybe use the original error instead of `fs.ErrExist` ?\n\n\n```suggestion\n\t\t\t\treturn errors.Wrapf(err, token.NoPos, \"error writing %q\", path)\n```",
+      "revId": "abdaab24ceb7d1e9b6f6f61578c45662cc2b5e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

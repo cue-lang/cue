@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2e20606_001209b4",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 1981,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-13T10:27:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "891dfd8e_e477e424",
+      "revId": "454b08aeefa07f042a36c29a346bd55fbb5b6de0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a8e1c47b_00e172b3",
@@ -48,6 +66,24 @@
       "writtenOn": "2026-01-12T15:23:17Z",
       "side": 1,
       "message": "I\u0027d expect this type assert as part of the type switch below",
+      "revId": "454b08aeefa07f042a36c29a346bd55fbb5b6de0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5364e23d_93861749",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 1990,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-13T10:27:10Z",
+      "side": 1,
+      "message": "Ugh, sorry - brain fart. This entire `if` block isn\u0027t needed. Done.",
+      "parentUuid": "a8e1c47b_00e172b3",
       "revId": "454b08aeefa07f042a36c29a346bd55fbb5b6de0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0f014dc_1a693604",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 2003,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-13T10:27:10Z",
+      "side": 1,
+      "message": "Err, I\u0027m taking the opposite view really - the last thing we want is for users to find the LSP crashing if eg they\u0027re using experimental features. For example, the new alias syntax is not supported by the LSP - there was no coordination or attempt made to add support to the LSP before that experiment got released and I\u0027ve not got around to it yet.",
+      "parentUuid": "df833529_c1c1e005",
+      "revId": "454b08aeefa07f042a36c29a346bd55fbb5b6de0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e52079fb_8d6c253d",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-01-12T15:23:17Z",
       "side": 1,
       "message": "no default case?",
+      "revId": "454b08aeefa07f042a36c29a346bd55fbb5b6de0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb785530_d555a876",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 2018,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-13T10:27:10Z",
+      "side": 1,
+      "message": "yeah same logic - if we can\u0027t extract field names / aliases then we ignore it.",
+      "parentUuid": "e52079fb_8d6c253d",
       "revId": "454b08aeefa07f042a36c29a346bd55fbb5b6de0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

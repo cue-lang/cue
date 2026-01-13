@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b195a102_c9b1b192",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 1559,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-13T12:57:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a066bb8c_2b09ff2d",
+      "revId": "454b08aeefa07f042a36c29a346bd55fbb5b6de0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "891dfd8e_e477e424",

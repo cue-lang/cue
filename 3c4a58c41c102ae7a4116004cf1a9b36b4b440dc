@@ -210,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1626e3db_b4ac3a62",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 2495,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-13T12:57:31Z",
+      "side": 1,
+      "message": "Well it\u0027s simply that `expanded :\u003d expandNavigables(unexpanded)`. And `expandNavigables` takes a slice and returns a map (well, a set). I could make `expandNavigables` take a map, but the first thing it\u0027d do would be convert it to a slice, so it\u0027s kind a pointless. I\u0027ve added a comment.",
+      "parentUuid": "9c54d618_f55be9e6",
+      "revId": "3c4a58c41c102ae7a4116004cf1a9b36b4b440dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6d2f85f1_411b717d",

@@ -34,6 +34,24 @@
       "parentUuid": "b53f1d65_f2b42d78",
       "revId": "62265bc793eaa96019ab4a2a18972d75bc4435ac",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5a10e25_e5cee742",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-01-13T22:15:12Z",
+      "side": 1,
+      "message": "AFAICS there is nowhere that it says that non-regular files _can_ be overwritten, and I\u0027m not sure it\u0027s obvious from these docs. AFAICS entirely valid interpretation of the docs would be that writing to an existing non-regular file is always an error and that there is no way to force a write to such a file (because `-f` only affects the behaviour with respect to regular files).\n\nPerhaps the docs for `-o` should say that it errors if a regular file exists but not if a non-regular file exists?",
+      "parentUuid": "c850373b_061890fd",
+      "revId": "62265bc793eaa96019ab4a2a18972d75bc4435ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -408,6 +408,8 @@ type Config struct {
 	// package which is embedded (e.g. made from JSON files), as
 	// opposed to being constructed of normal ".cue" files.
 	PackageIsEmbedded bool
+
+	visualiser *Visualiser
 }
 
 func (c *Config) init() {
@@ -523,6 +525,29 @@ func (e *Evaluator) Reset() {
 func (e *Evaluator) ForFile(filename string) *FileEvaluator {
 	e.bootFiles()
 	return e.byFilename[filename]
+}
+
+func (e *Evaluator) EvalAll() {
+	e.bootFiles()
+	worklist := []*navigable{e.pkgFrame.navigable}
+	for len(worklist) > 0 {
+		nav := worklist[0]
+		worklist = worklist[1:]
+		if nav.evaluated {
+			continue
+		}
+
+		nav.eval()
+
+		for _, fr := range nav.frames {
+			for _, childFr := range fr.childFrames {
+				worklist = append(worklist, childFr.navigable)
+			}
+		}
+
+		worklist = slices.AppendSeq(worklist, maps.Keys(nav.resolvesTo))
+		worklist = slices.AppendSeq(worklist, maps.Values(nav.bindings))
+	}
 }
 
 // bootFiles evaluates the top level (root) pkgFrame and its direct
@@ -2253,6 +2278,10 @@ func (f *frame) eval() {
 				remotePkgEvaluator.pkgDecls.recordUsage(attr, fr)
 			}
 		}
+	}
+
+	if vis := f.fileEvaluator.evaluator.config.visualiser; vis != nil {
+		vis.Snapshot()
 	}
 }
 

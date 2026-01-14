@@ -16,6 +16,41 @@
       "message": "Thanks for the review, I was trying to keep changes to the existing logic minimal and missed that the err could just as easily be returned instead of passing the decoder again. LMK if there\u0027s anything else in patchset 11 that looks off.",
       "revId": "8dfa8597634ee6d3dc3331c28b5bcd97f2e503c4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b674e2a6_d26bfffd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-14T09:40:17Z",
+      "side": 1,
+      "message": "Thanks! LGTM except one test change I just noticed.",
+      "parentUuid": "3ecd1727_42689895",
+      "revId": "8dfa8597634ee6d3dc3331c28b5bcd97f2e503c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3321dd1_f8397b07",
+        "filename": "cue/decode_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-14T09:40:17Z",
+      "side": 1,
+      "message": "sorry, I\u0027m not sure how I missed this - this behavior change is incorrect. When using a `json.RawMessage`, and the input being `null`, it should end up as `json.RawMessage(\"null\")` rather than `nil`. The whole point of `json.RawMessage` (or any other `json.Unmarshaler` for that fact) is that it can do whatever it wants with the input JSON, even if it\u0027s null.\n\nI suspect this is because you\u0027ve moved the unmarshaler calls after the null pointer check, which doesn\u0027t seem right.",
+      "revId": "8dfa8597634ee6d3dc3331c28b5bcd97f2e503c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -246,17 +246,17 @@ z: 1
 			)
 			want := []protocol.Location{
 				{
-					URI: rootURI + "/b/b.cue",
-					Range: protocol.Range{
-						Start: protocol.Position{Line: 2, Character: 0},
-						End:   protocol.Position{Line: 2, Character: 2},
-					},
-				},
-				{
 					URI: rootURI + "/b/c/c.cue",
 					Range: protocol.Range{
 						Start: protocol.Position{Line: 4, Character: 0},
 						End:   protocol.Position{Line: 4, Character: 2},
+					},
+				},
+				{
+					URI: rootURI + "/b/b.cue",
+					Range: protocol.Range{
+						Start: protocol.Position{Line: 2, Character: 0},
+						End:   protocol.Position{Line: 2, Character: 2},
 					},
 				},
 			}
@@ -266,7 +266,7 @@ z: 1
 					Start: protocol.Position{Line: 6, Character: 4},
 				},
 			})
-			qt.Assert(t, qt.ContentEquals(locs, want))
+			qt.Assert(t, qt.DeepEquals(locs, want))
 			locs = env.Definition(protocol.Location{
 				URI: rootURI + "/b/c/c.cue",
 				Range: protocol.Range{
@@ -276,7 +276,7 @@ z: 1
 					Start: protocol.Position{Line: 6, Character: 6},
 				},
 			})
-			qt.Assert(t, qt.ContentEquals(locs, want))
+			qt.Assert(t, qt.DeepEquals(locs, want))
 		})
 	})
 
@@ -298,7 +298,7 @@ z: 1
 					Start: protocol.Position{Line: 5, Character: 6},
 				},
 			})
-			qt.Assert(t, qt.ContentEquals(locs, []protocol.Location{
+			qt.Assert(t, qt.DeepEquals(locs, []protocol.Location{
 				{
 					URI: rootURI + "/a/a.cue",
 					// |v1|
@@ -316,7 +316,7 @@ z: 1
 					Start: protocol.Position{Line: 2, Character: 7},
 				},
 			})
-			qt.Assert(t, qt.ContentEquals(locs, []protocol.Location{
+			qt.Assert(t, qt.DeepEquals(locs, []protocol.Location{
 				{
 					URI: rootURI + "/a/a.cue",
 					// package |a|

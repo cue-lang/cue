@@ -148,7 +148,7 @@ import "
 					Start: protocol.Position{Line: 5, Character: 7},
 				},
 			})
-			qt.Assert(t, qt.ContentEquals(locs, []protocol.Location{
+			qt.Assert(t, qt.DeepEquals(locs, []protocol.Location{
 				{
 					URI: cacheURI + "/example.com/foo@v0.0.1/x/y.cue",
 					Range: protocol.Range{

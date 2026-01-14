@@ -174,7 +174,7 @@ func TestReferences(t *testing.T) {
 		}
 
 		gotTo := env.References(from)
-		qt.Assert(t, qt.ContentEquals(gotTo, wantTo), qt.Commentf("from: %#v", from))
+		qt.Assert(t, qt.DeepEquals(gotTo, wantTo), qt.Commentf("from: %#v", from))
 
 		env.Await(
 			// Make sure we did not create a package dontload: that pkg

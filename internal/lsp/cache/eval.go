@@ -66,6 +66,11 @@ func (w *Workspace) Definition(tokFile *token.File, fe *eval.FileEvaluator, srcM
 			Range: r,
 		}
 	}
+
+	slices.SortFunc(locations, func(a, b protocol.Location) int {
+		return rangeStartCompare(srcMapper.URI, a, b)
+	})
+
 	return locations
 }
 
@@ -109,6 +114,10 @@ func (w *Workspace) References(tokFile *token.File, fe *eval.FileEvaluator, srcM
 			Range: r,
 		}
 	}
+
+	slices.SortFunc(locations, func(a, b protocol.Location) int {
+		return rangeStartCompare(srcMapper.URI, a, b)
+	})
 	return locations
 }
 
@@ -135,8 +144,8 @@ func (w *Workspace) Hover(tokFile *token.File, fe *eval.FileEvaluator, srcMapper
 	keys := slices.Collect(maps.Keys(comments))
 	slices.SortFunc(keys, func(a, b ast.Node) int {
 		aPos, bPos := a.Pos().Position(), b.Pos().Position()
-		switch {
-		case aPos.Filename == bPos.Filename:
+		switch c := cmp.Compare(aPos.Filename, bPos.Filename); {
+		case c == 0:
 			return cmp.Compare(aPos.Offset, bPos.Offset)
 		case aPos.Filename == tokFile.Name():
 			// The current file goes last.
@@ -145,7 +154,7 @@ func (w *Workspace) Hover(tokFile *token.File, fe *eval.FileEvaluator, srcMapper
 			// The current file goes last.
 			return -1
 		default:
-			return cmp.Compare(aPos.Filename, bPos.Filename)
+			return c
 		}
 	})
 
@@ -307,4 +316,27 @@ func (w *Workspace) FileEvaluatorForURI(fileUri protocol.DocumentURI, loadAllPkg
 	}
 
 	return tokFile, fe, srcMapper, nil
+}
+
+// rangeStartCompare compares a and b.
+//
+// * If they both come from the same uri, then they are ordered by
+// their range starts.
+// * Otherwise which ever comes from srcUri comes first.
+// * Otherwise they're sorted by uri.
+func rangeStartCompare(srcUri protocol.DocumentURI, a, b protocol.Location) int {
+	switch c := cmp.Compare(a.URI, b.URI); {
+	case c == 0:
+		aStart, bStart := a.Range.Start, b.Range.Start
+		if aStart.Line < bStart.Line || (aStart.Line == bStart.Line && aStart.Character < bStart.Character) {
+			return -1
+		}
+		return 1
+	case a.URI == srcUri:
+		return -1
+	case b.URI == srcUri:
+		return 1
+	default:
+		return c
+	}
 }

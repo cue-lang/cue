@@ -31,7 +31,7 @@ y: x
 					Start: protocol.Position{Line: 1, Character: 3}, // the use of x on the 2nd line
 				},
 			})
-			qt.Assert(t, qt.ContentEquals(locs, []protocol.Location{
+			qt.Assert(t, qt.DeepEquals(locs, []protocol.Location{
 				{
 					URI: rootURI + "/a/a.cue",
 					Range: protocol.Range{

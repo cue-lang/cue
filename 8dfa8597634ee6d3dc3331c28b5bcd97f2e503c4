@@ -87,6 +87,24 @@
       "parentUuid": "74c9b5af_4005c1e1",
       "revId": "8dfa8597634ee6d3dc3331c28b5bcd97f2e503c4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "861a34d9_3570fb97",
+        "filename": "cue/decode_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-14T23:15:13Z",
+      "side": 1,
+      "message": "thanks! indeed I did not understand your previous comment :) LGTM",
+      "parentUuid": "fb1bebc6_7e5ffea2",
+      "revId": "8dfa8597634ee6d3dc3331c28b5bcd97f2e503c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

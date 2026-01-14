@@ -380,6 +380,7 @@ type Evaluator struct {
 	// for import specs that have paths which refer to a particular
 	// ImportPath.
 	importCanonicalisation map[string]ast.ImportPath
+	visualiser             *Visualiser
 }
 
 // New creates and performs initial configuration of a new [Evaluator]
@@ -1966,6 +1967,10 @@ func (f *frame) eval() {
 	}
 	for _, p := range f.childPaths {
 		p.resolvesToChanged(0)
+	}
+
+	if vis := f.fileEvaluator.evaluator.visualiser; vis != nil {
+		vis.Snapshot()
 	}
 }
 

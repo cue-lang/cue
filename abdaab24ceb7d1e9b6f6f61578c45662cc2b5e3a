@@ -16,6 +16,24 @@
       "message": "Just because `err` \"is\" fs.ErrExist doesn\u0027t mean that\u0027s all there is to it.\nMaybe use the original error instead of `fs.ErrExist` ?\n\n\n```suggestion\n\t\t\t\treturn errors.Wrapf(err, token.NoPos, \"error writing %q\", path)\n```",
       "revId": "abdaab24ceb7d1e9b6f6f61578c45662cc2b5e3a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f3e89fa_e16681ba",
+        "filename": "internal/encoding/encoder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-14T13:41:24Z",
+      "side": 1,
+      "message": "this is on purpose, because otherwise the errors are rather repetitive, like:\n\n\u003e error writing \"eval.cue\": open eval.cue: file exists\n\nand the tests show this fairly clearly.\n\nthe os.OpenFile errors tend to be like that; two layers with the top layer describing the operation and filename. hence I think it\u0027s safe to not keep the whole error.",
+      "parentUuid": "08ed4923_43436320",
+      "revId": "abdaab24ceb7d1e9b6f6f61578c45662cc2b5e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

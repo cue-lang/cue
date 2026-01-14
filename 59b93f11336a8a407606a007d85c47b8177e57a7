@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c843536_cf2c7303",
+        "filename": "cmd/cue/cmd/integration/workspace/editing_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-14T17:29:30Z",
+      "side": 1,
+      "message": "b/c/c.cue comes first because it\u0027s the file from which the query is made.",
+      "revId": "59b93f11336a8a407606a007d85c47b8177e57a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdb8878d_a5c058ec",
+        "filename": "internal/lsp/cache/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-14T17:29:30Z",
+      "side": 1,
+      "message": "The sorting of comments is different (kinda opposite) from definitions/usages; and we only can send one text block back to the editor so it\u0027s ordering here internally before we smush all the text together and send it to the editor. The edits here are just to make the code more similar to the code in the new `rangeStartCompare`.",
+      "revId": "59b93f11336a8a407606a007d85c47b8177e57a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

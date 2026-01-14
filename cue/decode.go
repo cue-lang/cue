@@ -89,41 +89,43 @@ func (d *decoder) clear(x reflect.Value) {
 
 var valueType = reflect.TypeFor[Value]()
 
-type unmarshalFunc func(v Value) error
-
-func unmarshalCUE(x Unmarshaler) unmarshalFunc {
-	return func(v Value) error {
-		return x.UnmarshalCUE(v)
-	}
+type valueUnmarshaler interface {
+	unmarshalValue(v Value) error
 }
 
-func unmarshalJSON(x json.Unmarshaler) unmarshalFunc {
-	return func(v Value) error {
-		b, err := v.MarshalJSON()
+type cueUnmarshaler struct{ Unmarshaler }
+
+func (u cueUnmarshaler) unmarshalValue(v Value) error {
+	return u.UnmarshalCUE(v)
+}
+
+type jsonUnmarshaler struct{ json.Unmarshaler }
+
+func (u jsonUnmarshaler) unmarshalValue(v Value) error {
+	b, err := v.MarshalJSON()
+	if err != nil {
+		return err
+	}
+	return u.UnmarshalJSON(b)
+}
+
+type textUnmarshaler struct{ encoding.TextUnmarshaler }
+
+func (u textUnmarshaler) unmarshalValue(v Value) error {
+	switch x := u.TextUnmarshaler.(type) {
+	case *big.Float:
+		f, err := v.Float(nil)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, v.Pos(), "Decode")
 		}
-		return x.UnmarshalJSON(b)
-	}
-}
-
-func unmarshalText(u encoding.TextUnmarshaler) unmarshalFunc {
-	return func(v Value) error {
-		switch x := u.(type) {
-		case *big.Float:
-			if f, err := v.Float(nil); err != nil {
-				return errors.Wrapf(err, v.Pos(), "Decode")
-			} else {
-				*x = *f
-				return nil
-			}
-		default:
-			if b, err := v.Bytes(); err != nil {
-				return errors.Wrapf(err, v.Pos(), "Decode")
-			} else {
-				return u.UnmarshalText(b)
-			}
+		*x = *f
+		return nil
+	default:
+		b, err := v.Bytes()
+		if err != nil {
+			return errors.Wrapf(err, v.Pos(), "Decode")
 		}
+		return u.UnmarshalText(b)
 	}
 }
 
@@ -148,13 +150,14 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 		return
 	}
 
-	unmarshal, x := indirect(x, v.IsNull())
-	if unmarshal != nil {
-		d.addErr(unmarshal(v))
+	unmarshaler, x := indirect(x, v.IsNull())
+	if unmarshaler != nil {
+		d.addErr(unmarshaler.unmarshalValue(v))
 		return
 	}
 
-	switch x.Kind() {
+	kind := x.Kind()
+	switch kind {
 	case reflect.Pointer, reflect.Map, reflect.Slice, reflect.Interface:
 		// nullable types
 		if v.IsNull() || !v.IsConcrete() {
@@ -169,8 +172,6 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 			return
 		}
 	}
-
-	kind := x.Kind()
 
 	if kind == reflect.Interface {
 		value := d.interfaceValue(v)
@@ -879,7 +880,7 @@ func simpleLetterEqualFold(s, t []byte) bool {
 // If it encounters an Unmarshaler, indirect stops and returns that.
 // If decodingNull is true, indirect stops at the first settable pointer so it
 // can be set to nil.
-func indirect(v reflect.Value, decodingNull bool) (unmarshalFunc, reflect.Value) {
+func indirect(v reflect.Value, decodingNull bool) (valueUnmarshaler, reflect.Value) {
 	// Issue #24153 indicates that it is generally not a guaranteed property
 	// that you may round-trip a reflect.Value by calling Value.Addr().Elem()
 	// and expect the value to still be settable for values derived from
@@ -932,15 +933,14 @@ func indirect(v reflect.Value, decodingNull bool) (unmarshalFunc, reflect.Value)
 			v.Set(reflect.New(v.Type().Elem()))
 		}
 		if v.Type().NumMethod() > 0 && v.CanInterface() {
-			if u, ok := v.Interface().(Unmarshaler); ok {
-				return unmarshalCUE(u), v
-			}
-			if u, ok := v.Interface().(json.Unmarshaler); ok {
-				return unmarshalJSON(u), v
-			}
-			if !decodingNull {
-				if u, ok := v.Interface().(encoding.TextUnmarshaler); ok {
-					return unmarshalText(u), v
+			switch u := v.Interface().(type) {
+			case Unmarshaler:
+				return cueUnmarshaler{u}, v
+			case json.Unmarshaler:
+				return jsonUnmarshaler{u}, v
+			case encoding.TextUnmarshaler:
+				if !decodingNull {
+					return textUnmarshaler{u}, v
 				}
 			}
 		}

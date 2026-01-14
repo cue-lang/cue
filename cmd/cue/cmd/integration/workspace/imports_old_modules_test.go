@@ -71,6 +71,6 @@ y: 5
 		}
 
 		gotTo := env.Definition(from)
-		qt.Assert(t, qt.ContentEquals(gotTo, wantTo), qt.Commentf("from: %#v", from))
+		qt.Assert(t, qt.DeepEquals(gotTo, wantTo), qt.Commentf("from: %#v", from))
 	})
 }

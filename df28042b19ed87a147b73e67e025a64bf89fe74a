@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "babc971f_7054a68f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1004381
+      },
+      "writtenOn": "2026-01-14T02:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02fa612d_f6d45bb9",
+      "revId": "df28042b19ed87a147b73e67e025a64bf89fe74a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f67d93a0_b77d92b4",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-01-12T10:19:54Z",
       "side": 1,
       "message": "the caller uses the returned error with `addErr` - so you should consistently return errors here as well. and perhaps we don\u0027t need to pass the decoder at all, given it\u0027s only used for addErr calls?",
+      "revId": "df28042b19ed87a147b73e67e025a64bf89fe74a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac4704dc_e187a690",
+        "filename": "cue/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1004381
+      },
+      "writtenOn": "2026-01-14T02:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f67d93a0_b77d92b4",
       "revId": "df28042b19ed87a147b73e67e025a64bf89fe74a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

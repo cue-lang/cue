@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ecd1727_42689895",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1004381
+      },
+      "writtenOn": "2026-01-14T02:28:10Z",
+      "side": 1,
+      "message": "Thanks for the review, I was trying to keep changes to the existing logic minimal and missed that the err could just as easily be returned instead of passing the decoder again. LMK if there\u0027s anything else in patchset 11 that looks off.",
+      "revId": "8dfa8597634ee6d3dc3331c28b5bcd97f2e503c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -51,6 +51,24 @@
       "message": "sorry, I\u0027m not sure how I missed this - this behavior change is incorrect. When using a `json.RawMessage`, and the input being `null`, it should end up as `json.RawMessage(\"null\")` rather than `nil`. The whole point of `json.RawMessage` (or any other `json.Unmarshaler` for that fact) is that it can do whatever it wants with the input JSON, even if it\u0027s null.\n\nI suspect this is because you\u0027ve moved the unmarshaler calls after the null pointer check, which doesn\u0027t seem right.",
       "revId": "8dfa8597634ee6d3dc3331c28b5bcd97f2e503c4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74c9b5af_4005c1e1",
+        "filename": "cue/decode_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1004381
+      },
+      "writtenOn": "2026-01-14T21:59:08Z",
+      "side": 1,
+      "message": "json.RawMessage is a newtype for byte[], and the json.Unmarshaller implementation for it looks like:\n\n```\n// UnmarshalJSON sets *m to a copy of data.\nfunc (m *RawMessage) UnmarshalJSON(data []byte) error {\n\tif m \u003d\u003d nil {\n\t\treturn errors.New(\"json.RawMessage: UnmarshalJSON on nil pointer\")\n\t}\n\t*m \u003d append((*m)[0:0], data...)\n\treturn nil\n}\n```\n\nSince the uninitialized value for any slice is nil, this means if you just create an empty Unmarshalers() the expected value would be nil (it should actually return an error, should probably check that test case further).",
+      "parentUuid": "d3321dd1_f8397b07",
+      "revId": "8dfa8597634ee6d3dc3331c28b5bcd97f2e503c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -52,6 +52,24 @@
       "parentUuid": "c850373b_061890fd",
       "revId": "62265bc793eaa96019ab4a2a18972d75bc4435ac",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2fd565d_12649624",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-14T13:37:54Z",
+      "side": 1,
+      "message": "the docs for `-o` are already rather long, so I\u0027m skeptical to make them even longer. can you please suggest what wording you prefer in the form of a patch?\n\nI don\u0027t claim that my change here is perfect, just an improvement over what we already had.",
+      "parentUuid": "f5a10e25_e5cee742",
+      "revId": "62265bc793eaa96019ab4a2a18972d75bc4435ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

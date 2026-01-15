@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dffb4d88_44655b01",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-15T09:11:28Z",
+      "side": 1,
+      "message": "I\u0027d personally add a very short reminder about this reasoning above the sort calls, because in the future a clever developer might notice that everything still works OK without the sorting, and think it\u0027s unnecessary :)",
+      "revId": "f0b286d3461803e64cf0d6fc889d4c0f954d06fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

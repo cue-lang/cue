@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "884b249d_771328f2",
+        "filename": "cmd/cue/cmd/integration/workspace/editing_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-15T09:11:28Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8c843536_cf2c7303",
+      "revId": "59b93f11336a8a407606a007d85c47b8177e57a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdb8878d_a5c058ec",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-01-14T17:29:30Z",
       "side": 1,
       "message": "The sorting of comments is different (kinda opposite) from definitions/usages; and we only can send one text block back to the editor so it\u0027s ordering here internally before we smush all the text together and send it to the editor. The edits here are just to make the code more similar to the code in the new `rangeStartCompare`.",
+      "revId": "59b93f11336a8a407606a007d85c47b8177e57a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32ed7790_dc73999a",
+        "filename": "internal/lsp/cache/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-15T09:11:28Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "cdb8878d_a5c058ec",
       "revId": "59b93f11336a8a407606a007d85c47b8177e57a7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

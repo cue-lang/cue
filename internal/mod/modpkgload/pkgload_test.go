@@ -49,7 +49,7 @@ func TestLoadPackages(t *testing.T) {
 					qt.Assert(t, qt.IsTrue(ok))
 					defaultMajorVersions[p] = v
 				}
-				initialRequirements := modrequirements.NewRequirements(mainModulePath, reg, moduleVersions, defaultMajorVersions)
+				initialRequirements := modrequirements.NewRequirements(mainModulePath, reg, moduleVersions, defaultMajorVersions, nil)
 
 				rootPackages := strings.Fields(readTestFile("root-packages"))
 				want := readTestFile("want")

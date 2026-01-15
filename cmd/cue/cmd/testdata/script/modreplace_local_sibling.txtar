@@ -1,0 +1,55 @@
+# Test local path replace directives with sibling directory (../)
+
+# Create the sibling directory structure
+mkdir sibling-dep
+mkdir sibling-dep/cue.mod
+cp sibling-module.cue sibling-dep/cue.mod/module.cue
+cp sibling-lib.cue sibling-dep/lib.cue
+
+# Run from the main directory
+cd main
+
+# Test that cue mod tidy works with sibling path replacements
+exec cue mod tidy
+cmp cue.mod/module.cue want-module.cue
+
+# Test that cue eval uses the sibling replacement
+exec cue eval .
+cmp stdout want-eval.txt
+
+-- sibling-module.cue --
+module: "example.com/sibling@v0"
+language: version: "v0.9.0"
+-- sibling-lib.cue --
+package lib
+
+value: "from sibling directory"
+-- main/cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.9.0"
+
+deps: {
+    "example.com/sibling@v0": {
+        v: "v0.1.0"
+        replace: "../sibling-dep"
+    }
+}
+-- main/main.cue --
+package main
+
+import "example.com/sibling@v0:lib"
+
+output: lib.value
+-- main/want-eval.txt --
+output: "from sibling directory"
+-- main/want-module.cue --
+module: "example.com/main@v0"
+language: {
+	version: "v0.9.0"
+}
+deps: {
+	"example.com/sibling@v0": {
+		v:       "v0.1.0"
+		replace: "../sibling-dep"
+	}
+}

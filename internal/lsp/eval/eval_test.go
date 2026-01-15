@@ -3798,6 +3798,67 @@ package a
 		},
 
 		{
+			name: "Resolve_Import_Embed",
+			archive: `-- a.cue --
+package a
+-- b.cue --
+package b
+
+import "a"
+
+y: z(a)
+-- c.cue --
+package a
+-- d.cue --
+package d
+
+import x "a"
+import "a"
+
+y: a / true
+`,
+			expectDefinitions: map[position][]position{
+				fln("b.cue", 3, 1, `"a"`): {fln("a.cue", 1, 3, "a"), fln("c.cue", 1, 3, "a")},
+				fln("b.cue", 5, 1, "a"):   {fln("b.cue", 3, 1, `"a"`)},
+
+				fln("d.cue", 3, 1, "x"):   {fln("a.cue", 1, 3, "a"), fln("c.cue", 1, 3, "a")},
+				fln("d.cue", 4, 1, `"a"`): {fln("a.cue", 1, 3, "a"), fln("c.cue", 1, 3, "a")},
+				fln("d.cue", 6, 1, "a"):   {fln("d.cue", 3, 1, "x"), fln("d.cue", 4, 1, `"a"`)},
+
+				fln("a.cue", 1, 3, "a"): {self, fln("c.cue", 1, 3, "a")},
+				fln("b.cue", 1, 1, "b"): {self},
+				fln("c.cue", 1, 3, "a"): {self, fln("a.cue", 1, 3, "a")},
+				fln("d.cue", 1, 1, "d"): {self},
+
+				fln("b.cue", 5, 1, "y"): {self},
+				fln("d.cue", 6, 1, "y"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				orf("b.cue", 10, 18): {f: []string{"y"}},
+				orf("b.cue", 18, 22): {e: []string{"a", "y"}},
+				orf("b.cue", 22, 25): {f: []string{"y"}},
+				orf("b.cue", 25, 31): {e: []string{"a", "y"}},
+
+				orf("d.cue", 10, 18): {f: []string{"y"}},
+				orf("d.cue", 18, 24): {e: []string{"a", "x", "y"}},
+				orf("d.cue", 24, 31): {f: []string{"y"}},
+				orf("d.cue", 31, 35): {e: []string{"a", "x", "y"}},
+				orf("d.cue", 35, 38): {f: []string{"y"}},
+				orf("d.cue", 38, 43): {e: []string{"a", "x", "y"}},
+				orf("d.cue", 47, 48): {e: []string{"a", "x", "y"}},
+			},
+
+			expectUsagesExtra: map[position]map[bool][]position{
+				fln("b.cue", 3, 1, `"a"`): {true: []position{self}},
+				fln("d.cue", 3, 1, "x"):   {true: []position{self, fln("d.cue", 4, 1, `"a"`)}},
+				fln("d.cue", 4, 1, `"a"`): {true: []position{self, fln("d.cue", 3, 1, "x")}},
+			},
+			importedBy: map[string][]string{
+				"a": {"b", "d"},
+			},
+		},
+
+		{
 			name: "Resolve_Import_Repeated",
 			archive: `-- a.cue --
 package a
@@ -4373,14 +4434,13 @@ func (tcs testCases) run(t *testing.T) {
 			}
 
 			analyse := func() testCaseAnalysis {
-				evalByFilename := make(map[string]*eval.FileEvaluator)
+				evalByFilename := make(map[string]*eval.Evaluator)
 				evalByPkgName := make(map[string]*eval.Evaluator)
 				forPackage := func(importPath ast.ImportPath) *eval.Evaluator {
 					return evalByPkgName[importPath.String()]
 				}
 				importCanonicalisation := make(map[string]ast.ImportPath)
 				analysis := testCaseAnalysis{
-					evalByPkgName:  evalByPkgName,
 					evalByFilename: evalByFilename,
 				}
 
@@ -4398,7 +4458,7 @@ func (tcs testCases) run(t *testing.T) {
 					eval := eval.New(ip, importCanonicalisation, forPackage, pkgImporters, files...)
 					evalByPkgName[pkgName] = eval
 					for _, fileAst := range files {
-						evalByFilename[fileAst.Filename] = eval.ForFile(fileAst.Filename)
+						evalByFilename[fileAst.Filename] = eval
 					}
 				}
 				return analysis
@@ -4414,8 +4474,7 @@ func (tcs testCases) run(t *testing.T) {
 }
 
 type testCaseAnalysis struct {
-	evalByPkgName  map[string]*eval.Evaluator
-	evalByFilename map[string]*eval.FileEvaluator
+	evalByFilename map[string]*eval.Evaluator
 }
 
 func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, analysis testCaseAnalysis) {
@@ -4425,7 +4484,7 @@ func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, analysis te
 
 		for posFrom, positionsWant := range tc.expectDefinitions {
 			filename := posFrom.filename
-			fileEval := evalByFilename[filename]
+			fileEval := evalByFilename[filename].ForFile(filename)
 			qt.Check(t, qt.IsNotNil(fileEval))
 
 			offset := posFrom.offset
@@ -4457,7 +4516,7 @@ func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, analysis te
 		// expectations, resolve to nothing.
 		for _, fileAst := range files {
 			filename := fileAst.Filename
-			fileEval := evalByFilename[filename]
+			fileEval := evalByFilename[filename].ForFile(filename)
 			for i := range fileAst.Pos().File().Content() {
 				if ranges.Contains(filename, i) {
 					continue
@@ -4529,8 +4588,9 @@ func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCas
 			if slices.Contains(posDfns, self) {
 				continue
 			} else if strings.HasSuffix(posUse.str, `"]`) {
-				// If posUse ends with "] then we assume it's a dynamic
-				// index into a struct. These can be inverted. E.g.
+				// If posUse ends with "] then we assume it's a const
+				// string dynamic index into a struct. These can be
+				// inverted. E.g.
 				//
 				//	{"g": 13}["g"]
 				//
@@ -4608,12 +4668,6 @@ func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCas
 
 		declarations := make(map[position][]position)
 		for posUse, posDfns := range tc.expectDefinitions {
-			// Package-declarations are slightly special and so we have
-			// to make sure they are not treated as declarations for our
-			// purposes here.
-			if posUse.offset == 8 && strings.HasPrefix(posUse.content, "package ") {
-				continue
-			}
 			posDfns := slices.Clone(posDfns)
 			for i, posDfn := range posDfns {
 				if posDfn == self { // this must be a field declaration
@@ -4684,7 +4738,7 @@ func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCas
 
 			for posUse, positionsWant := range expectUsages {
 				filename := posUse.filename
-				fe := analysis.evalByFilename[filename]
+				fe := analysis.evalByFilename[filename].ForFile(filename)
 				qt.Assert(t, qt.IsNotNil(fe))
 
 				fileOffsetsWant := make([]fileOffset, len(positionsWant))
@@ -4727,7 +4781,7 @@ func (tc *testCase) testCompletions(t *testing.T, files []*ast.File, analysis te
 			slices.Sort(fieldCompletionWant)
 			slices.Sort(embedCompletionWant)
 			filename := curRange.filename
-			fe := evalByFilename[filename]
+			fe := evalByFilename[filename].ForFile(filename)
 			qt.Check(t, qt.IsNotNil(fe))
 
 			ranges.Add(filename, curRange.from, curRange.to)
@@ -4756,7 +4810,7 @@ func (tc *testCase) testCompletions(t *testing.T, files []*ast.File, analysis te
 		// expectations, complete to nothing.
 		for _, fileAst := range files {
 			filename := fileAst.Filename
-			fe := evalByFilename[filename]
+			fe := evalByFilename[filename].ForFile(filename)
 
 			for i := range fileAst.Pos().File().Content() {
 				if ranges.Contains(filename, i) {
@@ -4769,10 +4823,10 @@ func (tc *testCase) testCompletions(t *testing.T, files []*ast.File, analysis te
 	})
 }
 
-func (tc *testCase) dumpCompletions(t *testing.T, files []*ast.File, evalByFilename map[string]*eval.FileEvaluator) {
+func (tc *testCase) dumpCompletions(t *testing.T, files []*ast.File, evalByFilename map[string]*eval.Evaluator) {
 	for _, fileAst := range files {
 		filename := fileAst.Filename
-		fe := evalByFilename[filename]
+		fe := evalByFilename[filename].ForFile(filename)
 		content := fileAst.Pos().File().Content()
 
 		var strs []string

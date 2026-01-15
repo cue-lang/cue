@@ -2564,6 +2564,25 @@ func (p *path) resolvesToChanged(i int) {
 		components[i+1].unexpanded = unexpanded
 		if pc.node != nil {
 			for _, nav := range unexpanded {
+				// We eval import specs in two stages (see [frame.eval])
+				// so that we delay booting remote pkg evals as long as
+				// possible. Because of this, if we resolve an ident to an
+				// import spec, we must eval it "early" otherwise use of
+				// the remote pkg may not be recorded correct. E.g.
+				//
+				//	package a
+				//	import "b"
+				//	c: b
+				//
+				// When resolving the path b on line 3, if we don't eval
+				// the import spec here, we would never record that pkg b
+				// is used by pkg a.
+				for _, fr := range nav.frames {
+					if _, ok := fr.node.(*ast.ImportSpec); ok {
+						nav.eval()
+						break
+					}
+				}
 				nav.recordUsage(pc.node, p.frame)
 			}
 		}

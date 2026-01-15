@@ -947,6 +947,19 @@ func usages(navsWorklist []*navigable) {
 			for parent := nav; parent != nil; child, parent = parent, parent.parent {
 				if parent == pkgNav {
 					isExported = true
+					if child != nil {
+						for _, fr := range nav.frames {
+							if _, ok := fr.node.(*ast.ImportSpec); ok {
+								// We're looking for usages of an imported pkg
+								// within the current pkg. Imports do not
+								// automatically get re-exported by a package,
+								// so although we've reached the pkgNav, this
+								// import spec is not exported.
+								isExported = false
+								break
+							}
+						}
+					}
 				}
 				evalWorklist = []*navigable{parent}
 				if child == nil {

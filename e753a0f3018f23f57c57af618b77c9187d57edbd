@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2895aed9_d8d74dc5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-15T12:45:21Z",
+      "side": 1,
+      "message": "nit: if you indent (with tabs or four spaces) it still results in a markdown code block, but looks much nicer in plaintext, which is what most of our usage of git commits is like.",
+      "revId": "e753a0f3018f23f57c57af618b77c9187d57edbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

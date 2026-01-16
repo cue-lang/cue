@@ -6,7 +6,9 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	"cuelang.org/go/internal/lsp/rangeset"
 	"github.com/go-quicktest/qt"
+	"golang.org/x/tools/txtar"
 )
 
 func TestEmbedSimple(t *testing.T) {
@@ -262,5 +264,149 @@ out: _ @embed(glob=data/*.json)
 			// And the downstream will get reloaded.
 			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
+	})
+}
+
+func TestEmbedHover(t *testing.T) {
+	const files = `
+-- cue.mod/module.cue --
+module: "mod.example/x"
+language: version: "v0.16.0"
+
+-- a.cue --
+@extern(embed)
+package a
+
+out: s @embed(file=data/file.json)
+
+out: field: {
+  // does the field contain cows?
+  cows: bool
+}
+
+glob: {"data/d1.json": s} @embed(glob=data/d*.json)
+-- b.cue --
+package a
+
+s: {
+  // how many fields do we have?
+  fieldCount: int
+}
+
+s: field: {
+  // does the field contain sheep?
+  sheep: bool
+}
+-- data/file.json --
+{
+  "field": {
+    "sheep": true,
+    "cows": false
+  },
+  "fieldCount": "wrong"
+}
+-- data/d1.json --
+{
+  "field": {
+    "sheep": false,
+    "cows": true
+  },
+  "fieldCount": 6
+}
+-- data/d2.json --
+{
+  "field": {
+    "cows": false
+  },
+  "fieldCount": -1
+}
+`
+
+	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+		rootURI := env.Sandbox.Workdir.RootURI()
+
+		env.OpenFile("data/file.json")
+		env.OpenFile("data/d1.json")
+		env.OpenFile("data/d2.json")
+		env.Await(
+			env.DoneWithOpen(),
+			LogMatching(protocol.Debug, fmt.Sprintf(`Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Created`, rootURI), 3, false),
+			LogMatching(protocol.Debug, fmt.Sprintf(`Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Reloaded`, rootURI), 3, false),
+		)
+
+		mappers := make(map[string]*protocol.Mapper)
+		for _, file := range txtar.Parse([]byte(files)).Files {
+			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
+			mappers[file.Name] = mapper
+		}
+
+		testCases := map[position]string{
+			fln("data/file.json", 3, 1, `sheep`): fmt.Sprintf(`
+does the field contain sheep?
+([b.cue line 10](%s/b.cue#L10))`[1:],
+				rootURI),
+			fln("data/file.json", 4, 1, `cows`): fmt.Sprintf(`
+does the field contain cows?
+([a.cue line 8](%s/a.cue#L8))`[1:],
+				rootURI),
+			fln("data/file.json", 6, 1, `fieldCount`): fmt.Sprintf(`
+how many fields do we have?
+([b.cue line 5](%s/b.cue#L5))`[1:],
+				rootURI),
+
+			fln("data/d1.json", 3, 1, `sheep`): fmt.Sprintf(`
+does the field contain sheep?
+([b.cue line 10](%s/b.cue#L10))`[1:],
+				rootURI),
+			fln("data/d1.json", 6, 1, `fieldCount`): fmt.Sprintf(`
+how many fields do we have?
+([b.cue line 5](%s/b.cue#L5))`[1:],
+				rootURI),
+		}
+
+		ranges := rangeset.NewFilenameRangeSet()
+
+		for p, expectation := range testCases {
+			p.determinePos(mappers)
+			// it's len(p.str)+1 because we want to go from the cursor
+			// before the start of the str up to cursor after the end of
+			// str. So |str to str|
+			strLen := len(p.str) + 1
+			ranges.Add(p.filename, p.offset, p.offset+strLen)
+			for i := range strLen {
+				pos := p.pos
+				pos.Character += uint32(i)
+				got, _ := env.Hover(protocol.Location{
+					URI:   p.mapper.URI,
+					Range: protocol.Range{Start: pos},
+				})
+				qt.Assert(t, qt.Equals(got.Value, expectation), qt.Commentf("%v(+%d)", p, i))
+			}
+		}
+
+		// Test that all offsets not explicitly mentioned in
+		// expectations, have no hovers (for the open files only).
+		for filename, mapper := range mappers {
+			if !env.Editor.HasBuffer(filename) {
+				continue
+			}
+			for i := range len(mapper.Content) {
+				if ranges.Contains(filename, i) {
+					continue
+				}
+				pos, err := mapper.OffsetPosition(i)
+				if err != nil {
+					t.Fatal(err)
+				}
+				got, _ := env.Hover(protocol.Location{
+					URI: mapper.URI,
+					Range: protocol.Range{
+						Start: pos,
+					},
+				})
+				qt.Assert(t, qt.IsNil(got), qt.Commentf("%v:%v (0-based)", filename, pos))
+			}
+		}
+
 	})
 }

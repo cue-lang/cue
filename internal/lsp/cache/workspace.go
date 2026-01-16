@@ -224,7 +224,7 @@ func (w *Workspace) FileWatchingGlobPatterns(ctx context.Context) map[protocol.R
 		for _, wfDir := range wfDirs {
 			// NB: a.Encloses(b) returns true if a == b
 			if wfDir.Encloses(activeDir) {
-				patterns[protocol.RelativePattern{Pattern: protocol.Pattern(activeDir)}] = struct{}{}
+				patterns[protocol.RelativePattern{Pattern: filepath.ToSlash(activeDir.Path())}] = struct{}{}
 				break
 			}
 		}
@@ -911,29 +911,90 @@ func (w *Workspace) reloadPackages() {
 			pkg := pkgModPkg.pkg
 			m := pkg.module
 
-			if len(pkg.dirURIs) != 1 { // old module system
-				continue
-			}
-			for descendentPkg := range m.descendantCuePackages(pkg.importPath) {
-				key.importPath = descendentPkg.importPath
-				if _, loaded := processedPkgs[key]; loaded {
+			if pkg.isCue {
+				// embeddings are "upstream" packages. The package will
+				// have expanded every embed attribute to a set of
+				// fileUris. We now need to try to find a package for each
+				// such fileUri.
+				for _, embedding := range pkg.embeddings {
+					for _, embedded := range embedding.results {
+						if embedded.pkg != nil {
+							continue
+						}
+						ip, dirUris, err := m.FindImportPathForFile(embedded.fileUri)
+						if err != nil || ip == nil || len(dirUris) == 0 {
+							continue
+						}
+						key.importPath = *ip
+						if _, loaded := processedPkgs[key]; loaded {
+							continue
+						}
+						pkg := m.EnsurePackage(*ip, dirUris)
+						// If pkg is dirty, it's probably because it's only
+						// just been created, so it'll need fully loading.
+						repeatReload = repeatReload || pkg.isDirty
+					}
+				}
+				if len(pkg.dirURIs) != 1 { // old module system
 					continue
 				}
-				// We can be here if: two packages already exist where
-				// one is the ancestor of the other, and a new file
-				// appears which adds to the ancestor
-				// package. Processing that new file will mark the
-				// ancestor as dirty, but not the descendent. So we
-				// deal with that situation here.
-				for _, file := range pkg.files {
-					descendentPkg.markFileDirty(file.uri)
+				for descendentPkg := range m.descendantCuePackages(pkg.importPath) {
+					key.importPath = descendentPkg.importPath
+					if _, loaded := processedPkgs[key]; loaded {
+						continue
+					}
+					// We can be here if: two packages already exist where
+					// one is the ancestor of the other, and a new file
+					// appears which adds to the ancestor
+					// package. Processing that new file will mark the
+					// ancestor as dirty, but not the descendent. So we
+					// deal with that situation here.
+					for _, file := range pkg.files {
+						descendentPkg.markFileDirty(file.uri)
+					}
+					repeatReload = true
 				}
-				repeatReload = true
+
+			} else {
+				// pkg is a non-cue pkg. We look through all cue pkgs
+				// which could possibly embed pkg.
+				for ascendantPkg := range m.ascendantCuePackages(pkg) {
+					key.importPath = ascendantPkg.importPath
+					if _, loaded := processedPkgs[key]; loaded {
+						continue
+					}
+					for fileUri := range pkg.files {
+						if ascendantPkg.matchesUnknownEmbedding(fileUri) {
+							// ascendantPkg has not just been reloaded, and
+							// it should embed pkg, but it doesn't. So it
+							// needs to be reloaded. This happens when pkg is
+							// created by a new (e.g. json-) file appearing,
+							// and ascendantPkg contains a suitable glob
+							// embed. This is where embed attributes (with
+							// globs) are very different to import specs: a
+							// glob embed attribute (essentially) represents
+							// a set of packages to embed, and that set can
+							// change as files are added to, or deleted from,
+							// the file system.
+							ascendantPkg.markDirty()
+							repeatReload = true
+							break
+						}
+					}
+				}
 			}
 		}
 
 		if !repeatReload {
 			break
+		}
+	}
+
+	// Finally, ask all packages to look up and link with any packages
+	// that they embed.
+	for _, m := range modules {
+		for _, pkg := range m.packages {
+			pkg.linkWithEmbeddedFiles()
 		}
 	}
 }

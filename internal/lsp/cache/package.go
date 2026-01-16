@@ -18,8 +18,12 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/interpreter/embed"
+	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/eval"
 	"cuelang.org/go/internal/mod/modpkgload"
@@ -48,6 +52,21 @@ type packageOrModule interface {
 	activeFilesAndDirs(files map[protocol.DocumentURI][]packageOrModule, dirs map[protocol.DocumentURI]struct{})
 }
 
+// embedding couples an [embed.Embed] embed attribute with the results
+// of its expansion.
+type embedding struct {
+	*embed.Embed
+	results []*embeddingResult
+}
+
+type embeddingResult struct {
+	// fileUri is immutable.
+	fileUri protocol.DocumentURI
+	// pkg may be nil for example if an embed attribute specifies a
+	// file which does not exist. It may later be updated to non-nil.
+	pkg *Package
+}
+
 // Package models a single CUE package within a CUE module.
 type Package struct {
 	// immutable fields: all set at construction only
@@ -74,12 +93,23 @@ type Package struct {
 	// imports contains the packages that are imported by this package.
 	imports []*Package
 
+	// embeddedBy contains the packages that directly embed this package.
+	embeddedBy []*Package
+
+	// embeddings contain the expansion of embed attributes extracted
+	// from the files within this package.
+	embeddings map[token.Pos]*embedding
+
 	// isDirty means that the package needs reloading.
 	isDirty bool
 
 	// eval for the files in this package. This is updated
 	// whenever the package status transitions to splendid.
 	eval *eval.Evaluator
+
+	// isCue records whether this package is made of regular ".cue"
+	// files. If false, this is a package that could be embedded.
+	isCue bool
 
 	// files contains the files that make up this package.
 	files map[protocol.DocumentURI]*File
@@ -135,6 +165,30 @@ func (pkg *Package) markDirty() {
 	pkg.isDirty = true
 }
 
+// matchesUnknownEmbedding reports whether the current pkg should
+// embed, but does not currently, the given fileUri.
+//
+// For example, if this pkg has an embed that uses a glob, and some
+// time after this pkg is loaded, new file is created which also
+// matches the glob, then this will method would return true.
+func (pkg *Package) matchesUnknownEmbedding(fileUri protocol.DocumentURI) bool {
+	filepath, wasCut := strings.CutPrefix(string(fileUri), string(pkg.module.rootURI)+"/")
+	if !wasCut {
+		return false
+	}
+	for _, embedding := range pkg.embeddings {
+		if embedding.Matches(filepath) {
+			for _, embedded := range embedding.results {
+				if embedded.fileUri == fileUri {
+					return false
+				}
+			}
+			return true
+		}
+	}
+	return false
+}
+
 // resetEval resets the package's own evaluator. If recursive is true,
 // it also resets the evaluators of every upstream and downstream
 // evaluator that could possibly contain objects (frames, navigables
@@ -156,8 +210,19 @@ func (pkg *Package) resetEval(recursive bool) {
 		worklist = append(worklist[1:], importedPkg.imports...)
 	}
 
-	// downstream - packages that import us
-	worklist = pkg.importedBy
+	// upstream - files/pkgs we embed - no need for transitive
+	// treatment because an embedded pkg cannot embed or import
+	// anything.
+	for _, embedding := range pkg.embeddings {
+		for _, embedded := range embedding.results {
+			if embeddedPkg := embedded.pkg; embeddedPkg != nil {
+				embeddedPkg.resetEval(false)
+			}
+		}
+	}
+
+	// downstream - packages that import (or embed) us
+	worklist = append(pkg.importedBy, pkg.embeddedBy...)
 	for len(worklist) > 0 {
 		pkg := worklist[0]
 		pkg.resetEval(false)
@@ -174,12 +239,15 @@ func (pkg *Package) delete() {
 
 	files := pkg.files
 	imports := pkg.imports
+	embeddings := pkg.embeddings
 
 	// wipe out our own state so that anyone with a reference back to
 	// us will act on empty state if they call any methods on us.
 	pkg.files = nil
 	pkg.imports = nil
+	pkg.embeddings = nil
 	pkg.importedBy = nil
+	pkg.embeddedBy = nil
 
 	w := m.workspace
 	for fileUri := range files {
@@ -190,6 +258,15 @@ func (pkg *Package) delete() {
 	// upstream - packages we import
 	for _, importedPkg := range imports {
 		importedPkg.RemoveImportedBy(pkg)
+	}
+
+	// upstream - files/pkgs we embed
+	for _, embedding := range embeddings {
+		for _, embedded := range embedding.results {
+			if embeddedPkg := embedded.pkg; embeddedPkg != nil {
+				embeddedPkg.RemoveEmbeddedBy(pkg)
+			}
+		}
 	}
 
 	w.debugLogf("%v Deleted", pkg)
@@ -226,6 +303,14 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		importedPkg.RemoveImportedBy(pkg)
 	}
 
+	for _, embedding := range pkg.embeddings {
+		for _, embedded := range embedding.results {
+			if embeddedPkg := embedded.pkg; embeddedPkg != nil {
+				embeddedPkg.RemoveEmbeddedBy(pkg)
+			}
+		}
+	}
+
 	importCanonicalisation := make(map[string]ast.ImportPath)
 	importCanonicalisation[modpkg.ImportPath()] = pkg.importPath
 	importCanonicalisation[ast.ParseImportPath(modpkg.ImportPath()).Canonical().String()] = pkg.importPath
@@ -248,11 +333,15 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	modpkgFiles := modpkg.Files()
 	evalASTs := make([]*ast.File, len(modpkgFiles))
 	filesSet := make(map[protocol.DocumentURI]*File, len(modpkgFiles))
+	isCue := true
+	var embeddings map[token.Pos]*embedding
 
 	for i, modpkgFile := range modpkgFiles {
 		evalASTs[i] = modpkgFile.Syntax
 		fileUri := m.rootURI + protocol.DocumentURI("/"+modpkgFile.FilePath)
 		delete(m.dirtyFiles, fileUri)
+
+		isCue = isCue && strings.HasSuffix(string(fileUri), ".cue")
 
 		file := w.ensureFile(fileUri)
 		filesSet[fileUri] = file
@@ -264,9 +353,59 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 			errs = append(errs, modpkgFile.SyntaxError)
 		}
 
+		if isCue && syntax != nil {
+			// embedded files are "upstream" of us, in the same way that
+			// imported packages are upstream. modpkgload discovers the
+			// import graph for a given package. This includes all
+			// (transitively) imported upstream packages, but no
+			// downstream packages. We take the same approach for embeds,
+			// so here we take a snapshot in time of the file system,
+			// expanding embed attributes to file paths. Later on,
+			// [Package.linkWithEmbeddedFiles] will be called which will
+			// enable us to link these file paths to any packages which
+			// have been found and loaded.
+			//
+			// There is one key difference between imported packages and
+			// embedded packages: a glob embed attribute expands to
+			// several packages, and so this can change over time as
+			// files are added and removed from the file system. This is
+			// not possible with imported packages: an import spec always
+			// refers to exactly one package.
+			attrsByField, err := runtime.ExtractFieldAttrsByKind(syntax, embedKind)
+			if err != nil {
+				errs = append(errs, err)
+			}
+			embeddedPaths, err := embed.EmbeddedPaths(modpkgFile.FilePath, attrsByField)
+			if err != nil {
+				errs = append(errs, err)
+			}
+			if len(embeddedPaths) > 0 {
+				if embeddings == nil {
+					embeddings = make(map[token.Pos]*embedding)
+				}
+				fs := w.overlayFS.IoFS(m.rootURI.Path())
+				for _, embed := range embeddedPaths {
+					matches, err := embed.MatchAll(fs)
+					if err != nil {
+						errs = append(errs, err)
+						continue
+					}
+					embedding := &embedding{Embed: embed}
+					embeddings[embed.Attribute.Pos] = embedding
+					for _, filePath := range matches {
+						embedding.results = append(embedding.results, &embeddingResult{
+							fileUri: m.rootURI + "/" + protocol.DocumentURI(filePath),
+						})
+					}
+				}
+			}
+		}
+
 		file.ensureUser(pkg, errs...)
 		w.standalone.deleteFile(fileUri)
 	}
+	pkg.isCue = isCue
+	pkg.embeddings = embeddings
 
 	for fileUri, file := range oldFilesSet {
 		if _, found := filesSet[fileUri]; !found {
@@ -282,6 +421,9 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		ImportCanonicalisation: importCanonicalisation,
 		ForPackage:             pkg.forPackage,
 		PkgImporters:           pkg.pkgImporters,
+		ForEmbedAttribute:      pkg.forEmbedAttribute,
+		PkgEmbedders:           pkg.pkgEmbedders,
+		PackageIsEmbedded:      !isCue,
 	}
 
 	// eval.New does almost no work - calculation of resolutions is
@@ -289,6 +431,35 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	pkg.eval = eval.New(config, evalASTs...)
 
 	return nil
+}
+
+var embedKind = embed.New().Kind()
+
+// linkWithEmbeddedFiles works through the pkg's embeddings,
+// populating existing expansions of embed attributes with their
+// corresponding package, on a best-effort basis.
+func (pkg *Package) linkWithEmbeddedFiles() {
+	activeFiles, _ := pkg.module.workspace.activeFilesAndDirs()
+
+	for _, embedding := range pkg.embeddings {
+		for _, embedded := range embedding.results {
+			fileUri := embedded.fileUri
+			if embedded.pkg != nil {
+				continue
+			}
+
+			remotePkgs := activeFiles[fileUri]
+			if len(remotePkgs) == 0 {
+				continue
+			}
+			if l := len(remotePkgs); l > 1 {
+				panic(fmt.Sprintf("Invariant failure: embedded file %q has %d packages. Must only have 1.", fileUri, l))
+			}
+			remotePkg := remotePkgs[0].(*Package)
+			embedded.pkg = remotePkg
+			remotePkg.EnsureEmbeddedBy(pkg)
+		}
+	}
 }
 
 // forPackage is a callback for the evaluator. See
@@ -316,6 +487,60 @@ func (pkg *Package) pkgImporters() []*eval.Evaluator {
 	return evals
 }
 
+// forEmbedAttribute is a callback for the evaluator. See
+// [eval.Config.ForEmbedAttribute]
+func (pkg *Package) forEmbedAttribute(attrPos token.Pos) (*embed.Embed, []*eval.Evaluator) {
+	if !pkg.isCue {
+		return nil, nil
+	}
+
+	// Scenario: we are a normal cue package, and we're trying to
+	// resolve an embed attribute into a set of evaluators of those
+	// remote embedded packages/files.
+
+	embedding, found := pkg.embeddings[attrPos]
+	if !found {
+		return nil, nil
+	}
+	evals := make([]*eval.Evaluator, 0, len(embedding.results))
+	for _, embedded := range embedding.results {
+		if embeddedPkg := embedded.pkg; embeddedPkg != nil {
+			evals = append(evals, embeddedPkg.eval)
+		}
+	}
+
+	return embedding.Embed, evals
+}
+
+// pkgEmbedders is a callback for the evaluator. See
+// [eval.Config.PkgEmbedders]
+func (pkg *Package) pkgEmbedders() map[*eval.Evaluator][]*embed.Embed {
+	if pkg.isCue {
+		return nil
+	}
+	// Scenario: we are an embedded package, and we're trying to find
+	// out which cue packages embed us.
+
+	evals := make(map[*eval.Evaluator][]*embed.Embed)
+	// For each package which embeds us,
+	for _, embedderPkg := range pkg.embeddedBy {
+		// look through all their embed attributes.
+		for _, embedding := range embedderPkg.embeddings {
+			// For each embed attribute, look at every pkg it expanded
+			// to:
+			for _, embedded := range embedding.results {
+				if embedded.pkg != pkg {
+					continue
+				}
+				evals[embedderPkg.eval] = append(evals[embedderPkg.eval], embedding.Embed)
+				break
+			}
+		}
+	}
+
+	return evals
+}
+
 // EnsureImportedBy ensures that importer is recorded as a user of
 // this package. This method is idempotent.
 func (pkg *Package) EnsureImportedBy(importer *Package) {
@@ -330,5 +555,22 @@ func (pkg *Package) EnsureImportedBy(importer *Package) {
 func (pkg *Package) RemoveImportedBy(importer *Package) {
 	pkg.importedBy = slices.DeleteFunc(pkg.importedBy, func(p *Package) bool {
 		return p == importer
+	})
+}
+
+// EnsureEmbeddedBy ensures that embedder is recorded as a user of
+// this package. This method is idempotent.
+func (pkg *Package) EnsureEmbeddedBy(embedder *Package) {
+	if slices.Contains(pkg.embeddedBy, embedder) {
+		return
+	}
+	pkg.embeddedBy = append(pkg.embeddedBy, embedder)
+}
+
+// RemoveEmbeddedBy ensures that embedder is not recorded as a user of
+// this package. This method is idempotent.
+func (pkg *Package) RemoveEmbeddedBy(embedder *Package) {
+	pkg.embeddedBy = slices.DeleteFunc(pkg.embeddedBy, func(p *Package) bool {
+		return p == embedder
 	})
 }

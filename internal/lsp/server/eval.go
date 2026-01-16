@@ -18,12 +18,13 @@ import (
 	"context"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/lsp/cache"
 )
 
 func (s *server) Definition(ctx context.Context, params *protocol.DefinitionParams) ([]protocol.Location, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, false)
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadNothing)
 	if file == nil || err != nil {
 		return nil, err
 	}
@@ -33,7 +34,7 @@ func (s *server) Definition(ctx context.Context, params *protocol.DefinitionPara
 func (s *server) Completion(ctx context.Context, params *protocol.CompletionParams) (*protocol.CompletionList, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, false)
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadNothing)
 	if file == nil || err != nil {
 		return nil, err
 	}
@@ -43,7 +44,7 @@ func (s *server) Completion(ctx context.Context, params *protocol.CompletionPara
 func (s *server) Hover(ctx context.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, false)
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadAllIfNonCue)
 	if file == nil || err != nil {
 		return nil, err
 	}
@@ -53,7 +54,7 @@ func (s *server) Hover(ctx context.Context, params *protocol.HoverParams) (*prot
 func (s *server) References(ctx context.Context, params *protocol.ReferenceParams) ([]protocol.Location, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, true)
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadAll)
 	if file == nil || err != nil {
 		return nil, err
 	}
@@ -63,7 +64,7 @@ func (s *server) References(ctx context.Context, params *protocol.ReferenceParam
 func (s *server) Rename(ctx context.Context, params *protocol.RenameParams) (*protocol.WorkspaceEdit, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, true)
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadAll)
 	if file == nil || err != nil {
 		return nil, err
 	}
@@ -73,7 +74,7 @@ func (s *server) Rename(ctx context.Context, params *protocol.RenameParams) (*pr
 func (s *server) PrepareRename(ctx context.Context, params *protocol.PrepareRenameParams) (*protocol.PrepareRenamePlaceholder, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, true)
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadAll)
 	if file == nil || err != nil {
 		return nil, err
 	}

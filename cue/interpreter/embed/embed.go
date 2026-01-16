@@ -93,6 +93,7 @@
 package embed
 
 import (
+	"fmt"
 	iofs "io/fs"
 	"os"
 	"path"
@@ -547,15 +548,19 @@ type embeddedGlob struct {
 }
 
 func (eg *embeddedGlob) matches(e *Embed, filepath string) bool {
+	fmt.Println("embeddedGlob matches", *eg, *e, filepath)
 	dir := path.Dir(e.FilePath)
+	fmt.Println(" dir", dir)
 	if dir != "." {
 		wasCut := false
 		filepath, wasCut = strings.CutPrefix(filepath, dir+"/")
+		fmt.Println(" filepath, wasCut", filepath, wasCut)
 		if !wasCut {
 			return false
 		}
 	}
 	result, err := pkgpath.Match(eg.glob, filepath, pkgpath.Unix)
+	fmt.Println(" result, err", result, err)
 	if !result || err != nil {
 		return false
 	}
@@ -563,12 +568,16 @@ func (eg *embeddedGlob) matches(e *Embed, filepath string) bool {
 }
 
 func (eg *embeddedGlob) matchAll(e *Embed, fs iofs.FS) ([]string, error) {
+	fmt.Println("embeddedGlob matchAll", *eg, *e, fs)
 	dir := path.Dir(e.FilePath)
+	fmt.Println(" dir", dir)
 	fs, err := iofs.Sub(fs, dir)
+	fmt.Println(" fs, err", fs, err)
 	if err != nil {
 		return nil, errors.Wrapf(err, e.Attribute.Pos, "%v", err)
 	}
 	filepaths, err := fsGlob(fs, eg.glob)
+	fmt.Println(" filepaths, err", filepaths, err)
 	if err != nil {
 		return nil, errors.Wrapf(err, e.Attribute.Pos, "%v", err)
 	}
@@ -578,5 +587,6 @@ func (eg *embeddedGlob) matchAll(e *Embed, fs iofs.FS) ([]string, error) {
 	for i, filepath := range filepaths {
 		filepaths[i] = path.Join(dir, filepath)
 	}
+	fmt.Println(" filepaths", filepaths)
 	return filepaths, nil
 }

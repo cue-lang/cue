@@ -28,7 +28,12 @@ type ReadCUEFS interface {
 	// If this method is implemented, but the implementation
 	// does not support reading CUE files,
 	// it should return [errors.ErrUnsupported].
+	//
+	// This method may be called with paths which do not have a `.cue`
+	// suffix. If the implementation is unable to read-and-convert (as
+	// necessary) a path to a CUE AST, it should  return nil, nil.
 	ReadCUEFile(path string, cfg parser.Config) (*ast.File, error)
+	IsDirWithCUEFiles(path string) (bool, error)
 }
 
 // OSRootFS can be implemented by an [fs.FS]

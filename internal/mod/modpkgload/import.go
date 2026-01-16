@@ -301,6 +301,13 @@ func (pkgs *Packages) findLocalPackage(pkgPath string) ([]module.SourceLoc, erro
 }
 
 func isDirWithCUEFiles(loc module.SourceLoc) (bool, error) {
+	fsys := loc.FS
+	if cueFS, ok := fsys.(module.ReadCUEFS); ok {
+		result, err := cueFS.IsDirWithCUEFiles(loc.Dir)
+		if !errors.Is(err, errors.ErrUnsupported) {
+			return result, err
+		}
+	}
 	// It would be nice if we could inspect the error returned from ReadDir to see
 	// if it's failing because it's not a directory, but unfortunately that doesn't
 	// seem to be something defined by the Go fs interface.

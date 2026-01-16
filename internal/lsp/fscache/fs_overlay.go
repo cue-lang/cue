@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -323,7 +324,7 @@ func (fs *OverlayFS) ReadFile(uri protocol.DocumentURI) (FileHandle, error) {
 
 	file, isFile := entry.(*overlayFileEntry)
 	if !isFile {
-		return nil, &iofs.PathError{Op: "open", Path: uri.Path(), Err: iofs.ErrInvalid}
+		return nil, &iofs.PathError{Op: "ReadFile", Path: uri.Path(), Err: iofs.ErrInvalid}
 	}
 
 	return file, nil
@@ -566,14 +567,14 @@ func (fs *rootedOverlayFS) pathComponents(name string) ([]string, string) {
 // Open implements [iofs.FS]
 func (fs *rootedOverlayFS) Open(name string) (iofs.File, error) {
 	if !iofs.ValidPath(name) {
-		return nil, &iofs.PathError{Op: "open", Path: name, Err: iofs.ErrInvalid}
+		return nil, &iofs.PathError{Op: "Open", Path: name, Err: iofs.ErrInvalid}
 	}
 
 	entry, err := fs.overlayfs.getEntry(fs.pathComponents(name))
 	if errors.Is(err, iofs.ErrNotExist) {
 		return fs.delegatefs.Open(name)
 	} else if err != nil {
-		return nil, &iofs.PathError{Op: "open", Path: name, Err: err}
+		return nil, &iofs.PathError{Op: "Open", Path: name, Err: err}
 	}
 
 	switch entry := entry.(type) {
@@ -612,7 +613,7 @@ func (fs *rootedOverlayFS) Open(name string) (iofs.File, error) {
 // ReadCUEFile implements [module.ReadCUEFS]
 func (fs *rootedOverlayFS) ReadCUEFile(name string, config parser.Config) (*ast.File, error) {
 	if !iofs.ValidPath(name) {
-		return nil, &iofs.PathError{Op: "readcuefile", Path: name, Err: iofs.ErrInvalid}
+		return nil, &iofs.PathError{Op: "ReadCUEFile", Path: name, Err: iofs.ErrInvalid}
 	}
 
 	entry, err := fs.overlayfs.getEntry(fs.pathComponents(name))
@@ -631,10 +632,53 @@ func (fs *rootedOverlayFS) ReadCUEFile(name string, config parser.Config) (*ast.
 	return nil, iofs.ErrInvalid
 }
 
+func (fs *rootedOverlayFS) IsDirWithCUEFiles(path string) (bool, error) {
+	if !iofs.ValidPath(path) {
+		return false, &iofs.PathError{Op: "IsDirWithCUEFiles", Path: path, Err: iofs.ErrInvalid}
+	}
+
+	entry, err := fs.overlayfs.getEntry(fs.pathComponents(path))
+	if errors.Is(err, iofs.ErrNotExist) {
+		return fs.delegatefs.IsDirWithCUEFiles(path)
+	} else if err != nil {
+		return false, err
+	}
+
+	dir, isDir := entry.(*overlayDirEntry)
+	if !isDir {
+		return false, iofs.ErrInvalid
+	}
+
+	overlayEntries, err := dir.open().ReadDir(0)
+	if err != nil {
+		return false, err
+	}
+
+	for _, entry := range overlayEntries {
+		file, isFile := entry.(*overlayFileEntry)
+		if !isFile {
+			continue
+		}
+
+		bf, err := filetypes.ParseFileAndType(file.basename, "", filetypes.Input)
+		if err != nil {
+			continue
+		}
+		switch bf.Encoding {
+		case build.CUE, build.JSON, build.YAML:
+			return true, nil
+		default:
+			continue
+		}
+	}
+
+	return fs.delegatefs.IsDirWithCUEFiles(path)
+}
+
 // ReadDir implements [iofs.ReadDirFS]
 func (fs *rootedOverlayFS) ReadDir(name string) ([]iofs.DirEntry, error) {
 	if !iofs.ValidPath(name) {
-		return nil, &iofs.PathError{Op: "readdir", Path: name, Err: iofs.ErrInvalid}
+		return nil, &iofs.PathError{Op: "ReadDir", Path: name, Err: iofs.ErrInvalid}
 	}
 
 	entry, err := fs.overlayfs.getEntry(fs.pathComponents(name))
@@ -720,7 +764,7 @@ func mergeSort(as, bs []iofs.DirEntry) []iofs.DirEntry {
 // ReadFile implements [iofs.ReadFileFS]
 func (fs *rootedOverlayFS) ReadFile(name string) ([]byte, error) {
 	if !iofs.ValidPath(name) {
-		return nil, &iofs.PathError{Op: "readfile", Path: name, Err: iofs.ErrInvalid}
+		return nil, &iofs.PathError{Op: "ReadFile", Path: name, Err: iofs.ErrInvalid}
 	}
 
 	entry, err := fs.overlayfs.getEntry(fs.pathComponents(name))
@@ -741,7 +785,7 @@ func (fs *rootedOverlayFS) ReadFile(name string) ([]byte, error) {
 // Stat implements [iofs.StatFS]
 func (fs *rootedOverlayFS) Stat(name string) (iofs.FileInfo, error) {
 	if !iofs.ValidPath(name) {
-		return nil, &iofs.PathError{Op: "stat", Path: name, Err: iofs.ErrInvalid}
+		return nil, &iofs.PathError{Op: "Stat", Path: name, Err: iofs.ErrInvalid}
 	}
 
 	entry, err := fs.overlayfs.getEntry(fs.pathComponents(name))

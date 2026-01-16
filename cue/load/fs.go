@@ -17,6 +17,7 @@ package load
 import (
 	"bytes"
 	"cmp"
+	stderrs "errors"
 	"fmt"
 	"io"
 	iofs "io/fs"
@@ -344,11 +345,18 @@ func (fs *ioFS) ReadFile(name string) ([]byte, error) {
 
 var _ module.ReadCUEFS = (*ioFS)(nil)
 
+func (fs *ioFS) IsDirWithCUEFiles(path string) (bool, error) {
+	return false, stderrs.ErrUnsupported
+}
+
 // ReadCUEFile implements [module.ReadCUEFS] by
 // reading and updating the syntax file cache, which
 // is shared with the cache used by the [fileSystem.getCUESyntax]
 // method.
 func (fs *ioFS) ReadCUEFile(path string, cfg parser.Config) (*ast.File, error) {
+	if !strings.HasSuffix(path, ".cue") {
+		return nil, nil
+	}
 	fpath, err := fs.absPathFromFSPath(path)
 	if err != nil {
 		return nil, err

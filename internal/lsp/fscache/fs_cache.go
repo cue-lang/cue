@@ -15,6 +15,8 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/encoding/json"
+	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -96,22 +98,48 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 	}
 
 	bf := p.buildFile
-	if !(bf != nil && bf.Encoding == build.CUE && bf.Form == "" && bf.Interpretation == "") {
+	if bf == nil {
 		return nil, parser.Config{}, nil
 	}
 
+	filename := bf.Filename
 	content := p.content
 
-	parseComments := parser.NewConfig(config)
-	parseComments.Mode = parser.ParseComments
-	importsOnly := parser.NewConfig(config)
-	importsOnly.Mode = parser.ImportsOnly
+	switch bf.Encoding {
+	case build.CUE:
+		parseComments := parser.NewConfig(config)
+		parseComments.Mode = parser.ParseComments
+		importsOnly := parser.NewConfig(config)
+		importsOnly.Mode = parser.ImportsOnly
 
-	for _, cfg = range []parser.Config{parseComments, importsOnly} {
-		syntax, err = parser.ParseFile(bf.Filename, content, cfg)
-		if syntax != nil {
-			break
+		for _, cfg = range []parser.Config{parseComments, importsOnly} {
+			syntax, err = parser.ParseFile(filename, content, cfg)
+			if syntax != nil {
+				break
+			}
 		}
+
+	case build.JSON:
+		expr, err := json.Extract(filename, content)
+		if err != nil {
+			return nil, parser.Config{}, err
+		}
+		syntax = &ast.File{Filename: filename}
+		switch expr := expr.(type) {
+		case *ast.StructLit:
+			syntax.Decls = expr.Elts
+		default:
+			syntax.Decls = []ast.Decl{&ast.EmbedDecl{Expr: expr}}
+		}
+
+	case build.YAML:
+		syntax, err = yaml.Extract(filename, content)
+		if err != nil {
+			return nil, parser.Config{}, err
+		}
+
+	default:
+		return nil, parser.Config{}, nil
 	}
 
 	if syntax != nil {
@@ -139,7 +167,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 		}
 		if pkg.Name == nil || pkg.Name.Name == "" || pkg.Name.Name == "_" {
 			// Important that this ident has no position.
-			pkg.Name = ast.NewIdent(phantomPackageName(bf.Filename))
+			pkg.Name = ast.NewIdent(phantomPackageName(filename))
 		}
 	}
 
@@ -329,12 +357,18 @@ func (fs *CUECacheFS) ReadFile(uri protocol.DocumentURI) (FileHandle, error) {
 func readFile(uri protocol.DocumentURI, mtime time.Time) (*diskFileEntry, error) {
 	// NB filePath is GOOS-appropriate (uri.Path() calls [filepath.FromSlash])
 	filePath := uri.Path()
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		return nil, err
-	}
 
 	bf, err := filetypes.ParseFileAndType(filePath, "", filetypes.Input)
+	if err != nil {
+		// yes, throw the error away
+		return &diskFileEntry{
+			modTime:       mtime,
+			uri:           uri,
+			cueFileParser: &cueFileParser{},
+		}, nil
+	}
+
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -416,6 +450,59 @@ func (fs *rootedCUECacheFS) ReadCUEFile(name string, config parser.Config) (*ast
 	}
 	ast, _, err := fh.ReadCUE(config)
 	return ast, err
+}
+
+func (fs *rootedCUECacheFS) IsDirWithCUEFiles(path string) (bool, error) {
+	if !iofs.ValidPath(path) {
+		return false, &iofs.PathError{Op: "IsDirWithCUEFiles", Path: path, Err: iofs.ErrInvalid}
+	}
+	path, err := filepath.Localize(path)
+	if err != nil {
+		return false, &iofs.PathError{Op: "IsDirWithCUEFiles", Path: path, Err: err}
+	}
+	path = filepath.Join(fs.root, path)
+
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		if errors.Is(err, iofs.ErrNotExist) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	for _, e := range entries {
+		bf, err := filetypes.ParseFileAndType(e.Name(), "", filetypes.Input)
+		if err != nil {
+			continue
+		}
+		switch bf.Encoding {
+		case build.CUE, build.JSON, build.YAML:
+		default:
+			continue
+		}
+
+		ftype := e.Type()
+		if ftype&iofs.ModeSymlink != 0 {
+			name, err := os.Readlink(filepath.Join(path, e.Name()))
+			if err != nil {
+				continue
+			}
+			if !filepath.IsAbs(name) {
+				name = filepath.Join(path, name)
+			}
+			finfo, err := os.Stat(name)
+			if err != nil {
+				continue
+			}
+			ftype = finfo.Mode()
+		}
+		if !ftype.IsRegular() {
+			continue
+		}
+		return true, nil
+	}
+
+	return false, nil
 }
 
 // ReadDir implements [iofs.ReadDirFS]

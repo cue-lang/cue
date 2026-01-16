@@ -16,6 +16,24 @@
       "message": "all the changes from this point on in this file are all \"general tidy-up\". Making sure absolutely no evaluation is done for the `/definitions` `/completions` `/usages` test targets *before* those tests actually start; removing an unneeded special case; and importing a comment. They\u0027re basically all drive-bys.",
       "revId": "1f3163f56a86509272a8519c0457f007dca90e9e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcdb7e02_43b18f15",
+        "filename": "internal/lsp/eval/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 4437,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-16T10:27:06Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "58e8adfc_332f69ba",
+      "revId": "1f3163f56a86509272a8519c0457f007dca90e9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -413,6 +413,9 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		ImportCanonicalisation: importCanonicalisation,
 		ForPackage:             pkg.forPackage,
 		PkgImporters:           pkg.pkgImporters,
+		ForEmbedAttribute:      pkg.forEmbedAttribute,
+		PkgEmbedders:           pkg.pkgEmbedders,
+		PackageIsEmbedded:      !isCue,
 	}
 
 	// eval.New does almost no work - calculation of resolutions is
@@ -473,6 +476,60 @@ func (pkg *Package) pkgImporters() []*eval.Evaluator {
 	for i, pkg := range pkg.importedBy {
 		evals[i] = pkg.eval
 	}
+	return evals
+}
+
+// forEmbedAttribute is a callback for the evaluator. See
+// [eval.Config.ForEmbedAttribute]
+func (pkg *Package) forEmbedAttribute(attrPos token.Pos) (*embed.Embed, []*eval.Evaluator) {
+	if !pkg.isCue {
+		return nil, nil
+	}
+
+	// Scenario: we are a normal cue package, and we're trying to
+	// resolve an embed attribute into a set of evaluators of those
+	// remote embedded packages/files.
+
+	embedding, found := pkg.embeddings[attrPos]
+	if !found {
+		return nil, nil
+	}
+	evals := make([]*eval.Evaluator, 0, len(embedding.results))
+	for _, embedded := range embedding.results {
+		if embeddedPkg := embedded.pkg; embeddedPkg != nil {
+			evals = append(evals, embeddedPkg.eval)
+		}
+	}
+
+	return embedding.Embed, evals
+}
+
+// pkgEmbedders is a callback for the evaluator. See
+// [eval.Config.PkgEmbedders]
+func (pkg *Package) pkgEmbedders() map[*eval.Evaluator][]*embed.Embed {
+	if pkg.isCue {
+		return nil
+	}
+	// Scenario: we are an embedded package, and we're trying to find
+	// out which cue packages embed us.
+
+	evals := make(map[*eval.Evaluator][]*embed.Embed)
+	// For each package which embeds us,
+	for _, embedderPkg := range pkg.embeddedBy {
+		// look through all their embed attributes.
+		for _, embedding := range embedderPkg.embeddings {
+			// For each embed attribute, look at every pkg it expanded
+			// to:
+			for _, embedded := range embedding.results {
+				if embedded.pkg != pkg {
+					continue
+				}
+				evals[embedderPkg.eval] = append(evals[embedderPkg.eval], embedding.Embed)
+				break
+			}
+		}
+	}
+
 	return evals
 }
 

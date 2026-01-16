@@ -220,9 +220,6 @@ func yieldAllModFiles(fsys fs.FS, fpath string, topDir bool, yield func(ModuleFi
 // It returns the yielded package name (if any) and reports whether
 // the iteration should continue.
 func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName string) bool, yield func(ModuleFile, error) bool) (pkgName string, cont bool) {
-	if !strings.HasSuffix(fpath, ".cue") {
-		return "", true
-	}
 	pf := ModuleFile{
 		FilePath: fpath,
 	}
@@ -237,9 +234,16 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 		// the default parser options used by cue/load for better
 		// cache behavior.
 		syntax, syntaxErr = cueFS.ReadCUEFile(fpath, parser.NewConfig(parser.ImportsOnly))
-		if syntax == nil && !errors.Is(syntaxErr, errors.ErrUnsupported) {
-			return "", yield(pf, syntaxErr)
+		if syntax == nil {
+			if syntaxErr == nil {
+				return "", true
+			} else if !errors.Is(syntaxErr, errors.ErrUnsupported) {
+				return "", yield(pf, syntaxErr)
+			}
 		}
+
+	} else if !strings.HasSuffix(fpath, ".cue") {
+		return "", true
 	}
 	if syntax == nil {
 		// Either the FS doesn't implement [module.ReadCUEFS]

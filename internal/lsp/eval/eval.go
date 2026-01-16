@@ -332,13 +332,16 @@ import (
 	"fmt"
 	"iter"
 	"maps"
+	stdpath "path"
 	"slices"
 	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/interpreter/embed"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/lsp/fscache"
 	"cuelang.org/go/internal/lsp/rangeset"
 )
 
@@ -347,9 +350,19 @@ import (
 // given import path, or nil if the package cannot be resolved.
 type EvaluatorForPackageFunc = func(importPath ast.ImportPath) *Evaluator
 
+// EvaluatorsForEmbedAttrFunc is a callback function used to resolve
+// embed attributes into [embed.Embed] values, and a list of
+// [Evaluator]s for the embedded packages.
+type EvaluatorsForEmbedAttrFunc = func(attrPos token.Pos) (*embed.Embed, []*Evaluator)
+
 // ImportersFunc is a callback function to fetch the package
 // evaluator for packages that directly import the current package.
 type ImportersFunc = func() []*Evaluator
+
+// EmbeddersFunc is a callback function to fetch the evaluators for
+// all the packages that embed us. Each evaluator is associated with
+// the [embed.Embed] attributes that expanded to this package.
+type EmbeddersFunc = func() map[*Evaluator][]*embed.Embed
 
 type Evaluator struct {
 	config Config
@@ -384,6 +397,16 @@ type Config struct {
 	// PkgImporters is a callback function to fetch the evaluator for
 	// all packages that directly import this package.
 	PkgImporters ImportersFunc
+	// ForEmbedAttribute is callback function to resolve embed
+	// attributes.
+	ForEmbedAttribute EvaluatorsForEmbedAttrFunc
+	// PkgEmbedders is a callback function to fetch the evaluators for
+	// the packages that embed us.
+	PkgEmbedders EmbeddersFunc
+	// PackageIsEmbedded indicates that this evaluator represents a
+	// package which is embedded (e.g. made from JSON files), as
+	// opposed to being constructed of normal ".cue" files.
+	PackageIsEmbedded bool
 }
 
 func (c *Config) init() {
@@ -392,6 +415,13 @@ func (c *Config) init() {
 	}
 	if c.PkgImporters == nil {
 		c.PkgImporters = func() []*Evaluator { return nil }
+	}
+
+	if c.ForEmbedAttribute == nil {
+		c.ForEmbedAttribute = func(attrPos token.Pos) (*embed.Embed, []*Evaluator) { return nil, nil }
+	}
+	if c.PkgEmbedders == nil {
+		c.PkgEmbedders = func() map[*Evaluator][]*embed.Embed { return nil }
 	}
 }
 
@@ -580,6 +610,47 @@ func (e *Evaluator) importSpecName(spec *ast.ImportSpec) string {
 	return name
 }
 
+// embedders constructs the set of navigables in remote evaluators
+// that correspond to where this package appears in those remote ASTs
+// via embed attributes.
+func (e *Evaluator) embedders() map[*navigable]struct{} {
+	var result []*navigable
+	for remotePkg, embeds := range e.config.PkgEmbedders() {
+		remotePkg.bootFiles()
+		for _, embed := range embeds {
+			remotePos := embed.Field.Value.Pos()
+			remoteFilename := remotePos.Filename()
+			remoteFe := remotePkg.byFilename[remoteFilename]
+			if remoteFe == nil {
+				continue
+			}
+			remoteFrames := remoteFe.evalForOffset(remotePos.Offset())
+			var unexpanded []*navigable
+			for _, fr := range remoteFrames {
+				unexpanded = append(unexpanded, fr.navigable)
+			}
+
+			if embed.IsGlob() {
+				// The evalForOffset call above will have also discovered
+				// the embed attribute is a glob, and will have
+				// constructed a navigable with bindings for each file
+				// name of the embedded files. Here we're doing the "other
+				// side" of that: navigating by the names of the files
+				// that make up this Evaluator.
+				remoteDir := stdpath.Dir(remoteFilename) + "/"
+				for filename := range e.byFilename {
+					fieldName := strings.TrimPrefix(filename, remoteDir)
+					result = append(result, navigateByName(expandNavigables(unexpanded), fieldName)...)
+				}
+
+			} else {
+				result = append(result, unexpanded...)
+			}
+		}
+	}
+	return expandNavigables(result)
+}
+
 type FileEvaluator struct {
 	evaluator *Evaluator
 	// File is the original [ast.File] that was passed to [New].
@@ -619,7 +690,12 @@ func (fe *FileEvaluator) DefinitionsForOffset(offset int) []ast.Node {
 func (fe *FileEvaluator) DocCommentsForOffset(offset int) map[ast.Node][]*ast.CommentGroup {
 	commentsMap := make(map[ast.Node][]*ast.CommentGroup)
 
-	for nav := range fe.definitionsForOffset(offset) {
+	navs := fe.definitionsForOffset(offset)
+	if fe.evaluator.config.PackageIsEmbedded {
+		navs = maps.Keys(expandNavigablesViaPath(slices.Collect(navs)))
+	}
+
+	for nav := range navs {
 		for _, fr := range nav.frames {
 			if fr.key != nil {
 				if comments := fr.docComments(); len(comments) > 0 {
@@ -839,9 +915,14 @@ nextFrame:
 		addCompletions(embedCompletions, nameSet)
 	}
 
+	expander := expandNavigables
+	if fe.evaluator.config.PackageIsEmbedded {
+		expander = expandNavigablesViaPath
+	}
+
 	for nav, fieldCompletions := range suggestFieldsFrom {
 		nameSet := make(map[string]struct{})
-		for nav := range expandNavigables([]*navigable{nav}) {
+		for nav := range expander([]*navigable{nav}) {
 			for name := range nav.bindings {
 				if !strings.HasPrefix(name, "__") {
 					nameSet[name] = struct{}{}
@@ -998,6 +1079,16 @@ func usages(navsWorklist []*navigable) {
 			}
 			evaluatedNavs[nav] = struct{}{}
 
+			// If this nav's evaluator is embedded, we assume it does not
+			// support references, (e.g. json) and so there's no point
+			// evaluating it, because doing so cannot possibly find any
+			// uses of the targetNavs. This massively reduces the amount
+			// of evaluation done for enormous json files, for example
+			// (without this, we'd evaluate the entire json file for no
+			// reason).
+			if nav.evaluator.config.PackageIsEmbedded {
+				continue
+			}
 			nav.eval()
 			for _, fr := range nav.frames {
 				for _, childFr := range fr.childFrames {
@@ -1049,6 +1140,10 @@ func usages(navsWorklist []*navigable) {
 			for _, remotePkg := range nav.evaluator.config.PkgImporters() {
 				navsWorklist = append(navsWorklist, remotePkg.initialNavsForImport(ip)...)
 			}
+			// Embeds however are different: they are embedded into a
+			// specific part of a CUE AST, and it absolutely makes sense
+			// to start by evaluating that section of the AST.
+			navsWorklist = slices.AppendSeq(navsWorklist, maps.Keys(nav.evaluator.embedders()))
 		}
 	}
 }
@@ -1449,6 +1544,35 @@ func expandNavigables(navs []*navigable) map[*navigable]struct{} {
 	return navsSet
 }
 
+// expandNavigablesViaPath is used by embedded packages only. From the
+// given navs it walks up the tree, constructing a path as it goes. If
+// it reaches the root of the navigable tree it looks for where this
+// evaluator/package is embedded into remote evaluators, and from
+// those locations it walks forward down the (reversed) path.
+func expandNavigablesViaPath(navs []*navigable) map[*navigable]struct{} {
+	result := expandNavigables(navs)
+	for nav := range result {
+		var names []string
+		for ; nav != nil && nav.name != ""; nav = nav.parent {
+			names = append(names, nav.name)
+		}
+
+		var walkFrom []*navigable
+
+		if nav.parent == nav.evaluator.pkgFrame.navigable {
+			walkFrom = slices.Collect(maps.Keys(nav.evaluator.embedders()))
+		} else {
+			walkFrom = []*navigable{nav}
+		}
+
+		for _, name := range slices.Backward(names) {
+			walkFrom = navigateByName(expandNavigables(walkFrom), name)
+		}
+		maps.Copy(result, expandNavigables(walkFrom))
+	}
+	return result
+}
+
 // frame corresponds to a node from the AST. A frame can be created at
 // any time, and creates the opportunity for evaluation to be paused
 // (and later resumed). Any binding reachable via
@@ -1624,7 +1748,17 @@ func (f *frame) eval() {
 			// imports of this package, in some other package.
 
 			childFr := f.newFrame(nil, f.fileEvaluator.evaluator.pkgDecls)
-			childFr.key = node.Name
+			if fscache.IsPhantomPackage(node) {
+				// For packages with invented names, be careful to avoid
+				// returning file coordinates that use the length of the
+				// invented name.
+				childFr.key = &ast.Ident{
+					Name:    "",
+					NamePos: f.fileEvaluator.File.Pos().File().Pos(0, token.NoRelPos),
+				}
+			} else {
+				childFr.key = node.Name
+			}
 			childFr.addRange(node)
 			childFr.docsNode = node
 			p := &path{
@@ -1970,6 +2104,68 @@ func (f *frame) eval() {
 				// expressions in the field label. Therefore,
 				// len(fieldDecl.exprs) > 0 implies !strings.HasPrefix(keyName, "__")
 				childFr.parent.newFrame(fieldDecl, nil)
+			}
+
+			for _, attr := range node.Attrs {
+				childFr.addRange(attr)
+				embed, remoteEvals := f.fileEvaluator.evaluator.config.ForEmbedAttribute(attr.Pos())
+				if len(remoteEvals) == 0 {
+					continue
+				}
+				isGlob := embed.IsGlob()
+				for _, remotePkgEvaluator := range remoteEvals {
+					// The attribute is an embed of 1 or more files, which
+					// we have converted to pkgs with evaluators. Booting
+					// them means their pkgDecls have frames.
+					//
+					// The behaviour here is very similar to processing an
+					// ImportSpec.
+					remotePkgEvaluator.bootFiles()
+
+					childFrs := []*frame{childFr}
+					if isGlob {
+						childFrs = childFrs[:0]
+						dir := stdpath.Dir(f.fileEvaluator.File.Filename) + "/"
+						for remoteFilename := range remotePkgEvaluator.byFilename {
+							fieldName := strings.TrimPrefix(remoteFilename, dir)
+							fieldNameIdent := ast.NewIdent(fieldName)
+							grandChildFr := childFr.newFrame(fieldNameIdent, childFr.navigable.ensureNavigable(fieldName))
+							grandChildFr.addRange(attr)
+							childFr.appendBinding(fieldName, grandChildFr)
+							childFrs = append(childFrs, grandChildFr)
+						}
+					}
+
+					for _, childFr := range childFrs {
+						// We add a path that records that this field resolves
+						// to the remote package. DefinitionsForOffset always
+						// passes through a path, so this path ensures
+						// DefinitionsForOffset on the attr itself will take
+						// you to the embedded files.
+						p := &path{
+							frame: childFr,
+							components: []pathComponent{{
+								unexpanded: []*navigable{remotePkgEvaluator.pkgDecls},
+								node:       attr,
+							}},
+						}
+						childFr.childPaths = append(childFr.childPaths, p)
+
+						// Ensure that the child frame resolves to the file
+						// navs from the remote package. This allows paths that
+						// travels through the embed and into the remote pkg to
+						// resolve correctly.
+						remotePkgFileFrames := remotePkgEvaluator.pkgFrame.childFrames
+						remotePkgNavs := make([]*navigable, len(remotePkgFileFrames))
+						for i, remoteFileFr := range remotePkgFileFrames {
+							remotePkgNavs[i] = remoteFileFr.navigable
+						}
+						childFr.navigable.ensureResolvesTo(remotePkgNavs)
+
+						// We also record that the attr uses the remote package.
+						remotePkgEvaluator.pkgDecls.recordUsage(attr, childFr)
+					}
+				}
 			}
 
 		default:

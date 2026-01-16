@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/eval"
 )
@@ -213,10 +214,18 @@ func (w *Workspace) Completion(file *File, fe *eval.FileEvaluator, srcMapper *pr
 
 	completions := fe.CompletionsForOffset(offset)
 
+	isJsonSrc := file.buildFile != nil && file.buildFile.Encoding == build.JSON
+	isYamlSrc := file.buildFile != nil && file.buildFile.Encoding == build.YAML
+
 	var completionItems []protocol.CompletionItem
 
 	for completion, names := range completions {
 		if len(names) == 0 {
+			continue
+		}
+		if completion.Kind == protocol.VariableCompletion && (isJsonSrc || isYamlSrc) {
+			// Don't suggest values if we're in a json or yaml file,
+			// because they can't have values which are references.
 			continue
 		}
 
@@ -252,7 +261,7 @@ func (w *Workspace) Completion(file *File, fe *eval.FileEvaluator, srcMapper *pr
 		completionRange.End = pos
 
 		for name := range names {
-			if !ast.IsValidIdent(name) {
+			if isJsonSrc || !ast.IsValidIdent(name) {
 				name = strconv.Quote(name)
 			}
 			item := protocol.CompletionItem{

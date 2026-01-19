@@ -95,6 +95,10 @@ func (w *printer) ReplaceArg(arg any) (replacement any, replaced bool) {
 	case adt.Formatter:
 		x = v.X
 		r = v.R
+	case errors.Error:
+		// Wrap errors to ensure they are formatted with our printer,
+		// which enables cycle detection in nested error formatting.
+		return errorFormatter{p: w, err: v}, true
 	}
 
 	switch x := x.(type) {
@@ -123,6 +127,18 @@ func (f formatter) String() string {
 	}
 	p.node(f.x)
 	return string(p.dst)
+}
+
+// errorFormatter wraps an error to ensure it is formatted with a printer
+// that supports cycle detection.
+type errorFormatter struct {
+	p   *printer
+	err errors.Error
+}
+
+func (f errorFormatter) String() string {
+	cfg := &errors.Config{Printer: f.p}
+	return errors.StringWithConfig(f.err, cfg)
 }
 
 func (w *printer) string(s string) {

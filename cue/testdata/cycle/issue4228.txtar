@@ -1,0 +1,463 @@
+# Test that cyclic error formatting doesn't cause stack overflow.
+# The combination of error() with self interpolation and complex nested
+# struct patterns can cause infinite recursion when formatting error messages.
+#
+# Issue #4228
+
+-- in.cue --
+package main
+
+_objectBase: self={
+	name: string
+	k8s: metadata: name: self.name
+}
+
+_namespacedResource: self={
+	_objectBase
+	namespace: string
+	k8s: metadata: namespace: self.namespace
+}
+
+// Key validation pattern with error() and self
+_allValuesAreValidStructs: [_]: self={
+	*{} | error("<- invalid \(self)")
+}
+
+_setTypeMeta: self={
+	#apiVersion!: string
+	#kind!: string
+	#template: k8s: {
+		apiVersion: self.#apiVersion
+		kind: self.#kind
+	}
+}
+
+// Resource kinds pattern
+_resourceKindsBase: {
+	_base!: _
+
+	[string]: {
+		_allValuesAreValidStructs
+		_setTypeMeta
+		#resourceSchema: _
+		#template: {
+			_base
+			k8s: #resourceSchema
+		}
+		[_]: #template
+	}
+}
+
+_namespacedResourceKinds: {
+	_resourceKindsBase
+	_base: _namespacedResource
+	[string]: [string]: namespace: string
+
+	app: {
+		#apiVersion: "argoproj.io/v1alpha1"
+		#kind: "Application"
+		#resourceSchema: {
+			spec?: revisionHistoryLimit?: int
+		}
+
+		#template: self={
+			revisionHistoryLimit: *3 | int
+			k8s: spec: revisionHistoryLimit: self.revisionHistoryLimit
+		}
+	}
+}
+
+// Usage
+argocd: _namespacedResourceKinds & {
+	app: apps: {}
+}
+
+-- export.cue --
+@experiment(aliasv2)
+
+package main
+
+import "encoding/yaml"
+
+let _globalScope = self
+
+#export: {
+	#entries: [...]
+	manifests: [
+		for _entry in #entries
+		for _ns in _entry
+		for _kind, _objs in _ns
+		for _name, _obj in _objs {
+			_obj.k8s
+		}]
+	yamlStream: yaml.MarshalStream(manifests)
+}
+
+#manifests: {#export, #entries: [_globalScope]}.yamlStream
+-- out/evalalpha/stats --
+Leaks:  1
+Freed:  187
+Reused: 128
+Allocs: 60
+Retain: 0
+
+Unifications: 100
+Conjuncts:    289
+Disjuncts:    28
+
+NumCloseIDs: 77
+
+ConjunctInfos:       194
+MaxConjunctInfos:    8
+MaxReqSets:          9
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,15 @@
+-Leaks:  3
+-Freed:  181
+-Reused: 172
+-Allocs: 12
+-Retain: 20
+-
+-Unifications: 181
+-Conjuncts:    308
+-Disjuncts:    201
++Leaks:  1
++Freed:  187
++Reused: 128
++Allocs: 60
++Retain: 0
++
++Unifications: 100
++Conjuncts:    289
++Disjuncts:    28
++
++NumCloseIDs: 77
++
++ConjunctInfos:       194
++MaxConjunctInfos:    8
++MaxReqSets:          9
+-- out/eval/stats --
+Leaks:  3
+Freed:  181
+Reused: 172
+Allocs: 12
+Retain: 20
+
+Unifications: 181
+Conjuncts:    308
+Disjuncts:    201
+-- out/evalalpha --
+Errors:
+_namespacedResourceKinds.app.#template.k8s.apiVersion: field not allowed:
+    ./in.cue:23:3
+_namespacedResourceKinds.app.#template.k8s.kind: field not allowed:
+    ./in.cue:24:3
+_namespacedResourceKinds.app.#template.k8s.metadata: field not allowed:
+    ./in.cue:5:7
+    ./in.cue:11:7
+argocd.app.#template.k8s.apiVersion: field not allowed:
+    ./in.cue:23:3
+argocd.app.#template.k8s.kind: field not allowed:
+    ./in.cue:24:3
+argocd.app.#template.k8s.metadata: field not allowed:
+    ./in.cue:5:7
+    ./in.cue:11:7
+argocd.app.apps: 4 errors in empty disjunction:
+argocd.app.apps.k8s.apiVersion: field not allowed:
+    ./in.cue:23:3
+argocd.app.apps.k8s.kind: field not allowed:
+    ./in.cue:24:3
+argocd.app.apps.k8s.metadata: field not allowed:
+    ./in.cue:5:7
+    ./in.cue:11:7
+#manifests: error in call to encoding/yaml.MarshalStream: field not allowed:
+    ./export.cue:18:14
+    ./export.cue:15:3
+    ./in.cue:23:3
+argocd.app.apps: <- invalid :
+    ./in.cue:16:8
+
+Result:
+(_|_){
+  // [eval]
+  let _globalScope#1 = (_|_){
+    // [structural cycle] _globalScope: structural cycle
+  }
+  #export: (#struct){
+    #entries: (list){
+    }
+    manifests: (#list){
+    }
+    yamlStream: (string){ "" }
+  }
+  #manifests: (_|_){
+    // [eval] #manifests: error in call to encoding/yaml.MarshalStream: field not allowed:
+    //     ./export.cue:18:14
+    //     ./export.cue:15:3
+    //     ./in.cue:23:3
+  }
+  _objectBase(:main): (struct){
+    name: (string){ string }
+    k8s: (struct){
+      metadata: (struct){
+        name: (string){ string }
+      }
+    }
+  }
+  _namespacedResource(:main): (struct){
+    namespace: (string){ string }
+    k8s: (struct){
+      metadata: (struct){
+        namespace: (string){ string }
+        name: (string){ string }
+      }
+    }
+    name: (string){ string }
+  }
+  _allValuesAreValidStructs(:main): (struct){
+  }
+  _setTypeMeta(:main): (struct){
+    #apiVersion!: (string){ string }
+    #kind!: (string){ string }
+    #template: (#struct){
+      k8s: (#struct){
+        apiVersion: (_|_){
+          // [incomplete] _setTypeMeta.#template.k8s.apiVersion: required field missing: #apiVersion:
+          //     ./in.cue:23:20
+        }
+        kind: (_|_){
+          // [incomplete] _setTypeMeta.#template.k8s.kind: required field missing: #kind:
+          //     ./in.cue:24:14
+        }
+      }
+    }
+  }
+  _resourceKindsBase(:main): (struct){
+    _base(:main)!: (_){ _ }
+  }
+  _namespacedResourceKinds(:main): (_|_){
+    // [eval]
+    _base(:main): ~(_namespacedResource(:main))
+    app: (_|_){
+      // [eval]
+      #apiVersion: (string){ "argoproj.io/v1alpha1" }
+      #kind: (string){ "Application" }
+      #resourceSchema: (#struct){
+        spec?: (#struct){
+          revisionHistoryLimit?: (int){ int }
+        }
+      }
+      #template: (_|_){
+        // [eval]
+        revisionHistoryLimit: (int){ |(*(int){ 3 }, (int){ int }) }
+        k8s: (_|_){
+          // [eval]
+          spec: (#struct){
+            revisionHistoryLimit: (int){ |(*(int){ 3 }, (int){ int }) }
+          }
+          apiVersion: (_|_){
+            // [eval] _namespacedResourceKinds.app.#template.k8s.apiVersion: field not allowed:
+            //     ./in.cue:23:3
+          }
+          kind: (_|_){
+            // [eval] _namespacedResourceKinds.app.#template.k8s.kind: field not allowed:
+            //     ./in.cue:24:3
+          }
+          metadata: (_|_){
+            // [eval] _namespacedResourceKinds.app.#template.k8s.metadata: field not allowed:
+            //     ./in.cue:5:7
+            //     ./in.cue:11:7
+            namespace: (_|_){
+              // [eval] _namespacedResourceKinds.app.#template.k8s.metadata.namespace: field not allowed:
+              //     ./in.cue:11:17
+            }
+            name: (_|_){
+              // [eval] _namespacedResourceKinds.app.#template.k8s.metadata.name: field not allowed:
+              //     ./in.cue:5:17
+            }
+          }
+        }
+        namespace: (string){ string }
+        name: (string){ string }
+      }
+    }
+  }
+  argocd: (_|_){
+    // [eval]
+    app: (_|_){
+      // [eval]
+      apps: (_|_){
+        // [eval] argocd.app.apps: 4 errors in empty disjunction:
+        // argocd.app.apps.k8s.apiVersion: field not allowed:
+        //     ./in.cue:23:3
+        // argocd.app.apps.k8s.kind: field not allowed:
+        //     ./in.cue:24:3
+        // argocd.app.apps.k8s.metadata: field not allowed:
+        //     ./in.cue:5:7
+        //     ./in.cue:11:7
+        // argocd.app.apps: <- invalid :
+        //     ./in.cue:16:8
+        namespace: (string){ string }
+        revisionHistoryLimit: (_){ _ }
+        k8s: (#struct){
+          spec: (#struct){
+            revisionHistoryLimit: (_){ _ }
+          }
+          apiVersion: (_){ _ }
+          kind: (_){ _ }
+          metadata: (#struct){
+            namespace: (_){ _ }
+            name: (_){ _ }
+          }
+        }
+        name: (string){ string }
+      }
+      #apiVersion: (string){ "argoproj.io/v1alpha1" }
+      #kind: (string){ "Application" }
+      #resourceSchema: (#struct){
+        spec?: (#struct){
+          revisionHistoryLimit?: (int){ int }
+        }
+      }
+      #template: (_|_){
+        // [eval]
+        revisionHistoryLimit: (int){ |(*(int){ 3 }, (int){ int }) }
+        k8s: (_|_){
+          // [eval]
+          spec: (#struct){
+            revisionHistoryLimit: (int){ |(*(int){ 3 }, (int){ int }) }
+          }
+          apiVersion: (_|_){
+            // [eval] argocd.app.#template.k8s.apiVersion: field not allowed:
+            //     ./in.cue:23:3
+          }
+          kind: (_|_){
+            // [eval] argocd.app.#template.k8s.kind: field not allowed:
+            //     ./in.cue:24:3
+          }
+          metadata: (_|_){
+            // [eval] argocd.app.#template.k8s.metadata: field not allowed:
+            //     ./in.cue:5:7
+            //     ./in.cue:11:7
+            namespace: (_|_){
+              // [eval] argocd.app.#template.k8s.metadata.namespace: field not allowed:
+              //     ./in.cue:11:17
+            }
+            name: (_|_){
+              // [eval] argocd.app.#template.k8s.metadata.name: field not allowed:
+              //     ./in.cue:5:17
+            }
+          }
+        }
+        namespace: (string){ string }
+        name: (string){ string }
+      }
+    }
+    _base(:main): ~(_namespacedResource(:main))
+  }
+}
+-- out/eval --
+-- out/compile --
+--- export.cue
+{
+  let _globalScope#1 = 〈1〉
+  #export: {
+    #entries: [
+      ...,
+    ]
+    manifests: [
+      for _, _entry in 〈1;#entries〉 for _, _ns in 〈0;_entry〉 for _kind, _objs in 〈0;_ns〉 for _name, _obj in 〈0;_objs〉 {
+        〈1;_obj〉.k8s
+      },
+    ]
+    yamlStream: 〈import;"encoding/yaml"〉.MarshalStream(〈0;manifests〉)
+  }
+  #manifests: {
+    〈1;#export〉
+    #entries: [
+      〈2;let _globalScope#1〉,
+    ]
+  }.yamlStream
+}
+--- in.cue
+{
+  _objectBase: {
+    name: string
+    k8s: {
+      metadata: {
+        name: 〈3〉.name
+      }
+    }
+  }
+  _namespacedResource: {
+    〈1;_objectBase〉
+    namespace: string
+    k8s: {
+      metadata: {
+        namespace: 〈3〉.namespace
+      }
+    }
+  }
+  _allValuesAreValidStructs: {
+    [_]: {
+      (*{}|error("<- invalid \(〈1〉)"))
+    }
+  }
+  _setTypeMeta: {
+    #apiVersion!: string
+    #kind!: string
+    #template: {
+      k8s: {
+        apiVersion: 〈3〉.#apiVersion
+        kind: 〈3〉.#kind
+      }
+    }
+  }
+  _resourceKindsBase: {
+    _base!: _
+    [string]: {
+      〈2;_allValuesAreValidStructs〉
+      〈2;_setTypeMeta〉
+      #resourceSchema: _
+      #template: {
+        〈2;_base〉
+        k8s: 〈1;#resourceSchema〉
+      }
+      [_]: 〈0;#template〉
+    }
+  }
+  _namespacedResourceKinds: {
+    〈1;_resourceKindsBase〉
+    _base: 〈1;_namespacedResource〉
+    [string]: {
+      [string]: {
+        namespace: string
+      }
+    }
+    app: {
+      #apiVersion: "argoproj.io/v1alpha1"
+      #kind: "Application"
+      #resourceSchema: {
+        spec?: {
+          revisionHistoryLimit?: int
+        }
+      }
+      #template: {
+        revisionHistoryLimit: (*3|int)
+        k8s: {
+          spec: {
+            revisionHistoryLimit: 〈3〉.revisionHistoryLimit
+          }
+        }
+      }
+    }
+  }
+  argocd: (〈0;_namespacedResourceKinds〉 & {
+    app: {
+      apps: {}
+    }
+  })
+}

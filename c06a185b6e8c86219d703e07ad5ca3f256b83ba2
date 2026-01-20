@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81fc7d71_6111cf75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-01-20T16:05:52Z",
+      "side": 1,
+      "message": "Yikes. Not a great solution, but happy to add it for now. Maybe add a TODO that we need to find something more sensible. My suspicion is this will be fixed in v2.",
+      "revId": "c06a185b6e8c86219d703e07ad5ca3f256b83ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

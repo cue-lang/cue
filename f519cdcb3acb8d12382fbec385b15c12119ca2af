@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49eee499_79fe3532",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-01-20T16:07:07Z",
+      "side": 1,
+      "message": "It would be good to see the before and after errors as before.",
+      "revId": "f519cdcb3acb8d12382fbec385b15c12119ca2af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

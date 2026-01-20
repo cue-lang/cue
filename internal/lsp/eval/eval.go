@@ -1032,8 +1032,8 @@ func usages(navsWorklist []*navigable) {
 			// For all the packages that import us, find where usages of
 			// this package appears.
 			ip := nav.evaluator.ip
-			for _, remotePkgDfns := range nav.evaluator.pkgImporters() {
-				navsWorklist = append(navsWorklist, remotePkgDfns.initialNavsForImport(ip)...)
+			for _, remotePkg := range nav.evaluator.pkgImporters() {
+				navsWorklist = append(navsWorklist, remotePkg.initialNavsForImport(ip)...)
 			}
 		}
 	}
@@ -1430,27 +1430,6 @@ func expandNavigables(navs []*navigable) map[*navigable]struct{} {
 
 		nav.eval()
 
-		for _, fr := range nav.frames {
-			spec, ok := fr.node.(*ast.ImportSpec)
-			if !ok {
-				continue
-			}
-			pkgEval := fr.fileEvaluator.evaluator
-			ip := pkgEval.parseImportSpec(spec)
-			if ip == nil {
-				continue
-			}
-			pkgEval = pkgEval.forPackage(*ip)
-			if pkgEval == nil {
-				continue
-			}
-			pkgFrame := pkgEval.pkgFrame
-			pkgFrame.eval()
-			for _, fileFr := range pkgFrame.childFrames {
-				worklist = append(worklist, fileFr.navigable)
-			}
-		}
-
 		worklist = slices.AppendSeq(worklist, maps.Keys(nav.resolvesTo))
 	}
 	return navsSet
@@ -1716,8 +1695,10 @@ func (f *frame) eval() {
 					remotePkgEvaluator = New(ast.ImportPath{}, nil, nil, nil)
 				}
 
-				// We add a path that records that the name of this import
-				// spec resolves to the remote package.
+				// DefinitionsForOffset always traverses a path, so here
+				// we add a path so that DefinitionsForOffset on this
+				// import spec reports the package declarations of the
+				// remote pkg.
 				p := &path{
 					frame: f,
 					components: []pathComponent{{
@@ -1726,6 +1707,18 @@ func (f *frame) eval() {
 					}},
 				}
 				f.childPaths = append(f.childPaths, p)
+
+				// Any path that actually traverses into the remote pkg
+				// can do so by following the resolvesTo of this frame's
+				// navigable. Rather than resolving to the remove pkg
+				// declarations, we must resolve to the files that make up
+				// the remote pkg.
+				remotePkgFileFrames := remotePkgEvaluator.pkgFrame.childFrames
+				remotePkgNavs := make([]*navigable, len(remotePkgFileFrames))
+				for i, remoteFileFr := range remotePkgFileFrames {
+					remotePkgNavs[i] = remoteFileFr.navigable
+				}
+				f.navigable.ensureResolvesTo(remotePkgNavs)
 
 				// We also record that we are using those package
 				// decls. This means that from the result of resolving the

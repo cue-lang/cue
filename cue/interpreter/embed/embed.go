@@ -92,13 +92,14 @@
 package embed
 
 import (
-	"io/fs"
+	iofs "io/fs"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -155,35 +156,78 @@ type compiler struct {
 
 	// file system cache
 	dir string
-	fs  fs.StatFS
+	fs  iofs.StatFS
 	pos token.Pos
+}
+
+// NB the fs must be have the attribute's file at its root
+func validateAttr(a *internal.Attr) (file, glob, typ string, allowEmptyGlob bool, errs errors.Error) {
+	pos := a.Pos
+
+	file, _, err := a.Lookup(0, "file")
+	if err != nil {
+		return "", "", "", false, errors.Promote(err, "invalid attribute")
+	}
+
+	glob, _, err = a.Lookup(0, "glob")
+	if err != nil {
+		return "", "", "", false, errors.Promote(err, "invalid attribute")
+	}
+
+	typ, _, err = a.Lookup(0, "type")
+	if err != nil {
+		return "", "", "", false, errors.Promote(err, "invalid type argument")
+	}
+
+	allowEmptyGlob, err = a.Flag(0, "allowEmptyGlob")
+	if err != nil {
+		return "", "", "", false, errors.Promote(err, "invalid allowEmptyGlob argument")
+	}
+
+	switch {
+	case file == "" && glob == "":
+		return "", "", "", false, errors.Newf(pos, "attribute must have file or glob field")
+
+	case file != "" && glob != "":
+		return "", "", "", false, errors.Newf(pos, "attribute cannot have both file and glob field")
+	case allowEmptyGlob && glob == "":
+		return "", "", "", false, errors.Newf(pos, "allowEmptyGlob must be specified with a glob field")
+
+	case file != "":
+		file, err := clean(pos, file)
+		if err != nil {
+			return "", "", "", false, err
+		}
+		return file, "", typ, allowEmptyGlob, nil
+
+	default:
+		glob, err := clean(pos, glob)
+		if err != nil {
+			return "", "", "", false, err
+		}
+		// Validate that the glob pattern is valid per [pkgpath.Match].
+		// Note that we use Unix match semantics because all embed paths are Unix-like.
+		if _, err := pkgpath.Match(glob, "", pkgpath.Unix); err != nil {
+			return "", "", "", false, errors.Wrapf(err, pos, "invalid glob pattern %q", glob)
+		}
+
+		// If we do not have a type, ensure the extension of the base is fully
+		// specified, i.e. does not contain any meta characters as specified by
+		// path.Match.
+		if typ == "" {
+			ext := path.Ext(path.Base(glob))
+			if ext == "" || strings.ContainsAny(ext, "*?[\\") {
+				return "", "", "", false, errors.Newf(pos, "extension not fully specified; type argument required")
+			}
+		}
+		return "", glob, typ, allowEmptyGlob, nil
+	}
 }
 
 // Compile interprets an embed attribute to either load a file
 // (@embed(file=...)) or a glob of files (@embed(glob=...)).
 // and decodes the given files.
 func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
-
-	file, _, err := a.Lookup(0, "file")
-	if err != nil {
-		return nil, errors.Promote(err, "invalid attribute")
-	}
-
-	glob, _, err := a.Lookup(0, "glob")
-	if err != nil {
-		return nil, errors.Promote(err, "invalid attribute")
-	}
-
-	typ, _, err := a.Lookup(0, "type")
-	if err != nil {
-		return nil, errors.Promote(err, "invalid type argument")
-	}
-
-	allowEmptyGlob, err := a.Flag(0, "allowEmptyGlob")
-	if err != nil {
-		return nil, errors.Promote(err, "invalid allowEmptyGlob argument")
-	}
-
 	c.opCtx = adt.NewContext((*runtime.Runtime)(c.runtime), nil)
 
 	pos := a.Pos
@@ -191,65 +235,30 @@ func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (
 
 	// Jump through some hoops to get file operations to behave the same for
 	// Windows and Unix.
-	// TODO: obtain a fs.FS from load or something similar.
+	// TODO: obtain an iofs.FS from load or something similar.
 	dir := filepath.Dir(pos.File().Name())
 	if c.dir != dir {
-		c.fs = os.DirFS(dir).(fs.StatFS) // Documented as implementing fs.StatFS
+		c.fs = os.DirFS(dir).(iofs.StatFS) // Documented as implementing iofs.StatFS
 		c.dir = dir
 	}
 
-	switch {
-	case file == "" && glob == "":
-		return nil, errors.Newf(a.Pos, "attribute must have file or glob field")
-
-	case file != "" && glob != "":
-		return nil, errors.Newf(a.Pos, "attribute cannot have both file and glob field")
-	case allowEmptyGlob && glob == "":
-		return nil, errors.Newf(a.Pos, "allowEmptyGlob must be specified with a glob field")
-	case file != "":
-		return c.processFile(file, typ, scope)
-
-	default: // glob != "":
-		return c.processGlob(glob, typ, allowEmptyGlob, scope)
-	}
-}
-
-func (c *compiler) processFile(file, scope string, schema adt.Value) (adt.Expr, errors.Error) {
-	file, err := c.clean(file)
+	file, glob, typ, allowEmptyGlob, err := validateAttr(a)
 	if err != nil {
 		return nil, err
 	}
-	for dir := path.Dir(file); dir != "."; dir = path.Dir(dir) {
-		if _, err := c.fs.Stat(path.Join(dir, "cue.mod")); err == nil {
-			return nil, errors.Newf(c.pos, "cannot embed file %q: in different module", file)
-		}
-	}
 
-	return c.decodeFile(file, scope, schema)
+	if file != "" {
+		for dir := path.Dir(file); dir != "."; dir = path.Dir(dir) {
+			if _, err := c.fs.Stat(path.Join(dir, "cue.mod")); err == nil {
+				return nil, errors.Newf(pos, "cannot embed file %q: in different module", file)
+			}
+		}
+		return c.decodeFile(file, typ, scope)
+	}
+	return c.processGlob(glob, typ, allowEmptyGlob, scope)
 }
 
 func (c *compiler) processGlob(glob, scope string, allowEmptyGlob bool, schema adt.Value) (adt.Expr, errors.Error) {
-	glob, ce := c.clean(glob)
-	if ce != nil {
-		return nil, ce
-	}
-
-	// Validate that the glob pattern is valid per [pkgpath.Match].
-	// Note that we use Unix match semantics because all embed paths are Unix-like.
-	if _, err := pkgpath.Match(glob, "", pkgpath.Unix); err != nil {
-		return nil, errors.Wrapf(err, c.pos, "invalid glob pattern %q", glob)
-	}
-
-	// If we do not have a type, ensure the extension of the base is fully
-	// specified, i.e. does not contain any meta characters as specified by
-	// path.Match.
-	if scope == "" {
-		ext := path.Ext(path.Base(glob))
-		if ext == "" || strings.ContainsAny(ext, "*?[\\") {
-			return nil, errors.Newf(c.pos, "extension not fully specified; type argument required")
-		}
-	}
-
 	m := &adt.StructLit{}
 
 	matches, err := fsGlob(c.fs, glob)
@@ -298,26 +307,26 @@ func (c *compiler) processGlob(glob, scope string, allowEmptyGlob bool, schema a
 	return m, nil
 }
 
-func (c *compiler) clean(s string) (string, errors.Error) {
+func clean(pos token.Pos, s string) (string, errors.Error) {
 	file := path.Clean(s)
 	if file != s {
-		return file, errors.Newf(c.pos, "path not normalized, use %q instead", file)
+		return file, errors.Newf(pos, "path not normalized, use %q instead", file)
 	}
 	if path.IsAbs(file) {
-		return "", errors.Newf(c.pos, "only relative files are allowed")
+		return "", errors.Newf(pos, "only relative files are allowed")
 	}
 	if file == ".." || strings.HasPrefix(file, "../") {
-		return "", errors.Newf(c.pos, "cannot refer to parent directory")
+		return "", errors.Newf(pos, "cannot refer to parent directory")
 	}
 	return file, nil
 }
 
-// fsGlob is like [fs.Glob] but only includes dot-prefixed files
+// fsGlob is like [iofs.Glob] but only includes dot-prefixed files
 // when the dot is explictly present in an element.
 // TODO: add option for including dot files?
-func fsGlob(fsys fs.FS, pattern string) ([]string, error) {
+func fsGlob(fsys iofs.FS, pattern string) ([]string, error) {
 	pattern = path.Clean(pattern)
-	matches, err := fs.Glob(fsys, pattern)
+	matches, err := iofs.Glob(fsys, pattern)
 	if err != nil {
 		return nil, err
 	}
@@ -351,7 +360,7 @@ func (c *compiler) decodeFile(file, scope string, schema adt.Value) (adt.Expr, e
 		return nil, errors.Promote(err, "invalid file type")
 	}
 
-	// Open and pre-load the file system using fs.FS, instead of relying
+	// Open and pre-load the file system using iofs.FS, instead of relying
 	r, err := c.fs.Open(file)
 	if err != nil {
 		return nil, errors.Newf(c.pos, "open %v: no such file or directory", file)
@@ -411,4 +420,116 @@ func (c *compiler) decodeFile(file, scope string, schema adt.Value) (adt.Expr, e
 
 	_, v := value.ToInternal(val)
 	return v, nil
+}
+
+func EmbeddedPaths(filepath string, attrsByField map[*ast.Field]*internal.Attr) ([]*Embed, errors.Error) {
+	if len(attrsByField) == 0 {
+		return nil, nil
+	}
+	var errs errors.Error
+	embeds := make([]*Embed, 0, len(attrsByField))
+	for field, attr := range attrsByField {
+		if attr.Err != nil {
+			errs = errors.Append(errs, attr.Err)
+			continue
+		}
+		file, glob, _, _, err := validateAttr(attr)
+		if err != nil {
+			errs = errors.Append(errs, attr.Err)
+			continue
+		}
+		embed := &Embed{
+			Field:     field,
+			Attribute: attr,
+			FilePath:  filepath,
+		}
+		embeds = append(embeds, embed)
+		if file != "" {
+			embed.interpreter = &embeddedFile{filepath: file}
+		} else if glob != "" {
+			embed.interpreter = &embeddedGlob{glob: glob}
+		}
+	}
+	return embeds, errs
+}
+
+type EmbedKey struct {
+	Dir       string
+	EmbedBody string
+}
+
+type Embed struct {
+	Field       *ast.Field
+	Attribute   *internal.Attr
+	FilePath    string
+	interpreter embedInterpreter
+}
+
+func (e *Embed) Key() EmbedKey {
+	return EmbedKey{
+		Dir:       path.Dir(e.FilePath),
+		EmbedBody: e.Attribute.Body,
+	}
+}
+
+func (e *Embed) Matches(filepath string) bool {
+	return e.interpreter.matches(e, filepath)
+}
+
+func (e *Embed) Match(fs iofs.FS) []string {
+	return e.interpreter.match(e, fs)
+}
+
+type embedInterpreter interface {
+	// all filepaths (including any within the Embed) are considered
+	// relative to the same root.
+	matches(e *Embed, filepath string) bool
+	match(e *Embed, fs iofs.FS) []string
+}
+
+type embeddedFile struct {
+	filepath string
+}
+
+func (ef *embeddedFile) matches(e *Embed, filepath string) bool {
+	dir := path.Dir(e.FilePath)
+	return filepath == path.Join(dir, ef.filepath)
+}
+
+func (ef *embeddedFile) match(e *Embed, fs iofs.FS) []string {
+	dir := path.Dir(e.FilePath)
+	filepath := path.Join(dir, ef.filepath)
+	info, err := iofs.Stat(fs, filepath)
+	if err != nil || !info.Mode().IsRegular() {
+		return nil
+	}
+	return []string{filepath}
+}
+
+type embeddedGlob struct {
+	glob string
+}
+
+func (eg *embeddedGlob) matches(e *Embed, filepath string) bool {
+	// TODO FIXME: this doesn't follow the rules on .-prefixed files.
+	dir := path.Dir(e.FilePath) + "/"
+	filepath, wasCut := strings.CutPrefix(filepath, dir)
+	if !wasCut {
+		return false
+	}
+	result, _ := pkgpath.Match(eg.glob, filepath, pkgpath.Unix)
+	return result
+}
+
+func (eg *embeddedGlob) match(e *Embed, fs iofs.FS) []string {
+	dir := path.Dir(e.FilePath)
+	fs, err := iofs.Sub(fs, dir)
+	if err != nil {
+		panic(err)
+	}
+	filepaths, err := fsGlob(fs, eg.glob)
+	if err != nil {
+		return nil
+	}
+	return filepaths
 }

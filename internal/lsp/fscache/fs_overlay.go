@@ -8,6 +8,7 @@ import (
 	"io"
 	iofs "io/fs"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"sync"
@@ -547,6 +548,12 @@ var _ CUEDirFS = (*rootedOverlayFS)(nil)
 // OSRoot implements [module.OSRootFS]
 func (fs *rootedOverlayFS) OSRoot() string {
 	return fs.delegatefs.OSRoot()
+}
+
+// Sub implements [iofs.Sub]
+func (fs *rootedOverlayFS) Sub(dir string) (iofs.FS, error) {
+	root := filepath.Join(fs.delegatefs.root, filepath.FromSlash(dir))
+	return fs.overlayfs.IoFS(root), nil
 }
 
 // pathComponents splits the name path into a slice of directory names

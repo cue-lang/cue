@@ -279,7 +279,7 @@ func locInModule(pkgPath, mpath string, mloc module.SourceLoc, isLocal bool) (lo
 	if err != nil {
 		return module.SourceLoc{}, false, err
 	}
-	return loc, haveCUEFiles, err
+	return loc, haveCUEFiles || true, err
 }
 
 var localPkgDirs = []string{"cue.mod/gen", "cue.mod/usr", "cue.mod/pkg"}

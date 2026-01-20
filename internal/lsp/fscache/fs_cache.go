@@ -411,6 +411,7 @@ type CUEDirFS interface {
 	DirFS
 	module.OSRootFS
 	module.ReadCUEFS
+	iofs.SubFS
 }
 
 // rootedCUECacheFS is a wrapper over [CUECacheFS] that implements
@@ -428,6 +429,12 @@ var _ CUEDirFS = (*rootedCUECacheFS)(nil)
 // OSRoot implements [module.OSRootFS]
 func (fs *rootedCUECacheFS) OSRoot() string {
 	return fs.root
+}
+
+// Sub implements [iofs.Sub]
+func (fs *rootedCUECacheFS) Sub(dir string) (iofs.FS, error) {
+	root := filepath.Join(fs.root, filepath.FromSlash(dir))
+	return fs.cuecachefs.IoFS(root), nil
 }
 
 // Open implements [iofs.FS]

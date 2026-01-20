@@ -241,7 +241,6 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 		} else if syntaxErr != nil && !errors.Is(syntaxErr, errors.ErrUnsupported) {
 			return "", yield(pf, syntaxErr)
 		}
-
 	}
 	if syntax == nil {
 		// Either the FS doesn't implement [module.ReadCUEFS]

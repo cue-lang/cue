@@ -148,23 +148,23 @@ loop:
 			}
 			fileAttr = a
 
-			attr := internal.ParseAttrBody(a.Pos(), body)
+			attr := internal.ParseAttrBody(pos, body)
 			if attr.Err != nil {
 				return "", pos, nil, attr.Err
 			}
 			k, err := attr.String(0)
 			if err != nil {
 				// Unreachable.
-				return "", pos, nil, errors.Newf(a.Pos(), "%s", err)
+				return "", pos, nil, errors.Newf(pos, "%s", err)
 			}
 
 			if k == "" {
-				return "", pos, nil, errors.Newf(a.Pos(),
+				return "", pos, nil, errors.Newf(pos,
 					"interpreter name must be non-empty")
 			}
 
 			if kind != "" {
-				return "", pos, nil, errors.Newf(a.Pos(),
+				return "", pos, nil, errors.Newf(pos,
 					"only one file-level extern attribute allowed per file")
 
 			}
@@ -289,6 +289,51 @@ func (d *externDecorator) markExternFieldAttr(kind string, decls []ast.Decl) (er
 	})
 
 	return errs
+}
+
+func ExtractFieldAttrsByKind(file *ast.File, kind string) (attrsByField map[*ast.Field]*internal.Attr, errs errors.Error) {
+	k, _, decs, err := findExternFileAttr(file)
+	if err != nil || len(decs) == 0 || k != kind {
+		return nil, err
+	}
+
+	ast.Walk(&ast.File{Decls: decs}, func(n ast.Node) bool {
+		switch n := n.(type) {
+		case *ast.Field:
+			for _, attr := range n.Attrs {
+				pos := attr.Pos()
+				k, body := attr.Split()
+
+				// Support old-style and new-style extern attributes.
+				if k != "extern" && k != kind {
+					break
+				}
+
+				_, _, err := ast.LabelName(n.Label)
+				if err != nil {
+					b, _ := format.Node(n.Label)
+					errs = errors.Append(errs, errors.Newf(pos, "external attribute has non-concrete label %s", b))
+					break
+				}
+
+				if attrsByField == nil {
+					attrsByField = make(map[*ast.Field]*internal.Attr)
+				}
+				if _, found := attrsByField[n]; found {
+					errs = errors.Append(errs, errors.Newf(pos, "duplicate @%s attributes", k))
+					break
+				}
+
+				attrParsed := internal.ParseAttrBody(pos, body)
+				attrsByField[n] = &attrParsed
+			}
+			return false
+		}
+
+		return true
+	}, nil)
+
+	return attrsByField, errs
 }
 
 func (d *externDecorator) decorateConjunct(e adt.Elem, scope *adt.Vertex) {

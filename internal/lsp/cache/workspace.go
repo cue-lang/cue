@@ -224,7 +224,7 @@ func (w *Workspace) FileWatchingGlobPatterns(ctx context.Context) map[protocol.R
 		for _, wfDir := range wfDirs {
 			// NB: a.Encloses(b) returns true if a == b
 			if wfDir.Encloses(activeDir) {
-				patterns[protocol.RelativePattern{Pattern: protocol.Pattern(activeDir)}] = struct{}{}
+				patterns[protocol.RelativePattern{Pattern: filepath.ToSlash(activeDir.Path())}] = struct{}{}
 				break
 			}
 		}
@@ -907,6 +907,16 @@ func (w *Workspace) reloadPackages() {
 				}
 			}
 		}
+	}
+
+	if !repeatReload {
+		for _, pkgModPkg := range processedPkgs {
+			pkg := pkgModPkg.pkg
+			if pkg != nil {
+				repeatReload = pkg.linkEmbeddings() || repeatReload
+			}
+		}
+
 	}
 
 	if repeatReload {

@@ -52,6 +52,7 @@ x: X={
   }
   x: (struct){
     regions: (#list){
+      0: (string){ "west" }
     }
     app: (struct){
       region: (string){ "west" }

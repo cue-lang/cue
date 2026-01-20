@@ -155,17 +155,26 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 	case Evaluator:
 		n.unshare()
 
-		// Expressions that contain a call may end up in an infinite recursion
-		// here if we do not ensure that there is non-cyclic data to propagate
-		// the evaluation. We therefore postpone expressions until we have
-		// evidence that such non-cyclic conjuncts exist.
-		if id.CycleType == IsCyclic && !n.hasNonCycle && !n.hasNonCyclic {
-			n.hasAncestorCycle = true
-			n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{c: c})
-			return
+		// Call expressions may end up in an infinite recursion if we do not
+		// ensure that there is non-cyclic data to propagate the evaluation.
+		// We therefore postpone call expressions until we have evidence that
+		// such non-cyclic conjuncts exist.
+		//
+		// We only defer calls that contain references in their arguments, as
+		// only those can cause infinite recursion. Calls with only literal
+		// arguments (like `or(["a", "b"])`) are safe to evaluate immediately,
+		// even when evaluated from within an unrelated cyclic context.
+		//
+		// TODO: this is rather hacky. We probably need a better solution
+		// in a future iteration of the evaluator.
+		if call, ok := x.(*CallExpr); ok && id.CycleType == IsCyclic && !n.hasNonCycle && !n.hasNonCyclic {
+			if slices.ContainsFunc(call.Args, exprHasResolver) {
+				n.hasAncestorCycle = true
+				n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{c: c})
+				return
+			}
 		}
 
-		// Interpolation, UnaryExpr, CallExpr
 		n.scheduleTask(handleExpr, env, x, id)
 
 	default:
@@ -173,6 +182,31 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 	}
 
 	n.ctx.stats.Conjuncts++
+}
+
+// exprHasResolver checks if an expression contains a Resolver (reference).
+func exprHasResolver(x Expr) bool {
+	switch v := x.(type) {
+	case Resolver:
+		return true
+	case Value:
+		return false // Already evaluated, cannot contain references.
+	case *BinaryExpr:
+		return exprHasResolver(v.X) || exprHasResolver(v.Y)
+	case *UnaryExpr:
+		return exprHasResolver(v.X)
+	case *CallExpr:
+		return slices.ContainsFunc(v.Args, exprHasResolver)
+	case *ListLit:
+		for _, elem := range v.Elems {
+			if expr, ok := elem.(Expr); ok && exprHasResolver(expr) {
+				return true
+			}
+		}
+		return false
+	default:
+		return true // Conservatively assume unknown types may have references.
+	}
 }
 
 // scheduleStruct records all elements of this conjunct in the structure and

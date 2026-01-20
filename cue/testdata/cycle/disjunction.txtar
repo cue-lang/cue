@@ -57,7 +57,7 @@ Allocs: 68
 Retain: 0
 
 Unifications: 50
-Conjuncts:    158
+Conjuncts:    159
 Disjuncts:    73
 
 NumCloseIDs: 20
@@ -80,7 +80,7 @@ diff old new
 -Conjuncts:    280
 -Disjuncts:    199
 +Unifications: 50
-+Conjuncts:    158
++Conjuncts:    159
 +Disjuncts:    73
 +
 +NumCloseIDs: 20

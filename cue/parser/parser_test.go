@@ -162,6 +162,13 @@ func TestParse(t *testing.T) {
 			out: `@experiment(aliasv2), [string]~X: int, [=~"^a"]~(K,V): string`,
 		},
 		{
+			desc: "postfix alias with blank identifier",
+			in: `@experiment(aliasv2)
+		a~_: 1`,
+			out: `@experiment(aliasv2), a~_: 1
+single postfix alias "_" field cannot be the blank identifier`,
+		},
+		{
 			desc: "keywords as selector",
 			in: `a : {
 			if: 0

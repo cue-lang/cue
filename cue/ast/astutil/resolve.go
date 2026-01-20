@@ -334,7 +334,7 @@ func insertPostfixAliases(s *scope, x *ast.Field, expr ast.Node) {
 		// Single form: ~X
 		if !hasField {
 			s.errFn(a.Pos(),
-				"single postfix alias %q field cannot be the blank identifier", a.Label.Name)
+				"single postfix alias %q field cannot be the blank identifier", a.Field.Name)
 		} else {
 			s.insert(a.Field.Name, x, a, nil)
 		}

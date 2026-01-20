@@ -1,0 +1,60 @@
+// Issue #4230
+//
+// Calls with only literal arguments like `or(["west", "east"])` were
+// incorrectly deferred when evaluated from within a cyclic context,
+// resulting in empty results.
+-- in.cue --
+#transform: {
+	_input: {...}
+	_output: [
+		if _input.app != _|_ {
+			_input.app.region
+		},
+	]
+}
+
+x: X={
+	regions: (#transform & {_input: X})._output
+	app: region: or(["west", "east"]) & "west"
+}
+-- out/compile --
+--- in.cue
+{
+  #transform: {
+    _input: {
+      ...
+    }
+    _output: [
+      if (〈1;_input〉.app != _|_(explicit error (_|_ literal) in source)) {
+        〈2;_input〉.app.region
+      },
+    ]
+  }
+  x: {
+    regions: (〈1;#transform〉 & {
+      _input: 〈2〉
+    })._output
+    app: {
+      region: (or([
+        "west",
+        "east",
+      ]) & "west")
+    }
+  }
+}
+-- out/evalalpha --
+(struct){
+  #transform: (#struct){
+    _input: (#struct){
+    }
+    _output: (#list){
+    }
+  }
+  x: (struct){
+    regions: (#list){
+    }
+    app: (struct){
+      region: (string){ "west" }
+    }
+  }
+}

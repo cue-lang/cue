@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac3a3e6c_870dbaa0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-21T10:13:36Z",
+      "side": 1,
+      "message": "I hesitated about exporting HasAbsPos, but we have HasRelPos, so I think it\u0027s nice for the sake of symmetry with HasRelPos and IsValid.\n\nThe only question is the terminology; I had been using \"printable\" elsewhere in the docs and comments, because having a file and an offset is what determines whether the position is more than just a relative position and can be printed to string form for the user.\n\nI like \"absolute\" too, and perhaps it\u0027s a more clear sidekick to \"relative\". So I\u0027m fine with HasAbsPos, but perhaps adjust the existing occurrences of \"printable\" that I added recently in this package?",
+      "revId": "b74d5f2c710a70f824aba7bfa2c1d1e004e306fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "508bec9c_3db26917",
+        "filename": "cue/token/position.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-21T10:13:36Z",
+      "side": 1,
+      "message": "I\u0027m OK with removing the check, but perhaps leave a one-line reminder that we assume `p.index() !\u003d 0` when `p.file !\u003d nil`.",
+      "revId": "b74d5f2c710a70f824aba7bfa2c1d1e004e306fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "953f80fe_2d2b5430",
+        "filename": "cue/token/position.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-21T10:13:36Z",
+      "side": 1,
+      "message": "to expand a little:\n\n\u003e , which can be obtained via [Pos.RelPos].",
+      "revId": "b74d5f2c710a70f824aba7bfa2c1d1e004e306fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2878bc14_d4e46e58",
+        "filename": "cue/token/position.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-21T10:13:36Z",
+      "side": 1,
+      "message": "to expand a little:\n\n\u003e , which can be obtained via [Pos.Position].",
+      "revId": "b74d5f2c710a70f824aba7bfa2c1d1e004e306fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1dc0ef1a_3279ef7a",
+        "filename": "cue/token/position.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-21T10:13:36Z",
+      "side": 1,
+      "message": "to expand this a bit: `s/means nothing/is an offset in the vacuum/`",
+      "revId": "b74d5f2c710a70f824aba7bfa2c1d1e004e306fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a683a3db_d6e7add8",
+        "filename": "cue/token/position.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-21T10:13:36Z",
+      "side": 1,
+      "message": "its offset",
+      "range": {
+        "startLine": 231,
+        "startChar": 54,
+        "endLine": 231,
+        "endChar": 56
+      },
+      "revId": "b74d5f2c710a70f824aba7bfa2c1d1e004e306fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

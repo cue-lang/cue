@@ -494,7 +494,30 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 			}
 
 			if n.hasNonCycle && n.hasNonCyclic && r.Depth != n.depth {
-				return ci, false
+				// Check for structural cycle indicators:
+				// 1. Sibling references (arc.Parent == n.node.Parent) are safe
+				//    because they don't cause unbounded structural expansion.
+				// 2. References where r.Node is NOT an ancestor of n.node are
+				//    typically safe (e.g., comprehension results).
+				// Only mark as cyclic if r.Node IS an ancestor of n.node AND
+				// arc and n.node are NOT siblings - this indicates the structure
+				// is expanding downward while referencing back to the same arc.
+				isSibling := arc.Parent != nil && n.node.Parent != nil &&
+					equalDeref(arc.Parent, n.node.Parent)
+				if isSibling {
+					return ci, false
+				}
+
+				isExpandingFromAncestor := false
+				for p := n.node.Parent; p != nil; p = p.Parent {
+					if equalDeref(p, r.Node) {
+						isExpandingFromAncestor = true
+						break
+					}
+				}
+				if !isExpandingFromAncestor {
+					return ci, false
+				}
 			}
 
 			return n.markCyclicPath(arc, env, x, ci)

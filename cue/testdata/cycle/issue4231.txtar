@@ -1,0 +1,324 @@
+// Issue #4231
+//
+// Embedding a self-referential structure causes infinite hang due to
+// structural cycle not being detected when references always resolve
+// to the same vertex at different depths.
+-- in.cue --
+// Original reproducer
+t1: {
+	b: a
+	a: b: b: a
+	a
+}
+
+// Multiple embeddings of mutually referencing fields
+t2: {
+	a: b: a
+	b: a
+	a
+	b
+}
+
+// Three-way cycle with embedding
+t3: {
+	a: x: b
+	b: x: c
+	c: x: a
+	a
+}
+
+// Definition with deep self-reference and embedding
+t4: {
+	#D: b: b: #D
+	x: #D
+	x
+}
+
+// Conditional embedding
+t5: {
+	a: {
+		if true {
+			b: b: a
+		}
+	}
+	x: a
+	x
+}
+
+// Self-unification with embedding
+t6: {
+	a: a & {b: b: a}
+	x: a
+	x
+}
+
+// Alias reference with embedding
+t7: {
+	X=a: b: b: X
+	y: a
+	y
+}
+
+// Hidden field with embedding
+t8: {
+	_a: b: b: _a
+	x: _a
+	x
+}
+-- out/evalalpha --
+Errors:
+t1.a.b.b: structural cycle
+t1.b.b.b.b: structural cycle
+t2.a.b: structural cycle
+t3.c.x: structural cycle
+t4.#D.b.b: structural cycle
+t5.a.b.b: structural cycle
+t6.a.b.b: structural cycle
+t7.a.b.b: structural cycle
+t8._a.b.b: structural cycle
+
+Result:
+(_|_){
+  // [structural cycle]
+  t1: (_|_){
+    // [structural cycle]
+    b: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle]
+          b: (_|_){
+            // [structural cycle] t1.b.b.b.b: structural cycle
+          }
+        }
+      }
+    }
+    a: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle] t1.a.b.b: structural cycle
+        }
+      }
+    }
+  }
+  t2: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle] t2.a.b: structural cycle
+      }
+    }
+    b: (_|_){
+      // [structural cycle] t2.a.b: structural cycle
+    }
+  }
+  t3: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      x: ~(t3.b)
+    }
+    b: (_|_){
+      // [structural cycle]
+      x: ~(t3.c)
+    }
+    c: (_|_){
+      // [structural cycle]
+      x: (_|_){
+        // [structural cycle] t3.c.x: structural cycle
+      }
+    }
+    x: (_|_){
+      // [structural cycle] t3.c.x: structural cycle
+    }
+  }
+  t4: (_|_){
+    // [structural cycle]
+    #D: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle] t4.#D.b.b: structural cycle
+        }
+      }
+    }
+    x: (_|_){
+      // [structural cycle] t4.#D.b.b: structural cycle
+    }
+    b: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle] t4.#D.b.b: structural cycle
+      }
+    }
+  }
+  t5: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle] t5.a.b.b: structural cycle
+        }
+      }
+    }
+    x: (_|_){
+      // [structural cycle] t5.a.b.b: structural cycle
+    }
+    b: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle] t5.a.b.b: structural cycle
+      }
+    }
+  }
+  t6: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle] t6.a.b.b: structural cycle
+        }
+      }
+    }
+    x: (_|_){
+      // [structural cycle] t6.a.b.b: structural cycle
+    }
+    b: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle] t6.a.b.b: structural cycle
+      }
+    }
+  }
+  t7: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle] t7.a.b.b: structural cycle
+        }
+      }
+    }
+    y: (_|_){
+      // [structural cycle] t7.a.b.b: structural cycle
+    }
+    b: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle] t7.a.b.b: structural cycle
+      }
+    }
+  }
+  t8: (_|_){
+    // [structural cycle]
+    _a: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle] t8._a.b.b: structural cycle
+        }
+      }
+    }
+    x: (_|_){
+      // [structural cycle] t8._a.b.b: structural cycle
+    }
+    b: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle] t8._a.b.b: structural cycle
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    b: 〈0;a〉
+    a: {
+      b: {
+        b: 〈2;a〉
+      }
+    }
+    〈0;a〉
+  }
+  t2: {
+    a: {
+      b: 〈1;a〉
+    }
+    b: 〈0;a〉
+    〈0;a〉
+    〈0;b〉
+  }
+  t3: {
+    a: {
+      x: 〈1;b〉
+    }
+    b: {
+      x: 〈1;c〉
+    }
+    c: {
+      x: 〈1;a〉
+    }
+    〈0;a〉
+  }
+  t4: {
+    #D: {
+      b: {
+        b: 〈2;#D〉
+      }
+    }
+    x: 〈0;#D〉
+    〈0;x〉
+  }
+  t5: {
+    a: {
+      if true {
+        b: {
+          b: 〈3;a〉
+        }
+      }
+    }
+    x: 〈0;a〉
+    〈0;x〉
+  }
+  t6: {
+    a: (〈0;a〉 & {
+      b: {
+        b: 〈2;a〉
+      }
+    })
+    x: 〈0;a〉
+    〈0;x〉
+  }
+  t7: {
+    a: {
+      b: {
+        b: 〈2;a〉
+      }
+    }
+    y: 〈0;a〉
+    〈0;y〉
+  }
+  t8: {
+    _a: {
+      b: {
+        b: 〈2;_a〉
+      }
+    }
+    x: 〈0;_a〉
+    〈0;x〉
+  }
+}

@@ -27,9 +27,9 @@ import (
 // -----------------------------------------------------------------------------
 // Positions
 
-// Position describes an arbitrary and printable source position within a file,
-// including offset, line, and column location,
-// which can be rendered in a human-friendly text form.
+// Position describes an arbitrary and absolute (printable) source
+// position within a file, including offset, line, and column
+// location, which can be rendered in a human-friendly text form.
 //
 // A Position is valid if the line number is > 0.
 type Position struct {
@@ -65,7 +65,7 @@ func (pos Position) String() string {
 
 // Pos is a compact encoding of a source position.
 // When valid, as reported by [Pos.IsValid], this can be either
-// a printable file position to obtain via [Pos.Position],
+// an absolute file position to obtain via [Pos.Position],
 // which can be rendered in a human-friendly text form,
 // and/or a relative position to obtain via [Pos.RelPos].
 type Pos struct {
@@ -73,12 +73,10 @@ type Pos struct {
 	offset int
 }
 
-// File returns the file that contains the printable position p
+// File returns the file that contains the absolute position p
 // or nil if there is no such file (for instance for p == [NoPos]).
 func (p Pos) File() *File {
-	if p.index() == 0 {
-		return nil
-	}
+	// assumed: p.index() != 0 iff p.file != nil
 	return p.file
 }
 
@@ -87,7 +85,7 @@ func (p Pos) File() *File {
 type hiddenPos = Pos
 
 func (p hiddenPos) Experiment() (x cueexperiment.File) {
-	if p.file == nil || p.file.experiments == nil {
+	if !p.HasAbsPos() || p.file.experiments == nil {
 		return x
 	}
 
@@ -117,7 +115,7 @@ func (p Pos) Column() int {
 // Filename returns the name of the file that this position belongs to.
 func (p Pos) Filename() string {
 	// Avoid calling [Pos.Position] as it also unpacks line and column info.
-	if p.file == nil {
+	if !p.HasAbsPos() {
 		return ""
 	}
 	return p.file.name
@@ -125,13 +123,13 @@ func (p Pos) Filename() string {
 
 // Position unpacks the position information into a flat struct.
 func (p Pos) Position() Position {
-	if p.file == nil {
+	if !p.HasAbsPos() {
 		return Position{}
 	}
 	return p.file.Position(p)
 }
 
-// String returns a human-readable form of a printable position.
+// String returns a human-readable form of an absolute position.
 func (p Pos) String() string {
 	return p.Position().String()
 }
@@ -197,9 +195,20 @@ func (p RelPos) Pos() Pos {
 	return Pos{nil, int(p)}
 }
 
-// HasRelPos reports whether p has a relative position.
+// HasRelPos reports whether p has a relative position, which can be
+// obtained via [Pos.RelPos].
 func (p Pos) HasRelPos() bool {
 	return p.offset&relMask != 0
+}
+
+// HasAbsPos reports whether p has an absolute position, which can be
+// obtained via [Pos.Position].
+func (p Pos) HasAbsPos() bool {
+	// It's assumed that p.file == nil iff p.index() == 0
+	//
+	// I.e. a file without an index is pointless (just a filename), and
+	// an index without a file is an offset in a vacuum.
+	return p.file != nil
 }
 
 // Before reports whether p < q, as documented in [Pos.Compare].
@@ -214,7 +223,7 @@ func (p Pos) Before(q Pos) bool {
 // Offset reports the byte offset relative to the file.
 func (p Pos) Offset() int {
 	// Avoid calling [Pos.Position] as it also unpacks line and column info.
-	if p.file == nil {
+	if !p.HasAbsPos() {
 		return 0
 	}
 	return p.file.Offset(p)
@@ -222,12 +231,16 @@ func (p Pos) Offset() int {
 
 // Add creates a new position relative to the p offset by n.
 func (p Pos) Add(n int) Pos {
+	// If p is not an absolute position, we can't add to its offset.
+	if !p.HasAbsPos() {
+		return p
+	}
 	return Pos{p.file, p.offset + toPos(index(n))}
 }
 
 // IsValid reports whether the position contains any useful information,
-// meaning either a printable file position to obtain via [Pos.Position],
-// and/or a relative position to obtain via [Pos.RelPos].
+// meaning either an absolute file position (obtained via [Pos.Position]),
+// and/or a relative position (obtained via [Pos.RelPos]).
 func (p Pos) IsValid() bool {
 	return p != NoPos
 }

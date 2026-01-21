@@ -76,9 +76,6 @@ type Pos struct {
 // File returns the file that contains the printable position p
 // or nil if there is no such file (for instance for p == [NoPos]).
 func (p Pos) File() *File {
-	if p.index() == 0 {
-		return nil
-	}
 	return p.file
 }
 
@@ -87,7 +84,7 @@ func (p Pos) File() *File {
 type hiddenPos = Pos
 
 func (p hiddenPos) Experiment() (x cueexperiment.File) {
-	if p.file == nil || p.file.experiments == nil {
+	if !p.HasAbsPos() || p.file.experiments == nil {
 		return x
 	}
 
@@ -117,7 +114,7 @@ func (p Pos) Column() int {
 // Filename returns the name of the file that this position belongs to.
 func (p Pos) Filename() string {
 	// Avoid calling [Pos.Position] as it also unpacks line and column info.
-	if p.file == nil {
+	if !p.HasAbsPos() {
 		return ""
 	}
 	return p.file.name
@@ -125,7 +122,7 @@ func (p Pos) Filename() string {
 
 // Position unpacks the position information into a flat struct.
 func (p Pos) Position() Position {
-	if p.file == nil {
+	if !p.HasAbsPos() {
 		return Position{}
 	}
 	return p.file.Position(p)
@@ -202,6 +199,15 @@ func (p Pos) HasRelPos() bool {
 	return p.offset&relMask != 0
 }
 
+// HasAbsPos reports whether p has an absolute position.
+func (p Pos) HasAbsPos() bool {
+	// It's assumed that p.file == nil iff p.index() == 0
+	//
+	// I.e. a file without an index is pointless (just a filename), and
+	// an index without a file means nothing.
+	return p.file != nil
+}
+
 // Before reports whether p < q, as documented in [Pos.Compare].
 //
 // Deprecated: use [Pos.Compare] instead.
@@ -214,7 +220,7 @@ func (p Pos) Before(q Pos) bool {
 // Offset reports the byte offset relative to the file.
 func (p Pos) Offset() int {
 	// Avoid calling [Pos.Position] as it also unpacks line and column info.
-	if p.file == nil {
+	if !p.HasAbsPos() {
 		return 0
 	}
 	return p.file.Offset(p)
@@ -222,6 +228,10 @@ func (p Pos) Offset() int {
 
 // Add creates a new position relative to the p offset by n.
 func (p Pos) Add(n int) Pos {
+	// If p is not an absolute position, we can't add to it.
+	if !p.HasAbsPos() {
+		return p
+	}
 	return Pos{p.file, p.offset + toPos(index(n))}
 }
 

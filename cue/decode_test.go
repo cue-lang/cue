@@ -383,6 +383,29 @@ func TestDecodeIntoCUEValue(t *testing.T) {
 	})
 }
 
+func TestDecodeIncompleteValueIntoCUEValue(t *testing.T) {
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		// We should be able to decode into a CUE value so we can
+		// decode partially incomplete values into Go.
+		// This test doesn't fit within the table used by TestDecode
+		// because cue values aren't easily comparable with cmp.Diff.
+		var st struct {
+			Field cue.Value `json:"field"`
+		}
+		err := getValue(m, `
+field: {
+	#x: _
+	a: #x.b
+}
+field: string | {
+	#x!: {...}
+	...
+}
+`).Decode(&st)
+		qt.Assert(t, qt.ErrorMatches(err, `field: 2 errors in empty disjunction:.*`))
+	})
+}
+
 type StructWithFloat struct {
 	Value *big.Float
 }

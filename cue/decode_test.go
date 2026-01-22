@@ -402,7 +402,16 @@ field: string | {
 	...
 }
 `).Decode(&st)
-		qt.Assert(t, qt.ErrorMatches(err, `field: 2 errors in empty disjunction:.*`))
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(fmt.Sprintf("%#v", st.Field), `(string | {
+	#x!: {
+		...
+	}
+	...
+}) & {
+	#x: _
+	a:  #x.b
+}`))
 	})
 }
 

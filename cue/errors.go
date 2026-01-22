@@ -91,6 +91,35 @@ var errNotExists = &adt.Bottom{
 	Err:       errors.Newf(token.NoPos, "undefined value"),
 }
 
+// IsIncomplete reports whether err is an incomplete error.
+// Incomplete errors occur when a value cannot be fully evaluated
+// due to missing information, such as unresolved references or
+// incomplete disjunctions. These errors may be acceptable in
+// non-concrete contexts.
+//
+// If the error returned by [Value.Err] is incomplete but the value
+// still exists (i.e., [Value.Exists] returns true), it typically means
+// the value is valid CUE but not fully resolved. In such cases,
+// [Value.Validate] with default options will return nil.
+func IsIncomplete(err error) bool {
+	if err == nil {
+		return false
+	}
+	// Fast path:
+	if ve, ok := err.(*valueError); ok {
+		return ve.err.IsIncomplete()
+	}
+	// Handle combined errors
+	for _, e := range errors.Errors(err) {
+		if ve, ok := e.(*valueError); ok {
+			if ve.err.IsIncomplete() {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func mkErr(src adt.Node, args ...interface{}) *adt.Bottom {
 	var e *adt.Bottom
 	var code adt.ErrorCode = -1

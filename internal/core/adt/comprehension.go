@@ -87,6 +87,12 @@ type envComprehension struct {
 	structs []*StructLit
 }
 
+// addEnv is used as a [YieldFunc] so that we don't need to create a new func
+// value for each comprehension.
+func (e *envComprehension) addEnv(env *Environment) {
+	e.envs = append(e.envs, env)
+}
+
 // envYield defines a comprehension for a specific field within a comprehension
 // value. Multiple envYields can be associated with a single envComprehension.
 // An envComprehension only needs to be evaluated once for multiple envYields.
@@ -334,16 +340,11 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 
 	// Compute environments, if needed.
 	if !d.done {
-		var envs []*Environment
-		f := func(env *Environment) {
-			envs = append(envs, env)
-		}
-
 		if err := ctx.yield(d.vertex, d.env, d.comp, Flags{
 			status:    state,
 			condition: allKnown,
 			mode:      ignore,
-		}, f); err != nil {
+		}, d.addEnv); err != nil {
 			if err.IsIncomplete() {
 				return err
 			}
@@ -357,8 +358,6 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 			}
 			return nil
 		}
-
-		d.envs = envs
 
 		if len(d.envs) > 0 {
 			for _, s := range d.structs {

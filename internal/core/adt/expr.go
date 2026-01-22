@@ -1452,7 +1452,7 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 		c.ci.FromEmbed = saved.FromEmbed
 	}()
 
-	args := []Value{}
+	args := make([]Value, 0, len(x.Args))
 	for i, a := range x.Args {
 		saved := c.errs
 		c.errs = nil

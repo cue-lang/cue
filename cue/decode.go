@@ -141,7 +141,7 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 		return
 	}
 
-	if err := v.Err(); err != nil {
+	if err := v.Err(); err != nil && !IsIncomplete(err) {
 		d.addErr(err)
 		return
 	}

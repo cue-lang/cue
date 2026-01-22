@@ -5,7 +5,7 @@ oauthregistry device-code-expired
 
 # Unrecognized token formats fail for now.
 ! exec cue login --token=unrecognized_token_format_1234
-stderr -count=1 'unknown token format, expected an appv1_ prefix'
+stderr -count=1 'unknown token format, expected a prefix like appv1_'
 
 # An empty token is rejected, to prevent issues like --token=${UNSET_VAR}.
 ! exec cue login --token=
@@ -28,6 +28,10 @@ exec cue login --token=appv1_validtoken5678 registry.mycorp.tld
 grep -count=1 '"registries": {' cueconfig/logins.json
 grep -count=1 '"registry\.mycorp\.tld"' cueconfig/logins.json
 grep -count=2 '"access_token"' cueconfig/logins.json
+
+# Ensure forward compatibility.
+exec cue login --token=nextv101_validtoken1234 registry.mycorp.tld
+grep -count=1 '"nextv101_validtoken1234"' cueconfig/logins.json
 
 # The full CUE_REGISTRY "simple" syntax is allowed.
 exec cue login --token=appv1_validtoken9999 fullsyntaxregistry.mycorp.tld/foobar+insecure

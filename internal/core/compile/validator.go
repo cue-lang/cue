@@ -29,7 +29,7 @@ var matchNBuiltin = &adt.Builtin{
 	Params:      []adt.Param{topParam, intParam, listParam}, // varargs
 	Result:      adt.BoolKind,
 	NonConcrete: true,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
 		args := call.Args()
 
@@ -88,7 +88,7 @@ var matchIfBuiltin = &adt.Builtin{
 	Params:      []adt.Param{topParam, topParam, topParam, topParam},
 	Result:      adt.BoolKind,
 	NonConcrete: true,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
 		args := call.Args()
 

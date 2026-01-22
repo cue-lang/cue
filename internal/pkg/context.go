@@ -28,7 +28,7 @@ import (
 
 // CallCtxt is passed to builtin implementations that need to use a cue.Value. This is an internal type. Its interface may change.
 type CallCtxt struct {
-	*adt.CallContext
+	adt.CallContext
 	ctx     *adt.OpContext
 	builtin *Builtin
 	Err     any

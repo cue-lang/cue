@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28c6644f_e0bdf792",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1039206
+      },
+      "writtenOn": "2026-01-22T19:15:27Z",
+      "side": 1,
+      "message": "How is performance if you write/use `func reflectMapRange(reflect.Value) iter.Seq2[reflect.Value, reflect.Value]` and `func reflectElems(reflect.Value) iter.Seq[reflect.Value]`? How would performance be if the reflect package got those helpers?",
+      "revId": "d4c91299db4f23617c1ea063057ec2f6c5d114bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

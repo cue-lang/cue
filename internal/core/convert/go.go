@@ -431,7 +431,10 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		case reflect.String, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 
-			for k, val := range val.Seq2() {
+			// Note that we don't use [reflect.Value.Seq2]; see the note below for [reflect.Array].
+			iter := val.MapRange()
+			for iter.Next() {
+				k, val := iter.Key(), iter.Value()
 				sub := fromGoValue(ctx, nilIsTop, val)
 				// mimic behavior of encoding/json: report error of unsupported type.
 				if sub == nil {
@@ -484,6 +487,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		// Note that we don't use [reflect.Value.Seq2],
 		// as it allocates more per iteration, and we don't need the index value.
 		// We can't use [reflect.Value.Seq] either, as that's just the indices.
+		// See the upstream bug report: https://go.dev/issue/76357
 		for i := range numElems {
 			val := val.Index(i)
 			x := fromGoValue(ctx, nilIsTop, val)

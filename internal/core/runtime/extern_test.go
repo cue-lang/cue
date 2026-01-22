@@ -119,7 +119,7 @@ func (c *compilerFake) Compile(name string, scope adt.Value, a *internal.Attr) (
 
 	call := &adt.CallExpr{Fun: &adt.Builtin{
 		Result: adt.TopKind,
-		Func: func(call *adt.CallContext) adt.Expr {
+		Func: func(call adt.CallContext) adt.Expr {
 			opctx := call.OpContext()
 
 			cuectx := (*cue.Context)(c.runtime)

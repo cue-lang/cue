@@ -1396,7 +1396,7 @@ func (x *CallExpr) Source() ast.Node {
 }
 
 func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
-	call := &CallContext{
+	call := CallContext{
 		ctx:  c,
 		call: x,
 	}
@@ -1529,7 +1529,7 @@ type Builtin struct {
 	// arguments. By default, all arguments are checked to be concrete.
 	NonConcrete bool
 
-	Func func(call *CallContext) Expr
+	Func func(call CallContext) Expr
 
 	// RawFunc gives low-level control to CUE's internals for builtins.
 	// It should be used when fine control over the evaluation process is
@@ -1539,7 +1539,7 @@ type Builtin struct {
 	// the Context.
 	//
 	// TODO: consider merging Func and RawFunc into a single field again.
-	RawFunc func(call *CallContext) Value
+	RawFunc func(call CallContext) Value
 
 	// Added indicates as of which language version this builtin can be used.
 	Added string
@@ -1623,7 +1623,7 @@ func (x *Builtin) checkArgs(c *OpContext, p token.Pos, numArgs int) bool {
 	return true
 }
 
-func (x *Builtin) call(call *CallContext) Expr {
+func (x *Builtin) call(call CallContext) Expr {
 	c := call.ctx
 	p := call.Pos()
 
@@ -1715,7 +1715,7 @@ func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {
 	args[0] = v
 	copy(args[1:], x.Args)
 
-	call := &CallContext{
+	call := CallContext{
 		ctx:         c,
 		call:        x.Src,
 		builtin:     x.Builtin,
@@ -1726,7 +1726,7 @@ func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {
 	return validateWithBuiltin(call)
 }
 
-func validateWithBuiltin(call *CallContext) *Bottom {
+func validateWithBuiltin(call CallContext) *Bottom {
 	var severeness ErrorCode
 	var err errors.Error
 

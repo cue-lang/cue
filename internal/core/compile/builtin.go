@@ -43,7 +43,7 @@ var errorBuiltin = &adt.Builtin{
 
 	Params: []adt.Param{stringParam},
 	Result: adt.BottomKind,
-	RawFunc: func(call *adt.CallContext) adt.Value {
+	RawFunc: func(call adt.CallContext) adt.Value {
 		ctx := call.OpContext()
 		arg := call.Expr(0)
 
@@ -86,7 +86,7 @@ var lenBuiltin = &adt.Builtin{
 	Name:   "len",
 	Params: []adt.Param{{Value: &adt.BasicType{K: supportedByLen}}},
 	Result: adt.IntKind,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
 		args := call.Args()
 
@@ -135,7 +135,7 @@ var closeBuiltin = &adt.Builtin{
 	Name:   "close",
 	Params: []adt.Param{structParam},
 	Result: adt.StructKind,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
 		args := call.Args()
 
@@ -157,7 +157,7 @@ var closeAllBuiltin = &adt.Builtin{
 	Name:   "__closeAll",
 	Params: []adt.Param{topParam},
 	Result: adt.TopKind,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
 
 		x := call.Expr(0)
@@ -189,7 +189,7 @@ var recloseBuiltin = &adt.Builtin{
 	Name:   "__reclose",
 	Params: []adt.Param{topParam},
 	Result: adt.TopKind,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
 
 		x := call.Expr(0)
@@ -224,7 +224,7 @@ var andBuiltin = &adt.Builtin{
 	Name:   "and",
 	Params: []adt.Param{listParam},
 	Result: adt.IntKind,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
 		args := call.Args()
 
@@ -245,7 +245,7 @@ var orBuiltin = &adt.Builtin{
 	Params:      []adt.Param{listParam},
 	Result:      adt.IntKind,
 	NonConcrete: true,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
 		args := call.Args()
 
@@ -283,7 +283,7 @@ var divBuiltin = &adt.Builtin{
 	Name:   "div",
 	Params: []adt.Param{intParam, intParam},
 	Result: adt.IntKind,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
 		args := call.Args()
 
@@ -297,7 +297,7 @@ var modBuiltin = &adt.Builtin{
 	Name:   "mod",
 	Params: []adt.Param{intParam, intParam},
 	Result: adt.IntKind,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
 		args := call.Args()
 
@@ -311,7 +311,7 @@ var quoBuiltin = &adt.Builtin{
 	Name:   "quo",
 	Params: []adt.Param{intParam, intParam},
 	Result: adt.IntKind,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
 		args := call.Args()
 
@@ -325,7 +325,7 @@ var remBuiltin = &adt.Builtin{
 	Name:   "rem",
 	Params: []adt.Param{intParam, intParam},
 	Result: adt.IntKind,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		c := call.OpContext()
 		args := call.Args()
 
@@ -352,7 +352,7 @@ var testExperiment = &adt.Builtin{
 	Name:   "testExperiment",
 	Params: []adt.Param{topParam},
 	Result: adt.TopKind,
-	Func: func(call *adt.CallContext) adt.Expr {
+	Func: func(call adt.CallContext) adt.Expr {
 		args := call.Args()
 
 		if call.Pos().Experiment().Testing {

@@ -28,27 +28,27 @@ type CallContext struct {
 	isValidator bool
 }
 
-func (c *CallContext) OpContext() *OpContext {
+func (c CallContext) OpContext() *OpContext {
 	return c.ctx
 }
 
-func (c *CallContext) Pos() token.Pos {
+func (c CallContext) Pos() token.Pos {
 	if c.call != nil {
 		return Pos(c.call)
 	}
 	return Pos(c.builtin)
 }
 
-func (c *CallContext) Value(i int) Value {
+func (c CallContext) Value(i int) Value {
 	return c.args[i]
 }
 
 // NumParams returns the total number of parameters to this function.
-func (c *CallContext) NumParams() int {
+func (c CallContext) NumParams() int {
 	return len(c.args)
 }
 
-func (c *CallContext) AddPositions(err *ValueError) {
+func (c CallContext) AddPositions(err *ValueError) {
 	for _, v := range c.args {
 		err.AddPosition(v)
 	}
@@ -57,7 +57,7 @@ func (c *CallContext) AddPositions(err *ValueError) {
 // Args return the pre-evaluated arguments. This function is only used for
 // transitioning and will be removed at some point. Use [CallContext.Value]
 // instead.
-func (c *CallContext) Args() []Value {
+func (c CallContext) Args() []Value {
 	return c.args
 }
 
@@ -67,7 +67,7 @@ func (c *CallContext) Args() []Value {
 //
 // This method of getting an argument should be used when the argument is used
 // as a schema and may contain cycles.
-func (c *CallContext) Arg(i int) Value {
+func (c CallContext) Arg(i int) Value {
 	// If the call context represents a validator call, the argument will be
 	// offset by 1.
 	if c.isValidator {
@@ -84,7 +84,7 @@ func (c *CallContext) Arg(i int) Value {
 }
 
 // Expr returns the nth argument expression without evaluating it.
-func (c *CallContext) Expr(i int) Expr {
+func (c CallContext) Expr(i int) Expr {
 	// If the call context represents a validator call, the argument will be
 	// offset by 1.
 	if c.isValidator {
@@ -99,6 +99,6 @@ func (c *CallContext) Expr(i int) Expr {
 	return x
 }
 
-func (c *CallContext) Errf(format string, args ...interface{}) *Bottom {
+func (c CallContext) Errf(format string, args ...interface{}) *Bottom {
 	return c.ctx.NewErrf(format, args...)
 }

@@ -132,13 +132,11 @@ func ToBuiltin(b *Builtin) *adt.Builtin {
 	}
 	x.Func = func(call adt.CallContext) (ret adt.Expr) {
 		ctx := call.OpContext()
-		args := call.Args()
 
 		// call, _ := ctx.Source().(*ast.CallExpr)
 		c := &CallCtxt{
 			CallContext: call,
 			ctx:         ctx,
-			args:        args,
 			builtin:     b,
 		}
 		defer func() {

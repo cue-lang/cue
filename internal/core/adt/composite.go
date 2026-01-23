@@ -1408,7 +1408,7 @@ func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 	v.Conjuncts = append(v.Conjuncts, c)
 }
 
-func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) {
+func (v *Vertex) AddStruct(s *StructLit) {
 	for i, t := range v.Structs {
 		if t.StructLit == s {
 			v.Structs[i].Repeats++

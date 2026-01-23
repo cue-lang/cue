@@ -233,7 +233,7 @@ func (n *nodeContext) insertComprehension(
 					isComprehension: true,
 				}
 			}
-			node.AddStruct(st, env, ci)
+			node.AddStruct(st)
 			switch {
 			case !ec.done:
 				ec.structs = append(ec.structs, st)

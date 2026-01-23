@@ -527,7 +527,16 @@ func ensureArcVertex(ctx *adt.OpContext, env *adt.Environment, x adt.Value, l ad
 		a.Label = l
 		return &a
 	}
-	arc := &adt.Vertex{Label: l}
+	// We know this is one vertex with exactly one conjunct,
+	// so allocate both together to reduce the runtime overhead.
+	var alloc struct {
+		arc   adt.Vertex
+		conjs [1]adt.Conjunct
+	}
+	arc := &alloc.arc
+	arc.Conjuncts = alloc.conjs[:0]
+
+	arc.Label = l
 	arc.AddConjunct(adt.MakeRootConjunct(env, x))
 	arc.SetValue(ctx, x)
 	arc.ForceDone()

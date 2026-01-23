@@ -107,7 +107,7 @@ Disjuncts:    28
 
 NumCloseIDs: 77
 
-ConjunctInfos:       197
+ConjunctInfos:       196
 MaxConjunctInfos:    8
 MaxReqSets:          9
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -136,7 +136,7 @@ diff old new
 +
 +NumCloseIDs: 77
 +
-+ConjunctInfos:       197
++ConjunctInfos:       196
 +MaxConjunctInfos:    8
 +MaxReqSets:          9
 -- out/eval/stats --

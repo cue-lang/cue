@@ -430,7 +430,7 @@ Notifications: 14
 
 NumCloseIDs: 728
 
-ConjunctInfos:       1165
+ConjunctInfos:       1120
 MaxConjunctInfos:    10
 MaxReqSets:          12
 MaxRedirect:         1
@@ -1292,7 +1292,7 @@ diff old new
 +
 +NumCloseIDs: 728
 +
-+ConjunctInfos:       1165
++ConjunctInfos:       1120
 +MaxConjunctInfos:    10
 +MaxReqSets:          12
 +MaxRedirect:         1

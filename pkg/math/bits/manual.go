@@ -25,18 +25,14 @@ import (
 	"math/bits"
 )
 
-// Lsh returns x shifted left by n bits.
+// Lsh sets and returns x shifted left by n bits.
 func Lsh(x *big.Int, n uint) *big.Int {
-	var z big.Int
-	z.Lsh(x, n)
-	return &z
+	return x.Lsh(x, n)
 }
 
-// Rsh returns x shifted right by n bits.
+// Rsh sets and returns x shifted right by n bits.
 func Rsh(x *big.Int, n uint) *big.Int {
-	var z big.Int
-	z.Rsh(x, n)
-	return &z
+	return x.Rsh(x, n)
 }
 
 // At returns the value of the i'th bit of x.
@@ -47,41 +43,31 @@ func At(x *big.Int, i uint) (uint, error) {
 	return x.Bit(int(i)), nil
 }
 
-// SetBit returns x with x's i'th bit set to b (0 or 1). That is, if b is 1
-// SetBit returns x with its i'th bit set; if b is 0 SetBit returns x with
-// its i'th bit cleared.
+// Set sets and returns x with x's i'th bit set to b (0 or 1).
+// That is, if b is 1 Set returns x with its i'th bit set;
+// if b is 0 Set returns x with its i'th bit cleared.
 func Set(x *big.Int, i int, bit uint) *big.Int {
-	var z big.Int
-	z.SetBit(x, i, bit)
-	return &z
+	return x.SetBit(x, i, bit)
 }
 
-// And returns the bitwise and of a and b.
+// And sets and returns a to the bitwise "and" of a and b.
 func And(a, b *big.Int) *big.Int {
-	var z big.Int
-	z.And(a, b)
-	return &z
+	return a.And(a, b)
 }
 
-// Or returns the bitwise or of a and b (a | b in Go).
+// Or sets and returns a to the bitwise "or" of a and b (a | b in Go).
 func Or(a, b *big.Int) *big.Int {
-	var z big.Int
-	z.Or(a, b)
-	return &z
+	return a.Or(a, b)
 }
 
-// Xor returns the bitwise xor of a and b (a ^ b in Go).
+// Xor sets and returns a to the bitwise xor of a and b (a ^ b in Go).
 func Xor(a, b *big.Int) *big.Int {
-	var z big.Int
-	z.Xor(a, b)
-	return &z
+	return a.Xor(a, b)
 }
 
-// Clear returns the bitwise and not of a and b (a &^ b in Go).
+// Clear sets and returns a to the bitwise "and not" of a and b (a &^ b in Go).
 func Clear(a, b *big.Int) *big.Int {
-	var z big.Int
-	z.AndNot(a, b)
-	return &z
+	return a.AndNot(a, b)
 }
 
 // OnesCount returns the number of one bits ("population count") in x.

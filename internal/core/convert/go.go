@@ -24,9 +24,9 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/cockroachdb/apd/v3"
-	"golang.org/x/text/encoding/unicode"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -197,8 +197,6 @@ func isNil(x reflect.Value) bool {
 	return false
 }
 
-var utf8Enc = unicode.UTF8.NewEncoder()
-
 func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result adt.Value) {
 	src := ctx.Source()
 	if !val.IsValid() { // untyped nil, or dereferencing a nil pointer/interface
@@ -299,8 +297,8 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "encoding.TextMarshaler"))
 		}
-		s, _ := utf8Enc.String(string(b))
-		return &adt.String{Src: src, Str: s}
+		str := strings.ToValidUTF8(string(b), string(utf8.RuneError))
+		return &adt.String{Src: src, Str: str}
 	}
 	if _, ok := implements(typ, goError); ok {
 		v, _ := val.Interface().(error) // TODO(go1.25): use reflect.TypeAssert
@@ -316,8 +314,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return ctx.NewBool(val.Bool())
 
 	case reflect.String:
-		str := val.String()
-		str, _ = utf8Enc.String(str)
+		str := strings.ToValidUTF8(val.String(), string(utf8.RuneError))
 		// TODO: here and above: allow to fail on invalid strings.
 		// if !utf8.ValidString(str) {
 		// 	return ctx.AddErrf("cannot convert result to string: invalid UTF-8")

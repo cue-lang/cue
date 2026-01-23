@@ -224,17 +224,16 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return &adt.Num{
 			Src: src,
 			K:   adt.IntKind,
-			X:   *apd.NewWithBigInt(new(apd.BigInt).SetMathBigInt(v), 0),
+			X:   fromGoBigInt(v),
 		}
 
 	case bigRat:
 		v, _ := val.Interface().(*big.Rat) // TODO(go1.25): use reflect.TypeAssert
 		// should we represent this as a binary operation?
 		n := &adt.Num{Src: src, K: adt.IntKind}
-		if _, err := internal.BaseContext.Quo(&n.X,
-			apd.NewWithBigInt(new(apd.BigInt).SetMathBigInt(v.Num()), 0),
-			apd.NewWithBigInt(new(apd.BigInt).SetMathBigInt(v.Denom()), 0),
-		); err != nil {
+		num := fromGoBigInt(v.Num())
+		denom := fromGoBigInt(v.Denom())
+		if _, err := internal.BaseContext.Quo(&n.X, &num, &denom); err != nil {
 			return ctx.AddErrf("could not convert *big.Rat: %v", err)
 		}
 		if !v.IsInt() {
@@ -509,6 +508,17 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return v
 	}
 	return nil
+}
+
+func fromGoBigInt(x *big.Int) apd.Decimal {
+	// Integers fitting in 64 bits is rather common.
+	// In that case, avoid the conversion to [apd.BigInt], which also allocates.
+	if x.IsInt64() {
+		var dec apd.Decimal
+		dec.SetInt64(x.Int64())
+		return dec
+	}
+	return *apd.NewWithBigInt(new(apd.BigInt).SetMathBigInt(x), 0)
 }
 
 func ensureArcVertex(ctx *adt.OpContext, x adt.Value, l adt.Feature) *adt.Vertex {

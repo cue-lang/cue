@@ -401,7 +401,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 
 			f := ctx.StringLabel(name)
 			sl.Decls = append(sl.Decls, &adt.Field{Label: f, Value: sub})
-			v.Arcs = append(v.Arcs, ensureArcVertex(ctx, env, sub, f))
+			v.Arcs = append(v.Arcs, ensureArcVertex(env, sub, f))
 		}
 
 		// There is no closedness or cycle info for Go structs, so we pass an empty CloseInfo.
@@ -439,7 +439,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 
 				s := fmt.Sprint(k)
 				f := ctx.StringLabel(s)
-				v.Arcs = append(v.Arcs, ensureArcVertex(ctx, env, sub, f))
+				v.Arcs = append(v.Arcs, ensureArcVertex(env, sub, f))
 			}
 			slices.SortFunc(v.Arcs, func(a, b *adt.Vertex) int {
 				return strings.Compare(a.Label.IdentString(ctx), b.Label.IdentString(ctx))
@@ -488,7 +488,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			}
 			list.Elems = append(list.Elems, x)
 			f := adt.MakeIntLabel(adt.IntLabel, int64(i))
-			v.Arcs = append(v.Arcs, ensureArcVertex(ctx, env, x, f))
+			v.Arcs = append(v.Arcs, ensureArcVertex(env, x, f))
 		}
 
 		v.AddConjunct(adt.MakeRootConjunct(env, list))
@@ -516,7 +516,7 @@ func fromGoBigInt(x *big.Int) apd.Decimal {
 	return *apd.NewWithBigInt(new(apd.BigInt).SetMathBigInt(x), 0)
 }
 
-func ensureArcVertex(ctx *adt.OpContext, env *adt.Environment, x adt.Value, l adt.Feature) *adt.Vertex {
+func ensureArcVertex(env *adt.Environment, x adt.Value, l adt.Feature) *adt.Vertex {
 	if arc, ok := x.(*adt.Vertex); ok {
 		if arc.Label == l {
 			// We already have a vertex with the correct label; do not make a copy.
@@ -527,9 +527,18 @@ func ensureArcVertex(ctx *adt.OpContext, env *adt.Environment, x adt.Value, l ad
 		a.Label = l
 		return &a
 	}
-	arc := &adt.Vertex{Label: l}
-	arc.AddConjunct(adt.MakeRootConjunct(env, x))
-	arc.SetValue(ctx, x)
+	// We know this is one vertex with exactly one conjunct,
+	// so allocate both together to reduce the runtime overhead.
+	var alloc struct {
+		arc   adt.Vertex
+		conjs [1]adt.Conjunct
+	}
+	arc := &alloc.arc
+	arc.Label = l
+	arc.BaseValue = x
+	arc.Conjuncts = alloc.conjs[:]
+	arc.Conjuncts[0] = adt.MakeRootConjunct(env, x)
+
 	arc.ForceDone()
 	return arc
 }

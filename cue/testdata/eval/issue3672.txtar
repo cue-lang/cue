@@ -312,7 +312,7 @@ Disjuncts:    574
 
 NumCloseIDs: 819
 
-ConjunctInfos:       894
+ConjunctInfos:       885
 MaxConjunctInfos:    7
 MaxReqSets:          15
 MaxRedirect:         6
@@ -342,7 +342,7 @@ diff old new
 +
 +NumCloseIDs: 819
 +
-+ConjunctInfos:       894
++ConjunctInfos:       885
 +MaxConjunctInfos:    7
 +MaxReqSets:          15
 +MaxRedirect:         6

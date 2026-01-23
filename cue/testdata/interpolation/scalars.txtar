@@ -28,6 +28,32 @@ Retain: 0
 Unifications: 11
 Conjuncts:    12
 Disjuncts:    11
+-- out/evalalpha --
+(struct){
+  bool1: (string){ "1+1=2:  true" }
+  bool2: (string){ "1+1=1:  false" }
+  b1: (bytes){ 'a\xed\x95a' }
+  bytes1s: (string){ "a�a" }
+  bytes1b: (bytes){ 'a\xed\x95a' }
+  b2: (bytes){ 'a\x80\x95a' }
+  bytes2s: (string){ "a�a" }
+  bytes2b: (bytes){ 'a\x80\x95a' }
+  n1: (string){ "1 2.00" }
+  n2: (string){ "1E+2" }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -5,7 +5,7 @@
+   bytes1s: (string){ "a�a" }
+   bytes1b: (bytes){ 'a\xed\x95a' }
+   b2: (bytes){ 'a\x80\x95a' }
+-  bytes2s: (string){ "a��a" }
++  bytes2s: (string){ "a�a" }
+   bytes2b: (bytes){ 'a\x80\x95a' }
+   n1: (string){ "1 2.00" }
+   n2: (string){ "1E+2" }
 -- out/eval --
 (struct){
   bool1: (string){ "1+1=2:  true" }

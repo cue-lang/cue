@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee5dcfd4_2ac37a58",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-23T09:32:59Z",
+      "side": 1,
+      "message": "only query here is I\u0027ve not spotted a guarantee that envCompr.envs is empty before we start.",
+      "revId": "dbe050562d65897b53f66a781daad74037ac8bdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

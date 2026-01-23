@@ -16,6 +16,24 @@
       "message": "only query here is I\u0027ve not spotted a guarantee that envCompr.envs is empty before we start.",
       "revId": "dbe050562d65897b53f66a781daad74037ac8bdd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9da065bd_d2790d61",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-23T09:38:34Z",
+      "side": 1,
+      "message": "here, `done \u003d\u003d false`, so we haven\u0027t yielded any envs yet. once we\u0027re done with that, we set it to true.",
+      "parentUuid": "ee5dcfd4_2ac37a58",
+      "revId": "dbe050562d65897b53f66a781daad74037ac8bdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

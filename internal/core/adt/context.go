@@ -19,10 +19,11 @@ import (
 	"iter"
 	"reflect"
 	"regexp"
+	"strings"
 	"sync/atomic"
+	"unicode/utf8"
 
 	"github.com/cockroachdb/apd/v3"
-	"golang.org/x/text/encoding/unicode"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
@@ -1208,8 +1209,7 @@ func (c *OpContext) toStringValue(v Value, k Kind, as interface{}) string {
 }
 
 func bytesToString(b []byte) string {
-	b, _ = unicode.UTF8.NewDecoder().Bytes(b)
-	return string(b)
+	return strings.ToValidUTF8(string(b), string(utf8.RuneError))
 }
 
 func (c *OpContext) bytesValue(v Value, as interface{}) []byte {

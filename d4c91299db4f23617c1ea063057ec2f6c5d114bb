@@ -34,6 +34,24 @@
       "parentUuid": "28c6644f_e0bdf792",
       "revId": "d4c91299db4f23617c1ea063057ec2f6c5d114bb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b22bfa60_6bcce5db",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-23T09:19:16Z",
+      "side": 1,
+      "message": "I\u0027ll reply to the upstream thread - or start a new issue - with a small reproducer. I think the func being recursive is part of the issue.",
+      "parentUuid": "15b5ad21_b10a15ba",
+      "revId": "d4c91299db4f23617c1ea063057ec2f6c5d114bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

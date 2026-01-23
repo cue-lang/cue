@@ -451,7 +451,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		}
 
 		v.AddStruct(obj)
-		v.SetValue(ctx, &adt.StructMarker{})
+		v.SetValue(ctx, structMarker)
 		v.ForceDone()
 		return v
 
@@ -492,12 +492,18 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		}
 
 		v.AddConjunct(adt.MakeRootConjunct(env, list))
-		v.SetValue(ctx, &adt.ListMarker{})
+		v.SetValue(ctx, listMarker)
 		v.ForceDone()
 		return v
 	}
 	return nil
 }
+
+// These are effectively singletons, so avoid allocating new ones.
+var (
+	structMarker = &adt.StructMarker{}
+	listMarker   = &adt.ListMarker{}
+)
 
 func fromGoBigInt(x *big.Int) apd.Decimal {
 	// Integers fitting in 64 bits is rather common.

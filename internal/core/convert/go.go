@@ -206,6 +206,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		}
 		return &adt.Null{Src: src}
 	}
+	env := ctx.Env(0)
 	typ := val.Type()
 	switch typ {
 	case astFile:
@@ -400,13 +401,9 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 
 			f := ctx.StringLabel(name)
 			sl.Decls = append(sl.Decls, &adt.Field{Label: f, Value: sub})
-			v.Arcs = append(v.Arcs, ensureArcVertex(ctx, sub, f))
+			v.Arcs = append(v.Arcs, ensureArcVertex(ctx, env, sub, f))
 		}
 
-		env := ctx.Env(0)
-		if env == nil {
-			env = &adt.Environment{}
-		}
 		// There is no closedness or cycle info for Go structs, so we pass an empty CloseInfo.
 		v.AddStruct(sl, env, adt.CloseInfo{})
 		v.SetValue(ctx, &adt.StructMarker{})
@@ -442,7 +439,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 
 				s := fmt.Sprint(k)
 				f := ctx.StringLabel(s)
-				v.Arcs = append(v.Arcs, ensureArcVertex(ctx, sub, f))
+				v.Arcs = append(v.Arcs, ensureArcVertex(ctx, env, sub, f))
 			}
 			slices.SortFunc(v.Arcs, func(a, b *adt.Vertex) int {
 				return strings.Compare(a.Label.IdentString(ctx), b.Label.IdentString(ctx))
@@ -453,10 +450,6 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			}
 		}
 
-		env := ctx.Env(0)
-		if env == nil {
-			env = &adt.Environment{}
-		}
 		v.AddStruct(obj, env, adt.CloseInfo{})
 		v.SetValue(ctx, &adt.StructMarker{})
 		v.ForceDone()
@@ -495,13 +488,9 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			}
 			list.Elems = append(list.Elems, x)
 			f := adt.MakeIntLabel(adt.IntLabel, int64(i))
-			v.Arcs = append(v.Arcs, ensureArcVertex(ctx, x, f))
+			v.Arcs = append(v.Arcs, ensureArcVertex(ctx, env, x, f))
 		}
 
-		env := ctx.Env(0)
-		if env == nil {
-			env = &adt.Environment{}
-		}
 		v.AddConjunct(adt.MakeRootConjunct(env, list))
 		v.SetValue(ctx, &adt.ListMarker{})
 		v.ForceDone()
@@ -521,7 +510,7 @@ func fromGoBigInt(x *big.Int) apd.Decimal {
 	return *apd.NewWithBigInt(new(apd.BigInt).SetMathBigInt(x), 0)
 }
 
-func ensureArcVertex(ctx *adt.OpContext, x adt.Value, l adt.Feature) *adt.Vertex {
+func ensureArcVertex(ctx *adt.OpContext, env *adt.Environment, x adt.Value, l adt.Feature) *adt.Vertex {
 	if arc, ok := x.(*adt.Vertex); ok {
 		if arc.Label == l {
 			// We already have a vertex with the correct label; do not make a copy.
@@ -531,10 +520,6 @@ func ensureArcVertex(ctx *adt.OpContext, x adt.Value, l adt.Feature) *adt.Vertex
 		a := *arc
 		a.Label = l
 		return &a
-	}
-	env := ctx.Env(0)
-	if env == nil {
-		env = &adt.Environment{}
 	}
 	arc := &adt.Vertex{Label: l}
 	arc.AddConjunct(adt.MakeRootConjunct(env, x))

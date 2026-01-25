@@ -1868,10 +1868,10 @@ float64   >=-1.797693134862315708145274237317043567981e+308 &
 
 An identifier of a package may be exported to permit access to it
 from another package.
-All identifiers not starting with `_` (so all regular fields and definitions
-starting with `#`) are exported.
-Any identifier starting with `_` is not visible outside the package and resides
-in a separate namespace than namesake identifiers of other packages.
+All identifiers not starting with `_` are exported,
+such as regular fields or definitions starting with `#`.
+Any identifier starting with `_` is hidden from other packages;
+it resides in a separate namespace than namesake identifiers of other packages.
 
 ```
 package mypackage

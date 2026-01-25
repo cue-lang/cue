@@ -2094,7 +2094,14 @@ func (x *ForClause) yield(s *compState) {
 				IsDynamic: true,
 				anonymous: true,
 			}
-			key := a.Label.ToValue(c)
+			var key Value
+			if a.Label.IsString() {
+				key = &String{Src: c.src, Str: c.IndexToString(a.Label.safeIndex())}
+			} else {
+				num := &Num{Src: c.src, K: IntKind}
+				num.X.SetInt64(int64(a.Label.Index()))
+				key = num
+			}
 			v.AddConjunct(MakeRootConjunct(env, key))
 			v.SetValue(c, key)
 			n.Arcs = append(n.Arcs, v)

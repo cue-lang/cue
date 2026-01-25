@@ -135,16 +135,12 @@ func TestMatchPatternValue(t *testing.T) {
 		expr := pv(t.T, tc.expr)
 
 		var f adt.Feature
-		var label adt.Value
 		if tc.label != "" {
-			f, label = str(tc.label)
+			f, _ = str(tc.label)
 		} else {
 			f = idx(tc.index)
 		}
-		if tc.value != "" {
-			label = pv(t.T, tc.value)
-		}
 
-		t.Equal(adt.MatchPatternValue(ctx, expr, f, label), tc.result)
+		t.Equal(adt.MatchPatternValue(ctx, expr, f), tc.result)
 	})
 }

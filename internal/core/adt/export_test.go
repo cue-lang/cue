@@ -18,6 +18,6 @@ package adt
 // fields_test.go and constraints_test.
 
 // MatchPatternValue exports matchPatternValue for testing.
-func MatchPatternValue(ctx *OpContext, p Value, f Feature, label Value) bool {
-	return matchPatternValue(ctx, p, f, label)
+func MatchPatternValue(ctx *OpContext, p Value, f Feature) bool {
+	return matchPatternValue(ctx, p, f)
 }

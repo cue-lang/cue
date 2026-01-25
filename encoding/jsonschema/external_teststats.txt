@@ -4,8 +4,8 @@ Core tests:
 
 v3:
 	schema extract (pass / total): 1072 / 1363 = 78.7%
-	tests (pass / total): 3913 / 4803 = 81.5%
-	tests on extracted schemas (pass / total): 3913 / 4041 = 96.8%
+	tests (pass / total): 3917 / 4803 = 81.6%
+	tests on extracted schemas (pass / total): 3917 / 4041 = 96.9%
 
 v3-roundtrip:
 	schema extract (pass / total): 240 / 1363 = 17.6%

@@ -127,35 +127,18 @@ func matchPattern(ctx *OpContext, pattern Value, f Feature) bool {
 		return false
 	}
 
-	// TODO(perf): this assumes that comparing an int64 against apd.Decimal
-	// is faster than converting this to a Num and using that for comparison.
-	// This may very well not be the case. But it definitely will be if we
-	// special-case integers that can fit in an int64 (or int32 if we want to
-	// avoid many bound checks), which we probably should. Especially when we
-	// allow list constraints, like [<10]: T.
-	var label Value
-	if f.IsString() && int64(f.Index()) != MaxIndex {
-		label = f.ToValue(ctx)
-	}
-
-	return matchPatternValue(ctx, pattern, f, label)
+	return matchPatternValue(ctx, pattern, f)
 }
 
-// matchPatternValue matches a concrete value against f. label must be the
-// CUE value that is obtained from converting f.
+// matchPatternValue matches a concrete value against f.
 //
 // This is an optimization an intended to be faster than regular CUE evaluation
 // for the majority of cases where pattern constraints are used.
-func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (result bool) {
+func matchPatternValue(ctx *OpContext, pattern Value, f Feature) (result bool) {
 	if v, ok := pattern.(*Vertex); ok {
 		v.unify(ctx, Flags{condition: scalarKnown, mode: finalize, checkTypos: false})
 	}
 	pattern = Unwrap(pattern)
-	label = Unwrap(label)
-
-	if pattern == label {
-		return true
-	}
 
 	k := IntKind
 	if f.IsString() {
@@ -193,10 +176,10 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (r
 	case *BoundValue:
 		switch x.Kind() {
 		case StringKind:
-			if label == nil {
+			if !f.IsString() || int64(f.Index()) == MaxIndex {
 				return false
 			}
-			str := label.(*String).Str
+			str := ctx.IndexToString(f.safeIndex())
 			return x.validateStr(ctx, str)
 
 		case NumberKind:
@@ -212,15 +195,15 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (r
 		return err == nil && xi == yi
 
 	case *String:
-		if label == nil {
+		if !f.IsString() || int64(f.Index()) == MaxIndex {
 			return false
 		}
-		y, ok := label.(*String)
-		return ok && x.Str == y.Str
+		str := ctx.IndexToString(f.safeIndex())
+		return x.Str == str
 
 	case *Conjunction:
 		for _, a := range x.Values {
-			if !matchPatternValue(ctx, a, f, label) {
+			if !matchPatternValue(ctx, a, f) {
 				return false
 			}
 		}
@@ -228,7 +211,7 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (r
 
 	case *Disjunction:
 		for _, a := range x.Values {
-			if matchPatternValue(ctx, a, f, label) {
+			if matchPatternValue(ctx, a, f) {
 				return true
 			}
 		}
@@ -242,10 +225,7 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (r
 	// slow track. One way to signal this would be to have a "value thunk" at
 	// the root that causes the fast track to be bypassed altogether.
 
-	if label == nil {
-		label = f.ToValue(ctx)
-	}
-
+	label := f.ToValue(ctx)
 	n := ctx.newInlineVertex(nil, nil,
 		MakeConjunct(ctx.e, pattern, ctx.ci),
 		MakeConjunct(ctx.e, label, ctx.ci))

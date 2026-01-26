@@ -345,6 +345,7 @@ func (fs *ioFS) ReadFile(name string) ([]byte, error) {
 
 var _ module.ReadCUEFS = (*ioFS)(nil)
 
+// IsDirWithCUEFiles implements [module.ReadCUEFS]
 func (fs *ioFS) IsDirWithCUEFiles(path string) (bool, error) {
 	return false, stderrs.ErrUnsupported
 }

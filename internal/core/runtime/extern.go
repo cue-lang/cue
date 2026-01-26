@@ -291,47 +291,67 @@ func (d *externDecorator) markExternFieldAttr(kind string, decls []ast.Decl) (er
 	return errs
 }
 
+// ExtractFieldAttrsByKind finds all the attributes of the given kind
+// in the given AST, parsing their bodies into [internal.Attr].
 func ExtractFieldAttrsByKind(file *ast.File, kind string) (attrsByField map[*ast.Field]*internal.Attr, errs errors.Error) {
 	k, _, decs, err := findExternFileAttr(file)
 	if err != nil || len(decs) == 0 || k != kind {
 		return nil, err
 	}
 
+	var fieldStack []*ast.Field
+
 	ast.Walk(&ast.File{Decls: decs}, func(n ast.Node) bool {
 		switch n := n.(type) {
 		case *ast.Field:
-			for _, attr := range n.Attrs {
-				pos := attr.Pos()
-				k, body := attr.Split()
+			fieldStack = append(fieldStack, n)
 
-				// Support old-style and new-style extern attributes.
-				if k != "extern" && k != kind {
-					break
-				}
+		case *ast.Attribute:
+			pos := n.Pos()
+			k, body := n.Split()
 
-				_, _, err := ast.LabelName(n.Label)
-				if err != nil {
-					b, _ := format.Node(n.Label)
-					errs = errors.Append(errs, errors.Newf(pos, "external attribute has non-concrete label %s", b))
-					break
-				}
-
-				if attrsByField == nil {
-					attrsByField = make(map[*ast.Field]*internal.Attr)
-				}
-				if _, found := attrsByField[n]; found {
-					errs = errors.Append(errs, errors.Newf(pos, "duplicate @%s attributes", k))
-					break
-				}
-
-				attrParsed := internal.ParseAttrBody(pos, body)
-				attrsByField[n] = &attrParsed
+			// Support old-style and new-style extern attributes.
+			if k != "extern" && k != kind {
+				break
 			}
+
+			lastFieldIdx := len(fieldStack) - 1
+			if lastFieldIdx < 0 {
+				errs = errors.Append(errs, errors.Newf(pos, "@%s attribute not associated with field", kind))
+				return true
+			}
+
+			f := fieldStack[lastFieldIdx]
+
+			_, _, err := ast.LabelName(f.Label)
+			if err != nil {
+				b, _ := format.Node(f.Label)
+				errs = errors.Append(errs, errors.Newf(pos, "external attribute has non-concrete label %s", b))
+				break
+			}
+
+			if attrsByField == nil {
+				attrsByField = make(map[*ast.Field]*internal.Attr)
+			}
+			if _, found := attrsByField[f]; found {
+				errs = errors.Append(errs, errors.Newf(pos, "duplicate @%s attributes", k))
+				break
+			}
+
+			attrParsed := internal.ParseAttrBody(pos, body)
+			attrsByField[f] = &attrParsed
+
 			return false
 		}
 
 		return true
-	}, nil)
+
+	}, func(n ast.Node) {
+		switch n.(type) {
+		case *ast.Field:
+			fieldStack = fieldStack[:len(fieldStack)-1]
+		}
+	})
 
 	return attrsByField, errs
 }

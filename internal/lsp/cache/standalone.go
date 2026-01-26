@@ -100,22 +100,21 @@ func (s *Standalone) deleteFile(uri protocol.DocumentURI) {
 // requirements are not met, then the file remains as a standalone
 // file.
 func (s *Standalone) subtractModulesAndPackages() error {
-	for uri, sfile := range s.files {
+	for fileUri, sfile := range s.files {
 		if pkgName := sfile.file.syntax.PackageName(); pkgName == "" {
 			continue
 		}
 
-		m, err := s.workspace.FindModuleForFile(uri)
+		m, err := s.workspace.FindModuleForFile(fileUri)
 		if err != nil && err != errModuleNotFound {
 			return err
 		} else if m != nil {
-			ip, dirUris, err := m.FindImportPathForFile(uri)
+			ip, dirUris, err := m.FindImportPathForFile(fileUri)
 			if err != nil || ip == nil || len(dirUris) == 0 {
 				continue
 			}
 			sfile.delete()
-			pkg := m.EnsurePackage(*ip, dirUris)
-			m.markPackagesDirty(pkg, uri)
+			m.EnsurePackage(*ip, dirUris).markFileDirty(fileUri)
 		}
 	}
 	return nil

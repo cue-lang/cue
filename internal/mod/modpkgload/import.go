@@ -302,7 +302,7 @@ func (pkgs *Packages) findLocalPackage(pkgPath string) ([]module.SourceLoc, erro
 
 func isDirWithCUEFiles(loc module.SourceLoc) (bool, error) {
 	fsys := loc.FS
-	if cueFS, ok := fsys.(module.ReadCUEFS); ok {
+	if cueFS, ok := fsys.(module.ReadCUEFS); ok && false {
 		result, err := cueFS.IsDirWithCUEFiles(loc.Dir)
 		if !errors.Is(err, errors.ErrUnsupported) {
 			return result, err

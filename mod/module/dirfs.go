@@ -33,6 +33,14 @@ type ReadCUEFS interface {
 	// suffix. If the implementation is unable to read-and-convert (as
 	// necessary) a path to a CUE AST, it should  return nil, nil.
 	ReadCUEFile(path string, cfg parser.Config) (*ast.File, error)
+
+	// IsDirWithCUEFiles reports whether the given path is a directory
+	// which contains files for which this implementation would attempt
+	// to read and parse, if its ReadCUEFile method were called.
+	//
+	// If this method is implemented, but the implementation does not
+	// support examining directories, it should return
+	// [errors.ErrUnsupported].
 	IsDirWithCUEFiles(path string) (bool, error)
 }
 

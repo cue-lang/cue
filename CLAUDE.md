@@ -8,13 +8,14 @@ This is the CUE language repository. CUE (Configure, Unify, Execute) is a genera
 
 ## Common Development Commands
 
-### Building
-```bash
-# Build and install the cue command
-go install ./cmd/cue
+### Running the "cue" command
 
-# Build without installing
-go build ./cmd/cue
+```bash
+# Build and run ./cmd/cue via a cached binary
+go tool cue
+
+# Or build and install it in $PATH.
+go install ./cmd/cue
 ```
 
 ### Testing
@@ -28,9 +29,9 @@ go test ./...
 go test ./internal/core/adt
 
 # Run a specific test function
-go test -run TestEvalV2 ./internal/core/adt
+go test -run TestEvalV3 ./internal/core/adt
 
-# Run a specific testscript test
+# Run a specific sub-test
 go test -run TestScript/eval_concrete ./cmd/cue/cmd
 
 # Update golden test files (when output changes are expected)
@@ -41,6 +42,7 @@ go test -race ./...
 ```
 
 ### Code Quality
+
 ```bash
 # Run go vet (catches common mistakes)
 go vet ./...
@@ -105,3 +107,12 @@ go fmt ./...
 - Follow existing code style and patterns in the package you're modifying
 - Check neighboring files for framework choices and conventions
 - Use existing libraries and utilities rather than assuming new dependencies
+
+## Rules to follow
+
+These rules MUST be followed at all times:
+- Do not use commands like `cat` to read or write files; read and write files directly
+- Do not write to temporary folders like /tmp; place all temporary files under the current directory
+- Do not use env vars like CUE_DEBUG for debug prints; print unconditionally, and remove them when done
+- Do not "go build" binaries; use commands like "go tool cue" or "go run ./cmd/cue" instead
+- When adding a regression test for a bug fix, ensure that the test fails without the fix

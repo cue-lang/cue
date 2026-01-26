@@ -9,4 +9,4 @@
 -- out/decode/extract --
 ERROR:
 keyword "$dynamicAnchor" not yet implemented:
-    schema.json:4:3
+    schema.json:4:4

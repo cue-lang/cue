@@ -80,7 +80,7 @@ cmp stderr expect-stderr-3
 }
 -- expect-stderr-1 --
 keyword "xml" not yet implemented:
-    ./openapi.json:13:17
+    ./openapi.json:13:18
 -- expect-out.cue --
 info: {
 	title:   *"My OpenAPI" | string
@@ -91,7 +91,7 @@ info: {
 }
 -- expect-stderr-2 --
 unknown keyword "unknown":
-    ./openapi-badkeyword.json:12:17
+    ./openapi-badkeyword.json:12:18
 -- expect-stderr-3 --
 unknown keyword "unknown":
-    ./openapi3.1-badkeyword.json:12:17
+    ./openapi3.1-badkeyword.json:12:18

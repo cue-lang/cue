@@ -8,4 +8,4 @@
 -- out/decode/extract --
 ERROR:
 keyword "id" is not supported in JSON schema version http://json-schema.org/draft-07/schema#:
-    schema.json:3:3
+    schema.json:3:4

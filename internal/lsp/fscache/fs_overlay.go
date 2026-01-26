@@ -639,6 +639,7 @@ func (fs *rootedOverlayFS) ReadCUEFile(name string, config parser.Config) (*ast.
 	return nil, iofs.ErrInvalid
 }
 
+// IsDirWithCUEFiles implements [module.ReadCUEFS]
 func (fs *rootedOverlayFS) IsDirWithCUEFiles(path string) (bool, error) {
 	if !iofs.ValidPath(path) {
 		return false, &iofs.PathError{Op: "IsDirWithCUEFiles", Path: path, Err: iofs.ErrInvalid}

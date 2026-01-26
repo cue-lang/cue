@@ -102,7 +102,7 @@ func main() {
 func extractExperiments() ([]Experiment, error) {
 	// Extract file experiments from File struct
 	fileExperiments, err := extractExperimentsFromStruct(
-		reflect.TypeOf(cueexperiment.File{}),
+		reflect.TypeFor[cueexperiment.File](),
 		"../../../internal/cueexperiment/file.go",
 		"File",
 		false, // IsGlobal = false for per-file experiments
@@ -113,7 +113,7 @@ func extractExperiments() ([]Experiment, error) {
 
 	// Extract global experiments from Config struct
 	globalExperiments, err := extractExperimentsFromStruct(
-		reflect.TypeOf(cueexperiment.Config{}),
+		reflect.TypeFor[cueexperiment.Config](),
 		"../../../internal/cueexperiment/exp.go",
 		"Config",
 		true, // IsGlobal = true for global experiments
@@ -152,7 +152,7 @@ func extractFieldComment(comments []*ast.Comment) string {
 
 func parseExperimentTag(tagStr string) *experimentInfo {
 	info := &experimentInfo{}
-	for _, part := range strings.Split(tagStr, ",") {
+	for part := range strings.SplitSeq(tagStr, ",") {
 		part = strings.TrimSpace(part)
 		key, value, found := strings.Cut(part, ":")
 		if !found {
@@ -326,30 +326,29 @@ Available per-file experiments:
 
 	// Generate per-file experiments
 	for _, exp := range fileExperiments {
-		sb.WriteString(fmt.Sprintf("  %s (preview: %s", exp.Name, exp.Preview))
+		fmt.Fprintf(&sb, "  %s (preview: %s", exp.Name, exp.Preview)
 		if exp.Default != "" {
-			sb.WriteString(fmt.Sprintf(", default: %s", exp.Default))
+			fmt.Fprintf(&sb, ", default: %s", exp.Default)
 		}
 		if exp.Stable != "" {
-			sb.WriteString(fmt.Sprintf(", stable: %s", exp.Stable))
+			fmt.Fprintf(&sb, ", stable: %s", exp.Stable)
 		}
 		if exp.Withdrawn != "" {
-			sb.WriteString(fmt.Sprintf(", withdrawn: %s", exp.Withdrawn))
+			fmt.Fprintf(&sb, ", withdrawn: %s", exp.Withdrawn)
 		}
 		sb.WriteString(")\n")
 
 		// Add full comment if available
 		if exp.Comment != "" {
 			// Split into lines and indent each line
-			lines := strings.Split(exp.Comment, "\n")
-			for _, line := range lines {
+			for line := range strings.SplitSeq(exp.Comment, "\n") {
 				line = strings.TrimSpace(line)
 				if line != "" {
 					// Replace field name with lowercase version in the first occurrence
 					line = strings.Replace(line, exp.FieldName, exp.Name, 1)
 					// Escape backticks to avoid syntax errors in Go string literals
 					line = strings.ReplaceAll(line, "`", "`+\"`\"+`")
-					sb.WriteString(fmt.Sprintf("    %s\n", line))
+					fmt.Fprintf(&sb, "    %s\n", line)
 				}
 			}
 		}
@@ -374,17 +373,17 @@ Available global experiments:
 `)
 
 		for _, exp := range globalExperiments {
-			sb.WriteString(fmt.Sprintf("  %s", exp.Name))
+			fmt.Fprintf(&sb, "  %s", exp.Name)
 			if exp.Preview != "" {
-				sb.WriteString(fmt.Sprintf(" (preview: %s", exp.Preview))
+				fmt.Fprintf(&sb, " (preview: %s", exp.Preview)
 				if exp.Default != "" {
-					sb.WriteString(fmt.Sprintf(", default: %s", exp.Default))
+					fmt.Fprintf(&sb, ", default: %s", exp.Default)
 				}
 				if exp.Stable != "" {
-					sb.WriteString(fmt.Sprintf(", stable: %s", exp.Stable))
+					fmt.Fprintf(&sb, ", stable: %s", exp.Stable)
 				}
 				if exp.Withdrawn != "" {
-					sb.WriteString(fmt.Sprintf(", withdrawn: %s", exp.Withdrawn))
+					fmt.Fprintf(&sb, ", withdrawn: %s", exp.Withdrawn)
 				}
 				sb.WriteString(")")
 			} else if exp.Withdrawn != "" {
@@ -395,15 +394,14 @@ Available global experiments:
 			// Add full comment if available
 			if exp.Comment != "" {
 				// Split into lines and indent each line
-				lines := strings.Split(exp.Comment, "\n")
-				for _, line := range lines {
+				for line := range strings.SplitSeq(exp.Comment, "\n") {
 					line = strings.TrimSpace(line)
 					if line != "" {
 						// Replace field name with lowercase version in the first occurrence
 						line = strings.Replace(line, exp.FieldName, exp.Name, 1)
 						// Escape backticks to avoid syntax errors in Go string literals
 						line = strings.ReplaceAll(line, "`", "`+\"`\"+`")
-						sb.WriteString(fmt.Sprintf("    %s\n", line))
+						fmt.Fprintf(&sb, "    %s\n", line)
 					}
 				}
 			}

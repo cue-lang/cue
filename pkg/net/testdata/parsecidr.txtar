@@ -1,0 +1,90 @@
+-- in.cue --
+import "net"
+
+// IPv4 tests
+t1: net.ParseCIDR("10.20.30.40/24")
+t2: net.ParseCIDR("192.168.1.0/24")
+t3: net.ParseCIDR("10.0.0.0/8")
+t4: net.ParseCIDR("172.16.0.0/16")
+t5: net.ParseCIDR("192.168.1.128/25")
+
+// IPv6 tests
+t6: net.ParseCIDR("2001:db8::/32")
+t7: net.ParseCIDR("fe80::/10")
+
+// Edge cases
+t8: net.ParseCIDR("0.0.0.0/0")
+t9: net.ParseCIDR("255.255.255.255/32")
+
+// Error cases
+t10: net.ParseCIDR("invalid")
+t11: net.ParseCIDR("192.168.1.1")
+-- out/net-v3 --
+Errors:
+t10: error in call to net.ParseCIDR: netip.ParsePrefix("invalid"): no '/':
+    ./in.cue:19:6
+t11: error in call to net.ParseCIDR: netip.ParsePrefix("192.168.1.1"): no '/':
+    ./in.cue:20:6
+
+Result:
+// IPv4 tests
+t1: {
+	prefix_mask:    "255.255.255.0"
+	prefix_len:     24
+	prefix_addr:    "10.20.30.0"
+	broadcast_addr: "10.20.30.255"
+}
+t2: {
+	prefix_mask:    "255.255.255.0"
+	prefix_len:     24
+	prefix_addr:    "192.168.1.0"
+	broadcast_addr: "192.168.1.255"
+}
+t3: {
+	prefix_mask:    "255.0.0.0"
+	prefix_len:     8
+	prefix_addr:    "10.0.0.0"
+	broadcast_addr: "10.255.255.255"
+}
+t4: {
+	prefix_mask:    "255.255.0.0"
+	prefix_len:     16
+	prefix_addr:    "172.16.0.0"
+	broadcast_addr: "172.16.255.255"
+}
+t5: {
+	prefix_mask:    "255.255.255.128"
+	prefix_len:     25
+	prefix_addr:    "192.168.1.128"
+	broadcast_addr: "192.168.1.255"
+}
+
+// IPv6 tests
+t6: {
+	prefix_mask: "ffff:ffff::"
+	prefix_len:  32
+	prefix_addr: "2001:db8::"
+}
+t7: {
+	prefix_mask: "ffc0::"
+	prefix_len:  10
+	prefix_addr: "fe80::"
+}
+
+// Edge cases
+t8: {
+	prefix_mask:    "0.0.0.0"
+	prefix_len:     0
+	prefix_addr:    "0.0.0.0"
+	broadcast_addr: "255.255.255.255"
+}
+t9: {
+	prefix_mask:    "255.255.255.255"
+	prefix_len:     32
+	prefix_addr:    "255.255.255.255"
+	broadcast_addr: "255.255.255.255"
+}
+
+// Error cases
+t10: _|_ // t10: error in call to net.ParseCIDR: netip.ParsePrefix("invalid"): no '/'
+t11: _|_ // t11: error in call to net.ParseCIDR: netip.ParsePrefix("192.168.1.1"): no '/'

@@ -264,6 +264,19 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
+		Name: "CIDRContainsIP",
+		Params: []pkg.Param{
+			{Kind: adt.TopKind},
+			{Kind: adt.TopKind},
+		},
+		Result: adt.BoolKind,
+		Func: func(c *pkg.CallCtxt) {
+			cidr, ip := c.Value(0), c.Value(1)
+			if c.Do() {
+				c.Ret, c.Err = CIDRContainsIP(cidr, ip)
+			}
+		},
+	}, {
 		Name: "PathEscape",
 		Params: []pkg.Param{
 			{Kind: adt.StringKind},

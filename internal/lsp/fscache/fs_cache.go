@@ -15,9 +15,9 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/encoding/json"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/robustio"
@@ -99,7 +99,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 
 	bf := p.buildFile
 	if bf == nil {
-		return nil, parser.Config{}, nil
+		return nil, parser.Config{}, module.ErrNotCUE
 	}
 
 	filename := bf.Filename
@@ -122,7 +122,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 	case build.JSON:
 		syntax = &ast.File{Filename: filename}
 		var expr ast.Expr
-		expr, err = json.Extract(filename, content)
+		expr, err = parser.ParseExpr(filename, content)
 		switch expr := expr.(type) {
 		case nil: // unparsable
 		case *ast.StructLit:
@@ -130,12 +130,13 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 		default:
 			syntax.Decls = []ast.Decl{&ast.EmbedDecl{Expr: expr}}
 		}
+		json.PatchExpr(syntax, nil)
 
 	case build.YAML:
 		syntax, err = yaml.Extract(filename, content)
 
 	default:
-		return nil, parser.Config{}, nil
+		return nil, parser.Config{}, module.ErrNotCUE
 	}
 
 	if syntax != nil {
@@ -356,7 +357,9 @@ func readFile(uri protocol.DocumentURI, mtime time.Time) (*diskFileEntry, error)
 
 	bf, err := filetypes.ParseFileAndType(filePath, "", filetypes.Input)
 	if err != nil {
-		// yes, throw the error away
+		// Yes, throw the error away, and return an empty cueFileParser
+		// so that we record that this uri can never be converted to a
+		// CUE AST.
 		return &diskFileEntry{
 			modTime:       mtime,
 			uri:           uri,
@@ -455,6 +458,7 @@ func (fs *rootedCUECacheFS) ReadCUEFile(name string, config parser.Config) (*ast
 	return ast, err
 }
 
+// IsDirWithCUEFiles implements [module.ReadCUEFS]
 func (fs *rootedCUECacheFS) IsDirWithCUEFiles(path string) (bool, error) {
 	if !iofs.ValidPath(path) {
 		return false, &iofs.PathError{Op: "IsDirWithCUEFiles", Path: path, Err: iofs.ErrInvalid}
@@ -486,23 +490,15 @@ func (fs *rootedCUECacheFS) IsDirWithCUEFiles(path string) (bool, error) {
 
 		ftype := e.Type()
 		if ftype&iofs.ModeSymlink != 0 {
-			name, err := os.Readlink(filepath.Join(path, e.Name()))
+			finfo, err := os.Stat(filepath.Join(path, e.Name()))
 			if err != nil {
-				continue
-			}
-			if !filepath.IsAbs(name) {
-				name = filepath.Join(path, name)
-			}
-			finfo, err := os.Stat(name)
-			if err != nil {
-				continue
+				continue // Ignore broken symlinks.
 			}
 			ftype = finfo.Mode()
 		}
-		if !ftype.IsRegular() {
-			continue
+		if ftype.IsRegular() {
+			return true, nil
 		}
-		return true, nil
 	}
 
 	return false, nil

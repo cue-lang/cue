@@ -220,6 +220,9 @@ func yieldAllModFiles(fsys fs.FS, fpath string, topDir bool, yield func(ModuleFi
 // It returns the yielded package name (if any) and reports whether
 // the iteration should continue.
 func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName string) bool, yield func(ModuleFile, error) bool) (pkgName string, cont bool) {
+	if !strings.HasSuffix(fpath, ".cue") {
+		return "", true
+	}
 	pf := ModuleFile{
 		FilePath: fpath,
 	}
@@ -234,24 +237,14 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 		// the default parser options used by cue/load for better
 		// cache behavior.
 		syntax, syntaxErr = cueFS.ReadCUEFile(fpath, parser.NewConfig(parser.ImportsOnly))
-		if syntax == nil {
-			if syntaxErr == nil {
-				// This file couldn't be read-and-converted to a CUE
-				// AST. Make no further attempts on this file.
-				return "", true
-			} else if !errors.Is(syntaxErr, errors.ErrUnsupported) {
-				return "", yield(pf, syntaxErr)
-			}
+		if syntax == nil && !errors.Is(syntaxErr, errors.ErrUnsupported) {
+			return "", yield(pf, syntaxErr)
 		}
 	}
 	if syntax == nil {
 		// Either the FS doesn't implement [module.ReadCUEFS]
 		// or the ReadCUEFile method returned ErrUnsupported,
 		// so we need to acquire the syntax ourselves.
-		if !strings.HasSuffix(fpath, ".cue") {
-			// This fallback only supports reading `.cue` files.
-			return "", true
-		}
 
 		f, err := fsys.Open(fpath)
 		if err != nil {

@@ -1,6 +1,7 @@
 package module
 
 import (
+	"errors"
 	"io/fs"
 	"os"
 
@@ -31,10 +32,20 @@ type ReadCUEFS interface {
 	//
 	// This method may be called with paths which do not have a `.cue`
 	// suffix. If the implementation is unable to read-and-convert (as
-	// necessary) a path to a CUE AST, it should  return nil, nil.
+	// necessary) a path to a CUE AST, it should  return [ErrNotCUE].
 	ReadCUEFile(path string, cfg parser.Config) (*ast.File, error)
+
+	// IsDirWithCUEFiles reports whether the given path is a directory
+	// which contains files for which this implementation would attempt
+	// to read and parse, if its ReadCUEFile method were called.
+	//
+	// If this method is implemented, but the implementation does not
+	// support examining directories, it should return
+	// [errors.ErrUnsupported].
 	IsDirWithCUEFiles(path string) (bool, error)
 }
+
+var ErrNotCUE = errors.New("Cannot convert file to CUE")
 
 // OSRootFS can be implemented by an [fs.FS]
 // implementation to return its root directory as

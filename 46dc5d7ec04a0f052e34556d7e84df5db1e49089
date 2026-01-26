@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33b922ad_0e7696a7",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-26T16:59:10Z",
+      "side": 0,
+      "message": "I had also given this the side eye before :) I think it was an attempt at reducing the scope of some local vars, but it\u0027s unnecessary and weird IMHO.",
+      "revId": "46dc5d7ec04a0f052e34556d7e84df5db1e49089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -173,6 +173,14 @@ foo: [
         [string]: _ // comment
     }
 }
+
+// issue #4238
+[string]: [
+	...string // inline comment without a comma
+]
+[string]: [
+	...string, // inline comment with a comma
+]
 -- out/format/comments.golden --
 // Package line 1 group 1
 // Package line 2 group 1
@@ -332,6 +340,14 @@ foo: [
 
 	// an ellipsis
 }
+
+// issue #4238
+[string]: [
+	...string // inline comment without a comma,
+]
+[string]: [
+	...string // inline comment with a comma,
+]
 -- comment_alone.input --
 // Just one comment on its own.
 -- out/format/comment_alone.golden --

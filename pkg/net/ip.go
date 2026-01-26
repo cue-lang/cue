@@ -304,3 +304,18 @@ func AddIPCIDR(ip cue.Value, offset *big.Int) (string, error) {
 	}
 	return netip.PrefixFrom(addr, prefix.Bits()).String(), nil
 }
+
+// InCIDR reports whether an IP address is contained a CIDR subnet string.
+func InCIDR(ip, cidr cue.Value) (bool, error) {
+	ipAddr := netGetIP(ip)
+	if !ipAddr.IsValid() {
+		return false, fmt.Errorf("invalid IP %q", ip)
+	}
+
+	prefix, err := netGetIPCIDR(cidr)
+	if err != nil {
+		return false, err
+	}
+
+	return prefix.Contains(ipAddr), nil
+}

@@ -1,0 +1,119 @@
+-- in.cue --
+import "net"
+
+// IPv4 tests
+t1: net.CIDRContainsIP("192.168.1.0/24", "192.168.1.5")
+t2: net.CIDRContainsIP("192.168.1.0/24", "192.168.2.5")
+t3: net.CIDRContainsIP("10.0.0.0/8", "10.0.0.1")
+t4: net.CIDRContainsIP("10.0.0.0/8", "11.0.0.1")
+
+// IPv4 with byte list
+t5: net.CIDRContainsIP("192.168.1.0/24", [192, 168, 1, 100])
+t6: net.CIDRContainsIP("192.168.1.0/24", [192, 168, 2, 100])
+
+// IPv6 tests
+t7: net.CIDRContainsIP("2001:db8::/32", "2001:db8::1")
+t8: net.CIDRContainsIP("2001:db8::/32", "2001:db9::1")
+
+// Edge cases
+t9:  net.CIDRContainsIP("192.168.1.0/24", "192.168.1.0")
+t10: net.CIDRContainsIP("192.168.1.0/24", "192.168.1.255")
+t11: net.CIDRContainsIP("0.0.0.0/0", "0.0.0.0")
+t12: net.CIDRContainsIP("0.0.0.0/0", "255.255.255.255")
+
+// Error cases
+t13: net.CIDRContainsIP("192.168.1.0/24", "invalid")
+t14: net.CIDRContainsIP("invalid", "192.168.1.1")
+t15: net.CIDRContainsIP("192.168.1.0", "192.168.1.1")
+-- out/net-v3 --
+Errors:
+t13: error in call to net.CIDRContainsIP: invalid IP "invalid":
+    ./in.cue:24:6
+t14: error in call to net.CIDRContainsIP: netip.ParsePrefix("invalid"): no '/':
+    ./in.cue:25:6
+t15: error in call to net.CIDRContainsIP: netip.ParsePrefix("192.168.1.0"): no '/':
+    ./in.cue:26:6
+
+Result:
+// IPv4 tests
+t1: true
+t2: false
+t3: true
+t4: false
+
+// IPv4 with byte list
+t5: true
+t6: false
+
+// IPv6 tests
+t7: true
+t8: false
+
+// Edge cases
+t9:  true
+t10: true
+t11: true
+t12: true
+
+// Error cases
+t13: _|_ // t13: error in call to net.CIDRContainsIP: invalid IP "invalid"
+t14: _|_ // t14: error in call to net.CIDRContainsIP: netip.ParsePrefix("invalid"): no '/'
+t15: _|_ // t15: error in call to net.CIDRContainsIP: netip.ParsePrefix("192.168.1.0"): no '/'
+-- diff/-out/net-v3<==>+out/net --
+diff old new
+--- old
++++ new
+@@ -1,14 +1,12 @@
+ Errors:
+ t13: error in call to net.CIDRContainsIP: invalid IP "invalid":
+-    ./in.cue:21:6
++    ./in.cue:24:6
+ t14: error in call to net.CIDRContainsIP: netip.ParsePrefix("invalid"): no '/':
+-    ./in.cue:22:6
++    ./in.cue:25:6
+ t15: error in call to net.CIDRContainsIP: netip.ParsePrefix("192.168.1.0"): no '/':
+-    ./in.cue:23:6
++    ./in.cue:26:6
+ 
+ Result:
+-import "net"
+-
+ // IPv4 tests
+ t1: true
+ t2: false
+-- out/net --
+Errors:
+t13: error in call to net.CIDRContainsIP: invalid IP "invalid":
+    ./in.cue:21:6
+t14: error in call to net.CIDRContainsIP: netip.ParsePrefix("invalid"): no '/':
+    ./in.cue:22:6
+t15: error in call to net.CIDRContainsIP: netip.ParsePrefix("192.168.1.0"): no '/':
+    ./in.cue:23:6
+
+Result:
+import "net"
+
+// IPv4 tests
+t1: true
+t2: false
+t3: true
+t4: false
+
+// IPv4 with byte list
+t5: true
+t6: false
+
+// IPv6 tests
+t7: true
+t8: false
+
+// Edge cases
+t9:  true
+t10: true
+t11: true
+t12: true
+
+// Error cases
+t13: _|_ // t13: error in call to net.CIDRContainsIP: invalid IP "invalid"
+t14: _|_ // t14: error in call to net.CIDRContainsIP: netip.ParsePrefix("invalid"): no '/'
+t15: _|_ // t15: error in call to net.CIDRContainsIP: netip.ParsePrefix("192.168.1.0"): no '/'

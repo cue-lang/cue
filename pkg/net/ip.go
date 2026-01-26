@@ -304,3 +304,21 @@ func AddIPCIDR(ip cue.Value, offset *big.Int) (string, error) {
 	}
 	return netip.PrefixFrom(addr, prefix.Bits()).String(), nil
 }
+
+// CIDRContainsIP reports whether the CIDR network cidr contains the IP address ip.
+//
+// The cidr must be a string in CIDR notation (e.g., "192.168.1.0/24").
+// The ip address may be a string or list of bytes.
+func CIDRContainsIP(cidr cue.Value, ip cue.Value) (bool, error) {
+	prefix, err := netGetIPCIDR(cidr)
+	if err != nil {
+		return false, err
+	}
+
+	ipAddr := netGetIP(ip)
+	if !ipAddr.IsValid() {
+		return false, fmt.Errorf("invalid IP %q", ip)
+	}
+
+	return prefix.Contains(ipAddr), nil
+}

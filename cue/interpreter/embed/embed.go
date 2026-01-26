@@ -161,7 +161,8 @@ type compiler struct {
 	pos token.Pos
 }
 
-// NB the fs must be have the attribute's file at its root
+// validateAttr performs logical validation of the attr. It does not
+// perform any checks against a filesystem.
 func validateAttr(a *internal.Attr) (file, glob, typ string, allowEmptyGlob bool, errs errors.Error) {
 	pos := a.Pos
 
@@ -206,6 +207,7 @@ func validateAttr(a *internal.Attr) (file, glob, typ string, allowEmptyGlob bool
 		if err != nil {
 			return "", "", "", false, err
 		}
+
 		// Validate that the glob pattern is valid per [pkgpath.Match].
 		// Note that we use Unix match semantics because all embed paths are Unix-like.
 		if _, err := pkgpath.Match(glob, "", pkgpath.Unix); err != nil {
@@ -331,6 +333,13 @@ func fsGlob(fsys iofs.FS, pattern string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	return filterFsGlobResults(pattern, matches...), nil
+}
+
+// filterFsGlobResults applies additional filtering on the given
+// matches to only include dot-prefixed files when the dot is
+// explictly present in the corresponding pattern element.
+func filterFsGlobResults(pattern string, matches ...string) []string {
 	patElems := strings.Split(pattern, "/")
 	included := func(m string) bool {
 		for i, elem := range strings.Split(m, "/") {
@@ -350,7 +359,7 @@ func fsGlob(fsys iofs.FS, pattern string) ([]string, error) {
 			i++
 		}
 	}
-	return matches[:i], nil
+	return matches[:i]
 }
 
 func (c *compiler) decodeFile(file, scope string, schema adt.Value) (adt.Expr, errors.Error) {
@@ -361,7 +370,7 @@ func (c *compiler) decodeFile(file, scope string, schema adt.Value) (adt.Expr, e
 		return nil, errors.Promote(err, "invalid file type")
 	}
 
-	// Open and pre-load the file system using iofs.FS, instead of relying
+	// Open and pre-load the file system using iofs.FS.
 	r, err := c.fs.Open(file)
 	if err != nil {
 		return nil, errors.Newf(c.pos, "open %v: no such file or directory", file)
@@ -423,6 +432,12 @@ func (c *compiler) decodeFile(file, scope string, schema adt.Value) (adt.Expr, e
 	return v, nil
 }
 
+// EmbeddedPaths validates the provided attributes as embed
+// attributes, returning a slice of [Embed] structs for attributes
+// that were successfully validated, and errors for those which were
+// not. The filepath should be the filepath of the file from which
+// these attributes were extracted, and relative to whatever root is
+// going to be used in calls to [Embed.Matches] and [Embed.MatchAll].
 func EmbeddedPaths(filepath string, attrsByField map[*ast.Field]*internal.Attr) ([]*Embed, errors.Error) {
 	if len(attrsByField) == 0 {
 		return nil, nil
@@ -434,58 +449,74 @@ func EmbeddedPaths(filepath string, attrsByField map[*ast.Field]*internal.Attr) 
 			errs = errors.Append(errs, attr.Err)
 			continue
 		}
-		file, glob, _, _, err := validateAttr(attr)
+		file, glob, typ, allowEmptyGlob, err := validateAttr(attr)
 		if err != nil {
-			errs = errors.Append(errs, attr.Err)
+			errs = errors.Append(errs, err)
 			continue
 		}
 		embed := &Embed{
 			Field:     field,
 			Attribute: attr,
 			FilePath:  filepath,
+			Type:      typ,
 		}
-		embeds = append(embeds, embed)
 		if file != "" {
-			embed.interpreter = &embeddedFile{filepath: file}
+			embed.interpreter = &embeddedFile{
+				filepath: file,
+			}
+			embeds = append(embeds, embed)
 		} else if glob != "" {
-			embed.interpreter = &embeddedGlob{glob: glob}
+			embed.interpreter = &embeddedGlob{
+				glob:           glob,
+				allowEmptyGlob: allowEmptyGlob,
+			}
+			embeds = append(embeds, embed)
 		}
 	}
 	return embeds, errs
-}
-
-type EmbedKey struct {
-	Dir       string
-	EmbedBody string
 }
 
 type Embed struct {
 	Field       *ast.Field
 	Attribute   *internal.Attr
 	FilePath    string
+	Type        string
 	interpreter embedInterpreter
 }
 
-func (e *Embed) Key() EmbedKey {
-	return EmbedKey{
-		Dir:       path.Dir(e.FilePath),
-		EmbedBody: e.Attribute.Body,
-	}
-}
-
+// Matches reports whether the provided filepath is matched by this
+// [Embed] attribute. The filepath should be relative to the same root
+// as the filepath provided to [EmbeddedPaths]. E.g. if in
+// `/wibble/foo/bar.cue` you have `@embed(filename=a/b.json)`, and
+// `foo/bar.cue` is the filepath passed to [EmbeddedPaths], then
+// [Embed.Matches] will return true if called with `foo/a/b.json`.
 func (e *Embed) Matches(filepath string) bool {
 	return e.interpreter.matches(e, filepath)
 }
 
-func (e *Embed) Match(fs iofs.FS) []string {
+// MatchAll uses the provided fs to report all the filepaths that
+// match this [Embed] attribute. The fs must be relative to the same
+// root as the filepath provided to [EmbeddedPaths]. I.e. for the
+// filepath provided to [EmbeddedPaths], iofs.Stat(fs, filepath)
+// should be accessing the same file which contained this [Embed]
+// attribute.
+func (e *Embed) MatchAll(fs iofs.FS) ([]string, error) {
 	return e.interpreter.match(e, fs)
 }
 
+// IsGlob reports whether this [Embed] attribute represents a glob
+// embedding.
+func (e *Embed) IsGlob() bool {
+	_, isGlob := e.interpreter.(*embeddedGlob)
+	return isGlob
+}
+
 type embedInterpreter interface {
-	// all filepaths (including any within the Embed) are considered
-	// relative to the same root.
+	// NB: All filepaths (including any within the Embed) are
+	// considered relative to the same root.
+
 	matches(e *Embed, filepath string) bool
-	match(e *Embed, fs iofs.FS) []string
+	match(e *Embed, fs iofs.FS) ([]string, error)
 }
 
 type embeddedFile struct {
@@ -497,43 +528,52 @@ func (ef *embeddedFile) matches(e *Embed, filepath string) bool {
 	return filepath == path.Join(dir, ef.filepath)
 }
 
-func (ef *embeddedFile) match(e *Embed, fs iofs.FS) []string {
+func (ef *embeddedFile) match(e *Embed, fs iofs.FS) ([]string, error) {
 	dir := path.Dir(e.FilePath)
 	filepath := path.Join(dir, ef.filepath)
 	info, err := iofs.Stat(fs, filepath)
-	if err != nil || !info.Mode().IsRegular() {
-		return nil
+	if err != nil {
+		return nil, errors.Wrapf(err, e.Attribute.Pos, "failed to stat %s: %v", filepath, err)
 	}
-	return []string{filepath}
+	if info.IsDir() {
+		return nil, errors.Newf(e.Attribute.Pos, "%v is a directory", filepath)
+	}
+	return []string{filepath}, nil
 }
 
 type embeddedGlob struct {
-	glob string
+	glob           string
+	allowEmptyGlob bool
 }
 
 func (eg *embeddedGlob) matches(e *Embed, filepath string) bool {
-	// TODO FIXME: this doesn't follow the rules on .-prefixed files.
 	dir := path.Dir(e.FilePath) + "/"
 	filepath, wasCut := strings.CutPrefix(filepath, dir)
 	if !wasCut {
 		return false
 	}
-	result, _ := pkgpath.Match(eg.glob, filepath, pkgpath.Unix)
-	return result
+	result, err := pkgpath.Match(eg.glob, filepath, pkgpath.Unix)
+	if !result || err != nil {
+		return false
+	}
+	return len(filterFsGlobResults(eg.glob, filepath)) == 1
 }
 
-func (eg *embeddedGlob) match(e *Embed, fs iofs.FS) []string {
+func (eg *embeddedGlob) match(e *Embed, fs iofs.FS) ([]string, error) {
 	dir := path.Dir(e.FilePath)
 	fs, err := iofs.Sub(fs, dir)
 	if err != nil {
-		panic(err)
+		return nil, errors.Wrapf(err, e.Attribute.Pos, "%v", err)
 	}
 	filepaths, err := fsGlob(fs, eg.glob)
 	if err != nil {
-		return nil
+		return nil, errors.Wrapf(err, e.Attribute.Pos, "%v", err)
+	}
+	if !eg.allowEmptyGlob && len(filepaths) == 0 {
+		return nil, errors.Newf(e.Attribute.Pos, "no matches for glob pattern %q", eg.glob)
 	}
 	for i, filepath := range filepaths {
 		filepaths[i] = path.Join(dir, filepath)
 	}
-	return filepaths
+	return filepaths, nil
 }

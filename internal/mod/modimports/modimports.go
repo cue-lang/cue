@@ -235,7 +235,7 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 		// cache behavior.
 		syntax, syntaxErr = cueFS.ReadCUEFile(fpath, parser.NewConfig(parser.ImportsOnly))
 		if syntax == nil {
-			if syntaxErr == nil {
+			if errors.Is(syntaxErr, module.ErrNotCUE) {
 				// This file couldn't be read-and-converted to a CUE
 				// AST. Make no further attempts on this file.
 				return "", true

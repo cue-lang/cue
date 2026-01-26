@@ -24,7 +24,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/token"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/eval"
 )
@@ -32,7 +32,7 @@ import (
 // Definition attempts to resolve the given position, within the file
 // definitions, to one or more ast nodes, and returns the positions of
 // the definitions of those nodes.
-func (w *Workspace) Definition(tokFile *token.File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) []protocol.Location {
+func (w *Workspace) Definition(file *File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) []protocol.Location {
 	offset, err := srcMapper.PositionOffset(pos)
 	if err != nil {
 		w.debugLog(err.Error())
@@ -78,7 +78,7 @@ func (w *Workspace) Definition(tokFile *token.File, fe *eval.FileEvaluator, srcM
 	return locations
 }
 
-func (w *Workspace) References(tokFile *token.File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, params *protocol.ReferenceParams) []protocol.Location {
+func (w *Workspace) References(file *File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, params *protocol.ReferenceParams) []protocol.Location {
 	// If UsagesForOffset returns no results, and if it's safe to
 	// do so, we back off the Character offset (column number) by 1 and
 	// try again. This can help when the caret symbol is a | (as
@@ -132,7 +132,7 @@ func (w *Workspace) References(tokFile *token.File, fe *eval.FileEvaluator, srcM
 // Hover is very similar to Definition. It attempts to resolve the
 // given position, within the file definitions, to one or more ast
 // nodes, and returns the doc comments attached to those ast nodes.
-func (w *Workspace) Hover(tokFile *token.File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.Hover {
+func (w *Workspace) Hover(file *File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.Hover {
 	offset, err := srcMapper.PositionOffset(pos)
 	if err != nil {
 		w.debugLog(err.Error())
@@ -144,6 +144,7 @@ func (w *Workspace) Hover(tokFile *token.File, fe *eval.FileEvaluator, srcMapper
 		return nil
 	}
 
+	tokFile := file.tokFile
 	// We sort comments by their location: comments within the same
 	// file are sorted by offset, and across different files by
 	// filepath, with the exception that comments from the current file
@@ -200,23 +201,31 @@ func (w *Workspace) Hover(tokFile *token.File, fe *eval.FileEvaluator, srcMapper
 
 // Completion attempts to resolve the given position, within the file
 // definitions, from which subsequent path elements can be suggested.
-func (w *Workspace) Completion(tokFile *token.File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.CompletionList {
+func (w *Workspace) Completion(file *File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.CompletionList {
 	offset, err := srcMapper.PositionOffset(pos)
 	if err != nil {
 		w.debugLog(err.Error())
 		return nil
 	}
-	content := tokFile.Content()
+	content := file.tokFile.Content()
 	// The cursor can be after the last character of the file, hence
 	// len(content), and not len(content)-1.
 	offset = min(offset, len(content))
 
 	completions := fe.CompletionsForOffset(offset)
 
+	isJsonSrc := file.buildFile != nil && file.buildFile.Encoding == build.JSON
+	isYamlSrc := file.buildFile != nil && file.buildFile.Encoding == build.YAML
+
 	var completionItems []protocol.CompletionItem
 
 	for completion, names := range completions {
 		if len(names) == 0 {
+			continue
+		}
+		if completion.Kind == protocol.VariableCompletion && (isJsonSrc || isYamlSrc) {
+			// Don't suggest values if we're in a json or yaml file,
+			// because they can't have values which are references.
 			continue
 		}
 
@@ -252,7 +261,7 @@ func (w *Workspace) Completion(tokFile *token.File, fe *eval.FileEvaluator, srcM
 		completionRange.End = pos
 
 		for name := range names {
-			if !ast.IsValidIdent(name) {
+			if isJsonSrc || !ast.IsValidIdent(name) {
 				name = strconv.Quote(name)
 			}
 			item := protocol.CompletionItem{
@@ -281,7 +290,7 @@ func (w *Workspace) Completion(tokFile *token.File, fe *eval.FileEvaluator, srcM
 	}
 }
 
-func (w *Workspace) FileEvaluatorForURI(fileUri protocol.DocumentURI, loadAllPkgsInMod bool) (*token.File, *eval.FileEvaluator, *protocol.Mapper, error) {
+func (w *Workspace) FileEvaluatorForURI(fileUri protocol.DocumentURI, loadAllPkgsInMod bool) (*File, *eval.FileEvaluator, *protocol.Mapper, error) {
 	mod, err := w.FindModuleForFile(fileUri)
 	if err != nil && err != errModuleNotFound {
 		return nil, nil, nil, err
@@ -291,8 +300,7 @@ func (w *Workspace) FileEvaluatorForURI(fileUri protocol.DocumentURI, loadAllPkg
 
 	if mod != nil {
 		if loadAllPkgsInMod {
-			mod.loadAllPackages()
-			w.reloadPackages()
+			mod.loadAllCuePackages()
 		}
 		ip, _, _ := mod.FindImportPathForFile(fileUri)
 		if ip != nil {
@@ -316,14 +324,18 @@ func (w *Workspace) FileEvaluatorForURI(fileUri protocol.DocumentURI, loadAllPkg
 		return nil, nil, nil, nil
 	}
 
-	tokFile := fe.File.Pos().File()
-	srcMapper := w.mappers[tokFile]
+	file := w.GetFile(fileUri)
+	if file == nil {
+		w.debugLog("file not found: " + string(fileUri))
+		return nil, nil, nil, nil
+	}
+	srcMapper := w.mappers[file.tokFile]
 	if srcMapper == nil {
 		w.debugLog("mapper not found: " + string(fileUri))
 		return nil, nil, nil, nil
 	}
 
-	return tokFile, fe, srcMapper, nil
+	return file, fe, srcMapper, nil
 }
 
 // rangeStartCompare compares a and b.

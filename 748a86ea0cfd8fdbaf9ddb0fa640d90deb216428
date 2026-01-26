@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5b58b2d_73cf1637",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-26T12:15:04Z",
+      "side": 1,
+      "message": "if singular (flag):\n```suggestion\n\t// The flag in this first section describes an active experiment.\n```\n\nBut I think you actually want to keep this all plural, as it was?",
+      "revId": "748a86ea0cfd8fdbaf9ddb0fa640d90deb216428",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

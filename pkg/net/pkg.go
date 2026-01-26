@@ -277,6 +277,18 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
+		Name: "ParseCIDR",
+		Params: []pkg.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.StructKind,
+		Func: func(c *pkg.CallCtxt) {
+			s := c.String(0)
+			if c.Do() {
+				c.Ret, c.Err = ParseCIDR(s)
+			}
+		},
+	}, {
 		Name: "PathEscape",
 		Params: []pkg.Param{
 			{Kind: adt.StringKind},

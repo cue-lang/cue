@@ -148,6 +148,11 @@ type OpContext struct {
 	// disjunctBuffer is reused when constructing [envDisjunct.disjuncts].
 	disjunctBuffer []disjunct
 
+	// refNodeArena is an arena for RefNode allocations used in cycle detection.
+	// RefNodes are referenced by index (uint32) rather than pointer to reduce
+	// GC pressure. Index 0 is reserved to represent nil/empty.
+	refNodeArena []RefNode
+
 	stats        stats.Counts
 	freeListNode *nodeContext
 

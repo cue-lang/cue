@@ -382,8 +382,8 @@ type CycleInfo struct {
 	// a cycle is detected and of which type.
 	CycleType CyclicType
 
-	// TODO(perf): pack this in with CloseInfo. Make an uint32 pointing into
-	// a buffer maintained in OpContext, using a mark-release mechanism.
+	// Refs is a linked list of RefNode tracking reference chains for cycle detection.
+	// RefNodes are allocated from OpContext.refNodeArena to reduce GC pressure.
 	Refs *RefNode
 }
 
@@ -393,7 +393,8 @@ func (ci CycleInfo) IsCyclic() bool {
 	return ci.CycleType == IsCyclic
 }
 
-// A RefNode is a linked list of associated references.
+// A RefNode is an element in a linked list of associated references.
+// RefNodes are allocated from OpContext.refNodeArena to reduce GC pressure.
 type RefNode struct {
 	Ref Resolver
 	Arc *Vertex // Ref points to this Vertex
@@ -420,6 +421,19 @@ type RefNode struct {
 
 	Next  *RefNode
 	Depth int32
+}
+
+// allocRefNode allocates a RefNode in the arena and returns a pointer to it.
+// This reduces GC pressure by batch-allocating RefNodes.
+func (c *OpContext) allocRefNode(arc, node *Vertex, ref Resolver, next *RefNode, depth int32) *RefNode {
+	c.refNodeArena = append(c.refNodeArena, RefNode{
+		Arc:   arc,
+		Node:  node,
+		Ref:   ref,
+		Next:  next,
+		Depth: depth,
+	})
+	return &c.refNodeArena[len(c.refNodeArena)-1]
 }
 
 // cyclicConjunct is used in nodeContext to postpone the computation of
@@ -504,13 +518,7 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 		}
 	}
 
-	ci.Refs = &RefNode{
-		Arc:   deref(arc),
-		Ref:   x,
-		Node:  deref(n.node),
-		Next:  ci.Refs,
-		Depth: n.depth,
-	}
+	ci.Refs = n.ctx.allocRefNode(deref(arc), deref(n.node), x, ci.Refs, n.depth)
 
 	return ci, false
 }

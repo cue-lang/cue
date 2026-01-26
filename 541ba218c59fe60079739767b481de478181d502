@@ -16,6 +16,24 @@
       "message": "hmm, I\u0027m not used to seeing this pattern. Is this really better than:\n```\narc :\u003d \u0026adt.Vertex{Label: l, Conjuncts: []adt.Conjunct{{}}}\n```\n?",
       "revId": "541ba218c59fe60079739767b481de478181d502",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c59e5b78_3e178a3d",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-26T09:03:45Z",
+      "side": 1,
+      "message": "Yes, because the Go compiler does not assume that it can \"join\" allocations in general, like with your snippet. Only if you force it (by e.g. allocating everything under a single struct) does it do that.\n\nWhich makes sense, because joining allocations in general could lead to holding onto too much memory at times.\n\nThis is not a pattern I use all the time. Only for very hot functions which allocate groups of objects which share the same lifetime.",
+      "parentUuid": "a800670d_82d530c1",
+      "revId": "541ba218c59fe60079739767b481de478181d502",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

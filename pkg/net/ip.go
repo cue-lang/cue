@@ -305,6 +305,56 @@ func AddIPCIDR(ip cue.Value, offset *big.Int) (string, error) {
 	return netip.PrefixFrom(addr, prefix.Bits()).String(), nil
 }
 
+// ParsedCIDR holds the parsed components of a CIDR notation string.
+type ParsedCIDR struct {
+	PrefixMask string `json:"prefix_mask"`
+	PrefixLen  int    `json:"prefix_len"`
+	PrefixAddr string `json:"prefix_addr"`
+	// BroadcastAddr is only set for IPv4 CIDRs.
+	BroadcastAddr string `json:"broadcast_addr,omitempty"`
+}
+
+// ParseCIDR parses a CIDR notation string and returns its components:
+// prefix_mask (e.g. "255.255.255.0"), prefix_len (e.g. 24),
+// prefix_addr (e.g. "10.20.30.0"), and broadcast_addr (e.g. "10.20.30.255").
+// broadcast_addr is only set for IPv4 CIDRs.
+func ParseCIDR(s string) (*ParsedCIDR, error) {
+	prefix, err := netip.ParsePrefix(s)
+	if err != nil {
+		return nil, err
+	}
+
+	bits := prefix.Bits()
+	addr := prefix.Addr()
+	maskBytes := make([]byte, addr.BitLen()/8)
+	for i := range bits / 8 {
+		maskBytes[i] = 0xFF
+	}
+	if rem := bits % 8; rem > 0 {
+		maskBytes[bits/8] = ^byte(0xFF >> rem)
+	}
+	netmask, _ := netip.AddrFromSlice(maskBytes)
+
+	networkAddr := prefix.Masked().Addr()
+
+	result := &ParsedCIDR{
+		PrefixMask: netmask.String(),
+		PrefixLen:  bits,
+		PrefixAddr: networkAddr.String(),
+	}
+
+	if addr.Is4() {
+		broadcastBytes := networkAddr.AsSlice()
+		for i := range broadcastBytes {
+			broadcastBytes[i] |= ^maskBytes[i]
+		}
+		broadcastAddr, _ := netip.AddrFromSlice(broadcastBytes)
+		result.BroadcastAddr = broadcastAddr.String()
+	}
+
+	return result, nil
+}
+
 // InCIDR reports whether an IP address is contained a CIDR subnet string.
 func InCIDR(ip, cidr cue.Value) (bool, error) {
 	ipAddr := netGetIP(ip)

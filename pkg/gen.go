@@ -474,6 +474,8 @@ func (g *generator) adtKind(typ types.Type) string {
 	// use CUE function signatures to validate their parameters and results.
 	case "*cuelang.org/go/pkg/time.Parts":
 		return "adt.StructKind"
+	case "*cuelang.org/go/pkg/net.ParsedCIDR":
+		return "adt.StructKind"
 	}
 	log.Fatal("adtKind: unhandled Go type ", typ.String())
 	return ""

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a800670d_82d530c1",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-26T09:01:56Z",
+      "side": 1,
+      "message": "hmm, I\u0027m not used to seeing this pattern. Is this really better than:\n```\narc :\u003d \u0026adt.Vertex{Label: l, Conjuncts: []adt.Conjunct{{}}}\n```\n?",
+      "revId": "541ba218c59fe60079739767b481de478181d502",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

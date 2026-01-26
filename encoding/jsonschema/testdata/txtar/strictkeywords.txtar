@@ -14,4 +14,4 @@ enabled.
 -- out/decode/extract --
 ERROR:
 unknown keyword "foo":
-    schema.json:5:3
+    schema.json:5:4

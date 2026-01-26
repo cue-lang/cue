@@ -8,4 +8,4 @@
 -- out/decode/extract --
 ERROR:
 keyword "$id" is not supported in JSON schema version http://json-schema.org/draft-04/schema#:
-    schema.json:2:3
+    schema.json:2:4

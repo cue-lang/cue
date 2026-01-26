@@ -11,4 +11,4 @@ Note: keywords alongside $ref are ignored until 2019-09
 -- out/decode/extract --
 ERROR:
 ignoring keyword "$id" alongside $ref:
-    schema.json:3:3
+    schema.json:3:4

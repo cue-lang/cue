@@ -43,8 +43,8 @@
 -- out/decode/extract --
 ERROR:
 from version https://json-schema.org/draft/2020-12/schema onwards, the value of "items" must be an object or a boolean:
-    schema.json:18:29
+    schema.json:18:30
 from version https://json-schema.org/draft/2020-12/schema onwards, the value of "items" must be an object or a boolean:
-    schema.json:21:29
+    schema.json:21:30
 from version https://json-schema.org/draft/2020-12/schema onwards, the value of "items" must be an object or a boolean:
-    schema.json:30:29
+    schema.json:30:30

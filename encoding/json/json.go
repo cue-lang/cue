@@ -223,27 +223,29 @@ func patchExpr(n ast.Node, patchPos func(n ast.Node)) {
 
 		case *ast.Field:
 			// label is always a string for JSON.
-			switch {
-			case true:
-				s, ok := x.Label.(*ast.BasicLit)
-				if !ok || s.Kind != token.STRING {
-					break // should not happen: implies invalid JSON
-				}
-
-				u, err := literal.Unquote(s.Value)
-				if err != nil {
-					break // should not happen: implies invalid JSON
-				}
-
-				// TODO(legacy): remove checking for '_' prefix once hidden
-				// fields are removed.
-				if ast.StringLabelNeedsQuoting(u) {
-					break // keep string
-				}
-
-				x.Label = ast.NewIdent(u)
-				astutil.CopyMeta(x.Label, s)
+			s, ok := x.Label.(*ast.BasicLit)
+			if !ok || s.Kind != token.STRING {
+				break // should not happen: implies invalid JSON
 			}
+
+			u, err := literal.Unquote(s.Value)
+			if err != nil {
+				break // should not happen: implies invalid JSON
+			}
+
+			// TODO(legacy): remove checking for '_' prefix once hidden
+			// fields are removed.
+			if ast.StringLabelNeedsQuoting(u) {
+				break // keep string
+			}
+
+			x.Label = ast.NewIdent(u)
+			astutil.CopyMeta(x.Label, s)
+			// Having removed the quote-marks, the ident start should be
+			// incremented by 1 so that the label content matches up with
+			// the raw json.
+			ast.SetPos(x.Label, x.Label.Pos().Add(1))
+
 			ast.Walk(x.Value, beforeFn, afterFn)
 			descent = false
 

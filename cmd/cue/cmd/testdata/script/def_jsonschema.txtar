@@ -106,23 +106,23 @@ import "strings"
 }
 -- expect-stderr-strict --
 keyword "$dynamicAnchor" not yet implemented:
-    ./bad.json:4:3
+    ./bad.json:4:4
 unknown keyword "foo":
-    ./bad.json:5:3
+    ./bad.json:5:4
 -- expect-stderr-strict-features --
 keyword "$dynamicAnchor" not yet implemented:
-    ./bad.json:4:3
+    ./bad.json:4:4
 -- data.yaml --
 age: twenty
 
 -- expect-stderr2 --
 age: conflicting values "twenty" and int (mismatched types string and int):
     ./data.yaml:1:6
-    ./schema.json:18:7
+    ./schema.json:18:8
 -- expect-stderr3 --
 age: conflicting values "twenty" and int (mismatched types string and int):
     ./data.yaml:1:6
-    ./schema.json:18:7
+    ./schema.json:18:8
 -- cue.mod/module.cue --
 module: "mod.test/config"
 language: version: "v0.9.0"

@@ -10,4 +10,4 @@ is enabled.
 -- out/decode/extract --
 ERROR:
 unsupported Perl regexp syntax in "^(?![ \\t\\n]*\\(default(.*)\\))[\\s\\S]*": error parsing regexp: invalid or unsupported Perl syntax: `(?!`:
-    schema.json:3:5
+    schema.json:3:6

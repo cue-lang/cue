@@ -8,4 +8,4 @@ Invalid patterns should result in failure
 -- out/decode/extract --
 ERROR:
 invalid string:
-    schema.json:3:5
+    schema.json:3:6

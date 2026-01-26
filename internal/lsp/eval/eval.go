@@ -387,10 +387,10 @@ type Config struct {
 	ForPackage EvaluatorForPackageFunc
 	// PkgImporters is a callback function to fetch the evaluator for
 	// all packages that directly import this package.
-	PkgImporters       ImportersFunc
-	ForEmbedAttribute  EvaluatorsForEmbedAttrFunc
-	PkgEmbedders       EmbeddersFunc
-	SupportsReferences bool
+	PkgImporters      ImportersFunc
+	ForEmbedAttribute EvaluatorsForEmbedAttrFunc
+	PkgEmbedders      EmbeddersFunc
+	PackageIsEmbedded bool
 }
 
 func (c *Config) init() {
@@ -407,8 +407,6 @@ func (c *Config) init() {
 	if c.PkgEmbedders == nil {
 		c.PkgEmbedders = func() map[*Evaluator][]*embed.Embed { return nil }
 	}
-
-	c.SupportsReferences = true
 }
 
 // New creates and performs initial configuration of a new [Evaluator]
@@ -615,9 +613,6 @@ type FileEvaluator struct {
 // DefinitionsForOffset reports the definitions that the file offset
 // (number of bytes from the start of the file) resolves to.
 func (fe *FileEvaluator) DefinitionsForOffset(offset int) []ast.Node {
-	if !fe.evaluator.config.SupportsReferences {
-		return nil
-	}
 	var nodes []ast.Node
 
 	for nav := range fe.definitionsForOffset(offset) {
@@ -638,7 +633,12 @@ func (fe *FileEvaluator) DefinitionsForOffset(offset int) []ast.Node {
 func (fe *FileEvaluator) DocCommentsForOffset(offset int) map[ast.Node][]*ast.CommentGroup {
 	commentsMap := make(map[ast.Node][]*ast.CommentGroup)
 
-	for nav := range fe.definitionsForOffset(offset) {
+	navs := fe.definitionsForOffset(offset)
+	if fe.evaluator.config.PackageIsEmbedded {
+		navs = maps.Keys(expandNavigablesViaPath(slices.Collect(navs)))
+	}
+
+	for nav := range navs {
 		for _, fr := range nav.frames {
 			if fr.key != nil {
 				if comments := fr.docComments(); len(comments) > 0 {
@@ -858,9 +858,14 @@ nextFrame:
 		addCompletions(embedCompletions, nameSet)
 	}
 
+	expander := expandNavigables
+	if fe.evaluator.config.PackageIsEmbedded {
+		expander = expandNavigablesViaPath
+	}
+
 	for nav, fieldCompletions := range suggestFieldsFrom {
 		nameSet := make(map[string]struct{})
-		for nav := range expandNavigables([]*navigable{nav}) {
+		for nav := range expander([]*navigable{nav}) {
 			for name := range nav.bindings {
 				if !strings.HasPrefix(name, "__") {
 					nameSet[name] = struct{}{}
@@ -1017,10 +1022,14 @@ func usages(navsWorklist []*navigable) {
 			}
 			evaluatedNavs[nav] = struct{}{}
 
-			// If this nav's evaluator does not support references
-			// (e.g. json) then there's no point evaluating it, because
-			// doing so cannot possibly find any uses of the targetNavs.
-			if !nav.evaluator.config.SupportsReferences {
+			// If this nav's evaluator is embedded, we assume it does not
+			// support references, (e.g. json) and so there's no point
+			// evaluating it, because doing so cannot possibly find any
+			// uses of the targetNavs. This massively reduces the amount
+			// of evaluation done for enormous json files, for example
+			// (without this, we'd evaluate the entire json file for no
+			// reason).
+			if nav.evaluator.config.PackageIsEmbedded {
 				continue
 			}
 			nav.eval()
@@ -1490,54 +1499,39 @@ func expandNavigables(navs []*navigable) map[*navigable]struct{} {
 	return navsSet
 }
 
-func expandNavigablesWithUsages(navs []*navigable) map[*navigable]struct{} {
-	fmt.Printf("expandNavigablesWithUsages %v\n", navs)
-
-	result := make(map[*navigable]struct{})
-	for _, nav := range navs {
+func expandNavigablesViaPath(navs []*navigable) map[*navigable]struct{} {
+	result := expandNavigables(navs)
+	for nav := range result {
 		var names []string
 		for ; nav != nil && nav.name != ""; nav = nav.parent {
 			names = append(names, nav.name)
 		}
-		fmt.Printf("  %v n:%p np:%p pk:%p\n", names, nav, nav.parent, nav.evaluator.pkgFrame.navigable)
+
+		var walkFrom []*navigable
+
 		if nav.parent == nav.evaluator.pkgFrame.navigable {
-			nav = nav.evaluator.pkgDecls
-		}
-		usages([]*navigable{nav})
-		navs := []*navigable{nav}
-		var importSpecNavs []*navigable
-		for _, useFr := range nav.usedBy {
-			if _, isSpec := useFr.node.(*ast.ImportSpec); isSpec {
-				importSpecNavs = append(importSpecNavs, useFr.navigable)
-			}
-		}
-		if len(importSpecNavs) > 0 {
-			usages(importSpecNavs)
-			navs = navs[:0]
-			for _, nav := range importSpecNavs {
-				navs = append(navs, nav)
-			}
-		}
-
-		walkFromMap := make(map[*navigable]struct{})
-		for _, nav := range navs {
-			fmt.Println("->", nav, nav.usedBy)
-			for _, fr := range nav.usedBy {
-				if _, found := fr.navigable.resolvesTo[nav]; !found {
-					continue
+			for remotePkg, embeds := range nav.evaluator.config.PkgEmbedders() {
+				remotePkg.bootFiles()
+				for _, embed := range embeds {
+					pos := embed.Field.Value.Pos()
+					fe := remotePkg.byFilename[pos.Filename()]
+					if fe == nil {
+						continue
+					}
+					for _, fr := range fe.evalForOffset(pos.Offset()) {
+						walkFrom = append(walkFrom, fr.navigable)
+					}
 				}
-				walkFromMap[fr.navigable] = struct{}{}
 			}
+
+		} else {
+			walkFrom = []*navigable{nav}
 		}
 
-		navs = slices.Collect(maps.Keys(walkFromMap))
 		for _, name := range slices.Backward(names) {
-			navs = navigateByName(expandNavigables(navs), name)
+			walkFrom = navigateByName(expandNavigables(walkFrom), name)
 		}
-		maps.Copy(result, expandNavigables(navs))
-	}
-	for nav := range result {
-		fmt.Println("result", nav)
+		maps.Copy(result, expandNavigables(walkFrom))
 	}
 	return result
 }

@@ -19,8 +19,10 @@ import (
 	"slices"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 )
 
@@ -33,6 +35,14 @@ func (w *Workspace) ensureFile(uri protocol.DocumentURI) *File {
 			workspace: w,
 			uri:       uri,
 		}
+		// Unfortunately this is repeating work done in fscache, but due
+		// to import cycles, there's no way we can attach the build.File
+		// to the token.File (or ast.File).
+		bf, err := filetypes.ParseFileAndType(uri.Path(), "", filetypes.Input)
+		if err == nil {
+			f.buildFile = bf
+		}
+
 		w.files[uri] = f
 	}
 	return f
@@ -78,6 +88,7 @@ func (w *Workspace) publishDiagnostics() {
 type File struct {
 	workspace *Workspace
 	uri       protocol.DocumentURI
+	buildFile *build.File
 	// isOpen records if this File is open within the client / editor.
 	isOpen bool
 
@@ -181,6 +192,7 @@ func (f *File) setSyntax(syntax *ast.File) {
 	if tokFile == nil {
 		f.mapper = nil
 	} else {
+		f.buildFile.Source = tokFile.Content()
 		f.mapper = protocol.NewMapper(f.uri, tokFile.Content())
 		w.mappers[tokFile] = f.mapper
 	}

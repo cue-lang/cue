@@ -204,7 +204,10 @@ func (pkg *Package) markDirty() {
 }
 
 func (pkg *Package) embeddingsMatch(fileUri protocol.DocumentURI) bool {
-	filepath := strings.TrimPrefix(string(fileUri), string(pkg.module.rootURI)+"/")
+	filepath, wasCut := strings.CutPrefix(string(fileUri), string(pkg.module.rootURI)+"/")
+	if !wasCut {
+		return false
+	}
 	for _, embedding := range pkg.embeddings {
 		if embedding.Matches(filepath) {
 			return true
@@ -381,7 +384,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		PkgImporters:           pkg.pkgImporters,
 		ForEmbedAttribute:      pkg.forEmbedAttribute,
 		PkgEmbedders:           pkg.pkgEmbedders,
-		SupportsReferences:     isCue,
+		PackageIsEmbedded:      !isCue,
 	}
 
 	// eval.New does almost no work - calculation of resolutions is
@@ -415,7 +418,11 @@ func (pkg *Package) pkgImporters() []*eval.Evaluator {
 }
 
 func (pkg *Package) forEmbedAttribute(attrPos token.Pos) []*eval.Evaluator {
-	// Scenario: pkg is a normal cue package, and we're trying to
+	if !pkg.isCue {
+		return nil
+	}
+
+	// Scenario: we are a normal cue package, and we're trying to
 	// resolve an embed attribute into a set of evaluators of those
 	// remote embedded packages/files.
 	embedding, found := pkg.embeddings[attrPos]
@@ -432,7 +439,7 @@ func (pkg *Package) forEmbedAttribute(attrPos token.Pos) []*eval.Evaluator {
 	needsReload := false
 
 	for {
-	results:
+	outer:
 		for _, embedded := range embedding.results {
 			fileUri := embedded.fileUri
 			if embeddedPkg := embedded.pkg; embeddedPkg != nil {
@@ -453,7 +460,7 @@ func (pkg *Package) forEmbedAttribute(attrPos token.Pos) []*eval.Evaluator {
 					embedded.pkg = remotePkg
 					remotePkg.EnsureEmbeddedBy(pkg)
 					evals = append(evals, remotePkg.eval)
-					continue results
+					continue outer
 				}
 			}
 
@@ -482,8 +489,13 @@ func (pkg *Package) forEmbedAttribute(attrPos token.Pos) []*eval.Evaluator {
 }
 
 func (pkg *Package) pkgEmbedders() map[*eval.Evaluator][]*embed.Embed {
-	// Scenario: pkg is an embedded package, and we're trying to find
+	if pkg.isCue {
+		return nil
+	}
+	// Scenario: we are an embedded package, and we're trying to find
 	// out which cue packages embed us.
+
+	pkg.module.loadAllAscendantPackages(pkg)
 
 	for remotePkg := range pkg.module.ascendantPackages(pkg) {
 		if !remotePkg.isCue {

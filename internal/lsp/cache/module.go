@@ -349,10 +349,9 @@ func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
 	// 2. Load all the packages found
 	modPath := m.modFile.QualifiedModule()
 	reqs := modrequirements.NewRequirements(modPath, w.registry, m.modFile.DepVersions(), m.modFile.DefaultMajorVersions())
-	rootUri := m.rootURI
 	ctx := context.Background()
 	loc := module.SourceLoc{
-		FS:  w.overlayFS.IoFS(rootUri.Path()),
+		FS:  w.overlayFS.IoFS(m.rootURI.Path()),
 		Dir: ".", // NB can't be ""
 	}
 	// Determinism in log messages:
@@ -370,6 +369,59 @@ func (m *Module) activeFilesAndDirs(files map[protocol.DocumentURI][]packageOrMo
 	dirs[m.rootURI] = struct{}{}
 	for _, pkg := range m.packages {
 		pkg.activeFilesAndDirs(files, dirs)
+	}
+}
+
+func (m *Module) loadAllAscendantPackages(pkg *Package) {
+	files, _ := m.workspace.activeFilesAndDirs()
+
+	var toLoad []protocol.DocumentURI
+	rootUri := m.rootURI
+	fsys := m.workspace.overlayFS.IoFS(m.rootURI.Path())
+
+	worklist := slices.Clone(pkg.dirURIs)
+	for i, dir := range worklist {
+		worklist[i] = dir.Dir()
+	}
+	for len(worklist) > 0 {
+		dir := worklist[0]
+		worklist = worklist[1:]
+		if !rootUri.Encloses(dir) {
+			continue
+		}
+
+		worklist = append(worklist, dir.Dir())
+
+		dirPath, wasCut := strings.CutPrefix(string(dir), string(rootUri)+"/")
+		if !wasCut {
+			dirPath = "."
+		}
+		entries, err := fs.ReadDir(fsys, dirPath)
+		if err != nil {
+			continue
+		}
+		for _, entry := range entries {
+			if entry.Type().IsRegular() && strings.HasSuffix(entry.Name(), ".cue") {
+				fileUri := dir + "/" + protocol.DocumentURI(entry.Name())
+				if _, found := files[fileUri]; !found {
+					toLoad = append(toLoad, fileUri)
+				}
+			}
+		}
+	}
+
+	reload := false
+	for _, uri := range toLoad {
+		ip, dirUris, err := m.FindImportPathForFile(uri)
+		if err != nil || ip == nil || len(dirUris) == 0 {
+			continue
+		}
+		pkg := m.EnsurePackage(*ip, dirUris)
+		m.markPackagesDirty(pkg, uri)
+		reload = true
+	}
+	if reload {
+		m.workspace.reloadPackages()
 	}
 }
 
@@ -396,14 +448,15 @@ func (m *Module) loadAllPackages() {
 		}
 		if d.Type().IsRegular() && strings.HasSuffix(p, ".cue") {
 			p = filepath.Join(rootPath, filepath.FromSlash(p))
-			uri := protocol.URIFromPath(p)
-			if _, found := files[uri]; !found {
-				toLoad = append(toLoad, uri)
+			fileUri := protocol.URIFromPath(p)
+			if _, found := files[fileUri]; !found {
+				toLoad = append(toLoad, fileUri)
 			}
 		}
 		return nil
 	})
 
+	reload := false
 	for _, uri := range toLoad {
 		ip, dirUris, err := m.FindImportPathForFile(uri)
 		if err != nil || ip == nil || len(dirUris) == 0 {
@@ -411,6 +464,10 @@ func (m *Module) loadAllPackages() {
 		}
 		pkg := m.EnsurePackage(*ip, dirUris)
 		m.markPackagesDirty(pkg, uri)
+		reload = true
+	}
+	if reload {
+		m.workspace.reloadPackages()
 	}
 }
 

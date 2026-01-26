@@ -15,9 +15,9 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/encoding/json"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/robustio"
@@ -122,7 +122,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 	case build.JSON:
 		syntax = &ast.File{Filename: filename}
 		var expr ast.Expr
-		expr, err = json.Extract(filename, content)
+		expr, err = parser.ParseExpr(filename, content)
 		switch expr := expr.(type) {
 		case nil: // unparsable
 		case *ast.StructLit:
@@ -130,6 +130,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 		default:
 			syntax.Decls = []ast.Decl{&ast.EmbedDecl{Expr: expr}}
 		}
+		json.PatchExpr(syntax, nil)
 
 	case build.YAML:
 		syntax, err = yaml.Extract(filename, content)

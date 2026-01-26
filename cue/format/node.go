@@ -231,12 +231,8 @@ func (f *formatter) walkListElems(list []ast.Expr) {
 	for _, x := range list {
 		f.before(x)
 
-		// This is a hack to ensure that comments are printed correctly in lists.
-		// A comment must be printed after each element in a list, but we can't
-		// print a comma at the end of a comment because it will be considered
-		// part of the comment and ignored.
-		// To fix this we collect all comments that appear after the element,
-		// and only handle them after it's formatted.
+		// Collect comments that appear after the element's start position.
+		// These need to be printed after the comma, not before it.
 		var commentsAfter []*ast.CommentGroup
 		splitComments := x.Pos().IsValid()
 		if splitComments {
@@ -257,7 +253,17 @@ func (f *formatter) walkListElems(list []ast.Expr) {
 			f.expr(n.Value)
 
 		case *ast.Ellipsis:
-			f.ellipsis(n)
+			// For ellipsis, also collect trailing comments from the type
+			// since they're attached to the nested node, not the ellipsis itself.
+			f.print(n.Ellipsis, token.ELLIPSIS)
+			if n.Type != nil && !isTop(n.Type) {
+				for _, cg := range ast.Comments(n.Type) {
+					if n.Type.Pos().Compare(cg.Pos()) < 0 {
+						commentsAfter = append(commentsAfter, cg)
+					}
+				}
+				f.exprRaw(n.Type, token.LowestPrec, 1)
+			}
 
 		case *ast.Alias:
 			f.expr(n.Ident)

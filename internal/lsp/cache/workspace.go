@@ -386,37 +386,37 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 	// successfully read their contents (so the fh value is never nil)
 
 	// Create any new modules we need
-	for uri := range updatedFiles {
-		if !strings.HasSuffix(string(uri), "/cue.mod/module.cue") {
+	for fileUri := range updatedFiles {
+		if !strings.HasSuffix(string(fileUri), "/cue.mod/module.cue") {
 			continue
 		}
-		delete(updatedFiles, uri)
+		delete(updatedFiles, fileUri)
 
-		_ = w.ensureModule(uri)
+		_ = w.ensureModule(fileUri)
 	}
 
 	// By now, all modules should be valid, and updatedFiles will only
 	// have "normal" cue files in them (i.e. not /cue.mod/module.cue).
-	for uri := range updatedFiles {
+	for fileUri := range updatedFiles {
 		// We can only parse a cue file if we know what module it belongs to.
-		m, err := w.FindModuleForFile(uri)
+		m, err := w.FindModuleForFile(fileUri)
 		if err == errModuleNotFound {
-			w.debugLogf("No module found for %v; treating as standalone", uri)
-			_ = w.standalone.reloadFile(uri)
+			w.debugLogf("No module found for %v; treating as standalone", fileUri)
+			_ = w.standalone.reloadFile(fileUri)
 			continue
 		}
 		if err != nil {
 			return err
 		}
-		if m.modFileURI == uri {
-			m.markFileDirty(uri)
+		if m.modFileURI == fileUri {
+			m.markFileDirty(fileUri)
 			continue
 		}
-		ip, dirUris, err := m.FindImportPathForFile(uri)
+		ip, dirUris, err := m.FindImportPathForFile(fileUri)
 		if err != nil {
 			if err == ErrBadModule {
-				w.debugLogf("Module for %v is bad; treating as standalone", uri)
-				_ = w.standalone.reloadFile(uri)
+				w.debugLogf("Module for %v is bad; treating as standalone", fileUri)
+				_ = w.standalone.reloadFile(fileUri)
 				continue
 			}
 			if _, ok := err.(cueerrors.Error); ok {
@@ -424,14 +424,15 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 				// TODO: this error might become a "diagnostics" message
 				continue
 			}
-			w.debugLogf("Error when processing updated file %v: %v", uri, err)
+			w.debugLogf("Error when processing updated file %v: %v", fileUri, err)
 			continue
 		}
 		if ip != nil && len(dirUris) != 0 {
-			pkg := m.EnsurePackage(*ip, dirUris)
-			m.markPackagesDirty(pkg, uri)
+			// This might be a new file into an existing package, so we
+			// must be sure to mark the pkg dirty.
+			m.EnsurePackage(*ip, dirUris).markFileDirty(fileUri)
 		} else {
-			w.standalone.reloadFile(uri)
+			w.standalone.reloadFile(fileUri)
 		}
 	}
 
@@ -665,38 +666,6 @@ func (w *Workspace) reloadModules() {
 // will be created and loaded. Imports are followed, and may result in
 // new packages and even new modules, being added to the workspace.
 func (w *Workspace) reloadPackages() {
-	modules := w.modules
-
-	var loadedPkgs []*modpkgload.Package
-	// A package in one module may import packages from different
-	// modules. We need to process and manage all such packages and
-	// modules. Therefore, whilst we ask the modules themselves to do
-	// the (re)loading of any dirty packages, we accumulate all the
-	// loaded packages here, and process them all together.
-	for _, m := range modules {
-		pkgs, err := m.loadDirtyPackages()
-		if err != nil {
-			continue
-		}
-
-		if pkgs == nil {
-			// No dirty packages within the module.
-			continue
-		}
-
-		// We need to track all packages that are loaded, so we use
-		// pkgs.All() and not pkgs.Roots().
-		loadedPkgs = append(loadedPkgs, pkgs.All()...)
-	}
-
-	if len(loadedPkgs) == 0 {
-		return
-	}
-
-	// Process the results of loading the all the dirty packages from
-	// all the modules. We need to do this in two passes to ensure we
-	// create all necessary packages before trying to build/update the
-	// inverted import graph.
 	type importPathModRootPair struct {
 		importPath ast.ImportPath
 		modRootURI protocol.DocumentURI
@@ -707,201 +676,326 @@ func (w *Workspace) reloadPackages() {
 	}
 	processedPkgs := make(map[importPathModRootPair]*pkgModPkgPair)
 
-	// 1. Ensure that all the necessary modules and packages exist.
-	for _, loadedPkg := range loadedPkgs {
-		if isUnhandledPackage(loadedPkg) {
-			continue
+	modules := w.modules
+
+	for {
+		// Wipe out all existing values in processedPkgs so that we can
+		// easily detect later on which packages have been loaded in
+		// this loop iteration.
+		for key := range processedPkgs {
+			processedPkgs[key] = nil
 		}
 
-		ip := normalizeImportPath(loadedPkg)
-		modRootURI := moduleRootURI(loadedPkg)
-
-		// The same package can appear multiple times in loadedPkgs, for
-		// several reasons. Firstly, two different packages in different
-		// modules could each import the same third package.
-		//
-		// Secondly, even within the same module, we can get multiple
-		// instances of the same package. Imagine some cue file in
-		// package foo.com/x has "import foo.com/y" in it. Imagine that
-		// we knew that both packages x and y are dirty, so when we
-		// called modpkgload.LoadPackages, we had pkgPaths set to
-		// [foo.com/x@v0, foo.com/y@v0]. Because modpkgload.LoadPackages
-		// does not normalize import paths, we end up with two loadings
-		// of y - one from the explicit pkgPath foo.com/y@v0, and one
-		// from the import foo.com/y (the different spelling is the
-		// critical thing).
-		//
-		// So we need to test whether we've already seen this package in
-		// the results of this load. If we have, we can skip.
-		key := importPathModRootPair{
-			importPath: ip,
-			modRootURI: modRootURI,
-		}
-		if _, seen := processedPkgs[key]; seen {
-			continue
-		}
-		pkgModPkg := &pkgModPkgPair{
-			modpkg: loadedPkg,
-		}
-		processedPkgs[key] = pkgModPkg
-
-		m := w.ensureModule(modRootURI + "/cue.mod/module.cue")
-		if err := m.ReloadModule(); err != nil {
-			continue
-		}
-
-		pkg, found := m.packages[ip]
-		if !found {
-			// Every package contains cue sources from one* "leaf"
-			// directory and optionally any ancestor directory. Here we
-			// determine that "leaf" directory.
-			//
-			// * In the case the "old modules" system is in use, with the
-			// cue.mod/{gen|pkg|usr} directories, it will be all three
-			// leaf directories, and ancestor imports don't apply. We
-			// always add all 3 directories so that when the first file
-			// is created in any of them, we're able to match that file
-			// to this package.
-			var dirUris []protocol.DocumentURI
-			dirUri := protocol.DocumentURI("")
-		locations:
-			for _, loc := range loadedPkg.Locations() {
-				for _, prefix := range []string{"cue.mod/gen/", "cue.mod/pkg/", "cue.mod/usr/"} {
-					if dirOldMod, wasCut := strings.CutPrefix(loc.Dir, prefix); wasCut {
-						dirUris = []protocol.DocumentURI{
-							m.rootURI + "/cue.mod/gen/" + protocol.DocumentURI(dirOldMod),
-							m.rootURI + "/cue.mod/pkg/" + protocol.DocumentURI(dirOldMod),
-							m.rootURI + "/cue.mod/usr/" + protocol.DocumentURI(dirOldMod),
-						}
-						break locations
-					}
-				}
-
-				uri := protocol.DocumentURI(string(modRootURI) + "/" + loc.Dir)
-				if dirUri == "" || dirUri.Encloses(uri) {
-					dirUri = uri
-				}
-			}
-
-			if dirUri != "" {
-				dirUris = []protocol.DocumentURI{dirUri}
-			}
-			pkg = m.newPackage(ip, dirUris)
-		}
-		pkgModPkg.pkg = pkg
-	}
-
-	// 2. Now that all pkgs exist, update them all.
-	for _, pkgModPkg := range processedPkgs {
-		pkg, loadedPkg := pkgModPkg.pkg, pkgModPkg.modpkg
-		if pkg != nil {
-			_ = pkg.update(loadedPkg)
-		}
-	}
-
-	// Any package that's still dirty at this point could not be loaded
-	// for some reason by modpkgload. We should delete it.
-	for _, m := range modules {
-		for _, pkg := range m.packages {
-			if pkg.isDirty {
-				pkg.delete()
-				key := importPathModRootPair{
-					importPath: pkg.importPath,
-					modRootURI: m.rootURI,
-				}
-				if _, found := processedPkgs[key]; !found {
-					// We have a pkg that is dirty, but when we tried to
-					// load it, we got nothing back at all. This possibly
-					// means this pkg doesn't exist within this module. It
-					// could be a race with the file system, or it could be
-					// a bug in the LSP.
-					w.debugLogf("Warning: attempt to load package %v within module %v produced no result.", pkg.importPath, m.rootURI)
-					// Add to processedPkgs so that we don't risk calling
-					// reloadPackages again and looping infinitely.
-					processedPkgs[key] = nil
-				}
-			}
-		}
-	}
-
-	// Note that there's a potential memory leak here: we might load a
-	// package "foo" because it's imported by "bar". If "bar" is edited
-	// so that it no longer imports "foo" then we'll notice that, and
-	// our "foo" Package will get updated so that its importedBy field
-	// is empty. But we never currently remove the "foo" package from
-	// its module. Ideally, we should keep track within each Package of
-	// the number of its files open in the editor/client. If that drops
-	// to zero, and the importedBy field is empty, then we should
-	// remove the package from the module. TODO.
-
-	// We need to watch out for when a dirty file moves package, either
-	// to an existing package which we've not reloaded, or to a package
-	// that we've never loaded. In both cases, the file will still be
-	// within this module.
-	repeatReload := false
-	for _, m := range modules {
-		for fileUri := range m.dirtyFiles {
-			delete(m.dirtyFiles, fileUri)
-
-			ip, dirUris, err := m.FindImportPathForFile(fileUri)
+		var loadedPkgs []*modpkgload.Package
+		// A package in one module may import packages from different
+		// modules. We need to process and manage all such packages and
+		// modules. Therefore, whilst we ask the modules themselves to
+		// do the (re)loading of any dirty packages, we accumulate all
+		// the loaded packages here, and process them all together.
+		for _, m := range modules {
+			pkgs, err := m.loadDirtyPackages()
 			if err != nil {
-				if err == ErrBadModule {
-					// The module is bad - ignore all its dirty files.
-					break
-				} else if errors.Is(err, fs.ErrNotExist) {
-					// The file has been deleted. nothing to do.
-					continue
-				} else if _, ok := err.(*fs.PathError); ok {
-					// A parent directory of the file has been
-					// deleted. Probably.
-					continue
-				} else if _, ok := err.(cueerrors.Error); ok {
-					// Most likely a syntax error; ignore it.
-					// TODO: this error might become a "diagnostics" message
-					continue
-				}
-				w.debugLogf("Error when processing updated file %v: %v", fileUri, err)
 				continue
 			}
-			if ip == nil || len(dirUris) == 0 {
-				// Probably the file had no package declaration.
-				w.standalone.reloadFile(fileUri)
+
+			if pkgs == nil {
+				// No dirty packages within the module.
 				continue
 			}
+
+			// We need to track all packages that are loaded, so we use
+			// pkgs.All() and not pkgs.Roots().
+			loadedPkgs = append(loadedPkgs, pkgs.All()...)
+		}
+
+		if len(loadedPkgs) == 0 {
+			return
+		}
+
+		// Process the results of loading the all the dirty packages
+		// from all the modules. We need to do this in two passes to
+		// ensure we create all necessary packages before trying to
+		// build/update the inverted import graph.
+
+		// 1. Ensure that all the necessary modules and packages exist.
+		for _, loadedPkg := range loadedPkgs {
+			if isUnhandledPackage(loadedPkg) {
+				continue
+			}
+
+			ip := normalizeImportPath(loadedPkg)
+			modRootURI := moduleRootURI(loadedPkg)
+
+			// The same package can appear multiple times in loadedPkgs,
+			// for several reasons. Firstly, two different packages in
+			// different modules could each import the same third
+			// package.
+			//
+			// Secondly, even within the same module, we can get multiple
+			// instances of the same package. Imagine some cue file in
+			// package foo.com/x has "import foo.com/y" in it. Imagine
+			// that we knew that both packages x and y are dirty, so when
+			// we called modpkgload.LoadPackages, we had pkgPaths set to
+			// [foo.com/x@v0, foo.com/y@v0]. Because
+			// modpkgload.LoadPackages does not normalize import paths,
+			// we end up with two loadings of y - one from the explicit
+			// pkgPath foo.com/y@v0, and one from the import foo.com/y
+			// (the different spelling is the critical thing).
+			//
+			// So we need to test whether we've already seen this package
+			// in the results of this load. If we have, we can skip.
 			key := importPathModRootPair{
-				importPath: *ip,
-				modRootURI: m.rootURI,
+				importPath: ip,
+				modRootURI: modRootURI,
 			}
 			if _, loaded := processedPkgs[key]; loaded {
-				// We've just loaded this pkg. If FindImportPathForFile
-				// thinks fileUri belongs in pkg, but the loading has not
-				// done that, then it most likely means modpkgload hit an
-				// error loading that package (e.g. syntactically invalid
-				// import declarations). We should *not* try to load the
-				// same package again, otherwise we can create an infinite
-				// loop.
-			} else {
-				pkg := m.EnsurePackage(*ip, dirUris)
-				pkg.markFileDirty(fileUri)
-				repeatReload = true
+				continue
 			}
-			if len(dirUris) == 1 { // i.e. the new module system is in use
-				for pkg := range m.descendantPackages(*ip) {
-					key.importPath = pkg.importPath
-					if _, loaded := processedPkgs[key]; loaded {
-						// Same as before: avoid infinite loops
-						continue
+			pkgModPkg := &pkgModPkgPair{
+				modpkg: loadedPkg,
+			}
+			processedPkgs[key] = pkgModPkg
+
+			m := w.ensureModule(modRootURI + "/cue.mod/module.cue")
+			if err := m.ReloadModule(); err != nil {
+				continue
+			}
+
+			pkg, found := m.packages[ip]
+			if !found {
+				// Every package contains cue sources from one* "leaf"
+				// directory and optionally any ancestor directory. Here
+				// we determine that "leaf" directory.
+				//
+				// * In the case the "old modules" system is in use, with
+				// the cue.mod/{gen|pkg|usr} directories, it will be all
+				// three leaf directories, and ancestor imports don't
+				// apply. We always add all 3 directories so that when the
+				// first file is created in any of them, we're able to
+				// match that file to this package.
+				var dirUris []protocol.DocumentURI
+				dirUri := protocol.DocumentURI("")
+			locations:
+				for _, loc := range loadedPkg.Locations() {
+					for _, prefix := range []string{"cue.mod/gen/", "cue.mod/pkg/", "cue.mod/usr/"} {
+						if dirOldMod, wasCut := strings.CutPrefix(loc.Dir, prefix); wasCut {
+							dirUris = []protocol.DocumentURI{
+								m.rootURI + "/cue.mod/gen/" + protocol.DocumentURI(dirOldMod),
+								m.rootURI + "/cue.mod/pkg/" + protocol.DocumentURI(dirOldMod),
+								m.rootURI + "/cue.mod/usr/" + protocol.DocumentURI(dirOldMod),
+							}
+							break locations
+						}
 					}
 
-					pkg.markFileDirty(fileUri)
+					uri := protocol.DocumentURI(string(modRootURI) + "/" + loc.Dir)
+					if dirUri == "" || dirUri.Encloses(uri) {
+						dirUri = uri
+					}
+				}
+
+				if dirUri != "" {
+					dirUris = []protocol.DocumentURI{dirUri}
+				}
+				pkg = m.newPackage(ip, dirUris)
+			}
+			pkgModPkg.pkg = pkg
+		}
+
+		// 2a. Now that all pkgs exist, update them all.
+		for _, pkgModPkg := range processedPkgs {
+			if pkgModPkg == nil {
+				continue
+			}
+			pkg, loadedPkg := pkgModPkg.pkg, pkgModPkg.modpkg
+			if pkg != nil {
+				_ = pkg.update(loadedPkg)
+			}
+		}
+
+		// Any package that's still dirty at this point could not be loaded
+		// for some reason by modpkgload. We should delete it.
+		for _, m := range modules {
+			for _, pkg := range m.packages {
+				if pkg.isDirty {
+					pkg.delete()
+					key := importPathModRootPair{
+						importPath: pkg.importPath,
+						modRootURI: m.rootURI,
+					}
+					if _, loaded := processedPkgs[key]; !loaded {
+						// We have a pkg that is dirty, but when we tried to
+						// load it, we got nothing back at all. This possibly
+						// means this pkg doesn't exist within this module. It
+						// could be a race with the file system, or it could be
+						// a bug in the LSP.
+						w.debugLogf("Warning: attempt to load package %v within module %v produced no result.", pkg.importPath, m.rootURI)
+						// Add to processedPkgs so that we don't risk calling
+						// reloadPackages again and looping infinitely.
+						processedPkgs[key] = nil
+					}
+				}
+			}
+		}
+
+		// Note that there's a potential memory leak here: we might load a
+		// package "foo" because it's imported by "bar". If "bar" is edited
+		// so that it no longer imports "foo" then we'll notice that, and
+		// our "foo" Package will get updated so that its importedBy field
+		// is empty. But we never currently remove the "foo" package from
+		// its module. Ideally, we should keep track within each Package of
+		// the number of its files open in the editor/client. If that drops
+		// to zero, and the importedBy field is empty, then we should
+		// remove the package from the module. TODO.
+
+		// We need to watch out for when a dirty file moves package, either
+		// to an existing package which we've not reloaded, or to a package
+		// that we've never loaded. In both cases, the file will still be
+		// within this module.
+		repeatReload := false
+		for _, m := range modules {
+			for fileUri := range m.dirtyFiles {
+				delete(m.dirtyFiles, fileUri)
+
+				ip, dirUris, err := m.FindImportPathForFile(fileUri)
+				if err != nil {
+					if err == ErrBadModule {
+						// The module is bad - ignore all its dirty files.
+						break
+					} else if errors.Is(err, fs.ErrNotExist) {
+						// The file has been deleted. nothing to do.
+						continue
+					} else if _, ok := err.(*fs.PathError); ok {
+						// A parent directory of the file has been
+						// deleted. Probably.
+						continue
+					} else if _, ok := err.(cueerrors.Error); ok {
+						// Most likely a syntax error; ignore it.
+						// TODO: this error might become a "diagnostics" message
+						continue
+					}
+					w.debugLogf("Error when processing updated file %v: %v", fileUri, err)
+					continue
+				}
+				if ip == nil || len(dirUris) == 0 {
+					// Probably the file had no package declaration.
+					w.standalone.reloadFile(fileUri)
+					continue
+				}
+				key := importPathModRootPair{
+					importPath: *ip,
+					modRootURI: m.rootURI,
+				}
+				if _, loaded := processedPkgs[key]; loaded {
+					// We've just loaded this pkg. If FindImportPathForFile
+					// thinks fileUri belongs in pkg, but the loading has not
+					// done that, then it most likely means modpkgload hit an
+					// error loading that package (e.g. syntactically invalid
+					// import declarations). We should *not* try to load the
+					// same package again, otherwise we can create an infinite
+					// loop.
+				} else {
+					m.EnsurePackage(*ip, dirUris).markFileDirty(fileUri)
 					repeatReload = true
 				}
 			}
 		}
+
+		// 2b. Search for descendant and ascendant packages that should
+		// be reloaded and have been missed. These are logically part of
+		// the import graph, but are beyond what modpkgload copes with.
+		for key, pkgModPkg := range processedPkgs {
+			if pkgModPkg == nil {
+				continue
+			}
+			pkg := pkgModPkg.pkg
+			m := pkg.module
+
+			if pkg.isCue {
+				// embeddings are "upstream" packages. The package will
+				// have expanded every embed attribute to a set of
+				// fileUris. We now need to try to find a package for each
+				// such fileUri.
+				for _, embedding := range pkg.embeddings {
+					for _, embedded := range embedding.results {
+						if embedded.pkg != nil {
+							continue
+						}
+						ip, dirUris, err := m.FindImportPathForFile(embedded.fileUri)
+						if err != nil || ip == nil || len(dirUris) == 0 {
+							continue
+						}
+						key.importPath = *ip
+						if _, loaded := processedPkgs[key]; loaded {
+							continue
+						}
+						pkg := m.EnsurePackage(*ip, dirUris)
+						// If pkg is dirty, it's probably because it's only
+						// just been created, so it'll need fully loading.
+						repeatReload = repeatReload || pkg.isDirty
+					}
+				}
+				if len(pkg.dirURIs) != 1 { // old module system
+					continue
+				}
+				for descendentPkg := range m.descendantCuePackages(pkg.importPath) {
+					key.importPath = descendentPkg.importPath
+					if _, loaded := processedPkgs[key]; loaded {
+						continue
+					}
+					// We can be here if: two packages already exist where
+					// one is the ancestor of the other, and a new file
+					// appears which adds to the ancestor
+					// package. Processing that new file will mark the
+					// ancestor as dirty, but not the descendent. So we
+					// deal with that situation here.
+					for _, file := range pkg.files {
+						descendentPkg.markFileDirty(file.uri)
+					}
+					repeatReload = true
+				}
+
+			} else {
+				// pkg is a non-cue pkg. We look through all cue pkgs
+				// which could possibly embed pkg.
+				for ascendantPkg := range m.ascendantCuePackages(pkg) {
+					key.importPath = ascendantPkg.importPath
+					if _, loaded := processedPkgs[key]; loaded {
+						continue
+					}
+					for fileUri := range pkg.files {
+						if ascendantPkg.matchesUnknownEmbedding(fileUri) {
+							// ascendantPkg has not just been reloaded, and
+							// it should embed pkg, but it doesn't. So it
+							// needs to be reloaded. This happens when pkg is
+							// created by a new (e.g. json-) file appearing,
+							// and ascendantPkg contains a suitable glob
+							// embed. This is where embed attributes (with
+							// globs) are very different to import specs: a
+							// glob embed attribute (essentially) represents
+							// a set of packages to embed, and that set can
+							// change as files are added to, or deleted from,
+							// the file system.
+							ascendantPkg.markDirty()
+							repeatReload = true
+							break
+						}
+					}
+				}
+			}
+		}
+
+		if !repeatReload {
+			break
+		}
 	}
 
-	if repeatReload {
-		w.reloadPackages()
+	// Finally, ask all packages to look up and link with any packages
+	// that they embed.
+	for _, m := range modules {
+		for _, pkg := range m.packages {
+			pkg.linkWithEmbeddedFiles()
+		}
 	}
 }
 

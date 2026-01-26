@@ -345,6 +345,7 @@ func (fs *ioFS) ReadFile(name string) ([]byte, error) {
 
 var _ module.ReadCUEFS = (*ioFS)(nil)
 
+// IsDirWithCUEFiles implements [module.ReadCUEFS]
 func (fs *ioFS) IsDirWithCUEFiles(path string) (bool, error) {
 	return false, stderrs.ErrUnsupported
 }
@@ -355,7 +356,7 @@ func (fs *ioFS) IsDirWithCUEFiles(path string) (bool, error) {
 // method.
 func (fs *ioFS) ReadCUEFile(path string, cfg parser.Config) (*ast.File, error) {
 	if !strings.HasSuffix(path, ".cue") {
-		return nil, nil
+		return nil, module.ErrNotCUE
 	}
 	fpath, err := fs.absPathFromFSPath(path)
 	if err != nil {

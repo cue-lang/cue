@@ -117,27 +117,6 @@ func (m *Module) encloses(file protocol.DocumentURI) bool {
 	return m.modFileURI == file
 }
 
-func (m *Module) markPackagesDirty(pkg *Package, fileUri protocol.DocumentURI) {
-	pkg.markFileDirty(fileUri)
-	if len(pkg.dirURIs) != 1 {
-		// the old module system is in use. No ancestor imports, and no embeddings.
-		return
-	}
-
-	if strings.HasSuffix(string(fileUri), ".cue") {
-		for p := range m.descendantPackages(pkg.importPath) {
-			p.markFileDirty(fileUri)
-		}
-
-	} else {
-		for p := range m.ascendantPackages(pkg) {
-			if p.embeddingsMatch(fileUri) {
-				p.markFileDirty(fileUri)
-			}
-		}
-	}
-}
-
 // ReloadModule reloads the module's modfile iff the module's status
 // is dirty. If an error is encountered when reloading the module, the
 // module and all its packages are deleted from the workspace.
@@ -279,21 +258,21 @@ func (m *Module) EnsurePackage(ip ast.ImportPath, dirUris []protocol.DocumentURI
 	return pkg
 }
 
-// descendantPackages returns all the existing loaded packages within
-// this module that would include the import path's package's files
-// due to the ancestor-import mechanism. The ancestor-import mechanism
-// is not available for the "old module" system, so only call this
-// unless you know the import path corresponds to the new module
-// system.
+// descendantCuePackages returns all the existing loaded Cue packages
+// within this module that would include the given import path's
+// package's files due to the ancestor-import mechanism. The
+// ancestor-import mechanism is not available for the "old module"
+// system, so only call this unless you know the import path
+// corresponds to the new module system.
 //
 // This method only returns existing packages; it does not create any
 // new packages.
-func (m *Module) descendantPackages(ip ast.ImportPath) iter.Seq[*Package] {
+func (m *Module) descendantCuePackages(ip ast.ImportPath) iter.Seq[*Package] {
 	return func(yield func(*Package) bool) {
 		prefix := ip.Path + "/"
 		for _, pkg := range m.packages {
 			pkgIp := pkg.importPath
-			if pkgIp.Qualifier == ip.Qualifier && strings.HasPrefix(pkgIp.Path, prefix) {
+			if pkg.isCue && pkgIp.Qualifier == ip.Qualifier && strings.HasPrefix(pkgIp.Path, prefix) {
 				if !yield(pkg) {
 					return
 				}
@@ -302,21 +281,28 @@ func (m *Module) descendantPackages(ip ast.ImportPath) iter.Seq[*Package] {
 	}
 }
 
-func (m *Module) ascendantPackages(pkg *Package) iter.Seq[*Package] {
+// ascendantCuePackages returns all existing loaded Cue packages
+// within this module that would be able to embed the given
+// package. This requires that their "leaf" directory encloses the
+// "leaf" directory of the given pkg.
+//
+// This method only returns existing packages; it does not create any
+// new packages.
+func (m *Module) ascendantCuePackages(pkg *Package) iter.Seq[*Package] {
 	return func(yield func(*Package) bool) {
-	pkgs:
 		for _, p := range m.packages {
-		pkgDirs:
-			for _, pkgDir := range pkg.dirURIs {
-				for _, pDir := range p.dirURIs {
+			if p == pkg || !p.isCue {
+				continue
+			}
+			for _, pDir := range p.dirURIs {
+				for _, pkgDir := range pkg.dirURIs {
 					if pDir.Encloses(pkgDir) {
-						continue pkgDirs
+						if !yield(p) {
+							return
+						}
+						break
 					}
 				}
-				continue pkgs
-			}
-			if !yield(p) {
-				return
 			}
 		}
 	}
@@ -349,10 +335,9 @@ func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
 	// 2. Load all the packages found
 	modPath := m.modFile.QualifiedModule()
 	reqs := modrequirements.NewRequirements(modPath, w.registry, m.modFile.DepVersions(), m.modFile.DefaultMajorVersions())
-	rootUri := m.rootURI
 	ctx := context.Background()
 	loc := module.SourceLoc{
-		FS:  w.overlayFS.IoFS(rootUri.Path()),
+		FS:  w.overlayFS.IoFS(m.rootURI.Path()),
 		Dir: ".", // NB can't be ""
 	}
 	// Determinism in log messages:
@@ -373,12 +358,12 @@ func (m *Module) activeFilesAndDirs(files map[protocol.DocumentURI][]packageOrMo
 	}
 }
 
-// loadAllPackages looks for all regular cue files within the module's
+// loadAllCuePackages looks for all regular cue files within the module's
 // root directory and if they're not already loaded, it attempts to
 // load them. Note that it ignores files with no package declaration;
 // it does not (currently) treat load them as standalone files.
-func (m *Module) loadAllPackages() {
-	files, _ := m.workspace.activeFilesAndDirs()
+func (m *Module) loadAllCuePackages() {
+	activeFiles, _ := m.workspace.activeFilesAndDirs()
 
 	var toLoad []protocol.DocumentURI
 	rootPath := m.rootURI.Path()
@@ -388,29 +373,33 @@ func (m *Module) loadAllPackages() {
 			return err
 		}
 		// Do not enter nested modules.
-		if d.Type().IsDir() {
+		if d.IsDir() {
 			info, err := fs.Stat(fsys, p+"/cue.mod/module.cue")
 			if err == nil && !info.IsDir() {
 				return fs.SkipDir
 			}
-		}
-		if d.Type().IsRegular() && strings.HasSuffix(p, ".cue") {
+
+		} else if strings.HasSuffix(p, ".cue") {
 			p = filepath.Join(rootPath, filepath.FromSlash(p))
-			uri := protocol.URIFromPath(p)
-			if _, found := files[uri]; !found {
-				toLoad = append(toLoad, uri)
+			fileUri := protocol.URIFromPath(p)
+			if _, found := activeFiles[fileUri]; !found {
+				toLoad = append(toLoad, fileUri)
 			}
 		}
 		return nil
 	})
 
-	for _, uri := range toLoad {
-		ip, dirUris, err := m.FindImportPathForFile(uri)
+	reload := false
+	for _, fileUri := range toLoad {
+		ip, dirUris, err := m.FindImportPathForFile(fileUri)
 		if err != nil || ip == nil || len(dirUris) == 0 {
 			continue
 		}
-		pkg := m.EnsurePackage(*ip, dirUris)
-		m.markPackagesDirty(pkg, uri)
+		m.EnsurePackage(*ip, dirUris).markFileDirty(fileUri)
+		reload = true
+	}
+	if reload {
+		m.workspace.reloadPackages()
 	}
 }
 

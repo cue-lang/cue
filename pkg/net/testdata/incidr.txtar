@@ -1,0 +1,89 @@
+-- in.cue --
+import "net"
+
+// IPv4 tests
+t1: net.InCIDR("192.168.1.5", "192.168.1.0/24")
+t2: net.InCIDR("192.168.2.5", "192.168.1.0/24")
+t3: net.InCIDR("10.0.0.1", "10.0.0.0/8")
+t4: net.InCIDR("11.0.0.1", "10.0.0.0/8")
+
+// IPv4 with byte list
+t5: net.InCIDR([192, 168, 1, 100], "192.168.1.0/24")
+t6: net.InCIDR([192, 168, 2, 100], "192.168.1.0/24")
+
+// IPv6 tests
+t7: net.InCIDR("2001:db8::1", "2001:db8::/32")
+t8: net.InCIDR("2001:db9::1", "2001:db8::/32")
+
+// IPv6 with byte list (2001:db8::1 = [32, 1, 13, 184, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+t9:  net.InCIDR([32, 1, 13, 184, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], "2001:db8::/32")
+t10: net.InCIDR([32, 1, 13, 185, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], "2001:db8::/32")
+
+// Edge cases
+t11: net.InCIDR("192.168.1.0", "192.168.1.0/24")
+t12: net.InCIDR("192.168.1.255", "192.168.1.0/24")
+t13: net.InCIDR("0.0.0.0", "0.0.0.0/0")
+t14: net.InCIDR("255.255.255.255", "0.0.0.0/0")
+
+// Error cases
+t15: net.InCIDR("invalid", "192.168.1.0/24")
+t16: net.InCIDR("192.168.1.1", "invalid")
+t17: net.InCIDR("192.168.1.1", "192.168.1.0")
+t18: net.InCIDR("192.168.1.0/24", "192.168.0.0/16")
+
+// Validator usage - IP is validated against a CIDR constraint
+v1: "192.168.1.50" & net.InCIDR("192.168.1.0/24")
+v2: "10.0.0.1" & net.InCIDR("192.168.1.0/24")
+v3: [192, 168, 1, 50] & net.InCIDR("192.168.1.0/24")
+v4: "2001:db8::1" & net.InCIDR("2001:db8::/32")
+-- out/net-v3 --
+Errors:
+t15: error in call to net.InCIDR: invalid IP "invalid":
+    ./in.cue:28:6
+t16: error in call to net.InCIDR: netip.ParsePrefix("invalid"): no '/':
+    ./in.cue:29:6
+t17: error in call to net.InCIDR: netip.ParsePrefix("192.168.1.0"): no '/':
+    ./in.cue:30:6
+t18: error in call to net.InCIDR: invalid IP "192.168.1.0/24":
+    ./in.cue:31:6
+v2: invalid value "10.0.0.1" (does not satisfy net.InCIDR("192.168.1.0/24")):
+    ./in.cue:35:18
+    ./in.cue:35:5
+    ./in.cue:35:29
+
+Result:
+// IPv4 tests
+t1: true
+t2: false
+t3: true
+t4: false
+
+// IPv4 with byte list
+t5: true
+t6: false
+
+// IPv6 tests
+t7: true
+t8: false
+
+// IPv6 with byte list (2001:db8::1 = [32, 1, 13, 184, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+t9:  true
+t10: false
+
+// Edge cases
+t11: true
+t12: true
+t13: true
+t14: true
+
+// Error cases
+t15: _|_ // t15: error in call to net.InCIDR: invalid IP "invalid"
+t16: _|_ // t16: error in call to net.InCIDR: netip.ParsePrefix("invalid"): no '/'
+t17: _|_ // t17: error in call to net.InCIDR: netip.ParsePrefix("192.168.1.0"): no '/'
+t18: _|_ // t18: error in call to net.InCIDR: invalid IP "192.168.1.0/24"
+
+// Validator usage - IP is validated against a CIDR constraint
+v1: "192.168.1.50"
+v2: _|_ // v2: invalid value "10.0.0.1" (does not satisfy net.InCIDR("192.168.1.0/24"))
+v3: [192, 168, 1, 50]
+v4: "2001:db8::1"

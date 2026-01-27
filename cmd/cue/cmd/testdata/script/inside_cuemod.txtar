@@ -1,0 +1,74 @@
+# Test running cue commands inside the cue.mod directory,
+# as well as interacting with packages and files inside of it.
+#
+# CUE files "inside a module" should be in a directory tree that contains
+# a cue.mod directory, but not actually inside the cue.mod directory itself.
+# However, it's easy for new users to think otherwise and drop their CUE code
+# inside the cue.mod directory somewhere, which can lead to confusing results.
+
+# From the module root, reaching into cue.mod.
+! exec cue export ./cue.mod
+stderr 'unknown file extension .mod'
+# TODO: should this work? perhaps offer `cue mod edit --json` like Go does.
+exec cue export cue.mod/module.cue
+cmp stdout $WORK/export-module.stdout
+
+# From cue.mod, reaching into the module root.
+# TODO: none of these should work; we should guide the user outside of cue.mod.
+cd $WORK/cue.mod
+exec cue export ..
+exec cue export ../root.cue
+
+# From cue.mod.
+# TODO: none of these should work; we should guide the user outside of cue.mod.
+cd $WORK/cue.mod
+exec cue mod tidy
+exec cue export .
+exec cue export somefile.cue
+exec cue export module.cue
+# Interestingly, these fail but with internal or confusing errors.
+! exec cue export ./subdir
+stderr 'internal error:.*non-internal package'
+! exec cue vet ./...
+stderr 'pattern not allowed in external package path'
+
+# From cue.mod/subdir.
+# TODO: none of these should work; we should guide the user outside of cue.mod.
+cd $WORK/cue.mod/subdir
+exec cue mod tidy
+exec cue export .
+
+# From cue.mod/pkg/foo.com/bar.
+# Arguably this should not work, but historically it has, and placing packages
+# in this directory structure is still supported as the old mechanism
+# to add package dependencies. For now, it continues to work.
+cd $WORK/cue.mod/pkg/foo.com/bar
+exec cue export .
+
+-- root.cue --
+package root
+
+location: "at module root"
+-- cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.9.0"
+
+-- cue.mod/somefile.cue --
+package somefile
+
+location: "in cue.mod"
+-- cue.mod/subdir/data.cue --
+package subdir
+
+location: "in cue.mod/subdir"
+-- cue.mod/pkg/foo.com/bar/data.cue --
+package bar
+
+location: "in cue.mod/pkg/foo.com/bar"
+-- export-module.stdout --
+{
+    "module": "example.com@v0",
+    "language": {
+        "version": "v0.9.0"
+    }
+}

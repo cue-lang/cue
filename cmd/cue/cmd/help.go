@@ -265,8 +265,9 @@ Files containing multiple documents cannot be embedded directly.
 For NDJSON or multi-document YAML files, embed as type=text
 and use APIs like yaml.Extract to decode as a list.
 
-For security reasons, only files contained in the same module
-can be embedded. Embedding is forbidden when outside a module.
+Only files in the same module containing the CUE file can be embedded.
+Embedding is forbidden when outside a module, and parent directory
+references are not allowed.
 
 Note that embedding CUE files is not supported at this time.
 

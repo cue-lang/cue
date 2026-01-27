@@ -24,8 +24,9 @@
 // all. This allows the @embed attribute to be used to load a file within a CUE
 // module into a field.
 //
-// References to files are always relative to directory in which the referring
-// file resides. Only files that exist within the CUE module are accessible.
+// References to files are always relative to the directory in which the
+// referring file resides. Only files in the same module containing the CUE
+// file can be embedded, and parent directory references are not allowed.
 //
 // # The @embed attribute
 //

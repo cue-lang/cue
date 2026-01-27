@@ -50,6 +50,23 @@
       "message": "fwiw, and it may not be much, personally I\u0027d have called that a mask, not a prefix. Even though I know it\u0027s closer to a prefix in operation. I just am more used to seeing them referred to as netmasks.\n\nEDIT: I\u0027ve never seen net/netip before. Curious that net has ParseCIDR and netip has ParsePrefix. I guess cidr is the best name but that\u0027s already taken here, and given the underlying stdlib, prefix probably is the next best. As you were 😉",
       "revId": "61fce98c45b4be8ad1f4c1640a122d759b9705b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a229d0d_8b8377c3",
+        "filename": "pkg/net/testdata/incidr.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-27T09:05:39Z",
+      "side": 1,
+      "message": "It would be nice to have 1 IPv6 byte-list case.",
+      "revId": "61fce98c45b4be8ad1f4c1640a122d759b9705b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

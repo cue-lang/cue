@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19b4b820_babd3239",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-27T15:09:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9bc7b158_0f12fe7e",
+      "revId": "be686e038c037e3ceae6e37141bd2afe721cfbce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fffe2b58_5fd6c0cf",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-01-27T14:29:18Z",
       "side": 1,
       "message": "I would change \"nested \" to \"sub-\". Because you could have nested modules, but the embed path doesn\u0027t cross the boundary into a different module.",
+      "revId": "be686e038c037e3ceae6e37141bd2afe721cfbce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c24ec24_9a4fa43f",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-27T15:09:23Z",
+      "side": 1,
+      "message": "I went with a new wording entirely after some back and forth with Claude, what do you think?",
+      "parentUuid": "fffe2b58_5fd6c0cf",
       "revId": "be686e038c037e3ceae6e37141bd2afe721cfbce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

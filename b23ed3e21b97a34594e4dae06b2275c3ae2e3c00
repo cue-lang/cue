@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ece11b9b_36329032",
+        "filename": "pkg/net/ip.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-27T11:43:14Z",
+      "side": 1,
+      "message": "I\u0027m a bit surprised that you\u0027ve needed to do this bitbanging yourself and there isn\u0027t a func in netip to do it for you.",
+      "revId": "b23ed3e21b97a34594e4dae06b2275c3ae2e3c00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bc7b158_0f12fe7e",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-27T14:29:18Z",
+      "side": 1,
+      "message": "and I\u0027d make the same change here too.",
+      "revId": "be686e038c037e3ceae6e37141bd2afe721cfbce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fffe2b58_5fd6c0cf",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-27T14:29:18Z",
+      "side": 1,
+      "message": "I would change \"nested \" to \"sub-\". Because you could have nested modules, but the embed path doesn\u0027t cross the boundary into a different module.",
+      "revId": "be686e038c037e3ceae6e37141bd2afe721cfbce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -13,33 +13,35 @@ stderr 'unknown file extension .mod'
 exec cue export cue.mod/module.cue
 cmp stdout $WORK/export-module.stdout
 
-# From cue.mod, reaching into the module root.
-# TODO: none of these should work; we should guide the user outside of cue.mod.
-# Note that some of these did not work on Windows either.
+# From cue.mod, reaching into the module root, all commands should fail.
 cd $WORK/cue.mod
-[!windows] exec cue export ..
-exec cue export ../root.cue
+! exec cue export ..
+stderr 'cannot load packages inside the cue.mod directory'
+! exec cue export ../root.cue
+stderr 'cannot load packages inside the cue.mod directory'
 
-# From cue.mod.
-# TODO: none of these should work; we should guide the user outside of cue.mod.
-cd $WORK/cue.mod
-exec cue mod tidy
-exec cue export .
-exec cue export somefile.cue
-exec cue export module.cue
-# Interestingly, these fail but with internal or confusing errors.
+# From cue.mod, all commands should fail.
+! exec cue export .
+stderr 'cannot load packages inside the cue.mod directory'
+! exec cue export somefile.cue
+stderr 'cannot load packages inside the cue.mod directory'
+! exec cue export module.cue
+stderr 'cannot load packages inside the cue.mod directory'
 ! exec cue export ./subdir
-stderr 'internal error:.*non-internal package'
+stderr 'cannot load packages inside the cue.mod directory'
 ! exec cue vet ./...
-stderr 'pattern not allowed in external package path'
+stderr 'cannot load packages inside the cue.mod directory'
+! exec cue mod tidy
+stderr 'cannot run this command inside the cue.mod directory'
 
-# From cue.mod/subdir.
-# TODO: none of these should work; we should guide the user outside of cue.mod.
+# From cue.mod/subdir, all commands should fail.
 cd $WORK/cue.mod/subdir
-exec cue mod tidy
-exec cue export .
+! exec cue export .
+stderr 'cannot load packages inside the cue.mod directory'
+! exec cue mod tidy
+stderr 'cannot run this command inside the cue.mod directory'
 
-# From cue.mod/pkg/foo.com/bar.
+# From cue.mod/pkg/foo.com/bar, loading CUE should work.
 # Arguably this should not work, but historically it has, and placing packages
 # in this directory structure is still supported as the old mechanism
 # to add package dependencies. For now, it continues to work.

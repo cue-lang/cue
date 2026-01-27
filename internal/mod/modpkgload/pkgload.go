@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"maps"
+	"path/filepath"
 	"runtime"
 	"slices"
 	"strings"
@@ -429,4 +430,38 @@ func (af *atomicLoadPkgFlags) has(cond Flags) bool {
 func IsStdlibPackage(pkgPath string) bool {
 	firstElem, _, _ := strings.Cut(pkgPath, "/")
 	return !strings.Contains(firstElem, ".")
+}
+
+// InsideCueMod reports whether absDir is inside a cue.mod directory,
+// excluding the legacy directories cue.mod/{pkg,usr,gen},
+// which are still supported for placing package dependencies.
+//
+// For example, /foo/cue.mod and /foo/cue.mod/bar are inside cue.mod,
+// but /foo, /foo/cue.modx, and /foo/cue.mod/pkg/example.com are not.
+//
+// absDir must be an absolute system path that is clean; see [filepath.Clean].
+func InsideCueMod(absDir string) bool {
+	lastPart := ""
+	for {
+		dir, base, found := cutLast(absDir, string(filepath.Separator))
+		if base == "cue.mod" {
+			switch lastPart {
+			case "pkg", "usr", "gen":
+				return false
+			}
+			return true
+		}
+		if !found {
+			return false
+		}
+		absDir = dir
+		lastPart = base
+	}
+}
+
+func cutLast(s, sep string) (before, after string, found bool) {
+	if i := strings.LastIndex(s, sep); i >= 0 {
+		return s[:i], s[i+len(sep):], true
+	}
+	return "", s, false
 }

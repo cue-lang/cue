@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
@@ -360,6 +361,9 @@ func (c Config) complete() (cfg *Config, err error) {
 		}
 	} else if c.Dir, err = filepath.Abs(c.Dir); err != nil {
 		return nil, err
+	}
+	if modpkgload.InsideCueMod(c.Dir) {
+		return nil, fmt.Errorf("cannot load packages inside the %s directory", modDir)
 	}
 
 	// TODO: we could populate this already with absolute file paths,

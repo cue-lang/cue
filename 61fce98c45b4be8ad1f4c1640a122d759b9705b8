@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15c63e70_a9716688",
+        "filename": "pkg/net/ip.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-27T09:08:42Z",
+      "side": 1,
+      "message": "Yeah, having done some more reading, \"mask\" is 100% not the right term. Ignore me!",
+      "parentUuid": "dda88f71_5811c692",
+      "revId": "61fce98c45b4be8ad1f4c1640a122d759b9705b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a229d0d_8b8377c3",

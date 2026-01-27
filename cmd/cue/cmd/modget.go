@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"cuelang.org/go/internal/mod/modload"
+	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/mod/modfile"
 )
 
@@ -115,6 +116,9 @@ func findModuleRoot() (string, error) {
 	// TODO this logic is duplicated in multiple places. We should
 	// consider deduplicating it.
 	dir := rootWorkingDir()
+	if modpkgload.InsideCueMod(dir) {
+		return "", fmt.Errorf("cannot run this command inside the cue.mod directory")
+	}
 	for {
 		if _, err := os.Stat(filepath.Join(dir, "cue.mod")); err == nil {
 			return dir, nil

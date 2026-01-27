@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "17a3b29f_6b5d9b50",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-27T09:46:19Z",
+      "side": 1,
+      "message": "yeah. I actually initially thought it was the opposite way because I forgot. but just following the existing design by Marcel here :) \n\n\nFWIW my initial logic was like currying in Haskell, where you can take a func that accepts (A, B), pass it A, and you get a func that takes (B).\n\nBut I think Marcel designed this like the validator always omits one argument, and it\u0027s the first as the \"receiver\" of the validator expression/constraint. So perhaps this is more Go-like and doesn\u0027t give the impression that we support Haskell-like currying.",
+      "parentUuid": "de6f1170_7f58e614",
+      "revId": "61fce98c45b4be8ad1f4c1640a122d759b9705b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6b3808d_750dbf26",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-01-27T09:05:25Z",
       "side": 1,
       "message": "\"OverlappingCIDRs\" is an even better name?",
+      "revId": "61fce98c45b4be8ad1f4c1640a122d759b9705b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a68ac618_5e144ca1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-27T09:46:19Z",
+      "side": 1,
+      "message": "I think it\u0027s slightly better to name these funcs like \"A foos B\" (HasPrefix), or \"property of A with B\" (MinItems), because they still read OK as validators with the \"receiver\" parameter missing. If we write `OverlappingCIDRs(cidr)` it reads a bit weird IMHO, given the plural but just one parameter.\n\n(but either way I\u0027m happy to bikeshed if/when we add that other API)",
+      "parentUuid": "a6b3808d_750dbf26",
       "revId": "61fce98c45b4be8ad1f4c1640a122d759b9705b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -83,6 +119,24 @@
       "writtenOn": "2026-01-27T09:05:39Z",
       "side": 1,
       "message": "It would be nice to have 1 IPv6 byte-list case.",
+      "revId": "61fce98c45b4be8ad1f4c1640a122d759b9705b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b01e843_d8c11aa2",
+        "filename": "pkg/net/testdata/incidr.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-27T09:46:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a229d0d_8b8377c3",
       "revId": "61fce98c45b4be8ad1f4c1640a122d759b9705b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

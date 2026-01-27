@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de6f1170_7f58e614",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-27T09:05:25Z",
+      "side": 1,
+      "message": "Whilst this does make sense, and is quite neat, you do need both your morning coffees first, otherwise you read it and segfault at the idea that partial application is going right to left, not left to right.",
+      "revId": "61fce98c45b4be8ad1f4c1640a122d759b9705b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6b3808d_750dbf26",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-27T09:05:25Z",
+      "side": 1,
+      "message": "\"OverlappingCIDRs\" is an even better name?",
+      "revId": "61fce98c45b4be8ad1f4c1640a122d759b9705b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dda88f71_5811c692",
+        "filename": "pkg/net/ip.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-27T09:05:25Z",
+      "side": 1,
+      "message": "fwiw, and it may not be much, personally I\u0027d have called that a mask, not a prefix. Even though I know it\u0027s closer to a prefix in operation. I just am more used to seeing them referred to as netmasks.\n\nEDIT: I\u0027ve never seen net/netip before. Curious that net has ParseCIDR and netip has ParsePrefix. I guess cidr is the best name but that\u0027s already taken here, and given the underlying stdlib, prefix probably is the next best. As you were 😉",
+      "revId": "61fce98c45b4be8ad1f4c1640a122d759b9705b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

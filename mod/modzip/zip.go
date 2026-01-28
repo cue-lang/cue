@@ -785,8 +785,8 @@ func listFilesInDir(dir string) (files []dirFile, omitted []FileError, err error
 				return filepath.SkipDir
 			}
 
-			// Skip submodules (directories containing go.mod files).
-			if goModInfo, err := os.Lstat(filepath.Join(filePath, "go.mod")); err == nil && !goModInfo.IsDir() {
+			// Skip submodules (directories containing cue.mod directories).
+			if cueModInfo, err := os.Lstat(filepath.Join(filePath, "cue.mod")); err == nil && cueModInfo.IsDir() {
 				omitted = append(omitted, FileError{Path: slashPath, Err: errSubmoduleDir})
 				return filepath.SkipDir
 			}

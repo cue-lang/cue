@@ -69,6 +69,24 @@
       "parentUuid": "aa12af92_8be021fc",
       "revId": "e2cbda1bf2c41ad2afb0b1327e56f7b6a52be25a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2ce85b3_e11d7dbb",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-28T15:09:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "41916c2c_39112313",
+      "revId": "e2cbda1bf2c41ad2afb0b1327e56f7b6a52be25a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

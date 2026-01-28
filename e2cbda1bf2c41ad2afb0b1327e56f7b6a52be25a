@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbf5abcc_16267743",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-28T14:38:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "48d7a0b1_fa4e776b",
+      "revId": "e2cbda1bf2c41ad2afb0b1327e56f7b6a52be25a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa12af92_8be021fc",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-01-28T14:31:39Z",
       "side": 1,
       "message": "Hmm. This seems more complex than I would have expected. The following seems a lot simpler to me:\n\n```go\nsep :\u003d string(filepath.Separator)\nabsDir +\u003d sep\nif strings.Contains(absDir, sep + \"cue.mod\" + sep) {\n  for _, dir :\u003d range []string{\"pkg\",\"usr\",\"gen\"} {\n    if strings.Contains(absDir, sep + \"cue.mod\" + sep + dir + sep) {\n      return false\n    }\n  }\n  return true\n}\nreturn false\n```",
+      "revId": "e2cbda1bf2c41ad2afb0b1327e56f7b6a52be25a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41916c2c_39112313",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-28T14:38:26Z",
+      "side": 1,
+      "message": "I also thought about something like this initially, but I\u0027m afraid that\u0027s not correct. It assumes that there will never be two `cue.mod` components in a path, which is not true.\n\nFor example, `/foo/cue.mod/pkg/bar/cue.mod` returns `true` with my version, but `false` with yours. Arguably it\u0027s a very odd scenario that we don\u0027t need to worry too much about, hence why I didn\u0027t bother testing it, but all of our logic to locate the module root walks up the chain of parent dirs, so I think we should do the same here.",
+      "parentUuid": "aa12af92_8be021fc",
       "revId": "e2cbda1bf2c41ad2afb0b1327e56f7b6a52be25a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

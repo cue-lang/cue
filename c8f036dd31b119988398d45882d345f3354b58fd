@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55a57262_306c79ca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-28T14:16:15Z",
+      "side": 1,
+      "message": "(just fyi - not a suggestion for a change to your commit msg)\n\n- lsp always attempts to stat or read cue.mod/module.cue. But then again if that doesn\u0027t exist then it would treat cue files as standalone, so it\u0027ll still work. It relies on modpkgload to load everything within a real module.",
+      "revId": "c8f036dd31b119988398d45882d345f3354b58fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

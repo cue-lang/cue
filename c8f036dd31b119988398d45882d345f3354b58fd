@@ -16,6 +16,24 @@
       "message": "(just fyi - not a suggestion for a change to your commit msg)\n\n- lsp always attempts to stat or read cue.mod/module.cue. But then again if that doesn\u0027t exist then it would treat cue files as standalone, so it\u0027ll still work. It relies on modpkgload to load everything within a real module.",
       "revId": "c8f036dd31b119988398d45882d345f3354b58fd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4071a112_a8c62fac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-28T14:18:34Z",
+      "side": 1,
+      "message": "I think that\u0027s fine. I think it makes sense for \"does this look like a CUE module\" to just lstat `cue.mod`, or check its presence as a directory entry, but \"load the CUE module\" to require cue.mod to be a directory containing a valid module.cue file.\n\narguably we should have some sort of common API for those two, but for now I wanted to fix this inconsistency with a test.",
+      "parentUuid": "55a57262_306c79ca",
+      "revId": "c8f036dd31b119988398d45882d345f3354b58fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

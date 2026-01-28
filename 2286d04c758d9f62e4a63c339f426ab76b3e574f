@@ -16,6 +16,24 @@
       "message": "Oh my. There are a lot of calls to os.Stat in our codebase. I wonder how many of them should actually be Lstat calls.",
       "revId": "2286d04c758d9f62e4a63c339f426ab76b3e574f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95bf8e59_e22f1a85",
+        "filename": "mod/modzip/zip.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-28T14:17:54Z",
+      "side": 1,
+      "message": "see the next commit, which standardizes the \"is directory\" inconsistency :) indeed stat vs lstat is another one. I\u0027ll let Claude have a go at that one once this stack is merged. no need to block the alpha for it methinks.\n\nat least with stat vs lstat, I think the difference is almost zero as long as we don\u0027t care about \"is directory\", because then the only difference would be symlinks which point to a missing file, as stat would fail on those but lstat would not. so I don\u0027t think any end users would see a noticeable change in behavior.",
+      "parentUuid": "019d1790_5e49434d",
+      "revId": "2286d04c758d9f62e4a63c339f426ab76b3e574f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

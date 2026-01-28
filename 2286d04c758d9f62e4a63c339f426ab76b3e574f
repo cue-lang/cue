@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "019d1790_5e49434d",
+        "filename": "mod/modzip/zip.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-28T14:09:46Z",
+      "side": 1,
+      "message": "Oh my. There are a lot of calls to os.Stat in our codebase. I wonder how many of them should actually be Lstat calls.",
+      "revId": "2286d04c758d9f62e4a63c339f426ab76b3e574f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

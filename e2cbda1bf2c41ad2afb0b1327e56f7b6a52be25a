@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48d7a0b1_fa4e776b",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-28T14:31:39Z",
+      "side": 1,
+      "message": "I think you should add that absDir should be GOOS-appropriate. I.e. it\u0027s filepath, not path.",
+      "revId": "e2cbda1bf2c41ad2afb0b1327e56f7b6a52be25a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa12af92_8be021fc",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-28T14:31:39Z",
+      "side": 1,
+      "message": "Hmm. This seems more complex than I would have expected. The following seems a lot simpler to me:\n\n```go\nsep :\u003d string(filepath.Separator)\nabsDir +\u003d sep\nif strings.Contains(absDir, sep + \"cue.mod\" + sep) {\n  for _, dir :\u003d range []string{\"pkg\",\"usr\",\"gen\"} {\n    if strings.Contains(absDir, sep + \"cue.mod\" + sep + dir + sep) {\n      return false\n    }\n  }\n  return true\n}\nreturn false\n```",
+      "revId": "e2cbda1bf2c41ad2afb0b1327e56f7b6a52be25a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

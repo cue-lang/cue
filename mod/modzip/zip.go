@@ -785,8 +785,8 @@ func listFilesInDir(dir string) (files []dirFile, omitted []FileError, err error
 				return filepath.SkipDir
 			}
 
-			// Skip submodules (directories containing cue.mod directories).
-			if cueModInfo, err := os.Lstat(filepath.Join(filePath, "cue.mod")); err == nil && cueModInfo.IsDir() {
+			// Skip submodules (directories containing cue.mod).
+			if _, err := os.Lstat(filepath.Join(filePath, "cue.mod")); err == nil {
 				omitted = append(omitted, FileError{Path: slashPath, Err: errSubmoduleDir})
 				return filepath.SkipDir
 			}

@@ -15,7 +15,6 @@
 package cue
 
 import (
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
@@ -186,17 +185,6 @@ func (inst *Instance) Value() Value {
 	// it is convenient to not include these.
 	// adt.AddStats(ctx)
 	return newVertexRoot(inst.index, ctx, inst.root)
-}
-
-// Eval evaluates an expression within an existing instance.
-//
-// Expressions may refer to builtin packages if they can be uniquely identified.
-//
-// Deprecated: use
-// inst.Value().Context().BuildExpr(expr, Scope(inst.Value), InferBuiltins(true))
-func (inst *hiddenInstance) Eval(expr ast.Expr) Value {
-	v := inst.Value()
-	return v.Context().BuildExpr(expr, Scope(v), InferBuiltins(true))
 }
 
 // Deprecated: do not use; use unification instead.

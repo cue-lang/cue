@@ -44,14 +44,6 @@ func (o unixInfo) volumeNameLen(path string) int {
 	return 0
 }
 
-// HasPrefix exists for historical compatibility and should not be used.
-//
-// Deprecated: HasPrefix does not respect path boundaries and
-// does not ignore case when required.
-func (o unixInfo) HasPrefix(p, prefix string) bool {
-	return strings.HasPrefix(p, prefix)
-}
-
 func (o unixInfo) splitList(path string) []string {
 	if path == "" {
 		return []string{}

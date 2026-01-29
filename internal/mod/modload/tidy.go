@@ -65,8 +65,21 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, checkTi
 	if err != nil {
 		return nil, err
 	}
+
+	mainModuleLoc := module.SourceLoc{
+		FS:  fsys,
+		Dir: modRoot,
+	}
+
+	// Wrap the registry to handle local path replacements.
+	// This allows cue mod tidy to read requirements from local modules.
+	wrappedReg, err := NewLocalReplacementRegistry(reg, mainModuleLoc, mf.Replacements())
+	if err != nil {
+		return nil, err
+	}
+
 	// TODO check that module path is well formed etc
-	origRs := modrequirements.NewRequirements(mf.QualifiedModule(), reg, mf.DepVersions(), mf.DefaultMajorVersions())
+	origRs := modrequirements.NewRequirements(mf.QualifiedModule(), wrappedReg, mf.DepVersions(), mf.DefaultMajorVersions(), mf.Replacements())
 	// Note: we can ignore build tags and the fact that we might
 	// have _tool.cue and _test.cue files, because we want to include
 	// all of those, but we do need to consider @ignore() attributes.
@@ -75,13 +88,10 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, checkTi
 		return nil, err
 	}
 	ld := &loader{
-		mainModule: mainModuleVersion,
-		registry:   reg,
-		mainModuleLoc: module.SourceLoc{
-			FS:  fsys,
-			Dir: modRoot,
-		},
-		checkTidy: checkTidy,
+		mainModule:    mainModuleVersion,
+		registry:      wrappedReg,
+		mainModuleLoc: mainModuleLoc,
+		checkTidy:     checkTidy,
 	}
 
 	rs, pkgs, err := ld.resolveDependencies(ctx, rootPkgPaths, origRs)
@@ -127,7 +137,8 @@ func equalRequirements(rs0, rs1 *modrequirements.Requirements) bool {
 	// Note that we clone the slice to not modify rs1's internal slice in-place.
 	rs1RootMods := slices.DeleteFunc(slices.Clone(rs1.RootModules()), module.Version.IsLocal)
 	return slices.Equal(rs0.RootModules(), rs1RootMods) &&
-		maps.Equal(rs0.DefaultMajorVersions(), rs1.DefaultMajorVersions())
+		maps.Equal(rs0.DefaultMajorVersions(), rs1.DefaultMajorVersions()) &&
+		maps.Equal(rs0.Replacements(), rs1.Replacements())
 }
 
 func readModuleFile(fsys fs.FS, modRoot string) (module.Version, *modfile.File, error) {
@@ -159,15 +170,36 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 		Source:   old.Source,
 		Custom:   old.Custom,
 	}
+
+	// First, preserve all replace directives from the original file.
+	// Replace directives are preserved during tidy operations, matching Go's behavior.
+	// This means replace directives may remain even if their target dependency is
+	// no longer needed - this is intentional to allow users to maintain replacements
+	// for dependencies that may be re-added later.
+	for path, dep := range old.Deps {
+		if dep.Replace != "" {
+			mf.Deps[path] = &modfile.Dep{
+				Version: dep.Version,
+				Default: dep.Default,
+				Replace: dep.Replace,
+			}
+		}
+	}
+
+	// Then add/update dependencies from requirements.
 	defaults := rs.DefaultMajorVersions()
 	for _, v := range rs.RootModules() {
 		if v.IsLocal() {
 			continue
 		}
-		mf.Deps[v.Path()] = &modfile.Dep{
-			Version: v.Version(),
-			Default: defaults[v.BasePath()] == semver.Major(v.Version()),
+		dep := mf.Deps[v.Path()]
+		if dep == nil {
+			dep = &modfile.Dep{}
+			mf.Deps[v.Path()] = dep
 		}
+		dep.Version = v.Version()
+		dep.Default = defaults[v.BasePath()] == semver.Major(v.Version())
+		// Note: Replace field is preserved from the first loop if it existed
 	}
 	return mf
 }
@@ -418,7 +450,7 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 			// graph so that we can update those roots to be consistent with other
 			// requirements.
 
-			rs = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, rs.DefaultMajorVersions())
+			rs = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, rs.DefaultMajorVersions(), rs.Replacements())
 			var err error
 			mg, err = rs.Graph(ctx)
 			if err != nil {
@@ -508,7 +540,7 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 		// preserve its cached ModuleGraph (if any).
 		return rs, nil
 	}
-	return modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, rs.DefaultMajorVersions()), nil
+	return modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, rs.DefaultMajorVersions(), rs.Replacements()), nil
 }
 
 // resolveMissingImports returns a set of modules that could be added as
@@ -629,7 +661,7 @@ func (ld *loader) tidyRoots(ctx context.Context, old *modrequirements.Requiremen
 		queued[pkg] = true
 	}
 	slices.SortFunc(roots, module.Version.Compare)
-	tidy := modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, old.DefaultMajorVersions())
+	tidy := modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, old.DefaultMajorVersions(), old.Replacements())
 
 	for len(queue) > 0 {
 		roots = tidy.RootModules()
@@ -661,7 +693,7 @@ func (ld *loader) tidyRoots(ctx context.Context, old *modrequirements.Requiremen
 
 		if tidyRoots := tidy.RootModules(); len(roots) > len(tidyRoots) {
 			slices.SortFunc(roots, module.Version.Compare)
-			tidy = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, tidy.DefaultMajorVersions())
+			tidy = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, tidy.DefaultMajorVersions(), tidy.Replacements())
 		}
 	}
 

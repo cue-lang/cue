@@ -1,0 +1,71 @@
+# Test that replace directives are preserved when dependency is removed
+#
+# This tests that replace directives are intentionally preserved during tidy
+# even when the dependency is no longer used (matching Go's go mod tidy behavior).
+# This allows users to maintain replacements for dependencies that may be
+# re-added later without losing the configuration.
+
+# Initial state: main.cue imports dep, module.cue has replace directive
+exec cue mod tidy
+exec cue eval .
+stdout '"from local replacement"'
+
+# Remove the import from main.cue
+cp _templates/main_no_import.cue main.cue
+
+# Run tidy - the replace directive should be preserved even though dep is unused
+exec cue mod tidy
+cmp cue.mod/module.cue _golden/want-module-after-tidy.cue
+
+# Re-add the import
+cp _templates/main_with_import.cue main.cue
+
+# Verify the replacement still works after tidy
+exec cue mod tidy
+exec cue eval .
+stdout '"from local replacement"'
+
+-- cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.9.0"
+
+deps: {
+    "example.com/dep@v0": {
+        v: "v0.1.0"
+        replace: "./local-dep"
+    }
+}
+-- main.cue --
+package main
+
+import "example.com/dep@v0:lib"
+
+output: lib.value
+-- _templates/main_with_import.cue --
+package main
+
+import "example.com/dep@v0:lib"
+
+output: lib.value
+-- _templates/main_no_import.cue --
+package main
+
+output: "no dependency"
+-- local-dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- local-dep/lib.cue --
+package lib
+
+value: "from local replacement"
+-- _golden/want-module-after-tidy.cue --
+module: "example.com/main@v0"
+language: {
+	version: "v0.9.0"
+}
+deps: {
+	"example.com/dep@v0": {
+		v:       "v0.1.0"
+		replace: "./local-dep"
+	}
+}

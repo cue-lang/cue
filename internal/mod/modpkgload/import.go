@@ -342,6 +342,8 @@ func (pkgs *Packages) fetch(ctx context.Context, mod module.Version) (loc module
 	if mod == pkgs.mainModuleVersion {
 		return pkgs.mainModuleLoc, true, nil
 	}
+	// The registry handles both local path replacements and remote module
+	// replacements via the localReplacementRegistry wrapper.
 	loc, err = pkgs.registry.Fetch(ctx, mod)
 	return loc, false, err
 }

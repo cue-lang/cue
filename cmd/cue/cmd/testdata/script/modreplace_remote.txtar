@@ -1,0 +1,54 @@
+# Test remote module replace directives
+# A module can be replaced with a different module from the registry.
+
+# Test that cue mod tidy works with remote replacements
+exec cue mod tidy
+cmp cue.mod/module.cue want-module.cue
+
+# Test that cue eval uses the replacement module
+exec cue eval .
+cmp stdout want-eval.txt
+
+-- cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.9.0"
+
+deps: {
+    "example.com/original@v0": {
+        v: "v0.1.0"
+        replace: "example.com/replacement@v0.1.0"
+    }
+}
+-- main.cue --
+package main
+
+import "example.com/original@v0:lib"
+
+output: lib.value
+-- _registry/example.com_original_v0.1.0/cue.mod/module.cue --
+module: "example.com/original@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_original_v0.1.0/lib.cue --
+package lib
+
+value: "from original (should not see this)"
+-- _registry/example.com_replacement_v0.1.0/cue.mod/module.cue --
+module: "example.com/replacement@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_replacement_v0.1.0/lib.cue --
+package lib
+
+value: "from replacement module"
+-- want-eval.txt --
+output: "from replacement module"
+-- want-module.cue --
+module: "example.com/main@v0"
+language: {
+	version: "v0.9.0"
+}
+deps: {
+	"example.com/original@v0": {
+		v:       "v0.1.0"
+		replace: "example.com/replacement@v0.1.0"
+	}
+}

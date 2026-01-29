@@ -1,0 +1,3 @@
+this non-CUE file keeps the directory around
+and used to be counted as CUE instance in some cases.
+

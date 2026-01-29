@@ -98,6 +98,60 @@ files:
 imports:
     mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
+		name: "ExplicitPackageWithNonCUEDirectories",
+		cfg: &Config{
+			Dir:   testdataDir,
+			Tools: false,
+		},
+		args: []string{"./noncuedirectories/...:foo"},
+		want: `path:   mod.test/test/noncuedirectories@v0:foo
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/noncuedirectories
+display:./noncuedirectories
+files:
+    $CWD/testdata/testmod/noncuedirectories/root.cue
+
+path:   mod.test/test/noncuedirectories/a@v0:foo
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/noncuedirectories/a
+display:./noncuedirectories/a
+files:
+    $CWD/testdata/testmod/noncuedirectories/root.cue
+
+path:   mod.test/test/noncuedirectories/b@v0:foo
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/noncuedirectories/b
+display:./noncuedirectories/b
+files:
+    $CWD/testdata/testmod/noncuedirectories/root.cue
+
+path:   mod.test/test/noncuedirectories/b/c@v0:foo
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/noncuedirectories/b/c
+display:./noncuedirectories/b/c
+files:
+    $CWD/testdata/testmod/noncuedirectories/root.cue
+    $CWD/testdata/testmod/noncuedirectories/b/c/foo.cue
+
+path:   mod.test/test/noncuedirectories/if@v0:foo
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/noncuedirectories/if
+display:./noncuedirectories/if
+files:
+    $CWD/testdata/testmod/noncuedirectories/root.cue
+
+path:   mod.test/test/noncuedirectories/tool@v0:foo
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/noncuedirectories/tool
+display:./noncuedirectories/tool
+files:
+    $CWD/testdata/testmod/noncuedirectories/root.cue`}, {
 		name: "DefaultPackageWithExplicitDotArgument",
 		// Even though the directory is called testdata, the last path in
 		// the module is test. So "package test" is correctly the default

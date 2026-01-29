@@ -188,17 +188,6 @@ func (inst *Instance) Value() Value {
 	return newVertexRoot(inst.index, ctx, inst.root)
 }
 
-// Eval evaluates an expression within an existing instance.
-//
-// Expressions may refer to builtin packages if they can be uniquely identified.
-//
-// Deprecated: use
-// inst.Value().Context().BuildExpr(expr, Scope(inst.Value), InferBuiltins(true))
-func (inst *hiddenInstance) Eval(expr ast.Expr) Value {
-	v := inst.Value()
-	return v.Context().BuildExpr(expr, Scope(v), InferBuiltins(true))
-}
-
 // Deprecated: do not use; use unification instead.
 func Merge(inst ...*Instance) *Instance {
 	v := &adt.Vertex{}

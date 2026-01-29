@@ -26,16 +26,9 @@
 //
 // While a context can be used to build values, note that loading a module and its
 // dependencies should be done with the [cuelang.org/go/cue/load] package.
+// To print a value into its string syntax form, use [cuelang.org/go/cue/format].
 //
-// Note that the following types are DEPRECATED and their usage should be
-// avoided if possible:
-//
-//   - [FieldInfo]
-//   - [Instance]
-//   - [Runtime]
-//   - [Struct]
-//
-// Many types also have deprecated methods. Code that already uses deprecated
-// methods can keep using them for at least some time. We aim to provide a
+// Note that some types and funcs are deprecated. Code that already uses deprecated
+// funcs can keep using them for at least some time. We aim to provide a
 // go or cue fix solution to automatically rewrite code using the new API.
 package cue

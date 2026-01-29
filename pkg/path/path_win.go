@@ -116,17 +116,6 @@ func (os windowsInfo) volumeNameLen(path string) int {
 	return 0
 }
 
-// HasPrefix exists for historical compatibility and should not be used.
-//
-// Deprecated: HasPrefix does not respect path boundaries and
-// does not ignore case when required.
-func (os windowsInfo) HasPrefix(p, prefix string) bool {
-	if strings.HasPrefix(p, prefix) {
-		return true
-	}
-	return strings.HasPrefix(strings.ToLower(p), strings.ToLower(prefix))
-}
-
 func (os windowsInfo) splitList(path string) []string {
 	// The same implementation is used in LookPath in os/exec;
 	// consider changing os/exec when changing this.

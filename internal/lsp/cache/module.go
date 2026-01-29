@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/fscache"
+	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/mod/modfile"
@@ -284,8 +285,7 @@ func (m *Module) DescendantPackages(ip ast.ImportPath) []*Package {
 
 // loadDirtyPackages identifies all dirty packages within the module,
 // loads them and returns them. To do this, the modfile itself must be
-// successfully loaded. The only non-nil error this method returns is
-// if the modfile cannot be loaded.
+// successfully loaded.
 func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
 	if err := m.ReloadModule(); err != nil {
 		return nil, err
@@ -308,17 +308,21 @@ func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
 
 	// 2. Load all the packages found
 	modPath := m.modFile.QualifiedModule()
-	reqs := modrequirements.NewRequirements(modPath, w.registry, m.modFile.DepVersions(), m.modFile.DefaultMajorVersions(), m.modFile.Replacements())
 	rootUri := m.rootURI
 	ctx := context.Background()
 	loc := module.SourceLoc{
 		FS:  w.overlayFS.IoFS(rootUri.Path()),
 		Dir: ".", // NB can't be ""
 	}
+	reg, err := modload.NewLocalReplacementRegistry(w.registry, loc, m.modFile.Replacements())
+	if err != nil {
+		return nil, err
+	}
+	reqs := modrequirements.NewRequirements(modPath, reg, m.modFile.DepVersions(), m.modFile.DefaultMajorVersions(), m.modFile.Replacements())
 	// Determinism in log messages:
 	slices.Sort(pkgPaths)
 	w.debugLogf("%v Loading packages %v", m, pkgPaths)
-	loadedPkgs := modpkgload.LoadPackages(ctx, modPath, loc, reqs, w.registry, pkgPaths, nil)
+	loadedPkgs := modpkgload.LoadPackages(ctx, modPath, loc, reqs, reg, pkgPaths, nil)
 
 	return loadedPkgs, nil
 }

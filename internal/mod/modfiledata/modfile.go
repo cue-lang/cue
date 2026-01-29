@@ -27,7 +27,6 @@ import (
 	"path"
 	"slices"
 	"strings"
-	"unicode"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/semver"
@@ -247,18 +246,9 @@ func (mf *File) init(strict bool) error {
 func parseReplacement(oldPath, replace string, strict bool) (Replacement, error) {
 	isLocal := strings.HasPrefix(replace, "./") || strings.HasPrefix(replace, "../")
 
-	// Reject absolute paths - they must use relative paths starting with ./ or ../
-	// Check for Unix-style absolute paths (/foo) but not UNC-style (//server)
-	if len(replace) > 0 && replace[0] == '/' && (len(replace) < 2 || replace[1] != '/') {
+	// Reject absolute paths - must use relative paths starting with ./ or ../
+	if isAbsolutePath(replace) {
 		return Replacement{}, fmt.Errorf("absolute path replacement %q not allowed; use relative path starting with ./ or ../", replace)
-	}
-	// Check for Windows-style absolute paths (C:\foo or C:/foo) - first char must be a letter
-	if len(replace) >= 3 && unicode.IsLetter(rune(replace[0])) && replace[1] == ':' && (replace[2] == '/' || replace[2] == '\\') {
-		return Replacement{}, fmt.Errorf("absolute path replacement %q not allowed; use relative path starting with ./ or ../", replace)
-	}
-	// Reject UNC paths (\\server\share or //server/share)
-	if len(replace) >= 2 && ((replace[0] == '\\' && replace[1] == '\\') || (replace[0] == '/' && replace[1] == '/')) {
-		return Replacement{}, fmt.Errorf("UNC path replacement %q not allowed; use relative path starting with ./ or ../", replace)
 	}
 
 	if strict && isLocal {
@@ -346,4 +336,84 @@ func (f *File) ModuleForImportPath(importPath string) (module.Version, bool) {
 		}
 	}
 	return module.Version{}, false
+}
+
+// isAbsolutePath reports whether the given path is an absolute path
+// on any supported platform (Unix or Windows).
+func isAbsolutePath(p string) bool {
+	return strings.HasPrefix(p, "/") || isWindowsAbs(p)
+}
+
+func isWindowsAbs(path string) bool {
+	if isReservedWindowsName(path) {
+		return true
+	}
+	volLen := windowsVolumeNameLen(path)
+	if volLen == 0 {
+		return false
+	}
+	if len(path) == volLen {
+		// UNC roots like \\server\share are absolute.
+		return len(path) >= 2 && isSlash(path[0]) && isSlash(path[1])
+	}
+	path = path[volLen:]
+	return isSlash(path[0])
+}
+
+func isSlash(c byte) bool {
+	return c == '\\' || c == '/'
+}
+
+var reservedWindowsNames = []string{
+	"CON", "PRN", "AUX", "NUL",
+	"COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+	"LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+}
+
+func isReservedWindowsName(path string) bool {
+	if len(path) == 0 {
+		return false
+	}
+	for _, reserved := range reservedWindowsNames {
+		if strings.EqualFold(path, reserved) {
+			return true
+		}
+	}
+	return false
+}
+
+// windowsVolumeNameLen returns length of the leading volume name on Windows.
+func windowsVolumeNameLen(path string) int {
+	if len(path) < 2 {
+		return 0
+	}
+	// with drive letter
+	c := path[0]
+	if path[1] == ':' && (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z')) {
+		return 2
+	}
+	// UNC path
+	if l := len(path); l >= 5 && isSlash(path[0]) && isSlash(path[1]) &&
+		!isSlash(path[2]) && path[2] != '.' {
+		// leading \\ then server name
+		for n := 3; n < l-1; n++ {
+			if isSlash(path[n]) {
+				n++
+				// share name
+				if !isSlash(path[n]) {
+					if path[n] == '.' {
+						break
+					}
+					for ; n < l; n++ {
+						if isSlash(path[n]) {
+							break
+						}
+					}
+					return n
+				}
+				break
+			}
+		}
+	}
+	return 0
 }

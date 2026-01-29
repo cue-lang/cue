@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package modreplace provides utilities for handling module replacements,
-// particularly local path replacements.
-package modreplace
+package modload
 
 import (
 	"fmt"

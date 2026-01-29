@@ -96,18 +96,18 @@ func TestParseReplacement(t *testing.T) {
 			wantErr: "absolute path replacement",
 		},
 
-		// UNC paths - should be rejected
+		// UNC paths - should be rejected as absolute paths
 		{
 			name:    "reject UNC path \\\\server",
 			oldPath: "example.com/foo@v0",
 			replace: "\\\\server\\share",
-			wantErr: "UNC path replacement",
+			wantErr: "absolute path replacement",
 		},
 		{
 			name:    "reject UNC path //server",
 			oldPath: "example.com/foo@v0",
 			replace: "//server/share",
-			wantErr: "UNC path replacement",
+			wantErr: "absolute path replacement",
 		},
 
 		// Non-absolute paths that look like they could be
@@ -115,7 +115,7 @@ func TestParseReplacement(t *testing.T) {
 			name:      "not absolute: 9:\\path (digit not letter)",
 			oldPath:   "example.com/foo@v0",
 			replace:   "9:\\notpath",
-			wantLocal: false, // Will be parsed as remote (and fail version parse)
+			wantLocal: false,                 // Will be parsed as remote (and fail version parse)
 			wantErr:   "invalid replacement", // fails as invalid module@version
 		},
 		{

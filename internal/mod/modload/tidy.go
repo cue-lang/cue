@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"cuelang.org/go/internal/buildattr"
-	"cuelang.org/go/internal/mod/modfiledata"
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
@@ -139,23 +138,7 @@ func equalRequirements(rs0, rs1 *modrequirements.Requirements) bool {
 	rs1RootMods := slices.DeleteFunc(slices.Clone(rs1.RootModules()), module.Version.IsLocal)
 	return slices.Equal(rs0.RootModules(), rs1RootMods) &&
 		maps.Equal(rs0.DefaultMajorVersions(), rs1.DefaultMajorVersions()) &&
-		equalReplacements(rs0.Replacements(), rs1.Replacements())
-}
-
-func equalReplacements(r0, r1 map[string]modfiledata.Replacement) bool {
-	if len(r0) != len(r1) {
-		return false
-	}
-	for k, v0 := range r0 {
-		v1, ok := r1[k]
-		if !ok {
-			return false
-		}
-		if v0.LocalPath != v1.LocalPath || !v0.New.Equal(v1.New) || !v0.Old.Equal(v1.Old) {
-			return false
-		}
-	}
-	return true
+		maps.Equal(rs0.Replacements(), rs1.Replacements())
 }
 
 func readModuleFile(fsys fs.FS, modRoot string) (module.Version, *modfile.File, error) {

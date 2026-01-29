@@ -18,17 +18,16 @@ import (
 	"context"
 
 	"cuelang.org/go/internal/mod/modfiledata"
-	"cuelang.org/go/internal/mod/modreplace"
 	"cuelang.org/go/mod/module"
 )
 
 // localReplacementRegistry wraps a Registry to handle local path replacements.
 // When Requirements or Fetch is called for a module that has a local path
-// replacement, it uses the modreplace.LocalReplacements helper to resolve
-// the local path instead of delegating to the underlying registry.
+// replacement, it uses LocalReplacements to resolve the local path instead of
+// delegating to the underlying registry.
 type localReplacementRegistry struct {
 	underlying   Registry
-	localReplace *modreplace.LocalReplacements
+	localReplace *LocalReplacements
 	replacements map[string]modfiledata.Replacement
 }
 
@@ -43,7 +42,7 @@ func NewLocalReplacementRegistry(reg Registry, mainModuleLoc module.SourceLoc, r
 		return reg, nil
 	}
 	// Create local replacements helper (may be nil if no local paths)
-	lr, err := modreplace.NewLocalReplacements(mainModuleLoc, replacements)
+	lr, err := NewLocalReplacements(mainModuleLoc, replacements)
 	if err != nil {
 		return nil, err
 	}

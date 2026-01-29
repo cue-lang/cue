@@ -6,8 +6,7 @@ package cache
 
 import (
 	"cuelang.org/go/internal/lsp/fscache"
-	"cuelang.org/go/internal/mod/modpkgload"
-	"cuelang.org/go/internal/mod/modrequirements"
+	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/mod/modconfig"
 )
 
@@ -42,6 +41,5 @@ type Cache struct {
 }
 
 type Registry interface {
-	modrequirements.Registry
-	modpkgload.Registry
+	modload.Registry
 }

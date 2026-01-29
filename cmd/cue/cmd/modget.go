@@ -24,6 +24,7 @@ import (
 
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/mod/modfile"
+	"cuelang.org/go/mod/module"
 )
 
 func newModGetCmd(c *Command) *cobra.Command {
@@ -69,7 +70,7 @@ func runModGet(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	mf, err := modload.UpdateVersions(ctx, os.DirFS(modRoot), ".", reg, args)
+	mf, err := modload.UpdateVersions(ctx, module.OSDirFS(modRoot), ".", reg, args)
 	if err != nil {
 		return suggestModCommand(err)
 	}

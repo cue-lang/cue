@@ -1295,6 +1295,7 @@ func (v Value) Bool() (bool, error) {
 }
 
 // String returns the string value if v is a string or an error otherwise.
+// To stringify a CUE value into text form, use [cuelang.org/go/cue/format].
 func (v Value) String() (string, error) {
 	v, _ = v.Default()
 	if str, _ := v.v.BaseValue.(*adt.String); str != nil {

@@ -142,6 +142,11 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	// See https://cuelang.org/docs/concept/modules-packages-instances/#instances.
 	for _, d := range dirs {
 		dir := filepath.Clean(d[1])
+		// firstDir keeps track of whether we're still looking at the initial
+		// directory rather than one of its parents. If there are no CUE files
+		// in the initial directory, we shouldn't walk to its parents because
+		// the initial directory isn't itself a CUE package.
+		firstDir := true
 		for {
 			sd, ok := l.dirCachedBuildFiles[dir]
 			if !ok {
@@ -154,6 +159,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 				}
 				return retErr(errors.Wrapf(err, token.NoPos, "import failed reading dir %v", dir))
 			}
+			added := false
 			for _, name := range sd.filenames {
 				file, err := filetypes.ParseFileAndType(name, "", filetypes.Input)
 				if err != nil {
@@ -161,11 +167,11 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 						Filename:      name,
 						ExcludeReason: errors.Newf(token.NoPos, "unknown filetype"),
 					})
-				} else {
-					fp.add(dir, file, 0)
+				} else if fp.add(dir, file, 0) {
+					added = true
 				}
 			}
-			if p.PkgName == "" || !inModule || l.cfg.isModRoot(dir) || dir == d[0] {
+			if p.PkgName == "" || !inModule || l.cfg.isModRoot(dir) || dir == d[0] || (firstDir && !added) {
 				break
 			}
 
@@ -180,6 +186,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 				break
 			}
 			dir = parent
+			firstDir = false
 		}
 	}
 

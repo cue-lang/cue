@@ -23,26 +23,13 @@ import (
 )
 
 const vetDoc = `The vet command validates CUE and other data files.
+The command is silent when it succeeds; otherwise it reports any errors found.
 
-The command is silent when it succeeds, emitting no output and an exit code of
-zero. Otherwise, errors are reported and the command returns a non-zero exit
-code.
+By default, vet ensures that the result of validation is concrete
+by reporting an error if any resulting regular fields have non-concrete values.
+Use -c=false to not require concreteness, or -c to show these error messages.
 
-vet starts by ensuring that there are no validation errors. If errors are found
-then they are reported and the command exits.
-
-If there are no validation errors then, by default, vet checks that the result
-of the evaluation is concrete. It reports an error if the evaluation contains
-any regular fields that have non-concrete values.
-Skip this step by specifying -c=false, which permits regular fields to have
-non-concrete values. Specify -c/-c=true to report errors mentioning which
-regular fields have non-concrete values.
-
-
-Checking non-CUE files
-
-Vet can also check non-CUE files. The following file formats are
-currently supported:
+vet can also validate non-CUE files in these file formats:
 
   Format       Extensions
 	JSON       .json .jsonl .ndjson
@@ -50,28 +37,24 @@ currently supported:
 	TOML       .toml
 	TEXT       .txt  (validate a single string value)
 
-To activate this mode, the non-CUE files must be explicitly mentioned on the
-command line. There must also be at least one CUE file to hold the constraints.
+Data files with multiple values, such as YAML with --- document separators,
+are validated one object at a time. Use --list to validate them as a list.
 
-In this mode, each file will be verified against a CUE constraint. If the files
-contain multiple objects (such as using --- in YAML) then each object will be
-verified individually.
-
-By default, each file is checked against the root of the loaded CUE files.
-The -d can be used to only verify files against the result of an expression
-evaluated within the CUE files. This can be useful if the CUE files contain
-a set of definitions to pick from.
+By default, each file is checked against the root of the loaded CUE.
+Use the -d flag to select a schema at a particular expression instead.
 
 Examples:
 
-  # Check files against a CUE file:
+  # Check that a collection of CUE packages has no errors.
+  cue vet -c=false ./...
+
+  # Check against a schema at the root of a CUE file:
   cue vet -c foo.cue foo.yaml
 
-  # Check files against a particular expression
-  cue vet -c foo.cue lang/en.yaml lang/de.yaml -d '#Translation'
+  # Check against a schema from a registry:
+  cue vet -c -d '#Workflow' cue.dev/x/githubactions@latest workflow.yml
 
-More than one expression may be given using multiple -d flags. Each non-CUE
-file must match all expression values.
+The -d flag can be repeated to validate against multiple schemas at once.
 `
 
 func newVetCmd(c *Command) *cobra.Command {

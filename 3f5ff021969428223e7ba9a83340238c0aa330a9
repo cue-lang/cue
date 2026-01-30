@@ -164,6 +164,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "248a0e0d_828d39af",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-30T11:43:34Z",
+      "side": 1,
+      "message": "\u003e For a single dir, you wouldn\u0027t use the files flag.\n\nWhy not? What if I wanted to format cue files in a directory, but not any that are included via ancestor imports? I presume that if I\u0027m using an import path, that *does* support ancestor imports.",
+      "parentUuid": "7fb16ced_bad5d5cc",
+      "revId": "3f5ff021969428223e7ba9a83340238c0aa330a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbb998a1_4e19fbbb",
         "filename": "cmd/cue/cmd/fmt.go",
         "patchSetId": 1

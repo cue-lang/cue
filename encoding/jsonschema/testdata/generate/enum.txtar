@@ -21,13 +21,13 @@ bad: {
 -- out/generate-v3/bad --
 bad.data: 3 errors in empty disjunction:
 bad.data: conflicting values 0 and "three" (mismatched types int and string):
-    1:59
     ./datatest/tests.cue:6:8
+    1:59
 bad.data: conflicting values 1 and 0:
-    1:59
     ./datatest/tests.cue:6:8
+    1:59
 bad.data: conflicting values 2 and 0:
-    1:59
     ./datatest/tests.cue:6:8
+    1:59
 -- out/generate-v3/ok1 --
 -- out/generate-v3/ok2 --

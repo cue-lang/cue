@@ -124,27 +124,27 @@ errorListWrongLength: {
 }
 -- out/generate-v3/errorFloatForInt --
 errorFloatForInt.data.int: conflicting values 2.0 and 2 (mismatched types float and int):
-    1:229
     ./datatest/tests.cue:16:8
+    1:229
 -- out/generate-v3/errorNonBool --
 errorNonBool.data.bool: conflicting values "foo" and true (mismatched types string and bool):
-    1:97
     ./datatest/tests.cue:24:14
+    1:97
 -- out/generate-v3/errorNonEqualFloat --
 errorNonEqualFloat.data.float: conflicting values 1.5 and 1.6:
-    1:209
     ./datatest/tests.cue:28:15
+    1:209
 -- out/generate-v3/errorNonEqualInt --
 errorNonEqualInt.data.int: conflicting values 2 and 9:
-    1:229
     ./datatest/tests.cue:32:13
+    1:229
 -- out/generate-v3/errorNonNull --
 errorNonNull.data.null: conflicting values 1 and null (mismatched types int and null):
     ./datatest/tests.cue:36:14
 -- out/generate-v3/errorNonString --
 errorNonString.data.string: conflicting values "something" and "other":
-    1:352
     ./datatest/tests.cue:40:16
+    1:352
 -- out/generate-v3/ok1 --
 -- out/generate-v3/errorClosedStructExtraField --
 errorClosedStructExtraField.data.closedStruct.c: field not allowed:
@@ -163,5 +163,5 @@ errorNonClosedStructFieldB.data.closedStruct.b: conflicting values 123 and 456:
     ./datatest/tests.cue:52:36
 -- out/generate-v3/errorNonUnaryEquals --
 errorNonUnaryEquals.data.unaryEquals: conflicting values 42 and 99:
-    1:388
     ./datatest/tests.cue:44:21
+    1:388

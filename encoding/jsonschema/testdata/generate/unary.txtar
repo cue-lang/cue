@@ -149,7 +149,7 @@ errorNotLessEqual.data.t08: invalid value 10.001 (out of bound <=10):
     ./datatest/tests.cue:55:13
 -- out/generate-v3/errorUnequal --
 errorUnequal.data.t03: conflicting values 1 and 2:
-    1:185
     ./datatest/tests.cue:27:13
+    1:185
 -- out/generate-v3/ok1 --
 -- out/generate-v3/ok2 --

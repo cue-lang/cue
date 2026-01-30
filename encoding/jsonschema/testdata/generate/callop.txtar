@@ -136,13 +136,13 @@ badDate.data.date: invalid value "2025-10-40" (does not satisfy time.Format("200
     ./datatest/tests.cue:30:14
 -- out/generate-v3/badDateTime --
 badDateTime.data.dateTime: invalid value "2025-10-02T13" (does not satisfy time.Time): error in call to time.Time: invalid time "2025-10-02T13":
-    1:215
     ./datatest/tests.cue:26:18
+    1:215
 -- out/generate-v3/badScore2 --
 badScore2.data.score: invalid value 5 (does not satisfy math.MultipleOf(10)):
     1:421
-    1:376
     ./datatest/tests.cue:42:15
+    1:376
 -- out/generate-v3/badTime --
 badTime.data.date: invalid value "25:00:10" (does not satisfy time.Format("2006-01-02")): error in call to time.Format: invalid time "25:00:10":
     1:170
@@ -150,9 +150,9 @@ badTime.data.date: invalid value "25:00:10" (does not satisfy time.Format("2006-
 -- out/generate-v3/badUserName --
 badUserName.data.userName: invalid value "x" (does not satisfy strings.MinRunes(3)):
     1:617
+    ./datatest/tests.cue:38:18
     1:602
     1:617
-    ./datatest/tests.cue:38:18
 -- out/generate-v3/notMultiple --
 notMultiple.data.multiple: invalid value 1 (does not satisfy math.MultipleOf(5)):
     1:351
@@ -161,10 +161,10 @@ notMultiple.data.multiple: invalid value 1 (does not satisfy math.MultipleOf(5))
 -- out/generate-v3/stringTooLong --
 stringTooLong.data.shortString: invalid value "01234567890" (does not satisfy strings.MaxRunes(10)):
     1:513
-    1:513
     ./datatest/tests.cue:14:21
+    1:513
 -- out/generate-v3/stringTooShort --
 stringTooShort.data.longString: invalid value "x" (does not satisfy strings.MinRunes(5)):
     1:308
-    1:308
     ./datatest/tests.cue:18:20
+    1:308

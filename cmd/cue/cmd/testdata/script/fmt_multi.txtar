@@ -1,10 +1,14 @@
 ! exec cue fmt --check .
 cmp stdout stdout.golden
 
-! exec cue fmt --check x.cue star.cue y.cue yb.cue
+! exec cue fmt --check x.cue underscore.cue unnamed.cue y.cue yb.cue
+cmp stdout stdout.golden
+
+! exec cue fmt --check --files .
 cmp stdout stdout.golden
 -- stdout.golden --
-star.cue
+underscore.cue
+unnamed.cue
 x.cue
 y.cue
 yb.cue
@@ -18,9 +22,13 @@ package x
 a:    1
 bb:  2
 
--- star.cue --
+-- underscore.cue --
 package _
 
+a:    1
+bb:  2
+
+-- unnamed.cue --
 a:    1
 bb:  2
 
@@ -39,32 +47,3 @@ package y
 
 a:    1 @test(foo)
 bb:  2
-
--- out/x.cue --
-// header
-
-package x
-
-// file comment
-
-a:  1
-bb: 2
--- out/star-cue --
-package _
-
-a:  1
-bb: 2
--- out/y-cue --
-package y
-
-// a comment
-a:  1
-bb: 2 @test(foo)
--- out/yb-cue --
-// only for prod
-@if(prod)
-
-package y
-
-a:  1 @test(foo)
-bb: 2

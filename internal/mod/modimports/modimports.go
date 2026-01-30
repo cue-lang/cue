@@ -233,6 +233,7 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 		// A notable FS implementation that does this is the one
 		// provided by cue/load, allowing that package to cache
 		// the parsed CUE.
+
 		// TODO maybe we should make the options here match
 		// the default parser options used by cue/load for better
 		// cache behavior.

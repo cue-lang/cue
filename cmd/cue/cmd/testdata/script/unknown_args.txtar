@@ -22,14 +22,14 @@ cmp stderr missing_mod_cmd.out
 ! stdout .
 cmp stderr unknown_mod_cmd.out
 
-! exec cue -v mod -E unknown --unknown
+! exec cue -i mod -E unknown --unknown
 ! stdout .
 cmp stderr unknown_mod_cmd.out
 
 # A rather convoluted edge case, but Cobra allows mixing flags with args,
-# even when the args are subcommand names. -v and -E are global flags.
+# even when the args are subcommand names. -i and -E are global flags.
 # TODO: this should result in an "unknown subcommand" error.
-! exec cue -v mod -E unknown --unknown
+! exec cue -i mod -E unknown --unknown
 ! stdout .
 cmp stderr unknown_mod_cmd.out
 

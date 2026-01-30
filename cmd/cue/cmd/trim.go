@@ -86,7 +86,7 @@ removal.
 		RunE: mkRunE(c, runTrim),
 	}
 
-	addOutFlags(cmd.Flags(), false)
+	addOutFlags(cmd)
 	cmd.Flags().Bool(string(flagTrace), false, "trace computation")
 	cmd.Flags().BoolP(string(flagDryRun), "n", false, "only run simulation")
 

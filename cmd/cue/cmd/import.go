@@ -254,8 +254,8 @@ Example:
 		RunE: mkRunE(c, runImport),
 	}
 
-	addOutFlags(cmd.Flags(), false)
-	addOrphanFlags(cmd.Flags())
+	addOutFlags(cmd)
+	addOrphanFlags(cmd)
 
 	cmd.Flags().Bool(string(flagFiles), false, "split multiple entries into different files")
 	cmd.Flags().Bool(string(flagDryRun), false, "show what files would be created")

@@ -65,8 +65,8 @@ func newVetCmd(c *Command) *cobra.Command {
 		RunE:  mkRunE(c, doVet),
 	}
 
-	addOrphanFlags(cmd.Flags())
-	addInjectionFlags(cmd.Flags(), false)
+	addOrphanFlags(cmd)
+	addInjectionFlags(cmd)
 
 	cmd.Flags().BoolP(string(flagConcrete), "c", false,
 		"require the evaluation to be concrete, or set -c=false to allow incomplete values")

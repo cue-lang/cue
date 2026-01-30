@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1208650_39499139",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-30T09:38:19Z",
+      "side": 1,
+      "message": "nit: you forgot to close the parenthesis",
+      "revId": "6fcffe9f37dd05834250a0bef081ca5e79564634",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80822459_718c92ff",
+        "filename": "cue/load/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-30T09:38:19Z",
+      "side": 1,
+      "message": "I\u0027d avoid unrelated whitespace changes if possible",
+      "revId": "6fcffe9f37dd05834250a0bef081ca5e79564634",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

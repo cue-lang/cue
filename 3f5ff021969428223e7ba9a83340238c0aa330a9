@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "51cc8284_1c351e8f",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-30T11:09:41Z",
+      "side": 1,
+      "message": "Sure. Personally I think \"file path\" as path/filepath might be something that is non-jarring to Go devs, but possible more jarring to others.\n\n\nHow about:\n\n```suggestion\nUse --files to treat arguments to files or directories. If directories, all the *.cue files found within the directory are formatted only.\n```\n\nassuming that there\u0027s no walking done into subdirs?",
+      "parentUuid": "318658a5_c7a96ae4",
+      "revId": "3f5ff021969428223e7ba9a83340238c0aa330a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbb998a1_4e19fbbb",
         "filename": "cmd/cue/cmd/fmt.go",
         "patchSetId": 1

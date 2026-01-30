@@ -128,6 +128,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "32730a92_5d93593a",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-30T11:29:41Z",
+      "side": 1,
+      "message": "Sorry, original typo by me, and then c+p. What I meant was:\n\n```suggestion\nUse --files to treat arguments as paths to files or directories. A path to a directory will format all *.cue files in that directory and all sub-directories, recursively.\n```",
+      "parentUuid": "ada247ac_41e1fefc",
+      "revId": "3f5ff021969428223e7ba9a83340238c0aa330a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbb998a1_4e19fbbb",
         "filename": "cmd/cue/cmd/fmt.go",
         "patchSetId": 1

@@ -1,12 +1,10 @@
-[short] skip 'this test uses sleeps'
-
 exec cue cmd after
 cmp stdout expect-stdout
 
 -- expect-stdout --
 run also
 run
-true
+timestamps are in order
 SUCCESS
 -- after_tool.cue --
 package home
@@ -26,21 +24,25 @@ top3: cli.Print & { text: "don't", $after: top2 }
 command: after: {
 	group: {
 		t1: exec.Run & {
-			cmd: ["testcmd", "sleep_and_print", "200ms", "UNIX_MILLI"]
+			cmd: ["testcmd", "sleep_and_print", "50ms", "UNIX_MILLI"]
 			stdout: string
 			$after: top1
 		}
 		t2: exec.Run & {
-			cmd: ["testcmd", "sleep_and_print", "0ms", "UNIX_MILLI"]
+			cmd: ["testcmd", "sleep_and_print", "10ms", "UNIX_MILLI"]
 			stdout: string
 			$after: t1
 		}
 	}
 	t3: cli.Print & {
-		text: strconv.FormatBool(
-			strconv.ParseInt(strings.TrimSpace(group.t1.stdout), 10, 64) <
-				strconv.ParseInt(strings.TrimSpace(group.t2.stdout), 10, 64)
-			)
+		_t1: strconv.Atoi(strings.TrimSpace(group.t1.stdout))
+		_t2: strconv.Atoi(strings.TrimSpace(group.t2.stdout))
+		if _t1 < _t2 {
+			text: "timestamps are in order"
+		}
+		if _t1 >= _t2 {
+			text: "out of order timestamps; t1: \(_t1); t2: \(_t2)"
+		}
 	}
 	t4: cli.Print & {
 		text: "SUCCESS"

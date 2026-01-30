@@ -98,9 +98,9 @@ See "cue help filetypes" for more information on values accepted by --out.
 		RunE: mkRunE(c, runExport),
 	}
 
-	addOutFlags(cmd.Flags(), true)
-	addOrphanFlags(cmd.Flags())
-	addInjectionFlags(cmd.Flags(), false)
+	addOutFlags(cmd)
+	addOrphanFlags(cmd)
+	addInjectionFlags(cmd)
 
 	cmd.Flags().Bool(string(flagEscape), false, "use HTML escaping")
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "export this expression only")

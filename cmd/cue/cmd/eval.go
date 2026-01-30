@@ -52,9 +52,9 @@ Examples:
 		RunE: mkRunE(c, runEval),
 	}
 
-	addOutFlags(cmd.Flags(), true)
-	addOrphanFlags(cmd.Flags())
-	addInjectionFlags(cmd.Flags(), false)
+	addOutFlags(cmd)
+	addOrphanFlags(cmd)
+	addInjectionFlags(cmd)
 
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "evaluate this expression only")
 

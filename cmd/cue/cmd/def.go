@@ -35,9 +35,9 @@ The --expression flag is used to only print parts of a configuration.
 		RunE: mkRunE(c, runDef),
 	}
 
-	addOutFlags(cmd.Flags(), true)
-	addOrphanFlags(cmd.Flags())
-	addInjectionFlags(cmd.Flags(), false)
+	addOutFlags(cmd)
+	addOrphanFlags(cmd)
+	addInjectionFlags(cmd)
 
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "evaluate this expression only")
 

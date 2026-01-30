@@ -17,6 +17,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
 
@@ -71,8 +72,11 @@ const (
 	flagMemProfile flagName = "memprofile"
 )
 
-func addOutFlags(f *pflag.FlagSet, allowNonCUE bool) {
-	if allowNonCUE {
+func addOutFlags(cmd *cobra.Command) {
+	f := cmd.Flags()
+
+	switch cmd.Name() {
+	case "def", "eval", "export":
 		f.String(string(flagOut), "",
 			`output format (run 'cue help filetypes' for more info)`)
 	}
@@ -81,7 +85,9 @@ func addOutFlags(f *pflag.FlagSet, allowNonCUE bool) {
 	f.BoolP(string(flagForce), "f", false, "force overwriting existing files")
 }
 
-func addGlobalFlags(f *pflag.FlagSet) {
+func addGlobalFlags(cmd *cobra.Command) {
+	f := cmd.PersistentFlags()
+
 	f.BoolP(string(flagSimplify), "s", false,
 		"simplify output")
 	f.BoolP(string(flagIgnore), "i", false,
@@ -94,7 +100,9 @@ func addGlobalFlags(f *pflag.FlagSet) {
 	f.MarkHidden(string(flagMemProfile))
 }
 
-func addOrphanFlags(f *pflag.FlagSet) {
+func addOrphanFlags(cmd *cobra.Command) {
+	f := cmd.Flags()
+
 	f.StringP(string(flagPackage), "p", "", "package name for non-CUE files")
 	f.StringP(string(flagSchema), "d", "",
 		"expression to select schema for evaluating values in non-CUE files")
@@ -107,10 +115,13 @@ func addOrphanFlags(f *pflag.FlagSet) {
 	f.Bool(string(flagMerge), true, "merge non-CUE files")
 }
 
-func addInjectionFlags(f *pflag.FlagSet, auto bool) {
+func addInjectionFlags(cmd *cobra.Command) {
+	f := cmd.Flags()
+
 	f.StringArrayP(string(flagInject), "t", nil,
 		"set the value of a tagged field")
-	f.BoolP(string(flagInjectVars), "T", auto,
+	autoInject := cmd.Name() == "cmd"
+	f.BoolP(string(flagInjectVars), "T", autoInject,
 		"inject system variables in tags")
 }
 

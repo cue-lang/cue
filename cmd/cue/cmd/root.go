@@ -264,7 +264,7 @@ func New(args []string) (*Command, error) {
 	}
 	c.cmdCmd = newCmdCmd(c)
 
-	addGlobalFlags(cmd.PersistentFlags())
+	addGlobalFlags(cmd)
 
 	// Cobra's --help flag shows up in help text by default, which is unnecessary.
 	cmd.InitDefaultHelpFlag()

@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f854ef51_7c2d3cb7",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-30T10:48:26Z",
+      "side": 1,
+      "message": "In both cases, my reading absolutely does not suggest anything other than *file* paths are accepted. I would expect an error if I passed a path to a directory. If that\u0027s not the case, then I really think the wording should be explicit that the paths can be to files or directories. IMO, it *never* hurts to be explicit.",
+      "parentUuid": "1e68da69_86c8b4f8",
+      "revId": "3f5ff021969428223e7ba9a83340238c0aa330a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbb998a1_4e19fbbb",
         "filename": "cmd/cue/cmd/fmt.go",
         "patchSetId": 1

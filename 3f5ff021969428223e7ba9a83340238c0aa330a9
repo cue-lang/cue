@@ -92,6 +92,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a3ffb876_2b134587",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-30T11:18:24Z",
+      "side": 1,
+      "message": "There is walking, hence \"descend\"",
+      "parentUuid": "51cc8284_1c351e8f",
+      "revId": "3f5ff021969428223e7ba9a83340238c0aa330a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbb998a1_4e19fbbb",
         "filename": "cmd/cue/cmd/fmt.go",
         "patchSetId": 1

@@ -175,8 +175,6 @@ Global Flags:
   -E, --all-errors   print all available errors
   -i, --ignore       proceed in the presence of errors
   -s, --simplify     simplify output
-      --trace        trace computation
-  -v, --verbose      print information about progress
 
 Use "cue cmd [command] --help" for more information about a command.
 -- cue-help-cmd-hello.stdout --
@@ -189,5 +187,3 @@ Global Flags:
   -E, --all-errors   print all available errors
   -i, --ignore       proceed in the presence of errors
   -s, --simplify     simplify output
-      --trace        trace computation
-  -v, --verbose      print information about progress

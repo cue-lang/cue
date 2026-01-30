@@ -82,14 +82,10 @@ func addOutFlags(f *pflag.FlagSet, allowNonCUE bool) {
 }
 
 func addGlobalFlags(f *pflag.FlagSet) {
-	f.Bool(string(flagTrace), false,
-		"trace computation")
 	f.BoolP(string(flagSimplify), "s", false,
 		"simplify output")
 	f.BoolP(string(flagIgnore), "i", false,
 		"proceed in the presence of errors")
-	f.BoolP(string(flagVerbose), "v", false,
-		"print information about progress")
 	f.BoolP(string(flagAllErrors), "E", false, "print all available errors")
 
 	f.String(string(flagCpuProfile), "", "write a CPU profile to the specified file before exiting")

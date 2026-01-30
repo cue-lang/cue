@@ -212,6 +212,9 @@ restrictive enum interpretation of #Switch remains.
 		RunE: mkRunE(c, extract),
 	}
 
+	cmd.Flags().BoolP(string(flagVerbose), "v", false,
+		"print information about progress")
+
 	cmd.Flags().StringP(string(flagExclude), "e", "",
 		"comma-separated list of regexps of identifiers to omit")
 

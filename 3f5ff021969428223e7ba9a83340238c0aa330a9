@@ -146,6 +146,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7fb16ced_bad5d5cc",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-30T11:32:08Z",
+      "side": 1,
+      "message": "For a single dir, you wouldn\u0027t use the files flag.\n\nMy thinking was that descend or walk are indeed recursive, but shorter/simpler in a sentence. If you meant non-recursive, then you\u0027d just say \"files in a dir\" rather than descend/walk.\n\nI\u0027m fine with your wording here, being longer in the help text can be OK. But this will definitely not fit in the flag text. I\u0027ll rewrite later to have a go.",
+      "parentUuid": "ada247ac_41e1fefc",
+      "revId": "3f5ff021969428223e7ba9a83340238c0aa330a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbb998a1_4e19fbbb",
         "filename": "cmd/cue/cmd/fmt.go",
         "patchSetId": 1

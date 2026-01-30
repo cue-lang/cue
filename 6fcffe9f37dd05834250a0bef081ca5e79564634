@@ -33,6 +33,24 @@
       "message": "I\u0027d avoid unrelated whitespace changes if possible",
       "revId": "6fcffe9f37dd05834250a0bef081ca5e79564634",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5a8cc3d_7e5659cd",
+        "filename": "cue/load/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-01-30T13:58:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80822459_718c92ff",
+      "revId": "6fcffe9f37dd05834250a0bef081ca5e79564634",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

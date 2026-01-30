@@ -17,6 +17,7 @@ package token
 import (
 	"cmp"
 	"fmt"
+	"path/filepath"
 	"sort"
 	"sync"
 
@@ -146,7 +147,16 @@ func (p Pos) Compare(p2 Pos) int {
 	}
 	// Avoid calling [Pos.Position] as it also unpacks line and column info;
 	// comparing positions only needs filenames and offsets.
-	if c := cmp.Compare(p.Filename(), p2.Filename()); c != 0 {
+	//
+	// Note that absolute paths always go first; this naturally happens on Unix-like
+	// systems given that a leading slash sorts before almost any filename character.
+	// On Windows, volume names like C: could sort after filenames like Bar,
+	// which can cause inconsistent ordering depending on the current directory.
+	f1, f2 := p.Filename(), p2.Filename()
+	if c := cmpBool(filepath.IsAbs(f1), filepath.IsAbs(f2)); c != 0 {
+		return -c
+	}
+	if c := cmp.Compare(f1, f2); c != 0 {
 		return c
 	}
 	// Note that CUE doesn't currently use any directives which alter
@@ -632,4 +642,15 @@ func searchInts(a []index, x index) int {
 		}
 	}
 	return i - 1
+}
+
+func cmpBool(x, y bool) int {
+	switch {
+	case !x && y:
+		return -1
+	case x && !y:
+		return +1
+	default:
+		return 0
+	}
 }

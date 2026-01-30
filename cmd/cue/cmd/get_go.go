@@ -264,7 +264,7 @@ type extractor struct {
 	pkg         *packages.Package
 	orig        map[types.Type]*ast.StructType
 	usedPkgs    map[string]bool
-	consts      map[string][]string
+	consts      map[types.Type][]string
 	k8sSemantic bool
 
 	// per file
@@ -473,7 +473,7 @@ outer:
 
 	e.recordTypeInfo(p)
 
-	e.consts = map[string][]string{}
+	e.consts = map[types.Type][]string{}
 
 	for _, f := range p.Syntax {
 		for _, d := range f.Decls {
@@ -691,7 +691,7 @@ func (e *extractor) recordConsts(x *ast.GenDecl) {
 			if n.Name == "_" {
 				continue
 			}
-			typ := e.pkg.TypesInfo.TypeOf(n).String()
+			typ := e.pkg.TypesInfo.TypeOf(n)
 			e.consts[typ] = append(e.consts[typ], n.Name)
 		}
 	}
@@ -730,7 +730,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 			}
 
 			typ := e.pkg.TypesInfo.TypeOf(v.Name)
-			enums := e.consts[typ.String()]
+			enums := e.consts[typ]
 			name := v.Name.Name
 			mapNamed := false
 			underlying := e.pkg.TypesInfo.TypeOf(v.Type)
@@ -1568,7 +1568,7 @@ func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, t
 	}
 
 	if attrs&(required|optional) == required|optional {
-		return 0, fmt.Errorf("field cannot be optional and required: %s", f.String())
+		return 0, fmt.Errorf("field cannot be optional and required: %s", f)
 	}
 	if attrs&required == required {
 		return attrs, nil

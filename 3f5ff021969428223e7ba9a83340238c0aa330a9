@@ -110,6 +110,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ada247ac_41e1fefc",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-01-30T11:23:57Z",
+      "side": 1,
+      "message": "descend does not mean recursive! So how do I format all files in a directory and none of its child directories? Presumably `--files path/to/dir/*.cue` and rely on shell glob expansion? Would be good to have that as an example.\n\n```suggestion\nUse --files to treat arguments to files or directories. A path to a directory will format all *.cue files in that directory and all sub-directories, recursively.\n```",
+      "parentUuid": "a3ffb876_2b134587",
+      "revId": "3f5ff021969428223e7ba9a83340238c0aa330a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbb998a1_4e19fbbb",
         "filename": "cmd/cue/cmd/fmt.go",
         "patchSetId": 1

@@ -16,6 +16,24 @@
       "message": "But please can we also update the docs to make clear ./... means something different for fmt than the others?",
       "revId": "d1076bf2de652ab4ed2396024f6c3ac5d00b7974",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf093bad_5d1263da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-30T10:15:05Z",
+      "side": 1,
+      "message": "Done; I did this in a follow-up patch because I also thought the help text needed a revamp overall.",
+      "parentUuid": "9fc3cc70_c51f6854",
+      "revId": "d1076bf2de652ab4ed2396024f6c3ac5d00b7974",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

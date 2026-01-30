@@ -182,6 +182,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f80e35d7_26651f26",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-01-30T14:26:03Z",
+      "side": 1,
+      "message": "the loading of ancestor packages, much like loading imported packages, only happens when you\u0027re building CUE values. this happens with commands working on CUE values like `export` or `vet`, but not `fmt` or `import`.\n\nI realise that this is not super intuitive - it mirrors the difference between packages and instances. `./...` is a package pattern, so fmt\u0027s current behavior given that it loads packages and formats all CUE files directly in them, but it does not build instances (values) with the extra steps needed for those.\n\nso I think the proper way to resolve this confusion would be to clarify the packages vs instances wording in the docs, including in `cue help` docs in terms of which packages do or do not load package instances.",
+      "parentUuid": "248a0e0d_828d39af",
+      "revId": "3f5ff021969428223e7ba9a83340238c0aa330a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbb998a1_4e19fbbb",
         "filename": "cmd/cue/cmd/fmt.go",
         "patchSetId": 1

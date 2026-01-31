@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7588767c_7572da31",
+        "filename": "cue/token/position.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-01-31T10:38:21Z",
+      "side": 1,
+      "message": "Why negate the result?",
+      "range": {
+        "startLine": 157,
+        "startChar": 9,
+        "endLine": 157,
+        "endChar": 11
+      },
+      "revId": "29b3e4d3258c3349dc13a06b053ce20c7f3003bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

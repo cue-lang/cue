@@ -20,10 +20,15 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/fs"
 	"math"
 	"os"
 	"strings"
 )
+
+type OpenFn func(name string) (fs.File, error)
+
+var OsOpen = func(name string) (fs.File, error) { return os.Open(name) }
 
 // ReadAll loads the source bytes for the given arguments. If src != nil,
 // ReadAll converts src to a []byte if possible; otherwise it returns an
@@ -68,11 +73,21 @@ func ReadAllSize(r io.Reader, size int) ([]byte, error) {
 
 // Open creates a source reader for the given arguments.
 // If src != nil, Open converts src to an [io.Reader] if possible; otherwise it returns an error.
-// If src == nil, Open returns the result of opening the file specified by filename.
+// If src == nil, Open returns the result of [os.Open] using filename.
 //
 // The caller must check if the result is an [io.Closer], and if so, close it when done.
 // The size of the opened reader is returned if possible, or -1 otherwise.
 func Open(filename string, src any) (_ io.Reader, size int, _ error) {
+	return OpenFunc(filename, src, OsOpen)
+}
+
+// OpenFunc creates a source reader for the given arguments.
+// If src != nil, Open converts src to an [io.Reader] if possible; otherwise it returns an error.
+// If src == nil, Open returns the result of openFn using filename.
+//
+// The caller must check if the result is an [io.Closer], and if so, close it when done.
+// The size of the opened reader is returned if possible, or -1 otherwise.
+func OpenFunc(filename string, src any, openFn OpenFn) (_ io.Reader, size int, _ error) {
 	if src != nil {
 		switch src := src.(type) {
 		case string:
@@ -86,14 +101,14 @@ func Open(filename string, src any) (_ io.Reader, size int, _ error) {
 		}
 		return nil, -1, fmt.Errorf("invalid source type %T", src)
 	}
-	f, err := os.Open(filename)
+	f, err := openFn(filename)
 	if err != nil {
 		return nil, -1, err
 	}
 	return fileWithSize(f)
 }
 
-func fileWithSize(f *os.File) (io.Reader, int, error) {
+func fileWithSize(f fs.File) (io.Reader, int, error) {
 	// If we just opened a regular file, return its size too.
 	// If we can't get its size, such as non-regular files, don't give one.
 	stat, err := f.Stat()

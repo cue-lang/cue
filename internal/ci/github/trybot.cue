@@ -35,6 +35,7 @@ workflows: trybot: _repo.bashWorkflow & {
 
 	jobs: {
 		test: {
+			permissions: "id-token": "write"
 			strategy: {
 				"fail-fast": false
 				matrix: {
@@ -60,6 +61,12 @@ workflows: trybot: _repo.bashWorkflow & {
 				for v in _repo.setupCaches {v},
 
 				_repo.loginCentralRegistry,
+
+				// TODO(go1.25) remove this step, because https://golang.org/issue/72824 is fixed
+				{
+					name: "workaround https://golang.org/issue/72824"
+					run:  "go tool -n cue"
+				},
 
 				_repo.earlyChecks & {
 					// These checks don't vary based on the Go version or OS,

@@ -75,7 +75,8 @@ jobs:
           registry: docker.io
           username: cueckoo
           password: ${{ secrets.CUECKOO_DOCKER_PAT }}
-      - run: go tool cue login --token=${{ secrets.NOTCUECKOO_CUE_TOKEN }}
+      - name: Login to CUE registry
+        uses: cue-labs/registry-login-action@v1
       - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:

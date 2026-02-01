@@ -16,6 +16,23 @@
       "message": "I\u0027ve wanted this helper a couple of times before, and this cleanup on its own makes sense, so I\u0027ve resurrected it :)",
       "revId": "7e3c33eddf2f1e929f0674d335a00ffc6f39306d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38909301_4c98feba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-01T05:06:30Z",
+      "side": 1,
+      "message": "To be clear, I only rebased (it was two years out of date) and fixed a very minor conflict. The patch is the same that Rog sent, hence my +2. It needs another +2 as I\u0027m now the uploader.",
+      "revId": "7e3c33eddf2f1e929f0674d335a00ffc6f39306d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

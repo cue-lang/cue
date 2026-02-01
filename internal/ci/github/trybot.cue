@@ -35,6 +35,7 @@ workflows: trybot: _repo.bashWorkflow & {
 
 	jobs: {
 		test: {
+			permissions: "id-token": "write"
 			strategy: {
 				"fail-fast": false
 				matrix: {
@@ -59,7 +60,10 @@ workflows: trybot: _repo.bashWorkflow & {
 				for v in installGo {v},
 				for v in _repo.setupCaches {v},
 
-				_repo.loginCentralRegistry,
+				{
+					name: "Login to CUE registry"
+					uses: "cue-labs/registry-login-action@v1"
+				},
 
 				_repo.earlyChecks & {
 					// These checks don't vary based on the Go version or OS,

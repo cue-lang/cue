@@ -338,6 +338,11 @@ containsUnityTrailer: containsDispatchTrailer & {
 
 _dispatchTrailerVariable: "github.event.head_commit.message"
 
+// loginCentralRegistry performs an ODIC-based auth with the CUE Central
+// Registry.
+//
+// TODO: enforce that the job to which this belongs has the relevant
+// permission.
 loginCentralRegistry: githubactions.#Step & {
 	name: "Login to CUE registry"
 	uses: "cue-labs/registry-login-action@v1"

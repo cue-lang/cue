@@ -16,6 +16,8 @@ jobs:
     defaults:
       run:
         shell: bash --noprofile --norc -euo pipefail {0}
+    permissions:
+      id-token: write
     runs-on: namespace-profile-linux-amd64-large
     if: ${{github.repository == 'cue-lang/cue'}}
     steps:

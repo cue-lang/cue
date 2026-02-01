@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "454c64bf_d9fc9d75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-02-01T14:00:49Z",
+      "side": 1,
+      "message": "This fixes the build break at tip. I confirmed (this time) that the release workflow actually works:\n\nhttps://github.com/cue-lang/cue/actions/runs/21564057297/job/62132577511",
+      "revId": "b8660e3b44d18f45720e80771c22f51c6c26ff50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

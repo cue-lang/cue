@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5618aa94_24d61d53",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-01T05:05:22Z",
+      "side": 1,
+      "message": "I\u0027ve wanted this helper a couple of times before, and this cleanup on its own makes sense, so I\u0027ve resurrected it :)",
+      "revId": "7e3c33eddf2f1e929f0674d335a00ffc6f39306d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

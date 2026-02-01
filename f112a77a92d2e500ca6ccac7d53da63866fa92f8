@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1b6a362_89589613",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-01T04:57:42Z",
+      "side": 1,
+      "message": "SGTM with the changes we discussed in person",
+      "revId": "f112a77a92d2e500ca6ccac7d53da63866fa92f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "762aa806_ec4c54a0",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_after.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-01T04:57:42Z",
+      "side": 1,
+      "message": "as discussed in person, I think this sleep should be zero again, and the comparison below should accept the two timestamps being equal as a pass",
+      "revId": "f112a77a92d2e500ca6ccac7d53da63866fa92f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b70eec6_ccbf95c0",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_after.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-01T04:57:42Z",
+      "side": 1,
+      "message": "this should be `\u003c\u003d` with the second sleep being zero, to mimic the original behavior that I unintentionally changed",
+      "revId": "f112a77a92d2e500ca6ccac7d53da63866fa92f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "046c611c_0b06dbd1",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_after.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-01T04:57:42Z",
+      "side": 1,
+      "message": "and then this should be `\u003e`",
+      "revId": "f112a77a92d2e500ca6ccac7d53da63866fa92f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

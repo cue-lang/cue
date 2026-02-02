@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"fmt"
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -89,8 +88,8 @@ y: x
 				// If a file is missing a package declaration then we add
 				// one. So if there is a valid module then such files will
 				// not be treated as standalone.
-				LogMatching(protocol.Debug, fmt.Sprintf(`Package dirs=\[%v/a\] importPath=cue\.example\.net/a@v0:_.+ Created`, rootURI), 1, false),
-				LogMatching(protocol.Debug, fmt.Sprintf(`Package dirs=\[%v/a\] importPath=cue\.example\.net/a@v0:_.+ Reloaded`, rootURI), 1, false),
+				LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/a\] importPath=cue\.example\.net/a@v0:_.+ Created`, rootURI),
+				LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/a\] importPath=cue\.example\.net/a@v0:_.+ Reloaded`, rootURI),
 			)
 		})
 	})

@@ -526,7 +526,8 @@ func NoErrorLogs() Expectation {
 // Logs are asynchronous to other LSP messages, so this expectation should not
 // be used with combinators such as OnceMet or AfterChange that assert on
 // ordering with respect to other operations.
-func LogMatching(typ protocol.MessageType, re string, count int, atLeast bool) Expectation {
+func LogMatching(typ protocol.MessageType, count int, atLeast bool, formatRe string, args ...any) Expectation {
+	re := fmt.Sprintf(formatRe, args...)
 	rec, err := regexp.Compile(re)
 	if err != nil {
 		panic(err)
@@ -564,18 +565,19 @@ func LogMatching(typ protocol.MessageType, re string, count int, atLeast bool) E
 // fmt.Sprintf(format, args...) a certain number of times.
 //
 // It is a convenience wrapper around [LogMatching], using
-// [regexp.QuoteMeta] and fmt.Sprintf. Note the string/regexp is not
-// anchored to the beginning or end of any log message, so this
-// behaves like [strings.Contains] rather than ==.
+// [regexp.QuoteMeta] on the format argument only. Note the
+// string/regexp is not anchored to the beginning or end of any log
+// message, so this behaves like [strings.Contains] rather than ==.
 func LogExactf(typ protocol.MessageType, count int, atLeast bool, format string, args ...any) Expectation {
-	return LogMatching(typ, regexp.QuoteMeta(fmt.Sprintf(format, args...)), count, atLeast)
+	return LogMatching(typ, count, atLeast, regexp.QuoteMeta(format), args...)
 }
 
 // NoLogMatching asserts that the client has not received a log message
 // of type typ matching the regexp re. If re is an empty string, any log
 // message is considered a match.
-func NoLogMatching(typ protocol.MessageType, re string) Expectation {
+func NoLogMatching(typ protocol.MessageType, formatRe string, args ...any) Expectation {
 	var r *regexp.Regexp
+	re := fmt.Sprintf(formatRe, args...)
 	if re != "" {
 		var err error
 		r, err = regexp.Compile(re)
@@ -603,7 +605,7 @@ func NoLogMatching(typ protocol.MessageType, re string) Expectation {
 // NoLogExactf is a convenience wrapper around [NoLogMatching], in the
 // same way that [LogExactf] is a wrapper around [LogMatching].
 func NoLogExactf(typ protocol.MessageType, format string, args ...any) Expectation {
-	return NoLogMatching(typ, regexp.QuoteMeta(fmt.Sprintf(format, args...)))
+	return NoLogMatching(typ, regexp.QuoteMeta(format), args...)
 }
 
 // FileWatchMatching expects that a file registration matches re.

@@ -148,23 +148,23 @@ loop:
 			}
 			fileAttr = a
 
-			attr := internal.ParseAttrBody(a.Pos(), body)
+			attr := internal.ParseAttrBody(pos, body)
 			if attr.Err != nil {
 				return "", pos, nil, attr.Err
 			}
 			k, err := attr.String(0)
 			if err != nil {
 				// Unreachable.
-				return "", pos, nil, errors.Newf(a.Pos(), "%s", err)
+				return "", pos, nil, errors.Newf(pos, "%s", err)
 			}
 
 			if k == "" {
-				return "", pos, nil, errors.Newf(a.Pos(),
+				return "", pos, nil, errors.Newf(pos,
 					"interpreter name must be non-empty")
 			}
 
 			if kind != "" {
-				return "", pos, nil, errors.Newf(a.Pos(),
+				return "", pos, nil, errors.Newf(pos,
 					"only one file-level extern attribute allowed per file")
 
 			}

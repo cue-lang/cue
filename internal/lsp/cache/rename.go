@@ -23,7 +23,7 @@ import (
 )
 
 // Rename implements the LSP Rename functionality.
-func (w *Workspace) Rename(tokFile *token.File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, params *protocol.RenameParams) *protocol.WorkspaceEdit {
+func (w *Workspace) Rename(file *File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, params *protocol.RenameParams) *protocol.WorkspaceEdit {
 	offset, err := srcMapper.PositionOffset(params.Position)
 	if err != nil {
 		w.debugLog(err.Error())
@@ -83,13 +83,14 @@ func (w *Workspace) Rename(tokFile *token.File, fe *eval.FileEvaluator, srcMappe
 }
 
 // Rename implements the LSP PrepareRename functionality.
-func (w *Workspace) PrepareRename(tokFile *token.File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.PrepareRenamePlaceholder {
+func (w *Workspace) PrepareRename(file *File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, pos protocol.Position) *protocol.PrepareRenamePlaceholder {
 	offset, err := srcMapper.PositionOffset(pos)
 	if err != nil {
 		w.debugLog(err.Error())
 		return nil
 	}
 
+	tokFile := file.tokFile
 	targets := fe.UsagesForOffset(offset, true)
 
 	// The client (editor) has provided us with a single position

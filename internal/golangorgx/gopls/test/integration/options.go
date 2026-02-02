@@ -5,6 +5,8 @@
 package integration
 
 import (
+	"maps"
+
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 	"cuelang.org/go/internal/lsp/cache"
@@ -92,9 +94,7 @@ func (s Settings) set(opts *runConfig) {
 	if opts.editor.Settings == nil {
 		opts.editor.Settings = make(map[string]interface{})
 	}
-	for k, v := range s {
-		opts.editor.Settings[k] = v
-	}
+	maps.Copy(opts.editor.Settings, s)
 }
 
 // WorkspaceFolders configures the workdir-relative workspace folders to send
@@ -156,9 +156,7 @@ func (e EnvVars) set(opts *runConfig) {
 	if opts.editor.Env == nil {
 		opts.editor.Env = make(map[string]string)
 	}
-	for k, v := range e {
-		opts.editor.Env[k] = v
-	}
+	maps.Copy(opts.editor.Env, e)
 }
 
 // MessageResponder configures the editor to respond to

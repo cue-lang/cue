@@ -33,7 +33,7 @@ func SemType(n int) string {
 func SemMods(n int) []string {
 	tokMods := SemanticModifiers()
 	mods := []string{}
-	for i := 0; i < len(tokMods); i++ {
+	for i := range tokMods {
 		if (n & (1 << uint(i))) != 0 {
 			mods = append(mods, tokMods[i])
 		}

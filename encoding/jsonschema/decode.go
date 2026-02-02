@@ -855,7 +855,7 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, init func(*state)) (ex
 	}
 
 	// do multiple passes over the constraints to ensure they are done in order.
-	for pass := 0; pass < numPhases; pass++ {
+	for pass := range numPhases {
 		s.processMap(n, func(key string, value cue.Value) {
 			if pass == 0 && key == "$ref" {
 				// Before 2019-19, keywords alongside $ref are ignored so keep

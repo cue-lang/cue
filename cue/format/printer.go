@@ -401,7 +401,7 @@ func (p *printer) writeString(s string, isLit bool) {
 }
 
 func (p *printer) writeByte(ch byte, n int) {
-	for i := 0; i < n; i++ {
+	for range n {
 		p.output = append(p.output, ch)
 	}
 
@@ -412,7 +412,7 @@ func (p *printer) writeByte(ch byte, n int) {
 		p.pos.Column = 1
 
 		n := p.cfg.Indent + p.indent // include base indentation
-		for i := 0; i < n; i++ {
+		for range n {
 			p.output = append(p.output, '\t')
 		}
 

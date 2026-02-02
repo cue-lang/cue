@@ -147,8 +147,8 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 	//
 	// TODO this logic entirely ignores the pattern that's
 	// after the "...". See cuelang.org/issue/3212
-	i := strings.Index(pattern, "...")
-	dir, _ := path.Split(pattern[:i])
+	before, _, _ := strings.Cut(pattern, "...")
+	dir, _ := path.Split(before)
 
 	root := l.abs(dir)
 

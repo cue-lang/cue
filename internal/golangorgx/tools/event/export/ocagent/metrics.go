@@ -104,7 +104,7 @@ func dataToTimeseries(data metric.Data, start time.Time) []*wire.TimeSeries {
 	startTimestamp := convertTimestamp(start)
 	timeseries := make([]*wire.TimeSeries, 0, numRows)
 
-	for i := 0; i < numRows; i++ {
+	for i := range numRows {
 		timeseries = append(timeseries, &wire.TimeSeries{
 			StartTimestamp: &startTimestamp,
 			// TODO: labels?
@@ -175,7 +175,7 @@ func dataToPoints(data metric.Data, i int) []*wire.Point {
 // supplied counts, count, and sum.
 func distributionToPoints(counts []int64, count int64, sum float64, bucketBounds []float64, end time.Time) []*wire.Point {
 	buckets := make([]*wire.Bucket, len(counts))
-	for i := 0; i < len(counts); i++ {
+	for i := range counts {
 		buckets[i] = &wire.Bucket{
 			Count: counts[i],
 		}

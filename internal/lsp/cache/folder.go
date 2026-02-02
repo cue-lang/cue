@@ -56,12 +56,9 @@ func (wf *WorkspaceFolder) UpdateOptions(opts *settings.Options) {
 // the given patterns map and reports whether this folder requires
 // subdirectories to be watched explicitly.
 func (wf *WorkspaceFolder) FileWatchingGlobPatterns(patterns map[protocol.RelativePattern]struct{}) bool {
-	const watchCueFiles = "**/*.cue"
+	const watchCueFiles = "**/*.{cue,json,yaml,yml}"
 
-	patterns[protocol.RelativePattern{
-		BaseURI: wf.dir,
-		Pattern: watchCueFiles,
-	}] = struct{}{}
+	patterns[protocol.RelativePattern{Pattern: watchCueFiles}] = struct{}{}
 
 	return wf.watchSubdirs()
 }

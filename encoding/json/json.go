@@ -24,11 +24,10 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	cuejson "cuelang.org/go/internal/encoding/json"
 	"cuelang.org/go/internal/source"
 )
 
@@ -62,7 +61,7 @@ func Extract(path string, data []byte) (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	patchExpr(expr, nil)
+	cuejson.PatchExpr(expr, nil)
 	return expr, nil
 }
 
@@ -126,7 +125,7 @@ func (d *Decoder) Extract() (ast.Expr, error) {
 	if err != nil {
 		return expr, err
 	}
-	patchExpr(expr, d.patchPos)
+	cuejson.PatchExpr(expr, d.patchPos)
 	return expr, nil
 }
 
@@ -157,118 +156,4 @@ func (d *Decoder) patchPos(n ast.Node) {
 	pos := n.Pos()
 	realPos := d.tokFile.Pos(pos.Offset()+d.startOffset, pos.RelPos())
 	ast.SetPos(n, realPos)
-}
-
-// patchExpr simplifies the AST parsed from JSON.
-// TODO: some of the modifications are already done in format, but are
-// a package deal of a more aggressive simplify. Other pieces of modification
-// should probably be moved to format.
-func patchExpr(n ast.Node, patchPos func(n ast.Node)) {
-	type info struct {
-		reflow bool
-	}
-	stack := []info{{true}}
-
-	afterFn := func(n ast.Node) {
-		switch n.(type) {
-		case *ast.ListLit, *ast.StructLit:
-			stack = stack[:len(stack)-1]
-		}
-	}
-
-	var beforeFn func(n ast.Node) bool
-
-	beforeFn = func(n ast.Node) bool {
-		if patchPos != nil {
-			patchPos(n)
-		}
-
-		isLarge := n.End().Offset()-n.Pos().Offset() > 50
-		descent := true
-
-		switch x := n.(type) {
-		case *ast.ListLit:
-			reflow := true
-			if !isLarge {
-				for _, e := range x.Elts {
-					if hasSpaces(e) {
-						reflow = false
-						break
-					}
-				}
-			}
-			stack = append(stack, info{reflow})
-			if reflow {
-				x.Lbrack = x.Lbrack.WithRel(token.NoRelPos)
-				x.Rbrack = x.Rbrack.WithRel(token.NoRelPos)
-			}
-			return true
-
-		case *ast.StructLit:
-			reflow := true
-			if !isLarge {
-				for _, e := range x.Elts {
-					if f, ok := e.(*ast.Field); !ok || hasSpaces(f) || hasSpaces(f.Value) {
-						reflow = false
-						break
-					}
-				}
-			}
-			stack = append(stack, info{reflow})
-			if reflow {
-				x.Lbrace = x.Lbrace.WithRel(token.NoRelPos)
-				x.Rbrace = x.Rbrace.WithRel(token.NoRelPos)
-			}
-			return true
-
-		case *ast.Field:
-			// label is always a string for JSON.
-			s, ok := x.Label.(*ast.BasicLit)
-			if !ok || s.Kind != token.STRING {
-				break // should not happen: implies invalid JSON
-			}
-
-			u, err := literal.Unquote(s.Value)
-			if err != nil {
-				break // should not happen: implies invalid JSON
-			}
-
-			// TODO(legacy): remove checking for '_' prefix once hidden
-			// fields are removed.
-			if ast.StringLabelNeedsQuoting(u) {
-				break // keep string
-			}
-
-			x.Label = ast.NewIdent(u)
-			astutil.CopyMeta(x.Label, s)
-			// Having removed the quote-marks, the ident start should be
-			// incremented by 1 so that the label content matches up with
-			// the raw json.
-			ast.SetPos(x.Label, x.Label.Pos().Add(1))
-
-			ast.Walk(x.Value, beforeFn, afterFn)
-			descent = false
-
-		case *ast.BasicLit:
-			if x.Kind == token.STRING && len(x.Value) > 10 {
-				s, err := literal.Unquote(x.Value)
-				if err != nil {
-					break // should not happen: implies invalid JSON
-				}
-
-				x.Value = literal.String.WithOptionalTabIndent(len(stack)).Quote(s)
-			}
-		}
-
-		if stack[len(stack)-1].reflow {
-			ast.SetRelPos(n, token.NoRelPos)
-		}
-		return descent
-	}
-
-	ast.Walk(n, beforeFn, afterFn)
-}
-
-func hasSpaces(n ast.Node) bool {
-	return n.Pos().RelPos() > token.NoSpace
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f36576b8_65e33e33",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2026-02-02T16:44:24Z",
+      "side": 1,
+      "message": "Applying a second +2 as Daniel given that the review already happened on the PR.",
+      "revId": "515550d1a838f2fffec53d8cf7621c11799da3c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

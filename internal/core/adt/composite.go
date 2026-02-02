@@ -126,7 +126,7 @@ func (e *Environment) DerefVertex(ctx *OpContext) *Vertex {
 }
 
 func (e *Environment) up(ctx *OpContext, count int32) *Environment {
-	for i := int32(0); i < count; i++ {
+	for range count {
 		e = e.Up
 		ctx.Assertf(ctx.Pos(), e.DerefVertex(ctx) != nil, "Environment.up encountered a nil vertex")
 	}

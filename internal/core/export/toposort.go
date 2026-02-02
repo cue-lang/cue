@@ -53,7 +53,7 @@ func extractFeatures(in []adt.StructInfo) (a [][]adt.Feature) {
 		if len(sorted) > 0 {
 			occurrences := 1 + s.Repeats
 			// Add this front (1 + Repeats) times to give it proper weight
-			for i := 0; i < occurrences; i++ {
+			for range occurrences {
 				a = append(a, sorted)
 			}
 		}

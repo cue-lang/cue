@@ -273,7 +273,7 @@ func scanAttributeTokens(s *scanner.Scanner, startPos token.Pos, close uint64) (
 
 func tokenMaskStr(m uint64) string {
 	var buf strings.Builder
-	for t := token.Token(0); t < 64; t++ {
+	for t := range token.Token(64) {
 		if (m & (1 << t)) != 0 {
 			if buf.Len() > 0 {
 				buf.WriteByte('|')

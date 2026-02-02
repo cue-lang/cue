@@ -49,8 +49,8 @@ func lookupString(obj cue.Value, key, def string) string {
 // splitLine splits the first line and the rest of the string.
 func splitLine(s string) (line, tail string) {
 	line = s
-	if p := strings.IndexByte(s, '\n'); p >= 0 {
-		line, tail = strings.TrimSpace(s[:p]), strings.TrimSpace(s[p+1:])
+	if before, after, ok := strings.Cut(s, "\n"); ok {
+		line, tail = strings.TrimSpace(before), strings.TrimSpace(after)
 	}
 	return
 }

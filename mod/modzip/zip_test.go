@@ -58,11 +58,11 @@ func readTest(file string) (testParams, error) {
 		if line == "" || line[0] == '#' {
 			continue
 		}
-		eq := strings.IndexByte(line, '=')
-		if eq < 0 {
+		before, after, ok := strings.Cut(line, "=")
+		if !ok {
 			return testParams{}, fmt.Errorf("%s:%d: missing = separator", file, n)
 		}
-		key, value := strings.TrimSpace(line[:eq]), strings.TrimSpace(line[eq+1:])
+		key, value := strings.TrimSpace(before), strings.TrimSpace(after)
 		if strings.HasPrefix(value, "\"") {
 			unq, err := strconv.Unquote(value)
 			if err != nil {

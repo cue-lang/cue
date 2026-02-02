@@ -194,13 +194,13 @@ func TestConcurrentTokenRefresh(t *testing.T) {
 	for i := range registries {
 		reg := &registries[i]
 		reg.mod = fmt.Sprintf("foo.mod%02d", i)
-		fsys, err := txtar.FS(txtar.Parse([]byte(fmt.Sprintf(`
+		fsys, err := txtar.FS(txtar.Parse(fmt.Appendf(nil, `
 -- %s_v0.0.1/cue.mod/module.cue --
 module: "%s@v0"
 language: version: "v0.8.0"
 -- %s_v0.0.1/bar/bar.cue --
 package bar
-`, reg.mod, reg.mod, reg.mod))))
+`, reg.mod, reg.mod, reg.mod)))
 		qt.Assert(t, qt.IsNil(err))
 		mux := http.NewServeMux()
 		r := ocimem.New()

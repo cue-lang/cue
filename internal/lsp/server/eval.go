@@ -23,59 +23,59 @@ import (
 func (s *server) Definition(ctx context.Context, params *protocol.DefinitionParams) ([]protocol.Location, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	tokFile, fe, srcMapper, err := w.FileEvaluatorForURI(uri, false)
-	if tokFile == nil || err != nil {
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, false)
+	if file == nil || err != nil {
 		return nil, err
 	}
-	return w.Definition(tokFile, fe, srcMapper, params.Position), nil
+	return w.Definition(file, fe, srcMapper, params.Position), nil
 }
 
 func (s *server) Completion(ctx context.Context, params *protocol.CompletionParams) (*protocol.CompletionList, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	tokFile, fe, srcMapper, err := w.FileEvaluatorForURI(uri, false)
-	if tokFile == nil || err != nil {
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, false)
+	if file == nil || err != nil {
 		return nil, err
 	}
-	return w.Completion(tokFile, fe, srcMapper, params.Position), nil
+	return w.Completion(file, fe, srcMapper, params.Position), nil
 }
 
 func (s *server) Hover(ctx context.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	tokFile, fe, srcMapper, err := w.FileEvaluatorForURI(uri, false)
-	if tokFile == nil || err != nil {
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, false)
+	if file == nil || err != nil {
 		return nil, err
 	}
-	return w.Hover(tokFile, fe, srcMapper, params.Position), nil
+	return w.Hover(file, fe, srcMapper, params.Position), nil
 }
 
 func (s *server) References(ctx context.Context, params *protocol.ReferenceParams) ([]protocol.Location, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	tokFile, fe, srcMapper, err := w.FileEvaluatorForURI(uri, true)
-	if tokFile == nil || err != nil {
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, true)
+	if file == nil || err != nil {
 		return nil, err
 	}
-	return w.References(tokFile, fe, srcMapper, params), nil
+	return w.References(file, fe, srcMapper, params), nil
 }
 
 func (s *server) Rename(ctx context.Context, params *protocol.RenameParams) (*protocol.WorkspaceEdit, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	tokFile, fe, srcMapper, err := w.FileEvaluatorForURI(uri, true)
-	if tokFile == nil || err != nil {
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, true)
+	if file == nil || err != nil {
 		return nil, err
 	}
-	return w.Rename(tokFile, fe, srcMapper, params), nil
+	return w.Rename(file, fe, srcMapper, params), nil
 }
 
 func (s *server) PrepareRename(ctx context.Context, params *protocol.PrepareRenameParams) (*protocol.PrepareRenamePlaceholder, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	tokFile, fe, srcMapper, err := w.FileEvaluatorForURI(uri, true)
-	if tokFile == nil || err != nil {
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, true)
+	if file == nil || err != nil {
 		return nil, err
 	}
-	return w.PrepareRename(tokFile, fe, srcMapper, params.Position), nil
+	return w.PrepareRename(file, fe, srcMapper, params.Position), nil
 }

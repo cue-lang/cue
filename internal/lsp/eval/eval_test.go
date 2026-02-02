@@ -4455,7 +4455,13 @@ func (tcs testCases) run(t *testing.T) {
 						}
 						return eval
 					}
-					eval := eval.New(ip, importCanonicalisation, forPackage, pkgImporters, files...)
+					config := eval.Config{
+						IP:                     ip,
+						ImportCanonicalisation: importCanonicalisation,
+						ForPackage:             forPackage,
+						PkgImporters:           pkgImporters,
+					}
+					eval := eval.New(config, files...)
 					evalByPkgName[pkgName] = eval
 					for _, fileAst := range files {
 						evalByFilename[fileAst.Filename] = eval

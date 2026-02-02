@@ -267,32 +267,43 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		}
 	}
 
-	forPackage := func(importPath ast.ImportPath) *eval.Evaluator {
-		for _, importedPkg := range pkg.imports {
-			if importedPkg.importPath != importPath {
-				continue
-			}
-			return importedPkg.eval
-		}
-		return nil
-	}
-
-	pkgImporters := func() []*eval.Evaluator {
-		if len(pkg.importedBy) == 0 {
-			return nil
-		}
-		evals := make([]*eval.Evaluator, len(pkg.importedBy))
-		for i, pkg := range pkg.importedBy {
-			evals[i] = pkg.eval
-		}
-		return evals
+	config := eval.Config{
+		IP:                     pkg.importPath,
+		ImportCanonicalisation: importCanonicalisation,
+		ForPackage:             pkg.forPackage,
+		PkgImporters:           pkg.pkgImporters,
 	}
 
 	// eval.New does almost no work - calculation of resolutions is
 	// done lazily. So no need to launch go-routines here.
-	pkg.eval = eval.New(pkg.importPath, importCanonicalisation, forPackage, pkgImporters, astFiles...)
+	pkg.eval = eval.New(config, astFiles...)
 
 	return nil
+}
+
+// forPackage is a callback for the evaluator. See
+// [eval.Config.ForPackage]
+func (pkg *Package) forPackage(importPath ast.ImportPath) *eval.Evaluator {
+	for _, importedPkg := range pkg.imports {
+		if importedPkg.importPath != importPath {
+			continue
+		}
+		return importedPkg.eval
+	}
+	return nil
+}
+
+// pkgImporters is a callback for the evaluator. See
+// [eval.Config.PkgImporters]
+func (pkg *Package) pkgImporters() []*eval.Evaluator {
+	if len(pkg.importedBy) == 0 {
+		return nil
+	}
+	evals := make([]*eval.Evaluator, len(pkg.importedBy))
+	for i, pkg := range pkg.importedBy {
+		evals[i] = pkg.eval
+	}
+	return evals
 }
 
 // EnsureImportedBy ensures that importer is recorded as a user of

@@ -18,7 +18,6 @@ import (
 	"errors"
 	"fmt"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/eval"
@@ -215,7 +214,7 @@ func (f *standaloneFile) reload() error {
 
 	f.file.setSyntax(syntax)
 	f.file.ensureUser(f, err)
-	f.definitions = eval.New(ast.ImportPath{}, nil, nil, nil, syntax)
+	f.definitions = eval.New(eval.Config{}, syntax)
 	w.debugLogf("%v Reloaded", f)
 	return nil
 }

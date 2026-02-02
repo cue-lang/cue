@@ -100,30 +100,21 @@ func (s *Standalone) deleteFile(uri protocol.DocumentURI) {
 // requirements are not met, then the file remains as a standalone
 // file.
 func (s *Standalone) subtractModulesAndPackages() error {
-	for uri, sfile := range s.files {
+	for fileUri, sfile := range s.files {
 		if pkgName := sfile.file.syntax.PackageName(); pkgName == "" {
 			continue
 		}
 
-		m, err := s.workspace.FindModuleForFile(uri)
+		m, err := s.workspace.FindModuleForFile(fileUri)
 		if err != nil && err != errModuleNotFound {
 			return err
 		} else if m != nil {
-			ip, dirUris, err := m.FindImportPathForFile(uri)
+			ip, dirUris, err := m.FindImportPathForFile(fileUri)
 			if err != nil || ip == nil || len(dirUris) == 0 {
 				continue
 			}
 			sfile.delete()
-			pkg := m.EnsurePackage(*ip, dirUris)
-			pkg.markFileDirty(uri)
-			if len(dirUris) == 1 {
-				for _, pkg := range m.DescendantPackages(*ip) {
-					if pkg.importPath == *ip {
-						continue
-					}
-					pkg.markFileDirty(uri)
-				}
-			}
+			m.EnsurePackage(*ip, dirUris).markFileDirty(fileUri)
 		}
 	}
 	return nil
@@ -206,14 +197,20 @@ func (f *standaloneFile) reload() error {
 	}
 
 	syntax, _, err := fh.ReadCUE(standaloneParserConfig)
+	file := f.file
+	file.setSyntax(syntax)
+	if err == nil {
+		file.ensureUser(f)
+	} else {
+		file.ensureUser(f, err)
+	}
+
 	if syntax == nil {
 		w.debugLogf("%v Error when reloading: %v", f, err)
 		f.delete()
 		return ErrBadFile
 	}
 
-	f.file.setSyntax(syntax)
-	f.file.ensureUser(f, err)
 	f.definitions = eval.New(eval.Config{}, syntax)
 	w.debugLogf("%v Reloaded", f)
 	return nil

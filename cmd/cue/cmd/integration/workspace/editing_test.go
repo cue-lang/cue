@@ -226,10 +226,12 @@ z: 1
 				// We should first see a reload of x/a, which will fail, and the package will be deleted.
 				LogExactf(protocol.Debug, 2, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/a@v0]", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=mod.example/x/a@v0 Deleted", rootURI),
-				// Both packages should get reloaded in one go:
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/a/d@v0:e mod.example/x/a@v0:e]", rootURI),
-				LogExactf(protocol.Debug, 2, false, "Package dirs=[%v/a/d] importPath=mod.example/x/a/d@v0:e Reloaded", rootURI),
+				// We then see the new ancestor import (x/a:e) gets loaded:
+				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/a@v0:e]", rootURI),
 				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=mod.example/x/a@v0:e Reloaded", rootURI),
+				// And then it should discover that the descendant package needs reloading:
+				LogExactf(protocol.Debug, 2, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/a/d@v0:e]", rootURI),
+				LogExactf(protocol.Debug, 2, false, "Package dirs=[%v/a/d] importPath=mod.example/x/a/d@v0:e Reloaded", rootURI),
 			)
 		})
 	})

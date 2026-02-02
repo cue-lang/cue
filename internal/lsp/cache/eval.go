@@ -291,8 +291,7 @@ func (w *Workspace) FileEvaluatorForURI(fileUri protocol.DocumentURI, loadAllPkg
 
 	if mod != nil {
 		if loadAllPkgsInMod {
-			mod.loadAllPackages()
-			w.reloadPackages()
+			mod.loadAllCuePackages()
 		}
 		ip, _, _ := mod.FindImportPathForFile(fileUri)
 		if ip != nil {

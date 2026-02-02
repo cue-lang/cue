@@ -67,10 +67,6 @@ type Package struct {
 
 	// mutable fields:
 
-	// modpkg is the [modpkgload.Package] for this package, as loaded
-	// by [modpkgload.LoadPackages].
-	modpkg *modpkgload.Package
-
 	// importedBy contains the packages that directly import this
 	// package.
 	importedBy []*Package
@@ -84,6 +80,9 @@ type Package struct {
 	// eval for the files in this package. This is updated
 	// whenever the package status transitions to splendid.
 	eval *eval.Evaluator
+
+	// files contains the files that make up this package.
+	files map[protocol.DocumentURI]*File
 }
 
 // newPackage creates a new [Package] and adds it to the module.
@@ -111,12 +110,8 @@ func (pkg *Package) encloses(file protocol.DocumentURI) bool {
 
 // activeFilesAndDirs implements [packageOrModule]
 func (pkg *Package) activeFilesAndDirs(files map[protocol.DocumentURI][]packageOrModule, dirs map[protocol.DocumentURI]struct{}) {
-	if pkg.modpkg == nil {
-		return
-	}
 	root := pkg.module.rootURI
-	for _, file := range pkg.modpkg.Files() {
-		fileUri := protocol.DocumentURI(string(root) + "/" + file.FilePath)
+	for fileUri := range pkg.files {
 		files[fileUri] = append(files[fileUri], pkg)
 		// the root will already be in dirs - the module will have seen
 		// to that:
@@ -135,37 +130,38 @@ func (pkg *Package) markFileDirty(file protocol.DocumentURI) {
 	pkg.markDirty()
 }
 
-// markDirty marks the current package as being dirty, and resets both
-// its own definitions and the definitions of every upstream and
-// downstream package, recursively in both directions.
+// markDirty marks the current package as being dirty.
 func (pkg *Package) markDirty() {
-	if pkg.isDirty {
-		return
+	pkg.isDirty = true
+}
+
+// resetEval resets the package's own evaluator. If recursive is true,
+// it also resets the evaluators of every upstream and downstream
+// evaluator that could possibly contain objects (frames, navigables
+// etc) from this package's evaluator.
+func (pkg *Package) resetEval(recursive bool) {
+	if pkg.eval != nil {
+		pkg.eval.Reset()
 	}
 
-	pkg.isDirty = true
-	pkg.resetDefinitions()
+	if !recursive {
+		return
+	}
 
 	// upstream - packges we import
 	worklist := pkg.imports
 	for len(worklist) > 0 {
-		pkg := worklist[0]
-		pkg.resetDefinitions()
-		worklist = append(worklist[1:], pkg.imports...)
+		importedPkg := worklist[0]
+		importedPkg.resetEval(false)
+		worklist = append(worklist[1:], importedPkg.imports...)
 	}
 
 	// downstream - packages that import us
 	worklist = pkg.importedBy
 	for len(worklist) > 0 {
 		pkg := worklist[0]
-		pkg.resetDefinitions()
+		pkg.resetEval(false)
 		worklist = append(worklist[1:], pkg.importedBy...)
-	}
-}
-
-func (pkg *Package) resetDefinitions() {
-	if pkg.eval != nil {
-		pkg.eval.Reset()
 	}
 }
 
@@ -174,18 +170,28 @@ func (pkg *Package) delete() {
 	m := pkg.module
 	delete(m.packages, pkg.importPath)
 
+	pkg.resetEval(true)
+
+	files := pkg.files
+	imports := pkg.imports
+
+	// wipe out our own state so that anyone with a reference back to
+	// us will act on empty state if they call any methods on us.
+	pkg.files = nil
+	pkg.imports = nil
+	pkg.importedBy = nil
+
 	w := m.workspace
-	if modpkg := pkg.modpkg; modpkg != nil {
-		for _, file := range modpkg.Files() {
-			fileUri := m.rootURI + protocol.DocumentURI("/"+file.FilePath)
-			w.standalone.reloadFile(fileUri)
-			w.GetFile(fileUri).removeUser(pkg)
-		}
+	for fileUri := range files {
+		w.standalone.reloadFile(fileUri)
+		w.GetFile(fileUri).removeUser(pkg)
 	}
-	for _, importedPkg := range pkg.imports {
+
+	// upstream - packages we import
+	for _, importedPkg := range imports {
 		importedPkg.RemoveImportedBy(pkg)
 	}
-	pkg.imports = nil
+
 	w.debugLogf("%v Deleted", pkg)
 	w.invalidateActiveFilesAndDirs()
 }
@@ -211,16 +217,14 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	}
 	w.debugLogf("%v Reloaded", pkg)
 
-	oldModpkg := pkg.modpkg
-	pkg.modpkg = modpkg
+	oldFilesSet := pkg.files
 	pkg.isDirty = false
 
-	w.invalidateActiveFilesAndDirs()
+	pkg.resetEval(true)
 
 	for _, importedPkg := range pkg.imports {
 		importedPkg.RemoveImportedBy(pkg)
 	}
-	pkg.imports = pkg.imports[:0]
 
 	importCanonicalisation := make(map[string]ast.ImportPath)
 	importCanonicalisation[modpkg.ImportPath()] = pkg.importPath
@@ -241,31 +245,37 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	}
 	pkg.imports = slices.Clip(pkg.imports)
 
-	currentFiles := make(map[protocol.DocumentURI]struct{})
-	files := modpkg.Files()
-	astFiles := make([]*ast.File, len(files))
-	for i, file := range files {
-		astFiles[i] = file.Syntax
-		fileUri := m.rootURI + protocol.DocumentURI("/"+file.FilePath)
+	modpkgFiles := modpkg.Files()
+	evalASTs := make([]*ast.File, len(modpkgFiles))
+	filesSet := make(map[protocol.DocumentURI]*File, len(modpkgFiles))
+
+	for i, modpkgFile := range modpkgFiles {
+		evalASTs[i] = modpkgFile.Syntax
+		fileUri := m.rootURI + protocol.DocumentURI("/"+modpkgFile.FilePath)
 		delete(m.dirtyFiles, fileUri)
-		currentFiles[fileUri] = struct{}{}
-		f := w.ensureFile(fileUri)
-		if file.SyntaxError == nil {
-			f.ensureUser(pkg)
-		} else {
-			f.ensureUser(pkg, file.SyntaxError)
+
+		file := w.ensureFile(fileUri)
+		filesSet[fileUri] = file
+		syntax := modpkgFile.Syntax
+		file.setSyntax(syntax)
+
+		var errs []error
+		if modpkgFile.SyntaxError != nil {
+			errs = append(errs, modpkgFile.SyntaxError)
 		}
-		f.setSyntax(file.Syntax)
+
+		file.ensureUser(pkg, errs...)
 		w.standalone.deleteFile(fileUri)
 	}
-	if oldModpkg != nil {
-		for _, file := range oldModpkg.Files() {
-			fileUri := m.rootURI + protocol.DocumentURI("/"+file.FilePath)
-			if _, found := currentFiles[fileUri]; !found {
-				w.GetFile(fileUri).removeUser(pkg)
-			}
+
+	for fileUri, file := range oldFilesSet {
+		if _, found := filesSet[fileUri]; !found {
+			file.removeUser(pkg)
 		}
 	}
+	pkg.files = filesSet
+
+	w.invalidateActiveFilesAndDirs()
 
 	config := eval.Config{
 		IP:                     pkg.importPath,
@@ -276,7 +286,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 
 	// eval.New does almost no work - calculation of resolutions is
 	// done lazily. So no need to launch go-routines here.
-	pkg.eval = eval.New(config, astFiles...)
+	pkg.eval = eval.New(config, evalASTs...)
 
 	return nil
 }

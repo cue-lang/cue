@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"iter"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -257,29 +258,27 @@ func (m *Module) EnsurePackage(ip ast.ImportPath, dirUris []protocol.DocumentURI
 	return pkg
 }
 
-// DescendantPackages returns all the existing loaded packages within
-// this module that correspond to the given import path, or would
-// include the import path's files due to the ancestor-import
-// mechanism. The ancestor-import mechanism is not available for the
-// "old module" system, so only call this unless you know the import
-// path corresponds to the new module system.
+// descendantCuePackages returns all the existing loaded Cue packages
+// within this module that would include the given import path's
+// package's files due to the ancestor-import mechanism. The
+// ancestor-import mechanism is not available for the "old module"
+// system, so only call this unless you know the import path
+// corresponds to the new module system.
 //
 // This method only returns existing packages; it does not create any
 // new packages.
-func (m *Module) DescendantPackages(ip ast.ImportPath) []*Package {
-	var pkgs []*Package
-	pkg, found := m.packages[ip]
-	if found {
-		pkgs = append(pkgs, pkg)
-	}
-	prefix := ip.Path + "/"
-	for _, pkg := range m.packages {
-		pkgIp := pkg.importPath
-		if pkgIp.Qualifier == ip.Qualifier && strings.HasPrefix(pkgIp.Path, prefix) {
-			pkgs = append(pkgs, pkg)
+func (m *Module) descendantCuePackages(ip ast.ImportPath) iter.Seq[*Package] {
+	return func(yield func(*Package) bool) {
+		prefix := ip.Path + "/"
+		for _, pkg := range m.packages {
+			pkgIp := pkg.importPath
+			if pkgIp.Qualifier == ip.Qualifier && strings.HasPrefix(pkgIp.Path, prefix) {
+				if !yield(pkg) {
+					return
+				}
+			}
 		}
 	}
-	return pkgs
 }
 
 // loadDirtyPackages identifies all dirty packages within the module,
@@ -309,10 +308,9 @@ func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
 	// 2. Load all the packages found
 	modPath := m.modFile.QualifiedModule()
 	reqs := modrequirements.NewRequirements(modPath, w.registry, m.modFile.DepVersions(), m.modFile.DefaultMajorVersions())
-	rootUri := m.rootURI
 	ctx := context.Background()
 	loc := module.SourceLoc{
-		FS:  w.overlayFS.IoFS(rootUri.Path()),
+		FS:  w.overlayFS.IoFS(m.rootURI.Path()),
 		Dir: ".", // NB can't be ""
 	}
 	// Determinism in log messages:
@@ -333,12 +331,12 @@ func (m *Module) activeFilesAndDirs(files map[protocol.DocumentURI][]packageOrMo
 	}
 }
 
-// loadAllPackages looks for all regular cue files within the module's
+// loadAllCuePackages looks for all regular cue files within the module's
 // root directory and if they're not already loaded, it attempts to
 // load them. Note that it ignores files with no package declaration;
 // it does not (currently) treat load them as standalone files.
-func (m *Module) loadAllPackages() {
-	files, _ := m.workspace.activeFilesAndDirs()
+func (m *Module) loadAllCuePackages() {
+	activeFiles, _ := m.workspace.activeFilesAndDirs()
 
 	var toLoad []protocol.DocumentURI
 	rootPath := m.rootURI.Path()
@@ -348,34 +346,33 @@ func (m *Module) loadAllPackages() {
 			return err
 		}
 		// Do not enter nested modules.
-		if d.Type().IsDir() {
+		if d.IsDir() {
 			info, err := fs.Stat(fsys, p+"/cue.mod/module.cue")
 			if err == nil && !info.IsDir() {
 				return fs.SkipDir
 			}
-		}
-		if d.Type().IsRegular() && strings.HasSuffix(p, ".cue") {
+
+		} else if strings.HasSuffix(p, ".cue") {
 			p = filepath.Join(rootPath, filepath.FromSlash(p))
-			uri := protocol.URIFromPath(p)
-			if _, found := files[uri]; !found {
-				toLoad = append(toLoad, uri)
+			fileUri := protocol.URIFromPath(p)
+			if _, found := activeFiles[fileUri]; !found {
+				toLoad = append(toLoad, fileUri)
 			}
 		}
 		return nil
 	})
 
-	for _, uri := range toLoad {
-		ip, dirUris, err := m.FindImportPathForFile(uri)
+	reload := false
+	for _, fileUri := range toLoad {
+		ip, dirUris, err := m.FindImportPathForFile(fileUri)
 		if err != nil || ip == nil || len(dirUris) == 0 {
 			continue
 		}
-		pkg := m.EnsurePackage(*ip, dirUris)
-		pkg.markFileDirty(uri)
-		if len(dirUris) == 1 { // i.e. the new module system is in use
-			for _, pkg := range m.DescendantPackages(pkg.importPath) {
-				pkg.markFileDirty(uri)
-			}
-		}
+		m.EnsurePackage(*ip, dirUris).markFileDirty(fileUri)
+		reload = true
+	}
+	if reload {
+		m.workspace.reloadPackages()
 	}
 }
 

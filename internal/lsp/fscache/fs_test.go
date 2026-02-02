@@ -3,6 +3,7 @@ package fscache_test
 import (
 	iofs "io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -167,6 +168,68 @@ func TestOverlayFS(t *testing.T) {
 	onDiskFiles = append(slices.Delete(onDiskFiles, 2, 3), extraFiles...)
 	err = fstest.TestFS(fs, onDiskFiles...)
 	qt.Assert(t, qt.IsNil(err))
+}
+
+func TestConvertToCueFS(t *testing.T) {
+	now := time.Now()
+	dir := t.TempDir()
+	onDiskFiles := map[string]string{
+		"foo/bar/a.json": `{"field": true}`,
+		"foo/bar/b.yaml": `field: false`,
+		"foo/c.txt":      `no chance`,
+	}
+	for f, content := range onDiskFiles {
+		absPath := filepath.Join(dir, filepath.FromSlash(f))
+		writeFile(t, absPath, content)
+	}
+
+	fs := fscache.NewOverlayFS(fscache.NewCUECachedFS())
+	iofs := fs.IoFS(dir)
+
+	for f, content := range onDiskFiles {
+		dir := path.Dir(f)
+		isCueable, err := iofs.IsDirWithCUEFiles(dir)
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(isCueable, path.Base(dir) == "bar"))
+
+		syntax, err := iofs.ReadCUEFile(f, parser.NewConfig())
+		qt.Assert(t, qt.IsNil(err))
+
+		qt.Assert(t, qt.Equals(syntax != nil, isCueable))
+		if syntax != nil {
+			tokFile := syntax.Pos().File()
+			qt.Assert(t, qt.IsNotNil(tokFile))
+			qt.Assert(t, qt.DeepEquals(tokFile.Content(), []byte(content)))
+		}
+	}
+
+	// create extra file in the overlay only, that adds at .cue file to
+	// the foo directory.
+	extraPath := "foo/d.cue"
+	extraPathUri := protocol.URIFromPath(path.Join(dir, extraPath))
+	err := fs.Update(func(txn *fscache.UpdateTxn) error {
+		_, err := txn.Set(extraPathUri, []byte(`field: yes`), now, 0)
+		return err
+	})
+	qt.Assert(t, qt.IsNil(err))
+
+	dir = path.Dir(extraPath)
+	isCueable, err := iofs.IsDirWithCUEFiles(dir)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.IsTrue(isCueable))
+	syntax, err := iofs.ReadCUEFile(extraPath, parser.NewConfig())
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.IsNotNil(syntax))
+
+	// delete that extra file
+	err = fs.Update(func(txn *fscache.UpdateTxn) error {
+		return txn.Delete(extraPathUri)
+	})
+	qt.Assert(t, qt.IsNil(err))
+	dir = path.Dir(extraPath)
+	isCueable, err = iofs.IsDirWithCUEFiles(dir)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.IsFalse(isCueable))
 }
 
 func setup(t *testing.T) (dir string, onDiskFiles, onDiskFilesAbs []string) {

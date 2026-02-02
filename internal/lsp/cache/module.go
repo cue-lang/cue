@@ -272,9 +272,36 @@ func (m *Module) descendantCuePackages(ip ast.ImportPath) iter.Seq[*Package] {
 		prefix := ip.Path + "/"
 		for _, pkg := range m.packages {
 			pkgIp := pkg.importPath
-			if pkgIp.Qualifier == ip.Qualifier && strings.HasPrefix(pkgIp.Path, prefix) {
+			if pkg.isCue && pkgIp.Qualifier == ip.Qualifier && strings.HasPrefix(pkgIp.Path, prefix) {
 				if !yield(pkg) {
 					return
+				}
+			}
+		}
+	}
+}
+
+// ascendantCuePackages returns all existing loaded Cue packages
+// within this module that would be able to embed the given
+// package. This requires that their "leaf" directory encloses the
+// "leaf" directory of the given pkg.
+//
+// This method only returns existing packages; it does not create any
+// new packages.
+func (m *Module) ascendantCuePackages(pkg *Package) iter.Seq[*Package] {
+	return func(yield func(*Package) bool) {
+		for _, p := range m.packages {
+			if p == pkg || !p.isCue {
+				continue
+			}
+			for _, pDir := range p.dirURIs {
+				for _, pkgDir := range pkg.dirURIs {
+					if pDir.Encloses(pkgDir) {
+						if !yield(p) {
+							return
+						}
+						break
+					}
 				}
 			}
 		}

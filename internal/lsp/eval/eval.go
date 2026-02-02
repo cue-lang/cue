@@ -352,9 +352,7 @@ type EvaluatorForPackageFunc = func(importPath ast.ImportPath) *Evaluator
 type ImportersFunc = func() []*Evaluator
 
 type Evaluator struct {
-	// ip is the canonical (with major-version suffix) import path for
-	// this package.
-	ip ast.ImportPath
+	config Config
 	// pkgFrame is the top level (or root) lexical scope
 	pkgFrame *frame
 	// pkgDecls contains every package declaration with the files
@@ -363,12 +361,13 @@ type Evaluator struct {
 	pkgDecls *navigable
 	// byFilename maps file names to [FileEvaluator]
 	byFilename map[string]*FileEvaluator
-	// forPackage is a callback function to resolve imported packages.
-	forPackage EvaluatorForPackageFunc
-	// pkgImporters is a callback function to fetch the evaluator for
-	// all packages that directly import this package.
-	pkgImporters ImportersFunc
-	// importCanonicalisation provides canonical (with major-version
+}
+
+type Config struct {
+	// IP is the canonical (with major-version suffix) import path for
+	// this package.
+	IP ast.ImportPath
+	// ImportCanonicalisation provides canonical (with major-version
 	// suffix) import paths for every import spec within the current
 	// package. The LSP always uses canonical import paths, but
 	// individual cue files can have import statements that (1) elide
@@ -379,7 +378,21 @@ type Evaluator struct {
 	// import the same package, but the path can differ); (2) searching
 	// for import specs that have paths which refer to a particular
 	// ImportPath.
-	importCanonicalisation map[string]ast.ImportPath
+	ImportCanonicalisation map[string]ast.ImportPath
+	// ForPackage is a callback function to resolve imported packages.
+	ForPackage EvaluatorForPackageFunc
+	// PkgImporters is a callback function to fetch the evaluator for
+	// all packages that directly import this package.
+	PkgImporters ImportersFunc
+}
+
+func (c *Config) init() {
+	if c.ForPackage == nil {
+		c.ForPackage = func(importPath ast.ImportPath) *Evaluator { return nil }
+	}
+	if c.PkgImporters == nil {
+		c.PkgImporters = func() []*Evaluator { return nil }
+	}
 }
 
 // New creates and performs initial configuration of a new [Evaluator]
@@ -391,19 +404,11 @@ type Evaluator struct {
 //
 // For the ip, importCanonicalisation, forPackage, and pkgImporters
 // parameters, see the corresponding fields in [Definitions].
-func New(ip ast.ImportPath, importCanonicalisation map[string]ast.ImportPath, forPackage EvaluatorForPackageFunc, pkgImporters ImportersFunc, files ...*ast.File) *Evaluator {
-	if forPackage == nil {
-		forPackage = func(importPath ast.ImportPath) *Evaluator { return nil }
-	}
-	if pkgImporters == nil {
-		pkgImporters = func() []*Evaluator { return nil }
-	}
+func New(config Config, files ...*ast.File) *Evaluator {
+	config.init()
 	evaluator := &Evaluator{
-		ip:                     ip,
-		importCanonicalisation: importCanonicalisation,
-		byFilename:             make(map[string]*FileEvaluator, len(files)),
-		forPackage:             forPackage,
-		pkgImporters:           pkgImporters,
+		config:     config,
+		byFilename: make(map[string]*FileEvaluator, len(files)),
 	}
 	evaluator.Reset()
 
@@ -507,7 +512,7 @@ func (e *Evaluator) parseImportSpec(spec *ast.ImportSpec) *ast.ImportPath {
 	if err != nil {
 		return nil
 	}
-	if ip, found := e.importCanonicalisation[str]; found {
+	if ip, found := e.config.ImportCanonicalisation[str]; found {
 		return &ip
 	}
 	// modimports/modpkgload calls Canonical on import paths, so if
@@ -516,7 +521,7 @@ func (e *Evaluator) parseImportSpec(spec *ast.ImportSpec) *ast.ImportPath {
 	// have been removed. So, parse the path, find the canonical form,
 	// and then check again to see if we find anything:
 	ip := ast.ParseImportPath(str).Canonical()
-	if ip, found := e.importCanonicalisation[ip.String()]; found {
+	if ip, found := e.config.ImportCanonicalisation[ip.String()]; found {
 		return &ip
 	}
 	return &ip
@@ -1031,8 +1036,17 @@ func usages(navsWorklist []*navigable) {
 		if isExported {
 			// For all the packages that import us, find where usages of
 			// this package appears.
-			ip := nav.evaluator.ip
-			for _, remotePkg := range nav.evaluator.pkgImporters() {
+			//
+			// Yes, after booting the remotePkg, our pkg decls, will be
+			// "usedBy" the relevant import spec in remotePkg. And yes,
+			// those import specs themselves would be usedBy paths that
+			// make use of the import. But only after those paths have
+			// been evaluated. So the whole point is to figure out which
+			// parts of the remotePkg should be evaluated, in order to
+			// populate the usedBy field of the navs we care about (which
+			// is not necessarily the import spec anyway).
+			ip := nav.evaluator.config.IP
+			for _, remotePkg := range nav.evaluator.config.PkgImporters() {
 				navsWorklist = append(navsWorklist, remotePkg.initialNavsForImport(ip)...)
 			}
 		}
@@ -1672,7 +1686,7 @@ func (f *frame) eval() {
 				// ImportSpec, we lookup the package imported and add a
 				// resolution to them.
 				ip := pkgEval.parseImportSpec(node)
-				remotePkgEvaluator := pkgEval.forPackage(*ip)
+				remotePkgEvaluator := pkgEval.config.ForPackage(*ip)
 				if remotePkgEvaluator != nil {
 					// The pkg exists. Booting it means that its
 					// pkgDecls have frames which are the
@@ -1690,9 +1704,9 @@ func (f *frame) eval() {
 					// If we really need to, we can tell that the import
 					// was successful or not from its evaluator:
 					//
-					// 1. a bad import will have an empty ip (importPath) field
+					// 1. a bad import will have an empty IP (importPath) field
 					// 2. a bad import will have pkgDecls with no frames
-					remotePkgEvaluator = New(ast.ImportPath{}, nil, nil, nil)
+					remotePkgEvaluator = New(Config{})
 				}
 
 				// DefinitionsForOffset always traverses a path, so here
@@ -1804,8 +1818,7 @@ func (f *frame) eval() {
 			//
 			//	[a, ...b] & [...c]
 			//
-			// b and c are not unified. So we do not use
-			// ensureNavigableBinding, as that would merge the ellipses.
+			// b and c are not unified.
 			childFr.navigable.name = "__..."
 			f.ellipses = append(f.ellipses, childFr.navigable)
 
@@ -2090,7 +2103,6 @@ func (f *frame) newBinding(key *ast.Ident, unprocessed ast.Node) *frame {
 	name := key.Name
 	f.appendBinding(name, childFr)
 	if !strings.HasPrefix(name, "__") {
-		// Same logic as in [frame.ensureNavigableBinding] above;
 		expr := &fieldDeclExpr{
 			key:        key,
 			keyIdent:   key,

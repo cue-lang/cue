@@ -284,7 +284,7 @@ func TestStore_Make_RepeatedCalls(t *testing.T) {
 
 	// Make the same value many times
 	var values []anyunique.Handle[string]
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		values = append(values, s.Make("repeated"))
 	}
 
@@ -352,14 +352,14 @@ func TestStore_Make_StressTest(t *testing.T) {
 	n := 10000
 	uniqueMap := make(map[int]anyunique.Handle[int])
 
-	for i := 0; i < n; i++ {
+	for i := range n {
 		u := s.Make(i)
 		uniqueMap[i] = u
 		qt.Assert(t, qt.Equals(u.Value(), i))
 	}
 
 	// Verify all values are stored correctly and re-making gives equal results
-	for i := 0; i < n; i++ {
+	for i := range n {
 		u := s.Make(i)
 		qt.Assert(t, qt.Equals(u, uniqueMap[i]))
 	}
@@ -497,7 +497,7 @@ func TestStore_Make_AlternatingPatterns(t *testing.T) {
 	s := anyunique.New[string](stringHasher{})
 
 	// Alternate between two values many times
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		u1 := s.Make("a")
 		u2 := s.Make("b")
 		u3 := s.Make("a")

@@ -447,33 +447,34 @@ func DebugStr(x interface{}) (out string) {
 		return out
 
 	case *ast.Field:
-		out := DebugStr(v.Label)
+		var out strings.Builder
+		out.WriteString(DebugStr(v.Label))
 		if v.Alias != nil {
-			out += "~"
+			out.WriteString("~")
 			if v.Alias.Label != nil {
 				// Dual form
-				out += "("
-				out += DebugStr(v.Alias.Label)
-				out += ","
-				out += DebugStr(v.Alias.Field)
-				out += ")"
+				out.WriteString("(")
+				out.WriteString(DebugStr(v.Alias.Label))
+				out.WriteString(",")
+				out.WriteString(DebugStr(v.Alias.Field))
+				out.WriteString(")")
 			} else {
 				// Simple form
-				out += DebugStr(v.Alias.Field)
+				out.WriteString(DebugStr(v.Alias.Field))
 			}
 		}
 		if t := v.Constraint; t != token.ILLEGAL {
-			out += t.String()
+			out.WriteString(t.String())
 		}
 		if v.Value != nil {
-			out += ": "
-			out += DebugStr(v.Value)
+			out.WriteString(": ")
+			out.WriteString(DebugStr(v.Value))
 			for _, a := range v.Attrs {
-				out += " "
-				out += DebugStr(a)
+				out.WriteString(" ")
+				out.WriteString(DebugStr(a))
 			}
 		}
-		return out
+		return out.String()
 
 	case *ast.Attribute:
 		return v.Text
@@ -578,12 +579,12 @@ func DebugStr(x interface{}) (out string) {
 		if len(v) == 0 {
 			return ""
 		}
-		out := ""
+		var out strings.Builder
 		for _, c := range v {
-			out += DebugStr(c)
-			out += " "
+			out.WriteString(DebugStr(c))
+			out.WriteString(" ")
 		}
-		return out
+		return out.String()
 
 	case []ast.Expr:
 		if len(v) == 0 {

@@ -6,8 +6,9 @@ package integration
 
 import (
 	"fmt"
+	"maps"
 	"regexp"
-	"sort"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -200,9 +201,7 @@ func ReadDiagnostics(fileName string, into *protocol.PublishDiagnosticsParams) E
 func ReadAllDiagnostics(into *map[string]*protocol.PublishDiagnosticsParams) Expectation {
 	check := func(s State) Verdict {
 		allDiags := make(map[string]*protocol.PublishDiagnosticsParams)
-		for name, diags := range s.diagnostics {
-			allDiags[name] = diags
-		}
+		maps.Copy(allDiags, s.diagnostics)
 		*into = allDiags
 		return Met
 	}
@@ -311,9 +310,7 @@ func (e *Env) DoneDiagnosingChanges() Expectation {
 	}
 
 	// Sort for stability.
-	sort.Slice(expected, func(i, j int) bool {
-		return expected[i] < expected[j]
-	})
+	slices.Sort(expected)
 
 	var all []Expectation
 	for _, source := range expected {

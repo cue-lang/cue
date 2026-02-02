@@ -7,6 +7,7 @@ package settings
 import (
 	"context"
 	"fmt"
+	"maps"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -709,9 +710,7 @@ func (o *Options) Clone() *Options {
 	// and UserOptions can be modified.
 	copyStringMap := func(src map[string]bool) map[string]bool {
 		dst := make(map[string]bool)
-		for k, v := range src {
-			dst[k] = v
-		}
+		maps.Copy(dst, src)
 		return dst
 	}
 	result.Analyses = copyStringMap(o.Analyses)
@@ -729,9 +728,7 @@ func (o *Options) Clone() *Options {
 
 	copyAnalyzerMap := func(src map[string]*Analyzer) map[string]*Analyzer {
 		dst := make(map[string]*Analyzer)
-		for k, v := range src {
-			dst[k] = v
-		}
+		maps.Copy(dst, src)
 		return dst
 	}
 	result.DefaultAnalyzers = copyAnalyzerMap(o.DefaultAnalyzers)
@@ -921,9 +918,7 @@ func (o *Options) set(name string, value interface{}, seen map[string]struct{}) 
 			if o.Codelenses == nil {
 				o.Codelenses = make(map[string]bool)
 			}
-			for lens, enabled := range lensOverrides {
-				o.Codelenses[lens] = enabled
-			}
+			maps.Copy(o.Codelenses, lensOverrides)
 		}
 
 	case "staticcheck":

@@ -288,7 +288,7 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 
 	// Slow path for processing all disjunctions. Do not use `range` in case
 	// evaluation adds more disjunctions.
-	for i := 0; i < len(a); i++ {
+	for i := range a {
 		d := &a[i]
 		n.nextDisjunction(i, len(a), d.holeID)
 

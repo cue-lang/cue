@@ -261,7 +261,7 @@ func BenchmarkUnifyAPI(b *testing.B) {
 		b.StopTimer()
 		ctx := cuecontext.New()
 		v := ctx.CompileString("")
-		for j := 0; j < 500; j++ {
+		for j := range 500 {
 			if j == 400 {
 				b.StartTimer()
 			}

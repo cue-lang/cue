@@ -481,12 +481,12 @@ func Test(t *testing.T) {
 		if strings.HasPrefix(line, "#") || line == "" {
 			continue
 		}
-		i := strings.Index(line, ":")
-		if i < 0 {
+		before, after, ok := strings.Cut(line, ":")
+		if !ok {
 			t.Fatalf("missing colon: %q", line)
 		}
-		key := strings.TrimSpace(line[:i])
-		val := strings.TrimSpace(line[i+1:])
+		key := strings.TrimSpace(before)
+		val := strings.TrimSpace(after)
 		if key == "" {
 			t.Fatalf("missing key: %q", line)
 		}

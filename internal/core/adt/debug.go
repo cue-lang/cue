@@ -491,7 +491,7 @@ func indentOnNewline(w io.Writer, level int) {
 }
 
 func indent(w io.Writer, level int) {
-	for i := 0; i < level; i++ {
+	for range level {
 		io.WriteString(w, "   ")
 	}
 }

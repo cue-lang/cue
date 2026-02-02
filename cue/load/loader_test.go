@@ -855,7 +855,7 @@ func TestLoadInstancesConcurrent(t *testing.T) {
 
 func race(t *testing.T, f func() error) {
 	var wg sync.WaitGroup
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		wg.Add(1)
 		go func() {
 			if err := f(); err != nil {

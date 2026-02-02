@@ -369,3 +369,15 @@ func InCIDR(ip, cidr cue.Value) (bool, error) {
 
 	return prefix.Contains(ipAddr), nil
 }
+
+func CompareIP(ip1, ip2 cue.Value) (int, error) {
+	addr1 := netGetIP(ip1)
+	if !addr1.IsValid() {
+		return 0, fmt.Errorf("invalid IP %q", ip1)
+	}
+	addr2 := netGetIP(ip2)
+	if !addr2.IsValid() {
+		return 0, fmt.Errorf("invalid IP %q", ip2)
+	}
+	return addr1.Compare(addr2), nil
+}

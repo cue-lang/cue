@@ -289,6 +289,19 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
+		Name: "CompareIP",
+		Params: []pkg.Param{
+			{Kind: adt.TopKind},
+			{Kind: adt.TopKind},
+		},
+		Result: adt.IntKind,
+		Func: func(c *pkg.CallCtxt) {
+			ip1, ip2 := c.Value(0), c.Value(1)
+			if c.Do() {
+				c.Ret, c.Err = CompareIP(ip1, ip2)
+			}
+		},
+	}, {
 		Name: "PathEscape",
 		Params: []pkg.Param{
 			{Kind: adt.StringKind},

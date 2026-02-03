@@ -16,6 +16,24 @@
       "message": "nit: leave the original line causing an error behind a comment, so we can easily re-add it in the future?",
       "revId": "6e047f26d717ddba40c1a83ba359aa6ffcf17753",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ca0d740_30bc1110",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-02-03T13:41:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77ab1c22_4df2420b",
+      "revId": "6e047f26d717ddba40c1a83ba359aa6ffcf17753",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

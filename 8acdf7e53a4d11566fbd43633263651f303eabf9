@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b4a91a41_d041d7f5",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-02-03T13:35:59Z",
+      "side": 1,
+      "message": "I\u0027ve tweaked the language following a change in approach following our discussion and your proposal. PTAL",
+      "parentUuid": "a6a0697a_4cb0ea82",
+      "revId": "8acdf7e53a4d11566fbd43633263651f303eabf9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f962dc44_6715c4b4",
         "filename": "internal/ci/base/github.cue",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2026-02-03T12:46:55Z",
       "side": 1,
       "message": "as discussed offline - I think this can be done as part of `jobs: [string]:`",
+      "revId": "8acdf7e53a4d11566fbd43633263651f303eabf9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7d5dbdd_2a09bff2",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-02-03T13:35:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f962dc44_6715c4b4",
       "revId": "8acdf7e53a4d11566fbd43633263651f303eabf9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -17,6 +17,24 @@ bashWorkflow: githubactions.#Workflow & {
 	//
 	// https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#defaultsrunshell
 	jobs: [string]: defaults: run: shell: "bash --noprofile --norc -euo pipefail {0}"
+
+	// We want to allow steps in a job to "set value" on the job that contains
+	// them. To allow this for steps that are re-used between jobs, we need a
+	// means of "passing up" values to the containing job.
+	//
+	// We explicitly "pass up" values for certain fields on a job, because it's
+	// otherwise not clear there isn't a cycle (because the job struct defines
+	// the steps field we comprehend over below). For now this is fine because
+	// we only need to "pass up" permissions.
+	jobs: [string]: steps: [...{#job: permissions?: jobInstance.permissions}]
+	let jobInstance = githubactions.#Workflow.#normalJob & {permissions: _}
+
+	// "Copy over" the permissions from any steps that set them to the
+	// containing job
+	for jn, jv in jobs for _, s in jv.steps
+	if s.#job != _|_ if s.#job.permissions != _|_ {
+		jobs: (jn): permissions: s.#job.permissions
+	}
 }
 
 // These are useful for workflows where we use a matrix over different OS runners
@@ -344,6 +362,7 @@ _dispatchTrailerVariable: "github.event.head_commit.message"
 // TODO: enforce that the job to which this belongs has the relevant
 // permission.
 loginCentralRegistry: githubactions.#Step & {
+	#job: permissions: "id-token": "write"
 	name: "Login to CUE registry"
 	uses: "cue-labs/registry-login-action@v1"
 }

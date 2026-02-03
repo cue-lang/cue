@@ -35,7 +35,6 @@ workflows: trybot: _repo.bashWorkflow & {
 
 	jobs: {
 		test: {
-			permissions: "id-token": "write"
 			strategy: {
 				"fail-fast": false
 				matrix: {

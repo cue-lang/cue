@@ -1,6 +1,6 @@
 module: "github.com/cue-lang/tmp/internal/ci"
 language: {
-	version: "v0.13.0"
+	version: "v0.15.0"
 }
 source: {
 	kind: "self"

@@ -1,3 +1,5 @@
+@experiment(explicitopen)
+
 package base
 
 // This file contains aspects principally related to GitHub workflows
@@ -12,11 +14,30 @@ import (
 )
 
 bashWorkflow: githubactions.#Workflow & {
-	// Use a custom default shell that extends the GitHub default to also fail
-	// on access to unset variables.
-	//
-	// https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#defaultsrunshell
-	jobs: [string]: defaults: run: shell: "bash --noprofile --norc -euo pipefail {0}"
+
+	jobs: [string]: {
+		// Use a custom default shell that extends the GitHub default to also fail
+		// on access to unset variables.
+		//
+		// https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#defaultsrunshell
+		defaults: run: shell: "bash --noprofile --norc -euo pipefail {0}"
+
+		// We want to allow steps in a job to define constraints on the job that
+		// contains them. To allow this for steps that are re-used between jobs,
+		// we need a means of a step declaring constraints that should be applied
+		// on the outer structure. And then use a comprehension at the job level
+		// to "lift" the constraints from the steps it contains.
+		//
+		// TODO: for some reason, as a result of either cuelang.org/issue/3594 or
+		// cuelang.org/issue/4079 we can't constrain this field as follows:
+		//
+		// steps: [...{#job: githubactions.#Job}]
+		steps: [...{#job: _}]
+
+		for _, s in steps {
+			s.#job...
+		}
+	}
 }
 
 // These are useful for workflows where we use a matrix over different OS runners
@@ -344,6 +365,7 @@ _dispatchTrailerVariable: "github.event.head_commit.message"
 // TODO: enforce that the job to which this belongs has the relevant
 // permission.
 loginCentralRegistry: githubactions.#Step & {
+	#job: permissions: "id-token": "write"
 	name: "Login to CUE registry"
 	uses: "cue-labs/registry-login-action@v1"
 }

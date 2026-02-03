@@ -38,7 +38,6 @@ workflows: release: _repo.bashWorkflow & {
 		branches: list.Concat([[_repo.testDefaultBranch], _repo.protectedBranchPatterns])
 	}
 	jobs: goreleaser: {
-		permissions: "id-token": "write"
 		"runs-on": _repo.linuxMachine
 		if:        "${{github.repository == '\(_repo.githubRepositoryPath)'}}"
 

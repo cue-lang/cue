@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6a0697a_4cb0ea82",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-03T12:46:55Z",
+      "side": 1,
+      "message": "nit: \"pass up\" sounds to me like \"skip on\" or \"not take advantage of\". perhaps write it as \"thread upwards\" or \"apply upwards\"?",
+      "revId": "8acdf7e53a4d11566fbd43633263651f303eabf9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f962dc44_6715c4b4",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-03T12:46:55Z",
+      "side": 1,
+      "message": "as discussed offline - I think this can be done as part of `jobs: [string]:`",
+      "revId": "8acdf7e53a4d11566fbd43633263651f303eabf9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

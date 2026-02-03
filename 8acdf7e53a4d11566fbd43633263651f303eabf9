@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "79e7ab8b_1f1b8e32",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-03T13:37:29Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b4a91a41_d041d7f5",
+      "revId": "8acdf7e53a4d11566fbd43633263651f303eabf9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f962dc44_6715c4b4",

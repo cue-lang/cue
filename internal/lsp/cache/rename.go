@@ -113,8 +113,13 @@ func (w *Workspace) PrepareRename(tokFile *token.File, fe *eval.FileEvaluator, s
 			continue
 		}
 		if protocol.Intersect(r, posRange) {
+			label := ""
+			if lab, ok := target.(ast.Label); ok {
+				label, _, _ = ast.LabelName(lab)
+			}
 			return &protocol.PrepareRenamePlaceholder{
-				Range: r,
+				Range:       r,
+				Placeholder: label,
 			}
 		}
 	}

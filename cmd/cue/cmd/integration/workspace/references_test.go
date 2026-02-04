@@ -207,6 +207,7 @@ func TestRename(t *testing.T) {
 			Start: protocol.Position{Line: 6, Character: 7},
 			End:   protocol.Position{Line: 6, Character: 10},
 		}))
+		qt.Assert(t, qt.Equals(result.Placeholder, "out"))
 
 		// Now do the rename for real
 		env.Rename(protocol.Location{

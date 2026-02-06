@@ -1,0 +1,99 @@
+# Test that the version must only be a major version, and not a full version.
+cd full-version
+! exec cue export .
+cmp stderr ../expect-stderr-full-version
+
+# Test that the version must come before the package qualifier, not after.
+# TODO: this should give a clear error.
+cd ../qualifier-before
+! exec cue export .
+cmp stderr ../expect-stderr-qualifier-before
+
+# Test that a full version is rejected even with a qualifier after it.
+cd ../full-version-qualifier
+! exec cue export .
+cmp stderr ../expect-stderr-full-version-qualifier
+
+# Test that a version in the qualifier is not treated as a path version.
+# TODO: this should give a clear error.
+cd ../version-in-qualifier
+! exec cue export .
+cmp stderr ../expect-stderr-version-in-qualifier
+
+# Test that qualifier after the version works correctly.
+cd ../qualifier-after
+exec cue export .
+cmp stdout ../expect-stdout-qualifier-after
+
+-- expect-stderr-full-version --
+test.org/full-version@v0: import failed: cannot find package "example.com/main@v0.0.2": malformed import path "example.com/main@v0.0.2": import paths can only contain a major version specifier:
+    ./main.cue:2:8
+-- expect-stderr-qualifier-before --
+test.org/qualifier-before@v0: import failed: cannot find package "example.com/main": no files in package directory with package name "other@v0":
+    ./main.cue:2:8
+-- expect-stderr-full-version-qualifier --
+test.org/full-version-qualifier@v0: import failed: cannot find package "example.com/main@v0.0.2": malformed import path "example.com/main@v0.0.2:other": import paths can only contain a major version specifier:
+    ./main.cue:2:8
+-- expect-stderr-version-in-qualifier --
+test.org/version-in-qualifier@v0: import failed: cannot find package "example.com/main@v0": no files in package directory with package name "other@v1":
+    ./main.cue:2:8
+-- expect-stdout-qualifier-after --
+{
+    "foo": "from other"
+}
+-- full-version/main.cue --
+package main
+import "example.com/main@v0.0.2"
+
+main.foo
+-- full-version/cue.mod/module.cue --
+module: "test.org/full-version"
+language: version: "v0.8.0"
+deps: "example.com/main": v: "v0.0.2"
+-- qualifier-before/main.cue --
+package main
+import "example.com/main:other@v0"
+
+other.foo
+-- qualifier-before/cue.mod/module.cue --
+module: "test.org/qualifier-before"
+language: version: "v0.8.0"
+deps: "example.com/main": v: "v0.0.2"
+-- full-version-qualifier/main.cue --
+package main
+import "example.com/main@v0.0.2:other"
+
+other.foo
+-- full-version-qualifier/cue.mod/module.cue --
+module: "test.org/full-version-qualifier"
+language: version: "v0.8.0"
+deps: "example.com/main": v: "v0.0.2"
+-- version-in-qualifier/main.cue --
+package main
+import "example.com/main@v0:other@v1"
+
+other.foo
+-- version-in-qualifier/cue.mod/module.cue --
+module: "test.org/version-in-qualifier"
+language: version: "v0.8.0"
+deps: "example.com/main": v: "v0.0.2"
+-- qualifier-after/main.cue --
+package main
+import "example.com/main@v0:other"
+
+other
+-- qualifier-after/cue.mod/module.cue --
+module: "test.org/qualifier-after"
+language: version: "v0.8.0"
+deps: "example.com/main": v: "v0.0.2"
+-- _registry/example.com_main_v0.0.2/cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_main_v0.0.2/main.cue --
+package main
+
+-- _registry/example.com_main_v0.0.2/other.cue --
+package other
+
+foo: "from other"

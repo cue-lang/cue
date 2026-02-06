@@ -782,7 +782,7 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	// If the arc has a running state, we must use the cache mechanism
 	// to properly detect and handle cycles.
 	arcState := arc.getState(ctx)
-	if !arc.MultiLet && (b == nil || isCyclePlaceholder(b)) && arcState == nil {
+	if !arc.MultiLet && ((b == nil && arcState == nil) || isCyclePlaceholder(b)) {
 		return arc
 	}
 

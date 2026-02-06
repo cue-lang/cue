@@ -22,44 +22,36 @@ case2: #schema & {
 	id:    "foo"
 }
 -- out/evalalpha --
-Errors:
-case2.subid: invalid value "foo:sub" (out of bound =~"^:sub$"):
-    ./in.cue:8:10
-    ./in.cue:11:9
-    ./in.cue:20:9
-
-Result:
-(_|_){
-  // [eval]
+(struct){
   #schema: (#struct){
     let splits#1 = (_|_){
-      // [cycle] #schema.#ID: invalid interpolation: cycle with field: prefix:
+      // [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
       //     ./in.cue:7:12
-      //     ./in.cue:7:16
+      //     ./in.cue:5:22
     }
     let prefix#2 = (_|_){
       // [incomplete] #schema.prefix: index out of range [0] with length 1:
       //     ./in.cue:5:22
     }
     #ID: (_|_){
-      // [cycle] #schema.#ID: invalid interpolation: cycle with field: prefix:
+      // [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
       //     ./in.cue:7:12
-      //     ./in.cue:7:16
+      //     ./in.cue:5:22
     }
     #SubID: (_|_){
-      // [cycle] #schema.#ID: invalid interpolation: cycle with field: prefix:
+      // [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
       //     ./in.cue:8:12
-      //     ./in.cue:7:16
+      //     ./in.cue:5:22
     }
     id: (_|_){
-      // [cycle] #schema.#ID: invalid interpolation: cycle with field: prefix:
+      // [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
       //     ./in.cue:7:12
-      //     ./in.cue:7:16
+      //     ./in.cue:5:22
     }
     subid: (_|_){
-      // [cycle] #schema.#ID: invalid interpolation: cycle with field: prefix:
+      // [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
       //     ./in.cue:8:12
-      //     ./in.cue:7:16
+      //     ./in.cue:5:22
     }
   }
   case1: (#struct){
@@ -72,30 +64,15 @@ Result:
     #ID: (string){ =~"^foo$" }
     #SubID: (string){ =~"^foo:sub$" }
   }
-  case2: (_|_){
-    // [eval]
-    subid: (_|_){
-      // [eval] case2.subid: invalid value "foo:sub" (out of bound =~"^:sub$"):
-      //     ./in.cue:8:10
-      //     ./in.cue:11:9
-      //     ./in.cue:20:9
+  case2: (#struct){
+    subid: (string){ "foo:sub" }
+    id: (string){ "foo" }
+    let splits#1 = (#list){
+      0: (string){ "foo" }
     }
-    id: (_|_){
-      // [cycle] case2.id: invalid interpolation: cycle with field: prefix:
-      //     ./in.cue:7:12
-      //     ./in.cue:7:16
-    }
-    let splits#1 = (_|_){
-      // [cycle] case2.id: invalid interpolation: cycle with field: prefix:
-      //     ./in.cue:7:12
-      //     ./in.cue:7:16
-    }
-    let prefix#2 = (_|_){
-      // [cycle] case2.id: cycle with field: prefix:
-      //     ./in.cue:7:16
-    }
-    #ID: (string){ =~"^$" }
-    #SubID: (string){ =~"^:sub$" }
+    let prefix#2 = (string){ "foo" }
+    #ID: (string){ =~"^foo$" }
+    #SubID: (string){ =~"^foo:sub$" }
   }
 }
 -- out/compile --

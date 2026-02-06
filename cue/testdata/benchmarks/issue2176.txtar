@@ -58,10 +58,10 @@ output: {
 	"2": (datastream & {marker: length: 14}).marker.position
 }
 -- out/evalalpha/stats --
-Leaks:  327
-Freed:  477
-Reused: 427
-Allocs: 377
+Leaks:  389
+Freed:  415
+Reused: 369
+Allocs: 435
 Retain: 0
 
 Unifications: 476
@@ -91,10 +91,10 @@ diff old new
 -MisalignedConjunct: 1216
 -
 -NumCloseIDs: 12
-+Leaks:  327
-+Freed:  477
-+Reused: 427
-+Allocs: 377
++Leaks:  389
++Freed:  415
++Reused: 369
++Allocs: 435
 +Retain: 0
 +
 +Unifications: 476

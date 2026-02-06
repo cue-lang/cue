@@ -28,6 +28,11 @@ stderr 'package foo.com/bar@v0: v0 is not a valid version to use as an argument;
 ! exec cue vet -d self foo.com/bar@v3.latest data.json
 cmp stderr stderr4-golden
 
+# Check that the package qualifier must come after the version, not before.
+# TODO: this should give a clear error.
+! exec cue export foo.com/bar:baz@v1.5.0
+stderr 'cannot combine scope with file'
+
 -- stdout1-golden --
 {
     "self": "foo.com_v2.1.0/bar"

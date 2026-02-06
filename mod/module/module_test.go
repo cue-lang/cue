@@ -488,6 +488,16 @@ var checkPathTests = []checkPathTest{{
 	modErr: `module path inappropriately contains version`,
 }, {
 	path: `foo.com/bar/baz`,
+}, {
+	// TODO: CheckImportPath should reject a version inside the qualifier.
+	path:    `foo.com/bar:baz@v0`,
+	modErr:  `module path inappropriately contains version`,
+	fileErr: `malformed file path "foo.com/bar:baz@v0": invalid char ':'`,
+}, {
+	// TODO: CheckImportPath should reject a version inside the qualifier.
+	path:    `foo.com/bar@v0:baz@v1`,
+	modErr:  `module path inappropriately contains version`,
+	fileErr: `malformed file path "foo.com/bar@v0:baz@v1": invalid char ':'`,
 }}
 
 func TestCheckPathWithoutVersion(t *testing.T) {

@@ -678,13 +678,13 @@ nextFrame:
 		// paths *after* explicitly testing the key ident of a
 		// fieldDecl.
 		fieldDecl, ok := fr.node.(*fieldDeclExpr)
-		inFieldDecl := ok && withinInclusive(offset, fieldDecl.start, fieldDecl.end)
+		inFieldDecl := ok && token.WithinInclusive(offset, fieldDecl.start, fieldDecl.end)
 		if inFieldDecl {
 			// Only make suggestions if we're really within the field key ident.
 			if keyIdent := fieldDecl.keyIdent; keyIdent != nil {
 				start := keyIdent.Pos()
 				end := keyIdent.End()
-				if withinInclusive(offset, start, end) {
+				if token.WithinInclusive(offset, start, end) {
 					// It's an existing field key ident, we don't care
 					// where the colon is; our suggestions replace the
 					// whole ident.
@@ -800,7 +800,7 @@ nextFrame:
 
 		node := fr.node
 		s, isStruct := node.(*ast.StructLit)
-		if isStruct && s.Lbrace.IsValid() && s.Rbrace.IsValid() && !withinInclusive(offset, s.Lbrace, s.Rbrace) {
+		if isStruct && s.Lbrace.IsValid() && s.Rbrace.IsValid() && !token.WithinInclusive(offset, s.Lbrace, s.Rbrace) {
 			continue
 		}
 
@@ -1549,7 +1549,7 @@ func (f *frame) contains(fe *FileEvaluator, offset int) (r bool) {
 	} else if f.fileEvaluator != fe {
 		return false
 	} else {
-		return withinInclusive(offset, start, end)
+		return token.WithinInclusive(offset, start, end)
 	}
 }
 
@@ -2603,7 +2603,7 @@ func (p *path) definitionsForOffset(offset int) (int, []*navigable) {
 		pc := components[0]
 		start := pc.node.Pos()
 		end := pc.node.End()
-		if withinInclusive(offset, start, end) {
+		if token.WithinInclusive(offset, start, end) {
 			return 0, pc.unexpanded
 		}
 		return -1, nil
@@ -2629,14 +2629,6 @@ func (p *path) definitionsForOffset(offset int) (int, []*navigable) {
 		return -1, nil
 	}
 	return i, components[i+1].unexpanded
-}
-
-// withinInclusive reports whether offset lies within the range start
-// to end, inclusive on both ends. It is up to the caller to ensure
-// that start and end are from the same file, and start is before end,
-// and that offset is appropriate for the file.
-func withinInclusive(offset int, start, end token.Pos) bool {
-	return start.Offset() <= offset && offset <= end.Offset()
 }
 
 // frameStack is used when evaluating comprehensions. It allows a

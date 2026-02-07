@@ -14,10 +14,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 )
 
-func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionParams) ([]protocol.CodeAction, error) {
-	return nil, notImplemented("CodeAction")
-}
-
 func (s *server) CodeLens(ctx context.Context, params *protocol.CodeLensParams) ([]protocol.CodeLens, error) {
 	return nil, notImplemented("CodeLens")
 }

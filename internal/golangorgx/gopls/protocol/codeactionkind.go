@@ -6,6 +6,5 @@ package protocol
 
 // Custom code actions that aren't explicitly stated in LSP
 const (
-	GoTest CodeActionKind = "goTest"
-	// TODO: Add GoGenerate, RegenerateCgo etc.
+	RefactorRewriteConvertToStruct CodeActionKind = "refactor.rewrite.convertToStruct"
 )

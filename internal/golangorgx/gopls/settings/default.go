@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 )
@@ -38,6 +39,11 @@ func DefaultOptions(overrides ...func(*Options)) *Options {
 				HierarchicalDocumentSymbolSupport:          true,
 			},
 			ServerOptions: ServerOptions{
+				SupportedCodeActions: map[file.Kind]map[protocol.CodeActionKind]bool{
+					file.CUE: {
+						protocol.RefactorRewriteConvertToStruct: true,
+					},
+				},
 				SupportedCommands: commands,
 			},
 			UserOptions: UserOptions{

@@ -278,6 +278,14 @@ func toPos(x index) int {
 	return (int(x) << relShift)
 }
 
+// WithinInclusive reports whether offset lies within the range start
+// to end, inclusive on both ends. It is up to the caller to ensure
+// that start and end are from the same file, and start is before end,
+// and that offset is appropriate for the file.
+func WithinInclusive(offset int, start, end Pos) bool {
+	return start.Offset() <= offset && offset <= end.Offset()
+}
+
 // -----------------------------------------------------------------------------
 // File
 

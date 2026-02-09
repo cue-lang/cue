@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22d5e3e7_eea1c10c",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-09T16:32:05Z",
+      "side": 1,
+      "message": "maybe s/does not skip/also dereferences/\n\nTook me a while to comprehend what it said.",
+      "revId": "cec7334fac1cdbb19a85bc8452b4de25e730c5d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

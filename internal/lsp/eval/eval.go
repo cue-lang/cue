@@ -1124,6 +1124,15 @@ func usages(navsWorklist []*navigable) {
 					navsWorklist = append(navsWorklist, use.navigable)
 				}
 			}
+			// Also check if anything that a target resolves to resolves
+			// back to the target. That would also indicate a use of
+			// target, and so that use needs to be evaluated. This
+			// pattern occurs particularly for [ast.Alias] expressions.
+			for nav := range target.resolvesTo {
+				if _, found := nav.resolvesTo[target]; found {
+					navsWorklist = append(navsWorklist, nav)
+				}
+			}
 		}
 
 		if isExported {
@@ -1939,7 +1948,9 @@ func (f *frame) eval() {
 
 		case *ast.Alias:
 			// X=e (the old deprecated alias syntax)
-			f.newBinding(node.Ident, node.Expr)
+			childFr := f.newBinding(node.Ident, node.Expr)
+			f.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
+			childFr.navigable.ensureResolvesTo([]*navigable{f.navigable})
 
 		case *ast.Ellipsis:
 			childFr := f.newFrame(node.Type, nil)

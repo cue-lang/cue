@@ -1,6 +1,6 @@
 -- cue.mod/module.cue --
 module: "cuelang.org/error"
-language: version: "v0.14.0"
+language: version: "v0.15.0"
 -- in.cue --
 selection: {
 	dropError: 1 | error("drop me")
@@ -20,6 +20,22 @@ interpolation: {
 	substituteAll: a.notExist | error("hello \(world)")
 
 	substituteFail: a.b + 1 | a.notExist | error("reference failed: \(a.b) | \(a.notExist)")
+
+	// When the error() message itself contains an error,
+	// the custom error should not be thrown away.
+	// For comparison, without interpolation:
+	errorNoInterpolation: "a" | "b" | error("custom")
+	errorNoInterpolation: "c"
+
+	// When the struct interpolation fails, the custom error should
+	// still be shown rather than being replaced by the interpolation error.
+	errorStructInterpolation: "a" | "b" | error("custom: \({x: 1})")
+	errorStructInterpolation: "c"
+
+	// When the interpolation always results in an error, the custom
+	// error should still be shown.
+	errorBottomInterpolation: "a" | "b" | error("custom: \(1 & 2)")
+	errorBottomInterpolation: "c"
 }
 indirect: {
 	x: error
@@ -35,6 +51,16 @@ maxFields: a: 1
 multi: struct.MinFields(2) | error("should remain incomplete") | error("second")
 multi: a: 1
 
+-- self.cue --
+@experiment(aliasv2)
+
+// When error() interpolates "self" which is the enclosing struct
+// containing the error value itself (a cycle), the custom error
+// should still be shown.
+errorSelf: {
+	v: "x" | "y" | error("bad: \(self)")
+	v: "z"
+}
 -- issues.cue --
 issue4001: {
 	a: "b"
@@ -51,6 +77,37 @@ issue3984: {
 	v: "a" | error("must be a")
 	v: "b"
 }
+-- out/evalalpha/stats --
+Leaks:  3
+Freed:  76
+Reused: 57
+Allocs: 22
+Retain: 0
+
+Unifications: 34
+Conjuncts:    91
+Disjuncts:    41
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  30
+-Reused: 25
+-Allocs: 5
++Leaks:  3
++Freed:  76
++Reused: 57
++Allocs: 22
+ Retain: 0
+ 
+-Unifications: 16
+-Conjuncts:    38
+-Disjuncts:    30
++Unifications: 34
++Conjuncts:    91
++Disjuncts:    41
 -- out/eval/stats --
 Leaks:  0
 Freed:  30
@@ -63,6 +120,20 @@ Conjuncts:    38
 Disjuncts:    30
 -- out/evalalpha --
 Errors:
+errorSelf.v: 3 errors in empty disjunction:
+errorSelf.v: conflicting values "x" and "z":
+    ./self.cue:7:5
+    ./self.cue:8:5
+errorSelf.v: conflicting values "y" and "z":
+    ./self.cue:7:11
+    ./self.cue:8:5
+interpolation.errorStructInterpolation: 3 errors in empty disjunction:
+interpolation.errorStructInterpolation: conflicting values "a" and "c":
+    ./in.cue:28:28
+    ./in.cue:29:28
+interpolation.errorStructInterpolation: conflicting values "b" and "c":
+    ./in.cue:28:34
+    ./in.cue:29:28
 issue3983.x: 2 errors in empty disjunction::
     ./issues.cue:7:5
     ./issues.cue:10:5
@@ -77,8 +148,20 @@ selection.twoUserErrors: error one:
     ./in.cue:6:23
 selection.twoUserErrors: error two:
     ./in.cue:6:44
+interpolation.errorNoInterpolation: custom:
+    ./in.cue:23:36
+    ./in.cue:23:24
+    ./in.cue:24:24
+interpolation.errorStructInterpolation: cannot use {x:1} (type struct) as type (bool|string|bytes|number):
+    ./in.cue:28:40
+    ./in.cue:28:57
+interpolation.errorBottomInterpolation: custom: (1 & 2):
+    ./in.cue:33:40
+    ./in.cue:33:28
+    ./in.cue:33:57
+    ./in.cue:34:28
 indirect.y: msg:
-    ./in.cue:22:5
+    ./in.cue:38:5
 issue4001.a: error: a='b':
     ./issues.cue:3:11
     ./issues.cue:2:5
@@ -91,6 +174,8 @@ issue3984.v: must be a:
     ./issues.cue:13:11
     ./issues.cue:13:5
     ./issues.cue:14:5
+errorSelf.v: bad: :
+    ./self.cue:7:17
 
 Result:
 (_|_){
@@ -120,7 +205,8 @@ Result:
       //     ./in.cue:8:5
     }
   }
-  interpolation: (struct){
+  interpolation: (_|_){
+    // [eval]
     a: (struct){
       b: (int){ int }
     }
@@ -135,13 +221,38 @@ Result:
       //     ./in.cue:13:9
       //     ./in.cue:18:77
     }
+    errorNoInterpolation: (_|_){
+      // [eval] interpolation.errorNoInterpolation: custom:
+      //     ./in.cue:23:36
+      //     ./in.cue:23:24
+      //     ./in.cue:24:24
+    }
+    errorStructInterpolation: (_|_){
+      // [eval] interpolation.errorStructInterpolation: 3 errors in empty disjunction:
+      // interpolation.errorStructInterpolation: conflicting values "a" and "c":
+      //     ./in.cue:28:28
+      //     ./in.cue:29:28
+      // interpolation.errorStructInterpolation: conflicting values "b" and "c":
+      //     ./in.cue:28:34
+      //     ./in.cue:29:28
+      // interpolation.errorStructInterpolation: cannot use {x:1} (type struct) as type (bool|string|bytes|number):
+      //     ./in.cue:28:40
+      //     ./in.cue:28:57
+    }
+    errorBottomInterpolation: (_|_){
+      // [eval] interpolation.errorBottomInterpolation: custom: (1 & 2):
+      //     ./in.cue:33:40
+      //     ./in.cue:33:28
+      //     ./in.cue:33:57
+      //     ./in.cue:34:28
+    }
   }
   indirect: (_|_){
     // [user]
     x: (string){ error() }
     y: (_|_){
       // [user] indirect.y: msg:
-      //     ./in.cue:22:5
+      //     ./in.cue:38:5
     }
   }
   minFields: (struct){ struct.MinFields(2) }
@@ -189,15 +300,43 @@ Result:
       //     ./issues.cue:14:5
     }
   }
+  errorSelf: (_|_){
+    // [eval]
+    v: (_|_){
+      // [eval] errorSelf.v: 3 errors in empty disjunction:
+      // errorSelf.v: conflicting values "x" and "z":
+      //     ./self.cue:7:5
+      //     ./self.cue:8:5
+      // errorSelf.v: conflicting values "y" and "z":
+      //     ./self.cue:7:11
+      //     ./self.cue:8:5
+      // errorSelf.v: bad: :
+      //     ./self.cue:7:17
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,14 +1,14 @@
+@@ -1,38 +1,75 @@
  Errors:
 -selection.twoUserErrors: 3 errors in empty disjunction:
 -selection.twoUserErrors: conflicting values 2 and 1:
++errorSelf.v: 3 errors in empty disjunction:
++errorSelf.v: conflicting values "x" and "z":
++    ./self.cue:7:5
++    ./self.cue:8:5
++errorSelf.v: conflicting values "y" and "z":
++    ./self.cue:7:11
++    ./self.cue:8:5
++interpolation.errorStructInterpolation: 3 errors in empty disjunction:
++interpolation.errorStructInterpolation: conflicting values "a" and "c":
++    ./in.cue:28:28
++    ./in.cue:29:28
++interpolation.errorStructInterpolation: conflicting values "b" and "c":
++    ./in.cue:28:34
++    ./in.cue:29:28
 +issue3983.x: 2 errors in empty disjunction::
 +    ./issues.cue:7:5
 +    ./issues.cue:10:5
@@ -215,10 +354,22 @@ diff old new
  selection.twoUserErrors: error one:
      ./in.cue:6:23
  selection.twoUserErrors: error two:
-@@ -15,24 +15,33 @@
      ./in.cue:6:44
++interpolation.errorNoInterpolation: custom:
++    ./in.cue:23:36
++    ./in.cue:23:24
++    ./in.cue:24:24
++interpolation.errorStructInterpolation: cannot use {x:1} (type struct) as type (bool|string|bytes|number):
++    ./in.cue:28:40
++    ./in.cue:28:57
++interpolation.errorBottomInterpolation: custom: (1 & 2):
++    ./in.cue:33:40
++    ./in.cue:33:28
++    ./in.cue:33:57
++    ./in.cue:34:28
  indirect.y: msg:
-     ./in.cue:22:5
+-    ./in.cue:22:5
++    ./in.cue:38:5
 +issue4001.a: error: a='b':
 +    ./issues.cue:3:11
 +    ./issues.cue:2:5
@@ -231,6 +382,8 @@ diff old new
 +    ./issues.cue:13:11
 +    ./issues.cue:13:5
 +    ./issues.cue:14:5
++errorSelf.v: bad: :
++    ./self.cue:7:17
  
  Result:
  (_|_){
@@ -257,7 +410,7 @@ diff old new
        //     ./in.cue:6:17
        //     ./in.cue:6:19
        // selection.twoUserErrors: error one:
-@@ -42,12 +51,9 @@
+@@ -42,38 +79,52 @@
      }
      x: (int){ int }
      dropIncomplete: (_|_){
@@ -268,11 +421,16 @@ diff old new
 -      // selection.dropIncomplete: user msg: x + 1 failed:
 +      // [incomplete] selection.dropIncomplete: user msg: x + 1 failed:
        //     ./in.cue:9:26
+-    }
+-  }
+-  interpolation: (struct){
 +      //     ./in.cue:8:5
-     }
-   }
-   interpolation: (struct){
-@@ -56,20 +62,11 @@
++    }
++  }
++  interpolation: (_|_){
++    // [eval]
+     a: (struct){
+       b: (int){ int }
      }
      world: (string){ "world" }
      substituteAll: (_|_){
@@ -295,10 +453,44 @@ diff old new
        //     ./in.cue:18:41
        //     ./in.cue:13:9
        //     ./in.cue:18:77
-@@ -83,11 +80,49 @@
-       //     ./in.cue:22:5
      }
++    errorNoInterpolation: (_|_){
++      // [eval] interpolation.errorNoInterpolation: custom:
++      //     ./in.cue:23:36
++      //     ./in.cue:23:24
++      //     ./in.cue:24:24
++    }
++    errorStructInterpolation: (_|_){
++      // [eval] interpolation.errorStructInterpolation: 3 errors in empty disjunction:
++      // interpolation.errorStructInterpolation: conflicting values "a" and "c":
++      //     ./in.cue:28:28
++      //     ./in.cue:29:28
++      // interpolation.errorStructInterpolation: conflicting values "b" and "c":
++      //     ./in.cue:28:34
++      //     ./in.cue:29:28
++      // interpolation.errorStructInterpolation: cannot use {x:1} (type struct) as type (bool|string|bytes|number):
++      //     ./in.cue:28:40
++      //     ./in.cue:28:57
++    }
++    errorBottomInterpolation: (_|_){
++      // [eval] interpolation.errorBottomInterpolation: custom: (1 & 2):
++      //     ./in.cue:33:40
++      //     ./in.cue:33:28
++      //     ./in.cue:33:57
++      //     ./in.cue:34:28
++    }
    }
+   indirect: (_|_){
+     // [user]
+@@ -80,14 +131,66 @@
+     x: (string){ error() }
+     y: (_|_){
+       // [user] indirect.y: msg:
+-      //     ./in.cue:22:5
+-    }
++      //     ./in.cue:38:5
++    }
++  }
 +  minFields: (struct){ struct.MinFields(2) }
 +  maxFields: (struct){
 +    a: (int){ 1 }
@@ -313,7 +505,7 @@ diff old new
 +    // multi: second:
 +    //     ./incomplete.cue:7:66
 +    a: (int){ 1 }
-+  }
+   }
    issue4001: (_|_){
 -    // [user]
 +    // [eval]
@@ -345,6 +537,20 @@ diff old new
 +      //     ./issues.cue:13:11
 +      //     ./issues.cue:13:5
 +      //     ./issues.cue:14:5
++    }
++  }
++  errorSelf: (_|_){
++    // [eval]
++    v: (_|_){
++      // [eval] errorSelf.v: 3 errors in empty disjunction:
++      // errorSelf.v: conflicting values "x" and "z":
++      //     ./self.cue:7:5
++      //     ./self.cue:8:5
++      // errorSelf.v: conflicting values "y" and "z":
++      //     ./self.cue:7:11
++      //     ./self.cue:8:5
++      // errorSelf.v: bad: :
++      //     ./self.cue:7:17
      }
    }
  }
@@ -459,6 +665,14 @@ Result:
     world: "world"
     substituteAll: (〈0;a〉.notExist|error("hello \(〈0;world〉)"))
     substituteFail: ((〈0;a〉.b + 1)|〈0;a〉.notExist|error("reference failed: \(〈0;a〉.b) | \(〈0;a〉.notExist)"))
+    errorNoInterpolation: ("a"|"b"|error("custom"))
+    errorNoInterpolation: "c"
+    errorStructInterpolation: ("a"|"b"|error("custom: \({
+      x: 1
+    })"))
+    errorStructInterpolation: "c"
+    errorBottomInterpolation: ("a"|"b"|error("custom: \((1 & 2))"))
+    errorBottomInterpolation: "c"
   }
   indirect: {
     x: error
@@ -491,5 +705,12 @@ Result:
   issue3984: {
     v: ("a"|error("must be a"))
     v: "b"
+  }
+}
+--- self.cue
+{
+  errorSelf: {
+    v: ("x"|"y"|error("bad: \(〈1〉)"))
+    v: "z"
   }
 }

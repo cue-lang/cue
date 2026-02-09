@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe34e6f0_ab16fb26",
+        "filename": "cmd/cue/cmd/integration/workspace/codeaction_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T10:24:23Z",
+      "side": 1,
+      "message": "Good point. This happens across a lot of the LSP integration tests. I\u0027ll address this in a different CL.",
+      "parentUuid": "ba3e7551_26ac7b74",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9329324_7e4bf72f",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-02-07T16:18:11Z",
       "side": 1,
       "message": "slices.ContainsFunc?",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e8a24c4_3729b0db",
+        "filename": "cmd/cue/cmd/integration/workspace/codeaction_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T10:24:23Z",
+      "side": 1,
+      "message": "Hmm, yes, I\u0027ve done this, but it is exactly the same loc, and could be slower because of creating the func.",
+      "parentUuid": "e9329324_7e4bf72f",
       "revId": "47009797322eebf63c208726d5223df9ca85878e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -140,6 +176,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "182f4cf7_e028fbe2",
+        "filename": "internal/lsp/cache/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T10:24:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7d20997_60f9d412",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "51a07aab_249a1869",
@@ -188,6 +242,24 @@
       "writtenOn": "2026-02-07T16:18:11Z",
       "side": 1,
       "message": "ditto",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6fd0984_3be52e2e",
+        "filename": "internal/lsp/cache/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T10:24:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ad34f99_0cb213bb",
       "revId": "47009797322eebf63c208726d5223df9ca85878e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -244,6 +316,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e0e32fc_1ee6cfbb",
+        "filename": "internal/lsp/cache/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T10:24:23Z",
+      "side": 1,
+      "message": "Yeah... I see where you\u0027re coming from, but to me `lineIdx` is much more confusing than lineNo.",
+      "parentUuid": "180e4fc6_4c6a27ca",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "74fa497b_e6be4de5",
@@ -275,6 +365,24 @@
       "side": 1,
       "message": "Lol, this code is c+p from upstream gopls.",
       "parentUuid": "74fa497b_e6be4de5",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17545cac_8a581676",
+        "filename": "internal/lsp/server/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T10:24:23Z",
+      "side": 1,
+      "message": "Right, what\u0027s going on here is that the server apparently organises code actions per file type, but then in the initialize message has to give the client a flat list, presumably without dupes.\n\nI completely agree that with the tiny number of code actions any lsp would support, compacting the list is better. Though you did also misspell `Values` ;)",
+      "parentUuid": "de9fc32b_07ced788",
       "revId": "47009797322eebf63c208726d5223df9ca85878e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

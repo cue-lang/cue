@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19753426_592de7ba",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "```suggestion\n\tos!:     \"Windows\" | \"Linux\" | \"MacOS\"\n\tarch!:   \"x86\" | \"arm64\"\n\tmem?:    int\n```",
+      "range": {
+        "startLine": 111,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 0
+      },
+      "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fba7611_a0d2df9c",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "looks like this could do with a cue fmt.",
+      "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b761438_446a509a",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "I don\u0027t understand what the `(*role | \"default\")` expression is doing here. We know that role is non-empty and not in error, so ISTM that this is exactly the same as doing `MachineByRole[role]`.",
+      "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee3de512_392aa3c2",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "```suggestion\n// This endpoint demonstrates capture of all path parameters.\n```",
+      "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "185dbd1a_5a961628",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "to do for later probably: it would be nice if this error response was consistent with the one above (i.e. json-formatted)",
+      "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43f3e509_2c3c3881",
+        "filename": "pkg/tool/http/serve.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Maybe exclude `{$}` too, because that\u0027s a very useful pattern to have available and we don\u0027t really want to treat the `$` as a variable name. Or leave a TODO.",
+      "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

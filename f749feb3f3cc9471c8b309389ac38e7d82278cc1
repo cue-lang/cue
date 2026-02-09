@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a816d16_be653eaf",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Both done.",
+      "parentUuid": "0e7affcb_4c77daff",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0e686bc6_0f3d89cc",
@@ -120,6 +138,24 @@
       "side": 1,
       "message": "checking whether I can post a comment",
       "parentUuid": "758af130_bfbede39",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4754b00e_c8d7d384",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7211b2e8_036b8a84",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -225,6 +261,24 @@
       "side": 1,
       "message": "I would say there is no fixed convention, really. But sure. And changing #Machine did catch an error. Very nice this validation thing. :)\n\nMachineByRole is sort of an in-between case. I would say it is data, it just has incomplete values, which themselves are now typed (now #Machine is).",
       "parentUuid": "c8ce7157_81dbeedc",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3589e251_b7804c7e",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a7ff305d_520124cb",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -486,6 +540,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "70b4323c_b1d1f749",
+        "filename": "internal/task/task.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c4bc1b99_4b0fc999",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2470bf00_15d472fa",
@@ -499,6 +571,30 @@
       "writtenOn": "2025-09-10T17:02:55Z",
       "side": 1,
       "message": "This sentence is hard to parse.\n```suggestion\n\t// routing configures the HTTP routes that are served.\n```\n?",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 0
+      },
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34c843fd_63642b85",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Still worth doing, I\u0027d suggest.",
+      "parentUuid": "2470bf00_15d472fa",
       "range": {
         "startLine": 71,
         "startChar": 0,
@@ -528,6 +624,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b57519c3_aaab6679",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Not done.",
+      "parentUuid": "1e15242e_6562e1bd",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "aa1bcb6a_d7c60bdb",
         "filename": "pkg/tool/http/http.cue",
         "patchSetId": 2
@@ -539,6 +653,30 @@
       "writtenOn": "2025-09-10T17:02:55Z",
       "side": 1,
       "message": "This seems like a holdover from the Go docs.",
+      "range": {
+        "startLine": 97,
+        "startChar": 20,
+        "endLine": 97,
+        "endChar": 48
+      },
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f2318e3_14b00dde",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Not done.",
+      "parentUuid": "aa1bcb6a_d7c60bdb",
       "range": {
         "startLine": 97,
         "startChar": 20,
@@ -568,6 +706,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1031f319_42c27c28",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Not done - it looks like the docs were lifted wholesale from the Go docs but that doesn\u0027t quite match what the user can provide.",
+      "parentUuid": "014abeea_c34d7e95",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5e601ec9_d9a8ee56",
         "filename": "pkg/tool/http/http.cue",
         "patchSetId": 2
@@ -579,6 +735,24 @@
       "writtenOn": "2025-09-10T17:02:55Z",
       "side": 1,
       "message": "This could do with a doc comment, particularly as it\u0027s not entirely clear which parts the user is expected to fill in. I\u0027m also thinking that some/all of these should be required or optional fields rather than regular fields. Maybe factor the whole of this out into a pure schema, say `#Request`?",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5f7b589_9385592d",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Could still do with addressing some of this, I think.",
+      "parentUuid": "5e601ec9_d9a8ee56",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -602,6 +776,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e2165150_7572c49c",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "This still seems like it\u0027s worth doing.",
+      "parentUuid": "1391e62b_5977cccb",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "53fbb142_07c13c1a",
         "filename": "pkg/tool/http/http.cue",
         "patchSetId": 2
@@ -613,6 +805,24 @@
       "writtenOn": "2025-09-10T17:02:55Z",
       "side": 1,
       "message": "This could do with some documentation. For example, if there\u0027s only a single value for a given header key and no constraint on `header`, will we see a `string` or a `[string]` for that key? I\u0027m somewhat inclined to suggest that we keep things simple and just use `[string, ... string]`. That also seems to fit with the implementation - I can\u0027t see any place where a header is filled in with a scalar string.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfd7829a_080bed80",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Not done.",
+      "parentUuid": "53fbb142_07c13c1a",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -636,6 +846,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3ba377a9_2e1d19a6",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Not clarified.",
+      "parentUuid": "36d97fbe_6a0fb344",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "efef706f_cdad61ca",
         "filename": "pkg/tool/http/http.cue",
         "patchSetId": 2
@@ -653,6 +881,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9ba76ee9_a0b544ad",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "Not done.",
+      "parentUuid": "efef706f_cdad61ca",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b99fc4c3_6fe3f273",
         "filename": "pkg/tool/http/serve.go",
         "patchSetId": 2
@@ -664,6 +910,24 @@
       "writtenOn": "2025-09-10T17:02:55Z",
       "side": 1,
       "message": "Alternatively you could just define a Go struct and fill with that, which turn out a bit simpler.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0e23714_35220e82",
+        "filename": "pkg/tool/http/serve.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "decided not to do this, i guess.",
+      "parentUuid": "b99fc4c3_6fe3f273",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -687,6 +951,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "12b14d2a_cd9d0bd9",
+        "filename": "pkg/tool/http/serve.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "not done - definitely worth addressing IMHO.",
+      "parentUuid": "1bf63307_722cdc7b",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1cfd045b_de4c89f1",
         "filename": "pkg/tool/http/serve.go",
         "patchSetId": 2
@@ -698,6 +980,24 @@
       "writtenOn": "2025-09-10T17:02:55Z",
       "side": 1,
       "message": "This is racy because it\u0027s not OK to do operations concurrently on `cue.Value`.\nI think you need a semi-global lock here.",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9847ef88_a3c611bb",
+        "filename": "pkg/tool/http/serve.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:56:10Z",
+      "side": 1,
+      "message": "not done. needs addressing to avoid potential panics.",
+      "parentUuid": "1cfd045b_de4c89f1",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

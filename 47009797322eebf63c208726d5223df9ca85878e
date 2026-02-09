@@ -405,6 +405,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "221db238_5bea7915",
+        "filename": "internal/lsp/server/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-09T10:33:15Z",
+      "side": 1,
+      "message": "FWIW I wasn\u0027t worrying about performance per se, just overly verbose/complex code.",
+      "parentUuid": "21754688_cc86cd1c",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b336b87e_b90744ee",

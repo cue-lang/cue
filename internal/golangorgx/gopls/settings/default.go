@@ -41,7 +41,8 @@ func DefaultOptions(overrides ...func(*Options)) *Options {
 			ServerOptions: ServerOptions{
 				SupportedCodeActions: map[file.Kind]map[protocol.CodeActionKind]bool{
 					file.CUE: {
-						protocol.RefactorRewriteConvertToStruct: true,
+						protocol.RefactorRewriteConvertToStruct:   true,
+						protocol.RefactorRewriteConvertFromStruct: true,
 					},
 				},
 				SupportedCommands: commands,

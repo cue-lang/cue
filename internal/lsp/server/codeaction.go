@@ -41,9 +41,21 @@ func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionPara
 	}
 	if convertToStructEdit != nil {
 		codeActions = append(codeActions, protocol.CodeAction{
-			Title: "Wrap field in struct",
+			Title: "Add surrounding struct braces",
 			Kind:  protocol.RefactorRewriteConvertToStruct,
 			Edit:  convertToStructEdit,
+		})
+	}
+
+	convertFromStructEdit, err := s.workspace.CodeActionConvertFromStruct(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	if convertFromStructEdit != nil {
+		codeActions = append(codeActions, protocol.CodeAction{
+			Title: "Remove surrounding struct braces",
+			Kind:  protocol.RefactorRewriteConvertFromStruct,
+			Edit:  convertFromStructEdit,
 		})
 	}
 

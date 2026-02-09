@@ -387,6 +387,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21754688_cc86cd1c",
+        "filename": "internal/lsp/server/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T10:26:49Z",
+      "side": 1,
+      "message": "That said, this method is called exactly once, on lsp server startup, so it\u0027s hardly hot-path.",
+      "parentUuid": "17545cac_8a581676",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b336b87e_b90744ee",

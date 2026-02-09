@@ -47,5 +47,17 @@ func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionPara
 		})
 	}
 
+	convertFromStructEdit, err := s.workspace.CodeActionConvertFromStruct(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	if convertFromStructEdit != nil {
+		codeActions = append(codeActions, protocol.CodeAction{
+			Title: "Unwrap field from struct",
+			Kind:  protocol.RefactorRewriteConvertFromStruct,
+			Edit:  convertFromStructEdit,
+		})
+	}
+
 	return codeActions, nil
 }

@@ -1,0 +1,79 @@
+-- in.cue --
+import "net"
+
+// IPv4 tests
+t1: net.CompareIP("192.168.1.1", "192.168.1.2")
+t2: net.CompareIP("192.168.1.2", "192.168.1.1")
+t3: net.CompareIP("192.168.1.1", "192.168.1.1")
+t4: net.CompareIP("10.0.0.1", "192.168.0.1")
+
+// IPv4 with byte list
+t5: net.CompareIP([192, 168, 1, 1], "192.168.1.2")
+t6: net.CompareIP("192.168.1.2", [192, 168, 1, 1])
+t7: net.CompareIP([10, 0, 0, 1], [10, 0, 0, 1])
+
+// IPv6 tests
+t8:  net.CompareIP("2001:db8::1", "2001:db8::2")
+t9:  net.CompareIP("2001:db8::2", "2001:db8::1")
+t10: net.CompareIP("2001:db8::1", "2001:db8::1")
+
+// IPv6 with byte list (2001:db8::1 = [32, 1, 13, 184, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+t11: net.CompareIP([32, 1, 13, 184, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], "2001:db8::2")
+t12: net.CompareIP([32, 1, 13, 184, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [32, 1, 13, 184, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+
+// IPv4 vs IPv6 - IPv4 sorts before IPv6
+t13: net.CompareIP("192.168.1.1", "2001:db8::1")
+t14: net.CompareIP("2001:db8::1", "192.168.1.1")
+
+// Edge cases
+t15: net.CompareIP("0.0.0.0", "255.255.255.255")
+t16: net.CompareIP("255.255.255.255", "0.0.0.0")
+t17: net.CompareIP("0.0.0.0", "0.0.0.0")
+
+// Error cases
+t18: net.CompareIP("invalid", "192.168.1.1")
+t19: net.CompareIP("192.168.1.1", "invalid")
+t20: net.CompareIP("invalid1", "invalid2")
+-- out/net-v3 --
+Errors:
+t18: error in call to net.CompareIP: invalid IP "invalid":
+    ./in.cue:33:6
+t19: error in call to net.CompareIP: invalid IP "invalid":
+    ./in.cue:34:6
+t20: error in call to net.CompareIP: invalid IP "invalid1":
+    ./in.cue:35:6
+
+Result:
+// IPv4 tests
+t1: -1
+t2: 1
+t3: 0
+t4: -1
+
+// IPv4 with byte list
+t5: -1
+t6: 1
+t7: 0
+
+// IPv6 tests
+t8:  -1
+t9:  1
+t10: 0
+
+// IPv6 with byte list (2001:db8::1 = [32, 1, 13, 184, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+t11: -1
+t12: 0
+
+// IPv4 vs IPv6 - IPv4 sorts before IPv6
+t13: -1
+t14: 1
+
+// Edge cases
+t15: -1
+t16: 1
+t17: 0
+
+// Error cases
+t18: _|_ // t18: error in call to net.CompareIP: invalid IP "invalid"
+t19: _|_ // t19: error in call to net.CompareIP: invalid IP "invalid"
+t20: _|_ // t20: error in call to net.CompareIP: invalid IP "invalid1"

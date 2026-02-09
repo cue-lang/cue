@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "651e2692_bb159a03",
+        "filename": "internal/golangorgx/gopls/protocol/codeactionkind.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T09:39:13Z",
+      "side": 1,
+      "message": "Good question. Gopls doesn\u0027t. There\u0027s no hint about that in the spec - https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#codeActionKind\nI think editors, if they support multiple LSPs on the same file, have to be quite explicit with the user about which LSP they\u0027re sending to. Our AI overlords don\u0027t suggest putting the server name in there either. So I\u0027m going to do what the machine says, and say No.",
+      "parentUuid": "f70bff5d_ad6c9091",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b7530ae_73700809",
@@ -65,6 +83,24 @@
       "writtenOn": "2026-02-07T16:18:11Z",
       "side": 1,
       "message": "FYI: Go has a helper for this sort of thing, which we could borrow if you want: https://pkg.go.dev/golang.org/x/tools/go/ast/astutil#PathEnclosingInterval\n\nAlthough I will say it\u0027s not very efficient as you might expect. I don\u0027t know if it\u0027s any smarter than what you\u0027re doing here. I suppose that, if one were to write such an API from scratch today, it could use an iterator.",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f3810ee_400bcfac",
+        "filename": "internal/lsp/cache/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T09:39:13Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8b7530ae_73700809",
       "revId": "47009797322eebf63c208726d5223df9ca85878e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -88,6 +124,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e7d20997_60f9d412",
+        "filename": "internal/lsp/cache/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T09:39:13Z",
+      "side": 1,
+      "message": "The helper is currently in eval. I\u0027ll move it into position.",
+      "parentUuid": "9144cebb_0dddeb14",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "51a07aab_249a1869",
         "filename": "internal/lsp/cache/codeaction.go",
         "patchSetId": 2
@@ -99,6 +153,24 @@
       "writtenOn": "2026-02-07T16:18:11Z",
       "side": 1,
       "message": "nit: do we need this variable?",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b1b4c77_2e5dd1e4",
+        "filename": "internal/lsp/cache/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T09:39:13Z",
+      "side": 1,
+      "message": "(I like your suggestion further down of completely removing extraction of the label - I think that would work)\n\nIn general, my understanding is that Go does not merge reads like, say, Java would. So in the code `if x(a.b) \u0026\u0026 y(a.b) {...` you have potentially two reads of field `b`, and so the value of `b` could change if there are concurrent writes to `a`. So I tend to err on the side of doing the read once. I know in the case of the AST there\u0027s no chance it\u0027ll ever change to concurrent modification, but I just tend to default to avoiding potential data races.",
+      "parentUuid": "51a07aab_249a1869",
       "revId": "47009797322eebf63c208726d5223df9ca85878e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -133,6 +205,24 @@
       "writtenOn": "2026-02-07T16:18:11Z",
       "side": 1,
       "message": "could this be `field.Pos()`, and then you don\u0027t need the walk func to \"return\" a label variable?",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fadf18cc_e75298e2",
+        "filename": "internal/lsp/cache/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T09:39:13Z",
+      "side": 1,
+      "message": "Yes, excellent point. I like.",
+      "parentUuid": "c85db946_f0bfd5bd",
       "revId": "47009797322eebf63c208726d5223df9ca85878e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -173,6 +263,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "de9fc32b_07ced788",
+        "filename": "internal/lsp/server/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T09:39:13Z",
+      "side": 1,
+      "message": "Lol, this code is c+p from upstream gopls.",
+      "parentUuid": "74fa497b_e6be4de5",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b336b87e_b90744ee",
         "filename": "internal/lsp/server/codeaction.go",
         "patchSetId": 2
@@ -184,6 +292,24 @@
       "writtenOn": "2026-02-07T16:18:11Z",
       "side": 1,
       "message": "could we support this action as a \"toggle\" for inline struct fields? that is, something like...\n1) if a field is inline, \"toggle\" it to use curly braces\n2) if a field is alone in curly braces, \"toggle\" it to the inline form\n3) (perhaps not as useful) if a field is among others in curly braces, \"toggle\" it to the inline form by splitting it off from the rest, duplicating the label(s)\n\nI say this because you\u0027re doing (1) here, but I\u0027d personally find (2) useful too, as a form of simplification in some cases.",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7505ef8b_d5c19331",
+        "filename": "internal/lsp/server/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T09:39:13Z",
+      "side": 1,
+      "message": "Yes, absolutely, I\u0027ll implement the inverse too, in a different CL.\n\nThe way code actions work, is that the editor asks the server for a menu of available code actions given the current cursor position. For anything that can be calculated reasonably quickly, the server actually responds with the potential diff immediately, and it\u0027s up to the editor to choose whether to apply the diff or not.\n\nSo for us here, what that means is that the inverse is implemented the same way, but the circumstances in which the inverse would provide a non-nil diff which would get returned to the editor, would be the exact opposite of this codeaction. So in practice, only one would ever appear.\n\nNow we could choose to give both the same name and include \"toggle\" in the name, but I\u0027m not really sure that is worth it. The inverse I might just call \"Remove enclosing struct\" - open to suggestions.",
+      "parentUuid": "b336b87e_b90744ee",
       "revId": "47009797322eebf63c208726d5223df9ca85878e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -47,7 +47,7 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 	node := fscache.RemovePhantomPackageDecl(parsedFile)
 	formatted, err := cueformat.Node(node)
 	if err != nil {
-		// TODO fix up the AST like gopls so we can do more with
+		// TODO fix up the AST like gopls so we can do more  with
 		// partial/incomplete code.
 		//
 		// For now return early because there is nothing we can do.

@@ -108,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7211b2e8_036b8a84",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T17:02:35Z",
+      "side": 1,
+      "message": "checking whether I can post a comment",
+      "parentUuid": "758af130_bfbede39",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "60ce4133_9b996630",
         "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
         "patchSetId": 2

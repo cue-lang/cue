@@ -231,6 +231,21 @@ inDefinitions: err2: {
 	#X: !={ name: "X" }
 	x: #X & { name: "X" }
 }
+-- issue4251-panic.cue --
+@experiment(structcmp)
+
+// SimplifyBounds should handle EqualOp bounds
+// without panicking, including in combination
+// with other bound types.
+issue4251: ok: {
+	a: !="c" & =="a" & "a"
+	b: =="b" & !="c" & "b"
+	c: =="x" & >="a" & "x"
+	d: <="z" & =="y" & "y"
+}
+issue4251: fail: {
+	b: =="b" & !="b" & "b"
+}
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  205
@@ -371,6 +386,10 @@ inDefinitions.err1.x: invalid value {name:"Y"} (out of bound =={name:"X"}):
 inDefinitions.err2.x: invalid value {name:"X"} (out of bound !={name:"X"}):
     ./issue4142.cue:16:6
     ./issue4142.cue:17:5
+issue4251.fail.b: invalid value "b" (out of bound !="b"):
+    ./issue4251-panic.cue:13:13
+    ./issue4251-panic.cue:13:5
+    ./issue4251-panic.cue:13:21
 
 Result:
 (_|_){
@@ -938,6 +957,24 @@ Result:
       }
     }
   }
+  issue4251: (_|_){
+    // [eval]
+    ok: (struct){
+      a: (string){ "a" }
+      b: (string){ "b" }
+      c: (string){ "x" }
+      d: (string){ "y" }
+    }
+    fail: (_|_){
+      // [eval]
+      b: (_|_){
+        // [eval] issue4251.fail.b: invalid value "b" (out of bound !="b"):
+        //     ./issue4251-panic.cue:13:13
+        //     ./issue4251-panic.cue:13:5
+        //     ./issue4251-panic.cue:13:21
+      }
+    }
+  }
 }
 -- out/compile --
 --- binary.cue
@@ -1317,6 +1354,22 @@ Result:
       x: (〈0;#X〉 & {
         name: "X"
       })
+    }
+  }
+}
+--- issue4251-panic.cue
+{
+  issue4251: {
+    ok: {
+      a: ((!="c" & =="a") & "a")
+      b: ((=="b" & !="c") & "b")
+      c: ((=="x" & >="a") & "x")
+      d: ((<="z" & =="y") & "y")
+    }
+  }
+  issue4251: {
+    fail: {
+      b: ((=="b" & !="b") & "b")
     }
   }
 }

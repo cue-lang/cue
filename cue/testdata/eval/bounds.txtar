@@ -231,6 +231,18 @@ inDefinitions: err2: {
 	#X: !={ name: "X" }
 	x: #X & { name: "X" }
 }
+-- issue4251-panic.cue --
+@experiment(structcmp)
+
+// SimplifyBounds should handle EqualOp bounds
+// without panicking, including in combination
+// with other bound types.
+issue4251: {
+	a: !="c" & =="a" & "a"
+	b: =="b" & !="c" & "b"
+	c: =="x" & >="a" & "x"
+	d: <="z" & =="y" & "y"
+}
 -- out/evalalpha/stats --
 Leaks:  0
 Freed:  205
@@ -938,6 +950,12 @@ Result:
       }
     }
   }
+  issue4251: (struct){
+    a: (string){ "a" }
+    b: (string){ "b" }
+    c: (string){ "x" }
+    d: (string){ "y" }
+  }
 }
 -- out/compile --
 --- binary.cue
@@ -1318,5 +1336,14 @@ Result:
         name: "X"
       })
     }
+  }
+}
+--- issue4251-panic.cue
+{
+  issue4251: {
+    a: ((!="c" & =="a") & "a")
+    b: ((=="b" & !="c") & "b")
+    c: ((=="x" & >="a") & "x")
+    d: ((<="z" & =="y") & "y")
   }
 }

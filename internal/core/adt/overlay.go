@@ -130,6 +130,19 @@ func (c *OpContext) deref(v *Vertex) *Vertex {
 	return v
 }
 
+// derefRoot is like deref, but does not skip the root vertex of each overlay
+// frame. This is needed for environment vertex resolution, where the root
+// vertex must be mapped to its clone during disjunction evaluation.
+func (c *OpContext) derefRoot(v *Vertex) *Vertex {
+	for i := len(c.overlays) - 1; i >= 0; i-- {
+		f := c.overlays[i]
+		if x, ok := f.vertexMap[v]; ok {
+			return x
+		}
+	}
+	return v
+}
+
 // deref reports a replacement of v or v itself if such a replacement does not
 // exists. It computes the transitive closure of the replacement graph.
 // TODO(perf): it is probably sufficient to only replace one level. But we need

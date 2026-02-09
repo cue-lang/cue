@@ -122,7 +122,7 @@ func (e *Environment) DerefVertex(ctx *OpContext) *Vertex {
 	if ctx == nil {
 		return e.Vertex
 	}
-	return ctx.deref(e.Vertex)
+	return ctx.derefRoot(e.Vertex)
 }
 
 func (e *Environment) up(ctx *OpContext, count int32) *Environment {

@@ -112,10 +112,10 @@ panic1: {
 	out: objs["obj1"].type
 }
 -- out/evalalpha/stats --
-Leaks:  18
-Freed:  163
-Reused: 134
-Allocs: 47
+Leaks:  20
+Freed:  161
+Reused: 132
+Allocs: 49
 Retain: 0
 
 Unifications: 73
@@ -138,10 +138,10 @@ diff old new
 -Unifications: 108
 -Conjuncts:    237
 -Disjuncts:    154
-+Leaks:  18
-+Freed:  163
-+Reused: 134
-+Allocs: 47
++Leaks:  20
++Freed:  161
++Reused: 132
++Allocs: 49
 +Retain: 0
 +
 +Unifications: 73
@@ -334,13 +334,9 @@ Disjuncts:    154
         //     ./in.cue:77:3
       }
     }
-    a: (_|_){
-      // [cycle] issue4251.a: 2 errors in empty disjunction:
-      // issue4251.a: conflicting values "b" and "a":
-      //     ./in.cue:82:11
-      //     ./in.cue:83:5
-      // issue4251.a._must: unresolved disjunction: x:
-      //     ./in.cue:78:17
+    a: (string){
+      "a"
+      _must: (bool){ true }
     }
   }
   panic1: (struct){
@@ -379,7 +375,7 @@ Disjuncts:    154
 diff old new
 --- old
 +++ new
-@@ -63,6 +63,25 @@
+@@ -63,6 +63,21 @@
        y: (int){ 1 }
      }
    }
@@ -393,19 +389,15 @@ diff old new
 +        //     ./in.cue:77:3
 +      }
 +    }
-+    a: (_|_){
-+      // [cycle] issue4251.a: 2 errors in empty disjunction:
-+      // issue4251.a: conflicting values "b" and "a":
-+      //     ./in.cue:82:11
-+      //     ./in.cue:83:5
-+      // issue4251.a._must: unresolved disjunction: x:
-+      //     ./in.cue:78:17
++    a: (string){
++      "a"
++      _must: (bool){ true }
 +    }
 +  }
    panic1: (struct){
      #TypeFoo: (#struct){
        name: (string){ "foo" }
-@@ -69,8 +88,8 @@
+@@ -69,8 +84,8 @@
        foo_field: (string){ string }
      }
      #TypeBar: (#struct){
@@ -415,7 +407,7 @@ diff old new
      }
      #TypeBar2: (#struct){
        name: (string){ "bar" }
-@@ -77,21 +96,21 @@
+@@ -77,21 +92,21 @@
      }
      objs: (struct){
        obj1: (struct){

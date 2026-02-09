@@ -1939,7 +1939,9 @@ func (f *frame) eval() {
 
 		case *ast.Alias:
 			// X=e (the old deprecated alias syntax)
-			f.newBinding(node.Ident, node.Expr)
+			childFr := f.newBinding(node.Ident, nil)
+			childFr.navigable.ensureResolvesTo([]*navigable{f.navigable})
+			unprocessed = append(unprocessed, node.Expr)
 
 		case *ast.Ellipsis:
 			childFr := f.newFrame(node.Type, nil)

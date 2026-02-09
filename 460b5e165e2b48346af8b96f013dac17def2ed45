@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "498eeb97_9b2b4c62",
+        "filename": "pkg/net/ip.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-09T16:00:24Z",
+      "side": 1,
+      "message": "I\u0027m not convinced about this name but I\u0027m not sure what would be better. CompareIPs? IPCompare?",
+      "revId": "460b5e165e2b48346af8b96f013dac17def2ed45",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

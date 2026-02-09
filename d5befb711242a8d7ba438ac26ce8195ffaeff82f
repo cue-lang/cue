@@ -301,6 +301,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "006961ec_078dfa92",
+        "filename": "pkg/encoding/openapi/openapi.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-09T16:48:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "3dfe433a_5cb2510f",
+      "revId": "d5befb711242a8d7ba438ac26ce8195ffaeff82f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3daa5543_ca57220f",

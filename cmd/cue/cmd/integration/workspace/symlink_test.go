@@ -106,6 +106,6 @@ x: _
 			URI:   rootURI + "/sym%20link/a.cue",
 			Range: protocol.Range{Start: protocol.Position{Line: 2, Character: 3}},
 		})
-		qt.Assert(t, qt.IsNotNil(got)) // This is WRONG: it *should* be nil.
+		qt.Assert(t, qt.IsNil(got))
 	})
 }

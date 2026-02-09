@@ -369,3 +369,20 @@ func InCIDR(ip, cidr cue.Value) (bool, error) {
 
 	return prefix.Contains(ipAddr), nil
 }
+
+// CompareIP compares two IP addresses and returns an integer:
+// -1 if ip1 sorts before ip2, 0 if they are equal, and +1 if ip1 sorts after ip2.
+// IPv4 addresses sort before IPv6 addresses.
+//
+// The addresses may be strings or lists of bytes.
+func CompareIP(ip1, ip2 cue.Value) (int, error) {
+	addr1 := netGetIP(ip1)
+	if !addr1.IsValid() {
+		return 0, fmt.Errorf("invalid IP %q", ip1)
+	}
+	addr2 := netGetIP(ip2)
+	if !addr2.IsValid() {
+		return 0, fmt.Errorf("invalid IP %q", ip2)
+	}
+	return addr1.Compare(addr2), nil
+}

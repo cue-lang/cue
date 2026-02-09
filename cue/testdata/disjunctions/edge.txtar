@@ -131,10 +131,10 @@ panic1: {
 	out: objs["obj1"].type
 }
 -- out/evalalpha/stats --
-Leaks:  18
-Freed:  181
-Reused: 150
-Allocs: 49
+Leaks:  24
+Freed:  175
+Reused: 144
+Allocs: 55
 Retain: 0
 
 Unifications: 83
@@ -157,10 +157,10 @@ diff old new
 -Unifications: 108
 -Conjuncts:    237
 -Disjuncts:    154
-+Leaks:  18
-+Freed:  181
-+Reused: 150
-+Allocs: 49
++Leaks:  24
++Freed:  175
++Reused: 144
++Allocs: 55
 +Retain: 0
 +
 +Unifications: 83
@@ -353,13 +353,9 @@ Disjuncts:    154
         //     ./in.cue:78:3
       }
     }
-    a: (_|_){
-      // [cycle] issue4251_notC.a: 2 errors in empty disjunction:
-      // issue4251_notC.a: conflicting values "b" and "a":
-      //     ./in.cue:83:11
-      //     ./in.cue:84:5
-      // issue4251_notC.a._must: unresolved disjunction: x:
-      //     ./in.cue:79:17
+    a: (string){
+      "a"
+      _must: (bool){ true }
     }
   }
   issue4251_notB: (struct){
@@ -372,13 +368,9 @@ Disjuncts:    154
         //     ./in.cue:88:3
       }
     }
-    a: (_|_){
-      // [cycle] issue4251_notB.a: 2 errors in empty disjunction:
-      // issue4251_notB.a: conflicting values "b" and "a":
-      //     ./in.cue:92:11
-      //     ./in.cue:93:5
-      // issue4251_notB.a._must: unresolved disjunction: x:
-      //     ./in.cue:89:17
+    a: (string){
+      "a"
+      _must: (bool){ true }
     }
   }
   issue4251_notB_reversed: (struct){
@@ -391,13 +383,9 @@ Disjuncts:    154
         //     ./in.cue:97:3
       }
     }
-    a: (_|_){
-      // [cycle] issue4251_notB_reversed.a: 2 errors in empty disjunction:
-      // issue4251_notB_reversed.a: conflicting values "b" and "a":
-      //     ./in.cue:101:5
-      //     ./in.cue:102:5
-      // issue4251_notB_reversed.a._must: unresolved disjunction: x:
-      //     ./in.cue:98:17
+    a: (string){
+      "a"
+      _must: (bool){ true }
     }
   }
   panic1: (struct){
@@ -436,7 +424,7 @@ Disjuncts:    154
 diff old new
 --- old
 +++ new
-@@ -63,6 +63,63 @@
+@@ -63,6 +63,51 @@
        y: (int){ 1 }
      }
    }
@@ -450,13 +438,9 @@ diff old new
 +        //     ./in.cue:78:3
 +      }
 +    }
-+    a: (_|_){
-+      // [cycle] issue4251_notC.a: 2 errors in empty disjunction:
-+      // issue4251_notC.a: conflicting values "b" and "a":
-+      //     ./in.cue:83:11
-+      //     ./in.cue:84:5
-+      // issue4251_notC.a._must: unresolved disjunction: x:
-+      //     ./in.cue:79:17
++    a: (string){
++      "a"
++      _must: (bool){ true }
 +    }
 +  }
 +  issue4251_notB: (struct){
@@ -469,13 +453,9 @@ diff old new
 +        //     ./in.cue:88:3
 +      }
 +    }
-+    a: (_|_){
-+      // [cycle] issue4251_notB.a: 2 errors in empty disjunction:
-+      // issue4251_notB.a: conflicting values "b" and "a":
-+      //     ./in.cue:92:11
-+      //     ./in.cue:93:5
-+      // issue4251_notB.a._must: unresolved disjunction: x:
-+      //     ./in.cue:89:17
++    a: (string){
++      "a"
++      _must: (bool){ true }
 +    }
 +  }
 +  issue4251_notB_reversed: (struct){
@@ -488,19 +468,15 @@ diff old new
 +        //     ./in.cue:97:3
 +      }
 +    }
-+    a: (_|_){
-+      // [cycle] issue4251_notB_reversed.a: 2 errors in empty disjunction:
-+      // issue4251_notB_reversed.a: conflicting values "b" and "a":
-+      //     ./in.cue:101:5
-+      //     ./in.cue:102:5
-+      // issue4251_notB_reversed.a._must: unresolved disjunction: x:
-+      //     ./in.cue:98:17
++    a: (string){
++      "a"
++      _must: (bool){ true }
 +    }
 +  }
    panic1: (struct){
      #TypeFoo: (#struct){
        name: (string){ "foo" }
-@@ -69,8 +126,8 @@
+@@ -69,8 +114,8 @@
        foo_field: (string){ string }
      }
      #TypeBar: (#struct){
@@ -510,7 +486,7 @@ diff old new
      }
      #TypeBar2: (#struct){
        name: (string){ "bar" }
-@@ -77,21 +134,21 @@
+@@ -77,21 +122,21 @@
      }
      objs: (struct){
        obj1: (struct){

@@ -220,11 +220,14 @@ func NewOverlayFS(fs *CUECacheFS) *OverlayFS {
 // may be empty), and the final basename.
 func (fs *OverlayFS) pathComponents(uri protocol.DocumentURI) ([]string, string) {
 	const fileSchemePrefix = "file:///"
-	str := string(uri)
-	if !strings.HasPrefix(str, fileSchemePrefix) {
-		panic(fmt.Sprintf("%q is not a valid DocumentURI", str))
+	if !strings.HasPrefix(string(uri), fileSchemePrefix) {
+		panic(fmt.Sprintf("%q is not a valid DocumentURI", uri))
 	}
-	components := strings.Split(str[len(fileSchemePrefix):], "/")
+	str := uri.Path()
+	if !(len(str) > 0 && str[0] == '/') {
+		return nil, ""
+	}
+	components := strings.Split(str[1:], "/")
 	// strings.Split always returns a slice of at least 1 element
 	idx := len(components) - 1
 	return components[:idx], components[idx]

@@ -16,6 +16,24 @@
       "message": "if you did `path.Clean` and handled a leading slash, is this loop really necessary?",
       "revId": "cbc40ba8dd0c21b839c31f77d1a5da2a0640f0ab",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d740545d_d057bde5",
+        "filename": "internal/lsp/fscache/fs_overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-09T14:42:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1b42445_7db334b7",
+      "revId": "cbc40ba8dd0c21b839c31f77d1a5da2a0640f0ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

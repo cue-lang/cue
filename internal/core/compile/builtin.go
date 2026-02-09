@@ -64,7 +64,7 @@ var errorBuiltin = &adt.Builtin{
 				if err := ctx.Err(); err != nil {
 					args = append(args, x.Parts[i])
 				} else if y.Concreteness() == adt.Concrete &&
-					y.Kind()&adt.NumberKind|adt.StringKind|adt.BytesKind|adt.BoolKind != 0 {
+					y.Kind()&(adt.NumberKind|adt.StringKind|adt.BytesKind|adt.BoolKind) != 0 {
 					args = append(args, ctx.ToString(y))
 				} else {
 					args = append(args, y)

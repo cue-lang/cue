@@ -120,20 +120,6 @@ Conjuncts:    38
 Disjuncts:    30
 -- out/evalalpha --
 Errors:
-errorSelf.v: 3 errors in empty disjunction:
-errorSelf.v: conflicting values "x" and "z":
-    ./self.cue:7:5
-    ./self.cue:8:5
-errorSelf.v: conflicting values "y" and "z":
-    ./self.cue:7:11
-    ./self.cue:8:5
-interpolation.errorStructInterpolation: 3 errors in empty disjunction:
-interpolation.errorStructInterpolation: conflicting values "a" and "c":
-    ./in.cue:28:28
-    ./in.cue:29:28
-interpolation.errorStructInterpolation: conflicting values "b" and "c":
-    ./in.cue:28:34
-    ./in.cue:29:28
 issue3983.x: 2 errors in empty disjunction::
     ./issues.cue:7:5
     ./issues.cue:10:5
@@ -152,9 +138,11 @@ interpolation.errorNoInterpolation: custom:
     ./in.cue:23:36
     ./in.cue:23:24
     ./in.cue:24:24
-interpolation.errorStructInterpolation: cannot use {x:1} (type struct) as type (bool|string|bytes|number):
+interpolation.errorStructInterpolation: custom: {x:1}:
     ./in.cue:28:40
+    ./in.cue:28:28
     ./in.cue:28:57
+    ./in.cue:29:28
 interpolation.errorBottomInterpolation: custom: (1 & 2):
     ./in.cue:33:40
     ./in.cue:33:28
@@ -174,8 +162,11 @@ issue3984.v: must be a:
     ./issues.cue:13:11
     ./issues.cue:13:5
     ./issues.cue:14:5
-errorSelf.v: bad: :
+errorSelf.v: bad: {v:_|_(errorSelf.v: bad: value at path 'errorSelf')}:
     ./self.cue:7:17
+    ./self.cue:6:12
+    ./self.cue:7:5
+    ./self.cue:8:5
 
 Result:
 (_|_){
@@ -228,16 +219,11 @@ Result:
       //     ./in.cue:24:24
     }
     errorStructInterpolation: (_|_){
-      // [eval] interpolation.errorStructInterpolation: 3 errors in empty disjunction:
-      // interpolation.errorStructInterpolation: conflicting values "a" and "c":
-      //     ./in.cue:28:28
-      //     ./in.cue:29:28
-      // interpolation.errorStructInterpolation: conflicting values "b" and "c":
-      //     ./in.cue:28:34
-      //     ./in.cue:29:28
-      // interpolation.errorStructInterpolation: cannot use {x:1} (type struct) as type (bool|string|bytes|number):
+      // [eval] interpolation.errorStructInterpolation: custom: {x:1}:
       //     ./in.cue:28:40
+      //     ./in.cue:28:28
       //     ./in.cue:28:57
+      //     ./in.cue:29:28
     }
     errorBottomInterpolation: (_|_){
       // [eval] interpolation.errorBottomInterpolation: custom: (1 & 2):
@@ -303,15 +289,11 @@ Result:
   errorSelf: (_|_){
     // [eval]
     v: (_|_){
-      // [eval] errorSelf.v: 3 errors in empty disjunction:
-      // errorSelf.v: conflicting values "x" and "z":
+      // [eval] errorSelf.v: bad: {v:_|_(errorSelf.v: bad: value at path 'errorSelf')}:
+      //     ./self.cue:7:17
+      //     ./self.cue:6:12
       //     ./self.cue:7:5
       //     ./self.cue:8:5
-      // errorSelf.v: conflicting values "y" and "z":
-      //     ./self.cue:7:11
-      //     ./self.cue:8:5
-      // errorSelf.v: bad: :
-      //     ./self.cue:7:17
     }
   }
 }
@@ -319,24 +301,10 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,38 +1,75 @@
+@@ -1,38 +1,66 @@
  Errors:
 -selection.twoUserErrors: 3 errors in empty disjunction:
 -selection.twoUserErrors: conflicting values 2 and 1:
-+errorSelf.v: 3 errors in empty disjunction:
-+errorSelf.v: conflicting values "x" and "z":
-+    ./self.cue:7:5
-+    ./self.cue:8:5
-+errorSelf.v: conflicting values "y" and "z":
-+    ./self.cue:7:11
-+    ./self.cue:8:5
-+interpolation.errorStructInterpolation: 3 errors in empty disjunction:
-+interpolation.errorStructInterpolation: conflicting values "a" and "c":
-+    ./in.cue:28:28
-+    ./in.cue:29:28
-+interpolation.errorStructInterpolation: conflicting values "b" and "c":
-+    ./in.cue:28:34
-+    ./in.cue:29:28
 +issue3983.x: 2 errors in empty disjunction::
 +    ./issues.cue:7:5
 +    ./issues.cue:10:5
@@ -359,9 +327,11 @@ diff old new
 +    ./in.cue:23:36
 +    ./in.cue:23:24
 +    ./in.cue:24:24
-+interpolation.errorStructInterpolation: cannot use {x:1} (type struct) as type (bool|string|bytes|number):
++interpolation.errorStructInterpolation: custom: {x:1}:
 +    ./in.cue:28:40
++    ./in.cue:28:28
 +    ./in.cue:28:57
++    ./in.cue:29:28
 +interpolation.errorBottomInterpolation: custom: (1 & 2):
 +    ./in.cue:33:40
 +    ./in.cue:33:28
@@ -382,8 +352,11 @@ diff old new
 +    ./issues.cue:13:11
 +    ./issues.cue:13:5
 +    ./issues.cue:14:5
-+errorSelf.v: bad: :
++errorSelf.v: bad: {v:_|_(errorSelf.v: bad: value at path 'errorSelf')}:
 +    ./self.cue:7:17
++    ./self.cue:6:12
++    ./self.cue:7:5
++    ./self.cue:8:5
  
  Result:
  (_|_){
@@ -410,7 +383,7 @@ diff old new
        //     ./in.cue:6:17
        //     ./in.cue:6:19
        // selection.twoUserErrors: error one:
-@@ -42,38 +79,52 @@
+@@ -42,38 +70,47 @@
      }
      x: (int){ int }
      dropIncomplete: (_|_){
@@ -461,16 +434,11 @@ diff old new
 +      //     ./in.cue:24:24
 +    }
 +    errorStructInterpolation: (_|_){
-+      // [eval] interpolation.errorStructInterpolation: 3 errors in empty disjunction:
-+      // interpolation.errorStructInterpolation: conflicting values "a" and "c":
-+      //     ./in.cue:28:28
-+      //     ./in.cue:29:28
-+      // interpolation.errorStructInterpolation: conflicting values "b" and "c":
-+      //     ./in.cue:28:34
-+      //     ./in.cue:29:28
-+      // interpolation.errorStructInterpolation: cannot use {x:1} (type struct) as type (bool|string|bytes|number):
++      // [eval] interpolation.errorStructInterpolation: custom: {x:1}:
 +      //     ./in.cue:28:40
++      //     ./in.cue:28:28
 +      //     ./in.cue:28:57
++      //     ./in.cue:29:28
 +    }
 +    errorBottomInterpolation: (_|_){
 +      // [eval] interpolation.errorBottomInterpolation: custom: (1 & 2):
@@ -482,7 +450,7 @@ diff old new
    }
    indirect: (_|_){
      // [user]
-@@ -80,14 +131,66 @@
+@@ -80,14 +117,62 @@
      x: (string){ error() }
      y: (_|_){
        // [user] indirect.y: msg:
@@ -542,15 +510,11 @@ diff old new
 +  errorSelf: (_|_){
 +    // [eval]
 +    v: (_|_){
-+      // [eval] errorSelf.v: 3 errors in empty disjunction:
-+      // errorSelf.v: conflicting values "x" and "z":
++      // [eval] errorSelf.v: bad: {v:_|_(errorSelf.v: bad: value at path 'errorSelf')}:
++      //     ./self.cue:7:17
++      //     ./self.cue:6:12
 +      //     ./self.cue:7:5
 +      //     ./self.cue:8:5
-+      // errorSelf.v: conflicting values "y" and "z":
-+      //     ./self.cue:7:11
-+      //     ./self.cue:8:5
-+      // errorSelf.v: bad: :
-+      //     ./self.cue:7:17
      }
    }
  }

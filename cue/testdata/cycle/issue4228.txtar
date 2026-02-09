@@ -173,12 +173,20 @@ argocd.app.apps.k8s.kind: field not allowed:
 argocd.app.apps.k8s.metadata: field not allowed:
     ./in.cue:5:7
     ./in.cue:11:7
-#manifests: error in call to encoding/yaml.MarshalStream: field not allowed:
+#manifests: error in call to encoding/yaml.MarshalStream: <- invalid {namespace:string,revisionHistoryLimit:*3 | int,k8s:_|_(#entries.0.argocd.app.apps: <- invalid value at path '#entries.0.argocd.app.apps'),name:string}:
     ./export.cue:18:14
-    ./export.cue:15:3
-    ./in.cue:23:3
-argocd.app.apps: <- invalid :
+    ./in.cue:15:38
     ./in.cue:16:8
+    ./in.cue:23:3
+    ./in.cue:40:8
+    ./in.cue:47:22
+    ./in.cue:65:13
+argocd.app.apps: <- invalid {namespace:string,revisionHistoryLimit:*3 | int,k8s:_|_(argocd.app.apps.k8s.apiVersion: argocd.app.apps.k8s.apiVersion: field not allowed (and 2 more errors)),name:string}:
+    ./in.cue:16:8
+    ./in.cue:15:38
+    ./in.cue:40:8
+    ./in.cue:47:22
+    ./in.cue:65:13
 
 Result:
 (_|_){
@@ -194,10 +202,14 @@ Result:
     yamlStream: (string){ "" }
   }
   #manifests: (_|_){
-    // [eval] #manifests: error in call to encoding/yaml.MarshalStream: field not allowed:
+    // [eval] #manifests: error in call to encoding/yaml.MarshalStream: <- invalid {namespace:string,revisionHistoryLimit:*3 | int,k8s:_|_(#entries.0.argocd.app.apps: <- invalid value at path '#entries.0.argocd.app.apps'),name:string}:
     //     ./export.cue:18:14
-    //     ./export.cue:15:3
+    //     ./in.cue:15:38
+    //     ./in.cue:16:8
     //     ./in.cue:23:3
+    //     ./in.cue:40:8
+    //     ./in.cue:47:22
+    //     ./in.cue:65:13
   }
   _objectBase(:main): (struct){
     name: (string){ string }
@@ -298,8 +310,12 @@ Result:
         // argocd.app.apps.k8s.metadata: field not allowed:
         //     ./in.cue:5:7
         //     ./in.cue:11:7
-        // argocd.app.apps: <- invalid :
+        // argocd.app.apps: <- invalid {namespace:string,revisionHistoryLimit:*3 | int,k8s:_|_(argocd.app.apps.k8s.apiVersion: argocd.app.apps.k8s.apiVersion: field not allowed (and 2 more errors)),name:string}:
         //     ./in.cue:16:8
+        //     ./in.cue:15:38
+        //     ./in.cue:40:8
+        //     ./in.cue:47:22
+        //     ./in.cue:65:13
         namespace: (string){ string }
         revisionHistoryLimit: (_){ _ }
         k8s: (#struct){

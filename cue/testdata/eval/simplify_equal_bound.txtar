@@ -1,0 +1,24 @@
+-- in.cue --
+// SimplifyBounds should handle EqualOp bounds
+// without panicking, including in combination
+// with other bound types.
+a: !="c" & =="a" & "a"
+b: =="b" & !="c" & "b"
+c: =="x" & >="a" & "x"
+d: <="z" & =="y" & "y"
+-- out/evalalpha --
+(struct){
+  a: (string){ "a" }
+  b: (string){ "b" }
+  c: (string){ "x" }
+  d: (string){ "y" }
+}
+-- out/eval --
+-- out/compile --
+--- in.cue
+{
+  a: ((!="c" & =="a") & "a")
+  b: ((=="b" & !="c") & "b")
+  c: ((=="x" & >="a") & "x")
+  d: ((<="z" & =="y") & "y")
+}

@@ -234,6 +234,16 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 			return errIncompatibleBounds(ctx, k, x, y)
 		}
 
+	case x.Op == EqualOp:
+		if BinOpBool(ctx, nil, y.Op, xv, yv) {
+			return x
+		}
+
+	case y.Op == EqualOp:
+		if BinOpBool(ctx, nil, x.Op, yv, xv) {
+			return y
+		}
+
 	case x.Op == NotEqualOp:
 		if !BinOpBool(ctx, nil, y.Op, xv, yv) {
 			return y
@@ -265,6 +275,8 @@ func opInfo(op Op) (cmp Op, norm int) {
 		return LessEqualOp, -1
 	case LessEqualOp:
 		return LessThanOp, -1
+	case EqualOp:
+		return EqualOp, 4
 	case NotEqualOp:
 		return NotEqualOp, 0
 	case MatchOp:

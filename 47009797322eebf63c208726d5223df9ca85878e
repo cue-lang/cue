@@ -438,6 +438,24 @@
       "parentUuid": "b336b87e_b90744ee",
       "revId": "47009797322eebf63c208726d5223df9ca85878e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9000ecf8_4430e3c8",
+        "filename": "internal/lsp/server/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-09T10:32:36Z",
+      "side": 1,
+      "message": "yes exactly - in my mind they would have different names, but be an almost mirror of each other under the hood. I agree that we\u0027d only ever show one at a time.\n\nGo has similar actions like this. For example, \"extract as variable\" versus \"inline variable\" could be seen as mirrors to each other, although they add more edge cases like the naming of a new variable.",
+      "parentUuid": "7505ef8b_d5c19331",
+      "revId": "47009797322eebf63c208726d5223df9ca85878e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

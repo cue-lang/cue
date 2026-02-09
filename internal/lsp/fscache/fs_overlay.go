@@ -223,13 +223,19 @@ func (fs *OverlayFS) pathComponents(uri protocol.DocumentURI) ([]string, string)
 	if !strings.HasPrefix(string(uri), fileSchemePrefix) {
 		panic(fmt.Sprintf("%q is not a valid DocumentURI", uri))
 	}
-	str := uri.Path()
-	if !(len(str) > 0 && str[0] == '/') {
+	components := strings.Split(uri.Path(), string(os.PathSeparator))
+	idx := 0
+	component := ""
+	for idx, component = range components {
+		if component != "" {
+			break
+		}
+	}
+	components = components[idx:]
+	if len(components) == 0 {
 		return nil, ""
 	}
-	components := strings.Split(str[1:], "/")
-	// strings.Split always returns a slice of at least 1 element
-	idx := len(components) - 1
+	idx = len(components) - 1
 	return components[:idx], components[idx]
 }
 

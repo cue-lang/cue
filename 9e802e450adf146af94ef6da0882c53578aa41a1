@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0b31d72_1ed0991e",
+        "filename": "cue/testdata/eval/bounds.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-09T14:34:51Z",
+      "side": 1,
+      "message": "Maybe als\t\nb: \u003d\u003d\"b\" \u0026 !\u003d\"b\" \u0026 \"b\"",
+      "revId": "9e802e450adf146af94ef6da0882c53578aa41a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

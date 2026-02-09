@@ -224,10 +224,10 @@ func (fs *OverlayFS) pathComponents(uri protocol.DocumentURI) ([]string, string)
 		panic(fmt.Sprintf("%q is not a valid DocumentURI", uri))
 	}
 	str := uri.Path()
-	if !(len(str) > 0 && str[0] == '/') {
+	if !(len(str) > 0 && str[0] == os.PathSeparator) {
 		return nil, ""
 	}
-	components := strings.Split(str[1:], "/")
+	components := strings.Split(str[1:], string(os.PathSeparator))
 	// strings.Split always returns a slice of at least 1 element
 	idx := len(components) - 1
 	return components[:idx], components[idx]

@@ -27,9 +27,17 @@ package foo
 	Run(t, files, func(t *testing.T, env *Env) {
 		env.OpenFile("foo.cue")
 		env.EditBuffer("foo.cue", fake.NewEdit(0, 0, 1, 0, "package bar\n"))
+		env.Await(
+			env.DoneWithOpen(),
+			env.DoneWithChange(),
+		)
 		env.FormatBuffer("foo.cue")
 		got := env.BufferText("foo.cue")
-		want := "package bar\n\n// this is a test\n"
+		want := `
+package bar
+
+// this is a test
+`[1:]
 		qt.Assert(t, qt.Equals(got, want))
 	})
 }

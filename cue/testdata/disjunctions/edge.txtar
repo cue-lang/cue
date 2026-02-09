@@ -76,6 +76,18 @@ cyclicSelfElimination: ok: {
 	y: 1 | {y: 1}
 	y
 }
+// Value aliases must resolve to the specific disjunct arm's
+// value, not the original unresolved disjunction.
+issue4251: {
+	#NotC: x={
+		string
+		_must: true & x != "c"
+	}
+
+	a: #NotC
+	a: "a" | "b"
+	a: "a"
+}
 -- panic.cue --
 // This used to cause a panic with evalv3.
 panic1: {
@@ -101,17 +113,17 @@ panic1: {
 }
 -- out/evalalpha/stats --
 Leaks:  18
-Freed:  154
-Reused: 126
-Allocs: 46
+Freed:  163
+Reused: 134
+Allocs: 47
 Retain: 0
 
-Unifications: 68
-Conjuncts:    186
-Disjuncts:    47
+Unifications: 73
+Conjuncts:    200
+Disjuncts:    49
 Notifications: 9
 
-NumCloseIDs: 49
+NumCloseIDs: 54
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -127,17 +139,17 @@ diff old new
 -Conjuncts:    237
 -Disjuncts:    154
 +Leaks:  18
-+Freed:  154
-+Reused: 126
-+Allocs: 46
++Freed:  163
++Reused: 134
++Allocs: 47
 +Retain: 0
 +
-+Unifications: 68
-+Conjuncts:    186
-+Disjuncts:    47
++Unifications: 73
++Conjuncts:    200
++Disjuncts:    49
 +Notifications: 9
 +
-+NumCloseIDs: 49
++NumCloseIDs: 54
 -- out/eval/stats --
 Leaks:  0
 Freed:  152
@@ -312,6 +324,25 @@ Disjuncts:    154
       y: (int){ 1 }
     }
   }
+  issue4251: (struct){
+    #NotC: (string){
+      string
+      _must: (_|_){
+        // [incomplete] issue4251.#NotC._must: non-concrete value string in operand to !=:
+        //     ./in.cue:78:17
+        //     ./in.cue:76:11
+        //     ./in.cue:77:3
+      }
+    }
+    a: (_|_){
+      // [cycle] issue4251.a: 2 errors in empty disjunction:
+      // issue4251.a: conflicting values "b" and "a":
+      //     ./in.cue:82:11
+      //     ./in.cue:83:5
+      // issue4251.a._must: unresolved disjunction: x:
+      //     ./in.cue:78:17
+    }
+  }
   panic1: (struct){
     #TypeFoo: (#struct){
       name: (string){ "foo" }
@@ -348,7 +379,33 @@ Disjuncts:    154
 diff old new
 --- old
 +++ new
-@@ -69,8 +69,8 @@
+@@ -63,6 +63,25 @@
+       y: (int){ 1 }
+     }
+   }
++  issue4251: (struct){
++    #NotC: (string){
++      string
++      _must: (_|_){
++        // [incomplete] issue4251.#NotC._must: non-concrete value string in operand to !=:
++        //     ./in.cue:78:17
++        //     ./in.cue:76:11
++        //     ./in.cue:77:3
++      }
++    }
++    a: (_|_){
++      // [cycle] issue4251.a: 2 errors in empty disjunction:
++      // issue4251.a: conflicting values "b" and "a":
++      //     ./in.cue:82:11
++      //     ./in.cue:83:5
++      // issue4251.a._must: unresolved disjunction: x:
++      //     ./in.cue:78:17
++    }
++  }
+   panic1: (struct){
+     #TypeFoo: (#struct){
+       name: (string){ "foo" }
+@@ -69,8 +88,8 @@
        foo_field: (string){ string }
      }
      #TypeBar: (#struct){
@@ -358,7 +415,7 @@ diff old new
      }
      #TypeBar2: (#struct){
        name: (string){ "bar" }
-@@ -77,21 +77,21 @@
+@@ -77,21 +96,21 @@
      }
      objs: (struct){
        obj1: (struct){
@@ -488,6 +545,15 @@ cyclicSelfElimination.ok: The new evaluator handles this correctly.
       })
       〈0;y〉
     }
+  }
+  issue4251: {
+    #NotC: {
+      string
+      _must: (true & (〈1〉 != "c"))
+    }
+    a: 〈0;#NotC〉
+    a: ("a"|"b")
+    a: "a"
   }
 }
 --- panic.cue

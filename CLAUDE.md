@@ -88,6 +88,7 @@ go fmt ./...
 - Tests use the `.txtar` format which contains both input and expected output in a single file
 - Use `TestX` functions in test files for debugging individual test cases
 - The `CUE_UPDATE=1` environment variable updates golden files with actual output
+- Prefer adding test cases to an existing txtar file that is appropriate for the type of reproducer
 
 ### Contribution Model
 - Single commit per PR/CL model

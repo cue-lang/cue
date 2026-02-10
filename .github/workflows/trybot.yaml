@@ -94,8 +94,6 @@ jobs:
         run: go env -w GOFLAGS=-count=1
       - name: Login to CUE registry
         uses: cue-labs/registry-login-action@v1
-      - name: workaround https://golang.org/issue/72824
-        run: go tool -n cue
       - if: (matrix.go-version == '1.26.x' && matrix.runner == 'namespace-profile-linux-amd64-large')
         name: Early git and code sanity checks
         run: go run ./internal/ci/checks

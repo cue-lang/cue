@@ -61,12 +61,6 @@ workflows: trybot: _repo.bashWorkflow & {
 
 				_repo.loginCentralRegistry,
 
-				// TODO(go1.25) remove this step, because https://golang.org/issue/72824 is fixed
-				{
-					name: "workaround https://golang.org/issue/72824"
-					run:  "go tool -n cue"
-				},
-
 				_repo.earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
 					// so we only need to run them on one of the matrix jobs.

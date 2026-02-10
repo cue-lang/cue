@@ -23,7 +23,6 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"regexp"
 	"slices"
 	"strings"
 	"testing"
@@ -84,13 +83,6 @@ func TestExternal(t *testing.T) {
 	err = writeExternalTestStats(testDir, tests)
 	qt.Assert(t, qt.IsNil(err))
 }
-
-var rxCharacterClassCategoryAlias = regexp.MustCompile(`\\p{(Cased_Letter|Close_Punctuation|Combining_Mark|Connector_Punctuation|Control|Currency_Symbol|Dash_Punctuation|Decimal_Number|Enclosing_Mark|Final_Punctuation|Format|Initial_Punctuation|Letter|Letter_Number|Line_Separator|Lowercase_Letter|Mark|Math_Symbol|Modifier_Letter|Modifier_Symbol|Nonspacing_Mark|Number|Open_Punctuation|Other|Other_Letter|Other_Number|Other_Punctuation|Other_Symbol|Paragraph_Separator|Private_Use|Punctuation|Separator|Space_Separator|Spacing_Mark|Surrogate|Symbol|Titlecase_Letter|Unassigned|Uppercase_Letter|cntrl|digit|punct)}`)
-
-var supportsCharacterClassCategoryAlias = func() bool {
-	_, err := regexp.Compile(`\p{Letter}`)
-	return err == nil
-}()
 
 var fixesParsingIPv6HostWithoutBrackets = func() bool {
 	// We use Sprintf so that staticcheck on Go 1.26 and later does not
@@ -188,17 +180,6 @@ func maybeSkip(t *testing.T, vers jsonschema.Version, versStr string, s *externa
 	switch {
 	case vers == jsonschema.VersionUnknown:
 		t.Skipf("skipping test for unknown schema version %v", versStr)
-
-	case rxCharacterClassCategoryAlias.Match(s.Schema) && !supportsCharacterClassCategoryAlias:
-		// Go 1.25 implements Unicode category aliases in regular expressions,
-		// and so e.g. \p{Letter} did not work on Go 1.24.x releases.
-		// See: https://github.com/golang/go/issues/70780
-		// Our tests must run on the latest two stable Go versions, currently 1.24 and 1.25,
-		// where such character classes lead to schema compilation errors on 1.24.
-		//
-		// As a temporary compromise, only run these tests on Go 1.25 or later.
-		// TODO: get rid of this whole thing once we require Go 1.25 or later in the future.
-		t.Skip("regexp character classes for Unicode category aliases work only on Go 1.25 and later")
 
 	case bytes.Contains(s.Schema, []byte(`"iri"`)) && fixesParsingIPv6HostWithoutBrackets:
 		// Go 1.26 fixes [url.Parse] so that it correctly rejects IPv6 hosts

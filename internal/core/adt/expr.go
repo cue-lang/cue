@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"fmt"
 	"math/big"
-	"regexp"
 
 	"github.com/cockroachdb/apd/v3"
 
@@ -294,7 +293,6 @@ func (x *Num) BigInt(z *big.Int) *big.Int {
 type String struct {
 	Src ast.Node
 	Str string
-	RE  *regexp.Regexp // only set if needed
 }
 
 func (x *String) Source() ast.Node { return x.Src }
@@ -304,7 +302,6 @@ func (x *String) Kind() Kind       { return StringKind }
 type Bytes struct {
 	Src ast.Node
 	B   []byte
-	RE  *regexp.Regexp // only set if needed
 }
 
 func (x *Bytes) Source() ast.Node { return x.Src }
@@ -1090,9 +1087,9 @@ func (x *Interpolation) evaluate(c *OpContext, state Flags) Value {
 		return err
 	}
 	if x.K == BytesKind {
-		return &Bytes{x.Src, buf.Bytes(), nil}
+		return &Bytes{x.Src, buf.Bytes()}
 	}
-	return &String{x.Src, buf.String(), nil}
+	return &String{x.Src, buf.String()}
 }
 
 // UnaryExpr is a unary expression.

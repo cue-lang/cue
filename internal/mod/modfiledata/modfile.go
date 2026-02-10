@@ -61,6 +61,9 @@ type File struct {
 	// defaultMajorVersions maps from module base path (the path
 	// without its major version) to the major version default for that path.
 	defaultMajorVersions map[string]string
+
+	// replacements maps from module path (with major version) to its replacement.
+	replacements map[string]Replacement
 }
 
 // QualifiedModule returns the fully qualified module path
@@ -116,6 +119,18 @@ type Language struct {
 type Dep struct {
 	Version string `json:"v"`
 	Default bool   `json:"default,omitempty"`
+	Replace string `json:"replace,omitempty"`
+}
+
+// Replacement represents a processed replace directive.
+// Either New or LocalPath will be set, but not both.
+type Replacement struct {
+	// Old is the module being replaced.
+	Old module.Version
+	// New is the replacement module version (for remote replacements).
+	New module.Version
+	// LocalPath is set for local path replacements (starts with ./ or ../).
+	LocalPath string
 }
 
 // Init initializes the private dependency-related fields of f from
@@ -158,12 +173,32 @@ func (mf *File) init(strict bool) error {
 	versionByModule := make(map[string]module.Version)
 	var versions []module.Version
 	defaultMajorVersions := make(map[string]string)
+	replacements := make(map[string]Replacement)
 	if mainPath != "" {
 		// The main module is always the default for its own major version.
 		defaultMajorVersions[mainPath] = mainMajor
 	}
 	// Check that major versions match dependency versions.
 	for m, dep := range mf.Deps {
+		// Handle replace directives
+		if dep.Replace != "" {
+			repl, err := parseReplacement(m, dep.Replace, strict)
+			if err != nil {
+				return err
+			}
+			replacements[m] = repl
+		}
+
+		// If version is empty and there's a replace, this is a version-independent
+		// replacement - we don't add it to the versions list but still track the replacement.
+		if dep.Version == "" {
+			if dep.Replace == "" {
+				return fmt.Errorf("module %q has no version and no replacement", m)
+			}
+			// Version-independent replacement - don't add to versions list
+			continue
+		}
+
 		vers, err := module.NewVersion(m, dep.Version)
 		if err != nil {
 			return fmt.Errorf("cannot make version from module %q, version %q: %v", m, dep.Version, err)
@@ -193,11 +228,57 @@ func (mf *File) init(strict bool) error {
 	if len(defaultMajorVersions) == 0 {
 		defaultMajorVersions = nil
 	}
+	if len(replacements) == 0 {
+		replacements = nil
+	}
 	mf.versions = versions[:len(versions):len(versions)]
 	slices.SortFunc(mf.versions, module.Version.Compare)
 	mf.versionByModule = versionByModule
 	mf.defaultMajorVersions = defaultMajorVersions
+	mf.replacements = replacements
 	return nil
+}
+
+// parseReplacement parses a replace directive value and returns a Replacement.
+// The replace value can be either:
+// - A local file path starting with "./" or "../"
+// - A remote module path with version (e.g., "other.com/bar@v1.0.0")
+func parseReplacement(oldPath, replace string, strict bool) (Replacement, error) {
+	isLocal := strings.HasPrefix(replace, "./") || strings.HasPrefix(replace, "../")
+
+	// Reject absolute paths - must use relative paths starting with ./ or ../
+	if isAbsolutePath(replace) {
+		return Replacement{}, fmt.Errorf("absolute path replacement %q not allowed; use relative path starting with ./ or ../", replace)
+	}
+
+	if strict && isLocal {
+		return Replacement{}, fmt.Errorf("local path replacement %q not allowed in strict mode", replace)
+	}
+
+	// Parse the old module path to create a module.Version. We use an empty
+	// version string because the replacement applies to all versions of the
+	// module (unlike Go, CUE replacements don't support version-specific replacements).
+	oldVers, err := module.NewVersion(oldPath, "")
+	if err != nil {
+		return Replacement{}, fmt.Errorf("invalid module path %q in replace directive: %v", oldPath, err)
+	}
+
+	repl := Replacement{
+		Old: oldVers,
+	}
+
+	if isLocal {
+		repl.LocalPath = replace
+	} else {
+		// Parse as module@version
+		newVers, err := module.ParseVersion(replace)
+		if err != nil {
+			return Replacement{}, fmt.Errorf("invalid replacement %q: must be local path (./... or ../...) or module@version: %v", replace, err)
+		}
+		repl.New = newVers
+	}
+
+	return repl, nil
 }
 
 // MajorVersion returns the major version of the module,
@@ -226,6 +307,13 @@ func (f *File) DefaultMajorVersions() map[string]string {
 	return f.defaultMajorVersions
 }
 
+// Replacements returns the map of module replacements.
+// The map is keyed by module path (with major version, e.g., "foo.com/bar@v0").
+// The caller should not modify the returned map.
+func (f *File) Replacements() map[string]Replacement {
+	return f.replacements
+}
+
 // ModuleForImportPath returns the module that should contain the given
 // import path and reports whether the module was found.
 // It does not check to see if the import path actually exists within the module.
@@ -248,4 +336,84 @@ func (f *File) ModuleForImportPath(importPath string) (module.Version, bool) {
 		}
 	}
 	return module.Version{}, false
+}
+
+// isAbsolutePath reports whether the given path is an absolute path
+// on any supported platform (Unix or Windows).
+func isAbsolutePath(p string) bool {
+	return strings.HasPrefix(p, "/") || isWindowsAbs(p)
+}
+
+func isWindowsAbs(path string) bool {
+	if isReservedWindowsName(path) {
+		return true
+	}
+	volLen := windowsVolumeNameLen(path)
+	if volLen == 0 {
+		return false
+	}
+	if len(path) == volLen {
+		// UNC roots like \\server\share are absolute.
+		return len(path) >= 2 && isSlash(path[0]) && isSlash(path[1])
+	}
+	path = path[volLen:]
+	return isSlash(path[0])
+}
+
+func isSlash(c byte) bool {
+	return c == '\\' || c == '/'
+}
+
+var reservedWindowsNames = []string{
+	"CON", "PRN", "AUX", "NUL",
+	"COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+	"LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+}
+
+func isReservedWindowsName(path string) bool {
+	if len(path) == 0 {
+		return false
+	}
+	for _, reserved := range reservedWindowsNames {
+		if strings.EqualFold(path, reserved) {
+			return true
+		}
+	}
+	return false
+}
+
+// windowsVolumeNameLen returns length of the leading volume name on Windows.
+func windowsVolumeNameLen(path string) int {
+	if len(path) < 2 {
+		return 0
+	}
+	// with drive letter
+	c := path[0]
+	if path[1] == ':' && (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z')) {
+		return 2
+	}
+	// UNC path
+	if l := len(path); l >= 5 && isSlash(path[0]) && isSlash(path[1]) &&
+		!isSlash(path[2]) && path[2] != '.' {
+		// leading \\ then server name
+		for n := 3; n < l-1; n++ {
+			if isSlash(path[n]) {
+				n++
+				// share name
+				if !isSlash(path[n]) {
+					if path[n] == '.' {
+						break
+					}
+					for ; n < l; n++ {
+						if isSlash(path[n]) {
+							break
+						}
+					}
+					return n
+				}
+				break
+			}
+		}
+	}
+	return 0
 }

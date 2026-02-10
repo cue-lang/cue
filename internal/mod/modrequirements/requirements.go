@@ -9,6 +9,7 @@ import (
 	"sync/atomic"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/mod/modfiledata"
 	"cuelang.org/go/internal/mod/mvs"
 	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/internal/par"
@@ -43,6 +44,10 @@ type Requirements struct {
 	// in the roots.
 	defaultMajorVersions map[string]majorVersionDefault
 
+	// replacements maps module paths to their replacements.
+	// Keyed by module path with major version (e.g., "foo.com/bar@v0").
+	replacements map[string]modfiledata.Replacement
+
 	graphOnce sync.Once // guards writes to (but not reads from) graph
 	graph     atomic.Pointer[cachedGraph]
 }
@@ -70,9 +75,11 @@ type cachedGraph struct {
 // mdule paths, if any have been specified. For example {"foo.com/bar": "v0"} specifies
 // that the default major version for the module `foo.com/bar` is `v0`.
 //
-// The caller must not modify rootModules or defaultMajorVersions after passing
+// The replacements map holds module replacements, keyed by module path with major version.
+//
+// The caller must not modify rootModules, defaultMajorVersions, or replacements after passing
 // them to NewRequirements.
-func NewRequirements(mainModulePath string, reg Registry, rootModules []module.Version, defaultMajorVersions map[string]string) *Requirements {
+func NewRequirements(mainModulePath string, reg Registry, rootModules []module.Version, defaultMajorVersions map[string]string, replacements map[string]modfiledata.Replacement) *Requirements {
 	mainModuleVersion := module.MustNewVersion(mainModulePath, "")
 	// TODO add direct, so we can tell which modules are directly used by the
 	// main module.
@@ -89,6 +96,7 @@ func NewRequirements(mainModulePath string, reg Registry, rootModules []module.V
 		mainModuleVersion: mainModuleVersion,
 		rootModules:       rootModules,
 		maxRootVersion:    make(map[string]string, len(rootModules)),
+		replacements:      replacements,
 	}
 	for i, m := range rootModules {
 		if i > 0 {
@@ -113,6 +121,7 @@ func (rs *Requirements) WithDefaultMajorVersions(defaults map[string]string) *Re
 		mainModuleVersion: rs.mainModuleVersion,
 		rootModules:       rs.rootModules,
 		maxRootVersion:    rs.maxRootVersion,
+		replacements:      rs.replacements,
 	}
 	// Initialize graph and graphOnce in rs1 to mimic their state in rs.
 	// We can't copy the sync.Once, so if it's already triggered, we'll
@@ -208,6 +217,19 @@ func (rs *Requirements) DefaultMajorVersion(mpath string) (string, MajorVersionD
 	}
 }
 
+// Replacement returns the replacement for the given module path, if any.
+// The mpath should include the major version (e.g., "foo.com/bar@v0").
+func (rs *Requirements) Replacement(mpath string) (modfiledata.Replacement, bool) {
+	r, ok := rs.replacements[mpath]
+	return r, ok
+}
+
+// Replacements returns the map of all module replacements.
+// The caller should not modify the returned map.
+func (rs *Requirements) Replacements() map[string]modfiledata.Replacement {
+	return rs.replacements
+}
+
 // rootModules returns the set of root modules of the graph, sorted and capped to
 // length. It may contain duplicates, and may contain multiple versions for a
 // given module path.
@@ -259,11 +281,20 @@ type ModuleGraph struct {
 //
 // The caller must not modify the returned summary.
 func (rs *Requirements) cueModSummary(ctx context.Context, m module.Version) (*modFileSummary, error) {
-	require, err := rs.registry.Requirements(ctx, m)
+	// Apply replacement if there is one for this module.
+	// Remote module replacements are handled here by substituting the fetch target.
+	// Local path replacements are handled transparently by the localReplacementRegistry
+	// wrapper (in localreg.go) which intercepts registry.Requirements() calls.
+	fetchModule := m
+	if repl, ok := rs.replacements[m.Path()]; ok && repl.New.IsValid() {
+		// Remote module replacement - fetch requirements from the replacement module
+		fetchModule = repl.New
+	}
+
+	require, err := rs.registry.Requirements(ctx, fetchModule)
 	if err != nil {
 		return nil, err
 	}
-	// TODO account for replacements, exclusions, etc.
 	return &modFileSummary{
 		module:  m,
 		require: require,

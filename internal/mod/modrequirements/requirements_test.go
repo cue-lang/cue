@@ -66,7 +66,7 @@ language: version: "v0.8.0"
 
 	rootVersion := mustParseVersion("example.com@v0")
 
-	rs := NewRequirements(rootVersion.Path(), reg, versions("foo.com/bar/hello@v0.2.3"), nil)
+	rs := NewRequirements(rootVersion.Path(), reg, versions("foo.com/bar/hello@v0.2.3"), nil, nil)
 
 	v, ok := rs.RootSelected(rootVersion.Path())
 	qt.Assert(t, qt.IsTrue(ok))
@@ -120,7 +120,7 @@ deps: "bar.com@v0": v: "v0.0.2"	// doesn't exist
 	rs := NewRequirements(rootVersion.Path(), reg, versions(
 		"bar.com@v0.0.2",
 		"foo.com/bar/hello@v0.2.3",
-	), nil)
+	), nil, nil)
 	_, err := rs.Graph(ctx)
 	qt.Assert(t, qt.ErrorMatches(err, `bar.com@v0.0.2: module bar.com@v0.0.2: module not found`))
 	qt.Assert(t, qt.ErrorAs(err, new(*mvs.BuildListError[module.Version])))
@@ -136,7 +136,7 @@ func TestRequirementsWithDefaultMajorVersions(t *testing.T) {
 		"foo.com/bar/hello@v0.2.3",
 	), map[string]string{
 		"bar.com": "v1",
-	})
+	}, nil)
 	qt.Assert(t, qt.DeepEquals(rs.DefaultMajorVersions(), map[string]string{
 		"bar.com": "v1",
 	}))

@@ -41,8 +41,16 @@ func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registr
 	if err != nil {
 		return nil, err
 	}
-	rs := modrequirements.NewRequirements(mf.QualifiedModule(), reg, mf.DepVersions(), mf.DefaultMajorVersions())
-	mversions, err := resolveUpdateVersions(ctx, reg, rs, mainModuleVersion, versions)
+	mainModuleLoc := module.SourceLoc{
+		FS:  fsys,
+		Dir: modRoot,
+	}
+	wrappedReg, err := NewLocalReplacementRegistry(reg, mainModuleLoc, mf.Replacements())
+	if err != nil {
+		return nil, err
+	}
+	rs := modrequirements.NewRequirements(mf.QualifiedModule(), wrappedReg, mf.DepVersions(), mf.DefaultMajorVersions(), mf.Replacements())
+	mversions, err := resolveUpdateVersions(ctx, wrappedReg, rs, mainModuleVersion, versions)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +88,7 @@ func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registr
 	}
 	newVersions = slices.AppendSeq(newVersions, maps.Values(mversionsMap))
 	slices.SortFunc(newVersions, module.Version.Compare)
-	rs = modrequirements.NewRequirements(mf.QualifiedModule(), reg, newVersions, mf.DefaultMajorVersions())
+	rs = modrequirements.NewRequirements(mf.QualifiedModule(), wrappedReg, newVersions, mf.DefaultMajorVersions(), mf.Replacements())
 	g, err = rs.Graph(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("cannot determine new module graph: %v", err)
@@ -99,7 +107,7 @@ func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registr
 			finalVersions = append(finalVersions, v)
 		}
 	}
-	rs = modrequirements.NewRequirements(mf.QualifiedModule(), reg, finalVersions, mf.DefaultMajorVersions())
+	rs = modrequirements.NewRequirements(mf.QualifiedModule(), wrappedReg, finalVersions, mf.DefaultMajorVersions(), mf.Replacements())
 	return modfileFromRequirements(mf, rs), nil
 }
 

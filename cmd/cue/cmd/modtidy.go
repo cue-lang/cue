@@ -25,6 +25,7 @@ import (
 
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/mod/modfile"
+	"cuelang.org/go/mod/module"
 )
 
 func newModTidyCmd(c *Command) *cobra.Command {
@@ -62,10 +63,10 @@ func runModTidy(cmd *Command, args []string) error {
 		return err
 	}
 	if flagCheck.Bool(cmd) {
-		err := modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg)
+		err := modload.CheckTidy(ctx, module.OSDirFS(modRoot), ".", reg)
 		return suggestModCommand(err)
 	}
-	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg)
+	mf, err := modload.Tidy(ctx, module.OSDirFS(modRoot), ".", reg)
 	if err != nil {
 		return suggestModCommand(err)
 	}

@@ -62,6 +62,14 @@ func (v *Vertex) Default() *Vertex {
 			return v
 		case 1:
 			w = ToVertex(Default(d.Values[0]))
+			// If w already has conjuncts, return as-is to avoid race.
+			if w.Conjuncts != nil {
+				return w
+			}
+			// Make a copy before modifying to avoid racing on shared vertex.
+			x := *w
+			x.state = nil
+			w = &x
 		default:
 			x := *v
 			x.state = nil
@@ -71,15 +79,13 @@ func (v *Vertex) Default() *Vertex {
 				NumDefaults: 0,
 			}
 			w = &x
-			w.Conjuncts = nil
 		}
 
-		if w.Conjuncts == nil {
-			for _, c := range v.Conjuncts {
-				// TODO: preserve field information.
-				expr, _ := stripNonDefaults(c.Elem())
-				w.Conjuncts = append(w.Conjuncts, MakeRootConjunct(c.Env, expr))
-			}
+		// w is now a fresh copy, safe to modify without race.
+		w.Conjuncts = make([]Conjunct, 0, len(v.Conjuncts))
+		for _, c := range v.Conjuncts {
+			node := stripNonDefaultsNode(c)
+			w.Conjuncts = append(w.Conjuncts, MakeRootConjunct(c.Env, node))
 		}
 		return w
 
@@ -98,6 +104,10 @@ func (v *Vertex) Default() *Vertex {
 	}
 }
 
+// stripNonDefaults removes non-default values from disjunctions in the given
+// expression. It returns the modified expression and whether any stripping
+// occurred. For example, `*1 | 2 | 3` becomes `1`.
+//
 // TODO: this should go: record preexpanded disjunctions in Vertex.
 func stripNonDefaults(elem Elem) (r Elem, stripped bool) {
 	expr, ok := elem.(Expr)
@@ -153,5 +163,56 @@ func stripNonDefaults(elem Elem) (r Elem, stripped bool) {
 
 	default:
 		return x, false
+	}
+}
+
+// stripNonDefaultsNode is like stripNonDefaults but operates on a Conjunct
+// and preserves field wrappers (Field, LetField, etc.) so that field metadata
+// is retained when computing defaults.
+func stripNonDefaultsNode(c Conjunct) Node {
+	switch x := c.x.(type) {
+	case *Field:
+		if expr, stripped := stripNonDefaults(x.Value); stripped {
+			f := *x
+			f.Value = expr.(Expr)
+			return &f
+		}
+		return x
+	case *LetField:
+		if expr, stripped := stripNonDefaults(x.Value); stripped {
+			f := *x
+			f.Value = expr.(Expr)
+			return &f
+		}
+		return x
+	case *BulkOptionalField:
+		if expr, stripped := stripNonDefaults(x.Value); stripped {
+			f := *x
+			f.Value = expr.(Expr)
+			return &f
+		}
+		return x
+	case *DynamicField:
+		if expr, stripped := stripNonDefaults(x.Value); stripped {
+			f := *x
+			f.Value = expr.(Expr)
+			return &f
+		}
+		return x
+	case *Ellipsis:
+		if x.Value == nil {
+			return x
+		}
+		if expr, stripped := stripNonDefaults(x.Value); stripped {
+			e := *x
+			e.Value = expr.(Expr)
+			return &e
+		}
+		return x
+	default:
+		if elem, stripped := stripNonDefaults(c.Elem()); stripped {
+			return elem
+		}
+		return c.x
 	}
 }

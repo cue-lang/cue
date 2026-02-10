@@ -1227,45 +1227,40 @@ func (c *OpContext) bytesValue(v Value, as interface{}) []byte {
 
 var matchNone = regexp.MustCompile("^$")
 
+// regexpCache caches compiled regular expressions by pattern string.
+// Uses weak references so unused patterns can be garbage collected.
+var regexpCache = newMemoizer(func(pattern string) (*regexp.Regexp, error) {
+	// TODO(mvdan): consider simplifying patterns (which regexp/syntax can do)
+	// before we look up or insert on the weak map? so that e.g. fo[o] bar{1} and
+	// foo bar share the same entry.
+	return regexp.Compile(pattern)
+})
+
+// cachedRegexp returns a compiled regexp for the given pattern, using a shared
+// cache to avoid recompilation and enable thread-safe access.
+//
+
 func (c *OpContext) regexp(v Value) *regexp.Regexp {
 	v = Unwrap(v)
 	if isError(v) {
 		return matchNone
 	}
+	var pattern string
 	switch x := v.(type) {
 	case *String:
-		if x.RE != nil {
-			return x.RE
-		}
-		// TODO: synchronization
-		p, err := regexp.Compile(x.Str)
-		if err != nil {
-			// FatalError? How to cache error
-			c.AddErrf("invalid regexp: %s", err)
-			x.RE = matchNone
-		} else {
-			x.RE = p
-		}
-		return x.RE
-
+		pattern = x.Str
 	case *Bytes:
-		if x.RE != nil {
-			return x.RE
-		}
-		// TODO: synchronization
-		p, err := regexp.Compile(string(x.B))
-		if err != nil {
-			c.AddErrf("invalid regexp: %s", err)
-			x.RE = matchNone
-		} else {
-			x.RE = p
-		}
-		return x.RE
-
+		pattern = string(x.B)
 	default:
 		c.typeError(v, StringKind|BytesKind)
 		return matchNone
 	}
+	re, err := regexpCache.get(pattern)
+	if err != nil {
+		c.AddErrf("invalid regexp: %s", err)
+		return matchNone
+	}
+	return re
 }
 
 // newNum creates a new number of the given kind. It reports an error value

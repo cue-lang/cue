@@ -1277,7 +1277,7 @@ func parseString(c *compiler, node ast.Expr, q literal.QuoteInfo, s string) (n a
 		return c.errf(node, "invalid string: %v", err)
 	}
 	if q.IsDouble() {
-		return &adt.String{Src: node, Str: str, RE: nil}
+		return &adt.String{Src: node, Str: str}
 	}
-	return &adt.Bytes{Src: node, B: []byte(str), RE: nil}
+	return &adt.Bytes{Src: node, B: []byte(str)}
 }

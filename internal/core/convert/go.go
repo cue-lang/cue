@@ -210,7 +210,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 	typ := val.Type()
 	switch typ {
 	case astFile:
-		v, _ := val.Interface().(*ast.File) // TODO(go1.25): use reflect.TypeAssert
+		v, _ := reflect.TypeAssert[*ast.File](val)
 		x, err := compile.Files(nil, ctx, pkgID(), v)
 		if err != nil {
 			return &adt.Bottom{Err: errors.Promote(err, "compile")}
@@ -221,7 +221,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return x
 
 	case bigInt:
-		v, _ := val.Interface().(*big.Int) // TODO(go1.25): use reflect.TypeAssert
+		v, _ := reflect.TypeAssert[*big.Int](val)
 		return &adt.Num{
 			Src: src,
 			K:   adt.IntKind,
@@ -229,7 +229,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		}
 
 	case bigRat:
-		v, _ := val.Interface().(*big.Rat) // TODO(go1.25): use reflect.TypeAssert
+		v, _ := reflect.TypeAssert[*big.Rat](val)
 		// should we represent this as a binary operation?
 		n := &adt.Num{Src: src, K: adt.IntKind}
 		num := fromGoBigInt(v.Num())
@@ -243,7 +243,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return n
 
 	case bigFloat:
-		v, _ := val.Interface().(*big.Float) // TODO(go1.25): use reflect.TypeAssert
+		v, _ := reflect.TypeAssert[*big.Float](val)
 		n := &adt.Num{Src: src, K: adt.FloatKind}
 		// NOTE: apd.Decimal has an API to set from a big.Int, but not from a big.Float.
 		if _, _, err := n.X.SetString(v.String()); err != nil {
@@ -252,7 +252,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return n
 
 	case apdDecimal:
-		v, _ := val.Interface().(*apd.Decimal) // TODO(go1.25): use reflect.TypeAssert
+		v, _ := reflect.TypeAssert[*apd.Decimal](val)
 		// TODO: should we allow an "int" bit to be set here?
 		// It is a bit tricky, as we would also need to pass down the result of rounding.
 		// So more likely an API must return explicitly whether a value is a float or an int after all.
@@ -270,17 +270,17 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 	}
 
 	if _, ok := implements(typ, typesInterface); ok {
-		v, _ := val.Interface().(types.Interface) // TODO(go1.25): use reflect.TypeAssert
+		v, _ := reflect.TypeAssert[types.Interface](val)
 		t := v.Core()
 		// TODO: panic if not the same runtime.
 		return t.V
 	}
 	if _, ok := implements(typ, astExpr); ok {
-		v, _ := val.Interface().(ast.Expr) // TODO(go1.25): use reflect.TypeAssert
+		v, _ := reflect.TypeAssert[ast.Expr](val)
 		return compileExpr(ctx, v)
 	}
 	if _, ok := implements(typ, jsonMarshaler); ok {
-		v, _ := val.Interface().(json.Marshaler) // TODO(go1.25): use reflect.TypeAssert
+		v, _ := reflect.TypeAssert[json.Marshaler](val)
 		b, err := v.MarshalJSON()
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "json.Marshaler"))
@@ -292,7 +292,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return compileExpr(ctx, expr)
 	}
 	if _, ok := implements(typ, textMarshaler); ok {
-		v, _ := val.Interface().(encoding.TextMarshaler) // TODO(go1.25): use reflect.TypeAssert
+		v, _ := reflect.TypeAssert[encoding.TextMarshaler](val)
 		b, err := v.MarshalText()
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "encoding.TextMarshaler"))
@@ -301,7 +301,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return &adt.String{Src: src, Str: str}
 	}
 	if _, ok := implements(typ, goError); ok {
-		v, _ := val.Interface().(error) // TODO(go1.25): use reflect.TypeAssert
+		v, _ := reflect.TypeAssert[error](val)
 		errs, ok := v.(errors.Error)
 		if !ok {
 			errs = ctx.Newf("%s", v.Error())

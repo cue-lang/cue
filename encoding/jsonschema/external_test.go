@@ -181,17 +181,16 @@ func maybeSkip(t *testing.T, vers jsonschema.Version, versStr string, s *externa
 	case vers == jsonschema.VersionUnknown:
 		t.Skipf("skipping test for unknown schema version %v", versStr)
 
-	case bytes.Contains(s.Schema, []byte(`"iri"`)) && fixesParsingIPv6HostWithoutBrackets:
+	case bytes.Contains(s.Schema, []byte(`"iri"`)) && !fixesParsingIPv6HostWithoutBrackets:
 		// Go 1.26 fixes [url.Parse] so that it correctly rejects IPv6 hosts
 		// without the required surrounding square brackets.
 		// See: https://github.com/golang/go/issues/31024
-		// Our tests must run on the latest two stable Go versions, currently 1.24 and 1.25,
-		// where such behavior is still buggy.
+		// Our tests must run on the latest two stable Go versions, currently 1.25 and 1.26.
+		// We only run the test on 1.26, the current stable Go version,
+		// which is also the one we use for release archives.
 		//
-		// As a temporary compromise, skip the test on 1.26 or later;
-		// we care about testing the behavior that most CUE users will see today.
 		// TODO: get rid of this whole thing once we require Go 1.26 or later in the future.
-		t.Skip("net/url.Parse tightens behavior on IPv6 hosts on Go 1.26 and later")
+		t.Skip("net/url.Parse fixes behavior on IPv6 hosts on Go 1.26 and later")
 	}
 }
 

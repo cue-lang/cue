@@ -54,11 +54,6 @@ func (c *listenCmd) IsService() bool {
 
 var m sync.Mutex
 
-// valueMu protects cue.Value operations which are not thread-safe.
-// This serializes all request handling, which is not ideal for performance.
-// TODO: remove this lock once cue.Value supports concurrent operations.
-var valueMu sync.Mutex
-
 var (
 	listenPath = cue.ParsePath("listenAddr")
 	pathPath   = cue.ParsePath("routing.path")
@@ -81,10 +76,8 @@ type httpRequest struct {
 }
 
 func (c *listenCmd) Run(ctx *task.Context) (res interface{}, err error) {
-	valueMu.Lock()
 	v := ctx.Obj
 	addr, err := v.LookupPath(listenPath).String()
-	valueMu.Unlock()
 
 	if err != nil {
 		return nil, err
@@ -112,12 +105,10 @@ func (c *listenCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 	m.Unlock()
 
-	valueMu.Lock()
 	url := "/"
 	if p := v.LookupPath(pathPath); p.Exists() {
 		url, err = p.String()
 		if err != nil {
-			valueMu.Unlock()
 			return nil, err
 		}
 	}
@@ -127,14 +118,12 @@ func (c *listenCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	if m := v.LookupPath(methodPath); m.Exists() {
 		method, err := m.String()
 		if err != nil {
-			valueMu.Unlock()
 			return nil, err
 		}
 		url = fmt.Sprintf("%s %s", method, url)
 	}
 
 	path := v.Path()
-	valueMu.Unlock()
 
 	log.Printf("adding handler for %v\n", url)
 	mux.HandleFunc(url, func(w http.ResponseWriter, req *http.Request) {
@@ -156,9 +145,6 @@ func (c *listenCmd) Run(ctx *task.Context) (res interface{}, err error) {
 				pathValues[variable] = s
 			}
 		}
-
-		valueMu.Lock()
-		defer valueMu.Unlock()
 
 		reqValue := v.FillPath(requestPath, httpRequest{
 			Method:     req.Method,

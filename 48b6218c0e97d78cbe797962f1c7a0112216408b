@@ -16,6 +16,24 @@
       "message": "In this case, even if they do, the _must would still pass for both.\n\nMaybe add another test like this:\n\nissue4251b: {\n\t#NotC: x\u003d{\n\t\tstring\n\t\t_must: true \u0026 x !\u003d \"b\"\n\t}\n\ta: #NotC\n\ta: \"a\" | \"b\"\n\ta: \"a\"\n}\n\nand \n\nissue4251c: {\n\t#NotC: x\u003d{\n\t\tstring\n\t\t_must: true \u0026 x !\u003d \"b\"\n\t}\n\ta: #NotC\n\ta: \"b\" | \"a\" // reversed\n\ta: \"a\"\n}",
       "revId": "48b6218c0e97d78cbe797962f1c7a0112216408b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e24ac44_21a83731",
+        "filename": "cue/testdata/disjunctions/edge.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-10T18:00:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c7f4b81_0aeb7db5",
+      "revId": "48b6218c0e97d78cbe797962f1c7a0112216408b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

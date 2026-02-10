@@ -15,12 +15,10 @@
 package jsonschema_test
 
 import (
-	"bytes"
 	stdjson "encoding/json"
 	"fmt"
 	"io"
 	"maps"
-	"net/url"
 	"os"
 	"path"
 	"slices"
@@ -83,13 +81,6 @@ func TestExternal(t *testing.T) {
 	err = writeExternalTestStats(testDir, tests)
 	qt.Assert(t, qt.IsNil(err))
 }
-
-var fixesParsingIPv6HostWithoutBrackets = func() bool {
-	// We use Sprintf so that staticcheck on Go 1.26 and later does not
-	// helpfully report that this URL will always fail to parse.
-	_, err := url.Parse(fmt.Sprintf("%s://2001:0db8:85a3:0000:0000:8a2e:0370:7334", "http"))
-	return err != nil
-}()
 
 func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *externaltest.Schema) {
 	t.Logf("file %v", path.Join("testdata/external", filename))
@@ -180,18 +171,6 @@ func maybeSkip(t *testing.T, vers jsonschema.Version, versStr string, s *externa
 	switch {
 	case vers == jsonschema.VersionUnknown:
 		t.Skipf("skipping test for unknown schema version %v", versStr)
-
-	case bytes.Contains(s.Schema, []byte(`"iri"`)) && fixesParsingIPv6HostWithoutBrackets:
-		// Go 1.26 fixes [url.Parse] so that it correctly rejects IPv6 hosts
-		// without the required surrounding square brackets.
-		// See: https://github.com/golang/go/issues/31024
-		// Our tests must run on the latest two stable Go versions, currently 1.24 and 1.25,
-		// where such behavior is still buggy.
-		//
-		// As a temporary compromise, skip the test on 1.26 or later;
-		// we care about testing the behavior that most CUE users will see today.
-		// TODO: get rid of this whole thing once we require Go 1.26 or later in the future.
-		t.Skip("net/url.Parse tightens behavior on IPv6 hosts on Go 1.26 and later")
 	}
 }
 

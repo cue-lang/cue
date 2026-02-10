@@ -47,10 +47,14 @@ func (r *Runtime) ConfigureOpCtx(ctx *adt.OpContext) {
 }
 
 func (r *Runtime) SetBuildData(b *build.Instance, x interface{}) {
+	r.index.lock.Lock()
+	defer r.index.lock.Unlock()
 	r.loaded[b] = x
 }
 
 func (r *Runtime) BuildData(b *build.Instance) (x interface{}, ok bool) {
+	r.index.lock.RLock()
+	defer r.index.lock.RUnlock()
 	x, ok = r.loaded[b]
 	return x, ok
 }

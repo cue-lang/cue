@@ -19,6 +19,7 @@ import (
 	Decls: []ast.Decl{}
 	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
+	Resolved: ast.resolveOnce{}
 }
 -- out/debugprint/package_only.cue --
 *ast.File{
@@ -34,6 +35,7 @@ import (
 	}
 	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
+	Resolved: ast.resolveOnce{}
 }
 -- out/debugprint/comments_only.cue --
 *ast.File{
@@ -41,6 +43,7 @@ import (
 	Decls: []ast.Decl{}
 	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
+	Resolved: ast.resolveOnce{}
 	Comments: []*ast.CommentGroup{
 		{
 			Doc: false
@@ -148,6 +151,7 @@ import (
 		}
 	}
 	LanguageVersion: "v0.13.0"
+	Resolved: ast.resolveOnce{}
 }
 -- out/debugprint/empty.cue/omitempty-strings --
 *ast.File{

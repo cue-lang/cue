@@ -48,6 +48,7 @@ b: 3
 	}
 	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
+	Resolved: ast.resolveOnce{}
 }
 -- out/debugprint/file.cue/omitempty-strings --
 *ast.File{

@@ -198,6 +198,7 @@ embed: {
 	}
 	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
+	Resolved: ast.resolveOnce{}
 }
 -- out/debugprint/fields.cue/omitempty-strings --
 *ast.File{

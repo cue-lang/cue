@@ -72,6 +72,7 @@ disjunctoin: b | c | *d
 	}
 	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
+	Resolved: ast.resolveOnce{}
 }
 -- out/debugprint/unify.txtar/omitempty-strings --
 *ast.File{

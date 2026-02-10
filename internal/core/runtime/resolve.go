@@ -56,6 +56,23 @@ func resolveFile(
 	p *build.Instance,
 	allFields map[string]ast.Node,
 ) errors.Error {
+	// Use the file's Resolved field to ensure resolution happens exactly once,
+	// even when called concurrently from multiple goroutines.
+	err := f.Resolved.Do(func() error {
+		return doResolveFile(idx, f, p, allFields)
+	})
+	if err != nil {
+		return err.(errors.Error)
+	}
+	return nil
+}
+
+func doResolveFile(
+	idx *index,
+	f *ast.File,
+	p *build.Instance,
+	allFields map[string]ast.Node,
+) errors.Error {
 	unresolved := map[string][]*ast.Ident{}
 	for _, u := range f.Unresolved {
 		unresolved[u.Name] = append(unresolved[u.Name], u)

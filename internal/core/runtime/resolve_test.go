@@ -15,6 +15,7 @@
 package runtime
 
 import (
+	"sync"
 	"testing"
 
 	"cuelang.org/go/cue/ast"
@@ -58,4 +59,48 @@ func TestPartiallyResolved(t *testing.T) {
 	if err != nil {
 		t.Errorf("exected no error, found %v", err)
 	}
+}
+
+// TestResolveFilesConcurrent tests that concurrent calls to ResolveFiles
+// on the same build.Instance are race-free. This is a regression test for
+// https://github.com/cue-lang/cue/issues/1746
+func TestResolveFilesConcurrent(t *testing.T) {
+	const importPath = "mod.test/foo"
+	spec := &ast.ImportSpec{
+		Path: ast.NewString(importPath),
+	}
+
+	f := &ast.File{
+		Decls: []ast.Decl{
+			&ast.ImportDecl{Specs: []*ast.ImportSpec{spec}},
+			&ast.Field{
+				Label: ast.NewIdent("X"),
+				Value: &ast.Ident{Name: "foo", Node: spec},
+			},
+		},
+		Imports:    []*ast.ImportSpec{spec},
+		Unresolved: []*ast.Ident{{Name: "foo"}},
+	}
+
+	p := &build.Instance{
+		Files: []*ast.File{f},
+		Imports: []*build.Instance{{
+			ImportPath: importPath,
+			PkgName:    "foo",
+		}},
+	}
+
+	r := New()
+
+	// Call ResolveFiles concurrently from multiple goroutines.
+	// Without the fix, this would cause a data race on f.Unresolved.
+	var wg sync.WaitGroup
+	for range 50 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			r.ResolveFiles(p)
+		}()
+	}
+	wg.Wait()
 }

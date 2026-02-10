@@ -21,10 +21,27 @@ import (
 	"iter"
 	"slices"
 	"strings"
+	"sync"
 
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 )
+
+// resolveOnce ensures file resolution happens exactly once.
+// It is used by the runtime to avoid concurrent modifications to File fields.
+type resolveOnce struct {
+	once sync.Once
+	err  error
+}
+
+// Do calls f if and only if Do is being called for the first time.
+// The error returned by f is cached and returned on subsequent calls.
+func (r *resolveOnce) Do(f func() error) error {
+	r.once.Do(func() {
+		r.err = f()
+	})
+	return r.err
+}
 
 // ----------------------------------------------------------------------------
 // Interfaces
@@ -1026,6 +1043,10 @@ type File struct {
 	// include the language version in the `token.File` so
 	// it's available in every Position.
 	LanguageVersion string // The language version as configured by [parser.ParseFile].
+
+	// Resolved ensures that file resolution (linking identifiers to their
+	// declarations) happens exactly once, even when called concurrently.
+	Resolved resolveOnce
 
 	comments
 }

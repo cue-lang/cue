@@ -34,6 +34,24 @@
       "parentUuid": "a0b31d72_1ed0991e",
       "revId": "9e802e450adf146af94ef6da0882c53578aa41a1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc2bef23_5691c160",
+        "filename": "cue/testdata/eval/bounds.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-10T15:51:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0e4e5611_a194771c",
+      "revId": "9e802e450adf146af94ef6da0882c53578aa41a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

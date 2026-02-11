@@ -177,6 +177,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4b985694_f0c5f1d2",
+        "filename": "mod/module/dirfs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T15:03:38Z",
+      "side": 1,
+      "message": "So, the existing behaviour here is that `ErrUnsupported` makes the caller fallback to a default implementation. That is different to being able to say \"this file can\u0027t be converted to a CUE AST\". In this latter case, you don\u0027t want the caller to fallback to a default implementation.\n\nSo I think we could change this to an explicit error, but it would not be ErrUnsupported (or the existing behaviour of ErrUnsupported would have to change to some other error too).",
+      "parentUuid": "87a9d61b_0cc35b49",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5ca77676_53aed4ba",
         "filename": "mod/module/dirfs.go",
         "patchSetId": 5

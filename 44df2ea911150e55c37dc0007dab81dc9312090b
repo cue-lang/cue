@@ -50,6 +50,24 @@
       "message": "this is five levels of \"for\" deep, which worries me a little",
       "revId": "44df2ea911150e55c37dc0007dab81dc9312090b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a8f2ea3_46828a34",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 24
+      },
+      "lineNbr": 2163,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T14:58:52Z",
+      "side": 1,
+      "message": "😄",
+      "parentUuid": "0f735cb1_31de8139",
+      "revId": "44df2ea911150e55c37dc0007dab81dc9312090b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

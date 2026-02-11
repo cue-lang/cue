@@ -219,7 +219,7 @@ func (inst *hiddenInstance) Build(p *build.Instance) *Instance {
 	idx := inst.index
 	r := inst.index
 
-	rErr := r.ResolveFiles(p)
+	rErr := p.ResolveIdentifiers()
 
 	cfg := &compile.Config{Scope: valueScope(Value{idx: r, v: inst.root})}
 	v, err := compile.Files(cfg, r, p.ID(), p.Files...)

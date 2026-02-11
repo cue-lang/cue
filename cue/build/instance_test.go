@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package runtime
+package build
 
 import (
+	"sync"
 	"testing"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/build"
 )
 
 // TestPartiallyResolved tests that the resolve will detect the usage of
@@ -48,14 +48,59 @@ func TestPartiallyResolved(t *testing.T) {
 		Imports: []*ast.ImportSpec{spec1, spec2},
 	}
 
-	err := resolveFile(nil, f, &build.Instance{
-		Imports: []*build.Instance{{
+	p := &Instance{
+		Files: []*ast.File{f},
+		Imports: []*Instance{{
 			ImportPath: importPath,
 			PkgName:    "foo",
 		}},
-	}, map[string]ast.Node{})
+	}
+
+	err := p.ResolveIdentifiers()
 
 	if err != nil {
 		t.Errorf("exected no error, found %v", err)
 	}
+}
+
+// TestResolveIdentifiersConcurrent tests that concurrent calls to
+// ResolveIdentifiers on the same build.Instance are race-free.
+// This is a regression test for https://github.com/cue-lang/cue/issues/1746
+func TestResolveIdentifiersConcurrent(t *testing.T) {
+	const importPath = "mod.test/foo"
+	spec := &ast.ImportSpec{
+		Path: ast.NewString(importPath),
+	}
+
+	f := &ast.File{
+		Decls: []ast.Decl{
+			&ast.ImportDecl{Specs: []*ast.ImportSpec{spec}},
+			&ast.Field{
+				Label: ast.NewIdent("X"),
+				Value: &ast.Ident{Name: "foo", Node: spec},
+			},
+		},
+		Imports:    []*ast.ImportSpec{spec},
+		Unresolved: []*ast.Ident{{Name: "foo"}},
+	}
+
+	p := &Instance{
+		Files: []*ast.File{f},
+		Imports: []*Instance{{
+			ImportPath: importPath,
+			PkgName:    "foo",
+		}},
+	}
+
+	// Call ResolveIdentifiers concurrently from multiple goroutines.
+	// Without the fix, this would cause a data race on f.Unresolved.
+	var wg sync.WaitGroup
+	for range 50 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			p.ResolveIdentifiers()
+		}()
+	}
+	wg.Wait()
 }

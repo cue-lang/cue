@@ -62,8 +62,7 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 		}
 	}
 
-	err := x.ResolveFiles(b)
-	errs = errors.Append(errs, err)
+	errs = errors.Append(errs, b.ResolveIdentifiers())
 
 	var cc *compile.Config
 	if cfg != nil {
@@ -73,7 +72,7 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 		b.ImportPath = cfg.ImportPath
 		b.PkgName = ast.ParseImportPath(b.ImportPath).Qualifier
 	}
-	v, err = compile.Files(cc, x, b.ID(), b.Files...)
+	v, err := compile.Files(cc, x, b.ID(), b.Files...)
 	errs = errors.Append(errs, err)
 
 	errs = errors.Append(errs, x.InjectImplementations(b, v))

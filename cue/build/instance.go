@@ -18,7 +18,10 @@ import (
 	"fmt"
 	pathpkg "path"
 	"path/filepath"
+	"slices"
+	"strconv"
 	"strings"
+	"sync"
 	"unicode"
 
 	"cuelang.org/go/cue/ast"
@@ -69,6 +72,13 @@ type Instance struct {
 	Err errors.Error
 
 	parent *Instance // TODO: for cycle detection
+
+	// resolved ensures identifier resolution happens exactly once per instance,
+	// even when called concurrently from multiple goroutines.
+	resolved struct {
+		once sync.Once
+		err  errors.Error
+	}
 
 	// The following fields are for informative purposes and are not used by
 	// the cue package to create an instance.
@@ -288,4 +298,137 @@ func makeImportValid(r rune) rune {
 func IsLocalImport(path string) bool {
 	return path == "." || path == ".." ||
 		strings.HasPrefix(path, "./") || strings.HasPrefix(path, "../")
+}
+
+// ResolveIdentifiers resolves unresolved identifiers in the instance's files
+// to their declarations. This includes linking import statements to their
+// imported packages and linking identifiers to top-level fields.
+//
+// Resolution happens at most once per instance; subsequent calls return the
+// cached result. This method is safe for concurrent use.
+func (inst *Instance) ResolveIdentifiers() errors.Error {
+	inst.resolved.once.Do(func() {
+		inst.resolved.err = inst.resolveIdentifiers()
+	})
+	return inst.resolved.err
+}
+
+func (inst *Instance) resolveIdentifiers() errors.Error {
+	// Link top-level declarations. As top-level entries get unified, an entry
+	// may be linked to any top-level entry of any of the files.
+	allFields := map[string]ast.Node{}
+	for _, f := range inst.Files {
+		if f.PackageName() == "" {
+			continue
+		}
+		for _, d := range f.Decls {
+			if f, ok := d.(*ast.Field); ok && f.Value != nil {
+				if ident, ok := f.Label.(*ast.Ident); ok {
+					allFields[ident.Name] = f.Value
+				}
+			}
+		}
+	}
+
+	var errs errors.Error
+	for _, f := range inst.Files {
+		err := inst.resolveFile(f, allFields)
+		errs = errors.Append(errs, err)
+	}
+	return errs
+}
+
+func (inst *Instance) resolveFile(f *ast.File, allFields map[string]ast.Node) errors.Error {
+	unresolved := map[string][]*ast.Ident{}
+	for _, u := range f.Unresolved {
+		unresolved[u.Name] = append(unresolved[u.Name], u)
+	}
+	fields := map[string]ast.Node{}
+	for _, d := range f.Decls {
+		if f, ok := d.(*ast.Field); ok && f.Value != nil {
+			if ident, ok := f.Label.(*ast.Ident); ok {
+				fields[ident.Name] = d
+			}
+		}
+	}
+	var errs errors.Error
+
+	specs := []*ast.ImportSpec{}
+
+	for spec := range f.ImportSpecs() {
+		id, err := strconv.Unquote(spec.Path.Value)
+		if err != nil {
+			continue // quietly ignore the error
+		}
+		name := pathpkg.Base(id)
+		if imp := inst.LookupImport(id); imp != nil {
+			name = imp.PkgName
+		}
+		if spec.Name != nil {
+			name = spec.Name.Name
+		}
+		if n, ok := fields[name]; ok {
+			errs = errors.Append(errs, errors.Newf(spec.Pos(),
+				"%s redeclared as imported package name\n"+
+					"\tprevious declaration at %s", name, n.Pos()))
+			continue
+		}
+		fields[name] = spec
+		used := false
+		for _, u := range unresolved[name] {
+			used = true
+			u.Node = spec
+		}
+		if !used {
+			specs = append(specs, spec)
+		}
+	}
+
+	// Verify each import is used.
+	if len(specs) > 0 {
+		// Find references to imports. This assumes that identifiers in labels
+		// are not resolved or that such errors are caught elsewhere.
+		ast.Walk(f, nil, func(n ast.Node) {
+			if x, ok := n.(*ast.Ident); ok {
+				// As we also visit labels, most nodes will be nil.
+				if x.Node == nil {
+					return
+				}
+				for i, s := range specs {
+					if s == x.Node {
+						specs[i] = nil
+						return
+					}
+				}
+			}
+		})
+
+		// Add errors for unused imports.
+		for _, spec := range specs {
+			if spec == nil {
+				continue
+			}
+			if spec.Name == nil {
+				errs = errors.Append(errs, errors.Newf(spec.Pos(),
+					"imported and not used: %s", spec.Path.Value))
+			} else {
+				errs = errors.Append(errs, errors.Newf(spec.Pos(),
+					"imported and not used: %s as %s", spec.Path.Value, spec.Name))
+			}
+		}
+	}
+
+	f.Unresolved = slices.DeleteFunc(f.Unresolved, func(u *ast.Ident) bool {
+		if u.Node != nil {
+			return true
+		}
+		if n, ok := allFields[u.Name]; ok {
+			u.Node = n
+			u.Scope = f
+			return true
+		}
+		return false
+	})
+
+	return errs
 }

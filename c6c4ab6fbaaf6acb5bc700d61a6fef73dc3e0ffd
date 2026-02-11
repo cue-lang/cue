@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03f24e0e_0b4361cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-11T13:50:51Z",
+      "side": 1,
+      "message": "This is a step in the right direction (modulo comment/suggestion below), but there\u0027s still remains a more fundamental issue regarding resolution of import paths (this test still fails after this CL is applied: https://github.com/cue-lang/cue/issues/2733#issuecomment-3876683414).",
+      "revId": "c6c4ab6fbaaf6acb5bc700d61a6fef73dc3e0ffd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

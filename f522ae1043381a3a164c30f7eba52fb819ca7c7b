@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c04aebe5_fca2c7e2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T12:46:52Z",
+      "side": 1,
+      "message": "\u003e For example, can an \"embed package\" contain normally loaded CUE files?\n\nNot in practice, no.\n\n\u003e can it \"import\" other packages?\n\nAgain, not in practice: reading+parsing such a file would return an AST with a unique package name and no imports.\n\n\u003e is it technically still part of the module?\n\nYes. An file can only be embedded if it resides in the same module as the CUE file with the @embed attribute.\n\n\u003e I might find it easier if we gave these a special name with a clear definition somewhere, like \"embed pseudo-package\" or \"embed virtual package\".\n\nI\u0027m not massively against that, but equally we\u0027ve not done that for files-with-no-package-decl-that-exist-within-a-module. These also get read and parsed and will have a unique package name and are considered part of the module.",
+      "parentUuid": "68a5c3ae_99b9f4f8",
+      "range": {
+        "startLine": 10,
+        "startChar": 33,
+        "endLine": 10,
+        "endChar": 61
+      },
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e19c39da_05f9865b",
         "filename": "cmd/cue/cmd/integration/workspace/embedded_test.go",
         "patchSetId": 6
@@ -37,6 +61,24 @@
       "writtenOn": "2026-02-11T10:10:58Z",
       "side": 1,
       "message": "every single LogMatching call comes with fmt.Sprintf - make that part of the func body?",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41cbb86f_0f618cc2",
+        "filename": "cmd/cue/cmd/integration/workspace/embedded_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T12:46:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e19c39da_05f9865b",
       "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "22ff74c7_47c73c9f",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T12:46:52Z",
+      "side": 1,
+      "message": "Totally agree, thank you.",
+      "parentUuid": "d50e6072_6dc0adb4",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6af16d9_8170d677",
@@ -71,6 +131,24 @@
       "writtenOn": "2026-02-11T10:10:58Z",
       "side": 1,
       "message": "nit: add ndjson as well, which is actually the new version of the ldjson extension, and what we document in `cue help filetypes`.",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "015cb713_96540297",
+        "filename": "internal/lsp/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T12:46:52Z",
+      "side": 1,
+      "message": "agh, actually I\u0027ve got this wrong. It should be jsonld, not ldjson. I.e. I\u0027m *not* supporting newline-delimited json at this point. Ah, but it seems I\u0027ve just got myself confused and we don\u0027t support jsonld at all elsewhere, so actually this entry should just be removed totally for now.",
+      "parentUuid": "d6af16d9_8170d677",
       "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -127,6 +205,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3b155ca_00025b03",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T12:46:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c44fa4f4_e492a405",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b19b5ac8_cd5b8ad8",
@@ -140,6 +236,24 @@
       "writtenOn": "2026-02-11T10:10:58Z",
       "side": 1,
       "message": "as before, I\u0027m confused why the func could return `ip \u003d\u003d nil` when `err \u003d\u003d nil`",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aab79926_61e763d7",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 950,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T12:46:52Z",
+      "side": 1,
+      "message": "Valid file, but with no package decl. Having thought a bit harder about this, we *could* change the documentation for fscache.FileHandle to declare the ReadCUE method, if it returns a non-nil ast.File, then that ast.File MUST have a valid package decl. Personally I think that would be a bit weird. Yes, at the moment we inject phantom package names if the file is missing one, but it still feels a bit weird to me to require that in the interface.",
+      "parentUuid": "b19b5ac8_cd5b8ad8",
       "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

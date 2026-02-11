@@ -856,13 +856,11 @@ func TestLoadInstancesConcurrent(t *testing.T) {
 func race(t *testing.T, f func() error) {
 	var wg sync.WaitGroup
 	for range 2 {
-		wg.Add(1)
-		go func() {
+		wg.Go(func() {
 			if err := f(); err != nil {
 				t.Error(err)
 			}
-			wg.Done()
-		}()
+		})
 	}
 	wg.Wait()
 }

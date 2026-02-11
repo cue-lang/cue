@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "c807fc58_f22ef648",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T10:37:44Z",
+      "side": 1,
+      "message": "I\u0027m not disagreeing with you at all, but this is exactly the code from modpkgload/import.go - https://github.com/cue-lang/cue/blob/master/internal/mod/modpkgload/import.go#L329",
+      "parentUuid": "d665d48f_adb5bd5c",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "c91d8bc8_d71349f5",
@@ -116,6 +134,30 @@
       "writtenOn": "2026-02-11T09:50:59Z",
       "side": 1,
       "message": "I\u0027m not sure that this is the right way to use ErrUnsupported; my understanding is that its best use case is for edge cases which are not supported. If you want this method to be optional for implementers, then split it off into e.g. `ReadDirFS` and then do a type assertion against that interface. forcing implementers to add this method to always return ErrUnsupported seems unnecessary.",
+      "range": {
+        "startLine": 41,
+        "startChar": 4,
+        "endLine": 41,
+        "endChar": 33
+      },
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "310fead6_bce6306f",
+        "filename": "mod/module/dirfs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T10:37:44Z",
+      "side": 1,
+      "message": "Yeah I agree - I was coping exactly the wording and behaviour of the existing ReadCUEFile method. I care that they both have the same semantics.",
+      "parentUuid": "5ca77676_53aed4ba",
       "range": {
         "startLine": 41,
         "startChar": 4,

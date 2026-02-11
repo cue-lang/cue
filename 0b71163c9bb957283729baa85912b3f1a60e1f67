@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9eee2c4c_b9237045",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1237,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-11T13:15:20Z",
+      "side": 1,
+      "message": "added todo.",
+      "parentUuid": "987d1b3f_1f39807f",
+      "revId": "0b71163c9bb957283729baa85912b3f1a60e1f67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b9613da1_75cf6ca6",
         "filename": "internal/core/adt/regexp_test.go",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2026-02-11T10:25:52Z",
       "side": 1,
       "message": "I get that these benchmarks were useful for the commit message stats, but I don\u0027t think they belong in the adt package at all. They benchmark regexp and WeakMap, and neither is something that we are actually maintaining or optimizing. And in terms of the evaluator, they are low level micro-benchmarks which don\u0027t represent the performance that we actually care about for end users.",
+      "revId": "0b71163c9bb957283729baa85912b3f1a60e1f67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76f4a326_77970942",
+        "filename": "internal/core/adt/regexp_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-11T13:15:20Z",
+      "side": 1,
+      "message": "REmoved",
+      "parentUuid": "b9613da1_75cf6ca6",
       "revId": "0b71163c9bb957283729baa85912b3f1a60e1f67",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -100,6 +136,42 @@
       "side": 1,
       "message": "FWIW this code is directly lifted from the issue I reference in the earlier review. it\u0027s not an accepted proposal at this point, but it\u0027s likely that the final API will look like that. so I\u0027d lean towards using an interface like that unless there\u0027s a strong reason not to, so that in the long term we\u0027re using an off-the-shelf API.",
       "parentUuid": "a7f9a791_9841c857",
+      "revId": "0b71163c9bb957283729baa85912b3f1a60e1f67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a5c82c1_e7071d85",
+        "filename": "internal/core/adt/weakmap.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-11T13:15:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d95b34d_6c715f47",
+      "revId": "0b71163c9bb957283729baa85912b3f1a60e1f67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "385e9d3f_1c218d40",
+        "filename": "internal/core/adt/weakmap.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-11T13:15:20Z",
+      "side": 1,
+      "message": "Avoiding the extra memory is nice, though, and won\u0027t be fixed with a generic package.\n\nDone",
+      "parentUuid": "cae347e9_1f202c6d",
       "revId": "0b71163c9bb957283729baa85912b3f1a60e1f67",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

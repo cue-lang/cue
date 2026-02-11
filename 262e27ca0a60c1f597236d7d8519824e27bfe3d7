@@ -33,6 +33,24 @@
       "message": "Presumably this should be marked as `[runtime]` too.",
       "revId": "262e27ca0a60c1f597236d7d8519824e27bfe3d7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0121a708_0091dae1",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 13
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-11T17:56:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99b2d9cc_ec291ceb",
+      "revId": "262e27ca0a60c1f597236d7d8519824e27bfe3d7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

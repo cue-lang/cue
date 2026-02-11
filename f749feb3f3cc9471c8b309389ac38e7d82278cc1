@@ -912,6 +912,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a8f8dfa_a2f6fe68",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-11T17:56:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "00d020c9_1225da8b",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "53fbb142_07c13c1a",
@@ -996,6 +1014,24 @@
       "side": 1,
       "message": "Not clarified.",
       "parentUuid": "36d97fbe_6a0fb344",
+      "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3e01e6f_35af13db",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-11T17:56:57Z",
+      "side": 1,
+      "message": "Clarified. Also see tests.",
+      "parentUuid": "3ba377a9_2e1d19a6",
       "revId": "f749feb3f3cc9471c8b309389ac38e7d82278cc1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

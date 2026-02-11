@@ -219,8 +219,6 @@ func (inst *hiddenInstance) Build(p *build.Instance) *Instance {
 	idx := inst.index
 	r := inst.index
 
-	rErr := r.ResolveFiles(p)
-
 	cfg := &compile.Config{Scope: valueScope(Value{idx: r, v: inst.root})}
 	v, err := compile.Files(cfg, r, p.ID(), p.Files...)
 
@@ -230,9 +228,6 @@ func (inst *hiddenInstance) Build(p *build.Instance) *Instance {
 	v.AddConjunct(adt.MakeRootConjunct(nil, inst.root))
 
 	i := newInstance(idx, p, v)
-	if rErr != nil {
-		i.setListOrError(rErr)
-	}
 	if i.Err != nil {
 		i.setListOrError(i.Err)
 	}

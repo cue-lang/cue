@@ -375,7 +375,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 				if embeddings == nil {
 					embeddings = make(map[token.Pos]*embedding)
 				}
-				fs := w.overlayFS.IoFS(m.rootURI.Path())
+				fs := w.overlayFS.IoFS(m.rootURI.FilePath())
 				for _, embed := range embeddedPaths {
 					embedding := &embedding{Embed: embed}
 					embeddings[embed.Attribute.Pos] = embedding

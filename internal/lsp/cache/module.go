@@ -133,7 +133,7 @@ func (m *Module) ReloadModule() error {
 		m.delete()
 		return ErrBadModule
 	}
-	modFile, err := modfile.ParseNonStrict(fh.Content(), m.modFileURI.Path())
+	modFile, err := modfile.ParseNonStrict(fh.Content(), m.modFileURI.FilePath())
 	if err != nil {
 		w.debugLogf("%v Error when reloading: %v", m, err)
 		m.delete()
@@ -337,7 +337,7 @@ func (m *Module) loadDirtyPackages() (*modpkgload.Packages, error) {
 	reqs := modrequirements.NewRequirements(modPath, w.registry, m.modFile.DepVersions(), m.modFile.DefaultMajorVersions())
 	ctx := context.Background()
 	loc := module.SourceLoc{
-		FS:  w.overlayFS.IoFS(m.rootURI.Path()),
+		FS:  w.overlayFS.IoFS(m.rootURI.FilePath()),
 		Dir: ".", // NB can't be ""
 	}
 	// Determinism in log messages:
@@ -366,7 +366,7 @@ func (m *Module) loadAllCuePackages() {
 	activeFiles, _ := m.workspace.activeFilesAndDirs()
 
 	var toLoad []protocol.DocumentURI
-	rootPath := m.rootURI.Path()
+	rootPath := m.rootURI.FilePath()
 	fsys := m.workspace.overlayFS.IoFS(rootPath)
 	fs.WalkDir(fsys, ".", func(p string, d fs.DirEntry, err error) error {
 		if err != nil {

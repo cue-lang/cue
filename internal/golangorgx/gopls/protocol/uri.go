@@ -67,12 +67,13 @@ func (uri *DocumentURI) UnmarshalText(data []byte) (err error) {
 	return
 }
 
-// Path returns the file path for the given URI.
+// FilePath returns the file path for the given URI. I.e. a
+// GOOS-appropriate path.
 //
-// DocumentURI("").Path() returns the empty string.
+// DocumentURI("").FilePath() returns the empty string.
 //
-// Path panics if called on a URI that is not a valid filename.
-func (uri DocumentURI) Path() string {
+// FilePath panics if called on a URI that is not a valid filename.
+func (uri DocumentURI) FilePath() string {
 	filename, err := filename(uri)
 	if err != nil {
 		// e.g. ParseRequestURI failed.
@@ -95,13 +96,13 @@ func (uri DocumentURI) Dir() DocumentURI {
 	}
 	// This function could be more efficiently implemented by avoiding any call
 	// to Path(), but at least consolidates URI manipulation.
-	return URIFromPath(filepath.Dir(uri.Path()))
+	return URIFromPath(filepath.Dir(uri.FilePath()))
 }
 
 // Encloses reports whether uri's path, considered as a sequence of segments,
 // is a prefix of file's path.
 func (uri DocumentURI) Encloses(file DocumentURI) bool {
-	return pathutil.InDir(uri.Path(), file.Path())
+	return pathutil.InDir(uri.FilePath(), file.FilePath())
 }
 
 func filename(uri DocumentURI) (string, error) {

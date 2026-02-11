@@ -140,7 +140,7 @@ func (c *Client) RegisterCapability(ctx context.Context, params *protocol.Regist
 				case protocol.Pattern:
 					globPattern = pattern
 				case protocol.RelativePattern:
-					globPattern = path.Join(filepath.ToSlash(pattern.BaseURI.Path()), pattern.Pattern)
+					globPattern = path.Join(filepath.ToSlash(pattern.BaseURI.FilePath()), pattern.Pattern)
 				}
 				// TODO(rfindley): honor the watch kind.
 				g, err := glob.Parse(globPattern)

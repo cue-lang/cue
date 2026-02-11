@@ -98,7 +98,7 @@ func (w *Workspace) debugLogf(format string, args ...any) {
 // idempotent: if the workspace already includes a workspace folder at
 // dir, then this method is a noop and returns nil.
 func (w *Workspace) EnsureFolder(dir protocol.DocumentURI, name string) (*WorkspaceFolder, error) {
-	inode1, err := os.Stat(dir.Path())
+	inode1, err := os.Stat(dir.FilePath())
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (w *Workspace) EnsureFolder(dir protocol.DocumentURI, name string) (*Worksp
 		if wf.dir == dir {
 			return wf, nil
 		}
-		inode2, err := os.Stat(filepath.FromSlash(wf.dir.Path()))
+		inode2, err := os.Stat(filepath.FromSlash(wf.dir.FilePath()))
 		if err != nil {
 			return nil, err
 		}
@@ -224,7 +224,7 @@ func (w *Workspace) FileWatchingGlobPatterns(ctx context.Context) map[protocol.R
 		for _, wfDir := range wfDirs {
 			// NB: a.Encloses(b) returns true if a == b
 			if wfDir.Encloses(activeDir) {
-				patterns[protocol.RelativePattern{Pattern: filepath.ToSlash(activeDir.Path())}] = struct{}{}
+				patterns[protocol.RelativePattern{Pattern: filepath.ToSlash(activeDir.FilePath())}] = struct{}{}
 				break
 			}
 		}

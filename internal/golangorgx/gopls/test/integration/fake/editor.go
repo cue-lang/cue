@@ -230,7 +230,7 @@ func makeSettings(sandbox *Sandbox, config EditorConfig, scopeURI *protocol.URI)
 	env := make(map[string]string)
 	maps.Copy(env, config.Env)
 	for k, v := range env {
-		v = strings.ReplaceAll(v, "$SANDBOX_WORKDIR", sandbox.Workdir.RootURI().Path())
+		v = strings.ReplaceAll(v, "$SANDBOX_WORKDIR", sandbox.Workdir.RootURI().FilePath())
 		env[k] = v
 	}
 
@@ -257,7 +257,7 @@ func makeSettings(sandbox *Sandbox, config EditorConfig, scopeURI *protocol.URI)
 	// settings for the nearest folder that has customized settings, if any.
 	if scopeURI != nil {
 		var (
-			scopePath       = protocol.DocumentURI(*scopeURI).Path()
+			scopePath       = protocol.DocumentURI(*scopeURI).FilePath()
 			closestDir      string         // longest dir with settings containing the scope, if any
 			closestSettings map[string]any // settings for that dir, if any
 		)
@@ -441,7 +441,7 @@ func (e *Editor) onFileChanges(ctx context.Context, evts []protocol.FileEvent) {
 		}
 		var matchedEvts []protocol.FileEvent
 		for _, evt := range evts {
-			filename := filepath.ToSlash(evt.URI.Path())
+			filename := filepath.ToSlash(evt.URI.FilePath())
 			for _, g := range e.watchPatterns {
 				if g.Match(filename) {
 					matchedEvts = append(matchedEvts, evt)

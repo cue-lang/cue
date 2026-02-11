@@ -1,0 +1,220 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "152e92ea_a5cf7bf5",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:37:24Z",
+      "side": 1,
+      "message": "is this method needed anymore? I\u0027d just inline all callers.",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "834da532_c1f837ed",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:37:24Z",
+      "side": 1,
+      "message": "I can\u0027t understand this sentence; the evaluators of each evaluator?",
+      "range": {
+        "startLine": 139,
+        "startChar": 22,
+        "endLine": 140,
+        "endChar": 12
+      },
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "431041c4_853dfc33",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:37:24Z",
+      "side": 1,
+      "message": "did you consider `clear(processedPkgs)`? it\u0027s not exactly the same, it is equivalent to deleting all keys rather than setting their values to nil, but I\u0027m not sure if that matters here.",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bc1fa60_0dfc4b6e",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 715,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:37:24Z",
+      "side": 1,
+      "message": "extra word?",
+      "range": {
+        "startLine": 715,
+        "startChar": 36,
+        "endLine": 715,
+        "endChar": 47
+      },
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5346b993_ee7578e5",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 809,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:37:24Z",
+      "side": 1,
+      "message": "document when this can happen? it\u0027s not obvious to me at least.",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7cdc349a_f14f847c",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 825,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:37:24Z",
+      "side": 1,
+      "message": "nit: invert and early continue to unindent",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9565ac46_d11667f5",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 826,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:37:24Z",
+      "side": 1,
+      "message": "nit: I\u0027d avoid the method name \"delete\" because it can be too easily confused with the delete builtin func",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "460f3a58_cbc0ea84",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 883,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:37:24Z",
+      "side": 1,
+      "message": "should we be using errors.Is for our own errors, or do we not wrap at all?",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82d072cd_c19da9fc",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:37:24Z",
+      "side": 1,
+      "message": "it seems odd to me like the func above can return `ip \u003d\u003d nil` when `err \u003d\u003d nil`",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4555818_ea0f52eb",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 929,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:37:24Z",
+      "side": 1,
+      "message": "as before, I\u0027m still a bit lost as to why this can be nil here.",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed0324b2_cbe8a743",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 935,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:37:24Z",
+      "side": 1,
+      "message": "expand this comment as to why we do nothing here?",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb46ab22_c94add84",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 956,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:37:24Z",
+      "side": 1,
+      "message": "I\u0027d find this logic easier to follow if the top-level loop was like `for needsReload {`.\n\nalso, it seems entirely possible that this top-level loop can iterate forever, no? if you intend the top-level loop to only iterate once or twice, I wonder if a slightly different mechanism would be clearer, like a `for reloadStep :\u003d range 2` and at the end of the loop, break if we don\u0027t need the repeat reload.",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

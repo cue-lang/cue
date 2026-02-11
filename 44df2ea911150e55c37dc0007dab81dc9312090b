@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49a2e756_f74f9016",
+        "filename": "internal/lsp/cache/file.go",
+        "patchSetId": 24
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T14:34:46Z",
+      "side": 1,
+      "message": "perhaps add a TODO, to see if we could untangle that cycle in the future.",
+      "revId": "44df2ea911150e55c37dc0007dab81dc9312090b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "985200bd_00512eb8",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 24
+      },
+      "lineNbr": 1573,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T14:34:46Z",
+      "side": 1,
+      "message": "nit: could expandNavigables take a map argument, which could be nil, such that it\u0027s \"append-like\" and we avoid creating a new map just to copy from it and throw it away?",
+      "revId": "44df2ea911150e55c37dc0007dab81dc9312090b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f735cb1_31de8139",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 24
+      },
+      "lineNbr": 2163,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T14:34:46Z",
+      "side": 1,
+      "message": "this is five levels of \"for\" deep, which worries me a little",
+      "revId": "44df2ea911150e55c37dc0007dab81dc9312090b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

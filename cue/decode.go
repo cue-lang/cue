@@ -385,7 +385,8 @@ func (d *decoder) convertMap(x reflect.Value, v Value) {
 		kt := t.Key()
 		if reflect.PointerTo(kt).Implements(textUnmarshalerType) {
 			kv = reflect.New(kt)
-			err := kv.Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(key))
+			u, _ := reflect.TypeAssert[encoding.TextUnmarshaler](kv)
+			err := u.UnmarshalText([]byte(key))
 			d.addErr(err)
 			kv = kv.Elem()
 		} else {

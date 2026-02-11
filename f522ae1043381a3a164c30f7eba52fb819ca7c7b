@@ -1,0 +1,146 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68a5c3ae_99b9f4f8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T10:10:58Z",
+      "side": 1,
+      "message": "I guess this makes sense from the perspective of the LSP internals, but it\u0027s breaking my brain a bit. For example, can an \"embed package\" contain normally loaded CUE files? can it \"import\" other packages? is it technically still part of the module?\n\nI might find it easier if we gave these a special name with a clear definition somewhere, like \"embed pseudo-package\" or \"embed virtual package\".",
+      "range": {
+        "startLine": 10,
+        "startChar": 33,
+        "endLine": 10,
+        "endChar": 61
+      },
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e19c39da_05f9865b",
+        "filename": "cmd/cue/cmd/integration/workspace/embedded_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T10:10:58Z",
+      "side": 1,
+      "message": "every single LogMatching call comes with fmt.Sprintf - make that part of the func body?",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d50e6072_6dc0adb4",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T10:10:58Z",
+      "side": 1,
+      "message": "nit: MatchAll tells me that it returns a boolean saying whether all files in the FS match the embed pattern. I think FindAll would be a more intuitive name, like https://pkg.go.dev/regexp#Regexp.FindAllString versus https://pkg.go.dev/regexp#Regexp.MatchString being the Matches method above.",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6af16d9_8170d677",
+        "filename": "internal/lsp/cache/folder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T10:10:58Z",
+      "side": 1,
+      "message": "nit: add ndjson as well, which is actually the new version of the ldjson extension, and what we document in `cue help filetypes`.",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec0e5675_b5a5f1f5",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T10:10:58Z",
+      "side": 1,
+      "message": "I thought that you needed to use a special method to properly decode paths from file URI strings",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c44fa4f4_e492a405",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T10:10:58Z",
+      "side": 1,
+      "message": "should this not be some sort of constant?",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b19b5ac8_cd5b8ad8",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 950,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T10:10:58Z",
+      "side": 1,
+      "message": "as before, I\u0027m confused why the func could return `ip \u003d\u003d nil` when `err \u003d\u003d nil`",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8009b2e_90494956",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1012,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T10:10:58Z",
+      "side": 1,
+      "message": "just to check - did you mean to break out of the outer loop, matching the earlier \"continue\"?",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

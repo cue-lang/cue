@@ -68,6 +68,12 @@ func (inst *Instance) Complete() error {
 	if err != nil {
 		inst.ReportError(err)
 	}
+
+	// Resolve identifiers after imports are loaded. Store errors separately
+	// to avoid "imported and not used" errors in dependencies being reported
+	// as "import failed".
+	inst.ResolutionErr = inst.resolveIdentifiers()
+
 	if inst.Err != nil {
 		inst.Incomplete = true
 		return inst.Err

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1a13222_bfb084b4",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T11:03:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "152e92ea_a5cf7bf5",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "834da532_c1f837ed",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-02-11T09:37:24Z",
       "side": 1,
       "message": "I can\u0027t understand this sentence; the evaluators of each evaluator?",
+      "range": {
+        "startLine": 139,
+        "startChar": 22,
+        "endLine": 140,
+        "endChar": 12
+      },
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29717ea7_45ae4266",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T11:03:49Z",
+      "side": 1,
+      "message": "Yep - should be \"upstream and downstream package\".",
+      "parentUuid": "834da532_c1f837ed",
       "range": {
         "startLine": 139,
         "startChar": 22,
@@ -99,6 +141,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4daf3a38_a224ab3d",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 715,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T11:03:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1bc1fa60_0dfc4b6e",
+      "range": {
+        "startLine": 715,
+        "startChar": 36,
+        "endLine": 715,
+        "endChar": 47
+      },
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5346b993_ee7578e5",
@@ -112,6 +178,24 @@
       "writtenOn": "2026-02-11T09:37:24Z",
       "side": 1,
       "message": "document when this can happen? it\u0027s not obvious to me at least.",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8fc28fa_a1b31cb1",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 809,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T11:03:49Z",
+      "side": 1,
+      "message": "I\u0027ve added documentation to processedPkgs.",
+      "parentUuid": "5346b993_ee7578e5",
       "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -133,6 +217,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0593e89_a5d7872e",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 825,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T11:03:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7cdc349a_f14f847c",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9565ac46_d11667f5",
@@ -146,6 +248,24 @@
       "writtenOn": "2026-02-11T09:37:24Z",
       "side": 1,
       "message": "nit: I\u0027d avoid the method name \"delete\" because it can be too easily confused with the delete builtin func",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44fbddb9_cf270edb",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 826,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T11:03:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9565ac46_d11667f5",
       "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -237,6 +357,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e59f5aa_9d59fb75",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 929,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T11:03:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c4555818_ea0f52eb",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ed0324b2_cbe8a743",
@@ -250,6 +388,24 @@
       "writtenOn": "2026-02-11T09:37:24Z",
       "side": 1,
       "message": "expand this comment as to why we do nothing here?",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2de94a85_9891afb9",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 935,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T11:03:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed0324b2_cbe8a743",
       "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

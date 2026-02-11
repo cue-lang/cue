@@ -1,0 +1,146 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f58d54e3_2a9eb76e",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:50:59Z",
+      "side": 1,
+      "message": "I think we already have `internal.ToFile` for this purpose",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0db824ae_70fcca39",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:50:59Z",
+      "side": 1,
+      "message": "should you not be skipping directories at the very start of the loop?",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d665d48f_adb5bd5c",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:50:59Z",
+      "side": 1,
+      "message": "I\u0027m not sure that this is correct; I thought the logic for loading CUE in general was \"ignore directories, read everything else\". So I think we should not attempt to resolve symlinks or check for regular files.",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c91d8bc8_d71349f5",
+        "filename": "internal/lsp/fscache/fs_overlay.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 669,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:50:59Z",
+      "side": 1,
+      "message": "(in comparison to the earlier loop, this early \"is dir\" check seems correct)",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e97522f_c78a0b87",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:50:59Z",
+      "side": 1,
+      "message": "I know you prefer to use variables for fields, which is fine - but then at least use them consistently :) further below you still access `loc.FS`.",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87a9d61b_0cc35b49",
+        "filename": "mod/module/dirfs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:50:59Z",
+      "side": 1,
+      "message": "```suggestion\n\t// necessary) a path to a CUE AST, it should return (nil, nil).\n```\n\nor consider using `errors.ErrUnsupported` for more clarity? I think the Go ecosystem is converging on this to mean \"an interface method implementation which does not support a particular feature\".",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ca77676_53aed4ba",
+        "filename": "mod/module/dirfs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:50:59Z",
+      "side": 1,
+      "message": "I\u0027m not sure that this is the right way to use ErrUnsupported; my understanding is that its best use case is for edge cases which are not supported. If you want this method to be optional for implementers, then split it off into e.g. `ReadDirFS` and then do a type assertion against that interface. forcing implementers to add this method to always return ErrUnsupported seems unnecessary.",
+      "range": {
+        "startLine": 41,
+        "startChar": 4,
+        "endLine": 41,
+        "endChar": 33
+      },
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57997eaf_5845731c",
+        "filename": "mod/module/dirfs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T09:50:59Z",
+      "side": 1,
+      "message": "I might name this FindCUEFiles or CanReadCUEFiles for the sake of being a bit more direct",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

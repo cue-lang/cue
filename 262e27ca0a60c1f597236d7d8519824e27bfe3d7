@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3554f33_30674e18",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-11T14:08:22Z",
+      "side": 1,
+      "message": "LGTM modulo a couple of minor issues still unresolved.",
+      "revId": "262e27ca0a60c1f597236d7d8519824e27bfe3d7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99b2d9cc_ec291ceb",
+        "filename": "pkg/tool/http/http.cue",
+        "patchSetId": 13
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-11T14:08:22Z",
+      "side": 1,
+      "message": "Presumably this should be marked as `[runtime]` too.",
+      "revId": "262e27ca0a60c1f597236d7d8519824e27bfe3d7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -476,6 +476,24 @@
       "parentUuid": "4926f829_56fc366d",
       "revId": "5f51a6db46078b2effcee8b4f9fe02b54fa6beac",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c20d7e0_22b68921",
+        "filename": "pkg/tool/http/serve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-11T14:08:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77742cc3_eadedf4c",
+      "revId": "5f51a6db46078b2effcee8b4f9fe02b54fa6beac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4357359_e3bec160",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-11T14:08:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19753426_592de7ba",
+      "range": {
+        "startLine": 111,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 0
+      },
+      "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fba7611_a0d2df9c",
@@ -37,6 +61,24 @@
       "writtenOn": "2026-02-09T17:56:10Z",
       "side": 1,
       "message": "looks like this could do with a cue fmt.",
+      "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "630ded2e_ef7b3606",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-11T14:08:22Z",
+      "side": 1,
+      "message": "still not done (there should be a space around the `\u0026` in `#Machine\u0026{`) but maybe I shouldn\u0027t worry about it. I\u0027ll mark it as resolved.",
+      "parentUuid": "1fba7611_a0d2df9c",
       "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "80965abe_5a76684b",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-11T14:08:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b761438_446a509a",
+      "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee3de512_392aa3c2",
@@ -71,6 +131,24 @@
       "writtenOn": "2026-02-09T17:56:10Z",
       "side": 1,
       "message": "```suggestion\n// This endpoint demonstrates capture of all path parameters.\n```",
+      "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2f36b64_f08c7c6c",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-11T14:08:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee3de512_392aa3c2",
       "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -92,6 +170,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "db336343_f3e712d5",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_serve.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-11T14:08:22Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "185dbd1a_5a961628",
+      "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "43f3e509_2c3c3881",
@@ -105,6 +201,24 @@
       "writtenOn": "2026-02-09T17:56:10Z",
       "side": 1,
       "message": "Maybe exclude `{$}` too, because that\u0027s a very useful pattern to have available and we don\u0027t really want to treat the `$` as a variable name. Or leave a TODO.",
+      "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2a325de_fa979770",
+        "filename": "pkg/tool/http/serve.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-11T14:08:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43f3e509_2c3c3881",
       "revId": "53ec5430a7aaac7f973e498452e2a534569d9f0b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

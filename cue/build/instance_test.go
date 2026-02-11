@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package runtime
+package build
 
 import (
 	"testing"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/build"
 )
 
 // TestPartiallyResolved tests that the resolve will detect the usage of
@@ -48,12 +47,15 @@ func TestPartiallyResolved(t *testing.T) {
 		Imports: []*ast.ImportSpec{spec1, spec2},
 	}
 
-	err := resolveFile(nil, f, &build.Instance{
-		Imports: []*build.Instance{{
+	p := &Instance{
+		Files: []*ast.File{f},
+		Imports: []*Instance{{
 			ImportPath: importPath,
 			PkgName:    "foo",
 		}},
-	}, map[string]ast.Node{})
+	}
+
+	err := p.resolveIdentifiers()
 
 	if err != nil {
 		t.Errorf("exected no error, found %v", err)

@@ -130,7 +130,7 @@ package a
 			env.DoneDiagnosingChanges(),
 			NoLogExactf(protocol.Debug, "Module dir=%v module=unknown Created", rootURI),
 		)
-		env.ChangeWorkspaceFolders(rootURI.Path())
+		env.ChangeWorkspaceFolders(rootURI.FilePath())
 		env.Await(
 			env.DoneDiagnosingChanges(),
 			NoLogExactf(protocol.Debug, "Module dir=%v module=unknown Created", rootURI),

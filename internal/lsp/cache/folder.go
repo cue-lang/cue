@@ -34,7 +34,7 @@ type WorkspaceFolder struct {
 // NewWorkspaceFolder creates a new workspace folder. The name is
 // entirely decorative and does not have any semantics attached to it.
 func NewWorkspaceFolder(dir protocol.DocumentURI, name string) (*WorkspaceFolder, error) {
-	dirPath := dir.Path()
+	dirPath := dir.FilePath()
 	err := checkPathValid(dirPath)
 	if err != nil {
 		return nil, fmt.Errorf("invalid workspace folder path %v: %w; check that the spelling of the configured workspace folder path agrees with the spelling reported by the operating system", dirPath, err)

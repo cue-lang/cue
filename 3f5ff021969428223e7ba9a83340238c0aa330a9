@@ -198,6 +198,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e77d2587_78cdbcae",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T11:20:59Z",
+      "side": 1,
+      "message": "I\u0027ve made the note about package instances as part of the redesign issue: https://github.com/cue-lang/cue/issues/2000#issuecomment-3883738806\n\nAnd I\u0027ll tweak the wording here to be clearer about the recursiveness.",
+      "parentUuid": "f80e35d7_26651f26",
+      "revId": "3f5ff021969428223e7ba9a83340238c0aa330a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fbb998a1_4e19fbbb",
@@ -211,6 +229,24 @@
       "writtenOn": "2026-01-30T10:32:21Z",
       "side": 1,
       "message": "Possibly a nit, but I don\u0027t believe \"to descend into\" is necessary or adds anything.",
+      "revId": "3f5ff021969428223e7ba9a83340238c0aa330a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca21957a_693c9b3e",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T11:20:59Z",
+      "side": 1,
+      "message": "discussed in the other thread; tweaked the wording here as well",
+      "parentUuid": "fbb998a1_4e19fbbb",
       "revId": "3f5ff021969428223e7ba9a83340238c0aa330a9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

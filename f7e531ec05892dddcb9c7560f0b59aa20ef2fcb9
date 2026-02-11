@@ -16,6 +16,24 @@
       "message": "This name doesn\u0027t make much sense to me. Maybe a doc comment might help?",
       "revId": "f7e531ec05892dddcb9c7560f0b59aa20ef2fcb9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d1a31a8_50fef336",
+        "filename": "internal/core/adt/default.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-11T13:15:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c45078ce_4dc732ad",
+      "revId": "f7e531ec05892dddcb9c7560f0b59aa20ef2fcb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

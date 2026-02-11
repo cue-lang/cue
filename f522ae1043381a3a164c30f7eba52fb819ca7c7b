@@ -94,6 +94,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d8d25c82_c200fa49",
+        "filename": "internal/lsp/cache/package.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T10:43:08Z",
+      "side": 1,
+      "message": "Yes good point. The client is meant to be consistent, so doing the cut/trim is fine. But yes, the fact the remains is actually used (without decoding) is a problem. I\u0027ll do another pass looking for those cases.",
+      "parentUuid": "ec0e5675_b5a5f1f5",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c44fa4f4_e492a405",
         "filename": "internal/lsp/cache/package.go",
         "patchSetId": 6
@@ -139,6 +157,24 @@
       "writtenOn": "2026-02-11T10:10:58Z",
       "side": 1,
       "message": "just to check - did you mean to break out of the outer loop, matching the earlier \"continue\"?",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58ec6877_98039307",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1012,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T10:43:08Z",
+      "side": 1,
+      "message": "Nope. We\u0027ve marked the ascendantPkg dirty, there\u0027s nothing else to do with that package, so we need to move on to the next ascendantPkg. So we\u0027re just breaking out of the inner loop.",
+      "parentUuid": "e8009b2e_90494956",
       "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

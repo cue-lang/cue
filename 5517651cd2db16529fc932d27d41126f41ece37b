@@ -108,6 +108,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "ec181a02_889b4ceb",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T15:06:21Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c807fc58_f22ef648",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "c91d8bc8_d71349f5",
         "filename": "internal/lsp/fscache/fs_overlay.go",
         "patchSetId": 5
@@ -193,6 +211,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "04e1bd09_57537f3f",
+        "filename": "mod/module/dirfs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T15:06:21Z",
+      "side": 1,
+      "message": "ah I see. no strong feelings then, whichever you think is clearest",
+      "parentUuid": "4b985694_f0c5f1d2",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ca77676_53aed4ba",
@@ -230,6 +266,30 @@
       "side": 1,
       "message": "Yeah I agree - I was coping exactly the wording and behaviour of the existing ReadCUEFile method. I care that they both have the same semantics.",
       "parentUuid": "5ca77676_53aed4ba",
+      "range": {
+        "startLine": 41,
+        "startChar": 4,
+        "endLine": 41,
+        "endChar": 33
+      },
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "879026c3_a9ffdaa2",
+        "filename": "mod/module/dirfs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T15:06:21Z",
+      "side": 1,
+      "message": "using the same semantics for both seems fine. not a strong feeling for me either way, even if I\u0027d lean towards a separate interface.",
+      "parentUuid": "310fead6_bce6306f",
       "range": {
         "startLine": 41,
         "startChar": 4,

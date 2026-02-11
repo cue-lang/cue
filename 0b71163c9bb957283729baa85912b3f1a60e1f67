@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "26067944_677bcb98",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-11T12:06:26Z",
+      "side": 1,
+      "message": "LGTM with a suggestion for a slightly different regexp caching primitive.",
+      "revId": "0b71163c9bb957283729baa85912b3f1a60e1f67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "987d1b3f_1f39807f",
@@ -48,6 +65,23 @@
       "writtenOn": "2026-02-11T10:25:52Z",
       "side": 1,
       "message": "I\u0027d add a TODO saying that this is borrowed from https://github.com/golang/go/issues/43615 and we should replace the implementation if/when the upstream issue is resolved.",
+      "revId": "0b71163c9bb957283729baa85912b3f1a60e1f67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7f9a791_9841c857",
+        "filename": "internal/core/adt/weakmap.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-02-11T12:06:26Z",
+      "side": 1,
+      "message": "I\u0027d either unexport this or put it in its own package. It doesn\u0027t seem like API that we particularly want to expose from core/adt. It could do with a few unit tests though.\n\nAlso, this seems a bit more memory hungry than necessary (the entry structs) and arguably a bit more complex than it needs to be (when storing we don\u0027t really need to do the Swap dance).\n\nHow about making it a closer fit to the problem being solved, something like this perhaps?\n\n```\n// newMemoizer returns a new memoizer value that caches\n// the results of calling the make function.\n// It does not guarantee that there will be at most one\n// *V value at any one time or that make won\u0027t be invoked concurrently.\n//\n// It does not memoize results when make returns an error,\nfunc newMemoizer[K comparable, V any](make func(K) (*V, error)) *memoizer[K, V] {\n\treturn \u0026memoizer[K, V]{\n\t\tmake: make,\n\t}\n}\n\n// memoizer implements a garbage-collectable cache of\n// results from calling the make function.\ntype memoizer[K comparable, V any] struct {\n\t// make returns a new result for K. It is expected\n\t// that it will always return an equivalent non-nil value\n\t// for a given key.\n\tmake func(K) (*V, error)\n\t// string -\u003e weak.Pointer[V]\n\tm sync.Map\n}\n\n// get returns the result for the key k.\nfunc (c *memoizer[K, V]) get(k K) (*V, error) {\n\tif entry, ok :\u003d c.m.Load(k); ok {\n\t\tif v :\u003d entry.(weak.Pointer[V]).Value(); v !\u003d nil {\n\t\t\treturn v, nil\n\t\t}\n\t}\n\t// Could potentially use singleflight or similar to\n\t// avoid redundant make calls in concurrent situations\n\t// but the redundancy probably isn\u0027t much of an issue\n\t// in practice.\n\tv, err :\u003d c.make(k)\n\tif err !\u003d nil {\n\t\treturn nil, err\n\t}\n\twp :\u003d weak.Make(v)\n\truntime.AddCleanup(v, func(wp weak.Pointer[V]) {\n\t\tc.m.CompareAndDelete(k, wp)\n\t}, wp)\n\tc.m.Store(k, wp)\n\treturn v, nil\n}\n```\n\nThen you won\u0027t need the `cachedRegexp` helper function:\n\n```\nvar regexpCache \u003d newMemoizer(regexp.Compile)\n```",
       "revId": "0b71163c9bb957283729baa85912b3f1a60e1f67",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

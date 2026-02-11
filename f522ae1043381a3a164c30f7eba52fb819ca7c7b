@@ -48,6 +48,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58c4a3b9_b9c3bc77",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T15:07:27Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c04aebe5_fca2c7e2",
+      "range": {
+        "startLine": 10,
+        "startChar": 33,
+        "endLine": 10,
+        "endChar": 61
+      },
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e19c39da_05f9865b",
@@ -272,6 +296,24 @@
       "side": 1,
       "message": "Valid file, but with no package decl. Having thought a bit harder about this, we *could* change the documentation for fscache.FileHandle to declare the ReadCUE method, if it returns a non-nil ast.File, then that ast.File MUST have a valid package decl. Personally I think that would be a bit weird. Yes, at the moment we inject phantom package names if the file is missing one, but it still feels a bit weird to me to require that in the interface.",
       "parentUuid": "b19b5ac8_cd5b8ad8",
+      "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ae41870_d74ad9f4",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 950,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T15:07:27Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "aab79926_61e763d7",
       "revId": "f522ae1043381a3a164c30f7eba52fb819ca7c7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

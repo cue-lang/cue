@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "987d1b3f_1f39807f",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1237,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T10:25:52Z",
+      "side": 1,
+      "message": "is it worth simplifying patterns (which regexp/syntax can do) before we look up or insert on the weak map? so that e.g. `fo[o] bar{1}` and `foo bar` share the same entry.\n\nprobably not important in practice, but perhaps worth a comment here to reevaluate if extremely similar but not identical patterns actually pop up in user code.",
+      "revId": "0b71163c9bb957283729baa85912b3f1a60e1f67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9613da1_75cf6ca6",
+        "filename": "internal/core/adt/regexp_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T10:25:52Z",
+      "side": 1,
+      "message": "I get that these benchmarks were useful for the commit message stats, but I don\u0027t think they belong in the adt package at all. They benchmark regexp and WeakMap, and neither is something that we are actually maintaining or optimizing. And in terms of the evaluator, they are low level micro-benchmarks which don\u0027t represent the performance that we actually care about for end users.",
+      "revId": "0b71163c9bb957283729baa85912b3f1a60e1f67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d95b34d_6c715f47",
+        "filename": "internal/core/adt/weakmap.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T10:25:52Z",
+      "side": 1,
+      "message": "I\u0027d add a TODO saying that this is borrowed from https://github.com/golang/go/issues/43615 and we should replace the implementation if/when the upstream issue is resolved.",
+      "revId": "0b71163c9bb957283729baa85912b3f1a60e1f67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

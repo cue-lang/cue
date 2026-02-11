@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc5d732b_5d2b097c",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T11:23:42Z",
+      "side": 1,
+      "message": "Thank you!",
+      "parentUuid": "f58d54e3_2a9eb76e",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0db824ae_70fcca39",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-02-11T09:50:59Z",
       "side": 1,
       "message": "should you not be skipping directories at the very start of the loop?",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ad24eca_06ec17a9",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T11:23:42Z",
+      "side": 1,
+      "message": "Yes absolutely. Just testing! 😀",
+      "parentUuid": "0db824ae_70fcca39",
       "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -100,6 +136,24 @@
       "writtenOn": "2026-02-11T09:50:59Z",
       "side": 1,
       "message": "I know you prefer to use variables for fields, which is fine - but then at least use them consistently :) further below you still access `loc.FS`.",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4ad1b22_6b16c0f4",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T11:23:42Z",
+      "side": 1,
+      "message": "Totally agree. Thank you!",
+      "parentUuid": "7e97522f_c78a0b87",
       "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -181,6 +235,24 @@
       "writtenOn": "2026-02-11T09:50:59Z",
       "side": 1,
       "message": "I might name this FindCUEFiles or CanReadCUEFiles for the sake of being a bit more direct",
+      "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8853af8c_fa5062c5",
+        "filename": "mod/module/dirfs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T11:23:42Z",
+      "side": 1,
+      "message": "Where it\u0027s used in modpkgload, finding/testing directories is in a very different place from searching within those directories. So I don\u0027t like `FindCUEFiles` because I would expect that to return an iter, and that\u0027s really not what\u0027s wanted. I think there\u0027s not much between `CanReadCUEFiles` and `IsDirWithCUEFiles` really. I know it\u0027s not a great name, but I actually prefer the latter because it makes it clearer that path should be interpreted as a path to a dir, whereas it\u0027s ambiguous with `CanReadCUEFiles`.",
+      "parentUuid": "57997eaf_5845731c",
       "revId": "5517651cd2db16529fc932d27d41126f41ece37b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

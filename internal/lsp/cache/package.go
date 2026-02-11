@@ -172,7 +172,7 @@ func (pkg *Package) markDirty() {
 // time after this pkg is loaded, new file is created which also
 // matches the glob, then this will method would return true.
 func (pkg *Package) matchesUnknownEmbedding(fileUri protocol.DocumentURI) bool {
-	filepath, wasCut := strings.CutPrefix(string(fileUri), string(pkg.module.rootURI)+"/")
+	filepath, wasCut := strings.CutPrefix(fileUri.Path(), pkg.module.rootURI.Path()+"/")
 	if !wasCut {
 		return false
 	}

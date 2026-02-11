@@ -12,6 +12,7 @@ package protocol
 import (
 	"fmt"
 	"net/url"
+	"path"
 	"path/filepath"
 	"strings"
 	"unicode"
@@ -85,6 +86,26 @@ func (uri DocumentURI) FilePath() string {
 		panic(err)
 	}
 	return filepath.FromSlash(filename)
+}
+
+// Path returns the /-separated path for the given URI. The returned
+// path has been cleaned.
+//
+// DocumentURI("").Path() returns the empty string.
+//
+// Path panics if called on a URI that is not a valid filename.
+func (uri DocumentURI) Path() string {
+	filename, err := filename(uri)
+	if err != nil {
+		// e.g. ParseRequestURI failed.
+		//
+		// This can only affect DocumentURIs created by
+		// direct string manipulation; all DocumentURIs
+		// received from the client pass through
+		// ParseRequestURI, which ensures validity.
+		panic(err)
+	}
+	return path.Clean(filename)
 }
 
 // Dir returns the URI for the directory containing the receiver.

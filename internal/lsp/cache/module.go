@@ -213,7 +213,7 @@ func (m *Module) FindImportPathForFile(file protocol.DocumentURI) (*ast.ImportPa
 
 	dirUri := file.Dir()
 	// NB pkgPath will have a '/' at [0]  because m.rootURI will not have a trailing '/'
-	pkgPath := strings.TrimPrefix(string(dirUri), string(m.rootURI))
+	pkgPath := strings.TrimPrefix(dirUri.Path(), m.rootURI.Path())
 
 	isOldMod := false
 	ip := ast.ImportPath{Qualifier: pkgName}

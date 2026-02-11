@@ -104,7 +104,7 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 			return
 		}
 		if k == reflect.Pointer {
-			if n, ok := v.Interface().(ast.Node); ok {
+			if n, ok := reflect.TypeAssert[ast.Node](v); ok {
 				ptrVal = v.Pointer()
 				if id, ok := d.nodeRefs[n]; ok {
 					refName = refIDToName(id)
@@ -259,8 +259,7 @@ func (d *debugPrinter) structFields(v reflect.Value) (anyElems bool) {
 			d.truncate(elemStart)
 		}
 	}
-	val := v.Addr().Interface()
-	if val, ok := val.(ast.Node); ok {
+	if val, ok := reflect.TypeAssert[ast.Node](v.Addr()); ok {
 		// Comments attached to a node aren't a regular field, but are still useful.
 		// The majority of nodes won't have comments, so skip them when empty.
 		if comments := ast.Comments(val); len(comments) > 0 {

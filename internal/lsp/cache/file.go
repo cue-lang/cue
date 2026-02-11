@@ -38,7 +38,7 @@ func (w *Workspace) ensureFile(uri protocol.DocumentURI) *File {
 		// Unfortunately this is repeating work done in fscache, but due
 		// to import cycles, there's no way we can attach the build.File
 		// to the token.File (or ast.File).
-		bf, _ := filetypes.ParseFileAndType(uri.Path(), "", filetypes.Input)
+		bf, _ := filetypes.ParseFileAndType(uri.FilePath(), "", filetypes.Input)
 		f.buildFile = bf
 
 		w.files[uri] = f

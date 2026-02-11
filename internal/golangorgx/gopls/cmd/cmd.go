@@ -520,7 +520,7 @@ func applyTextEdits(mapper *protocol.Mapper, edits []protocol.TextEdit, flags *E
 		return err
 	}
 
-	filename := mapper.URI.Path()
+	filename := mapper.URI.FilePath()
 
 	if flags.List {
 		fmt.Println(filename)
@@ -640,7 +640,7 @@ func (c *cmdClient) getFile(uri protocol.DocumentURI) *cmdFile {
 		c.files[uri] = file
 	}
 	if file.mapper == nil {
-		content, err := os.ReadFile(uri.Path())
+		content, err := os.ReadFile(uri.FilePath())
 		if err != nil {
 			file.err = fmt.Errorf("getFile: %v: %v", uri, err)
 			return file

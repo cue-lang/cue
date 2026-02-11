@@ -76,7 +76,7 @@ func (s *server) UpdateWatchedFiles(ctx context.Context) error {
 		} else {
 			p := pattern.Pattern
 			if pattern.BaseURI != "" {
-				p = path.Join(filepath.ToSlash(pattern.BaseURI.Path()), p)
+				p = path.Join(filepath.ToSlash(pattern.BaseURI.FilePath()), p)
 			}
 			value = p
 		}

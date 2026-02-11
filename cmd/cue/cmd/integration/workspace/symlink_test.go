@@ -24,7 +24,7 @@ package a
 `
 	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
-		rootFilePath := rootURI.Path()
+		rootFilePath := rootURI.FilePath()
 
 		// Need to wind the mtime of a.cue back into the past so that
 		// fs_cache will cache the file.
@@ -81,7 +81,7 @@ x: _
 `
 	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
-		rootFilePath := rootURI.Path()
+		rootFilePath := rootURI.FilePath()
 
 		err := os.Symlink(filepath.Join(rootFilePath, "real"), filepath.Join(rootFilePath, "sym link"))
 		qt.Assert(t, qt.IsNil(err))

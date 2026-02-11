@@ -225,7 +225,7 @@ func (fs *OverlayFS) pathComponents(uri protocol.DocumentURI) ([]string, string)
 	if !strings.HasPrefix(string(uri), fileSchemePrefix) {
 		panic(fmt.Sprintf("%q is not a valid DocumentURI", uri))
 	}
-	str := filepath.Clean(uri.Path())
+	str := filepath.Clean(uri.FilePath())
 	if str == "." { // if uri.Path() returns "", filepath.Clean() returns "."
 		return nil, ""
 	}
@@ -334,7 +334,7 @@ func (fs *OverlayFS) ReadFile(uri protocol.DocumentURI) (FileHandle, error) {
 
 	file, isFile := entry.(*overlayFileEntry)
 	if !isFile {
-		return nil, &iofs.PathError{Op: "ReadFile", Path: uri.Path(), Err: iofs.ErrInvalid}
+		return nil, &iofs.PathError{Op: "ReadFile", Path: uri.FilePath(), Err: iofs.ErrInvalid}
 	}
 
 	return file, nil
@@ -473,7 +473,7 @@ type UpdateTxn struct {
 // This modifies the overlay *only*. It does not, under any
 // circumstances, access the underlying CUECacheFS.
 func (txn *UpdateTxn) Set(uri protocol.DocumentURI, content []byte, mtime time.Time, version int32) (FileHandle, error) {
-	filePath := uri.Path()
+	filePath := uri.FilePath()
 	components, entryName := txn.pathComponents(uri)
 	dir, err := txn.getDirLocked(components, true)
 	if err != nil {

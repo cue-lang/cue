@@ -330,7 +330,7 @@ func (w *Workspace) FileEvaluatorForURI(fileUri protocol.DocumentURI, loadExtra 
 		}
 	}
 
-	fe := e.ForFile(fileUri.Path())
+	fe := e.ForFile(fileUri.FilePath())
 	if fe == nil {
 		return nil, nil, nil, nil
 	}

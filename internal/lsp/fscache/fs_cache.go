@@ -261,7 +261,7 @@ func (fs *CUECacheFS) purgeCacheUnder(uri protocol.DocumentURI) {
 // [iofs.ErrNotExist]. If uri is a directory, the error will be
 // [iofs.PathError].
 func (fs *CUECacheFS) ReadFile(uri protocol.DocumentURI) (FileHandle, error) {
-	id, mtime, err := robustio.GetFileID(uri.Path())
+	id, mtime, err := robustio.GetFileID(uri.FilePath())
 	if err != nil {
 		if errors.Is(err, iofs.ErrNotExist) {
 			// URI could have been a file, or a directory. In both cases
@@ -350,7 +350,7 @@ func (fs *CUECacheFS) ReadFile(uri protocol.DocumentURI) (FileHandle, error) {
 
 func readFile(uri protocol.DocumentURI, mtime time.Time) (*diskFileEntry, error) {
 	// NB filePath is GOOS-appropriate (uri.Path() calls [filepath.FromSlash])
-	filePath := uri.Path()
+	filePath := uri.FilePath()
 
 	bf, err := filetypes.ParseFileAndType(filePath, "", filetypes.Input)
 	if err != nil {

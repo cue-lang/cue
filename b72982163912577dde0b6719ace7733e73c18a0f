@@ -443,6 +443,24 @@
       "parentUuid": "bb46ab22_c94add84",
       "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfdbe6ad_03496734",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 956,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-11T15:04:22Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d66407cc_2be1473e",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

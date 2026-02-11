@@ -58,6 +58,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "22012434_f2273cbd",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T10:31:06Z",
+      "side": 1,
+      "message": "It really does matter. I rely on key-with-nil-value to mean something very specific, and very different to key-not-present.",
+      "parentUuid": "431041c4_853dfc33",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1bc1fa60_0dfc4b6e",
@@ -149,6 +167,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bacae265_bb630d4a",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 883,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T10:31:06Z",
+      "side": 1,
+      "message": "There\u0027s zero wrapping of the errors within this cache package.",
+      "parentUuid": "460f3a58_cbc0ea84",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "82d072cd_c19da9fc",
@@ -162,6 +198,24 @@
       "writtenOn": "2026-02-11T09:37:24Z",
       "side": 1,
       "message": "it seems odd to me like the func above can return `ip \u003d\u003d nil` when `err \u003d\u003d nil`",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2eda6dfc_f21fb67b",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T10:31:06Z",
+      "side": 1,
+      "message": "It\u0027s not an error to have a readable CUE file which doesn\u0027t have a package name. It\u0027s that situation where ip is nil and err is nil.",
+      "parentUuid": "82d072cd_c19da9fc",
       "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -213,6 +267,24 @@
       "writtenOn": "2026-02-11T09:37:24Z",
       "side": 1,
       "message": "I\u0027d find this logic easier to follow if the top-level loop was like `for needsReload {`.\n\nalso, it seems entirely possible that this top-level loop can iterate forever, no? if you intend the top-level loop to only iterate once or twice, I wonder if a slightly different mechanism would be clearer, like a `for reloadStep :\u003d range 2` and at the end of the loop, break if we don\u0027t need the repeat reload.",
+      "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d66407cc_2be1473e",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 956,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T10:31:06Z",
+      "side": 1,
+      "message": "\u003e also, it seems entirely possible that this top-level loop can iterate forever, no\n\nNope that\u0027s exactly the reason for adding processedPkgs entries with nil values: the existence of the key records that we\u0027ve made an attempt to load that package. Once the key exists, we would never mark that package as dirty again, and so there would be no repeated attempts to load it. If the loading of a package failed, then we make sure processedPkgs still has the key present (with a nil value) so that we avoid any infinite loop.",
+      "parentUuid": "bb46ab22_c94add84",
       "revId": "b72982163912577dde0b6719ace7733e73c18a0f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

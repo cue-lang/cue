@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b77d7ff_c38fa35b",
+        "filename": "internal/lsp/cache/file.go",
+        "patchSetId": 24
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T15:10:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49a2e756_f74f9016",
+      "revId": "44df2ea911150e55c37dc0007dab81dc9312090b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "985200bd_00512eb8",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-02-11T14:34:46Z",
       "side": 1,
       "message": "nit: could expandNavigables take a map argument, which could be nil, such that it\u0027s \"append-like\" and we avoid creating a new map just to copy from it and throw it away?",
+      "revId": "44df2ea911150e55c37dc0007dab81dc9312090b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4100ae4_fbdc30e3",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 24
+      },
+      "lineNbr": 1573,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-11T15:10:29Z",
+      "side": 1,
+      "message": "Yes I quite like that idea. I think I might do that in a different CL though. I wonder if, when I do that, a nicer API / set of patterns might emerge.",
+      "parentUuid": "985200bd_00512eb8",
       "revId": "44df2ea911150e55c37dc0007dab81dc9312090b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

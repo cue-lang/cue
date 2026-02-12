@@ -486,9 +486,13 @@ func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 			}
 
 			// Create a let clause: let X = self
+			// Mark the "self" identifier as a predeclared reference so that
+			// Sanitize will rename it to "__self" if shadowed in scope.
+			selfIdent := ast.NewIdent("self")
+			selfIdent.Node = ast.Predeclared
 			letClause := &ast.LetClause{
 				Ident: alias.Ident,
-				Expr:  ast.NewIdent("self"),
+				Expr:  selfIdent,
 			}
 
 			// Insert the let clause at the beginning of the struct

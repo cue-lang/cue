@@ -348,7 +348,7 @@ package foo
 
 // Field named self in same struct
 samestruct: {
-	let X = self
+	let X = __self
 	i:    X.self
 	self: 42
 }
@@ -357,7 +357,7 @@ samestruct: {
 enclosingfield: {
 	self: 42
 	inner: {
-		let X = self
+		let X = __self
 		i: X.a
 		a: 1
 	}
@@ -367,7 +367,7 @@ enclosingfield: {
 enclosinglet: {
 	let self = {z: 99}
 	inner: {
-		let X = self
+		let X = __self
 		i: X.a
 		a: 1
 		j: self.z
@@ -381,7 +381,7 @@ aliassamescope: {
 	}
 	baz: self.data
 	foo: {
-		let X = self
+		let X = __self
 		i: X.a
 		a: 1
 	}
@@ -395,7 +395,7 @@ aliasenclosing: {
 	baz: self.data
 	inner: {
 		foo: {
-			let X = self
+			let X = __self
 			i: X.a
 			a: 1
 		}

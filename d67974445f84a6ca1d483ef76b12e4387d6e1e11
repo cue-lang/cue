@@ -87,6 +87,24 @@
       "parentUuid": "60dc98fa_2a638650",
       "revId": "d67974445f84a6ca1d483ef76b12e4387d6e1e11",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1934e28_fde88b79",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1953,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-12T23:28:59Z",
+      "side": 1,
+      "message": "https://go.dev/play/p/9wW_2gsSc1r\n\nWell well TIL. That\u0027s good to know. I guess that means there\u0027s really no downsides to ever using variadics. Other than the restriction that they have to be the last arg.",
+      "parentUuid": "c55c4f46_bb9e789e",
+      "revId": "d67974445f84a6ca1d483ef76b12e4387d6e1e11",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

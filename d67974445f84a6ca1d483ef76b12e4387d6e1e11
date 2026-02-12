@@ -69,6 +69,24 @@
       "parentUuid": "bf02e4ea_b110b7d8",
       "revId": "d67974445f84a6ca1d483ef76b12e4387d6e1e11",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c55c4f46_bb9e789e",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1953,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T18:00:32Z",
+      "side": 1,
+      "message": "no, no copy with that \"spread\" operator - a variadic arg is still a slice underneath. it\u0027s just a matter of what feels right with the API UX.",
+      "parentUuid": "60dc98fa_2a638650",
+      "revId": "d67974445f84a6ca1d483ef76b12e4387d6e1e11",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

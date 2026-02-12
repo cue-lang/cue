@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "786d0ec4_fde8feb2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T13:00:43Z",
+      "side": 1,
+      "message": "The spec and code changes LGTM. I can re-review and +2 once you\u0027ve consolidated the openspec files as agreed.",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "197c1b43_41380188",
+        "filename": "cue/testdata/comprehensions/else.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T13:00:43Z",
+      "side": 1,
+      "message": "what is this diff here for? we\u0027re not testing/running evalv2 anymore.",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91f01f69_895095d2",
+        "filename": "cue/testdata/comprehensions/else_errors.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T13:00:43Z",
+      "side": 1,
+      "message": "ditto. I don\u0027t understand why we have v2 vs v3 diffs. AFAICT we should only have v3 output files now.",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c220281f_243eb6f4",
+        "filename": "cue/testdata/comprehensions/else_on_error.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T13:00:43Z",
+      "side": 1,
+      "message": "I\u0027d personally join this with `else_errors.txtar`. the two kinds of test cases can share a package, and the filenames and purposes are quite similar already.",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a2aae13_4ddd2a64",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2633,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T13:00:43Z",
+      "side": 1,
+      "message": "can we reword this slightly to clarify that `if foo { ... } else { ... }` is also allowed? the current wording is all about iterating, so it seems to imply that it\u0027s only for `for` comprehensions, and it\u0027s only the examples below that seem to suggest otherwise.",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2b924f8_6fca580f",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T13:00:43Z",
+      "side": 1,
+      "message": "remove?",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e825ff1_8beaf924",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T13:00:43Z",
+      "side": 1,
+      "message": "presumably this field is no longer needed. a bit worried that the AI did not catch this.",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

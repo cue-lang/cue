@@ -28,8 +28,6 @@ import (
 // - handle comprehensions
 // - change field from foo to "foo" if it isn't referenced, rather than
 //   relying on introducing a unique alias.
-// - change a predeclared identifier reference to use the __ident form,
-//   instead of introducing an alias.
 
 // Sanitize rewrites File f in place to be well-formed after automated
 // construction of an AST.
@@ -256,6 +254,15 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 
 	if node.node == n.Node {
 		return true
+	}
+
+	// A predeclared reference (e.g. "self") is shadowed by a local
+	// declaration. Use the "__"-prefixed form to avoid the shadow.
+	if n.Node == ast.Predeclared {
+		n.Name = "__" + n.Name
+		n.Node = nil
+		n.Scope = nil
+		return false
 	}
 
 	// n.Node != node and are both not nil and n.Node is not an ImportSpec.

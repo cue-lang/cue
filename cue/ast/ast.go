@@ -446,6 +446,22 @@ type Ident struct {
 	expr
 }
 
+// Predeclared is a sentinel [Node] that can be used as [Ident.Node]
+// for an identifier referring to a predeclared name such as "self" or "int".
+//
+// When [cuelang.org/go/cue/ast/astutil.Sanitize] encounters an identifier
+// whose Node is this sentinel and the name is shadowed in scope, it renames
+// the identifier to its "__"-prefixed form (e.g. "__self") to avoid the shadow.
+var Predeclared Node = &predeclaredNode{}
+
+type predeclaredNode struct {
+	comments
+}
+
+func (n *predeclaredNode) Pos() token.Pos  { return token.NoPos }
+func (n *predeclaredNode) pos() *token.Pos { return nil }
+func (n *predeclaredNode) End() token.Pos  { return token.NoPos }
+
 // A BasicLit node represents a literal of basic type.
 type BasicLit struct {
 	ValuePos token.Pos   // literal position

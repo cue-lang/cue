@@ -424,10 +424,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		case reflect.String, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 
-			// Note that we don't use [reflect.Value.Seq2]; see the note below for [reflect.Array].
-			iter := val.MapRange()
-			for iter.Next() {
-				k, val := iter.Key(), iter.Value()
+			for k, val := range val.Seq2() {
 				sub := fromGoValue(ctx, nilIsTop, val)
 				// mimic behavior of encoding/json: report error of unsupported type.
 				if sub == nil {

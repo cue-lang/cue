@@ -107,8 +107,6 @@ const (
 	// TODO: Possible future attr kinds
 	// ElemAttr (is a ValueAttr)
 	// FileAttr (not a ValueAttr)
-
-	// TODO: Merge: merge namesake attributes.
 )
 
 // An Attribute contains metadata about a field.

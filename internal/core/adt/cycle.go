@@ -494,6 +494,14 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 			}
 
 			if n.hasNonCycle && n.hasNonCyclic && r.Depth != n.depth {
+				// Mark the close info as cyclic so that downstream
+				// conjuncts propagate the cycle, preventing unbounded
+				// structural expansion through non-ancestor references.
+				// TODO: this is too aggressive for some legitimate
+				// multi-level expansions (e.g. issue3940). A more
+				// targeted fix is needed to distinguish truly infinite
+				// expansion from bounded multi-level expansion.
+				ci.CycleType = IsCyclic
 				return ci, false
 			}
 

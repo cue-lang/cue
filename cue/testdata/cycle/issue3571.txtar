@@ -38,11 +38,20 @@ Unifications: 54
 Conjuncts:    125
 Disjuncts:    73
 -- out/evalalpha --
-(struct){
-  simplified: (#struct){
-    in: (#struct){
+Errors:
+simplified.in.in: structural cycle
+
+Result:
+(_|_){
+  // [structural cycle]
+  simplified: (_|_){
+    // [structural cycle]
+    in: (_|_){
+      // [structural cycle]
       x: ~(simplified.#T)
-      in: ~(simplified.#T)
+      in: (_|_){
+        // [structural cycle] simplified.in.in: structural cycle
+      }
     }
     x: (#struct){
       x: ~(simplified.#T)
@@ -94,10 +103,10 @@ Disjuncts:    73
 diff old new
 --- old
 +++ new
-@@ -1,24 +1,12 @@
- (struct){
-   simplified: (#struct){
-     in: (#struct){
+@@ -1,24 +1,21 @@
+-(struct){
+-  simplified: (#struct){
+-    in: (#struct){
 -      in: (#struct){
 -        in: (_){ _ }
 -        x: (_){ _ }
@@ -105,9 +114,20 @@ diff old new
 -      x: (#struct){
 -        in: (_){ _ }
 -        x: (_){ _ }
--      }
++Errors:
++simplified.in.in: structural cycle
++
++Result:
++(_|_){
++  // [structural cycle]
++  simplified: (_|_){
++    // [structural cycle]
++    in: (_|_){
++      // [structural cycle]
 +      x: ~(simplified.#T)
-+      in: ~(simplified.#T)
++      in: (_|_){
++        // [structural cycle] simplified.in.in: structural cycle
+       }
      }
      x: (#struct){
 -      in: (#struct){
@@ -123,7 +143,7 @@ diff old new
      }
      #T: (#struct){
        in: (_){ _ }
-@@ -28,52 +16,30 @@
+@@ -28,52 +25,30 @@
    issue3571: (struct){
      a: (#struct){
        in: (#struct){

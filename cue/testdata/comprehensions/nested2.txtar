@@ -263,17 +263,17 @@ issue3990: {
 }
 -- out/evalalpha/stats --
 Leaks:  16
-Freed:  414
-Reused: 354
-Allocs: 76
+Freed:  385
+Reused: 332
+Allocs: 69
 Retain: 0
 
-Unifications: 373
-Conjuncts:    712
+Unifications: 350
+Conjuncts:    656
 Disjuncts:    0
 Notifications: 5
 
-NumCloseIDs: 217
+NumCloseIDs: 193
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -293,17 +293,17 @@ diff old new
 -
 -NumCloseIDs: 61
 +Leaks:  16
-+Freed:  414
-+Reused: 354
-+Allocs: 76
++Freed:  385
++Reused: 332
++Allocs: 69
 +Retain: 0
 +
-+Unifications: 373
-+Conjuncts:    712
++Unifications: 350
++Conjuncts:    656
 +Disjuncts:    0
 +Notifications: 5
 +
-+NumCloseIDs: 217
++NumCloseIDs: 193
 -- out/eval/stats --
 Leaks:  112
 Freed:  510
@@ -319,7 +319,15 @@ MisalignedConjunct: 48
 
 NumCloseIDs: 61
 -- out/evalalpha --
-(struct){
+Errors:
+objects: undefined field: objects:
+    ./issue3940.cue:56:50
+objects: undefined field: objects:
+    ./issue3940.cue:117:48
+
+Result:
+(_|_){
+  // [eval]
   given: (struct){
     INC: (struct){
       USD: (float){ 2.0 }
@@ -380,7 +388,8 @@ NumCloseIDs: 61
       }
     }
   }
-  issue3940: (struct){
+  issue3940: (_|_){
+    // [eval]
     reduced1: (struct){
       a: (struct){
         b: (struct){
@@ -442,7 +451,9 @@ NumCloseIDs: 61
             }
           }
         }
-        o: (#list){
+        o: (_|_){
+          // [incomplete] o: undefined field: o:
+          //     ./issue3940.cue:40:36
         }
       }
       E: (struct){
@@ -452,8 +463,10 @@ NumCloseIDs: 61
         }
       }
     }
-    reduced4: (struct){
-      out: (struct){
+    reduced4: (_|_){
+      // [eval]
+      out: (_|_){
+        // [eval]
         _imports: (#list){
           0: (struct){
             objects: (struct){
@@ -474,7 +487,9 @@ NumCloseIDs: 61
             }
           }
         }
-        objects: (#list){
+        objects: (_|_){
+          // [eval] objects: undefined field: objects:
+          //     ./issue3940.cue:56:50
         }
       }
       Exporter: (struct){
@@ -509,8 +524,10 @@ NumCloseIDs: 61
         //     ./issue3940.cue:73:15
       }
     }
-    full: (struct){
-      out: (#struct){
+    full: (_|_){
+      // [eval]
+      out: (_|_){
+        // [eval]
         _imports: (#list){
           0: (#struct){
             objects: (#struct){
@@ -652,27 +669,9 @@ NumCloseIDs: 61
         }
         _objects: (#struct){
         }
-        objects: (#list){
-          0: (#struct){
-            branch: (#struct){
-              #conf: (#struct){
-                global: (#struct){
-                  region: (string){ "Europe" }
-                }
-              }
-              region: (string){ "Europe" }
-            }
-          }
-          1: (#struct){
-            leaf: (#struct){
-              #conf: (#struct){
-                global: (#struct){
-                  region: (string){ "Europe" }
-                }
-              }
-              region: (string){ "Europe" }
-            }
-          }
+        objects: (_|_){
+          // [eval] objects: undefined field: objects:
+          //     ./issue3940.cue:117:48
         }
       }
       _branch: (struct){
@@ -896,7 +895,29 @@ NumCloseIDs: 61
 diff old new
 --- old
 +++ new
-@@ -65,12 +65,7 @@
+@@ -1,4 +1,12 @@
+-(struct){
++Errors:
++objects: undefined field: objects:
++    ./issue3940.cue:56:50
++objects: undefined field: objects:
++    ./issue3940.cue:117:48
++
++Result:
++(_|_){
++  // [eval]
+   given: (struct){
+     INC: (struct){
+       USD: (float){ 2.0 }
+@@ -59,18 +67,14 @@
+       }
+     }
+   }
+-  issue3940: (struct){
++  issue3940: (_|_){
++    // [eval]
+     reduced1: (struct){
+       a: (struct){
          b: (struct){
            a: (struct){
              b: (struct){
@@ -910,7 +931,7 @@ diff old new
              }
            }
            objects: (_|_){
-@@ -95,12 +90,7 @@
+@@ -95,12 +99,7 @@
          b: (struct){
            a: (struct){
              b: (struct){
@@ -924,7 +945,7 @@ diff old new
              }
            }
            objects: (_|_){
-@@ -125,12 +115,7 @@
+@@ -125,18 +124,15 @@
          i: (struct){
            x: (struct){
              i: (struct){
@@ -938,7 +959,73 @@ diff old new
              }
              o: (#list){
              }
-@@ -183,12 +168,7 @@
+           }
+         }
+-        o: (#list){
++        o: (_|_){
++          // [incomplete] o: undefined field: o:
++          //     ./issue3940.cue:40:36
+         }
+       }
+       E: (struct){
+@@ -146,29 +142,33 @@
+         }
+       }
+     }
+-    reduced4: (struct){
+-      out: (struct){
+-        _imports: (#list){
+-          0: (struct){
+-            objects: (struct){
+-            }
+-            #export: (#struct){
+-              _imports: (#list){
+-                0: (#struct){
+-                  #export: (#struct){
+-                    _imports: (list){
+-                    }
+-                    objects: (#list){
+-                    }
+-                  }
+-                }
+-              }
+-              objects: (#list){
+-              }
+-            }
+-          }
+-        }
+-        objects: (#list){
++    reduced4: (_|_){
++      // [eval]
++      out: (_|_){
++        // [eval]
++        _imports: (#list){
++          0: (struct){
++            objects: (struct){
++            }
++            #export: (#struct){
++              _imports: (#list){
++                0: (#struct){
++                  #export: (#struct){
++                    _imports: (list){
++                    }
++                    objects: (#list){
++                    }
++                  }
++                }
++              }
++              objects: (#list){
++              }
++            }
++          }
++        }
++        objects: (_|_){
++          // [eval] objects: undefined field: objects:
++          //     ./issue3940.cue:56:50
+         }
+       }
+       Exporter: (struct){
+@@ -183,12 +183,7 @@
          b: (struct){
            a: (struct){
              b: (struct){
@@ -952,10 +1039,12 @@ diff old new
              }
            }
            objects: (_|_){
-@@ -210,17 +190,10 @@
+@@ -208,19 +203,14 @@
+         //     ./issue3940.cue:73:15
+       }
      }
-     full: (struct){
-       out: (#struct){
+-    full: (struct){
+-      out: (#struct){
 -        #conf: (#struct){
 -          global: (#struct){
 -            region: (string){ "Europe" }
@@ -967,6 +1056,10 @@ diff old new
 -          0: (struct){
 -            objects: (struct){
 -              branch: (struct){
++    full: (_|_){
++      // [eval]
++      out: (_|_){
++        // [eval]
 +        _imports: (#list){
 +          0: (#struct){
 +            objects: (#struct){
@@ -974,7 +1067,7 @@ diff old new
                  #conf: (#struct){
                  }
                  region: (_|_){
-@@ -230,9 +203,9 @@
+@@ -230,9 +220,9 @@
                }
              }
              imports: (#list){
@@ -987,7 +1080,7 @@ diff old new
                      #conf: (#struct){
                      }
                      region: (_|_){
-@@ -242,8 +215,6 @@
+@@ -242,8 +232,6 @@
                    }
                  }
                  #export: (#struct){
@@ -996,7 +1089,7 @@ diff old new
                    _objects: (#struct){
                      leaf: (#struct){
                        #conf: (#struct){
-@@ -254,6 +225,8 @@
+@@ -254,6 +242,8 @@
                        }
                      }
                    }
@@ -1005,7 +1098,7 @@ diff old new
                    _imports: (list){
                    }
                    objects: (#list){
-@@ -272,8 +245,6 @@
+@@ -272,8 +262,6 @@
                }
              }
              #export: (#struct){
@@ -1014,7 +1107,7 @@ diff old new
                _objects: (#struct){
                  branch: (#struct){
                    #conf: (#struct){
-@@ -297,8 +268,6 @@
+@@ -297,8 +285,6 @@
                      }
                    }
                    #export: (#struct){
@@ -1023,7 +1116,7 @@ diff old new
                      _objects: (#struct){
                        leaf: (#struct){
                          #conf: (#struct){
-@@ -309,6 +278,8 @@
+@@ -309,6 +295,8 @@
                          }
                        }
                      }
@@ -1032,7 +1125,7 @@ diff old new
                      _imports: (list){
                      }
                      objects: (#list){
-@@ -326,6 +297,8 @@
+@@ -326,6 +314,8 @@
                    }
                  }
                }
@@ -1041,10 +1134,31 @@ diff old new
                objects: (#list){
                  0: (#struct){
                    branch: (#struct){
-@@ -351,6 +324,13 @@
+@@ -351,27 +341,16 @@
              }
            }
          }
+-        objects: (#list){
+-          0: (#struct){
+-            branch: (#struct){
+-              #conf: (#struct){
+-                global: (#struct){
+-                  region: (string){ "Europe" }
+-                }
+-              }
+-              region: (string){ "Europe" }
+-            }
+-          }
+-          1: (#struct){
+-            leaf: (#struct){
+-              #conf: (#struct){
+-                global: (#struct){
+-                  region: (string){ "Europe" }
+-                }
+-              }
+-              region: (string){ "Europe" }
+-            }
+-          }
 +        #conf: (#struct){
 +          global: (#struct){
 +            region: (string){ "Europe" }
@@ -1052,10 +1166,13 @@ diff old new
 +        }
 +        _objects: (#struct){
 +        }
-         objects: (#list){
-           0: (#struct){
-             branch: (#struct){
-@@ -386,50 +366,9 @@
++        objects: (_|_){
++          // [eval] objects: undefined field: objects:
++          //     ./issue3940.cue:117:48
+         }
+       }
+       _branch: (struct){
+@@ -386,50 +365,9 @@
            }
          }
          imports: (#list){
@@ -1109,7 +1226,7 @@ diff old new
            _objects: (#struct){
              branch: (#struct){
                #conf: (#struct){
-@@ -453,8 +392,6 @@
+@@ -453,8 +391,6 @@
                  }
                }
                #export: (#struct){
@@ -1118,7 +1235,7 @@ diff old new
                  _objects: (#struct){
                    leaf: (#struct){
                      #conf: (#struct){
-@@ -465,6 +402,8 @@
+@@ -465,6 +401,8 @@
                      }
                    }
                  }
@@ -1127,7 +1244,7 @@ diff old new
                  _imports: (list){
                  }
                  objects: (#list){
-@@ -482,6 +421,8 @@
+@@ -482,6 +420,8 @@
                }
              }
            }
@@ -1136,7 +1253,7 @@ diff old new
            objects: (#list){
              0: (#struct){
                branch: (#struct){
-@@ -518,8 +459,6 @@
+@@ -518,8 +458,6 @@
            }
          }
          #export: (#struct){
@@ -1145,7 +1262,7 @@ diff old new
            _objects: (#struct){
              leaf: (#struct){
                #conf: (#struct){
-@@ -530,6 +469,8 @@
+@@ -530,6 +468,8 @@
                }
              }
            }
@@ -1154,7 +1271,7 @@ diff old new
            _imports: (list){
            }
            objects: (#list){
-@@ -560,43 +501,16 @@
+@@ -560,43 +500,16 @@
    }
    issue3990: (struct){
      _imports: (#list){
@@ -1203,7 +1320,7 @@ diff old new
            }
          }
        }
-@@ -605,6 +519,11 @@
+@@ -605,6 +518,11 @@
        name: (string){ "someVolumes" }
        exportObjs: (struct){
          deployment: (struct){
@@ -1215,7 +1332,7 @@ diff old new
            _names: (struct){
              data: (string){ "data" }
            }
-@@ -611,11 +530,6 @@
+@@ -611,11 +529,6 @@
            volumeNames: (#list){
              0: (string){ "data" }
            }
@@ -1227,7 +1344,7 @@ diff old new
          }
        }
      }
-@@ -627,13 +541,12 @@
+@@ -627,13 +540,12 @@
          //     ./issue3990.cue:21:21
        }
      }
@@ -1246,7 +1363,7 @@ diff old new
        _names: (struct){
          data: (string){ "data" }
        }
-@@ -640,10 +553,11 @@
+@@ -640,10 +552,11 @@
        volumeNames: (#list){
          0: (string){ "data" }
        }

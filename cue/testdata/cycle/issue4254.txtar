@@ -1,0 +1,45 @@
+-- in.cue --
+b: a
+a: b: b: a
+a
+-- out/evalalpha --
+Errors:
+a.b.b: structural cycle
+b.b.b.b: structural cycle
+
+Result:
+(_|_){
+  // [structural cycle]
+  b: (_|_){
+    // [structural cycle]
+    b: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle] b.b.b.b: structural cycle
+        }
+      }
+    }
+  }
+  a: (_|_){
+    // [structural cycle]
+    b: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle] a.b.b: structural cycle
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  b: 〈0;a〉
+  a: {
+    b: {
+      b: 〈2;a〉
+    }
+  }
+  〈0;a〉
+}

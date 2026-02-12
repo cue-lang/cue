@@ -18,7 +18,6 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/runtime"
 )
 
@@ -136,29 +135,6 @@ func getImportFromPath(x *runtime.Runtime, id string) *Instance {
 	return inst
 }
 
-// newInstance creates a new instance. Use Insert to populate the instance.
-func newInstance(x *runtime.Runtime, p *build.Instance, v *adt.Vertex) *Instance {
-	// TODO: associate root source with structLit.
-	inst := &Instance{
-		root: v,
-		inst: p,
-	}
-	if p != nil {
-		inst.ImportPath = p.ImportPath
-		inst.Dir = p.Dir
-		inst.PkgName = p.PkgName
-		inst.DisplayName = p.ImportPath
-		if p.Err != nil {
-			inst.setListOrError(p.Err)
-		}
-	}
-
-	x.AddInst(p.ImportPath, v, p)
-	x.SetBuildData(p, inst)
-	inst.index = x
-	return inst
-}
-
 func (inst *Instance) setListOrError(err errors.Error) {
 	inst.Incomplete = true
 	inst.Err = errors.Append(inst.Err, err)
@@ -185,42 +161,6 @@ func (inst *Instance) Value() Value {
 	// it is convenient to not include these.
 	// adt.AddStats(ctx)
 	return newVertexRoot(inst.index, ctx, inst.root)
-}
-
-// Build creates a new instance from the build instances, allowing unbound
-// identifier to bind to the top-level field in inst. The top-level fields in
-// inst take precedence over predeclared identifier and builtin functions.
-//
-// Deprecated: use [Context.BuildInstance]
-func (inst *hiddenInstance) Build(p *build.Instance) *Instance {
-	p.Complete()
-
-	idx := inst.index
-	r := inst.index
-
-	rErr := r.ResolveFiles(p)
-
-	cfg := &compile.Config{Scope: valueScope(Value{idx: r, v: inst.root})}
-	v, err := compile.Files(cfg, r, p.ID(), p.Files...)
-
-	// Just like [runtime.Runtime.Build], ensure that the @embed compiler is run as needed.
-	err = errors.Append(err, r.InjectImplementations(p, v))
-
-	v.AddConjunct(adt.MakeRootConjunct(nil, inst.root))
-
-	i := newInstance(idx, p, v)
-	if rErr != nil {
-		i.setListOrError(rErr)
-	}
-	if i.Err != nil {
-		i.setListOrError(i.Err)
-	}
-
-	if err != nil {
-		i.setListOrError(err)
-	}
-
-	return i
 }
 
 // Lookup reports the value at a path starting from the top level struct. The
@@ -267,27 +207,4 @@ func (inst *hiddenInstance) LookupField(path ...string) (f FieldInfo, err error)
 		v = f.Value
 	}
 	return f, err
-}
-
-// Fill creates a new instance with the values of the old instance unified with
-// the given value. It is not possible to update the emit value.
-//
-// Values may be any Go value that can be converted to CUE, an ast.Expr or
-// a Value. In the latter case, it will panic if the Value is not from the same
-// Runtime.
-//
-// Deprecated: use [Value.FillPath]
-func (inst *hiddenInstance) Fill(x interface{}, path ...string) (*Instance, error) {
-	v := inst.Value().Fill(x, path...)
-
-	inst = addInst(inst.index, &Instance{
-		root: v.v,
-		inst: nil,
-
-		// Omit ImportPath to indicate this is not an importable package.
-		Dir:        inst.Dir,
-		PkgName:    inst.PkgName,
-		Incomplete: inst.Incomplete,
-	})
-	return inst, nil
 }

@@ -1,42 +1,53 @@
+cd $WORK/cycle
 ! exec cue cmd cycle
-cmp stderr expect-stderr1
-! exec cue cmd aftercycle
-cmp stderr expect-stderr2
-exec cue cmd interlockedTasks
-cmp stdout interlocked-stdout
-cmp stderr expect-stderr3
+cmp stderr $WORK/expect-stderr-cycle
 
--- expect-stderr1 --
+cd $WORK/aftercycle
+! exec cue cmd aftercycle
+cmp stderr $WORK/expect-stderr-aftercycle
+
+cd $WORK/interlocked
+exec cue cmd interlocked
+cmp stdout $WORK/interlocked-stdout
+cmp stderr $WORK/expect-stderr-interlocked
+
+-- expect-stderr-cycle --
 cyclic task dependency:
 	task command.cycle.t1 refers to
 	task command.cycle.t2 refers to
 	task command.cycle.t1:
-    ./after_tool.cue:18:2
-    ./after_tool.cue:19:2
--- expect-stderr2 --
+    ./x_tool.cue:6:2
+    ./x_tool.cue:7:2
+-- expect-stderr-aftercycle --
 command.aftercycle.t2.$after: structural cycle
--- expect-stderr3 --
+-- expect-stderr-interlocked --
 -- interlocked-stdout --
 v
 v
--- after_tool.cue --
+-- aftercycle/x_tool.cue --
 package home
 
-import (
-	"tool/cli"
-)
-
-command: interlockedTasks: {
-  t1: cli.Print & { text: t2.value, value: "v" }
-  t2: cli.Print & { text: t1.value, value: "v" }
-}
+import "tool/cli"
 
 command: aftercycle: {
-	t1: cli.Print & { $after: t2, text: "t1" }
-	t2: cli.Print & { $after: t1, text: "t2" }
+	t1: cli.Print & {$after: t2, text: "t1"}
+	t2: cli.Print & {$after: t1, text: "t2"}
 }
+-- cycle/x_tool.cue --
+package home
+
+import "tool/cli"
 
 command: cycle: {
-	t1: cli.Print & { text: t2.text }
-	t2: cli.Print & { text: t1.text }
+	t1: cli.Print & {text: t2.text}
+	t2: cli.Print & {text: t1.text}
+}
+-- interlocked/x_tool.cue --
+package home
+
+import "tool/cli"
+
+command: interlocked: {
+	t1: cli.Print & {text: t2.value, value: "v"}
+	t2: cli.Print & {text: t1.value, value: "v"}
 }

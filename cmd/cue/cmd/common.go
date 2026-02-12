@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
@@ -733,33 +734,30 @@ func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) ([
 	return insts, nil
 }
 
-func buildToolInstances(ctx *cue.Context, binst []*build.Instance) ([]*cue.Instance, error) {
+func buildToolInstances(ctx *cue.Context, binst []*build.Instance) ([]cue.Value, error) {
 	// Reuse the same context, if there is one, so that the @embed interpreter can be used.
 	// Note that ctx may be nil when we do `cue help cmd`.
-	r := new(cue.Runtime)
-	if ctx != nil {
-		r = (*cue.Runtime)(ctx)
+	if ctx == nil {
+		ctx = cuecontext.New()
 	}
-	instances, _ := r.BuildInstances(binst)
-	for _, inst := range instances {
-		if inst.Err != nil {
-			return nil, inst.Err
-		}
+	values, err := ctx.BuildInstances(binst)
+	if err != nil {
+		return nil, err
 	}
 
 	// TODO check errors after the fact in case of ignore.
-	for _, inst := range instances {
-		if err := inst.Value().Validate(); err != nil {
+	for _, v := range values {
+		if err := v.Validate(); err != nil {
 			return nil, err
 		}
 	}
-	return instances, nil
+	return values, nil
 }
 
-func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
+func buildTools(cmd *Command, args []string) (cue.Value, error) {
 	cfg, err := defaultConfig()
 	if err != nil {
-		return nil, err
+		return cue.Value{}, err
 	}
 	loadCfg := *cfg.loadCfg
 	loadCfg.Tools = true
@@ -767,7 +765,7 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 
 	binst := loadFromArgs(args, &loadCfg)
 	if len(binst) == 0 {
-		return nil, nil
+		return cue.Value{}, nil
 	}
 	included := map[string]bool{}
 
@@ -789,22 +787,22 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 		})
 	}
 
-	insts, err := buildToolInstances(cmd.ctx, binst)
+	values, err := buildToolInstances(cmd.ctx, binst)
 	if err != nil {
-		return nil, err
+		return cue.Value{}, err
 	}
 
-	inst := insts[0]
-	if len(insts) > 1 {
-		inst = cue.Merge(insts...)
+	v := values[0]
+	for _, other := range values[1:] {
+		v = v.Unify(other)
 	}
 
-	ctx := inst.Value().Context()
+	ctx := v.Context()
 	for _, b := range binst {
 		for _, i := range b.Imports {
 			val := ctx.BuildInstance(i)
 			if err := val.Err(); err != nil {
-				return nil, err
+				return cue.Value{}, err
 			}
 		}
 	}
@@ -812,8 +810,11 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 	// Set path equal to the package from which it is loading.
 	ti.ImportPath = binst[0].ImportPath
 
-	inst = inst.Build(ti)
-	return inst, inst.Err
+	result := ctx.BuildInstance(ti, cue.Scope(v))
+	if err := result.Err(); err != nil {
+		return cue.Value{}, err
+	}
+	return result, nil
 }
 
 func shortFile(root string, f *build.File) string {

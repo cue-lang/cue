@@ -7,7 +7,7 @@ source: {
 }
 deps: {
 	"cue.dev/x/githubactions@v0": {
-		v:       "v0.2.0"
+		v:       "v0.3.0"
 		default: true
 	}
 }

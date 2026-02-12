@@ -90,7 +90,7 @@ installGo: {
 checkoutCode: [...githubactions.#Step] & [
 	{
 		name: "Checkout code"
-		uses: "actions/checkout@v5" // TODO(mvdan): switch to namespacelabs/nscloud-checkout-action@v1 once Windows supports caching
+		uses: "actions/checkout@v6" // TODO(mvdan): switch to namespacelabs/nscloud-checkout-action@v1 once Windows supports caching
 
 		// "pull_request_target" builds will by default use a merge commit,
 		// testing the PR's HEAD merged on top of the master branch.
@@ -156,7 +156,7 @@ checkoutCode: [...githubactions.#Step] & [
 
 earlyChecks: githubactions.#Step & {
 	name: "Early git and code sanity checks"
-	run:  *"go run cuelang.org/go/internal/ci/checks@v0.14.1" | string
+	run:  *"go run cuelang.org/go/internal/ci/checks@v0.15.0" | string
 }
 
 curlGitHubAPI: {

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34129f69_98c7fda6",
+        "filename": "internal/lsp/server/codeaction.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T12:50:50Z",
+      "side": 1,
+      "message": "trying to think about the naming and description of these...\n\n\"Wrap in struct\" and \"Unwrap from struct\" sounds like we\u0027re adding and removing structs, when that\u0027s not really what\u0027s happening. The struct is still there, it\u0027s just the braces at the syntactic level.\n\nThe spec calls the brace-less form \"shorthand notation for nested structs\": https://cuelang.org/docs/reference/spec/#shorthand-notation-for-nested-structs\n\nSo... perhaps the two code actions could be called something like:\n1) Shorten struct field notation\n2) Expand struct field notation with braces\n\nJudson and others had been using the terms \"collapse\" or \"inline\" for the first case, if that is useful.\n\nOr, alternatively, if we wanted to be really explicit:\n\n1) Remove braces to shorten struct field notation\n2) Add braces to expand struct field notation",
+      "revId": "fe6bad5c4a988ce5ebe5c7b511aa137422426510",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

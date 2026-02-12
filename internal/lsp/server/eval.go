@@ -34,7 +34,7 @@ func (s *server) Definition(ctx context.Context, params *protocol.DefinitionPara
 func (s *server) Completion(ctx context.Context, params *protocol.CompletionParams) (*protocol.CompletionList, error) {
 	uri := params.TextDocument.URI
 	w := s.workspace
-	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadNothing)
+	file, fe, srcMapper, err := w.FileEvaluatorForURI(uri, cache.LoadAllIfNonCue)
 	if file == nil || err != nil {
 		return nil, err
 	}

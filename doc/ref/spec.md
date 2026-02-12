@@ -254,7 +254,7 @@ package      import
 The following keywords are used in comprehensions.
 
 ```
-for          in           if           let
+for          in           if           let          else
 ```
 
 <!--
@@ -2626,8 +2626,22 @@ Within structs, the values yielded by a comprehension are embedded within the
 struct.
 Both structs and lists may contain multiple comprehensions.
 
+A comprehension may have an optional `else` clause.
+The else clause is evaluated and its contents yielded
+if the comprehension completes without yielding any values.
+This occurs when a `for` clause iterates over an empty collection,
+or when all iterations are filtered out by `if` clauses.
+
+The else clause body is evaluated in the enclosing scope,
+not the comprehension's internal scope.
+This means identifiers bound by `for` or `let` clauses
+are not accessible within the else clause.
+
+If the comprehension source or condition contains an error,
+the error propagates rather than triggering the else clause.
+
 ```
-Comprehension       = Clauses StructLit .
+Comprehension       = Clauses StructLit [ ElseClause ] .
 
 Clauses             = StartClause { [ "," ] Clause } .
 StartClause         = ForClause | GuardClause .
@@ -2635,6 +2649,7 @@ Clause              = StartClause | LetClause .
 ForClause           = "for" identifier [ "," identifier ] "in" Expression .
 GuardClause         = "if" Expression .
 LetClause           = "let" identifier "=" Expression .
+ElseClause          = "else" StructLit .
 ```
 
 ```
@@ -2649,6 +2664,24 @@ c: {
     }
 }
 d: { "1": 2, "2": 3, "3": 4 }
+
+// else clause examples
+e: {
+    if false { a: 1 } else { b: 2 }
+}
+f: { b: 2 }
+
+g: {
+    for x in [] { "\(x)": x } else { empty: true }
+}
+h: { empty: true }
+
+// else clause accesses outer scope
+i: {
+    let threshold = 10
+    for x in [] { x } else { fallback: threshold }
+}
+j: { fallback: 10 }
 ```
 
 

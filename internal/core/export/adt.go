@@ -730,6 +730,10 @@ func (e *exporter) elem(env *adt.Environment, d adt.Elem) ast.Expr {
 func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) *ast.Comprehension {
 	c := &ast.Comprehension{}
 
+	// Save outer environment for else clause (which doesn't have access to
+	// comprehension-internal bindings).
+	outerEnv := env
+
 	for _, y := range comp.Clauses {
 		switch x := y.(type) {
 		case *adt.ForClause:
@@ -794,5 +798,14 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 		v = ast.NewStruct(ast.Embed(v))
 	}
 	c.Value = v
+
+	// Export else clause using outer environment.
+	if comp.Else != nil {
+		elseBody := e.expr(outerEnv, comp.Else)
+		if body, ok := elseBody.(*ast.StructLit); ok {
+			c.Else = &ast.ElseClause{Body: body}
+		}
+	}
+
 	return c
 }

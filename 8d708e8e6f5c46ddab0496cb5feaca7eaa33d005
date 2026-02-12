@@ -16,6 +16,24 @@
       "message": "I wonder if we could do better in the future. But I guess it\u0027s no huge deal given that, presumably, \"load all packages in the current module\" is still a reasonably lazy and cheap operation, which is typically only done once.",
       "revId": "8d708e8e6f5c46ddab0496cb5feaca7eaa33d005",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1149c5f1_1cf65991",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-12T12:24:25Z",
+      "side": 1,
+      "message": "Unfortunately no. It\u0027s the same as in normal cue files/packages searching for usages / references of a given field - there\u0027s nothing you can do to avoid just loading everything in the current module to figure out what imports what and so how far you have to search+evaluate to figure out usages.\n\nIt\u0027s not super expensive - you have the IO for reading the files, and you have to parse it to get the AST, but that is about it.",
+      "parentUuid": "9a3029f8_801d3377",
+      "revId": "8d708e8e6f5c46ddab0496cb5feaca7eaa33d005",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

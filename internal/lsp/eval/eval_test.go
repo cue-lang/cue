@@ -2171,27 +2171,33 @@ a: l=({b: 3} & {c: l.b})`,
 			name: "Alias_Expr_External",
 			archive: `-- a.cue --
 a: l={b: 3}
-c: l.b`,
+c: l.b
+d: a.b`,
 			// This type of alias is only visible within the value.
 			expectDefinitions: map[position][]position{
 				ln(2, 1, "l"): {},
 				ln(2, 1, "b"): {},
+				ln(3, 1, "a"): {ln(1, 1, "a")},
+				ln(3, 1, "b"): {}, // This is WRONG it should be {ln(1, 1, "b")},
 
 				ln(1, 1, "a"): {self},
 				ln(1, 1, "l"): {self},
 				ln(1, 1, "b"): {self},
 
 				ln(2, 1, "c"): {self},
+				ln(3, 1, "d"): {self},
 			},
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
-				or(0, 2):   {f: []string{"a", "c"}},
-				or1(2):     {e: []string{"a", "c"}},
-				or1(5):     {f: []string{"b"}, e: []string{"a", "c", "l"}},
+				or(0, 2):   {f: []string{"a", "c", "d"}},
+				or1(2):     {e: []string{"a", "c", "d"}},
+				or1(5):     {f: []string{"b"}, e: []string{"a", "c", "d", "l"}},
 				or(6, 8):   {f: []string{"b"}},
-				or1(8):     {e: []string{"a", "b", "c", "l"}},
-				or1(10):    {e: []string{"a", "b", "c", "l"}},
-				or(12, 14): {f: []string{"a", "c"}},
-				or(14, 17): {e: []string{"a", "c"}},
+				or1(8):     {e: []string{"a", "b", "c", "d", "l"}},
+				or1(10):    {e: []string{"a", "b", "c", "d", "l"}},
+				or(12, 14): {f: []string{"a", "c", "d"}},
+				or(14, 17): {e: []string{"a", "c", "d"}},
+				or(19, 21): {f: []string{"a", "c", "d"}},
+				or(21, 24): {e: []string{"a", "c", "d"}},
 			},
 		},
 

@@ -23,6 +23,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/mod/modresolve"
 	"cuelang.org/go/mod/modconfig"
 )
@@ -67,7 +68,7 @@ func newHelpCmd(c *Command) *cobra.Command {
 					pkgArgs = args[2:]
 					args = args[:2]
 				}
-
+				c.ctx = cuecontext.New()
 				tools, err := buildTools(c, pkgArgs)
 				if err == nil {
 					addCustomCommands(c, cmd, commandSection, tools)

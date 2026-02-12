@@ -20,10 +20,10 @@ mv itemsList_tool.cue itemsList.cue
 exec cue export ./...
 cmp stdout stdout.export-post.golden
 
-# Attempt to ls in this state, which fails, as each of the CUE packages
-# hold an items list with different lengths.
-! exec cue cmd ls ./...
-stderr 'itemsList: incompatible list lengths \(0 and 1\)'
+# Attempt to ls in this state, which is OK, as finalization of
+# each package happens after they've all been unified together.
+exec cue cmd ls ./...
+cmp stdout stdout.ls-multi.golden
 
 -- cue.mod/module.cue --
 module: "mod.com"
@@ -97,3 +97,6 @@ ls: a b
         "b"
     ]
 }
+-- stdout.ls-multi.golden --
+ls: a b
+

@@ -37,10 +37,7 @@ if true {
     _depKinds: (string){ "" }
     variable: (string){ "{}" }
   }
-  output: (_|_){
-    // [incomplete] 0: undefined field: kind:
-    //     ./in.cue:10:41
-  }
+  output: (string){ "{kind1}" }
   _input: (#list){
     0: (struct){
       _deps: (#list){
@@ -63,14 +60,8 @@ if true {
         }
         _out: (string){ "" }
       }
-      _depKinds: (_|_){
-        // [incomplete] 0: undefined field: kind:
-        //     ./in.cue:10:41
-      }
-      variable: (_|_){
-        // [incomplete] 0: undefined field: kind:
-        //     ./in.cue:10:41
-      }
+      _depKinds: (string){ "kind1" }
+      variable: (string){ "{kind1}" }
     }
   }
 }

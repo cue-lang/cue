@@ -80,19 +80,19 @@ out: #sub & {#p: _test.s1}
 -- diff/todo/p3 --
 Reordering
 -- out/evalalpha/stats --
-Leaks:  210
-Freed:  654
-Reused: 626
-Allocs: 238
+Leaks:  192
+Freed:  678
+Reused: 646
+Allocs: 224
 Retain: 0
 
-Unifications: 332
-Conjuncts:    1358
+Unifications: 338
+Conjuncts:    1388
 Disjuncts:    106
 
-NumCloseIDs: 422
+NumCloseIDs: 434
 
-ConjunctInfos:       977
+ConjunctInfos:       1007
 MaxConjunctInfos:    5
 MaxReqSets:          19
 MaxRedirect:         4
@@ -336,19 +336,19 @@ diff old new
 -MisalignedConjunct: 4502
 -
 -NumCloseIDs: 4
-+Leaks:  210
-+Freed:  654
-+Reused: 626
-+Allocs: 238
++Leaks:  192
++Freed:  678
++Reused: 646
++Allocs: 224
 +Retain: 0
 +
-+Unifications: 332
-+Conjuncts:    1358
++Unifications: 338
++Conjuncts:    1388
 +Disjuncts:    106
 +
-+NumCloseIDs: 422
++NumCloseIDs: 434
 +
-+ConjunctInfos:       977
++ConjunctInfos:       1007
 +MaxConjunctInfos:    5
 +MaxReqSets:          19
 +MaxRedirect:         4

@@ -150,7 +150,6 @@ func (n *nodeContext) insertComprehension(
 
 	x := c.Value
 
-	ci.setOptional(nil)
 	node := n.node.DerefDisjunct()
 
 	var decls []Decl

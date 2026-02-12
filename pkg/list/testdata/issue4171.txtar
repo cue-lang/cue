@@ -9,9 +9,9 @@ X: list.IsSorted(list.Descending)
 X: ["A", "B", "C"]
 -- out/list-v3 --
 Errors:
-X: invalid value ["A","B","C"] (does not satisfy list.IsSorted({T:number | string,x:number | string,y:number | string,less:_|_(Descending.less: Descending.less: unresolved disjunction number | string (type (string|number)) (and 1 more errors))})):
+X: invalid value ["A","B","C"] (does not satisfy list.IsSorted({T:number | string,x:number | string,y:number | string,less:_|_(Descending.less: unresolved disjunction number | string (type (string|number)) (and 1 more errors))})):
     ./in.cue:3:4
     ./in.cue:4:4
 
 Result:
-X: _|_ // X: invalid value ["A","B","C"] (does not satisfy list.IsSorted({T:number | string,x:number | string,y:number | string,less:_|_(Descending.less: Descending.less: unresolved disjunction number | string (type (string|number)) (and 1 more errors))}))
+X: _|_ // X: invalid value ["A","B","C"] (does not satisfy list.IsSorted({T:number | string,x:number | string,y:number | string,less:_|_(Descending.less: unresolved disjunction number | string (type (string|number)) (and 1 more errors))}))

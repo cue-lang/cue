@@ -440,6 +440,14 @@ func (p list) Error() string {
 	return fmt.Sprintf(format, args...)
 }
 
+// pathlessError wraps an Error to suppress its path, for use as a
+// format argument when the path is already provided by the caller.
+type pathlessError struct{ cueError }
+type cueError = Error // alias to avoid field name conflicting with Error() method
+
+func (e pathlessError) Path() []string { return nil }
+func (e pathlessError) Unwrap() error  { return Unwrap(e.cueError) }
+
 // Msg reports the unformatted error message for the first error, if any.
 func (p list) Msg() (format string, args []interface{}) {
 	switch len(p) {
@@ -448,7 +456,10 @@ func (p list) Msg() (format string, args []interface{}) {
 	case 1:
 		return p[0].Msg()
 	}
-	return "%s (and %d more errors)", []interface{}{p[0], len(p) - 1}
+	// Wrap p[0] to suppress its path. The list's own Path() already
+	// returns p[0].Path(), so including the path in the format arg
+	// would cause it to appear twice in the output.
+	return "%s (and %d more errors)", []interface{}{pathlessError{p[0]}, len(p) - 1}
 }
 
 // Position reports the primary position for the first error, if any.

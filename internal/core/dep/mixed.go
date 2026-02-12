@@ -134,4 +134,7 @@ func (m marked) markExpr(x adt.Expr) {
 
 func (m marked) markComprehension(y *adt.Comprehension) {
 	m.markExpr(adt.ToExpr(y.Value))
+	if y.Else != nil {
+		m.markExpr(y.Else)
+	}
 }

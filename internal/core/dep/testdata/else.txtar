@@ -1,0 +1,26 @@
+-- in.cue --
+// Test that dependencies in else clause are tracked
+
+// else clause references outer field - else triggers because list is empty
+a: b: {
+	for x in c { "\(x)": x } else { fallback: d }
+}
+c: []
+d: 10
+-- out/dependencies/field --
+line  reference    path of resulting vertex
+5:    c         => c
+-- out/dependencies/all --
+line  reference    path of resulting vertex
+5:    c         => c
+5:    d         => d
+-- out/dependencies/dynamic --
+line  reference    path of resulting vertex
+5:    c         => c
+5:    d         => d
+-- out/dependencies-v3/stats/field --
+// COUNT: 2
+-- out/dependencies-v3/stats/all --
+// COUNT: 6
+-- out/dependencies-v3/stats/dynamic --
+// COUNT: 9

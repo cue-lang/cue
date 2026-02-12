@@ -1,0 +1,70 @@
+-- in.cue --
+// When the source expression has an error, the error propagates
+// rather than triggering the else clause.
+
+// Error in for source - else should NOT trigger
+forSourceError: {
+	for x in "not-a-list" { "\(x)": x } else { fallback: true }
+}
+
+// Error in if condition - else should NOT trigger
+ifConditionError: {
+	if ("not" + 1) { a: 1 } else { b: 2 }
+}
+
+// Bottom value in for source - else should NOT trigger
+forSourceBottom: {
+	for x in _|_ { "\(x)": x } else { fallback: true }
+}
+-- out/evalalpha --
+Errors:
+forSourceError: cannot range over "not-a-list" (found string, want list or struct):
+    ./in.cue:6:11
+ifConditionError: invalid operands "not" and 1 to '+' (type string and int):
+    ./in.cue:11:6
+    ./in.cue:11:14
+explicit error (_|_ literal) in source:
+    ./in.cue:16:11
+
+Result:
+(_|_){
+  // [eval]
+  forSourceError: (_|_){
+    // [eval] forSourceError: cannot range over "not-a-list" (found string, want list or struct):
+    //     ./in.cue:6:11
+  }
+  ifConditionError: (_|_){
+    // [eval] ifConditionError: invalid operands "not" and 1 to '+' (type string and int):
+    //     ./in.cue:11:6
+    //     ./in.cue:11:14
+  }
+  forSourceBottom: (_|_){
+    // [user] explicit error (_|_ literal) in source:
+    //     ./in.cue:16:11
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  forSourceError: {
+    for _, x in "not-a-list" {
+      "\(〈1;x〉)": 〈1;x〉
+    } else {
+      fallback: true
+    }
+  }
+  ifConditionError: {
+    if ("not" + 1) {
+      a: 1
+    } else {
+      b: 2
+    }
+  }
+  forSourceBottom: {
+    for _, x in _|_(explicit error (_|_ literal) in source) {
+      "\(〈1;x〉)": 〈1;x〉
+    } else {
+      fallback: true
+    }
+  }
+}

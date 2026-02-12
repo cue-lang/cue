@@ -380,6 +380,11 @@ func (s *scope) Before(n ast.Node) bool {
 		s = scopeClauses(s, x.Clauses)
 		defer s.freeScopesUntil(outer)
 		ast.Walk(x.Value, s.Before, nil)
+		// Walk the else clause in the OUTER scope, since else should not
+		// have access to for/let variables from the comprehension clauses.
+		if x.Else != nil {
+			ast.Walk(x.Else.Body, outer.Before, nil)
+		}
 		return false
 
 	case *ast.Field:

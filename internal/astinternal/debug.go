@@ -409,6 +409,9 @@ func DebugStr(x interface{}) (out string) {
 	case *ast.Comprehension:
 		out := DebugStr(v.Clauses)
 		out += DebugStr(v.Value)
+		if v.Else != nil {
+			out += " else " + DebugStr(v.Else.Body)
+		}
 		return out
 
 	case *ast.StructLit:

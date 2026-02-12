@@ -943,11 +943,41 @@ func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 		return c.errf(x, "comprehension value without clauses")
 	}
 
-	return &adt.Comprehension{
+	comp := &adt.Comprehension{
 		Syntax:  x,
 		Clauses: a,
 		Value:   st,
 	}
+
+	// Compile else clause in the outer scope (before comprehension variables).
+	// The else clause should NOT have access to for/let variables.
+	if x.Else != nil {
+		// Check language version - else clause requires v0.16.0 or later.
+		if v := c.experiments.LanguageVersion(); v != "" && semver.Compare("v0.16.0", v) > 0 {
+			return c.errf(x.Else, "else clause in comprehension requires language version v0.16.0 or later; current version is %s", v)
+		}
+		// Pop all comprehension scopes temporarily to compile else in outer scope.
+		// We need to compile the else body outside the comprehension's scope chain.
+		savedStack := c.stack
+		// Find the scope depth before the comprehension clauses were pushed.
+		// Each for/let clause pushes one scope.
+		outerDepth := len(savedStack)
+		for _, clause := range x.Clauses {
+			switch clause.(type) {
+			case *ast.ForClause, *ast.LetClause:
+				outerDepth--
+			}
+		}
+		// Temporarily truncate to outer scope depth.
+		c.stack = savedStack[:outerDepth]
+		elseBody := c.expr(x.Else.Body)
+		c.stack = savedStack // Restore full stack
+		if elseSt, ok := elseBody.(*adt.StructLit); ok {
+			comp.Else = elseSt
+		}
+	}
+
+	return comp
 }
 
 func (c *compiler) labeledExpr(f ast.Decl, lab labeler, expr ast.Expr) adt.Expr {

@@ -61,7 +61,7 @@ func (r *Runtime) Label(s string, isIdent bool) adt.Feature {
 // TODO: move to Runtime as fields.
 var (
 	labelMap = map[string]int{}
-	labels   = make([]string, 0, 1000)
+	labels   sync.Map
 	mutex    sync.RWMutex
 )
 
@@ -83,15 +83,13 @@ func getKey(s string) int64 {
 	if ok {
 		return int64(p)
 	}
-	p = len(labels)
-	labels = append(labels, s)
+	p = len(labelMap)
+	labels.Store(p, s)
 	labelMap[s] = p
 	return int64(p)
 }
 
 func (x *index) IndexToString(i int64) string {
-	mutex.RLock()
-	s := labels[i]
-	mutex.RUnlock()
-	return s
+	s, _ := labels.Load(int(i))
+	return s.(string)
 }

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9304ab9_74747646",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1130,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T17:32:48Z",
+      "side": 1,
+      "message": "nit: linkify this, like `[ast.Alias]`",
+      "revId": "d67974445f84a6ca1d483ef76b12e4387d6e1e11",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf02e4ea_b110b7d8",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1953,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T17:32:48Z",
+      "side": 1,
+      "message": "for the sake of UX, I wonder if this method should take variadic args, then you could avoid the slice literal syntax.",
+      "revId": "d67974445f84a6ca1d483ef76b12e4387d6e1e11",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -267,8 +267,7 @@ out: _ @embed(glob=data/*.json)
 	})
 }
 
-func TestEmbedHover(t *testing.T) {
-	const files = `
+const filesHoverComplete = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
 language: version: "v0.16.0"
@@ -296,6 +295,7 @@ s: {
 s: field: {
   // does the field contain sheep?
   sheep: bool
+  horses: bool
 }
 -- data/file.json --
 {
@@ -322,7 +322,8 @@ s: field: {
 }
 `
 
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+func TestEmbedHover(t *testing.T) {
+	WithOptions(RootURIAsDefaultFolder()).Run(t, filesHoverComplete, func(t *testing.T, env *Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("data/file.json")
@@ -335,7 +336,7 @@ s: field: {
 		)
 
 		mappers := make(map[string]*protocol.Mapper)
-		for _, file := range txtar.Parse([]byte(files)).Files {
+		for _, file := range txtar.Parse([]byte(filesHoverComplete)).Files {
 			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
 			mappers[file.Name] = mapper
 		}
@@ -407,7 +408,50 @@ how many fields do we have?
 				qt.Assert(t, qt.IsNil(got), qt.Commentf("%v:%v (0-based)", filename, pos))
 			}
 		}
+	})
+}
 
+func TestEmbedCompletion(t *testing.T) {
+	WithOptions(RootURIAsDefaultFolder()).Run(t, filesHoverComplete, func(t *testing.T, env *Env) {
+		rootURI := env.Sandbox.Workdir.RootURI()
+
+		env.OpenFile("data/file.json")
+		env.Await(
+			env.DoneWithOpen(),
+			LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Created`, rootURI),
+			LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Reloaded`, rootURI),
+			NoLogMatching(protocol.Debug, `Package dirs=\[%v/data\] importPath=mod\.example/x@v0:a Created`, rootURI),
+		)
+
+		mappers := make(map[string]*protocol.Mapper)
+		for _, file := range txtar.Parse([]byte(filesHoverComplete)).Files {
+			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
+			mappers[file.Name] = mapper
+		}
+
+		completionsTestCases := map[position][]string{
+			fln("data/file.json", 3, 1, `"`): {`"sheep"`, `"cows"`, `"horses"`},
+			fln("data/file.json", 6, 1, `"`): {`"field"`, `"fieldCount"`},
+		}
+
+		for p, expectedLabels := range completionsTestCases {
+			p.determinePos(mappers)
+			completions := env.Completion(protocol.Location{
+				URI:   p.mapper.URI,
+				Range: protocol.Range{Start: p.pos},
+			})
+			qt.Assert(t, qt.IsNotNil(completions))
+			items := completions.Items
+			gotLabels := make([]string, len(items))
+			for i, item := range items {
+				gotLabels[i] = item.Label
+			}
+			qt.Assert(t, qt.ContentEquals(gotLabels, expectedLabels))
+		}
+
+		env.Await(
+			LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v\] importPath=mod\.example/x@v0:a Created`, rootURI),
+		)
 	})
 }
 

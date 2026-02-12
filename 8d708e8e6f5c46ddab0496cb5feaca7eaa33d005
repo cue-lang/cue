@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a3029f8_801d3377",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T12:02:25Z",
+      "side": 1,
+      "message": "I wonder if we could do better in the future. But I guess it\u0027s no huge deal given that, presumably, \"load all packages in the current module\" is still a reasonably lazy and cheap operation, which is typically only done once.",
+      "revId": "8d708e8e6f5c46ddab0496cb5feaca7eaa33d005",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

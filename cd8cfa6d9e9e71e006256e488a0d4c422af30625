@@ -1,5 +1,23 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5bb6ac7_9c58f3fe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-12T21:59:12Z",
+      "side": 1,
+      "message": "This was meant to be #4231, FWIW.",
+      "revId": "cd8cfa6d9e9e71e006256e488a0d4c422af30625",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ],
   "submitRequirementResults": [
     {
       "submitRequirement": {

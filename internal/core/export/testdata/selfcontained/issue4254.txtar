@@ -1,0 +1,23 @@
+#inlineImports: true
+
+-- cue.mod/module.cue --
+module: "mod.test/a"
+language: version: "v0.9.0"
+
+-- in.cue --
+import "mod.test/a/pkg"
+
+pkg
+
+-- pkg/pkg.cue --
+package pkg
+
+data: _
+
+#foo: {
+	for _v in data
+	for _v in _v {
+		_v
+	}
+}
+-- out/self/default --

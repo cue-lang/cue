@@ -1,0 +1,116 @@
+-- in.cue --
+import "strings"
+
+// Marking comprehension fields as optional for cycle detection
+// should not prevent fixed fields from being resolved.
+_listBuilder: {
+	kind: "kind1"
+	_deps: [...]
+	_kindJoin: {
+		_objs: [...]
+		_out: strings.Join([for d in _objs {d.kind}], ",")
+	}
+	_depKinds: {_kindJoin & {_objs: _deps}}._out
+	variable: "{" + _depKinds + "}"
+}
+
+output: _
+if true {
+	_input: [{
+		_listBuilder
+		_deps: [{_listBuilder}]
+	}]
+
+	output: _input[0].variable
+}
+-- out/evalalpha --
+(struct){
+  _listBuilder: (struct){
+    kind: (string){ "kind1" }
+    _deps: (list){
+    }
+    _kindJoin: (struct){
+      _objs: (list){
+      }
+      _out: (string){ "" }
+    }
+    _depKinds: (string){ "" }
+    variable: (string){ "{}" }
+  }
+  output: (_|_){
+    // [incomplete] 0: undefined field: kind:
+    //     ./in.cue:10:41
+  }
+  _input: (#list){
+    0: (struct){
+      _deps: (#list){
+        0: (struct){
+          kind: (string){ "kind1" }
+          _deps: (list){
+          }
+          _kindJoin: (struct){
+            _objs: (list){
+            }
+            _out: (string){ "" }
+          }
+          _depKinds: (string){ "" }
+          variable: (string){ "{}" }
+        }
+      }
+      kind: (string){ "kind1" }
+      _kindJoin: (struct){
+        _objs: (list){
+        }
+        _out: (string){ "" }
+      }
+      _depKinds: (_|_){
+        // [incomplete] 0: undefined field: kind:
+        //     ./in.cue:10:41
+      }
+      variable: (_|_){
+        // [incomplete] 0: undefined field: kind:
+        //     ./in.cue:10:41
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  _listBuilder: {
+    kind: "kind1"
+    _deps: [
+      ...,
+    ]
+    _kindJoin: {
+      _objs: [
+        ...,
+      ]
+      _out: 〈import;strings〉.Join([
+        for _, d in 〈1;_objs〉 {
+          〈1;d〉.kind
+        },
+      ], ",")
+    }
+    _depKinds: {
+      (〈1;_kindJoin〉 & {
+        _objs: 〈2;_deps〉
+      })
+    }._out
+    variable: (("{" + 〈0;_depKinds〉) + "}")
+  }
+  output: _
+  if true {
+    _input: [
+      {
+        〈3;_listBuilder〉
+        _deps: [
+          {
+            〈5;_listBuilder〉
+          },
+        ]
+      },
+    ]
+    output: 〈0;_input〉[0].variable
+  }
+}

@@ -16,6 +16,24 @@
       "message": "I not totally convinced this is the right place to put this. Looking at where the resolving code is, it depends not only on the ast.File itself but also its surrounding context, the build.Instance, which is used to populate the `allFields` map used for the actual resolution. That is, the resolution will only be repeatable if the same File is used inside the same Instance. If not, then the results might be wrong.\n\nWith that in mind, I\u0027m wondering if it would be more appropriate to put the Once inside *build.Instance instead, guarding the Unresolved slices of all the Files inside the instance. This should also make the `ResolveFiles` faster when called multiple times.\n\nAll that said, ISTM that this symbol resolution code is almost entirely independent of the runtime. We know how to resolve symbols in an instance regardless of what the runtime looks like. The only exception to that seems to be this code:\n\n```\n\t\t} else if _, ok :\u003d idx.builtinPaths[id]; !ok {\n\t\t\terrs \u003d errors.Append(errs,\n\t\t\t\tnodeErrorf(spec, \"package %q not found\", id))\n\t\t\tcontinue\n\t\t}\n```\nwhich is the only place that `doResolveFile` uses the index. However, nothing at all seems to break if we remove that code, which makes intuitive sense because CUE has the nice property that we know what a symbol resolves to regardless of the context.\n\nSo perhaps the \"right\" place to put this code is as a method on `build.Instance`, say `Instance.ResolveIdentifiers` and have `load.Instances` invoke it as a matter of course. Then we avoid the race entirely.",
       "revId": "e130323c3c7f2f90a0c86da2c24855ac92857ff2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f34ab2e6_2ef9aba0",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1049,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-12T09:55:31Z",
+      "side": 1,
+      "message": "Done, and moved to Complete as per later suggestion. \n\nNote that we still need to communicate the Resovle error in a separate step.",
+      "parentUuid": "b60cfd3d_afc5387c",
+      "revId": "e130323c3c7f2f90a0c86da2c24855ac92857ff2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

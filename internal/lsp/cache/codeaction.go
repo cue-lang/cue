@@ -129,7 +129,7 @@ func (w *Workspace) CodeActionConvertToStruct(ctx context.Context, params *proto
 		contentBuilder.WriteString("\t")
 		isLastLine := i+1 == len(fieldLines)
 		if isLastLine {
-			// The last field line may or may not have a trailing line
+			// The last field line may or may not have a trailing  line
 			// ending (because it might be the last line in the file).
 			fieldLine = bytes.TrimRight(fieldLine, "\r\n")
 			fieldLine = bytes.TrimRight(fieldLine, ", \t")

@@ -1,0 +1,67 @@
+#path: out
+
+Extracting a sub-expression that contains nested (Def & {...}).field
+expressions used to cause a panic.
+
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.0"
+-- in.cue --
+import "test.example/pkg"
+
+pkg.#Module
+-- pkg/pkg.cue --
+package pkg
+
+#B: {
+	out: {x: 1}
+}
+
+#A: {
+	out: (#B & {}).out
+}
+
+#Module: {
+	out: (#A & {}).out
+}
+-- out/self-v3/default --
+
+_#def
+_#def: (A.#x & {}).out
+
+//cue:path: #A
+let A = {
+	#x: {
+		out: (B.#x & {}).out
+	}
+}
+
+//cue:path: #B
+let B = {
+	#x: {
+		out: {
+			x: 1
+		}
+	}
+}
+-- out/self-v3-noshare/default --
+
+_#def
+_#def: (A.#x & {}).out
+
+//cue:path: #A
+let A = {
+	#x: {
+		out: (B.#x & {}).out
+	}
+}
+
+//cue:path: #B
+let B = {
+	#x: {
+		out: {
+			x: 1
+		}
+	}
+}
+-- out/self/default --

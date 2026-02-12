@@ -56,11 +56,21 @@ func (e *exporter) completePivot(f *ast.File) {
 	if s == nil || f == nil {
 		return
 	}
-	for _, d := range s.deps {
-		if !d.isExternalRoot() {
-			continue
+	// Use a fixpoint loop because exporting one external's body (in
+	// addExternal) may set needTopLevel on deps earlier in the list.
+	for {
+		progress := false
+		for _, d := range s.deps {
+			if d.exported || !d.isExternalRoot() || !d.needTopLevel {
+				continue
+			}
+			d.exported = true
+			progress = true
+			s.addExternal(d)
 		}
-		s.addExternal(d)
+		if !progress {
+			break
+		}
 	}
 	f.Decls = append(f.Decls, s.decls...)
 }
@@ -95,6 +105,7 @@ type depData struct {
 	useCount     int // Other reference using this vertex
 	included     bool
 	needTopLevel bool
+	exported     bool // already processed by addExternal in the fixpoint loop
 }
 
 // isExternalRoot reports whether d is an external node (a node referenced
@@ -376,7 +387,9 @@ func relPathLength(r adt.Resolver) (length int, newRoot bool) {
 		case adt.Resolver:
 			r = x
 		default:
-			panic("unreachable")
+			// A non-Resolver expression (e.g. BinaryExpr) is a valid
+			// end-of-chain; we simply cannot walk any further.
+			return length, false
 		}
 	}
 }

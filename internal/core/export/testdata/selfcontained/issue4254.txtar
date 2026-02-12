@@ -20,4 +20,28 @@ data: _
 		_v
 	}
 }
+-- out/self-v3/default --
+import "mod.test/a/pkg"
+
+pkg
+-- out/self-v3-noshare/default --
+import "mod.test/a/pkg"
+
+pkg
 -- out/self/default --
+-- out/self-v3/expand_imports --
+data: _
+#foo: {
+	for _v_567475F3 in data
+	for _v_567475F3 in _v_567475F3 {
+		_v_567475F3
+	}
+}
+-- out/self-v3-noshare/expand_imports --
+data: _
+#foo: {
+	for _v_567475F3 in data
+	for _v_567475F3 in _v_567475F3 {
+		_v_567475F3
+	}
+}

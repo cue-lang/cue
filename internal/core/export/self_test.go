@@ -49,9 +49,6 @@ func TestSelfContained(t *testing.T) {
 			"self/selfcontained/cyclic":            `reference not properly substituted`,
 			"self-v3/selfcontained/cyclic":         `reference not properly substituted`,
 			"self-v3-noshare/selfcontained/cyclic": `reference not properly substituted`,
-
-			"self-v3/selfcontained/issue4254":         `hidden for clause variable not renamed`,
-			"self-v3-noshare/selfcontained/issue4254": `hidden for clause variable not renamed`,
 		},
 	}
 

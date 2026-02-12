@@ -29,7 +29,7 @@ import (
 )
 
 func (e *exporter) ident(x adt.Feature) *ast.Ident {
-	s := x.IdentString(e.ctx)
+	s := e.identString(x)
 	if !ast.IsValidIdent(s) {
 		panic(s + " is not a valid identifier")
 	}

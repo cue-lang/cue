@@ -272,6 +272,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 
 		switch x := elem.(type) {
 		case *Comprehension:
+			indexBefore := index
 			err := c.yield(nil, t.env, x, Flags{status: partial, mode: mode}, func(e *Environment) {
 				label, err := MakeLabel(x.Source(), index, IntLabel)
 				n.addErr(err)
@@ -284,6 +285,15 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 			if err != nil {
 				n.addBottom(err)
 				return
+			}
+			// If comprehension yielded zero values and has an else clause,
+			// insert the else clause's struct contents as list elements.
+			if index == indexBefore && x.Else != nil {
+				label, err := MakeLabel(x.Source(), index, IntLabel)
+				n.addErr(err)
+				index++
+				conj := MakeConjunct(t.env, x.Else, id)
+				n.insertArc(label, ArcMember, conj, id, true)
 			}
 
 		case *Ellipsis:

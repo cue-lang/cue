@@ -15,6 +15,12 @@ cmp stderr expect/foobar/stderr
 exec cue export --out text -e 'yaml.MarshalStream(X)' issue999/x.cue
 cmp stdout expect/issue999/stdout
 
+# Issue #4202: cue eval -e should not produce an internal error
+# when a for comprehension's if-guard references the same definition
+# used in a pattern constraint on the iterated struct.
+exec cue eval -e _out issue4202/x.cue
+! stdout '_\|_'
+
 -- expect/nonExist/stdout --
 -- expect/nonExist/stderr --
 reference "nonExist" not found:
@@ -64,4 +70,17 @@ X: [
 a: 1
 ---
 b: 2
+
+-- issue4202/x.cue --
+#K: string
+
+x: [#K]: _
+
+x: a: 1
+
+_out: [
+	for k, v in x
+	if k =~ #K {v},
+]
+
 

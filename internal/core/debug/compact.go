@@ -352,6 +352,10 @@ func (w *printer) compactNode(n adt.Node) {
 			w.node(c)
 		}
 		w.node(adt.ToExpr(x.Value))
+		if x.Else != nil {
+			w.string(" else ")
+			w.node(x.Else)
+		}
 
 	case *adt.ForClause:
 		w.string("for ")

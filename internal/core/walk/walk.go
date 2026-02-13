@@ -167,6 +167,9 @@ func (w *Visitor) node(n adt.Node) {
 			w.node(c)
 		}
 		w.node(adt.ToExpr(x.Value))
+		if x.Else != nil {
+			w.node(x.Else)
+		}
 
 	case *adt.ForClause:
 		w.feature(x.Key, x)

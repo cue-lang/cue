@@ -546,6 +546,55 @@ cannot import package as definition identifier`,
 			out: `{y: {a: 1, b: 2}, a: {for k: v in y let x=v+2 if x>2 {"\(k)": v}}}`,
 		},
 		{
+			desc:    "if-else comprehension",
+			version: "v0.16.0",
+			in: `{
+			a: {
+				if true { x: 1 } else { y: 2 }
+			}
+		}`,
+			out: `{a: {if true {x: 1} else {y: 2}}}`,
+		},
+		{
+			desc:    "for-else comprehension",
+			version: "v0.16.0",
+			in: `{
+			a: {
+				for x in [] { "\(x)": x } else { empty: true }
+			}
+		}`,
+			out: `{a: {for x in [] {"\(x)": x} else {empty: true}}}`,
+		},
+		{
+			desc:    "multi-clause comprehension with else",
+			version: "v0.16.0",
+			in: `{
+			a: {
+				for x in [1,2] if x > 10 { "\(x)": x } else { none: true }
+			}
+		}`,
+			out: `{a: {for x in [1, 2] if x>10 {"\(x)": x} else {none: true}}}`,
+		},
+		{
+			desc:    "list comprehension with else",
+			version: "v0.16.0",
+			in: `{
+			a: [for x in [] { x } else { 0 }]
+		}`,
+			out: `{a: [for x in [] {x} else {0}]}`,
+		},
+		{
+			desc:    "multiple else clauses error",
+			version: "v0.16.0",
+			in: `{
+			a: {
+				if true { x: 1 } else { y: 2 } else { z: 3 }
+			}
+		}`,
+			out: `{a: {if true {x: 1} else {y: 2}, {z: 3}}}
+missing ',' in struct literal`,
+		},
+		{
 			desc: "let declaration",
 			in: `{
 			let X = 42

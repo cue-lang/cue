@@ -159,6 +159,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1cfea3d_dce45c24",
+        "filename": "cue/testdata/comprehensions/else_on_error.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-13T09:24:47Z",
+      "side": 1,
+      "message": "ah perfect, I was just going to suggest a rename.",
+      "parentUuid": "1a414031_659e190c",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a2aae13_4ddd2a64",

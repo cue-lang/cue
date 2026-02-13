@@ -655,6 +655,9 @@ func (c *visitor) markDecl(env *adt.Environment, d adt.Decl) {
 }
 
 func (c *visitor) markComprehension(env *adt.Environment, y *adt.Comprehension) {
+	// Save outer environment for else clause.
+	outerEnv := env
+
 	env = c.markClauses(env, y.Clauses)
 
 	// Use "live" environments if we have them. This is important if
@@ -679,6 +682,11 @@ func (c *visitor) markComprehension(env *adt.Environment, y *adt.Comprehension) 
 	}
 	// TODO: consider using adt.EnvExpr and remove the above loop.
 	c.markExpr(env, adt.ToExpr(y.Value))
+
+	// Mark else clause in outer environment.
+	if y.Else != nil {
+		c.markExpr(outerEnv, y.Else)
+	}
 }
 
 func (c *visitor) markClauses(env *adt.Environment, a []adt.Yielder) *adt.Environment {

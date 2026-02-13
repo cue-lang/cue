@@ -476,6 +476,7 @@ func applyCursor(v applyVisitor, c Cursor) {
 	case *ast.Comprehension:
 		applyList(v, c, n.Clauses)
 		apply(v, c, &n.Value)
+		applyIfNotNil(v, c, &n.Else)
 
 	// Files and packages
 	case *ast.File:
@@ -491,6 +492,9 @@ func applyCursor(v applyVisitor, c Cursor) {
 
 	case *ast.IfClause:
 		apply(v, c, &n.Condition)
+
+	case *ast.ElseClause:
+		apply(v, c, &n.Body)
 
 	default:
 		panic(fmt.Sprintf("Walk: unexpected node type %T", n))

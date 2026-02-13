@@ -334,6 +334,19 @@ func (c *compiler) compileExpr(x ast.Expr) adt.Conjunct {
 	return adt.MakeRootConjunct(env, expr)
 }
 
+// requireVersion checks if a feature is available in the current language version.
+// Returns an error if the feature requires a newer version, nil otherwise.
+func (c *compiler) requireVersion(n ast.Node, minVersion, feature string) *adt.Bottom {
+	v := c.experiments.LanguageVersion()
+	if v == "" {
+		return nil
+	}
+	if semver.Compare(minVersion, v) > 0 {
+		return c.errf(n, "%s requires language version %s or later; current version is %s", feature, minVersion, v)
+	}
+	return nil
+}
+
 // verifyVersion checks whether n is a Builtin and then checks whether the
 // Added version is compatible with the file version registered in c.
 func (c *compiler) verifyVersion(src ast.Node, n adt.Expr) adt.Expr {
@@ -943,11 +956,40 @@ func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 		return c.errf(x, "comprehension value without clauses")
 	}
 
-	return &adt.Comprehension{
+	comp := &adt.Comprehension{
 		Syntax:  x,
 		Clauses: a,
 		Value:   st,
 	}
+
+	// Compile else clause in the outer scope (before comprehension variables).
+	// The else clause should NOT have access to for/let variables.
+	if x.Else != nil {
+		if err := c.requireVersion(x.Else, "v0.16.0", "else clause in comprehension"); err != nil {
+			return err
+		}
+		// Pop all comprehension scopes temporarily to compile else in outer scope.
+		// We need to compile the else body outside the comprehension's scope chain.
+		savedStack := c.stack
+		// Find the scope depth before the comprehension clauses were pushed.
+		// Each for/let clause pushes one scope.
+		outerDepth := len(savedStack)
+		for _, clause := range x.Clauses {
+			switch clause.(type) {
+			case *ast.ForClause, *ast.LetClause:
+				outerDepth--
+			}
+		}
+		// Temporarily truncate to outer scope depth.
+		c.stack = savedStack[:outerDepth]
+		elseBody := c.expr(x.Else.Body)
+		c.stack = savedStack // Restore full stack
+		if elseSt, ok := elseBody.(*adt.StructLit); ok {
+			comp.Else = elseSt
+		}
+	}
+
+	return comp
 }
 
 func (c *compiler) labeledExpr(f ast.Decl, lab labeler, expr ast.Expr) adt.Expr {

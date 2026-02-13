@@ -1,0 +1,281 @@
+-- in.cue --
+// if-else: condition true - no else
+ifTrue: {
+	if true { a: 1 } else { b: 2 }
+}
+
+// if-else: condition false - else yields
+ifFalse: {
+	if false { a: 1 } else { b: 2 }
+}
+
+// for-else: non-empty source - no else
+forNonEmpty: {
+	for x in [1, 2] { "\(x)": x } else { empty: true }
+}
+
+// for-else: empty source - else yields
+forEmpty: {
+	for x in [] { "\(x)": x } else { empty: true }
+}
+
+// for-else with filter: filter removes all - else yields
+forFilteredAll: {
+	for x in [1, 2, 3] if x > 10 { "\(x)": x } else { empty: true }
+}
+
+// for-else with filter: filter keeps some - no else
+forFilteredSome: {
+	for x in [1, 2, 3] if x > 1 { "\(x)": x } else { empty: true }
+}
+
+// list if-else: true
+listIfTrue: [
+	if true { 1 } else { 2 }
+]
+
+// list if-else: false
+listIfFalse: [
+	if false { 1 } else { 2 }
+]
+
+// list for-else: empty
+listForEmpty: [
+	for x in [] { x } else { 0 }
+]
+
+// list for-else: non-empty
+listForNonEmpty: [
+	for x in [1, 2] { x * 2 } else { 0 }
+]
+
+// else with multiple fields
+elseMultipleFields: {
+	if false { a: 1 } else { b: 2, c: 3 }
+}
+
+// else embeds into existing struct
+elseEmbeds: {
+	existing: 1
+	if false { added: 2 } else { fallback: 3 }
+}
+
+// else with outer scope access
+outerScope: {
+	let threshold = 10
+	for x in [] { x } else { fallback: threshold }
+}
+
+// nested comprehensions - outer else triggers
+nestedOuterElse: {
+	for x in [] { for y in [1] { y } else { inner: true } } else { outer: true }
+}
+
+// nested comprehensions - inner else triggers
+nestedInnerElse: {
+	for x in [1] { for y in [] { y } else { inner: true } } else { outer: true }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  69
+Reused: 60
+Allocs: 9
+Retain: 0
+
+Unifications: 69
+Conjuncts:    90
+Disjuncts:    69
+
+NumCloseIDs: 2
+-- out/eval --
+(struct){
+  ifTrue: (struct){
+    a: (int){ 1 }
+  }
+  ifFalse: (struct){
+    b: (int){ 2 }
+  }
+  forNonEmpty: (struct){
+    "1": (int){ 1 }
+    "2": (int){ 2 }
+  }
+  forEmpty: (struct){
+    empty: (bool){ true }
+  }
+  forFilteredAll: (struct){
+    empty: (bool){ true }
+  }
+  forFilteredSome: (struct){
+    "2": (int){ 2 }
+    "3": (int){ 3 }
+  }
+  listIfTrue: (#list){
+    0: (int){ 1 }
+  }
+  listIfFalse: (#list){
+    0: (int){ 2 }
+  }
+  listForEmpty: (#list){
+    0: (int){ 0 }
+  }
+  listForNonEmpty: (#list){
+    0: (int){ 2 }
+    1: (int){ 4 }
+  }
+  elseMultipleFields: (struct){
+    b: (int){ 2 }
+    c: (int){ 3 }
+  }
+  elseEmbeds: (struct){
+    existing: (int){ 1 }
+    fallback: (int){ 3 }
+  }
+  outerScope: (struct){
+    let threshold#1 = (int){ 10 }
+    fallback: (int){ 10 }
+  }
+  nestedOuterElse: (struct){
+    outer: (bool){ true }
+  }
+  nestedInnerElse: (struct){
+    inner: (bool){ true }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  ifTrue: {
+    if true {
+      a: 1
+    } else {
+      b: 2
+    }
+  }
+  ifFalse: {
+    if false {
+      a: 1
+    } else {
+      b: 2
+    }
+  }
+  forNonEmpty: {
+    for _, x in [
+      1,
+      2,
+    ] {
+      "\(〈1;x〉)": 〈1;x〉
+    } else {
+      empty: true
+    }
+  }
+  forEmpty: {
+    for _, x in [] {
+      "\(〈1;x〉)": 〈1;x〉
+    } else {
+      empty: true
+    }
+  }
+  forFilteredAll: {
+    for _, x in [
+      1,
+      2,
+      3,
+    ] if (〈0;x〉 > 10) {
+      "\(〈1;x〉)": 〈1;x〉
+    } else {
+      empty: true
+    }
+  }
+  forFilteredSome: {
+    for _, x in [
+      1,
+      2,
+      3,
+    ] if (〈0;x〉 > 1) {
+      "\(〈1;x〉)": 〈1;x〉
+    } else {
+      empty: true
+    }
+  }
+  listIfTrue: [
+    if true {
+      1
+    } else {
+      2
+    },
+  ]
+  listIfFalse: [
+    if false {
+      1
+    } else {
+      2
+    },
+  ]
+  listForEmpty: [
+    for _, x in [] {
+      〈1;x〉
+    } else {
+      0
+    },
+  ]
+  listForNonEmpty: [
+    for _, x in [
+      1,
+      2,
+    ] {
+      (〈1;x〉 * 2)
+    } else {
+      0
+    },
+  ]
+  elseMultipleFields: {
+    if false {
+      a: 1
+    } else {
+      b: 2
+      c: 3
+    }
+  }
+  elseEmbeds: {
+    existing: 1
+    if false {
+      added: 2
+    } else {
+      fallback: 3
+    }
+  }
+  outerScope: {
+    let threshold#1 = 10
+    for _, x in [] {
+      〈1;x〉
+    } else {
+      fallback: 〈1;let threshold#1〉
+    }
+  }
+  nestedOuterElse: {
+    for _, x in [] {
+      for _, y in [
+        1,
+      ] {
+        〈1;y〉
+      } else {
+        inner: true
+      }
+    } else {
+      outer: true
+    }
+  }
+  nestedInnerElse: {
+    for _, x in [
+      1,
+    ] {
+      for _, y in [] {
+        〈1;y〉
+      } else {
+        inner: true
+      }
+    } else {
+      outer: true
+    }
+  }
+}

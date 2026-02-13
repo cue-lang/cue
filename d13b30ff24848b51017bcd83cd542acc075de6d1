@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21c6abf1_0a7ffc18",
+        "filename": "scripts/setup-openspec.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-13T12:45:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0bd689d_8540da6a",
+      "revId": "d13b30ff24848b51017bcd83cd542acc075de6d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a641bffb_daf0026d",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5895d3de_3eb602ea",
+        "filename": "scripts/setup-openspec.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-13T12:45:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a641bffb_daf0026d",
+      "revId": "d13b30ff24848b51017bcd83cd542acc075de6d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27616555_01af9fb6",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-02-13T09:29:12Z",
       "side": 1,
       "message": "nit: if you use `\u003c\u003c-` you can tab-indent the contents and EOF, kinda like a CUE multiline string, then it\u0027s really obvious to visually see where the heredoc starts and ends.",
+      "revId": "d13b30ff24848b51017bcd83cd542acc075de6d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57e1e280_21f84a23",
+        "filename": "scripts/setup-openspec.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-13T12:45:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27616555_01af9fb6",
       "revId": "d13b30ff24848b51017bcd83cd542acc075de6d1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

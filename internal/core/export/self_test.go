@@ -49,6 +49,9 @@ func TestSelfContained(t *testing.T) {
 			"self/selfcontained/cyclic":            `reference not properly substituted`,
 			"self-v3/selfcontained/cyclic":         `reference not properly substituted`,
 			"self-v3-noshare/selfcontained/cyclic": `reference not properly substituted`,
+
+			"self-v3/selfcontained/issue4221":         `let variable name collides with field name in dependency`,
+			"self-v3-noshare/selfcontained/issue4221": `let variable name collides with field name in dependency`,
 		},
 	}
 

@@ -1,0 +1,76 @@
+#path: out
+
+-- in.cue --
+@experiment(aliasv2)
+
+flags: goos: string | *"darwin"
+
+out: {
+	for k, v in d.matrix {
+		(k): v
+	}
+}
+d: {
+	[string]~(a, _): _
+
+	_t: GOOS: string
+
+	matrix: {
+		local:  _t & {GOOS: flags.goos}
+		linux:  _t & {GOOS: "linux"}
+		darwin: _t & {GOOS: flags.goos}
+	}
+}
+-- out/self-v3/default --
+
+for k, v in MATRIX {
+	(k): v
+}
+
+//cue:path: d.matrix
+let MATRIX = {
+	local: T & {
+		GOOS: GOOS_1
+	}
+	linux: T & {
+		GOOS: "linux"
+	}
+	darwin: T & {
+		GOOS: GOOS_1
+	}
+}
+
+//cue:path: d._t
+let T = {
+	GOOS: string
+}
+
+//cue:path: flags.goos
+let GOOS_1 = string | *"darwin"
+-- out/self-v3-noshare/default --
+
+for k, v in MATRIX {
+	(k): v
+}
+
+//cue:path: d.matrix
+let MATRIX = {
+	local: T & {
+		GOOS: GOOS_1
+	}
+	linux: T & {
+		GOOS: "linux"
+	}
+	darwin: T & {
+		GOOS: GOOS_1
+	}
+}
+
+//cue:path: d._t
+let T = {
+	GOOS: string
+}
+
+//cue:path: flags.goos
+let GOOS_1 = string | *"darwin"
+-- out/self/default --

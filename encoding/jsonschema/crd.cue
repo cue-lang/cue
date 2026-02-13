@@ -23,8 +23,7 @@ specs: {
 				#CRDSpec
 			},
 		]
-	}
-	if (input & [...]) == _|_ {
+	} else {
 		// It's a single document. Include it if it looks like a CRD.
 		if (input & {#crdlike, ...}) != _|_ {
 			[{input, #CRDSpec}]

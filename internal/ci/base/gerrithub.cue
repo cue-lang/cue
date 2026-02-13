@@ -50,7 +50,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 		(trybot.key): {
 			"runs-on": linuxSmallMachine + overrideCacheTagDispatch
 
-			let goodDummyData = [if json.Marshal(#dummyDispatch) != _|_ {true}, false][0]
+			let goodDummyData = json.Marshal(#dummyDispatch) != _|_
 
 			// We set the "on" conditions above, but this would otherwise mean we
 			// run for all dispatch events.

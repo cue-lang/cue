@@ -14,15 +14,14 @@ import (
 _matchPattern: {
 	variable: string
 	pattern:  string
-	expr: [
+	expr: {
 		if strings.HasSuffix(pattern, "*") {
 			let prefix = strings.TrimSuffix(pattern, "*")
 			"startsWith(\(variable), '\(prefix)')"
-		},
-		{
+		} else {
 			"\(variable) == '\(pattern)'"
-		},
-	][0]
+		}
+	}
 }
 
 doNotEditMessage: {

@@ -227,12 +227,13 @@ goChecks: githubactions.#Step & {
 
 staticcheck: githubactions.#Step & {
 	#in: modfile: string | *"" // an optional -modfile flag to not use the main go.mod
-	let gotool = [
+	let gotool = {
 		if #in.modfile != "" {
 			"go tool -modfile=\(#in.modfile)"
-		},
-		"go tool",
-	][0]
+		} else {
+			"go tool"
+		}
+	}
 
 	// TODO(mvdan): swap "/cache" for "${{ env.NSC_CACHE_PATH }}" once Namespace wires up that env var
 	// for the workspace environment. See: https://discord.com/channels/975088590705012777/1397128547797176340
@@ -341,7 +342,8 @@ containsDispatchTrailer: {
 	//
 	//     Dispatch-Trailer: {"type:}
 	//
-	let _typeCheck = [if #type != _|_ {#type + "\""}, ""][0]
+	// TODO(mvdan): using a struct embedding a string here doesn't work. why?
+	let _typeCheck = [if #type != _|_ {#type + "\""} else {""}][0]
 	"""
 	(contains(\(_dispatchTrailerVariable), '\n\(dispatchTrailer): {"type":"\(_typeCheck)'))
 	"""

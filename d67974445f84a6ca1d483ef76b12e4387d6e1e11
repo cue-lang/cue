@@ -105,6 +105,24 @@
       "parentUuid": "c55c4f46_bb9e789e",
       "revId": "d67974445f84a6ca1d483ef76b12e4387d6e1e11",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75601283_ec37c496",
+        "filename": "internal/lsp/eval/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1953,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-13T10:11:23Z",
+      "side": 1,
+      "message": "I\u0027ll add this to the list of ideas to play with, along with the \"make expandNavs take an acc map rather than always creating a fresh one\".",
+      "parentUuid": "b1934e28_fde88b79",
+      "revId": "d67974445f84a6ca1d483ef76b12e4387d6e1e11",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

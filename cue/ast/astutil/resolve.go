@@ -466,7 +466,12 @@ func (s *scope) Before(n ast.Node) bool {
 		saved := s.index[name]
 		delete(s.index, name) // The same name may still appear in another scope
 
+		// Set inField so that the label expression check in pattern constraints
+		// does not walk beyond the let clause's value. A let clause's value is
+		// a separate context, just like a field value.
+		s.inField = true
 		ast.Walk(x.Expr, s.Before, nil)
+		s.inField = false
 		s.index[name] = saved
 		return false
 

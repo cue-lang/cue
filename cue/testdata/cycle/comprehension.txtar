@@ -416,21 +416,32 @@ issue2229: reduced_fail: X={
 	x: true
 	y: [ for _, v in X if v & true { _ } ]
 }
+-- issue4100.cue --
+// Caused a panic in freeNodeContext during memory reclamation.
+issue4100: {
+	a: {
+		let l = [0]
+		if l != _|_ {
+			l[:]
+		}
+	}
+	for _ in a {}
+}
 -- out/evalalpha/stats --
 Leaks:  53
-Freed:  913
-Reused: 878
-Allocs: 88
+Freed:  920
+Reused: 884
+Allocs: 89
 Retain: 0
 
-Unifications: 581
-Conjuncts:    1707
+Unifications: 588
+Conjuncts:    1718
 Disjuncts:    210
 Notifications: 14
 
-NumCloseIDs: 728
+NumCloseIDs: 732
 
-ConjunctInfos:       1120
+ConjunctInfos:       1131
 MaxConjunctInfos:    10
 MaxReqSets:          12
 MaxRedirect:         1
@@ -1151,6 +1162,14 @@ Result:
       }
     }
   }
+  issue4100: (struct){
+    a: (#list){
+      let l#1 = (#list){
+        0: (int){ 0 }
+      }
+      0: (int){ 0 }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -1261,6 +1280,19 @@ diff old new
          }
          objs: (#list){
          }
+@@ -689,4 +714,12 @@
+       }
+     }
+   }
++  issue4100: (struct){
++    a: (#list){
++      let l#1 = (#list){
++        0: (int){ 0 }
++      }
++      0: (int){ 0 }
++    }
++  }
+ }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -1280,19 +1312,19 @@ diff old new
 -
 -NumCloseIDs: 16
 +Leaks:  53
-+Freed:  913
-+Reused: 878
-+Allocs: 88
++Freed:  920
++Reused: 884
++Allocs: 89
 +Retain: 0
 +
-+Unifications: 581
-+Conjuncts:    1707
++Unifications: 588
++Conjuncts:    1718
 +Disjuncts:    210
 +Notifications: 14
 +
-+NumCloseIDs: 728
++NumCloseIDs: 732
 +
-+ConjunctInfos:       1120
++ConjunctInfos:       1131
 +MaxConjunctInfos:    10
 +MaxReqSets:          12
 +MaxRedirect:         1
@@ -2677,5 +2709,19 @@ Result:
         }
       }
     }
+  }
+}
+--- issue4100.cue
+{
+  issue4100: {
+    a: {
+      let l#1 = [
+        0,
+      ]
+      if (〈0;let l#1〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let l#1〉[:]
+      }
+    }
+    for _, _ in 〈0;a〉 {}
   }
 }

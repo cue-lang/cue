@@ -163,7 +163,7 @@ func (r reclaimer) reclaim(v *Vertex) bool {
 				goto skipRoot
 			}
 		}
-		if n.ctx == r.ctx {
+		if n.node != nil && n.ctx == r.ctx {
 			// TODO(mem): it should be fine to just release the nodeContext into
 			// c unconditionally. But the result is that it can result in
 			// negative values for 'Leaks'. This is because loading imports

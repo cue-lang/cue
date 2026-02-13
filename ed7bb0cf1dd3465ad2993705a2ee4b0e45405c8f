@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "533acbf5_d8a8ad1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-13T09:21:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "786d0ec4_fde8feb2",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "197c1b43_41380188",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "01542be2_537b3f3e",
+        "filename": "cue/testdata/comprehensions/else.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-13T09:21:45Z",
+      "side": 1,
+      "message": "I think the AI just generated this because it saw diffs in other files. No other explanation.",
+      "parentUuid": "197c1b43_41380188",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91f01f69_895095d2",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-02-12T13:00:43Z",
       "side": 1,
       "message": "ditto. I don\u0027t understand why we have v2 vs v3 diffs. AFAICT we should only have v3 output files now.",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2986a5e_6e4cc27d",
+        "filename": "cue/testdata/comprehensions/else_errors.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-13T09:21:45Z",
+      "side": 1,
+      "message": "I think the AI just generated this because it saw diffs in other files. No other explanation.",
+      "parentUuid": "91f01f69_895095d2",
       "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -71,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e626c3ac_8a115425",
+        "filename": "cue/testdata/comprehensions/else_on_error.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-13T09:21:45Z",
+      "side": 1,
+      "message": "That doesn\u0027t work well: one has compile errors, the other evaluation errors. The compile errors will prevent the evaluation errors from being shown.",
+      "parentUuid": "c220281f_243eb6f4",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5a2aae13_4ddd2a64",
         "filename": "doc/ref/spec.md",
         "patchSetId": 2
@@ -82,6 +154,24 @@
       "writtenOn": "2026-02-12T13:00:43Z",
       "side": 1,
       "message": "can we reword this slightly to clarify that `if foo { ... } else { ... }` is also allowed? the current wording is all about iterating, so it seems to imply that it\u0027s only for `for` comprehensions, and it\u0027s only the examples below that seem to suggest otherwise.",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c7a863e_1fde8348",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2633,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-13T09:21:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a2aae13_4ddd2a64",
       "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +193,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba016707_5c3bda87",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-13T09:21:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f2b924f8_6fca580f",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7e825ff1_8beaf924",
@@ -116,6 +224,24 @@
       "writtenOn": "2026-02-12T13:00:43Z",
       "side": 1,
       "message": "presumably this field is no longer needed. a bit worried that the AI did not catch this.",
+      "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c23c4ab0_c1b1f2e6",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-13T09:21:45Z",
+      "side": 1,
+      "message": "Hmmm, indeed. Nice catch.",
+      "parentUuid": "7e825ff1_8beaf924",
       "revId": "ed7bb0cf1dd3465ad2993705a2ee4b0e45405c8f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

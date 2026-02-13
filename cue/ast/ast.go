@@ -389,8 +389,9 @@ func (a *PostfixAlias) End() token.Pos {
 
 // A Comprehension node represents a comprehension declaration.
 type Comprehension struct {
-	Clauses []Clause // There must be at least one clause.
-	Value   Expr     // Must be a struct TODO: change to Struct
+	Clauses []Clause    // There must be at least one clause.
+	Value   Expr        // Must be a struct TODO: change to Struct
+	Else    *ElseClause // Optional else clause
 
 	comments
 	decl
@@ -400,6 +401,9 @@ type Comprehension struct {
 func (x *Comprehension) Pos() token.Pos  { return getPos(x) }
 func (x *Comprehension) pos() *token.Pos { return x.Clauses[0].pos() }
 func (x *Comprehension) End() token.Pos {
+	if x.Else != nil {
+		return x.Else.Body.End()
+	}
 	return x.Value.End()
 }
 
@@ -687,6 +691,15 @@ type LetClause struct {
 	decl
 }
 
+// An ElseClause node represents an else clause in a comprehension.
+type ElseClause struct {
+	Else token.Pos
+	Body *StructLit
+
+	comments
+	clause
+}
+
 // A ParenExpr node represents a parenthesized expression.
 type ParenExpr struct {
 	Lparen token.Pos // position of "("
@@ -833,6 +846,8 @@ func (x *ForClause) Pos() token.Pos     { return x.For }
 func (x *ForClause) pos() *token.Pos    { return &x.For }
 func (x *IfClause) Pos() token.Pos      { return x.If }
 func (x *IfClause) pos() *token.Pos     { return &x.If }
+func (x *ElseClause) Pos() token.Pos    { return x.Else }
+func (x *ElseClause) pos() *token.Pos   { return &x.Else }
 func (x *ParenExpr) Pos() token.Pos     { return x.Lparen }
 func (x *ParenExpr) pos() *token.Pos    { return &x.Lparen }
 func (x *SelectorExpr) Pos() token.Pos  { return x.X.Pos() }
@@ -876,6 +891,7 @@ func (x *Ellipsis) End() token.Pos {
 func (x *LetClause) End() token.Pos    { return x.Expr.End() }
 func (x *ForClause) End() token.Pos    { return x.Source.End() }
 func (x *IfClause) End() token.Pos     { return x.Condition.End() }
+func (x *ElseClause) End() token.Pos   { return x.Body.End() }
 func (x *ParenExpr) End() token.Pos    { return x.Rparen.Add(1) }
 func (x *SelectorExpr) End() token.Pos { return x.Sel.End() }
 func (x *IndexExpr) End() token.Pos    { return x.Rbrack.Add(1) }

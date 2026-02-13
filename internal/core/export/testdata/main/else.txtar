@@ -1,0 +1,140 @@
+-- a.cue --
+// Test export of else clause in comprehensions
+
+// if-else
+ifElse: {
+	if false { a: 1 } else { b: 2 }
+}
+
+// for-else with empty list
+forElse: {
+	for x in [] { "\(x)": x } else { empty: true }
+}
+
+// for-else with outer scope reference
+forElseOuter: {
+	let val = 10
+	for x in [] { x } else { fallback: val }
+}
+-- out/definition --
+// Test export of else clause in comprehensions
+// if-else
+ifElse: {
+	if false {
+		a: 1
+	} else {
+		b: 2
+	}
+}
+
+// for-else with empty list
+forElse: {
+	for x in [] {
+		"\(x)": x
+	} else {
+		empty: true
+	}
+}
+
+// for-else with outer scope reference
+forElseOuter: {
+	let val = 10
+	for x in [] {
+		x
+	} else {
+		fallback: val
+	}
+}
+-- out/doc --
+[]
+- Test export of else clause in comprehensions
+
+[ifElse]
+- if-else
+
+[ifElse b]
+[forElse]
+- for-else with empty list
+
+[forElse empty]
+[forElseOuter]
+- for-else with outer scope reference
+
+[forElseOuter val]
+[forElseOuter fallback]
+-- out/value --
+== Simplified
+{
+	// if-else
+	ifElse: {
+		b: 2
+	}
+
+	// for-else with empty list
+	forElse: {
+		empty: true
+	}
+
+	// for-else with outer scope reference
+	forElseOuter: {
+		fallback: 10
+	}
+}
+== Raw
+{
+	// if-else
+	ifElse: {
+		b: 2
+	}
+
+	// for-else with empty list
+	forElse: {
+		empty: true
+	}
+
+	// for-else with outer scope reference
+	forElseOuter: {
+		fallback: 10
+	}
+}
+== Final
+{
+	ifElse: {
+		b: 2
+	}
+	forElse: {
+		empty: true
+	}
+	forElseOuter: {
+		fallback: 10
+	}
+}
+== All
+{
+	// if-else
+	ifElse: {
+		b: 2
+	}
+
+	// for-else with empty list
+	forElse: {
+		empty: true
+	}
+
+	// for-else with outer scope reference
+	forElseOuter: {
+		fallback: 10
+	}
+}
+== Eval
+{
+	ifElse: {
+		b: 2
+	}
+	forElse: {
+		empty: true
+	}
+	forElseOuter: {
+		fallback: 10
+	}
+}

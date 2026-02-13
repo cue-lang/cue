@@ -40,6 +40,7 @@ for k, v in input if v > 2 {
 				}
 				Rbrace: token.Pos("comprehensions.cue:3:1", newline)
 			}
+			Else: nil
 		}
 		*ast.Comprehension{
 			Clauses: []ast.Clause{
@@ -104,6 +105,7 @@ for k, v in input if v > 2 {
 				}
 				Rbrace: token.Pos("comprehensions.cue:6:1", newline)
 			}
+			Else: nil
 		}
 	}
 	Imports: []*ast.ImportSpec{}

@@ -251,6 +251,10 @@ func (f *formatter) walkListElems(list []ast.Expr) {
 			f.walkClauseList(n.Clauses, blank)
 			f.print(blank, nooverride)
 			f.expr(n.Value)
+			if n.Else != nil {
+				f.print(blank, n.Else.Else, token.ELSE, blank)
+				f.expr(n.Else.Body)
+			}
 
 		case *ast.Ellipsis:
 			// For ellipsis, also collect trailing comments from the type
@@ -493,6 +497,10 @@ func (f *formatter) embedding(decl ast.Expr) {
 		f.walkClauseList(n.Clauses, blank)
 		f.print(blank, nooverride)
 		f.expr(n.Value)
+		if n.Else != nil {
+			f.print(blank, n.Else.Else, token.ELSE, blank)
+			f.expr(n.Else.Body)
+		}
 
 	case *ast.Ellipsis:
 		f.ellipsis(n)

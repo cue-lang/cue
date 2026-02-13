@@ -1,0 +1,75 @@
+-- in.cue --
+// else cannot access for variable
+forVarInElse: {
+	for i in [1,2,3] { "\(i)": i } else { bad: i }
+}
+
+// else cannot access let variable from comprehension
+letVarInElse: {
+	for x in [1,2,3] let y = x*2 { "\(x)": y } else { bad: y }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  2
+Reused: 2
+Allocs: 0
+Retain: 0
+
+Unifications: 2
+Conjuncts:    2
+Disjuncts:    2
+
+NumCloseIDs: 0
+-- out/evalalpha --
+forVarInElse.bad: reference "i" not found:
+    ./in.cue:3:45
+letVarInElse.bad: reference "y" not found:
+    ./in.cue:8:57
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,4 @@
+-forVarInElse: reference "i" not found:
+-    ./in.cue:3:47
+-letVarInElse: reference "y" not found:
+-    ./in.cue:7:55
++forVarInElse.bad: reference "i" not found:
++    ./in.cue:3:45
++letVarInElse.bad: reference "y" not found:
++    ./in.cue:8:57
+-- out/eval --
+forVarInElse: reference "i" not found:
+    ./in.cue:3:47
+letVarInElse: reference "y" not found:
+    ./in.cue:7:55
+-- out/compile --
+forVarInElse.bad: reference "i" not found:
+    ./in.cue:3:45
+letVarInElse.bad: reference "y" not found:
+    ./in.cue:8:57
+--- in.cue
+{
+  forVarInElse: {
+    for _, i in [
+      1,
+      2,
+      3,
+    ] {
+      "\(〈1;i〉)": 〈1;i〉
+    } else {
+      bad: _|_(reference "i" not found)
+    }
+  }
+  letVarInElse: {
+    for _, x in [
+      1,
+      2,
+      3,
+    ] let y = (〈0;x〉 * 2) {
+      "\(〈2;x〉)": 〈1;y〉
+    } else {
+      bad: _|_(reference "y" not found)
+    }
+  }
+}

@@ -846,6 +846,11 @@ func (p *parser) parseComprehension() (decl ast.Decl, ident *ast.Ident) {
 	expr := p.parseStruct()
 	sc.closeExpr(p, expr)
 
+	var elseClause *ast.ElseClause
+	if p.tok == token.ELSE {
+		elseClause = p.parseElseClause()
+	}
+
 	if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
 		p.next()
 	}
@@ -853,6 +858,7 @@ func (p *parser) parseComprehension() (decl ast.Decl, ident *ast.Ident) {
 	return &ast.Comprehension{
 		Clauses: clauses,
 		Value:   expr,
+		Else:    elseClause,
 	}, nil
 }
 
@@ -1191,6 +1197,20 @@ func (p *parser) parseComprehensionClauses() (clauses []ast.Clause, c *commentSt
 	}
 }
 
+// parseElseClause parses an else clause in a comprehension.
+func (p *parser) parseElseClause() *ast.ElseClause {
+	if p.trace {
+		defer un(trace(p, "ElseClause"))
+	}
+	c := p.openComments()
+	elsePos := p.expect(token.ELSE)
+	body := p.parseStruct()
+	return c.closeClause(p, &ast.ElseClause{
+		Else: elsePos,
+		Body: body.(*ast.StructLit),
+	}).(*ast.ElseClause)
+}
+
 func (p *parser) parseFunc() (expr ast.Expr) {
 	if p.trace {
 		defer un(trace(p, "Func"))
@@ -1312,6 +1332,11 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 			expr := p.parseStruct()
 			sc.closeExpr(p, expr)
 
+			var elseClause *ast.ElseClause
+			if p.tok == token.ELSE {
+				elseClause = p.parseElseClause()
+			}
+
 			if p.atComma("list literal", token.RBRACK) { // TODO: may be EOF
 				p.next()
 			}
@@ -1319,6 +1344,7 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 			return &ast.Comprehension{
 				Clauses: clauses,
 				Value:   expr,
+				Else:    elseClause,
 			}, true
 		}
 

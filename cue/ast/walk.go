@@ -148,6 +148,7 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 	case *Comprehension:
 		walkList(n.Clauses, before, after)
 		Walk(n.Value, before, after)
+		walkIfNotNil(n.Else, before, after)
 
 	// Files and packages
 	case *File:
@@ -163,6 +164,9 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 
 	case *IfClause:
 		Walk(n.Condition, before, after)
+
+	case *ElseClause:
+		Walk(n.Body, before, after)
 
 	default:
 		panic(fmt.Sprintf("Walk: unexpected node type %T", n))

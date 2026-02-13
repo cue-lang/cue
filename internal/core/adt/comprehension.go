@@ -173,10 +173,11 @@ func (n *nodeContext) insertComprehension(
 				}
 
 				// Create partial comprehension
-				c := &Comprehension{
+				partialComp := &Comprehension{
 					Syntax:  c.Syntax,
 					Clauses: c.Clauses,
 					Value:   f,
+					Else:    c.Else,    // Propagate else clause to partial comprehension
 					arcType: f.ArcType, // TODO: can be derived, remove this field.
 
 					comp:   ec,
@@ -184,7 +185,7 @@ func (n *nodeContext) insertComprehension(
 					arc:    node,
 				}
 
-				conjunct := MakeConjunct(env, c, ci)
+				conjunct := MakeConjunct(env, partialComp, ci)
 				n.assertInitialized()
 				n.insertArc(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
 
@@ -196,17 +197,18 @@ func (n *nodeContext) insertComprehension(
 				numFixed++
 
 				// Create partial comprehension
-				c := &Comprehension{
+				partialComp := &Comprehension{
 					Syntax:  c.Syntax,
 					Clauses: c.Clauses,
 					Value:   f,
+					Else:    c.Else, // Propagate else clause to partial comprehension
 
 					comp:   ec,
 					parent: c,
 					arc:    node,
 				}
 
-				conjunct := MakeConjunct(env, c, ci)
+				conjunct := MakeConjunct(env, partialComp, ci)
 				n.assertInitialized()
 				arc := n.insertFieldUnchecked(f.Label, ArcMember, conjunct)
 				arc.MultiLet = true // NOTE: v2 was f.IsMulti
@@ -258,7 +260,17 @@ func (n *nodeContext) insertComprehension(
 			if kind == TopKind {
 				c.kind = StructKind
 			}
-			return
+			// If there's an else clause, we still need to schedule a task
+			// to handle the fallback case when comprehension yields zero values.
+			if c.Else == nil {
+				return
+			}
+			// Use an empty struct as the main value since all fields were
+			// handled at field level. The else clause will be embedded if
+			// the comprehension yields zero values.
+			x = &StructLit{
+				isComprehension: true,
+			}
 
 		default:
 			// Create a new StructLit with only the fields that need to be
@@ -371,6 +383,15 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	d.inserted = true
 
 	if len(d.envs) == 0 {
+		// If there's an else clause, use it instead of marking arc as not present.
+		if d.comp.Else != nil {
+			// Evaluate the else clause in the outer environment.
+			// We use linkChildren to properly chain the environment, similar to
+			// normal comprehension yield processing.
+			env := linkChildren(d.env, d.leaf)
+			n.scheduleConjunct(Conjunct{env, d.comp.Else, d.id}, d.id)
+			return nil
+		}
 		n.node.updateArcType(ArcNotPresent)
 		return nil
 	}

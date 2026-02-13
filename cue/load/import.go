@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"os"
 	pathpkg "path"
 	"path/filepath"
 	"slices"
@@ -55,7 +54,7 @@ import (
 //	        is present.
 //	_       anonymous files (which may be marked with _)
 //	*       all packages
-func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
+func (l *loader) importPkg(_ token.Pos, p *build.Instance) []*build.Instance {
 	retErr := func(errs errors.Error) []*build.Instance {
 		// XXX: move this loop to ReportError
 		for _, err := range errors.Errors(errs) {
@@ -276,8 +275,8 @@ func setFileSource(cfg *Config, f *build.File) error {
 		return nil
 	}
 
-	if !filepath.IsAbs(fullPath) {
-		fullPath = filepath.Join(cfg.Dir, fullPath)
+	if !cfg.fileSystem.lfs.IsAbs(fullPath) {
+		fullPath = cfg.fileSystem.lfs.Join(cfg.Dir, fullPath)
 		// Ensure that encoding.NewDecoder will work correctly.
 		f.Filename = fullPath
 	}
@@ -292,12 +291,12 @@ func setFileSource(cfg *Config, f *build.File) error {
 
 	// Note that we do this after ensuring fullPath is absolute, and after checking
 	// whether the overlay provides the source.
-	info, err := os.Stat(fullPath)
+	info, err := cfg.fileSystem.lfs.Stat(fullPath)
 	if err != nil {
 		return err
 	}
 	if !info.Mode().IsRegular() {
-		b, err := os.ReadFile(fullPath)
+		b, err := cfg.fileSystem.lfs.ReadFile(fullPath)
 		if err != nil {
 			return err
 		}
@@ -424,9 +423,10 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	i.Dir = dir
 	parts := ast.ParseImportPath(string(p))
 	i.PkgName = parts.Qualifier
-	if i.PkgName == "" {
+	switch i.PkgName {
+	case "":
 		i.Err = errors.Append(i.Err, l.errPkgf([]token.Pos{pos}, "cannot determine package name for %q; set it explicitly with ':'", p))
-	} else if i.PkgName == "_" {
+	case "_":
 		i.Err = errors.Append(i.Err, l.errPkgf([]token.Pos{pos}, "_ is not a valid import path qualifier in %q", p))
 	}
 	i.DisplayPath = string(p)
@@ -464,7 +464,7 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (dir string, 
 	return dir, mv, modRoot, nil
 }
 
-func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir string, mv module.Version, modRoot module.SourceLoc, err error) {
+func (l *loader) absDirFromImportPath1(_ token.Pos, p importPath) (absDir string, mv module.Version, modRoot module.SourceLoc, err error) {
 	failf := func(f string, a ...any) (string, module.Version, module.SourceLoc, error) {
 		return "", module.Version{}, module.SourceLoc{}, fmt.Errorf(f, a...)
 	}

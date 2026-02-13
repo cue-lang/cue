@@ -135,6 +135,15 @@ func (p *pivotter) linkDependencies(v *adt.Vertex) {
 		}
 	}
 
+	// Mark features used in dependency vertices so that generated let
+	// variable names (from makeParentPath/uniqueFeature) don't collide
+	// with field names in the exported external values.
+	for _, d := range p.deps {
+		if d.dstNode != nil {
+			p.x.markUsedFeatures(d.dstNode)
+		}
+	}
+
 	// Compute the paths for the parent nodes.
 	for _, d := range p.deps {
 		if d.parent == nil {

@@ -441,9 +441,13 @@ func (e *exporter) finalize(n *adt.Vertex, v ast.Expr) (f *ast.File, err errors.
 	return f, nil
 }
 
+// markUsedFeatures walks x to record features in usedFeature,
+// so that uniqueFeature can avoid generating colliding names.
+// It may be called multiple times to accumulate features from different expressions.
 func (e *exporter) markUsedFeatures(x adt.Expr) {
-	e.usedFeature = make(map[adt.Feature]adt.Expr)
-
+	if e.usedFeature == nil {
+		e.usedFeature = make(map[adt.Feature]adt.Expr)
+	}
 	w := &walk.Visitor{}
 	w.Before = func(n adt.Node) bool {
 		switch x := n.(type) {

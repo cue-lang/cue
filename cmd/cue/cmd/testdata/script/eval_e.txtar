@@ -19,7 +19,7 @@ cmp stdout expect/issue999/stdout
 # when a for comprehension's if-guard references the same definition
 # used in a pattern constraint on the iterated struct.
 exec cue eval -e _out issue4202/x.cue
-! stdout '_\|_'
+cmp stdout expect/issue4202/stdout
 
 -- expect/nonExist/stdout --
 -- expect/nonExist/stderr --
@@ -71,6 +71,26 @@ a: 1
 ---
 b: 2
 
+-- expect/issue4202/stdout --
+
+[
+    for k, v in X
+    if k =~ K.#x {
+        v
+    }]
+
+//cue:path: x
+let X = {
+    {
+        [K.#x]: _
+    }
+    a: 1
+}
+
+//cue:path: #K
+let K = {
+    #x: string
+}
 -- issue4202/x.cue --
 #K: string
 

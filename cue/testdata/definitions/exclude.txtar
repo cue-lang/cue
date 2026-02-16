@@ -508,13 +508,13 @@ Result:
   hidden: {
     err1: {
       #D: {
-        _foo: {
+        _foo(:p): {
           a: int
         }
       }
       a: 〈0;#D〉
       a: {
-        _foo: {
+        _foo(:p): {
           b: int
         }
       }
@@ -523,7 +523,7 @@ Result:
       #D: {}
       a: 〈0;#D〉
       a: {
-        _foo: {
+        _foo(:p): {
           b: int
         }
       }
@@ -567,7 +567,7 @@ Result:
   hidden: {
     ok1: {
       out: (〈0;#Workflow〉 & {
-        _hidden: (〈1;#step〉 & {
+        _hidden(:p): (〈1;#step〉 & {
           run: "foo bar"
         })
       })

@@ -72,7 +72,112 @@ Disjuncts:    75
 MisalignedConjunct: 5
 
 NumCloseIDs: 1
--- out/eval --
+-- out/compile --
+--- in.cue
+{
+  service: {
+    "node-exporter": {
+      spec: {
+        ports: [
+          {
+            name: "metrics"
+            port: 9100
+            protocol: "TCP"
+          },
+        ]
+      }
+    }
+  }
+  deployment: {
+    "node-exporter": {
+      spec: {
+        template: {
+          spec: {
+            containers: [
+              {
+                ports: [
+                  {
+                    containerPort: 9100
+                    name: "scrape"
+                  },
+                ]
+              },
+            ]
+          }
+        }
+      }
+    }
+  }
+  service: {
+    [string]: {
+      spec: {
+        ports: [
+          ...{
+            port: int
+            protocol: (*"TCP"|"UDP")
+            name: (string|*"client")
+          },
+        ]
+      }
+    }
+  }
+  deployment: {
+    [string]: {}
+  }
+  deployment: {
+    [_]: (〈1;_spec(:kube)〉 & {})
+  }
+  _spec(:kube): {
+    _name(:kube): string
+    spec: {
+      template: {
+        spec: {
+          containers: [
+            {
+              name: 〈5;_name(:kube)〉
+            },
+          ]
+        }
+      }
+    }
+  }
+  _spec(:kube): {
+    spec: {
+      template: {
+        spec: {
+          containers: [
+            ...{
+              ports: [
+                ...{
+                  _export(:kube): (*true|false)
+                },
+              ]
+            },
+          ]
+        }
+      }
+    }
+  }
+  for k, v in 〈0;deployment〉 {
+    service: {
+      "\(〈2;k〉)": {
+        spec: {
+          selector: 〈4;v〉.spec.template.metadata.labels
+        }
+        spec: {
+          ports: [
+            for _, c in 〈5;v〉.spec.template.spec.containers for _, p in 〈0;c〉.ports if 〈0;p〉._export(:kube) {
+              let Port#1 = 〈1;p〉.containerPort
+              port: (*〈0;let Port#1〉|int)
+              targetPort: (*〈0;let Port#1〉|int)
+            },
+          ]
+        }
+      }
+    }
+  }
+}
+-- out/evalalpha --
 (struct){
   service: (struct){
     "node-exporter": (struct){
@@ -128,111 +233,6 @@ NumCloseIDs: 1
               }
             }
           }
-        }
-      }
-    }
-  }
-}
--- out/compile --
---- in.cue
-{
-  service: {
-    "node-exporter": {
-      spec: {
-        ports: [
-          {
-            name: "metrics"
-            port: 9100
-            protocol: "TCP"
-          },
-        ]
-      }
-    }
-  }
-  deployment: {
-    "node-exporter": {
-      spec: {
-        template: {
-          spec: {
-            containers: [
-              {
-                ports: [
-                  {
-                    containerPort: 9100
-                    name: "scrape"
-                  },
-                ]
-              },
-            ]
-          }
-        }
-      }
-    }
-  }
-  service: {
-    [string]: {
-      spec: {
-        ports: [
-          ...{
-            port: int
-            protocol: (*"TCP"|"UDP")
-            name: (string|*"client")
-          },
-        ]
-      }
-    }
-  }
-  deployment: {
-    [string]: {}
-  }
-  deployment: {
-    [_]: (〈1;_spec〉 & {})
-  }
-  _spec: {
-    _name: string
-    spec: {
-      template: {
-        spec: {
-          containers: [
-            {
-              name: 〈5;_name〉
-            },
-          ]
-        }
-      }
-    }
-  }
-  _spec: {
-    spec: {
-      template: {
-        spec: {
-          containers: [
-            ...{
-              ports: [
-                ...{
-                  _export: (*true|false)
-                },
-              ]
-            },
-          ]
-        }
-      }
-    }
-  }
-  for k, v in 〈0;deployment〉 {
-    service: {
-      "\(〈2;k〉)": {
-        spec: {
-          selector: 〈4;v〉.spec.template.metadata.labels
-        }
-        spec: {
-          ports: [
-            for _, c in 〈5;v〉.spec.template.spec.containers for _, p in 〈0;c〉.ports if 〈0;p〉._export {
-              let Port#1 = 〈1;p〉.containerPort
-              port: (*〈0;let Port#1〉|int)
-              targetPort: (*〈0;let Port#1〉|int)
-            },
-          ]
         }
       }
     }

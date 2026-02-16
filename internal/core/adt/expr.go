@@ -22,6 +22,7 @@ import (
 	"github.com/cockroachdb/apd/v3"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
@@ -725,7 +726,10 @@ func (x *DynamicReference) resolve(ctx *OpContext, state Flags) *Vertex {
 type ImportReference struct {
 	Src        *ast.Ident
 	ImportPath Feature
-	Label      Feature // for informative purposes
+	// Instance holds the build instance that the import
+	// resolves to. This is nil for standard library imports.
+	Instance *build.Instance
+	Label    Feature // for informative purposes
 }
 
 func (x *ImportReference) Source() ast.Node {
@@ -736,10 +740,15 @@ func (x *ImportReference) Source() ast.Node {
 }
 
 func (x *ImportReference) resolve(ctx *OpContext, state Flags) *Vertex {
-	path := x.ImportPath.StringValue(ctx)
-	v := ctx.Runtime.LoadImport(path)
+	var v *Vertex
+	if x.Instance != nil {
+		v = ctx.Runtime.LoadInstance(x.Instance)
+	} else {
+		v = ctx.Runtime.LoadBuiltin(x.ImportPath.StringValue(ctx))
+	}
 	if v == nil {
-		ctx.addErrf(EvalError, x.Src.Pos(), "cannot find package %q", path)
+		ctx.addErrf(EvalError, x.Src.Pos(), "cannot find package %q",
+			x.ImportPath.StringValue(ctx))
 	}
 	return v
 }

@@ -3066,13 +3066,13 @@ NumCloseIDs: 1
 -- out/compile --
 --- in.cue
 {
-  _entries: [
+  _entries(:p): [
     for _, i in 〈import;list〉.Range(1, 1500, 1) {
       〈1;i〉
     },
   ]
   unified: {
-    for _, entry in 〈1;_entries〉 {
+    for _, entry in 〈1;_entries(:p)〉 {
       "\(〈1;entry〉)": true
     }
   }

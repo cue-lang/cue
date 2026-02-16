@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
@@ -46,23 +47,28 @@ type Config struct {
 	// Under normal circumstances, identifiers bind to import specifications,
 	// which get resolved to an ImportReference. Use this option to
 	// automatically resolve identifiers to imports.
-	Imports func(x *ast.Ident) (pkgPath string)
+	Imports func(x *ast.Ident) string
 
 	// pkgPath is used to qualify the scope of hidden fields. The default
 	// scope is "_".
 	pkgPath string
 }
 
-// Files compiles the given files as a single instance. It disregards
-// the package names and it is the responsibility of the user to verify that
-// the packages names are consistent. The pkgID must be a unique identifier
-// for a package in a module, for instance as obtained from build.Instance.ID.
+// Files is a convenience method that wraps [Instance].
+func Files(cfg *Config, r adt.Runtime, pkgID string, files ...*ast.File) (*adt.Vertex, errors.Error) {
+	return Instance(cfg, r, &build.Instance{
+		ImportPath: pkgID,
+		Files:      files,
+	})
+}
+
+// Instance compiles the given instance.
 //
 // Files may return a completed parse even if it has errors.
-func Files(cfg *Config, r adt.Runtime, pkgID string, files ...*ast.File) (*adt.Vertex, errors.Error) {
-	c := newCompiler(cfg, pkgID, r)
+func Instance(cfg *Config, r adt.Runtime, inst *build.Instance) (*adt.Vertex, errors.Error) {
+	c := newCompiler(cfg, inst, r)
 
-	v := c.compileFiles(files)
+	v := c.compileFiles(inst.Files) // TODO use inst.BuildFiles?
 
 	if c.errs != nil {
 		return v, c.errs
@@ -74,7 +80,9 @@ func Files(cfg *Config, r adt.Runtime, pkgID string, files ...*ast.File) (*adt.V
 // unique identifier for a package in a module, for instance as obtained from
 // build.Instance.ID.
 func Expr(cfg *Config, r adt.Runtime, pkgPath string, x ast.Expr) (adt.Conjunct, errors.Error) {
-	c := newCompiler(cfg, pkgPath, r)
+	c := newCompiler(cfg, &build.Instance{
+		ImportPath: pkgPath,
+	}, r)
 
 	v := c.compileExpr(x)
 
@@ -84,22 +92,26 @@ func Expr(cfg *Config, r adt.Runtime, pkgPath string, x ast.Expr) (adt.Conjunct,
 	return v, nil
 }
 
-func newCompiler(cfg *Config, pkgPath string, r adt.Runtime) *compiler {
+func newCompiler(cfg *Config, inst *build.Instance, r adt.Runtime) *compiler {
 	c := &compiler{
+		inst:  inst,
 		index: r,
 	}
 	if cfg != nil {
 		c.Config = *cfg
 	}
-	if pkgPath == "" {
-		pkgPath = "_"
-	}
-	c.Config.pkgPath = pkgPath
+	c.Config.pkgPath = inst.ID()
 	return c
 }
 
 type compiler struct {
 	Config
+
+	// inst holds the build instance within which the current
+	// expression is being compiler. This is used to resolve
+	// imports to instances
+	inst *build.Instance
+
 	upCountOffset int32 // 1 for files; 0 for expressions
 
 	index adt.StringIndexer
@@ -408,9 +420,17 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 	// X in import "path/X"
 	// X in import X "path"
 	if imp, ok := n.Node.(*ast.ImportSpec); ok {
+		importPath := c.label(imp.Path)
+		importPathStr := importPath.StringValue(c.index)
+		inst := c.inst.LookupImport(importPathStr)
+		if inst == nil && !isStdlibPackage(importPathStr) {
+			// It's an external package, which should be mentioned in [build.Instance.Imports].
+			c.errf(n, "import %q not found", importPathStr)
+		}
 		return &adt.ImportReference{
 			Src:        n,
 			ImportPath: c.label(imp.Path),
+			Instance:   inst,
 			Label:      c.label(n),
 		}
 	}
@@ -453,6 +473,8 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 
 		if c.Config.Imports != nil {
 			if pkgPath := c.Config.Imports(n); pkgPath != "" {
+				// Note: Config.Imports is (currently) only used for stdlib
+				// imports, so we can leave the Instance field nil.
 				return &adt.ImportReference{
 					Src:        n,
 					ImportPath: adt.MakeStringLabel(c.index, pkgPath),
@@ -1403,4 +1425,11 @@ func parseString(c *compiler, node ast.Expr, q literal.QuoteInfo, s string) (n a
 		return &adt.String{Src: node, Str: str}
 	}
 	return &adt.Bytes{Src: node, B: []byte(str)}
+}
+
+// isStdlibPackage reports whether the given import
+// path looks like an import path in the standard library.
+func isStdlibPackage(pkgPath string) bool {
+	firstElem, _, _ := strings.Cut(pkgPath, "/")
+	return !strings.Contains(firstElem, ".")
 }

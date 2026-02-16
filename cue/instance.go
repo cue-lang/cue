@@ -70,7 +70,7 @@ func addInst(x *runtime.Runtime, p *Instance) *Instance {
 			PkgName:    p.PkgName,
 		}
 	}
-	x.AddInst(p.ImportPath, p.root, p.inst)
+	x.AddInst(p.root, p.inst)
 	x.SetBuildData(p.inst, p)
 	p.index = x
 	return p
@@ -118,7 +118,7 @@ func getImportFromNode(x *runtime.Runtime, v *adt.Vertex) *Instance {
 }
 
 func getImportFromPath(x *runtime.Runtime, id string) *Instance {
-	node := x.LoadImport(id)
+	node := x.LoadBuiltin(id)
 	if node == nil {
 		return nil
 	}
@@ -153,7 +153,7 @@ func newInstance(x *runtime.Runtime, p *build.Instance, v *adt.Vertex) *Instance
 		}
 	}
 
-	x.AddInst(p.ImportPath, v, p)
+	x.AddInst(v, p)
 	x.SetBuildData(p, inst)
 	inst.index = x
 	return inst
@@ -220,7 +220,7 @@ func (inst *hiddenInstance) Build(p *build.Instance) *Instance {
 	r := inst.index
 
 	cfg := &compile.Config{Scope: valueScope(Value{idx: r, v: inst.root})}
-	v, err := compile.Files(cfg, r, p.ID(), p.Files...)
+	v, err := compile.Instance(cfg, r, p)
 
 	// Just like [runtime.Runtime.Build], ensure that the @embed compiler is run as needed.
 	err = errors.Append(err, r.InjectImplementations(p, v))

@@ -72,7 +72,7 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 		b.ImportPath = cfg.ImportPath
 		b.PkgName = ast.ParseImportPath(b.ImportPath).Qualifier
 	}
-	v, err := compile.Files(cc, x, b.ID(), b.Files...)
+	v, err := compile.Instance(cc, x, b)
 	errs = errors.Append(errs, err)
 
 	errs = errors.Append(errs, x.InjectImplementations(b, v))
@@ -82,7 +82,7 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 		b.Err = errs
 	}
 
-	x.AddInst(b.ImportPath, v, b)
+	x.AddInst(v, b)
 
 	return v, errs
 }
@@ -129,7 +129,7 @@ func (x *Runtime) buildSpec(cfg *Config, b *build.Instance, spec *ast.ImportSpec
 			return errors.Newf(spec.Pos(),
 				"package %q imported but not defined in %s",
 				path, b.ImportPath)
-		} else if x.index.builtinPaths[path] == nil {
+		} else if x.index.builtins == nil || x.index.builtins.importPaths[path] == nil {
 			return errors.Newf(spec.Pos(),
 				"builtin package %q undefined", path)
 		}

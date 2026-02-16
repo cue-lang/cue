@@ -49,14 +49,14 @@ checks: [string]: ok: true
 -- stdout.golden --
 #Team: {}
 team: {
-    alice: ["EM"]
-    bob: ["TL"]
+	alice: ["EM"]
+	bob: ["TL"]
 }
 checks: {
-    enoughMembers: {
-        ok: true
-    }
-    hasManager: {
-        ok: true
-    }
+	enoughMembers: {
+		ok: true
+	}
+	hasManager: {
+		ok: true
+	}
 }

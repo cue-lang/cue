@@ -385,8 +385,8 @@ Result:
       ...,
     ]
     manifests: [
-      for _, _entry in 〈1;#entries〉 for _, _ns in 〈0;_entry〉 for _kind, _objs in 〈0;_ns〉 for _name, _obj in 〈0;_objs〉 {
-        〈1;_obj〉.k8s
+      for _, _entry in 〈1;#entries〉 for _, _ns in 〈0;_entry(:main)〉 for _kind, _objs in 〈0;_ns(:main)〉 for _name, _obj in 〈0;_objs(:main)〉 {
+        〈1;_obj(:main)〉.k8s
       },
     ]
     yamlStream: 〈import;"encoding/yaml"〉.MarshalStream(〈0;manifests〉)
@@ -400,7 +400,7 @@ Result:
 }
 --- in.cue
 {
-  _objectBase: {
+  _objectBase(:main): {
     name: string
     k8s: {
       metadata: {
@@ -408,8 +408,8 @@ Result:
       }
     }
   }
-  _namespacedResource: {
-    〈1;_objectBase〉
+  _namespacedResource(:main): {
+    〈1;_objectBase(:main)〉
     namespace: string
     k8s: {
       metadata: {
@@ -417,12 +417,12 @@ Result:
       }
     }
   }
-  _allValuesAreValidStructs: {
+  _allValuesAreValidStructs(:main): {
     [_]: {
       (*{}|error("<- invalid \(〈1〉)"))
     }
   }
-  _setTypeMeta: {
+  _setTypeMeta(:main): {
     #apiVersion!: string
     #kind!: string
     #template: {
@@ -432,22 +432,22 @@ Result:
       }
     }
   }
-  _resourceKindsBase: {
-    _base!: _
+  _resourceKindsBase(:main): {
+    _base(:main)!: _
     [string]: {
-      〈2;_allValuesAreValidStructs〉
-      〈2;_setTypeMeta〉
+      〈2;_allValuesAreValidStructs(:main)〉
+      〈2;_setTypeMeta(:main)〉
       #resourceSchema: _
       #template: {
-        〈2;_base〉
+        〈2;_base(:main)〉
         k8s: 〈1;#resourceSchema〉
       }
       [_]: 〈0;#template〉
     }
   }
-  _namespacedResourceKinds: {
-    〈1;_resourceKindsBase〉
-    _base: 〈1;_namespacedResource〉
+  _namespacedResourceKinds(:main): {
+    〈1;_resourceKindsBase(:main)〉
+    _base(:main): 〈1;_namespacedResource(:main)〉
     [string]: {
       [string]: {
         namespace: string
@@ -471,7 +471,7 @@ Result:
       }
     }
   }
-  argocd: (〈0;_namespacedResourceKinds〉 & {
+  argocd: (〈0;_namespacedResourceKinds(:main)〉 & {
     app: {
       apps: {}
     }

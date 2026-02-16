@@ -40,11 +40,11 @@ V2: ("x" | "y") | *#SomeBaseType.#AUTO
 
 -- expect-cue --
 #SomeBaseType: {
-    "a"
-    #AUTO: "z"
+	"a"
+	#AUTO: "z"
 } | {
-    "b"
-    #AUTO: "z"
+	"b"
+	#AUTO: "z"
 }
 V1: "z"
 V2: "x" | "y"

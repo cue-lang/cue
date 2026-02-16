@@ -113,19 +113,19 @@ diff old new
 --- in.cue
 {
   #Spec: {
-    _vars: {
+    _vars(:foobar): {
       something: string
     }
     data: {
       #foo: {
-        use: 〈2;_vars〉.something
+        use: 〈2;_vars(:foobar)〉.something
       }
-      baz: 〈import;"encoding/yaml"〉.Marshal(〈1;_vars〉.something)
+      baz: 〈import;"encoding/yaml"〉.Marshal(〈1;_vars(:foobar)〉.something)
       foobar: 〈import;"encoding/yaml"〉.Marshal(〈0;#foo〉)
     }
   }
   Val: (〈0;#Spec〉 & {
-    _vars: {
+    _vars(:foobar): {
       something: "var-string"
     }
   })

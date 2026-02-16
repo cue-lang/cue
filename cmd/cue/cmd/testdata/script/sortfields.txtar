@@ -71,8 +71,8 @@ a: true
 -- eval.stdout --
 a: true
 b: {
-    x: true
-    y: true
-    z: true
+	x: true
+	y: true
+	z: true
 }
 c: true

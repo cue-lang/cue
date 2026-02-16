@@ -100,10 +100,7 @@ func runEval(cmd *Command, args []string) error {
 
 	// Keep for legacy reasons. Note that `cue eval` is to be deprecated by
 	// `cue` eventually.
-	opts := []format.Option{
-		format.UseSpaces(4),
-		format.TabIndent(false),
-	}
+	opts := []format.Option{}
 	if flagSimplify.Bool(cmd) {
 		opts = append(opts, format.Simplify())
 	}
@@ -167,7 +164,6 @@ func runEval(cmd *Command, args []string) error {
 				}
 			}
 		}
-
 		f := internal.ToFile(v.Syntax(syn...), false)
 		f.Filename = id
 		err := e.EncodeFile(f)

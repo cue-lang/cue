@@ -72,7 +72,7 @@ Disjuncts:    75
 MisalignedConjunct: 5
 
 NumCloseIDs: 1
--- out/eval --
+-- out/evalalpha --
 (struct){
   service: (struct){
     "node-exporter": (struct){
@@ -117,6 +117,80 @@ NumCloseIDs: 1
     }
   }
   _spec(:kube): (struct){
+    _name(:kube): (string){ string }
+    spec: (struct){
+      template: (struct){
+        spec: (struct){
+          containers: (#list){
+            0: (struct){
+              name: (string){ string }
+              ports: (list){
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -41,7 +41,7 @@
+       _name(:kube): (string){ string }
+     }
+   }
+-  _spec: (struct){
++  _spec(:kube): (struct){
+     _name(:kube): (string){ string }
+     spec: (struct){
+       template: (struct){
+-- out/eval --
+(struct){
+  service: (struct){
+    "node-exporter": (struct){
+      spec: (struct){
+        ports: (#list){
+          0: (struct){
+            name: (string){ "metrics" }
+            port: (int){ 9100 }
+            protocol: (string){ "TCP" }
+            let Port#1 = (int){ 9100 }
+            targetPort: (int){ |(*(int){ 9100 }, (int){ int }) }
+          }
+        }
+        selector: (_|_){
+          // [incomplete] service."node-exporter".spec.selector: undefined field: metadata:
+          //     ./in.cue:48:35
+        }
+      }
+    }
+  }
+  deployment: (struct){
+    "node-exporter": (struct){
+      spec: (struct){
+        template: (struct){
+          spec: (struct){
+            containers: (#list){
+              0: (struct){
+                ports: (#list){
+                  0: (struct){
+                    containerPort: (int){ 9100 }
+                    name: (string){ "scrape" }
+                    _export(:kube): (bool){ |(*(bool){ true }, (bool){ false }) }
+                  }
+                }
+                name: (string){ string }
+              }
+            }
+          }
+        }
+      }
+      _name(:kube): (string){ string }
+    }
+  }
+  _spec: (struct){
     _name(:kube): (string){ string }
     spec: (struct){
       template: (struct){
@@ -186,23 +260,23 @@ NumCloseIDs: 1
     [string]: {}
   }
   deployment: {
-    [_]: (〈1;_spec〉 & {})
+    [_]: (〈1;_spec(:kube)〉 & {})
   }
-  _spec: {
-    _name: string
+  _spec(:kube): {
+    _name(:kube): string
     spec: {
       template: {
         spec: {
           containers: [
             {
-              name: 〈5;_name〉
+              name: 〈5;_name(:kube)〉
             },
           ]
         }
       }
     }
   }
-  _spec: {
+  _spec(:kube): {
     spec: {
       template: {
         spec: {
@@ -210,7 +284,7 @@ NumCloseIDs: 1
             ...{
               ports: [
                 ...{
-                  _export: (*true|false)
+                  _export(:kube): (*true|false)
                 },
               ]
             },
@@ -227,7 +301,7 @@ NumCloseIDs: 1
         }
         spec: {
           ports: [
-            for _, c in 〈5;v〉.spec.template.spec.containers for _, p in 〈0;c〉.ports if 〈0;p〉._export {
+            for _, c in 〈5;v〉.spec.template.spec.containers for _, p in 〈0;c〉.ports if 〈0;p〉._export(:kube) {
               let Port#1 = 〈1;p〉.containerPort
               port: (*〈0;let Port#1〉|int)
               targetPort: (*〈0;let Port#1〉|int)

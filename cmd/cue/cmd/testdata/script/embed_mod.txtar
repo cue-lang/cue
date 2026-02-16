@@ -40,12 +40,12 @@ a: _ @embed(file=foo.txt)
 hello
 -- out/eval --
 a: {
-    x: 34
+	x: 34
 }
 b: {
-    x: 35
+	x: 35
 }
 c: """
-    hello
+	hello
 
-    """
+	"""

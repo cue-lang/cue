@@ -209,24 +209,24 @@ globSymlinkDir: _ @embed(glob="symlink-dir/*.json")
 { "y": "another symlink target file" }
 -- symlink/out/std --
 file: {
-    x: "symlink target file"
+	x: "symlink target file"
 }
 glob: {
-    "symlink-parent.json": {
-        x: 34
-    }
-    "symlink.json": {
-        x: "symlink target file"
-    }
-    "test.json": {
-        x: "symlink target file"
-    }
+	"symlink-parent.json": {
+		x: 34
+	}
+	"symlink.json": {
+		x: "symlink target file"
+	}
+	"test.json": {
+		x: "symlink target file"
+	}
 }
 fileSymlinkDir: {
-    y: "another symlink target file"
+	y: "another symlink target file"
 }
 globSymlinkDir: {
-    "symlink-dir/test.json": {
-        y: "another symlink target file"
-    }
+	"symlink-dir/test.json": {
+		y: "another symlink target file"
+	}
 }

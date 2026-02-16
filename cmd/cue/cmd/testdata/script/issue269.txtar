@@ -20,22 +20,22 @@ data: {
 -- expect-stderr --
 -- expect-stdout --
 #type: {
-    x: 0
-    y: 0
-    i: 0
-    j: 0
+	x: 0
+	y: 0
+	i: 0
+	j: 0
 }
 data: {
-    a: {
-        i: 0
-        j: 0
-        x: 0
-        y: 0
-    }
-    b: {
-        i: 0
-        j: 0
-        x: 0
-        y: 0
-    }
+	a: {
+		i: 0
+		j: 0
+		x: 0
+		y: 0
+	}
+	b: {
+		i: 0
+		j: 0
+		x: 0
+		y: 0
+	}
 }

@@ -4,8 +4,8 @@ exec cue eval .
 cmp stdout expect-stdout
 -- expect-stdout --
 a: {
-    e: true
-    f: true
+	e: true
+	f: true
 }
 -- cue.mod/module.cue --
 module: "main.org"

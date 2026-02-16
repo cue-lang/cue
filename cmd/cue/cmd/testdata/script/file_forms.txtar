@@ -26,8 +26,8 @@ b: {
 -- expect-data-foo --
 a: 4
 b: {
-    c: 1
-    d: 2
+	c: 1
+	d: 2
 }
 -- expect-data-bar --
 references not allowed in data mode:
@@ -35,5 +35,5 @@ references not allowed in data mode:
 -- expect-graph-bar --
 a: 4
 b: {
-    c: 4
+	c: 4
 }

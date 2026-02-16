@@ -20,77 +20,73 @@ import (
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
 type PackageFunc func(ctx adt.Runtime) (*adt.Vertex, errors.Error)
 
-func RegisterBuiltin(importPath string, f PackageFunc) {
-	sharedIndex.RegisterBuiltin(importPath, f)
+func RegisterBuiltin(inst *build.Instance, f PackageFunc) {
+	stdBuiltins.registerBuiltin(inst, f)
 }
 
-func (x *index) RegisterBuiltin(importPath string, f PackageFunc) {
-	if x.builtinPaths == nil {
-		x.builtinPaths = map[string]PackageFunc{}
-		x.builtinShort = map[string]string{}
-	}
-	x.builtinPaths[importPath] = f
-	base := path.Base(importPath)
-	if _, ok := x.builtinShort[base]; ok {
-		importPath = "" // Don't allow ambiguous base paths.
-	}
-	x.builtinShort[base] = importPath
+var stdBuiltins = &builtins{
+	importPaths: make(map[string]*build.Instance),
+	instances:   make(map[*build.Instance]func(*Runtime) (*adt.Vertex, error)),
+	shortNames:  make(map[string]*build.Instance),
 }
 
-// We use a sync.OnceValue below so that cueexperiment.Init is only called
-// the first time that the API is used, letting the user set $CUE_EXPERIMENT globally
-// as part of their package init if they want to.
-var SharedRuntime = sync.OnceValue(func() *Runtime {
-	r := &Runtime{index: sharedIndex}
-	// The version logic below is copied from [Runtime.Init];
-	// consider refactoring to share the code if it gets any more complicated.
-	//
-	// TODO(mvdan,mpvl): Note that SharedRuntime follows the globally set evaluator version,
-	// which may be different than what was supplied via Go code for each context like
-	// via cuecontext.EvaluatorVersion(cuecontext.EvalV3).
-	// This does not cause issues between evalv2 and evalv3 as they use the same ADT,
-	// but future evaluator versions may not be compatible at that level.
-	// We should consider using one SharedRuntime per evaluator version,
-	// or getting rid of SharedRuntime altogether.
-	r.SetVersion(internal.DefaultVersion)
-	return r
-})
+// builtins defines a set of builtin packages (usually the CUE standard library).
+type builtins struct {
+	importPaths map[string]*build.Instance
+	instances   map[*build.Instance]func(*Runtime) (*adt.Vertex, error)
+	shortNames  map[string]*build.Instance
+}
+
+func (b *builtins) registerBuiltin(inst *build.Instance, f PackageFunc) {
+	b.importPaths[inst.ImportPath] = inst
+	b.instances[inst] = func(r *Runtime) (*adt.Vertex, error) {
+		return f(r)
+	}
+	base := path.Base(inst.ImportPath)
+	if _, ok := b.shortNames[base]; ok {
+		b.shortNames[base] = nil // Don't allow ambiguous base paths.
+	} else {
+		b.shortNames[base] = inst
+	}
+}
 
 // BuiltinPackagePath converts a short-form builtin package identifier to its
 // full path or "" if this doesn't exist.
-func (x *Runtime) BuiltinPackagePath(path string) string {
-	return x.index.shortBuiltinToPath(path)
+func (x *Runtime) BuiltinPackagePath(ident string) string {
+	inst := x.BuiltinPackageInstance(ident)
+	if inst == nil {
+		return ""
+	}
+	return inst.ImportPath
 }
 
-// sharedIndex is used for indexing builtins and any other labels common to
-// all instances.
-var sharedIndex = newIndex()
+// BuiltinPackageInstance converts a short-form builtin package identifier to its
+// build instance or nil if this doesn't exist.
+func (x *Runtime) BuiltinPackageInstance(ident string) *build.Instance {
+	if x.index.builtins == nil {
+		return nil
+	}
+	return x.index.builtins.shortNames[ident]
+}
 
-// index maps conversions from label names to internal codes.
-//
-// All instances belonging to the same package should share this index.
+// index caches the results of converting [build.Instance]
+// values to ADT nodes, and also defines the namespace
+// of builtin packages.
 type index struct {
+	builtins *builtins
+
 	// lock is used to guard imports-related maps.
-	// TODO: makes these per cuecontext.
 	lock           sync.RWMutex
 	imports        map[*adt.Vertex]*build.Instance
-	importsByPath  map[string]*adt.Vertex
 	importsByBuild map[*build.Instance]*adt.Vertex
 
 	nextUniqueID uint64
-
-	// These are initialized during Go package initialization time and do not
-	// need to be guarded.
-	builtinPaths map[string]PackageFunc // Full path
-	builtinShort map[string]string      // Commandline shorthand
-
-	typeCache sync.Map // map[reflect.Type]evaluated
+	typeCache    sync.Map // map[reflect.Type]evaluated
 }
 
 func (i *index) getNextUniqueID() uint64 {
@@ -105,20 +101,12 @@ func (i *index) getNextUniqueID() uint64 {
 func newIndex() *index {
 	i := &index{
 		imports:        map[*adt.Vertex]*build.Instance{},
-		importsByPath:  map[string]*adt.Vertex{},
 		importsByBuild: map[*build.Instance]*adt.Vertex{},
 	}
 	return i
 }
 
-func (x *index) shortBuiltinToPath(id string) string {
-	if x == nil || x.builtinPaths == nil {
-		return ""
-	}
-	return x.builtinShort[id]
-}
-
-func (r *Runtime) AddInst(path string, key *adt.Vertex, p *build.Instance) {
+func (r *Runtime) AddInst(key *adt.Vertex, p *build.Instance) {
 	r.index.lock.Lock()
 	defer r.index.lock.Unlock()
 
@@ -128,9 +116,6 @@ func (r *Runtime) AddInst(path string, key *adt.Vertex, p *build.Instance) {
 	}
 	x.imports[key] = p
 	x.importsByBuild[p] = key
-	if path != "" {
-		x.importsByPath[path] = key
-	}
 }
 
 func (r *Runtime) GetInstanceFromNode(key *adt.Vertex) *build.Instance {
@@ -147,33 +132,36 @@ func (r *Runtime) getNodeFromInstance(key *build.Instance) *adt.Vertex {
 	return r.index.importsByBuild[key]
 }
 
-func (r *Runtime) LoadImport(importPath string) *adt.Vertex {
-	r.index.lock.Lock()
-	defer r.index.lock.Unlock()
-
+// LoadBuiltin loads the builtin package with the given import path.
+func (r *Runtime) LoadBuiltin(importPath string) *adt.Vertex {
 	x := r.index
-
-	key := x.importsByPath[importPath]
-	if key != nil {
-		return key
+	inst := x.builtins.importPaths[importPath]
+	if inst == nil {
+		return nil
 	}
-
-	if x.builtinPaths != nil {
-		if f := x.builtinPaths[importPath]; f != nil {
-			p, err := f(r)
-			if err != nil {
-				return adt.ToVertex(&adt.Bottom{Err: err})
-			}
-			inst := &build.Instance{
-				ImportPath: importPath,
-				PkgName:    path.Base(importPath),
-			}
-			x.imports[p] = inst
-			x.importsByPath[importPath] = p
-			x.importsByBuild[inst] = p
-			return p
-		}
+	if v := r.LoadInstance(inst); v != nil {
+		return v
 	}
+	x.lock.Lock()
+	defer x.lock.Unlock()
 
-	return key
+	if v := x.importsByBuild[inst]; v != nil {
+		// Another goroutine got there first.
+		return v
+	}
+	v, err := x.builtins.instances[inst](r)
+	if err != nil {
+		// TODO why not just cache the error, or even just have the
+		// builtin builder return *adt.Bottom?
+		return adt.ToVertex(&adt.Bottom{Err: errors.Promote(err, "builtin")})
+	}
+	x.importsByBuild[inst] = v
+	x.imports[v] = inst
+	return v
+}
+
+func (r *Runtime) LoadInstance(inst *build.Instance) *adt.Vertex {
+	r.index.lock.RLock()
+	defer r.index.lock.RUnlock()
+	return r.index.importsByBuild[inst]
 }

@@ -3,8 +3,8 @@ cmp stdout expect-stdout
 
 -- expect-stdout --
 var: {
-    env:  "staging"
-    name: "bar"
+	env:  "staging"
+	name: "bar"
 }
 -- tags.cue --
 package tags

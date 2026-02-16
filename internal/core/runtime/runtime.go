@@ -116,11 +116,7 @@ func (r *Runtime) Init() {
 		return
 	}
 	r.index = newIndex()
-
-	// TODO: the builtin-specific instances will ultimately also not be
-	// shared by indexes.
-	r.index.builtinPaths = sharedIndex.builtinPaths
-	r.index.builtinShort = sharedIndex.builtinShort
+	r.index.builtins = stdBuiltins
 
 	r.loaded = map[*build.Instance]interface{}{}
 

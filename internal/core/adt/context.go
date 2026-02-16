@@ -26,6 +26,7 @@ import (
 	"github.com/cockroachdb/apd/v3"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
@@ -40,9 +41,14 @@ type Runtime interface {
 	// canonical numeric representation.
 	StringIndexer
 
-	// LoadImport loads a unique Vertex associated with a given import path. It
-	// returns nil if no import for this package could be found.
-	LoadImport(importPath string) *Vertex
+	// LoadBuiltin loads a unique Vertex associated with a given builtin
+	// (standard library) import path. It returns nil if no builtin for
+	// this import path could be found.
+	LoadBuiltin(importPath string) *Vertex
+
+	// LoadInstance loads a unique Vertex associated with the given build
+	// instance. It returns nil if no such instance has been compiled.
+	LoadInstance(inst *build.Instance) *Vertex
 
 	// StoreType associates a CUE expression with a Go type.
 	StoreType(t reflect.Type, src ast.Expr, expr Expr)

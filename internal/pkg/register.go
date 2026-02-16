@@ -15,6 +15,9 @@
 package pkg
 
 import (
+	"path"
+
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/eval"
@@ -22,10 +25,14 @@ import (
 )
 
 func Register(importPath string, p *Package) {
+	inst := &build.Instance{
+		ImportPath: importPath,
+		PkgName:    path.Base(importPath),
+	}
 	f := func(r adt.Runtime) (*adt.Vertex, errors.Error) {
 		ctx := eval.NewContext(r, nil)
 
 		return p.MustCompile(ctx, importPath), nil
 	}
-	runtime.RegisterBuiltin(importPath, f)
+	runtime.RegisterBuiltin(inst, f)
 }

@@ -107,7 +107,7 @@ diff old new
 -- out/compile --
 --- in.cue
 {
-  _#matchPattern: {
+  _#matchPattern(:x): {
     #pattern: string
     [
       if 〈import;strings〉.HasSuffix(〈1;#pattern〉, "*") {
@@ -117,7 +117,7 @@ diff old new
       "'\(〈1;#pattern〉)'",
     ][0]
   }
-  _#isReleaseTag: (〈0;_#matchPattern〉 & {
+  _#isReleaseTag(:x): (〈0;_#matchPattern(:x)〉 & {
     #pattern: "refs/tags/v*"
     _
   })
@@ -125,6 +125,6 @@ diff old new
     if: (number|string)
   }
   m: (〈0;#step〉 & {
-    if: 〈1;_#isReleaseTag〉
+    if: 〈1;_#isReleaseTag(:x)〉
   })
 }

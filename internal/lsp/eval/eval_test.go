@@ -4374,6 +4374,84 @@ a: b: c: d: e: f: f
 				or(37, 40): {e: []string{"a", "b", "c", "d", "e", "f"}},
 			},
 		},
+
+		{
+			name: "Comprehension_Try_Struct",
+			archive: `-- a.cue --
+@experiment(try)
+a: b: 5
+c: {
+	try {
+		d: a.b?
+	}
+}
+`,
+			expectDefinitions: map[position][]position{
+				ln(5, 1, "a"): {ln(2, 1, "a")},
+				ln(5, 1, "b"): {ln(2, 1, "b")},
+
+				ln(2, 1, "a"): {self},
+				ln(2, 1, "b"): {self},
+				ln(3, 1, "c"): {self},
+				ln(5, 1, "d"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(16, 19): {f: []string{"a", "c"}},
+				or1(19):    {f: []string{"b"}, e: []string{"a", "c"}},
+				or(20, 22): {f: []string{"b"}},
+				or1(22):    {e: []string{"a", "b", "c"}},
+				or1(24):    {e: []string{"a", "b", "c"}},
+				or(25, 27): {f: []string{"a", "c"}},
+				or(27, 39): {f: []string{"d"}, e: []string{"a", "c"}},
+				or(39, 41): {f: []string{"d"}},
+				or(41, 44): {e: []string{"a", "c", "d"}},
+				or(44, 46): {e: []string{"b"}},
+				or1(46):    {e: []string{"a", "c", "d"}},
+				or(47, 49): {f: []string{"d"}, e: []string{"a", "c"}},
+				or1(50):    {f: []string{"d"}, e: []string{"a", "c"}},
+			},
+		},
+
+		{
+			name: "Comprehension_Try_Assignment",
+			archive: `-- a.cue --
+@experiment(try)
+a: b: 5
+c: {
+	try x = a.b? {
+		d: x
+	}
+}
+`,
+			expectDefinitions: map[position][]position{
+				ln(4, 1, "a"): {ln(2, 1, "a")},
+				ln(4, 1, "b"): {ln(2, 1, "b")},
+				ln(5, 1, "x"): {ln(4, 1, "x")},
+
+				ln(2, 1, "a"): {self},
+				ln(2, 1, "b"): {self},
+				ln(3, 1, "c"): {self},
+				ln(4, 1, "x"): {self},
+				ln(5, 1, "d"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(16, 19): {f: []string{"a", "c"}},
+				or1(19):    {f: []string{"b"}, e: []string{"a", "c"}},
+				or(20, 22): {f: []string{"b"}},
+				or1(22):    {e: []string{"a", "b", "c"}},
+				or1(24):    {e: []string{"a", "b", "c"}},
+				or(25, 27): {f: []string{"a", "c"}},
+				or(27, 35): {f: []string{"d"}, e: []string{"a", "c"}},
+				or(37, 41): {e: []string{"a", "c"}},
+				or(41, 43): {e: []string{"a", "b", "c"}},
+				or1(43):    {e: []string{"a", "c"}},
+				or(44, 48): {f: []string{"d"}, e: []string{"a", "c", "x"}},
+				or(48, 50): {f: []string{"d"}},
+				or(50, 53): {e: []string{"a", "c", "d", "x"}},
+				or(53, 55): {f: []string{"d"}, e: []string{"a", "c", "x"}},
+				or1(56):    {f: []string{"d"}, e: []string{"a", "c"}},
+			},
+		},
 	}.run(t)
 }
 

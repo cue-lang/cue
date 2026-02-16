@@ -254,7 +254,8 @@ package      import
 The following keywords are used in comprehensions.
 
 ```
-for          in           if           let
+for          in           if           let          try
+else         fallback
 ```
 
 <!--
@@ -2592,10 +2593,10 @@ function returns.
 Lists and fields can be constructed using comprehensions.
 
 Comprehensions define a clause sequence that consists of a sequence of
-`for`, `if`, and `let` clauses, nesting from left to right.
-The sequence must start with a `for` or `if` clause.
-The `for` and `let` clauses each define a new scope in which new values are
-bound to be available for the next clause.
+`for`, `if`, `let`, and `try` clauses, nesting from left to right.
+The sequence must start with a `for`, `if`, or `try` clause.
+The `for`, `let`, and `try` (assignment form) clauses each define a new scope
+in which new values are bound to be available for the next clause.
 
 The `for` clause binds the defined identifiers, on each iteration, to the next
 value of some iterable value in a new scope.
@@ -2614,6 +2615,25 @@ iteration if it evaluates to false.
 The `let` clause binds the result of an expression to the defined identifier
 in a new scope.
 
+The `try` clause enables conditional field inclusion based on whether
+optional references resolve successfully.
+A `try` clause has two forms: the binding form (`try x = expr { body }`)
+and the struct form (`try { struct }`).
+The struct form must be the last clause; the comprehension value
+becomes the try expression.
+
+Within a `try` expression, references may be marked with a `?`
+suffix (e.g., `a?`, `a.b?.c`, `a[foo?]?`) to indicate optional evaluation.
+The `?` marker is only valid within the try expression scope.
+
+If any `?`-marked reference fails to resolve because the referenced field does
+not exist (undeclared or a field constraint), the entire `try` clause silently
+discards its output. Other errors propagate normally.
+
+In the binding form, the expression after `=` is evaluated and,
+if successful, bound to the identifier for use in subsequent clauses
+and the comprehension body.
+
 A current iteration is said to complete if the innermost block of the clause
 sequence is reached.
 Syntactically, the comprehension value is a struct.
@@ -2626,16 +2646,42 @@ Within structs, the values yielded by a comprehension are embedded within the
 struct.
 Both structs and lists may contain multiple comprehensions.
 
+A comprehension may have an optional fallback clause.
+The fallback clause is evaluated and its contents yielded
+if the comprehension completes without yielding any values.
+For an `if` comprehension, this occurs when the condition is false.
+For a `for` comprehension, this occurs when the source is empty
+or when all iterations are filtered out by subsequent `if` clauses.
+
+The fallback clause body is evaluated in the enclosing scope,
+not the comprehension's internal scope.
+This means identifiers bound by `for` or `let` clauses
+are not accessible within the fallback clause.
+
+If the comprehension source or condition contains an error,
+the error propagates rather than triggering the fallback clause.
+
+The keyword used depends on the comprehension type:
+`for` comprehensions use the `fallback` keyword,
+while `if` and `try` comprehensions use the `else` keyword.
+This allows for more specific semantics of else for `try` and `if`
+in the future.
+
+To avoid ambiguous semantics, the following restrictions apply:
+- `else` is only allowed with a single `if` clause or single `try` clause
+- `fallback` requires at least one `for` clause to be present
+
 ```
-Comprehension       = Clauses StructLit .
+Comprehension       = Clauses StructLit [ FallbackClause ] .
 
 Clauses             = StartClause { [ "," ] Clause } .
-StartClause         = ForClause | GuardClause .
+StartClause         = ForClause | GuardClause | TryClause .
 Clause              = StartClause | LetClause .
 ForClause           = "for" identifier [ "," identifier ] "in" Expression .
 GuardClause         = "if" Expression .
 LetClause           = "let" identifier "=" Expression .
-ElseClause          = "else" StructLit .
+TryClause           = "try" [ identifier "=" Expression ] .
+FallbackClause      = ( "else" | "fallback" ) StructLit .
 ```
 
 ```
@@ -2650,6 +2696,71 @@ c: {
     }
 }
 d: { "1": 2, "2": 3, "3": 4 }
+
+// else examples (single clause only)
+e: {
+    if false { a: 1 } else { b: 2 }
+}
+f: { b: 2 }
+
+g: {
+    for x in [] { "\(x)": x } fallback { empty: true }
+}
+h: { empty: true }
+
+// fallback accesses outer scope
+i: {
+    let threshold = 10
+    for x in [] { x } fallback { fallbackField: threshold }
+}
+j: { fallbackField: 10 }
+
+// try clause examples (requires @experiment(try))
+@experiment(try)
+
+// struct form: include fields only if optional references resolve
+k: {
+    x: 1
+    try { y: x? } // { y: 1 }
+}
+
+// try with else: fallback when reference doesn't resolve
+m: {
+    optField?: int
+    try { y: optField? } else { z: 0 } // z: 0
+}
+
+// binding form: bind result to identifier
+o: {
+    x: 1
+    try v = x? { y: v + 1 } // y: 2
+}
+
+// chained try clauses
+q: {
+    a: 1
+    b: 2
+    try x = a? try y = b? { sum: x + y } // sum: 3
+}
+
+// optional marker on selector and index expressions
+s: {
+    obj: { field: 1 }
+    list: [1, 2, 3]
+    try { a: obj.field?, b: list[0]? } // { a: 1, b: 1 }
+}
+
+t: {
+    a:  1
+    b?: int
+    try { aa: a?, bb: b? } else { cc: "missing b" } // cc: "missing b"
+}
+
+// for with try: process items conditionally
+u: {
+    items: [{ val: 1 }, { other: 2 }, { val: 3 }]
+    for i, item in items try { "a\(i)": item.val? } // { "a0": 1, "a2": 3 }
+}
 ```
 
 

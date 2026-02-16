@@ -6,10 +6,10 @@ exec cue export foo.com/bar@v0.0.3
 cmp stdout stdout2-golden
 
 ! exec cue export foo.com/bar@v0
-stderr 'imports are unavailable because there is no cue.mod/module.cue file'
+stderr 'package foo.com/bar@v0: v0 is not a valid version to use as an argument; use a fully qualified version like v0.0.0, v0.latest, or @latest'
 
 ! exec cue export foo.com/bar@v2
-stderr 'imports are unavailable because there is no cue.mod/module.cue file'
+stderr 'package foo.com/bar@v2: v2 is not a valid version to use as an argument; use a fully qualified version like v2.0.0, v2.latest, or @latest'
 
 exec cue export foo.com/bar@v3.latest
 cmp stdout stdout3-golden
@@ -22,7 +22,7 @@ exec cue cmd hello foo.com/bar@latest
 stdout 'hello from foo.com_v2.1.0/bar'
 
 ! exec cue cmd hello foo.com/bar@v0
-stderr 'imports are unavailable because there is no cue.mod/module.cue file'
+stderr 'package foo.com/bar@v0: v0 is not a valid version to use as an argument; use a fully qualified version like v0.0.0, v0.latest, or @latest'
 
 # Check we can use it with vet.
 ! exec cue vet -d self foo.com/bar@v3.latest data.json

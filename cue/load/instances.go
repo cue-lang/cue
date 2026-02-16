@@ -97,6 +97,20 @@ func Instances(args []string, c *Config) []*build.Instance {
 		pkgArgs = pkgArgs1
 	}
 
+	// When outside a module, a major-only version like foo.com/bar@v2
+	// cannot be resolved. Provide a helpful error suggesting alternatives.
+	if c.modFile == nil || c.modFile.Module == "" {
+		for _, p := range pkgArgs {
+			ip := ast.ParseImportPath(p)
+			if ip.Version != "" && semver.Major(ip.Version) == ip.Version {
+				return []*build.Instance{c.newErrInstance(fmt.Errorf(
+					"package %s: %[2]s is not a valid version to use as an argument; use a fully qualified version like %[2]s.0.0, %[2]s.latest, or @latest",
+					p, ip.Version,
+				))}
+			}
+		}
+	}
+
 	tg := newTagger(c)
 
 	var pkgs *modpkgload.Packages

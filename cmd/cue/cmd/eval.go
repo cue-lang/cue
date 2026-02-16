@@ -168,7 +168,7 @@ func runEval(cmd *Command, args []string) error {
 			}
 		}
 
-		f := internal.ToFile(v.Syntax(syn...))
+		f := internal.ToFile(v.Syntax(syn...), false)
 		f.Filename = id
 		err := e.EncodeFile(f)
 		if err != nil {

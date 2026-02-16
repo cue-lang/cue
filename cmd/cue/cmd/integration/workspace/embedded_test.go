@@ -283,7 +283,7 @@ out: field: {
   cows: bool
 }
 
-glob: {"data/d1.json": s} @embed(glob=data/d*.json)
+glob: {"data/d1.json": s, "data/d3.json": s} @embed(glob=data/d*.json)
 -- b.cue --
 package a
 
@@ -319,6 +319,9 @@ s: field: {
     "cows": false
   },
   "fieldCount": -1
+}
+-- data/d3.json --
+{
 }
 `
 
@@ -422,10 +425,11 @@ func TestEmbedCompletion(t *testing.T) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("data/file.json")
+		env.OpenFile("data/d3.json")
 		env.Await(
 			env.DoneWithOpen(),
-			LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Created`, rootURI),
-			LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Reloaded`, rootURI),
+			LogMatching(protocol.Debug, 2, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Created`, rootURI),
+			LogMatching(protocol.Debug, 2, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Reloaded`, rootURI),
 			NoLogMatching(protocol.Debug, `Package dirs=\[%v/data\] importPath=mod\.example/x@v0:a Created`, rootURI),
 		)
 
@@ -438,6 +442,7 @@ func TestEmbedCompletion(t *testing.T) {
 		testCases := map[position][]string{
 			fln("data/file.json", 3, 1, `"`): {`"sheep"`, `"cows"`, `"horses"`},
 			fln("data/file.json", 6, 1, `"`): {`"field"`, `"fieldCount"`},
+			fln("data/d3.json", 2, 1, `}`):   {`"field"`, `"fieldCount"`},
 		}
 
 		for p, expectedLabels := range testCases {
@@ -455,8 +460,9 @@ func TestEmbedCompletion(t *testing.T) {
 			qt.Assert(t, qt.ContentEquals(gotLabels, expectedLabels))
 		}
 
-		// Calling Hover should have caused package x:a to be loaded
-		// because that's the package which embeds the json files.
+		// Calling Completion should have caused package x:a to be
+		// loaded because that's the package which embeds the json
+		// files.
 		env.Await(
 			LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v\] importPath=mod\.example/x@v0:a Created`, rootURI),
 		)

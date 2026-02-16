@@ -93,11 +93,11 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 			if err != nil {
 				return nil, err
 			}
-			return internal.ToFile(expr), nil
+			return internal.ToFile(expr, false), nil
 		}
 	case build.ProtobufJSON:
 		e.interpret = func(v cue.Value) (*ast.File, error) {
-			f := internal.ToFile(v.Syntax())
+			f := internal.ToFile(v.Syntax(), false)
 			return f, jsonpb.NewEncoder(v).RewriteFile(f)
 		}
 	default:
@@ -147,7 +147,7 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 
 			// Casting an ast.Expr to an ast.File ensures that it always ends
 			// with a newline.
-			f := internal.ToFile(n)
+			f := internal.ToFile(n, false)
 			if e.cfg.PkgName != "" && f.PackageName() == "" {
 				pkg := &ast.Package{
 					PackagePos: token.NoPos.WithRel(token.NewSection),

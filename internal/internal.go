@@ -240,16 +240,27 @@ func ToExpr(n ast.Node) ast.Expr {
 // ToFile converts an expression to a file.
 //
 // Adjusts the spacing of x when needed.
-func ToFile(n ast.Node) *ast.File {
+//
+// If preserveStructLit is true and n is a [*ast.StructLit], then n
+// will be embedded within the returned [*ast.File] rather than only
+// its elements being included in the returned File. This ensures that
+// position information of the StructLit's braces is not lost.
+func ToFile(n ast.Node, preserveStructLit bool) *ast.File {
 	if n == nil {
 		return nil
 	}
 	switch n := n.(type) {
 	case *ast.StructLit:
-		f := &ast.File{Decls: n.Elts}
-		// Ensure that the comments attached to the struct literal are not lost.
-		ast.SetComments(f, ast.Comments(n))
-		return f
+		if preserveStructLit {
+			ast.SetRelPos(n, token.NoSpace)
+			return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: n}}}
+
+		} else {
+			f := &ast.File{Decls: n.Elts}
+			// Ensure that the comments attached to the struct literal are not lost.
+			ast.SetComments(f, ast.Comments(n))
+			return f
+		}
 	case ast.Expr:
 		ast.SetRelPos(n, token.NoSpace)
 		return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: n}}}

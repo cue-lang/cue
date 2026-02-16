@@ -87,44 +87,59 @@ installGo: {
 	]
 }
 
-checkoutCode: [...githubactions.#Step] & [
-	{
-		name: "Checkout code"
-		uses: "actions/checkout@v6" // TODO(mvdan): switch to namespacelabs/nscloud-checkout-action@v1 once Windows supports caching
+checkoutCode: [...githubactions.#Step] & {
+	#checkout: _
 
-		// "pull_request_target" builds will by default use a merge commit,
-		// testing the PR's HEAD merged on top of the master branch.
-		// For consistency with Gerrit, avoid that merge commit entirely.
-		// This doesn't affect builds by other events like "push",
-		// since github.event.pull_request is unset so ref remains empty.
-		with: {
-			ref:           "${{ github.event.pull_request.head.sha }}"
-			"fetch-depth": 0 // see the docs below
-		}
-	},
+	[
+		{
+			#checkout...
 
-	// Restore modified times to work around https://go.dev/issues/58571,
-	// as otherwise we would get lots of unnecessary Go test cache misses.
-	// Note that this action requires actions/checkout to use a fetch-depth of 0.
-	// Since this is a third-party action which runs arbitrary code,
-	// we pin a commit hash for v2 to be in control of code updates.
-	// Also note that git-restore-mtime does not update all directories,
-	// per the bug report at https://github.com/MestreLion/git-tools/issues/47,
-	// so we first reset all directory timestamps to a static time as a fallback.
-	// TODO(mvdan): May be unnecessary once the Go bug above is fixed.
-	{
-		name: "Reset git directory modification times"
-		run:  "touch -t 202211302355 $(find * -type d)"
-	},
-	{
-		name: "Restore git file modification times"
-		uses: "chetan/git-restore-mtime-action@cbf8161ddb4e9b162409104954fb540e8a38c1da" // 2025-08-27
-	},
+			name: "Checkout code"
+			uses: "actions/checkout@v6" // TODO(mvdan): switch to namespacelabs/nscloud-checkout-action@v1 once Windows supports caching
 
-	{
-		name: "Try to extract \(dispatchTrailer)"
-		id:   dispatchTrailerStepID
-		run:  """
+			// "pull_request_target" builds will by default use a merge commit,
+			// testing the PR's HEAD merged on top of the master branch.
+			// For consistency with Gerrit, avoid that merge commit entirely.
+			// This doesn't affect builds by other events like "push",
+			// since github.event.pull_request is unset so ref remains empty.
+			with: {
+				ref:           "${{ github.event.pull_request.head.sha }}"
+				"fetch-depth": 0 // see the docs below
+
+				// Default persist-credentials to false. Limiting the use of
+				// credentials to the checkout step maintains the principle of
+				// least privilege. But it also means that if/where we need to set
+				// custom credentials elsewhere (via git's extraheader) then we
+				// don't end up with a situation of having double extraheaders in
+				// the resulting config. For example, in the cuelang.org tip deploy
+				// workflow, we set a custom header with write permissions when we
+				// want to push to tip.cuelang.org.
+				"persist-credentials": *false | bool
+			}
+		},
+
+		// Restore modified times to work around https://go.dev/issues/58571,
+		// as otherwise we would get lots of unnecessary Go test cache misses.
+		// Note that this action requires actions/checkout to use a fetch-depth of 0.
+		// Since this is a third-party action which runs arbitrary code,
+		// we pin a commit hash for v2 to be in control of code updates.
+		// Also note that git-restore-mtime does not update all directories,
+		// per the bug report at https://github.com/MestreLion/git-tools/issues/47,
+		// so we first reset all directory timestamps to a static time as a fallback.
+		// TODO(mvdan): May be unnecessary once the Go bug above is fixed.
+		{
+			name: "Reset git directory modification times"
+			run:  "touch -t 202211302355 $(find * -type d)"
+		},
+		{
+			name: "Restore git file modification times"
+			uses: "chetan/git-restore-mtime-action@cbf8161ddb4e9b162409104954fb540e8a38c1da" // 2025-08-27
+		},
+
+		{
+			name: "Try to extract \(dispatchTrailer)"
+			id:   dispatchTrailerStepID
+			run:  """
 			x="$(git log -1 --pretty='%(trailers:key=\(dispatchTrailer),valueonly)')"
 			if [[ "$x" == "" ]]
 			then
@@ -140,19 +155,20 @@ checkoutCode: [...githubactions.#Step] & [
 			echo "$x" >> $GITHUB_OUTPUT
 			echo "EOD" >> $GITHUB_OUTPUT
 			"""
-	},
+		},
 
-	// Safety nets to flag if we ever have a Dispatch-Trailer slip through the
-	// net and make it to master
-	{
-		name: "Check we don't have \(dispatchTrailer) on a protected branch"
-		if:   "\(isProtectedBranch) && \(containsDispatchTrailer)"
-		run:  """
+		// Safety nets to flag if we ever have a Dispatch-Trailer slip through the
+		// net and make it to master
+		{
+			name: "Check we don't have \(dispatchTrailer) on a protected branch"
+			if:   "\(isProtectedBranch) && \(containsDispatchTrailer)"
+			run:  """
 			echo "\(_dispatchTrailerVariable) contains \(dispatchTrailer) but we are on a protected branch"
 			false
 			"""
-	},
-]
+		},
+	]
+}
 
 earlyChecks: githubactions.#Step & {
 	name: "Early git and code sanity checks"

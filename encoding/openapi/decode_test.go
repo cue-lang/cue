@@ -80,7 +80,7 @@ func TestDecode(t *testing.T) {
 					if inFile == nil {
 						var inExpr ast.Expr
 						inExpr, err = json.Extract(f.Name, f.Data)
-						inFile = internal.ToFile(inExpr)
+						inFile = internal.ToFile(inExpr, false)
 					}
 				case ".yaml":
 					if inFile == nil {

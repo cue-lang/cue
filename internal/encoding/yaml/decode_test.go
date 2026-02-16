@@ -791,7 +791,7 @@ func cueStr(node ast.Node) string {
 	if node == nil {
 		return ""
 	}
-	b, _ := format.Node(internal.ToFile(node))
+	b, _ := format.Node(internal.ToFile(node, false))
 	return strings.TrimSpace(string(b))
 }
 

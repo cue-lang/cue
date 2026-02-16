@@ -34,6 +34,31 @@ Retain: 8
 Unifications: 6
 Conjuncts:    8
 Disjuncts:    8
+-- out/evalalpha --
+Errors:
+b: undefined field: c:
+    ./b/b.cue:5:6
+
+Result:
+(struct){
+  theb: (_|_){
+    // [incomplete] b: undefined field: c:
+    //     ./b/b.cue:5:6
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,3 +1,8 @@
++Errors:
++b: undefined field: c:
++    ./b/b.cue:5:6
++
++Result:
+ (struct){
+   theb: (_|_){
+     // [incomplete] b: undefined field: c:
 -- out/eval --
 (struct){
   theb: (_|_){

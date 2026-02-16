@@ -32,7 +32,7 @@ package p
 
 import "externalmod.test/imports/root"
 
-root.Type
+root.#Type
 -- go.mod --
 module mod.test/local
 

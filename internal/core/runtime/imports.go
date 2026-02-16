@@ -140,6 +140,13 @@ func (r *Runtime) GetInstanceFromNode(key *adt.Vertex) *build.Instance {
 	return r.index.imports[key]
 }
 
+func (r *Runtime) IsPackage(v *adt.Vertex) bool {
+	r.index.lock.RLock()
+	defer r.index.lock.RUnlock()
+
+	return r.index.imports[v] != nil
+}
+
 func (r *Runtime) getNodeFromInstance(key *build.Instance) *adt.Vertex {
 	r.index.lock.RLock()
 	defer r.index.lock.RUnlock()

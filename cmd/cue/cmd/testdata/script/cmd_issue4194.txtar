@@ -1,9 +1,9 @@
 # Verify that using a non-existent task type reports the actual CUE error
 # rather than "no tasks found".
-# TODO(#4194): the error should mention "undefined field: Mkdir".
 
 ! exec cue cmd testdata
-stderr 'no tasks found'
+stderr 'undefined field: Mkdir'
+! stderr 'no tasks found'
 
 -- cue.mod/module.cue --
 module: "mod.test/test"

@@ -2788,6 +2788,22 @@ func TestValidate(t *testing.T) {
 		a: { b: time.Duration } | { c: time.Duration }
 		`,
 	}, {
+		desc: "issue2773",
+		in: `
+		import "strings"
+
+		a: strings.NoSuchField
+		`,
+		err: true,
+	}, {
+		desc: "issue2773 definition",
+		in: `
+		import "strings"
+
+		a: strings.#NoSuchDef
+		`,
+		err: true,
+	}, {
 		desc: "comprehension error",
 		in: `
 			a: { if b == "foo" { field: 2 } }

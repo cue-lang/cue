@@ -295,6 +295,9 @@ func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg
 		Code: code,
 		Err:  err,
 		Node: v,
+		// An imported package can never gain new fields via unification,
+		// so a missing field lookup on a package is a permanent error.
+		Permanent: c.Runtime.IsPackage(v),
 	}
 	// TODO: yield failure
 	c.AddBottom(b) // TODO: unify error mechanism.

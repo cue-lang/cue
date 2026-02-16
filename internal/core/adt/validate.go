@@ -153,7 +153,7 @@ func (v *validator) validate(x *Vertex) {
 			}
 
 		case IncompleteError:
-			if v.ReportIncomplete || v.checkConcrete() {
+			if b.Permanent || v.ReportIncomplete || v.checkConcrete() {
 				v.add(b)
 			}
 

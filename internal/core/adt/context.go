@@ -44,6 +44,9 @@ type Runtime interface {
 	// returns nil if no import for this package could be found.
 	LoadImport(importPath string) *Vertex
 
+	// IsPackage reports whether the given Vertex is an imported package.
+	IsPackage(v *Vertex) bool
+
 	// StoreType associates a CUE expression with a Go type.
 	StoreType(t reflect.Type, src ast.Expr, expr Expr)
 

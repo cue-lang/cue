@@ -157,8 +157,12 @@ func Generate(pkgPath string, inst cue.InstanceOrValue, c *Config) (b []byte, er
 	}
 
 	r := (*cue.Runtime)(val.Context())
-	b, err = r.Marshal(&val)
+	b, err = r.Marshal(val)
 	g.addErr(err)
+	// If we can't round-trip it, fail.
+	if _, err := r.Unmarshal(b); err != nil {
+		g.addErr(fmt.Errorf("cannot round-trip marshaled CUE: %w", err))
+	}
 
 	g.exec(loadCode, map[string]string{
 		"runtime": g.RuntimeVar,

@@ -6,7 +6,7 @@
 			"$ref": "https://json-schema.org/draft/2019-09/schema"
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: package \"json-schema.org/draft/2019-09/schema\" imported but not defined in :\n    generated.cue:1:8\n",
+			"v3": "extract error: cannot compile resulting schema: package \"json-schema.org/draft/2019-09/schema\" imported but not defined in :\n    generated.cue:1:8\nimport \"json-schema.org/draft/2019-09/schema\" not found:\n    generated.cue:5:1\n",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [

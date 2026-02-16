@@ -186,23 +186,23 @@ NumCloseIDs: 1
     [string]: {}
   }
   deployment: {
-    [_]: (〈1;_spec〉 & {})
+    [_]: (〈1;_spec(:kube)〉 & {})
   }
-  _spec: {
-    _name: string
+  _spec(:kube): {
+    _name(:kube): string
     spec: {
       template: {
         spec: {
           containers: [
             {
-              name: 〈5;_name〉
+              name: 〈5;_name(:kube)〉
             },
           ]
         }
       }
     }
   }
-  _spec: {
+  _spec(:kube): {
     spec: {
       template: {
         spec: {
@@ -210,7 +210,7 @@ NumCloseIDs: 1
             ...{
               ports: [
                 ...{
-                  _export: (*true|false)
+                  _export(:kube): (*true|false)
                 },
               ]
             },
@@ -227,7 +227,7 @@ NumCloseIDs: 1
         }
         spec: {
           ports: [
-            for _, c in 〈5;v〉.spec.template.spec.containers for _, p in 〈0;c〉.ports if 〈0;p〉._export {
+            for _, c in 〈5;v〉.spec.template.spec.containers for _, p in 〈0;c〉.ports if 〈0;p〉._export(:kube) {
               let Port#1 = 〈1;p〉.containerPort
               port: (*〈0;let Port#1〉|int)
               targetPort: (*〈0;let Port#1〉|int)

@@ -115,7 +115,7 @@ func TestValueX(t *testing.T) {
 	r.SetVersion(internal.DevVersion)
 	r.SetDebugOptions(&cuedebug.Config{Sharing: true})
 
-	v, errs := compile.Files(nil, r, "", a[0].Files...)
+	v, errs := compile.Instance(nil, r, a[0])
 	if errs != nil {
 		t.Fatal(errs)
 	}

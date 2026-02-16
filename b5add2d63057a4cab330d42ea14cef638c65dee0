@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "723d48d5_4fd77bb9",
+        "filename": "internal/internal.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-16T13:25:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3855ce1a_883b8057",
+      "range": {
+        "startLine": 247,
+        "startChar": 50,
+        "endLine": 247,
+        "endChar": 53
+      },
+      "revId": "b5add2d63057a4cab330d42ea14cef638c65dee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95d77df5_ba1515a4",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-02-16T13:12:08Z",
       "side": 1,
       "message": "how about `keepBraces`?",
+      "range": {
+        "startLine": 248,
+        "startChar": 24,
+        "endLine": 248,
+        "endChar": 41
+      },
+      "revId": "b5add2d63057a4cab330d42ea14cef638c65dee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a86c3abf_a25df638",
+        "filename": "internal/internal.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-02-16T13:25:25Z",
+      "side": 1,
+      "message": "I actually don\u0027t like that - the fact the braces are preserved is more a side effect of preserving the structlit; if the structlit gains extra fields which also do not exist in File then this\u0027ll be preserving those too.",
+      "parentUuid": "95d77df5_ba1515a4",
       "range": {
         "startLine": 248,
         "startChar": 24,

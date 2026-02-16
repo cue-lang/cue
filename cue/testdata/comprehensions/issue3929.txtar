@@ -565,26 +565,26 @@ diff old new
       }
     }
     #def1: {
-      _in: _
+      _in(:main): _
       def1: (〈1;#def2〉 & {
-        _in: 〈1;_in〉
+        _in(:main): 〈1;_in(:main)〉
       })
     }
     #def2: {
-      _in: _
+      _in(:main): _
       def2: (〈1;#def3〉 & {
-        _in: 〈1;_in〉
+        _in(:main): 〈1;_in(:main)〉
       })
     }
     #def3: {
-      _in: 〈1;#Input〉
-      def3: 〈0;_in〉.age
+      _in(:main): 〈1;#Input〉
+      def3: 〈0;_in(:main)〉.age
     }
     in: {
       name: "foobar"
     }
     out: (〈0;#def1〉 & {
-      _in: 〈1;in〉
+      _in(:main): 〈1;in〉
     }).def1
   }
   full: {
@@ -609,35 +609,35 @@ diff old new
         }
       }
     }
-    _#cronjob: {
-      _config: 〈1;#CronjobConfig〉
+    _#cronjob(:main): {
+      _config(:main): 〈1;#CronjobConfig〉
       out: {
         spec: {
           jobTemplate: {
             spec: {
-              template: (〈5;_#pod〉 & {
-                _config: 〈5;_config〉
+              template: (〈5;_#pod(:main)〉 & {
+                _config(:main): 〈5;_config(:main)〉
               })
             }
           }
         }
       }
     }
-    _#pod: {
-      _config: 〈1;#PodConfig〉
+    _#pod(:main): {
+      _config(:main): 〈1;#PodConfig〉
       spec: {
         containers: [
           {
-            (〈4;_#container〉 & {
-              _config: 〈4;_config〉
+            (〈4;_#container(:main)〉 & {
+              _config(:main): 〈4;_config(:main)〉
             })
           },
         ]
       }
     }
-    _#container: {
-      _config: 〈1;#ContainerConfig〉
-      imagePullPolicy: 〈0;_config〉.imagePullPolicy
+    _#container(:main): {
+      _config(:main): 〈1;#ContainerConfig〉
+      imagePullPolicy: 〈0;_config(:main)〉.imagePullPolicy
     }
     cronjob: {
       foobar: {
@@ -647,8 +647,8 @@ diff old new
     for k, v in 〈0;cronjob〉 {
       objects: {
         cronjob: {
-          "\(〈3;k〉)": (〈4;_#cronjob〉 & {
-            _config: 〈4;v〉
+          "\(〈3;k〉)": (〈4;_#cronjob(:main)〉 & {
+            _config(:main): 〈4;v〉
           }).out
         }
       }

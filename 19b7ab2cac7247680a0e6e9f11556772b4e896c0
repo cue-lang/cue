@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "face8aaf_4a0bd682",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-16T11:25:37Z",
+      "side": 1,
+      "message": "FWIW encoding/json/v2 will encode nil slices and maps as empty arrays/objects by default, so this should be resolved if/when we switch to it eventually.",
+      "revId": "19b7ab2cac7247680a0e6e9f11556772b4e896c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

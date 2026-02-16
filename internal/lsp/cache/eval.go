@@ -217,7 +217,8 @@ func (w *Workspace) Completion(file *File, fe *eval.FileEvaluator, srcMapper *pr
 	isJsonSrc := file.buildFile != nil && file.buildFile.Encoding == build.JSON
 	isYamlSrc := file.buildFile != nil && file.buildFile.Encoding == build.YAML
 
-	var completionItems []protocol.CompletionItem
+	// We must not return a nil list of completions
+	completionItems := []protocol.CompletionItem{}
 
 	for completion, names := range completions {
 		if len(names) == 0 {

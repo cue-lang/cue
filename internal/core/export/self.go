@@ -95,6 +95,11 @@ type pivotter struct {
 	// infinite recursion on recursive definitions like [string]: #c.
 	inlining map[*adt.Vertex]bool
 
+	// exporting is the dep currently being exported by addExternal, used to
+	// detect self-referential lets and generate inner definition references
+	// instead.
+	exporting *depData
+
 	decls []ast.Decl
 }
 
@@ -306,6 +311,15 @@ func (p *pivotter) makeParentPath(d *depData) {
 func (p *pivotter) makeAlternativeReference(ref *refData, r adt.Resolver) ast.Expr {
 	d := ref.dst
 
+	// If this reference points back to the dep we're currently exporting
+	// as a let binding, and the dep has a definition wrapper (len > 1),
+	// generate a reference to the inner definition label instead of the
+	// let identifier. This avoids self-referential lets, which CUE does
+	// not support, while definitions can be self-referential.
+	if d == p.exporting && d.parent == nil && len(d.path) > 1 {
+		return p.x.ident(d.path[len(d.path)-1])
+	}
+
 	// Determine if the reference can be inline.
 
 	var path []adt.Feature
@@ -465,7 +479,10 @@ func (p *pivotter) addExternal(d *depData) {
 		return
 	}
 
+	saved := p.exporting
+	p.exporting = d
 	expr := p.x.expr(nil, d.node())
+	p.exporting = saved
 
 	if len(d.path) > 1 {
 		expr = ast.NewStruct(&ast.Field{

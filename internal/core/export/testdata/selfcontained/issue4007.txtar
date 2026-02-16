@@ -1,0 +1,16 @@
+#path: result
+
+#Issue: 4007
+-- in.cue --
+#R: {
+	x: _
+	out: "default"
+	if (x & int) != _|_ {
+		out: (#R & {x: 1}).out
+	}
+}
+
+result: (#R & {x: "s"}).out
+-- out/self/default --
+
+"default"

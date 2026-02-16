@@ -197,7 +197,7 @@ func Visit(cfg *Config, c *adt.OpContext, n *adt.Vertex, f VisitFunc) error {
 		top:             true,
 		cfgDynamic:      cfg.Dynamic,
 		resolved:        map[refEntry]bool{},
-		visitedInternal: map[*adt.Vertex]bool{},
+		visitedInternal: map[adt.Resolver]bool{},
 	}
 	return v.visitReusingVisitor(n, true)
 }
@@ -273,9 +273,10 @@ type visitor struct {
 	// resolved dedups resolving references to prevent exponential blowup.
 	resolved map[refEntry]bool
 
-	// visitedInternal tracks vertices already processed by markInternalResolvers
-	// to prevent infinite recursion on recursive definitions like [string]: #c.
-	visitedInternal map[*adt.Vertex]bool
+	// visitedInternal tracks resolvers already processed by
+	// markInternalResolvers to prevent infinite recursion on recursive
+	// definitions like [string]: #c or (#R & {x: 1}).out.
+	visitedInternal map[adt.Resolver]bool
 }
 
 type refEntry struct {
@@ -562,10 +563,10 @@ func (c *visitor) markConjuncts(v *adt.Vertex) {
 // proactive. For selectors and indices this means we need to evaluate their
 // objects to see exactly what the selector or index refers to.
 func (c *visitor) markInternalResolvers(env *adt.Environment, r adt.Resolver, v *adt.Vertex) {
-	if c.visitedInternal[v] {
+	if c.visitedInternal[r] {
 		return
 	}
-	c.visitedInternal[v] = true
+	c.visitedInternal[r] = true
 
 	saved := c.all // recursive traversal already done by this function.
 

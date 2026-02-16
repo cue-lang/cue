@@ -610,7 +610,17 @@ func (p *parser) parseOperand() (expr ast.Expr) {
 
 	switch p.tok {
 	case token.IDENT:
-		return p.parseIdent()
+		ident := p.parseIdent()
+		// Check for optional reference marker (?)
+		// Don't consume ? if it's followed by : (that's a field constraint, not optional reference)
+		if p.tok == token.OPTION {
+			// Peek ahead to see if this is a field constraint (foo?: value)
+			p.peek()
+			if p.peekToken.tok != token.COLON {
+				return p.wrapOptional(ident, p.tok)
+			}
+		}
+		return ident
 
 	case token.LBRACE:
 		return p.parseStruct()
@@ -711,12 +721,22 @@ func (p *parser) parseIndexOrSlice(x ast.Expr) (expr ast.Expr) {
 		}
 	}
 
-	return &ast.IndexExpr{
+	result := &ast.IndexExpr{
 		X:      x,
 		Lbrack: lbrack,
 		Index:  index[0],
 		Rbrack: rbrack,
 	}
+	return p.wrapOptional(result, p.tok)
+}
+
+func (p *parser) wrapOptional(x ast.Expr, tok token.Token) ast.Expr {
+	if tok == token.OPTION {
+		pos := p.pos
+		p.next()
+		return &ast.PostfixExpr{X: x, Op: token.OPTION, OpPos: pos}
+	}
+	return x
 }
 
 func (p *parser) parseCallOrConversion(fun ast.Expr) (expr *ast.CallExpr) {
@@ -1010,7 +1030,7 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, decl ast.
 	tok := p.tok
 	switch tok {
 
-	case token.FOR, token.IF:
+	case token.FOR, token.IF, token.TRY:
 		if rhs {
 			expr = p.parseExpr()
 			break
@@ -1185,6 +1205,36 @@ func (p *parser) parseComprehensionClauses() (clauses []ast.Clause, c *commentSt
 				Ident: ident,
 				Equal: assign,
 				Expr:  expr,
+			}))
+
+		case token.TRY:
+			c := p.openComments()
+			tryPos := p.expect(token.TRY)
+
+			// Check for assignment form: try x = expr
+			if p.tok == token.IDENT {
+				// Peek to see if this is assignment form (ident =) or struct form
+				p.peek()
+				if p.peekToken.tok == token.BIND {
+					// Assignment form: try x = expr
+					ident := p.parseIdent()
+					equalPos := p.expect(token.BIND)
+					expr := p.parseRHS()
+
+					clauses = append(clauses, c.closeClause(p, &ast.TryClause{
+						Try:   tryPos,
+						Ident: ident,
+						Equal: equalPos,
+						Expr:  expr,
+					}))
+					break
+				}
+			}
+
+			// Struct form: try { ... }
+			// Don't set Value - the struct becomes Comprehension.Value
+			clauses = append(clauses, c.closeClause(p, &ast.TryClause{
+				Try: tryPos,
 			}))
 
 		default:
@@ -1548,6 +1598,7 @@ L:
 					Period: period,
 					Sel:    p.parseIdent(),
 				}
+				x = p.wrapOptional(x, p.tok)
 			case token.STRING:
 				if strings.HasPrefix(p.lit, `"`) && !strings.HasPrefix(p.lit, `""`) {
 					str := &ast.BasicLit{
@@ -1561,6 +1612,7 @@ L:
 						Period: period,
 						Sel:    str,
 					}
+					x = p.wrapOptional(x, p.tok)
 					break
 				}
 				fallthrough
@@ -1571,6 +1623,7 @@ L:
 						Period: period,
 						Sel:    p.parseKeyIdent(),
 					}
+					x = p.wrapOptional(x, p.tok)
 					break
 				}
 

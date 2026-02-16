@@ -1,0 +1,488 @@
+-- a.cue --
+@experiment(try)
+// Test export of try clause in comprehensions
+
+// Basic try with successful reference
+tryBasic: {
+	x: 1
+	try { y: x? }
+}
+
+// Try with else - reference exists
+tryWithElseExists: {
+	x: 1
+	try { y: x? } else { z: 0 }
+}
+
+// Try with else - optional field missing (uses else)
+tryWithElseMissing: {
+	optField?: int
+	try { y: optField? } else { z: 0 }
+}
+
+// Try assignment form
+tryAssign: {
+	x: 1
+	try v = x? { y: v }
+}
+
+// Try assignment with else - optional field missing
+tryAssignElse: {
+	optField?: int
+	try v = optField? { y: v } else { z: 0 }
+}
+-- out/definition --
+@experiment(try)
+// Test export of try clause in comprehensions
+
+// Basic try with successful reference
+tryBasic: {
+	x: 1
+	try {
+		y: x?
+	}
+}
+
+// Try with else - reference exists
+tryWithElseExists: {
+	x: 1
+	try {
+		y: x?
+	} else {
+		z: 0
+	}
+}
+
+// Try with else - optional field missing (uses else)
+tryWithElseMissing: {
+	optField?: int
+	try {
+		y: optField?
+	} else {
+		z: 0
+	}
+}
+
+// Try assignment form
+tryAssign: {
+	x: 1
+	try v = x? {
+		y: v
+	}
+}
+
+// Try assignment with else - optional field missing
+tryAssignElse: {
+	optField?: int
+	try v = optField? {
+		y: v
+	} else {
+		z: 0
+	}
+}
+-- out/doc-v3 --
+[]
+[tryBasic]
+- Basic try with successful reference
+
+[tryBasic x]
+[tryBasic y]
+[tryWithElseExists]
+- Try with else - reference exists
+
+[tryWithElseExists x]
+[tryWithElseExists y]
+[tryWithElseMissing]
+- Try with else - optional field missing (uses else)
+
+[tryWithElseMissing optField]
+[tryWithElseMissing z]
+[tryAssign]
+- Try assignment form
+
+[tryAssign x]
+[tryAssign y]
+[tryAssignElse]
+- Try assignment with else - optional field missing
+
+[tryAssignElse optField]
+[tryAssignElse z]
+-- diff/-out/doc-v3<==>+out/doc --
+diff old new
+--- old
++++ new
+@@ -1,6 +1,4 @@
+ []
+-- Test export of try clause in comprehensions
+-
+ [tryBasic]
+ - Basic try with successful reference
+ 
+-- out/doc --
+[]
+- Test export of try clause in comprehensions
+
+[tryBasic]
+- Basic try with successful reference
+
+[tryBasic x]
+[tryBasic y]
+[tryWithElseExists]
+- Try with else - reference exists
+
+[tryWithElseExists x]
+[tryWithElseExists y]
+[tryWithElseMissing]
+- Try with else - optional field missing (uses else)
+
+[tryWithElseMissing optField]
+[tryWithElseMissing z]
+[tryAssign]
+- Try assignment form
+
+[tryAssign x]
+[tryAssign y]
+[tryAssignElse]
+- Try assignment with else - optional field missing
+
+[tryAssignElse optField]
+[tryAssignElse z]
+-- out/value-v3 --
+== Simplified
+{
+	// Basic try with successful reference
+	tryBasic: {
+		x: 1
+		y: 1
+	}
+
+	// Try with else - reference exists
+	tryWithElseExists: {
+		x: 1
+		y: 1
+	}
+
+	// Try with else - optional field missing (uses else)
+	tryWithElseMissing: {
+		z: 0
+	}
+
+	// Try assignment form
+	tryAssign: {
+		x: 1
+		y: 1
+	}
+
+	// Try assignment with else - optional field missing
+	tryAssignElse: {
+		z: 0
+	}
+}
+== Raw
+{
+	// Basic try with successful reference
+	tryBasic: {
+		x: 1
+		y: 1
+	}
+
+	// Try with else - reference exists
+	tryWithElseExists: {
+		x: 1
+		y: 1
+	}
+
+	// Try with else - optional field missing (uses else)
+	tryWithElseMissing: {
+		optField?: int
+		z:         0
+	}
+
+	// Try assignment form
+	tryAssign: {
+		x: 1
+		y: 1
+	}
+
+	// Try assignment with else - optional field missing
+	tryAssignElse: {
+		optField?: int
+		z:         0
+	}
+}
+== Final
+{
+	tryBasic: {
+		x: 1
+		y: 1
+	}
+	tryWithElseExists: {
+		x: 1
+		y: 1
+	}
+	tryWithElseMissing: {
+		z: 0
+	}
+	tryAssign: {
+		x: 1
+		y: 1
+	}
+	tryAssignElse: {
+		z: 0
+	}
+}
+== All
+{
+	@experiment(try)
+	// Test export of try clause in comprehensions
+
+	// Basic try with successful reference
+	tryBasic: {
+		x: 1
+		y: 1
+	}
+
+	// Try with else - reference exists
+	tryWithElseExists: {
+		x: 1
+		y: 1
+	}
+
+	// Try with else - optional field missing (uses else)
+	tryWithElseMissing: {
+		optField?: int
+		z:         0
+	}
+
+	// Try assignment form
+	tryAssign: {
+		x: 1
+		y: 1
+	}
+
+	// Try assignment with else - optional field missing
+	tryAssignElse: {
+		optField?: int
+		z:         0
+	}
+}
+== Eval
+{
+	@experiment(try)
+	// Test export of try clause in comprehensions
+	tryBasic: {
+		x: 1
+		y: 1
+	}
+	tryWithElseExists: {
+		x: 1
+		y: 1
+	}
+	tryWithElseMissing: {
+		optField?: int
+		z:         0
+	}
+	tryAssign: {
+		x: 1
+		y: 1
+	}
+	tryAssignElse: {
+		optField?: int
+		z:         0
+	}
+}
+-- diff/-out/value-v3<==>+out/value --
+diff old new
+--- old
++++ new
+@@ -83,6 +83,9 @@
+ }
+ == All
+ {
++	@experiment(try)
++	// Test export of try clause in comprehensions
++
+ 	// Basic try with successful reference
+ 	tryBasic: {
+ 		x: 1
+@@ -115,22 +118,26 @@
+ }
+ == Eval
+ {
+-	tryBasic: {
+-		x: 1
+-		y: 1
+-	}
+-	tryWithElseExists: {
+-		x: 1
+-		y: 1
+-	}
+-	tryWithElseMissing: {
+-		z: 0
+-	}
+-	tryAssign: {
+-		x: 1
+-		y: 1
+-	}
+-	tryAssignElse: {
+-		z: 0
++	@experiment(try)
++	// Test export of try clause in comprehensions
++	tryBasic: {
++		x: 1
++		y: 1
++	}
++	tryWithElseExists: {
++		x: 1
++		y: 1
++	}
++	tryWithElseMissing: {
++		optField?: int
++		z:         0
++	}
++	tryAssign: {
++		x: 1
++		y: 1
++	}
++	tryAssignElse: {
++		optField?: int
++		z:         0
+ 	}
+ }
+-- out/value --
+== Simplified
+{
+	// Basic try with successful reference
+	tryBasic: {
+		x: 1
+		y: 1
+	}
+
+	// Try with else - reference exists
+	tryWithElseExists: {
+		x: 1
+		y: 1
+	}
+
+	// Try with else - optional field missing (uses else)
+	tryWithElseMissing: {
+		z: 0
+	}
+
+	// Try assignment form
+	tryAssign: {
+		x: 1
+		y: 1
+	}
+
+	// Try assignment with else - optional field missing
+	tryAssignElse: {
+		z: 0
+	}
+}
+== Raw
+{
+	// Basic try with successful reference
+	tryBasic: {
+		x: 1
+		y: 1
+	}
+
+	// Try with else - reference exists
+	tryWithElseExists: {
+		x: 1
+		y: 1
+	}
+
+	// Try with else - optional field missing (uses else)
+	tryWithElseMissing: {
+		optField?: int
+		z:         0
+	}
+
+	// Try assignment form
+	tryAssign: {
+		x: 1
+		y: 1
+	}
+
+	// Try assignment with else - optional field missing
+	tryAssignElse: {
+		optField?: int
+		z:         0
+	}
+}
+== Final
+{
+	tryBasic: {
+		x: 1
+		y: 1
+	}
+	tryWithElseExists: {
+		x: 1
+		y: 1
+	}
+	tryWithElseMissing: {
+		z: 0
+	}
+	tryAssign: {
+		x: 1
+		y: 1
+	}
+	tryAssignElse: {
+		z: 0
+	}
+}
+== All
+{
+	// Basic try with successful reference
+	tryBasic: {
+		x: 1
+		y: 1
+	}
+
+	// Try with else - reference exists
+	tryWithElseExists: {
+		x: 1
+		y: 1
+	}
+
+	// Try with else - optional field missing (uses else)
+	tryWithElseMissing: {
+		optField?: int
+		z:         0
+	}
+
+	// Try assignment form
+	tryAssign: {
+		x: 1
+		y: 1
+	}
+
+	// Try assignment with else - optional field missing
+	tryAssignElse: {
+		optField?: int
+		z:         0
+	}
+}
+== Eval
+{
+	tryBasic: {
+		x: 1
+		y: 1
+	}
+	tryWithElseExists: {
+		x: 1
+		y: 1
+	}
+	tryWithElseMissing: {
+		z: 0
+	}
+	tryAssign: {
+		x: 1
+		y: 1
+	}
+	tryAssignElse: {
+		z: 0
+	}
+}

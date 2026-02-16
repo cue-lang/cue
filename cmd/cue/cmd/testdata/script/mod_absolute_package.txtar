@@ -5,11 +5,24 @@ cmp stdout stdout1-golden
 exec cue export foo.com/bar@v0.0.3
 cmp stdout stdout2-golden
 
+! exec cue export foo.com/bar@v0
+stderr 'imports are unavailable because there is no cue.mod/module.cue file'
+
 ! exec cue export foo.com/bar@v2
 stderr 'imports are unavailable because there is no cue.mod/module.cue file'
 
 exec cue export foo.com/bar@v3.latest
 cmp stdout stdout3-golden
+
+# Check we can use it with cmd.
+exec cue cmd hello foo.com/bar@v0.0.3
+stdout 'hello from foo.com_v0.0.3/bar'
+
+exec cue cmd hello foo.com/bar@latest
+stdout 'hello from foo.com_v2.1.0/bar'
+
+! exec cue cmd hello foo.com/bar@v0
+stderr 'imports are unavailable because there is no cue.mod/module.cue file'
 
 # Check we can use it with vet.
 ! exec cue vet -d self foo.com/bar@v3.latest data.json
@@ -45,6 +58,14 @@ language: version: "v0.8.0"
 -- _registry/foo.com_v0.0.3/bar/x.cue --
 package bar
 self: "foo.com_v0.0.3/bar"
+-- _registry/foo.com_v0.0.3/bar/x_tool.cue --
+package bar
+
+import "tool/cli"
+
+command: hello: cli.Print & {
+	text: "hello from \(self)"
+}
 
 -- _registry/foo.com_v0.1.0/cue.mod/module.cue --
 module: "foo.com@v0"
@@ -73,6 +94,14 @@ language: version: "v0.8.0"
 -- _registry/foo.com_v2.1.0/bar/x.cue --
 package bar
 self: "foo.com_v2.1.0/bar"
+-- _registry/foo.com_v2.1.0/bar/x_tool.cue --
+package bar
+
+import "tool/cli"
+
+command: hello: cli.Print & {
+	text: "hello from \(self)"
+}
 
 -- _registry/foo.com_v2.1.1-pre/cue.mod/module.cue --
 module: "foo.com@v2"

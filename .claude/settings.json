@@ -44,6 +44,8 @@
       "Bash(git checkout:*)",
       "Bash(git stash:*)",
       "Bash(git rebase:*)",
+      "Bash(git fetch:*)",
+      "Bash(git apply:*)",
       "Bash(git mv:*)",
       "Bash(git rm:*)",
       "Bash(gh issue view:*)",
@@ -58,7 +60,15 @@
       "Bash(gh run view:*)",
       "Bash(gh run list:*)",
       "Bash(gh workflow view:*)",
-      "Bash(gh workflow list:*)"
+      "Bash(gh workflow list:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:gist.github.com)"
+    ],
+    "deny": [
+      "Bash(cat:*)",
+      "Bash(sed:*)",
+      "Bash(git -C:*)",
+      "Edit(//tmp/**/*)"
     ]
   }
 }

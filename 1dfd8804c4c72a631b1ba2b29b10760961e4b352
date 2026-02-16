@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7d11ebe_1500cc98",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-02-16T12:54:39Z",
+      "side": 1,
+      "message": "but it moves it away from the other methods that create *Bottom values.",
+      "revId": "1dfd8804c4c72a631b1ba2b29b10760961e4b352",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+#version: v0.16.0
+-- try.input --
+@experiment(try)
+package tryclauses
+
+// Basic struct-form try
+a: {
+	try { x: val? }
+}
+
+// Try with else
+b: {
+	try { x: val? } else { fallback: 0 }
+}
+
+// Assignment form
+c: {
+	try x = val? { result: x }
+}
+
+// Assignment form with else
+d: {
+	try x = val? { result: x } else { fallback: 0 }
+}
+
+// Chained try clauses
+e: {
+	try x = a? try y = b? { sum: x + y }
+}
+
+// Try in for comprehension
+f: {
+	for k, v in obj try { "\(k)": v? }
+}
+
+// Optional on selector expression
+g: {
+	try { x: obj.field? }
+}
+
+// Optional on index expression
+h: {
+	try { x: list[0]? }
+}
+
+// Optional on nested selector
+i: {
+	try { x: a.b.c? }
+}
+
+// Multiple optional markers
+j: {
+	try { x: a? + b? }
+}
+
+// Nested try
+k: {
+	try {
+		outer: a?
+		try { inner: b? }
+	}
+}
+
+// Try with complex expression
+l: {
+	try x = (a? + b?) * 2 { result: x }
+}
+
+-- out/format/try.golden --
+@experiment(try)
+package tryclauses
+
+// Basic struct-form try
+a: {
+	try {x: val?}
+}
+
+// Try with else
+b: {
+	try {x: val?} else {fallback: 0}
+}
+
+// Assignment form
+c: {
+	try x = val? {result: x}
+}
+
+// Assignment form with else
+d: {
+	try x = val? {result: x} else {fallback: 0}
+}
+
+// Chained try clauses
+e: {
+	try x = a? try y = b? {sum: x + y}
+}
+
+// Try in for comprehension
+f: {
+	for k, v in obj try {"\(k)": v?}
+}
+
+// Optional on selector expression
+g: {
+	try {x: obj.field?}
+}
+
+// Optional on index expression
+h: {
+	try {x: list[0]?}
+}
+
+// Optional on nested selector
+i: {
+	try {x: a.b.c?}
+}
+
+// Multiple optional markers
+j: {
+	try {x: a? + b?}
+}
+
+// Nested try
+k: {
+	try {
+		outer: a?
+		try {inner: b?}
+	}
+}
+
+// Try with complex expression
+l: {
+	try x = (a? + b?) * 2 {result: x}
+}

@@ -706,6 +706,14 @@ func (c *visitor) markClauses(env *adt.Environment, a []adt.Yielder) *adt.Enviro
 			c.markExpr(env, x.Condition)
 			// In dynamic mode, only continue if condition is true.
 
+		case *adt.TryClause:
+			if x.Expr != nil {
+				// Assignment form: try x = expr
+				c.markExpr(env, x.Expr)
+				env = &adt.Environment{Up: env, Vertex: empty}
+			}
+			// Struct form: no expression, body is in Comprehension.Value
+
 		case *adt.ValueClause:
 			env = &adt.Environment{Up: env, Vertex: empty}
 		}

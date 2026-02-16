@@ -148,3 +148,10 @@ func (l *letScope) labelString() string {
 	// TODO: include more info in square brackets.
 	return "let[]"
 }
+
+type tryScope ast.TryClause
+
+func (t *tryScope) labelString() string {
+	// TODO: include more info in square brackets.
+	return "try[]"
+}

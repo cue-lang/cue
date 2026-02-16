@@ -827,6 +827,18 @@ func (f *formatter) clause(clause ast.Clause) {
 		f.expr(n.Expr)
 		f.markUnindentLine()
 
+	case *ast.TryClause:
+		f.print(n.Try, token.TRY)
+		if n.Ident != nil {
+			// Assignment form: try x = expr
+			f.print(blank, nooverride, indent)
+			f.expr(n.Ident)
+			f.print(blank, nooverride, n.Equal, token.BIND, blank)
+			f.expr(n.Expr)
+			f.markUnindentLine()
+		}
+		// Struct form: just "try" - body comes from Comprehension.Value
+
 	default:
 		panic("unknown clause type")
 	}

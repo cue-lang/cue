@@ -160,6 +160,7 @@ type OpContext struct {
 
 	errs      *Bottom
 	positions []Node // keep track of error positions
+	skipTry   bool   // set when an option reference is not present
 
 	// vertex is used to determine the path location in case of error. Turning
 	// this into a stack could also allow determining the cyclic path for

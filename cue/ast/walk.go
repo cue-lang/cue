@@ -137,6 +137,14 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 		Walk(n.Ident, before, after)
 		Walk(n.Expr, before, after)
 
+	case *TryClause:
+		if n.Ident != nil {
+			// Assignment form: try x = expr
+			Walk(n.Ident, before, after)
+			Walk(n.Expr, before, after)
+		}
+		// Struct form: body is in Comprehension.Value, walked separately
+
 	case *Alias:
 		Walk(n.Ident, before, after)
 		Walk(n.Expr, before, after)

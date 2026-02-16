@@ -1,0 +1,104 @@
+-- in.cue --
+@experiment(try)
+
+// Struct-form try must be the last clause
+structFormNotLast: {
+    try if true { x: 1 }
+}
+
+// ? marker outside try context
+optionalOutsideTry: {
+    a: 1
+    b: a?
+}
+
+// ? marker in for clause source (outside try)
+optionalInForSource: {
+    a?: [1, 2, 3]
+    for x in a? { "\(x)": x }
+}
+
+// ? marker in body of assignment-form try
+optionalInAssignmentBody: {
+    a: 1
+    b: 2
+    try y = a? { x: b? } else { fallback: 23 }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  2
+Reused: 2
+Allocs: 0
+Retain: 0
+
+Unifications: 2
+Conjuncts:    2
+Disjuncts:    2
+
+NumCloseIDs: 0
+-- out/evalalpha --
+structFormNotLast: struct-form try clause must be the last clause in a comprehension:
+    ./in.cue:5:5
+optionalOutsideTry.b: optional marker (?) is only valid within a try clause:
+    ./in.cue:11:8
+optionalInForSource: optional marker (?) is only valid within a try clause:
+    ./in.cue:17:14
+optionalInAssignmentBody.try[].x: optional marker (?) is only valid within a try clause:
+    ./in.cue:24:21
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -3,4 +3,6 @@
+ optionalOutsideTry.b: optional marker (?) is only valid within a try clause:
+     ./in.cue:11:8
+ optionalInForSource: optional marker (?) is only valid within a try clause:
+-    ./in.cue:16:14
++    ./in.cue:17:14
++optionalInAssignmentBody.try[].x: optional marker (?) is only valid within a try clause:
++    ./in.cue:24:21
+-- out/eval --
+structFormNotLast: struct-form try clause must be the last clause in a comprehension:
+    ./in.cue:5:5
+optionalOutsideTry.b: optional marker (?) is only valid within a try clause:
+    ./in.cue:11:8
+optionalInForSource: optional marker (?) is only valid within a try clause:
+    ./in.cue:16:14
+-- out/compile --
+structFormNotLast: struct-form try clause must be the last clause in a comprehension:
+    ./in.cue:5:5
+optionalOutsideTry.b: optional marker (?) is only valid within a try clause:
+    ./in.cue:11:8
+optionalInForSource: optional marker (?) is only valid within a try clause:
+    ./in.cue:17:14
+optionalInAssignmentBody.try[].x: optional marker (?) is only valid within a try clause:
+    ./in.cue:24:21
+--- in.cue
+{
+  structFormNotLast: {
+    _|_(struct-form try clause must be the last clause in a comprehension)
+  }
+  optionalOutsideTry: {
+    a: 1
+    b: 〈0;a〉?
+  }
+  optionalInForSource: {
+    a?: [
+      1,
+      2,
+      3,
+    ]
+    for _, x in 〈0;a〉? {
+      "\(〈1;x〉)": 〈1;x〉
+    }
+  }
+  optionalInAssignmentBody: {
+    a: 1
+    b: 2
+    try y = 〈0;a〉? {
+      x: 〈2;b〉?
+    } else {
+      fallback: 23
+    }
+  }
+}

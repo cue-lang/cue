@@ -392,3 +392,4 @@ func (*Comprehension) node()     {}
 func (*ForClause) node()         {}
 func (*IfClause) node()          {}
 func (*LetClause) node()         {}
+func (*TryClause) node()         {}

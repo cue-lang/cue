@@ -564,9 +564,10 @@ func (x *NodeLink) resolve(c *OpContext, state Flags) *Vertex {
 //
 //	a
 type FieldReference struct {
-	Src     *ast.Ident
-	UpCount int32
-	Label   Feature
+	Src      *ast.Ident
+	UpCount  int32
+	Label    Feature
+	Optional bool // true if this is a ?-marked reference (e.g., a?)
 }
 
 func (x *FieldReference) Source() ast.Node {
@@ -579,7 +580,28 @@ func (x *FieldReference) Source() ast.Node {
 func (x *FieldReference) resolve(c *OpContext, state Flags) *Vertex {
 	n := c.relNode(x.UpCount)
 	pos := Pos(x)
-	return c.lookup(n, pos, x.Label, state)
+
+	savedErrs := c.errs
+	c.errs = nil
+	defer func() {
+		c.errs = CombineErrors(c.src, c.errs, savedErrs)
+	}()
+
+	v := c.lookup(n, pos, x.Label, state)
+
+	return c.checkSkipTry(x.Optional, v)
+}
+
+func (c *OpContext) checkSkipTry(optional bool, arc *Vertex) *Vertex {
+	if arc != nil {
+		return arc
+	}
+
+	if optional && c.errs != nil && c.errs.IsIncomplete() {
+		c.skipTry = true
+	}
+
+	return nil
 }
 
 // A ValueReference represents a lexical reference to a value.
@@ -845,10 +867,12 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 // A SelectorExpr looks up a fixed field in an expression.
 //
 //	a.sel
+//	a.sel? (optional - returns OptionalUndefined if field doesn't exist)
 type SelectorExpr struct {
-	Src *ast.SelectorExpr
-	X   Expr
-	Sel Feature
+	Src      *ast.SelectorExpr
+	X        Expr
+	Sel      Feature
+	Optional bool // true if selector has ? suffix (e.g., foo.bar?)
 }
 
 func (x *SelectorExpr) Source() ast.Node {
@@ -871,17 +895,27 @@ func (x *SelectorExpr) resolve(c *OpContext, state Flags) *Vertex {
 	// will otherwise be discarded and there will be no other chance to check
 	// the struct is valid.
 
+	savedErrs := c.errs
+	c.errs = nil
+	defer func() {
+		c.errs = CombineErrors(c.src, c.errs, savedErrs)
+	}()
+
 	pos := x.Src.Sel.Pos()
-	return c.lookup(n, pos, x.Sel, state)
+	result := c.lookup(n, pos, x.Sel, state)
+
+	return c.checkSkipTry(x.Optional, result)
 }
 
 // IndexExpr is like a selector, but selects an index.
 //
 //	a[index]
+//	a[index]? (optional - returns OptionalUndefined if index doesn't exist)
 type IndexExpr struct {
-	Src   *ast.IndexExpr
-	X     Expr
-	Index Expr
+	Src      *ast.IndexExpr
+	X        Expr
+	Index    Expr
+	Optional bool // true if index has ? suffix (e.g., foo[0]?)
 }
 
 func (x *IndexExpr) Source() ast.Node {
@@ -920,8 +954,18 @@ func (x *IndexExpr) resolve(ctx *OpContext, state Flags) *Vertex {
 	if ctx.errs != nil {
 		return nil
 	}
+
+	// TODO: uncomment once above code can be removed.
+	// savedErrs := ctx.errs
+	// ctx.errs = nil
+	// defer func() {
+	// 	ctx.errs = CombineErrors(ctx.src, ctx.errs, savedErrs)
+	// }()
+
 	pos := x.Src.Index.Pos()
-	return ctx.lookup(n, pos, f, state)
+	result := ctx.lookup(n, pos, f, state)
+
+	return ctx.checkSkipTry(x.Optional, result)
 }
 
 // A SliceExpr represents a slice operation. (Not currently in spec.)
@@ -2174,4 +2218,79 @@ func (x *LetClause) yield(s *compState) {
 	}}
 
 	s.yield(c.spawn(n))
+}
+
+// A TryClause represents a try clause in a comprehension.
+// It evaluates its body and yields if successful. If a ?-marked reference
+// fails due to an undefined optional field, the try clause discards silently.
+// Other errors propagate normally.
+//
+//	try { ... }
+//
+// TryClause represents a try clause in a comprehension.
+// It can have two forms:
+//   - try { struct } - Value is set, Label/Expr are zero/nil
+//   - try x = expr   - Label/Expr are set, Value is nil
+type TryClause struct {
+	Src   *ast.TryClause
+	Label Feature // identifier for assignment form (InvalidLabel for struct form)
+	Expr  Expr    // expression for assignment form (nil for struct form)
+	// Struct form: body is in Comprehension.Value
+}
+
+func (x *TryClause) Source() ast.Node {
+	if x.Src == nil {
+		return nil
+	}
+	return x.Src
+}
+
+func (x *TryClause) yield(s *compState) {
+	c := s.ctx
+	env := c.e
+
+	// Pre-evaluate the try body to detect OptionalUndefined errors from
+	// ?-marked references. If any ?-marked reference fails, the try block
+	// is discarded and the else clause (if present) runs.
+	//
+	// Final (non-incomplete) errors are reported immediately as an optimization,
+	// since they would be encountered during re-evaluation anyway.
+
+	// Save state
+	savedSkipTry := c.skipTry
+	c.skipTry = false
+	defer func() { c.skipTry = savedSkipTry }()
+
+	// TODO(perf): we could capture "final" errors and bail out processing of
+	// the try expression early.
+
+	var expr Expr
+	if x.Expr != nil {
+		expr = x.Expr
+	} else {
+		// Struct form: body is in Comprehension.Value
+		expr = s.comp.Value.(Expr)
+	}
+
+	v := c.newInlineVertex(env.DerefVertex(c), nil, Conjunct{env, expr, c.ci})
+	v.Finalize(c)
+
+	// If any ?-marked reference failed, don't yield - else clause runs.
+	// Check for OptionalUndefined - set by ?-marked references that fail.
+	if c.skipTry {
+		return
+	}
+
+	// Success - yield with fresh conjuncts (will be re-evaluated).
+	if x.Expr != nil {
+		n := &Vertex{Arcs: []*Vertex{{
+			Label:     x.Label,
+			IsDynamic: true,
+			anonymous: true,
+			Conjuncts: []Conjunct{{c.Env(0), x.Expr, c.ci}},
+		}}}
+		s.yield(c.spawn(n))
+	} else {
+		s.yield(env)
+	}
 }

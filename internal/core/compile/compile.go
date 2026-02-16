@@ -119,6 +119,11 @@ type compiler struct {
 	// across different iterations of the same field.
 	refersToForVariable bool
 
+	// inTryContext tracks the nesting depth of try clauses. The ? marker on
+	// references is only valid when inTryContext > 0. In the future, this may
+	// also be set by other contexts like exists() builtins or query contexts.
+	inTryContext int
+
 	fileScope map[adt.Feature]bool
 
 	num literal.NumInfo
@@ -887,6 +892,7 @@ func (c *compiler) elem(n ast.Expr) adt.Elem {
 
 func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 	var a []adt.Yielder
+	hasTry := false
 	for _, v := range x.Clauses {
 		switch x := v.(type) {
 		case *ast.ForClause:
@@ -930,11 +936,53 @@ func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 			defer c.popScope()
 			f.isComprehensionVar = !inList && refsCompVar
 			a = append(a, y)
+
+		case *ast.TryClause:
+			// Check experiment flag
+			if !c.experiments.Try {
+				return c.errf(x, "try clause requires the try experiment (language version v0.16.0 or later)")
+			}
+			y := &adt.TryClause{Src: x}
+			if x.Ident == nil {
+				// Struct form: try { ... }
+				hasTry = true
+			} else {
+				// Bind form try x = expr
+				savedUses := c.refersToForVariable
+				c.refersToForVariable = false
+
+				// Enable try context for the expression
+				c.inTryContext++
+				expr := c.expr(x.Expr)
+				c.inTryContext--
+
+				refsCompVar := c.refersToForVariable
+				c.refersToForVariable = savedUses || refsCompVar
+
+				y.Label = c.label(x.Ident)
+				y.Expr = expr
+
+				// Push a scope for the identifier binding.
+				f := c.pushScope((*tryScope)(x), 1, v)
+				defer c.popScope()
+				f.isComprehensionVar = !inList && refsCompVar
+			}
+			// Struct form: body is in Comprehension.Value, compiled with try context
+			a = append(a, y)
 		}
 
 		if _, ok := a[0].(*adt.LetClause); ok {
 			return c.errf(x,
 				"first comprehension clause must be 'if' or 'for'")
+		}
+
+		// Check that struct-form try (without assignment) is the last clause.
+		// It gets its body from Comprehension.Value, so it must be last.
+		for i, clause := range a[:len(a)-1] {
+			if tc, ok := clause.(*adt.TryClause); ok && tc.Expr == nil {
+				return c.errf(x.Clauses[i],
+					"struct-form try clause must be the last clause in a comprehension")
+			}
 		}
 	}
 
@@ -944,7 +992,14 @@ func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 			"comprehension value must be struct, found %T", y)
 	}
 
+	// Enable try context for struct form try clause body
+	if hasTry {
+		c.inTryContext++
+	}
 	y := c.expr(x.Value)
+	if hasTry {
+		c.inTryContext--
+	}
 
 	st, ok := y.(*adt.StructLit)
 	if !ok {
@@ -1073,11 +1128,11 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		// standard library, look up the builtin, and check its version. The
 		// index of standard libraries is available in c.index, which is really
 		// an adt.Runtime under the hood.
-		ret := &adt.SelectorExpr{
+		return &adt.SelectorExpr{
 			Src: n,
 			X:   x,
-			Sel: c.label(n.Sel)}
-		return ret
+			Sel: c.label(n.Sel),
+		}
 
 	case *ast.IndexExpr:
 		return &adt.IndexExpr{
@@ -1212,13 +1267,39 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 	case *ast.PostfixExpr:
 		switch n.Op {
 		case token.ELLIPSIS:
-			if c.experiments.ExplicitOpen {
-				return &adt.OpenExpr{
-					Src: n,
-					X:   c.expr(n.X),
-				}
+			if !c.experiments.ExplicitOpen {
+				// TODO: consider not returning.
+				return c.errf(n, "postfix ... operator requires @experiment(explicitopen)")
 			}
-			return c.errf(n, "postfix ... operator requires @experiment(explicitopen)")
+
+			return &adt.OpenExpr{
+				Src: n,
+				X:   c.expr(n.X),
+			}
+
+		case token.OPTION:
+			if !c.experiments.Try {
+				c.errf(n, "optional marker (?) requires the try experiment (language version v0.16.0 or later)")
+			} else if c.inTryContext == 0 {
+				c.errf(n, "optional marker (?) is only valid within a try clause")
+			}
+
+			// Compile the inner expression first, then validate.
+			// This gives better error output by showing the reference.
+			x := c.expr(n.X)
+			switch r := x.(type) {
+			case *adt.FieldReference:
+				r.Optional = true
+				return r
+			case *adt.SelectorExpr:
+				r.Optional = true
+				return r
+			case *adt.IndexExpr:
+				r.Optional = true
+				return r
+			default:
+				return c.errf(n, "optional marker (?) can only be used on references")
+			}
 		default:
 			return c.errf(n, "unsupported postfix operator %s", n.Op)
 		}

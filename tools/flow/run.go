@@ -67,11 +67,18 @@ func (c *Controller) runLoop() {
 				waiting = true
 
 			case Ready:
-				running = true
-
 				t.state = Running
 				c.updateTaskValue(t)
 
+				// If the task's path no longer resolves in the configuration
+				// (e.g. because a conditional guard was eliminated as the
+				// config became more concrete), skip this task.
+				if !t.v.Exists() {
+					t.state = Terminated
+					continue
+				}
+
+				running = true
 				t.ctxt = eval.NewContext(value.ToInternal(t.v))
 
 				go func(t *Task) {

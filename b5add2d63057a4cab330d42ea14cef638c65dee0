@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3855ce1a_883b8057",
+        "filename": "internal/internal.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-16T13:12:08Z",
+      "side": 1,
+      "message": "nit: is?",
+      "range": {
+        "startLine": 247,
+        "startChar": 50,
+        "endLine": 247,
+        "endChar": 53
+      },
+      "revId": "b5add2d63057a4cab330d42ea14cef638c65dee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95d77df5_ba1515a4",
+        "filename": "internal/internal.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-16T13:12:08Z",
+      "side": 1,
+      "message": "how about `keepBraces`?",
+      "range": {
+        "startLine": 248,
+        "startChar": 24,
+        "endLine": 248,
+        "endChar": 41
+      },
+      "revId": "b5add2d63057a4cab330d42ea14cef638c65dee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

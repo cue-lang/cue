@@ -21,11 +21,19 @@ The try clause SHALL require the `@experiment(try)` attribute for language versi
 - **AND** code uses `a?` anywhere
 - **THEN** compile error: "optional marker (?) requires the try experiment"
 
-### Requirement: Optional marker only valid within try context
-The `?` marker on references (identifiers, selectors, indices) SHALL only be valid within a try clause body. Using `?` outside of try SHALL produce a compile error.
+### Requirement: Optional marker only valid within try expression scope
+The `?` marker on references (identifiers, selectors, indices) SHALL only be valid within the try expression scope:
+- **Struct form** (`try { struct }`): `?` is valid within the struct
+- **Assignment form** (`try x = expr { body }`): `?` is valid only in `expr`, NOT in `body`
 
-#### Scenario: Optional marker in try body succeeds
+Using `?` outside of try or in the body of assignment-form try SHALL produce a compile error.
+
+#### Scenario: Optional marker in struct form succeeds
 - **WHEN** `@experiment(try)` and `try { x: a? }`
+- **THEN** compiles successfully
+
+#### Scenario: Optional marker in assignment expression succeeds
+- **WHEN** `@experiment(try)` and `try y = a? + b? { x: y }`
 - **THEN** compiles successfully
 
 #### Scenario: Optional marker outside try fails
@@ -34,7 +42,7 @@ The `?` marker on references (identifiers, selectors, indices) SHALL only be val
 
 #### Scenario: Optional marker in assignment form body fails
 - **WHEN** `@experiment(try)` and `try y = a? { x: b? }`
-- **THEN** compile error: optional marker (?) is not valid in assignment-form try body
+- **THEN** compile error: "optional marker (?) is only valid within a try clause"
 
 ### Requirement: Optional marker tests existence only
 The `?` marker SHALL only test whether a field exists, NOT whether its value is concrete. An incomplete value (such as a type constraint like `int`) SHALL be considered to exist and SHALL be returned successfully.

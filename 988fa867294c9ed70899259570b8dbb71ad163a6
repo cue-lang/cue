@@ -16,6 +16,23 @@
       "message": "FYI Rog, this fixes an issue of yours from a couple of years ago, if you want to check :) \n\nThis applies to values which are exactly a package struct value, so I\u0027m fairly sure it should not break any users, as it\u0027s impossible for an imported package value to directly gain fields.",
       "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c275e51d_e78f7d5e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-16T23:17:29Z",
+      "side": 1,
+      "message": "Unsurprisingly, the Unity failure is surfacing an actual bug in third party user code!\n\n\u003e \tkind:       v1.#PrometheusKind\n\nThis definition does not exist; they actually meant:\n\n\u003e \tkind:       v1.#PrometheusesKind",
+      "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

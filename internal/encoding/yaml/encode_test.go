@@ -243,6 +243,78 @@ route:
   receiver: pager
   group_by: [alertname, cluster]
 		`,
+	}, {
+		name: "yaml_tag_scalar",
+		in: `
+		key: "value" @yaml(,tag="!Custom")
+		env: "VAR_NAME" @yaml(,tag="!Env")
+		`,
+		out: `
+key: !Custom value
+env: !Env VAR_NAME
+		`,
+	}, {
+		name: "yaml_tag_sequence",
+		in: `
+		lookup: ["table", ["key", "value"]] @yaml(,tag="!Find")
+		items: [1, 2, 3] @yaml(,tag="!Seq")
+		`,
+		out: `
+lookup: !Find [table, [key, value]]
+items: !Seq [1, 2, 3]
+		`,
+	}, {
+		name: "yaml_tag_mapping",
+		in: `
+		config: {
+			key: "value"
+			count: 42
+		} @yaml(,tag="!Map")
+		`,
+		out: `
+config: !Map
+  key: value
+  count: 42
+		`,
+	}, {
+		name: "yaml_tag_mixed",
+		in: `
+		plain: "no-tag"
+		tagged: "has-tag" @yaml(,tag="!Custom")
+		nested: {
+			field: "value" @yaml(,tag="!Nested")
+		}
+		`,
+		out: `
+plain: no-tag
+tagged: !Custom has-tag
+nested:
+  field: !Nested value
+		`,
+	}, {
+		name: "yaml_tag_verbatim",
+		in: `
+		custom: "value" @yaml(,tag="!<tag:example.com,2000:app/foo>")
+		`,
+		out: `
+custom: !%3Ctag:example.com,2000:app/foo%3E value
+		`,
+	}, {
+		name: "yaml_tag_url",
+		in: `
+		item: "value" @yaml(,tag="!<https://example.com/schema/v1>")
+		`,
+		out: `
+item: !%3Chttps://example.com/schema/v1%3E value
+		`,
+	}, {
+		name: "yaml_attribute_without_tag",
+		in: `
+		field: "value" @yaml(,other="ignored")
+		`,
+		out: `
+field: value
+		`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

@@ -234,6 +234,28 @@ func encodeExprs(exprs []ast.Expr) (n *yaml.Node, err error) {
 	return n, nil
 }
 
+// extractYAMLTag looks for @yaml(,tag="...") attribute and returns the tag value.
+// Returns an empty string if no @yaml attribute or no tag argument is found.
+// Returns an error if the attribute is malformed.
+func extractYAMLTag(attrs []*ast.Attribute) (string, error) {
+	for _, attr := range attrs {
+		key, body := attr.Split()
+		if key != "yaml" {
+			continue
+		}
+		parsed := internal.ParseAttrBody(attr.Pos(), body)
+		if parsed.Err != nil {
+			return "", parsed.Err
+		}
+		if val, found, err := parsed.Lookup(1, "tag"); err != nil {
+			return "", err
+		} else if found {
+			return val, nil
+		}
+	}
+	return "", nil
+}
+
 // encodeDecls converts a sequence of declarations to a value. If it encounters
 // an embedded value, it will return this expression. This is more relaxed for
 // structs than is currently allowed for CUE, but the expectation is that this
@@ -289,6 +311,15 @@ func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
 			if err != nil {
 				return nil, err
 			}
+
+			yamlTag, err := extractYAMLTag(x.Attrs)
+			if err != nil {
+				return nil, err
+			}
+			if yamlTag != "" {
+				value.Tag = yamlTag
+			}
+
 			lastHead = label
 			lastFoot = value
 			addDocs(x, label, value)

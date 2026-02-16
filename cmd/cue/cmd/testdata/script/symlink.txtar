@@ -70,7 +70,7 @@ deps: {
 x: true
 z: true
 dep: {
-    self: "deps.example/d1"
+	self: "deps.example/d1"
 }
 -- want-stdout-3 --
 x: true

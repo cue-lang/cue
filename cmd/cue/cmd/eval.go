@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 
@@ -85,6 +86,7 @@ const (
 )
 
 func runEval(cmd *Command, args []string) error {
+	log.Printf("XXXX")
 	b, err := parseArgs(cmd, args, &config{mode: filetypes.Eval})
 	if err != nil {
 		return err
@@ -100,11 +102,9 @@ func runEval(cmd *Command, args []string) error {
 
 	// Keep for legacy reasons. Note that `cue eval` is to be deprecated by
 	// `cue` eventually.
-	opts := []format.Option{
-		format.UseSpaces(4),
-		format.TabIndent(false),
-	}
+	opts := []format.Option{}
 	if flagSimplify.Bool(cmd) {
+		log.Printf("adding Simplify")
 		opts = append(opts, format.Simplify())
 	}
 	b.encConfig.Format = opts
@@ -138,9 +138,11 @@ func runEval(cmd *Command, args []string) error {
 		}
 
 		if flagConcrete.Bool(cmd) {
+			log.Printf("adding Concrete")
 			syn = append(syn, cue.Concrete(true))
 		}
 		if flagHidden.Bool(cmd) || flagAll.Bool(cmd) {
+			log.Printf("adding Hidden")
 			syn = append(syn, cue.Hidden(true))
 		}
 
@@ -167,6 +169,9 @@ func runEval(cmd *Command, args []string) error {
 				}
 			}
 		}
+		fxx := v.Syntax(syn...)
+		data, _ := format.Node(fxx)
+		log.Printf("syntax: %q (opts %#v)", data, syn)
 
 		f := internal.ToFile(v.Syntax(syn...), false)
 		f.Filename = id

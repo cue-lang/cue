@@ -13,5 +13,6 @@ f: 234
 -- schema-optional.cue --
 f?: string
 -- want-stderr-optional --
+XXXX
 textproto: invalid string or bytes: invalid quote character 2:
     ./input.textproto:1:1

@@ -35,6 +35,7 @@ cmp stdout stdout-sort
 cd ..
 
 -- different-packages.stderr --
+XXXX
 found packages "kube" (kube.cue) and "kube2" (kube2.cue) in "."
 -- data.cue --
 foo:3
@@ -85,15 +86,15 @@ files: child_7: 0
 files: root_3: 0
 -- sort/stdout-sort --
 files: {
-    child_1:      0
-    child_2:      0
-    child_3:      0
-    child_5:      0
-    child_6:      0
-    child_7:      0
-    grandchild_1: 0
-    grandchild_2: 0
-    root_1:       0
-    root_3:       0
+	child_1:      0
+	child_2:      0
+	child_3:      0
+	child_5:      0
+	child_6:      0
+	child_7:      0
+	grandchild_1: 0
+	grandchild_2: 0
+	root_1:       0
+	root_3:       0
 }
 flat: ["root_1", "root_3", "child_1", "child_2", "child_3", "child_5", "child_6", "child_7", "grandchild_1", "grandchild_2"]

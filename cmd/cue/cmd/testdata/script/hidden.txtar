@@ -38,9 +38,9 @@ a: _h0: int
 -- expect-stdout --
 _top: 1
 a: {
-    _h0: int
+	_h0: int
 }
 #foo: {
-    _h1: string
+	_h1: string
 }
 _h2: string

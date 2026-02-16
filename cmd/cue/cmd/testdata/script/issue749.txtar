@@ -8,6 +8,8 @@ x : strconv.ParseFloat("3.14", 32)
 y : strconv.ParseFloat("3.14", 64)
 
 -- expect-stderr --
+XXXX
+syntax: "{\n\tx: 3.140000104904175\n\ty: 3.14\n}" (opts []cue.Option{(cue.Option)(0xe78ea0), (cue.Option)(0xe418a0), (cue.Option)(0xe41880), (cue.Option)(0xe41860), (cue.Option)(0xe41840)})
 -- expect-stdout --
 x: 3.140000104904175
 y: 3.14

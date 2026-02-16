@@ -74,5 +74,6 @@ nodes: [{
 #map: {for n in nodes {"\(n.name)": n}}
 
 -- out-stderr --
+XXXX
 #map: reference "nodes" not found:
     ./check.cue:1:17

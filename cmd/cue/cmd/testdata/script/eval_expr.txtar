@@ -6,6 +6,10 @@ cmp stdout expect-stdout
 // b.a.b
 4
 -- expect-stderr --
+XXXX
+adding Concrete
+syntax: "4" (opts []cue.Option{(cue.Option)(0xe78ea0), (cue.Option)(0xe418a0), (cue.Option)(0xe41880), (cue.Option)(0xe41860), (cue.Option)(0xe41840), (cue.Option)(0xe41720)})
+adding Concrete
 // b.idx
 b.idx: invalid non-ground value string (must be concrete string):
     ./partial.cue:8:7

@@ -6,4 +6,5 @@ stdin -
 cmp stderr expect-stderr
 -- - --
 -- expect-stderr --
+XXXX
 no CUE files in .

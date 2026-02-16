@@ -38,8 +38,8 @@ w: widget.#Widget
 
 -- expect-stdout-eval --
 w: {
-    model:    "retroencabulator"
-    explicit: "literal string"
+	model:    "retroencabulator"
+	explicit: "literal string"
 }
 -- expect-stdout-def --
 import "mod.test/config/components:widget"

@@ -18,24 +18,26 @@ data: {
     a: y: b.y
 }
 -- expect-stderr --
+XXXX
+syntax: "{\n\t#type: {\n\t\tx: 0\n\t\ty: 0\n\t\ti: 0\n\t\tj: 0\n\t}\n\tdata: {\n\t\ta: {\n\t\t\ti: 0\n\t\t\tj: 0\n\t\t\tx: 0\n\t\t\ty: 0\n\t\t}\n\t\tb: {\n\t\t\ti: 0\n\t\t\tj: 0\n\t\t\tx: 0\n\t\t\ty: 0\n\t\t}\n\t}\n}" (opts []cue.Option{(cue.Option)(0xe78ea0), (cue.Option)(0xe418a0), (cue.Option)(0xe41880), (cue.Option)(0xe41860), (cue.Option)(0xe41840)})
 -- expect-stdout --
 #type: {
-    x: 0
-    y: 0
-    i: 0
-    j: 0
+	x: 0
+	y: 0
+	i: 0
+	j: 0
 }
 data: {
-    a: {
-        i: 0
-        j: 0
-        x: 0
-        y: 0
-    }
-    b: {
-        i: 0
-        j: 0
-        x: 0
-        y: 0
-    }
+	a: {
+		i: 0
+		j: 0
+		x: 0
+		y: 0
+	}
+	b: {
+		i: 0
+		j: 0
+		x: 0
+		y: 0
+	}
 }

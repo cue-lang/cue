@@ -27,6 +27,7 @@ info: {
     title: "test title 2"
 }
 -- expect-stderr-openapi --
+XXXX
 info.title: conflicting values "test title 2" and "test title":
     ./repeated.cue:2:12
     ./repeated.cue:6:12

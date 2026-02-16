@@ -32,3 +32,5 @@ import "list"
 x: [1, 2, 3]
 sortedx: list.Sort(x, {})
 -- expect-stderr2 --
+XXXX
+syntax: "import \"list\"\n\nx: [1, 2, 3]\nsortedx: list.Sort(x, {})\n" (opts []cue.Option{(cue.Option)(0xe78ea0), (cue.Option)(0xe418a0), (cue.Option)(0xe41880), (cue.Option)(0xe41860), (cue.Option)(0xe41840)})

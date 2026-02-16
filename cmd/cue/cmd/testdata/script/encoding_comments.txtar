@@ -171,7 +171,7 @@ disjunction: _disjunction1 | _disjunction2
 -- eval-cue.stdout --
 #Schema: {}
 Data: {
-    name: "Foo"
+	name: "Foo"
 }
 foo:              "bar"
 implicitUnified:  "some value"
@@ -180,8 +180,8 @@ explicitUnified2: "some value"
 explicitUnified:  "some value"
 disjunction:      "some default"
 struct: {
-    field1: "message1"
-    field2: "message2"
+	field1: "message1"
+	field2: "message2"
 }
 list: [1, 2, 3]
 -- export-cue.stdout --

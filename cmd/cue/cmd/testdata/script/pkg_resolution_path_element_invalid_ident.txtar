@@ -41,7 +41,9 @@ x: 5
 -- stdout.golden --
 x: 5
 -- test2-import-stderr.golden --
+XXXX
 import failed: cannot determine package name for "mod.com/1x"; set it explicitly with ':':
     ./test2/root.cue:3:8
 -- test2-abs-stderr.golden --
+XXXX
 cannot determine package name for "mod.com/1x"; set it explicitly with ':'

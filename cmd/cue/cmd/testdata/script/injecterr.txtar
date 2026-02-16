@@ -26,6 +26,7 @@ cmp stderr expect-stderr
 }
 
 -- expect-stderr --
+XXXX
 @tag not allowed within field constraint:
     ./test.cue:5:18
 @tag not allowed within field constraint:

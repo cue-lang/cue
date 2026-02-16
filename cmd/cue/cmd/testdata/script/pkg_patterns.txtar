@@ -49,22 +49,31 @@ cmp stderr external-dots-middle.stderr
 cmp stderr external-dots-multimod.stderr
 
 -- external.stderr --
+XXXX
 pattern not allowed in external package path "example.com/foo/..."
 -- all.stderr --
+XXXX
 cue: "all" matched no packages
 -- cmd.stderr --
+XXXX
 cue: "cmd" matched no packages
 -- std.stderr --
+XXXX
 cue: "std" matched no packages
 -- dots.stderr --
+XXXX
 pattern not allowed in external package path "..."
 -- dots-prefix.stderr --
+XXXX
 pattern not allowed in external package path ".../leaf"
 -- current-dots-middle.stderr --
+XXXX
 cue: "mod.com/.../leaf" matched no packages
 -- external-dots-middle.stderr --
+XXXX
 pattern not allowed in external package path "example.com/foo/.../bar"
 -- external-dots-multimod.stderr --
+XXXX
 pattern not allowed in external package path "example.com/..."
 -- cue.mod/module.cue --
 module: "mod.com"

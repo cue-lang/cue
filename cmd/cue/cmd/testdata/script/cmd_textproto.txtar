@@ -34,4 +34,5 @@ a: 4
 b: [1, 2, 3, 4, 5]
 c: "foo"
 -- out/stderr3 --
+XXXX
 cannot combine --schema flag with flag "path", "list", or "files"

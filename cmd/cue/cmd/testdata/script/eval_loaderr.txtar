@@ -3,4 +3,5 @@
 cmp stderr expect-stderr
 
 -- expect-stderr --
+XXXX
 standard library import path "nonexisting" cannot be imported as a CUE package

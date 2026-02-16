@@ -23,14 +23,18 @@ cmp stdout expect/issue4202/stdout
 
 -- expect/nonExist/stdout --
 -- expect/nonExist/stderr --
+XXXX
 reference "nonExist" not found:
     --expression:1:1
 -- expect/incomplete/stdout --
 
 -- expect/incomplete/stderr --
+XXXX
+syntax: "{}" (opts []cue.Option{(cue.Option)(0xe78ea0), (cue.Option)(0xe418a0), (cue.Option)(0xe41880), (cue.Option)(0xe41860), (cue.Option)(0xe41840)})
 -- expect/foobar/stdout --
 
 -- expect/foobar/stderr --
+XXXX
 unknown file extension .bar
 -- input/ --
 -- partial.cue --

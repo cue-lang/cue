@@ -45,16 +45,16 @@ deps: {
 -- want-stdout-1 --
 prod: false
 x: {
-    self: "test.example/d2"
+	self: "test.example/d2"
 }
 -- want-stdout-2 --
 prod: true
 x: {
-    self:        "test.example/d1"
-    prodenabled: false
-    y: {
-        self: "test.example/d4"
-    }
+	self:        "test.example/d1"
+	prodenabled: false
+	y: {
+		self: "test.example/d4"
+	}
 }
 -- cue.mod/module.cue --
 module: "main.org"

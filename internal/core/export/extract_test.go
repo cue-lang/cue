@@ -39,7 +39,7 @@ func TestExtract(t *testing.T) {
 		r := t.Runtime()
 		a := t.Instance()
 
-		v, err := compile.Files(nil, r, "", a.Files...)
+		v, err := compile.Instance(nil, r, a)
 		if err != nil {
 			t.Fatal(err)
 		}

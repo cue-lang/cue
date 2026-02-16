@@ -4,7 +4,7 @@ cmp stdout expect-stdout
 import "list"
 
 def: {
-    #types: list.MinItems(1)
+	#types: list.MinItems(1)
 }
 -- in.cue --
 import (

@@ -52,6 +52,7 @@ command: user: {
 -- expect-stdout-vars --
 base: "script-inject"
 -- expect-stderr-err --
+XXXX
 tag variable 'userz' not found
 -- expect-stdout-override --
 base: "xxx"

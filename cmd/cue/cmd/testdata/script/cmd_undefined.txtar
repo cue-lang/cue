@@ -1,13 +1,13 @@
-skip 'TODO(evalv3): make this test work on evalv3'
+# TODO(#4194): the errors should mention "undefined field: DoesntExist".
 
 ! exec cue cmd tool
-stderr 'command.tool.bad: undefined field: DoesntExist'
+stderr 'command.tool: no tasks found'
 
 ! exec cue cmd builtin
-stderr 'command.builtin.bad: undefined field: DoesntExist'
+stderr 'command.builtin: no tasks found'
 
 ! exec cue cmd package
-stderr 'command.package.bad: undefined field: DoesntExist'
+stderr 'command.package: no tasks found'
 -- cue.mod/module.cue --
 module: "mod.test/test"
 language: version: "v0.9.0"

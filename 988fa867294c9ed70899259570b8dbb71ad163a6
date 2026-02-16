@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5934d97_2ca07ce1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-16T17:44:56Z",
+      "side": 1,
+      "message": "FYI Rog, this fixes an issue of yours from a couple of years ago, if you want to check :) \n\nThis applies to values which are exactly a package struct value, so I\u0027m fairly sure it should not break any users, as it\u0027s impossible for an imported package value to directly gain fields.",
+      "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

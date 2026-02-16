@@ -122,7 +122,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 	case build.JSON:
 		var expr ast.Expr
 		expr, err = parser.ParseExpr(filename, content)
-		syntax = internal.ToFile(expr)
+		syntax = internal.ToFile(expr, true)
 		if syntax == nil {
 			syntax = &ast.File{}
 		}

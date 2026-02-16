@@ -113,7 +113,7 @@ func (i *Decoder) File() *ast.File {
 	if i.file != nil {
 		return i.file
 	}
-	return internal.ToFile(i.expr)
+	return internal.ToFile(i.expr, false)
 }
 
 func (i *Decoder) Err() error {

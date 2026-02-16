@@ -48,7 +48,7 @@ func TestCompile(t *testing.T) {
 
 		a := t.Instance()
 
-		v, err := compile.Files(nil, r, "", a.Files...)
+		v, err := compile.Instance(nil, r, a)
 
 		// Write the results.
 		t.WriteErrors(err)

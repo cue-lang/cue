@@ -228,30 +228,30 @@ Result:
 --- in.cue
 {
   #def: {
-    _name: {
+    _name(:foo): {
       d: int
     }
   }
   d: (〈import;"mod.test/pkg"〉.#D & {
-    _name: {
+    _name(:foo): {
       d: int
     }
-    _val: {
+    _val(:foo): {
       f: 4
     }
   })
   e: ((〈import;"mod.test/pkg"〉.#D & 〈0;#def〉) & {
-    _name: {
+    _name(:foo): {
       c: int
     }
-    _val: {
+    _val(:foo): {
       g: int
     }
   })
   f: (〈import;"mod.test/pkg"〉.#D & {
-    _val: {
+    _val(:foo): {
       f: 4
     }
   })
-  g: 〈0;f〉._val
+  g: 〈0;f〉._val(:foo)
 }

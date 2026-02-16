@@ -50,7 +50,7 @@ func TestDefinition(t *testing.T) {
 		r := t.Runtime()
 		a := t.Instance()
 
-		v, errs := compile.Files(nil, r, "", a.Files...)
+		v, errs := compile.Instance(nil, r, a)
 		if errs != nil {
 			t.Fatal(errs)
 		}
@@ -294,7 +294,7 @@ func TestX(t *testing.T) {
 
 	ctx := cuecontext.New()
 	r := (*runtime.Runtime)(ctx)
-	v, errs := compile.Files(nil, r, "", a[0].Files...)
+	v, errs := compile.Instance(nil, r, a[0])
 	if errs != nil {
 		t.Fatal(errs)
 	}

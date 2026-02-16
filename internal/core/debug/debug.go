@@ -542,6 +542,9 @@ func (w *printer) node(n adt.Node) {
 		w.string(";")
 		w.label(x.Label)
 		w.string(closeTuple)
+		if x.Optional {
+			w.string("?")
+		}
 
 	case *adt.ValueReference:
 		w.string(openTuple)
@@ -582,12 +585,18 @@ func (w *printer) node(n adt.Node) {
 		w.node(x.X)
 		w.string(".")
 		w.label(x.Sel)
+		if x.Optional {
+			w.string("?")
+		}
 
 	case *adt.IndexExpr:
 		w.node(x.X)
 		w.string("[")
 		w.node(x.Index)
 		w.string("]")
+		if x.Optional {
+			w.string("?")
+		}
 
 	case *adt.SliceExpr:
 		w.node(x.X)
@@ -731,6 +740,16 @@ func (w *printer) node(n adt.Node) {
 		w.string(" = ")
 		w.node(x.Expr)
 		w.string(" ")
+
+	case *adt.TryClause:
+		w.string("try ")
+		if x.Label != adt.InvalidLabel {
+			// Assignment form: try x = expr
+			w.ident(x.Label)
+			w.string(" = ")
+			w.node(x.Expr)
+			w.string(" ")
+		}
 
 	case *adt.ValueClause:
 

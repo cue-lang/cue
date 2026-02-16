@@ -182,6 +182,14 @@ func (w *Visitor) node(n adt.Node) {
 		w.feature(x.Label, x)
 		w.node(x.Expr)
 
+	case *adt.TryClause:
+		if x.Expr != nil {
+			// Assignment form
+			w.feature(x.Label, x)
+			w.node(x.Expr)
+		}
+		// Struct form: body is in Comprehension.Value, walked separately
+
 	case *adt.ValueClause:
 
 	default:

@@ -74,6 +74,14 @@ Available per-file experiments:
     Spec change:   https://cuelang.org/cl/1221642
     Requires cue fix when upgrading
 
+  try (preview: v0.16.0)
+    try enables the try clause and optional reference markers (?).
+    The try clause allows conditional field inclusion based on whether
+    optional references resolve. The ? marker on references (a?, a.b?, a[i]?)
+    is only valid within a try context.
+    Proposal:      https://cuelang.org/issue/4019
+    Spec change:   https://cuelang.org/cl/1231444
+
 
 ## Global Experiments
 

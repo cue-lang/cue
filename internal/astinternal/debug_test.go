@@ -54,6 +54,7 @@ func TestDebugPrint(t *testing.T) {
 			// The syntax tree does not contain any maps, so
 			// the generated reference names should be deterministic.
 			full := astinternal.AppendDebug(nil, f, astinternal.DebugConfig{
+				OmitEmpty:       true,
 				IncludeNodeRefs: true,
 				IncludePointers: includePointers,
 				AllPositions:    allPositions,

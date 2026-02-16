@@ -27,20 +27,16 @@ for k, v in input if v > 2 {
 							NamePos: token.Pos("comprehensions.cue:2:2", newline)
 							Name: "a"
 						}
-						Alias: nil
-						Constraint: token.Token("ILLEGAL")
 						TokenPos: token.Pos("comprehensions.cue:2:3", nospace)
 						Value: *ast.BasicLit{
 							ValuePos: token.Pos("comprehensions.cue:2:5", blank)
 							Kind: token.Token("true")
 							Value: "true"
 						}
-						Attrs: []*ast.Attribute{}
 					}
 				}
 				Rbrace: token.Pos("comprehensions.cue:3:1", newline)
 			}
-			Else: nil
 		}
 		*ast.Comprehension{
 			Clauses: []ast.Clause{
@@ -92,23 +88,18 @@ for k, v in input if v > 2 {
 							}
 							Rparen: token.Pos("comprehensions.cue:5:4", nospace)
 						}
-						Alias: nil
-						Constraint: token.Token("ILLEGAL")
 						TokenPos: token.Pos("comprehensions.cue:5:5", nospace)
 						Value: *ast.Ident{
 							NamePos: token.Pos("comprehensions.cue:5:7", blank)
 							Name: "v"
 							Node: @ref001 (*ast.Ident)
 						}
-						Attrs: []*ast.Attribute{}
 					}
 				}
 				Rbrace: token.Pos("comprehensions.cue:6:1", newline)
 			}
-			Else: nil
 		}
 	}
-	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
 }
 -- out/debugprint/comprehensions.cue/omitempty-strings --

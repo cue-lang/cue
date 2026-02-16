@@ -20,33 +20,26 @@ b: 3
 				NamePos: token.Pos("file.cue:3:1", section)
 				Name: "a"
 			}
-			Alias: nil
-			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("file.cue:3:2", nospace)
 			Value: *ast.Ident@XXXX{
 				NamePos: token.Pos("file.cue:3:4", blank)
 				Name: "b"
 				Node: @XXXX (ast.BasicLit)
 			}
-			Attrs: []*ast.Attribute{}
 		}
 		*ast.Field@XXXX{
 			Label: *ast.Ident@XXXX{
 				NamePos: token.Pos("file.cue:4:1", newline)
 				Name: "b"
 			}
-			Alias: nil
-			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("file.cue:4:2", nospace)
 			Value: *ast.BasicLit@XXXX{
 				ValuePos: token.Pos("file.cue:4:4", blank)
 				Kind: token.Token("INT")
 				Value: "3"
 			}
-			Attrs: []*ast.Attribute{}
 		}
 	}
-	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
 }
 -- out/debugprint/file.cue/omitempty-strings --

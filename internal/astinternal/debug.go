@@ -135,6 +135,10 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 		d.printf(")")
 		return
 	case token.Token:
+		if d.cfg.OmitEmpty && v == token.ILLEGAL {
+			// ILLEGAL is the zero value, meaning "no token".
+			return
+		}
 		d.printf("%s(%q)", t, v)
 		return
 	}

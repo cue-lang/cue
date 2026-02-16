@@ -19,8 +19,6 @@ embed: {
 				NamePos: token.Pos("fields.cue:1:1", nospace)
 				Name: "a"
 			}
-			Alias: nil
-			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:1:2", nospace)
 			Value: *ast.BasicLit{
 				ValuePos: token.Pos("fields.cue:1:4", blank)
@@ -39,8 +37,6 @@ embed: {
 				NamePos: token.Pos("fields.cue:2:1", newline)
 				Name: "b"
 			}
-			Alias: nil
-			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:2:2", nospace)
 			Value: *ast.BasicLit{
 				ValuePos: token.Pos("fields.cue:2:4", blank)
@@ -63,30 +59,24 @@ embed: {
 				NamePos: token.Pos("fields.cue:3:1", newline)
 				Name: "c"
 			}
-			Alias: nil
 			Constraint: token.Token("!")
 			TokenPos: token.Pos("fields.cue:3:3", nospace)
 			Value: *ast.StructLit{
-				Lbrace: token.Pos("-")
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.Ident{
 							NamePos: token.Pos("fields.cue:3:5", blank)
 							Name: "d"
 						}
-						Alias: nil
 						Constraint: token.Token("?")
 						TokenPos: token.Pos("fields.cue:3:7", nospace)
 						Value: *ast.Ident{
 							NamePos: token.Pos("fields.cue:3:9", blank)
 							Name: "string"
 						}
-						Attrs: []*ast.Attribute{}
 					}
 				}
-				Rbrace: token.Pos("-")
 			}
-			Attrs: []*ast.Attribute{}
 		}
 		*ast.Field{
 			Label: *ast.Alias{
@@ -100,11 +90,8 @@ embed: {
 					Name: "e"
 				}
 			}
-			Alias: nil
-			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:4:4", nospace)
 			Value: *ast.StructLit{
-				Lbrace: token.Pos("-")
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.ListLit{
@@ -124,27 +111,20 @@ embed: {
 							}
 							Rbrack: token.Pos("fields.cue:4:15", nospace)
 						}
-						Alias: nil
-						Constraint: token.Token("ILLEGAL")
 						TokenPos: token.Pos("fields.cue:4:16", nospace)
 						Value: *ast.Ident{
 							NamePos: token.Pos("fields.cue:4:18", blank)
 							Name: "int"
 						}
-						Attrs: []*ast.Attribute{}
 					}
 				}
-				Rbrace: token.Pos("-")
 			}
-			Attrs: []*ast.Attribute{}
 		}
 		*ast.Field{
 			Label: *ast.Ident{
 				NamePos: token.Pos("fields.cue:5:1", newline)
 				Name: "#Schema"
 			}
-			Alias: nil
-			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:5:8", nospace)
 			Value: *ast.StructLit@ref001{
 				Lbrace: token.Pos("fields.cue:5:10", blank)
@@ -154,31 +134,24 @@ embed: {
 							NamePos: token.Pos("fields.cue:6:2", newline)
 							Name: "name"
 						}
-						Alias: nil
-						Constraint: token.Token("ILLEGAL")
 						TokenPos: token.Pos("fields.cue:6:6", nospace)
 						Value: *ast.Ident{
 							NamePos: token.Pos("fields.cue:6:8", blank)
 							Name: "string"
 						}
-						Attrs: []*ast.Attribute{}
 					}
 					*ast.Ellipsis{
 						Ellipsis: token.Pos("fields.cue:7:2", newline)
-						Type: nil
 					}
 				}
 				Rbrace: token.Pos("fields.cue:8:1", newline)
 			}
-			Attrs: []*ast.Attribute{}
 		}
 		*ast.Field{
 			Label: *ast.Ident{
 				NamePos: token.Pos("fields.cue:9:1", newline)
 				Name: "embed"
 			}
-			Alias: nil
-			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:9:6", nospace)
 			Value: *ast.StructLit{
 				Lbrace: token.Pos("fields.cue:9:8", blank)
@@ -193,10 +166,8 @@ embed: {
 				}
 				Rbrace: token.Pos("fields.cue:11:1", newline)
 			}
-			Attrs: []*ast.Attribute{}
 		}
 	}
-	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
 }
 -- out/debugprint/fields.cue/omitempty-strings --

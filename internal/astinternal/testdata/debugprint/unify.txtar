@@ -10,8 +10,6 @@ disjunctoin: b | c | *d
 				NamePos: token.Pos("unify.txtar:1:1", nospace)
 				Name: "unification"
 			}
-			Alias: nil
-			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("unify.txtar:1:12", nospace)
 			Value: *ast.BinaryExpr{
 				X: *ast.BinaryExpr{
@@ -33,15 +31,12 @@ disjunctoin: b | c | *d
 					Name: "d"
 				}
 			}
-			Attrs: []*ast.Attribute{}
 		}
 		*ast.Field{
 			Label: *ast.Ident{
 				NamePos: token.Pos("unify.txtar:2:1", newline)
 				Name: "disjunctoin"
 			}
-			Alias: nil
-			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("unify.txtar:2:12", nospace)
 			Value: *ast.BinaryExpr{
 				X: *ast.BinaryExpr{
@@ -67,10 +62,8 @@ disjunctoin: b | c | *d
 					}
 				}
 			}
-			Attrs: []*ast.Attribute{}
 		}
 	}
-	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
 }
 -- out/debugprint/unify.txtar/omitempty-strings --

@@ -16,8 +16,6 @@ import (
 -- out/debugprint/empty.cue --
 *ast.File{
 	Filename: "empty.cue"
-	Decls: []ast.Decl{}
-	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
 }
 -- out/debugprint/package_only.cue --
@@ -32,20 +30,14 @@ import (
 			}
 		}
 	}
-	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
 }
 -- out/debugprint/comments_only.cue --
 *ast.File{
 	Filename: "comments_only.cue"
-	Decls: []ast.Decl{}
-	Imports: []*ast.ImportSpec{}
 	LanguageVersion: "v0.13.0"
 	Comments: []*ast.CommentGroup{
 		{
-			Doc: false
-			Line: false
-			Position: 0
 			List: []*ast.Comment{
 				{
 					Slash: token.Pos("comments_only.cue:1:1", newline)
@@ -72,32 +64,26 @@ import (
 		}
 		*ast.ImportDecl{
 			Import: token.Pos("imports.cue:3:1", section)
-			Lparen: token.Pos("-")
 			Specs: []*ast.ImportSpec{
 				{
-					Name: nil
 					Path: *ast.BasicLit{
 						ValuePos: token.Pos("imports.cue:3:8", blank)
 						Kind: token.Token("STRING")
 						Value: "\"foo\""
 					}
-					EndPos: token.Pos("-")
 				}
 			}
-			Rparen: token.Pos("-")
 		}
 		*ast.ImportDecl{
 			Import: token.Pos("imports.cue:5:1", section)
 			Lparen: token.Pos("imports.cue:5:8", blank)
 			Specs: []*ast.ImportSpec{
 				{
-					Name: nil
 					Path: *ast.BasicLit{
 						ValuePos: token.Pos("imports.cue:6:2", newline)
 						Kind: token.Token("STRING")
 						Value: "\"bar\""
 					}
-					EndPos: token.Pos("-")
 				}
 				{
 					Name: *ast.Ident{
@@ -109,7 +95,6 @@ import (
 						Kind: token.Token("STRING")
 						Value: "\"baz\""
 					}
-					EndPos: token.Pos("-")
 				}
 			}
 			Rparen: token.Pos("imports.cue:8:1", newline)
@@ -117,22 +102,18 @@ import (
 	}
 	Imports: []*ast.ImportSpec{
 		{
-			Name: nil
 			Path: *ast.BasicLit{
 				ValuePos: token.Pos("imports.cue:3:8", blank)
 				Kind: token.Token("STRING")
 				Value: "\"foo\""
 			}
-			EndPos: token.Pos("-")
 		}
 		{
-			Name: nil
 			Path: *ast.BasicLit{
 				ValuePos: token.Pos("imports.cue:6:2", newline)
 				Kind: token.Token("STRING")
 				Value: "\"bar\""
 			}
-			EndPos: token.Pos("-")
 		}
 		{
 			Name: *ast.Ident{
@@ -144,7 +125,6 @@ import (
 				Kind: token.Token("STRING")
 				Value: "\"baz\""
 			}
-			EndPos: token.Pos("-")
 		}
 	}
 	LanguageVersion: "v0.13.0"

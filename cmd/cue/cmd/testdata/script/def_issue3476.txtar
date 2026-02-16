@@ -20,6 +20,6 @@ _#def: {
 //cue:path: #c
 let C = {
 	#x: {
-		[string]: C.#x
+		[string]: #x
 	}
 }

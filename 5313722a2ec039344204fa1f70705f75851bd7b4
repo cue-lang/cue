@@ -16,6 +16,24 @@
       "message": "Can remove [0]",
       "revId": "5313722a2ec039344204fa1f70705f75851bd7b4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d852575e_e354e78e",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-16T16:39:38Z",
+      "side": 1,
+      "message": "as discussed, we can\u0027t, because of the TODO above",
+      "parentUuid": "7c5e67f3_602fa9ed",
+      "revId": "5313722a2ec039344204fa1f70705f75851bd7b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -33,6 +33,24 @@
       "message": "Unsurprisingly, the Unity failure is surfacing an actual bug in third party user code!\n\n\u003e \tkind:       v1.#PrometheusKind\n\nThis definition does not exist; they actually meant:\n\n\u003e \tkind:       v1.#PrometheusesKind",
       "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e8df80a_ef518dec",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-02-16T23:19:28Z",
+      "side": 1,
+      "message": "I\u0027ll coordinate with the maintainer to fix this before this can be mergeable.",
+      "parentUuid": "c275e51d_e78f7d5e",
+      "revId": "988fa867294c9ed70899259570b8dbb71ad163a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

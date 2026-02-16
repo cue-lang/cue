@@ -91,6 +91,10 @@ type pivotter struct {
 	refs   []*refData
 	refMap map[adt.Resolver]*refData
 
+	// inlining tracks vertices currently being inlined by refExpr to prevent
+	// infinite recursion on recursive definitions like [string]: #c.
+	inlining map[*adt.Vertex]bool
+
 	decls []ast.Decl
 }
 
@@ -432,11 +436,18 @@ func (p *pivotter) refExpr(r adt.Resolver) ast.Expr {
 		// Don't simplify for errors to make the position of the error clearer.
 	case !n.IsConcrete() && p.x.inExpression > 0:
 		// Don't simplify an expression that is known will fail.
+	case p.inlining[n]:
+		// Prevent infinite recursion on recursive definitions.
 	case dst.usageCount() == 1 && p.x.inExpression == 0:
 		// Used only once.
 		fallthrough
 	case n.IsConcrete() && len(n.Arcs) == 0:
 		// Simple scalar value.
+		if p.inlining == nil {
+			p.inlining = map[*adt.Vertex]bool{}
+		}
+		p.inlining[n] = true
+		defer delete(p.inlining, n)
 		return p.x.expr(nil, n)
 	}
 

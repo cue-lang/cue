@@ -1,0 +1,25 @@
+# Verify that cue def does not stack overflow on recursive definitions.
+# Issue #3476.
+
+exec cue def -e '#a' in.cue
+cmp stdout stdout.golden
+
+-- in.cue --
+#a:  (#b & {x: _}).x
+#b: {
+    x?: #c
+    #c: [string]: #c
+}
+-- stdout.golden --
+
+_#def
+_#def: {
+	[string]: [string]: C.#x
+}
+
+//cue:path: #c
+let C = {
+	#x: {
+		[string]: C.#x
+	}
+}

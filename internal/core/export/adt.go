@@ -411,6 +411,9 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 					ident := ast.NewIdent(aliasFromLabel(f))
 					ident.Node = entry.field
 					ident.Scope = entry.scope
+					if x.Optional {
+						return &ast.PostfixExpr{X: ident, Op: token.OPTION}
+					}
 					return ident
 				}
 			}
@@ -438,6 +441,9 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 			}
 		}
 
+		if x.Optional {
+			return &ast.PostfixExpr{X: ident, Op: token.OPTION}
+		}
 		return ident
 
 	case *adt.ValueReference:
@@ -506,16 +512,24 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 		return e.resolveLet(env, x)
 
 	case *adt.SelectorExpr:
-		return &ast.SelectorExpr{
+		sel := &ast.SelectorExpr{
 			X:   e.innerExpr(env, x.X),
 			Sel: e.stringLabel(x.Sel),
 		}
+		if x.Optional {
+			return &ast.PostfixExpr{X: sel, Op: token.OPTION}
+		}
+		return sel
 
 	case *adt.IndexExpr:
-		return &ast.IndexExpr{
+		idx := &ast.IndexExpr{
 			X:     e.innerExpr(env, x.X),
 			Index: e.innerExpr(env, x.Index),
 		}
+		if x.Optional {
+			return &ast.PostfixExpr{X: idx, Op: token.OPTION}
+		}
+		return idx
 	}
 	panic("unreachable")
 }
@@ -775,6 +789,23 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 			defer e.popFrame(saved)
 
 			e.addField(x.Label, nil, clause)
+
+		case *adt.TryClause:
+			clause := &ast.TryClause{}
+			if x.Label != adt.InvalidLabel {
+				// Assignment form: try x = expr
+				env = &adt.Environment{Up: env, Vertex: empty}
+				clause.Ident = e.ident(x.Label)
+				clause.Expr = e.innerExpr(env, x.Expr)
+
+				_, saved := e.pushFrame(empty, nil)
+				defer e.popFrame(saved)
+
+				e.addField(x.Label, nil, clause)
+			}
+			// Struct form has no Ident/Expr - body is in Comprehension.Value
+			e.copyMeta(clause, x.Src)
+			c.Clauses = append(c.Clauses, clause)
 
 		case *adt.ValueClause:
 			// Can occur in nested comprehenions.

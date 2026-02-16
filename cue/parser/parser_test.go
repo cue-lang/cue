@@ -584,6 +584,78 @@ cannot import package as definition identifier`,
 			out: `{a: [for x in [] {x} else {0}]}`,
 		},
 		{
+			desc:    "try struct form",
+			version: "v0.16.0",
+			in: `@experiment(try)
+		{
+			a: { try { x: val? } }
+		}`,
+			out: `@experiment(try), {a: {try {x: val?}}}`,
+		},
+		{
+			desc:    "try with else",
+			version: "v0.16.0",
+			in: `@experiment(try)
+		{
+			a: { try { x: val? } else { y: 0 } }
+		}`,
+			out: `@experiment(try), {a: {try {x: val?} else {y: 0}}}`,
+		},
+		{
+			desc:    "try assignment form",
+			version: "v0.16.0",
+			in: `@experiment(try)
+		{
+			a: { try v = x? { y: v } }
+		}`,
+			out: `@experiment(try), {a: {try v = x? {y: v}}}`,
+		},
+		{
+			desc:    "try assignment with else",
+			version: "v0.16.0",
+			in: `@experiment(try)
+		{
+			a: { try v = x? { y: v } else { z: 0 } }
+		}`,
+			out: `@experiment(try), {a: {try v = x? {y: v} else {z: 0}}}`,
+		},
+		{
+			desc:    "for with try clause",
+			version: "v0.16.0",
+			in: `@experiment(try)
+		{
+			a: { for k, v in obj try { "\(k)": v? } }
+		}`,
+			out: `@experiment(try), {a: {for k: v in obj try {"\(k)": v?}}}`,
+		},
+		{
+			desc:    "chained try clauses",
+			version: "v0.16.0",
+			in: `@experiment(try)
+		{
+			a: { try x = a? try y = b? { sum: x + y } }
+		}`,
+			out: `@experiment(try), {a: {try x = a? try y = b? {sum: x+y}}}`,
+		},
+		{
+			desc:    "optional on selector",
+			version: "v0.16.0",
+			in: `@experiment(try)
+		{
+			a: { try { x: obj.field? } }
+		}`,
+			out: `@experiment(try), {a: {try {x: obj.field?}}}`,
+		},
+		{
+			desc:    "optional on index",
+			version: "v0.16.0",
+			in: `@experiment(try)
+		{
+			a: { try { x: list[0]? } }
+		}`,
+			out: `@experiment(try), {a: {try {x: list[0]?}}}`,
+		},
+		{
 			desc:    "multiple else clauses error",
 			version: "v0.16.0",
 			in: `{

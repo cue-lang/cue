@@ -376,6 +376,15 @@ func DebugStr(x interface{}) (out string) {
 		out += DebugStr(v.Expr)
 		return out
 
+	case *ast.TryClause:
+		out := "try"
+		if v.Ident != nil {
+			// Assignment form: try x = expr
+			out += " " + DebugStr(v.Ident) + " = " + DebugStr(v.Expr)
+		}
+		// Struct form: body is in Comprehension.Value
+		return out
+
 	case *ast.Alias:
 		out := DebugStr(v.Ident)
 		out += "="

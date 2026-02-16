@@ -79,6 +79,15 @@ type File struct {
 	// Spec change:   https://cuelang.org/cl/1222377
 	// Requires cue fix when upgrading
 	AliasV2 bool `experiment:"preview:v0.15.0"`
+
+	// Try enables the try clause and optional reference markers (?).
+	// The try clause allows conditional field inclusion based on whether
+	// optional references resolve. The ? marker on references (a?, a.b?, a[i]?)
+	// is only valid within a try context.
+	//
+	// Proposal:      https://cuelang.org/issue/4019
+	// Spec change:   https://cuelang.org/cl/1231444
+	Try bool `experiment:"preview:v0.16.0"`
 }
 
 // LanguageVersion returns the language version of the file or "" if no language

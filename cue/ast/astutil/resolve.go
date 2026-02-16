@@ -232,7 +232,7 @@ func (s *scope) isLet(n ast.Node) bool {
 		return true
 	}
 	switch n.(type) {
-	case *ast.LetClause, *ast.Alias, *ast.Field:
+	case *ast.LetClause, *ast.TryClause, *ast.Alias, *ast.Field:
 		return true
 	}
 	return false
@@ -245,7 +245,7 @@ func (s *scope) mustBeUnique(n ast.Node) bool {
 	switch n.(type) {
 	// TODO: add *ast.ImportSpec when some implementations are moved over to
 	// Sanitize.
-	case *ast.ImportSpec, *ast.LetClause, *ast.Alias, *ast.Field:
+	case *ast.ImportSpec, *ast.LetClause, *ast.TryClause, *ast.Alias, *ast.Field:
 		return true
 	}
 	return false
@@ -480,6 +480,21 @@ func (s *scope) Before(n ast.Node) bool {
 		s.index[name] = saved
 		return false
 
+	case *ast.TryClause:
+		// For the assignment form (try x = expr), disallow referring to the
+		// current LHS name.
+		if x.Ident != nil {
+			name := x.Ident.Name
+			saved := s.index[name]
+			delete(s.index, name) // The same name may still appear in another scope
+
+			ast.Walk(x.Expr, s.Before, nil)
+			s.index[name] = saved
+			return false
+		}
+		// For the struct form (try { ... }), just walk normally.
+		return true
+
 	case *ast.Alias:
 		// Disallow referring to the current LHS name.
 		name := x.Ident.Name
@@ -552,6 +567,17 @@ func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 			ast.Walk(x.Expr, s.Before, nil)
 			s = newScope(s.file, s, x, nil)
 			s.insert(x.Ident.Name, x.Ident, x, nil)
+
+		case *ast.TryClause:
+			// For the assignment form (try x = expr), handle scope like LetClause.
+			if x.Ident != nil {
+				ast.Walk(x.Expr, s.Before, nil)
+				s = newScope(s.file, s, x, nil)
+				s.insert(x.Ident.Name, x.Ident, x, nil)
+			} else {
+				// For the struct form (try { ... }), just walk normally.
+				ast.Walk(c, s.Before, nil)
+			}
 
 		default:
 			ast.Walk(c, s.Before, nil)

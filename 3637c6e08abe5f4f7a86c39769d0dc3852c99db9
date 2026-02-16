@@ -16,6 +16,24 @@
       "message": "please document why we turn this off by default, unlike upstream\u0027s default, because this is quite important. I worry that later on we could remove this line thinking it\u0027s unnecessary.",
       "revId": "3637c6e08abe5f4f7a86c39769d0dc3852c99db9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "520291a7_46af4767",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-02-16T15:29:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb198437_5a5a2ddd",
+      "revId": "3637c6e08abe5f4f7a86c39769d0dc3852c99db9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,139 @@
+// Issue #4210
+//
+// CUE hangs when evaluating expressions like `a: b: c: {a}.b` — a structural
+// cycle where a cyclic reference is embedded within braces and followed by a
+// selector. Without braces (`a: b: c: a.b`), the cycle is correctly detected.
+-- in.cue --
+t1: {
+	a: b: c: {a}.b
+}
+t2: {
+	a: b: c: {a & _}.b
+}
+t3: {
+	a: b: c: d: {a.b}.c
+}
+t4: {
+	x: y: z: {a}.y
+	a: x
+}
+-- out/evalalpha --
+Errors:
+t1.a.b.c.c: structural cycle
+t2.a.b.c.c: structural cycle
+t3.a.b.c.d.d: structural cycle
+t4.x.y.z.z: structural cycle
+
+Result:
+(_|_){
+  // [structural cycle]
+  t1: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        c: (_|_){
+          // [structural cycle]
+          c: (_|_){
+            // [structural cycle] t1.a.b.c.c: structural cycle
+          }
+        }
+      }
+    }
+  }
+  t2: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        c: (_|_){
+          // [structural cycle]
+          c: (_|_){
+            // [structural cycle] t2.a.b.c.c: structural cycle
+          }
+        }
+      }
+    }
+  }
+  t3: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        c: (_|_){
+          // [structural cycle]
+          d: (_|_){
+            // [structural cycle]
+            d: (_|_){
+              // [structural cycle] t3.a.b.c.d.d: structural cycle
+            }
+          }
+        }
+      }
+    }
+  }
+  t4: (_|_){
+    // [structural cycle]
+    x: (_|_){
+      // [structural cycle]
+      y: (_|_){
+        // [structural cycle]
+        z: (_|_){
+          // [structural cycle]
+          z: (_|_){
+            // [structural cycle] t4.x.y.z.z: structural cycle
+          }
+        }
+      }
+    }
+    a: (_|_){
+      // [structural cycle] t4.x.y.z.z: structural cycle
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    a: {
+      b: {
+        c: {
+          〈3;a〉
+        }.b
+      }
+    }
+  }
+  t2: {
+    a: {
+      b: {
+        c: {
+          (〈3;a〉 & _)
+        }.b
+      }
+    }
+  }
+  t3: {
+    a: {
+      b: {
+        c: {
+          d: {
+            〈4;a〉.b
+          }.c
+        }
+      }
+    }
+  }
+  t4: {
+    x: {
+      y: {
+        z: {
+          〈3;a〉
+        }.y
+      }
+    }
+    a: 〈0;x〉
+  }
+}

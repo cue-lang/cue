@@ -499,8 +499,20 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 
 			return n.markCyclicPath(arc, env, x, ci)
 		}
-		if equalDeref(r.Node, n.node) && r.Ref == x && arc.nonRooted {
-			return n.markCyclicPath(arc, env, x, ci)
+		if r.Ref == x && arc.nonRooted {
+			if equalDeref(r.Node, n.node) {
+				return n.markCyclicPath(arc, env, x, ci)
+			}
+			// Also detect cycles through StructLit inline vertices
+			// (e.g. {a}.b), where each evaluation creates a fresh
+			// vertex that prevents matching by identity above.
+			// We identify these as IsDynamic with no Parent (unlike
+			// let vertices which have Parent set).
+			if p := arc.Parent; r.Arc.nonRooted &&
+				p != nil && p.IsDynamic && p.Parent == nil &&
+				p.state != nil && p.state.hasAncestorCycle {
+				return n.markCyclic(arc, env, x, ci)
+			}
 		}
 	}
 

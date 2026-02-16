@@ -235,6 +235,15 @@ func (w *Workspace) Completion(file *File, fe *eval.FileEvaluator, srcMapper *pr
 			w.debugLog(rangeErr.Error())
 		}
 
+		if isJsonSrc && completionRange.Start != completionRange.End {
+			// If we're in JSON (so field names are quoted) and we're
+			// replacing an existing field name (so Start != End), then
+			// we should expand the range by 1 each end to cover the
+			// existing quotes.
+			completionRange.Start.Character -= 1
+			completionRange.End.Character += 1
+		}
+
 		// According to the LSP spec, TextEdits must be entirely on the
 		// same line as offset (the cursor position), and must include
 		// offset. If we're in the middle of a selector that's spread
@@ -253,7 +262,7 @@ func (w *Workspace) Completion(file *File, fe *eval.FileEvaluator, srcMapper *pr
 
 		// Testing shows, and general advice seems to be, that the
 		// completions should have their range finish at the current
-		// cursor position. This is not ideal as it makes replacing
+		// cursor position. This is not ideal as it means replacing
 		// existing tokens won't quite work correctly, but not trimming
 		// this End causes problematic behaviour in popular editors.
 		//

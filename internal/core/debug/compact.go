@@ -210,6 +210,9 @@ func (w *printer) compactNode(n adt.Node) {
 
 	case *adt.FieldReference:
 		w.label(x.Label)
+		if x.Optional {
+			w.string("?")
+		}
 
 	case *adt.ValueReference:
 		w.label(x.Label)
@@ -234,12 +237,18 @@ func (w *printer) compactNode(n adt.Node) {
 		w.node(x.X)
 		w.string(".")
 		w.label(x.Sel)
+		if x.Optional {
+			w.string("?")
+		}
 
 	case *adt.IndexExpr:
 		w.node(x.X)
 		w.string("[")
 		w.node(x.Index)
 		w.string("]")
+		if x.Optional {
+			w.string("?")
+		}
 
 	case *adt.SliceExpr:
 		w.node(x.X)
@@ -377,6 +386,17 @@ func (w *printer) compactNode(n adt.Node) {
 		w.string(" = ")
 		w.node(x.Expr)
 		w.string(" ")
+
+	case *adt.TryClause:
+		w.string("try ")
+		if x.Label != adt.InvalidLabel {
+			// Assignment form: try x = expr
+			w.ident(x.Label)
+			w.string(" = ")
+			w.node(x.Expr)
+			w.string(" ")
+		}
+		// Struct form has no Ident/Expr - body is in Comprehension.Value
 
 	case *adt.ValueClause:
 

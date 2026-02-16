@@ -41,6 +41,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+          persist-credentials: false
       - name: Reset git directory modification times
         run: touch -t 202211302355 $(find * -type d)
       - name: Restore git file modification times

@@ -105,6 +105,7 @@ const (
 	FOR  // for
 	IN   // in
 	LET  // let
+	TRY  // try
 	// experimental
 	FUNC // func
 

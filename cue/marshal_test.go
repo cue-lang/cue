@@ -108,6 +108,17 @@ func TestMarshalMultiPackage(t *testing.T) {
 		Object: "World"
 		`),
 	}
+	// pkg1dep is the same as pkg1 but not a root instance;
+	// it's only present as a dependency.
+	pkg1dep := &instanceData{
+		false,
+		"mod.test/foo/pkg1",
+		files(`
+		package pkg1
+
+		Object: "World"
+		`),
+	}
 	pkg2 := &instanceData{
 		true,
 		"mod.test/foo/pkg2",
@@ -164,6 +175,18 @@ func TestMarshalMultiPackage(t *testing.T) {
 		"Hello \(pkg.Number)!"`),
 		}),
 		`"Hello 12!"`,
+	}, {
+		// Test that a non-root dependency is correctly included
+		// in the marshaled data.
+		insts(pkg1dep, &instanceData{true, "",
+			files(
+				`package test
+
+		import "mod.test/foo/pkg1"
+
+		"Hello \(pkg1.Object)!"`),
+		}),
+		`"Hello World!"`,
 	}}
 
 	strValue := func(a []*Instance) (ret []string) {

@@ -218,11 +218,11 @@ diff old new
 -- out/compile --
 --- in.cue
 {
-  _taxPayer: {
+  _taxPayer(:p): {
     self: {}
   }
   let sam#1 = {
-    taxPayer: 〈1;_taxPayer〉
+    taxPayer: 〈1;_taxPayer(:p)〉
   }
   assert: {
     invoke: 〈1;let sam#1〉
@@ -233,7 +233,7 @@ diff old new
   }
   subject: {
     in: 〈1;#ReturnData〉
-    _computed: (〈1;#computeF1040〉 & {
+    _computed(:p): (〈1;#computeF1040〉 & {
       in: 〈1;in〉
     })
   }

@@ -72,67 +72,6 @@ Disjuncts:    75
 MisalignedConjunct: 5
 
 NumCloseIDs: 1
--- out/eval --
-(struct){
-  service: (struct){
-    "node-exporter": (struct){
-      spec: (struct){
-        ports: (#list){
-          0: (struct){
-            name: (string){ "metrics" }
-            port: (int){ 9100 }
-            protocol: (string){ "TCP" }
-            let Port#1 = (int){ 9100 }
-            targetPort: (int){ |(*(int){ 9100 }, (int){ int }) }
-          }
-        }
-        selector: (_|_){
-          // [incomplete] service."node-exporter".spec.selector: undefined field: metadata:
-          //     ./in.cue:48:35
-        }
-      }
-    }
-  }
-  deployment: (struct){
-    "node-exporter": (struct){
-      spec: (struct){
-        template: (struct){
-          spec: (struct){
-            containers: (#list){
-              0: (struct){
-                ports: (#list){
-                  0: (struct){
-                    containerPort: (int){ 9100 }
-                    name: (string){ "scrape" }
-                    _export(:kube): (bool){ |(*(bool){ true }, (bool){ false }) }
-                  }
-                }
-                name: (string){ string }
-              }
-            }
-          }
-        }
-      }
-      _name(:kube): (string){ string }
-    }
-  }
-  _spec(:kube): (struct){
-    _name(:kube): (string){ string }
-    spec: (struct){
-      template: (struct){
-        spec: (struct){
-          containers: (#list){
-            0: (struct){
-              name: (string){ string }
-              ports: (list){
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {
@@ -233,6 +172,67 @@ NumCloseIDs: 1
               targetPort: (*〈0;let Port#1〉|int)
             },
           ]
+        }
+      }
+    }
+  }
+}
+-- out/evalalpha --
+(struct){
+  service: (struct){
+    "node-exporter": (struct){
+      spec: (struct){
+        ports: (#list){
+          0: (struct){
+            name: (string){ "metrics" }
+            port: (int){ 9100 }
+            protocol: (string){ "TCP" }
+            let Port#1 = (int){ 9100 }
+            targetPort: (int){ |(*(int){ 9100 }, (int){ int }) }
+          }
+        }
+        selector: (_|_){
+          // [incomplete] service."node-exporter".spec.selector: undefined field: metadata:
+          //     ./in.cue:48:35
+        }
+      }
+    }
+  }
+  deployment: (struct){
+    "node-exporter": (struct){
+      spec: (struct){
+        template: (struct){
+          spec: (struct){
+            containers: (#list){
+              0: (struct){
+                ports: (#list){
+                  0: (struct){
+                    containerPort: (int){ 9100 }
+                    name: (string){ "scrape" }
+                    _export(:kube): (bool){ |(*(bool){ true }, (bool){ false }) }
+                  }
+                }
+                name: (string){ string }
+              }
+            }
+          }
+        }
+      }
+      _name(:kube): (string){ string }
+    }
+  }
+  _spec(:kube): (struct){
+    _name(:kube): (string){ string }
+    spec: (struct){
+      template: (struct){
+        spec: (struct){
+          containers: (#list){
+            0: (struct){
+              name: (string){ string }
+              ports: (list){
+              }
+            }
+          }
         }
       }
     }

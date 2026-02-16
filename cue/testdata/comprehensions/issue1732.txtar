@@ -778,15 +778,15 @@ diff old new
     formatOutput: {
       ...
     }
-    _outputs: {
+    _outputs(:config): {
       ...
     }
     for _chartName, _chartValues in 〈0;charts〉 {
-      _outputs: {
-        "\(〈2;_chartName〉)": {}
+      _outputs(:config): {
+        "\(〈2;_chartName(:config)〉)": {}
       }
     }
-    _outputs: {
+    _outputs(:config): {
       for _, ns in [
         "ns",
       ] {
@@ -825,7 +825,7 @@ diff old new
     for _, ns in [
       "ns",
     ] {
-      for k, v in 〈2;_outputs〉 {
+      for k, v in 〈2;_outputs(:config)〉 {
         formatOutput: {
           "\(〈2;k〉)": 〈2;v〉
         }

@@ -20,7 +20,6 @@ import (
 	"encoding/gob"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -98,7 +97,6 @@ func compileInstances(r *Runtime, data []*instanceData) (instances []*Instance, 
 		}
 		builds = append(builds, b.build(i))
 	}
-
 	return r.BuildInstances(builds)
 }
 
@@ -142,6 +140,7 @@ func (r *Runtime) Marshal(values ...InstanceOrValue) (b []byte, err error) {
 	var errs errors.Error
 
 	var stageInstance func(i Value) (pos int)
+	allStaged := make(map[*build.Instance]bool)
 	stageInstance = func(i Value) (pos int) {
 		inst := i.BuildInstance()
 		if p, ok := done[inst.ImportPath]; ok {
@@ -149,10 +148,12 @@ func (r *Runtime) Marshal(values ...InstanceOrValue) (b []byte, err error) {
 		}
 		// TODO: support exporting instance
 		file, _ := export.Def(r.runtime(), inst.ID(), i.instance().root)
-		imports := []string{}
+		imports := make(map[*build.Instance]bool)
 		for spec := range file.ImportSpecs() {
 			path, _ := strconv.Unquote(spec.Path.Value)
-			imports = append(imports, path)
+			if impInst := inst.LookupImport(path); impInst != nil {
+				imports[impInst] = true
+			}
 		}
 
 		if inst.PkgName != "" {
@@ -193,21 +194,22 @@ func (r *Runtime) Marshal(values ...InstanceOrValue) (b []byte, err error) {
 
 		p := len(staged) - 1
 
-		for _, imp := range imports {
-			i := getImportFromPath(r.runtime(), imp)
-			if i == nil || !strings.Contains(imp, ".") {
-				continue // a builtin package.
+		for impInst := range imports {
+			if allStaged[impInst] {
+				continue
 			}
-			stageInstance(i.Value())
+			if v := r.runtime().LoadInstance(impInst); v != nil {
+				allStaged[impInst] = true
+				imp := getImportFromBuild(r.runtime(), impInst, v)
+				stageInstance(imp.Value())
+			}
 		}
 
 		return p
 	}
-
 	for _, val := range values {
 		staged[stageInstance(val.Value())].Root = true
 	}
-
 	buf := &bytes.Buffer{}
 	buf.WriteByte(version)
 

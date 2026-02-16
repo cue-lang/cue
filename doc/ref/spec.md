@@ -254,7 +254,7 @@ package      import
 The following keywords are used in comprehensions.
 
 ```
-for          in           if           let          else
+for          in           if           let          else         try
 ```
 
 <!--
@@ -2592,10 +2592,10 @@ function returns.
 Lists and fields can be constructed using comprehensions.
 
 Comprehensions define a clause sequence that consists of a sequence of
-`for`, `if`, and `let` clauses, nesting from left to right.
-The sequence must start with a `for` or `if` clause.
-The `for` and `let` clauses each define a new scope in which new values are
-bound to be available for the next clause.
+`for`, `if`, `let`, and `try` clauses, nesting from left to right.
+The sequence must start with a `for`, `if`, or `try` clause.
+The `for`, `let`, and `try` (assignment form) clauses each define a new scope
+in which new values are bound to be available for the next clause.
 
 The `for` clause binds the defined identifiers, on each iteration, to the next
 value of some iterable value in a new scope.
@@ -2613,6 +2613,23 @@ iteration if it evaluates to false.
 
 The `let` clause binds the result of an expression to the defined identifier
 in a new scope.
+
+The `try` clause enables conditional field inclusion based on whether
+optional references resolve successfully.
+A `try` clause has two forms: the binding form (`try x = expr`) and
+a naked `try`.
+In the latter case it must be the last clause and the comprehension value
+will be used as the try expression.
+
+Within a `try` expression, references may be marked with a `?` suffix
+(e.g., `a?`, `a.b?.c`, `a[foo?]?`) to indicate optional evaluation.
+If any `?`-marked reference fails to resolve because the referenced field
+does not exist or is optional and undefined, the entire `try` clause
+silently discards its output. Other errors propagate normally.
+
+In the binding form, the expression after `=` is evaluated and,
+if successful, bound to the identifier for use in subsequent clauses
+and the comprehension body.
 
 A current iteration is said to complete if the innermost block of the clause
 sequence is reached.
@@ -2645,11 +2662,12 @@ the error propagates rather than triggering the else clause.
 Comprehension       = Clauses StructLit [ ElseClause ] .
 
 Clauses             = StartClause { [ "," ] Clause } .
-StartClause         = ForClause | GuardClause .
+StartClause         = ForClause | GuardClause | TryClause .
 Clause              = StartClause | LetClause .
 ForClause           = "for" identifier [ "," identifier ] "in" Expression .
 GuardClause         = "if" Expression .
 LetClause           = "let" identifier "=" Expression .
+TryClause           = "try" [ identifier "=" Expression ] .
 ElseClause          = "else" StructLit .
 ```
 
@@ -2683,6 +2701,53 @@ i: {
     for x in [] { x } else { fallback: threshold }
 }
 j: { fallback: 10 }
+
+// try clause examples (requires @experiment(try))
+@experiment(try)
+
+// struct form: include fields only if optional references resolve
+k: {
+    x: 1
+    try { y: x? } // { y: 1 }
+}
+
+// try with else: fallback when reference doesn't resolve
+m: {
+    optField?: int
+    try { y: optField? } else { z: 0 } // z: 0
+}
+
+// binding form: bind result to identifier
+o: {
+    x: 1
+    try v = x? { y: v + 1 } // y: 2
+}
+
+// chained try clauses
+q: {
+    a: 1
+    b: 2
+    try x = a? try y = b? { sum: x + y } // sum: 3
+}
+
+// optional marker on selector and index expressions
+s: {
+    obj: { field: 1 }
+    list: [1, 2, 3]
+    try { a: obj.field?, b: list[0]? } // { a: 1, b: 1 }
+}
+
+t: {
+    a:  1
+    b?: int
+    try { aa: a?, bb: b? } else { cc: "missing b" } // cc: "missing b"
+}
+
+// for with try: process items conditionally
+u: {
+    items: [{ val: 1 }, { other: 2 }, { val: 3 }]
+    for i, item in items try { "a\(i)": item.val? } // { "a0": 1, "a2": 3 }
+}
 ```
 
 
